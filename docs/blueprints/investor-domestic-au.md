@@ -2,7 +2,7 @@
 
 > Part of the **Vietnamese Diaspora Property Platform** document set. See [README.md](../README.md) for the full index.
 >
-> **This is a working specification** for the investor blueprint serving Vietnamese-Australian citizens/PRs investing in Australian property. Companion specs: [fhb-domestic-au-v1.0.md](fhb-domestic-au-v1.0.md) (Mode A FHB), [fhb-foreign-au-v1.0.md](fhb-foreign-au-v1.0.md) (Mode B foreign FHB), [investor-foreign-au-v1.0.md](investor-foreign-au-v1.0.md) (Mode D foreign investor).
+> **This is a working specification** for the investor blueprint serving Vietnamese-Australian citizens/PRs investing in Australian property. Companion specs: [fhb-domestic-au.md](fhb-domestic-au.md) (Mode A FHB), [fhb-foreign-au.md](fhb-foreign-au.md) (Mode B foreign FHB), [investor-foreign-au.md](investor-foreign-au.md) (Mode D foreign investor).
 
 ---
 
@@ -11,7 +11,6 @@
 ```jsonc
 {
   "blueprint_id": "investor-domestic-au",
-  "version": "1.0",
   "effective_from": "2026-05-19",
   "effective_until": null,
   "buyer_mode": "investor",
@@ -20,7 +19,7 @@
   "firb_required": false,
   "language_primary": "en",
   "language_alternate": "vi",
-  "renderer_set": "investor-v1"
+  "renderer_set": "investor"
 }
 ```
 
@@ -686,7 +685,7 @@ The `mortgage_plan` outcome feeds `yield_modelling.loan_costs` (the loan cost ca
 
 **Parameters:**
 
-Same as [Mode A buying_strategy](fhb-domestic-au-v1.0.md#5-buying_strategy) with these adjustments:
+Same as [Mode A buying_strategy](fhb-domestic-au.md#5-buying_strategy) with these adjustments:
 
 ```jsonc
 {
@@ -727,7 +726,7 @@ Same as [Mode A buying_strategy](fhb-domestic-au-v1.0.md#5-buying_strategy) with
 
 **Parameters:**
 
-Same as [Mode A due_diligence](fhb-domestic-au-v1.0.md#6-due_diligence) with these additions:
+Same as [Mode A due_diligence](fhb-domestic-au.md#6-due_diligence) with these additions:
 
 ```jsonc
 {
@@ -764,7 +763,7 @@ Same as [Mode A due_diligence](fhb-domestic-au-v1.0.md#6-due_diligence) with the
 
 **Parameters:**
 
-Same as [Mode A settlement_prep](fhb-domestic-au-v1.0.md#7-settlement_prep) with these additions:
+Same as [Mode A settlement_prep](fhb-domestic-au.md#7-settlement_prep) with these additions:
 
 ```jsonc
 {
@@ -972,20 +971,20 @@ No cycles. `tax_structure` is on the critical path because it informs `cash_posi
 
 ---
 
-## Open questions for v1.1 iteration
+## Open questions / future iteration
 
-1. **Portfolio-aggregate view** — Mode C investors often have multiple plan cards (one per property). v1.0 captures per-property data; v1.1 should specify how `ownership_planning_investor` outcomes aggregate into a portfolio dashboard.
-2. **SMSF-specific complexity** — SMSF + LRBA arrangements have additional compliance requirements (sole purpose test, trust deed compliance, audit). v1.1 may extract SMSF into a sub-blueprint variant.
-3. **Land tax aggregation across states** — investors with properties in multiple states face state-specific aggregation rules. v1.1 should add a cross-property land tax forecasting flow.
-4. **Rentvest scenario** — investor still rents PPOR while owning investments. v1.0 assumes investor has PPOR; v1.1 should support the rentvest pattern (common among Vietnamese-AU younger investors).
-5. **Commercial property pivot** — v1.0 is residential only. v2.0 may extend to commercial residential, NDIS/SDA, dual-occupancy.
+1. **Portfolio-aggregate view** — Mode C investors often have multiple plan cards (one per property). The current design captures per-property data; a future iteration should specify how `ownership_planning_investor` outcomes aggregate into a portfolio dashboard.
+2. **SMSF-specific complexity** — SMSF + LRBA arrangements have additional compliance requirements (sole purpose test, trust deed compliance, audit). A future iteration may extract SMSF into a sub-blueprint variant.
+3. **Land tax aggregation across states** — investors with properties in multiple states face state-specific aggregation rules. A future iteration should add a cross-property land tax forecasting flow.
+4. **Rentvest scenario** — investor still rents PPOR while owning investments. The current design assumes investor has PPOR; a future iteration should support the rentvest pattern (common among Vietnamese-AU younger investors).
+5. **Commercial property pivot** — currently residential only. A future iteration may extend to commercial residential, NDIS/SDA, dual-occupancy.
 
 ---
 
 ## Document control
 
-- **Status:** v1.0 draft, May 2026 — third concrete blueprint (Mode C investor, domestic)
+- **Status:** draft, May 2026 — third concrete blueprint (Mode C investor, domestic)
 - **Author:** Strategic design synthesis (Claude + maintainer)
-- **Companion blueprints:** [`fhb-domestic-au-v1.0`](fhb-domestic-au-v1.0.md), [`fhb-foreign-au-v1.0`](fhb-foreign-au-v1.0.md). Pending: `investor-foreign-au-v1.0` (Mode D).
+- **Companion blueprints:** [`fhb-domestic-au`](fhb-domestic-au.md), [`fhb-foreign-au`](fhb-foreign-au.md). Pending: `investor-foreign-au` (Mode D).
 - **Direct competitor positioning:** This blueprint produces the same depth of investor analytics HTAG offers, but in Vietnamese + with family-financial-pattern fluency + integrated with the lifecycle (Mode A graduates).
 - **Disclaimer:** This is a working spec, not regulatory or tax advice. Tax entity selection, negative gearing implications, depreciation schedules, CGT projections, and land tax obligations must be verified with a registered tax agent or accountant before commitment. The blueprint produces structured reasoning; the user must confirm strategic decisions with licensed professionals.

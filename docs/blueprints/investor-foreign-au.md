@@ -2,7 +2,7 @@
 
 > Part of the **Vietnamese Diaspora Property Platform** document set. See [README.md](../README.md) for the full index.
 >
-> **This is a working specification** for the investor blueprint serving Vietnam-located investors buying Australian property as investment. Companion specs: [investor-domestic-au-v1.0.md](investor-domestic-au-v1.0.md) (Mode C), [fhb-foreign-au-v1.0.md](fhb-foreign-au-v1.0.md) (Mode B), [fhb-domestic-au-v1.0.md](fhb-domestic-au-v1.0.md) (Mode A).
+> **This is a working specification** for the investor blueprint serving Vietnam-located investors buying Australian property as investment. Companion specs: [investor-domestic-au.md](investor-domestic-au.md) (Mode C), [fhb-foreign-au.md](fhb-foreign-au.md) (Mode B), [fhb-domestic-au.md](fhb-domestic-au.md) (Mode A).
 
 ---
 
@@ -11,7 +11,6 @@
 ```jsonc
 {
   "blueprint_id": "investor-foreign-au",
-  "version": "1.0",
   "effective_from": "2026-05-19",
   "effective_until": null,
   "buyer_mode": "investor",
@@ -20,7 +19,7 @@
   "firb_required": true,
   "language_primary": "vi",
   "language_alternate": "en",
-  "renderer_set": "investor-v1"
+  "renderer_set": "investor"
 }
 ```
 
@@ -232,7 +231,7 @@ Note: Mode D does NOT activate Mode B's Family view tab by default — Vietnam-l
 
 **Parameters:**
 
-Same structure as [Mode C property_assessment](investor-domestic-au-v1.0.md#2-property_assessment-investor-lens) PLUS:
+Same structure as [Mode C property_assessment](investor-domestic-au.md#2-property_assessment-investor-lens) PLUS:
 
 ```jsonc
 {
@@ -287,7 +286,7 @@ Same structure as [Mode C property_assessment](investor-domestic-au-v1.0.md#2-pr
 
 **Inputs:** `investor_profile_foreign.outcome` + `property_fit_investor_foreign.outcome`
 
-**Same as [Mode B firb_workflow](fhb-foreign-au-v1.0.md#4-firb_workflow---new--replaces-mode-a-eligibility)**. No changes for Mode D — same parameters, same outcome schema, same KB anchors. The component is reused across foreign-person blueprints.
+**Same as [Mode B firb_workflow](fhb-foreign-au.md#4-firb_workflow---new--replaces-mode-a-eligibility)**. No changes for Mode D — same parameters, same outcome schema, same KB anchors. The component is reused across foreign-person blueprints.
 
 **Outcome:** `firb_status` (same as Mode B)
 
@@ -307,7 +306,7 @@ Same structure as [Mode C property_assessment](investor-domestic-au-v1.0.md#2-pr
 
 **Parameters:**
 
-Same as [Mode C investment_strategy](investor-domestic-au-v1.0.md#3-investment_strategy-replaces-fhb-eligibility) with these additions and adapted enums:
+Same as [Mode C investment_strategy](investor-domestic-au.md#3-investment_strategy-replaces-fhb-eligibility) with these additions and adapted enums:
 
 ```jsonc
 {
@@ -450,7 +449,7 @@ The `mortgage_plan` outcome feeds `yield_modelling.loan_costs`, `tax_structure_n
 
 **Parameters:**
 
-Same as [Mode C yield_modelling](investor-domestic-au-v1.0.md#4-yield_modelling--new) PLUS:
+Same as [Mode C yield_modelling](investor-domestic-au.md#4-yield_modelling--new) PLUS:
 
 ```jsonc
 {
@@ -665,7 +664,7 @@ Mode D regulatory imposts on a $1M property typically run $130–200k (FIRB appl
 
 **Inputs:** `investor_profile_foreign.outcome` + `budget_envelope_foreign_investor`
 
-**Same as [Mode B cross_border_funding](fhb-foreign-au-v1.0.md#6-cross_border_funding---new)** with one note: Mode D `declared_purpose_category` typically defaults to `property_investment_foreign_direct_investment` rather than `student_tuition_and_living_expenses` (which is Mode B's typical category for student-funding scenarios).
+**Same as [Mode B cross_border_funding](fhb-foreign-au.md#6-cross_border_funding---new)** with one note: Mode D `declared_purpose_category` typically defaults to `property_investment_foreign_direct_investment` rather than `student_tuition_and_living_expenses` (which is Mode B's typical category for student-funding scenarios).
 
 **Outcome:** `transfer_plan` (same as Mode B)
 
@@ -685,7 +684,7 @@ Mode D regulatory imposts on a $1M property typically run $130–200k (FIRB appl
 
 **Parameters:**
 
-Combines [Mode C buying_strategy investor_anchoring](investor-domestic-au-v1.0.md#7-buying_strategy-investor-tactics) with [Mode B firb_gate](fhb-foreign-au-v1.0.md#7-buying_strategy-similar-to-mode-a--firb-approval-gate). Specifically:
+Combines [Mode C buying_strategy investor_anchoring](investor-domestic-au.md#7-buying_strategy-investor-tactics) with [Mode B firb_gate](fhb-foreign-au.md#7-buying_strategy-similar-to-mode-a--firb-approval-gate). Specifically:
 
 ```jsonc
 {
@@ -725,7 +724,7 @@ Combines [Mode C buying_strategy investor_anchoring](investor-domestic-au-v1.0.m
 
 **Parameters:**
 
-Combines [Mode C investor_specific_documents](investor-domestic-au-v1.0.md#8-due_diligence-investor-focus) with [Mode B cross-border documentation](fhb-foreign-au-v1.0.md#8-due_diligence-similar-to-mode-a--cross-border-documentation). All FHB documents plus investor docs plus cross-border docs.
+Combines [Mode C investor_specific_documents](investor-domestic-au.md#8-due_diligence-investor-focus) with [Mode B cross-border documentation](fhb-foreign-au.md#8-due_diligence-similar-to-mode-a--cross-border-documentation). All FHB documents plus investor docs plus cross-border docs.
 
 **Outcome schema:** `risk_assessment_foreign_investor`
 
@@ -743,7 +742,7 @@ Combines [Mode C investor_specific_documents](investor-domestic-au-v1.0.md#8-due
 
 **UI tab hint:** Temporal flow
 
-**Parameters:** Combines [Mode C investor_specific_milestones](investor-domestic-au-v1.0.md#9-settlement_prep-similar-to-mode-a--entity-setup) with [Mode B firb_milestones + currency_transfer_milestones](fhb-foreign-au-v1.0.md#9-settlement_prep--firb-approval-milestone--currency-transfer-milestone).
+**Parameters:** Combines [Mode C investor_specific_milestones](investor-domestic-au.md#9-settlement_prep-similar-to-mode-a--entity-setup) with [Mode B firb_milestones + currency_transfer_milestones](fhb-foreign-au.md#9-settlement_prep--firb-approval-milestone--currency-transfer-milestone).
 
 **Outcome:** `settlement_checklist_foreign` (combines investor + cross-border milestones)
 
@@ -902,22 +901,22 @@ No cycles. Mode D's pipeline has the deepest dependency graph of the four bluepr
 
 ---
 
-## Open questions for v1.1 iteration
+## Open questions / future iteration
 
-1. **Multi-property foreign-investor portfolio** — each new property requires fresh FIRB application + foreign-buyer surcharge. v1.0 captures per-property; v1.1 should specify portfolio-level FIRB compliance tracking.
-2. **VN-AU tax treaty specifics** — the AU-VN double tax agreement has nuances on rental income, capital gains, withholding. v1.1 should embed treaty-specific reasoning in `tax_structure_non_resident`.
-3. **Mode switch on PR grant** — when a Mode D investor's AU-resident status changes (e.g., spouse becomes PR, investor migrates), the plan card should signal migration to Mode C. v1.0 captures the signal; v1.1 should specify the migration UX.
-4. **Currency hedging product integration** — v1.0 surfaces `currency_hedging_strategy` as a parameter but doesn't recommend specific hedging products. v1.1 could integrate with FX hedging providers.
-5. **SMSF for Vietnamese-resident investors** — typically not available (SMSF requires Australian residency for sole purpose test), but worth explicit confirmation. v1.1 should clearly exclude or note.
-6. **Sole-investor vs family-pool variations** — v1.0 supports `co_investor_relationship: family_pool` but doesn't fully specify the family-pool decision authority and disclosure mechanics. v1.1 should formalise.
+1. **Multi-property foreign-investor portfolio** — each new property requires fresh FIRB application + foreign-buyer surcharge. The current design captures per-property; a future iteration should specify portfolio-level FIRB compliance tracking.
+2. **VN-AU tax treaty specifics** — the AU-VN double tax agreement has nuances on rental income, capital gains, withholding. A future iteration should embed treaty-specific reasoning in `tax_structure_non_resident`.
+3. **Mode switch on PR grant** — when a Mode D investor's AU-resident status changes (e.g., spouse becomes PR, investor migrates), the plan card should signal migration to Mode C. The current design captures the signal; a future iteration should specify the refresh UX.
+4. **Currency hedging product integration** — the current design surfaces `currency_hedging_strategy` as a parameter but doesn't recommend specific hedging products. A future iteration could integrate with FX hedging providers.
+5. **SMSF for Vietnamese-resident investors** — typically not available (SMSF requires Australian residency for sole purpose test), but worth explicit confirmation. A future iteration should clearly exclude or note.
+6. **Sole-investor vs family-pool variations** — the current design supports `co_investor_relationship: family_pool` but doesn't fully specify the family-pool decision authority and disclosure mechanics. A future iteration should formalise.
 
 ---
 
 ## Document control
 
-- **Status:** v1.0 draft, May 2026 — fourth and final concrete blueprint (Mode D — foreign investor)
+- **Status:** draft, May 2026 — fourth and final concrete blueprint (Mode D — foreign investor)
 - **Author:** Strategic design synthesis (Claude + maintainer)
-- **Companion blueprints:** [`fhb-domestic-au-v1.0`](fhb-domestic-au-v1.0.md), [`fhb-foreign-au-v1.0`](fhb-foreign-au-v1.0.md), [`investor-domestic-au-v1.0`](investor-domestic-au-v1.0.md)
+- **Companion blueprints:** [`fhb-domestic-au`](fhb-domestic-au.md), [`fhb-foreign-au`](fhb-foreign-au.md), [`investor-domestic-au`](investor-domestic-au.md)
 - **Complexity:** Mode D is the most complex of the four blueprints — combines foreign-person regulatory regime (FIRB, surcharge, vacancy fee, AML, VN capital controls, VN PDP) with investor analytics (yield, tax structure, gearing, portfolio) plus non-resident-specific tax treatment (no CGT discount, no PPOR exemption, FRCGW on sale, AU-VN treaty).
 - **Direct competitor:** HTAG AI Copilot (English / professional). Mode D's wedge is Vietnamese language + foreign-investor compliance handled natively. The Vietnamese investor segment is genuinely underserved by HTAG and all other current AU property tech.
 - **Disclaimer:** This is a working spec, not regulatory, tax, or financial advice. Non-resident tax treatment, FIRB compliance, VN capital controls, AU-VN tax treaty interpretation, AML/CTF requirements, and cross-border entity structures must be verified with Australian-registered tax agents AND Vietnamese-licensed legal counsel before commitment. Wrong advice across two jurisdictions has real consequences for the user in both. The blueprint produces structured reasoning; licensed professionals confirm strategic decisions.

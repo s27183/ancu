@@ -4,7 +4,7 @@
 >
 > **This document covers:** Recommended next steps for a builder pursuing this — user research, regulatory scoping, MVP scope, distribution test, partnership exploration.
 >
-> **Related documents:** [03-strategy.md](03-strategy.md) (the wedge sequence these next steps execute), [04-architecture.md](04-architecture.md) (Claude Code build implications).
+> **Related documents:** [03-strategy.md](03-strategy.md) (the wedge sequence these next steps execute), [architecture/architecture.md](architecture/architecture.md) (Claude Code build implications).
 
 ---
 

@@ -6,9 +6,9 @@
 >
 > - The offline KB agent (Claude Code + maintainer) to validate KB anchor coverage and renderer consistency
 > - The user-facing planning agent at session time (loaded as system prompt context, rendered as plan card UI)
-> - The migration script at deployment time to publish a new blueprint version into the `blueprints` table
+> - The migration script at deployment time to publish the blueprint into the `blueprints` table (replacing the prior deploy; git holds history)
 >
-> Companion specs (to be drafted next): [fhb-foreign-au-v1.0.md](fhb-foreign-au-v1.0.md) (Mode B), [investor-domestic-au-v1.0.md](investor-domestic-au-v1.0.md) (Mode C), [investor-foreign-au-v1.0.md](investor-foreign-au-v1.0.md) (Mode D).
+> Companion specs (to be drafted next): [fhb-foreign-au.md](fhb-foreign-au.md) (Mode B), [investor-domestic-au.md](investor-domestic-au.md) (Mode C), [investor-foreign-au.md](investor-foreign-au.md) (Mode D).
 
 ---
 
@@ -17,7 +17,6 @@
 ```jsonc
 {
   "blueprint_id": "fhb-domestic-au",
-  "version": "1.0",
   "effective_from": "2026-05-19",
   "effective_until": null,
   "buyer_mode": "fhb",
@@ -26,11 +25,11 @@
   "firb_required": false,
   "language_primary": "en",
   "language_alternate": "vi",
-  "renderer_set": "fhb-v1"
+  "renderer_set": "fhb"
 }
 ```
 
-This blueprint serves **Mode A** users only — Vietnamese-Australian citizens and permanent residents buying their first home. Foreign-person flows (Mode B — students, 485 holders, Vietnam-located parents) are served by a separate blueprint (`fhb-foreign-au`) because ~50% of components differ structurally. See [§11.9 in 04-architecture.md](../04-architecture.md#119-blueprint-as-data-model--presentation-specification) for the rationale.
+This blueprint serves **Mode A** users only — Vietnamese-Australian citizens and permanent residents buying their first home. Foreign-person flows (Mode B — students, 485 holders, Vietnam-located parents) are served by a separate blueprint (`fhb-foreign-au`) because ~50% of components differ structurally. See [§11.9 in architecture.md](../architecture/architecture.md#119-blueprint-as-data-model--presentation-specification) for the rationale.
 
 ---
 
@@ -824,7 +823,7 @@ The following kb_anchor slugs are referenced by components in this blueprint. Th
 
 ## Renderer vocabulary used
 
-This blueprint uses 8 of the constrained renderer vocabulary defined in [§11.9 in 04-architecture.md](../04-architecture.md#119-blueprint-as-data-model--presentation-specification):
+This blueprint uses 8 of the constrained renderer vocabulary defined in [§11.9 in architecture.md](../architecture/architecture.md#119-blueprint-as-data-model--presentation-specification):
 
 | Renderer | Used by component(s) |
 |---|---|
@@ -842,7 +841,7 @@ This blueprint uses 8 of the constrained renderer vocabulary defined in [§11.9 
 
 ## Parameter signal vocabulary
 
-This blueprint uses signal placeholders defined in [§11.9 in 04-architecture.md](../04-architecture.md#119-blueprint-as-data-model--presentation-specification):
+This blueprint uses signal placeholders defined in [§11.9 in architecture.md](../architecture/architecture.md#119-blueprint-as-data-model--presentation-specification):
 
 | Signal | Used for |
 |---|---|
@@ -852,7 +851,7 @@ This blueprint uses signal placeholders defined in [§11.9 in 04-architecture.md
 | `<from_property_assessment>` | Pulled from upstream `property_assessment` outcome |
 | `<from_eligibility>` | Pulled from upstream `eligibility` outcome |
 
-Future versions may add `<pending: user>`, `<pending: agent>`, `<stale: 90d>`, `<conflict: user_override>`.
+Future iterations may add `<pending: user>`, `<pending: agent>`, `<stale: 90d>`, `<conflict: user_override>`.
 
 ---
 
@@ -876,22 +875,22 @@ No cycles. `due_diligence` is independent of `buying_strategy` (parallel — buy
 
 ---
 
-## Open questions for v1.1 iteration
+## Open questions / future iteration
 
-These were deferred from v1.0 design and should be considered for the next blueprint version:
+These were deferred from the current design and should be considered in a future iteration:
 
 1. **Multi-property comparison view** — when a user has multiple plan cards (one per property), should the blueprint specify how to render aggregate comparison? Or is this a UI-layer concern outside the blueprint?
 2. **Pre-approval lifecycle** — currently absent; should be a sub-component within `buyer_profile` or a separate `preapproval_status` component with its own outcome.
-3. **Migration semantics** — when a user has a v1.0 plan card and v1.1 publishes, what's the exact prompt and migration UX?
+3. **Refresh semantics** — when a plan card was filled against an earlier deploy and the blueprint is redeployed, what's the exact prompt and refresh UX?
 4. **Live coach state machine** — the buying_strategy component has `live_coach.armed: bool`, but the actual auction-day state machine (pre-brief, live bid, win, post-loss) is not yet specified. Consider extracting to its own ephemeral micro-component.
-5. **Mode B (foreign-person FHB) variant** — the companion `fhb-foreign-au-v1.0` blueprint needs FIRB workflow component, currency transfer component, cross-border family component, and modifications to cash_position (foreign-buyer surcharge), eligibility (FHG/FHSS not eligible), property_assessment (new-build filter due to established-dwelling ban).
+5. **Mode B (foreign-person FHB) variant** — the companion `fhb-foreign-au` blueprint needs FIRB workflow component, currency transfer component, cross-border family component, and modifications to cash_position (foreign-buyer surcharge), eligibility (FHG/FHSS not eligible), property_assessment (new-build filter due to established-dwelling ban).
 
 ---
 
 ## Document control
 
-- **Status:** v1.0 draft, May 2026 — first concrete blueprint specification
+- **Status:** draft, May 2026 — first concrete blueprint specification
 - **Author:** Strategic design synthesis (Claude + maintainer)
 - **Consumers:** Offline KB agent, user-facing planning agent, migration script, UI renderer layer
-- **Companion blueprints (pending):** `fhb-foreign-au-v1.0`, `investor-domestic-au-v1.0`, `investor-foreign-au-v1.0`
+- **Companion blueprints (pending):** `fhb-foreign-au`, `investor-domestic-au`, `investor-foreign-au`
 - **Disclaimer:** This is a working spec, not a regulatory document. Actual scheme rules, FIRB regulations, and state stamp duty schedules must be confirmed against authoritative sources (resolved via kb_anchor lookups) at runtime. Wrong eligibility advice has real consequences; the blueprint must be paired with rigorous KB curation discipline and agent reasoning verification.

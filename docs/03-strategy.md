@@ -4,7 +4,7 @@
 >
 > **This document covers:** Strategic positioning (the five moats + augmentation framing), REA partnership economics (two-tier complementary model), policy intelligence as secondary moat, hard truths and cross-border / FIRB-specific risks, and the 30-month four-wedge build sequence.
 >
-> **Related documents:** [02-competitive-landscape.md](02-competitive-landscape.md) (the channel chain analysis this strategy operationalises), [04-architecture.md](04-architecture.md) (technical strategy that enables this business strategy), [05-ux-model.md](05-ux-model.md) (user-facing instance of this strategy).
+> **Related documents:** [02-competitive-landscape.md](02-competitive-landscape.md) (the channel chain analysis this strategy operationalises), [architecture/architecture.md](architecture/architecture.md) (technical strategy that enables this business strategy), [05-ux-model.md](05-ux-model.md) (user-facing instance of this strategy).
 
 ---
 
@@ -19,7 +19,7 @@ Critically, this is a **lifecycle planning service**, not a property tech platfo
 The product splits into:
 
 - **Base plan** — property-agnostic, AI-augmented, available immediately to anyone matching one of the four user modes. Generates eligibility, scheme stacking (Mode A), FIRB compliance (Mode B / D), cross-border family coordination (Mode B), investment strategy (Mode C / D), tax structure, cash position against a *target price range* (not a specific price). Map view surfaces a **suburb-intelligence overlay** (investment grade, rental yield, family-friendly, Vietnamese-community proximity) sourced from public data feeds, not property listings.
-- **Tìm Nhà** ("Find a Home") — human-curated property search **service**, agent-invoked when the user is ready for specific properties. Vietnamese-speaking curators manually search REA / Domain / partner REA inventory and return a shortlist matched to the user's plan. Paid per engagement ($200–500). See [§11.11 in 04-architecture.md](04-architecture.md#1111-tìm-nhà-property-search-service-agent-invoked-human-curated).
+- **Tìm Nhà** ("Find a Home") — human-curated property search **service**, agent-invoked when the user is ready for specific properties. Vietnamese-speaking curators manually search REA / Domain / partner REA inventory and return a shortlist matched to the user's plan. Paid per engagement ($200–500). See [§11.11 in architecture/architecture.md](architecture/architecture.md#1111-tìm-nhà-property-search-service-agent-invoked-human-curated).
 - **Property addenda** — once a user attaches a specific property (via Tìm Nhà handoff, URL paste, or browser extension on REA / Domain), the plan card gains a property-specific addendum filled by the planning agent (property_assessment, buying_strategy, due_diligence, settlement_prep, ownership_planning).
 
 Five defensible moats:
@@ -283,7 +283,7 @@ None of this is insurmountable, but it explains why **Wedge 2 (Vietnam-parent) f
 
 The goal is end-to-end coverage of the Vietnamese diaspora property journey across four core segments (Vietnamese-Australian FHBs, Vietnamese students in AU, Vietnam-located parents funding AU property, Vietnam-located investors). The risk is launching too broad and trying to serve all four segments simultaneously. The discipline is to be 10× better at one segment + one entry point, build trust, and let users pull the product into adjacent segments.
 
-The product is built on a unified platform with mode-switching by user location and intent (Option A — see [§13 in 05-ux-model.md](05-ux-model.md)). All four segments share the same Layer 1 KB, Layer 2 schema, Layer 3 reasoning infrastructure ([§11 in 04-architecture.md](04-architecture.md#11-architecture--interaction-model)), and context-and-flow architecture ([§12 in 04-architecture.md](04-architecture.md#12-context-and-flow-are-the-moats)). What changes per segment is which flows are active and which user-state fields matter.
+The product is built on a unified platform with mode-switching by user location and intent (Option A — see [§13 in 05-ux-model.md](05-ux-model.md)). All four segments share the same Layer 1 KB, Layer 2 schema, Layer 3 reasoning infrastructure ([§11 in architecture/architecture.md](architecture/architecture.md#11-architecture--interaction-model)), and context-and-flow architecture ([§12 in architecture/architecture.md](architecture/architecture.md#12-context-and-flow-are-the-moats)). What changes per segment is which flows are active and which user-state fields matter.
 
 ### 10.1 The 30-month wedge sequence
 
@@ -326,7 +326,7 @@ Wedge 1 is **sub-phased** to match the property-data-light architecture. The bas
 
 **Why this timing:** Base plan demand needs ~3 months to aggregate before Tìm Nhà has a queue to serve. Launching parallel to Wedge 1a would burn the human team on too few engagements.
 
-**Pricing:** $200–500 per engagement. See [§11.11 in 04-architecture.md](04-architecture.md#1111-tìm-nhà-property-search-service-agent-invoked-human-curated).
+**Pricing:** $200–500 per engagement. See [§11.11 in architecture/architecture.md](architecture/architecture.md#1111-tìm-nhà-property-search-service-agent-invoked-human-curated).
 
 #### Wedge 1c — User URL paste + browser extension (months 6–12)
 

@@ -2,9 +2,9 @@
 
 > Part of the **Vietnamese Diaspora Property Platform — Research & Strategy** document set. See [README.md](README.md) for the full index.
 >
-> **This document covers:** Property-first entry as foundational decision, the four user modes (A/B/C/D), the seven UX surfaces, two worked examples (Sarah's 365-day Vietnamese-Australian FHB journey + An Tran's cross-border family journey demonstrating Mode B), MVP scope for Wedge 1, and six product traps to avoid.
+> **This document covers:** Plan-first entry as foundational decision (property granularity added when the user is ready), the four user modes (A/B/C/D), the seven UX surfaces, two worked examples (Sarah's 365-day Vietnamese-Australian FHB journey + An Tran's cross-border family journey demonstrating Mode B), MVP scope for Wedge 1, and six product traps to avoid.
 >
-> **Related documents:** [03-strategy.md](03-strategy.md) (the wedge sequence and modes this UX implements), [04-architecture.md](04-architecture.md) (the technical infrastructure underneath the UX), [first_home_buyer_plan.html](first_home_buyer_plan.html) (the working Mode A prototype demonstrating these surfaces).
+> **Related documents:** [03-strategy.md](03-strategy.md) (the wedge sequence and modes this UX implements), [architecture/architecture.md](architecture/architecture.md) (the technical infrastructure underneath the UX), [first_home_buyer_plan.html](first_home_buyer_plan.html) (the working Mode A prototype demonstrating these surfaces).
 
 ---
 
@@ -16,21 +16,21 @@ Three foundational decisions define the UX:
 2. **Base plan + property addenda** — every user has one persistent base plan (property-agnostic) and zero or more property addenda (one per attached property). Components have `scope: base | per-property | both` — the base plan runs immediately with no property data; addenda activate per-property as the user adds them.
 3. **Mode-switched by user context** — one unified platform, four modes by user location + FIRB status + intent. Each mode has different default flows, different artifact emphasis, but shares the same Layer 1 KB + Layer 2 schema infrastructure (Option A from architecture decision).
 
-The platform is a **lifecycle planning service**, not a property tech platform. We do not operate a property listing scraping pipeline. Property data flows only via narrow, demand-driven paths (suburb enrichment from public feeds, user URL paste, browser extension, and eventually partner REA push). See [§11.10 in 04-architecture.md](04-architecture.md#1110-property-data-pipeline--narrow-and-demand-driven) and [§11.11 in 04-architecture.md](04-architecture.md#1111-tìm-nhà-property-search-service-agent-invoked-human-curated).
+The platform is a **lifecycle planning service**, not a property tech platform. We do not operate a property listing scraping pipeline. Property data flows only via narrow, demand-driven paths (suburb enrichment from public feeds, user URL paste, browser extension, and eventually partner REA push). See [§11.10 in architecture/architecture.md](architecture/architecture.md#1110-property-data-pipeline--narrow-and-demand-driven) and [§11.11 in architecture/architecture.md](architecture/architecture.md#1111-tìm-nhà-property-search-service-agent-invoked-human-curated).
 
 ### 13.1 Core principle — artifacts are substance, chat is layer
 
-A chat thread is the wrong persistent object — it makes the product indistinguishable from ChatGPT, kills the lifecycle continuity moat, and renders Layer 2 (user state) vestigial. The right persistent objects are **property cards on a plan canvas** with attached artifacts (document reports, decision trail entries, FIRB approvals, opportunity alerts) that accumulate over months and years.
+A chat thread is the wrong persistent object — it makes the product indistinguishable from ChatGPT, kills the lifecycle continuity moat, and renders Layer 2 (user state) vestigial. The right persistent object is the **plan card** — one per (user × mode), holding the base plan plus any property addenda — with attached artifacts (document reports, decision trail entries, FIRB approvals, opportunity alerts) that accumulate over months and years. Properties are inputs to the plan card via addenda, not the central object themselves.
 
 Every agentic interaction should produce or update a structured artifact the user can return to.
 
 | Interaction | Artifact produced or updated |
 |---|---|
-| Property URL paste | **Property card** (central artifact — Vietnamese-language analysis, FIRB filter, scheme eligibility) |
-| Document upload | Document report artifact attached to a property card |
-| Scheme/FIRB calc | Plan dashboard update (eligibility, cash needs, timeline) |
+| Property URL paste | **Property addendum** on the plan card (Vietnamese-language analysis, FIRB filter, scheme eligibility) |
+| Document upload | Document report artifact attached to the relevant property addendum |
+| Scheme/FIRB calc | Plan card update (eligibility, cash needs, timeline) |
 | Family-coordination session | Cross-border decision trail (parent + child view) |
-| Negotiation session | Decision trail entry attached to property card |
+| Negotiation session | Decision trail entry attached to the property addendum |
 | Refi alert | Opportunity card on plan dashboard |
 | FIRB approval workflow | FIRB status artifact (gate for foreign-person flows) |
 
@@ -49,12 +49,12 @@ Mode switching can happen within one customer over time: student (Mode B) → gr
 
 ### 13.3 The seven UX surfaces
 
-Six original surfaces (see [§11.5 in 04-architecture.md](04-architecture.md#115-product-modes-follow-interaction-intensity)) plus one new surface for foreign-person flows. Chat lives on every surface as a layer.
+Six original surfaces (see [§11.5 in architecture/architecture.md](architecture/architecture.md#115-product-modes-follow-interaction-intensity)) plus one new surface for foreign-person flows. Chat lives on every surface as a layer.
 
 | Surface | Pattern | When used | Mode emphasis |
 |---|---|---|---|
 | **Plan dashboard (home)** | Persistent canvas — property cards, schemes, cash math, FIRB status, alerts | Every session start | All modes |
-| **Property workbench** | Per-property cards, comparison view, suburb risk overlay, FIRB-aware filtering | Active search — primary entry | All modes; **central for Mode A** |
+| **Property workbench** | Per-property cards, comparison view, suburb risk overlay, FIRB-aware filtering | Active search — after a property is attached | All modes; **central for Mode A** |
 | **Document workspace** | Drag-drop, side-by-side viewer, Vietnamese-language risk summary | Pre-approval, due diligence | A, C |
 | **FIRB workflow assistant** | Step-by-step foreign-person approval flow, fee calculator, documentation checklist | Before contract for foreign persons | **Central for B, D** |
 | **Cross-border family view** | Parent + child shared dashboard, bilingual artifacts, currency conversion, AML documentation | Cross-border funding coordination | **Central for B** |
@@ -138,7 +138,7 @@ This is dramatically different from the property-pin browsing pattern. Vietnames
 
 When ANY of these paths fires, the planning agent creates a **property addendum** on the user's plan card and fills the property-specific components (property_assessment, buying_strategy, due_diligence, settlement_prep, ownership_planning). The base plan persists alongside.
 
-This is the **property-first-when-the-user-is-ready** pattern — replacing the previously-documented property-first-as-entry pattern.
+This is the **plan-first, property-when-ready** pattern — the base plan is the entry point at suburb/price granularity; property granularity is layered on later, as an addendum, when the user is ready. It replaces the previously-documented property-first-as-entry pattern.
 
 ### 13.5 Worked examples — two journeys across two modes
 
@@ -327,11 +327,11 @@ What's protected by getting the UX shape right from day 1:
 5. **The mode-confusion trap** — treating all four user modes the same. A Vietnam-located parent has fundamentally different concerns from a Vietnamese-Australian FHB. Default flows must differ.
 6. **The cross-border-glossover trap** — building cross-border features without FIRB / AML / VN PDP / capital-control awareness baked in. Wrong advice across jurisdictions has real legal consequences.
 
-The property-first + mode-switched + Vietnamese-cultural architecture avoids these by making each segment's specific reality first-class, not an afterthought.
+The plan-first + mode-switched + Vietnamese-cultural architecture avoids these by making each segment's specific reality first-class, not an afterthought.
 
 ### 13.9 Agent / user flow + plan card lifecycle
 
-This subsection captures the end-to-end flow from user landing on the platform through agent reasoning to persistent plan card state. The flow grounds the abstract UX surfaces (§13.3) in a concrete sequence and ties them to the blueprint architecture ([§11.9 in 04-architecture.md](04-architecture.md#119-blueprint-as-data-model--presentation-specification)).
+This subsection captures the end-to-end flow from user landing on the platform through agent reasoning to persistent plan card state. The flow grounds the abstract UX surfaces (§13.3) in a concrete sequence and ties them to the blueprint architecture ([§11.9 in architecture/architecture.md](architecture/architecture.md#119-blueprint-as-data-model--presentation-specification)).
 
 #### Two parallel processes
 
@@ -340,98 +340,83 @@ The platform runs two distinct agent processes that meet at the plan card:
 **Offline KB agent process** (Claude Code + maintainer, runs ahead of any user session):
 
 1. **Curate domain KB** — schemes, FIRB regs, state duty schedules, lender policies, process knowledge. Re-fetched and verified periodically (quarterly / monthly / per-event per §11.2 cadences).
-2. **Ingest property data** — web scraping (REA.com.au, Domain), REA partner uploads, user URL pastes (cached), council data, developer feeds. Normalised into a unified property record stored in the `properties` table.
-3. **Curate and version blueprints** — when laws or transaction mechanisms change, the FHB or investor blueprint is updated and published as a new version. Old plan cards remain pinned to their original version until users opt to migrate.
+2. **Ingest property data** — REA partner uploads, user URL pastes (cached), council data, developer feeds (no scraping, §11.10). Normalised into a unified property record in the `properties` table (OPTIONAL in v1).
+3. **Curate blueprints** — when laws or transaction mechanisms change, the FHB or investor blueprint is updated and redeployed. Git holds the history; old plan cards stay reproducible from the deploy commit SHA + KB snapshot recorded when they were filled, and offer an opt-in refresh.
 
-This process is the **batch / asynchronous lane**. It produces curated KB, normalised property data, and versioned blueprints — all available to the user-facing agent at session time.
+This process is the **batch / asynchronous lane**. It produces curated KB, normalised property data, and the current deployed blueprints — all available to the user-facing agent at session time.
 
 **User-facing planning agent process** (runs per user session):
 
-1. User opens map → property selection → plan tab → mode selection (FHB / investor)
-2. Agent loads blueprint + KB + property + uploads → reasons → returns structured output
-3. System fills plan card → renders to user → persists
+1. User onboards → mode + state + target price range + target zone → base plan card created
+2. Agent loads blueprint + KB + profile + uploads → reasons → fills base components → returns structured output
+3. Later, user attaches a property → per-property components fill as an addendum → plan refines
+4. System fills/refines plan card → renders to user → persists
 
-This process is the **synchronous / real-time lane**. It reads from offline-curated KB and property data; it writes to filled plan cards and session logs.
+This process is the **synchronous / real-time lane**. It reads from offline-curated KB (and property data only once a property is attached); it writes to filled plan cards and session logs.
 
 #### The user-facing flow (sequence)
 
 ```
-USER ACTION                          SYSTEM RESPONSE                       PERSISTENCE
-═══════════                          ════════════════                       ════════════
+USER ACTION                          SYSTEM RESPONSE                      PERSISTENCE
+═══════════                          ════════════════                     ════════════
 
-1. Opens map view                    Loads property pins for visible
-   (Google or OSM base)              area from `properties` table
-                                     (offline-ingested, normalised)
+1. Onboards: mode, state,            Planning agent activates.            INSERT plan_card row
+   target price range (VND→AUD),     Loads the mode's blueprint             (blueprint_id, mode,
+   target zone (map click /          (`fhb-domestic-au` or                  deploy_commit_sha,
+   address). No property.            `investor-domestic-au`).               user_id, content_jsonb
+                                     Base plan card created;                with base params
+                                     base params = `<initial>`.             = <initial>)
 
-2. Zooms to area, taps               Property card surfaces:
-   property pin                      ┌──────────────────────────┐
-                                     │ Tab A: Property info     │
-                                     │   (curated, balanced)    │
-                                     │ Tab B: Plan              │
-                                     │   (mode selection)       │
-                                     └──────────────────────────┘
+2. Views base plan + map             `scope: base|both` components fill
+                                     from profile + target zone +
+                                     suburb medians + KB. Map shows a
+                                     suburb-intelligence overlay
+                                     (NOT property pins).
 
-3. Opens Plan tab, picks             Planning agent activates.            INSERT plan_card row
-   FHB or Investor                   Loads appropriate blueprint           (blueprint_id,
-                                     (`fhb-domestic-au-v1.0` or          blueprint_version,
-                                     `investor-au-v1.0`).                  user_id, property_id,
-                                     Initial plan card created with        content_jsonb with
-                                     all parameters = `<initial>`.         all params <initial>)
-
-4. User chats (text/voice)           Agent constructs system prompt:      INSERT session row
+3. User chats (text/voice)           Agent constructs system prompt:      INSERT session row
    or uploads docs                   - Blueprint components + params         (session_id =
                                      - Current parameter values            user_id × plan_card_id)
                                      - KB anchors                          Conversation log
-                                     - Property card data                  appended per message
+                                     - Property addendum data (if any)      appended per message
                                      - Uploaded doc summaries
                                      - User's current query
                                      (No conversation history — only
                                      current context)
 
-5. (agent reasons)                   Agent returns structured output:
-                                     ```
-                                     {
-                                       updates: [
-                                         {
-                                           component_id: "buying",
-                                           parameters: {
-                                             max_bid: {
-                                               value: 925000,
-                                               confidence: 0.82,
-                                               reasoning: "..."
-                                             },
-                                             ...
-                                           }
-                                         }
-                                       ],
-                                       questions_for_user: [...],
-                                       artifacts_created: [...]
-                                     }
-                                     ```
+4. (agent reasons)                   Returns structured output:
+                                       { updates: [ { component_id: "buying",
+                                           parameters: { max_bid: { value: 925000,
+                                             confidence: 0.82, reasoning: "..." } } } ],
+                                         questions_for_user: [...],
+                                         artifacts_created: [...] }
 
-6. System fills plan card,           Plan card UI re-renders.             UPDATE plan_card
-   renders updated view              User sees filled components.            content_jsonb with
-                                     User can refine via further           new parameter values
-                                     chat or accept current state.
+5. User attaches a property          Per-property components
+   (Tìm Nhà / URL paste /            (property_assessment, buying_strategy,
+    browser extension)               due_diligence, …) fill as an         UPSERT addendum into
+                                     addendum; base plan refines.          plan_card content_jsonb
+                                                                           (one addendum per property)
 
-7. User refines / accepts            Loop back to step 4 with              Each refinement
-                                     updated context.                      writes new
-                                                                           plan_card revision
-                                                                           (or upserts).
+6. System fills/refines plan card,   Plan card UI re-renders.             UPDATE plan_card
+   renders updated view              User sees filled components,           content_jsonb with
+                                     can refine via chat or accept.        new parameter values
+
+7. User refines / accepts            Loop back to step 3 with             Each refinement writes
+                                     updated context.                      a new plan_card
+                                                                           revision (or upserts)
 ```
 
-#### Property data — multi-source ingestion
+#### Property data — narrow, demand-driven (no scraping)
 
-Property data feeds the map and property cards. Four sources, all routed through the offline KB agent:
+The suburb-intelligence map is fed by **suburb-level public data** (ABS Census, state feeds), not property listings. Individual property data is **not** load-bearing (OPTIONAL in v1, §11.10) and enters only when a user attaches a specific property, via narrow demand-driven paths — all normalised into the `properties` table by the offline KB agent:
 
-| Source | Update cadence | Coverage |
+| Source | Trigger | Coverage |
 |---|---|---|
-| Web scraping (REA.com.au, Domain) | Daily / weekly batch | Comprehensive — most listings |
-| Partner REA uploads | Real-time API | High quality, Vietnamese-community focus |
-| User URL paste (cached) | On-demand → cached | Long-tail / non-portal listings |
-| Other (council data, developer feeds, off-the-plan inventory) | Periodic | Specialist data |
+| User URL paste (cached) | User pastes a REA / Domain link | Any single listing the user is considering |
+| Browser extension | User browses a listing | Same, in-context |
+| Tìm Nhà human curation | User requests a curated shortlist | Culturally-curated, Vietnamese-community focus |
+| Partner REA push (later) | Partner REA submits inventory | High quality, Vietnamese-community focus |
 
-Web scraping is operationally complex (rate limits, ToS considerations, structural change resilience) and best handled by a dedicated offline ingestion pipeline rather than at user request time. Normalised property records sit in `properties` table; the user-facing agent reads from this cache, not from external sources.
+There is **no listing scraper** (§11.10): legally fraught, operationally fragile, and not where the platform's value lies. The user-facing agent reads property data from the `properties` cache only after a property is attached; the base plan never depends on it.
 
 #### System prompt construction — always reflect current plan card state
 
@@ -440,7 +425,7 @@ Critically, the system prompt is **dynamically constructed at every request** fr
 Conversation history is **not** appended to the system prompt. Planning is grounded in:
 
 - Current plan card state (all filled parameters in their latest values)
-- Current property card (property context for this plan card)
+- Current property addendum (property context, if a property is attached)
 - Uploaded document summaries (if any)
 - Current user query (the message just sent)
 
@@ -451,8 +436,8 @@ This bounds token consumption (no growing conversation tail) and prevents the ag
 The plan card is updated (re-filled) on these events:
 
 - **User interaction adds context** — uploaded a document, answered an agent question, updated a profile field
-- **User selects a different property** — new plan card created (don't overwrite previous; one plan card per property)
-- **System event invalidates parameters** — blueprint version updated, scheme rule changed in KB, property data refreshed, FIRB regime change
+- **User attaches a property** — a property addendum is added to the plan card and its per-property components fill (base plan persists; one addendum per attached property)
+- **System event invalidates parameters** — blueprint updated, scheme rule changed in KB, property data refreshed, FIRB regime change
 - **Time-based stale check** — parameters older than threshold (e.g., 90 days) flagged for re-fill on next session
 
 Confirmed scope: blueprint template never changes per user; only the filled instance does.
@@ -461,13 +446,13 @@ Confirmed scope: blueprint template never changes per user; only the filled inst
 
 | What | Where | Lifetime |
 |---|---|---|
-| Blueprint templates | `blueprints` table, jsonb, versioned | Permanent; old versions retained |
-| Filled plan card | `plan_cards` table, jsonb, references blueprint version | Permanent; one per (user × property) |
+| Blueprint templates | `blueprints` table, jsonb, keyed by slug | Redeployed in place; git holds prior states |
+| Filled plan card | `plan_cards` table, jsonb, records deploy commit SHA + KB snapshot | Permanent; one per (user × mode) — holds base plan + property addenda |
 | Session conversation log | `sessions` table, append-only, keyed by `session_id = user_id × plan_card_id` | Permanent; for user re-reading + audit |
 | Normalised property data | `properties` table, jsonb | Persistent; updated by offline ingestion |
 | KB anchors | Embedded in blueprint via `kb_anchors` references | Updated quarterly/monthly per §11.2 |
 
-A user returning to a property they previously planned sees the persisted filled plan card immediately, with conversation history available alongside, and can resume refinement or trigger a refresh if blueprint or KB has changed since.
+A user returning to a plan they previously started sees the persisted filled plan card immediately (base plan plus any property addenda), with conversation history available alongside, and can resume refinement or trigger a refresh if the blueprint or KB has changed since.
 
 #### Mapping to UX surfaces (§13.3)
 
@@ -475,20 +460,20 @@ The flow operationalises four of the seven UX surfaces simultaneously:
 
 | Surface | Activated when |
 |---|---|
-| Property workbench | User zooms / taps property pin on map |
-| Plan dashboard | Property card's Plan tab opens — filled plan card renders |
-| Document workspace | User uploads contract / Section 32 / strata report into the Plan tab |
-| Quick question (chat) | The chat interface itself in the Plan tab |
+| Plan dashboard | Onboarding completes — base plan generates and renders |
+| Property workbench | User attaches / explores a specific property (addendum) |
+| Document workspace | User uploads contract / Section 32 / strata report |
+| Quick question (chat) | The chat interface itself, layered on any surface |
 
 The remaining three surfaces (FIRB workflow assistant, cross-border family view, live coach, background monitor) activate on mode-specific triggers — FIRB workflow for Mode B/D, family view when buyer invites parent, live coach when buyer signals "I'm at the auction," background monitor in ownership phase.
 
 #### Why this flow design holds up
 
-- **Map-first entry is sharper than profile-first** — users start with intent (a specific property) rather than abstract setup; agent has concrete context immediately.
-- **Plan card per property gives the agent the right unit** — eligibility, cash math, and Buying strategy all depend on which property; aggregating across properties happens at the dashboard layer, not in the agent's reasoning.
+- **Plan-first entry beats property-first** — the base plan delivers value immediately with zero property data, so the user is never blocked on finding a listing; property granularity layers on as an addendum when they're ready.
+- **Plan card per (user × mode) is the right unit** — the base plan (eligibility, cash math, scheme stack) is property-agnostic and reused across every property the user considers; per-property reasoning lives in addenda, not in duplicated plan cards.
 - **System prompt grounded in state, not history** — keeps tokens bounded, keeps reasoning clean, makes evaluation tractable.
 - **Two parallel processes (offline KB + user-facing agent) decouple update cadence from session latency** — the user-facing agent is fast because the heavy lifting (KB curation, property ingestion, blueprint authoring) happens offline.
-- **Blueprint versioning makes evolution safe** — laws change, blueprints version, old plan cards survive as historical artifacts, users opt-in to migration.
+- **Deploy-time snapshots make evolution safe** — laws change, blueprints are redeployed, old plan cards survive as historical artifacts (reproducible from their commit SHA + KB snapshot), users opt-in to refresh.
 
 ---
 

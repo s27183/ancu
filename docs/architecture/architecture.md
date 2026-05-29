@@ -1,10 +1,10 @@
 # 04 — Architecture & context-flow framing
 
-> Part of the **Vietnamese Diaspora Property Platform — Research & Strategy** document set. See [README.md](README.md) for the full index.
+> Part of the **Vietnamese Diaspora Property Platform — Research & Strategy** document set. See [README.md](../README.md) for the full index.
 >
 > **This document covers:** The three-layer architecture (static KB / user state / agentic reasoning), update cadences, interaction intensity by phase, product modes, Claude Code fit, the user state trap, the context-and-flow framing that explains why this shape, the agentic platform formula, flow taxonomy, and implications for org structure.
 >
-> **Related documents:** [03-strategy.md](03-strategy.md) (business strategy that this architecture serves), [05-ux-model.md](05-ux-model.md) (user-facing surfaces over this architecture).
+> **Related documents:** [03-strategy.md](../03-strategy.md) (business strategy that this architecture serves), [05-ux-model.md](../05-ux-model.md) (user-facing surfaces over this architecture).
 
 ---
 
@@ -45,8 +45,8 @@ The product cleanly separates into three layers with different update cadences a
 The offline KB agent (Claude Code + maintainer working on the local repo) has **three distinct roles**, all operating on different cadences:
 
 1. **Curate domain KB** — schemes, FIRB regs, state duty schedules, lender policies, process knowledge, document templates. Re-fetch from official sources, diff, review, publish.
-2. **Ingest property data** — web scraping (REA.com.au, Domain), normalise partner REA uploads, cache user URL pastes, integrate council/developer feeds. Output: unified `properties` table for the user-facing agent to query.
-3. **Curate and version blueprints** — when laws or transaction mechanisms change, update FHB or investor plan card blueprint, publish as new version. Old versions retained for historical plan card pinning (see §11.9).
+2. **Ingest property data** — normalise partner REA uploads, cache user URL pastes, integrate council/developer feeds (no scraping, §11.10). Output: unified `properties` table (OPTIONAL in v1) for the user-facing agent to query.
+3. **Curate blueprints** — when laws or transaction mechanisms change, update the FHB or investor plan card blueprint and redeploy. Git holds the history; reproducibility comes from the deploy commit SHA + KB snapshot recorded on each filled plan card (see §11.9).
 
 All three roles produce **batch-updated context** that the user-facing planning agent reads at session time but never writes back to.
 
@@ -54,8 +54,8 @@ All three roles produce **batch-updated context** that the user-facing planning 
 |---|---|---|
 | Quarterly | Scheme structures (FHG, Help to Buy, FHSS), state duty schedules, FHOG amounts, process knowledge, document templates, HECS thresholds | Scripted re-fetch + diff + review |
 | Monthly | Lender policy updates, RBA cash rate, FHG panel changes, participating lender lists | Scripted monitor + diff + alerts |
-| Weekly / daily | Property listing scrape (REA, Domain), partner REA inventory sync, FX rates for Mode D | Scripted ingestion pipeline |
-| Per-event | Federal Budget (May annually), State Budgets (June annually), Housing Australia rule changes, ABS quarterly releases, ASIC bulletins, FIRB regime changes | Calendar-triggered + RSS / news watchers; triggers blueprint version review |
+| Weekly / daily | Partner REA inventory sync, user URL paste cache, FX rates for Mode D | Scripted ingestion (no scraping, §11.10) |
+| Per-event | Federal Budget (May annually), State Budgets (June annually), Housing Australia rule changes, ABS quarterly releases, ASIC bulletins, FIRB regime changes | Calendar-triggered + RSS / news watchers; triggers blueprint review |
 | Real-time | Buyer's situation, specific property selection, uploaded document, live negotiation, current chat message | Never batchable — Layer 3 territory |
 
 Almost nothing in this domain requires sub-day knowledge freshness. What needs to be real-time is **the buyer's situation against the knowledge**, not the knowledge itself. This is a structural cost advantage if architected correctly — Layer 1 ops are predictable scripts, not data engineering.
@@ -141,7 +141,7 @@ A foundational architectural decision: the platform organises agent reasoning ar
 
 The UI is a *view of the filled blueprint instance*, and the agent reasons within and across *the same component pipeline*. One template; two consumers.
 
-Reference: [`docs/blueprints/fhb-domestic-au-v1.0.md`](../blueprints/fhb-domestic-au-v1.0.md) is the first concrete blueprint following this model. The remainder of this section formalises the model.
+Reference: [`docs/blueprints/fhb-domestic-au.md`](../blueprints/fhb-domestic-au.md) is the first concrete blueprint following this model. The remainder of this section formalises the model.
 
 #### Component pipeline as a DAG
 
@@ -207,23 +207,23 @@ The platform ships four blueprints, one for each user mode (§13.2):
 
 | Blueprint | Mode | Audience | FIRB applies | Status |
 |---|---|---|---|---|
-| `fhb-domestic-au` | A | Vietnamese-AU citizen / PR FHB | No | **v1.0 drafted** |
-| `fhb-foreign-au` | B | Vietnam-parent funding AU child; AU student / 485 holder | Yes | v1.0 next |
-| `investor-domestic-au` | C | Vietnamese-AU investor (citizen / PR) | No | v1.0 future |
-| `investor-foreign-au` | D | Vietnam-located investor | Yes | v1.0 future |
+| `fhb-domestic-au` | A | Vietnamese-AU citizen / PR FHB | No | **drafted** |
+| `fhb-foreign-au` | B | Vietnam-parent funding AU child; AU student / 485 holder | Yes | drafted |
+| `investor-domestic-au` | C | Vietnamese-AU investor (citizen / PR) | No | drafted |
+| `investor-foreign-au` | D | Vietnam-located investor | Yes | drafted |
 
 Each Mode gets its own blueprint rather than activating FIRB conditionally in a shared blueprint because ~50% of components differ structurally between domestic and foreign-person modes (FHG/FHSS not eligible for foreign persons; established-dwelling ban; foreign-buyer surcharge; FIRB approval workflow; currency transfer; cross-border family coordination). Shared component patterns (`property_assessment`, `due_diligence`, `decision_trail`) are imported by reference rather than duplicated, keeping authoring efficient without entangling reasoning.
 
-#### Storage and versioning
+#### Storage and deployment
 
 | Table | Content | Update pattern |
 |---|---|---|
-| `blueprints` | Versioned templates (jsonb column for content) | New version published as new row; old versions retained; pinned by `(blueprint_id, version)` |
-| `plan_cards` | Filled instances (jsonb), references `(blueprint_id, blueprint_version)` | Created when user activates plan on a property; refilled on user interaction or system event |
-| `properties` | Normalised property data from offline KB ingestion | Updated periodically by web scraping + REA uploads + user URL paste |
+| `blueprints` | Templates (jsonb column for content), keyed by slug | Redeployed in place on each deploy; git holds prior states. Filled plan cards record the deploy commit SHA for reproducibility, not a row version. |
+| `plan_cards` | Filled instances (jsonb), references the blueprint by slug | Created at onboarding from mode + state + price range + zone (no property required, per plan-first); refilled on user interaction or system event |
+| `properties` | Normalised property data (OPTIONAL in v1; not load-bearing) | Populated only via narrow demand-driven paths (§11.10): user URL paste, browser extension, Tìm Nhà human curation, and later partner REA push. No scraping pipeline. |
 | `sessions` | Conversation log by `(session_id = user_id × plan_card_id)` | Append-only |
 
-Filled plan cards are **pinned to a specific blueprint version**. When laws or transaction mechanisms change, a new blueprint version is published; existing plan cards remain valid as historical artifacts but display a "blueprint updated — refresh?" prompt when the user revisits. Migration is opt-in, not destructive.
+Filled plan cards **snapshot the resolved KB content and record the deploy commit SHA** active when filled. When laws or transaction mechanisms change, the blueprint is updated and redeployed; existing plan cards remain valid as historical artifacts — reproducible from their snapshot + commit SHA — but display a "plan updated — refresh?" prompt when the user revisits. Refresh is opt-in, not destructive.
 
 This separation reflects the §11.2 cadence model: blueprint = static KB (batch-updated by offline agent); filled plan card = user state (transactional); session log = user state (append-only).
 
@@ -250,7 +250,7 @@ Critically, **conversation history is not appended**. Planning is grounded in th
 
 #### Initial-signal vocabulary
 
-The `<initial>` placeholder is the agent's cue that a parameter needs filling. The FHB v1.0 blueprint also uses **upstream-reference signals** that point to outcomes from earlier components or external sources:
+The `<initial>` placeholder is the agent's cue that a parameter needs filling. The FHB blueprint also uses **upstream-reference signals** that point to outcomes from earlier components or external sources:
 
 | Signal | Meaning | Agent behaviour |
 |---|---|---|
@@ -266,7 +266,7 @@ Future signal expansions (deferred to v1.1):
 |---|---|---|
 | `<pending: user>` | Needs user input before agent can fill | Surface a clear question to the user |
 | `<pending: agent>` | Prerequisites met; agent should reason | Compute and fill on next pass |
-| `<stale: 90d>` | Was filled but blueprint version or property data updated | Flag in UI; offer refresh |
+| `<stale: 90d>` | Was filled but blueprint or property data updated | Flag in UI; offer refresh |
 | `<conflict: user_override>` | User explicitly set a value contrary to agent's recommendation | Preserve user value; note disagreement in decision trail |
 
 V1 implementation uses `<initial>` + the five upstream-reference signals. Pending/stale/conflict signals are added as the agent matures and edge cases emerge.
@@ -276,14 +276,14 @@ V1 implementation uses `<initial>` + the five upstream-reference signals. Pendin
 The filled plan card is updated (re-filled) on these events:
 
 - **User interaction** that adds or changes context — uploaded a document, answered an agent question, updated profile field, changed property
-- **System event** that invalidates parameters — blueprint version updated, scheme rule changed in KB, property data refreshed, FIRB regime change
+- **System event** that invalidates parameters — blueprint updated, scheme rule changed in KB, property data refreshed, FIRB regime change
 - **Time-based stale check** — parameters older than threshold (e.g., 90 days) flagged for re-fill on next session
 
 The blueprint template itself never changes per user — only the filled instance does.
 
 #### KB anchors — slug-based references
 
-Components reference curated KB content via **slug-based references** rather than embedded content or version-pinned URLs. The operational chain:
+Components reference curated KB content via **slug-based references** rather than embedded content or hard-coded URLs. The operational chain:
 
 ```
 1. Offline KB agent maintains markdown files in repo:
@@ -295,7 +295,6 @@ Components reference curated KB content via **slug-based references** rather tha
    Each file has frontmatter:
      ---
      slug: scheme.qld.fhnhc
-     version: 1.2
      effective_from: 2025-05-01
      last_verified: 2026-05-19
      ---
@@ -306,7 +305,7 @@ Components reference curated KB content via **slug-based references** rather tha
    - Validates every blueprint's kb_anchors resolve to existing slugs (CI gate)
    - Parses frontmatter + body
    - Writes to kb_anchors table:
-       (slug, version, effective_from, last_verified, content_md, content_json)
+       (slug, effective_from, last_verified, content_md, content_json)
 
 3. Blueprints reference KB via slug only:
      "kb_anchors": ["scheme.fhg", "scheme.qld.fhnhc"]
@@ -319,11 +318,11 @@ Components reference curated KB content via **slug-based references** rather tha
 Tracking and linking:
 
 - **Build-time validation** — CI verifies every `kb_anchors` slug in every blueprint resolves to an existing KB record. Broken references block deployment.
-- **Version pinning option** — blueprints can pin to a specific KB version: `"scheme.fhg@1.2"` for stable reasoning, or `"scheme.fhg"` for latest.
-- **Change propagation** — when a KB doc updates, the migration script bumps version + records `last_verified`. Plan cards filled before the update detect the version drift via the `<stale: 90d>` signal in v1.1.
-- **Audit trail** — every filled plan card records which KB versions were active when filled, so historical decisions are reproducible.
+- **Always latest** — blueprints reference KB by slug only and always resolve the currently deployed content. There is no version pinning; reproducibility is handled by snapshotting the resolved content onto the filled plan card (see Audit trail).
+- **Change propagation** — when a KB doc updates, the migration script records the new `effective_from` + `last_verified` and redeploys. Plan cards filled before the update detect content drift via the `<stale: 90d>` signal (their snapshot's `last_verified` now lags the deployed doc).
+- **Audit trail** — every filled plan card records the deploy commit SHA and a snapshot of the resolved KB content active when filled, so historical decisions are reproducible.
 
-This pattern is essentially how DBT, Terraform, and OpenAPI work — content lives as files in the repo, IDs are stable, deploy is a script. The FHB v1.0 blueprint references 39 distinct KB slugs across its 8 components; the offline KB agent's first responsibility is ensuring every slug has a curated doc.
+This pattern is essentially how DBT, Terraform, and OpenAPI work — content lives as files in the repo, IDs are stable, deploy is a script. The FHB blueprint references 39 distinct KB slugs across its 8 components; the offline KB agent's first responsibility is ensuring every slug has a curated doc.
 
 #### Renderer vocabulary — constrained enum
 
@@ -345,12 +344,12 @@ The platform's UI has a constrained set of renderer components. Blueprints can o
 | `firb-workflow-card` | FIRB approval state machine (Mode B/D) | `{ stage, fees, documents[], next_action }` |
 | `family-view-card` | Cross-border bilingual coordination (Mode B) | `{ child_view, parent_view, sync_state }` |
 
-The FHB Mode A v1.0 blueprint uses 9 of these (summary-card, scheme-stack-card, calculator, buying-strategy-card, risk-flag-list, checklist, swimlane-diagram, data-table, opportunity-card). Mode B blueprints will activate firb-workflow-card and family-view-card. New renderers are added as new component types emerge; each addition is a versioned change to this vocabulary.
+The FHB Mode A blueprint uses 9 of these (summary-card, scheme-stack-card, calculator, buying-strategy-card, risk-flag-list, checklist, swimlane-diagram, data-table, opportunity-card). Mode B blueprints will activate firb-workflow-card and family-view-card. New renderers are added as new component types emerge; each addition is a deliberate, reviewed change to this vocabulary.
 
 #### Why this architecture is sharp
 
 - **The component becomes the unit of agent reasoning** — bounded scope, typed outcome, clear inputs. Easier to evaluate, harder to hallucinate against.
-- **The blueprint becomes the unit of work** for the offline KB agent (Claude Code + maintainer): create components, version blueprints, evolve.
+- **The blueprint becomes the unit of work** for the offline KB agent (Claude Code + maintainer): create components, evolve blueprints, redeploy.
 - **The filled plan card becomes the unit of value** for the user: persistent, returnable, structured.
 - **The UI is a thin renderer** over the blueprint + filled state — easy to build, easy to extend (add a new component → assign a renderer → CI validates).
 - **Outcomes are interfaces, not parameters** — downstream components read structured outcomes (not raw upstream parameters), making the pipeline composable and the agent's reasoning bounded.
@@ -579,7 +578,7 @@ Context has a budget. At inference time you have ~200k tokens (or whatever the m
 - What's relevant for *this* query vs the user's full history
 - What cross-user signal (anonymised) is worth surfacing — *"Sarah's situation looks like 47 prior users at this stage; here's how their outcomes informed her recommendations"*
 
-This is where the **policy intelligence moat ([§8.6 in 03-strategy.md](03-strategy.md#86-policy-intelligence-as-a-secondary-moat)) and product reasoning converge** — same accumulated dataset, two uses.
+This is where the **policy intelligence moat ([§8.6 in 03-strategy.md](../03-strategy.md#86-policy-intelligence-as-a-secondary-moat)) and product reasoning converge** — same accumulated dataset, two uses.
 
 ### 12.4 Flow is testable; context is auditable
 

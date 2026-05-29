@@ -6,9 +6,9 @@
 >
 > - The offline KB agent (Claude Code + maintainer) to validate KB anchor coverage and renderer consistency
 > - The user-facing planning agent at session time (loaded as system prompt context, rendered as plan card UI)
-> - The migration script at deployment time to publish a new blueprint version into the `blueprints` table
+> - The migration script at deployment time to publish the blueprint into the `blueprints` table (replacing the prior deploy; git holds history)
 >
-> Companion specs: [fhb-domestic-au-v1.0.md](fhb-domestic-au-v1.0.md) (Mode A). Investor blueprints (Modes C, D) to follow.
+> Companion specs: [fhb-domestic-au.md](fhb-domestic-au.md) (Mode A). Investor blueprints (Modes C, D) to follow.
 
 ---
 
@@ -17,7 +17,6 @@
 ```jsonc
 {
   "blueprint_id": "fhb-foreign-au",
-  "version": "1.0",
   "effective_from": "2026-05-19",
   "effective_until": null,
   "buyer_mode": "fhb",
@@ -26,7 +25,7 @@
   "firb_required": true,
   "language_primary": "vi",
   "language_alternate": "en",
-  "renderer_set": "fhb-v1"
+  "renderer_set": "fhb"
 }
 ```
 
@@ -273,7 +272,7 @@ Mode B activates two new surfaces (Family view, FIRB & Funding) that don't appea
 
 **Parameters:**
 
-Same structure as [Mode A property_assessment](fhb-domestic-au-v1.0.md#2-property_assessment) with these additions and changes:
+Same structure as [Mode A property_assessment](fhb-domestic-au.md#2-property_assessment) with these additions and changes:
 
 ```jsonc
 {
@@ -667,7 +666,7 @@ Note `regulatory_imposts_total` (FIRB fee + foreign-buyer surcharge + LMI if app
 
 **Parameters:**
 
-Identical to [Mode A buying_strategy](fhb-domestic-au-v1.0.md#5-buying_strategy) with these additions:
+Identical to [Mode A buying_strategy](fhb-domestic-au.md#5-buying_strategy) with these additions:
 
 ```jsonc
 {
@@ -709,7 +708,7 @@ The agent enforces the FIRB gate: it refuses to recommend an unconditional bid u
 
 **Parameters:**
 
-Same as [Mode A due_diligence](fhb-domestic-au-v1.0.md#6-due_diligence) plus:
+Same as [Mode A due_diligence](fhb-domestic-au.md#6-due_diligence) plus:
 
 ```jsonc
 {
@@ -747,7 +746,7 @@ Same as [Mode A due_diligence](fhb-domestic-au-v1.0.md#6-due_diligence) plus:
 
 **Parameters:**
 
-Same as [Mode A settlement_prep](fhb-domestic-au-v1.0.md#7-settlement_prep) plus:
+Same as [Mode A settlement_prep](fhb-domestic-au.md#7-settlement_prep) plus:
 
 ```jsonc
 {
@@ -788,7 +787,7 @@ Same as [Mode A settlement_prep](fhb-domestic-au-v1.0.md#7-settlement_prep) plus
 
 **Parameters:**
 
-Same as [Mode A ownership_planning](fhb-domestic-au-v1.0.md#8-ownership_planning) with these critical differences:
+Same as [Mode A ownership_planning](fhb-domestic-au.md#8-ownership_planning) with these critical differences:
 
 ```jsonc
 {
@@ -913,7 +912,7 @@ The `mode_switch_eligible` field signals when the user's status has changed (e.g
 
 ## Renderer vocabulary used
 
-This blueprint uses 10 of the constrained renderer vocabulary defined in [§11.9 in 04-architecture.md](../04-architecture.md#119-blueprint-as-data-model--presentation-specification):
+This blueprint uses 10 of the constrained renderer vocabulary defined in [§11.9 in architecture.md](../architecture/architecture.md#119-blueprint-as-data-model--presentation-specification):
 
 | Renderer | Used by component(s) |
 |---|---|
@@ -967,22 +966,22 @@ No cycles. Mode B specifically adds two critical-path dependencies: `firb_status
 
 ---
 
-## Open questions for v1.1 iteration
+## Open questions / future iteration
 
-These deferred from v1.0 design:
+These deferred from the current design:
 
-1. **Mode switch on PR grant** — when the AU member becomes PR or citizen, the user is no longer a foreign person. The plan card should signal a mode switch to `fhb-domestic-au` or `investor-domestic-au`. v1.0 captures this signal but doesn't specify the migration UX. v1.1 should specify.
-2. **Multi-jurisdiction tax planning** — Vietnamese parents may face Vietnamese tax implications on funding AU property. This blueprint doesn't address VN-side tax obligations. v1.1 should add a `vn_side_tax_implications` component or sub-component.
-3. **Family decision rollback** — if the VN parent decides not to fund after AU member commits, what's the rollback path? v1.1 needs a `decision_rollback` workflow.
-4. **Currency hedging** — large transfers exposed to VND/AUD volatility between commitment and transfer. v1.1 could add hedging guidance to `cross_border_funding`.
-5. **Joint family applications** — if multiple AU-side members co-buy, the `buyer_profile` and `family_context` need to capture multiple AU members. v1.0 assumes single AU member; v1.1 should support joint.
+1. **Mode switch on PR grant** — when the AU member becomes PR or citizen, the user is no longer a foreign person. The plan card should signal a mode switch to `fhb-domestic-au` or `investor-domestic-au`. The current design captures this signal but doesn't specify the refresh UX; a future iteration should specify.
+2. **Multi-jurisdiction tax planning** — Vietnamese parents may face Vietnamese tax implications on funding AU property. This blueprint doesn't address VN-side tax obligations. A future iteration should add a `vn_side_tax_implications` component or sub-component.
+3. **Family decision rollback** — if the VN parent decides not to fund after AU member commits, what's the rollback path? A future iteration needs a `decision_rollback` workflow.
+4. **Currency hedging** — large transfers exposed to VND/AUD volatility between commitment and transfer. A future iteration could add hedging guidance to `cross_border_funding`.
+5. **Joint family applications** — if multiple AU-side members co-buy, the `buyer_profile` and `family_context` need to capture multiple AU members. The current design assumes a single AU member; a future iteration should support joint.
 
 ---
 
 ## Document control
 
-- **Status:** v1.0 draft, May 2026 — second concrete blueprint specification (Mode B)
+- **Status:** draft, May 2026 — second concrete blueprint specification (Mode B)
 - **Author:** Strategic design synthesis (Claude + maintainer)
 - **Consumers:** Offline KB agent, user-facing planning agent, migration script, UI renderer layer
-- **Companion blueprints:** [`fhb-domestic-au-v1.0`](fhb-domestic-au-v1.0.md) (Mode A — drafted). Pending: `investor-domestic-au-v1.0` (Mode C), `investor-foreign-au-v1.0` (Mode D).
+- **Companion blueprints:** [`fhb-domestic-au`](fhb-domestic-au.md) (Mode A — drafted). Pending: `investor-domestic-au` (Mode C), `investor-foreign-au` (Mode D).
 - **Disclaimer:** This is a working spec, not a regulatory document. FIRB regulations, foreign-buyer surcharge percentages, vacancy-fee rules, Vietnamese capital control thresholds, AML/CTF requirements, and non-resident tax treatments must be confirmed against authoritative sources (resolved via kb_anchor lookups) at runtime. Wrong advice across jurisdictions has real legal consequences in both Australia and Vietnam; the blueprint must be paired with rigorous KB curation, agent reasoning verification, and Vietnam-licensed legal partnership.

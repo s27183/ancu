@@ -21,7 +21,7 @@ Critical reference docs by purpose:
 | If you need | Read |
 |---|---|
 | Strategic positioning, REA economics, wedge sequence | [`docs/03-strategy.md`](docs/03-strategy.md) |
-| Three-layer architecture, blueprint model, property pipeline | [`docs/04-architecture.md`](docs/04-architecture.md) |
+| Three-layer architecture, blueprint model, property pipeline | [`docs/architecture/architecture.md`](docs/architecture/architecture.md) |
 | UX model, four user modes, onboarding flow, plan card lifecycle | [`docs/05-ux-model.md`](docs/05-ux-model.md) |
 | The four concrete plan card blueprints | [`docs/blueprints/`](docs/blueprints/) |
 | What a real property card looks like (test output) | [`docs/samples/property-card-example.html`](docs/samples/property-card-example.html) |
@@ -36,13 +36,15 @@ These are not preferences. They are decisions locked into the architecture. Viol
 
 2. **Base plan + property addenda.** Every plan card has one persistent base plan (property-agnostic) and zero-or-more property addenda (one per attached property). Components have `scope: base | per-property | both`.
 
-3. **No property scraping pipeline.** We do not operate at scale in the property data acquisition market. Property data flows only via narrow paths: suburb enrichment from public feeds (ABS), user URL paste, browser extension, Tìm Nhà human curation, and (later) partner REA push. See [`docs/04-architecture.md#1110-property-data-pipeline--narrow-and-demand-driven`](docs/04-architecture.md).
+3. **No property scraping pipeline.** We do not operate at scale in the property data acquisition market. Property data flows only via narrow paths: suburb enrichment from public feeds (ABS), user URL paste, browser extension, Tìm Nhà human curation, and (later) partner REA push. See [`docs/architecture/architecture.md#1110-property-data-pipeline--narrow-and-demand-driven`](docs/architecture/architecture.md).
 
 4. **Fully agentic.** The planning agent reasons over context (KB + user state + uploads) and produces structured output. Tìm Nhà human curators are a tool the agent invokes, not a replacement for agency.
 
-5. **Component-flow architecture.** Each blueprint is a directed acyclic pipeline of components with `goal`, `inputs`, `parameters`, `outcome_schema`. Outcomes are typed interfaces; downstream components read outcomes, not upstream parameters. See [`docs/04-architecture.md#119-blueprint-as-data-model--presentation-specification`](docs/04-architecture.md).
+5. **Component-flow architecture.** Each blueprint is a directed acyclic pipeline of components with `goal`, `inputs`, `parameters`, `outcome_schema`. Outcomes are typed interfaces; downstream components read outcomes, not upstream parameters. See [`docs/architecture/architecture.md#119-blueprint-as-data-model--presentation-specification`](docs/architecture/architecture.md).
 
-6. **Slug-based KB references.** KB content lives in `docs/kb/*.md` files with frontmatter (`slug:`, `version:`, `effective_from:`, `last_verified:`). Blueprints reference KB via slugs (e.g., `scheme.fhg`, `kb.firb.application-process`). Migration script validates slugs at deploy.
+6. **Slug-based KB references.** KB content lives in `docs/kb/*.md` files with frontmatter (`slug:`, `effective_from:`, `last_verified:`). Blueprints reference KB via slugs (e.g., `scheme.fhg`, `kb.firb.application-process`). Migration script validates slugs at deploy.
+
+    **No semantic versioning (CI/CD).** Blueprints and KB are not version-numbered (no `v1.0`, no `@1.2` pinning). The repo is the source of truth; deploy publishes the latest, git holds the history. Reproducibility for the regulated audit trail comes from each filled plan card recording the **deploy commit SHA + a snapshot of the resolved KB content** at fill time. (Roadmap phase names like "Wedge 1" are planning language, not artifact versions.)
 
 7. **Constrained renderer vocabulary.** Blueprints can only use renderers from the enum defined in §11.9 (`summary-card`, `swimlane-diagram`, `checklist`, `data-table`, `calculator`, `buying-strategy-card`, `risk-flag-list`, `comparison-grid`, `opportunity-card`, `scheme-stack-card`, `firb-workflow-card`, `family-view-card`, `decision-trail`). New renderers are intentional design decisions, not arbitrary additions.
 
@@ -56,10 +58,10 @@ These are not preferences. They are decisions locked into the architecture. Viol
 
 | Mode | Audience | FIRB | Blueprint |
 |---|---|---|---|
-| A | Vietnamese-AU citizen / PR FHB | No | [`blueprints/fhb-domestic-au-v1.0.md`](docs/blueprints/fhb-domestic-au-v1.0.md) |
-| B | Vietnam-parent funding AU child / AU temp resident FHB | Yes | [`blueprints/fhb-foreign-au-v1.0.md`](docs/blueprints/fhb-foreign-au-v1.0.md) |
-| C | Vietnamese-AU investor (citizen / PR) | No | [`blueprints/investor-domestic-au-v1.0.md`](docs/blueprints/investor-domestic-au-v1.0.md) |
-| D | Vietnam-located investor | Yes | [`blueprints/investor-foreign-au-v1.0.md`](docs/blueprints/investor-foreign-au-v1.0.md) |
+| A | Vietnamese-AU citizen / PR FHB | No | [`blueprints/fhb-domestic-au.md`](docs/blueprints/fhb-domestic-au.md) |
+| B | Vietnam-parent funding AU child / AU temp resident FHB | Yes | [`blueprints/fhb-foreign-au.md`](docs/blueprints/fhb-foreign-au.md) |
+| C | Vietnamese-AU investor (citizen / PR) | No | [`blueprints/investor-domestic-au.md`](docs/blueprints/investor-domestic-au.md) |
+| D | Vietnam-located investor | Yes | [`blueprints/investor-foreign-au.md`](docs/blueprints/investor-foreign-au.md) |
 
 Wedge 1 targets Mode A only. Mode B / C / D blueprints are drafted but not in scope for Wedge 1a.
 
@@ -73,7 +75,7 @@ In order of value + dependency:
 
 3. **Suburb enrichment ingestion** — ABS Data API adapter for SAL-level Census 2021 data (Vietnamese ancestry %, demographics, family composition, dwelling characteristics). State education / planning / flood adapters as separate jobs. RBA FX rate daily feed. CoreLogic / PropTrack are PAID, deferred — don't subscribe yet.
 
-4. **Mode A FHB blueprint loader + planning agent (base scope only)** — load `fhb-domestic-au-v1.0.md`, validate kb_anchors resolve, implement the agent prompt for each `scope: base` component (`buyer_profile`, `eligibility`, `mortgage_finance` base, `cash_position` base, `ownership_planning` base).
+4. **Mode A FHB blueprint loader + planning agent (base scope only)** — load `fhb-domestic-au.md`, validate kb_anchors resolve, implement the agent prompt for each `scope: base` component (`buyer_profile`, `eligibility`, `mortgage_finance` base, `cash_position` base, `ownership_planning` base).
 
 5. **Onboarding UI** — mode picker, state picker, VND/AUD price range, map zone selection, intent tags. Saves to `plan_cards` table.
 
@@ -94,14 +96,16 @@ firsthomey/
 ├── CLAUDE.md (this file)
 ├── docs/                         (strategic + architectural docs — the working agreement)
 │   ├── README.md
-│   ├── 01-market.md through 06-roadmap.md
-│   ├── 04-architecture.md
-│   ├── 05-ux-model.md
+│   ├── 01-market.md, 02-competitive-landscape.md, 03-strategy.md, 05-ux-model.md, 06-roadmap.md
+│   ├── architecture/                  (architecture doc + design principles)
+│   │   ├── architecture.md            (three-layer architecture, blueprint model, property pipeline)
+│   │   ├── principles.md
+│   │   └── erlang-design-checklist.md
 │   ├── blueprints/
-│   │   ├── fhb-domestic-au-v1.0.md
-│   │   ├── fhb-foreign-au-v1.0.md
-│   │   ├── investor-domestic-au-v1.0.md
-│   │   └── investor-foreign-au-v1.0.md
+│   │   ├── fhb-domestic-au.md
+│   │   ├── fhb-foreign-au.md
+│   │   ├── investor-domestic-au.md
+│   │   └── investor-foreign-au.md
 │   ├── kb/                       (to be created: curated KB markdown files with frontmatter)
 │   │   ├── scheme/
 │   │   ├── firb/
@@ -166,7 +170,7 @@ firsthomey/
 
 1. Re-read the relevant section of the docs (the README has an audience-guided reading path).
 2. Update the docs to reflect the new understanding before writing code that depends on the new understanding.
-3. Component-flow questions → §11.9 in `docs/04-architecture.md`.
+3. Component-flow questions → §11.9 in `docs/architecture/architecture.md`.
 4. UX / surface questions → §13 in `docs/05-ux-model.md`.
 5. Strategic positioning questions → §8 in `docs/03-strategy.md`.
 6. "Should the platform do X?" → if X requires a market position in property data acquisition, the answer is no.

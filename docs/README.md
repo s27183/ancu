@@ -10,7 +10,7 @@ This document set contains the research, strategy, architecture, UX model, and r
 
 ## The platform in one paragraph
 
-The Vietnamese diaspora property segment is structurally unserved by independent, end-to-end planning tools. Vietnamese-Australians (318,760 Vietnam-born + 334,781 with Vietnamese ancestry) and Vietnam-located buyers (Vietnamese = 4th largest foreign buyers of Australian residential property, 8–10% of off-the-plan apartments) are large, growing, and unaddressed by incumbents (Aussie, Lendi, HTAG, banks). The platform serves four user modes (Vietnamese-AU FHB, Vietnam-parent funding AU property, AU investor, VN-located investor) on a unified architecture, with property-first entry and FIRB-aware mode switching. Independence is the moat: buyers pay; REAs partner under fee structures that preserve buyer-side trust. Cultural + linguistic vertical, cross-border family coordination, and lifecycle continuity define the defensible position.
+The Vietnamese diaspora property segment is structurally unserved by independent, end-to-end planning tools. Vietnamese-Australians (318,760 Vietnam-born + 334,781 with Vietnamese ancestry) and Vietnam-located buyers (Vietnamese = 4th largest foreign buyers of Australian residential property, 8–10% of off-the-plan apartments) are large, growing, and unaddressed by incumbents (Aussie, Lendi, HTAG, banks). The platform serves four user modes (Vietnamese-AU FHB, Vietnam-parent funding AU property, AU investor, VN-located investor) on a unified architecture, with plan-first entry (property added when the user is ready) and FIRB-aware mode switching. Independence is the moat: buyers pay; REAs partner under fee structures that preserve buyer-side trust. Cultural + linguistic vertical, cross-border family coordination, and lifecycle continuity define the defensible position.
 
 For the working Mode A prototype demonstrating property analysis, scheme stacking, and document review for Vietnamese-Australian FHBs, see [`first_home_buyer_plan.html`](first_home_buyer_plan.html).
 
@@ -23,15 +23,15 @@ For the working Mode A prototype demonstrating property analysis, scheme stackin
 | **[01-market.md](01-market.md)** | Federal + state scheme landscape (FHG, Help to Buy, FHSS, state stamp duty concessions, QLD new-home concession, FIRB regime), the temporal transaction flow, FHB pain points (Finder 2025), market sizing across four Vietnamese-diaspora segments | …you want to understand the underlying market mechanics and segment sizes |
 | **[02-competitive-landscape.md](02-competitive-landscape.md)** | Existing tools (firsthomebuyers.gov.au, Aussie, Lendi, CBA, HTAG, Proper Inspect, DocoCheck, Tomo, Habito), the current Vietnamese buyer channel structure with chain comparisons across all four user modes, gap analysis | …you want to understand who's already in the space and where the cost / inefficiency in the current Vietnamese buyer chain sits |
 | **[03-strategy.md](03-strategy.md)** | Positioning (five moats + augmentation framing), REA partnership economics (two-tier complementary model: Vietnamese-community + mainstream), policy intelligence as secondary moat, hard truths and cross-border / FIRB risks, the 30-month four-wedge build sequence | …you want the business strategy and go-to-market plan |
-| **[04-architecture.md](04-architecture.md)** | Three-layer architecture (static KB / user state / agentic reasoning), update cadences, interaction intensity by phase, product modes, Claude Code fit, the user state trap, context-and-flow framing (the agentic platform formula), flow taxonomy, org structure | …you want the technical strategy and build approach |
-| **[05-ux-model.md](05-ux-model.md)** | Property-first entry, four user modes, seven UX surfaces, two worked journeys (Sarah for Mode A Vietnamese-AU FHB; An Tran's cross-border family for Mode B with FIRB workflow), MVP scope for Wedge 1, six traps to avoid | …you want to understand the user experience, surfaces, and concrete user journeys |
+| **[architecture/architecture.md](architecture/architecture.md)** | Three-layer architecture (static KB / user state / agentic reasoning), update cadences, interaction intensity by phase, product modes, Claude Code fit, the user state trap, context-and-flow framing (the agentic platform formula), flow taxonomy, org structure | …you want the technical strategy and build approach |
+| **[05-ux-model.md](05-ux-model.md)** | Plan-first entry, four user modes, seven UX surfaces, two worked journeys (Sarah for Mode A Vietnamese-AU FHB; An Tran's cross-border family for Mode B with FIRB workflow), MVP scope for Wedge 1, six traps to avoid | …you want to understand the user experience, surfaces, and concrete user journeys |
 | **[06-roadmap.md](06-roadmap.md)** | Next steps for a builder pursuing this — user research, regulatory scoping, MVP scope, distribution tests, partnership exploration | …you want the execution checklist |
 | **[references.md](references.md)** | All 54 numbered references + document control + disclaimers | …you want to verify a specific claim or follow a source |
 | **[blueprints/](blueprints/)** | Plan card blueprint specifications — concrete data + presentation specs that the offline KB agent maintains, the user-facing planning agent reads at session time, and the UI renders | …you want the working specs Claude Code builds against |
-| **[blueprints/fhb-domestic-au-v1.0.md](blueprints/fhb-domestic-au-v1.0.md)** | Mode A — Vietnamese-AU citizen / PR FHB — **9-component pipeline** (buyer_profile → property_assessment → eligibility → **mortgage_finance** → cash_position → buying_strategy → due_diligence → settlement_prep → ownership_planning) | …you're building the Mode A flow |
-| **[blueprints/fhb-foreign-au-v1.0.md](blueprints/fhb-foreign-au-v1.0.md)** | Mode B — Vietnam-parent funding AU child OR AU temp resident FHB — **11-component pipeline** adding `family_context`, `firb_workflow`, `mortgage_finance` (non-resident variant), `cross_border_funding`; foreign-buyer surcharge + FIRB fees + FX; vacancy fee + non-resident tax | …you're building the cross-border / FIRB-aware FHB flow |
-| **[blueprints/investor-domestic-au-v1.0.md](blueprints/investor-domestic-au-v1.0.md)** | Mode C — Vietnamese-AU investor (citizen / PR) — **11-component pipeline** with `investment_strategy`, `mortgage_finance` (investor variant: IO + offset + investor lenders), `yield_modelling`, `tax_structure` (incl. negative gearing); investor-tactics buying; portfolio planning. Competes directly with HTAG | …you're building the domestic investor flow |
-| **[blueprints/investor-foreign-au-v1.0.md](blueprints/investor-foreign-au-v1.0.md)** | Mode D — Vietnam-located investor — **13-component pipeline** combining Mode B foreign-person components with Mode C investor components, plus `mortgage_finance` (non-resident investor — most restrictive lender pool); non-resident tax (FRCGW, no CGT discount); repatriation strategy; most complex of the four | …you're building the Vietnam-located investor flow |
+| **[blueprints/fhb-domestic-au.md](blueprints/fhb-domestic-au.md)** | Mode A — Vietnamese-AU citizen / PR FHB — **9-component pipeline** (buyer_profile → property_assessment → eligibility → **mortgage_finance** → cash_position → buying_strategy → due_diligence → settlement_prep → ownership_planning) | …you're building the Mode A flow |
+| **[blueprints/fhb-foreign-au.md](blueprints/fhb-foreign-au.md)** | Mode B — Vietnam-parent funding AU child OR AU temp resident FHB — **11-component pipeline** adding `family_context`, `firb_workflow`, `mortgage_finance` (non-resident variant), `cross_border_funding`; foreign-buyer surcharge + FIRB fees + FX; vacancy fee + non-resident tax | …you're building the cross-border / FIRB-aware FHB flow |
+| **[blueprints/investor-domestic-au.md](blueprints/investor-domestic-au.md)** | Mode C — Vietnamese-AU investor (citizen / PR) — **11-component pipeline** with `investment_strategy`, `mortgage_finance` (investor variant: IO + offset + investor lenders), `yield_modelling`, `tax_structure` (incl. negative gearing); investor-tactics buying; portfolio planning. Competes directly with HTAG | …you're building the domestic investor flow |
+| **[blueprints/investor-foreign-au.md](blueprints/investor-foreign-au.md)** | Mode D — Vietnam-located investor — **13-component pipeline** combining Mode B foreign-person components with Mode C investor components, plus `mortgage_finance` (non-resident investor — most restrictive lender pool); non-resident tax (FRCGW, no CGT discount); repatriation strategy; most complex of the four | …you're building the Vietnam-located investor flow |
 | **[first_home_buyer_plan.html](first_home_buyer_plan.html)** | Mode A example output — Overview, Temporal flow, Before you buy, After you buy, Cash calculator tabs demonstrating what a filled plan card looks like | …you want the working prototype demonstrating property analysis + scheme stacking + document review |
 
 ---
@@ -48,7 +48,7 @@ For the working Mode A prototype demonstrating property analysis, scheme stackin
 
 **If you're a technical co-founder or early hire:**
 1. This README (5 min)
-2. [04-architecture.md](04-architecture.md) entire (20 min) — three-layer architecture + context-and-flow framing + Claude Code fit
+2. [architecture/architecture.md](architecture/architecture.md) entire (20 min) — three-layer architecture + context-and-flow framing + Claude Code fit
 3. [05-ux-model.md](05-ux-model.md) entire (15 min) — surfaces, modes, journeys
 4. [03-strategy.md](03-strategy.md) §10 Wedge sequence (10 min) — what to build first and why
 5. [02-competitive-landscape.md](02-competitive-landscape.md) §6.5 AI-native point tools + §6.8 chain structure (10 min) — context for product decisions
@@ -61,7 +61,7 @@ For the working Mode A prototype demonstrating property analysis, scheme stackin
 **If you're a mainstream REA (Ray White, McGrath, etc.) considering Tier 2 partnership:**
 1. [03-strategy.md](03-strategy.md) §8.5 Tier 2 — Mainstream REAs (10 min) — what you get, what you pay
 2. [02-competitive-landscape.md](02-competitive-landscape.md) §6.8 chain analysis (10 min) — the Vietnamese demand you currently can't reach
-3. [05-ux-model.md](05-ux-model.md) §13.4 Property-first entry (5 min) — how the platform routes buyers to you
+3. [05-ux-model.md](05-ux-model.md) §13.4 Plan-first onboarding (5 min) — how the platform routes buyers to you
 
 **If you're a regulator or policy contact:**
 1. This README (5 min)
@@ -88,7 +88,7 @@ Sections retain their original numbering across the split (§1–§14). To find 
 | §1–§5 | [01-market.md](01-market.md) |
 | §6–§7 | [02-competitive-landscape.md](02-competitive-landscape.md) |
 | §8–§10 | [03-strategy.md](03-strategy.md) |
-| §11–§12 | [04-architecture.md](04-architecture.md) |
+| §11–§12 | [architecture/architecture.md](architecture/architecture.md) |
 | §13 | [05-ux-model.md](05-ux-model.md) |
 | §14 | [06-roadmap.md](06-roadmap.md) |
 | References + Document control | [references.md](references.md) |
@@ -103,9 +103,9 @@ In-narrative references like *"see §8.5"* will navigate within their containing
 | §8.4 Augmentation positioning | [03-strategy.md](03-strategy.md) | "Augmentation, not disintermediation" — the cooperative framing for the channel |
 | §8.5 REA partnership economics (two-tier) | [03-strategy.md](03-strategy.md) | Tier 1 (community REAs) + Tier 2 (mainstream REAs) with independence guardrails |
 | §10 Build strategy & wedge sequence | [03-strategy.md](03-strategy.md) | The 30-month four-wedge plan |
-| §11.9 Blueprint as data model + presentation specification | [04-architecture.md](04-architecture.md) | The dual-role plan card blueprint — data model AND UI driver; storage/versioning; system prompt construction |
-| §11.10 Property data pipeline — narrow and demand-driven | [04-architecture.md](04-architecture.md) | The platform does NOT operate a property scraping pipeline. Property data flows only via narrow demand-driven paths: suburb enrichment (public feeds), user URL paste, browser extension, and (later) partner REA push |
-| §11.11 Tìm Nhà property search service | [04-architecture.md](04-architecture.md) | Agent-invoked, human-curated property search. Vietnamese-speaking curators manually research listings. $200–500 per engagement |
+| §11.9 Blueprint as data model + presentation specification | [architecture/architecture.md](architecture/architecture.md) | The dual-role plan card blueprint — data model AND UI driver; storage/deployment; system prompt construction |
+| §11.10 Property data pipeline — narrow and demand-driven | [architecture/architecture.md](architecture/architecture.md) | The platform does NOT operate a property scraping pipeline. Property data flows only via narrow demand-driven paths: suburb enrichment (public feeds), user URL paste, browser extension, and (later) partner REA push |
+| §11.11 Tìm Nhà property search service | [architecture/architecture.md](architecture/architecture.md) | Agent-invoked, human-curated property search. Vietnamese-speaking curators manually research listings. $200–500 per engagement |
 | §13.2 The four user modes | [05-ux-model.md](05-ux-model.md) | Mode A/B/C/D with FIRB status, default flows |
 | §13.4 Plan-first onboarding + suburb-intelligence map | [05-ux-model.md](05-ux-model.md) | Replaces property-first entry. User enters with situation; map shows suburb intelligence (investment / yield / family / Vietnamese community), not property pins |
 | §13.5 Worked examples (Sarah + An Tran) | [05-ux-model.md](05-ux-model.md) | Two concrete journeys: Mode A FHB + Mode B cross-border family |
