@@ -1,0 +1,73 @@
+# IDE / agents / shells
+.idea/
+.vscode/
+.junie/
+.claude/
+**/CLAUDE.local.md
+
+# OS detritus
+.DS_Store
+**/.DS_Store
+Thumbs.db
+
+# Secrets and env
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.jwk
+.dev-tenant.jwk
+
+# Logs
+**/logs/
+*.log
+
+# Scratch
+**/scratch.md
+**/scratch/
+**/.scratch/
+
+# Orchestrator subagent worktrees (Phase 2.7.4)
+tmp/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+build/
+dist/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Erlang / OTP
+_build/
+*.beam
+ebin/
+erl_crash.dump
+.rebar3/
+rebar3.crashdump
+
+# Node / SvelteKit
+node_modules/
+.svelte-kit/
+.vite/
+.cache/
+.turbo/
+build/
+
+# Database
+*.dump
+*.sqlite
+*.sqlite3
+
+# Generated reports (local-only)
+docs/reports/
+docs/scratch/

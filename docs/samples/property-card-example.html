@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Property Card — Victoria Square, Footscray (Pipeline Test Output)</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    background: #fafaf9;
+    color: #1c1917;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 32px 24px 80px; }
+
+  /* Pipeline banner */
+  .pipeline-banner {
+    background: #fef3c7;
+    border: 1px solid #fde68a;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    color: #92400e;
+  }
+  .pipeline-banner strong { color: #78350f; }
+
+  header { margin-bottom: 20px; }
+  header h1 {
+    font-size: 22px; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 6px;
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  }
+  header .meta { color: #57534e; font-size: 13px; }
+
+  .controls {
+    display: flex; gap: 10px; align-items: center; margin-top: 12px; flex-wrap: wrap;
+  }
+  .lang-toggle {
+    background: #ffffff; border: 1px solid #d6d3d1; border-radius: 8px;
+    padding: 4px; display: inline-flex; gap: 2px;
+  }
+  .lang-toggle button {
+    padding: 6px 12px; border: none; background: transparent;
+    font-size: 12px; font-weight: 500; color: #57534e; border-radius: 6px;
+    cursor: pointer; font-family: inherit;
+  }
+  .lang-toggle button.active { background: #1c1917; color: #ffffff; }
+
+  /* Quality + provenance bar */
+  .quality-bar {
+    background: #ffffff; border: 1px solid #e7e5e4; border-radius: 8px;
+    padding: 12px 16px; margin-bottom: 20px;
+    display: flex; flex-wrap: wrap; gap: 14px; align-items: center;
+    font-size: 12px;
+  }
+  .qual-item { display: inline-flex; align-items: center; gap: 6px; color: #57534e; }
+  .qual-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .qual-dot.green { background: #16a34a; }
+  .qual-dot.amber { background: #f59e0b; }
+  .qual-dot.red { background: #dc2626; }
+  .qual-dot.gray { background: #a8a29e; }
+  .qual-value { color: #1c1917; font-weight: 600; }
+
+  /* Tabs */
+  nav.tabs {
+    display: flex; gap: 4px; flex-wrap: wrap;
+    background: #f5f5f4; padding: 4px; border-radius: 10px;
+    margin-bottom: 22px; border: 1px solid #e7e5e4;
+  }
+  nav.tabs button {
+    flex: 1; min-width: 140px;
+    padding: 10px 14px; border: none; background: transparent;
+    color: #57534e; font-size: 13px; font-weight: 500;
+    border-radius: 7px; cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    font-family: inherit;
+  }
+  nav.tabs button:hover { color: #1c1917; }
+  nav.tabs button.active {
+    background: #ffffff; color: #1c1917;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  }
+
+  section.tab { display: none; }
+  section.tab.active { display: block; }
+
+  .card {
+    background: #ffffff; border: 1px solid #e7e5e4;
+    border-radius: 10px; padding: 22px;
+    margin-bottom: 16px;
+  }
+  .card h2 {
+    font-size: 16px; font-weight: 600; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .card h3 { font-size: 13px; font-weight: 600; margin-top: 14px; margin-bottom: 6px; color: #1c1917; }
+  .card p { color: #44403c; font-size: 13px; margin-bottom: 8px; line-height: 1.55; }
+  .card ul { padding-left: 18px; color: #44403c; font-size: 13px; }
+  .card ul li { margin-bottom: 4px; }
+
+  /* Hero card */
+  .hero-card { position: relative; padding: 0; overflow: hidden; }
+  .hero-card .hero-image {
+    width: 100%; height: 220px; background: linear-gradient(135deg, #c2410c, #9a3412);
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.5); font-size: 12px; font-style: italic;
+  }
+  .hero-card .hero-content { padding: 20px 22px; }
+  .hero-card h2 { font-size: 19px; margin-bottom: 8px; }
+  .hero-card .price-range {
+    font-size: 22px; font-weight: 700; color: #1c1917; margin-bottom: 4px;
+  }
+  .hero-card .price-source {
+    font-size: 11px; color: #92400e; background: #fef3c7;
+    padding: 2px 8px; border-radius: 4px; display: inline-block;
+  }
+  .hero-card .address-line { color: #57534e; font-size: 14px; margin-top: 6px; }
+
+  /* Field grid */
+  .field-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  }
+  @media (max-width: 720px) { .field-grid { grid-template-columns: 1fr; } }
+  .field {
+    background: #fafaf9; border: 1px solid #e7e5e4;
+    border-radius: 6px; padding: 10px 12px;
+  }
+  .field .label {
+    font-size: 10px; color: #78716c; text-transform: uppercase;
+    letter-spacing: 0.04em; font-weight: 600; margin-bottom: 4px;
+  }
+  .field .value { font-size: 14px; color: #1c1917; font-weight: 600; }
+  .field .source-tag {
+    display: inline-block; font-size: 9px; padding: 1px 6px;
+    border-radius: 999px; margin-left: 6px; vertical-align: middle;
+    font-weight: 500;
+  }
+  .source-tag.source { background: #dbeafe; color: #1e40af; }
+  .source-tag.simulated { background: #fef3c7; color: #92400e; }
+  .source-tag.derived { background: #d1fae5; color: #065f46; }
+  .source-tag.missing { background: #fee2e2; color: #991b1b; }
+
+  /* Description */
+  .description {
+    background: #fafaf9; border-left: 3px solid #c2410c;
+    padding: 12px 16px; border-radius: 4px;
+    font-size: 13px; color: #44403c; font-style: italic; line-height: 1.6;
+  }
+
+  /* Plan tab placeholder */
+  .plan-placeholder { text-align: center; padding: 30px 20px; }
+  .plan-placeholder h2 { justify-content: center; font-size: 18px; }
+  .plan-placeholder .subhead { color: #57534e; font-size: 14px; margin-bottom: 20px; }
+  .mode-selector {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 20px 0;
+  }
+  @media (max-width: 720px) { .mode-selector { grid-template-columns: 1fr; } }
+  .mode-card {
+    border: 2px solid #e7e5e4; border-radius: 10px; padding: 20px;
+    cursor: pointer; transition: border-color 0.15s, background 0.15s;
+    text-align: left;
+  }
+  .mode-card:hover { border-color: #c2410c; background: #fff7ed; }
+  .mode-card h3 { font-size: 14px; color: #1c1917; margin-bottom: 4px; }
+  .mode-card .mode-sub { font-size: 11px; color: #78716c; margin-bottom: 10px; }
+  .mode-card .mode-desc { font-size: 12px; color: #44403c; line-height: 1.5; }
+  .mode-card .firb-warn {
+    display: inline-block; font-size: 10px; background: #fee2e2; color: #991b1b;
+    padding: 2px 6px; border-radius: 4px; margin-top: 8px;
+  }
+  .next-steps {
+    background: #fef3c7; border: 1px solid #fde68a; border-radius: 6px;
+    padding: 12px 16px; margin-top: 18px;
+    font-size: 12px; color: #92400e; text-align: left;
+  }
+  .next-steps strong { color: #78350f; }
+
+  footer {
+    margin-top: 30px; padding-top: 18px; border-top: 1px solid #e7e5e4;
+    font-size: 11px; color: #78716c; line-height: 1.6;
+  }
+  footer a { color: #c2410c; text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  /* Vietnamese visibility (only show vi when language=vi) */
+  body[lang="en"] .vi-only { display: none; }
+  body[lang="vi"] .en-only { display: none; }
+</style>
+</head>
+<body lang="en">
+<div class="wrap">
+
+<!-- Pipeline banner: explains this is a test output -->
+<div class="pipeline-banner">
+  <strong>Pipeline test output (May 2026):</strong> this property card was produced end-to-end by running the §11.10 property data pipeline against a real listing. Source: Nestoria aggregator (original listing on Domain via Barry Plant Yarraville). Fields are marked by source: <span class="source-tag source">SOURCE</span> from the fetched page, <span class="source-tag derived">DERIVED</span> computed/inferred from source, <span class="source-tag simulated">SIM</span> simulated enrichment that would come from external feeds in production, <span class="source-tag missing">MISSING</span> not available — confirm at listing.
+</div>
+
+<header>
+  <h1>
+    <span class="en-only">Property card</span>
+    <span class="vi-only">Thẻ tài sản</span>
+  </h1>
+  <p class="meta">
+    <span class="en-only">Generated by the offline KB agent property data pipeline. This is the artifact rendered to the user when they select a property from the map or paste a listing URL.</span>
+    <span class="vi-only">Được tạo bởi quy trình dữ liệu tài sản của KB agent offline. Đây là thành phẩm hiển thị cho người dùng khi họ chọn một tài sản từ bản đồ hoặc dán URL.</span>
+  </p>
+  <div class="controls">
+    <div class="lang-toggle" role="tablist" aria-label="Language">
+      <button data-lang="en" class="active" onclick="setLang('en')">English</button>
+      <button data-lang="vi" onclick="setLang('vi')">Tiếng Việt</button>
+    </div>
+  </div>
+</header>
+
+<!-- Quality + provenance bar -->
+<div class="quality-bar">
+  <span class="qual-item">
+    <span class="qual-dot amber"></span>
+    <span class="en-only">Completeness:</span><span class="vi-only">Hoàn chỉnh:</span>
+    <span class="qual-value">58%</span>
+  </span>
+  <span class="qual-item">
+    <span class="qual-dot amber"></span>
+    <span class="en-only">Source freshness:</span><span class="vi-only">Độ mới:</span>
+    <span class="qual-value">30+ days</span>
+  </span>
+  <span class="qual-item">
+    <span class="qual-dot green"></span>
+    <span class="en-only">Cache fetched:</span><span class="vi-only">Tải về:</span>
+    <span class="qual-value">just now</span>
+  </span>
+  <span class="qual-item">
+    <span class="qual-dot amber"></span>
+    <span class="en-only">Source authority:</span><span class="vi-only">Nguồn:</span>
+    <span class="qual-value">aggregator (Nestoria → Domain)</span>
+  </span>
+  <span class="qual-item">
+    <span class="qual-dot green"></span>
+    <span class="en-only">Deduplication:</span><span class="vi-only">Trùng lặp:</span>
+    <span class="qual-value">unique</span>
+  </span>
+</div>
+
+<!-- Tabs -->
+<nav class="tabs" role="tablist">
+  <button data-tab="property" class="active" role="tab">
+    <span class="en-only">Property info</span><span class="vi-only">Thông tin tài sản</span>
+  </button>
+  <button data-tab="plan" role="tab">
+    <span class="en-only">Plan</span><span class="vi-only">Kế hoạch</span>
+  </button>
+</nav>
+
+<!-- TAB: Property info -->
+<section id="property" class="tab active">
+
+  <!-- Hero -->
+  <div class="card hero-card">
+    <div class="hero-image">[image placeholder · primary_image_url available in source]</div>
+    <div class="hero-content">
+      <h2>
+        <span class="en-only">Victoria Square (high-rise) · 2BR / 2BA apartment</span>
+        <span class="vi-only">Tòa Victoria Square · căn hộ 2 phòng ngủ / 2 phòng tắm</span>
+      </h2>
+      <div class="price-range">$550,000 – $650,000</div>
+      <span class="price-source">
+        <span class="en-only">SIM · suburb 2BR median estimate (price not disclosed by aggregator)</span>
+        <span class="vi-only">SIM · ước tính theo trung vị 2 phòng ngủ trong khu vực</span>
+      </span>
+      <div class="address-line">
+        <strong>Victoria Square complex, 16th floor</strong><br>
+        Footscray VIC 3011, Australia
+      </div>
+    </div>
+  </div>
+
+  <!-- Basics -->
+  <div class="card">
+    <h2>
+      <span class="en-only">Basics</span><span class="vi-only">Thông tin cơ bản</span>
+    </h2>
+    <div class="field-grid">
+      <div class="field">
+        <div class="label"><span class="en-only">Property type</span><span class="vi-only">Loại tài sản</span></div>
+        <div class="value">Established apartment <span class="source-tag source">SOURCE</span></div>
+      </div>
+      <div class="field">
+        <div class="label"><span class="en-only">Bedrooms</span><span class="vi-only">Phòng ngủ</span></div>
+        <div class="value">2 <span class="source-tag source">SOURCE</span></div>
+      </div>
+      <div class="field">
+        <div class="label"><span class="en-only">Bathrooms</span><span class="vi-only">Phòng tắm</span></div>
+        <div class="value">2 <span class="source-tag source">SOURCE</span></div>
+      </div>
+      <div class="field">
+        <div class="label"><span class="en-only">Parking</span><span class="vi-only">Đậu xe</span></div>
+        <div class="value">1 (typical for complex) <span class="source-tag simulated">SIM</span></div>
+      </div>
+      <div class="field">
+        <div class="label"><span class="en-only">Internal area</span><span class="vi-only">Diện tích trong</span></div>
+        <div class="value">~65–75 sqm <span class="source-tag simulated">SIM</span></div>
+      </div>
+      <div class="field">
+        <div class="label"><span class="en-only">Year built</span><span class="vi-only">Năm xây</span></div>
+        <div class="value">~2018–2020 (Victoria Square complex) <span class="source-tag simulated">SIM</span></div>
+      </div>
+      <div class="field">
+        <div class="label"><span class="en-only">Floor</span><span class="vi-only">Tầng</span></div>
+        <div class="value">16 <span class="source-tag source">SOURCE</span></div>
+      </div>
+      <div class="field">
+        <div class="label"><span class="en-only">Land size</span><span class="vi-only">Diện tích đất</span></div>
+        <div class="value">N/A (apartment) <span class="source-tag derived">DERIVED</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Location & enrichment -->
+  <div class="card">
+    <h2>
+      <span class="en-only">Location &amp; suburb context</span>
+      <span class="vi-only">Vị trí &amp; bối cảnh khu vực</span>
+    </h2>
+    <div class="field-grid">
+      <div class="field">
+        <div class="label"><span class="en-only">Suburb</span><span class="vi-only">Khu vực</span></div>
+        <div class="value">Footscray, VIC 3011 <span class="source-tag source">SOURCE</span></div>
+      </div>
+      <div class="field">
+        <div class="label"><span class="en-only">Geocode confidence</span><span class="vi-only">Độ chính xác toạ độ</span></div>
+        <div class="value">70% (suburb level) <span class="source-tag derived">DERIVED</span></div>
+      </div>
+      <div class="field">
+        <div class="label"><span class="en-only">Flood risk band</span><span class="vi-only">Rủi ro lũ lụt</span></div>
+        <div class="value">Low-medium (Maribyrnong nearby) <span class="source-tag simulated">SIM</span></div>
+      </div>
+      <div class="field">
+        <div class="label"><span class="en-only">School catchment</span><span class="vi-only">Khu vực trường học</span></div>
+        <div class="value">Mixed (Footscray Primary, Footscray HS) <span class="source-tag simulated">SIM</span></div>
+      </div>
+      <div class="field">
+        <div class="label"><span class="en-only">Transport (Footscray Station)</span><span class="vi-only">Giao thông (ga Footscray)</span></div>
+        <div class="value">800m walk · 1 stop to CBD <span class="source-tag source">SOURCE</span></div>
+      </div>
+      <div class="field">
+        <div class="label"><span class="en-only">5yr suburb growth</span><span class="vi-only">Tăng trưởng 5 năm</span></div>
+        <div class="value">~4–6%/yr (median apartment) <span class="source-tag simulated">SIM</span></div>
+      </div>
+      <div class="field">
+        <div class="label"><span class="en-only">Rental vacancy rate</span><span class="vi-only">Tỷ lệ trống</span></div>
+        <div class="value">~2.5% <span class="source-tag simulated">SIM</span></div>
+      </div>
+      <div class="field">
+        <div class="label"><span class="en-only">Vietnamese community proximity</span><span class="vi-only">Cộng đồng Việt</span></div>
+        <div class="value">High (Footscray is a hub) <span class="source-tag simulated">SIM</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Strata & building -->
+  <div class="card">
+    <h2>
+      <span class="en-only">Strata &amp; building</span><span class="vi-only">Khối &amp; tòa nhà</span>
+    </h2>
+    <div class="field-grid">
+      <div class="field">
+        <div class="label"><span class="en-only">Body corporate fees (quarterly)</span><span class="vi-only">Phí khối nhà (theo quý)</span></div>
+        <div class="value"><span class="source-tag missing">MISSING</span> — confirm at source</div>
+      </div>
+      <div class="field">
+        <div class="label"><span class="en-only">Sinking fund balance</span><span class="vi-only">Quỹ dự phòng</span></div>
+        <div class="value"><span class="source-tag missing">MISSING</span> — strata report needed</div>
+      </div>
+      <div class="field">
+        <div class="label"><span class="en-only">Special levies (last 3 years)</span><span class="vi-only">Phí đặc biệt (3 năm qua)</span></div>
+        <div class="value"><span class="source-tag missing">MISSING</span> — strata report needed</div>
+      </div>
+      <div class="field">
+        <div class="label"><span class="en-only">Building amenities</span><span class="vi-only">Tiện ích tòa nhà</span></div>
+        <div class="value">Heated pool · gym · cinema · skypark <span class="source-tag source">SOURCE</span></div>
+      </div>
+    </div>
+    <p style="margin-top:12px; font-size:11px; color:#92400e;">
+      <span class="en-only"><strong>Note:</strong> body corporate fees are typically $1,800–$3,500/quarter for high-rise apartments with full amenities (heated pool, gym). Confirm at listing or via Section 32.</span>
+      <span class="vi-only"><strong>Lưu ý:</strong> Phí khối nhà thường là $1,800–$3,500/quý cho căn hộ cao tầng đầy đủ tiện ích. Xác nhận tại danh sách hoặc qua Section 32.</span>
+    </p>
+  </div>
+
+  <!-- Description -->
+  <div class="card">
+    <h2>
+      <span class="en-only">Listing description</span><span class="vi-only">Mô tả tài sản</span>
+      <span class="source-tag source">SOURCE</span>
+    </h2>
+    <div class="description">
+      <span class="en-only">"Positioned on the sixteenth floor of the highly sought-after Victoria Square complex, this impressive two-bedroom, two-bathroom apartment captures spectacular elevated views across the city skyline and Maribyrnong River, enhanced by an abundance of natural light. Floor-to-ceiling glass doors extend the living space to a private, sheltered balcony. Easy access to Footscray Station, multiple bus routes, Footscray Market, newly built Footscray Hospital and the scenic Maribyrnong River trails, while being just moments from Highpoint Shopping Centre, Victoria University, Docklands, and the CBD. Sleek modern kitchen featuring stone benchtops, concealed fridge space, and quality Bosch appliances including a full-sized dishwasher."</span>
+      <span class="vi-only">"Ở tầng 16 của khu phức hợp Victoria Square nổi tiếng. Căn hộ 2 phòng ngủ 2 phòng tắm có tầm nhìn ấn tượng ra đường chân trời thành phố và sông Maribyrnong, đầy ánh sáng tự nhiên. Cửa kính từ sàn đến trần mở rộng không gian sống ra ban công riêng. Dễ dàng đến ga Footscray, chợ Footscray, bệnh viện Footscray mới xây và đường mòn sông Maribyrnong. Bếp hiện đại với mặt đá, không gian tủ lạnh ẩn, thiết bị Bosch chất lượng."</span>
+    </div>
+  </div>
+
+  <!-- Listing metadata -->
+  <div class="card">
+    <h2>
+      <span class="en-only">Listing metadata</span><span class="vi-only">Thông tin niêm yết</span>
+    </h2>
+    <div class="field-grid">
+      <div class="field">
+        <div class="label"><span class="en-only">Listing agent</span><span class="vi-only">Đại lý niêm yết</span></div>
+        <div class="value">Barry Plant Yarraville <span class="source-tag source">SOURCE</span></div>
+      </div>
+      <div class="field">
+        <div class="label"><span class="en-only">Days on market</span><span class="vi-only">Số ngày niêm yết</span></div>
+        <div class="value">30+ (first seen over a month ago) <span class="source-tag derived">DERIVED</span></div>
+      </div>
+      <div class="field">
+        <div class="label"><span class="en-only">Listing status</span><span class="vi-only">Trạng thái</span></div>
+        <div class="value">For sale <span class="source-tag source">SOURCE</span></div>
+      </div>
+      <div class="field">
+        <div class="label"><span class="en-only">Auction date</span><span class="vi-only">Ngày đấu giá</span></div>
+        <div class="value">None (private treaty) <span class="source-tag derived">DERIVED</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Source provenance -->
+  <div class="card">
+    <h2>
+      <span class="en-only">Source provenance</span><span class="vi-only">Nguồn gốc dữ liệu</span>
+    </h2>
+    <ul>
+      <li>
+        <strong>Nestoria aggregator</strong> — fetched 2026-05-19 03:30 UTC · raw ID <code>nestoria-AU-8870002758308070382</code> · authority 65/100
+      </li>
+      <li>
+        <strong>Domain.com.au (original)</strong> — listing referenced; not directly fetched in this pass · authority 85/100
+      </li>
+      <li>
+        <strong>Barry Plant Yarraville (listing agency)</strong> — vendor's appointed REA · authority 90/100
+      </li>
+    </ul>
+    <p style="margin-top:8px; font-size:11px; color:#78716c;">
+      <span class="en-only">Production pipeline would also fetch the original Domain page directly (synchronous user-URL-paste path) and merge field-level provenance — currently only aggregator-level provenance shown.</span>
+      <span class="vi-only">Quy trình sản xuất sẽ tải trực tiếp từ Domain (qua đường dẫn người dùng dán URL) và hợp nhất nguồn từng trường — hiện chỉ hiển thị nguồn ở cấp aggregator.</span>
+    </p>
+  </div>
+
+</section>
+
+<!-- TAB: Plan placeholder -->
+<section id="plan" class="tab plan-placeholder">
+  <div class="card">
+    <h2>
+      <span class="en-only">Start your plan</span>
+      <span class="vi-only">Bắt đầu lập kế hoạch</span>
+    </h2>
+    <div class="subhead">
+      <span class="en-only">Select your mode below. The planning agent will load the relevant blueprint, gather your situation, and produce a personalised plan card.</span>
+      <span class="vi-only">Chọn chế độ bên dưới. Agent lập kế hoạch sẽ tải blueprint phù hợp, thu thập thông tin của bạn, và tạo thẻ kế hoạch cá nhân hóa.</span>
+    </div>
+
+    <div class="mode-selector">
+      <div class="mode-card">
+        <h3>
+          <span class="en-only">First Home Buyer (Mode A or B)</span>
+          <span class="vi-only">Người mua nhà đầu tiên (Mode A hoặc B)</span>
+        </h3>
+        <div class="mode-sub">
+          <span class="en-only">Buying as your primary residence</span>
+          <span class="vi-only">Mua để ở</span>
+        </div>
+        <div class="mode-desc">
+          <span class="en-only">Eligibility check for FHG, FHSS, state concessions. Cash math, document review, buying strategy, settlement timeline, ownership plan. Mode A if you're a citizen/PR; Mode B if you're a Vietnam-located parent or AU temp resident (FIRB applies).</span>
+          <span class="vi-only">Kiểm tra điều kiện FHG, FHSS, ưu đãi của bang. Tính toán tiền mặt, xem xét tài liệu, chiến lược mua, lịch trình giao dịch, kế hoạch sở hữu. Mode A nếu bạn là công dân/PR; Mode B nếu bạn là phụ huynh ở Việt Nam hoặc người tạm trú tại Úc (áp dụng FIRB).</span>
+        </div>
+        <span class="firb-warn">
+          <span class="en-only">⚠ Mode B: foreign-person constraints apply (FIRB approval required; established-dwelling ban). This established apartment is NOT eligible for Mode B buyers until 30 Jun 2029.</span>
+          <span class="vi-only">⚠ Mode B: áp dụng hạn chế người nước ngoài (cần phê duyệt FIRB; cấm mua nhà đã xây). Căn hộ này KHÔNG đủ điều kiện cho người mua Mode B cho đến 30/6/2029.</span>
+        </span>
+      </div>
+
+      <div class="mode-card">
+        <h3>
+          <span class="en-only">Investor (Mode C or D)</span>
+          <span class="vi-only">Nhà đầu tư (Mode C hoặc D)</span>
+        </h3>
+        <div class="mode-sub">
+          <span class="en-only">Buying as an investment property</span>
+          <span class="vi-only">Mua để đầu tư</span>
+        </div>
+        <div class="mode-desc">
+          <span class="en-only">Yield modelling, depreciation analysis, tax structure, cash flow projection, portfolio planning. Mode C if you're a citizen/PR investor; Mode D if you're a Vietnam-located investor (FIRB applies).</span>
+          <span class="vi-only">Mô hình lợi nhuận, phân tích khấu hao, cấu trúc thuế, dự báo dòng tiền, kế hoạch danh mục. Mode C nếu bạn là nhà đầu tư công dân/PR; Mode D nếu bạn ở Việt Nam (áp dụng FIRB).</span>
+        </div>
+        <span class="firb-warn">
+          <span class="en-only">⚠ Mode D: foreign-person constraints apply. Same as Mode B — established-dwelling ban means this property is NOT eligible for Mode D investors.</span>
+          <span class="vi-only">⚠ Mode D: áp dụng hạn chế người nước ngoài. Giống Mode B — không đủ điều kiện cho nhà đầu tư Mode D.</span>
+        </span>
+      </div>
+    </div>
+
+    <div class="next-steps">
+      <strong>
+        <span class="en-only">Next stage (not yet implemented):</span>
+        <span class="vi-only">Giai đoạn tiếp theo (chưa triển khai):</span>
+      </strong>
+      <span class="en-only">After mode selection, the planning agent receives this property card plus the buyer profile and runs the blueprint pipeline (buyer_profile → property_assessment → eligibility/firb_workflow → cash_position → buying_strategy → due_diligence → settlement_prep → ownership_planning). Output: a filled plan card rendered across the existing 5 UI tabs (Overview, Temporal flow, Before you buy, After you buy, Cash calculator).</span>
+      <span class="vi-only">Sau khi chọn chế độ, agent lập kế hoạch nhận thẻ tài sản này cộng với hồ sơ người mua và chạy pipeline blueprint. Kết quả: thẻ kế hoạch được điền hiển thị trên 5 tab UI hiện có.</span>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>
+    <strong>Pipeline test output</strong> — produced by running the §11.10 property data pipeline against a real listing (Footscray, VIC 3011). The property card is a self-contained artifact; in production it's persisted in the <code>properties</code> table and served to the user-facing planning agent at session time. See <a href="../README.md">README</a>, <a href="../04-architecture.md#1110-property-data-pipeline--parallel-to-blueprint-kb-curation">§11.10 in 04-architecture.md</a>, <a href="../05-ux-model.md#139-agent--user-flow--plan-card-lifecycle">§13.9 in 05-ux-model.md</a>.
+  </p>
+  <p>
+    <strong>Disclaimer:</strong> example output only. Some field values are simulated for demonstration; production pipeline pulls suburb context, comparable sales, strata details from authoritative feeds at runtime. Verify all material facts at the original listing before any commitment.
+  </p>
+</footer>
+
+</div>
+
+<script>
+  // Tab switching
+  document.querySelectorAll('nav.tabs button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.tab;
+      document.querySelectorAll('nav.tabs button').forEach(b => b.classList.toggle('active', b === btn));
+      document.querySelectorAll('section.tab').forEach(s => s.classList.toggle('active', s.id === target));
+    });
+  });
+
+  // Language toggle
+  function setLang(lang) {
+    document.body.setAttribute('lang', lang);
+    document.querySelectorAll('.lang-toggle button').forEach(b => {
+      b.classList.toggle('active', b.dataset.lang === lang);
+    });
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>First Home Buyer Plan — Mode A Example Output</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    background: #fafaf9;
+    color: #1c1917;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 32px 24px 80px; }
+
+  header { margin-bottom: 28px; }
+  header h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 6px; }
+  header .meta { color: #57534e; font-size: 14px; }
+  header .pills { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #ffffff; border: 1px solid #e7e5e4;
+    padding: 5px 10px; border-radius: 999px;
+    font-size: 12px; color: #44403c;
+  }
+  .pill strong { color: #c2410c; font-weight: 600; }
+
+  nav.tabs {
+    display: flex; gap: 4px; flex-wrap: wrap;
+    background: #f5f5f4; padding: 4px; border-radius: 10px;
+    margin-bottom: 22px; border: 1px solid #e7e5e4;
+  }
+  nav.tabs button {
+    flex: 1; min-width: 110px;
+    padding: 10px 14px; border: none; background: transparent;
+    color: #57534e; font-size: 13px; font-weight: 500;
+    border-radius: 7px; cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    font-family: inherit;
+  }
+  nav.tabs button:hover { color: #1c1917; }
+  nav.tabs button.active {
+    background: #ffffff; color: #1c1917;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  }
+
+  section.tab { display: none; }
+  section.tab.active { display: block; }
+
+  .card {
+    background: #ffffff; border: 1px solid #e7e5e4;
+    border-radius: 10px; padding: 22px;
+    margin-bottom: 16px;
+  }
+  .card h2 {
+    font-size: 18px; font-weight: 600; margin-bottom: 14px;
+    letter-spacing: -0.005em;
+  }
+  .card h3 {
+    font-size: 14px; font-weight: 600; margin-top: 18px; margin-bottom: 8px;
+    color: #1c1917;
+  }
+  .card p { color: #44403c; font-size: 14px; margin-bottom: 10px; }
+  .card ul { padding-left: 20px; color: #44403c; font-size: 14px; }
+  .card ul li { margin-bottom: 6px; }
+  .card strong { color: #1c1917; }
+
+  table {
+    width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 13px;
+  }
+  table th, table td {
+    text-align: left; padding: 9px 10px;
+    border-bottom: 1px solid #e7e5e4;
+    color: #44403c;
+  }
+  table th {
+    background: #fafaf9; font-weight: 600; color: #1c1917;
+    font-size: 12px; text-transform: uppercase; letter-spacing: 0.03em;
+  }
+  table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  table tr.total td { font-weight: 600; color: #1c1917; border-top: 2px solid #1c1917; }
+
+  .callout {
+    border-left: 3px solid #c2410c;
+    background: #fff7ed;
+    padding: 12px 14px;
+    border-radius: 4px;
+    margin: 14px 0;
+    font-size: 13px;
+    color: #44403c;
+  }
+  .callout strong { color: #9a3412; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 720px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  /* Diagram */
+  .diagram-container {
+    overflow-x: auto;
+    background: #fafaf9;
+    border: 1px solid #e7e5e4;
+    border-radius: 8px;
+    padding: 10px;
+  }
+  .diagram-container svg { display: block; min-width: 820px; }
+
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 16px; margin-top: 14px;
+    font-size: 12px; color: #57534e;
+  }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend .dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+
+  /* Checklist */
+  .checklist { list-style: none; padding: 0; }
+  .checklist li {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 8px 0; border-bottom: 1px dashed #e7e5e4;
+    font-size: 14px; color: #44403c;
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist input[type="checkbox"] {
+    margin-top: 4px; accent-color: #c2410c; cursor: pointer;
+  }
+  .checklist label { cursor: pointer; flex: 1; }
+  .checklist input:checked + label { text-decoration: line-through; color: #a8a29e; }
+
+  /* Calculator */
+  .calc-form {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+    margin-bottom: 20px;
+  }
+  @media (max-width: 720px) { .calc-form { grid-template-columns: 1fr; } }
+  .calc-form label {
+    display: block; font-size: 12px; font-weight: 600;
+    color: #57534e; margin-bottom: 6px;
+    text-transform: uppercase; letter-spacing: 0.03em;
+  }
+  .calc-form select, .calc-form input {
+    width: 100%; padding: 10px 12px;
+    border: 1px solid #d6d3d1; border-radius: 6px;
+    font-size: 14px; font-family: inherit;
+    background: #ffffff;
+  }
+  .calc-form select:focus, .calc-form input:focus {
+    outline: 2px solid #c2410c; outline-offset: -1px; border-color: #c2410c;
+  }
+  .calc-result {
+    background: #fafaf9; border: 1px solid #e7e5e4;
+    border-radius: 8px; padding: 18px;
+  }
+  .calc-result .verdict {
+    font-size: 18px; font-weight: 600; margin-bottom: 12px;
+    padding: 12px 14px; border-radius: 6px;
+  }
+  .verdict.ok { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
+  .verdict.warn { background: #fffbeb; color: #92400e; border: 1px solid #fde68a; }
+  .verdict.bad { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+
+  footer {
+    margin-top: 40px; padding-top: 20px; border-top: 1px solid #e7e5e4;
+    font-size: 12px; color: #78716c;
+  }
+  footer a { color: #c2410c; text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  .sr-only {
+    position: absolute; width: 1px; height: 1px;
+    padding: 0; margin: -1px; overflow: hidden;
+    clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
+
+  /* Journey timeline (unused — kept for future use) */
+  .journey {
+    position: relative;
+    padding-left: 32px;
+    margin: 16px 0 4px;
+  }
+  .journey::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 12px;
+    bottom: 12px;
+    width: 2px;
+    background: #e7e5e4;
+  }
+  .milestone {
+    position: relative;
+    padding-bottom: 22px;
+  }
+  .milestone:last-child { padding-bottom: 0; }
+  .milestone::before {
+    content: '';
+    position: absolute;
+    left: -28px;
+    top: 6px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #c2410c;
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 0 2px #fdba74;
+  }
+  .milestone .day-label {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    color: #c2410c;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-right: 8px;
+  }
+  .surface-tag {
+    display: inline-block;
+    font-size: 10px;
+    background: #fef3c7;
+    color: #92400e;
+    padding: 2px 9px;
+    border-radius: 999px;
+    border: 1px solid #fde68a;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .surface-tag.live { background: #fee2e2; color: #991b1b; border-color: #fecaca; }
+  .surface-tag.dash { background: #dbeafe; color: #1e40af; border-color: #93c5fd; }
+  .surface-tag.doc { background: #f3e8ff; color: #6b21a8; border-color: #d8b4fe; }
+  .surface-tag.prop { background: #d1fae5; color: #065f46; border-color: #6ee7b7; }
+  .surface-tag.bg { background: #f5f5f4; color: #44403c; border-color: #d6d3d1; }
+  .milestone h4 {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 6px 0 4px;
+    color: #1c1917;
+  }
+  .milestone p {
+    font-size: 13px;
+    color: #44403c;
+    margin-bottom: 6px;
+    line-height: 1.55;
+  }
+  .milestone .artifact {
+    font-size: 12px;
+    color: #9a3412;
+    font-weight: 500;
+    background: #fff7ed;
+    border-left: 3px solid #c2410c;
+    padding: 6px 10px;
+    border-radius: 0 4px 4px 0;
+    margin-top: 6px;
+    display: inline-block;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>First Home Buyer Plan — Mode A Example Output</h1>
+  <p class="meta">Working example: Vietnamese-Australian citizen / PR buying first home · $50k cash · QLD/VIC · property-first UX</p>
+  <div class="pills">
+    <span class="pill">FHG eligible <strong>since Oct 2025</strong></span>
+    <span class="pill">Brisbane cap <strong>$1.0M</strong></span>
+    <span class="pill">Melbourne cap <strong>$950k</strong></span>
+    <span class="pill">QLD new build duty <strong>$0</strong></span>
+    <span class="pill">FHSS lifetime cap <strong>$50k</strong></span>
+  </div>
+  <p style="margin-top: 14px; font-size: 13px; color: #78716c;">This is one example of the kind of personalised plan the platform produces. For strategy, architecture, UX model, market sizing, channel analysis, wedge sequence, and policy positioning, see the <a href="README.md" style="color: #c2410c; text-decoration: none; font-weight: 500;">README and document set</a>.</p>
+</header>
+
+<nav class="tabs" role="tablist">
+  <button data-tab="overview" class="active" role="tab">Overview</button>
+  <button data-tab="flow" role="tab">Temporal flow</button>
+  <button data-tab="prep" role="tab">Before you buy</button>
+  <button data-tab="ongoing" role="tab">After you buy</button>
+  <button data-tab="calc" role="tab">Cash calculator</button>
+</nav>
+
+<!-- OVERVIEW -->
+<section id="overview" class="tab active">
+  <div class="card">
+    <h2>What this is</h2>
+    <p>An <strong>example output</strong> demonstrating the kind of personalised plan the platform produces for a Vietnamese-Australian citizen or PR buying their first home (Mode A in the strategy doc set).</p>
+    <p>Walk through the tabs: <strong>Overview</strong> for the headline plan, <strong>Temporal flow</strong> for the who-pays-whom-when swimlane, <strong>Before you buy</strong> for the checklist and money buffer, <strong>After you buy</strong> for ongoing obligations, and <strong>Cash calculator</strong> to plug in your own numbers.</p>
+    <p>The strategic context — why this product exists, what the architecture looks like, the wedge sequence to build it, how it serves the broader Vietnamese diaspora (cross-border family flows, investor analytics, multi-CALD expansion), how REA partnerships work, and the regulatory risks — lives in the companion document set. Start with <a href="README.md" style="color: #c2410c; text-decoration: none; font-weight: 500;">README.md</a>.</p>
+  </div>
+
+  <div class="card">
+    <h2>The plan in 90 seconds</h2>
+    <p>
+      Since October 2025, the federal <strong>First Home Guarantee</strong> has had no income cap and no place cap.
+      With a 5% deposit, the government guarantees the rest and you avoid Lenders Mortgage Insurance.
+      Brisbane / Gold Coast / Sunshine Coast cap is <strong>$1.0M</strong>; Melbourne / Geelong is <strong>$950k</strong>.
+    </p>
+    <p>
+      From 1 May 2025, Queensland gives first home buyers a <strong>full stamp duty exemption with no price cap on new builds</strong>.
+      Combined with FHG, your $50k can be a 5% deposit on a $1M new build with <strong>zero stamp duty and zero LMI</strong>.
+    </p>
+    <p>
+      Catch: you still need ~$19–28k cash <em>on top of the deposit</em> for inspection, conveyancing, insurance, settlement fees,
+      and a 3-month cash reserve. Realistic working figure for the full $1M target is <strong>$65–75k</strong> accessible at settlement.
+    </p>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3 style="margin-top:0">Best path</h3>
+      <p><strong>QLD new build up to $1M.</strong> Federal FHG removes LMI on 5% deposit. QLD first-home new-home concession removes stamp duty. Most efficient use of your cash.</p>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">Safer path</h3>
+      <p><strong>QLD established under $700k.</strong> FHG + QLD first home concession both kick in. $35k deposit + ~$3k legals = only ~$38k cash needed. Leaves a real buffer.</p>
+    </div>
+  </div>
+</section>
+
+<!-- TEMPORAL FLOW -->
+<section id="flow" class="tab">
+  <div class="card">
+    <h2>Who moves what, and when</h2>
+    <p>Swimlane across five phases. <strong>$</strong> = money flow · <strong>◆</strong> = document/legal step · <strong>⟳</strong> = recurring.</p>
+    <div class="diagram-container">
+<svg viewBox="0 0 820 640" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="diagTitle diagDesc">
+  <title id="diagTitle">First home buyer FHG temporal flow</title>
+  <desc id="diagDesc">Swimlane showing transactions between buyer, government, lender, and other parties across five phases.</desc>
+
+  <defs>
+    <marker id="arrAcc2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#c2410c"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="820" height="640" fill="#fafaf9"/>
+
+  <!-- Header -->
+  <text x="20" y="26" fill="#1c1917" font-size="16" font-weight="600" font-family="ui-sans-serif, system-ui, sans-serif">First home buyer — temporal flow of transactions</text>
+  <text x="20" y="44" fill="#78716c" font-size="11" font-family="ui-sans-serif, system-ui, sans-serif">FHG path · QLD new build target · $ = money · ◆ = doc/legal · ⟳ = recurring</text>
+
+  <!-- Phase header -->
+  <g transform="translate(150,62)" font-family="ui-sans-serif, system-ui, sans-serif">
+    <rect x="0" y="0" width="128" height="30" fill="#f5f5f4" stroke="#e7e5e4" rx="3"/>
+    <text x="64" y="14" fill="#1c1917" font-size="11" font-weight="600" text-anchor="middle">1. PREPARE</text>
+    <text x="64" y="25" fill="#78716c" font-size="9" text-anchor="middle">Weeks 0–4</text>
+
+    <rect x="132" y="0" width="128" height="30" fill="#f5f5f4" stroke="#e7e5e4" rx="3"/>
+    <text x="196" y="14" fill="#1c1917" font-size="11" font-weight="600" text-anchor="middle">2. PRE-APPROVAL</text>
+    <text x="196" y="25" fill="#78716c" font-size="9" text-anchor="middle">Weeks 4–8</text>
+
+    <rect x="264" y="0" width="128" height="30" fill="#f5f5f4" stroke="#e7e5e4" rx="3"/>
+    <text x="328" y="14" fill="#1c1917" font-size="11" font-weight="600" text-anchor="middle">3. CONTRACT</text>
+    <text x="328" y="25" fill="#78716c" font-size="9" text-anchor="middle">Weeks 8–12</text>
+
+    <rect x="396" y="0" width="128" height="30" fill="#f5f5f4" stroke="#e7e5e4" rx="3"/>
+    <text x="460" y="14" fill="#1c1917" font-size="11" font-weight="600" text-anchor="middle">4. SETTLE</text>
+    <text x="460" y="25" fill="#78716c" font-size="9" text-anchor="middle">Weeks 12–18</text>
+
+    <rect x="528" y="0" width="142" height="30" fill="#fff7ed" stroke="#fdba74" rx="3"/>
+    <text x="599" y="14" fill="#9a3412" font-size="11" font-weight="600" text-anchor="middle">5. OWN</text>
+    <text x="599" y="25" fill="#c2410c" font-size="9" text-anchor="middle">Month 4 onwards · ⟳</text>
+  </g>
+
+  <!-- Actor labels -->
+  <g font-family="ui-sans-serif, system-ui, sans-serif">
+    <rect x="14" y="100" width="130" height="120" fill="#ffffff" stroke="#e7e5e4" rx="3"/>
+    <text x="22" y="118" fill="#1c1917" font-size="11" font-weight="600">YOU</text>
+    <text x="22" y="134" font-size="9" fill="#78716c">buyer</text>
+
+    <rect x="14" y="224" width="130" height="120" fill="#ffffff" stroke="#e7e5e4" rx="3"/>
+    <text x="22" y="242" fill="#1c1917" font-size="11" font-weight="600">GOVERNMENT</text>
+    <text x="22" y="256" font-size="9" fill="#78716c">Federal: Housing Australia</text>
+    <text x="22" y="268" font-size="9" fill="#78716c">State: QRO/SRO + council</text>
+    <text x="22" y="280" font-size="9" fill="#78716c">ATO</text>
+
+    <rect x="14" y="348" width="130" height="120" fill="#ffffff" stroke="#e7e5e4" rx="3"/>
+    <text x="22" y="366" fill="#1c1917" font-size="11" font-weight="600">LENDER</text>
+    <text x="22" y="380" font-size="9" fill="#78716c">FHG-panel bank</text>
+
+    <rect x="14" y="472" width="130" height="155" fill="#ffffff" stroke="#e7e5e4" rx="3"/>
+    <text x="22" y="490" fill="#1c1917" font-size="11" font-weight="600">OTHER PARTIES</text>
+    <text x="22" y="504" font-size="9" fill="#78716c">Vendor / agent</text>
+    <text x="22" y="516" font-size="9" fill="#78716c">Conveyancer</text>
+    <text x="22" y="528" font-size="9" fill="#78716c">Inspector, insurer</text>
+    <text x="22" y="540" font-size="9" fill="#78716c">Strata, utilities</text>
+  </g>
+
+  <!-- Row 1: YOU -->
+  <g font-family="ui-sans-serif, system-ui, sans-serif" font-size="9" fill="#44403c">
+    <rect x="150" y="100" width="128" height="120" fill="#ffffff" stroke="#e7e5e4" rx="3"/>
+    <text x="157" y="116" fill="#1c1917" font-weight="600">Gather docs ◆</text>
+    <text x="157" y="130">2yr NOAs, payslips</text>
+    <text x="157" y="143">3–6mo bank stmts</text>
+    <text x="157" y="156">Citizenship proof</text>
+    <text x="157" y="172" fill="#1c1917" font-weight="600">Clean up</text>
+    <text x="157" y="186">Close unused cards</text>
+    <text x="157" y="199">Pay down debt</text>
+    <text x="157" y="212">Start FHSS sal-sac</text>
+
+    <rect x="282" y="100" width="128" height="120" fill="#ffffff" stroke="#e7e5e4" rx="3"/>
+    <text x="289" y="116" fill="#1c1917" font-weight="600">Apply to lender ◆</text>
+    <text x="289" y="130">Tick FHG box</text>
+    <text x="289" y="143">Engage broker</text>
+    <text x="289" y="159" fill="#1c1917" font-weight="600">Confirm budget</text>
+    <text x="289" y="173">Set max price</text>
+    <text x="289" y="186">Pick QLD/VIC area</text>
+    <text x="289" y="202" fill="#1c1917" font-weight="600">Engage conveyancer</text>
+
+    <rect x="414" y="100" width="128" height="120" fill="#ffffff" stroke="#e7e5e4" rx="3"/>
+    <text x="421" y="116" fill="#1c1917" font-weight="600">Offer + sign ◆</text>
+    <text x="421" y="130" fill="#c2410c">$ deposit to trust</text>
+    <text x="421" y="143">(5–10% of price)</text>
+    <text x="421" y="159" fill="#1c1917" font-weight="600">Pay $ inspection</text>
+    <text x="421" y="172">~$500–700</text>
+    <text x="421" y="188" fill="#1c1917" font-weight="600">Buy insurance</text>
+    <text x="421" y="201">Effective day 1</text>
+
+    <rect x="546" y="100" width="128" height="120" fill="#ffffff" stroke="#e7e5e4" rx="3"/>
+    <text x="553" y="116" fill="#1c1917" font-weight="600">Pay balance $</text>
+    <text x="553" y="130">Via conveyancer</text>
+    <text x="553" y="146" fill="#1c1917" font-weight="600">Receive keys</text>
+    <text x="553" y="162" fill="#1c1917" font-weight="600">Pay $ legals</text>
+    <text x="553" y="175">~$1.5–2.5k</text>
+    <text x="553" y="191" fill="#1c1917" font-weight="600">Move in ≤6mo</text>
+    <text x="553" y="204">(FHG rule)</text>
+
+    <rect x="678" y="100" width="128" height="120" fill="#fff7ed" stroke="#fdba74" rx="3"/>
+    <text x="685" y="116" fill="#9a3412" font-weight="600">Live in it ⟳</text>
+    <text x="685" y="130">Owner-occupier</text>
+    <text x="685" y="146" fill="#9a3412" font-weight="600">Mortgage $ ⟳</text>
+    <text x="685" y="159">Monthly P&amp;I</text>
+    <text x="685" y="175" fill="#9a3412" font-weight="600">Maintain</text>
+    <text x="685" y="188">~1% value/yr</text>
+    <text x="685" y="204" fill="#9a3412" font-weight="600">Annual review</text>
+  </g>
+
+  <!-- Row 2: GOVERNMENT -->
+  <g font-family="ui-sans-serif, system-ui, sans-serif" font-size="9" fill="#44403c">
+    <rect x="150" y="224" width="128" height="120" fill="#ffffff" stroke="#e7e5e4" rx="3"/>
+    <text x="157" y="240" fill="#1c1917" font-weight="600">ATO ◆</text>
+    <text x="157" y="254">FHSS contributions</text>
+    <text x="157" y="267">($50k lifetime cap)</text>
+    <text x="157" y="283" fill="#1c1917" font-weight="600">State revenue ◆</text>
+    <text x="157" y="297">Check first-home</text>
+    <text x="157" y="310">status (no prior</text>
+    <text x="157" y="323">property owned)</text>
+
+    <rect x="282" y="224" width="128" height="120" fill="#ffffff" stroke="#e7e5e4" rx="3"/>
+    <text x="289" y="240" fill="#1c1917" font-weight="600">Housing Aust ◆</text>
+    <text x="289" y="254">Reserves FHG slot</text>
+    <text x="289" y="267">(via lender)</text>
+    <text x="289" y="283" fill="#1c1917" font-weight="600">~14-day window</text>
+    <text x="289" y="296">to find property</text>
+
+    <rect x="414" y="224" width="128" height="120" fill="#ffffff" stroke="#e7e5e4" rx="3"/>
+    <text x="421" y="240" fill="#1c1917" font-weight="600">Housing Aust</text>
+    <text x="421" y="254">Approves property</text>
+    <text x="421" y="267">under price cap</text>
+    <text x="421" y="283" fill="#1c1917" font-weight="600">FHSS release $</text>
+    <text x="421" y="297">(if requested)</text>
+    <text x="421" y="310">15–25 biz days</text>
+
+    <rect x="546" y="224" width="128" height="120" fill="#ffffff" stroke="#e7e5e4" rx="3"/>
+    <text x="553" y="240" fill="#1c1917" font-weight="600">QRO/SRO ◆</text>
+    <text x="553" y="254" fill="#c2410c">Stamp duty: $0</text>
+    <text x="553" y="267">(QLD new build)</text>
+    <text x="553" y="283" fill="#1c1917" font-weight="600">Title transferred</text>
+    <text x="553" y="297">via Titles Office</text>
+    <text x="553" y="310">Reg fee ~$200</text>
+
+    <rect x="678" y="224" width="128" height="120" fill="#fff7ed" stroke="#fdba74" rx="3"/>
+    <text x="685" y="240" fill="#9a3412" font-weight="600">Council $ ⟳</text>
+    <text x="685" y="254">Rates quarterly</text>
+    <text x="685" y="267">~$400–700/qtr</text>
+    <text x="685" y="283" fill="#9a3412" font-weight="600">ATO ⟳</text>
+    <text x="685" y="297">Annual return</text>
+    <text x="685" y="310">(no FHG flag)</text>
+    <text x="685" y="323" fill="#9a3412" font-weight="600">Land tax: $0 PPOR</text>
+  </g>
+
+  <!-- Row 3: LENDER -->
+  <g font-family="ui-sans-serif, system-ui, sans-serif" font-size="9" fill="#44403c">
+    <rect x="150" y="348" width="128" height="120" fill="#ffffff" stroke="#e7e5e4" rx="3"/>
+    <text x="157" y="364" fill="#1c1917" font-weight="600">Shortlist FHG ◆</text>
+    <text x="157" y="378">CommBank, NAB,</text>
+    <text x="157" y="391">Westpac, ANZ +</text>
+    <text x="157" y="404">~30 non-majors</text>
+    <text x="157" y="420" fill="#1c1917" font-weight="600">Compare rates</text>
+    <text x="157" y="434">FHG-eligible only</text>
+
+    <rect x="282" y="348" width="128" height="120" fill="#ffffff" stroke="#e7e5e4" rx="3"/>
+    <text x="289" y="364" fill="#1c1917" font-weight="600">Assess + approve ◆</text>
+    <text x="289" y="378">Servicing test</text>
+    <text x="289" y="391">+3% buffer rate</text>
+    <text x="289" y="407" fill="#1c1917" font-weight="600">Issue pre-app</text>
+    <text x="289" y="421">Valid 90 days</text>
+    <text x="289" y="437" fill="#1c1917" font-weight="600">Reserve FHG slot</text>
+
+    <rect x="414" y="348" width="128" height="120" fill="#ffffff" stroke="#e7e5e4" rx="3"/>
+    <text x="421" y="364" fill="#1c1917" font-weight="600">Property valuation</text>
+    <text x="421" y="378">(lender ordered)</text>
+    <text x="421" y="394" fill="#1c1917" font-weight="600">Unconditional ◆</text>
+    <text x="421" y="408">Full loan approval</text>
+    <text x="421" y="424" fill="#1c1917" font-weight="600">Loan docs sent</text>
+    <text x="421" y="438">Sign + return</text>
+
+    <rect x="546" y="348" width="128" height="120" fill="#ffffff" stroke="#e7e5e4" rx="3"/>
+    <text x="553" y="364" fill="#1c1917" font-weight="600">Release $ loan</text>
+    <text x="553" y="378" fill="#c2410c">95% to vendor</text>
+    <text x="553" y="391">via PEXA</text>
+    <text x="553" y="407" fill="#1c1917" font-weight="600">Register mortgage</text>
+    <text x="553" y="421">on title</text>
+    <text x="553" y="437" fill="#1c1917" font-weight="600">No LMI charged</text>
+
+    <rect x="678" y="348" width="128" height="120" fill="#fff7ed" stroke="#fdba74" rx="3"/>
+    <text x="685" y="364" fill="#9a3412" font-weight="600">Direct debit $ ⟳</text>
+    <text x="685" y="378">Monthly P&amp;I</text>
+    <text x="685" y="394" fill="#9a3412" font-weight="600">Annual statement</text>
+    <text x="685" y="410" fill="#9a3412" font-weight="600">LVR drops &lt;80%</text>
+    <text x="685" y="424">→ FHG ends;</text>
+    <text x="685" y="438">free refinancing</text>
+  </g>
+
+  <!-- Row 4: OTHER PARTIES -->
+  <g font-family="ui-sans-serif, system-ui, sans-serif" font-size="9" fill="#44403c">
+    <rect x="150" y="472" width="128" height="155" fill="#ffffff" stroke="#e7e5e4" rx="3"/>
+    <text x="157" y="488" fill="#1c1917" font-weight="600">Broker engaged</text>
+    <text x="157" y="502">(free to you)</text>
+    <text x="157" y="518" fill="#1c1917" font-weight="600">Real estate agents</text>
+    <text x="157" y="532">Open homes</text>
+    <text x="157" y="548" fill="#1c1917" font-weight="600">Builder / developer</text>
+    <text x="157" y="562">(if new build)</text>
+
+    <rect x="282" y="472" width="128" height="155" fill="#ffffff" stroke="#e7e5e4" rx="3"/>
+    <text x="289" y="488" fill="#1c1917" font-weight="600">Conveyancer ◆</text>
+    <text x="289" y="502">Reviews contracts</text>
+    <text x="289" y="515">~$1.5–2.5k total</text>
+    <text x="289" y="531" fill="#1c1917" font-weight="600">Insurance quote</text>
+    <text x="289" y="544">~$800–1,500/yr</text>
+
+    <rect x="414" y="472" width="128" height="155" fill="#ffffff" stroke="#e7e5e4" rx="3"/>
+    <text x="421" y="488" fill="#1c1917" font-weight="600">Vendor signs</text>
+    <text x="421" y="502">Exchange contracts</text>
+    <text x="421" y="518" fill="#1c1917" font-weight="600">Agent holds $</text>
+    <text x="421" y="531">deposit in trust</text>
+    <text x="421" y="547" fill="#1c1917" font-weight="600">Inspector ◆</text>
+    <text x="421" y="561">Building + pest</text>
+    <text x="421" y="577" fill="#1c1917" font-weight="600">Insurer issues</text>
+    <text x="421" y="591">cover note</text>
+
+    <rect x="546" y="472" width="128" height="155" fill="#ffffff" stroke="#e7e5e4" rx="3"/>
+    <text x="553" y="488" fill="#1c1917" font-weight="600">Conveyancer ◆</text>
+    <text x="553" y="502">Runs settlement</text>
+    <text x="553" y="515">via PEXA</text>
+    <text x="553" y="531" fill="#1c1917" font-weight="600">Vendor releases</text>
+    <text x="553" y="544">property + keys</text>
+    <text x="553" y="560" fill="#1c1917" font-weight="600">Utilities connect</text>
+    <text x="553" y="573">Power, water, NBN</text>
+
+    <rect x="678" y="472" width="128" height="155" fill="#fff7ed" stroke="#fdba74" rx="3"/>
+    <text x="685" y="488" fill="#9a3412" font-weight="600">Insurer $ ⟳</text>
+    <text x="685" y="502">Annual premium</text>
+    <text x="685" y="518" fill="#9a3412" font-weight="600">Utilities $ ⟳</text>
+    <text x="685" y="531">Monthly/qtrly</text>
+    <text x="685" y="547" fill="#9a3412" font-weight="600">Strata $ ⟳</text>
+    <text x="685" y="560">(if applicable)</text>
+    <text x="685" y="573">Qtrly levies</text>
+    <text x="685" y="589" fill="#9a3412" font-weight="600">Tradies (ad-hoc)</text>
+    <text x="685" y="603">Maintenance</text>
+  </g>
+
+  <!-- Settlement vertical money flow arrows -->
+  <g stroke="#c2410c" stroke-width="1.5" fill="none">
+    <line x1="610" y1="220" x2="610" y2="225" marker-end="url(#arrAcc2)" opacity="0.7"/>
+    <line x1="610" y1="344" x2="610" y2="349" marker-end="url(#arrAcc2)" opacity="0.7"/>
+    <line x1="610" y1="468" x2="610" y2="473" marker-end="url(#arrAcc2)" opacity="0.7"/>
+  </g>
+</svg>
+    </div>
+    <div class="legend">
+      <span><span class="dot" style="background:#ffffff;border:1px solid #e7e5e4"></span>One-off action</span>
+      <span><span class="dot" style="background:#fff7ed;border:1px solid #fdba74"></span>Recurring after settlement</span>
+      <span><span class="dot" style="background:#c2410c"></span>Key money flow at settlement</span>
+    </div>
+  </div>
+</section>
+
+<!-- BEFORE YOU BUY -->
+<section id="prep" class="tab">
+  <div class="card">
+    <h2>What you need beyond the $50k cash</h2>
+    <p>The deposit is just one piece. Here's everything else.</p>
+
+    <h3>Documents to gather (weeks 0–2)</h3>
+    <ul class="checklist">
+      <li><input type="checkbox" id="d1"><label for="d1">Australian citizenship proof (FHG requires citizenship or NZ Special Category Visa; PR alone doesn't qualify)</label></li>
+      <li><input type="checkbox" id="d2"><label for="d2">Driver's licence + passport (100 points of ID)</label></li>
+      <li><input type="checkbox" id="d3"><label for="d3">Last 2 years' Notice of Assessment from ATO</label></li>
+      <li><input type="checkbox" id="d4"><label for="d4">Last 3 months payslips + employment contract / letter</label></li>
+      <li><input type="checkbox" id="d5"><label for="d5">3–6 months bank statements showing deposit (genuine savings rule: 5% of property value held for 3+ months)</label></li>
+      <li><input type="checkbox" id="d6"><label for="d6">Credit card statements, BNPL, HECS/HELP balance, car/personal loan statements</label></li>
+      <li><input type="checkbox" id="d7"><label for="d7">Rental ledger or landlord reference</label></li>
+      <li><input type="checkbox" id="d8"><label for="d8">Credit report (free from Equifax or Illion — check for surprises)</label></li>
+    </ul>
+
+    <h3>People to engage</h3>
+    <ul>
+      <li><strong>Mortgage broker</strong> with FHG panel access — free to you, paid by lender. Submits the FHG reservation on your behalf.</li>
+      <li><strong>Conveyancer or solicitor</strong> — engage before signing anything. ~$1,500–2,500.</li>
+      <li><strong>Building &amp; pest inspector</strong> — $500–700 for established. For new build, replaced by pre-handover inspection.</li>
+      <li><strong>Insurer</strong> — building insurance must be in force from contract exchange (QLD) or settlement (VIC). Confirm with conveyancer.</li>
+    </ul>
+
+    <h3>Money buffer beyond the $50k</h3>
+    <table>
+      <thead>
+        <tr><th>Item</th><th class="num">Rough cost</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Building &amp; pest inspection</td><td class="num">$500–700</td></tr>
+        <tr><td>Conveyancing</td><td class="num">$1,500–2,500</td></tr>
+        <tr><td>Lender application/settlement fees</td><td class="num">$500–1,000</td></tr>
+        <tr><td>Mortgage registration (state)</td><td class="num">~$200</td></tr>
+        <tr><td>Title transfer registration</td><td class="num">$200–500</td></tr>
+        <tr><td>First-year building insurance</td><td class="num">$800–1,500</td></tr>
+        <tr><td>Utility connections</td><td class="num">$200–500</td></tr>
+        <tr><td>Moving costs</td><td class="num">$500–3,000</td></tr>
+        <tr><td>Cash reserve (3 months mortgage + bills)</td><td class="num">$15,000–18,000</td></tr>
+        <tr class="total"><td>Total buffer on top of deposit</td><td class="num">$19,000–28,000</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      <strong>Watch out:</strong> Lenders increasingly want to see a post-settlement cash reserve in your name as part of the serviceability assessment. If you'd settle with literally $0 left, some lenders won't approve.
+    </div>
+
+    <h3>FHG-specific gates to clear</h3>
+    <ul>
+      <li>Property under the cap ($1M Brisbane/Gold Coast/Sunshine Coast; $950k Melbourne/Geelong)</li>
+      <li>Owner-occupier intent (cannot be investment)</li>
+      <li>First home buyer status confirmed by state revenue office</li>
+      <li>FHG slot reserved by lender — usually a ~14–90 day window to find a property once reserved</li>
+      <li>For QLD new build path: confirm property meets "new home" definition under QRO rules (off-the-plan, never occupied, or substantially renovated)</li>
+    </ul>
+  </div>
+</section>
+
+<!-- AFTER YOU BUY -->
+<section id="ongoing" class="tab">
+  <div class="card">
+    <h2>Ongoing obligations after settlement</h2>
+
+    <h3>Monthly (recurring direct debits)</h3>
+    <ul>
+      <li><strong>Mortgage P&amp;I to lender</strong> — on $1M at 95% LVR (loan ≈ $950k) at ~6.0% over 30 years = roughly <strong>$5,700/month</strong>. Build in ~$300/month buffer for rate moves.</li>
+      <li><strong>Utilities</strong> (electricity, gas, internet) — $300–500/month combined.</li>
+      <li>Optional: contents insurance, income protection, life insurance.</li>
+    </ul>
+
+    <h3>Quarterly</h3>
+    <ul>
+      <li><strong>Council rates</strong> to local council — $400–700/quarter ($1,600–2,800/year)</li>
+      <li><strong>Water access charge + usage</strong> — $200–350/quarter</li>
+      <li><strong>Strata / body corporate levies</strong> (if apartment/townhouse) — $700–1,500/quarter for typical Brisbane apartment</li>
+      <li>Emergency services / fire levies in some council areas</li>
+    </ul>
+
+    <h3>Annually</h3>
+    <ul>
+      <li><strong>Building insurance</strong> premium — $800–1,500/year. Mandatory while mortgaged.</li>
+      <li><strong>Mortgage statement</strong> — review and consider refinancing if uncompetitive.</li>
+      <li><strong>Tax return</strong> to ATO — no special FHG handling. If you used FHSS, released amount appears as assessable income with a 30% tax offset.</li>
+      <li><strong>Land tax</strong> — usually $0 for principal place of residence in QLD and VIC.</li>
+    </ul>
+
+    <h3>Event-driven (life-of-loan)</h3>
+    <ul>
+      <li><strong>Maintenance reserve</strong> — budget ~1% of property value/year ($10k/year on a $1M home)</li>
+      <li><strong>Refinancing</strong> — review every 2–4 years to chase competitive rates</li>
+      <li><strong>Selling or moving out</strong> — FHG ends when loan paid off, refinanced, or property sold. No clawback.</li>
+      <li>If you stop owner-occupying (e.g. rent it out), loan may breach FHG conditions. Notify lender first.</li>
+    </ul>
+
+    <div class="callout">
+      <strong>The "graduation" event:</strong> When your LVR drops below 80% (typically 4–8 years in), the FHG is no longer doing work for you. You can refinance freely to any lender, full market open, no LMI either way. You've become a regular mortgage holder.
+    </div>
+
+    <h3>Counterparties you'll have a recurring relationship with</h3>
+    <table>
+      <thead>
+        <tr><th>Counterparty</th><th>Frequency</th><th>What flows</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Lender</td><td>Monthly + annual</td><td>Mortgage payments out · statement in</td></tr>
+        <tr><td>Local council</td><td>Quarterly</td><td>Rates out</td></tr>
+        <tr><td>Water utility</td><td>Quarterly</td><td>Access + usage out</td></tr>
+        <tr><td>Strata corporation</td><td>Quarterly (if applicable)</td><td>Levies out</td></tr>
+        <tr><td>Insurer</td><td>Annual</td><td>Premium out · cover certificate in</td></tr>
+        <tr><td>ATO</td><td>Annual</td><td>Tax return + any FHSS reconciliation</td></tr>
+        <tr><td>State revenue office</td><td>As needed</td><td>Only if PPOR status / land tax exposure changes</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- CALCULATOR -->
+<section id="calc" class="tab">
+  <div class="card">
+    <h2>Cash calculator — am I ready?</h2>
+    <p>Estimate the cash you need at settlement for a target property. Approximations only; confirm with a broker and your state revenue office.</p>
+
+    <div class="calc-form">
+      <div>
+        <label for="state">State</label>
+        <select id="state">
+          <option value="qld">Queensland</option>
+          <option value="vic">Victoria</option>
+        </select>
+      </div>
+      <div>
+        <label for="type">Property type</label>
+        <select id="type">
+          <option value="new">New build / off-the-plan</option>
+          <option value="established">Established home</option>
+        </select>
+      </div>
+      <div>
+        <label for="price">Target price ($)</label>
+        <input id="price" type="number" value="1000000" min="200000" step="10000">
+      </div>
+      <div>
+        <label for="cash">Your cash on hand ($)</label>
+        <input id="cash" type="number" value="50000" min="0" step="1000">
+      </div>
+    </div>
+
+    <div class="calc-result">
+      <div id="verdict" class="verdict warn">Calculating…</div>
+      <table>
+        <thead>
+          <tr><th>Item</th><th class="num">Amount</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Deposit (5% under FHG)</td><td class="num" id="r-deposit">—</td></tr>
+          <tr><td>Stamp duty (after concessions)</td><td class="num" id="r-duty">—</td></tr>
+          <tr><td>Other buying costs (inspection, conveyancing, fees, insurance)</td><td class="num" id="r-other">—</td></tr>
+          <tr><td>Cash reserve buffer (3 mo)</td><td class="num" id="r-buffer">—</td></tr>
+          <tr class="total"><td>Total cash needed at settlement</td><td class="num" id="r-total">—</td></tr>
+          <tr><td>Your cash on hand</td><td class="num" id="r-cash">—</td></tr>
+          <tr class="total"><td id="r-gap-label">Gap</td><td class="num" id="r-gap">—</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:12px;color:#78716c;margin-top:12px">
+        Notes: assumes federal FHG (95% LVR, no LMI). QLD new build uses uncapped first-home-new-home concession. VIC uses standard first home concession (full to $600k, sliding to $750k). VIC new build &lt;$750k gets the $10k FHOG offset. Estimates only.
+      </p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p><strong>Companion documents:</strong> <a href="README.md">README</a> · <a href="01-market.md">Market context</a> · <a href="02-competitive-landscape.md">Competitive landscape</a> · <a href="03-strategy.md">Strategy</a> · <a href="04-architecture.md">Architecture</a> · <a href="05-ux-model.md">UX model</a> · <a href="06-roadmap.md">Roadmap</a> · <a href="references.md">References</a></p>
+  <p style="margin-top:8px"><strong>Sources (verified May 2026):</strong> <a href="https://www.housingaustralia.gov.au/" target="_blank">Housing Australia</a> · <a href="https://qro.qld.gov.au/duties/transfer-duty/concessions/homes/first-home-new-home/" target="_blank">QRO first home (new home) concession</a> · <a href="https://qro.qld.gov.au/duties/transfer-duty/concessions/homes/first-home/" target="_blank">QRO first home concession</a> · <a href="https://www.sro.vic.gov.au/buying-property/land-transfer-stamp-duty/concessions-exemptions-and-waivers/first-home-buyers/first-home-buyer-duty-exemption-or-concession" target="_blank">SRO Victoria first home buyer concession</a> · <a href="https://www.ato.gov.au/individuals-and-families/super-for-individuals-and-families/super/withdrawing-and-using-your-super/early-access-to-super/first-home-super-saver-scheme" target="_blank">ATO First Home Super Saver Scheme</a> · <a href="https://firsthomebuyers.gov.au/australian-government-help-buy-scheme" target="_blank">Help to Buy (federal)</a></p>
+  <p style="margin-top:8px"><strong>Disclaimer:</strong> General information only. Not financial, legal, or mortgage advice. Schemes and thresholds change — confirm current eligibility with an FHG-panel broker, your conveyancer, and the relevant state revenue office before committing. This file is one example output; for full strategy, architecture, and UX model context, see the companion document set above.</p>
+</footer>
+
+</div>
+
+<script>
+  // Tab switching
+  const tabs = document.querySelectorAll('nav.tabs button');
+  const sections = document.querySelectorAll('section.tab');
+  tabs.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.tab;
+      tabs.forEach(b => b.classList.toggle('active', b === btn));
+      sections.forEach(s => s.classList.toggle('active', s.id === target));
+    });
+  });
+
+  // Calculator
+  const fmt = n => '$' + Math.round(n).toLocaleString('en-AU');
+
+  function vicDuty(price) {
+    // Approximate VIC general transfer duty (above first-home thresholds)
+    if (price <= 25000) return price * 0.014;
+    if (price <= 130000) return 350 + (price - 25000) * 0.024;
+    if (price <= 960000) return 2870 + (price - 130000) * 0.06;
+    if (price <= 2000000) return price * 0.055;
+    return 110000 + (price - 2000000) * 0.065;
+  }
+
+  function vicFirstHomeDuty(price) {
+    if (price <= 600000) return 0;
+    if (price <= 750000) {
+      // Concession phases out linearly
+      const fullDuty = vicDuty(price);
+      const fraction = (price - 600000) / 150000;
+      return fullDuty * fraction;
+    }
+    return vicDuty(price);
+  }
+
+  function qldFirstHomeEstablishedDuty(price) {
+    // Full exemption to $700k; partial $700–800k; above $800k = home concession kicks in
+    if (price <= 700000) return 0;
+    if (price <= 800000) {
+      // Sliding scale, max concession at $700k = $24,525
+      const maxBenefit = 24525;
+      const reduction = maxBenefit * (1 - (price - 700000) / 100000);
+      const homeConcessionDuty = qldHomeConcessionDuty(price);
+      return Math.max(0, homeConcessionDuty - reduction);
+    }
+    return qldHomeConcessionDuty(price);
+  }
+
+  function qldHomeConcessionDuty(price) {
+    // QLD home concession (general)
+    if (price <= 350000) return price * 0.01;
+    if (price <= 540000) return 3500 + (price - 350000) * 0.035;
+    if (price <= 1000000) return 10150 + (price - 540000) * 0.045;
+    return 30850 + (price - 1000000) * 0.0575;
+  }
+
+  function compute() {
+    const state = document.getElementById('state').value;
+    const type = document.getElementById('type').value;
+    const price = Math.max(0, parseFloat(document.getElementById('price').value) || 0);
+    const cash = Math.max(0, parseFloat(document.getElementById('cash').value) || 0);
+
+    const deposit = price * 0.05;
+    let duty = 0;
+
+    if (state === 'qld') {
+      if (type === 'new') {
+        duty = 0; // QLD first home (new home) concession — uncapped from 1 May 2025
+      } else {
+        duty = qldFirstHomeEstablishedDuty(price);
+      }
+    } else {
+      duty = vicFirstHomeDuty(price);
+      if (type === 'new' && price <= 750000) {
+        duty = Math.max(0, duty - 10000); // FHOG offsets cash needed
+      }
+    }
+
+    const other = 6000; // inspection + conveyancing + lender fees + reg + insurance
+    const buffer = 15000; // 3-month reserve
+    const total = deposit + duty + other + buffer;
+    const gap = total - cash;
+
+    document.getElementById('r-deposit').textContent = fmt(deposit);
+    document.getElementById('r-duty').textContent = fmt(duty);
+    document.getElementById('r-other').textContent = fmt(other);
+    document.getElementById('r-buffer').textContent = fmt(buffer);
+    document.getElementById('r-total').textContent = fmt(total);
+    document.getElementById('r-cash').textContent = fmt(cash);
+
+    const gapEl = document.getElementById('r-gap');
+    const labelEl = document.getElementById('r-gap-label');
+    const verdict = document.getElementById('verdict');
+
+    if (gap <= 0) {
+      gapEl.textContent = fmt(-gap) + ' surplus';
+      gapEl.style.color = '#065f46';
+      labelEl.textContent = 'Surplus';
+      verdict.className = 'verdict ok';
+      verdict.textContent = '✓ You can do it. Cash on hand covers deposit + buying costs + reserve.';
+    } else if (gap <= 10000) {
+      gapEl.textContent = fmt(gap) + ' short';
+      gapEl.style.color = '#92400e';
+      labelEl.textContent = 'Gap';
+      verdict.className = 'verdict warn';
+      verdict.textContent = '⚠ Tight. You\'re within $10k of the target — consider FHSS top-up or smaller buffer.';
+    } else {
+      gapEl.textContent = fmt(gap) + ' short';
+      gapEl.style.color = '#991b1b';
+      labelEl.textContent = 'Gap';
+      verdict.className = 'verdict bad';
+      verdict.textContent = '✗ Not enough cash. Drop target price, change property type/state, or extend timeline.';
+    }
+  }
+
+  ['state','type','price','cash'].forEach(id => {
+    document.getElementById(id).addEventListener('input', compute);
+    document.getElementById(id).addEventListener('change', compute);
+  });
+  compute();
+</script>
+
+</body>
+</html>
