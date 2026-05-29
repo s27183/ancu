@@ -276,7 +276,7 @@ System prompt =
   +
   [Buyer profile fields — citizenship, FIRB status, etc.]
   +
-  [Agent reasoning instructions — fill `<initial>` parameters, respect `requires`, ask user when ambiguous]
+  [Agent reasoning instructions — fill the `agent_reasoning_required` leaves still `<initial>`, respect `requires`, ask user when ambiguous]
 ```
 
 Critically, **conversation history is not appended**. Planning is grounded in the current context (plan card + property + uploads + current query). This both reduces token consumption and prevents the agent from drifting on stale conversational context. The session log is preserved for user re-reading, not for agent grounding.
@@ -304,6 +304,17 @@ Future signal expansions (deferred to v1.1):
 
 V1 implementation uses `<initial>` + the five upstream-reference signals. Pending/stale/conflict signals are added as the agent matures and edge cases emerge.
 
+#### Two fill paths — deterministic resolver vs agent turn
+
+Filling a component is not monolithic. Each leaf parameter already declares *how* it is filled — via the signal vocabulary above plus the `agent_reasoning_required` / `derived_from` flags (§11.9 component shape). That declaration partitions every parameter into one of two fill paths:
+
+- **Deterministic resolver** (no LLM) — fills `<from_X>` copies, `derived_from` computations, and unflagged numeric leaves (formulae over resolved KB tables: stamp duty, LMI, deposit amounts, reserve buffer, totals, threshold verdicts). A pure function of current plan-card state + resolved KB. Instant, free, and **reproducible**: identical inputs always produce identical figures — which is exactly what makes the audit trail and the ASIC "computed, not advised" posture defensible.
+- **Agent turn** (LLM) — fills only `agent_reasoning_required: true` leaves: judgment over rules ∩ circumstances, scheme-stacking rationale, lender shortlist + reasoning, buying strategy, risk synthesis, document summarisation. This is the reasoning the platform exists to provide.
+
+The resolver runs **first**; the agent turn then sees a plan card whose deterministic leaves are already filled and reasons only over what remains (hence the system-prompt instruction above fills the `agent_reasoning_required` leaves *still* `<initial>`). This is why the `cash_position` calculator (renderer `calculator`) recomputes a budget envelope on every price/cash change with no model call — its parameters are entirely resolver-path — while `eligibility` and `mortgage_finance` carry `agent_reasoning_required` leaves and need the turn.
+
+Both paths emit `component_filled` ([engine-contract.md](engine-contract.md) §4); only the agent path emits `usage`. Keeping money math out of the LLM is deliberate: LLMs do arithmetic unreliably, and a hallucinated stamp-duty figure is both a product defect and a compliance hazard.
+
 #### Re-fill triggers
 
 The filled plan card is updated (re-filled) on these events:
@@ -311,6 +322,8 @@ The filled plan card is updated (re-filled) on these events:
 - **User interaction** that adds or changes context — uploaded a document, answered an agent question, updated profile field, changed property
 - **System event** that invalidates parameters — blueprint updated, scheme rule changed in KB, property data refreshed, FIRB regime change
 - **Time-based stale check** — parameters older than threshold (e.g., 90 days) flagged for re-fill on next session
+
+**Which path a trigger takes follows from the DAG.** A trigger re-runs the deterministic resolver over the affected components; it escalates to an agent turn **iff** the changed input feeds — directly or transitively through the pipeline DAG — a leaf flagged `agent_reasoning_required`. A hypothetical price change that only moves calculator inputs stays resolver-only (instant, free, no `usage`); the same change crossing a scheme cap — which flips an `agent_reasoning_required` eligibility leaf — escalates to a turn. This is statically decidable from the blueprint, so the engine knows *before* running whether a given edit costs an LLM call.
 
 The blueprint template itself never changes per user — only the filled instance does.
 
@@ -387,6 +400,7 @@ The FHB Mode A blueprint uses 9 of these (summary-card, scheme-stack-card, calcu
 - **The UI is a thin renderer** over the blueprint + filled state — easy to build, easy to extend (add a new component → assign a renderer → CI validates).
 - **Outcomes are interfaces, not parameters** — downstream components read structured outcomes (not raw upstream parameters), making the pipeline composable and the agent's reasoning bounded.
 - **Token economics are favourable** — system prompt is bounded by current plan card + property + uploads, not by accumulated history.
+- **Two fill paths keep math out of the model** — the per-leaf `agent_reasoning_required` flag splits each component into a deterministic resolver (copies, `derived_from`, calculator math — reproducible, free, no LLM) and an agent turn (judgment only). Recompute-on-input (e.g., a what-if price in `cash_position`) is instant and costs nothing; only edits that reach an agent-flagged leaf spend a turn.
 - **Blueprint evolution is decoupled from instance migration** — laws change frequently; user plan cards remain stable until they opt to refresh.
 - **KB anchors and renderers are validated at build time** — the migration script gates deployment on schema correctness, preventing the agent from referencing missing content or undefined renderers in production.
 
