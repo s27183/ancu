@@ -1,16 +1,49 @@
-# 04 — Architecture & context-flow framing
+# Architecture & context-flow framing
 
 > Part of the **Vietnamese Diaspora Property Platform — Research & Strategy** document set. See [README.md](../README.md) for the full index.
 >
-> **This document covers:** The three-layer architecture (static KB / user state / agentic reasoning), update cadences, interaction intensity by phase, product modes, Claude Code fit, the user state trap, the context-and-flow framing that explains why this shape, the agentic platform formula, flow taxonomy, and implications for org structure.
+> **This document covers:** The engine/shell deployable split (§11.0), the three-layer architecture (static KB / user state / agentic reasoning), update cadences, interaction intensity by phase, product modes, Claude Code fit, the user state trap, the context-and-flow framing that explains why this shape, the agentic platform formula, flow taxonomy, and implications for org structure.
 >
-> **Related documents:** [03-strategy.md](../03-strategy.md) (business strategy that this architecture serves), [05-ux-model.md](../05-ux-model.md) (user-facing surfaces over this architecture).
+> **Related documents:** [03-strategy.md](../03-strategy.md) (business strategy that this architecture serves), [04-ux-model.md](../04-ux-model.md) (user-facing surfaces over this architecture).
 
 ---
 
 ## 11. Architecture & interaction model
 
 The product cleanly separates into three layers with different update cadences and engineering disciplines. Designing this separation correctly is the single biggest leverage point for build speed, operating cost, and product depth.
+
+### 11.0 Engine / shell split (deployable shape)
+
+The three layers below are the *logical* model. Physically, the platform is two independently-deployable halves — a pattern adapted from the ATP project (see [`engine-contract.md`](engine-contract.md) for the full contract and [`principles.md`](principles.md) for the six principles that govern it):
+
+- **Engine** — Erlang/OTP gateway + stateless Python sidecars. Runs the agentic planning workload: resolves the blueprint + KB anchors, runs the planning agent over current plan-card state, fills components, enforces the compliance gate, persists, and streams typed events. Exposes **primitives** (`/api/engine/*`), never views. Owns Layer 1 and Layer 2 as the source of truth, and the Layer 3 runtime.
+- **Shell(s)** — web app, browser extension, Tìm Nhà curator console (Svelte frontend + Erlang backend). Own UX, identity, commerce, and display projection. Consume engine primitives and render the typed component outcomes via the constrained renderer vocabulary (§11.9).
+
+| Layer | Engine owns | Shell owns |
+|---|---|---|
+| L1 — Static KB | `kb_anchors`, `blueprints` (offline KB agent writes at deploy — build-time flow) | — |
+| L2 — User state | `plan_cards`, `sessions` (SOT; the agent's grounding, §11.9 / constraint #9) | A *view* of plan cards — title, layout, prefs |
+| L3 — Agentic reasoning | Planning agent in a disposable Python sidecar; `gen_statem` per plan-card turn; compliance pipeline; metering | Onboarding / map / upload UX; renders outcomes; commerce gating |
+
+The forcing function: if two shells would render the same data differently, it is shell-owned and the engine must not shape it. The engine **meters** (emits `usage` events) but does not **gate** on commerce — shells gate, which keeps both billing and ASIC liability out of the agent loop. Compliance (FIRB / ASIC / AML) is a *gate on agent behavior*, so it is engine-owned: the regulatory boundary is structural (constraint #10), not a disclaimer. OTP patterns for the engine live in [`erlang-design-checklist.md`](erlang-design-checklist.md).
+
+**Repository layout** (target — supersedes the earlier flat `src/`):
+
+```
+firsthomey/
+├── engine/                      ← agentic planning workload
+│   ├── erlang/src/              gateway: cowboy /api/engine/*, gen_statem per plan-card turn,
+│   │                            sidecar lifecycle, compliance pipeline, metering, PGO
+│   ├── erlang/priv/migrations/  engine schema + KB/blueprint deploy (offline KB agent)
+│   ├── python/                  stateless sidecars (planning agent — Anthropic SDK; Playwright URL fetch)
+│   └── python/pyproject.toml
+└── shell/
+    ├── svelte/frontend/         web app: onboarding, suburb map, plan-card render, uploads
+    ├── svelte/backend/          identity, commerce (subscription / one-time / success fee), usage consumer
+    └── extension/               browser extension (Phase B property capture)
+```
+
+`engine/` and `shell/` deploy independently; the API is the only contract between them.
 
 ### 11.1 The three layers
 

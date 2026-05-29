@@ -21,8 +21,9 @@ Critical reference docs by purpose:
 | If you need | Read |
 |---|---|
 | Strategic positioning, REA economics, wedge sequence | [`docs/03-strategy.md`](docs/03-strategy.md) |
-| Three-layer architecture, blueprint model, property pipeline | [`docs/architecture/architecture.md`](docs/architecture/architecture.md) |
-| UX model, four user modes, onboarding flow, plan card lifecycle | [`docs/05-ux-model.md`](docs/05-ux-model.md) |
+| Engine/shell split, three-layer architecture, blueprint model, property pipeline | [`docs/architecture/architecture.md`](docs/architecture/architecture.md) |
+| Engine↔shell boundary: primitives, events, metering, compliance gate | [`docs/architecture/engine-contract.md`](docs/architecture/engine-contract.md) |
+| UX model, four user modes, onboarding flow, plan card lifecycle | [`docs/04-ux-model.md`](docs/04-ux-model.md) |
 | The four concrete plan card blueprints | [`docs/blueprints/`](docs/blueprints/) |
 | What a real property card looks like (test output) | [`docs/samples/property-card-example.html`](docs/samples/property-card-example.html) |
 
@@ -54,6 +55,8 @@ These are not preferences. They are decisions locked into the architecture. Viol
 
 10. **FIRB status as first-class user attribute.** Every flow branches on it. Foreign persons cannot buy established dwellings 1 Apr 2025 – 30 Jun 2029. Misadvice has real harm; build the gate into the architecture, not as a disclaimer.
 
+11. **Engine / shell split.** Two independently-deployable halves: an Erlang/OTP + Python **engine** that runs the planning agent and exposes primitives (`/api/engine/*`, typed events), and **shell(s)** (web, extension, curator console) that own UX, identity, and commerce. The engine **meters** (emits `usage`); shells **gate** on commerce — keeping billing *and* ASIC liability out of the agent loop. Compliance (FIRB/ASIC/AML) is a gate on agent behavior → engine-owned. If two shells would render the same data differently, it's shell-owned. See [`docs/architecture/engine-contract.md`](docs/architecture/engine-contract.md).
+
 ## Four user modes
 
 | Mode | Audience | FIRB | Blueprint |
@@ -67,25 +70,25 @@ Wedge 1 targets Mode A only. Mode B / C / D blueprints are drafted but not in sc
 
 ## Where to start building (Wedge 1a)
 
-In order of value + dependency:
+In order of value + dependency. **Engine is the dependency root** (the shell renders what the engine produces); build-time KB curation feeds the engine. Tags: `[engine]` runtime, `[build-time]` offline KB agent, `[shell]` Svelte. See [`docs/architecture/engine-contract.md`](docs/architecture/engine-contract.md).
 
-1. **DB schema + migration script** — `kb_anchors`, `blueprints`, `plan_cards`, `sessions`, `suburbs`, `properties` tables. Migration script reads `docs/kb/*.md` and `docs/blueprints/*.md`, validates slugs + renderer enum, generates SQL. Note: `properties` table is OPTIONAL in v1 — not load-bearing.
+1. **`[engine]` DB schema + migration** — `kb_anchors`, `blueprints`, `plan_cards` (base + addenda, `deploy_commit_sha`), `plan_card_events`, `sessions`, `suburbs`, `properties` (OPTIONAL — not load-bearing). The migration *is* the offline KB agent's build-time deploy: reads `docs/kb/*.md` + `docs/blueprints/*.md`, validates slugs + renderer enum, writes SQL. PGO from Erlang.
 
-2. **First KB doc** — `docs/kb/scheme/federal/fhg.md` with frontmatter + body. Validates the markdown format. Then `scheme/state/qld/fhnhc.md`, `scheme/federal/fhss.md`, `firb/established-dwelling-ban.md` to bootstrap Mode A KB.
+2. **`[build-time]` First KB docs** — `docs/kb/scheme/federal/fhg.md` (validates the format), then `scheme/state/qld/fhnhc.md`, `scheme/federal/fhss.md`, `firb/established-dwelling-ban.md` to bootstrap Mode A KB.
 
-3. **Suburb enrichment ingestion** — ABS Data API adapter for SAL-level Census 2021 data (Vietnamese ancestry %, demographics, family composition, dwelling characteristics). State education / planning / flood adapters as separate jobs. RBA FX rate daily feed. CoreLogic / PropTrack are PAID, deferred — don't subscribe yet.
+3. **`[build-time]` Suburb enrichment ingestion** — jobs writing the engine `suburbs` table: ABS Data API for SAL-level Census 2021 (Vietnamese ancestry %, demographics, family composition, dwellings); state education / planning / flood adapters; RBA FX daily. CoreLogic / PropTrack are PAID — deferred.
 
-4. **Mode A FHB blueprint loader + planning agent (base scope only)** — load `fhb-domestic-au.md`, validate kb_anchors resolve, implement the agent prompt for each `scope: base` component (`buyer_profile`, `eligibility`, `mortgage_finance` base, `cash_position` base, `ownership_planning` base).
+4. **`[engine]` Gateway + planning sidecar (base scope)** — Erlang `/api/engine/*` + `gen_statem` per plan-card turn; Python sidecar loads `fhb-domestic-au.md`, validates kb_anchors resolve, runs each `scope: base` component (`buyer_profile`, `eligibility`, `mortgage_finance`/`cash_position`/`ownership_planning` base), streams `component_filled`. Wire the ASIC boundary into the compliance pipeline from day one.
 
-5. **Onboarding UI** — mode picker, state picker, VND/AUD price range, map zone selection, intent tags. Saves to `plan_cards` table.
+5. **`[shell]` Onboarding** — mode / state / VND-AUD range / map-zone / intent tags; calls the engine to create the plan card + run the base turn.
 
-6. **Base plan rendering** — render Mode A base plan from filled blueprint components. Reuse the design language from [`docs/first_home_buyer_plan.html`](docs/first_home_buyer_plan.html) as the visual template.
+6. **`[shell]` Base plan rendering** — render Mode A base plan from `component_filled` outcomes via the renderer vocabulary. Reuse the design language from [`docs/first_home_buyer_plan.html`](docs/first_home_buyer_plan.html) as the visual template.
 
-7. **Suburb intelligence map** — Leaflet / Mapbox + ABS-data overlays. Vietnamese-community proximity is the killer layer; ship that first.
+7. **`[shell]` Suburb-intelligence map** — Leaflet / Mapbox + ABS-data overlays. Vietnamese-community proximity is the killer layer; ship that first.
 
-8. **Tìm Nhà request flow** — user submits request from base plan; agent generates search brief; brief lands in curator queue. Curator side can be manual / spreadsheet-driven in v1. Defer when ready.
+8. **`[shell+engine]` Tìm Nhà request flow** — shell submits a request; the engine's agent emits `curator_input_required` + a search brief; the curator console (shell; manual / spreadsheet-driven in v1) returns a shortlist → addenda. Defer when ready.
 
-9. **User URL paste handler** — synchronous fetch of REA / Domain via headless Chrome (Playwright); normalise to canonical Property schema; create property addendum. This activates Phase B (per-property components).
+9. **`[engine]` User URL paste handler** — synchronous single-page fetch via Playwright (engine sidecar, user-initiated); normalise to canonical Property schema; attach as addendum → activates Phase B (per-property components).
 
 ## Conventions
 
@@ -96,11 +99,12 @@ firsthomey/
 ├── CLAUDE.md (this file)
 ├── docs/                         (strategic + architectural docs — the working agreement)
 │   ├── README.md
-│   ├── 01-market.md, 02-competitive-landscape.md, 03-strategy.md, 05-ux-model.md, 06-roadmap.md
-│   ├── architecture/                  (architecture doc + design principles)
-│   │   ├── architecture.md            (three-layer architecture, blueprint model, property pipeline)
-│   │   ├── principles.md
-│   │   └── erlang-design-checklist.md
+│   ├── 01-market.md, 02-competitive-landscape.md, 03-strategy.md, 04-ux-model.md, 05-roadmap.md
+│   ├── architecture/                  (architecture doc + engine/shell contract + design principles)
+│   │   ├── architecture.md            (engine/shell split, three-layer model, blueprint, property pipeline)
+│   │   ├── engine-contract.md         (engine↔shell boundary: primitives, events, metering, compliance gate)
+│   │   ├── principles.md              (six architecture principles, adapted from ATP)
+│   │   └── erlang-design-checklist.md (OTP patterns for the engine)
 │   ├── blueprints/
 │   │   ├── fhb-domestic-au.md
 │   │   ├── fhb-foreign-au.md
@@ -115,21 +119,27 @@ firsthomey/
 │   ├── samples/
 │   │   └── property-card-example.html
 │   └── first_home_buyer_plan.html (Mode A example output, design reference)
-├── src/                          (to be created: production code)
+├── engine/                       (to be created: Erlang/OTP gateway + Python sidecars — agentic planning)
+│   ├── erlang/                   (cowboy /api/engine/*, gen_statem per plan-card turn, compliance, metering, PGO)
+│   │   └── priv/migrations/      (engine schema + KB/blueprint deploy)
+│   └── python/                   (stateless sidecars: planning agent (Anthropic SDK), Playwright URL fetch)
+├── shell/                        (to be created: Svelte frontend + Erlang backend — UX, identity, commerce)
+│   ├── svelte/frontend/
+│   ├── svelte/backend/
+│   └── extension/                (browser extension — Phase B property capture)
 ├── tests/                        (to be created)
-├── migrations/                   (to be created: SQL migrations)
-├── pyproject.toml
-└── .venv/
+└── pyproject.toml                (sidecar deps; .venv)
 ```
+
+See [`docs/architecture/engine-contract.md`](docs/architecture/engine-contract.md) for what lives where and why; `engine/` and `shell/` deploy independently with the API as the only contract.
 
 ### Code style (when written)
 
-- Python with type hints throughout
-- Pydantic for blueprint / KB / plan card schema validation
-- FastAPI for the user-facing planning agent service
-- PostgreSQL with `jsonb` columns for blueprint / plan card content
-- Headless Chrome (Playwright) for the synchronous URL fetch path
-- The agentic layer uses Claude API via the Anthropic SDK; no LangChain or similar wrapper unless materially justified
+The platform is an **engine** (agentic planning) + **shell(s)** (UX/commerce). See [`docs/architecture/engine-contract.md`](docs/architecture/engine-contract.md).
+
+- **Engine — Erlang/OTP.** Cowboy gateway (`/api/engine/*`, REST+SSE), `gen_statem` per plan-card turn, supervised Python ports, compliance pipeline, metering. PostgreSQL via PGO; `jsonb` for plan-card / blueprint content; **Postgres is the source of truth**. Follow [`docs/architecture/erlang-design-checklist.md`](docs/architecture/erlang-design-checklist.md); use the Erlang MCP server (per global CLAUDE.md).
+- **Engine sidecars — Python** with type hints; Pydantic for blueprint / KB / plan-card / outcome schemas; the planning agent uses the Claude API via the Anthropic SDK (no LangChain unless materially justified). Sidecars are **stateless and disposable** (principle 3) — full context in on stdin, JSON-RPC events out on stdout, exit. Playwright for the synchronous user-URL-paste fetch (engine sidecar, user-initiated only).
+- **Shell — Svelte** (use the Svelte MCP server, per global CLAUDE.md). Owns onboarding, suburb map, plan-card rendering (constrained renderer vocabulary), identity, and commerce. Gates on commerce; the engine only meters.
 
 ### Testing approach
 
@@ -171,7 +181,7 @@ firsthomey/
 1. Re-read the relevant section of the docs (the README has an audience-guided reading path).
 2. Update the docs to reflect the new understanding before writing code that depends on the new understanding.
 3. Component-flow questions → §11.9 in `docs/architecture/architecture.md`.
-4. UX / surface questions → §13 in `docs/05-ux-model.md`.
+4. UX / surface questions → §13 in `docs/04-ux-model.md`.
 5. Strategic positioning questions → §8 in `docs/03-strategy.md`.
 6. "Should the platform do X?" → if X requires a market position in property data acquisition, the answer is no.
 

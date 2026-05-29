@@ -91,7 +91,7 @@ The engine emits `usage` events per turn. It does not gate on commerce. Shells p
 - Markup / currency / tier logic in the engine.
 - Any table in engine DB shaped like `credits` or `credit_transactions`.
 
-**Anchored in.** Contract §1 "Metering vs. gating." Implemented across Phases 0–6: `mcp_usage_events.erl` emits `usage`; engine-side commerce has been stripped (migrations 017, 023, 025); `mcp_billing.erl` moved to shell as `mcp_shell_billing.erl`; `mcp_credits.erl` retains only a residual admin check. Shells tail the outbox (`mcp_shell_usage_consumer`) and debit in their own ledger. See [billing.md](billing.md).
+**Anchored in.** Contract §1 "Metering vs. gating." Implemented across Phases 0–6: `mcp_usage_events.erl` emits `usage`; engine-side commerce has been stripped (migrations 017, 023, 025); `mcp_billing.erl` moved to shell as `mcp_shell_billing.erl`; `mcp_credits.erl` retains only a residual admin check. Shells tail the outbox (`mcp_shell_usage_consumer`) and debit in their own ledger. (Those are the ATP anchors; FirstHomey's metering/gating boundary and DB split are in [engine-contract.md](engine-contract.md) §1 and §9.)
 
 ---
 
@@ -115,8 +115,7 @@ When a protocol defines the mechanism — MCP Streamable HTTP for tool calls, ve
 
 ## Pointers
 
-- **[engine-contract.md](engine-contract.md)** — the stable contract between engine and shells. Concrete application of principles 4 and 5.
-- **[../design/engine-contract-migration.md](../design/engine-contract-migration.md)** — per-endpoint migration from today's mixed state to the contract. Seven phases.
+- **[engine-contract.md](engine-contract.md)** — the stable contract between engine and shells. Concrete application of principles 4 and 5. (FirstHomey is greenfield — the contract is built from scratch, so the ATP per-endpoint migration plan does not apply.)
 - **[erlang-design-checklist.md](erlang-design-checklist.md)** — Erlang-specific playbook. Concrete application of principles 1 and 2 in OTP terms.
 
 When adding a new endpoint, table, or event: run it past the six forcing-function tests above. If it fails any of them, the design is wrong — not the principle.

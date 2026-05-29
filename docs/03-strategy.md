@@ -4,7 +4,7 @@
 >
 > **This document covers:** Strategic positioning (the five moats + augmentation framing), REA partnership economics (two-tier complementary model), policy intelligence as secondary moat, hard truths and cross-border / FIRB-specific risks, and the 30-month four-wedge build sequence.
 >
-> **Related documents:** [02-competitive-landscape.md](02-competitive-landscape.md) (the channel chain analysis this strategy operationalises), [architecture/architecture.md](architecture/architecture.md) (technical strategy that enables this business strategy), [05-ux-model.md](05-ux-model.md) (user-facing instance of this strategy).
+> **Related documents:** [02-competitive-landscape.md](02-competitive-landscape.md) (the channel chain analysis this strategy operationalises), [architecture/architecture.md](architecture/architecture.md) (technical strategy that enables this business strategy), [04-ux-model.md](04-ux-model.md) (user-facing instance of this strategy).
 
 ---
 
@@ -283,7 +283,7 @@ None of this is insurmountable, but it explains why **Wedge 2 (Vietnam-parent) f
 
 The goal is end-to-end coverage of the Vietnamese diaspora property journey across four core segments (Vietnamese-Australian FHBs, Vietnamese students in AU, Vietnam-located parents funding AU property, Vietnam-located investors). The risk is launching too broad and trying to serve all four segments simultaneously. The discipline is to be 10× better at one segment + one entry point, build trust, and let users pull the product into adjacent segments.
 
-The product is built on a unified platform with mode-switching by user location and intent (Option A — see [§13 in 05-ux-model.md](05-ux-model.md)). All four segments share the same Layer 1 KB, Layer 2 schema, Layer 3 reasoning infrastructure ([§11 in architecture/architecture.md](architecture/architecture.md#11-architecture--interaction-model)), and context-and-flow architecture ([§12 in architecture/architecture.md](architecture/architecture.md#12-context-and-flow-are-the-moats)). What changes per segment is which flows are active and which user-state fields matter.
+The product is built on a unified platform with mode-switching by user location and intent (Option A — see [§13 in 04-ux-model.md](04-ux-model.md)). All four segments share the same Layer 1 KB, Layer 2 schema, Layer 3 reasoning infrastructure ([§11 in architecture/architecture.md](architecture/architecture.md#11-architecture--interaction-model)), and context-and-flow architecture ([§12 in architecture/architecture.md](architecture/architecture.md#12-context-and-flow-are-the-moats)). What changes per segment is which flows are active and which user-state fields matter.
 
 ### 10.1 The 30-month wedge sequence
 
