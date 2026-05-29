@@ -153,7 +153,7 @@ Mode B activates two new surfaces (Family view, FIRB & Funding) that don't appea
     "visa_class": { "type": "enum", "options": ["student_500", "graduate_485", "skilled_482", "skilled_186", "spouse_309", "spouse_820", "other_temporary", "non_resident", "permanent_resident", "citizen"], "value": "<initial>" },
     "visa_grant_date": { "type": "date", "value": "<initial>" },
     "residency_duration_months": { "type": "integer", "value": "<initial>", "derived_from": "visa_grant_date" },
-    "firb_classification": { "type": "enum", "options": ["foreign_person", "not_foreign_person"], "value": "<initial>", "agent_reasoning_required": true, "derived_from": "visa_class" },
+    "firb_classification": { "type": "enum", "options": ["foreign_person", "not_foreign_person"], "value": "<initial>", "derived_from": "visa_class" },
     "employment_status": { "type": "enum", "options": ["full_time_au", "part_time_au", "studying_only", "not_employed_au"], "value": "<initial>" },
     "annual_income_aud": { "type": "money_per_year", "value": "<initial>" },
     "au_savings_aud": { "type": "money", "value": "<initial>" },
@@ -282,24 +282,24 @@ Same structure as [Mode A property_assessment](fhb-domestic-au.md#2-property_ass
   "strata_or_building": { /* same as Mode A */ },
 
   "foreign_person_eligibility": {
-    "is_new_build_or_vacant_land": { "type": "bool", "value": "<initial>", "agent_reasoning_required": true, "derived_from": "basics.property_type" },
+    "is_new_build_or_vacant_land": { "type": "bool", "value": "<initial>", "derived_from": "basics.property_type" },
     "established_dwelling_ban_applies": { "type": "bool", "value": true, "agent_reasoning_required": false },
-    "foreign_person_can_purchase": { "type": "bool", "value": "<initial>", "agent_reasoning_required": true },
+    "foreign_person_can_purchase": { "type": "bool", "value": "<initial>" },
     "developer_exemption_certificate_held": { "type": "bool", "value": "<initial>" },
     "firb_application_required": { "type": "bool", "value": true }
   },
   "firb_fee_estimate": {
     "value_tier": { "type": "enum", "options": ["under_1m", "1m_to_2m", "2m_to_3m", "3m_to_5m", "over_5m"], "value": "<initial>", "derived_from": "basics.price" },
-    "estimated_application_fee": { "type": "money", "value": "<initial>", "agent_reasoning_required": true }
+    "estimated_application_fee": { "type": "money", "value": "<initial>" }
   },
   "foreign_buyer_surcharge_estimate": {
     "applicable_surcharge_percentage": { "type": "percentage", "value": "<initial>", "derived_from": "basics.state" },
-    "estimated_surcharge_amount": { "type": "money", "value": "<initial>", "agent_reasoning_required": true }
+    "estimated_surcharge_amount": { "type": "money", "value": "<initial>" }
   },
   "fit_against_buyer": {
     "price_within_family_capacity": { "type": "bool", "value": "<initial>" },
-    "lifestyle_match_score_au_member": { "type": "integer_0_10", "value": "<initial>" },
-    "rentability_score_if_unoccupied": { "type": "integer_0_10", "value": "<initial>" }
+    "lifestyle_match_score_au_member": { "type": "integer_0_10", "value": "<initial>", "agent_reasoning_required": true },
+    "rentability_score_if_unoccupied": { "type": "integer_0_10", "value": "<initial>", "agent_reasoning_required": true }
   }
 }
 ```
@@ -347,7 +347,7 @@ If `foreign_person_eligible == false` (the property is established and the buyer
   },
   "fee_calculation": {
     "property_value_tier": { "type": "enum", "options": ["under_1m", "1m_to_2m", "2m_to_3m", "3m_to_5m", "over_5m"], "value": "<from_property_assessment>" },
-    "base_application_fee": { "type": "money", "value": "<initial>", "agent_reasoning_required": true },
+    "base_application_fee": { "type": "money", "value": "<initial>" },
     "additional_fees_if_any": { "type": "money", "value": 0 },
     "total_firb_fee_payable": { "type": "money", "value": "<initial>" }
   },
@@ -422,7 +422,7 @@ The `blocking_for_contract` field is the critical gate downstream — `buying_st
 ```jsonc
 {
   "borrowing_capacity": {
-    "non_resident_lender_assessment": { "type": "money_range", "value": "<initial>", "agent_reasoning_required": true, "note": "Non-resident lenders typically apply stricter serviceability — lower borrowing power than equivalent domestic profile" },
+    "non_resident_lender_assessment": { "type": "money_range", "value": "<initial>", "note": "Non-resident lenders typically apply stricter serviceability — lower borrowing power than equivalent domestic profile" },
     "lender_pool_size": { "type": "integer", "value": "<initial>", "note": "Typically 5–10 lenders willing to lend to foreign persons / temp residents" },
     "income_assessment_currency": { "type": "enum", "options": ["AUD_au_employment_only", "VND_with_haircut", "blended"], "value": "<initial>" }
   },
@@ -440,7 +440,7 @@ The `blocking_for_contract` field is the critical gate downstream — `buying_st
       "applicable": { "type": "bool", "value": "<initial>" },
       "lender_shortlist": { "type": "array<string>", "value": [] }
     },
-    "recommended_path": { "type": "enum", "options": ["standard_non_resident", "temp_resident_with_au_income", "wait_for_pr"], "value": "<initial>", "agent_reasoning_required": true },
+    "recommended_path": { "type": "enum", "options": ["standard_non_resident", "temp_resident_with_au_income", "wait_for_pr"], "value": "<initial>" },
     "recommended_path_reasoning": { "type": "string", "value": "<initial>" }
   },
   "debt_optimisation_recommendations": {
@@ -603,13 +603,13 @@ Note `regulatory_imposts_total` (FIRB fee + foreign-buyer surcharge + LMI if app
   },
   "provider_selection": {
     "evaluated_providers": { "type": "array<{ provider, spread_percentage, fee, total_cost, eta_days }>", "value": [] },
-    "recommended_provider": { "type": "enum", "options": ["wise", "ofx", "bank_wire_anz", "bank_wire_cba", "bank_wire_nab", "bank_wire_westpac", "other"], "value": "<initial>", "agent_reasoning_required": true },
+    "recommended_provider": { "type": "enum", "options": ["wise", "ofx", "bank_wire_anz", "bank_wire_cba", "bank_wire_nab", "bank_wire_westpac", "other"], "value": "<initial>" },
     "recommendation_reasoning": { "type": "string", "value": "<initial>" }
   },
   "vn_capital_control_compliance": {
-    "amount_exceeds_sbv_threshold": { "type": "bool", "value": "<initial>", "agent_reasoning_required": true },
+    "amount_exceeds_sbv_threshold": { "type": "bool", "value": "<initial>" },
     "sbv_approval_required": { "type": "bool", "value": "<initial>" },
-    "declared_purpose_category": { "type": "enum", "options": ["student_tuition_and_living_expenses", "family_remittance", "property_investment_foreign_direct_investment", "other"], "value": "<initial>", "agent_reasoning_required": true },
+    "declared_purpose_category": { "type": "enum", "options": ["student_tuition_and_living_expenses", "family_remittance", "property_investment_foreign_direct_investment", "other"], "value": "<initial>" },
     "purpose_documentation_required": { "type": "array<string>", "value": [] },
     "vn_bank_used": { "type": "string", "value": "<initial>" }
   },
@@ -718,8 +718,8 @@ Same as [Mode A due_diligence](fhb-domestic-au.md#6-due_diligence) plus:
     "vn_parent_documentation": { "required": "<initial>", "received": "<initial>", "reviewed": "<initial>" }
   },
   "cross_border_flags": {
-    "vn_documentation_gaps": { "type": "array<{ severity, item, action }>", "value": [] },
-    "au_aml_documentation_gaps": { "type": "array<{ severity, item, action }>", "value": [] }
+    "vn_documentation_gaps": { "type": "array<{ severity, item, action }>", "value": [], "agent_reasoning_required": true },
+    "au_aml_documentation_gaps": { "type": "array<{ severity, item, action }>", "value": [], "agent_reasoning_required": true }
   },
   "firb_specific_conditions_review": {
     "contract_includes_firb_approval_clause": { "type": "bool", "value": "<initial>" },
@@ -808,7 +808,7 @@ Same as [Mode A ownership_planning](fhb-domestic-au.md#8-ownership_planning) wit
       "occupancy_tracker_armed": { "type": "bool", "value": "<initial>" }
     },
     "non_resident_tax_obligations": {
-      "rental_income_withholding_applicable": { "type": "bool", "value": "<initial>", "agent_reasoning_required": true },
+      "rental_income_withholding_applicable": { "type": "bool", "value": "<initial>" },
       "cgt_on_eventual_sale_treatment": { "type": "string", "value": "Foreign-resident CGT applies; no PPOR exemption available for foreign-resident periods" },
       "annual_tax_filing_strategy": { "type": "string", "value": "<initial>" }
     }
@@ -944,6 +944,8 @@ This blueprint uses the same signal placeholders as Mode A, with one addition fo
 | `<from_property_assessment>` | Pulled from `property_assessment.outcome` |
 | `<from_firb_workflow>` | Pulled from `firb_workflow.outcome` (Mode B exclusive) |
 | `<from_cash_position>` | Pulled from `cash_position.outcome` |
+
+**Fill-path classification.** Per [agentic-boundary.md](../architecture/agentic-boundary.md), a leaf carrying `agent_reasoning_required: true` is agent-path; all others resolve deterministically. Mode B's FIRB mechanics (classification, eligibility predicate, fee + surcharge schedules) and cross-border compliance (SBV threshold, declared-purpose category, provider selection, withholding) are **all resolver** — rules and lookups. The only Mode-B-specific agent leaves are the subjective fit scores (`property_assessment.fit_against_buyer.lifestyle_match_score_au_member`, `rentability_score_if_unoccupied`) and the cross-border document-gap flags (`due_diligence.cross_border_flags.*`). Shared components (`buying_strategy`, `due_diligence` base, `settlement_prep`, `ownership_planning`) inherit Mode A's classification.
 
 ---
 

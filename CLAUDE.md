@@ -23,6 +23,7 @@ Critical reference docs by purpose:
 | Strategic positioning, REA economics, wedge sequence | [`docs/03-strategy.md`](docs/03-strategy.md) |
 | Engine/shell split, three-layer architecture, blueprint model, property pipeline | [`docs/architecture/architecture.md`](docs/architecture/architecture.md) |
 | Engine↔shell boundary: primitives, events, metering, compliance gate | [`docs/architecture/engine-contract.md`](docs/architecture/engine-contract.md) |
+| When an operation needs the agent vs deterministic rules (resolver/agent decision rule) | [`docs/architecture/agentic-boundary.md`](docs/architecture/agentic-boundary.md) |
 | UX model, four user modes, onboarding flow, plan card lifecycle | [`docs/04-ux-model.md`](docs/04-ux-model.md) |
 | The four concrete plan card blueprints | [`docs/blueprints/`](docs/blueprints/) |
 | What a real property card looks like (test output) | [`docs/samples/property-card-example.html`](docs/samples/property-card-example.html) |

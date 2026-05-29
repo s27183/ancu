@@ -198,29 +198,29 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
     "parking_spaces": { "type": "integer", "value": "<from_property_card>" }
   },
   "location_factors": {
-    "flood_risk_band": { "type": "enum", "options": ["none", "low", "medium", "high", "unknown"], "value": "<initial>" },
-    "school_catchment_quality": { "type": "enum", "options": ["strong", "average", "weak", "unknown"], "value": "<initial>" },
-    "transport_score": { "type": "integer_0_100", "value": "<initial>" },
-    "vietnamese_community_proximity": { "type": "enum", "options": ["high", "medium", "low"], "value": "<initial>" },
-    "planning_changes_pending": { "type": "array<string>", "value": [] }
+    "flood_risk_band": { "type": "enum", "options": ["none", "low", "medium", "high", "unknown"], "value": "<from_suburb>" },
+    "school_catchment_quality": { "type": "enum", "options": ["strong", "average", "weak", "unknown"], "value": "<from_suburb>" },
+    "transport_score": { "type": "integer_0_100", "value": "<from_suburb>" },
+    "vietnamese_community_proximity": { "type": "enum", "options": ["high", "medium", "low"], "value": "<from_suburb>" },
+    "planning_changes_pending": { "type": "array<string>", "value": "<from_suburb>" }
   },
   "market_position": {
-    "comparable_sales": { "type": "array<comparable_sale>", "value": [] },
-    "estimated_market_value_range": { "type": "money_range", "value": "<initial>" },
-    "asking_price_vs_market": { "type": "enum", "options": ["below_market", "fair", "above_market", "significantly_above"], "value": "<initial>" },
-    "days_on_market": { "type": "integer", "value": "<initial>" }
+    "comparable_sales": { "type": "array<comparable_sale>", "value": [], "agent_reasoning_required": true },
+    "estimated_market_value_range": { "type": "money_range", "value": "<initial>", "agent_reasoning_required": true },
+    "asking_price_vs_market": { "type": "enum", "options": ["below_market", "fair", "above_market", "significantly_above"], "value": "<initial>", "agent_reasoning_required": true },
+    "days_on_market": { "type": "integer", "value": "<from_property_card>" }
   },
   "strata_or_building": {
     "applicable": { "type": "bool", "value": "<initial>", "derived_from": "basics.property_type" },
-    "body_corporate_quarterly_fees": { "type": "money", "value": "<initial>" },
-    "sinking_fund_balance": { "type": "money", "value": "<initial>" },
-    "special_levies_in_last_3_years": { "type": "array<string>", "value": [] },
-    "structural_red_flags": { "type": "array<string>", "value": [] }
+    "body_corporate_quarterly_fees": { "type": "money", "value": "<from_document>" },
+    "sinking_fund_balance": { "type": "money", "value": "<from_document>" },
+    "special_levies_in_last_3_years": { "type": "array<string>", "value": "<from_document>" },
+    "structural_red_flags": { "type": "array<string>", "value": "<from_document>" }
   },
   "fit_against_buyer": {
     "price_within_borrowing_capacity": { "type": "bool", "value": "<initial>" },
     "price_within_scheme_cap": { "type": "bool", "value": "<initial>" },
-    "lifestyle_match_score": { "type": "integer_0_10", "value": "<initial>" }
+    "lifestyle_match_score": { "type": "integer_0_10", "value": "<initial>", "agent_reasoning_required": true }
   }
 }
 ```
@@ -259,7 +259,7 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
 ```jsonc
 {
   "fhg": {
-    "eligible": { "type": "bool", "value": "<initial>", "agent_reasoning_required": true },
+    "eligible": { "type": "bool", "value": "<initial>" },
     "applicable_cap_for_location_property": { "type": "money", "value": "<initial>" },
     "deposit_percentage_required": { "type": "percentage", "value": 5 },
     "lmi_savings_estimate": { "type": "money", "value": "<initial>" },
@@ -285,7 +285,7 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
     "concession_type": { "type": "enum", "options": ["full_exemption", "partial_concession", "no_concession"], "value": "<initial>" }
   },
   "fhog": {
-    "applicable": { "type": "bool", "value": "<initial>", "agent_reasoning_required": true, "derived_from": "property_assessment.basics.property_type" },
+    "applicable": { "type": "bool", "value": "<initial>", "derived_from": "property_assessment.basics.property_type" },
     "amount": { "type": "money", "value": "<initial>" }
   }
 }
@@ -327,7 +327,7 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
 ```jsonc
 {
   "borrowing_capacity": {
-    "with_current_debts": { "type": "money_range", "value": "<initial>", "agent_reasoning_required": true },
+    "with_current_debts": { "type": "money_range", "value": "<initial>" },
     "if_hecs_cleared": { "type": "money_range", "value": "<initial>" },
     "if_unused_credit_cards_closed": { "type": "money_range", "value": "<initial>" },
     "if_all_optimisations_applied": { "type": "money_range", "value": "<initial>" },
@@ -336,13 +336,13 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
   "debt_optimisation_recommendations": {
     "hecs": {
       "current_balance": { "type": "money", "value": "<from_buyer_profile>" },
-      "clear_before_application_recommended": { "type": "bool", "value": "<initial>", "agent_reasoning_required": true },
+      "clear_before_application_recommended": { "type": "bool", "value": "<initial>" },
       "estimated_capacity_uplift_if_cleared": { "type": "money", "value": "<initial>" },
       "trade_off_cash_drain": { "type": "money", "value": "<initial>" },
       "reasoning": { "type": "string", "value": "<initial>" }
     },
     "credit_cards": {
-      "close_unused_cards_recommended": { "type": "bool", "value": "<initial>", "agent_reasoning_required": true },
+      "close_unused_cards_recommended": { "type": "bool", "value": "<initial>" },
       "limits_to_reduce": { "type": "array<string>", "value": [] },
       "estimated_capacity_uplift": { "type": "money", "value": "<initial>" }
     },
@@ -373,13 +373,13 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
       "lmi_payable": { "type": "money", "value": 0 },
       "broader_lender_shortlist": { "type": "array<{ lender, rate_range, processing_time }>", "value": [] }
     },
-    "recommended_path": { "type": "enum", "options": ["fhg_backed", "lmi_5_to_20", "twenty_plus", "user_specific_alternative"], "value": "<initial>", "agent_reasoning_required": true },
+    "recommended_path": { "type": "enum", "options": ["fhg_backed", "lmi_5_to_20", "twenty_plus", "user_specific_alternative"], "value": "<initial>" },
     "recommended_path_reasoning": { "type": "string", "value": "<initial>" }
   },
   "loan_structure": {
     "principal_and_interest_vs_interest_only": { "type": "enum", "options": ["principal_and_interest", "interest_only", "split"], "value": "principal_and_interest", "note": "Mode A FHB typically P&I" },
     "fixed_vs_variable": { "type": "enum", "options": ["variable", "fixed_1yr", "fixed_2yr", "fixed_3yr", "split_fixed_variable"], "value": "<initial>", "agent_reasoning_required": true },
-    "offset_account_included": { "type": "bool", "value": "<initial>", "agent_reasoning_required": true },
+    "offset_account_included": { "type": "bool", "value": "<initial>" },
     "offset_strategy": { "type": "string", "value": "<initial>" }
   },
   "lender_synthesis": {
@@ -533,12 +533,12 @@ The `mortgage_plan` outcome feeds `cash_position` (loan amount + buffer requirem
     },
     "walk_away_price": { "type": "money", "value": "<initial>" },
     "opening_bid_recommended": { "type": "money", "value": "<initial>" },
-    "reserve_estimate_range": { "type": "money_range", "value": "<initial>" }
+    "reserve_estimate_range": { "type": "money_range", "value": "<initial>", "agent_reasoning_required": true }
   },
   "bid_tactics": {
     "increment_size_recommended": { "type": "money", "value": "<initial>" },
     "drop_out_signal": { "type": "string", "value": "<initial>" },
-    "early_offer_vs_wait": { "type": "enum", "options": ["make_early_offer", "wait_for_auction", "wait_for_post_auction_negotiation"], "value": "<initial>" }
+    "early_offer_vs_wait": { "type": "enum", "options": ["make_early_offer", "wait_for_auction", "wait_for_post_auction_negotiation"], "value": "<initial>", "agent_reasoning_required": true }
   },
   "negotiation_style": {
     "recommended_style": { "type": "enum", "options": ["assertive", "patient", "early_offer", "low_anchor"], "value": "<initial>", "agent_reasoning_required": true },
@@ -606,18 +606,18 @@ The `mortgage_plan` outcome feeds `cash_position` (loan amount + buffer requirem
     "title_search": { "required": true, "received": "<initial>", "reviewed": "<initial>" }
   },
   "flags_by_document": {
-    "contract_of_sale_flags": { "type": "array<{ severity, item, action }>", "value": [] },
-    "s32_flags": { "type": "array<{ severity, item, action }>", "value": [] },
-    "building_flags": { "type": "array<{ severity, item, action, estimated_repair_cost }>", "value": [] },
-    "pest_flags": { "type": "array<{ severity, item, action }>", "value": [] },
-    "strata_flags": { "type": "array<{ severity, item, action }>", "value": [] },
-    "title_flags": { "type": "array<{ severity, item, action }>", "value": [] }
+    "contract_of_sale_flags": { "type": "array<{ severity, item, action }>", "value": [], "agent_reasoning_required": true },
+    "s32_flags": { "type": "array<{ severity, item, action }>", "value": [], "agent_reasoning_required": true },
+    "building_flags": { "type": "array<{ severity, item, action, estimated_repair_cost }>", "value": [], "agent_reasoning_required": true },
+    "pest_flags": { "type": "array<{ severity, item, action }>", "value": [], "agent_reasoning_required": true },
+    "strata_flags": { "type": "array<{ severity, item, action }>", "value": [], "agent_reasoning_required": true },
+    "title_flags": { "type": "array<{ severity, item, action }>", "value": [], "agent_reasoning_required": true }
   },
   "special_conditions_to_request": { "type": "array<string>", "value": [] },
   "questions_to_ask_vendor_or_agent": { "type": "array<string>", "value": [] },
   "estimated_additional_costs_from_findings": { "type": "money_range", "value": "<initial>" },
   "go_no_go_recommendation": {
-    "verdict": { "type": "enum", "options": ["proceed", "proceed_with_conditions", "renegotiate", "withdraw"], "value": "<initial>" },
+    "verdict": { "type": "enum", "options": ["proceed", "proceed_with_conditions", "renegotiate", "withdraw"], "value": "<initial>", "agent_reasoning_required": true },
     "rationale": { "type": "string", "value": "<initial>" }
   }
 }
@@ -657,12 +657,12 @@ The `mortgage_plan` outcome feeds `cash_position` (loan amount + buffer requirem
 ```jsonc
 {
   "key_dates": {
-    "contract_signed_date": { "type": "date", "value": "<initial>" },
-    "cooling_off_end_date": { "type": "date", "value": "<initial>" },
-    "deposit_due_date": { "type": "date", "value": "<initial>" },
-    "finance_approval_deadline": { "type": "date", "value": "<initial>" },
-    "building_insurance_effective_date": { "type": "date", "value": "<initial>" },
-    "settlement_date": { "type": "date", "value": "<initial>" }
+    "contract_signed_date": { "type": "date", "value": "<from_document>" },
+    "cooling_off_end_date": { "type": "date", "value": "<initial>", "derived_from": "key_dates.contract_signed_date" },
+    "deposit_due_date": { "type": "date", "value": "<initial>", "derived_from": "key_dates.contract_signed_date" },
+    "finance_approval_deadline": { "type": "date", "value": "<initial>", "derived_from": "key_dates.contract_signed_date" },
+    "settlement_date": { "type": "date", "value": "<from_document>" },
+    "building_insurance_effective_date": { "type": "date", "value": "<initial>", "derived_from": "key_dates.settlement_date" }
   },
   "milestones": {
     "contract_signed": { "type": "milestone", "value": { "status": "<initial>", "due_date": "<initial>" } },
@@ -847,17 +847,21 @@ This blueprint uses signal placeholders defined in [§11.9 in architecture.md](.
 |---|---|
 | `<initial>` | Never-filled parameter — most common |
 | `<from_property_card>` | Pulled from property selection (e.g., address, price, suburb) |
+| `<from_suburb>` | Pulled from the suburb enrichment record (`suburbs` table) — resolver lookup |
+| `<from_document>` | Pulled from facts extracted from an uploaded document — resolver copy (extraction sidecar ran upstream) |
 | `<from_buyer_profile>` | Pulled from upstream `buyer_profile` outcome |
 | `<from_property_assessment>` | Pulled from upstream `property_assessment` outcome |
 | `<from_eligibility>` | Pulled from upstream `eligibility` outcome |
 
 Future iterations may add `<pending: user>`, `<pending: agent>`, `<stale: 90d>`, `<conflict: user_override>`.
 
+**Fill-path classification.** A leaf carrying `agent_reasoning_required: true` is filled by an agent turn (LLM); every other leaf resolves deterministically (copy, `derived_from`, formula, or rules engine). Which leaves clear the agent bar is governed by [agentic-boundary.md](../architecture/agentic-boundary.md). In this blueprint the agent-path leaves are exactly: property valuation (`property_assessment.market_position.comparable_sales` / `estimated_market_value_range` / `asking_price_vs_market`, `fit_against_buyer.lifestyle_match_score`); lender fit + rate structure (`mortgage_finance.lender_synthesis.most_likely_approval_lenders`, `loan_structure.fixed_vs_variable`); negotiation reads (`buying_strategy.negotiation_style.recommended_style`, `bid_tactics.early_offer_vs_wait`, `price_envelope.reserve_estimate_range`); and document significance + go/no-go (`due_diligence.flags_by_document.*`, `go_no_go_recommendation.verdict`). Everything else — **eligibility, scheme stacking, all cash / serviceability math, dates, settlement, ownership projections** — is resolver.
+
 ---
 
 ## Cross-component output dependency graph
 
-For migration script validation: confirm that every `<from_X>` reference in a component's parameters has a corresponding output in an upstream component, and that the pipeline is acyclic.
+For migration script validation: confirm that every `<from_X>` reference in a component's parameters resolves either to an output in an upstream component or to a recognised external source (`<from_property_card>`, `<from_suburb>`, `<from_document>`), and that the pipeline is acyclic.
 
 ```
 buyer_profile         → outcome: profile               (no upstream)

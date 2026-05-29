@@ -139,7 +139,7 @@ Mode C's base plan is sharper than Mode A's because investor reasoning often hap
   },
   "income_and_tax": {
     "primary_taxable_income": { "type": "money_per_year", "value": "<initial>" },
-    "marginal_tax_rate_estimate": { "type": "percentage", "value": "<initial>", "agent_reasoning_required": true, "derived_from": "primary_taxable_income" },
+    "marginal_tax_rate_estimate": { "type": "percentage", "value": "<initial>", "derived_from": "primary_taxable_income" },
     "income_stability": { "type": "enum", "options": ["permanent_payg", "contractor", "self_employed", "casual", "mixed"], "value": "<initial>" },
     "spousal_income_if_joint": { "type": "money_per_year", "value": 0 }
   },
@@ -217,7 +217,7 @@ Mode C's base plan is sharper than Mode A's because investor reasoning often hap
     "internal_area_sqm": { "type": "integer", "value": "<initial>" }
   },
   "investor_grade_features": {
-    "land_to_asset_ratio": { "type": "percentage", "value": "<initial>", "agent_reasoning_required": true },
+    "land_to_asset_ratio": { "type": "percentage", "value": "<initial>" },
     "rentable_bedroom_count": { "type": "integer", "value": "<initial>" },
     "rentable_living_areas": { "type": "integer", "value": "<initial>" },
     "outdoor_space_quality": { "type": "enum", "options": ["excellent", "good", "minimal", "none"], "value": "<initial>" },
@@ -228,7 +228,7 @@ Mode C's base plan is sharper than Mode A's because investor reasoning often hap
     "rental_market_vacancy_rate_suburb": { "type": "percentage", "value": "<initial>" },
     "days_on_market_typical_for_rent": { "type": "integer", "value": "<initial>" },
     "tenant_demand_score": { "type": "integer_0_10", "value": "<initial>" },
-    "rental_yield_estimate_gross": { "type": "percentage", "value": "<initial>", "agent_reasoning_required": true }
+    "rental_yield_estimate_gross": { "type": "percentage", "value": "<initial>" }
   },
   "growth_indicators": {
     "5_year_capital_growth_suburb": { "type": "percentage", "value": "<initial>" },
@@ -239,7 +239,7 @@ Mode C's base plan is sharper than Mode A's because investor reasoning often hap
   },
   "depreciation_potential": {
     "build_year_estimated": { "type": "integer", "value": "<initial>", "derived_from": "basics.year_built" },
-    "post_1987_capital_works_depreciable": { "type": "bool", "value": "<initial>", "agent_reasoning_required": true, "derived_from": "build_year_estimated" },
+    "post_1987_capital_works_depreciable": { "type": "bool", "value": "<initial>", "derived_from": "build_year_estimated" },
     "plant_and_equipment_depreciable": { "type": "bool", "value": "<initial>", "note": "Only applies to new properties or substantial renovations post May 2017" },
     "estimated_annual_depreciation_year_1": { "type": "money", "value": "<initial>" }
   },
@@ -256,9 +256,9 @@ Mode C's base plan is sharper than Mode A's because investor reasoning often hap
     "special_levies_in_last_3_years": { "type": "array<string>", "value": [] }
   },
   "market_position": {
-    "comparable_sales": { "type": "array<comparable_sale>", "value": [] },
-    "estimated_market_value_range": { "type": "money_range", "value": "<initial>" },
-    "asking_price_vs_market": { "type": "enum", "options": ["below_market", "fair", "above_market", "significantly_above"], "value": "<initial>" }
+    "comparable_sales": { "type": "array<comparable_sale>", "value": [], "agent_reasoning_required": true },
+    "estimated_market_value_range": { "type": "money_range", "value": "<initial>", "agent_reasoning_required": true },
+    "asking_price_vs_market": { "type": "enum", "options": ["below_market", "fair", "above_market", "significantly_above"], "value": "<initial>", "agent_reasoning_required": true }
   }
 }
 ```
@@ -368,7 +368,7 @@ Mode C's base plan is sharper than Mode A's because investor reasoning often hap
 ```jsonc
 {
   "borrowing_capacity": {
-    "investment_loan_assessment": { "type": "money_range", "value": "<initial>", "agent_reasoning_required": true, "note": "Investment loans use different serviceability — typically excludes rental income at full value (lenders haircut ~20–30%)" },
+    "investment_loan_assessment": { "type": "money_range", "value": "<initial>", "note": "Investment loans use different serviceability — typically excludes rental income at full value (lenders haircut ~20–30%)" },
     "lender_pool_size": { "type": "integer", "value": "<initial>" },
     "uses_existing_ppor_equity": { "type": "bool", "value": "<initial>", "agent_reasoning_required": true },
     "equity_release_amount": { "type": "money", "value": "<initial>", "derived_from": "investor_profile.existing_portfolio.ppor_estimated_equity" }
@@ -446,7 +446,7 @@ The `mortgage_plan` outcome feeds `yield_modelling.loan_costs` (the loan cost ca
   "rental_income": {
     "weekly_rent_estimate": { "type": "money_per_week", "value": "<from_property_assessment>" },
     "annual_gross_rental_income": { "type": "money_per_year", "value": "<initial>" },
-    "vacancy_rate_assumed": { "type": "percentage", "value": "<initial>", "agent_reasoning_required": true },
+    "vacancy_rate_assumed": { "type": "percentage", "value": "<initial>" },
     "effective_annual_rental_income": { "type": "money_per_year", "value": "<initial>" }
   },
   "operating_expenses": {
@@ -457,7 +457,7 @@ The `mortgage_plan` outcome feeds `yield_modelling.loan_costs` (the loan cost ca
     "body_corporate_annual": { "type": "money_per_year", "value": "<initial>", "applicable": "<initial>" },
     "landlord_insurance_annual": { "type": "money_per_year", "value": "<initial>" },
     "building_insurance_annual": { "type": "money_per_year", "value": "<initial>" },
-    "land_tax_annual": { "type": "money_per_year", "value": "<initial>", "agent_reasoning_required": true },
+    "land_tax_annual": { "type": "money_per_year", "value": "<initial>" },
     "maintenance_repairs_reserve_annual": { "type": "money_per_year", "value": "<initial>" },
     "letting_fees_periodic": { "type": "money_per_year", "value": "<initial>" }
   },
@@ -616,7 +616,7 @@ The `mortgage_plan` outcome feeds `yield_modelling.loan_costs` (the loan cost ca
   "stamp_duty": {
     "standard_stamp_duty": { "type": "money", "value": "<initial>" },
     "first_home_concession_applicable": { "type": "bool", "value": false },
-    "investor_concession_applicable_if_any": { "type": "bool", "value": "<initial>", "agent_reasoning_required": true }
+    "investor_concession_applicable_if_any": { "type": "bool", "value": "<initial>" }
   },
   "other_buying_costs": {
     "building_pest_inspection": { "type": "money", "value": "<initial>" },
@@ -691,7 +691,7 @@ Same as [Mode A buying_strategy](fhb-domestic-au.md#5-buying_strategy) with thes
 {
   // all Mode A parameters, plus:
   "investor_anchoring": {
-    "yield_anchored_max_price": { "type": "money", "value": "<initial>", "agent_reasoning_required": true, "note": "Calculated from target_yield × annual_rent / 100" },
+    "yield_anchored_max_price": { "type": "money", "value": "<initial>", "note": "Calculated from target_yield × annual_rent / 100" },
     "thesis_alignment_check": { "type": "enum", "options": ["aligned", "stretched", "misaligned"], "value": "<initial>" },
     "walk_away_more_strictly_enforced": { "type": "bool", "value": true, "note": "Investor discipline: don't chase property above yield-anchored max" }
   },
@@ -739,7 +739,7 @@ Same as [Mode A due_diligence](fhb-domestic-au.md#6-due_diligence) with these ad
   },
   "investor_specific_flags": {
     "rental_appraisal_significantly_below_expectation": { "type": "bool", "value": "<initial>" },
-    "current_tenancy_unfavourable_terms": { "type": "array<string>", "value": [] },
+    "current_tenancy_unfavourable_terms": { "type": "array<string>", "value": [], "agent_reasoning_required": true },
     "rental_yield_below_thesis_threshold": { "type": "bool", "value": "<initial>" }
   }
 }
@@ -949,6 +949,8 @@ Same as Mode A + B with one Mode C-exclusive addition:
 | `<from_investor_profile>` | From `investor_profile.outcome` (Mode C exclusive) |
 | `<from_property_assessment>` | From `property_assessment.outcome` |
 | `<from_tax_structure>` | From `tax_structure.outcome` (Mode C exclusive) |
+
+**Fill-path classification.** Per [agentic-boundary.md](../architecture/agentic-boundary.md), `agent_reasoning_required: true` marks agent-path leaves; all others resolve deterministically. Mode C agent-path leaves: rent + property valuation (`property_assessment.rental_market.estimated_weekly_rent_range`, `market_position.*`), investment thesis (`investment_strategy.strategy_archetype`, `thesis_one_liner`, `gearing_type`), investor loan structure + lender fit (`mortgage_finance.uses_existing_ppor_equity`, IO/PI, `fixed_vs_variable`, `offset_account_strategy`, `investor_friendly_lender_shortlist`), entity structuring (`tax_structure.recommended_entity`), negotiation style, and lease interpretation (`due_diligence.investor_specific_flags.current_tenancy_unfavourable_terms`). Resolver: all yield/cashflow math, land tax, depreciation predicates, tax-rate lookups, vacancy assumptions, concession eligibility, yield-anchored max price.
 
 ---
 

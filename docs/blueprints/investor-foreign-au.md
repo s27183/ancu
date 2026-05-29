@@ -160,7 +160,7 @@ Note: Mode D does NOT activate Mode B's Family view tab by default — Vietnam-l
   },
   "income_and_vn_tax": {
     "vn_taxable_income_vnd": { "type": "money_vnd_per_year", "value": "<initial>" },
-    "vn_marginal_tax_rate": { "type": "percentage", "value": "<initial>", "agent_reasoning_required": true },
+    "vn_marginal_tax_rate": { "type": "percentage", "value": "<initial>" },
     "income_source_country": { "type": "enum", "options": ["vn_only", "vn_and_other", "diversified_global"], "value": "<initial>" },
     "vn_tax_treaty_implications_au": { "type": "string", "value": "<initial>" }
   },
@@ -237,23 +237,23 @@ Same structure as [Mode C property_assessment](investor-domestic-au.md#2-propert
 {
   // all Mode C investor parameters, plus:
   "foreign_person_eligibility": {
-    "is_new_build_or_vacant_land": { "type": "bool", "value": "<initial>", "agent_reasoning_required": true },
+    "is_new_build_or_vacant_land": { "type": "bool", "value": "<initial>" },
     "established_dwelling_ban_applies": { "type": "bool", "value": true },
-    "foreign_person_can_purchase": { "type": "bool", "value": "<initial>", "agent_reasoning_required": true },
+    "foreign_person_can_purchase": { "type": "bool", "value": "<initial>" },
     "developer_exemption_certificate_held": { "type": "bool", "value": "<initial>" }
   },
   "firb_fee_estimate": {
     "value_tier": { "type": "enum", "options": ["under_1m", "1m_to_2m", "2m_to_3m", "3m_to_5m", "over_5m"], "value": "<initial>", "derived_from": "basics.price" },
-    "estimated_application_fee": { "type": "money", "value": "<initial>", "agent_reasoning_required": true }
+    "estimated_application_fee": { "type": "money", "value": "<initial>" }
   },
   "foreign_buyer_surcharge_estimate": {
     "applicable_surcharge_percentage": { "type": "percentage", "value": "<initial>", "derived_from": "basics.state" },
-    "estimated_surcharge_amount": { "type": "money", "value": "<initial>", "agent_reasoning_required": true }
+    "estimated_surcharge_amount": { "type": "money", "value": "<initial>" }
   },
   "off_the_plan_specific_considerations_for_foreign_investor": {
-    "developer_track_record_check": { "type": "enum", "options": ["strong", "acceptable", "concerning", "unknown"], "value": "<initial>" },
-    "sunset_clause_protection_assessment": { "type": "enum", "options": ["adequate", "concerning"], "value": "<initial>" },
-    "vendor_disclosure_completeness": { "type": "enum", "options": ["complete", "partial", "minimal"], "value": "<initial>" }
+    "developer_track_record_check": { "type": "enum", "options": ["strong", "acceptable", "concerning", "unknown"], "value": "<initial>", "agent_reasoning_required": true },
+    "sunset_clause_protection_assessment": { "type": "enum", "options": ["adequate", "concerning"], "value": "<initial>", "agent_reasoning_required": true },
+    "vendor_disclosure_completeness": { "type": "enum", "options": ["complete", "partial", "minimal"], "value": "<initial>", "agent_reasoning_required": true }
   }
 }
 ```
@@ -370,7 +370,7 @@ Same as [Mode C investment_strategy](investor-domestic-au.md#3-investment_strate
 ```jsonc
 {
   "borrowing_capacity": {
-    "non_resident_investment_loan_assessment": { "type": "money_range", "value": "<initial>", "agent_reasoning_required": true, "note": "Most restrictive pool in AU market — typically 3–5 lenders willing; income from Vietnam usually accepted with 20–40% haircut" },
+    "non_resident_investment_loan_assessment": { "type": "money_range", "value": "<initial>", "note": "Most restrictive pool in AU market — typically 3–5 lenders willing; income from Vietnam usually accepted with 20–40% haircut" },
     "vn_income_acceptance_by_lender": { "type": "array<{ lender, accepts_vn_income, haircut_percentage }>", "value": [] },
     "rental_income_treatment": { "type": "string", "value": "<initial>", "note": "Typically 70–80% of projected rental income counted toward serviceability" }
   },
@@ -398,7 +398,7 @@ Same as [Mode C investment_strategy](investor-domestic-au.md#3-investment_strate
   },
   "currency_considerations": {
     "loan_denomination_currency": { "type": "enum", "value": "AUD", "note": "All AU property loans in AUD; FX risk is on VN-side capital flow + ongoing repayments if investor's income is VND" },
-    "fx_risk_on_ongoing_repayments": { "type": "string", "value": "<initial>", "agent_reasoning_required": true, "note": "Material risk if investor's income is VND and repayments are AUD — VND volatility affects net cost over time" }
+    "fx_risk_on_ongoing_repayments": { "type": "string", "value": "<initial>", "note": "Material risk if investor's income is VND and repayments are AUD — VND volatility affects net cost over time" }
   },
   "pre_approval_workflow": {
     "documents_required_for_non_resident_investor": { "type": "array<{ document, status }>", "value": [], "note": "Includes passport, visa proof if any, VN tax returns, VN bank statements, source-of-funds letter, FIRB application reference, intended-use declaration" },
@@ -456,7 +456,7 @@ Same as [Mode C yield_modelling](investor-domestic-au.md#4-yield_modelling--new)
   // all Mode C yield_modelling parameters, plus:
   "non_resident_tax_withholding": {
     "rental_income_withholding_applicable": { "type": "bool", "value": true },
-    "withholding_rate_applicable": { "type": "percentage", "value": "<initial>", "agent_reasoning_required": true },
+    "withholding_rate_applicable": { "type": "percentage", "value": "<initial>" },
     "annual_withholding_amount": { "type": "money_per_year", "value": "<initial>" },
     "net_rental_income_after_withholding": { "type": "money_per_year", "value": "<initial>" }
   },
@@ -532,8 +532,8 @@ Same as [Mode C yield_modelling](investor-domestic-au.md#4-yield_modelling--new)
     "foreign_resident_capital_gains_withholding_at_sale": { "type": "money", "value": "<initial>", "note": "12.5% (NSW/VIC) withholding on sale price by purchaser for properties >$750k" }
   },
   "vn_side_tax_implications": {
-    "vn_tax_on_au_rental_income": { "type": "string", "value": "<initial>", "agent_reasoning_required": true },
-    "vn_tax_on_au_capital_gain": { "type": "string", "value": "<initial>", "agent_reasoning_required": true },
+    "vn_tax_on_au_rental_income": { "type": "string", "value": "<initial>" },
+    "vn_tax_on_au_capital_gain": { "type": "string", "value": "<initial>" },
     "au_vn_tax_treaty_relief_available": { "type": "bool", "value": "<initial>" },
     "foreign_tax_credit_for_au_tax_paid_in_vn": { "type": "bool", "value": "<initial>" }
   },
@@ -587,7 +587,7 @@ Same as [Mode C yield_modelling](investor-domestic-au.md#4-yield_modelling--new)
     "firb_fee_payable": { "type": "money", "value": "<from_firb_workflow>" }
   },
   "deposit": {
-    "minimum_required_percentage_non_resident_investment_loan": { "type": "percentage", "value": "<initial>", "agent_reasoning_required": true, "note": "Typically 30%+ for non-resident investment loans" },
+    "minimum_required_percentage_non_resident_investment_loan": { "type": "percentage", "value": "<initial>", "note": "Typically 30%+ for non-resident investment loans" },
     "typical_required_percentage": { "type": "percentage", "value": 30 },
     "minimum_required_amount": { "type": "money", "value": "<initial>" },
     "recommended_amount": { "type": "money", "value": "<initial>" }
@@ -785,7 +785,7 @@ Combines Mode C `ownership_planning_investor` (property management, tax reportin
     "land_tax_with_foreign_surcharge": { "type": "money_per_year", "value": "<initial>" }
   },
   "tax_obligations_vn": {
-    "vn_tax_filing_required_on_au_income": { "type": "bool", "value": "<initial>", "agent_reasoning_required": true },
+    "vn_tax_filing_required_on_au_income": { "type": "bool", "value": "<initial>" },
     "au_vn_treaty_relief_applied": { "type": "bool", "value": "<initial>" },
     "foreign_tax_credit_documented": { "type": "bool", "value": "<initial>" }
   },
@@ -877,6 +877,8 @@ All Mode A + B + C signals apply. Mode D introduces:
 |---|---|
 | `<from_investor_profile>` | From `investor_profile_foreign.outcome` (note: signal name reused from Mode C; resolves to Mode D variant based on blueprint context) |
 | `<from_tax_structure>` | From `tax_structure_non_resident.outcome` (Mode D variant) |
+
+**Fill-path classification.** Per [agentic-boundary.md](../architecture/agentic-boundary.md), `agent_reasoning_required: true` marks agent-path leaves. Mode-D-specific agent leaves: off-the-plan foreign-investor judgment (`property_assessment.off_the_plan_specific_considerations_for_foreign_investor.*`), investment thesis (`investment_strategy.strategy_archetype`), non-resident lender fit (`mortgage_finance.non_resident_investor_loan_shortlist`), and entity structuring (`tax_structure_non_resident.recommended_entity`). All FIRB fees / surcharges / predicates, VN tax rates / treatment / filing, withholding rates, non-resident deposit minimums, and the FX-risk note are **resolver** — rule-governed (VN cross-border tax is complex but determined by tax law + the VN–AU DTA; encode it in KB rather than reason it per turn). Valuation, strategy, and loan-structure judgment are inherited from Mode C; cross-border document-gap flags from Mode B.
 
 ---
 
