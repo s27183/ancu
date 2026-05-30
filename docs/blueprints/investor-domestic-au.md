@@ -224,7 +224,7 @@ Mode C's base plan is sharper than Mode A's because investor reasoning often hap
     "parking_quality": { "type": "enum", "options": ["double_garage", "single_garage", "covered_carport", "off_street", "street_only"], "value": "<initial>" }
   },
   "rental_market": {
-    "estimated_weekly_rent_range": { "type": "money_range_per_week", "value": "<initial>", "agent_reasoning_required": true },
+    "estimated_weekly_rent_range": { "type": "money_range_per_week", "value": "<initial>", "agent_reasoning_required": true, "reasoning_domain": "rentability" },
     "rental_market_vacancy_rate_suburb": { "type": "percentage", "value": "<initial>" },
     "days_on_market_typical_for_rent": { "type": "integer", "value": "<initial>" },
     "tenant_demand_score": { "type": "integer_0_10", "value": "<initial>" },
@@ -256,9 +256,9 @@ Mode C's base plan is sharper than Mode A's because investor reasoning often hap
     "special_levies_in_last_3_years": { "type": "array<string>", "value": [] }
   },
   "market_position": {
-    "comparable_sales": { "type": "array<comparable_sale>", "value": [], "agent_reasoning_required": true },
-    "estimated_market_value_range": { "type": "money_range", "value": "<initial>", "agent_reasoning_required": true },
-    "asking_price_vs_market": { "type": "enum", "options": ["below_market", "fair", "above_market", "significantly_above"], "value": "<initial>", "agent_reasoning_required": true }
+    "comparable_sales": { "type": "array<comparable_sale>", "value": [], "agent_reasoning_required": true, "reasoning_domain": "valuation" },
+    "estimated_market_value_range": { "type": "money_range", "value": "<initial>", "agent_reasoning_required": true, "reasoning_domain": "valuation" },
+    "asking_price_vs_market": { "type": "enum", "options": ["below_market", "fair", "above_market", "significantly_above"], "value": "<initial>", "agent_reasoning_required": true, "reasoning_domain": "valuation" }
   }
 }
 ```
@@ -300,8 +300,8 @@ Mode C's base plan is sharper than Mode A's because investor reasoning often hap
 ```jsonc
 {
   "thesis": {
-    "strategy_archetype": { "type": "enum", "options": ["cash_flow", "capital_growth", "balanced", "dual_income", "value_add", "land_banking"], "value": "<initial>", "agent_reasoning_required": true },
-    "thesis_one_liner": { "type": "string", "value": "<initial>", "agent_reasoning_required": true }
+    "strategy_archetype": { "type": "enum", "options": ["cash_flow", "capital_growth", "balanced", "dual_income", "value_add", "land_banking"], "value": "<initial>", "agent_reasoning_required": true, "reasoning_domain": "investment_thesis" },
+    "thesis_one_liner": { "type": "string", "value": "<initial>", "agent_reasoning_required": true, "reasoning_domain": "investment_thesis" }
   },
   "targets": {
     "target_gross_yield": { "type": "percentage", "value": "<initial>" },
@@ -310,7 +310,7 @@ Mode C's base plan is sharper than Mode A's because investor reasoning often hap
     "hold_period_years": { "type": "integer", "value": "<initial>" }
   },
   "gearing_strategy": {
-    "gearing_type": { "type": "enum", "options": ["positive_geared", "neutral_geared", "negatively_geared"], "value": "<initial>", "agent_reasoning_required": true },
+    "gearing_type": { "type": "enum", "options": ["positive_geared", "neutral_geared", "negatively_geared"], "value": "<initial>", "agent_reasoning_required": true, "reasoning_domain": "investment_thesis" },
     "target_lvr": { "type": "percentage", "value": "<initial>" },
     "interest_only_vs_pi": { "type": "enum", "options": ["interest_only", "principal_and_interest"], "value": "<initial>" },
     "offset_account_strategy": { "type": "enum", "options": ["use_for_buffer", "use_for_other_property", "not_applicable"], "value": "<initial>" }
@@ -370,17 +370,17 @@ Mode C's base plan is sharper than Mode A's because investor reasoning often hap
   "borrowing_capacity": {
     "investment_loan_assessment": { "type": "money_range", "value": "<initial>", "note": "Investment loans use different serviceability — typically excludes rental income at full value (lenders haircut ~20–30%)" },
     "lender_pool_size": { "type": "integer", "value": "<initial>" },
-    "uses_existing_ppor_equity": { "type": "bool", "value": "<initial>", "agent_reasoning_required": true },
+    "uses_existing_ppor_equity": { "type": "bool", "value": "<initial>", "agent_reasoning_required": true, "reasoning_domain": "lender_fit" },
     "equity_release_amount": { "type": "money", "value": "<initial>", "derived_from": "investor_profile.existing_portfolio.ppor_estimated_equity" }
   },
   "loan_structure": {
-    "principal_and_interest_vs_interest_only": { "type": "enum", "options": ["principal_and_interest", "interest_only"], "value": "<initial>", "agent_reasoning_required": true, "note": "Most investors choose IO for tax efficiency; agent reasons based on strategy thesis" },
+    "principal_and_interest_vs_interest_only": { "type": "enum", "options": ["principal_and_interest", "interest_only"], "value": "<initial>", "agent_reasoning_required": true, "reasoning_domain": "lender_fit", "note": "Most investors choose IO for tax efficiency; agent reasons based on strategy thesis" },
     "interest_only_period_years": { "type": "integer", "value": 5, "note": "Standard IO term is 5 years; max 10 with renewal" },
-    "fixed_vs_variable": { "type": "enum", "options": ["variable", "fixed_1yr", "fixed_2yr", "fixed_3yr", "split_fixed_variable"], "value": "<initial>", "agent_reasoning_required": true },
-    "offset_account_strategy": { "type": "enum", "options": ["full_offset_on_this_property", "offset_pointed_at_ppor_for_tax_efficiency", "redraw_only", "no_offset"], "value": "<initial>", "agent_reasoning_required": true, "note": "For investors with existing PPOR, offset should typically be on the PPOR not the investment property — tax efficiency" }
+    "fixed_vs_variable": { "type": "enum", "options": ["variable", "fixed_1yr", "fixed_2yr", "fixed_3yr", "split_fixed_variable"], "value": "<initial>", "agent_reasoning_required": true, "reasoning_domain": "lender_fit" },
+    "offset_account_strategy": { "type": "enum", "options": ["full_offset_on_this_property", "offset_pointed_at_ppor_for_tax_efficiency", "redraw_only", "no_offset"], "value": "<initial>", "agent_reasoning_required": true, "reasoning_domain": "lender_fit", "note": "For investors with existing PPOR, offset should typically be on the PPOR not the investment property — tax efficiency" }
   },
   "lender_synthesis": {
-    "investor_friendly_lender_shortlist": { "type": "array<{ lender, rate_range, investment_loan_specialty, processing_time }>", "value": [], "agent_reasoning_required": true },
+    "investor_friendly_lender_shortlist": { "type": "array<{ lender, rate_range, investment_loan_specialty, processing_time }>", "value": [], "agent_reasoning_required": true, "reasoning_domain": "lender_fit" },
     "lenders_lenient_on_rental_income_haircut": { "type": "array<string>", "value": [] },
     "lenders_with_offset_on_investment_loans": { "type": "array<string>", "value": [] }
   },
@@ -523,7 +523,7 @@ The `mortgage_plan` outcome feeds `yield_modelling.loan_costs` (the loan cost ca
 ```jsonc
 {
   "ownership_entity": {
-    "recommended_entity": { "type": "enum", "options": ["personal_sole", "personal_joint", "discretionary_trust", "unit_trust", "company", "smsf", "smsf_with_lrba"], "value": "<initial>", "agent_reasoning_required": true },
+    "recommended_entity": { "type": "enum", "options": ["personal_sole", "personal_joint", "discretionary_trust", "unit_trust", "company", "smsf", "smsf_with_lrba"], "value": "<initial>", "agent_reasoning_required": true, "reasoning_domain": "entity_structuring" },
     "reasoning": { "type": "string", "value": "<initial>" },
     "setup_cost_estimate": { "type": "money", "value": "<initial>" },
     "annual_compliance_cost_estimate": { "type": "money_per_year", "value": "<initial>" }
@@ -696,7 +696,7 @@ Same as [Mode A buying_strategy](fhb-domestic-au.md#5-buying_strategy) with thes
     "walk_away_more_strictly_enforced": { "type": "bool", "value": true, "note": "Investor discipline: don't chase property above yield-anchored max" }
   },
   "negotiation_style": {
-    "recommended_style": { "type": "enum", "options": ["assertive", "patient", "early_offer", "low_anchor", "thesis_walk_away"], "value": "<initial>", "agent_reasoning_required": true }
+    "recommended_style": { "type": "enum", "options": ["assertive", "patient", "early_offer", "low_anchor", "thesis_walk_away"], "value": "<initial>", "agent_reasoning_required": true, "reasoning_domain": "negotiation" }
   },
   "conditions_to_include_in_offer": {
     "subject_to_finance": { "type": "bool", "value": true },
@@ -739,7 +739,7 @@ Same as [Mode A due_diligence](fhb-domestic-au.md#6-due_diligence) with these ad
   },
   "investor_specific_flags": {
     "rental_appraisal_significantly_below_expectation": { "type": "bool", "value": "<initial>" },
-    "current_tenancy_unfavourable_terms": { "type": "array<string>", "value": [], "agent_reasoning_required": true },
+    "current_tenancy_unfavourable_terms": { "type": "array<string>", "value": [], "agent_reasoning_required": true, "reasoning_domain": "lease_interpretation" },
     "rental_yield_below_thesis_threshold": { "type": "bool", "value": "<initial>" }
   }
 }

@@ -251,9 +251,9 @@ Same structure as [Mode C property_assessment](investor-domestic-au.md#2-propert
     "estimated_surcharge_amount": { "type": "money", "value": "<initial>" }
   },
   "off_the_plan_specific_considerations_for_foreign_investor": {
-    "developer_track_record_check": { "type": "enum", "options": ["strong", "acceptable", "concerning", "unknown"], "value": "<initial>", "agent_reasoning_required": true },
-    "sunset_clause_protection_assessment": { "type": "enum", "options": ["adequate", "concerning"], "value": "<initial>", "agent_reasoning_required": true },
-    "vendor_disclosure_completeness": { "type": "enum", "options": ["complete", "partial", "minimal"], "value": "<initial>", "agent_reasoning_required": true }
+    "developer_track_record_check": { "type": "enum", "options": ["strong", "acceptable", "concerning", "unknown"], "value": "<initial>", "agent_reasoning_required": true, "reasoning_domain": "off_the_plan" },
+    "sunset_clause_protection_assessment": { "type": "enum", "options": ["adequate", "concerning"], "value": "<initial>", "agent_reasoning_required": true, "reasoning_domain": "off_the_plan" },
+    "vendor_disclosure_completeness": { "type": "enum", "options": ["complete", "partial", "minimal"], "value": "<initial>", "agent_reasoning_required": true, "reasoning_domain": "off_the_plan" }
   }
 }
 ```
@@ -311,7 +311,7 @@ Same as [Mode C investment_strategy](investor-domestic-au.md#3-investment_strate
 ```jsonc
 {
   "thesis": {
-    "strategy_archetype": { "type": "enum", "options": ["cash_flow", "capital_growth", "balanced", "wealth_diversification", "future_migration_pathway", "child_education_property", "land_banking"], "value": "<initial>", "agent_reasoning_required": true },
+    "strategy_archetype": { "type": "enum", "options": ["cash_flow", "capital_growth", "balanced", "wealth_diversification", "future_migration_pathway", "child_education_property", "land_banking"], "value": "<initial>", "agent_reasoning_required": true, "reasoning_domain": "investment_thesis" },
     "thesis_one_liner": { "type": "string", "value": "<initial>" }
   },
   "targets": { /* same as Mode C */ },
@@ -380,7 +380,7 @@ Same as [Mode C investment_strategy](investor-domestic-au.md#3-investment_strate
     "recommended_amount": { "type": "money", "value": "<initial>" }
   },
   "loan_path": {
-    "non_resident_investor_loan_shortlist": { "type": "array<{ lender, rate_range, deposit_min, vn_income_accepted, processing_time }>", "value": [], "agent_reasoning_required": true },
+    "non_resident_investor_loan_shortlist": { "type": "array<{ lender, rate_range, deposit_min, vn_income_accepted, processing_time }>", "value": [], "agent_reasoning_required": true, "reasoning_domain": "lender_fit" },
     "rate_premium_above_domestic_investor": { "type": "percentage_range", "value": "<initial>", "note": "Typically 100–200bp above domestic investor rates" },
     "recommended_lender": { "type": "string", "value": "<initial>" },
     "recommended_lender_reasoning": { "type": "string", "value": "<initial>" }
@@ -507,7 +507,7 @@ Same as [Mode C yield_modelling](investor-domestic-au.md#4-yield_modelling--new)
 ```jsonc
 {
   "ownership_entity": {
-    "recommended_entity": { "type": "enum", "options": ["personal_sole_non_resident", "personal_joint_non_resident", "au_company_with_foreign_shareholder", "au_unit_trust_with_foreign_beneficiary", "other"], "value": "<initial>", "agent_reasoning_required": true },
+    "recommended_entity": { "type": "enum", "options": ["personal_sole_non_resident", "personal_joint_non_resident", "au_company_with_foreign_shareholder", "au_unit_trust_with_foreign_beneficiary", "other"], "value": "<initial>", "agent_reasoning_required": true, "reasoning_domain": "entity_structuring" },
     "reasoning": { "type": "string", "value": "<initial>" },
     "setup_cost_estimate": { "type": "money", "value": "<initial>" },
     "annual_compliance_cost_estimate": { "type": "money_per_year", "value": "<initial>" }

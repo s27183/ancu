@@ -47,9 +47,23 @@ When the resolver hits a rule that is **silent or ambiguous** ([`agentic-boundar
 
 **One runner mechanism, specialised by a swappable domain prompt-module** selected per leaf — not N hard-separate specialist agents (the ATP shape).
 
-The discriminator is a new blueprint field on agent leaves, **`reasoning_domain`** (e.g. `valuation`, `lender_fit`, `negotiation`, `document_significance`; Modes B–D add `rentability`, `developer_track_record`, `off_the_plan`, `aml_documentation`, …). The runner loads the matching module's `<context>`/`<goal>`/`<tools>` sections (§5). Adding a mode adds *prompt-modules*, not *agents*.
+The discriminator is a new blueprint field on agent leaves, **`reasoning_domain`**. Every `agent_reasoning_required: true` leaf across the four blueprints now carries one (41 leaves, 11 domains):
 
-> **Follow-on:** the agent leaves in the four blueprints do not yet carry `reasoning_domain`. Annotating them is a separate, mechanical pass (one value per already-flagged leaf), governed by the same flag set the agent-flag sweep produced — not done in this change.
+| Domain | Covers | Modes |
+|---|---|---|
+| `valuation` | comparable_sales, estimated_market_value_range, asking_price_vs_market | A, C |
+| `lender_fit` | lender shortlists + loan/rate structure (fixed_vs_variable, IO/PI, offset, PPOR-equity use) | A, C, D |
+| `document_significance` | due-diligence flags (contract/S32/building/pest/strata/title) + go/no-go verdict | A |
+| `negotiation` | reserve_estimate_range, early_offer_vs_wait, recommended_style | A, C |
+| `investment_thesis` | strategy_archetype, thesis_one_liner, gearing_type | C, D |
+| `entity_structuring` | recommended_entity | C, D |
+| `rentability` | estimated_weekly_rent_range, rentability_score_if_unoccupied | B, C |
+| `lifestyle_fit` | lifestyle_match_score(_au_member) | A, B |
+| `cross_border_documentation` | vn_documentation_gaps, au_aml_documentation_gaps | B |
+| `off_the_plan` | developer_track_record, sunset_clause, vendor_disclosure_completeness | D |
+| `lease_interpretation` | current_tenancy_unfavourable_terms | C |
+
+The runner loads the matching module's `<context>`/`<goal>`/`<tools>` sections (§5). A domain is shared across modes (one `valuation` module serves A and C) — adding a mode adds *prompt-modules only where the new mode introduces a genuinely new reasoning kind*, not new agents.
 
 **Why one runner does not create contamination** — the concern that prompted this decision:
 

@@ -205,9 +205,9 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
     "planning_changes_pending": { "type": "array<string>", "value": "<from_suburb>" }
   },
   "market_position": {
-    "comparable_sales": { "type": "array<comparable_sale>", "value": [], "agent_reasoning_required": true },
-    "estimated_market_value_range": { "type": "money_range", "value": "<initial>", "agent_reasoning_required": true },
-    "asking_price_vs_market": { "type": "enum", "options": ["below_market", "fair", "above_market", "significantly_above"], "value": "<initial>", "agent_reasoning_required": true },
+    "comparable_sales": { "type": "array<comparable_sale>", "value": [], "agent_reasoning_required": true, "reasoning_domain": "valuation" },
+    "estimated_market_value_range": { "type": "money_range", "value": "<initial>", "agent_reasoning_required": true, "reasoning_domain": "valuation" },
+    "asking_price_vs_market": { "type": "enum", "options": ["below_market", "fair", "above_market", "significantly_above"], "value": "<initial>", "agent_reasoning_required": true, "reasoning_domain": "valuation" },
     "days_on_market": { "type": "integer", "value": "<from_property_card>" }
   },
   "strata_or_building": {
@@ -220,7 +220,7 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
   "fit_against_buyer": {
     "price_within_borrowing_capacity": { "type": "bool", "value": "<initial>" },
     "price_within_scheme_cap": { "type": "bool", "value": "<initial>" },
-    "lifestyle_match_score": { "type": "integer_0_10", "value": "<initial>", "agent_reasoning_required": true }
+    "lifestyle_match_score": { "type": "integer_0_10", "value": "<initial>", "agent_reasoning_required": true, "reasoning_domain": "lifestyle_fit" }
   }
 }
 ```
@@ -378,12 +378,12 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
   },
   "loan_structure": {
     "principal_and_interest_vs_interest_only": { "type": "enum", "options": ["principal_and_interest", "interest_only", "split"], "value": "principal_and_interest", "note": "Mode A FHB typically P&I" },
-    "fixed_vs_variable": { "type": "enum", "options": ["variable", "fixed_1yr", "fixed_2yr", "fixed_3yr", "split_fixed_variable"], "value": "<initial>", "agent_reasoning_required": true },
+    "fixed_vs_variable": { "type": "enum", "options": ["variable", "fixed_1yr", "fixed_2yr", "fixed_3yr", "split_fixed_variable"], "value": "<initial>", "agent_reasoning_required": true, "reasoning_domain": "lender_fit" },
     "offset_account_included": { "type": "bool", "value": "<initial>" },
     "offset_strategy": { "type": "string", "value": "<initial>" }
   },
   "lender_synthesis": {
-    "most_likely_approval_lenders": { "type": "array<{ lender, approval_likelihood, reasoning }>", "value": [], "agent_reasoning_required": true },
+    "most_likely_approval_lenders": { "type": "array<{ lender, approval_likelihood, reasoning }>", "value": [], "agent_reasoning_required": true, "reasoning_domain": "lender_fit" },
     "lenders_with_lenient_hecs": { "type": "array<string>", "value": [] },
     "lenders_with_lenient_genuine_savings": { "type": "array<string>", "value": [] },
     "broker_vs_direct_recommendation": { "type": "enum", "options": ["broker", "direct", "either"], "value": "broker" }
@@ -533,15 +533,15 @@ The `mortgage_plan` outcome feeds `cash_position` (loan amount + buffer requirem
     },
     "walk_away_price": { "type": "money", "value": "<initial>" },
     "opening_bid_recommended": { "type": "money", "value": "<initial>" },
-    "reserve_estimate_range": { "type": "money_range", "value": "<initial>", "agent_reasoning_required": true }
+    "reserve_estimate_range": { "type": "money_range", "value": "<initial>", "agent_reasoning_required": true, "reasoning_domain": "negotiation" }
   },
   "bid_tactics": {
     "increment_size_recommended": { "type": "money", "value": "<initial>" },
     "drop_out_signal": { "type": "string", "value": "<initial>" },
-    "early_offer_vs_wait": { "type": "enum", "options": ["make_early_offer", "wait_for_auction", "wait_for_post_auction_negotiation"], "value": "<initial>", "agent_reasoning_required": true }
+    "early_offer_vs_wait": { "type": "enum", "options": ["make_early_offer", "wait_for_auction", "wait_for_post_auction_negotiation"], "value": "<initial>", "agent_reasoning_required": true, "reasoning_domain": "negotiation" }
   },
   "negotiation_style": {
-    "recommended_style": { "type": "enum", "options": ["assertive", "patient", "early_offer", "low_anchor"], "value": "<initial>", "agent_reasoning_required": true },
+    "recommended_style": { "type": "enum", "options": ["assertive", "patient", "early_offer", "low_anchor"], "value": "<initial>", "agent_reasoning_required": true, "reasoning_domain": "negotiation" },
     "rationale": { "type": "string", "value": "<initial>" }
   },
   "agent_tactics_watchlist": {
@@ -606,18 +606,18 @@ The `mortgage_plan` outcome feeds `cash_position` (loan amount + buffer requirem
     "title_search": { "required": true, "received": "<initial>", "reviewed": "<initial>" }
   },
   "flags_by_document": {
-    "contract_of_sale_flags": { "type": "array<{ severity, item, action }>", "value": [], "agent_reasoning_required": true },
-    "s32_flags": { "type": "array<{ severity, item, action }>", "value": [], "agent_reasoning_required": true },
-    "building_flags": { "type": "array<{ severity, item, action, estimated_repair_cost }>", "value": [], "agent_reasoning_required": true },
-    "pest_flags": { "type": "array<{ severity, item, action }>", "value": [], "agent_reasoning_required": true },
-    "strata_flags": { "type": "array<{ severity, item, action }>", "value": [], "agent_reasoning_required": true },
-    "title_flags": { "type": "array<{ severity, item, action }>", "value": [], "agent_reasoning_required": true }
+    "contract_of_sale_flags": { "type": "array<{ severity, item, action }>", "value": [], "agent_reasoning_required": true, "reasoning_domain": "document_significance" },
+    "s32_flags": { "type": "array<{ severity, item, action }>", "value": [], "agent_reasoning_required": true, "reasoning_domain": "document_significance" },
+    "building_flags": { "type": "array<{ severity, item, action, estimated_repair_cost }>", "value": [], "agent_reasoning_required": true, "reasoning_domain": "document_significance" },
+    "pest_flags": { "type": "array<{ severity, item, action }>", "value": [], "agent_reasoning_required": true, "reasoning_domain": "document_significance" },
+    "strata_flags": { "type": "array<{ severity, item, action }>", "value": [], "agent_reasoning_required": true, "reasoning_domain": "document_significance" },
+    "title_flags": { "type": "array<{ severity, item, action }>", "value": [], "agent_reasoning_required": true, "reasoning_domain": "document_significance" }
   },
   "special_conditions_to_request": { "type": "array<string>", "value": [] },
   "questions_to_ask_vendor_or_agent": { "type": "array<string>", "value": [] },
   "estimated_additional_costs_from_findings": { "type": "money_range", "value": "<initial>" },
   "go_no_go_recommendation": {
-    "verdict": { "type": "enum", "options": ["proceed", "proceed_with_conditions", "renegotiate", "withdraw"], "value": "<initial>", "agent_reasoning_required": true },
+    "verdict": { "type": "enum", "options": ["proceed", "proceed_with_conditions", "renegotiate", "withdraw"], "value": "<initial>", "agent_reasoning_required": true, "reasoning_domain": "document_significance" },
     "rationale": { "type": "string", "value": "<initial>" }
   }
 }

@@ -298,8 +298,8 @@ Same structure as [Mode A property_assessment](fhb-domestic-au.md#2-property_ass
   },
   "fit_against_buyer": {
     "price_within_family_capacity": { "type": "bool", "value": "<initial>" },
-    "lifestyle_match_score_au_member": { "type": "integer_0_10", "value": "<initial>", "agent_reasoning_required": true },
-    "rentability_score_if_unoccupied": { "type": "integer_0_10", "value": "<initial>", "agent_reasoning_required": true }
+    "lifestyle_match_score_au_member": { "type": "integer_0_10", "value": "<initial>", "agent_reasoning_required": true, "reasoning_domain": "lifestyle_fit" },
+    "rentability_score_if_unoccupied": { "type": "integer_0_10", "value": "<initial>", "agent_reasoning_required": true, "reasoning_domain": "rentability" }
   }
 }
 ```
@@ -718,8 +718,8 @@ Same as [Mode A due_diligence](fhb-domestic-au.md#6-due_diligence) plus:
     "vn_parent_documentation": { "required": "<initial>", "received": "<initial>", "reviewed": "<initial>" }
   },
   "cross_border_flags": {
-    "vn_documentation_gaps": { "type": "array<{ severity, item, action }>", "value": [], "agent_reasoning_required": true },
-    "au_aml_documentation_gaps": { "type": "array<{ severity, item, action }>", "value": [], "agent_reasoning_required": true }
+    "vn_documentation_gaps": { "type": "array<{ severity, item, action }>", "value": [], "agent_reasoning_required": true, "reasoning_domain": "cross_border_documentation" },
+    "au_aml_documentation_gaps": { "type": "array<{ severity, item, action }>", "value": [], "agent_reasoning_required": true, "reasoning_domain": "cross_border_documentation" }
   },
   "firb_specific_conditions_review": {
     "contract_includes_firb_approval_clause": { "type": "bool", "value": "<initial>" },
