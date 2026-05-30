@@ -2,7 +2,7 @@
 
 This document defines the public contract of the FirstHomey **planning engine** — the Erlang/OTP application plus its Python sidecars — for consumption by one or more user-facing shells. The engine runs the agentic planning workload (load blueprint + KB + plan-card state → reason → fill components → persist). A shell is any frontend+backend that provides UI/UX, user identity, commerce, and display-layer concerns on top of the engine.
 
-Companion references: [`principles.md`](principles.md) (the six architecture principles this contract applies), [`erlang-design-checklist.md`](erlang-design-checklist.md) (OTP patterns for the engine), [`architecture.md`](architecture.md) (the three-layer model this engine implements). The shell-engine pattern is adapted from the ATP project; the boundary discipline is identical, the domain is not.
+Companion references: [`principles.md`](principles.md) (the six architecture principles this contract applies), [`erlang-design-checklist.md`](erlang-design-checklist.md) (OTP patterns for the engine), [`architecture.md`](architecture.md) (the three-layer model this engine implements), [`agentic-boundary.md`](agentic-boundary.md) (the resolver/agent decision rule) and [`agentic-flow.md`](agentic-flow.md) (the agent types, prompt structure, vendor layer, and context management that run inside this contract). The shell-engine pattern is adapted from the ATP project; the boundary discipline is identical, the domain is not.
 
 ## 1. Invariant
 

@@ -5,7 +5,7 @@ Every operation that responds to a user runs in one of two modes:
 - **Resolver** — a deterministic function of structured inputs evaluated against a fixed rule set. Includes arithmetic, lookups, copies, *and* a rules engine (eligibility predicates, scheme-stacking constraints). Reproducible, free, auditable, no LLM.
 - **Agent** — adaptive reasoning over context an LLM produces. Non-deterministic, metered, slower.
 
-This document is the decision rule for which mode an operation belongs to. It governs the blueprint (`agent_reasoning_required` flag), the engine (`fill_path`, `usage` metering), and KB curation (what must be encoded as rules). For *how* the decision is encoded, see [architecture.md §11.9](architecture.md#119-blueprint-as-data-model--presentation-specification) and [engine-contract.md §4](engine-contract.md). This is a standalone test on purpose — the same rule is applied in three places and must not drift between them.
+This document is the decision rule for which mode an operation belongs to. It governs the blueprint (`agent_reasoning_required` flag), the engine (`fill_path`, `usage` metering), and KB curation (what must be encoded as rules). For *how* the decision is encoded, see [architecture.md §11.9](architecture.md#119-blueprint-as-data-model--presentation-specification) and [engine-contract.md §4](engine-contract.md); for *how the agent paths run at runtime* (agent types, prompt structure, vendor layer, context management), see [agentic-flow.md](agentic-flow.md). This is a standalone test on purpose — the same rule is applied in three places and must not drift between them.
 
 ---
 
