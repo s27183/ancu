@@ -25,6 +25,7 @@ Critical reference docs by purpose:
 | Engine↔shell boundary: primitives, events, metering, compliance gate | [`docs/architecture/engine-contract.md`](docs/architecture/engine-contract.md) |
 | When an operation needs the agent vs deterministic rules (resolver/agent decision rule) | [`docs/architecture/agentic-boundary.md`](docs/architecture/agentic-boundary.md) |
 | How the reasoning runs: agent types, dynamic prompt structure, vendor layer, context management | [`docs/architecture/agentic-flow.md`](docs/architecture/agentic-flow.md) |
+| Units of isolation: plan card vs turn, per-card serialization, conversation persistence, vendor config | [`docs/architecture/isolation-model.md`](docs/architecture/isolation-model.md) |
 | UX model, four user modes, onboarding flow, plan card lifecycle | [`docs/04-ux-model.md`](docs/04-ux-model.md) |
 | The four concrete plan card blueprints | [`docs/blueprints/`](docs/blueprints/) |
 | What a real property card looks like (test output) | [`docs/samples/property-card-example.html`](docs/samples/property-card-example.html) |
@@ -102,9 +103,12 @@ firsthomey/
 ├── docs/                         (strategic + architectural docs — the working agreement)
 │   ├── README.md
 │   ├── 01-market.md, 02-competitive-landscape.md, 03-strategy.md, 04-ux-model.md, 05-roadmap.md
-│   ├── architecture/                  (architecture doc + engine/shell contract + design principles)
+│   ├── architecture/                  (architecture doc + engine/shell contract + agentic + design principles)
 │   │   ├── architecture.md            (engine/shell split, three-layer model, blueprint, property pipeline)
 │   │   ├── engine-contract.md         (engine↔shell boundary: primitives, events, metering, compliance gate)
+│   │   ├── agentic-boundary.md        (resolver/agent decision rule — when an op needs the LLM)
+│   │   ├── agentic-flow.md            (agent types, prompt structure, vendor layer, context management)
+│   │   ├── isolation-model.md         (plan card vs turn, per-card serialization, conversation persistence, vendor config)
 │   │   ├── principles.md              (six architecture principles, adapted from ATP)
 │   │   └── erlang-design-checklist.md (OTP patterns for the engine)
 │   ├── blueprints/
