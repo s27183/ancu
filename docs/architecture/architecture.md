@@ -343,10 +343,10 @@ Components reference curated KB content via **slug-based references** rather tha
 
 ```
 1. Offline KB agent maintains markdown files in repo:
-     docs/kb/schemes/federal/fhg.md
-     docs/kb/schemes/state/qld/first-home-new-home-concession.md
+     docs/kb/scheme/federal/fhg.md
+     docs/kb/scheme/state/qld/fhnhc.md
      docs/kb/firb/established-dwelling-ban.md
-     docs/kb/processes/auction-rules-vic.md
+     docs/kb/process/auction-rules-vic.md
    
    Each file has frontmatter:
      ---
