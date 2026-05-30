@@ -2,7 +2,7 @@
 
 This document defines the public contract of the FirstHomey **planning engine** — the Erlang/OTP application plus its Python sidecars — for consumption by one or more user-facing shells. The engine runs the agentic planning workload (load blueprint + KB + plan-card state → reason → fill components → persist). A shell is any frontend+backend that provides UI/UX, user identity, commerce, and display-layer concerns on top of the engine.
 
-Companion references: [`principles.md`](principles.md) (the six architecture principles this contract applies), [`erlang-design-checklist.md`](erlang-design-checklist.md) (OTP patterns for the engine), [`architecture.md`](architecture.md) (the three-layer model this engine implements), [`agentic-boundary.md`](agentic-boundary.md) (the resolver/agent decision rule) and [`agentic-flow.md`](agentic-flow.md) (the agent types, prompt structure, vendor layer, and context management that run inside this contract). The shell-engine pattern is adapted from the ATP project; the boundary discipline is identical, the domain is not.
+Companion references: [`principles.md`](principles.md) (the six architecture principles this contract applies), [`erlang-design-checklist.md`](erlang-design-checklist.md) (OTP patterns for the engine), [`architecture.md`](architecture.md) (the three-layer model this engine implements), [`agentic-boundary.md`](agentic-boundary.md) (the resolver/agent decision rule), [`agentic-flow.md`](agentic-flow.md) (the agent types, prompt structure, vendor layer, and context management that run inside this contract), and [`isolation-model.md`](isolation-model.md) (what `plan_card_id` / `turn_id` isolate, the per-card serialization invariant, and engine-owned conversation persistence). The shell-engine pattern is adapted from the ATP project; the boundary discipline is identical, the domain is not.
 
 ## 1. Invariant
 
@@ -102,6 +102,10 @@ The engine emits typed events over SSE. Event names and field sets are part of t
 
 **Ordering guarantees.** SSE event IDs are monotonic per `(tenant_id, plan_card_id)`; reconnect supplies `Last-Event-ID`. Within a turn: `turn_started` precedes all output; `usage` (when the turn invoked the agent) precedes the terminal event; terminal event is last. A **resolver-only turn** — one whose triggering change reaches no `agent_reasoning_required` parameter and invokes no document extraction (architecture §11.9) — emits `component_filled` events (each with `fill_path: resolver`) and a terminal event but **no** `usage`. `tool_result` follows its matching `tool_use`. `turn_id ≠ plan_card_id` — a plan card is the persistent container; a turn is one trigger (onboarding, message, property attach, refresh) → one terminal event.
 
+**Serialization invariant.** `plan_card_id` is the serialization key: **at most one in-flight turn per plan card**; concurrent triggers queue. This is what makes the per-card monotonic event order above well-defined — two turns mutating one card's `content_jsonb` (e.g. a refine arriving mid-base-turn) would race on the source of truth. Different plan cards run fully in parallel (the only ceiling is tenant-level resource protection). See [`isolation-model.md`](isolation-model.md) §3.
+
+**Staged turns.** A single turn may cross agent-type boundaries and so emit a *heterogeneous* event stream under one `turn_id`: a document uploaded mid-Q&A runs extraction → affected fills → Q&A, so `component_filled` (and possibly `compliance_gate`) precede the `text_delta` answer within that one turn. The Q&A agent never calls extraction — the `gen_statem` sequences the stages and the agent grounds in the now-updated card ([`isolation-model.md`](isolation-model.md) §6). Shells must be prepared to render a freshened component card *and* a streamed answer from one turn.
+
 ## 5. Attachments
 
 Shells own blob storage; the engine accepts references. Turn input accepts `attachments: [Attachment]`:
@@ -111,6 +115,8 @@ Shells own blob storage; the engine accepts references. Turn input accepts `atta
 - `{kind: "ref", blob_id, mime_type}` — shell-provided opaque ID resolved via a per-tenant registered resolver.
 
 The engine maps attachments to the vendor SDK content-block shape; unsupported MIME types surface as `error{code: unsupported_attachment}`, never silently dropped. The engine does not persist attachment bytes beyond the consuming turn.
+
+A turn carrying attachments invokes document extraction (an LLM-call boundary → `usage`), so it is a **document-review** moment even when the user experiences it as chat (the upload-mid-Q&A case, [`isolation-model.md`](isolation-model.md) §6). The engine meters it; the shell pre-gates the attachments-present case on its **document-review** entitlement (architecture §11.6 pricing), separately from and before whatever gates plain Q&A — consistent with metering-not-gating (§1).
 
 ## 6. Compliance extension pipeline
 
@@ -125,6 +131,8 @@ Each extension emits a `compliance_gate` event and writes an `audit_events` row 
 ## 7. Reasoning stream toggle & cancellation
 
 `include_reasoning: bool` (default `false`) — when true and the model supports it, the engine emits `reasoning_delta`; otherwise it disables reasoning at the vendor call. Reasoning is a display/cost decision; the engine provides the switch, not a view on it.
+
+**Vendor/model is engine config, never user-facing.** The active vendor and model are engine-internal configuration (`.env`), keyed per agent role (extraction / leaf-fill / Q&A), resolved by Erlang at turn start and passed into the sidecar's run config. Vendor/model is **not** a JWT claim, **not** a tenant attribute, **not** a user toggle (§3 claims are unchanged). Resolution is per turn with no thread pinning — safe because the persisted glue is vendor-neutral (above), so a config change between turns strands no format-locked history. `usage.model` records the model actually served per turn for audit. See [`isolation-model.md`](isolation-model.md) §5 and [`agentic-flow.md`](agentic-flow.md) §7.
 
 Cancellation: `POST /api/engine/plan-cards/:id/cancel`. Signals the running sidecar gen_statem to stop; emits `usage` for work done; terminates with `turn_cancelled`; partial component fills are persisted and replayable; idempotent (`204` on already-finished); per-plan-card scope; caller `(tenant_id, user_id)` must own the plan card.
 
@@ -154,7 +162,7 @@ The engine runs its own Postgres. Each shell runs its own. The API is the only c
 | `tenants`, `tenant_signing_keys` | Per-tenant keys, resource-protection quotas |
 | `plan_cards` | `{plan_card_id, tenant_id, user_id, blueprint_slug, mode, status, deploy_commit_sha, content_jsonb}` — base plan + addenda; SOT for the agent's grounding (constraint #9) |
 | `plan_card_events` | Durable typed-event log (§4). SOT for `Last-Event-ID` replay |
-| `sessions` | Conversation log, `session_id = user_id × plan_card_id`. For user re-reading + audit; **not** agent grounding |
+| `sessions` | Conversation log, `session_id = user_id × plan_card_id`. Stores vendor-neutral glue `(turn_id, user_text, assistant_text, ts)` only — **not** reasoning items, **not** pinned file ids (those are in-turn-transient / vendor-format; [`isolation-model.md`](isolation-model.md) §4). For user re-reading + Q&A coherence + audit; **not** agent grounding (constraint #9) |
 | `kb_anchors` | `{slug, effective_from, last_verified, content_md, content_json}` — curated KB, written at deploy by the offline KB agent (build-time flow) |
 | `blueprints` | Current deployed blueprint templates, keyed by slug (no row versioning; git is history) |
 | `audit_events` | Compliance-pipeline attribution + which KB versions were active per fill. No cost fields |
