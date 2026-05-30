@@ -286,7 +286,7 @@ Same structure as [Mode C property_assessment](investor-domestic-au.md#2-propert
 
 **Inputs:** `investor_profile_foreign.outcome` + `property_fit_investor_foreign.outcome`
 
-**Same as [Mode B firb_workflow](fhb-foreign-au.md#4-firb_workflow---new--replaces-mode-a-eligibility)**. No changes for Mode D — same parameters, same outcome schema, same KB anchors. The component is reused across foreign-person blueprints.
+**Same as [Mode B firb_workflow](fhb-foreign-au.md#4-firb_workflow--new--replaces-mode-a-eligibility)**. No changes for Mode D — same parameters, same outcome schema, same KB anchors. The component is reused across foreign-person blueprints.
 
 **Outcome:** `firb_status` (same as Mode B)
 
@@ -449,7 +449,7 @@ The `mortgage_plan` outcome feeds `yield_modelling.loan_costs`, `tax_structure_n
 
 **Parameters:**
 
-Same as [Mode C yield_modelling](investor-domestic-au.md#4-yield_modelling--new) PLUS:
+Same as [Mode C yield_modelling](investor-domestic-au.md#5-yield_modelling--new) PLUS:
 
 ```jsonc
 {
@@ -664,7 +664,7 @@ Mode D regulatory imposts on a $1M property typically run $130–200k (FIRB appl
 
 **Inputs:** `investor_profile_foreign.outcome` + `budget_envelope_foreign_investor`
 
-**Same as [Mode B cross_border_funding](fhb-foreign-au.md#6-cross_border_funding---new)** with one note: Mode D `declared_purpose_category` typically defaults to `property_investment_foreign_direct_investment` rather than `student_tuition_and_living_expenses` (which is Mode B's typical category for student-funding scenarios).
+**Same as [Mode B cross_border_funding](fhb-foreign-au.md#7-cross_border_funding--new)** with one note: Mode D `declared_purpose_category` typically defaults to `property_investment_foreign_direct_investment` rather than `student_tuition_and_living_expenses` (which is Mode B's typical category for student-funding scenarios).
 
 **Outcome:** `transfer_plan` (same as Mode B)
 
@@ -684,7 +684,7 @@ Mode D regulatory imposts on a $1M property typically run $130–200k (FIRB appl
 
 **Parameters:**
 
-Combines [Mode C buying_strategy investor_anchoring](investor-domestic-au.md#7-buying_strategy-investor-tactics) with [Mode B firb_gate](fhb-foreign-au.md#7-buying_strategy-similar-to-mode-a--firb-approval-gate). Specifically:
+Combines [Mode C buying_strategy investor_anchoring](investor-domestic-au.md#8-buying_strategy-investor-tactics) with [Mode B firb_gate](fhb-foreign-au.md#8-buying_strategy-similar-to-mode-a--firb-approval-gate). Specifically:
 
 ```jsonc
 {
@@ -724,7 +724,7 @@ Combines [Mode C buying_strategy investor_anchoring](investor-domestic-au.md#7-b
 
 **Parameters:**
 
-Combines [Mode C investor_specific_documents](investor-domestic-au.md#8-due_diligence-investor-focus) with [Mode B cross-border documentation](fhb-foreign-au.md#8-due_diligence-similar-to-mode-a--cross-border-documentation). All FHB documents plus investor docs plus cross-border docs.
+Combines [Mode C investor_specific_documents](investor-domestic-au.md#9-due_diligence-investor-focus) with [Mode B cross-border documentation](fhb-foreign-au.md#9-due_diligence-similar-to-mode-a--cross-border-documentation). All FHB documents plus investor docs plus cross-border docs.
 
 **Outcome schema:** `risk_assessment_foreign_investor`
 
@@ -742,7 +742,7 @@ Combines [Mode C investor_specific_documents](investor-domestic-au.md#8-due_dili
 
 **UI tab hint:** Temporal flow
 
-**Parameters:** Combines [Mode C investor_specific_milestones](investor-domestic-au.md#9-settlement_prep-similar-to-mode-a--entity-setup) with [Mode B firb_milestones + currency_transfer_milestones](fhb-foreign-au.md#9-settlement_prep--firb-approval-milestone--currency-transfer-milestone).
+**Parameters:** Combines [Mode C investor_specific_milestones](investor-domestic-au.md#10-settlement_prep-similar-to-mode-a--entity-setup) with [Mode B firb_milestones + currency_transfer_milestones](fhb-foreign-au.md#10-settlement_prep--firb-approval-milestone--currency-transfer-milestone).
 
 **Outcome:** `settlement_checklist_foreign` (combines investor + cross-border milestones)
 

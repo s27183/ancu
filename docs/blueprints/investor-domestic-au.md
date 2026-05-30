@@ -685,7 +685,7 @@ The `mortgage_plan` outcome feeds `yield_modelling.loan_costs` (the loan cost ca
 
 **Parameters:**
 
-Same as [Mode A buying_strategy](fhb-domestic-au.md#5-buying_strategy) with these adjustments:
+Same as [Mode A buying_strategy](fhb-domestic-au.md#6-buying_strategy) with these adjustments:
 
 ```jsonc
 {
@@ -726,7 +726,7 @@ Same as [Mode A buying_strategy](fhb-domestic-au.md#5-buying_strategy) with thes
 
 **Parameters:**
 
-Same as [Mode A due_diligence](fhb-domestic-au.md#6-due_diligence) with these additions:
+Same as [Mode A due_diligence](fhb-domestic-au.md#7-due_diligence) with these additions:
 
 ```jsonc
 {
@@ -763,7 +763,7 @@ Same as [Mode A due_diligence](fhb-domestic-au.md#6-due_diligence) with these ad
 
 **Parameters:**
 
-Same as [Mode A settlement_prep](fhb-domestic-au.md#7-settlement_prep) with these additions:
+Same as [Mode A settlement_prep](fhb-domestic-au.md#8-settlement_prep) with these additions:
 
 ```jsonc
 {

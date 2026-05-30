@@ -666,7 +666,7 @@ Note `regulatory_imposts_total` (FIRB fee + foreign-buyer surcharge + LMI if app
 
 **Parameters:**
 
-Identical to [Mode A buying_strategy](fhb-domestic-au.md#5-buying_strategy) with these additions:
+Identical to [Mode A buying_strategy](fhb-domestic-au.md#6-buying_strategy) with these additions:
 
 ```jsonc
 {
@@ -708,7 +708,7 @@ The agent enforces the FIRB gate: it refuses to recommend an unconditional bid u
 
 **Parameters:**
 
-Same as [Mode A due_diligence](fhb-domestic-au.md#6-due_diligence) plus:
+Same as [Mode A due_diligence](fhb-domestic-au.md#7-due_diligence) plus:
 
 ```jsonc
 {
@@ -746,7 +746,7 @@ Same as [Mode A due_diligence](fhb-domestic-au.md#6-due_diligence) plus:
 
 **Parameters:**
 
-Same as [Mode A settlement_prep](fhb-domestic-au.md#7-settlement_prep) plus:
+Same as [Mode A settlement_prep](fhb-domestic-au.md#8-settlement_prep) plus:
 
 ```jsonc
 {
@@ -787,7 +787,7 @@ Same as [Mode A settlement_prep](fhb-domestic-au.md#7-settlement_prep) plus:
 
 **Parameters:**
 
-Same as [Mode A ownership_planning](fhb-domestic-au.md#8-ownership_planning) with these critical differences:
+Same as [Mode A ownership_planning](fhb-domestic-au.md#9-ownership_planning) with these critical differences:
 
 ```jsonc
 {

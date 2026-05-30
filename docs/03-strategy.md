@@ -19,7 +19,7 @@ Critically, this is a **lifecycle planning service**, not a property tech platfo
 The product splits into:
 
 - **Base plan** — property-agnostic, AI-augmented, available immediately to anyone matching one of the four user modes. Generates eligibility, scheme stacking (Mode A), FIRB compliance (Mode B / D), cross-border family coordination (Mode B), investment strategy (Mode C / D), tax structure, cash position against a *target price range* (not a specific price). Map view surfaces a **suburb-intelligence overlay** (investment grade, rental yield, family-friendly, Vietnamese-community proximity) sourced from public data feeds, not property listings.
-- **Tìm Nhà** ("Find a Home") — human-curated property search **service**, agent-invoked when the user is ready for specific properties. Vietnamese-speaking curators manually search REA / Domain / partner REA inventory and return a shortlist matched to the user's plan. Paid per engagement ($200–500). See [§11.11 in architecture/architecture.md](architecture/architecture.md#1111-tìm-nhà-property-search-service-agent-invoked-human-curated).
+- **Tìm Nhà** ("Find a Home") — human-curated property search **service**, agent-invoked when the user is ready for specific properties. Vietnamese-speaking curators manually search REA / Domain / partner REA inventory and return a shortlist matched to the user's plan. Paid per engagement ($200–500). See [§11.11 in architecture/architecture.md](architecture/architecture.md#1111-tìm-nhà-property-search-service--agent-invoked-human-curated).
 - **Property addenda** — once a user attaches a specific property (via Tìm Nhà handoff, URL paste, or browser extension on REA / Domain), the plan card gains a property-specific addendum filled by the planning agent (property_assessment, buying_strategy, due_diligence, settlement_prep, ownership_planning).
 
 Five defensible moats:
@@ -326,7 +326,7 @@ Wedge 1 is **sub-phased** to match the property-data-light architecture. The bas
 
 **Why this timing:** Base plan demand needs ~3 months to aggregate before Tìm Nhà has a queue to serve. Launching parallel to Wedge 1a would burn the human team on too few engagements.
 
-**Pricing:** $200–500 per engagement. See [§11.11 in architecture/architecture.md](architecture/architecture.md#1111-tìm-nhà-property-search-service-agent-invoked-human-curated).
+**Pricing:** $200–500 per engagement. See [§11.11 in architecture/architecture.md](architecture/architecture.md#1111-tìm-nhà-property-search-service--agent-invoked-human-curated).
 
 #### Wedge 1c — User URL paste + browser extension (months 6–12)
 
