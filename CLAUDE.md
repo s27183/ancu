@@ -75,7 +75,7 @@ Wedge 1 targets Mode A only. Mode B / C / D blueprints are drafted but not in sc
 
 In order of value + dependency. **Engine is the dependency root** (the shell renders what the engine produces); build-time KB curation feeds the engine. Tags: `[engine]` runtime, `[build-time]` offline KB agent, `[shell]` Svelte. See [`docs/architecture/engine-contract.md`](docs/architecture/engine-contract.md).
 
-1. **`[engine]` DB schema + migration** — `kb_anchors`, `blueprints`, `plan_cards` (base + addenda, `deploy_commit_sha`), `plan_card_events`, `sessions`, `suburbs`, `properties` (OPTIONAL — not load-bearing). The migration *is* the offline KB agent's build-time deploy: reads `docs/kb/*.md` + `docs/blueprints/*.md`, validates slugs + renderer enum, writes SQL. PGO from Erlang.
+1. **`[engine]` PG schema + KB/blueprint artifact compiler** — two distinct things. (a) PG migration creates `plan_cards` (base + addenda, `deploy_commit_sha`), `plan_card_events`, `sessions`, `suburbs`, `properties` (OPTIONAL — not load-bearing); PGO from Erlang. (b) The offline KB agent's build-time deploy reads `docs/kb/*.md` + `docs/blueprints/*.md`, validates slugs (globally unique + every blueprint `kb_anchor` resolves) + renderer enum + acyclic pipeline, and **compiles a versioned artifact** (loaded into `persistent_term` at boot). **KB + blueprints are NOT Postgres tables** — git is SOT, the artifact is a rebuildable projection. See [`docs/architecture/engine-contract.md`](docs/architecture/engine-contract.md) §9.1.
 
 2. **`[build-time]` First KB docs** — `docs/kb/scheme/federal/fhg.md` (validates the format), then `scheme/state/qld/fhnhc.md`, `scheme/federal/fhss.md`, `firb/established-dwelling-ban.md` to bootstrap Mode A KB.
 
@@ -127,7 +127,8 @@ firsthomey/
 │   └── first_home_buyer_plan.html (Mode A example output, design reference)
 ├── engine/                       (to be created: Erlang/OTP gateway + Python sidecars — agentic planning)
 │   ├── erlang/                   (cowboy /api/engine/*, gen_statem per plan-card turn, compliance, metering, PGO)
-│   │   └── priv/migrations/      (engine schema + KB/blueprint deploy)
+│   │   ├── priv/migrations/      (engine PG schema: plan-card state, events, sessions)
+│   │   └── priv/kb/              (compiled KB + blueprint artifact, emitted at deploy)
 │   └── python/                   (stateless sidecars: planning agent (Anthropic SDK), Playwright URL fetch)
 ├── shell/                        (to be created: Svelte frontend + Erlang backend — UX, identity, commerce)
 │   ├── svelte/frontend/
@@ -143,7 +144,7 @@ See [`docs/architecture/engine-contract.md`](docs/architecture/engine-contract.m
 
 The platform is an **engine** (agentic planning) + **shell(s)** (UX/commerce). See [`docs/architecture/engine-contract.md`](docs/architecture/engine-contract.md).
 
-- **Engine — Erlang/OTP.** Cowboy gateway (`/api/engine/*`, REST+SSE), `gen_statem` per plan-card turn, supervised Python ports, compliance pipeline, metering. PostgreSQL via PGO; `jsonb` for plan-card / blueprint content; **Postgres is the source of truth**. Follow [`docs/architecture/erlang-design-checklist.md`](docs/architecture/erlang-design-checklist.md); use the Erlang MCP server (per global CLAUDE.md).
+- **Engine — Erlang/OTP.** Cowboy gateway (`/api/engine/*`, REST+SSE), `gen_statem` per plan-card turn, supervised Python ports, compliance pipeline, metering. PostgreSQL via PGO; `jsonb` for plan-card content; **Postgres is the source of truth for runtime state** (plan cards, events, sessions). **KB + blueprints are not in Postgres** — they are git-authored and compiled to an in-memory artifact at deploy (`persistent_term`; git is SOT). Follow [`docs/architecture/erlang-design-checklist.md`](docs/architecture/erlang-design-checklist.md); use the Erlang MCP server (per global CLAUDE.md).
 - **Engine sidecars — Python** with type hints; Pydantic for blueprint / KB / plan-card / outcome schemas; the planning agent uses the Claude API via the Anthropic SDK (no LangChain unless materially justified). Sidecars are **stateless and disposable** (principle 3) — full context in on stdin, JSON-RPC events out on stdout, exit. Playwright for the synchronous user-URL-paste fetch (engine sidecar, user-initiated only).
 - **Shell — Svelte** (use the Svelte MCP server, per global CLAUDE.md). Owns onboarding, suburb map, plan-card rendering (constrained renderer vocabulary), identity, and commerce. Gates on commerce; the engine only meters.
 

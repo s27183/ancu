@@ -45,7 +45,7 @@ Each component has a `scope` indicating when it runs in the plan card lifecycle:
 |---|---|---|
 | 1 buyer_profile | `base` | Onboarding; persistent across plan lifetime |
 | 2 property_assessment | `per-property` | When a specific property is attached (Tìm Nhà handoff, URL paste, browser extension, or partner REA push) |
-| 3 eligibility | `base` | Onboarding; against target price range |
+| 3 eligibility | `both` | Base: provisional scheme stack from profile facts + target price range at onboarding; refined per-property against the specific property's location + price |
 | 4 mortgage_finance | `both` | Base estimate of borrowing capacity + lender shortlist + debt-optimisation recommendations at onboarding; refined per-property when loan amount known |
 | 5 cash_position | `both` | Base estimate against target price range at onboarding; refined per-property in addendum |
 | 6 buying_strategy | `per-property` | When user signals readiness to bid on a specific property |
@@ -103,7 +103,7 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
 
 ### 1. buyer_profile
 
-**Goal:** Capture and structure the buyer's situation — citizenship, residency, income, savings, debt, family financial pooling, employment.
+**Goal:** Capture and structure the buyer's situation — citizenship, residency, age, ownership history, income, savings, debt, family financial pooling, employment.
 
 **Inputs:** User questions answered in chat; any uploaded documents (employer letter, NOA, payslips, bank statements). No upstream component dependency — this is the pipeline entry.
 
@@ -120,6 +120,8 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
   "identity": {
     "citizenship_status": { "type": "enum", "options": ["citizen", "permanent_resident", "temporary_resident", "non_resident"], "value": "<initial>" },
     "firb_status": { "type": "enum", "options": ["not_foreign_person", "foreign_person"], "value": "<initial>", "derived_from": "citizenship_status" },
+    "age": { "type": "integer", "value": "<initial>" },
+    "owner_occupier_intent": { "type": "bool", "value": true },
     "location_state": { "type": "enum", "options": ["NSW", "VIC", "QLD", "WA", "SA", "TAS", "ACT", "NT"], "value": "<initial>" },
     "language_preference": { "type": "enum", "options": ["en", "vi"], "value": "en" }
   },
@@ -127,6 +129,11 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
     "buying_alone": { "type": "bool", "value": "<initial>" },
     "co_buyer_count": { "type": "integer", "value": 0 },
     "dependents_count": { "type": "integer", "value": 0 }
+  },
+  "ownership_history": {
+    "ever_owned_au_property": { "type": "bool", "value": "<initial>" },
+    "years_since_last_au_property_interest": { "type": "integer", "value": "<initial>", "note": "0 / none if never owned AU property; else years since last disposal — feeds FHG 10-yr re-entry" },
+    "prior_overseas_property_ownership": { "type": "bool", "value": false, "note": "captured but NON-disqualifying for AU schemes — Mode A diaspora hook" }
   },
   "income": {
     "primary_taxable_income": { "type": "money_per_year", "value": "<initial>" },
@@ -149,6 +156,10 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
   "timeline": {
     "target_purchase_months": { "type": "integer", "value": "<initial>" },
     "already_pre_approved": { "type": "bool", "value": false }
+  },
+  "purchase_target": {
+    "target_price_range": { "type": "money_range", "value": "<initial>", "note": "from onboarding (constraint #1) — base-scope cap + cash checks run against this until a property is attached" },
+    "target_zone": { "type": "array<string>", "value": "<initial>", "note": "onboarding map-zone — target suburbs / regions" }
   }
 }
 ```
@@ -159,12 +170,26 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
 {
   "type": "profile",
   "fields": {
-    "firb_required": "bool",                          // derived
-    "fhg_eligible_basic": "bool",                     // citizen/PR + not previously owned
-    "approx_borrowing_capacity": "money_range",       // computed from income - debts
+    // legal-status & personal facts (the eligibility fact surface)
+    "citizenship_status": "enum [citizen, permanent_resident, temporary_resident, non_resident]",
+    "firb_required": "bool",                          // derived fact: FIRB law on residency (constraint #10)
+    "age": "integer",
+    "owner_occupier_intent": "bool",
+    // ownership-history facts — feed FHG 10-yr re-entry + FHSS never-owned predicates
+    "ever_owned_au_property": "bool",
+    "years_since_last_au_property_interest": "integer",  // 0 / none if never
+    "prior_overseas_property_ownership": "bool",         // non-disqualifying
+    // neutral derived financials (facts, not verdicts)
+    "assessable_income": "money_per_year",            // primary + secondary; for income-capped schemes (Help to Buy)
+    "approx_borrowing_capacity": "money_range",       // computed from income − debts
     "deposit_ready_for_purchase_amount": "money",     // cash + family + FHSS available
+    // purchase-target facts (onboarding) — base-scope cap + cash checks run against these
+    "target_price_range": "money_range",
+    "target_zone": "array<string>",
+    // narrative
     "key_constraints": "array<string>",
     "key_strengths": "array<string>"
+    // REMOVED fhg_eligible_basic — a scheme verdict; now computed in `eligibility` (zero downstream readers, confirmed)
   }
 }
 ```
@@ -246,7 +271,9 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
 
 **Goal:** Determine all applicable schemes and produce an optimal stacked scheme stack with rationale for inclusion/exclusion.
 
-**Inputs:** `buyer_profile.outcome` + `property_assessment.outcome`
+**Scope:** `both` — base: provisional eligibility from profile facts + `target_price_range` (which schemes apply; FHG / FHSS / state-concession predicates; target-range-vs-cap check). Refined per-property once the specific property's location + price are known (`applicable_cap_for_location_property`, `fhog.applicable`).
+
+**Inputs:** base — `buyer_profile.outcome` (incl. `target_price_range`, `target_zone`); per-property — adds `property_assessment.outcome`
 
 **KB anchors:** `scheme.fhg`, `scheme.fhss`, `scheme.help-to-buy`, `scheme.fhog.federal`, `scheme.qld.fhc`, `scheme.qld.fhnhc`, `scheme.vic.fhb-duty`, `scheme.vic.fhog`, `scheme.nsw.fhbas`, `scheme.nsw.fhog`
 
@@ -823,7 +850,7 @@ The following kb_anchor slugs are referenced by components in this blueprint. Th
 
 ## Renderer vocabulary used
 
-This blueprint uses 8 of the constrained renderer vocabulary defined in [§11.9 in architecture.md](../architecture/architecture.md#119-blueprint-as-data-model--presentation-specification):
+This blueprint uses 9 of the constrained renderer vocabulary defined in [§11.9 in architecture.md](../architecture/architecture.md#119-blueprint-as-data-model--presentation-specification):
 
 | Renderer | Used by component(s) |
 |---|---|

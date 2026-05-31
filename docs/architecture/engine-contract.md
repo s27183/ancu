@@ -163,12 +163,12 @@ The engine runs its own Postgres. Each shell runs its own. The API is the only c
 | `plan_cards` | `{plan_card_id, tenant_id, user_id, blueprint_slug, mode, status, deploy_commit_sha, content_jsonb}` — base plan + addenda; SOT for the agent's grounding (constraint #9) |
 | `plan_card_events` | Durable typed-event log (§4). SOT for `Last-Event-ID` replay |
 | `sessions` | Conversation log, `session_id = user_id × plan_card_id`. Stores vendor-neutral glue `(turn_id, user_text, assistant_text, ts)` only — **not** reasoning items, **not** pinned file ids (those are in-turn-transient / vendor-format; [`isolation-model.md`](isolation-model.md) §4). For user re-reading + Q&A coherence + audit; **not** agent grounding (constraint #9) |
-| `kb_anchors` | `{slug, effective_from, last_verified, content_md, content_json}` — curated KB, written at deploy by the offline KB agent (build-time flow) |
-| `blueprints` | Current deployed blueprint templates, keyed by slug (no row versioning; git is history) |
 | `audit_events` | Compliance-pipeline attribution + which KB versions were active per fill. No cost fields |
 | `artifacts` | Content-addressed engine outputs (document reports, Tìm Nhà briefs, decision-trail entries) backing artifact refs |
 
-The engine schema evolves on the engine's cadence; no shell coordinates on an engine migration. The offline KB agent's deploy-time migration (architecture §11.9) writes `kb_anchors` + `blueprints` — that is the build-time/runtime handoff point.
+The engine schema evolves on the engine's cadence; no shell coordinates on an engine migration.
+
+**KB + blueprints are not Postgres tables.** They are git-authored (`docs/kb`, `docs/blueprints`), compiled into a versioned artifact shipped with the engine release and loaded into memory (`persistent_term`) at boot — each KB entry `{slug, effective_from, last_verified, content_md, content_json}`. Git is the source of truth; the artifact is a deterministic, rebuildable projection (rebuild from the deploy commit SHA). The engine is the **sole reader** — all KB access, including future online curator UIs, goes through engine primitives, never a direct store read/write. The offline KB agent's deploy-time compile (architecture §11.9) emits this artifact — that is the build-time/runtime handoff point. (Reproducibility for the audit trail lives in the plan-card snapshot — `plan_cards.deploy_commit_sha` + the resolved KB content copied into `content_jsonb` at fill time, architecture §11.9 "Audit trail" — not in a live KB table.)
 
 ### 9.2 Shell databases
 

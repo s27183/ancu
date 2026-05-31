@@ -30,7 +30,7 @@ Two axes — **when** (build-time / runtime) and **what** (reasoning / normalisa
 
 | Agent | When | Role | Emits | Meters (`usage`)? |
 |---|---|---|---|---|
-| **KB-curation agent** | build-time (offline) | canonical sources → evaluable rules + curated `kb_anchors` | `kb_anchors` rows at deploy | n/a (offline) |
+| **KB-curation agent** | build-time (offline) | canonical sources → evaluable rules + curated KB | compiled KB + blueprint artifact at deploy | n/a (offline) |
 | **Document-extraction sidecar** | runtime, pre-fill | unstructured upload → structured facts (**normalisation, not reasoning**) | structured facts into the input layer; **no** `component_filled` | yes (LLM-call boundary) |
 | **Leaf-fill agent** | runtime, in-turn | fill an `agent_reasoning_required` leaf | `component_filled` `{fill_path: agent}` | yes |
 | **Conversation (Q&A) agent** | runtime, post-fill | open-ended Q&A over the filled card | `text_delta` stream | yes |

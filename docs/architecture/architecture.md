@@ -21,7 +21,7 @@ The three layers below are the *logical* model. Physically, the platform is two 
 
 | Layer | Engine owns | Shell owns |
 |---|---|---|
-| L1 — Static KB | `kb_anchors`, `blueprints` (offline KB agent writes at deploy — build-time flow) | — |
+| L1 — Static KB | Compiled KB + blueprint artifact (git-authored `docs/kb` + `docs/blueprints`; offline KB agent compiles + validates at deploy, loaded into memory at boot — build-time flow). **Not** Postgres tables; git is SOT. | — |
 | L2 — User state | `plan_cards`, `sessions` (SOT; the agent's grounding, §11.9 / constraint #9) | A *view* of plan cards — title, layout, prefs |
 | L3 — Agentic reasoning | Planning agent in a disposable Python sidecar; `gen_statem` per plan-card turn; compliance pipeline; metering | Onboarding / map / upload UX; renders outcomes; commerce gating |
 
@@ -34,7 +34,8 @@ firsthomey/
 ├── engine/                      ← agentic planning workload
 │   ├── erlang/src/              gateway: cowboy /api/engine/*, gen_statem per plan-card turn,
 │   │                            sidecar lifecycle, compliance pipeline, metering, PGO
-│   ├── erlang/priv/migrations/  engine schema + KB/blueprint deploy (offline KB agent)
+│   ├── erlang/priv/migrations/  engine PG schema (plan-card state, events, sessions)
+│   ├── erlang/priv/kb/          compiled KB + blueprint artifact (offline KB agent emits at deploy)
 │   ├── python/                  stateless sidecars (planning agent — Anthropic SDK; Playwright URL fetch)
 │   └── python/pyproject.toml
 └── shell/
@@ -189,6 +190,8 @@ Each component represents an **atomic unit of agent reasoning** — a coherent g
 
 The key abstraction: downstream components read **outcomes** (curated, structured), not upstream parameters (raw, hierarchical). This makes the pipeline composable, the agent's reasoning bounded, and migrations tractable.
 
+**Outcomes carry facts, not verdicts.** An upstream outcome exposes *normalised facts* — residency, age, ownership history, income, derived financials — never the result of applying a particular scheme's rules to them. A verdict ("FHG-eligible") is produced by the component that *owns* those rules (`eligibility`), in base or per-property scope, and is never pre-baked into a profile that the rule-owning component then reads from. One place owns each rule; the same facts feed every scheme's predicate; the judgment is auditable where it is made. (This is the component-flow rule in [CLAUDE.md](../../CLAUDE.md): *profile holds facts; downstream reasons about facts*.)
+
 #### Component structure (template)
 
 A blueprint contains a list of components. Each component looks roughly like this (excerpt from the FHB Mode A blueprint, `eligibility` component):
@@ -208,8 +211,8 @@ A blueprint contains a list of components. Each component looks roughly like thi
   "ui_tab_hint": "overview",
   "parameters": {
     "fhg": {
-      "eligible":               { "type": "bool",       "value": "<initial>", "agent_reasoning_required": true },
-      "applicable_cap":         { "type": "money",      "value": "<initial>" },
+      "eligible":               { "type": "bool",       "value": "<initial>" },   // resolver: predicate over the fact surface (agentic-boundary.md)
+      "applicable_cap":         { "type": "money",      "value": "<initial>" },   // resolver: lookup by (state, location_tier)
       "deposit_percentage":     { "type": "percentage", "value": 5 },
       "lmi_savings_estimate":   { "type": "money",      "value": "<initial>" }
     },
@@ -233,6 +236,17 @@ A blueprint contains a list of components. Each component looks roughly like thi
 ```
 
 Each component carries: `id`, `goal`, `inputs`, `kb_anchors`, `renderer`, `ui_tab_hint`, `parameters` (hierarchical with simple atomic leaves), and `outcome_schema` (the typed interface for downstream components). Each leaf parameter carries: `type`, `value` (or signal like `<initial>`), optional `agent_reasoning_required` flag, optional `options` (for enums), optional `derived_from` (for parameters computed from other parameters).
+
+#### The fact surface and the resolver-input registry
+
+Because outcomes carry facts (above), each component's `outcome_schema` *is* the typed **fact surface** the next components read. Resolver rules — eligibility predicates, lookups, and the parameters formulas consume (the KB rules layer, `content_json`) — may reference inputs only from the **resolver-input registry**: the union of the `outcome_schema` fields of all upstream components along the pipeline DAG, plus the declared external sources (property card, suburb enrichment). For `eligibility` the registry is `profile.*` ⊕ property `basics.*` / `property_fit.*` ⊕ `suburb.*`.
+
+The registry makes two properties checkable at deploy by the artifact compiler:
+
+- **Reference integrity** — every field a rule names resolves to a registry field of compatible type. A predicate that needs an input no upstream outcome produces is a *build error* — this is the check that catches a scheme rule requiring a fact the profile never collected.
+- **One access path** — resolver and agent both read *outcomes only*; the registry is just the typed enumeration of that surface, so there is no separate route into raw parameters.
+
+Some registry fields are themselves *derived* rather than collected — e.g. a property's `location_tier` (capital / designated-regional-centre / rest-of-state) is derived from its suburb via a scheme's designated-centres list. Such derivations are ordinary resolver rules and resolve within the registry.
 
 #### Four blueprints — one per user mode
 
@@ -355,19 +369,25 @@ Components reference curated KB content via **slug-based references** rather tha
      last_verified: 2026-05-19
      ---
 
-2. Migration script (run on deployment):
-   - Walks docs/kb/
+2. Artifact compiler (run at deploy, build-time):
+   - Walks docs/kb/ and docs/blueprints/
    - Validates slugs are globally unique
    - Validates every blueprint's kb_anchors resolve to existing slugs (CI gate)
+   - Validates renderer enum + acyclic pipeline
    - Parses frontmatter + body
-   - Writes to kb_anchors table:
+   - Compiles a versioned KB + blueprint artifact shipped with the engine
+     release; each KB entry is:
        (slug, effective_from, last_verified, content_md, content_json)
+   - NOT a Postgres write: git is SOT, the artifact is a deterministic,
+     rebuildable projection (rebuild from the deploy commit SHA)
 
 3. Blueprints reference KB via slug only:
      "kb_anchors": ["scheme.fhg", "scheme.qld.fhnhc"]
 
 4. At runtime, system prompt construction:
-   - Resolves slugs to current kb_anchor records
+   - Resolves slugs against the in-memory artifact (loaded into persistent_term
+     at boot); the engine is the sole reader (incl. future curator UIs, which go
+     through engine primitives)
    - Injects relevant content into prompt
 ```
 
@@ -375,14 +395,69 @@ Tracking and linking:
 
 - **Build-time validation** — CI verifies every `kb_anchors` slug in every blueprint resolves to an existing KB record. Broken references block deployment.
 - **Always latest** — blueprints reference KB by slug only and always resolve the currently deployed content. There is no version pinning; reproducibility is handled by snapshotting the resolved content onto the filled plan card (see Audit trail).
-- **Change propagation** — when a KB doc updates, the migration script records the new `effective_from` + `last_verified` and redeploys. Plan cards filled before the update detect content drift via the `<stale: 90d>` signal (their snapshot's `last_verified` now lags the deployed doc).
+- **Change propagation** — when a KB doc updates, the deploy recompiles the artifact with the new `effective_from` + `last_verified`. Plan cards filled before the update detect content drift via the `<stale: 90d>` signal (their snapshot's `last_verified` now lags the deployed doc).
 - **Audit trail** — every filled plan card records the deploy commit SHA and a snapshot of the resolved KB content active when filled, so historical decisions are reproducible.
 
-This pattern is essentially how DBT, Terraform, and OpenAPI work — content lives as files in the repo, IDs are stable, deploy is a script. The FHB blueprint references 39 distinct KB slugs across its 8 components; the offline KB agent's first responsibility is ensuring every slug has a curated doc.
+This pattern is essentially how DBT, Terraform, and OpenAPI work — content lives as files in the repo, IDs are stable, deploy is a script. The FHB blueprint references 40 distinct KB slugs across its 9 components; the offline KB agent's first responsibility is ensuring every slug has a curated doc.
+
+#### KB rules — the `content_json` layer
+
+A KB doc carries two bodies: **`content_md`** — prose for agent grounding and Q&A — and **`content_json`** — the *evaluable rules* the resolver runs. The rule vocabulary is **grounded in the resolver primitives** defined in [agentic-boundary.md](agentic-boundary.md): the resolver's algorithms are code; `content_json` supplies the data they operate on. One rule kind exists per resolver primitive that consumes KB data — no more.
+
+| Kind | Resolver primitive | Produces | Shape |
+|---|---|---|---|
+| `criteria` | eligibility predicates | bool leaves | `all_of` / `any_of` of `{ field, op, value \| ref }`; fixed ops `eq, neq, in, nin, gte, gt, lte, lt, between` |
+| `lookup` | lookups / bracketed rates | caps, amounts, bracket values | keyed table `key: [dims] → value` with an explicit `default` |
+| `parameter` | arithmetic + date coefficients | formula inputs, fixed scalars | one typed scalar a resolver (code) formula consumes |
+| `stacking` | scheme-stacking constraint-satisfaction | the outcome's `stacking_constraints` + application order | per-scheme relations (`combines_with` / `alternative_to` / `requires`, `order_hint`) the resolver aggregates |
+
+The first three are **leaf-producing** — each binds to one outcome-leaf `path` and lives in the doc's `fills[]`. `stacking` is **relational** — it declares how this scheme combines with others, which the cross-scheme resolver aggregates into the eligibility outcome; it sits in its own block, not `fills`. `copies` (`<from_suburb>`, `<from_property_card>`) are a resolver primitive too, but the signal vocabulary handles them, so they need no KB rule.
+
+Three design rules govern the layer:
+
+- **Declarative, not a DSL.** Fixed operator set; no arithmetic, no control flow in `content_json`. The FHSS releasable-amount formula, stamp-duty brackets, LMI, and serviceability all live in **resolver code** (testable, reproducible); `content_json` supplies only the numbers they consume. This keeps each rule auditable by inspection, lets a new scheme be added as *data* rather than an engine deploy, and — for money / eligibility figures — enforces "computed, not asserted" (agentic-boundary "What this rules out"; an ASIC line).
+- **Bound + validated.** Each `fills` rule names the outcome leaf it produces; every `field` / key-dim resolves against the resolver-input registry (above). The artifact compiler gates on *coverage* (every resolver leaf a slug feeds has a rule) and *reference integrity* (every field resolves to a registry field of compatible type).
+- **A doc owns only its own leaves.** Cross-doc composition — e.g. FHG's `lmi_savings_estimate` computed via `kb.lmi.calculation` — is resolver orchestration, not one doc reaching into another.
+
+Worked example — `scheme.fhg` `content_json` (the facts live once, as data; the prose a buyer reads stays in `content_md`):
+
+```jsonc
+{
+  "fills": [
+    { "leaf": "eligibility.fhg.eligible",
+      "rule": { "kind": "criteria", "combine": "all_of", "criteria": [
+        { "field": "profile.citizenship_status", "op": "in",  "value": ["citizen","permanent_resident"] },
+        { "field": "profile.age",                 "op": "gte", "value": 18 },
+        { "combine": "any_of", "criteria": [
+          { "field": "profile.ever_owned_au_property",                "op": "eq",  "value": false },
+          { "field": "profile.years_since_last_au_property_interest", "op": "gte", "value": 10 } ] },
+        { "field": "profile.owner_occupier_intent", "op": "eq",  "value": true },
+        { "field": "property.price", "op": "lte", "ref": "eligibility.fhg.applicable_cap_for_location_property" } ] } },
+
+    { "leaf": "eligibility.fhg.applicable_cap_for_location_property",
+      "rule": { "kind": "lookup",
+        "key": ["property.state", "property.location_tier"],
+        "table": [
+          { "when": ["NSW","capital_or_regional_centre"], "value": 1500000 },
+          { "when": ["NSW","rest_of_state"],               "value": 800000  },
+          { "when": ["QLD","capital_or_regional_centre"],  "value": 1000000 }
+          /* … remaining rows mirror the content_md cap table … */ ],
+        "default": null } },                       // unmapped location ⇒ resolver flags a curation gap
+
+    { "leaf": "eligibility.fhg.deposit_percentage_required",
+      "rule": { "kind": "parameter", "type": "percentage", "value": 5 } }
+  ],
+  "stacking": {
+    "combines_with": ["scheme.fhss", "state_concession"],
+    "alternative_to": ["scheme.help-to-buy"],      // assess against, do not sum
+    "order_hint": 20
+  }
+}
+```
 
 #### Renderer vocabulary — constrained enum
 
-The platform's UI has a constrained set of renderer components. Blueprints can only reference renderers in this enum, validated at build time. This prevents fragmentation, eases evaluation, and makes adding new renderers an intentional design decision.
+The platform's UI has a constrained set of renderer components. Blueprints can only reference renderers in this enum, validated at build time. This prevents fragmentation, eases evaluation, and makes adding new renderers an intentional design decision. A component may **compose** two renderers (e.g. `risk-flag-list + checklist`, `data-table + opportunity-card`); each must independently be in the enum, and the compiler validates the pair.
 
 | Renderer | Purpose | Outcome shape (rough) |
 |---|---|---|
@@ -412,7 +487,7 @@ The FHB Mode A blueprint uses 9 of these (summary-card, scheme-stack-card, calcu
 - **Token economics are favourable** — system prompt is bounded by current plan card + property + uploads, not by accumulated history.
 - **Two fill paths keep math out of the model** — the per-leaf `agent_reasoning_required` flag splits each component into a deterministic resolver (copies, `derived_from`, calculator math — reproducible, free, no LLM) and an agent turn (judgment only). Recompute-on-input (e.g., a what-if price in `cash_position`) is instant and costs nothing; only edits that reach an agent-flagged leaf spend a turn.
 - **Blueprint evolution is decoupled from instance migration** — laws change frequently; user plan cards remain stable until they opt to refresh.
-- **KB anchors and renderers are validated at build time** — the migration script gates deployment on schema correctness, preventing the agent from referencing missing content or undefined renderers in production.
+- **KB anchors and renderers are validated at build time** — the artifact compiler gates deployment on schema correctness, preventing the agent from referencing missing content or undefined renderers in production.
 
 This is the operational substrate of the §11.1 three layers. Layer 1 produces blueprints + KB anchors; Layer 2 stores filled plan cards + sessions; Layer 3 runs the planning agent over the assembled context. The blueprint is the bridge — domain knowledge structured as a computational pipeline for agent reasoning *and* as a presentation specification for user-facing rendering.
 
