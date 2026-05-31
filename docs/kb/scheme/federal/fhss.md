@@ -52,6 +52,50 @@ FHSS combines naturally with the **First Home Guarantee**: FHSS builds the depos
 - The benefit is largest for buyers with **taxable employment income** who can salary-sacrifice concessionally — common for employed citizens/PRs building a deposit over a few years.
 - FHSS rewards **planning ahead**: because contributions are capped at $15,000/year, the full $50,000 benefit takes several financial years to build, so it is worth surfacing early in the base plan rather than at purchase time.
 
+## Rules
+
+The resolver rules the artifact compiler extracts as this doc's `content_json` (schema: [architecture.md §11.9](../../../architecture/architecture.md#119-blueprint-as-data-model--presentation-specification)). Everything above is `content_md`. The `parameters{}` block holds the coefficients the resolver's (code) release-amount and tax formulas consume — `available_release_amount` and `tax_offset_estimate` are computed in resolver code, not filled by a rule here.
+
+```jsonc
+{
+  "fills": [
+    { "leaf": "eligibility.fhss.eligible",
+      "rule": { "kind": "criteria", "combine": "all_of", "criteria": [
+        { "field": "profile.age",                    "op": "gte", "value": 18 },     // at the release request
+        { "field": "profile.ever_owned_au_property", "op": "eq",  "value": false },   // never held an AU property interest
+        { "field": "profile.owner_occupier_intent",  "op": "eq",  "value": true },    // live in 6 of first 12 months
+        { "field": "profile.prior_fhss_release",     "op": "eq",  "value": false } ] } },  // ⚠ field NOT yet in the fact surface — see note
+
+    { "leaf": "eligibility.fhss.release_timeline_business_days",
+      "rule": { "kind": "parameter", "type": "integer", "value": 25 } },             // plan for the upper end of the 15–25 range
+
+    { "leaf": "eligibility.fhss.contract_window_months_after_release",
+      "rule": { "kind": "parameter", "type": "integer", "value": 12 } }
+  ],
+  "parameters": {
+    "annual_contribution_cap":             { "type": "money",      "value": 15000 },
+    "total_contribution_cap":              { "type": "money",      "value": 50000 },
+    "concessional_releasable_pct":         { "type": "percentage", "value": 85 },
+    "non_concessional_releasable_pct":     { "type": "percentage", "value": 100 },
+    "withdrawal_tax_offset_pct":           { "type": "percentage", "value": 30 },
+    "unused_release_keep_tax_pct":         { "type": "percentage", "value": 20 },
+    "contract_window_days_before_release": { "type": "integer",    "value": 90 },
+    "ato_notify_days_after_contract":      { "type": "integer",    "value": 90 }
+  },
+  "stacking": {
+    "combines_with": ["scheme.fhg", "state_concession"],
+    "alternative_to": [],
+    "order_hint": 10
+  }
+}
+```
+
+Notes:
+
+- **`profile.prior_fhss_release`** (one valid release per lifetime) is referenced but **not yet in the buyer_profile fact surface** — same class as the ownership-history gap. Reference-integrity will fail the compile until it is added; flagged as a finding rather than silently dropped.
+- **`available_release_amount`** computation needs the contribution split (concessional vs non-concessional) + associated earnings; the profile currently captures only a single `fhss_contributions_to_date` figure, so the resolver can estimate but not compute exactly until that split is captured. Minor.
+- `order_hint: 10` (lower than FHG's 20) — FHSS is acted on *earliest* (save over years before purchase).
+
 ## Sources
 
 - ATO — *First home super saver scheme* — https://www.ato.gov.au/individuals-and-families/super-for-individuals-and-families/super/withdrawing-and-using-your-super/early-access-to-super/first-home-super-saver-scheme

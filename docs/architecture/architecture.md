@@ -374,7 +374,7 @@ Components reference curated KB content via **slug-based references** rather tha
    - Validates slugs are globally unique
    - Validates every blueprint's kb_anchors resolve to existing slugs (CI gate)
    - Validates renderer enum + acyclic pipeline
-   - Parses frontmatter + body
+   - Parses frontmatter; splits the body — the `## Rules` fenced `jsonc` block is `content_json`, the remaining prose is `content_md`
    - Compiles a versioned KB + blueprint artifact shipped with the engine
      release; each KB entry is:
        (slug, effective_from, last_verified, content_md, content_json)
@@ -408,10 +408,12 @@ A KB doc carries two bodies: **`content_md`** — prose for agent grounding and 
 |---|---|---|---|
 | `criteria` | eligibility predicates | bool leaves | `all_of` / `any_of` of `{ field, op, value \| ref }`; fixed ops `eq, neq, in, nin, gte, gt, lte, lt, between` |
 | `lookup` | lookups / bracketed rates | caps, amounts, bracket values | keyed table `key: [dims] → value` with an explicit `default` |
-| `parameter` | arithmetic + date coefficients | formula inputs, fixed scalars | one typed scalar a resolver (code) formula consumes |
+| `parameter` | arithmetic + date coefficients | formula inputs, fixed-value leaves | a fixed typed value (scalar or list) a resolver (code) formula consumes, or copies into a leaf |
 | `stacking` | scheme-stacking constraint-satisfaction | the outcome's `stacking_constraints` + application order | per-scheme relations (`combines_with` / `alternative_to` / `requires`, `order_hint`) the resolver aggregates |
 
 The first three are **leaf-producing** — each binds to one outcome-leaf `path` and lives in the doc's `fills[]`. `stacking` is **relational** — it declares how this scheme combines with others, which the cross-scheme resolver aggregates into the eligibility outcome; it sits in its own block, not `fills`. `copies` (`<from_suburb>`, `<from_property_card>`) are a resolver primitive too, but the signal vocabulary handles them, so they need no KB rule.
+
+Free coefficients that feed a resolver formula but bind to no single leaf — e.g. the FHSS contribution caps behind `available_release_amount` — sit in a top-level **`parameters{}`** map the resolver code reads by name; leaf-bound fixed values stay as `parameter` rules in `fills[]`. So a doc's `content_json` is `{ fills[], parameters{}, stacking{} }`, any of which may be absent.
 
 Three design rules govern the layer:
 
