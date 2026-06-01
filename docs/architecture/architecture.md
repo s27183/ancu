@@ -202,10 +202,10 @@ A blueprint contains a list of components. Each component looks roughly like thi
   "goal": "Determine all applicable schemes and produce an optimal stacked scheme stack with rationale for inclusion/exclusion.",
   "inputs": ["buyer_profile.outcome", "property_assessment.outcome"],
   "kb_anchors": [
-    "scheme.fhg", "scheme.fhss", "scheme.help-to-buy",
-    "scheme.qld.fhc", "scheme.qld.fhnhc",
-    "scheme.vic.fhb-duty", "scheme.vic.fhog",
-    "scheme.nsw.fhbas", "scheme.nsw.fhog"
+    "kb.scheme.fhg", "kb.scheme.fhss", "kb.scheme.help-to-buy",
+    "kb.scheme.qld.fhc", "kb.scheme.qld.fhnhc",
+    "kb.scheme.vic.fhb-duty", "kb.scheme.vic.fhog",
+    "kb.scheme.nsw.fhbas", "kb.scheme.nsw.fhog"
   ],
   "renderer": "scheme-stack-card",
   "ui_tab_hint": "overview",
@@ -239,14 +239,17 @@ Each component carries: `id`, `goal`, `inputs`, `kb_anchors`, `renderer`, `ui_ta
 
 #### The fact surface and the resolver-input registry
 
-Because outcomes carry facts (above), each component's `outcome_schema` *is* the typed **fact surface** the next components read. Resolver rules — eligibility predicates, lookups, and the parameters formulas consume (the KB rules layer, `content_json`) — may reference inputs only from the **resolver-input registry**: the union of the `outcome_schema` fields of all upstream components along the pipeline DAG, plus the declared external sources (property card, suburb enrichment). For `eligibility` the registry is `profile.*` ⊕ property `basics.*` / `property_fit.*` ⊕ `suburb.*`.
+Because outcomes carry facts (above), each component's `outcome_schema` *is* the typed **fact surface** the next components read. Resolver rules — eligibility predicates, lookups, and the parameters formulas consume (the KB rules layer, `content_json`) — may reference inputs only from the **resolver-input registry**: the union of the `outcome_schema` fields of all upstream components along the pipeline DAG, plus the declared external sources (property card, suburb enrichment). For `eligibility` the registry is `profile.*` ⊕ `property_fit.*` ⊕ `suburb.*` — note it reads the property *outcome* (`property_fit.*`), never `property_assessment`'s raw `basics.*` parameters, per the one-access-path rule below. (This is why the neutral property facts a scheme needs — `state`, `price`, `property_type`, `lga`, `is_capital_city` — are published in `property_fit`, not left in `basics`.)
 
 The registry makes two properties checkable at deploy by the artifact compiler:
 
 - **Reference integrity** — every field a rule names resolves to a registry field of compatible type. A predicate that needs an input no upstream outcome produces is a *build error* — this is the check that catches a scheme rule requiring a fact the profile never collected.
 - **One access path** — resolver and agent both read *outcomes only*; the registry is just the typed enumeration of that surface, so there is no separate route into raw parameters.
 
-Some registry fields are themselves *derived* rather than collected — e.g. a property's `location_tier` (capital / designated-regional-centre / rest-of-state) is derived from its suburb via a scheme's designated-centres list. Such derivations are ordinary resolver rules and resolve within the registry.
+Some values a rule consumes are *derived* rather than collected. Two cases, kept distinct:
+
+- **Derived published facts** live in an outcome and are read like any other registry field — e.g. `profile.firb_required` (from `citizenship_status`) or `property_fit.is_capital_city`. They are neutral facts, scheme-agnostic, so they are published once and reused.
+- **Resolver-local intermediates** are computed inside one scheme's rule and not published — e.g. FHG's `location_tier` (`capital_or_regional_centre` / `rest_of_state`). It is *not* a registry field: region tiering is per-scheme (state duty concessions tier regions differently), so there is no single published tier. The FHG resolver derives it from published geo facts (`property_fit.state`, `.lga`, `.is_capital_city`) plus FHG's own `designated_regional_centre_lgas` parameter (in `kb.scheme.fhg`), then uses it as the key into the cap lookup. The data (the LGA list, the cap table) is declarative KB; the classification is resolver code — no new `content_json` rule kind.
 
 #### Four blueprints — one per user mode
 
@@ -357,14 +360,14 @@ Components reference curated KB content via **slug-based references** rather tha
 
 ```
 1. Offline KB agent maintains markdown files in repo:
-     docs/kb/scheme/federal/fhg.md
-     docs/kb/scheme/state/qld/fhnhc.md
+     docs/kb/scheme/fhg.md
+     docs/kb/scheme/qld/fhnhc.md
      docs/kb/firb/established-dwelling-ban.md
      docs/kb/process/auction-rules-vic.md
    
    Each file has frontmatter:
      ---
-     slug: scheme.qld.fhnhc
+     slug: kb.scheme.qld.fhnhc
      effective_from: 2025-05-01
      last_verified: 2026-05-19
      ---
@@ -382,7 +385,7 @@ Components reference curated KB content via **slug-based references** rather tha
      rebuildable projection (rebuild from the deploy commit SHA)
 
 3. Blueprints reference KB via slug only:
-     "kb_anchors": ["scheme.fhg", "scheme.qld.fhnhc"]
+     "kb_anchors": ["kb.scheme.fhg", "kb.scheme.qld.fhnhc"]
 
 4. At runtime, system prompt construction:
    - Resolves slugs against the in-memory artifact (loaded into persistent_term
@@ -411,17 +414,17 @@ A KB doc carries two bodies: **`content_md`** — prose for agent grounding and 
 | `parameter` | arithmetic + date coefficients | formula inputs, fixed-value leaves | a fixed typed value (scalar or list) a resolver (code) formula consumes, or copies into a leaf |
 | `stacking` | scheme-stacking constraint-satisfaction | the outcome's `stacking_constraints` + application order | per-scheme relations (`combines_with` / `alternative_to` / `requires`, `order_hint`) the resolver aggregates |
 
-The first three are **leaf-producing** — each binds to one outcome-leaf `path` and lives in the doc's `fills[]`. `stacking` is **relational** — it declares how this scheme combines with others, which the cross-scheme resolver aggregates into the eligibility outcome; it sits in its own block, not `fills`. `copies` (`<from_suburb>`, `<from_property_card>`) are a resolver primitive too, but the signal vocabulary handles them, so they need no KB rule.
+The first three are **leaf-producing** — each binds to one outcome-leaf `path` and lives in the doc's `fills[]`. `stacking` is **relational** — it declares how this scheme combines with others, which the cross-scheme resolver aggregates into the eligibility outcome; it sits in its own block, not `fills`. Its references are **concrete KB slugs** (e.g. `kb.scheme.fhss`), validated by reference-integrity like any field. `combines_with` / `alternative_to` are **symmetric**: the resolver unions every such edge across all docs into one undirected graph and dedups, so each edge is declared **once, on either endpoint** — a federal scheme therefore **never enumerates state concessions**; each state-concession doc declares its own `combines_with` to the federal slugs, and that single edge is read from both sides. (`requires` is directional.) Do not confuse a stacking ref with the eligibility component's `state_concession` **slot** — the slot is a fill namespace (`eligibility.state_concession.*`, filled by whichever state scheme is `applicable`); a stacking ref is a slug. Intra-slot exclusivity (e.g. `kb.scheme.qld.fhnhc` vs `kb.scheme.qld.fhc`, which compete for that slot) is expressible precisely because refs are slug-grained, not slot-grained. `copies` (`<from_suburb>`, `<from_property_card>`) are a resolver primitive too, but the signal vocabulary handles them, so they need no KB rule.
 
 Free coefficients that feed a resolver formula but bind to no single leaf — e.g. the FHSS contribution caps behind `available_release_amount` — sit in a top-level **`parameters{}`** map the resolver code reads by name; leaf-bound fixed values stay as `parameter` rules in `fills[]`. So a doc's `content_json` is `{ fills[], parameters{}, stacking{} }`, any of which may be absent.
 
 Three design rules govern the layer:
 
 - **Declarative, not a DSL.** Fixed operator set; no arithmetic, no control flow in `content_json`. The FHSS releasable-amount formula, stamp-duty brackets, LMI, and serviceability all live in **resolver code** (testable, reproducible); `content_json` supplies only the numbers they consume. This keeps each rule auditable by inspection, lets a new scheme be added as *data* rather than an engine deploy, and — for money / eligibility figures — enforces "computed, not asserted" (agentic-boundary "What this rules out"; an ASIC line).
-- **Bound + validated.** Each `fills` rule names the outcome leaf it produces; every `field` / key-dim resolves against the resolver-input registry (above). The artifact compiler gates on *coverage* (every resolver leaf a slug feeds has a rule) and *reference integrity* (every field resolves to a registry field of compatible type).
+- **Bound + validated.** Each `fills` rule names the outcome leaf it produces; every `field` / key-dim resolves against the resolver-input registry (above). The artifact compiler gates on *coverage* (every resolver leaf a slug feeds has a rule) and *reference integrity* (every field resolves to a registry field of compatible type; every `stacking` ref resolves to a KB slug).
 - **A doc owns only its own leaves.** Cross-doc composition — e.g. FHG's `lmi_savings_estimate` computed via `kb.lmi.calculation` — is resolver orchestration, not one doc reaching into another.
 
-Worked example — `scheme.fhg` `content_json` (the facts live once, as data; the prose a buyer reads stays in `content_md`):
+Worked example — `kb.scheme.fhg` `content_json` (the facts live once, as data; the prose a buyer reads stays in `content_md`):
 
 ```jsonc
 {
@@ -438,7 +441,7 @@ Worked example — `scheme.fhg` `content_json` (the facts live once, as data; th
 
     { "leaf": "eligibility.fhg.applicable_cap_for_location_property",
       "rule": { "kind": "lookup",
-        "key": ["property.state", "property.location_tier"],
+        "key": ["property_fit.state", "location_tier"],  // location_tier = resolver-local, derived from property_fit.{state,lga,is_capital_city} + designated_regional_centre_lgas (not a published field)
         "table": [
           { "when": ["NSW","capital_or_regional_centre"], "value": 1500000 },
           { "when": ["NSW","rest_of_state"],               "value": 800000  },
@@ -450,8 +453,8 @@ Worked example — `scheme.fhg` `content_json` (the facts live once, as data; th
       "rule": { "kind": "parameter", "type": "percentage", "value": 5 } }
   ],
   "stacking": {
-    "combines_with": ["scheme.fhss", "state_concession"],
-    "alternative_to": ["scheme.help-to-buy"],      // assess against, do not sum
+    "combines_with": ["kb.scheme.fhss"],   // concrete slugs only; the fhg↔state-concession edge is declared on the state doc (symmetric)
+    "alternative_to": ["kb.scheme.help-to-buy"],      // assess against, do not sum
     "order_hint": 20
   }
 }

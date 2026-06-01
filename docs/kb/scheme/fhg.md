@@ -1,5 +1,5 @@
 ---
-slug: scheme.fhg
+slug: kb.scheme.fhg
 effective_from: 2025-10-01
 last_verified: 2026-05-30
 ---
@@ -62,7 +62,7 @@ The FHG is a **deposit-gap guarantee**. It is independent of, and does not consu
 
 ## Rules
 
-The resolver rules the artifact compiler extracts as this doc's `content_json` (schema: [architecture.md §11.9](../../../architecture/architecture.md#119-blueprint-as-data-model--presentation-specification)). Everything above this section is `content_md`. Figures here are the source of truth for the resolver; the prose narrates the same facts for the reader and must be kept in step.
+The resolver rules the artifact compiler extracts as this doc's `content_json` (schema: [architecture.md §11.9](../../architecture/architecture.md#119-blueprint-as-data-model--presentation-specification)). Everything above this section is `content_md`. Figures here are the source of truth for the resolver; the prose narrates the same facts for the reader and must be kept in step.
 
 ```jsonc
 {
@@ -75,12 +75,12 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
           { "field": "profile.ever_owned_au_property",                "op": "eq",  "value": false },
           { "field": "profile.years_since_last_au_property_interest", "op": "gte", "value": 10 } ] },
         { "field": "profile.owner_occupier_intent", "op": "eq",  "value": true },
-        { "field": "property.price", "op": "lte", "ref": "eligibility.fhg.applicable_cap_for_location_property" } ] } },
-        // the property.price criterion activates in per-property scope; base scope evaluates the profile-only criteria → provisional eligibility
+        { "field": "property_fit.price", "op": "lte", "ref": "eligibility.fhg.applicable_cap_for_location_property" } ] } },
+        // the property_fit.price criterion activates in per-property scope; base scope evaluates the profile-only criteria → provisional eligibility
 
     { "leaf": "eligibility.fhg.applicable_cap_for_location_property",
       "rule": { "kind": "lookup",
-        "key": ["property.state", "property.location_tier"],
+        "key": ["property_fit.state", "location_tier"],   // location_tier is resolver-derived (see parameters + note), not a published field
         "table": [
           { "when": ["NSW", "capital_or_regional_centre"], "value": 1500000 },
           { "when": ["NSW", "rest_of_state"],              "value": 800000  },
@@ -108,9 +108,16 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
         "Owner-occupier only — not available for investment"
       ] } }
   ],
+  "parameters": {
+    "designated_regional_centre_lgas": { "type": "array<string>", "value": [
+      "Illawarra", "Newcastle", "Lake Macquarie",   // NSW
+      "Geelong",                                     // VIC
+      "Gold Coast", "Sunshine Coast"                 // QLD
+    ], "note": "LGAs/regions that receive the capital-city cap. FHG-specific (region tiering differs per scheme), so it lives here, not in the neutral property fact surface. Resolver: location_tier = capital_or_regional_centre if property_fit.is_capital_city OR property_fit.lga ∈ this list, else rest_of_state." }
+  },
   "stacking": {
-    "combines_with": ["scheme.fhss", "state_concession"],
-    "alternative_to": ["scheme.help-to-buy"],
+    "combines_with": ["kb.scheme.fhss"],   // concrete slugs only; the fhg↔state-concession edge is declared on each state-concession doc (combines_with is symmetric — see §11.9), never enumerated here
+    "alternative_to": ["kb.scheme.help-to-buy"],
     "order_hint": 20
   }
 }
@@ -118,7 +125,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
 
 Notes on the cap lookup:
 
-- **`location_tier`** is a *derived* registry field (§11.9): `capital_or_regional_centre` covers each state capital **and** the designated regional centres named above (Illawarra, Newcastle / Lake Macquarie, Geelong, Gold Coast, Sunshine Coast); `rest_of_state` is everywhere else. The suburb → tier derivation is a separate resolver rule — *its placement (property_assessment vs a dedicated `kb.fhg.designated-regional-centres` slug) is not yet decided.*
+- **`location_tier`** is a *resolver-local intermediate*, **not** a published registry field (§11.9): region tiering is per-scheme, so there is no single shared tier. The FHG resolver derives it from neutral published geo facts — `location_tier = capital_or_regional_centre` if `property_fit.is_capital_city` **or** `property_fit.lga ∈ designated_regional_centre_lgas` (the parameter above), else `rest_of_state` — then uses it as the cap-lookup key. The designated-centre list is FHG-specific data and lives in this doc's `parameters` (not in the neutral `property_fit` surface, and not a separate slug — nothing else references it); the classification is resolver code.
 - **ACT and NT** have a single territory-wide cap, mapped to the `capital_or_regional_centre` tier.
 - **External territories** (Jervis Bay / Norfolk Island $550k; Christmas / Cocos $400k) are in the prose but **out of the current `property.state` enum** (NSW…NT), so they are not in the lookup.
 - `eligibility.fhg.lmi_savings_estimate` is **not** filled here — it is resolver arithmetic against the specific purchase using `kb.lmi.calculation` (cross-doc orchestration).

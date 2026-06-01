@@ -269,6 +269,15 @@ Mode C's base plan is sharper than Mode A's because investor reasoning often hap
 {
   "type": "property_fit_investor",
   "fields": {
+    // neutral property facts (per-property fact surface) — the only route downstream components
+    // read property data; never via basics.* params (§11.9 one access path). estimated_weekly_rent_range
+    // is a computed property fact (agent leaf in rental_market) that yield_modelling reads.
+    "state": "enum [NSW, VIC, QLD, WA, SA, TAS, ACT, NT]",
+    "suburb": "string",
+    "price": "money",
+    "property_type": "enum [established_house, established_apartment, new_house, new_apartment, off_the_plan, house_and_land]",
+    "estimated_weekly_rent_range": "money_range_per_week",
+    // viability verdicts (this component's own reasoning)
     "viability_verdict": "enum [strong_investment, acceptable_investment, marginal, reconsider]",
     "rental_yield_gross_estimate": "percentage",
     "capital_growth_outlook": "enum [strong, moderate, flat, declining]",

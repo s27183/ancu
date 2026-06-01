@@ -133,7 +133,7 @@ Mode B activates two new surfaces (Family view, FIRB & Funding) that don't appea
 
 **Inputs:** User questions answered in chat; any uploaded documents (visa grant letter, passport, employer letter if employed in AU, NOA if filed). No upstream component dependency — this is the pipeline entry.
 
-**KB anchors:** `kb.firb.status-determination`, `kb.visas.au-temporary-residency-classes`, `kb.au-temp-residents.banking-and-tax-basics`
+**KB anchors:** `kb.firb.status-determination`, `kb.firb.established-dwelling-ban`, `kb.visas.au-temporary-residency-classes`, `kb.au-temp-residents.banking-and-tax-basics`
 
 **Renderer:** `summary-card`
 
@@ -182,7 +182,7 @@ Mode B activates two new surfaces (Family view, FIRB & Funding) that don't appea
     "firb_required": "bool",                       // always true for Mode B
     "au_member_present": "bool",
     "vn_funding_member_present": "bool",
-    "established_property_eligible": "bool",       // always false 1 April 2025 – 30 June 2029
+    "established_property_eligible": "bool",       // false while the ban is in force — derived from kb.firb.established-dwelling-ban (single owner of the window)
     "new_build_only_constraint": "bool",
     "approx_au_side_contribution_capacity": "money",
     "approx_vn_side_contribution_capacity": "money",
@@ -281,21 +281,11 @@ Same structure as [Mode A property_assessment](fhb-domestic-au.md#2-property_ass
   "market_position": { /* same as Mode A — comparables, asking_price_vs_market, days_on_market */ },
   "strata_or_building": { /* same as Mode A */ },
 
-  "foreign_person_eligibility": {
-    "is_new_build_or_vacant_land": { "type": "bool", "value": "<initial>", "derived_from": "basics.property_type" },
-    "established_dwelling_ban_applies": { "type": "bool", "value": true, "agent_reasoning_required": false },
-    "foreign_person_can_purchase": { "type": "bool", "value": "<initial>" },
-    "developer_exemption_certificate_held": { "type": "bool", "value": "<initial>" },
-    "firb_application_required": { "type": "bool", "value": true }
-  },
-  "firb_fee_estimate": {
-    "value_tier": { "type": "enum", "options": ["under_1m", "1m_to_2m", "2m_to_3m", "3m_to_5m", "over_5m"], "value": "<initial>", "derived_from": "basics.price" },
-    "estimated_application_fee": { "type": "money", "value": "<initial>" }
-  },
-  "foreign_buyer_surcharge_estimate": {
-    "applicable_surcharge_percentage": { "type": "percentage", "value": "<initial>", "derived_from": "basics.state" },
-    "estimated_surcharge_amount": { "type": "money", "value": "<initial>" }
-  },
+  // FIRB eligibility + fee determination moved to firb_workflow (it owns FIRB verdicts — the Mode-A
+  // eligibility analog). Foreign-buyer stamp-duty surcharge lives in cash_position's stamp_duty_and_surcharge
+  // (it is state duty, not a FIRB fee). property_assessment stays FIRB-agnostic — neutral facts + property-fit,
+  // plus an early non-authoritative ban warning in key_concerns (see outcome).
+
   "fit_against_buyer": {
     "price_within_family_capacity": { "type": "bool", "value": "<initial>" },
     "lifestyle_match_score_au_member": { "type": "integer_0_10", "value": "<initial>", "agent_reasoning_required": true, "reasoning_domain": "lifestyle_fit" },
@@ -310,18 +300,26 @@ Same structure as [Mode A property_assessment](fhb-domestic-au.md#2-property_ass
 {
   "type": "property_fit",
   "fields": {
-    "viability_verdict": "enum [proceed, proceed_with_caution, reconsider, blocked_foreign_person_ineligible]",
-    "foreign_person_eligible": "bool",
-    "firb_fee_tier": "enum",
-    "foreign_buyer_surcharge_amount": "money",
+    // neutral property facts (per-property fact surface) — the only route downstream components
+    // read property data; never via basics.* params (§11.9 one access path)
+    "state": "enum [NSW, VIC, QLD, WA, SA, TAS, ACT, NT]",
+    "suburb": "string",
+    "price": "money",
+    "property_type": "enum [established_house, established_apartment, new_house, new_apartment, off_the_plan, house_and_land]",
+    // property-fit verdicts (this component's own reasoning) — FIRB verdicts now live in firb_workflow.
+    // No `blocked_foreign_person_ineligible`: property_assessment runs before firb_workflow and cannot
+    // own the FIRB verdict. Instead it emits an EARLY, non-authoritative ban warning in key_concerns
+    // (from neutral facts: profile.firb_status foreign + established property_type); firb_workflow issues
+    // the authoritative foreign_person_eligible=false + blocking_for_contract.
+    "viability_verdict": "enum [proceed, proceed_with_caution, reconsider]",
     "key_strengths": "array<string>",
-    "key_concerns": "array<string>",
+    "key_concerns": "array<string>",   // carries the early FIRB-ban warning when foreign + established
     "market_price_assessment": "string"
   }
 }
 ```
 
-If `foreign_person_eligible == false` (the property is established and the buyer is a foreign person), the agent stops here and surfaces alternative new-build options. The downstream components don't fill until viability_verdict ≠ `blocked_foreign_person_ineligible`.
+When the buyer is a foreign person and the property is an established dwelling, property_assessment surfaces an **early ban warning** in `key_concerns` (non-authoritative, from neutral facts) so the user sees it at the property card. The **authoritative** determination is `firb_workflow`'s — `foreign_person_eligible == false` → `blocking_for_contract == true`. Downstream components (`mortgage_finance`, `buying_strategy`, `settlement_prep`) gate on `firb_status.blocking_for_contract`, not on property_assessment, and the agent surfaces alternative new-build options at that point.
 
 ---
 
@@ -331,7 +329,7 @@ If `foreign_person_eligible == false` (the property is established and the buyer
 
 **Inputs:** `buyer_profile.outcome` + `property_assessment.outcome`
 
-**KB anchors:** `kb.firb.application-process`, `kb.firb.fee-schedule-current`, `kb.firb.documents-required`, `kb.firb.timelines-standard`, `kb.firb.exemption-certificates-developer`, `kb.firb.approval-conditions-typical`, `kb.firb.penalties-non-compliance`
+**KB anchors:** `kb.firb.established-dwelling-ban`, `kb.firb.application-process`, `kb.firb.fee-schedule-current`, `kb.firb.documents-required`, `kb.firb.timelines-standard`, `kb.firb.exemption-certificates-developer`, `kb.firb.approval-conditions-typical`, `kb.firb.penalties-non-compliance`
 
 **Renderer:** `firb-workflow-card`
 
@@ -341,12 +339,20 @@ If `foreign_person_eligible == false` (the property is established and the buyer
 
 ```jsonc
 {
+  "eligibility": {
+    // FIRB eligibility determination — moved here from property_assessment (firb_workflow owns FIRB verdicts).
+    // Reads neutral property facts (property_fit.property_type) + profile (firb_status); resolver, not agent.
+    "is_new_build_or_vacant_land": { "type": "bool", "value": "<initial>", "derived_from": "property_fit.property_type" },
+    "established_dwelling_ban_applies": { "type": "bool", "value": "<initial>", "derived_from": "kb.firb.established-dwelling-ban (current date within ban_start_date..ban_end_date)", "agent_reasoning_required": false },  // resolver-derived from the KB window — not hardcoded, so it self-expires 30 Jun 2029
+    "foreign_person_can_purchase": { "type": "bool", "value": "<initial>", "note": "false ⇒ firb_status.foreign_person_eligible=false ⇒ blocking_for_contract. Developer new-dwelling exemption handled in exemption_pathway below." },
+    "firb_application_required": { "type": "bool", "value": true }
+  },
   "application_state": {
     "current_stage": { "type": "enum", "options": ["not_started", "in_preparation", "submitted", "under_review", "approved", "approved_with_conditions", "rejected", "withdrawn"], "value": "not_started" },
     "stage_entered_at": { "type": "date", "value": "<initial>" }
   },
   "fee_calculation": {
-    "property_value_tier": { "type": "enum", "options": ["under_1m", "1m_to_2m", "2m_to_3m", "3m_to_5m", "over_5m"], "value": "<from_property_assessment>" },
+    "property_value_tier": { "type": "enum", "options": ["under_1m", "1m_to_2m", "2m_to_3m", "3m_to_5m", "over_5m"], "value": "<initial>", "derived_from": "property_fit.price" },
     "base_application_fee": { "type": "money", "value": "<initial>" },
     "additional_fees_if_any": { "type": "money", "value": 0 },
     "total_firb_fee_payable": { "type": "money", "value": "<initial>" }
@@ -388,12 +394,16 @@ If `foreign_person_eligible == false` (the property is established and the buyer
 {
   "type": "firb_status",
   "fields": {
-    "current_stage": "enum",
+    // FIRB verdicts (authoritative — moved here from property_assessment)
+    "foreign_person_eligible": "bool",          // false when foreign person + established dwelling (ban) → blocking_for_contract
+    "firb_fee_tier": "enum",
     "total_firb_fee_payable": "money",
+    // approval state machine
+    "current_stage": "enum",
     "approval_received": "bool",
     "approval_conditions": "array<string>",
     "days_to_expected_decision": "integer",
-    "blocking_for_contract": "bool",
+    "blocking_for_contract": "bool",            // true while not approved OR foreign_person_eligible == false
     "documents_outstanding": "array<string>"
   }
 }
@@ -522,7 +532,7 @@ The `mortgage_plan` outcome feeds `cash_position` (loan amount + deposit), `cros
   "stamp_duty_and_surcharge": {
     "standard_stamp_duty_before_concession": { "type": "money", "value": "<initial>" },
     "first_home_concession_applicable_for_foreign_person": { "type": "bool", "value": false },
-    "foreign_buyer_surcharge_percentage": { "type": "percentage", "value": "<initial>", "derived_from": "property_assessment.basics.state" },
+    "foreign_buyer_surcharge_percentage": { "type": "percentage", "value": "<initial>", "derived_from": "property_fit.state" },
     "foreign_buyer_surcharge_amount": { "type": "money", "value": "<initial>" },
     "total_state_duty_payable": { "type": "money", "value": "<initial>" }
   },

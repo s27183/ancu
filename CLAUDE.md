@@ -46,7 +46,7 @@ These are not preferences. They are decisions locked into the architecture. Viol
 
 5. **Component-flow architecture.** Each blueprint is a directed acyclic pipeline of components with `goal`, `inputs`, `parameters`, `outcome_schema`. Outcomes are typed interfaces; downstream components read outcomes, not upstream parameters. See [`docs/architecture/architecture.md#119-blueprint-as-data-model--presentation-specification`](docs/architecture/architecture.md).
 
-6. **Slug-based KB references.** KB content lives in `docs/kb/*.md` files with frontmatter (`slug:`, `effective_from:`, `last_verified:`). Blueprints reference KB via slugs (e.g., `scheme.fhg`, `kb.firb.application-process`). Migration script validates slugs at deploy.
+6. **Slug-based KB references.** KB content lives in `docs/kb/**.md` files with frontmatter (`slug:`, `effective_from:`, `last_verified:`). A doc's **slug is its path under `docs/`** — `/`→`.`, `.md` dropped, no segments dropped (so `docs/kb/scheme/qld/fhnhc.md` → `kb.scheme.qld.fhnhc`; the `kb.` prefix is just the `kb/` root and marks KB anchors as distinct from registry-field refs like `profile.*`). Blueprints reference KB via slugs (e.g., `kb.scheme.fhg`, `kb.firb.application-process`). Migration script validates `slug == path` + resolution at deploy.
 
     **No semantic versioning (CI/CD).** Blueprints and KB are not version-numbered (no `v1.0`, no `@1.2` pinning). The repo is the source of truth; deploy publishes the latest, git holds the history. Reproducibility for the regulated audit trail comes from each filled plan card recording the **deploy commit SHA + a snapshot of the resolved KB content** at fill time. (Roadmap phase names like "Wedge 1" are planning language, not artifact versions.)
 
@@ -77,7 +77,7 @@ In order of value + dependency. **Engine is the dependency root** (the shell ren
 
 1. **`[engine]` PG schema + KB/blueprint artifact compiler** — two distinct things. (a) PG migration creates `plan_cards` (base + addenda, `deploy_commit_sha`), `plan_card_events`, `sessions`, `suburbs`, `properties` (OPTIONAL — not load-bearing); PGO from Erlang. (b) The offline KB agent's build-time deploy reads `docs/kb/*.md` + `docs/blueprints/*.md`, validates slugs (globally unique + every blueprint `kb_anchor` resolves) + renderer enum + acyclic pipeline, and **compiles a versioned artifact** (loaded into `persistent_term` at boot). **KB + blueprints are NOT Postgres tables** — git is SOT, the artifact is a rebuildable projection. See [`docs/architecture/engine-contract.md`](docs/architecture/engine-contract.md) §9.1.
 
-2. **`[build-time]` First KB docs** — `docs/kb/scheme/federal/fhg.md` (validates the format), then `scheme/state/qld/fhnhc.md`, `scheme/federal/fhss.md`, `firb/established-dwelling-ban.md` to bootstrap Mode A KB.
+2. **`[build-time]` First KB docs** — `docs/kb/scheme/fhg.md` (validates the format), then `scheme/qld/fhnhc.md`, `scheme/fhss.md`, `firb/established-dwelling-ban.md` to bootstrap Mode A KB.
 
 3. **`[build-time]` Suburb enrichment ingestion** — jobs writing the engine `suburbs` table: ABS Data API for SAL-level Census 2021 (Vietnamese ancestry %, demographics, family composition, dwellings); state education / planning / flood adapters; RBA FX daily. CoreLogic / PropTrack are PAID — deferred.
 

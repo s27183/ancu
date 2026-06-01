@@ -136,7 +136,7 @@ Note: Mode D does NOT activate Mode B's Family view tab by default — Vietnam-l
 
 **Inputs:** User questions; uploaded documents (Vietnamese passport, residency proof, prior AU FIRB approvals if any, financial statements).
 
-**KB anchors:** `kb.firb.status-determination`, `kb.vn-tax.brackets-2026`, `kb.vn-tax.income-from-foreign-property`, `kb.non-resident.serviceability-au-lenders`, `kb.investor.experience-levels`
+**KB anchors:** `kb.firb.status-determination`, `kb.firb.established-dwelling-ban`, `kb.vn-tax.brackets-2026`, `kb.vn-tax.income-from-foreign-property`, `kb.non-resident.serviceability-au-lenders`, `kb.investor.experience-levels`
 
 **Renderer:** `summary-card`
 
@@ -202,7 +202,7 @@ Note: Mode D does NOT activate Mode B's Family view tab by default — Vietnam-l
   "type": "investor_profile_foreign_summary",
   "fields": {
     "firb_required": "bool",                       // always true for Mode D
-    "established_property_eligible": "bool",       // always false 1 April 2025 – 30 June 2029
+    "established_property_eligible": "bool",       // false while the ban is in force — derived from kb.firb.established-dwelling-ban (single owner of the window)
     "new_build_only_constraint": "bool",
     "vn_marginal_tax_rate": "percentage",
     "available_capital_aud_equivalent": "money",
@@ -236,20 +236,10 @@ Same structure as [Mode C property_assessment](investor-domestic-au.md#2-propert
 ```jsonc
 {
   // all Mode C investor parameters, plus:
-  "foreign_person_eligibility": {
-    "is_new_build_or_vacant_land": { "type": "bool", "value": "<initial>" },
-    "established_dwelling_ban_applies": { "type": "bool", "value": true },
-    "foreign_person_can_purchase": { "type": "bool", "value": "<initial>" },
-    "developer_exemption_certificate_held": { "type": "bool", "value": "<initial>" }
-  },
-  "firb_fee_estimate": {
-    "value_tier": { "type": "enum", "options": ["under_1m", "1m_to_2m", "2m_to_3m", "3m_to_5m", "over_5m"], "value": "<initial>", "derived_from": "basics.price" },
-    "estimated_application_fee": { "type": "money", "value": "<initial>" }
-  },
-  "foreign_buyer_surcharge_estimate": {
-    "applicable_surcharge_percentage": { "type": "percentage", "value": "<initial>", "derived_from": "basics.state" },
-    "estimated_surcharge_amount": { "type": "money", "value": "<initial>" }
-  },
+  // FIRB eligibility + fee determination moved to firb_workflow (it owns FIRB verdicts). Foreign-buyer
+  // stamp-duty surcharge lives in cash_position's stamp_duty_and_surcharge (state duty, not a FIRB fee).
+  // property_assessment stays FIRB-agnostic — neutral facts + investor property-fit, plus an early
+  // non-authoritative ban warning in key_concerns (see outcome). Same consolidation as Mode B.
   "off_the_plan_specific_considerations_for_foreign_investor": {
     "developer_track_record_check": { "type": "enum", "options": ["strong", "acceptable", "concerning", "unknown"], "value": "<initial>", "agent_reasoning_required": true, "reasoning_domain": "off_the_plan" },
     "sunset_clause_protection_assessment": { "type": "enum", "options": ["adequate", "concerning"], "value": "<initial>", "agent_reasoning_required": true, "reasoning_domain": "off_the_plan" },
@@ -264,10 +254,17 @@ Same structure as [Mode C property_assessment](investor-domestic-au.md#2-propert
 {
   "type": "property_fit_investor_foreign",
   "fields": {
-    "viability_verdict": "enum [strong_investment, acceptable_investment, marginal, blocked_foreign_person_ineligible]",
-    "foreign_person_eligible": "bool",
-    "firb_fee_tier": "enum",
-    "foreign_buyer_surcharge_amount": "money",
+    // neutral property facts (per-property fact surface) — the only route downstream components
+    // read property data; never via basics.* params (§11.9 one access path)
+    "state": "enum [NSW, VIC, QLD, WA, SA, TAS, ACT, NT]",
+    "suburb": "string",
+    "price": "money",
+    "property_type": "enum [established_house, established_apartment, new_house, new_apartment, off_the_plan, house_and_land]",
+    // investor property-fit verdicts (this component's own reasoning) — FIRB verdicts now live in firb_workflow.
+    // No `blocked_foreign_person_ineligible`: property_assessment runs before firb_workflow. It emits an EARLY,
+    // non-authoritative ban warning in key_concerns (foreign profile + established property_type); firb_workflow
+    // issues the authoritative foreign_person_eligible=false + blocking_for_contract.
+    "viability_verdict": "enum [strong_investment, acceptable_investment, marginal, reconsider]",
     "rental_yield_gross_estimate": "percentage",
     "capital_growth_outlook": "enum",
     "depreciation_attractiveness": "enum",
@@ -594,7 +591,7 @@ Same as [Mode C yield_modelling](investor-domestic-au.md#5-yield_modelling--new)
   },
   "stamp_duty_and_surcharge": {
     "standard_stamp_duty": { "type": "money", "value": "<initial>" },
-    "foreign_buyer_surcharge_percentage": { "type": "percentage", "value": "<initial>", "derived_from": "property_assessment.basics.state" },
+    "foreign_buyer_surcharge_percentage": { "type": "percentage", "value": "<initial>", "derived_from": "property_fit_investor_foreign.state" },
     "foreign_buyer_surcharge_amount": { "type": "money", "value": "<initial>" },
     "total_state_duty_payable": { "type": "money", "value": "<initial>" }
   },

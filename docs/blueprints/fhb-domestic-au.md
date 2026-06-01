@@ -133,7 +133,9 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
   "ownership_history": {
     "ever_owned_au_property": { "type": "bool", "value": "<initial>" },
     "years_since_last_au_property_interest": { "type": "integer", "value": "<initial>", "note": "0 / none if never owned AU property; else years since last disposal — feeds FHG 10-yr re-entry" },
-    "prior_overseas_property_ownership": { "type": "bool", "value": false, "note": "captured but NON-disqualifying for AU schemes — Mode A diaspora hook" }
+    "prior_overseas_property_ownership": { "type": "bool", "value": false, "note": "Mode A diaspora hook — NON-disqualifying for FEDERAL schemes (FHG/FHSS test AU only), but some STATE concessions test residences worldwide and disqualify on it (e.g. kb.scheme.qld.fhnhc). Neutral fact; each scheme's criteria decides." },
+    "prior_fhss_release": { "type": "bool", "value": false, "note": "FHSS scheme-usage history (one valid release per lifetime) — not property ownership; grouped here as a first-home eligibility gate, feeds eligibility.fhss.eligible" },
+    "currently_owns_property": { "type": "bool", "value": "<initial>", "note": "CURRENT ownership of any residential property in Australia OR overseas — distinct from the historical ever_owned_au_property / prior_overseas_property_ownership facts. Feeds Help to Buy's 'cannot currently own' test (kb.scheme.help-to-buy), which admits past owners who have since sold ('returning to home ownership'). Neutral fact; each scheme's criteria decides." }
   },
   "income": {
     "primary_taxable_income": { "type": "money_per_year", "value": "<initial>" },
@@ -178,7 +180,9 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
     // ownership-history facts — feed FHG 10-yr re-entry + FHSS never-owned predicates
     "ever_owned_au_property": "bool",
     "years_since_last_au_property_interest": "integer",  // 0 / none if never
-    "prior_overseas_property_ownership": "bool",         // non-disqualifying
+    "prior_overseas_property_ownership": "bool",         // non-disqualifying federally (FHG/FHSS); but disqualifies for some state concessions (e.g. QLD FHNHC)
+    "prior_fhss_release": "bool",                        // FHSS one-release-per-lifetime gate (scheme usage, not property)
+    "currently_owns_property": "bool",                   // CURRENT ownership AU or overseas — Help to Buy 'cannot currently own' test (past owners who sold are OK); distinct from ever_owned/prior_overseas
     // neutral derived financials (facts, not verdicts)
     "assessable_income": "money_per_year",            // primary + secondary; for income-capped schemes (Help to Buy)
     "approx_borrowing_capacity": "money_range",       // computed from income − debts
@@ -216,6 +220,8 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
     "address": { "type": "string", "value": "<from_property_card>" },
     "suburb": { "type": "string", "value": "<from_property_card>" },
     "state": { "type": "enum", "value": "<from_property_card>" },
+    "lga": { "type": "string", "value": "<from_suburb>", "note": "ABS local government area — neutral geo fact; feeds each scheme's own region tiering (e.g. FHG location_tier)" },
+    "is_capital_city": { "type": "bool", "value": "<from_suburb>", "note": "neutral geo fact — property is in the state capital LGA" },
     "price": { "type": "money", "value": "<from_property_card>" },
     "property_type": { "type": "enum", "options": ["established_house", "established_apartment", "new_house", "new_apartment", "off_the_plan", "house_and_land"], "value": "<from_property_card>" },
     "bedrooms": { "type": "integer", "value": "<from_property_card>" },
@@ -244,7 +250,8 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
   },
   "fit_against_buyer": {
     "price_within_borrowing_capacity": { "type": "bool", "value": "<initial>" },
-    "price_within_scheme_cap": { "type": "bool", "value": "<initial>" },
+    // price_within_scheme_cap removed — it is eligibility.fhg's cap criterion (property.price ≤ applicable_cap);
+    // property_assessment runs before eligibility in the DAG and cannot know the cap. See eligibility component.
     "lifestyle_match_score": { "type": "integer_0_10", "value": "<initial>", "agent_reasoning_required": true, "reasoning_domain": "lifestyle_fit" }
   }
 }
@@ -256,11 +263,20 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
 {
   "type": "property_fit",
   "fields": {
+    // neutral property facts (the per-property fact surface) — the only route downstream
+    // components (eligibility, mortgage_finance) read property data; never via basics.* params (§11.9 one access path)
+    "state": "enum [NSW, VIC, QLD, WA, SA, TAS, ACT, NT]",
+    "suburb": "string",
+    "lga": "string",                                  // ABS LGA — feeds each scheme's own region tiering
+    "is_capital_city": "bool",                        // neutral; FHG tier = capital OR designated regional centre
+    "price": "money",
+    "property_type": "enum [established_house, established_apartment, new_house, new_apartment, off_the_plan, house_and_land]",
+    // viability verdicts/narrative (this component's own reasoning)
     "viability_verdict": "enum [proceed, proceed_with_caution, reconsider]",
     "key_strengths": "array<string>",
     "key_concerns": "array<string>",
     "market_price_assessment": "string",
-    "scheme_eligibility_hint": "string"
+    "scheme_eligibility_hint": "string"               // soft hint only — property_assessment runs before eligibility; authoritative verdict is eligibility.outcome
   }
 }
 ```
@@ -275,7 +291,7 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
 
 **Inputs:** base — `buyer_profile.outcome` (incl. `target_price_range`, `target_zone`); per-property — adds `property_assessment.outcome`
 
-**KB anchors:** `scheme.fhg`, `scheme.fhss`, `scheme.help-to-buy`, `scheme.fhog.federal`, `scheme.qld.fhc`, `scheme.qld.fhnhc`, `scheme.vic.fhb-duty`, `scheme.vic.fhog`, `scheme.nsw.fhbas`, `scheme.nsw.fhog`
+**KB anchors:** `kb.scheme.fhg`, `kb.scheme.fhss`, `kb.scheme.help-to-buy`, `kb.scheme.qld.fhc`, `kb.scheme.qld.fhnhc`, `kb.scheme.vic.fhb-duty`, `kb.scheme.vic.fhog`, `kb.scheme.nsw.fhbas`, `kb.scheme.nsw.fhog`
 
 **Renderer:** `scheme-stack-card`
 
@@ -312,7 +328,7 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
     "concession_type": { "type": "enum", "options": ["full_exemption", "partial_concession", "no_concession"], "value": "<initial>" }
   },
   "fhog": {
-    "applicable": { "type": "bool", "value": "<initial>", "derived_from": "property_assessment.basics.property_type" },
+    "applicable": { "type": "bool", "value": "<initial>", "derived_from": "property_fit.property_type" },
     "amount": { "type": "money", "value": "<initial>" }
   }
 }
@@ -741,7 +757,7 @@ The `mortgage_plan` outcome feeds `cash_position` (loan amount + buffer requirem
 
 **Inputs:** `property_assessment.outcome` + `eligibility.outcome` + `cash_position.outcome`
 
-**KB anchors:** `kb.ongoing-costs.rates-water-strata`, `kb.refi.windows-and-triggers`, `kb.graduation.lvr80`, `kb.land-tax.ppor-exemption`, `kb.maintenance.budget-by-property-type`
+**KB anchors:** `kb.ongoing-costs.rates-water-strata`, `kb.refinance.windows-and-triggers`, `kb.graduation.lvr80`, `kb.land-tax.ppor-exemption`, `kb.maintenance.budget-by-property-type`
 
 **Renderer:** `data-table` + `opportunity-card`
 
@@ -812,16 +828,15 @@ The following kb_anchor slugs are referenced by components in this blueprint. Th
 | `kb.property.comparables-methodology` | 2, 5 | How to identify and weight comparable sales |
 | `kb.strata.health-indicators` | 2, 6 | Strata report red flags, sinking fund interpretation |
 | `kb.building-types.risk-by-type` | 2 | Risk profiles for established house, apartment, off-the-plan |
-| `scheme.fhg` | 3 | Federal First Home Guarantee — rules, caps by location, mechanics |
-| `scheme.fhss` | 3 | First Home Super Saver — contribution limits, release process, tax |
-| `scheme.help-to-buy` | 3 | Federal Help to Buy shared equity scheme |
-| `scheme.fhog.federal` | 3 | First Home Owner Grant (federal context) |
-| `scheme.qld.fhc` | 3 | QLD First Home Concession (established homes) |
-| `scheme.qld.fhnhc` | 3 | QLD First Home (New Home) Concession |
-| `scheme.vic.fhb-duty` | 3 | VIC First Home Buyer Duty Exemption / Concession |
-| `scheme.vic.fhog` | 3 | VIC First Home Owner Grant |
-| `scheme.nsw.fhbas` | 3 | NSW First Home Buyer Assistance Scheme |
-| `scheme.nsw.fhog` | 3 | NSW First Home Owner Grant |
+| `kb.scheme.fhg` | 3 | Federal First Home Guarantee — rules, caps by location, mechanics |
+| `kb.scheme.fhss` | 3 | First Home Super Saver — contribution limits, release process, tax |
+| `kb.scheme.help-to-buy` | 3 | Federal Help to Buy shared equity scheme |
+| `kb.scheme.qld.fhc` | 3 | QLD First Home Concession (established homes) |
+| `kb.scheme.qld.fhnhc` | 3 | QLD First Home (New Home) Concession |
+| `kb.scheme.vic.fhb-duty` | 3 | VIC First Home Buyer Duty Exemption / Concession |
+| `kb.scheme.vic.fhog` | 3 | VIC First Home Owner Grant |
+| `kb.scheme.nsw.fhbas` | 3 | NSW First Home Buyer Assistance Scheme |
+| `kb.scheme.nsw.fhog` | 3 | NSW First Home Owner Grant |
 | `kb.stamp-duty.calc-by-state` | 4 | Stamp duty calculation methodology per state |
 | `kb.buyer-costs.inspections-conveyancing-fees` | 4 | Typical ranges for buyer-side transaction costs |
 | `kb.cash-reserve.lender-expectations` | 4 | Lender expectations for post-settlement cash reserves |
@@ -841,7 +856,7 @@ The following kb_anchor slugs are referenced by components in this blueprint. Th
 | `kb.insurance.timing-of-risk-pass` | 7 | When risk passes to buyer; insurance binding timing |
 | `kb.lender-docs.standard-timeline` | 7 | Lender document timeline from approval to settlement |
 | `kb.ongoing-costs.rates-water-strata` | 8 | Council rates, water rates, strata levy ranges |
-| `kb.refi.windows-and-triggers` | 8 | When and how to refinance; lender switching mechanics |
+| `kb.refinance.windows-and-triggers` | 8 | When and how to refinance; lender switching mechanics |
 | `kb.graduation.lvr80` | 8 | The 80% LVR graduation event and FHG implications |
 | `kb.land-tax.ppor-exemption` | 8 | Land tax PPOR exemption rules |
 | `kb.maintenance.budget-by-property-type` | 8 | Maintenance budget heuristics by property type |

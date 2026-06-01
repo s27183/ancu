@@ -1,5 +1,5 @@
 ---
-slug: scheme.fhss
+slug: kb.scheme.fhss
 effective_from: 2024-09-15
 last_verified: 2026-05-30
 ---
@@ -8,7 +8,7 @@ last_verified: 2026-05-30
 
 The **First Home Super Saver** scheme lets a first home buyer save for a deposit **inside superannuation** and later withdraw those voluntary contributions (plus deemed earnings) to buy or build their first home. The benefit is tax: voluntary contributions made concessionally are taxed in super at 15% rather than at the saver's marginal rate, and the released amount attracts a 30% tax offset on withdrawal. It is administered by the **ATO**, not the super fund — the ATO issues the determination and authorises the release.
 
-FHSS is a **savings vehicle**, not a guarantee or a grant. It does not change how a buyer borrows; it changes how efficiently they accumulate the deposit. It therefore sits alongside, and is independent of, the [First Home Guarantee](fhg.md) (`scheme.fhg`).
+FHSS is a **savings vehicle**, not a guarantee or a grant. It does not change how a buyer borrows; it changes how efficiently they accumulate the deposit. It therefore sits alongside, and is independent of, the [First Home Guarantee](fhg.md) (`kb.scheme.fhg`).
 
 ## Eligibility
 
@@ -54,7 +54,7 @@ FHSS combines naturally with the **First Home Guarantee**: FHSS builds the depos
 
 ## Rules
 
-The resolver rules the artifact compiler extracts as this doc's `content_json` (schema: [architecture.md §11.9](../../../architecture/architecture.md#119-blueprint-as-data-model--presentation-specification)). Everything above is `content_md`. The `parameters{}` block holds the coefficients the resolver's (code) release-amount and tax formulas consume — `available_release_amount` and `tax_offset_estimate` are computed in resolver code, not filled by a rule here.
+The resolver rules the artifact compiler extracts as this doc's `content_json` (schema: [architecture.md §11.9](../../architecture/architecture.md#119-blueprint-as-data-model--presentation-specification)). Everything above is `content_md`. The `parameters{}` block holds the coefficients the resolver's (code) release-amount and tax formulas consume — `available_release_amount` and `tax_offset_estimate` are computed in resolver code, not filled by a rule here.
 
 ```jsonc
 {
@@ -64,7 +64,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
         { "field": "profile.age",                    "op": "gte", "value": 18 },     // at the release request
         { "field": "profile.ever_owned_au_property", "op": "eq",  "value": false },   // never held an AU property interest
         { "field": "profile.owner_occupier_intent",  "op": "eq",  "value": true },    // live in 6 of first 12 months
-        { "field": "profile.prior_fhss_release",     "op": "eq",  "value": false } ] } },  // ⚠ field NOT yet in the fact surface — see note
+        { "field": "profile.prior_fhss_release",     "op": "eq",  "value": false } ] } },  // one valid release per lifetime; field in the buyer_profile fact surface
 
     { "leaf": "eligibility.fhss.release_timeline_business_days",
       "rule": { "kind": "parameter", "type": "integer", "value": 25 } },             // plan for the upper end of the 15–25 range
@@ -83,7 +83,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
     "ato_notify_days_after_contract":      { "type": "integer",    "value": 90 }
   },
   "stacking": {
-    "combines_with": ["scheme.fhg", "state_concession"],
+    "combines_with": ["kb.scheme.fhg"],   // state-concession edges are declared by the state doc (symmetric aggregation, §11.9); a federal scheme never enumerates state slugs
     "alternative_to": [],
     "order_hint": 10
   }
@@ -92,7 +92,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
 
 Notes:
 
-- **`profile.prior_fhss_release`** (one valid release per lifetime) is referenced but **not yet in the buyer_profile fact surface** — same class as the ownership-history gap. Reference-integrity will fail the compile until it is added; flagged as a finding rather than silently dropped.
+- **`profile.prior_fhss_release`** (one valid release per lifetime) is now in the buyer_profile fact surface (`ownership_history` group — scheme-usage history, not property ownership), so this predicate passes reference-integrity. Resolved 2026-05-31 (task #14a).
 - **`available_release_amount`** computation needs the contribution split (concessional vs non-concessional) + associated earnings; the profile currently captures only a single `fhss_contributions_to_date` figure, so the resolver can estimate but not compute exactly until that split is captured. Minor.
 - `order_hint: 10` (lower than FHG's 20) — FHSS is acted on *earliest* (save over years before purchase).
 
