@@ -526,7 +526,7 @@ Same as [Mode C yield_modelling](investor-domestic-au.md#5-yield_modelling--new)
     "ppor_exemption_eligible": { "type": "bool", "value": false, "note": "Removed for foreign residents on disposal from 1 July 2020 with limited transition" },
     "estimated_capital_gain_at_exit": { "type": "money", "value": "<initial>" },
     "cgt_payable_at_marginal_rate": { "type": "money", "value": "<initial>" },
-    "foreign_resident_capital_gains_withholding_at_sale": { "type": "money", "value": "<initial>", "note": "12.5% (NSW/VIC) withholding on sale price by purchaser for properties >$750k" }
+    "foreign_resident_capital_gains_withholding_at_sale": { "type": "money", "value": "<initial>", "note": "Federal (ATO) foreign-resident CGT withholding — purchaser withholds at settlement; NOT state-based. Rate and any value threshold resolve from kb.foreign-investor.frcgw-on-sale, not hardcoded here" }
   },
   "vn_side_tax_implications": {
     "vn_tax_on_au_rental_income": { "type": "string", "value": "<initial>" },

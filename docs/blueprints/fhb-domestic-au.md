@@ -705,7 +705,7 @@ The `mortgage_plan` outcome feeds `cash_position` (loan amount + buffer requirem
     "deposit_due_date": { "type": "date", "value": "<initial>", "derived_from": "key_dates.contract_signed_date" },
     "finance_approval_deadline": { "type": "date", "value": "<initial>", "derived_from": "key_dates.contract_signed_date" },
     "settlement_date": { "type": "date", "value": "<from_document>" },
-    "building_insurance_effective_date": { "type": "date", "value": "<initial>", "derived_from": "key_dates.settlement_date" }
+    "building_insurance_effective_date": { "type": "date", "value": "<initial>", "derived_from": "property_fit.state + key_dates.contract_signed_date + key_dates.settlement_date", "note": "STATE-CONDITIONAL per kb.insurance.timing-of-risk-pass — QLD: on or before contract_signed_date (the standard REIQ contract passes risk to the buyer at 5pm the first business day after contract, so the buyer must insure on signing); NSW / VIC: settlement_date (risk stays with the vendor until settlement/possession). Deriving from settlement_date alone underinsures a QLD buyer for the entire contract→settlement window." }
   },
   "milestones": {
     "contract_signed": { "type": "milestone", "value": { "status": "<initial>", "due_date": "<initial>" } },
@@ -821,12 +821,12 @@ The following kb_anchor slugs are referenced by components in this blueprint. Th
 
 | Slug | Component(s) | Owns |
 |---|---|---|
-| `kb.hecs.thresholds` | 1 buyer_profile | HECS repayment thresholds, treatment by lenders |
-| `kb.firb.status-determination` | 1, 3 | How to determine FIRB classification from visa/citizenship status |
-| `kb.lender.serviceability-basics` | 1, 3 | Lender serviceability assessment basics (income, debts, buffer rate) |
+| `kb.hecs.thresholds` | 1 | HECS repayment thresholds, treatment by lenders |
+| `kb.firb.status-determination` | 1 | How to determine FIRB classification from visa/citizenship status |
+| `kb.lender.serviceability-basics` | 1, 4 | Lender serviceability assessment basics (income, debts, buffer rate) |
 | `kb.property.suburb-risk-factors` | 2 | Suburb-level risk (flood, planning, school catchment data sources) |
-| `kb.property.comparables-methodology` | 2, 5 | How to identify and weight comparable sales |
-| `kb.strata.health-indicators` | 2, 6 | Strata report red flags, sinking fund interpretation |
+| `kb.property.comparables-methodology` | 2 | How to identify and weight comparable sales |
+| `kb.strata.health-indicators` | 2 | Strata report red flags, sinking fund interpretation |
 | `kb.building-types.risk-by-type` | 2 | Risk profiles for established house, apartment, off-the-plan |
 | `kb.scheme.fhg` | 3 | Federal First Home Guarantee — rules, caps by location, mechanics |
 | `kb.scheme.fhss` | 3 | First Home Super Saver — contribution limits, release process, tax |
@@ -837,29 +837,35 @@ The following kb_anchor slugs are referenced by components in this blueprint. Th
 | `kb.scheme.vic.fhog` | 3 | VIC First Home Owner Grant |
 | `kb.scheme.nsw.fhbas` | 3 | NSW First Home Buyer Assistance Scheme |
 | `kb.scheme.nsw.fhog` | 3 | NSW First Home Owner Grant |
-| `kb.stamp-duty.calc-by-state` | 4 | Stamp duty calculation methodology per state |
-| `kb.buyer-costs.inspections-conveyancing-fees` | 4 | Typical ranges for buyer-side transaction costs |
-| `kb.cash-reserve.lender-expectations` | 4 | Lender expectations for post-settlement cash reserves |
-| `kb.lmi.calculation` | 4 | LMI estimation when not using FHG |
-| `kb.auction.rules-by-state` | 5 | Auction rules, cooling-off applicability, bidder registration |
-| `kb.cooling-off.by-state` | 5, 7 | Cooling-off periods by state and transaction mode |
-| `kb.negotiation.patterns-by-market-condition` | 5 | Negotiation patterns in hot vs cold markets |
-| `kb.agent-tactics.detection` | 5 | Common real estate agent tactics and counters |
-| `kb.comparables.reading-the-room` | 5 | Interpreting comparables in the context of an active offer |
-| `kb.contract-of-sale.review-points-by-state` | 6 | Standard CoS review points per state |
-| `kb.s32.review-points` | 6 | Section 32 review points (VIC) |
-| `kb.building-pest.interpretation` | 6 | Interpreting building and pest reports |
-| `kb.strata-report.red-flags` | 6 | Strata report red flags and what they mean |
-| `kb.special-conditions.standard-set` | 6 | Standard special conditions to request |
-| `kb.settlement.process-by-state` | 7 | Settlement process and timelines per state |
-| `kb.pexa.settlement` | 7 | PEXA electronic settlement mechanics |
-| `kb.insurance.timing-of-risk-pass` | 7 | When risk passes to buyer; insurance binding timing |
-| `kb.lender-docs.standard-timeline` | 7 | Lender document timeline from approval to settlement |
-| `kb.ongoing-costs.rates-water-strata` | 8 | Council rates, water rates, strata levy ranges |
-| `kb.refinance.windows-and-triggers` | 8 | When and how to refinance; lender switching mechanics |
-| `kb.graduation.lvr80` | 8 | The 80% LVR graduation event and FHG implications |
-| `kb.land-tax.ppor-exemption` | 8 | Land tax PPOR exemption rules |
-| `kb.maintenance.budget-by-property-type` | 8 | Maintenance budget heuristics by property type |
+| `kb.lender.fhg-panel-list` | 4 | FHG participating-lender panel (closed list; no rate premium) |
+| `kb.lender.hecs-treatment-by-lender` | 4 | Per-lender HECS/HELP treatment in serviceability |
+| `kb.lender.credit-card-treatment` | 4 | Credit-card limit treatment in serviceability |
+| `kb.lender.bnpl-treatment-2026` | 4 | BNPL treatment in serviceability (NCCP commencement 2025) |
+| `kb.lmi.providers` | 4 | LMI provider landscape; lender (not borrower) selects the insurer |
+| `kb.offset-account.basics` | 4 | Offset account mechanics |
+| `kb.stamp-duty.calc-by-state` | 5 | Stamp duty calculation methodology per state |
+| `kb.buyer-costs.inspections-conveyancing-fees` | 5 | Typical ranges for buyer-side transaction costs |
+| `kb.cash-reserve.lender-expectations` | 5 | Lender expectations for post-settlement cash reserves |
+| `kb.lmi.calculation` | 4, 5 | LMI estimation when not using FHG |
+| `kb.auction.rules-by-state` | 6 | Auction rules, cooling-off applicability, bidder registration |
+| `kb.cooling-off.by-state` | 6, 8 | Cooling-off periods by state and transaction mode |
+| `kb.negotiation.patterns-by-market-condition` | 6 | Negotiation patterns in hot vs cold markets |
+| `kb.agent-tactics.detection` | 6 | Common real estate agent tactics and counters |
+| `kb.comparables.reading-the-room` | 6 | Interpreting comparables in the context of an active offer |
+| `kb.contract-of-sale.review-points-by-state` | 7 | Standard CoS review points per state |
+| `kb.s32.review-points` | 7 | Section 32 review points (VIC) |
+| `kb.building-pest.interpretation` | 7 | Interpreting building and pest reports |
+| `kb.strata-report.red-flags` | 7 | Strata report red flags and what they mean |
+| `kb.special-conditions.standard-set` | 7 | Standard special conditions to request |
+| `kb.settlement.process-by-state` | 8 | Settlement process and timelines per state |
+| `kb.pexa.settlement` | 8 | PEXA electronic settlement mechanics |
+| `kb.insurance.timing-of-risk-pass` | 8 | When risk passes to buyer; insurance binding timing |
+| `kb.lender-docs.standard-timeline` | 8 | Lender document timeline from approval to settlement |
+| `kb.ongoing-costs.rates-water-strata` | 9 | Council rates, water rates, strata levy ranges |
+| `kb.refinance.windows-and-triggers` | 4, 9 | When and how to refinance; lender switching mechanics |
+| `kb.graduation.lvr80` | 9 | The 80% LVR graduation event and FHG implications |
+| `kb.land-tax.ppor-exemption` | 9 | Land tax PPOR exemption rules |
+| `kb.maintenance.budget-by-property-type` | 9 | Maintenance budget heuristics by property type |
 
 ---
 

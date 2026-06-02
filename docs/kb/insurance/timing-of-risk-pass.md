@@ -74,7 +74,7 @@ Notes:
 **Canonical (state authorities / legislation):**
 
 - *Conveyancing Act 1919* (NSW), **ss 66J–66M** (s66K risk passes at completion or stipulated post-possession time; s66L 28-day rescission for substantial damage; s66M abatement; s66J "substantially damaged" definition). Authorised version, current for 15 Aug 2025 — `docs/sources/nsw/conveyancing_act_1919_no_6.pdf`
-- *Sale of Land Act 1962* (Vic), **ss 34–36** (s34 14-day rescission if dwelling unfit, non-excludable; s35 vendor's insurance enures for the buyer between contract and possession). Authorised version — `docs/sources/vic/sales_of_land_act_1962.pdf`
+- *Sale of Land Act 1962* (Vic), **ss 34–36** (s34 14-day rescission if dwelling unfit, non-excludable; s35 vendor's insurance enures for the buyer between contract and possession). Authorised Version No. 172, incorporating amendments as at 25 November 2025 — `docs/sources/vic/sales_of_land_act_1962.pdf`
 - *Property Law Act 2023* (Qld), **s 77** ("Buyer may rescind contract if residential dwelling unfit for occupation" — rescind before the earliest of settlement, possession, or the seller restoring the dwelling; refund on rescission; applies despite any agreement to the contrary). Act No. 27 of 2023, authorised PDF current as at 28 Apr 2026 — https://www.legislation.qld.gov.au/view/pdf/inforce/current/act-2023-027
 - Queensland Government / conveyancing guidance — *risk passes to the buyer at 5pm on the first business day after the Contract Date* under the standard REIQ contract (cl 8.1); buyers should arrange insurance immediately after signing — https://www.qld.gov.au/law/housing-and-neighbours/buying-and-selling-a-property/buying-a-home
 

@@ -59,7 +59,7 @@ Notes:
 
 **Canonical (state authorities / legislation):**
 
-- *Conveyancing (Sale of Land) Regulation 2022* (NSW), **Schedule 1 Part 1** (prescribed documents — planning certificate, sewerage diagram, property certificate + plan, easement/covenant instruments) made under *Conveyancing Act 1919* **s52A(2)(a)** — `docs/sources/nsw/conveyancing_regulation_2022_act.pdf`
+- *Conveyancing (Sale of Land) Regulation 2022* (NSW), **Schedule 1 Part 1** (prescribed documents — planning certificate, sewerage diagram, property certificate + plan, easement/covenant instruments) made under *Conveyancing Act 1919* **s52A(2)(a)**. As-published instrument — Published LW 26 August 2022 (2022 No 485); this PDF is the as-made Regulation, not a later consolidated reprint — `docs/sources/nsw/conveyancing_regulation_2022_act.pdf`
 - NSW Fair Trading — *Making an offer on a property* (consumer-facing summary; ~10% deposit; review the contract before signing) — https://www.nsw.gov.au/housing-and-construction/buying-and-selling-property/buying-property-nsw/making-an-offer-on-a-property
 - Consumer Affairs Victoria — *Conveyancing and contracts for sellers* (the Section 32 vendor statement is the VIC pre-contract disclosure document) — https://www.consumer.vic.gov.au/housing/buying-and-selling-property/selling-property/conveyancing-and-contracts-for-sellers
 - Queensland Government — *Seller disclosure scheme* (mandatory disclosure statement + prescribed certificates before signing, from 1 Aug 2025; non-compliance may allow termination) — https://www.qld.gov.au/law/housing-and-neighbours/buying-and-selling-a-property/seller-disclosure-scheme
