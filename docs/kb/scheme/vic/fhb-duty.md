@@ -75,7 +75,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
 
 Notes:
 
-- **`duty_savings`** (the `eligibility.state_concession.duty_savings` leaf) is **not** filled here — resolver arithmetic against the Victorian land-transfer-duty rate schedule (`kb.scheme.vic.land-transfer-duty-rates`, to be authored) on the dutiable value. Same pattern as the QLD/NSW concessions.
+- **`duty_savings`** (the `eligibility.state_concession.duty_savings` leaf) is **not** filled here — resolver arithmetic against the Victorian land-transfer-duty rate schedule ([`kb.stamp-duty.calc-by-state`](../../stamp-duty/calc-by-state.md)) on the dutiable value. Same pattern as the QLD/NSW concessions.
 - **`concession_type`** is **resolver-derived**, not a flat parameter: `full_exemption` at or under `exemption_threshold` ($600k), `partial_concession` up to `concession_cap` ($750k), else `no_concession`. Banded selection is control flow → resolver code, document-supplied numbers.
 - **No `property_type` restriction** — the duty benefit covers new **and** established homes (and vacant land). This contrasts with QLD (separate new/established concessions) and is the reason there is no `alternative_to` within Victoria for the duty slot.
 - **`ever_owned_au_property` only** — Australia-only test, so `prior_overseas_property_ownership` is deliberately not consulted (the same neutral fact that disqualifies under QLD is not in this predicate).
