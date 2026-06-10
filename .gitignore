@@ -55,6 +55,10 @@ erl_crash.dump
 .rebar3/
 rebar3.crashdump
 
+# Compiled KB/blueprint artifact — a rebuildable projection of docs/ (git is SOT,
+# emitted at deploy by engine/build/kb_compiler.py). Not tracked.
+engine/erlang/priv/kb/artifact.json
+
 # Node / SvelteKit
 node_modules/
 .svelte-kit/
@@ -71,3 +75,9 @@ build/
 # Generated reports (local-only)
 docs/reports/
 docs/scratch/
+
+# The bare `build/` patterns above (Python / Node build OUTPUT) over-match
+# engine/build/ — which is build-TIME SOURCE (the KB artifact compiler), not
+# output. Re-include it (its own __pycache__ etc. stay ignored by their rules).
+!engine/build/
+!engine/build/**/*.py
