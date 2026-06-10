@@ -21,6 +21,7 @@ Critical reference docs by purpose:
 | If you need | Read |
 |---|---|
 | Strategic positioning, REA economics, wedge sequence | [`docs/03-strategy.md`](docs/03-strategy.md) |
+| **The whole picture** — every structure (blueprint, KB, foundations, agentic flow, plan card, engine/shell) and how they relate across planes, in diagrams (**read first**) | [`docs/architecture/structure-map.md`](docs/architecture/structure-map.md) |
 | Engine/shell split, three-layer architecture, blueprint model, property pipeline | [`docs/architecture/architecture.md`](docs/architecture/architecture.md) |
 | Engine↔shell boundary: primitives, events, metering, compliance gate | [`docs/architecture/engine-contract.md`](docs/architecture/engine-contract.md) |
 | When an operation needs the agent vs deterministic rules (resolver/agent decision rule) | [`docs/architecture/agentic-boundary.md`](docs/architecture/agentic-boundary.md) |
@@ -81,7 +82,7 @@ In order of value + dependency. **Engine is the dependency root** (the shell ren
 
 3. **`[build-time]` Suburb enrichment ingestion** — jobs writing the engine `suburbs` table: ABS Data API for SAL-level Census 2021 (Vietnamese ancestry %, demographics, family composition, dwellings); state education / planning / flood adapters; RBA FX daily. CoreLogic / PropTrack are PAID — deferred.
 
-4. **`[engine]` Gateway + planning sidecar (base scope)** — Erlang `/api/engine/*` + `gen_statem` per plan-card turn; Python sidecar loads `fhb-domestic-au.md`, validates kb_anchors resolve, runs each `scope: base` component (`buyer_profile`, `eligibility`, `mortgage_finance`/`cash_position`/`ownership_planning` base), streams `component_filled`. Wire the ASIC boundary into the compliance pipeline from day one.
+4. **`[engine]` Gateway + planning sidecar (base scope)** — Erlang `/api/engine/*` + `gen_statem` per plan-card turn; Python sidecar loads `fhb-domestic-au.md`, validates kb_anchors resolve, runs each `scope: base` component (`buyer_profile`, `eligibility`, `mortgage_finance`/`cash_position`/`ownership_planning` base), streams `component_filled`. Wire the ASIC boundary into the compliance pipeline from day one. **Slice 1 DONE** — the Erlang↔Python seam, gateway (`fh_engine_http` + handlers), ed25519 JWT auth, real `fh_engine_turn` lifecycle driving a supervised `{packet,4}` Python port, FIRB→ASIC→AML compliance pipeline (Mode-A pass-through), `plan_card_events` SOT + `content_jsonb` snapshot + `pg` SSE fan-out, all proven end-to-end with a **stub** sidecar (`engine/python/planner_stub.py`) against Docker PG (`engine/erlang/test/seam_smoke.escript`). **Slice 2 (next):** replace the stub with the real Anthropic-SDK sidecar (loads the compiled artifact into `persistent_term` at boot; dynamic prompt from plan-card state; resolver/agent two-path fill; `usage` metering) — needs `ANTHROPIC_API_KEY`. See [`docs/grounding-checklist.md`](docs/grounding-checklist.md) item 8.
 
 5. **`[shell]` Onboarding** — mode / state / VND-AUD range / map-zone / intent tags; calls the engine to create the plan card + run the base turn.
 
@@ -125,11 +126,12 @@ firsthomey/
 │   ├── samples/
 │   │   └── property-card-example.html
 │   └── first_home_buyer_plan.html (Mode A example output, design reference)
-├── engine/                       (to be created: Erlang/OTP gateway + Python sidecars — agentic planning)
+├── engine/                       (Erlang/OTP gateway + Python sidecars — agentic planning)
+│   ├── build/                    (offline KB+blueprint artifact compiler — kb_compiler.py: materializes the registry, runs structural+semantic gates, emits priv/kb/artifact.json)
 │   ├── erlang/                   (cowboy /api/engine/*, gen_statem per plan-card turn, compliance, metering, PGO)
 │   │   ├── priv/migrations/      (engine PG schema: plan-card state, events, sessions)
 │   │   └── priv/kb/              (compiled KB + blueprint artifact, emitted at deploy)
-│   └── python/                   (stateless sidecars: planning agent (Anthropic SDK), Playwright URL fetch)
+│   └── python/                   (to be created: stateless sidecars — planning agent (Anthropic SDK), Playwright URL fetch)
 ├── shell/                        (to be created: Svelte frontend + Erlang backend — UX, identity, commerce)
 │   ├── svelte/frontend/
 │   ├── svelte/backend/

@@ -1,0 +1,236 @@
+# Fact model vs. pipeline — a design finding and direction
+
+**Status:** Direction accepted; the plan-card-unit decision is **resolved** (see Decisions); the **concrete schema is drafted and reconciled to the live Mode A source** (see "The unified fact-base schema"); the four modeling sub-questions are **resolved against the canonical ground** (not open). Grounding revealed Mode A is *already* the canonical identity shape, so **item 2's executable-now work is this spec reconciliation, not a blueprint rewrite** — the structural generalizations (`off_title_parties[]`, `tax{}`) and B/C/D authoring are deferred to their real triggers (Wedge-2 authoring; `target → plan.*` rides the item-4 storage split). Two things stay deferred by design: the table-layout sub-question (to the PG-schema step) and B/C/D blueprint adoption ("build nothing for B/C/D").
+
+**Why this exists.** While grounding the cross-mode data flow (the §0 pass in [`grounding-checklist.md`](../grounding-checklist.md)), a single root cause surfaced under a string of seemingly-separate bugs. This doc records the finding, why the *strategy* (not taste) adjudicates it, and the direction — so the analysis is an artifact to decide against, not something reassembled from memory each time.
+
+Read alongside [`structure-map.md`](structure-map.md), the hub that maps all the structures and how they relate; this doc is about where one part of it (the buyer fact base) should go.
+
+---
+
+## The finding in one line
+
+The data **flow** is sound and should stay. The data **model** forks the buyer's fact shape per mode, and that fork — at the *identity/profile* layer specifically — is an initial scaffold that fights the strategy's central moat and is the root of every cross-mode bug in this workstream.
+
+## What is actually forked
+
+Each of the four blueprints re-declares the buyer's facts as a **different outcome type**:
+
+| Mode | buyer_profile outcome `type` | FIRB facts published | `applicants[]`? |
+|---|---|---|---|
+| A | `profile` | `firb_required_any` (+ per-applicant `firb_required` in `applicants[]`) | yes |
+| B | `profile_foreign` | flat `firb_required` (always true) | no (`au_member.visa_class → firb_classification`) |
+| C | `investor_profile_summary` | flat `citizenship_status` | no |
+| D | `investor_profile_foreign_summary` | flat `firb_required` (hard-set foreign) | no (`co_investor_count`) |
+
+The **property** layer is *not* forked — all four modes run `property_assessment → property_fit`, one shared shape. So the fork is asymmetric: **shared at the property layer, forked at the identity layer.** That asymmetry is the whole diagnosis.
+
+## Why this is the root of the bugs
+
+Every problem in this workstream traces to "the buyer's facts have four shapes":
+
+- `firb_required` vs `firb_required_any` (F14) — a shared FIRB KB doc can't name one field that exists in all anchoring modes, because each mode publishes the fact under a different name/shape.
+- `profile.*` vs `profile_foreign.*` — the namespace-addressing question only exists because the outcome `type` differs per mode.
+- "Does this rule resolve in mode X?" — the compiler-gate semantics we had to invent (skip modes lacking the namespace) is entirely a consequence of the fork.
+
+Unify the identity fact shape and this class of bug is **structurally absent**, not patched.
+
+## Why the strategy adjudicates it (not preference)
+
+Three independent lines in the settled docs all require a *single, continuous, mode-independent* buyer fact model:
+
+1. **Lifecycle continuity is the central moat — and it requires one fact model.** [`03-strategy.md`](../03-strategy.md) §8.3 ("persistent agent from student → PR → FHB → investor, a 10–25 year relationship") and §10.6. The UX makes it concrete: [`04-ux-model.md`](../04-ux-model.md) §13.2 and the An Tran journey (§13.5, Day 365) — *"Mode auto-switches from B → C… data accumulates across modes."* The **same person** is Mode B (foreign student, family-funded) then Mode C (PR investor). Four siloed profile types structurally **cannot** represent "An over time" — which is the moat itself.
+
+2. **Shared schema was always the stated intent.** [`03-strategy.md`](../03-strategy.md) §10: *"All four segments share the same Layer 1 KB, Layer 2 schema, Layer 3 reasoning infrastructure. What changes per segment is which flows are active and which user-state fields matter."* The intent was **one fact model, mode-varying pipelines.** The implementation forked the fact model *as well as* the pipeline; only the pipeline needed forking.
+
+3. **Both data moats are cross-mode analytics over buyer facts.** Demand aggregation (§8.3) and policy intelligence (§8.6 — case-level friction, scheme combinations actually used, cognitive-gap data) join across modes. Four divergent schemas make the asset four datasets that don't join; one fact model makes it the asset the strategy claims.
+
+## What stays (the flow mechanics are right)
+
+Nothing here argues against the pipeline machinery. Several pieces are strategy-required and should not move:
+
+- **Resolver/agent split** ⟸ the ASIC "computed, not advised" line ([`03-strategy.md`](../03-strategy.md) §9.1.4, §9.3).
+- **Slug-based KB + build-time compiler + snapshot-on-fill** ⟸ "scheme rules change constantly" (§9.1.3) + reproducible audit trail. This *is* the "evolve intelligently" engine.
+- **Outcomes-carry-facts-not-verdicts + one-access-path** ⟸ bounded agent, clean audit.
+- **Mode-specific pipelines** ⟸ the genuine ~50% structural difference (architecture §11.9 "Four blueprints"). Pipelines *should* vary by mode; they just shouldn't each redefine the buyer's fact shape.
+
+## Direction (to decide, then design concretely)
+
+1. **One canonical, mode-independent buyer fact model.** The registry's `profile.*` becomes a single schema holding every fact any mode can need (citizenship/visa status, `applicants[]`, cross-border family funder, co-investors, intent, funds provenance). A mode **populates a subset**; it does not redefine the shape. `firb_required` is one fact, derived uniformly regardless of which input fields a mode collects.
+2. **Pipelines stay mode-specific** — which components run, and in what order, still varies by mode. They **read the one fact model**.
+3. **Mode is a derived view** over the fact model (FIRB status + intent). A mode-switch re-runs a different pipeline over the **same accumulating facts** — exactly [`04-ux-model.md`](../04-ux-model.md) §13.2's "automatic based on user-state attributes."
+4. **KB rules bind to the one namespace.** The addressing convention largely dissolves: one `profile.*`, no per-mode type divergence; a rule is mode-scoped only where the *fact* is genuinely mode-specific.
+
+## Wedge 1 staging — this does not expand Wedge 1 scope
+
+Wedge 1 is Mode A only (4–6 weeks). The move is **design the seam now, populate later**: author Mode A's identity layer as *"the shared fact model, Mode-A subset filled,"* not *"Mode A's private `profile` type."* Build nothing for B/C/D. The only cost now is shaping Mode A's profile so B/C/D **populate** it later rather than **fork** it — the difference between forward-compatible and re-paying this debt at Wedge 2.
+
+## Decisions
+
+### 1. Plan-card unit — RESOLVED: do not key on mode
+
+`per (user × mode)` is rejected. A partition key must be **stable** and **single-valued**; the scenario set ([`../blueprints/scenarios.md`](../blueprints/scenarios.md)) proves mode is neither:
+
+- **Mutable** (breaks stability, and the lifecycle moat): the mode-defining facts change inside a live plan — S3 (PR granted mid-plan, `citizenship_status` flips, FIRB re-derives), S22/S23 (applicant set changes), and An's B→C (UX §13.5). Keying on mode would orphan the accumulated fact base at every mode boundary — severing the 10–25-year continuity that is the moat (strategy §8.3).
+- **Multi-valued** (breaks single-valuedness): S1 (citizen + 482 co-buyer) and S4 (citizen + foreign parent on title) are **one plan, two modes** — the domestic applicant runs Mode A while the foreign applicant's interest routes to the FIRB path. There is no single mode to key on.
+
+The resolved schema is three layers, mode derived at the top:
+
+1. **User / household fact base** — persistent, accumulating, **mode-independent**: the applicant set (per-applicant facts — F1/F2/F3), the non-buying partner (F4), household financials, documents, decision trail, FIRB approvals. This *is* the unified fact model above and the lifecycle-continuity anchor.
+2. **Plan (purchase journey)** — keyed by *journey*, **not** mode: an applicant subset + target (state/price/zone, mutable — S24) + zero-or-more property addenda. **1..N per user** over a lifetime (first home → investment = two journeys over one fact base); Wedge 1 populates exactly one.
+3. **Mode** — *derived* per plan **and** per applicant, re-computed as facts change. A label on the view, never a row key.
+
+This satisfies both grounding factors and leaves the COVERED scenario core (scheme stacking, LVR, strata, settlement) untouched — they read the fact base exactly as today.
+
+**Deferred sub-question (to the PG-schema step):** whether the user fact base and the journey-keyed plan are **one table with a journey discriminator** or **two tables** (fact base ⟵ plans by FK). Both express the decision above; it's a normalisation call made when the migration is written.
+
+### 2. Sequencing — design-first
+
+We are on path: work the unified-fact-model design to a concrete shape *before* further KB/blueprint edits, treating the four current blueprints as the thing being refactored. KB/blueprint edits stay parked until the unification is planned (see below).
+
+## The unified fact-base schema (concrete design)
+
+This realizes the Direction above as a concrete shape — item 1 of [`../grounding-checklist.md`](../grounding-checklist.md). It is what the four blueprints' identity layer refactors onto (item 2) and what the PG migration keys against (item 4). Wedge 1 authors **Mode A's subset of this one type**, not a Mode-A-private `profile`.
+
+Grounded in the live identity outcomes of all four blueprints (re-read at design time): Mode A `profile` (the rich one — `applicants[]`, `non_buying_partner`, `firb_required_any`), Mode B `profile_foreign` (`au_member` scalar + `vn_family_member` funder), Mode C `investor_profile_summary` (portfolio + `marginal_tax_rate`), Mode D `investor_profile_foreign_summary` (global portfolio + `vn_marginal_tax_rate`). Every field below traces to one of those.
+
+**This schema is the persistent fact base (the item-4 storage shape), not a blueprint outcome.** Each mode's `buyer_profile` *outcome* is a flatter **projection** of it; Mode A's validated `profile` outcome ([`../blueprints/fhb-domestic-au.md`](../blueprints/fhb-domestic-au.md) §1) is the **reference projection** and is **already** the canonical identity shape — `applicants[].citizenship_status → applicant.firb_required → profile.firb_required_any`, the scalar `non_buying_partner`, the F1–F12 facts — validated 45/45 and wired into the KB (e.g. `status-determination.md`, `established-dwelling-ban.md`). So item 2 does **not** churn Mode A, and the canonical field names are **Mode A's** (e.g. `citizenship_status`, not a fresh `residency_status`): renaming would churn a regulated graph for zero Mode-A gain. The structural generalizations below that go *beyond* Mode A's current outcome — `off_title_parties[]` (array vs Mode A's scalar `non_buying_partner`), `tax{}` (object vs flat `tax_residency`), the `household_financials`/`derived`/`traits` grouping, `existing_portfolio` — are the **canonical target**; Mode A keeps filling its validated subset, and full adoption (Mode-A restructure + authoring in B/C/D) is **deferred** under "build nothing for B/C/D." Two consequences ride later items, not this one: `target → plan.*` rides the **item-4** storage split (where the plan/profile partition is actually built); B/C/D adopting the canonical names rides **Wedge-2** authoring — and *that* is what closes F14 (`established-dwelling-ban` already reads the aggregate `profile.firb_required_any` correctly, confirmed live; the fork to fix is B/D publishing it, not the KB doc).
+
+### Three layers, concretely (Decision 1, made buildable)
+
+| Layer | Lifetime | Keyed by | Holds |
+|---|---|---|---|
+| `profile` | persistent, accumulates over the user's life | user / household | the buyer facts — **one** mode-independent shape |
+| `plan` | per purchase journey (1..N) | journey id | what *this* purchase is: applicant subset, intent, target, addenda |
+| `mode` | derived, recomputed as facts change | — (**never** a key) | a label = (firb axis × intent axis) |
+
+### `profile` — one canonical type, every mode a subset
+
+```jsonc
+profile {                                  // ONE type, all modes; a mode fills a subset, never redefines the shape
+  applicants: [ {                          // 1..N — the eligibility/FIRB fact surface
+                                           //   (unifies A.applicants[], B.au_member, C/D scalar identity + co_investor_count)
+    role,                                  // primary | co_buyer | co_investor
+    citizenship_status,                    // citizen | permanent_resident | temporary_resident | non_resident
+                                           //   ← the canonical FIRB axis. ADOPTS Mode A's validated field name (already wired
+                                           //     into status-determination + the KB, validated 45/45) — NOT a fresh
+                                           //     `residency_status`. B/C/D adopt THIS (was B.visa_class class, C.citizenship_status,
+                                           //     D.firb_classification).
+    visa_class,                            // B-add: finer detail when temporary_resident (Mode B lender treatment + FIRB nuance);
+                                           //     null otherwise. Mode A's surface does not collect it yet.
+    firb_required,                         // DERIVED per applicant from residency_status (+ visa_class) — the per-person fact
+    age,
+    owner_occupier_intent,                 // this person intends to live there (A, B)
+    ownership_history { ever_owned_au_property, ever_owned_and_occupied_residence,
+                        years_since_last_au_property_interest, prior_overseas_property_ownership,
+                        prior_fhss_release, currently_owns_property },   // A today; B/C/D fill the subset their schemes test
+    tax { residency_for_tax, marginal_rate, jurisdiction }              // unifies A.tax_residency, C.marginal_tax_rate (AU),
+                                                                        //   D.vn_marginal_tax_rate (VN); jurisdiction disambiguates
+  } ],
+  off_title_parties: [ {                   // 0..N — people linked to the purchase but NOT on title
+                                           //   (unifies A.non_buying_partner + B.vn_family_member)
+    relationship,                          // spouse | de_facto | parent | sibling | family_pool | other
+    counts_for_couple_as_one,              // true → ownership folds into the all-applicants eligibility test (F4)
+    ownership_history { … },               // populated when counts_for_couple_as_one
+    funder { expected_to_fund, residence_country, contribution_capacity_aud }   // populated when this party funds (B VN parent, D family pool)
+  } ],
+  household_financials {
+    income { assessable_income, foreign_sourced_component, foreign_income_currency, income_stability },  // A; B au-side; D vn-side→AUD-equiv
+    savings_and_deposit { cash_savings, genuine_savings_evidence_months, family_gift_or_loan_amount,
+                          fhss_contributions_to_date,
+                          funds_provenance { deposit_source, cross_border_transfer, transfer_channel } },
+    debts { hecs_balance, credit_card_limits_total, personal_loans_balance, car_loan_balance, buy_now_pay_later_balance },
+    existing_portfolio { ppor_owned, ppor_estimated_equity, investment_count, investment_value,
+                         investment_loans, net_yield_estimate }         // C/D; A fills ppor_* only for a rentvestor
+  },
+  traits {                                 // persistent dispositions that ACCUMULATE across journeys (per-journey posture lives in `plan`)
+    experience_level                       // C/D — monotonic across journeys (first → experienced)
+  },
+  derived {                                // household-level FACTS (not verdicts), recomputed on any applicant change
+    applicant_count,
+    firb_required_any,                     // TRUE iff ANY applicant.firb_required — the SINGLE household FIRB fact, ALL modes
+                                           //   (B/D = true definitionally). This is the F14 fix.
+    new_build_only_constraint,             // property-INDEPENDENT corollary of foreign + ban-in-force
+                                           //   (the per-property verdict established_property_eligible lives in firb_workflow — sub-question 3)
+    approx_borrowing_capacity,             // owner-occ (A/B) or investment-loan (C/D) flavoured by plan.intent
+    deposit_ready_for_purchase_amount,
+    ppor_equity_available_for_leverage,    // C/D
+    available_capital_aud_equivalent       // D
+  },
+  narrative { key_constraints, key_strengths }
+}
+```
+
+### `plan` — the purchase journey (what moves OUT of `profile`)
+
+Everything *about a specific purchase* — therefore mutable per journey — moves here. Today Mode A's `profile` outcome conflates `target_price_range` / `target_zone` into the persistent profile; under Decision 1 (target is per-journey, mutable — scenario S24) they belong to the plan:
+
+```jsonc
+plan {                                     // one purchase journey; 1..N per profile (first home → later investment = two plans, one fact base)
+  applicant_subset,                        // which profile.applicants are on THIS purchase
+  intent,                                  // owner_occupier | investment   ← the intent axis of mode
+  intended_occupancy_use,                  // sole_occupier | partial_rental | granny_flat | not_occupied (F12) — only when intent=owner_occupier
+  target { price_range, zone, state, timeline },                        // MOVED out of profile (mutable per journey — S24)
+  risk_tolerance { negative_gearing_comfort, vacancy_months_comfort,    // per-journey posture (sub-question 2); was C/D investor_profile params
+                   leverage_comfort_lvr, currency_volatility_concern },
+  investment_goals { primary, secondary, intended_hold_period_years, exit_strategy },   // only when intent=investment (was C/D params)
+  property_addenda: [ … ]                  // 0..N attached properties (unchanged)
+
+}
+```
+
+### Mode is derived — two axes
+
+```
+firb_axis   = profile.derived.firb_required_any   →  domestic | foreign    (COMPOSITIONAL: per-applicant firb_required picks each person's sub-path)
+intent_axis = plan.intent                         →  fhb | investor        (per-plan)
+
+              owner_occupier      investment
+  domestic         A                  C
+  foreign          B                  D
+```
+
+A **mixed-status plan** (S1 citizen + 482 partner; S4 citizen + foreign parent on title) is exactly "one plan, two modes": `intent_axis` is fixed for the plan (e.g. `fhb`), while `firb_axis` varies **by applicant** — the domestic applicant runs the A sub-path, the foreign applicant's interest routes to the B (FIRB) sub-path. That is why mode cannot be a row key (it is multi-valued here) and the partition is `applicants[]` + journey instead.
+
+### How each mode populates the one schema
+
+| Branch | A (dom FHB) | B (foreign FHB) | C (dom investor) | D (foreign investor) |
+|---|---|---|---|---|
+| `applicants[]` | 1..N, mixed status | AU member (1) | 1..N citizen/PR | 1..N foreign |
+| `off_title_parties[]` | non-buying partner | VN funder | — | family pool |
+| `household_financials.income` | ✓ | au-side | ✓ | vn-side → AUD |
+| `…existing_portfolio` | ppor only (rentvestor) | — | ✓ | ✓ global |
+| `traits` | — | — | ✓ | ✓ |
+| `derived.firb_required_any` | computed | = true | = false | = true |
+| `derived.new_build_only_constraint` | (false) | = true | (false) | = true |
+| `plan.intent` | owner_occupier | owner_occupier / future-PPOR | investment | investment |
+| `plan.risk_tolerance` | — | — | ✓ | ✓ |
+| `plan.investment_goals` | — | — | ✓ | ✓ |
+
+### What this collapses (the bug class that becomes structurally absent)
+
+- **F14** — one `derived.firb_required_any`, present in every mode (B/D = true definitionally). `kb.firb.established-dwelling-ban` reads it uniformly; the fork that made the field un-nameable across modes is gone.
+- **`profile.*` vs `profile_foreign.*`** — one type, one read namespace. The §11.9 "canonical slot alias" is simply `profile.*`; the per-mode addressing question dissolves.
+- **`au_member` / `co_investor_count` / `buying_alone`** — degenerate views of `applicants[]` (`au_member` = the lone AU applicant; `co_investor_count` = length − 1; `buying_alone` = count == 1).
+- **`non_buying_partner` + `vn_family_member`** — one role-tagged `off_title_parties[]`.
+- **`marginal_tax_rate` (C) + `vn_marginal_tax_rate` (D) + `tax_residency` (A)** — per-applicant `tax{}` with `jurisdiction`.
+
+### Modeling sub-questions — resolved against the canonical ground
+
+These are not preference calls. The canonical ground for the project's design decisions, in priority: **strategy** (`../03-strategy.md`) → **architecture principles + §11.9 component-flow** (outcomes-carry-facts-not-verdicts, one-access-path, components-read-outcomes-not-params, DAG ordering) → **the designed scenarios** (`../blueprints/scenarios.md`) → **the live blueprints** (the consuming components). Each sub-question is adjudicated by that corpus, not by taste.
+
+1. **`off_title_parties[]` merge → MERGE.** Ground: *one-access-path*. A funding non-buying spouse is one person carrying two role flags; two separate fields would split that person across two records and break one-access-path. The schema stays one array; each consumer filters by the flag it reads (`eligibility` ← `counts_for_couple_as_one`; `cross_border_funding` ← `funder`).
+2. **`traits` placement → SPLIT (per Decision-1's per-journey test).** `experience_level` accumulates monotonically across journeys → stays in `profile`. `risk_tolerance` is a per-journey posture (cautious first home vs aggressive later investment) → moves to `plan` alongside `investment_goals`. `tax.marginal_rate` is assessed per person → stays per-applicant in `applicants[]`. *(This corrects the schema above, which provisionally placed `risk_tolerance` under `profile.traits`.)*
+3. **`established_property_eligible` → VERDICT; moves to `firb_workflow` (not a `profile` field).** Two grounds converge. (a) *Outcomes-carry-facts-not-verdicts* — precedent in this very file: Mode A already **removed `fhg_eligible_basic`** from its `profile` outcome ("a scheme verdict; now computed in `eligibility`", `fhb-domestic-au.md` line 221); `established_property_eligible` in B/D is the identical category error. (b) *DAG ordering* — it depends on `property_fit.property_type`, but `profile` runs **before** `property_assessment`, so it cannot be a profile field at all. `profile.derived` keeps only the property-independent status facts (`firb_required_any`, `new_build_only_constraint`); the per-property determination is produced by `firb_workflow` (reads `firb_required_any` + `property_fit.property_type` + `kb.firb.established-dwelling-ban`). *(This corrects the schema above, which provisionally kept `established_property_eligible` under `profile.derived`.)*
+4. **`target` profile→plan → not an open fork.** Already settled by Decision 1 (per-journey, mutable — S24). Listed here only to mark it as a *consequence* executed in the item-2 refactor + item-4 migration, not a decision still to make.
+
+### Wedge-1 staging (no scope expansion)
+
+Mode A is **already** authored as this canonical identity shape ([`../blueprints/fhb-domestic-au.md`](../blueprints/fhb-domestic-au.md) §1, validated 45/45): `applicants[]` with `citizenship_status`/`firb_required`, the scalar `non_buying_partner`, household income/savings/debts, `derived.firb_required_any`, `new_build_only_constraint` (= false for Mode A), `narrative`. So Wedge 1 needs **no Mode-A restructure**. The only forward-compat cost *now* is a **spec** one: recording in this doc that the canonical fact base generalizes Mode A's scalars (`non_buying_partner → off_title_parties[]`, `tax_residency → tax{}`) and that `target` is a `plan` attribute — so B/C/D **populate** the shared shape later, and item 4 partitions storage correctly, rather than re-forking at Wedge 2. Build nothing for B/C/D now.
+
+## Relationship to parked work
+
+The two edits parked earlier — pinning the read-namespace convention in architecture §11.9, and the `established-dwelling-ban` FIRB read — are **downstream of decision 1**, now resolved, and grounding in the live source corrects what they are:
+
+- **Read-namespace convention.** Under the unified fact base there is one `profile.*` namespace across modes, so the convention is "read by the canonical (mode-independent) slot alias." This is a §11.9/`structure-map.md` edit, and it rides Wedge-2 (when B/C/D actually adopt the shape and a second namespace would otherwise appear); for Mode A alone there is only ever `profile.*`, so nothing to pin yet.
+- **`established-dwelling-ban` read — no revert needed.** The parked note assumed it should read flat `profile.firb_required`; the live predicate already reads the aggregate `profile.firb_required_any` (`established-dwelling-ban.md` line 74), which is **correct** under the unified design (the household-level FIRB fact). There is no Mode-A edit here. The only fix this anchor needs is on the **B/D publish side** (they currently emit flat `firb_required`; they must publish `firb_required_any`) — Wedge-2 authoring, the F14 close.

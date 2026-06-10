@@ -248,7 +248,7 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
     "lga": { "type": "string", "value": "<from_suburb>", "note": "ABS local government area — neutral geo fact; feeds each scheme's own region tiering (e.g. FHG location_tier)" },
     "is_capital_city": { "type": "bool", "value": "<from_suburb>", "note": "neutral geo fact — property is in the state capital LGA" },
     "price": { "type": "money", "value": "<from_property_card>" },
-    "property_type": { "type": "enum", "options": ["established_house", "established_apartment", "new_house", "new_apartment", "off_the_plan", "house_and_land"], "value": "<from_property_card>" },
+    "property_type": { "type": "enum", "options": ["established_house", "established_apartment", "new_house", "new_apartment", "off_the_plan", "house_and_land", "vacant_land"], "value": "<from_property_card>" },
     "bedrooms": { "type": "integer", "value": "<from_property_card>" },
     "bathrooms": { "type": "integer", "value": "<from_property_card>" },
     "parking_spaces": { "type": "integer", "value": "<from_property_card>" }
@@ -295,7 +295,7 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
     "lga": "string",                                  // ABS LGA — feeds each scheme's own region tiering
     "is_capital_city": "bool",                        // neutral; FHG tier = capital OR designated regional centre
     "price": "money",
-    "property_type": "enum [established_house, established_apartment, new_house, new_apartment, off_the_plan, house_and_land]",
+    "property_type": "enum [established_house, established_apartment, new_house, new_apartment, off_the_plan, house_and_land, vacant_land]",
     // viability verdicts/narrative (this component's own reasoning)
     "viability_verdict": "enum [proceed, proceed_with_caution, reconsider]",
     "key_strengths": "array<string>",
@@ -318,7 +318,7 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
 
 **Inputs:** base — `buyer_profile.outcome` (incl. `target_price_range`, `target_zone`); per-property — adds `property_assessment.outcome`
 
-**KB anchors:** `kb.scheme.fhg`, `kb.scheme.fhss`, `kb.scheme.help-to-buy`, `kb.scheme.qld.fhc`, `kb.scheme.qld.fhnhc`, `kb.scheme.vic.fhb-duty`, `kb.scheme.vic.fhog`, `kb.scheme.nsw.fhbas`, `kb.scheme.nsw.fhog`
+**KB anchors:** `kb.scheme.fhg`, `kb.scheme.fhss`, `kb.scheme.help-to-buy`, `kb.scheme.qld.fhc`, `kb.scheme.qld.fhnhc`, `kb.scheme.qld.fh-vacant-land`, `kb.scheme.vic.fhb-duty`, `kb.scheme.vic.fhog`, `kb.scheme.nsw.fhbas`, `kb.scheme.nsw.fhog`
 
 **Renderer:** `scheme-stack-card`
 

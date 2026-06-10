@@ -49,9 +49,9 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
     { "leaf": "eligibility.state_concession.applicable",
       "rule": { "kind": "criteria", "combine": "all_of", "criteria": [
         { "field": "property_fit.state",             "op": "eq",  "value": "NSW" },
-        { "field": "profile.ever_owned_au_property", "op": "eq",  "value": false },             // AU-only test — overseas ownership does NOT disqualify (favourable; opposite of QLD)
-        { "field": "profile.citizenship_status",     "op": "in",  "value": ["citizen", "permanent_resident"] },
-        { "field": "profile.owner_occupier_intent",  "op": "eq",  "value": true },              // move in within 12 mo, live 6 continuous mo
+        { "field": "applicant.ever_owned_au_property", "op": "eq",  "value": false },             // AU-only test — overseas ownership does NOT disqualify (favourable; opposite of QLD)
+        { "field": "applicant.citizenship_status",     "op": "in",  "value": ["citizen", "permanent_resident"] },
+        { "field": "applicant.owner_occupier_intent",  "op": "eq",  "value": true },              // move in within 12 mo, live 6 continuous mo
         { "field": "property_fit.price",             "op": "lte", "value": 1000000 } ] } },     // outer bound for a HOME; above $1M no concession. Vacant-land bands are lower — see Notes
         // property_fit.* criteria activate in per-property scope; base scope evaluates the profile-only criteria → provisional
 
@@ -77,7 +77,7 @@ Notes:
 
 - **`duty_savings`** (the `eligibility.state_concession.duty_savings` leaf) is **not** filled here — it is resolver arithmetic against the NSW transfer-duty rate schedule ([`kb.stamp-duty.calc-by-state`](../../stamp-duty/calc-by-state.md)) on the dutiable value. Same pattern as the QLD concessions and FHG's `lmi_savings_estimate`.
 - **`concession_type`** is **resolver-derived**, not a flat parameter: for a home, `full_exemption` at or under `home_exemption_threshold`, `partial_concession` up to `home_concession_cap`, else `no_concession`; for vacant land, the lower `vacant_land_*` thresholds apply. Banded/property-type-dependent selection is control flow → resolver code, document-supplied numbers ("computed, not asserted").
-- **Vacant land has its own lower thresholds**, but the `property_fit.property_type` enum has no `vacant_land` value (the closest is `house_and_land`, the build path). The `applicable` predicate uses the home ceiling ($1M) as the outer bound; the resolver applies the vacant-land bands when the purchase is land-only. Flag for refinement if a `vacant_land` property type is ever added to the surface.
+- **Vacant land has its own lower thresholds**, and the `property_fit.property_type` enum now carries a distinct `vacant_land` value (separate from `house_and_land`, the bundled build package). FHBAS is a *single* type-agnostic scheme — it covers a home (new or existing) **and** vacant land — so the `applicable` predicate has no property-type criterion; it uses the home ceiling ($1M) as the coarse outer bound. The resolver branches the **band** on `property_fit.property_type`: `vacant_land` → the lower `vacant_land_*` thresholds ($350k exemption / $450k cut-off); the home types → `home_*` ($800k / $1M). The banded `concession_type` is the authoritative full/partial/none verdict (a $600k vacant-land purchase resolves `no_concession` even though it clears the coarse $1M bound).
 - **`ever_owned_au_property` only** — FHBAS is Australia-only, so `prior_overseas_property_ownership` is **deliberately not** in the predicate (it would wrongly disqualify). This is the fact surface working as intended: the same neutral overseas fact that disqualifies under QLD is simply not consulted here.
 - **The "previously received this scheme" gate and the spouse extension are not encoded as hard predicates.** There is no `profile.prior_fhbas_benefit` fact, and the spouse's ownership/benefit history is not on the surface. Both are rare for a fresh Mode A first-home buyer; documented here rather than dangling unbacked references — promote to facts only if they prove load-bearing. (Same treatment as FHNHC's "never claimed the vacant-land concession" edge case.)
 

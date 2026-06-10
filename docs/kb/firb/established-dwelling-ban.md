@@ -64,14 +64,15 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
     // The in-ban purchase-eligibility predicate for a foreign person against THIS property.
     // any_of: not a foreign person (ban N/A — this branch also absorbs the NZ-citizen/SCV and
     // spouse-as-joint-tenants carve-outs, which resolve upstream at kb.firb.status-determination to
-    // firb_required=false) OR the property is a new/near-new build (permitted). The resolver GATES this
+    // applicant.firb_required=false, propagating to the aggregate profile.firb_required_any read below)
+    // OR the property is a new/near-new build (permitted). The resolver GATES this
     // predicate with the ban window (see established_dwelling_ban_applies in Notes): outside the window an
     // established dwelling is purchasable with approval, so this predicate is decisive only while the ban
     // is in force. The commercial-scale exceptions (redevelopment ≥20 dwellings, BTR, PALM) are
     // agent-surfaced, not resolver predicates — see Notes.
     { "leaf": "firb_workflow.eligibility.foreign_person_can_purchase",
       "rule": { "kind": "criteria", "combine": "any_of", "criteria": [
-        { "field": "profile.firb_required",      "op": "eq", "value": false },
+        { "field": "profile.firb_required_any",  "op": "eq", "value": false },
         { "field": "property_fit.property_type", "op": "in", "value": ["new_house", "new_apartment", "off_the_plan", "house_and_land"] } ] } },
 
     { "leaf": "firb_workflow.eligibility.firb_application_required",
@@ -108,7 +109,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
 Notes:
 
 - **The exception lattice is split by layer, not flattened into one predicate (design resolution).** The five exceptions fall into two kinds, each handled at its correct layer rather than re-encoded here:
-  - **Status-level carve-outs** — New Zealand citizens / SCV (444) holders, and the spouse-of-citizen/PR/NZ-citizen acquiring **as joint tenants** — change whether the buyer is a *foreign person requiring approval* at all. They resolve **upstream** at [`kb.firb.status-determination`](status-determination.md) to `profile.firb_required == false`, which the `foreign_person_can_purchase` `any_of` already absorbs. No predicate is dropped; it is captured one layer up.
+  - **Status-level carve-outs** — New Zealand citizens / SCV (444) holders, and the spouse-of-citizen/PR/NZ-citizen acquiring **as joint tenants** — change whether the buyer is a *foreign person requiring approval* at all. They resolve **upstream** at [`kb.firb.status-determination`](status-determination.md), which sets the carved-out applicant's `applicant.firb_required = false`; this propagates to the household aggregate `profile.firb_required_any` — the field the `foreign_person_can_purchase` `any_of` actually reads (line 74). No predicate is dropped; it is captured one layer up.
   - **Supply-increasing / commercial-scale exceptions** — redevelopment (≥20 dwellings), BTR / retirement / aged-care / student accommodation, PALM employer housing — turn on the buyer's **development intent**, which is not a Mode B/D FHB or single-dwelling-investor fact (no `redevelopment_intent` / `is_btr` field in the surface). Encoding them as hard predicates would dangle unbacked references, so they are **agent-surfaced** pathways ("if you are buying to redevelop into 20+ dwellings…") — reserving the agent for the irreducible. Promote one to a profile fact only if it proves load-bearing (rare for these buyers).
 - **`established_dwelling_ban_applies` is resolver-derived from the window, so it is not a `fills` rule** (same pattern as FHNHC `duty_savings` / FHG `lmi_savings_estimate`, which are resolver-computed, not asserted). The resolver reads `ban_start_date`/`ban_end_date` from this doc and computes `start ≤ today ≤ end`; when the window closes 30 Jun 2029 the verdict flips with **no blueprint edit** — "computed, not asserted." It also **gates** `foreign_person_can_purchase`: out of window, the new-build-only predicate stops being decisive. The `firb_workflow` blueprint param was changed from a hardcoded `value: true` to this resolver derivation as part of wiring (below).
 - **No `context.current_date` / `value_ref` (design resolution).** An earlier draft modelled the window check as a `criteria` rule over `context.current_date` with a `value_ref` to a parameter. §11.9 sanctions neither — the registry has no `context.*` external source, and the grammar forbids control flow in `content_json`. The correct shape (used here) is **dates as `parameter` leaves + the comparison in resolver code**; no schema extension was needed.

@@ -50,10 +50,10 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
     { "leaf": "eligibility.state_concession.applicable",
       "rule": { "kind": "criteria", "combine": "all_of", "criteria": [
         { "field": "property_fit.state",             "op": "eq",  "value": "VIC" },
-        { "field": "profile.ever_owned_au_property", "op": "eq",  "value": false },            // AU-only test — overseas ownership does NOT disqualify (favourable; opposite of QLD)
-        { "field": "profile.age",                    "op": "gte", "value": 18 },
-        { "field": "profile.citizenship_status",     "op": "in",  "value": ["citizen", "permanent_resident"] },
-        { "field": "profile.owner_occupier_intent",  "op": "eq",  "value": true },             // live 12 continuous months, starting within 12 months of settlement
+        { "field": "applicant.ever_owned_au_property", "op": "eq",  "value": false },            // AU-only test — overseas ownership does NOT disqualify (favourable; opposite of QLD)
+        { "field": "applicant.age",                    "op": "gte", "value": 18 },
+        { "field": "applicant.citizenship_status",     "op": "in",  "value": ["citizen", "permanent_resident"] },
+        { "field": "applicant.owner_occupier_intent",  "op": "eq",  "value": true },             // live 12 continuous months, starting within 12 months of settlement
         { "field": "property_fit.price",             "op": "lte", "value": 750000 } ] } },     // outer bound; ≤$600k exempt, $600k–$750k sliding concession, above → none. Covers new AND established (no property_type restriction)
         // property_fit.* criteria activate in per-property scope; base scope evaluates the profile-only criteria → provisional
 

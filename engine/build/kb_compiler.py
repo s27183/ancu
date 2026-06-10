@@ -1,0 +1,641 @@
+#!/usr/bin/env python3
+"""KB + blueprint artifact compiler (build-time, engine-owned).
+
+Promotes the old structural sweep (tests/validate_build.py) into the compiler
+§11.9 specifies: it parses every `docs/kb/*.md` and `docs/blueprints/*.md`,
+**materializes the resolver-input registry**, runs the two missing gates
+(reference-integrity + coverage), and **emits the artifact** the engine loads
+into `persistent_term` at boot.
+
+Why this lives in `engine/build/` (not `engine/python/` sidecars, not a repo-root
+`build/`): it is engine-scoped on the two properties that matter — its output
+(`engine/erlang/priv/kb/artifact.json`) and its sole consumer (the engine) are
+both the engine. Build tooling lives within the half it serves, so `engine/` and
+`shell/` stay independently deployable (constraint #11). It reads repo-root
+`docs/` as shared-git-SOT input; that doesn't make it repo-scoped.
+
+Grounding (architecture.md §11.9):
+  - Registry = union of upstream components' `outcome_schema` fields, namespaced
+    by outcome TYPE (`profile.*` ⊕ `applicant.*` ⊕ `property_fit.*` ⊕ `suburb.*`).
+    Registry fields are namespaced BY CONSTRUCTION → a *bare* token (`location_tier`)
+    cannot be a registry field; it is a resolver-local intermediate (§11.9:256),
+    exempt from reference-integrity. No new `content_json` syntax to declare it
+    (the declarative-fixed-vocabulary rule, §11.9:427).
+  - `applicant.*` is the registry projection of the `profile.applicants` element
+    (§11.9:246) — flat field names, type-enriched from the `applicants` parameter.
+  - A `fills` rule names the leaf it produces (`{component}.{param-path}`, or an
+    `applicant.*` derived-fact leaf); the gate is coverage (every fill maps to a
+    real slot) + reference integrity (every `field`/key-dim resolves to a registry
+    field or a resolver-local; every `ref` to a known leaf/slot; every `stacking`
+    slug to a KB doc) — §11.9:428.
+
+Scope: Wedge 1 = Mode A. The split tracks the scope call. **Structural** gates
+(slug==path, renderer-in-enum, pipeline-acyclic) are mode-independent and run over
+EVERY blueprint/doc — a B/C/D blueprint is an authored part of the working agreement,
+so structural drift there is real drift. **Semantic** gates (reference-integrity,
+coverage, type-compat) need the mode's registry materialized, so they run against the
+Mode-A registry (the `fhb-domestic-au` anchors) only; KB docs anchored solely by the
+unbuilt B/C/D modes are parsed structurally and reported as INVENTORY, never failures
+(the standing scope call). The DAG-upstream *scoping* of the registry (a field
+must be produced by a component upstream of its consumer, not merely exist
+somewhere) is a documented future strengthening — see STRENGTHENINGS below.
+
+STRENGTHENINGS (not v1):
+  - DAG-scoped reference integrity (field ∈ consumer's ancestors, not global).
+  - Full coverage direction (every resolver-fillable param HAS a rule), which
+    needs the resolver/agent fill-path classification (agentic-boundary.md).
+  - Type-compat for `applicant.firb_required` and other derived leaves whose
+    type is not declared in a parameter (currently reported as type-unknown).
+"""
+import json
+import re
+import sys
+import pathlib
+
+ROOT = pathlib.Path(__file__).resolve().parents[2]
+KB = ROOT / "docs" / "kb"
+BP = ROOT / "docs" / "blueprints"
+ARTIFACT_OUT = ROOT / "engine" / "erlang" / "priv" / "kb" / "artifact.json"
+
+IN_SCOPE_BLUEPRINT = "fhb-domestic-au"  # Wedge 1 = Mode A
+
+# architecture.md §11.9 renderer enum (13 members).
+RENDERER_ENUM = {
+    "summary-card", "swimlane-diagram", "checklist", "data-table", "calculator",
+    "buying-strategy-card", "decision-trail", "risk-flag-list", "comparison-grid",
+    "opportunity-card", "scheme-stack-card", "firb-workflow-card", "family-view-card",
+}
+
+# Declared external read-namespaces (not produced by a blueprint component):
+# the property card and suburb enrichment (§11.9:244). Referenced fields under
+# these resolve-as-external (existence unverifiable here), never a failure.
+EXTERNAL_NS = {"suburb", "property", "property_card"}
+
+NUMERIC_TYPES = {
+    "integer", "money", "number", "percentage", "money_per_year", "money_per_month",
+    "money_per_quarter", "money_per_week", "integer_0_100", "percentage_0_100",
+    "integer_0_10", "money_range", "percentage_0_100",
+}
+NUMERIC_OPS = {"gte", "gt", "lte", "lt", "between"}
+SET_OPS = {"in", "nin"}
+ALL_OPS = NUMERIC_OPS | SET_OPS | {"eq", "neq"}
+
+
+# --------------------------------------------------------------------------- #
+# Tolerant JSONC parsing (content_json blocks carry // and /* */ comments and
+# trailing commas — json.loads alone fails on them).
+# --------------------------------------------------------------------------- #
+def strip_jsonc(s):
+    """Remove // and /* */ comments (string-aware) and trailing commas."""
+    out, i, n = [], 0, len(s)
+    in_str, quote = False, ""
+    while i < n:
+        c = s[i]
+        if in_str:
+            out.append(c)
+            if c == "\\" and i + 1 < n:
+                out.append(s[i + 1]); i += 2; continue
+            if c == quote:
+                in_str = False
+            i += 1; continue
+        if c in ('"', "'"):
+            in_str, quote = True, c; out.append(c); i += 1; continue
+        if c == "/" and i + 1 < n and s[i + 1] == "/":
+            while i < n and s[i] != "\n":
+                i += 1
+            continue
+        if c == "/" and i + 1 < n and s[i + 1] == "*":
+            i += 2
+            while i + 1 < n and not (s[i] == "*" and s[i + 1] == "/"):
+                i += 1
+            i += 2; continue
+        out.append(c); i += 1
+    res = "".join(out)
+    res = re.sub(r",(\s*[}\]])", r"\1", res)  # trailing commas
+    return res
+
+
+def parse_jsonc(block):
+    return json.loads(strip_jsonc(block))
+
+
+def fenced_jsonc_after(text, marker):
+    """First ```jsonc fenced block after `marker`; None if marker/block absent."""
+    pos = text.find(marker)
+    if pos < 0:
+        return None
+    m = re.search(r"```jsonc\s*\n(.*?)\n```", text[pos:], re.S)
+    return m.group(1) if m else None
+
+
+def rules_block(text):
+    """The `## Rules` content_json block, or None for a pure-prose doc."""
+    pos = text.find("## Rules")
+    if pos < 0:
+        return None
+    m = re.search(r"```jsonc\s*\n(.*?)\n```", text[pos:], re.S)
+    return m.group(1) if m else None
+
+
+# --------------------------------------------------------------------------- #
+# Type helpers
+# --------------------------------------------------------------------------- #
+def parse_type_string(s):
+    """An outcome-schema field type string -> (base, options|None)."""
+    s = s.strip()
+    m = re.match(r"enum\s*\[([^\]]*)\]", s)
+    if m:
+        return "enum", [x.strip() for x in m.group(1).split(",") if x.strip()]
+    if s.startswith("array<"):
+        return "array", None
+    return s, None
+
+
+def flatten_param_slots(d, prefix=""):
+    """Param dict -> {dotted_path: meta}. A node WITH a `type` key is a leaf slot
+    (do not recurse into it — milestones/arrays carry nested `value`)."""
+    slots = {}
+    for k, v in d.items():
+        path = f"{prefix}{k}"
+        if isinstance(v, dict) and "type" in v:
+            slots[path] = v
+        elif isinstance(v, dict):
+            slots.update(flatten_param_slots(v, path + "."))
+    return slots
+
+
+def flatten_element_meta(d, acc):
+    """Applicant element -> {leaf_name: meta} (ownership_history flattened to the
+    leaf name, matching the flat `applicant.*` projection)."""
+    for k, v in d.items():
+        if isinstance(v, dict) and "type" in v:
+            acc[k] = {"type": v["type"], "options": v.get("options")}
+        elif isinstance(v, dict):
+            flatten_element_meta(v, acc)
+    return acc
+
+
+# --------------------------------------------------------------------------- #
+# Blueprint parsing
+# --------------------------------------------------------------------------- #
+class Component:
+    def __init__(self, name):
+        self.name = name
+        self.outcome_type = None
+        self.outcome_fields = {}     # field -> type string
+        self.param_slots = {}        # "{component}.path" -> meta
+        self.anchors = []
+        self.renderers = []
+
+
+def parse_blueprint(path):
+    text = path.read_text()
+    slug = "blueprints." + path.stem
+    comps = []
+    # numbered component sections: "### 1. buyer_profile"
+    heads = list(re.finditer(r"^### (\d+)\.\s+(\w+)\s*$", text, re.M))
+    for idx, h in enumerate(heads):
+        name = h.group(2)
+        end = heads[idx + 1].start() if idx + 1 < len(heads) else len(text)
+        body = text[h.end():end]
+        c = Component(name)
+        for line in re.findall(r"^\*\*KB anchors:\*\*(.*)$", body, re.M):
+            c.anchors += re.findall(r"kb\.[a-z0-9.\-]+", line)
+        for line in re.findall(r"^\*\*Renderer:\*\*(.*)$", body, re.M):
+            c.renderers += re.findall(r"`([a-z\-]+)`", line)
+        ob = fenced_jsonc_after(body, "**Outcome schema:**")
+        if ob:
+            o = parse_jsonc(ob)
+            c.outcome_type = o.get("type")
+            c.outcome_fields = o.get("fields", {})
+        pb = fenced_jsonc_after(body, "**Parameters:**")
+        if pb:
+            params = parse_jsonc(pb)
+            c.param_slots = flatten_param_slots(params, c.name + ".")
+            if name == "buyer_profile":
+                c._params = params  # keep for applicant element extraction
+        comps.append(c)
+    # pipeline DAG: "producer → outcome: NAME (reads: a, b)"
+    producer, reads = {}, {}
+    for comp, out, rd in re.findall(
+        r"^(\w+)\s*→\s*outcome:\s*(\w+)\s*(?:\(reads:\s*([^)]*)\))?", text, re.M
+    ):
+        producer[out] = comp
+        reads[comp] = [x.strip() for x in rd.split(",") if x.strip()] if rd else []
+    return slug, comps, producer, reads
+
+
+# --------------------------------------------------------------------------- #
+# Registry materialization (the foundation reasoning binds to)
+# --------------------------------------------------------------------------- #
+class Registry:
+    def __init__(self):
+        self.outcome_fields = {}     # outcome_type -> {field: type string}
+        self.applicant_fields = {}   # field -> meta {type, options}|None
+        self.param_slots = {}        # "{component}.path" -> meta  (leaf slots)
+        self.leaves = {}             # leaf path -> [filling slugs]
+
+    def field_meta(self, ns, rest):
+        """(status, meta) for a dotted read token ns.rest.
+        status ∈ {field, external, missing_ns, missing_field}."""
+        if ns == "applicant":
+            if rest in self.applicant_fields:
+                return "field", self.applicant_fields[rest]
+            return "missing_field", None
+        if ns in EXTERNAL_NS:
+            return "external", None
+        if ns in self.outcome_fields:
+            fields = self.outcome_fields[ns]
+            if rest in fields:
+                base, opts = parse_type_string(fields[rest])
+                return "field", {"type": base, "options": opts}
+            return "missing_field", None
+        return "missing_ns", None
+
+    def ref_exists(self, ref):
+        if ref in self.leaves or ref in self.param_slots:
+            return True
+        if "." in ref:
+            ns, _, rest = ref.partition(".")
+            st, _ = self.field_meta(ns, rest)
+            if st in ("field", "external"):
+                return True
+        return False
+
+
+def build_registry(components):
+    reg = Registry()
+    bp_comp = None
+    for c in components:
+        if c.outcome_type:
+            reg.outcome_fields.setdefault(c.outcome_type, {}).update(c.outcome_fields)
+        reg.param_slots.update(c.param_slots)
+        if c.name == "buyer_profile":
+            bp_comp = c
+    # applicant.* projection: names from the profile outcome element, types
+    # enriched from the buyer_profile `applicants` parameter element.
+    prof = reg.outcome_fields.get("profile", {})
+    appl_str = prof.get("applicants", "")
+    m = re.search(r"\{([^}]*)\}", appl_str)
+    names = [x.strip() for x in m.group(1).split(",")] if m else []
+    elem_meta = {}
+    if bp_comp is not None and getattr(bp_comp, "_params", None):
+        appl_param = bp_comp._params.get("applicants", {})
+        val = appl_param.get("value")
+        if isinstance(val, list) and val:
+            flatten_element_meta(val[0], elem_meta)
+    for name in names:
+        reg.applicant_fields[name] = elem_meta.get(name)  # None => type-unknown
+    return reg
+
+
+# --------------------------------------------------------------------------- #
+# KB doc parsing
+# --------------------------------------------------------------------------- #
+def parse_kb_doc(path):
+    text = path.read_text()
+    slug_m = re.search(r"^slug:\s*(\S+)", text, re.M)
+    eff_m = re.search(r"^effective_from:\s*(\S+)", text, re.M)
+    ver_m = re.search(r"^last_verified:\s*(\S+)", text, re.M)
+    rb = rules_block(text)
+    content_json = None
+    parse_error = None
+    if rb is not None:
+        try:
+            content_json = parse_jsonc(rb)
+        except Exception as e:  # noqa: BLE001 - report, do not crash the build
+            parse_error = str(e)
+    # content_md = everything before "## Rules"
+    cut = text.find("## Rules")
+    fm_end = text.find("---", 3)
+    body_start = text.find("\n", fm_end) + 1 if fm_end > 0 else 0
+    content_md = (text[body_start:cut] if cut > 0 else text[body_start:]).strip()
+    return {
+        "slug": slug_m.group(1) if slug_m else None,
+        "effective_from": eff_m.group(1) if eff_m else None,
+        "last_verified": ver_m.group(1) if ver_m else None,
+        "content_md": content_md,
+        "content_json": content_json,
+        "parse_error": parse_error,
+        "path": path,
+    }
+
+
+def iter_rule_fields(rule):
+    """Yield ('field', token) and ('ref', token) and ('keydim', token) from a rule."""
+    kind = rule.get("kind")
+    if kind == "criteria":
+        yield from _iter_criteria(rule)
+    elif kind == "lookup":
+        for dim in rule.get("key", []):
+            yield "keydim", dim
+        # a row value may itself be a ref — rare; not modelled
+    # parameter: fixed value, no field references
+
+
+def _iter_criteria(node):
+    for crit in node.get("criteria", []):
+        if "combine" in crit:
+            yield from _iter_criteria(crit)
+            continue
+        if "field" in crit:
+            yield "field", crit["field"], crit
+        if "ref" in crit:
+            yield "ref", crit["ref"], crit
+
+
+# --------------------------------------------------------------------------- #
+# Gates
+# --------------------------------------------------------------------------- #
+def check_type_compat(crit, meta):
+    """Return an error string if the criterion is type-incompatible, else None.
+    Skips silently when type is unknown (reported as 'unchecked' by the caller)."""
+    if meta is None or meta.get("type") is None:
+        return "unchecked"
+    base = meta["type"]
+    base, _ = parse_type_string(base) if isinstance(base, str) else (base, None)
+    opts = meta.get("options")
+    op = crit.get("op")
+    has_value = "value" in crit
+    val = crit.get("value")
+    if op in NUMERIC_OPS:
+        if base not in NUMERIC_TYPES:
+            return f"numeric op '{op}' on non-numeric field type '{base}'"
+        if op == "between" and not (isinstance(val, list) and len(val) == 2):
+            return "op 'between' needs a 2-element value"
+    if op in SET_OPS:
+        if not isinstance(val, list):
+            return f"set op '{op}' needs a list value"
+        if base == "enum" and opts:
+            bad = [v for v in val if v not in opts]
+            if bad:
+                return f"value(s) {bad} not in enum options {opts}"
+    if op in ("eq", "neq") and has_value and base == "enum" and opts:
+        if not isinstance(val, list) and val not in opts:
+            return f"value {val!r} not in enum options {opts}"
+    return None
+
+
+def detect_cycle(producer, reads):
+    """(cycle_path|None, externals) for a blueprint's `producer→outcome (reads:)` DAG.
+    Structural + mode-independent — run over every blueprint, in-scope or not."""
+    nodes = set(reads)
+    edges = {c: set() for c in nodes}
+    externals = set()
+    for comp, outs in reads.items():
+        for o in outs:
+            if o in producer:
+                edges[comp].add(producer[o])
+            else:
+                externals.add(o)
+    color = {c: 0 for c in nodes}
+    cyc = []
+
+    def dfs(u, stack):
+        color[u] = 1
+        for v in edges.get(u, ()):
+            if color.get(v) == 1:
+                cyc.extend(stack + [u, v]); return True
+            if color.get(v, 0) == 0 and dfs(v, stack + [u]):
+                return True
+        color[u] = 2
+        return False
+
+    has_cycle = any(color.get(c, 0) == 0 and dfs(c, []) for c in nodes)
+    return (cyc if has_cycle else None), externals
+
+
+def run(emit=False):
+    fails, warns, info = [], [], []
+    stats = {}
+
+    # ---- parse blueprints ------------------------------------------------- #
+    blueprints = {}
+    for bp in sorted(BP.glob("*.md")):
+        slug, comps, producer, reads = parse_blueprint(bp)
+        blueprints[bp.stem] = (slug, comps, producer, reads)
+
+    if IN_SCOPE_BLUEPRINT not in blueprints:
+        fails.append(f"in-scope blueprint {IN_SCOPE_BLUEPRINT} not found")
+        return fails, warns, info, stats, None
+
+    _, comps, _, _ = blueprints[IN_SCOPE_BLUEPRINT]
+    reg = build_registry(comps)
+    in_scope_anchors = set()
+    for c in comps:
+        in_scope_anchors.update(c.anchors)
+
+    # ---- parse all KB docs ------------------------------------------------ #
+    kb_docs = {}
+    for f in sorted(KB.rglob("*.md")):
+        doc = parse_kb_doc(f)
+        rel = f.relative_to(ROOT / "docs").with_suffix("")
+        expect = str(rel).replace("/", ".")
+        # GATE 1: slug == path
+        if doc["slug"] != expect:
+            fails.append(f"[slug] {f}: slug={doc['slug']} expect={expect}")
+        if doc["slug"]:
+            kb_docs[doc["slug"]] = doc
+        # GATE 5: content_json parses
+        if doc["parse_error"]:
+            fails.append(f"[content_json] {doc['slug']}: parse error: {doc['parse_error']}")
+    stats["kb_docs"] = len(kb_docs)
+
+    # ---- materialize the leaf -> filler(s) map (in-scope docs) ------------ #
+    for slug in in_scope_anchors:
+        doc = kb_docs.get(slug)
+        if not doc or not doc.get("content_json"):
+            continue
+        for fill in doc["content_json"].get("fills", []):
+            leaf = fill.get("leaf")
+            if leaf:
+                reg.leaves.setdefault(leaf, []).append(slug)
+
+    # ---- GATE 2: every blueprint kb_anchor resolves ----------------------- #
+    def kb_exists(slug):
+        return (ROOT / "docs" / (slug.replace(".", "/") + ".md")).is_file()
+
+    for stem, (_, bcomps, _, _) in blueprints.items():
+        anchors = set(a for c in bcomps for a in c.anchors)
+        missing = sorted(a for a in anchors if not kb_exists(a))
+        if stem == IN_SCOPE_BLUEPRINT:
+            for a in missing:
+                fails.append(f"[anchor] {stem}: missing KB doc {a}")
+        else:
+            if missing:
+                info.append(f"[inventory] {stem}: {len(missing)} unbuilt anchor(s) "
+                            f"(out-of-scope mode): {missing}")
+
+    # ---- GATE 3: renderers in enum (all blueprints — structural, mode-independent) #
+    for stem, (_, bcomps, _, _) in blueprints.items():
+        for c in bcomps:
+            bad = [r for r in c.renderers if r not in RENDERER_ENUM]
+            if bad:
+                fails.append(f"[renderer] {stem}/{c.name}: not in enum: {bad}")
+
+    # ---- GATE 4: pipeline acyclic (all blueprints — structural, mode-independent) #
+    for stem, (_, _, bproducer, breads) in blueprints.items():
+        cyc, externals = detect_cycle(bproducer, breads)
+        if cyc:
+            fails.append(f"[pipeline] {stem}: CYCLE: {cyc}")
+        if stem == IN_SCOPE_BLUEPRINT:
+            stats["dag"] = {"components": len(breads), "externals": sorted(externals)}
+
+    # ---- GATE 6 + 7: reference-integrity + coverage (in-scope docs) -------- #
+    ref_checked = ref_unchecked_type = 0
+    deferred_docs = 0
+    valid_slots = set(reg.param_slots) | {f"applicant.{n}" for n in reg.applicant_fields}
+
+    for slug, doc in sorted(kb_docs.items()):
+        cj = doc.get("content_json")
+        if cj is None:
+            continue
+        if slug not in in_scope_anchors:
+            deferred_docs += 1
+            continue
+        for fill in cj.get("fills", []):
+            leaf = fill.get("leaf")
+            rule = fill.get("rule", {})
+            # COVERAGE 7b: leaf maps to a real slot
+            if leaf:
+                if leaf.startswith("applicant."):
+                    name = leaf.split(".", 1)[1]
+                    if name not in reg.applicant_fields:
+                        fails.append(f"[coverage] {slug}: leaf {leaf} not an applicant field")
+                elif leaf not in reg.param_slots:
+                    fails.append(f"[coverage] {slug}: leaf {leaf} not a declared slot")
+            # REFERENCE-INTEGRITY 6a/6b/6d
+            for item in iter_rule_fields(rule):
+                tag, tok = item[0], item[1]
+                crit = item[2] if len(item) > 2 else None
+                if tag in ("field", "keydim"):
+                    if "." not in tok:
+                        info.append(f"[resolver-local] {slug}: {tok}")  # bare → exempt
+                        continue
+                    ns, _, rest = tok.partition(".")
+                    st, meta = reg.field_meta(ns, rest)
+                    if st == "missing_ns":
+                        fails.append(f"[ref-integrity] {slug}: unknown namespace in {tok!r}")
+                    elif st == "missing_field":
+                        fails.append(f"[ref-integrity] {slug}: {tok!r} not a registry field")
+                    elif st == "external":
+                        info.append(f"[external] {slug}: {tok} (existence unverifiable)")
+                    elif st == "field" and tag == "field" and crit is not None:
+                        res = check_type_compat(crit, meta)
+                        if res == "unchecked":
+                            ref_unchecked_type += 1
+                        elif res:
+                            fails.append(f"[type] {slug}: field {tok}: {res}")
+                        else:
+                            ref_checked += 1
+                elif tag == "ref":
+                    if not reg.ref_exists(tok):
+                        fails.append(f"[ref-integrity] {slug}: ref {tok!r} resolves to nothing")
+        # COVERAGE 6c: stacking slugs resolve
+        for st in (cj.get("stacking") or {}).values():
+            if isinstance(st, list):
+                for ref in st:
+                    if isinstance(ref, str) and ref.startswith("kb.") and not kb_exists(ref):
+                        fails.append(f"[stacking] {slug}: ref {ref} resolves to no KB doc")
+
+    # multi-filled leaves: report (competitive slots like state_concession are by
+    # design; a same-component non-slot collision would be a smell — surfaced, not
+    # auto-failed, since legitimacy is a semantic/exclusivity question, not structural).
+    multi = {k: v for k, v in reg.leaves.items() if len(v) > 1}
+    for leaf, fillers in sorted(multi.items()):
+        info.append(f"[multi-fill] {leaf} <- {sorted(fillers)}")
+
+    stats["registry"] = {
+        "outcome_namespaces": sorted(reg.outcome_fields),
+        "outcome_field_count": sum(len(v) for v in reg.outcome_fields.values()),
+        "applicant_fields": len(reg.applicant_fields),
+        "param_slots": len(reg.param_slots),
+        "leaves": len(reg.leaves),
+    }
+    stats["ref_integrity"] = {
+        "type_checks_passed": ref_checked,
+        "type_unchecked": ref_unchecked_type,
+        "in_scope_anchors": len(in_scope_anchors),
+        "deferred_docs": deferred_docs,
+    }
+
+    artifact = None
+    if not fails:
+        artifact = build_artifact(blueprints, reg, kb_docs)
+        if emit:
+            ARTIFACT_OUT.parent.mkdir(parents=True, exist_ok=True)
+            ARTIFACT_OUT.write_text(
+                json.dumps(artifact, indent=2, sort_keys=True, ensure_ascii=False) + "\n"
+            )
+
+    return fails, warns, info, stats, artifact
+
+
+def build_artifact(blueprints, reg, kb_docs):
+    kb = {
+        slug: {
+            "effective_from": d["effective_from"],
+            "last_verified": d["last_verified"],
+            "content_md": d["content_md"],
+            "content_json": d["content_json"],
+        }
+        for slug, d in kb_docs.items()
+    }
+    bps = {}
+    for stem, (slug, comps, producer, reads) in blueprints.items():
+        bps[slug] = {
+            "components": [
+                {"name": c.name, "outcome_type": c.outcome_type,
+                 "anchors": c.anchors, "renderers": c.renderers}
+                for c in comps
+            ],
+            "dag_reads": reads,
+        }
+    return {
+        "schema_version": 1,
+        "in_scope_blueprint": IN_SCOPE_BLUEPRINT,
+        "kb": kb,
+        "registry": {
+            "outcome_fields": reg.outcome_fields,
+            "applicant_fields": {k: v for k, v in reg.applicant_fields.items()},
+            "param_slots": sorted(reg.param_slots),
+            "leaves": {k: sorted(v) for k, v in reg.leaves.items()},
+        },
+        "blueprints": bps,
+    }
+
+
+def main():
+    emit = "--no-emit" not in sys.argv
+    fails, warns, info, stats, artifact = run(emit=emit)
+
+    print(f"registry: {json.dumps(stats.get('registry', {}))}")
+    print(f"ref-integrity: {json.dumps(stats.get('ref_integrity', {}))}")
+    print(f"dag: {json.dumps(stats.get('dag', {}))}")
+    print(f"kb docs: {stats.get('kb_docs')}")
+    if info:
+        print(f"\nINFO ({len(info)}):")
+        for m in info:
+            print("  " + m)
+    if warns:
+        print(f"\nWARN ({len(warns)}):")
+        for m in warns:
+            print("  " + m)
+    print("\n" + "=" * 64)
+    if fails:
+        print(f"FAIL — {len(fails)} problem(s):")
+        for m in fails:
+            print("  " + m)
+        return 1
+    if emit and artifact is not None:
+        print(f"PASS — artifact emitted: {ARTIFACT_OUT.relative_to(ROOT)}")
+        print(f"       {len(artifact['kb'])} KB entries, "
+              f"{stats['registry']['outcome_field_count']} outcome fields, "
+              f"{stats['registry']['leaves']} leaves")
+    else:
+        print("PASS — all gates green (no emit)")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

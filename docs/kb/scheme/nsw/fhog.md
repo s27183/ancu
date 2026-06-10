@@ -50,10 +50,10 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
     { "leaf": "eligibility.fhog.applicable",
       "rule": { "kind": "criteria", "combine": "all_of", "criteria": [
         { "field": "property_fit.state",             "op": "eq",  "value": "NSW" },
-        { "field": "profile.ever_owned_au_property", "op": "eq",  "value": false },            // AU-only test — overseas ownership does NOT disqualify (favourable)
-        { "field": "profile.age",                    "op": "gte", "value": 18 },
-        { "field": "profile.citizenship_status",     "op": "in",  "value": ["citizen", "permanent_resident"] },
-        { "field": "profile.owner_occupier_intent",  "op": "eq",  "value": true },             // move in within 12 mo, live 6 continuous mo
+        { "field": "applicant.ever_owned_au_property", "op": "eq",  "value": false },            // AU-only test — overseas ownership does NOT disqualify (favourable)
+        { "field": "applicant.age",                    "op": "gte", "value": 18 },
+        { "field": "applicant.citizenship_status",     "op": "in",  "value": ["citizen", "permanent_resident"] },
+        { "field": "applicant.owner_occupier_intent",  "op": "eq",  "value": true },             // move in within 12 mo, live 6 continuous mo
         { "field": "property_fit.property_type", "op": "in", "value": ["new_house", "new_apartment", "off_the_plan", "house_and_land"] },  // NEW homes only — established excluded
         { "field": "property_fit.price",             "op": "lte", "value": 750000 } ] } },     // outer bound (build cap); completed-purchase cap is lower ($600k) — see Notes
         // property_fit.* criteria activate in per-property scope; base scope evaluates the profile-only criteria → provisional

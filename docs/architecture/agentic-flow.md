@@ -1,4 +1,4 @@
-# Agentic Flow — how the engine's reasoning runs
+0   so# Agentic Flow — how the engine's reasoning runs
 
 This document specifies the runtime shape of FirstHomey's agentic work: the **types of agent**, each agent's **dynamic prompt structure**, the **vendor-neutral run layer**, and **conversation + context management**. It is the *how the reasoning runs* companion to [`agentic-boundary.md`](agentic-boundary.md) (the *what reasons* — the resolver/agent decision rule) and [`engine-contract.md`](engine-contract.md) (the events, metering, and compliance gate the reasoning rides on). For how the fill paths are encoded in the blueprint, see [architecture.md §11.9](architecture.md#119-blueprint-as-data-model--presentation-specification).
 

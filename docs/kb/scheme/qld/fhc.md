@@ -66,10 +66,10 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
     { "leaf": "eligibility.state_concession.applicable",
       "rule": { "kind": "criteria", "combine": "all_of", "criteria": [
         { "field": "property_fit.state",                       "op": "eq",  "value": "QLD" },
-        { "field": "profile.ever_owned_au_property",           "op": "eq",  "value": false },
-        { "field": "profile.prior_overseas_property_ownership", "op": "eq", "value": false },  // ⚠ QLD tests residences ANYWHERE — diverges from FHG/FHSS (AU-only)
-        { "field": "profile.age",                              "op": "gte", "value": 18 },
-        { "field": "profile.owner_occupier_intent",            "op": "eq",  "value": true },   // move in within 1 yr of settlement, live daily
+        { "field": "applicant.ever_owned_au_property",           "op": "eq",  "value": false },
+        { "field": "applicant.prior_overseas_property_ownership", "op": "eq", "value": false },  // ⚠ QLD tests residences ANYWHERE — diverges from FHG/FHSS (AU-only)
+        { "field": "applicant.age",                              "op": "gte", "value": 18 },
+        { "field": "applicant.owner_occupier_intent",            "op": "eq",  "value": true },   // move in within 1 yr of settlement, live daily
         { "field": "property_fit.property_type", "op": "in", "value": ["established_house", "established_apartment"] },  // established branch — disjoint from fhnhc (new) and fh-vacant-land
         { "field": "property_fit.price",                       "op": "lte", "value": 800000 } ] } },
         // property_fit.* criteria activate in per-property scope; base scope evaluates the profile-only criteria → provisional

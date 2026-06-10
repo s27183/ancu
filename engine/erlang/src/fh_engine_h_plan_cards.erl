@@ -1,0 +1,66 @@
+-module(fh_engine_h_plan_cards).
+
+%% POST /api/engine/plan-cards — create a plan card from onboarding inputs
+%% (mode/state/target price range/target zone/intent) and start the base planning
+%% turn (engine-contract §2.1, constraint #1 plan-first). Returns {plan_card_id,
+%% turn_id}; events stream from GET .../events. Plan-first: no property required.
+
+-export([init/2]).
+
+%% Wedge 1 targets Mode A only (CLAUDE.md). Mode is a DERIVED label; for a domestic
+%% FHB onboarding it is 'A' and the blueprint is fhb-domestic-au.
+-define(BLUEPRINT, <<"fhb-domestic-au">>).
+-define(MODE, <<"A">>).
+
+init(Req0, State) ->
+    case cowboy_req:method(Req0) of
+        <<"POST">> -> handle_post(Req0, State);
+        _ ->
+            Req = fh_engine_http:reply_json(405,
+                #{<<"error">> => <<"method_not_allowed">>}, Req0),
+            {ok, Req, State}
+    end.
+
+handle_post(Req0, State) ->
+    case fh_engine_http:authenticate(Req0) of
+        {ok, #{tenant_id := T, user_id := U}} ->
+            case fh_engine_http:read_json_body(Req0) of
+                {ok, Params, Req1} -> create(T, U, Params, Req1, State);
+                {error, invalid_json} ->
+                    {ok, fh_engine_http:reply_json(400,
+                        #{<<"error">> => <<"invalid_json">>}, Req0), State}
+            end;
+        {error, Status, Body} ->
+            {ok, fh_engine_http:reply_json(Status, Body, Req0), State}
+    end.
+
+create(T, U, Params, Req, State) ->
+    Intent = intent_of(Params),
+    %% Onboarding inputs become the initial household fact base (slice 2's
+    %% buyer_profile fill enriches it). Mode A enters via a non-foreign lead.
+    Facts = #{
+        <<"onboarding">> => Params,
+        <<"derived">> => #{<<"firb_required_any">> => false}
+    },
+    {ok, ProfileId} = fh_engine_store:create_profile(T, U, Facts),
+    {ok, PlanCardId} = fh_engine_store:create_plan_card(
+        T, ProfileId, ?BLUEPRINT, Intent, ?MODE, #{}),
+    TurnId = fh_engine_util:uuid4(),
+    ok = fh_engine_turn_registry:reserve(PlanCardId, TurnId),
+    {ok, _Pid} = fh_engine_turn_sup:start_turn(#{
+        tenant_id => T,
+        plan_card_id => PlanCardId,
+        turn_id => TurnId,
+        mode => ?MODE,
+        intent => Intent,
+        firb_required_any => false
+    }),
+    Body = #{<<"plan_card_id">> => PlanCardId, <<"turn_id">> => TurnId},
+    {ok, fh_engine_http:reply_json(202, Body, Req), State}.
+
+%% The intent axis of mode (engine-contract §9.1): owner_occupier | investment.
+intent_of(Params) ->
+    case maps:get(<<"intent">>, Params, <<"owner_occupier">>) of
+        <<"investment">> -> <<"investment">>;
+        _ -> <<"owner_occupier">>
+    end.

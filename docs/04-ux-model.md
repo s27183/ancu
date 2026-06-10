@@ -14,13 +14,13 @@ Three foundational decisions define the UX:
 
 1. **Plan-first onboarding** — the user enters by telling us their situation (mode, state, target price range in VND auto-converted to AUD, target zone via map click or address), NOT by selecting a specific property. The base plan generates immediately. Specific properties are added later via Tìm Nhà property search service, URL paste, or browser extension — when (and if) the user is ready.
 2. **Base plan + property addenda** — every user has one persistent base plan (property-agnostic) and zero or more property addenda (one per attached property). Components have `scope: base | per-property | both` — the base plan runs immediately with no property data; addenda activate per-property as the user adds them.
-3. **Mode-switched by user context** — one unified platform, four modes by user location + FIRB status + intent. Each mode has different default flows, different artifact emphasis, but shares the same Layer 1 KB + Layer 2 schema infrastructure (Option A from architecture decision).
+3. **Mode is derived, not picked** — one unified platform; *mode* is a **derived view** over the applicant set + intent (each applicant's FIRB status + owner-occupier/investment intent), not a fixed label the user chooses at signup. A plan can be **mixed-status** (a domestic lead applicant with a foreign co-applicant routes that interest to the FIRB path) and a person's mode can **change over time** (student → PR → investor). All modes share the same Layer 1 KB + Layer 2 fact model; what varies is which pipeline runs and which fields matter (Option A). See [`architecture/fact-model-unification.md`](architecture/fact-model-unification.md).
 
 The platform is a **lifecycle planning service**, not a property tech platform. We do not operate a property listing scraping pipeline. Property data flows only via narrow, demand-driven paths (suburb enrichment from public feeds, user URL paste, browser extension, and eventually partner REA push). See [§11.10 in architecture/architecture.md](architecture/architecture.md#1110-property-data-pipeline--narrow-and-demand-driven) and [§11.11 in architecture/architecture.md](architecture/architecture.md#1111-tìm-nhà-property-search-service--agent-invoked-human-curated).
 
 ### 13.1 Core principle — artifacts are substance, chat is layer
 
-A chat thread is the wrong persistent object — it makes the product indistinguishable from ChatGPT, kills the lifecycle continuity moat, and renders Layer 2 (user state) vestigial. The right persistent object is the **plan card** — one per (user × mode), holding the base plan plus any property addenda — with attached artifacts (document reports, decision trail entries, FIRB approvals, opportunity alerts) that accumulate over months and years. Properties are inputs to the plan card via addenda, not the central object themselves.
+A chat thread is the wrong persistent object — it makes the product indistinguishable from ChatGPT, kills the lifecycle continuity moat, and renders Layer 2 (user state) vestigial. The right persistent objects are a persistent **user/household fact base** (the applicant set + facts that accumulate across journeys and modes — the lifecycle-continuity moat) and, over it, one **plan card per purchase journey** (1..N per user; one in Wedge 1), holding the base plan plus any property addenda. **Mode is derived** — per plan and per applicant — never the key (see [`architecture/fact-model-unification.md`](architecture/fact-model-unification.md)). Document reports, decision trail entries, FIRB approvals, and opportunity alerts attach and accumulate over months and years. Properties are inputs to the plan card via addenda, not the central object themselves.
 
 Every agentic interaction should produce or update a structured artifact the user can return to.
 
@@ -36,7 +36,7 @@ Every agentic interaction should produce or update a structured artifact the use
 
 ### 13.2 The four user modes
 
-Same platform, four modes. Mode determined by FIRB status + intent at onboarding (a single key question: "Where do you live?" + "What's your intent?").
+Same platform, four modes — but a **mode is a derived label, not a per-user choice.** It is computed from the **applicant set** (who is on title and/or the loan, and each person's FIRB status) plus intent (owner-occupier vs investment). The four modes below name the **default flows** a plan runs; the onboarding questions ("Where does each buyer live / what's their status?" + "What's your intent?") are *inputs to that derivation*, not a menu the user picks from.
 
 | Mode | User profile | FIRB status | Default flows | Acquisition channel |
 |---|---|---|---|---|
@@ -45,7 +45,9 @@ Same platform, four modes. Mode determined by FIRB status + intent at onboarding
 | **C: Vietnamese-AU investor** | Citizen or PR, investment property | Not foreign person | Yield modelling, depreciation, negative gearing, portfolio analytics | Mode A graduates, Vietnamese-AU investment networks |
 | **D: Vietnam-located investor** | Resident in VN, investing in AU | Foreign person — FIRB applies | FIRB-aware analytics, non-resident tax, vacancy fee planning, off-the-plan inventory | VN investment advisory, Vietnamese banks with AU relationships |
 
-Mode switching can happen within one customer over time: student (Mode B) → graduates with PR → first home (Mode A) → equity builds → investment property (Mode C). The platform follows them; switching modes is automatic based on user-state attributes.
+**Mode is derived per applicant, so a single plan can be mixed-status.** The labels above describe the *lead* applicant's pipeline, but FIRB status is a **per-applicant** fact (constraint #10). A domestic lead applicant (Mode A/C) buying jointly with a foreign co-applicant routes that co-applicant's interest through the FIRB path (Mode B/D machinery) *within the same plan* — the gate fires on **any** foreign applicant, not just the primary buyer. A non-buying spouse's ownership is likewise folded into the eligibility test even though they take no legal interest (couple-as-one). So the four labels are default-flow selectors, **not a partition over users** — a plan can straddle them.
+
+**Mode also changes over time.** Within one customer the derivation re-runs as facts change: student (Mode B) → graduates with PR → first home (Mode A) → equity builds → investment (Mode C). The platform follows them automatically — a mode-switch is just the derivation producing a new result over the same accumulating fact model, not a new account or plan. (The fact base is **per user/household**; plan cards are keyed per purchase journey, with mode derived — see [`architecture/fact-model-unification.md`](architecture/fact-model-unification.md).)
 
 ### 13.3 The seven UX surfaces
 
@@ -69,18 +71,20 @@ Users enter the platform by describing their situation, not by selecting a speci
 #### Onboarding flow (5–10 minutes)
 
 ```
-1. Mode selection
-   - Vietnamese-AU FHB (Mode A)
-   - Vietnam-parent funding AU child / AU temp resident (Mode B)
-   - Vietnamese-AU investor (Mode C)
-   - Vietnam-located investor (Mode D)
+1. Who's buying + intent  (inputs to the mode derivation — the user does not pick a mode)
+   - Applicant set — each person who will be on title and/or the loan; per applicant:
+       · citizenship / visa status (drives THAT applicant's FIRB classification)
+       · owner-occupier vs investment intent
+   - Non-buying spouse / de-facto partner? — if so, their ownership history
+     (couple-as-one tests can disqualify even a partner who takes no legal interest)
+   - Where each buyer lives (Australia / Vietnam)
+   → mode is DERIVED from the applicant set + intent, and may be mixed-status (see §13.2)
 
 2. Situation capture
    - State (NSW / VIC / QLD / WA / SA / TAS / ACT / NT)
    - Target price range, in VND → auto-converted to AUD via daily FX feed
-   - Citizenship / visa status (drives FIRB classification)
-   - Family-funding context (Modes B, D — optional)
-   - Investment goals (Modes C, D — yield / growth / balanced)
+   - Family-funding context — an off-title funder, e.g. a parent in Vietnam (optional)
+   - Investment goals (for investment intent — yield / growth / balanced)
 
 3. Target zone selection
    - Map view zoom-in → click suburb (returns lat/lon + suburb name)
@@ -278,6 +282,10 @@ An Tran, 24, Vietnamese international student on 485 graduate visa in Melbourne 
 
 This journey demonstrates: FIRB compliance gating, cross-border family coordination, currency-transfer + AML support, partner REA routing, mode-switching on status change. None of these flows exist in any incumbent product.
 
+#### Mode-derivation in practice — a mixed-status couple
+
+Linh (Australian citizen, born here) buys her first home **jointly** with her partner Đức, on a 482 temporary-skill visa — a **foreign person** under FIRB. They onboard as one household; the platform captures *two applicants with different statuses*, not a single buyer. The derivation does not collapse them to one mode: Linh's interest runs the Mode A FHB pipeline (FHG, state concessions) while Đức's foreign-person interest is routed to the FIRB path — **within one plan**. The FIRB gate fires on Đức even though Linh, the lead applicant, is domestic; eligibility resolves over *both* applicants (a scheme applies only if every applicant qualifies). This mixed-status case — common in the diaspora — is exactly why mode is derived from the applicant set rather than picked at signup: reading it as a clean Mode A plan (the gate never firing) is the highest-harm failure the model exists to prevent (constraint #10).
+
 ### 13.6 What this UX accomplishes
 
 | Outcome | How |
@@ -307,7 +315,7 @@ Day-1 scope for Wedge 1 (Vietnamese-Australian FHB mode):
 What's protected by getting the UX shape right from day 1:
 
 - Property card as first-class object in Layer 2 (not as a chat artifact)
-- FIRB status as a foundational user attribute (set up for Wedge 2 expansion)
+- FIRB status as a foundational **per-applicant** attribute — the applicant set (each buyer's status) captured from day 1, so a foreign co-applicant trips the gate even in an otherwise-domestic plan (set up for Wedge 2 expansion)
 - User state schema designed for multi-property accumulation
 - Mode-switching architecture in place (only Mode A active in Wedge 1, but Mode B/C/D enabled by config)
 - Plan dashboard exists as a real page, not a generated chat message
@@ -447,7 +455,7 @@ Confirmed scope: blueprint template never changes per user; only the filled inst
 | What | Where | Lifetime |
 |---|---|---|
 | Blueprint templates | `blueprints` table, jsonb, keyed by slug | Redeployed in place; git holds prior states |
-| Filled plan card | `plan_cards` table, jsonb, records deploy commit SHA + KB snapshot | Permanent; one per (user × mode) — holds base plan + property addenda |
+| Filled plan card | `plan_cards` table, jsonb, records deploy commit SHA + KB snapshot | Permanent; one **per purchase journey** (1..N per user) over a persistent user/household fact base — mode derived, not keyed; holds base plan + property addenda. (Fact-base ↔ plan table split decided at the PG-schema step.) |
 | Session conversation log | `sessions` table, append-only, keyed by `session_id = user_id × plan_card_id` | Permanent; for user re-reading + audit |
 | Normalised property data | `properties` table, jsonb | Persistent; updated by offline ingestion |
 | KB anchors | Embedded in blueprint via `kb_anchors` references | Updated quarterly/monthly per §11.2 |
@@ -470,7 +478,7 @@ The remaining three surfaces (FIRB workflow assistant, cross-border family view,
 #### Why this flow design holds up
 
 - **Plan-first entry beats property-first** — the base plan delivers value immediately with zero property data, so the user is never blocked on finding a listing; property granularity layers on as an addendum when they're ready.
-- **Plan card per (user × mode) is the right unit** — the base plan (eligibility, cash math, scheme stack) is property-agnostic and reused across every property the user considers; per-property reasoning lives in addenda, not in duplicated plan cards.
+- **Plan card per purchase journey — over a persistent per-user/household fact base, mode derived — is the right unit** — the base plan (eligibility, cash math, scheme stack) is property-agnostic and reused across every property the user considers; per-property reasoning lives in addenda, not duplicated plan cards. Keying on mode is rejected: mode is mutable (PR granted mid-plan) and heterogeneous (mixed-status couple), so it cannot be a partition key without severing the lifecycle fact base — see [`architecture/fact-model-unification.md`](architecture/fact-model-unification.md).
 - **System prompt grounded in state, not history** — keeps tokens bounded, keeps reasoning clean, makes evaluation tractable.
 - **Two parallel processes (offline KB + user-facing agent) decouple update cadence from session latency** — the user-facing agent is fast because the heavy lifting (KB curation, property ingestion, blueprint authoring) happens offline.
 - **Deploy-time snapshots make evolution safe** — laws change, blueprints are redeployed, old plan cards survive as historical artifacts (reproducible from their commit SHA + KB snapshot), users opt-in to refresh.

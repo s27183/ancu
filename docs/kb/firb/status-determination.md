@@ -28,7 +28,7 @@ The second limb is what separates permanent from temporary residents:
 
 ## Status-level carve-outs (Modes B / D)
 
-Two carve-outs change a buyer from *foreign person requiring approval* to *not a foreign person* — they resolve **here**, upstream of the ban, so the [established-dwelling ban](established-dwelling-ban.md)'s purchase predicate already absorbs them as `firb_required == false`:
+Two carve-outs change a buyer from *foreign person requiring approval* to *not a foreign person* — they resolve **here**, upstream of the ban, by setting the carved-out applicant's `applicant.firb_required = false`, which propagates to the aggregate `profile.firb_required_any` that the [established-dwelling ban](established-dwelling-ban.md)'s purchase predicate reads:
 
 - **New Zealand citizens / Special Category Visa (subclass 444) holders** — do not require foreign-investment approval and are treated as outside the foreign-person framework for residential purchases.
 - **Spouse of an Australian citizen, permanent resident, or NZ citizen** — where the couple acquires the property **as joint tenants**, the foreign spouse is carved out of foreign-person treatment for that acquisition.
@@ -37,14 +37,14 @@ Both turn on facts not yet on the Mode A profile surface (there is no NZ-citizen
 
 ## Relevance for Vietnamese-Australian buyers
 
-- **Mode A (citizen / PR ordinarily resident in Australia): not a foreign person.** `firb_required` resolves to **false**; do not surface FIRB as a constraint — it only confuses. This is the common diaspora case (naturalised citizens and settled PRs).
+- **Mode A (citizen / PR ordinarily resident in Australia): not a foreign person.** `applicant.firb_required` resolves to **false** (and so the aggregate `profile.firb_required_any`); do not surface FIRB as a constraint — it only confuses. This is the common diaspora case (naturalised citizens and settled PRs).
 - **Mode B (Vietnam-parent funding an AU child; AU temporary resident): the child on a student / graduate / skilled *temporary* visa IS a foreign person**, even living in Australia full-time — the time-limited visa fails the ordinarily-resident test. They need approval and are caught by the established-dwelling ban (new-build / vacant-land only) unless the spouse-joint-tenant carve-out applies.
 - **Mode D (Vietnam-located investor): a foreign person** (non-resident). Approval required; new-build / vacant-land only.
 - **PR living in Vietnam:** a permanent resident who has spent fewer than 200 days in Australia in the past year is **not ordinarily resident** and can be a foreign person despite holding PR — relevant where a diaspora buyer holds AU PR but lives in Vietnam (a Mode-D-shaped case).
 
 ## Rules
 
-The resolver rules the artifact compiler extracts as this doc's `content_json` (schema: [architecture.md §11.9](../../architecture/architecture.md#119-blueprint-as-data-model--presentation-specification)). Everything above is `content_md`. This doc is the **single owner** of the `profile.firb_required` derivation (constraint #10 — the gate lives in the architecture, not in a disclaimer). The classification rule fills the derived bool; the 200-day test and the carve-outs are parameters/agent-surfaced (see Notes).
+The resolver rules the artifact compiler extracts as this doc's `content_json` (schema: [architecture.md §11.9](../../architecture/architecture.md#119-blueprint-as-data-model--presentation-specification)). Everything above is `content_md`. This doc is the **single owner** of the `applicant.firb_required` derivation — per-applicant (mapped over `profile.applicants`), with the application-scoped aggregate `profile.firb_required_any` published by `buyer_profile` (constraint #10 — the gate lives in the architecture, not in a disclaimer). The classification rule fills the derived bool; the 200-day test and the carve-outs are parameters/agent-surfaced (see Notes).
 
 ```jsonc
 {
@@ -53,9 +53,9 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
     // (ordinarily-resident) PR are not foreign. This is the derivation behind firb_status's
     // `derived_from: citizenship_status` in buyer_profile. The PR-not-ordinarily-resident edge and the
     // NZ / spouse carve-outs are NOT in this predicate (no backing facts on the Mode A surface) — see Notes.
-    { "leaf": "profile.firb_required",
+    { "leaf": "applicant.firb_required",
       "rule": { "kind": "criteria", "combine": "all_of", "criteria": [
-        { "field": "profile.citizenship_status", "op": "in", "value": ["temporary_resident", "non_resident"] } ] } }
+        { "field": "applicant.citizenship_status", "op": "in", "value": ["temporary_resident", "non_resident"] } ] } }
   ],
   "parameters": {
     "ordinarily_resident_min_days":   { "type": "integer", "value": 200, "note": "physically in Australia ≥200 of the preceding 365 days — limb 1 of the ordinarily-resident test" },

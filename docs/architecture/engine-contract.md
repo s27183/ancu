@@ -160,11 +160,14 @@ The engine runs its own Postgres. Each shell runs its own. The API is the only c
 | Table | Purpose |
 |---|---|
 | `tenants`, `tenant_signing_keys` | Per-tenant keys, resource-protection quotas |
-| `plan_cards` | `{plan_card_id, tenant_id, user_id, blueprint_slug, mode, status, deploy_commit_sha, content_jsonb}` — base plan + addenda; SOT for the agent's grounding (constraint #9) |
+| `profiles` | `{profile_id, tenant_id, user_id, facts_jsonb, created_at, updated_at}` — the persistent **household fact base** (Decision 1, [`fact-model-unification.md`](fact-model-unification.md)): mode-independent buyer facts (`applicants[]`, `off_title_parties[]`, household financials, `derived.firb_required_any`), accumulating across journeys = the lifecycle moat. SOT for *current* facts; outlives every plan card |
+| `plan_cards` | `{plan_card_id, tenant_id, profile_id, blueprint_slug, intent, mode, status, deploy_commit_sha, content_jsonb}` — one per **purchase journey** (FK → `profiles`), 1..N per household; base plan + addenda in `content_jsonb`. `mode` is a **derived** label (`firb_required_any × intent`), never a key (Decision 1). SOT for the agent's grounding (constraint #9) |
 | `plan_card_events` | Durable typed-event log (§4). SOT for `Last-Event-ID` replay |
 | `sessions` | Conversation log, `session_id = user_id × plan_card_id`. Stores vendor-neutral glue `(turn_id, user_text, assistant_text, ts)` only — **not** reasoning items, **not** pinned file ids (those are in-turn-transient / vendor-format; [`isolation-model.md`](isolation-model.md) §4). For user re-reading + Q&A coherence + audit; **not** agent grounding (constraint #9) |
 | `audit_events` | Compliance-pipeline attribution + which KB versions were active per fill. No cost fields |
 | `artifacts` | Content-addressed engine outputs (document reports, Tìm Nhà briefs, decision-trail entries) backing artifact refs |
+
+**Fact base ↔ plan split (Decision 1, [`fact-model-unification.md`](fact-model-unification.md)).** Buyer facts live **once** in `profiles` (the accumulating moat), not per plan card — so a household's first-home journey and a later investment journey share one fact base, and a mode/journey change never orphans it. `plan_cards` reference it by FK. At each fill, the resolved facts + KB content are **snapshotted into `plan_cards.content_jsonb`** (with `deploy_commit_sha`) for the reproducible audit trail (architecture §11.9) and as the card's grounding surface; `profiles` stays live. **Serialization:** the per-`plan_card_id` invariant ([`isolation-model.md`](isolation-model.md) §3) covers Wedge 1 (one plan card per household); when multiple journeys exist, writes to the shared `profiles` row serialize per `profile_id` (a household-level turn) and plan-card turns read the profile at turn start. `mode` is never a partition key — derived per plan and per applicant.
 
 The engine schema evolves on the engine's cadence; no shell coordinates on an engine migration.
 

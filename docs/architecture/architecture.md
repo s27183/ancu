@@ -175,6 +175,8 @@ A foundational architectural decision: the platform organises agent reasoning ar
 
 The UI is a *view of the filled blueprint instance*, and the agent reasons within and across *the same component pipeline*. One template; two consumers.
 
+> **Read [`structure-map.md`](structure-map.md) first** for the hub map — all the structures and how they relate across planes (build-time, runtime data, agentic turn, persistence, engine/shell), in mermaid, with the containers, the concrete FHG trace, and the addressing convention. This section is the detailed formalisation of the runtime-data plane; that doc is the picture it formalises and the index into every other section.
+
 Reference: [`docs/blueprints/fhb-domestic-au.md`](../blueprints/fhb-domestic-au.md) is the first concrete blueprint following this model. The remainder of this section formalises the model.
 
 #### Component pipeline as a DAG
@@ -239,7 +241,9 @@ Each component carries: `id`, `goal`, `inputs`, `kb_anchors`, `renderer`, `ui_ta
 
 #### The fact surface and the resolver-input registry
 
-Because outcomes carry facts (above), each component's `outcome_schema` *is* the typed **fact surface** the next components read. Resolver rules — eligibility predicates, lookups, and the parameters formulas consume (the KB rules layer, `content_json`) — may reference inputs only from the **resolver-input registry**: the union of the `outcome_schema` fields of all upstream components along the pipeline DAG, plus the declared external sources (property card, suburb enrichment). For `eligibility` the registry is `profile.*` ⊕ `property_fit.*` ⊕ `suburb.*` — note it reads the property *outcome* (`property_fit.*`), never `property_assessment`'s raw `basics.*` parameters, per the one-access-path rule below. (This is why the neutral property facts a scheme needs — `state`, `price`, `property_type`, `lga`, `is_capital_city` — are published in `property_fit`, not left in `basics`.)
+Because outcomes carry facts (above), each component's `outcome_schema` *is* the typed **fact surface** the next components read. Resolver rules — eligibility predicates, lookups, and the parameters formulas consume (the KB rules layer, `content_json`) — may reference inputs only from the **resolver-input registry**: the union of the `outcome_schema` fields of all upstream components along the pipeline DAG, plus the declared external sources (property card, suburb enrichment). For `eligibility` the registry is `profile.*` ⊕ `applicant.*` ⊕ `property_fit.*` ⊕ `suburb.*` — note it reads the property *outcome* (`property_fit.*`), never `property_assessment`'s raw `basics.*` parameters, per the one-access-path rule below. (This is why the neutral property facts a scheme needs — `state`, `price`, `property_type`, `lga`, `is_capital_city` — are published in `property_fit`, not left in `basics`.)
+
+The **`applicant.*` namespace** is a registry projection of the `profile.applicants` array's *element* type: every per-applicant leaf (`applicant.citizenship_status`, `applicant.age`, `applicant.ever_owned_au_property`, …) resolves and type-checks against that element schema, exactly like a flat `profile.*` field. It exists because the eligibility-bearing facts are per-applicant (a joint application has several), and the declarative rule layer has no quantifier (no control flow — see below). The quantification therefore lives in **resolver code**, fixed by which side the namespace appears on: a `criteria` `field` in `applicant.*` is evaluated for **every** element and the results **AND**-ed (the all-applicants test — `eligibility` §3 scope note); a `fills` rule whose `leaf` is in `applicant.*` is computed **per element** (a map over the array, e.g. `applicant.firb_required` derived from `applicant.citizenship_status`). Neither is control flow in the data — the criterion stays `{field, op, value}`; the ∀/map is a resolver behaviour the namespace selects. An application-scoped aggregate of a per-applicant fact is published as its own flat field (e.g. `profile.firb_required_any`), read like any other registry field.
 
 The registry makes two properties checkable at deploy by the artifact compiler:
 
@@ -248,7 +252,7 @@ The registry makes two properties checkable at deploy by the artifact compiler:
 
 Some values a rule consumes are *derived* rather than collected. Two cases, kept distinct:
 
-- **Derived published facts** live in an outcome and are read like any other registry field — e.g. `profile.firb_required` (from `citizenship_status`) or `property_fit.is_capital_city`. They are neutral facts, scheme-agnostic, so they are published once and reused.
+- **Derived published facts** live in an outcome and are read like any other registry field — e.g. `applicant.firb_required` (per-applicant, from `applicant.citizenship_status`) and its application-scoped aggregate `profile.firb_required_any`, or `property_fit.is_capital_city`. They are neutral facts, scheme-agnostic, so they are published once and reused.
 - **Resolver-local intermediates** are computed inside one scheme's rule and not published — e.g. FHG's `location_tier` (`capital_or_regional_centre` / `rest_of_state`). It is *not* a registry field: region tiering is per-scheme (state duty concessions tier regions differently), so there is no single published tier. The FHG resolver derives it from published geo facts (`property_fit.state`, `.lga`, `.is_capital_city`) plus FHG's own `designated_regional_centre_lgas` parameter (in `kb.scheme.fhg`), then uses it as the key into the cap lookup. The data (the LGA list, the cap table) is declarative KB; the classification is resolver code — no new `content_json` rule kind.
 
 #### Four blueprints — one per user mode
@@ -430,13 +434,13 @@ Worked example — `kb.scheme.fhg` `content_json` (the facts live once, as data;
 {
   "fills": [
     { "leaf": "eligibility.fhg.eligible",
-      "rule": { "kind": "criteria", "combine": "all_of", "criteria": [
-        { "field": "profile.citizenship_status", "op": "in",  "value": ["citizen","permanent_resident"] },
-        { "field": "profile.age",                 "op": "gte", "value": 18 },
+      "rule": { "kind": "criteria", "combine": "all_of", "criteria": [   // applicant.* ⇒ ∀ applicants (all-applicants test)
+        { "field": "applicant.citizenship_status", "op": "in",  "value": ["citizen","permanent_resident"] },
+        { "field": "applicant.age",                 "op": "gte", "value": 18 },
         { "combine": "any_of", "criteria": [
-          { "field": "profile.ever_owned_au_property",                "op": "eq",  "value": false },
-          { "field": "profile.years_since_last_au_property_interest", "op": "gte", "value": 10 } ] },
-        { "field": "profile.owner_occupier_intent", "op": "eq",  "value": true },
+          { "field": "applicant.ever_owned_au_property",                "op": "eq",  "value": false },
+          { "field": "applicant.years_since_last_au_property_interest", "op": "gte", "value": 10 } ] },
+        { "field": "applicant.owner_occupier_intent", "op": "eq",  "value": true },
         { "field": "property.price", "op": "lte", "ref": "eligibility.fhg.applicable_cap_for_location_property" } ] } },
 
     { "leaf": "eligibility.fhg.applicable_cap_for_location_property",

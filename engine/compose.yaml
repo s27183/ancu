@@ -1,0 +1,24 @@
+name: firsthomey-engine
+
+# Dev Postgres for the engine's runtime-state DB (engine-contract §9.1). The
+# schema is applied by the boot-time runner (fh_engine_migrations), not by this
+# file. Disposable: `docker compose -f engine/compose.yaml up -d`.
+services:
+  postgres:
+    image: postgres:16-alpine        # DDL needs >= 13 (pgcrypto, IDENTITY)
+    environment:
+      POSTGRES_DB: firsthomey_engine
+      POSTGRES_USER: engine
+      POSTGRES_PASSWORD: engine_dev_pw
+    ports:
+      - "5433:5432"                  # 5433 on host to avoid clashing with a local pg
+    volumes:
+      - engine_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U engine -d firsthomey_engine"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  engine_pg:

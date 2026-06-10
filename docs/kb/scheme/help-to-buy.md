@@ -55,10 +55,10 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
   "fills": [
     { "leaf": "eligibility.help_to_buy.eligible",
       "rule": { "kind": "criteria", "combine": "all_of", "criteria": [
-        { "field": "profile.citizenship_status",      "op": "eq",  "value": "citizen" },   // ⚠ citizen ONLY — PRs excluded (diverges from FHG)
-        { "field": "profile.age",                      "op": "gte", "value": 18 },
-        { "field": "profile.currently_owns_property",  "op": "eq",  "value": false },        // CURRENT ownership AU or overseas; past owners who sold are OK
-        { "field": "profile.owner_occupier_intent",    "op": "eq",  "value": true } ] } }
+        { "field": "applicant.citizenship_status",      "op": "eq",  "value": "citizen" },   // ⚠ citizen ONLY — PRs excluded (diverges from FHG)
+        { "field": "applicant.age",                      "op": "gte", "value": 18 },
+        { "field": "applicant.currently_owns_property",  "op": "eq",  "value": false },        // CURRENT ownership AU or overseas; past owners who sold are OK
+        { "field": "applicant.owner_occupier_intent",    "op": "eq",  "value": true } ] } }
     // income_cap_compliance, government_equity_percentage_offered, places_available are resolver-derived — see Notes
   ],
   "parameters": {

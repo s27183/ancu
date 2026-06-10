@@ -1,0 +1,17 @@
+{application, fh_engine, [
+    {description, "FirstHomey planning engine — Erlang/OTP gateway + sidecars"},
+    {vsn, "0.1.0"},
+    {registered, [fh_engine_sup, fh_engine_turn_sup]},
+    {mod, {fh_engine_app, []}},
+    {applications, [
+        kernel,
+        stdlib,
+        sasl,
+        crypto,
+        pgo,
+        cowboy
+    ]},
+    {modules, []},
+    {licenses, ["Apache-2.0"]},
+    {links, []}
+]}.

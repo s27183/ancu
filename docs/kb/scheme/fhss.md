@@ -61,10 +61,10 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
   "fills": [
     { "leaf": "eligibility.fhss.eligible",
       "rule": { "kind": "criteria", "combine": "all_of", "criteria": [
-        { "field": "profile.age",                    "op": "gte", "value": 18 },     // at the release request
-        { "field": "profile.ever_owned_au_property", "op": "eq",  "value": false },   // never held an AU property interest
-        { "field": "profile.owner_occupier_intent",  "op": "eq",  "value": true },    // live in 6 of first 12 months
-        { "field": "profile.prior_fhss_release",     "op": "eq",  "value": false } ] } },  // one valid release per lifetime; field in the buyer_profile fact surface
+        { "field": "applicant.age",                    "op": "gte", "value": 18 },     // at the release request
+        { "field": "applicant.ever_owned_au_property", "op": "eq",  "value": false },   // never held an AU property interest
+        { "field": "applicant.owner_occupier_intent",  "op": "eq",  "value": true },    // live in 6 of first 12 months
+        { "field": "applicant.prior_fhss_release",     "op": "eq",  "value": false } ] } },  // one valid release per lifetime; field in the buyer_profile fact surface
 
     { "leaf": "eligibility.fhss.release_timeline_business_days",
       "rule": { "kind": "parameter", "type": "integer", "value": 25 } },             // plan for the upper end of the 15–25 range

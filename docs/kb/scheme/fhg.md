@@ -69,12 +69,12 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
   "fills": [
     { "leaf": "eligibility.fhg.eligible",
       "rule": { "kind": "criteria", "combine": "all_of", "criteria": [
-        { "field": "profile.citizenship_status", "op": "in",  "value": ["citizen", "permanent_resident"] },
-        { "field": "profile.age",                 "op": "gte", "value": 18 },
+        { "field": "applicant.citizenship_status", "op": "in",  "value": ["citizen", "permanent_resident"] },
+        { "field": "applicant.age",                 "op": "gte", "value": 18 },
         { "combine": "any_of", "criteria": [
-          { "field": "profile.ever_owned_au_property",                "op": "eq",  "value": false },
-          { "field": "profile.years_since_last_au_property_interest", "op": "gte", "value": 10 } ] },
-        { "field": "profile.owner_occupier_intent", "op": "eq",  "value": true },
+          { "field": "applicant.ever_owned_au_property",                "op": "eq",  "value": false },
+          { "field": "applicant.years_since_last_au_property_interest", "op": "gte", "value": 10 } ] },
+        { "field": "applicant.owner_occupier_intent", "op": "eq",  "value": true },
         { "field": "property_fit.price", "op": "lte", "ref": "eligibility.fhg.applicable_cap_for_location_property" } ] } },
         // the property_fit.price criterion activates in per-property scope; base scope evaluates the profile-only criteria → provisional eligibility
 
