@@ -183,6 +183,15 @@ Extend the py + escript conformance suites with three postconditions:
 3. **Figures single-source** — a figure appears once (the data field), not duplicated per
    language; the `vi`/`en` prose carries no divergent number.
 
+> **Durability — see [`outcome-conformance.md`](outcome-conformance.md).** The conformance
+> here is attached to the current *workflow* (a hardcoded copy-doc list, hand-written cases),
+> so it must be re-extended as producers/languages change. The long-term solution reframes
+> bilingual as the **first clause** of a general *outcome-schema conformance* property,
+> enforced at the two workflow-invariant points every fill crosses (the compiler at build,
+> the `fh_engine_turn` serialization seam at runtime), driven off a `localized_text` type
+> declared in `outcome_schema`. That note records the design and the sequencing (the
+> build-time half is a down-payment doable now; the runtime half folds into 2c).
+
 ## 8. Contract amendment (surfaced drift, fixed not patched)
 
 `engine-contract.md:145,178` parks *"locale"* wholesale on the shell side. That is now wrong
