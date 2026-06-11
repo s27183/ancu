@@ -38,7 +38,11 @@ fill(Args, Upstream) ->
     Target = maps:get(<<"target_price_range">>, Profile, null),
     GlobalRules = fh_engine_kb:rules(),
     Facts = #{<<"applicants">> => Applicants,
-              <<"property_fit">> => #{<<"state">> => State}},
+              <<"property_fit">> => #{<<"state">> => State},
+              %% the couple-as-one partner gate (F4/G2) reads non_buying_partner.*;
+              %% buyer_profile defaults it to #{exists => false} (single-buyer).
+              <<"non_buying_partner">> =>
+                  maps:get(<<"non_buying_partner">>, Profile, #{<<"exists">> => false})},
     Schemes = catalog(State),
     Evaluated = [evaluate(S, GlobalRules, Facts, Target) || S <- Schemes],
     Outcome = assemble(Evaluated, State),

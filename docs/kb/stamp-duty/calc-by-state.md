@@ -102,7 +102,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
       "note": "Revenue NSW standard transfer-duty scale, 2025–26. marginal_rate_pct charged 'for each $100 or part of $100' over lower_bound (round excess up to next $100). First bracket has a $20 minimum.",
       "rounds_marginal_to_part_of_100": true,
       "entries": [
-        { "lower_bound": 0,       "upper_bound": 17000,   "base_duty": 0,      "marginal_rate_pct": 1.25, "calc_type": "marginal", "note": "minimum duty $20" },
+        { "lower_bound": 0,       "upper_bound": 17000,   "base_duty": 0,      "marginal_rate_pct": 1.25, "calc_type": "marginal", "min_duty": 20, "note": "minimum duty $20 (data-driven; the kernel applies max(duty, min_duty))" },
         { "lower_bound": 17000,   "upper_bound": 37000,   "base_duty": 212,    "marginal_rate_pct": 1.5,  "calc_type": "marginal" },
         { "lower_bound": 37000,   "upper_bound": 99000,   "base_duty": 512,    "marginal_rate_pct": 1.75, "calc_type": "marginal" },
         { "lower_bound": 99000,   "upper_bound": 372000,  "base_duty": 1597,   "marginal_rate_pct": 3.5,  "calc_type": "marginal" },
@@ -143,6 +143,16 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
         { "lower_bound": 540000,  "upper_bound": 1000000, "base_duty": 17325, "marginal_rate_pct": 4.5,  "calc_type": "marginal" },
         { "lower_bound": 1000000, "upper_bound": null,    "base_duty": 38025, "marginal_rate_pct": 5.75, "calc_type": "marginal" }
       ]
+    },
+    "qld_home_concession_scale": {
+      "note": "QRO home-concession rate schedule (owner-occupier) — a SECOND, lower QLD scale, NOT the standard one. It is the base the QLD first-home concession subtracts from: QRO computes 'duty at the home concession rate minus the additional [first-home] concession amount' (kb.scheme.qld.fhc). marginal_rate_pct charged 'for each $100 or part of $100' over lower_bound. The standalone home-concession ELIGIBILITY doc (kb.scheme.qld.home-concession) is still to author; this is only its rate SCALE, needed for the first-home arithmetic.",
+      "rounds_marginal_to_part_of_100": true,
+      "entries": [
+        { "lower_bound": 0,       "upper_bound": 350000,  "base_duty": 0,     "marginal_rate_pct": 1.0,  "calc_type": "marginal" },
+        { "lower_bound": 350000,  "upper_bound": 540000,  "base_duty": 3500,  "marginal_rate_pct": 3.5,  "calc_type": "marginal" },
+        { "lower_bound": 540000,  "upper_bound": 1000000, "base_duty": 10150, "marginal_rate_pct": 4.5,  "calc_type": "marginal" },
+        { "lower_bound": 1000000, "upper_bound": null,    "base_duty": 30850, "marginal_rate_pct": 5.75, "calc_type": "marginal" }
+      ]
     }
   }
 }
@@ -154,7 +164,7 @@ Notes:
 - **These are `lookup` tables, not `INDICATIVE`.** Unlike the [LMI rate matrix](../lmi/calculation.md) (proprietary, unpublished → indicative), duty scales are **published statutory schedules** — exact, regulated, ordered bands. They are real `lookup` data the resolver applies precisely, subject only to the per-$100 rounding rule and annual NSW indexation.
 - **`calc_type` carries the arithmetic shape.** Almost every bracket is `marginal` (base + rate × excess). Two exceptions are encoded so the resolver doesn't mis-apply them: QLD's first bracket is `nil`, and VIC's $960k–$2M bracket is `flat_on_total` (5.5% of the entire dutiable value, a deliberate VIC quirk). `rounds_marginal_to_part_of_100` (true for NSW/QLD, false for VIC) carries the "or part of $100" rule.
 - **VIC carries two scales by design.** The PPR concessional scale and the general scale are both SRO-published rate tables; which applies is control flow (owner-occupier? ≤ $550k?) → resolver code reading `applies_max_dutiable_value`. The FHB exemption is a third, separate layer owned by [`kb.scheme.vic.fhb-duty`](../scheme/vic/fhb-duty.md) — not re-derived here.
-- **QLD concession layers are cross-refs, not duplicated.** The home concession (`kb.scheme.qld.home-concession`, to be authored) and FHC/FHNHC reduce duty *from* this standard scale; single-owner discipline keeps their figures in their own docs.
+- **QLD carries two scales — standard and home-concession — both here.** Like VIC's two scales, both are published QRO rate schedules, so single-owner discipline puts both with the base scales: `qld_standard_scale` is "duty otherwise payable"; `qld_home_concession_scale` is the lower owner-occupier rate the **first-home** concession subtracts from (QRO: "home concession rate minus the additional concession amount"). The **first-home** concession *amount* (the stepped table) and FHC/FHNHC eligibility stay in their scheme docs; the standalone home-concession *eligibility* doc (`kb.scheme.qld.home-concession`) is still to author — only its rate scale is here, because the first-home arithmetic needs it. See [`stamp-duty-concession-mechanics.md`](../../architecture/stamp-duty-concession-mechanics.md) §3/§5.
 - **Seam reconciliation (done).** Four concession docs previously pointed their `duty_savings` notes at speculative per-state `…-duty-rates` slugs authored before this doc existed; those named the data **this doc** now owns, so [fhbas.md](../scheme/nsw/fhbas.md), [fhb-duty.md](../scheme/vic/fhb-duty.md), [fhc.md](../scheme/qld/fhc.md) and [fhnhc.md](../scheme/qld/fhnhc.md) have been repointed here. (`kb.scheme.qld.home-concession` is a genuinely distinct doc still to author — left as-is.)
 
 ## Sources

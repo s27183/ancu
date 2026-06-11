@@ -27,9 +27,8 @@ resolver(<<"buyer_profile">>, Args, _Upstream) ->
     buyer_profile(Args);
 resolver(<<"eligibility">>, Args, Upstream) ->
     fh_engine_eligibility:fill(Args, Upstream);
-resolver(<<"cash_position">>, _Args, _Upstream) ->
-    provisional(<<"budget_envelope">>, <<"calculator">>,
-                [<<"kb.stamp-duty.calc-by-state">>]);
+resolver(<<"cash_position">>, Args, Upstream) ->
+    fh_engine_cash:fill(Args, Upstream);
 resolver(<<"ownership_planning">>, _Args, _Upstream) ->
     provisional(<<"ongoing_obligations">>, <<"data-table">>,
                 [<<"kb.land-tax.ppor-exemption">>]);
@@ -86,6 +85,11 @@ buyer_profile(Args) ->
         %% conservative / fail-closed for FIRB: flag unless EVERY applicant is
         %% definitely non-foreign (`undetermined` errs toward requiring FIRB). Mode A → false.
         <<"firb_required_any">> => lists:any(fun(F) -> F =/= false end, FirbTri),
+        %% single-buyer default (consistent with the single-lead onboarding): no
+        %% non-buying partner declared. The couple-as-one schemes' partner gate (F4/G2)
+        %% reads this — exists=false makes the gate pass; a refine turn that reveals a
+        %% partner narrows it. (Their ownership facts arrive then, not at onboarding.)
+        <<"non_buying_partner">> => #{<<"exists">> => false},
         <<"intended_occupancy_use">> => <<"sole_occupier">>,
         <<"target_price_range">> => TargetRange,
         <<"target_zone">> => TargetZone,

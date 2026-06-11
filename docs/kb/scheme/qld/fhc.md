@@ -92,6 +92,24 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
       "Notify QRO (Form D2.4) if a retention condition is breached — reassessment plus interest and penalty tax may apply"
     ] }
   },
+  "lookup": {
+    "first_home_concession_amount": {
+      "note": "QRO first-home concession AMOUNT by value band, contracts on/after 9 Jun 2024. This is the amount SUBTRACTED from qld_home_concession_scale duty (kb.stamp-duty.calc-by-state) — NOT the dollar saving. cash_position computes after = max(0, home_concession_duty(V) − amount(V)); the max(0,…) floor yields full exemption ≤ $700k. Each band is [lower, max_value]; pick the band where value ≤ max_value. See stamp-duty-concession-mechanics.md §3/§5.",
+      "entries": [
+        { "max_value": 709999.99, "amount": 17350 },
+        { "max_value": 719999.99, "amount": 15615 },
+        { "max_value": 729999.99, "amount": 13880 },
+        { "max_value": 739999.99, "amount": 12145 },
+        { "max_value": 749999.99, "amount": 10410 },
+        { "max_value": 759999.99, "amount": 8675 },
+        { "max_value": 769999.99, "amount": 6940 },
+        { "max_value": 779999.99, "amount": 5205 },
+        { "max_value": 789999.99, "amount": 3470 },
+        { "max_value": 799999.99, "amount": 1735 },
+        { "max_value": null,      "amount": 0 }
+      ]
+    }
+  },
   "stacking": {
     "combines_with": ["kb.scheme.fhg", "kb.scheme.fhss", "kb.scheme.help-to-buy"],   // the state doc declares the federal↔state edges (symmetric, §11.9); the federal docs do not list state concessions. Help to Buy explicitly allows stacking stamp-duty concessions.
     "alternative_to": ["kb.scheme.qld.fhnhc", "kb.scheme.qld.fh-vacant-land"],   // intra-slot exclusivity (all three fill the eligibility state_concession slot) — slug-grained, so expressible; also enforced by disjoint `applicable` criteria (established vs new vs vacant)
@@ -103,6 +121,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
 Notes:
 
 - **`duty_savings`** (the `eligibility.state_concession.duty_savings` leaf) is **not** filled here — it is resolver arithmetic: the difference between full transfer duty and concessional duty on `property_fit.price`, from the Queensland transfer-duty rate schedule ([`kb.stamp-duty.calc-by-state`](../../stamp-duty/calc-by-state.md)), capped at `max_first_home_saving`. Cross-doc orchestration, the same pattern as FHG's `lmi_savings_estimate` and FHNHC's `duty_savings`.
+- **Two different QLD numbers — saving vs concession amount — don't confuse them.** `max_first_home_saving` ($24,525) is the **dollar SAVING** at $700k = the *standard* duty there (what the buyer avoids). The `first_home_concession_amount` table tops out at **$17,350** — a different quantity, the amount **subtracted from the lower home-concession-scale duty** (= home-concession duty at $700k, which the subtraction zeroes). Both are correct: at $700k, standard $24,525 − concessional $0 = $24,525 saving, while the concession *amount* applied to the home-concession scale is $17,350. The mechanics: `after = max(0, home_concession_duty(V) − first_home_concession_amount(V))`, `saving = standard_duty(V) − after`. See [`stamp-duty-concession-mechanics.md`](../../../architecture/stamp-duty-concession-mechanics.md) §3.
 - **`concession_type`** (the `eligibility.state_concession.concession_type` leaf) is likewise **resolver-derived**, not a flat parameter as in FHNHC — it is value-banded: `full_exemption` at or under `nil_duty_threshold` ($700k), `partial_concession` above that up to `value_cap` ($800k), `no_concession` above `value_cap`. The enum cannot be expressed as a `criteria` fill (criteria yield bools), so the resolver assigns it from `property_fit.price` against the two thresholds. Document-supplied numbers, resolver-applied comparison — the "computed, not asserted" line.
 - **`prior_overseas_property_ownership` carries opposite verdicts across schemes** — non-disqualifying for `kb.scheme.fhg`/`kb.scheme.fhss`, disqualifying here. This is the fact surface working as intended (the profile holds the neutral fact; each scheme's `criteria` decides). QLD's statutory test is "another **residence**"; our fact is property-level (slightly broader), a conservative approximation — flag if a residence-vs-any-interest distinction ever becomes load-bearing.
 - **`order_hint: 30`** (after FHSS 10 and FHG 20) — a duty concession is claimed at **settlement** (self-assessed via the transfer), the latest of the three in the buyer's timeline. Matches FHNHC, since only one of the two ever fills the slot for a given purchase.

@@ -51,6 +51,9 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
       "rule": { "kind": "criteria", "combine": "all_of", "criteria": [
         { "field": "property_fit.state",             "op": "eq",  "value": "VIC" },
         { "field": "applicant.ever_owned_au_property", "op": "eq",  "value": false },            // AU-only test — overseas ownership does NOT disqualify (favourable; opposite of QLD)
+        { "combine": "any_of", "criteria": [                                                     // F4/G2 couple-as-one: a spouse/de-facto partner's prior AU ownership disqualifies even with no legal interest
+          { "field": "non_buying_partner.exists",                 "op": "eq", "value": false },   // no partner → gate moot
+          { "field": "non_buying_partner.ever_owned_au_property", "op": "eq", "value": false } ] },
         { "field": "applicant.age",                    "op": "gte", "value": 18 },
         { "field": "applicant.citizenship_status",     "op": "in",  "value": ["citizen", "permanent_resident"] },
         { "field": "applicant.owner_occupier_intent",  "op": "eq",  "value": true },             // live 12 continuous months, starting within 12 months of settlement
@@ -79,7 +82,7 @@ Notes:
 - **`concession_type`** is **resolver-derived**, not a flat parameter: `full_exemption` at or under `exemption_threshold` ($600k), `partial_concession` up to `concession_cap` ($750k), else `no_concession`. Banded selection is control flow → resolver code, document-supplied numbers.
 - **No `property_type` restriction** — the duty benefit covers new **and** established homes (and vacant land). This contrasts with QLD (separate new/established concessions) and is the reason there is no `alternative_to` within Victoria for the duty slot.
 - **`ever_owned_au_property` only** — Australia-only test, so `prior_overseas_property_ownership` is deliberately not consulted (the same neutral fact that disqualifies under QLD is not in this predicate).
-- **The "previously received this benefit" gate and spouse history are not encoded** as hard predicates (no such facts on the surface); rare for a fresh Mode A FHB, documented rather than dangled — same treatment as the NSW and QLD docs.
+- **Spouse OWNERSHIP history IS now encoded** (`non_buying_partner.ever_owned_au_property`, F4/G2) — `non_buying_partner` is now a typed namespace on the resolver-input registry ([`registry-projection.md`](../../architecture/registry-projection.md)), so the "promote to facts when load-bearing" threshold is met (a buyer with no partner, `non_buying_partner.exists = false`, passes). Still **not** encoded (no backing fact): the **"previously received this benefit" gate** and the spouse's prior-*benefit* history; rare for a fresh Mode A FHB, documented rather than dangled.
 
 ## Sources
 

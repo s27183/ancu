@@ -151,6 +151,46 @@ def parse_type_string(s):
     return s, None
 
 
+def split_top_level(s, sep=","):
+    """Split on `sep` only at bracket depth 0 (so an `enum [a, b]` sub-type isn't cut)."""
+    out, depth, cur = [], 0, []
+    for ch in s:
+        if ch in "[{(":
+            depth += 1
+        elif ch in "]})":
+            depth -= 1
+        if ch == sep and depth == 0:
+            out.append("".join(cur))
+            cur = []
+        else:
+            cur.append(ch)
+    if cur:
+        out.append("".join(cur))
+    return out
+
+
+def parse_object_entity(tstr):
+    """A nested-object outcome-field type string `{ f: type, ... }` (optionally
+    `| null`) -> {field: meta{type,options}|None}; None if `tstr` is not an object.
+    A sub-field written name-only (no `: type`) is type-unknown (None) — the same
+    graceful state as a typeless applicant field. (registry-projection.md §2.)"""
+    s = re.sub(r"\s*\|\s*null\s*$", "", tstr.strip()).strip()
+    if not (s.startswith("{") and s.endswith("}")):
+        return None
+    fields = {}
+    for part in split_top_level(s[1:-1]):
+        part = part.strip()
+        if not part:
+            continue
+        if ":" in part:
+            name, _, typ = part.partition(":")
+            base, opts = parse_type_string(typ.strip())
+            fields[name.strip()] = {"type": base, "options": opts}
+        else:
+            fields[part] = None
+    return fields
+
+
 def flatten_param_slots(d, prefix=""):
     """Param dict -> {dotted_path: meta}. A node WITH a `type` key is a leaf slot
     (do not recurse into it — milestones/arrays carry nested `value`)."""
@@ -232,15 +272,19 @@ class Registry:
     def __init__(self):
         self.outcome_fields = {}     # outcome_type -> {field: type string}
         self.applicant_fields = {}   # field -> meta {type, options}|None
+        self.entities = {}           # namespace -> {fields: {field: meta}, cardinality}
         self.param_slots = {}        # "{component}.path" -> meta  (leaf slots)
         self.leaves = {}             # leaf path -> [filling slugs]
 
     def field_meta(self, ns, rest):
         """(status, meta) for a dotted read token ns.rest.
         status ∈ {field, external, missing_ns, missing_field}."""
-        if ns == "applicant":
-            if rest in self.applicant_fields:
-                return "field", self.applicant_fields[rest]
+        # projected structured-entity namespaces (registry-projection.md): `applicant`
+        # (per-element) + nested objects like `non_buying_partner` (singleton).
+        if ns in self.entities:
+            fields = self.entities[ns]["fields"]
+            if rest in fields:
+                return "field", fields[rest]
             return "missing_field", None
         if ns in EXTERNAL_NS:
             return "external", None
@@ -286,6 +330,30 @@ def build_registry(components):
             flatten_element_meta(val[0], elem_meta)
     for name in names:
         reg.applicant_fields[name] = elem_meta.get(name)  # None => type-unknown
+    # `applicant` is the PER-ELEMENT instance of the structured-entity rule (its types
+    # are sourced from the parameter element above — the array entity's SOT, §2).
+    reg.entities["applicant"] = {"fields": reg.applicant_fields, "cardinality": "per_element"}
+    # SINGLETON object entities: every outcome field typed as a nested object `{ ... }`
+    # projects its sub-fields into a namespace = the field name (registry-projection.md §1/§3).
+    # `array<{...}>` fields (applicants) are NOT matched here — they are per-element entities
+    # under an explicit alias (only `applicant` today). Types come from the producing
+    # component's same-named PARAMETER when present (the entity's SOT — flattened like the
+    # applicant element, so a nested `ownership_history` group flattens to leaf names), else
+    # from inline type-string types. Purely additive: only makes previously-`missing_ns`
+    # nested tokens resolvable, never changes an existing resolution.
+    bp_params = getattr(bp_comp, "_params", None) or {}
+    for fields in reg.outcome_fields.values():
+        for fname, tstr in fields.items():
+            inline = parse_object_entity(tstr)
+            if inline is None:
+                continue
+            typed = {}
+            param = bp_params.get(fname)
+            if isinstance(param, dict):
+                flatten_element_meta(param, typed)
+            ent_fields = {n: (typed.get(n) if typed.get(n) is not None else inline.get(n))
+                          for n in inline}
+            reg.entities[fname] = {"fields": ent_fields, "cardinality": "singleton"}
     return reg
 
 
@@ -624,6 +692,8 @@ def build_artifact(blueprints, reg, kb_docs):
         "registry": {
             "outcome_fields": reg.outcome_fields,
             "applicant_fields": {k: v for k, v in reg.applicant_fields.items()},
+            "entities": {ns: {"fields": e["fields"], "cardinality": e["cardinality"]}
+                         for ns, e in sorted(reg.entities.items())},
             "param_slots": sorted(reg.param_slots),
             "leaves": {k: sorted(v) for k, v in reg.leaves.items()},
         },

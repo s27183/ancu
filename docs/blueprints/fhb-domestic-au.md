@@ -560,6 +560,7 @@ The `mortgage_plan` outcome feeds `cash_position` (loan amount + buffer requirem
 {
   "type": "budget_envelope",
   "fields": {
+    "stamp_duty": "{ before_concession: money|null, concession_applied: money|null, after_concession: money|null, notes: array<string> }",  // the calculator's transfer-duty breakdown — resolver-computed (mechanism B) by fh_engine_cash from kb.stamp-duty.calc-by-state + the eligible concession (architecture/stamp-duty-concession-mechanics.md). At base, evaluated at the target-range ceiling; the income/savings-dependent fields below stay null until a refine turn (honest partial output).
     "max_property_price_supported": "money",
     "actual_property_price": "money",
     "total_cash_required": "money",
