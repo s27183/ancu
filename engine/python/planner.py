@@ -96,6 +96,16 @@ def notify(method, params):
     write_frame({"method": method, "params": params})
 
 
+# --- bilingual content type (bilingual-content.md §1/§3a) ----------------------
+# Every user-facing FREE-TEXT field is a {vi, en} pair — Vietnamese is first-class,
+# authored in the same pass (not translated; trap #4). Figures/enums/bools/dates stay
+# single-valued (the shell localizes labels + formats numbers). The agent authors BOTH
+# languages; making the field this type is what FORCES it to (schema-as-constraint).
+class LocalizedText(BaseModel):
+    vi: str
+    en: str
+
+
 # --- the agent's output schema: the TWO lender_fit leaves ONLY (2b-3) -----------
 # §98 enforcement-by-schema: the agent authors ONLY these two qualitative leaves —
 # there is NO money/number field here, so the LLM structurally cannot produce a
@@ -112,9 +122,9 @@ RateStructure = Literal["variable", "fixed_1yr", "fixed_2yr", "fixed_3yr",
 
 
 class LenderRec(BaseModel):
-    lender: str
-    reasoning: str
-    approval_likelihood: str  # high | moderate | low | indicative
+    lender: str                  # proper name — single-valued
+    reasoning: LocalizedText     # user-facing prose — {vi, en} (bilingual-content.md §1)
+    approval_likelihood: str     # enum: high | moderate | low | indicative — single-valued
 
 
 class LenderFitLeaves(BaseModel):
@@ -207,8 +217,14 @@ user-facing text fields of your output. A figure and its plain-language basis ar
 content; the internal rule label is not."""
 
 _STYLE = """\
-Concise and plain — figures over adjectives. The reader is a first home buyer often \
-reading in a second language (Vietnamese / English). Prefer short, concrete statements."""
+Concise and plain — figures over adjectives; short, concrete statements.
+BILINGUAL (first-class, both languages): every free-text field is a {vi, en} object. \
+Author BOTH — Vietnamese (`vi`) AND English (`en`) — carrying the SAME meaning. The \
+Vietnamese is natural, register-appropriate Vietnamese for a first home buyer and their \
+family (warm but precise; the formal/respectful register a Vietnamese reader expects when \
+money and family are involved) — NOT a word-for-word transliteration of the English, and \
+NOT machine-translation tone. Write each language as a fluent speaker would; keep both \
+equally concise. Do not leave `vi` as an English string."""
 
 # Per-reasoning_domain modules (agentic-flow §3). `lender_fit` is the mortgage_finance
 # agent half of a TWO-PATH component (mortgage-finance-two-path.md): the figures are
@@ -254,7 +270,8 @@ lender. Defer precise per-lender treatment to a broker.
 `<plan_card_state>` (buyer profile + scheme_stack) and the KB.
 2. If the recommended_path is `fhg_backed`, build the shortlist from the FHG panel — \
 the majors plus the breadth of customer-owned/regional panel lenders — each with plain \
-reasoning grounded in the KB (e.g. wide panel → broker can compare; no rate premium).
+reasoning grounded in the KB (e.g. wide panel → broker can compare; no rate premium). \
+Each `reasoning` is a {vi, en} pair: author the Vietnamese AND the English (see <style>).
 3. Set `approval_likelihood` honestly: `indicative` when income/debts are pending; a \
 real read (high/moderate/low) only if those facts are actually present.
 4. Set `fixed_vs_variable` to EXACTLY ONE of: variable | fixed_1yr | fixed_2yr | \

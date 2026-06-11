@@ -27,6 +27,10 @@
 
 -export([fill/2]).
 
+%% bilingual copy-templates (bilingual-content.md §3b) — user-facing notes/reasons are
+%% {vi,en} via fh_engine_i18n:subst/2; no Vietnamese literal in this module.
+-define(COPY, <<"kb.copy.eligibility">>).
+
 -spec fill(map(), map()) -> {map(), binary(), [map()]}.
 fill(Args, Upstream) ->
     Profile = maps:get(<<"profile">>, Upstream, #{}),
@@ -162,8 +166,7 @@ disposition(_Joint, BaseNode, BaseCrits, GR, Facts, Band, TypeCond, Target) ->
     case band_resolve(Band, Target) of
         {above, Cap} ->
             #{status => rejected,
-              reason => iolist_to_binary([<<"Property price cap is ">>, money(Cap),
-                                          <<"; your target starts above it.">>])};
+              reason => copy(<<"band_cap_above">>, #{<<"cap">> => money(Cap)})};
         BandOut ->
             BaseTri = fh_engine_resolver:eval_node_joint(BaseNode, GR, Facts),
             joint_disp(BaseTri, BaseCrits, GR, Facts, BandOut, TypeCond)
@@ -185,12 +188,12 @@ per_applicant_disp(PerAppl) ->
     case {lists:member(true, PerAppl), lists:member(undetermined, PerAppl)} of
         {true, _} ->
             #{status => eligible, eligible_applicants => EligibleIdx,
-              notes => [<<"Assessed per applicant — each eligible person can run their own."/utf8>>]};
+              notes => [copy(<<"per_applicant_eligible">>, #{})]};
         {false, true} ->
             #{status => pending,
-              notes => [<<"Confirm no previous First Home Super Saver release to finalise.">>]};
+              notes => [copy(<<"per_applicant_pending">>, #{})]};
         {false, false} ->
-            #{status => rejected, reason => <<"No applicant meets the FHSS criteria.">>}
+            #{status => rejected, reason => copy(<<"per_applicant_rejected">>, #{})}
     end.
 
 add_max(Disp, {straddle, Max}) -> Disp#{max_eligible_price => Max};
@@ -201,8 +204,8 @@ add_max(Disp, _)               -> Disp.
 reject_reason(BaseCrits, GR, Facts) ->
     Failing = [label_of(C) || C <- BaseCrits, crit_tri(C, GR, Facts) =:= false],
     case Failing of
-        [L | _] -> iolist_to_binary([<<"Does not meet: ">>, L, <<".">>]);
-        []      -> <<"Does not meet the eligibility criteria.">>
+        [L | _] -> copy(<<"reject_meets">>, #{<<"label">> => L});
+        []      -> copy(<<"reject_generic">>, #{})
     end.
 
 pending_labels(BaseCrits, GR, Facts) ->
@@ -212,29 +215,33 @@ crit_tri(C, GR, Facts) ->
     fh_engine_resolver:eval_node_joint(
         #{<<"combine">> => <<"all_of">>, <<"criteria">> => [C]}, GR, Facts).
 
+%% confirm_note: the failing labels are bilingual; join each language separately, then
+%% drop the joined phrase into the bilingual frame (bilingual-content.md §3b).
 confirm_note(Labels) ->
-    iolist_to_binary([<<"Confirm ">>, join(Labels, <<", ">>), <<" to finalise.">>]).
+    copy(<<"confirm">>, #{<<"labels">> => join_loc(Labels, <<", ">>)}).
 
 band_notes({straddle, Max}) ->
-    [iolist_to_binary([<<"Eligible for properties up to ">>, money(Max),
-                       <<"; the exact cap depends on the suburb.">>])];
+    [copy(<<"band_straddle">>, #{<<"max">> => money(Max)})];
 band_notes(_) -> [].
 
-type_notes(true)  -> [<<"Available for an eligible new build or off-the-plan purchase.">>];
+type_notes(true)  -> [copy(<<"type_new_build">>, #{})];
 type_notes(false) -> [].
 
+%% label_of: a user-facing noun phrase naming a criterion, as a bilingual {vi,en}
+%% fragment (it interpolates into the reject_meets / confirm frames).
 label_of(C) ->
-    case field_of(C) of
-        undefined                                       -> <<"ownership history">>;
-        <<"applicant.citizenship_status">>              -> <<"Australian citizenship or permanent residency">>;
-        <<"applicant.age">>                             -> <<"age 18 or over">>;
-        <<"applicant.ever_owned_au_property">>          -> <<"first-home-buyer status">>;
-        <<"applicant.owner_occupier_intent">>           -> <<"intention to live in the home">>;
-        <<"applicant.prior_fhss_release">>              -> <<"no previous FHSS release">>;
-        <<"applicant.currently_owns_property">>         -> <<"not currently owning property">>;
-        <<"property_fit.state">>                        -> <<"a property in your state">>;
-        _                                               -> <<"the eligibility details">>
-    end.
+    Id = case field_of(C) of
+        undefined                                       -> <<"label_ownership_history">>;
+        <<"applicant.citizenship_status">>              -> <<"label_citizenship">>;
+        <<"applicant.age">>                             -> <<"label_age">>;
+        <<"applicant.ever_owned_au_property">>          -> <<"label_first_home_buyer">>;
+        <<"applicant.owner_occupier_intent">>           -> <<"label_owner_occupier">>;
+        <<"applicant.prior_fhss_release">>              -> <<"label_no_prior_fhss">>;
+        <<"applicant.currently_owns_property">>         -> <<"label_not_currently_owning">>;
+        <<"property_fit.state">>                        -> <<"label_property_state">>;
+        _                                               -> <<"label_generic">>
+    end,
+    copy(Id, #{}).
 
 %% --- assembly ----------------------------------------------------------------
 
@@ -263,9 +270,9 @@ to_applicable(E) ->
       <<"notes">> => status_prefix(Disp) ++ maps:get(notes, Disp, [])}.
 
 %% surface the disposition as the lead note (renderer reads `notes`).
-status_prefix(#{status := eligible})    -> [<<"Eligible.">>];
-status_prefix(#{status := conditional}) -> [<<"Conditionally available.">>];
-status_prefix(#{status := pending})     -> [<<"Likely eligible — pending a few details."/utf8>>];
+status_prefix(#{status := eligible})    -> [copy(<<"status_eligible">>, #{})];
+status_prefix(#{status := conditional}) -> [copy(<<"status_conditional">>, #{})];
+status_prefix(#{status := pending})     -> [copy(<<"status_pending">>, #{})];
 status_prefix(_)                        -> [].
 
 basis(Evaluated) ->
@@ -286,8 +293,8 @@ stacking_constraints(Applicable) ->
         end, Applicable)).
 
 alternatives_note(A, B) ->
-    [X, Y] = lists:sort([A, B]),
-    iolist_to_binary([X, <<" and ">>, Y, <<" are alternatives — choose one."/utf8>>]).
+    [X, Y] = lists:sort([A, B]),   %% scheme names — scalar params, same in both languages
+    copy(<<"alternatives">>, #{<<"a">> => X, <<"b">> => Y}).
 
 sort_by_order(Applicable) ->
     lists:sort(fun(A, B) -> order_hint(A) =< order_hint(B) end, Applicable).
@@ -300,8 +307,7 @@ maybe_state_note(Outcome, _State) ->
     %% no silent cap: non-NSW state concessions aren't evaluated yet.
     Constraints = maps:get(<<"stacking_constraints">>, Outcome),
     Outcome#{<<"stacking_constraints">> =>
-                 Constraints ++ [<<"State stamp-duty concessions for your state are not "
-                                   "yet assessed here — federal schemes only."/utf8>>]}.
+                 Constraints ++ [copy(<<"state_not_assessed">>, #{})]}.
 
 %% --- helpers -----------------------------------------------------------------
 
@@ -319,6 +325,17 @@ enumerate(L) -> lists:zip(lists:seq(0, length(L) - 1), L).
 join([], _Sep) -> <<>>;
 join([X], _Sep) -> X;
 join([X | Rest], Sep) -> iolist_to_binary([X, Sep, join(Rest, Sep)]).
+
+%% join_loc: join bilingual fragments per-language (vi's together, en's together) so the
+%% joined phrase reads naturally in each language before it enters a frame.
+join_loc(Locs, Sep) ->
+    fh_engine_i18n:loc(join([maps:get(<<"vi">>, L) || L <- Locs], Sep),
+                       join([maps:get(<<"en">>, L) || L <- Locs], Sep)).
+
+%% subst a kb.copy.eligibility template into a bilingual {vi,en} value.
+-spec copy(binary(), #{binary() => fh_engine_i18n:param()}) -> fh_engine_i18n:localized().
+copy(Id, Params) ->
+    fh_engine_i18n:subst(fh_engine_kb:copy(?COPY, Id), Params).
 
 %% money as a plain "$1,500,000" string — shared formatter (fh_engine_money).
 money(N) -> fh_engine_money:money(N).

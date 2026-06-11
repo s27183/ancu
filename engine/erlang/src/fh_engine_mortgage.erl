@@ -22,6 +22,7 @@
          pre_approval_action_plan/0]).
 
 -define(SERVICEABILITY, <<"kb.lender.serviceability-basics">>).
+-define(COPY, <<"kb.copy.mortgage">>).   %% bilingual copy-templates (bilingual-content.md §3b)
 
 %% --- fill (resolver half) ---------------------------------------------------
 
@@ -97,40 +98,37 @@ loan_structure_base() ->
       <<"offset">> => null}.
 
 %% A generic, KB-grounded pre-approval action plan (process steps, not figures). The
-%% 5%/3-month genuine-savings convention is pulled from the serviceability KB so there
-%% is no magic literal; informational/decision-support, not advice.
--spec pre_approval_action_plan() -> [binary()].
+%% 5%/3-month genuine-savings convention is pulled from the serviceability KB so there is
+%% no magic literal; the user-facing copy is the bilingual {vi,en} template (kb.copy.mortgage)
+%% interpolated by fh_engine_i18n:subst/2 — no Vietnamese literal in Erlang, no io:format ~s
+%% (bilingual-content.md §3b). Informational/decision-support, not advice.
+-spec pre_approval_action_plan() -> [fh_engine_i18n:localized()].
 pre_approval_action_plan() ->
     Pct    = kb_param(?SERVICEABILITY, <<"genuine_savings_min_pct">>),
     Months = kb_param(?SERVICEABILITY, <<"genuine_savings_min_months">>),
-    [ iolist_to_binary(io_lib:format(
-        "Build genuine-savings evidence: about ~p% of the purchase price held for ~p+ "
-        "months (regular savings, not a sudden lump sum).", [Pct, Months])),
-      <<"Gather income evidence (recent payslips; tax returns if self-employed).">>,
-      <<"List current debts with their limits (HECS, credit cards, BNPL, personal/car "
-        "loans) - limits, not balances, drive serviceability.">>,
-      <<"Compare lenders across the First Home Guarantee panel, or engage a broker who "
-        "covers many panel lenders.">> ].
+    [ copy(<<"action_genuine_savings">>, #{<<"pct">> => Pct, <<"months">> => Months}),
+      copy(<<"action_income_evidence">>, #{}),
+      copy(<<"action_list_debts">>, #{}),
+      copy(<<"action_compare_panel">>, #{}) ].
 
 %% key_assumptions: the one regulated constant (the buffer) plus the conventions that
 %% shape capacity, each flagged as a convention (not this buyer's actual lender policy),
-%% and the honest-partial note that capacity is pending the income/debt facts.
--spec key_assumptions(number(), boolean()) -> [binary()].
+%% and the honest-partial note that capacity is pending the income/debt facts. Bilingual
+%% via kb.copy.mortgage; only the buffer figure is interpolated.
+-spec key_assumptions(number(), boolean()) -> [fh_engine_i18n:localized()].
 key_assumptions(BufferPp, HasFhg) ->
-    Base = [
-        iolist_to_binary(io_lib:format(
-            "Borrowing capacity is assessed at your product rate + ~p percentage points "
-            "(the APRA serviceability buffer - a regulated constant).", [BufferPp])),
-        <<"Income shading (~80% of overtime/bonus/rental), the genuine-savings rule, and "
-          "the high-DTI ceiling (about 6x income) are lender conventions, not your "
-          "actual lender's policy - a broker confirms the specifics.">>,
-        <<"Your borrowing capacity and debt-optimisation figures are pending - they "
-          "compute once your income and debts are entered.">> ],
+    Base = [ copy(<<"assume_buffer">>, #{<<"buffer_pp">> => BufferPp}),
+             copy(<<"assume_conventions">>, #{}),
+             copy(<<"assume_pending">>, #{}) ],
     case HasFhg of
-        true  -> [<<"The First Home Guarantee lets you borrow with a 5% deposit and no "
-                    "LMI; there is no rate premium for using the guarantee.">> | Base];
+        true  -> [copy(<<"assume_fhg">>, #{}) | Base];
         false -> Base
     end.
+
+%% subst a kb.copy.mortgage template into a bilingual {vi,en} value.
+-spec copy(binary(), #{binary() => fh_engine_i18n:param()}) -> fh_engine_i18n:localized().
+copy(Id, Params) ->
+    fh_engine_i18n:subst(fh_engine_kb:copy(?COPY, Id), Params).
 
 %% --- KB access (matches fh_engine_ownership / fh_engine_cash) ----------------
 

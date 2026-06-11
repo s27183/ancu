@@ -76,7 +76,10 @@ _FIXTURES = {
         "outcome": {
             "recommended_lender_shortlist": [
                 {"lender": "A major lender (FHG panel)",
-                 "reasoning": "wide FHG panel; a broker can compare across it",
+                 "reasoning": {  # bilingual {vi, en} (bilingual-content.md §1)
+                     "vi": "Danh sách lớn các ngân hàng thuộc nhóm FHG; một chuyên viên "
+                           "vay vốn có thể so sánh giúp bạn.",
+                     "en": "wide FHG panel; a broker can compare across it"},
                  "approval_likelihood": "indicative"}],
             "fixed_vs_variable": "variable",
         },

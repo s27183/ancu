@@ -142,7 +142,7 @@ These belong to the shell, even when every shell wants them. The engine exposes 
 
 - Onboarding wizard, mode picker, map zone selection UX.
 - Plan-card visual rendering, the suburb-intelligence map, overlay toggles, tab layout.
-- Bilingual disclaimer copy, VND/AUD display formatting, locale, timezone.
+- *Display*-locale: VND/AUD number formatting, timezone, canned-chrome copy (fixed disclaimers), and enum→label maps (the renderer vocabulary, constraint #7). **Not** content-language: the bilingual `{vi, en}` *generated content* (agent rationale, resolver notes/assumptions) is **engine-owned** — the agent authors both languages and the resolver fills bilingual copy-templates, snapshotted at fill time for the audit trail ([`bilingual-content.md`](bilingual-content.md)). The shell chooses which language to show (or both, side-by-side for the Mode B family view); it never translates engine content.
 - Document-upload UI, attachment thumbnails, blob storage.
 - Tìm Nhà request form, curator queue UI, curator assignment workflow.
 - Commerce: Stripe, subscriptions, one-time fees, success-fee invoicing, regional pricing, credit/quota gating.
@@ -175,7 +175,7 @@ The engine schema evolves on the engine's cadence; no shell coordinates on an en
 
 ### 9.2 Shell databases
 
-One per shell, each owning its schema. Examples: `users`/`user_profiles` (identity, locale, bilingual prefs); the shell's *view* of plan cards (`{engine_plan_card_id, title, archived, last_opened_tab}`); commerce tables (subscriptions, one-time charges, success-fee ledger); `usage_records` (mirror of engine `usage`, aggregated for billing); Tìm Nhà request/queue state for the curator console; auth UX tables.
+One per shell, each owning its schema. Examples: `users`/`user_profiles` (identity, locale, bilingual *display* prefs — which language to show; engine content is already bilingual, [`bilingual-content.md`](bilingual-content.md)); the shell's *view* of plan cards (`{engine_plan_card_id, title, archived, last_opened_tab}`); commerce tables (subscriptions, one-time charges, success-fee ledger); `usage_records` (mirror of engine `usage`, aggregated for billing); Tìm Nhà request/queue state for the curator console; auth UX tables.
 
 ### 9.3 Cross-boundary
 

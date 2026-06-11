@@ -25,6 +25,8 @@
 -export([maintenance_target/1, statutory_band/0, land_tax_check/1,
          graduation_target_lvr/0, land_tax_threshold/1, has_fhg/1]).
 
+-define(COPY, <<"kb.copy.ownership">>).   %% bilingual copy-templates (bilingual-content.md §3b)
+
 %% --- entry -------------------------------------------------------------------
 
 -spec fill(map(), map()) -> {map(), binary(), [map()]}.
@@ -81,10 +83,8 @@ recurring_costs() ->
       <<"utilities">>          => null,   %% pending: no KB band (electricity/gas) - refine
       <<"building_insurance">> => null,   %% pending: sum-insured is property-specific - per-property
       <<"notes">> =>
-          [<<"Indicative annual ranges for a metro home; the binding figures are your "
-             "rates notice and (if strata) the disclosure statement.">>,
-           <<"Mortgage repayments and the all-in monthly total fill in once your loan "
-             "amount and rate are set.">>]}.
+          [copy(<<"note_indicative">>, #{}),
+           copy(<<"note_mortgage_pending">>, #{})]}.
 
 %% council + water annual band (strata excluded - applies only to strata title).
 -spec statutory_band() -> map().
@@ -135,28 +135,22 @@ alerts(HasFhg, LandTax, State, Intent) ->
 
 fhg_alert(true) ->
     Lvr = graduation_target_lvr(),
-    [#{<<"trigger">> => <<"Your loan-to-value ratio drops below 80%">>,
-       <<"action">>  => iolist_to_binary(
-           [<<"The First Home Guarantee falls away at ">>, integer_to_binary(Lvr),
-            <<"% LVR with nothing to repay, and a no-LMI refinance window opens - "
-              "we will flag it.">>])}];
+    [#{<<"trigger">> => copy(<<"alert_fhg_trigger">>, #{}),
+       <<"action">>  => copy(<<"alert_fhg_action">>, #{<<"lvr">> => Lvr})}];
 fhg_alert(false) -> [].
 
 review_alert() ->
     Cadence = kb_param(<<"kb.refinance.windows-and-triggers">>,
                        <<"refinance_review_cadence_months">>),
-    #{<<"trigger">> => iolist_to_binary(
-          [<<"Every ">>, integer_to_binary(Cadence), <<" months">>]),
-      <<"action">>  => <<"Review your rate against the market; a same-lender reprice "
-                         "is often cheaper than switching.">>}.
+    #{<<"trigger">> => copy(<<"alert_review_trigger">>, #{<<"cadence">> => Cadence}),
+      <<"action">>  => copy(<<"alert_review_action">>, #{})}.
 
 land_tax_alert(<<"exempt_ppor">>, State, <<"owner_occupier">>) ->
     Threshold = land_tax_threshold(State),
-    [#{<<"trigger">> => <<"You move out and rent this home">>,
-       <<"action">>  => iolist_to_binary(
-           [<<"It stops being your principal residence, so the land-tax exemption "
-              "ends and land tax can apply above the ">>, State, <<" threshold (">>,
-            fh_engine_money:money(Threshold), <<").">>])}];
+    [#{<<"trigger">> => copy(<<"alert_landtax_trigger">>, #{}),
+       <<"action">>  => copy(<<"alert_landtax_action">>,
+                             #{<<"state">> => State,
+                               <<"threshold">> => fh_engine_money:money(Threshold)})}];
 land_tax_alert(_, _, _) -> [].
 
 %% --- KB access + helpers -----------------------------------------------------
@@ -177,6 +171,12 @@ kb_param(Slug, Key) ->
     {ok, Cj} = fh_engine_kb:kb_rules(Slug),
     Params = maps:get(<<"parameters">>, Cj),
     maps:get(<<"value">>, maps:get(Key, Params)).
+
+%% subst a kb.copy.ownership template into a bilingual {vi,en} value (no Vietnamese
+%% literal in Erlang, no io:format ~s — bilingual-content.md §3b).
+-spec copy(binary(), #{binary() => fh_engine_i18n:param()}) -> fh_engine_i18n:localized().
+copy(Id, Params) ->
+    fh_engine_i18n:subst(fh_engine_kb:copy(?COPY, Id), Params).
 
 ceiling([_Lo, Hi]) when is_integer(Hi) -> Hi;
 ceiling(_)                             -> null.

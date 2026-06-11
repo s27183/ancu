@@ -22,6 +22,8 @@
 %% exported for the conformance harness (same anchors as the Python spec):
 -export([duty/2, stamp_duty/3]).
 
+-define(COPY, <<"kb.copy.cash">>).   %% bilingual copy-templates (bilingual-content.md §3b)
+
 %% --- entry -------------------------------------------------------------------
 
 -spec fill(map(), map()) -> {map(), binary(), [map()]}.
@@ -51,13 +53,11 @@ fill(Args, Upstream) ->
 
 -spec stamp_duty(binary(), boolean(), integer() | null) -> map().
 stamp_duty(_State, _HasConc, null) ->
-    pending_sd(<<"Set a target price range to estimate transfer duty.">>);
+    pending_sd(copy(<<"note_set_range">>, #{}));
 stamp_duty(State, HasConc, V) when is_integer(V) ->
     case scale_for(State) of
         undefined ->
-            pending_sd(iolist_to_binary(
-                [<<"Transfer duty for ">>, State,
-                 <<" is not yet modelled (NSW, VIC, QLD supported)."/utf8>>]));
+            pending_sd(copy(<<"note_state_unmodelled">>, #{<<"state">> => State}));
         StdScale ->
             BeforeRaw = duty(V, StdScale),
             AfterRaw  = case HasConc of
@@ -73,11 +73,11 @@ stamp_duty(State, HasConc, V) when is_integer(V) ->
               <<"notes">> => duty_notes(State, HasConc, V, Saving)}
     end.
 
-pending_sd(Why) ->
+pending_sd(LocNote) ->
     #{<<"before_concession">>  => null,
       <<"concession_applied">> => null,
       <<"after_concession">>   => null,
-      <<"notes">> => [Why]}.
+      <<"notes">> => [LocNote]}.
 
 %% --- the shared marginal-bracket kernel (§3) ---------------------------------
 %% duty(V, ScaleName): base + marginal_rate% x (V - lower), with the per-$100
@@ -190,25 +190,20 @@ budget_envelope(Sd, Ceiling) ->
       <<"genuine_savings_verdict">>      => <<"unknown">>,
       <<"mitigation_options_if_short">>  => [],
       <<"key_assumptions">> =>
-          [<<"Stamp duty is the only settlement cost estimated so far; the full cash "
-             "picture fills in as you add income, savings and a property.">>]
-          ++ ceiling_assumption(Ceiling)}.
+          [copy(<<"assume_stamp_only">>, #{})] ++ ceiling_assumption(Ceiling)}.
 
 ceiling_assumption(null)    -> [];
 ceiling_assumption(Ceiling) ->
-    [iolist_to_binary([<<"Duty computed at the top of your target range (">>,
-                       money(Ceiling), <<").">>])].
+    [copy(<<"assume_ceiling">>, #{<<"ceiling">> => money(Ceiling)})].
 
-%% --- user-facing duty notes --------------------------------------------------
+%% --- user-facing duty notes (bilingual via kb.copy.cash) ---------------------
 
 duty_notes(_State, true, _V, Saving) when Saving > 0 ->
-    [iolist_to_binary([<<"Includes the first-home transfer-duty concession — about "/utf8>>,
-                       money(Saving), <<" off — pending confirmation of your details."/utf8>>])];
+    [copy(<<"duty_concession_applied">>, #{<<"saving">> => money(Saving)})];
 duty_notes(_State, true, _V, _Saving) ->
-    [<<"At the top of your target range the first-home duty concession no longer "
-       "applies; a lower target may qualify.">>];
+    [copy(<<"duty_concession_phased_out">>, #{})];
 duty_notes(_State, false, _V, _Saving) ->
-    [<<"Shown at full duty — no first-home concession applied at this price/state yet."/utf8>>].
+    [copy(<<"duty_full">>, #{})].
 
 concession_anchor(<<"NSW">>, true) -> [<<"kb.scheme.nsw.fhbas">>];
 concession_anchor(<<"VIC">>, true) -> [<<"kb.scheme.vic.fhb-duty">>];
@@ -216,6 +211,12 @@ concession_anchor(<<"QLD">>, true) -> [<<"kb.scheme.qld.fhc">>];
 concession_anchor(_State, _)       -> [].
 
 %% --- KB access ---------------------------------------------------------------
+
+%% subst a kb.copy.cash template into a bilingual {vi,en} value (no Vietnamese
+%% literal in Erlang, no io:format ~s — bilingual-content.md §3b).
+-spec copy(binary(), #{binary() => fh_engine_i18n:param()}) -> fh_engine_i18n:localized().
+copy(Id, Params) ->
+    fh_engine_i18n:subst(fh_engine_kb:copy(?COPY, Id), Params).
 
 scale(Name) -> maps:get(Name, lookup(<<"kb.stamp-duty.calc-by-state">>)).
 

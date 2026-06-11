@@ -21,7 +21,7 @@
 -export([load/0, load/1]).
 -export([schema_version/0, in_scope_blueprint/0]).
 -export([blueprint/1, components/1, component/2]).
--export([kb/1, kb_content_md/1, kb_rules/1, kb_anchors/1]).
+-export([kb/1, kb_content_md/1, kb_rules/1, kb_anchors/1, copy/2]).
 -export([rules/0]).
 -export([registry/0, registry/1]).
 
@@ -124,6 +124,19 @@ kb_rules(Slug) ->
     case kb(Slug) of
         {ok, E} -> {ok, maps:get(<<"content_json">>, E, #{})};
         Err     -> Err
+    end.
+
+%% A bilingual copy-template: content_json.copy[TemplateId] -> {vi, en} pair with
+%% `{param}` placeholders (bilingual-content.md §3b). The resolver pairs this with
+%% fh_engine_i18n:subst/2 to produce user-facing {vi, en} content WITHOUT any Vietnamese
+%% literal in Erlang (which would crash io:format ~s on its >255 codepoints). A missing
+%% template is a build error — crash loudly (fail-closed), do not silently English-only.
+-spec copy(binary(), binary()) -> fh_engine_i18n:localized().
+copy(Slug, TemplateId) ->
+    {ok, Cj} = kb_rules(Slug),
+    case maps:find(TemplateId, maps:get(<<"copy">>, Cj, #{})) of
+        {ok, Template} -> Template;
+        error          -> error({kb_copy_not_found, Slug, TemplateId})
     end.
 
 %% The kb_versions audit snapshot for a fill: slug -> {effective_from, last_verified}.
