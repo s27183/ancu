@@ -2,4 +2,7 @@
 name = "firsthomey"
 version = "0.1.0"
 requires-python = ">=3.14"
-dependencies = []
+dependencies = [
+    "claude-agent-sdk",  # the planning-sidecar runner (agentic-flow §7/§7.1); draws subscription credit
+    "pydantic",          # outcome_schema validation of leaf-fill structured output
+]
