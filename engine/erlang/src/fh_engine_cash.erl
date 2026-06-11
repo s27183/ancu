@@ -258,18 +258,5 @@ onboarding_state(Args, Profile) ->
 dollars(X) when X =< 0 -> 0;
 dollars(X)            -> trunc(X + 0.5).
 
-%% money as a plain "$1,500,000" string (local copy of the eligibility formatter —
-%% extract to a shared fh_engine_money util as a separate refactor; flagged).
-money(N) when is_integer(N), N < 0 -> iolist_to_binary([<<"-">>, money(-N)]);
-money(N) when is_integer(N) ->
-    iolist_to_binary([<<"$">>, group_thousands(integer_to_list(N))]);
-money(N) -> iolist_to_binary(io_lib:format("$~p", [N])).
-
-group_thousands(Digits) ->
-    Chunks = chunk3(lists:reverse(Digits)),
-    Groups = lists:reverse([lists:reverse(C) || C <- Chunks]),
-    lists:flatten(lists:join(",", Groups)).
-
-chunk3([])            -> [];
-chunk3([A, B, C | T]) -> [[A, B, C] | chunk3(T)];
-chunk3(Rest)          -> [Rest].
+%% money as a plain "$1,500,000" string — shared formatter (fh_engine_money).
+money(N) -> fh_engine_money:money(N).

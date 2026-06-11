@@ -23,9 +23,16 @@ the Max-subscription credit — only via the SDK / `claude -p`, never raw Messag
 when CLAUDE_CODE_OAUTH_TOKEN is set and ANTHROPIC_API_KEY is empty); Pydantic-
 validated structured output; and the Node grandchild under the {packet,4} port.
 
-STILL DEFERRED: engine-resolved KB+schema on stdin (the leaf still reads its KB doc
-from the repo + hardcodes its Pydantic model); the mortgage_finance two-path split
-(capacity is resolver per §98 — 2b-3); real FIRB/ASIC/AML (2b-4); the heartbeat.
+2b-3 makes mortgage_finance genuinely TWO-PATH (mortgage-finance-two-path.md): the
+RESOLVER (Erlang) computes every figure + the loan-path structure and passes it in as
+`resolver_outcome` (read-only grounding); this sidecar authors ONLY the two `lender_fit`
+leaves (`recommended_lender_shortlist`, `fixed_vs_variable`). The agent's output schema
+has NO money field, so it cannot author a capacity figure — the §98 compliance boundary
+becomes a verifiable postcondition, not an asserted behaviour. Erlang merges the two
+leaves into the resolver outcome (slot-scoped) — the LLM never touches a figure.
+
+STILL DEFERRED: engine-resolved KB+schema on stdin (the leaf still reads its KB docs
+from the repo); real FIRB/ASIC/AML (2b-4); the heartbeat.
 
 Wire framing: 4-byte big-endian length prefix + UTF-8 JSON (Erlang port {packet,4}).
 """
@@ -36,6 +43,8 @@ import os
 import struct
 import sys
 from pathlib import Path
+
+from typing import Literal
 
 from pydantic import BaseModel, ValidationError
 
@@ -87,37 +96,30 @@ def notify(method, params):
     write_frame({"method": method, "params": params})
 
 
-# --- the one real leaf's outcome schema (2a: hardcoded; 2b: from the artifact) --
-# Shape mirrors the mortgage_finance fixture; drives `output_format` + validation.
+# --- the agent's output schema: the TWO lender_fit leaves ONLY (2b-3) -----------
+# §98 enforcement-by-schema: the agent authors ONLY these two qualitative leaves —
+# there is NO money/number field here, so the LLM structurally cannot produce a
+# borrowing-capacity figure (capacity is resolver-computed, passed in as grounding).
+# Erlang folds these into the resolver outcome (fh_engine_mortgage:merge_agent/2).
+# `fixed_vs_variable` matches the blueprint enum; the shortlist is the FHG-panel read.
 
-class DebtOptimisation(BaseModel):
-    action: str
-    expected_uplift: int
-    urgency: str  # before_application | anytime | not_recommended
+_RATE_OPTIONS = ("variable", "fixed_1yr", "fixed_2yr", "fixed_3yr", "split_fixed_variable")
+# A Literal (not a bare str) so the enum lands IN the JSON schema — the model must pick
+# one option, and cannot put prose in this field (its reasoning goes in a lender's
+# `reasoning`). Matches the blueprint `loan_structure.fixed_vs_variable` enum.
+RateStructure = Literal["variable", "fixed_1yr", "fixed_2yr", "fixed_3yr",
+                        "split_fixed_variable"]
 
 
 class LenderRec(BaseModel):
     lender: str
     reasoning: str
-    approval_likelihood: str  # high | moderate | low
+    approval_likelihood: str  # high | moderate | low | indicative
 
 
-class LoanStructure(BaseModel):
-    type: str   # principal_and_interest | interest_only
-    rate: str   # fixed | variable | split
-    offset: bool
-
-
-class MortgageFinanceOutcome(BaseModel):
-    recommended_path: str
-    expected_borrowing_capacity: list[int]  # [min, max]
-    debt_optimisations_to_action: list[DebtOptimisation]
+class LenderFitLeaves(BaseModel):
     recommended_lender_shortlist: list[LenderRec]
-    loan_structure_recommendation: LoanStructure
-    pre_approval_action_plan: list[str]
-    pre_approval_expiry: str | None
-    reapplication_required: bool
-    key_assumptions: list[str]
+    fixed_vs_variable: RateStructure
 
 
 # --- prompt assembly (agentic-flow.md §5) --------------------------------------
@@ -148,7 +150,12 @@ def _credit_env():
     return {"ANTHROPIC_API_KEY": "", "CLAUDE_CODE_OAUTH_TOKEN": token}
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
-_KB_DOC = _REPO_ROOT / "docs" / "kb" / "lender" / "serviceability-basics.md"
+_KB_DOCS = {
+    "kb.lender.serviceability-basics":
+        _REPO_ROOT / "docs" / "kb" / "lender" / "serviceability-basics.md",
+    "kb.lender.fhg-panel-list":
+        _REPO_ROOT / "docs" / "kb" / "lender" / "fhg-panel-list.md",
+}
 
 
 def _kb_content_md(path):
@@ -203,48 +210,58 @@ _STYLE = """\
 Concise and plain — figures over adjectives. The reader is a first home buyer often \
 reading in a second language (Vietnamese / English). Prefer short, concrete statements."""
 
-# Per-reasoning_domain modules (agentic-flow §3). 2a populates `lender_fit` (the
-# mortgage_finance leaf); 2b adds valuation / negotiation / document_significance / …
+# Per-reasoning_domain modules (agentic-flow §3). `lender_fit` is the mortgage_finance
+# agent half of a TWO-PATH component (mortgage-finance-two-path.md): the figures are
+# resolver-computed and handed in as <resolver_outcome>; this module authors ONLY the
+# two qualitative leaves. 2b adds valuation / negotiation / document_significance / …
 _DOMAINS = {
     "lender_fit": {
-        "kb_slug": "kb.lender.serviceability-basics",
+        "kb_slugs": ["kb.lender.serviceability-basics", "kb.lender.fhg-panel-list"],
         "context": """\
-You are the `mortgage_finance` component (reasoning_domain: lender_fit). You reason \
-about ONE thing: this buyer's mortgage finance — borrowing capacity, debt \
-optimisations that lift it, a short lender shortlist, and a loan structure. Your inputs \
-are the buyer's profile facts and scheme eligibility (the upstream outcomes in \
-`<plan_card_state>`), grounded in the lender-serviceability KB. You do NOT recompute \
-eligibility or scheme math — those are settled upstream; you read them.""",
+You are the agent half of the `mortgage_finance` component (reasoning_domain: \
+lender_fit). The borrowing capacity, loan-path structure, and every figure have ALREADY \
+been computed for you by the engine's resolver and are given in `<resolver_outcome>` \
+(read-only). You do NOT compute or restate any figure. You reason about exactly TWO \
+qualitative things: (1) a short LENDER SHORTLIST this buyer could consider, and (2) the \
+rate structure (fixed vs variable). Your inputs are the buyer's profile + scheme \
+eligibility (`<plan_card_state>`) and the resolver figures, grounded in the lender KB.""",
         "goal": """\
-Produce this buyer's mortgage-finance plan: a recommended borrowing path, an expected \
-borrowing-capacity range, concrete debt optimisations, a short lender shortlist with \
-reasoning, a loan-structure recommendation, and a pre-approval action plan.""",
+Produce ONLY the two lender-fit leaves: `recommended_lender_shortlist` (a short list of \
+lenders to CONSIDER, each with plain reasoning and an approval-likelihood read) and \
+`fixed_vs_variable` (the rate-structure option). Nothing else — no figures, no capacity, \
+no debt optimisations (those are the resolver's and already in `<resolver_outcome>`).""",
         "non_negotiables": """\
-1. **Ground every figure.** Borrowing capacity is COMPUTED from the APRA buffer \
-(assess repayments at product_rate + 3.0pp) against the buyer's assessable income and \
-committed debts — never asserted, never merely copied from the upstream estimate.
-2. **One regulated constant; the rest are conventions.** Only the 3.0pp APRA buffer is \
-a hard regulatory figure. Income shading (~80%), the genuine-savings rule (~5% held \
-~3 months), and the high-DTI threshold (≈6×) are industry CONVENTIONS — present them \
-as typical, record them in `key_assumptions`, and never state them as this buyer's \
-actual lender policy.
-3. **Decision-support, not advice (ASIC).** Lender names are a shortlist to CONSIDER, \
-each with its reasoning — never a recommendation to act; defer precise per-lender \
-treatment to a broker.
-4. **Never fabricate specifics.** Do not invent a lender policy, an interest rate, or \
-an approval outcome. If the KB and facts do not support a claim, do not make it.
-5. **Emit only the structured object** (see `<output>`).""",
+1. **Author no figure.** You do NOT produce borrowing capacity, LMI, an uplift, or any \
+dollar/percent number. Those are resolver-computed and given to you. Your output schema \
+has no number field — keep it that way.
+2. **At the base turn, income and debts are PENDING.** If `<plan_card_state>` shows the \
+buyer's income/debts absent (the base plan), you CANNOT assess true approval likelihood. \
+The shortlist is then the First Home Guarantee panel relevant to this buyer's scheme \
+eligibility and target price range, with `approval_likelihood: "indicative"` and \
+reasoning that says it confirms once income and debts are entered. Never invent an \
+approval outcome from absent facts.
+3. **FHG panel facts (from the KB).** An FHG-backed loan can be written only by a \
+Housing-Australia panel lender; all four majors plus ~30 customer-owned/regional lenders \
+participate; there is NO rate premium for the guarantee, so choosing among panel lenders \
+is a normal best-loan comparison. Surface the panel breadth; do not hard-code a full \
+membership list (it drifts) — name the majors as definitely on-panel and note the breadth.
+4. **Decision-support, not advice (ASIC).** A shortlist to CONSIDER with reasoning — \
+never a recommendation to act, and never directing the buyer to a specific broker or \
+lender. Defer precise per-lender treatment to a broker.
+5. **Emit only the two-leaf object** (see `<output>`).""",
         "procedure": """\
-1. Read the upstream outcomes (`buyer_profile`, `eligibility`) and the KB.
-2. Compute the borrowing-capacity range from the buffer (product_rate + 3.0pp) against \
-the buyer's assessable income and committed debts (HECS; a credit card on its LIMIT, \
-not its balance; etc.).
-3. Identify debt optimisations that materially lift capacity (e.g. reducing a card \
-limit), grounded in the KB's principles, each with its expected uplift and urgency.
-4. Propose a short lender shortlist — each with plain reasoning and an \
-approval-likelihood read — and a loan structure + pre-approval action plan.
-5. Assemble the structured outcome; record every convention-based assumption in \
-`key_assumptions`.""",
+1. Read `<resolver_outcome>` (the computed figures + recommended_path) and \
+`<plan_card_state>` (buyer profile + scheme_stack) and the KB.
+2. If the recommended_path is `fhg_backed`, build the shortlist from the FHG panel — \
+the majors plus the breadth of customer-owned/regional panel lenders — each with plain \
+reasoning grounded in the KB (e.g. wide panel → broker can compare; no rate premium).
+3. Set `approval_likelihood` honestly: `indicative` when income/debts are pending; a \
+real read (high/moderate/low) only if those facts are actually present.
+4. Set `fixed_vs_variable` to EXACTLY ONE of: variable | fixed_1yr | fixed_2yr | \
+fixed_3yr | split_fixed_variable (a single enum value, not a sentence — put any \
+reasoning in a lender's `reasoning`). Default to `variable` for flexibility at the base \
+stage; never assert a specific rate number.
+5. Emit ONLY the two leaves.""",
     },
 }
 
@@ -279,30 +296,33 @@ def build_system_prompt(reasoning_domain, kb_md):
 {d["procedure"]}
 </procedure>
 
-<kb slug="{d["kb_slug"]}">
+<kb>
 {kb_md}
 </kb>
 
 <output>
-Return a single JSON object conforming to the provided output schema. Capacity figures \
-must be reasoned from the buffer and the buyer's income/debts, not copied from the \
-upstream estimate. Flag convention-based figures in `key_assumptions`. Produce only the \
-JSON object.
+Return a single JSON object conforming to the provided output schema — ONLY the two \
+lender-fit leaves (`recommended_lender_shortlist`, `fixed_vs_variable`). Author NO \
+figure: capacity and every dollar/percent value are resolver-computed and given to you \
+in `<resolver_outcome>`. Produce only the JSON object.
 </output>"""
 
 
-def build_user_content(upstream_outcomes):
+def build_user_content(upstream_outcomes, resolver_outcome):
     component = {
         "component_id": "mortgage_finance",
-        "goal": "Determine borrowing capacity, debt optimisations, lender shortlist, "
-                "and loan structure for this buyer.",
-        "inputs": ["buyer_profile.outcome", "eligibility.outcome"],
+        "goal": "Author the two lender-fit leaves (lender shortlist + fixed_vs_variable) "
+                "given the resolver-computed figures. Author no figure.",
+        "inputs": ["buyer_profile.outcome", "eligibility.outcome",
+                   "resolver_outcome (the computed mortgage_plan figures + structure)"],
         "reads": "upstream DAG outcomes only (not upstream parameters) — §11.9",
     }
     return (
         "<plan_card_state>\n"
         + json.dumps(upstream_outcomes, indent=2, ensure_ascii=False)
-        + "\n</plan_card_state>\n\n<component>\n"
+        + "\n</plan_card_state>\n\n<resolver_outcome>\n"
+        + json.dumps(resolver_outcome, indent=2, ensure_ascii=False)
+        + "\n</resolver_outcome>\n\n<component>\n"
         + json.dumps(component, indent=2, ensure_ascii=False)
         + "\n</component>"
     )
@@ -310,32 +330,43 @@ def build_user_content(upstream_outcomes):
 
 # --- the real fill -------------------------------------------------------------
 
-async def fill_mortgage_finance(upstream_outcomes):
-    """One real Agent-SDK structured one-shot: no tools (KB is injected, §6), a
-    per-call system_prompt (constraint #9), output_format = the leaf's schema.
-    Returns (outcome_dict, usage_dict)."""
+def _kb_block():
+    """Concatenate the lender_fit KB docs (serviceability + FHG panel), each fenced by
+    its slug, as the injected `<kb>` content (§6 — KB is injected, not tool-pulled)."""
+    parts = []
+    for slug in _DOMAINS["lender_fit"]["kb_slugs"]:
+        parts.append(f"[{slug}]\n{_kb_content_md(_KB_DOCS[slug])}")
+    return "\n\n".join(parts)
+
+
+async def fill_mortgage_finance(upstream_outcomes, resolver_outcome):
+    """Two-path agent half (mortgage-finance-two-path.md): one real Agent-SDK structured
+    one-shot that authors ONLY the two lender_fit leaves. The figures are resolver-
+    computed and passed in as `resolver_outcome` (read-only grounding). output_format =
+    the two-leaf schema (no money field → §98 enforced by schema). Returns
+    (leaves_dict, usage_dict)."""
     import time
     _t0 = time.monotonic()
     from claude_agent_sdk import ClaudeAgentOptions, ResultMessage, query
     _t_import = time.monotonic()
 
-    kb_md = _kb_content_md(_KB_DOC)
     options = ClaudeAgentOptions(
         model=LEAF_MODEL,
         effort=LEAF_EFFORT,   # bound reasoning depth (else opus thinks for minutes)
-        system_prompt=build_system_prompt("lender_fit", kb_md),
+        system_prompt=build_system_prompt("lender_fit", _kb_block()),
         setting_sources=[],   # do NOT load CLAUDE.md / project settings
         allowed_tools=[],     # leaf-fill pulls no tools
         env=_credit_env(),    # subscription-credit auth, subprocess-scoped
         output_format={"type": "json_schema",
-                       "schema": MortgageFinanceOutcome.model_json_schema()},
+                       "schema": LenderFitLeaves.model_json_schema()},
     )
 
     async def _consume():
         structured = None
         usage = {}
-        async for message in query(prompt=build_user_content(upstream_outcomes),
-                                   options=options):
+        async for message in query(
+                prompt=build_user_content(upstream_outcomes, resolver_outcome),
+                options=options):
             if isinstance(message, ResultMessage):
                 structured = getattr(message, "structured_output", None)
                 usage = getattr(message, "usage", {}) or {}
@@ -352,11 +383,14 @@ async def fill_mortgage_finance(upstream_outcomes):
         raise RuntimeError("Agent SDK returned no structured_output")
 
     _t_query = time.monotonic()
-    print(f"[planner] mortgage_finance: sdk_import={_t_import - _t0:.1f}s "
+    print(f"[planner] mortgage_finance(lender_fit): sdk_import={_t_import - _t0:.1f}s "
           f"query={_t_query - _t_import:.1f}s model={LEAF_MODEL} effort={LEAF_EFFORT}",
           file=sys.stderr, flush=True)
-    outcome = MortgageFinanceOutcome(**structured)  # raises ValidationError if off
-    return outcome.model_dump(), usage
+    leaves = LenderFitLeaves(**structured)  # raises ValidationError if off
+    # belt-and-braces §98: reject any rate option outside the blueprint enum.
+    if leaves.fixed_vs_variable not in _RATE_OPTIONS:
+        raise RuntimeError(f"fixed_vs_variable {leaves.fixed_vs_variable!r} not in enum")
+    return leaves.model_dump(), usage
 
 
 # --- fill_component (2b-2b: the sidecar fills ONE agent component) -------------
@@ -377,6 +411,9 @@ async def handle_fill_component(params):
     component_id = params.get("component_id")
     reasoning_domain = params.get("reasoning_domain")
     upstream = params.get("upstream", {})
+    # Two-path: the resolver figures arrive as read-only grounding. Absent for a
+    # (future) pure-agent component, where the filler computes the whole outcome.
+    resolver_outcome = params.get("resolver_outcome", {})
     entry = _FILLERS.get(reasoning_domain)
     if entry is None:
         notify("error", {"code": "no_filler_for_domain",
@@ -385,18 +422,16 @@ async def handle_fill_component(params):
         return
     _expected_id, filler = entry
     try:
-        outcome, usage = await filler(upstream)
+        leaves, usage = await filler(upstream, resolver_outcome)
     except (ValidationError, Exception) as exc:  # noqa: BLE001 — surface, don't crash
         notify("error", {"code": "leaf_fill_failed",
                          "message": f"{component_id}: {type(exc).__name__}: {exc}"})
         return
 
-    notify("component_filled", {
-        "component_id": component_id,
-        "renderer": "summary-card",
-        "kb_versions": [{"slug": "kb.lender.serviceability-basics"}],
-        "outcome": outcome,
-    })
+    # Two-path reply: `outcome` carries ONLY the agent leaves; Erlang folds them into
+    # the resolver outcome (fh_engine_mortgage:merge_agent/2) — renderer + kb_versions
+    # are the resolver's, so they are omitted here.
+    notify("component_filled", {"component_id": component_id, "outcome": leaves})
     notify("usage", {"component_id": component_id, "source": "agent_sdk",
                      "model": LEAF_MODEL, "usage": usage})
     notify("fill_done", {"component_id": component_id})

@@ -12,7 +12,8 @@ agent / two-path component via `fill_component`. So this stub is a SINGLE-COMPON
 filler matching planner.py's protocol (it is no longer a turn driver):
 
   request: {method: fill_component,
-            params: {component_id, reasoning_domain, plan_card_id, upstream}}
+            params: {component_id, reasoning_domain, plan_card_id, upstream,
+                     resolver_outcome?}}   # resolver_outcome present for a two-path comp
   reply:   component_filled  (canned schema-shaped outcome — Erlang stamps fill_path)
            usage             (zero tokens — a stub meters nothing, but the event keeps
                               the §4 sequence identical to the real planner's)
@@ -62,30 +63,22 @@ def notify(method, params):
     write_frame({"method": method, "params": params})
 
 
-# Canned agent-leaf outcomes keyed by reasoning_domain. Only `lender_fit`
-# (mortgage_finance) is in Mode-A base scope; the per-property domains are stubbed so
-# the stub can answer any agent fill_component the turn dispatches. Schema-shaped
-# fixtures, not real planning — they exist to prove the renderer / outcome contract.
+# Canned agent-leaf outcomes keyed by reasoning_domain. `lender_fit` (mortgage_finance)
+# is a TWO-PATH component (mortgage-finance-two-path.md): the sidecar authors ONLY the
+# two lender_fit leaves; the figures + structure are the resolver's, and Erlang folds
+# the leaves in. So this fixture is the two-leaf shape (NO money field — §98), matching
+# planner.py's LenderFitLeaves. The per-property domains are pure-agent stubs (whole
+# outcome). Schema-shaped fixtures, not real planning — they prove the outcome contract.
 _FIXTURES = {
     "lender_fit": {
-        "renderer": "summary-card",
+        "renderer": "summary-card",  # ignored for two-path (resolver supplies renderer)
         "kb_versions": [{"slug": "kb.lender.serviceability-basics"}],
         "outcome": {
-            "recommended_path": "fhg_backed",
-            "expected_borrowing_capacity": [480000, 540000],
-            "debt_optimisations_to_action": [
-                {"action": "Reduce credit card limit to $2k",
-                 "expected_uplift": 15000, "urgency": "before_application"}],
             "recommended_lender_shortlist": [
-                {"lender": "Lender A (FHG panel)",
-                 "reasoning": "lenient HECS treatment",
-                 "approval_likelihood": "high"}],
-            "loan_structure_recommendation": {
-                "type": "principal_and_interest", "rate": "variable", "offset": True},
-            "pre_approval_action_plan": ["Gather 2 recent payslips", "NOA"],
-            "pre_approval_expiry": None,
-            "reapplication_required": False,
-            "key_assumptions": ["APRA buffer +3%", "income stable PAYG"],
+                {"lender": "A major lender (FHG panel)",
+                 "reasoning": "wide FHG panel; a broker can compare across it",
+                 "approval_likelihood": "indicative"}],
+            "fixed_vs_variable": "variable",
         },
     },
     "valuation": {

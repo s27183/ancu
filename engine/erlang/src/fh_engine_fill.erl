@@ -10,17 +10,26 @@
 %%   Upstream :: #{OutcomeType => Outcome} accumulated from already-filled components
 %%   Outcome  :: the component's typed outcome (a binary-keyed map)
 %%
-%% STATUS (2b-2b keystone): `buyer_profile` is a REAL fill — it projects the
-%% onboarding fact base into the `profile` outcome and derives per-applicant FIRB
-%% via fh_engine_resolver (the §11.9 applicant.* semantics). The other three
-%% resolver components (`eligibility`, `cash_position`, `ownership_planning`) return
-%% an explicitly **provisional** outcome (carrying <<"_provisional">> => true) — the
-%% turn-walk + dispatch is proven now; their real fills land in the following units
-%% (eligibility via the define-simulate-document discipline, as it is property-
-%% agnostic banded all-applicants logic touching F7/F1; cash_position/ownership_
-%% planning via the mechanism-(B) formula code over the KB bracket/fee tables).
+%% STATUS: all four base resolver components are REAL fills. `buyer_profile` projects
+%% the onboarding fact base into the `profile` outcome and derives per-applicant FIRB
+%% via fh_engine_resolver (§11.9 applicant.* semantics); `eligibility`
+%% (fh_engine_eligibility) is the three-valued banded scheme_stack; `cash_position`
+%% (fh_engine_cash) and `ownership_planning` (fh_engine_ownership) are mechanism-(B)
+%% formula code over the KB tables (stamp-duty brackets / ongoing-cost bands).
 
--export([resolver/3]).
+-export([resolver/3, has_resolver/1, merge_agent/3]).
+
+%% Does this component have a resolver fill? Empty `agent_leaves` → pure resolver;
+%% non-empty + has_resolver → TWO-PATH (the turn runs the resolver, then folds the
+%% agent leaves via merge_agent/3); non-empty + no resolver → pure agent (the sidecar
+%% fills the whole outcome — the later per-property valuation/negotiation components).
+-spec has_resolver(binary()) -> boolean().
+has_resolver(<<"buyer_profile">>)      -> true;
+has_resolver(<<"eligibility">>)        -> true;
+has_resolver(<<"cash_position">>)      -> true;
+has_resolver(<<"ownership_planning">>) -> true;
+has_resolver(<<"mortgage_finance">>)   -> true;
+has_resolver(_)                        -> false.
 
 -spec resolver(binary(), map(), map()) -> {map(), binary(), [map()]}.
 resolver(<<"buyer_profile">>, Args, _Upstream) ->
@@ -29,11 +38,21 @@ resolver(<<"eligibility">>, Args, Upstream) ->
     fh_engine_eligibility:fill(Args, Upstream);
 resolver(<<"cash_position">>, Args, Upstream) ->
     fh_engine_cash:fill(Args, Upstream);
-resolver(<<"ownership_planning">>, _Args, _Upstream) ->
-    provisional(<<"ongoing_obligations">>, <<"data-table">>,
-                [<<"kb.land-tax.ppor-exemption">>]);
+resolver(<<"ownership_planning">>, Args, Upstream) ->
+    fh_engine_ownership:fill(Args, Upstream);
+resolver(<<"mortgage_finance">>, Args, Upstream) ->
+    fh_engine_mortgage:fill(Args, Upstream);
 resolver(Other, _Args, _Upstream) ->
     erlang:error({no_resolver_fill_for, Other}).
+
+%% Fold a two-path component's agent leaves (from the sidecar reply) into the outcome
+%% the resolver assembled. The component module owns the slot mapping (it knows its own
+%% outcome shape); the merge is slot-scoped so the agent cannot move a figure (§98).
+-spec merge_agent(binary(), map(), map()) -> map().
+merge_agent(<<"mortgage_finance">>, ResolverOutcome, AgentValues) ->
+    fh_engine_mortgage:merge_agent(ResolverOutcome, AgentValues);
+merge_agent(Other, _ResolverOutcome, _AgentValues) ->
+    erlang:error({no_agent_merge_for, Other}).
 
 %% --- buyer_profile (real) ---------------------------------------------------
 %% The pipeline entry: project the onboarding fact base into the `profile` outcome.
@@ -111,14 +130,3 @@ buyer_profile(Args) ->
 tri_to_json(true)         -> true;
 tri_to_json(false)        -> false;
 tri_to_json(undetermined) -> <<"needs_determination">>.
-
-%% --- provisional resolver fills (explicitly TODO) ---------------------------
-%% A structurally-valid placeholder so the turn-walk runs green end-to-end while
-%% the real mechanism-(A)/(B) fills are written. Marked <<"_provisional">> so it is
-%% never mistaken for a real outcome; the smoke test asserts structure (fill_path,
-%% no usage), not these values.
-
-provisional(OutcomeType, Renderer, AnchorSlugs) ->
-    Outcome = #{<<"_provisional">> => true,
-                <<"outcome_type">> => OutcomeType},
-    {Outcome, Renderer, fh_engine_kb:kb_anchors(AnchorSlugs)}.

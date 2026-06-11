@@ -791,7 +791,7 @@ The `mortgage_plan` outcome feeds `cash_position` (loan amount + buffer requirem
 
 **Goal:** Project ongoing costs and obligations after settlement, and set alert triggers for refinance windows, graduation events, and rate moves.
 
-**Inputs:** `property_assessment.outcome` + `eligibility.outcome` + `cash_position.outcome`
+**Inputs:** `property_assessment.outcome` + `eligibility.outcome` + `cash_position.outcome` + `mortgage_finance.outcome` (the loan terms that drive P&I, graduation/LVR, and refinance windows — `mortgage_plan`; matches the pipeline diagram and the compiled `dag_reads`)
 
 **KB anchors:** `kb.ongoing-costs.rates-water-strata`, `kb.refinance.windows-and-triggers`, `kb.graduation.lvr80`, `kb.land-tax.ppor-exemption`, `kb.maintenance.budget-by-property-type`
 
@@ -840,11 +840,13 @@ The `mortgage_plan` outcome feeds `cash_position` (loan amount + buffer requirem
 {
   "type": "ongoing_obligations",
   "fields": {
-    "total_monthly_outgoings_estimate": "money",
-    "total_annual_outgoings_estimate": "money",
-    "maintenance_reserve_target": "money_per_year",
-    "graduation_milestone": "{ target_lvr, estimated_year }",
-    "alert_triggers_armed": "array<{ trigger, action }>"
+    "total_monthly_outgoings_estimate": "money|null",   // null at base — mortgage-P&I-dominated, needs a firm loan amount + rate (refine turn)
+    "total_annual_outgoings_estimate": "money|null",     // null at base — as above
+    "maintenance_reserve_target": "money_per_year",      // resolver-computed (mechanism B) by fh_engine_ownership: reserve_pct × the target-range ceiling
+    "recurring_costs_estimate": "{ statutory_band: { low: money|null, high: money|null, period, components: array<string> }, strata_levies: money|null, utilities: money|null, building_insurance: money|null, notes: array<string> }",  // the data-table's non-mortgage cost breakdown — resolver-computed (mechanism B) from kb.ongoing-costs.rates-water-strata (architecture/ongoing-costs-projection.md). At base only statutory_band (council+water) is filled; strata (needs property type), utilities + building insurance (no KB band / property-specific) stay null until a refine/per-property turn (honest partial)
+    "land_tax_check": "enum [exempt_ppor, applicable, to_verify]",  // F12 — regulated PPOR status from kb.land-tax.ppor-exemption; Mode-A owner-occupier → exempt_ppor
+    "graduation_milestone": "{ target_lvr, estimated_year: number|null }",  // target_lvr determinate (80); estimated_year null at base (needs the LVR trajectory)
+    "alert_triggers_armed": "array<{ trigger, action }>"   // FHG-graduation (if FHG in scheme_stack), periodic rate review, land-tax mode-switch
   }
 }
 ```

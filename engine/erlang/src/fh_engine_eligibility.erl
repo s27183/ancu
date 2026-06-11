@@ -320,19 +320,5 @@ join([], _Sep) -> <<>>;
 join([X], _Sep) -> X;
 join([X | Rest], Sep) -> iolist_to_binary([X, Sep, join(Rest, Sep)]).
 
-%% money as a plain "$1,500,000" string.
-money(N) when is_integer(N), N < 0 -> iolist_to_binary([<<"-">>, money(-N)]);
-money(N) when is_integer(N) ->
-    iolist_to_binary([<<"$">>, group_thousands(integer_to_list(N))]);
-money(N) -> iolist_to_binary(io_lib:format("$~p", [N])).
-
-%% "1500000" -> "1,500,000". Chunk the reversed digits into 3s (right-to-left
-%% groups), restore each group's order, then join the groups left-to-right.
-group_thousands(Digits) ->
-    Chunks = chunk3(lists:reverse(Digits)),
-    Groups = lists:reverse([lists:reverse(C) || C <- Chunks]),
-    lists:flatten(lists:join(",", Groups)).
-
-chunk3([])           -> [];
-chunk3([A, B, C | T]) -> [[A, B, C] | chunk3(T)];
-chunk3(Rest)         -> [Rest].
+%% money as a plain "$1,500,000" string — shared formatter (fh_engine_money).
+money(N) -> fh_engine_money:money(N).

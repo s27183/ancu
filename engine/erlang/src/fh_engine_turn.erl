@@ -9,9 +9,16 @@
 %%   - RESOLVER component (agent_leaves == []) → filled in-process by fh_engine_fill
 %%     (no sidecar, no LLM, no `usage`; fill_path: resolver). Driven synchronously
 %%     via an internal `step` event.
-%%   - AGENT / two-path component (agent_leaves =/= []) → a disposable Python sidecar
-%%     fills it (principle 3, {packet,4} JSON-RPC `fill_component`); fill_path: agent,
-%%     meters `usage`. The walk parks until the sidecar replies, then resumes.
+%%   - TWO-PATH component (agent_leaves =/= [] AND a resolver exists, e.g.
+%%     mortgage_finance) → fh_engine_fill computes the figures + structure FIRST, then
+%%     a disposable sidecar fills only the agent leaves (read-only `resolver_outcome`
+%%     grounding); merge_agent/3 folds them in (fill_path: two_path; §98: the agent
+%%     never authors a figure). See mortgage-finance-two-path.md.
+%%   - AGENT component (agent_leaves =/= [], no resolver — the later per-property
+%%     valuation/negotiation components) → the sidecar fills the whole outcome
+%%     (fill_path: agent).
+%%   Two-path + agent fills run a disposable Python sidecar (principle 3, {packet,4}
+%%   JSON-RPC `fill_component`) that meters `usage`; the walk parks until it replies.
 %%
 %% Lifecycle: emit `turn_started` → step through the DAG (resolver fills inline;
 %% agent fills via a per-fill disposable port) → each filled component runs the
@@ -62,19 +69,32 @@ running(internal, step, #{components := []} = Data) ->
     {stop, normal, Data};
 running(internal, step, #{components := [Comp | Rest]} = Data) ->
     Name = maps:get(<<"name">>, Comp),
-    case is_agent_component(Comp) of
-        false ->
+    case fill_path(Comp) of
+        resolver ->
             %% Resolver: fill in-process, commit, accumulate, advance.
             {Outcome, Renderer, KbVersions} =
                 fh_engine_fill:resolver(Name, Data, maps:get(outcomes, Data)),
             Data1 = commit(Comp, <<"resolver">>, Renderer, KbVersions, Outcome, Data),
             {keep_state, Data1#{components := Rest},
              [{next_event, internal, step}]};
-        true ->
-            %% Agent / two-path: spawn a disposable sidecar to fill this one
-            %% component, then park until it replies.
-            Port = start_fill_port(Comp, Data),
-            {keep_state, Data#{components := Rest, port => Port, pending => Comp}}
+        two_path ->
+            %% Two-path (mortgage-finance-two-path.md): run the RESOLVER half first
+            %% (all figures + the loan-path structure), then spawn the sidecar to fill
+            %% only the agent leaves, passing the resolver outcome as read-only
+            %% grounding. The walk parks until the sidecar replies; merge_agent folds
+            %% the leaves in (§98: the agent never authors a figure — slot-scoped merge).
+            {RO, Renderer, KbVersions} =
+                fh_engine_fill:resolver(Name, Data, maps:get(outcomes, Data)),
+            Port = start_fill_port(Comp, Data, RO),
+            Pending = #{kind => two_path, comp => Comp, resolver_outcome => RO,
+                        renderer => Renderer, kb => KbVersions},
+            {keep_state, Data#{components := Rest, port => Port, pending => Pending}};
+        agent ->
+            %% Pure agent: the sidecar fills the whole outcome (no resolver half — the
+            %% later per-property valuation/negotiation components). Park until it replies.
+            Port = start_fill_port(Comp, Data, undefined),
+            Pending = #{kind => agent, comp => Comp},
+            {keep_state, Data#{components := Rest, port => Port, pending => Pending}}
     end;
 
 running(info, {Port, {data, Frame}}, #{port := Port} = Data) ->
@@ -94,7 +114,17 @@ running(_EventType, _Event, Data) ->
 %% --- sidecar message dispatch (agent fills) ---------------------------------
 
 handle_sidecar(#{<<"method">> := <<"component_filled">>, <<"params">> := P},
-               #{pending := Comp} = Data) ->
+               #{pending := #{kind := two_path, comp := Comp, resolver_outcome := RO,
+                              renderer := Renderer, kb := KbVersions}} = Data) ->
+    %% Two-path: the sidecar reply carries ONLY the agent leaves; fold them into the
+    %% resolver outcome (the renderer + KB are the resolver's). fill_path: two_path.
+    Name = maps:get(<<"name">>, Comp),
+    AgentValues = maps:get(<<"outcome">>, P, #{}),
+    Final = fh_engine_fill:merge_agent(Name, RO, AgentValues),
+    Data1 = commit(Comp, <<"two_path">>, Renderer, KbVersions, Final, Data),
+    {keep_state, Data1};
+handle_sidecar(#{<<"method">> := <<"component_filled">>, <<"params">> := P},
+               #{pending := #{kind := agent, comp := Comp}} = Data) ->
     Renderer = maps:get(<<"renderer">>, P, default_renderer(Comp)),
     KbVersions = maps:get(<<"kb_versions">>, P, []),
     Outcome = maps:get(<<"outcome">>, P, #{}),
@@ -171,8 +201,19 @@ base_components() ->
     ByName = maps:from_list([{maps:get(<<"name">>, C), C} || C <- All]),
     [maps:get(N, ByName) || N <- ?BASE_COMPONENTS, maps:is_key(N, ByName)].
 
-is_agent_component(Comp) ->
-    maps:get(<<"agent_leaves">>, Comp, []) =/= [].
+%% The fill path of a base component (mortgage-finance-two-path.md §2): empty
+%% `agent_leaves` → resolver (in-process); non-empty + a resolver exists → two_path
+%% (resolver figures + agent leaves, Erlang-merged); non-empty + no resolver → agent
+%% (the sidecar fills the whole outcome — the later per-property components).
+fill_path(Comp) ->
+    Name = maps:get(<<"name">>, Comp),
+    case maps:get(<<"agent_leaves">>, Comp, []) of
+        [] -> resolver;
+        _  -> case fh_engine_fill:has_resolver(Name) of
+                  true  -> two_path;
+                  false -> agent
+              end
+    end.
 
 %% reasoning_domain of an agent component = its agent leaves' shared domain.
 reasoning_domain(Comp) ->
@@ -193,17 +234,23 @@ component_scope(_) -> <<"both">>.
 %% Spawn a disposable sidecar to fill ONE agent component. The sidecar receives the
 %% component id + reasoning_domain + the upstream outcomes it reads (filtered by the
 %% blueprint DAG `dag_reads`), fills, emits component_filled + usage, and exits.
-start_fill_port(Comp, #{plan_card_id := PC} = Data) ->
+start_fill_port(Comp, #{plan_card_id := PC} = Data, ResolverOutcome) ->
     PythonExe = python_exe(),
     Script = planner_script(),
     Port = open_port({spawn_executable, PythonExe},
                      [{args, [Script]}, {packet, 4}, binary, exit_status]),
-    Req = #{<<"method">> => <<"fill_component">>,
-            <<"params">> => #{
-                <<"plan_card_id">> => PC,
+    %% For a two-path component the resolver has already computed the figures; hand
+    %% them to the sidecar as READ-ONLY grounding so the lender reasoning is grounded
+    %% in the real path/FHG facts. `undefined` (pure-agent) → no grounding block.
+    Params0 = #{<<"plan_card_id">> => PC,
                 <<"component_id">> => maps:get(<<"name">>, Comp),
                 <<"reasoning_domain">> => reasoning_domain(Comp),
-                <<"upstream">> => upstream_for(Comp, Data)}},
+                <<"upstream">> => upstream_for(Comp, Data)},
+    Params = case ResolverOutcome of
+                 undefined -> Params0;
+                 _         -> Params0#{<<"resolver_outcome">> => ResolverOutcome}
+             end,
+    Req = #{<<"method">> => <<"fill_component">>, <<"params">> => Params},
     port_command(Port, fh_engine_util:json_encode(Req)),
     Port.
 
