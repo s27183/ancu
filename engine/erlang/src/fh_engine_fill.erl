@@ -19,6 +19,8 @@
 
 -export([resolver/3, has_resolver/1, merge_agent/3]).
 
+-define(COPY, <<"kb.copy.profile">>).   %% buyer_profile bilingual copy-templates (bilingual-content.md §3b)
+
 %% Does this component have a resolver fill? Empty `agent_leaves` → pure resolver;
 %% non-empty + has_resolver → TWO-PATH (the turn runs the resolver, then folds the
 %% agent leaves via merge_agent/3); non-empty + no resolver → pure agent (the sidecar
@@ -112,12 +114,10 @@ buyer_profile(Args) ->
         <<"intended_occupancy_use">> => <<"sole_occupier">>,
         <<"target_price_range">> => TargetRange,
         <<"target_zone">> => TargetZone,
-        <<"key_constraints">> =>
-            [<<"Applicant financial details (income, savings, debts) pending — "
-               "the base plan refines as you answer."/utf8>>],
-        <<"key_strengths">> =>
-            [<<"First home buyer — full Mode A scheme access (pending eligibility "
-               "checks)."/utf8>>]
+        %% bilingual {vi,en} via kb.copy.profile (no Vietnamese in Erlang literals —
+        %% the io:format ~s >255-codepoint trap; bilingual-content.md §3b).
+        <<"key_constraints">> => [copy(<<"constraint_financials_pending">>, #{})],
+        <<"key_strengths">>   => [copy(<<"strength_first_home_buyer">>, #{})]
     },
     KbVersions = fh_engine_kb:kb_anchors(
         [<<"kb.hecs.thresholds">>, <<"kb.firb.status-determination">>,
@@ -130,3 +130,9 @@ buyer_profile(Args) ->
 tri_to_json(true)         -> true;
 tri_to_json(false)        -> false;
 tri_to_json(undetermined) -> <<"needs_determination">>.
+
+%% subst a kb.copy.profile template into a bilingual {vi,en} value (no Vietnamese
+%% in Erlang literals; same mechanism as fh_engine_cash).
+-spec copy(binary(), #{binary() => fh_engine_i18n:param()}) -> fh_engine_i18n:localized().
+copy(Id, Params) ->
+    fh_engine_i18n:subst(fh_engine_kb:copy(?COPY, Id), Params).

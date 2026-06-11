@@ -121,7 +121,6 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
 {
   "application": {
     "location_state": { "type": "enum", "options": ["NSW", "VIC", "QLD", "WA", "SA", "TAS", "ACT", "NT"], "value": "<initial>" },
-    "language_preference": { "type": "enum", "options": ["en", "vi"], "value": "en" },
     "applicant_count": { "type": "integer", "value": 1, "note": "= applicants[] length. Replaces the old buying_alone / co_buyer_count (buying_alone ≡ applicant_count == 1; co_buyer_count ≡ applicant_count − 1)." },
     "dependents_count": { "type": "integer", "value": 0 },
     "intended_occupancy_use": { "type": "enum", "options": ["sole_occupier", "partial_rental", "granny_flat", "not_occupied"], "value": "sole_occupier", "note": "F12 — DWELLING-level use, distinct from each applicant's owner_occupier_intent (who lives there). partial_rental (rent a room) / granny_flat flips the land-tax PPOR exemption, the CGT main-residence exemption, and can breach a scheme's occupancy condition; not_occupied puts the purchase outside owner-occupier schemes entirely (and, for a foreign applicant, into investor/FIRB territory). Drives ownership_planning.land_tax_check." }
@@ -216,8 +215,8 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
     "target_price_range": "money_range",
     "target_zone": "array<string>",
     // narrative
-    "key_constraints": "array<string>",
-    "key_strengths": "array<string>"
+    "key_constraints": "array<localized_text>",
+    "key_strengths": "array<localized_text>"
     // REMOVED fhg_eligible_basic — a scheme verdict; now computed in `eligibility` (zero downstream readers, confirmed)
   }
 }
@@ -367,12 +366,12 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
 {
   "type": "scheme_stack",
   "fields": {
-    "applicable_schemes": "array<{ name, benefit_value, role, notes }>",
-    "rejected_schemes": "array<{ name, reason }>",
+    "applicable_schemes": "array<{ name, benefit_value, role, notes: array<localized_text> }>",
+    "rejected_schemes": "array<{ name, reason: localized_text }>",
     "eligibility_basis": "enum [all_applicants_eligible, eligible_only_if_restructured, ineligible]",  // F1 — result of the all-applicants test over profile.applicants
     "structuring_options": "array<{ if_purchased_as, applicable_schemes, benefit_value, tradeoffs }>",  // F1 — populated when the joint application fails an all-applicants test but a subset qualifies (e.g. {if_purchased_as: 'lead applicant alone'}); also carries the foreign-co-applicant → FIRB-path note. Empty when all applicants qualify jointly.
     "total_benefit_value": "money",
-    "stacking_constraints": "array<string>",
+    "stacking_constraints": "array<localized_text>",
     "recommended_application_order": "array<string>"
   }
 }
@@ -485,12 +484,12 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
     "recommended_path": "enum",
     "expected_borrowing_capacity": "money_range",
     "debt_optimisations_to_action": "array<{ action, expected_uplift, urgency }>",
-    "recommended_lender_shortlist": "array<{ lender, reasoning, approval_likelihood }>",
+    "recommended_lender_shortlist": "array<{ lender, reasoning: localized_text, approval_likelihood }>",
     "loan_structure_recommendation": "object",
-    "pre_approval_action_plan": "array<string>",
+    "pre_approval_action_plan": "array<localized_text>",
     "pre_approval_expiry": "date",                    // F11 — tracked expiry the engine watches for a re-application alert; null until pre-approval granted
     "reapplication_required": "bool",                 // F11 — true once expiry lapses before a property is secured
-    "key_assumptions": "array<string>"
+    "key_assumptions": "array<localized_text>"
   }
 }
 ```
@@ -560,7 +559,7 @@ The `mortgage_plan` outcome feeds `cash_position` (loan amount + buffer requirem
 {
   "type": "budget_envelope",
   "fields": {
-    "stamp_duty": "{ before_concession: money|null, concession_applied: money|null, after_concession: money|null, notes: array<string> }",  // the calculator's transfer-duty breakdown — resolver-computed (mechanism B) by fh_engine_cash from kb.stamp-duty.calc-by-state + the eligible concession (architecture/stamp-duty-concession-mechanics.md). At base, evaluated at the target-range ceiling; the income/savings-dependent fields below stay null until a refine turn (honest partial output).
+    "stamp_duty": "{ before_concession: money|null, concession_applied: money|null, after_concession: money|null, notes: array<localized_text> }",  // the calculator's transfer-duty breakdown — resolver-computed (mechanism B) by fh_engine_cash from kb.stamp-duty.calc-by-state + the eligible concession (architecture/stamp-duty-concession-mechanics.md). At base, evaluated at the target-range ceiling; the income/savings-dependent fields below stay null until a refine turn (honest partial output).
     "max_property_price_supported": "money",
     "actual_property_price": "money",
     "total_cash_required": "money",
@@ -569,7 +568,7 @@ The `mortgage_plan` outcome feeds `cash_position` (loan amount + buffer requirem
     "verdict": "enum [surplus, tight, short]",
     "genuine_savings_verdict": "enum [meets, fails_recent_gift, insufficient_track_record, unknown]",  // F5 — DISTINCT from verdict (cash sufficiency). A buyer can read 'surplus' on cash yet fail the lender's 5% genuine-savings test (a recent family gift doesn't count — the '1% rule'). Resolver derives the determinate cases (gift-exclusion + savings-trail math) from buyer_profile.savings_and_deposit (genuine_savings_evidence_months, family_gift_or_loan_amount, funds_provenance.deposit_source) against the policy params in kb.cash-reserve.lender-expectations — the EXISTING owner of this gate (5%/3-month, 1% rule, rental-history substitute); already a cash_position anchor, NOT a new doc. Returns `unknown` to defer the irreducible cases (the 12-month rental-history substitute, ambiguous/mixed sources) to the agent.
     "mitigation_options_if_short": "array<string>",
-    "key_assumptions": "array<string>"
+    "key_assumptions": "array<localized_text>"
   }
 }
 ```
@@ -843,10 +842,10 @@ The `mortgage_plan` outcome feeds `cash_position` (loan amount + buffer requirem
     "total_monthly_outgoings_estimate": "money|null",   // null at base — mortgage-P&I-dominated, needs a firm loan amount + rate (refine turn)
     "total_annual_outgoings_estimate": "money|null",     // null at base — as above
     "maintenance_reserve_target": "money_per_year",      // resolver-computed (mechanism B) by fh_engine_ownership: reserve_pct × the target-range ceiling
-    "recurring_costs_estimate": "{ statutory_band: { low: money|null, high: money|null, period, components: array<string> }, strata_levies: money|null, utilities: money|null, building_insurance: money|null, notes: array<string> }",  // the data-table's non-mortgage cost breakdown — resolver-computed (mechanism B) from kb.ongoing-costs.rates-water-strata (architecture/ongoing-costs-projection.md). At base only statutory_band (council+water) is filled; strata (needs property type), utilities + building insurance (no KB band / property-specific) stay null until a refine/per-property turn (honest partial)
+    "recurring_costs_estimate": "{ statutory_band: { low: money|null, high: money|null, period, components: array<string> }, strata_levies: money|null, utilities: money|null, building_insurance: money|null, notes: array<localized_text> }",  // the data-table's non-mortgage cost breakdown — resolver-computed (mechanism B) from kb.ongoing-costs.rates-water-strata (architecture/ongoing-costs-projection.md). At base only statutory_band (council+water) is filled; strata (needs property type), utilities + building insurance (no KB band / property-specific) stay null until a refine/per-property turn (honest partial)
     "land_tax_check": "enum [exempt_ppor, applicable, to_verify]",  // F12 — regulated PPOR status from kb.land-tax.ppor-exemption; Mode-A owner-occupier → exempt_ppor
     "graduation_milestone": "{ target_lvr, estimated_year: number|null }",  // target_lvr determinate (80); estimated_year null at base (needs the LVR trajectory)
-    "alert_triggers_armed": "array<{ trigger, action }>"   // FHG-graduation (if FHG in scheme_stack), periodic rate review, land-tax mode-switch
+    "alert_triggers_armed": "array<{ trigger: localized_text, action: localized_text }>"   // FHG-graduation (if FHG in scheme_stack), periodic rate review, land-tax mode-switch
   }
 }
 ```

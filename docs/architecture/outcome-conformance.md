@@ -1,11 +1,15 @@
 # Outcome conformance — enforcing invariants that survive workflow change
 
-> **Status: PROPOSED — §9 step 1 (build-time half) IMPLEMENTED; runtime half pending 2c.**
-> Decision owner: Son. The build-time half is live: the compiler runs a fail-closed
-> bilingual gate over every discovered `copy` block (`kb_compiler.py` GATE 8, driven off a
-> single `LOCALES` constant), and `tests/bilingual_eval.py` discovers copy docs instead of
-> enumerating them. The runtime half (`localized_text` in `outcome_schema` + `validate/2` at
-> the `fh_engine_turn` seam) is recorded below and folds into 2c (§9 step 2).
+> **Status: ACCEPTED — build-time half SHIPPED; runtime half being built WITH 2b-4** (the
+> compliance pipeline is the proving producer; [`compliance-pipeline.md`](compliance-pipeline.md)
+> is the regulated layer that rides this structural one). Decision owner: Son — all three Open
+> Decisions resolved (§"Resolved decisions"). The build-time half is live: the compiler runs a
+> fail-closed bilingual gate over every discovered `copy` block (`kb_compiler.py` GATE 8, driven
+> off a single `LOCALES` constant), and `tests/bilingual_eval.py` discovers copy docs instead of
+> enumerating them. The runtime half (`localized_text` in `outcome_schema` + `validate/2` at the
+> `fh_engine_turn` seam) is now built rather than deferred: 2b-4's ASIC gate needs a
+> seam-level post-condition on the agent's output, and that post-condition *is* this validator —
+> so the second producer that proves the seam check is the compliance pipeline, not 2c (§9).
 > Motivated by the bilingual rollout ([`bilingual-content.md`](bilingual-content.md)):
 > that work is correct, but its *enforcement* is attached to the current workflow
 > (specific producers, a hardcoded copy-doc list, hand-written conformance cases), so it
@@ -30,10 +34,11 @@ Today the "user-facing text is localized" rule is guarded at three places, each 
 
 Every one of these *enumerates what to check*. Enumeration fails exactly when the author of
 the next change does not know the rule — which is the normal case as the team and the
-surface grow. The same shape already bit us once: the blueprint still declares an unused
-`application.language_preference` input (`fhb-domestic-au.md:124`) left over from before the
-bilingual-always decision — a workflow-attached artifact that nothing updated when the
-workflow moved on.
+surface grow. The same shape already bit us once: the Mode-A blueprint declared an unused
+`application.language_preference` input left over from before the bilingual-always decision —
+a workflow-attached artifact that nothing updated when the workflow moved on (**removed at
+2b-4a**; the B/C/D blueprints still carry it, recorded as a Wedge-2 reconciliation — they are
+unbuilt, so the removal rides their build rather than churning them speculatively).
 
 The question this note answers: **what enforcement survives the workflow changing** — new
 producers (a Q&A sidecar in 2c, a refine turn, a curator brief), new languages
@@ -178,12 +183,26 @@ premise with the conclusion so a future reader can re-decide if it no longer hol
    build; reverts clean). 46 templates across 4 docs gated. This closes the most common
    future edit (curators adding/editing copy) and is **literally the build-time half of this
    design** — a down-payment, not a patch to rip out.
-2. **With 2c (first new producer) — the runtime half**: introduce `localized_text` in
+2. **With 2b-4 (the compliance pipeline) — the runtime half**: introduce `localized_text` in
    `outcome_schema`, generate `LocalizedText` + the type from `LOCALES`, and add
-   `validate(outcome, outcome_schema)` at `fh_engine_turn.erl:180` as the general
-   outcome-conformance step (bilingual being its first clause). 2c is the right trigger
-   because a second producer is exactly what the runtime seam-check exists to cover —
-   building it then proves it against a real second producer rather than speculatively.
+   `validate(outcome, outcome_schema)` at the `fh_engine_turn` commit seam as the general
+   outcome-conformance step (bilingual being its first clause). **2b-4 — not 2c — is the
+   proving producer:** the ASIC gate ([`compliance-pipeline.md`](compliance-pipeline.md)) needs
+   a seam-level post-condition that the agent's output stays decision-support (no LLM-authored
+   figure — §98), and that post-condition is the *figure-type* clause of this same validator.
+   So the regulated layer **consumes** Layer 1's verdict rather than re-deriving it: one source
+   of truth for "this outcome conforms," two readers (the structural fail-closed crash, and
+   ASIC's regulated attestation). Building it now proves the seam check against a real second
+   consumer — exactly the non-speculative trigger §8 asks for — and it arrives a slice earlier
+   than the original 2c plan because a regulated consumer materialized first.
+
+   **The two layers, ordered at the seam** (full regulated detail in
+   [`compliance-pipeline.md`](compliance-pipeline.md)):
+   - **Layer 1 — `validate(outcome, outcome_schema)`** (this note): structural, producer- and
+     mode-agnostic, **fail-closed crash** on any non-conformance. Runs first.
+   - **Layer 2 — FIRB→ASIC→AML** (the compliance note): regulated dispositions + the
+     `audit_events` trail; ASIC reads Layer 1's figure-type verdict. Runs second, on a
+     Layer-1-conforming outcome.
 
 ## 10. Worked simulation (define → simulate)
 
@@ -215,17 +234,23 @@ Walk concrete *future* changes through the design; show the enumerate-approach m
   classification rule for *which* fields are localized), [`engine-contract.md`](engine-contract.md)
   (content-language engine-owned, §8/§9.2), [`agentic-boundary.md`](agentic-boundary.md)
   (the resolver/agent boundary this makes movable), §98 (becomes a typed post-condition).
-- **Index wiring deferred:** when implemented, add an entry to `docs/README.md` and a node to
-  [`structure-map.md`](structure-map.md) (the coherence hub maps *built* structures); this
-  note is a proposal until then.
+- **Index wiring:** on implementation (2b-4b), add an entry to `docs/README.md` and a node to
+  [`structure-map.md`](structure-map.md) (the coherence hub maps *built* structures) for the
+  seam validator + its regulated rider, alongside [`compliance-pipeline.md`](compliance-pipeline.md).
 
-## Open decisions for Son
+## Resolved decisions (Son, at 2b-4)
 
-1. **Build the runtime half with 2c (recommended) or sooner?** §9 sequences it with 2c as
-   the first producer that proves it.
-2. **`localized_text` as a new `type` value, or a `"localized": true` flag on a `string`
-   field?** A distinct type is cleaner for the total-walk; a flag is a smaller spec change.
-   (Leaning: distinct type — it makes the inverse error in §2 a type mismatch, not a missing
-   flag.)
-3. **Where does `LOCALES` live** — a top-level key in the compiled artifact, or engine
-   config? (Leaning: artifact — keeps git as SOT and snapshots it for the audit trail.)
+1. **Runtime half timing → build now, with 2b-4.** The original §9 deferred it to 2c "the
+   first new producer that proves it." A regulated consumer (the ASIC gate) materialized
+   first and needs exactly this seam post-condition, so 2b-4 *is* the proving producer.
+   Built now, not speculatively — the §8 premise (a real second consumer) is satisfied by the
+   compliance pipeline.
+2. **`localized_text` → a distinct `type` value** (not a `"localized": true` flag on a
+   `string`). The total-walk reads one type per field; a distinct type makes the inverse error
+   (§2 — prose-localization on a figure/enum) a plain type mismatch the walk already catches,
+   rather than a flag someone forgot. Slightly larger spec change, paid once.
+3. **`LOCALES` → a top-level key in the compiled artifact** (not engine config). Git stays
+   SOT; the artifact snapshots it into every fill's audit trail; the compiler gate, the seam
+   `validate/2`, the generated `LocalizedText`, and the shell picker all read the one value
+   (§6). Per-locale validators (the vi-diacritic heuristic) sit in an isolated registry beside
+   it, never load-bearing (§3).

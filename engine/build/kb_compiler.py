@@ -232,6 +232,65 @@ def parse_object_entity(tstr):
     return fields
 
 
+# The outcome-field type vocabulary the seam validator recognises (outcome-conformance.md
+# §2). `localized_text` is the bilingual clause (the first clause of the general property);
+# every other type is single-valued (a figure/enum/id — never a {vi,en} map, §98). A type
+# outside this set parses to {"kind": "unknown"} and is NOT checked at the seam — graceful
+# for a name-only sub-field or a per-property custom type (e.g. comparable_sale).
+LOCALIZED_TYPE = "localized_text"
+SCALAR_TYPES = {
+    "string", "bool", "date", "object", "number",
+    "money", "money_range", "money_per_year", "integer", "integer_0_10",
+}
+
+
+def parse_field_type(tstr):
+    """An outcome-schema type string -> a recursive {kind: ...} tree the engine walks at
+    the commit seam (outcome-conformance.md §2). Nullability is implicit-universal at the
+    validator — an honest-partial `null` conforms to any field — so a trailing `| null` is
+    stripped here rather than modelled. Single parser, Python-side: Erlang reads the tree,
+    never re-parses type strings (one source of parsing, [[ground-design-choices]])."""
+    s = re.sub(r"\s*\|\s*null\s*$", "", tstr.strip()).strip()
+    m = re.match(r"enum\s*\[([^\]]*)\]$", s)
+    if m:
+        return {"kind": "enum",
+                "options": [x.strip() for x in m.group(1).split(",") if x.strip()]}
+    if s.startswith("array<") and s.endswith(">"):
+        return {"kind": "array", "element": parse_field_type(s[6:-1])}
+    if s.startswith("{") and s.endswith("}"):
+        fields = {}
+        for part in split_top_level(s[1:-1]):
+            part = part.strip()
+            if not part:
+                continue
+            name, sep, typ = part.partition(":")
+            fields[name.strip()] = parse_field_type(typ.strip()) if sep else {"kind": "unknown"}
+        return {"kind": "object", "fields": fields}
+    if s == LOCALIZED_TYPE:
+        return {"kind": "localized"}
+    if s in SCALAR_TYPES:
+        return {"kind": "scalar", "type": s}
+    return {"kind": "unknown", "raw": s}
+
+
+def string_leaf_paths(node, prefix=""):
+    """Dotted paths of every `string`-typed scalar inside a parsed field type — the §3
+    declarative-boundary nudge: prose mistakenly declared `string` (not localized_text)
+    escapes the seam check, so the compiler REPORTS each for human review (info, not a
+    hard fail — many strings are genuinely ids/codes/names)."""
+    k = node.get("kind")
+    if k == "scalar" and node.get("type") == "string":
+        return [prefix or "<root>"]
+    if k == "array":
+        return string_leaf_paths(node["element"], prefix + "[]")
+    if k == "object":
+        out = []
+        for f, sub in node["fields"].items():
+            out += string_leaf_paths(sub, f"{prefix}.{f}" if prefix else f)
+        return out
+    return []
+
+
 def flatten_param_slots(d, prefix=""):
     """Param dict -> {dotted_path: meta}. A node WITH a `type` key is a leaf slot
     (do not recurse into it — milestones/arrays carry nested `value`)."""
@@ -547,6 +606,21 @@ def run(emit=False):
     for c in comps:
         in_scope_anchors.update(c.anchors)
 
+    # ---- §3 nudge: outcome fields declared `string` (confirm not prose) --- #
+    # The seam validator only localizes a field typed `localized_text`; prose mistyped
+    # `string` slips through silently (outcome-conformance.md §3 declarative boundary).
+    # Report every string-typed leaf across the in-scope outcomes for human review — info,
+    # never a hard fail (ids / scheme names / currency codes are legitimately `string`).
+    string_leaves = []
+    for otype, fields in sorted(reg.outcome_fields.items()):
+        for f, tstr in sorted(fields.items()):
+            for path in string_leaf_paths(parse_field_type(tstr), f):
+                string_leaves.append(f"{otype}.{path}")
+    for sl in string_leaves:
+        info.append(f"[outcome-string] {sl} — declared `string`; confirm not user-facing "
+                    f"prose (else localized_text)")
+    stats["outcome_string_leaves"] = len(string_leaves)
+
     # ---- parse all KB docs ------------------------------------------------ #
     kb_docs = {}
     for f in sorted(KB.rglob("*.md")):
@@ -748,9 +822,23 @@ def build_artifact(blueprints, reg, kb_docs):
     return {
         "schema_version": 1,
         "in_scope_blueprint": IN_SCOPE_BLUEPRINT,
+        # The locale set is the single source of truth (outcome-conformance.md §6): the
+        # compiler copy gate, the seam validator, the generated LocalizedText, and the
+        # shell's display picker all read it here. Adding a locale touches LOCALES + the
+        # per-locale validator registry — nowhere else. Snapshotted into the artifact so
+        # git stays SOT and every fill's audit trail carries the locale set it was checked
+        # against.
+        "locales": list(LOCALES),
         "kb": kb,
         "registry": {
             "outcome_fields": reg.outcome_fields,
+            # Parsed recursive type tree per outcome field (parse_field_type) — the
+            # machine-readable form the seam validator walks (outcome-conformance.md §2);
+            # `localized_text` -> {kind: localized}, figures -> {kind: scalar}, etc.
+            "outcome_types": {
+                otype: {f: parse_field_type(t) for f, t in fields.items()}
+                for otype, fields in reg.outcome_fields.items()
+            },
             "applicant_fields": {k: v for k, v in reg.applicant_fields.items()},
             "entities": {ns: {"fields": e["fields"], "cardinality": e["cardinality"]}
                          for ns, e in sorted(reg.entities.items())},
@@ -771,6 +859,9 @@ def main():
     print(f"kb docs: {stats.get('kb_docs')}")
     print(f"copy templates: {stats.get('copy_templates')} (bilingual gate, "
           f"locales={'+'.join(LOCALES)})")
+    print(f"outcome conformance: locales={'+'.join(LOCALES)}, "
+          f"{stats.get('outcome_string_leaves')} string-typed outcome leaf(s) for review "
+          f"(§3 nudge)")
     if info:
         print(f"\nINFO ({len(info)}):")
         for m in info:
