@@ -193,7 +193,7 @@ def parse_blueprint(path):
     slug = "blueprints." + path.stem
     comps = []
     # numbered component sections: "### 1. buyer_profile"
-    heads = list(re.finditer(r"^### (\d+)\.\s+(\w+)\s*$", text, re.M))
+    heads = list(re.finditer(r"^### (\d+)\.\s+(\w+)\b", text, re.M))
     for idx, h in enumerate(heads):
         name = h.group(2)
         end = heads[idx + 1].start() if idx + 1 < len(heads) else len(text)
@@ -410,9 +410,22 @@ def run(emit=False):
     stats = {}
 
     # ---- parse blueprints ------------------------------------------------- #
+    # A blueprint is a DAG of components (constraint #5), so a file under
+    # docs/blueprints/ with NEITHER components NOR a producer→outcome pipeline is
+    # definitionally not a blueprint (e.g. scenarios.md is a scenario register) —
+    # skip it, logged so the drop is visible. The condition is "no component
+    # structure at all" (not "0 components") so the skip never swallows a real
+    # blueprint: the B/C/D component-header regex now matches headers carrying
+    # parenthetical/★ suffixes (`### N. name (variant)`), so all four modes parse
+    # their components AND their DAG and are structurally gated (slug, renderer
+    # enum, acyclicity) over every blueprint. (IN_SCOPE_BLUEPRINT is still
+    # asserted present below, so Mode A can never be skipped unnoticed.)
     blueprints = {}
     for bp in sorted(BP.glob("*.md")):
         slug, comps, producer, reads = parse_blueprint(bp)
+        if not comps and not producer:
+            info.append(f"[skip] {slug}: no component pipeline — not a blueprint (constraint #5)")
+            continue
         blueprints[bp.stem] = (slug, comps, producer, reads)
 
     if IN_SCOPE_BLUEPRINT not in blueprints:
@@ -586,7 +599,20 @@ def build_artifact(blueprints, reg, kb_docs):
         bps[slug] = {
             "components": [
                 {"name": c.name, "outcome_type": c.outcome_type,
-                 "anchors": c.anchors, "renderers": c.renderers}
+                 "anchors": c.anchors, "renderers": c.renderers,
+                 # Fill-path classification (blueprint "Fill-path classification"
+                 # block; agentic-boundary.md). The agent-path leaves carry
+                 # `agent_reasoning_required: true`; everything else resolves
+                 # deterministically. The engine derives the component's path:
+                 # empty -> pure resolver (no sidecar, no usage); non-empty -> the
+                 # listed leaves are agent, the rest resolver (a two-path component
+                 # like mortgage_finance). reasoning_domain selects the leaf-fill
+                 # prompt module (agentic-flow §3).
+                 "agent_leaves": [
+                     {"leaf": path, "reasoning_domain": meta.get("reasoning_domain")}
+                     for path, meta in sorted(c.param_slots.items())
+                     if meta.get("agent_reasoning_required") is True
+                 ]}
                 for c in comps
             ],
             "dag_reads": reads,

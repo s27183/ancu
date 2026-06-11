@@ -12,9 +12,13 @@
 
 -export([init/2, info/3, terminate/3]).
 
-%% Safety cap so a wedged stream can't pin a connection forever; the turn always
-%% emits a terminal event, so a healthy stream closes well before this.
--define(SSE_TIMEOUT, 120000).
+%% SSE liveness (erlang-design-checklist §12/§13/§15): a leaf-fill can be minutes of
+%% silence between events, so the stream is kept alive with periodic keepalive
+%% comments — NOT a wall-clock cap that can't tell a slow turn from a dead one. The
+%% only wall-clock timer is a long inactivity guard for user abandonment (§15.3),
+%% reset on each real event.
+-define(KEEPALIVE_MS, 15000).
+-define(INACTIVITY_MS, 1800000).   %% 30 min — user walked away (the one legit wall-clock use)
 
 init(Req0, _State) ->
     case fh_engine_http:authenticate(Req0) of
@@ -45,13 +49,14 @@ start_stream(T, PlanCardId, Req0) ->
             finish(Req),
             {ok, Req, undefined};
         false ->
-            TRef = erlang:send_after(?SSE_TIMEOUT, self(), sse_timeout),
             {cowboy_loop, Req,
-             #{plan_card_id => PlanCardId, max_id => MaxId, tref => TRef}}
+             #{plan_card_id => PlanCardId, max_id => MaxId,
+               keepalive => arm_keepalive(), inactivity => arm_inactivity()}}
     end.
 
 info({plan_card_event, PlanCardId, {Id, Type, Payload}}, Req,
-     #{plan_card_id := PlanCardId, max_id := MaxId} = State) ->
+     #{plan_card_id := PlanCardId, max_id := MaxId} = State0) ->
+    State = reset_inactivity(State0),
     case Id > MaxId of
         true ->
             stream_event(Req, Id, Type, Payload),
@@ -62,17 +67,33 @@ info({plan_card_event, PlanCardId, {Id, Type, Payload}}, Req,
         false ->
             {ok, Req, State}
     end;
-info(sse_timeout, Req, State) ->
+info(keepalive, Req, State) ->
+    %% SSE comment line (leading ':') — ignored by clients, keeps the connection from
+    %% idling out during a long silent leaf-fill (§13).
+    cowboy_req:stream_body(<<":keepalive\n\n">>, nofin, Req),
+    {ok, Req, State#{keepalive := arm_keepalive()}};
+info(inactivity_timeout, Req, State) ->
     finish(Req),
     {stop, Req, State};
 info(_Other, Req, State) ->
     {ok, Req, State}.
 
-terminate(_Reason, _Req, #{tref := TRef}) ->
-    erlang:cancel_timer(TRef),
+terminate(_Reason, _Req, #{keepalive := K, inactivity := I}) ->
+    erlang:cancel_timer(K),
+    erlang:cancel_timer(I),
     ok;
 terminate(_Reason, _Req, _State) ->
     ok.
+
+%% --- timers -----------------------------------------------------------------
+
+arm_keepalive() -> erlang:send_after(?KEEPALIVE_MS, self(), keepalive).
+
+arm_inactivity() -> erlang:send_after(?INACTIVITY_MS, self(), inactivity_timeout).
+
+reset_inactivity(#{inactivity := Ref} = State) ->
+    erlang:cancel_timer(Ref),
+    State#{inactivity := arm_inactivity()}.
 
 %% --- internals --------------------------------------------------------------
 

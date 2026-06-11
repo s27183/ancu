@@ -49,7 +49,7 @@ main(_) ->
     %% --- persisted event log is the SOT (count matches the stream) ---
     EventCount = scalar("SELECT count(*) FROM plan_card_events WHERE plan_card_id = $1",
                         [PlanCardId]),
-    expect(EventCount =:= 7, "7 events persisted"),
+    expect(EventCount =:= 8, "8 events persisted"),
 
     %% --- content_jsonb snapshot holds all 5 base components ---
     {200, CardResp} = req(get, Base ++ "/plan-cards/" ++ binary_to_list(PlanCardId),
@@ -74,9 +74,14 @@ main(_) ->
     io:format("~n==== SEAM SMOKE: ALL ASSERTIONS PASSED ====~n"),
     halt(0).
 
+%% 2b-2b base turn: turn_started → buyer_profile/eligibility (resolver, Erlang) →
+%% mortgage_finance (agent, sidecar) immediately followed by its `usage` →
+%% cash_position/ownership_planning (resolver) → turn_completed. The lone `usage`
+%% sits where the one agent fill ran; the four resolver fills emit none (§4).
 expected_sequence() ->
     [<<"turn_started">>,
      <<"component_filled">>, <<"component_filled">>, <<"component_filled">>,
+     <<"usage">>,
      <<"component_filled">>, <<"component_filled">>,
      <<"turn_completed">>].
 
@@ -110,18 +115,34 @@ sse_loop(ReqId, Acc) ->
         {http, {ReqId, stream, Chunk}} -> sse_loop(ReqId, <<Acc/binary, Chunk/binary>>);
         {http, {ReqId, stream_end, _Headers}} -> Acc;
         {http, {ReqId, {error, Reason}}} -> error({sse_error, Reason})
-    after 15000 ->
+    after 30000 ->   %% > the 15s SSE keepalive cadence — keepalives reset this each tick
         error(sse_timeout)
     end.
 
 parse_event_types(Raw) ->
     Frames = binary:split(Raw, <<"\n\n">>, [global]),
-    lists:filtermap(fun(Frame) ->
-        case re:run(Frame, <<"event: (.+)">>, [{capture, [1], binary}]) of
-            {match, [Type]} -> {true, Type};
-            nomatch -> false
+    Pairs = lists:filtermap(fun parse_frame/1, Frames),
+    %% Dedup by event id: httpc may reconnect mid-stream, and without Last-Event-ID the
+    %% engine correctly replays from 0 — so a naive client sees the replay twice. A real
+    %% SSE client dedups via Last-Event-ID; we do the same here (keep first-seen order).
+    {_, Rev} = lists:foldl(fun({Id, Type}, {Seen, Acc}) ->
+        case sets:is_element(Id, Seen) of
+            true -> {Seen, Acc};
+            false -> {sets:add_element(Id, Seen), [Type | Acc]}
         end
-    end, Frames).
+    end, {sets:new(), []}, Pairs),
+    lists:reverse(Rev).
+
+parse_frame(Frame) ->
+    case re:run(Frame, <<"event: (.+)">>, [{capture, [1], binary}]) of
+        {match, [Type]} ->
+            Id = case re:run(Frame, <<"id: (\\d+)">>, [{capture, [1], binary}]) of
+                     {match, [I]} -> binary_to_integer(I);
+                     nomatch -> 0
+                 end,
+            {true, {Id, Type}};
+        nomatch -> false
+    end.
 
 scalar(SQL, Params) ->
     #{rows := [{Val}]} = pgo:query(SQL, Params),

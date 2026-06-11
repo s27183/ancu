@@ -53,7 +53,11 @@ create(T, U, Params, Req, State) ->
         turn_id => TurnId,
         mode => ?MODE,
         intent => Intent,
-        firb_required_any => false
+        firb_required_any => false,
+        %% Onboarding inputs ground the base turn's buyer_profile fill (constraint
+        %% #1 plan-first; the deep facts arrive via chat on a later refine turn,
+        %% which will load the enriched profile from the profiles SOT).
+        onboarding => Params
     }),
     Body = #{<<"plan_card_id">> => PlanCardId, <<"turn_id">> => TurnId},
     {ok, fh_engine_http:reply_json(202, Body, Req), State}.

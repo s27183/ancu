@@ -2,7 +2,7 @@
 
 This document specifies the runtime shape of FirstHomey's agentic work: the **types of agent**, each agent's **dynamic prompt structure**, the **vendor-neutral run layer**, and **conversation + context management**. It is the *how the reasoning runs* companion to [`agentic-boundary.md`](agentic-boundary.md) (the *what reasons* — the resolver/agent decision rule) and [`engine-contract.md`](engine-contract.md) (the events, metering, and compliance gate the reasoning rides on). For how the fill paths are encoded in the blueprint, see [architecture.md §11.9](architecture.md#119-blueprint-as-data-model--presentation-specification).
 
-Patterns are borrowed from two sibling systems — ATP (the orchestrated skill-agent prompt structure) and `plc_agent` (the multi-vendor run layer and conversation management) — but the *shape* is FirstHomey's own. Where a borrowed mechanism is deliberately **not** adopted, the reason is recorded; that "why not" is load-bearing (it stops a future contributor porting the heavier machinery wholesale).
+Patterns are borrowed from three sibling systems — ATP (the orchestrated skill-agent prompt structure), `plc_agent` (the multi-vendor run layer and conversation management), and aleap (ADR 0031 — the Claude Agent SDK as a runner under that layer) — but the *shape* is FirstHomey's own. Where a borrowed mechanism is deliberately **not** adopted, the reason is recorded; that "why not" is load-bearing (it stops a future contributor porting the heavier machinery wholesale).
 
 ---
 
@@ -112,7 +112,7 @@ FirstHomey **inverts the static/dynamic split**, because constraint #9 says the 
 - `<property>` / `<documents>` — addendum context + extracted facts, when present
 - `<user_query>` — the question (Q&A / refine turns only)
 
-This is `plc_agent`'s "dynamic per-turn instruction rebuilding" (the reason it rejected the Claude Agent SDK — that SDK lacks per-turn instruction rebuilding and shared mutable context) realised with ATP's tagged-block builder. The `<kb>` + scaffold portion forms a **stable cacheable prefix** (§7).
+This is `plc_agent`'s "dynamic per-turn instruction rebuilding" realised with ATP's tagged-block builder. (`plc_agent` once rejected the Claude Agent SDK for *lacking* per-turn instruction rebuilding and forcing shared mutable context. The current `claude-agent-sdk` has neither limitation — `ClaudeAgentOptions(system_prompt=…)` takes a fresh per-call prompt and `query()` is stateless by default, "fresh starts each time" — so that rejection no longer binds, and FirstHomey adopts the SDK as its single runner, §7.) The `<kb>` + scaffold portion forms a **stable cacheable prefix** (§7).
 
 ---
 
@@ -152,11 +152,33 @@ Adopt `plc_agent`'s protocol-layer pattern; FirstHomey already has the seam **fo
 | Leaf-fill (§3) | `run_blocking` — structured `output_type`, one-shot | none (`plc_agent`'s child-agent path) |
 | Q&A (§4) | `run` — streaming text | light (§8) |
 
-**Scope for Wedge 1a — protocol layer now, Anthropic adapter only.** Define the dataclasses (cheap, and they document the seam); build only the `AnthropicAgentRunner` (the engine's events already mirror the Anthropic SDK natively — [engine-contract.md §4](engine-contract.md#4-event-taxonomy), principle 6). Leave the OpenAI adapter as a documented extension point. **Do not build it speculatively** — same discipline as the deferred `/mcp` surface ([engine-contract.md §2.2](engine-contract.md)) and CLAUDE.md's "no LangChain unless materially justified." Multi-vendor pays off *less* here than in `plc_agent` precisely because the agent surface is small and resolver-dominated.
+**Scope for Wedge 1a — protocol layer now, one adapter: the Claude Agent SDK.** Define the dataclasses (cheap, and they document the seam); build a single `AgentSdkRunner` over the Python `claude-agent-sdk` (borrowed from aleap ADR 0031). **One adapter, not two (no raw-Messages path for fills), because the subscription credit flows only through the Agent SDK / `claude -p`, never the raw Messages API** (§7.1) — so even a degenerate no-tool structured fill runs through the SDK to draw the credit. The SDK implements the protocol's two run modes natively, so one runner serves both roles (§3, §4):
+
+- **Leaf-fill** (`run_blocking`) → `query()` + a per-call `system_prompt` (the rebuilt scaffold+KB prefix, constraint #9) + `output_format` JSON-schema (the leaf's `outcome_schema`, validated against the Pydantic model via `ResultMessage.structured_output`) + **no tools** (KB is injected, not pulled — §6). A stateless structured one-shot.
+- **Q&A** (`run`) → the streaming `query()` + the KB-lookup tool (`@tool` / `create_sdk_mcp_server`, in-process — §6) + no `output_format`.
+- `ResultMessage.usage` feeds the engine's `usage` event (§9); `total_cost_usd` is a client-side estimate, so metering stays tokens×model, not the SDK's cost figure.
+
+Leave a raw-Messages adapter and the OpenAI adapter as documented extension points. **Do not build them speculatively** — same discipline as the deferred `/mcp` surface ([engine-contract.md §2.2](engine-contract.md)) and CLAUDE.md's "no LangChain unless materially justified." Multi-vendor pays off *less* here than in `plc_agent` precisely because the agent surface is small and resolver-dominated.
 
 **Vendor selection is engine config, never user-facing.** The active vendor/model is engine-internal `.env` configuration, keyed **per agent role** (extraction / leaf-fill / Q&A may each map to a different model), resolved by the Erlang engine at turn start and passed into the sidecar's `RunConfig`. It is **not** a JWT claim, **not** a tenant attribute, **not** a user toggle — users never see a vendor option. Resolution is **per turn with no thread pinning** (interpretation A): each turn reads current config; a plan card is not pinned to a vendor for its lifetime. `.env` changes at operator cadence (deploy/restart — new model, pricing, failover), so a conversation sees one vendor in practice while a long thread may cross a config change harmlessly.
 
 **This is exactly why vendor-switching is safe here.** `plc_agent` locks vendor after the first exchange (message-format lock-in from accumulated vendor-format history); FirstHomey persists only vendor-neutral glue (§8) and leaf fills are fresh each turn (constraint #9), so there is no format-locked history to strand — the backend can rotate vendor between turns freely. "No mid-conversation switch" means no *user-driven* switch and no in-turn whiplash, both satisfied by operator-cadence config without pinning. See [`isolation-model.md`](isolation-model.md) §5.
+
+### 7.1 Borrow-and-reshape from aleap ADR 0031
+
+aleap's ADR 0031 (`aleap/docs/design/decisions/0031-agent-sdk-runner-for-content-lead-scope.md`) added a Claude Agent SDK runner to its vendor router so that internal (`content_lead`) inference draws on the founder's Max-subscription Agent-SDK credit instead of pay-as-you-go API. FirstHomey borrows the **runner**, not the topology — the reshape, recorded so no one ports the heavier machinery wholesale:
+
+| ADR 0031 element | FirstHomey disposition | Why |
+|---|---|---|
+| Agent SDK runner; tools-as-Python-functions; structured output | **Adopt** | it *is* the §7 single adapter — covers both run modes, validates `outcome_schema`, exposes `usage` |
+| OAuth-token-wins auth (`env ANTHROPIC_API_KEY=""`) | **Adopt** | draws the subscription credit; reframes the slice-2 blocker (below) |
+| Scope-based routing (`content_lead` vs `customer`) | **Omit** | FirstHomey has one buyer archetype — no internal/customer split to route on |
+| `quota_ledger` cost recovery; three-runner router | **Omit** | the buyer pays the *shell*; the engine only meters (`usage`). One adapter, no router |
+| Long-lived MCP-tool-handler sidecar | **Reshape** | keep FirstHomey's **disposable per-turn** sidecar (principle 3) — the SDK call runs inside the process Erlang spawns per turn, then exits |
+
+**Auth / credit.** `ANTHROPIC_API_KEY` **preempts** `CLAUDE_CODE_OAUTH_TOKEN` (a present key wins even over a working subscription login). So to draw the credit, the Erlang gateway passes the sidecar port an env carrying the OAuth token **with `ANTHROPIC_API_KEY=""`** (empty == unset). This reframes slice 2's blocker from "provision an API key + accept token spend" to "point dev inference at the subscription credit" — a `claude setup-token`, not a metered key.
+
+**Process model.** The Python SDK shells out to a **bundled Node `claude` binary** (Python → node subprocess), so the engine's supervised `{packet,4}` port gains a Node *grandchild*. Two engine-side consequences, handled at wiring (not a redesign): the `fh_engine_turn` liveness budget must cover SDK+Node cold-start on the first call, and port teardown must reap the grandchild. (Prompt-caching of the KB+scaffold prefix per §8: the SDK caches the system prompt automatically — confirm at implementation that we get the breakpoint §8 wants rather than asserting it.)
 
 ---
 
@@ -202,5 +224,5 @@ Nothing here adds an engine event or endpoint — the agentic flow runs *inside*
 4. **Q&A = one thread per plan card**, cross-domain, de-contaminated by card re-grounding (constraint #9); history is glue.
 5. **Prompt = preamble (declares the instruction/data boundary) + static scaffold + dynamic state blocks** (static/dynamic inverted vs ATP, per constraint #9).
 6. **KB split** — resolver reads rules; leaf-fill injects declared anchors (audit + cache); Q&A uses a KB-lookup tool. Blueprint stays engine-internal.
-7. **Vendor-neutral protocol layer now, Anthropic adapter only**; the two roles map to `run_blocking` / `run`.
+7. **Vendor-neutral protocol layer now, one adapter — the Claude Agent SDK** (borrowed from aleap ADR 0031, §7.1); the two roles map to `run_blocking` / `run`, and the SDK draws subscription credit via the OAuth-token-wins auth.
 8. **Context management is light** — KB-prefix caching + glue-only Q&A compression; Layer 3 / dual-vendor pre-upload / rehydration omitted because extraction-to-facts and ground-in-state remove the need.

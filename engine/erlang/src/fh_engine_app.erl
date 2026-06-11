@@ -2,11 +2,13 @@
 -behaviour(application).
 
 %% Engine boot. Order is load-bearing (migrations README + engine-contract §9.1):
-%%   .env -> Postgres pool -> migrations (synchronous) -> supervision tree.
-%% Migrations run BEFORE the tree accepts turns. FAIL-CLOSED: the engine's runtime
-%% state (plan cards, events, sessions) lives in Postgres, and the regulated audit
-%% trail depends on a migrated schema — so a missing ENGINE_DATABASE_URL or a failed
-%% migration aborts boot rather than serving on an unmigrated/absent DB. (ATP's
+%%   .env -> Postgres pool -> migrations (synchronous) -> KB artifact -> supervision tree.
+%% Migrations and the KB-artifact load both run BEFORE the tree accepts turns.
+%% FAIL-CLOSED: the engine's runtime state (plan cards, events, sessions) lives in
+%% Postgres and the regulated audit trail depends on a migrated schema; the planning
+%% turn (resolver rules + leaf-fill KB) depends on the compiled artifact — so a
+%% missing ENGINE_DATABASE_URL, a failed migration, or an unreadable artifact aborts
+%% boot rather than serving a runtime that would silently fail every turn. (ATP's
 %% mcp_app logs-and-continues; FirstHomey deliberately does not — see the
 %% borrow-and-reshape note in fh_engine_migrations.)
 
@@ -20,6 +22,7 @@ start(_StartType, _StartArgs) ->
         {ok, _PoolPid} ->
             logger:info("engine Postgres pool started"),
             ok = fh_engine_migrations:run(),  %% raises on failure -> boot aborts
+            ok = fh_engine_kb:load(),         %% raises on failure -> boot aborts
             fh_engine_sup:start_link();
         {error, database_url_not_set} ->
             logger:error("ENGINE_DATABASE_URL not set — engine cannot boot without "

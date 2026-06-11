@@ -58,6 +58,11 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
 
 ```jsonc
 {
+  // FHSS is an INDIVIDUAL scheme — each applicant holds their own super and releases
+  // independently (resolver-semantics.md / eligibility-resolution.md decision 2, F13).
+  // The eligibility component evaluates this scheme PER APPLICANT (eligible_applicants),
+  // not ∀-joint. Absence of this marker ⇒ joint (the documented default; every other scheme).
+  "resolution": "per_applicant",
   "fills": [
     { "leaf": "eligibility.fhss.eligible",
       "rule": { "kind": "criteria", "combine": "all_of", "criteria": [

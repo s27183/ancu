@@ -1,0 +1,185 @@
+-module(fh_engine_kb).
+
+%% The compiled KB + blueprint artifact, loaded into persistent_term at boot.
+%%
+%% engine-contract §9.1: KB + blueprints are NOT Postgres tables. They are
+%% git-authored (docs/kb, docs/blueprints), compiled by the offline build agent
+%% (engine/build/kb_compiler.py) into a versioned artifact (priv/kb/artifact.json),
+%% and loaded into memory at deploy. Git is SOT; the artifact is a deterministic,
+%% rebuildable projection. The engine is the SOLE reader — all KB/blueprint access
+%% goes through these accessors, never a direct file read elsewhere.
+%%
+%% persistent_term is the right home: set-once-at-boot, read-mostly, large, and
+%% shared by every turn's gen_statem. No copy-on-read, no gen_server bottleneck,
+%% no runtime writes. (If a deploy ever needs hot-reload, that is an explicit
+%% persistent_term:put/2 with the known global-GC cost — not a runtime path.)
+%%
+%% FAIL-CLOSED at boot (matching fh_engine_migrations): the engine cannot plan
+%% without its rules + blueprints, so an unreadable/undecodable artifact aborts
+%% boot rather than serving a runtime that would silently fail every turn.
+
+-export([load/0, load/1]).
+-export([schema_version/0, in_scope_blueprint/0]).
+-export([blueprint/1, components/1, component/2]).
+-export([kb/1, kb_content_md/1, kb_rules/1, kb_anchors/1]).
+-export([rules/0]).
+-export([registry/0, registry/1]).
+
+-define(PT_KEY, {?MODULE, artifact}).
+
+%% --- load -------------------------------------------------------------------
+
+-spec load() -> ok.
+load() ->
+    load(default_path()).
+
+-spec load(file:filename_all()) -> ok.
+load(Path) ->
+    case file:read_file(Path) of
+        {ok, Bin} ->
+            Artifact = fh_engine_util:json_decode(Bin),
+            persistent_term:put(?PT_KEY, Artifact),
+            #{<<"kb">> := Kb, <<"blueprints">> := Bps} = Artifact,
+            logger:info("KB artifact loaded from ~s: ~p KB entries, ~p blueprints, "
+                        "schema_version ~p, in_scope=~s",
+                        [Path, map_size(Kb), map_size(Bps),
+                         schema_version(), in_scope_blueprint()]),
+            ok;
+        {error, Reason} ->
+            logger:error("KB artifact unreadable at ~s: ~p — engine cannot boot "
+                         "without its compiled rules + blueprints", [Path, Reason]),
+            error({kb_artifact_unreadable, Path, Reason})
+    end.
+
+default_path() ->
+    filename:join([code:priv_dir(fh_engine), "kb", "artifact.json"]).
+
+%% --- top-level accessors ----------------------------------------------------
+
+-spec schema_version() -> integer().
+schema_version() ->
+    maps:get(<<"schema_version">>, artifact()).
+
+-spec in_scope_blueprint() -> binary().
+in_scope_blueprint() ->
+    maps:get(<<"in_scope_blueprint">>, artifact()).
+
+%% --- blueprint accessors ----------------------------------------------------
+%% Slugs accepted bare ("fhb-domestic-au") or fully-qualified
+%% ("blueprints.fhb-domestic-au"); the artifact keys are fully-qualified.
+
+-spec blueprint(binary()) -> {ok, map()} | {error, {blueprint_not_found, binary()}}.
+blueprint(Slug) ->
+    Bps = maps:get(<<"blueprints">>, artifact()),
+    Key = qualify(<<"blueprints">>, Slug),
+    case maps:find(Key, Bps) of
+        {ok, Bp} -> {ok, Bp};
+        error    -> {error, {blueprint_not_found, Slug}}
+    end.
+
+-spec components(binary()) -> {ok, [map()]} | {error, term()}.
+components(Slug) ->
+    case blueprint(Slug) of
+        {ok, Bp} -> {ok, maps:get(<<"components">>, Bp)};
+        Err      -> Err
+    end.
+
+-spec component(binary(), binary()) ->
+    {ok, map()} | {error, {component_not_found, binary()}} | {error, term()}.
+component(Slug, Name) ->
+    case components(Slug) of
+        {ok, Comps} ->
+            case lists:search(fun(C) -> maps:get(<<"name">>, C) =:= Name end, Comps) of
+                {value, C} -> {ok, C};
+                false      -> {error, {component_not_found, Name}}
+            end;
+        Err -> Err
+    end.
+
+%% --- KB accessors -----------------------------------------------------------
+%% A KB entry is {content_md, content_json, effective_from, last_verified}
+%% (engine-contract §9.1). Slugs accepted bare or "kb."-qualified.
+
+-spec kb(binary()) -> {ok, map()} | {error, {kb_not_found, binary()}}.
+kb(Slug) ->
+    Kb = maps:get(<<"kb">>, artifact()),
+    Key = qualify(<<"kb">>, Slug),
+    case maps:find(Key, Kb) of
+        {ok, Entry} -> {ok, Entry};
+        error       -> {error, {kb_not_found, Slug}}
+    end.
+
+%% Prose body — injected into the leaf-fill scaffold's <kb> block (agentic-flow §6).
+-spec kb_content_md(binary()) -> {ok, binary()} | {error, term()}.
+kb_content_md(Slug) ->
+    case kb(Slug) of
+        {ok, E} -> {ok, maps:get(<<"content_md">>, E)};
+        Err     -> Err
+    end.
+
+%% Evaluable rules — read directly by the resolver (agentic-flow §6: rules engine,
+%% no prompt). The shape is the compiler's content_json (fills/criteria/lookup/...).
+-spec kb_rules(binary()) -> {ok, map()} | {error, term()}.
+kb_rules(Slug) ->
+    case kb(Slug) of
+        {ok, E} -> {ok, maps:get(<<"content_json">>, E, #{})};
+        Err     -> Err
+    end.
+
+%% The kb_versions audit snapshot for a fill: slug -> {effective_from, last_verified}.
+-spec kb_anchors([binary()]) -> [map()].
+kb_anchors(Slugs) ->
+    lists:filtermap(
+        fun(Slug) ->
+            case kb(Slug) of
+                {ok, E} ->
+                    {true, #{<<"slug">> => qualify(<<"kb">>, Slug),
+                             <<"effective_from">> => maps:get(<<"effective_from">>, E),
+                             <<"last_verified">> => maps:get(<<"last_verified">>, E)}};
+                {error, _} -> false
+            end
+        end, Slugs).
+
+%% Every fill across all KB docs merged into one leaf -> rule map, the form the
+%% resolver interprets (fh_engine_resolver). Refs resolve globally across docs;
+%% a leaf filled by more than one doc takes the last (matching the executable spec
+%% tests/resolver_eval.py load_rules — multi-fill leaves like eligibility.fhog.*
+%% are reconciled by the eligibility component, not the raw interpreter).
+-spec rules() -> #{binary() => map()}.
+rules() ->
+    Kb = maps:get(<<"kb">>, artifact()),
+    maps:fold(
+        fun(_Slug, Entry, Acc) ->
+            Cj = maps:get(<<"content_json">>, Entry, #{}),
+            lists:foldl(fun merge_fill/2, Acc, maps:get(<<"fills">>, Cj, []))
+        end, #{}, Kb).
+
+merge_fill(Fill, Acc) ->
+    case {maps:get(<<"leaf">>, Fill, undefined), maps:get(<<"rule">>, Fill, undefined)} of
+        {undefined, _} -> Acc;
+        {_, undefined} -> Acc;
+        {Leaf, Rule}   -> Acc#{Leaf => Rule}
+    end.
+
+%% --- registry (the materialized resolver-input surface) ---------------------
+
+-spec registry() -> map().
+registry() ->
+    maps:get(<<"registry">>, artifact()).
+
+-spec registry(binary()) -> term().
+registry(Section) ->
+    maps:get(Section, registry()).
+
+%% --- internals --------------------------------------------------------------
+
+artifact() ->
+    persistent_term:get(?PT_KEY).
+
+qualify(Prefix, Slug) ->
+    PrefixDot = <<Prefix/binary, ".">>,
+    Plen = byte_size(PrefixDot),
+    case Slug of
+        <<P:Plen/binary, _/binary>> when P =:= PrefixDot -> Slug;
+        _ -> <<PrefixDot/binary, Slug/binary>>
+    end.

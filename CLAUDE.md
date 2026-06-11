@@ -117,7 +117,7 @@ firsthomey/
 │   │   ├── fhb-foreign-au.md
 │   │   ├── investor-domestic-au.md
 │   │   └── investor-foreign-au.md
-│   ├── kb/                       (to be created: curated KB markdown files with frontmatter)
+│   ├── kb/                       (curated KB markdown files with frontmatter — Mode-A set authored; one slug per file)
 │   │   ├── scheme/
 │   │   ├── firb/
 │   │   ├── lender/
@@ -131,12 +131,12 @@ firsthomey/
 │   ├── erlang/                   (cowboy /api/engine/*, gen_statem per plan-card turn, compliance, metering, PGO)
 │   │   ├── priv/migrations/      (engine PG schema: plan-card state, events, sessions)
 │   │   └── priv/kb/              (compiled KB + blueprint artifact, emitted at deploy)
-│   └── python/                   (to be created: stateless sidecars — planning agent (Anthropic SDK), Playwright URL fetch)
+│   └── python/                   (stateless disposable sidecars — planner_stub.py built; real Anthropic-SDK planner + Playwright fetch = slice 2)
 ├── shell/                        (to be created: Svelte frontend + Erlang backend — UX, identity, commerce)
 │   ├── svelte/frontend/
 │   ├── svelte/backend/
 │   └── extension/                (browser extension — Phase B property capture)
-├── tests/                        (to be created)
+├── tests/                        (build validation + resolver eval — validate_build.py, resolver_eval.py)
 └── pyproject.toml                (sidecar deps; .venv)
 ```
 

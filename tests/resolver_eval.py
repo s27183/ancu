@@ -5,26 +5,39 @@ The compiler ([`engine/build/kb_compiler.py`]) validates that every `content_jso
 rule *references* real registry fields and that each `leaf` maps to a real slot —
 structure and reference integrity. It never *executes* a rule. That is the blind
 spot §1 names "rule *semantics*": a rule can reference all-valid fields and still
-compute the wrong outcome. F13 is the open instance — FHSS is an **individual**
-scheme, but its eligibility is modelled as one joint bool with ∀-over-applicants
-semantics, so a household where one of two applicants qualifies reads as ineligible
-rather than "one applicant releases".
+compute the wrong outcome.
 
 This harness closes that class. It carries a small **reference resolver** that
 interprets the emitted artifact's `content_json` rules (criteria / lookup /
 parameter) against worked-example fact-sets and asserts each computed outcome leaf
 against an expected value drawn from the KB prose (the ground truth). A mismatch
 surfaces a rule-semantics bug. The reference resolver also doubles as the executable
-spec the engine's production resolver (Python sidecar / Erlang) must conform to —
-when that lands, this becomes its conformance suite.
+spec the engine's production resolver (Python sidecar / Erlang `fh_engine_resolver`)
+must conform to — `engine/erlang/test/resolver_conformance.escript` runs the same
+worked examples against the Erlang port and asserts identical outcomes.
 
-It binds to the **materialized artifact** (`engine/erlang/priv/kb/artifact.json`),
-not re-parsed docs — the same ground the engine loads (reason-from-materialized-ground).
+THREE-VALUED (Kleene) semantics — see `docs/architecture/resolver-semantics.md`.
+A fact at base is often *partially known*: a **scalar** (pinned), a **set**
+`{"oneof": [...]}` (one of these, unknown which — e.g. Mode A → citizenship is
+`{citizen, permanent_resident}`), a **range** `{"range": [lo, hi]}` (an interval
+over an ordered domain — `lo`/`hi` `None` = ∓∞), or **absent** (the universe). A
+criterion over a possibility set is three-valued — `True` if it holds for ALL the
+set's values, `False` for NONE, else `UNDET`. Combinators are strong Kleene
+(`all_of` → `False` if any child false, else `UNDET` if any undetermined, else
+`True`; `any_of` dual). A `None` `rhs` (e.g. the FHG cap `lookup` defaulting to
+`null` when `location_tier` is absent) → `UNDET` — structurally closing G3 (no
+spurious pass from a null threshold). The verdict is policy-free; each CONSUMER
+collapses: `eligibility` `UNDET → applicable-pending`, the compliance gate
+`UNDET → deny` (fail-closed).
 
-Applicant semantics: a criteria rule is evaluated PER APPLICANT and ∀-combined into
-the joint leaf — the §11.9 `applicant.*` repoint's modelled semantics ("all
-applicants eligible"; conservative and correct for a single applicant). F13 is
-precisely where ∀ is the wrong collapse for an individual scheme.
+Backward-compat guarantee (resolver-semantics §5): when every referenced fact is a
+pinned **scalar**, the resolver returns exactly the old `True`/`False` and never
+`UNDET`. The scalar CASES below are unchanged and are the guard for this property.
+
+Applicant semantics: a criteria rule is evaluated PER APPLICANT. A **joint** scheme
+∀-combines (Kleene) into one verdict (`leaf`); a **per-applicant** scheme (FHSS,
+by the KB `resolution` marker) keeps the per-applicant list (`leaf_per_applicant`)
+— the F13 close.
 
 Known-open findings carry an `xfail` marker (the finding id):
   - an xfail case that still mismatches  → confirmed-open gap; does NOT fail the run.
@@ -45,55 +58,162 @@ class ResolverError(Exception):
     """A rule could not be evaluated (malformed rule, unresolved ref). Hard failure."""
 
 
+class _Undet:
+    """The third truth value — 'could be either', distinct from True/False and from
+    None (which means 'missing fact' / lookup default). A singleton."""
+    __slots__ = ()
+    def __repr__(self):
+        return "UNDET"
+    def __bool__(self):
+        raise TypeError("UNDET is not a Python bool — collapse it with a consumer policy")
+
+
+UNDET = _Undet()
+
+
+# --------------------------------------------------------------------------- #
+# Possibility-set helpers. A fact value is a scalar, a tagged set/range dict, or
+# None (absent = the universe). Tagged dicts are the only new structure.
+# --------------------------------------------------------------------------- #
+def _is_oneof(v):
+    return isinstance(v, dict) and "oneof" in v
+
+
+def _is_range(v):
+    return isinstance(v, dict) and "range" in v
+
+
+def _sat(op, p, rhs):
+    """The ordinary two-valued predicate at a concrete value `p` (rhs known, non-None)."""
+    if op == "eq":
+        return p == rhs
+    if op == "neq":
+        return p != rhs
+    if op == "gte":
+        return p >= rhs
+    if op == "gt":
+        return p > rhs
+    if op == "lte":
+        return p <= rhs
+    if op == "lt":
+        return p < rhs
+    if op == "in":
+        return p in rhs
+    if op == "nin":
+        return p not in rhs
+    if op == "between":
+        return isinstance(rhs, list) and len(rhs) == 2 and rhs[0] <= p <= rhs[1]
+    raise ResolverError(f"unknown op {op!r}")
+
+
+def _cmp_range(op, lo, hi, rhs):
+    """Three-valued evaluation of `[lo,hi] op rhs` (inclusive interval; None = ∓∞)."""
+    L = float("-inf") if lo is None else lo
+    H = float("inf") if hi is None else hi
+    if op == "gte":
+        return True if L >= rhs else (False if H < rhs else UNDET)
+    if op == "gt":
+        return True if L > rhs else (False if H <= rhs else UNDET)
+    if op == "lte":
+        return True if H <= rhs else (False if L > rhs else UNDET)
+    if op == "lt":
+        return True if H < rhs else (False if L >= rhs else UNDET)
+    if op == "eq":
+        return True if (L == H == rhs) else (False if (rhs < L or rhs > H) else UNDET)
+    if op == "neq":
+        return False if (L == H == rhs) else (True if (rhs < L or rhs > H) else UNDET)
+    if op == "between":
+        if not (isinstance(rhs, list) and len(rhs) == 2):
+            return False
+        a, b = rhs
+        if a <= L and H <= b:
+            return True
+        if H < a or L > b:
+            return False
+        return UNDET
+    if op in ("in", "nin"):
+        # a true interval can't be a discrete-list membership; only a degenerate
+        # point range (lo == hi) is decidable.
+        return _sat(op, L, rhs) if L == H else UNDET
+    raise ResolverError(f"unknown op {op!r}")
+
+
+def _cmp(op, lhs, rhs):
+    """Apply a criterion operator three-valued over a possibility set `lhs`.
+    Absent fact (lhs None) → UNDET; unresolved threshold (rhs None) → UNDET (G3).
+    A scalar `lhs` reduces to the ordinary two-valued predicate (backward-compat)."""
+    if lhs is None:
+        return UNDET
+    if rhs is None:
+        return UNDET
+    if _is_oneof(lhs):
+        sats = [_sat(op, m, rhs) for m in lhs["oneof"]]
+        if all(sats):
+            return True
+        if not any(sats):
+            return False
+        return UNDET
+    if _is_range(lhs):
+        lo, hi = lhs["range"]
+        return _cmp_range(op, lo, hi, rhs)
+    return _sat(op, lhs, rhs)
+
+
+# --------------------------------------------------------------------------- #
+# Strong-Kleene (K3) combinators. A definite disqualifier wins over pending
+# siblings (all_of short-circuits to False); a definite qualifier wins in any_of.
+# --------------------------------------------------------------------------- #
+def _k3_all(results):
+    if any(r is False for r in results):
+        return False
+    if any(r is UNDET for r in results):
+        return UNDET
+    return True
+
+
+def _k3_any(results):
+    if any(r is True for r in results):
+        return True
+    if any(r is UNDET for r in results):
+        return UNDET
+    return False
+
+
 # --------------------------------------------------------------------------- #
 # Reference resolver — interprets content_json rules against a fact-set.
 #
 # Fact-set shape (a worked example supplies it):
 #   {
-#     "applicants": [ {<applicant.* field>: value, ...}, ... ],   # 1..N
-#     "property_fit": {<field>: value, ...},                       # shared, namespaced
-#     "profile":      {<field>: value, ...},                       # shared, namespaced
-#     "locals":  {<resolver-local intermediate>: value, ...},      # e.g. location_tier
-#     "refs":    {<leaf>: value, ...},                             # pre-supplied cross-doc refs
+#     "applicants": [ {<applicant.* field>: <possibility>, ...}, ... ],  # 1..N
+#     "property_fit": {<field>: <possibility>, ...},                      # shared
+#     "profile":      {<field>: <possibility>, ...},                      # shared
+#     "locals":  {<resolver-local intermediate>: value, ...},             # e.g. location_tier
+#     "refs":    {<leaf>: value, ...},                                    # pre-supplied refs
 #   }
-# Only `applicants` is special-cased (per-applicant ∀); everything else is a
-# namespace dict resolved by dotted token.
+# A <possibility> is a scalar, {"oneof":[...]}, {"range":[lo,hi]}, or absent.
 # --------------------------------------------------------------------------- #
-def _cmp(op, lhs, rhs):
-    """Apply a criterion operator. A missing fact (lhs is None) fails the criterion
-    conservatively — the resolver never invents a pass from absent data."""
-    if lhs is None:
-        return False
-    if op == "eq":
-        return lhs == rhs
-    if op == "neq":
-        return lhs != rhs
-    if op == "gte":
-        return lhs >= rhs
-    if op == "gt":
-        return lhs > rhs
-    if op == "lte":
-        return lhs <= rhs
-    if op == "lt":
-        return lhs < rhs
-    if op == "in":
-        return lhs in rhs
-    if op == "nin":
-        return lhs not in rhs
-    if op == "between":
-        return isinstance(rhs, list) and len(rhs) == 2 and rhs[0] <= lhs <= rhs[1]
-    raise ResolverError(f"unknown op {op!r}")
-
-
 class Resolver:
     def __init__(self, rules):
         self.rules = rules  # leaf -> rule (merged across all in-scope docs)
 
     # -- public ------------------------------------------------------------- #
     def leaf(self, leaf, facts):
+        """A JOINT leaf: ∀-combined (Kleene) across applicants → one verdict."""
         if leaf not in self.rules:
             raise ResolverError(f"no rule fills leaf {leaf!r}")
         return self._rule(self.rules[leaf], facts, (leaf,))
+
+    def leaf_per_applicant(self, leaf, facts):
+        """A PER-APPLICANT leaf (FHSS, by the KB `resolution` marker): the list of
+        per-applicant three-valued verdicts (no collapse). The consumer derives
+        `eligible_applicants` from it — the F13 close."""
+        if leaf not in self.rules:
+            raise ResolverError(f"no rule fills leaf {leaf!r}")
+        rule = self.rules[leaf]
+        if rule.get("kind") != "criteria":
+            raise ResolverError(f"leaf {leaf!r} is not a criteria rule — per-applicant N/A")
+        applicants = facts.get("applicants") or [{}]
+        return [self._criteria(rule, facts, appl, (leaf,)) for appl in applicants]
 
     # -- rule dispatch ------------------------------------------------------ #
     def _rule(self, rule, facts, stack):
@@ -106,13 +226,14 @@ class Resolver:
             return self._criteria_joint(rule, facts, stack)
         raise ResolverError(f"unknown rule kind {kind!r}")
 
-    # -- criteria: per-applicant ∀ ------------------------------------------ #
+    # -- criteria: per-applicant, Kleene ∀ ---------------------------------- #
     def _criteria_joint(self, node, facts, stack):
-        """Evaluate the criteria tree once per applicant and ∀-combine — the joint
-        bool is true iff EVERY applicant satisfies it. (Rules with no applicant.*
-        field yield the same bool for each applicant, so ∀ is idempotent there.)"""
+        """Evaluate the criteria tree once per applicant and Kleene-∀-combine: False
+        if any applicant is False, UNDET if any is undetermined, else True. (Rules
+        with no applicant.* field yield the same verdict per applicant, so ∀ is
+        idempotent there.)"""
         applicants = facts.get("applicants") or [{}]
-        return all(self._criteria(node, facts, appl, stack) for appl in applicants)
+        return _k3_all([self._criteria(node, facts, appl, stack) for appl in applicants])
 
     def _criteria(self, node, facts, appl, stack):
         combine = node.get("combine", "all_of")
@@ -122,7 +243,7 @@ class Resolver:
                 results.append(self._criteria(crit, facts, appl, stack))
             else:
                 results.append(self._leaf_crit(crit, facts, appl, stack))
-        return all(results) if combine == "all_of" else any(results)
+        return _k3_all(results) if combine == "all_of" else _k3_any(results)
 
     def _leaf_crit(self, crit, facts, appl, stack):
         lhs = self._resolve_field(crit["field"], facts, appl)
@@ -163,13 +284,17 @@ class Resolver:
 
 # --------------------------------------------------------------------------- #
 # Worked examples (the eval set). Expected values are the ground truth from the
-# KB prose, not what the current model happens to compute — that gap is the point.
-# Seeded focused for v1; scenarios.md is the source to grow this from.
+# KB prose, not what the current model happens to compute. A case asserts either
+# `expect` (joint leaf -> value, via Resolver.leaf) and/or `expect_per_applicant`
+# (per-applicant leaf -> [v0, v1, ...], via Resolver.leaf_per_applicant). Expected
+# values may be True / False / UNDET.
 # --------------------------------------------------------------------------- #
 CASES = [
+    # -- scalar cases: the backward-compat guard (resolver-semantics §5). Every
+    #    referenced fact is pinned → identical to the old bi-state, never UNDET.
     {
         "name": "fhss-single-eligible",
-        "note": "One applicant meeting every FHSS criterion → eligible. Green path.",
+        "note": "One applicant meeting every FHSS criterion, all facts pinned → eligible.",
         "facts": {"applicants": [
             {"age": 30, "ever_owned_au_property": False,
              "owner_occupier_intent": True, "prior_fhss_release": False},
@@ -177,25 +302,10 @@ CASES = [
         "expect": {"eligibility.fhss.eligible": True},
     },
     {
-        "name": "fhss-two-applicants-one-qualifies",
-        "note": ("FHSS is per-person (KB: 'assessed per person … two eligible buyers "
-                 "can each run their own FHSS'). Applicant A qualifies, B previously "
-                 "owned AU property. Correct outcome: FHSS is available (A releases). "
-                 "The current joint-bool ∀ model computes False — that mismatch IS F13."),
-        "facts": {"applicants": [
-            {"age": 30, "ever_owned_au_property": False,
-             "owner_occupier_intent": True, "prior_fhss_release": False},   # A: eligible
-            {"age": 32, "ever_owned_au_property": True,
-             "owner_occupier_intent": True, "prior_fhss_release": False},   # B: owned AU property
-        ]},
-        "expect": {"eligibility.fhss.eligible": True},
-        "xfail": "F13",
-    },
-    {
         "name": "fhg-single-eligible-under-cap",
         "note": ("Citizen FHB, never owned, owner-occupier, NSW capital, $1.2M ≤ $1.5M cap. "
                  "Exercises nested any_of, the property_fit.price ↔ lookup-cap ref, and the "
-                 "(state, location_tier) lookup."),
+                 "(state, location_tier) lookup. All facts pinned."),
         "facts": {
             "applicants": [
                 {"citizenship_status": "citizen", "age": 30,
@@ -224,6 +334,89 @@ CASES = [
         },
         "expect": {"eligibility.fhg.eligible": False},
     },
+
+    # -- three-valued cases: partial knowledge (the new semantics).
+    {
+        "name": "citizenship-set-mode-a",
+        "note": ("Mode A → citizenship is the SET {citizen, permanent_resident}. "
+                 "FHG's `in [citizen,PR]` holds for ALL the set → True; Help-to-Buy's "
+                 "`eq citizen` holds for SOME → UNDET (pending: citizen vs PR). Other "
+                 "facts pinned to isolate the set semantics."),
+        "facts": {
+            "applicants": [
+                {"citizenship_status": {"oneof": ["citizen", "permanent_resident"]},
+                 "age": 30, "ever_owned_au_property": False,
+                 "years_since_last_au_property_interest": 0,
+                 "owner_occupier_intent": True, "currently_owns_property": False},
+            ],
+            "property_fit": {"state": "NSW", "price": 1200000},
+            "locals": {"location_tier": "capital_or_regional_centre"},
+        },
+        "expect": {
+            "eligibility.fhg.eligible": True,
+            "eligibility.help_to_buy.eligible": UNDET,
+        },
+    },
+    {
+        "name": "absent-fact-undetermined",
+        "note": ("`prior_fhss_release` absent (not yet asked) → the criterion is UNDET, "
+                 "so FHSS is UNDET — 'applicable, confirm you haven't released before'. "
+                 "Bi-state gave False (wrongly ineligible). The absent → UNDET change."),
+        "facts": {"applicants": [
+            {"age": 30, "ever_owned_au_property": False, "owner_occupier_intent": True},
+        ]},
+        "expect": {"eligibility.fhss.eligible": UNDET},
+    },
+    {
+        "name": "prior-owner-unknown-years",
+        "note": ("W-B: owned AU property, but WHEN is unknown. FHG's any_of(ever_owned "
+                 "eq false → False, years_since gte 10 → UNDET[absent]) → UNDET → 'pending: "
+                 "10+ years since?'. Bi-state gave False — wrongly ineligible for someone "
+                 "who may qualify under the 10-year rule."),
+        "facts": {
+            "applicants": [
+                {"citizenship_status": "citizen", "age": 40,
+                 "ever_owned_au_property": True, "owner_occupier_intent": True},
+            ],
+            "property_fit": {"state": "NSW", "price": 1200000},
+            "locals": {"location_tier": "capital_or_regional_centre"},
+        },
+        "expect": {"eligibility.fhg.eligible": UNDET},
+    },
+    {
+        "name": "fhg-null-cap-rhs-undetermined",
+        "note": ("G3: `location_tier` absent → the cap lookup returns its null default → "
+                 "the price criterion's rhs is None → UNDET (never a spurious pass). In "
+                 "Erlang term order `price ≤ null` was spuriously True; in Python it would "
+                 "TypeError. Three-valued (rhs None → UNDET) fixes both. So FHG → UNDET."),
+        "facts": {
+            "applicants": [
+                {"citizenship_status": "citizen", "age": 30,
+                 "ever_owned_au_property": False, "years_since_last_au_property_interest": 0,
+                 "owner_occupier_intent": True},
+            ],
+            "property_fit": {"state": "NSW", "price": 1200000},
+            # location_tier deliberately absent → cap lookup → null default.
+        },
+        "expect": {"eligibility.fhg.eligible": UNDET},
+    },
+
+    # -- F13 close: FHSS is per-applicant (KB `resolution: per_applicant`).
+    {
+        "name": "fhss-two-applicants-one-qualifies",
+        "note": ("FHSS is per-person (KB: 'assessed per person … two eligible buyers can "
+                 "each run their own FHSS'). A qualifies; B previously owned AU property. "
+                 "Per-applicant verdicts [True, False] → the household derives "
+                 "eligible_applicants=[A]. Closes F13 — the bi-state joint-∀ leaf computed "
+                 "one False for the household (the old xfail). Now asserted per-applicant."),
+        "facts": {"applicants": [
+            {"age": 30, "ever_owned_au_property": False,
+             "owner_occupier_intent": True, "prior_fhss_release": False},   # A: eligible
+            {"age": 32, "ever_owned_au_property": True,
+             "owner_occupier_intent": True, "prior_fhss_release": False},   # B: owned AU property
+        ]},
+        "expect_per_applicant": {"eligibility.fhss.eligible": [True, False]},
+    },
 ]
 
 
@@ -242,6 +435,26 @@ def load_rules(artifact):
     return rules
 
 
+def _eval_case(resolver, case):
+    """Return (mismatches, error). mismatches :: [(leaf, got, want)]."""
+    mism = []
+    for leaf, want in case.get("expect", {}).items():
+        try:
+            got = resolver.leaf(leaf, case["facts"])
+        except ResolverError as e:
+            return mism, f"{leaf}: {e}"
+        if got is not want and got != want:
+            mism.append((leaf, got, want))
+    for leaf, want in case.get("expect_per_applicant", {}).items():
+        try:
+            got = resolver.leaf_per_applicant(leaf, case["facts"])
+        except ResolverError as e:
+            return mism, f"{leaf} (per-applicant): {e}"
+        if got != want:
+            mism.append((leaf + " [per-applicant]", got, want))
+    return mism, None
+
+
 def run():
     if not ARTIFACT.is_file():
         print(f"FAIL — artifact not found: {ARTIFACT.relative_to(ROOT)} "
@@ -253,17 +466,8 @@ def run():
     hard_fails, xfail_confirmed, xpass, passed = [], [], [], []
 
     for case in CASES:
-        name, facts, xfail = case["name"], case["facts"], case.get("xfail")
-        mism = []  # (leaf, got, want)
-        erred = None
-        for leaf, want in case["expect"].items():
-            try:
-                got = resolver.leaf(leaf, facts)
-            except ResolverError as e:
-                erred = f"{leaf}: {e}"
-                break
-            if got != want:
-                mism.append((leaf, got, want))
+        name, xfail = case["name"], case.get("xfail")
+        mism, erred = _eval_case(resolver, case)
 
         if erred is not None:
             hard_fails.append((name, f"resolver error — {erred}", case.get("note")))
