@@ -189,8 +189,10 @@ Extend the py + escript conformance suites with three postconditions:
 > bilingual as the **first clause** of a general *outcome-schema conformance* property,
 > enforced at the two workflow-invariant points every fill crosses (the compiler at build,
 > the `fh_engine_turn` serialization seam at runtime), driven off a `localized_text` type
-> declared in `outcome_schema`. That note records the design and the sequencing (the
-> build-time half is a down-payment doable now; the runtime half folds into 2c).
+> declared in `outcome_schema`. That note records the design and the sequencing; its
+> **build-time half is now implemented** (compiler GATE 8 over discovered `copy` blocks,
+> fail-closed at deploy; the eval discovers docs instead of enumerating), the runtime half
+> folds into 2c.
 
 ## 8. Contract amendment (surfaced drift, fixed not patched)
 

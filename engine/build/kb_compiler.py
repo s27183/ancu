@@ -80,6 +80,47 @@ NUMERIC_OPS = {"gte", "gt", "lte", "lt", "between"}
 SET_OPS = {"in", "nin"}
 ALL_OPS = NUMERIC_OPS | SET_OPS | {"eq", "neq"}
 
+# --- bilingual copy-template gate (outcome-conformance.md §9 step 1) ---------- #
+# The required locale set, the single source of truth for the build-time half of
+# the bilingual invariant. LIVES HERE for now; outcome-conformance.md §6 moves it to
+# the artifact (so the seam check, the generated LocalizedText, and the shell all read
+# one declaration). Keeping the gate driven off this constant makes that move a one-liner.
+LOCALES = ("vi", "en")
+
+# Per-locale anti-fallback heuristics — ISOLATED on purpose (outcome-conformance.md §3):
+# the load-bearing, locale-agnostic check is "all locales present, non-empty, pairwise
+# distinct"; these per-locale predicates are an extra net (a vi string copied from en would
+# be all-ASCII), NEVER the core rule. Add zh -> add an entry, nothing else changes.
+LOCALE_VALIDATORS = {
+    "vi": (lambda s: any(ord(c) > 127 for c in s),
+           "vi has no non-ASCII char (English copied into the vi slot?)"),
+}
+
+
+def check_copy_template(pair, locales=LOCALES):
+    """Return an error string if a `copy` template is not well-formed in every locale,
+    else None. Well-formed = a dict carrying every locale as a non-empty string, all
+    pairwise-distinct (the anti-fallback), each passing its per-locale heuristic.
+
+    Boundary (outcome-conformance.md §3): a template whose `vi` is legitimately all-ASCII
+    (only proper nouns) would false-fail the vi heuristic — none exist today; when one
+    appears, relax LOCALE_VALIDATORS for it. The gate is fail-closed so that relaxation is
+    a conscious decision, not a silent gap."""
+    if not isinstance(pair, dict):
+        return "not a {locale: text} object"
+    vals = []
+    for loc in locales:
+        v = pair.get(loc)
+        if not isinstance(v, str) or not v:
+            return f"missing/empty locale {loc!r}"
+        check = LOCALE_VALIDATORS.get(loc)
+        if check and not check[0](v):
+            return check[1]
+        vals.append(v)
+    if len(set(vals)) != len(vals):
+        return "locales not pairwise-distinct (English fallback in another slot?)"
+    return None
+
 
 # --------------------------------------------------------------------------- #
 # Tolerant JSONC parsing (content_json blocks carry // and /* */ comments and
@@ -522,6 +563,25 @@ def run(emit=False):
             fails.append(f"[content_json] {doc['slug']}: parse error: {doc['parse_error']}")
     stats["kb_docs"] = len(kb_docs)
 
+    # ---- GATE 8: bilingual copy-template well-formedness (all docs) -------- #
+    # Every `copy` template is localized in every LOCALES locale (outcome-conformance.md
+    # §9 step 1 — the build-time half of the bilingual invariant, fail-closed at deploy).
+    # DISCOVERED, not enumerated: runs over EVERY doc carrying a `copy` block, so a new
+    # kb.copy.* doc is gated the instant it compiles — no list to extend. Mode-independent
+    # (copy is content, not registry-scoped), so it does not gate on in-scope anchors.
+    copy_templates = 0
+    for slug, doc in sorted(kb_docs.items()):
+        cj = doc.get("content_json")
+        copy = cj.get("copy") if isinstance(cj, dict) else None
+        if not isinstance(copy, dict):
+            continue
+        for tid, pair in copy.items():
+            copy_templates += 1
+            err = check_copy_template(pair)
+            if err:
+                fails.append(f"[copy] {slug}/{tid}: {err}")
+    stats["copy_templates"] = copy_templates
+
     # ---- materialize the leaf -> filler(s) map (in-scope docs) ------------ #
     for slug in in_scope_anchors:
         doc = kb_docs.get(slug)
@@ -709,6 +769,8 @@ def main():
     print(f"ref-integrity: {json.dumps(stats.get('ref_integrity', {}))}")
     print(f"dag: {json.dumps(stats.get('dag', {}))}")
     print(f"kb docs: {stats.get('kb_docs')}")
+    print(f"copy templates: {stats.get('copy_templates')} (bilingual gate, "
+          f"locales={'+'.join(LOCALES)})")
     if info:
         print(f"\nINFO ({len(info)}):")
         for m in info:

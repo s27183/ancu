@@ -8,13 +8,17 @@ Two postcondition families, mirrored by `engine/erlang/test/bilingual_conformanc
      §98 postcondition still holds (no number-typed field anywhere in `LenderFitLeaves`,
      so the LLM cannot author a regulated figure).
 
-  2. AUTHORED COPY (the resolver's templates) — every template in the four copy docs
-     (`kb.copy.{mortgage,eligibility,cash,ownership}`, as compiled into the artifact) is genuinely
-     bilingual: vi and en both non-empty, vi != en, and vi carries a Vietnamese diacritic
-     (a >127 codepoint). This is the build-time guard against an English string silently
+  2. AUTHORED COPY (the resolver's templates) — every template in every copy doc is
+     genuinely bilingual: vi and en both non-empty, vi != en, and vi carries a Vietnamese
+     diacritic (a >127 codepoint). This is the guard against an English string silently
      authored into the `vi` slot (English is ASCII). The diacritic heuristic is tuned to
      the current copy (every vi string has diacritics); a legitimately all-ASCII vi (only
      proper nouns) would false-fail — none exist today; relax per-template if one is added.
+
+     Copy docs are DISCOVERED from the artifact (any doc carrying a non-empty `copy` block),
+     not enumerated — so a new `kb.copy.*` doc is checked the instant it compiles, with no
+     list to extend (outcome-conformance.md §9 step 1). The compiler runs the same gate
+     fail-closed at deploy (`kb_compiler.py` GATE 8); this eval is the test-suite mirror.
 
 Run from repo root.
 """
@@ -25,7 +29,6 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 ARTIFACT = ROOT / "engine" / "erlang" / "priv" / "kb" / "artifact.json"
-COPY_DOCS = ["kb.copy.mortgage", "kb.copy.eligibility", "kb.copy.cash", "kb.copy.ownership"]
 
 
 # --- (1) schema postconditions ----------------------------------------------
@@ -110,19 +113,20 @@ def main():
     if bad:
         fails.append(f"§98: number-typed field(s) in agent schema: {bad}")
 
-    # (2) authored copy
-    for slug in COPY_DOCS:
-        entry = artifact["kb"].get(slug)
-        if not entry:
-            n += 1
-            fails.append(f"{slug}: copy doc missing from artifact")
-            continue
-        copy = entry["content_json"].get("copy", {})
-        if not copy:
-            n += 1
-            fails.append(f"{slug}: no copy block")
-            continue
-        for tid, pair in copy.items():
+    # (2) authored copy — DISCOVER every doc carrying a non-empty copy block
+    copy_docs = sorted(
+        slug for slug, entry in artifact["kb"].items()
+        if isinstance(entry.get("content_json"), dict)
+        and isinstance(entry["content_json"].get("copy"), dict)
+        and entry["content_json"]["copy"]
+    )
+    # sanity floor: discovery returning nothing would silently pass 0 checks — the exact
+    # enumerate-trap inverted. We know copy docs exist, so zero discovery is itself a fail.
+    n += 1
+    if not copy_docs:
+        fails.append("no copy docs discovered in artifact (discovery broken or artifact stale)")
+    for slug in copy_docs:
+        for tid, pair in artifact["kb"][slug]["content_json"]["copy"].items():
             n += 1
             f = check_template(f"{slug}/{tid}", pair)
             if f:
@@ -135,7 +139,7 @@ def main():
         print(f"\nFAIL — {len(fails)}/{n} bilingual checks failed")
         return 1
     print(f"PASS — all {n} bilingual checks green "
-          f"({len(COPY_DOCS)} copy docs + agent schema)")
+          f"({len(copy_docs)} copy docs discovered + agent schema)")
     return 0
 
 

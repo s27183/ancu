@@ -1,6 +1,11 @@
 # Outcome conformance — enforcing invariants that survive workflow change
 
-> **Status: PROPOSED (design pass, not yet implemented).** Decision owner: Son.
+> **Status: PROPOSED — §9 step 1 (build-time half) IMPLEMENTED; runtime half pending 2c.**
+> Decision owner: Son. The build-time half is live: the compiler runs a fail-closed
+> bilingual gate over every discovered `copy` block (`kb_compiler.py` GATE 8, driven off a
+> single `LOCALES` constant), and `tests/bilingual_eval.py` discovers copy docs instead of
+> enumerating them. The runtime half (`localized_text` in `outcome_schema` + `validate/2` at
+> the `fh_engine_turn` seam) is recorded below and folds into 2c (§9 step 2).
 > Motivated by the bilingual rollout ([`bilingual-content.md`](bilingual-content.md)):
 > that work is correct, but its *enforcement* is attached to the current workflow
 > (specific producers, a hardcoded copy-doc list, hand-written conformance cases), so it
@@ -165,12 +170,14 @@ premise with the conclusion so a future reader can re-decide if it no longer hol
 
 ## 9. Sequencing — nothing throwaway
 
-1. **Now — the build-time half + discover-don't-enumerate** (the cheap lever, already
-   scoped): `bilingual_eval.py` discovers every doc carrying a `copy` block instead of a
-   hardcoded list; the compiler gains a gate asserting every `copy` template is well-formed
-   in every `LOCALES` locale. This closes the most common future edit (curators
-   adding/editing copy) and is **literally the build-time half of this design** — a
-   down-payment, not a patch to rip out.
+1. **DONE — the build-time half + discover-don't-enumerate** (the cheap lever):
+   `tests/bilingual_eval.py` discovers every doc carrying a `copy` block instead of a
+   hardcoded list (with a zero-discovery sanity floor); the compiler gained GATE 8
+   (`check_copy_template` + `LOCALES`) asserting every `copy` template is well-formed in
+   every locale, **fail-closed at deploy** (verified: a vi=en or ASCII-vi injection fails the
+   build; reverts clean). 46 templates across 4 docs gated. This closes the most common
+   future edit (curators adding/editing copy) and is **literally the build-time half of this
+   design** — a down-payment, not a patch to rip out.
 2. **With 2c (first new producer) — the runtime half**: introduce `localized_text` in
    `outcome_schema`, generate `LocalizedText` + the type from `LOCALES`, and add
    `validate(outcome, outcome_schema)` at `fh_engine_turn.erl:180` as the general
