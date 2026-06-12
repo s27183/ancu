@@ -26,22 +26,22 @@ paired with its quarterly sales count as the small-n confidence denominator (the
 UPDATE-only against the census spine — VPSR publishes its OWN valuation-locality gazette,
 which is ≈ but ≠ ABS SAL, so localities with no SAL ('WESTGARTH', 'SYNDAL', sub-localities
 ABS folds into a larger suburb) are logged drops, never guessed (§5,
-[[enforce-invariants-not-workflows]]). ~96% of reported localities crosswalk; the ~2200
-rural VIC SALs VPSR never reports keep median=null (honest-partial, §7). xls reader: xlrd
-(legacy BIFF; openpyxl is .xlsx-only).
+[[enforce-invariants-not-workflows]]). The name→SAL crosswalk is the shared `_namecross`
+machine (base unique-wins + LGA disambiguation); ~96% of reported localities resolve, the
+~2200 rural VIC SALs VPSR never reports keep median=null (honest-partial, §7). xls reader:
+xlrd (legacy BIFF; openpyxl is .xlsx-only).
 
 Run:  cd engine/build && ENGINE_DATABASE_URL=… ../../.venv/bin/python -m suburbs.vic_vpsr
 """
 from __future__ import annotations
 
 import os
-import re
 import sys
 from collections import defaultdict
 
 import xlrd
 
-from . import db
+from . import _namecross, db
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
 MEDIAN_COL = 9   # rightmost of the five quarter-median columns (1,3,5,7,9) = latest quarter
@@ -73,54 +73,6 @@ SOURCE = {
     "notes": "Human-staged .xls (Cloudflare-gated). Median by suburb → name→SAL crosswalk; "
              "facts_jsonb median_{house,unit}_price + _sales_qtr. NSW/QLD price are separate (§7).",
 }
-
-
-def _norm(s: object) -> str:
-    return re.sub(r"\s+", " ", str(s).strip()).upper()
-
-
-# ABS SAL VIC names: bare ('Airport West'), state-tagged ('Abbotsford (Vic.)'),
-# or LGA-disambiguated ('Ascot (Greater Bendigo - Vic.)'). → (base, lga|None).
-_ABS_RE = re.compile(r"^(.*?)\s*\((?:(.+?)\s*-\s*)?Vic\.\)\s*$")
-# VPSR localities: bare ('ABBOTSFORD') or LGA-qualified ('ASCOT (GREATER BENDIGO)').
-_VPSR_RE = re.compile(r"^(.*?)\s*\((.+)\)\s*$")
-
-
-def _abs_parse(name: str) -> tuple[str, str | None]:
-    m = _ABS_RE.match(name)
-    if m:
-        return _norm(m.group(1)), (_norm(m.group(2)) if m.group(2) else None)
-    return _norm(name), None
-
-
-def _vpsr_parse(locality: str) -> tuple[str, str | None]:
-    m = _VPSR_RE.match(locality.strip())
-    if m:
-        return _norm(m.group(1)), _norm(m.group(2))
-    return _norm(locality), None
-
-
-def _build_index(conn) -> dict[str, list[tuple[str, str | None]]]:
-    """VIC census-spine names → {base_name: [(sal_code, lga|None), …]} for the crosswalk."""
-    idx: dict[str, list[tuple[str, str | None]]] = defaultdict(list)
-    with conn.cursor() as cur:
-        cur.execute("SELECT sal_code, name FROM suburbs WHERE state = 'VIC'")
-        for sal, name in cur.fetchall():
-            base, lga = _abs_parse(name)
-            idx[base].append((sal, lga))
-    return idx
-
-
-def _resolve(base: str, lga: str | None, idx: dict) -> str | None:
-    """Name→SAL: unique base wins; a multi-SAL base is disambiguated by the LGA qualifier.
-    Returns the sal_code, or None when absent/ambiguous (the caller logs the drop)."""
-    cands = idx.get(base)
-    if not cands:
-        return None
-    if len(cands) == 1:
-        return cands[0][0]
-    hit = [sal for sal, clga in cands if clga is not None and clga == lga]
-    return hit[0] if len(hit) == 1 else None
 
 
 def _as_of(sheet) -> str:
@@ -157,7 +109,7 @@ def run() -> tuple[int, int]:
 
     conn = db.connect()
     try:
-        idx = _build_index(conn)
+        xw = _namecross.build(conn, "VIC", "Vic.")
         # Accumulate facts per SAL across both files so each SAL gets one UPDATE carrying
         # whichever of house/unit it has.
         facts: dict[str, dict] = defaultdict(dict)
@@ -172,8 +124,7 @@ def run() -> tuple[int, int]:
             src = {"source_id": SOURCE["source_id"], "as_of": as_of}
             hit = 0
             for locality, median, sales in rows:
-                base, lga = _vpsr_parse(locality)
-                sal = _resolve(base, lga, idx)
+                sal = xw.resolve(locality)
                 if sal is None:
                     dropped.append(f"{fname}:{locality}")
                     continue

@@ -110,7 +110,7 @@ CREATE TABLE suburb_sources (
 Correspondence is needed only where a source isn't already at SAL, and there are exactly **two mechanisms**:
 
 1. **Point → SAL (spatial join).** School locations, GTFS stops, and NSW VG sale *addresses* are points → point-in-polygon against the ABS SAL boundary file (GeoPackage). Deterministic, offline.
-2. **Named-suburb → SAL (name crosswalk).** BOCSAR crime and the VIC VPSR publish by *their own* gazetted suburb list, which is ≈ but ≠ ABS SAL (spelling, splits/merges). A name+state crosswalk (with a spatial fallback for the residue) reconciles them. This is **the** fiddly bit — budget for a hand-curated crosswalk for the unmatched tail, and `log()` the drop (no silent truncation — [[enforce-invariants-not-workflows]]).
+2. **Named-suburb → SAL (name crosswalk).** BOCSAR crime and the VIC VPSR publish by *their own* gazetted suburb list, which is ≈ but ≠ ABS SAL (spelling, splits/merges). A name+state crosswalk reconciles them. This is **the** fiddly bit — and now a **shared machine** (`engine/build/suburbs/_namecross.py`), extracted once a second adapter needed the identical logic (the robust root, not a 4th copy — [[long-term-vs-patch-design]]): parse `Name (LGA)` on both sides, a unique base wins, a multi-SAL base is disambiguated by the LGA qualifier, otherwise `log()` the drop and never guess (no silent truncation — [[enforce-invariants-not-workflows]]). Measured coverage: **VPSR 96%** (VIC; the ~4% tail is sub-localities ABS folds into a larger suburb), **BOCSAR 100%** (NSW — the NSW gazette enforces name uniqueness, LGA-qualifying only the duplicate tail). The unmatched residue is honest-partial `null`, not a hand-curated patch.
 
 The build emits `suburbs.boundary_jsonb` from the SAL boundary file for the choropleth; the spatial joins reuse the same boundaries.
 
@@ -128,7 +128,7 @@ Each adapter: a `engine/build/` job that fetches → transforms → upserts a fi
 | `nsw_vg_psi` | NSW VG **Bulk PSI** — actual sales `.DAT`/LGA | point→SAL | **weekly** | CC BY (data.NSW) | `median_house_price`, `median_unit_price` (aggregated) |
 | `vic_vpsr` ✅ | VIC **Property Sales Report** — median/suburb (**human-staged `.xls`**, §7) | name→SAL | **quarterly** | CC BY 4.0 | `median_house_price`, `median_unit_price` (direct) + `median_*_sales_qtr` (small-n denom) |
 | `qld_price` | — **(none free; §7)** | — | — | — | `median_*` → **`null`** |
-| `bocsar` / `csa_vic` / `qps` | state crime agency (CSV/API) | name→SAL | quarterly | CC BY (verify per state) | `crime_incidents_per_1000`→`crime_safety_band` |
+| `bocsar` ✅ / `csa_vic` / `qps` | state crime agency (CSV/API) — **NSW live-pull** `SuburbData.zip` (Azure blob); VIC/QLD deferred | name→SAL | quarterly | CC BY 4.0 (NSW) | `crime_incidents_per_1000` (+ `crime_incidents_annual`·`crime_period` denom) → `crime_safety_band` |
 | `gtfs_*` | TfNSW / DTP Vic / TransLink GTFS | point→SAL | static+live | CC BY 4.0 | `transport_score` |
 | `schools_*` | ACARA **locations** + state catchments | point/boundary→SAL | annual | locations ok; **NAPLAN/ICSEA restricted** | `school_catchment_quality` |
 | `planning_*` | state planning/emergency portals | boundary→SAL | per-event | CC BY (mostly) | `flood_risk_band`, `planning_changes_pending` |
@@ -164,6 +164,13 @@ Validated end-to-end against dev PG: **15,329** of the 15,345 spine rows got a c
 
 Validated end-to-end against dev PG, the two free layers + price now coexist on the Vietnamese hubs: Springvale (23.1% Vietnamese, SEIFA d2) house `$970k` (n=47) / unit `$680k`; St Albans (25.7%, d1) `$730k` (n=108); Footscray (10.0%, d8) `$950k` (n=53); Abbotsford `$1.288M` (byte-matches the staged `.xls` row). Per-field provenance stamped (`{source_id: vic_vpsr, as_of: 2025-12-31}`); 0 unmatched spine rows. **NSW `nsw_vg_psi` remains deferred** — `point→SAL` needs the deferred SAL polygons (the `abs_asgs` boundary mechanism) + `.DAT` parse + sales aggregation; QLD stays `null` (§7).
 
+**Fifth adapter implemented** (`bocsar`, June 2026): the **NSW third** of the crime family (`crime_incidents_per_1000`). Crime is three adapters under one §6 concept (BOCSAR NSW, CSA VIC, QPS QLD); this ships the NSW one. Distinguishing facts, each grounded against the live contract:
+
+- **A clean live-pull, not human-staged** — the fetch-mechanism tier landed opposite VPSR's. `SuburbData.zip` sits on an Azure blob (`bocsarblob.blob.core.windows.net`) with no Cloudflare/auth wall, so the adapter pulls + streams it (httpx → `zipfile`). The zip holds one **432MB wide CSV** — `(Suburb, Offence category, Subcategory, then a column per month Jan 1995→latest)` of raw monthly incident **counts** — read row-by-row, never fully in memory.
+- **The adapter computes the rate; the band is resolver-projected.** BOCSAR ships counts, not rates, so the adapter sums **all** offence subcategories over the trailing 12 months → an annual count, then `crime_incidents_per_1000 = annual ÷ census_total_persons × 1000` (the population denominator the census adapter stored for exactly this, §8). Summing *all* offences is the least-interpretive composite (privileges no category); a residential-safety subset (drop liquor / transport-regulatory) is **KB-band curation, deferred (§8)**. `crime_safety_band` is **not** stored — the resolver projects it from the rate + a KB threshold ([[adapter-band-sourced-vs-projected]]: BOCSAR publishes no band → ours to project).
+- **The count + window are stored as the small-n floor.** `crime_incidents_annual` + `crime_period` ride alongside the rate (same role as VPSR's sales count) — so the resolver's §8 population floor has the numerator. The live distribution shows why it is needed: median **38.6/1000**, leafy north-shore at the floor (Westleigh 5.1, East Killara 7.3), hubs at the top (Cabramatta 151, Fairfield 122), and a `max ~19778` tail from a near-zero-residential commercial zone — the §8 distortion the band floor handles. The adapter stays mechanical; the floor is interpretive, downstream.
+- **The name→SAL crosswalk reused the shared `_namecross` machine** (§5) — its second consumer, which drove the extraction. **100% coverage** (all 4508 BOCSAR localities → a unique NSW SAL); 169 matched SALs lacked a census population → rate `null`, count kept (honest-partial). 0 unmatched spine rows; provenance `{source_id: bocsar, as_of: 2025-12-31}` stamped. **VIC `csa_vic` / QLD `qps` crime remain deferred** (separate state feeds, §6).
+
 ### 6.1 License compliance is a real obligation, not a footnote
 
 CC BY 4.0 **requires attribution** (render the `suburb_sources.attribution` string wherever a layer shows) — the shell map needs an attribution strip. **ACARA is the exception**: NAPLAN/ICSEA are `redistribution: restricted` (no redistribution, "must not compete with My School," Data Access Program application). So `school_catchment_quality` derives from **school locations + state catchment boundaries** (permitted), **not** from redistributing ACARA performance data. The `suburb_sources` register makes this enforceable: an adapter whose source row is `redistribution: restricted` must not write a field the shell will publish. Don't ship what you're not licensed to.
@@ -195,7 +202,7 @@ Suburb median price is **free but uneven across the three Wedge-1a states**, and
 
 ## 9. Worked simulation (define → simulate → document)
 
-Three suburbs, one per Wedge-1a state, proving the schema carries the asymmetry. Ancestry, **SEIFA**, **centroid** and now the **VIC median** are **real** (`abs_census_2021` + `abs_seifa_2021` + `abs_asgs_2021` + `vic_vpsr`, ingested June 2026); the NSW median stays illustrative (`nsw_vg_psi` deferred, §7), QLD is `null`:
+Three suburbs, one per Wedge-1a state, proving the schema carries the asymmetry. Ancestry, **SEIFA**, **centroid**, the **VIC median** and now the **NSW crime rate** are **real** (`abs_census_2021` + `abs_seifa_2021` + `abs_asgs_2021` + `vic_vpsr` + `bocsar`, ingested June 2026); the NSW median + VIC/QLD crime stay illustrative (`nsw_vg_psi` / `csa_vic` / `qps` deferred, §6/§7), QLD price is `null`:
 
 | | Cabramatta (NSW) | Footscray (VIC) | Inala (QLD) |
 |---|---|---|---|
@@ -205,7 +212,8 @@ Three suburbs, one per Wedge-1a state, proving the schema carries the asymmetry.
 | `vietnamese_community_proximity` (coarse, **KB-threshold projection, §8**) | `high` | `high?` (10% is the borderline the KB threshold must adjudicate) | `high` |
 | `seifa_irsad_decile` (real, sourced) | **1** | **8** | **1** |
 | `median_house_price` | **$1.02M** (NSW VG PSI — *illustrative, deferred*) | **$950k** (real `vic_vpsr`, n=53, Oct–Dec 2025) | **`null`** (QLD closed) |
-| `crime_safety_band` | `medium` (BOCSAR) | `medium` (CSA) | `medium` (QPS) |
+| `crime_incidents_per_1000` (raw) | **151.1** (real `bocsar`, n=3195, Jan–Dec 2025) | `~40` (CSA — *illustrative, deferred*) | `~45` (QPS — *illustrative, deferred*) |
+| `crime_safety_band` (KB-threshold projection, §8) | `medium`/`high`? | `medium`? | `medium`? |
 | Map renders | choropleth + $ | choropleth + $ | choropleth + **"price unavailable"** |
 | Resolver reads | coarse bands; price decoration | same | same; `median: null` → honest-partial |
 
