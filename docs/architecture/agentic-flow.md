@@ -85,6 +85,8 @@ What keeps a valuation turn from poisoning a later eligibility turn is **not** s
 
 Card is truth; history is glue. That is the mechanism that makes a single cross-domain thread safe. The Q&A agent composes the **same domain modules** the leaf-fill agents use (§3): when a question is clearly about valuation, it pulls the `valuation` module. The leaf-fill/Q&A difference is *run mode* (blocking-structured vs streaming-conversational) and *history posture* (none vs glue) — not the domain knowledge.
 
+**The Q&A answer is bilingual, engine-emitted, and gated before emit** (resolved at 2c). Vietnamese is a first-class engine output ([`bilingual-content.md`](bilingual-content.md)), and that holds on the chat surface too: the engine emits a `{vi, en}` answer object (the same `localized_text` discipline as the structured fills) so the **shell picks the display** — show one with a toggle, or both stacked, per surface, without re-asking the engine. This keeps the base-turn invariant ("emit both, no language input to the engine") intact on Q&A — the single-language path was the one that would have needed a per-turn locale signal; bilingual-always avoids that plumbing. Two consequences fall out of the bilingual + regulated nature of the surface and are recorded where they bind: the answer rides `text_delta {text, lang}` ([`engine-contract.md`](engine-contract.md) §4), and it is **buffer-then-gate** — the full answer is assembled, run through the compliance pipeline (Layer 1 bilingual clause + ASIC on free text), and only then emitted ([`compliance-pipeline.md`](compliance-pipeline.md) §10), because an ungated advice crossing on a regulated surface cannot be un-shown. So "streaming-conversational" above means the *tool loop* streams its machinery signals (`tool_use`/`tool_result`) live; the *answer text* does not stream token-by-token in Wedge 1a.
+
 ---
 
 ## 5. Dynamic prompt structure
@@ -102,7 +104,7 @@ FirstHomey **inverts the static/dynamic split**, because constraint #9 says the 
 - `<safety>` — input-as-data + **the ASIC decision-support boundary** (surface options + reasoning; never licensed financial/credit *advice*) + output protection
 - `<style>` — bilingual, concise
 - `<tools>` — KB-lookup (Q&A only, §6); curator dispatch where the domain allows it
-- `<output>` — the leaf's typed `outcome_schema` (structured) for fill; free text for Q&A
+- `<output>` — the leaf's typed `outcome_schema` (structured) for fill; a **bilingual `{vi, en}` answer object** for Q&A (§4 — engine emits both, shell picks display; not single-language free text)
 
 **Dynamic blocks** — rebuilt each turn **from plan-card state, not history** (constraint #9), injected ATP-style but carrying FirstHomey domain objects:
 

@@ -24,6 +24,7 @@ routes() ->
         {"/api/engine/health",                  fh_engine_h_health,     []},
         {"/api/engine/plan-cards",              fh_engine_h_plan_cards, []},
         {"/api/engine/plan-cards/:id/events",   fh_engine_h_events,     []},
+        {"/api/engine/plan-cards/:id/messages", fh_engine_h_messages,   []},
         {"/api/engine/plan-cards/:id/cancel",   fh_engine_h_cancel,     []},
         {"/api/engine/plan-cards/:id",          fh_engine_h_plan_card,  []}
     ]}].

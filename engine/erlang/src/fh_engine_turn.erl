@@ -33,7 +33,7 @@
 
 -export([start_link/1]).
 -export([callback_mode/0, init/1, terminate/3]).
--export([running/3]).
+-export([running/3, qa/3]).
 
 %% Mode-A base turn: the resolver/agent components in DAG (topological) order. The
 %% per-property components (property_assessment, buying_strategy, due_diligence,
@@ -50,14 +50,23 @@ start_link(Args) ->
 -spec callback_mode() -> gen_statem:callback_mode_result().
 callback_mode() -> state_functions.
 
-%% Args :: #{tenant_id, plan_card_id, turn_id, mode, intent, firb_required_any, onboarding}
+%% Args (base) :: #{tenant_id, plan_card_id, turn_id, mode, intent,
+%%                  firb_required_any, onboarding}
+%% Args (qa)   :: the above with kind => qa, plus card, message, locale (2c-1).
+%% `kind` selects the turn shape: a base/onboarding turn walks the DAG; a Q&A turn
+%% runs one conversational pass over the filled card (agentic-flow.md §4).
 init(#{tenant_id := T, plan_card_id := PC, turn_id := Tn} = Args) ->
     fh_engine_turn_registry:set_pid(PC, Tn, self()),
     emit(T, PC, <<"turn_started">>,
          #{<<"plan_card_id">> => PC, <<"turn_id">> => Tn}),
-    Components = base_components(),
-    Data = Args#{components => Components, outcomes => #{}},
-    {ok, running, Data, [{next_event, internal, step}]}.
+    case maps:get(kind, Args, base) of
+        base ->
+            Components = base_components(),
+            Data = Args#{components => Components, outcomes => #{}},
+            {ok, running, Data, [{next_event, internal, step}]};
+        qa ->
+            {ok, qa, Args, [{next_event, internal, start}]}
+    end.
 
 %% --- running state ----------------------------------------------------------
 
@@ -115,6 +124,129 @@ running(cast, cancel, #{tenant_id := T, plan_card_id := PC, turn_id := Tn} = Dat
     {stop, normal, Data};
 running(_EventType, _Event, Data) ->
     {keep_state, Data}.
+
+%% --- qa state (2c-3) --------------------------------------------------------
+%% A Q&A turn runs ONE conversational pass over the FILLED card (agentic-flow.md §4):
+%% re-ground from `card` (passed in Args, constraint #9), assemble glue from `sessions`,
+%% spawn the KB-lookup sidecar, forward its sanitized tool_use/tool_result LIVE, buffer
+%% the bilingual answer, run it through the compliance pipeline (buffer-then-gate,
+%% compliance-pipeline.md §10), and only THEN emit `text_delta{lang}` + persist the glue
+%% pair. The answer text never streams token-by-token — buffer-then-gate is the whole
+%% point (an ungated advice crossing on a regulated surface can't be un-shown).
+
+qa(internal, start, #{tenant_id := T, user_id := U, plan_card_id := PC} = Data) ->
+    Glue = fh_engine_store:read_glue(T, U, PC),
+    Port = start_qa_port(Data, Glue),
+    {keep_state, Data#{port => Port}};
+qa(info, {Port, {data, Frame}}, #{port := Port} = Data) ->
+    handle_qa_sidecar(fh_engine_util:json_decode(Frame), Data);
+qa(info, {Port, {exit_status, N}}, #{port := Port} = Data) ->
+    fail(Data, <<"sidecar_crashed">>,
+         iolist_to_binary(io_lib:format("qa sidecar exit status ~p before reply", [N]))),
+    {stop, normal, Data};
+qa(cast, cancel, #{tenant_id := T, plan_card_id := PC, turn_id := Tn} = Data) ->
+    close_port(Data),
+    emit(T, PC, <<"turn_cancelled">>,
+         #{<<"plan_card_id">> => PC, <<"turn_id">> => Tn}),
+    {stop, normal, Data};
+qa(_EventType, _Event, Data) ->
+    {keep_state, Data}.
+
+%% --- qa sidecar dispatch ----------------------------------------------------
+
+%% tool_use / tool_result are machinery signals (already sanitized by the sidecar — no
+%% raw KB / slug) and DO stream live, so the shell can show "looking up…".
+handle_qa_sidecar(#{<<"method">> := <<"tool_use">>, <<"params">> := P},
+                  #{tenant_id := T, plan_card_id := PC} = Data) ->
+    emit(T, PC, <<"tool_use">>, P#{<<"plan_card_id">> => PC}),
+    {keep_state, Data};
+handle_qa_sidecar(#{<<"method">> := <<"tool_result">>, <<"params">> := P},
+                  #{tenant_id := T, plan_card_id := PC} = Data) ->
+    emit(T, PC, <<"tool_result">>, P#{<<"plan_card_id">> => PC}),
+    {keep_state, Data};
+handle_qa_sidecar(#{<<"method">> := <<"qa_answer">>, <<"params">> := P}, Data) ->
+    %% Buffer-then-gate: the complete answer arrives here; gate it, THEN emit.
+    case commit_qa(P, Data) of
+        {ok, Data1} ->
+            {keep_state, Data1};
+        {blocked, Data1} ->
+            %% turn_failed already emitted by commit_qa; the answer never reaches the user.
+            close_port(Data1),
+            {stop, normal, Data1}
+    end;
+handle_qa_sidecar(#{<<"method">> := <<"usage">>, <<"params">> := P},
+                  #{tenant_id := T, plan_card_id := PC, turn_id := Tn} = Data) ->
+    emit(T, PC, <<"usage">>,
+         P#{<<"plan_card_id">> => PC, <<"turn_id">> => Tn}),
+    {keep_state, Data};
+handle_qa_sidecar(#{<<"method">> := <<"qa_done">>},
+                  #{tenant_id := T, plan_card_id := PC, turn_id := Tn} = Data) ->
+    close_port(Data),
+    emit(T, PC, <<"turn_completed">>,
+         #{<<"plan_card_id">> => PC, <<"turn_id">> => Tn}),
+    {stop, normal, Data};
+handle_qa_sidecar(#{<<"method">> := <<"error">>, <<"params">> := P}, Data) ->
+    close_port(Data),
+    fail(Data, maps:get(<<"code">>, P, <<"qa_error">>),
+         maps:get(<<"message">>, P, <<"">>)),
+    {stop, normal, Data};
+handle_qa_sidecar(_Other, Data) ->
+    {keep_state, Data}.
+
+%% Gate the buffered answer (two layers, compliance-pipeline.md §10), then emit it.
+commit_qa(P, #{tenant_id := T, user_id := U, plan_card_id := PC, turn_id := Tn,
+               mode := Mode, message := Msg} = Data) ->
+    Answer = maps:get(<<"answer">>, P, #{}),
+    Slugs = maps:get(<<"kb_slugs">>, P, []),
+    KbVersions = [#{<<"slug">> => S} || S <- Slugs],
+    %% Layer 1: the bilingual structural post-condition on the answer (both locales
+    %% present, non-empty, pairwise-distinct). Fail-closed CRASH on a non-bilingual
+    %% answer — a producer contract breach, not a regulated decision (§10). The figure/
+    %% enum clauses are vacuous on free text.
+    Locales = fh_engine_kb:locales(),
+    ok = case fh_engine_outcome:check(#{<<"kind">> => <<"localized">>}, Answer, Locales) of
+             ok -> ok;
+             {error, R} -> error({qa_answer_nonconforming, R})
+         end,
+    Layer1Verdict = #{<<"layer">> => 1, <<"localized">> => <<"conformed">>,
+                      <<"figure_type">> => <<"not_applicable">>},
+    %% Layer 2: ASIC substantive on the free text; FIRB/AML assert-clear (Mode A).
+    Ctx = #{mode => Mode, intent => maps:get(intent, Data, <<"owner_occupier">>),
+            firb_required_any => maps:get(firb_required_any, Data, false)},
+    {_, Gates} = fh_engine_compliance:run_qa(Ctx, Answer, Layer1Verdict),
+    %% Audit + stream every gate, clear or not (the q_and_a producer; fill_path agent).
+    lists:foreach(
+        fun(G) ->
+            ok = fh_engine_store:append_audit(T, PC, <<"q_and_a">>, <<"agent">>,
+                                              KbVersions, G),
+            emit(T, PC, <<"compliance_gate">>,
+                 G#{<<"plan_card_id">> => PC, <<"component_id">> => <<"q_and_a">>})
+        end, Gates),
+    case blocking_gate(Gates) of
+        {block, G} ->
+            fail(Data, <<"asic_block">>, gate_detail(G)),
+            {blocked, Data};
+        none ->
+            %% Cleared: NOW emit the answer, one text_delta per language (§4).
+            emit_answer(T, PC, Answer),
+            %% Persist the vendor-neutral glue pair. EN is the canonical coherence text
+            %% (the full bilingual answer persists in the text_delta events for replay).
+            ok = fh_engine_store:append_session_turn(
+                   T, U, PC, Tn, Msg, maps:get(<<"en">>, Answer, <<"">>)),
+            {ok, Data}
+    end.
+
+emit_answer(T, PC, Answer) ->
+    lists:foreach(
+        fun(Lang) ->
+            case maps:get(Lang, Answer, undefined) of
+                undefined -> ok;
+                Text ->
+                    emit(T, PC, <<"text_delta">>,
+                         #{<<"text">> => Text, <<"lang">> => Lang,
+                           <<"plan_card_id">> => PC})
+            end
+        end, [<<"vi">>, <<"en">>]).
 
 %% --- sidecar message dispatch (agent fills) ---------------------------------
 
@@ -301,6 +433,28 @@ start_fill_port(Comp, #{plan_card_id := PC} = Data, ResolverOutcome) ->
                  _         -> Params0#{<<"resolver_outcome">> => ResolverOutcome}
              end,
     Req = #{<<"method">> => <<"fill_component">>, <<"params">> => Params},
+    port_command(Port, fh_engine_util:json_encode(Req)),
+    Port.
+
+%% Spawn a disposable sidecar for ONE Q&A turn. It receives the user message, the FILLED
+%% card (re-grounding, constraint #9), and the conversational glue; it runs the streaming
+%% KB-lookup loop, buffers a bilingual answer, and emits tool_use/tool_result (live) +
+%% qa_answer (buffered) + usage + qa_done, then exits (principle 3).
+start_qa_port(#{plan_card_id := PC, message := Msg, card := Card} = Data, Glue) ->
+    PythonExe = python_exe(),
+    Script = planner_script(),
+    Port = open_port({spawn_executable, PythonExe},
+                     [{args, [Script]}, {packet, 4}, binary, exit_status]),
+    Locale = case maps:get(locale, Data, undefined) of
+                 undefined -> null;
+                 L -> L
+             end,
+    Params = #{<<"plan_card_id">> => PC,
+               <<"message">> => Msg,
+               <<"card">> => Card,
+               <<"glue">> => Glue,
+               <<"locale">> => Locale},
+    Req = #{<<"method">> => <<"qa">>, <<"params">> => Params},
     port_command(Port, fh_engine_util:json_encode(Req)),
     Port.
 

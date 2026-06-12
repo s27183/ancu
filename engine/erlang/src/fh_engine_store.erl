@@ -15,6 +15,7 @@
 -export([append_event/4, events_since/3]).
 -export([append_audit/6]).
 -export([snapshot_component/3, get_plan_card/2]).
+-export([read_glue/3, append_session_turn/6]).
 
 %% --- tenancy / auth ---------------------------------------------------------
 
@@ -144,6 +145,41 @@ get_plan_card(TenantId, PlanCardId) ->
         [] ->
             {error, not_found}
     end.
+
+%% --- Q&A conversation glue (sessions / session_turns; isolation-model §4) ----
+
+%% The prior (user_text, assistant_text) pairs for this (user × plan card), oldest→
+%% newest, bounded to a short recent window. GLUE for conversational coherence (pronoun
+%% resolution), NOT agent grounding — the card re-grounds each turn (constraint #9,
+%% agentic-flow §8). Empty list before the first Q&A turn.
+-spec read_glue(binary(), binary(), binary()) -> [map()].
+read_glue(TenantId, UserId, PlanCardId) ->
+    Res = query(
+        "SELECT st.user_text, st.assistant_text FROM session_turns st "
+        "JOIN sessions s ON s.session_id = st.session_id "
+        "WHERE s.tenant_id = $1::uuid AND s.user_id = $2::uuid "
+        "  AND s.plan_card_id = $3::uuid "
+        "ORDER BY st.ts ASC LIMIT 10",
+        [TenantId, UserId, PlanCardId]),
+    [#{<<"user_text">> => U, <<"assistant_text">> => A} || {U, A} <- rows(Res)].
+
+%% Append one vendor-neutral glue pair after a Q&A turn's answer has been gated +
+%% emitted. Ensures the (user × plan_card) session row first (session_id is one per
+%% pair, engine-contract §9.1). Stores text only — never reasoning items / vendor format.
+-spec append_session_turn(binary(), binary(), binary(), binary(), binary(), binary())
+        -> ok.
+append_session_turn(TenantId, UserId, PlanCardId, TurnId, UserText, AssistantText) ->
+    _ = query(
+        "INSERT INTO sessions (tenant_id, user_id, plan_card_id) "
+        "VALUES ($1::uuid, $2::uuid, $3::uuid) "
+        "ON CONFLICT (user_id, plan_card_id) DO NOTHING",
+        [TenantId, UserId, PlanCardId]),
+    _ = query(
+        "INSERT INTO session_turns (turn_id, session_id, user_text, assistant_text) "
+        "SELECT $1::uuid, s.session_id, $2, $3 FROM sessions s "
+        "WHERE s.user_id = $4::uuid AND s.plan_card_id = $5::uuid",
+        [TurnId, UserText, AssistantText, UserId, PlanCardId]),
+    ok.
 
 %% --- internals --------------------------------------------------------------
 

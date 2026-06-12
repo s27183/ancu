@@ -74,7 +74,7 @@ The engine emits typed events over SSE. Event names and field sets are part of t
 
 **Model output events** — incremental output from the vendor SDK.
 
-- `text_delta` — `{text}`.
+- `text_delta` — `{text, lang?}`. `lang` ∈ `vi | en` tags which language this chunk belongs to; absent only on a legacy single-language stream. A **Q&A answer is bilingual** (`{vi, en}`, constraint engine-owned content-language, [`bilingual-content.md`](bilingual-content.md)) and is delivered as `text_delta` frames tagged by `lang`, so the shell concatenates per language and picks display (show one + toggle, or both stacked — shell-owned). It is **gated before emit** (buffer-then-gate, §6 + [`compliance-pipeline.md`](compliance-pipeline.md) §10): for the regulated free-text surface the engine buffers the complete answer, runs the compliance pipeline, and only then emits — Wedge-1a Q&A is therefore not true token streaming (the field shape keeps that door open for later chunk-gated streaming).
 - `reasoning_delta` — `{text, signature}`. Only when `include_reasoning: true`; `signature` preserved verbatim for continuations.
 - `tool_use` — `{tool_use_id, tool_name, display_name, arguments_summary}`. Tool-internal identifiers (raw KB lookups, curator dispatch) are sanitized into `display_name`.
 - `tool_result` — `{tool_use_id, status, result_summary?, error?}`.
@@ -120,7 +120,7 @@ A turn carrying attachments invokes document extraction (an LLM-call boundary �
 
 ## 6. Compliance extension pipeline
 
-On every turn, the engine runs a fixed pipeline of compliance extensions over the agent's proposed output before it is committed and streamed (analogous to ATP's policy/legal/transactional extensions):
+On every turn, the engine runs a fixed pipeline of compliance extensions over the agent's proposed output before it is committed and streamed (analogous to ATP's policy/legal/transactional extensions). For a structured fill the "proposed output" is the whole component outcome; for a **Q&A answer** it is the complete buffered free-text answer — the engine **buffers to completion, gates, then emits** (`text_delta`), never forwarding answer tokens live, because an ungated advice crossing cannot be un-shown ([`compliance-pipeline.md`](compliance-pipeline.md) §10). `tool_use`/`tool_result` machinery signals are not answer prose and do stream live.
 
 - **FIRB** — branches on `firb_status` (first-class user attribute, constraint #10). For foreign persons, enforces the established-dwelling ban window and the new-build-only filter; annotates surcharge + vacancy-fee obligations.
 - **ASIC** — enforces the decision-support boundary: the agent may surface options + reasoning (lender shortlist, scheme stack) but must not cross into licensed financial/credit *advice*. Outputs that cross the line are gated and rewritten or flagged.

@@ -251,6 +251,65 @@ be the §98 enforcer — it attests to a verdict already rendered.
   unextended (it indexes major docs, not the implementation design-note tier — see
   [`outcome-conformance.md`](outcome-conformance.md) §12 for the same decision).
 
+## 10. Extension: the Q&A answer — a fourth gated producer (2c)
+
+Through 2b the pipeline gates one shape: a **structured component outcome** at the
+`fh_engine_turn` commit seam. The Q&A turn (2c, [`agentic-flow.md`](agentic-flow.md) §4) adds a
+**fourth producer** with a different shape — a **free-text bilingual answer** (`{vi, en}`), not a
+typed outcome with figure/enum fields. The two-layer composition still applies; what each layer
+*finds* differs because the shape differs.
+
+**Buffer-then-gate (the regulated posture; Son, at 2c).** `engine-contract.md` §6 says the
+pipeline runs "before it is committed *and streamed*." For a structured fill that is trivially
+true (the whole outcome exists before commit). For a *streamed* answer it is the load-bearing
+choice: an ASIC-crossing sentence that reaches the user's screen cannot be un-said, so post-hoc
+annotation is the **wrong enforcement grade** for a regulated advice surface
+([[match-enforcement-grade-to-property-kind]] — an advice crossing is a *hard* contract, not a
+soft-quality one). Therefore the Q&A agent's answer is **buffered to completion, gated, and only
+then emitted** — the engine does **not** forward answer tokens live. Defence-in-depth, gate *and*
+prompt (§2): the scaffold's `<safety>` (the ASIC boundary) steers generation, and this gate is
+the backstop on the finished text. The cost is that Wedge-1a Q&A is *not* true token streaming;
+`text_delta` carries the gated answer (per language) after the gate clears. Chunk-gated streaming
+(gate at sentence/paragraph boundaries) is a later refinement that keeps this same gate-before-eyes
+invariant; it is not Wedge 1a.
+
+> **Scope boundary.** "Buffer-then-gate" is a property *of the regulated free-text surface*. It
+> does **not** apply to the `tool_use` / `tool_result` machinery signals — those are sanitized
+> status events (a KB lookup happened), carry no advice prose, and stream live so the shell can
+> show "looking up…". Only the *answer text* is gated.
+
+**What each layer finds on a free-text answer:**
+
+- **Layer 1** (`validate/2`) — the answer is a `localized_text` value, so the **localized clause**
+  applies (both `vi` and `en` present, non-empty, pairwise-distinct — the bilingual postcondition,
+  [[bilingual-first-class-engine-output]]). The figure-type/§98 and enum clauses are **vacuous** (a
+  conversational answer has no figure or enum *field* — a number it cites is prose, not a typed
+  slot). So Layer 1 on Q&A is the bilingual contract only; it still **crashes fail-closed** on an
+  English-only or empty answer.
+- **Layer 2 ASIC** — **substantive, and the primary gate here.** Free text can phrase advice in
+  ways a typed schema forbids by construction, so ASIC carries more weight on Q&A than it does on
+  the §98-by-schema structured fills. It reads the finished answer for the decision-support
+  boundary: surfacing options + reasoning = `clear` `decision_support_boundary_held`; an imperative
+  personal recommendation ("you should take the CBA loan") = `annotate` `reframed_as_information`
+  (flag, never silent rewrite — §3); a hard crossing the prompt failed to prevent (e.g. a definitive
+  licensed-advice claim) = `block` → `turn_failed`, the answer never reaches the user. FIRB and AML
+  stay **assert-and-clear** in Mode A (no foreign person, no fund custody — §1), audited like any
+  turn.
+
+**Worked simulation (Q&A rows, extending §7):**
+
+| Scenario | Layer 1 | ASIC | Emit? |
+|---|---|---|---|
+| **"Is $700k doable on our deposit?"** — answer surfaces the resolver figures + options, bilingual | `clear` (vi≠en, both present) | `clear` boundary_held | yes — `text_delta` per language after gate |
+| **Answer comes back English-only** (vi == en or vi empty) | **crash** (localized clause) — fail-closed | not reached | no |
+| **Answer phrases a pick imperatively** ("take loan X") | `clear` | `annotate` reframed_as_information | yes — emitted with the annotation event |
+| **Answer makes a definitive licensed-advice claim** the `<safety>` prompt didn't stop | `clear` | `block` asic_advice_crossing → `turn_failed` | **no** — buffered answer discarded, audit row written |
+
+The fourth row is the reason buffer-then-gate is non-negotiable: the block can only protect the
+user if the gate runs *before* the first token is emitted. Audit rows are written per (Q&A turn,
+gate) exactly as for a component fill — the turn's `component_id` slot records the Q&A producer
+(`q_and_a`), `fill_path: agent`.
+
 ## Resolved decisions (Son, at 2b-4)
 
 1. **Mode-A scope** = audit trail (all gates) + ASIC body (decision-support seam
@@ -261,3 +320,11 @@ be the §98 enforcer — it attests to a verdict already rendered.
    (flag, never silent rewrite); a clear gate still writes an audit row.
 4. **Layer ordering:** structural validator (fail-closed crash) first, regulated pipeline
    second, on a conforming outcome.
+
+### Added at 2c (Son)
+
+5. **The Q&A answer is a fourth gated producer** (§10), gated by the same two layers. **Buffer-
+   then-gate:** the free-text answer is buffered to completion, run through Layer 1 (bilingual
+   clause) + ASIC (substantive, the primary Q&A gate), and only emitted if the gate clears — no
+   live answer-token forwarding. `tool_use`/`tool_result` machinery signals stream live (not
+   advice prose); only the answer text is gated. *Designed at 2c; §10 ships with the Q&A turn.*

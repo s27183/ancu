@@ -30,7 +30,7 @@
 %% to a real branch/block the moment their trigger (a foreign applicant / a cross-border
 %% deposit) appears. The Mode-A built-now path is `clear×3` + three audit rows.
 
--export([run/4]).
+-export([run/4, run_qa/3]).
 
 %% run(ComponentId, Ctx, Outcome, Layer1Verdict) -> {Outcome1, [GateResult]}
 %%   Ctx          :: #{mode, intent, firb_required_any, ...}
@@ -87,6 +87,83 @@ advice_adjacent(_)                      -> false.
 %% facts) — route money transfer only to licensed partners, block informal VN routes.
 aml(_ComponentId, _Ctx, Outcome, _Verdict) ->
     {Outcome, gate(<<"aml">>, <<"clear">>, <<"no_fund_custody">>, #{})}.
+
+%% --- Q&A variant (compliance-pipeline.md §10) -------------------------------
+
+%% The conversational producer: the "outcome" is a free-text bilingual answer, not a
+%% structured component outcome. Same FIRB → ASIC → AML composition, but ASIC is the
+%% SUBSTANTIVE gate here (free text can phrase advice in ways a typed schema forbids by
+%% construction) and reads the answer TEXT. FIRB/AML assert-and-clear as in the base
+%% turn (Mode A). Returns {Answer, [GateResult]} — ASIC flags (annotate), it never
+%% rewrites the prose (§8).
+-spec run_qa(map(), map(), map()) -> {map(), [map()]}.
+run_qa(Ctx, Answer, Layer1Verdict) ->
+    Cid = <<"q_and_a">>,
+    {_, FirbG} = firb(Cid, Ctx, #{}, #{}),
+    AsicG = asic_qa(Answer, Layer1Verdict),
+    {_, AmlG} = aml(Cid, Ctx, #{}, #{}),
+    {Answer, [FirbG, AsicG, AmlG]}.
+
+%% ASIC on the free-text answer. A DETERMINISTIC backstop + the audit attestation — NOT
+%% a semantic judge. Reliability of the prose is the producer's grounding job (KB + the
+%% decision-support scaffold), never adjudication: an LLM-judge would only move the trust
+%% problem (a judge needs a judge), so we don't have one. This gate does only what a
+%% deterministic check can do reliably — attest the boundary + audit, and catch BLATANT
+%% crossings the grounding should already have prevented:
+%%   - an explicit licensed-advice claim → `block` (the answer must not reach the user);
+%%   - an imperative personal recommendation → `annotate` (flag, never silent rewrite).
+%% The pattern lists are intentionally small and high-precision (a false `block` on a
+%% legitimate answer is its own harm). BOUNDARY: the patterns are English-side (scanning
+%% bilingual prose semantically is exactly the judge problem we reject); the gross-case
+%% backstop is not a semantic guarantee, and the audit row records ASIC ran regardless.
+asic_qa(Answer, Layer1Verdict) ->
+    Text = answer_text(Answer),
+    case asic_scan(Text) of
+        block ->
+            gate(<<"asic">>, <<"block">>, <<"asic_advice_crossing">>, Layer1Verdict);
+        annotate ->
+            gate(<<"asic">>, <<"annotate">>, <<"reframed_as_information">>, Layer1Verdict);
+        clear ->
+            gate(<<"asic">>, <<"clear">>, <<"decision_support_boundary_held">>,
+                 Layer1Verdict)
+    end.
+
+%% The answer's languages joined + lowercased for the pattern scan.
+answer_text(Answer) when is_map(Answer) ->
+    Parts = [V || V <- maps:values(Answer), is_binary(V)],
+    Joined = iolist_to_binary(lists:join(<<" ">>, Parts)),
+    unicode:characters_to_binary(string:lowercase(Joined));
+answer_text(_) -> <<>>.
+
+asic_scan(Text) ->
+    case contains_any(Text, block_patterns()) of
+        true -> block;
+        false ->
+            case contains_any(Text, annotate_patterns()) of
+                true -> annotate;
+                false -> clear
+            end
+    end.
+
+%% Explicit licensed-advice framing — the egregious crossing the scaffold forbids.
+block_patterns() ->
+    [<<"as your financial adviser">>, <<"as your financial advisor">>,
+     <<"as your credit adviser">>, <<"this is financial advice">>,
+     <<"this is credit advice">>, <<"i am licensed">>,
+     <<"guaranteed approval">>, <<"i guarantee">>].
+
+%% Imperative personal recommendation — informational content phrased as a directive.
+annotate_patterns() ->
+    [<<"you should take">>, <<"you should choose">>, <<"i recommend you">>,
+     <<"you must choose">>, <<"the best loan for you is">>,
+     <<"the right loan for you is">>].
+
+contains_any(_Text, []) -> false;
+contains_any(Text, [P | Rest]) ->
+    case binary:match(Text, P) of
+        nomatch -> contains_any(Text, Rest);
+        _       -> true
+    end.
 
 %% --- internals --------------------------------------------------------------
 
