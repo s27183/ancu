@@ -44,9 +44,9 @@ import struct
 import sys
 from pathlib import Path
 
-from typing import Literal
+from typing import Annotated, Literal
 
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel, Field, StringConstraints, ValidationError
 
 
 # --- protocol-stream isolation -------------------------------------------------
@@ -101,9 +101,19 @@ def notify(method, params):
 # authored in the same pass (not translated; trap #4). Figures/enums/bools/dates stay
 # single-valued (the shell localizes labels + formats numbers). The agent authors BOTH
 # languages; making the field this type is what FORCES it to (schema-as-constraint).
+# Brevity is a SOFT property (a long rationale is suboptimal for the renderer, not
+# UNSAFE), so the grade is: the prompt sets the target (~2 sentences), and this
+# max_length is a GENEROUS catastrophe-backstop — well above observed-normal (~414
+# chars) so normal variation never trips it, but the pathological tail (the old 33KB
+# whole-turn fill) cannot recur. NOT a tight clip (that would turn_failed on mere
+# verbosity). Caps the only unbounded agent free-text surface (2b-5).
+_PROSE_MAX = 600
+ProseText = Annotated[str, StringConstraints(max_length=_PROSE_MAX)]
+
+
 class LocalizedText(BaseModel):
-    vi: str
-    en: str
+    vi: ProseText
+    en: ProseText
 
 
 # --- the agent's output schema: the TWO lender_fit leaves ONLY (2b-3) -----------
@@ -121,14 +131,22 @@ RateStructure = Literal["variable", "fixed_1yr", "fixed_2yr", "fixed_3yr",
                         "split_fixed_variable"]
 
 
+# Same enforcement-by-schema as RateStructure: a Literal (not a bare str) so the enum
+# lands IN the JSON schema — the model must pick one option and cannot put prose
+# ("moderate, pending income") into a field the renderer treats as an enum chip (2b-5).
+ApprovalLikelihood = Literal["high", "moderate", "low", "indicative"]
+
+
 class LenderRec(BaseModel):
-    lender: str                  # proper name — single-valued
-    reasoning: LocalizedText     # user-facing prose — {vi, en} (bilingual-content.md §1)
-    approval_likelihood: str     # enum: high | moderate | low | indicative — single-valued
+    lender: str                       # proper name — single-valued
+    reasoning: LocalizedText          # user-facing prose — {vi, en} (bilingual-content.md §1)
+    approval_likelihood: ApprovalLikelihood   # single-valued enum (schema-as-constraint)
 
 
 class LenderFitLeaves(BaseModel):
-    recommended_lender_shortlist: list[LenderRec]
+    # A shortlist to CONSIDER is 3–5 lenders; this hard cap bounds the only unbounded
+    # list surface (a 20-lender list is wrong, not just verbose — hard contract) (2b-5).
+    recommended_lender_shortlist: Annotated[list[LenderRec], Field(max_length=5)]
     fixed_vs_variable: RateStructure
 
 
@@ -268,10 +286,12 @@ lender. Defer precise per-lender treatment to a broker.
         "procedure": """\
 1. Read `<resolver_outcome>` (the computed figures + recommended_path) and \
 `<plan_card_state>` (buyer profile + scheme_stack) and the KB.
-2. If the recommended_path is `fhg_backed`, build the shortlist from the FHG panel — \
-the majors plus the breadth of customer-owned/regional panel lenders — each with plain \
-reasoning grounded in the KB (e.g. wide panel → broker can compare; no rate premium). \
-Each `reasoning` is a {vi, en} pair: author the Vietnamese AND the English (see <style>).
+2. If the recommended_path is `fhg_backed`, build a shortlist of 3–5 lenders from the \
+FHG panel — the majors plus the breadth of customer-owned/regional panel lenders — each \
+with plain reasoning grounded in the KB (e.g. wide panel → broker can compare; no rate \
+premium). Each `reasoning` is a {vi, en} pair: author the Vietnamese AND the English \
+(see <style>). Keep each rationale to ~2 sentences per language — a brief read for a \
+card, not an essay; defer detail to the broker.
 3. Set `approval_likelihood` honestly: `indicative` when income/debts are pending; a \
 real read (high/moderate/low) only if those facts are actually present.
 4. Set `fixed_vs_variable` to EXACTLY ONE of: variable | fixed_1yr | fixed_2yr | \

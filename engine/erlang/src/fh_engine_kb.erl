@@ -19,7 +19,7 @@
 %% boot rather than serving a runtime that would silently fail every turn.
 
 -export([load/0, load/1]).
--export([schema_version/0, in_scope_blueprint/0]).
+-export([schema_version/0, in_scope_blueprint/0, locales/0]).
 -export([blueprint/1, components/1, component/2]).
 -export([kb/1, kb_content_md/1, kb_rules/1, kb_anchors/1, copy/2]).
 -export([rules/0]).
@@ -63,6 +63,13 @@ schema_version() ->
 -spec in_scope_blueprint() -> binary().
 in_scope_blueprint() ->
     maps:get(<<"in_scope_blueprint">>, artifact()).
+
+%% The required locale set, the single SOT for outcome conformance (the seam
+%% validate/2), the compiler copy-gate, and the shell display picker — carried in the
+%% artifact (git is SOT). Adding a locale touches the compiler's LOCALES and this value.
+-spec locales() -> [binary()].
+locales() ->
+    maps:get(<<"locales">>, artifact()).
 
 %% --- blueprint accessors ----------------------------------------------------
 %% Slugs accepted bare ("fhb-domestic-au") or fully-qualified

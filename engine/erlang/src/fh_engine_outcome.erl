@@ -1,0 +1,181 @@
+-module(fh_engine_outcome).
+
+%% Layer-1 outcome conformance — the structural, producer- and mode-agnostic
+%% post-condition at the fh_engine_turn commit seam (outcome-conformance.md). EVERY
+%% fill (resolver, two-path merge, future 2c answer, refine turn, curator brief)
+%% crosses this seam on its way to plan_cards.content_jsonb + the component_filled
+%% event, so enforcing the invariant HERE holds it for any workflow that routes
+%% content through the engine — which, by construction, is all of them.
+%%
+%% The invariant: every field of a fill matches its declared outcome_schema type. The
+%% compiler materializes each outcome type as a parsed {kind} tree (registry.outcome_types,
+%% via parse_field_type) so this consumer WALKS A TREE and never re-parses type strings
+%% (materialize-parse-once; the byte-fragile Erlang side stays out of the parsing business).
+%%
+%% Three load-bearing clauses; everything else passes gracefully:
+%%   - localized → every required locale present, each a non-empty binary, and the
+%%     locales PAIRWISE-DISTINCT (the locale-agnostic anti-fallback — catches English
+%%     copied into the `vi` slot). The vi-diacritic heuristic is deliberately NOT applied
+%%     here: it is vi-specific and stays in the build/eval layer, never load-bearing at the
+%%     fail-closed seam (outcome-conformance.md §3).
+%%   - enum → value is one of the declared options.
+%%   - figure (money/money_range/money_per_year/number/integer/integer_0_10) → numbers all
+%%     the way down: never a binary ("$500k"), never a {vi,en} map. This IS the §98 guard,
+%%     generalized — the agent cannot smuggle an authored figure past the schema.
+%%
+%% Nullability is implicit-universal: `null` conforms to ANY field (honest-partial fills
+%% leave genuinely-unknown facts absent). string/bool/date/object scalars and `unknown`
+%% kinds are NOT checked at runtime (the compiler's §3 string-nudge covers prose mistyped
+%% as `string` at BUILD time; runtime stays graceful so a name-only sub-field never crashes
+%% a turn).
+%%
+%% FAIL-CLOSED (§7): a non-conforming fill is `error/1` — it crashes the supervised turn
+%% (let it surface, don't swallow; the OTP idiom). The reference spec + the shared case set
+%% live in tests/outcome_validate.py; engine/erlang/test/outcome_conformance.escript runs the
+%% SAME cases through check/3 and asserts identical conform/reject verdicts (the cross-language
+%% lockstep — reason text is informative, the VERDICT is contractual).
+
+-export([validate/2, check/3]).
+
+%% The numeric family (§98). money_range is a [lo, hi] list of numbers; the rest a bare
+%% number. string/bool/date/object are scalars too but are NOT figures (not checked).
+-define(FIGURE_TYPES,
+        [<<"money">>, <<"money_per_year">>, <<"number">>,
+         <<"integer">>, <<"integer_0_10">>]).
+
+%% --- seam entry -------------------------------------------------------------
+
+%% Look up the component's declared outcome type-tree from the artifact and walk the
+%% fill against it. A missing schema (e.g. a per-property outcome type not yet declared)
+%% passes gracefully — consistent with the {kind:unknown} pass-through; base components
+%% all carry a schema (verified at build).
+-spec validate(binary(), map()) -> ok.
+validate(OutcomeType, Outcome) ->
+    OutcomeTypes = fh_engine_kb:registry(<<"outcome_types">>),
+    case maps:find(OutcomeType, OutcomeTypes) of
+        error ->
+            ok;
+        {ok, Fields} ->
+            Locales = fh_engine_kb:locales(),
+            case validate_fields(maps:to_list(Fields), Outcome, Locales) of
+                ok ->
+                    ok;
+                {error, Field, Reason} ->
+                    error({outcome_nonconforming, OutcomeType, Field, Reason})
+            end
+    end.
+
+validate_fields([], _Outcome, _Locales) ->
+    ok;
+validate_fields([{Field, Tree} | Rest], Outcome, Locales) ->
+    Value = maps:get(Field, Outcome, null),
+    case check(Tree, Value, Locales) of
+        ok         -> validate_fields(Rest, Outcome, Locales);
+        {error, R} -> {error, Field, R}
+    end.
+
+%% --- the pure recursive walk (mirror of tests/outcome_validate.py:check) ----
+
+-spec check(map(), term(), [binary()]) -> ok | {error, binary()}.
+check(_Tree, null, _Locales) ->
+    ok;  %% implicit-universal nullability
+check(#{<<"kind">> := <<"localized">>}, Value, Locales) ->
+    check_localized(Value, Locales);
+check(#{<<"kind">> := <<"enum">>, <<"options">> := Options}, Value, _Locales) ->
+    case lists:member(Value, Options) of
+        true  -> ok;
+        false -> {error, reason(<<"enum value not in options">>, Value)}
+    end;
+check(#{<<"kind">> := <<"scalar">>, <<"type">> := Type}, Value, _Locales) ->
+    check_scalar(Type, Value);
+check(#{<<"kind">> := <<"array">>, <<"element">> := El}, Value, Locales)
+  when is_list(Value) ->
+    check_array(El, Value, Locales, 0);
+check(#{<<"kind">> := <<"array">>}, Value, _Locales) ->
+    {error, reason(<<"expected array">>, Value)};
+check(#{<<"kind">> := <<"object">>, <<"fields">> := Fields}, Value, Locales)
+  when is_map(Value) ->
+    check_object(maps:to_list(Fields), Value, Locales);
+check(#{<<"kind">> := <<"object">>}, Value, _Locales) ->
+    {error, reason(<<"expected object">>, Value)};
+check(_Tree, _Value, _Locales) ->
+    ok.  %% unknown / unrecognized kind — graceful
+
+%% --- clauses ----------------------------------------------------------------
+
+check_localized(Value, Locales) when is_map(Value) ->
+    case collect_locales(Locales, Value, []) of
+        {error, R} ->
+            {error, R};
+        {ok, Vals} ->
+            case length(lists:usort(Vals)) =:= length(Vals) of
+                true  -> ok;
+                false -> {error, <<"localized locales not pairwise-distinct">>}
+            end
+    end;
+check_localized(Value, _Locales) ->
+    {error, reason(<<"localized field must be a {locale} map">>, Value)}.
+
+collect_locales([], _Value, Acc) ->
+    {ok, lists:reverse(Acc)};
+collect_locales([Loc | Rest], Value, Acc) ->
+    case maps:find(Loc, Value) of
+        error ->
+            {error, <<"localized missing locale ", Loc/binary>>};
+        {ok, S} when is_binary(S) ->
+            case is_blank(S) of
+                true  -> {error, <<"localized locale ", Loc/binary, " empty">>};
+                false -> collect_locales(Rest, Value, [S | Acc])
+            end;
+        {ok, _} ->
+            {error, <<"localized locale ", Loc/binary, " non-string">>}
+    end.
+
+check_scalar(<<"money_range">>, Value) ->
+    case is_list(Value) andalso lists:all(fun erlang:is_number/1, Value) of
+        true  -> ok;
+        false -> {error, reason(<<"money_range must be a list of numbers">>, Value)}
+    end;
+check_scalar(Type, Value) ->
+    case lists:member(Type, ?FIGURE_TYPES) of
+        true ->
+            case is_number(Value) of
+                true  -> ok;
+                false -> {error, <<Type/binary, " must be a number">>}
+            end;
+        false ->
+            ok  %% string / bool / date / object — graceful (not a figure)
+    end.
+
+check_array(_El, [], _Locales, _I) ->
+    ok;
+check_array(El, [H | T], Locales, I) ->
+    case check(El, H, Locales) of
+        ok ->
+            check_array(El, T, Locales, I + 1);
+        {error, R} ->
+            {error, <<"[", (integer_to_binary(I))/binary, "] ", R/binary>>}
+    end.
+
+check_object([], _Value, _Locales) ->
+    ok;
+check_object([{Field, Tree} | Rest], Value, Locales) ->
+    Sub = maps:get(Field, Value, null),
+    case check(Tree, Sub, Locales) of
+        ok         -> check_object(Rest, Value, Locales);
+        {error, R} -> {error, <<".", Field/binary, " ", R/binary>>}
+    end.
+
+%% --- internals --------------------------------------------------------------
+
+%% A binary is blank if empty or whitespace-only. (~p, not ~s, in reason/2 — ~s on a
+%% >255-codepoint Vietnamese binary is the crash trap; ~p byte-escapes safely.)
+is_blank(S) ->
+    case string:trim(S) of
+        <<>> -> true;
+        ""   -> true;
+        _    -> false
+    end.
+
+reason(Msg, Value) ->
+    iolist_to_binary([Msg, ": ", io_lib:format("~p", [Value])]).

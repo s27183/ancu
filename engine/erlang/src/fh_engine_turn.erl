@@ -74,9 +74,14 @@ running(internal, step, #{components := [Comp | Rest]} = Data) ->
             %% Resolver: fill in-process, commit, accumulate, advance.
             {Outcome, Renderer, KbVersions} =
                 fh_engine_fill:resolver(Name, Data, maps:get(outcomes, Data)),
-            Data1 = commit(Comp, <<"resolver">>, Renderer, KbVersions, Outcome, Data),
-            {keep_state, Data1#{components := Rest},
-             [{next_event, internal, step}]};
+            case commit(Comp, <<"resolver">>, Renderer, KbVersions, Outcome, Data) of
+                {ok, Data1} ->
+                    {keep_state, Data1#{components := Rest},
+                     [{next_event, internal, step}]};
+                {blocked, G, _} ->
+                    fail(Data, <<"compliance_block">>, gate_detail(G)),
+                    {stop, normal, Data}
+            end;
         two_path ->
             %% Two-path (mortgage-finance-two-path.md): run the RESOLVER half first
             %% (all figures + the loan-path structure), then spawn the sidecar to fill
@@ -121,15 +126,27 @@ handle_sidecar(#{<<"method">> := <<"component_filled">>, <<"params">> := P},
     Name = maps:get(<<"name">>, Comp),
     AgentValues = maps:get(<<"outcome">>, P, #{}),
     Final = fh_engine_fill:merge_agent(Name, RO, AgentValues),
-    Data1 = commit(Comp, <<"two_path">>, Renderer, KbVersions, Final, Data),
-    {keep_state, Data1};
+    case commit(Comp, <<"two_path">>, Renderer, KbVersions, Final, Data) of
+        {ok, Data1} ->
+            {keep_state, Data1};
+        {blocked, G, _} ->
+            close_port(Data),
+            fail(Data, <<"compliance_block">>, gate_detail(G)),
+            {stop, normal, Data}
+    end;
 handle_sidecar(#{<<"method">> := <<"component_filled">>, <<"params">> := P},
                #{pending := #{kind := agent, comp := Comp}} = Data) ->
     Renderer = maps:get(<<"renderer">>, P, default_renderer(Comp)),
     KbVersions = maps:get(<<"kb_versions">>, P, []),
     Outcome = maps:get(<<"outcome">>, P, #{}),
-    Data1 = commit(Comp, <<"agent">>, Renderer, KbVersions, Outcome, Data),
-    {keep_state, Data1};
+    case commit(Comp, <<"agent">>, Renderer, KbVersions, Outcome, Data) of
+        {ok, Data1} ->
+            {keep_state, Data1};
+        {blocked, G, _} ->
+            close_port(Data),
+            fail(Data, <<"compliance_block">>, gate_detail(G)),
+            {stop, normal, Data}
+    end;
 handle_sidecar(#{<<"method">> := <<"usage">>, <<"params">> := P},
                #{tenant_id := T, plan_card_id := PC, turn_id := Tn} = Data) ->
     %% Meter at the LLM-call boundary (engine-contract §4); persisted Erlang-side.
@@ -162,26 +179,59 @@ terminate(_Reason, _State, #{plan_card_id := PC}) ->
 commit(Comp, FillPath, Renderer, KbVersions, Outcome0,
        #{tenant_id := T, plan_card_id := PC} = Data) ->
     Name = maps:get(<<"name">>, Comp),
+    OutcomeType = maps:get(<<"outcome_type">>, Comp, Name),
+    %% Layer 1 (outcome-conformance.md): the structural post-condition, BEFORE the
+    %% regulated pipeline. Fail-closed — a non-conforming fill crashes this (supervised)
+    %% turn rather than persisting a bad value (§7).
+    ok = fh_engine_outcome:validate(OutcomeType, Outcome0),
+    %% The Layer-1 attestation ASIC consumes (compliance-pipeline.md §2 — ASIC does not
+    %% re-derive §98; one source of truth). Reaching here means validate/2 found the
+    %% outcome conforming (figures are figures, localized text is bilingual).
+    Layer1Verdict = #{<<"layer">> => 1,
+                      <<"outcome_type">> => OutcomeType,
+                      <<"figure_type">> => <<"conformed">>,
+                      <<"localized">> => <<"conformed">>},
+    %% Layer 2: regulated dispositions over the conforming outcome.
     Ctx = #{mode => maps:get(mode, Data),
             intent => maps:get(intent, Data, <<"owner_occupier">>),
             firb_required_any => maps:get(firb_required_any, Data, false)},
-    {Outcome, Gates} = fh_engine_compliance:run(Name, Ctx, Outcome0),
+    {Outcome, Gates} = fh_engine_compliance:run(Name, Ctx, Outcome0, Layer1Verdict),
+    %% Audit + stream every gate, clear or not (compliance-pipeline.md §5): the
+    %% audit_events row is the regulated trail; the compliance_gate event is its live signal.
     lists:foreach(
-        fun(G) -> emit(T, PC, <<"compliance_gate">>, G#{<<"plan_card_id">> => PC}) end,
-        Gates),
-    Entry = #{
-        <<"component_id">> => Name,
-        <<"scope">> => component_scope(Name),
-        <<"renderer">> => Renderer,
-        <<"outcome">> => Outcome,
-        <<"kb_versions">> => KbVersions,
-        <<"fill_path">> => FillPath
-    },
-    fh_engine_store:snapshot_component(PC, Name, Entry),
-    emit(T, PC, <<"component_filled">>, Entry#{<<"plan_card_id">> => PC}),
-    OutcomeType = maps:get(<<"outcome_type">>, Comp, Name),
-    Outcomes = maps:get(outcomes, Data),
-    Data#{outcomes := Outcomes#{OutcomeType => Outcome}}.
+        fun(G) ->
+            ok = fh_engine_store:append_audit(T, PC, Name, FillPath, KbVersions, G),
+            emit(T, PC, <<"compliance_gate">>,
+                 G#{<<"plan_card_id">> => PC, <<"component_id">> => Name})
+        end, Gates),
+    case blocking_gate(Gates) of
+        {block, G} ->
+            %% A regulated stop (§4): the outcome must NOT reach content_jsonb or
+            %% component_filled. The audit row written above is the record.
+            {blocked, G, Data};
+        none ->
+            Entry = #{
+                <<"component_id">> => Name,
+                <<"scope">> => component_scope(Name),
+                <<"renderer">> => Renderer,
+                <<"outcome">> => Outcome,
+                <<"kb_versions">> => KbVersions,
+                <<"fill_path">> => FillPath
+            },
+            fh_engine_store:snapshot_component(PC, Name, Entry),
+            emit(T, PC, <<"component_filled">>, Entry#{<<"plan_card_id">> => PC}),
+            Outcomes = maps:get(outcomes, Data),
+            {ok, Data#{outcomes := Outcomes#{OutcomeType => Outcome}}}
+    end.
+
+%% The first `block` disposition among the gates, if any (compliance-pipeline.md §4).
+blocking_gate(Gates) ->
+    case [G || G <- Gates, maps:get(<<"disposition">>, G) =:= <<"block">>] of
+        [G | _] -> {block, G};
+        []      -> none
+    end.
+
+gate_detail(G) -> maps:get(<<"detail">>, G, <<"blocked">>).
 
 %% --- internals --------------------------------------------------------------
 

@@ -28,6 +28,7 @@ Every structure named in the architecture, in one place, with where its detail l
 | **profile / plan / mode** | household fact base (persistent) ⟵ plan (per journey); mode *derived*, never a key | [`fact-model-unification.md`](fact-model-unification.md) |
 | **renderer** | a member of the constrained presentation vocabulary that turns an outcome into UI | [§11.9](architecture.md#119-blueprint-as-data-model--presentation-specification) |
 | **engine / shell** | the two independently-deployable halves; API is the only contract | [§11.0](architecture.md#110-engine--shell-split-deployable-shape) · [`engine-contract.md`](engine-contract.md) |
+| **commit-seam compliance** | the two layers every fill crosses at the `fh_engine_turn` commit: **Layer 1** structural outcome-conformance (`localized_text` · §98 figure-type · enum; fail-closed crash) then **Layer 2** regulated FIRB/ASIC/AML dispositions (`clear`/`annotate`/`branch`/`block`) → one `audit_events` row per (component, gate) | [`outcome-conformance.md`](outcome-conformance.md) · [`compliance-pipeline.md`](compliance-pipeline.md) |
 
 **Outcomes carry facts, not verdicts.** An outcome exposes normalised facts (age, residency, price); the verdict ("FHG-eligible") is produced by the component that *owns the rule*, never pre-baked upstream. This is the invariant the whole data plane rests on.
 
@@ -200,7 +201,7 @@ flowchart TB
 
 Two properties make this safe and cheap: **card is truth, history is glue** — the filled card is re-injected fresh as grounding every turn; message history is kept only for pronoun resolution, never as grounding. And **one runner, many domain modules** — leaf-fill is stateless (a `valuation` fill and a `lender_fit` fill are as isolated as two pure-function calls), so isolation comes from the run model, not from cloned agents. The `preamble → scaffold → kb` prefix is stable, so it caches across fills and turns.
 
-Detail: [`agentic-flow.md`](agentic-flow.md) (agent types, prompt, vendor layer, context), [`agentic-boundary.md`](agentic-boundary.md) (the resolver/agent decision rule), [`engine-contract.md`](engine-contract.md) §4/§6 (events + the compliance gate).
+Detail: [`agentic-flow.md`](agentic-flow.md) (agent types, prompt, vendor layer, context), [`agentic-boundary.md`](agentic-boundary.md) (the resolver/agent decision rule), [`engine-contract.md`](engine-contract.md) §4/§6 (events + the compliance gate); the gate's two layers at the commit seam: [`outcome-conformance.md`](outcome-conformance.md) (Layer 1, structural) · [`compliance-pipeline.md`](compliance-pipeline.md) (Layer 2, regulated).
 
 ---
 
@@ -213,6 +214,7 @@ erDiagram
   TENANTS ||--o{ PROFILES : "scopes"
   PROFILES ||--o{ PLAN_CARDS : "1 to N (per journey)"
   PLAN_CARDS ||--o{ PLAN_CARD_EVENTS : "append-only history"
+  PLAN_CARDS ||--o{ AUDIT_EVENTS : "compliance trail (per component x gate)"
   PLAN_CARDS ||--o{ SESSIONS : "conversation"
   SESSIONS ||--o{ SESSION_TURNS : "glue (text pairs)"
 
@@ -226,6 +228,14 @@ erDiagram
     string mode "DERIVED column, never a key"
     jsonb content_jsonb "base plan + property addenda - snapshot at fill"
     string deploy_commit_sha "audit reproducibility"
+  }
+  AUDIT_EVENTS {
+    uuid audit_id PK
+    string component_id "which fill"
+    string fill_path "resolver | two_path | agent"
+    jsonb compliance_jsonb "gate, disposition, detail, verdict_refs"
+    jsonb kb_versions_jsonb "KB snapshot active at fill"
+    string deploy_commit_sha "reproducibility"
   }
 ```
 
@@ -242,7 +252,9 @@ flowchart LR
 
 The discipline that makes this coherent: **structure is built now, data flows later.** The base plan needs zero property data (constraint #1/#2); the property foundation defines the *structure* of an addendum, and a specific property is the *data* that fills it via the narrow Phase-B paths. The buyer foundation settled the *units* (profile/plan); the property foundation completes the *content structure* of one nested part (the addendum) — it introduces no new persistent unit and changes no keys. At each fill, resolved facts + the KB content snapshot into `content_jsonb` with the `deploy_commit_sha`, so the regulated artifact is reproducible.
 
-Detail: [`fact-model-unification.md`](fact-model-unification.md) (the profile/plan/mode decision), [`property-model-foundation.md`](property-model-foundation.md) (the addendum structure), [`engine-contract.md`](engine-contract.md) §9.1 (the schema), [`isolation-model.md`](isolation-model.md) (plan card vs turn, per-card serialization).
+Beside the plan card itself, every committed fill writes one **`audit_events`** row per (component, gate) — the regulated compliance trail (FIRB/ASIC/AML disposition + the consumed Layer-1 verdict + the KB snapshot + the deploy SHA), written even on a `clear`. It is attribution, not cost (no token/price fields ever — metering is the `usage` event stream).
+
+Detail: [`fact-model-unification.md`](fact-model-unification.md) (the profile/plan/mode decision), [`property-model-foundation.md`](property-model-foundation.md) (the addendum structure), [`engine-contract.md`](engine-contract.md) §9.1 (the schema), [`isolation-model.md`](isolation-model.md) (plan card vs turn, per-card serialization), [`compliance-pipeline.md`](compliance-pipeline.md) §5 (the audit trail) · [`outcome-conformance.md`](outcome-conformance.md) (the Layer-1 verdict it records).
 
 ---
 

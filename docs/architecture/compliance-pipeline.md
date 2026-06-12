@@ -1,16 +1,22 @@
 # The compliance pipeline — FIRB / ASIC / AML as a real gate, not a pass-through
 
-> **Status: ACCEPTED — being built at 2b-4.** Decision owner: Son. This is the *regulated
-> layer* (Layer 2) that rides the structural seam validator
-> ([`outcome-conformance.md`](outcome-conformance.md), Layer 1). It makes
-> [`engine-contract.md`](engine-contract.md) §6 real: the three gates run on every committed
-> outcome, emit a `compliance_gate` event, and — the gap this closes — **write an
-> `audit_events` row even on a clear disposition**. Today (`fh_engine_compliance.erl`) the
-> pipeline is structurally wired at the commit seam but all three stages are pass-throughs
-> returning `[]`, and *nothing in the engine writes `audit_events` at all*. Constraint #10 says
-> "build the gate into the architecture, not as a disclaimer"; a gate that produces no audit
-> trail is still a disclaimer. This note defines what "real" means **for Mode A**, where each
-> gate's enforcement body actually lives, and the trigger that turns the deferred bodies on.
+> **Status: ACCEPTED — SHIPPED at 2b-4c.** Decision owner: Son. This is the *regulated layer*
+> (Layer 2) that rides the structural seam validator
+> ([`outcome-conformance.md`](outcome-conformance.md), Layer 1, shipped at 2b-4b). It makes
+> [`engine-contract.md`](engine-contract.md) §6 real: `fh_engine_compliance:run/4` runs the three
+> gates (FIRB → ASIC → AML) on every committed outcome, each producing a disposition
+> (`clear|annotate|branch|block`); `fh_engine_turn:commit` writes one `audit_events` row per
+> (component, gate) via the new `fh_engine_store:append_audit/6` — **even on a clear** — emits a
+> `compliance_gate` event, and fails the turn on a `block`. ASIC **consumes** Layer 1's
+> figure-type verdict (`verdict_refs`), never re-deriving §98. **Verified** (`seam_smoke.escript`
+> vs Docker PG): the Mode-A healthy turn writes 15 audit rows (3 gates × 5 components), all
+> `clear`, ASIC `decision_support_boundary_held` on the 2 advice-adjacent components
+> (mortgage_finance, eligibility) and `no_advice_surface` on the arithmetic ones, the consumed
+> Layer-1 `figure_type=conformed` recorded in `verdict_refs`, `deploy_commit_sha` + kb_versions
+> stamped. Constraint #10 ("build the gate into the architecture, not as a disclaimer") is now
+> met: a gate that produces no audit trail is still a disclaimer; this one produces the trail.
+> This note defines what "real" means **for Mode A**, where each gate's enforcement body lives,
+> and the trigger that turns the deferred Mode-B/D bodies on.
 
 ## 0. The problem: a wired-but-inert pipeline with no audit trail
 
@@ -160,7 +166,7 @@ ever (metering lives in the `usage` event stream, §1; `audit_events` is the com
 ```
 audit_events row, per (component, gate):
   component_id        the blueprint component filled
-  fill_path           'resolver' | 'agent'   (already a column)
+  fill_path           'resolver' | 'two_path' | 'agent'   (the real commit-path domain)
   kb_versions_jsonb   [{slug, effective_from, last_verified}] active at fill (audit snapshot)
   compliance_jsonb    { gate, disposition, detail, verdict_refs }   <-- this gate's result
   deploy_commit_sha   reproducibility (constraint #6 — repo is SOT)
@@ -225,16 +231,25 @@ be the §98 enforcer — it attests to a verdict already rendered.
 
 ## 9. Situate in the engine
 
-- **Spine reused:** the existing `fh_engine_compliance:run/3` fold at the `fh_engine_turn`
-  commit seam; the `compliance_gate` event (§4 taxonomy); the `audit_events` table
-  (`001_init_engine.sql`, writer added here); `fh_engine_store` for persistence.
+- **Spine reused:** the existing `fh_engine_compliance:run` fold at the `fh_engine_turn`
+  commit seam (extended `run/3` → `run/4` to pass ASIC the Layer-1 verdict); the
+  `compliance_gate` event (§4 taxonomy); the `audit_events` table (`001_init_engine.sql`,
+  writer `fh_engine_store:append_audit/6` added here); `fh_engine_store` for persistence.
+  **Implementation seam surfaced + reconciled:** `audit_events.fill_path`'s CHECK predated
+  the two-path fill (slice 2f) and allowed only `{resolver, agent}`, so a `two_path`
+  component's audit row (mortgage_finance) would have been rejected. Widened to
+  `{resolver, two_path, agent}` via the forward-only `002_audit_fill_path_two_path.sql`
+  (001 is checksum-locked — a new migration, not an edit).
 - **Rides:** [`outcome-conformance.md`](outcome-conformance.md) — Layer 1, the structural seam
   validator ASIC consumes. Built together at 2b-4.
 - **Relates to:** [`engine-contract.md`](engine-contract.md) §6 (the pipeline contract this
   realizes), §1 (metering-not-gating — why audit carries no cost), constraint #10 (the gate in
   the architecture); the four-mode table (the deferred FIRB/AML bodies are Mode B/D).
-- **Index wiring:** on implementation (2b-4c), add to `docs/README.md` and a node to
-  [`structure-map.md`](structure-map.md) (the coherence hub maps built structures).
+- **Index wiring (done):** [`structure-map.md`](structure-map.md) gained a **commit-seam
+  compliance** inventory node (Layer 1 + Layer 2) + an `audit_events` entity in the Plane-4
+  persistence ER + a Plane-3 cross-link. The `docs/README.md` table was deliberately left
+  unextended (it indexes major docs, not the implementation design-note tier — see
+  [`outcome-conformance.md`](outcome-conformance.md) §12 for the same decision).
 
 ## Resolved decisions (Son, at 2b-4)
 

@@ -1,15 +1,22 @@
 # Outcome conformance — enforcing invariants that survive workflow change
 
-> **Status: ACCEPTED — build-time half SHIPPED; runtime half being built WITH 2b-4** (the
-> compliance pipeline is the proving producer; [`compliance-pipeline.md`](compliance-pipeline.md)
-> is the regulated layer that rides this structural one). Decision owner: Son — all three Open
-> Decisions resolved (§"Resolved decisions"). The build-time half is live: the compiler runs a
-> fail-closed bilingual gate over every discovered `copy` block (`kb_compiler.py` GATE 8, driven
-> off a single `LOCALES` constant), and `tests/bilingual_eval.py` discovers copy docs instead of
-> enumerating them. The runtime half (`localized_text` in `outcome_schema` + `validate/2` at the
-> `fh_engine_turn` seam) is now built rather than deferred: 2b-4's ASIC gate needs a
-> seam-level post-condition on the agent's output, and that post-condition *is* this validator —
-> so the second producer that proves the seam check is the compliance pipeline, not 2c (§9).
+> **Status: ACCEPTED — build-time half SHIPPED; runtime Layer 1 SHIPPED at 2b-4b**
+> (Layer 2, the regulated rider, is 2b-4c; [`compliance-pipeline.md`](compliance-pipeline.md)
+> is that layer). Decision owner: Son — all three Open Decisions resolved (§"Resolved
+> decisions"). The build-time half is live: the compiler runs a fail-closed bilingual gate over
+> every discovered `copy` block (`kb_compiler.py` GATE 8, driven off a single `LOCALES`
+> constant), and `tests/bilingual_eval.py` discovers copy docs instead of enumerating them.
+> **The runtime half is now built (2b-4b):** `localized_text` is a first-class `outcome_schema`
+> type (the compiler emits `registry.outcome_types`, a parsed `{kind}` tree), and
+> `fh_engine_outcome:validate/2` runs at the `fh_engine_turn` commit seam (before snapshot,
+> fail-closed) walking every field of every fill against its declared type — localized
+> (present · non-empty · pairwise-distinct), enum-in-options, and the §98 figure-type guard.
+> The pure walk `check/3` is in lockstep with the reference spec `tests/outcome_validate.py`
+> (21 shared cases) via `engine/erlang/test/outcome_conformance.escript`, which also proves the
+> seam crashes fail-closed against the real artifact. **Layer 2 (2b-4c) then CONSUMES Layer 1's
+> figure-type verdict** rather than re-deriving it — 2b-4's ASIC gate needs exactly this
+> seam-level post-condition, so the second producer that proves the seam check is the compliance
+> pipeline, not 2c (§9).
 > Motivated by the bilingual rollout ([`bilingual-content.md`](bilingual-content.md)):
 > that work is correct, but its *enforcement* is attached to the current workflow
 > (specific producers, a hardcoded copy-doc list, hand-written conformance cases), so it
@@ -234,9 +241,14 @@ Walk concrete *future* changes through the design; show the enumerate-approach m
   classification rule for *which* fields are localized), [`engine-contract.md`](engine-contract.md)
   (content-language engine-owned, §8/§9.2), [`agentic-boundary.md`](agentic-boundary.md)
   (the resolver/agent boundary this makes movable), §98 (becomes a typed post-condition).
-- **Index wiring:** on implementation (2b-4b), add an entry to `docs/README.md` and a node to
-  [`structure-map.md`](structure-map.md) (the coherence hub maps *built* structures) for the
-  seam validator + its regulated rider, alongside [`compliance-pipeline.md`](compliance-pipeline.md).
+- **Index wiring (done at 2b-4c, when the pair completed):** [`structure-map.md`](structure-map.md)
+  gained a **commit-seam compliance** node in the inventory (both layers) + an `audit_events`
+  entity in the Plane-4 persistence ER + cross-links from Plane 3. The `docs/README.md` table was
+  deliberately **not** extended: it indexes the major architecture/strategy docs, not the tier of
+  implementation design notes (eligibility-resolution, mortgage-finance-two-path, bilingual-content
+  are likewise absent) — adding only these two would be inconsistent. The hub (structure-map) is
+  the right home for built-structure discovery; CLAUDE.md and the grounding-checklist carry the
+  pointers.
 
 ## Resolved decisions (Son, at 2b-4)
 

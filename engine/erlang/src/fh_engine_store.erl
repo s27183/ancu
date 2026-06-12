@@ -13,6 +13,7 @@
 -export([tenant_active_keys/1, upsert_tenant/2, add_signing_key/3]).
 -export([create_profile/3, create_plan_card/6]).
 -export([append_event/4, events_since/3]).
+-export([append_audit/6]).
 -export([snapshot_component/3, get_plan_card/2]).
 
 %% --- tenancy / auth ---------------------------------------------------------
@@ -85,6 +86,26 @@ events_since(TenantId, PlanCardId, LastEventId) ->
         "ORDER BY event_id ASC",
         [TenantId, PlanCardId, LastEventId]),
     [{Id, Type, decode_jsonb(Payload)} || {Id, Type, Payload} <- rows(Res)].
+
+%% --- compliance audit trail (compliance-pipeline.md §5) ---------------------
+
+%% One audit_events row per (component, gate), written REGARDLESS of disposition — a
+%% `clear` is as much the regulated trail as a `block` ("we checked FIRB, not required,
+%% on this KB version, at this commit" is exactly the auditor's record). Attribution,
+%% never cost: no token/price fields ever live here (metering is the `usage` stream, §1).
+%% deploy_commit_sha is stamped engine-side for reproducibility (constraint #6).
+-spec append_audit(binary(), binary(), binary(), binary(), [map()], map()) -> ok.
+append_audit(TenantId, PlanCardId, ComponentId, FillPath, KbVersions, Compliance) ->
+    _ = query(
+        "INSERT INTO audit_events "
+        "(tenant_id, plan_card_id, component_id, fill_path, kb_versions_jsonb, "
+        " compliance_jsonb, deploy_commit_sha) "
+        "VALUES ($1::uuid, $2::uuid, $3, $4, $5::jsonb, $6::jsonb, $7)",
+        [TenantId, PlanCardId, ComponentId, FillPath,
+         fh_engine_util:json_encode(KbVersions),
+         fh_engine_util:json_encode(Compliance),
+         deploy_commit_sha()]),
+    ok.
 
 %% --- plan-card content snapshot ---------------------------------------------
 
