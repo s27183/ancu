@@ -14,14 +14,18 @@ So the adapter computes the rate itself: sum **all** offence subcategories over 
 — the population denominator the census adapter stored for exactly this (§8). Summing ALL
 offences is the least-interpretive composite (it privileges no category); a
 residential-safety subset (e.g. dropping liquor / transport-regulatory) is KB-band
-curation, deferred (§8). The COUNT and window are stored too (`crime_incidents_annual`,
-`crime_period`) as the small-n confidence floor — a 30-person locality with 5 incidents
-reads as a huge rate, so the resolver's band projection floors on population (§8); the
-adapter stays mechanical and stores the numerator so the floor has it.
+curation. The COUNT and window are stored too (`crime_incidents_annual`, `crime_period`)
+for the map's small-n honesty — a 30-person locality with 5 incidents reads as a huge rate,
+so the shell can caveat thin-population suburbs at display time; the adapter stays
+mechanical and stores the numerator so the map has it.
 
-The `crime_safety_band` enum is **not** stored: the resolver projects it from the rate + a
-KB threshold (§8), because BOCSAR publishes no band — OUR interpretive band, not a sourced
-one ([[adapter-band-sourced-vs-projected]]).
+Crime is MAP-ONLY: the raw `crime_incidents_per_1000` lands in facts_jsonb for the shell
+map to render in context, and there is **NO `crime_safety_band` resolver field** (decision,
+June 2026, suburb-data-foundation.md §1). Crime fails the resolver/agent boundary — no
+plan-DAG component reads it — and a coarse band would invert the killer community-proximity
+layer by stamping `high crime` on the Vietnamese hubs (Cabramatta/Fairfield top the raw
+distribution from commercial-strip/historical inflation, not residential lived risk). So
+crime is neither sourced nor projected: it is *unbanded* ([[adapter-band-sourced-vs-projected]]).
 
 ENRICHMENT-facts (db.update_facts), UPDATE-only against the NSW census spine via the shared
 name→SAL crosswalk (`_namecross`; 100% coverage measured — the NSW gazette enforces name
@@ -63,7 +67,7 @@ SOURCE = {
     "url": "https://data.nsw.gov.au/data/dataset/crime-by-offence-by-nsw-suburb",
     "notes": "Live-pull SuburbData.zip (Azure blob). Monthly incident counts → trailing-12mo "
              "sum / census_total_persons * 1000 = crime_incidents_per_1000 (NSW). All offences "
-             "summed; band is resolver-projected (§8). VIC/QLD crime are separate (§6).",
+             "summed; map-only raw, no resolver band (§1). VIC/QLD crime are separate (§6).",
 }
 
 
