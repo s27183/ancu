@@ -52,6 +52,7 @@ The seven fields the blueprint reads today **stay verbatim** (ground vocabularie
 | `crime_safety_band` | enum `very_low·low·medium·high·unknown` | **state crime agency** | **new** |
 | `median_house_price` | int AUD (**`null` per state**) | **state Valuer-General** | **new — asymmetric (§7)** |
 | `median_unit_price` | int AUD (`null` per state) | state Valuer-General | new |
+| `median_house_sales_qtr` · `median_unit_sales_qtr` | int (`null`) | state Valuer-General | new — the small-n confidence denominator paired with each median (VIC: ~200/772 localities are `^` thin markets) |
 
 The raw map-facing fields (`vietnamese_ancestry_pct`, `seifa_irsad_score`, `crime_incidents_per_1000`, `median_*_as_of`, demographics) live in `facts_jsonb` but are **not** part of the resolver registry surface — the shell reads them, the resolver does not. Adding a `suburb.*` field is a registry change → the compiler's reference-integrity gate covers it (a blueprint `<from_suburb>` ref to an absent field fails the build).
 
@@ -125,7 +126,7 @@ Each adapter: a `engine/build/` job that fetches → transforms → upserts a fi
 | `abs_seifa_2021` ✅ | ABS SEIFA (IRSAD), flow `ABS_SEIFA2021_SAL` | **SAL direct** | 5y | CC BY 4.0 | `seifa_irsad_score` (raw), `seifa_irsad_decile` (sourced), `seifa_irsad_population` |
 | `abs_asgs_2021` ◑ | ABS **ArcGIS REST** (`ASGS2021/SAL`: layer 2 SAL_PT centroids ✅; layer 1 SAL_GEN polygons ⏳) + MB allocation ⏳ | SAL-direct (centroid); MB→SAL (lga/gccsa) | per-edition | CC BY 4.0 | `centroid_*` ✅; `lga`·`is_capital_city`·`boundary_jsonb` deferred (§6 note) |
 | `nsw_vg_psi` | NSW VG **Bulk PSI** — actual sales `.DAT`/LGA | point→SAL | **weekly** | CC BY (data.NSW) | `median_house_price`, `median_unit_price` (aggregated) |
-| `vic_vpsr` | VIC **Property Sales Report** — median/suburb | name→SAL | **quarterly** | CC BY 4.0 | `median_house_price`, `median_unit_price` (direct) |
+| `vic_vpsr` ✅ | VIC **Property Sales Report** — median/suburb (**human-staged `.xls`**, §7) | name→SAL | **quarterly** | CC BY 4.0 | `median_house_price`, `median_unit_price` (direct) + `median_*_sales_qtr` (small-n denom) |
 | `qld_price` | — **(none free; §7)** | — | — | — | `median_*` → **`null`** |
 | `bocsar` / `csa_vic` / `qps` | state crime agency (CSV/API) | name→SAL | quarterly | CC BY (verify per state) | `crime_incidents_per_1000`→`crime_safety_band` |
 | `gtfs_*` | TfNSW / DTP Vic / TransLink GTFS | point→SAL | static+live | CC BY 4.0 | `transport_score` |
@@ -154,6 +155,15 @@ Validated end-to-end against dev PG: all **15,345** spine rows enriched (decile/
 
 Validated end-to-end against dev PG: **15,329** of the 15,345 spine rows got a centroid; the **16** that did not are *exactly* the non-geographic pseudo-localities (`No usual address` + `Migratory – Offshore – Shipping`, one pair per state/territory) — they have no location, honest-partial `null` is correct, not a miss. Spot-checks land: Cabramatta `(-33.898, 150.936)` Sydney SW, Footscray `(-37.801, 144.895)` Melbourne W, Inala `(-27.590, 152.973)` Brisbane SW; the only centroid outside the mainland box is **Lord Howe Island** `(-31.5, 159.1)` — a real NSW external territory, accurate. The **5** unmatched ASGS codes are the out-of-scope `SAL9000x` (Other Territories) the census spine deliberately skipped — logged not swallowed (§5).
 
+**Fourth adapter implemented** (`vic_vpsr`, June 2026): the **VIC half** of the §7 price layer — median house/unit price by suburb. Price is *two* adapters under one §6 concept (NSW `point→SAL`, VIC `name→SAL`); this ships the cleaner-grounded VIC one (the deliberate mechanism-seam split again, [[decompose-build-unit-by-mechanism]]). Four things distinguish it, each grounded against the live contract:
+
+- **The fetch is human-staged, not a live pull** (the live contract overturned §7's "free, pre-aggregated ✅" framing). VPSR publishes only as a Crystal-Reports legacy `.xls` (BIFF, not CSV) served from `land.vic.gov.au` behind a **Cloudflare JS challenge** (403 to any bot/UA), and the data.gov.au mirror's `datastore_active` is stale (its JSON API returns Drupal HTML). So there is no automated pull: a human downloads the quarter's `.xls` (the quarterly cadence makes that legitimate) to `suburbs/data/vpsr-median-{house,unit}.xls`, and the adapter transforms the staged file. `xlrd` reads legacy `.xls` (openpyxl is `.xlsx`-only). The `as_of` quarter is parsed **from the file's own header** (latest median column's month-range + year → quarter-end), fail-closed on an unrecognised label — the figure's currency is never guessed.
+- **An enrichment-*facts* adapter** (`db.update_facts`) — medians are `facts_jsonb` keys (the map's raw-metric surface, alongside seifa/ancestry; §4 makes them facts not columns), UPDATE-only against the census spine. Each median is paired with its **quarterly sales count** as the small-n confidence denominator — the same [[adapter-band-sourced-vs-projected]] floor as SEIFA's URP: ~200/772 house localities are `^` (fewer than 10 sales / thin market), so the count lets the map flag "indicative only" honestly.
+- **The name→SAL crosswalk is the fiddly bit, grounded empirically** (§5). VPSR localities are UPPERCASE, LGA-qualified for duplicates (`ASCOT (GREATER BENDIGO)`); ABS SAL names are bare / state-tagged (`Abbotsford (Vic.)`) / LGA-disambiguated (`Ascot (Greater Bendigo - Vic.)`). The resolver matches base-name (unique wins) then disambiguates a multi-SAL base by the LGA qualifier — verified: `Ascot (Greater Bendigo)` → its median, `Ascot (Ballarat)` correctly `null` (VPSR didn't report it — not guessed), `Ascot Vale` (distinct suburb) → its own. **96% crosswalk** (742/772 house, 424/444 unit); the ~4% miss tail is VPSR sub-localities ABS doesn't gazette as separate SALs (`WESTGARTH`, `SYNDAL`, `KEW NORTH` — folded into a larger suburb) — logged drops, never invented.
+- **Coverage is honest-partial by design** (§7): **748** distinct VIC SALs got a median (742 house / 424 unit); the ~2200 rural VIC SALs VPSR never reports keep `median = null` — correct, since median is decoration (the user's target price is an input, not derived from the suburb).
+
+Validated end-to-end against dev PG, the two free layers + price now coexist on the Vietnamese hubs: Springvale (23.1% Vietnamese, SEIFA d2) house `$970k` (n=47) / unit `$680k`; St Albans (25.7%, d1) `$730k` (n=108); Footscray (10.0%, d8) `$950k` (n=53); Abbotsford `$1.288M` (byte-matches the staged `.xls` row). Per-field provenance stamped (`{source_id: vic_vpsr, as_of: 2025-12-31}`); 0 unmatched spine rows. **NSW `nsw_vg_psi` remains deferred** — `point→SAL` needs the deferred SAL polygons (the `abs_asgs` boundary mechanism) + `.DAT` parse + sales aggregation; QLD stays `null` (§7).
+
 ### 6.1 License compliance is a real obligation, not a footnote
 
 CC BY 4.0 **requires attribution** (render the `suburb_sources.attribution` string wherever a layer shows) — the shell map needs an attribution strip. **ACARA is the exception**: NAPLAN/ICSEA are `redistribution: restricted` (no redistribution, "must not compete with My School," Data Access Program application). So `school_catchment_quality` derives from **school locations + state catchment boundaries** (permitted), **not** from redistributing ACARA performance data. The `suburb_sources` register makes this enforceable: an adapter whose source row is `redistribution: restricted` must not write a field the shell will publish. Don't ship what you're not licensed to.
@@ -164,8 +174,8 @@ CC BY 4.0 **requires attribution** (render the `suburb_sources.attribution` stri
 
 Suburb median price is **free but uneven across the three Wedge-1a states**, and ABS itself does *not* provide it at suburb grain (the SA2-level Residential Property Price Index was **discontinued Dec 2021**; *Total Value of Dwellings* is capital-city + rest-of-state only):
 
-- **NSW** — VG **Bulk PSI**: actual sales since 1990, weekly, free → aggregate to a current suburb median. ✅
-- **VIC** — **VPSR**: median by suburb (house/unit/land), quarterly, free, pre-aggregated. ✅
+- **NSW** — VG **Bulk PSI**: actual sales since 1990, weekly, free → aggregate to a current suburb median. **Deferred** — `point→SAL` (point-in-polygon) needs the SAL polygons the `abs_asgs` boundary mechanism defers, plus `.DAT` parse + sales aggregation; build it when the polygon mechanism lands.
+- **VIC** — **VPSR**: median by suburb (house/unit/land), quarterly, free, pre-aggregated. **Shipped** (`vic_vpsr`, §6) — but **"free + easy" was optimistic until grounded**: the file is a legacy `.xls` behind a Cloudflare challenge with no working JSON API, so the fetch is **human-staged** (quarterly cadence makes that fine). Grounding cut *both* ways across these adapters — it *collapsed* `abs_asgs` (pre-computed centroids killed the geo-library) and *revealed* friction here ([[decompose-build-unit-by-mechanism]] grounding-collapses-friction corollary).
 - **QLD** — suburb medians are **closed** (IP/revenue; QVAS extracts quoted >$20k). QLD Globe gives *valuations* not sales; RTA gives median *rents*; REIQ is an industry body (redistribution unclear). ❌
 
 **Son's decision: (a) ship NSW/VIC real medians; QLD `median_* = null` → the shell shows "range / unavailable."** This is just honest-partial again — and it costs the base plan nothing, because the user's **target price range is a user input** (constraint #1), never derived from the suburb. The median is decoration ("is my budget realistic here?"), not load-bearing. QLD fills behind the same nullable column when a feed appears (paid CoreLogic in Wedge 3, or a future free QLD release).
@@ -185,7 +195,7 @@ Suburb median price is **free but uneven across the three Wedge-1a states**, and
 
 ## 9. Worked simulation (define → simulate → document)
 
-Three suburbs, one per Wedge-1a state, proving the schema carries the asymmetry. Ancestry **and SEIFA** figures are now **real** (`abs_census_2021` + `abs_seifa_2021`, ingested June 2026); price figures remain illustrative pending the VG adapters (§7):
+Three suburbs, one per Wedge-1a state, proving the schema carries the asymmetry. Ancestry, **SEIFA**, **centroid** and now the **VIC median** are **real** (`abs_census_2021` + `abs_seifa_2021` + `abs_asgs_2021` + `vic_vpsr`, ingested June 2026); the NSW median stays illustrative (`nsw_vg_psi` deferred, §7), QLD is `null`:
 
 | | Cabramatta (NSW) | Footscray (VIC) | Inala (QLD) |
 |---|---|---|---|
@@ -194,7 +204,7 @@ Three suburbs, one per Wedge-1a state, proving the schema carries the asymmetry.
 | `vietnamese_ancestry_pct` (raw) | **37.82%** | **10.03%** | **27.64%** |
 | `vietnamese_community_proximity` (coarse, **KB-threshold projection, §8**) | `high` | `high?` (10% is the borderline the KB threshold must adjudicate) | `high` |
 | `seifa_irsad_decile` (real, sourced) | **1** | **8** | **1** |
-| `median_house_price` | **$1.02M** (NSW VG PSI) | **$915k** (VIC VPSR) | **`null`** (QLD closed) |
+| `median_house_price` | **$1.02M** (NSW VG PSI — *illustrative, deferred*) | **$950k** (real `vic_vpsr`, n=53, Oct–Dec 2025) | **`null`** (QLD closed) |
 | `crime_safety_band` | `medium` (BOCSAR) | `medium` (CSA) | `medium` (QPS) |
 | Map renders | choropleth + $ | choropleth + $ | choropleth + **"price unavailable"** |
 | Resolver reads | coarse bands; price decoration | same | same; `median: null` → honest-partial |
