@@ -55,7 +55,7 @@ Six original surfaces (see [§11.5 in architecture/architecture.md](architecture
 
 | Surface | Pattern | When used | Mode emphasis |
 |---|---|---|---|
-| **Plan dashboard (home)** | Persistent canvas — property cards, schemes, cash math, FIRB status, alerts | Every session start | All modes |
+| **Suburb-intelligence map (home)** | Full-bleed zone map is the home. The base plan is **engine state, not a rendered canvas** — it surfaces *on* the map as a **plan projection** (zone-default → per-suburb): the invariant core (eligibility, cash math, scheme stack) plus a per-suburb overlay. Its only no-map form is an on-demand **export dossier**. No standalone base-plan dashboard. | Every session start | All modes |
 | **Property workbench** | Per-property cards, comparison view, suburb risk overlay, FIRB-aware filtering | Active search — after a property is attached | All modes; **central for Mode A** |
 | **Document workspace** | Drag-drop, side-by-side viewer, Vietnamese-language risk summary | Pre-approval, due diligence | A, C |
 | **FIRB workflow assistant** | Step-by-step foreign-person approval flow, fee calculator, documentation checklist | Before contract for foreign persons | **Central for B, D** |
@@ -128,7 +128,7 @@ After base plan generation, the map view shows a **suburb-intelligence overlay**
 | FHG-eligible price band | Filter to suburbs where median is within user's range | ABS median + scheme caps from KB |
 | Foreign-buyer-eligible suburbs | For Mode B/D — highlight new-build-rich areas | Public planning data |
 
-Clicking a suburb opens a **context drawer** showing median prices, demographics, schools, transport, flood risk, Vietnamese-community %, and a "Refine my plan to focus on this suburb" action.
+Clicking a suburb opens the **plan projection** for that suburb — the base plan's invariant core (eligibility, cash math, scheme stack) plus a suburb overlay (median prices, demographics, schools, transport, flood risk, Vietnamese-community %, stamp duty at this price, FHG price-cap check). With no suburb selected, the projection shows its **zone-default** state over the onboarding target zone (e.g. "5 of the 8 suburbs in your zone sit within your FHG cap"). This *is* the base plan, viewed through a place — there is no separate base-plan canvas. The full property-agnostic dossier is reachable only as an on-demand **export** (the `first_home_buyer_plan.html` deliverable), not a navigation surface.
 
 This is dramatically different from the property-pin browsing pattern. Vietnamese users get **strategic exploration** of where to look — something they cannot get on REA / Domain (English-language, no Vietnamese-community highlighting, no investor-grade composite scoring).
 
@@ -375,11 +375,13 @@ USER ACTION                          SYSTEM RESPONSE                      PERSIS
                                      Base plan card created;                with base params
                                      base params = `<initial>`.             = <initial>)
 
-2. Views base plan + map             `scope: base|both` components fill
-                                     from profile + target zone +
-                                     suburb medians + KB. Map shows a
-                                     suburb-intelligence overlay
-                                     (NOT property pins).
+2. Lands on the map (home);          `scope: base|both` components fill
+   plan projection in its            from profile + target zone +
+   zone-default state                suburb medians + KB. The base plan
+                                     is engine state; it surfaces as the
+                                     zone→suburb plan projection (NOT a
+                                     separate dashboard), over a
+                                     suburb-intelligence map (NOT pins).
 
 3. User chats (text/voice)           Agent constructs system prompt:      INSERT session row
    or uploads docs                   - Blueprint components + params         (session_id =
@@ -468,7 +470,7 @@ The flow operationalises four of the seven UX surfaces simultaneously:
 
 | Surface | Activated when |
 |---|---|
-| Plan dashboard | Onboarding completes — base plan generates and renders |
+| Suburb-intelligence map (home) + plan projection | Onboarding completes — base plan generates as engine state and surfaces as the zone-default projection on the map (no standalone dashboard); export dossier available on demand |
 | Property workbench | User attaches / explores a specific property (addendum) |
 | Document workspace | User uploads contract / Section 32 / strata report |
 | Quick question (chat) | The chat interface itself, layered on any surface |

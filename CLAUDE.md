@@ -86,7 +86,7 @@ In order of value + dependency. **Engine is the dependency root** (the shell ren
 
 5. **`[shell]` Onboarding** — mode / state / VND-AUD range / map-zone / intent tags; calls the engine to create the plan card + run the base turn.
 
-6. **`[shell]` Base plan rendering** — render Mode A base plan from `component_filled` outcomes via the renderer vocabulary. Reuse the design language from [`docs/first_home_buyer_plan.html`](docs/first_home_buyer_plan.html) as the visual template.
+6. **`[shell]` Base plan rendering** — the base plan is **engine state, not a standalone dashboard**. It surfaces only as a **plan projection** on the map-home (zone-default → per-suburb: invariant core — eligibility, cash math, scheme stack — plus a per-suburb overlay), rendered from `component_filled` outcomes via the renderer vocabulary. Its only no-map form is an on-demand **export dossier** — reuse [`docs/first_home_buyer_plan.html`](docs/first_home_buyer_plan.html) as that export's design language, not as a home screen. See [`docs/04-ux-model.md`](docs/04-ux-model.md) §13.3/§13.4.
 
 7. **`[shell]` Suburb-intelligence map** — Leaflet / Mapbox + ABS-data overlays. Vietnamese-community proximity is the killer layer; ship that first.
 
