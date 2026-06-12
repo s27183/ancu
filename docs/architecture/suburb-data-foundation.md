@@ -123,7 +123,7 @@ Each adapter: a `engine/build/` job that fetches → transforms → upserts a fi
 |---|---|---|---|---|---|
 | `abs_census_2021` ✅ | ABS Data API (SDMX-JSON, no key) — flow `C21_G08_SAL` | **SAL direct** | 5y | CC BY 4.0 | `vietnamese_ancestry_pct` (raw); demographics/dwellings later |
 | `abs_seifa_2021` ✅ | ABS SEIFA (IRSAD), flow `ABS_SEIFA2021_SAL` | **SAL direct** | 5y | CC BY 4.0 | `seifa_irsad_score` (raw), `seifa_irsad_decile` (sourced), `seifa_irsad_population` |
-| `abs_asgs` | ASGS boundaries + LGA correspondence | — | per-edition | CC BY 4.0 | `lga`, `is_capital_city`, `centroid_*`, `boundary_jsonb` |
+| `abs_asgs_2021` ◑ | ABS **ArcGIS REST** (`ASGS2021/SAL`: layer 2 SAL_PT centroids ✅; layer 1 SAL_GEN polygons ⏳) + MB allocation ⏳ | SAL-direct (centroid); MB→SAL (lga/gccsa) | per-edition | CC BY 4.0 | `centroid_*` ✅; `lga`·`is_capital_city`·`boundary_jsonb` deferred (§6 note) |
 | `nsw_vg_psi` | NSW VG **Bulk PSI** — actual sales `.DAT`/LGA | point→SAL | **weekly** | CC BY (data.NSW) | `median_house_price`, `median_unit_price` (aggregated) |
 | `vic_vpsr` | VIC **Property Sales Report** — median/suburb | name→SAL | **quarterly** | CC BY 4.0 | `median_house_price`, `median_unit_price` (direct) |
 | `qld_price` | — **(none free; §7)** | — | — | — | `median_*` → **`null`** |
@@ -145,6 +145,14 @@ Each adapter: a `engine/build/` job that fetches → transforms → upserts a fi
 - **Stores `seifa_irsad_population` (URP).** Same rationale as the census denominator (the small-n / SEIFA-exclusion floor + map population). Notably **URP survives index suppression**: ABS suppresses the index for tiny areas (1780 suppressed observations → honest-partial `null` decile/score) but still publishes population, so a 3-person SAL keeps its population while its decile is correctly absent.
 
 Validated end-to-end against dev PG: all **15,345** spine rows enriched (decile/score on 14,457 after suppression; population on all 15,345); SEIFA `URP` for Cabramatta = **21,142**, byte-identical to census `census_total_persons` (the SAL join key is consistent across feeds); the **7** unmatched SEIFA SALs are exactly the out-of-scope codes the census spine deliberately skipped (`SAL9000x` Other Territories / `SAL99797` no-usual-address), logged not swallowed (§5); census and SEIFA fields coexist in one row with per-field provenance (no clobber, the `jsonb || jsonb` merge proven across two adapters).
+
+**Third adapter implemented** (June 2026): `abs_asgs_2021` — SAL **centroids**, the map-placement spine. Three things distinguish it, each grounded against the live ABS contract:
+
+- **A different ABS surface — ArcGIS REST, not the SDMX Data API.** The geography (boundaries, centroids) lives in ABS feature services (`https://geo.abs.gov.au/arcgis/rest/services/ASGS2021/SAL/MapServer`), the statistics in the Data API. The SAL service has three layers — `0` full polygons, `1` generalised polygons (SAL_GEN), `2` **boundary centroids** (SAL_PT). Centroids are **pre-computed by ABS**, so a representative lon/lat per SAL needs *no* geometry library — `outSR=4326&f=geojson`, paged at the layer's `maxRecordCount` 2000 (~15.3k SALs ⇒ 8 pages, `orderByFields=sal_code_2021` for stable paging). The §5 "Point → SAL spatial join" is unneeded for the centroid itself.
+- **Writes real COLUMNS, not `facts_jsonb`** (§4 makes centroid a column — the map filters/joins on it). A third db role joins the spine/enrichment pair: `db.update_columns` (UPDATE-only by `sal_code`, a **whitelisted** dynamic SET so a column name can never come from feed data, provenance still merged into `provenance_jsonb` for uniform freshness). `sal_code_2021` is digits-only (`10738`) → prefixed `SAL` to match the census spine key.
+- **The adapter is deliberately split along the §6 row's *mechanism* seam.** This session shipped only `centroid_*` (ArcGIS REST, zero new deps — the load-bearing field, since 8b–8d cannot place a suburb without it). **`boundary_jsonb` is deferred to 8d** (the choropleth is its only consumer; §4 flags it "optional, large" — storing ~15k generalised polygons nothing reads yet is premature bloat). **`lga_name` + `is_capital_city` are deferred to a dedicated Mesh-Block correspondence sub-build** — the first real §5 *name/area* correspondence (SAL is a non-ABS structure carrying no LGA/GCCSA; the route is the ABS MB allocation files MB→SAL ⋈ MB→LGA/GCCSA, `.xlsx`, modal-aggregated to SAL — a distinct mechanism, not a REST pull, warranting its own focused build).
+
+Validated end-to-end against dev PG: **15,329** of the 15,345 spine rows got a centroid; the **16** that did not are *exactly* the non-geographic pseudo-localities (`No usual address` + `Migratory – Offshore – Shipping`, one pair per state/territory) — they have no location, honest-partial `null` is correct, not a miss. Spot-checks land: Cabramatta `(-33.898, 150.936)` Sydney SW, Footscray `(-37.801, 144.895)` Melbourne W, Inala `(-27.590, 152.973)` Brisbane SW; the only centroid outside the mainland box is **Lord Howe Island** `(-31.5, 159.1)` — a real NSW external territory, accurate. The **5** unmatched ASGS codes are the out-of-scope `SAL9000x` (Other Territories) the census spine deliberately skipped — logged not swallowed (§5).
 
 ### 6.1 License compliance is a real obligation, not a footnote
 
@@ -182,6 +190,7 @@ Three suburbs, one per Wedge-1a state, proving the schema carries the asymmetry.
 | | Cabramatta (NSW) | Footscray (VIC) | Inala (QLD) |
 |---|---|---|---|
 | `sal_code` | SAL10738 | SAL20935 | SAL31388 |
+| `centroid_lat, lon` (real, `abs_asgs`) | **-33.898, 150.936** | **-37.801, 144.895** | **-27.590, 152.973** |
 | `vietnamese_ancestry_pct` (raw) | **37.82%** | **10.03%** | **27.64%** |
 | `vietnamese_community_proximity` (coarse, **KB-threshold projection, §8**) | `high` | `high?` (10% is the borderline the KB threshold must adjudicate) | `high` |
 | `seifa_irsad_decile` (real, sourced) | **1** | **8** | **1** |

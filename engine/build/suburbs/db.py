@@ -97,6 +97,50 @@ def update_facts(conn: psycopg.Connection, rows: list[dict]) -> tuple[int, list[
     return matched, missed
 
 
+# Real columns an enrichment adapter may write (vs facts_jsonb). Whitelisted so the
+# dynamic SET below can never take a column name from feed data — suburb-data-foundation
+# §4 makes these columns (not jsonb) because the map filters/joins on them.
+_COLUMN_WRITABLE = {
+    "name", "state", "lga_name", "is_capital_city",
+    "centroid_lat", "centroid_lon", "boundary_jsonb",
+}
+_JSONB_COLUMNS = {"boundary_jsonb"}
+
+
+def update_columns(conn: psycopg.Connection, rows: list[dict]) -> tuple[int, list[str]]:
+    """Enrichment path for real COLUMNS (centroid/lga/is_capital/boundary), not facts_jsonb.
+
+    Each row: {sal_code, cols: {column: value}, prov: {field: src}}. UPDATE-only by
+    sal_code (same crosswalk-miss semantics as `update_facts`); provenance still merges
+    into provenance_jsonb so a column field's freshness is detectable uniformly (§4).
+    Returns (matched, missed) — `missed` is the sal_codes no spine row matched.
+    """
+    matched, missed = 0, []
+    with conn.cursor() as cur:
+        for r in rows:
+            cols = r.get("cols") or {}
+            bad = set(cols) - _COLUMN_WRITABLE
+            if bad:
+                raise ValueError(f"refusing to write non-whitelisted column(s): {bad}")
+            sets = ", ".join(f"{c} = %({c})s" for c in cols)
+            params = {
+                c: (Jsonb(v) if c in _JSONB_COLUMNS else v) for c, v in cols.items()
+            }
+            params["sal_code"] = r["sal_code"]
+            params["prov"] = Jsonb(r.get("prov") or {})
+            cur.execute(
+                f"UPDATE suburbs SET {sets}, "
+                f"provenance_jsonb = provenance_jsonb || %(prov)s, updated_at = now() "
+                f"WHERE sal_code = %(sal_code)s",
+                params,
+            )
+            if cur.rowcount:
+                matched += 1
+            else:
+                missed.append(r["sal_code"])
+    return matched, missed
+
+
 _UPSERT_SOURCE = """
 INSERT INTO suburb_sources (source_id, name, publisher, license, attribution,
                             redistribution, cadence, url, notes)
