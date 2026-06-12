@@ -6,4 +6,5 @@ dependencies = [
     "claude-agent-sdk", # the planning-sidecar runner (agentic-flow §7/§7.1); draws subscription credit
     "psycopg[binary]>=3.3.4",
     "pydantic", # outcome_schema validation of leaf-fill structured output
+    "xlrd>=2.0", # build-time only: reads VIC VPSR legacy .xls (BIFF); openpyxl is .xlsx-only
 ]
