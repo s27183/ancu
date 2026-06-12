@@ -48,7 +48,7 @@ The seven fields the blueprint reads today **stay verbatim** (ground vocabularie
 | `transport_score` | int 0–100 | GTFS proximity | existing |
 | `vietnamese_community_proximity` | enum `high·medium·low` | ABS Census ancestry | existing |
 | `planning_changes_pending` | array&lt;string&gt; | state planning | existing |
-| `seifa_irsad_decile` | int 1–10 (`null`=unknown) | **ABS SEIFA** | **new — socio-economic spine** |
+| `seifa_irsad_decile` | int 1–10 (`null`=unknown) | **ABS SEIFA** | **new — socio-economic spine.** Unlike `vietnamese_community_proximity` (an *interpretive* band → resolver-projected from a KB threshold, §8), the decile is sourced **directly** — ABS publishes it as the official national-distribution rank (`RWAD`), so the adapter writes it, no threshold to apply. |
 | `crime_safety_band` | enum `very_low·low·medium·high·unknown` | **state crime agency** | **new** |
 | `median_house_price` | int AUD (**`null` per state**) | **state Valuer-General** | **new — asymmetric (§7)** |
 | `median_unit_price` | int AUD (`null` per state) | state Valuer-General | new |
@@ -122,7 +122,7 @@ Each adapter: a `engine/build/` job that fetches → transforms → upserts a fi
 | `source_id` | Feed | Grain → SAL | Cadence | License | `suburb.*` / raw fields |
 |---|---|---|---|---|---|
 | `abs_census_2021` ✅ | ABS Data API (SDMX-JSON, no key) — flow `C21_G08_SAL` | **SAL direct** | 5y | CC BY 4.0 | `vietnamese_ancestry_pct` (raw); demographics/dwellings later |
-| `abs_seifa_2021` | ABS SEIFA (IRSAD) | **SAL direct** | 5y | CC BY 4.0 | `seifa_irsad_score`→`seifa_irsad_decile` |
+| `abs_seifa_2021` ✅ | ABS SEIFA (IRSAD), flow `ABS_SEIFA2021_SAL` | **SAL direct** | 5y | CC BY 4.0 | `seifa_irsad_score` (raw), `seifa_irsad_decile` (sourced), `seifa_irsad_population` |
 | `abs_asgs` | ASGS boundaries + LGA correspondence | — | per-edition | CC BY 4.0 | `lga`, `is_capital_city`, `centroid_*`, `boundary_jsonb` |
 | `nsw_vg_psi` | NSW VG **Bulk PSI** — actual sales `.DAT`/LGA | point→SAL | **weekly** | CC BY (data.NSW) | `median_house_price`, `median_unit_price` (aggregated) |
 | `vic_vpsr` | VIC **Property Sales Report** — median/suburb | name→SAL | **quarterly** | CC BY 4.0 | `median_house_price`, `median_unit_price` (direct) |
@@ -137,6 +137,14 @@ Each adapter: a `engine/build/` job that fetches → transforms → upserts a fi
 
 - **API host moved.** `api.data.abs.gov.au` now **301-redirects to `data.api.abs.gov.au/rest`** — the working base. (The §11.10 / memory references to the old host are stale; the adapter uses the new one.)
 - **The adapter writes the RAW metric, not the band.** §3 lists both `vietnamese_ancestry_pct` (raw, map-facing) and `vietnamese_community_proximity` (coarse, resolver-facing); the adapter writes **only the raw pct**. The coarse band is a *resolver-side projection from a KB threshold* at the `<from_suburb>` lookup (§1 interpretation-threshold-is-KB, §2 the-table-is-the-superset-suburb.*-is-a-projection). So this table's "→ band" entries denote *lineage* (this feed ultimately drives that field), **not** that the adapter materializes the enum. Result validated end-to-end: Cabramatta 7995/21142 = **37.82%** (matches ABS QuickStats), and the national top-12 are the known diaspora suburbs (Cabramatta, Canley Heights, Sunshine North, Inala…).
+
+**Second adapter implemented** (June 2026): `abs_seifa_2021` — the socio-economic spine, the first **enrichment** adapter (`db.update_facts`, UPDATE-only, no spine; it enriches the census-seeded rows). Three grounded divergences from the census adapter, each verified against the live ABS contract:
+
+- **The decile is written DIRECTLY, not projected** (the one departure from the raw-metric-only discipline above). ABS publishes the IRSAD national decile as the official statistic `RWAD` (Rank Within Australia, Decile) — there is no FirstHomey threshold to apply, so the adapter materializes `seifa_irsad_decile` itself (plus the raw `seifa_irsad_score` for the map). The §2/§8 "adapter writes raw, resolver projects the band" rule's boundary is *interpretive* bands; an ABS-published decile falls outside it. The decile's near-uniform 1–10 distribution (~1445 SALs each) cross-checks that `RWAD` is the true national rank.
+- **CSV, not SDMX-JSON.** An enrichment adapter carries no `name`/`state` (the spine owns those) and the flow has no STATE dimension, so it needs neither structure-section parsing for REGION→name nor per-state paging — the filtered CSV key `.IRSAD.SCORE+RWAD+URP` (~3.4 MB) is self-describing via column headers.
+- **Stores `seifa_irsad_population` (URP).** Same rationale as the census denominator (the small-n / SEIFA-exclusion floor + map population). Notably **URP survives index suppression**: ABS suppresses the index for tiny areas (1780 suppressed observations → honest-partial `null` decile/score) but still publishes population, so a 3-person SAL keeps its population while its decile is correctly absent.
+
+Validated end-to-end against dev PG: all **15,345** spine rows enriched (decile/score on 14,457 after suppression; population on all 15,345); SEIFA `URP` for Cabramatta = **21,142**, byte-identical to census `census_total_persons` (the SAL join key is consistent across feeds); the **7** unmatched SEIFA SALs are exactly the out-of-scope codes the census spine deliberately skipped (`SAL9000x` Other Territories / `SAL99797` no-usual-address), logged not swallowed (§5); census and SEIFA fields coexist in one row with per-field provenance (no clobber, the `jsonb || jsonb` merge proven across two adapters).
 
 ### 6.1 License compliance is a real obligation, not a footnote
 
@@ -169,20 +177,20 @@ Suburb median price is **free but uneven across the three Wedge-1a states**, and
 
 ## 9. Worked simulation (define → simulate → document)
 
-Three suburbs, one per Wedge-1a state, proving the schema carries the asymmetry. Ancestry figures are now **real** (`abs_census_2021`, ingested June 2026); price figures remain illustrative pending the VG adapters (§7):
+Three suburbs, one per Wedge-1a state, proving the schema carries the asymmetry. Ancestry **and SEIFA** figures are now **real** (`abs_census_2021` + `abs_seifa_2021`, ingested June 2026); price figures remain illustrative pending the VG adapters (§7):
 
 | | Cabramatta (NSW) | Footscray (VIC) | Inala (QLD) |
 |---|---|---|---|
 | `sal_code` | SAL10738 | SAL20935 | SAL31388 |
 | `vietnamese_ancestry_pct` (raw) | **37.82%** | **10.03%** | **27.64%** |
 | `vietnamese_community_proximity` (coarse, **KB-threshold projection, §8**) | `high` | `high?` (10% is the borderline the KB threshold must adjudicate) | `high` |
-| `seifa_irsad_decile` | 2 | 4 | 2 |
+| `seifa_irsad_decile` (real, sourced) | **1** | **8** | **1** |
 | `median_house_price` | **$1.02M** (NSW VG PSI) | **$915k** (VIC VPSR) | **`null`** (QLD closed) |
 | `crime_safety_band` | `medium` (BOCSAR) | `medium` (CSA) | `medium` (QPS) |
 | Map renders | choropleth + $ | choropleth + $ | choropleth + **"price unavailable"** |
 | Resolver reads | coarse bands; price decoration | same | same; `median: null` → honest-partial |
 
-The killer layer (Vietnamese ancestry) is **free and present in all three** — vs a ~1% national baseline, every one is strongly elevated; the asymmetry is isolated to one nullable column (price) in one state. The schema does not special-case QLD — `null` is a value the contract already handles. (The coarse *band* is the resolver's KB-thresholded projection, §8 — not stored; Footscray's 10% shows why the threshold + a population floor are the load-bearing curation, not the ingestion.)
+The killer layer (Vietnamese ancestry) is **free and present in all three** — vs a ~1% national baseline, every one is strongly elevated; the asymmetry is isolated to one nullable column (price) in one state. The schema does not special-case QLD — `null` is a value the contract already handles. (The coarse *band* is the resolver's KB-thresholded projection, §8 — not stored; Footscray's 10% shows why the threshold + a population floor are the load-bearing curation, not the ingestion.) The real SEIFA also shows the two free layers **decorrelate** — Cabramatta/Inala are decile 1 (genuinely disadvantaged) but **Footscray is decile 8** (gentrified to relative advantage despite the migrant heritage), so the SES spine is a distinct signal from ancestry, not a proxy for it — exactly why both layers earn their place.
 
 ---
 
