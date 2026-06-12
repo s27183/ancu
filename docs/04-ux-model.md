@@ -31,7 +31,7 @@ Every agentic interaction should produce or update a structured artifact the use
 | Scheme/FIRB calc | Plan card update (eligibility, cash needs, timeline) |
 | Family-coordination session | Cross-border decision trail (parent + child view) |
 | Negotiation session | Decision trail entry attached to the property addendum |
-| Refi alert | Opportunity card on plan dashboard |
+| Refi alert | Opportunity card on the plan projection |
 | FIRB approval workflow | FIRB status artifact (gate for foreign-person flows) |
 
 ### 13.2 The four user modes
@@ -152,21 +152,21 @@ Sarah Nguyen, 32, lives in Brisbane, Vietnamese-Australian citizen (second-gener
 
 **Day 0 — Discovery (5 minutes)**
 
-- Lands from Google search "QLD Section 32 review AI"
-- No signup required. Uploads a Section 32 for a $750k Coorparoo townhouse (established).
-- Free preview shows 3 flagged items + scheme eligibility headline.
-- Paywall: $30 for the full plain-English report. Pays. Creates account to save it.
+- Lands from Google search "Vietnamese first home buyer plan Brisbane" (community SEO).
+- Onboards **plan-first — no property required**: mode (Vietnamese-AU FHB), state (QLD), target price range (set in AUD), target zone (taps her preferred Brisbane suburbs on the map).
+- The **base plan generates immediately** and surfaces as the zone-default **plan projection** on the map: FHG/FHSS eligibility, cash math against her range, scheme stack. Free.
+- Creates an account to save it.
 
-→ Artifact created: **document report** linked to a **property card**.
+→ Artifact created: her **plan card** (base plan), surfaced as the map projection.
 
-**Day 7 — Returns and compares**
+**Day 7 — Attaches a property and compares**
 
-- Returns to the **plan dashboard**. Sees her profile placeholder, the Coorparoo property card, scheme eligibility (FHG qualified; QLD first home concession partial because established and >$700k).
-- Dashboard flag: "*$15k short of recommended cash buffer.*"
-- Uploads a second contract for a $680k apartment in Annerley.
+- Returns to the map. Her **plan projection**, narrowed to the Coorparoo suburb she's been eyeing, shows scheme eligibility (FHG qualified; QLD first home concession partial because established and >$700k) and the flag "*$15k short of recommended cash buffer.*"
+- She's considering a $750k Coorparoo townhouse (established). Uploads its Section 32 → a **property addendum** is created on her plan card, with a $40 plain-English **document report** (3 flagged items).
+- Uploads a second contract for a $680k Annerley apartment → a second addendum.
 - Agent shows side-by-side risk comparison + duty saving ($24k full exemption at <$700k vs partial above).
 
-→ Artifacts: second **document report**, second **property card**, **comparison view**.
+→ Artifacts: second **document report**, second **property addendum**, **comparison view**.
 
 **Day 14 — Subscribes and decides on HECS**
 
@@ -178,20 +178,20 @@ Sarah Nguyen, 32, lives in Brisbane, Vietnamese-Australian citizen (second-gener
 
 **Day 30 — Lender selection**
 
-- Plan dashboard shows pre-approval checklist with progress bars: NOAs ✓, payslips ✓, bank statements 2 of 3 months, employer letter missing.
+- Her plan projection's finance section shows a pre-approval checklist with progress bars: NOAs ✓, payslips ✓, bank statements 2 of 3 months, employer letter missing.
 - Agent prompts upload of missing items.
 - Chat: *"Which FHG lenders should I consider?"* — agent surfaces personalised shortlist of 3 most-likely-to-approve lenders for her profile.
 - Sarah picks one. Pre-approval initiated.
 
-→ Artifacts: **lender comparison card**, **application status** entry on dashboard.
+→ Artifacts: **lender comparison card**, **application status** entry on her plan.
 
 **Days 45–75 — Active search**
 
 - Sarah inspects ~6 properties per week.
-- Adds each by URL into the **property workbench**. Agent auto-fills suburb data (flood, planning, schools), comparable sales, body corporate red flags (for strata).
+- Adds each by URL into the **property workbench** (each becomes an addendum). Agent auto-fills suburb data (flood, planning, schools), comparable sales, body corporate red flags (for strata).
 - Each weekend a quick chat exchange: *"What should I look out for at 14 Beech St?"*
 
-→ Artifacts: ~25 **property cards**, most archived as "ruled out"; 3 active shortlist.
+→ Artifacts: ~25 **property addenda**, most archived as "ruled out"; 3 active shortlist.
 
 **Day 75 — Auction Saturday (Live coach mode)**
 
@@ -208,17 +208,17 @@ Sarah Nguyen, 32, lives in Brisbane, Vietnamese-Australian citizen (second-gener
 - Mostly background. Agent sends a reminder calendar: building insurance to bind by [date], conveyancer payment due, mortgage docs to sign.
 - Chat handles sporadic process Q&A ("What is PEXA?", "When do I get the keys?").
 
-→ Plan dashboard updates to settlement view; checklist auto-populates.
+→ Her plan enters its settlement view (on the won property's addendum); checklist auto-populates.
 
 **Day 135 onwards — Move-in and ownership**
 
-- Plan dashboard shifts to ownership view. Quick checklist for utilities, council registration, address updates.
+- Her plan shifts to its ownership view. Quick checklist for utilities, council registration, address updates.
 - Subscription auto-drops to $5/month or "alerts only" free tier (Sarah's choice).
 
 **Day 365 — Refinance opportunity (1-year mark)**
 
 - Email arrives: *"RBA just cut rates 25bp. Your loan is currently 6.1% — your LVR is now 78% (graduated), so the FHG no longer applies. Three lenders would offer you 5.65% today. Savings: ~$3,200/year. Want to model the refinance?"*
-- Sarah taps through to the dashboard, models refinance, decides to proceed.
+- Sarah taps through to her plan, models refinance, decides to proceed.
 
 → Artifact: **opportunity card** (refinance modelled, action taken).
 
@@ -234,15 +234,15 @@ An Tran, 24, Vietnamese international student on 485 graduate visa in Melbourne 
 - Agent suggests new-build alternatives in the same suburb with comparable price points.
 - An signs up to save the search. Pays $40 for full Vietnamese-language analysis of three new-build alternatives.
 
-→ Artifacts: property card with FIRB-blocked status; three new-build comparison cards.
+→ Artifacts: property addendum with FIRB-blocked status; three new-build comparison addenda.
 
 **Day 3 — An invites parents to family view**
 
 - An shares the platform with her father in Saigon via WhatsApp link.
-- Father logs in (Vietnamese UI default based on geo-IP); platform invites him to "Family view" — shared dashboard with An's property cards, Vietnamese-language summaries, translation toggles.
-- Father reviews the new-build options on his Vietnamese-language dashboard. Comments. An sees comments. Bilingual coordination begins.
+- Father logs in (Vietnamese UI default based on geo-IP); platform invites him to "Family view" — a shared view of An's plan with its property addenda, Vietnamese-language summaries, translation toggles.
+- Father reviews the new-build options on his Vietnamese-language family view. Comments. An sees comments. Bilingual coordination begins.
 
-→ Artifact: **cross-border family view** with shared property cards.
+→ Artifact: **cross-border family view** with shared property addenda.
 
 **Day 14 — Family decision + FIRB workflow**
 
@@ -254,7 +254,7 @@ An Tran, 24, Vietnamese international student on 485 graduate visa in Melbourne 
 
 **Day 30 — FIRB approved + contract**
 
-- FIRB approval received. Platform unlocks "ready to contract" status on the property card.
+- FIRB approval received. Platform unlocks "ready to contract" status on the property addendum.
 - An connects with a Vietnamese-speaking partner REA from Footscray who handles the off-the-plan contract. Platform charges REA a $150 qualified-connection fee. An pays REA nothing extra.
 - Contract signed. Conveyancer engaged.
 
@@ -290,7 +290,7 @@ Linh (Australian citizen, born here) buys her first home **jointly** with her pa
 
 | Outcome | How |
 |---|---|
-| Lifecycle continuity moat | Plan canvas persists for years; chat history alone would not |
+| Lifecycle continuity moat | The plan card persists for years; chat history alone would not |
 | Switching cost | Sarah's document library, property history, decision trail can't be reproduced elsewhere |
 | Per-user LTV beyond settlement | Free or low-cost ownership tier keeps her returnable for refi, second home, investment |
 | Distinct from ChatGPT | The product is a workspace, not a conversation |
@@ -299,26 +299,27 @@ Linh (Australian citizen, born here) buys her first home **jointly** with her pa
 | **Cross-border uniqueness** | Vietnamese-language Mode B family-coordination flow is genuinely unduplicated anywhere |
 | **Mode-switching continuity** | Customer follows their own lifecycle within one platform; data accumulates across modes |
 
-### 13.7 MVP scope (Wedge 1) — what's actually built in 8–12 weeks
+### 13.7 MVP scope (Wedge 1a) — what's actually built in 4–6 weeks
 
-Day-1 scope for Wedge 1 (Vietnamese-Australian FHB mode):
+Day-1 scope for Wedge 1a (Vietnamese-Australian FHB mode):
 
-- Browser extension on REA.com.au and Domain (Vietnamese-language analysis button)
-- URL paste landing page
-- **Property card** as the first-class artifact — Vietnamese-language analysis, FIRB filter (citizen/PR for Wedge 1), scheme eligibility check, comparable sales
+- **Plan-first onboarding** — mode (Vietnamese-AU FHB), state, target price range (VND→AUD), target zone (map click / address); no property required
+- **Plan card** as the first-class artifact — base plan (FHG/FHSS eligibility, cash math, scheme stack), property-agnostic; properties attach later as addenda
+- **Suburb-intelligence map (home)** with overlays (Vietnamese-community proximity first), where the base plan surfaces as the zone→suburb **plan projection** — no standalone dashboard
+- On-demand **export dossier** (the base plan as a deliverable)
 - Optional account creation
-- Bare-bones plan dashboard — saved property cards, FIRB status, scheme stack summary
-- Document workspace (upload S32 / Contract of Sale → Vietnamese-language risk summary)
-- Chat layered over the dashboard
+- Chat layered on the map / projection
+- Document workspace (upload S32 / Contract of Sale → Vietnamese-language risk summary → property addendum) — activated once a property is attached
+- Property-attach paths: URL paste + browser extension on REA.com.au / Domain (Vietnamese-language analysis button) → property addendum
 - REA partner directory (initial 10–20 Vietnamese-speaking agents in target suburbs)
 
 What's protected by getting the UX shape right from day 1:
 
-- Property card as first-class object in Layer 2 (not as a chat artifact)
+- **Plan card** as the first-class object in Layer 2 (not the property card, not a chat artifact) — properties are inputs via addenda
+- The base plan is **engine state**, surfaced only as the map projection + export — never a standalone dashboard page
 - FIRB status as a foundational **per-applicant** attribute — the applicant set (each buyer's status) captured from day 1, so a foreign co-applicant trips the gate even in an otherwise-domestic plan (set up for Wedge 2 expansion)
-- User state schema designed for multi-property accumulation
-- Mode-switching architecture in place (only Mode A active in Wedge 1, but Mode B/C/D enabled by config)
-- Plan dashboard exists as a real page, not a generated chat message
+- User state schema designed for multi-property accumulation (addenda over one base plan)
+- Mode-switching architecture in place (only Mode A active in Wedge 1a, but Mode B/C/D enabled by config)
 - New surfaces (FIRB workflow, cross-border family view, live coach, background monitor) can be added as views over the same persistent state
 
 ### 13.8 Three traps to avoid (plus three new ones for Vietnamese diaspora)
