@@ -2,7 +2,7 @@
 
 **Status:** Direction accepted (Son, June 2026 — "we are building the geo-socio-economic KB here"). This doc **completes the third shared surface** named by the registry — `profile.* ⊕ applicant.* ⊕ property_fit.* ⊕ suburb.*` ([structure-map](structure-map.md) plane 2). The `suburb.*` *surface* and its `<from_suburb>` lookup were already specified ([property-model-foundation §`suburb.*`](property-model-foundation.md), [architecture §11.10 "Suburb enrichment pipeline"](architecture.md#1110-property-data-pipeline--narrow-and-demand-driven), blueprint `fhb-domestic-au.md` lines 247–260); what was **never specified** is the *engineering* — the `suburbs` table schema, the per-state adapters, the join grain + correspondences, and the provenance/license model. This doc owns that. It is *completion, not duplication*: §11.10 holds the strategic scope (no scraping, suburb-level only, free-tier-first) and the verified ABS access points; this doc holds the materialization.
 
-The executable remainder is one migration (`003_suburbs.sql`) + the `engine/build/` adapters. **Not started** — design pass first.
+The executable remainder is one migration (`003_suburbs.sql`) + the `engine/build/` adapters. **`003_suburbs.sql` landed** (June 2026 — both tables + the source register, validated against dev PG); the per-state adapters remain.
 
 ---
 
@@ -121,7 +121,7 @@ Each adapter: a `engine/build/` job that fetches → transforms → upserts a fi
 
 | `source_id` | Feed | Grain → SAL | Cadence | License | `suburb.*` / raw fields |
 |---|---|---|---|---|---|
-| `abs_census_2021` | ABS Data API (SDMX-JSON, no key) | **SAL direct** | 5y | CC BY 4.0 | `vietnamese_ancestry_pct`→`vietnamese_community_proximity`, demographics, dwellings |
+| `abs_census_2021` ✅ | ABS Data API (SDMX-JSON, no key) — flow `C21_G08_SAL` | **SAL direct** | 5y | CC BY 4.0 | `vietnamese_ancestry_pct` (raw); demographics/dwellings later |
 | `abs_seifa_2021` | ABS SEIFA (IRSAD) | **SAL direct** | 5y | CC BY 4.0 | `seifa_irsad_score`→`seifa_irsad_decile` |
 | `abs_asgs` | ASGS boundaries + LGA correspondence | — | per-edition | CC BY 4.0 | `lga`, `is_capital_city`, `centroid_*`, `boundary_jsonb` |
 | `nsw_vg_psi` | NSW VG **Bulk PSI** — actual sales `.DAT`/LGA | point→SAL | **weekly** | CC BY (data.NSW) | `median_house_price`, `median_unit_price` (aggregated) |
@@ -132,6 +132,11 @@ Each adapter: a `engine/build/` job that fetches → transforms → upserts a fi
 | `schools_*` | ACARA **locations** + state catchments | point/boundary→SAL | annual | locations ok; **NAPLAN/ICSEA restricted** | `school_catchment_quality` |
 | `planning_*` | state planning/emergency portals | boundary→SAL | per-event | CC BY (mostly) | `flood_risk_band`, `planning_changes_pending` |
 | `rba_fx` | RBA/interbank | national | daily | CC BY | VND/AUD (not a `suburbs` field — onboarding-time conversion) |
+
+**First adapter implemented** (`engine/build/suburbs/`, June 2026): `abs_census_2021` + the shared merge-upsert (`db.upsert_facts` — `jsonb || jsonb`, so adapters never clobber each other's fields). Two facts the live build confirmed/corrected:
+
+- **API host moved.** `api.data.abs.gov.au` now **301-redirects to `data.api.abs.gov.au/rest`** — the working base. (The §11.10 / memory references to the old host are stale; the adapter uses the new one.)
+- **The adapter writes the RAW metric, not the band.** §3 lists both `vietnamese_ancestry_pct` (raw, map-facing) and `vietnamese_community_proximity` (coarse, resolver-facing); the adapter writes **only the raw pct**. The coarse band is a *resolver-side projection from a KB threshold* at the `<from_suburb>` lookup (§1 interpretation-threshold-is-KB, §2 the-table-is-the-superset-suburb.*-is-a-projection). So this table's "→ band" entries denote *lineage* (this feed ultimately drives that field), **not** that the adapter materializes the enum. Result validated end-to-end: Cabramatta 7995/21142 = **37.82%** (matches ABS QuickStats), and the national top-12 are the known diaspora suburbs (Cabramatta, Canley Heights, Sunshine North, Inala…).
 
 ### 6.1 License compliance is a real obligation, not a footnote
 
@@ -158,25 +163,26 @@ Suburb median price is **free but uneven across the three Wedge-1a states**, and
 - **Missing suburb / missing field → the coarse `unknown` band**, never a crash and never a guess. `flood_risk_band: unknown`, `median_house_price: null` propagate as honest-partial; downstream resolvers already tolerate `unknown` (the K3 collapse — [[firsthomey-data-model-direction]]).
 - The pulled values + their `provenance_jsonb` snapshot into the plan card's `content_jsonb` at fill (the same audit-snapshot discipline as KB content), so a filled card is reproducible even after the suburb feed refreshes.
 - No `tenant_id` filter — `suburbs` is global.
+- **The band projection must floor on population (small-n caveat — denominator now stored).** The census build surfaced tiny remote SALs where a handful of people swing `vietnamese_ancestry_pct` to a misleadingly high value (e.g. "South Plantations, WA" — **27.13% off just 188 persons**, vs Cabramatta's 37.82% off 21,142; ABS small-cell perturbation amplifies this). So when the `<from_suburb>` resolver projects the coarse `vietnamese_community_proximity` band from the raw pct + KB threshold, it must **also gate on total persons** (below a floor → `unknown`/`low`, not `high`). The adapter therefore **stores `census_total_persons`** (the pct's own denominator) — not a speculative field: it has three real consumers (the band-projection floor, pct self-auditing/provenance, and the map's population layer), and population is core census demographics already in the §6 remit. (This reverses an earlier "defer until the band projection is built" note — the denominator is already fetched to compute the pct, and its consumers exist today.)
 
 ---
 
 ## 9. Worked simulation (define → simulate → document)
 
-Three suburbs, one per Wedge-1a state, proving the schema carries the asymmetry. Figures illustrative except Cabramatta's ancestry (ABS QuickStats, cited in §11.10):
+Three suburbs, one per Wedge-1a state, proving the schema carries the asymmetry. Ancestry figures are now **real** (`abs_census_2021`, ingested June 2026); price figures remain illustrative pending the VG adapters (§7):
 
 | | Cabramatta (NSW) | Footscray (VIC) | Inala (QLD) |
 |---|---|---|---|
-| `sal_code` | SAL10738 | SAL20935 | SAL3… |
-| `vietnamese_ancestry_pct` (raw) | **37.8%** | high | high |
-| `vietnamese_community_proximity` (coarse) | `high` | `high` | `high` |
+| `sal_code` | SAL10738 | SAL20935 | SAL31388 |
+| `vietnamese_ancestry_pct` (raw) | **37.82%** | **10.03%** | **27.64%** |
+| `vietnamese_community_proximity` (coarse, **KB-threshold projection, §8**) | `high` | `high?` (10% is the borderline the KB threshold must adjudicate) | `high` |
 | `seifa_irsad_decile` | 2 | 4 | 2 |
 | `median_house_price` | **$1.02M** (NSW VG PSI) | **$915k** (VIC VPSR) | **`null`** (QLD closed) |
 | `crime_safety_band` | `medium` (BOCSAR) | `medium` (CSA) | `medium` (QPS) |
 | Map renders | choropleth + $ | choropleth + $ | choropleth + **"price unavailable"** |
 | Resolver reads | coarse bands; price decoration | same | same; `median: null` → honest-partial |
 
-The killer layer (Vietnamese proximity) is `high` and **free** in all three; the asymmetry is isolated to one nullable column in one state. The schema does not special-case QLD — `null` is a value the contract already handles.
+The killer layer (Vietnamese ancestry) is **free and present in all three** — vs a ~1% national baseline, every one is strongly elevated; the asymmetry is isolated to one nullable column (price) in one state. The schema does not special-case QLD — `null` is a value the contract already handles. (The coarse *band* is the resolver's KB-thresholded projection, §8 — not stored; Footscray's 10% shows why the threshold + a population floor are the load-bearing curation, not the ingestion.)
 
 ---
 
@@ -205,4 +211,4 @@ The killer layer (Vietnamese proximity) is `high` and **free** in all three; the
   - **Live amenity / commute / geocode augmentation** — Google Places (nearby supermarkets, the Vietnamese-grocer layer), Routes/Distance-Matrix (commute-to-CBD), Geocoding (the Phase-B URL-paste address→coords). Gov feeds give these poorly.
 
   This augmentation is a **fourth bucket** beside the three in [[build-time-structure-vs-runtime-data]] (compiled structure / runtime state / persisted reference): **live third-party API — per-session, ToS-bound, attributed at point of use, not stored.** It is **architecturally distinct from this surface** and must never flow into the `suburbs` table: Google Maps Platform ToS *prohibits* caching/storing its content (sole exceptions: lat/lon/distance/duration/ETA cacheable ≤30 days, `place_id` indefinitely) — storing it, or using it to build a competing dataset, is grounds for termination. The persisted-projection design here is only legal because the gov spine is CC-BY; commercial data may not enter it. So this layer is **shell-owned, live-call, deferred** to the map build (a `<from_suburb>` field is never sourced from it), and is recorded here only to fix the boundary.
-- **The migration + adapters** — `003_suburbs.sql` and the `engine/build/` jobs are the executable remainder; this is the design pass only.
+- **The adapters** — `003_suburbs.sql` is **done** (`suburbs` + `suburb_sources`, the §4 DDL, validated against dev PG: CHECK constraints + jsonb round-trip + a clean rolled-back apply); the `engine/build/` per-state ingestion jobs (§6) are the remaining executable piece.

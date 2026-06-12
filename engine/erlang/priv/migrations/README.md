@@ -10,11 +10,12 @@ into `persistent_term` at boot — *not* Postgres) are out of scope here.
 | File | What it creates |
 |---|---|
 | `001_init_engine.sql` | Core runtime state: `tenants`, `tenant_signing_keys`, `profiles` (the household fact base — Decision 1), `plan_cards` (per journey, FK → `profiles`), `plan_card_events`, `sessions` + `session_turns`, `audit_events`, `artifacts` |
+| `002_audit_fill_path_two_path.sql` | Widens `audit_events.fill_path` CHECK to `{resolver, two_path, agent}` (the two-path fill added `two_path` — slice 2f) |
+| `003_suburbs.sql` | The `suburb.*` reference surface: `suburbs` (SAL-keyed, **global — no `tenant_id`**, `facts_jsonb` metric set) + `suburb_sources` (per-feed license/redistribution register). Shared reference data, the third bucket — see [`suburb-data-foundation.md`](../../../../docs/architecture/suburb-data-foundation.md) |
 
-Deferred to later migrations (not load-bearing for the Decision-1 split): `suburbs`
-(build-time enrichment — CLAUDE.md "Where to start building" 3) and the optional
-`properties` table (narrow-path property data; addenda otherwise live in
-`plan_cards.content_jsonb`).
+Deferred to later migrations: the optional `properties` table (narrow-path
+property data; addenda otherwise live in `plan_cards.content_jsonb` —
+CLAUDE.md "Where to start building" 9).
 
 ## Applying
 
