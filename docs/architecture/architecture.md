@@ -537,20 +537,22 @@ The one pipeline we *do* operate offline. Compiles public + lightly-subscribed d
 |---|---|---|---|---|
 | **ABS Data API — Census 2021 (SAL-level)** | Free | $0 | 5-yearly (2021 latest, 2026 in progress) | Vietnamese ancestry %, country of birth, language at home, family composition, age distribution, education, dwelling characteristics, median dwelling value (Census-time), median rent (Census-time) |
 | **ABS Data API — non-Census series (SA2-level)** | Free | $0 | Quarterly | Estimated resident population, dwelling indicators, sub-state Lending Indicators (where granular enough) |
-| **State Education Department open data** | Free | $0 | Annual | School catchments, school rankings |
+| **ABS SEIFA 2021 (SAL-level)** | Free | $0 | 5-yearly | Socio-economic indexes (IRSAD/IRSD/IER/IEO) → `seifa_irsad_decile` — the socio-economic spine |
+| **State Education + ACARA school locations** | Free | $0 | Annual | School catchments + school locations (lat/lon). **NAPLAN/ICSEA performance data is licence-restricted** (no redistribution, Data Access Program) — `school_catchment_quality` derives from locations + catchments, *not* redistributed rankings |
 | **State Emergency / Planning portals** | Free | $0 | Per-event + periodic | Flood risk bands, bushfire zones, planning changes |
-| **State Valuer-General offices** | Free | $0 | Annual (rates revaluation cycles) | Capital improved values (rates valuation — stale but indicative) |
+| **State Valuer-General — actual sales** | Free | $0 | NSW weekly · VIC quarterly | **Current** suburb median sale price — NSW **Bulk PSI** (actual sales → aggregate), VIC **Property Sales Report** (median/suburb, pre-aggregated). **QLD suburb median is closed** (IP/revenue; QVAS >$20k) → `median_* = null` |
+| **State crime agencies (BOCSAR · CSA Vic · QPS)** | Free | $0 | Quarterly | Recorded incidents by suburb/LGA → `crime_safety_band` |
 | **RBA / interbank FX rates** | Free | $0 | Daily | VND/AUD rate for price-range conversion |
 | **PropTrack subscription (optional)** | Paid | ~$79/month | Continuous | Current median rent, days on market, rental demand by suburb |
 | **CoreLogic / Cotality subscription (optional)** | Paid | ~$139/month | Continuous | Current median sale prices, capital growth rates, yields, suburb-level market stats |
 
-This is **batch-updateable** and operates parallel to §11.9 blueprint KB curation. CI gate validates that every suburb referenced by the base plan has a complete enrichment record before deployment.
+This is **batch-updateable** and operates parallel to §11.9 blueprint KB curation. CI gate validates that every suburb referenced by the base plan has a complete enrichment record before deployment. The **engineering spec** — the `suburbs` table schema, the per-state adapters, the SAL join grain + correspondences, and the provenance/license register (the ACARA restriction is a first-class row) — is [`suburb-data-foundation.md`](suburb-data-foundation.md); this section holds the strategic scope, that doc holds the materialization. Note: suburb data is **reference data in Postgres**, *not* a prose KB compiled to the artifact (it is neither structure nor runtime-state — a third bucket).
 
 **Deployment tier optionality:**
 
-- **Wedge 1a minimum (free tier only):** ABS Census-time median values + state Valuer-General data + qualitative tags (Vietnamese-community proximity, school catchment, flood risk) are sufficient for the base plan's suburb-intelligence overlay. Vietnamese-community proximity — the most differentiated field for our positioning — is free at SAL level. The base plan works without any paid subscription.
+- **Wedge 1a minimum (free tier only):** ABS Census + **SEIFA** (socio-economic) + **current transaction-based suburb medians for NSW/VIC** (VG Bulk PSI / VPSR — *not* just stale rates-valuations) + **crime bands** + qualitative tags (Vietnamese-community proximity, school catchment, flood risk) are sufficient for the base plan's overlay. **QLD median is `null`** (closed) — honest-partial, and harmless because the target price range is a *user input* (constraint #1), so the median is decoration, not load-bearing. Vietnamese-community proximity — the signature field — is free at SAL level. The base plan works with zero paid subscription.
 - **Wedge 1c upgrade (~$80/month):** Add PropTrack for current rent + days-on-market signal. Improves Mode A buying strategy quality and Mode C yield modelling.
-- **Wedge 3 upgrade (~$220/month combined):** Add CoreLogic for current sale prices + growth rates. Required for credible investor-grade analytics (Mode C/D).
+- **Wedge 3 upgrade (~$220/month combined):** Add CoreLogic for **QLD current median** (the one state without a free sales feed) + capital-growth / yield **composites**. NSW/VIC current median is already free above; CoreLogic is required only for investor-grade analytics (Mode C/D) and to close the QLD price gap.
 
 **Verified suburb-data access points (May 2026):**
 

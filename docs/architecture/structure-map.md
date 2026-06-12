@@ -23,6 +23,7 @@ Every structure named in the architecture, in one place, with where its detail l
 | **buyer fact base** (foundation) | the one mode-independent `profile.*` surface; modes populate a subset | [`fact-model-unification.md`](fact-model-unification.md) |
 | **property model** (foundation) | the `property_fit.*` surface, the `property_type` enum, the property-dependent scheme structure | [`property-model-foundation.md`](property-model-foundation.md) |
 | **resolver / agent** (fill paths) | the two ways a leaf is filled: deterministic resolver, or an agent turn at `agent_reasoning_required` leaves | [`agentic-boundary.md`](agentic-boundary.md) |
+| **suburb data** (reference surface) | the `suburb.*` surface (third registry term) materialized as the `suburbs` table; build-time ABS/SEIFA/state ingestion; `<from_suburb>` session-start lookup | [`suburb-data-foundation.md`](suburb-data-foundation.md) |
 | **agentic flow** | agent types, dynamic prompt structure, vendor-neutral run layer, context management | [`agentic-flow.md`](agentic-flow.md) |
 | **plan card** | the persistent runtime instance: a base plan + 0..N property addenda | [§11.1](architecture.md#111-the-three-layers) · [`isolation-model.md`](isolation-model.md) |
 | **profile / plan / mode** | household fact base (persistent) ⟵ plan (per journey); mode *derived*, never a key | [`fact-model-unification.md`](fact-model-unification.md) |
