@@ -39,8 +39,8 @@ firsthomey/
 │   ├── python/                  stateless sidecars (planning agent — Anthropic SDK; Playwright URL fetch)
 │   └── python/pyproject.toml
 └── shell/
-    ├── svelte/frontend/         web app: onboarding, suburb map, plan-card render, uploads
-    ├── svelte/backend/          identity, commerce (subscription / one-time / success fee), usage consumer
+    ├── web/frontend/            SvelteKit: onboarding, suburb map, plan projection, chat layer, uploads
+    ├── web/backend/             Erlang/OTP: identity, user/engine JWT, commerce (subscription / one-time / success fee), usage consumer
     └── extension/               browser extension (Phase B property capture)
 ```
 

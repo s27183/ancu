@@ -28,7 +28,7 @@ Every structure named in the architecture, in one place, with where its detail l
 | **plan card** | the persistent runtime instance: a base plan + 0..N property addenda | [§11.1](architecture.md#111-the-three-layers) · [`isolation-model.md`](isolation-model.md) |
 | **profile / plan / mode** | household fact base (persistent) ⟵ plan (per journey); mode *derived*, never a key | [`fact-model-unification.md`](fact-model-unification.md) |
 | **renderer** | a member of the constrained presentation vocabulary that turns an outcome into UI | [§11.9](architecture.md#119-blueprint-as-data-model--presentation-specification) |
-| **engine / shell** | the two independently-deployable halves; API is the only contract | [§11.0](architecture.md#110-engine--shell-split-deployable-shape) · [`engine-contract.md`](engine-contract.md) |
+| **engine / shell** | the two independently-deployable halves; API is the only contract | [§11.0](architecture.md#110-engine--shell-split-deployable-shape) · [`engine-contract.md`](engine-contract.md) (engine side) · [`shell-architecture.md`](shell-architecture.md) (shell side) |
 | **commit-seam compliance** | the two layers every fill crosses at the `fh_engine_turn` commit: **Layer 1** structural outcome-conformance (`localized_text` · §98 figure-type · enum; fail-closed crash) then **Layer 2** regulated FIRB/ASIC/AML dispositions (`clear`/`annotate`/`branch`/`block`) → one `audit_events` row per (component, gate) | [`outcome-conformance.md`](outcome-conformance.md) · [`compliance-pipeline.md`](compliance-pipeline.md) |
 
 **Outcomes carry facts, not verdicts.** An outcome exposes normalised facts (age, residency, price); the verdict ("FHG-eligible") is produced by the component that *owns the rule*, never pre-baked upstream. This is the invariant the whole data plane rests on.
@@ -285,7 +285,7 @@ flowchart TB
   GATE -.->|"gates access (engine never gates)"| REND
 ```
 
-The two things the engine deliberately keeps and keeps *out*: **compliance** (FIRB/ASIC/AML) is a gate on agent behaviour → engine-owned and structural (constraint #10), not a shell disclaimer; **commerce** is shell-owned, so the engine only meters — keeping billing *and* ASIC liability out of the agent loop. Detail: [§11.0](architecture.md#110-engine--shell-split-deployable-shape), [`engine-contract.md`](engine-contract.md), [`principles.md`](principles.md).
+The two things the engine deliberately keeps and keeps *out*: **compliance** (FIRB/ASIC/AML) is a gate on agent behaviour → engine-owned and structural (constraint #10), not a shell disclaimer; **commerce** is shell-owned, so the engine only meters — keeping billing *and* ASIC liability out of the agent loop. Detail: [§11.0](architecture.md#110-engine--shell-split-deployable-shape), [`engine-contract.md`](engine-contract.md) (the boundary from the engine side), [`shell-architecture.md`](shell-architecture.md) (what sits behind the shell edge — two-JWT, backend modules, shell DB), [`billing.md`](billing.md) (the commerce mechanism — tiered subscription, metering→billing outbox, measured cost basis, Stripe), [`principles.md`](principles.md).
 
 ---
 
@@ -300,4 +300,4 @@ The hub is navigable both ways: from a plane to its detail, and from an architec
 | 2 runtime pipeline | component DAG · params→outcome→registry · fill-path | [§11.9](architecture.md#119-blueprint-as-data-model--presentation-specification), [`agentic-boundary.md`](agentic-boundary.md) |
 | 3 agentic turn | prompt → runner → output → gate | [`agentic-flow.md`](agentic-flow.md), [`agentic-boundary.md`](agentic-boundary.md) |
 | 4 persistence | profile ⟵ plan_cards · addendum structure · snapshot | [`engine-contract.md`](engine-contract.md) §9.1, [`isolation-model.md`](isolation-model.md), foundations |
-| 5 engine/shell | what runs where · meter vs gate | [§11.0](architecture.md#110-engine--shell-split-deployable-shape), [`engine-contract.md`](engine-contract.md) |
+| 5 engine/shell | what runs where · meter vs gate · commerce | [§11.0](architecture.md#110-engine--shell-split-deployable-shape), [`engine-contract.md`](engine-contract.md), [`shell-architecture.md`](shell-architecture.md), [`billing.md`](billing.md) |

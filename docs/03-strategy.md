@@ -152,7 +152,7 @@ The platform's value to buyers includes showing them what they currently pay vs 
 
 | Source | Volume | Per-unit | Annual |
 |---|---|---|---|
-| Vietnamese-AU FHB base plan subscriptions (Wedge 1) | 2,000 active | $300 | $600k |
+| Vietnamese-AU FHB base plan subscriptions (Wedge 1) | 2,000 paying | $300 blended ARPU | $600k |
 | **Tìm Nhà property search service** (Mode A users → Phase B) | 800 engagements | $350 | $280k |
 | Document review one-time fees (per property addendum) | 5,000 reports | $40 | $200k |
 | Settlement success fees | 200 settlements | $750 | $150k |
@@ -318,7 +318,7 @@ Wedge 1 is **sub-phased** to match the property-data-light architecture. The bas
 
 **Ships in 4–6 weeks with Claude Code** because the offline KB agent only needs to curate scheme rules + suburb enrichment + FX feed — no property scraping pipeline.
 
-**Pricing:** Free or freemium for base plan (maximises demand aggregation, which IS the asset). Vietnamese-AU FHB subscription $25/month optional for advanced features (decision trail history, comparison views).
+**Pricing:** Free base plan (maximises demand aggregation, which IS the asset), with tiered subscriptions — **Plus $25/month** (decision-trail history, comparison views) and **Pro $49/month** (Tìm Nhà priority, higher quota). Per-tier token limits bound compute cost; the tier table and the measured cost basis are in [`architecture/billing.md`](architecture/billing.md).
 
 #### Wedge 1b — Tìm Nhà property search service (months 3–6)
 

@@ -132,9 +132,9 @@ firsthomey/
 │   │   ├── priv/migrations/      (engine PG schema: plan-card state, events, sessions)
 │   │   └── priv/kb/              (compiled KB + blueprint artifact, emitted at deploy)
 │   └── python/                   (stateless disposable sidecars — planner_stub.py built; real Anthropic-SDK planner + Playwright fetch = slice 2)
-├── shell/                        (to be created: Svelte frontend + Erlang backend — UX, identity, commerce)
-│   ├── svelte/frontend/
-│   ├── svelte/backend/
+├── shell/                        (SvelteKit frontend + Erlang/OTP backend — UX, identity, commerce; 8-S0 scaffold + JWT-mint seam landed)
+│   ├── web/frontend/             (SvelteKit SPA — scaffold built; onboarding, suburb map, plan projection, chat layer = 8-S2+)
+│   ├── web/backend/              (Erlang/OTP fh_shell_* — boot+migrations+health+two-JWT seam built; login/proxy/commerce = later slices)
 │   └── extension/                (browser extension — Phase B property capture)
 ├── tests/                        (build validation + resolver eval — validate_build.py, resolver_eval.py)
 └── pyproject.toml                (sidecar deps; .venv)
