@@ -194,10 +194,23 @@ One Postgres, owned entirely by the shell. Never read by the engine; never joine
 
 The product is **map-first** (the one structural revision of `04-ux-model.md` §13.4's form-first flow, now reconciled there). The map is the home and the dashboard; plan cards pin to their zones.
 
-- **Map home (`/`)** — full-bleed suburb-intelligence map (Leaflet), zone-data overlays reading raw `facts_jsonb` (Vietnamese-community proximity is the killer layer, shipped first). Click a suburb (SAL) → sheet with a **zone-data tab** + a **planning tab**. Engine owns the suburb *data* (8-S1 read endpoint); the shell owns rendering.
+- **Map home (`/`)** — full-bleed suburb-intelligence map (MapLibre GL JS via MIERUNE `svelte-maplibre-gl`; see [`map-stack.md`](map-stack.md)), zone-data overlays reading raw `facts_jsonb` (Vietnamese-community proximity is the killer layer, shipped first). Click a suburb (SAL) → sheet with a **zone-data tab** + a **planning tab**. Engine owns the suburb *data* (8-S1 read endpoint); the shell owns rendering.
 - **Onboarding (first-run)** — mode + applicant-set capture (each person's FIRB status + intent — the highest-harm input, constraint #10) populates the persistent household fact base (`profiles`); target price range is a **user input** (VND→AUD slider, constraint #1), not zone data. One capture per household; zone + budget + intent are per-plan-card.
 - **Plan projection (the planning tab)** — the base plan has **no standalone dashboard**; its only surface is the plan **projection** in a gradient from zone-default (no suburb pinned) → per-suburb (click narrows the overlay). The projection carries the **invariant core** (eligibility, borrowing, deposit, FHSS, scheme stack — identical in every suburb) plus the thin suburb overlay (stamp duty, FHG cap, proximity). Rendered from `component_filled` outcomes via the renderer vocabulary. Its only no-map form is an on-demand **export dossier** (`first_home_buyer_plan.html` as a deliverable, not a nav surface).
 - **Chat layer (the planning tab)** — the 2c bilingual Q&A path (already built engine-side), VI-default + EN toggle. `text_delta {text, lang}` frames concatenated per language; shell picks display.
+
+### 7.1 Mobile-native, minimal cognitive load
+
+Every buyer-facing surface is designed phone-first (the diaspora buyer's primary device): one-handed, full-bleed canvas, touch targets, primary action in the thumb zone. Desktop is the **adjusted** variant — wider canvas, side-panel instead of bottom-sheet, hover affordances — never a separately-designed layout. The governing goal is **minimal cognitive load**, achieved by:
+
+- **One primary decision per view.** Surface the single thing that matters now; defer the rest behind a tap. Tabs and hierarchical popup sheets (button-triggered) are the mechanisms; deep nesting and dense dashboards are the anti-pattern.
+- **No scrolling to reach a decision.** Everything decision-critical sits above the fold or one tap away. (Long-form content — the export dossier, a full plan projection — may scroll; the rule is about *decisions*, not *length*.)
+- **Obvious, consistent navigation.** The same action lives in the same place across surfaces; navigation signs are explicit, not discovered.
+- **One language on the surface, the other on demand.** VI-default; never `{vi, en}` stacked (that doubles density and defeats minimal-load). The shell picks one per surface (see [`agentic-flow.md`](agentic-flow.md) on bilingual-first-class engine output); the second language is a tap away. The chat layer's VI-default + EN toggle (above) is the first instance.
+- **Uncertainty reads as calm confidence.** Honest partials (`PENDING`, banded ranges, `to_verify`, bilingual disclaimers) render as reassurance, not error-noise. Subtle, affirmative color; regulated/uncertain content is *informed*, never alarming.
+- **Never a blank wait.** Agent turns are slow (inference behind the engine seam) — stream, skeleton, show progress; no frozen screen.
+
+**Boundary:** this governs buyer-facing surfaces. The curator console is a back-office tool and is desktop-first.
 
 Full UX rationale: [`04-ux-model.md`](../04-ux-model.md) §13; the design conversation that set this direction is captured in the `firsthomey-shell-direction` working note.
 
