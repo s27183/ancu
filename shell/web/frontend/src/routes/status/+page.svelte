@@ -18,11 +18,13 @@
     });
 </script>
 
-<h1>{$t('status.title')}</h1>
-{#if phase === 'checking'}
-    <p class="placeholder">{$t('status.checking')}</p>
-{:else if phase === 'ok'}
-    <p>{$t('status.ok')} — <code>{service}</code></p>
-{:else}
-    <p>{$t('status.fail')}</p>
-{/if}
+<section class="content">
+    <h1>{$t('status.title')}</h1>
+    {#if phase === 'checking'}
+        <p class="placeholder">{$t('status.checking')}</p>
+    {:else if phase === 'ok'}
+        <p>{$t('status.ok')} — <code>{service}</code></p>
+    {:else}
+        <p>{$t('status.fail')}</p>
+    {/if}
+</section>

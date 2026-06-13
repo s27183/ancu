@@ -10,7 +10,7 @@
 %% in 8-S0b..8-S5 per shell-architecture.md §5. The shell backend is a proxy +
 %% identity/commerce layer in front of the engine, not a re-implementation.
 
--export([child_spec/0, port/0]).
+-export([child_spec/0, port/0, routes/0]).
 -export([reply_json/3, read_json_body/1]).
 
 -spec child_spec() -> supervisor:child_spec().
@@ -21,9 +21,14 @@ child_spec() ->
         cowboy_clear,
         #{env => #{dispatch => Dispatch}}).
 
+%% Exported so a test can stand up the listener without booting the full app
+%% (the app starts the Postgres pool + migrations; routes that don't touch the
+%% shell DB — e.g. the public /api/suburbs proxy — are testable without it).
+-spec routes() -> cowboy_router:routes().
 routes() ->
     [{'_', [
-        {"/health", fh_shell_health_handler, []}
+        {"/health", fh_shell_health_handler, []},
+        {"/api/suburbs", fh_shell_h_suburbs, []}
     ]}].
 
 -spec port() -> inet:port_number().

@@ -18,9 +18,36 @@ const messages = {
     'nav.status': { vi: 'Trạng thái', en: 'Status' },
     'lang.label': { vi: 'Ngôn ngữ', en: 'Language' },
 
-    'home.placeholder': {
-        vi: 'Bản đồ khu vực sẽ xuất hiện ở đây (8-S2).',
-        en: 'The suburb-intelligence map will land here (8-S2).'
+    'map.state.label': { vi: 'Bang', en: 'State' },
+    'map.legend.title': { vi: 'Tỉ lệ cộng đồng gốc Việt', en: 'Vietnamese ancestry' },
+    'map.legend.nodata': { vi: 'Chưa có dữ liệu', en: 'No data' },
+    'map.loading': { vi: 'Đang tải bản đồ…', en: 'Loading the map…' },
+    'map.error': {
+        vi: 'Không tải được dữ liệu khu vực. Vui lòng thử lại.',
+        en: 'Couldn’t load suburb data. Please try again.'
+    },
+    'map.retry': { vi: 'Thử lại', en: 'Retry' },
+
+    'sheet.tab.zone': { vi: 'Dữ liệu khu vực', en: 'Zone data' },
+    'sheet.tab.plan': { vi: 'Kế hoạch', en: 'Plan' },
+    'sheet.close': { vi: 'Đóng', en: 'Close' },
+    'sheet.viet': { vi: 'Cộng đồng gốc Việt', en: 'Vietnamese community' },
+    'sheet.seifa': { vi: 'Chỉ số kinh tế – xã hội (SEIFA)', en: 'Socio-economic (SEIFA)' },
+    'sheet.seifa.note': {
+        vi: 'Thập phân vị 1 = khó khăn nhất, 10 = thuận lợi nhất.',
+        en: 'Decile 1 = most disadvantaged, 10 = most advantaged.'
+    },
+    'sheet.population': { vi: 'Dân số', en: 'Population' },
+    'sheet.crime': { vi: 'Số vụ được ghi nhận', en: 'Recorded incidents' },
+    'sheet.crime.unit': { vi: 'trên 1.000 dân', en: 'per 1,000 people' },
+    'sheet.crime.note': {
+        vi: 'Số liệu tham khảo, không phải đánh giá khu vực.',
+        en: 'A reference figure — not a rating of the area.'
+    },
+    'sheet.nodata': { vi: 'Chưa có dữ liệu', en: 'No data yet' },
+    'sheet.plan.placeholder': {
+        vi: 'Kế hoạch mua nhà cho khu vực này sẽ xuất hiện ở đây.',
+        en: 'Your home-buying plan for this suburb will appear here.'
     },
 
     'status.title': { vi: 'Trạng thái hệ thống', en: 'System status' },
