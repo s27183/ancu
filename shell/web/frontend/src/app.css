@@ -1,0 +1,86 @@
+/* FirstHomey shell — minimal design substrate (8-S0 scaffold). Semantic tokens so
+   pages reference roles, not hexes; the real token set + map theming lands with the
+   map home (8-S2). VI-first, mobile-native (shell-architecture.md §7). */
+
+:root {
+    --bg: #f8fafc;
+    --surface: #ffffff;
+    --ink: #0f172a;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --accent: #047857; /* emerald-700 — placeholder brand accent */
+    --accent-ink: #ffffff;
+    --radius: 0.4rem;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family:
+        system-ui,
+        -apple-system,
+        'Segoe UI',
+        Roboto,
+        'Helvetica Neue',
+        Arial,
+        sans-serif;
+    line-height: 1.5;
+}
+
+header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+}
+
+header .brand {
+    font-weight: 700;
+    color: var(--accent);
+    text-decoration: none;
+}
+
+header nav {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.lang button {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    border-radius: var(--radius);
+    padding: 0.15rem 0.5rem;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+.lang button.active {
+    background: var(--accent);
+    color: var(--accent-ink);
+    border-color: var(--accent);
+}
+
+main {
+    padding: 1.5rem 1rem;
+    max-width: 48rem;
+    margin: 0 auto;
+}
+
+.placeholder {
+    color: var(--muted);
+}

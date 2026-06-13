@@ -1,0 +1,26 @@
+name: firsthomey-shell
+
+# Dev Postgres for the shell's identity/commerce DB (shell-architecture.md §6).
+# A SEPARATE database from the engine's (engine-contract §9.2) — different host
+# port (5434 vs the engine's 5433) so both can run side by side in dev. The schema
+# is applied by the boot-time runner (fh_shell_migrations), not by this file.
+# Disposable: `docker compose -f shell/web/backend/compose.yaml up -d`.
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: firsthomey_shell
+      POSTGRES_USER: shell
+      POSTGRES_PASSWORD: shell_dev_pw
+    ports:
+      - "5434:5432"
+    volumes:
+      - shell_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U shell -d firsthomey_shell"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  shell_pg:

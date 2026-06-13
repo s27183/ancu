@@ -1,0 +1,6 @@
+# SPA fallback. Any path that doesn't match a built file (deep links like
+# /onboarding, /plan/:id, /curator) serves index.html with status 200 so the
+# SvelteKit client router takes over. /api/* and /health are served by the shell
+# backend (Erlang), not the static host.
+
+/*  /index.html  200

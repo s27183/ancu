@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="vi">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <script>
+            // Apply the persisted language to <html> before first paint (no flicker).
+            // Default is vi (the product is VI-first; bilingual-content.md). localStorage
+            // can throw in private mode — swallow and keep the markup default.
+            (function () {
+                try {
+                    var l = localStorage.getItem('firsthomey-lang');
+                    if (l) document.documentElement.setAttribute('lang', l);
+                } catch (e) {}
+            })();
+        </script>
+        %sveltekit.head%
+    </head>
+    <body data-sveltekit-preload-data="hover">
+        <div style="display: contents">%sveltekit.body%</div>
+    </body>
+</html>

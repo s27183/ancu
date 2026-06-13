@@ -1,0 +1,17 @@
+{application, fh_shell, [
+    {description, "FirstHomey web shell backend — identity, the engine-JWT seam, commerce"},
+    {vsn, "0.1.0"},
+    {registered, [fh_shell_sup]},
+    {mod, {fh_shell_app, []}},
+    {applications, [
+        kernel,
+        stdlib,
+        sasl,
+        crypto,
+        pgo,
+        cowboy
+    ]},
+    {modules, []},
+    {licenses, ["Apache-2.0"]},
+    {links, []}
+]}.
