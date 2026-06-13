@@ -22,6 +22,7 @@ child_spec() ->
 routes() ->
     [{'_', [
         {"/api/engine/health",                  fh_engine_h_health,     []},
+        {"/api/engine/suburbs",                 fh_engine_h_suburbs,    []},
         {"/api/engine/plan-cards",              fh_engine_h_plan_cards, []},
         {"/api/engine/plan-cards/:id/events",   fh_engine_h_events,     []},
         {"/api/engine/plan-cards/:id/messages", fh_engine_h_messages,   []},

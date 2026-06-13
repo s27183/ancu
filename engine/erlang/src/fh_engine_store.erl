@@ -15,6 +15,7 @@
 -export([append_event/4, events_since/3]).
 -export([append_audit/6]).
 -export([snapshot_component/3, get_plan_card/2]).
+-export([list_suburbs_by_state/1, list_suburb_sources/0]).
 -export([read_glue/3, append_session_turn/6]).
 
 %% --- tenancy / auth ---------------------------------------------------------
@@ -145,6 +146,51 @@ get_plan_card(TenantId, PlanCardId) ->
         [] ->
             {error, not_found}
     end.
+
+%% --- suburb reference surface (the shell map's raw-metric source) ------------
+%%
+%% GLOBAL reference data, NOT tenant-scoped: `suburbs` carries no tenant_id and a
+%% WHERE tenant_id filter here would be a category error (suburb-data-foundation §1).
+%% The handler still AUTHENTICATES the tenant JWT (a registered shell), but the row
+%% selection is tenant-independent. This serves the MAP's raw projection (§2 "two
+%% readers": shell renders the raw metrics; the resolver's coarse suburb.* band is a
+%% separate internal <from_suburb> path). facts_jsonb is passed through verbatim —
+%% the table is the superset, the shell decides what to render (§2/§4).
+-spec list_suburbs_by_state(binary()) -> [map()].
+list_suburbs_by_state(State) ->
+    Res = query(
+        "SELECT sal_code, name, state, lga_name, is_capital_city, "
+        "centroid_lat, centroid_lon, facts_jsonb "
+        "FROM suburbs WHERE state = $1 ORDER BY name",
+        [State]),
+    [#{<<"sal_code">> => Sal,
+       <<"name">> => Name,
+       <<"state">> => St,
+       <<"lga_name">> => Lga,
+       <<"is_capital_city">> => Cap,
+       <<"centroid">> => centroid(Lat, Lon),
+       <<"facts">> => decode_jsonb(Facts)}
+     || {Sal, Name, St, Lga, Cap, Lat, Lon, Facts} <- rows(Res)].
+
+%% The source/license register (suburb_sources) → the attribution block the map's
+%% attribution strip must render wherever a CC-BY layer shows (§6.1).
+-spec list_suburb_sources() -> [map()].
+list_suburb_sources() ->
+    Res = query(
+        "SELECT source_id, name, publisher, license, attribution "
+        "FROM suburb_sources ORDER BY source_id", []),
+    [#{<<"source_id">> => Id,
+       <<"name">> => Name,
+       <<"publisher">> => Pub,
+       <<"license">> => Lic,
+       <<"attribution">> => Attr}
+     || {Id, Name, Pub, Lic, Attr} <- rows(Res)].
+
+%% NULL centroid (the 16 non-geographic pseudo-localities, §6) → JSON null, not a
+%% {lat:null,lon:null} object — an absent location is absent, not a zero point.
+centroid(null, _) -> null;
+centroid(_, null) -> null;
+centroid(Lat, Lon) -> #{<<"lat">> => Lat, <<"lon">> => Lon}.
 
 %% --- Q&A conversation glue (sessions / session_turns; isolation-model §4) ----
 
