@@ -1,14 +1,17 @@
 // Pure map helpers (no Svelte, no DOM) for the suburb-intelligence home (8-S2):
 // the GeoJSON projection of the engine's suburb rows, the data-driven CircleLayer
 // paint (the Vietnamese-community-proximity layer — the killer layer), the minimal
-// no-basemap style (v1; the real Protomaps basemap is a follow-on, map-stack.md §5),
-// and the per-state default view. Kept framework-free so it is unit-testable.
+// no-basemap style + the Protomaps basemap style (8-S2d, map-stack.md §2), and the
+// per-state default view. Kept framework-free so it is unit-testable — the basemap
+// builder just returns a plain style object; the `pmtiles://` protocol registration
+// (a browser side effect) lives separately in lib/pmtiles.ts.
 import type {
     CircleLayerSpecification,
     StyleSpecification,
     ExpressionSpecification
 } from 'maplibre-gl';
 import type { FeatureCollection, Point } from 'geojson';
+import { layers, namedFlavor } from '@protomaps/basemaps';
 import type { Suburb } from '$lib/api';
 
 /** The engine's CHECK-constrained state enum (003_suburbs.sql) — the map's query grain. */
@@ -111,3 +114,30 @@ export const minimalStyle: StyleSpecification = {
     sources: {},
     layers: [{ id: 'bg', type: 'background', paint: { 'background-color': '#eef2f6' } }]
 };
+
+// Protomaps basemap (8-S2d). Static assets (glyphs/sprite) load from protomaps.github.io
+// in dev/eval; prod self-hosts them alongside the owned R2 `.pmtiles` extract (map-stack.md
+// §2, deploy-build). The `light` flavor matches the calm cream aesthetic of the bubble layer
+// (§7.1). These basemap layers sit BELOW the bubble layer — svelte-maplibre-gl adds the
+// CircleLayer after the style loads, so the killer layer stays on top of the basemap.
+const PROTOMAPS_ASSETS = 'https://protomaps.github.io/basemaps-assets';
+
+/** A Protomaps-backed MapLibre style for a given `.pmtiles` archive URL. The caller must
+ *  have registered the `pmtiles://` protocol first (ensurePmtilesProtocol, lib/pmtiles.ts).
+ *  Returns a plain object — no DOM, no protocol side effect — so this stays unit-testable. */
+export function basemapStyle(pmtilesUrl: string): StyleSpecification {
+    return {
+        version: 8,
+        glyphs: `${PROTOMAPS_ASSETS}/fonts/{fontstack}/{range}.pbf`,
+        sprite: `${PROTOMAPS_ASSETS}/sprites/v4/light`,
+        sources: {
+            protomaps: {
+                type: 'vector',
+                url: `pmtiles://${pmtilesUrl}`,
+                attribution:
+                    '<a href="https://protomaps.com">Protomaps</a> © <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>'
+            }
+        },
+        layers: layers('protomaps', namedFlavor('light'), { lang: 'en' })
+    };
+}

@@ -1,13 +1,23 @@
 <script lang="ts">
     // The suburb-intelligence map (8-S2): MapLibre GL JS via MIERUNE svelte-maplibre-gl
-    // (map-stack.md). v1 = a centroid CircleLayer — the Vietnamese-community-proximity
-    // layer (the killer layer) — over a minimal no-basemap style. Click a bubble →
-    // onselect(suburb); the parent owns the selection + the sheet.
+    // (map-stack.md). The centroid CircleLayer — the Vietnamese-community-proximity layer
+    // (the killer layer) — sits over the basemap. Click a bubble → onselect(suburb); the
+    // parent owns the selection + the sheet.
+    //
+    // Basemap (8-S2d): VITE_PMTILES_URL set → a Protomaps pmtiles basemap; unset → the
+    // no-basemap minimalStyle (the original 8-S2 behaviour — dev/build never regresses).
+    // Dev/eval points at a Protomaps daily build; prod at the owned R2 AU extract.
     import 'maplibre-gl/dist/maplibre-gl.css'; // self-hosted, not the CDN autoload
     import { MapLibre, GeoJSONSource, CircleLayer } from 'svelte-maplibre-gl';
     import type { MapLayerMouseEvent } from 'maplibre-gl';
     import type { Suburb } from '$lib/api';
-    import { toFeatureCollection, circlePaint, minimalStyle } from '$lib/map';
+    import { toFeatureCollection, circlePaint, minimalStyle, basemapStyle } from '$lib/map';
+    import { ensurePmtilesProtocol } from '$lib/pmtiles';
+
+    // Build-time: Vite statically replaces this; unset → undefined → no-basemap fallback.
+    const PMTILES_URL = import.meta.env.VITE_PMTILES_URL;
+    if (PMTILES_URL) ensurePmtilesProtocol();
+    const mapStyle = PMTILES_URL ? basemapStyle(PMTILES_URL) : minimalStyle;
 
     let {
         suburbs,
@@ -34,10 +44,10 @@
 </script>
 
 <MapLibre
-    style={minimalStyle}
+    style={mapStyle}
     {center}
     {zoom}
-    attributionControl={false}
+    attributionControl={PMTILES_URL ? { compact: true } : false}
     autoloadGlobalCss={false}
     inlineStyle="position:absolute;inset:0"
 >
