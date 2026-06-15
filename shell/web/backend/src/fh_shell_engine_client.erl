@@ -11,7 +11,8 @@
 %% (fetch state, SSE event proxy, messages, suburbs) lands as the shell UX surfaces
 %% are built (8-S1..8-S4). HTTP via inets httpc (started by the shell app).
 
--export([create_plan_card/2, list_suburbs/1]).
+-export([create_plan_card/2, get_plan_card/2, post_message/3, stream_events/3,
+         list_suburbs/1]).
 
 %% The system principal for unauthenticated reference-data reads. `suburbs` is
 %% global CC-BY reference data; the map is the pre-login landing surface, so the
@@ -40,6 +41,62 @@ create_plan_card(UserId, BodyMap) ->
         httpc:request(post, {Url, Headers, "application/json", Body},
                       [], [{body_format, binary}]),
     {Status, Resp}.
+
+%% Fetch a plan card's filled content on behalf of UserId — the projection's data
+%% source (8-S4, GET /api/engine/plan-cards/:id). The shell has already confirmed the
+%% user owns this card (fh_shell_store:owns_plan_card/2) before calling. Returns
+%% {StatusCode, ResponseBodyBinary}: the engine answers 200 with the typed outcomes
+%% (content.components.*), 404 if the card is unknown to the tenant. Relayed verbatim.
+-spec get_plan_card(binary(), binary()) -> {non_neg_integer(), binary()}.
+get_plan_card(UserId, PlanCardId) ->
+    Token = fh_shell_engine_jwt:mint(#{user_id => UserId}),
+    Url = base_url() ++ "/plan-cards/" ++ binary_to_list(PlanCardId),
+    Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
+    {ok, {{_, Status, _}, _, Resp}} =
+        httpc:request(get, {Url, Headers}, [], [{body_format, binary}]),
+    {Status, Resp}.
+
+%% Ask a question about a plan card (the Q&A path, 8-S4) — POST
+%% /api/engine/plan-cards/:id/messages with the user's message. The shell has
+%% confirmed ownership first. The engine starts a kind:qa turn and answers 202 with
+%% {plan_card_id, turn_id}; the bilingual answer arrives later as text_delta frames on
+%% the SSE stream (proxied in 8-S4b). 409 if a turn is already in flight (one per card).
+-spec post_message(binary(), binary(), map()) -> {non_neg_integer(), binary()}.
+post_message(UserId, PlanCardId, BodyMap) ->
+    Token = fh_shell_engine_jwt:mint(#{user_id => UserId}),
+    Url = base_url() ++ "/plan-cards/" ++ binary_to_list(PlanCardId) ++ "/messages",
+    Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
+    Body = fh_shell_util:json_encode(BodyMap),
+    {ok, {{_, Status, _}, _, Resp}} =
+        httpc:request(post, {Url, Headers, "application/json", Body},
+                      [], [{body_format, binary}]),
+    {Status, Resp}.
+
+%% Open an async-streaming GET on the engine's SSE events endpoint (8-S4b) on behalf
+%% of UserId — the channel both the live projection-fill and the Q&A answers ride.
+%% MUST be called from the cowboy handler process: httpc with {stream, self} sends the
+%% stream parts ({http, {ReqId, stream_start|stream|stream_end, _}}) to the CALLING
+%% process, which is the process that relays them downstream (fh_shell_h_events).
+%% Returns {ok, RequestId} | {error, Reason}. `timeout` is infinity (an SSE stream is
+%% long-lived — the engine's terminal event or its 30-min inactivity guard ends it,
+%% or the client disconnects); connect_timeout is finite so a dead engine fails fast.
+%% LastEventId (the downstream client's, header-or-query) is forwarded so the ENGINE
+%% owns replay/dedup (one source of truth, engine-contract §4).
+-spec stream_events(binary(), binary(), binary() | undefined) ->
+    {ok, term()} | {error, term()}.
+stream_events(UserId, PlanCardId, LastEventId) ->
+    Token = fh_shell_engine_jwt:mint(#{user_id => UserId}),
+    Url = base_url() ++ "/plan-cards/" ++ binary_to_list(PlanCardId) ++ "/events",
+    Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}
+               | last_event_id_header(LastEventId)],
+    httpc:request(get, {Url, Headers},
+                  [{timeout, infinity}, {connect_timeout, 5000}],
+                  [{sync, false}, {stream, self}, {body_format, binary}]).
+
+-spec last_event_id_header(binary() | undefined) -> [{string(), string()}].
+last_event_id_header(undefined) -> [];
+last_event_id_header(Id) when is_binary(Id) ->
+    [{"last-event-id", binary_to_list(Id)}].
 
 %% Proxy GET /api/engine/suburbs?state=State — the map's raw-metric source (8-S1,
 %% suburb-data-foundation §2). State is the engine's required query grain; `undefined`

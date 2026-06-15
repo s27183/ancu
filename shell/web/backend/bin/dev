@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+#
+# Shell-backend local-dev launcher. Run from THIS dir:
+#   cd shell/web/backend && bin/dev
+#
+#   bin/dev          homebrew Postgres (:5432) + firsthomey_shell + shell on :8081
+#   bin/dev reset    drop the firsthomey_shell dev DB
+#
+# At boot the backend auto-mints + registers its ed25519 tenant key with the
+# engine (SHELL_DEV_AUTOPROVISION) — start the engine FIRST so registration lands.
+# Prod launch is the relx release bin (_build/prod/rel/fh_shell/bin/fh_shell);
+# this is its dev mirror (rebar3 shell). Config comes from the repo-root .env.
+#
+set -euo pipefail
+
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"   # shell/web/backend/bin
+BE_DIR="$(dirname "$HERE")"                             # shell/web/backend
+PG_BIN="/opt/homebrew/opt/postgresql@18/bin"
+
+# Make the homebrew Postgres CLI tools reachable if they aren't already on PATH.
+command -v createdb >/dev/null 2>&1 || { [ -d "$PG_BIN" ] && export PATH="$PG_BIN:$PATH"; }
+
+if [ "${1:-}" = "reset" ]; then
+    echo "dropping firsthomey_shell…"
+    dropdb -h localhost --if-exists firsthomey_shell
+    echo "✓ reset — the next boot recreates the schema"
+    exit 0
+fi
+
+if ! nc -z localhost 5432 2>/dev/null; then
+    echo "→ starting homebrew Postgres…"
+    brew services start postgresql@18
+    tries=30
+    until nc -z localhost 5432 2>/dev/null; do
+        tries=$((tries - 1))
+        [ "$tries" -le 0 ] && { echo "  timed out waiting for :5432" >&2; exit 1; }
+        sleep 1
+    done
+fi
+if createdb -h localhost firsthomey_shell 2>/dev/null; then
+    echo "→ created firsthomey_shell"
+fi  # already exists → no-op
+
+echo "→ shell backend on :8081 (reads root .env; auto-provisions its tenant key)…"
+cd "$BE_DIR"
+exec rebar3 shell

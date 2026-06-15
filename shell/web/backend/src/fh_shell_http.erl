@@ -11,7 +11,7 @@
 %% identity/commerce layer in front of the engine, not a re-implementation.
 
 -export([child_spec/0, port/0, routes/0]).
--export([reply_json/3, read_json_body/1]).
+-export([reply_json/3, read_json_body/1, authenticate_user/1]).
 
 -spec child_spec() -> supervisor:child_spec().
 child_spec() ->
@@ -19,7 +19,15 @@ child_spec() ->
     ranch:child_spec(fh_shell_listener, ranch_tcp,
         #{socket_opts => [{port, port()}], max_connections => 1024},
         cowboy_clear,
-        #{env => #{dispatch => Dispatch}}).
+        %% reset_idle_timeout_on_send: cowboy's idle_timeout (default 60s) is reset
+        %% only on data RECEIVED, not sent, unless this is true (cowboy_http
+        %% reset_idle_timeout_on_send, default false). The SSE proxy (fh_shell_h_events,
+        %% 8-S4b) streams a long-lived response where the client sends nothing after
+        %% the request — only the relayed keepalives flow, outbound. Without this the
+        %% stream would be killed at 60s mid-fill; with it each relayed keepalive (15s)
+        %% resets the timer, so the connection lives while the engine is producing and
+        %% dies 60s after it stops. Harmless to ordinary fast request/response.
+        #{env => #{dispatch => Dispatch}, reset_idle_timeout_on_send => true}).
 
 %% Exported so a test can stand up the listener without booting the full app
 %% (the app starts the Postgres pool + migrations; routes that don't touch the
@@ -28,7 +36,18 @@ child_spec() ->
 routes() ->
     [{'_', [
         {"/health", fh_shell_health_handler, []},
-        {"/api/suburbs", fh_shell_h_suburbs, []}
+        {"/api/suburbs", fh_shell_h_suburbs, []},
+        {"/api/plan-cards", fh_shell_h_plan_cards, []},
+        {"/api/plan-cards/:id/events", fh_shell_h_events, []},
+        {"/api/plan-cards/:id/messages", fh_shell_h_plan_card, [messages]},
+        {"/api/plan-cards/:id", fh_shell_h_plan_card, []},
+        %% Login flow (8-S login slice) — one handler, action per route opt.
+        {"/api/auth/magic", fh_shell_h_auth, [magic_request]},
+        {"/api/auth/magic/verify", fh_shell_h_auth, [magic_verify]},
+        {"/api/auth/logout", fh_shell_h_auth, [logout]},
+        {"/api/auth/google", fh_shell_h_auth, [google_start]},
+        {"/api/auth/google/callback", fh_shell_h_auth, [google_callback]},
+        {"/api/me", fh_shell_h_me, []}
     ]}].
 
 -spec port() -> inet:port_number().
@@ -61,4 +80,50 @@ read_all(Req0, Acc) ->
     case cowboy_req:read_body(Req0) of
         {ok, Data, Req1} -> {ok, <<Acc/binary, Data/binary>>, Req1};
         {more, Data, Req1} -> read_all(Req1, <<Acc/binary, Data/binary>>)
+    end.
+
+%% Validate the USER JWT (HS256, shell-architecture.md §3 — the browser<->shell
+%% token, distinct from the ed25519 tenant JWT the shell mints for the engine).
+%% Returns the validated claims or a ready-to-send {error, 401, BodyMap}. A failed
+%% or absent token is uniformly 401 (re-login) — unlike the engine's 401/403 split,
+%% a user session token has no "registered but wrong" case. The login flow sets the
+%% token as the httpOnly `fh_session` cookie (fh_shell_h_auth), so the browser sends
+%% it automatically; an explicit Authorization: Bearer is also accepted (programmatic
+%% callers + tests). Cookie is preferred — it is the credential the SPA actually uses.
+-spec authenticate_user(cowboy_req:req()) -> {ok, map()} | {error, 401, map()}.
+authenticate_user(Req) ->
+    case session_token(Req) of
+        undefined ->
+            {error, 401, #{<<"error">> => <<"missing_authorization">>}};
+        Token ->
+            case fh_shell_jwt:verify(Token) of
+                {ok, Claims} -> {ok, Claims};
+                {error, _Reason} ->
+                    {error, 401, #{<<"error">> => <<"invalid_token">>}}
+            end
+    end.
+
+-spec session_token(cowboy_req:req()) -> binary() | undefined.
+session_token(Req) ->
+    case bearer_token(Req) of
+        undefined -> session_cookie(Req);
+        Token -> Token
+    end.
+
+-spec bearer_token(cowboy_req:req()) -> binary() | undefined.
+bearer_token(Req) ->
+    case cowboy_req:header(<<"authorization">>, Req, undefined) of
+        undefined -> undefined;
+        Header ->
+            case binary:split(Header, <<" ">>) of
+                [<<"Bearer">>, Token] -> Token;
+                _ -> undefined
+            end
+    end.
+
+-spec session_cookie(cowboy_req:req()) -> binary() | undefined.
+session_cookie(Req) ->
+    case proplists:get_value(<<"fh_session">>, cowboy_req:parse_cookies(Req)) of
+        <<>> -> undefined;
+        Val -> Val
     end.

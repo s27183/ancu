@@ -22,6 +22,7 @@ start(_StartType, _StartArgs) ->
         {ok, _PoolPid} ->
             logger:info("shell Postgres pool started"),
             ok = fh_shell_migrations:run(),  %% raises on failure -> boot aborts
+            ok = fh_shell_provision:maybe_autoprovision(),  %% dev-only tenant handshake
             fh_shell_sup:start_link();
         {error, database_url_not_set} ->
             logger:error("SHELL_DATABASE_URL not set — shell backend cannot boot "
@@ -36,15 +37,18 @@ start(_StartType, _StartArgs) ->
 stop(_State) ->
     ok.
 
-%% --- .env loader (borrowed from fh_engine_app; cwd assumption reshaped to the
-%% shell backend — rebar3 shell cwd = shell/web/backend, the .env is one level up). ---
+%% --- .env loader (mirrors fh_engine_app: ONE repo-root .env for both backends,
+%% the aleap/atp convention). rebar3 shell cwd = shell/web/backend, so the repo
+%% root is three levels up. ---
 
 -spec load_dotenv() -> ok.
 load_dotenv() ->
     Path = case os:getenv("DOTENV_PATH") of
         false ->
             {ok, Cwd} = file:get_cwd(),
-            filename:join(filename:dirname(Cwd), ".env");
+            %% cwd = shell/web/backend → repo root is three levels up.
+            filename:join(
+                [filename:dirname(filename:dirname(filename:dirname(Cwd))), ".env"]);
         P -> P
     end,
     case file:read_file(Path) of

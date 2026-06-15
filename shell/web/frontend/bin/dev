@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+#
+# Frontend local-dev launcher. Run from THIS dir:
+#   cd shell/web/frontend && bin/dev
+#
+# Vite dev server on :5173, proxying /api + /health → the shell backend on :8081.
+# Prod build is adapter-static → Cloudflare Pages (npm run build → build/).
+#
+set -euo pipefail
+
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"   # shell/web/frontend/bin
+FE_DIR="$(dirname "$HERE")"                             # shell/web/frontend
+
+cd "$FE_DIR"
+[ -d node_modules ] || npm install
+exec npm run dev

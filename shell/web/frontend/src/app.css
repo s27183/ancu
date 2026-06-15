@@ -342,3 +342,578 @@ main {
         border-radius: 1rem;
     }
 }
+
+/* Affirmative primary action — emerald, full-width, thumb-zone (§7.1). Shared by
+   the plan CTA and onboarding. */
+.primary {
+    border: 1px solid var(--accent);
+    background: var(--accent);
+    color: var(--accent-ink);
+    border-radius: var(--radius);
+    padding: 0.7rem 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+}
+.primary:disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+
+.plan-cta {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* --- Onboarding (8-S3): a focused sheet over the map. Bottom-sheet on phone, a
+   centred card on desktop — one layout, adjusted (§7.1). --------------------- */
+.ob-backdrop {
+    position: absolute;
+    inset: 0;
+    z-index: 40;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    background: rgb(15 23 42 / 0.35);
+}
+.onboarding {
+    background: var(--surface);
+    width: 100%;
+    max-height: 88%;
+    display: flex;
+    flex-direction: column;
+    border-radius: 1rem 1rem 0 0;
+    box-shadow: 0 -2px 16px rgb(15 23 42 / 0.22);
+}
+.ob-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.9rem 1rem 0.5rem;
+}
+.ob-head h2 {
+    margin: 0;
+    font-size: 1.15rem;
+}
+.ob-head .close {
+    margin-left: auto;
+    border: none;
+    background: transparent;
+    font-size: 1.1rem;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 0.2rem 0.4rem;
+    line-height: 1;
+}
+.ob-body {
+    padding: 0.5rem 1rem 1rem;
+    overflow-y: auto;
+}
+.ob-body fieldset {
+    border: none;
+    margin: 0;
+    padding: 0.5rem 0;
+}
+.ob-body legend {
+    padding: 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+}
+/* Yes/No gate + budget chips — large tap targets, calm selected state. */
+.choice {
+    display: flex;
+    gap: 0.5rem;
+}
+.choice button {
+    flex: 1;
+    padding: 0.6rem;
+    font-size: 0.95rem;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--ink);
+    border-radius: var(--radius);
+    cursor: pointer;
+}
+.bands {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+}
+.bands button {
+    padding: 0.6rem;
+    font-size: 0.9rem;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--ink);
+    border-radius: var(--radius);
+    cursor: pointer;
+}
+.choice button.active,
+.bands button.active {
+    border-color: var(--accent);
+    background: #ecfdf5; /* emerald-50 — affirmative, not loud */
+    color: var(--accent);
+    font-weight: 600;
+}
+.ob-hint {
+    margin: 0.5rem 0 0;
+    font-size: 0.72rem;
+    color: var(--muted);
+}
+.ob-note {
+    margin: 0.75rem 0 0;
+    padding: 0.75rem;
+    background: var(--bg);
+    border-radius: var(--radius);
+    font-size: 0.85rem;
+    color: var(--muted);
+}
+.ob-error {
+    margin: 0.75rem 0 0;
+    font-size: 0.85rem;
+    color: #b5341f;
+}
+.ob-foot {
+    padding: 0.75rem 1rem 1rem;
+    border-top: 1px solid var(--border);
+}
+.ob-terminal {
+    padding: 1rem 1.25rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+.ob-terminal h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    color: var(--accent);
+}
+.ob-terminal p {
+    margin: 0;
+    color: var(--muted);
+}
+.ob-terminal .primary {
+    margin-top: 0.5rem;
+}
+
+@media (min-width: 48rem) {
+    .ob-backdrop {
+        align-items: center;
+    }
+    .onboarding {
+        max-width: 26rem;
+        max-height: 80%;
+        border-radius: 1rem;
+    }
+}
+
+/* --- Account chip + sign-in feedback (login slice) ----------------------- */
+
+/* Top-right: the session identity or a sign-in entry. Below the sheet's z so the
+   desktop side-panel takes precedence when open. */
+.account {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.account-email {
+    font-size: 0.8rem;
+    color: var(--ink);
+    background: rgb(255 255 255 / 0.92);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.3rem 0.5rem;
+    box-shadow: 0 1px 4px rgb(15 23 42 / 0.12);
+    max-width: 45vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.account-btn {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--accent);
+    border-radius: var(--radius);
+    padding: 0.35rem 0.7rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 1px 4px rgb(15 23 42 / 0.12);
+}
+
+/* Calm sign-in banner — top-centre, status not alarm; emerald when ok. */
+.signin-banner {
+    position: absolute;
+    top: 0.75rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 35;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    max-width: min(92vw, 26rem);
+    padding: 0.5rem 0.75rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 2px 10px rgb(15 23 42 / 0.18);
+    font-size: 0.85rem;
+    color: var(--ink);
+}
+.signin-banner.ok {
+    border-color: var(--accent);
+    background: #ecfdf5;
+    color: var(--accent);
+}
+.signin-banner button {
+    margin-left: auto;
+    border: none;
+    background: transparent;
+    color: inherit;
+    font-size: 1rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 0.2rem;
+}
+
+/* --- Login sheet (login slice) — reuses .ob-* chrome, adds email + Google --- */
+.auth-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+.auth-field span {
+    font-size: 0.85rem;
+    color: var(--muted);
+}
+.auth-field input {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.65rem 0.6rem;
+    font-size: 1rem;
+    color: var(--ink);
+    background: var(--surface);
+}
+.auth-divider {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin: 1rem 0 0.75rem;
+    color: var(--muted);
+    font-size: 0.8rem;
+}
+.auth-divider::before,
+.auth-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+}
+/* Google: a neutral bordered full-width button, visually secondary to the emerald
+   primary (the magic link is the recommended path). */
+.google-btn {
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--ink);
+    border-radius: var(--radius);
+    padding: 0.7rem 1rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+.dev-link {
+    display: block;
+    word-break: break-all;
+    font-size: 0.72rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+}
+
+/* --- Plan projection (8-S4c): the base plan as titled cards inside the sheet's
+   plan tab. Calm, mobile-first (§7.1) — figures as quiet reference, honest-partial
+   fields render as a muted "pending", never a zero. ----------------------------- */
+.pp-state {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+.pp-state button {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--ink);
+    border-radius: var(--radius);
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.pp-running {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin: 0 0 0.75rem;
+}
+.pp-spinner {
+    width: 0.8rem;
+    height: 0.8rem;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: pp-spin 0.8s linear infinite;
+    flex: none;
+}
+@keyframes pp-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.pp-projection {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.pp-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.75rem 0.85rem;
+    background: var(--surface);
+}
+.pp-card-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 0 0 0.5rem;
+}
+.pp-computing {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin: 0;
+}
+
+/* a label/value row (Field atom) */
+.pp-field {
+    display: flex;
+    flex-direction: column;
+    padding: 0.4rem 0;
+    border-bottom: 1px solid var(--border);
+}
+.pp-field:last-child {
+    border-bottom: none;
+}
+.pp-label {
+    font-size: 0.75rem;
+    color: var(--muted);
+}
+.pp-value {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--ink);
+}
+.pp-value.pp-neg {
+    color: #b91c1c; /* red-700 — a cash gap reads as attention, calmly */
+}
+.pp-pending {
+    font-size: 0.9rem;
+    font-style: italic;
+    color: var(--muted);
+}
+
+/* enum chip */
+.pp-chip {
+    display: inline-block;
+    align-self: flex-start;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    margin-top: 0.1rem;
+}
+.pp-chip-good {
+    background: #ecfdf5;
+    color: #047857;
+    border-color: #a7f3d0;
+}
+.pp-chip-warn {
+    background: #fffbeb;
+    color: #b45309;
+    border-color: #fde68a;
+}
+.pp-chip-info {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border-color: #bfdbfe;
+}
+.pp-chip-neutral {
+    background: var(--bg);
+    color: var(--muted);
+}
+
+/* note lists (engine prose) */
+.pp-notes {
+    padding: 0.4rem 0;
+}
+.pp-notes-head {
+    font-size: 0.75rem;
+    color: var(--muted);
+}
+.pp-notes ul,
+.pp-sublist ul,
+.pp-order {
+    margin: 0.25rem 0 0;
+    padding-left: 1.1rem;
+}
+.pp-notes li,
+.pp-sublist li {
+    font-size: 0.85rem;
+    color: var(--ink);
+    margin: 0.15rem 0;
+}
+
+/* nested lists: schemes / lenders / alerts */
+.pp-sublist {
+    padding: 0.4rem 0;
+    border-bottom: 1px solid var(--border);
+}
+.pp-sublist:last-child {
+    border-bottom: none;
+}
+.pp-scheme,
+.pp-lender,
+.pp-alert {
+    margin-top: 0.4rem;
+}
+.pp-scheme.muted .pp-scheme-name {
+    color: var(--muted);
+}
+.pp-scheme-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+.pp-scheme-name,
+.pp-lender-name,
+.pp-alert-trigger {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--ink);
+}
+.pp-scheme-benefit {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--accent);
+}
+.pp-scheme-why,
+.pp-lender-why {
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin: 0.15rem 0 0;
+}
+.pp-alert {
+    display: flex;
+    flex-direction: column;
+}
+.pp-alert-action {
+    font-size: 0.82rem;
+    color: var(--muted);
+}
+
+/* --- Chat / Q&A (8-S4d) --------------------------------------------------- */
+.chat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+}
+.chat-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 0;
+}
+.chat-log {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.chat-msg {
+    max-width: 85%;
+    padding: 0.5rem 0.7rem;
+    border-radius: var(--radius);
+    font-size: 0.9rem;
+    line-height: 1.45;
+}
+.chat-msg p {
+    margin: 0;
+    white-space: pre-wrap; /* the engine answer carries its own paragraph breaks */
+}
+.chat-msg.user {
+    align-self: flex-end;
+    background: var(--accent);
+    color: #fff;
+}
+.chat-msg.assistant {
+    align-self: flex-start;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--ink);
+}
+.chat-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--muted);
+}
+.chat-err {
+    color: #b45309; /* amber-700 — a calm "couldn't answer", not alarm */
+}
+.chat-input {
+    display: flex;
+    gap: 0.5rem;
+}
+.chat-input input {
+    flex: 1;
+    min-width: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.55rem 0.7rem;
+    font-size: 0.9rem;
+    background: var(--surface);
+    color: var(--ink);
+}
+.chat-input input:disabled {
+    opacity: 0.6;
+}
+.chat-input button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+.chat-disclaimer {
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin: 0;
+}

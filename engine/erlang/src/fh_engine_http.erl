@@ -17,11 +17,20 @@ child_spec() ->
     ranch:child_spec(fh_engine_listener, ranch_tcp,
         #{socket_opts => [{port, port()}], max_connections => 1024},
         cowboy_clear,
-        #{env => #{dispatch => Dispatch}}).
+        %% reset_idle_timeout_on_send: without this, cowboy resets idle_timeout
+        %% (default 60s) only on data RECEIVED, not sent (cowboy_http
+        %% reset_idle_timeout_on_send, default false). The SSE stream
+        %% (fh_engine_h_events) keeps a long-lived turn alive with 15s keepalive
+        %% comments, but those are OUTBOUND — so without this they don't reset the
+        %% timer and the stream is killed at 60s mid-fill (a minutes-long leaf-fill
+        %% is silent between events), forcing a client reconnect. This makes the
+        %% keepalive design actually do its job. Harmless to fast request/response.
+        #{env => #{dispatch => Dispatch}, reset_idle_timeout_on_send => true}).
 
 routes() ->
     [{'_', [
         {"/api/engine/health",                  fh_engine_h_health,     []},
+        {"/api/engine/dev/tenants",             fh_engine_h_dev_provision, []},
         {"/api/engine/suburbs",                 fh_engine_h_suburbs,    []},
         {"/api/engine/plan-cards",              fh_engine_h_plan_cards, []},
         {"/api/engine/plan-cards/:id/events",   fh_engine_h_events,     []},

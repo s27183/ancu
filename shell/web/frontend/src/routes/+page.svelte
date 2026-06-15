@@ -4,11 +4,16 @@
     // state selector (the engine's query grain), a legend, the CC-BY attribution
     // strip (§6.1), and the click-sheet. Mobile-native: full-bleed canvas, the
     // sheet is a bottom-sheet on phone / side-panel on desktop (§7.1).
+    import { onMount } from 'svelte';
     import { getSuburbs, type Suburb, type SuburbSource } from '$lib/api';
     import { AU_STATES, STATE_VIEW, DEFAULT_STATE, type AuState } from '$lib/map';
+    import { signinFlag, type SigninFlag } from '$lib/auth';
+    import { session, sessionLoaded, refreshSession, signOut } from '$lib/stores/session';
     import SuburbMap from '$lib/SuburbMap.svelte';
     import SuburbSheet from '$lib/SuburbSheet.svelte';
-    import { t } from '$lib/i18n';
+    import Onboarding from '$lib/Onboarding.svelte';
+    import Login from '$lib/Login.svelte';
+    import { t, type MessageKey } from '$lib/i18n';
 
     // NB: never name a $state var `state` — svelte-check reads it as a store subscribe.
     let auState = $state<AuState>(DEFAULT_STATE);
@@ -17,8 +22,24 @@
     let loading = $state(true);
     let errored = $state(false);
     let selected = $state<Suburb | null>(null);
+    // Onboarding opens over the map from the selected suburb's planning tab (8-S3).
+    let planning = $state(false);
+    // The login sheet + the calm feedback banner the backend redirects back with.
+    let login = $state(false);
+    let banner = $state<SigninFlag | null>(null);
 
     const view = $derived(STATE_VIEW[auState]);
+
+    // On load: learn the session, and surface any ?signin=… feedback from a redeem /
+    // OAuth redirect, then strip the query so a reload doesn't replay it (§7.1 calm).
+    onMount(() => {
+        refreshSession();
+        const flag = signinFlag(window.location.search);
+        if (flag) {
+            banner = flag;
+            history.replaceState(null, '', window.location.pathname);
+        }
+    });
 
     async function load(st: AuState) {
         loading = true;
@@ -57,6 +78,30 @@
         />
     {/if}
 
+    <!-- Account chip (top-right): the session, or a sign-in entry point. Held back
+         until /api/me resolves so it never flashes "Sign in" for an authed user. -->
+    <div class="account">
+        {#if $session}
+            <span class="account-email">{$session.email}</span>
+            <button type="button" class="account-btn" onclick={() => signOut()}
+                >{$t('auth.signout')}</button
+            >
+        {:else if $sessionLoaded}
+            <button type="button" class="account-btn" onclick={() => (login = true)}
+                >{$t('auth.signin')}</button
+            >
+        {/if}
+    </div>
+
+    {#if banner}
+        <div class="signin-banner" class:ok={banner === 'ok'} role="status">
+            <span>{$t(`auth.flag.${banner}` as MessageKey)}</span>
+            <button type="button" onclick={() => (banner = null)} aria-label={$t('sheet.close')}
+                >✕</button
+            >
+        </div>
+    {/if}
+
     <!-- State selector — the engine's query grain; native <select> is the most
          thumb-friendly control on phone (§7.1). -->
     <div class="state-picker">
@@ -93,7 +138,27 @@
 
     {#if selected}
         {#key selected.sal_code}
-            <SuburbSheet suburb={selected} onclose={() => (selected = null)} />
+            <SuburbSheet
+                suburb={selected}
+                onclose={() => (selected = null)}
+                onplan={() => (planning = true)}
+            />
         {/key}
+    {/if}
+
+    {#if planning && selected}
+        <Onboarding
+            stateCode={auState}
+            suburbName={selected.name}
+            onclose={() => (planning = false)}
+            onsignin={() => {
+                planning = false;
+                login = true;
+            }}
+        />
+    {/if}
+
+    {#if login}
+        <Login onclose={() => (login = false)} />
     {/if}
 </div>

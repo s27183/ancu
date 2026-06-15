@@ -1,0 +1,169 @@
+// Pure plan-card model: the engine's typed outcomes as the shell reads them, plus
+// the bilingual + honest-partial helpers the renderers share. Two engine invariants
+// shape every field here:
+//   - The engine OWNS the content language (bilingual-content.md): free-text prose
+//     arrives as LocalizedText {vi, en}; figures and enums are single-valued. We pick
+//     the display locale here, NEVER route content through the chrome i18n ($t).
+//   - Base-scope fills are honest-partial (base-turn-honest-partial-output): a field
+//     the base turn cannot yet know is null/absent, never faked. So nearly every field
+//     is nullable, and renderers show absence as a calm "pending" — never a zero.
+// No Svelte/DOM imports — unit-testable, mirrors onboarding.ts.
+
+export type Lang = 'vi' | 'en';
+
+/** Free-text prose the engine localized at the source. */
+export interface LocalizedText {
+    vi: string;
+    en: string;
+}
+
+/** Pick the display locale from an engine LocalizedText; '' if absent (so callers can
+ *  treat empty as pending). Falls back to en only if the chosen locale is missing. */
+export function pick(t: LocalizedText | null | undefined, lang: Lang): string {
+    if (!t) return '';
+    return t[lang] || t.en || t.vi || '';
+}
+
+/** A money range [low, high] in AUD, as the engine emits `money_range`. */
+export type MoneyRange = [number, number];
+
+// --- the five base-scope outcome types (registry.outcome_types) -------------
+// Every field is optional + nullable: honest-partial. Renderers read defensively.
+
+/** buyer_profile → summary-card (outcome type `profile`). */
+export interface ProfileOutcome {
+    applicant_count?: number | null;
+    firb_required_any?: boolean | null;
+    intended_occupancy_use?: string | null;
+    assessable_income?: number | null;
+    approx_borrowing_capacity?: MoneyRange | null;
+    deposit_ready_for_purchase_amount?: number | null;
+    target_price_range?: MoneyRange | null;
+    target_zone?: string[] | null;
+    key_constraints?: LocalizedText[] | null;
+    key_strengths?: LocalizedText[] | null;
+}
+
+export interface SchemeEntry {
+    name?: string | null;
+    benefit_value?: number | null;
+    role?: string | null;
+    notes?: LocalizedText[] | null;
+}
+export interface RejectedScheme {
+    name?: string | null;
+    reason?: LocalizedText | null;
+}
+/** eligibility → scheme-stack-card (outcome type `scheme_stack`). */
+export interface SchemeStackOutcome {
+    applicable_schemes?: SchemeEntry[] | null;
+    rejected_schemes?: RejectedScheme[] | null;
+    eligibility_basis?: string | null;
+    total_benefit_value?: number | null;
+    stacking_constraints?: LocalizedText[] | null;
+    recommended_application_order?: string[] | null;
+}
+
+export interface LenderEntry {
+    lender?: string | null;
+    reasoning?: LocalizedText | null;
+    approval_likelihood?: string | null;
+}
+/** mortgage_finance → summary-card (outcome type `mortgage_plan`). */
+export interface MortgagePlanOutcome {
+    recommended_path?: string | null;
+    expected_borrowing_capacity?: MoneyRange | null;
+    recommended_lender_shortlist?: LenderEntry[] | null;
+    pre_approval_action_plan?: LocalizedText[] | null;
+    pre_approval_expiry?: string | null;
+    key_assumptions?: LocalizedText[] | null;
+}
+
+export interface StampDuty {
+    before_concession?: number | null;
+    concession_applied?: number | null;
+    after_concession?: number | null;
+    notes?: LocalizedText[] | null;
+}
+/** cash_position → calculator (outcome type `budget_envelope`). */
+export interface BudgetEnvelopeOutcome {
+    stamp_duty?: StampDuty | null;
+    max_property_price_supported?: number | null;
+    actual_property_price?: number | null;
+    total_cash_required?: number | null;
+    cash_available?: number | null;
+    gap_or_surplus?: number | null;
+    verdict?: string | null;
+    genuine_savings_verdict?: string | null;
+    mitigation_options_if_short?: string[] | null;
+    key_assumptions?: LocalizedText[] | null;
+}
+
+export interface StatutoryBand {
+    low?: number | null;
+    high?: number | null;
+    period?: string | null;
+    components?: string[] | null;
+}
+export interface RecurringCosts {
+    statutory_band?: StatutoryBand | null;
+    strata_levies?: number | null;
+    utilities?: number | null;
+    building_insurance?: number | null;
+    notes?: LocalizedText[] | null;
+}
+export interface AlertTrigger {
+    trigger?: LocalizedText | null;
+    action?: LocalizedText | null;
+}
+/** ownership_planning → data-table (outcome type `ongoing_obligations`). */
+export interface OngoingObligationsOutcome {
+    total_monthly_outgoings_estimate?: number | null;
+    total_annual_outgoings_estimate?: number | null;
+    maintenance_reserve_target?: number | null;
+    recurring_costs_estimate?: RecurringCosts | null;
+    land_tax_check?: string | null;
+    alert_triggers_armed?: AlertTrigger[] | null;
+}
+
+// --- the plan-card envelope (fh_engine_store:get_plan_card) ------------------
+
+/** One filled component as the engine snapshots it (fh_engine_turn entry / the
+ *  component_filled SSE payload). `renderer` is the singular presentation primitive
+ *  (first of the blueprint's `renderers`); `outcome` is the typed result above. */
+export interface ComponentEntry {
+    component_id: string;
+    scope: 'base' | 'both' | 'per-property';
+    renderer: string;
+    outcome: Record<string, unknown>;
+    kb_versions: string[];
+    fill_path: 'resolver' | 'two_path' | 'agent';
+}
+
+export interface PlanCard {
+    plan_card_id: string;
+    blueprint_slug: string;
+    intent: string;
+    mode: string;
+    status: 'active' | 'retired';
+    content: { components?: Record<string, ComponentEntry> };
+}
+
+/** A display handle from GET /api/plan-cards (shell-DB read, no engine call). */
+export interface PlanCardSummary {
+    plan_card_id: string;
+    title: string;
+    created_at: string;
+}
+
+/** The base components in DAG order — the projection renders in this order. The
+ *  engine fills them in the same order (fh_engine_turn ?BASE_COMPONENTS). */
+export const BASE_COMPONENT_ORDER = [
+    'buyer_profile',
+    'eligibility',
+    'mortgage_finance',
+    'cash_position',
+    'ownership_planning'
+] as const;
+
+export type BaseComponentId = (typeof BASE_COMPONENT_ORDER)[number];

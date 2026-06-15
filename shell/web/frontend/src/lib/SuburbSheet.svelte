@@ -7,8 +7,13 @@
     import type { Suburb } from '$lib/api';
     import { t } from '$lib/i18n';
     import { lang } from '$lib/stores/lang';
+    import PlanProjection from '$lib/PlanProjection.svelte';
 
-    let { suburb, onclose }: { suburb: Suburb; onclose: () => void } = $props();
+    let { suburb, onclose, onplan }: {
+        suburb: Suburb;
+        onclose: () => void;
+        onplan: () => void;
+    } = $props();
 
     // Opens on the zone tab. The parent remounts this component per suburb
     // ({#key suburb.sal_code}), so `tab` resets naturally on a new selection —
@@ -100,7 +105,9 @@
                 {/if}
             </div>
         {:else}
-            <p class="placeholder">{$t('sheet.plan.placeholder')}</p>
+            <!-- The plan projection mounts lazily when this tab is shown; it finds the
+                 user's card for THIS zone, or renders the create CTA itself (8-S4c). -->
+            <PlanProjection suburbName={suburb.name} {onplan} />
         {/if}
     </div>
 </div>

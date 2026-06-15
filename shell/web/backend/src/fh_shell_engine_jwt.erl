@@ -29,8 +29,7 @@
 
 -spec mint(#{user_id := binary()}) -> binary().
 mint(#{user_id := UserId}) when is_binary(UserId) ->
-    TenantId = require_env("SHELL_TENANT_ID"),
-    Priv = base64:decode(require_env("SHELL_TENANT_PRIVKEY")),
+    {TenantId, Priv} = tenant_material(),
     Now = erlang:system_time(second),
     Claims = #{
         <<"tenant_id">> => TenantId,
@@ -51,6 +50,22 @@ sign(Claims, Priv) ->
     Sig = fh_shell_util:b64url_encode(
         crypto:sign(eddsa, none, SigningInput, [Priv, ed25519])),
     <<SigningInput/binary, ".", Sig/binary>>.
+
+%% The (tenant_id, raw-private-key) the JWT is signed with. PROD: the static env pair
+%% (SHELL_TENANT_PRIVKEY present → use it, unchanged). DEV: the in-memory keypair
+%% fh_shell_provision minted at boot and stashed in persistent_term. Env wins so the
+%% production path is never shadowed by a stray dev flag.
+-spec tenant_material() -> {binary(), binary()}.
+tenant_material() ->
+    case os:getenv("SHELL_TENANT_PRIVKEY") of
+        Set when Set =/= false, Set =/= "" ->
+            {require_env("SHELL_TENANT_ID"), base64:decode(list_to_binary(Set))};
+        _ ->
+            case persistent_term:get({fh_shell, tenant_material}, undefined) of
+                #{tenant_id := TenantId, priv := Priv} -> {TenantId, Priv};
+                undefined -> error({missing_env, "SHELL_TENANT_PRIVKEY"})
+            end
+    end.
 
 -spec require_env(string()) -> binary().
 require_env(Name) ->

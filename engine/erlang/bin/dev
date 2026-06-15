@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+#
+# Engine local-dev launcher. Run from THIS dir:  cd engine/erlang && bin/dev
+#
+#   bin/dev          engine Postgres (docker :5433) + engine on :8080
+#   bin/dev reset    wipe the engine dev DB (docker compose down -v)
+#
+# Prod launch is the relx release bin (_build/prod/rel/fh_engine/bin/fh_engine);
+# this is its dev mirror (rebar3 shell). Config comes from the repo-root .env.
+#
+set -euo pipefail
+
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"   # engine/erlang/bin
+ERL_DIR="$(dirname "$HERE")"                            # engine/erlang
+ROOT="$(cd "$ERL_DIR/../.." && pwd)"                    # repo root
+COMPOSE="$ROOT/engine/compose.yaml"
+
+if [ "${1:-}" = "reset" ]; then
+    echo "wiping engine dev DB…"
+    docker compose -f "$COMPOSE" down -v
+    echo "✓ reset — the next boot recreates the schema"
+    exit 0
+fi
+
+echo "→ engine Postgres (docker :5433)…"
+docker compose -f "$COMPOSE" up -d
+tries=30
+until nc -z localhost 5433 2>/dev/null; do
+    tries=$((tries - 1))
+    [ "$tries" -le 0 ] && { echo "  timed out waiting for :5433" >&2; exit 1; }
+    sleep 1
+done
+
+echo "→ engine on :8080 (config from root .env)…"
+cd "$ERL_DIR"
+exec rebar3 shell

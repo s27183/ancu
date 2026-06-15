@@ -10,7 +10,7 @@
 %% binary that round-trips cleanly) and every id param is BOUND with an explicit
 %% `$N::uuid` cast (a `text` OID won't implicitly assign to a uuid column).
 
--export([tenant_active_keys/1, upsert_tenant/2, add_signing_key/3]).
+-export([tenant_active_keys/1, upsert_tenant/2, add_signing_key/3, ensure_signing_key/3]).
 -export([create_profile/3, create_plan_card/6]).
 -export([append_event/4, events_since/3]).
 -export([append_audit/6]).
@@ -42,6 +42,19 @@ add_signing_key(TenantId, Algo, PubKeyB64) ->
     _ = query(
         "INSERT INTO tenant_signing_keys (tenant_id, public_key, algo) "
         "VALUES ($1::uuid, $2, $3)",
+        [TenantId, PubKeyB64, Algo]),
+    ok.
+
+%% Idempotent variant for the dev-provision handshake: insert only if this tenant
+%% does not already have this exact public key active. Lets the shell re-register on
+%% every dev boot without the engine accumulating duplicate rows for a stable key.
+-spec ensure_signing_key(binary(), binary(), binary()) -> ok.
+ensure_signing_key(TenantId, Algo, PubKeyB64) ->
+    _ = query(
+        "INSERT INTO tenant_signing_keys (tenant_id, public_key, algo) "
+        "SELECT $1::uuid, $2, $3 WHERE NOT EXISTS ("
+        "  SELECT 1 FROM tenant_signing_keys "
+        "  WHERE tenant_id = $1::uuid AND public_key = $2 AND status = 'active')",
         [TenantId, PubKeyB64, Algo]),
     ok.
 

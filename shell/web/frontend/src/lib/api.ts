@@ -73,3 +73,126 @@ export async function getSuburbs(
     if (!res.ok) throw new Error(`suburbs ${res.status}`);
     return (await res.json()) as SuburbsResponse;
 }
+
+// --- Onboarding: create a plan card (8-S3) ----------------------------------
+// POST /api/plan-cards on the shell backend (fh_shell_h_plan_cards): plan-first
+// (constraint #1) — the body carries mode-derived inputs, never a property. The
+// shell mints the tenant JWT and forwards to the engine, then records its view.
+
+/** The onboarding payload — exactly the fields the engine base turn reads. */
+export interface OnboardingInput {
+    state: string;
+    target_price_range: [number, number];
+    target_zone: string[];
+    intent: 'owner_occupier' | 'investment';
+}
+
+/** The engine's 202 reply: the new plan card + the base turn now running async. */
+export interface CreatePlanCardResult {
+    plan_card_id: string;
+    turn_id: string;
+}
+
+/** A discriminated outcome so the UI can branch calmly (§7.1) without try/catch.
+ *  `auth_required` is the EXPECTED pre-login path: the shell requires a user JWT and
+ *  the login flow is a later slice, so an unauthenticated create returns 401 today. */
+export type CreateOutcome =
+    | { kind: 'created'; result: CreatePlanCardResult }
+    | { kind: 'auth_required' }
+    | { kind: 'error'; status: number };
+
+/** POST /api/plan-cards. No auth header is attached here yet — the login slice will
+ *  decide how the user JWT travels (cookie vs bearer) and wire it in; until then a
+ *  create returns 401 → `auth_required`. */
+export async function createPlanCard(
+    body: OnboardingInput,
+    fetchFn: typeof fetch = fetch
+): Promise<CreateOutcome> {
+    const res = await fetchFn('/api/plan-cards', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(body)
+    });
+    if (res.status === 202) {
+        return { kind: 'created', result: (await res.json()) as CreatePlanCardResult };
+    }
+    if (res.status === 401) return { kind: 'auth_required' };
+    return { kind: 'error', status: res.status };
+}
+
+// --- Plan projection: read a card + list a user's cards (8-S4c) --------------
+// Both go to the shell backend, which gates on the (user, card) ownership binding
+// (plan_card_views) before touching the engine — the engine treats user_id as opaque
+// (§9.3, no cross-DB join). An unowned/unknown/malformed id is a uniform 404. Live
+// fill streams over SSE separately (planCardStream.ts).
+import type { PlanCard, PlanCardSummary } from '$lib/planCard';
+
+/** A discriminated read outcome so the projection branches calmly (§7.1). 404 is the
+ *  EXPECTED "no plan for this zone yet / not signed in" path → onboarding CTA. */
+export type PlanCardOutcome =
+    | { kind: 'ok'; card: PlanCard }
+    | { kind: 'not_found' }
+    | { kind: 'auth_required' }
+    | { kind: 'error'; status: number };
+
+/** GET /api/plan-cards/:id via the shell backend (relays the engine's typed state). */
+export async function getPlanCard(
+    id: string,
+    fetchFn: typeof fetch = fetch
+): Promise<PlanCardOutcome> {
+    const res = await fetchFn(`/api/plan-cards/${encodeURIComponent(id)}`);
+    if (res.ok) return { kind: 'ok', card: (await res.json()) as PlanCard };
+    if (res.status === 404) return { kind: 'not_found' };
+    if (res.status === 401) return { kind: 'auth_required' };
+    return { kind: 'error', status: res.status };
+}
+
+/** GET /api/plan-cards — the signed-in user's plan-card display handles (shell-DB
+ *  read, no engine call). 401 (signed out) returns an empty list — the caller treats
+ *  "no card" and "signed out" identically (both → the create CTA). */
+export async function listPlanCards(
+    fetchFn: typeof fetch = fetch
+): Promise<PlanCardSummary[]> {
+    const res = await fetchFn('/api/plan-cards');
+    if (!res.ok) return [];
+    const body = (await res.json()) as { plan_cards?: PlanCardSummary[] };
+    return body.plan_cards ?? [];
+}
+
+// --- Chat: ask a question about the card (8-S4d) ----------------------------
+// POST /api/plan-cards/:id/messages — starts a kind:qa turn over the FILLED card.
+// The engine answers 202 {turn_id} immediately; the bilingual answer + machinery
+// (tool_use/tool_result/text_delta) stream over the SAME /events EventSource
+// (subscribeConversation). 409 = a turn is already in flight (one per card) → the
+// caller asks the user to wait; the engine, not the shell, owns serialization.
+
+/** A discriminated send outcome so the chat branches calmly. `busy` is the EXPECTED
+ *  path while another turn (e.g. the base fill) is still running. */
+export type MessageOutcome =
+    | { kind: 'accepted'; turnId: string }
+    | { kind: 'busy' }
+    | { kind: 'auth_required' }
+    | { kind: 'not_found' }
+    | { kind: 'error'; status: number };
+
+/** POST a chat message. The answer does NOT come back here — it streams over the
+ *  card's event stream; this returns only the turn handle to attribute those frames. */
+export async function postMessage(
+    planCardId: string,
+    message: string,
+    fetchFn: typeof fetch = fetch
+): Promise<MessageOutcome> {
+    const res = await fetchFn(`/api/plan-cards/${encodeURIComponent(planCardId)}/messages`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ message })
+    });
+    if (res.status === 202) {
+        const body = (await res.json()) as { turn_id: string };
+        return { kind: 'accepted', turnId: body.turn_id };
+    }
+    if (res.status === 409) return { kind: 'busy' };
+    if (res.status === 401) return { kind: 'auth_required' };
+    if (res.status === 404) return { kind: 'not_found' };
+    return { kind: 'error', status: res.status };
+}

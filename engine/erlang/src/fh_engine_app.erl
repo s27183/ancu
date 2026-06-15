@@ -44,8 +44,9 @@ load_dotenv() ->
     Path = case os:getenv("DOTENV_PATH") of
         false ->
             {ok, Cwd} = file:get_cwd(),
-            %% rebar3 shell cwd = engine/erlang -> the engine .env is one level up.
-            filename:join(filename:dirname(Cwd), ".env");
+            %% cwd = engine/erlang → the single repo-root .env is two levels up
+            %% (one .env for both backends, mirroring aleap/atp).
+            filename:join([filename:dirname(filename:dirname(Cwd)), ".env"]);
         P -> P
     end,
     case file:read_file(Path) of
