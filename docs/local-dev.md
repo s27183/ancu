@@ -197,7 +197,7 @@ The next `bin/dev` in each dir recreates that component's schema on boot.
 
 ---
 
-## Production (designed — packaging not yet built)
+## Production (designed — packaging built, deploy not yet executed)
 
 Local dev mirrors the production shape: **per component, each its own deployable** — the
 aleap deployment model FirstHomey targets (aleap `docs/architecture/deployment.md`):
@@ -213,10 +213,12 @@ Both Erlang halves already build as relx releases (`fh_engine`/`fh_shell`,
 replay), and the frontend is already `adapter-static`. The **two databases live on one
 managed cluster** (different db segment), HTTP-only between apps, never a cross-DB join.
 
-**Not yet built:** the DO packaging layer — per-component `Dockerfile` + `app.yaml`, the
-out-of-band PG-cluster provisioning, the secret matrix (secrets in the dashboard, config in
-`app.yaml`), DNS/domains, and the Cloudflare Pages wiring. The full as-designed prod
-topology + runbook (the gaps table is the build checklist) lives in
+**Packaging built; deploy not yet executed.** The DO packaging layer is authored — per-component
+`Dockerfile`, two `app.yaml`, and the Cloudflare Pages **Function** `/api` proxy (both engine +
+shell images build and boot to their fail-closed DB gate locally). What remains is the **execute**
+half (billable, needs the DO account + a real apex): out-of-band PG-cluster provisioning, the
+secret values, `doctl apps create`, DNS/domains, and the Cloudflare Pages env wiring. The full
+as-designed prod topology + runbook (the gaps table is the build checklist) lives in
 [`architecture/deployment.md`](architecture/deployment.md). One divergence carried over:
 FH's tenant seam is **ed25519** (`SHELL_TENANT_ID`/`SHELL_TENANT_PRIVKEY`, public key
 registered with the engine), not aleap's shared-secret `TENANT_SLUG`/`TENANT_SIGNING_KEY`.
