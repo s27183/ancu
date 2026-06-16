@@ -50,7 +50,7 @@ start_link(Args) ->
 -spec callback_mode() -> gen_statem:callback_mode_result().
 callback_mode() -> state_functions.
 
-%% Args (base) :: #{tenant_id, plan_card_id, turn_id, mode, intent,
+%% Args (base) :: #{tenant_id, user_id, plan_card_id, turn_id, mode, intent,
 %%                  firb_required_any, onboarding}
 %% Args (qa)   :: the above with kind => qa, plus card, message, locale (2c-1).
 %% `kind` selects the turn shape: a base/onboarding turn walks the DAG; a Q&A turn
@@ -175,9 +175,9 @@ handle_qa_sidecar(#{<<"method">> := <<"qa_answer">>, <<"params">> := P}, Data) -
             {stop, normal, Data1}
     end;
 handle_qa_sidecar(#{<<"method">> := <<"usage">>, <<"params">> := P},
-                  #{tenant_id := T, plan_card_id := PC, turn_id := Tn} = Data) ->
+                  #{tenant_id := T, user_id := U, plan_card_id := PC, turn_id := Tn} = Data) ->
     emit(T, PC, <<"usage">>,
-         P#{<<"plan_card_id">> => PC, <<"turn_id">> => Tn}),
+         P#{<<"plan_card_id">> => PC, <<"turn_id">> => Tn, <<"user_id">> => U}),
     {keep_state, Data};
 handle_qa_sidecar(#{<<"method">> := <<"qa_done">>},
                   #{tenant_id := T, plan_card_id := PC, turn_id := Tn} = Data) ->
@@ -280,10 +280,13 @@ handle_sidecar(#{<<"method">> := <<"component_filled">>, <<"params">> := P},
             {stop, normal, Data}
     end;
 handle_sidecar(#{<<"method">> := <<"usage">>, <<"params">> := P},
-               #{tenant_id := T, plan_card_id := PC, turn_id := Tn} = Data) ->
+               #{tenant_id := T, user_id := U, plan_card_id := PC, turn_id := Tn} = Data) ->
     %% Meter at the LLM-call boundary (engine-contract §4); persisted Erlang-side.
+    %% user_id rides the event (§9) so the shell's outbox attributes tokens without a
+    %% join — the acting user (the JWT that created the turn; == card owner under the
+    %% 8-S4a ownership gate in Wedge 1a).
     emit(T, PC, <<"usage">>,
-         P#{<<"plan_card_id">> => PC, <<"turn_id">> => Tn}),
+         P#{<<"plan_card_id">> => PC, <<"turn_id">> => Tn, <<"user_id">> => U}),
     {keep_state, Data};
 handle_sidecar(#{<<"method">> := <<"fill_done">>}, Data) ->
     %% The sidecar finished its single component fill; close the disposable port and

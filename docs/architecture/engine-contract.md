@@ -179,7 +179,7 @@ One per shell, each owning its schema. Examples: `users`/`user_profiles` (identi
 
 ### 9.3 Cross-boundary
 
-No cross-DB joins, ever. A shell rendering "my plans with titles and cost" queries the engine API for plan-card primitives and its own DB for display+commerce, then merges in application code (caching engine primitives with TTL/subscription invalidation if hot). The engine emits `usage` once; each shell mirrors its own tenant's events via the **pull-model outbox** (a shell consumer tails `usage` by cursor) — never RPC into engine tables.
+No cross-DB joins, ever. A shell rendering "my plans with titles and cost" queries the engine API for plan-card primitives and its own DB for display+commerce, then merges in application code (caching engine primitives with TTL/subscription invalidation if hot). The engine emits `usage` once; each shell mirrors its own tenant's events via the **pull-model outbox** (a shell consumer tails `usage` by cursor) — never RPC into engine tables. The outbox endpoint is **`GET /api/engine/usage_events?after=<cursor>&limit=<n>`** (8-S5b): tenant-authenticated + tenant-scoped, returning `type='usage'` events with `event_id > after` (ASC, capped), envelope `{events, count, cursor}`. The cursor is the monotonic `plan_card_events.event_id` (a `bigint`); the shell needs no cursor table — it bootstraps from `MAX(engine_event_id)` in its mirror. Each event carries `user_id` (the acting user, §9 above) so the shell attributes tokens without a join.
 
 ## Appendix: relationship to the principles
 

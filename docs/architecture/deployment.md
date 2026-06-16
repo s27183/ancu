@@ -3,11 +3,17 @@
 > **Audience:** whoever stands FirstHomey up or debugs a live deploy.
 > **Scope:** the *as-designed* production topology, boot sequence, the env/secret
 > matrix, the first-time deploy order, and the post-deploy smoke.
-> **Status: DESIGNED — packaging not yet built.** The runtime halves exist and run
-> (relx releases, migrate-on-boot, `adapter-static` frontend); what this doc specifies
-> and does **not** yet exist is the *packaging layer* — per-component `Dockerfile` +
-> `app.yaml`, the managed-PG provisioning, the secret matrix, DNS, and the Cloudflare
-> Pages wiring. The §6 gaps table is therefore also the build checklist for this slice.
+> **Status: PACKAGING BUILT (8-S deploy-build, June 2026) — out-of-band deploy steps
+> remain.** The *packaging layer* now exists and is verified locally: `engine/Dockerfile`
+> + `shell/web/Dockerfile` (both **build and boot** to their fail-closed DB gates — the
+> engine compiles the KB artifact in-build, installs the native `claude` CLI + Python
+> Agent-SDK deps; the shell runtime is `debian:trixie-slim` to match the builder glibc),
+> `engine/app.yaml` + `shell/web/app.yaml` (DO App specs), and the Cloudflare Pages
+> **Function** proxy (`shell/web/frontend/functions/api/[[path]].js` + `health.js`) for
+> the relative-`/api/*` same-origin SPA. What remains is everything that needs your DO
+> account + the real apex: the out-of-band `doctl databases create`, the secret values,
+> DNS/DKIM, the tenant-pubkey `psql` insert, and the Cloudflare Pages env vars (§4 — all
+> **billable / your-go**). The §6 table marks what is built vs still-open.
 >
 > Modeled on aleap's `docs/architecture/deployment.md`, **reshaped to FirstHomey's
 > actual (simpler) topology** — see [§0 How FH differs from aleap](#0-how-fh-differs-from-aleap).
@@ -138,12 +144,17 @@ Cloudflare Pages dashboard.
 | `FH_ENGINE_HTTP_PORT` | config | `8080` |
 | `FH_PLANNER_SCRIPT` | config | path to the real `planner.py` (NOT the stub default) |
 | `FH_SIDECAR_PYTHON` | config | path to the bundled venv's `python` (the SDK deps) |
-| `FH_DEPLOY_COMMIT_SHA` | config | injected from the build — audit trail (constraint #6) |
+| `FH_DEPLOY_COMMIT_SHA` | config | audit trail (constraint #6). DO does **not** auto-inject the git SHA; the Dockerfile defaults it to `"unknown"`. For a real SHA, build via CI with `--build-arg FH_DEPLOY_COMMIT_SHA=$(git rev-parse HEAD)` — plain `deploy_on_push` builds stay `"unknown"`. |
 | `ENGINE_DATABASE_URL` | **secret** | full `doadmin` string, db `firsthomey_engine`, `?sslmode=require`. Not DO-injected (App Platform won't provision the cluster from-spec). Derive from the out-of-band cluster (§4). |
 | `CLAUDE_CODE_OAUTH_TOKEN` | **secret** | Anthropic Max subscription credit for the Agent-SDK planner (the prod runner; see billing.md). |
 | `ANTHROPIC_API_KEY` | **secret** *(optional)* | only if a cash-billed fallback / shadow-costing path is enabled. |
-| `ERLANG_COOKIE` | **secret** | distribution cookie |
 | `ENGINE_DEV_PROVISION` | — | **MUST be unset** (dev-only tenant registration endpoint). |
+
+> **No `ERLANG_COOKIE`.** FH's relx releases have no `config/vm.args.src`, so they run
+> **non-distributed** (single-node DO App, no epmd, no remote console) — there is no
+> cookie to set. (aleap templates a cookie into `vm.args.src`; FH doesn't, so the spec
+> omits it. Add a `vm.args.src` + this secret only if remote-console/distribution is
+> later wanted.)
 
 Tenant **public** keys are NOT env vars — they live in the engine DB
 (`tenant_signing_keys`), provisioned out-of-band (§4 step 5). The engine needs **no
@@ -158,24 +169,42 @@ CORS** (no browser calls it directly).
 | `APP_BASE_URL` | config | `https://app.<apex>` — base for the magic-link + Google redirect URIs |
 | `COOKIE_SECURE` | config | `1` (prod) — `fh_session` gets `Secure` |
 | `EMAIL_FROM` / `EMAIL_FROM_NAME` | config | magic-link sender, e.g. `no-reply@<apex>` / `FirstHomey` |
+| `STRIPE_API_BASE` | config | `https://api.stripe.com` (live default; explicit for clarity — never set the test stub in prod). |
+| `ADDON_AMOUNT_DOC_REVIEW` | config | doc_review add-on price in cents (`4000` = $40). Optional; code defaults to 4000 (8-S5f). |
+| `ADMIN_EMAILS` | config | comma-separated admin allowlist (charge-exempt, still metered — 8-S5e). Emails aren't secret but leave empty in-repo; set the real list in the Dashboard. |
 | `SHELL_DATABASE_URL` | **secret** | `firsthomey_shell` DB on the shared cluster, `?sslmode=require`. Set manually post-cluster (DO doesn't cross-inject DB refs across apps). |
 | `SHELL_JWT_SECRET` | **secret** | user-JWT HMAC (`openssl rand -hex 32`) |
 | `SHELL_TENANT_ID` / `SHELL_TENANT_PRIVKEY` | **secret** | the ed25519 tenant identity — `SHELL_TENANT_PRIVKEY` is base64 of the private key; its **public** half is registered with the engine (§4 step 5). |
 | `RESEND_API_KEY` | **secret** | `re_…` — set → magic-link emails via Resend; unset → link logged. |
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | **secret** | OAuth; redirect URI `https://app.<apex>/api/auth/google/callback`. |
-| `ERLANG_COOKIE` | **secret** | distribution cookie |
+| `STRIPE_SECRET_KEY` | **secret** | Stripe API key (8-S5e/8-S5f) — checkout create + webhook. |
+| `STRIPE_WEBHOOK_SECRET` | **secret** | `whsec_…` — raw-body HMAC verification of Stripe webhooks. |
+| `STRIPE_PRICE_PLUS` / `STRIPE_PRICE_PRO` | **secret** | recurring Price ids → tier reverse-map (8-S5e). |
 | `SHELL_DEV_AUTOPROVISION` | — | **MUST be unset** (else the shell would mint an ephemeral key instead of using the static one). |
+| `AUTH_DEV_EXPOSE_LINK` / `GOOGLE_TOKEN_URL` | — | **MUST be unset** (dev-only magic-link echo / Google-token stub override). |
+
+> **No `ERLANG_COOKIE`** (same reason as the engine — non-distributed release, no
+> `vm.args.src`). Stripe vars are shell-only — the engine never touches money (it
+> meters; the shell gates). `STRIPE_PRICE_*` carry no secret value but are kept as
+> SECRETs to avoid committing account-specific ids.
 
 ### Frontend (Cloudflare Pages) — dashboard
 
-| Var | Value |
-|---|---|
-| `NODE_VERSION` | `20` |
+| Var | Kind | Value |
+|---|---|---|
+| `NODE_VERSION` | build | `20` |
+| `VITE_PMTILES_URL` | **build** | Protomaps pmtiles basemap URL (8-S2d). Vite inlines `import.meta.env.VITE_*` at **build** time, so this is a Pages **build** env var. Unset → the `minimalStyle` fallback (no basemap, no regression). Prod target: the R2 pmtiles extract. |
+| `SHELL_ORIGIN` | **runtime** | the shell backend origin the Pages **Function** proxies to (e.g. `https://api.<apex>`, or the shell `*.ondigitalocean.app` ingress pre-DNS). Read by `functions/api/[[path]].js` + `functions/health.js` at request time — a Pages **runtime** env var, NOT a `VITE_` build var. Unset → the proxy 503s. |
 
-The frontend calls **relative `/api/*`** (no API-base env). Cloudflare Pages must
-**proxy `/api/*` and `/health` to the shell** (`api.<apex>` or the shell ingress) so the
-browser sees one origin — see §4 step 6. This keeps the existing host-only,
-`SameSite=Lax` session cookie and the no-CORS backend working unchanged.
+The frontend calls **relative `/api/*`** (no API-base env), so the browser sees **one
+origin** (`app.<apex>`). Cloudflare Pages **cannot** proxy `/api/*` to an external origin
+via `_redirects` (CF: *"Proxying will only support relative URLs on your site. You cannot
+proxy external domains"*; 200-rewrites are unsupported), so the proxy is a **Pages
+Function** — `shell/web/frontend/functions/api/[[path]].js` (catch-all) + `functions/health.js`
+forward to `SHELL_ORIGIN`, relaying Set-Cookie and streaming SSE. Functions are invoked
+**before** `_redirects`, so the `/* → /index.html 200` SPA fallback never intercepts
+`/api/*` or `/health`. This keeps the host-only, `SameSite=Lax` session cookie and the
+no-CORS backend working unchanged.
 
 ---
 
@@ -245,10 +274,13 @@ already-existing databases. All `doctl … create` steps are **billable + your-g
    `ENGINE_BASE_URL` to the engine's `*.ondigitalocean.app` ingress; revert to
    `engine.<apex>` once DNS lands.
 7. **Frontend** on Cloudflare Pages — root dir `shell/web/frontend`, build
-   `npm install && npm run build`, output `build`, env `NODE_VERSION`. **Add a proxy
-   rule** so `/api/*` and `/health` reach the shell (a `_redirects`/`_routes` rewrite or
-   a Pages Function to `https://api.<apex>/...`) — this is what makes the relative-`/api`
-   SPA + same-origin cookie work without CORS.
+   `npm install && npm run build`, output `build`. The `/api/*` + `/health` proxy is the
+   committed **Pages Function** (`functions/api/[[path]].js` + `functions/health.js`) — it
+   is **not** a `_redirects` rule (CF can't proxy external origins via `_redirects`). Set
+   the dashboard env vars from the §3 frontend table: `NODE_VERSION` + `VITE_PMTILES_URL`
+   (**build**) and `SHELL_ORIGIN` (**runtime**, the shell origin the Function forwards to —
+   the shell `*.ondigitalocean.app` ingress pre-DNS, `https://api.<apex>` after). This is
+   what makes the relative-`/api` SPA + same-origin cookie work without CORS.
 8. **Domains / DNS.** Add DNS for `app.` (Cloudflare Pages custom domain), `api.`, and
    `engine.<apex>` (the two DO apps' `domains:` blocks). The sender domain `<apex>` needs
    its **own DKIM/SPF** verified in Resend (a dedicated apex, not the pre-verified
@@ -284,17 +316,19 @@ already-existing databases. All `doctl … create` steps are **billable + your-g
 
 | Gap | State | Action |
 |---|---|---|
-| **Dockerfiles** (engine + shell) | not written | engine = Erlang release + Python sidecar venv + KB artifact; shell = Erlang release only. |
-| **`engine/app.yaml` + `shell/web/app.yaml`** | not written | DO App specs; build context = repo root; no `databases:` block. |
-| **KB artifact in-image** | compiled locally to `priv/kb/artifact.json` | compile during Docker build (preferred) or `COPY` the committed file; ensure inputs tracked on `main`. |
-| **Agent-SDK runtime deps** | **confirmed — aleap deploys this exact stack** | the engine image needs the **Claude Code CLI as a standalone native binary** (`claude.ai/install.sh`, pinned + `DISABLE_AUTOUPDATER=1`, **no Node**) on PATH, plus Python 3.14 + the venv (claude-agent-sdk / psycopg / pydantic). `claude_agent_sdk.query()` resolves `claude` via `shutil.which` (`setting_sources=[]`), authed by `CLAUDE_CODE_OAUTH_TOKEN` (`_credit_env()` blanks `ANTHROPIC_API_KEY` in the subprocess). Lift aleap's `engine/Dockerfile` install block verbatim. |
-| **Sidecar reads repo files at runtime** | **confirmed — not yet fully stdin-fed** | `planner.py` resolves `_REPO_ROOT = parents[2]` and reads `docs/kb/lender/{serviceability-basics,fhg-panel-list}.md` (leaf-fill, no override) and `engine/erlang/priv/kb/artifact.json` (QA, override `FH_ARTIFACT_PATH`). So the engine image must **ship `docs/kb/**` + the artifact in their repo-relative layout** alongside `engine/python/planner.py` — OR finish the deferred "KB+schema on stdin" so the sidecar is truly stateless (principle 3; the cleaner fix). Decide this before the engine Dockerfile is final. |
+| **Dockerfiles** (engine + shell) | **BUILT + boot-verified** | `engine/Dockerfile` (4-stage: KB-compile → Erlang release → Python deps → runtime) + `shell/web/Dockerfile` (2-stage, `debian:trixie-slim` runtime). Both `docker build` clean and `foreground`-boot to their fail-closed DB gates locally. |
+| **`engine/app.yaml` + `shell/web/app.yaml`** | **WRITTEN** | DO App specs authored; engine `basic-s` (2 GB), shell `apps-s-1vcpu-1gb-fixed`; build context per-service; no `databases:` block. Set `github.repo` (placeholder — FH has no remote yet) + run `doctl apps spec validate` before create. |
+| **KB artifact in-image** | **DONE — compiled in Docker build** | engine Dockerfile stage 1 runs `kb_compiler.py` (pure stdlib), bakes `artifact.json` into the release `priv/kb/` (Erlang boot-load) **and** ships it at `/app/engine/erlang/priv/kb/artifact.json` (sidecar). `artifact.json` is gitignored (rebuildable projection — constraint #6); inputs (`docs/`, `engine/build/`) confirmed tracked. |
+| **Agent-SDK runtime deps** | **DONE — verified in image** | native `claude` CLI 2.1.167 (`claude.ai/install.sh`, `DISABLE_AUTOUPDATER=1`, **no Node**) on PATH + Python 3.14 + claude-agent-sdk/psycopg/pydantic (all `import`-verified in the built image). Authed by `CLAUDE_CODE_OAUTH_TOKEN`; `_credit_env()` blanks `ANTHROPIC_API_KEY` in the subprocess. |
+| **Sidecar reads repo files at runtime** | **resolved this slice → ship-in-image** | the engine image ships `docs/kb/**` + `artifact.json` in their repo-relative layout (`_REPO_ROOT = /app`) alongside `engine/python/planner.py` — verified present in the image. The cleaner "KB+schema on stdin" (truly-stateless sidecar, principle 3) is a **separate engine follow-up**, deliberately NOT folded into this packaging slice (one change at a time). |
+| **Cloudflare Pages `/api` proxy** | **BUILT (Pages Function)** | `functions/api/[[path]].js` + `functions/health.js` proxy to `SHELL_ORIGIN` (relaying Set-Cookie + streaming SSE). `_redirects` **cannot** proxy external origins, confirmed vs CF docs; Functions run before `_redirects`. Set `SHELL_ORIGIN`/`VITE_PMTILES_URL`/`NODE_VERSION` in the Pages dashboard (§3). |
+| **SSE through the Pages Function** | **watch — verify in prod** | the 8-S4b plan-card SSE stream now rides `/api/*` through the Pages Function. Workers stream `fetch` bodies, but **verify long-lived SSE duration/streaming** against CF Pages Function limits in the post-deploy smoke (§5); if capped, consider a dedicated SSE route. |
 | **Prod tenant-pubkey provisioning** | manual `psql` insert (§4 step 5) | works; an authenticated admin endpoint is the future nicety (carried 8-S0b gap). |
-| **Cloudflare Pages `/api` proxy** | not configured | required for the relative-`/api` SPA + same-origin cookie (§4 step 7). |
-| **DNS + custom domains + DKIM/SPF** | none | `app.`/`api.`/`engine.<apex>` + Resend domain verification for the dedicated apex. |
+| **`FH_DEPLOY_COMMIT_SHA` injection** | image defaults `"unknown"` | DO can't auto-inject the git SHA on `deploy_on_push`; build via CI with `--build-arg` for a real audit SHA (constraint #6). |
+| **DNS + custom domains + DKIM/SPF** | none (your-go) | `app.`/`api.`/`engine.<apex>` + Resend domain verification for the dedicated apex. |
 | **PG connection ceiling** | `db-s-1vcpu-1gb` ≈ 22 non-superuser slots | engine + shell pools consume most; bump cluster size if pools error under load. |
 | **VN data residency (Decree 13/2023)** | out of Wedge-1a scope | Wedge 1a is Mode A (AU users); plan VN-side residency from Wedge 2 before onboarding VN-located users (CLAUDE.md). |
-| **Stripe / commerce** | deferred (8-S5 chain) | no billing secrets yet; subscription/metering lands with the commerce slices. |
+| **Stripe / commerce** | **landed (8-S5)** | shell-only secrets (`STRIPE_SECRET_KEY`/`STRIPE_WEBHOOK_SECRET`/`STRIPE_PRICE_*`) now in `shell/web/app.yaml` §3; engine carries none (it meters; the shell gates). |
 
 ---
 

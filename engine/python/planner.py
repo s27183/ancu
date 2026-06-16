@@ -96,6 +96,35 @@ def notify(method, params):
     write_frame({"method": method, "params": params})
 
 
+# --- usage normalization (engine-contract §9) ----------------------------------
+# The Agent SDK's ResultMessage.usage is a VENDOR-shaped dict; flatten it to the
+# engine-contract §9 flat token fields so the `usage` EVENT the shell mirrors is
+# vendor-neutral — Anthropic key names (`cache_*_input_tokens`) must never cross the
+# engine/shell boundary (§6: vendor/model is engine-internal). The contract drops the
+# SDK's `_input` infix on the cache counts. Absent/non-numeric slices → 0 (an error or
+# stub call carries none). tokens_total is the shell's to sum (it is the metered unit).
+def _usage_event(source_detail, model, sdk_usage):
+    u = sdk_usage or {}
+
+    def pick(*keys):
+        for k in keys:
+            v = u.get(k)
+            if isinstance(v, (int, float)):
+                return int(v)
+        return 0
+
+    return {
+        "source": "agent_sdk",
+        "source_detail": source_detail,
+        "model": model,
+        "input_tokens": pick("input_tokens"),
+        "output_tokens": pick("output_tokens"),
+        "cache_read_tokens": pick("cache_read_tokens", "cache_read_input_tokens"),
+        "cache_creation_tokens": pick("cache_creation_tokens",
+                                      "cache_creation_input_tokens"),
+    }
+
+
 # --- bilingual content type (bilingual-content.md §1/§3a) ----------------------
 # Every user-facing FREE-TEXT field is a {vi, en} pair — Vietnamese is first-class,
 # authored in the same pass (not translated; trap #4). Figures/enums/bools/dates stay
@@ -475,8 +504,7 @@ async def handle_fill_component(params):
     # the resolver outcome (fh_engine_mortgage:merge_agent/2) — renderer + kb_versions
     # are the resolver's, so they are omitted here.
     notify("component_filled", {"component_id": component_id, "outcome": leaves})
-    notify("usage", {"component_id": component_id, "source": "agent_sdk",
-                     "model": LEAF_MODEL, "usage": usage})
+    notify("usage", _usage_event(component_id, LEAF_MODEL, usage))
     notify("fill_done", {"component_id": component_id})
 
 
@@ -738,7 +766,7 @@ async def handle_qa(params):
     # Erlang's kb_versions) — internal, never surfaced to the shell.
     notify("qa_answer", {"answer": answer.answer.model_dump(),
                          "kb_slugs": state["consulted"]})
-    notify("usage", {"source": "agent_sdk", "model": QA_MODEL, "usage": usage})
+    notify("usage", _usage_event("qa", QA_MODEL, usage))
     notify("qa_done", {})
 
 

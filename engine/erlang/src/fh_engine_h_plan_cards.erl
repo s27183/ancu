@@ -49,6 +49,7 @@ create(T, U, Params, Req, State) ->
     ok = fh_engine_turn_registry:reserve(PlanCardId, TurnId),
     {ok, _Pid} = fh_engine_turn_sup:start_turn(#{
         tenant_id => T,
+        user_id => U,
         plan_card_id => PlanCardId,
         turn_id => TurnId,
         mode => ?MODE,

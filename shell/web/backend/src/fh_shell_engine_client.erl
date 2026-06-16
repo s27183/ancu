@@ -12,7 +12,7 @@
 %% are built (8-S1..8-S4). HTTP via inets httpc (started by the shell app).
 
 -export([create_plan_card/2, get_plan_card/2, post_message/3, stream_events/3,
-         list_suburbs/1]).
+         list_suburbs/1, get_usage_events/2]).
 
 %% The system principal for unauthenticated reference-data reads. `suburbs` is
 %% global CC-BY reference data; the map is the pre-login landing surface, so the
@@ -116,3 +116,27 @@ list_suburbs(State) ->
 state_query(undefined) -> "";
 state_query(State) when is_binary(State) ->
     "?" ++ uri_string:compose_query([{<<"state">>, State}]).
+
+%% Poll the engine's pull-model usage outbox (billing.md §2) for THIS tenant's usage
+%% events with event_id > After, capped at Limit. Tenant-wide, not user-scoped: the
+%% endpoint authorizes on the tenant JWT and ignores user_id, so mint with the system
+%% principal (the nil-uuid, same faithful "no acting user" as list_suburbs — the usage
+%% mirror is a tenant-level concern, not a user request). Returns the decoded envelope
+%% {ok, #{<<"events">> := [...], <<"cursor">> := Int, <<"count">> := Int}} on 200, or
+%% {error, Reason} on a non-200 / transport failure (the consumer logs + retries).
+-spec get_usage_events(integer(), pos_integer()) -> {ok, map()} | {error, term()}.
+get_usage_events(After, Limit) ->
+    Token = fh_shell_engine_jwt:mint(#{user_id => ?ANON_USER_ID}),
+    Query = uri_string:compose_query([{<<"after">>, integer_to_binary(After)},
+                                      {<<"limit">>, integer_to_binary(Limit)}]),
+    Url = base_url() ++ "/usage_events?" ++ Query,
+    Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
+    case httpc:request(get, {Url, Headers},
+                       [{connect_timeout, 5000}], [{body_format, binary}]) of
+        {ok, {{_, 200, _}, _, Body}} ->
+            {ok, fh_shell_util:json_decode(Body)};
+        {ok, {{_, Status, _}, _, Body}} ->
+            {error, {http, Status, Body}};
+        {error, Reason} ->
+            {error, Reason}
+    end.

@@ -1,6 +1,9 @@
 # SPA fallback. Any path that doesn't match a built file (deep links like
 # /onboarding, /plan/:id, /curator) serves index.html with status 200 so the
-# SvelteKit client router takes over. /api/* and /health are served by the shell
-# backend (Erlang), not the static host.
+# SvelteKit client router takes over.
+#
+# /api/* and /health are handled by Pages Functions (functions/), which proxy to
+# the shell backend. Functions are invoked BEFORE _redirects for matching routes,
+# so this /* catch-all never intercepts them.
 
 /*  /index.html  200

@@ -58,14 +58,31 @@ read(UserId, PlanCardId, Req0, Opts) ->
 %% owns the message contract (non-empty, in-flight serialization); a bad body relays
 %% through. The bilingual answer arrives later as text_delta frames on the SSE stream
 %% (proxied in 8-S4b), not in this reply — the engine answers 202 here.
+%%
+%% The §7 pre-call token-limit GATE runs FIRST (8-S5d, billing.md §7): a Q&A turn is
+%% always an agent turn, so a user already over their tier's period token limit is
+%% blocked with a 402 BEFORE any tenant JWT is minted or the engine is touched —
+%% metering-not-gating, the engine would happily run it; the shell decides. (The
+%% base-plan create turn is the free offering and is deliberately NOT gated; only
+%% this chat/refresh surface is — billing.md §5 "capped chat/refresh".)
 ask(UserId, PlanCardId, Req0, Opts) ->
-    case fh_shell_http:read_json_body(Req0) of
-        {ok, Body, Req1} ->
-            {Status, Resp} = fh_shell_engine_client:post_message(UserId, PlanCardId, Body),
-            {ok, relay(Status, Resp, Req1), Opts};
-        {error, invalid_json} ->
-            {ok, fh_shell_http:reply_json(400,
-                #{<<"error">> => <<"invalid_json">>}, Req0), Opts}
+    case fh_shell_meter:gate(UserId) of
+        allow ->
+            case fh_shell_http:read_json_body(Req0) of
+                {ok, Body, Req1} ->
+                    {Status, Resp} =
+                        fh_shell_engine_client:post_message(UserId, PlanCardId, Body),
+                    {ok, relay(Status, Resp, Req1), Opts};
+                {error, invalid_json} ->
+                    {ok, fh_shell_http:reply_json(400,
+                        #{<<"error">> => <<"invalid_json">>}, Req0), Opts}
+            end;
+        {block, #{tier := Tier, used := Used, limit := Limit}} ->
+            {ok, fh_shell_http:reply_json(402,
+                #{<<"error">> => <<"quota_exceeded">>,
+                  <<"tier">> => Tier,
+                  <<"used_tokens">> => Used,
+                  <<"limit_tokens">> => Limit}, Req0), Opts}
     end.
 
 %% Relay the engine's already-encoded JSON body + status verbatim (same as the

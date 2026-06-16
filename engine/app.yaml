@@ -1,0 +1,81 @@
+# DigitalOcean App Platform spec — FirstHomey engine (deployment.md §3/§4).
+#
+# Deploy:  doctl apps spec validate --spec engine/app.yaml
+#          doctl apps create --spec engine/app.yaml
+# (The "Create App from repo" wizard reports "No components detected" because the
+#  Dockerfiles live in subdirs — use the App Spec editor / doctl, deployment.md §4.)
+#
+# The managed PG cluster (firsthomey-pg, PG 16, sgp1) is provisioned OUT-OF-BAND
+# via `doctl databases create` — NOT from a `databases:` block here. App Platform
+# won't create a cluster from-spec, and an attached block hands a restricted user
+# that can't CREATE DATABASE. The engine connects via ENGINE_DATABASE_URL (doadmin
+# creds, db firsthomey_engine, ?sslmode=require) — set as a SECRET below.
+#
+# Region slugs: the APP region is `sgp`; the PG CLUSTER region is `sgp1`.
+
+name: firsthomey-engine
+region: sgp
+services:
+  - name: engine
+    # Build context = repo root so the Dockerfile can reach docs/ (KB sources),
+    # engine/build/ (compiler), and repo-root pyproject.toml/uv.lock.
+    source_dir: /
+    dockerfile_path: engine/Dockerfile
+    github:
+      # TODO(operator): set to your GitHub repo (FH has no remote yet).
+      repo: <github-owner>/firsthomey
+      branch: main
+      deploy_on_push: true
+    http_port: 8080
+    # Heavier of the two apps — carries the per-turn Python Agent-SDK subprocess.
+    # `basic-s` ≈ 1 vcpu / 2 GB. Slugs drift — confirm with
+    # `doctl apps tier instance-size list`.
+    instance_size_slug: basic-s
+    instance_count: 1
+    health_check:
+      http_path: /health
+      # Boot runs migrations + loads the KB artifact before serving — a short delay
+      # avoids a boot-time health flap.
+      initial_delay_seconds: 60
+      period_seconds: 10
+      timeout_seconds: 5
+      success_threshold: 1
+      failure_threshold: 3
+    envs:
+      # ── Config (non-secret; committed) ──────────────────────────────────────────
+      - key: FH_ENGINE_HTTP_PORT
+        value: "8080"
+      - key: FH_SIDECAR_PYTHON
+        value: "python3"
+      - key: FH_PLANNER_SCRIPT
+        value: "/app/engine/python/planner.py"
+      # Audit-trail commit SHA (constraint #6). DO does NOT auto-inject the git SHA;
+      # set it per build (CI: --build-arg FH_DEPLOY_COMMIT_SHA=$(git rev-parse HEAD))
+      # or leave the image default "unknown" for plain deploy_on_push (deployment.md §6).
+      - key: FH_DEPLOY_COMMIT_SHA
+        value: "unknown"
+      # ── Secrets (set in DO Dashboard → Settings → Environment Variables) ─────────
+      # Full doadmin string, db firsthomey_engine, ?sslmode=require. Derive from the
+      # out-of-band cluster (deployment.md §4 step 2/4). Not DO-injected.
+      - key: ENGINE_DATABASE_URL
+        type: SECRET
+      # Anthropic Max-subscription credit for the Agent-SDK planner (the prod runner;
+      # billing.md). The native `claude` binary authes off this; the planner blanks
+      # ANTHROPIC_API_KEY in the SDK subprocess so this token wins.
+      - key: CLAUDE_CODE_OAUTH_TOKEN
+        type: SECRET
+      # Optional cash-billed fallback / shadow-costing path only.
+      - key: ANTHROPIC_API_KEY
+        type: SECRET
+      # ── Intentionally UNSET in prod ─────────────────────────────────────────────
+      # ENGINE_DEV_PROVISION — the dev-only POST /api/engine/dev/tenants endpoint must
+      # stay 404 in prod. Prod tenant pubkeys are provisioned out-of-band (deployment.md
+      # §4 step 5). Do NOT add it here.
+      #
+      # The engine needs NO CORS (no browser hits it directly — the suburb map is
+      # proxied through the shell). Tenant PUBLIC keys live in the engine DB
+      # (tenant_signing_keys), not env.
+
+domains:
+  - domain: engine.firsthomey.com.au  # <apex> placeholder — substitute your real apex
+    type: PRIMARY

@@ -12,7 +12,7 @@
 
 -export([tenant_active_keys/1, upsert_tenant/2, add_signing_key/3, ensure_signing_key/3]).
 -export([create_profile/3, create_plan_card/6]).
--export([append_event/4, events_since/3]).
+-export([append_event/4, events_since/3, usage_events_since/3]).
 -export([append_audit/6]).
 -export([snapshot_component/3, get_plan_card/2]).
 -export([list_suburbs_by_state/1, list_suburb_sources/0]).
@@ -101,6 +101,20 @@ events_since(TenantId, PlanCardId, LastEventId) ->
         "ORDER BY event_id ASC",
         [TenantId, PlanCardId, LastEventId]),
     [{Id, Type, decode_jsonb(Payload)} || {Id, Type, Payload} <- rows(Res)].
+
+%% Tenant-wide `usage` event tail for the shell's pull-model outbox (billing.md §2,
+%% engine-contract §9). Returns this TENANT's usage events with event_id > Cursor, in
+%% order, capped at Limit → [{EventId, PayloadMap}]. Unlike events_since/3 this is NOT
+%% scoped to one plan card: the shell mirrors ALL of its tenant's usage (the meter is
+%% tenant/user-wide). event_id is the bigint IDENTITY → the consumer's cursor.
+-spec usage_events_since(binary(), integer(), pos_integer()) -> [{integer(), map()}].
+usage_events_since(TenantId, Cursor, Limit) ->
+    Res = query(
+        "SELECT event_id, payload_jsonb FROM plan_card_events "
+        "WHERE tenant_id = $1::uuid AND type = 'usage' AND event_id > $2 "
+        "ORDER BY event_id ASC LIMIT $3",
+        [TenantId, Cursor, Limit]),
+    [{Id, decode_jsonb(Payload)} || {Id, Payload} <- rows(Res)].
 
 %% --- compliance audit trail (compliance-pipeline.md §5) ---------------------
 
