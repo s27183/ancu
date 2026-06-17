@@ -10,6 +10,8 @@
     import { BUDGET_BANDS, buildOnboardingInput, type BudgetBand } from '$lib/onboarding';
     import { t } from '$lib/i18n';
     import { lang } from '$lib/stores/lang';
+    import { fade } from 'svelte/transition';
+    import { modalCard } from '$lib/transitions';
 
     let { stateCode, suburbName, onclose, onsignin }: {
         stateCode: string;
@@ -53,8 +55,8 @@
     }
 </script>
 
-<div class="ob-backdrop">
-<div class="onboarding" role="dialog" aria-modal="true" aria-label={suburbName}>
+<div class="ob-backdrop" transition:fade={{ duration: 200 }}>
+<div class="onboarding" role="dialog" aria-modal="true" aria-label={suburbName} transition:modalCard>
     <header class="ob-head">
         <h2>{$t('onboarding.title')} {suburbName}</h2>
         <button type="button" class="close" onclick={onclose} aria-label={$t('sheet.close')}

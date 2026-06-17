@@ -7,6 +7,7 @@
     import type { Suburb } from '$lib/api';
     import { t } from '$lib/i18n';
     import { lang } from '$lib/stores/lang';
+    import { sheet } from '$lib/transitions';
     import PlanProjection from '$lib/PlanProjection.svelte';
 
     let { suburb, onclose, onplan }: {
@@ -29,7 +30,8 @@
     }
 </script>
 
-<div class="sheet" role="dialog" aria-modal="false" aria-label={suburb.name}>
+<div class="sheet" role="dialog" aria-modal="false" aria-label={suburb.name} transition:sheet>
+    <div class="sheet-handle"></div>
     <header class="sheet-head">
         <div class="title">
             <h2>{suburb.name}</h2>

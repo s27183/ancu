@@ -15,7 +15,7 @@
 -export([append_event/4, events_since/3, usage_events_since/3]).
 -export([append_audit/6]).
 -export([snapshot_component/3, get_plan_card/2]).
--export([list_suburbs_by_state/1, list_suburb_sources/0]).
+-export([list_suburbs_by_state/1, list_all_suburbs/0, list_suburb_sources/0]).
 -export([read_glue/3, append_session_turn/6]).
 
 %% --- tenancy / auth ---------------------------------------------------------
@@ -185,11 +185,23 @@ get_plan_card(TenantId, PlanCardId) ->
 %% the table is the superset, the shell decides what to render (§2/§4).
 -spec list_suburbs_by_state(binary()) -> [map()].
 list_suburbs_by_state(State) ->
-    Res = query(
+    suburb_rows(query(
         "SELECT sal_code, name, state, lga_name, is_capital_city, "
         "centroid_lat, centroid_lon, facts_jsonb "
         "FROM suburbs WHERE state = $1 ORDER BY name",
-        [State]),
+        [State])).
+
+%% The "ALL" map scope — every state in one payload. `suburbs` is global reference
+%% data (no tenant filter), so this is just the by-state query without the WHERE.
+-spec list_all_suburbs() -> [map()].
+list_all_suburbs() ->
+    suburb_rows(query(
+        "SELECT sal_code, name, state, lga_name, is_capital_city, "
+        "centroid_lat, centroid_lon, facts_jsonb "
+        "FROM suburbs ORDER BY state, name",
+        [])).
+
+suburb_rows(Res) ->
     [#{<<"sal_code">> => Sal,
        <<"name">> => Name,
        <<"state">> => St,

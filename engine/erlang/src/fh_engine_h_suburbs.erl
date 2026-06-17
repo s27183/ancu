@@ -8,9 +8,9 @@
 %% tenant: `suburbs` is GLOBAL reference data with no tenant_id (§1). This is the
 %% one handler that authenticates a tenant then ignores it for row selection.
 %%
-%% `state` is the query grain (§4 "the map queries by state") and is REQUIRED —
-%% the unfiltered ~15k-row dump is not a surface we serve; a viewport/bbox variant
-%% lands with the map (8-S2) if it needs one.
+%% `state` is the query grain (§4 "the map queries by state") and is REQUIRED.
+%% `state=ALL` is the one explicit opt-in to the national scope (every state in one
+%% payload — the map's "ALL" view). A viewport/bbox variant lands later if needed.
 
 -export([init/2]).
 
@@ -26,10 +26,14 @@ handle_get(Req0, State) ->
     case fh_engine_http:authenticate(Req0) of
         {ok, _Claims} ->
             case state_param(Req0) of
-                {ok, St} ->
+                {ok, Scope} ->
+                    {Label, Suburbs} = case Scope of
+                        all -> {<<"ALL">>, fh_engine_store:list_all_suburbs()};
+                        St  -> {St, fh_engine_store:list_suburbs_by_state(St)}
+                    end,
                     Body = #{
-                        <<"state">> => St,
-                        <<"suburbs">> => fh_engine_store:list_suburbs_by_state(St),
+                        <<"state">> => Label,
+                        <<"suburbs">> => Suburbs,
                         <<"attribution">> => fh_engine_store:list_suburb_sources()
                     },
                     {ok, fh_engine_http:reply_json(200, Body, Req0), State};
@@ -49,6 +53,8 @@ state_param(Req) ->
         undefined ->
             {error, #{<<"error">> => <<"missing_state">>,
                       <<"detail">> => <<"query param `state` is required">>}};
+        <<"ALL">> ->
+            {ok, all};
         St ->
             case lists:member(St, valid_states()) of
                 true  -> {ok, St};

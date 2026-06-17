@@ -14,13 +14,23 @@ const messages = {
         vi: 'Kế hoạch mua nhà đầu tiên tại Úc',
         en: 'Your first-home plan in Australia'
     },
-    'nav.home': { vi: 'Trang chính', en: 'Home' },
-    'nav.status': { vi: 'Trạng thái', en: 'Status' },
     'lang.label': { vi: 'Ngôn ngữ', en: 'Language' },
 
     'map.state.label': { vi: 'Bang', en: 'State' },
-    'map.legend.title': { vi: 'Tỉ lệ cộng đồng gốc Việt', en: 'Vietnamese ancestry' },
+    'map.state.all': { vi: 'Tất cả', en: 'All' },
+    // Size filter — the criterion driving each suburb dot's colour + size. The chosen
+    // criterion's label doubles as the legend title.
+    'map.size.label': { vi: 'Hiển thị theo', en: 'Show by' },
+    'map.size.seifa': { vi: 'Chỉ số kinh tế', en: 'Economic index' },
+    'map.size.vietnamese': { vi: 'Cộng đồng gốc Việt', en: 'Vietnamese community' },
+    'map.size.population': { vi: 'Dân số', en: 'Population' },
+    'map.size.crime': { vi: 'Chỉ số tội phạm', en: 'Recorded criminal incidents' },
     'map.legend.nodata': { vi: 'Chưa có dữ liệu', en: 'No data' },
+    'map.sources': { vi: 'Nguồn dữ liệu', en: 'Data sources' },
+    'map.zoomhint': {
+        vi: 'Phóng to vào một thành phố để so sánh từng khu vực',
+        en: 'Zoom into a city to compare suburbs'
+    },
     'map.loading': { vi: 'Đang tải bản đồ…', en: 'Loading the map…' },
     'map.error': {
         vi: 'Không tải được dữ liệu khu vực. Vui lòng thử lại.',

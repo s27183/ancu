@@ -6,9 +6,21 @@
     // sheet is a bottom-sheet on phone / side-panel on desktop (§7.1).
     import { onMount } from 'svelte';
     import { getSuburbs, type Suburb, type SuburbSource } from '$lib/api';
-    import { AU_STATES, STATE_VIEW, DEFAULT_STATE, type AuState } from '$lib/map';
+    import {
+        MAP_SCOPES,
+        STATE_VIEW,
+        DEFAULT_STATE,
+        SIZE_CRITERIA,
+        DEFAULT_SIZE_BY,
+        legendFor,
+        heatmapEnabled,
+        OVERVIEW_MAX_ZOOM,
+        type MapScope,
+        type SizeBy
+    } from '$lib/map';
     import { signinFlag, type SigninFlag } from '$lib/auth';
-    import { session, sessionLoaded, refreshSession, signOut } from '$lib/stores/session';
+    import { refreshSession } from '$lib/stores/session';
+    import { loginOpen } from '$lib/stores/ui';
     import SuburbMap from '$lib/SuburbMap.svelte';
     import SuburbSheet from '$lib/SuburbSheet.svelte';
     import Onboarding from '$lib/Onboarding.svelte';
@@ -16,7 +28,20 @@
     import { t, type MessageKey } from '$lib/i18n';
 
     // NB: never name a $state var `state` — svelte-check reads it as a store subscribe.
-    let auState = $state<AuState>(DEFAULT_STATE);
+    let auState = $state<MapScope>(DEFAULT_STATE);
+    // The criterion driving each suburb dot's colour + size (economic index default).
+    let sizeBy = $state<SizeBy>(DEFAULT_SIZE_BY);
+    const sizeLabelKey = {
+        seifa: 'map.size.seifa',
+        vietnamese: 'map.size.vietnamese',
+        population: 'map.size.population',
+        crime: 'map.size.crime'
+    } as const;
+    const legend = $derived(legendFor(sizeBy));
+    // Live map zoom (reported by SuburbMap). Drives the overview hint for intensive
+    // criteria, which have no heatmap and only reveal their dots once you zoom in.
+    let mapZoom = $state(STATE_VIEW[DEFAULT_STATE].zoom);
+    const showZoomHint = $derived(!heatmapEnabled(sizeBy) && mapZoom < OVERVIEW_MAX_ZOOM);
     let suburbs = $state<Suburb[]>([]);
     let attribution = $state<SuburbSource[]>([]);
     let loading = $state(true);
@@ -24,9 +49,11 @@
     let selected = $state<Suburb | null>(null);
     // Onboarding opens over the map from the selected suburb's planning tab (8-S3).
     let planning = $state(false);
-    // The login sheet + the calm feedback banner the backend redirects back with.
-    let login = $state(false);
+    // The calm feedback banner the backend redirects back with (the login sheet's
+    // open state now lives in the shared `loginOpen` store, opened from the header).
     let banner = $state<SigninFlag | null>(null);
+    // CC-BY attribution is required (§6.1) but space-cheap when collapsed to a chip.
+    let attrOpen = $state(false);
 
     const view = $derived(STATE_VIEW[auState]);
 
@@ -41,7 +68,7 @@
         }
     });
 
-    async function load(st: AuState) {
+    async function load(st: MapScope) {
         loading = true;
         errored = false;
         selected = null;
@@ -74,24 +101,11 @@
             {suburbs}
             center={view.center}
             zoom={view.zoom}
+            {sizeBy}
             onselect={(s) => (selected = s)}
+            onzoom={(z) => (mapZoom = z)}
         />
     {/if}
-
-    <!-- Account chip (top-right): the session, or a sign-in entry point. Held back
-         until /api/me resolves so it never flashes "Sign in" for an authed user. -->
-    <div class="account">
-        {#if $session}
-            <span class="account-email">{$session.email}</span>
-            <button type="button" class="account-btn" onclick={() => signOut()}
-                >{$t('auth.signout')}</button
-            >
-        {:else if $sessionLoaded}
-            <button type="button" class="account-btn" onclick={() => (login = true)}
-                >{$t('auth.signin')}</button
-            >
-        {/if}
-    </div>
 
     {#if banner}
         <div class="signin-banner" class:ok={banner === 'ok'} role="status">
@@ -102,24 +116,44 @@
         </div>
     {/if}
 
-    <!-- State selector — the engine's query grain; native <select> is the most
-         thumb-friendly control on phone (§7.1). -->
-    <div class="state-picker">
-        <label for="state-select">{$t('map.state.label')}</label>
-        <select id="state-select" bind:value={auState}>
-            {#each AU_STATES as s (s)}
-                <option value={s}>{s}</option>
-            {/each}
-        </select>
+    <!-- Map controls — state (the engine's query grain) + the size/colour criterion.
+         Native <select>s, restyled: the most thumb-friendly control on phone (§7.1). -->
+    <div class="map-controls">
+        <div class="control">
+            <label for="state-select">{$t('map.state.label')}</label>
+            <div class="select-wrap">
+                <select id="state-select" bind:value={auState}>
+                    {#each MAP_SCOPES as s (s)}
+                        <option value={s}>{s === 'ALL' ? $t('map.state.all') : s}</option>
+                    {/each}
+                </select>
+            </div>
+        </div>
+        <div class="control">
+            <label for="size-select">{$t('map.size.label')}</label>
+            <div class="select-wrap">
+                <select id="size-select" bind:value={sizeBy}>
+                    {#each SIZE_CRITERIA as c (c)}
+                        <option value={c}>{$t(sizeLabelKey[c])}</option>
+                    {/each}
+                </select>
+            </div>
+        </div>
     </div>
 
-    <!-- Vietnamese-ancestry legend -->
+    <!-- Legend — reflects the selected criterion (its label + gradient + endpoints). -->
     <div class="legend" aria-hidden="true">
-        <span class="legend-title">{$t('map.legend.title')}</span>
-        <div class="legend-bar"></div>
-        <div class="legend-scale"><span>0%</span><span>40%+</span></div>
+        <span class="legend-title">{$t(sizeLabelKey[sizeBy])}</span>
+        <div class="legend-bar" style="background:linear-gradient(to right, {legend.gradient})"></div>
+        <div class="legend-scale"><span>{legend.min}</span><span>{legend.max}</span></div>
         <div class="legend-nodata"><span class="swatch"></span>{$t('map.legend.nodata')}</div>
     </div>
+
+    <!-- Intensive criteria (a rate / an index) get no overview heatmap — a density sum
+         would be dishonest — so prompt to zoom in where the per-suburb dots read. -->
+    {#if showZoomHint}
+        <div class="zoom-hint">{$t('map.zoomhint')}</div>
+    {/if}
 
     {#if loading}
         <div class="overlay"><p>{$t('map.loading')}</p></div>
@@ -131,8 +165,22 @@
     {/if}
 
     {#if attribution.length}
-        <div class="attribution">
-            {#each attribution as src (src.source_id)}<span>{src.attribution}</span>{/each}
+        <!-- Collapsed to a small chip by default (CC-BY stays accessible, §6.1). -->
+        <div class="attribution" class:open={attrOpen}>
+            <button
+                type="button"
+                class="attr-toggle"
+                aria-expanded={attrOpen}
+                onclick={() => (attrOpen = !attrOpen)}
+            >
+                <span class="attr-mark" aria-hidden="true">©</span>
+                <span class="attr-label">{$t('map.sources')}</span>
+            </button>
+            {#if attrOpen}
+                <div class="attr-list">
+                    {#each attribution as src (src.source_id)}<span>{src.attribution}</span>{/each}
+                </div>
+            {/if}
         </div>
     {/if}
 
@@ -153,12 +201,12 @@
             onclose={() => (planning = false)}
             onsignin={() => {
                 planning = false;
-                login = true;
+                loginOpen.set(true);
             }}
         />
     {/if}
 
-    {#if login}
-        <Login onclose={() => (login = false)} />
+    {#if $loginOpen}
+        <Login onclose={() => loginOpen.set(false)} />
     {/if}
 </div>

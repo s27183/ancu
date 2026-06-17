@@ -10,7 +10,45 @@
     --border: #e2e8f0;
     --accent: #047857; /* emerald-700 — placeholder brand accent */
     --accent-ink: #ffffff;
-    --radius: 0.4rem;
+    --accent-soft: #ecfdf5; /* emerald-50 — calm selected/affirmative wash */
+    --radius: 0.6rem;
+    --radius-lg: 1rem;
+    /* Layered, soft shadows — depth without the harsh 1px drop of the old chrome. */
+    --shadow-1: 0 1px 2px rgb(15 23 42 / 0.06), 0 2px 8px rgb(15 23 42 / 0.08);
+    --shadow-2: 0 6px 16px rgb(15 23 42 / 0.12), 0 24px 48px rgb(15 23 42 / 0.18);
+    --scrim: rgb(15 23 42 / 0.45);
+    --ring: 0 0 0 3px rgb(4 120 87 / 0.18); /* focus ring keyed to the accent */
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --t-fast: 140ms;
+    --t-med: 240ms;
+    /* Uniform glass language. `glass` = floating chrome over the map (lighter,
+       stronger blur). `panel` = content surfaces you READ over the map (sheet/modals)
+       — higher opacity so text stays legible against a moving basemap. */
+    --glass-bg: rgb(255 255 255 / 0.72);
+    --glass-blur: saturate(1.4) blur(14px);
+    --glass-border: rgb(255 255 255 / 0.5);
+    --panel-bg: rgb(255 255 255 / 0.92);
+    --panel-blur: saturate(1.2) blur(18px);
+    --header-h: 3.25rem;
+}
+
+/* The shared glass surface — one rule every floating control opts into. */
+.glass {
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+}
+
+/* A single, consistent focus ring for every interactive control (replaces the
+   browser-default outline that read as "1990s"). */
+button:focus-visible,
+select:focus-visible,
+input:focus-visible,
+a:focus-visible {
+    outline: none;
+    box-shadow: var(--ring);
+    border-color: var(--accent);
 }
 
 * {
@@ -37,19 +75,30 @@ body {
     line-height: 1.5;
 }
 
+/* A floating glass bar over the full-bleed map (so the map runs edge-to-edge under
+   it). Content pages clear it via .content's padding-top. */
 header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 20; /* below the sheet (30) so the desktop drawer covers it top-to-bottom */
+    height: var(--header-h);
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    padding: 0.75rem 1rem;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
+    padding: 0 1rem;
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    border-bottom: 1px solid var(--glass-border);
 }
 
 header .brand {
     font-weight: 700;
     color: var(--accent);
     text-decoration: none;
+    letter-spacing: -0.01em;
 }
 
 header nav {
@@ -59,20 +108,45 @@ header nav {
     gap: 0.5rem;
 }
 
-.lang button {
+/* Segmented language toggle: a pill track with a sliding white thumb under the
+   active segment. */
+.lang {
+    position: relative;
+    display: inline-flex;
+    padding: 0.15rem;
+    border-radius: 999px;
+    background: rgb(15 23 42 / 0.06);
     border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--muted);
-    border-radius: var(--radius);
-    padding: 0.15rem 0.5rem;
-    cursor: pointer;
-    font-size: 0.85rem;
 }
-
+.lang-thumb {
+    position: absolute;
+    top: 0.15rem;
+    bottom: 0.15rem;
+    width: calc(50% - 0.15rem);
+    left: 0.15rem;
+    border-radius: 999px;
+    background: var(--surface);
+    box-shadow: var(--shadow-1);
+    transition: transform var(--t-med) var(--ease);
+}
+.lang[data-active='en'] .lang-thumb {
+    transform: translateX(100%);
+}
+.lang button {
+    position: relative;
+    z-index: 1;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    border-radius: 999px;
+    padding: 0.25rem 0.7rem;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: color var(--t-fast) var(--ease);
+}
 .lang button.active {
-    background: var(--accent);
-    color: var(--accent-ink);
-    border-color: var(--accent);
+    color: var(--ink);
 }
 
 /* Map-first, full-bleed: the app is a viewport-height column (header + flexing main),
@@ -95,7 +169,7 @@ main {
 }
 
 .content {
-    padding: 1.5rem 1rem;
+    padding: calc(var(--header-h) + 1.5rem) 1rem 1.5rem;
     max-width: 48rem;
     margin: 0 auto;
 }
@@ -111,48 +185,90 @@ main {
     height: 100%;
     width: 100%;
     overflow: hidden;
-    background: #eef2f6;
+    background: #e7e9ed;
 }
 
-/* State selector — top-left, compact, thumb-reachable. */
-.state-picker {
+/* Map controls — top-left card grouping the state + size-criterion pickers. */
+.map-controls {
     position: absolute;
-    top: 0.75rem;
+    top: calc(var(--header-h) + 0.75rem);
     left: 0.75rem;
     z-index: 10;
     display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.35rem 0.5rem;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    box-shadow: 0 1px 4px rgb(15 23 42 / 0.12);
-    font-size: 0.85rem;
+    flex-direction: column;
+    gap: 0.55rem;
+    padding: 0.7rem 0.75rem;
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-1);
 }
-.state-picker label {
+.map-controls .control {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+.map-controls label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
     color: var(--muted);
 }
-.state-picker select {
+
+/* Custom-styled native <select>: keep the accessible/thumb-friendly native control,
+   but dress it with a chevron + padding + focus ring so it stops looking 1990s. */
+.select-wrap {
+    position: relative;
+}
+.select-wrap::after {
+    content: '';
+    position: absolute;
+    right: 0.7rem;
+    top: 50%;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-right: 2px solid var(--muted);
+    border-bottom: 2px solid var(--muted);
+    transform: translateY(-65%) rotate(45deg);
+    pointer-events: none;
+}
+.select-wrap select {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 100%;
+    min-width: 9rem;
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 0.25rem 0.4rem;
+    padding: 0.5rem 2rem 0.5rem 0.7rem;
     font-size: 0.9rem;
+    font-weight: 500;
     background: var(--surface);
     color: var(--ink);
+    cursor: pointer;
+    transition:
+        border-color var(--t-fast) var(--ease),
+        box-shadow var(--t-fast) var(--ease);
+}
+.select-wrap select:hover {
+    border-color: #cbd5e1;
 }
 
 /* Vietnamese-ancestry legend — bottom-left, calm + affirmative. */
 .legend {
     position: absolute;
-    bottom: 2.25rem;
+    bottom: 0.75rem;
     left: 0.75rem;
     z-index: 10;
-    padding: 0.5rem 0.6rem;
-    background: rgb(255 255 255 / 0.92);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    box-shadow: 0 1px 4px rgb(15 23 42 / 0.12);
+    padding: 0.6rem 0.7rem;
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-1);
     font-size: 0.72rem;
     color: var(--muted);
     max-width: 11rem;
@@ -166,7 +282,7 @@ main {
 .legend-bar {
     height: 0.5rem;
     border-radius: 999px;
-    background: linear-gradient(to right, #fdf4e3, #fcd9a6, #f4a261, #e76f51, #b5341f);
+    /* gradient set inline per the selected criterion (legendFor in +page) */
 }
 .legend-scale {
     display: flex;
@@ -187,6 +303,27 @@ main {
     border: 1px solid #fff;
 }
 
+/* Overview hint for intensive criteria (no heatmap) — a calm centred glass pill. */
+.zoom-hint {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    padding: 0.5rem 0.9rem;
+    border-radius: 999px;
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-1);
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--ink);
+    pointer-events: none;
+    white-space: nowrap;
+}
+
 /* Loading / error — calm, centred, never alarming (§7.1). */
 .overlay {
     position: absolute;
@@ -197,7 +334,7 @@ main {
     align-items: center;
     justify-content: center;
     gap: 0.75rem;
-    background: rgb(238 242 246 / 0.85);
+    background: rgb(231 233 237 / 0.85);
     color: var(--muted);
 }
 .overlay button {
@@ -209,22 +346,56 @@ main {
     cursor: pointer;
 }
 
-/* CC-BY attribution strip (§6.1) — must render where the layer shows. */
+/* CC-BY attribution (§6.1) — required, but collapsed to a small chip bottom-right so
+   it stops eating a full-width strip. Click expands the source list. */
 .attribution {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    bottom: 0.5rem;
+    right: 0.75rem;
     z-index: 10;
     display: flex;
-    flex-wrap: wrap;
-    gap: 0 0.6rem;
-    padding: 0.15rem 0.5rem;
-    background: rgb(255 255 255 / 0.82);
-    border-top: 1px solid var(--border);
-    font-size: 0.62rem;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.3rem;
+    max-width: min(80vw, 22rem);
+}
+.attr-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.25rem 0.55rem;
+    border-radius: 999px;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: var(--shadow-1);
+    font-size: 0.7rem;
+    font-weight: 600;
     color: var(--muted);
-    line-height: 1.3;
+    cursor: pointer;
+}
+.attr-mark {
+    font-weight: 700;
+}
+.attribution:not(.open) .attr-label {
+    /* collapsed: keep the label readable but tight */
+}
+.attr-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.5rem 0.6rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--glass-border);
+    background: var(--panel-bg);
+    -webkit-backdrop-filter: var(--panel-blur);
+    backdrop-filter: var(--panel-blur);
+    box-shadow: var(--shadow-1);
+    font-size: 0.62rem;
+    line-height: 1.35;
+    color: var(--muted);
+    text-align: right;
 }
 
 /* Click-sheet: a bottom-sheet on phone, a side-panel on desktop — one layout,
@@ -232,22 +403,33 @@ main {
 .sheet {
     position: absolute;
     z-index: 30;
-    background: var(--surface);
+    background: var(--panel-bg);
+    -webkit-backdrop-filter: var(--panel-blur);
+    backdrop-filter: var(--panel-blur);
     display: flex;
     flex-direction: column;
-    box-shadow: 0 -2px 16px rgb(15 23 42 / 0.18);
-    /* phone: bottom sheet */
+    box-shadow: var(--shadow-2);
+    /* phone: a modern partial bottom-sheet with a grab handle. */
     left: 0;
     right: 0;
     bottom: 0;
-    max-height: 70%;
-    border-radius: 1rem 1rem 0 0;
+    max-height: 85%;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+/* Grab handle — phone only; the desktop drawer hides it. */
+.sheet-handle {
+    flex: none;
+    width: 2.25rem;
+    height: 0.3rem;
+    border-radius: 999px;
+    background: var(--border);
+    margin: 0.5rem auto 0;
 }
 .sheet-head {
     display: flex;
     align-items: flex-start;
     gap: 0.5rem;
-    padding: 0.9rem 1rem 0.5rem;
+    padding: 0.7rem 1rem 0.5rem;
 }
 .sheet-head .title h2 {
     margin: 0;
@@ -330,16 +512,21 @@ main {
     color: var(--accent);
 }
 
-/* Desktop: the sheet becomes a right side-panel; the picker/legend stay put. */
+/* Desktop: the sheet becomes a full-height drawer, flush right, top-to-bottom (it
+   covers the header by design — a focused detail surface). */
 @media (min-width: 48rem) {
     .sheet {
-        top: 0.75rem;
-        bottom: 0.75rem;
-        right: 0.75rem;
+        top: 0;
+        bottom: 0;
+        right: 0;
         left: auto;
-        width: 22rem;
+        width: 24rem;
         max-height: none;
-        border-radius: 1rem;
+        border-radius: 0;
+        border-left: 1px solid var(--glass-border);
+    }
+    .sheet-handle {
+        display: none;
     }
 }
 
@@ -350,15 +537,28 @@ main {
     background: var(--accent);
     color: var(--accent-ink);
     border-radius: var(--radius);
-    padding: 0.7rem 1rem;
+    padding: 0.8rem 1rem;
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
     width: 100%;
+    box-shadow: var(--shadow-1);
+    transition:
+        transform var(--t-fast) var(--ease),
+        background var(--t-fast) var(--ease),
+        box-shadow var(--t-fast) var(--ease);
+}
+.primary:hover:not(:disabled) {
+    background: #036249; /* emerald-800 */
+    box-shadow: var(--shadow-2);
+}
+.primary:active:not(:disabled) {
+    transform: translateY(1px);
 }
 .primary:disabled {
     opacity: 0.45;
     cursor: default;
+    box-shadow: none;
 }
 
 .plan-cta {
@@ -376,16 +576,19 @@ main {
     display: flex;
     align-items: flex-end;
     justify-content: center;
-    background: rgb(15 23 42 / 0.35);
+    background: var(--scrim);
+    backdrop-filter: blur(2px);
 }
 .onboarding {
-    background: var(--surface);
+    background: var(--panel-bg);
+    -webkit-backdrop-filter: var(--panel-blur);
+    backdrop-filter: var(--panel-blur);
     width: 100%;
     max-height: 88%;
     display: flex;
     flex-direction: column;
-    border-radius: 1rem 1rem 0 0;
-    box-shadow: 0 -2px 16px rgb(15 23 42 / 0.22);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    box-shadow: var(--shadow-2);
 }
 .ob-head {
     display: flex;
@@ -430,13 +633,17 @@ main {
 }
 .choice button {
     flex: 1;
-    padding: 0.6rem;
+    padding: 0.7rem;
     font-size: 0.95rem;
     border: 1px solid var(--border);
     background: var(--surface);
     color: var(--ink);
     border-radius: var(--radius);
     cursor: pointer;
+    transition:
+        border-color var(--t-fast) var(--ease),
+        background var(--t-fast) var(--ease),
+        color var(--t-fast) var(--ease);
 }
 .bands {
     display: grid;
@@ -444,18 +651,27 @@ main {
     gap: 0.5rem;
 }
 .bands button {
-    padding: 0.6rem;
+    padding: 0.7rem;
     font-size: 0.9rem;
     border: 1px solid var(--border);
     background: var(--surface);
     color: var(--ink);
     border-radius: var(--radius);
     cursor: pointer;
+    transition:
+        border-color var(--t-fast) var(--ease),
+        background var(--t-fast) var(--ease),
+        color var(--t-fast) var(--ease);
+}
+.choice button:hover,
+.bands button:hover {
+    border-color: #cbd5e1;
+    background: var(--bg);
 }
 .choice button.active,
 .bands button.active {
     border-color: var(--accent);
-    background: #ecfdf5; /* emerald-50 — affirmative, not loud */
+    background: var(--accent-soft); /* affirmative, not loud */
     color: var(--accent);
     font-weight: 600;
 }
@@ -507,7 +723,7 @@ main {
     .onboarding {
         max-width: 26rem;
         max-height: 80%;
-        border-radius: 1rem;
+        border-radius: var(--radius-lg);
     }
 }
 
@@ -515,56 +731,46 @@ main {
 
 /* Top-right: the session identity or a sign-in entry. Below the sheet's z so the
    desktop side-panel takes precedence when open. */
-.account {
-    position: absolute;
-    top: 0.75rem;
-    right: 0.75rem;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
+/* Account chip — now lives inline in the header nav. */
 .account-email {
     font-size: 0.8rem;
-    color: var(--ink);
-    background: rgb(255 255 255 / 0.92);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 0.3rem 0.5rem;
-    box-shadow: 0 1px 4px rgb(15 23 42 / 0.12);
-    max-width: 45vw;
+    color: var(--muted);
+    max-width: 32vw;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+/* Ghost button — transparent so it blends into the glass header (no opaque white pill);
+   a faint accent edge + accent text read cleanly on the blur. */
 .account-btn {
-    border: 1px solid var(--border);
-    background: var(--surface);
+    border: 1px solid rgb(4 120 87 / 0.32);
+    background: transparent;
     color: var(--accent);
-    border-radius: var(--radius);
-    padding: 0.35rem 0.7rem;
-    font-size: 0.85rem;
+    border-radius: 999px;
+    padding: 0.35rem 0.85rem;
+    font-size: 0.82rem;
     font-weight: 600;
     cursor: pointer;
-    box-shadow: 0 1px 4px rgb(15 23 42 / 0.12);
 }
 
 /* Calm sign-in banner — top-centre, status not alarm; emerald when ok. */
 .signin-banner {
     position: absolute;
-    top: 0.75rem;
+    top: calc(var(--header-h) + 0.75rem);
     left: 50%;
     transform: translateX(-50%);
-    z-index: 35;
+    z-index: 36;
     display: flex;
     align-items: center;
     gap: 0.6rem;
     max-width: min(92vw, 26rem);
-    padding: 0.5rem 0.75rem;
-    background: var(--surface);
-    border: 1px solid var(--border);
+    padding: 0.55rem 0.8rem;
+    background: var(--panel-bg);
+    -webkit-backdrop-filter: var(--panel-blur);
+    backdrop-filter: var(--panel-blur);
+    border: 1px solid var(--glass-border);
     border-radius: var(--radius);
-    box-shadow: 0 2px 10px rgb(15 23 42 / 0.18);
+    box-shadow: var(--shadow-2);
     font-size: 0.85rem;
     color: var(--ink);
 }
@@ -916,4 +1122,72 @@ main {
     font-size: 0.72rem;
     color: var(--muted);
     margin: 0;
+}
+
+/* --- UI polish: shared refinements (motion, hover, round close targets) ----- */
+
+/* Close buttons (sheet + modals) become round, tactile hover targets. */
+.sheet-head .close,
+.ob-head .close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.9rem;
+    height: 1.9rem;
+    padding: 0;
+    border-radius: 999px;
+    transition:
+        background var(--t-fast) var(--ease),
+        color var(--t-fast) var(--ease);
+}
+.sheet-head .close:hover,
+.ob-head .close:hover {
+    background: var(--bg);
+    color: var(--ink);
+}
+
+/* Tabs: a smoother underline + hover ink. */
+.sheet .tabs button {
+    transition:
+        color var(--t-fast) var(--ease),
+        border-color var(--t-fast) var(--ease);
+}
+.sheet .tabs button:hover {
+    color: var(--ink);
+}
+
+/* Secondary / neutral buttons pick up the same calm motion. */
+.account-btn,
+.google-btn,
+.choice button,
+.pp-state button {
+    transition:
+        background var(--t-fast) var(--ease),
+        border-color var(--t-fast) var(--ease),
+        box-shadow var(--t-fast) var(--ease);
+}
+.google-btn:hover,
+.pp-state button:hover {
+    background: var(--bg);
+    border-color: #cbd5e1;
+}
+.account-btn:hover {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+}
+
+/* Text inputs: a soft, consistent surface (focus ring is global). */
+.auth-field input,
+.chat-input input {
+    transition:
+        border-color var(--t-fast) var(--ease),
+        box-shadow var(--t-fast) var(--ease);
+}
+
+/* Respect users who prefer no motion — disable transitions + transforms. */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+    }
 }

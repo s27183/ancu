@@ -1,0 +1,16 @@
+# Staged build-time inputs for the suburb adapters (suburb-adapter-workflow.md).
+#
+# COMMITTED here: vpsr-median-*.xls (VIC price) and lsg_stats_*.xlsx (SA price). They
+# are small AND non-refetchable by automation — VPSR is Cloudflare-walled and
+# data.sa.gov.au 403s every programmatic client — so pinning the file in git is the
+# only way to reproduce the build. (No ignore line: they don't match the patterns below.)
+#
+# IGNORED: the CSA Victoria crime workbooks (Data_Tables_*.xlsx, ~18 MB each). Unlike
+# VPSR, the CSA file host (files.crimestatistics.vic.gov.au) is openly reachable, so
+# the input is refetchable from the URL recorded in README.md — no need to carry the
+# weight in git. Re-download into this dir before re-running `suburbs.csa_vic`.
+Data_Tables_*.xlsx
+#
+# IGNORED: the QLD crime CSV (qps) — 21 MB from data.qld.gov.au (AWS-WAF-walled, but
+# refetchable via a browser; refetch URL in README.md). Re-download before `suburbs.qps`.
+*_Reported_Offences_Number.csv
