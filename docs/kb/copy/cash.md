@@ -8,13 +8,16 @@ last_verified: 2026-06-01
 
 User-facing copy-templates for the `cash_position` resolver half (`fh_engine_cash`): the
 stamp-duty `notes` (concession applied / phased out / full duty / pending), the
-`key_assumptions` narration, and the two pending-state notes. Each template is a `{vi, en}`
-pair with `{param}` placeholders the resolver fills via `fh_engine_i18n:subst/2`.
+`key_assumptions` narration, the pending-state notes, and the NEED-side notes (Decision 9 —
+deposit assumption, banded other-costs, the pending reserve buffer). Each template is a
+`{vi, en}` pair with `{param}` placeholders the resolver fills via `fh_engine_i18n:subst/2`.
 
 Params here are all **scalars** (same in both languages, per the figure/locale boundary,
 bilingual-content.md §3b/§4): `{state}` is a state code proper noun (NSW/VIC/QLD), `{ceiling}`
-and `{saving}` are money figures the resolver pre-formats with `fh_engine_money:money/1`
-(the engine emits the bare composed figure; fine-grained locale formatting is shell-owned, §4).
+and `{saving}` are money figures the resolver pre-formats with `fh_engine_money:money/1`,
+and `{pct}` / `{months}` are integers (deposit percentage, reserve months) the resolver
+passes raw (`fh_engine_i18n:subst/2` stringifies them; the engine emits the bare composed
+figure, fine-grained locale formatting is shell-owned, §4).
 
 This is a **copy doc**: it fills no slot and is not a blueprint anchor (reference-exempt;
 only slug==path + content_json-parse gates apply). Vietnamese is authored for register —
@@ -37,6 +40,10 @@ template ids the resolver references, each a `{vi, en}` pair.
       "vi": "Thuế trước bạ cho tiểu bang {state} chưa được tính ở đây (hiện hỗ trợ NSW, VIC, QLD).",
       "en": "Transfer duty for {state} is not yet modelled (NSW, VIC, QLD supported)."
     },
+    "note_state_unknown": {
+      "vi": "Chưa xác định được tiểu bang cho khu vực của bạn, nên chưa ước tính thuế trước bạ.",
+      "en": "We couldn't determine the state for your area yet, so transfer duty isn't estimated."
+    },
     "assume_stamp_only": {
       "vi": "Hiện mới ước tính thuế trước bạ trong các chi phí khi hoàn tất giao dịch; bức tranh tiền mặt đầy đủ sẽ hiện ra khi bạn nhập thu nhập, tiền tiết kiệm và một bất động sản cụ thể.",
       "en": "Stamp duty is the only settlement cost estimated so far; the full cash picture fills in as you add income, savings and a property."
@@ -44,6 +51,26 @@ template ids the resolver references, each a `{vi, en}` pair.
     "assume_ceiling": {
       "vi": "Thuế được tính ở mức cao nhất trong khoảng giá mục tiêu của bạn ({ceiling}).",
       "en": "Duty computed at the top of your target range ({ceiling})."
+    },
+    "assume_need_side": {
+      "vi": "Đây là số tiền cần để bắt đầu mua — tiền đặt cọc, thuế trước bạ và chi phí giao dịch, ước tính ở mức cao nhất trong khoảng giá mục tiêu. Việc bạn có đủ hay không sẽ rõ khi bạn nhập thu nhập và tiền tiết kiệm.",
+      "en": "This is what it costs to get in — deposit, transfer duty and transaction costs, estimated at the top of your target range. Whether your savings cover it fills in once you add your income and savings."
+    },
+    "deposit_min_fhg": {
+      "vi": "Giả định mức đặt cọc tối thiểu {pct}% theo phương án Bảo lãnh Nhà đầu tiên (không cần bảo hiểm khoản vay LMI).",
+      "en": "Assumes the minimum {pct}% deposit on the First Home Guarantee path (no LMI)."
+    },
+    "deposit_min_floor": {
+      "vi": "Giả định mức đặt cọc tối thiểu {pct}%; phương án vay của bạn sẽ xác nhận con số này.",
+      "en": "Assumes the minimum {pct}% deposit; your loan path will confirm the figure."
+    },
+    "costs_banded": {
+      "vi": "Phí đăng bộ của nhà nước là con số chính xác; chi phí kiểm định, sang tên, bảo hiểm, điện nước và chuyển nhà là khoảng ước tính thông thường — báo giá thực tế của bạn mới là con số ràng buộc. Bảo hiểm công trình áp dụng cho nhà riêng; với căn hộ chung cư, khoản này nằm trong phí quản lý chung cư.",
+      "en": "Government registration fees are exact; inspection, conveyancing, insurance, utilities and moving are typical ranges — your own quotes are the binding figures. Building insurance applies to houses; for a strata apartment it sits in the body-corporate levies instead."
+    },
+    "reserve_pending": {
+      "vi": "Nên giữ một khoản dự phòng sau khi hoàn tất giao dịch, khoảng {months} tháng tiền trả góp — chúng tôi sẽ tính cụ thể khi biết mức trả góp khoản vay của bạn.",
+      "en": "A post-settlement cash buffer of about {months} months of repayments is recommended — we'll size it once your loan repayment is known."
     },
     "duty_concession_applied": {
       "vi": "Đã bao gồm ưu đãi thuế trước bạ cho người mua nhà lần đầu — giảm khoảng {saving} — còn chờ xác nhận thông tin của bạn.",

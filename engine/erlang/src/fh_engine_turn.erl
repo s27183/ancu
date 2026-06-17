@@ -60,7 +60,10 @@ init(#{tenant_id := T, plan_card_id := PC, turn_id := Tn} = Args) ->
     emit(T, PC, <<"turn_started">>,
          #{<<"plan_card_id">> => PC, <<"turn_id">> => Tn}),
     case maps:get(kind, Args, base) of
-        base ->
+        K when K =:= base; K =:= base_resolver ->
+            %% base = full walk (resolver + two-path sidecar); base_resolver =
+            %% resolver-only refresh (plan-card-refresh.md): two-path components run
+            %% their resolver half and re-attach the EXISTING agent leaves, no sidecar.
             Components = base_components(),
             Data = Args#{components => Components, outcomes => #{}},
             {ok, running, Data, [{next_event, internal, step}]};
@@ -92,17 +95,31 @@ running(internal, step, #{components := [Comp | Rest]} = Data) ->
                     {stop, normal, Data}
             end;
         two_path ->
-            %% Two-path (mortgage-finance-two-path.md): run the RESOLVER half first
-            %% (all figures + the loan-path structure), then spawn the sidecar to fill
-            %% only the agent leaves, passing the resolver outcome as read-only
-            %% grounding. The walk parks until the sidecar replies; merge_agent folds
-            %% the leaves in (§98: the agent never authors a figure — slot-scoped merge).
-            {RO, Renderer, KbVersions} =
-                fh_engine_fill:resolver(Name, Data, maps:get(outcomes, Data)),
-            Port = start_fill_port(Comp, Data, RO),
-            Pending = #{kind => two_path, comp => Comp, resolver_outcome => RO,
-                        renderer => Renderer, kb => KbVersions},
-            {keep_state, Data#{components := Rest, port => Port, pending => Pending}};
+            %% Two-path (mortgage-finance-two-path.md): the FULL turn runs the resolver
+            %% half then spawns the sidecar for the agent leaves (§98: slot-scoped merge,
+            %% the agent never authors a figure). A RESOLVER-ONLY refresh (base_resolver)
+            %% SKIPS this component entirely — it does NOT re-run or re-commit it. The
+            %% agent leaf's inputs didn't change, and re-committing the STORED leaf through
+            %% the fail-closed gate would crash on legacy/non-bilingual data. The stored
+            %% outcome is left exactly as-is (the shortlist preserved) and injected into
+            %% `outcomes` only so downstream resolver reads stay consistent.
+            case maps:get(kind, Data, base) of
+                base_resolver ->
+                    Existing = maps:get(Name, maps:get(existing_outcomes, Data, #{}), #{}),
+                    OutcomeType = maps:get(<<"outcome_type">>, Comp, Name),
+                    Outcomes = maps:get(outcomes, Data),
+                    {keep_state,
+                     Data#{components := Rest,
+                           outcomes := Outcomes#{OutcomeType => Existing}},
+                     [{next_event, internal, step}]};
+                _ ->
+                    {RO, Renderer, KbVersions} =
+                        fh_engine_fill:resolver(Name, Data, maps:get(outcomes, Data)),
+                    Port = start_fill_port(Comp, Data, RO),
+                    Pending = #{kind => two_path, comp => Comp, resolver_outcome => RO,
+                                renderer => Renderer, kb => KbVersions},
+                    {keep_state, Data#{components := Rest, port => Port, pending => Pending}}
+            end;
         agent ->
             %% Pure agent: the sidecar fills the whole outcome (no resolver half — the
             %% later per-property valuation/negotiation components). Park until it replies.

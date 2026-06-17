@@ -123,6 +123,23 @@ The base plan for Mode B captures the most regulatory complexity even before a s
 
 Mode B activates two new surfaces (Family view, FIRB & Funding) that don't appear in Mode A. The remaining tabs map similarly but with foreign-person-aware content.
 
+**Machine-readable form** — compiled to `ui_tabs` in the artifact, **canonical for the runtime** (the table above is the human view), in the canonical lifecycle order. `kind: synthesis` is a shell-composed summary; `interactive: true` is the client-side cash what-if. The `journey` tab gains `purchase_journey` (per-mode base swimlane) when Mode B content is built. Structure is authored now; **Mode B content is dormant** until `fhb-foreign-au` comes in scope (see [`../architecture/plan-card-lifecycle-restoration.md`](../architecture/plan-card-lifecycle-restoration.md) §4).
+
+```jsonc
+{
+  "ui_tabs": [
+    { "tab_id": "overview",            "kind": "synthesis",  "components": ["buyer_profile", "family_context", "property_assessment"] },
+    { "tab_id": "family_view",         "kind": "components", "components": ["family_context"], "note": "Mode B central surface; bilingual" },
+    { "tab_id": "firb_funding",        "kind": "components", "components": ["firb_workflow", "cross_border_funding"] },
+    { "tab_id": "cash_calculator",     "kind": "components", "interactive": true, "components": ["cash_position"] },
+    { "tab_id": "journey",             "kind": "components", "components": ["settlement_prep"] },
+    { "tab_id": "property",            "kind": "components", "components": ["property_assessment", "due_diligence"] },
+    { "tab_id": "buying",              "kind": "components", "components": ["buying_strategy"] },
+    { "tab_id": "after_you_buy",       "kind": "components", "components": ["ownership_planning"] }
+  ]
+}
+```
+
 ---
 
 ## Components

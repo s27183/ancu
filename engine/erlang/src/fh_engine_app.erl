@@ -23,7 +23,13 @@ start(_StartType, _StartArgs) ->
             logger:info("engine Postgres pool started"),
             ok = fh_engine_migrations:run(),  %% raises on failure -> boot aborts
             ok = fh_engine_kb:load(),         %% raises on failure -> boot aborts
-            fh_engine_sup:start_link();
+            case fh_engine_sup:start_link() of
+                {ok, SupPid} ->
+                    maybe_dev_refresh_sweep(),
+                    {ok, SupPid};
+                Other ->
+                    Other
+            end;
         {error, database_url_not_set} ->
             logger:error("ENGINE_DATABASE_URL not set — engine cannot boot without "
                          "its runtime-state database"),
@@ -36,6 +42,26 @@ start(_StartType, _StartArgs) ->
 -spec stop(term()) -> ok.
 stop(_State) ->
     ok.
+
+%% DEV-ONLY (gated on ENGINE_DEV_PROVISION): after the tree is up, refresh saved cards
+%% in place so a rebuild + restart picks up resolver/KB changes without a manual re-run
+%% (plan-card-refresh.md — the rebuild IS the trigger). Spawned async so boot isn't
+%% blocked; resolver-only (no LLM); a crash is isolated + logged, never aborts boot.
+%% Prod refresh is an authenticated, throttled trigger, never this boot hook.
+-spec maybe_dev_refresh_sweep() -> ok.
+maybe_dev_refresh_sweep() ->
+    case os:getenv("ENGINE_DEV_PROVISION") of
+        V when V =:= "1"; V =:= "true" ->
+            spawn(fun() ->
+                try fh_engine_refresh:sweep(all)
+                catch Class:Reason ->
+                    logger:warning("[refresh-sweep] skipped: ~p:~p", [Class, Reason])
+                end
+            end),
+            ok;
+        _ ->
+            ok
+    end.
 
 %% --- .env loader (borrowed from ATP mcp_app; cwd assumption reshaped to engine/.env) ---
 

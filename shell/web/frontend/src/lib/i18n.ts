@@ -26,6 +26,15 @@ const messages = {
     'map.size.population': { vi: 'Dân số', en: 'Population' },
     'map.size.crime': { vi: 'Chỉ số tội phạm', en: 'Recorded criminal incidents' },
     'map.legend.nodata': { vi: 'Chưa có dữ liệu', en: 'No data' },
+    // Filters — the collapsible controls cluster + the saved-plans / name filter.
+    'map.filters': { vi: 'Bộ lọc', en: 'Filters' },
+    'filter.saved': { vi: 'Kế hoạch đã lưu', en: 'Saved plans' },
+    'filter.name.placeholder': { vi: 'Tìm khu vực…', en: 'Search suburbs…' },
+    'filter.nomatch': { vi: 'Không tìm thấy khu vực phù hợp.', en: 'No matching suburbs.' },
+    'filter.saved.empty': {
+        vi: 'Bạn chưa lưu kế hoạch nào. Hãy tạo một kế hoạch để ghim khu vực tại đây.',
+        en: 'No saved plans yet. Create a plan to pin a suburb here.'
+    },
     'map.sources': { vi: 'Nguồn dữ liệu', en: 'Data sources' },
     'map.zoomhint': {
         vi: 'Phóng to vào một thành phố để so sánh từng khu vực',
@@ -92,6 +101,7 @@ const messages = {
         vi: 'Kế hoạch cơ bản đang được tính toán và sẽ xuất hiện trong mục Kế hoạch.',
         en: 'Your base plan is being computed and will appear in the Plan tab.'
     },
+    'onboarding.created.cta': { vi: 'Xem kế hoạch', en: 'View your plan' },
     'onboarding.auth.title': { vi: 'Đăng nhập để lưu kế hoạch', en: 'Sign in to save your plan' },
     'onboarding.auth.body': {
         vi: 'Bạn cần đăng nhập để lưu và xem kế hoạch của mình.',
@@ -129,6 +139,51 @@ const messages = {
     'plan.c.cash_position': { vi: 'Dòng tiền', en: 'Cash position' },
     'plan.c.ownership_planning': { vi: 'Chi phí sở hữu', en: 'Owning the home' },
 
+    // Plan sub-tab labels (short) — the plan sections + Q&A as tabs inside the Plan view.
+    'plan.tab.buyer_profile': { vi: 'Hồ sơ', en: 'Profile' },
+    'plan.tab.eligibility': { vi: 'Chương trình', en: 'Schemes' },
+    'plan.tab.mortgage_finance': { vi: 'Vay', en: 'Finance' },
+    'plan.tab.cash_position': { vi: 'Dòng tiền', en: 'Cash' },
+    'plan.tab.ownership_planning': { vi: 'Sở hữu', en: 'Owning' },
+    'plan.tab.qa': { vi: 'Hỏi đáp', en: 'Q&A' },
+    // Lifecycle tab labels — the blueprint-declared spine (plan-card-lifecycle-restoration.md
+    // §3.2). The full mode-general vocabulary (Mode A renders a 6-tab subset; B/C/D tabs are
+    // present for when those blueprints come in scope).
+    'plan.ltab.overview': { vi: 'Tổng quan', en: 'Overview' },
+    'plan.ltab.family_view': { vi: 'Gia đình', en: 'Family view' },
+    'plan.ltab.investment_strategy': { vi: 'Chiến lược đầu tư', en: 'Investment strategy' },
+    'plan.ltab.firb_funding': { vi: 'FIRB & Chuyển tiền', en: 'FIRB & Funding' },
+    'plan.ltab.before_you_buy': { vi: 'Trước khi mua', en: 'Before you buy' },
+    'plan.ltab.yield_tax': { vi: 'Lợi suất & Thuế', en: 'Yield & Tax' },
+    'plan.ltab.cash_calculator': { vi: 'Tính tiền mặt', en: 'Cash calculator' },
+    'plan.ltab.journey': { vi: 'Hành trình', en: 'Journey' },
+    'plan.ltab.property': { vi: 'Bất động sản', en: 'Property' },
+    'plan.ltab.buying': { vi: 'Ra giá & Mua', en: 'Buying' },
+    'plan.ltab.after_you_buy': { vi: 'Sau khi mua', en: 'After you buy' },
+    'plan.ltab.portfolio': { vi: 'Danh mục', en: 'Portfolio' },
+    // Per-property component titles — shown as affordance cards at base (the full
+    // component appears once a property is attached). Base components already have plan.c.*.
+    'plan.c.due_diligence': { vi: 'Thẩm định', en: 'Due diligence' },
+    'plan.c.settlement_prep': { vi: 'Chuẩn bị bàn giao', en: 'Settlement prep' },
+    'plan.c.buying_strategy': { vi: 'Chiến lược ra giá', en: 'Buying strategy' },
+    'plan.attach_property': {
+        vi: 'Phần này mở ra khi bạn gắn một bất động sản cụ thể vào kế hoạch.',
+        en: 'This unlocks once you attach a specific property to your plan.'
+    },
+    'plan.qa.pending': {
+        vi: 'Phần hỏi đáp sẽ sẵn sàng khi kế hoạch tính xong.',
+        en: 'Q&A opens once your plan finishes computing.'
+    },
+    // Overview tab — shell-composed synthesis (OverviewCard).
+    'plan.ov.lead': {
+        vi: 'Kế hoạch của bạn trong 90 giây',
+        en: 'Your plan in 90 seconds'
+    },
+    'plan.ov.partial': {
+        vi: 'Một số con số sẽ hiện ra khi bạn bổ sung thu nhập và tiền tiết kiệm.',
+        en: 'Some figures unlock once you add your income and savings.'
+    },
+
     'plan.f.applicants': { vi: 'Số người mua', en: 'Applicants' },
     'plan.f.firb': { vi: 'Cần FIRB?', en: 'FIRB required?' },
     'plan.f.income': { vi: 'Thu nhập xét duyệt', en: 'Assessable income' },
@@ -162,6 +217,12 @@ const messages = {
     'plan.path.lmi_5_to_20': { vi: 'Vay kèm bảo hiểm LMI (cọc 5–20%)', en: 'LMI (5–20% deposit)' },
     'plan.path.twenty_plus': { vi: 'Cọc từ 20% trở lên', en: '20%+ deposit' },
     'plan.path.user_specific_alternative': { vi: 'Phương án riêng', en: 'Tailored option' },
+    'plan.path.recommended': { vi: 'đề xuất', en: 'recommended' },
+    'plan.reach.label': { vi: 'Khả năng với tới', en: 'Your reach' },
+    'plan.reach.capacity_pending': {
+        vi: 'Khả năng vay sẽ tính khi bạn thêm thu nhập và tiền tiết kiệm.',
+        en: 'Borrowing capacity computes once you add income and savings.'
+    },
 
     'plan.f.stamp_duty': { vi: 'Thuế trước bạ', en: 'Stamp duty' },
     'plan.f.duty_before': { vi: 'Trước ưu đãi', en: 'Before concession' },
@@ -173,6 +234,27 @@ const messages = {
     'plan.f.verdict': { vi: 'Đánh giá dòng tiền', en: 'Cash verdict' },
     'plan.f.genuine_savings': { vi: 'Tiết kiệm thực', en: 'Genuine savings' },
     'plan.f.mitigation': { vi: 'Gợi ý nếu còn thiếu', en: 'If you’re short' },
+    'plan.cash.need': { vi: 'Tiền mặt cần để bắt đầu', en: 'Cash to get in' },
+    'plan.cash.deposit': { vi: 'Tiền cọc tối thiểu', en: 'Min. deposit' },
+    'plan.cash.other': { vi: 'Chi phí giao dịch khác', en: 'Other costs' },
+    'plan.cash.reserve': { vi: 'Quỹ dự phòng sau giao dịch', en: 'Post-settlement buffer' },
+    'plan.cash.add_savings': {
+        vi: 'Nhập thu nhập và tiền tiết kiệm để biết bạn có đủ hay chưa.',
+        en: 'Add your income and savings to see if you’re covered.'
+    },
+    // Interactive cash what-if (B2) — client-side subtraction vs the engine's need range.
+    'plan.cash.whatif.label': { vi: 'Thử số tiền mặt bạn có', en: 'Test your cash on hand' },
+    'plan.cash.whatif.placeholder': { vi: 'ví dụ 150.000', en: 'e.g. 150,000' },
+    'plan.cash.whatif.spare': { vi: 'Ước tính dư', en: 'Estimated spare' },
+    'plan.cash.whatif.shortfall': { vi: 'Ước tính còn thiếu', en: 'Estimated shortfall' },
+    'plan.cash.whatif.toptier': {
+        vi: 'Đủ mức thấp; còn thiếu so với mức cao',
+        en: 'Covers the low end; short of the top by'
+    },
+    'plan.cash.whatif.disclaimer': {
+        vi: 'Đây là ước tính tham khảo so với nhu cầu tiền mặt của bạn — không phải tư vấn tài chính. Muốn thử mức giá khác, hãy cập nhật lại kế hoạch.',
+        en: 'An informational estimate against your cash need — not financial advice. To test a different price, refine your plan.'
+    },
     'plan.verdict.surplus': { vi: 'Dư', en: 'Surplus' },
     'plan.verdict.tight': { vi: 'Vừa đủ', en: 'Tight' },
     'plan.verdict.short': { vi: 'Còn thiếu', en: 'Short' },
@@ -183,6 +265,9 @@ const messages = {
 
     'plan.f.recurring': { vi: 'Chi phí định kỳ (ước tính)', en: 'Recurring costs (est.)' },
     'plan.f.statutory': { vi: 'Phí pháp định (rates + nước)', en: 'Council + water' },
+    'plan.f.strata': { vi: 'Phí chung cư', en: 'Strata levies' },
+    'plan.f.utilities': { vi: 'Điện nước', en: 'Utilities' },
+    'plan.f.insurance': { vi: 'Bảo hiểm công trình', en: 'Building insurance' },
     'plan.f.land_tax': { vi: 'Thuế đất', en: 'Land tax' },
     'plan.f.maintenance': { vi: 'Quỹ bảo trì mỗi năm', en: 'Maintenance reserve / yr' },
     'plan.f.monthly': { vi: 'Chi phí hàng tháng', en: 'Monthly outgoings' },
@@ -217,6 +302,8 @@ const messages = {
 
     'auth.signin': { vi: 'Đăng nhập', en: 'Sign in' },
     'auth.signout': { vi: 'Đăng xuất', en: 'Sign out' },
+    'account.title': { vi: 'Tài khoản', en: 'Account' },
+    'account.menu': { vi: 'Menu tài khoản', en: 'Account menu' },
     'auth.title': { vi: 'Đăng nhập vào FirstHomey', en: 'Sign in to FirstHomey' },
     'auth.email.label': { vi: 'Email', en: 'Email' },
     'auth.email.placeholder': { vi: 'ban@example.com', en: 'you@example.com' },

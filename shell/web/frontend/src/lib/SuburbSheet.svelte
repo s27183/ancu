@@ -7,13 +7,16 @@
     import type { Suburb } from '$lib/api';
     import { t } from '$lib/i18n';
     import { lang } from '$lib/stores/lang';
-    import { sheet } from '$lib/transitions';
     import PlanProjection from '$lib/PlanProjection.svelte';
 
-    let { suburb, onclose, onplan }: {
+    let { suburb, onclose, onplan, reloadPlan = 0 }: {
         suburb: Suburb;
         onclose: () => void;
         onplan: () => void;
+        /** Bumped by the parent when a plan is created → remounts PlanProjection (via
+         *  `{#key reloadPlan}`) so the Plan tab shows the new plan without a close/reopen.
+         *  The user is already on the Plan tab here (the create CTA lives there). */
+        reloadPlan?: number;
     } = $props();
 
     // Opens on the zone tab. The parent remounts this component per suburb
@@ -30,8 +33,7 @@
     }
 </script>
 
-<div class="sheet" role="dialog" aria-modal="false" aria-label={suburb.name} transition:sheet>
-    <div class="sheet-handle"></div>
+<div class="sheet" role="dialog" aria-modal="false" aria-label={suburb.name}>
     <header class="sheet-head">
         <div class="title">
             <h2>{suburb.name}</h2>
@@ -108,8 +110,11 @@
             </div>
         {:else}
             <!-- The plan projection mounts lazily when this tab is shown; it finds the
-                 user's card for THIS zone, or renders the create CTA itself (8-S4c). -->
-            <PlanProjection suburbName={suburb.name} {onplan} />
+                 user's card for THIS zone, or renders the create CTA itself (8-S4c).
+                 Keyed by reloadPlan so a freshly-created plan reloads it in place. -->
+            {#key reloadPlan}
+                <PlanProjection suburbName={suburb.name} {onplan} />
+            {/key}
         {/if}
     </div>
 </div>

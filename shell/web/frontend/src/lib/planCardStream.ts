@@ -7,10 +7,13 @@
 //   - the engine replays past events on connect (subscribe→replay→live, pg fan-out),
 //     so a late subscriber reconstructs full state, and re-delivery is idempotent when
 //     callers merge by component_id / event id.
-// We do NOT manage Last-Event-ID here: EventSource sets it automatically across its
-// own auto-reconnects, and the first connect (no header) gets a full replay, which is
-// what the projection wants. The caller closes the stream on a terminal event so the
-// browser doesn't auto-reconnect after the turn ends.
+// The first connect passes `lastEventId` (the GET snapshot's event_cursor) as
+// ?last_event_id= so the replay carries only events AFTER the snapshot. Without it a
+// FULL replay (from 0) re-applies OLD turns over the fresh snapshot — a card can have
+// many turns (re-runs/refreshes) in the append-only log, and the stream closes on the
+// FIRST (oldest) terminal, so the projection would render the stalest turn. EventSource
+// sets Last-Event-ID itself across its own auto-reconnects; the caller closes the stream
+// on a terminal event so the browser doesn't auto-reconnect after a turn ends.
 import type { ComponentEntry, LocalizedText } from '$lib/planCard';
 
 /** A streamed bilingual answer chunk (kind:qa turns) — consumed by the chat layer. */
@@ -50,9 +53,11 @@ function parse(e: MessageEvent): unknown {
  *  only — guard with `browser` at the call site. */
 export function subscribePlanCard(
     planCardId: string,
-    handlers: PlanCardStreamHandlers
+    handlers: PlanCardStreamHandlers,
+    lastEventId?: number
 ): PlanCardStream {
-    const es = new EventSource(`/api/plan-cards/${encodeURIComponent(planCardId)}/events`, {
+    const q = typeof lastEventId === 'number' && lastEventId > 0 ? `?last_event_id=${lastEventId}` : '';
+    const es = new EventSource(`/api/plan-cards/${encodeURIComponent(planCardId)}/events${q}`, {
         withCredentials: true
     });
     let closed = false;

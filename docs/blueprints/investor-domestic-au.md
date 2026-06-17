@@ -107,6 +107,23 @@ Mode C's base plan is sharper than Mode A's because investor reasoning often hap
 | Temporal flow | `settlement_prep` |
 | Portfolio | `ownership_planning_investor` (single-property view + portfolio-aggregate view) |
 
+**Machine-readable form** — compiled to `ui_tabs` in the artifact, **canonical for the runtime** (the table above is the human view), in the canonical lifecycle order. `kind: synthesis` is a shell-composed summary; `interactive: true` is the client-side cash what-if. The `journey` tab gains `purchase_journey` (per-mode base swimlane) when Mode C content is built. Structure is authored now; **Mode C content is dormant** until `investor-domestic-au` comes in scope (see [`../architecture/plan-card-lifecycle-restoration.md`](../architecture/plan-card-lifecycle-restoration.md) §4).
+
+```jsonc
+{
+  "ui_tabs": [
+    { "tab_id": "overview",            "kind": "synthesis",  "components": ["investor_profile", "property_assessment", "investment_strategy"] },
+    { "tab_id": "investment_strategy", "kind": "components", "components": ["investment_strategy"] },
+    { "tab_id": "yield_tax",           "kind": "components", "components": ["yield_modelling", "tax_structure"] },
+    { "tab_id": "cash_calculator",     "kind": "components", "interactive": true, "components": ["cash_position"] },
+    { "tab_id": "journey",             "kind": "components", "components": ["settlement_prep"] },
+    { "tab_id": "property",            "kind": "components", "components": ["property_assessment", "due_diligence"] },
+    { "tab_id": "buying",              "kind": "components", "components": ["buying_strategy"] },
+    { "tab_id": "portfolio",           "kind": "components", "components": ["ownership_planning_investor"] }
+  ]
+}
+```
+
 ---
 
 ## Components

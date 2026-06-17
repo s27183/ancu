@@ -10,14 +10,15 @@
     import { BUDGET_BANDS, buildOnboardingInput, type BudgetBand } from '$lib/onboarding';
     import { t } from '$lib/i18n';
     import { lang } from '$lib/stores/lang';
-    import { fade } from 'svelte/transition';
-    import { modalCard } from '$lib/transitions';
 
-    let { stateCode, suburbName, onclose, onsignin }: {
+    let { stateCode, suburbName, suburbSal, onclose, onsignin, oncreated }: {
         stateCode: string;
         suburbName: string;
+        suburbSal: string;
         onclose: () => void;
         onsignin: () => void;
+        /** The plan card was created — close the modal and reveal it in the Plan tab. */
+        oncreated: () => void;
     } = $props();
 
     let citizenPr = $state<boolean | null>(null);
@@ -46,7 +47,7 @@
         if (band === null) return;
         phase = 'submitting';
         const outcome = await createPlanCard(
-            buildOnboardingInput(stateCode, suburbName, band)
+            buildOnboardingInput(stateCode, suburbName, suburbSal, band)
         );
         phase =
             outcome.kind === 'created' ? 'created'
@@ -55,8 +56,8 @@
     }
 </script>
 
-<div class="ob-backdrop" transition:fade={{ duration: 200 }}>
-<div class="onboarding" role="dialog" aria-modal="true" aria-label={suburbName} transition:modalCard>
+<div class="ob-backdrop">
+<div class="onboarding" role="dialog" aria-modal="true" aria-label={suburbName}>
     <header class="ob-head">
         <h2>{$t('onboarding.title')} {suburbName}</h2>
         <button type="button" class="close" onclick={onclose} aria-label={$t('sheet.close')}
@@ -68,7 +69,7 @@
         <div class="ob-terminal">
             <h3>{$t('onboarding.created.title')}</h3>
             <p>{$t('onboarding.created.body')}</p>
-            <button type="button" class="primary" onclick={onclose}>{$t('sheet.close')}</button>
+            <button type="button" class="primary" onclick={oncreated}>{$t('onboarding.created.cta')}</button>
         </div>
     {:else if phase === 'auth'}
         <div class="ob-terminal">

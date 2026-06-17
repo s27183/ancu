@@ -76,15 +76,21 @@ body {
 }
 
 /* A floating glass bar over the full-bleed map (so the map runs edge-to-edge under
-   it). Content pages clear it via .content's padding-top. */
-header {
+   it). Content pages clear it via .content's padding-top. SCOPED to .app-header — a
+   bare `header` selector also matches the nested <header> elements inside the sheet
+   (.sheet-head) and modals (.ob-head), yanking them to position:absolute and hiding
+   their siblings (this was the vanished-tabs bug). */
+.app-header {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     z-index: 20; /* below the sheet (30) so the desktop drawer covers it top-to-bottom */
     height: var(--header-h);
-    display: flex;
+    /* 3 columns: brand (left) · language toggle (centred) · account (right). The two
+       1fr edge columns keep the centre column visually centred regardless of side widths. */
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
     gap: 0.75rem;
     padding: 0 1rem;
@@ -94,18 +100,160 @@ header {
     border-bottom: 1px solid var(--glass-border);
 }
 
-header .brand {
+.app-header .brand {
+    justify-self: start;
     font-weight: 700;
     color: var(--accent);
     text-decoration: none;
     letter-spacing: -0.01em;
 }
-
-header nav {
-    margin-left: auto;
+.app-header .lang {
+    justify-self: center;
+}
+.header-right {
+    justify-self: end;
     display: flex;
     align-items: center;
     gap: 0.5rem;
+}
+
+/* Account-menu trigger — a round person-icon button that opens the right side-sheet. */
+.account-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.2rem;
+    height: 2.2rem;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--ink);
+    border-radius: 999px;
+    cursor: pointer;
+    transition:
+        background var(--t-fast) var(--ease),
+        border-color var(--t-fast) var(--ease);
+}
+.account-trigger svg {
+    width: 1.15rem;
+    height: 1.15rem;
+}
+.account-trigger:hover {
+    background: var(--bg);
+    border-color: #cbd5e1;
+}
+
+/* Account side-sheet — slides in from the right edge (CSS transform; solid panel). */
+.account-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 55;
+    border: none;
+    padding: 0;
+    background: var(--scrim);
+    opacity: 0;
+    pointer-events: none;
+    cursor: default;
+    transition: opacity var(--t-med) var(--ease);
+}
+.account-backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+.account-sheet {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 60;
+    width: min(20rem, 85vw);
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    box-shadow: var(--shadow-2);
+    transform: translateX(100%);
+    transition: transform var(--t-med) var(--ease);
+}
+.account-sheet.open {
+    transform: translateX(0);
+}
+.account-sheet-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.9rem 1rem;
+    border-bottom: 1px solid var(--border);
+    font-weight: 700;
+    color: var(--ink);
+}
+.account-sheet-head .close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.9rem;
+    height: 1.9rem;
+    border: none;
+    background: transparent;
+    font-size: 1.1rem;
+    color: var(--muted);
+    cursor: pointer;
+    border-radius: 999px;
+    transition:
+        background var(--t-fast) var(--ease),
+        color var(--t-fast) var(--ease);
+}
+.account-sheet-head .close:hover {
+    background: var(--bg);
+    color: var(--ink);
+}
+.account-sheet-body {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+}
+.account-user {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+.account-avatar {
+    flex: none;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0.5rem;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    color: var(--accent);
+}
+.account-user-email {
+    font-size: 0.9rem;
+    color: var(--ink);
+    word-break: break-all;
+}
+.account-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--ink);
+    border-radius: var(--radius);
+    padding: 0.65rem 0.85rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+        background var(--t-fast) var(--ease),
+        border-color var(--t-fast) var(--ease);
+}
+.account-action svg {
+    width: 1.1rem;
+    height: 1.1rem;
+    color: var(--muted);
+}
+.account-action:hover {
+    background: var(--bg);
+    border-color: #cbd5e1;
 }
 
 /* Segmented language toggle: a pill track with a sliding white thumb under the
@@ -188,22 +336,68 @@ main {
     background: #e7e9ed;
 }
 
-/* Map controls — top-left card grouping the state + size-criterion pickers. */
-.map-controls {
+/* Controls cluster — top-left. Collapsed to a glass icon by default; the panel drops
+   below the icon when open. The cluster owns the absolute positioning; the panel is a
+   normal-flow child so it stacks under the toggle. */
+.controls-cluster {
     position: absolute;
     top: calc(var(--header-h) + 0.75rem);
     left: 0.75rem;
-    z-index: 10;
+    z-index: 12;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    align-items: flex-start;
+}
+/* The glass icon button (the collapsed state). */
+.controls-toggle {
+    display: grid;
+    place-items: center;
+    width: 2.6rem;
+    height: 2.6rem;
+    border-radius: 50%;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: var(--shadow-1);
+    color: var(--ink);
+    cursor: pointer;
+    transition:
+        background var(--t-fast) var(--ease),
+        box-shadow var(--t-fast) var(--ease),
+        transform var(--t-fast) var(--ease);
+}
+.controls-toggle:hover {
+    box-shadow: var(--shadow-2);
+}
+.controls-cluster.open .controls-toggle {
+    background: var(--panel-bg);
+}
+.controls-toggle svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+/* Map controls — the expanded panel grouping the state + size-criterion + saved filter. */
+.map-controls {
     display: flex;
     flex-direction: column;
     gap: 0.55rem;
     padding: 0.7rem 0.75rem;
-    background: var(--glass-bg);
-    -webkit-backdrop-filter: var(--glass-blur);
-    backdrop-filter: var(--glass-blur);
+    background: var(--panel-bg);
+    -webkit-backdrop-filter: var(--panel-blur);
+    backdrop-filter: var(--panel-blur);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-1);
+    box-shadow: var(--shadow-2);
+    animation: controls-in var(--t-fast) var(--ease);
+}
+@keyframes controls-in {
+    from {
+        opacity: 0;
+        transform: translateY(-0.3rem);
+    }
 }
 .map-controls .control {
     display: flex;
@@ -254,6 +448,111 @@ main {
 }
 .select-wrap select:hover {
     border-color: #cbd5e1;
+}
+
+/* Saved-plans filter — a checkbox + a name combobox, separated from the pickers above. */
+.control-saved {
+    gap: 0.45rem;
+    padding-top: 0.55rem;
+    border-top: 1px solid var(--border);
+}
+/* `.map-controls .checkbox` (0,2,0) outranks `.map-controls label` (0,1,1) so the
+   toggle reads as an action, not a tiny uppercase section heading like the pickers. */
+.map-controls .checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--ink);
+}
+.checkbox input {
+    width: 1.05rem;
+    height: 1.05rem;
+    accent-color: #ff1f8f; /* matches the saved-plans pulse */
+    cursor: pointer;
+}
+.combo {
+    position: relative;
+}
+.combo-input {
+    width: 100%;
+    min-width: 11rem;
+    box-sizing: border-box;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.5rem 0.7rem;
+    font-size: 0.9rem;
+    background: var(--surface);
+    color: var(--ink);
+    transition:
+        border-color var(--t-fast) var(--ease),
+        box-shadow var(--t-fast) var(--ease);
+}
+.combo-input:focus {
+    outline: none;
+    border-color: #ff1f8f;
+    box-shadow: 0 0 0 3px rgb(255 31 143 / 0.16);
+}
+.combo-list {
+    position: absolute;
+    top: calc(100% + 0.3rem);
+    left: 0;
+    right: 0;
+    z-index: 2;
+    margin: 0;
+    padding: 0.25rem;
+    list-style: none;
+    max-height: 14rem;
+    overflow-y: auto;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-2);
+}
+.combo-list li {
+    margin: 0;
+}
+.combo-list li button {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.45rem 0.55rem;
+    border: none;
+    border-radius: calc(var(--radius) - 0.2rem);
+    background: transparent;
+    color: var(--ink);
+    font-size: 0.9rem;
+    text-align: left;
+    cursor: pointer;
+    transition: background var(--t-fast) var(--ease);
+}
+.combo-list li button:hover {
+    background: var(--surface-2, #f1f5f9);
+}
+.combo-name {
+    font-weight: 500;
+}
+.combo-state {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--muted);
+}
+.combo-empty {
+    padding: 0.5rem 0.55rem;
+    font-size: 0.85rem;
+    color: var(--muted);
+}
+.filter-hint {
+    margin: 0;
+    font-size: 0.8rem;
+    line-height: 1.35;
+    color: var(--muted);
 }
 
 /* Vietnamese-ancestry legend — bottom-left, calm + affirmative. */
@@ -403,17 +702,20 @@ main {
 .sheet {
     position: absolute;
     z-index: 30;
-    background: var(--panel-bg);
-    -webkit-backdrop-filter: var(--panel-blur);
-    backdrop-filter: var(--panel-blur);
+    /* SOLID panel (not glass): a backdrop-filter here drops descendant painting when the
+       slide transition applies a transform (browser compositing bug) — that's what was
+       hiding the tab row. Solid is also more legible for the content you read here. */
+    background: var(--surface);
     display: flex;
     flex-direction: column;
+    overflow: hidden; /* contain children; the body is the only scroll region */
     box-shadow: var(--shadow-2);
-    /* phone: a modern partial bottom-sheet with a grab handle. */
+    /* phone: a partial bottom-sheet at a FIXED height, so switching tabs doesn't
+       resize it — the body (flex:1, overflow-y:auto) absorbs the difference + scrolls. */
     left: 0;
     right: 0;
     bottom: 0;
-    max-height: 85%;
+    height: 75%;
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
 /* Grab handle — phone only; the desktop drawer hides it. */
@@ -426,6 +728,7 @@ main {
     margin: 0.5rem auto 0;
 }
 .sheet-head {
+    flex: none; /* fixed-size chrome — never shrinks into the tabs' space */
     display: flex;
     align-items: flex-start;
     gap: 0.5rem;
@@ -451,6 +754,7 @@ main {
     line-height: 1;
 }
 .sheet .tabs {
+    flex: none; /* fixed-size chrome — never shrinks into the body */
     display: flex;
     gap: 0.25rem;
     padding: 0 1rem;
@@ -471,6 +775,8 @@ main {
     font-weight: 600;
 }
 .sheet .body {
+    flex: 1 1 auto; /* the body absorbs the slack + is the scroll region */
+    min-height: 0;
     padding: 0.75rem 1rem 1.25rem;
     overflow-y: auto;
 }
@@ -512,21 +818,34 @@ main {
     color: var(--accent);
 }
 
-/* Desktop: the sheet becomes a full-height drawer, flush right, top-to-bottom (it
-   covers the header by design — a focused detail surface). */
+/* Desktop: the sheet becomes a CENTERED popup modal — wide but not full-screen. Its
+   height follows its CONTENT (so the Zone and Plan tabs are each their own height, not
+   forced to one fixed card height), capped at 85vh so a long plan tab scrolls inside.
+   No dimming backdrop on purpose: the map stays visible so the selected suburb's pulse
+   reads. Transform-centring is paint-safe here because .sheet is SOLID (no backdrop-
+   filter — the compositing trap noted above). */
 @media (min-width: 48rem) {
     .sheet {
-        top: 0;
-        bottom: 0;
-        right: 0;
-        left: auto;
-        width: 24rem;
-        max-height: none;
-        border-radius: 0;
-        border-left: 1px solid var(--glass-border);
+        top: 50%;
+        left: 50%;
+        right: auto;
+        bottom: auto;
+        transform: translate(-50%, -50%);
+        width: min(92vw, 40rem);
+        height: auto;
+        max-height: 85vh;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--glass-border);
+        animation: modal-in var(--t-med) var(--ease);
     }
     .sheet-handle {
         display: none;
+    }
+}
+@keyframes modal-in {
+    from {
+        opacity: 0;
+        transform: translate(-50%, calc(-50% + 0.5rem));
     }
 }
 
@@ -580,9 +899,9 @@ main {
     backdrop-filter: blur(2px);
 }
 .onboarding {
-    background: var(--panel-bg);
-    -webkit-backdrop-filter: var(--panel-blur);
-    backdrop-filter: var(--panel-blur);
+    /* SOLID, not glass — same backdrop-filter + transform (modalCard) compositing bug
+       as the sheet; and forms read better on a solid surface. */
+    background: var(--surface);
     width: 100%;
     max-height: 88%;
     display: flex;
@@ -896,6 +1215,44 @@ main {
     display: flex;
     flex-direction: column;
     gap: 1rem;
+}
+
+/* Plan sub-tabs — a horizontally-scrollable pill row; one section shows at a time. */
+.pp-subtabs {
+    display: flex;
+    gap: 0.35rem;
+    overflow-x: auto;
+    margin: 0 0 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+    scrollbar-width: none; /* Firefox */
+}
+.pp-subtabs::-webkit-scrollbar {
+    display: none;
+}
+.pp-subtabs button {
+    flex: none;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    border-radius: 999px;
+    padding: 0.3rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+        background var(--t-fast) var(--ease),
+        border-color var(--t-fast) var(--ease),
+        color var(--t-fast) var(--ease);
+}
+.pp-subtabs button:hover {
+    border-color: #cbd5e1;
+}
+.pp-subtabs button.active {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent);
 }
 .pp-card {
     border: 1px solid var(--border);

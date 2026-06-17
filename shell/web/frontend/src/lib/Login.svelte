@@ -7,8 +7,6 @@
     // sets on redemption; this sheet never touches a token.
     import { requestMagicLink, GOOGLE_SIGNIN_HREF } from '$lib/auth';
     import { t } from '$lib/i18n';
-    import { fade } from 'svelte/transition';
-    import { modalCard } from '$lib/transitions';
 
     let { onclose }: { onclose: () => void } = $props();
 
@@ -31,8 +29,8 @@
     }
 </script>
 
-<div class="ob-backdrop" transition:fade={{ duration: 200 }}>
-    <div class="onboarding" role="dialog" aria-modal="true" aria-label={$t('auth.title')} transition:modalCard>
+<div class="ob-backdrop">
+    <div class="onboarding" role="dialog" aria-modal="true" aria-label={$t('auth.title')}>
         <header class="ob-head">
             <h2>{$t('auth.title')}</h2>
             <button type="button" class="close" onclick={onclose} aria-label={$t('sheet.close')}

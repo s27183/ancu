@@ -19,12 +19,13 @@ main(_) ->
     io:format("cash-duty conformance — fh_engine_cash vs the official figures~n~n"),
     K = [run_kernel(C) || C <- kernel_cases()],
     S = [run_stamp(C) || C <- stamp_cases()],
-    Fails = [R || R <- K ++ S, R =:= fail],
+    R = [run_reg(C) || C <- reg_cases()],
+    Fails = [X || X <- K ++ S ++ R, X =:= fail],
     io:format("~n================================================================~n"),
     case Fails of
         [] ->
-            io:format("PASS — all ~p cash-duty anchors match (~p kernel + ~p stamp_duty)~n",
-                      [length(K) + length(S), length(K), length(S)]),
+            io:format("PASS — all ~p cash anchors match (~p kernel + ~p stamp_duty + ~p registration)~n",
+                      [length(K) + length(S) + length(R), length(K), length(S), length(R)]),
             halt(0);
         _ ->
             io:format("FAIL — ~p anchor(s) mismatched~n", [length(Fails)]),
@@ -81,6 +82,27 @@ run_stamp({State, HasConc, V, Before, Saving, After}) ->
                  pass;
         false -> io:format("  FAIL   stamp_duty(~s, ~p, ~p) = ~p, expected ~p~n",
                            [State, HasConc, V, Got, Want]), fail
+    end.
+
+%% --- registration cases (mirror cash_duty_eval.py REG_CASES) ----------------
+%% {State, Value, ExpectedTotalDollars} — transfer + mortgage registration, whole
+%% dollars, against each registry's published schedule (REGULATED — Decision 9).
+
+reg_cases() ->
+    [{<<"NSW">>, 600000,  351},    %% flat $351.40 → $351 (price-independent)
+     {<<"NSW">>, 850000,  351},    %% same flat fee at any price
+     {<<"VIC">>, 700000,  1865},   %% 1739.50 + 125.70 = 1865.20
+     {<<"VIC">>, 2000000, 3737},   %% transfer capped 3611 + 125.70 (proves the cap)
+     {<<"QLD">>, 600000,  2452},   %% 2203.56 + 248.04 = 2451.60
+     {<<"QLD">>, 180000,  496},    %% at threshold: 248.04 + 248.04
+     {<<"QLD">>, 185000,  543}].   %% $5k over → 1 increment "or part" (round-up)
+
+run_reg({State, V, Expected}) ->
+    Got = fh_engine_cash:registration_total(State, V),
+    case Got =:= Expected of
+        true  -> io:format("  PASS   registration_total(~s, ~p) = ~p~n", [State, V, Got]), pass;
+        false -> io:format("  FAIL   registration_total(~s, ~p) = ~p, expected ~p~n",
+                           [State, V, Got, Expected]), fail
     end.
 
 %% round half up to whole dollars — identical to fh_engine_cash:dollars/1 and the

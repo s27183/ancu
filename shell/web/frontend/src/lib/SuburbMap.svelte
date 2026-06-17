@@ -9,7 +9,8 @@
     // Dev/eval points at a Protomaps daily build; prod at the owned R2 AU extract.
     import 'maplibre-gl/dist/maplibre-gl.css'; // self-hosted, not the CDN autoload
     import { MapLibre, GeoJSONSource, CircleLayer, HeatmapLayer } from 'svelte-maplibre-gl';
-    import type { MapLayerMouseEvent, Map as MlMap } from 'maplibre-gl';
+    import type { MapLayerMouseEvent, Map as MlMap, CircleLayerSpecification } from 'maplibre-gl';
+    import type { FeatureCollection, Point } from 'geojson';
     import type { Suburb } from '$lib/api';
     import {
         toFeatureCollection,
@@ -36,6 +37,8 @@
         center,
         zoom,
         sizeBy = DEFAULT_SIZE_BY,
+        pulseSaved = false,
+        selected = null,
         onselect,
         onzoom
     }: {
@@ -43,10 +46,21 @@
         center: [number, number];
         zoom: number;
         sizeBy?: SizeBy;
+        /** Saved-plans mode: render the (few) suburbs as a uniform bright pulse instead
+         *  of the criterion ramp — they're already filtered to the saved set upstream. */
+        pulseSaved?: boolean;
+        /** The currently-selected suburb — gets a prominent pulse wherever it is (saved
+         *  or not), so the click/combobox target is unmistakable on the map. */
+        selected?: Suburb | null;
         onselect: (s: Suburb | null) => void;
         /** Reports the live map zoom up to the parent (drives the overview hint). */
         onzoom?: (z: number) => void;
     } = $props();
+
+    /** Fly to a suburb (the name combobox picks one). Zooms in enough to resolve it. */
+    export function flyTo(lon: number, lat: number) {
+        map?.flyTo({ center: [lon, lat], zoom: Math.max(map.getZoom(), 11) });
+    }
 
     // Track the live zoom via the map instance (separate from the initial `zoom` prop,
     // which still drives recentre-on-state-change). Reported up for the overview hint.
@@ -69,6 +83,73 @@
     // dots as you zoom in. See the measurement note in lib/map.ts.
     const heatPaint = $derived(heatmapPaintFor(sizeBy));
 
+    // --- Pulse highlight -----------------------------------------------------
+    // ONE bright pulse signal — a solid centre dot + an expanding ring animated by rAF
+    // — shared by (a) the saved suburbs in saved-only mode and (b) the SELECTED suburb
+    // (saved or not). The ring is JS-driven (MapLibre paint can't read time), so we
+    // re-derive its paint each frame — fine for a handful of points. prefers-reduced-
+    // motion → a static mid-expansion ring (no animation).
+    const PULSE = '#ff1f8f'; // saturated magenta — distinct from every criterion ramp
+
+    // The selected suburb as a 0/1-feature source for its own (always-on) pulse.
+    const selectedData = $derived({
+        type: 'FeatureCollection',
+        features: selected?.centroid
+            ? [
+                  {
+                      type: 'Feature' as const,
+                      geometry: {
+                          type: 'Point' as const,
+                          coordinates: [selected.centroid.lon, selected.centroid.lat]
+                      },
+                      properties: {}
+                  }
+              ]
+            : []
+    } satisfies FeatureCollection<Point>);
+    const hasSelectedPoint = $derived(!!selected?.centroid);
+
+    let pulse = $state(0); // 0→1→0 eased ring progress
+    $effect(() => {
+        if (!pulseSaved && !hasSelectedPoint) return;
+        const reduce =
+            typeof matchMedia === 'function' &&
+            matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (reduce) {
+            pulse = 0.5;
+            return;
+        }
+        let raf = 0;
+        let start: number | null = null;
+        const tick = (ts: number) => {
+            if (start === null) start = ts;
+            const phase = (((ts - start) / 1500) % 1) * 2 * Math.PI; // 1.5s period
+            pulse = 0.5 - 0.5 * Math.cos(phase); // smooth 0→1→0
+            raf = requestAnimationFrame(tick);
+        };
+        raf = requestAnimationFrame(tick);
+        return () => cancelAnimationFrame(raf);
+    });
+
+    // The solid centre dot (always visible at any zoom — the pulse must read at the
+    // continental overview, where the criterion dots are fully faded out). Big + bold.
+    const dotPaint = {
+        'circle-color': PULSE,
+        'circle-opacity': 0.95,
+        'circle-radius': 7,
+        'circle-stroke-color': '#ffffff',
+        'circle-stroke-width': 2
+    } satisfies CircleLayerSpecification['paint'];
+    // The expanding ring — radius grows, stroke fades, as `pulse` runs 0→1.
+    const ringPaint = $derived({
+        'circle-color': PULSE,
+        'circle-opacity': 0,
+        'circle-radius': 7 + pulse * 26,
+        'circle-stroke-color': PULSE,
+        'circle-stroke-width': 3,
+        'circle-stroke-opacity': 0.85 * (1 - pulse)
+    } satisfies CircleLayerSpecification['paint']);
+
     function handleClick(ev: MapLayerMouseEvent) {
         const sal = ev.features?.[0]?.properties?.sal_code as string | undefined;
         onselect(sal ? (index.get(sal) ?? null) : null);
@@ -88,18 +169,42 @@
     inlineStyle="position:absolute;inset:0"
 >
     <GeoJSONSource id="suburbs" {data}>
-        <!-- KDE heatmap for the overplotted overview; sits below the dots. Only for
-             extensive criteria — null (omitted) for intensive ones (SEIFA/crime). -->
-        {#if heatPaint}
-            <HeatmapLayer id="suburb-heat" paint={heatPaint} beforeId={labelBeforeId} />
+        {#if pulseSaved}
+            <!-- Saved-plans mode: an expanding ring (declared first → below the dot) and
+                 a solid bright centre dot. Uniform bright highlight, no criterion ramp. -->
+            <CircleLayer id="suburb-pulse" paint={ringPaint} beforeId={labelBeforeId} />
+            <CircleLayer
+                id="suburb-saved"
+                paint={dotPaint}
+                beforeId={labelBeforeId}
+                onclick={handleClick}
+                onmouseenter={(e: MapLayerMouseEvent) => setPointer(e, true)}
+                onmouseleave={(e: MapLayerMouseEvent) => setPointer(e, false)}
+            />
+        {:else}
+            <!-- KDE heatmap for the overplotted overview; sits below the dots. Only for
+                 extensive criteria — null (omitted) for intensive ones (SEIFA/crime). -->
+            {#if heatPaint}
+                <HeatmapLayer id="suburb-heat" paint={heatPaint} beforeId={labelBeforeId} />
+            {/if}
+            <CircleLayer
+                id="suburb-bubbles"
+                {paint}
+                beforeId={labelBeforeId}
+                onclick={handleClick}
+                onmouseenter={(e: MapLayerMouseEvent) => setPointer(e, true)}
+                onmouseleave={(e: MapLayerMouseEvent) => setPointer(e, false)}
+            />
         {/if}
-        <CircleLayer
-            id="suburb-bubbles"
-            {paint}
-            beforeId={labelBeforeId}
-            onclick={handleClick}
-            onmouseenter={(e: MapLayerMouseEvent) => setPointer(e, true)}
-            onmouseleave={(e: MapLayerMouseEvent) => setPointer(e, false)}
-        />
     </GeoJSONSource>
+
+    <!-- The selected suburb's own pulse — always on (saved or not), sitting on its own
+         single-feature source so it shows over any base layer. No click handler: the
+         dot underneath still handles re-selection. -->
+    {#if hasSelectedPoint}
+        <GeoJSONSource id="suburb-selected" data={selectedData}>
+            <CircleLayer id="sel-pulse" paint={ringPaint} beforeId={labelBeforeId} />
+            <CircleLayer id="sel-dot" paint={dotPaint} beforeId={labelBeforeId} />
+        </GeoJSONSource>
+    {/if}
 </MapLibre>

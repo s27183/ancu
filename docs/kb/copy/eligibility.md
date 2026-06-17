@@ -35,6 +35,17 @@ Everything above is `content_md`. The `copy` block is this doc's `content_json`.
     "status_conditional":  { "vi": "Có điều kiện.", "en": "Conditionally available." },
     "status_pending":      { "vi": "Có khả năng đủ điều kiện — còn chờ một vài chi tiết.", "en": "Likely eligible — pending a few details." },
 
+    "benefit_fhg":          { "vi": "Mua nhà với khoản đặt cọc 5% mà không phải trả bảo hiểm thế chấp (LMI).", "en": "Buy with a 5% deposit and no Lenders Mortgage Insurance." },
+    "benefit_fhss":         { "vi": "Tích lũy tiền đặt cọc trong quỹ hưu trí và rút ra với ưu đãi thuế.", "en": "Save your deposit inside super and release it tax-effectively." },
+    "benefit_help_to_buy":  { "vi": "Chính phủ cùng góp vốn sở hữu, giảm khoản đặt cọc và khoản vay bạn cần.", "en": "The government co-buys an equity share, cutting the deposit and loan you need." },
+    "benefit_state_duty":   { "vi": "Miễn hoặc giảm thuế trước bạ chuyển nhượng.", "en": "Full or partial transfer-duty exemption." },
+    "benefit_fhog":         { "vi": "Khoản trợ cấp $10,000 cho một căn nhà mới đủ điều kiện.", "en": "A $10,000 grant for an eligible new home." },
+
+    "duty_phase_out":       { "vi": "Mức tiết kiệm cao nhất ở đầu thấp của khoảng giá và giảm dần về 0 khi đến mức trần.", "en": "The saving is largest at the lower end of your price range and tapers to nil at the cap." },
+    "lmi_estimate":         { "vi": "Ước tính tham khảo — mức phí LMI chính xác là báo giá của công ty bảo hiểm khi nộp hồ sơ.", "en": "Indicative estimate — the exact LMI premium is the insurer's quote at application." },
+    "fhog_if_new_build":    { "vi": "Chỉ áp dụng nếu bạn mua nhà xây mới; $0 đối với nhà đã qua sử dụng.", "en": "Applies only to a new build; $0 for an established home." },
+    "total_excludes":       { "vi": "Tổng chưa bao gồm {names} (giá trị tùy theo chi tiết chưa xác định).", "en": "Total excludes {names} (value depends on details not yet known)." },
+
     "band_cap_above":  { "vi": "Giới hạn giá bất động sản là {cap}; mức mục tiêu của bạn bắt đầu cao hơn mức đó.", "en": "Property price cap is {cap}; your target starts above it." },
     "band_straddle":   { "vi": "Đủ điều kiện cho bất động sản đến {max}; mức giới hạn chính xác tùy theo khu vực.", "en": "Eligible for properties up to {max}; the exact cap depends on the suburb." },
     "type_new_build":  { "vi": "Áp dụng cho nhà xây mới hoặc mua theo dự án (off-the-plan) đủ điều kiện.", "en": "Available for an eligible new build or off-the-plan purchase." },

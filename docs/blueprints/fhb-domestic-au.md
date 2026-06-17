@@ -99,6 +99,21 @@ Components with `scope: base` fill **once per user** in the persistent base plan
 
 UI tab assignment is a presentation concern; the blueprint defines the data model and reasoning structure.
 
+**Machine-readable form** — compiled to `ui_tabs` in the artifact and **canonical for the runtime** (the table above is the human view). Tabs render in the order listed. `kind: synthesis` is a shell-composed summary (not a vocabulary renderer); `interactive: true` marks the client-side cash what-if (B2). The `journey` tab gains `purchase_journey` (the base lifecycle swimlane) in B1; until then it carries only the per-property `settlement_prep`. See [`../architecture/plan-card-lifecycle-restoration.md`](../architecture/plan-card-lifecycle-restoration.md) §3.2/§5.
+
+```jsonc
+{
+  "ui_tabs": [
+    { "tab_id": "overview",        "kind": "synthesis",  "components": ["buyer_profile", "eligibility", "mortgage_finance", "cash_position"] },
+    { "tab_id": "before_you_buy",  "kind": "components", "components": ["eligibility", "cash_position", "due_diligence"] },
+    { "tab_id": "cash_calculator", "kind": "components", "interactive": true, "components": ["cash_position"] },
+    { "tab_id": "journey",         "kind": "components", "components": ["settlement_prep"] },
+    { "tab_id": "buying",          "kind": "components", "components": ["buying_strategy"] },
+    { "tab_id": "after_you_buy",   "kind": "components", "components": ["ownership_planning"] }
+  ]
+}
+```
+
 ---
 
 ## Components
@@ -311,7 +326,7 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
 
 **Goal:** Determine all applicable schemes and produce an optimal stacked scheme stack with rationale for inclusion/exclusion.
 
-**Scope:** `both` — base: provisional eligibility from profile facts + `target_price_range` (which schemes apply; FHG / FHSS / state-concession predicates; target-range-vs-cap check). Refined per-property once the specific property's location + price are known (`applicable_cap_for_location_property`, `fhog.applicable`).
+**Scope:** `both` — base: provisional eligibility from profile facts + `target_price_range` (which schemes apply; FHG / FHSS / state-concession predicates; target-range-vs-cap check) **plus each scheme's benefit as a `money_range` quantified from the price range** (Decision 8 in [`eligibility-resolution.md`](../architecture/eligibility-resolution.md): duty saving via the shared `fh_engine_cash`, FHOG fixed, FHG LMI band; FHSS/Help-to-Buy honestly null). Refined per-property once the specific property's location + price are known (`applicable_cap_for_location_property`, `fhog.applicable`) — the ranges narrow to points.
 
 **All-applicants resolution (F1).** Every scheme predicate resolves as the **AND over all `profile.applicants`** — a scheme is applicable to the joint application only if *every* applicant satisfies its first-home + residency + ownership tests. Two consequences: (a) if `profile.firb_required_any` is true (a foreign co-applicant), FHB schemes are unavailable to the joint application and that applicant's interest follows the FIRB path (`fhb-foreign-au`); (b) where the joint application fails an all-applicants test but a subset would qualify (e.g. the eligible applicant buying alone), the alternative is surfaced in `scheme_stack.structuring_options` rather than silently dropped. Per-scheme individual-vs-combined nuances (e.g. Help to Buy income caps) are resolved against the relevant applicants, not assumed joint. The test also folds in `profile.non_buying_partner` where present — a married / de-facto partner's ownership counts for FHOG and state concessions even when they take no legal interest (F4).
 
@@ -366,11 +381,11 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
 {
   "type": "scheme_stack",
   "fields": {
-    "applicable_schemes": "array<{ name, benefit_value, role, notes: array<localized_text> }>",
+    "applicable_schemes": "array<{ name, benefit_value: money_range, benefit_is_estimate: bool, role, notes: array<localized_text> }>",  // Decision 8 — benefit_value is a money_range (base: from target_price_range; per-property: narrowed). null when honestly unknown (FHSS/Help-to-Buy at base). benefit_is_estimate marks a banded estimate (FHG LMI) vs an exact regulated figure (duty, FHOG).
     "rejected_schemes": "array<{ name, reason: localized_text }>",
     "eligibility_basis": "enum [all_applicants_eligible, eligible_only_if_restructured, ineligible]",  // F1 — result of the all-applicants test over profile.applicants
-    "structuring_options": "array<{ if_purchased_as, applicable_schemes, benefit_value, tradeoffs }>",  // F1 — populated when the joint application fails an all-applicants test but a subset qualifies (e.g. {if_purchased_as: 'lead applicant alone'}); also carries the foreign-co-applicant → FIRB-path note. Empty when all applicants qualify jointly.
-    "total_benefit_value": "money",
+    "structuring_options": "array<{ if_purchased_as, applicable_schemes, benefit_value: money_range, tradeoffs }>",  // F1 — populated when the joint application fails an all-applicants test but a subset qualifies (e.g. {if_purchased_as: 'lead applicant alone'}); also carries the foreign-co-applicant → FIRB-path note. Empty when all applicants qualify jointly.
+    "total_benefit_value": "money_range",  // Decision 8 — sum over a COMPATIBLE stack (never alternatives together); excludes null-benefit schemes (noted).
     "stacking_constraints": "array<localized_text>",
     "recommended_application_order": "array<string>"
   }
@@ -560,11 +575,14 @@ The `mortgage_plan` outcome feeds `cash_position` (loan amount + buffer requirem
   "type": "budget_envelope",
   "fields": {
     "stamp_duty": "{ before_concession: money|null, concession_applied: money|null, after_concession: money|null, notes: array<localized_text> }",  // the calculator's transfer-duty breakdown — resolver-computed (mechanism B) by fh_engine_cash from kb.stamp-duty.calc-by-state + the eligible concession (architecture/stamp-duty-concession-mechanics.md). At base, evaluated at the target-range ceiling; the income/savings-dependent fields below stay null until a refine turn (honest partial output).
+    "deposit": "{ minimum_required_percentage: percentage|null, minimum_required_amount: money_range|null, notes: array<localized_text> }",  // [NEW, Decision 9] minimum deposit for the recommended path — 5% when mortgage_plan.recommended_path = fhg_backed, else the 5% floor + note. money_range at base (over target_price_range); collapses to a point per-property. Resolver (fh_engine_cash) from kb.cash-reserve genuine_savings_pct_of_price.
+    "other_buying_costs": "{ total: money_range|null, registration_exact: money|null, notes: array<localized_text> }",  // [NEW, Decision 9] transaction costs beyond deposit + duty: per-state land-titles registration (REGULATED, exact, per-state formula) + convention bands (inspection, conveyancing, insurance, utilities, moving). total = [reg+Σlo, reg+Σhi]. Resolver (fh_engine_cash) from kb.buyer-costs.inspections-conveyancing-fees.
+    "reserve_buffer": "{ months_of_repayments_recommended: integer, amount: money|null, notes: array<localized_text> }",  // [NEW, Decision 9] post-settlement reserve = months × monthly repayment. amount NULL at base (needs the loan repayment/rate — a refine fact); EXCLUDED from total_cash_required (which is _at_settlement). kb.cash-reserve recommended_post_settlement_reserve_months.
     "max_property_price_supported": "money",
     "actual_property_price": "money",
-    "total_cash_required": "money",
-    "cash_available": "money",
-    "gap_or_surplus": "money",
+    "total_cash_required": "money_range",  // [Decision 9] NEED side AT SETTLEMENT = deposit + stamp_duty.after_concession + other_buying_costs.total. money_range at base (over target_price_range); a point per-property. Excludes the post-settlement reserve_buffer.
+    "cash_available": "money",  // HAVE side = cash_on_hand + fhss_release + family_contribution. NULL at base (onboarding captures no savings — plan-first; computes on a refine turn).
+    "gap_or_surplus": "money",  // cash_available − total_cash_required. NULL at base (HAVE side null) → the verdict is PENDING by design.
     "verdict": "enum [surplus, tight, short]",
     "genuine_savings_verdict": "enum [meets, fails_recent_gift, insufficient_track_record, unknown]",  // F5 — DISTINCT from verdict (cash sufficiency). A buyer can read 'surplus' on cash yet fail the lender's 5% genuine-savings test (a recent family gift doesn't count — the '1% rule'). Resolver derives the determinate cases (gift-exclusion + savings-trail math) from buyer_profile.savings_and_deposit (genuine_savings_evidence_months, family_gift_or_loan_amount, funds_provenance.deposit_source) against the policy params in kb.cash-reserve.lender-expectations — the EXISTING owner of this gate (5%/3-month, 1% rule, rental-history substitute); already a cash_position anchor, NOT a new doc. Returns `unknown` to defer the irreducible cases (the 12-month rental-history substitute, ambiguous/mixed sources) to the agent.
     "mitigation_options_if_short": "array<string>",

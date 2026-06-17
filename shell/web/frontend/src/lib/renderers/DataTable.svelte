@@ -11,8 +11,13 @@
     import Field from './Field.svelte';
     import Chip from './Chip.svelte';
     import NoteList from './NoteList.svelte';
+    import Pending from './Pending.svelte';
+    import StackedBar from './StackedBar.svelte';
 
-    let { outcome }: { outcome: Record<string, unknown> } = $props();
+    let { outcome, density = 'compact' }: {
+        outcome: Record<string, unknown>;
+        density?: 'compact' | 'full';
+    } = $props();
     const o = $derived(outcome as OngoingObligationsOutcome);
 
     const LAND_TAX: Record<string, 'good' | 'info' | 'neutral'> = {
@@ -34,7 +39,34 @@
         if (hi === null) return lo;
         return `${lo} – ${hi}`;
     });
+
+    // Outgoings hero (plan-card-visual-spec §3.5): a segmented bar of the recurring cost
+    // lines. At base only the statutory band (council + water) is knowable; strata /
+    // utilities / building insurance need a property → hatched (counted, not sized). The
+    // monthly total is mortgage-dominated → Pending until a loan. Reuses StackedBar (R1/R2).
+    const num2 = (v: number | null | undefined): v is number => typeof v === 'number';
+    const bandMid = $derived(num2(band?.low) && num2(band?.high) ? (band!.low! + band!.high!) / 2 : null);
+    const rc = $derived(o.recurring_costs_estimate ?? null);
+    const outSegments = $derived([
+        { value: bandMid, label: $t('plan.f.statutory'), amount: statutory ?? '—', estimate: true },
+        { value: rc?.strata_levies ?? null, label: $t('plan.f.strata'),
+          amount: money(rc?.strata_levies, $lang) ?? '—', estimate: false },
+        { value: rc?.utilities ?? null, label: $t('plan.f.utilities'),
+          amount: money(rc?.utilities, $lang) ?? '—', estimate: false },
+        { value: rc?.building_insurance ?? null, label: $t('plan.f.insurance'),
+          amount: money(rc?.building_insurance, $lang) ?? '—', estimate: false }
+    ]);
+    const monthly = $derived(money(o.total_monthly_outgoings_estimate, $lang));
 </script>
+
+<!-- ── Outgoings hero ─────────────────────────────────────────────────── -->
+<div class="og-hero">
+    <div class="og-head">
+        <span class="og-label">{$t('plan.f.monthly')}</span>
+        {#if monthly}<span class="og-total">{monthly}</span>{:else}<Pending />{/if}
+    </div>
+    <StackedBar segments={outSegments} {density} />
+</div>
 
 <Field label={$t('plan.f.statutory')} value={statutory} />
 
@@ -66,3 +98,26 @@
         {/each}
     </div>
 {/if}
+
+<style>
+    .og-hero {
+        margin-bottom: 0.6rem;
+    }
+    .og-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    .og-label {
+        font-size: 0.85rem;
+        color: var(--muted);
+    }
+    .og-total {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: var(--accent);
+        font-variant-numeric: tabular-nums;
+    }
+</style>

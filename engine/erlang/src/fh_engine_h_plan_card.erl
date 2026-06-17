@@ -20,7 +20,28 @@ handle_get(Req0, State) ->
             PlanCardId = cowboy_req:binding(id, Req0),
             case fh_engine_store:get_plan_card(T, PlanCardId) of
                 {ok, Card} ->
-                    {ok, fh_engine_http:reply_json(200, Card, Req0), State};
+                    %% The snapshot's as-of cursor + whether a turn is in flight. The
+                    %% shell relays these verbatim; the projection subscribes to the SSE
+                    %% with `event_cursor` as Last-Event-ID so the replay can't regress
+                    %% the fresh snapshot with an OLD turn from the append-only log, and
+                    %% sets its done-state from `turn_running` (no terminal replays when
+                    %% the cursor skips the history). See plan-card-refresh.md.
+                    Cursor = fh_engine_store:max_event_id(T, PlanCardId),
+                    Running = case fh_engine_turn_registry:lookup(PlanCardId) of
+                                  {ok, _}            -> true;
+                                  {error, not_found} -> false
+                              end,
+                    %% The blueprint's lifecycle-tab spine (engine-owned structure from
+                    %% the artifact) travels with the card so the shell renders tabs, not
+                    %% the raw component list (plan-card-lifecycle-restoration.md §5).
+                    UiTabs = case fh_engine_kb:ui_tabs(maps:get(<<"blueprint_slug">>, Card)) of
+                                 {ok, Tabs} -> Tabs;
+                                 _          -> []
+                             end,
+                    Body = Card#{<<"event_cursor">> => Cursor,
+                                 <<"turn_running">> => Running,
+                                 <<"ui_tabs">> => UiTabs},
+                    {ok, fh_engine_http:reply_json(200, Body, Req0), State};
                 {error, not_found} ->
                     {ok, fh_engine_http:reply_json(404,
                         #{<<"error">> => <<"not_found">>}, Req0), State}

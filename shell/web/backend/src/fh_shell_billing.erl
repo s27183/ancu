@@ -342,7 +342,7 @@ addon_amount_cents(_)                -> undefined.
 
 %% The product name shown on the Stripe-hosted checkout page (bilingual-friendly UTF-8 —
 %% compose_query encodes it utf8, not via a byte-fragile formatter).
-addon_label(<<"doc_review">>) -> <<"FirstHomey — Contract & Section 32 review">>;
+addon_label(<<"doc_review">>) -> <<"FirstHomey — Contract & Section 32 review"/utf8>>;
 addon_label(<<"timnha">>)     -> <<"FirstHomey — Tìm Nhà property search"/utf8>>;
 addon_label(_)                -> <<"FirstHomey add-on">>.
 

@@ -28,16 +28,21 @@ export const BUDGET_BANDS: readonly BudgetBand[] = [
 
 /** Build the engine onboarding payload (the body of POST /api/plan-cards). Shapes
  *  exactly the fields the base turn reads: state, target_price_range [lo,hi],
- *  target_zone, intent (fh_engine_h_plan_cards + the base-turn fills). */
+ *  target_zone, target_sal, intent (fh_engine_h_plan_cards + the base-turn fills).
+ *  target_sal is the stable opaque state key (the suburb is always map-selected, so
+ *  the SAL is in hand); it decouples state resolution from the name string, which is
+ *  also the title + match key. target_zone/state stay for display + as fallbacks. */
 export function buildOnboardingInput(
     stateCode: string,
     suburbName: string,
+    suburbSal: string,
     band: BudgetBand
 ): OnboardingInput {
     return {
         state: stateCode,
         target_price_range: [band.lo, band.hi],
         target_zone: [suburbName],
+        target_sal: suburbSal,
         intent: 'owner_occupier'
     };
 }

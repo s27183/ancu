@@ -133,6 +133,43 @@ def stamp_duty(artifact, state, has_conc, v):
             "after_concession": after}
 
 
+# --- land-titles registration fees (REGULATED, mechanics: kb.buyer-costs) ----
+# transfer + mortgage, per state. NSW flat; VIC/QLD add a value-based transfer
+# component. Same formula fh_engine_cash:registration_total/2 runs — Decision 9.
+
+def _reg_entry(artifact, state):
+    entries = _kb(artifact, "kb.buyer-costs.inspections-conveyancing-fees") \
+        ["lookup"]["state_registration_fees"]["entries"]
+    for e in entries:
+        if e["state"] == state:
+            return e
+    return None
+
+
+def _increments_over(v, thr, step):
+    return ((v - thr) + step - 1) // step if v > thr else 0  # "or part of" → round up
+
+
+def _transfer_reg(e, v):
+    if not e["transfer_scales_with_value"]:
+        return e["transfer_registration_flat"]
+    if "transfer_registration_per_1000_consideration" in e:  # VIC: base + per-$1000, capped
+        return min(e["transfer_registration_max"],
+                   e["transfer_registration_base"]
+                   + e["transfer_registration_per_1000_consideration"] * (v // 1000))
+    # QLD: base + per-$10,000 (or part) over threshold
+    return e["transfer_lodgement_base"] \
+        + e["transfer_additional_per_10000_over_threshold"] \
+        * _increments_over(v, e["transfer_additional_threshold"], 10000)
+
+
+def registration_total(artifact, state, v):
+    e = _reg_entry(artifact, state)
+    if e is None:
+        return None
+    return _dollars(_transfer_reg(e, v) + e["mortgage_registration_flat"])
+
+
 # --- anchors: the verified official-calculator outputs (ground truth) -------
 
 # duty() kernel checks — bracket mechanics, the VIC flat-on-total quirk, the NSW min.
@@ -168,6 +205,18 @@ DUTY_CASES = [
     ("QLD", True,  850000, 31275, 0, 31275),      # above cap → standard duty (no first-home)
 ]
 
+# registration_total() checks — (state, value, expected_total_dollars). The whole-dollar
+# total of transfer + mortgage against each registry's published schedule (kb.buyer-costs).
+REG_CASES = [
+    ("NSW", 600000, 351),   # flat $175.70 + $175.70 = $351.40 → $351 (price-independent)
+    ("NSW", 850000, 351),   # same flat fee at any price (proves NSW does not scale)
+    ("VIC", 700000, 1865),  # transfer 101.50 + 2.34×700 = 1739.50, + mortgage 125.70 = 1865.20
+    ("VIC", 2000000, 3737), # transfer capped at 3611, + mortgage 125.70 = 3736.70 (proves the cap)
+    ("QLD", 600000, 2452),  # transfer 248.04 + 46.56×42 = 2203.56, + mortgage 248.04 = 2451.60
+    ("QLD", 180000, 496),   # at threshold: 248.04 + 248.04 = 496.08 (no value component)
+    ("QLD", 185000, 543),   # $5k over → 1 increment "or part": 294.60 + 248.04 = 542.64 (round-up)
+]
+
 
 def main():
     if not ARTIFACT.is_file():
@@ -189,15 +238,21 @@ def main():
         if got != exp:
             fails.append(f"stamp_duty({state}, has_conc={hc}, {v}) = {got}, expected {exp}")
 
-    total = len(KERNEL_CASES) + len(DUTY_CASES)
+    for state, v, expected in REG_CASES:
+        got = registration_total(artifact, state, v)
+        if got != expected:
+            fails.append(f"registration_total({state}, {v}) = {got}, expected {expected}")
+
+    total = len(KERNEL_CASES) + len(DUTY_CASES) + len(REG_CASES)
     if fails:
         print(f"FAIL — {len(fails)}/{total} cash-duty checks failed:")
         for f in fails:
             print(f"  {f}")
         return 1
     print(f"PASS — all {total} cash-duty checks green "
-          f"({len(KERNEL_CASES)} kernel + {len(DUTY_CASES)} stamp_duty), "
-          f"matching the official revenue-office figures.")
+          f"({len(KERNEL_CASES)} kernel + {len(DUTY_CASES)} stamp_duty "
+          f"+ {len(REG_CASES)} registration), "
+          f"matching the official revenue-office + registry figures.")
     return 0
 
 

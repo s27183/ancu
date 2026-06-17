@@ -20,7 +20,7 @@
 
 -export([load/0, load/1]).
 -export([schema_version/0, in_scope_blueprint/0, locales/0]).
--export([blueprint/1, components/1, component/2]).
+-export([blueprint/1, components/1, component/2, ui_tabs/1]).
 -export([kb/1, kb_content_md/1, kb_rules/1, kb_anchors/1, copy/2]).
 -export([rules/0]).
 -export([registry/0, registry/1]).
@@ -88,6 +88,16 @@ blueprint(Slug) ->
 components(Slug) ->
     case blueprint(Slug) of
         {ok, Bp} -> {ok, maps:get(<<"components">>, Bp)};
+        Err      -> Err
+    end.
+
+%% The blueprint's ordered lifecycle-tab declaration (plan-card-lifecycle-restoration.md
+%% §3) — the shell renders these tabs, not the raw component list. Missing on an older
+%% artifact => [] (the shell falls back to its component order), never a crash.
+-spec ui_tabs(binary()) -> {ok, [map()]} | {error, term()}.
+ui_tabs(Slug) ->
+    case blueprint(Slug) of
+        {ok, Bp} -> {ok, maps:get(<<"ui_tabs">>, Bp, [])};
         Err      -> Err
     end.
 

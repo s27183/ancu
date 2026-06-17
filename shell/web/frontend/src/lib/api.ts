@@ -84,6 +84,13 @@ export interface OnboardingInput {
     state: string;
     target_price_range: [number, number];
     target_zone: string[];
+    /** The pinned suburb's SAL code — the stable opaque key the engine's
+     *  projection_state() prefers for resolving the scheme-eligibility state. Today's
+     *  ABS names are state-qualified ("Richmond (Vic.)") so the name-based target_zone
+     *  lookup already resolves a single state; the SAL just decouples state resolution
+     *  from that name string, which is otherwise overloaded (it's also the plan-card
+     *  title + the frontend's card match key). target_zone/state stay as fallbacks. */
+    target_sal: string;
     intent: 'owner_occupier' | 'investment';
 }
 

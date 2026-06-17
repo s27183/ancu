@@ -178,6 +178,21 @@ def rules_block(text):
     return m.group(1) if m else None
 
 
+def ui_tabs_block(text):
+    """The blueprint's `ui_tabs` declaration (plan-card-lifecycle-restoration.md §3),
+    or None. DISCOVERED, not marker-bound: scan every ```jsonc block and return the
+    first that parses to a dict carrying a top-level `ui_tabs` key — so a wording
+    change to the prose heading above it can't silently un-find the declaration."""
+    for m in re.finditer(r"```jsonc\s*\n(.*?)\n```", text, re.S):
+        try:
+            obj = parse_jsonc(m.group(1))
+        except Exception:  # noqa: BLE001 - a malformed sibling block isn't ours
+            continue
+        if isinstance(obj, dict) and "ui_tabs" in obj:
+            return obj["ui_tabs"]
+    return None
+
+
 # --------------------------------------------------------------------------- #
 # Type helpers
 # --------------------------------------------------------------------------- #
@@ -362,7 +377,7 @@ def parse_blueprint(path):
     ):
         producer[out] = comp
         reads[comp] = [x.strip() for x in rd.split(",") if x.strip()] if rd else []
-    return slug, comps, producer, reads
+    return slug, comps, producer, reads, ui_tabs_block(text)
 
 
 # --------------------------------------------------------------------------- #
@@ -590,17 +605,17 @@ def run(emit=False):
     # asserted present below, so Mode A can never be skipped unnoticed.)
     blueprints = {}
     for bp in sorted(BP.glob("*.md")):
-        slug, comps, producer, reads = parse_blueprint(bp)
+        slug, comps, producer, reads, ui_tabs = parse_blueprint(bp)
         if not comps and not producer:
             info.append(f"[skip] {slug}: no component pipeline — not a blueprint (constraint #5)")
             continue
-        blueprints[bp.stem] = (slug, comps, producer, reads)
+        blueprints[bp.stem] = (slug, comps, producer, reads, ui_tabs)
 
     if IN_SCOPE_BLUEPRINT not in blueprints:
         fails.append(f"in-scope blueprint {IN_SCOPE_BLUEPRINT} not found")
         return fails, warns, info, stats, None
 
-    _, comps, _, _ = blueprints[IN_SCOPE_BLUEPRINT]
+    _, comps, _, _, _ = blueprints[IN_SCOPE_BLUEPRINT]
     reg = build_registry(comps)
     in_scope_anchors = set()
     for c in comps:
@@ -670,7 +685,7 @@ def run(emit=False):
     def kb_exists(slug):
         return (ROOT / "docs" / (slug.replace(".", "/") + ".md")).is_file()
 
-    for stem, (_, bcomps, _, _) in blueprints.items():
+    for stem, (_, bcomps, _, _, _) in blueprints.items():
         anchors = set(a for c in bcomps for a in c.anchors)
         missing = sorted(a for a in anchors if not kb_exists(a))
         if stem == IN_SCOPE_BLUEPRINT:
@@ -682,19 +697,51 @@ def run(emit=False):
                             f"(out-of-scope mode): {missing}")
 
     # ---- GATE 3: renderers in enum (all blueprints — structural, mode-independent) #
-    for stem, (_, bcomps, _, _) in blueprints.items():
+    for stem, (_, bcomps, _, _, _) in blueprints.items():
         for c in bcomps:
             bad = [r for r in c.renderers if r not in RENDERER_ENUM]
             if bad:
                 fails.append(f"[renderer] {stem}/{c.name}: not in enum: {bad}")
 
     # ---- GATE 4: pipeline acyclic (all blueprints — structural, mode-independent) #
-    for stem, (_, _, bproducer, breads) in blueprints.items():
+    for stem, (_, _, bproducer, breads, _) in blueprints.items():
         cyc, externals = detect_cycle(bproducer, breads)
         if cyc:
             fails.append(f"[pipeline] {stem}: CYCLE: {cyc}")
         if stem == IN_SCOPE_BLUEPRINT:
             stats["dag"] = {"components": len(breads), "externals": sorted(externals)}
+
+    # ---- GATE 9: ui_tabs reference-integrity (all blueprints — structural) - #
+    # The lifecycle tab spine (plan-card-lifecycle-restoration.md §3): each blueprint
+    # declares an ORDERED tab subset of the shared vocabulary; every component a tab
+    # names must be a real component of THAT blueprint, every kind in the enum, every
+    # tab_id unique. Structural + mode-independent (no registry needed) → runs over
+    # every blueprint, so B/C/D declarations are validated now though their modes are
+    # dormant (plan-card-lifecycle-restoration.md §4). This is the gate that makes
+    # "blueprint-driven tabs" a checked property, not a claim.
+    KIND_ENUM = {"synthesis", "components"}
+    for stem, (_, bcomps, _, _, ui_tabs) in blueprints.items():
+        if not ui_tabs:
+            fails.append(f"[ui_tabs] {stem}: no ui_tabs declaration")
+            continue
+        cnames = {c.name for c in bcomps}
+        seen = set()
+        for t in ui_tabs:
+            tid = t.get("tab_id")
+            if not tid:
+                fails.append(f"[ui_tabs] {stem}: a tab is missing tab_id")
+                continue
+            if tid in seen:
+                fails.append(f"[ui_tabs] {stem}: duplicate tab_id {tid!r}")
+            seen.add(tid)
+            kind = t.get("kind", "components")
+            if kind not in KIND_ENUM:
+                fails.append(f"[ui_tabs] {stem}/{tid}: kind {kind!r} not in {sorted(KIND_ENUM)}")
+            missing = [c for c in t.get("components", []) if c not in cnames]
+            if missing:
+                fails.append(f"[ui_tabs] {stem}/{tid}: components not in blueprint: {missing}")
+        if stem == IN_SCOPE_BLUEPRINT:
+            stats["ui_tabs"] = [t.get("tab_id") for t in ui_tabs]
 
     # ---- GATE 6 + 7: reference-integrity + coverage (in-scope docs) -------- #
     ref_checked = ref_unchecked_type = 0
@@ -797,8 +844,9 @@ def build_artifact(blueprints, reg, kb_docs):
         for slug, d in kb_docs.items()
     }
     bps = {}
-    for stem, (slug, comps, producer, reads) in blueprints.items():
+    for stem, (slug, comps, producer, reads, ui_tabs) in blueprints.items():
         bps[slug] = {
+            "ui_tabs": ui_tabs or [],
             "components": [
                 {"name": c.name, "outcome_type": c.outcome_type,
                  "anchors": c.anchors, "renderers": c.renderers,
@@ -856,6 +904,7 @@ def main():
     print(f"registry: {json.dumps(stats.get('registry', {}))}")
     print(f"ref-integrity: {json.dumps(stats.get('ref_integrity', {}))}")
     print(f"dag: {json.dumps(stats.get('dag', {}))}")
+    print(f"ui_tabs (in-scope): {json.dumps(stats.get('ui_tabs', []))}")
     print(f"kb docs: {stats.get('kb_docs')}")
     print(f"copy templates: {stats.get('copy_templates')} (bilingual gate, "
           f"locales={'+'.join(LOCALES)})")

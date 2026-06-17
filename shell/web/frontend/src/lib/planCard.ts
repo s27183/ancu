@@ -46,8 +46,12 @@ export interface ProfileOutcome {
 
 export interface SchemeEntry {
     name?: string | null;
-    benefit_value?: number | null;
+    // Decision 8: benefit_value is a money_range [low, high] (base: from target_price_range;
+    // per-property: narrowed to a point). null when honestly unknown (FHSS/Help-to-Buy at base).
+    benefit_value?: MoneyRange | null;
     role?: string | null;
+    // estimate=true marks a banded estimate (e.g. FHG LMI-avoided) vs an exact regulated figure.
+    benefit_is_estimate?: boolean | null;
     notes?: LocalizedText[] | null;
 }
 export interface RejectedScheme {
@@ -59,7 +63,7 @@ export interface SchemeStackOutcome {
     applicable_schemes?: SchemeEntry[] | null;
     rejected_schemes?: RejectedScheme[] | null;
     eligibility_basis?: string | null;
-    total_benefit_value?: number | null;
+    total_benefit_value?: MoneyRange | null;
     stacking_constraints?: LocalizedText[] | null;
     recommended_application_order?: string[] | null;
 }
@@ -85,12 +89,38 @@ export interface StampDuty {
     after_concession?: number | null;
     notes?: LocalizedText[] | null;
 }
+// Decision 9: the NEED-side itemization. Each amount is a money_range at base (over
+// the target price range), a point per-property. All nullable — honest-partial.
+export interface Deposit {
+    minimum_required_percentage?: number | null;
+    minimum_required_amount?: MoneyRange | null;
+    notes?: LocalizedText[] | null;
+}
+export interface OtherBuyingCosts {
+    /** registration (exact) + convention bands → [lo, hi]. */
+    total?: MoneyRange | null;
+    /** the regulated, exact land-titles registration portion (at the range ceiling). */
+    registration_exact?: number | null;
+    notes?: LocalizedText[] | null;
+}
+export interface ReserveBuffer {
+    months_of_repayments_recommended?: number | null;
+    /** null at base — needs the loan repayment (a refine fact). */
+    amount?: number | null;
+    notes?: LocalizedText[] | null;
+}
 /** cash_position → calculator (outcome type `budget_envelope`). */
 export interface BudgetEnvelopeOutcome {
     stamp_duty?: StampDuty | null;
+    // NEED side (Decision 9) — real at base.
+    deposit?: Deposit | null;
+    other_buying_costs?: OtherBuyingCosts | null;
+    reserve_buffer?: ReserveBuffer | null;
+    /** NEED total AT SETTLEMENT = deposit + duty + other costs. money_range at base. */
+    total_cash_required?: MoneyRange | null;
     max_property_price_supported?: number | null;
     actual_property_price?: number | null;
-    total_cash_required?: number | null;
+    // HAVE side + verdict — null at base (no savings captured at onboarding; refine turn).
     cash_available?: number | null;
     gap_or_surplus?: number | null;
     verdict?: string | null;
@@ -140,6 +170,19 @@ export interface ComponentEntry {
     fill_path: 'resolver' | 'two_path' | 'agent';
 }
 
+/** One lifecycle tab the in-scope blueprint declares (engine artifact `ui_tabs`,
+ *  plan-card-lifecycle-restoration.md §3). The shell renders these tabs in order, not
+ *  the raw component list. `kind: synthesis` is a shell-composed summary (Overview);
+ *  `interactive` marks the client-side cash what-if (B2). `components` are the
+ *  blueprint's own component ids surfaced under this tab. */
+export interface UiTab {
+    tab_id: string;
+    kind?: 'synthesis' | 'components';
+    interactive?: boolean;
+    components: string[];
+    note?: string;
+}
+
 export interface PlanCard {
     plan_card_id: string;
     blueprint_slug: string;
@@ -147,6 +190,14 @@ export interface PlanCard {
     mode: string;
     status: 'active' | 'retired';
     content: { components?: Record<string, ComponentEntry> };
+    /** The blueprint's lifecycle-tab spine (engine GET; absent/[] on an older engine). */
+    ui_tabs?: UiTab[];
+    // The snapshot's as-of event cursor + whether a turn is in flight (engine GET).
+    // The projection subscribes to the SSE from `event_cursor` so a replay of an OLD
+    // turn in the append-only log can't regress this (latest) snapshot, and takes its
+    // done-state from `turn_running`. (Optional for backward-compat with an older engine.)
+    event_cursor?: number;
+    turn_running?: boolean;
 }
 
 /** A display handle from GET /api/plan-cards (shell-DB read, no engine call). */

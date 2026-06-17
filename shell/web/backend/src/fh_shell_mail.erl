@@ -43,7 +43,7 @@ resend_send(Key, Email, Url) ->
     Body = fh_shell_util:json_encode(#{
         <<"from">>    => from_address(),
         <<"to">>      => [Email],
-        <<"subject">> => <<"Sign in to FirstHomey / Đăng nhập FirstHomey">>,
+        <<"subject">> => <<"Sign in to FirstHomey / Đăng nhập FirstHomey"/utf8>>,
         <<"html">>    => html_body(Url),
         <<"text">>    => text_body(Url)
     }),
@@ -89,12 +89,13 @@ with_name(Addr) ->
 html_body(Url) ->
     <<"<p>Nhấp vào liên kết bên dưới để đăng nhập vào FirstHomey "
       "(liên kết hết hạn sau 15 phút):</p>"
-      "<p><a href=\"", Url/binary, "\">Đăng nhập / Sign in</a></p>"
+      "<p><a href=\""/utf8, Url/binary,
+      "\">Đăng nhập / Sign in</a></p>"
       "<p style=\"color:#666;font-size:13px\">Click the link above to sign in to "
       "FirstHomey. The link expires in 15 minutes. If you did not request this, "
-      "you can ignore this email.</p>">>.
+      "you can ignore this email.</p>"/utf8>>.
 
 -spec text_body(binary()) -> binary().
 text_body(Url) ->
-    <<"Đăng nhập vào FirstHomey / Sign in to FirstHomey:\n", Url/binary,
-      "\n\nLiên kết hết hạn sau 15 phút. / The link expires in 15 minutes.">>.
+    <<"Đăng nhập vào FirstHomey / Sign in to FirstHomey:\n"/utf8, Url/binary,
+      "\n\nLiên kết hết hạn sau 15 phút. / The link expires in 15 minutes."/utf8>>.

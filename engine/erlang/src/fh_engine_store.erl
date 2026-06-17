@@ -12,9 +12,10 @@
 
 -export([tenant_active_keys/1, upsert_tenant/2, add_signing_key/3, ensure_signing_key/3]).
 -export([create_profile/3, create_plan_card/6]).
--export([append_event/4, events_since/3, usage_events_since/3]).
+-export([append_event/4, events_since/3, usage_events_since/3, max_event_id/2]).
 -export([append_audit/6]).
--export([snapshot_component/3, get_plan_card/2]).
+-export([snapshot_component/3, get_plan_card/2, get_card_rerun_context/1]).
+-export([deploy_commit_sha/0, projection_state/1, list_active_plan_card_ids/0]).
 -export([list_suburbs_by_state/1, list_all_suburbs/0, list_suburb_sources/0]).
 -export([read_glue/3, append_session_turn/6]).
 
@@ -91,6 +92,18 @@ append_event(TenantId, PlanCardId, Type, Payload) ->
         "VALUES ($1::uuid, $2::uuid, $3, $4::jsonb) RETURNING event_id",
         [TenantId, PlanCardId, Type, fh_engine_util:json_encode(Payload)]),
     {ok, single(Res)}.
+
+%% The card's latest event_id — the "as-of" cursor for a GET snapshot. A client that
+%% subscribes to the SSE with this as Last-Event-ID replays only events AFTER the snapshot
+%% (none for a settled card; a running turn's new events live) — so a stale OLD turn in the
+%% append-only log can't be replayed over the fresh snapshot (plan-card-refresh.md / the
+%% multi-turn replay fix). 0 when the card has no events yet.
+-spec max_event_id(binary(), binary()) -> integer().
+max_event_id(TenantId, PlanCardId) ->
+    single(query(
+        "SELECT COALESCE(MAX(event_id), 0) FROM plan_card_events "
+        "WHERE tenant_id = $1::uuid AND plan_card_id = $2::uuid",
+        [TenantId, PlanCardId])).
 
 %% Events with event_id > LastEventId, in order → [{EventId, Type, PayloadMap}].
 -spec events_since(binary(), binary(), integer()) -> [{integer(), binary(), map()}].
@@ -173,6 +186,78 @@ get_plan_card(TenantId, PlanCardId) ->
         [] ->
             {error, not_found}
     end.
+
+%% Reconstruct the base-turn inputs for an existing card (plan-card-refresh.md): join
+%% the card to its profile so a re-run recomputes against the CURRENT profile facts +
+%% the card's own mode/intent. Looked up by plan_card_id alone — the DEV re-run trust
+%% model (the recompute is still tenant-scoped via the returned tenant_id). The returned
+%% deploy_commit_sha is the card's creation SHA (the drift signal vs deploy_commit_sha/0).
+-spec get_card_rerun_context(binary()) -> {ok, map()} | {error, not_found}.
+get_card_rerun_context(PlanCardId) ->
+    Res = query(
+        "SELECT pc.tenant_id::text, pr.user_id::text, pc.mode, pc.intent, "
+        "       pc.blueprint_slug, pc.status, pc.deploy_commit_sha, pr.facts_jsonb "
+        "FROM plan_cards pc JOIN profiles pr ON pr.profile_id = pc.profile_id "
+        "WHERE pc.plan_card_id = $1::uuid",
+        [PlanCardId]),
+    case rows(Res) of
+        [{Tenant, User, Mode, Intent, Bp, Status, Sha, Facts}] ->
+            {ok, #{tenant_id => Tenant, user_id => User, mode => Mode,
+                   intent => Intent, blueprint_slug => Bp, status => Status,
+                   deploy_commit_sha => Sha, facts => decode_jsonb(Facts)}};
+        [] ->
+            {error, not_found}
+    end.
+
+%% The PROJECTION state for the base plan (eligibility-resolution.md 2026-06-17 / G4):
+%% state-specific schemes resolve from the SUBURB being planned, not the map browse-
+%% filter `onboarding.state` (which may be "ALL"). Precedence, most-specific first:
+%%   1. `target_sal`  — the pinned suburb's SAL (shell precision) → suburbs.state.
+%%   2. `target_zone` — the zone's first suburb NAME → suburbs.state (a single state;
+%%      ambiguous name across states → undefined, never a guess).
+%%   3. `state`       — an explicit single-state filter the user chose (a real state,
+%%      never the "ALL" sentinel) → used when no suburb pins the state.
+%%   4. undefined     — no single state determinable → caller omits the state slice
+%%      (fail-honest), never a wrong default.
+%% Steps 1-2 hit the DB only when a SAL/zone is present; step 3 is pure (so the no-PG
+%% conformance, which passes `state` directly, needs no database).
+-spec projection_state(map()) -> binary() | undefined.
+projection_state(Onboarding) ->
+    case sal_state(maps:get(<<"target_sal">>, Onboarding, undefined)) of
+        undefined ->
+            case zone_state(maps:get(<<"target_zone">>, Onboarding, [])) of
+                undefined -> explicit_state(maps:get(<<"state">>, Onboarding, undefined));
+                S         -> S
+            end;
+        S -> S
+    end.
+
+%% Active plan cards for the refresh sweep (plan-card-refresh.md). Coarse scope (all
+%% non-retired); provenance-driven targeting (SHA/slug/blueprint) is a later refinement.
+-spec list_active_plan_card_ids() -> [binary()].
+list_active_plan_card_ids() ->
+    [Id || {Id} <- rows(query(
+        "SELECT plan_card_id::text FROM plan_cards "
+        "WHERE status IS DISTINCT FROM 'retired'", []))].
+
+sal_state(Sal) when is_binary(Sal) ->
+    case rows(query("SELECT state FROM suburbs WHERE sal_code = $1", [Sal])) of
+        [{S}] -> S;
+        _     -> undefined
+    end;
+sal_state(_) -> undefined.
+
+zone_state([Name | _]) when is_binary(Name) ->
+    %% DISTINCT so a single state resolves even with several SAL rows; >1 (name reused
+    %% across states) or 0 → undefined.
+    case rows(query("SELECT DISTINCT state FROM suburbs WHERE name = $1", [Name])) of
+        [{S}] -> S;
+        _     -> undefined
+    end;
+zone_state(_) -> undefined.
+
+explicit_state(S) when is_binary(S), S =/= <<"ALL">>, S =/= <<>> -> S;
+explicit_state(_) -> undefined.
 
 %% --- suburb reference surface (the shell map's raw-metric source) ------------
 %%

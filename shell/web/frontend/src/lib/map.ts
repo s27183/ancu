@@ -26,6 +26,19 @@ export const MAP_SCOPES: MapScope[] = ['ALL', ...AU_STATES];
 
 export const DEFAULT_STATE: MapScope = 'ALL'; // open on the whole continent
 
+/** Full English state names — the selector shows "New South Wales (NSW)". Always
+ *  English (proper place names), never routed through the chrome i18n. */
+export const STATE_NAMES: Record<AuState, string> = {
+    NSW: 'New South Wales',
+    VIC: 'Victoria',
+    QLD: 'Queensland',
+    WA: 'Western Australia',
+    SA: 'South Australia',
+    TAS: 'Tasmania',
+    ACT: 'Australian Capital Territory',
+    NT: 'Northern Territory'
+};
+
 /** Where the map opens per scope — a state centres on the metro where the Vietnamese
  *  community clusters; ALL frames the whole continent. [lon, lat] (MapLibre order) + zoom. */
 export const STATE_VIEW: Record<MapScope, { center: [number, number]; zoom: number }> = {

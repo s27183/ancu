@@ -38,7 +38,9 @@ fill(Args, Upstream) ->
                      []  -> [#{}];
                      As  -> As
                  end,
-    State = onboarding_state(Args, Profile),
+    %% The PROJECTION state — the suburb being planned, not the map browse-filter
+    %% (2026-06-17 / G4). Shared with fh_engine_cash so the two never disagree.
+    State = fh_engine_store:projection_state(maps:get(onboarding, Args, #{})),
     Target = maps:get(<<"target_price_range">>, Profile, null),
     GlobalRules = fh_engine_kb:rules(),
     Facts = #{<<"applicants">> => Applicants,
@@ -48,7 +50,7 @@ fill(Args, Upstream) ->
               <<"non_buying_partner">> =>
                   maps:get(<<"non_buying_partner">>, Profile, #{<<"exists">> => false})},
     Schemes = catalog(State),
-    Evaluated = [evaluate(S, GlobalRules, Facts, Target) || S <- Schemes],
+    Evaluated = [evaluate(S, GlobalRules, Facts, Target, State) || S <- Schemes],
     Outcome = assemble(Evaluated, State),
     KbVersions = fh_engine_kb:kb_anchors([maps:get(slug, S) || S <- Schemes]),
     {Outcome, <<"scheme-stack-card">>, KbVersions}.
@@ -57,38 +59,54 @@ fill(Args, Upstream) ->
 
 catalog(State) -> federal() ++ state_catalog(State).
 
+%% `desc` is the kb.copy.eligibility template id for the scheme's one-line benefit
+%% blurb (bilingual — no English literal here); the dollar `benefit_value` is computed
+%% per Decision 8 (benefit_value/3), not stored in the catalog.
 federal() ->
     [#{key => fhg, slug => <<"kb.scheme.fhg">>,
        leaf => <<"eligibility.fhg.eligible">>,
        name => <<"First Home Guarantee (FHG)">>, role => <<"deposit_guarantee">>,
-       benefit => <<"Buy with a 5% deposit and no Lenders Mortgage Insurance.">>},
+       desc => <<"benefit_fhg">>},
      #{key => fhss, slug => <<"kb.scheme.fhss">>,
        leaf => <<"eligibility.fhss.eligible">>,
        name => <<"First Home Super Saver (FHSS)">>, role => <<"deposit_savings">>,
-       benefit => <<"Save your deposit inside super and release it tax-effectively.">>},
+       desc => <<"benefit_fhss">>},
      #{key => help_to_buy, slug => <<"kb.scheme.help-to-buy">>,
        leaf => <<"eligibility.help_to_buy.eligible">>,
        name => <<"Help to Buy">>, role => <<"shared_equity">>,
-       benefit => <<"Government co-buys an equity share, cutting the deposit and loan you need.">>}].
+       desc => <<"benefit_help_to_buy">>}].
 
 state_catalog(<<"NSW">>) ->
     [#{key => fhbas, slug => <<"kb.scheme.nsw.fhbas">>,
        leaf => <<"eligibility.state_concession.applicable">>,
        name => <<"NSW First Home Buyers Assistance (transfer duty)">>,
-       role => <<"stamp_duty_concession">>,
-       benefit => <<"Full or partial transfer-duty exemption.">>},
+       role => <<"stamp_duty_concession">>, desc => <<"benefit_state_duty">>},
      #{key => fhog_nsw, slug => <<"kb.scheme.nsw.fhog">>,
        leaf => <<"eligibility.fhog.applicable">>,
        name => <<"NSW First Home Owner Grant">>, role => <<"grant">>,
-       benefit => <<"$10,000 grant for an eligible new home.">>}];
+       desc => <<"benefit_fhog">>}];
+state_catalog(<<"VIC">>) ->
+    %% VIC duty is type-agnostic (covers new + established + vacant land — no
+    %% alternative_to within VIC), so it resolves at base like NSW. The vic_after
+    %% taper already exists in fh_engine_cash; wiring it here turns on both the
+    %% scheme-stack benefit AND the cash has_state_concession gate (Decision 8 dep).
+    [#{key => fhb_duty, slug => <<"kb.scheme.vic.fhb-duty">>,
+       leaf => <<"eligibility.state_concession.applicable">>,
+       name => <<"Victoria First Home Buyer Duty Exemption/Concession">>,
+       role => <<"stamp_duty_concession">>, desc => <<"benefit_state_duty">>},
+     #{key => fhog_vic, slug => <<"kb.scheme.vic.fhog">>,
+       leaf => <<"eligibility.fhog.applicable">>,
+       name => <<"Victoria First Home Owner Grant">>, role => <<"grant">>,
+       desc => <<"benefit_fhog">>}];
 state_catalog(_Other) ->
-    %% VIC/QLD concessions need their own walk-through (QLD is a property-type
-    %% partition, decision 6). Federal-only here for now — surfaced in the outcome.
+    %% QLD is a property-type partition (decision 6 — fhc/fhnhc/fh-vacant-land);
+    %% it + the remaining states get their own walk-through. Federal-only here for
+    %% now — surfaced via maybe_state_note, not silently dropped.
     [].
 
 %% --- per-scheme evaluation ---------------------------------------------------
 
-evaluate(S, GlobalRules, Facts, Target) ->
+evaluate(S, GlobalRules, Facts, Target, State) ->
     {ok, Cj} = fh_engine_kb:kb_rules(maps:get(slug, S)),
     Rule = scheme_rule(maps:get(leaf, S), Cj),
     Resolution = maps:get(<<"resolution">>, Cj, <<"joint">>),
@@ -100,7 +118,85 @@ evaluate(S, GlobalRules, Facts, Target) ->
     TypeConditional = TypeCrits =/= [],
     Disp = disposition(Resolution, BaseNode, BaseCrits, GlobalRules, Facts,
                        Band, TypeConditional, Target),
-    S#{disposition => Disp, stacking => Stacking}.
+    {BV, Est} = benefit_value(S, State, Target),
+    S#{disposition => Disp, stacking => Stacking,
+       benefit_value => BV, benefit_is_estimate => Est}.
+
+%% --- benefit quantification (Decision 8) -------------------------------------
+%% Each applicable scheme's dollar benefit as a `money_range` from target_price_range
+%% (eligibility-resolution.md §8). Resolver-only; honest-partial (null when a needed
+%% fact is absent at base). Returns {Range | null, IsEstimate :: boolean()}.
+%%   - state duty concession: the shared, conformance-locked fh_engine_cash duty calc
+%%     (NEVER a second duty implementation — one computer per figure).
+%%   - FHG: LMI-avoided indicative BAND from kb.lmi.calculation (estimate=true).
+%%   - FHOG: fixed grant, conditional on a new build → [0, amount] at base.
+%%   - FHSS / Help-to-Buy: null at base (needs income/contributions; equity is not a
+%%     cash saving) — surfaced qualitatively via the scheme's notes.
+
+benefit_value(#{role := <<"stamp_duty_concession">>}, State, Target) ->
+    {duty_saving_range(State, Target), false};
+benefit_value(#{key := fhg}, _State, Target) ->
+    {lmi_avoided_range(Target), true};
+benefit_value(#{role := <<"grant">>} = S, _State, _Target) ->
+    {fhog_range(S), false};
+benefit_value(_S, _State, _Target) ->
+    {null, false}.
+
+%% duty saving over the price range: saving = concession_applied at each endpoint,
+%% ordered [min, max] (the saving is non-monotonic — it tapers as price rises, so the
+%% range honestly spans "$0 (top of band) .. full (bottom)"). One computer: fh_engine_cash.
+duty_saving_range(State, [Lo, Hi]) when is_integer(Lo), is_integer(Hi) ->
+    case {duty_saving(State, Lo), duty_saving(State, Hi)} of
+        {A, B} when is_integer(A), is_integer(B) -> [erlang:min(A, B), erlang:max(A, B)];
+        _                                        -> null
+    end;
+duty_saving_range(_State, _Target) ->
+    null.
+
+duty_saving(State, V) ->
+    maps:get(<<"concession_applied">>, fh_engine_cash:stamp_duty(State, true, V)).
+
+%% FHG LMI-avoided: a 5% deposit ⇒ 95% LVR ⇒ the 91-95 indicative band. loan ≈ 95% of
+%% price; premium ≈ rate × loan, floored at the insurer minimum. INDICATIVE (estimate);
+%% the binding premium is the insurer's quote (kb.lmi.calculation).
+lmi_avoided_range([Lo, Hi]) when is_integer(Lo), is_integer(Hi) ->
+    {RateLo, RateHi} = lmi_band_95_pct(),
+    Min = lmi_min_premium(),
+    PremLo = erlang:max(Min, round(RateLo / 100 * round(0.95 * Lo))),
+    PremHi = erlang:max(Min, round(RateHi / 100 * round(0.95 * Hi))),
+    [erlang:min(PremLo, PremHi), erlang:max(PremLo, PremHi)];
+lmi_avoided_range(_Target) ->
+    null.
+
+lmi_band_95_pct() ->
+    {ok, Cj} = fh_engine_kb:kb_rules(<<"kb.lmi.calculation">>),
+    Entries = maps:get(<<"entries">>,
+        maps:get(<<"indicative_premium_by_lvr_band">>, maps:get(<<"lookup">>, Cj))),
+    {value, E} = lists:search(
+        fun(X) -> maps:get(<<"lvr_band">>, X) =:= <<"91-95">> end, Entries),
+    {maps:get(<<"indicative_rate_pct_of_loan_low">>, E),
+     maps:get(<<"indicative_rate_pct_of_loan_high">>, E)}.
+
+lmi_min_premium() ->
+    {ok, Cj} = fh_engine_kb:kb_rules(<<"kb.lmi.calculation">>),
+    maps:get(<<"value">>,
+        maps:get(<<"min_premium_aud_qbe">>, maps:get(<<"parameters">>, Cj))).
+
+%% FHOG: fixed grant, but new-build-only ⇒ at base (property_type unknown) it is [0, amount]
+%% — $0 if established, the grant if a new build. The amount is the scheme doc's own fill.
+fhog_range(S) ->
+    case fill_value(maps:get(slug, S), <<"eligibility.fhog.amount">>) of
+        Amt when is_integer(Amt) -> [0, Amt];
+        _                        -> null
+    end.
+
+fill_value(Slug, Leaf) ->
+    {ok, Cj} = fh_engine_kb:kb_rules(Slug),
+    case lists:search(fun(F) -> maps:get(<<"leaf">>, F, undefined) =:= Leaf end,
+                      maps:get(<<"fills">>, Cj, [])) of
+        {value, F} -> maps:get(<<"value">>, maps:get(<<"rule">>, F, #{}), null);
+        false      -> null
+    end.
 
 %% the criteria rule for this leaf, from THIS doc's fills.
 scheme_rule(Leaf, Cj) ->
@@ -248,6 +344,7 @@ label_of(C) ->
 assemble(Evaluated, State) ->
     Applicable = [E || E <- Evaluated, status(E) =/= rejected],
     Rejected   = [E || E <- Evaluated, status(E) =:= rejected],
+    Constraints = stacking_constraints(Applicable) ++ excludes_note(Applicable),
     Outcome = #{
         <<"applicable_schemes">> => [to_applicable(E) || E <- Applicable],
         <<"rejected_schemes">> =>
@@ -256,18 +353,58 @@ assemble(Evaluated, State) ->
         <<"eligibility_basis">> => basis(Evaluated),
         <<"recommended_application_order">> =>
             [maps:get(name, E) || E <- sort_by_order(Applicable)],
-        <<"stacking_constraints">> => stacking_constraints(Applicable),
+        <<"stacking_constraints">> => Constraints,
         <<"structuring_options">> => [],   %% multi-applicant refine-turn concern (decisions 3/4)
-        <<"total_benefit_value">> => null  %% Mode-A base benefits are qualitative; quantified per-property
+        <<"total_benefit_value">> => total_benefit(Applicable)  %% Decision 8 — money_range over the compatible stack
     },
     maybe_state_note(Outcome, State).
+
+%% total_benefit: sum the quantified (non-null) benefit ranges across the applicable
+%% schemes. In Mode A the only alternative_to pair is FHG<->Help-to-Buy and Help-to-Buy's
+%% benefit is null (equity, not a saving), so summing the non-null ranges never
+%% double-counts a mutually-exclusive path. Returns a money_range or null.
+total_benefit(Applicable) ->
+    Ranges = [BV || E <- Applicable, BV <- [maps:get(benefit_value, E, null)], is_list(BV)],
+    case Ranges of
+        [] -> null;
+        _  -> [lists:sum([Lo || [Lo, _] <- Ranges]),
+               lists:sum([Hi || [_, Hi] <- Ranges])]
+    end.
+
+%% honest-partial: name the applicable schemes excluded from the total because their
+%% value isn't knowable at base (FHSS, Help-to-Buy) — never silently drop them.
+excludes_note(Applicable) ->
+    Names = [maps:get(name, E) || E <- Applicable,
+             maps:get(benefit_value, E, null) =:= null],
+    case Names of
+        [] -> [];
+        _  -> [copy(<<"total_excludes">>, #{<<"names">> => join(Names, <<", ">>)})]
+    end.
 
 to_applicable(E) ->
     Disp = maps:get(disposition, E),
     #{<<"name">> => maps:get(name, E),
-      <<"benefit_value">> => maps:get(benefit, E),
+      <<"benefit_value">> => maps:get(benefit_value, E, null),
+      <<"benefit_is_estimate">> => maps:get(benefit_is_estimate, E, false),
       <<"role">> => maps:get(role, E),
-      <<"notes">> => status_prefix(Disp) ++ maps:get(notes, Disp, [])}.
+      <<"notes">> => status_prefix(Disp)
+                     ++ [desc_note(E)]
+                     ++ maps:get(notes, Disp, [])
+                     ++ value_notes(E)}.
+
+%% the scheme's one-line benefit blurb (bilingual copy), as the lead descriptive note.
+desc_note(E) -> copy(maps:get(desc, E), #{}).
+
+%% a value-specific note: the duty taper, the LMI estimate caveat, the FHOG new-build
+%% condition — only where the corresponding benefit_value was quantified.
+value_notes(#{role := <<"stamp_duty_concession">>, benefit_value := [Lo, Hi]}) when Lo =/= Hi ->
+    [copy(<<"duty_phase_out">>, #{})];
+value_notes(#{key := fhg, benefit_value := BV}) when is_list(BV) ->
+    [copy(<<"lmi_estimate">>, #{})];
+value_notes(#{role := <<"grant">>, benefit_value := BV}) when is_list(BV) ->
+    [copy(<<"fhog_if_new_build">>, #{})];
+value_notes(_E) ->
+    [].
 
 %% surface the disposition as the lead note (renderer reads `notes`).
 status_prefix(#{status := eligible})    -> [copy(<<"status_eligible">>, #{})];
@@ -302,9 +439,9 @@ sort_by_order(Applicable) ->
 order_hint(E) ->
     maps:get(<<"order_hint">>, maps:get(stacking, E, #{}), 999).
 
-maybe_state_note(Outcome, <<"NSW">>) -> Outcome;
+maybe_state_note(Outcome, State) when State =:= <<"NSW">>; State =:= <<"VIC">> -> Outcome;
 maybe_state_note(Outcome, _State) ->
-    %% no silent cap: non-NSW state concessions aren't evaluated yet.
+    %% no silent cap: QLD (type partition) + the remaining states aren't evaluated yet.
     Constraints = maps:get(<<"stacking_constraints">>, Outcome),
     Outcome#{<<"stacking_constraints">> =>
                  Constraints ++ [copy(<<"state_not_assessed">>, #{})]}.
@@ -312,13 +449,6 @@ maybe_state_note(Outcome, _State) ->
 %% --- helpers -----------------------------------------------------------------
 
 status(E) -> maps:get(status, maps:get(disposition, E)).
-
-onboarding_state(Args, Profile) ->
-    Onboarding = maps:get(onboarding, Args, #{}),
-    case maps:get(<<"state">>, Onboarding, undefined) of
-        undefined -> maps:get(<<"state">>, Profile, <<"NSW">>);
-        S         -> S
-    end.
 
 enumerate(L) -> lists:zip(lists:seq(0, length(L) - 1), L).
 
