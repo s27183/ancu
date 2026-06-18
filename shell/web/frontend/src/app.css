@@ -1108,6 +1108,37 @@ main {
     cursor: pointer;
     padding: 0 0.2rem;
 }
+/* Session-expired cue: the message takes a full row; the actions (re-sign-in pill +
+   dismiss) wrap to a right-aligned second row, so a long (Vietnamese) message never
+   gets squeezed to one-word-per-line by the nowrap pill. */
+.signin-banner-cue {
+    flex-wrap: wrap;
+}
+.signin-banner-cue .signin-banner-msg {
+    flex: 1 1 100%;
+}
+.signin-banner-cue .signin-banner-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: auto;
+}
+/* The re-sign-in action — a real pill, not the bare ✕. Button-tag specificity to
+   outrank the generic `.signin-banner button` above (which would strip the pill). */
+.signin-banner button.signin-banner-action {
+    margin-left: 0;
+    padding: 0.25rem 0.65rem;
+    border-radius: var(--radius);
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+/* the actions group owns its own margins; neutralise the generic auto-margin. */
+.signin-banner-actions button {
+    margin-left: 0;
+}
 
 /* --- Login sheet (login slice) — reuses .ob-* chrome, adds email + Google --- */
 .auth-field {

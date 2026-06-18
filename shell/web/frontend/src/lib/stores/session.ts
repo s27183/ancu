@@ -8,21 +8,49 @@ import { getMe, type Session } from '$lib/auth';
 
 export const session = writable<Session | null>(null);
 export const sessionLoaded = writable<boolean>(false);
+// True when /api/me resolves to null but we HAD a session before — the 1-day session
+// JWT (fh_shell_jwt, no refresh) lapsed under the user. This is distinct from
+// never-signed-in: the UI prompts a calm re-login instead of silently dropping the
+// saved-plans surface (which is gated on `$session`). The "had a session" fact is
+// persisted to localStorage so the cue survives a reload until re-login or an explicit
+// sign-out (which is intentional, not an expiry).
+export const sessionExpired = writable<boolean>(false);
+
+const PRIOR_KEY = 'fh-had-session';
+const hadPriorSession = (): boolean => browser && localStorage.getItem(PRIOR_KEY) === '1';
 
 /** Re-read /api/me and update the store. Safe to call repeatedly. */
 export async function refreshSession(): Promise<void> {
     if (!browser) return;
+    let s: Session | null = null;
     try {
-        session.set(await getMe());
+        s = await getMe();
     } catch {
-        session.set(null);
-    } finally {
-        sessionLoaded.set(true);
+        s = null;
     }
+    session.set(s);
+    if (s) {
+        localStorage.setItem(PRIOR_KEY, '1');
+        sessionExpired.set(false);
+    } else {
+        // null + a prior session on record ⇒ the cookie lapsed (not never-signed-in).
+        sessionExpired.set(hadPriorSession());
+    }
+    sessionLoaded.set(true);
+}
+
+/** Acknowledge the expired-session cue (dismiss). Clears the prior-session marker so a
+ *  reload doesn't replay it — mirrors the ?signin=… banner's no-replay behaviour. */
+export function dismissSessionExpired(): void {
+    sessionExpired.set(false);
+    if (browser) localStorage.removeItem(PRIOR_KEY);
 }
 
 export async function signOut(): Promise<void> {
     const { logout } = await import('$lib/auth');
     await logout();
     session.set(null);
+    // An intentional sign-out is not an expiry — clear the marker so no cue fires.
+    sessionExpired.set(false);
+    if (browser) localStorage.removeItem(PRIOR_KEY);
 }

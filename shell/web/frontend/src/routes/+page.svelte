@@ -20,7 +20,7 @@
         type SizeBy
     } from '$lib/map';
     import { signinFlag, type SigninFlag } from '$lib/auth';
-    import { refreshSession, session } from '$lib/stores/session';
+    import { refreshSession, session, sessionExpired, dismissSessionExpired } from '$lib/stores/session';
     import { loginOpen } from '$lib/stores/ui';
     import { clickOutside } from '$lib/actions/clickOutside';
     import SuburbMap from '$lib/SuburbMap.svelte';
@@ -181,6 +181,30 @@
             <button type="button" onclick={() => (banner = null)} aria-label={$t('sheet.close')}
                 >✕</button
             >
+        </div>
+    {/if}
+
+    <!-- Session-expired cue (the 1-day JWT lapsed under a previously-signed-in user) —
+         distinct from never-signed-in: prompt a calm re-login so the saved-plans surface
+         doesn't just silently vanish. Signing in restores the checkbox + the saved set. -->
+    {#if $sessionExpired}
+        <div class="signin-banner signin-banner-cue" role="status">
+            <span class="signin-banner-msg">{$t('auth.expired.cue')}</span>
+            <span class="signin-banner-actions">
+                <button
+                    type="button"
+                    class="signin-banner-action"
+                    onclick={() => {
+                        dismissSessionExpired();
+                        loginOpen.set(true);
+                    }}>{$t('auth.signin')}</button
+                >
+                <button
+                    type="button"
+                    onclick={dismissSessionExpired}
+                    aria-label={$t('sheet.close')}>✕</button
+                >
+            </span>
         </div>
     {/if}
 

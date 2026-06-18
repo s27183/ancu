@@ -328,6 +328,10 @@ const messages = {
         vi: 'Liên kết dev (chỉ môi trường phát triển):',
         en: 'Dev link (development only):'
     },
+    'auth.expired.cue': {
+        vi: 'Phiên đăng nhập đã hết hạn — đăng nhập lại để xem các kế hoạch đã lưu.',
+        en: 'Your session expired — sign in again to see your saved plans.'
+    },
     'auth.flag.ok': { vi: 'Bạn đã đăng nhập.', en: 'You’re signed in.' },
     'auth.flag.expired': {
         vi: 'Liên kết đã hết hạn hoặc đã được sử dụng. Vui lòng yêu cầu liên kết mới.',
