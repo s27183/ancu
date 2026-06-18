@@ -334,7 +334,7 @@ Filling a component is not monolithic. Each leaf parameter declares *how* it is 
 - **Deterministic resolver** (no LLM) — fills `<from_X>` copies, `derived_from` computations, unflagged formula leaves (stamp duty, LMI, deposit amounts, totals, threshold verdicts), *and* the rules engine (eligibility predicates, scheme-stacking constraints). A pure function of current plan-card state + resolved KB. Instant, free, and **reproducible**: identical inputs always produce identical figures — which is what makes the audit trail and the ASIC "computed, not advised" posture defensible.
 - **Agent turn** (LLM) — fills only `agent_reasoning_required: true` leaves: the operations that clear the three-trigger test in [agentic-boundary.md](agentic-boundary.md) — valuation read, lender fit, negotiation style, synthesis of unstructured-document significance, and open-ended Q&A over the card. This is the reasoning the platform exists to provide.
 
-The resolver runs **first**; the agent turn then sees a plan card whose deterministic leaves are already filled and reasons only over what remains (hence the system-prompt instruction above fills the `agent_reasoning_required` leaves *still* `<initial>`). This is why the `cash_position` calculator (renderer `calculator`) recomputes a budget envelope on every price/cash change with no model call — its parameters are entirely resolver-path — while `property_assessment` (valuation) and `mortgage_finance` (lender fit) carry `agent_reasoning_required` leaves and need the turn. Even `eligibility` — an intricate multi-scheme determination — is resolver: its criteria are rules, not judgment.
+The resolver runs **first**; the agent turn then sees a plan card whose deterministic leaves are already filled and reasons only over what remains (hence the system-prompt instruction above fills the `agent_reasoning_required` leaves *still* `<initial>`). This is why the `cash_position` calculator (renderer `calculator`) recomputes a budget envelope on every what-if with no model call — its parameters are entirely resolver-path (cash-on-hand resolves instantly in the client; a *structural* what-if — price/state/type — runs a free engine resolver preview, [`lifecycle-simulation-model.md`](lifecycle-simulation-model.md) §4 + engine-contract §10) — while `property_assessment` (valuation) and `mortgage_finance` (lender fit) carry `agent_reasoning_required` leaves and need the turn. Even `eligibility` — an intricate multi-scheme determination — is resolver: its criteria are rules, not judgment.
 
 The partition is **derivable from the blueprint**: a leaf is agent-path iff it carries `agent_reasoning_required: true`; everything else (`<from_X>` copies, `derived_from` computations, unflagged formula leaves) is resolver-path. The corollary discipline: every leaf that needs judgment **must** be flagged, or it silently falls to the resolver. A component with zero flagged leaves (e.g. `settlement_prep` — a date + dependency engine) is a pure resolver component even though it activates per-property; **scope (`base | per-property | both`) is independent of fill path.**
 
@@ -471,10 +471,10 @@ The platform's UI has a constrained set of renderer components. Blueprints can o
 | Renderer | Purpose | Outcome shape (rough) |
 |---|---|---|
 | `summary-card` | Short prose + key facts | `{ headline, key_facts[], call_to_action? }` |
-| `swimlane-diagram` | Temporal flow across actors | `{ phases[], actors[], events[] }` |
+| `swimlane-diagram` | Temporal flow across actors + who-pays/talks-to-whom | `{ phases[], actors[], cells[{ …, counterparty }], interactions[{ from_actor, to_actor, phase, flows }] }` |
 | `checklist` | Tickable items with status | `{ items[{ label, status, doc_ref? }] }` |
 | `data-table` | Tabular data | `{ headers[], rows[] }` |
-| `calculator` | Interactive form + computed outputs | `{ inputs[], outputs[], verdict? }` |
+| `calculator` | Interactive financial spine — phased cash-flow + what-if form | `{ inputs[], cash_events[] (by phase), outputs[], verdict? }` |
 | `buying-strategy-card` | Bid plan with confidence | `{ max_bid, walk_away, comparables[], style }` |
 | `decision-trail` | Chronological list of decisions | `{ entries[{ date, decision, reasoning }] }` |
 | `risk-flag-list` | Flagged items with severity | `{ flags[{ severity, item, action }] }` |
@@ -486,6 +486,15 @@ The platform's UI has a constrained set of renderer components. Blueprints can o
 
 The FHB Mode A blueprint uses 9 of these (summary-card, scheme-stack-card, calculator, buying-strategy-card, risk-flag-list, checklist, swimlane-diagram, data-table, opportunity-card). Mode B blueprints will activate firb-workflow-card and family-view-card. New renderers are added as new component types emerge; each addition is a deliberate, reviewed change to this vocabulary.
 
+**The two-spines + simulation model ([`lifecycle-simulation-model.md`](lifecycle-simulation-model.md)) extends shapes, not the enum.** Realizing it needs **zero new renderers** — a deliberate result, not an accident (constraint #7):
+
+- **`cash_events` is a shared outcome primitive, not a renderer.** `cash_position` emits an ordered `cash_events[]` (`{phase, label, direction, amount: money_range, timing, counterparty, source_component}`); the `calculator` projects it onto the money×phase axis and `swimlane-diagram` (the `purchase_journey` component) reads the *same* list for its amount-bearing cells. Both **place** figures; neither recomputes — one-computer-per-figure extended to every consumer (outcomes-are-interfaces). The union is assembled by placement from the figure-owning components (`cash_position`, `eligibility`, `ownership_planning`) and gated by [`outcome-conformance.md`](outcome-conformance.md) so every placed event traces to an owner.
+- **`interactions` extends the `swimlane-diagram` outcome**, not the vocabulary — the `counterparty` on each event yields the who-pays/talks-to-whom edges, at purchase *and* in ownership. (This also reconciles the rough shape's `cells[]` with the blueprint's field name; the earlier `events[]` sketch was a drift.)
+- **Q&A is a conversational *tab kind*, not a renderer.** It is a shell surface over the engine's existing bilingual Q&A stream (engine-contract §4 `text_delta`, §6 buffer-then-gate) plus the `sessions` log — there is no `component_filled` outcome, so `ui_tabs` gains a `kind: "qa"` tab carrying no components; the renderer enum is untouched.
+- **Base-scope preparation content** (document checklist / people-to-engage / money buffer) is a new **component** at `scope: base` (reclassified out of the per-property `due_diligence`), composing the existing `checklist` + `data-table` renderers.
+
+So the Mode-A renderer count stays at 9; the model lands as extended outcome shapes + one new `ui_tabs` kind + one new base-scope component.
+
 #### Why this architecture is sharp
 
 - **The component becomes the unit of agent reasoning** — bounded scope, typed outcome, clear inputs. Easier to evaluate, harder to hallucinate against.
@@ -494,7 +503,7 @@ The FHB Mode A blueprint uses 9 of these (summary-card, scheme-stack-card, calcu
 - **The UI is a thin renderer** over the blueprint + filled state — easy to build, easy to extend (add a new component → assign a renderer → CI validates).
 - **Outcomes are interfaces, not parameters** — downstream components read structured outcomes (not raw upstream parameters), making the pipeline composable and the agent's reasoning bounded.
 - **Token economics are favourable** — system prompt is bounded by current plan card + property + uploads, not by accumulated history.
-- **Two fill paths keep math out of the model** — the per-leaf `agent_reasoning_required` flag splits each component into a deterministic resolver (copies, `derived_from`, calculator math — reproducible, free, no LLM) and an agent turn (judgment only). Recompute-on-input (e.g., a what-if price in `cash_position`) is instant and costs nothing; only edits that reach an agent-flagged leaf spend a turn.
+- **Two fill paths keep math out of the model** — the per-leaf `agent_reasoning_required` flag splits each component into a deterministic resolver (copies, `derived_from`, calculator math — reproducible, free, no LLM) and an agent turn (judgment only). A what-if recompute costs nothing (resolver-path, no LLM): cash-on-hand resolves instantly in the client, a structural what-if (price/state/type) via a free engine resolver preview (engine-contract §10, [`lifecycle-simulation-model.md`](lifecycle-simulation-model.md)); only edits that reach an agent-flagged leaf spend a turn.
 - **Blueprint evolution is decoupled from instance migration** — laws change frequently; user plan cards remain stable until they opt to refresh.
 - **KB anchors and renderers are validated at build time** — the artifact compiler gates deployment on schema correctness, preventing the agent from referencing missing content or undefined renderers in production.
 

@@ -8,8 +8,10 @@ last_verified: 2026-06-01
 
 User-facing copy-templates for the `cash_position` resolver half (`fh_engine_cash`): the
 stamp-duty `notes` (concession applied / phased out / full duty / pending), the
-`key_assumptions` narration, the pending-state notes, and the NEED-side notes (Decision 9 —
-deposit assumption, banded other-costs, the pending reserve buffer). Each template is a
+`key_assumptions` narration, the pending-state notes, the NEED-side notes (Decision 9 —
+deposit assumption, banded other-costs, the pending reserve buffer), and the
+`cash_events` spine labels (`event_*` — two-spines §2; param-free, since the figure
+rides in the event's `amount`, not interpolated into prose). Each template is a
 `{vi, en}` pair with `{param}` placeholders the resolver fills via `fh_engine_i18n:subst/2`.
 
 Params here are all **scalars** (same in both languages, per the figure/locale boundary,
@@ -83,6 +85,22 @@ template ids the resolver references, each a `{vi, en}` pair.
     "duty_full": {
       "vi": "Đang hiển thị mức thuế đầy đủ — chưa áp dụng ưu đãi người mua nhà lần đầu ở mức giá/tiểu bang này.",
       "en": "Shown at full duty — no first-home concession applied at this price/state yet."
+    },
+    "event_deposit": {
+      "vi": "Tiền đặt cọc khi ký hợp đồng",
+      "en": "Deposit at contract"
+    },
+    "event_stamp_duty": {
+      "vi": "Thuế trước bạ khi hoàn tất giao dịch",
+      "en": "Transfer duty at settlement"
+    },
+    "event_other_costs": {
+      "vi": "Chi phí giao dịch (đăng bộ, kiểm định, sang tên)",
+      "en": "Transaction costs (registration, inspection, conveyancing)"
+    },
+    "event_grant": {
+      "vi": "Trợ cấp người mua nhà lần đầu (nhận khi hoàn tất giao dịch)",
+      "en": "First-home owner grant (received at settlement)"
     }
   }
 }

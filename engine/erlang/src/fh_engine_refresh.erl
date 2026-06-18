@@ -20,6 +20,11 @@
 %% bound in-flight turns + the metering budget (plan-card-refresh.md §safety).
 
 -export([sweep/1, refresh_card/1]).
+%% Shared with fh_engine_h_refine (W7b): the base_resolver turn-start primitive and the
+%% existing-leaf extraction. Refine is the refresh sweep driven by an OVERRIDDEN onboarding
+%% (a saved what-if) instead of the card's current onboarding — same turn, same no-usage,
+%% same re-attached agent leaves. One source so the two callers can never drift.
+-export([start_base_resolver/4, existing_outcomes/1]).
 
 -spec sweep(all) -> map().
 sweep(all) ->
@@ -49,13 +54,26 @@ refresh_card(PlanCardId) ->
     end.
 
 start(PlanCardId, Ctx, Existing) ->
+    Onboarding = maps:get(<<"onboarding">>, maps:get(facts, Ctx), #{}),
+    case start_base_resolver(PlanCardId, Ctx, Existing, Onboarding) of
+        {ok, _TurnId}       -> started;
+        {error, in_flight}  -> {skipped, in_flight}
+    end.
+
+%% Reserve + start one card's base_resolver turn against an EXPLICIT onboarding (the
+%% refresh sweep passes the card's current onboarding; a refine — W7b — passes the
+%% overridden what-if). Resolver-only: re-runs the deterministic fills, SKIPS the two-path
+%% sidecar and re-attaches the stored agent leaves from `Existing` (no LLM, no `usage`).
+%% One in-flight turn per card (registry-gated → {error, in_flight}).
+-spec start_base_resolver(binary(), map(), map(), map()) ->
+    {ok, binary()} | {error, in_flight}.
+start_base_resolver(PlanCardId, Ctx, Existing, Onboarding) ->
     TurnId = fh_engine_util:uuid4(),
     case fh_engine_turn_registry:reserve(PlanCardId, TurnId) of
         {error, in_flight} ->
-            {skipped, in_flight};
+            {error, in_flight};
         ok ->
-            Facts = maps:get(facts, Ctx),
-            Derived = maps:get(<<"derived">>, Facts, #{}),
+            Derived = maps:get(<<"derived">>, maps:get(facts, Ctx), #{}),
             {ok, _Pid} = fh_engine_turn_sup:start_turn(#{
                 tenant_id => maps:get(tenant_id, Ctx),
                 user_id => maps:get(user_id, Ctx),
@@ -64,15 +82,16 @@ start(PlanCardId, Ctx, Existing) ->
                 mode => maps:get(mode, Ctx),
                 intent => maps:get(intent, Ctx),
                 firb_required_any => maps:get(<<"firb_required_any">>, Derived, false),
-                onboarding => maps:get(<<"onboarding">>, Facts, #{}),
+                onboarding => Onboarding,
                 kind => base_resolver,
                 existing_outcomes => Existing
             }),
-            started
+            {ok, TurnId}
     end.
 
 %% #{component_id => outcome} from the card's content snapshot — fed to the
 %% resolver-only turn so two-path components re-attach their existing agent leaves.
+-spec existing_outcomes(map()) -> map().
 existing_outcomes(Card) ->
     Components = maps:get(<<"components">>, maps:get(<<"content">>, Card, #{}), #{}),
     maps:map(fun(_Name, Entry) -> maps:get(<<"outcome">>, Entry, #{}) end, Components).

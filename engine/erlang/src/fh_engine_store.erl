@@ -14,7 +14,7 @@
 -export([create_profile/3, create_plan_card/6]).
 -export([append_event/4, events_since/3, usage_events_since/3, max_event_id/2]).
 -export([append_audit/6]).
--export([snapshot_component/3, get_plan_card/2, get_card_rerun_context/1]).
+-export([snapshot_component/3, get_plan_card/2, get_card_rerun_context/1, set_card_target/2]).
 -export([deploy_commit_sha/0, projection_state/1, list_active_plan_card_ids/0]).
 -export([list_suburbs_by_state/1, list_all_suburbs/0, list_suburb_sources/0]).
 -export([read_glue/3, append_session_turn/6]).
@@ -196,18 +196,46 @@ get_plan_card(TenantId, PlanCardId) ->
 get_card_rerun_context(PlanCardId) ->
     Res = query(
         "SELECT pc.tenant_id::text, pr.user_id::text, pc.mode, pc.intent, "
-        "       pc.blueprint_slug, pc.status, pc.deploy_commit_sha, pr.facts_jsonb "
+        "       pc.blueprint_slug, pc.status, pc.deploy_commit_sha, pr.facts_jsonb, "
+        "       pc.target_jsonb "
         "FROM plan_cards pc JOIN profiles pr ON pr.profile_id = pc.profile_id "
         "WHERE pc.plan_card_id = $1::uuid",
         [PlanCardId]),
     case rows(Res) of
-        [{Tenant, User, Mode, Intent, Bp, Status, Sha, Facts}] ->
+        [{Tenant, User, Mode, Intent, Bp, Status, Sha, Facts, Target}] ->
             {ok, #{tenant_id => Tenant, user_id => User, mode => Mode,
                    intent => Intent, blueprint_slug => Bp, status => Status,
-                   deploy_commit_sha => Sha, facts => decode_jsonb(Facts)}};
+                   deploy_commit_sha => Sha,
+                   facts => overlay_target(decode_jsonb(Facts), decode_jsonb(Target))}};
         [] ->
             {error, not_found}
     end.
+
+%% The plan-target overlay (lifecycle-simulation-model §4.3 / W7b). A non-empty overlay
+%% (a saved refine scenario) is the card's CURRENT target — it fully supersedes the
+%% profile onboarding for the recompute, so a refresh/refine/preview re-derives from the
+%% saved scenario, not stale profile facts. Empty '{}' (every card before its first
+%% refine) → the profile onboarding is used unchanged. The overlay holds the FULL
+%% effective onboarding the refine wrote, so a `state` save's stripped pin stays stripped
+%% (no patch-deletion semantics).
+-spec overlay_target(map(), map()) -> map().
+overlay_target(Facts, Target) when map_size(Target) > 0 ->
+    Facts#{<<"onboarding">> => Target};
+overlay_target(Facts, _Target) ->
+    Facts.
+
+%% Persist a refine's chosen scenario — the FULL effective onboarding — to the card's
+%% plan-target overlay (W7b). target_* is a PLAN fact, so it lands on the card, never the
+%% profile (which a sibling journey would share). Written AFTER the turn is reserved (so a
+%% 409 never mutates the target); the turn itself reads its onboarding from its start args,
+%% not from this column, so the write order vs the async turn is immaterial.
+-spec set_card_target(binary(), map()) -> ok.
+set_card_target(PlanCardId, Onboarding) ->
+    _ = query(
+        "UPDATE plan_cards SET target_jsonb = $2::jsonb, updated_at = now() "
+        "WHERE plan_card_id = $1::uuid",
+        [PlanCardId, fh_engine_util:json_encode(Onboarding)]),
+    ok.
 
 %% The PROJECTION state for the base plan (eligibility-resolution.md 2026-06-17 / G4):
 %% state-specific schemes resolve from the SUBURB being planned, not the map browse-

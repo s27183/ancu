@@ -234,3 +234,16 @@ The two edits parked earlier — pinning the read-namespace convention in archit
 
 - **Read-namespace convention.** Under the unified fact base there is one `profile.*` namespace across modes, so the convention is "read by the canonical (mode-independent) slot alias." This is a §11.9/`structure-map.md` edit, and it rides Wedge-2 (when B/C/D actually adopt the shape and a second namespace would otherwise appear); for Mode A alone there is only ever `profile.*`, so nothing to pin yet.
 - **`established-dwelling-ban` read — no revert needed.** The parked note assumed it should read flat `profile.firb_required`; the live predicate already reads the aggregate `profile.firb_required_any` (`established-dwelling-ban.md` line 74), which is **correct** under the unified design (the household-level FIRB fact). There is no Mode-A edit here. The only fix this anchor needs is on the **B/D publish side** (they currently emit flat `firb_required`; they must publish `firb_required_any`) — Wedge-2 authoring, the F14 close.
+
+## Per-override storage mapping — the simulate/refine seam
+
+[`engine-contract.md`](engine-contract.md) §10.2 (the saved-scenario commit) and [`lifecycle-simulation-model.md`](lifecycle-simulation-model.md) §4.3 defer the per-override profile-vs-card mapping here, because *where a saved override lands* is a fact-model question, not a contract one. The structural overrides the base simulate/refine accepts map by Decision 1's partition:
+
+| Override | Canonical layer | Persists on commit to | Why |
+|---|---|---|---|
+| `target_price` (→ `target.price_range`) | **`plan`** | the **card** (plan-target overlay) | `target.*` is per-journey, mutable (Decision 1, sub-question 4 — S24); a profile-level write leaks across a profile's other journeys |
+| `state` (→ `target.state`, the projection basis) | **`plan`** | the **card** (plan-target overlay) | same — the projection state is a property of *this* journey's target, not the household |
+| `target_sal` / `target_zone` (the projection pin) | **`plan`** | the **card** (plan-target overlay) | same; and a `state` save **strips** these (precedence `sal` > `zone` > `state` — an explicit state save supersedes the pin, [`lifecycle-simulation-model.md`](lifecycle-simulation-model.md) §4.3) |
+| `property_type` | per-property addendum | n/a at base | no property attached at base → moves zero base figures; a Phase-B dimension (engine-contract §10.1), rejected by base simulate |
+
+So **every base override is a `plan` fact** — they all persist on the card via the plan-target overlay, none touches `profiles`. This is the first concrete consumer of item-4's plan/profile storage split: the overlay column **is** `plan.target` realized for Wedge 1, additive over the 1:1 shape (an empty overlay = today's behaviour). The persistent `profile` (applicants, household financials, `derived`) is never written by a base refine — only the journey's target moves. The earlier note in engine-contract §10.2 that called `target_price_range` a *profile fact* reflected the legacy conflation (target lived in `profiles.facts_jsonb.onboarding` only because `profile:card` was 1:1); it is corrected to a *plan* fact there.

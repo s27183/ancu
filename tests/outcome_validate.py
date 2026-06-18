@@ -108,13 +108,102 @@ def check(tree, value, locales=LOCALES):
     return None
 
 
-def validate(type_tree_fields, outcome, locales=LOCALES):
-    """An outcome map against an outcome_type's {field: parsed_tree}. None or first reason."""
+def validate(type_tree_fields, outcome, locales=LOCALES, components=()):
+    """An outcome map against an outcome_type's {field: parsed_tree}. None or first reason.
+
+    Runs the §13 placement/provenance pass after the type walk (graceful when `components`
+    is empty — check 1 has nothing to resolve against)."""
     for f, sub in type_tree_fields.items():
         r = check(sub, outcome.get(f), locales)
         if r:
             return f"{f}{r}" if r[0] in ".[" else f"{f}: {r}"
+    return check_placement(outcome, components)
+
+
+# --- §13 placement & provenance (outcome-conformance.md §13) --------------------
+# A SEMANTIC pass over the whole outcome (not the type-tree walk): the two-spines model
+# adds PLACED figures, tagged with provenance + money-flow fields. Field-name driven, so it
+# attaches to the invariant wherever it appears (every cash_event / cell), not to a hardcoded
+# outcome list. Mirror of fh_engine_outcome:check_placement/2.
+
+MONEY_MARKERS = {"money_out", "money_in"}
+NONMONEY_MARKERS = {"none", "document", "milestone"}
+MONEY_DIRECTIONS = {"out", "in"}
+
+
+def _walk_maps(value):
+    """Yield every dict nested anywhere in `value` (including `value` itself)."""
+    if isinstance(value, dict):
+        yield value
+        for v in value.values():
+            yield from _walk_maps(v)
+    elif isinstance(value, list):
+        for v in value:
+            yield from _walk_maps(v)
+
+
+def _amt_key(a):
+    return tuple(a) if isinstance(a, list) else a
+
+
+def _check_element(m, components):
+    # check 1: provenance resolves (skip when the component set is unavailable).
+    src = m.get("source_component")
+    if isinstance(src, str) and components and src not in components:
+        return f"source_component {src!r} is not a real component"
+    # checks 2 govern PLACED elements — those carrying provenance (a cash_event / cell). A
+    # derived interaction flow has `direction` but NO source_component → governed by check 3,
+    # not here; skip it so its missing counterparty is not a false positive.
+    if not isinstance(src, str):
+        return None
+    # check 2: money flow ⟹ counterparty (cash_event shape: carries `direction`).
+    if m.get("direction") in MONEY_DIRECTIONS and m.get("counterparty") is None:
+        return "money flow (cash_event) has no counterparty"
+    # check 2 + inverse (cell shape: carries `flow_marker`).
+    marker = m.get("flow_marker")
+    if marker in MONEY_MARKERS:
+        if m.get("counterparty") is None:
+            return "money cell has no counterparty"
+    elif marker in NONMONEY_MARKERS:
+        if m.get("counterparty") is not None:
+            return "non-money cell carries a counterparty"
+        if m.get("amount") is not None:
+            return "non-money cell carries an amount"
     return None
+
+
+def _check_interactions(outcome):
+    # check 3: every interaction flow corresponds to a placed money cell in this outcome.
+    interactions, cells = outcome.get("interactions"), outcome.get("cells")
+    if not isinstance(interactions, list) or not isinstance(cells, list):
+        return None
+    marker_dir = {"money_out": "out", "money_in": "in"}
+    placed = {
+        (c.get("phase"), marker_dir[c["flow_marker"]], _amt_key(c.get("amount")))
+        for c in cells
+        if isinstance(c, dict) and c.get("flow_marker") in marker_dir
+    }
+    for ix in interactions:
+        if not isinstance(ix, dict):
+            continue
+        for fl in ix.get("flows", []) or []:
+            if not isinstance(fl, dict):
+                continue
+            key = (ix.get("phase"), fl.get("direction"), _amt_key(fl.get("amount")))
+            if key not in placed:
+                return "interaction flow has no corresponding placed cell"
+    return None
+
+
+def check_placement(outcome, components=()):
+    """None if `outcome`'s placements conform to §13, else a short reason string."""
+    if not isinstance(outcome, dict):
+        return None
+    for m in _walk_maps(outcome):
+        r = _check_element(m, components)
+        if r:
+            return r
+    return _check_interactions(outcome)
 
 
 # --- shared cases (mirrored by outcome_conformance.escript) ---------------------
@@ -184,6 +273,72 @@ CASES = [
 ]
 
 
+# --- shared placement cases (mirrored by outcome_conformance.escript) ------------
+# Each: a whole outcome + a component set + the expected VERDICT through check_placement.
+PLACEMENT_COMPS = ["cash_position", "eligibility", "ownership_planning", "purchase_journey"]
+
+
+def _cell(phase, marker, cp, amount, src, **extra):
+    return {"phase": phase, "flow_marker": marker, "counterparty": cp,
+            "amount": amount, "source_component": src, **extra}
+
+
+PLACEMENT_CASES = [
+    # check 1 — provenance resolves
+    {"name": "prov-ok",
+     "outcome": {"cells": [_cell("prepare", "none", None, None, "cash_position")]},
+     "comps": PLACEMENT_COMPS, "ok": True},
+    {"name": "prov-bad-typo",
+     "outcome": {"cells": [_cell("prepare", "none", None, None, "buyer_profilex")]},
+     "comps": PLACEMENT_COMPS, "ok": False, "expect": "real component"},
+    {"name": "prov-skip-when-no-components",
+     "outcome": {"cells": [_cell("prepare", "none", None, None, "buyer_profilex")]},
+     "comps": [], "ok": True},
+
+    # check 2 — money flow ⟹ counterparty (cash_event shape)
+    {"name": "cashevent-out-no-cp",
+     "outcome": {"cash_events": [{"direction": "out", "counterparty": None,
+                                  "amount": [1, 2], "source_component": "cash_position"}]},
+     "comps": PLACEMENT_COMPS, "ok": False, "expect": "counterparty"},
+    {"name": "cashevent-out-ok",
+     "outcome": {"cash_events": [{"direction": "out", "counterparty": "other",
+                                  "amount": [1, 2], "source_component": "cash_position"}]},
+     "comps": PLACEMENT_COMPS, "ok": True},
+
+    # check 2 — money cell shape + inverse
+    {"name": "cell-money-no-cp",
+     "outcome": {"cells": [_cell("settle", "money_out", None, [1, 2], "cash_position")]},
+     "comps": PLACEMENT_COMPS, "ok": False, "expect": "counterparty"},
+    {"name": "nonmoney-cell-with-cp",
+     "outcome": {"cells": [_cell("contract", "document", "you", None, "purchase_journey")]},
+     "comps": PLACEMENT_COMPS, "ok": False, "expect": "counterparty"},
+    {"name": "nonmoney-cell-with-amount",
+     "outcome": {"cells": [_cell("settle", "milestone", None, [1, 2], "purchase_journey")]},
+     "comps": PLACEMENT_COMPS, "ok": False, "expect": "amount"},
+
+    # check 3 — interactions derive, not invent
+    {"name": "interactions-ok",
+     "outcome": {
+         "cells": [_cell("contract", "money_out", "you", [30000, 35000], "cash_position",
+                         actor="other")],
+         "interactions": [{"from_actor": "you", "to_actor": "other", "phase": "contract",
+                           "flows": [{"direction": "out", "amount": [30000, 35000]}]}]},
+     "comps": PLACEMENT_COMPS, "ok": True},
+    {"name": "interactions-invented-flow",
+     "outcome": {
+         "cells": [_cell("contract", "money_out", "you", [30000, 35000], "cash_position",
+                         actor="other")],
+         "interactions": [{"from_actor": "you", "to_actor": "other", "phase": "contract",
+                           "flows": [{"direction": "out", "amount": [99, 99]}]}]},
+     "comps": PLACEMENT_COMPS, "ok": False, "expect": "no corresponding placed cell"},
+
+    # graceful — an outcome with no placement fields (localized prose only)
+    {"name": "placement-graceful-no-fields",
+     "outcome": {"key_assumptions": [{"vi": "x", "en": "y"}]},
+     "comps": PLACEMENT_COMPS, "ok": True},
+]
+
+
 def run():
     fails = []
     for c in CASES:
@@ -197,13 +352,28 @@ def run():
             fails.append((c["name"], f"reason {reason!r} lacks {c['expect']!r}"))
             continue
         print(f"  ok   {c['name']:34s} -> {'conform' if got_ok else reason}")
+
+    print("\n  --- §13 placement & provenance ---")
+    for c in PLACEMENT_CASES:
+        reason = check_placement(c["outcome"], c["comps"])
+        got_ok = reason is None
+        if got_ok != c["ok"]:
+            fails.append((c["name"], f"verdict mismatch: ok={got_ok} expected ok={c['ok']} "
+                                     f"(reason={reason!r})"))
+            continue
+        if not c["ok"] and "expect" in c and c["expect"] not in (reason or ""):
+            fails.append((c["name"], f"reason {reason!r} lacks {c['expect']!r}"))
+            continue
+        print(f"  ok   {c['name']:34s} -> {'conform' if got_ok else reason}")
+
+    n = len(CASES) + len(PLACEMENT_CASES)
     print("\n================================================================")
     if fails:
         for name, why in fails:
             print(f"  FAIL {name}: {why}")
         print(f"FAIL — {len(fails)} case(s)")
         return 1
-    print(f"PASS — {len(CASES)} cases (Layer-1 outcome-conformance walk)")
+    print(f"PASS — {n} cases (Layer-1 walk + §13 placement)")
     return 0
 
 

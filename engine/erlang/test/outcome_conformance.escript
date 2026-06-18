@@ -20,14 +20,17 @@ main(_) ->
     io:format("outcome conformance — fh_engine_outcome:check/3 vs tests/outcome_validate.py~n~n"),
     Results = [run_case(C) || C <- cases()],
     CaseFails = [R || {fail, _} = R <- Results],
+    io:format("~n--- §13 placement & provenance (check_placement/2 lockstep) ---~n"),
+    PlacementResults = [run_placement_case(C) || C <- placement_cases()],
+    PlacementFails = [R || {fail, _} = R <- PlacementResults],
     io:format("~n--- seam fail-closed (validate/2 against the real artifact) ---~n"),
     SeamFails = seam_cases(),
-    Fails = CaseFails ++ SeamFails,
+    Fails = CaseFails ++ PlacementFails ++ SeamFails,
     io:format("~n================================================================~n"),
     case Fails of
         [] ->
-            io:format("PASS — ~p check/3 cases + seam fail-closed proven (conform/reject lockstep)~n",
-                      [length(Results)]),
+            io:format("PASS — ~p check/3 + ~p placement cases + seam fail-closed proven (lockstep)~n",
+                      [length(Results), length(PlacementResults)]),
             halt(0);
         _ ->
             io:format("FAIL — ~p mismatch(es)~n", [length(Fails)]),
@@ -53,9 +56,96 @@ seam_cases() ->
                    {'EXIT', {{outcome_nonconforming, <<"profile">>, <<"key_strengths">>, _}, _}} -> true;
                    _ -> false
                end,
+    %% §13 seam: a budget_envelope whose type walk PASSES (a minimal cash_event: null label
+    %% conforms, [1,2] is a money_range, "out" is a valid direction) but whose PLACEMENT
+    %% fails — a money flow with counterparty=null — must crash fail-closed at validate/2,
+    %% tagged `placement`, against the REAL artifact's component set (source=cash_position
+    %% resolves, so the crash is check 2, not check 1). Proves the new clause runs at the seam.
+    BadPlacement = #{<<"cash_events">> =>
+                         [#{<<"direction">> => <<"out">>, <<"counterparty">> => null,
+                            <<"amount">> => [1, 2], <<"source_component">> => <<"cash_position">>}]},
+    PlacementCrash = case catch fh_engine_outcome:validate(<<"budget_envelope">>, BadPlacement) of
+                         {'EXIT', {{outcome_nonconforming, <<"budget_envelope">>, <<"placement">>, _}, _}} -> true;
+                         _ -> false
+                     end,
     F1 = assert("seam-conforming-profile-passes", GoodOk),
     F2 = assert("seam-nonconforming-crashes-fail-closed", BadCrash),
-    F1 ++ F2.
+    F3 = assert("seam-placement-violation-crashes-fail-closed", PlacementCrash),
+    F1 ++ F2 ++ F3.
+
+%% --- §13 placement cases (mirror tests/outcome_validate.py PLACEMENT_CASES) --
+
+placement_comps() ->
+    [<<"cash_position">>, <<"eligibility">>, <<"ownership_planning">>, <<"purchase_journey">>].
+
+pcell(Phase, Marker, Cp, Amount, Src) ->
+    #{<<"phase">> => Phase, <<"flow_marker">> => Marker, <<"counterparty">> => Cp,
+      <<"amount">> => Amount, <<"source_component">> => Src}.
+
+placement_cases() ->
+    C = placement_comps(),
+    [
+     %% check 1 — provenance resolves
+     #{name => "prov-ok", comps => C, ok => true,
+       outcome => #{<<"cells">> => [pcell(<<"prepare">>, <<"none">>, null, null, <<"cash_position">>)]}},
+     #{name => "prov-bad-typo", comps => C, ok => false,
+       outcome => #{<<"cells">> => [pcell(<<"prepare">>, <<"none">>, null, null, <<"buyer_profilex">>)]}},
+     #{name => "prov-skip-when-no-components", comps => [], ok => true,
+       outcome => #{<<"cells">> => [pcell(<<"prepare">>, <<"none">>, null, null, <<"buyer_profilex">>)]}},
+
+     %% check 2 — money flow ⟹ counterparty (cash_event shape)
+     #{name => "cashevent-out-no-cp", comps => C, ok => false,
+       outcome => #{<<"cash_events">> =>
+                        [#{<<"direction">> => <<"out">>, <<"counterparty">> => null,
+                           <<"amount">> => [1, 2], <<"source_component">> => <<"cash_position">>}]}},
+     #{name => "cashevent-out-ok", comps => C, ok => true,
+       outcome => #{<<"cash_events">> =>
+                        [#{<<"direction">> => <<"out">>, <<"counterparty">> => <<"other">>,
+                           <<"amount">> => [1, 2], <<"source_component">> => <<"cash_position">>}]}},
+
+     %% check 2 — money cell shape + inverse
+     #{name => "cell-money-no-cp", comps => C, ok => false,
+       outcome => #{<<"cells">> => [pcell(<<"settle">>, <<"money_out">>, null, [1, 2], <<"cash_position">>)]}},
+     #{name => "nonmoney-cell-with-cp", comps => C, ok => false,
+       outcome => #{<<"cells">> => [pcell(<<"contract">>, <<"document">>, <<"you">>, null, <<"purchase_journey">>)]}},
+     #{name => "nonmoney-cell-with-amount", comps => C, ok => false,
+       outcome => #{<<"cells">> => [pcell(<<"settle">>, <<"milestone">>, null, [1, 2], <<"purchase_journey">>)]}},
+
+     %% check 3 — interactions derive, not invent
+     #{name => "interactions-ok", comps => C, ok => true,
+       outcome => #{<<"cells">> =>
+                        [(pcell(<<"contract">>, <<"money_out">>, <<"you">>, [30000, 35000], <<"cash_position">>))
+                         #{<<"actor">> => <<"other">>}],
+                    <<"interactions">> =>
+                        [#{<<"from_actor">> => <<"you">>, <<"to_actor">> => <<"other">>,
+                           <<"phase">> => <<"contract">>,
+                           <<"flows">> => [#{<<"direction">> => <<"out">>, <<"amount">> => [30000, 35000]}]}]}},
+     #{name => "interactions-invented-flow", comps => C, ok => false,
+       outcome => #{<<"cells">> =>
+                        [(pcell(<<"contract">>, <<"money_out">>, <<"you">>, [30000, 35000], <<"cash_position">>))
+                         #{<<"actor">> => <<"other">>}],
+                    <<"interactions">> =>
+                        [#{<<"from_actor">> => <<"you">>, <<"to_actor">> => <<"other">>,
+                           <<"phase">> => <<"contract">>,
+                           <<"flows">> => [#{<<"direction">> => <<"out">>, <<"amount">> => [99, 99]}]}]}},
+
+     %% graceful — no placement fields
+     #{name => "placement-graceful-no-fields", comps => C, ok => true,
+       outcome => #{<<"key_assumptions">> => [#{<<"vi">> => <<"x">>, <<"en">> => <<"y">>}]}}
+    ].
+
+run_placement_case(#{name := Name, outcome := Outcome, comps := Comps, ok := ExpectOk}) ->
+    Got = fh_engine_outcome:check_placement(Outcome, Comps),
+    GotOk = (Got =:= ok),
+    case GotOk =:= ExpectOk of
+        true ->
+            io:format("  ok   ~-34s -> ~s~n", [Name, render(Got)]),
+            {pass, Name};
+        false ->
+            io:format("  FAIL ~-34s -> got ~s, expected ~s~n",
+                      [Name, render(Got), case ExpectOk of true -> "conform"; false -> "reject" end]),
+            {fail, Name}
+    end.
 
 assert(Name, true) ->
     io:format("  ok   ~-44s -> as expected~n", [Name]), [];

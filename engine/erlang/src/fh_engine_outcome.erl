@@ -35,13 +35,19 @@
 %% SAME cases through check/3 and asserts identical conform/reject verdicts (the cross-language
 %% lockstep — reason text is informative, the VERDICT is contractual).
 
--export([validate/2, check/3]).
+-export([validate/2, check/3, check_placement/2]).
 
 %% The numeric family (§98). money_range is a [lo, hi] list of numbers; the rest a bare
 %% number. string/bool/date/object are scalars too but are NOT figures (not checked).
 -define(FIGURE_TYPES,
         [<<"money">>, <<"money_per_year">>, <<"number">>,
          <<"integer">>, <<"integer_0_10">>]).
+
+%% §13 placement vocabulary — the money-flow markers/directions a placed element carries.
+%% A cash_event carries `direction` (out/in); a swimlane cell carries `flow_marker`.
+-define(MONEY_MARKERS,     [<<"money_out">>, <<"money_in">>]).
+-define(NONMONEY_MARKERS,  [<<"none">>, <<"document">>, <<"milestone">>]).
+-define(MONEY_DIRECTIONS,  [<<"out">>, <<"in">>]).
 
 %% --- seam entry -------------------------------------------------------------
 
@@ -59,10 +65,26 @@ validate(OutcomeType, Outcome) ->
             Locales = fh_engine_kb:locales(),
             case validate_fields(maps:to_list(Fields), Outcome, Locales) of
                 ok ->
-                    ok;
+                    %% §13 placement/provenance clause — the same total-walk, a new clause.
+                    %% Runs only when a schema exists (graceful otherwise, like the type walk).
+                    case check_placement(Outcome, component_names()) of
+                        ok ->
+                            ok;
+                        {error, R} ->
+                            error({outcome_nonconforming, OutcomeType, <<"placement">>, R})
+                    end;
                 {error, Field, Reason} ->
                     error({outcome_nonconforming, OutcomeType, Field, Reason})
             end
+    end.
+
+%% The set of real component names in the in-scope compiled blueprint — the ground truth
+%% for §13 check 1 (provenance resolves). Empty (no artifact) ⟹ check 1 is graceful (it
+%% has nothing to resolve against), consistent with the missing-schema pass-through.
+component_names() ->
+    case fh_engine_kb:components(fh_engine_kb:in_scope_blueprint()) of
+        {ok, Comps} -> [maps:get(<<"name">>, C) || C <- Comps];
+        _           -> []
     end.
 
 validate_fields([], _Outcome, _Locales) ->
@@ -165,6 +187,146 @@ check_object([{Field, Tree} | Rest], Value, Locales) ->
         ok         -> check_object(Rest, Value, Locales);
         {error, R} -> {error, <<".", Field/binary, " ", R/binary>>}
     end.
+
+%% --- §13 placement & provenance (the two-spines clause) ---------------------
+%%
+%% A SEMANTIC pass over the whole outcome (not the type-tree walk): the two-spines model
+%% adds PLACED figures — an outcome carries figures it did not compute, tagged with
+%% provenance and money-flow fields. The invariant: *a placement carries provenance and
+%% introduces no figure of its own* (outcome-conformance.md §13; lifecycle-simulation-model
+%% §2). Field-name driven, so it attaches to the INVARIANT wherever it appears — every
+%% cash_event / cell across any mode — not to a hardcoded outcome list ([[enforce-invariants-
+%% not-workflows]] discover-don't-enumerate). Four checks; each stays single-outcome (§5):
+%%   1. Provenance resolves — every element's `source_component` is a real component.
+%%   2. Money flow ⟹ counterparty — a `direction`-bearing (cash_event) or money `flow_marker`
+%%      (cell) element carries a counterparty; the inverse: a non-money cell carries neither
+%%      counterparty nor amount.
+%%   3. Interactions derive, not invent — every interactions[].flows[] entry matches a placed
+%%      money cell (phase, direction, amount) in the same outcome.
+%%   4. Figure-type still applies to each placed amount — already covered by the type walk.
+-spec check_placement(map(), [binary()]) -> ok | {error, binary()}.
+check_placement(Outcome, Components) ->
+    case walk_elements(Outcome, Components) of
+        ok  -> check_interactions(Outcome);
+        Err -> Err
+    end.
+
+%% recurse every nested map/list; check each map as a placement element (checks 1 + 2).
+walk_elements(M, Components) when is_map(M) ->
+    case check_element(M, Components) of
+        {error, R} -> {error, R};
+        ok         -> walk_list(maps:values(M), Components)
+    end;
+walk_elements(L, Components) when is_list(L) ->
+    walk_list(L, Components);
+walk_elements(_, _) ->
+    ok.
+
+walk_list([], _) -> ok;
+walk_list([H | T], Components) ->
+    case walk_elements(H, Components) of
+        ok  -> walk_list(T, Components);
+        Err -> Err
+    end.
+
+check_element(M, Components) ->
+    case provenance(M, Components) of
+        {error, R} ->
+            {error, R};
+        ok ->
+            %% checks 2 govern PLACED elements (those carrying provenance). A derived
+            %% interaction flow has `direction` but no source_component → check 3 governs
+            %% it; skip here so its absent counterparty is not a false positive.
+            case maps:get(<<"source_component">>, M, null) of
+                S when is_binary(S) -> money_flow(M);
+                _                   -> ok
+            end
+    end.
+
+%% check 1: a present source_component must name a real component (skip when the component
+%% set is unavailable — nothing to resolve against).
+provenance(M, Components) ->
+    case maps:get(<<"source_component">>, M, null) of
+        S when is_binary(S), Components =/= [] ->
+            case lists:member(S, Components) of
+                true  -> ok;
+                false -> {error, <<"source_component not a real component: ", S/binary>>}
+            end;
+        _ ->
+            ok
+    end.
+
+%% check 2 (+ inverse): a money flow carries a counterparty; a non-money cell carries none.
+money_flow(M) ->
+    Dir    = maps:get(<<"direction">>, M, null),
+    Marker = maps:get(<<"flow_marker">>, M, null),
+    Cp     = maps:get(<<"counterparty">>, M, null),
+    Amount = maps:get(<<"amount">>, M, null),
+    case lists:member(Dir, ?MONEY_DIRECTIONS) andalso Cp =:= null of
+        true ->
+            {error, <<"money flow (cash_event) has no counterparty">>};
+        false ->
+            case lists:member(Marker, ?MONEY_MARKERS) of
+                true when Cp =:= null ->
+                    {error, <<"money cell has no counterparty">>};
+                true ->
+                    ok;
+                false ->
+                    nonmoney_cell(Marker, Cp, Amount)
+            end
+    end.
+
+nonmoney_cell(Marker, Cp, Amount) ->
+    case lists:member(Marker, ?NONMONEY_MARKERS) of
+        true when Cp =/= null     -> {error, <<"non-money cell carries a counterparty">>};
+        true when Amount =/= null -> {error, <<"non-money cell carries an amount">>};
+        _                         -> ok
+    end.
+
+%% check 3: every interaction flow corresponds to a placed money cell in the same outcome.
+check_interactions(Outcome) ->
+    Interactions = maps:get(<<"interactions">>, Outcome, null),
+    Cells        = maps:get(<<"cells">>, Outcome, null),
+    case is_list(Interactions) andalso is_list(Cells) of
+        false -> ok;
+        true  -> check_flows(Interactions, placed_cells(Cells))
+    end.
+
+%% the set of placed money cells keyed (phase, direction, amount) — the flow's source.
+placed_cells(Cells) ->
+    lists:foldl(
+      fun(C, Acc) when is_map(C) ->
+              case marker_dir(maps:get(<<"flow_marker">>, C, null)) of
+                  null -> Acc;
+                  D    -> [{maps:get(<<"phase">>, C, null), D,
+                            maps:get(<<"amount">>, C, null)} | Acc]
+              end;
+         (_, Acc) -> Acc
+      end, [], Cells).
+
+marker_dir(<<"money_out">>) -> <<"out">>;
+marker_dir(<<"money_in">>)  -> <<"in">>;
+marker_dir(_)               -> null.
+
+check_flows([], _) -> ok;
+check_flows([Ix | Rest], Placed) when is_map(Ix) ->
+    Phase = maps:get(<<"phase">>, Ix, null),
+    case check_flow_list(maps:get(<<"flows">>, Ix, []), Phase, Placed) of
+        ok  -> check_flows(Rest, Placed);
+        Err -> Err
+    end;
+check_flows([_ | Rest], Placed) ->
+    check_flows(Rest, Placed).
+
+check_flow_list([], _, _) -> ok;
+check_flow_list([F | Rest], Phase, Placed) when is_map(F) ->
+    Key = {Phase, maps:get(<<"direction">>, F, null), maps:get(<<"amount">>, F, null)},
+    case lists:member(Key, Placed) of
+        true  -> check_flow_list(Rest, Phase, Placed);
+        false -> {error, <<"interaction flow has no corresponding placed cell">>}
+    end;
+check_flow_list([_ | Rest], Phase, Placed) ->
+    check_flow_list(Rest, Phase, Placed).
 
 %% --- internals --------------------------------------------------------------
 

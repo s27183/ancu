@@ -123,6 +123,11 @@ the figures are structured `amount` fields, not interpolated into prose).
       "en": "A refinance window opens once your LVR drops below 80%."
     },
 
+    "cell_own_recurring": {
+      "vi": "Chi phí định kỳ hằng năm: thuế suất hội đồng và nước.",
+      "en": "Ongoing yearly outgoings: council rates and water."
+    },
+
     "assumption_indicative": {
       "vi": "Sơ đồ hành trình mang tính tổng quan cho người mua nhà lần đầu tại Úc; mốc thời gian và thứ tự có thể thay đổi theo tiểu bang và theo giao dịch cụ thể.",
       "en": "This journey is a general overview for first-home buyers in Australia; timing and order vary by state and by your specific transaction."

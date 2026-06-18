@@ -26,10 +26,11 @@ Every structure named in the architecture, in one place, with where its detail l
 | **suburb data** (reference surface) | the `suburb.*` surface (third registry term) materialized as the `suburbs` table; build-time ABS/SEIFA/state ingestion; `<from_suburb>` session-start lookup | [`suburb-data-foundation.md`](suburb-data-foundation.md) |
 | **agentic flow** | agent types, dynamic prompt structure, vendor-neutral run layer, context management | [`agentic-flow.md`](agentic-flow.md) |
 | **plan card** | the persistent runtime instance: a base plan + 0..N property addenda | [§11.1](architecture.md#111-the-three-layers) · [`isolation-model.md`](isolation-model.md) |
+| **two spines + `cash_events`** (lifecycle model) | the plan card projected onto two axes — legal swimlane (party × phase) · financial calculator (money × phase) — over one shared `cash_events` list; plus the simulate-preview vs save-as-refine rule (exactly one saved scenario) | [`lifecycle-simulation-model.md`](lifecycle-simulation-model.md) |
 | **profile / plan / mode** | household fact base (persistent) ⟵ plan (per journey); mode *derived*, never a key | [`fact-model-unification.md`](fact-model-unification.md) |
 | **renderer** | a member of the constrained presentation vocabulary that turns an outcome into UI | [§11.9](architecture.md#119-blueprint-as-data-model--presentation-specification) |
 | **engine / shell** | the two independently-deployable halves; API is the only contract | [§11.0](architecture.md#110-engine--shell-split-deployable-shape) · [`engine-contract.md`](engine-contract.md) (engine side) · [`shell-architecture.md`](shell-architecture.md) (shell side) |
-| **commit-seam compliance** | the two layers every fill crosses at the `fh_engine_turn` commit: **Layer 1** structural outcome-conformance (`localized_text` · §98 figure-type · enum; fail-closed crash) then **Layer 2** regulated FIRB/ASIC/AML dispositions (`clear`/`annotate`/`branch`/`block`) → one `audit_events` row per (component, gate) | [`outcome-conformance.md`](outcome-conformance.md) · [`compliance-pipeline.md`](compliance-pipeline.md) |
+| **commit-seam compliance** | the two layers every fill crosses at the `fh_engine_turn` commit: **Layer 1** structural outcome-conformance (`localized_text` · §98 figure-type · enum · placement/provenance; fail-closed crash) then **Layer 2** regulated FIRB/ASIC/AML dispositions (`clear`/`annotate`/`branch`/`block`) → one `audit_events` row per (component, gate) | [`outcome-conformance.md`](outcome-conformance.md) · [`compliance-pipeline.md`](compliance-pipeline.md) |
 
 **Outcomes carry facts, not verdicts.** An outcome exposes normalised facts (age, residency, price); the verdict ("FHG-eligible") is produced by the component that *owns the rule*, never pre-baked upstream. This is the invariant the whole data plane rests on.
 
@@ -149,7 +150,9 @@ flowchart TB
   classDef ext fill:#eee,stroke:#999,stroke-dasharray:3 3;
 ```
 
-*(Mode A's pipeline. Each arrow is labelled with the **outcome** the downstream component reads — never the upstream parameters. `due_diligence` is parallel to the bidding path. The two grey nodes are external inputs, not components.)*
+*(Mode A's pipeline, acquisition components 1–9. Each arrow is labelled with the **outcome** the downstream component reads — never the upstream parameters. `due_diligence` is parallel to the bidding path. The two grey nodes are external inputs, not components.)*
+
+**The two spines and the shared `cash_events` primitive.** Two further **base-scope projection** components close the pipeline — `purchase_journey` (10) and `preparation` (11). They compute no new figures; they *place* figures the upstream components already own onto the two **spines** of the lifecycle. The financial spine (the `calculator`) and the legal spine (the `swimlane-diagram`) both read **one** shared list — `cash_events` (`{phase, direction, amount, counterparty, source_component}`) — so the two views cannot disagree (one-computer-per-figure extended to *every* consumer, including the client). The DAG constrains where that list can live: `cash_events` is owned by `cash_position` (5) for the phases it can see (Prepare→Settle — the calculator's span), while the whole-lifecycle swimlane is assembled last by `purchase_journey` (10), which alone also reads `ownership_planning`'s (9) Own-phase events. So the calculator legitimately spans fewer phases than the swimlane — by DAG necessity, not omission. Detail: [`lifecycle-simulation-model.md`](lifecycle-simulation-model.md) §2–§3.
 
 **Filling a leaf — the only branch in the system.** Each leaf is filled by exactly one of two paths, statically declared in the blueprint so the engine knows the cost before running:
 
@@ -255,6 +258,8 @@ The discipline that makes this coherent: **structure is built now, data flows la
 
 Beside the plan card itself, every committed fill writes one **`audit_events`** row per (component, gate) — the regulated compliance trail (FIRB/ASIC/AML disposition + the consumed Layer-1 verdict + the KB snapshot + the deploy SHA), written even on a `clear`. It is attribution, not cost (no token/price fields ever — metering is the `usage` event stream).
 
+**Simulation persists nothing until Save.** A structural what-if is a non-persisting `simulate` **preview** — it writes no `content_jsonb`, no `plan_card_events`, no cursor advance, no `usage` — so it is exempt from per-card serialization and cannot race the snapshot. **Save** is an ordinary resolver-only **refine turn** that advances the card's *single* current snapshot (there is no scenarios table and no fork; history lives in the append-only event log). A card therefore always holds exactly one saved scenario, audit-reproducible like any other fill. Detail: [`lifecycle-simulation-model.md`](lifecycle-simulation-model.md) §4, [`engine-contract.md`](engine-contract.md) §10.
+
 Detail: [`fact-model-unification.md`](fact-model-unification.md) (the profile/plan/mode decision), [`property-model-foundation.md`](property-model-foundation.md) (the addendum structure), [`engine-contract.md`](engine-contract.md) §9.1 (the schema), [`isolation-model.md`](isolation-model.md) (plan card vs turn, per-card serialization), [`compliance-pipeline.md`](compliance-pipeline.md) §5 (the audit trail) · [`outcome-conformance.md`](outcome-conformance.md) (the Layer-1 verdict it records).
 
 ---
@@ -297,7 +302,7 @@ The hub is navigable both ways: from a plane to its detail, and from an architec
 |---|---|---|
 | 0 master map | all structures, all halves | this doc |
 | 1 build time | files → compiler → artifact | [§11.9](architecture.md#119-blueprint-as-data-model--presentation-specification), [§11.2](architecture.md#112-update-cadences-and-offline-kb-agent-roles), foundations |
-| 2 runtime pipeline | component DAG · params→outcome→registry · fill-path | [§11.9](architecture.md#119-blueprint-as-data-model--presentation-specification), [`agentic-boundary.md`](agentic-boundary.md) |
+| 2 runtime pipeline | component DAG · params→outcome→registry · fill-path · two spines + `cash_events` | [§11.9](architecture.md#119-blueprint-as-data-model--presentation-specification), [`agentic-boundary.md`](agentic-boundary.md), [`lifecycle-simulation-model.md`](lifecycle-simulation-model.md) |
 | 3 agentic turn | prompt → runner → output → gate | [`agentic-flow.md`](agentic-flow.md), [`agentic-boundary.md`](agentic-boundary.md) |
-| 4 persistence | profile ⟵ plan_cards · addendum structure · snapshot | [`engine-contract.md`](engine-contract.md) §9.1, [`isolation-model.md`](isolation-model.md), foundations |
+| 4 persistence | profile ⟵ plan_cards · addendum structure · snapshot · simulate-preview vs save | [`engine-contract.md`](engine-contract.md) §9.1, [`isolation-model.md`](isolation-model.md), [`lifecycle-simulation-model.md`](lifecycle-simulation-model.md), foundations |
 | 5 engine/shell | what runs where · meter vs gate · commerce | [§11.0](architecture.md#110-engine--shell-split-deployable-shape), [`engine-contract.md`](engine-contract.md), [`shell-architecture.md`](shell-architecture.md), [`billing.md`](billing.md) |

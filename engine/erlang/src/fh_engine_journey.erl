@@ -1,25 +1,43 @@
 -module(fh_engine_journey).
 
 %% The base-turn `purchase_journey` fill — the whole-of-journey lifecycle swimlane
-%% (plan-card-lifecycle-restoration.md §7; the spine the prototype led with). It is a
-%% RESOLVER fill (agentic-boundary.md): the journey structure + bilingual cell prose are
-%% generic Mode-A KB content (kb.journey.fhg-path); the money flows on the timeline are
-%% the buyer's ALREADY-COMPUTED upstream figures, PLACED — never recomputed.
+%% (lifecycle-simulation-model.md; the legal/temporal spine the prototype led with). It is
+%% a RESOLVER fill (agentic-boundary.md): the journey structure + bilingual cell prose are
+%% generic Mode-A KB content (kb.journey.fhg-path); the money flows on the timeline are the
+%% buyer's ALREADY-COMPUTED upstream figures, PLACED — never recomputed.
+%%
+%% TWO PROJECTIONS OF ONE LIFECYCLE (lifecycle-simulation-model §2). The swimlane and the
+%% cash calculator read ONE shared primitive — `budget_envelope.cash_events` — so they
+%% cannot disagree. This component builds two kinds of cell:
+%%   - LEGAL/PROSE cells: one per meaningful (phase, actor), authored in kb.journey.fhg-path,
+%%     flow_marker ∈ {none, document, milestone}, NO amount, counterparty=null. They are the
+%%     legal-spine narrative; source_component = `purchase_journey` (it owns its own prose).
+%%   - MONEY cells: GENERATED from cash_events. §2: "the swimlane's amount-bearing cells ARE
+%%     cash events." Each event is placed as a cell at (phase, actor = event.counterparty) —
+%%     the non-`you` party gets the row — with the cell's own counterparty = `you` (the buyer
+%%     is the implicit other end of every event), flow_marker from direction, and the amount +
+%%     source_component carried through verbatim. The Own phase adds one recurring money cell
+%%     placed from ownership_planning's statutory band (cash_events is Prepare→Settle only).
 %%
 %% One-computer-per-figure (the load-bearing constraint, [[verify-regulated-figures-by-
-%% postcondition]]): the regulated/derived figures (deposit, stamp duty, total cash to
-%% settle, scheme benefit) are read from budget_envelope / scheme_stack and dropped onto
-%% the relevant cells. This component computes NO figure of its own, so there is no second
-%% computer to verify — the conformance burden stays entirely on cash_position/eligibility.
-%% This is why it runs AFTER cash_position in the base DAG.
+%% postcondition]], [[place-upstream-figures-dont-recompute]]): every figure on the timeline is
+%% read from budget_envelope / ongoing_obligations and dropped onto a cell. This component
+%% computes NO figure of its own, so there is no second computer to verify — the conformance
+%% burden stays entirely on cash_position / eligibility / ownership_planning. This is why it
+%% runs LAST in the base DAG; its read of the downstream ownership_planning (9→10) is a
+%% forward edge, still acyclic.
 %%
-%% The journey_swimlane outcome is mode-general (phases × actors × cells); Modes B/C/D
-%% reuse the schema + the mode-agnostic swimlane-diagram renderer with their own
-%% kb.journey.* doc + resolver (plan-card-lifecycle-restoration.md §3.3). Mode A only here.
+%% `interactions` (lifecycle-simulation-model §2 "who pays whom"): because every money cell
+%% names both ends (actor + counterparty=you), the who-pays/talks-to-whom view falls straight
+%% out of the cells — derived by PLACEMENT, never recomputed.
+%%
+%% The journey_swimlane outcome is mode-general (phases × actors × cells); Modes B/C/D reuse
+%% the schema + the mode-agnostic swimlane-diagram renderer with their own kb.journey.* doc +
+%% resolver (plan-card-lifecycle-restoration.md §3.3). Mode A only here.
 
 -export([fill/2]).
 %% exported for the conformance harness:
--export([phases/0, actors/0, cells/2]).
+-export([phases/0, actors/0, prose_cells/0, money_cells/2, interactions/1]).
 
 -define(COPY, <<"kb.journey.fhg-path">>).   %% bilingual labels + cell prose (no params)
 
@@ -27,12 +45,15 @@
 
 -spec fill(map(), map()) -> {map(), binary(), [map()]}.
 fill(_Args, Upstream) ->
-    Stack  = maps:get(<<"scheme_stack">>, Upstream, #{}),
-    Budget = maps:get(<<"budget_envelope">>, Upstream, #{}),
+    Budget    = maps:get(<<"budget_envelope">>, Upstream, #{}),
+    Ownership = maps:get(<<"ongoing_obligations">>, Upstream, #{}),
+    Events    = maps:get(<<"cash_events">>, Budget, []),
+    Cells     = prose_cells() ++ money_cells(Events, Ownership),
     Outcome = #{
-        <<"phases">> => phases(),
-        <<"actors">> => actors(),
-        <<"cells">>  => cells(Stack, Budget),
+        <<"phases">>       => phases(),
+        <<"actors">>       => actors(),
+        <<"cells">>        => Cells,
+        <<"interactions">> => interactions(Cells),
         <<"key_assumptions">> =>
             [copy(<<"assumption_indicative">>), copy(<<"assumption_figures">>)]
     },
@@ -56,76 +77,140 @@ actors() ->
      actor(<<"lender">>,     <<"actor_lender">>),
      actor(<<"other">>,      <<"actor_other">>)].
 
-%% One action per (phase, actor) that carries one. The money cells take their figure from
-%% upstream; a money marker shows ONLY when its figure is present (honest-partial), else the
-%% prose stands alone. document/milestone markers carry no figure.
--spec cells(map(), map()) -> [map()].
-cells(Stack, Budget) ->
-    Deposit = money_range(get_in(Budget, [<<"deposit">>, <<"minimum_required_amount">>])),
-    Total   = money_range(maps:get(<<"total_cash_required">>, Budget, null)),
-    Duty    = point(get_in(Budget, [<<"stamp_duty">>, <<"after_concession">>])),
-    Benefit = money_range(maps:get(<<"total_benefit_value">>, Stack, null)),
-    [
-     money_cell(<<"prepare">>, <<"you">>, <<"cell_prepare_you">>, <<"money_out">>, Deposit),
-     cell(<<"prepare">>, <<"government">>, <<"cell_prepare_government">>, <<"none">>, null),
-     cell(<<"prepare">>, <<"lender">>, <<"cell_prepare_lender">>, <<"none">>, null),
+%% --- the legal/prose spine (one prose cell per meaningful (phase, actor)) ----
+%% These carry NO figure — they are the legal narrative. The money flows are placed
+%% separately by money_cells/2 (the financial spine), at their TRUE phase, in the
+%% recipient's lane. So prepare/you is "save up" (the deposit OUTFLOW lands at contract);
+%% settle/you is "pay the balance" (the individual out-events land in government/other).
+-spec prose_cells() -> [map()].
+prose_cells() ->
+    [prose(<<"prepare">>, <<"you">>,        <<"cell_prepare_you">>,        <<"none">>),
+     prose(<<"prepare">>, <<"government">>, <<"cell_prepare_government">>, <<"none">>),
+     prose(<<"prepare">>, <<"lender">>,     <<"cell_prepare_lender">>,     <<"none">>),
 
-     cell(<<"pre_approve">>, <<"you">>, <<"cell_pre_approve_you">>, <<"document">>, null),
-     money_cell(<<"pre_approve">>, <<"government">>, <<"cell_pre_approve_government">>,
-                <<"money_in">>, Benefit),
-     cell(<<"pre_approve">>, <<"lender">>, <<"cell_pre_approve_lender">>, <<"milestone">>, null),
-     cell(<<"pre_approve">>, <<"other">>, <<"cell_pre_approve_other">>, <<"none">>, null),
+     prose(<<"pre_approve">>, <<"you">>,        <<"cell_pre_approve_you">>,        <<"document">>),
+     prose(<<"pre_approve">>, <<"government">>, <<"cell_pre_approve_government">>, <<"milestone">>),
+     prose(<<"pre_approve">>, <<"lender">>,     <<"cell_pre_approve_lender">>,     <<"milestone">>),
+     prose(<<"pre_approve">>, <<"other">>,      <<"cell_pre_approve_other">>,      <<"none">>),
 
-     cell(<<"contract">>, <<"you">>, <<"cell_contract_you">>, <<"milestone">>, null),
-     cell(<<"contract">>, <<"government">>, <<"cell_contract_government">>, <<"document">>, null),
-     cell(<<"contract">>, <<"lender">>, <<"cell_contract_lender">>, <<"document">>, null),
-     cell(<<"contract">>, <<"other">>, <<"cell_contract_other">>, <<"document">>, null),
+     prose(<<"contract">>, <<"you">>,        <<"cell_contract_you">>,        <<"milestone">>),
+     prose(<<"contract">>, <<"government">>, <<"cell_contract_government">>, <<"document">>),
+     prose(<<"contract">>, <<"lender">>,     <<"cell_contract_lender">>,     <<"document">>),
+     prose(<<"contract">>, <<"other">>,      <<"cell_contract_other">>,      <<"document">>),
 
-     money_cell(<<"settle">>, <<"you">>, <<"cell_settle_you">>, <<"money_out">>, Total),
-     money_cell(<<"settle">>, <<"government">>, <<"cell_settle_government">>,
-                <<"money_out">>, Duty),
-     cell(<<"settle">>, <<"lender">>, <<"cell_settle_lender">>, <<"milestone">>, null),
-     cell(<<"settle">>, <<"other">>, <<"cell_settle_other">>, <<"milestone">>, null),
+     prose(<<"settle">>, <<"you">>,        <<"cell_settle_you">>,        <<"milestone">>),
+     prose(<<"settle">>, <<"government">>, <<"cell_settle_government">>, <<"none">>),
+     prose(<<"settle">>, <<"lender">>,     <<"cell_settle_lender">>,     <<"milestone">>),
+     prose(<<"settle">>, <<"other">>,      <<"cell_settle_other">>,      <<"milestone">>),
 
-     cell(<<"own">>, <<"you">>, <<"cell_own_you">>, <<"milestone">>, null),
-     cell(<<"own">>, <<"government">>, <<"cell_own_government">>, <<"none">>, null),
-     cell(<<"own">>, <<"lender">>, <<"cell_own_lender">>, <<"none">>, null)
-    ].
+     prose(<<"own">>, <<"you">>,        <<"cell_own_you">>,        <<"milestone">>),
+     prose(<<"own">>, <<"government">>, <<"cell_own_government">>, <<"none">>),
+     prose(<<"own">>, <<"lender">>,     <<"cell_own_lender">>,     <<"none">>)].
+
+%% --- the financial spine, PLACED (the amount-bearing cells ARE cash events) --
+%% One money cell per cash_event: placed at (phase, actor = event.counterparty), the
+%% cell's own counterparty = `you` (the buyer is the implicit other end), marker from
+%% direction, amount + source_component carried through verbatim. The Own phase appends
+%% the recurring statutory band from ownership_planning (cash_events is Prepare→Settle).
+-spec money_cells([map()], map()) -> [map()].
+money_cells(Events, Ownership) ->
+    [money_cell_from_event(E) || E <- Events] ++ own_recurring_cells(Ownership).
+
+money_cell_from_event(E) ->
+    money_cell(maps:get(<<"phase">>, E),
+               maps:get(<<"counterparty">>, E),         %% the non-`you` party gets the row
+               maps:get(<<"label">>, E),
+               marker(maps:get(<<"direction">>, E)),
+               maps:get(<<"amount">>, E),
+               maps:get(<<"source_component">>, E)).
+
+%% The Own-phase recurring outgoing: the council-rates + water statutory band from
+%% ownership_planning, placed as a yearly money_out to government. Honest-partial: emit
+%% only when the band carries a real [low, high] (never a fabricated figure).
+own_recurring_cells(Ownership) ->
+    Rec  = maps:get(<<"recurring_costs_estimate">>, Ownership, #{}),
+    Band = maps:get(<<"statutory_band">>, Rec, #{}),
+    case band_range(Band) of
+        null  -> [];
+        Range -> [money_cell(<<"own">>, <<"government">>, copy(<<"cell_own_recurring">>),
+                             <<"money_out">>, Range, <<"ownership_planning">>)]
+    end.
+
+%% --- interactions: the who-pays/talks-to-whom view, DERIVED from money cells --
+%% out ⟹ you → actor (you pay the counterparty); in ⟹ actor → you (the counterparty
+%% pays you). Grouped by (from, to, phase); flows preserve cell order, the list is sorted
+%% by lifecycle phase then party for a stable outcome.
+-spec interactions([map()]) -> [map()].
+interactions(Cells) ->
+    Money = [C || C <- Cells,
+                  lists:member(maps:get(<<"flow_marker">>, C),
+                               [<<"money_out">>, <<"money_in">>])],
+    Grouped = lists:foldl(fun add_flow/2, [], Money),
+    Sorted = lists:sort(fun({Ka, _}, {Kb, _}) -> key_order(Ka) =< key_order(Kb) end,
+                        Grouped),
+    [#{<<"from_actor">> => From, <<"to_actor">> => To, <<"phase">> => Phase,
+       <<"flows">> => lists:reverse(Flows)}
+     || {{From, To, Phase}, Flows} <- Sorted].
+
+add_flow(Cell, Acc) ->
+    Phase  = maps:get(<<"phase">>, Cell),
+    Actor  = maps:get(<<"actor">>, Cell),                %% the non-`you` party
+    {From, To, Dir} =
+        case maps:get(<<"flow_marker">>, Cell) of
+            <<"money_out">> -> {<<"you">>, Actor, <<"out">>};
+            <<"money_in">>  -> {Actor, <<"you">>, <<"in">>}
+        end,
+    Flow = #{<<"label">>     => maps:get(<<"item">>, Cell),
+             <<"direction">> => Dir,
+             <<"amount">>    => maps:get(<<"amount">>, Cell)},
+    Key = {From, To, Phase},
+    case lists:keytake(Key, 1, Acc) of
+        {value, {Key, Flows}, Rest} -> [{Key, [Flow | Flows]} | Rest];
+        false                       -> [{Key, [Flow]} | Acc]
+    end.
+
+%% lifecycle order for stable interactions: by phase, then from-actor, then to-actor.
+key_order({From, To, Phase}) -> {phase_index(Phase), From, To}.
+
+phase_index(<<"prepare">>)     -> 0;
+phase_index(<<"pre_approve">>) -> 1;
+phase_index(<<"contract">>)    -> 2;
+phase_index(<<"settle">>)      -> 3;
+phase_index(<<"own">>)         -> 4;
+phase_index(_)                 -> 9.
 
 %% --- builders ----------------------------------------------------------------
 
 phase(Id, CopyId) -> #{<<"id">> => Id, <<"label">> => copy(CopyId)}.
 actor(Id, CopyId) -> #{<<"id">> => Id, <<"label">> => copy(CopyId)}.
 
-cell(Phase, Actor, CopyId, Marker, Amount) ->
-    #{<<"phase">>       => Phase,
-      <<"actor">>       => Actor,
-      <<"item">>        => copy(CopyId),
-      <<"flow_marker">> => Marker,
-      <<"amount">>      => Amount}.
+%% a legal/prose cell: no figure, no flow counterparty; the journey owns its own prose.
+prose(Phase, Actor, CopyId, Marker) ->
+    cell(Phase, Actor, copy(CopyId), Marker, null, null, <<"purchase_journey">>).
 
-%% A money cell: the marker is shown only when its figure is present, else `none` (the
-%% prose still renders) — honest-partial, never a money marker with no number behind it.
-money_cell(Phase, Actor, CopyId, _Dir, null) ->
-    cell(Phase, Actor, CopyId, <<"none">>, null);
-money_cell(Phase, Actor, CopyId, Dir, Amount) ->
-    cell(Phase, Actor, CopyId, Dir, Amount).
+%% a money cell: the placed figure rides in `amount`; counterparty is the buyer (`you`),
+%% source_component traces the figure to its OWNER (cash_position / eligibility /
+%% ownership_planning) for the placement/provenance gate.
+money_cell(Phase, Actor, Item, Marker, Amount, Source) ->
+    cell(Phase, Actor, Item, Marker, Amount, <<"you">>, Source).
+
+cell(Phase, Actor, Item, Marker, Amount, Counterparty, Source) ->
+    #{<<"phase">>            => Phase,
+      <<"actor">>            => Actor,
+      <<"item">>             => Item,
+      <<"flow_marker">>      => Marker,
+      <<"amount">>           => Amount,
+      <<"counterparty">>     => Counterparty,
+      <<"source_component">> => Source}.
+
+marker(<<"out">>) -> <<"money_out">>;
+marker(<<"in">>)  -> <<"money_in">>.
 
 %% --- figure normalisers (place, never compute) -------------------------------
 
-%% A money_range upstream figure stays a [lo, hi] of numbers; anything else (null,
-%% malformed) becomes null. The journey never fabricates a figure.
-money_range([Lo, Hi]) when is_number(Lo), is_number(Hi) -> [Lo, Hi];
-money_range(_) -> null.
-
-%% A point (scalar) upstream figure (stamp duty) is placed as a collapsed range [v, v]
-%% so the renderer reads one money type; null stays null.
-point(V) when is_number(V) -> [V, V];
-point(_) -> null.
-
-get_in(Map, []) -> Map;
-get_in(Map, [K | Ks]) when is_map(Map) -> get_in(maps:get(K, Map, null), Ks);
-get_in(_, _) -> null.
+%% the ownership statutory_band {low, high} → a [lo, hi] money_range; anything else → null.
+band_range(#{<<"low">> := Lo, <<"high">> := Hi}) when is_number(Lo), is_number(Hi) -> [Lo, Hi];
+band_range(_) -> null.
 
 %% A bilingual label/line from the journey KB doc. No params — the figures are structured
 %% `amount` fields, not interpolated — so the template is returned as-is.

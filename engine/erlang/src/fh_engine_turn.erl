@@ -34,14 +34,20 @@
 -export([start_link/1]).
 -export([callback_mode/0, init/1, terminate/3]).
 -export([running/3, qa/3]).
+-export([base_components/0]).
 
 %% Mode-A base turn: the resolver/agent components in DAG (topological) order. The
 %% per-property components (property_assessment, buying_strategy, due_diligence,
 %% settlement_prep) are NOT in the base turn. (Deriving this from a `scope` field in
 %% the artifact is a follow-on; the Mode-A base sequence is fixed.)
+%% NOTE the order: ownership_planning runs BEFORE purchase_journey, because the W5
+%% two-spines journey PLACES ownership_planning.ongoing_obligations on the Own column
+%% (forward edge 9→10, still acyclic — blueprint dependency graph). preparation (11)
+%% reads only eligibility + cash_position and likewise places, so it sits last.
 -define(BASE_COMPONENTS,
         [<<"buyer_profile">>, <<"eligibility">>, <<"mortgage_finance">>,
-         <<"cash_position">>, <<"purchase_journey">>, <<"ownership_planning">>]).
+         <<"cash_position">>, <<"ownership_planning">>, <<"purchase_journey">>,
+         <<"preparation">>]).
 
 -spec start_link(map()) -> gen_statem:start_ret().
 start_link(Args) ->
@@ -398,6 +404,9 @@ fail(#{tenant_id := T, plan_card_id := PC, turn_id := Tn}, Code, Msg) ->
            <<"code">> => Code, <<"message">> => Msg}).
 
 %% The in-scope blueprint's components, filtered to the base set, in DAG order.
+%% Exported as the SINGLE source of the ordered base-resolver DAG: the simulate
+%% preview (fh_engine_simulate) walks this same list, so the turn and the preview
+%% can never drift on which components run or in what order (engine-contract §10.1).
 base_components() ->
     {ok, All} = fh_engine_kb:components(fh_engine_kb:in_scope_blueprint()),
     ByName = maps:from_list([{maps:get(<<"name">>, C), C} || C <- All]),
@@ -432,6 +441,7 @@ default_renderer(Comp) ->
 
 component_scope(<<"buyer_profile">>)    -> <<"base">>;
 component_scope(<<"purchase_journey">>) -> <<"base">>;
+component_scope(<<"preparation">>)      -> <<"base">>;
 component_scope(_) -> <<"both">>.
 
 %% Spawn a disposable sidecar to fill ONE agent component. The sidecar receives the

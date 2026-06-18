@@ -130,9 +130,29 @@ After base plan generation, the map view shows a **suburb-intelligence overlay**
 | FHG-eligible price band | Filter to suburbs where median is within user's range | ABS median + scheme caps from KB |
 | Foreign-buyer-eligible suburbs | For Mode B/D — highlight new-build-rich areas | Public planning data |
 
-Clicking a suburb opens the **plan projection** for that suburb — the base plan's invariant core (eligibility, cash math, scheme stack) plus a suburb overlay (median prices, demographics, schools, transport, flood risk, Vietnamese-community %, stamp duty at this price, FHG price-cap check). With no suburb selected, the projection shows its **zone-default** state over the onboarding target zone (e.g. "5 of the 8 suburbs in your zone sit within your FHG cap"). This *is* the base plan, viewed through a place — there is no separate base-plan canvas. The full property-agnostic dossier is reachable only as an on-demand **export** (the `first_home_buyer_plan.html` deliverable), not a navigation surface.
+Clicking a suburb opens the **plan projection** for that suburb — the base plan's invariant core (eligibility, cash math, scheme stack) plus a suburb overlay (median prices, demographics, schools, transport, flood risk, Vietnamese-community %, stamp duty at this price, FHG price-cap check). With no suburb selected, the projection shows its **zone-default** state over the onboarding target zone (e.g. "5 of the 8 suburbs in your zone sit within your FHG cap"). This *is* the base plan, viewed through a place — there is no separate base-plan canvas. The full property-agnostic dossier is reachable only as an on-demand **export** (the `first_home_buyer_plan.html` deliverable), not a navigation surface. Within the projection, the plan card renders as a **guided lifecycle rail** — overview first, then the two spines, then phase detail — scoped to the selected suburb (next subsection).
 
 This is dramatically different from the property-pin browsing pattern. Vietnamese users get **strategic exploration** of where to look — something they cannot get on REA / Domain (English-language, no Vietnamese-community highlighting, no investor-grade composite scoring).
+
+#### The plan card as a guided lifecycle — one rail, two spines, simulate-to-save
+
+The plan projection is not a bag of tabs; it is a **single guided lifecycle rail** — one segmented container that walks the buyer Prepare → Pre-approve → Contract → Settle → Own, in the order the blueprint's `ui_tabs` declare (overview → cash calculator → journey → before you buy → buying → after you buy → Q&A). The tabs are *segments of one journey*, not independent pills — the prototype's strength, and the regression production fell into by rendering the engine's component DAG as loose tabs. The rail is data-driven: the shell renders the in-scope blueprint's declared `ui_tabs`, so Modes B/C/D get their own ordered subset of the same tab vocabulary without a shell fork ([`architecture/plan-card-lifecycle-restoration.md`](architecture/plan-card-lifecycle-restoration.md) §3).
+
+**Overview leads with "what this is."** The first segment is a plain-language plan summary — what this plan is, who it's for, and the one or two numbers that matter most — before any detail.
+
+**Two spines hold the fragments together.** The same lifecycle is projected onto two axes, each a spine every other component hangs off ([`architecture/lifecycle-simulation-model.md`](architecture/lifecycle-simulation-model.md)):
+- the **cash calculator** is the *financial* spine — the phased cash-flow (deposit, duty, costs out; grants in) across Prepare → Settle, and the interactive what-if surface;
+- the **journey swimlane** is the *legal/temporal* spine — the four parties (You / Government / Lender / Other) across all five phases, with each money flow placed on the timeline and a **who-pays/talks-to-whom** view derived straight from it.
+
+Both spines read **one shared `cash_events` list** — so they can never disagree, and every figure traces to the single component that computed it (no second calculator).
+
+**Pending numbers are invitations to simulate, not dead ends.** A base plan computes what is knowable from onboarding and honestly marks the rest pending — but pending is never a blank wall. Where production showed *"Một số con số sẽ hiện ra khi bạn bổ sung thu nhập và tiền tiết kiệm"* with nowhere to enter them, the **calculator is that entry point**: the user types their cash-on-hand and the gap / verdict resolves instantly; a structural what-if (a different target price, state, or property type) recomputes the whole financial spine.
+
+**Explore freely; save one scenario.** Simulation has two speeds, neither of which spends an LLM turn:
+- **cash-on-hand** is pure client-side arithmetic against the already-verified `total_cash_required` — instant, no round-trip;
+- a **structural what-if** runs a free engine `simulate` **preview** (a deterministic resolver recompute, verified to the dollar — never a client-side reimplementation of the regulated duty formula), which writes nothing and is exempt from metering and per-card serialization.
+
+The user can explore as many scenarios as they like; the card persists **exactly one** — the scenario the user chooses to **Save**, which commits as an ordinary resolver-only refine turn (advancing the single snapshot; history lives in the append-only event log). There is no scenario gallery and no fork. See [`architecture/lifecycle-simulation-model.md`](architecture/lifecycle-simulation-model.md) §4 and [`architecture/engine-contract.md`](architecture/engine-contract.md) §10.
 
 #### Three paths to attach a specific property (when ready)
 
@@ -309,6 +329,7 @@ Day-1 scope for Wedge 1a (Vietnamese-Australian FHB mode):
 - **Plan card** as the first-class artifact — base plan (FHG/FHSS eligibility, cash math, scheme stack), property-agnostic; properties attach later as addenda
 - **Suburb-intelligence map (home)** with overlays (Vietnamese-community proximity first), where the base plan surfaces as the zone→suburb **plan projection** — no standalone dashboard
 - On-demand **export dossier** (the base plan as a deliverable)
+- **Guided lifecycle rail + interactive cash calculator** — the projection renders as the segmented lifecycle tab rail (overview → calculator → journey → …) led by a "what this is" overview, with the calculator's client-side cash-on-hand what-if live; the structural `simulate` preview + save-as-refine land as the calculator's structural inputs are wired
 - Optional account creation
 - Chat layered on the map / projection
 - Document workspace (upload S32 / Contract of Sale → Vietnamese-language risk summary → property addendum) — activated once a property is attached
@@ -329,7 +350,7 @@ What's protected by getting the UX shape right from day 1:
 **Original traps:**
 
 1. **The chatbot trap** — UX is a conversation; product is indistinguishable from ChatGPT once past first novelty.
-2. **The calculator trap** — UX is a form → static output; product is a fancy stamp duty calculator.
+2. **The calculator trap** — UX is a form → static output; product is a fancy stamp duty calculator. (The two-spines model — the calculator as the *financial spine* of the lifecycle, wired to the journey via shared `cash_events` and driving live what-ifs, not a standalone form — is how the production card escapes this trap; see §13.4.)
 3. **The PDF-output trap** — agent generates a 20-page report once; nothing persists or evolves.
 
 **New traps specific to Vietnamese diaspora platform:**
@@ -452,6 +473,7 @@ The plan card is updated (re-filled) on these events:
 - **User attaches a property** — a property addendum is added to the plan card and its per-property components fill (base plan persists; one addendum per attached property)
 - **System event invalidates parameters** — blueprint updated, scheme rule changed in KB, property data refreshed, FIRB regime change
 - **Time-based stale check** — parameters older than threshold (e.g., 90 days) flagged for re-fill on next session
+- **User saves a simulated scenario** — a structural what-if (target price / state / property type) the user chose to keep. A *preview* of a what-if is **not** a re-fill (it writes nothing — no turn, no metering; see §13.4); only **Save** re-fills, as a resolver-only refine turn that advances the card's single snapshot (the card holds exactly one saved scenario).
 
 Confirmed scope: blueprint template never changes per user; only the filled instance does.
 
@@ -464,6 +486,8 @@ Confirmed scope: blueprint template never changes per user; only the filled inst
 | Session conversation log | `sessions` table, append-only, keyed by `session_id = user_id × plan_card_id` | Permanent; for user re-reading + audit |
 | Normalised property data | `properties` table, jsonb | Persistent; updated by offline ingestion |
 | KB anchors | Embedded in blueprint via `kb_anchors` references | Updated quarterly/monthly per §11.2 |
+
+A what-if **preview** is the deliberate exception to this table: it persists *nothing* (no plan-card revision, no session row, no metering) and lives only in the client until the user **Saves** — at which point it commits as a normal refine turn, advancing the card's single snapshot (§13.4; [`architecture/engine-contract.md`](architecture/engine-contract.md) §10).
 
 A user returning to a plan they previously started sees the persisted filled plan card immediately (base plan plus any property addenda), with conversation history available alongside, and can resume refinement or trigger a refresh if the blueprint or KB has changed since.
 

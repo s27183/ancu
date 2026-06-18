@@ -240,7 +240,9 @@ Walk concrete *future* changes through the design; show the enumerate-approach m
 - **Relates to:** [`bilingual-content.md`](bilingual-content.md) (the first clause + the
   classification rule for *which* fields are localized), [`engine-contract.md`](engine-contract.md)
   (content-language engine-owned, §8/§9.2), [`agentic-boundary.md`](agentic-boundary.md)
-  (the resolver/agent boundary this makes movable), §98 (becomes a typed post-condition).
+  (the resolver/agent boundary this makes movable), §98 (becomes a typed post-condition),
+  [`lifecycle-simulation-model.md`](lifecycle-simulation-model.md) (the placement/provenance
+  clause this gate adds for the two spines — §13).
 - **Index wiring (done at 2b-4c, when the pair completed):** [`structure-map.md`](structure-map.md)
   gained a **commit-seam compliance** node in the inventory (both layers) + an `audit_events`
   entity in the Plane-4 persistence ER + cross-links from Plane 3. The `docs/README.md` table was
@@ -249,6 +251,80 @@ Walk concrete *future* changes through the design; show the enumerate-approach m
   are likewise absent) — adding only these two would be inconsistent. The hub (structure-map) is
   the right home for built-structure discovery; CLAUDE.md and the grounding-checklist carry the
   pointers.
+
+## 13. Placement & provenance — the next clause (the two-spines reframe)
+
+> **Status: SHIPPED (W6g, 2026-06-18).** The localized / enum / figure-type clauses shipped
+> at 2b-4b; this placement/provenance clause shipped with the two-spines reframe work (the
+> `cash_events` fill on `cash_position` (W4), the `interactions` + `counterparty`/`source_component`
+> on `purchase_journey` (W5), the `preparation` fill (W6)) — [`lifecycle-simulation-model.md`](lifecycle-simulation-model.md) §2,
+> [`../blueprints/fhb-domestic-au.md`](../blueprints/fhb-domestic-au.md) (cash_position `:594`,
+> swimlane cells `:904`, interactions `:905`). It is `fh_engine_outcome:check_placement/2`, run
+> by `validate/2` after the type walk; reference spec `tests/outcome_validate.py:check_placement`,
+> lockstep `engine/erlang/test/outcome_conformance.escript` (11 placement cases + a seam
+> fail-closed case), both green. **Implementation note (one refinement past the spec):** checks
+> 2 (money-flow⟹counterparty + inverse) apply only to elements carrying `source_component` — a
+> derived `interactions[].flows[]` entry has `direction` but no provenance, so it is governed by
+> check 3, not falsely flagged by check 2 as a counterparty-less cash_event.
+
+The two-spines model introduces **placed figures**: a component emits an outcome carrying
+figures it did **not** compute — it read a figure-owner's outcome and *placed* it (the
+swimlane cell, the `cash_events` in-event, the `interactions` flow). The invariant this adds:
+
+> *A placement carries provenance and introduces no figure of its own.*
+
+This is **one-computer-per-figure** — already a typed post-condition for the LLM (§98 / the
+figure-type clause) — extended to **every consumer, including a downstream resolver and the
+client** (anchor §2: "no consumer recomputes"). It is **not** a new mechanism: it is a new
+clause of the same total-walk (§2). The `outcome_schema` already declares the placement shape
+(`cash_events`, `cells`, `interactions` each carry `source_component` + the money-flow fields);
+`validate/2` gains the placement checks alongside the localized / enum / figure-type ones.
+
+**Structural checks — hard, fail-closed at the seam** (each stays within the single-outcome
+charter of §5 — it needs only the fill and the static component set the artifact already
+carries, never cross-fill state):
+
+1. **Provenance resolves.** Every placed element's `source_component` is a real component in
+   the compiled blueprint. A typo or a dangling owner fails the turn closed.
+2. **Money flow ⟹ counterparty.** A `cash_event` with `direction ∈ {out,in}` (and a cell with
+   `flow_marker ∈ {money_out, money_in}`) carries a non-null `counterparty`; conversely a
+   non-money cell (`document`/`milestone`) carries no `amount`/`counterparty`. This catches the
+   inverse error exactly as §2's "a `localized_text` requirement is forbidden on a figure" does.
+3. **Interactions derive, not invent.** Every `interactions[].flows[]` entry corresponds to a
+   placed cell/event present **in the same outcome** — the aggregation references existing
+   placements, it does not introduce a new flow. (Checkable single-outcome because the cells
+   and the interactions live in one `journey_swimlane` fill.)
+4. **Figure-type still applies** (§98) to each placed `amount`: `money_range | null`, never a
+   string — unchanged, now reached via a placed array.
+
+**The boundary — what the gate does NOT check, named honestly** (per §3 / §5 / §11):
+
+- **Value-equality to the owner's figure is by construction, not a gate.** The gate verifies a
+  placed amount is *well-formed and attributed* — not that it byte-equals what `cash_position`
+  emitted. That equality holds **structurally**: placement is performed by the **trusted
+  resolver** (`purchase_journey` / `preparation` are resolver fills) reading the upstream
+  outcome through the registry — there is **no untrusted producer placing a figure**. So §4
+  applies directly: for a trusted producer the seam structural check suffices, and a
+  cross-outcome equality re-check would be unearned ceremony *and* would push `validate/2` past
+  its single-outcome charter (§5). The resolver-conformance lockstep (`resolver_eval.py` ↔
+  `fh_engine_resolver`) is the executable spec that keeps placement faithful. **Premise stated
+  with the conclusion (§8):** *if* a placement were ever produced by the agent (untrusted), §4
+  flips — the value-equality re-check becomes earned, and `validate/2` would then take the
+  accumulated upstream outcomes as a second argument. It is sound to omit it **only while every
+  placer is a resolver.**
+- **Completeness is a resolver-correctness property, not a seam post-condition.** The gate
+  cannot confirm a placer placed *all* of an owner's events rather than a subset; that is tested
+  by the conformance harness (the worked simulations), not asserted at the seam.
+
+**Worked simulation** (define → simulate; mirrors §10):
+
+| Future placement | Placement-conformance | Caught? |
+|---|---|---|
+| `cash_event` `direction: "out"`, `counterparty: null` | check 2 fails | seam fails closed |
+| cell `source_component: "buyer_profilex"` (typo) | check 1 fails (not a real component) | seam fails closed |
+| `interactions` flow with no corresponding placed cell | check 3 fails | seam fails closed |
+| placed `amount: "$5,000"` (string) | figure-type clause (§98) fails | seam fails closed |
+| `purchase_journey` places `$4,900` where `cash_position` emitted `$5,000` | provenance + shape conform; value differs | **NOT caught** — by-construction / resolver-lockstep territory (the boundary above) |
 
 ## Resolved decisions (Son, at 2b-4)
 

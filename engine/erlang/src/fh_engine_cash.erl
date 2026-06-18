@@ -47,7 +47,7 @@ fill(Args, Upstream) ->
     HasConc = has_state_concession(Stack),
     RecPath = maps:get(<<"recommended_path">>, Mortgage, null),
     Sd = stamp_duty(State, HasConc, Ceiling),
-    Outcome = budget_envelope(Sd, State, RecPath, Range, Ceiling),
+    Outcome = budget_envelope(Sd, State, RecPath, Range, Ceiling, Stack),
     KbVersions = fh_engine_kb:kb_anchors(
         [<<"kb.stamp-duty.calc-by-state">>,
          <<"kb.buyer-costs.inspections-conveyancing-fees">>,
@@ -196,7 +196,7 @@ fhc_pick(V, [E | Rest]) ->
 %% stay null BY DESIGN: onboarding captures no savings (plan-first), so they compute on
 %% a refine turn (eligibility-resolution.md §9). Honest-partial throughout.
 
-budget_envelope(Sd, State, RecPath, Range, Ceiling) ->
+budget_envelope(Sd, State, RecPath, Range, Ceiling, Stack) ->
     Deposit    = deposit(RecPath, Range),
     OtherCosts = other_buying_costs(State, Ceiling),
     Total      = total_cash_required(Deposit, Sd, OtherCosts),
@@ -212,8 +212,79 @@ budget_envelope(Sd, State, RecPath, Range, Ceiling) ->
       <<"gap_or_surplus">>               => null,   %% needs cash_available
       <<"verdict">>                      => null,   %% PENDING by design (no savings at base)
       <<"genuine_savings_verdict">>      => <<"unknown">>,
+      <<"cash_events">>                  => cash_events(Deposit, Sd, OtherCosts, Stack),
       <<"mitigation_options_if_short">>  => [],
       <<"key_assumptions">> => key_assumptions(Total, Ceiling)}.
+
+%% --- cash_events (two-spines §2): the ACQUISITION financial spine ------------
+%% PLACES already-computed figures as phased money events (one-computer-per-figure —
+%% this computes NOTHING). Out-events are this component's own figures (deposit at
+%% exchange, duty + transaction costs at settlement); the only in-event class is a
+%% scheme GRANT (FHOG, role=grant) — an actual cash receipt at settlement, owned by
+%% eligibility (source_component=eligibility, the provenance W6g gates).
+%%
+%% Why grant is the ONLY inflow (no double count, ASIC decision-support figure): the
+%% duty concession is already netted into stamp_duty.after_concession (the reduced
+%% out-event); FHG (deposit_guarantee) and Help to Buy (shared_equity) are AVOIDED
+%% costs already reflected in the deposit/loan figures, not cash received; FHSS
+%% (deposit_savings) is the buyer's own released super — it sits on the HAVE side
+%% (cash_available), not as an inflow. Counting any of those as money_in would inflate
+%% the cumulative cash-flow. This narrows the blueprint's "scheme grants/benefits".
+%%
+%% Acquisition phases only (Prepare→Settle): Own-phase recurring costs belong to
+%% ownership_planning and are placed on the swimlane's Own column by purchase_journey
+%% (cash_position cannot see downstream). Honest-partial: an event is emitted only when
+%% its placed figure is non-null (the figure is the event; no figure → no event).
+cash_events(Deposit, Sd, OtherCosts, Stack) ->
+    Out = [
+        event(<<"deposit">>, <<"contract">>, <<"event_deposit">>, <<"out">>,
+              amount(maps:get(<<"minimum_required_amount">>, Deposit, null)),
+              false, <<"other">>, <<"cash_position">>),
+        event(<<"stamp_duty">>, <<"settle">>, <<"event_stamp_duty">>, <<"out">>,
+              point(maps:get(<<"after_concession">>, Sd, null)),
+              false, <<"government">>, <<"cash_position">>),
+        event(<<"other_buying_costs">>, <<"settle">>, <<"event_other_costs">>, <<"out">>,
+              amount(maps:get(<<"total">>, OtherCosts, null)),
+              true, <<"other">>, <<"cash_position">>)
+    ],
+    In = grant_events(Stack),
+    [E || E <- Out ++ In, maps:get(<<"amount">>, E) =/= null].
+
+%% one in-event per applicable role=grant scheme (FHOG); benefit_value placed verbatim
+%% (money_range, [0, amount] at base — honest), is_estimate mirrors the source flag.
+grant_events(Stack) ->
+    Grants = [S || S <- maps:get(<<"applicable_schemes">>, Stack, []),
+                   maps:get(<<"role">>, S, <<>>) =:= <<"grant">>],
+    [grant_event(I, S) || {I, S} <- lists:enumerate(Grants)].
+
+grant_event(I, S) ->
+    event(<<"grant_", (integer_to_binary(I))/binary>>, <<"settle">>,
+          <<"event_grant">>, <<"in">>,
+          amount(maps:get(<<"benefit_value">>, S, null)),
+          maps:get(<<"benefit_is_estimate">>, S, false),
+          <<"government">>, <<"eligibility">>).
+
+%% acquisition events are all one_off (period=null); recurring/Own-phase events are
+%% placed by purchase_journey, not here. The label is a no-param bilingual copy line.
+event(Id, Phase, LabelCopyId, Dir, Amount, IsEst, Counterparty, Source) ->
+    #{<<"id">>               => Id,
+      <<"phase">>            => Phase,
+      <<"label">>            => copy(LabelCopyId, #{}),
+      <<"direction">>        => Dir,
+      <<"amount">>           => Amount,
+      <<"is_estimate">>      => IsEst,
+      <<"timing">>           => <<"one_off">>,
+      <<"period">>           => null,
+      <<"counterparty">>     => Counterparty,
+      <<"source_component">> => Source}.
+
+%% place a money_range figure as-is; a scalar (duty) collapses to [v, v]; anything else
+%% (null / malformed) → null, which the cash_events filter drops (place, never fabricate).
+amount([Lo, Hi]) when is_number(Lo), is_number(Hi) -> [Lo, Hi];
+amount(_) -> null.
+
+point(V) when is_number(V) -> [V, V];
+point(_) -> null.
 
 %% need side computed → say so + the ceiling assumption; couldn't (no state/price) →
 %% the prior stamp-only honest-partial note.
