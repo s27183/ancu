@@ -49,19 +49,19 @@ main(_) ->
     %% --- persisted event log is the SOT (count matches the stream) ---
     EventCount = scalar("SELECT count(*) FROM plan_card_events WHERE plan_card_id = $1",
                         [PlanCardId]),
-    expect(EventCount =:= 23, "23 events persisted"),
+    expect(EventCount =:= 27, "27 events persisted"),
 
     %% --- compliance audit trail (2b-4c, compliance-pipeline.md §5): one audit_events
-    %%     row per (component, gate) = 3 × 5 = 15, every one `clear` on the Mode-A healthy
+    %%     row per (component, gate) = 3 × 6 = 18, every one `clear` on the Mode-A healthy
     %%     path; ASIC attests decision_support_boundary_held on the 2 advice-adjacent
     %%     components (mortgage_finance, eligibility). The audit trail is the regulated
     %%     record constraint #10 demands — a gate with no audit row is still a disclaimer. ---
     AuditCount = scalar("SELECT count(*) FROM audit_events WHERE plan_card_id = $1",
                         [PlanCardId]),
-    expect(AuditCount =:= 15, "15 audit_events rows (3 gates × 5 components)"),
+    expect(AuditCount =:= 18, "18 audit_events rows (3 gates × 6 components)"),
     ClearCount = scalar("SELECT count(*) FROM audit_events WHERE plan_card_id = $1 "
                         "AND compliance_jsonb->>'disposition' = 'clear'", [PlanCardId]),
-    expect(ClearCount =:= 15, "all 15 audit rows disposition=clear (Mode-A healthy)"),
+    expect(ClearCount =:= 18, "all 18 audit rows disposition=clear (Mode-A healthy)"),
     AsicHeld = scalar("SELECT count(*) FROM audit_events WHERE plan_card_id = $1 "
                       "AND compliance_jsonb->>'gate' = 'asic' "
                       "AND compliance_jsonb->>'detail' = 'decision_support_boundary_held'",
@@ -71,13 +71,14 @@ main(_) ->
                           "AND fill_path = 'two_path'", [PlanCardId]),
     expect(TwoPathAudit =:= 3, "two_path fill_path audited (migration 002 widened the CHECK)"),
 
-    %% --- content_jsonb snapshot holds all 5 base components ---
+    %% --- content_jsonb snapshot holds all 6 base components ---
     {200, CardResp} = req(get, Base ++ "/plan-cards/" ++ binary_to_list(PlanCardId),
                           [Auth], <<>>),
     #{<<"content">> := #{<<"components">> := Components}} =
         fh_engine_util:json_decode(CardResp),
-    expect(map_size(Components) =:= 5, "5 components snapshotted into content_jsonb"),
+    expect(map_size(Components) =:= 6, "6 components snapshotted into content_jsonb"),
     expect(maps:is_key(<<"eligibility">>, Components), "eligibility component present"),
+    expect(maps:is_key(<<"purchase_journey">>, Components), "purchase_journey component present"),
 
     %% --- cancel is idempotent: turn already finished -> 204 ---
     {204, _} = req(post, Base ++ "/plan-cards/" ++ binary_to_list(PlanCardId) ++ "/cancel",
@@ -97,8 +98,9 @@ main(_) ->
 %% Base turn with Layer 2 live (2b-4c): each component now emits THREE compliance_gate
 %% events (firb · asic · aml, each audited) immediately before its component_filled.
 %% Order: buyer_profile/eligibility (resolver) → mortgage_finance (two_path; its `usage`
-%% lands right after its component_filled, from the sidecar fill) → cash_position/
-%% ownership_planning (resolver) → turn_completed. 1 + 5×(3 gate + 1 filled) + usage + 1 = 23.
+%% lands right after its component_filled, from the sidecar fill) → cash_position →
+%% purchase_journey → ownership_planning (resolver) → turn_completed.
+%% 1 + 6×(3 gate + 1 filled) + usage + 1 = 27.
 expected_sequence() ->
     Gates = [<<"compliance_gate">>, <<"compliance_gate">>, <<"compliance_gate">>],
     CF = <<"component_filled">>,
@@ -108,6 +110,7 @@ expected_sequence() ->
        Gates, CF,                      %% eligibility    (resolver)
        Gates, CF, <<"usage">>,         %% mortgage_finance (two_path) + its usage
        Gates, CF,                      %% cash_position  (resolver)
+       Gates, CF,                      %% purchase_journey (resolver)
        Gates, CF,                      %% ownership_planning (resolver)
        <<"turn_completed">>]).
 

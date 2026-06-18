@@ -156,6 +156,35 @@ export interface OngoingObligationsOutcome {
     alert_triggers_armed?: AlertTrigger[] | null;
 }
 
+// --- purchase_journey → swimlane-diagram (outcome type `journey_swimlane`) ---
+// The base lifecycle spine (plan-card-lifecycle-restoration §7): phases × actors ×
+// cells. The engine PLACES already-computed upstream figures on the timeline (it
+// computes none of its own); `amount` is a money_range ([v,v] for a point) or null.
+
+export type FlowMarker = 'none' | 'money_out' | 'money_in' | 'document' | 'milestone';
+
+export interface JourneyPhase {
+    id: string;
+    label: LocalizedText;
+}
+export interface JourneyActor {
+    id: string;
+    label: LocalizedText;
+}
+export interface JourneyCell {
+    phase: string;
+    actor: string;
+    item: LocalizedText;
+    flow_marker: FlowMarker;
+    amount?: MoneyRange | null;
+}
+export interface JourneySwimlaneOutcome {
+    phases?: JourneyPhase[] | null;
+    actors?: JourneyActor[] | null;
+    cells?: JourneyCell[] | null;
+    key_assumptions?: LocalizedText[] | null;
+}
+
 // --- the plan-card envelope (fh_engine_store:get_plan_card) ------------------
 
 /** One filled component as the engine snapshots it (fh_engine_turn entry / the

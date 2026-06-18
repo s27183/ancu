@@ -9,6 +9,7 @@
     import SchemeStackCard from './SchemeStackCard.svelte';
     import Calculator from './Calculator.svelte';
     import DataTable from './DataTable.svelte';
+    import SwimlaneDiagram from './SwimlaneDiagram.svelte';
 
     let { componentId, entry, filling, density = 'compact', interactive = false }: {
         componentId: string;
@@ -37,6 +38,8 @@
             <Calculator outcome={entry.outcome} {density} {interactive} />
         {:else if entry.renderer === 'data-table'}
             <DataTable outcome={entry.outcome} {density} />
+        {:else if entry.renderer === 'swimlane-diagram'}
+            <SwimlaneDiagram outcome={entry.outcome} {density} />
         {/if}
     {:else if filling}
         <p class="pp-computing"><span class="pp-spinner" aria-hidden="true"></span>{$t('plan.computing')}</p>

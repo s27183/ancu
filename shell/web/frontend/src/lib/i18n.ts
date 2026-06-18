@@ -163,6 +163,7 @@ const messages = {
     'plan.ltab.portfolio': { vi: 'Danh mục', en: 'Portfolio' },
     // Per-property component titles — shown as affordance cards at base (the full
     // component appears once a property is attached). Base components already have plan.c.*.
+    'plan.c.purchase_journey': { vi: 'Hành trình mua nhà', en: 'Your buying journey' },
     'plan.c.due_diligence': { vi: 'Thẩm định', en: 'Due diligence' },
     'plan.c.settlement_prep': { vi: 'Chuẩn bị bàn giao', en: 'Settlement prep' },
     'plan.c.buying_strategy': { vi: 'Chiến lược ra giá', en: 'Buying strategy' },
@@ -183,6 +184,9 @@ const messages = {
         vi: 'Một số con số sẽ hiện ra khi bạn bổ sung thu nhập và tiền tiết kiệm.',
         en: 'Some figures unlock once you add your income and savings.'
     },
+    // Journey swimlane (purchase_journey) — non-money cell marker tags.
+    'plan.journey.flow.document': { vi: 'Hồ sơ', en: 'Doc' },
+    'plan.journey.flow.milestone': { vi: 'Mốc', en: 'Step' },
 
     'plan.f.applicants': { vi: 'Số người mua', en: 'Applicants' },
     'plan.f.firb': { vi: 'Cần FIRB?', en: 'FIRB required?' },

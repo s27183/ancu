@@ -54,6 +54,7 @@ Each component has a `scope` indicating when it runs in the plan card lifecycle:
 | 7 due_diligence | `per-property` | When user uploads documents for a specific property |
 | 8 settlement_prep | `per-property` | Activated when contract is signed on a specific property |
 | 9 ownership_planning | `both` | Base estimate of ongoing costs at onboarding; refined per-property post-settlement |
+| 10 purchase_journey | `base` | Onboarding; the property-agnostic whole-of-journey lifecycle overview (swimlane). Distinct from `settlement_prep` (8), which is the per-property settlement checklist. |
 
 Components with `scope: base` fill **once per user** in the persistent base plan. Components with `scope: per-property` fill **once per property** the user attaches, creating a property addendum on the plan card. Components with `scope: both` have a base form (using target price range and suburb medians) and a refined form (using specific property data).
 
@@ -99,7 +100,7 @@ Components with `scope: base` fill **once per user** in the persistent base plan
 
 UI tab assignment is a presentation concern; the blueprint defines the data model and reasoning structure.
 
-**Machine-readable form** — compiled to `ui_tabs` in the artifact and **canonical for the runtime** (the table above is the human view). Tabs render in the order listed. `kind: synthesis` is a shell-composed summary (not a vocabulary renderer); `interactive: true` marks the client-side cash what-if (B2). The `journey` tab gains `purchase_journey` (the base lifecycle swimlane) in B1; until then it carries only the per-property `settlement_prep`. See [`../architecture/plan-card-lifecycle-restoration.md`](../architecture/plan-card-lifecycle-restoration.md) §3.2/§5.
+**Machine-readable form** — compiled to `ui_tabs` in the artifact and **canonical for the runtime** (the table above is the human view). Tabs render in the order listed. `kind: synthesis` is a shell-composed summary (not a vocabulary renderer); `interactive: true` marks the client-side cash what-if (B2). The `journey` tab leads with `purchase_journey` (the base lifecycle swimlane, B1) and falls through to the per-property `settlement_prep` (an "attach a property" affordance until a property is attached). See [`../architecture/plan-card-lifecycle-restoration.md`](../architecture/plan-card-lifecycle-restoration.md) §3.2/§5/§7.
 
 ```jsonc
 {
@@ -107,7 +108,7 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
     { "tab_id": "overview",        "kind": "synthesis",  "components": ["buyer_profile", "eligibility", "mortgage_finance", "cash_position"] },
     { "tab_id": "before_you_buy",  "kind": "components", "components": ["eligibility", "cash_position", "due_diligence"] },
     { "tab_id": "cash_calculator", "kind": "components", "interactive": true, "components": ["cash_position"] },
-    { "tab_id": "journey",         "kind": "components", "components": ["settlement_prep"] },
+    { "tab_id": "journey",         "kind": "components", "components": ["purchase_journey", "settlement_prep"] },
     { "tab_id": "buying",          "kind": "components", "components": ["buying_strategy"] },
     { "tab_id": "after_you_buy",   "kind": "components", "components": ["ownership_planning"] }
   ]
@@ -870,6 +871,40 @@ The `mortgage_plan` outcome feeds `cash_position` (loan amount + buffer requirem
 
 ---
 
+### 10. purchase_journey
+
+**Goal:** Present the whole-of-journey lifecycle as a swimlane — the phases of a first-home purchase across time (Prepare → Pre-approve → Contract → Settle → Own) against the actors who act in each (You / Government / Lender / Other), with the buyer's already-computed money flows placed on the timeline. This is the **base lifecycle spine** the prototype led with — property-agnostic, generated at onboarding.
+
+**Scope:** `base` — the journey structure is generic to a Mode-A FHB purchase; it does not depend on a specific property. (`settlement_prep` (8) is the *per-property* settlement checklist that refines the Settle phase once a property is attached — a distinct component.)
+
+**Inputs:** `eligibility.outcome` (scheme_stack) + `mortgage_finance.outcome` (mortgage_plan) + `cash_position.outcome` (budget_envelope). It runs **after** `cash_position` precisely so it can place the cash figures the calculator already computed — it computes **no figure of its own** (one-computer-per-figure; the regulated duty / deposit / total are referenced, never recomputed).
+
+**KB anchors:** `kb.journey.fhg-path`
+
+**Renderer:** `swimlane-diagram`
+
+**UI tab hint:** Journey (leads the tab; `settlement_prep` follows per-property)
+
+**Fill path:** resolver. The journey structure + bilingual cell prose are generic KB content (`kb.journey.fhg-path`); the figures are upstream outcomes placed on the timeline. No agent leaf.
+
+**Outcome schema:** `journey_swimlane`
+
+```jsonc
+{
+  "type": "journey_swimlane",
+  "fields": {
+    "phases": "array<{ id: string, label: localized_text }>",   // ordered lifecycle phases (Prepare → Pre-approve → Contract → Settle → Own)
+    "actors": "array<{ id: string, label: localized_text }>",   // the swimlane rows (You / Government / Lender / Other)
+    "cells": "array<{ phase: string, actor: string, item: localized_text, flow_marker: enum [none, money_out, money_in, document, milestone], amount: money_range }>",  // one action per (phase, actor) that has one; amount is an upstream figure placed on the timeline (a point figure is emitted as [v, v]; null when no figure attaches) — NEVER computed here (one-computer-per-figure)
+    "key_assumptions": "array<localized_text>"
+  }
+}
+```
+
+The `journey_swimlane` shape is **mode-general** (phases × actors × cells); Modes B/C/D reuse the same schema + the mode-agnostic `swimlane-diagram` renderer with their own `kb.journey.*` content and resolver (plan-card-lifecycle-restoration.md §3.3). Mode A is built; the rest are content-only follow-ons.
+
+---
+
 ## KB anchor index (for this blueprint)
 
 The following kb_anchor slugs are referenced by components in this blueprint. The offline KB agent must ensure each slug resolves to a curated KB document. Slugs use dot-notation; lookups are case-sensitive.
@@ -921,6 +956,7 @@ The following kb_anchor slugs are referenced by components in this blueprint. Th
 | `kb.graduation.lvr80` | 9 | The 80% LVR graduation event and FHG implications |
 | `kb.land-tax.ppor-exemption` | 9 | Land tax PPOR exemption rules |
 | `kb.maintenance.budget-by-property-type` | 9 | Maintenance budget heuristics by property type |
+| `kb.journey.fhg-path` | 10 | The Mode-A FHB lifecycle template — phase + actor labels, per-cell bilingual prose, journey assumptions (the swimlane's structure + copy; figures are placed from upstream, not stored here) |
 
 ---
 
@@ -936,7 +972,7 @@ This blueprint uses 9 of the constrained renderer vocabulary defined in [§11.9 
 | `buying-strategy-card` | 5 buying_strategy |
 | `risk-flag-list` | 6 due_diligence |
 | `checklist` | 6 due_diligence, 7 settlement_prep |
-| `swimlane-diagram` | 7 settlement_prep |
+| `swimlane-diagram` | 7 settlement_prep, 10 purchase_journey |
 | `data-table` | 8 ownership_planning |
 | `opportunity-card` | 8 ownership_planning |
 
@@ -976,6 +1012,7 @@ buying_strategy       → outcome: bid_plan              (reads: property_fit, b
 due_diligence         → outcome: risk_assessment       (reads: property_fit, uploaded_docs)
 settlement_prep       → outcome: settlement_checklist  (reads: scheme_stack, property_fit, bid_plan, mortgage_plan)
 ownership_planning    → outcome: ongoing_obligations   (reads: property_fit, scheme_stack, budget_envelope, mortgage_plan)
+purchase_journey      → outcome: journey_swimlane      (reads: scheme_stack, mortgage_plan, budget_envelope)
 ```
 
 No cycles. `due_diligence` is independent of `buying_strategy` (parallel — buyer can run due diligence before deciding to bid). `mortgage_finance` slots in between `eligibility` and `cash_position` because cash math needs the loan amount + LMI / FHG path decision from the mortgage plan.

@@ -229,18 +229,24 @@ One change at a time; each phase green by its own gate before the next.
 
 ---
 
-## 9. Open decisions
+## 9. Open decisions — RESOLVED at implementation
 
-- **`purchase_journey` DAG placement** — after `mortgage_finance` (reads scheme_stack + path) is the
-  proposal; confirm it shouldn't read only `{profile, eligibility}` and run earlier.
-- **Compiler scope** — does `kb_compiler`/`validate_build` process all four blueprints (so B/C/D
-  `ui_tabs` are validated now), or only the in-scope one? If only in-scope, the B/C/D declarations are
-  authored-but-unvalidated until those modes activate — acceptable, but worth knowing.
-- **Journey KB granularity** — one `kb.journey.fhg-path` with `{state, path}` variants inline
-  (proposal), vs per-state docs.
-- **Overview "best/safer path"** — the prototype showed two strategies; at base we have one
-  target+path. Proposal: Overview shows the single recommended path; multi-strategy compare is a later
-  (refine/per-property) enhancement.
+- **`purchase_journey` DAG placement** — **RESOLVED: reads `{scheme_stack, mortgage_plan,
+  budget_envelope}` and runs AFTER `cash_position`.** The §9 proposal ("after `mortgage_finance`") was
+  overturned by grounding: the journey's money flows (deposit, duty, total cash, scheme benefit) are
+  *already computed upstream*, so the journey **places** them and computes none of its own
+  (one-computer-per-figure, stronger than reuse). Placing requires `budget_envelope`, which exists only
+  after `cash_position` — so it runs there, not earlier.
+- **Compiler scope** — **RESOLVED: structural gates (slug, renderer-enum, acyclicity, ui_tabs
+  ref-integrity / GATE 9) run over ALL four blueprints; semantic gates (reference-integrity, coverage,
+  type-compat) run in-scope (Mode A) only.** So B/C/D `ui_tabs` are validated now, dormant until their
+  modes activate.
+- **Journey KB granularity** — **RESOLVED: one `kb.journey.fhg-path` copy doc** (phase/actor labels +
+  per-cell prose + assumptions, bilingual). It carries NO `{state, path}` figure variants — the figures
+  ride in the outcome's `amount` field from upstream, not the KB doc. Per-state prose nuance (cooling-off
+  days, settlement weeks) is deferred (the journey points to Before-you-buy), not embedded.
+- **Overview "best/safer path"** — **RESOLVED: Overview shows the single recommended path** (A4
+  shipped). Multi-strategy compare is a later refine/per-property enhancement.
 
 ## 10. Non-goals
 

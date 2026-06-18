@@ -41,7 +41,7 @@
 %% the artifact is a follow-on; the Mode-A base sequence is fixed.)
 -define(BASE_COMPONENTS,
         [<<"buyer_profile">>, <<"eligibility">>, <<"mortgage_finance">>,
-         <<"cash_position">>, <<"ownership_planning">>]).
+         <<"cash_position">>, <<"purchase_journey">>, <<"ownership_planning">>]).
 
 -spec start_link(map()) -> gen_statem:start_ret().
 start_link(Args) ->
@@ -430,7 +430,8 @@ default_renderer(Comp) ->
         _ -> <<"summary-card">>
     end.
 
-component_scope(<<"buyer_profile">>) -> <<"base">>;
+component_scope(<<"buyer_profile">>)    -> <<"base">>;
+component_scope(<<"purchase_journey">>) -> <<"base">>;
 component_scope(_) -> <<"both">>.
 
 %% Spawn a disposable sidecar to fill ONE agent component. The sidecar receives the
