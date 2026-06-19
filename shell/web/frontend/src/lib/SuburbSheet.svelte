@@ -113,7 +113,7 @@
                  user's card for THIS zone, or renders the create CTA itself (8-S4c).
                  Keyed by reloadPlan so a freshly-created plan reloads it in place. -->
             {#key reloadPlan}
-                <PlanProjection suburbName={suburb.name} {onplan} />
+                <PlanProjection suburbName={suburb.name} suburbState={suburb.state} {onplan} />
             {/key}
         {/if}
     </div>

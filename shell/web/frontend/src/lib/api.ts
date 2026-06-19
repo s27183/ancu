@@ -166,6 +166,53 @@ export async function listPlanCards(
     return body.plan_cards ?? [];
 }
 
+// --- Simulate: preview a structural what-if (W9) ----------------------------
+// POST /api/plan-cards/:id/simulate — the engine recomputes the base plan resolver-only
+// under {target_price, state} overrides and returns the recomputed outcomes in the BODY.
+// A PREVIEW: ephemeral, no persist, NO usage (so no token gate, unlike a chat turn). The
+// returned `outcomes` are keyed by component_id (engine-contract §10.1) — the SAME keying
+// as the GET card's content.components — so the projection merges them onto its existing
+// entries by one key. Saving a previewed scenario is a separate refine turn (W8), not this.
+
+/** The structural what-if overrides. Both optional — send only the dimensions varied.
+ *  `target_price` is a single number (the engine collapses it to a [p,p] point range);
+ *  `state` is an AU state code. property_type is Phase-B (per-property) → engine 400. */
+export interface SimulateOverrides {
+    target_price?: number;
+    state?: string;
+}
+
+/** A discriminated preview outcome. `invalid` is the engine's 400 for a rejected
+ *  override (e.g. property_type, or an unknown key) — surfaced calmly, not thrown. */
+export type SimulateOutcome =
+    | { kind: 'ok'; outcomes: Record<string, Record<string, unknown>> }
+    | { kind: 'invalid' }
+    | { kind: 'not_found' }
+    | { kind: 'auth_required' }
+    | { kind: 'error'; status: number };
+
+/** POST a what-if preview. Returns the recomputed outcomes (component_id-keyed); the
+ *  caller overlays them on the card's components and re-renders. Nothing is persisted. */
+export async function simulatePlanCard(
+    planCardId: string,
+    overrides: SimulateOverrides,
+    fetchFn: typeof fetch = fetch
+): Promise<SimulateOutcome> {
+    const res = await fetchFn(`/api/plan-cards/${encodeURIComponent(planCardId)}/simulate`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ overrides })
+    });
+    if (res.ok) {
+        const body = (await res.json()) as { outcomes: Record<string, Record<string, unknown>> };
+        return { kind: 'ok', outcomes: body.outcomes ?? {} };
+    }
+    if (res.status === 400) return { kind: 'invalid' };
+    if (res.status === 404) return { kind: 'not_found' };
+    if (res.status === 401) return { kind: 'auth_required' };
+    return { kind: 'error', status: res.status };
+}
+
 // --- Chat: ask a question about the card (8-S4d) ----------------------------
 // POST /api/plan-cards/:id/messages — starts a kind:qa turn over the FILLED card.
 // The engine answers 202 {turn_id} immediately; the bilingual answer + machinery

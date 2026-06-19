@@ -68,7 +68,7 @@ preview(Id, Overrides, Onboarding, Intent, Req, State) ->
         {ok, Outcomes} ->
             Resp = #{<<"plan_card_id">> => Id,
                      <<"overrides">> => Overrides,
-                     <<"outcomes">> => Outcomes},
+                     <<"outcomes">> => by_component(Outcomes)},
             {ok, fh_engine_http:reply_json(200, Resp, Req), State}
     catch
         Class:Why:St ->
@@ -80,6 +80,20 @@ preview(Id, Overrides, Onboarding, Intent, Req, State) ->
             {ok, fh_engine_http:reply_json(500,
                 #{<<"error">> => <<"outcome_nonconforming">>}, Req), State}
     end.
+
+%% Re-key the preview outcomes from outcome_type (the DAG accumulator's internal shape —
+%% downstream components read upstream outcomes by type) to COMPONENT_ID, so the preview
+%% response matches the committed snapshot's keying (content_jsonb.components is
+%% component_id-keyed). The shell merges preview[component_id] onto its existing
+%% ComponentEntry by the same key — "preview is commit minus persistence" at the response
+%% layer, not just the compute layer (engine-contract §10.1; W9 is the first consumer).
+%% base_components/0 is the single source of the component_id↔outcome_type pairing, so the
+%% shell needs no second copy of that mapping.
+by_component(Outcomes) ->
+    maps:from_list(
+      [{maps:get(<<"name">>, C),
+        maps:get(maps:get(<<"outcome_type">>, C, maps:get(<<"name">>, C)), Outcomes)}
+       || C <- fh_engine_turn:base_components()]).
 
 reject(property_type_phase_b, Req, State) ->
     {ok, fh_engine_http:reply_json(400,

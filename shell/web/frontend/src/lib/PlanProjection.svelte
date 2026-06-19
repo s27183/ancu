@@ -7,14 +7,27 @@
     // the property-agnostic BASE components, identical across suburbs.
     import { onMount } from 'svelte';
     import { t } from '$lib/i18n';
-    import { getPlanCard, listPlanCards } from '$lib/api';
+    import { lang } from '$lib/stores/lang';
+    import { getPlanCard, listPlanCards, simulatePlanCard, type SimulateOverrides } from '$lib/api';
     import { subscribePlanCard, type PlanCardStream } from '$lib/planCardStream';
-    import { BASE_COMPONENT_ORDER, type ComponentEntry, type UiTab } from '$lib/planCard';
+    import {
+        BASE_COMPONENT_ORDER,
+        type ComponentEntry,
+        type UiTab,
+        type ProfileOutcome,
+        type MoneyRange
+    } from '$lib/planCard';
+    import { AU_STATES } from '$lib/map';
+    import { money, moneyRange } from '$lib/format';
     import ComponentCard from '$lib/renderers/ComponentCard.svelte';
     import OverviewCard from '$lib/renderers/OverviewCard.svelte';
     import Chat from '$lib/Chat.svelte';
 
-    let { suburbName, onplan }: { suburbName: string; onplan: () => void } = $props();
+    let { suburbName, suburbState, onplan }: {
+        suburbName: string;
+        suburbState: string;
+        onplan: () => void;
+    } = $props();
 
     // The plan is shown one lifecycle TAB at a time (the blueprint's ui_tabs spine —
     // plan-card-lifecycle-restoration.md §3 — plus a Q&A tab) so the user never scrolls a
@@ -43,7 +56,77 @@
 
     const running = $derived(phase === 'ready' && !turnDone && !turnFailed);
 
+    // ── Structural what-if (W9, engine-contract §10.1) ──────────────────────
+    // Vary target_price / state → POST /simulate → the engine recomputes the base plan
+    // resolver-only and returns outcomes keyed by component_id (same keying as the GET
+    // snapshot). EPHEMERAL: previewOutcomes overlays the live components for ALL tabs but
+    // nothing persists — saving a scenario is a separate refine turn (W8). property_type
+    // is Phase-B (per-property), so it's not offered here. State seeds from the suburb the
+    // card is projected under; only a CHANGED state is sent as an override.
+    let priceInput = $state('');
+    // Seeded to suburbState by resetPreview() (called at the top of load()), not at init —
+    // $state captures only the initial prop value, and the bar only renders post-load.
+    let stateSelect = $state('');
+    let previewOutcomes = $state<Record<string, Record<string, unknown>> | null>(null);
+    let previewing = $state(false);
+    let previewError = $state(false);
+    const previewActive = $derived(previewOutcomes !== null);
+
+    // The components the tabs render: live outcomes, or — under an active preview — each
+    // entry with its outcome swapped for the previewed one (renderer/scope/etc preserved,
+    // merged by component_id). A component absent from the preview keeps its live outcome.
+    const viewComponents = $derived.by((): Record<string, ComponentEntry> => {
+        if (!previewOutcomes) return components;
+        const pv = previewOutcomes;
+        return Object.fromEntries(
+            Object.entries(components).map(([cid, entry]) => [
+                cid,
+                pv[cid] ? { ...entry, outcome: pv[cid] } : entry
+            ])
+        );
+    });
+
+    // The card's current target price (band or point), shown as the what-if baseline hint.
+    const currentPriceLabel = $derived.by((): string | null => {
+        const o = components.buyer_profile?.outcome as ProfileOutcome | undefined;
+        const r = o?.target_price_range as MoneyRange | null | undefined;
+        if (!Array.isArray(r) || r.length !== 2) return null;
+        return r[0] === r[1] ? money(r[0], $lang) : moneyRange(r, $lang);
+    });
+
+    async function runPreview() {
+        if (!cardId) return;
+        const overrides: SimulateOverrides = {};
+        const p = Number(priceInput.replace(/[^0-9.]/g, ''));
+        if (priceInput.trim() !== '' && Number.isFinite(p) && p > 0) overrides.target_price = p;
+        if (stateSelect && stateSelect !== suburbState) overrides.state = stateSelect;
+        // Nothing varied → clear any prior preview rather than round-trip a no-op.
+        if (Object.keys(overrides).length === 0) {
+            previewOutcomes = null;
+            previewError = false;
+            return;
+        }
+        previewing = true;
+        previewError = false;
+        const res = await simulatePlanCard(cardId, overrides);
+        previewing = false;
+        if (res.kind === 'ok') {
+            previewOutcomes = res.outcomes;
+        } else {
+            previewError = true;
+            previewOutcomes = null;
+        }
+    }
+
+    function resetPreview() {
+        previewOutcomes = null;
+        previewError = false;
+        priceInput = '';
+        stateSelect = suburbState;
+    }
+
     async function load() {
+        resetPreview();
         const myGen = ++gen;
         stream?.close();
         stream = null;
@@ -146,6 +229,49 @@
         >
     </div>
 
+    <!-- Structural what-if bar (W9): a plan-level control — varying price/state re-renders
+         EVERY tab, so it lives above the tabs, not inside a renderer. Hidden on Q&A (chat
+         runs over the committed card, not a preview) and until the base plan has filled. -->
+    {#if cardId && turnDone && !turnFailed && sub !== 'qa'}
+        <div class="pp-whatif" class:active={previewActive}>
+            <div class="pp-wi-controls">
+                <label class="pp-wi-field">
+                    <span class="pp-wi-label">{$t('plan.whatif.price')}</span>
+                    <input
+                        type="text"
+                        inputmode="numeric"
+                        bind:value={priceInput}
+                        placeholder={currentPriceLabel
+                            ? `${$t('plan.whatif.current')} ${currentPriceLabel}`
+                            : $t('plan.cash.whatif.placeholder')}
+                        onkeydown={(e) => e.key === 'Enter' && runPreview()}
+                    />
+                </label>
+                <label class="pp-wi-field">
+                    <span class="pp-wi-label">{$t('plan.whatif.state')}</span>
+                    <select bind:value={stateSelect}>
+                        {#each AU_STATES as s (s)}
+                            <option value={s}>{s}</option>
+                        {/each}
+                    </select>
+                </label>
+                <button type="button" class="primary" onclick={runPreview} disabled={previewing}>
+                    {previewing ? $t('plan.whatif.running') : $t('plan.whatif.run')}
+                </button>
+                {#if previewActive}
+                    <button type="button" class="pp-wi-reset" onclick={resetPreview}
+                        >{$t('plan.whatif.reset')}</button
+                    >
+                {/if}
+            </div>
+            {#if previewActive}
+                <p class="pp-wi-banner">{$t('plan.whatif.banner')}</p>
+            {:else if previewError}
+                <p class="pp-wi-error">{$t('plan.whatif.error')}</p>
+            {/if}
+        </div>
+    {/if}
+
     <div class="pp-subcontent">
         {#if sub === 'qa'}
             <!-- Chat runs over the FILLED card; the engine 409s a qa turn while the base
@@ -158,17 +284,17 @@
         {:else if activeTab?.kind === 'synthesis'}
             <!-- The Overview tab: a shell-composed synthesis over the filled base
                  outcomes (the "plan in 90 seconds"), not the raw component cards. -->
-            <OverviewCard {components} filling={running} />
+            <OverviewCard components={viewComponents} filling={running} />
         {:else if activeTab}
             <!-- A lifecycle tab renders its mapped components in order. A component with no
                  entry once the base turn has finished is not part of the base plan (a
                  per-property component, or the not-yet-built base swimlane) → an honest
                  affordance, never a perpetual "computing". -->
             {#each activeTab.components as cid (cid)}
-                {#if components[cid]}
+                {#if viewComponents[cid]}
                     <ComponentCard
                         componentId={cid}
-                        entry={components[cid]}
+                        entry={viewComponents[cid]}
                         filling={running}
                         interactive={activeTab.interactive ?? false}
                     />

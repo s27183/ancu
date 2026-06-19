@@ -21,7 +21,7 @@ main(_) ->
     ok = fh_engine_kb:load(),
     io:format("simulate preview smoke — apply_overrides + pure run/2, no PG~n~n"),
 
-    R = override_mapping_checks() ++ run_walk_checks(),
+    R = override_mapping_checks() ++ run_walk_checks() ++ rekey_checks(),
 
     io:format("~n================================================================~n"),
     case [X || X <- R, X =:= fail] of
@@ -96,6 +96,32 @@ run_walk_checks() ->
      check("the override reaches the journey spine (different journey under a dearer price)",
            maps:get(<<"journey_swimlane">>, OutBase)
                =/= maps:get(<<"journey_swimlane">>, OutDearer), true)].
+
+%% --- 3. component_id re-key (W9, fork A) ------------------------------------
+%% The handler returns outcomes keyed by COMPONENT_ID (matching the committed snapshot),
+%% re-keying from run/2's outcome_type accumulator via base_components/0. Prove that
+%% mapping is TOTAL: every base component_id resolves to a present outcome (no
+%% outcome_type missing from run/2's output) — the property the handler's by_component/1
+%% relies on. We reproduce the handler's exact mapping here (no PG / no HTTP needed).
+
+rekey_checks() ->
+    io:format("~ncomponent_id re-key — handler by_component/1 mapping (W9)~n"),
+    {ok, Out} = fh_engine_simulate:run(onboarding(<<"NSW">>, [600000, 600000]),
+                                       <<"owner_occupier">>),
+    Comps = fh_engine_turn:base_components(),
+    ByComponent =
+        maps:from_list(
+          [{maps:get(<<"name">>, C),
+            maps:get(maps:get(<<"outcome_type">>, C, maps:get(<<"name">>, C)), Out)}
+           || C <- Comps]),
+    CompIds = [maps:get(<<"name">>, C) || C <- Comps],
+    [check("re-key covers every base component_id (mapping is total)",
+           lists:sort(maps:keys(ByComponent)), lists:sort(CompIds)),
+     check("no component_id maps to a missing/undefined outcome",
+           lists:any(fun(V) -> V =:= undefined end, maps:values(ByComponent)), false),
+     check("cash_position re-keys to the budget_envelope outcome (component_id↔outcome_type)",
+           maps:get(<<"cash_position">>, ByComponent),
+           maps:get(<<"budget_envelope">>, Out))].
 
 %% --- helpers ----------------------------------------------------------------
 

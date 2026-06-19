@@ -11,8 +11,8 @@
 %% (fetch state, SSE event proxy, messages, suburbs) lands as the shell UX surfaces
 %% are built (8-S1..8-S4). HTTP via inets httpc (started by the shell app).
 
--export([create_plan_card/2, get_plan_card/2, post_message/3, stream_events/3,
-         list_suburbs/1, get_usage_events/2]).
+-export([create_plan_card/2, get_plan_card/2, post_message/3, simulate/3,
+         stream_events/3, list_suburbs/1, get_usage_events/2]).
 
 %% The system principal for unauthenticated reference-data reads. `suburbs` is
 %% global CC-BY reference data; the map is the pre-login landing surface, so the
@@ -65,6 +65,24 @@ get_plan_card(UserId, PlanCardId) ->
 post_message(UserId, PlanCardId, BodyMap) ->
     Token = fh_shell_engine_jwt:mint(#{user_id => UserId}),
     Url = base_url() ++ "/plan-cards/" ++ binary_to_list(PlanCardId) ++ "/messages",
+    Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
+    Body = fh_shell_util:json_encode(BodyMap),
+    {ok, {{_, Status, _}, _, Resp}} =
+        httpc:request(post, {Url, Headers, "application/json", Body},
+                      [], [{body_format, binary}]),
+    {Status, Resp}.
+
+%% Preview a structural what-if (W9) — POST /api/engine/plan-cards/:id/simulate with
+%% {overrides: {target_price|state}}. The shell has confirmed ownership first. The engine
+%% recomputes the base plan resolver-only and returns the recomputed outcomes (keyed by
+%% component_id, §10.1) in the 200 BODY — a PREVIEW: no persist, no turn, NO usage. So
+%% unlike post_message this carries no meter gate (the shell does not gate a zero-cost
+%% read; metering-not-gating). 400 on a rejected override (e.g. property_type). Relayed
+%% verbatim — the engine owns the simulate contract.
+-spec simulate(binary(), binary(), map()) -> {non_neg_integer(), binary()}.
+simulate(UserId, PlanCardId, BodyMap) ->
+    Token = fh_shell_engine_jwt:mint(#{user_id => UserId}),
+    Url = base_url() ++ "/plan-cards/" ++ binary_to_list(PlanCardId) ++ "/simulate",
     Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
     Body = fh_shell_util:json_encode(BodyMap),
     {ok, {{_, Status, _}, _, Resp}} =

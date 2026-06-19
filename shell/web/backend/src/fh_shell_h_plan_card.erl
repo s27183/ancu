@@ -22,6 +22,7 @@ init(Req0, Opts) ->
     case {Opts, cowboy_req:method(Req0)} of
         {[], <<"GET">>}          -> with_owned_card(Req0, Opts, fun read/4);
         {[messages], <<"POST">>} -> with_owned_card(Req0, Opts, fun ask/4);
+        {[simulate], <<"POST">>} -> with_owned_card(Req0, Opts, fun simulate/4);
         _ ->
             {ok, fh_shell_http:reply_json(405,
                 #{<<"error">> => <<"method_not_allowed">>}, Req0), Opts}
@@ -83,6 +84,22 @@ ask(UserId, PlanCardId, Req0, Opts) ->
                   <<"tier">> => Tier,
                   <<"used_tokens">> => Used,
                   <<"limit_tokens">> => Limit}, Req0), Opts}
+    end.
+
+%% POST /api/plan-cards/:id/simulate — preview a structural what-if (W9) → the engine
+%% recomputes the base plan resolver-only and returns the outcomes in the body. NO meter
+%% gate (unlike `ask`): a simulate is resolver-only and emits zero usage — it is free
+%% decision-support, the same posture as the base-plan create (billing.md §5). Just
+%% authenticate → own → relay; the engine validates the overrides (400 on a rejected one).
+simulate(UserId, PlanCardId, Req0, Opts) ->
+    case fh_shell_http:read_json_body(Req0) of
+        {ok, Body, Req1} ->
+            {Status, Resp} =
+                fh_shell_engine_client:simulate(UserId, PlanCardId, Body),
+            {ok, relay(Status, Resp, Req1), Opts};
+        {error, invalid_json} ->
+            {ok, fh_shell_http:reply_json(400,
+                #{<<"error">> => <<"invalid_json">>}, Req0), Opts}
     end.
 
 %% Relay the engine's already-encoded JSON body + status verbatim (same as the

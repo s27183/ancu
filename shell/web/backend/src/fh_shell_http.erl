@@ -40,6 +40,7 @@ routes() ->
         {"/api/plan-cards", fh_shell_h_plan_cards, []},
         {"/api/plan-cards/:id/events", fh_shell_h_events, []},
         {"/api/plan-cards/:id/messages", fh_shell_h_plan_card, [messages]},
+        {"/api/plan-cards/:id/simulate", fh_shell_h_plan_card, [simulate]},
         {"/api/plan-cards/:id", fh_shell_h_plan_card, []},
         %% Login flow (8-S login slice) — one handler, action per route opt.
         {"/api/auth/magic", fh_shell_h_auth, [magic_request]},

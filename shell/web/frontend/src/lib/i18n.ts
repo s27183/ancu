@@ -259,6 +259,22 @@ const messages = {
         vi: 'Đây là ước tính tham khảo so với nhu cầu tiền mặt của bạn — không phải tư vấn tài chính. Muốn thử mức giá khác, hãy cập nhật lại kế hoạch.',
         en: 'An informational estimate against your cash need — not financial advice. To test a different price, refine your plan.'
     },
+    // Structural what-if (W9) — vary target price / state → engine preview, no save.
+    'plan.whatif.title': { vi: 'Thử kịch bản khác', en: 'Try a different scenario' },
+    'plan.whatif.price': { vi: 'Giá mục tiêu', en: 'Target price' },
+    'plan.whatif.state': { vi: 'Tiểu bang', en: 'State' },
+    'plan.whatif.current': { vi: 'Hiện tại:', en: 'Now:' },
+    'plan.whatif.run': { vi: 'Xem thử', en: 'Preview' },
+    'plan.whatif.reset': { vi: 'Đặt lại', en: 'Reset' },
+    'plan.whatif.running': { vi: 'Đang tính lại…', en: 'Recomputing…' },
+    'plan.whatif.banner': {
+        vi: 'Bản xem thử — chưa lưu. Đặt lại để xem kế hoạch hiện tại.',
+        en: 'Preview — not saved. Reset to see your current plan.'
+    },
+    'plan.whatif.error': {
+        vi: 'Không xem thử được kịch bản này. Vui lòng thử lại.',
+        en: 'Couldn’t preview that scenario. Please try again.'
+    },
     'plan.verdict.surplus': { vi: 'Dư', en: 'Surplus' },
     'plan.verdict.tight': { vi: 'Vừa đủ', en: 'Tight' },
     'plan.verdict.short': { vi: 'Còn thiếu', en: 'Short' },

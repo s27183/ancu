@@ -1285,6 +1285,81 @@ main {
     border-color: var(--accent);
     color: var(--accent);
 }
+
+/* Structural what-if bar (W9) — plan-level price/state preview control. */
+.pp-whatif {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.6rem 0.7rem;
+    margin: 0 0 0.75rem;
+    background: var(--surface);
+}
+.pp-whatif.active {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+}
+.pp-wi-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 0.5rem;
+}
+.pp-wi-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    flex: 1 1 8rem;
+    min-width: 0;
+}
+.pp-wi-label {
+    font-size: 0.72rem;
+    color: var(--muted);
+}
+.pp-wi-field input,
+.pp-wi-field select {
+    padding: 0.4rem 0.55rem;
+    border: 1px solid var(--border);
+    border-radius: 0.4rem;
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 0.95rem;
+    font-variant-numeric: tabular-nums;
+}
+.pp-wi-field input:focus,
+.pp-wi-field select:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+.pp-whatif .primary {
+    flex: none;
+    padding: 0.4rem 0.85rem;
+    font-size: 0.85rem;
+}
+.pp-wi-reset {
+    flex: none;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    border-radius: 0.4rem;
+    padding: 0.4rem 0.7rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+.pp-wi-reset:hover {
+    border-color: #cbd5e1;
+}
+.pp-wi-banner {
+    margin: 0.5rem 0 0;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--accent);
+}
+.pp-wi-error {
+    margin: 0.5rem 0 0;
+    font-size: 0.78rem;
+    color: #b91c1c;
+}
 .pp-card {
     border: 1px solid var(--border);
     border-radius: var(--radius);
