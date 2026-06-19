@@ -8,7 +8,13 @@
     import { onMount } from 'svelte';
     import { t } from '$lib/i18n';
     import { lang } from '$lib/stores/lang';
-    import { getPlanCard, listPlanCards, simulatePlanCard, type SimulateOverrides } from '$lib/api';
+    import {
+        getPlanCard,
+        listPlanCards,
+        simulatePlanCard,
+        refinePlanCard,
+        type SimulateOverrides
+    } from '$lib/api';
     import { subscribePlanCard, type PlanCardStream } from '$lib/planCardStream';
     import {
         BASE_COMPONENT_ORDER,
@@ -71,6 +77,13 @@
     let previewing = $state(false);
     let previewError = $state(false);
     const previewActive = $derived(previewOutcomes !== null);
+    // Save (W8) — the COMMIT half: refine persists the previewed overrides + runs a
+    // base_resolver turn whose recomputed components arrive over the SAME SSE. `committing`
+    // is set on a 202 so onDone clears the preview once the saved (== previewed) snapshot
+    // is live, making the hand-off seamless (commit == preview parity).
+    let saving = $state(false);
+    let saveError = $state(false);
+    let committing = $state(false);
 
     // The components the tabs render: live outcomes, or — under an active preview — each
     // entry with its outcome swapped for the previewed one (renderer/scope/etc preserved,
@@ -94,12 +107,20 @@
         return r[0] === r[1] ? money(r[0], $lang) : moneyRange(r, $lang);
     });
 
-    async function runPreview() {
-        if (!cardId) return;
+    // The overrides the current inputs describe — shared by preview and save so the saved
+    // scenario is exactly the one on screen. Only a CHANGED state is an override (the
+    // suburb's own state is the baseline); a non-positive / blank price is omitted.
+    function buildOverrides(): SimulateOverrides {
         const overrides: SimulateOverrides = {};
         const p = Number(priceInput.replace(/[^0-9.]/g, ''));
         if (priceInput.trim() !== '' && Number.isFinite(p) && p > 0) overrides.target_price = p;
         if (stateSelect && stateSelect !== suburbState) overrides.state = stateSelect;
+        return overrides;
+    }
+
+    async function runPreview() {
+        if (!cardId) return;
+        const overrides = buildOverrides();
         // Nothing varied → clear any prior preview rather than round-trip a no-op.
         if (Object.keys(overrides).length === 0) {
             previewOutcomes = null;
@@ -108,6 +129,7 @@
         }
         previewing = true;
         previewError = false;
+        saveError = false;
         const res = await simulatePlanCard(cardId, overrides);
         previewing = false;
         if (res.kind === 'ok') {
@@ -118,9 +140,30 @@
         }
     }
 
+    // Save the previewed scenario (W8) → POST the refine commit. On 202 the override inputs
+    // are persisted and a base_resolver turn recomputes the snapshot; we flip to running
+    // (turnDone=false hides the bar and blocks a racing 2nd save) and keep the preview
+    // overlay shown until onDone swaps in the now-live committed components.
+    async function saveScenario() {
+        if (!cardId) return;
+        const overrides = buildOverrides();
+        if (Object.keys(overrides).length === 0) return;
+        saving = true;
+        saveError = false;
+        const res = await refinePlanCard(cardId, overrides);
+        saving = false;
+        if (res.kind === 'accepted') {
+            turnDone = false;
+            committing = true;
+        } else {
+            saveError = true;
+        }
+    }
+
     function resetPreview() {
         previewOutcomes = null;
         previewError = false;
+        saveError = false;
         priceInput = '';
         stateSelect = suburbState;
     }
@@ -170,6 +213,13 @@
                     if (myGen !== gen) return;
                     if (failed) turnFailed = true;
                     turnDone = true;
+                    // A just-committed save (W8): the recomputed components are now merged
+                    // live (== what was previewed), so drop the preview overlay and reset
+                    // the inputs — the hand-off is invisible thanks to commit==preview parity.
+                    if (committing) {
+                        committing = false;
+                        resetPreview();
+                    }
                 }
                 // onError: EventSource auto-reconnects; stay calm (no banner).
             }, res.card.event_cursor);
@@ -259,6 +309,14 @@
                     {previewing ? $t('plan.whatif.running') : $t('plan.whatif.run')}
                 </button>
                 {#if previewActive}
+                    <button
+                        type="button"
+                        class="pp-wi-save"
+                        onclick={saveScenario}
+                        disabled={saving}
+                    >
+                        {saving ? $t('plan.whatif.saving') : $t('plan.whatif.save')}
+                    </button>
                     <button type="button" class="pp-wi-reset" onclick={resetPreview}
                         >{$t('plan.whatif.reset')}</button
                     >
@@ -268,6 +326,9 @@
                 <p class="pp-wi-banner">{$t('plan.whatif.banner')}</p>
             {:else if previewError}
                 <p class="pp-wi-error">{$t('plan.whatif.error')}</p>
+            {/if}
+            {#if saveError}
+                <p class="pp-wi-error">{$t('plan.whatif.saveerror')}</p>
             {/if}
         </div>
     {/if}

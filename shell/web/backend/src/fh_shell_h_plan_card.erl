@@ -23,6 +23,7 @@ init(Req0, Opts) ->
         {[], <<"GET">>}          -> with_owned_card(Req0, Opts, fun read/4);
         {[messages], <<"POST">>} -> with_owned_card(Req0, Opts, fun ask/4);
         {[simulate], <<"POST">>} -> with_owned_card(Req0, Opts, fun simulate/4);
+        {[refine], <<"POST">>}   -> with_owned_card(Req0, Opts, fun refine/4);
         _ ->
             {ok, fh_shell_http:reply_json(405,
                 #{<<"error">> => <<"method_not_allowed">>}, Req0), Opts}
@@ -96,6 +97,24 @@ simulate(UserId, PlanCardId, Req0, Opts) ->
         {ok, Body, Req1} ->
             {Status, Resp} =
                 fh_shell_engine_client:simulate(UserId, PlanCardId, Body),
+            {ok, relay(Status, Resp, Req1), Opts};
+        {error, invalid_json} ->
+            {ok, fh_shell_http:reply_json(400,
+                #{<<"error">> => <<"invalid_json">>}, Req0), Opts}
+    end.
+
+%% POST /api/plan-cards/:id/refine — SAVE a previewed structural what-if (W8) as the
+%% card's current scenario → the engine persists the overrides + runs a base_resolver turn
+%% that advances the snapshot, answering 202; the recomputed components stream over /events.
+%% NO meter gate (like simulate, unlike `ask`): a refine is resolver-only and emits zero
+%% usage — the saved scenario re-runs deterministic fills and re-attaches the stored agent
+%% leaves, not re-billed (billing.md §5; metering-not-gating). The engine validates the
+%% overrides (400) and serializes turns (409); both relay through.
+refine(UserId, PlanCardId, Req0, Opts) ->
+    case fh_shell_http:read_json_body(Req0) of
+        {ok, Body, Req1} ->
+            {Status, Resp} =
+                fh_shell_engine_client:refine(UserId, PlanCardId, Body),
             {ok, relay(Status, Resp, Req1), Opts};
         {error, invalid_json} ->
             {ok, fh_shell_http:reply_json(400,

@@ -213,6 +213,41 @@ export async function simulatePlanCard(
     return { kind: 'error', status: res.status };
 }
 
+/** A discriminated save outcome. `busy` is the engine's 409 (a turn is already running
+ *  for this card); `invalid` its 400 for a rejected override — both surfaced calmly. */
+export type RefineOutcome =
+    | { kind: 'accepted'; turnId: string }
+    | { kind: 'busy' }
+    | { kind: 'invalid' }
+    | { kind: 'not_found' }
+    | { kind: 'auth_required' }
+    | { kind: 'error'; status: number };
+
+/** SAVE a previewed scenario (W8) — the COMMIT half of simulate. Same override shape;
+ *  the engine persists the inputs + runs a base_resolver turn (answers 202 {turn_id}),
+ *  and the recomputed components arrive over the SAME /events stream as the live fill —
+ *  not in this reply. Resolver-only, so nothing is metered. */
+export async function refinePlanCard(
+    planCardId: string,
+    overrides: SimulateOverrides,
+    fetchFn: typeof fetch = fetch
+): Promise<RefineOutcome> {
+    const res = await fetchFn(`/api/plan-cards/${encodeURIComponent(planCardId)}/refine`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ overrides })
+    });
+    if (res.status === 202) {
+        const body = (await res.json()) as { turn_id: string };
+        return { kind: 'accepted', turnId: body.turn_id };
+    }
+    if (res.status === 409) return { kind: 'busy' };
+    if (res.status === 400) return { kind: 'invalid' };
+    if (res.status === 404) return { kind: 'not_found' };
+    if (res.status === 401) return { kind: 'auth_required' };
+    return { kind: 'error', status: res.status };
+}
+
 // --- Chat: ask a question about the card (8-S4d) ----------------------------
 // POST /api/plan-cards/:id/messages — starts a kind:qa turn over the FILLED card.
 // The engine answers 202 {turn_id} immediately; the bilingual answer + machinery

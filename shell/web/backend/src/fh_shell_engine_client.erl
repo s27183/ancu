@@ -12,7 +12,7 @@
 %% are built (8-S1..8-S4). HTTP via inets httpc (started by the shell app).
 
 -export([create_plan_card/2, get_plan_card/2, post_message/3, simulate/3,
-         stream_events/3, list_suburbs/1, get_usage_events/2]).
+         refine/3, stream_events/3, list_suburbs/1, get_usage_events/2]).
 
 %% The system principal for unauthenticated reference-data reads. `suburbs` is
 %% global CC-BY reference data; the map is the pre-login landing surface, so the
@@ -83,6 +83,26 @@ post_message(UserId, PlanCardId, BodyMap) ->
 simulate(UserId, PlanCardId, BodyMap) ->
     Token = fh_shell_engine_jwt:mint(#{user_id => UserId}),
     Url = base_url() ++ "/plan-cards/" ++ binary_to_list(PlanCardId) ++ "/simulate",
+    Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
+    Body = fh_shell_util:json_encode(BodyMap),
+    {ok, {{_, Status, _}, _, Resp}} =
+        httpc:request(post, {Url, Headers, "application/json", Body},
+                      [], [{body_format, binary}]),
+    {Status, Resp}.
+
+%% Save a previewed structural what-if (W8) — POST /api/engine/plan-cards/:id/refine with
+%% {overrides: {target_price|state}}, the COMMIT half of simulate (engine-contract §10.2).
+%% The shell has confirmed ownership first. The engine persists the override inputs to the
+%% plan-target overlay and runs a base_resolver turn that advances the single snapshot,
+%% answering 202 {plan_card_id, turn_id}; the recomputed components stream over the SAME
+%% /events SSE the live fill rides. Like simulate, this is resolver-only and emits NO usage
+%% (the saved scenario re-runs deterministic fills + re-attaches the stored agent leaves —
+%% not re-billed), so it carries NO meter gate. 409 if a turn is already in flight (one per
+%% card); 400 on a rejected override. Relayed verbatim — the engine owns the refine contract.
+-spec refine(binary(), binary(), map()) -> {non_neg_integer(), binary()}.
+refine(UserId, PlanCardId, BodyMap) ->
+    Token = fh_shell_engine_jwt:mint(#{user_id => UserId}),
+    Url = base_url() ++ "/plan-cards/" ++ binary_to_list(PlanCardId) ++ "/refine",
     Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
     Body = fh_shell_util:json_encode(BodyMap),
     {ok, {{_, Status, _}, _, Resp}} =

@@ -275,6 +275,12 @@ const messages = {
         vi: 'Không xem thử được kịch bản này. Vui lòng thử lại.',
         en: 'Couldn’t preview that scenario. Please try again.'
     },
+    'plan.whatif.save': { vi: 'Lưu kịch bản này', en: 'Save this scenario' },
+    'plan.whatif.saving': { vi: 'Đang lưu…', en: 'Saving…' },
+    'plan.whatif.saveerror': {
+        vi: 'Không lưu được kịch bản. Vui lòng thử lại.',
+        en: 'Couldn’t save the scenario. Please try again.'
+    },
     'plan.verdict.surplus': { vi: 'Dư', en: 'Surplus' },
     'plan.verdict.tight': { vi: 'Vừa đủ', en: 'Tight' },
     'plan.verdict.short': { vi: 'Còn thiếu', en: 'Short' },

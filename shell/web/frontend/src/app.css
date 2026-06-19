@@ -1335,6 +1335,24 @@ main {
     padding: 0.4rem 0.85rem;
     font-size: 0.85rem;
 }
+.pp-wi-save {
+    flex: none;
+    border: 1px solid #15803d;
+    background: #16a34a;
+    color: #fff;
+    border-radius: 0.4rem;
+    padding: 0.4rem 0.85rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+.pp-wi-save:hover:not(:disabled) {
+    background: #15803d;
+}
+.pp-wi-save:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
 .pp-wi-reset {
     flex: none;
     border: 1px solid var(--border);
