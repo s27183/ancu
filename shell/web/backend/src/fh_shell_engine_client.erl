@@ -12,7 +12,31 @@
 %% are built (8-S1..8-S4). HTTP via inets httpc (started by the shell app).
 
 -export([create_plan_card/2, get_plan_card/2, post_message/3, simulate/3,
-         refine/3, stream_events/3, list_suburbs/1, get_usage_events/2]).
+         refine/3, stream_events/3, list_suburbs/1, get_usage_events/2,
+         start_httpc_profiles/0]).
+
+%% Dedicated httpc profile for the LONG-LIVED SSE stream proxy (stream_events/3).
+%% SSE requests run with {timeout, infinity} and hold an httpc session for the entire
+%% EventSource lifetime. Keeping them on their OWN profile means a never-ending stream
+%% can never occupy a slot in the DEFAULT profile's tiny connection pool (max_sessions
+%% defaults to 2) and starve the plain request/response calls (get/simulate/refine/
+%% create/suburbs/messages) that also run on the default profile — the bug where a
+%% single held SSE made plain calls land behind it and hang forever. The streams are
+%% isolated from EACH OTHER too: the profile's max_sessions is raised so each concurrent
+%% stream gets its own connection rather than queueing behind another (which would just
+%% move the same wedge into this profile). EVERY streaming / infinity-timeout request
+%% MUST use this profile; plain RPC stays on the default profile.
+-define(SSE_PROFILE, fh_shell_sse).
+-define(SSE_MAX_SESSIONS, 1024).
+%% Headroom for concurrent plain RPC on the default profile (the map + plan + chat all
+%% proxy at once); each call is sub-second so this is generous, not load-bearing.
+-define(RPC_MAX_SESSIONS, 64).
+%% A finite bound on every plain request/response call to the engine. All of them are
+%% fast — create/refine answer 202 immediately (the turn runs async over SSE), get/
+%% simulate are resolver-only reads — so this never truncates a legitimate call; it
+%% turns any future pool wedge into a fast error the shell relays, never an infinite
+%% browser spinner. The SSE stream legitimately keeps {timeout, infinity}.
+-define(RPC_TIMEOUT_MS, 15000).
 
 %% The system principal for unauthenticated reference-data reads. `suburbs` is
 %% global CC-BY reference data; the map is the pre-login landing surface, so the
@@ -28,6 +52,21 @@ base_url() ->
         Url   -> Url
     end.
 
+%% Start + configure the httpc profiles this module uses. Called ONCE at boot by
+%% fh_shell_app (after inets is up). Idempotent: tolerates an already-started profile
+%% so a hot reload / re-run doesn't crash boot. See ?SSE_PROFILE for the why.
+-spec start_httpc_profiles() -> ok.
+start_httpc_profiles() ->
+    case inets:start(httpc, [{profile, ?SSE_PROFILE}]) of
+        {ok, _Pid}                    -> ok;
+        {error, {already_started, _}} -> ok
+    end,
+    ok = httpc:set_options([{max_sessions, ?SSE_MAX_SESSIONS}], ?SSE_PROFILE),
+    %% Raise the DEFAULT profile (plain RPC) too — no SSE rides it any more, so its
+    %% only job is short request/response calls; give them headroom under concurrency.
+    ok = httpc:set_options([{max_sessions, ?RPC_MAX_SESSIONS}]),
+    ok.
+
 %% Create a plan card (plan-first: the onboarding payload, no property) on behalf of
 %% UserId. Returns {StatusCode, ResponseBodyBinary}; the engine answers 202 with
 %% {plan_card_id, turn_id} (the base turn runs async, streamed over SSE).
@@ -39,7 +78,7 @@ create_plan_card(UserId, BodyMap) ->
     Body = fh_shell_util:json_encode(BodyMap),
     {ok, {{_, Status, _}, _, Resp}} =
         httpc:request(post, {Url, Headers, "application/json", Body},
-                      [], [{body_format, binary}]),
+                      [{timeout, ?RPC_TIMEOUT_MS}], [{body_format, binary}]),
     {Status, Resp}.
 
 %% Fetch a plan card's filled content on behalf of UserId — the projection's data
@@ -53,7 +92,8 @@ get_plan_card(UserId, PlanCardId) ->
     Url = base_url() ++ "/plan-cards/" ++ binary_to_list(PlanCardId),
     Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
     {ok, {{_, Status, _}, _, Resp}} =
-        httpc:request(get, {Url, Headers}, [], [{body_format, binary}]),
+        httpc:request(get, {Url, Headers},
+                      [{timeout, ?RPC_TIMEOUT_MS}], [{body_format, binary}]),
     {Status, Resp}.
 
 %% Ask a question about a plan card (the Q&A path, 8-S4) — POST
@@ -69,7 +109,7 @@ post_message(UserId, PlanCardId, BodyMap) ->
     Body = fh_shell_util:json_encode(BodyMap),
     {ok, {{_, Status, _}, _, Resp}} =
         httpc:request(post, {Url, Headers, "application/json", Body},
-                      [], [{body_format, binary}]),
+                      [{timeout, ?RPC_TIMEOUT_MS}], [{body_format, binary}]),
     {Status, Resp}.
 
 %% Preview a structural what-if (W9) — POST /api/engine/plan-cards/:id/simulate with
@@ -87,7 +127,7 @@ simulate(UserId, PlanCardId, BodyMap) ->
     Body = fh_shell_util:json_encode(BodyMap),
     {ok, {{_, Status, _}, _, Resp}} =
         httpc:request(post, {Url, Headers, "application/json", Body},
-                      [], [{body_format, binary}]),
+                      [{timeout, ?RPC_TIMEOUT_MS}], [{body_format, binary}]),
     {Status, Resp}.
 
 %% Save a previewed structural what-if (W8) — POST /api/engine/plan-cards/:id/refine with
@@ -107,7 +147,7 @@ refine(UserId, PlanCardId, BodyMap) ->
     Body = fh_shell_util:json_encode(BodyMap),
     {ok, {{_, Status, _}, _, Resp}} =
         httpc:request(post, {Url, Headers, "application/json", Body},
-                      [], [{body_format, binary}]),
+                      [{timeout, ?RPC_TIMEOUT_MS}], [{body_format, binary}]),
     {Status, Resp}.
 
 %% Open an async-streaming GET on the engine's SSE events endpoint (8-S4b) on behalf
@@ -129,7 +169,8 @@ stream_events(UserId, PlanCardId, LastEventId) ->
                | last_event_id_header(LastEventId)],
     httpc:request(get, {Url, Headers},
                   [{timeout, infinity}, {connect_timeout, 5000}],
-                  [{sync, false}, {stream, self}, {body_format, binary}]).
+                  [{sync, false}, {stream, self}, {body_format, binary}],
+                  ?SSE_PROFILE).
 
 -spec last_event_id_header(binary() | undefined) -> [{string(), string()}].
 last_event_id_header(undefined) -> [];
@@ -147,7 +188,8 @@ list_suburbs(State) ->
     Url = base_url() ++ "/suburbs" ++ state_query(State),
     Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
     {ok, {{_, Status, _}, _, Resp}} =
-        httpc:request(get, {Url, Headers}, [], [{body_format, binary}]),
+        httpc:request(get, {Url, Headers},
+                      [{timeout, ?RPC_TIMEOUT_MS}], [{body_format, binary}]),
     {Status, Resp}.
 
 -spec state_query(binary() | undefined) -> string().
@@ -170,7 +212,8 @@ get_usage_events(After, Limit) ->
     Url = base_url() ++ "/usage_events?" ++ Query,
     Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
     case httpc:request(get, {Url, Headers},
-                       [{connect_timeout, 5000}], [{body_format, binary}]) of
+                       [{connect_timeout, 5000}, {timeout, ?RPC_TIMEOUT_MS}],
+                       [{body_format, binary}]) of
         {ok, {{_, 200, _}, _, Body}} ->
             {ok, fh_shell_util:json_decode(Body)};
         {ok, {{_, Status, _}, _, Body}} ->

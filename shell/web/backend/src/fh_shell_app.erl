@@ -23,6 +23,9 @@ start(_StartType, _StartArgs) ->
             logger:info("shell Postgres pool started"),
             ok = fh_shell_migrations:run(),  %% raises on failure -> boot aborts
             ok = fh_shell_provision:maybe_autoprovision(),  %% dev-only tenant handshake
+            %% Dedicated httpc profile for the long-lived SSE proxy, isolated from the
+            %% default profile that serves plain RPC (see fh_shell_engine_client).
+            ok = fh_shell_engine_client:start_httpc_profiles(),
             fh_shell_sup:start_link();
         {error, database_url_not_set} ->
             logger:error("SHELL_DATABASE_URL not set — shell backend cannot boot "
