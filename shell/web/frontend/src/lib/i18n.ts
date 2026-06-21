@@ -134,6 +134,7 @@ const messages = {
     'plan.pending': { vi: 'Chưa có', en: 'Not yet' },
 
     'plan.c.buyer_profile': { vi: 'Hồ sơ của bạn', en: 'Your profile' },
+    'plan.c.preparation': { vi: 'Chuẩn bị', en: 'Getting ready' },
     'plan.c.eligibility': { vi: 'Chương trình hỗ trợ', en: 'Schemes & eligibility' },
     'plan.c.mortgage_finance': { vi: 'Vay & tài chính', en: 'Mortgage & finance' },
     'plan.c.cash_position': { vi: 'Dòng tiền', en: 'Cash position' },
@@ -150,6 +151,9 @@ const messages = {
     // §3.2). The full mode-general vocabulary (Mode A renders a 6-tab subset; B/C/D tabs are
     // present for when those blueprints come in scope).
     'plan.ltab.overview': { vi: 'Tổng quan', en: 'Overview' },
+    // Mode-A three-view spine: Flow (legal/temporal journey) + Budget (financial spine).
+    'plan.ltab.flow': { vi: 'Hành trình', en: 'Flow' },
+    'plan.ltab.budget': { vi: 'Ngân sách', en: 'Budget' },
     'plan.ltab.family_view': { vi: 'Gia đình', en: 'Family view' },
     'plan.ltab.investment_strategy': { vi: 'Chiến lược đầu tư', en: 'Investment strategy' },
     'plan.ltab.firb_funding': { vi: 'FIRB & Chuyển tiền', en: 'FIRB & Funding' },
@@ -258,6 +262,80 @@ const messages = {
     'plan.cash.whatif.disclaimer': {
         vi: 'Đây là ước tính tham khảo so với nhu cầu tiền mặt của bạn — không phải tư vấn tài chính. Muốn thử mức giá khác, hãy cập nhật lại kế hoạch.',
         en: 'An informational estimate against your cash need — not financial advice. To test a different price, refine your plan.'
+    },
+    // Financial spine — cash_events grouped by lifecycle phase (the calculator's
+    // projection, phase-aligned with the swimlane). Phase labels match the swimlane.
+    'plan.cash.spine': { vi: 'Dòng tiền theo giai đoạn', en: 'When the money moves' },
+    'plan.cash.spine.empty': { vi: 'Chưa có dòng tiền ở giai đoạn này.', en: 'No cash flow at this stage yet.' },
+    'plan.cash.col_item': { vi: 'Khoản mục', en: 'Item' },
+    'plan.cash.col_amount': { vi: 'Số tiền', en: 'Amount' },
+    'plan.cash.breakdown': { vi: 'Chi tiết ngân sách', en: 'Budget breakdown' },
+    'plan.cash.recurring': { vi: 'định kỳ', en: 'recurring' },
+    'plan.cash.in': { vi: 'nhận về', en: 'in' },
+    'plan.cash.out': { vi: 'chi ra', en: 'out' },
+    'plan.cash.ready': { vi: 'Bạn đã đủ chưa?', en: 'Am I ready?' },
+    'plan.phase.prepare': { vi: 'Chuẩn bị', en: 'Prepare' },
+    'plan.phase.pre_approve': { vi: 'Phê duyệt sơ bộ', en: 'Pre-approval' },
+    'plan.phase.contract': { vi: 'Hợp đồng', en: 'Contract' },
+    'plan.phase.settle': { vi: 'Bàn giao', en: 'Settle' },
+    'plan.phase.own': { vi: 'Sở hữu', en: 'Own' },
+    // Budget cockpit (the prototype's input form, engine-driven).
+    'plan.cockpit.title': { vi: 'Ngân sách — bạn đã sẵn sàng?', en: 'Budget — am I ready?' },
+    'plan.cockpit.intro': {
+        vi: 'Đổi giá hoặc tiểu bang để tính lại toàn bộ kế hoạch; nhập tiền mặt bạn có để xem còn thiếu bao nhiêu. Phí trước bạ do hệ thống tính chính xác, không phải ước lượng.',
+        en: 'Change the price or state to recompute the whole plan; enter your cash on hand to see the gap. Stamp duty is computed exactly, not estimated.'
+    },
+    'plan.cockpit.ptype': { vi: 'Loại bất động sản', en: 'Property type' },
+    'plan.cockpit.ptype.locked': {
+        vi: 'Gắn một bất động sản để so sánh nhà mới vs nhà cũ.',
+        en: 'Attach a property to compare new vs established.'
+    },
+    // Preparation → checklist renderer (the prototype's "Before you buy").
+    'plan.prep.docs': { vi: 'Giấy tờ cần chuẩn bị', en: 'Documents to gather' },
+    'plan.prep.people': { vi: 'Những người cần liên hệ', en: 'People to engage' },
+    'plan.prep.schemes': { vi: 'Chương trình cần nộp đơn', en: 'Scheme applications to start' },
+    'plan.prep.buffer': { vi: 'Khoản dự phòng tiền mặt', en: 'Money buffer' },
+    'plan.prep.when': { vi: 'Khi nào', en: 'When' },
+    'plan.prep.why': { vi: 'Vì sao', en: 'Why' },
+    'plan.prep.status.not_started': { vi: 'Chưa bắt đầu', en: 'Not started' },
+    'plan.prep.status.in_progress': { vi: 'Đang làm', en: 'In progress' },
+    'plan.prep.status.done': { vi: 'Xong', en: 'Done' },
+    // Flow view → per-phase drill-down sheet (the legal/temporal spine's actionable layer).
+    'plan.flow.open': { vi: 'Mở từng giai đoạn', en: 'Open a stage' },
+    'plan.flow.close': { vi: 'Đóng', en: 'Close' },
+    'plan.flow.actions': { vi: 'Việc cần làm', en: 'What to do' },
+    'plan.flow.risks': { vi: 'Rủi ro & cách xử lý', en: 'Risks & what to do' },
+    'plan.flow.detail': { vi: 'Xem chi tiết', en: 'See detail' },
+    'plan.flow.detail_hide': { vi: 'Ẩn chi tiết', en: 'Hide detail' },
+    'plan.flow.done': { vi: 'Đã xong', en: 'Done' },
+    'plan.flow.empty': {
+        vi: 'Chưa có việc nào ở giai đoạn này.',
+        en: 'No actions at this stage yet.'
+    },
+    // Risk-flag-list → severity chrome + mitigation label.
+    'plan.risk.sev.low': { vi: 'Thấp', en: 'Low' },
+    'plan.risk.sev.medium': { vi: 'Trung bình', en: 'Medium' },
+    'plan.risk.sev.high': { vi: 'Cao', en: 'High' },
+    'plan.risk.mitigation': { vi: 'Cách xử lý', en: 'What to do' },
+    // Swimlane → who-talks-to-whom (interactions).
+    'plan.journey.interactions': { vi: 'Ai làm việc với ai', en: 'Who deals with whom' },
+    'plan.journey.to': { vi: '→', en: '→' },
+    // Ownership → the graduation milestone (the prototype's "graduation event").
+    'plan.grad.title': { vi: 'Cột mốc “tốt nghiệp”', en: 'The “graduation” event' },
+    'plan.grad.body': {
+        vi: 'Khi tỷ lệ vay (LVR) giảm xuống {lvr}%, chương trình First Home Guarantee hết vai trò: bạn có thể tái cấp vốn tự do, không cần bảo hiểm LMI. Bạn trở thành người vay thông thường.',
+        en: 'When your LVR drops below {lvr}%, the First Home Guarantee stops doing work for you — you can refinance freely with no LMI either way. You become a regular mortgage holder.'
+    },
+    'plan.grad.year': { vi: 'Ước tính vào khoảng năm', en: 'Estimated around year' },
+    'plan.grad.year_pending': {
+        vi: 'Thời điểm sẽ rõ hơn khi bạn bổ sung khoản vay và tiền tiết kiệm.',
+        en: 'The timing becomes clearer once you add your loan and savings.'
+    },
+    // Overview → "What this is" intro (the prototype's lead card).
+    'plan.ov.what.title': { vi: 'Đây là gì', en: 'What this is' },
+    'plan.ov.what.body': {
+        vi: 'Đây là kế hoạch mua căn nhà đầu tiên được cá nhân hoá cho bạn. Hãy đi qua các thẻ: Tổng quan để xem bức tranh lớn, Tính tiền mặt để nhập số liệu của bạn, Hành trình để xem ai làm gì khi nào, Trước/Sau khi mua cho các bước cụ thể, và Hỏi đáp để hỏi thêm.',
+        en: 'This is your personalised plan for buying your first home. Walk the tabs: Overview for the big picture, Cash calculator to plug in your own numbers, Journey for who does what when, Before/After you buy for the concrete steps, and Q&A to ask anything.'
     },
     // Structural what-if (W9) — vary target price / state → engine preview, no save.
     'plan.whatif.title': { vi: 'Thử kịch bản khác', en: 'Try a different scenario' },

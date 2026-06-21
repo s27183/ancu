@@ -146,11 +146,20 @@ review_alert() ->
       <<"action">>  => copy(<<"alert_review_action">>, #{})}.
 
 land_tax_alert(<<"exempt_ppor">>, State, <<"owner_occupier">>) ->
-    Threshold = land_tax_threshold(State),
+    %% Honest-partial: the land-tax threshold is state-specific, so it is null for any
+    %% state we hold no figure for — notably the mode-independent base projection (State
+    %% = "ALL"). Never interpolate the figure then (that leaked "$null"); use the
+    %% no-figure copy variant. money/1 is only ever handed a known integer.
+    Action = case land_tax_threshold(State) of
+                 null ->
+                     copy(<<"alert_landtax_action_nothreshold">>, #{});
+                 Threshold ->
+                     copy(<<"alert_landtax_action">>,
+                          #{<<"state">> => State,
+                            <<"threshold">> => fh_engine_money:money(Threshold)})
+             end,
     [#{<<"trigger">> => copy(<<"alert_landtax_trigger">>, #{}),
-       <<"action">>  => copy(<<"alert_landtax_action">>,
-                             #{<<"state">> => State,
-                               <<"threshold">> => fh_engine_money:money(Threshold)})}];
+       <<"action">>  => Action}];
 land_tax_alert(_, _, _) -> [].
 
 %% --- KB access + helpers -----------------------------------------------------

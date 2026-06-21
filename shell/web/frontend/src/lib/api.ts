@@ -132,7 +132,7 @@ export async function createPlanCard(
 // (plan_card_views) before touching the engine — the engine treats user_id as opaque
 // (§9.3, no cross-DB join). An unowned/unknown/malformed id is a uniform 404. Live
 // fill streams over SSE separately (planCardStream.ts).
-import type { PlanCard, PlanCardSummary } from '$lib/planCard';
+import type { PlanCard, PlanCardSummary, ChecklistStatusMap } from '$lib/planCard';
 
 /** A discriminated read outcome so the projection branches calmly (§7.1). 404 is the
  *  EXPECTED "no plan for this zone yet / not signed in" path → onboarding CTA. */
@@ -281,6 +281,49 @@ export async function postMessage(
         return { kind: 'accepted', turnId: body.turn_id };
     }
     if (res.status === 409) return { kind: 'busy' };
+    if (res.status === 401) return { kind: 'auth_required' };
+    if (res.status === 404) return { kind: 'not_found' };
+    return { kind: 'error', status: res.status };
+}
+
+// --- Checklist status: attest a phase action done/not (Flow view) ------------
+// PATCH /api/plan-cards/:id/checklist-status — the user-set layer (task 7). USER-ATTESTED
+// state, not a computed figure: a small jsonb patch, NO recompute and NO usage (zero-cost,
+// so no meter gate). The engine is SOT — the 200 returns the AUTHORITATIVE checklist_status
+// map, so the caller renders engine state, not a local guess (optimistic flip, reconciled
+// from this response; revert on failure). Cross-tab live fan-out (the engine also emits
+// checklist_status_changed over SSE) is a future consumer — a fresh GET reflects it.
+
+/** A discriminated toggle outcome. `ok` carries the engine's authoritative map. */
+export type ChecklistStatusOutcome =
+    | { kind: 'ok'; checklistStatus: ChecklistStatusMap }
+    | { kind: 'invalid' }
+    | { kind: 'auth_required' }
+    | { kind: 'not_found' }
+    | { kind: 'error'; status: number };
+
+/** PATCH one phase action's status. Returns the full updated checklist_status map (the
+ *  engine SOT) so the caller can set state from it rather than trust the optimistic flip. */
+export async function setChecklistStatus(
+    planCardId: string,
+    phase: string,
+    actionId: string,
+    status: 'done' | 'not_started',
+    fetchFn: typeof fetch = fetch
+): Promise<ChecklistStatusOutcome> {
+    const res = await fetchFn(
+        `/api/plan-cards/${encodeURIComponent(planCardId)}/checklist-status`,
+        {
+            method: 'PATCH',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ phase, action_id: actionId, status })
+        }
+    );
+    if (res.ok) {
+        const body = (await res.json()) as { checklist_status?: ChecklistStatusMap };
+        return { kind: 'ok', checklistStatus: body.checklist_status ?? {} };
+    }
+    if (res.status === 400) return { kind: 'invalid' };
     if (res.status === 401) return { kind: 'auth_required' };
     if (res.status === 404) return { kind: 'not_found' };
     return { kind: 'error', status: res.status };

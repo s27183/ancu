@@ -15,6 +15,7 @@
 -export([append_event/4, events_since/3, usage_events_since/3, max_event_id/2]).
 -export([append_audit/6]).
 -export([snapshot_component/3, get_plan_card/2, get_card_rerun_context/1, set_card_target/2]).
+-export([set_checklist_status/4, get_checklist_status/2]).
 -export([deploy_commit_sha/0, projection_state/1, list_active_plan_card_ids/0]).
 -export([list_suburbs_by_state/1, list_all_suburbs/0, list_suburb_sources/0]).
 -export([read_glue/3, append_session_turn/6]).
@@ -170,18 +171,26 @@ snapshot_component(PlanCardId, ComponentId, OutcomeEntry) ->
 -spec get_plan_card(binary(), binary()) -> {ok, map()} | {error, not_found}.
 get_plan_card(TenantId, PlanCardId) ->
     Res = query(
-        "SELECT plan_card_id::text, blueprint_slug, intent, mode, status, content_jsonb "
+        "SELECT plan_card_id::text, blueprint_slug, intent, mode, status, "
+        "       content_jsonb, checklist_status_jsonb "
         "FROM plan_cards WHERE tenant_id = $1::uuid AND plan_card_id = $2::uuid",
         [TenantId, PlanCardId]),
     case rows(Res) of
-        [{Id, Bp, Intent, Mode, Status, Content}] ->
+        [{Id, Bp, Intent, Mode, Status, Content, Checklist}] ->
             {ok, #{
                 <<"plan_card_id">> => Id,
                 <<"blueprint_slug">> => Bp,
                 <<"intent">> => Intent,
                 <<"mode">> => Mode,
                 <<"status">> => Status,
-                <<"content">> => decode_jsonb(Content)
+                <<"content">> => decode_jsonb(Content),
+                %% The card user-set layer (005) returned as a SIBLING of content,
+                %% never merged into it: content is the computed snapshot (the SSE
+                %% replay streams it raw), and attaching a user's own status flag to
+                %% a checklist row is a render-time overlay, not a recompute. The
+                %% client overlays this onto the current phase_playbook actions;
+                %% '{}' (untouched card) reads as every action `not_started`.
+                <<"checklist_status">> => decode_jsonb(Checklist)
             }};
         [] ->
             {error, not_found}
@@ -236,6 +245,49 @@ set_card_target(PlanCardId, Onboarding) ->
         "WHERE plan_card_id = $1::uuid",
         [PlanCardId, fh_engine_util:json_encode(Onboarding)]),
     ok.
+
+%% The checklist-status slice of the card user-set layer (005). A toggle is a small
+%% patch on the sparse map {"<phase>": {"<action_id>": "done"}}, with NO recompute and
+%% NO `usage` (zero-cost user attestation). `done` sets the leaf (creating the phase
+%% object on first tick via the same coalesce trick as snapshot_component); any other
+%% status REMOVES the key (#- path), so an "untick" returns the action to the seed
+%% `not_started` and the column stays sparse (no patch-deletion semantics on read).
+%% Returns the FULL updated map (RETURNING — one round trip) so the caller can reply
+%% with the reconciled state. Tenant-scope is enforced by the handler's prior
+%% get_plan_card/2 ownership check, so the UPDATE keys on plan_card_id alone.
+-spec set_checklist_status(binary(), binary(), binary(), binary()) -> {ok, map()}.
+set_checklist_status(PlanCardId, Phase, ActionId, <<"done">>) ->
+    Res = query(
+        "UPDATE plan_cards SET "
+        "checklist_status_jsonb = jsonb_set("
+        "  CASE WHEN checklist_status_jsonb ? $2 THEN checklist_status_jsonb "
+        "       ELSE jsonb_set(checklist_status_jsonb, ARRAY[$2], '{}'::jsonb, true) END, "
+        "  ARRAY[$2, $3], $4::jsonb, true), "
+        "updated_at = now() "
+        "WHERE plan_card_id = $1::uuid "
+        "RETURNING checklist_status_jsonb",
+        [PlanCardId, Phase, ActionId, fh_engine_util:json_encode(<<"done">>)]),
+    {ok, decode_jsonb(single(Res))};
+set_checklist_status(PlanCardId, Phase, ActionId, _NotStarted) ->
+    Res = query(
+        "UPDATE plan_cards SET "
+        "checklist_status_jsonb = checklist_status_jsonb #- ARRAY[$2, $3], "
+        "updated_at = now() "
+        "WHERE plan_card_id = $1::uuid "
+        "RETURNING checklist_status_jsonb",
+        [PlanCardId, Phase, ActionId]),
+    {ok, decode_jsonb(single(Res))}.
+
+-spec get_checklist_status(binary(), binary()) -> {ok, map()} | {error, not_found}.
+get_checklist_status(TenantId, PlanCardId) ->
+    Res = query(
+        "SELECT checklist_status_jsonb FROM plan_cards "
+        "WHERE tenant_id = $1::uuid AND plan_card_id = $2::uuid",
+        [TenantId, PlanCardId]),
+    case rows(Res) of
+        [{Checklist}] -> {ok, decode_jsonb(Checklist)};
+        []            -> {error, not_found}
+    end.
 
 %% The PROJECTION state for the base plan (eligibility-resolution.md 2026-06-17 / G4):
 %% state-specific schemes resolve from the SUBURB being planned, not the map browse-

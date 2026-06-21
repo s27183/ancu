@@ -57,6 +57,13 @@
           amount: money(rc?.building_insurance, $lang) ?? '—', estimate: false }
     ]);
     const monthly = $derived(money(o.total_monthly_outgoings_estimate, $lang));
+
+    // The "graduation" event (point 6) — when LVR crosses the target, the FHG falls away
+    // and a no-LMI refinance window opens. Year is PENDING until a loan/savings fact.
+    const grad = $derived(o.graduation_milestone ?? null);
+    const gradBody = $derived(
+        grad ? $t('plan.grad.body').replace('{lvr}', String(grad.target_lvr ?? 80)) : ''
+    );
 </script>
 
 <!-- ── Outgoings hero ─────────────────────────────────────────────────── -->
@@ -84,6 +91,18 @@
 <Field label={$t('plan.f.annual')} value={money(o.total_annual_outgoings_estimate, $lang)} />
 
 <NoteList notes={o.recurring_costs_estimate?.notes} />
+
+{#if grad}
+    <div class="og-grad">
+        <span class="og-grad-title">{$t('plan.grad.title')}</span>
+        <p class="og-grad-body">{gradBody}</p>
+        {#if typeof grad.estimated_year === 'number'}
+            <p class="og-grad-year">{$t('plan.grad.year')} {grad.estimated_year}</p>
+        {:else}
+            <p class="og-grad-year og-grad-pending">{$t('plan.grad.year_pending')}</p>
+        {/if}
+    </div>
+{/if}
 
 {#if o.alert_triggers_armed?.length}
     <div class="pp-sublist">
@@ -119,5 +138,35 @@
         font-weight: 700;
         color: var(--accent);
         font-variant-numeric: tabular-nums;
+    }
+    /* The graduation milestone — a calm highlight (the prototype's callout). */
+    .og-grad {
+        margin: 0.7rem 0 0.4rem;
+        padding: 0.6rem 0.75rem;
+        border-left: 3px solid var(--accent);
+        background: var(--accent-soft, #fff7ed);
+        border-radius: 0 0.4rem 0.4rem 0;
+    }
+    .og-grad-title {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: var(--accent);
+    }
+    .og-grad-body {
+        margin: 0.25rem 0 0;
+        font-size: 0.82rem;
+        color: var(--ink);
+        line-height: 1.45;
+    }
+    .og-grad-year {
+        margin: 0.3rem 0 0;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--ink);
+    }
+    .og-grad-pending {
+        font-weight: 400;
+        font-style: italic;
+        color: var(--muted);
     }
 </style>

@@ -61,6 +61,12 @@
     ]);
 </script>
 
+<!-- "What this is" — the prototype's lead card: orient the buyer before the numbers. -->
+<section class="pp-card ov-what">
+    <h3 class="ov-what-title">{$t('plan.ov.what.title')}</h3>
+    <p class="ov-what-body">{$t('plan.ov.what.body')}</p>
+</section>
+
 <section class="pp-card ov-card">
     <p class="ov-lead">{$t('plan.ov.lead')}</p>
 
@@ -94,6 +100,21 @@
 </section>
 
 <style>
+    .ov-what {
+        margin-bottom: 0.6rem;
+    }
+    .ov-what-title {
+        margin: 0 0 0.35rem;
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--ink);
+    }
+    .ov-what-body {
+        margin: 0;
+        font-size: 0.85rem;
+        color: var(--muted);
+        line-height: 1.5;
+    }
     .ov-lead {
         margin: 0 0 0.75rem;
         font-size: 0.95rem;

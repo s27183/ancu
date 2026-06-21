@@ -43,11 +43,13 @@
 %% NOTE the order: ownership_planning runs BEFORE purchase_journey, because the W5
 %% two-spines journey PLACES ownership_planning.ongoing_obligations on the Own column
 %% (forward edge 9→10, still acyclic — blueprint dependency graph). preparation (11)
-%% reads only eligibility + cash_position and likewise places, so it sits last.
+%% reads only eligibility + cash_position and likewise places. phase_playbook (12) reads
+%% cash_position (cash_event ids it links by budget_ref) + purchase_journey (the phase
+%% set), so it sits LAST (forward edges, still acyclic).
 -define(BASE_COMPONENTS,
         [<<"buyer_profile">>, <<"eligibility">>, <<"mortgage_finance">>,
          <<"cash_position">>, <<"ownership_planning">>, <<"purchase_journey">>,
-         <<"preparation">>]).
+         <<"preparation">>, <<"phase_playbook">>]).
 
 -spec start_link(map()) -> gen_statem:start_ret().
 start_link(Args) ->
@@ -442,6 +444,7 @@ default_renderer(Comp) ->
 component_scope(<<"buyer_profile">>)    -> <<"base">>;
 component_scope(<<"purchase_journey">>) -> <<"base">>;
 component_scope(<<"preparation">>)      -> <<"base">>;
+component_scope(<<"phase_playbook">>)   -> <<"base">>;
 component_scope(_) -> <<"both">>.
 
 %% Spawn a disposable sidecar to fill ONE agent component. The sidecar receives the

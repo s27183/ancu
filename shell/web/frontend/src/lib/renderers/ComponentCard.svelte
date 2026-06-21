@@ -10,8 +10,9 @@
     import Calculator from './Calculator.svelte';
     import DataTable from './DataTable.svelte';
     import SwimlaneDiagram from './SwimlaneDiagram.svelte';
+    import Checklist from './Checklist.svelte';
 
-    let { componentId, entry, filling, density = 'compact', interactive = false }: {
+    let { componentId, entry, filling, density = 'compact' }: {
         componentId: string;
         entry: ComponentEntry | undefined;
         filling: boolean;
@@ -19,9 +20,6 @@
         // model, two surfaces (plan-card-visual-spec §1). Only the hero renderers read
         // it; the rest are density-agnostic for now.
         density?: 'compact' | 'full';
-        // The hosting tab's ui_tabs `interactive` flag (passed through to the calculator,
-        // the only renderer that has an interactive mode — B2).
-        interactive?: boolean;
     } = $props();
 
     const title = $derived($t(`plan.c.${componentId}` as 'plan.c.buyer_profile'));
@@ -35,11 +33,13 @@
         {:else if entry.renderer === 'scheme-stack-card'}
             <SchemeStackCard outcome={entry.outcome} {density} />
         {:else if entry.renderer === 'calculator'}
-            <Calculator outcome={entry.outcome} {density} {interactive} />
+            <Calculator outcome={entry.outcome} {density} />
         {:else if entry.renderer === 'data-table'}
             <DataTable outcome={entry.outcome} {density} />
         {:else if entry.renderer === 'swimlane-diagram'}
             <SwimlaneDiagram outcome={entry.outcome} {density} />
+        {:else if entry.renderer === 'checklist'}
+            <Checklist outcome={entry.outcome} />
         {/if}
     {:else if filling}
         <p class="pp-computing"><span class="pp-spinner" aria-hidden="true"></span>{$t('plan.computing')}</p>

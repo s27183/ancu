@@ -9,6 +9,8 @@
 %%   - ownership_planning runs BEFORE purchase_journey, so the journey PLACES the Own-phase
 %%     recurring cell from ongoing_obligations (the W5 9→10 forward edge actually resolves).
 %%   - preparation runs after eligibility + cash_position, so its placed figures resolve.
+%%   - phase_playbook runs LAST over the REAL cash_position, so its action budget_refs
+%%     validate against the actual cash_event ids (a dead-link the synthetic unit can't see).
 %% Every committed outcome also passes the Layer-1 gate (the commit-seam check).
 %%
 %% Pure given onboarding Args + the persistent_term artifact (no Postgres): state is passed
@@ -26,7 +28,8 @@ order() ->
      {<<"cash_position">>,      <<"budget_envelope">>},
      {<<"ownership_planning">>, <<"ongoing_obligations">>},
      {<<"purchase_journey">>,   <<"journey_swimlane">>},
-     {<<"preparation">>,        <<"preparation_plan">>}].
+     {<<"preparation">>,        <<"preparation_plan">>},
+     {<<"phase_playbook">>,     <<"phase_playbook">>}].
 
 main(_) ->
     ok = fh_engine_kb:load(),
@@ -57,12 +60,22 @@ main(_) ->
     Ix = maps:get(<<"interactions">>, Journey),
     OwnIx = [I || I <- Ix, maps:get(<<"phase">>, I) =:= <<"own">>],
 
+    %% --- the phase_playbook payoff: budget_refs validated against REAL cash_events ----
+    Playbook = maps:get(<<"phase_playbook">>, Upstream),
+    KeptRefs = [maps:get(<<"budget_ref">>, A)
+                || P <- maps:get(<<"phases">>, Playbook),
+                   A <- maps:get(<<"actions">>, P),
+                   maps:get(<<"budget_ref">>, A) =/= null],
+
     R = [check("ownership_planning ran before purchase_journey → Own recurring cell PLACED",
                length(OwnRecur), 1),
          check("the Own recurring cell carries a real money_range amount",
                is_money_range(maps:get(<<"amount">>, hd(OwnRecur))), true),
          check("the Own interaction (you→government recurring) was derived",
-               length(OwnIx) >= 1, true)
+               length(OwnIx) >= 1, true),
+         check("phase_playbook ran last over REAL cash_position → budget_refs are LIVE "
+               "(the KB doc's ids match cash_position's cash_event ids)",
+               length(KeptRefs) >= 1, true)
          | Fails0],
 
     io:format("~n================================================================~n"),

@@ -721,8 +721,10 @@ def run(emit=False):
     # "blueprint-driven tabs" a checked property, not a claim.
     # kinds: "components" (render the named components), "synthesis" (a shell-composed
     # overview, e.g. OverviewCard), "qa" (a shell-owned chat surface over the engine Q&A
-    # stream — components: [] by design; not a component_filled). See lifecycle-simulation-model.md.
-    KIND_ENUM = {"synthesis", "components", "qa"}
+    # stream — components: [] by design; not a component_filled), "flow" (the legal/temporal
+    # spine: the swimlane IS the navigation and each phase opens a drill-down sheet; it still
+    # names the components whose data the sheet composes). See lifecycle-simulation-model.md §7.
+    KIND_ENUM = {"synthesis", "components", "qa", "flow"}
     for stem, (_, bcomps, _, _, ui_tabs) in blueprints.items():
         if not ui_tabs:
             fails.append(f"[ui_tabs] {stem}: no ui_tabs declaration")

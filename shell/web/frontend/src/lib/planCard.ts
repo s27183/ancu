@@ -109,8 +109,27 @@ export interface ReserveBuffer {
     amount?: number | null;
     notes?: LocalizedText[] | null;
 }
+/** One money flow on the financial spine (plan-card-lifecycle §7) — the calculator's
+ *  projection of the lifecycle, phase-aligned with the swimlane's `interactions`. The
+ *  engine PLACES already-computed figures here (it computes none of its own); `amount`
+ *  is a money_range ([v,v] for a point). `phase` matches the journey's phase ids. */
+export interface CashEvent {
+    id: string;
+    label: LocalizedText;
+    amount: MoneyRange;
+    direction: 'in' | 'out';
+    timing: 'one_off' | 'recurring';
+    phase: string;
+    counterparty?: string | null;
+    period?: string | null;
+    is_estimate?: boolean | null;
+    source_component?: string | null;
+}
+
 /** cash_position → calculator (outcome type `budget_envelope`). */
 export interface BudgetEnvelopeOutcome {
+    /** The financial spine: every money flow across the lifecycle phases. */
+    cash_events?: CashEvent[] | null;
     stamp_duty?: StampDuty | null;
     // NEED side (Decision 9) — real at base.
     deposit?: Deposit | null;
@@ -146,6 +165,13 @@ export interface AlertTrigger {
     trigger?: LocalizedText | null;
     action?: LocalizedText | null;
 }
+/** The "graduation" event — when LVR crosses the target (typ. 80%), the FHG falls away
+ *  and a no-LMI refinance window opens. `estimated_year` is PENDING until a loan/savings
+ *  fact lets the engine estimate it. */
+export interface GraduationMilestone {
+    target_lvr?: number | null;
+    estimated_year?: number | null;
+}
 /** ownership_planning → data-table (outcome type `ongoing_obligations`). */
 export interface OngoingObligationsOutcome {
     total_monthly_outgoings_estimate?: number | null;
@@ -153,7 +179,42 @@ export interface OngoingObligationsOutcome {
     maintenance_reserve_target?: number | null;
     recurring_costs_estimate?: RecurringCosts | null;
     land_tax_check?: string | null;
+    graduation_milestone?: GraduationMilestone | null;
     alert_triggers_armed?: AlertTrigger[] | null;
+}
+
+// --- preparation → checklist (outcome type `readiness`) ---------------------
+// The property-agnostic readiness layer (the prototype's "Before you buy"): documents
+// to gather (with WHY each is needed), people to engage (role · when · why), the money
+// buffer, and scheme applications to start. Bilingual prose throughout.
+
+export interface ChecklistDoc {
+    id: string;
+    item: LocalizedText;
+    /** not_started | in_progress | done (engine-set; no persisted user toggle yet). */
+    status?: string | null;
+    why?: LocalizedText | null;
+}
+export interface PersonToEngage {
+    role: LocalizedText;
+    when?: LocalizedText | null;
+    why?: LocalizedText | null;
+}
+export interface SchemeApplication {
+    scheme: string;
+    action: LocalizedText;
+}
+export interface MoneyBuffer {
+    genuine_savings_verdict?: string | null;
+    reserve_buffer?: number | null;
+    notes?: LocalizedText[] | null;
+}
+export interface PreparationOutcome {
+    document_checklist?: ChecklistDoc[] | null;
+    people_to_engage?: PersonToEngage[] | null;
+    scheme_applications_to_prepare?: SchemeApplication[] | null;
+    money_buffer?: MoneyBuffer | null;
+    key_assumptions?: LocalizedText[] | null;
 }
 
 // --- purchase_journey → swimlane-diagram (outcome type `journey_swimlane`) ---
@@ -178,12 +239,69 @@ export interface JourneyCell {
     flow_marker: FlowMarker;
     amount?: MoneyRange | null;
 }
+/** One money flow within an interaction — who pays/sends what to whom. */
+export interface InteractionFlow {
+    label: LocalizedText;
+    direction: 'in' | 'out';
+    amount?: MoneyRange | null;
+}
+/** Who deals with whom in a phase (the swimlane's "who talks to whom" — same shared
+ *  flows as cash_events, the two spines' common primitive). actor ids match `actors`. */
+export interface JourneyInteraction {
+    phase: string;
+    from_actor: string;
+    to_actor: string;
+    flows?: InteractionFlow[] | null;
+}
 export interface JourneySwimlaneOutcome {
     phases?: JourneyPhase[] | null;
     actors?: JourneyActor[] | null;
     cells?: JourneyCell[] | null;
+    interactions?: JourneyInteraction[] | null;
     key_assumptions?: LocalizedText[] | null;
 }
+
+// --- phase_playbook → checklist + risk-flag-list (outcome `phase_playbook`) --
+// The actionable layer of the legal/temporal spine (the Flow view's drill-down):
+// per-phase action checklists + KB-grounded risks. The engine PLACES this — actions
+// LINK to figures by id (budget_ref → a cash_event.id, amount joined at render; never
+// a placed amount) and to backing components by id (component_ref). honest-partial: a
+// budget_ref naming no cash_event in THIS buyer's budget is already null (engine-side).
+
+/** One temporally-ordered action in a phase. `status` is the resolver's seed
+ *  (`not_started`); the user-set layer overlays `done` at render. `budget_ref` is a
+ *  cash_event id (or null); `component_ref` a backing component id (or null). */
+export interface PhaseAction {
+    id: string;
+    order: number;
+    label: LocalizedText;
+    detail: LocalizedText;
+    budget_ref?: string | null;
+    component_ref?: string | null;
+    status: 'not_started' | 'done';
+}
+/** One KB-grounded risk + its mitigation for a phase (the risk-flag-list). */
+export interface PhaseRisk {
+    severity: 'low' | 'medium' | 'high';
+    item: LocalizedText;
+    action: LocalizedText;
+}
+export interface PhasePlaybookPhase {
+    phase: string;
+    actions?: PhaseAction[] | null;
+    risks?: PhaseRisk[] | null;
+}
+export interface PhasePlaybookOutcome {
+    phases?: PhasePlaybookPhase[] | null;
+    key_assumptions?: LocalizedText[] | null;
+}
+
+/** The card user-set layer (fh_engine_store, migration 005): a SPARSE map of the
+ *  user's own `done` attestations, `{ "<phase>": { "<action_id>": "done" } }`. Only
+ *  `done` is ever stored (not_started removes the key); absent reads as not_started.
+ *  Overlaid onto the current phase_playbook actions at render — never merged into the
+ *  computed content snapshot. Returned as a sibling of `content` on the GET card. */
+export type ChecklistStatusMap = Record<string, Record<string, string>>;
 
 // --- the plan-card envelope (fh_engine_store:get_plan_card) ------------------
 
@@ -202,11 +320,14 @@ export interface ComponentEntry {
 /** One lifecycle tab the in-scope blueprint declares (engine artifact `ui_tabs`,
  *  plan-card-lifecycle-restoration.md §3). The shell renders these tabs in order, not
  *  the raw component list. `kind: synthesis` is a shell-composed summary (Overview);
- *  `interactive` marks the client-side cash what-if (B2). `components` are the
- *  blueprint's own component ids surfaced under this tab. */
+ *  `kind: flow` is the legal/temporal spine — the purchase_journey swimlane as overview
+ *  with a per-phase phase_playbook drill-down (FlowView); `kind: qa` is the shell's chat
+ *  surface (no component fills it — rendered by the shell's Q&A tab, not in the lifecycle
+ *  rail); `interactive` marks the client-side cash what-if (B2). `components` are the
+ *  blueprint's own component ids under this tab. */
 export interface UiTab {
     tab_id: string;
-    kind?: 'synthesis' | 'components';
+    kind?: 'synthesis' | 'components' | 'flow' | 'qa';
     interactive?: boolean;
     components: string[];
     note?: string;
@@ -219,6 +340,10 @@ export interface PlanCard {
     mode: string;
     status: 'active' | 'retired';
     content: { components?: Record<string, ComponentEntry> };
+    /** The card user-set layer (sibling of content, never merged): the user's `done`
+     *  checklist attestations, overlaid onto phase_playbook actions at render. Absent
+     *  / {} on an untouched card (every action reads not_started). */
+    checklist_status?: ChecklistStatusMap;
     /** The blueprint's lifecycle-tab spine (engine GET; absent/[] on an older engine). */
     ui_tabs?: UiTab[];
     // The snapshot's as-of event cursor + whether a turn is in flight (engine GET).

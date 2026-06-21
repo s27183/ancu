@@ -13,6 +13,7 @@
         listPlanCards,
         simulatePlanCard,
         refinePlanCard,
+        setChecklistStatus,
         type SimulateOverrides
     } from '$lib/api';
     import { subscribePlanCard, type PlanCardStream } from '$lib/planCardStream';
@@ -21,12 +22,19 @@
         type ComponentEntry,
         type UiTab,
         type ProfileOutcome,
-        type MoneyRange
+        type MoneyRange,
+        type JourneySwimlaneOutcome,
+        type PhasePlaybookOutcome,
+        type BudgetEnvelopeOutcome,
+        type ChecklistStatusMap
     } from '$lib/planCard';
     import { AU_STATES } from '$lib/map';
     import { money, moneyRange } from '$lib/format';
     import ComponentCard from '$lib/renderers/ComponentCard.svelte';
     import OverviewCard from '$lib/renderers/OverviewCard.svelte';
+    import Calculator from '$lib/renderers/Calculator.svelte';
+    import FlowView from '$lib/renderers/FlowView.svelte';
+    import Tabs from '$lib/Tabs.svelte';
     import Chat from '$lib/Chat.svelte';
 
     let { suburbName, suburbState, onplan }: {
@@ -49,12 +57,32 @@
         components: [c]
     }));
     const activeTab = $derived(uiTabs.find((t) => t.tab_id === sub) ?? uiTabs[0]);
+    // The lifecycle rail renders every tab EXCEPT the chat surface: qa is the shell's
+    // own (kind: 'qa', no component fills it — engine-contract), rendered once via the
+    // Q&A button below + the `sub === 'qa'` content branch. The engine declares qa last
+    // in ui_tabs; rendering it in the rail too would duplicate the button AND crash
+    // (there is deliberately no plan.ltab.qa label — qa uses plan.tab.qa).
+    const railTabs = $derived(uiTabs.filter((t) => t.kind !== 'qa'));
+
+    // The budget (Cash-calculator) tab's three sub-tabs (§7.3): the cockpit inputs + the
+    // "Bạn đã đủ chưa?" verdict → the cash-events table → the breakdown detail. Labels reuse
+    // the existing calculator keys. A self-owned table row routes here to 'detail'.
+    let budgetSub = $state<string>('ready');
+    const budgetTabs = $derived([
+        { id: 'ready', label: $t('plan.cash.ready') },
+        { id: 'table', label: $t('plan.cash.spine') },
+        { id: 'detail', label: $t('plan.cash.breakdown') }
+    ]);
 
     let phase = $state<'loading' | 'ready' | 'no_card' | 'error'>('loading');
     let components = $state<Record<string, ComponentEntry>>({});
     let cardId = $state<string | null>(null);
     let turnDone = $state(false);
     let turnFailed = $state(false);
+    // The card user-set layer (the Flow checklist done-toggles), seeded from the GET card
+    // and overlaid onto phase_playbook actions at render. The engine is SOT: a toggle is
+    // optimistic for immediacy, then reconciled from the PATCH response (revert on failure).
+    let checklistStatus = $state<ChecklistStatusMap>({});
 
     let stream: PlanCardStream | null = null;
     // A generation token so a retry's async can't be clobbered by a stale in-flight one.
@@ -85,6 +113,15 @@
     let saveError = $state(false);
     let committing = $state(false);
 
+    // Cash-on-hand (the cockpit's 4th input) — CLIENT-SIDE only: a subtraction against the
+    // engine's verified need range, never a regulated recompute. Independent of the price/
+    // state scenario (it's the user's own figure), so it survives a scenario reset.
+    let cashOnHandInput = $state('');
+    const cashOnHand = $derived.by((): number | null => {
+        const n = Number(cashOnHandInput.replace(/[^0-9.]/g, ''));
+        return cashOnHandInput.trim() !== '' && Number.isFinite(n) && n >= 0 ? n : null;
+    });
+
     // The components the tabs render: live outcomes, or — under an active preview — each
     // entry with its outcome swapped for the previewed one (renderer/scope/etc preserved,
     // merged by component_id). A component absent from the preview keeps its live outcome.
@@ -98,6 +135,43 @@
             ])
         );
     });
+
+    // ── Flow view (task 10) ────────────────────────────────────────────────
+    // The legal/temporal spine's three live inputs, read from viewComponents so a what-if
+    // preview re-renders the Flow too: the journey (swimlane spine), the playbook (per-phase
+    // actions + risks), and cash_events (the budget figures the actions LINK to by id).
+    // settlement_prep is Phase-B → simply absent at base (honest-partial in FlowView).
+    const flowJourney = $derived(
+        viewComponents.purchase_journey?.outcome as JourneySwimlaneOutcome | undefined
+    );
+    const flowPlaybook = $derived(
+        viewComponents.phase_playbook?.outcome as PhasePlaybookOutcome | undefined
+    );
+    const flowCashEvents = $derived(
+        (viewComponents.cash_position?.outcome as BudgetEnvelopeOutcome | undefined)
+            ?.cash_events ?? []
+    );
+
+    // Toggle one phase action's done-state. The engine is SOT: flip optimistically for
+    // immediacy, PATCH, then set checklistStatus from the AUTHORITATIVE returned map;
+    // revert to the pre-flip snapshot on any failure. Zero-cost (no usage, no meter gate).
+    async function toggleChecklist(
+        phaseId: string,
+        actionId: string,
+        next: 'done' | 'not_started'
+    ) {
+        if (!cardId) return;
+        const prev = checklistStatus;
+        // Optimistic overlay (new objects so $state sees the change).
+        const phaseMap = { ...(prev[phaseId] ?? {}) };
+        if (next === 'done') phaseMap[actionId] = 'done';
+        else delete phaseMap[actionId];
+        checklistStatus = { ...prev, [phaseId]: phaseMap };
+
+        const res = await setChecklistStatus(cardId, phaseId, actionId, next);
+        if (res.kind === 'ok') checklistStatus = res.checklistStatus;
+        else checklistStatus = prev; // reconcile to the engine: revert the optimistic flip
+    }
 
     // The card's current target price (band or point), shown as the what-if baseline hint.
     const currentPriceLabel = $derived.by((): string | null => {
@@ -175,6 +249,7 @@
         stream = null;
         phase = 'loading';
         components = {};
+        checklistStatus = {};
         uiTabs = [];
         cardId = null;
         turnDone = false;
@@ -193,6 +268,7 @@
         if (myGen !== gen) return;
         if (res.kind === 'ok') {
             components = res.card.content.components ?? {};
+            checklistStatus = res.card.checklist_status ?? {};
             uiTabs = res.card.ui_tabs?.length ? res.card.ui_tabs : FALLBACK_TABS;
             if (!uiTabs.some((t) => t.tab_id === sub)) sub = uiTabs[0]?.tab_id ?? '';
             cardId = match.plan_card_id;
@@ -260,7 +336,7 @@
     <!-- Sub-tabs: one per plan section + a Q&A tab — each section shows on its own, so
          the user never scrolls a long plan. Horizontally scrollable on narrow screens. -->
     <div class="pp-subtabs" role="tablist">
-        {#each uiTabs as tab (tab.tab_id)}
+        {#each railTabs as tab (tab.tab_id)}
             <button
                 type="button"
                 role="tab"
@@ -279,57 +355,16 @@
         >
     </div>
 
-    <!-- Structural what-if bar (W9): a plan-level control — varying price/state re-renders
-         EVERY tab, so it lives above the tabs, not inside a renderer. Hidden on Q&A (chat
-         runs over the committed card, not a preview) and until the base plan has filled. -->
-    {#if cardId && turnDone && !turnFailed && sub !== 'qa'}
-        <div class="pp-whatif" class:active={previewActive}>
-            <div class="pp-wi-controls">
-                <label class="pp-wi-field">
-                    <span class="pp-wi-label">{$t('plan.whatif.price')}</span>
-                    <input
-                        type="text"
-                        inputmode="numeric"
-                        bind:value={priceInput}
-                        placeholder={currentPriceLabel
-                            ? `${$t('plan.whatif.current')} ${currentPriceLabel}`
-                            : $t('plan.cash.whatif.placeholder')}
-                        onkeydown={(e) => e.key === 'Enter' && runPreview()}
-                    />
-                </label>
-                <label class="pp-wi-field">
-                    <span class="pp-wi-label">{$t('plan.whatif.state')}</span>
-                    <select bind:value={stateSelect}>
-                        {#each AU_STATES as s (s)}
-                            <option value={s}>{s}</option>
-                        {/each}
-                    </select>
-                </label>
-                <button type="button" class="primary" onclick={runPreview} disabled={previewing}>
-                    {previewing ? $t('plan.whatif.running') : $t('plan.whatif.run')}
-                </button>
-                {#if previewActive}
-                    <button
-                        type="button"
-                        class="pp-wi-save"
-                        onclick={saveScenario}
-                        disabled={saving}
-                    >
-                        {saving ? $t('plan.whatif.saving') : $t('plan.whatif.save')}
-                    </button>
-                    <button type="button" class="pp-wi-reset" onclick={resetPreview}
-                        >{$t('plan.whatif.reset')}</button
-                    >
-                {/if}
-            </div>
-            {#if previewActive}
-                <p class="pp-wi-banner">{$t('plan.whatif.banner')}</p>
-            {:else if previewError}
-                <p class="pp-wi-error">{$t('plan.whatif.error')}</p>
-            {/if}
-            {#if saveError}
-                <p class="pp-wi-error">{$t('plan.whatif.saveerror')}</p>
-            {/if}
+    <!-- Cross-tab what-if indicator: the price/state cockpit lives in the Cash-calculator
+         tab (the financial spine is where you reason about money), but a scenario re-renders
+         EVERY tab — so on the other tabs, signpost that the figures are a preview, with a
+         reset. The calculator tab shows the full cockpit instead (below). -->
+    {#if previewActive && sub !== 'qa' && !activeTab?.interactive}
+        <div class="pp-whatif active">
+            <p class="pp-wi-banner">{$t('plan.whatif.banner')}</p>
+            <button type="button" class="pp-wi-reset" onclick={resetPreview}
+                >{$t('plan.whatif.reset')}</button
+            >
         </div>
     {/if}
 
@@ -346,6 +381,132 @@
             <!-- The Overview tab: a shell-composed synthesis over the filled base
                  outcomes (the "plan in 90 seconds"), not the raw component cards. -->
             <OverviewCard components={viewComponents} filling={running} />
+        {:else if activeTab?.kind === 'flow'}
+            <!-- The Flow view: the legal/temporal spine — the journey swimlane as the
+                 overview, each phase drilling into its actions (with the done-toggle +
+                 budget/component links) and KB-grounded risks. -->
+            <FlowView
+                journey={flowJourney}
+                playbook={flowPlaybook}
+                cashEvents={flowCashEvents}
+                components={viewComponents}
+                {checklistStatus}
+                onToggle={toggleChecklist}
+                filling={running}
+            />
+        {:else if activeTab?.interactive}
+            <!-- The Cash-calculator tab: the financial spine + the cockpit that drives it
+                 (the prototype's interactive calculator, engine-driven). price/state →
+                 simulate (re-renders every tab); cash-on-hand → client-side verdict only;
+                 property type is per-property (Phase B) so it's shown locked, not faked.
+                 The interactive tab is [cash_position]; any other component falls through. -->
+            <section class="pp-card pp-calc pp-flat">
+                {#if viewComponents.cash_position}
+                    <Tabs tabs={budgetTabs} active={budgetSub} onSelect={(id) => (budgetSub = id)} />
+
+                    {#if budgetSub === 'ready'}
+                        <!-- Tab 1: the cockpit inputs + the "Bạn đã đủ chưa?" verdict. -->
+                        <p class="pp-calc-intro">{$t('plan.cockpit.intro')}</p>
+                        <div class="pp-cockpit">
+                            <label class="pp-ck-field">
+                                <span class="pp-ck-label">{$t('plan.whatif.price')}</span>
+                                <input
+                                    type="text"
+                                    inputmode="numeric"
+                                    bind:value={priceInput}
+                                    placeholder={currentPriceLabel
+                                        ? `${$t('plan.whatif.current')} ${currentPriceLabel}`
+                                        : $t('plan.cash.whatif.placeholder')}
+                                    onkeydown={(e) => e.key === 'Enter' && runPreview()}
+                                />
+                            </label>
+                            <label class="pp-ck-field">
+                                <span class="pp-ck-label">{$t('plan.whatif.state')}</span>
+                                <select bind:value={stateSelect} onchange={runPreview}>
+                                    {#each AU_STATES as s (s)}
+                                        <option value={s}>{s}</option>
+                                    {/each}
+                                </select>
+                            </label>
+                            <label class="pp-ck-field pp-ck-locked">
+                                <span class="pp-ck-label">{$t('plan.cockpit.ptype')}</span>
+                                <select disabled>
+                                    <option>{$t('plan.attach_property')}</option>
+                                </select>
+                            </label>
+                            <label class="pp-ck-field">
+                                <span class="pp-ck-label">{$t('plan.cash.whatif.label')}</span>
+                                <input
+                                    type="text"
+                                    inputmode="numeric"
+                                    bind:value={cashOnHandInput}
+                                    placeholder={$t('plan.cash.whatif.placeholder')}
+                                />
+                            </label>
+                        </div>
+                        <div class="pp-cockpit-actions">
+                            <button type="button" class="primary" onclick={runPreview} disabled={previewing}>
+                                {previewing ? $t('plan.whatif.running') : $t('plan.whatif.run')}
+                            </button>
+                            {#if previewActive}
+                                <button type="button" class="pp-wi-save" onclick={saveScenario} disabled={saving}>
+                                    {saving ? $t('plan.whatif.saving') : $t('plan.whatif.save')}
+                                </button>
+                                <button type="button" class="pp-wi-reset" onclick={resetPreview}
+                                    >{$t('plan.whatif.reset')}</button
+                                >
+                            {/if}
+                        </div>
+                        {#if previewActive}
+                            <p class="pp-wi-banner">{$t('plan.whatif.banner')}</p>
+                        {:else if previewError}
+                            <p class="pp-wi-error">{$t('plan.whatif.error')}</p>
+                        {/if}
+                        {#if saveError}
+                            <p class="pp-wi-error">{$t('plan.whatif.saveerror')}</p>
+                        {/if}
+                        <Calculator
+                            outcome={viewComponents.cash_position.outcome}
+                            view="verdict"
+                            {cashOnHand}
+                            components={viewComponents}
+                            density="full"
+                        />
+                    {:else}
+                        <!-- Tabs 2/3: the cockpit is on tab 1, so signpost an active preview here. -->
+                        {#if previewActive}
+                            <div class="pp-whatif active">
+                                <p class="pp-wi-banner">{$t('plan.whatif.banner')}</p>
+                                <button type="button" class="pp-wi-reset" onclick={resetPreview}
+                                    >{$t('plan.whatif.reset')}</button
+                                >
+                            </div>
+                        {/if}
+                        {#if budgetSub === 'table'}
+                            <!-- Tab 2: the cash-events table. A self-owned row → the Detail tab. -->
+                            <Calculator
+                                outcome={viewComponents.cash_position.outcome}
+                                view="table"
+                                components={viewComponents}
+                                onShowDetail={() => (budgetSub = 'detail')}
+                                density="full"
+                            />
+                        {:else}
+                            <!-- Tab 3: the breakdown detail, inline. -->
+                            <Calculator
+                                outcome={viewComponents.cash_position.outcome}
+                                view="detail"
+                                components={viewComponents}
+                                density="full"
+                            />
+                        {/if}
+                    {/if}
+                {:else if running}
+                    <p class="pp-computing"><span class="pp-spinner" aria-hidden="true"></span>{$t('plan.computing')}</p>
+                {:else}
+                    <p class="pp-pending">{$t('plan.computing')}</p>
+                {/if}
+            </section>
         {:else if activeTab}
             <!-- A lifecycle tab renders its mapped components in order. A component with no
                  entry once the base turn has finished is not part of the base plan (a
@@ -357,7 +518,6 @@
                         componentId={cid}
                         entry={viewComponents[cid]}
                         filling={running}
-                        interactive={activeTab.interactive ?? false}
                     />
                 {:else if turnDone && !turnFailed}
                     <section class="pp-card">

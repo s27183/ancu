@@ -40,6 +40,7 @@ routes() ->
         {"/api/engine/plan-cards/:id/rerun",    fh_engine_h_rerun,      []},
         {"/api/engine/plan-cards/:id/simulate", fh_engine_h_simulate,   []},
         {"/api/engine/plan-cards/:id/refine",   fh_engine_h_refine,     []},
+        {"/api/engine/plan-cards/:id/checklist-status", fh_engine_h_checklist_status, []},
         {"/api/engine/plan-cards/:id",          fh_engine_h_plan_card,  []}
     ]}].
 

@@ -33,6 +33,7 @@ has_resolver(<<"ownership_planning">>) -> true;
 has_resolver(<<"mortgage_finance">>)   -> true;
 has_resolver(<<"purchase_journey">>)   -> true;
 has_resolver(<<"preparation">>)        -> true;
+has_resolver(<<"phase_playbook">>)     -> true;
 has_resolver(_)                        -> false.
 
 -spec resolver(binary(), map(), map()) -> {map(), binary(), [map()]}.
@@ -50,6 +51,8 @@ resolver(<<"purchase_journey">>, Args, Upstream) ->
     fh_engine_journey:fill(Args, Upstream);
 resolver(<<"preparation">>, Args, Upstream) ->
     fh_engine_preparation:fill(Args, Upstream);
+resolver(<<"phase_playbook">>, Args, Upstream) ->
+    fh_engine_phase_playbook:fill(Args, Upstream);
 resolver(Other, _Args, _Upstream) ->
     erlang:error({no_resolver_fill_for, Other}).
 

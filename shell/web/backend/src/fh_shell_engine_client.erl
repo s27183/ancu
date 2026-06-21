@@ -12,8 +12,8 @@
 %% are built (8-S1..8-S4). HTTP via inets httpc (started by the shell app).
 
 -export([create_plan_card/2, get_plan_card/2, post_message/3, simulate/3,
-         refine/3, stream_events/3, list_suburbs/1, get_usage_events/2,
-         start_httpc_profiles/0]).
+         refine/3, set_checklist_status/3, stream_events/3, list_suburbs/1,
+         get_usage_events/2, start_httpc_profiles/0]).
 
 %% Dedicated httpc profile for the LONG-LIVED SSE stream proxy (stream_events/3).
 %% SSE requests run with {timeout, infinity} and hold an httpc session for the entire
@@ -147,6 +147,24 @@ refine(UserId, PlanCardId, BodyMap) ->
     Body = fh_shell_util:json_encode(BodyMap),
     {ok, {{_, Status, _}, _, Resp}} =
         httpc:request(post, {Url, Headers, "application/json", Body},
+                      [{timeout, ?RPC_TIMEOUT_MS}], [{body_format, binary}]),
+    {Status, Resp}.
+
+%% Toggle one phase action's checklist status — PATCH /api/engine/plan-cards/:id/
+%% checklist-status with {phase, action_id, status} (the card user-set layer, task 7).
+%% The shell has confirmed ownership first. USER-ATTESTED state, not a computed figure:
+%% a small jsonb patch, NO recompute and NO usage — so, like simulate/refine, it carries
+%% NO meter gate. The engine answers 200 with the AUTHORITATIVE checklist_status map (the
+%% acting client renders engine state, not a local guess); 400 on a bad field. Relayed
+%% verbatim — the engine owns the user-set contract.
+-spec set_checklist_status(binary(), binary(), map()) -> {non_neg_integer(), binary()}.
+set_checklist_status(UserId, PlanCardId, BodyMap) ->
+    Token = fh_shell_engine_jwt:mint(#{user_id => UserId}),
+    Url = base_url() ++ "/plan-cards/" ++ binary_to_list(PlanCardId) ++ "/checklist-status",
+    Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
+    Body = fh_shell_util:json_encode(BodyMap),
+    {ok, {{_, Status, _}, _, Resp}} =
+        httpc:request(patch, {Url, Headers, "application/json", Body},
                       [{timeout, ?RPC_TIMEOUT_MS}], [{body_format, binary}]),
     {Status, Resp}.
 

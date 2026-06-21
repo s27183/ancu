@@ -24,6 +24,8 @@ init(Req0, Opts) ->
         {[messages], <<"POST">>} -> with_owned_card(Req0, Opts, fun ask/4);
         {[simulate], <<"POST">>} -> with_owned_card(Req0, Opts, fun simulate/4);
         {[refine], <<"POST">>}   -> with_owned_card(Req0, Opts, fun refine/4);
+        {[checklist_status], <<"PATCH">>} ->
+            with_owned_card(Req0, Opts, fun checklist_status/4);
         _ ->
             {ok, fh_shell_http:reply_json(405,
                 #{<<"error">> => <<"method_not_allowed">>}, Req0), Opts}
@@ -115,6 +117,24 @@ refine(UserId, PlanCardId, Req0, Opts) ->
         {ok, Body, Req1} ->
             {Status, Resp} =
                 fh_shell_engine_client:refine(UserId, PlanCardId, Body),
+            {ok, relay(Status, Resp, Req1), Opts};
+        {error, invalid_json} ->
+            {ok, fh_shell_http:reply_json(400,
+                #{<<"error">> => <<"invalid_json">>}, Req0), Opts}
+    end.
+
+%% PATCH /api/plan-cards/:id/checklist-status — toggle one phase action's status in the
+%% card user-set layer (task 7). USER-ATTESTED state, NOT a computed figure: a small jsonb
+%% patch with no recompute and no `usage`, so — like simulate/refine, unlike `ask` — it
+%% carries NO meter gate (zero-cost attestation; the engine would run it regardless, the
+%% shell does not gate it). Just authenticate → own → relay; the engine validates the
+%% closed enums (phase, status) and returns the authoritative checklist_status map (400 on
+%% a bad field). The acting client renders that map, not its optimistic guess.
+checklist_status(UserId, PlanCardId, Req0, Opts) ->
+    case fh_shell_http:read_json_body(Req0) of
+        {ok, Body, Req1} ->
+            {Status, Resp} =
+                fh_shell_engine_client:set_checklist_status(UserId, PlanCardId, Body),
             {ok, relay(Status, Resp, Req1), Opts};
         {error, invalid_json} ->
             {ok, fh_shell_http:reply_json(400,
