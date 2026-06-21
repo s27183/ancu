@@ -60,6 +60,10 @@ template ids the resolver references, each a `{vi, en}` pair.
     "alert_landtax_action": {
       "vi": "Căn nhà không còn là nơi ở chính của bạn, nên quyền miễn thuế đất chấm dứt và thuế đất có thể áp dụng khi vượt ngưỡng của tiểu bang {state} ({threshold}).",
       "en": "It stops being your principal residence, so the land-tax exemption ends and land tax can apply above the {state} threshold ({threshold})."
+    },
+    "alert_landtax_action_nothreshold": {
+      "vi": "Căn nhà không còn là nơi ở chính của bạn, nên quyền miễn thuế đất chấm dứt và thuế đất có thể áp dụng khi vượt ngưỡng miễn thuế đất của tiểu bang nơi bạn mua.",
+      "en": "It stops being your principal residence, so the land-tax exemption ends and land tax can apply above your state’s land-tax threshold."
     }
   }
 }

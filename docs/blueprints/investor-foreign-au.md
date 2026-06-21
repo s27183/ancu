@@ -37,7 +37,7 @@ Mode D is the **most complex of the four blueprints** because it combines:
 
 ## Component pipeline
 
-12 components. Borrows from Mode B (foreign-person) and Mode C (investor) with Mode D-specific adaptations marked `★`.
+14 components. Borrows from Mode B (foreign-person) and Mode C (investor) with Mode D-specific adaptations marked `★`. `disposition` (14) is added by the full-temporal-flow reframe ([`../architecture/lifecycle-simulation-model.md` §8](../architecture/lifecycle-simulation-model.md)) — **design-first / dormant**, the foreign-resident-CGT path of the same dispose-phase owner.
 
 ### Component scope (base plan vs property addendum)
 
@@ -58,6 +58,7 @@ Mode D's base plan captures the deepest pre-property reasoning of all four bluep
 | 11 due_diligence (investor + cross-border) | `per-property` | When user uploads docs |
 | 12 settlement_prep (investor + FIRB + transfer) | `per-property` | Activated when contract signed |
 | 13 ownership_planning_foreign_investor ★ | `both` | Base estimate of vacancy/tax/repatriation obligations; refined per-property post-settlement |
+| 14 disposition ★ | `base` | Dispose-phase figure-owner — sale proceeds, selling costs, loan payout, and **foreign-resident CGT** (no 50% discount, no PPOR exemption, plus FRCGW withheld at settlement of sale) over the hold horizon `H`; the full-horizon net position. Resolver, no agent leaf. *Design-first* (§8.5). |
 
 This base-heavy structure is genuinely well-suited to Mode D's audience: Vietnam-located investors making major capital allocation decisions across borders. They need to validate the strategic shape (entity, FIRB path, currency transfer plan, tax structure, target yield) before they're ready to commit to a specific property.
 
@@ -108,7 +109,15 @@ This base-heavy structure is genuinely well-suited to Mode D's audience: Vietnam
 [12] ownership_planning_foreign_investor ★ (Mode C portfolio + Mode B vacancy/tax)
         inputs: property_fit_investor_foreign, tax_structure_non_resident_summary, cash_flow_projection_foreign
         outcome: portfolio_position_foreign
+       │
+       ▼
+[13] disposition ★ (NEW — dispose-phase figure-owner, foreign-resident CGT + FRCGW, full-horizon net position)
+        inputs: strategy_thesis_foreign (hold_period_years = H, exit_strategy), property_fit_investor_foreign,
+                cash_flow_projection_foreign, tax_structure_non_resident_summary, budget_envelope_foreign_investor
+        outcome: disposition
 ```
+
+> The diagram numbers are sequential reading order, not component IDs (the IDs are the scope table's 1–14; `mortgage_finance` is omitted from the sketch). `disposition` runs **last among the base figure-owners** — a pure sink reading every upstream figure-owner (acquire from `cash_position`, hold from `yield_modelling`/`tax_structure_non_resident` over `H`, the CGT determinants from `tax_structure_non_resident`) and read by none (acyclic). The foreign-resident path strips the main-residence exemption and the 50% discount and adds FRCGW (see component 14).
 
 **UI tab mapping** for Mode D:
 
@@ -119,7 +128,7 @@ This base-heavy structure is genuinely well-suited to Mode D's audience: Vietnam
 | FIRB & Funding | `firb_workflow` + `cross_border_funding` |
 | Yield & Tax | `yield_modelling` + `tax_structure_non_resident` |
 | Property | `property_assessment` + `due_diligence` |
-| Cash calculator | `cash_position` (interactive form) |
+| Cash calculator | `cash_position` + `disposition` (full-horizon net position: acquire → hold over `H` → dispose; horizon slider = structural what-if) |
 | Buying | `buying_strategy` |
 | Temporal flow | `settlement_prep` |
 | Portfolio | `ownership_planning_foreign_investor` |
@@ -133,7 +142,7 @@ This base-heavy structure is genuinely well-suited to Mode D's audience: Vietnam
     { "tab_id": "investment_strategy", "kind": "components", "components": ["investment_strategy"] },
     { "tab_id": "firb_funding",        "kind": "components", "components": ["firb_workflow", "cross_border_funding"] },
     { "tab_id": "yield_tax",           "kind": "components", "components": ["yield_modelling", "tax_structure_non_resident"] },
-    { "tab_id": "cash_calculator",     "kind": "components", "interactive": true, "components": ["cash_position"] },
+    { "tab_id": "cash_calculator",     "kind": "components", "interactive": true, "components": ["cash_position", "disposition"] },
     { "tab_id": "journey",             "kind": "components", "components": ["settlement_prep"] },
     { "tab_id": "property",            "kind": "components", "components": ["property_assessment", "due_diligence"] },
     { "tab_id": "buying",              "kind": "components", "components": ["buying_strategy"] },
@@ -503,6 +512,8 @@ Same as [Mode C yield_modelling](investor-domestic-au.md#5-yield_modelling--new)
 }
 ```
 
+**Hold-phase `cash_events` (full-temporal-flow wiring, design-first — §8.5/§8.6).** `yield_modelling` owns the **recurring hold-phase** flows the full-horizon financial spine places at phase `own` over `H`: rental income (`money_in`, recurring/year), operating expenses, loan interest, and the **non-resident rental withholding** (`money_out`, recurring/year), each `source_component: yield_modelling`, gated by the §13 placement check. `tax_structure_non_resident` adds the negative-gearing tax effect (offset against AU-source income only) on the same axis.
+
 ---
 
 ### 7. tax_structure_non_resident ★
@@ -539,12 +550,16 @@ Same as [Mode C yield_modelling](investor-domestic-au.md#5-yield_modelling--new)
     "plant_and_equipment_depreciation_available": { "type": "bool", "value": "<initial>", "note": "Only for new properties or substantial renovations post May 2017" },
     "total_depreciation_year_1": { "type": "money", "value": "<initial>" }
   },
-  "cgt_projection_non_resident": {
-    "fifty_percent_discount_eligible": { "type": "bool", "value": false, "note": "Removed for foreign residents from 8 May 2012" },
-    "ppor_exemption_eligible": { "type": "bool", "value": false, "note": "Removed for foreign residents on disposal from 1 July 2020 with limited transition" },
-    "estimated_capital_gain_at_exit": { "type": "money", "value": "<initial>" },
-    "cgt_payable_at_marginal_rate": { "type": "money", "value": "<initial>" },
-    "foreign_resident_capital_gains_withholding_at_sale": { "type": "money", "value": "<initial>", "note": "Federal (ATO) foreign-resident CGT withholding — purchaser withholds at settlement; NOT state-based. Rate and any value threshold resolve from kb.foreign-investor.frcgw-on-sale, not hardcoded here" }
+  "cgt_determinants_non_resident": {
+    // RESOLVED (§8.5): the previously-homeless `cgt_projection_non_resident` (figures with no
+    // phase, no cash_event, no owner) is reframed here as the foreign-resident CGT *determinants*.
+    // The dispose-phase CGT FIGURE (gain, payable, FRCGW) is computed and OWNED by `disposition`
+    // (component 14) at the `dispose` phase, where it lands as cash_events — one-computer-per-figure.
+    "fifty_percent_discount_eligible": { "type": "bool", "value": false, "note": "Removed for foreign residents from 8 May 2012 (kb.non-resident.cgt-no-50-percent-discount-from-2012); read by disposition" },
+    "ppor_exemption_eligible": { "type": "bool", "value": false, "note": "Removed for foreign residents on disposal from 1 July 2020 with limited transition (kb.non-resident.cgt-no-ppor-exemption); read by disposition" },
+    "cgt_marginal_rate": { "type": "percentage", "value": "<initial>", "note": "foreign-resident marginal rate the gain is taxed at; read by disposition" },
+    "frcgw_applicable": { "type": "bool", "value": true, "note": "Federal (ATO) foreign-resident CGT withholding applies at settlement of sale; read by disposition" },
+    "frcgw_rate_and_threshold": { "type": "string", "value": "<from kb.foreign-investor.frcgw-on-sale>", "note": "rate + any value threshold resolve from KB, NOT hardcoded; disposition applies them to compute the withheld amount" }
   },
   "vn_side_tax_implications": {
     "vn_tax_on_au_rental_income": { "type": "string", "value": "<initial>" },
@@ -570,13 +585,17 @@ Same as [Mode C yield_modelling](investor-domestic-au.md#5-yield_modelling--new)
     "annual_au_tax_payable_on_rental": "money",
     "negative_gearing_available_against_au_income": "bool",
     "annual_depreciation_year_1": "money",
-    "cgt_at_exit_estimate": "money",
-    "frcgw_at_sale_estimate": "money",
+    "cgt_discount_eligible": "bool",
+    "ppor_exemption_eligible": "bool",
+    "cgt_marginal_rate": "percentage",
+    "frcgw_applicable": "bool",
     "vn_tax_treaty_relief_applicable": "bool",
     "annual_compliance_cost_au": "money"
   }
 }
 ```
+
+**Hold-phase + dispose wiring (full-temporal-flow, design-first — §8.5).** `tax_structure_non_resident` owns the **recurring hold-phase** non-resident tax effect — the annual AU tax on rental (net of the negative-gearing offset against AU-source income), placed at phase `own` over `H` — and supplies the **foreign-resident CGT determinants** (`cgt_determinants_non_resident` above: no discount, no PPOR exemption, the marginal rate, FRCGW applicability/rate) to `disposition` (component 14), which owns the **dispose-phase CGT + FRCGW figures** and their cash_events. `yield_modelling` owns the recurring rental/expense/interest/withholding hold-phase events on the same axis. The previously-homeless `cgt_projection_non_resident` is thus resolved: hold-phase effects stay here; the dispose-phase gain/payable/FRCGW land at the `dispose` phase, owned by the one computer for those figures.
 
 ---
 
@@ -817,10 +836,10 @@ Combines Mode C `ownership_planning_investor` (property management, tax reportin
     "expanded_portfolio_increases_firb_complexity": { "type": "bool", "value": true, "note": "Each new property requires fresh FIRB application" }
   },
   "exit_planning": {
-    "frcgw_at_sale_estimate": { "type": "money", "value": "<from_tax_structure>" },
-    "vn_side_tax_on_gain": { "type": "money", "value": "<initial>" },
-    "estimated_net_proceeds_after_taxes": { "type": "money", "value": "<initial>" },
-    "convert_to_ppor_eligibility_when_pr_granted": { "type": "bool", "value": "<initial>" }
+    // SUPERSEDED by `disposition` (component 14, §8.5): the dispose-phase figures (FRCGW, net
+    // proceeds, the gain) are OWNED there now — one-computer-per-figure. ownership_planning keeps
+    // only the PPOR-conversion-on-PR planning flag; it PLACES disposition's figures, never recomputes.
+    "convert_to_ppor_eligibility_when_pr_granted": { "type": "bool", "value": "<initial>", "note": "on PR grant the mode switches to C — future gains then get the 50% discount; dispose figures themselves are owned by disposition" }
   },
   "lifecycle_alerts": {
     "vacancy_declaration_reminder_armed": { "type": "bool", "value": true },
@@ -852,12 +871,55 @@ Combines Mode C `ownership_planning_investor` (property management, tax reportin
 
 ---
 
+### 14. disposition ★ (NEW — the dispose-phase figure-owner)
+
+> **Design-first / dormant.** Added by the full-temporal-flow reframe ([`../architecture/lifecycle-simulation-model.md` §8.5](../architecture/lifecycle-simulation-model.md)). The *structure* is built across all modes now; the **Mode-D foreign-resident tax content** — the removed discount/exemption, FRCGW, and the VN-side treaty interplay — is authored when Mode D enters scope, against the currently-dangling `kb.non-resident.*` / `kb.foreign-investor.*` anchors (§8.7). This is the **foreign-resident** path of the same dispose-phase owner: Mode-A is main-residence-exempt (`cgt: null`), Mode-C is full-CGT-with-discount, Mode-D is **full-CGT, no discount, no PPOR exemption, plus FRCGW** withheld at settlement.
+
+**Goal:** Project the position at sale over the hold horizon `H` and own the dispose-phase figures the old `cgt_projection_non_resident` / `ownership_planning.exit_planning` placeholders lacked a single home for: sale proceeds (growth-projected), selling costs, loan payout, **foreign-resident CGT** (no 50% discount, no PPOR exemption, at the marginal rate), the **FRCGW withheld at settlement** (a prepayment credited against the final CGT — *not* an additional cost), and the **full-horizon net position**. Surface the VN-side CGT / treaty-relief note for completeness.
+
+**Inputs:** `strategy_thesis_foreign` (`hold_period_years` = the horizon `H`, `exit_strategy`) + `property_fit_investor_foreign.outcome` (growth indicators, purchase price) + `cash_flow_projection_foreign` (the hold-phase recurring flows to roll up) + `tax_structure_non_resident_summary` (the **CGT determinants**: `cgt_discount_eligible: false`, `ppor_exemption_eligible: false`, `cgt_marginal_rate`, `frcgw_applicable`) + `budget_envelope_foreign_investor` (acquisition cash to roll up; loan amount for the payout)
+
+**KB anchors:** `kb.property.capital-growth-bands` (banded growth — **labelled placeholder**, re-ground before surfacing), `kb.selling-costs.agent-legal` (selling-cost bands), `kb.non-resident.cgt-no-50-percent-discount-from-2012` *(dangling — Mode-D, design-first)*, `kb.non-resident.cgt-no-ppor-exemption` *(dangling — design-first)*, `kb.foreign-investor.frcgw-on-sale` *(dangling — the FRCGW rate/threshold, design-first)*
+
+**Renderer:** `calculator` (the full-horizon net position; no new renderer — constraint #7, §8.8)
+
+**Fill path:** **resolver, no agent leaf.** Growth/selling-costs/CGT/FRCGW are KB-grounded resolver computations, never LLM-paraphrased (the figures are removed from the agent's reach — [verify-regulated-figures-by-postcondition], [no-judge-ground-the-producer]). Banded and PENDING when the growth assumption is unparameterized (honest-partial).
+
+**Outcome schema:** `disposition`
+
+```jsonc
+{
+  "type": "disposition",
+  "fields": {
+    "horizon_years": "integer",
+    "sale_proceeds": "money_range",                    // purchase_price grown over H; PENDING when unparameterized
+    "selling_costs": "money_range",                     // agent commission + legal/marketing at sale
+    "loan_payout": "money_range",                       // remaining principal at settlement of sale
+    "taxable_gain": "money_range",                      // proceeds − adjusted cost base; NO 50% discount (foreign resident)
+    "cgt": "money_range",                               // taxable_gain × marginal_rate — full, no discount/exemption
+    "frcgw_withheld_at_settlement": "money_range",      // purchaser withholds at settlement; a PREPAYMENT credited against cgt, not an extra cost
+    "cgt_status": "enum [computed, to_verify]",         // to_verify directs the user to a registered tax agent (never asserted as advice)
+    "vn_side_cgt_note": "localized_text",               // VN tax on the AU gain + treaty relief (kb.au-vn-tax-treaty) — informational
+    "net_proceeds": "money_range",                      // sale_proceeds − selling_costs − loan_payout − cgt  (FRCGW is inside cgt, not double-counted)
+    "full_horizon_net_position": "money_range",         // acquire + hold net over H + dispose net_proceeds
+    "dispose_cash_events": "array<{ phase: 'dispose', timing: 'one_off', direction, amount, counterparty, source_component: 'disposition' }>",
+    "key_assumptions": "array<localized_text>"
+  }
+}
+```
+
+- **One-computer-per-figure.** `disposition` owns the dispose figures + the full-horizon roll-up; it **places** acquire (from `cash_position`) and hold (from `yield_modelling`/`tax_structure_non_resident` over `H`) figures, never recomputing them ([place-upstream-figures-dont-recompute]). FRCGW is modelled as a withholding *inside* the CGT figure, **not** added on top of `net_proceeds` (no double-count). It emits the dispose-phase `cash_events`, gated by §13.
+- **ASIC.** CGT, FRCGW, and growth are KB-grounded estimates surfaced as ranges with the basis stated, `cgt_status: to_verify` directing the user to a registered tax agent — decision support, never tax advice.
+
+---
+
 ## KB anchor index summary
 
-Mode D references ~75 KB slugs:
+Mode D references ~77 KB slugs:
 
 - 35 shared with Mode B (foreign-person components)
 - 40 shared with Mode C (investor components)
+- 2 shared with Mode A — `kb.property.capital-growth-bands` + `kb.selling-costs.agent-legal` (component 14 `disposition`; the FRCGW-specific anchors stay Mode-D-exclusive, below)
 - ~10 Mode-D-exclusive (non-resident tax, FRCGW, repatriation, VN-AU treaty, foreign-investor strategy)
 
 Mode-D-exclusive slugs include: `kb.vn-tax.brackets-2026`, `kb.vn-tax.income-from-foreign-property`, `kb.non-resident.serviceability-au-lenders`, `kb.non-resident.rental-income-withholding-tax`, `kb.non-resident.cgt-no-50-percent-discount-from-2012`, `kb.non-resident.cgt-no-ppor-exemption`, `kb.non-resident.entity-options-au-property`, `kb.au-vn-tax-treaty`, `kb.foreign-investor.thesis-archetypes`, `kb.foreign-investor.currency-hedging-considerations`, `kb.foreign-investor.future-migration-pathway-considerations`, `kb.foreign-investor.repatriation-strategy`, `kb.foreign-investor.frcgw-on-sale`, `kb.foreign-investor.absentee-owner-management`, `kb.non-resident.investment-loan-deposit-requirements`.
@@ -872,7 +934,7 @@ The offline KB agent's Mode D onboarding workstream is the largest of the four �
 |---|---|
 | `summary-card` | 1 investor_profile_foreign, 2 property_assessment, 4 investment_strategy |
 | `firb-workflow-card` | 3 firb_workflow, 8 cross_border_funding |
-| `calculator` | 5 yield_modelling, 6 tax_structure_non_resident, 7 cash_position |
+| `calculator` | 5 yield_modelling, 6 tax_structure_non_resident, 7 cash_position, 14 disposition |
 | `data-table` | 6 tax_structure_non_resident, 12 ownership_planning_foreign_investor |
 | `buying-strategy-card` | 9 buying_strategy |
 | `risk-flag-list` | 10 due_diligence |
@@ -893,7 +955,7 @@ All Mode A + B + C signals apply. Mode D introduces:
 | `<from_investor_profile>` | From `investor_profile_foreign.outcome` (note: signal name reused from Mode C; resolves to Mode D variant based on blueprint context) |
 | `<from_tax_structure>` | From `tax_structure_non_resident.outcome` (Mode D variant) |
 
-**Fill-path classification.** Per [agentic-boundary.md](../architecture/agentic-boundary.md), `agent_reasoning_required: true` marks agent-path leaves. Mode-D-specific agent leaves: off-the-plan foreign-investor judgment (`property_assessment.off_the_plan_specific_considerations_for_foreign_investor.*`), investment thesis (`investment_strategy.strategy_archetype`), non-resident lender fit (`mortgage_finance.non_resident_investor_loan_shortlist`), and entity structuring (`tax_structure_non_resident.recommended_entity`). All FIRB fees / surcharges / predicates, VN tax rates / treatment / filing, withholding rates, non-resident deposit minimums, and the FX-risk note are **resolver** — rule-governed (VN cross-border tax is complex but determined by tax law + the VN–AU DTA; encode it in KB rather than reason it per turn). Valuation, strategy, and loan-structure judgment are inherited from Mode C; cross-border document-gap flags from Mode B.
+**Fill-path classification.** Per [agentic-boundary.md](../architecture/agentic-boundary.md), `agent_reasoning_required: true` marks agent-path leaves. Mode-D-specific agent leaves: off-the-plan foreign-investor judgment (`property_assessment.off_the_plan_specific_considerations_for_foreign_investor.*`), investment thesis (`investment_strategy.strategy_archetype`), non-resident lender fit (`mortgage_finance.non_resident_investor_loan_shortlist`), and entity structuring (`tax_structure_non_resident.recommended_entity`). All FIRB fees / surcharges / predicates, VN tax rates / treatment / filing, withholding rates, non-resident deposit minimums, and the FX-risk note are **resolver** — rule-governed (VN cross-border tax is complex but determined by tax law + the VN–AU DTA; encode it in KB rather than reason it per turn). Valuation, strategy, and loan-structure judgment are inherited from Mode C; cross-border document-gap flags from Mode B. **All of `disposition`** (component 14) is **resolver** — growth projection, selling costs, loan payout, taxable gain, foreign-resident CGT, FRCGW, and the full-horizon roll-up are KB-grounded computations deliberately removed from the agent's reach (§8.5); the VN-side treaty note is a resolver KB lookup, not a per-turn judgment.
 
 ---
 
@@ -912,9 +974,10 @@ buying_strategy                → outcome: bid_plan_foreign_investor           
 due_diligence                  → outcome: risk_assessment_foreign_investor    (reads: property_fit_investor_foreign, uploaded_docs)
 settlement_prep                → outcome: settlement_checklist_foreign        (reads: property_fit_investor_foreign, bid_plan_foreign_investor, firb_status, transfer_plan, tax_structure_non_resident_summary)
 ownership_planning_foreign_investor → outcome: portfolio_position_foreign     (reads: property_fit_investor_foreign, tax_structure_non_resident_summary, cash_flow_projection_foreign)
+disposition                    → outcome: disposition                       (reads: strategy_thesis_foreign, property_fit_investor_foreign, cash_flow_projection_foreign, tax_structure_non_resident_summary, budget_envelope_foreign_investor)
 ```
 
-No cycles. Mode D's pipeline has the deepest dependency graph of the four blueprints — `cash_position` reads four upstream outcomes (investor profile, property fit, FIRB status, tax structure) reflecting the combinatorial complexity of foreign + investor.
+No cycles. Mode D's pipeline has the deepest dependency graph of the four blueprints — `cash_position` reads four upstream outcomes (investor profile, property fit, FIRB status, tax structure) reflecting the combinatorial complexity of foreign + investor. `disposition` is a **pure sink** — it reads the upstream figure-owners (the horizon from `strategy_thesis_foreign`, the acquire/hold flows and CGT determinants from the cash/yield/tax outcomes) and is read by none, so it adds a leaf, not a cycle.
 
 ---
 

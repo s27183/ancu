@@ -37,7 +37,7 @@ The `firb_required: false` metadata above is the blueprint's **entry assumption*
 
 ## Component pipeline
 
-The blueprint is a directed pipeline of eleven components. Each component has a single goal, atomic group of actions, typed inputs from upstream components, and a typed outcome that feeds downstream. The agent reasons within a component and commits a structured outcome; downstream components read the outcome (not the upstream parameters individually).
+The blueprint is a directed pipeline of thirteen components. Each component has a single goal, atomic group of actions, typed inputs from upstream components, and a typed outcome that feeds downstream. The agent reasons within a component and commits a structured outcome; downstream components read the outcome (not the upstream parameters individually).
 
 ### Component scope (base plan vs property addendum)
 
@@ -56,6 +56,8 @@ Each component has a `scope` indicating when it runs in the plan card lifecycle:
 | 9 ownership_planning | `both` | Base estimate of ongoing costs at onboarding; refined per-property post-settlement |
 | 10 purchase_journey | `base` | Onboarding; the property-agnostic whole-of-journey lifecycle overview (swimlane). Distinct from `settlement_prep` (8), which is the per-property settlement checklist. |
 | 11 preparation | `base` | Onboarding; the property-agnostic readiness layer (document checklist, people to engage, money buffer) — the prototype's "Before you buy" content, surfaced before any property is attached. Distinct from `due_diligence` (7), the per-property document-risk review. |
+| 12 phase_playbook | `base` | Onboarding; the per-phase **action checklist** (temporal order, budget-linked) + per-phase **risks & mitigations** behind each Flow-view phase sheet. Authored KB content, kept separate from `purchase_journey` (10, the pure swimlane projection) so authored content does not overload a placement component. |
+| 13 disposition | `base` | Onboarding; the **dispose-phase figure-owner** — projects sale proceeds, selling costs, loan payout, CGT, and net proceeds over a hold horizon `H`, plus the full-horizon net position (buy → hold → sell). The terminal financial component (lifecycle-simulation-model §8). Mode-A path = main-residence CGT exemption (`cgt: null`). |
 
 Components with `scope: base` fill **once per user** in the persistent base plan. Components with `scope: per-property` fill **once per property** the user attaches, creating a property addendum on the plan card. Components with `scope: both` have a base form (using target price range and suburb medians) and a refined form (using specific property data).
 
@@ -88,34 +90,28 @@ Components with `scope: base` fill **once per user** in the persistent base plan
            outcome: ongoing_obligations, alert_triggers
 ```
 
-> The diagram shows the acquisition pipeline (components 1–9). The two base-scope **projection** components — `purchase_journey` (10) and `preparation` (11) — read several of these outcomes and *place* their already-computed figures (they compute none of their own); see the full dependency graph at the end of this document.
+> The diagram shows the acquisition pipeline (components 1–9). The base-scope **projection** components — `purchase_journey` (10) and `preparation` (11) — read several of these outcomes and *place* their already-computed figures (they compute none of their own). A third base-scope component, `phase_playbook` (12), **authors** the per-phase checklist + risks (KB content) and *links* to placed figures by id (`budget_ref`) rather than placing them — it is the actionable layer of the Flow spine, not a projection. A fourth, `disposition` (13), is the **dispose-phase figure-owner** — it extends the lifecycle past `own` to a terminal `dispose` phase (lifecycle-simulation-model §8), computing the sale/CGT/net figures and the full-horizon net position; it runs after the acquisition + ownership figures exist so it can place them into the whole-of-horizon roll-up. See the full dependency graph at the end of this document.
 
-**UI tab mapping** — the eleven components are presented across seven UI tabs, ordered as a single **guided lifecycle rail** (Son's point 1): the tabs are not independent pills but one container that walks the buyer through the journey — overview first, the interactive financial spine second, then the legal/temporal spine, then the phase detail, then Q&A last.
+**UI tab mapping** — the twelve components surface through **three top-level views + a Q&A tab** ([`../architecture/lifecycle-simulation-model.md`](../architecture/lifecycle-simulation-model.md) §7), not a flat tab list. The earlier seven-tab rail repeated the same component across tabs (`cash_position` in three, `eligibility` in two) — the three-view model collapses that redundancy and mirrors the buyer's lifecycle, not the component DAG. Everything dropped from the top level is reached *through a spine*: a legal step's detail through its phase sheet, a figure's detail through its budget row — never as its own tab.
 
-| # | UI tab | Components rendered |
-|---|---|---|
-| 1 | Overview | "what this is" plan summary + aggregated read of `buyer_profile` + `eligibility` + `mortgage_finance` + `cash_position` |
-| 2 | Cash calculator | `cash_position` rendered as the interactive **financial spine** (phased cash-flow + what-if form) |
-| 3 | Journey | `purchase_journey` (base lifecycle swimlane — the **legal spine**) → `settlement_prep` (per-property, refines the Settle phase) |
-| 4 | Before you buy | `preparation` (readiness — NEW) + `eligibility` + `cash_position` (detail) + `due_diligence` (per-property) |
-| 5 | Buying | `buying_strategy` |
-| 6 | After you buy | `ownership_planning` |
-| 7 | Q&A | bilingual planning-agent chat (a shell surface over the engine Q&A stream — `kind: "qa"`, not a `component_filled`) |
+| # | View | `kind` | What it shows |
+|---|---|---|---|
+| 1 | Overview | `synthesis` | "what this is" + aggregated read of `buyer_profile` + `eligibility` + `mortgage_finance` + `cash_position` |
+| 2 | Flow | `flow` | the legal/temporal spine — `purchase_journey` (swimlane, now spanning Prepare → … → Own → **Dispose**) as navigation; each phase opens a sheet = swimlane slice + `phase_playbook` actions (ordered, budget-linked) + `phase_playbook` risks; `settlement_prep` enriches the Settle phase per-property |
+| 3 | Budget | `components` (interactive) | the financial spine — `cash_position` as the phased acquisition cash-flow + what-if cockpit; `disposition` as the **full-horizon net position** (buy → hold over `H` → sell) + horizon slider; each cash-event row drills to its `source_component` |
+| 4 | Q&A | `qa` | bilingual planning-agent chat (a shell surface over the engine Q&A stream — not a `component_filled`) |
 
-UI tab assignment is a presentation concern; the blueprint defines the data model and reasoning structure. The two **spines** (calculator + swimlane) and the shared `cash_events` primitive both spines project are specified in [`../architecture/lifecycle-simulation-model.md`](../architecture/lifecycle-simulation-model.md); the segmented-rail UX and the explore→save simulation flow are specified in [`../04-ux-model.md`](../04-ux-model.md).
+UI tab assignment is a presentation concern; the blueprint defines the data model and reasoning structure. The two **spines** (Budget calculator + Flow swimlane), the shared `cash_events` primitive both project, the phase-drill-down sheet, and the three-view collapse are specified in [`../architecture/lifecycle-simulation-model.md`](../architecture/lifecycle-simulation-model.md) §7; the three-view navigation and the explore→save simulation flow are specified in [`../04-ux-model.md`](../04-ux-model.md).
 
-**Machine-readable form** — compiled to `ui_tabs` in the artifact and **canonical for the runtime** (the table above is the human view). Tabs render in the order listed (the lifecycle rail). `kind: synthesis` is a shell-composed summary (not a vocabulary renderer); `kind: "qa"` is the shell's chat surface over the engine's bilingual Q&A stream (no component fills it); `interactive: true` marks the calculator's what-if form (cash-on-hand resolves client-side; a *structural* what-if runs a free engine `simulate` preview — lifecycle-simulation-model §4, engine-contract §10). The `journey` tab leads with `purchase_journey` (the base lifecycle swimlane) and falls through to the per-property `settlement_prep` (an "attach a property" affordance until a property is attached). See [`../architecture/plan-card-lifecycle-restoration.md`](../architecture/plan-card-lifecycle-restoration.md) §3.2/§5/§7.
+**Machine-readable form** — compiled to `ui_tabs` in the artifact and **canonical for the runtime** (the table above is the human view). Views render in the order listed. `kind: synthesis` is a shell-composed summary (not a vocabulary renderer); `kind: flow` is the legal/temporal spine rendered as the `purchase_journey` swimlane with a per-phase drill-down sheet fed by `phase_playbook` (a new tab-*kind*, not a renderer — the build compiler must accept it); `kind: qa` is the shell's chat surface over the engine's bilingual Q&A stream (no component fills it); `interactive: true` marks the Budget view's what-if cockpit (cash-on-hand resolves client-side; a *structural* what-if runs a free engine `simulate` preview — lifecycle-simulation-model §4, engine-contract §10). The components dropped from the top level (`eligibility`, `mortgage_finance`, `preparation`, `buying_strategy`, `due_diligence`, `ownership_planning`) are reached as backing detail via `phase_playbook.actions[].component_ref`, not as tabs. See [`../architecture/plan-card-lifecycle-restoration.md`](../architecture/plan-card-lifecycle-restoration.md) §3.2/§5/§7.
 
 ```jsonc
 {
   "ui_tabs": [
-    { "tab_id": "overview",        "kind": "synthesis",  "components": ["buyer_profile", "eligibility", "mortgage_finance", "cash_position"] },
-    { "tab_id": "cash_calculator", "kind": "components", "interactive": true, "components": ["cash_position"] },
-    { "tab_id": "journey",         "kind": "components", "components": ["purchase_journey", "settlement_prep"] },
-    { "tab_id": "before_you_buy",  "kind": "components", "components": ["preparation", "eligibility", "cash_position", "due_diligence"] },
-    { "tab_id": "buying",          "kind": "components", "components": ["buying_strategy"] },
-    { "tab_id": "after_you_buy",   "kind": "components", "components": ["ownership_planning"] },
-    { "tab_id": "qa",              "kind": "qa",         "components": [] }
+    { "tab_id": "overview", "kind": "synthesis",  "components": ["buyer_profile", "eligibility", "mortgage_finance", "cash_position"] },
+    { "tab_id": "flow",     "kind": "flow",        "components": ["purchase_journey", "phase_playbook", "settlement_prep"] },
+    { "tab_id": "budget",   "kind": "components", "interactive": true, "components": ["cash_position", "disposition"] },
+    { "tab_id": "qa",       "kind": "qa",          "components": [] }
   ]
 }
 ```
@@ -210,7 +206,8 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
   },
   "purchase_target": {
     "target_price_range": { "type": "money_range", "value": "<initial>", "note": "from onboarding (constraint #1) — base-scope cap + cash checks run against this until a property is attached" },
-    "target_zone": { "type": "array<string>", "value": "<initial>", "note": "onboarding map-zone — target suburbs / regions" }
+    "target_zone": { "type": "array<string>", "value": "<initial>", "note": "onboarding map-zone — target suburbs / regions" },
+    "hold_horizon_years": { "type": "integer", "value": "<initial>", "note": "the years-held horizon H the dispose-phase projection assumes (lifecycle-simulation-model §8.3). A plan (per-journey) fact on the plan-target overlay — mutable per journey like target_price_range, NOT a profile fact; it is a structural what-if dimension (vary H → free resolver recompute via simulate, engine-contract §10.5). Mode-A owner-occupier default: long/indefinite hold (null = no disposal projection, an optional 'what if I sell in N years?'); an investor's H derives from exit_strategy. Feeds the disposition component." }
   }
 }
 ```
@@ -235,6 +232,7 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
     // purchase-target facts (onboarding) — base-scope cap + cash checks run against these
     "target_price_range": "money_range",
     "target_zone": "array<string>",
+    "hold_horizon_years": "integer",                  // §8.3 — the dispose-phase hold horizon H; a plan-target-overlay fact (mutable per journey, a structural what-if); null = no disposal projection (Mode-A long/indefinite default). Read by disposition.
     // narrative
     "key_constraints": "array<localized_text>",
     "key_strengths": "array<localized_text>"
@@ -529,7 +527,7 @@ The `mortgage_plan` outcome feeds `cash_position` (loan amount + buffer requirem
 
 **Renderer:** `calculator`
 
-**UI tab hint:** Cash calculator (interactive) + Before you buy (summary)
+**UI tab hint:** Budget (interactive financial spine) + Overview (summary) + Flow → Settle phase sheet (settlement cash need)
 
 **Parameters:**
 
@@ -879,11 +877,11 @@ The `mortgage_plan` outcome feeds `cash_position` (loan amount + buffer requirem
 
 ### 10. purchase_journey
 
-**Goal:** Present the whole-of-journey lifecycle as a swimlane — the phases of a first-home purchase across time (Prepare → Pre-approve → Contract → Settle → Own) against the actors who act in each (You / Government / Lender / Other), with the buyer's already-computed money flows placed on the timeline. This is the **base lifecycle spine** the prototype led with — property-agnostic, generated at onboarding.
+**Goal:** Present the whole-of-journey lifecycle as a swimlane — the phases of a first-home purchase across time (Prepare → Pre-approve → Contract → Settle → Own → **Dispose**) against the actors who act in each (You / Government / Lender / Other), with the buyer's already-computed money flows placed on the timeline. This is the **base lifecycle spine** the prototype led with — property-agnostic, generated at onboarding. The terminal `dispose` phase (sale → next purchase) extends the lifecycle past ownership entry (lifecycle-simulation-model §8); its cells place `disposition`'s sale/cost/net figures, present only when a hold horizon `H` is set.
 
 **Scope:** `base` — the journey structure is generic to a Mode-A FHB purchase; it does not depend on a specific property. (`settlement_prep` (8) is the *per-property* settlement checklist that refines the Settle phase once a property is attached — a distinct component.)
 
-**Inputs:** `eligibility.outcome` (scheme_stack) + `mortgage_finance.outcome` (mortgage_plan) + `cash_position.outcome` (budget_envelope, incl. its `cash_events`) + `ownership_planning.outcome` (ongoing_obligations — for the Own-phase recurring costs). It runs **last** precisely so it can place figures every upstream component already computed — it computes **no figure of its own** (one-computer-per-figure; the regulated duty / deposit / total / recurring are referenced, never recomputed). This is the **whole-lifecycle spine**: it reads `budget_envelope.cash_events` (the Prepare→Settle acquisition flow) and `ongoing_obligations.recurring_costs_estimate` (the Own phase) and PLACES each on the swimlane at its (phase, actor/counterparty) cell. Because every `cash_event` already carries a `counterparty`, both the cell placement and the who-pays/talks-to-whom `interactions` fall straight out — no new computation.
+**Inputs:** `eligibility.outcome` (scheme_stack) + `mortgage_finance.outcome` (mortgage_plan) + `cash_position.outcome` (budget_envelope, incl. its `cash_events`) + `ownership_planning.outcome` (ongoing_obligations — for the Own-phase recurring costs) + `disposition.outcome` (the Dispose-phase sale/cost/net `cash_events`). It runs **last among the figure-owners** precisely so it can place figures every upstream component already computed — it computes **no figure of its own** (one-computer-per-figure; the regulated duty / deposit / total / recurring / disposal figures are referenced, never recomputed). This is the **whole-lifecycle spine**: it reads `budget_envelope.cash_events` (the Prepare→Settle acquisition flow), `ongoing_obligations.recurring_costs_estimate` (the Own phase), and `disposition.dispose_cash_events` (the Dispose phase) and PLACES each on the swimlane at its (phase, actor/counterparty) cell. Because every `cash_event` already carries a `counterparty`, both the cell placement and the who-pays/talks-to-whom `interactions` fall straight out — no new computation.
 
 **KB anchors:** `kb.journey.fhg-path`
 
@@ -899,7 +897,7 @@ The `mortgage_plan` outcome feeds `cash_position` (loan amount + buffer requirem
 {
   "type": "journey_swimlane",
   "fields": {
-    "phases": "array<{ id: string, label: localized_text }>",   // ordered lifecycle phases (Prepare → Pre-approve → Contract → Settle → Own)
+    "phases": "array<{ id: string, label: localized_text }>",   // ordered lifecycle phases (prepare → pre_approve → contract → settle → own → dispose); the terminal `dispose` phase is present only when a hold horizon H is set (honest-partial — no empty Dispose column otherwise)
     "actors": "array<{ id: string, label: localized_text }>",   // the swimlane rows (You / Government / Lender / Other)
     "cells": "array<{ phase: string, actor: string, item: localized_text, flow_marker: enum [none, money_out, money_in, document, milestone], amount: money_range, counterparty: string|null, source_component: string }>",  // one action per (phase, actor) that has one; amount is an upstream figure PLACED on the timeline (a point figure is emitted as [v, v]; null when no figure attaches) — NEVER computed here (one-computer-per-figure). counterparty is the OTHER end of a money flow (the actor the money goes to / comes from; null for non-money cells) — carried through from the source cash_event. source_component traces the cell to the figure's owner (cash_position / eligibility / ownership_planning) for the outcome-conformance gate.
     "interactions": "array<{ from_actor: string, to_actor: string, phase: string, flows: array<{ label: localized_text, direction: enum [out, in], amount: money_range }> }>",  // [two-spines] the who-pays/talks-to-whom view (Son's point 3) — a structural aggregation of the cells' (actor, counterparty, amount) tuples per phase (e.g. You → Other(vendor): deposit + balance in Contract/Settle; Government → You: grant in Settle). Derived by PLACEMENT from the same cash_events, not recomputed; this is the per-stage 'four parties, who interacts with whom' structure neither the prototype nor production had.
@@ -934,7 +932,7 @@ The `journey_swimlane` shape is **mode-general** (phases × actors × cells); Mo
 {
   "type": "preparation_plan",
   "fields": {
-    "document_checklist": "array<{ id, item: localized_text, why: localized_text, status: enum [not_started, gathered] }>",  // generic FHB document set (photo ID, NOA, payslips, bank statements, deposit evidence) from kb.preparation.fhb-readiness. status is a USER-ATTESTED fact (the 'Chưa có / Đã có' toggle — Son's point 4: the user sets it), stored on the card; resolver seeds it not_started. NOT the per-property contract/S32/inspection docs (those are due_diligence).
+    "document_checklist": "array<{ id, item: localized_text, why: localized_text, status: enum [not_started, gathered] }>",  // generic FHB document set (photo ID, NOA, payslips, bank statements, deposit evidence) from kb.preparation.fhb-readiness. status is a USER-ATTESTED fact (the 'Chưa có / Đã có' toggle — Son's point 4: the user sets it), stored in the card's **user-set layer** so a recompute never clobbers it (the toggle-write is engine-contract §10.4, lifecycle-simulation-model §7.4a — the SAME mechanism `phase_playbook` uses); resolver seeds it not_started into the computed snapshot, the read overlays the user-set status. NOT the per-property contract/S32/inspection docs (those are due_diligence).
     "people_to_engage": "array<{ role: localized_text, when: localized_text, why: localized_text }>",  // generic roles to line up (mortgage broker, conveyancer/solicitor, buyer's agent if used) — bilingual KB content; the named individuals are filled per-property in settlement_prep.counterparties.
     "scheme_applications_to_prepare": "array<{ scheme, action: localized_text }>",  // PLACED from scheme_stack.applicable_schemes (e.g. FHSS release request, FHG slot reservation) — read, not recomputed.
     "money_buffer": "{ genuine_savings_verdict: enum [meets, fails_recent_gift, insufficient_track_record, unknown], reserve_buffer: money|null, notes: array<localized_text> }",  // PLACED from budget_envelope.genuine_savings_verdict + budget_envelope.reserve_buffer (one-computer-per-figure; null at base until a refine turn). The readiness read of the buffer the calculator owns.
@@ -943,7 +941,118 @@ The `journey_swimlane` shape is **mode-general** (phases × actors × cells); Mo
 }
 ```
 
-The user can mark `document_checklist[].status` and run a structural **what-if** on the buffer (via the calculator's `simulate` preview) without spending a turn; saving a chosen readiness state is an ordinary resolver-only refine turn (lifecycle-simulation-model §4, engine-contract §10).
+The user can mark `document_checklist[].status` (via the §10.4 toggle-write into the card's user-set layer) and run a structural **what-if** on the buffer (via the calculator's `simulate` preview) without spending a turn; saving a chosen readiness state is an ordinary resolver-only refine turn (lifecycle-simulation-model §4, engine-contract §10).
+
+---
+
+### 12. phase_playbook
+
+**Goal:** Behind each Flow-view phase sheet, present the **actionable, temporally-ordered checklist** for that phase (what to do, in sequence) and the **often-seen risks + mitigations** for that phase. This is the actionable layer of the legal/temporal spine: what the swimlane shows as "what happens" becomes "what *you* do, in what order, and what to watch for" (Son's point 1 — actionable checklist + per-phase risk management).
+
+**Scope:** `base` — generic to a Mode-A FHB lifecycle; phase-keyed, property-agnostic. Per-property components enrich a phase via their own outcomes, reached through an action's `component_ref` (e.g. `buying_strategy` behind a Contract action, `settlement_prep` behind a Settle action); `phase_playbook` itself stays base.
+
+**Inputs:** `cash_position.outcome` (budget_envelope — so each action's `budget_ref` resolves to a real `cash_event.id`; the *id* is referenced, the *amount* is joined at render, never recomputed) + `purchase_journey.outcome` (journey_swimlane — to share the phase set). It runs **last** (after `purchase_journey`) so the cash-event ids it links already exist. Unlike `purchase_journey`/`preparation` (figure-projections), `phase_playbook` **authors KB content**: it computes no figure and places no amount — it links to figures by id.
+
+**KB anchors:** `kb.journey.phase-actions`, `kb.risks.fhb-by-phase`
+
+**Renderer:** `checklist` + `risk-flag-list`
+
+**UI tab hint:** Flow (the per-phase drill-down sheet)
+
+**Fill path:** resolver. Actions, ordering, risks, and mitigations are bilingual KB content keyed by phase; the only upstream read is `cash_event.id` resolution for `budget_ref`. **No agent leaf** — the risks are KB-grounded, never LLM-generated (the engine does not let the model author the risk list; reliability is structural, not a judge — lifecycle-simulation-model §7.5).
+
+**Outcome schema:** `phase_playbook`
+
+```jsonc
+{
+  "type": "phase_playbook",
+  "fields": {
+    "phases": "array<{ phase: string, actions: array<{ id: string, label: localized_text, detail: localized_text, order: integer, budget_ref: string|null, component_ref: string|null, status: enum [not_started, done] }>, risks: array<{ severity: enum [low, medium, high], item: localized_text, action: localized_text }> }>",
+    // one entry per lifecycle phase (prepare → pre_approve → contract → settle → own); phase ids align with purchase_journey.phases + cash_event.phase.
+    //   ACTION (the ordered, actionable checklist item): order = temporal sequence within the phase. budget_ref → a cash_event.id (the checklist↔budget link; null when no cash consequence) — the Budget view groups cash_events by the same phase, so an item and its money pair automatically; the amount is JOINED at render, never stored here (one-computer-per-figure, extended to this consumer). component_ref → a component id (tap opens that component's renderer as backing detail, e.g. eligibility behind 'Apply for FHG'; null when none). status is USER-ATTESTED (engine seeds not_started into THIS computed snapshot; the user sets it via the §10.4 toggle-write); the effective value is stored in the card's USER-SET LAYER and overlaid at read so a recompute never clobbers it (lifecycle-simulation-model §7.4a) — the SAME mechanism as preparation.document_checklist[].status.
+    //   RISK (often-seen risk for the phase + its mitigation, risk-flag-list shape): item = the risk; action = the mitigation. KB-grounded (kb.risks.fhb-by-phase), never generated. Honest-partial: a phase with no substantiated risk emits NO risk — never a fabricated one.
+    "key_assumptions": "array<localized_text>"
+  }
+}
+```
+
+The `phase_playbook` shape is **mode-general** (phase-keyed actions + risks); Modes B/C/D reuse the same schema + the same `checklist` + `risk-flag-list` renderers with their own `kb.journey.*` / `kb.risks.*` content. Mode A is the first; the rest are content-only follow-ons.
+
+> **Build order (lifecycle-simulation-model §7.7).** Slice 1 ships the three-view surface on today's data (no `phase_playbook` yet — Flow phase sheets show the swimlane slice only). Slice 2 adds `phase_playbook.actions` + the `budget_ref`/`component_ref` affordances + the user-set-layer toggle-write. Slice 3 adds `phase_playbook.risks` + the `kb.risks.fhb-by-phase` authoring. The schema above is the full target; the slices fill it incrementally.
+
+---
+
+### 13. disposition
+
+**Goal:** Project the financial outcome of **disposing** of the property after a hold horizon `H` — the sale proceeds (growth-projected), the costs of selling, the loan payout, the CGT, and the **net proceeds** — and roll them up with the acquisition and ownership figures into a **full-horizon net position** (buy → hold over `H` → sell). This is the **terminal financial component**: it answers the question the truncated lifecycle could not — *"over my whole buy–hold–sell, where do I stand?"* (lifecycle-simulation-model §8.6). For a Mode-A owner-occupier the dispose value is the **equity realised at sale → the next purchase** (the graduation / upgrade story); CGT is the **main-residence exemption** (`cgt: null`).
+
+**Scope:** `base` — the projection runs at onboarding against `target_price_range` + the hold horizon `H`; it narrows per-property when a specific property's price attaches (the same base-then-property narrowing every financial figure follows). Present only when `H` is set (Mode-A default is long/indefinite → no disposal projection until the user asks "what if I sell in N years?").
+
+**Inputs:** `buyer_profile.outcome` (`hold_horizon_years` H, `target_price_range`, `intended_occupancy_use`, `tax_residency` — the CGT-exemption determinants) + `property_assessment.outcome` (`price`, per-property) + `mortgage_finance.outcome` (loan terms → the remaining loan balance at year `H`) + `cash_position.outcome` (`budget_envelope.total_cash_required` — the acquisition cash to place into the roll-up) + `ownership_planning.outcome` (`ongoing_obligations` — the annual hold costs to place × `H`). It runs **after `cash_position` + `ownership_planning`** (so the acquire + hold figures exist to place) and **before `purchase_journey`** (which places its `dispose_cash_events` on the swimlane). It is a **figure-owner** for the dispose phase, but its full-horizon roll-up **places** the acquire/hold figures (one-computer-per-figure — it never recomputes them).
+
+**KB anchors:** `kb.property.capital-growth-bands`, `kb.selling-costs.agent-legal`, `kb.tax.cgt-main-residence-exemption`
+
+**Renderer:** `calculator`
+
+**UI tab hint:** Budget (the full-horizon net position + horizon slider) + Flow → Dispose phase sheet
+
+**Fill path:** resolver. Sale proceeds (the KB growth band compounded over `H`), selling costs (commission band × proceeds + legal + marketing), loan payout (amortisation at `H`), CGT (Mode-A main-residence exemption → `null` / `to_verify`), net proceeds, and the full-horizon roll-up are all **deterministic** from KB + upstream figures. **No agent leaf** — growth and CGT are removed from the LLM's reach (banded, KB-grounded, resolver-computed; reliability is structural, not a judge — lifecycle-simulation-model §8.4).
+
+**Parameters:**
+
+```jsonc
+{
+  "horizon": {
+    "hold_horizon_years": { "type": "integer", "value": "<from_buyer_profile>", "note": "H; null = no disposal projection (Mode-A long/indefinite default). A structural what-if dimension — varying it re-runs this component free (resolver-only simulate, engine-contract §10.5)." },
+    "growth_band_used": { "type": "string", "value": "<initial>", "note": "the capital-growth band applied from kb.property.capital-growth-bands (currently a PLACEHOLDER), compounded over H; stated in key_assumptions" }
+  },
+  "proceeds": {
+    "purchase_price_basis": { "type": "money", "value": "<initial>", "note": "target_price_range ceiling at base; the specific property price per-property" },
+    "projected_sale_proceeds": { "type": "money_range", "value": "<initial>", "note": "purchase_price × (1 + rate)^H at both band ends; PENDING when H or price unparameterised (honest-partial)" }
+  },
+  "costs": {
+    "agent_commission": { "type": "money_range", "value": "<initial>", "note": "commission band × projected_sale_proceeds (kb.selling-costs.agent-legal)" },
+    "legal_conveyancing": { "type": "money_range", "value": "<initial>" },
+    "marketing": { "type": "money_range", "value": "<initial>" },
+    "total_selling_costs": { "type": "money_range", "value": "<initial>" }
+  },
+  "loan_payout": {
+    "estimated_balance_at_horizon": { "type": "money", "value": "<initial>", "note": "remaining principal at year H from the mortgage_plan amortisation; null at base until the loan amount + rate are known (honest-partial, the reserve_buffer precedent)" }
+  },
+  "cgt": {
+    "main_residence_exempt": { "type": "bool", "value": "<initial>", "derived_from": "buyer_profile.intended_occupancy_use + buyer_profile.tax_residency", "note": "Mode-A sole_occupier + resident-for-tax → true (cgt null); partial_rental / granny_flat / non-resident-for-tax / land > 2 ha → to_verify (kb.tax.cgt-main-residence-exemption)" },
+    "cgt_estimate": { "type": "money", "value": "<initial>", "note": "<initial> stays null on the exempt path; Mode-A NEVER estimates a taxable gain — to_verify defers to a registered tax agent. The investor gain math (50% discount, cost base) is Modes C/D, design-first." }
+  },
+  "net": {
+    "net_proceeds_at_sale": { "type": "money_range", "value": "<initial>", "note": "projected_sale_proceeds − total_selling_costs − loan_payout − cgt" },
+    "full_horizon_net_position": { "type": "money_range", "value": "<initial>", "note": "the buy→hold→sell roll-up — PLACES acquire (budget_envelope.total_cash_required) + hold (ongoing_obligations annualised × H) + this dispose net; placed, never recomputed (§8.6)" }
+  }
+}
+```
+
+**Outcome schema:** `disposition`
+
+```jsonc
+{
+  "type": "disposition",
+  "fields": {
+    "horizon_years": "integer|null",                  // H; null = no disposal projection set (Mode-A long/indefinite default)
+    "sale_proceeds": "money_range|null",              // growth-projected over H (kb.property.capital-growth-bands — PLACEHOLDER band); null/PENDING when H or price unparameterised
+    "selling_costs": "money_range|null",              // commission + legal + marketing (kb.selling-costs.agent-legal); money_out at dispose
+    "loan_payout": "money_range|null",                // remaining loan principal discharged at sale settlement; null until the loan is known (honest-partial)
+    "cgt": "money_range|null",                        // tax on the gain; null on the Mode-A main-residence-exempt path
+    "cgt_status": "enum [exempt, to_verify]",         // Mode-A: exempt (clean owner-occupier, resident-for-tax) | to_verify (rented / partial_rental / granny_flat / non-resident-for-tax / land > 2 ha — kb.tax.cgt-main-residence-exemption). NEVER an estimated taxable gain for Mode A.
+    "net_proceeds": "money_range|null",               // sale_proceeds − selling_costs − loan_payout − cgt — the equity realised at sale (→ the next purchase, the graduation story)
+    "full_horizon_net_position": "money_range|null",  // §8.6 — the buy→hold→sell roll-up: PLACES acquire (budget_envelope.total_cash_required) + hold (ongoing_obligations annualised × H) + this dispose net. One-computer-per-figure: the acquire/hold figures are referenced from their owners, never recomputed; only this roll-up and the dispose figures are owned here.
+    "dispose_cash_events": "array<{ id: string, phase: string, label: localized_text, direction: enum [out, in], amount: money_range|null, is_estimate: bool, timing: enum [one_off, recurring], period: enum [once, monthly, quarterly, annual]|null, counterparty: string, source_component: string }>",  // the Dispose-phase entries of the shared financial spine (phase = "dispose", timing = one_off): sale_proceeds (in, counterparty: buyer/market), selling_costs + loan_payout + cgt (out, counterparty: agent / lender / government). Each source_component: disposition. purchase_journey PLACES these on the swimlane's Dispose column; the Budget calculator groups them by phase into the full-horizon cash-flow — the SAME placement discipline as budget_envelope.cash_events. is_estimate true (growth-projected / banded).
+    "key_assumptions": "array<localized_text>"        // the growth band used (WITH the PLACEHOLDER caveat), the held period H, the CGT exemption basis, the selling-cost basis. ASIC: decision-support with the assumption stated, never a forecast or advice.
+  }
+}
+```
+
+The `disposition` shape is **mode-general** (a horizon-parameterised disposal projection). Mode A is built here on the **main-residence-exemption** path (`cgt: null` / `to_verify`, no taxable-gain estimate). Modes C/D reuse the same schema + the `calculator` renderer with the **investor** CGT computation (50% discount for assets held > 12 months, cost base / depreciation, partial-exemption apportionment) and the recurring holding-phase gearing events — authored **design-first** when those modes enter scope (lifecycle-simulation-model §8.7); the `kb.tax.*` / `kb.investor.*` anchors they need are dangling in `investor-domestic-au.md` until then.
+
+> **Build order.** The structure (phase enum `dispose`, the horizon param, the `disposition` outcome shape, the full-horizon roll-up) is built now for all modes. Mode-A content is authored now (`kb.tax.cgt-main-residence-exemption`, `kb.selling-costs.agent-legal`, and the **placeholder** `kb.property.capital-growth-bands` — to be re-grounded against a named series before any figure is surfaced). Investor tax content is design-first (§8.7).
 
 ---
 
@@ -1000,6 +1109,11 @@ The following kb_anchor slugs are referenced by components in this blueprint. Th
 | `kb.maintenance.budget-by-property-type` | 9 | Maintenance budget heuristics by property type |
 | `kb.journey.fhg-path` | 10 | The Mode-A FHB lifecycle template — phase + actor labels, per-cell bilingual prose, journey assumptions (the swimlane's structure + copy; figures are placed from upstream, not stored here) |
 | `kb.preparation.fhb-readiness` | 11 | The Mode-A FHB readiness template — generic document checklist + people-to-engage roles + bilingual prose (buffer figures are placed from upstream, not stored here) |
+| `kb.journey.phase-actions` | 12 | The Mode-A per-phase **action** template — ordered actions per phase with `budget_ref`/`component_ref` links + bilingual prose (figures linked by id from upstream, not stored here). Slice 2. |
+| `kb.risks.fhb-by-phase` | 12 | The Mode-A per-phase **risk + mitigation** template — often-seen risks per lifecycle phase with severity + bilingual mitigation; verified against the transactional risk KB (`kb.s32.review-points`, `kb.cooling-off.by-state`, `kb.special-conditions.standard-set`, `kb.auction.rules-by-state`, `kb.agent-tactics.detection`). Slice 3. |
+| `kb.property.capital-growth-bands` | 13 | The capital-growth assumption band the disposition resolver compounds over the hold horizon H to project sale proceeds — **PLACEHOLDER**, to be re-grounded against a named series (ABS RPPI / CoreLogic / state Valuer-General) before any figure is surfaced. |
+| `kb.selling-costs.agent-legal` | 13 | Conventional **sale-side** cost bands (agent commission %, legal/conveyancing, marketing) — estimates, surfaced as ranges. Distinct from the buyer-side `kb.buyer-costs.inspections-conveyancing-fees`. |
+| `kb.tax.cgt-main-residence-exemption` | 13 | The CGT **main-residence exemption** rules (full-exemption conditions, 2-ha cap, income-production / 6-year absence / foreign-resident triggers) — REGULATED, ATO-verified. Mode-A owner-occupier → exempt (`cgt: null`); investor CGT is Modes C/D, design-first. |
 
 ---
 
@@ -1011,10 +1125,10 @@ This blueprint uses 9 of the constrained renderer vocabulary defined in [§11.9 
 |---|---|
 | `summary-card` | 1 buyer_profile, 2 property_assessment, 4 mortgage_finance |
 | `scheme-stack-card` | 3 eligibility |
-| `calculator` | 5 cash_position |
+| `calculator` | 5 cash_position, 13 disposition |
 | `buying-strategy-card` | 6 buying_strategy |
-| `risk-flag-list` | 7 due_diligence |
-| `checklist` | 7 due_diligence, 8 settlement_prep, 11 preparation |
+| `risk-flag-list` | 7 due_diligence, 12 phase_playbook |
+| `checklist` | 7 due_diligence, 8 settlement_prep, 11 preparation, 12 phase_playbook |
 | `swimlane-diagram` | 8 settlement_prep, 10 purchase_journey |
 | `data-table` | 4 mortgage_finance, 9 ownership_planning, 11 preparation |
 | `opportunity-card` | 9 ownership_planning |
@@ -1037,7 +1151,7 @@ This blueprint uses signal placeholders defined in [§11.9 in architecture.md](.
 
 Future iterations may add `<pending: user>`, `<pending: agent>`, `<stale: 90d>`, `<conflict: user_override>`.
 
-**Fill-path classification.** A leaf carrying `agent_reasoning_required: true` is filled by an agent turn (LLM); every other leaf resolves deterministically (copy, `derived_from`, formula, or rules engine). Which leaves clear the agent bar is governed by [agentic-boundary.md](../architecture/agentic-boundary.md). In this blueprint the agent-path leaves are exactly: property valuation (`property_assessment.market_position.comparable_sales` / `estimated_market_value_range` / `asking_price_vs_market`, `fit_against_buyer.lifestyle_match_score`); lender fit + rate structure (`mortgage_finance.lender_synthesis.most_likely_approval_lenders`, `loan_structure.fixed_vs_variable`); negotiation reads (`buying_strategy.negotiation_style.recommended_style`, `bid_tactics.early_offer_vs_wait`, `price_envelope.reserve_estimate_range`); and document significance + go/no-go (`due_diligence.flags_by_document.*`, `go_no_go_recommendation.verdict`). Everything else — **eligibility, scheme stacking, all cash / serviceability math, dates, settlement, ownership projections** — is resolver.
+**Fill-path classification.** A leaf carrying `agent_reasoning_required: true` is filled by an agent turn (LLM); every other leaf resolves deterministically (copy, `derived_from`, formula, or rules engine). Which leaves clear the agent bar is governed by [agentic-boundary.md](../architecture/agentic-boundary.md). In this blueprint the agent-path leaves are exactly: property valuation (`property_assessment.market_position.comparable_sales` / `estimated_market_value_range` / `asking_price_vs_market`, `fit_against_buyer.lifestyle_match_score`); lender fit + rate structure (`mortgage_finance.lender_synthesis.most_likely_approval_lenders`, `loan_structure.fixed_vs_variable`); negotiation reads (`buying_strategy.negotiation_style.recommended_style`, `bid_tactics.early_offer_vs_wait`, `price_envelope.reserve_estimate_range`); and document significance + go/no-go (`due_diligence.flags_by_document.*`, `go_no_go_recommendation.verdict`). Everything else — **eligibility, scheme stacking, all cash / serviceability math, dates, settlement, ownership projections, and the disposition projection (growth-banded sale proceeds, selling costs, loan payout, CGT exemption, net proceeds, full-horizon roll-up)** — is resolver. Growth and CGT are deliberately resolver-computed and removed from the agent's reach (banded, KB-grounded — lifecycle-simulation-model §8.4).
 
 ---
 
@@ -1056,10 +1170,12 @@ due_diligence         → outcome: risk_assessment       (reads: property_fit, u
 settlement_prep       → outcome: settlement_checklist  (reads: scheme_stack, property_fit, bid_plan, mortgage_plan)
 ownership_planning    → outcome: ongoing_obligations   (reads: property_fit, scheme_stack, budget_envelope, mortgage_plan)
 preparation           → outcome: preparation_plan      (reads: scheme_stack, budget_envelope)
-purchase_journey      → outcome: journey_swimlane      (reads: scheme_stack, mortgage_plan, budget_envelope, ongoing_obligations)
+disposition           → outcome: disposition           (reads: profile, property_fit, mortgage_plan, budget_envelope, ongoing_obligations)   // dispose figure-owner; places acquire+hold into the full-horizon roll-up; runs after cash_position+ownership_planning, before purchase_journey
+purchase_journey      → outcome: journey_swimlane      (reads: scheme_stack, mortgage_plan, budget_envelope, ongoing_obligations, disposition)
+phase_playbook        → outcome: phase_playbook        (reads: budget_envelope, journey_swimlane)   // links cash_event.id via budget_ref; runs last
 ```
 
-No cycles. `due_diligence` is independent of `buying_strategy` (parallel — buyer can run due diligence before deciding to bid). `mortgage_finance` slots in between `eligibility` and `cash_position` because cash math needs the loan amount + LMI / FHG path decision from the mortgage plan. `purchase_journey` runs **last** so it can place figures from every figure-owner — its new read of `ongoing_obligations` (for the Own phase) is a forward edge (9 → 10), so the graph stays acyclic; it still computes nothing of its own. `preparation` reads only upstream base outcomes (`scheme_stack`, `budget_envelope`) and likewise places, never recomputes.
+No cycles. `due_diligence` is independent of `buying_strategy` (parallel — buyer can run due diligence before deciding to bid). `mortgage_finance` slots in between `eligibility` and `cash_position` because cash math needs the loan amount + LMI / FHG path decision from the mortgage plan. `disposition` runs **after** `cash_position` + `ownership_planning` (it places their acquire + hold figures into the full-horizon roll-up) and **before** `purchase_journey` (which places its `dispose_cash_events` on the swimlane's Dispose column) — both forward edges, so the graph stays acyclic; `disposition` owns only the dispose figures + the roll-up, never recomputing the placed acquire/hold figures. `purchase_journey` runs **last among the figure-owners** so it can place figures from every one of them — its reads of `ongoing_obligations` (Own phase) and `disposition` (Dispose phase) are forward edges, so the graph stays acyclic; it still computes nothing of its own. `preparation` reads only upstream base outcomes (`scheme_stack`, `budget_envelope`) and likewise places, never recomputes.
 
 ---
 

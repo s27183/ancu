@@ -472,7 +472,7 @@ The platform's UI has a constrained set of renderer components. Blueprints can o
 |---|---|---|
 | `summary-card` | Short prose + key facts | `{ headline, key_facts[], call_to_action? }` |
 | `swimlane-diagram` | Temporal flow across actors + who-pays/talks-to-whom | `{ phases[], actors[], cells[{ …, counterparty }], interactions[{ from_actor, to_actor, phase, flows }] }` |
-| `checklist` | Tickable items with status | `{ items[{ label, status, doc_ref? }] }` |
+| `checklist` | Tickable items with status | `{ items[{ label, status, doc_ref?, budget_ref?, component_ref? }] }` |
 | `data-table` | Tabular data | `{ headers[], rows[] }` |
 | `calculator` | Interactive financial spine — phased cash-flow + what-if form | `{ inputs[], cash_events[] (by phase), outputs[], verdict? }` |
 | `buying-strategy-card` | Bid plan with confidence | `{ max_bid, walk_away, comparables[], style }` |
@@ -494,6 +494,23 @@ The FHB Mode A blueprint uses 9 of these (summary-card, scheme-stack-card, calcu
 - **Base-scope preparation content** (document checklist / people-to-engage / money buffer) is a new **component** at `scope: base` (reclassified out of the per-property `due_diligence`), composing the existing `checklist` + `data-table` renderers.
 
 So the Mode-A renderer count stays at 9; the model lands as extended outcome shapes + one new `ui_tabs` kind + one new base-scope component.
+
+**The phase-sheet surface reshape ([`lifecycle-simulation-model.md`](lifecycle-simulation-model.md) §7) also extends shapes, not the enum.** Collapsing the seven flat tabs to three views (Overview / Flow / Budget) + Q&A, with a per-phase drill-down sheet, needs **zero new renderers** — the same unification tell (constraint #7):
+
+- **`phase_playbook` is a second base-scope component, composing existing renderers.** It owns the per-phase **action checklist** + **risks** (neither exists today: swimlane `cells` are per-`(phase, actor)` prose, `preparation` is a *global* checklist, `risk-flag-list` is wired only to per-property `due_diligence`). It composes `checklist` + `risk-flag-list` — both already in the Mode-A 9 — so the count stays at 9. Its outcome type is `phase_playbook` (rough shape: `{ phases[{ phase, actions[{ id, label, detail, order, budget_ref?, component_ref?, status }], risks[{ severity, item, action }] }] }`); it is kept **separate from `purchase_journey`** (the pure projection) so authored content does not overload a placement component (lifecycle §7.4). Fill path: resolver (KB content + upstream `cash_event` links; no agent leaf).
+- **The `checklist` renderer gains two optional item affordances** (above): `budget_ref` → a `cash_event.id` (the checklist↔budget coupling — the Budget view groups events by the same `phase`), and `component_ref` → a component id (tap opens that component's renderer as the item's backing detail, so the components dropped from the top level surface *through* a checklist item). Both nullable — honest-partial.
+- **`risk-flag-list` is reclassified to *also* base scope.** Previously per-property only (`due_diligence`); `phase_playbook` is its first base-scope consumer. Same `{ flags[{ severity, item, action }] }` shape; the risks are KB-grounded and resolver-placed, never LLM-generated (lifecycle §7.5).
+
+So the Mode-A renderer count *still* stays at 9; this reshape lands as one more base-scope component (`phase_playbook`), two optional `checklist` item fields, and `risk-flag-list` reclassified base-and-per-property — plus the `ui_tabs` re-key (three views), specified in the blueprint.
+
+**The full temporal flow ([`lifecycle-simulation-model.md`](lifecycle-simulation-model.md) §8) also extends shapes, not the enum.** Extending the lifecycle past `own` to a terminal **`dispose`** phase (so negative gearing and CGT have somewhere to land) needs **zero new renderers** — the same tell (constraint #7):
+
+- **The `phase` enum gains `dispose`** → `prepare | pre_approve | contract | settle | own | dispose`, and `own` becomes **horizon-aware** (the hold span). The `cash_event` shape is **unchanged**: `timing` (`one_off | recurring`) and `period` already carry the multi-year hold (`recurring`/`period: year`) and the one-off disposal — `phase` ⊥ `timing`, so "hold" is `own` *parameterized by horizon*, not a second phase (lifecycle §8.2). Adding an enum value touches no renderer (`swimlane-diagram.phases[]` and `calculator.cash_events[] (by phase)` already range over the enum).
+- **`disposition` is a third base-scope figure-owner** (joining `cash_position`, `eligibility`, `ownership_planning`) — the computer the placeholder `cgt_projection` lacked. Outcome type `disposition` (`{ horizon_years, sale_proceeds, selling_costs, loan_payout, cgt, net_proceeds, key_assumptions }`, lifecycle §8.5). It owns those figures and emits the dispose-phase `cash_events` (`source_component: disposition`); the spines **place**, never recompute ([`outcome-conformance.md`](outcome-conformance.md) gates the trace). It renders via the existing **`calculator`** (the net-proceeds-at-disposal waterfall) — already one of the Mode-A 9.
+- **The financial spine extends to a full-horizon net position** (acquire → hold over H → dispose) — the *same* `calculator` projecting the *same* `cash_events[]`, now carrying hold and dispose entries; the `swimlane-diagram` gains a `dispose` column reading that same list. Both place; neither recomputes (lifecycle §8.6).
+- **Horizon + growth carry no renderer.** `horizon` is a card-level what-if param (engine-contract §10.5); the growth assumption is KB-grounded, resolver-computed, **banded**, ASIC-safe (lifecycle §8.4). Both flow into the figures the `calculator` already places.
+
+So the Mode-A renderer count *still* stays at 9; the temporal flow lands as the `dispose` enum value, one new base-scope component (`disposition`, using `calculator`), extended `cash_events` entries, and the `swimlane-diagram` `dispose` column. Mode-C investor tax (negative gearing, the CGT discount, depreciation) is the same structure, authored design-first (lifecycle §8.7).
 
 #### Why this architecture is sharp
 

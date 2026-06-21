@@ -33,7 +33,7 @@ Compared to Mode A FHB, this blueprint **replaces** four FHB-specific components
 
 ## Component pipeline
 
-10 components. Two are new vs Mode A FHB (marked `★`); the rest are adapted for investor reasoning.
+12 components. Two are new vs Mode A FHB (marked `★`); `disposition` (12) is added by the full-temporal-flow reframe ([`../architecture/lifecycle-simulation-model.md` §8](../architecture/lifecycle-simulation-model.md)) as the dispose-phase figure-owner — **design-first / dormant** until Mode C ships, the same as the rest of this blueprint; the remainder are adapted for investor reasoning.
 
 ### Component scope (base plan vs property addendum)
 
@@ -50,6 +50,7 @@ Compared to Mode A FHB, this blueprint **replaces** four FHB-specific components
 | 9 due_diligence (investor focus) | `per-property` | When user uploads docs |
 | 10 settlement_prep (+ entity setup) | `per-property` | Activated when contract signed |
 | 11 ownership_planning_investor | `both` | Base estimate of portfolio fit + ongoing operations; refined per-property post-settlement |
+| 12 disposition | `base` | Dispose-phase figure-owner — projected sale proceeds, selling costs, loan payout, and **full CGT** (50%-discount-if-held-over-12-months, depreciation clawback) over the hold horizon `H`; the full-horizon net position. Resolver, no agent leaf. *Design-first* (§8.5). |
 
 Mode C's base plan is sharper than Mode A's because investor reasoning often happens *before* property identification — the user decides their thesis, entity, target yield, target suburb characteristics, then looks for properties matching. This makes the base plan the central decision artifact for investors.
 
@@ -92,7 +93,15 @@ Mode C's base plan is sharper than Mode A's because investor reasoning often hap
 [10] ownership_planning_investor (replaces FHB ownership — property mgmt, portfolio, tax)
         inputs: property_fit_investor, tax_optimised_structure, cash_flow_projection
         outcome: portfolio_position
+        │
+        ▼
+[11] disposition (NEW — dispose-phase figure-owner, full CGT, full-horizon net position)
+        inputs: strategy_thesis (hold_period_years = H, exit_strategy), property_fit_investor,
+                cash_flow_projection, tax_optimised_structure, budget_envelope_investor
+        outcome: disposition
 ```
+
+> The diagram numbers are sequential reading order, not component IDs (the IDs are the scope table's 1–12; `mortgage_finance` is omitted from the sketch above). `disposition` runs **last among the base figure-owners** — it places acquire figures (from `cash_position`), hold figures (from `yield_modelling`/`tax_structure` over `H`), and owns the dispose figures, so it reads every upstream figure-owner and is read by none (acyclic).
 
 **UI tab mapping** for Mode C:
 
@@ -102,7 +111,7 @@ Mode C's base plan is sharper than Mode A's because investor reasoning often hap
 | Investment strategy | `investment_strategy` (central) |
 | Yield & Tax | `yield_modelling` + `tax_structure` |
 | Property | `property_assessment` + `due_diligence` |
-| Cash calculator | `cash_position` (interactive form) |
+| Cash calculator | `cash_position` + `disposition` (full-horizon net position: acquire → hold over `H` → dispose; horizon slider = structural what-if) |
 | Buying | `buying_strategy` |
 | Temporal flow | `settlement_prep` |
 | Portfolio | `ownership_planning_investor` (single-property view + portfolio-aggregate view) |
@@ -115,7 +124,7 @@ Mode C's base plan is sharper than Mode A's because investor reasoning often hap
     { "tab_id": "overview",            "kind": "synthesis",  "components": ["investor_profile", "property_assessment", "investment_strategy"] },
     { "tab_id": "investment_strategy", "kind": "components", "components": ["investment_strategy"] },
     { "tab_id": "yield_tax",           "kind": "components", "components": ["yield_modelling", "tax_structure"] },
-    { "tab_id": "cash_calculator",     "kind": "components", "interactive": true, "components": ["cash_position"] },
+    { "tab_id": "cash_calculator",     "kind": "components", "interactive": true, "components": ["cash_position", "disposition"] },
     { "tab_id": "journey",             "kind": "components", "components": ["settlement_prep"] },
     { "tab_id": "property",            "kind": "components", "components": ["property_assessment", "due_diligence"] },
     { "tab_id": "buying",              "kind": "components", "components": ["buying_strategy"] },
@@ -530,6 +539,8 @@ The `mortgage_plan` outcome feeds `yield_modelling.loan_costs` (the loan cost ca
 }
 ```
 
+**Hold-phase `cash_events` (full-temporal-flow wiring, design-first — §8.5/§8.6).** `yield_modelling` owns the **recurring hold-phase** flows that the full-horizon financial spine places at phase `own` over the horizon `H`: rental income (`money_in`, `timing: recurring`, `period: year`), operating expenses and loan interest (`money_out`, recurring/year), each `source_component: yield_modelling`, gated by the §13 placement/provenance check. These are the holding-years entries the truncated (acquire-only) model had nowhere to put; `tax_structure` adds the negative-gearing tax effect on the same axis (below).
+
 ---
 
 ### 6. tax_structure ★ (NEW)
@@ -571,11 +582,15 @@ The `mortgage_plan` outcome feeds `yield_modelling.loan_costs` (the loan cost ca
     "total_depreciation_year_5": { "type": "money", "value": "<initial>" },
     "total_depreciation_year_10": { "type": "money", "value": "<initial>" }
   },
-  "cgt_projection": {
-    "estimated_capital_gain_at_exit": { "type": "money", "value": "<initial>" },
-    "50_percent_discount_eligible": { "type": "bool", "value": true, "note": "Applies if held >12 months" },
-    "taxable_capital_gain": { "type": "money", "value": "<initial>" },
-    "cgt_payable_estimate": { "type": "money", "value": "<initial>" }
+  "cgt_determinants": {
+    // RESOLVED (§8.5): the previously-homeless `cgt_projection` (a figure with no phase, no
+    // cash_event, no owner) is reframed here as the CGT *determinants*. The dispose-phase CGT
+    // FIGURE (projected gain, taxable gain, cgt payable) is computed and OWNED by `disposition`
+    // (component 12) at the `dispose` phase, where it lands as a cash_event — one-computer-per-figure.
+    // This block supplies only the inputs to that calc.
+    "50_percent_discount_eligible": { "type": "bool", "value": true, "note": "Resolver — true if held >12 months (kb.tax.cgt-50-percent-discount); read by disposition" },
+    "marginal_tax_rate_for_cgt": { "type": "percentage", "value": "<from_investor_profile>", "note": "rate at which the (discounted) gain is taxed; read by disposition" },
+    "cost_base_depreciation_clawback": { "type": "bool", "value": true, "note": "capital-works (Div 43) claimed reduces the cost base → larger gain at sale; the depreciation interplay (§8.5), applied by disposition" }
   },
   "annual_compliance": {
     "tax_return_complexity": { "type": "enum", "options": ["simple_personal", "joint", "trust_distribution", "company", "smsf"], "value": "<initial>" },
@@ -603,12 +618,16 @@ The `mortgage_plan` outcome feeds `yield_modelling.loan_costs` (the loan cost ca
     "after_tax_cash_flow_year_1": "money",
     "after_tax_cash_flow_per_week": "money",
     "total_depreciation_year_1": "money",
-    "cgt_projection_at_exit": "money",
+    "cgt_discount_eligible": "bool",
+    "cgt_marginal_rate": "percentage",
+    "cost_base_depreciation_clawback": "bool",
     "annual_compliance_cost": "money",
     "setup_costs": "money"
   }
 }
 ```
+
+**Hold-phase + dispose wiring (full-temporal-flow, design-first — §8.5).** `tax_structure` owns the **recurring hold-phase** negative-gearing tax effect — the annual tax refund (`money_in`, `timing: recurring`, `period: year`, `source_component: tax_structure`) placed at phase `own` over `H` — and supplies the **CGT determinants** (`cgt_determinants` block above: discount eligibility, marginal rate, depreciation clawback) to `disposition` (component 12), which owns the **dispose-phase CGT figure** and its cash_event. The previously-homeless `cgt_projection` is thus resolved: hold-phase tax effects stay here; the dispose-phase gain/payable lands at the `dispose` phase, owned by the one computer for that figure.
 
 ---
 
@@ -887,9 +906,67 @@ Same as [Mode A settlement_prep](fhb-domestic-au.md#8-settlement_prep) with thes
 
 ---
 
+### 12. disposition (NEW — the dispose-phase figure-owner)
+
+> **Design-first / dormant.** Added by the full-temporal-flow reframe ([`../architecture/lifecycle-simulation-model.md` §8.5](../architecture/lifecycle-simulation-model.md)). The *structure* (this component, the `dispose` phase, the full-horizon spine) is built across all modes now; the **Mode-C investor tax content** — negative gearing, the CGT 50% discount, depreciation clawback — is authored when Mode C enters scope, against the currently-dangling `kb.tax.*` anchors (§8.7, the worked "kind-3" instance of the kb-update-runbook Phase-0 classifier). Mode-A's `disposition` ([`fhb-domestic-au.md`](fhb-domestic-au.md) component 13) is the same shape on the *main-residence-exempt* path (`cgt: null`); this is the same shape on the **full-CGT** path.
+
+**Goal:** Project the position at sale over the hold horizon `H` and own the dispose-phase figures the old `cgt_projection` placeholder lacked a home for: sale proceeds (growth-projected), selling costs, loan payout, and **CGT** (taxable gain after the 50% discount and depreciation clawback, at the marginal rate). Roll the acquire and hold flows up into a **full-horizon net position** — the investor's core *"over buy → hold → sell, where do I stand?"* question.
+
+**Inputs:** `strategy_thesis` (`hold_period_years` = the horizon `H`, `exit_strategy`) + `property_fit_investor.outcome` (growth indicators, purchase price) + `cash_flow_projection` (yield_modelling — the hold-phase recurring flows to roll up) + `tax_optimised_structure` (tax_structure — the **CGT determinants**: `cgt_discount_eligible`, `cgt_marginal_rate`, `cost_base_depreciation_clawback`) + `budget_envelope_investor` (cash_position — acquisition cash to roll up; loan amount for the payout)
+
+**KB anchors:** `kb.property.capital-growth-bands` (the banded growth assumption — **labelled placeholder**, re-ground before surfacing), `kb.selling-costs.agent-legal` (selling-cost bands), `kb.tax.cgt-50-percent-discount` *(dangling — Mode-C, design-first)*, `kb.tax.depreciation-division-43-and-40` *(dangling — the cost-base clawback, design-first)*
+
+**Renderer:** `calculator` (the full-horizon net position; no new renderer — constraint #7, §8.8)
+
+**Fill path:** **resolver, no agent leaf.** Growth/selling-costs/CGT are KB-grounded resolver computations, never LLM-paraphrased — the figures are removed from the agent's reach ([verify-regulated-figures-by-postcondition], [no-judge-ground-the-producer]). Banded and PENDING when the growth assumption is unparameterized (honest-partial).
+
+**Parameters:**
+
+```jsonc
+{
+  "horizon": {
+    "hold_horizon_years": { "type": "integer", "value": "<from strategy_thesis.hold_period_years>", "note": "the §8.3 horizon H; a structural what-if (simulate/refine override on the plan-target overlay), not an agent leaf" }
+  },
+  "growth_assumption": {
+    "capital_growth_band_pct_pa": { "type": "percentage_range", "value": "<from kb.property.capital-growth-bands>", "note": "PLACEHOLDER band — re-ground vs ABS RPPI / CoreLogic / Valuer-General before any figure is surfaced; banded, honest-partial" }
+  },
+  "cgt": {
+    "50_percent_discount_applied": { "type": "bool", "value": "<from tax_structure.cgt_determinants>", "note": "true if held >12 months — read from tax_structure, not re-derived" },
+    "marginal_rate": { "type": "percentage", "value": "<from tax_structure.cgt_determinants>" },
+    "cost_base_depreciation_clawback_applied": { "type": "bool", "value": "<from tax_structure.cgt_determinants>" }
+  }
+}
+```
+
+**Outcome schema:** `disposition`
+
+```jsonc
+{
+  "type": "disposition",
+  "fields": {
+    "horizon_years": "integer",                       // the hold H this projection assumes
+    "sale_proceeds": "money_range",                    // purchase_price grown over H by the banded assumption; PENDING when unparameterized
+    "selling_costs": "money_range",                    // agent commission + legal/marketing at sale
+    "loan_payout": "money_range",                      // remaining principal discharged at settlement of sale
+    "taxable_gain": "money_range",                     // (proceeds − adjusted cost base) × (1 − discount); cost base reduced by Div 43 clawback
+    "cgt": "money_range",                              // taxable_gain × marginal_rate — the investor path computes it (NOT null/exempt, unlike Mode A's main residence)
+    "cgt_status": "enum [computed, to_verify]",        // computed from KB determinants; to_verify = surfaced for a registered tax agent (never asserted as advice)
+    "net_proceeds": "money_range",                     // sale_proceeds − selling_costs − loan_payout − cgt
+    "full_horizon_net_position": "money_range",        // acquire (from budget_envelope_investor) + hold net over H (from cash_flow_projection) + dispose net_proceeds
+    "dispose_cash_events": "array<{ phase: 'dispose', timing: 'one_off', direction, amount, counterparty, source_component: 'disposition' }>",
+    "key_assumptions": "array<localized_text>"         // the growth band, the held period, the discount basis, the clawback — each labelled as estimate/regulated
+  }
+}
+```
+
+- **One-computer-per-figure.** `disposition` owns these dispose figures + the full-horizon roll-up; it **places** acquire (from `cash_position`) and hold (from `yield_modelling`/`tax_structure` over `H`) figures, never recomputing them ([place-upstream-figures-dont-recompute]). It emits the dispose-phase `cash_events`, gated by §13 placement/provenance.
+- **ASIC.** CGT and growth are KB-grounded estimates surfaced as ranges with the basis stated, with `cgt_status: to_verify` directing the user to a registered tax agent — decision support, never tax advice (the §1018 disclaimer covers it).
+
+---
+
 ## KB anchor index (for this blueprint)
 
-40 slugs referenced. Italics mark Mode C-only anchors (not in Mode A FHB).
+42 slugs referenced. Italics mark Mode C-only anchors (not in Mode A FHB); the two growth/selling-cost anchors at component 12 are **shared with Mode A** (non-italic).
 
 | Slug | Component(s) | Owns |
 |---|---|---|
@@ -914,8 +991,8 @@ Same as [Mode A settlement_prep](fhb-domestic-au.md#8-settlement_prep) with thes
 | *`kb.investor.property-management-fees`* | 4, 10 | PM fee structures and benchmarks |
 | *`kb.tax.entity-comparison-personal-trust-company-smsf`* | 5 | Entity comparison for property investment |
 | *`kb.tax.negative-gearing-mechanics`* | 5 | Negative gearing tax mechanics |
-| *`kb.tax.depreciation-division-43-and-40`* | 5 | Capital works (Div 43) and plant & equipment (Div 40) depreciation |
-| *`kb.tax.cgt-50-percent-discount`* | 5 | CGT 50% discount eligibility |
+| *`kb.tax.depreciation-division-43-and-40`* | 5, 12 | Capital works (Div 43) and plant & equipment (Div 40) depreciation; the cost-base clawback at disposition |
+| *`kb.tax.cgt-50-percent-discount`* | 5, 12 | CGT 50% discount eligibility; the dispose-phase CGT figure at disposition |
 | *`kb.tax.quantity-surveyor-reports`* | 5, 6 | Quantity surveyor depreciation reports |
 | *`kb.tax.land-tax-by-state`* | 5 | Land tax thresholds and rates by state |
 | *`kb.tax.entity-setup-costs`* | 6 | Entity setup cost ranges |
@@ -946,6 +1023,8 @@ Same as [Mode A settlement_prep](fhb-domestic-au.md#8-settlement_prep) with thes
 | *`kb.investor.portfolio-review-cadence`* | 10 | Portfolio review cadence |
 | *`kb.investor.scale-up-using-equity`* | 10 | Equity release for next property |
 | *`kb.investor.land-tax-aggregation`* | 10 | Land tax aggregation rules across portfolio |
+| `kb.property.capital-growth-bands` | 12 | Banded capital-growth assumption for sale-proceeds projection (**labelled placeholder** — re-ground vs ABS RPPI / CoreLogic / Valuer-General; shared with Mode A) |
+| `kb.selling-costs.agent-legal` | 12 | Selling-cost bands — agent commission + legal + marketing at the dispose phase (shared with Mode A) |
 
 ---
 
@@ -954,7 +1033,7 @@ Same as [Mode A settlement_prep](fhb-domestic-au.md#8-settlement_prep) with thes
 | Renderer | Used by component(s) |
 |---|---|
 | `summary-card` | 1 investor_profile, 2 property_assessment, 3 investment_strategy |
-| `calculator` | 4 yield_modelling, 5 tax_structure, 6 cash_position |
+| `calculator` | 4 yield_modelling, 5 tax_structure, 6 cash_position, 12 disposition |
 | `data-table` | 5 tax_structure, 10 ownership_planning_investor |
 | `buying-strategy-card` | 7 buying_strategy |
 | `risk-flag-list` | 8 due_diligence |
@@ -976,7 +1055,7 @@ Same as Mode A + B with one Mode C-exclusive addition:
 | `<from_property_assessment>` | From `property_assessment.outcome` |
 | `<from_tax_structure>` | From `tax_structure.outcome` (Mode C exclusive) |
 
-**Fill-path classification.** Per [agentic-boundary.md](../architecture/agentic-boundary.md), `agent_reasoning_required: true` marks agent-path leaves; all others resolve deterministically. Mode C agent-path leaves: rent + property valuation (`property_assessment.rental_market.estimated_weekly_rent_range`, `market_position.*`), investment thesis (`investment_strategy.strategy_archetype`, `thesis_one_liner`, `gearing_type`), investor loan structure + lender fit (`mortgage_finance.uses_existing_ppor_equity`, IO/PI, `fixed_vs_variable`, `offset_account_strategy`, `investor_friendly_lender_shortlist`), entity structuring (`tax_structure.recommended_entity`), negotiation style, and lease interpretation (`due_diligence.investor_specific_flags.current_tenancy_unfavourable_terms`). Resolver: all yield/cashflow math, land tax, depreciation predicates, tax-rate lookups, vacancy assumptions, concession eligibility, yield-anchored max price.
+**Fill-path classification.** Per [agentic-boundary.md](../architecture/agentic-boundary.md), `agent_reasoning_required: true` marks agent-path leaves; all others resolve deterministically. Mode C agent-path leaves: rent + property valuation (`property_assessment.rental_market.estimated_weekly_rent_range`, `market_position.*`), investment thesis (`investment_strategy.strategy_archetype`, `thesis_one_liner`, `gearing_type`), investor loan structure + lender fit (`mortgage_finance.uses_existing_ppor_equity`, IO/PI, `fixed_vs_variable`, `offset_account_strategy`, `investor_friendly_lender_shortlist`), entity structuring (`tax_structure.recommended_entity`), negotiation style, and lease interpretation (`due_diligence.investor_specific_flags.current_tenancy_unfavourable_terms`). Resolver: all yield/cashflow math, land tax, depreciation predicates, tax-rate lookups, vacancy assumptions, concession eligibility, yield-anchored max price, and **all of `disposition`** (growth projection, selling costs, loan payout, taxable gain, CGT, the full-horizon roll-up — KB-grounded computations deliberately removed from the agent's reach, §8.5).
 
 ---
 
@@ -993,9 +1072,10 @@ buying_strategy          → outcome: bid_plan_investor          (reads: propert
 due_diligence            → outcome: risk_assessment_investor   (reads: property_fit_investor, uploaded_docs)
 settlement_prep          → outcome: settlement_checklist       (reads: property_fit_investor, bid_plan_investor, tax_optimised_structure)
 ownership_planning_investor → outcome: portfolio_position      (reads: property_fit_investor, tax_optimised_structure, cash_flow_projection)
+disposition              → outcome: disposition              (reads: strategy_thesis, property_fit_investor, cash_flow_projection, tax_optimised_structure, budget_envelope_investor)
 ```
 
-No cycles. `tax_structure` is on the critical path because it informs `cash_position` (entity setup costs) and `ownership_planning_investor` (annual compliance).
+No cycles. `tax_structure` is on the critical path because it informs `cash_position` (entity setup costs) and `ownership_planning_investor` (annual compliance). `disposition` is a **pure sink** — it reads the upstream figure-owners (`strategy_thesis` for the horizon `H`, the yield/tax/cash outcomes for the acquire+hold flows it places and the CGT determinants it consumes) and is read by no one, so it adds a leaf, not a cycle.
 
 ---
 
