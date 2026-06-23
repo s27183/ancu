@@ -1,0 +1,281 @@
+#!/usr/bin/env escript
+%%! -sname fh_disposition_conformance
+%%
+%% Conformance suite for fh_engine_disposition (the base-turn `disposition` fill — the
+%% TERMINAL financial component, lifecycle-simulation-model §8.5/§8.6). Loads the SAME
+%% materialized artifact the engine loads (priv/kb/artifact.json via fh_engine_kb) and
+%% asserts what the commit seam relies on:
+%%   1. FIGURES — sale_proceeds / selling_costs / loan_payout / net_proceeds /
+%%      full_horizon_net_position computed EXACTLY (growth-banded sale, commission-banded
+%%      selling, P&I-amortised loan payout, interval-arithmetic net + full-horizon roll-up).
+%%   2. PLACE-NEVER-RECOMPUTE — the full-horizon roll-up PLACES budget_envelope's acquire
+%%      figure + ownership's hold band × H; net_proceeds is the exported interval arithmetic
+%%      of the owned dispose figures ([[place-upstream-figures-dont-recompute]]).
+%%   3. CGT (Mode-A main residence) — `cgt: null` always; `cgt_status` exempt for the clean
+%%      owner-occupier resident case, to_verify once a trap applies; to_verify ⟹ net PENDING
+%%      (Mode A NEVER estimates a taxable gain — [[verify-regulated-figures-by-postcondition]]).
+%%   4. HONEST-PARTIAL — H unset ⟹ every projected figure null + the set-horizon invitation;
+%%      H set but loan unknown ⟹ loan/net/full null, sale/selling banded; never a fabricated
+%%      point ([[base-turn-honest-partial-output]]).
+%%   5. dispose_cash_events — mirror the cash_event shape (phase=dispose, timing=one_off,
+%%      source_component=disposition), honest-partial drop on null amount (purchase_journey
+%%      PLACES these on the swimlane's Dispose column, TW3).
+%%   6. GROWTH PLACEHOLDER surfaced + bilingual key_assumptions (the §8.4 ASIC discipline).
+%%   7. LAYER-1 CONFORMANCE — every state passes fh_engine_outcome:validate/2 against the
+%%      compiled `disposition` schema (the fail-closed commit-seam check is strict now).
+%%
+%% Run from engine/erlang with the build libs on the path (no Postgres needed):
+%%   ERL_LIBS=_build/default/lib escript test/disposition_conformance.escript
+
+-mode(compile).
+
+main(_) ->
+    ok = fh_engine_kb:load(),
+    io:format("disposition conformance — fh_engine_disposition (terminal dispose-phase figure-owner)~n~n"),
+    R = lists:flatten([figure_cases(), arithmetic_cases(), cgt_cases(),
+                       honest_partial_cases(), event_cases(), assumption_cases(),
+                       rate_source_cases(), layer1_cases()]),
+    Fails = [X || X <- R, X =:= fail],
+    io:format("~n================================================================~n"),
+    case Fails of
+        [] ->
+            io:format("PASS — all ~p disposition anchors hold~n", [length(R)]),
+            halt(0);
+        _ ->
+            io:format("FAIL — ~p anchor(s) mismatched~n", [length(Fails)]),
+            halt(1)
+    end.
+
+%% --- fixtures ----------------------------------------------------------------
+%% The canonical full upstream: H=10, target ceiling 800000, loan known (560000 @ 6.0%),
+%% acquire band [200000,205000], hold band [2200,3600]/yr, clean owner-occupier resident.
+
+profile(Occupancy) ->
+    #{<<"hold_horizon_years">>     => 10,
+      <<"target_price_range">>     => [600000, 800000],
+      <<"intended_occupancy_use">> => Occupancy,
+      <<"tax_residency">>          => <<"resident">>}.
+
+budget()   -> #{<<"total_cash_required">> => [200000, 205000]}.
+%% the REAL mortgage_plan shape: loan_structure_recommendation.rate holds the agent's
+%% rate-STRUCTURE enum ("variable"/"fixed_1yr"/…), NOT a numeric rate. loan_payout amortises
+%% at the KB representative product rate (6.0%), so it must NOT read this field as a number
+%% (seam B); rate_source_cases/0 proves the independence directly.
+mortgage() -> #{<<"expected_borrowing_capacity">> => 560000,
+                <<"loan_structure_recommendation">> =>
+                    #{<<"type">> => <<"principal_and_interest">>,
+                      <<"rate">> => <<"variable">>, <<"offset">> => null}}.
+ownership()-> #{<<"recurring_costs_estimate">> =>
+                   #{<<"statutory_band">> => #{<<"low">> => 2200, <<"high">> => 3600}}}.
+
+full_upstream() ->
+    #{<<"profile">> => profile(<<"sole_occupier">>), <<"budget_envelope">> => budget(),
+      <<"mortgage_plan">> => mortgage(), <<"ongoing_obligations">> => ownership()}.
+
+fill(Upstream) ->
+    {Outcome, Renderer, _Kb} = fh_engine_disposition:fill(#{}, Upstream),
+    {Outcome, Renderer}.
+
+g(Outcome, K) -> maps:get(K, Outcome).
+
+%% --- 1. figures (exact) -----------------------------------------------------
+
+figure_cases() ->
+    {Outcome, Renderer} = fill(full_upstream()),
+    [check("renderer = calculator", Renderer, <<"calculator">>),
+     check("horizon_years = 10", g(Outcome, <<"horizon_years">>), 10),
+     check("sale_proceeds = ceiling 800000 × growth band over H=10", g(Outcome, <<"sale_proceeds">>),
+           [975196, 1303116]),
+     check("selling_costs = commission band × sale + legal + marketing", g(Outcome, <<"selling_costs">>),
+           [16428, 56109]),
+     check("loan_payout = P&I remaining balance at year 10 (560000 @ 6.0%)", g(Outcome, <<"loan_payout">>),
+           [468640, 468640]),
+     check("net_proceeds = sale − selling − loan − cgt (interval arithmetic)", g(Outcome, <<"net_proceeds">>),
+           [450447, 818048]),
+     check("full_horizon_net_position = net − acquire − hold×H (placed)",
+           g(Outcome, <<"full_horizon_net_position">>), [209447, 596048])].
+
+%% --- 2. place-never-recompute: net/full are the exported interval arithmetic ---
+
+arithmetic_cases() ->
+    {Outcome, _} = fill(full_upstream()),
+    Sale  = g(Outcome, <<"sale_proceeds">>),
+    Sell  = g(Outcome, <<"selling_costs">>),
+    Loan  = g(Outcome, <<"loan_payout">>),
+    %% Mode-A exempt ⟹ cgt contributes [0,0]; the exported net_proceeds/4 takes that band.
+    NetFromExport  = fh_engine_disposition:net_proceeds(Sale, Sell, Loan, [0, 0]),
+    FullFromExport = fh_engine_disposition:full_horizon(NetFromExport, budget(), ownership(), 10),
+    [check("net_proceeds matches the exported interval arithmetic (no second computer)",
+           g(Outcome, <<"net_proceeds">>), NetFromExport),
+     check("full_horizon matches the exported roll-up (places acquire + hold×H)",
+           g(Outcome, <<"full_horizon_net_position">>), FullFromExport),
+     %% interval discipline: net_lo subtracts the HIGH cost ends, net_hi the LOW ends
+     check("net_lo = sale_lo − selling_hi − loan_hi − cgt_hi",
+           hd(g(Outcome, <<"net_proceeds">>)), 975196 - 56109 - 468640 - 0),
+     check("net_hi = sale_hi − selling_lo − loan_lo − cgt_lo",
+           lists:last(g(Outcome, <<"net_proceeds">>)), 1303116 - 16428 - 468640 - 0)].
+
+%% --- 3. CGT (Mode-A main residence) -----------------------------------------
+
+cgt_cases() ->
+    {Clean, _}  = fill(full_upstream()),
+    %% a trap: the dwelling is partly rented ⟹ to_verify (Mode A never estimates a gain).
+    Rented = (full_upstream())#{<<"profile">> => profile(<<"partial_rental">>)},
+    {Trap, _}  = fill(Rented),
+    [check("clean owner-occupier: cgt = null", g(Clean, <<"cgt">>), null),
+     check("clean owner-occupier: cgt_status = exempt", g(Clean, <<"cgt_status">>), <<"exempt">>),
+     check("rented trap: cgt = null (NEVER an estimated gain)", g(Trap, <<"cgt">>), null),
+     check("rented trap: cgt_status = to_verify", g(Trap, <<"cgt_status">>), <<"to_verify">>),
+     %% to_verify ⟹ cgt contribution unknown ⟹ net + full stay PENDING (not a $0-tax assertion)
+     check("rented trap: net_proceeds PENDING (null) — cgt unknown, never assumed $0",
+           g(Trap, <<"net_proceeds">>), null),
+     check("rented trap: full_horizon PENDING (null)",
+           g(Trap, <<"full_horizon_net_position">>), null),
+     %% the exported cgt/1 verdict surface
+     check("cgt/1 sole_occupier+resident → {null, exempt}",
+           fh_engine_disposition:cgt(profile(<<"sole_occupier">>)), {null, <<"exempt">>}),
+     check("cgt/1 partial_rental → {null, to_verify}",
+           fh_engine_disposition:cgt(profile(<<"partial_rental">>)), {null, <<"to_verify">>})].
+
+%% --- 4. honest-partial ------------------------------------------------------
+
+honest_partial_cases() ->
+    %% (a) no horizon ⟹ no disposal projection at all.
+    NoH = (full_upstream())#{<<"profile">> =>
+               (profile(<<"sole_occupier">>))#{<<"hold_horizon_years">> => null}},
+    {A, _} = fill(NoH),
+    %% (b) horizon set, loan unknown (empty mortgage_plan — the reserve_buffer precedent).
+    NoLoan = (full_upstream())#{<<"mortgage_plan">> => #{}},
+    {B, _} = fill(NoLoan),
+    [check("H=null: sale PENDING", g(A, <<"sale_proceeds">>), null),
+     check("H=null: selling PENDING", g(A, <<"selling_costs">>), null),
+     check("H=null: loan PENDING", g(A, <<"loan_payout">>), null),
+     check("H=null: net PENDING", g(A, <<"net_proceeds">>), null),
+     check("H=null: full PENDING", g(A, <<"full_horizon_net_position">>), null),
+     check("H=null: zero dispose_cash_events", length(g(A, <<"dispose_cash_events">>)), 0),
+     check("H=null: only the set-horizon invitation assumption",
+           length(g(A, <<"key_assumptions">>)), 1),
+     %% loan-pending: sale/selling banded, loan/net/full PENDING — no fabricated point.
+     check("H set, loan unknown: sale banded", g(B, <<"sale_proceeds">>), [975196, 1303116]),
+     check("H set, loan unknown: selling banded", g(B, <<"selling_costs">>), [16428, 56109]),
+     check("H set, loan unknown: loan PENDING", g(B, <<"loan_payout">>), null),
+     check("H set, loan unknown: net PENDING", g(B, <<"net_proceeds">>), null),
+     check("H set, loan unknown: full PENDING", g(B, <<"full_horizon_net_position">>), null)].
+
+%% --- 5. dispose_cash_events shape + honest-partial drop ---------------------
+
+event_cases() ->
+    {Full, _}   = fill(full_upstream()),
+    Events      = g(Full, <<"dispose_cash_events">>),
+    Ids         = [maps:get(<<"id">>, E) || E <- Events],
+    Sale        = ev_by_id(Events, <<"dispose_sale_proceeds">>),
+    Loan        = ev_by_id(Events, <<"dispose_loan_payout">>),
+    %% loan-pending ⟹ the loan event is dropped (honest-partial), sale+selling remain.
+    {NoLoanF, _} = fill((full_upstream())#{<<"mortgage_plan">> => #{}}),
+    NoLoanIds    = [maps:get(<<"id">>, E) || E <- g(NoLoanF, <<"dispose_cash_events">>)],
+    [check("full: 3 dispose events (sale, selling, loan; cgt exempt ⟹ dropped)", length(Events), 3),
+     check("full: event ids", Ids,
+           [<<"dispose_sale_proceeds">>, <<"dispose_selling_costs">>, <<"dispose_loan_payout">>]),
+     check("sale event: phase=dispose, direction=in, counterparty=other, src=disposition",
+           {maps:get(<<"phase">>, Sale), maps:get(<<"direction">>, Sale),
+            maps:get(<<"counterparty">>, Sale), maps:get(<<"source_component">>, Sale)},
+           {<<"dispose">>, <<"in">>, <<"other">>, <<"disposition">>}),
+     check("sale event: timing=one_off, is_estimate=true, amount carried",
+           {maps:get(<<"timing">>, Sale), maps:get(<<"is_estimate">>, Sale),
+            maps:get(<<"amount">>, Sale)},
+           {<<"one_off">>, true, [975196, 1303116]}),
+     check("loan event: out / lender", {maps:get(<<"direction">>, Loan),
+            maps:get(<<"counterparty">>, Loan)}, {<<"out">>, <<"lender">>}),
+     check("loan-pending: loan event dropped (honest-partial), sale+selling remain", NoLoanIds,
+           [<<"dispose_sale_proceeds">>, <<"dispose_selling_costs">>])].
+
+%% --- 6. growth placeholder surfaced + bilingual assumptions ------------------
+
+assumption_cases() ->
+    {Full, _} = fill(full_upstream()),
+    Assumptions = g(Full, <<"key_assumptions">>),
+    %% 5 lines when H set + loan known: horizon, growth placeholder, cgt basis, selling
+    %% costs, the representative loan-rate basis (seam B — the amortisation rate is a
+    %% labelled KB convention, surfaced).
+    AllBilingual = lists:all(fun bilingual/1, Assumptions),
+    AnyDiacritic = lists:any(
+        fun(L) ->
+            Vi = maps:get(<<"vi">>, L, <<>>),
+            lists:any(fun(C) -> C > 127 end, unicode:characters_to_list(Vi))
+        end, Assumptions),
+    %% the growth placeholder line carries the band ends (2 / 5) substituted into prose.
+    GrowthMentionsBand = lists:any(
+        fun(L) ->
+            En = maps:get(<<"en">>, L, <<>>),
+            binary:match(En, <<"2">>) =/= nomatch andalso binary:match(En, <<"5">>) =/= nomatch
+        end, Assumptions),
+    LoanRateStated = lists:any(
+        fun(L) ->
+            En = maps:get(<<"en">>, L, <<>>),
+            binary:match(En, <<"representative">>) =/= nomatch andalso
+            binary:match(En, <<"amortises">>) =/= nomatch
+        end, Assumptions),
+    [check("H set + loan known: 5 key_assumptions (horizon, growth, cgt, selling, loan-rate)",
+           length(Assumptions), 5),
+     check("every key_assumption is bilingual {vi,en}, both non-empty + distinct", AllBilingual, true),
+     check("a key_assumption carries real Vietnamese (non-ASCII)", AnyDiacritic, true),
+     check("growth assumption surfaces the placeholder band (2 / 5 %)", GrowthMentionsBand, true),
+     check("loan-rate assumption stated (representative rate, a labelled convention)", LoanRateStated, true)].
+
+%% --- 8. seam (B): loan_payout is KB-rate-driven, NOT the agent rate field ----
+%% loan_structure_recommendation.rate holds the agent's rate-STRUCTURE enum, never a numeric
+%% rate. loan_payout amortises at the KB representative rate, so it must be INDEPENDENT of
+%% that field — proven by feeding "variable", an absurd numeric, and an absent structure;
+%% all yield the SAME payout (§98: the regulated figure has no LLM in its lineage).
+
+rate_source_cases() ->
+    Base = full_upstream(),
+    M = fun(Mortgage) -> Base#{<<"mortgage_plan">> => Mortgage} end,
+    {Variable, _} = fill(M(#{<<"expected_borrowing_capacity">> => 560000,
+                             <<"loan_structure_recommendation">> => #{<<"rate">> => <<"variable">>}})),
+    {Absurd, _}   = fill(M(#{<<"expected_borrowing_capacity">> => 560000,
+                             <<"loan_structure_recommendation">> => #{<<"rate">> => 999.0}})),
+    {NoLS, _}     = fill(M(#{<<"expected_borrowing_capacity">> => 560000})),
+    Want = [468640, 468640],
+    [check("loan_payout with rate=\"variable\" (enum string) = KB-rate amortised",
+           g(Variable, <<"loan_payout">>), Want),
+     check("loan_payout IGNORES an absurd numeric in the agent field (999%) — KB rate governs (§98)",
+           g(Absurd, <<"loan_payout">>), Want),
+     check("loan_payout with NO loan_structure_recommendation = same (capacity + KB rate only)",
+           g(NoLS, <<"loan_payout">>), Want)].
+
+%% --- 7. Layer-1 conformance across every state (the fail-closed seam) --------
+
+layer1_cases() ->
+    States = [{<<"full">>,        full_upstream()},
+              {<<"rented">>,      (full_upstream())#{<<"profile">> => profile(<<"partial_rental">>)}},
+              {<<"no_horizon">>,  (full_upstream())#{<<"profile">> =>
+                                      (profile(<<"sole_occupier">>))#{<<"hold_horizon_years">> => null}}},
+              {<<"loan_pending">>,(full_upstream())#{<<"mortgage_plan">> => #{}}},
+              {<<"empty">>,       #{}}],
+    [begin
+         {Outcome, _} = fill(Up),
+         V = try fh_engine_outcome:validate(<<"disposition">>, Outcome), ok
+             catch _:Why -> {error, Why} end,
+         check(<<"Layer-1 conforms: ", Name/binary>>, V, ok)
+     end || {Name, Up} <- States].
+
+%% --- helpers ----------------------------------------------------------------
+
+ev_by_id(Events, Id) ->
+    case [E || E <- Events, maps:get(<<"id">>, E) =:= Id] of
+        [E | _] -> E;
+        []      -> #{}
+    end.
+
+bilingual(L) when is_map(L) ->
+    Vi = maps:get(<<"vi">>, L, <<>>),
+    En = maps:get(<<"en">>, L, <<>>),
+    byte_size(Vi) > 0 andalso byte_size(En) > 0 andalso Vi =/= En;
+bilingual(_) -> false.
+
+check(Label, Got, Want) ->
+    case Got =:= Want of
+        true  -> io:format("  PASS   ~ts~n", [Label]), pass;
+        false -> io:format("  FAIL   ~ts = ~p, expected ~p~n", [Label, Got, Want]), fail
+    end.
