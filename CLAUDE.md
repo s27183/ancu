@@ -20,7 +20,8 @@ Critical reference docs by purpose:
 
 | If you need | Read |
 |---|---|
-| Strategic positioning, REA economics, wedge sequence | [`docs/03-strategy.md`](docs/03-strategy.md) |
+| Strategic positioning, REA economics, wedge sequence (GTM-time order) | [`docs/03-strategy.md`](docs/03-strategy.md) |
+| **What to build next** — wedge dependency graph + foundational build order (Mode C before B) | [`docs/architecture/wedge-build-sequence.md`](docs/architecture/wedge-build-sequence.md) |
 | **The whole picture** — every structure (blueprint, KB, foundations, agentic flow, plan card, engine/shell) and how they relate across planes, in diagrams (**read first**) | [`docs/architecture/structure-map.md`](docs/architecture/structure-map.md) |
 | Engine/shell split, three-layer architecture, blueprint model, property pipeline | [`docs/architecture/architecture.md`](docs/architecture/architecture.md) |
 | Engine↔shell boundary: primitives, events, metering, compliance gate | [`docs/architecture/engine-contract.md`](docs/architecture/engine-contract.md) |

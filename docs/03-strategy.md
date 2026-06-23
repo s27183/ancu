@@ -306,6 +306,8 @@ Wedge 4: Multi-CALD                              ██████████�
 
 Each wedge layers on cultural + linguistic + product trust earned by the previous. By month 30 the Vietnamese diaspora platform is mature; multi-CALD extension begins.
 
+> **This is the GTM-time order** (willingness-to-pay, cross-sell, trust earned). For the **build-dependency order** — what each wedge depends on, which external prerequisites gate it, and the chosen build sequence (which currently puts Mode C before Mode B on foundationality grounds) — see [`architecture/wedge-build-sequence.md`](architecture/wedge-build-sequence.md). The two orderings diverge deliberately.
+
 ### 10.2 Wedge 1 — Vietnamese-Australian FHB lifecycle planning (months 0–14)
 
 **Target segment:** Vietnamese-Australian citizens and PRs buying their first home in Australia.
