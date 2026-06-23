@@ -109,14 +109,16 @@ Status legend: `[ ]` not started · `[~]` drafting · `[v]` facts verified vs pr
 
 | St | Slug | Consuming component → fields | Figure handling |
 |----|------|------------------------------|-----------------|
-| [ ] | kb.lender.investment-loan-policies | mortgage_finance → policy constraints | reference |
-| [ ] | kb.lender.investor-friendly-shortlist | mortgage_finance → lender shortlist | shortlist + reasoning, user picks (no recommendation) |
-| [ ] | kb.lender.serviceability-investment-loans | mortgage_finance → approx_borrowing_capacity | resolver-computed, banded (§98) |
-| [ ] | kb.loan.interest-only-vs-pi-investor | mortgage_finance, tax_structure → IO vs P&I | decision-support |
-| [ ] | kb.loan.offset-vs-redraw-investor | mortgage_finance → offset/redraw | reference |
-| [ ] | kb.loan.refinance-strategies-portfolio-growth | ownership_planning_investor → scale-up via equity | reference |
-| [ ] | kb.loan.fixed-rate-roll-off-planning | mortgage_finance → roll-off planning | reference |
-| [ ] | kb.investor.deposit-requirements-investment-loans | cash_position → deposit_ready_for_purchase | banded ranges |
+| [v] | kb.lender.investment-loan-policies | mortgage_finance → policy constraints | reference |
+| [v] | kb.lender.investor-friendly-shortlist | mortgage_finance → lender shortlist | shortlist + reasoning, user picks (no recommendation) |
+| [v] | kb.lender.serviceability-investment-loans | mortgage_finance → approx_borrowing_capacity | resolver-computed, banded (§98) |
+| [v] | kb.loan.interest-only-vs-pi-investor | mortgage_finance, tax_structure → IO vs P&I | decision-support |
+| [v] | kb.loan.offset-vs-redraw-investor | mortgage_finance → offset/redraw | reference |
+| [v] | kb.loan.refinance-strategies-portfolio-growth | ownership_planning_investor → scale-up via equity | reference |
+| [v] | kb.loan.fixed-rate-roll-off-planning | mortgage_finance → roll-off planning | reference |
+| [v] | kb.investor.deposit-requirements-investment-loans | cash_position → deposit_ready_for_purchase | banded ranges |
+
+**Cluster F COMPLETE (8/8, 2026-06-23).** All verified vs APRA (APG 223, macroprudential settings) / ATO / ASIC Moneysmart primaries; ACL line built in (decision-support only, no named lender recommendation — `investor-friendly-shortlist` owns *criteria*, not a lender list; the four ACL policy flags mirror the tax cluster's ASIC flags). The `kb.lender.serviceability-investment-loans` keeper was authored (not the `kb.investor.*` duplicate — P2 repoints the blueprint's investor_profile anchor to it). **Three load-bearing regulated facts captured:** (a) **IO assessed as P&I over the residual term** (APG 223) → IO yields a *lower* max loan; (b) **APRA DTI cap from Feb 2026** (DTI ≥6 limited to 20% of new lending, investor portfolio separately) → the binding scale-up ceiling; (c) **ATO TR 2000/2 "use" test** for offset-vs-redraw → offset preserves deductibility, private redraw permanently contaminates the loan. The 2026-27 Budget NG reform is cross-ref'd from `interest-only-vs-pi-investor` (IO tax rationale narrows for established post-Budget purchases). **Two dangling cross-refs (expected — later clusters):** `kb.buyer-costs.investor-additional-costs` (Cluster Y) and `kb.investor.scale-up-using-equity` (Cluster S); GATE 6 reference-integrity only fires at the P3 all-or-nothing flip, so these resolve when those clusters land. No new spec-seam beyond the already-tracked serviceability slug duplication (P2).
 
 ### Cluster Y — Yield / market data — source: rental market data + methodology (several forward-looking → labelled placeholders)
 
