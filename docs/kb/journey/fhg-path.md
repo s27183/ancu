@@ -8,9 +8,12 @@ last_verified: 2026-06-18
 
 The whole-of-journey template for a Mode-A first-home purchase — the **swimlane** the
 `purchase_journey` resolver (`fh_engine_journey`) renders. It carries the journey's
-*structure as copy*: the five phase labels (Prepare → Pre-approve → Contract → Settle →
-Own), the four actor-row labels (You / Government / Lender / Services), one bilingual line
-per meaningful (phase, actor) cell, and the journey's assumptions.
+*structure as copy*: the six phase labels (Prepare → Pre-approve → Contract → Settle →
+Own → Sell), the four actor-row labels (You / Government / Lender / Services), one bilingual
+line per meaningful (phase, actor) cell, and the journey's assumptions. The terminal **Sell**
+(`dispose`) phase is the lifecycle's full temporal arc (lifecycle-simulation-model §8) — its
+column renders only when a hold horizon `H` is set; its money flows (sale proceeds, selling
+costs, loan payout) are placed from the `disposition` outcome, never recomputed here.
 
 **It stores no figures.** The money flows on the timeline (deposit, stamp duty, total cash
 to settle, scheme benefit) are placed by the resolver from the buyer's already-computed
@@ -40,6 +43,7 @@ the figures are structured `amount` fields, not interpolated into prose).
     "phase_contract":    { "vi": "Ký hợp đồng",     "en": "Contract" },
     "phase_settle":      { "vi": "Bàn giao",        "en": "Settle" },
     "phase_own":         { "vi": "Sở hữu",          "en": "Own" },
+    "phase_dispose":     { "vi": "Bán nhà",         "en": "Sell" },
 
     "actor_you":        { "vi": "Bạn",        "en": "You" },
     "actor_government": { "vi": "Nhà nước",   "en": "Government" },
@@ -126,6 +130,23 @@ the figures are structured `amount` fields, not interpolated into prose).
     "cell_own_recurring": {
       "vi": "Chi phí định kỳ hằng năm: thuế suất hội đồng và nước.",
       "en": "Ongoing yearly outgoings: council rates and water."
+    },
+
+    "cell_dispose_you": {
+      "vi": "Khi bán, phần vốn (equity) bạn đã tích lũy có thể trở thành tiền cọc cho căn nhà tiếp theo.",
+      "en": "When you sell, the equity you've built can become the deposit for your next home."
+    },
+    "cell_dispose_government": {
+      "vi": "Nhà ở chính của bạn thường được miễn thuế lãi vốn (CGT) khi bán.",
+      "en": "Your home is generally exempt from capital gains tax when you sell it as your main residence."
+    },
+    "cell_dispose_lender": {
+      "vi": "Khoản vay còn lại được tất toán từ tiền bán nhà khi hoàn tất giao dịch.",
+      "en": "Your remaining loan is discharged from the sale proceeds at settlement."
+    },
+    "cell_dispose_other": {
+      "vi": "Đại lý bán nhà tiếp thị căn nhà; chuyên viên chuyển nhượng lo thủ tục sang tên.",
+      "en": "A selling agent markets the property; your conveyancer handles the transfer."
     },
 
     "assumption_indicative": {

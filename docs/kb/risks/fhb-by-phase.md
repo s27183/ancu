@@ -40,6 +40,7 @@ as a recommendation.
 - **contract** — *auction has no escape* (no cooling-off, no subject-to-finance/inspection): `kb.cooling-off.by-state`, `kb.auction.rules-by-state`. *finance falls through* (no subject-to-finance ⇒ deposit at risk): `kb.special-conditions.standard-set`. *short cooling-off* (3–5 business days, penalty-bearing): `kb.cooling-off.by-state`. *undisclosed defects* (no builder warranty; structural/termite): `kb.building-pest.interpretation`. *contract/disclosure gaps* (easements, overlays, OC, notices): `kb.s32.review-points`, `kb.contract-of-sale.review-points-by-state`. *selling-agent pressure*: `kb.agent-tactics.detection`.
 - **settle** — *insurance gap* (QLD risk passes day after contract): `kb.insurance.timing-of-risk-pass`. *settlement shortfall* (funds not cleared ⇒ delay/penalty interest): `kb.settlement.process-by-state`, `kb.pexa.settlement`. *changed condition at handover*: `kb.special-conditions.standard-set`.
 - **own** — *PPOR status* (land-tax exemption / owner-occupier basis depend on it): `kb.land-tax.ppor-exemption`. *ongoing costs under-budgeted*: `kb.ongoing-costs.rates-water-strata`, `kb.maintenance.budget-by-property-type`.
+- **dispose** — *selling costs erode equity* (agent commission + legal + marketing reduce the net): `kb.selling-costs.agent-legal`. *CGT exemption trap* (lost if rented out / non-resident for tax at disposal / land > 2 ha): `kb.tax.cgt-main-residence-exemption`. *market timing* (proceeds depend on capital growth, not guaranteed — a conservative band, not a forecast): `kb.property.capital-growth-bands`.
 
 ## Rules
 
@@ -100,6 +101,14 @@ and its `risks`.
         "risks": [
           { "id": "ppor_status",       "severity": "medium" },
           { "id": "ongoing_underbudget","severity": "medium" }
+        ]
+      },
+      {
+        "phase": "dispose",
+        "risks": [
+          { "id": "selling_costs_erode", "severity": "medium" },
+          { "id": "cgt_trap",            "severity": "medium" },
+          { "id": "market_timing",       "severity": "low" }
         ]
       }
     ]
@@ -228,6 +237,31 @@ and its `risks`.
     "risk_own_ongoing_underbudget_action": {
       "vi": "Dự trù các khoản chi định kỳ và giữ một khoản dự phòng cho chi phí phát sinh.",
       "en": "Budget for the recurring outgoings and keep a buffer for unexpected costs."
+    },
+
+    "risk_dispose_selling_costs_erode_item": {
+      "vi": "Chi phí bán nhà — hoa hồng đại lý (~1,5%–3,5%), phí pháp lý và tiếp thị — làm giảm phần vốn bạn thực nhận, dễ bị bỏ sót khi ước tính tiền thu về.",
+      "en": "Selling costs — agent commission (~1.5%–3.5%), legal and marketing — reduce the equity you actually receive, and are easy to overlook when estimating proceeds."
+    },
+    "risk_dispose_selling_costs_erode_action": {
+      "vi": "Tính chi phí bán vào kỳ vọng vốn ròng và thương lượng mức hoa hồng; kế hoạch chiếu các chi phí này như một dải, không phải con số cố định.",
+      "en": "Factor selling costs into your net-equity expectation and negotiate the commission; the plan shows these as a band, not a fixed figure."
+    },
+    "risk_dispose_cgt_trap_item": {
+      "vi": "Quyền miễn thuế lãi vốn (CGT) cho nhà ở chính có thể mất nếu bạn đã cho thuê nhà, trở thành người không cư trú về thuế khi bán, hoặc đất rộng hơn 2 ha.",
+      "en": "The main-residence CGT exemption can be lost if you've rented the home out, become a non-resident for tax at the time of sale, or the land is over 2 hectares."
+    },
+    "risk_dispose_cgt_trap_action": {
+      "vi": "Nếu bất kỳ trường hợp nào áp dụng, hãy xác nhận với chuyên viên thuế đã đăng ký hoặc ATO trước khi bán — kế hoạch nêu trạng thái “cần kiểm tra” thay vì giả định miễn thuế.",
+      "en": "If any of these apply, confirm with a registered tax agent or the ATO before selling — the plan flags this as 'to verify' rather than assuming the exemption."
+    },
+    "risk_dispose_market_timing_item": {
+      "vi": "Tiền bán nhà phụ thuộc vào tăng trưởng giá trị tại thời điểm bạn bán; tăng trưởng không được bảo đảm và có thể chững lại hoặc giảm.",
+      "en": "Sale proceeds depend on capital growth at the time you sell; growth is not guaranteed and can stall or fall."
+    },
+    "risk_dispose_market_timing_action": {
+      "vi": "Xem phần tiền thu về dự kiến như một dải ước tính thận trọng, không phải dự báo, và đừng phụ thuộc vào một mức tăng trưởng cụ thể.",
+      "en": "Treat projected proceeds as a conservative band, not a forecast, and don't rely on a specific growth rate."
     }
   }
 }

@@ -7,8 +7,11 @@ last_verified: 2026-06-20
 # Mode-A FHB per-phase action checklist (bilingual)
 
 The **actionable layer** of the legal/temporal spine — for each lifecycle phase (Prepare →
-Pre-approve → Contract → Settle → Own), the ordered "do these, in this sequence" steps a
-Mode-A first-home buyer works through. It is the content the `phase_playbook` resolver
+Pre-approve → Contract → Settle → Own → Sell), the ordered "do these, in this sequence" steps
+a Mode-A first-home buyer works through. The terminal **Sell** (`dispose`) phase is the full
+temporal arc (lifecycle-simulation-model §8); its actions link to the `disposition` component
+for the sale / cost / net figures (`component_ref`, no `budget_ref` — the dispose figures live
+on `disposition.dispose_cash_events`, not the acquisition `budget_envelope.cash_events`). It is the content the `phase_playbook` resolver
 (component 12) renders as a `checklist` behind each Flow-view phase sheet. The swimlane
 (`kb.journey.fhg-path`) shows *what happens*; this doc turns that into *what you do, in what
 order*.
@@ -105,6 +108,16 @@ figure. `key_assumptions[]` ← the `assumption_*` lines.
           { "id": "budget_ongoing",  "order": 2, "budget_ref": null, "component_ref": "ownership_planning" },
           { "id": "keep_ppor",       "order": 3, "budget_ref": null, "component_ref": "ownership_planning" },
           { "id": "watch_refinance", "order": 4, "budget_ref": null, "component_ref": "ownership_planning" }
+        ]
+      },
+      {
+        "phase": "dispose",
+        "actions": [
+          { "id": "decide_to_sell",        "order": 1, "budget_ref": null, "component_ref": "disposition" },
+          { "id": "engage_selling_agent",  "order": 2, "budget_ref": null, "component_ref": "disposition" },
+          { "id": "confirm_cgt_exemption", "order": 3, "budget_ref": null, "component_ref": "disposition" },
+          { "id": "discharge_mortgage",    "order": 4, "budget_ref": null, "component_ref": "disposition" },
+          { "id": "plan_next_purchase",    "order": 5, "budget_ref": null, "component_ref": "disposition" }
         ]
       }
     ]
@@ -313,6 +326,47 @@ figure. `key_assumptions[]` ← the `assumption_*` lines.
     "action_own_watch_refinance_detail": {
       "vi": "Khi LVR xuống dưới 80%, cơ hội tái cấp vốn sang lãi suất tốt hơn có thể mở ra.",
       "en": "Once your LVR drops below 80%, a window to refinance to a better rate may open."
+    },
+
+    "action_dispose_decide_to_sell_label": {
+      "vi": "Quyết định bán và chọn thời điểm",
+      "en": "Decide to sell and set your timing"
+    },
+    "action_dispose_decide_to_sell_detail": {
+      "vi": "Số năm bạn giữ nhà (hold horizon) và điều kiện thị trường khi bán quyết định số tiền thu về; kế hoạch chiếu một dải ước tính thận trọng, không phải dự báo.",
+      "en": "How long you hold and market conditions at sale shape the proceeds; the plan projects a conservative band, not a forecast."
+    },
+    "action_dispose_engage_selling_agent_label": {
+      "vi": "Chọn đại lý bán và thỏa thuận hoa hồng",
+      "en": "Engage a selling agent and agree the commission"
+    },
+    "action_dispose_engage_selling_agent_detail": {
+      "vi": "Hoa hồng đại lý có thể thương lượng và thường vào khoảng 1,5%–3,5% giá bán, cộng chi phí pháp lý và tiếp thị; các khoản này làm giảm phần vốn bạn thu về.",
+      "en": "Agent commission is negotiable and conventionally around 1.5%–3.5% of the sale price, plus legal and marketing costs; these reduce the equity you walk away with."
+    },
+    "action_dispose_confirm_cgt_exemption_label": {
+      "vi": "Xác nhận quyền miễn thuế lãi vốn cho nhà ở chính",
+      "en": "Confirm your main-residence CGT exemption"
+    },
+    "action_dispose_confirm_cgt_exemption_detail": {
+      "vi": "Nhà ở chính thường được miễn thuế lãi vốn (CGT). Nếu bạn từng cho thuê nhà, đã dọn ra nước ngoài và thành người không cư trú về thuế, hoặc đất rộng hơn 2 ha, hãy hỏi chuyên viên thuế trước khi bán.",
+      "en": "Your main residence is generally CGT-exempt. If you've ever rented it out, moved overseas and become a non-resident for tax, or the land is over 2 hectares, confirm with a tax professional before selling."
+    },
+    "action_dispose_discharge_mortgage_label": {
+      "vi": "Sắp xếp tất toán khoản vay còn lại",
+      "en": "Arrange to discharge your remaining loan"
+    },
+    "action_dispose_discharge_mortgage_detail": {
+      "vi": "Khoản vay còn lại được trả cho ngân hàng từ tiền bán nhà khi hoàn tất giao dịch; phần còn lại sau chi phí bán và tất toán vay là vốn ròng của bạn.",
+      "en": "Your remaining loan is repaid to the lender from the sale proceeds at settlement; what's left after selling costs and the loan payout is your net equity."
+    },
+    "action_dispose_plan_next_purchase_label": {
+      "vi": "Lập kế hoạch dùng vốn ròng cho lần mua tiếp theo",
+      "en": "Plan how your net equity funds your next purchase"
+    },
+    "action_dispose_plan_next_purchase_detail": {
+      "vi": "Vốn ròng thu về sau khi bán có thể trở thành tiền cọc cho căn nhà tiếp theo — câu chuyện nâng cấp dần của người mua nhà lần đầu.",
+      "en": "The net equity realised at sale can become the deposit for your next home — the step-up story for a first-home buyer."
     },
 
     "assumption_indicative": {

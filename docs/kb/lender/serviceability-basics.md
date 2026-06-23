@@ -63,7 +63,10 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
     "genuine_savings_min_months":    { "type": "integer",    "value": 3,    "note": "CONVENTION — minimum hold period for funds to count as genuine savings" },
     "income_shading_overtime_bonus_pct": { "type": "percentage", "value": 80, "note": "CONVENTION — typical proportion of overtime/bonus/commission counted; lender-specific" },
     "income_shading_rental_pct":     { "type": "percentage", "value": 80,   "note": "CONVENTION — typical proportion of rental income counted (vacancy/cost allowance); lender-specific" },
-    "living_expenses_basis":         { "type": "string",     "value": "greater of declared expenses or HEM benchmark", "note": "HEM scales by income, location, household size — no single figure" }
+    "living_expenses_basis":         { "type": "string",     "value": "greater of declared expenses or HEM benchmark", "note": "HEM scales by income, location, household size — no single figure; the convention BAND the capacity resolver subtracts is owned by kb.lender.hem-living-expenses (the 'gets its own doc' note below, now authored)" },
+    "representative_product_rate_pct": { "type": "percentage", "value": 6.0, "note": "CONVENTION — representative owner-occupier variable rate used as the capacity assessment BASE when no specific product is chosen; assessment rate = this + apra_serviceability_buffer_pp (= 9.0%). Labelled, re-groundable; the agent's lender_fit rate NEVER overrides this resolver figure (§98 — capacity removed from the LLM's reach)" },
+    "loan_term_years":                 { "type": "integer",    "value": 30,  "note": "CONVENTION — standard P&I term for the capacity present-value inversion (matches fh_engine_disposition's amortisation constant)" },
+    "consumer_loan_monthly_repayment_pct_of_balance": { "type": "percentage", "value": 2.5, "note": "CONVENTION — personal/car/BNPL balances are counted as a monthly commitment ≈ this % of balance (conservative; over-stating a commitment under-states capacity, the safe direction). Credit cards use the card-specific limit band in kb.lender.credit-card-treatment; HECS uses the income-contingent schedule in kb.hecs.thresholds" }
   }
 }
 ```
