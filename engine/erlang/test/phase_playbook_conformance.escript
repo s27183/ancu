@@ -5,7 +5,8 @@
 %% component 12 — the actionable layer of the legal/temporal spine, blueprint §12 /
 %% lifecycle-simulation-model §7). Loads the SAME materialized artifact the engine loads
 %% (priv/kb/artifact.json via fh_engine_kb) and asserts:
-%%   1. STRUCTURE — renderer=checklist; 5 phases in canonical order, each carrying its
+%%   1. STRUCTURE — renderer=checklist; 6 phases in canonical order (incl. terminal dispose),
+%%      each carrying its
 %%      authored actions + risks; actions sorted by `order`; status seeded not_started;
 %%      label/detail/item/action bilingual; severity in the closed enum.
 %%   2. LAYER-1 CONFORMANCE — the outcome passes fh_engine_outcome:validate/2 against the
@@ -66,10 +67,11 @@ structure_cases() ->
     AllActions = all_actions(Outcome),
     AllRisks   = lists:flatmap(fun(P) -> maps:get(<<"risks">>, P) end, Phases),
     [check("renderer = checklist", Renderer, <<"checklist">>),
-     check("5 phases in canonical lifecycle order", PhaseIds,
-           [<<"prepare">>, <<"pre_approve">>, <<"contract">>, <<"settle">>, <<"own">>]),
-     check("action counts per phase", ActionCnt, [5, 4, 7, 5, 4]),
-     check("risk counts per phase", RiskCnt, [2, 2, 6, 3, 2]),
+     check("6 phases in canonical lifecycle order (incl. terminal dispose)", PhaseIds,
+           [<<"prepare">>, <<"pre_approve">>, <<"contract">>, <<"settle">>, <<"own">>,
+            <<"dispose">>]),
+     check("action counts per phase", ActionCnt, [5, 4, 7, 5, 4, 5]),
+     check("risk counts per phase", RiskCnt, [2, 2, 6, 3, 2, 3]),
      check("every action status seeded not_started",
            lists:all(fun(A) -> maps:get(<<"status">>, A) =:= <<"not_started">> end, AllActions), true),
      check("actions within each phase sorted by order",

@@ -25,7 +25,8 @@ main(_) ->
     ok = fh_engine_kb:load(),
     io:format("journey conformance — fh_engine_journey (two-spines place-never-compute)~n~n"),
     R = lists:flatten([structure_cases(), conformance_cases(), placement_cases(),
-                       interaction_cases(), honest_partial_cases(), bilingual_case()]),
+                       interaction_cases(), honest_partial_cases(), bilingual_case(),
+                       dispose_cases()]),
     Fails = [X || X <- R, X =:= fail],
     io:format("~n================================================================~n"),
     case Fails of
@@ -177,6 +178,55 @@ bilingual_case() ->
      check("own/government prose item: vi carries a non-ASCII char (real Vietnamese)",
            lists:any(fun(C) -> C > 127 end, unicode:characters_to_list(Vi)), true)].
 
+%% --- dispose: the terminal column appears ONLY with a horizon (TW3) ----------
+%% lifecycle-simulation-model §8: the journey READS disposition.dispose_cash_events and
+%% PLACES them on the Dispose column (same place-never-compute discipline). Honest-partial
+%% §8.2: no disposition events ⟹ no Dispose column (the empty-upstream/empty-events cases).
+
+%% a synthetic disposition outcome carrying the H=10 loan-known dispose flows (TW1 figures):
+%% sale_proceeds (in, other), selling_costs (out, other), loan_payout (out, lender); CGT
+%% exempt ⟹ no cgt event. Mirrors the cash_event shape disposition emits.
+disposition_outcome() ->
+    #{<<"dispose_cash_events">> =>
+          [disp_ev(<<"sale_proceeds">>, <<"in">>,  [975196, 1303116], <<"other">>),
+           disp_ev(<<"selling_costs">>, <<"out">>, [16428, 56109],    <<"other">>),
+           disp_ev(<<"loan_payout">>,   <<"out">>, [468640, 468640],  <<"lender">>)]}.
+
+disp_ev(Id, Dir, Amount, Counterparty) ->
+    #{<<"id">> => <<"dispose_", Id/binary>>, <<"phase">> => <<"dispose">>,
+      <<"direction">> => Dir, <<"amount">> => Amount, <<"counterparty">> => Counterparty,
+      <<"is_estimate">> => true, <<"timing">> => <<"one_off">>, <<"period">> => null,
+      <<"source_component">> => <<"disposition">>,
+      <<"label">> => #{<<"vi">> => <<"Khoản bán"/utf8>>, <<"en">> => <<"A dispose flow">>}}.
+
+dispose_cases() ->
+    Up = (full_upstream())#{<<"disposition">> => disposition_outcome()},
+    {Outcome, _} = fill(Up),
+    Phases   = maps:get(<<"phases">>, Outcome),
+    PhaseIds = [maps:get(<<"id">>, P) || P <- Phases],
+    Cells    = maps:get(<<"cells">>, Outcome),
+    DisposeProse = [C || C <- Cells, maps:get(<<"phase">>, C) =:= <<"dispose">>,
+                        maps:get(<<"source_component">>, C) =:= <<"purchase_journey">>],
+    Sale  = money_at(Cells, <<"dispose">>, <<"other">>,  <<"money_in">>),
+    Loan  = money_at(Cells, <<"dispose">>, <<"lender">>, <<"money_out">>),
+    %% honest-partial: a disposition outcome with NO dispose_cash_events ⟹ no Dispose column.
+    {EmptyDisp, _} = fill((full_upstream())#{<<"disposition">> => #{<<"dispose_cash_events">> => []}}),
+    EmptyIds = [maps:get(<<"id">>, P) || P <- maps:get(<<"phases">>, EmptyDisp)],
+    Conform = try fh_engine_outcome:validate(<<"journey_swimlane">>, Outcome), ok
+              catch _:Why -> {error, Why} end,
+    [check("dispose set: 6 phases, dispose last", PhaseIds,
+           [<<"prepare">>, <<"pre_approve">>, <<"contract">>, <<"settle">>, <<"own">>,
+            <<"dispose">>]),
+     check("dispose set: 4 dispose prose cells (the legal narrative)", length(DisposeProse), 4),
+     check("dispose set: sale placed at (dispose, other) money_in [975196,1303116], src=disposition",
+           {amount(Sale), src(Sale)}, {[975196, 1303116], <<"disposition">>}),
+     check("dispose set: loan payout placed at (dispose, lender) money_out [468640,468640]",
+           amount(Loan), [468640, 468640]),
+     check("dispose set: Layer-1 conforms with the Dispose column", Conform, ok),
+     check("honest-partial: empty dispose_cash_events ⟹ no Dispose column (5 phases)",
+           EmptyIds,
+           [<<"prepare">>, <<"pre_approve">>, <<"contract">>, <<"settle">>, <<"own">>])].
+
 %% --- helpers ----------------------------------------------------------------
 
 %% first cell at (phase, actor) — used for the unique prose cells.
@@ -217,7 +267,7 @@ src(Cell)    -> maps:get(<<"source_component">>, Cell, undefined).
 
 is_phase_ordered(Phases) ->
     Idx = fun(<<"prepare">>) -> 0; (<<"pre_approve">>) -> 1; (<<"contract">>) -> 2;
-             (<<"settle">>) -> 3; (<<"own">>) -> 4; (_) -> 9 end,
+             (<<"settle">>) -> 3; (<<"own">>) -> 4; (<<"dispose">>) -> 5; (_) -> 9 end,
     Nums = [Idx(P) || P <- Phases],
     Nums =:= lists:sort(Nums).
 

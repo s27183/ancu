@@ -36,9 +36,13 @@
 -define(ACTIONS, <<"kb.journey.phase-actions">>).  %% ordered actions per phase + bilingual copy
 -define(RISKS,   <<"kb.risks.fhb-by-phase">>).     %% per-phase risks + mitigations + bilingual copy
 
-%% The canonical lifecycle phase order (fh_engine_journey:phases/0; cash_event.phase).
+%% The canonical lifecycle phase order (fh_engine_journey:phases/0; cash_event.phase),
+%% incl. the terminal `dispose` (lifecycle-simulation-model §8.1). The dispose phase carries
+%% its own authored actions + risks (kb.journey.phase-actions / kb.risks.fhb-by-phase); a
+%% phase with no authored content emits empty lists (honest-partial, build_phase/4).
 -define(PHASE_ORDER,
-        [<<"prepare">>, <<"pre_approve">>, <<"contract">>, <<"settle">>, <<"own">>]).
+        [<<"prepare">>, <<"pre_approve">>, <<"contract">>, <<"settle">>, <<"own">>,
+         <<"dispose">>]).
 
 %% --- entry -------------------------------------------------------------------
 

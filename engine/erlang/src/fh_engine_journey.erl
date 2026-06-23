@@ -45,12 +45,24 @@
 
 -spec fill(map(), map()) -> {map(), binary(), [map()]}.
 fill(_Args, Upstream) ->
-    Budget    = maps:get(<<"budget_envelope">>, Upstream, #{}),
-    Ownership = maps:get(<<"ongoing_obligations">>, Upstream, #{}),
-    Events    = maps:get(<<"cash_events">>, Budget, []),
-    Cells     = prose_cells() ++ money_cells(Events, Ownership),
+    Budget        = maps:get(<<"budget_envelope">>, Upstream, #{}),
+    Ownership     = maps:get(<<"ongoing_obligations">>, Upstream, #{}),
+    Disposition   = maps:get(<<"disposition">>, Upstream, #{}),
+    Events        = maps:get(<<"cash_events">>, Budget, []),
+    DisposeEvents = maps:get(<<"dispose_cash_events">>, Disposition, []),
+    %% Honest-partial: the terminal Dispose column (its prose + the placed dispose money
+    %% cells) renders ONLY when a hold horizon H is set — disposition then emits
+    %% dispose_cash_events; with H unset it emits none, so no empty Dispose column lands on
+    %% the legal spine (lifecycle-simulation-model §8.2, the §7.2 honest-partial discipline).
+    HasDispose    = DisposeEvents =/= [],
+    DisposeCells  = case HasDispose of
+                        true  -> dispose_prose_cells()
+                                 ++ [money_cell_from_event(E) || E <- DisposeEvents];
+                        false -> []
+                    end,
+    Cells = prose_cells() ++ money_cells(Events, Ownership) ++ DisposeCells,
     Outcome = #{
-        <<"phases">>       => phases(),
+        <<"phases">>       => rendered_phases(HasDispose),
         <<"actors">>       => actors(),
         <<"cells">>        => Cells,
         <<"interactions">> => interactions(Cells),
@@ -60,15 +72,26 @@ fill(_Args, Upstream) ->
     KbVersions = fh_engine_kb:kb_anchors([?COPY]),
     {Outcome, <<"swimlane-diagram">>, KbVersions}.
 
-%% --- the swimlane structure (Mode-A FHB: Prepare → … → Own) ------------------
+%% --- the swimlane structure (Mode-A FHB: Prepare → … → Own → Dispose) --------
 
+%% The canonical lifecycle phase enum (6 values, incl. the terminal `dispose`,
+%% lifecycle-simulation-model §8.1 — mirrored by fh_engine_phase_playbook:?PHASE_ORDER and
+%% fh_engine_h_checklist_status:?PHASES). The swimlane RENDERS `dispose` only when a horizon
+%% is set (rendered_phases/1); the enum itself is fixed.
 -spec phases() -> [map()].
 phases() ->
     [phase(<<"prepare">>,     <<"phase_prepare">>),
      phase(<<"pre_approve">>, <<"phase_pre_approve">>),
      phase(<<"contract">>,    <<"phase_contract">>),
      phase(<<"settle">>,      <<"phase_settle">>),
-     phase(<<"own">>,         <<"phase_own">>)].
+     phase(<<"own">>,         <<"phase_own">>),
+     phase(<<"dispose">>,     <<"phase_dispose">>)].
+
+%% The rendered swimlane columns: the full enum when a horizon is set, else the 5
+%% acquisition→own phases (the terminal Dispose column is dropped — honest-partial §8.2).
+-spec rendered_phases(boolean()) -> [map()].
+rendered_phases(true)  -> phases();
+rendered_phases(false) -> [P || P <- phases(), maps:get(<<"id">>, P) =/= <<"dispose">>].
 
 -spec actors() -> [map()].
 actors() ->
@@ -106,6 +129,18 @@ prose_cells() ->
      prose(<<"own">>, <<"you">>,        <<"cell_own_you">>,        <<"milestone">>),
      prose(<<"own">>, <<"government">>, <<"cell_own_government">>, <<"none">>),
      prose(<<"own">>, <<"lender">>,     <<"cell_own_lender">>,     <<"none">>)].
+
+%% --- the Dispose-phase legal/prose spine (added only when a horizon is set) ----
+%% The terminal column's narrative (kb.journey.fhg-path): the sale (you), the main-residence
+%% CGT exemption (government), the loan discharge (lender), and the agent/conveyancer
+%% (other). The money flows — sale_proceeds / selling_costs / loan_payout — are PLACED
+%% separately from disposition's dispose_cash_events; these carry no figure.
+-spec dispose_prose_cells() -> [map()].
+dispose_prose_cells() ->
+    [prose(<<"dispose">>, <<"you">>,        <<"cell_dispose_you">>,        <<"milestone">>),
+     prose(<<"dispose">>, <<"government">>, <<"cell_dispose_government">>, <<"none">>),
+     prose(<<"dispose">>, <<"lender">>,     <<"cell_dispose_lender">>,     <<"milestone">>),
+     prose(<<"dispose">>, <<"other">>,      <<"cell_dispose_other">>,      <<"milestone">>)].
 
 %% --- the financial spine, PLACED (the amount-bearing cells ARE cash events) --
 %% One money cell per cash_event: placed at (phase, actor = event.counterparty), the
@@ -177,6 +212,7 @@ phase_index(<<"pre_approve">>) -> 1;
 phase_index(<<"contract">>)    -> 2;
 phase_index(<<"settle">>)      -> 3;
 phase_index(<<"own">>)         -> 4;
+phase_index(<<"dispose">>)     -> 5;
 phase_index(_)                 -> 9.
 
 %% --- builders ----------------------------------------------------------------
