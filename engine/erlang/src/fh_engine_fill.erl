@@ -17,7 +17,7 @@
 %% (fh_engine_cash) and `ownership_planning` (fh_engine_ownership) are mechanism-(B)
 %% formula code over the KB tables (stamp-duty brackets / ongoing-cost bands).
 
--export([resolver/3, has_resolver/1, merge_agent/3]).
+-export([resolver/3, has_resolver/1, merge_agent/3, agent_values_from_outcome/2]).
 
 -define(COPY, <<"kb.copy.profile">>).   %% buyer_profile bilingual copy-templates (bilingual-content.md §3b)
 
@@ -34,6 +34,7 @@ has_resolver(<<"mortgage_finance">>)   -> true;
 has_resolver(<<"purchase_journey">>)   -> true;
 has_resolver(<<"preparation">>)        -> true;
 has_resolver(<<"phase_playbook">>)     -> true;
+has_resolver(<<"disposition">>)        -> true;
 has_resolver(_)                        -> false.
 
 -spec resolver(binary(), map(), map()) -> {map(), binary(), [map()]}.
@@ -53,6 +54,8 @@ resolver(<<"preparation">>, Args, Upstream) ->
     fh_engine_preparation:fill(Args, Upstream);
 resolver(<<"phase_playbook">>, Args, Upstream) ->
     fh_engine_phase_playbook:fill(Args, Upstream);
+resolver(<<"disposition">>, Args, Upstream) ->
+    fh_engine_disposition:fill(Args, Upstream);
 resolver(Other, _Args, _Upstream) ->
     erlang:error({no_resolver_fill_for, Other}).
 
@@ -65,6 +68,17 @@ merge_agent(<<"mortgage_finance">>, ResolverOutcome, AgentValues) ->
 merge_agent(Other, _ResolverOutcome, _AgentValues) ->
     erlang:error({no_agent_merge_for, Other}).
 
+%% Recover a two-path component's stored agent-leaf VALUES (in the sidecar-reply shape
+%% merge_agent/3 consumes) from a previously-committed outcome — the inverse of the merge.
+%% A base_resolver refresh feeds these back through the SAME merge_agent/3 after re-running
+%% the resolver half, so the resolver figures are always fresh and only the agent leaf's
+%% SOURCE (snapshot here, sidecar on a full turn) varies. Component-owned, like merge_agent.
+-spec agent_values_from_outcome(binary(), map()) -> map().
+agent_values_from_outcome(<<"mortgage_finance">>, Stored) ->
+    fh_engine_mortgage:agent_values_from_outcome(Stored);
+agent_values_from_outcome(Other, _Stored) ->
+    erlang:error({no_agent_reattach_for, Other}).
+
 %% --- buyer_profile (real) ---------------------------------------------------
 %% The pipeline entry: project the onboarding fact base into the `profile` outcome.
 %% At the onboarding turn the deep applicant facts (citizenship, age, income,
@@ -75,6 +89,13 @@ merge_agent(Other, _ResolverOutcome, _AgentValues) ->
 
 buyer_profile(Args) ->
     Onboarding = maps:get(onboarding, Args, #{}),
+    %% IC3: the enriched household financial facts, loaded from the profiles SOT
+    %% (facts_jsonb.household_financials — the canonical fact-model key, fact-model-
+    %% unification.md §"unified schema") and threaded into the turn args. The `profile`
+    %% outcome is the FLAT PROJECTION of this grouped storage (that doc §97). Absent at
+    %% onboarding (plan-first) → empty → the framed financials stay PENDING (null/empty),
+    %% the pre-IC3 honest-partial state; they arrive on a refine turn (constraint #1/#9).
+    Financials = maps:get(household_financials, Args, #{}),
     TargetRange = maps:get(<<"target_price_range">>, Onboarding, null),
     TargetZone = maps:get(<<"target_zone">>, Onboarding, []),
     Intent = maps:get(intent, Args, <<"owner_occupier">>),
@@ -121,8 +142,26 @@ buyer_profile(Args) ->
         %% partner narrows it. (Their ownership facts arrive then, not at onboarding.)
         <<"non_buying_partner">> => #{<<"exists">> => false},
         <<"intended_occupancy_use">> => <<"sole_occupier">>,
+        %% CGT-exemption determinants for disposition (kb.tax.cgt-main-residence-exemption):
+        %% Mode-A definitional projection — a Vietnamese-AU citizen/PR buying a home to live
+        %% in is an Australian resident for tax. sole_occupier + resident → main-residence
+        %% exempt (cgt null). The overseas-move trap (non-resident at disposal) is a refine
+        %% narrowing, not a base fact.
+        <<"tax_residency">> => <<"resident">>,
+        %% H: the hold horizon (years). null at base = Mode-A long/indefinite default → no
+        %% disposal projection until the horizon what-if sets it (engine-contract §10.5).
+        <<"hold_horizon_years">> => maps:get(<<"hold_horizon_years">>, Onboarding, null),
         <<"target_price_range">> => TargetRange,
         <<"target_zone">> => TargetZone,
+        %% IC3 — neutral derived financials (facts, not verdicts): the framed income +
+        %% raw debt facts the serviceability resolver reads downstream (profile holds
+        %% facts; mortgage reasons — §11.9). assessable_income is the SHADED combined
+        %% income; for the Mode-A wedge (PAYG base salary) shading is identity — the
+        %% income-TYPE haircuts (rental/overtime/offshore) arrive with income types on a
+        %% later refine turn. null/empty when no financials captured (capacity PENDING).
+        <<"assessable_income">> => assessable_income(Financials),
+        <<"foreign_sourced_income_component">> => foreign_sourced(Financials),
+        <<"debts">> => debts(Financials),
         %% bilingual {vi,en} via kb.copy.profile (no Vietnamese in Erlang literals —
         %% the io:format ~s >255-codepoint trap; bilingual-content.md §3b).
         <<"key_constraints">> => [copy(<<"constraint_financials_pending">>, #{})],
@@ -139,6 +178,42 @@ buyer_profile(Args) ->
 tri_to_json(true)         -> true;
 tri_to_json(false)        -> false;
 tri_to_json(undetermined) -> <<"needs_determination">>.
+
+%% --- IC3: framing the household financial facts into the profile outcome ------
+%% buyer_profile PROJECTS the grouped fact-base storage into the flat profile outcome
+%% (fact-model-unification.md §97); mortgage_finance REASONS over the projection
+%% (serviceability). assessable_income is the canonical household income fact
+%% (household_financials.income.assessable_income) — the gross assessable figure; lender
+%% shading by income_stability / foreign_sourced_component is the reasoning layer's job.
+%% null when no positive income is known — the honest-partial PENDING state that keeps
+%% borrowing_capacity null.
+-spec assessable_income(map()) -> number() | null.
+assessable_income(Financials) ->
+    Income = maps:get(<<"income">>, Financials, #{}),
+    case maps:get(<<"assessable_income">>, Income, null) of
+        I when is_number(I), I > 0 -> I;
+        _                          -> null
+    end.
+
+%% F6 — the offshore/FX income portion lenders may haircut; passthrough (0 default,
+%% the Mode-A domestic case). mortgage_finance reads this alongside the total.
+-spec foreign_sourced(map()) -> number().
+foreign_sourced(Financials) ->
+    Income = maps:get(<<"income">>, Financials, #{}),
+    num0(maps:get(<<"foreign_sourced_component">>, Income, 0)).
+
+%% The raw debt facts (balances/limits) the serviceability resolver reads. Passthrough
+%% of the household financials' debts sub-map; empty → no debt drag (no facts captured).
+-spec debts(map()) -> map().
+debts(Financials) ->
+    case maps:get(<<"debts">>, Financials, #{}) of
+        D when is_map(D) -> D;
+        _                -> #{}
+    end.
+
+%% a number, or 0 for absent/non-numeric (matches fh_engine_mortgage:num0/1).
+num0(N) when is_number(N) -> N;
+num0(_)                   -> 0.
 
 %% subst a kb.copy.profile template into a bilingual {vi,en} value (no Vietnamese
 %% in Erlang literals; same mechanism as fh_engine_cash).

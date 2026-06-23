@@ -57,6 +57,9 @@ rerun(PlanCardId, Ctx, Req0, State) ->
             Onboarding = maps:get(<<"onboarding">>, Facts, #{}),
             Firb = maps:get(<<"firb_required_any">>,
                             maps:get(<<"derived">>, Facts, #{}), false),
+            %% IC3: the enriched household financials from the profiles SOT (the canonical
+            %% facts_jsonb.household_financials key).
+            Financials = maps:get(<<"household_financials">>, Facts, #{}),
             {ok, _Pid} = fh_engine_turn_sup:start_turn(#{
                 tenant_id => maps:get(tenant_id, Ctx),
                 user_id => maps:get(user_id, Ctx),
@@ -65,7 +68,8 @@ rerun(PlanCardId, Ctx, Req0, State) ->
                 mode => maps:get(mode, Ctx),
                 intent => maps:get(intent, Ctx),
                 firb_required_any => Firb,
-                onboarding => Onboarding
+                onboarding => Onboarding,
+                household_financials => Financials
             }),
             logger:notice("[dev-rerun] re-ran base turn for card ~s (turn ~s)",
                           [PlanCardId, TurnId]),

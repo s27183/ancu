@@ -22,8 +22,10 @@
 
 -export([init/2]).
 
-%% The canonical legal/temporal phase enum (fh_engine_journey:phases/0).
--define(PHASES, [<<"prepare">>, <<"pre_approve">>, <<"contract">>, <<"settle">>, <<"own">>]).
+%% The canonical legal/temporal phase enum (fh_engine_journey:phases/0), incl. the terminal
+%% `dispose` (lifecycle-simulation-model §8.1) — so a dispose-phase action can be toggled.
+-define(PHASES, [<<"prepare">>, <<"pre_approve">>, <<"contract">>, <<"settle">>, <<"own">>,
+                 <<"dispose">>]).
 -define(STATUSES, [<<"done">>, <<"not_started">>]).
 
 init(Req0, State) ->

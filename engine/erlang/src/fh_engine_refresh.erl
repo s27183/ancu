@@ -74,6 +74,11 @@ start_base_resolver(PlanCardId, Ctx, Existing, Onboarding) ->
             {error, in_flight};
         ok ->
             Derived = maps:get(<<"derived">>, maps:get(facts, Ctx), #{}),
+            %% IC3: the enriched household financials from the profiles SOT (the canonical
+            %% `household_financials` key). A profile fact (not a plan-target what-if), so
+            %% it rides the facts unchanged — an override (the refine scenario) only
+            %% touches `onboarding`.
+            Financials = maps:get(<<"household_financials">>, maps:get(facts, Ctx), #{}),
             {ok, _Pid} = fh_engine_turn_sup:start_turn(#{
                 tenant_id => maps:get(tenant_id, Ctx),
                 user_id => maps:get(user_id, Ctx),
@@ -83,6 +88,7 @@ start_base_resolver(PlanCardId, Ctx, Existing, Onboarding) ->
                 intent => maps:get(intent, Ctx),
                 firb_required_any => maps:get(<<"firb_required_any">>, Derived, false),
                 onboarding => Onboarding,
+                household_financials => Financials,
                 kind => base_resolver,
                 existing_outcomes => Existing
             }),

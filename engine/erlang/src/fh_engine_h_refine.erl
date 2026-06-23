@@ -2,7 +2,7 @@
 
 %% POST /api/engine/plan-cards/:id/refine — the simulate COMMIT half (engine-contract
 %% §10.2 / §10.3, lifecycle-simulation-model.md §4.3). Body:
-%% {"overrides": {"target_price": <number>, "state": <"NSW"|...>}}.
+%% {"overrides": {"target_price": <number>, "state": <"NSW"|...>, "horizon": <years>}}.
 %%
 %% Saves a previewed structural what-if as the card's CURRENT scenario:
 %%   1. persists the override INPUTS to the plan-target overlay (plan_cards.target_jsonb —
@@ -95,7 +95,7 @@ reject(property_type_phase_b, Req, State) ->
         #{<<"error">> => <<"override_not_supported">>,
           <<"field">> => <<"property_type">>,
           <<"detail">> => <<"property_type is a Phase-B (per-property) dimension; attach a "
-                            "property to vary it. Base refine accepts target_price and state.">>},
+                            "property to vary it. Base refine accepts target_price, state, and horizon.">>},
         Req), State};
 reject({unknown_override, K}, Req, State) ->
     {ok, fh_engine_http:reply_json(400,

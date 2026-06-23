@@ -16,6 +16,7 @@
 -export([append_audit/6]).
 -export([snapshot_component/3, get_plan_card/2, get_card_rerun_context/1, set_card_target/2]).
 -export([set_checklist_status/4, get_checklist_status/2]).
+-export([set_profile_financials/2, list_plan_card_ids_for_profile/1]).
 -export([deploy_commit_sha/0, projection_state/1, list_active_plan_card_ids/0]).
 -export([list_suburbs_by_state/1, list_all_suburbs/0, list_suburb_sources/0]).
 -export([read_glue/3, append_session_turn/6]).
@@ -245,6 +246,41 @@ set_card_target(PlanCardId, Onboarding) ->
         "WHERE plan_card_id = $1::uuid",
         [PlanCardId, fh_engine_util:json_encode(Onboarding)]),
     ok.
+
+%% IC4 — write the household financial facts to the profiles SOT (the canonical
+%% `household_financials` key, fact-model-unification.md). Reached via the addressed
+%% plan card's profile (the handler's prior get_plan_card/2 enforces tenant-scope, so the
+%% join keys on plan_card_id alone). FULL-REPLACE of the one key (the Budget cockpit owns
+%% the full financials state and submits it whole — the set_card_target precedent, no
+%% patch-deletion semantics); `onboarding`/`derived` are untouched. Returns the profile_id
+%% so the caller can sweep every SIBLING journey that derives from this shared fact base
+%% (a saved card is a computed SNAPSHOT — a changed input must re-derive all snapshots,
+%% the same invariant the refresh sweep maintains for an artifact rebuild). {error,
+%% not_found} if the card (hence profile) does not exist.
+-spec set_profile_financials(binary(), map()) -> {ok, binary()} | {error, not_found}.
+set_profile_financials(PlanCardId, HouseholdFinancials) ->
+    Res = query(
+        "UPDATE profiles p "
+        "SET facts_jsonb = jsonb_set(p.facts_jsonb, '{household_financials}', $2::jsonb, true), "
+        "    updated_at = now() "
+        "FROM plan_cards pc "
+        "WHERE pc.plan_card_id = $1::uuid AND pc.profile_id = p.profile_id "
+        "RETURNING p.profile_id::text",
+        [PlanCardId, fh_engine_util:json_encode(HouseholdFinancials)]),
+    case rows(Res) of
+        [{ProfileId}] -> {ok, ProfileId};
+        []            -> {error, not_found}
+    end.
+
+%% IC4 — every active (non-retired) plan card on a profile: the bounded sibling set a
+%% profile-fact write must refresh (a household has few journeys, so this is bounded by
+%% construction, unlike the global list_active_plan_card_ids/0 fleet sweep).
+-spec list_plan_card_ids_for_profile(binary()) -> [binary()].
+list_plan_card_ids_for_profile(ProfileId) ->
+    [Id || {Id} <- rows(query(
+        "SELECT plan_card_id::text FROM plan_cards "
+        "WHERE profile_id = $1::uuid AND status IS DISTINCT FROM 'retired'",
+        [ProfileId]))].
 
 %% The checklist-status slice of the card user-set layer (005). A toggle is a small
 %% patch on the sparse map {"<phase>": {"<action_id>": "done"}}, with NO recompute and

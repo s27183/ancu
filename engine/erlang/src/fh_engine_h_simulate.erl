@@ -1,7 +1,8 @@
 -module(fh_engine_h_simulate).
 
 %% POST /api/engine/plan-cards/:id/simulate — the simulate PREVIEW (engine-contract
-%% §10.1). Body: {"overrides": {"target_price": <number>, "state": <"NSW"|...>}}.
+%% §10.1). Body: {"overrides": {"target_price": <number>, "state": <"NSW"|...>,
+%% "horizon": <years>}} (horizon = the dispose-phase hold years H, §10.5).
 %%
 %% Recomputes the base plan under the structural what-if overrides and returns the
 %% recomputed outcomes in the 200 BODY. A PREVIEW, not a turn: no persist, no
@@ -57,14 +58,18 @@ run(Id, Body, Req, State) ->
             Facts = maps:get(facts, Ctx),
             Onboarding0 = maps:get(<<"onboarding">>, Facts, #{}),
             Intent = maps:get(intent, Ctx, <<"owner_occupier">>),
+            %% IC3: the enriched financials from the SOT (canonical household_financials
+            %% key) — preview parity with the turn.
+            Financials = maps:get(<<"household_financials">>, Facts, #{}),
             case fh_engine_simulate:apply_overrides(Overrides, Onboarding0) of
-                {ok, Onboarding} -> preview(Id, Overrides, Onboarding, Intent, Req, State);
+                {ok, Onboarding} ->
+                    preview(Id, Overrides, Onboarding, Intent, Financials, Req, State);
                 {error, Reason}  -> reject(Reason, Req, State)
             end
     end.
 
-preview(Id, Overrides, Onboarding, Intent, Req, State) ->
-    try fh_engine_simulate:run(Onboarding, Intent) of
+preview(Id, Overrides, Onboarding, Intent, Financials, Req, State) ->
+    try fh_engine_simulate:run(Onboarding, Intent, Financials) of
         {ok, Outcomes} ->
             Resp = #{<<"plan_card_id">> => Id,
                      <<"overrides">> => Overrides,
@@ -101,7 +106,7 @@ reject(property_type_phase_b, Req, State) ->
           <<"field">> => <<"property_type">>,
           <<"detail">> => <<"property_type is a Phase-B (per-property) simulate "
                             "dimension; attach a property to vary it. Base simulate "
-                            "accepts target_price and state.">>}, Req), State};
+                            "accepts target_price, state, and horizon.">>}, Req), State};
 reject({unknown_override, K}, Req, State) ->
     {ok, fh_engine_http:reply_json(400,
         #{<<"error">> => <<"unknown_override">>, <<"field">> => K}, Req), State};

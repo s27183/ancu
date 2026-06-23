@@ -46,10 +46,14 @@
 %% reads only eligibility + cash_position and likewise places. phase_playbook (12) reads
 %% cash_position (cash_event ids it links by budget_ref) + purchase_journey (the phase
 %% set), so it sits LAST (forward edges, still acyclic).
+%% disposition runs AFTER its figure-owners (cash_position, ownership_planning, mortgage_finance
+%% — it places their figures) and BEFORE purchase_journey (which places disposition's
+%% dispose_cash_events on the swimlane). [[place-upstream-figures-dont-recompute]] — the
+%% placement need sets the DAG position.
 -define(BASE_COMPONENTS,
         [<<"buyer_profile">>, <<"eligibility">>, <<"mortgage_finance">>,
-         <<"cash_position">>, <<"ownership_planning">>, <<"purchase_journey">>,
-         <<"preparation">>, <<"phase_playbook">>]).
+         <<"cash_position">>, <<"ownership_planning">>, <<"disposition">>,
+         <<"purchase_journey">>, <<"preparation">>, <<"phase_playbook">>]).
 
 -spec start_link(map()) -> gen_statem:start_ret().
 start_link(Args) ->
@@ -103,23 +107,35 @@ running(internal, step, #{components := [Comp | Rest]} = Data) ->
                     {stop, normal, Data}
             end;
         two_path ->
-            %% Two-path (mortgage-finance-two-path.md): the FULL turn runs the resolver
-            %% half then spawns the sidecar for the agent leaves (§98: slot-scoped merge,
-            %% the agent never authors a figure). A RESOLVER-ONLY refresh (base_resolver)
-            %% SKIPS this component entirely — it does NOT re-run or re-commit it. The
-            %% agent leaf's inputs didn't change, and re-committing the STORED leaf through
-            %% the fail-closed gate would crash on legacy/non-bilingual data. The stored
-            %% outcome is left exactly as-is (the shortlist preserved) and injected into
-            %% `outcomes` only so downstream resolver reads stay consistent.
+            %% Two-path (mortgage-finance-two-path.md): the resolver half is a PURE
+            %% function of (facts, upstream, artifact); the agent half is the qualitative
+            %% lender_fit leaves. The two are INDEPENDENT (§98). So the resolver half is
+            %% recomputed on EVERY base-DAG walk — only the AGENT half varies by turn kind,
+            %% and only in its SOURCE: the sidecar (a full `base` turn) or the stored
+            %% snapshot (a `base_resolver` refresh). A RESOLVER-ONLY refresh re-runs the
+            %% resolver half (so a compliance-sensitive figure like borrowing_capacity
+            %% recomputes when income arrives via /profile, IC4 — §98: a figure must equal
+            %% f(current facts)) and RE-ATTACHES the stored agent leaves through the SAME
+            %% merge_agent the sidecar path uses (no sidecar, no LLM, no usage). This is
+            %% the preview/commit-parity invariant: fh_engine_simulate recomputes the
+            %% resolver half too, so commit must compute it identically. The commit
+            %% re-validates the re-attached leaf (fail-closed); a leaf that was gate-valid
+            %% when first committed passes again (Wedge-1a cards are post-bilingual-gate).
             case maps:get(kind, Data, base) of
                 base_resolver ->
+                    {RO, Renderer, KbVersions} =
+                        fh_engine_fill:resolver(Name, Data, maps:get(outcomes, Data)),
                     Existing = maps:get(Name, maps:get(existing_outcomes, Data, #{}), #{}),
-                    OutcomeType = maps:get(<<"outcome_type">>, Comp, Name),
-                    Outcomes = maps:get(outcomes, Data),
-                    {keep_state,
-                     Data#{components := Rest,
-                           outcomes := Outcomes#{OutcomeType => Existing}},
-                     [{next_event, internal, step}]};
+                    AgentValues = fh_engine_fill:agent_values_from_outcome(Name, Existing),
+                    Final = fh_engine_fill:merge_agent(Name, RO, AgentValues),
+                    case commit(Comp, <<"two_path">>, Renderer, KbVersions, Final, Data) of
+                        {ok, Data1} ->
+                            {keep_state, Data1#{components := Rest},
+                             [{next_event, internal, step}]};
+                        {blocked, G, _} ->
+                            fail(Data, <<"compliance_block">>, gate_detail(G)),
+                            {stop, normal, Data}
+                    end;
                 _ ->
                     {RO, Renderer, KbVersions} =
                         fh_engine_fill:resolver(Name, Data, maps:get(outcomes, Data)),
@@ -445,6 +461,7 @@ component_scope(<<"buyer_profile">>)    -> <<"base">>;
 component_scope(<<"purchase_journey">>) -> <<"base">>;
 component_scope(<<"preparation">>)      -> <<"base">>;
 component_scope(<<"phase_playbook">>)   -> <<"base">>;
+component_scope(<<"disposition">>)      -> <<"base">>;
 component_scope(_) -> <<"both">>.
 
 %% Spawn a disposable sidecar to fill ONE agent component. The sidecar receives the
