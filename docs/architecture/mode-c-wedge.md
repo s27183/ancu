@@ -36,6 +36,21 @@ wedge, tax cluster first:
   growth/vacancy), per `honest-deferral-not-rug` / `kb-doc-authoring`.
 - **Bilingual {vi,en} at the source** (co-equal), per [`bilingual-content.md`](bilingual-content.md).
 
+## Cross-cutting — the 2026-27 Budget NG/CGT reform (proposed, not yet law)
+
+Surfaced mid-authoring (2026-06-23). The 2026-27 Budget (Budget night 7:30pm AEST 12 May 2026)
+announced, via the *Treasury Laws Amendment (Tax Reform No. 1) Bill 2026* (**introduced, not yet
+passed**), from **1 July 2027**: (a) the **50% CGT discount → cost-base indexation + a 30% minimum
+tax** (individuals/trusts/partnerships; existing holdings split at 1 July 2027; new builds may choose
+either regime; pensioners exempt), and (b) **negative gearing limited to new builds** (established
+post-Budget purchases lose the wage offset; held-before-Budget grandfathered). This hits the wedge's
+**own target buyer** (established purchase, now, held long). Captured in `kb.tax.cgt-50-percent-discount`
+and `kb.tax.negative-gearing-mechanics` as **proposed-not-law** sections (current law computed; reform
+flagged; post-2027 portion → `to_verify`). **Open decision for P2** (disposition `cgt/1` branch): how
+far to model the split-at-2027 vs defer to `to_verify`, and whether a dedicated transitional KB doc +
+blueprint anchor is warranted over the inline flags. Default (regulated-safe): compute current law,
+flag the reform, `to_verify` the post-2027 portion — do not model unenacted law as settled.
+
 ## The fail-closed activation rule
 
 The compiler flip (`IN_SCOPE_BLUEPRINT` → `investor-domestic-au`) is **all-or-nothing**: the
@@ -80,13 +95,15 @@ Status legend: `[ ]` not started · `[~]` drafting · `[v]` facts verified vs pr
 
 | St | Slug | Consuming component → fields | Figure handling |
 |----|------|------------------------------|-----------------|
-| [ ] | kb.tax.cgt-50-percent-discount | tax_structure, disposition → CGT on sale | resolver-computed, remove-from-reach |
-| [ ] | kb.tax.negative-gearing-mechanics | tax_structure → gearing position | decision-support framing, no "attractive" verdict |
-| [ ] | kb.tax.depreciation-division-43-and-40 | tax_structure, disposition → depreciation + clawback | resolver-computed; rates from ATO |
-| [ ] | kb.tax.entity-comparison-personal-trust-company-smsf | tax_structure → recommended_entity | options + considerations only (ASIC line) |
-| [ ] | kb.tax.entity-setup-costs | cash_position, settlement_prep → setup cost | banded ranges |
-| [ ] | kb.tax.land-tax-by-state | tax_structure, ownership_planning_investor → land tax + aggregation | resolver; thresholds per state revenue office |
-| [ ] | kb.tax.quantity-surveyor-reports | tax_structure, due_diligence → QS report need/cost | banded; reference doc |
+| [v] | kb.tax.cgt-50-percent-discount | tax_structure, disposition → CGT on sale | resolver-computed, remove-from-reach |
+| [v] | kb.tax.negative-gearing-mechanics | tax_structure → gearing position | decision-support framing, no "attractive" verdict |
+| [v] | kb.tax.depreciation-division-43-and-40 | tax_structure, disposition → depreciation + clawback | resolver-computed; rates from ATO |
+| [v] | kb.tax.entity-comparison-personal-trust-company-smsf | tax_structure → recommended_entity | options + considerations only (ASIC line) |
+| [v] | kb.tax.entity-setup-costs | cash_position, settlement_prep → setup cost | banded ranges |
+| [v] | kb.tax.land-tax-by-state | tax_structure, ownership_planning_investor → land tax + aggregation | resolver; NSW/VIC/QLD primary-verified, SA/WA/TAS/ACT `to_verify` pending-primary, NT nil |
+| [v] | kb.tax.quantity-surveyor-reports | tax_structure, due_diligence → QS report need/cost | banded; reference doc |
+
+**Cluster T COMPLETE (7/7, 2026-06-23).** All verified vs ATO / state revenue / ASIC primaries; the 2026-27 Budget NG/CGT reform captured as proposed-not-law in the cgt + negative-gearing + entity-comparison docs (see cross-cutting section above). **Two seams surfaced for later clusters:** (a) **land-tax SA/WA/TAS/ACT** scales are `to_verify` (secondary-only) — re-ground against RevenueSA/RevenueWA/SRO-Tas/ACT-Revenue (a P1-Cluster-S or freshness-pass trigger; NSW/VIC/QLD + NT are settled). (b) **QS-report overlap** — `kb.tax.quantity-surveyor-reports` (this cluster, owns the report's purpose/cost) vs Cluster-S `kb.investor.depreciation-report-quantity-surveyor` + `kb.investor.depreciation-schedule-procurement` (settlement timeline) may be redundant; reconcile single-owner when authoring Cluster S (this doc owns purpose+cost, the S docs own the settlement-phase procurement milestone).
 
 ### Cluster F — Finance / lending — source: APRA serviceability framework + lender published policy (ACL: informational only)
 
