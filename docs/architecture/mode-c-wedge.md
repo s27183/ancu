@@ -124,17 +124,19 @@ Status legend: `[ ]` not started · `[~]` drafting · `[v]` facts verified vs pr
 
 | St | Slug | Consuming component → fields | Figure handling |
 |----|------|------------------------------|-----------------|
-| [ ] | kb.investor.rental-income-modelling | yield_modelling → rental income | methodology; figures from suburb data |
-| [ ] | kb.investor.operating-expenses-typical-ratios | yield_modelling → opex | banded ratios |
-| [ ] | kb.investor.vacancy-rate-assumptions | yield_modelling → vacancy | labelled-placeholder (forward-looking) |
-| [ ] | kb.investor.cash-flow-modelling-methodology | yield_modelling → cash_flow_projection | methodology |
-| [ ] | kb.investor.property-management-fees | yield_modelling → PM fees | banded ranges |
-| [ ] | kb.property.growth-corridors-au | property_assessment → growth thesis | labelled-placeholder (forward-looking) |
-| [ ] | kb.property.depreciation-by-build-year | property_assessment, tax_structure → depreciation basis | reference |
-| [ ] | kb.property.investor-grade-features | property_assessment → fit | reference |
-| [ ] | kb.property.rental-market-data-sources | property_assessment, yield_modelling → data provenance | reference (source list) |
-| [ ] | kb.strata.health-indicators-investor-lens | property_assessment → strata health | reference |
-| [ ] | kb.buyer-costs.investor-additional-costs | cash_position → investor cost adders | banded ranges |
+| [v] | kb.investor.rental-income-modelling | yield_modelling → rental income | methodology; figures from suburb data |
+| [v] | kb.investor.operating-expenses-typical-ratios | yield_modelling → opex | banded ratios |
+| [v] | kb.investor.vacancy-rate-assumptions | yield_modelling → vacancy | labelled-placeholder (forward-looking) |
+| [v] | kb.investor.cash-flow-modelling-methodology | yield_modelling → cash_flow_projection | methodology |
+| [v] | kb.investor.property-management-fees | yield_modelling → PM fees | banded ranges |
+| [v] | kb.property.growth-corridors-au | property_assessment → growth thesis | labelled-placeholder (forward-looking) |
+| [v] | kb.property.depreciation-by-build-year | property_assessment, tax_structure → depreciation basis | reference |
+| [v] | kb.property.investor-grade-features | property_assessment → fit | reference |
+| [v] | kb.property.rental-market-data-sources | property_assessment, yield_modelling → data provenance | reference (source list) |
+| [v] | kb.strata.health-indicators-investor-lens | property_assessment → strata health | reference |
+| [v] | kb.buyer-costs.investor-additional-costs | cash_position → investor cost adders | banded ranges |
+
+**Cluster Y COMPLETE (11/11, 2026-06-23).** All pure-reference (`fills: []`) — consumed by the computed/agent-reasoned components (yield_modelling = calculator/resolver, property_assessment = summary-card/agent, cash_position = calculator), matching the shape rule (cost/computed component → pure-reference). Verified vs ATO / state tenancy authorities / ABS / SQM / ASIC Moneysmart primaries. **Single-owner handled across three doc-pairs:** (a) `growth-corridors-au` owns the *qualitative location-factor → outlook* methodology and **references** the numeric projection band owned by the existing `kb.property.capital-growth-bands` (not duplicated — the band stays the single labelled-placeholder for sale-value projection); (b) `depreciation-by-build-year` owns the *build-year → eligibility classification* and references the rates/clawback owned by Cluster-T `kb.tax.depreciation-division-43-and-40`; (c) `strata.health-indicators-investor-lens` is a **variant** that owns only investor deltas (levy-as-yield-line, special-levy-as-cash-flow-shock, resale liquidity, by-laws, deductibility) and references the regulated funding horizons owned by FHB `kb.strata.health-indicators`; `investor-additional-costs` is the **delta** on FHB `kb.buyer-costs.inspections-conveyancing-fees`. **Two labelled placeholders** per the tracker: `vacancy-rate-assumptions` (default fallback band is the placeholder; suburb-specific path is sourced) and `growth-corridors-au` (forward outlook framed decision-support, no named-corridor forecast; numeric band deferred to capital-growth-bands). **One new regulated fact removed-from-reach:** state **minimum rental/housing standards** as an investor-only acquisition cost (VIC 14 standards from 29 Mar 2021; QLD all tenancies from 1 Sep 2024; NSW 7 standards + mandatory smoke alarms — regulator-confirmed; SA/WA/TAS/ACT/NT `to_verify` at the row level, same honest-partial move as land-tax-by-state). **Five expected-dangling cross-refs to Cluster S** (`kb.investor.{strategy-archetypes, property-management-vs-self-managed, rental-appraisal-from-pm-agent, tenancy-in-situ-considerations, land-tax-aggregation}`) — all in the Cluster-S list below; GATE 6 reference-integrity only fires at the P3 all-or-nothing flip, so these resolve when Cluster S lands. All 11 slug==path OK; all non-Cluster-S cross-refs resolve.
 
 ### Cluster S — Strategy / process — source: mixed reference / process (lower figure-density; decision-support framed)
 
