@@ -124,7 +124,8 @@ So the base output is real and honest: **the loan-path structure + FHG applicabi
 default + an indicative FHG-panel shortlist + a rate read**, with capacity and the
 debt-optimisation figures explicitly PENDING — never asserted from absent data. The capacity
 *formula* itself (buffer-assessed) is a refine-turn concern (when income arrives); §98 then
-keeps it resolver-computed.
+keeps it resolver-computed. Its full define-simulate-document spec lives in
+[`borrowing-capacity-computation.md`](borrowing-capacity-computation.md).
 
 ---
 
@@ -234,7 +235,8 @@ and each other (the cash/ownership shape).
 
 ## 9. Boundaries (refine-turn / per-property — explicitly NOT base)
 
-The buffer-assessed capacity formula (when income arrives); the debt-optimisation uplifts
+The buffer-assessed capacity formula (when income arrives — now specified in
+[`borrowing-capacity-computation.md`](borrowing-capacity-computation.md)); the debt-optimisation uplifts
 (when HECS/card/BNPL balances arrive); LMI-payable estimates and the FHG-vs-LMI cash crossover
 (when loan amount known); `offset_strategy`; the F11 pre-approval dates. Each fills when its
 facts arrive — never asserted at base. §98 keeps capacity resolver-computed at every turn.

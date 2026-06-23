@@ -229,6 +229,7 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
     "foreign_sourced_income_component": "money_per_year",  // F6 — offshore/FX portion lenders may haircut or exclude; mortgage_finance reads this, not just the total
     "approx_borrowing_capacity": "money_range",       // computed from combined income − debts
     "deposit_ready_for_purchase_amount": "money",     // cash + family + FHSS available
+    "debts": "{ hecs_balance, credit_card_limits_total, personal_loans_balance, car_loan_balance, buy_now_pay_later_balance } | null",  // raw debt facts (balances/limits) the serviceability resolver reads — profile HOLDS facts, mortgage_finance reasons over them (§11.9; CLAUDE.md "Don't merge debts into mortgage params"). Closes the pipeline's `mortgage_finance ◄── profile (incl. debts)` contract. null until captured on a refine turn (honest-partial).
     // purchase-target facts (onboarding) — base-scope cap + cash checks run against these
     "target_price_range": "money_range",
     "target_zone": "array<string>",
@@ -404,7 +405,7 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
 
 **Inputs:** `buyer_profile.outcome` (profile — including debts) + `eligibility.outcome` (scheme_stack — particularly FHG eligibility and slot reservation availability)
 
-**KB anchors:** `kb.lender.serviceability-basics`, `kb.lender.fhg-panel-list`, `kb.lender.hecs-treatment-by-lender`, `kb.lender.credit-card-treatment`, `kb.lender.bnpl-treatment-2026`, `kb.lmi.calculation`, `kb.lmi.providers`, `kb.offset-account.basics`, `kb.refinance.windows-and-triggers`
+**KB anchors:** `kb.lender.serviceability-basics`, `kb.lender.fhg-panel-list`, `kb.lender.hecs-treatment-by-lender`, `kb.lender.credit-card-treatment`, `kb.lender.bnpl-treatment-2026`, `kb.lender.hem-living-expenses`, `kb.tax.income-tax-resident-2025-26`, `kb.hecs.thresholds`, `kb.lmi.calculation`, `kb.lmi.providers`, `kb.offset-account.basics`, `kb.refinance.windows-and-triggers`
 
 **Renderer:** `summary-card` + `data-table`
 
@@ -988,15 +989,15 @@ The `phase_playbook` shape is **mode-general** (phase-keyed actions + risks); Mo
 
 **Scope:** `base` — the projection runs at onboarding against `target_price_range` + the hold horizon `H`; it narrows per-property when a specific property's price attaches (the same base-then-property narrowing every financial figure follows). Present only when `H` is set (Mode-A default is long/indefinite → no disposal projection until the user asks "what if I sell in N years?").
 
-**Inputs:** `buyer_profile.outcome` (`hold_horizon_years` H, `target_price_range`, `intended_occupancy_use`, `tax_residency` — the CGT-exemption determinants) + `property_assessment.outcome` (`price`, per-property) + `mortgage_finance.outcome` (loan terms → the remaining loan balance at year `H`) + `cash_position.outcome` (`budget_envelope.total_cash_required` — the acquisition cash to place into the roll-up) + `ownership_planning.outcome` (`ongoing_obligations` — the annual hold costs to place × `H`). It runs **after `cash_position` + `ownership_planning`** (so the acquire + hold figures exist to place) and **before `purchase_journey`** (which places its `dispose_cash_events` on the swimlane). It is a **figure-owner** for the dispose phase, but its full-horizon roll-up **places** the acquire/hold figures (one-computer-per-figure — it never recomputes them).
+**Inputs:** `buyer_profile.outcome` (`hold_horizon_years` H, `target_price_range`, `intended_occupancy_use`, `tax_residency` — the CGT-exemption determinants) + `property_assessment.outcome` (`price`, per-property) + `mortgage_finance.outcome` (`expected_borrowing_capacity` → the loan amount; amortised to the remaining balance at year `H` at the KB representative product rate, NOT the agent's `loan_structure_recommendation.rate`, which is the rate-STRUCTURE enum) + `cash_position.outcome` (`budget_envelope.total_cash_required` — the acquisition cash to place into the roll-up) + `ownership_planning.outcome` (`ongoing_obligations` — the annual hold costs to place × `H`). It runs **after `cash_position` + `ownership_planning`** (so the acquire + hold figures exist to place) and **before `purchase_journey`** (which places its `dispose_cash_events` on the swimlane). It is a **figure-owner** for the dispose phase, but its full-horizon roll-up **places** the acquire/hold figures (one-computer-per-figure — it never recomputes them).
 
-**KB anchors:** `kb.property.capital-growth-bands`, `kb.selling-costs.agent-legal`, `kb.tax.cgt-main-residence-exemption`
+**KB anchors:** `kb.property.capital-growth-bands`, `kb.selling-costs.agent-legal`, `kb.tax.cgt-main-residence-exemption`, `kb.lender.serviceability-basics`
 
 **Renderer:** `calculator`
 
 **UI tab hint:** Budget (the full-horizon net position + horizon slider) + Flow → Dispose phase sheet
 
-**Fill path:** resolver. Sale proceeds (the KB growth band compounded over `H`), selling costs (commission band × proceeds + legal + marketing), loan payout (amortisation at `H`), CGT (Mode-A main-residence exemption → `null` / `to_verify`), net proceeds, and the full-horizon roll-up are all **deterministic** from KB + upstream figures. **No agent leaf** — growth and CGT are removed from the LLM's reach (banded, KB-grounded, resolver-computed; reliability is structural, not a judge — lifecycle-simulation-model §8.4).
+**Fill path:** resolver. Sale proceeds (the KB growth band compounded over `H`), selling costs (commission band × proceeds + legal + marketing), loan payout (`expected_borrowing_capacity` amortised at `H` at the KB representative product rate — `kb.lender.serviceability-basics`, the capacity-assessment base without the APRA stress buffer), CGT (Mode-A main-residence exemption → `null` / `to_verify`), net proceeds, and the full-horizon roll-up are all **deterministic** from KB + upstream figures. **No agent leaf** — growth, CGT, and the amortisation rate are removed from the LLM's reach (banded/KB-grounded, resolver-computed; reliability is structural, not a judge — lifecycle-simulation-model §8.4).
 
 **Parameters:**
 
