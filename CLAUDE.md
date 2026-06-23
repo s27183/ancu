@@ -10,7 +10,7 @@ This is a **lifecycle planning service**, NOT a property tech platform. The data
 
 ## Status
 
-**Pre-implementation.** Documentation complete; first concrete blueprints drafted. About to start Wedge 1a (Vietnamese-AU FHB base plan, 4–6 weeks). Python project scaffolded (`pyproject.toml`, `.venv`); no production code yet.
+**Wedge 1a — build-complete (2026-06-23), not yet deployed.** The Mode-A FHB lifecycle plan works end-to-end. **Engine:** the full agentic stack — cowboy `/api/engine/*` gateway, `fh_engine_turn` gen_statem driving a supervised Python sidecar (real Anthropic Agent-SDK planner), resolver/agent two-path fill, FIRB→ASIC→AML compliance + outcome-conformance gates, `usage` metering, bilingual Q&A, `plan_card_events` SOT + SSE fan-out. **Shell:** the 8-S chain — SvelteKit SPA (map-first home, onboarding, plan projection + chat, the two-spine lifecycle: swimlane + cash calculator + the full buy→hold→sell temporal flow with disposition/full-horizon), Erlang/OTP backend (two-JWT identity, magic-link + Google login, commerce), all over the engine API. **Verified:** the whole income→borrowing-capacity→disposition full-horizon chain was confirmed **full-stack live-pixel (EN+VI)** on a real Footscray card — figures matching the engine to the dollar. Progress SOT = [`docs/grounding-checklist.md`](docs/grounding-checklist.md) (items 8/9/10/11 all `[x]`). **Remaining open work is deliberately trigger-gated:** identity-layer unification → Wedge 2 (item 2); investor-tax KB (`kb.tax.*`/`kb.investor.*`) → when Mode C ships. Next up: commit + a deploy pass (env: `CLAUDE_CODE_OAUTH_TOKEN` for the Q&A sidecar; the dev `qa_smoke` is green with it set).
 
 ## Documentation
 
@@ -203,4 +203,4 @@ This file should evolve as the project evolves. Specifically:
 - Update the "Don't" list when a new pitfall is encountered.
 - Keep this file under ~200 lines. If it grows, refactor — link out to docs/ instead.
 
-Last updated: May 2026 — pre-implementation, all blueprints drafted, ready for Wedge 1a.
+Last updated: June 2026 — Wedge 1a build-complete (engine 8a + shell 8-S + two-spines + full temporal flow + income→capacity), full-stack live-pixel confirmed; next is commit + deploy.
