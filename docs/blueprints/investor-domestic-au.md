@@ -56,26 +56,26 @@ Mode C's base plan is sharper than Mode A's because investor reasoning often hap
 
 ```
 [1] investor_profile (replaces buyer_profile — investor-focused)
-       │   outcome: investor_profile_summary
+       │   outcome: profile
        ▼
 [2] property_assessment (investor lens — rental + growth + depreciation)
-       │   inputs: investor_profile_summary
+       │   inputs: profile
        │   outcome: property_fit_investor
        ▼
 [3] investment_strategy (replaces FHB eligibility — yield/growth/gearing goals)
-       │   inputs: investor_profile_summary, property_fit_investor
+       │   inputs: profile, property_fit_investor
        │   outcome: strategy_thesis
        ▼
 [4] yield_modelling ★
-       │   inputs: investor_profile_summary, property_fit_investor, strategy_thesis
+       │   inputs: profile, property_fit_investor, strategy_thesis
        │   outcome: cash_flow_projection
        ▼
 [5] tax_structure ★
-       │   inputs: investor_profile_summary, yield_modelling.outcome
+       │   inputs: profile, yield_modelling.outcome
        │   outcome: tax_optimised_structure
        ▼
 [6] cash_position (investor variant — investment loan, higher deposit, no schemes)
-       │   inputs: investor_profile_summary, property_fit_investor, tax_optimised_structure
+       │   inputs: profile, property_fit_investor, tax_optimised_structure
        │   outcome: budget_envelope_investor
        ▼
 [7] buying_strategy (investor tactics — less emotional, more analytical)
@@ -153,21 +153,31 @@ Mode C's base plan is sharper than Mode A's because investor reasoning often hap
 
 ```jsonc
 {
-  "identity": {
-    "citizenship_status": { "type": "enum", "options": ["citizen", "permanent_resident"], "value": "<initial>" },
+  "application": {
     "location_state": { "type": "enum", "options": ["NSW", "VIC", "QLD", "WA", "SA", "TAS", "ACT", "NT"], "value": "<initial>" },
-    "language_preference": { "type": "enum", "options": ["en", "vi"], "value": "en" }
-  },
-  "household": {
-    "buying_alone": { "type": "bool", "value": "<initial>" },
-    "co_investor_count": { "type": "integer", "value": 0 },
+    "applicant_count": { "type": "integer", "value": 1, "note": "= applicants[] length. Replaces the old buying_alone / co_investor_count (buying_alone ≡ applicant_count == 1; co_investor_count ≡ applicant_count − 1)." },
     "dependents_count": { "type": "integer", "value": 0 }
   },
-  "income_and_tax": {
-    "primary_taxable_income": { "type": "money_per_year", "value": "<initial>" },
-    "marginal_tax_rate_estimate": { "type": "percentage", "value": "<initial>", "derived_from": "primary_taxable_income" },
-    "income_stability": { "type": "enum", "options": ["permanent_payg", "contractor", "self_employed", "casual", "mixed"], "value": "<initial>" },
-    "spousal_income_if_joint": { "type": "money_per_year", "value": 0 }
+  "applicants": {
+    "type": "array<applicant>",
+    "note": "F1 — one entry per person taking an ownership interest. Mode C: 1..N citizen/PR investors. The tax-bearing facts (marginal rate, tax residency) are PER-APPLICANT — a joint investment is assessed per owner. citizenship_status is citizen/PR only; a foreign co-investor routes to the FIRB path (→ Mode D). No first-home ownership_history / owner_occupier_intent — not eligibility-bearing for an investor (the canonical applicant element carries them; an investor simply does not fill them).",
+    "value": [
+      {
+        "role": { "type": "enum", "options": ["primary", "co_investor"], "value": "primary" },
+        "citizenship_status": { "type": "enum", "options": ["citizen", "permanent_resident"], "value": "<initial>" },
+        "firb_required": { "type": "bool", "value": false, "derived_from": "citizenship_status", "note": "Mode C = domestic; false for every applicant. The household aggregate profile.firb_required_any is the single FIRB fact read across modes." },
+        "taxable_income": { "type": "money_per_year", "value": "<initial>", "note": "per-applicant assessable income; the household assessable_income aggregates the array." },
+        "tax": {
+          "residency_for_tax": { "type": "enum", "options": ["resident", "non_resident", "temporary_resident_for_tax"], "value": "resident", "note": "Mode-C-activated tax{} (fact-model-unification.md 'Mode-C activation'). Drives the CGT 50% discount + main-residence interactions read by tax_structure / disposition." },
+          "marginal_rate": { "type": "percentage", "value": "<initial>", "derived_from": "taxable_income", "note": "per-applicant marginal rate (kb.investor.tax-brackets-2026); read as applicant.tax.marginal_rate by tax_structure / disposition." },
+          "jurisdiction": { "type": "enum", "options": ["AU"], "value": "AU", "note": "Mode C = AU tax jurisdiction; Mode D adds VN." }
+        }
+      }
+    ],
+    "_item_note": "Each array entry is one investor with the shape shown; the single example entry illustrates the per-applicant leaf schema."
+  },
+  "income": {
+    "income_stability": { "type": "enum", "options": ["permanent_payg", "contractor", "self_employed", "casual", "mixed"], "value": "<initial>" }
   },
   "existing_portfolio": {
     "ppor_owned": { "type": "bool", "value": "<initial>" },
@@ -178,10 +188,13 @@ Mode C's base plan is sharper than Mode A's because investor reasoning often hap
     "existing_portfolio_net_yield_estimate": { "type": "percentage", "value": "<initial>" }
   },
   "investment_experience": {
+    // experience_level → profile.traits.experience_level (Mode-C-activated; a persistent trait that accumulates across journeys, NOT a per-journey posture)
     "experience_level": { "type": "enum", "options": ["first_investment", "second_or_third", "experienced_4_plus"], "value": "<initial>" },
     "depreciation_strategies_used": { "type": "bool", "value": "<initial>" },
     "trust_or_company_structures_used": { "type": "bool", "value": "<initial>" }
   },
+  // investment_goals + risk_tolerance are plan.* facts (per-journey), NOT profile facts (engine-contract §9.1, architecture §11.9):
+  // collected here pending the item-4 storage split, exactly as Mode A still keeps purchase_target in buyer_profile params.
   "investment_goals": {
     "primary_goal": { "type": "enum", "options": ["cash_flow", "capital_growth", "balanced", "tax_optimisation", "diversification"], "value": "<initial>" },
     "secondary_goal": { "type": "enum", "options": ["cash_flow", "capital_growth", "balanced", "tax_optimisation", "diversification", "none"], "value": "none" },
@@ -196,23 +209,34 @@ Mode C's base plan is sharper than Mode A's because investor reasoning often hap
 }
 ```
 
-**Outcome schema:** `investor_profile_summary`
+**Outcome schema:** `profile`
 
 ```jsonc
 {
-  "type": "investor_profile_summary",
+  "type": "profile",   // canonical, mode-independent identity shape — Mode C projects the investor subset (fact-model-unification.md "Mode-C activation"); NOT a private profile type
   "fields": {
-    "marginal_tax_rate": "percentage",
-    "approx_borrowing_capacity_investment_loan": "money_range",
-    "ppor_equity_available_for_leverage": "money",
-    "experience_level": "enum",
-    "primary_investment_goal": "enum",
-    "negative_gearing_attractive": "bool",
-    "key_strengths": "array<string>",
-    "key_constraints": "array<string>"
+    // legal-status & tax facts — PER-APPLICANT (read as applicant.*). Mode C: 1..N citizen/PR investors.
+    "applicants": "array<{ role, citizenship_status, firb_required, tax }>",  // role ∈ {primary, co_investor}; per-applicant tax{ residency_for_tax, marginal_rate, jurisdiction } (Mode-C-activated nested object, jurisdiction=AU). No owner_occupier_intent / first-home ownership_history — not eligibility-bearing for an investor.
+    "applicant_count": "integer",
+    "firb_required_any": "bool",                      // derived = false for Mode C (domestic citizen/PR) — the SINGLE household FIRB fact, read uniformly across all modes (B/D = true)
+    // household-level FACTS (not verdicts)
+    "assessable_income": "money_per_year",            // aggregate of applicants[].taxable_income
+    "approx_borrowing_capacity": "money_range",       // canonical name, investment-loan flavoured by plan.intent (§98 — banded, resolver-computed)
+    "deposit_ready_for_purchase_amount": "money",
+    "ppor_equity_available_for_leverage": "money",    // equity release from an owned PPOR; read by mortgage_finance
+    "debts": "{ hecs_balance, credit_card_limits_total, personal_loans_balance, car_loan_balance, buy_now_pay_later_balance } | null",  // raw debt facts the serviceability resolver reads (profile HOLDS facts; mortgage reasons over them). null until captured (honest-partial).
+    "existing_portfolio": "{ ppor_owned, ppor_estimated_equity, investment_count, investment_value, investment_loans, net_yield_estimate } | null",  // Mode-C-activated household_financials.existing_portfolio
+    "traits": "{ experience_level } | null",          // Mode-C-activated — persistent disposition, accumulates across journeys (per-journey posture is plan.risk_tolerance, NOT here)
+    // narrative
+    "key_constraints": "array<localized_text>",       // bilingual (engine-output), canonical type — was array<string>
+    "key_strengths": "array<localized_text>"
+    // DROPPED primary_investment_goal → plan.investment_goals.primary (a plan fact, not an identity fact)
+    // DROPPED negative_gearing_attractive → a tax_structure verdict (outcomes carry facts, not verdicts; §11.9)
   }
 }
 ```
+
+> **Identity-layer conformance (2026-06-23).** This component's outcome is now the **canonical `profile`** (not a per-mode `profile`), projecting the Mode-C-activated generalizations — per-applicant `tax{}`, `existing_portfolio`, `traits` ([`../architecture/fact-model-unification.md`](../architecture/fact-model-unification.md) "Mode-C activation"). Downstream components read `profile.*` / `applicant.*` / `plan.*` (architecture §11.9 read-namespace convention). **Deferred to the Mode-C wedge:** the downstream components' precise field-path reads, the investor KB (`kb.investor.*` / `kb.tax.*`), flipping Mode C **in-scope**, and the compiler's **semantic**-gate extension. This unit conforms the identity layer and keeps the **structural** gates green.
 
 ---
 
@@ -388,7 +412,7 @@ Mode C's base plan is sharper than Mode A's because investor reasoning often hap
 
 **Goal:** Determine **investment loan structure** (IO vs P&I; offset strategy; fixed vs variable), shortlist investor-friendly lenders, plan refinance triggers for portfolio growth, with explicit reasoning about how loan structure interacts with negative gearing strategy.
 
-**Inputs:** `investor_profile.outcome` (investor_profile_summary — including debts, marginal tax rate, existing portfolio) + `investment_strategy.outcome` (strategy_thesis — particularly gearing_type and target_lvr)
+**Inputs:** `investor_profile.outcome` (profile — including debts, marginal tax rate, existing portfolio) + `investment_strategy.outcome` (strategy_thesis — particularly gearing_type and target_lvr)
 
 **KB anchors:** `kb.lender.investment-loan-policies`, `kb.lender.investor-friendly-shortlist`, `kb.loan.interest-only-vs-pi-investor`, `kb.loan.offset-vs-redraw-investor`, `kb.loan.refinance-strategies-portfolio-growth`, `kb.lender.hecs-treatment-by-lender`, `kb.loan.fixed-rate-roll-off-planning`, `kb.lender.serviceability-investment-loans`
 
@@ -1062,12 +1086,12 @@ Same as Mode A + B with one Mode C-exclusive addition:
 ## Cross-component output dependency graph
 
 ```
-investor_profile         → outcome: investor_profile_summary
-property_assessment      → outcome: property_fit_investor      (reads: investor_profile_summary)
-investment_strategy      → outcome: strategy_thesis            (reads: investor_profile_summary, property_fit_investor)
-yield_modelling          → outcome: cash_flow_projection       (reads: investor_profile_summary, property_fit_investor, strategy_thesis)
-tax_structure            → outcome: tax_optimised_structure    (reads: investor_profile_summary, cash_flow_projection)
-cash_position            → outcome: budget_envelope_investor   (reads: investor_profile_summary, property_fit_investor, tax_optimised_structure)
+investor_profile         → outcome: profile
+property_assessment      → outcome: property_fit_investor      (reads: profile)
+investment_strategy      → outcome: strategy_thesis            (reads: profile, property_fit_investor)
+yield_modelling          → outcome: cash_flow_projection       (reads: profile, property_fit_investor, strategy_thesis)
+tax_structure            → outcome: tax_optimised_structure    (reads: profile, cash_flow_projection)
+cash_position            → outcome: budget_envelope_investor   (reads: profile, property_fit_investor, tax_optimised_structure)
 buying_strategy          → outcome: bid_plan_investor          (reads: property_fit_investor, budget_envelope_investor, strategy_thesis)
 due_diligence            → outcome: risk_assessment_investor   (reads: property_fit_investor, uploaded_docs)
 settlement_prep          → outcome: settlement_checklist       (reads: property_fit_investor, bid_plan_investor, tax_optimised_structure)
