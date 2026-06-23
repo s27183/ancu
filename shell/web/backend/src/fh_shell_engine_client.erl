@@ -12,8 +12,8 @@
 %% are built (8-S1..8-S4). HTTP via inets httpc (started by the shell app).
 
 -export([create_plan_card/2, get_plan_card/2, post_message/3, simulate/3,
-         refine/3, set_checklist_status/3, stream_events/3, list_suburbs/1,
-         get_usage_events/2, start_httpc_profiles/0]).
+         refine/3, set_profile_financials/3, set_checklist_status/3, stream_events/3,
+         list_suburbs/1, get_usage_events/2, start_httpc_profiles/0]).
 
 %% Dedicated httpc profile for the LONG-LIVED SSE stream proxy (stream_events/3).
 %% SSE requests run with {timeout, infinity} and hold an httpc session for the entire
@@ -143,6 +143,23 @@ simulate(UserId, PlanCardId, BodyMap) ->
 refine(UserId, PlanCardId, BodyMap) ->
     Token = fh_shell_engine_jwt:mint(#{user_id => UserId}),
     Url = base_url() ++ "/plan-cards/" ++ binary_to_list(PlanCardId) ++ "/refine",
+    Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
+    Body = fh_shell_util:json_encode(BodyMap),
+    {ok, {{_, Status, _}, _, Resp}} =
+        httpc:request(post, {Url, Headers, "application/json", Body},
+                      [{timeout, ?RPC_TIMEOUT_MS}], [{body_format, binary}]),
+    {Status, Resp}.
+
+%% Write the household financial facts (IC4) — POST /api/engine/plan-cards/:id/profile with
+%% {household_financials: {income, debts}}. The shell has confirmed ownership first. The
+%% engine validates (400 invalid_financials), full-replaces the canonical household_financials
+%% key on the profiles SOT, and re-derives every card on the profile (resolver-only, NO usage
+%% — so NO meter gate); the recomputed capacity streams over each card's /events. Answers 202
+%% {plan_card_id, cards_recomputing}. Relayed verbatim — the engine owns the financials contract.
+-spec set_profile_financials(binary(), binary(), map()) -> {non_neg_integer(), binary()}.
+set_profile_financials(UserId, PlanCardId, BodyMap) ->
+    Token = fh_shell_engine_jwt:mint(#{user_id => UserId}),
+    Url = base_url() ++ "/plan-cards/" ++ binary_to_list(PlanCardId) ++ "/profile",
     Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
     Body = fh_shell_util:json_encode(BodyMap),
     {ok, {{_, Status, _}, _, Resp}} =

@@ -36,6 +36,19 @@ export interface ProfileOutcome {
     firb_required_any?: boolean | null;
     intended_occupancy_use?: string | null;
     assessable_income?: number | null;
+    // Foreign-sourced slice of assessable_income (diaspora-relevant; the engine's profile
+    // outcome key carries the `_income_` infix, distinct from the write endpoint's
+    // income.foreign_sourced_component). Used to SEED the cockpit field (IC5).
+    foreign_sourced_income_component?: number | null;
+    // Raw debt facts (IC3 framing — profile holds facts, mortgage_finance reasons). The
+    // five balances/limits the serviceability resolver reads; null/absent → honest-partial.
+    debts?: {
+        hecs_balance?: number | null;
+        credit_card_limits_total?: number | null;
+        personal_loans_balance?: number | null;
+        car_loan_balance?: number | null;
+        buy_now_pay_later_balance?: number | null;
+    } | null;
     approx_borrowing_capacity?: MoneyRange | null;
     deposit_ready_for_purchase_amount?: number | null;
     target_price_range?: MoneyRange | null;
@@ -145,6 +158,30 @@ export interface BudgetEnvelopeOutcome {
     verdict?: string | null;
     genuine_savings_verdict?: string | null;
     mitigation_options_if_short?: string[] | null;
+    key_assumptions?: LocalizedText[] | null;
+}
+
+/** disposition → calculator (outcome type `disposition`). The TERMINAL dispose-phase
+ *  figure-owner (lifecycle-simulation-model §8): the sell-side projection over a hold
+ *  horizon `H` + the full-horizon net position (buy → hold → sell). It OWNS the dispose
+ *  figures and PLACES the acquire/hold figures into the roll-up (one-computer-per-figure).
+ *  Honest-partial: `horizon_years` null → no projection (Mode-A long/indefinite default);
+ *  `H` set but loan unknown (no income captured) → sale/selling banded, loan/net/full null.
+ *  Mode-A CGT = main-residence exemption (`cgt` always null, `cgt_status` exempt|to_verify —
+ *  never an estimated taxable gain; verify-regulated-figures-by-postcondition). */
+export interface DispositionOutcome {
+    horizon_years?: number | null;
+    sale_proceeds?: MoneyRange | null;
+    selling_costs?: MoneyRange | null;
+    loan_payout?: MoneyRange | null;
+    /** Always null on the Mode-A main-residence path (no taxable-gain estimate). */
+    cgt?: MoneyRange | null;
+    cgt_status?: 'exempt' | 'to_verify' | string | null;
+    net_proceeds?: MoneyRange | null;
+    /** THE headline: net proceeds − acquisition cash − hold costs × H. May be negative. */
+    full_horizon_net_position?: MoneyRange | null;
+    /** The Dispose-phase entries of the shared spine (same shape as cash_events). */
+    dispose_cash_events?: CashEvent[] | null;
     key_assumptions?: LocalizedText[] | null;
 }
 

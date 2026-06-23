@@ -174,12 +174,15 @@ export async function listPlanCards(
 // as the GET card's content.components — so the projection merges them onto its existing
 // entries by one key. Saving a previewed scenario is a separate refine turn (W8), not this.
 
-/** The structural what-if overrides. Both optional — send only the dimensions varied.
+/** The structural what-if overrides. All optional — send only the dimensions varied.
  *  `target_price` is a single number (the engine collapses it to a [p,p] point range);
- *  `state` is an AU state code. property_type is Phase-B (per-property) → engine 400. */
+ *  `state` is an AU state code; `horizon` is the dispose-phase hold years H (a positive
+ *  integer — the engine rejects 0/non-int; its ABSENCE is the long/indefinite default,
+ *  engine-contract §10.5). property_type is Phase-B (per-property) → engine 400. */
 export interface SimulateOverrides {
     target_price?: number;
     state?: string;
+    horizon?: number;
 }
 
 /** A discriminated preview outcome. `invalid` is the engine's 400 for a rejected
@@ -243,6 +246,71 @@ export async function refinePlanCard(
     }
     if (res.status === 409) return { kind: 'busy' };
     if (res.status === 400) return { kind: 'invalid' };
+    if (res.status === 404) return { kind: 'not_found' };
+    if (res.status === 401) return { kind: 'auth_required' };
+    return { kind: 'error', status: res.status };
+}
+
+// --- Profile financials: enrich income/debts → recompute capacity (IC5) ------
+// POST /api/plan-cards/:id/profile — write the household financial FACTS (income +
+// debts) to the profiles SOT (IC4). Unlike simulate/refine (structural what-ifs) and
+// cash-on-hand (a client-side verdict figure), this is a persisted FACT: it commits
+// directly (no preview) and the engine recomputes borrowing capacity resolver-only,
+// re-deriving every card on the profile (a fact is profile-shared). The recomputed
+// outcomes — capacity → mortgage_finance → disposition full-horizon — arrive over the
+// SAME /events stream as the live fill, NOT in this reply. Resolver-only → no usage,
+// no meter gate. FULL-REPLACE: the cockpit owns the whole financials object and submits
+// it whole, so omitting a field clears it (honest-partial → null downstream).
+
+/** The household financial facts the serviceability resolver consumes (IC4 scope).
+ *  All fields optional — capacity computes once income is present. Money figures are
+ *  non-negative numbers; the engine validates fail-closed and rejects any other key. */
+export interface HouseholdFinancials {
+    income?: {
+        assessable_income?: number;
+        foreign_sourced_component?: number;
+    };
+    debts?: {
+        hecs_balance?: number;
+        credit_card_limits_total?: number;
+        personal_loans_balance?: number;
+        car_loan_balance?: number;
+        buy_now_pay_later_balance?: number;
+    };
+}
+
+/** A discriminated write outcome. `accepted` carries `cardsRecomputing` — the count of
+ *  profile cards that actually started a recompute; 0 means the addressed card was mid-
+ *  turn and skipped (it picks up the facts on its next recompute → "try again shortly").
+ *  `invalid` carries the engine's human-readable 400 detail (a rejected field/non-number). */
+export type ProfileFinancialsOutcome =
+    | { kind: 'accepted'; cardsRecomputing: number }
+    | { kind: 'invalid'; detail: string }
+    | { kind: 'not_found' }
+    | { kind: 'auth_required' }
+    | { kind: 'error'; status: number };
+
+/** POST the household financials. The recomputed components do NOT come back here — they
+ *  stream over the card's /events (this card is one of the recomputing siblings); this
+ *  returns only whether the write was accepted and how many cards started. */
+export async function setProfileFinancials(
+    planCardId: string,
+    financials: HouseholdFinancials,
+    fetchFn: typeof fetch = fetch
+): Promise<ProfileFinancialsOutcome> {
+    const res = await fetchFn(`/api/plan-cards/${encodeURIComponent(planCardId)}/profile`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ household_financials: financials })
+    });
+    if (res.status === 202) {
+        const body = (await res.json()) as { cards_recomputing?: number };
+        return { kind: 'accepted', cardsRecomputing: body.cards_recomputing ?? 0 };
+    }
+    if (res.status === 400) {
+        const body = (await res.json().catch(() => ({}))) as { detail?: string };
+        return { kind: 'invalid', detail: body.detail ?? '' };
+    }
     if (res.status === 404) return { kind: 'not_found' };
     if (res.status === 401) return { kind: 'auth_required' };
     return { kind: 'error', status: res.status };

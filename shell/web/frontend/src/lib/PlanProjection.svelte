@@ -13,8 +13,10 @@
         listPlanCards,
         simulatePlanCard,
         refinePlanCard,
+        setProfileFinancials,
         setChecklistStatus,
-        type SimulateOverrides
+        type SimulateOverrides,
+        type HouseholdFinancials
     } from '$lib/api';
     import { subscribePlanCard, type PlanCardStream } from '$lib/planCardStream';
     import {
@@ -26,6 +28,7 @@
         type JourneySwimlaneOutcome,
         type PhasePlaybookOutcome,
         type BudgetEnvelopeOutcome,
+        type DispositionOutcome,
         type ChecklistStatusMap
     } from '$lib/planCard';
     import { AU_STATES } from '$lib/map';
@@ -68,11 +71,8 @@
     // "Bạn đã đủ chưa?" verdict → the cash-events table → the breakdown detail. Labels reuse
     // the existing calculator keys. A self-owned table row routes here to 'detail'.
     let budgetSub = $state<string>('ready');
-    const budgetTabs = $derived([
-        { id: 'ready', label: $t('plan.cash.ready') },
-        { id: 'table', label: $t('plan.cash.spine') },
-        { id: 'detail', label: $t('plan.cash.breakdown') }
-    ]);
+    // The budget sub-tabs are derived below, after `viewComponents` (the 4th "Full horizon"
+    // tab is gated on the disposition component existing).
 
     let phase = $state<'loading' | 'ready' | 'no_card' | 'error'>('loading');
     let components = $state<Record<string, ComponentEntry>>({});
@@ -101,6 +101,16 @@
     // Seeded to suburbState by resetPreview() (called at the top of load()), not at init —
     // $state captures only the initial prop value, and the bar only renders post-load.
     let stateSelect = $state('');
+    // The horizon slider (TW6): the dispose-phase hold years H — a structural what-if at
+    // PLAN scope (it re-renders the Full-horizon tab + the Flow dispose column, not just one
+    // renderer — preview-is-commit-minus-persistence, place-at-scope-of-effect), so it lives
+    // in the cockpit alongside price/state. 0 = no sale projection (the Mode-A long/indefinite
+    // default — the engine rejects horizon=0, so we omit it rather than send it). Seeded from
+    // the card's current H; only a value that differs from that baseline is sent as an override.
+    let horizonValue = $state(0);
+    const baselineHorizon = $derived(
+        (components.disposition?.outcome as DispositionOutcome | undefined)?.horizon_years ?? 0
+    );
     let previewOutcomes = $state<Record<string, Record<string, unknown>> | null>(null);
     let previewing = $state(false);
     let previewError = $state(false);
@@ -122,6 +132,102 @@
         return cashOnHandInput.trim() !== '' && Number.isFinite(n) && n >= 0 ? n : null;
     });
 
+    // ── Household financials (IC5) ──────────────────────────────────────────
+    // A persisted FACT — income + debts — distinct from the what-if above (price/state/
+    // horizon → ephemeral simulate) and from cash-on-hand (a client-side verdict figure).
+    // It commits directly (a fact, no preview) via POST /profile (IC4); the engine
+    // recomputes borrowing capacity resolver-only and the new figures (capacity →
+    // mortgage_finance → disposition full-horizon) arrive over the SAME /events SSE — this
+    // card is one of the recomputing siblings. No usage → no meter gate (like refine).
+    let finIncome = $state('');
+    let finForeign = $state('');
+    let finHecs = $state('');
+    let finCards = $state('');
+    let finPersonal = $state('');
+    let finCar = $state('');
+    let finBnpl = $state('');
+    let finSaving = $state(false);
+    // A profile write committed (cards_recomputing>0); the live recompute is in flight, so
+    // the inputs lock and we re-seed from the engine SOT once onDone fires.
+    let finRecomputing = $state(false);
+    let finError = $state<null | 'busy' | 'invalid' | 'error'>(null);
+    let finErrorDetail = $state('');
+    const finBusy = $derived(running || finSaving || finRecomputing);
+
+    // Seed the finance fields from the live buyer_profile outcome (engine SOT). LOAD-BEARING
+    // for correctness, not just UX: the write is FULL-REPLACE, so the form must hold the
+    // whole financials object — seeding keeps untouched figures intact across an edit (else
+    // editing income would wipe stored debts). Honest-partial: a null/absent figure → blank.
+    function seedFinancials() {
+        const o = components.buyer_profile?.outcome as ProfileOutcome | undefined;
+        const num = (v: unknown): string => (typeof v === 'number' ? String(v) : '');
+        finIncome = num(o?.assessable_income);
+        finForeign = num(o?.foreign_sourced_income_component);
+        const d = o?.debts ?? undefined;
+        finHecs = num(d?.hecs_balance);
+        finCards = num(d?.credit_card_limits_total);
+        finPersonal = num(d?.personal_loans_balance);
+        finCar = num(d?.car_loan_balance);
+        finBnpl = num(d?.buy_now_pay_later_balance);
+    }
+
+    // Build the FULL financials object from the form (full-replace — a blank field is
+    // omitted → cleared downstream → honest-partial null). Parses non-negative numbers,
+    // matching the engine's fail-closed validator (which is the backstop, not the gate).
+    function buildFinancials(): HouseholdFinancials {
+        const n = (s: string): number | undefined => {
+            const v = Number(s.replace(/[^0-9.]/g, ''));
+            return s.trim() !== '' && Number.isFinite(v) && v >= 0 ? v : undefined;
+        };
+        const income: Record<string, number> = {};
+        const inc = n(finIncome);
+        if (inc !== undefined) income.assessable_income = inc;
+        const fgn = n(finForeign);
+        if (fgn !== undefined) income.foreign_sourced_component = fgn;
+        const debts: Record<string, number> = {};
+        const pairs: Array<[string, string]> = [
+            ['hecs_balance', finHecs],
+            ['credit_card_limits_total', finCards],
+            ['personal_loans_balance', finPersonal],
+            ['car_loan_balance', finCar],
+            ['buy_now_pay_later_balance', finBnpl]
+        ];
+        for (const [key, raw] of pairs) {
+            const v = n(raw);
+            if (v !== undefined) debts[key] = v;
+        }
+        const hf: HouseholdFinancials = {};
+        if (Object.keys(income).length) hf.income = income;
+        if (Object.keys(debts).length) hf.debts = debts;
+        return hf;
+    }
+
+    // Submit the financials (the COMMIT — a fact, no preview). On 202 with a started
+    // recompute, flip to recomputing (turnDone=false hides the settled state, blocks a
+    // racing 2nd submit); the recomputed capacity arrives over the live SSE and onDone
+    // re-seeds from SOT. cards_recomputing===0 → the card was mid-turn (skipped) → retry.
+    async function saveFinancials() {
+        if (!cardId || finBusy) return;
+        finError = null;
+        finErrorDetail = '';
+        finSaving = true;
+        const res = await setProfileFinancials(cardId, buildFinancials());
+        finSaving = false;
+        if (res.kind === 'accepted') {
+            if (res.cardsRecomputing > 0) {
+                turnDone = false;
+                finRecomputing = true;
+            } else {
+                finError = 'busy';
+            }
+        } else if (res.kind === 'invalid') {
+            finError = 'invalid';
+            finErrorDetail = res.detail;
+        } else {
+            finError = 'error';
+        }
+    }
+
     // The components the tabs render: live outcomes, or — under an active preview — each
     // entry with its outcome swapped for the previewed one (renderer/scope/etc preserved,
     // merged by component_id). A component absent from the preview keeps its live outcome.
@@ -135,6 +241,17 @@
             ])
         );
     });
+
+    // The budget (Cash-calculator) sub-tabs (§7.3): cockpit + verdict → cash-events table →
+    // breakdown detail → the disposition projection. The 4th "Full horizon" tab is present
+    // only when the engine emits a disposition component (honest-partial tab presence; its
+    // own content is honest-partial too — an invitation until a hold horizon H is set). TW5.
+    const budgetTabs = $derived([
+        { id: 'ready', label: $t('plan.cash.ready') },
+        { id: 'table', label: $t('plan.cash.spine') },
+        { id: 'detail', label: $t('plan.cash.breakdown') },
+        ...(viewComponents.disposition ? [{ id: 'horizon', label: $t('plan.cash.horizon') }] : [])
+    ]);
 
     // ── Flow view (task 10) ────────────────────────────────────────────────
     // The legal/temporal spine's three live inputs, read from viewComponents so a what-if
@@ -189,6 +306,9 @@
         const p = Number(priceInput.replace(/[^0-9.]/g, ''));
         if (priceInput.trim() !== '' && Number.isFinite(p) && p > 0) overrides.target_price = p;
         if (stateSelect && stateSelect !== suburbState) overrides.state = stateSelect;
+        // horizon: only a positive H that differs from the card's baseline (omit 0 — the
+        // engine has no "clear horizon" override; absence IS the indefinite default).
+        if (horizonValue >= 1 && horizonValue !== baselineHorizon) overrides.horizon = horizonValue;
         return overrides;
     }
 
@@ -240,6 +360,7 @@
         saveError = false;
         priceInput = '';
         stateSelect = suburbState;
+        horizonValue = baselineHorizon;
     }
 
     async function load() {
@@ -268,6 +389,8 @@
         if (myGen !== gen) return;
         if (res.kind === 'ok') {
             components = res.card.content.components ?? {};
+            horizonValue = baselineHorizon; // seed the slider from the card's saved H
+            seedFinancials(); // seed income/debts from the card's stored profile facts (IC5)
             checklistStatus = res.card.checklist_status ?? {};
             uiTabs = res.card.ui_tabs?.length ? res.card.ui_tabs : FALLBACK_TABS;
             if (!uiTabs.some((t) => t.tab_id === sub)) sub = uiTabs[0]?.tab_id ?? '';
@@ -295,6 +418,15 @@
                     if (committing) {
                         committing = false;
                         resetPreview();
+                    }
+                    // A just-committed financials write (IC5): the recomputed capacity is
+                    // now live, so re-seed the fields from the engine SOT (reflects what was
+                    // actually stored, incl. any normalization). Gated on finRecomputing so
+                    // an unrelated onDone (base turn / scenario save) never clobbers an
+                    // in-progress finance draft.
+                    if (finRecomputing) {
+                        finRecomputing = false;
+                        seedFinancials();
                     }
                 }
                 // onError: EventSource auto-reconnects; stay calm (no banner).
@@ -428,6 +560,28 @@
                                     {/each}
                                 </select>
                             </label>
+                            <!-- Horizon slider (TW6): drag to project the sell-side over H
+                                 years; oninput shows the live value, onchange (on release)
+                                 runs ONE simulate (not per-tick during the drag). 0 = no sale
+                                 projection (the Mode-A default) → omitted from the override. -->
+                            <label class="pp-ck-field pp-ck-horizon">
+                                <span class="pp-ck-label">
+                                    {$t('plan.whatif.horizon')}
+                                    <span class="pp-ck-hval">
+                                        {horizonValue >= 1
+                                            ? `${horizonValue} ${$t('plan.whatif.years_unit')}`
+                                            : $t('plan.whatif.horizon_off')}
+                                    </span>
+                                </span>
+                                <input
+                                    type="range"
+                                    min="0"
+                                    max="30"
+                                    step="1"
+                                    bind:value={horizonValue}
+                                    onchange={runPreview}
+                                />
+                            </label>
                             <label class="pp-ck-field pp-ck-locked">
                                 <span class="pp-ck-label">{$t('plan.cockpit.ptype')}</span>
                                 <select disabled>
@@ -472,6 +626,82 @@
                             components={viewComponents}
                             density="full"
                         />
+
+                        <!-- Household financials (IC5): a persisted FACT — income + debts —
+                             distinct from the what-if scenario above and the client-side
+                             cash-on-hand. Commits via POST /profile → the engine recomputes
+                             borrowing capacity → the full-horizon net position arrives over
+                             the live SSE. Seeded from the engine SOT; full-replace on submit. -->
+                        <section class="pp-fin">
+                            <h4 class="pp-fin-title">{$t('plan.fin.title')}</h4>
+                            <p class="pp-fin-intro">{$t('plan.fin.intro')}</p>
+                            <div class="pp-fin-grid">
+                                <label class="pp-ck-field pp-fin-wide">
+                                    <span class="pp-ck-label">{$t('plan.fin.income')}</span>
+                                    <input
+                                        type="text"
+                                        inputmode="numeric"
+                                        bind:value={finIncome}
+                                        placeholder={$t('plan.fin.placeholder')}
+                                        disabled={finBusy}
+                                    />
+                                    <span class="pp-fin-hint">{$t('plan.fin.income_hint')}</span>
+                                </label>
+                                <label class="pp-ck-field">
+                                    <span class="pp-ck-label">{$t('plan.fin.foreign')}</span>
+                                    <input
+                                        type="text"
+                                        inputmode="numeric"
+                                        bind:value={finForeign}
+                                        placeholder={$t('plan.fin.placeholder0')}
+                                        disabled={finBusy}
+                                    />
+                                </label>
+                            </div>
+                            <span class="pp-ck-label pp-fin-debts-label">{$t('plan.fin.debts_label')}</span>
+                            <div class="pp-fin-grid">
+                                <label class="pp-ck-field">
+                                    <span class="pp-ck-label">{$t('plan.fin.hecs')}</span>
+                                    <input type="text" inputmode="numeric" bind:value={finHecs}
+                                        placeholder={$t('plan.fin.placeholder0')} disabled={finBusy} />
+                                </label>
+                                <label class="pp-ck-field">
+                                    <span class="pp-ck-label">{$t('plan.fin.cards')}</span>
+                                    <input type="text" inputmode="numeric" bind:value={finCards}
+                                        placeholder={$t('plan.fin.placeholder0')} disabled={finBusy} />
+                                </label>
+                                <label class="pp-ck-field">
+                                    <span class="pp-ck-label">{$t('plan.fin.personal')}</span>
+                                    <input type="text" inputmode="numeric" bind:value={finPersonal}
+                                        placeholder={$t('plan.fin.placeholder0')} disabled={finBusy} />
+                                </label>
+                                <label class="pp-ck-field">
+                                    <span class="pp-ck-label">{$t('plan.fin.car')}</span>
+                                    <input type="text" inputmode="numeric" bind:value={finCar}
+                                        placeholder={$t('plan.fin.placeholder0')} disabled={finBusy} />
+                                </label>
+                                <label class="pp-ck-field">
+                                    <span class="pp-ck-label">{$t('plan.fin.bnpl')}</span>
+                                    <input type="text" inputmode="numeric" bind:value={finBnpl}
+                                        placeholder={$t('plan.fin.placeholder0')} disabled={finBusy} />
+                                </label>
+                            </div>
+                            <div class="pp-cockpit-actions">
+                                <button type="button" class="primary" onclick={saveFinancials} disabled={finBusy}>
+                                    {finSaving ? $t('plan.fin.saving') : $t('plan.fin.save')}
+                                </button>
+                            </div>
+                            {#if finRecomputing}
+                                <p class="pp-wi-banner">{$t('plan.fin.recomputing')}</p>
+                            {:else if finError === 'busy'}
+                                <p class="pp-wi-error">{$t('plan.fin.busy')}</p>
+                            {:else if finError === 'invalid'}
+                                <p class="pp-wi-error">{$t('plan.fin.error')} {finErrorDetail}</p>
+                            {:else if finError === 'error'}
+                                <p class="pp-wi-error">{$t('plan.fin.error')}</p>
+                            {/if}
+                            <p class="pp-fin-disclaimer">{$t('plan.fin.disclaimer')}</p>
+                        </section>
                     {:else}
                         <!-- Tabs 2/3: the cockpit is on tab 1, so signpost an active preview here. -->
                         {#if previewActive}
@@ -491,6 +721,20 @@
                                 onShowDetail={() => (budgetSub = 'detail')}
                                 density="full"
                             />
+                        {:else if budgetSub === 'horizon'}
+                            <!-- Tab 4 (TW5): the disposition projection — the sell-side +
+                                 full-horizon net position, a SEPARATE outcome via the same
+                                 calculator renderer. Honest-partial: invitation until H set. -->
+                            {#if viewComponents.disposition}
+                                <Calculator
+                                    outcome={viewComponents.disposition.outcome}
+                                    view="disposition"
+                                    components={viewComponents}
+                                    density="full"
+                                />
+                            {:else}
+                                <p class="pp-pending">{$t('plan.computing')}</p>
+                            {/if}
                         {:else}
                             <!-- Tab 3: the breakdown detail, inline. -->
                             <Calculator

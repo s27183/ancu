@@ -24,6 +24,7 @@ init(Req0, Opts) ->
         {[messages], <<"POST">>} -> with_owned_card(Req0, Opts, fun ask/4);
         {[simulate], <<"POST">>} -> with_owned_card(Req0, Opts, fun simulate/4);
         {[refine], <<"POST">>}   -> with_owned_card(Req0, Opts, fun refine/4);
+        {[profile], <<"POST">>}  -> with_owned_card(Req0, Opts, fun profile/4);
         {[checklist_status], <<"PATCH">>} ->
             with_owned_card(Req0, Opts, fun checklist_status/4);
         _ ->
@@ -117,6 +118,23 @@ refine(UserId, PlanCardId, Req0, Opts) ->
         {ok, Body, Req1} ->
             {Status, Resp} =
                 fh_shell_engine_client:refine(UserId, PlanCardId, Body),
+            {ok, relay(Status, Resp, Req1), Opts};
+        {error, invalid_json} ->
+            {ok, fh_shell_http:reply_json(400,
+                #{<<"error">> => <<"invalid_json">>}, Req0), Opts}
+    end.
+
+%% POST /api/plan-cards/:id/profile — write the household financial facts (income/debts)
+%% to the engine's profiles SOT (IC4) → the engine validates (400), full-replaces the
+%% canonical household_financials key, and re-derives every card on the profile; the
+%% recomputed capacity streams over each card's /events. NO meter gate (like simulate/
+%% refine, unlike `ask`): the recompute is resolver-only and emits zero usage. The engine
+%% owns the financials contract — relay verbatim.
+profile(UserId, PlanCardId, Req0, Opts) ->
+    case fh_shell_http:read_json_body(Req0) of
+        {ok, Body, Req1} ->
+            {Status, Resp} =
+                fh_shell_engine_client:set_profile_financials(UserId, PlanCardId, Body),
             {ok, relay(Status, Resp, Req1), Opts};
         {error, invalid_json} ->
             {ok, fh_shell_http:reply_json(400,

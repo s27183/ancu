@@ -76,13 +76,14 @@
         return a ? pick(a.label, $lang) : id;
     }
 
-    // (phase, actor) → cell. A plain lookup map keyed by "phase actor" (internal
-    // plumbing, never rendered → no SvelteMap needed).
-    const byKey = $derived(
-        new Map(cells.map((c) => [`${c.phase} ${c.actor}`, c]))
-    );
-    const cellAt = (phaseId: string, actorId: string): JourneyCell | undefined =>
-        byKey.get(`${phaseId} ${actorId}`);
+    // (phase, actor) → ALL cells at that coordinate. The engine emits TWO kinds of cell
+    // (legal prose + one money cell per placed flow, fh_engine_journey "two kinds of cell"),
+    // so a coordinate can hold several — e.g. Dispose/other = the agent prose + sale_proceeds
+    // (in) + selling_costs (out); Settle/government = duty + the FHOG grant. We render them
+    // ALL, stacked — keying a Map by (phase, actor) would keep only the last and silently
+    // drop the rest. cells is tiny (≤ phases × actors), so a plain filter is fine.
+    const cellsAt = (phaseId: string, actorId: string): JourneyCell[] =>
+        cells.filter((c) => c.phase === phaseId && c.actor === actorId);
 
     // grid: a sticky actor-label column + one column per phase.
     const cols = $derived(`minmax(4.5rem, auto) repeat(${phases.length}, minmax(8.5rem, 1fr))`);
@@ -151,18 +152,18 @@
             {#each actors as a (a.id)}
                 <div class="sw-actor">{pick(a.label, $lang)}</div>
                 {#each phases as p (p.id)}
-                    {@const c = cellAt(p.id, a.id)}
-                    <!-- svelte-ignore a11y_no_noninteractive_tabindex (role=button + tabindex set together under `interactive && c`) -->
+                    {@const cs = cellsAt(p.id, a.id)}
+                    <!-- svelte-ignore a11y_no_noninteractive_tabindex (role=button + tabindex set together under `interactive && cs.length`) -->
                     <div
                         class="sw-cell"
-                        class:sw-clickable={interactive && c}
+                        class:sw-clickable={interactive && cs.length}
                         class:sw-selected={selectedPhase === p.id}
-                        role={interactive && c ? 'button' : undefined}
-                        tabindex={interactive && c ? 0 : undefined}
-                        onclick={interactive && c ? () => onSelectPhase?.(p.id) : undefined}
-                        onkeydown={interactive && c ? (e) => onPhaseKey(e, p.id) : undefined}
+                        role={interactive && cs.length ? 'button' : undefined}
+                        tabindex={interactive && cs.length ? 0 : undefined}
+                        onclick={interactive && cs.length ? () => onSelectPhase?.(p.id) : undefined}
+                        onkeydown={interactive && cs.length ? (e) => onPhaseKey(e, p.id) : undefined}
                     >
-                        {#if c}{@render cellBody(c)}{/if}
+                        {#each cs as c, i (i)}{@render cellBody(c)}{/each}
                     </div>
                 {/each}
             {/each}
@@ -189,8 +190,8 @@
                 </div>
                 <div class="sw-ph-rows">
                     {#each actors as a (a.id)}
-                        {@const c = cellAt(p.id, a.id)}
-                        {#if c}
+                        {@const cs = cellsAt(p.id, a.id)}
+                        {#if cs.length}
                             <!-- svelte-ignore a11y_no_noninteractive_tabindex (role=button + tabindex set together under `interactive`) -->
                             <div
                                 class="sw-srow"
@@ -201,7 +202,9 @@
                                 onkeydown={interactive ? (e) => onPhaseKey(e, p.id) : undefined}
                             >
                                 <span class="sw-srow-actor">{pick(a.label, $lang)}</span>
-                                <div class="sw-srow-body">{@render cellBody(c)}</div>
+                                <div class="sw-srow-body">
+                                    {#each cs as c, i (i)}{@render cellBody(c)}{/each}
+                                </div>
                             </div>
                         {/if}
                     {/each}

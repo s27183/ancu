@@ -1460,6 +1460,22 @@ main {
     cursor: not-allowed;
     background: var(--surface);
 }
+/* Horizon slider (TW6): reset the generic .pp-ck-field input box chrome for the range,
+   and show the live value as an accent chip beside the label. */
+.pp-ck-field input[type='range'] {
+    padding: 0;
+    border: none;
+    background: transparent;
+    accent-color: var(--accent);
+    cursor: pointer;
+    align-self: stretch;
+}
+.pp-ck-hval {
+    margin-left: 0.4rem;
+    color: var(--accent);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
 .pp-cockpit-actions {
     display: flex;
     flex-wrap: wrap;
@@ -1471,6 +1487,58 @@ main {
     flex: none;
     padding: 0.45rem 0.9rem;
     font-size: 0.85rem;
+}
+.pp-ck-field input:disabled {
+    background: var(--surface);
+    color: var(--muted);
+    cursor: not-allowed;
+}
+
+/* Household financials (IC5): a persisted FACT block — income + debts — visually set
+   apart from the what-if scenario cockpit above by a top hairline + tinted ground. */
+.pp-fin {
+    margin-top: 1rem;
+    padding-top: 0.85rem;
+    border-top: 1px solid var(--border);
+}
+.pp-fin-title {
+    margin: 0 0 0.2rem;
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--ink);
+}
+.pp-fin-intro {
+    margin: 0 0 0.7rem;
+    font-size: 0.8rem;
+    color: var(--muted);
+}
+.pp-fin-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.6rem 0.75rem;
+    margin-bottom: 0.6rem;
+}
+@media (max-width: 520px) {
+    .pp-fin-grid {
+        grid-template-columns: 1fr;
+    }
+}
+.pp-fin-wide {
+    grid-column: 1 / -1;
+}
+.pp-fin-hint {
+    font-size: 0.72rem;
+    color: var(--muted);
+}
+.pp-fin-debts-label {
+    display: block;
+    margin: 0.2rem 0 0.4rem;
+}
+.pp-fin-disclaimer {
+    margin: 0.6rem 0 0;
+    font-size: 0.72rem;
+    color: var(--muted);
+    font-style: italic;
 }
 .pp-card {
     border: 1px solid var(--border);

@@ -25,6 +25,7 @@
         type BudgetEnvelopeOutcome,
         type CashEvent,
         type ComponentEntry,
+        type DispositionOutcome,
         type MoneyRange
     } from '$lib/planCard';
     import { money, moneyRange } from '$lib/format';
@@ -57,7 +58,9 @@
         // 'table' (the cash-events spine), 'detail' (the breakdown, inline). Default 'full'
         // stacks all three with the breakdown behind a modal — the standalone render used by
         // ComponentCard and the export dossier (untouched by the tabbed budget surface).
-        view?: 'verdict' | 'table' | 'detail' | 'full';
+        // 'disposition' renders the SEPARATE `disposition` outcome (the dispose-phase
+        // figure-owner) — the sell-side projection + full-horizon net position (TW5).
+        view?: 'verdict' | 'table' | 'detail' | 'full' | 'disposition';
         // Tabbed mode only: a self-owned row (deposit/duty/other → cash_position itself) has
         // no external explainer, so instead of the breakdown MODAL it asks the parent to
         // switch to the Detail tab. Absent (full mode) → the self-owned row opens the modal.
@@ -200,6 +203,31 @@
             o.key_assumptions?.length
         )
     );
+
+    // ── Disposition (view='disposition') — the dispose-phase figure-owner ──────
+    // A SEPARATE outcome shape from budget_envelope; both use the `calculator` renderer
+    // (the blueprint maps both → calculator). This view reads `disposition`: the sell-side
+    // projection (sale − selling − loan − cgt = net) + the full-horizon net position.
+    // Honest-partial: H null → invitation; H set + loan unknown (no income captured, the
+    // common simulate-only state) → sale/selling banded, loan/net/full PENDING with a CTA.
+    const d = $derived(outcome as DispositionOutcome);
+    // The `calculator` renderer is mapped to BOTH outcome types (cash_position's
+    // budget_envelope AND disposition); a standalone render (ComponentCard / export dossier /
+    // the PhaseSheet component_ref drill) hands view='full', so the renderer must discriminate
+    // by outcome shape — `cgt_status` is always a non-null string for disposition and absent
+    // for budget_envelope (robust even if the JSON drops null-valued keys).
+    const isDisposition = $derived(typeof d.cgt_status === 'string');
+    const hasHorizon = $derived(typeof d.horizon_years === 'number' && d.horizon_years > 0);
+    const loanPending = $derived(hasHorizon && !hasRange(d.loan_payout));
+    const fullHorizon = $derived(hasRange(d.full_horizon_net_position) ? d.full_horizon_net_position : null);
+    const CGT_TONE: Record<string, 'good' | 'warn' | 'neutral'> = { exempt: 'good', to_verify: 'warn' };
+    // Map the closed cgt_status enum to literal i18n keys (no dynamic-key cast that would
+    // hide a producer rename — firsthomey-svelte-conventions).
+    function cgtLabel(s: string): string {
+        if (s === 'exempt') return $t('plan.disp.cgt.exempt');
+        if (s === 'to_verify') return $t('plan.disp.cgt.to_verify');
+        return s;
+    }
 </script>
 
 <!-- The breakdown detail — the line breakdown + summary. Rendered INLINE in the Detail tab
@@ -248,7 +276,7 @@
 {/snippet}
 
 <!-- ── (1) "Am I ready?" verdict hero ───────────────────────────────────── -->
-{#if view === 'verdict' || view === 'full'}
+{#if view === 'verdict' || (view === 'full' && !isDisposition)}
 <div class="cw-hero" class:cw-full={density === 'full'}>
     <div class="cw-head">
         <span class="cw-need-label">{$t('plan.cash.need')}</span>
@@ -282,7 +310,7 @@
 <!-- ── (2) The financial spine — cash_events across the lifecycle phases ──── -->
 <!-- A clean Item/Amount table (the prototype's design language). Each phase is a sub-header
      band; each event row drills to its source_component (§7.3) when that owner is filled. -->
-{#if (view === 'table' || view === 'full') && hasSpine}
+{#if (view === 'table' || (view === 'full' && !isDisposition)) && hasSpine}
     <div class="cw-spine">
         <h4 class="cw-spine-title">{$t('plan.cash.spine')}</h4>
         <table class="cw-table">
@@ -333,7 +361,7 @@
 {/if}
 
 <!-- full mode: the breakdown sits behind a modal opener under the table. -->
-{#if view === 'full' && hasBreakdown}
+{#if view === 'full' && !isDisposition && hasBreakdown}
     <button type="button" class="cw-breakdown-btn" onclick={() => (showBreakdown = true)}>
         {$t('plan.cash.breakdown')}
     </button>
@@ -345,6 +373,79 @@
         {@render breakdownBody()}
     {:else}
         <Pending />
+    {/if}
+{/if}
+
+<!-- ── (4) Disposition — the sell-side projection + full-horizon net position. ── -->
+<!-- A separate outcome (the dispose-phase figure-owner); the calculator's culminating
+     projection of the financial process (buy → hold → sell). Honest-partial throughout.
+     Triggered by view='disposition' (the Budget tab) OR a 'full' render of a disposition
+     outcome (ComponentCard / dossier / PhaseSheet drill — the renderer self-discriminates). -->
+{#if view === 'disposition' || (view === 'full' && isDisposition)}
+    {#if hasHorizon}
+        <!-- The full-horizon net position hero (the headline). -->
+        <div class="cw-hero cw-full">
+            <div class="cw-head">
+                <span class="cw-need-label">{$t('plan.disp.full_horizon')}</span>
+                {#if fullHorizon}
+                    <span class="cw-need-total">{rangeLabel(fullHorizon)}</span>
+                {:else}
+                    <Pending />
+                {/if}
+            </div>
+            <p class="cw-disp-sub">{$t('plan.disp.full_horizon_sub')}</p>
+        </div>
+
+        <!-- The sell-side breakdown: sale − selling − loan − cgt = net. Every figure is
+             resolver-computed + banded; a pending figure shows "—", never a fake zero. -->
+        <div class="cw-spine">
+            <h4 class="cw-spine-title">{phaseLabel('dispose')}</h4>
+            <table class="cw-table">
+                <tbody>
+                    <tr class="cw-trevent">
+                        <td class="cw-td-item"><span class="cw-ev-label">{$t('plan.disp.sale')}</span></td>
+                        <td class="num cw-ev-amt cw-in">+{rangeLabel(d.sale_proceeds)}</td>
+                    </tr>
+                    <tr class="cw-trevent">
+                        <td class="cw-td-item"><span class="cw-ev-label">{$t('plan.disp.selling')}</span></td>
+                        <td class="num cw-ev-amt cw-out">−{rangeLabel(d.selling_costs)}</td>
+                    </tr>
+                    <tr class="cw-trevent">
+                        <td class="cw-td-item"><span class="cw-ev-label">{$t('plan.disp.loan')}</span></td>
+                        <td class="num cw-ev-amt" class:cw-out={hasRange(d.loan_payout)}
+                            >{hasRange(d.loan_payout) ? '−' + rangeLabel(d.loan_payout) : '—'}</td
+                        >
+                    </tr>
+                    <tr class="cw-trevent">
+                        <td class="cw-td-item"><span class="cw-ev-label">{$t('plan.disp.cgt')}</span></td>
+                        <td class="num">
+                            {#if d.cgt_status}
+                                <Chip label={cgtLabel(d.cgt_status)} tone={CGT_TONE[d.cgt_status] ?? 'neutral'} />
+                            {:else}
+                                —
+                            {/if}
+                        </td>
+                    </tr>
+                    <tr class="cw-trevent cw-trnet">
+                        <td class="cw-td-item"><span class="cw-ev-label">{$t('plan.disp.net')}</span></td>
+                        <td class="num cw-ev-amt">{rangeLabel(d.net_proceeds)}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        {#if loanPending}
+            <p class="cw-cta">{$t('plan.disp.loan_pending')}</p>
+        {/if}
+
+        <NoteList heading={$t('plan.f.assumptions')} notes={d.key_assumptions} />
+    {:else}
+        <!-- H null → no projection (Mode-A long/indefinite default); the engine emits the
+             single invitation line in key_assumptions. TW6 wires the horizon control. -->
+        <div class="cw-hero">
+            <span class="cw-need-label">{$t('plan.disp.set_horizon')}</span>
+        </div>
+        <NoteList notes={d.key_assumptions} />
     {/if}
 {/if}
 
@@ -387,6 +488,13 @@
     .cw-vbody { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
     .cw-vamount { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink); }
     .cw-cta { margin: 0; font-size: 0.85rem; color: var(--muted); font-style: italic; }
+
+    /* Disposition: the sub-label under the full-horizon hero + the net subtotal row. */
+    .cw-disp-sub { margin: 0.25rem 0 0; font-size: 0.78rem; color: var(--muted); }
+    .cw-trnet td {
+        border-top: 2px solid var(--border); font-weight: 700;
+        padding-top: 0.55rem; background: var(--surface-2, #fafaf9);
+    }
 
     /* Financial spine — cash_events as a clean Item/Amount table (prototype design
        language: uppercase head, hairline row borders, right-aligned tabular amounts). */

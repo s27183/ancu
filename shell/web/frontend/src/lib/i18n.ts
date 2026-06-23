@@ -168,6 +168,7 @@ const messages = {
     // Per-property component titles — shown as affordance cards at base (the full
     // component appears once a property is attached). Base components already have plan.c.*.
     'plan.c.purchase_journey': { vi: 'Hành trình mua nhà', en: 'Your buying journey' },
+    'plan.c.disposition': { vi: 'Khi bán nhà', en: 'When you sell' },
     'plan.c.due_diligence': { vi: 'Thẩm định', en: 'Due diligence' },
     'plan.c.settlement_prep': { vi: 'Chuẩn bị bàn giao', en: 'Settlement prep' },
     'plan.c.buying_strategy': { vi: 'Chiến lược ra giá', en: 'Buying strategy' },
@@ -274,11 +275,32 @@ const messages = {
     'plan.cash.in': { vi: 'nhận về', en: 'in' },
     'plan.cash.out': { vi: 'chi ra', en: 'out' },
     'plan.cash.ready': { vi: 'Bạn đã đủ chưa?', en: 'Am I ready?' },
+    'plan.cash.horizon': { vi: 'Cả hành trình', en: 'Full horizon' },
+    // Disposition (the dispose-phase figure-owner, lifecycle-simulation-model §8): the
+    // sell-side projection + the full-horizon net position. Honest-partial throughout.
+    'plan.disp.full_horizon': { vi: 'Vị thế ròng cả hành trình', en: 'Full-horizon net position' },
+    'plan.disp.full_horizon_sub': {
+        vi: 'Mua → giữ → bán: sau tiền mặt ban đầu và chi phí sở hữu.',
+        en: 'Buy → hold → sell: after acquisition cash and holding costs.'
+    },
+    'plan.disp.sale': { vi: 'Tiền bán (dự phóng)', en: 'Sale proceeds (projected)' },
+    'plan.disp.selling': { vi: 'Chi phí bán', en: 'Selling costs' },
+    'plan.disp.loan': { vi: 'Tất toán khoản vay', en: 'Loan payout' },
+    'plan.disp.net': { vi: 'Tiền ròng nhận về', en: 'Net proceeds' },
+    'plan.disp.cgt': { vi: 'Thuế lãi vốn (CGT)', en: 'Capital gains tax (CGT)' },
+    'plan.disp.cgt.exempt': { vi: 'Được miễn', en: 'Exempt' },
+    'plan.disp.cgt.to_verify': { vi: 'Cần kiểm tra', en: 'To verify' },
+    'plan.disp.set_horizon': { vi: 'Chưa có dự phóng khi bán', en: 'No sell-side projection yet' },
+    'plan.disp.loan_pending': {
+        vi: 'Khoản tất toán vay và tiền ròng sẽ được tính khi biết số tiền vay — bổ sung thu nhập của bạn trong phần trò chuyện.',
+        en: 'Loan payout and net proceeds compute once your loan amount is known — add your income in chat.'
+    },
     'plan.phase.prepare': { vi: 'Chuẩn bị', en: 'Prepare' },
     'plan.phase.pre_approve': { vi: 'Phê duyệt sơ bộ', en: 'Pre-approval' },
     'plan.phase.contract': { vi: 'Hợp đồng', en: 'Contract' },
     'plan.phase.settle': { vi: 'Bàn giao', en: 'Settle' },
     'plan.phase.own': { vi: 'Sở hữu', en: 'Own' },
+    'plan.phase.dispose': { vi: 'Bán nhà', en: 'Sell' },
     // Budget cockpit (the prototype's input form, engine-driven).
     'plan.cockpit.title': { vi: 'Ngân sách — bạn đã sẵn sàng?', en: 'Budget — am I ready?' },
     'plan.cockpit.intro': {
@@ -341,6 +363,12 @@ const messages = {
     'plan.whatif.title': { vi: 'Thử kịch bản khác', en: 'Try a different scenario' },
     'plan.whatif.price': { vi: 'Giá mục tiêu', en: 'Target price' },
     'plan.whatif.state': { vi: 'Tiểu bang', en: 'State' },
+    // The horizon slider (TW6): the dispose-phase hold years H — a structural what-if at
+    // plan scope (drives the free simulate, re-renders the Full-horizon tab + Flow dispose
+    // column). 0 = no sale projection (the Mode-A long/indefinite default).
+    'plan.whatif.horizon': { vi: 'Số năm nắm giữ', en: 'Hold horizon' },
+    'plan.whatif.years_unit': { vi: 'năm', en: 'yrs' },
+    'plan.whatif.horizon_off': { vi: 'Giữ lâu dài', en: 'Hold indefinitely' },
     'plan.whatif.current': { vi: 'Hiện tại:', en: 'Now:' },
     'plan.whatif.run': { vi: 'Xem thử', en: 'Preview' },
     'plan.whatif.reset': { vi: 'Đặt lại', en: 'Reset' },
@@ -358,6 +386,43 @@ const messages = {
     'plan.whatif.saveerror': {
         vi: 'Không lưu được kịch bản. Vui lòng thử lại.',
         en: 'Couldn’t save the scenario. Please try again.'
+    },
+    // Budget cockpit — household financials (IC5). A persisted FACT (income + debts) that
+    // unblocks borrowing capacity → the full-horizon net position; distinct from the
+    // ephemeral price/state what-if and the client-side cash-on-hand figure.
+    'plan.fin.title': { vi: 'Tài chính của bạn', en: 'Your finances' },
+    'plan.fin.intro': {
+        vi: 'Nhập thu nhập và các khoản nợ để hệ thống ước tính khả năng vay và vị thế ròng cả hành trình. Thông tin này được lưu vào kế hoạch của bạn.',
+        en: 'Enter your income and debts so we can estimate your borrowing capacity and full-horizon net position. This is saved to your plan.'
+    },
+    'plan.fin.income': { vi: 'Thu nhập hộ gia đình (trước thuế)', en: 'Household income (before tax)' },
+    'plan.fin.income_hint': {
+        vi: 'Tổng thu nhập chịu thuế của cả hộ, mỗi năm.',
+        en: 'Combined household assessable income, per year.'
+    },
+    'plan.fin.foreign': { vi: 'Trong đó, thu nhập từ nước ngoài', en: 'of which, foreign-sourced' },
+    'plan.fin.debts_label': { vi: 'Các khoản nợ', en: 'Debts' },
+    'plan.fin.hecs': { vi: 'Dư nợ HECS/HELP', en: 'HECS/HELP balance' },
+    'plan.fin.cards': { vi: 'Tổng hạn mức thẻ tín dụng', en: 'Total credit-card limits' },
+    'plan.fin.personal': { vi: 'Vay tiêu dùng', en: 'Personal loans' },
+    'plan.fin.car': { vi: 'Vay mua xe', en: 'Car loan' },
+    'plan.fin.bnpl': { vi: 'Mua trước trả sau (BNPL)', en: 'Buy now, pay later (BNPL)' },
+    'plan.fin.placeholder': { vi: 'ví dụ 95.000', en: 'e.g. 95,000' },
+    'plan.fin.placeholder0': { vi: 'ví dụ 0', en: 'e.g. 0' },
+    'plan.fin.save': { vi: 'Cập nhật tài chính', en: 'Update my finances' },
+    'plan.fin.saving': { vi: 'Đang lưu…', en: 'Saving…' },
+    'plan.fin.recomputing': {
+        vi: 'Đang tính lại kế hoạch với số liệu mới…',
+        en: 'Recomputing your plan with the new figures…'
+    },
+    'plan.fin.busy': {
+        vi: 'Một bản cập nhật đang chạy. Vui lòng thử lại sau giây lát.',
+        en: 'An update is already running. Please try again shortly.'
+    },
+    'plan.fin.error': { vi: 'Không lưu được. Vui lòng thử lại.', en: 'Couldn’t save. Please try again.' },
+    'plan.fin.disclaimer': {
+        vi: 'Khả năng vay là ước tính theo dải, dựa trên quy ước của người cho vay — không phải lời khuyên tài chính hay cam kết cho vay.',
+        en: 'Borrowing capacity is a banded estimate based on lender conventions — not financial advice or a loan commitment.'
     },
     'plan.verdict.surplus': { vi: 'Dư', en: 'Surplus' },
     'plan.verdict.tight': { vi: 'Vừa đủ', en: 'Tight' },
