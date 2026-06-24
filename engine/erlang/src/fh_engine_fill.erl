@@ -27,6 +27,7 @@
 %% fills the whole outcome — the later per-property valuation/negotiation components).
 -spec has_resolver(binary()) -> boolean().
 has_resolver(<<"buyer_profile">>)      -> true;
+has_resolver(<<"investor_profile">>)   -> true;
 has_resolver(<<"eligibility">>)        -> true;
 has_resolver(<<"cash_position">>)      -> true;
 has_resolver(<<"ownership_planning">>) -> true;
@@ -40,6 +41,8 @@ has_resolver(_)                        -> false.
 -spec resolver(binary(), map(), map()) -> {map(), binary(), [map()]}.
 resolver(<<"buyer_profile">>, Args, _Upstream) ->
     buyer_profile(Args);
+resolver(<<"investor_profile">>, Args, _Upstream) ->
+    investor_profile(Args);
 resolver(<<"eligibility">>, Args, Upstream) ->
     fh_engine_eligibility:fill(Args, Upstream);
 resolver(<<"cash_position">>, Args, Upstream) ->
@@ -170,6 +173,80 @@ buyer_profile(Args) ->
     KbVersions = fh_engine_kb:kb_anchors(
         [<<"kb.hecs.thresholds">>, <<"kb.firb.status-determination">>,
          <<"kb.lender.serviceability-basics">>]),
+    {Outcome, <<"summary-card">>, KbVersions}.
+
+%% --- investor_profile (Mode C, real) ----------------------------------------
+%% The investor pipeline entry: project the onboarding fact base into the CANONICAL
+%% `profile` outcome, investor lens (blueprint component 1). Same canonical, mode-
+%% independent shape as buyer_profile (identity-layer unification, fact-model-
+%% unification.md "Mode-C activation"); the investor deltas are (a) a per-applicant
+%% tax{} object (residency + jurisdiction; marginal_rate derived_from income → PENDING
+%% until captured) in place of the owner-occupier eligibility leaves (no
+%% owner_occupier_intent / first-home ownership history — not eligibility-bearing for an
+%% investor), and (b) a domestic-investor strength rather than the FHB one. The deep
+%% investor facts (existing_portfolio, traits.experience_level, deposit, ppor equity,
+%% borrowing capacity) arrive on a refine turn from the profiles SOT — null at onboarding
+%% (plan-first, constraint #1/#9), honest-partial. Distinct component name from
+%% buyer_profile ⟹ zero Mode-A reach (the FHB turn never selects this clause).
+investor_profile(Args) ->
+    Onboarding = maps:get(onboarding, Args, #{}),
+    Financials = maps:get(household_financials, Args, #{}),
+    TargetRange = maps:get(<<"target_price_range">>, Onboarding, null),
+    TargetZone = maps:get(<<"target_zone">>, Onboarding, []),
+    %% Mode-C definitional applicant: a domestic (citizen/PR) investor. citizenship is the
+    %% SAME set as Mode A; the investor-specific leaf is the per-applicant tax{}.
+    %% residency_for_tax=resident is the domestic default (drives the CGT 50% discount read
+    %% by tax_structure / disposition); jurisdiction=AU (Mode D adds VN); marginal_rate
+    %% ABSENT until income captured (a refine narrowing, derived_from taxable_income).
+    Applicant = #{
+        <<"role">> => <<"primary">>,
+        <<"citizenship_status">> =>
+            #{<<"oneof">> => [<<"citizen">>, <<"permanent_resident">>]},
+        <<"tax">> => #{
+            <<"residency_for_tax">> => <<"resident">>,
+            <<"jurisdiction">> => <<"AU">>
+        }
+    },
+    %% firb_required per applicant via the SAME resolver Mode A uses — over the citizen/PR
+    %% set, `in [temporary_resident, non_resident]` is definitely-false → false (Mode C is
+    %% domestic; a foreign co-investor would route to the FIRB path → Mode D).
+    Facts = #{<<"applicants">> => [Applicant]},
+    FirbTri = fh_engine_resolver:eval_applicants(
+        <<"applicant.firb_required">>, fh_engine_kb:rules(), Facts),
+    Applicants = [A#{<<"firb_required">> => tri_to_json(F)}
+                  || {A, F} <- lists:zip([Applicant], FirbTri)],
+    Outcome = #{
+        <<"applicants">> => Applicants,
+        <<"applicant_count">> => length(Applicants),
+        %% conservative / fail-closed for FIRB (Mode C → false).
+        <<"firb_required_any">> => lists:any(fun(F) -> F =/= false end, FirbTri),
+        %% income facts framed the SAME way as Mode A (IC3 helpers reused); null/empty when
+        %% no financials captured. Borrowing capacity stays PENDING — computed downstream by
+        %% the mortgage_finance investor variant (a later unit), never here.
+        <<"assessable_income">> => assessable_income(Financials),
+        <<"foreign_sourced_income_component">> => foreign_sourced(Financials),
+        <<"debts">> => debts(Financials),
+        %% the onboarding target → DAG carrier (downstream investor yield/cash read these
+        %% off profile.*, exactly as Mode A's downstream reads them).
+        <<"target_price_range">> => TargetRange,
+        <<"target_zone">> => TargetZone,
+        %% null at base = no disposal projection until the horizon is set (for an investor H
+        %% also arrives via strategy_thesis.hold_period_years — a later component).
+        <<"hold_horizon_years">> => maps:get(<<"hold_horizon_years">>, Onboarding, null),
+        %% bilingual {vi,en} via kb.copy.profile. One honest constraint (financials pending,
+        %% mode-neutral, reused) + one definitional Mode-C strength (domestic investor: no
+        %% FIRB / no foreign-buyer surcharge / resident CGT-discount eligible). Decision-
+        %% support tone — states the position, not "you should invest" (ASIC line).
+        <<"key_constraints">> => [copy(<<"constraint_financials_pending">>, #{})],
+        <<"key_strengths">>   => [copy(<<"strength_domestic_investor">>, #{})]
+        %% ABSENT (→ null → honest-partial): existing_portfolio, traits,
+        %% deposit_ready_for_purchase_amount, ppor_equity_available_for_leverage,
+        %% approx_borrowing_capacity — gathered on a refine turn (profiles SOT).
+    },
+    KbVersions = fh_engine_kb:kb_anchors(
+        [<<"kb.tax.income-tax-resident-2025-26">>,
+         <<"kb.lender.serviceability-investment-loans">>,
+         <<"kb.investor.experience-levels">>]),
     {Outcome, <<"summary-card">>, KbVersions}.
 
 %% A three-valued resolver verdict, made JSON-safe for the outcome snapshot:

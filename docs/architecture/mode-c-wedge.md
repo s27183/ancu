@@ -87,12 +87,22 @@ committable on its own (coupling-in-a-unit ≠ coupling-in-a-commit).
   pure-additive, zero Mode-A risk. (The onboarding intent picker moved to P5: unhardcoding `intent`
   in the shell while the engine still hardcodes `fhb` is a silent-wrong rug, so the picker must land
   **atomically** with the engine dispatch — the doc's own atomic-last rule.)
-- **P5 — Onboarding activation** (atomic-last, only after P3+P4 green → Mode C live end-to-end):
-  the onboarding **intent picker** (`onboarding.ts` — unhardcode owner-occupier; the
-  `intent: 'owner_occupier' | 'investment'` type already exists in `api.ts`) **+** the engine
-  **dispatch** (`fh_engine_h_plan_cards.erl`: select `blueprint_slug` by `intent`), landed together.
-  Also builds the per-blueprint `base_components` sequence (the P3 follow-on) — an investor base turn
-  verifies it end-to-end.
+- **P5 — Investor base engine + onboarding activation.** Grounding the live engine (2026-06-24)
+  reshaped this phase: the original line ("dispatch + per-blueprint `base_components` → an investor
+  base turn verifies end-to-end") was **under-scoped**. An investor base turn can't run — its
+  resolvers don't exist. `has_resolver/1` lists only Mode-A component names; `investor_profile`,
+  `yield_modelling`, `ownership_planning_investor` have no module (a base turn `error`s on the first),
+  and the shared-name `cash_position`/`mortgage_finance` resolvers run **Mode-A** logic (FHB schemes /
+  P&I — wrong figures). Only `disposition` is investor-ready (P2). So P5 splits:
+  - **P5-engine** — the investor resolver suite, decomposed **one component at a time** (each verified
+    in isolation via a conformance escript against its KB — the P2 disposition rhythm; no onboarding
+    needed). Regulated figures resolver-computed + removed-from-reach throughout (tax_structure is the
+    most-regulated surface). The per-applicant `tax{}` / `existing_portfolio` / `traits` are the
+    Mode-C-activated canonical-`profile` deltas.
+  - **P5-activate (atomic-last)** — the per-blueprint `base_components/1` sequence (the P3 follow-on)
+    **+** the `fh_engine_h_plan_cards` dispatch (select `blueprint_slug` by `intent`) **+** the
+    `onboarding.ts` intent picker (the type already exists in `api.ts`), landing **together** once the
+    turn computes end-to-end — so a user onboarding as an investor never hits a half-built turn.
 
 ## Spec-seam reconciliations (P2 — free, reduces 47 anchors → 45 to author)
 
@@ -193,8 +203,15 @@ Status legend: `[ ]` not started · `[~]` drafting · `[v]` facts verified vs pr
 | [x] | P3 | Re-emit artifact; **prove selection** — both registries present, investor `disposition.cgt_status` `[computed, to_verify]`; both modes green |
 | [x] | P4 | Shell renderer: `buying-strategy-card` (Svelte component + dispatcher branch; enum + §11.9 row already authored) |
 | [x] | P4 | Shell renderer: `opportunity-card` (Svelte component + dispatcher branch; enum + §11.9 row already authored) |
-| [ ] | P5 | Onboarding **intent picker** (`onboarding.ts` — unhardcode owner-occupier) — moved from P4, lands atomically with dispatch |
-| [ ] | P5 | Onboarding **dispatch**: `fh_engine_h_plan_cards.erl` selects blueprint by `intent` (atomic-last) + per-blueprint `base_components` sequence |
+| [x] | P5-engine | `investor_profile` resolver (`fh_engine_fill` inline, mirrors `buyer_profile`) — canonical `profile`, investor lens (per-applicant `tax{}`, no owner-occupier leaves, domestic-investor strength); honest-partial |
+| [ ] | P5-engine | `investment_strategy` agent-path wiring (3 leaves, no resolver) — `strategy_thesis` from the Cluster-S KB (archetype/gearing/hold/exit) |
+| [ ] | P5-engine | `mortgage_finance` investor variant (branch the shared resolver) — investment-loan serviceability, IO-vs-PI, DTI cap (Cluster-F KB) |
+| [ ] | P5-engine | `yield_modelling` resolver (NEW module) — `cash_flow_projection` (rent/opex/vacancy/PM; Cluster-Y KB, banded/placeholder) |
+| [ ] | P5-engine | `tax_structure` agent + regulated figures (1 leaf) — `tax_optimised_structure`; CGT/depreciation/land-tax resolver-computed, removed-from-reach (Cluster-T KB; the load-bearing ASIC surface) |
+| [ ] | P5-engine | `cash_position` investor variant (branch the shared resolver) — investment deposit, no FHB schemes, investor cost adders (Cluster-Y/F KB) |
+| [ ] | P5-engine | `ownership_planning_investor` resolver (NEW module) — `portfolio_position` (land-tax aggregation, mgmt model, scale-up; Cluster-S KB) + the `opportunities[]` producer seam flagged in P4 |
+| [ ] | P5-activate | per-blueprint `base_components/1` sequence (the P3 follow-on — derive the investor base set + DAG order, replacing the Mode-A `?BASE_COMPONENTS` macro) |
+| [ ] | P5-activate | Onboarding **dispatch** (`fh_engine_h_plan_cards.erl` selects blueprint by `intent`) **+** **intent picker** (`onboarding.ts`), atomic-last |
 
 **P2 COMPLETE (2026-06-24).** Two free repoints + the investor CGT branch, all committable now (no
 deploy until P3). **Repoints** in `investor-domestic-au.md`: `kb.investor.tax-brackets-2026` →
@@ -274,6 +291,27 @@ which carries `alert_triggers_armed: array<{trigger,action}>`, *already rendered
 when `ownership_planning_investor` is wired, its `outcome_schema` must emit an `opportunities[]`
 field (or the contract be reconciled). A **producer-wiring** concern (post-P5), logged here + in the
 `OpportunityCardOutcome` type comment; the renderer is built to its declared contract meanwhile.
+
+**P5-engine STARTED (2026-06-24) — `investor_profile` resolver (1st of the suite).** Grounding the
+live engine surfaced that P5 is an investor **resolver suite**, not a dispatch wire (the reshape is in
+the phase bullet above + the table). Built the DAG-root resolver first (Son's "one resolver, fully"):
+`investor_profile` as an inline fill in `fh_engine_fill` (mirroring `buyer_profile`, reusing
+`eval_applicants` / `tri_to_json` / the IC3 `assessable_income`/`debts` helpers / `copy`), plus
+`has_resolver(<<"investor_profile">>) -> true` and the dispatch clause. It projects the **canonical,
+mode-independent `profile`** (identity-layer unification), with the Mode-C deltas: a per-applicant
+`tax{ residency_for_tax=resident, jurisdiction=AU }` object (marginal_rate PENDING until income),
+**no** owner-occupier eligibility leaves, and a definitional domestic-investor strength
+(`strength_domestic_investor`, new `kb.copy.profile` key — no FIRB / no foreign surcharge / resident
+CGT-discount eligible, decision-support tone). Honest-partial: `existing_portfolio` / `traits` /
+capacity / deposit / ppor-equity ABSENT at onboarding (refine-turn / downstream facts). **Verified**
+by `investor_profile_conformance.escript` — **40 anchors** (applicant projection, honest-partial,
+financials framing, bilingual narration + KB-anchor audit, Layer-1 conformance to the investor
+registry, and **no Mode-A regression**: `buyer_profile` still dispatches + conforms to the FHB
+registry). Recompiled the artifact (the new copy key + the 3 investor KB anchors present);
+`resolver_conformance` / `outcome_conformance` / `disposition_conformance` all still green;
+`erlang-checker` clean. **Distinct component name ⟹ zero Mode-A reach** (the FHB turn never selects
+the clause); dormant until P5-activate wires the dispatch. **Next P5-engine unit:** `investment_strategy`
+(agent-path) or `mortgage_finance` investor variant — Son's call.
 
 ## Deferred out (honest — first-exercising instance is Mode B/D, not here)
 
