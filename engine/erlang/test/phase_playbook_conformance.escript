@@ -92,7 +92,7 @@ structure_cases() ->
 conformance_cases() ->
     [begin
          {O, _} = fill(U),
-         Ok = try fh_engine_outcome:validate(<<"phase_playbook">>, O), ok
+         Ok = try fh_engine_outcome:validate(<<"fhb-domestic-au">>, <<"phase_playbook">>, O), ok
               catch _:Why -> {error, Why} end,
          check(<<Name/binary, " fill conforms (Layer 1)">>, Ok, ok)
      end

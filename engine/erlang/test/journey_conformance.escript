@@ -89,10 +89,10 @@ structure_cases() ->
 
 conformance_cases() ->
     {Outcome, _} = fill(full_upstream()),
-    Full = try fh_engine_outcome:validate(<<"journey_swimlane">>, Outcome), ok
+    Full = try fh_engine_outcome:validate(<<"fhb-domestic-au">>, <<"journey_swimlane">>, Outcome), ok
            catch _:Why -> {error, Why} end,
     {Empty, _} = fill(#{}),
-    EmptyOk = try fh_engine_outcome:validate(<<"journey_swimlane">>, Empty), ok
+    EmptyOk = try fh_engine_outcome:validate(<<"fhb-domestic-au">>, <<"journey_swimlane">>, Empty), ok
               catch _:Why2 -> {error, Why2} end,
     [check("full fill conforms (Layer 1, incl. counterparty/source/interactions)", Full, ok),
      check("empty-upstream fill conforms (Layer 1)", EmptyOk, ok)].
@@ -212,7 +212,7 @@ dispose_cases() ->
     %% honest-partial: a disposition outcome with NO dispose_cash_events ⟹ no Dispose column.
     {EmptyDisp, _} = fill((full_upstream())#{<<"disposition">> => #{<<"dispose_cash_events">> => []}}),
     EmptyIds = [maps:get(<<"id">>, P) || P <- maps:get(<<"phases">>, EmptyDisp)],
-    Conform = try fh_engine_outcome:validate(<<"journey_swimlane">>, Outcome), ok
+    Conform = try fh_engine_outcome:validate(<<"fhb-domestic-au">>, <<"journey_swimlane">>, Outcome), ok
               catch _:Why -> {error, Why} end,
     [check("dispose set: 6 phases, dispose last", PhaseIds,
            [<<"prepare">>, <<"pre_approve">>, <<"contract">>, <<"settle">>, <<"own">>,

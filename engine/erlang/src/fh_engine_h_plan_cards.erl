@@ -52,6 +52,7 @@ create(T, U, Params, Req, State) ->
         user_id => U,
         plan_card_id => PlanCardId,
         turn_id => TurnId,
+        blueprint_slug => ?BLUEPRINT,
         mode => ?MODE,
         intent => Intent,
         firb_required_any => false,

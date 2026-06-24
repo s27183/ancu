@@ -29,15 +29,20 @@ Grounding (architecture.md §11.9):
     field or a resolver-local; every `ref` to a known leaf/slot; every `stacking`
     slug to a KB doc) — §11.9:428.
 
-Scope: Wedge 1 = Mode A. The split tracks the scope call. **Structural** gates
-(slug==path, renderer-in-enum, pipeline-acyclic) are mode-independent and run over
-EVERY blueprint/doc — a B/C/D blueprint is an authored part of the working agreement,
-so structural drift there is real drift. **Semantic** gates (reference-integrity,
-coverage, type-compat) need the mode's registry materialized, so they run against the
-Mode-A registry (the `fhb-domestic-au` anchors) only; KB docs anchored solely by the
-unbuilt B/C/D modes are parsed structurally and reported as INVENTORY, never failures
-(the standing scope call). The DAG-upstream *scoping* of the registry (a field
-must be produced by a component upstream of its consumer, not merely exist
+Scope: an in-scope SET of blueprints (Wedge 1a: `fhb-domestic-au`; Mode-C activation
+adds `investor-domestic-au`). **Structural** gates (slug==path, renderer-in-enum,
+pipeline-acyclic) are mode-independent and run over EVERY blueprint/doc — a B/C/D
+blueprint is an authored part of the working agreement, so structural drift there is
+real drift. **Semantic** gates (reference-integrity, coverage, type-compat) need a
+materialized registry, so they run **per in-scope blueprint, each against its own
+registry** (architecture §11.9 "the registry is per-blueprint"): outcome-type names
+are shared across modes (`profile`, `disposition`) but their fields/enums diverge
+(e.g. `disposition.cgt_status` is `[exempt, to_verify]` vs `[computed, to_verify]`),
+so a single global registry could not represent both. A KB doc anchored by an in-scope
+blueprint is gated against THAT blueprint's registry; a doc no in-scope blueprint
+anchors (the unbuilt B/D modes) is parsed structurally and reported as INVENTORY,
+never a failure (the standing scope call). The DAG-upstream *scoping* of the registry
+(a field must be produced by a component upstream of its consumer, not merely exist
 somewhere) is a documented future strengthening — see STRENGTHENINGS below.
 
 STRENGTHENINGS (not v1):
@@ -57,7 +62,12 @@ KB = ROOT / "docs" / "kb"
 BP = ROOT / "docs" / "blueprints"
 ARTIFACT_OUT = ROOT / "engine" / "erlang" / "priv" / "kb" / "artifact.json"
 
-IN_SCOPE_BLUEPRINT = "fhb-domestic-au"  # Wedge 1 = Mode A
+# The in-scope SET — every blueprint whose registry is materialized + semantically
+# gated + emitted (architecture §11.9, engine-contract §9.1). The runtime selects the
+# blueprint per plan-card from its blueprint_slug; activating one mode never dormants
+# another. A blueprint outside this set is still structurally gated, but its semantic
+# gates are deferred and its anchors reported as inventory.
+IN_SCOPE_BLUEPRINTS = {"fhb-domestic-au", "investor-domestic-au"}
 
 # architecture.md §11.9 renderer enum (13 members).
 RENDERER_ENUM = {
@@ -67,9 +77,11 @@ RENDERER_ENUM = {
 }
 
 # Declared external read-namespaces (not produced by a blueprint component):
-# the property card and suburb enrichment (§11.9:244). Referenced fields under
-# these resolve-as-external (existence unverifiable here), never a failure.
-EXTERNAL_NS = {"suburb", "property", "property_card"}
+# the property card + suburb enrichment (§11.9:244), and the per-journey `plan.*`
+# input facts (§11.9 "the plan.* namespace" — sourced from plan_cards journey state,
+# engine-contract §9.1, not a component outcome). Referenced fields under these
+# resolve-as-external (existence unverifiable here), never a failure.
+EXTERNAL_NS = {"suburb", "property", "property_card", "plan"}
 
 NUMERIC_TYPES = {
     "integer", "money", "number", "percentage", "money_per_year", "money_per_month",
@@ -367,8 +379,7 @@ def parse_blueprint(path):
         if pb:
             params = parse_jsonc(pb)
             c.param_slots = flatten_param_slots(params, c.name + ".")
-            if name == "buyer_profile":
-                c._params = params  # keep for applicant element extraction
+            c._params = params  # raw params; the identity component's drive applicant/entity types
         comps.append(c)
     # pipeline DAG: "producer → outcome: NAME (reads: a, b)"
     producer, reads = {}, {}
@@ -429,7 +440,10 @@ def build_registry(components):
         if c.outcome_type:
             reg.outcome_fields.setdefault(c.outcome_type, {}).update(c.outcome_fields)
         reg.param_slots.update(c.param_slots)
-        if c.name == "buyer_profile":
+        # The identity component is the one producing the canonical `profile` outcome —
+        # `buyer_profile` (Mode A) or `investor_profile` (Mode C); keyed by outcome type,
+        # not name, so the applicant/entity element types are sourced whichever mode runs.
+        if c.outcome_type == "profile":
             bp_comp = c
     # applicant.* projection: names from the profile outcome element, types
     # enriched from the buyer_profile `applicants` parameter element.
@@ -588,6 +602,113 @@ def detect_cycle(producer, reads):
     return (cyc if has_cycle else None), externals
 
 
+def kb_exists(slug):
+    """A `kb.*` slug resolves to a docs/ file (slug == path, GATE 1's inverse)."""
+    return (ROOT / "docs" / (slug.replace(".", "/") + ".md")).is_file()
+
+
+def semantic_gates(stem, comps, kb_docs, fails, info):
+    """Materialize ONE blueprint's registry and run its SEMANTIC gates (architecture
+    §11.9 "the registry is per-blueprint"): GATE 6 reference-integrity + GATE 7 coverage
+    against THIS blueprint's registry, the §3 string-leaf nudge, the leaf->filler map,
+    and multi-fill reporting. Appends to the shared fails/info lists (labelled by stem)
+    and returns (reg, anchors, reg_stats)."""
+    reg = build_registry(comps)
+    anchors = set()
+    for c in comps:
+        anchors.update(c.anchors)
+
+    # §3 nudge: outcome fields declared `string` (confirm not prose). Info, never a hard
+    # fail (ids / scheme names / currency codes are legitimately `string`).
+    n_string = 0
+    for otype, fields in sorted(reg.outcome_fields.items()):
+        for f, tstr in sorted(fields.items()):
+            for path in string_leaf_paths(parse_field_type(tstr), f):
+                info.append(f"[outcome-string] {stem}/{otype}.{path} — declared `string`; "
+                            f"confirm not user-facing prose (else localized_text)")
+                n_string += 1
+
+    # leaf -> filler(s) map for this blueprint's anchored docs.
+    for slug in anchors:
+        doc = kb_docs.get(slug)
+        if not doc or not doc.get("content_json"):
+            continue
+        for fill in doc["content_json"].get("fills", []):
+            leaf = fill.get("leaf")
+            if leaf:
+                reg.leaves.setdefault(leaf, []).append(slug)
+
+    # GATE 6 + 7: reference-integrity + coverage, against THIS registry.
+    ref_checked = ref_unchecked_type = 0
+    for slug in sorted(anchors):
+        doc = kb_docs.get(slug)
+        cj = doc.get("content_json") if doc else None
+        if cj is None:
+            continue
+        for fill in cj.get("fills", []):
+            leaf = fill.get("leaf")
+            rule = fill.get("rule", {})
+            # COVERAGE 7b: leaf maps to a real slot
+            if leaf:
+                if leaf.startswith("applicant."):
+                    name = leaf.split(".", 1)[1]
+                    if name not in reg.applicant_fields:
+                        fails.append(f"[coverage] {stem}/{slug}: leaf {leaf} not an applicant field")
+                elif leaf not in reg.param_slots:
+                    fails.append(f"[coverage] {stem}/{slug}: leaf {leaf} not a declared slot")
+            # REFERENCE-INTEGRITY 6a/6b/6d
+            for item in iter_rule_fields(rule):
+                tag, tok = item[0], item[1]
+                crit = item[2] if len(item) > 2 else None
+                if tag in ("field", "keydim"):
+                    if "." not in tok:
+                        info.append(f"[resolver-local] {stem}/{slug}: {tok}")  # bare → exempt
+                        continue
+                    ns, _, rest = tok.partition(".")
+                    st, meta = reg.field_meta(ns, rest)
+                    if st == "missing_ns":
+                        fails.append(f"[ref-integrity] {stem}/{slug}: unknown namespace in {tok!r}")
+                    elif st == "missing_field":
+                        fails.append(f"[ref-integrity] {stem}/{slug}: {tok!r} not a registry field")
+                    elif st == "external":
+                        info.append(f"[external] {stem}/{slug}: {tok} (existence unverifiable)")
+                    elif st == "field" and tag == "field" and crit is not None:
+                        res = check_type_compat(crit, meta)
+                        if res == "unchecked":
+                            ref_unchecked_type += 1
+                        elif res:
+                            fails.append(f"[type] {stem}/{slug}: field {tok}: {res}")
+                        else:
+                            ref_checked += 1
+                elif tag == "ref":
+                    if not reg.ref_exists(tok):
+                        fails.append(f"[ref-integrity] {stem}/{slug}: ref {tok!r} resolves to nothing")
+        # COVERAGE 6c: stacking slugs resolve
+        for stk in (cj.get("stacking") or {}).values():
+            if isinstance(stk, list):
+                for ref in stk:
+                    if isinstance(ref, str) and ref.startswith("kb.") and not kb_exists(ref):
+                        fails.append(f"[stacking] {stem}/{slug}: ref {ref} resolves to no KB doc")
+
+    # multi-filled leaves: report (competitive slots like state_concession are by design;
+    # a same-component non-slot collision would be a smell — surfaced, not auto-failed).
+    for leaf, fillers in sorted({k: v for k, v in reg.leaves.items() if len(v) > 1}.items()):
+        info.append(f"[multi-fill] {stem}/{leaf} <- {sorted(fillers)}")
+
+    reg_stats = {
+        "outcome_namespaces": sorted(reg.outcome_fields),
+        "outcome_field_count": sum(len(v) for v in reg.outcome_fields.values()),
+        "applicant_fields": len(reg.applicant_fields),
+        "param_slots": len(reg.param_slots),
+        "leaves": len(reg.leaves),
+        "string_leaves": n_string,
+        "type_checks_passed": ref_checked,
+        "type_unchecked": ref_unchecked_type,
+        "anchors": len(anchors),
+    }
+    return reg, anchors, reg_stats
+
+
 def run(emit=False):
     fails, warns, info = [], [], []
     stats = {}
@@ -601,8 +722,8 @@ def run(emit=False):
     # blueprint: the B/C/D component-header regex now matches headers carrying
     # parenthetical/★ suffixes (`### N. name (variant)`), so all four modes parse
     # their components AND their DAG and are structurally gated (slug, renderer
-    # enum, acyclicity) over every blueprint. (IN_SCOPE_BLUEPRINT is still
-    # asserted present below, so Mode A can never be skipped unnoticed.)
+    # enum, acyclicity) over every blueprint. (Every IN_SCOPE_BLUEPRINTS member is
+    # asserted present below, so an in-scope mode can never be skipped unnoticed.)
     blueprints = {}
     for bp in sorted(BP.glob("*.md")):
         slug, comps, producer, reads, ui_tabs = parse_blueprint(bp)
@@ -611,43 +732,22 @@ def run(emit=False):
             continue
         blueprints[bp.stem] = (slug, comps, producer, reads, ui_tabs)
 
-    if IN_SCOPE_BLUEPRINT not in blueprints:
-        fails.append(f"in-scope blueprint {IN_SCOPE_BLUEPRINT} not found")
+    missing_scope = sorted(b for b in IN_SCOPE_BLUEPRINTS if b not in blueprints)
+    if missing_scope:
+        for b in missing_scope:
+            fails.append(f"in-scope blueprint {b} not found")
         return fails, warns, info, stats, None
 
-    _, comps, _, _, _ = blueprints[IN_SCOPE_BLUEPRINT]
-    reg = build_registry(comps)
-    in_scope_anchors = set()
-    for c in comps:
-        in_scope_anchors.update(c.anchors)
-
-    # ---- §3 nudge: outcome fields declared `string` (confirm not prose) --- #
-    # The seam validator only localizes a field typed `localized_text`; prose mistyped
-    # `string` slips through silently (outcome-conformance.md §3 declarative boundary).
-    # Report every string-typed leaf across the in-scope outcomes for human review — info,
-    # never a hard fail (ids / scheme names / currency codes are legitimately `string`).
-    string_leaves = []
-    for otype, fields in sorted(reg.outcome_fields.items()):
-        for f, tstr in sorted(fields.items()):
-            for path in string_leaf_paths(parse_field_type(tstr), f):
-                string_leaves.append(f"{otype}.{path}")
-    for sl in string_leaves:
-        info.append(f"[outcome-string] {sl} — declared `string`; confirm not user-facing "
-                    f"prose (else localized_text)")
-    stats["outcome_string_leaves"] = len(string_leaves)
-
-    # ---- parse all KB docs ------------------------------------------------ #
+    # ---- parse all KB docs (GATE 1 slug==path, GATE 5 parse — mode-independent) #
     kb_docs = {}
     for f in sorted(KB.rglob("*.md")):
         doc = parse_kb_doc(f)
         rel = f.relative_to(ROOT / "docs").with_suffix("")
         expect = str(rel).replace("/", ".")
-        # GATE 1: slug == path
         if doc["slug"] != expect:
             fails.append(f"[slug] {f}: slug={doc['slug']} expect={expect}")
         if doc["slug"]:
             kb_docs[doc["slug"]] = doc
-        # GATE 5: content_json parses
         if doc["parse_error"]:
             fails.append(f"[content_json] {doc['slug']}: parse error: {doc['parse_error']}")
     stats["kb_docs"] = len(kb_docs)
@@ -671,30 +771,32 @@ def run(emit=False):
                 fails.append(f"[copy] {slug}/{tid}: {err}")
     stats["copy_templates"] = copy_templates
 
-    # ---- materialize the leaf -> filler(s) map (in-scope docs) ------------ #
-    for slug in in_scope_anchors:
-        doc = kb_docs.get(slug)
-        if not doc or not doc.get("content_json"):
-            continue
-        for fill in doc["content_json"].get("fills", []):
-            leaf = fill.get("leaf")
-            if leaf:
-                reg.leaves.setdefault(leaf, []).append(slug)
+    # ---- per-blueprint registry materialization + SEMANTIC gates ---------- #
+    # The registry is per-blueprint (architecture §11.9): each in-scope blueprint is
+    # materialized + GATE-6/7-gated against its OWN registry, and emitted as
+    # blueprints[slug].registry. Outcome-type names shared across modes (`profile`,
+    # `disposition`) diverge in fields/enums, so a single global registry could not
+    # represent both — the runtime selects the card's blueprint and reads that registry.
+    registries = {}                # stem -> Registry
+    all_in_scope_anchors = set()   # union over the in-scope set, for the inventory tally
+    stats["registry"] = {}
+    for stem in sorted(IN_SCOPE_BLUEPRINTS):
+        _, comps, _, _, _ = blueprints[stem]
+        reg, anchors, reg_stats = semantic_gates(stem, comps, kb_docs, fails, info)
+        registries[stem] = reg
+        all_in_scope_anchors |= anchors
+        stats["registry"][stem] = reg_stats
 
     # ---- GATE 2: every blueprint kb_anchor resolves ----------------------- #
-    def kb_exists(slug):
-        return (ROOT / "docs" / (slug.replace(".", "/") + ".md")).is_file()
-
     for stem, (_, bcomps, _, _, _) in blueprints.items():
         anchors = set(a for c in bcomps for a in c.anchors)
         missing = sorted(a for a in anchors if not kb_exists(a))
-        if stem == IN_SCOPE_BLUEPRINT:
+        if stem in IN_SCOPE_BLUEPRINTS:
             for a in missing:
                 fails.append(f"[anchor] {stem}: missing KB doc {a}")
-        else:
-            if missing:
-                info.append(f"[inventory] {stem}: {len(missing)} unbuilt anchor(s) "
-                            f"(out-of-scope mode): {missing}")
+        elif missing:
+            info.append(f"[inventory] {stem}: {len(missing)} unbuilt anchor(s) "
+                        f"(out-of-scope mode): {missing}")
 
     # ---- GATE 3: renderers in enum (all blueprints — structural, mode-independent) #
     for stem, (_, bcomps, _, _, _) in blueprints.items():
@@ -704,12 +806,13 @@ def run(emit=False):
                 fails.append(f"[renderer] {stem}/{c.name}: not in enum: {bad}")
 
     # ---- GATE 4: pipeline acyclic (all blueprints — structural, mode-independent) #
+    stats["dag"] = {}
     for stem, (_, _, bproducer, breads, _) in blueprints.items():
         cyc, externals = detect_cycle(bproducer, breads)
         if cyc:
             fails.append(f"[pipeline] {stem}: CYCLE: {cyc}")
-        if stem == IN_SCOPE_BLUEPRINT:
-            stats["dag"] = {"components": len(breads), "externals": sorted(externals)}
+        if stem in IN_SCOPE_BLUEPRINTS:
+            stats["dag"][stem] = {"components": len(breads), "externals": sorted(externals)}
 
     # ---- GATE 9: ui_tabs reference-integrity (all blueprints — structural) - #
     # The lifecycle tab spine (plan-card-lifecycle-restoration.md §3): each blueprint
@@ -725,6 +828,7 @@ def run(emit=False):
     # spine: the swimlane IS the navigation and each phase opens a drill-down sheet; it still
     # names the components whose data the sheet composes). See lifecycle-simulation-model.md §7.
     KIND_ENUM = {"synthesis", "components", "qa", "flow"}
+    stats["ui_tabs"] = {}
     for stem, (_, bcomps, _, _, ui_tabs) in blueprints.items():
         if not ui_tabs:
             fails.append(f"[ui_tabs] {stem}: no ui_tabs declaration")
@@ -745,90 +849,18 @@ def run(emit=False):
             missing = [c for c in t.get("components", []) if c not in cnames]
             if missing:
                 fails.append(f"[ui_tabs] {stem}/{tid}: components not in blueprint: {missing}")
-        if stem == IN_SCOPE_BLUEPRINT:
-            stats["ui_tabs"] = [t.get("tab_id") for t in ui_tabs]
+        if stem in IN_SCOPE_BLUEPRINTS:
+            stats["ui_tabs"][stem] = [t.get("tab_id") for t in ui_tabs]
 
-    # ---- GATE 6 + 7: reference-integrity + coverage (in-scope docs) -------- #
-    ref_checked = ref_unchecked_type = 0
-    deferred_docs = 0
-    valid_slots = set(reg.param_slots) | {f"applicant.{n}" for n in reg.applicant_fields}
-
-    for slug, doc in sorted(kb_docs.items()):
-        cj = doc.get("content_json")
-        if cj is None:
-            continue
-        if slug not in in_scope_anchors:
-            deferred_docs += 1
-            continue
-        for fill in cj.get("fills", []):
-            leaf = fill.get("leaf")
-            rule = fill.get("rule", {})
-            # COVERAGE 7b: leaf maps to a real slot
-            if leaf:
-                if leaf.startswith("applicant."):
-                    name = leaf.split(".", 1)[1]
-                    if name not in reg.applicant_fields:
-                        fails.append(f"[coverage] {slug}: leaf {leaf} not an applicant field")
-                elif leaf not in reg.param_slots:
-                    fails.append(f"[coverage] {slug}: leaf {leaf} not a declared slot")
-            # REFERENCE-INTEGRITY 6a/6b/6d
-            for item in iter_rule_fields(rule):
-                tag, tok = item[0], item[1]
-                crit = item[2] if len(item) > 2 else None
-                if tag in ("field", "keydim"):
-                    if "." not in tok:
-                        info.append(f"[resolver-local] {slug}: {tok}")  # bare → exempt
-                        continue
-                    ns, _, rest = tok.partition(".")
-                    st, meta = reg.field_meta(ns, rest)
-                    if st == "missing_ns":
-                        fails.append(f"[ref-integrity] {slug}: unknown namespace in {tok!r}")
-                    elif st == "missing_field":
-                        fails.append(f"[ref-integrity] {slug}: {tok!r} not a registry field")
-                    elif st == "external":
-                        info.append(f"[external] {slug}: {tok} (existence unverifiable)")
-                    elif st == "field" and tag == "field" and crit is not None:
-                        res = check_type_compat(crit, meta)
-                        if res == "unchecked":
-                            ref_unchecked_type += 1
-                        elif res:
-                            fails.append(f"[type] {slug}: field {tok}: {res}")
-                        else:
-                            ref_checked += 1
-                elif tag == "ref":
-                    if not reg.ref_exists(tok):
-                        fails.append(f"[ref-integrity] {slug}: ref {tok!r} resolves to nothing")
-        # COVERAGE 6c: stacking slugs resolve
-        for st in (cj.get("stacking") or {}).values():
-            if isinstance(st, list):
-                for ref in st:
-                    if isinstance(ref, str) and ref.startswith("kb.") and not kb_exists(ref):
-                        fails.append(f"[stacking] {slug}: ref {ref} resolves to no KB doc")
-
-    # multi-filled leaves: report (competitive slots like state_concession are by
-    # design; a same-component non-slot collision would be a smell — surfaced, not
-    # auto-failed, since legitimacy is a semantic/exclusivity question, not structural).
-    multi = {k: v for k, v in reg.leaves.items() if len(v) > 1}
-    for leaf, fillers in sorted(multi.items()):
-        info.append(f"[multi-fill] {leaf} <- {sorted(fillers)}")
-
-    stats["registry"] = {
-        "outcome_namespaces": sorted(reg.outcome_fields),
-        "outcome_field_count": sum(len(v) for v in reg.outcome_fields.values()),
-        "applicant_fields": len(reg.applicant_fields),
-        "param_slots": len(reg.param_slots),
-        "leaves": len(reg.leaves),
-    }
-    stats["ref_integrity"] = {
-        "type_checks_passed": ref_checked,
-        "type_unchecked": ref_unchecked_type,
-        "in_scope_anchors": len(in_scope_anchors),
-        "deferred_docs": deferred_docs,
-    }
+    # deferred docs: a content_json doc no in-scope blueprint anchors (inventory).
+    stats["deferred_docs"] = sum(
+        1 for slug, doc in kb_docs.items()
+        if doc.get("content_json") is not None and slug not in all_in_scope_anchors
+    )
 
     artifact = None
     if not fails:
-        artifact = build_artifact(blueprints, reg, kb_docs)
+        artifact = build_artifact(blueprints, registries, kb_docs)
         if emit:
             ARTIFACT_OUT.parent.mkdir(parents=True, exist_ok=True)
             ARTIFACT_OUT.write_text(
@@ -838,7 +870,27 @@ def run(emit=False):
     return fails, warns, info, stats, artifact
 
 
-def build_artifact(blueprints, reg, kb_docs):
+def registry_payload(reg):
+    """One blueprint's registry, in the artifact's machine-readable shape — the engine
+    reads it by blueprint slug at runtime (engine-contract §9.1)."""
+    return {
+        "outcome_fields": reg.outcome_fields,
+        # Parsed recursive type tree per outcome field (parse_field_type) — the
+        # machine-readable form the seam validator walks (outcome-conformance.md §2);
+        # `localized_text` -> {kind: localized}, figures -> {kind: scalar}, etc.
+        "outcome_types": {
+            otype: {f: parse_field_type(t) for f, t in fields.items()}
+            for otype, fields in reg.outcome_fields.items()
+        },
+        "applicant_fields": {k: v for k, v in reg.applicant_fields.items()},
+        "entities": {ns: {"fields": e["fields"], "cardinality": e["cardinality"]}
+                     for ns, e in sorted(reg.entities.items())},
+        "param_slots": sorted(reg.param_slots),
+        "leaves": {k: sorted(v) for k, v in reg.leaves.items()},
+    }
+
+
+def build_artifact(blueprints, registries, kb_docs):
     kb = {
         slug: {
             "effective_from": d["effective_from"],
@@ -850,7 +902,7 @@ def build_artifact(blueprints, reg, kb_docs):
     }
     bps = {}
     for stem, (slug, comps, producer, reads, ui_tabs) in blueprints.items():
-        bps[slug] = {
+        entry = {
             "ui_tabs": ui_tabs or [],
             "components": [
                 {"name": c.name, "outcome_type": c.outcome_type,
@@ -872,9 +924,18 @@ def build_artifact(blueprints, reg, kb_docs):
             ],
             "dag_reads": reads,
         }
+        # The per-blueprint registry — present only for the in-scope set (an
+        # out-of-scope blueprint is structurally parsed but not semantically
+        # materialized). architecture §11.9 "the registry is per-blueprint".
+        if stem in registries:
+            entry["registry"] = registry_payload(registries[stem])
+        bps[slug] = entry
     return {
         "schema_version": 1,
-        "in_scope_blueprint": IN_SCOPE_BLUEPRINT,
+        # The in-scope SET (bare stems, the same identifier fh_engine_kb:blueprint/1
+        # qualifies). The runtime selects the card's blueprint from this set and reads
+        # that blueprint's registry; modes coexist (engine-contract §9.1).
+        "in_scope_blueprints": sorted(IN_SCOPE_BLUEPRINTS),
         # The locale set is the single source of truth (outcome-conformance.md §6): the
         # compiler copy gate, the seam validator, the generated LocalizedText, and the
         # shell's display picker all read it here. Adding a locale touches LOCALES + the
@@ -883,21 +944,6 @@ def build_artifact(blueprints, reg, kb_docs):
         # against.
         "locales": list(LOCALES),
         "kb": kb,
-        "registry": {
-            "outcome_fields": reg.outcome_fields,
-            # Parsed recursive type tree per outcome field (parse_field_type) — the
-            # machine-readable form the seam validator walks (outcome-conformance.md §2);
-            # `localized_text` -> {kind: localized}, figures -> {kind: scalar}, etc.
-            "outcome_types": {
-                otype: {f: parse_field_type(t) for f, t in fields.items()}
-                for otype, fields in reg.outcome_fields.items()
-            },
-            "applicant_fields": {k: v for k, v in reg.applicant_fields.items()},
-            "entities": {ns: {"fields": e["fields"], "cardinality": e["cardinality"]}
-                         for ns, e in sorted(reg.entities.items())},
-            "param_slots": sorted(reg.param_slots),
-            "leaves": {k: sorted(v) for k, v in reg.leaves.items()},
-        },
         "blueprints": bps,
     }
 
@@ -906,16 +952,19 @@ def main():
     emit = "--no-emit" not in sys.argv
     fails, warns, info, stats, artifact = run(emit=emit)
 
-    print(f"registry: {json.dumps(stats.get('registry', {}))}")
-    print(f"ref-integrity: {json.dumps(stats.get('ref_integrity', {}))}")
-    print(f"dag: {json.dumps(stats.get('dag', {}))}")
-    print(f"ui_tabs (in-scope): {json.dumps(stats.get('ui_tabs', []))}")
+    for stem in sorted(stats.get("registry", {})):
+        rs = stats["registry"][stem]
+        print(f"[{stem}] registry: outcome_fields={rs['outcome_field_count']} "
+              f"applicant_fields={rs['applicant_fields']} param_slots={rs['param_slots']} "
+              f"leaves={rs['leaves']} | ref-integrity: checked={rs['type_checks_passed']} "
+              f"unchecked={rs['type_unchecked']} anchors={rs['anchors']} | "
+              f"dag={json.dumps(stats.get('dag', {}).get(stem, {}))} | "
+              f"ui_tabs={json.dumps(stats.get('ui_tabs', {}).get(stem, []))}")
+    print(f"in-scope blueprints: {sorted(IN_SCOPE_BLUEPRINTS)} | deferred docs: "
+          f"{stats.get('deferred_docs')}")
     print(f"kb docs: {stats.get('kb_docs')}")
     print(f"copy templates: {stats.get('copy_templates')} (bilingual gate, "
           f"locales={'+'.join(LOCALES)})")
-    print(f"outcome conformance: locales={'+'.join(LOCALES)}, "
-          f"{stats.get('outcome_string_leaves')} string-typed outcome leaf(s) for review "
-          f"(§3 nudge)")
     if info:
         print(f"\nINFO ({len(info)}):")
         for m in info:
@@ -933,8 +982,8 @@ def main():
     if emit and artifact is not None:
         print(f"PASS — artifact emitted: {ARTIFACT_OUT.relative_to(ROOT)}")
         print(f"       {len(artifact['kb'])} KB entries, "
-              f"{stats['registry']['outcome_field_count']} outcome fields, "
-              f"{stats['registry']['leaves']} leaves")
+              f"{len(artifact['blueprints'])} blueprints, "
+              f"{len(stats.get('registry', {}))} in-scope registries")
     else:
         print("PASS — all gates green (no emit)")
     return 0

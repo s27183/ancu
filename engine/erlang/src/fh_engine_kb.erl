@@ -19,11 +19,11 @@
 %% boot rather than serving a runtime that would silently fail every turn.
 
 -export([load/0, load/1]).
--export([schema_version/0, in_scope_blueprint/0, locales/0]).
+-export([schema_version/0, in_scope_blueprints/0, locales/0]).
 -export([blueprint/1, components/1, component/2, ui_tabs/1]).
 -export([kb/1, kb_content_md/1, kb_rules/1, kb_anchors/1, copy/2]).
 -export([rules/0]).
--export([registry/0, registry/1]).
+-export([registry/1, registry/2]).
 
 -define(PT_KEY, {?MODULE, artifact}).
 
@@ -41,9 +41,9 @@ load(Path) ->
             persistent_term:put(?PT_KEY, Artifact),
             #{<<"kb">> := Kb, <<"blueprints">> := Bps} = Artifact,
             logger:info("KB artifact loaded from ~s: ~p KB entries, ~p blueprints, "
-                        "schema_version ~p, in_scope=~s",
+                        "schema_version ~p, in_scope=~p",
                         [Path, map_size(Kb), map_size(Bps),
-                         schema_version(), in_scope_blueprint()]),
+                         schema_version(), in_scope_blueprints()]),
             ok;
         {error, Reason} ->
             logger:error("KB artifact unreadable at ~s: ~p — engine cannot boot "
@@ -60,9 +60,12 @@ default_path() ->
 schema_version() ->
     maps:get(<<"schema_version">>, artifact()).
 
--spec in_scope_blueprint() -> binary().
-in_scope_blueprint() ->
-    maps:get(<<"in_scope_blueprint">>, artifact()).
+%% The in-scope SET of blueprints (engine-contract §9.1): every blueprint whose
+%% registry is materialized + emitted. The runtime selects the card's blueprint
+%% from this set; modes coexist. (Bare stems, the form blueprint/1 qualifies.)
+-spec in_scope_blueprints() -> [binary()].
+in_scope_blueprints() ->
+    maps:get(<<"in_scope_blueprints">>, artifact()).
 
 %% The required locale set, the single SOT for outcome conformance (the seam
 %% validate/2), the compiler copy-gate, and the shell display picker — carried in the
@@ -193,13 +196,21 @@ merge_fill(Fill, Acc) ->
 
 %% --- registry (the materialized resolver-input surface) ---------------------
 
--spec registry() -> map().
-registry() ->
-    maps:get(<<"registry">>, artifact()).
+%% A blueprint's materialized registry (architecture §11.9 "the registry is
+%% per-blueprint"): outcome_fields, outcome_types, applicant_fields, entities,
+%% param_slots, leaves. The runtime selects the card's blueprint and reads ITS
+%% registry — outcome-type names collide across modes (`disposition`: [exempt,…]
+%% vs [computed,…]), so there is no single global registry. A blueprint outside the
+%% in-scope set carries no registry → crashes loudly here (it is never planned, by
+%% construction; fail-closed beats a silent wrong-registry validation).
+-spec registry(binary()) -> map().
+registry(BlueprintSlug) ->
+    {ok, Bp} = blueprint(BlueprintSlug),
+    maps:get(<<"registry">>, Bp).
 
--spec registry(binary()) -> term().
-registry(Section) ->
-    maps:get(Section, registry()).
+-spec registry(binary(), binary()) -> term().
+registry(BlueprintSlug, Section) ->
+    maps:get(Section, registry(BlueprintSlug)).
 
 %% --- internals --------------------------------------------------------------
 

@@ -41,7 +41,7 @@ main(_) ->
                        <<"target_price_range">> => [600000, 600000],
                        <<"target_zone">> => [],
                        <<"intent">> => <<"owner_occupier">>},
-    {ok, SeedOutcomes} = fh_engine_simulate:run(SeedOnboarding, <<"owner_occupier">>),
+    {ok, SeedOutcomes} = fh_engine_simulate:run(<<"fhb-domestic-au">>, SeedOnboarding, <<"owner_occupier">>),
     SeedMortgage = maps:get(<<"mortgage_plan">>, SeedOutcomes),
     Facts = #{<<"onboarding">> => SeedOnboarding,
               <<"derived">> => #{<<"firb_required_any">> => false}},
@@ -60,7 +60,7 @@ main(_) ->
     SeedBudget = maps:get(<<"budget_envelope">>, SeedOutcomes),
     {ok, OvOnboarding} =
         fh_engine_simulate:apply_overrides(#{<<"target_price">> => 900000}, SeedOnboarding),
-    {ok, OvOutcomes} = fh_engine_simulate:run(OvOnboarding, <<"owner_occupier">>),
+    {ok, OvOutcomes} = fh_engine_simulate:run(<<"fhb-domestic-au">>, OvOnboarding, <<"owner_occupier">>),
     PreviewBudget = maps:get(<<"budget_envelope">>, OvOutcomes),
     expect(PreviewBudget =/= SeedBudget, "precondition: $900k preview differs from $600k baseline"),
 

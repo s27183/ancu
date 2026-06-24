@@ -58,22 +58,23 @@ run(Id, Body, Req, State) ->
             Facts = maps:get(facts, Ctx),
             Onboarding0 = maps:get(<<"onboarding">>, Facts, #{}),
             Intent = maps:get(intent, Ctx, <<"owner_occupier">>),
+            Slug = maps:get(blueprint_slug, Ctx),
             %% IC3: the enriched financials from the SOT (canonical household_financials
             %% key) — preview parity with the turn.
             Financials = maps:get(<<"household_financials">>, Facts, #{}),
             case fh_engine_simulate:apply_overrides(Overrides, Onboarding0) of
                 {ok, Onboarding} ->
-                    preview(Id, Overrides, Onboarding, Intent, Financials, Req, State);
+                    preview(Id, Slug, Overrides, Onboarding, Intent, Financials, Req, State);
                 {error, Reason}  -> reject(Reason, Req, State)
             end
     end.
 
-preview(Id, Overrides, Onboarding, Intent, Financials, Req, State) ->
-    try fh_engine_simulate:run(Onboarding, Intent, Financials) of
+preview(Id, Slug, Overrides, Onboarding, Intent, Financials, Req, State) ->
+    try fh_engine_simulate:run(Slug, Onboarding, Intent, Financials) of
         {ok, Outcomes} ->
             Resp = #{<<"plan_card_id">> => Id,
                      <<"overrides">> => Overrides,
-                     <<"outcomes">> => by_component(Outcomes)},
+                     <<"outcomes">> => by_component(Slug, Outcomes)},
             {ok, fh_engine_http:reply_json(200, Resp, Req), State}
     catch
         Class:Why:St ->
@@ -94,11 +95,11 @@ preview(Id, Overrides, Onboarding, Intent, Financials, Req, State) ->
 %% layer, not just the compute layer (engine-contract §10.1; W9 is the first consumer).
 %% base_components/0 is the single source of the component_id↔outcome_type pairing, so the
 %% shell needs no second copy of that mapping.
-by_component(Outcomes) ->
+by_component(Slug, Outcomes) ->
     maps:from_list(
       [{maps:get(<<"name">>, C),
         maps:get(maps:get(<<"outcome_type">>, C, maps:get(<<"name">>, C)), Outcomes)}
-       || C <- fh_engine_turn:base_components()]).
+       || C <- fh_engine_turn:base_components(Slug)]).
 
 reject(property_type_phase_b, Req, State) ->
     {ok, fh_engine_http:reply_json(400,

@@ -84,10 +84,10 @@ structure_cases() ->
 
 conformance_cases() ->
     {Full, _}  = fill(full_upstream()),
-    FullOk = try fh_engine_outcome:validate(<<"preparation_plan">>, Full), ok
+    FullOk = try fh_engine_outcome:validate(<<"fhb-domestic-au">>, <<"preparation_plan">>, Full), ok
              catch _:Why -> {error, Why} end,
     {Empty, _} = fill(#{}),
-    EmptyOk = try fh_engine_outcome:validate(<<"preparation_plan">>, Empty), ok
+    EmptyOk = try fh_engine_outcome:validate(<<"fhb-domestic-au">>, <<"preparation_plan">>, Empty), ok
               catch _:Why2 -> {error, Why2} end,
     [check("full fill conforms (Layer 1)", FullOk, ok),
      check("empty-upstream fill conforms (Layer 1)", EmptyOk, ok)].

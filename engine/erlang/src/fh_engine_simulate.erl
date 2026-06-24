@@ -27,7 +27,7 @@
 %% (target_price / state / horizon) is deterministic and cannot move a FIRB/ASIC/AML
 %% branch — the full pipeline runs at COMMIT (the refine turn, W7b), never here.
 
--export([apply_overrides/2, run/2, run/3]).
+-export([apply_overrides/2, run/3, run/4]).
 
 %% --- override mapping (engine-contract §10.1/§10.2) -------------------------
 %%
@@ -90,26 +90,26 @@ apply_one({K, _}, _Ob) ->
 %% Crashes (fail-closed) if any outcome fails the Layer-1 gate — that is an engine bug,
 %% not a user error; the caller maps the crash to 500 and the (unpersisted) outcome never
 %% reaches the client as a 200.
--spec run(map(), binary()) -> {ok, map()}.
-run(Onboarding, Intent) ->
-    run(Onboarding, Intent, #{}).
+-spec run(binary(), map(), binary()) -> {ok, map()}.
+run(BlueprintSlug, Onboarding, Intent) ->
+    run(BlueprintSlug, Onboarding, Intent, #{}).
 
 %% IC3: preview parity — the what-if recompute reads the same enriched financials the
 %% persisted turn does (preview = commit minus persistence), so a structural what-if
 %% surfaces capacity / full-horizon when the profile already carries income. Financials
 %% are a profile fact, NOT a what-if dimension — they pass through unchanged.
--spec run(map(), binary(), map()) -> {ok, map()}.
-run(Onboarding, Intent, Financials) ->
-    Args = #{onboarding => Onboarding, intent => Intent,
-             household_financials => Financials},
-    Components = fh_engine_turn:base_components(),
+-spec run(binary(), map(), binary(), map()) -> {ok, map()}.
+run(BlueprintSlug, Onboarding, Intent, Financials) ->
+    Args = #{blueprint_slug => BlueprintSlug, onboarding => Onboarding,
+             intent => Intent, household_financials => Financials},
+    Components = fh_engine_turn:base_components(BlueprintSlug),
     Outcomes =
         lists:foldl(
           fun(Comp, Up) ->
               Name = maps:get(<<"name">>, Comp),
               Type = maps:get(<<"outcome_type">>, Comp, Name),
               {Outcome, _Renderer, _Kb} = fh_engine_fill:resolver(Name, Args, Up),
-              ok = fh_engine_outcome:validate(Type, Outcome),
+              ok = fh_engine_outcome:validate(BlueprintSlug, Type, Outcome),
               Up#{Type => Outcome}
           end, #{}, Components),
     {ok, Outcomes}.

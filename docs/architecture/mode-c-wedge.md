@@ -53,12 +53,15 @@ flag the reform, `to_verify` the post-2027 portion — do not model unenacted la
 
 ## The fail-closed activation rule
 
-The compiler flip (`IN_SCOPE_BLUEPRINT` → `investor-domestic-au`) is **all-or-nothing**: the
-in-scope semantic gates (GATE 2 anchor-resolution, GATE 6 reference-integrity, GATE 7 coverage)
-demand *every* anchor resolve at once. KB docs land in clusters while investor stays out-of-scope;
-the flip happens only after all 45 are authored. Onboarding dispatch (which makes Mode C
-user-selectable) must be **atomic-last** — after the flip greens *and* the shell renderers exist —
-or a user onboarding as an investor hits an uncompiled artifact or a blank missing-renderer slot.
+Adding `investor-domestic-au` to the in-scope **set** (`IN_SCOPE_BLUEPRINTS`) is **all-or-nothing**:
+its semantic gates (GATE 2 anchor-resolution, GATE 6 reference-integrity, GATE 7 coverage) demand
+*every* anchor resolve at once. KB docs land in clusters while investor stays out-of-scope; the
+add happens only after all 45 are authored. **This is an addition, not a replacement** — the
+runtime is multi-blueprint (each in-scope blueprint carries its own registry; the turn + gates
+select by the card's `blueprint_slug`), so activating Mode C never dormants Mode A (engine-contract
+§9.1, architecture §11.9). Onboarding dispatch (which makes Mode C user-selectable) must be
+**atomic-last** — after the add greens *and* the shell renderers exist — or a user onboarding as an
+investor hits a missing blueprint or a blank missing-renderer slot.
 
 ## Phase order (neutralizes the KB↔engine↔shell coupling)
 
@@ -69,9 +72,14 @@ committable on its own (coupling-in-a-unit ≠ coupling-in-a-commit).
   vs its primary source, ASIC-framed. Commit as the foundation.
 - **P2 — Spec-seam reconciliations** (§ below) + the **`cgt/1` investor branch** in
   `fh_engine_disposition` (consumes P1 tax KB: 50% discount, no PPOR exemption, Div-43/40 clawback).
-- **P3 — Compiler flip** (`IN_SCOPE` → investor) + declare `plan.*` (add to `EXTERNAL_NS`) +
-  green all semantic gates (reconcile whatever GATE 6/7 seams surface) + re-emit artifact + **prove
-  selection** (the investor DAG is now in the compiled artifact).
+- **P3 — Multi-blueprint runtime** (foundational reframe of the original "compiler flip": a single
+  in-scope constant could not represent two modes — `disposition.cgt_status` is `[exempt, to_verify]`
+  vs `[computed, to_verify]` — so the runtime selects the blueprint per plan-card). Contract docs
+  (engine-contract §9.1 + architecture §11.9) → compiler emits an in-scope **set** + a registry **per**
+  in-scope blueprint (`blueprints[slug].registry`) → engine threads the card's `blueprint_slug` through
+  the turn DAG + Layer-1/Layer-2 gates → declare `plan.*` (`EXTERNAL_NS`) + green both modes' semantic
+  gates + re-emit artifact + **prove selection** (both registries present; investor disposition
+  validates against its own). Modes coexist; no Mode-A regression.
 - **P4 — Shell**: 2 net-new renderers (`buying-strategy-card`, `opportunity-card`) + onboarding
   intent selection (the `intent: 'owner_occupier' | 'investment'` type already exists in `api.ts`;
   `onboarding.ts` deliberately hardcodes owner-occupier — unhardcode it).
@@ -171,10 +179,10 @@ Status legend: `[ ]` not started · `[~]` drafting · `[v]` facts verified vs pr
 | [x] | P2 | Reconcile `tax-brackets-2026` → `kb.tax.income-tax-resident-2025-26` (blueprint edit) |
 | [x] | P2 | Reconcile serviceability slug duplication (keep `kb.lender.*`) |
 | [x] | P2 | `cgt/1` investor branch in `fh_engine_disposition` (50% discount, no PPOR exemption, Div-43/40 clawback) — currently returns `to_verify` for non-PPOR |
-| [ ] | P3 | Flip `IN_SCOPE_BLUEPRINT` → `investor-domestic-au` in `kb_compiler.py` |
-| [ ] | P3 | Declare `plan.*` (add `"plan"` to `EXTERNAL_NS`) |
-| [ ] | P3 | Green all semantic gates; reconcile GATE 6/7 reference-integrity / coverage seams |
-| [ ] | P3 | Re-emit artifact; prove the investor DAG is selected (not a silent no-op) |
+| [x] | P3 | **Contract docs** — pin the multi-blueprint runtime (engine-contract §9.1 + architecture §11.9): in-scope **set**, per-blueprint registry, per-card blueprint resolution |
+| [x] | P3 | **Compiler** — `IN_SCOPE_BLUEPRINT` (str) → `IN_SCOPE_BLUEPRINTS` (set `{fhb, investor}`); registry materialized + GATE 6/7-gated **per** in-scope blueprint; emit `blueprints[slug].registry`; declare `plan.*` (`EXTERNAL_NS`) |
+| [x] | P3 | **Engine** — thread the card's `blueprint_slug`: `fh_engine_kb:registry/1,2` + `in_scope_blueprints/0`; `fh_engine_outcome:validate/3` + `component_names/1`; `fh_engine_turn:base_components/1` + `dag_reads/2`; `fh_engine_simulate:run/3,4`; 4 turn-starters |
+| [x] | P3 | Re-emit artifact; **prove selection** — both registries present, investor `disposition.cgt_status` `[computed, to_verify]`; both modes green |
 | [ ] | P4 | Shell renderer: `buying-strategy-card` (enum + §11.9 table + Svelte component) |
 | [ ] | P4 | Shell renderer: `opportunity-card` (enum + §11.9 table + Svelte component) |
 | [ ] | P4 | Onboarding intent selection UI (`onboarding.ts` — unhardcode owner-occupier) |
@@ -209,6 +217,31 @@ investor-**computed** Layer-1 case can only green once IN_SCOPE flips at P3 (the
 `[computed, to_verify]`) — its figures are exactly asserted in `investor_cases/0` meanwhile, and the
 investor-**to_verify** Layer-1 case (shared enum) already passes. The artifact is untracked
 (gitignored, `KB.rglob` includes all on-disk docs), so re-emit is a no-tracked-file P3 step.
+
+**P3 COMPLETE (2026-06-24) — reframed from "compiler flip" to the multi-blueprint runtime.** The
+one-line plan ("flip `IN_SCOPE_BLUEPRINT` → investor") would have *replaced* Mode A, not added Mode
+C: `in_scope_blueprint` was load-bearing at runtime (turn DAG, both gates, the registry), and the
+registry is one flat map keyed by outcome-type name — but the modes share names with divergent
+fields/enums (`disposition.cgt_status` `[exempt, to_verify]` vs `[computed, to_verify]`;
+`profile`/`mortgage_plan` differ too). So a flat registry physically can't hold both → the runtime
+must select per-card. **Built docs-first** (Son's order for a cross-contract reframe): (1) contract —
+engine-contract §9.1 + architecture §11.9 pin the in-scope **set**, the per-blueprint registry, and
+per-card resolution from `plan_cards.blueprint_slug`; (2) compiler — `IN_SCOPE_BLUEPRINTS` (set),
+`semantic_gates/4` materializes + GATE-6/7-gates each in-scope blueprint's own registry, emits
+`blueprints[slug].registry` + top-level `in_scope_blueprints` (dropped the singular `registry`/
+`in_scope_blueprint`); also generalized `build_registry` to key the identity component off the
+`profile` *outcome* (not the `buyer_profile` *name*) so the investor registry's applicant types
+populate; (3) engine — `fh_engine_kb:registry/1,2` + `in_scope_blueprints/0`,
+`fh_engine_outcome:validate/3` + `component_names/1`, `fh_engine_turn:base_components/1` +
+`dag_reads/2`, `fh_engine_simulate:run/3,4`, the 4 turn-starters thread the card's `blueprint_slug`.
+**Verified:** compiler 0 fails (both registries, divergent enums coexist); `disposition_conformance`
+**79 anchors** (the investor-**computed** Layer-1 case now validates against the investor registry —
+the P2 deferral closed); the full Mode-A conformance suite green (no regression); `refine_smoke`
+against live PG green with a 67-card refresh sweep through the threaded turn path; `erlang-checker`
+clean. **One honest follow-on:** `base_components/1`'s base SET+ORDER is still the Mode-A
+`?BASE_COMPONENTS` macro — correct for `fhb` (the only blueprint creating base turns until P5), no
+investor caller exists yet; deriving a per-blueprint base sequence from the `scope` table lands in
+P5 where an investor base turn verifies it end-to-end.
 
 ## Deferred out (honest — first-exercising instance is Mode B/D, not here)
 

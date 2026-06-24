@@ -119,7 +119,7 @@ main(_) ->
            "no null-amount events ever emitted"),
 
     %% --- the commit-seam gate accepts the outcome (runs in the turn, not fill/2) --
-    ok = fh_engine_outcome:validate(<<"budget_envelope">>, Outcome),
+    ok = fh_engine_outcome:validate(<<"fhb-domestic-au">>, <<"budget_envelope">>, Outcome),
     expect(true, "outcome-conformance gate passes budget_envelope (incl. cash_events)"),
 
     io:format("~nALL ASSERTIONS PASSED~n"),

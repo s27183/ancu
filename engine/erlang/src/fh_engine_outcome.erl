@@ -35,7 +35,7 @@
 %% SAME cases through check/3 and asserts identical conform/reject verdicts (the cross-language
 %% lockstep — reason text is informative, the VERDICT is contractual).
 
--export([validate/2, check/3, check_placement/2]).
+-export([validate/3, check/3, check_placement/2]).
 
 %% The numeric family (§98). money_range is a [lo, hi] list of numbers; the rest a bare
 %% number. string/bool/date/object are scalars too but are NOT figures (not checked).
@@ -55,9 +55,9 @@
 %% fill against it. A missing schema (e.g. a per-property outcome type not yet declared)
 %% passes gracefully — consistent with the {kind:unknown} pass-through; base components
 %% all carry a schema (verified at build).
--spec validate(binary(), map()) -> ok.
-validate(OutcomeType, Outcome) ->
-    OutcomeTypes = fh_engine_kb:registry(<<"outcome_types">>),
+-spec validate(binary(), binary(), map()) -> ok.
+validate(BlueprintSlug, OutcomeType, Outcome) ->
+    OutcomeTypes = fh_engine_kb:registry(BlueprintSlug, <<"outcome_types">>),
     case maps:find(OutcomeType, OutcomeTypes) of
         error ->
             ok;
@@ -67,7 +67,7 @@ validate(OutcomeType, Outcome) ->
                 ok ->
                     %% §13 placement/provenance clause — the same total-walk, a new clause.
                     %% Runs only when a schema exists (graceful otherwise, like the type walk).
-                    case check_placement(Outcome, component_names()) of
+                    case check_placement(Outcome, component_names(BlueprintSlug)) of
                         ok ->
                             ok;
                         {error, R} ->
@@ -78,11 +78,11 @@ validate(OutcomeType, Outcome) ->
             end
     end.
 
-%% The set of real component names in the in-scope compiled blueprint — the ground truth
+%% The set of real component names in the card's compiled blueprint — the ground truth
 %% for §13 check 1 (provenance resolves). Empty (no artifact) ⟹ check 1 is graceful (it
 %% has nothing to resolve against), consistent with the missing-schema pass-through.
-component_names() ->
-    case fh_engine_kb:components(fh_engine_kb:in_scope_blueprint()) of
+component_names(BlueprintSlug) ->
+    case fh_engine_kb:components(BlueprintSlug) of
         {ok, Comps} -> [maps:get(<<"name">>, C) || C <- Comps];
         _           -> []
     end.

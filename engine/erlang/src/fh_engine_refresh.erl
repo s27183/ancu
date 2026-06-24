@@ -84,6 +84,7 @@ start_base_resolver(PlanCardId, Ctx, Existing, Onboarding) ->
                 user_id => maps:get(user_id, Ctx),
                 plan_card_id => PlanCardId,
                 turn_id => TurnId,
+                blueprint_slug => maps:get(blueprint_slug, Ctx),
                 mode => maps:get(mode, Ctx),
                 intent => maps:get(intent, Ctx),
                 firb_required_any => maps:get(<<"firb_required_any">>, Derived, false),

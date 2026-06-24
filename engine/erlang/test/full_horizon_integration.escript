@@ -65,7 +65,7 @@ main(_) ->
 %% --- 1. the chain: income SET ⟹ full_horizon non-null (seam B + the unblock) -
 
 chain_cases() ->
-    {ok, Out} = fh_engine_simulate:run(onboarding(), <<"owner_occupier">>, financials()),
+    {ok, Out} = fh_engine_simulate:run(<<"fhb-domestic-au">>, onboarding(), <<"owner_occupier">>, financials()),
     Mortgage = maps:get(<<"mortgage_plan">>, Out),
     Disp     = maps:get(<<"disposition">>, Out),
     Cap      = maps:get(<<"expected_borrowing_capacity">>, Mortgage),
@@ -91,7 +91,7 @@ chain_cases() ->
 %% guard. (Sale/selling still band — they need only price + H, not income.)
 
 regression_cases() ->
-    {ok, Out} = fh_engine_simulate:run(onboarding(), <<"owner_occupier">>, #{}),
+    {ok, Out} = fh_engine_simulate:run(<<"fhb-domestic-au">>, onboarding(), <<"owner_occupier">>, #{}),
     Mortgage = maps:get(<<"mortgage_plan">>, Out),
     Disp     = maps:get(<<"disposition">>, Out),
     [chkNull("income absent ⟹ borrowing_capacity PENDING (null)",

@@ -44,7 +44,7 @@ main(_) ->
         lists:foldl(
           fun({Comp, Type}, {Up, Fails}) ->
               {Outcome, _Renderer, _Kb} = fh_engine_fill:resolver(Comp, Args, Up),
-              F = try fh_engine_outcome:validate(Type, Outcome), pass
+              F = try fh_engine_outcome:validate(<<"fhb-domestic-au">>, Type, Outcome), pass
                   catch _:Why -> io:format("  FAIL   ~s gate: ~p~n", [Comp, Why]), fail end,
               io:format("  ~s   ~s committed (~s)~n", [tag(F), Comp, Type]),
               {Up#{Type => Outcome}, [F | Fails]}

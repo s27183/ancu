@@ -341,26 +341,30 @@ rate_source_cases() ->
 %% --- 7. Layer-1 conformance across every state (the fail-closed seam) --------
 
 layer1_cases() ->
-    States = [{<<"full">>,        full_upstream()},
-              {<<"rented">>,      (full_upstream())#{<<"profile">> => profile(<<"partial_rental">>)}},
-              {<<"no_horizon">>,  (full_upstream())#{<<"profile">> =>
+    Fhb = <<"fhb-domestic-au">>,
+    Inv = <<"investor-domestic-au">>,
+    %% Each state validates against ITS blueprint's registry (per-blueprint registry,
+    %% architecture §11.9): the owner-occupier states against fhb-domestic-au
+    %% ([exempt, to_verify]), the investor states against investor-domestic-au
+    %% ([computed, to_verify] + taxable_gain). P3 put BOTH blueprints in scope, so the
+    %% investor COMPUTED path — deferred at P2 because the Mode-A enum lacked "computed"
+    %% — validates here now; its figures are exactly asserted in investor_cases/0.
+    States = [{<<"full">>,        Fhb, full_upstream()},
+              {<<"rented">>,      Fhb, (full_upstream())#{<<"profile">> => profile(<<"partial_rental">>)}},
+              {<<"no_horizon">>,  Fhb, (full_upstream())#{<<"profile">> =>
                                       (profile(<<"sole_occupier">>))#{<<"hold_horizon_years">> => null}}},
-              {<<"loan_pending">>,(full_upstream())#{<<"mortgage_plan">> => #{}}},
-              %% the investor to_verify path conforms NOW (cgt_status "to_verify" ∈ the Mode-A
-              %% enum; cgt null like Mode A). The investor COMPUTED path is deliberately absent
-              %% here: cgt_status "computed" is not in the in-scope (Mode-A) disposition enum —
-              %% it validates only once IN_SCOPE flips to investor at P3 (the schema then carries
-              %% [computed, to_verify] + taxable_gain). Its figures are exactly asserted in
-              %% investor_cases/0; the Layer-1 commit-seam gate proves green at the P3 flip.
-              {<<"investor_to_verify">>, inv_upstream(inv_profile(<<"resident">>),
+              {<<"loan_pending">>,Fhb, (full_upstream())#{<<"mortgage_plan">> => #{}}},
+              {<<"investor_computed">>,  Inv, inv_upstream(inv_profile(<<"resident">>),
+                                            inv_tax(<<"personal_sole">>, 37.0, false))},
+              {<<"investor_to_verify">>, Inv, inv_upstream(inv_profile(<<"resident">>),
                                             inv_tax(<<"personal_sole">>, 37.0, true))},
-              {<<"empty">>,       #{}}],
+              {<<"empty">>,       Fhb, #{}}],
     [begin
          {Outcome, _} = fill(Up),
-         V = try fh_engine_outcome:validate(<<"disposition">>, Outcome), ok
+         V = try fh_engine_outcome:validate(Slug, <<"disposition">>, Outcome), ok
              catch _:Why -> {error, Why} end,
          check(<<"Layer-1 conforms: ", Name/binary>>, V, ok)
-     end || {Name, Up} <- States].
+     end || {Name, Slug, Up} <- States].
 
 %% --- helpers ----------------------------------------------------------------
 

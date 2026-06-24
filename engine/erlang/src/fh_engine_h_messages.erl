@@ -59,6 +59,7 @@ start_qa(T, U, PlanCardId, Card, Body, Req, State) ->
                         user_id => U,
                         plan_card_id => PlanCardId,
                         turn_id => TurnId,
+                        blueprint_slug => maps:get(<<"blueprint_slug">>, Card),
                         kind => qa,
                         mode => Mode,
                         intent => maps:get(<<"intent">>, Card, <<"owner_occupier">>),

@@ -112,7 +112,7 @@ run(Financials) ->
                    <<"target_price_range">> => [600000, 600000],
                    <<"target_zone">> => [],
                    <<"hold_horizon_years">> => 10},
-    fh_engine_simulate:run(Onboarding, <<"owner_occupier">>, Financials).
+    fh_engine_simulate:run(<<"fhb-domestic-au">>, Onboarding, <<"owner_occupier">>, Financials).
 
 inject_rate(Mort, Rate) ->
     LS = maps:get(<<"loan_structure_recommendation">>, Mort, #{}),

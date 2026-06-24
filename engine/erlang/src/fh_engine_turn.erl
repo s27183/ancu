@@ -34,7 +34,7 @@
 -export([start_link/1]).
 -export([callback_mode/0, init/1, terminate/3]).
 -export([running/3, qa/3]).
--export([base_components/0]).
+-export([base_components/1]).
 
 %% Mode-A base turn: the resolver/agent components in DAG (topological) order. The
 %% per-property components (property_assessment, buying_strategy, due_diligence,
@@ -62,8 +62,8 @@ start_link(Args) ->
 -spec callback_mode() -> gen_statem:callback_mode_result().
 callback_mode() -> state_functions.
 
-%% Args (base) :: #{tenant_id, user_id, plan_card_id, turn_id, mode, intent,
-%%                  firb_required_any, onboarding}
+%% Args (base) :: #{tenant_id, user_id, plan_card_id, turn_id, blueprint_slug, mode,
+%%                  intent, firb_required_any, onboarding}
 %% Args (qa)   :: the above with kind => qa, plus card, message, locale (2c-1).
 %% `kind` selects the turn shape: a base/onboarding turn walks the DAG; a Q&A turn
 %% runs one conversational pass over the filled card (agentic-flow.md §4).
@@ -76,7 +76,7 @@ init(#{tenant_id := T, plan_card_id := PC, turn_id := Tn} = Args) ->
             %% base = full walk (resolver + two-path sidecar); base_resolver =
             %% resolver-only refresh (plan-card-refresh.md): two-path components run
             %% their resolver half and re-attach the EXISTING agent leaves, no sidecar.
-            Components = base_components(),
+            Components = base_components(maps:get(blueprint_slug, Args)),
             Data = Args#{components => Components, outcomes => #{}},
             {ok, running, Data, [{next_event, internal, step}]};
         qa ->
@@ -359,9 +359,9 @@ commit(Comp, FillPath, Renderer, KbVersions, Outcome0,
     %% Layer 1 (outcome-conformance.md): the structural post-condition, BEFORE the
     %% regulated pipeline. Fail-closed — a non-conforming fill crashes this (supervised)
     %% turn rather than persisting a bad value (§7).
-    ok = fh_engine_outcome:validate(OutcomeType, Outcome0),
+    ok = fh_engine_outcome:validate(maps:get(blueprint_slug, Data), OutcomeType, Outcome0),
     %% The Layer-1 attestation ASIC consumes (compliance-pipeline.md §2 — ASIC does not
-    %% re-derive §98; one source of truth). Reaching here means validate/2 found the
+    %% re-derive §98; one source of truth). Reaching here means validate/3 found the
     %% outcome conforming (figures are figures, localized text is bilingual).
     Layer1Verdict = #{<<"layer">> => 1,
                       <<"outcome_type">> => OutcomeType,
@@ -421,12 +421,17 @@ fail(#{tenant_id := T, plan_card_id := PC, turn_id := Tn}, Code, Msg) ->
          #{<<"plan_card_id">> => PC, <<"turn_id">> => Tn,
            <<"code">> => Code, <<"message">> => Msg}).
 
-%% The in-scope blueprint's components, filtered to the base set, in DAG order.
-%% Exported as the SINGLE source of the ordered base-resolver DAG: the simulate
-%% preview (fh_engine_simulate) walks this same list, so the turn and the preview
-%% can never drift on which components run or in what order (engine-contract §10.1).
-base_components() ->
-    {ok, All} = fh_engine_kb:components(fh_engine_kb:in_scope_blueprint()),
+%% The card's blueprint components, filtered to the base set, in DAG order. Exported as
+%% the SINGLE source of the ordered base-resolver DAG: the simulate preview
+%% (fh_engine_simulate) walks this same list, so the turn and the preview can never
+%% drift on which components run or in what order (engine-contract §10.1).
+%% BlueprintSlug selects which blueprint's component definitions to fetch; the base
+%% SET+ORDER is still the Mode-A ?BASE_COMPONENTS sequence — correct for fhb-domestic-au,
+%% the only blueprint that creates base turns until P5 onboarding-dispatch makes investor
+%% cards. Deriving a per-blueprint base sequence (from the blueprint's `scope` table)
+%% lands in P5, where an investor base turn can verify it end-to-end (mode-c-wedge.md P3/P5).
+base_components(BlueprintSlug) ->
+    {ok, All} = fh_engine_kb:components(BlueprintSlug),
     ByName = maps:from_list([{maps:get(<<"name">>, C), C} || C <- All]),
     [maps:get(N, ByName) || N <- ?BASE_COMPONENTS, maps:is_key(N, ByName)].
 
@@ -514,11 +519,11 @@ start_qa_port(#{plan_card_id := PC, message := Msg, card := Card} = Data, Glue) 
 upstream_for(Comp, Data) ->
     Outcomes = maps:get(outcomes, Data),
     Name = maps:get(<<"name">>, Comp),
-    Reads = dag_reads(Name),
+    Reads = dag_reads(maps:get(blueprint_slug, Data), Name),
     maps:with(Reads, Outcomes).
 
-dag_reads(Name) ->
-    case fh_engine_kb:blueprint(fh_engine_kb:in_scope_blueprint()) of
+dag_reads(BlueprintSlug, Name) ->
+    case fh_engine_kb:blueprint(BlueprintSlug) of
         {ok, Bp} -> maps:get(Name, maps:get(<<"dag_reads">>, Bp, #{}), []);
         _        -> []
     end.

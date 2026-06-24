@@ -74,9 +74,9 @@ run_walk_checks() ->
 
     %% run/2 crashes fail-closed if any outcome fails the Layer-1 gate; reaching {ok,_}
     %% for all three is itself the "every outcome conforms" proof.
-    {ok, OutBase}   = fh_engine_simulate:run(Base, <<"owner_occupier">>),
-    {ok, OutDearer} = fh_engine_simulate:run(Dearer, <<"owner_occupier">>),
-    {ok, OutVic}    = fh_engine_simulate:run(VicOb, <<"owner_occupier">>),
+    {ok, OutBase}   = fh_engine_simulate:run(<<"fhb-domestic-au">>, Base, <<"owner_occupier">>),
+    {ok, OutDearer} = fh_engine_simulate:run(<<"fhb-domestic-au">>, Dearer, <<"owner_occupier">>),
+    {ok, OutVic}    = fh_engine_simulate:run(<<"fhb-domestic-au">>, VicOb, <<"owner_occupier">>),
 
     BudgetBase = maps:get(<<"budget_envelope">>, OutBase),
     BudgetDear = maps:get(<<"budget_envelope">>, OutDearer),
@@ -106,9 +106,9 @@ run_walk_checks() ->
 
 rekey_checks() ->
     io:format("~ncomponent_id re-key — handler by_component/1 mapping (W9)~n"),
-    {ok, Out} = fh_engine_simulate:run(onboarding(<<"NSW">>, [600000, 600000]),
+    {ok, Out} = fh_engine_simulate:run(<<"fhb-domestic-au">>, onboarding(<<"NSW">>, [600000, 600000]),
                                        <<"owner_occupier">>),
-    Comps = fh_engine_turn:base_components(),
+    Comps = fh_engine_turn:base_components(<<"fhb-domestic-au">>),
     ByComponent =
         maps:from_list(
           [{maps:get(<<"name">>, C),

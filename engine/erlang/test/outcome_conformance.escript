@@ -51,8 +51,8 @@ seam_cases() ->
              <<"key_strengths">> =>
                  [#{<<"vi">> => <<"mua lần đầu"/utf8>>, <<"en">> => <<"first home buyer">>}]},
     Bad = Good#{<<"key_strengths">> => [<<"english only, no localization">>]},
-    GoodOk = (catch fh_engine_outcome:validate(<<"profile">>, Good)) =:= ok,
-    BadCrash = case catch fh_engine_outcome:validate(<<"profile">>, Bad) of
+    GoodOk = (catch fh_engine_outcome:validate(<<"fhb-domestic-au">>, <<"profile">>, Good)) =:= ok,
+    BadCrash = case catch fh_engine_outcome:validate(<<"fhb-domestic-au">>, <<"profile">>, Bad) of
                    {'EXIT', {{outcome_nonconforming, <<"profile">>, <<"key_strengths">>, _}, _}} -> true;
                    _ -> false
                end,
@@ -64,7 +64,7 @@ seam_cases() ->
     BadPlacement = #{<<"cash_events">> =>
                          [#{<<"direction">> => <<"out">>, <<"counterparty">> => null,
                             <<"amount">> => [1, 2], <<"source_component">> => <<"cash_position">>}]},
-    PlacementCrash = case catch fh_engine_outcome:validate(<<"budget_envelope">>, BadPlacement) of
+    PlacementCrash = case catch fh_engine_outcome:validate(<<"fhb-domestic-au">>, <<"budget_envelope">>, BadPlacement) of
                          {'EXIT', {{outcome_nonconforming, <<"budget_envelope">>, <<"placement">>, _}, _}} -> true;
                          _ -> false
                      end,
