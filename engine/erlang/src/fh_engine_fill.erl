@@ -32,6 +32,7 @@ has_resolver(<<"eligibility">>)        -> true;
 has_resolver(<<"cash_position">>)      -> true;
 has_resolver(<<"ownership_planning">>) -> true;
 has_resolver(<<"mortgage_finance">>)   -> true;
+has_resolver(<<"investment_strategy">>) -> true;
 has_resolver(<<"purchase_journey">>)   -> true;
 has_resolver(<<"preparation">>)        -> true;
 has_resolver(<<"phase_playbook">>)     -> true;
@@ -51,6 +52,8 @@ resolver(<<"ownership_planning">>, Args, Upstream) ->
     fh_engine_ownership:fill(Args, Upstream);
 resolver(<<"mortgage_finance">>, Args, Upstream) ->
     fh_engine_mortgage:fill(Args, Upstream);
+resolver(<<"investment_strategy">>, _Args, Upstream) ->
+    investment_strategy(Upstream);
 resolver(<<"purchase_journey">>, Args, Upstream) ->
     fh_engine_journey:fill(Args, Upstream);
 resolver(<<"preparation">>, Args, Upstream) ->
@@ -68,6 +71,17 @@ resolver(Other, _Args, _Upstream) ->
 -spec merge_agent(binary(), map(), map()) -> map().
 merge_agent(<<"mortgage_finance">>, ResolverOutcome, AgentValues) ->
     fh_engine_mortgage:merge_agent(ResolverOutcome, AgentValues);
+%% investment_strategy: the three investment_thesis leaves the sidecar authored
+%% (archetype, gearing_type, one_liner). Slot-scoped fold — the agent reach is exactly
+%% these three judgment fields; every other strategy_thesis field (the property-relative
+%% targets, the alignment verdict, the carried horizon) is the resolver scaffold's and is
+%% left untouched (the agent authors NO figure, NO verdict — the §98 property here too).
+merge_agent(<<"investment_strategy">>, ResolverOutcome, AgentValues) ->
+    ResolverOutcome#{
+        <<"archetype">>    => maps:get(<<"archetype">>, AgentValues, null),
+        <<"gearing_type">> => maps:get(<<"gearing_type">>, AgentValues, null),
+        <<"one_liner">>    => maps:get(<<"one_liner">>, AgentValues, null)
+    };
 merge_agent(Other, _ResolverOutcome, _AgentValues) ->
     erlang:error({no_agent_merge_for, Other}).
 
@@ -79,6 +93,14 @@ merge_agent(Other, _ResolverOutcome, _AgentValues) ->
 -spec agent_values_from_outcome(binary(), map()) -> map().
 agent_values_from_outcome(<<"mortgage_finance">>, Stored) ->
     fh_engine_mortgage:agent_values_from_outcome(Stored);
+%% investment_strategy: recover the three thesis leaves verbatim from the snapshot (the
+%% inverse of merge_agent/3 above) so a base_resolver refresh re-runs the scaffold (fresh
+%% renderer/kb_versions/carried-horizon) and re-attaches the stored thesis WITHOUT a sidecar
+%% call — the agent re-authors nothing. Direct field map (no nesting, unlike mortgage's rate).
+agent_values_from_outcome(<<"investment_strategy">>, Stored) ->
+    #{<<"archetype">>    => maps:get(<<"archetype">>, Stored, null),
+      <<"gearing_type">> => maps:get(<<"gearing_type">>, Stored, null),
+      <<"one_liner">>    => maps:get(<<"one_liner">>, Stored, null)};
 agent_values_from_outcome(Other, _Stored) ->
     erlang:error({no_agent_reattach_for, Other}).
 
@@ -247,6 +269,56 @@ investor_profile(Args) ->
         [<<"kb.tax.income-tax-resident-2025-26">>,
          <<"kb.lender.serviceability-investment-loans">>,
          <<"kb.investor.experience-levels">>]),
+    {Outcome, <<"summary-card">>, KbVersions}.
+
+%% --- investment_strategy (Mode C, two-path RESOLVER half) -------------------
+%% The investor base spine (blueprint component 3 — replaces FHB eligibility): the
+%% investment thesis. This is the FIRST Mode-C agent-path component, built TWO-PATH
+%% (mortgage-finance-two-path.md): the SIDECAR (reasoning_domain investment_thesis)
+%% authors the three IRREDUCIBLE judgment leaves — strategy_archetype, gearing_type, and
+%% the bilingual thesis one_liner — and merge_agent/3 above folds them in. This function
+%% is the RESOLVER half: the deterministic scaffold the agent is NOT trusted with —
+%%   - the renderer (summary-card) + the kb_versions AUDIT TRAIL (the four strategy
+%%     anchors), resolver-owned so the regulated audit can't be agent-omitted/fabricated;
+%%   - hold_period_years CARRIED from the upstream profile (the user's onboarding horizon;
+%%     it sets disposition's H downstream) — a deterministic carry, not a judgment;
+%%   - every other strategy_thesis field left null = HONEST-PARTIAL. The property-relative
+%%     targets (gross_yield / capital_growth / lvr) follow from BOTH the archetype (agent
+%%     output, not yet known when this scaffold runs) AND a specific property (dag_reads
+%%     property_fit_investor — per-property, ABSENT at base), so they resolve on a
+%%     per-property turn; exit_strategy follows the archetype+horizon (judgment pending);
+%%     is_property_aligned_with_thesis / alignment_reasoning are STRUCTURALLY null at base
+%%     (there is no property to align the thesis to).
+%% So the agent's reach is exactly the three judgment leaves — no figure, no verdict
+%% (§98 / [[match-enforcement-grade-to-property-kind]]: the thesis is SOFT quality, forced
+%% bilingual + enum by the sidecar's output schema; the targets are removed from its reach
+%% by being resolver-null). Reads only the upstream `profile` outcome (dag_reads).
+investment_strategy(Upstream) ->
+    Profile = maps:get(<<"profile">>, Upstream, #{}),
+    Outcome = #{
+        %% AGENT slots (investment_thesis) — null here; merge_agent/3 folds the sidecar's
+        %% three leaves. A base_resolver refresh re-attaches the stored ones (no LLM).
+        <<"archetype">>    => null,
+        <<"gearing_type">> => null,
+        <<"one_liner">>    => null,
+        %% property-relative targets — honest-partial null at base (need archetype + property).
+        <<"target_gross_yield">>    => null,
+        <<"target_capital_growth">> => null,
+        <<"target_lvr">>            => null,
+        %% the hold horizon: carry the user's onboarding intent off profile (= disposition's
+        %% H). null when unset = the long/indefinite default (no disposal projection yet).
+        <<"hold_period_years">> => maps:get(<<"hold_horizon_years">>, Profile, null),
+        %% exit follows archetype+horizon → null at base (judgment pending the thesis).
+        <<"exit_strategy">> => null,
+        %% structural null at base — no property attached to align the thesis against.
+        <<"is_property_aligned_with_thesis">> => null,
+        <<"alignment_reasoning">> => null
+    },
+    KbVersions = fh_engine_kb:kb_anchors(
+        [<<"kb.investor.strategy-archetypes">>,
+         <<"kb.investor.gearing-types-and-implications">>,
+         <<"kb.investor.hold-period-considerations">>,
+         <<"kb.investor.exit-strategy-options">>]),
     {Outcome, <<"summary-card">>, KbVersions}.
 
 %% A three-valued resolver verdict, made JSON-safe for the outcome snapshot:

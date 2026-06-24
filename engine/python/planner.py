@@ -179,6 +179,27 @@ class LenderFitLeaves(BaseModel):
     fixed_vs_variable: RateStructure
 
 
+# --- the investment_thesis agent schema: the THREE judgment leaves ONLY (P5) ----
+# investment_strategy is TWO-PATH like mortgage_finance: the resolver owns the renderer,
+# the kb_versions audit, the carried horizon, and leaves every property-relative TARGET
+# (gross_yield / capital_growth / lvr) null. The agent authors ONLY these three judgment
+# fields — so, as with LenderFitLeaves, there is NO number field here: the LLM structurally
+# cannot author a target figure (the targets are resolver-null until a per-property turn).
+# The enums are Literals (schema-as-constraint) so the model must pick one option and cannot
+# put prose in an enum field; they mirror the blueprint `strategy.thesis.strategy_archetype`
+# and `gearing_strategy.gearing_type` option lists exactly. Field names match the
+# strategy_thesis OUTCOME fields so merge_agent/3 folds them directly.
+StrategyArchetype = Literal["cash_flow", "capital_growth", "balanced", "dual_income",
+                            "value_add", "land_banking"]
+GearingType = Literal["positive_geared", "neutral_geared", "negatively_geared"]
+
+
+class InvestmentThesisLeaves(BaseModel):
+    archetype: StrategyArchetype       # single-valued enum (schema-as-constraint)
+    gearing_type: GearingType          # single-valued enum (schema-as-constraint)
+    one_liner: LocalizedText           # the bilingual thesis line — {vi, en} (§1)
+
+
 # --- prompt assembly (agentic-flow.md §5) --------------------------------------
 # 2a builds the scaffold in code; 2b composes it from the artifact's component
 # descriptor + engine-resolved KB. The static/dynamic split is constraint-#9
@@ -218,6 +239,15 @@ _KB_DOCS = {
         _REPO_ROOT / "docs" / "kb" / "lender" / "serviceability-basics.md",
     "kb.lender.fhg-panel-list":
         _REPO_ROOT / "docs" / "kb" / "lender" / "fhg-panel-list.md",
+    # investment_thesis (Mode C) — the four strategy KB docs the thesis grounds in.
+    "kb.investor.strategy-archetypes":
+        _REPO_ROOT / "docs" / "kb" / "investor" / "strategy-archetypes.md",
+    "kb.investor.gearing-types-and-implications":
+        _REPO_ROOT / "docs" / "kb" / "investor" / "gearing-types-and-implications.md",
+    "kb.investor.hold-period-considerations":
+        _REPO_ROOT / "docs" / "kb" / "investor" / "hold-period-considerations.md",
+    "kb.investor.exit-strategy-options":
+        _REPO_ROOT / "docs" / "kb" / "investor" / "exit-strategy-options.md",
 }
 
 
@@ -237,9 +267,9 @@ def _kb_content_md(path):
 
 _PREAMBLE = """\
 You are a single component of FirstHomey's planning engine, which helps \
-Vietnamese-Australian first home buyers plan an Australian property purchase. You fill \
-ONE component of a plan and return a structured object that downstream components and \
-the user-facing card consume.
+Vietnamese-Australian buyers plan an Australian property purchase (first home or \
+investment). You fill ONE component of a plan and return a structured object that \
+downstream components and the user-facing card consume.
 
 You will be provided with:
 - **Context** — who you are and your single task. `<context>`.
@@ -273,7 +303,7 @@ _STYLE = """\
 Concise and plain — figures over adjectives; short, concrete statements.
 BILINGUAL (first-class, both languages): every free-text field is a {vi, en} object. \
 Author BOTH — Vietnamese (`vi`) AND English (`en`) — carrying the SAME meaning. The \
-Vietnamese is natural, register-appropriate Vietnamese for a first home buyer and their \
+Vietnamese is natural, register-appropriate Vietnamese for a buyer and their \
 family (warm but precise; the formal/respectful register a Vietnamese reader expects when \
 money and family are involved) — NOT a word-for-word transliteration of the English, and \
 NOT machine-translation tone. Write each language as a fluent speaker would; keep both \
@@ -335,6 +365,60 @@ reasoning in a lender's `reasoning`). Default to `variable` for flexibility at t
 stage; never assert a specific rate number.
 5. Emit ONLY the two leaves.""",
     },
+    # investment_thesis is the agent half of the `investment_strategy` component (Mode C,
+    # TWO-PATH like lender_fit): the renderer, the kb_versions audit, the carried horizon,
+    # and every property-relative TARGET are resolver-owned (in <resolver_outcome>); this
+    # module authors ONLY the three judgment leaves (archetype, gearing_type, one_liner).
+    "investment_thesis": {
+        "kb_slugs": ["kb.investor.strategy-archetypes",
+                     "kb.investor.gearing-types-and-implications",
+                     "kb.investor.hold-period-considerations",
+                     "kb.investor.exit-strategy-options"],
+        "context": """\
+You are the agent half of the `investment_strategy` component (reasoning_domain: \
+investment_thesis), for a Vietnamese-Australian DOMESTIC property investor. The renderer, \
+the carried hold horizon, and every numeric TARGET (yield, capital growth, LVR) are the \
+engine resolver's and appear in `<resolver_outcome>` (read-only) — most are intentionally \
+null at this base stage. You reason about exactly THREE qualitative things: (1) the \
+investment STRATEGY ARCHETYPE that best fits this investor, (2) the GEARING TYPE that \
+follows from it, and (3) a short bilingual ONE-LINER stating the thesis. Your inputs are \
+the investor's profile (`<plan_card_state>`) grounded in the strategy KB.""",
+        "goal": """\
+Produce ONLY the three thesis leaves: `archetype` (exactly one of the six archetypes), \
+`gearing_type` (exactly one of the three), and `one_liner` (a {vi, en} one-sentence \
+thesis). Nothing else — no target yield/growth/LVR, no hold period, no exit strategy, no \
+figures (those are the resolver's and already in `<resolver_outcome>`).""",
+        "non_negotiables": """\
+1. **Author no figure.** You do NOT produce a target yield, growth rate, LVR, hold \
+period, dollar, or percent. Your output schema has no number field — keep it that way. \
+The numeric targets are resolver-computed on a later per-property turn.
+2. **At the base turn, deep facts are PENDING.** If `<plan_card_state>` shows the \
+investor's income / existing portfolio / experience absent (the base plan, plan-first), \
+choose the archetype and gearing from the goals expressed by the target price range, \
+target zone, and hold horizon, grounded in the KB — and keep the one_liner about the \
+strategy DIRECTION. Never invent a portfolio, an income, or a capacity.
+3. **Pick from the enums, exactly one each.** `archetype` ∈ {cash_flow, capital_growth, \
+balanced, dual_income, value_add, land_banking}; `gearing_type` ∈ {positive_geared, \
+neutral_geared, negatively_geared}. Ground the choice in the strategy-archetypes and \
+gearing KB; a gearing type that contradicts the archetype (e.g. cash_flow + heavily \
+negatively_geared) is wrong.
+4. **Decision-support, not advice (ASIC).** Articulate a thesis with its reasoning — \
+never instruct the investor to buy, to gear a particular way, or to act. The one_liner \
+describes a strategy direction, not a recommendation; no advice tone.
+5. **Emit only the three-leaf object** (see `<output>`).""",
+        "procedure": """\
+1. Read `<plan_card_state>` (the investor profile + the onboarding target criteria and \
+hold horizon in `<resolver_outcome>`) and the strategy KB.
+2. Choose the `archetype` that best fits the investor's goals + horizon, grounded in the \
+strategy-archetypes KB (e.g. a long horizon with growth corridors → capital_growth; a \
+short-horizon income focus → cash_flow).
+3. Choose the `gearing_type` that follows from the archetype + the hold horizon, grounded \
+in the gearing KB — consistent with the archetype (not contradicting it).
+4. Write the `one_liner` as a {vi, en} pair: author the Vietnamese AND the English (see \
+<style>), one concise sentence each, stating the thesis direction (archetype + gearing + \
+the horizon's logic) in plain language — a card headline, not an essay. No figures.
+5. Emit ONLY the three leaves.""",
+    },
 }
 
 
@@ -373,22 +457,18 @@ def build_system_prompt(reasoning_domain, kb_md):
 </kb>
 
 <output>
-Return a single JSON object conforming to the provided output schema — ONLY the two \
-lender-fit leaves (`recommended_lender_shortlist`, `fixed_vs_variable`). Author NO \
-figure: capacity and every dollar/percent value are resolver-computed and given to you \
-in `<resolver_outcome>`. Produce only the JSON object.
+Return a single JSON object conforming to the provided output schema — EXACTLY the \
+leaves named in `<goal>`, nothing else. Author NO figure: any dollar / percent / number \
+value is resolver-computed and given to you in `<resolver_outcome>` (where present). \
+Produce only the JSON object.
 </output>"""
 
 
-def build_user_content(upstream_outcomes, resolver_outcome):
-    component = {
-        "component_id": "mortgage_finance",
-        "goal": "Author the two lender-fit leaves (lender shortlist + fixed_vs_variable) "
-                "given the resolver-computed figures. Author no figure.",
-        "inputs": ["buyer_profile.outcome", "eligibility.outcome",
-                   "resolver_outcome (the computed mortgage_plan figures + structure)"],
-        "reads": "upstream DAG outcomes only (not upstream parameters) — §11.9",
-    }
+def build_user_content(component, upstream_outcomes, resolver_outcome):
+    """Assemble the user turn (the DATA to reason over): the upstream outcomes this
+    component reads, the read-only resolver grounding, and the component contract. The
+    framing is shared across reasoning_domains (extracted at the 2nd two-path instance);
+    `component` is the per-domain descriptor the caller passes."""
     return (
         "<plan_card_state>\n"
         + json.dumps(upstream_outcomes, indent=2, ensure_ascii=False)
@@ -402,13 +482,34 @@ def build_user_content(upstream_outcomes, resolver_outcome):
 
 # --- the real fill -------------------------------------------------------------
 
-def _kb_block():
-    """Concatenate the lender_fit KB docs (serviceability + FHG panel), each fenced by
-    its slug, as the injected `<kb>` content (§6 — KB is injected, not tool-pulled)."""
+def _kb_block(reasoning_domain):
+    """Concatenate a reasoning_domain's KB docs, each fenced by its slug, as the injected
+    `<kb>` content (§6 — KB is injected, not tool-pulled)."""
     parts = []
-    for slug in _DOMAINS["lender_fit"]["kb_slugs"]:
+    for slug in _DOMAINS[reasoning_domain]["kb_slugs"]:
         parts.append(f"[{slug}]\n{_kb_content_md(_KB_DOCS[slug])}")
     return "\n\n".join(parts)
+
+
+# Per-domain component descriptors (the <component> contract block). The framing is
+# shared (build_user_content); only this descriptor differs per reasoning_domain.
+_MORTGAGE_COMPONENT = {
+    "component_id": "mortgage_finance",
+    "goal": "Author the two lender-fit leaves (lender shortlist + fixed_vs_variable) "
+            "given the resolver-computed figures. Author no figure.",
+    "inputs": ["buyer_profile.outcome", "eligibility.outcome",
+               "resolver_outcome (the computed mortgage_plan figures + structure)"],
+    "reads": "upstream DAG outcomes only (not upstream parameters) — §11.9",
+}
+_STRATEGY_COMPONENT = {
+    "component_id": "investment_strategy",
+    "goal": "Author the three thesis leaves (archetype, gearing_type, one_liner) for a "
+            "domestic investor. Author no figure — the numeric targets are resolver-owned.",
+    "inputs": ["profile.outcome (investor profile)",
+               "resolver_outcome (the strategy_thesis scaffold: carried horizon + "
+               "null targets — the agent fills none of these)"],
+    "reads": "upstream DAG outcomes only (not upstream parameters) — §11.9",
+}
 
 
 async def fill_mortgage_finance(upstream_outcomes, resolver_outcome):
@@ -425,7 +526,7 @@ async def fill_mortgage_finance(upstream_outcomes, resolver_outcome):
     options = ClaudeAgentOptions(
         model=LEAF_MODEL,
         effort=LEAF_EFFORT,   # bound reasoning depth (else opus thinks for minutes)
-        system_prompt=build_system_prompt("lender_fit", _kb_block()),
+        system_prompt=build_system_prompt("lender_fit", _kb_block("lender_fit")),
         setting_sources=[],   # do NOT load CLAUDE.md / project settings
         allowed_tools=[],     # leaf-fill pulls no tools
         env=_credit_env(),    # subscription-credit auth, subprocess-scoped
@@ -437,7 +538,8 @@ async def fill_mortgage_finance(upstream_outcomes, resolver_outcome):
         structured = None
         usage = {}
         async for message in query(
-                prompt=build_user_content(upstream_outcomes, resolver_outcome),
+                prompt=build_user_content(_MORTGAGE_COMPONENT, upstream_outcomes,
+                                          resolver_outcome),
                 options=options):
             if isinstance(message, ResultMessage):
                 structured = getattr(message, "structured_output", None)
@@ -465,17 +567,71 @@ async def fill_mortgage_finance(upstream_outcomes, resolver_outcome):
     return leaves.model_dump(), usage
 
 
+async def fill_investment_strategy(upstream_outcomes, resolver_outcome):
+    """Two-path agent half of `investment_strategy` (Mode C, reasoning_domain
+    investment_thesis): one real Agent-SDK structured one-shot authoring ONLY the three
+    judgment leaves (archetype, gearing_type, one_liner). The renderer, the kb_versions
+    audit, the carried horizon, and every numeric target are resolver-owned and passed in
+    as `resolver_outcome` (read-only grounding). output_format = the three-leaf schema
+    (no number field → the targets stay out of the LLM's reach, the §98 posture). Returns
+    (leaves_dict, usage_dict) — same shape fill_mortgage_finance returns."""
+    import time
+    _t0 = time.monotonic()
+    from claude_agent_sdk import ClaudeAgentOptions, ResultMessage, query
+    _t_import = time.monotonic()
+
+    options = ClaudeAgentOptions(
+        model=LEAF_MODEL,
+        effort=LEAF_EFFORT,   # bound reasoning depth (else opus thinks for minutes)
+        system_prompt=build_system_prompt("investment_thesis",
+                                          _kb_block("investment_thesis")),
+        setting_sources=[],   # do NOT load CLAUDE.md / project settings
+        allowed_tools=[],     # leaf-fill pulls no tools
+        env=_credit_env(),    # subscription-credit auth, subprocess-scoped
+        output_format={"type": "json_schema",
+                       "schema": InvestmentThesisLeaves.model_json_schema()},
+    )
+
+    async def _consume():
+        structured = None
+        usage = {}
+        async for message in query(
+                prompt=build_user_content(_STRATEGY_COMPONENT, upstream_outcomes,
+                                          resolver_outcome),
+                options=options):
+            if isinstance(message, ResultMessage):
+                structured = getattr(message, "structured_output", None)
+                usage = getattr(message, "usage", {}) or {}
+        return structured, usage
+
+    try:
+        structured, usage = await asyncio.wait_for(_consume(), timeout=LEAF_TIMEOUT_S)
+    except asyncio.TimeoutError:
+        raise RuntimeError(f"leaf-fill exceeded {LEAF_TIMEOUT_S}s app-side timeout")
+
+    if structured is None:
+        raise RuntimeError("Agent SDK returned no structured_output")
+
+    _t_query = time.monotonic()
+    print(f"[planner] investment_strategy(investment_thesis): "
+          f"sdk_import={_t_import - _t0:.1f}s query={_t_query - _t_import:.1f}s "
+          f"model={LEAF_MODEL} effort={LEAF_EFFORT}", file=sys.stderr, flush=True)
+    leaves = InvestmentThesisLeaves(**structured)  # raises ValidationError if off
+    return leaves.model_dump(), usage
+
+
 # --- fill_component (2b-2b: the sidecar fills ONE agent component) -------------
 # The turn's gen_statem walks the DAG and dispatches resolver components in-process
 # (Erlang); it spawns this disposable sidecar only for an agent / two-path component,
 # sends `fill_component` with the upstream outcomes that component reads, and resumes
 # the walk on `fill_done`. The sidecar is single-shot: fill one, emit, exit (P3).
 
-# reasoning_domain -> the real fill coroutine. Only lender_fit (mortgage_finance) is
-# wired now; valuation / negotiation / document_significance arrive with the
-# per-property components.
+# reasoning_domain -> the real fill coroutine. lender_fit (mortgage_finance, Mode A) and
+# investment_thesis (investment_strategy, Mode C) are wired; valuation / negotiation /
+# document_significance arrive with the per-property components.
 _FILLERS = {
     "lender_fit": ("mortgage_finance", fill_mortgage_finance),
+    "investment_thesis": ("investment_strategy", fill_investment_strategy),
 }
 
 
@@ -500,8 +656,8 @@ async def handle_fill_component(params):
                          "message": f"{component_id}: {type(exc).__name__}: {exc}"})
         return
 
-    # Two-path reply: `outcome` carries ONLY the agent leaves; Erlang folds them into
-    # the resolver outcome (fh_engine_mortgage:merge_agent/2) — renderer + kb_versions
+    # Two-path reply: `outcome` carries ONLY the agent leaves; Erlang folds them into the
+    # resolver outcome (fh_engine_fill:merge_agent/3, per-component) — renderer + kb_versions
     # are the resolver's, so they are omitted here.
     notify("component_filled", {"component_id": component_id, "outcome": leaves})
     notify("usage", _usage_event(component_id, LEAF_MODEL, usage))

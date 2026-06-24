@@ -204,7 +204,7 @@ Status legend: `[ ]` not started · `[~]` drafting · `[v]` facts verified vs pr
 | [x] | P4 | Shell renderer: `buying-strategy-card` (Svelte component + dispatcher branch; enum + §11.9 row already authored) |
 | [x] | P4 | Shell renderer: `opportunity-card` (Svelte component + dispatcher branch; enum + §11.9 row already authored) |
 | [x] | P5-engine | `investor_profile` resolver (`fh_engine_fill` inline, mirrors `buyer_profile`) — canonical `profile`, investor lens (per-applicant `tax{}`, no owner-occupier leaves, domestic-investor strength); honest-partial |
-| [ ] | P5-engine | `investment_strategy` agent-path wiring (3 leaves, no resolver) — `strategy_thesis` from the Cluster-S KB (archetype/gearing/hold/exit) |
+| [x] | P5-engine | `investment_strategy` **two-path** (resolver scaffold + 3 `investment_thesis` agent leaves) — `strategy_thesis` from the Cluster-S KB (archetype/gearing/one_liner); first Mode-C agent component |
 | [ ] | P5-engine | `mortgage_finance` investor variant (branch the shared resolver) — investment-loan serviceability, IO-vs-PI, DTI cap (Cluster-F KB) |
 | [ ] | P5-engine | `yield_modelling` resolver (NEW module) — `cash_flow_projection` (rent/opex/vacancy/PM; Cluster-Y KB, banded/placeholder) |
 | [ ] | P5-engine | `tax_structure` agent + regulated figures (1 leaf) — `tax_optimised_structure`; CGT/depreciation/land-tax resolver-computed, removed-from-reach (Cluster-T KB; the load-bearing ASIC surface) |
@@ -310,8 +310,38 @@ registry, and **no Mode-A regression**: `buyer_profile` still dispatches + confo
 registry). Recompiled the artifact (the new copy key + the 3 investor KB anchors present);
 `resolver_conformance` / `outcome_conformance` / `disposition_conformance` all still green;
 `erlang-checker` clean. **Distinct component name ⟹ zero Mode-A reach** (the FHB turn never selects
-the clause); dormant until P5-activate wires the dispatch. **Next P5-engine unit:** `investment_strategy`
-(agent-path) or `mortgage_finance` investor variant — Son's call.
+the clause); dormant until P5-activate wires the dispatch.
+
+**P5-engine 2/suite COMPLETE (2026-06-24) — `investment_strategy` (the FIRST Mode-C agent component).**
+Son picked it as the DAG keystone. Grounding the live engine corrected the initial scoping (the
+mortgage variant is *agent*-path, not a clean resolver, and sits *downstream* of `investment_strategy`)
+and settled the design as **two-path** (mirroring `mortgage_finance`), not pure-agent — so the
+kb_versions **audit trail** stays resolver-owned (not agent-fabricable), the honest-partial nulls are
+structural, and the unit reuses the **tested resolver-only-refresh re-attach** (a base component must
+re-attach stored leaves without re-running the LLM). **Erlang** (`fh_engine_fill`, all additive):
+`has_resolver` + dispatch clause; the `investment_strategy/1` resolver **scaffold** (renderer
+`summary-card`; the four-anchor strategy kb_versions; `hold_period_years` carried off upstream
+`profile`; every agent slot + property-relative target + alignment verdict null = honest-partial —
+the targets follow from the archetype *and* a property, both absent at base); `merge_agent/3` +
+`agent_values_from_outcome/2` clauses (slot-scoped fold of the 3 leaves; §98 — no figure/verdict moved).
+**Python** (`planner.py`, generalized at the 2nd two-path instance): new `investment_thesis`
+`_DOMAINS` module + `InvestmentThesisLeaves` schema (`archetype`/`gearing_type` as Literals,
+`one_liner` as bilingual `LocalizedText` — **no number field → targets out of the LLM's reach**) +
+`fill_investment_strategy` coroutine + `_FILLERS` entry; `_kb_block`/`build_user_content` parameterized
+(per-domain descriptors), `_PREAMBLE`/`_STYLE` de-FHB'd ("buyers", not "first home buyers") to serve
+both domains — the mortgage path preserved. **Verified:** `investment_strategy_conformance.escript`
+**27 anchors** (scaffold, slot-scoped merge, refresh round-trip = inverse of merge, Layer-1 conformance
+to the investor `strategy_thesis` schema incl. the `{vi,en}` `one_liner` passing the `string`/scalar
+field, no Mode-A regression); a Python structural suite (schema enums + bilingual rejection + prompt
+assembly + dispatch + mortgage-path-preserved); and a **live end-to-end Opus fill** (subscription
+credit) — `capital_growth` + `negatively_geared` (consistent), a register-appropriate KB-grounded
+bilingual one-liner, decision-support tone, no figure leaked (23s, 2510-in/1049-out). `erlang-checker`
+clean; no recompile needed (no new copy doc — the 4 strategy anchors already compiled). **Observation
+(flagged, not patched):** the registry types `one_liner`/`alignment_reasoning` as `string`, but they're
+produced/displayed bilingual — the bilingual contract is enforced at the producer (Pydantic), and a
+`string→localized` registry upgrade for backstop enforcement is a deliberate cross-field pass, separate
+from this unit. **Next P5-engine unit:** `mortgage_finance` investor variant (now unblocked — its
+`strategy_thesis` upstream exists), or `yield_modelling` / `cash_position` resolver — Son's call.
 
 ## Deferred out (honest — first-exercising instance is Mode B/D, not here)
 
