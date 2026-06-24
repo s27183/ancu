@@ -142,25 +142,27 @@ Status legend: `[ ]` not started · `[~]` drafting · `[v]` facts verified vs pr
 
 | St | Slug | Consuming component → fields | Figure handling |
 |----|------|------------------------------|-----------------|
-| [ ] | kb.investor.strategy-archetypes | investment_strategy → archetype | reference |
-| [ ] | kb.investor.gearing-types-and-implications | investment_strategy → gearing | decision-support |
-| [ ] | kb.investor.hold-period-considerations | investment_strategy → hold period | reference |
-| [ ] | kb.investor.exit-strategy-options | investment_strategy, disposition → exit | reference |
-| [ ] | kb.investor.experience-levels | investor_profile → traits.experience_level | reference (bands) |
-| [ ] | kb.investor.bid-discipline | buying_strategy → bid plan | decision-support |
-| [ ] | kb.investor.yield-anchored-pricing | buying_strategy → price ceiling | resolver-anchored to yield |
-| [ ] | kb.investor.tenancy-in-situ-considerations | due_diligence → tenancy | reference |
-| [ ] | kb.investor.rental-appraisal-from-pm-agent | due_diligence → rental appraisal | reference |
-| [ ] | kb.investor.depreciation-report-quantity-surveyor | due_diligence, settlement_prep → QS report | reference |
-| [ ] | kb.investor.entity-setup-timeline | settlement_prep → entity setup milestone | reference |
-| [ ] | kb.investor.depreciation-schedule-procurement | settlement_prep → depreciation schedule | reference |
-| [ ] | kb.investor.property-management-appointment-timeline | settlement_prep → PM appointment | reference |
-| [ ] | kb.investor.property-management-vs-self-managed | ownership_planning_investor → management model | decision-support |
-| [ ] | kb.investor.annual-tax-return-investor | ownership_planning_investor → annual return | reference |
-| [ ] | kb.investor.cash-flow-tracking | ownership_planning_investor → tracking | reference |
-| [ ] | kb.investor.portfolio-review-cadence | ownership_planning_investor → review cadence | reference |
-| [ ] | kb.investor.scale-up-using-equity | ownership_planning_investor → scale-up | decision-support |
-| [ ] | kb.investor.land-tax-aggregation | ownership_planning_investor → land-tax aggregation | resolver (consumes kb.tax.land-tax-by-state) |
+| [v] | kb.investor.strategy-archetypes | investment_strategy → archetype | reference |
+| [v] | kb.investor.gearing-types-and-implications | investment_strategy → gearing | decision-support |
+| [v] | kb.investor.hold-period-considerations | investment_strategy → hold period | reference |
+| [v] | kb.investor.exit-strategy-options | investment_strategy, disposition → exit | reference |
+| [v] | kb.investor.experience-levels | investor_profile → traits.experience_level | reference (bands) |
+| [v] | kb.investor.bid-discipline | buying_strategy → bid plan | decision-support |
+| [v] | kb.investor.yield-anchored-pricing | buying_strategy → price ceiling | resolver-anchored to yield |
+| [v] | kb.investor.tenancy-in-situ-considerations | due_diligence → tenancy | reference |
+| [v] | kb.investor.rental-appraisal-from-pm-agent | due_diligence → rental appraisal | reference |
+| [v] | kb.investor.depreciation-report-quantity-surveyor | due_diligence, settlement_prep → QS report | reference |
+| [v] | kb.investor.entity-setup-timeline | settlement_prep → entity setup milestone | reference |
+| [v] | kb.investor.depreciation-schedule-procurement | settlement_prep → depreciation schedule | reference |
+| [v] | kb.investor.property-management-appointment-timeline | settlement_prep → PM appointment | reference |
+| [v] | kb.investor.property-management-vs-self-managed | ownership_planning_investor → management model | decision-support |
+| [v] | kb.investor.annual-tax-return-investor | ownership_planning_investor → annual return | reference |
+| [v] | kb.investor.cash-flow-tracking | ownership_planning_investor → tracking | reference |
+| [v] | kb.investor.portfolio-review-cadence | ownership_planning_investor → review cadence | reference |
+| [v] | kb.investor.scale-up-using-equity | ownership_planning_investor → scale-up | decision-support |
+| [v] | kb.investor.land-tax-aggregation | ownership_planning_investor → land-tax aggregation | resolver (consumes kb.tax.land-tax-by-state) |
+
+**Cluster S COMPLETE (19/19, 2026-06-24).** All pure-reference (`fills: []`) — the consuming components are agent-reasoned (`investment_strategy` archetype/gearing, `buying_strategy` negotiation style, `due_diligence` lease interpretation) or resolver-computed (`yield_anchored_max_price`, the land-tax estimate), so these docs supply vocabulary / method / behaviour, never a setter. **P1 now COMPLETE: T(7) + F(8) + Y(11) + S(19) = 45/45.** Verified against ATO / state revenue offices / state tenancy authorities / APRA / ASIC Moneysmart primaries. **Two earlier-cluster seams closed:** (a) the **QS-report overlap** flagged in Cluster T is resolved by a clean three-way single-owner split — `kb.tax.quantity-surveyor-reports` owns **purpose+cost**, `kb.investor.depreciation-report-quantity-surveyor` owns the **due-diligence validation lens** (pre-purchase estimate), `kb.investor.depreciation-schedule-procurement` owns the **post-settlement procurement milestone + refresh**; rates/rules → tax doc, eligibility → `kb.property.depreciation-by-build-year`; no fact duplicated. (b) **All five previously-dangling Cluster-Y → Cluster-S cross-refs** (`strategy-archetypes`, `property-management-vs-self-managed`, `rental-appraisal-from-pm-agent`, `tenancy-in-situ-considerations`, `land-tax-aggregation`) **and the Cluster-F → `scale-up-using-equity` ref now resolve** — every relative `.md` link target in the 19 docs checked on disk (zero missing). **Single-owner across cost-vs-decision and figure-vs-method seams:** management *fee* → `kb.investor.property-management-fees` vs management *decision* → `property-management-vs-self-managed`; the *yield-anchored price* method (this cluster) reads the *rent* (`rental-income-modelling`) and *binding rent source* (`rental-appraisal-from-pm-agent`); land-tax *aggregation behaviour* (this cluster) vs *thresholds/rates* → `kb.tax.land-tax-by-state` (its SA/WA/TAS/ACT `to_verify` rows inherited, not re-asserted — the figure is resolver-computed, removed-from-reach). **Reform default applied** in `gearing-types-and-implications` + `hold-period-considerations`: current law computed, the 2026-27 Budget NG/CGT change flagged, post-1-July-2027 → `to_verify`; the status itself owned by the Cluster-T tax docs. **One regulated structural fact, principle-level not figure:** state land-tax aggregation (per-owner, per-state pooling on a progressive scale; PPOR exempt; not pooled across states) and tenancy-in-situ (a fixed-term lease binds the buyer) — both asserted as stable national principles, with the time-sensitive per-state details (`to_verify`) deferred to the owning docs. All 19 slug==path OK. GATE 6 reference-integrity (P3 flip) should now find P1 closed end-to-end.
 
 ## P2–P5 — engine + shell tracker
 
