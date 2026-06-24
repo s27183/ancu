@@ -206,7 +206,7 @@ Status legend: `[ ]` not started · `[~]` drafting · `[v]` facts verified vs pr
 | [x] | P5-engine | `investor_profile` resolver (`fh_engine_fill` inline, mirrors `buyer_profile`) — canonical `profile`, investor lens (per-applicant `tax{}`, no owner-occupier leaves, domestic-investor strength); honest-partial |
 | [x] | P5-engine | `investment_strategy` **two-path** (resolver scaffold + 3 `investment_thesis` agent leaves) — `strategy_thesis` from the Cluster-S KB (archetype/gearing/one_liner); first Mode-C agent component |
 | [ ] | P5-engine | `mortgage_finance` investor variant (branch the shared resolver) — investment-loan serviceability, IO-vs-PI, DTI cap (Cluster-F KB) |
-| [ ] | P5-engine | `yield_modelling` resolver (NEW module) — `cash_flow_projection` (rent/opex/vacancy/PM; Cluster-Y KB, banded/placeholder) |
+| [~] | P5-engine | `yield_modelling` resolver — base-spine presence DONE (`fh_engine_fill` inline, honest-partial all-null `cash_flow_projection` + `calculator` + 5 Cluster-Y anchors); the cash-flow **arithmetic** (NEW module) defers to `property_assessment` (its rent-leaf producer) + the banded-vs-scalar seam |
 | [ ] | P5-engine | `tax_structure` agent + regulated figures (1 leaf) — `tax_optimised_structure`; CGT/depreciation/land-tax resolver-computed, removed-from-reach (Cluster-T KB; the load-bearing ASIC surface) |
 | [ ] | P5-engine | `cash_position` investor variant (branch the shared resolver) — investment deposit, no FHB schemes, investor cost adders (Cluster-Y/F KB) |
 | [ ] | P5-engine | `ownership_planning_investor` resolver (NEW module) — `portfolio_position` (land-tax aggregation, mgmt model, scale-up; Cluster-S KB) + the `opportunities[]` producer seam flagged in P4 |
@@ -342,6 +342,36 @@ produced/displayed bilingual — the bilingual contract is enforced at the produ
 `string→localized` registry upgrade for backstop enforcement is a deliberate cross-field pass, separate
 from this unit. **Next P5-engine unit:** `mortgage_finance` investor variant (now unblocked — its
 `strategy_thesis` upstream exists), or `yield_modelling` / `cash_position` resolver — Son's call.
+
+**P5-engine 3/suite COMPLETE (2026-06-24) — `yield_modelling` base-spine presence (a pure-resolver
+figure-owner).** Grounding settled the shape: `cash_flow_projection` has **no free-text field** (every
+field is a figure/enum), so `yield_modelling` is a **pure resolver** (empty `agent_leaves`), the same
+class as `fh_engine_disposition` — no two-path, the figures removed from the LLM's reach. **At base it
+is necessarily honest-partial, all-null:** the binding input is the **weekly rent**, which the KB sources
+from `estimated_weekly_rent_range` — an *agent leaf on `property_assessment`*, a per-property component
+that is **unbuilt** (and there is no base rent source — suburb median-rent data isn't wired, the paid
+feeds are deferred). Every figure hangs off that rent → null at base, exactly as `disposition` returns
+null when its inputs are unset. **Erlang** (`fh_engine_fill`, additive): `has_resolver` + dispatch clause
++ the `yield_modelling/1` resolver returning the 11-field honest-partial null `cash_flow_projection`,
+`calculator` renderer, and the **five Cluster-Y anchors** as the resolver-owned method/band audit trail.
+One clause serves both investor blueprints (the Mode-D `cash_flow_projection_foreign` variant too — fine
+at base, its fields deferred with Mode D). **Verified:** `yield_modelling_conformance.escript` **33
+anchors** (renderer; all 11 figures null + input-independent on empty upstream; exact field set; the five
+anchors; `has_resolver` true; Layer-1 conformance of the all-null scaffold to the `cash_flow_projection`
+schema; **pure-resolver — no `merge_agent`/`agent_values_from_outcome` clause**; no Mode-A/Mode-C
+regression). All existing suites green (investment_strategy 27, investor_profile 40, disposition 79,
+outcome 21+11, resolver lockstep); `erlang-checker` clean; no recompile (no new copy doc — the 5 anchors
+already compiled). **Deferred (honest — unbuilt upstream dependency, not a rug):** the cash-flow
+**arithmetic** (income→opex→yields→cash-flow→year-5/10) is a NEW module that reads `property_assessment`'s
+rent leaf; building it now would assert an ungrounded producer shape ([[place-upstream-figures-dont-
+recompute]]). It lands with `property_assessment`. **Cross-contract seam flagged (decide there, not
+patched):** `cash_flow_projection` figures are typed `money`/`percentage` **scalar** in the registry AND
+`disposition` already consumes `cash_flow_before_tax_year_1` as a scalar number, but the KB says **banded
+ranges** (rent is a range) and every other figure-owner (disposition's `sale_proceeds` etc.) is
+`money_range` — the banded-vs-scalar call ripples KB ↔ blueprint ↔ registry ↔ `disposition` consumer ↔
+`calculator` renderer; it doesn't bite at base (all null). **Next P5-engine unit:** `mortgage_finance`
+investor variant, `cash_position` investor variant, or `property_assessment` (which unblocks
+`yield_modelling`'s arithmetic + forces the banded/scalar call) — Son's pick.
 
 ## Deferred out (honest — first-exercising instance is Mode B/D, not here)
 

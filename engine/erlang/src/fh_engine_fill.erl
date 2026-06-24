@@ -33,6 +33,7 @@ has_resolver(<<"cash_position">>)      -> true;
 has_resolver(<<"ownership_planning">>) -> true;
 has_resolver(<<"mortgage_finance">>)   -> true;
 has_resolver(<<"investment_strategy">>) -> true;
+has_resolver(<<"yield_modelling">>)    -> true;
 has_resolver(<<"purchase_journey">>)   -> true;
 has_resolver(<<"preparation">>)        -> true;
 has_resolver(<<"phase_playbook">>)     -> true;
@@ -54,6 +55,8 @@ resolver(<<"mortgage_finance">>, Args, Upstream) ->
     fh_engine_mortgage:fill(Args, Upstream);
 resolver(<<"investment_strategy">>, _Args, Upstream) ->
     investment_strategy(Upstream);
+resolver(<<"yield_modelling">>, _Args, Upstream) ->
+    yield_modelling(Upstream);
 resolver(<<"purchase_journey">>, Args, Upstream) ->
     fh_engine_journey:fill(Args, Upstream);
 resolver(<<"preparation">>, Args, Upstream) ->
@@ -320,6 +323,71 @@ investment_strategy(Upstream) ->
          <<"kb.investor.hold-period-considerations">>,
          <<"kb.investor.exit-strategy-options">>]),
     {Outcome, <<"summary-card">>, KbVersions}.
+
+%% --- yield_modelling (Mode C, pure RESOLVER — base-spine presence) -----------
+%% The investor base spine (blueprint component 5): the rental cash-flow model. A PURE
+%% resolver figure-owner — the same class as fh_engine_disposition (every cash_flow_projection
+%% field is a figure/enum, NO free-text → empty agent_leaves, no two-path). The figures are
+%% removed from the LLM's reach (§98 / [[no-judge-ground-the-producer]]): resolver-computed,
+%% KB-grounded (the five Cluster-Y anchors), banded where the inputs are bands — never agent-
+%% authored.
+%%
+%% HONEST-PARTIAL AT BASE ([[base-turn-honest-partial-output]]). The binding input is the
+%% WEEKLY RENT, which the KB (kb.investor.rental-income-modelling) sources from
+%% `estimated_weekly_rent_range` — an AGENT LEAF on `property_assessment`, a per-property
+%% component that is ABSENT at base (and not yet built). There is no base rent source (suburb
+%% median-rent data is not wired; the paid feeds are deferred). Every cash_flow_projection
+%% figure hangs off that rent, so with no property the whole outcome resolves null — exactly as
+%% disposition returns null when its horizon/price inputs are unset. The base-knowable items
+%% (vacancy ~3%, PM 7.5%, growth 3% p.a.) are KB *assumptions*, and cash_flow_projection has no
+%% field to carry them, so they stay in the KB until the arithmetic runs. null conforms to any
+%% field (fh_engine_outcome implicit-universal nullability), so the scaffold passes Layer-1
+%% trivially with NO banded-vs-scalar type decision forced here.
+%%
+%% DEFERRED: THE CASH-FLOW ARITHMETIC. The income→expenses→yields→cash-flow→projection
+%% computation depends on property_assessment's rent leaf (an UNBUILT upstream) — building it
+%% now would assert an ungrounded producer shape ([[place-upstream-figures-dont-recompute]]).
+%% It lands with the property_assessment unit, where a CROSS-CONTRACT decision must be resolved:
+%% cash_flow_projection figures are typed `money`/`percentage` SCALAR in the registry AND
+%% disposition already consumes `cash_flow_before_tax_year_1` as a SCALAR number, but the KB
+%% says BANDED ranges (rent is a range) and every other figure-owner (disposition's
+%% sale_proceeds etc.) is money_range. That seam (KB ↔ blueprint ↔ registry ↔ disposition
+%% consumer ↔ calculator renderer) is decided deliberately when the arithmetic runs, not here.
+%%
+%% One clause serves BOTH investor blueprints (resolver keys on component name): the Mode-D
+%% `cash_flow_projection_foreign` variant also runs through here — fine at base (null conforms;
+%% its FX-specific fields default null), the Mode-D figures deferred with Mode D. Reads only
+%% upstream (no Args); the base outcome is input-independent (all null) — Upstream is taken for
+%% shape symmetry with the other resolvers and the per-property branch to come.
+yield_modelling(_Upstream) ->
+    %% the cash_flow_projection schema, honest-partial: every figure null at base (no rent input).
+    Outcome = #{
+        %% income lines — null until a property's weekly rent is known.
+        <<"annual_rental_income_year_1">>      => null,
+        <<"annual_operating_expenses_year_1">> => null,
+        <<"annual_interest_year_1">>           => null,
+        %% headline cash flow (annual + per-week) — null at base.
+        <<"cash_flow_before_tax_year_1">>      => null,
+        <<"cash_flow_before_tax_per_week">>    => null,
+        %% yields — null at base (gross needs rent; net needs rent + expenses ± loan).
+        <<"gross_yield">>                  => null,
+        <<"net_yield_pre_loan">>           => null,
+        <<"net_yield_post_loan_pre_tax">>  => null,
+        %% multi-year projection — null at base (compounds the year-1 figures, themselves null).
+        <<"year_5_projected_cash_flow">>   => null,
+        <<"year_10_projected_cash_flow">>  => null,
+        %% the geared-position verdict — null (sign of a null cash flow is undetermined).
+        <<"is_positive_neutral_or_negative_geared_pre_tax">> => null
+    },
+    %% the five Cluster-Y anchors — the resolver-owned audit trail (method + bands), carried at
+    %% base so the methodology is provenanced before any figure exists.
+    KbVersions = fh_engine_kb:kb_anchors(
+        [<<"kb.investor.rental-income-modelling">>,
+         <<"kb.investor.operating-expenses-typical-ratios">>,
+         <<"kb.investor.vacancy-rate-assumptions">>,
+         <<"kb.investor.cash-flow-modelling-methodology">>,
+         <<"kb.investor.property-management-fees">>]),
+    {Outcome, <<"calculator">>, KbVersions}.
 
 %% A three-valued resolver verdict, made JSON-safe for the outcome snapshot:
 %% true/false stay booleans; `undetermined` becomes an explicit marker (rather than
