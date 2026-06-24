@@ -168,9 +168,9 @@ Status legend: `[ ]` not started · `[~]` drafting · `[v]` facts verified vs pr
 
 | St | Phase | Item |
 |----|-------|------|
-| [ ] | P2 | Reconcile `tax-brackets-2026` → `kb.tax.income-tax-resident-2025-26` (blueprint edit) |
-| [ ] | P2 | Reconcile serviceability slug duplication (keep `kb.lender.*`) |
-| [ ] | P2 | `cgt/1` investor branch in `fh_engine_disposition` (50% discount, no PPOR exemption, Div-43/40 clawback) — currently returns `to_verify` for non-PPOR |
+| [x] | P2 | Reconcile `tax-brackets-2026` → `kb.tax.income-tax-resident-2025-26` (blueprint edit) |
+| [x] | P2 | Reconcile serviceability slug duplication (keep `kb.lender.*`) |
+| [x] | P2 | `cgt/1` investor branch in `fh_engine_disposition` (50% discount, no PPOR exemption, Div-43/40 clawback) — currently returns `to_verify` for non-PPOR |
 | [ ] | P3 | Flip `IN_SCOPE_BLUEPRINT` → `investor-domestic-au` in `kb_compiler.py` |
 | [ ] | P3 | Declare `plan.*` (add `"plan"` to `EXTERNAL_NS`) |
 | [ ] | P3 | Green all semantic gates; reconcile GATE 6/7 reference-integrity / coverage seams |
@@ -179,6 +179,36 @@ Status legend: `[ ]` not started · `[~]` drafting · `[v]` facts verified vs pr
 | [ ] | P4 | Shell renderer: `opportunity-card` (enum + §11.9 table + Svelte component) |
 | [ ] | P4 | Onboarding intent selection UI (`onboarding.ts` — unhardcode owner-occupier) |
 | [ ] | P5 | Onboarding dispatch: `fh_engine_h_plan_cards.erl` selects blueprint by `intent` (atomic-last) |
+
+**P2 COMPLETE (2026-06-24).** Two free repoints + the investor CGT branch, all committable now (no
+deploy until P3). **Repoints** in `investor-domestic-au.md`: `kb.investor.tax-brackets-2026` →
+`kb.tax.income-tax-resident-2025-26` (shared with Mode A → de-italicised in the anchor index) and
+`kb.investor.serviceability-investment-loans` → `kb.lender.serviceability-investment-loans` (the
+Cluster-F keeper; investor_profile now shares it with mortgage_finance, anchor index "1, 4"). Both
+are dormant until GATE 6 fires at the P3 flip. **`fh_engine_disposition`** gained a mode branch:
+`fill/2` dispatches on a `tax_optimised_structure` upstream (only the investor blueprint runs a
+`tax_structure` component) → `fill_owner_occupier/2` (Mode-A path, byte-unchanged) vs
+`fill_investor/3` (full CGT). `cgt_investor/4` computes the discounted taxable gain × marginal rate
+for the **clean case only** (resident individual, rate known, no Div-43 clawback in play) and returns
+**`to_verify` (cgt = null → net/full PENDING)** once a trap applies — non-resident period,
+trust/company/SMSF entity, unknown rate, or a live clawback. **Seam reconciled** (cgt-50-percent vs
+depreciation-43-40): the depreciation doc defers the dollar clawback to a tax agent, so when a
+clawback is in play the branch surfaces the indicative pre-clawback `taxable_gain` but returns the
+CGT `to_verify` — never an overstated net. All figures resolver-computed, removed from the LLM's
+reach: the 50% discount + by-entity rates from `kb.tax.cgt-50-percent-discount`, the investment-loan
+amortisation rate = owner-occupier representative (6.0%) + premium (0.35pp) from the F-cluster docs.
+**Reform default applied** (the open decision above): current 50% law computed, the 2026-27 Budget
+reform surfaced as a flagged bilingual `key_assumption`, no dedicated transitional KB doc (the inline
+flags suffice). New bilingual copy in `kb.copy.disposition` (`assumption_cgt_computed` /
+`assumption_cgt_investor_to_verify` / `assumption_cgt_reform`). Verified by
+`disposition_conformance.escript` — **78 anchors green** (50 Mode-A unchanged + 28 investor: exact
+figures, no-second-computer, honest-partial, bilingual). **P2/P3 boundary surfaced:** `taxable_gain`
+and `cgt_status: computed` are absent from the **in-scope (Mode-A) registry**, so (a) the validator's
+lenient unknown-field pass-through lets `taxable_gain` ride harmlessly now, and (b) the
+investor-**computed** Layer-1 case can only green once IN_SCOPE flips at P3 (the enum becomes
+`[computed, to_verify]`) — its figures are exactly asserted in `investor_cases/0` meanwhile, and the
+investor-**to_verify** Layer-1 case (shared enum) already passes. The artifact is untracked
+(gitignored, `KB.rglob` includes all on-disk docs), so re-emit is a no-tracked-file P3 step.
 
 ## Deferred out (honest — first-exercising instance is Mode B/D, not here)
 

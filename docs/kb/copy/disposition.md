@@ -9,7 +9,8 @@ last_verified: 2026-06-22
 User-facing copy-templates for the `disposition` resolver (`fh_engine_disposition`): the
 dispose-phase `dispose_cash_events` labels (sale proceeds, selling costs, loan payout, CGT)
 and the `key_assumptions` lines (the hold horizon, the **placeholder** capital-growth band,
-the CGT exemption basis, the selling-cost basis, the representative loan-rate basis). Each template is filled via
+the CGT basis — owner-occupier exemption *or* the Mode-C/D investor computed/to_verify lines plus
+the 2026-27 reform flag — the selling-cost basis, the representative loan-rate basis). Each template is filled via
 `fh_engine_i18n:subst/2` — no Vietnamese literal in Erlang (the `io:format ~s` >255-codepoint
 trap; bilingual-content.md §3b).
 
@@ -72,6 +73,18 @@ basis — decision-support, never a forecast or advice.
     "assumption_loan_rate": {
       "vi": "Khoản tất toán vay được tính theo lãi suất tham chiếu {rate}%/năm trong {term} năm — GIẢ ĐỊNH quy ước, không phải lãi suất sản phẩm thực tế của bạn.",
       "en": "Loan payout assumes the loan amortises at a representative {rate}%/year over {term} years — a CONVENTION, not your actual product rate."
+    },
+    "assumption_cgt_computed": {
+      "vi": "Thuế lãi vốn được ước tính từ phần lãi dự phóng (giảm 50% nếu nắm giữ trên 12 tháng) theo thuế suất biên của bạn — chỉ là ước tính, không phải tư vấn; hãy xác nhận với chuyên viên thuế.",
+      "en": "Capital gains tax is estimated from the projected gain (50% discount if held over 12 months) at your marginal rate — an estimate, not advice; confirm with a registered tax agent."
+    },
+    "assumption_cgt_investor_to_verify": {
+      "vi": "Thuế lãi vốn ở đây cần chuyên viên thuế xác định — phụ thuộc vào khấu hao đã khấu trừ (làm tăng phần lãi), loại hình sở hữu, và tình trạng cư trú thuế của bạn, nên chúng tôi không ước tính con số.",
+      "en": "Capital gains tax here needs a registered tax agent — it depends on depreciation claimed (which raises the gain), the ownership entity, and your tax residency, so we don't estimate the figure."
+    },
+    "assumption_cgt_reform": {
+      "vi": "Phần này áp dụng luật hiện hành (giảm 50% thuế lãi vốn). Một đề xuất cải cách trong Ngân sách 2026-27 — chưa thành luật — có thể thay đổi từ ngày 1/7/2027; hãy xác nhận với chuyên viên thuế.",
+      "en": "This uses current law (the 50% CGT discount). A proposed 2026-27 Budget reform — not yet law — may change it from 1 July 2027; confirm with a registered tax agent."
     }
   }
 }

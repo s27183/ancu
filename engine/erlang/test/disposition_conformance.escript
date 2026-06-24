@@ -33,6 +33,7 @@ main(_) ->
     ok = fh_engine_kb:load(),
     io:format("disposition conformance — fh_engine_disposition (terminal dispose-phase figure-owner)~n~n"),
     R = lists:flatten([figure_cases(), arithmetic_cases(), cgt_cases(),
+                       investor_cases(),
                        honest_partial_cases(), event_cases(), assumption_cases(),
                        rate_source_cases(), layer1_cases()]),
     Fails = [X || X <- R, X =:= fail],
@@ -77,6 +78,35 @@ fill(Upstream) ->
     {Outcome, Renderer}.
 
 g(Outcome, K) -> maps:get(K, Outcome).
+
+%% --- investor (Mode C) fixtures ---------------------------------------------
+%% Same H=10 / ceiling 800000 as Mode A (so sale_proceeds matches), but the investor upstream:
+%% a tax_optimised_structure (the mode discriminator + CGT determinants), budget_envelope_investor
+%% (loan_amount + acquire), and a cash_flow_projection (a negatively-geared −8000/yr hold).
+
+inv_profile(Residency) ->
+    #{<<"hold_horizon_years">> => 10,
+      <<"target_price_range">> => [600000, 800000],
+      <<"applicants">> => [#{<<"role">> => <<"primary">>,
+                             <<"tax">>  => #{<<"residency_for_tax">> => Residency}}]}.
+
+inv_tax(Entity, Rate, Clawback) -> inv_tax(Entity, Rate, Clawback, true).
+inv_tax(Entity, Rate, Clawback, Eligible) ->
+    #{<<"recommended_entity">>             => Entity,
+      <<"cgt_discount_eligible">>          => Eligible,
+      <<"cgt_marginal_rate">>              => Rate,
+      <<"cost_base_depreciation_clawback">> => Clawback}.
+
+inv_budget()   -> #{<<"total_cash_required">> => [200000, 205000], <<"loan_amount">> => 560000}.
+inv_cashflow() -> #{<<"cash_flow_before_tax_year_1">> => -8000}.
+
+inv_upstream(Profile, Tax) ->
+    #{<<"profile">>                  => Profile,
+      <<"budget_envelope_investor">> => inv_budget(),
+      <<"cash_flow_projection">>     => inv_cashflow(),
+      <<"tax_optimised_structure">>  => Tax}.
+
+ev_ids(Outcome) -> [maps:get(<<"id">>, E) || E <- g(Outcome, <<"dispose_cash_events">>)].
 
 %% --- 1. figures (exact) -----------------------------------------------------
 
@@ -136,6 +166,70 @@ cgt_cases() ->
            fh_engine_disposition:cgt(profile(<<"sole_occupier">>)), {null, <<"exempt">>}),
      check("cgt/1 partial_rental → {null, to_verify}",
            fh_engine_disposition:cgt(profile(<<"partial_rental">>)), {null, <<"to_verify">>})].
+
+%% --- 3b. CGT (Mode-C investor — the full-CGT path) --------------------------
+%% COMPUTED for the clean case (resident individual, rate known, no clawback); to_verify (cgt
+%% null → net PENDING) once a trap applies, with the indicative discounted gain still surfaced.
+
+investor_cases() ->
+    Clean    = inv_upstream(inv_profile(<<"resident">>), inv_tax(<<"personal_sole">>, 37.0, false)),
+    {C, CR}  = fill(Clean),
+    Sale     = g(C, <<"sale_proceeds">>),
+    Sell     = g(C, <<"selling_costs">>),
+    Loan     = g(C, <<"loan_payout">>),
+    Cgt      = g(C, <<"cgt">>),
+    LoanExp  = fh_engine_disposition:loan_payout_investor(inv_budget(), 10),
+    NetExp   = fh_engine_disposition:net_proceeds(Sale, Sell, Loan, Cgt),
+    FullExp  = fh_engine_disposition:full_horizon_investor(NetExp, inv_budget(), inv_cashflow(), 10),
+    Assumps  = g(C, <<"key_assumptions">>),
+    Reform   = lists:any(fun(L) -> binary:match(maps:get(<<"en">>, L, <<>>), <<"2027">>) =/= nomatch end, Assumps),
+    AllBilin = lists:all(fun bilingual/1, Assumps),
+    %% held < 12 months (eligibility false) → 0% discount, full gain taxable, still computed.
+    {U, _}   = fill(inv_upstream(inv_profile(<<"resident">>),
+                                 inv_tax(<<"personal_sole">>, 37.0, false, false))),
+    %% to_verify traps — clawback in play, a non-resident period, a trust entity, an unknown rate.
+    {TV1, _} = fill(inv_upstream(inv_profile(<<"resident">>),     inv_tax(<<"personal_sole">>, 37.0, true))),
+    {TV2, _} = fill(inv_upstream(inv_profile(<<"non_resident">>), inv_tax(<<"personal_sole">>, 37.0, false))),
+    {TV3, _} = fill(inv_upstream(inv_profile(<<"resident">>),     inv_tax(<<"discretionary_trust">>, 37.0, false))),
+    {TV4, _} = fill(inv_upstream(inv_profile(<<"resident">>),     inv_tax(<<"personal_sole">>, null, false))),
+    [check("investor renderer = calculator", CR, <<"calculator">>),
+     check("clean: taxable_gain = (sale − 800000 cost base) × 50% discount", g(C, <<"taxable_gain">>),
+           [87598, 251558]),
+     check("clean: cgt = taxable_gain × 37% marginal rate", Cgt, [32411, 93076]),
+     check("clean: cgt_status = computed", g(C, <<"cgt_status">>), <<"computed">>),
+     check("clean: loan_payout = investment-loan amortised @6.35% (no second computer)", Loan, LoanExp),
+     check("clean: net_proceeds = exported interval arithmetic (sale−sell−loan−cgt)",
+           g(C, <<"net_proceeds">>), NetExp),
+     check("clean: full_horizon = net − acquire + signed hold×H (exported)",
+           g(C, <<"full_horizon_net_position">>), FullExp),
+     check("clean: 6 key_assumptions (horizon, growth, cgt, reform, selling, loan-rate)",
+           length(Assumps), 6),
+     check("clean: 2026-27 reform flag surfaced (1 Jul 2027)", Reform, true),
+     check("clean: every investor assumption bilingual {vi,en}", AllBilin, true),
+     check("clean: cgt dispose event emitted (out/government)", lists:member(<<"dispose_cgt">>, ev_ids(C)), true),
+     %% exported cgt_investor/4 verdict surface
+     check("cgt_investor/4 clean → {gain, cgt, computed}",
+           fh_engine_disposition:cgt_investor(inv_profile(<<"resident">>),
+               inv_tax(<<"personal_sole">>, 37.0, false), [975196, 1303116], 800000),
+           {[87598, 251558], [32411, 93076], <<"computed">>}),
+     %% held < 12 months: undiscounted, still computed
+     check("held <12mo: taxable_gain undiscounted (0% discount)", g(U, <<"taxable_gain">>), [175196, 503116]),
+     check("held <12mo: cgt = full gain × 37%", g(U, <<"cgt">>), [64823, 186153]),
+     check("held <12mo: cgt_status = computed", g(U, <<"cgt_status">>), <<"computed">>),
+     %% clawback trap: to_verify ⟹ cgt null ⟹ net/full PENDING; indicative gain STILL surfaced
+     check("clawback: cgt_status = to_verify", g(TV1, <<"cgt_status">>), <<"to_verify">>),
+     check("clawback: cgt = null (dollar deferred to a tax agent)", g(TV1, <<"cgt">>), null),
+     check("clawback: net_proceeds PENDING", g(TV1, <<"net_proceeds">>), null),
+     check("clawback: full_horizon PENDING", g(TV1, <<"full_horizon_net_position">>), null),
+     check("clawback: indicative taxable_gain STILL surfaced", g(TV1, <<"taxable_gain">>), [87598, 251558]),
+     check("clawback: cgt dispose event dropped (honest-partial)", lists:member(<<"dispose_cgt">>, ev_ids(TV1)), false),
+     %% other traps: to_verify, cgt null
+     check("non-resident period: cgt_status = to_verify", g(TV2, <<"cgt_status">>), <<"to_verify">>),
+     check("non-resident period: cgt = null", g(TV2, <<"cgt">>), null),
+     check("trust entity: cgt_status = to_verify", g(TV3, <<"cgt_status">>), <<"to_verify">>),
+     check("trust entity: cgt = null", g(TV3, <<"cgt">>), null),
+     check("rate unknown: cgt_status = to_verify", g(TV4, <<"cgt_status">>), <<"to_verify">>),
+     check("rate unknown: cgt = null", g(TV4, <<"cgt">>), null)].
 
 %% --- 4. honest-partial ------------------------------------------------------
 
@@ -252,6 +346,14 @@ layer1_cases() ->
               {<<"no_horizon">>,  (full_upstream())#{<<"profile">> =>
                                       (profile(<<"sole_occupier">>))#{<<"hold_horizon_years">> => null}}},
               {<<"loan_pending">>,(full_upstream())#{<<"mortgage_plan">> => #{}}},
+              %% the investor to_verify path conforms NOW (cgt_status "to_verify" ∈ the Mode-A
+              %% enum; cgt null like Mode A). The investor COMPUTED path is deliberately absent
+              %% here: cgt_status "computed" is not in the in-scope (Mode-A) disposition enum —
+              %% it validates only once IN_SCOPE flips to investor at P3 (the schema then carries
+              %% [computed, to_verify] + taxable_gain). Its figures are exactly asserted in
+              %% investor_cases/0; the Layer-1 commit-seam gate proves green at the P3 flip.
+              {<<"investor_to_verify">>, inv_upstream(inv_profile(<<"resident">>),
+                                            inv_tax(<<"personal_sole">>, 37.0, true))},
               {<<"empty">>,       #{}}],
     [begin
          {Outcome, _} = fill(Up),

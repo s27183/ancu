@@ -26,25 +26,43 @@
 %% reserve_buffer precedent), loan_payout / net_proceeds / full_horizon_net_position stay null;
 %% sale_proceeds + selling_costs surface as banded estimates. No figure is ever fabricated.
 %%
-%% MODE-A CGT. The dwelling is the buyer's main residence → CGT-exempt (cgt = null,
-%% cgt_status = exempt) for the clean owner-occupier resident-for-tax case; to_verify once a
-%% trap applies (part rental / non-resident / land > 2 ha — kb.tax.cgt-main-residence-exemption).
-%% Mode A NEVER estimates a taxable gain. The investor CGT math (50% discount, cost base) is
-%% Modes C/D, design-first (§8.7).
+%% TWO CGT PATHS, ONE OUTCOME. fill/2 dispatches on the presence of a `tax_optimised_structure`
+%% upstream (only the investor blueprint runs a tax_structure component) — same outcome type +
+%% calculator renderer, two mode-appropriate computations:
 %%
-%% The disposition outcome + the calculator renderer are mode-general; Modes C/D reuse them with
-%% the investor CGT computation, authored design-first when those modes ship.
+%%   MODE-A/B owner-occupier (fill_owner_occupier/2). The dwelling is the buyer's main residence
+%%   → CGT-exempt (cgt = null, cgt_status = exempt) for the clean resident-for-tax case; to_verify
+%%   once a trap applies (part rental / non-resident / land > 2 ha — kb.tax.cgt-main-residence-
+%%   exemption). Mode A NEVER estimates a taxable gain.
+%%
+%%   MODE-C/D investor (fill_investor/3, cgt_investor/4). The property is NOT a main residence →
+%%   the disposal is a taxable CGT event (kb.tax.cgt-50-percent-discount). cgt is a COMPUTED
+%%   money_range (discounted gain × marginal rate) only for the clean case — resident individual,
+%%   marginal rate known, no Div-43 cost-base clawback in play; to_verify (cgt = null → net
+%%   PENDING) once a trap applies: a non-resident period, a trust/company/SMSF entity nuance, an
+%%   unknown marginal rate, OR a depreciation clawback whose dollar the KB defers to a tax agent
+%%   (kb.tax.depreciation-division-43-and-40 FLAGS the clawback, never asserts a dollar). The
+%%   2026-27 Budget NG/CGT reform is surfaced as a flagged assumption (current law computed;
+%%   post-1-July-2027 → to_verify). taxable_gain (the investor-only outcome field) carries the
+%%   indicative discounted gain even on the to_verify path — what's computable is shown.
 
 -export([fill/2]).
 %% exported for the conformance harness:
 -export([sale_proceeds/4, selling_costs/1, loan_payout/2, cgt/1,
          net_proceeds/4, full_horizon/4, dispose_cash_events/4]).
+%% the Mode-C/D investor path (full CGT):
+-export([cgt_investor/4, taxable_gain/3, loan_payout_investor/2, full_horizon_investor/4]).
 
 -define(COPY,    <<"kb.copy.disposition">>).
 -define(GROWTH,  <<"kb.property.capital-growth-bands">>).
 -define(SELLING, <<"kb.selling-costs.agent-legal">>).
 -define(CGT,     <<"kb.tax.cgt-main-residence-exemption">>).
 -define(SERVICEABILITY, <<"kb.lender.serviceability-basics">>).
+%% Mode-C/D investor anchors (the full-CGT path): the 50% discount + by-entity rates, the
+%% depreciation cost-base clawback, and the investment-loan rate premium.
+-define(CGT_INV,  <<"kb.tax.cgt-50-percent-discount">>).
+-define(DEPR,     <<"kb.tax.depreciation-division-43-and-40">>).
+-define(SERV_INV, <<"kb.lender.serviceability-investment-loans">>).
 
 -define(LOAN_TERM_YEARS, 30).   %% standard P&I term; the amortisation default (mortgage_plan
                                 %% carries no term at base — a documented constant, not a magic figure).
@@ -53,7 +71,18 @@
 
 -spec fill(map(), map()) -> {map(), binary(), [map()]}.
 fill(_Args, Upstream) ->
-    Profile   = maps:get(<<"profile">>, Upstream, #{}),
+    Profile = maps:get(<<"profile">>, Upstream, #{}),
+    %% Mode discriminator: only the investor blueprint runs a `tax_structure` component, so its
+    %% outcome's presence upstream marks the Mode-C/D investor path (full CGT) vs the Mode-A/B
+    %% owner-occupier path (main-residence-exempt). Same outcome type + calculator renderer.
+    case maps:get(<<"tax_optimised_structure">>, Upstream, undefined) of
+        undefined -> fill_owner_occupier(Profile, Upstream);
+        Tax       -> fill_investor(Profile, Tax, Upstream)
+    end.
+
+%% --- Mode-A/B owner-occupier (main-residence-exempt) -------------------------
+
+fill_owner_occupier(Profile, Upstream) ->
     Budget    = maps:get(<<"budget_envelope">>, Upstream, #{}),
     Mortgage  = maps:get(<<"mortgage_plan">>, Upstream, #{}),
     Ownership = maps:get(<<"ongoing_obligations">>, Upstream, #{}),
@@ -84,6 +113,45 @@ fill(_Args, Upstream) ->
         <<"key_assumptions">>           => assumptions(H, GLow, GHigh, Status, Loan)
     },
     KbVersions = fh_engine_kb:kb_anchors([?GROWTH, ?SELLING, ?CGT, ?SERVICEABILITY, ?COPY]),
+    {Outcome, <<"calculator">>, KbVersions}.
+
+%% --- Mode-C/D investor (full CGT) --------------------------------------------
+%% Reuses the mode-general sale_proceeds/selling_costs/net_proceeds; differs in the upstream
+%% sources (budget_envelope_investor + cash_flow_projection over the main-residence variants),
+%% the investment-loan amortisation rate, the full-CGT computation, and a signed hold cash flow
+%% rolled into the full-horizon position.
+
+fill_investor(Profile, Tax, Upstream) ->
+    Budget   = maps:get(<<"budget_envelope_investor">>, Upstream, #{}),
+    CashFlow = maps:get(<<"cash_flow_projection">>, Upstream, #{}),
+
+    H        = horizon(Profile),
+    Price    = price_basis(Profile),
+    {GLow, GHigh, _IsPlaceholder} = growth_band(),
+
+    Sale                = sale_proceeds(Price, H, GLow, GHigh),
+    Selling             = selling_costs(Sale),
+    Loan                = loan_payout_investor(Budget, H),
+    {Gain, Cgt, Status} = cgt_investor(Profile, Tax, Sale, Price),
+    %% cgt IS the contribution: a money_range when computed, null (→ net PENDING) when to_verify.
+    Net                 = net_proceeds(Sale, Selling, Loan, Cgt),
+    Full                = full_horizon_investor(Net, Budget, CashFlow, H),
+    Events              = dispose_cash_events(Sale, Selling, Loan, Cgt),
+
+    Outcome = #{
+        <<"horizon_years">>             => H,
+        <<"sale_proceeds">>             => Sale,
+        <<"selling_costs">>             => Selling,
+        <<"loan_payout">>               => Loan,
+        <<"taxable_gain">>              => Gain,
+        <<"cgt">>                       => Cgt,
+        <<"cgt_status">>                => Status,
+        <<"net_proceeds">>              => Net,
+        <<"full_horizon_net_position">> => Full,
+        <<"dispose_cash_events">>       => Events,
+        <<"key_assumptions">>           => assumptions_investor(H, GLow, GHigh, Status, Loan)
+    },
+    KbVersions = fh_engine_kb:kb_anchors([?GROWTH, ?SELLING, ?CGT_INV, ?DEPR, ?SERV_INV, ?COPY]),
     {Outcome, <<"calculator">>, KbVersions}.
 
 %% --- inputs ------------------------------------------------------------------
@@ -186,6 +254,27 @@ remaining_balance(P, AnnualRatePct, TermYears, ElapsedYears) ->
     K = ElapsedYears * 12,
     P * (math:pow(1 + R, N) - math:pow(1 + R, K)) / (math:pow(1 + R, N) - 1).
 
+%% --- investor loan payout: investment-loan amount amortised at the investment rate -----
+%% reads budget_envelope_investor.loan_amount (the actual loan for THIS purchase, not a capacity)
+%% and amortises at the KB representative owner-occupier rate PLUS the investment premium — both
+%% KB-grounded, removed from the LLM's reach (§98). null until the loan amount is known.
+-spec loan_payout_investor(map(), integer() | null) -> [integer()] | null.
+loan_payout_investor(_Budget, null) -> null;
+loan_payout_investor(Budget, H) when is_integer(H) ->
+    case principal_band(maps:get(<<"loan_amount">>, Budget, null)) of
+        null       -> null;
+        [PLo, PHi] ->
+            R = investor_rate(),
+            [round(remaining_balance(PLo, R, ?LOAN_TERM_YEARS, H)),
+             round(remaining_balance(PHi, R, ?LOAN_TERM_YEARS, H))]
+    end.
+
+%% the investment-loan amortisation rate: the owner-occupier representative rate
+%% (kb.lender.serviceability-basics) + the investment premium (kb.lender.serviceability-
+%% investment-loans). A labelled KB convention surfaced in key_assumptions, never a product rate.
+investor_rate() ->
+    representative_rate() + param(?SERV_INV, <<"investment_rate_premium_pp">>).
+
 %% --- CGT: Mode-A main-residence exemption ------------------------------------
 %% exempt (cgt = null) for the clean owner-occupier resident-for-tax case; to_verify once
 %% a trap applies. Mode A NEVER estimates a taxable gain (kb.tax.cgt-main-residence-exemption).
@@ -204,6 +293,74 @@ cgt(Profile) ->
 %% asserting a $0 tax that may not hold).
 cgt_contribution(null, <<"exempt">>)    -> [0, 0];
 cgt_contribution(_,    <<"to_verify">>) -> null.
+
+%% --- CGT: Mode-C/D investor (taxable gain, 50% discount, depreciation clawback) ---
+%% COMPUTED (a discounted-gain money_range, cgt_status = computed) only for the clean case: a
+%% resident individual, marginal rate known, and NO Div-43 cost-base clawback in play. to_verify
+%% (cgt = null → net PENDING) once a trap applies — a non-resident period, a trust/company/SMSF
+%% entity nuance, an unknown marginal rate, OR a depreciation clawback whose dollar the KB defers
+%% to a tax agent (kb.tax.depreciation-division-43-and-40 FLAGS the clawback, never asserts a
+%% dollar). The indicative discounted gain is surfaced as taxable_gain on BOTH paths (what's
+%% computable is shown). cgt = taxable_gain × marginal rate.
+
+-spec cgt_investor(map(), map(), [integer()] | null, number() | null) ->
+          {[integer()] | null, [integer()] | null, binary()}.
+cgt_investor(Profile, Tax, Sale, Price) ->
+    Entity   = maps:get(<<"recommended_entity">>, Tax, null),
+    Rate     = maps:get(<<"cgt_marginal_rate">>, Tax, null),
+    Eligible = maps:get(<<"cgt_discount_eligible">>, Tax, null),
+    Clawback = maps:get(<<"cost_base_depreciation_clawback">>, Tax, null),
+    %% the discount only when the holding clears 12 months (kb.tax.cgt-50-percent-discount); else
+    %% 0% — the full nominal gain is taxable (held < 12 months OR eligibility undetermined: the
+    %% conservative, higher-gain direction).
+    Discount = case Eligible of
+                   true -> param(?CGT_INV, <<"discount_pct_individual">>);
+                   _    -> 0
+               end,
+    Gain = taxable_gain(Sale, Price, Discount),
+    %% the clean computed case — an individual resident with a known rate and no clawback in play.
+    %% Holding period sets the discount %, not clean-ness (a sub-12-month individual sale is still
+    %% computed, just undiscounted). Trust/company/SMSF, a non-resident period, an unknown rate,
+    %% or a live clawback ⟹ to_verify (defer the figure to a registered tax agent).
+    Clean = all_resident(Profile)
+            andalso lists:member(Entity, [<<"personal_sole">>, <<"personal_joint">>])
+            andalso is_number(Rate)
+            andalso Clawback =:= false,
+    case Clean of
+        true when is_list(Gain) ->
+            [GLo, GHi] = Gain,
+            {Gain, [round(GLo * Rate / 100), round(GHi * Rate / 100)], <<"computed">>};
+        _ ->
+            {Gain, null, <<"to_verify">>}
+    end.
+
+%% the indicative discounted gain: (sale − cost base) × (1 − discount), floored at 0 (a capital
+%% loss yields no CGT here). The cost base is the conservative purchase-price basis — omitting
+%% incidental acquisition costs RAISES the gain (the safe direction; their inclusion is a
+%% to_verify refinement). Banded (sale is banded); null when sale or price is unparameterised.
+-spec taxable_gain([integer()] | null, number() | null, number()) -> [integer()] | null.
+taxable_gain(null, _Price, _Discount) -> null;
+taxable_gain(_Sale, null, _Discount) -> null;
+taxable_gain([SaleLo, SaleHi], Price, Discount) when is_number(Price) ->
+    F = (100 - Discount) / 100,
+    [max(0, round((SaleLo - Price) * F)),
+     max(0, round((SaleHi - Price) * F))].
+
+%% all owners resident-for-tax? a non-resident period apportions the discount away
+%% (kb.tax.cgt-50-percent-discount) ⟹ to_verify. Empty applicants ⟹ [#{}] (the resolver's
+%% idempotent treatment); the default residency is the clean "resident".
+all_resident(Profile) ->
+    lists:all(
+        fun(A) ->
+            T = maps:get(<<"tax">>, A, #{}),
+            maps:get(<<"residency_for_tax">>, T, <<"resident">>) =:= <<"resident">>
+        end, applicants(Profile)).
+
+applicants(Profile) ->
+    case maps:get(<<"applicants">>, Profile, []) of
+        []                -> [#{}];
+        L when is_list(L) -> L
+    end.
 
 %% --- net proceeds: sale − selling − loan − cgt -------------------------------
 %% interval arithmetic; null when any required input is null (honest-partial).
@@ -240,13 +397,37 @@ hold_band(Ownership) ->
         _ -> null
     end.
 
+%% --- investor full-horizon: net − acquire + signed hold cash flow × H ---------
+%% PLACES the acquire figure (budget_envelope_investor.total_cash_required) and the hold figure
+%% (cash_flow_projection.cash_flow_before_tax_year_1, SIGNED — negative for a negatively-geared
+%% hold — applied flat over H as a documented year-1 simplification); never recomputes them. The
+%% sign is the Mode-A contrast: an owner-occupier's hold band is pure cost (subtracted), an
+%% investor's hold cash flow can be income or cost (added with its sign). null when net, acquire,
+%% or the hold cash flow is unknown (honest-partial).
+-spec full_horizon_investor([integer()] | null, map(), map(), integer() | null) ->
+          [integer()] | null.
+full_horizon_investor(null, _Budget, _CashFlow, _H) -> null;
+full_horizon_investor(_Net, _Budget, _CashFlow, null) -> null;
+full_horizon_investor([NLo, NHi], Budget, CashFlow, H) when is_integer(H) ->
+    Acq = money_range(maps:get(<<"total_cash_required">>, Budget, null)),
+    CF  = maps:get(<<"cash_flow_before_tax_year_1">>, CashFlow, null),
+    case {Acq, CF} of
+        {null, _}                        -> null;
+        {_, CFv} when not is_number(CFv) -> null;
+        {[AcqLo, AcqHi], CFv} ->
+            Hold = round(CFv * H),
+            [NLo - AcqHi + Hold, NHi - AcqLo + Hold]
+    end.
+
 %% --- dispose_cash_events (the Dispose-phase entries of the shared spine) ------
 %% Mirrors the cash_event shape exactly so purchase_journey PLACES them on the swimlane's
 %% Dispose column (TW3). phase = "dispose", timing = one_off. Honest-partial: an event is
 %% emitted only when its amount is present (a null-amount figure is dropped, never faked).
 
+%% Cgt is null on the Mode-A/owner-occupier path (exempt/to_verify) and on the investor
+%% to_verify path; a money_range on the investor computed path (the cgt event is then emitted).
 -spec dispose_cash_events([integer()] | null, [integer()] | null,
-                          [integer()] | null, null) -> [map()].
+                          [integer()] | null, [integer()] | null) -> [map()].
 dispose_cash_events(Sale, Selling, Loan, Cgt) ->
     Candidates = [
         event(<<"sale_proceeds">>, <<"event_sale_proceeds">>, <<"in">>,  Sale,    <<"other">>),
@@ -289,6 +470,28 @@ assumptions(H, GLow, GHigh, Status, Loan) ->
 
 cgt_assumption(<<"exempt">>)    -> copy(<<"assumption_cgt_exempt">>, #{});
 cgt_assumption(<<"to_verify">>) -> copy(<<"assumption_cgt_to_verify">>, #{}).
+
+%% --- investor key_assumptions (bilingual; the §8.4 ASIC discipline) ----------
+%% reuses horizon / growth-placeholder / selling-cost / loan-rate lines (the loan-rate line
+%% carries the investor rate via {rate} substitution); swaps in the investor CGT basis and adds
+%% the 2026-27 Budget reform flag (current law computed; the reform may change it from 1 Jul 2027).
+assumptions_investor(null, _GLow, _GHigh, _Status, _Loan) ->
+    [copy(<<"assumption_set_horizon">>, #{})];
+assumptions_investor(H, GLow, GHigh, Status, Loan) ->
+    Base = [copy(<<"assumption_horizon">>, #{<<"years">> => H}),
+            copy(<<"assumption_growth_placeholder">>, #{<<"low">> => GLow, <<"high">> => GHigh}),
+            cgt_assumption_investor(Status),
+            copy(<<"assumption_cgt_reform">>, #{}),
+            copy(<<"assumption_selling_costs">>, #{})],
+    case Loan of
+        null -> Base;
+        _    -> Base ++ [copy(<<"assumption_loan_rate">>,
+                              #{<<"rate">> => investor_rate(),
+                                <<"term">> => ?LOAN_TERM_YEARS})]
+    end.
+
+cgt_assumption_investor(<<"computed">>)  -> copy(<<"assumption_cgt_computed">>, #{});
+cgt_assumption_investor(<<"to_verify">>) -> copy(<<"assumption_cgt_investor_to_verify">>, #{}).
 
 %% --- helpers -----------------------------------------------------------------
 
