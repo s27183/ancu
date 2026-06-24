@@ -207,7 +207,7 @@ Status legend: `[ ]` not started · `[~]` drafting · `[v]` facts verified vs pr
 | [x] | P5-engine | `investment_strategy` **two-path** (resolver scaffold + 3 `investment_thesis` agent leaves) — `strategy_thesis` from the Cluster-S KB (archetype/gearing/one_liner); first Mode-C agent component |
 | [ ] | P5-engine | `mortgage_finance` investor variant (branch the shared resolver) — investment-loan serviceability, IO-vs-PI, DTI cap (Cluster-F KB) |
 | [~] | P5-engine | `yield_modelling` resolver — base-spine presence DONE (`fh_engine_fill` inline, honest-partial all-null `cash_flow_projection` + `calculator` + 5 Cluster-Y anchors); the cash-flow **arithmetic** (NEW module) defers to `property_assessment` (its rent-leaf producer) + the banded-vs-scalar seam |
-| [ ] | P5-engine | `tax_structure` agent + regulated figures (1 leaf) — `tax_optimised_structure`; CGT/depreciation/land-tax resolver-computed, removed-from-reach (Cluster-T KB; the load-bearing ASIC surface) |
+| [~] | P5-engine | `tax_structure` **two-path** — base-spine presence DONE (`fh_engine_fill` inline: resolver scaffold + `entity_structuring` agent leaf `recommended_entity`, live-verified; the two CGT-determinant **constants** `disposition` reads — `cgt_discount_eligible`/`cost_base_depreciation_clawback` = true; `data-table` + 6 Cluster-T anchors). Deferred to `property_assessment`: `cgt_marginal_rate` (needs an ATO-brackets KB doc + income), `setup_costs`/`annual_compliance_cost` (banded-vs-scalar seam), the 5 property/rent-dependent figures |
 | [ ] | P5-engine | `cash_position` investor variant (branch the shared resolver) — investment deposit, no FHB schemes, investor cost adders (Cluster-Y/F KB) |
 | [ ] | P5-engine | `ownership_planning_investor` resolver (NEW module) — `portfolio_position` (land-tax aggregation, mgmt model, scale-up; Cluster-S KB) + the `opportunities[]` producer seam flagged in P4 |
 | [ ] | P5-activate | per-blueprint `base_components/1` sequence (the P3 follow-on — derive the investor base set + DAG order, replacing the Mode-A `?BASE_COMPONENTS` macro) |
@@ -369,9 +369,50 @@ patched):** `cash_flow_projection` figures are typed `money`/`percentage` **scal
 `disposition` already consumes `cash_flow_before_tax_year_1` as a scalar number, but the KB says **banded
 ranges** (rent is a range) and every other figure-owner (disposition's `sale_proceeds` etc.) is
 `money_range` — the banded-vs-scalar call ripples KB ↔ blueprint ↔ registry ↔ `disposition` consumer ↔
-`calculator` renderer; it doesn't bite at base (all null). **Next P5-engine unit:** `mortgage_finance`
-investor variant, `cash_position` investor variant, or `property_assessment` (which unblocks
-`yield_modelling`'s arithmetic + forces the banded/scalar call) — Son's pick.
+`calculator` renderer; it doesn't bite at base (all null).
+
+**P5-engine 4/suite COMPLETE (2026-06-25) — `tax_structure` base-spine presence (a two-path
+component, the most regulated surface in the wedge).** Picked next over `cash_position` (which
+*consumes* `tax_structure`'s CGT figures → producer-first) and `property_assessment` (per-property /
+Phase-B, not on the base spine). Grounding settled the shape: `tax_optimised_structure` has **one
+irreducible judgment field** — `recommended_entity` (the artifact's single `agent_leaves` entry,
+`reasoning_domain entity_structuring`) — so `tax_structure` is **two-path** like `investment_strategy`
+(resolver scaffold + one agent leaf), not pure-resolver. **Foundation-first payoff:** the *already-built*
+`disposition` consumer (`fh_engine_disposition:cgt_investor/4`) reads **exactly four**
+`tax_optimised_structure` fields and its `Clean` test already defines their contract
+(`recommended_entity` ∈ personal_sole/joint; `cgt_marginal_rate` `is_number`; `cgt_discount_eligible`
+true; `cost_base_depreciation_clawback` =:= false) — so this base output is not free-floating, it
+**closes wiring `disposition` already expected** (producer + consumer designed together). **Erlang**
+(`fh_engine_fill`, additive): `has_resolver` + dispatch clause + `tax_structure/1` (the **two
+KB-grounded boolean constants** the consumer reads — `cgt_discount_eligible`/`cost_base_depreciation_
+clawback` = true, the latter → `disposition` `to_verify`, the conservative outcome the depreciation KB
+demands; `data-table` renderer; the **six Cluster-T anchors**), `merge_agent` (slot-scoped fold of the
+one entity leaf, §98), `agent_values_from_outcome` (entity round-trip for base-resolver refresh).
+**Python** (`planner.py`): `EntityStructuringLeaves` (single-enum, **no number field** → §98 by schema),
+the `entity_structuring` domain (ASIC discipline load-bearing in the prompt — a *starting structure to
+confirm with a registered tax agent*, never a directive; base default = lowest-complexity personal
+ownership), `fill_tax_structure`, `_FILLERS` registration. **Verified:**
+`tax_structure_conformance.escript` **39 anchors** (data-table renderer; the 2 constants +
+input-independence; 9 nulls; exact 11-field set; 6 anchors; `has_resolver` true; Layer-1 conformance of
+both the scaffold AND the merged outcome; two-path merge folds **only** the entity + **§98 figure-tight**
+— a stray `setup_costs`/`cgt_discount_eligible` in the agent reply is NOT folded; `agent_values`
+round-trip; no regression — `yield_modelling` stays pure-resolver, `investment_strategy` two-path intact).
+**Live Opus** (`fill_tax_structure`, subscription credit): returns `personal_sole` for a single resident
+base profile (the KB-grounded low-complexity default), exactly one leaf, no figure leaked, ASIC posture
+held. All regression suites green; `erlang-checker` clean; no recompile (the 6 anchors + outcome schema
+already compiled). **Deferred (honest, trigger-gated — all to `property_assessment`):** `cgt_marginal_rate`
+(needs an **ATO income-tax-brackets KB doc** — unauthored — + `assessable_income`; null → `disposition`
+CGT `to_verify`); `setup_costs`/`annual_compliance_cost` (the **same banded-vs-scalar seam** flagged on
+`yield_modelling` — KB gives bands, registry types scalar `money`); the 5 property/rent-dependent figures
+(`negative_gearing_active`, tax refund, after-tax cash flow ×2, depreciation). **Two doc/schema seams
+flagged (not patched):** (1) `cgt_discount_eligible`'s "true if held >12 months" semantics wants
+`strategy_thesis.hold_period_years`, but `strategy_thesis` is **not a declared `tax_structure` input**
+(profile + cash_flow_projection are) → constant `true` matches the compiled blueprint; a hold-aware
+refinement needs the input declared. (2) the regulated `recommended_entity` has **no `reasoning` field**
+in the compiled outcome — surfacing its reasoning is a separate outcome-schema unit. **Next P5-engine
+unit:** `cash_position` investor variant (now unblocked — its `tax_optimised_structure` upstream exists),
+`mortgage_finance` investor variant, or `ownership_planning_investor` (NEW module + the P4 `opportunities[]`
+seam) — Son's pick. Then P5-activate (base_components/1 + dispatch + intent picker, atomic-last).
 
 ## Deferred out (honest — first-exercising instance is Mode B/D, not here)
 

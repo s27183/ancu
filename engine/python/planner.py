@@ -200,6 +200,24 @@ class InvestmentThesisLeaves(BaseModel):
     one_liner: LocalizedText           # the bilingual thesis line — {vi, en} (§1)
 
 
+# --- the entity_structuring agent schema: the ONE judgment leaf ONLY (P5) -------
+# tax_structure is TWO-PATH like investment_strategy: the resolver owns the renderer, the
+# kb_versions audit, and EVERY figure (the CGT determinants + the deferred money); the agent
+# authors ONLY the single entity recommendation. There is NO number field — the LLM
+# structurally cannot author a figure (§98). The enum is a Literal (schema-as-constraint) so
+# the model must pick exactly one structure; the options mirror the blueprint
+# `ownership_entity.recommended_entity` list and the kb.tax.entity-comparison enum exactly.
+# Field name matches the tax_optimised_structure OUTCOME field so merge_agent/3 folds it
+# directly. (No `reasoning` field — the compiled outcome carries none; surfacing the entity's
+# reasoning is a separate outcome-schema unit.)
+OwnershipEntity = Literal["personal_sole", "personal_joint", "discretionary_trust",
+                          "unit_trust", "company", "smsf", "smsf_with_lrba"]
+
+
+class EntityStructuringLeaves(BaseModel):
+    recommended_entity: OwnershipEntity  # single-valued enum (schema-as-constraint)
+
+
 # --- prompt assembly (agentic-flow.md §5) --------------------------------------
 # 2a builds the scaffold in code; 2b composes it from the artifact's component
 # descriptor + engine-resolved KB. The static/dynamic split is constraint-#9
@@ -248,6 +266,12 @@ _KB_DOCS = {
         _REPO_ROOT / "docs" / "kb" / "investor" / "hold-period-considerations.md",
     "kb.investor.exit-strategy-options":
         _REPO_ROOT / "docs" / "kb" / "investor" / "exit-strategy-options.md",
+    # entity_structuring (Mode C) — the entity comparison the agent reasons over (the most
+    # regulated content in the wedge). The CGT/loss/land-tax figures it references are owned
+    # by their own docs; this doc owns the structure comparison only.
+    "kb.tax.entity-comparison-personal-trust-company-smsf":
+        _REPO_ROOT / "docs" / "kb" / "tax"
+        / "entity-comparison-personal-trust-company-smsf.md",
 }
 
 
@@ -419,6 +443,61 @@ in the gearing KB — consistent with the archetype (not contradicting it).
 the horizon's logic) in plain language — a card headline, not an essay. No figures.
 5. Emit ONLY the three leaves.""",
     },
+    # entity_structuring is the agent half of the `tax_structure` component (Mode C,
+    # TWO-PATH): the renderer, the kb_versions audit, the CGT determinants, and every
+    # deferred money figure are resolver-owned (in <resolver_outcome>); this module suggests
+    # ONLY the single ownership structure (recommended_entity). This is the MOST regulated
+    # content in the wedge — the ASIC discipline below is load-bearing.
+    "entity_structuring": {
+        "kb_slugs": ["kb.tax.entity-comparison-personal-trust-company-smsf"],
+        "context": """\
+You are the agent half of the `tax_structure` component (reasoning_domain: \
+entity_structuring), for a Vietnamese-Australian DOMESTIC property investor. The renderer, \
+the CGT determinants, and every dollar figure are the engine resolver's and appear in \
+`<resolver_outcome>` (read-only) — null at this base stage where they depend on a property \
+or a decision not yet made. You reason about EXACTLY ONE qualitative thing: the ownership \
+STRUCTURE that best fits this investor as a STARTING POINT to confirm with a registered tax \
+agent. Your inputs are the investor's profile (`<plan_card_state>`) grounded in the entity \
+comparison KB.""",
+        "goal": """\
+Suggest ONLY `recommended_entity` (exactly one of the seven structures) — a starting \
+ownership structure grounded in the entity comparison KB and the investor's circumstances. \
+Nothing else — no setup cost, no compliance cost, no tax refund, no figures (those are the \
+resolver's and already in `<resolver_outcome>`).""",
+        "non_negotiables": """\
+1. **This is a conversation-starter, NEVER advice (ASIC — load-bearing here).** Choosing an \
+ownership entity is tax and often financial advice (AFSL / tax-agent territory, personal \
+liability if crossed). Your `recommended_entity` is a STARTING STRUCTURE to take to a \
+registered tax agent / accountant — never a directive. Never present it as "best", never \
+instruct the investor to "set up a trust", never use an advice tone.
+2. **Author no figure.** You do NOT produce a setup cost, compliance cost, tax refund, \
+dollar, or percent. Your output schema has no number field — keep it that way. Every figure \
+is resolver-computed.
+3. **At the base turn, deep facts are PENDING.** If `<plan_card_state>` shows income / \
+existing portfolio / asset-protection needs / SMSF intent absent (the base plan, \
+plan-first), default to the LOWEST-COMPLEXITY structure consistent with the known facts — \
+for a resident individual or couple with no stated trust/SMSF need, that is \
+`personal_sole` (one applicant) or `personal_joint` (a couple). Suggest a more complex \
+structure (trust / company / SMSF) ONLY when the investor's stated goals clearly indicate \
+it (income-splitting, asset protection, super-environment investing), grounded in the KB. \
+Never invent a portfolio, an income, or a goal.
+4. **Pick from the enum, exactly one.** `recommended_entity` ∈ {personal_sole, \
+personal_joint, discretionary_trust, unit_trust, company, smsf, smsf_with_lrba}. Ground the \
+choice in the entity-comparison KB (e.g. a couple wanting to split income → consider \
+discretionary_trust but note the trapped-loss drawback; a company is rarely used for \
+appreciating residential as it loses the CGT discount).
+5. **Emit only the single-leaf object** (see `<output>`).""",
+        "procedure": """\
+1. Read `<plan_card_state>` (the investor profile: applicant count, residency, any stated \
+goals / portfolio) and the entity-comparison KB.
+2. Identify what is KNOWN vs PENDING. At base most deep facts are pending — do not infer \
+them.
+3. Choose the `recommended_entity` that best fits the KNOWN circumstances as a starting \
+point, grounded in the KB: default to personal_sole / personal_joint unless a stated goal \
+clearly points elsewhere. Respect the KB's load-bearing drawbacks (trapped losses in \
+trusts, no CGT discount in a company, SMSF restrictions).
+4. Emit ONLY the single leaf.""",
+    },
 }
 
 
@@ -508,6 +587,16 @@ _STRATEGY_COMPONENT = {
     "inputs": ["profile.outcome (investor profile)",
                "resolver_outcome (the strategy_thesis scaffold: carried horizon + "
                "null targets — the agent fills none of these)"],
+    "reads": "upstream DAG outcomes only (not upstream parameters) — §11.9",
+}
+_TAX_COMPONENT = {
+    "component_id": "tax_structure",
+    "goal": "Suggest the single ownership-structure leaf (recommended_entity) for a domestic "
+            "investor — a starting point to confirm with a registered tax agent. Author no "
+            "figure — the CGT determinants + every dollar are resolver-owned.",
+    "inputs": ["profile.outcome (investor profile)",
+               "resolver_outcome (the tax_optimised_structure scaffold: the CGT determinants "
+               "+ null property/seam-deferred money — the agent fills none of these)"],
     "reads": "upstream DAG outcomes only (not upstream parameters) — §11.9",
 }
 
@@ -620,6 +709,60 @@ async def fill_investment_strategy(upstream_outcomes, resolver_outcome):
     return leaves.model_dump(), usage
 
 
+async def fill_tax_structure(upstream_outcomes, resolver_outcome):
+    """Two-path agent half of `tax_structure` (Mode C, reasoning_domain entity_structuring):
+    one real Agent-SDK structured one-shot suggesting ONLY the single ownership-structure leaf
+    (recommended_entity) — a starting point to confirm with a registered tax agent. The
+    renderer, the kb_versions audit, the CGT determinants, and every dollar are resolver-owned
+    and passed in as `resolver_outcome` (read-only grounding). output_format = the single-leaf
+    enum schema (no number field → every figure stays out of the LLM's reach, the §98 posture;
+    the entity comparison is the most regulated content in the wedge). Returns (leaves_dict,
+    usage_dict) — same shape the other two-path fills return."""
+    import time
+    _t0 = time.monotonic()
+    from claude_agent_sdk import ClaudeAgentOptions, ResultMessage, query
+    _t_import = time.monotonic()
+
+    options = ClaudeAgentOptions(
+        model=LEAF_MODEL,
+        effort=LEAF_EFFORT,   # bound reasoning depth (else opus thinks for minutes)
+        system_prompt=build_system_prompt("entity_structuring",
+                                          _kb_block("entity_structuring")),
+        setting_sources=[],   # do NOT load CLAUDE.md / project settings
+        allowed_tools=[],     # leaf-fill pulls no tools
+        env=_credit_env(),    # subscription-credit auth, subprocess-scoped
+        output_format={"type": "json_schema",
+                       "schema": EntityStructuringLeaves.model_json_schema()},
+    )
+
+    async def _consume():
+        structured = None
+        usage = {}
+        async for message in query(
+                prompt=build_user_content(_TAX_COMPONENT, upstream_outcomes,
+                                          resolver_outcome),
+                options=options):
+            if isinstance(message, ResultMessage):
+                structured = getattr(message, "structured_output", None)
+                usage = getattr(message, "usage", {}) or {}
+        return structured, usage
+
+    try:
+        structured, usage = await asyncio.wait_for(_consume(), timeout=LEAF_TIMEOUT_S)
+    except asyncio.TimeoutError:
+        raise RuntimeError(f"leaf-fill exceeded {LEAF_TIMEOUT_S}s app-side timeout")
+
+    if structured is None:
+        raise RuntimeError("Agent SDK returned no structured_output")
+
+    _t_query = time.monotonic()
+    print(f"[planner] tax_structure(entity_structuring): "
+          f"sdk_import={_t_import - _t0:.1f}s query={_t_query - _t_import:.1f}s "
+          f"model={LEAF_MODEL} effort={LEAF_EFFORT}", file=sys.stderr, flush=True)
+    leaves = EntityStructuringLeaves(**structured)  # raises ValidationError if off
+    return leaves.model_dump(), usage
+
+
 # --- fill_component (2b-2b: the sidecar fills ONE agent component) -------------
 # The turn's gen_statem walks the DAG and dispatches resolver components in-process
 # (Erlang); it spawns this disposable sidecar only for an agent / two-path component,
@@ -632,6 +775,7 @@ async def fill_investment_strategy(upstream_outcomes, resolver_outcome):
 _FILLERS = {
     "lender_fit": ("mortgage_finance", fill_mortgage_finance),
     "investment_thesis": ("investment_strategy", fill_investment_strategy),
+    "entity_structuring": ("tax_structure", fill_tax_structure),
 }
 
 

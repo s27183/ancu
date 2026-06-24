@@ -34,6 +34,7 @@ has_resolver(<<"ownership_planning">>) -> true;
 has_resolver(<<"mortgage_finance">>)   -> true;
 has_resolver(<<"investment_strategy">>) -> true;
 has_resolver(<<"yield_modelling">>)    -> true;
+has_resolver(<<"tax_structure">>)      -> true;
 has_resolver(<<"purchase_journey">>)   -> true;
 has_resolver(<<"preparation">>)        -> true;
 has_resolver(<<"phase_playbook">>)     -> true;
@@ -57,6 +58,8 @@ resolver(<<"investment_strategy">>, _Args, Upstream) ->
     investment_strategy(Upstream);
 resolver(<<"yield_modelling">>, _Args, Upstream) ->
     yield_modelling(Upstream);
+resolver(<<"tax_structure">>, _Args, Upstream) ->
+    tax_structure(Upstream);
 resolver(<<"purchase_journey">>, Args, Upstream) ->
     fh_engine_journey:fill(Args, Upstream);
 resolver(<<"preparation">>, Args, Upstream) ->
@@ -85,6 +88,15 @@ merge_agent(<<"investment_strategy">>, ResolverOutcome, AgentValues) ->
         <<"gearing_type">> => maps:get(<<"gearing_type">>, AgentValues, null),
         <<"one_liner">>    => maps:get(<<"one_liner">>, AgentValues, null)
     };
+%% tax_structure: the SINGLE entity_structuring leaf the sidecar authored
+%% (recommended_entity). Slot-scoped fold — the agent reach is exactly this one judgment
+%% field; every figure (the CGT determinants, the null property/seam-deferred money) is the
+%% resolver scaffold's and is left untouched (§98 — the agent authors NO figure, NO verdict).
+merge_agent(<<"tax_structure">>, ResolverOutcome, AgentValues) ->
+    ResolverOutcome#{
+        <<"recommended_entity">> =>
+            maps:get(<<"recommended_entity">>, AgentValues, null)
+    };
 merge_agent(Other, _ResolverOutcome, _AgentValues) ->
     erlang:error({no_agent_merge_for, Other}).
 
@@ -104,6 +116,12 @@ agent_values_from_outcome(<<"investment_strategy">>, Stored) ->
     #{<<"archetype">>    => maps:get(<<"archetype">>, Stored, null),
       <<"gearing_type">> => maps:get(<<"gearing_type">>, Stored, null),
       <<"one_liner">>    => maps:get(<<"one_liner">>, Stored, null)};
+%% tax_structure: recover the single entity leaf verbatim from the snapshot (the inverse of
+%% merge_agent/3 above) so a base_resolver refresh re-runs the scaffold (fresh
+%% renderer/kb_versions/CGT determinants) and re-attaches the stored entity WITHOUT a sidecar
+%% call — the agent re-authors nothing.
+agent_values_from_outcome(<<"tax_structure">>, Stored) ->
+    #{<<"recommended_entity">> => maps:get(<<"recommended_entity">>, Stored, null)};
 agent_values_from_outcome(Other, _Stored) ->
     erlang:error({no_agent_reattach_for, Other}).
 
@@ -323,6 +341,85 @@ investment_strategy(Upstream) ->
          <<"kb.investor.hold-period-considerations">>,
          <<"kb.investor.exit-strategy-options">>]),
     {Outcome, <<"summary-card">>, KbVersions}.
+
+%% --- tax_structure (Mode C, two-path RESOLVER half — base-spine presence) ----
+%% The investor base spine (blueprint component 6): the tax-optimised ownership structure.
+%% TWO-PATH like investment_strategy (mortgage-finance-two-path.md): the SIDECAR
+%% (reasoning_domain entity_structuring) authors the ONE irreducible judgment leaf —
+%% recommended_entity, the ownership structure to take to a registered tax agent — and
+%% merge_agent/3 above folds it in. This function is the RESOLVER half: the deterministic
+%% scaffold the agent is NOT trusted with — the renderer (data-table), the kb_versions audit
+%% (the six tax anchors), and EVERY figure (§98 / [[no-judge-ground-the-producer]]: the CGT
+%% determinants + the deferred money are resolver-owned, never agent-authored).
+%%
+%% FOUNDATION-FIRST PAYOFF ([[place-upstream-figures-dont-recompute]] inverse, completing a
+%% built consumer). The already-built `disposition` (fh_engine_disposition:cgt_investor/4)
+%% reads EXACTLY four tax_optimised_structure fields and its `Clean` test already defines
+%% their contract: recommended_entity (∈ personal_sole/joint for the clean computed path),
+%% cgt_marginal_rate (is_number), cgt_discount_eligible (true → 50% discount), and
+%% cost_base_depreciation_clawback (=:= false for clean). So this base output is not
+%% free-floating — it CLOSES wiring disposition already expects; the producer and consumer
+%% were designed together.
+%%
+%% RESOLVER computes (KB-grounded boolean constants — no income, no property, no band):
+%%   - cgt_discount_eligible = true: the blueprint default (kb.tax.cgt-50-percent-discount —
+%%     a multi-year investment hold clears 12 months). [Doc seam, flagged not patched: the
+%%     field's "true if held >12 months" semantics wants strategy_thesis.hold_period_years,
+%%     but strategy_thesis is NOT a declared tax_structure input (profile + cash_flow_projection
+%%     are); the constant matches the compiled blueprint. A hold-aware refinement needs the
+%%     input declared.]
+%%   - cost_base_depreciation_clawback = true: Div 43 capital works claimed reduces the cost
+%%     base (kb.tax.depreciation-division-43-and-40, which FLAGS the clawback, never asserts a
+%%     dollar). true → disposition's Clean is false → CGT to_verify: the conservative, honest
+%%     outcome (the clawback dollar is deferred to a tax agent).
+%%
+%% HONEST-PARTIAL NULL AT BASE ([[base-turn-honest-partial-output]]), in two deferral classes:
+%%   (a) property/rent-dependent — negative_gearing_active + the tax-refund / after-tax
+%%       cash-flow / depreciation figures all hang off the rental cash flow (cash_flow_projection,
+%%       null at base — no property). null → disposition CGT to_verify (the conservative net).
+%%   (b) BLOCKED by an unresolved decision (null because a contract is undecided, NOT because the
+%%       datum is unknown): cgt_marginal_rate needs an ATO income-tax-brackets KB doc (UNAUTHORED)
+%%       + assessable_income — null → disposition CGT to_verify; setup_costs +
+%%       annual_compliance_cost hit the SAME banded-vs-scalar seam flagged on yield_modelling
+%%       (the KB gives BANDS — entity setup $1.5k–$4k, kb.tax.entity-setup-costs — but the
+%%       registry types these scalar `money`; a scalar point would assert false precision, a band
+%%       would fail Layer-1). Both land with property_assessment, where the banded/scalar call is
+%%       resolved for the whole investor money surface.
+%%
+%% The agent's reach is exactly the one entity leaf — no figure, no verdict (the
+%% entity-comparison KB is the most regulated content in the wedge; the sidecar's single-enum
+%% output schema removes every figure from its reach, and the ASIC posture — a starting
+%% structure to confirm with a licensed professional, never a directive — is enforced in the
+%% entity_structuring prompt). [Doc/schema seam, flagged not patched: the regulated entity
+%% recommendation has NO `reasoning` field in the compiled outcome — surfacing its reasoning is
+%% a separate outcome-schema unit.] Reads only upstream; the base outcome is input-independent.
+tax_structure(_Upstream) ->
+    Outcome = #{
+        %% AGENT slot (entity_structuring) — null here; merge_agent/3 folds the sidecar's one
+        %% leaf. A base_resolver refresh re-attaches the stored entity (no LLM).
+        <<"recommended_entity">> => null,
+        %% RESOLVER — KB-grounded boolean constants (the CGT determinants disposition reads).
+        <<"cgt_discount_eligible">>            => true,
+        <<"cost_base_depreciation_clawback">> => true,
+        %% NULL (a) property/rent-dependent — need cash_flow_projection (null at base).
+        <<"negative_gearing_active">>     => null,
+        <<"annual_tax_refund_year_1">>    => null,
+        <<"after_tax_cash_flow_year_1">>  => null,
+        <<"after_tax_cash_flow_per_week">> => null,
+        <<"total_depreciation_year_1">>   => null,
+        %% NULL (b) blocked by an unresolved decision — deferred with property_assessment.
+        <<"cgt_marginal_rate">>     => null,   %% needs ATO-brackets KB + assessable_income
+        <<"setup_costs">>           => null,   %% banded-vs-scalar seam (KB band vs scalar money)
+        <<"annual_compliance_cost">> => null   %% banded-vs-scalar seam
+    },
+    KbVersions = fh_engine_kb:kb_anchors(
+        [<<"kb.tax.entity-comparison-personal-trust-company-smsf">>,
+         <<"kb.tax.negative-gearing-mechanics">>,
+         <<"kb.tax.depreciation-division-43-and-40">>,
+         <<"kb.tax.cgt-50-percent-discount">>,
+         <<"kb.tax.quantity-surveyor-reports">>,
+         <<"kb.tax.land-tax-by-state">>]),
+    {Outcome, <<"data-table">>, KbVersions}.
 
 %% --- yield_modelling (Mode C, pure RESOLVER — base-spine presence) -----------
 %% The investor base spine (blueprint component 5): the rental cash-flow model. A PURE
