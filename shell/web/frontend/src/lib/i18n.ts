@@ -446,6 +446,31 @@ const messages = {
     'plan.landtax.applicable': { vi: 'Có áp dụng', en: 'Applicable' },
     'plan.landtax.to_verify': { vi: 'Cần xác minh', en: 'To verify' },
 
+    // --- Investor (Mode C) renderers ----------------------------------------
+    // buying-strategy-card (buying_strategy → bid_plan_investor): the bid-discipline
+    // price ladder + the closed thesis/style enums (mapped to display labels here).
+    'plan.f.max_bid': { vi: 'Giá đặt tối đa', en: 'Max bid' },
+    'plan.f.walk_away': { vi: 'Giá rút lui', en: 'Walk-away price' },
+    'plan.f.yield_ceiling': { vi: 'Trần giá theo lợi suất', en: 'Yield-anchored ceiling' },
+    'plan.f.thesis': { vi: 'Mức phù hợp chiến lược', en: 'Thesis alignment' },
+    'plan.f.nego_style': { vi: 'Phong cách thương lượng', en: 'Negotiation style' },
+    'plan.f.comparables': { vi: 'Giao dịch so sánh', en: 'Comparable sales' },
+    'plan.f.conditions': { vi: 'Điều kiện trong đề nghị', en: 'Offer conditions' },
+    'plan.thesis.aligned': { vi: 'Phù hợp', en: 'Aligned' },
+    'plan.thesis.stretched': { vi: 'Hơi quá tầm', en: 'Stretched' },
+    'plan.thesis.misaligned': { vi: 'Lệch chiến lược', en: 'Misaligned' },
+    'plan.style.assertive': { vi: 'Quyết đoán', en: 'Assertive' },
+    'plan.style.patient': { vi: 'Kiên nhẫn', en: 'Patient' },
+    'plan.style.early_offer': { vi: 'Ra giá sớm', en: 'Early offer' },
+    'plan.style.low_anchor': { vi: 'Neo giá thấp', en: 'Low anchor' },
+    'plan.style.thesis_walk_away': { vi: 'Kỷ luật, sẵn sàng rút', en: 'Disciplined walk-away' },
+    // opportunity-card (ownership_planning_investor): modelled opportunities to act on.
+    'plan.f.modeled_benefit': { vi: 'Lợi ích ước tính', en: 'Modelled benefit' },
+    'plan.opp.none': {
+        vi: 'Chưa có cơ hội nào được mô hình hoá.',
+        en: 'No opportunities modelled yet.'
+    },
+
     // --- Chat / Q&A (8-S4d) --------------------------------------------------
     // Chrome only. The answer prose is engine-authored {vi,en} (pick()), never $t.
     'chat.title': { vi: 'Hỏi về kế hoạch của bạn', en: 'Ask about your plan' },

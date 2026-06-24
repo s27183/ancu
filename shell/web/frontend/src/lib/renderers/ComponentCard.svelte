@@ -11,6 +11,8 @@
     import DataTable from './DataTable.svelte';
     import SwimlaneDiagram from './SwimlaneDiagram.svelte';
     import Checklist from './Checklist.svelte';
+    import BuyingStrategyCard from './BuyingStrategyCard.svelte';
+    import OpportunityCard from './OpportunityCard.svelte';
 
     let { componentId, entry, filling, density = 'compact' }: {
         componentId: string;
@@ -40,6 +42,10 @@
             <SwimlaneDiagram outcome={entry.outcome} {density} />
         {:else if entry.renderer === 'checklist'}
             <Checklist outcome={entry.outcome} />
+        {:else if entry.renderer === 'buying-strategy-card'}
+            <BuyingStrategyCard outcome={entry.outcome} />
+        {:else if entry.renderer === 'opportunity-card'}
+            <OpportunityCard outcome={entry.outcome} />
         {/if}
     {:else if filling}
         <p class="pp-computing"><span class="pp-spinner" aria-hidden="true"></span>{$t('plan.computing')}</p>

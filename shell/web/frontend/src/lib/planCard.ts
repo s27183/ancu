@@ -220,6 +220,48 @@ export interface OngoingObligationsOutcome {
     alert_triggers_armed?: AlertTrigger[] | null;
 }
 
+// --- Investor (Mode C) outcome types ----------------------------------------
+// The two renderers Mode C adds (buying-strategy-card, opportunity-card). No live
+// producer yet — buying_strategy and ownership_planning_investor are Phase-B/agent
+// components, unwired in both modes — so these are typed against the §11.9 renderer
+// CONTRACT, honest-partial (every field nullable). See mode-c-wedge.md P4.
+
+/** One comparable sale backing the bid plan. */
+export interface Comparable {
+    address?: string | null;
+    price?: number | null;
+    note?: LocalizedText | null;
+}
+/** buying_strategy → buying-strategy-card (outcome type `bid_plan_investor`). The
+ *  investor bid-discipline plan: §11.9 { max_bid, walk_away, comparables[], style } +
+ *  the blueprint's yield_anchored_max_price / thesis_alignment. Decision-support: the
+ *  yield ceiling + walk-away frame the max bid; the engine owns the figures. */
+export interface BidPlanInvestorOutcome {
+    max_bid?: number | null;
+    walk_away?: number | null;
+    yield_anchored_max_price?: number | null;
+    thesis_alignment?: 'aligned' | 'stretched' | 'misaligned' | string | null;
+    style?: string | null;
+    comparables?: Comparable[] | null;
+    conditions?: LocalizedText[] | null;
+    key_assumptions?: LocalizedText[] | null;
+}
+
+/** One modelled opportunity (rent review, equity release, scale-up). `modeled_benefit`
+ *  is a banded estimate (range) or a point. */
+export interface Opportunity {
+    kind?: string | null;
+    modeled_benefit?: MoneyRange | number | null;
+    action?: LocalizedText | null;
+}
+/** ownership_planning_investor → opportunity-card (§11.9 { kind, modeled_benefit,
+ *  action }). list-tolerant: an `opportunities[]` or a single opportunity. NOTE the
+ *  producer seam — portfolio_position emits alert_triggers_armed (DataTable renders it),
+ *  NOT this shape; opportunities[] is owed when the component is wired (mode-c-wedge P4). */
+export interface OpportunityCardOutcome extends Opportunity {
+    opportunities?: Opportunity[] | null;
+}
+
 // --- preparation → checklist (outcome type `readiness`) ---------------------
 // The property-agnostic readiness layer (the prototype's "Before you buy"): documents
 // to gather (with WHY each is needed), people to engage (role · when · why), the money

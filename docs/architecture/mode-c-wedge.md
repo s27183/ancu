@@ -80,11 +80,19 @@ committable on its own (coupling-in-a-unit ≠ coupling-in-a-commit).
   the turn DAG + Layer-1/Layer-2 gates → declare `plan.*` (`EXTERNAL_NS`) + green both modes' semantic
   gates + re-emit artifact + **prove selection** (both registries present; investor disposition
   validates against its own). Modes coexist; no Mode-A regression.
-- **P4 — Shell**: 2 net-new renderers (`buying-strategy-card`, `opportunity-card`) + onboarding
-  intent selection (the `intent: 'owner_occupier' | 'investment'` type already exists in `api.ts`;
-  `onboarding.ts` deliberately hardcodes owner-occupier — unhardcode it).
-- **P5 — Onboarding dispatch** (`fh_engine_h_plan_cards.erl`: select blueprint by `intent`) —
-  **atomic-last**, only after P3+P4 are green → Mode C live end-to-end.
+- **P4 — Shell renderers**: 2 renderers net-new *to the shell* (`buying-strategy-card`,
+  `opportunity-card`) — the enum + §11.9 rows already exist (authored with the blueprint), so the
+  work is **Svelte-component + dispatcher-branch only**. Both are Phase-B/agent components with no
+  live producer in either mode yet, so they render against the §11.9 contract, honest-partial —
+  pure-additive, zero Mode-A risk. (The onboarding intent picker moved to P5: unhardcoding `intent`
+  in the shell while the engine still hardcodes `fhb` is a silent-wrong rug, so the picker must land
+  **atomically** with the engine dispatch — the doc's own atomic-last rule.)
+- **P5 — Onboarding activation** (atomic-last, only after P3+P4 green → Mode C live end-to-end):
+  the onboarding **intent picker** (`onboarding.ts` — unhardcode owner-occupier; the
+  `intent: 'owner_occupier' | 'investment'` type already exists in `api.ts`) **+** the engine
+  **dispatch** (`fh_engine_h_plan_cards.erl`: select `blueprint_slug` by `intent`), landed together.
+  Also builds the per-blueprint `base_components` sequence (the P3 follow-on) — an investor base turn
+  verifies it end-to-end.
 
 ## Spec-seam reconciliations (P2 — free, reduces 47 anchors → 45 to author)
 
@@ -183,10 +191,10 @@ Status legend: `[ ]` not started · `[~]` drafting · `[v]` facts verified vs pr
 | [x] | P3 | **Compiler** — `IN_SCOPE_BLUEPRINT` (str) → `IN_SCOPE_BLUEPRINTS` (set `{fhb, investor}`); registry materialized + GATE 6/7-gated **per** in-scope blueprint; emit `blueprints[slug].registry`; declare `plan.*` (`EXTERNAL_NS`) |
 | [x] | P3 | **Engine** — thread the card's `blueprint_slug`: `fh_engine_kb:registry/1,2` + `in_scope_blueprints/0`; `fh_engine_outcome:validate/3` + `component_names/1`; `fh_engine_turn:base_components/1` + `dag_reads/2`; `fh_engine_simulate:run/3,4`; 4 turn-starters |
 | [x] | P3 | Re-emit artifact; **prove selection** — both registries present, investor `disposition.cgt_status` `[computed, to_verify]`; both modes green |
-| [ ] | P4 | Shell renderer: `buying-strategy-card` (enum + §11.9 table + Svelte component) |
-| [ ] | P4 | Shell renderer: `opportunity-card` (enum + §11.9 table + Svelte component) |
-| [ ] | P4 | Onboarding intent selection UI (`onboarding.ts` — unhardcode owner-occupier) |
-| [ ] | P5 | Onboarding dispatch: `fh_engine_h_plan_cards.erl` selects blueprint by `intent` (atomic-last) |
+| [x] | P4 | Shell renderer: `buying-strategy-card` (Svelte component + dispatcher branch; enum + §11.9 row already authored) |
+| [x] | P4 | Shell renderer: `opportunity-card` (Svelte component + dispatcher branch; enum + §11.9 row already authored) |
+| [ ] | P5 | Onboarding **intent picker** (`onboarding.ts` — unhardcode owner-occupier) — moved from P4, lands atomically with dispatch |
+| [ ] | P5 | Onboarding **dispatch**: `fh_engine_h_plan_cards.erl` selects blueprint by `intent` (atomic-last) + per-blueprint `base_components` sequence |
 
 **P2 COMPLETE (2026-06-24).** Two free repoints + the investor CGT branch, all committable now (no
 deploy until P3). **Repoints** in `investor-domestic-au.md`: `kb.investor.tax-brackets-2026` →
@@ -242,6 +250,30 @@ clean. **One honest follow-on:** `base_components/1`'s base SET+ORDER is still t
 `?BASE_COMPONENTS` macro — correct for `fhb` (the only blueprint creating base turns until P5), no
 investor caller exists yet; deriving a per-blueprint base sequence from the `scope` table lands in
 P5 where an investor base turn verifies it end-to-end.
+
+**P4 COMPLETE (2026-06-24) — shell renderers (Svelte-only; onboarding picker reclassified to P5).**
+Grounding the live shell reshaped the tracker line two ways. (1) **"enum + §11.9 table" was already
+done** — both rows exist in `architecture.md` §11.9 (added with the blueprint), so the deliverable
+was purely the **Svelte component + dispatcher branch**, not a three-layer ripple. (2) **Neither
+renderer has a live producer.** `buying_strategy` (→`bid_plan_investor`) and
+`ownership_planning_investor` (→`portfolio_position`) are Phase-B/agent components, unwired to any
+resolver in *either* mode (Mode A never rendered these seven vocabulary renderers either). So they
+render against the **§11.9 contract shape**, honest-partial — pure-additive, **zero Mode-A risk**
+(Mode A emits neither renderer). This is the "no blank slot when the investor blueprint fills"
+foundation the atomic-last rule requires. **Built:** `BuyingStrategyCard.svelte` (a bid-discipline
+price ladder — walk-away / yield-anchored ceiling / max bid on one axis, `thesis_alignment` +
+negotiation `style` as $t'd closed-enum chips, comparables, conditions), `OpportunityCard.svelte`
+(list-tolerant `{ kind, modeled_benefit, action }`), two `ComponentCard.svelte` dispatcher branches,
+two spec-derived `planCard.ts` types (`BidPlanInvestorOutcome`, `OpportunityCardOutcome`), and the
+renderer-internal bilingual `plan.*` labels (en+vi, incl. the thesis/style enum display labels).
+Component **title** keys for investor components stay P5 (they render only when an investor turn runs).
+**Verified:** `svelte-autofixer` clean on both, `svelte-check` 0/0, production build green.
+**One producer seam flagged (not patched):** `opportunity-card`'s §11.9 contract `{ kind,
+modeled_benefit, action }` has no matching field in the blueprint's `portfolio_position` outcome —
+which carries `alert_triggers_armed: array<{trigger,action}>`, *already rendered by DataTable*. So
+when `ownership_planning_investor` is wired, its `outcome_schema` must emit an `opportunities[]`
+field (or the contract be reconciled). A **producer-wiring** concern (post-P5), logged here + in the
+`OpportunityCardOutcome` type comment; the renderer is built to its declared contract meanwhile.
 
 ## Deferred out (honest — first-exercising instance is Mode B/D, not here)
 
