@@ -205,7 +205,7 @@ Status legend: `[ ]` not started · `[~]` drafting · `[v]` facts verified vs pr
 | [x] | P4 | Shell renderer: `opportunity-card` (Svelte component + dispatcher branch; enum + §11.9 row already authored) |
 | [x] | P5-engine | `investor_profile` resolver (`fh_engine_fill` inline, mirrors `buyer_profile`) — canonical `profile`, investor lens (per-applicant `tax{}`, no owner-occupier leaves, domestic-investor strength); honest-partial |
 | [x] | P5-engine | `investment_strategy` **two-path** (resolver scaffold + 3 `investment_thesis` agent leaves) — `strategy_thesis` from the Cluster-S KB (archetype/gearing/one_liner); first Mode-C agent component |
-| [ ] | P5-engine | `mortgage_finance` investor variant (branch the shared resolver) — investment-loan serviceability, IO-vs-PI, DTI cap (Cluster-F KB) |
+| [x] | P5-engine | `mortgage_finance` investor variant (branch the shared resolver) — investment-loan serviceability, IO-vs-PI, DTI cap (Cluster-F KB). **Two-path** (5 `lender_fit` agent leaves); shared-name branch on `strategy_thesis` upstream (FHB body byte-identical); new `lender_fit_investor` sidecar module; live-verified |
 | [~] | P5-engine | `yield_modelling` resolver — base-spine presence DONE (`fh_engine_fill` inline, honest-partial all-null `cash_flow_projection` + `calculator` + 5 Cluster-Y anchors); the cash-flow **arithmetic** (NEW module) defers to `property_assessment` (its rent-leaf producer) + the banded-vs-scalar seam |
 | [~] | P5-engine | `tax_structure` **two-path** — base-spine presence DONE (`fh_engine_fill` inline: resolver scaffold + `entity_structuring` agent leaf `recommended_entity`, live-verified; the two CGT-determinant **constants** `disposition` reads — `cgt_discount_eligible`/`cost_base_depreciation_clawback` = true; `data-table` + 6 Cluster-T anchors). Deferred to `property_assessment`: `cgt_marginal_rate` (needs an ATO-brackets KB doc + income), `setup_costs`/`annual_compliance_cost` (banded-vs-scalar seam), the 5 property/rent-dependent figures |
 | [~] | P5-engine | `cash_position` investor variant — base presence DONE (`fh_engine_cash:fill_investor/2`, branched on the `tax_optimised_structure` discriminator like `disposition`; **pure-resolver**, `agent_leaves []`). The compiled `budget_envelope_investor` is 9 point-summary figures, all honestly null at base (plan-first: no property, no savings); emits `calculator` + the 6 Cluster-Y/T cash anchors. Deferred to `property_assessment` (per-property): the property-price-dependent figures; `max_property_price_supported` → investor `mortgage_finance` capacity (unbuilt); HAVE-side → refine turn |
@@ -488,6 +488,49 @@ stays pure-resolver). Recompile clean (copy doc + schema landed). Regression: `o
 `rebar3 compile` + erlang-checker clean. Pure resolver → no live model. **Next P5-engine unit:**
 `mortgage_finance` investor variant (shared-name branch — unblocks `max_property_price_supported`), the
 last base resolver before P5-activate (base_components/1 + dispatch + intent picker, atomic-last).
+
+**P5-engine 7/suite COMPLETE (2026-06-25) — `mortgage_finance` investor variant (the LAST base
+resolver; the base figure-owner spine is now complete end-to-end).** The first **two-path** investor unit
+that is also a **shared-name** branch (both traits at once, unlike the prior units): the component is
+literally named `mortgage_finance` in both blueprints with **different outcome shapes** (both typed
+`mortgage_plan`, distinct per-blueprint registries) **and** carries **five** `lender_fit` agent leaves
+(vs the FHB two). **Dispatch — two local shape-sniffs, no signature change, no new wire field** (the
+`cash_position`/`disposition` pattern): `fh_engine_mortgage:fill/2` routes on the `strategy_thesis`
+upstream (investor reads `investment_strategy`, FHB reads `scheme_stack`) → `fill_investor/2` (new) vs
+`fill_fhb/2` (**pure rename — byte-identical**, zero regression); `merge_agent/2` +
+`agent_values_from_outcome/1` route on the `io_vs_pi_recommendation` outcome key (investor-only).
+`fh_engine_fill.erl` needs **no edit** (already routes `mortgage_finance` → this module). **The five
+agent leaves** (io-vs-P&I, fixed-vs-variable, offset strategy, uses-existing-PPOR-equity, investor lender
+shortlist) are surfaced slot-scoped: the io/PI + offset choices land both as the top-level enum field AND
+inside `recommended_loan_structure` (**place-don't-recompute** — one agent value, two read positions).
+**Resolver half = honest-partial** (§98): borrowing capacity / loan cost are compliance-sensitive figures,
+PENDING at base (income/debts/property absent) → `loan_cost_estimate_year_1` null, `debt_optimisations` [];
+the loan-structure scaffold's IO term + the refinance framing's LVR conventions are **KB params** (`io_max_
+term_years_typical` 5, `usable_equity_target_lvr_pct` 80 / with-LMI 90, retest=true), **no magic literal**;
+the property/date-dependent refinance figures null. Emits `summary-card` (`renderers[0]`, the reachable
+primary) + the **8 Cluster-F lender/loan anchors** (all verified to resolve). **Sidecar — new
+`lender_fit_investor` module** (separate from the FHB `lender_fit`: different leaf set + the 8 investor KB
+docs injected): a 5-leaf `LenderFitInvestorLeaves` schema (all `Literal` enums = schema-as-constraint, no
+number field → §98), its own ASIC/ACL-disciplined prompt (IO-vs-P&I + offset-on-PPOR decision-support, no
+named lender, no rate number), dispatched via the public `fill_mortgage_finance` by the same RO-shape sniff
+(`io_vs_pi_recommendation` present → investor) — **no new `reasoning_domain` on the wire** (both arrive as
+`lender_fit`). **No blueprint edit** (outcome already compiled) → no recompile; **no new copy doc** (all
+user-facing prose lives in the agent leaves). **Verified — three grades:** (1) resolver+merge
+`mortgage_finance_investor_conformance.escript` **40/40** (scaffold: summary-card, 7-field set, agent slots
+null, debt-opt [], loan-cost null, KB-grounded structure+refinance, 8 anchors, input-independence; Layer-1
+vs investor `mortgage_plan`; merge: 5 leaves folded both positions, slot-scoped figures byte-identical,
+`agent_values_from_outcome` inverts + idempotent re-merge, merged still validates; no-regression: FHB
+summary-card, `recommended_path`=fhg_backed, capacity null, no investor field, FHB 2-leaf merge intact);
+(2) regression — FHB `mortgage_conformance` **23/23 byte-identical**, `serviceability` 22,
+`cash_position_investor` 31, `ownership_planning_investor` 27, `cash_duty` 28, `disposition` 79, `outcome`
+21+11; `rebar3 compile` + `erlang-checker` clean; (3) **LIVE** — a real Opus `lender_fit_investor` fill
+(43.5s, metered) authored all five leaves: enums constrained (`interest_only` for the negatively-geared
+growth thesis, `variable`, `full_offset_on_this_property`), bilingual `{vi,en}` lender reasoning in natural
+register, `approval_likelihood: indicative` (honest at base), **no figure authored**, no named lender / no
+advice tone (ASIC/ACL line held), and the public-entry shape-sniff delegation fired correctly. **The base
+figure-owner spine is COMPLETE** (profile → strategy → mortgage → yield → tax → cash → ownership →
+disposition). **Next: P5-activate** (per-blueprint `base_components/1` sequence + onboarding dispatch by
+`intent` + intent picker, atomic-last) — the last step to make investor cards live.
 
 ## Deferred out (honest — first-exercising instance is Mode B/D, not here)
 

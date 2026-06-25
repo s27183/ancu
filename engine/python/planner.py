@@ -179,6 +179,32 @@ class LenderFitLeaves(BaseModel):
     fixed_vs_variable: RateStructure
 
 
+# --- the investor lender_fit agent schema: the FIVE leaves ONLY (P5-engine) ------
+# mortgage_finance is a shared component NAME with a Mode-C investor variant: a DIFFERENT
+# outcome shape (mortgage_plan, investor registry) and FIVE agent leaves vs the FHB two.
+# Same §98 enforcement-by-schema posture: NO money/number field — borrowing capacity, loan
+# cost, and the refinance figures are resolver-computed and handed in as <resolver_outcome>;
+# the LLM structurally cannot author a figure. Every choice is a Literal (schema-as-
+# constraint) so the model picks exactly one option and cannot put prose in an enum field.
+# Field names match the investor mortgage_plan OUTCOME (io_vs_pi_recommendation,
+# offset_strategy_recommendation) so fh_engine_mortgage:merge_agent_investor/2 folds them
+# directly; fixed_vs_variable + uses_existing_ppor_equity are folded into the structure object.
+IoVsPi = Literal["principal_and_interest", "interest_only"]
+# Mirrors the blueprint `loan_structure.offset_account_strategy` option list exactly.
+OffsetStrategy = Literal["full_offset_on_this_property",
+                         "offset_pointed_at_ppor_for_tax_efficiency",
+                         "redraw_only", "no_offset"]
+
+
+class LenderFitInvestorLeaves(BaseModel):
+    uses_existing_ppor_equity: bool             # bool (no figure) — equity-release intent
+    io_vs_pi_recommendation: IoVsPi             # single-valued enum (schema-as-constraint)
+    fixed_vs_variable: RateStructure            # single-valued enum (reused from FHB)
+    offset_strategy_recommendation: OffsetStrategy   # single-valued enum
+    # A shortlist to CONSIDER is 3–5 lenders; same hard cap as the FHB list surface.
+    recommended_lender_shortlist: Annotated[list[LenderRec], Field(max_length=5)]
+
+
 # --- the investment_thesis agent schema: the THREE judgment leaves ONLY (P5) ----
 # investment_strategy is TWO-PATH like mortgage_finance: the resolver owns the renderer,
 # the kb_versions audit, the carried horizon, and leaves every property-relative TARGET
@@ -272,6 +298,25 @@ _KB_DOCS = {
     "kb.tax.entity-comparison-personal-trust-company-smsf":
         _REPO_ROOT / "docs" / "kb" / "tax"
         / "entity-comparison-personal-trust-company-smsf.md",
+    # lender_fit_investor (Mode C) — the eight investor lender/loan docs the mortgage_finance
+    # investor leaf-fill grounds in (IO-vs-P&I, offset placement, equity-release refinance,
+    # investor serviceability + DTI, HECS treatment, fixed-rate roll-off, the lender shortlist).
+    "kb.lender.investment-loan-policies":
+        _REPO_ROOT / "docs" / "kb" / "lender" / "investment-loan-policies.md",
+    "kb.lender.investor-friendly-shortlist":
+        _REPO_ROOT / "docs" / "kb" / "lender" / "investor-friendly-shortlist.md",
+    "kb.loan.interest-only-vs-pi-investor":
+        _REPO_ROOT / "docs" / "kb" / "loan" / "interest-only-vs-pi-investor.md",
+    "kb.loan.offset-vs-redraw-investor":
+        _REPO_ROOT / "docs" / "kb" / "loan" / "offset-vs-redraw-investor.md",
+    "kb.loan.refinance-strategies-portfolio-growth":
+        _REPO_ROOT / "docs" / "kb" / "loan" / "refinance-strategies-portfolio-growth.md",
+    "kb.lender.hecs-treatment-by-lender":
+        _REPO_ROOT / "docs" / "kb" / "lender" / "hecs-treatment-by-lender.md",
+    "kb.loan.fixed-rate-roll-off-planning":
+        _REPO_ROOT / "docs" / "kb" / "loan" / "fixed-rate-roll-off-planning.md",
+    "kb.lender.serviceability-investment-loans":
+        _REPO_ROOT / "docs" / "kb" / "lender" / "serviceability-investment-loans.md",
 }
 
 
@@ -388,6 +433,82 @@ fixed_3yr | split_fixed_variable (a single enum value, not a sentence — put an
 reasoning in a lender's `reasoning`). Default to `variable` for flexibility at the base \
 stage; never assert a specific rate number.
 5. Emit ONLY the two leaves.""",
+    },
+    # lender_fit_investor is the agent half of the `mortgage_finance` INVESTOR variant (Mode C,
+    # TWO-PATH): the renderer, the kb_versions audit, the refinance framing, and EVERY figure
+    # (borrowing capacity, loan cost) are resolver-owned (in <resolver_outcome>); this module
+    # authors ONLY the five lender_fit leaves. Same shared component NAME as the Mode-A
+    # lender_fit; a separate module because the leaf set + KB grounding differ.
+    "lender_fit_investor": {
+        "kb_slugs": ["kb.lender.investment-loan-policies",
+                     "kb.lender.investor-friendly-shortlist",
+                     "kb.loan.interest-only-vs-pi-investor",
+                     "kb.loan.offset-vs-redraw-investor",
+                     "kb.loan.refinance-strategies-portfolio-growth",
+                     "kb.lender.hecs-treatment-by-lender",
+                     "kb.loan.fixed-rate-roll-off-planning",
+                     "kb.lender.serviceability-investment-loans"],
+        "context": """\
+You are the agent half of the `mortgage_finance` component (reasoning_domain: \
+lender_fit_investor), for a Vietnamese-Australian DOMESTIC property INVESTOR. The borrowing \
+capacity, the loan-cost estimate, the refinance framing, and every figure have ALREADY been \
+computed by the engine's resolver and are given in `<resolver_outcome>` (read-only). You do \
+NOT compute or restate any figure. You reason about exactly FIVE qualitative things: (1) the \
+repayment type (interest-only vs principal-and-interest), (2) the rate structure (fixed vs \
+variable), (3) the offset-account strategy, (4) whether to use existing PPOR equity, and (5) \
+a short investor-friendly LENDER SHORTLIST. Your inputs are the investor's profile + \
+investment thesis (`<plan_card_state>`) and the resolver figures, grounded in the lender KB.""",
+        "goal": """\
+Produce ONLY the five investor lender-fit leaves: `io_vs_pi_recommendation` (interest_only \
+or principal_and_interest), `fixed_vs_variable` (the rate-structure option), \
+`offset_strategy_recommendation` (where the offset sits), `uses_existing_ppor_equity` \
+(true/false), and `recommended_lender_shortlist` (a short list of investor-friendly lenders \
+to CONSIDER, each with plain reasoning + an approval-likelihood read). Nothing else — no \
+figures, no capacity, no loan cost (those are the resolver's and already in \
+<resolver_outcome>).""",
+        "non_negotiables": """\
+1. **Author no figure.** You do NOT produce borrowing capacity, loan cost, an interest \
+rate, an LVR, or any dollar/percent number. Those are resolver-computed and given to you. \
+Your output schema has no number field — keep it that way.
+2. **At the base turn, income / debts / property are PENDING.** If `<plan_card_state>` shows \
+them absent (the base plan, plan-first), you CANNOT assess true approval likelihood. The \
+shortlist is then investor-friendly lenders relevant to the strategy thesis with \
+`approval_likelihood: "indicative"` and reasoning that says it confirms once income, debts, \
+and a property are entered. Never invent an approval outcome or a portfolio from absent facts.
+3. **IO vs P&I is decision-support, NOT a verdict (ASIC/ACL).** Investors commonly choose \
+interest-only for the tax efficiency of keeping deductible debt high, but IO builds no equity, \
+reverts to P&I over the residual term (payment step-up), and does NOT increase capacity (it is \
+assessed as P&I). Pick the option that fits the thesis and say why — never instruct the \
+investor to act.
+4. **Offset placement is the load-bearing investor insight (from the KB).** For an investor \
+who also has a PPOR (owner-occupier) loan, the offset typically belongs on the PPOR \
+(non-deductible debt) for tax efficiency, not on the investment loan. Released equity is \
+deductible only if used to produce income (ATO 'use' test). Reason from this; do not assert a \
+buyer's tax outcome.
+5. **Lender shortlist (from the KB).** Surface a few investor-friendly lenders to CONSIDER \
+(panel breadth, investment-loan specialty, offset-on-investment availability), each with \
+plain {vi, en} reasoning ~2 sentences per language. Do not hard-code a full membership list \
+(it drifts); name the breadth and defer precise per-lender policy to a broker.
+6. **Decision-support, not advice (ASIC/ACL).** Options with reasoning — never a \
+recommendation to act, never directing the investor to a specific broker or lender.
+7. **Emit only the five-leaf object** (see `<output>`).""",
+        "procedure": """\
+1. Read `<resolver_outcome>` (the computed figures + refinance framing) and \
+`<plan_card_state>` (investor profile + strategy_thesis) and the KB.
+2. Set `io_vs_pi_recommendation` to EXACTLY ONE of: principal_and_interest | interest_only \
+— grounded in the thesis (gearing type + horizon) and the IO-vs-P&I KB trade-offs.
+3. Set `fixed_vs_variable` to EXACTLY ONE of: variable | fixed_1yr | fixed_2yr | fixed_3yr | \
+split_fixed_variable. Default to `variable` for flexibility at the base stage; never assert a \
+rate number.
+4. Set `offset_strategy_recommendation` to EXACTLY ONE of: full_offset_on_this_property | \
+offset_pointed_at_ppor_for_tax_efficiency | redraw_only | no_offset — grounded in the \
+offset/redraw KB and whether the investor has a PPOR.
+5. Set `uses_existing_ppor_equity` (true/false) from the strategy thesis + whether a PPOR \
+with equity is present; false when no PPOR equity is evident at the base stage.
+6. Build a shortlist of 3–5 investor-friendly lenders, each with {vi, en} reasoning (author \
+the Vietnamese AND the English, see <style>) and an honest `approval_likelihood` \
+(`indicative` when facts are pending). Keep each rationale ~2 sentences per language.
+7. Emit ONLY the five leaves.""",
     },
     # investment_thesis is the agent half of the `investment_strategy` component (Mode C,
     # TWO-PATH like lender_fit): the renderer, the kb_versions audit, the carried horizon,
@@ -580,6 +701,16 @@ _MORTGAGE_COMPONENT = {
                "resolver_outcome (the computed mortgage_plan figures + structure)"],
     "reads": "upstream DAG outcomes only (not upstream parameters) — §11.9",
 }
+_INVESTOR_MORTGAGE_COMPONENT = {
+    "component_id": "mortgage_finance",
+    "goal": "Author the five investor lender-fit leaves (IO-vs-P&I, fixed-vs-variable, "
+            "offset strategy, uses-existing-PPOR-equity, investor-friendly lender shortlist) "
+            "for a domestic investor, given the resolver-computed figures. Author no figure.",
+    "inputs": ["investor_profile.outcome",
+               "investment_strategy.outcome (strategy_thesis — gearing_type, horizon)",
+               "resolver_outcome (the computed mortgage_plan structure + refinance framing)"],
+    "reads": "upstream DAG outcomes only (not upstream parameters) — §11.9",
+}
 _STRATEGY_COMPONENT = {
     "component_id": "investment_strategy",
     "goal": "Author the three thesis leaves (archetype, gearing_type, one_liner) for a "
@@ -607,6 +738,12 @@ async def fill_mortgage_finance(upstream_outcomes, resolver_outcome):
     computed and passed in as `resolver_outcome` (read-only grounding). output_format =
     the two-leaf schema (no money field → §98 enforced by schema). Returns
     (leaves_dict, usage_dict)."""
+    # Shared component NAME, two blueprints: the Mode-C investor mortgage_plan resolver
+    # outcome carries `io_vs_pi_recommendation` (the FHB one does not). Mirror the engine's
+    # RO-shape discriminator (fh_engine_mortgage) — delegate the investor path to its own
+    # 5-leaf fill. No new reasoning_domain on the wire (both arrive as lender_fit).
+    if "io_vs_pi_recommendation" in resolver_outcome:
+        return await fill_mortgage_finance_investor(upstream_outcomes, resolver_outcome)
     import time
     _t0 = time.monotonic()
     from claude_agent_sdk import ClaudeAgentOptions, ResultMessage, query
@@ -651,6 +788,64 @@ async def fill_mortgage_finance(upstream_outcomes, resolver_outcome):
           file=sys.stderr, flush=True)
     leaves = LenderFitLeaves(**structured)  # raises ValidationError if off
     # belt-and-braces §98: reject any rate option outside the blueprint enum.
+    if leaves.fixed_vs_variable not in _RATE_OPTIONS:
+        raise RuntimeError(f"fixed_vs_variable {leaves.fixed_vs_variable!r} not in enum")
+    return leaves.model_dump(), usage
+
+
+async def fill_mortgage_finance_investor(upstream_outcomes, resolver_outcome):
+    """Two-path agent half of the `mortgage_finance` INVESTOR variant (Mode C,
+    reasoning_domain lender_fit_investor): one real Agent-SDK structured one-shot authoring
+    ONLY the five investor lender_fit leaves (IO-vs-P&I, fixed-vs-variable, offset strategy,
+    uses_existing_ppor_equity, investor lender shortlist). The renderer, the kb_versions
+    audit, the refinance framing, and every figure are resolver-owned and passed in as
+    `resolver_outcome` (read-only grounding). output_format = the five-leaf schema (no number
+    field → every figure stays out of the LLM's reach, the §98 posture). Returns
+    (leaves_dict, usage_dict) — same shape fill_mortgage_finance returns."""
+    import time
+    _t0 = time.monotonic()
+    from claude_agent_sdk import ClaudeAgentOptions, ResultMessage, query
+    _t_import = time.monotonic()
+
+    options = ClaudeAgentOptions(
+        model=LEAF_MODEL,
+        effort=LEAF_EFFORT,   # bound reasoning depth (else opus thinks for minutes)
+        system_prompt=build_system_prompt("lender_fit_investor",
+                                          _kb_block("lender_fit_investor")),
+        setting_sources=[],   # do NOT load CLAUDE.md / project settings
+        allowed_tools=[],     # leaf-fill pulls no tools
+        env=_credit_env(),    # subscription-credit auth, subprocess-scoped
+        output_format={"type": "json_schema",
+                       "schema": LenderFitInvestorLeaves.model_json_schema()},
+    )
+
+    async def _consume():
+        structured = None
+        usage = {}
+        async for message in query(
+                prompt=build_user_content(_INVESTOR_MORTGAGE_COMPONENT, upstream_outcomes,
+                                          resolver_outcome),
+                options=options):
+            if isinstance(message, ResultMessage):
+                structured = getattr(message, "structured_output", None)
+                usage = getattr(message, "usage", {}) or {}
+        return structured, usage
+
+    try:
+        structured, usage = await asyncio.wait_for(_consume(), timeout=LEAF_TIMEOUT_S)
+    except asyncio.TimeoutError:
+        raise RuntimeError(f"leaf-fill exceeded {LEAF_TIMEOUT_S}s app-side timeout")
+
+    if structured is None:
+        raise RuntimeError("Agent SDK returned no structured_output")
+
+    _t_query = time.monotonic()
+    print(f"[planner] mortgage_finance(lender_fit_investor): "
+          f"sdk_import={_t_import - _t0:.1f}s query={_t_query - _t_import:.1f}s "
+          f"model={LEAF_MODEL} effort={LEAF_EFFORT}", file=sys.stderr, flush=True)
+    leaves = LenderFitInvestorLeaves(**structured)  # raises ValidationError if off
+    # belt-and-braces §98: reject any rate option outside the blueprint enum (the IO/PI +
+    # offset enums are already Literal-enforced by the schema).
     if leaves.fixed_vs_variable not in _RATE_OPTIONS:
         raise RuntimeError(f"fixed_vs_variable {leaves.fixed_vs_variable!r} not in enum")
     return leaves.model_dump(), usage

@@ -2,9 +2,16 @@
 
 %% The base-turn `mortgage_finance` fill — the RESOLVER half of a TWO-PATH component
 %% (mortgage-finance-two-path.md). It assembles the `mortgage_plan` outcome's figures
-%% and loan-path structure deterministically; the two `lender_fit` leaves
-%% (`recommended_lender_shortlist`, `loan_structure_recommendation.rate`) are left
-%% `null` for the agent and folded in by merge_agent/2 after the sidecar replies.
+%% and loan-path structure deterministically; the `lender_fit` leaves are left `null`
+%% for the agent and folded in by merge_agent/2 after the sidecar replies.
+%%
+%% TWO VARIANTS, shared component NAME (`mortgage_finance`): the Mode-A FHB path (fill_fhb/2,
+%% two leaves: shortlist + rate) and the Mode-C investor path (fill_investor/2, five leaves:
+%% io/PI, rate, offset strategy, uses_existing_ppor_equity, investor lender shortlist). fill/2
+%% routes on the `strategy_thesis` upstream (investor-only); merge_agent/2 +
+%% agent_values_from_outcome/1 route on the `io_vs_pi_recommendation` outcome key
+%% (investor-only). Both discriminators are local shape sniffs — no signature change, the FHB
+%% bodies are byte-identical (zero regression). Mirrors fh_engine_cash / fh_engine_disposition.
 %%
 %% §98 (agentic-boundary): borrowing capacity is a COMPLIANCE-sensitive figure and must
 %% be computed, never LLM-asserted. At the base turn income + committed debts are ABSENT
@@ -32,8 +39,22 @@
 
 %% --- fill (resolver half) ---------------------------------------------------
 
+%% MODE DISPATCH (mirrors fh_engine_cash / fh_engine_disposition): mortgage_finance is a
+%% shared component NAME across the FHB and investor blueprints with DIFFERENT outcome
+%% shapes (both typed `mortgage_plan`, distinct per-blueprint registries). Only the investor
+%% blueprint runs an `investment_strategy` component upstream of mortgage_finance, so the
+%% presence of its `strategy_thesis` outcome marks the Mode-C investor path; the Mode-A FHB
+%% path reads `scheme_stack`. The FHB body is renamed fill_fhb/2 VERBATIM (byte-identical —
+%% zero regression); the investor body (fill_investor/2) is new.
 -spec fill(map(), map()) -> {map(), binary(), [map()]}.
-fill(_Args, Upstream) ->
+fill(Args, Upstream) ->
+    case maps:is_key(<<"strategy_thesis">>, Upstream) of
+        true  -> fill_investor(Args, Upstream);
+        false -> fill_fhb(Args, Upstream)
+    end.
+
+-spec fill_fhb(map(), map()) -> {map(), binary(), [map()]}.
+fill_fhb(_Args, Upstream) ->
     Profile = maps:get(<<"profile">>, Upstream, #{}),
     Stack   = maps:get(<<"scheme_stack">>, Upstream, #{}),
     HasFhg  = has_fhg(Stack),
@@ -64,6 +85,75 @@ fill(_Args, Upstream) ->
          <<"kb.lender.bnpl-treatment-2026">>]),
     {Outcome, <<"summary-card">>, KbVersions}.
 
+%% --- fill_investor (resolver half, Mode-C investor mortgage_plan) -----------
+%% The investor `mortgage_plan` (7 fields) is a TWO-PATH outcome like the FHB one: the
+%% resolver owns the renderer, the kb_versions audit, the loan-structure scaffold, the
+%% KB-grounded refinance framing, and EVERY figure; the FIVE lender_fit leaves (io/PI,
+%% fixed_vs_variable, offset strategy, uses_existing_ppor_equity, lender shortlist) are
+%% left null/[] for the agent and folded by merge_agent_investor/2 after the sidecar
+%% replies. §98: borrowing capacity / loan cost are COMPLIANCE-sensitive figures — at the
+%% base turn income, debts, and the property are ABSENT, so they are honestly PENDING
+%% (null), the same honest-partial call as the FHB fill. No magic literal: the IO term and
+%% the refinance LVR conventions are KB params (flagged conventions), not code constants.
+-spec fill_investor(map(), map()) -> {map(), binary(), [map()]}.
+fill_investor(_Args, _Upstream) ->
+    Outcome = #{
+        %% resolver scaffold; the agent folds repayment_type/rate/offset/uses_ppor_equity.
+        <<"recommended_loan_structure">> => loan_structure_investor_base(),
+        %% AGENT slots (lender_fit) — filled by merge_agent_investor/2 from the sidecar.
+        <<"recommended_lender_shortlist">> => null,
+        <<"io_vs_pi_recommendation">> => null,
+        <<"offset_strategy_recommendation">> => null,
+        %% resolver, KB-grounded conventions + null property/date-dependent fields.
+        <<"refinance_plan_for_portfolio_growth">> => refinance_plan_base(),
+        %% PENDING — needs the debt balances (HECS/cards/other), absent at base.
+        <<"debt_optimisations_to_action">> => [],
+        %% PENDING — needs the loan amount (a property/Phase-B figure). §98: never LLM-set.
+        <<"loan_cost_estimate_year_1">> => null
+    },
+    KbVersions = fh_engine_kb:kb_anchors(
+        [<<"kb.lender.investment-loan-policies">>,
+         <<"kb.lender.investor-friendly-shortlist">>,
+         <<"kb.loan.interest-only-vs-pi-investor">>,
+         <<"kb.loan.offset-vs-redraw-investor">>,
+         <<"kb.loan.refinance-strategies-portfolio-growth">>,
+         <<"kb.lender.hecs-treatment-by-lender">>,
+         <<"kb.loan.fixed-rate-roll-off-planning">>,
+         <<"kb.lender.serviceability-investment-loans">>]),
+    {Outcome, <<"summary-card">>, KbVersions}.
+
+%% the investor base loan-structure scaffold: the IO term default (KB convention) + the
+%% four agent slots (null until merge_agent_investor/2). Mirrors loan_structure_base/0.
+-spec loan_structure_investor_base() -> map().
+loan_structure_investor_base() ->
+    #{<<"repayment_type">> => null,              %% agent (io_vs_pi)
+      <<"rate">> => null,                        %% agent (fixed_vs_variable)
+      <<"offset">> => null,                      %% agent (offset strategy)
+      <<"uses_existing_ppor_equity">> => null,   %% agent
+      <<"interest_only_period_years">> =>
+          kb_param(<<"kb.loan.interest-only-vs-pi-investor">>,
+                   <<"io_max_term_years_typical">>)}.
+
+%% the KB-grounded refinance framing true at base (plan-first, pre-property): the usable-
+%% equity LVR conventions + the load-bearing serviceability-retest insight; the figures and
+%% dates that need a settled property (usable equity $, expiry/release dates) are null.
+-spec refinance_plan_base() -> map().
+refinance_plan_base() ->
+    Refi = <<"kb.loan.refinance-strategies-portfolio-growth">>,
+    #{<<"usable_equity_target_lvr_pct">> =>
+          kb_param(Refi, <<"usable_equity_target_lvr_pct">>),
+      <<"usable_equity_with_lmi_lvr_pct">> =>
+          kb_param(Refi, <<"usable_equity_with_lmi_lvr_pct">>),
+      <<"equity_release_triggers_serviceability_retest">> =>
+          kb_param(Refi, <<"equity_release_triggers_serviceability_retest">>),
+      <<"interest_only_term_years_typical">> =>
+          kb_param(<<"kb.loan.interest-only-vs-pi-investor">>,
+                   <<"io_max_term_years_typical">>),
+      %% PENDING — need a settled property + loan balance + settlement date.
+      <<"usable_equity_estimate">> => null,
+      <<"io_period_expiry_date">> => null,
+      <<"next_property_equity_release_target_date">> => null}.
+
 %% --- merge_agent (fold the two lender_fit leaves into the resolver outcome) --
 %% AgentValues carries ONLY the two qualitative leaves the sidecar authored; the merge
 %% is slot-scoped, so the LLM cannot author or overwrite any figure (the §98 property,
@@ -71,12 +161,47 @@ fill(_Args, Upstream) ->
 
 -spec merge_agent(map(), map()) -> map().
 merge_agent(ResolverOutcome, AgentValues) ->
+    %% RO-shape discriminator: only the investor mortgage_plan carries io_vs_pi_recommendation
+    %% (the FHB outcome has recommended_path / loan_structure_recommendation). Local sniff —
+    %% no signature change, mirrors the fill/2 + cash discriminators.
+    case maps:is_key(<<"io_vs_pi_recommendation">>, ResolverOutcome) of
+        true  -> merge_agent_investor(ResolverOutcome, AgentValues);
+        false -> merge_agent_fhb(ResolverOutcome, AgentValues)
+    end.
+
+-spec merge_agent_fhb(map(), map()) -> map().
+merge_agent_fhb(ResolverOutcome, AgentValues) ->
     Shortlist = maps:get(<<"recommended_lender_shortlist">>, AgentValues, []),
     Rate      = maps:get(<<"fixed_vs_variable">>, AgentValues, null),
     LS0 = maps:get(<<"loan_structure_recommendation">>, ResolverOutcome),
     ResolverOutcome#{
         <<"recommended_lender_shortlist">> => Shortlist,
         <<"loan_structure_recommendation">> => LS0#{<<"rate">> => Rate}
+    }.
+
+%% fold the FIVE investor lender_fit leaves into the resolver outcome. Slot-scoped (§98):
+%% the agent authors only these qualitative slots; every figure (the refinance framing, the
+%% null loan cost, the debt optimisations) is the resolver's and is left untouched. The io/PI
+%% and offset choices are surfaced both as the top-level enum field AND inside the structure
+%% object (place-don't-recompute — one agent value, two read positions).
+-spec merge_agent_investor(map(), map()) -> map().
+merge_agent_investor(ResolverOutcome, AgentValues) ->
+    Shortlist = maps:get(<<"recommended_lender_shortlist">>, AgentValues, []),
+    IoPi      = maps:get(<<"io_vs_pi_recommendation">>, AgentValues, null),
+    Offset    = maps:get(<<"offset_strategy_recommendation">>, AgentValues, null),
+    Rate      = maps:get(<<"fixed_vs_variable">>, AgentValues, null),
+    UsesPpor  = maps:get(<<"uses_existing_ppor_equity">>, AgentValues, null),
+    LS0 = maps:get(<<"recommended_loan_structure">>, ResolverOutcome),
+    ResolverOutcome#{
+        <<"recommended_lender_shortlist">> => Shortlist,
+        <<"io_vs_pi_recommendation">> => IoPi,
+        <<"offset_strategy_recommendation">> => Offset,
+        <<"recommended_loan_structure">> => LS0#{
+            <<"repayment_type">> => IoPi,
+            <<"rate">> => Rate,
+            <<"offset">> => Offset,
+            <<"uses_existing_ppor_equity">> => UsesPpor
+        }
     }.
 
 %% The INVERSE of merge_agent/2: recover the agent-leaf VALUES (in the sidecar-reply
@@ -88,10 +213,33 @@ merge_agent(ResolverOutcome, AgentValues) ->
 %% (§98); the qualitative leaves are preserved verbatim from the snapshot.
 -spec agent_values_from_outcome(map()) -> map().
 agent_values_from_outcome(Stored) ->
+    case maps:is_key(<<"io_vs_pi_recommendation">>, Stored) of
+        true  -> agent_values_from_outcome_investor(Stored);
+        false -> agent_values_from_outcome_fhb(Stored)
+    end.
+
+-spec agent_values_from_outcome_fhb(map()) -> map().
+agent_values_from_outcome_fhb(Stored) ->
     LS = maps:get(<<"loan_structure_recommendation">>, Stored, #{}),
     #{<<"recommended_lender_shortlist">> =>
           maps:get(<<"recommended_lender_shortlist">>, Stored, []),
       <<"fixed_vs_variable">> => maps:get(<<"rate">>, LS, null)}.
+
+%% inverse of merge_agent_investor/2: recover the five investor leaves verbatim from a
+%% stored outcome (the refresh round-trip — re-run the resolver, re-attach these). The
+%% rate + uses_ppor_equity live inside recommended_loan_structure; the enums are top-level.
+-spec agent_values_from_outcome_investor(map()) -> map().
+agent_values_from_outcome_investor(Stored) ->
+    LS = maps:get(<<"recommended_loan_structure">>, Stored, #{}),
+    #{<<"recommended_lender_shortlist">> =>
+          maps:get(<<"recommended_lender_shortlist">>, Stored, []),
+      <<"io_vs_pi_recommendation">> =>
+          maps:get(<<"io_vs_pi_recommendation">>, Stored, null),
+      <<"offset_strategy_recommendation">> =>
+          maps:get(<<"offset_strategy_recommendation">>, Stored, null),
+      <<"fixed_vs_variable">> => maps:get(<<"rate">>, LS, null),
+      <<"uses_existing_ppor_equity">> =>
+          maps:get(<<"uses_existing_ppor_equity">>, LS, null)}.
 
 %% --- structure (KB-grounded, determinate) -----------------------------------
 
