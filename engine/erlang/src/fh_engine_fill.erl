@@ -15,7 +15,9 @@
 %% via fh_engine_resolver (§11.9 applicant.* semantics); `eligibility`
 %% (fh_engine_eligibility) is the three-valued banded scheme_stack; `cash_position`
 %% (fh_engine_cash) and `ownership_planning` (fh_engine_ownership) are mechanism-(B)
-%% formula code over the KB tables (stamp-duty brackets / ongoing-cost bands).
+%% formula code over the KB tables (stamp-duty brackets / ongoing-cost bands). The Mode-C
+%% investor variants reuse the same modules by name: `ownership_planning_investor` →
+%% fh_engine_ownership:fill_investor/2 (a clean sibling — unique name, FHB fill/2 untouched).
 
 -export([resolver/3, has_resolver/1, merge_agent/3, agent_values_from_outcome/2]).
 
@@ -31,6 +33,7 @@ has_resolver(<<"investor_profile">>)   -> true;
 has_resolver(<<"eligibility">>)        -> true;
 has_resolver(<<"cash_position">>)      -> true;
 has_resolver(<<"ownership_planning">>) -> true;
+has_resolver(<<"ownership_planning_investor">>) -> true;
 has_resolver(<<"mortgage_finance">>)   -> true;
 has_resolver(<<"investment_strategy">>) -> true;
 has_resolver(<<"yield_modelling">>)    -> true;
@@ -52,6 +55,8 @@ resolver(<<"cash_position">>, Args, Upstream) ->
     fh_engine_cash:fill(Args, Upstream);
 resolver(<<"ownership_planning">>, Args, Upstream) ->
     fh_engine_ownership:fill(Args, Upstream);
+resolver(<<"ownership_planning_investor">>, Args, Upstream) ->
+    fh_engine_ownership:fill_investor(Args, Upstream);
 resolver(<<"mortgage_finance">>, Args, Upstream) ->
     fh_engine_mortgage:fill(Args, Upstream);
 resolver(<<"investment_strategy">>, _Args, Upstream) ->

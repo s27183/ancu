@@ -209,7 +209,7 @@ Status legend: `[ ]` not started · `[~]` drafting · `[v]` facts verified vs pr
 | [~] | P5-engine | `yield_modelling` resolver — base-spine presence DONE (`fh_engine_fill` inline, honest-partial all-null `cash_flow_projection` + `calculator` + 5 Cluster-Y anchors); the cash-flow **arithmetic** (NEW module) defers to `property_assessment` (its rent-leaf producer) + the banded-vs-scalar seam |
 | [~] | P5-engine | `tax_structure` **two-path** — base-spine presence DONE (`fh_engine_fill` inline: resolver scaffold + `entity_structuring` agent leaf `recommended_entity`, live-verified; the two CGT-determinant **constants** `disposition` reads — `cgt_discount_eligible`/`cost_base_depreciation_clawback` = true; `data-table` + 6 Cluster-T anchors). Deferred to `property_assessment`: `cgt_marginal_rate` (needs an ATO-brackets KB doc + income), `setup_costs`/`annual_compliance_cost` (banded-vs-scalar seam), the 5 property/rent-dependent figures |
 | [~] | P5-engine | `cash_position` investor variant — base presence DONE (`fh_engine_cash:fill_investor/2`, branched on the `tax_optimised_structure` discriminator like `disposition`; **pure-resolver**, `agent_leaves []`). The compiled `budget_envelope_investor` is 9 point-summary figures, all honestly null at base (plan-first: no property, no savings); emits `calculator` + the 6 Cluster-Y/T cash anchors. Deferred to `property_assessment` (per-property): the property-price-dependent figures; `max_property_price_supported` → investor `mortgage_finance` capacity (unbuilt); HAVE-side → refine turn |
-| [ ] | P5-engine | `ownership_planning_investor` resolver (NEW module) — `portfolio_position` (land-tax aggregation, mgmt model, scale-up; Cluster-S KB) + the `opportunities[]` producer seam flagged in P4 |
+| [~] | P5-engine | `ownership_planning_investor` — base presence DONE (`fh_engine_ownership:fill_investor/2`, a clean sibling on the UNIQUE name — no discriminator, FHB `fill/2` untouched; **pure-resolver**, `agent_leaves []`). **Honest-partial:** `annual_tax_obligations` (5, bilingual) + `alert_triggers_armed` (4 investor alerts, bilingual) filled from the 6 Cluster-S KB anchors via a new `kb.copy.ownership-investor` doc; the 6 post-acquisition figure fields null at base. **Producer half of the P4 `opportunities[]` seam CLOSED**: field added to the schema (recompiled), emitted `[]` at base (populates per-property); `annual_tax_obligations` retyped `array<localized_text>` (validator-enforced bilingual). Emits `data-table` (the reachable primary). Deferred: the 6 figure fields → `property_assessment`; the **consumer half** (shell renders only `renderers[0]`) → a shell unit |
 | [ ] | P5-activate | per-blueprint `base_components/1` sequence (the P3 follow-on — derive the investor base set + DAG order, replacing the Mode-A `?BASE_COMPONENTS` macro) |
 | [ ] | P5-activate | Onboarding **dispatch** (`fh_engine_h_plan_cards.erl` selects blueprint by `intent`) **+** **intent picker** (`onboarding.ts`), atomic-last |
 
@@ -285,12 +285,18 @@ two spec-derived `planCard.ts` types (`BidPlanInvestorOutcome`, `OpportunityCard
 renderer-internal bilingual `plan.*` labels (en+vi, incl. the thesis/style enum display labels).
 Component **title** keys for investor components stay P5 (they render only when an investor turn runs).
 **Verified:** `svelte-autofixer` clean on both, `svelte-check` 0/0, production build green.
-**One producer seam flagged (not patched):** `opportunity-card`'s §11.9 contract `{ kind,
-modeled_benefit, action }` has no matching field in the blueprint's `portfolio_position` outcome —
-which carries `alert_triggers_armed: array<{trigger,action}>`, *already rendered by DataTable*. So
-when `ownership_planning_investor` is wired, its `outcome_schema` must emit an `opportunities[]`
-field (or the contract be reconciled). A **producer-wiring** concern (post-P5), logged here + in the
-`OpportunityCardOutcome` type comment; the renderer is built to its declared contract meanwhile.
+**One producer seam — producer half CLOSED in P5-engine 6/suite; consumer half is a shell unit.**
+`opportunity-card`'s §11.9 contract `{ kind, modeled_benefit, action }` had no matching field in
+`portfolio_position`. The seam splits across the engine↔shell contract: (a) **producer** — the
+schema lacked `opportunities[]`; **now added + emitted `[]` at base** by `fill_investor/2` (an
+opportunity is defined by its `modeled_benefit`, a figure off an owned property, so none exist
+plan-first — it populates per-property in Phase B). (b) **consumer** — the shell renders only
+`renderers[0]` per component (`planCard.ts:389` — `entry.renderer` = "first of the blueprint's
+renderers"), so the *second* declared renderer (`opportunity-card`) is **unreached for every
+dual-renderer component**, incl. the already-shipped FHB `ownership_planning` (same
+`['data-table','opportunity-card']`). Dispatching the second renderer changes behaviour for 5+
+shipped components → a scoped **shell** unit, not foldable into a Mode-C engine resolver. Logged
+here + in the `OpportunityCardOutcome` type comment; the renderer is built to its contract meanwhile.
 
 **P5-engine STARTED (2026-06-24) — `investor_profile` resolver (1st of the suite).** Grounding the
 live engine surfaced that P5 is an investor **resolver suite**, not a dispatch wire (the reshape is in
@@ -448,6 +454,40 @@ field, so the investor acquire-phase financial spine is **design-first (§8.5)**
 unit:** `mortgage_finance` investor variant (also a shared-name branch — unblocks
 `max_property_price_supported`), or `ownership_planning_investor` (NEW module + the P4 `opportunities[]`
 seam) — Son's pick. Then P5-activate (base_components/1 + dispatch + intent picker, atomic-last).
+
+**P5-engine 6/suite COMPLETE (2026-06-25) — `ownership_planning_investor` (the hold/operate base
+spine; closes the base figure-owner spine: profile → strategy → yield → tax → cash → ownership →
+disposition).** A **pure-resolver** figure-owner (`agent_leaves []`), built in `fh_engine_ownership:
+fill_investor/2` — a clean sibling on the **unique** component name (no shared-name collision, unlike
+`cash_position`; the FHB `fill/2` is untouched → zero regression by construction). **Honest-partial,
+not all-null** (unlike `cash_position`-investor's point-shaped outcome): `portfolio_position` carries
+two array fields with mode-level, property-agnostic, KB-grounded content — `annual_tax_obligations`
+(5 bilingual lines) + `alert_triggers_armed` (4 investor alerts: rent review, refi/equity review,
+depreciation refresh, land-tax aggregation) — filled at base (the FHB ownership precedent); the six
+post-acquisition figure fields (tracked cash flow, current LVR, equity, diversification, ready-for-next)
+are null plan-first. Bilingual copy externalized to a **new `kb.copy.ownership-investor`** doc (12
+`{vi,en}` templates; cadences qualitative — the KB frames them "a default, not a deadline"). Renderer
+`data-table` (the reachable primary) + the 6 Cluster-S anchors.
+
+**The P4 `opportunities[]` seam — producer half dealt with here (not deferred).** On Son's challenge,
+re-grounded the defer against his foundation-first/honest-deferral discriminator (build-but-unconsumed
+= honest; unbuilt-foundation = rug): the `opportunities[]` *producer* is a foundation, so it gets built
+now — added to the `portfolio_position` schema (recompiled) + emitted `[]` at base (an opportunity is
+defined by its `modeled_benefit`, a figure off an owned property → none plan-first; populates Phase B).
+Also retyped `annual_tax_obligations` `array<string>` → `array<localized_text>` (validator-enforced
+bilingual; matches `disposition.key_assumptions`). **Residual, proven (not asserted):** the shell
+renders only `renderers[0]`, so `opportunity-card` is unreached for every dual-renderer component incl.
+shipped FHB ownership — the *consumer* half is a scoped shell unit.
+
+**Verified:** `ownership_planning_investor_conformance.escript` 27/27 (scaffold: data-table, 9-field
+set, 6 nulls + input-independence, 5 obligations + 4 alerts, `opportunities []`, 6 anchors,
+`has_resolver`; Layer-1 vs `portfolio_position` incl. localized-text enforcement; bilingual: every
+obligation + alert half a well-formed `{vi,en}`; no-regression: FHB ownership untouched, yield_modelling
+stays pure-resolver). Recompile clean (copy doc + schema landed). Regression: `ownership_conformance`
+17, `cash_duty` 28 (byte-identical FHB), `cash_position_investor` 31, `disposition` 79, `outcome` 21+11.
+`rebar3 compile` + erlang-checker clean. Pure resolver → no live model. **Next P5-engine unit:**
+`mortgage_finance` investor variant (shared-name branch — unblocks `max_property_price_supported`), the
+last base resolver before P5-activate (base_components/1 + dispatch + intent picker, atomic-last).
 
 ## Deferred out (honest — first-exercising instance is Mode B/D, not here)
 

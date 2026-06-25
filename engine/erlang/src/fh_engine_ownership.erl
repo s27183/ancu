@@ -20,12 +20,13 @@
 %% totals, estimated graduation year, refi-window date, strata (needs property type),
 %% utilities + building insurance (no KB band / property-specific).
 
--export([fill/2]).
+-export([fill/2, fill_investor/2]).
 %% exported for the conformance harness (same anchors as the Python spec):
 -export([maintenance_target/1, statutory_band/0, land_tax_check/1,
          graduation_target_lvr/0, land_tax_threshold/1, has_fhg/1]).
 
 -define(COPY, <<"kb.copy.ownership">>).   %% bilingual copy-templates (bilingual-content.md §3b)
+-define(COPY_INV, <<"kb.copy.ownership-investor">>).  %% Mode-C investor copy doc
 
 %% --- entry -------------------------------------------------------------------
 
@@ -46,6 +47,82 @@ fill(Args, Upstream) ->
          <<"kb.graduation.lvr80">>,
          <<"kb.refinance.windows-and-triggers">>]),
     {Outcome, <<"data-table">>, KbVersions}.
+
+%% --- Mode-C investor ownership_planning_investor (portfolio_position) --------
+%%
+%% A PURE-resolver figure-owner (agent_leaves = []; the same class as fh_engine_cash:
+%% fill_investor / fh_engine_disposition / yield_modelling). UNIQUE component name —
+%% no shared-name collision with the FHB `ownership_planning` (fill/2 above), so this is
+%% a clean sibling dispatched directly by fh_engine_fill; the FHB fill/2 is untouched
+%% (zero regression by construction).
+%%
+%% HONEST-PARTIAL, not all-null: portfolio_position carries two array fields whose content
+%% is mode-level, property-agnostic, and KB-grounded — the standing annual obligations of an
+%% investment property and the investor lifecycle alerts — so we fill them at base (the FHB
+%% ownership precedent does the same with its statutory band + armed alerts). The six FIGURE
+%% fields are post-acquisition actuals (tracked cash flow, current LVR, equity built,
+%% diversification across a portfolio, ready-for-next derived from LVR) — plan-first there is
+%% no property and no actuals, so each is null (three-valued for the bool).
+%%
+%% `opportunities` is the producer half of the P4 opportunity-card seam: the field now exists
+%% in the contract and the fill emits [] at base — an opportunity is defined by its
+%% modeled_benefit (equity release, rent review, scale-up), a figure off an OWNED property, so
+%% none exist plan-first; it populates per-property (Phase B). The consumer half (the shell
+%% renders only renderers[0], so opportunity-card is unreached for every dual-renderer
+%% component incl. shipped FHB ownership) is a separate shell unit.
+%%
+%% Cadences are qualitative, not month-numbered: the owning KB docs frame review intervals as
+%% "a default, not a deadline" — the specific intervals live as editable parameters, not in the
+%% reminder copy. Renderer = data-table (the reachable primary; it renders both array fields).
+
+-spec fill_investor(map(), map()) -> {map(), binary(), [map()]}.
+fill_investor(_Args, _Upstream) ->
+    Outcome = #{
+        %% post-acquisition actuals — no property/actuals at base
+        <<"monthly_net_cash_flow_actual">>     => null,
+        <<"ytd_cash_flow_vs_projection">>      => null,
+        <<"current_lvr">>                      => null,
+        <<"equity_built">>                     => null,
+        <<"ready_for_next_property">>          => null,   %% derives from current_lvr (three-valued)
+        <<"portfolio_diversification_score">>  => null,   %% no portfolio at base (future-aggregate)
+        %% base-computable: KB-grounded, property-agnostic
+        <<"annual_tax_obligations">>           => annual_obligations(),
+        <<"alert_triggers_armed">>             => investor_alerts(),
+        %% producer foundation: [] at base, populates per-property (Phase B)
+        <<"opportunities">>                    => []
+    },
+    KbVersions = fh_engine_kb:kb_anchors(
+        [<<"kb.investor.property-management-vs-self-managed">>,
+         <<"kb.investor.annual-tax-return-investor">>,
+         <<"kb.investor.cash-flow-tracking">>,
+         <<"kb.investor.portfolio-review-cadence">>,
+         <<"kb.investor.scale-up-using-equity">>,
+         <<"kb.investor.land-tax-aggregation">>]),
+    {Outcome, <<"data-table">>, KbVersions}.
+
+%% the standing annual obligations of an investment property — bilingual prose, KB-grounded
+%% (annual-tax-return-investor + land-tax-aggregation + property-management). Static copy.
+annual_obligations() ->
+    [ci(<<"obligation_tax_return">>),
+     ci(<<"obligation_depreciation_schedule">>),
+     ci(<<"obligation_land_tax_assessment">>),
+     ci(<<"obligation_pm_review">>),
+     ci(<<"obligation_keep_records">>)].
+
+%% investor lifecycle alerts (the alert_triggers_armed surface) — each a {trigger, action}
+%% pair of bilingual prose. Qualitative cadences (the KB frames them as defaults, not deadlines).
+investor_alerts() ->
+    [alert(<<"alert_rent_review_trigger">>, <<"alert_rent_review_action">>),
+     alert(<<"alert_refi_review_trigger">>, <<"alert_refi_review_action">>),
+     alert(<<"alert_depreciation_refresh_trigger">>, <<"alert_depreciation_refresh_action">>),
+     alert(<<"alert_land_tax_aggregation_trigger">>, <<"alert_land_tax_aggregation_action">>)].
+
+alert(TriggerId, ActionId) ->
+    #{<<"trigger">> => ci(TriggerId), <<"action">> => ci(ActionId)}.
+
+%% the investor copy doc — static templates (no params), so the localized value is used as-is.
+-spec ci(binary()) -> fh_engine_i18n:localized().
+ci(Id) -> fh_engine_kb:copy(?COPY_INV, Id).
 
 %% --- the ongoing_obligations outcome (honest partial) ------------------------
 %% Filled: maintenance_reserve_target, recurring_costs_estimate.statutory_band,

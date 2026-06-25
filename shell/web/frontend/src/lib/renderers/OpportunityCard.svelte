@@ -5,10 +5,11 @@
     // modeled_benefit, action }. Decision-support: it surfaces the option + its modelled
     // benefit; the user decides and acts.
     //
-    // No live producer yet, and a flagged producer seam: the blueprint's portfolio_position
-    // outcome carries alert_triggers_armed (rendered by DataTable), NOT this shape — when
-    // ownership_planning_investor is wired it must emit opportunities[] (mode-c-wedge P4).
-    // Built against the §11.9 renderer contract; list-tolerant + honest-partial.
+    // Producer half closed (mode-c-wedge P5-engine 6): portfolio_position now declares + emits
+    // opportunities[] ([] at base — populates per-property in Phase B). Consumer half remains:
+    // ComponentCard renders only renderers[0] (data-table), so this card is unreached until
+    // dual-renderer support lands (a shell unit). Built against the §11.9 renderer contract;
+    // list-tolerant + honest-partial.
     import { t } from '$lib/i18n';
     import { lang } from '$lib/stores/lang';
     import { pick, type OpportunityCardOutcome, type Opportunity } from '$lib/planCard';

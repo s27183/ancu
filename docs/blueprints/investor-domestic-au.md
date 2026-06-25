@@ -922,8 +922,9 @@ Same as [Mode A settlement_prep](fhb-domestic-au.md#8-settlement_prep) with thes
     "equity_built": "money",
     "ready_for_next_property": "bool",
     "alert_triggers_armed": "array<{ trigger, action }>",
-    "annual_tax_obligations": "array<string>",
-    "portfolio_diversification_score": "integer_0_10"
+    "annual_tax_obligations": "array<localized_text>",  // user-facing prose → bilingual {vi,en}, validator-enforced (matches disposition.key_assumptions)
+    "portfolio_diversification_score": "integer_0_10",
+    "opportunities": "array<{ kind, modeled_benefit, action }>"  // the opportunity-card surface (§11.9). [] at base — an opportunity is defined by its modeled_benefit, a figure off an OWNED property (equity release, rent review, scale-up); none exist plan-first. Populates per-property (Phase B). The producer half of the P4 opportunity-card seam, closed here; the consumer half (shell renders only renderers[0]) is a separate shell unit.
   }
 }
 ```

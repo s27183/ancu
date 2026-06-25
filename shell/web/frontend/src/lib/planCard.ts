@@ -255,9 +255,10 @@ export interface Opportunity {
     action?: LocalizedText | null;
 }
 /** ownership_planning_investor → opportunity-card (§11.9 { kind, modeled_benefit,
- *  action }). list-tolerant: an `opportunities[]` or a single opportunity. NOTE the
- *  producer seam — portfolio_position emits alert_triggers_armed (DataTable renders it),
- *  NOT this shape; opportunities[] is owed when the component is wired (mode-c-wedge P4). */
+ *  action }). list-tolerant: an `opportunities[]` or a single opportunity. The PRODUCER
+ *  half of the seam is closed (mode-c-wedge P5-engine 6): portfolio_position now declares +
+ *  emits opportunities[] ([] at base — populates per-property). The CONSUMER half remains: the
+ *  shell renders only renderers[0], so this card is unreached until dual-renderer support lands. */
 export interface OpportunityCardOutcome extends Opportunity {
     opportunities?: Opportunity[] | null;
 }
