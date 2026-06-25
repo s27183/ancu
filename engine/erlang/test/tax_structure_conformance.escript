@@ -33,7 +33,7 @@ main(_) ->
     ok = fh_engine_kb:load(),
     io:format("tax_structure conformance — fh_engine_fill (Mode-C two-path)~n~n"),
     R = lists:flatten([scaffold_cases(), layer1_cases(), two_path_cases(),
-                       no_regression_cases()]),
+                       per_property_cases(), no_regression_cases()]),
     Fails = [X || X <- R, X =:= fail],
     io:format("~n================================================================~n"),
     case Fails of
@@ -150,6 +150,92 @@ two_path_cases() ->
            lists:sort(maps:keys(Merged)), lists:sort(fields())),
      check("agent_values_from_outcome round-trips the entity",
            maps:get(<<"recommended_entity">>, AV), <<"discretionary_trust">>)].
+
+%% --- 5. per-property figures (Slice B2 — class (a) rent/income-dependent) ----
+%% Drives the REAL yield_modelling producer (no fabricated cash-flow band — the producer→consumer
+%% contract under test, not a hand-built upstream) for a negatively-geared house, then exercises
+%% tax_structure on (a) a per-property turn with NO income → the gearing position lights up but the
+%% money figures stay null (honest-partial — marginal rate needs income, a refine turn), (b) a
+%% refine turn WITH income → marginal rate + negative-gearing refund + after-tax cash flow compute
+%% (bands, derived from the real Cf × the rate helper), and (c) a positively-geared property →
+%% negative_gearing_active null, never false (depreciation is QS-deferred → tax position undetermined).
+
+house_pf() ->
+    #{<<"price">> => 920000,
+      <<"property_type">> => <<"established_house">>,
+      <<"estimated_weekly_rent_range">> => [620, 720]}.
+
+real_cfp() ->
+    {Cfp, _, _} = fh_engine_fill:resolver(<<"yield_modelling">>, #{},
+                                          #{<<"property_fit_investor">> => house_pf()}),
+    Cfp.
+
+per_property_cases() ->
+    Cfp    = real_cfp(),
+    [CfLo, CfHi] = maps:get(<<"cash_flow_before_tax_year_1">>, Cfp),
+    Geared = maps:get(<<"is_positive_neutral_or_negative_geared_pre_tax">>, Cfp),
+    Income = 120000,
+    Rate   = fh_engine_mortgage:marginal_rate(Income),    %% 30 (b2 bracket) + 2 (Medicare) = 32
+    F      = (100 - Rate) / 100,
+    ExpAt     = [round(CfLo * F), round(CfHi * F)],
+    [AtLo, AtHi] = ExpAt,
+    ExpRefund = [round(-Rate / 100 * CfHi), round(-Rate / 100 * CfLo)],
+    ExpWeek   = [round(AtLo / 52), round(AtHi / 52)],
+    %% (a) per-property, NO income.
+    {ONoInc, _, _} = scaffold(#{<<"cash_flow_projection">> => Cfp,
+                               <<"profile">> => #{<<"target_price_range">> => [800000, 1000000]}}),
+    %% (b) refine turn, income captured.
+    {OInc, _, _} = scaffold(#{<<"cash_flow_projection">> => Cfp,
+                            <<"profile">> => #{<<"assessable_income">> => Income}}),
+    %% (c) positively-geared property (income present).
+    PosCfp = Cfp#{<<"cash_flow_before_tax_year_1">> => [4000, 9000],
+                  <<"is_positive_neutral_or_negative_geared_pre_tax">> => <<"positive">>},
+    {OPos, _, _} = scaffold(#{<<"cash_flow_projection">> => PosCfp,
+                            <<"profile">> => #{<<"assessable_income">> => Income}}),
+    [check("precondition: real yield_modelling produces a negatively-geared house",
+           Geared, <<"negative">>),
+     %% (a) no income → gearing lights up, money figures null
+     check("no-income: negative_gearing_active = true (gearing needs only the cash flow)",
+           g(ONoInc, <<"negative_gearing_active">>), true),
+     check("no-income: cgt_marginal_rate null (income absent)",
+           g(ONoInc, <<"cgt_marginal_rate">>), null),
+     check("no-income: annual_tax_refund_year_1 null (rate absent)",
+           g(ONoInc, <<"annual_tax_refund_year_1">>), null),
+     check("no-income: after_tax_cash_flow_year_1 null",
+           g(ONoInc, <<"after_tax_cash_flow_year_1">>), null),
+     check("no-income: after_tax_cash_flow_per_week null",
+           g(ONoInc, <<"after_tax_cash_flow_per_week">>), null),
+     check("no-income: total_depreciation_year_1 null (QS-deferred)",
+           g(ONoInc, <<"total_depreciation_year_1">>), null),
+     check("no-income: cgt_discount_eligible constant still true",
+           g(ONoInc, <<"cgt_discount_eligible">>), true),
+     check("no-income: field set still the eleven",
+           lists:sort(maps:keys(ONoInc)), lists:sort(fields())),
+     check("no-income: Layer-1 conforms", validate(ONoInc), ok),
+     %% (b) income → computed
+     check("marginal_rate(120000) = 32 (b2 bracket 30 + Medicare 2)", Rate, 32),
+     check("income: negative_gearing_active = true",
+           g(OInc, <<"negative_gearing_active">>), true),
+     check("income: cgt_marginal_rate = the computed rate",
+           g(OInc, <<"cgt_marginal_rate">>), Rate),
+     check("income: annual_tax_refund_year_1 = −r × Cf band (a positive refund on the loss)",
+           g(OInc, <<"annual_tax_refund_year_1">>), ExpRefund),
+     check("income: refund is positive (a saving, not a charge)",
+           hd(ExpRefund) > 0, true),
+     check("income: after_tax_cash_flow_year_1 = Cf × (1 − r) band",
+           g(OInc, <<"after_tax_cash_flow_year_1">>), ExpAt),
+     check("income: after_tax_cash_flow_per_week band",
+           g(OInc, <<"after_tax_cash_flow_per_week">>), ExpWeek),
+     check("income: after-tax less-negative than pre-tax (the refund softens the loss)",
+           AtLo > CfLo andalso AtHi > CfHi, true),
+     check("income: Layer-1 conforms (banded after-tax money_range)", validate(OInc), ok),
+     %% (c) positive gearing → null, never false
+     check("positive-geared: negative_gearing_active null (never false — depreciation undetermined)",
+           g(OPos, <<"negative_gearing_active">>), null),
+     check("positive-geared: annual_tax_refund_year_1 null (only negative gearing refunds)",
+           g(OPos, <<"annual_tax_refund_year_1">>), null),
+     check("positive-geared: cgt_marginal_rate still computed (income present)",
+           g(OPos, <<"cgt_marginal_rate">>), Rate)].
 
 %% --- 4. no regression --------------------------------------------------------
 

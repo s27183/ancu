@@ -416,45 +416,37 @@ investment_strategy(Upstream) ->
 %%     dollar). true → disposition's Clean is false → CGT to_verify: the conservative, honest
 %%     outcome (the clawback dollar is deferred to a tax agent).
 %%
-%% HONEST-PARTIAL NULL AT BASE ([[base-turn-honest-partial-output]]), in two deferral classes:
-%%   (a) property/rent-dependent — negative_gearing_active + the tax-refund / after-tax
-%%       cash-flow / depreciation figures all hang off the rental cash flow (cash_flow_projection,
-%%       null at base — no property). null → disposition CGT to_verify (the conservative net).
-%%   (b) BLOCKED by an unresolved decision (null because a contract is undecided, NOT because the
-%%       datum is unknown): cgt_marginal_rate needs an ATO income-tax-brackets KB doc (UNAUTHORED)
-%%       + assessable_income — null → disposition CGT to_verify; setup_costs +
-%%       annual_compliance_cost hit the SAME banded-vs-scalar seam flagged on yield_modelling
-%%       (the KB gives BANDS — entity setup $1.5k–$4k, kb.tax.entity-setup-costs — but the
-%%       registry types these scalar `money`; a scalar point would assert false precision, a band
-%%       would fail Layer-1). Both land with property_assessment, where the banded/scalar call is
-%%       resolved for the whole investor money surface.
+%% HONEST-PARTIAL NULL, in two deferral classes (Slice B2 lights up class (a)):
+%%   (a) property/rent + income-dependent — negative_gearing_active + the tax-refund / after-tax
+%%       cash-flow figures hang off the rental cash flow (cash_flow_projection from yield_modelling,
+%%       which runs BEFORE this — DAG: yield→tax→cash) AND the marginal rate (profile.assessable_income).
+%%       Each lights up only when its inputs are present (tax_figures/2): the gearing position needs
+%%       only the cash flow (per-property turn); the money figures also need income (a refine turn —
+%%       plan-first onboarding carries no income, exactly like mortgage borrowing capacity). null
+%%       when absent → disposition CGT to_verify (the conservative net). total_depreciation stays
+%%       null — the KB defers the Div-43/40 dollar to a QS (kb.tax.depreciation-division-43-and-40),
+%%       never asserts it.
+%%   (b) entity-structure banded-vs-scalar seam: setup_costs + annual_compliance_cost (the KB gives
+%%       BANDS — entity setup $1.5k–$4k, kb.tax.entity-setup-costs) are entity-dependent, not
+%%       rent-dependent — out of B2's scope, deferred to the entity-cost unit.
 %%
 %% The agent's reach is exactly the one entity leaf — no figure, no verdict (the
 %% entity-comparison KB is the most regulated content in the wedge; the sidecar's single-enum
 %% output schema removes every figure from its reach, and the ASIC posture — a starting
 %% structure to confirm with a licensed professional, never a directive — is enforced in the
-%% entity_structuring prompt). [Doc/schema seam, flagged not patched: the regulated entity
-%% recommendation has NO `reasoning` field in the compiled outcome — surfacing its reasoning is
-%% a separate outcome-schema unit.] Reads only upstream; the base outcome is input-independent.
-tax_structure(_Upstream) ->
-    Outcome = #{
-        %% AGENT slot (entity_structuring) — null here; merge_agent/3 folds the sidecar's one
-        %% leaf. A base_resolver refresh re-attaches the stored entity (no LLM).
-        <<"recommended_entity">> => null,
-        %% RESOLVER — KB-grounded boolean constants (the CGT determinants disposition reads).
-        <<"cgt_discount_eligible">>            => true,
-        <<"cost_base_depreciation_clawback">> => true,
-        %% NULL (a) property/rent-dependent — need cash_flow_projection (null at base).
-        <<"negative_gearing_active">>     => null,
-        <<"annual_tax_refund_year_1">>    => null,
-        <<"after_tax_cash_flow_year_1">>  => null,
-        <<"after_tax_cash_flow_per_week">> => null,
-        <<"total_depreciation_year_1">>   => null,
-        %% NULL (b) blocked by an unresolved decision — deferred with property_assessment.
-        <<"cgt_marginal_rate">>     => null,   %% needs ATO-brackets KB + assessable_income
-        <<"setup_costs">>           => null,   %% banded-vs-scalar seam (KB band vs scalar money)
-        <<"annual_compliance_cost">> => null   %% banded-vs-scalar seam
-    },
+%% entity_structuring prompt). Every figure below is resolver-computed, removed from the LLM's
+%% reach (§98). [Doc/schema seam, flagged not patched: the regulated entity recommendation has NO
+%% `reasoning` field in the compiled outcome — a separate outcome-schema unit. And the announced
+%% negative-gearing reform (limited to new builds from 1 Jul 2027; an established post-Budget
+%% purchase loses the wage offset — kb.tax.negative-gearing-mechanics) has no outcome field to flag
+%% it: a separate blueprint-schema + renderer unit, material to the wedge's own target case.]
+tax_structure(Upstream) ->
+    Cfp     = maps:get(<<"cash_flow_projection">>, Upstream, #{}),
+    Profile = maps:get(<<"profile">>, Upstream, #{}),
+    Income  = maps:get(<<"assessable_income">>, Profile, null),
+    %% scaffold (all-null figures + the two CGT determinant constants + the agent slot), then
+    %% the per-property/income figures override it — base (no cash flow, no income) ⟹ unchanged.
+    Outcome = maps:merge(tax_structure_scaffold(), tax_figures(Cfp, Income)),
     KbVersions = fh_engine_kb:kb_anchors(
         [<<"kb.tax.entity-comparison-personal-trust-company-smsf">>,
          <<"kb.tax.negative-gearing-mechanics">>,
@@ -463,6 +455,59 @@ tax_structure(_Upstream) ->
          <<"kb.tax.quantity-surveyor-reports">>,
          <<"kb.tax.land-tax-by-state">>]),
     {Outcome, <<"data-table">>, KbVersions}.
+
+%% the input-independent scaffold: the entity agent slot (null pre-merge), the two KB-grounded CGT
+%% determinant CONSTANTS the disposition consumer reads, and every figure null (overridden below).
+tax_structure_scaffold() ->
+    #{
+        %% AGENT slot (entity_structuring) — null here; merge_agent/3 folds the sidecar's one
+        %% leaf. A base_resolver refresh re-attaches the stored entity (no LLM).
+        <<"recommended_entity">> => null,
+        %% RESOLVER — KB-grounded boolean constants (the CGT determinants disposition reads).
+        <<"cgt_discount_eligible">>           => true,
+        <<"cost_base_depreciation_clawback">> => true,
+        %% figures — null until their inputs arrive (tax_figures/2 overrides).
+        <<"negative_gearing_active">>      => null,
+        <<"annual_tax_refund_year_1">>     => null,
+        <<"after_tax_cash_flow_year_1">>   => null,
+        <<"after_tax_cash_flow_per_week">> => null,
+        <<"total_depreciation_year_1">>    => null,  %% QS-deferred (no schedule in reach)
+        <<"cgt_marginal_rate">>            => null,
+        <<"setup_costs">>                  => null,  %% entity-cost banded-vs-scalar seam (class b)
+        <<"annual_compliance_cost">>       => null   %% entity-cost banded-vs-scalar seam (class b)
+    }.
+
+%% the rent/cash-flow + income-dependent figures (class a), each honest-partial. Returns the
+%% overrides merged onto the all-null scaffold (B2).
+tax_figures(Cfp, Income) ->
+    Cf     = maps:get(<<"cash_flow_before_tax_year_1">>, Cfp, null),
+    Geared = maps:get(<<"is_positive_neutral_or_negative_geared_pre_tax">>, Cfp, null),
+    Rate   = case Income of I when is_number(I) -> fh_engine_mortgage:marginal_rate(I); _ -> null end,
+    Ng     = negative_gearing(Geared),
+    maps:merge(
+        #{<<"negative_gearing_active">> => Ng, <<"cgt_marginal_rate">> => Rate},
+        refund_figures(Ng, Cf, Rate)).
+
+%% negative gearing is ACTIVE iff the pre-tax cash position is a loss (yield's geared = negative);
+%% never assert FALSE for a cash-positive/neutral property — depreciation (QS-deferred,
+%% kb.tax.depreciation-division-43-and-40) can make it tax-negative while cash-positive, so the
+%% tax position is undetermined → null (honest-partial). PLACES yield's classification (no recompute,
+%% [[place-upstream-figures-dont-recompute]]).
+negative_gearing(<<"negative">>) -> true;
+negative_gearing(_)              -> null.
+
+%% the negative-gearing refund + after-tax cash flow — computed ONLY when negatively geared AND the
+%% marginal rate is known (income captured). after-tax = Cf × (1 − r); refund = −r × Cf (the tax
+%% saving on the loss). Bands (Cf is banded, r a point). Depreciation is EXCLUDED from the loss
+%% (QS-deferred) → understates the refund → MORE-negative after-tax = the conservative direction.
+refund_figures(true, [CfLo, CfHi], Rate) when is_number(Rate) ->
+    F = (100 - Rate) / 100,
+    {AtLo, AtHi} = {round(CfLo * F), round(CfHi * F)},
+    #{<<"annual_tax_refund_year_1">>     => [round(-Rate / 100 * CfHi), round(-Rate / 100 * CfLo)],
+      <<"after_tax_cash_flow_year_1">>   => [AtLo, AtHi],
+      <<"after_tax_cash_flow_per_week">> => [round(AtLo / 52), round(AtHi / 52)]};
+refund_figures(_, _, _) ->
+    #{}.
 
 %% --- yield_modelling (Mode C, pure RESOLVER — base-spine presence) -----------
 %% The investor base spine (blueprint component 5): the rental cash-flow model. A PURE

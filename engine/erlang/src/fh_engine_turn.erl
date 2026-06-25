@@ -35,6 +35,8 @@
 -export([callback_mode/0, init/1, terminate/3]).
 -export([running/3, qa/3]).
 -export([base_components/1]).
+%% exported for the Phase-B wiring smoke (no-PG integration of the per-property turn):
+-export([property_components/1, two_path_stored_leaf/2]).
 
 %% Mode-A base turn: the resolver/agent components in DAG (topological) order. The
 %% per-property components (property_assessment, buying_strategy, due_diligence,
@@ -149,11 +151,19 @@ running(internal, step, #{components := [Comp | Rest]} = Data) ->
             %% resolver half too, so commit must compute it identically. The commit
             %% re-validates the re-attached leaf (fail-closed); a leaf that was gate-valid
             %% when first committed passes again (Wedge-1a cards are post-bilingual-gate).
-            case maps:get(kind, Data, base) of
-                base_resolver ->
+            %% REUSE the stored agent leaf (resolver-only, no sidecar/LLM/usage) vs run the
+            %% sidecar (fresh agent fill). Reuse when the agent judgment is already decided:
+            %%   - base_resolver: the plan-card-refresh sweep (stored leaf from existing_outcomes);
+            %%   - a `property` turn refreshing a scope:both two-path component whose base outcome is
+            %%     in the seed (e.g. tax_structure — the entity was decided at base; the per-property
+            %%     turn refreshes only its resolver figures off the per-property cash flow).
+            %% Run the sidecar when the agent leaves are fresh: a base full turn, or a per-property
+            %% component with no base outcome in the seed (e.g. property_assessment — rent/valuation
+            %% for THIS property genuinely needs the agent).
+            case two_path_stored_leaf(Data, Comp) of
+                {reuse, Existing} ->
                     {RO, Renderer, KbVersions} =
                         fh_engine_fill:resolver(Name, Data, maps:get(outcomes, Data)),
-                    Existing = maps:get(Name, maps:get(existing_outcomes, Data, #{}), #{}),
                     AgentValues = fh_engine_fill:agent_values_from_outcome(Name, Existing),
                     Final = fh_engine_fill:merge_agent(Name, RO, AgentValues),
                     case commit(Comp, <<"two_path">>, Renderer, KbVersions, Final, Data) of
@@ -164,7 +174,7 @@ running(internal, step, #{components := [Comp | Rest]} = Data) ->
                             fail(Data, <<"compliance_block">>, gate_detail(G)),
                             {stop, normal, Data}
                     end;
-                _ ->
+                fresh ->
                     {RO, Renderer, KbVersions} =
                         fh_engine_fill:resolver(Name, Data, maps:get(outcomes, Data)),
                     Port = start_fill_port(Comp, Data, RO),
@@ -480,6 +490,29 @@ order(BlueprintSlug, Names) ->
     ByName = maps:from_list([{maps:get(<<"name">>, C), C} || C <- All]),
     [maps:get(N, ByName) || N <- Names, maps:is_key(N, ByName)].
 
+%% Decide whether a two-path component reuses its stored agent leaf (resolver-only refresh, no
+%% sidecar/LLM/usage) or runs the sidecar for a fresh agent fill:
+%%   - base_resolver: always reuse — the plan-card-refresh sweep (stored leaf keyed by component
+%%     name in existing_outcomes);
+%%   - property turn: reuse iff the component's outcome_type is already in the seed (a scope:both
+%%     two-path component whose agent judgment was decided at base — e.g. tax_structure's entity);
+%%     a per-property component with no base outcome (property_assessment) is a fresh agent fill;
+%%   - base (full) turn: always fresh (the sidecar authors the agent leaves).
+two_path_stored_leaf(Data, Comp) ->
+    Name = maps:get(<<"name">>, Comp),
+    case maps:get(kind, Data, base) of
+        base_resolver ->
+            {reuse, maps:get(Name, maps:get(existing_outcomes, Data, #{}), #{})};
+        property ->
+            OutcomeType = maps:get(<<"outcome_type">>, Comp, Name),
+            case maps:get(OutcomeType, maps:get(outcomes, Data), undefined) of
+                undefined -> fresh;
+                Existing  -> {reuse, Existing}
+            end;
+        _ ->
+            fresh
+    end.
+
 %% The fill path of a base component (mortgage-finance-two-path.md §2): empty
 %% `agent_leaves` → resolver (in-process); non-empty + a resolver exists → two_path
 %% (resolver figures + agent leaves, Erlang-merged); non-empty + no resolver → agent
@@ -530,11 +563,16 @@ property_components(<<"investor-domestic-au">> = Slug) ->
     %% Slice B1/B3a: yield_modelling re-fills per-property — its resolver branches on the
     %% property_fit_investor now in upstream and computes the banded cash_flow_projection.
     %% Slice B3b: cash_position re-fills per-property — the cash-to-complete off the exact price.
+    %% Slice B2: tax_structure re-fills per-property — RESOLVER-ONLY (the entity agent leaf was
+    %% decided at base, re-attached from the seed by two_path_stored_leaf/2; no sidecar/LLM/usage),
+    %% refreshing the rent/income-dependent tax figures (negative gearing, after-tax cash flow) off
+    %% the per-property cash_flow_projection. It runs AFTER yield_modelling (reads its cash flow)
+    %% and BEFORE cash_position/disposition (they read its refreshed CGT determinants).
     %% Slice B3c: disposition re-fills per-property — price-aware (the attached price drives the
     %% dispose figures); reads cash_position (acquire) + yield_modelling (hold) for the full horizon.
-    %% order/2 keeps the canonical order (property_assessment → yield_modelling → cash_position →
-    %% disposition); each reads property_fit_investor (in upstream after property_assessment).
-    order(Slug, [<<"property_assessment">>, <<"yield_modelling">>,
+    %% order/2 keeps the canonical order (property_assessment → yield_modelling → tax_structure →
+    %% cash_position → disposition); each reads property_fit_investor (in upstream after property_assessment).
+    order(Slug, [<<"property_assessment">>, <<"yield_modelling">>, <<"tax_structure">>,
                  <<"cash_position">>, <<"disposition">>]);
 property_components(_Slug) ->
     [].

@@ -593,8 +593,9 @@ full-stack live, EN+VI, against real Opus.**
 
 ## Phase B — per-property build plan (the `property_assessment` keystone)
 
-**Status: Slice A + B0/B1 + B3a/B3b/B3c LIVE-PROVEN 2026-06-25 (full-stack, real Opus); Slice B2
-(tax) + the other per-property components deferred.** The per-property financial spine now computes
+**Status: Slice A + B0/B1 + B2 + B3a/B3b/B3c DONE 2026-06-25 (B0/B1/B3* full-stack live-proven; B2
+proven deterministically below the live LLM — the full-stack seam is environment-blocked, see B2
+note); the other per-property components deferred.** The per-property financial spine now computes
 end-to-end for an attached property (acquire → hold → dispose), gated only by the regulated CGT
 `to_verify`. The base spine (P5) owns every property-agnostic
 figure; Phase B is what a *specific property* unblocks. Grounded against the live engine: the artifact
@@ -651,14 +652,19 @@ per-property namespace. So Phase B is greenfield *runtime* on an already-compile
     to a tax agent), so `cgt → null → net_proceeds → null → full_horizon → null`. This is the correct
     ASIC-safe posture, not a gap. So B3c delivered property-specific dispose figures, not "the full-horizon
     computes" (which is structurally `to_verify` until the clawback posture changes).
-  - **B2 — `tax_structure` income/cash-flow tax figures.** Now unblocked by B3a's cash flow: `negative_
-    gearing_active`, `annual_tax_refund_year_1`, `after_tax_cash_flow_*` (= cash flow × marginal rate). The
-    **ATO brackets KB doc already EXISTS** (`kb.tax.income-tax-resident-2025-26`, full table — the "unauthored"
-    note was stale), so no KB authoring. **Single-owner:** the profile owns `applicants[].tax.marginal_rate`
-    (`derived_from taxable_income`); `tax_structure` PLACES it into `cgt_marginal_rate`. Caveat: income arrives
-    on a **refine turn** (null at property-attach → honest-partial), and `disposition` CGT stays `to_verify`
-    while `cost_base_depreciation_clawback = true` regardless of the rate. Also closes the entity-cost
-    banded↔scalar seam (`setup_costs`/`annual_compliance_cost`, now `money_range`).
+  - **B2 — `tax_structure` income/cash-flow tax figures — DONE 2026-06-25** (detail below). Unblocked by
+    B3a's cash flow: `negative_gearing_active`, `cgt_marginal_rate`, `annual_tax_refund_year_1`,
+    `after_tax_cash_flow_*` (= cash flow × marginal rate). The **ATO brackets KB doc already EXISTS**
+    (`kb.tax.income-tax-resident-2025-26`, full table — the "unauthored" note was stale), so no KB authoring.
+    **Owner:** `tax_structure` owns `cgt_marginal_rate` (computed from `profile.assessable_income` via the new
+    `fh_engine_mortgage:marginal_rate/1`, reusing the schedule-indexing module that owns the TAX anchor);
+    `disposition` reads it. **Honest-partial:** `negative_gearing_active` lights up off yield's per-property
+    cash flow (true iff geared at a loss; null never false — depreciation QS-deferred); the money figures need
+    income, which arrives on a **refine turn** (null at property-attach), and `disposition` CGT stays
+    `to_verify` while `cost_base_depreciation_clawback = true` regardless of the rate. **NOT in scope (revised
+    from the plan):** the entity-cost `setup_costs`/`annual_compliance_cost` are entity-dependent (class b),
+    not rent-dependent — left null/scalar, deferred to an entity-cost unit. The announced NG reform flag has
+    no outcome field → flagged as a separate blueprint-schema + renderer unit.
 - **Deferred by trigger:** #5 and the real property *sources* (URL-paste = CLAUDE.md item 9; curator push =
   item 8). Slice A proves the contract with a **hand-fed normalized property_card** in a harness — exactly
   how the onboarding turn was proven (`investor_seam_smoke` feeds inputs). The engine's contract is "given a
@@ -870,6 +876,68 @@ after-tax cash flow; needs income on a refine turn for the marginal rate), the o
 components, the real property *sources*. **The per-property financial spine is now complete end-to-end**
 (attach → cash-to-complete + banded cash flow + property-specific dispose), the only gap being the
 regulated CGT `to_verify`.
+
+### Slice B2 — `tax_structure` income/cash-flow tax figures — DONE (2026-06-25)
+
+**The income/cash-flow tax figures, refreshed per-property.** `tax_structure` now computes its rent/income-
+dependent figures (class a): `negative_gearing_active`, `cgt_marginal_rate`, `annual_tax_refund_year_1`,
+`after_tax_cash_flow_year_1`/`_per_week`. Each is honest-partial on its inputs:
+- **`negative_gearing_active`** PLACES yield's gearing classification (`is_positive_neutral_or_negative_
+  geared_pre_tax`) — `true` iff `negative`, else **`null` never `false`** (depreciation is QS-deferred →
+  a cash-positive property can still be tax-negative, so the tax position is undetermined). Lights up on the
+  per-property turn (needs only the cash flow).
+- **`cgt_marginal_rate`** (scalar `percentage`) — computed from `profile.assessable_income` via the new
+  exported `fh_engine_mortgage:marginal_rate/1` (bracket marginal % + 2% Medicare above the low-income
+  threshold), reusing `find_band`/the TAX anchor the one schedule-owning module holds. `tax_structure` owns
+  it; `disposition` reads it (no second computer). **Null until income** — plan-first onboarding carries none,
+  so it lands on a refine turn (the same honest-partial as borrowing capacity).
+- **the after-tax trio** (bands, retyped `money → money_range` in the outcome_schema — the B0 banded surface,
+  since they derive from the banded cash flow): `after_tax = Cf × (1 − r)`; `refund = −r × Cf`. Computed only
+  when negatively geared AND the rate is known; depreciation is excluded from the loss (QS-deferred) →
+  understates the refund → more-negative after-tax = the conservative direction. Every figure resolver-
+  computed, removed from the LLM's reach (§98).
+
+**The runtime wiring (the part that made B2 reach a real turn).** Grounding found `tax_structure` was NOT in
+the Phase-B `property_components` set — so it never re-ran per-property and B2 would have been inert ("build
+green ≠ loaded/selected"). Fix: add `tax_structure` to the set in canonical order (PA → yield → **tax** →
+cash → disposition). But it's two-path (the entity agent leaf), and the entity is a **base** judgment, not
+per-property — re-invoking the sidecar per-property would waste a call and risk drift. So the turn's two-path
+handling now decides reuse-vs-fresh via `two_path_stored_leaf/2`: on a `property` turn a two-path component
+whose outcome_type is already in the base seed (tax_structure, scope:both) **reuses the stored entity**
+(resolver-only refresh — re-run the resolver over the per-property cash flow, re-attach the entity via
+`agent_values_from_outcome → merge_agent`, **no sidecar/LLM/usage**), while a per-property component with no
+base outcome (`property_assessment`) runs the agent. base_resolver keeps reusing from `existing_outcomes`;
+base/other stay fresh.
+
+**Two stale comments corrected in-flight:** the "ATO brackets KB UNAUTHORED" note (`income-tax-resident-2025-
+26` exists, Mode-A-authored, explicitly reusable by C/D), and the class-(b) deferral framing (setup_costs/
+annual_compliance_cost are entity-dependent, out of B2's rent scope — left null/scalar). **One flag, not
+silent scope:** the announced NG reform (limited to new builds 1 Jul 2027; an established post-Budget purchase
+loses the wage offset) has no outcome field — a separate blueprint-schema + renderer unit, material to the
+wedge's own target case.
+
+**Verified.** `tax_structure_conformance` **61/61** (39 base + 22 B2: drives the REAL `yield_modelling`
+producer for a negatively-geared house, then exercises no-income → gearing lights up / money figures null,
+income → `marginal_rate(120000)=32`, refund/after-tax bands = `Cf × (1−r)` / `−r × Cf`, positive-geared →
+`negative_gearing_active` null never false). New no-PG **`phase_b_wiring_smoke` 16/16** proves the Phase-B
+machinery below the live LLM: the DAG position (tax after yield, before cash/disposition), the reuse-vs-fresh
+decision matrix (`two_path_stored_leaf/2`), and the reuse-refresh composition (entity reused + figures
+refreshed off the per-property cash flow — replicating the gen_statem reuse branch exactly). Regression all
+green: `yield` 67, `cash_position_investor` 43, `disposition` 87, FHB `cash_duty` 28, `outcome` 25+11,
+`resolver` lockstep, python `outcome_validate` 36; `base_turn_order`/`refine`/`simulate` smokes (the
+base_resolver/resolver-only paths the two-path refactor touches) green; `rebar3 compile` + `erlang-checker`
+clean; artifact recompiled (3 fields → `money_range`).
+
+**Full-stack seam — environment-blocked, NOT a B2 regression.** `property_assessment_seam` fails today at
+`property_assessment`'s **live-LLM** rent band coming back `null` (line 144) — and the **committed baseline
+(d18659b) fails identically** when re-run, so the block is a live-sidecar/Anthropic-environment issue
+independent of B2 (the same flaky/degraded live fill the B3c note observed). Per proportionate verification,
+B2's per-property wiring is proven at the layer below the live model (the wiring smoke + the unit conformance
+driving the real producer). **Residue to close when the live sidecar recovers:** re-run
+`property_assessment_seam` (now expects **23 events** — 5 components; tax_structure adds gate×3 + filled, NO
+usage since it's resolver-only) to confirm the gen_statem end-to-end (the addendum carries `tax_structure`
+with `fill_path=two_path`, the reused entity, and `negative_gearing_active` off the live cash flow). The seam
+assertions are already in place.
 
 ## Deferred out (honest — first-exercising instance is Mode B/D, not here)
 

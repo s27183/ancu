@@ -28,7 +28,8 @@
 -export([recommended_path/1, has_fhg/1, loan_structure_base/0, key_assumptions/2,
          pre_approval_action_plan/0]).
 %% exported for the serviceability conformance suite:
--export([borrowing_capacity/1, income_tax/1, hecs_repayment/1, net_annual_income/1]).
+-export([borrowing_capacity/1, income_tax/1, hecs_repayment/1, net_annual_income/1,
+         marginal_rate/1]).
 
 -define(SERVICEABILITY, <<"kb.lender.serviceability-basics">>).
 -define(HEM,    <<"kb.lender.hem-living-expenses">>).
@@ -365,6 +366,24 @@ income_tax(Income) ->
                 + num(maps:get(<<"marginal_rate_pct">>, B, 0)) / 100
                   * (Income - num(maps:get(<<"marginal_over">>, B, 0)))
     end.
+
+%% the marginal tax rate (%) on the next dollar of income, INCLUDING the Medicare levy —
+%% the rate at which a rental loss is refunded (negative gearing) and a discounted capital
+%% gain is taxed (CGT). The 2025-26 resident bracket marginal rate + the 2% Medicare levy
+%% (applied above the low-income phase-in; 0 below it, where the levy phases out and the
+%% refund is immaterial). Schedule indexing stays in the one module that owns the TAX anchor
+%% (kb.tax.income-tax-resident-2025-26); tax_structure / disposition read this, never re-index.
+-spec marginal_rate(number()) -> number().
+marginal_rate(Income) when is_number(Income) ->
+    Bracket = case find_band(Income, lookup_entries(?TAX, <<"resident_rates_2025_26">>)) of
+                  none -> 0;
+                  B    -> num(maps:get(<<"marginal_rate_pct">>, B, 0))
+              end,
+    Medicare = case Income > sparam(?TAX, <<"medicare_low_income_single_threshold">>) of
+                   true  -> sparam(?TAX, <<"medicare_levy_pct">>);
+                   false -> 0
+               end,
+    Bracket + Medicare.
 
 %% HECS compulsory repayment from the income-contingent schedule (kb.hecs lookup);
 %% included only when a balance exists (the drag scales with income, not balance).

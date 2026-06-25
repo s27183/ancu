@@ -91,8 +91,8 @@ main(_) ->
     %% --- persisted log is the SOT: base + 11 Phase-B events ---
     EventCount = scalar("SELECT count(*) FROM plan_card_events WHERE plan_card_id = $1",
                         [PlanCardId]),
-    expect(EventCount =:= BaseLen + 19,
-           "Phase-B added 19 events (1 + PA[3+1+usage] + yield[3+1] + cash[3+1] + disposition[3+1] + 1)"),
+    expect(EventCount =:= BaseLen + 23,
+           "Phase-B added 23 events (1 + PA[3+1+usage] + yield[3+1] + tax[3+1] + cash[3+1] + disposition[3+1] + 1)"),
 
     %% --- per-property compliance audit: 3 rows for property_assessment, all clear, two_path,
     %%     ASIC boundary_held (property_assessment is advice_adjacent — it carries a viability verdict) ---
@@ -242,6 +242,42 @@ main(_) ->
               [IncLo, IncHi, OpLo, OpHi, GrossYield,
                maps:get(<<"net_yield_pre_loan">>, Cfp)]),
 
+    %% --- Slice B2: tax_structure re-filled per-property in the SAME Phase-B turn — RESOLVER-ONLY
+    %%     (the entity agent leaf reused from the base seed, NO sidecar/LLM/usage), refreshing the
+    %%     rent/income-dependent tax figures off the per-property cash_flow_projection ---
+    TxEntry = maps:get(<<"tax_structure">>,
+                       maps:get(<<"components">>, Addendum, #{}), undefined),
+    expect(is_map(TxEntry), "tax_structure snapshotted under the addendum (Slice B2)"),
+    expect(maps:get(<<"fill_path">>, TxEntry) =:= <<"two_path">>,
+           "tax_structure fill_path=two_path (resolver-only refresh, entity re-attached)"),
+    Tx = maps:get(<<"outcome">>, TxEntry),
+    %% the entity is REUSED from the base (decided at base, not re-derived per-property → no usage).
+    BaseTax = maps:get(<<"tax_structure">>, BaseComponents, #{}),
+    BaseEntity = maps:get(<<"recommended_entity">>, maps:get(<<"outcome">>, BaseTax, #{}), undefined),
+    expect(maps:get(<<"recommended_entity">>, Tx) =:= BaseEntity,
+           "recommended_entity reused from the base seed (no sidecar re-derivation)"),
+    %% negative gearing lights up off the per-property cash flow (true when geared at a loss; null
+    %% never false — depreciation is QS-deferred). Live cash-flow sign varies → accept true|null.
+    expect(lists:member(maps:get(<<"negative_gearing_active">>, Tx), [true, null]),
+           "negative_gearing_active ∈ {true, null} (placed off yield's gearing; never asserted false)"),
+    %% the money figures stay null — onboarding carries no income, so the marginal rate is uncaptured
+    %% (the same honest-partial as borrowing capacity; they light up on a refine turn with income).
+    expect(maps:get(<<"cgt_marginal_rate">>, Tx) =:= null,
+           "cgt_marginal_rate null (no income at onboarding → refine turn)"),
+    expect(maps:get(<<"annual_tax_refund_year_1">>, Tx) =:= null,
+           "annual_tax_refund_year_1 null (marginal rate uncaptured)"),
+    expect(maps:get(<<"after_tax_cash_flow_year_1">>, Tx) =:= null,
+           "after_tax_cash_flow_year_1 null (marginal rate uncaptured)"),
+    expect(maps:get(<<"cgt_discount_eligible">>, Tx) =:= true,
+           "cgt_discount_eligible = true (resolver constant, recomputed on the refresh)"),
+    %% base tax_structure untouched (the per-property fill went to the addendum, not base).
+    expect(maps:get(<<"negative_gearing_active">>, maps:get(<<"outcome">>, BaseTax, #{}), null) =:= null,
+           "base tax_structure still null (addendum did not leak into base)"),
+    io:format("live tax_structure: entity=~p negative_gearing=~p cgt_marginal_rate=~p~n",
+              [maps:get(<<"recommended_entity">>, Tx),
+               maps:get(<<"negative_gearing_active">>, Tx),
+               maps:get(<<"cgt_marginal_rate">>, Tx)]),
+
     %% --- Slice B3b: cash_position re-filled per-property in the SAME Phase-B turn — the
     %%     cash-to-complete POINT figures off the exact price (scalar money, not banded) ---
     CpEntry = maps:get(<<"cash_position">>,
@@ -300,12 +336,14 @@ main(_) ->
     io:format("~n==== PROPERTY_ASSESSMENT SEAM (Slice A + B1/B3a yield + B3b cash + B3c disposition): ALL ASSERTIONS PASSED ====~n"),
     halt(0).
 
-%% The Phase-B turn (Slice A + B1/B3a + B3b + B3c): four components, in DAG order.
+%% The Phase-B turn (Slice A + B1/B3a + B2 + B3b + B3c): five components, in DAG order.
 %%   property_assessment (two_path) → 3 gate, 1 filled, 1 usage (the sidecar fill)
 %%   yield_modelling     (resolver) → 3 gate, 1 filled       (no sidecar, no usage — §98 figure-owner)
+%%   tax_structure       (two_path) → 3 gate, 1 filled       (resolver-only refresh — entity reused
+%%                                                            from the seed, NO sidecar/LLM/usage)
 %%   cash_position       (resolver) → 3 gate, 1 filled       (no sidecar, no usage)
 %%   disposition         (resolver) → 3 gate, 1 filled       (no sidecar, no usage)
-%% wrapped by turn_started/turn_completed. 1 + (3+1+1) + (3+1) + (3+1) + (3+1) + 1 = 19.
+%% wrapped by turn_started/turn_completed. 1 + (3+1+1) + (3+1) + (3+1) + (3+1) + (3+1) + 1 = 23.
 expected_phase_b() ->
     Gates = [<<"compliance_gate">>, <<"compliance_gate">>, <<"compliance_gate">>],
     CF = <<"component_filled">>,
@@ -313,6 +351,7 @@ expected_phase_b() ->
       [<<"turn_started">>,
        Gates, CF, <<"usage">>,   %% property_assessment (two_path)
        Gates, CF,                %% yield_modelling     (resolver — banded cash_flow_projection)
+       Gates, CF,                %% tax_structure       (two_path resolver-only — tax figures refresh)
        Gates, CF,                %% cash_position       (resolver — cash-to-complete)
        Gates, CF,                %% disposition         (resolver — price-aware dispose figures)
        <<"turn_completed">>]).

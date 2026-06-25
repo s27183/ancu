@@ -642,9 +642,9 @@ The `mortgage_plan` outcome feeds `yield_modelling.loan_costs` (the loan cost ca
   "fields": {
     "recommended_entity": "enum",
     "negative_gearing_active": "bool",
-    "annual_tax_refund_year_1": "money",
-    "after_tax_cash_flow_year_1": "money",
-    "after_tax_cash_flow_per_week": "money",
+    "annual_tax_refund_year_1": "money_range",
+    "after_tax_cash_flow_year_1": "money_range",
+    "after_tax_cash_flow_per_week": "money_range",
     "total_depreciation_year_1": "money",
     "cgt_discount_eligible": "bool",
     "cgt_marginal_rate": "percentage",
