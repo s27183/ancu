@@ -7,10 +7,10 @@
 
 -export([init/2]).
 
-%% Wedge 1 targets Mode A only (CLAUDE.md). Mode is a DERIVED label; for a domestic
-%% FHB onboarding it is 'A' and the blueprint is fhb-domestic-au.
--define(BLUEPRINT, <<"fhb-domestic-au">>).
--define(MODE, <<"A">>).
+%% Mode is a DERIVED label; the blueprint is selected by the onboarding `intent` axis
+%% (engine-contract §9.1). Both domestic modes are in scope (mode-c-wedge.md P5-activate):
+%% owner_occupier → Mode A / fhb-domestic-au; investment → Mode C / investor-domestic-au.
+%% The foreign modes (B/D) are deferred. FIRB is false for both (domestic).
 
 init(Req0, State) ->
     case cowboy_req:method(Req0) of
@@ -36,15 +36,17 @@ handle_post(Req0, State) ->
 
 create(T, U, Params, Req, State) ->
     Intent = intent_of(Params),
+    {Blueprint, Mode} = blueprint_for(Intent),
     %% Onboarding inputs become the initial household fact base (slice 2's
-    %% buyer_profile fill enriches it). Mode A enters via a non-foreign lead.
+    %% buyer_profile / investor_profile fill enriches it). Both domestic modes enter via
+    %% a non-foreign lead (firb false; the per-applicant derivation runs in the profile fill).
     Facts = #{
         <<"onboarding">> => Params,
         <<"derived">> => #{<<"firb_required_any">> => false}
     },
     {ok, ProfileId} = fh_engine_store:create_profile(T, U, Facts),
     {ok, PlanCardId} = fh_engine_store:create_plan_card(
-        T, ProfileId, ?BLUEPRINT, Intent, ?MODE, #{}),
+        T, ProfileId, Blueprint, Intent, Mode, #{}),
     TurnId = fh_engine_util:uuid4(),
     ok = fh_engine_turn_registry:reserve(PlanCardId, TurnId),
     {ok, _Pid} = fh_engine_turn_sup:start_turn(#{
@@ -52,8 +54,8 @@ create(T, U, Params, Req, State) ->
         user_id => U,
         plan_card_id => PlanCardId,
         turn_id => TurnId,
-        blueprint_slug => ?BLUEPRINT,
-        mode => ?MODE,
+        blueprint_slug => Blueprint,
+        mode => Mode,
         intent => Intent,
         firb_required_any => false,
         %% Onboarding inputs ground the base turn's buyer_profile fill (constraint
@@ -70,3 +72,8 @@ intent_of(Params) ->
         <<"investment">> -> <<"investment">>;
         _ -> <<"owner_occupier">>
     end.
+
+%% Select the blueprint + derived mode label from the intent axis (mode-c-wedge.md
+%% P5-activate). owner_occupier → Mode A; investment → Mode C. Both domestic / in scope.
+blueprint_for(<<"investment">>) -> {<<"investor-domestic-au">>, <<"C">>};
+blueprint_for(_)                -> {<<"fhb-domestic-au">>, <<"A">>}.

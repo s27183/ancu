@@ -55,6 +55,22 @@
          <<"cash_position">>, <<"ownership_planning">>, <<"disposition">>,
          <<"purchase_journey">>, <<"preparation">>, <<"phase_playbook">>]).
 
+%% Mode-C (investor-domestic-au) base turn — the property-AGNOSTIC investor spine in DAG
+%% order. EXCLUDES the per-property components (property_assessment, buying_strategy,
+%% due_diligence, settlement_prep — all read property_fit_investor, absent at base). The
+%% order is DISCRIMINATOR-load-bearing, not merely topological: the three shared-name
+%% modules sniff the accumulated upstream (keyed by outcome_type) to pick their investor
+%% branch, so each must run AFTER the component producing its discriminating outcome:
+%%   - mortgage_finance keys on `strategy_thesis` present → after investment_strategy;
+%%   - cash_position keys on `tax_optimised_structure` present → after tax_structure;
+%%   - disposition keys on `tax_optimised_structure` present (cgt_investor path) → after
+%%     tax_structure (+ budget_envelope_investor → after cash_position).
+%% (Mode C has no purchase_journey/preparation/phase_playbook — those are FHB-only.)
+-define(BASE_COMPONENTS_INVESTOR,
+        [<<"investor_profile">>, <<"investment_strategy">>, <<"mortgage_finance">>,
+         <<"yield_modelling">>, <<"tax_structure">>, <<"cash_position">>,
+         <<"ownership_planning_investor">>, <<"disposition">>]).
+
 -spec start_link(map()) -> gen_statem:start_ret().
 start_link(Args) ->
     gen_statem:start_link(?MODULE, Args, []).
@@ -425,15 +441,21 @@ fail(#{tenant_id := T, plan_card_id := PC, turn_id := Tn}, Code, Msg) ->
 %% the SINGLE source of the ordered base-resolver DAG: the simulate preview
 %% (fh_engine_simulate) walks this same list, so the turn and the preview can never
 %% drift on which components run or in what order (engine-contract §10.1).
-%% BlueprintSlug selects which blueprint's component definitions to fetch; the base
-%% SET+ORDER is still the Mode-A ?BASE_COMPONENTS sequence — correct for fhb-domestic-au,
-%% the only blueprint that creates base turns until P5 onboarding-dispatch makes investor
-%% cards. Deriving a per-blueprint base sequence (from the blueprint's `scope` table)
-%% lands in P5, where an investor base turn can verify it end-to-end (mode-c-wedge.md P3/P5).
-base_components(BlueprintSlug) ->
+%% BlueprintSlug selects BOTH the blueprint's component definitions AND the per-blueprint
+%% base SET+ORDER (P5-activate, mode-c-wedge.md): fhb-domestic-au → the Mode-A sequence;
+%% investor-domestic-au → the Mode-C investor spine (the discriminator-ordered set above).
+%% The base set+order is an engine-owned concern (these macros, not the artifact) — the
+%% blueprint declares dag_reads, not the base/per-property split. An unknown slug falls
+%% through to the FHB sequence (the only blueprint that created base turns pre-P5).
+base_components(<<"investor-domestic-au">> = Slug) ->
+    order(Slug, ?BASE_COMPONENTS_INVESTOR);
+base_components(Slug) ->
+    order(Slug, ?BASE_COMPONENTS).
+
+order(BlueprintSlug, Names) ->
     {ok, All} = fh_engine_kb:components(BlueprintSlug),
     ByName = maps:from_list([{maps:get(<<"name">>, C), C} || C <- All]),
-    [maps:get(N, ByName) || N <- ?BASE_COMPONENTS, maps:is_key(N, ByName)].
+    [maps:get(N, ByName) || N <- Names, maps:is_key(N, ByName)].
 
 %% The fill path of a base component (mortgage-finance-two-path.md §2): empty
 %% `agent_leaves` → resolver (in-process); non-empty + a resolver exists → two_path

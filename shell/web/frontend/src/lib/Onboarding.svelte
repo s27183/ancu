@@ -1,13 +1,14 @@
 <script lang="ts">
     // The onboarding sheet (8-S3b): entered from a map suburb's planning tab, so the
     // state + zone arrive pre-filled (plan cards pin to a zone, §7). It captures the
-    // Wedge-1a Mode-A set — a mode-qualifying gate (citizen/PR + first home,
-    // constraint #10) then a target budget band — and POSTs the plan-first payload
+    // domestic set — the intent choice (owner_occupier → Mode A / investment → Mode C),
+    // a mode-qualifying gate (citizen/PR, plus first-home for owner-occupiers only,
+    // constraint #10), then a target budget band — and POSTs the plan-first payload
     // (constraint #1). Mobile-native: one decision per step, big tap targets, the
     // primary action in the thumb zone, calm terminal states (§7.1). The base plan
     // itself renders later, in the Plan tab (8-S4).
     import { createPlanCard } from '$lib/api';
-    import { BUDGET_BANDS, buildOnboardingInput, type BudgetBand } from '$lib/onboarding';
+    import { BUDGET_BANDS, buildOnboardingInput, type BudgetBand, type Intent } from '$lib/onboarding';
     import { t } from '$lib/i18n';
     import { lang } from '$lib/stores/lang';
 
@@ -21,13 +22,25 @@
         oncreated: () => void;
     } = $props();
 
+    let intent = $state<Intent | null>(null);
     let citizenPr = $state<boolean | null>(null);
     let firstHome = $state<boolean | null>(null);
     let band = $state<BudgetBand | null>(null);
     let phase = $state<'form' | 'submitting' | 'created' | 'auth' | 'error'>('form');
 
-    const gateAnswered = $derived(citizenPr !== null && firstHome !== null);
-    const eligible = $derived(citizenPr === true && firstHome === true);
+    // The gate branches on intent (mode-c-wedge.md P5-activate): owner_occupier still
+    // requires a first-home answer (Mode A); investment needs only citizen/PR (Mode C —
+    // first-home is meaningless for an investor). The "citizen/PR yes · not first home ·
+    // live-in" cell is the Mode-E next-home gap, out of scope (calm note, not an error).
+    const ooNeedsFirstHome = $derived(intent === 'owner_occupier');
+    const gateAnswered = $derived(
+        intent !== null && citizenPr !== null && (!ooNeedsFirstHome || firstHome !== null)
+    );
+    const eligible = $derived(
+        intent !== null &&
+            citizenPr === true &&
+            (intent === 'investment' || firstHome === true)
+    );
     const canSubmit = $derived(eligible && band !== null && phase === 'form');
 
     const nf = $derived(
@@ -44,10 +57,10 @@
     }
 
     async function submit() {
-        if (band === null) return;
+        if (band === null || intent === null) return;
         phase = 'submitting';
         const outcome = await createPlanCard(
-            buildOnboardingInput(stateCode, suburbName, suburbSal, band)
+            buildOnboardingInput(stateCode, suburbName, suburbSal, band, intent)
         );
         phase =
             outcome.kind === 'created' ? 'created'
@@ -81,7 +94,26 @@
         </div>
     {:else}
         <div class="ob-body">
-            <!-- Mode-A gate (constraint #10) — two taps. -->
+            <!-- Intent first — it decides which gate questions apply (P5-activate). -->
+            <fieldset class="gate">
+                <legend>{$t('onboarding.intent.label')}</legend>
+                <div class="choice">
+                    <button
+                        type="button"
+                        class:active={intent === 'owner_occupier'}
+                        aria-pressed={intent === 'owner_occupier'}
+                        onclick={() => (intent = 'owner_occupier')}>{$t('onboarding.intent.live')}</button
+                    >
+                    <button
+                        type="button"
+                        class:active={intent === 'investment'}
+                        aria-pressed={intent === 'investment'}
+                        onclick={() => (intent = 'investment')}>{$t('onboarding.intent.invest')}</button
+                    >
+                </div>
+            </fieldset>
+
+            <!-- Domestic gate (constraint #10) — citizen/PR applies to both modes. -->
             <fieldset class="gate">
                 <legend>{$t('onboarding.gate.citizen')}</legend>
                 <div class="choice">
@@ -100,27 +132,35 @@
                 </div>
             </fieldset>
 
-            <fieldset class="gate">
-                <legend>{$t('onboarding.gate.firsthome')}</legend>
-                <div class="choice">
-                    <button
-                        type="button"
-                        class:active={firstHome === true}
-                        aria-pressed={firstHome === true}
-                        onclick={() => (firstHome = true)}>{$t('onboarding.yes')}</button
-                    >
-                    <button
-                        type="button"
-                        class:active={firstHome === false}
-                        aria-pressed={firstHome === false}
-                        onclick={() => (firstHome = false)}>{$t('onboarding.no')}</button
-                    >
-                </div>
-            </fieldset>
+            {#if ooNeedsFirstHome}
+                <!-- First-home gate is Mode-A only — meaningless for an investor (Mode C). -->
+                <fieldset class="gate">
+                    <legend>{$t('onboarding.gate.firsthome')}</legend>
+                    <div class="choice">
+                        <button
+                            type="button"
+                            class:active={firstHome === true}
+                            aria-pressed={firstHome === true}
+                            onclick={() => (firstHome = true)}>{$t('onboarding.yes')}</button
+                        >
+                        <button
+                            type="button"
+                            class:active={firstHome === false}
+                            aria-pressed={firstHome === false}
+                            onclick={() => (firstHome = false)}>{$t('onboarding.no')}</button
+                        >
+                    </div>
+                </fieldset>
+            {/if}
 
             {#if gateAnswered && !eligible}
-                <!-- Out of Wedge-1a scope — calm, not an error (§7.1). -->
-                <p class="ob-note">{$t('onboarding.outofscope')}</p>
+                <!-- Out of scope — calm, not an error (§7.1). Two distinct reasons:
+                     foreign (Mode B/D) vs domestic next-home owner-occupier (Mode-E gap). -->
+                <p class="ob-note">
+                    {citizenPr === false
+                        ? $t('onboarding.outofscope.foreign')
+                        : $t('onboarding.outofscope')}
+                </p>
             {:else if eligible}
                 <fieldset class="budget">
                     <legend>{$t('onboarding.budget.label')}</legend>

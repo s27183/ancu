@@ -210,8 +210,8 @@ Status legend: `[ ]` not started · `[~]` drafting · `[v]` facts verified vs pr
 | [~] | P5-engine | `tax_structure` **two-path** — base-spine presence DONE (`fh_engine_fill` inline: resolver scaffold + `entity_structuring` agent leaf `recommended_entity`, live-verified; the two CGT-determinant **constants** `disposition` reads — `cgt_discount_eligible`/`cost_base_depreciation_clawback` = true; `data-table` + 6 Cluster-T anchors). Deferred to `property_assessment`: `cgt_marginal_rate` (needs an ATO-brackets KB doc + income), `setup_costs`/`annual_compliance_cost` (banded-vs-scalar seam), the 5 property/rent-dependent figures |
 | [~] | P5-engine | `cash_position` investor variant — base presence DONE (`fh_engine_cash:fill_investor/2`, branched on the `tax_optimised_structure` discriminator like `disposition`; **pure-resolver**, `agent_leaves []`). The compiled `budget_envelope_investor` is 9 point-summary figures, all honestly null at base (plan-first: no property, no savings); emits `calculator` + the 6 Cluster-Y/T cash anchors. Deferred to `property_assessment` (per-property): the property-price-dependent figures; `max_property_price_supported` → investor `mortgage_finance` capacity (unbuilt); HAVE-side → refine turn |
 | [~] | P5-engine | `ownership_planning_investor` — base presence DONE (`fh_engine_ownership:fill_investor/2`, a clean sibling on the UNIQUE name — no discriminator, FHB `fill/2` untouched; **pure-resolver**, `agent_leaves []`). **Honest-partial:** `annual_tax_obligations` (5, bilingual) + `alert_triggers_armed` (4 investor alerts, bilingual) filled from the 6 Cluster-S KB anchors via a new `kb.copy.ownership-investor` doc; the 6 post-acquisition figure fields null at base. **Producer half of the P4 `opportunities[]` seam CLOSED**: field added to the schema (recompiled), emitted `[]` at base (populates per-property); `annual_tax_obligations` retyped `array<localized_text>` (validator-enforced bilingual). Emits `data-table` (the reachable primary). Deferred: the 6 figure fields → `property_assessment`; the **consumer half** (shell renders only `renderers[0]`) → a shell unit |
-| [ ] | P5-activate | per-blueprint `base_components/1` sequence (the P3 follow-on — derive the investor base set + DAG order, replacing the Mode-A `?BASE_COMPONENTS` macro) |
-| [ ] | P5-activate | Onboarding **dispatch** (`fh_engine_h_plan_cards.erl` selects blueprint by `intent`) **+** **intent picker** (`onboarding.ts`), atomic-last |
+| [x] | P5-activate | per-blueprint `base_components/1` sequence — `?BASE_COMPONENTS_INVESTOR` (8-component property-agnostic investor spine, DISCRIMINATOR-ordered) + a slug clause over a factored `order/2`; FHB macro byte-identical. Verified: `base_components_investor_conformance.escript` 19/19 (set+order, per-property excluded, FHB unchanged, DAG-walk proves each shared-name discriminator fires investor-side) |
+| [x] | P5-activate | Onboarding **dispatch** (`fh_engine_h_plan_cards:blueprint_for/1` selects blueprint+mode by `intent`) **+** **intent picker** (`Onboarding.svelte` gate reshape — intent first, first-home gate owner-occupier-only, branched out-of-scope copy; `buildOnboardingInput` threads intent), atomic-last. Mode-E next-home gap logged |
 
 **P2 COMPLETE (2026-06-24).** Two free repoints + the investor CGT branch, all committable now (no
 deploy until P3). **Repoints** in `investor-domestic-au.md`: `kb.investor.tax-brackets-2026` →
@@ -532,9 +532,60 @@ figure-owner spine is COMPLETE** (profile → strategy → mortgage → yield �
 disposition). **Next: P5-activate** (per-blueprint `base_components/1` sequence + onboarding dispatch by
 `intent` + intent picker, atomic-last) — the last step to make investor cards live.
 
+**P5-activate COMPLETE (2026-06-25) — investor cards are LIVE (the three wiring pieces, landed atomically).**
+The base figure-owner spine (P5-engine 1–7) was built but unreachable: nothing created investor base turns.
+P5-activate is the pure wiring that flips it on, all three pieces in one commit (the doc's **atomic-last**
+rule — a shell picker while the engine hardcodes `fhb` would be a silent-wrong rug).
+(1) **Base sequence** — `fh_engine_turn:base_components/1` now selects the base SET+ORDER by blueprint slug:
+a new `?BASE_COMPONENTS_INVESTOR` macro (the **8-component property-agnostic investor spine** — excludes the
+four per-property components that read `property_fit_investor`) + a slug clause over a factored `order/2`;
+the FHB macro is **byte-identical**. The order is **discriminator-load-bearing, not merely topological**: the
+three shared-name modules (`mortgage_finance`/`cash_position`/`disposition`) sniff the accumulated upstream
+(keyed by outcome_type) to pick their investor branch, so each must run AFTER the component producing its
+discriminating outcome (`strategy_thesis` before mortgage; `tax_optimised_structure` before cash + disposition;
+`budget_envelope_investor` before disposition). All 8 investor resolvers were already registered in
+`fh_engine_fill` (`has_resolver`/`resolver/3`) by P5-engine — **no fill edit needed**.
+(2) **Onboarding dispatch** — `fh_engine_h_plan_cards:blueprint_for/1` (new) maps the `intent` axis to
+{blueprint, mode}: `owner_occupier`→{fhb-domestic-au, A}, `investment`→{investor-domestic-au, C}; threaded
+through `create_plan_card` + `start_turn` (replacing the hardcoded `?BLUEPRINT`/`?MODE` macros). FIRB stays
+false for both (domestic; per-applicant derivation runs in the profile fill).
+(3) **Intent picker + gate reshape** — `Onboarding.svelte`: intent is now the FIRST choice and **reshapes the
+gate** — citizen/PR applies to both modes, the first-home gate is owner-occupier-only (meaningless for an
+investor), `eligible` = owner_occupier ? (citizenPr && firstHome) : citizenPr. Out-of-scope copy branches:
+`!citizenPr` → foreign (Mode B/D, deferred); `owner_occupier && !firstHome` → the **Mode-E next-home gap**
+(logged, see below). `buildOnboardingInput` threads the chosen intent; new bilingual i18n keys
+(`onboarding.intent.*`, `onboarding.outofscope.foreign`). **Verified:**
+`base_components_investor_conformance.escript` **19/19** (set+order = the 8-spine, per-property excluded, FHB
+byte-identical; a no-PG **DAG walk** through `fh_engine_fill:resolver/3` proves every outcome validates vs the
+investor registry AND each shared-name discriminator's key is present in the upstream BEFORE that component
+runs → each produces its investor shape: `io_vs_pi_recommendation`/`lmi_payable`/`taxable_gain`); regression —
+`base_turn_order_smoke` (FHB DAG + placements end-to-end), `mortgage_conformance` 23, `disposition` 79,
+`outcome` 21+11, all investor suites green; `rebar3 compile` + `erlang-checker` clean; shell — `svelte-autofixer`
+clean, `svelte-check` 0/0, `npm run build` green. Proportionate gap (deploy-pass): a full-stack LIVE investor
+onboarding turn (HTTP `intent=investment` → gen_statem walk + sidecar + PG + SSE) — the gen_statem/seam
+mechanism is blueprint-agnostic + FHB-proven, the two-path sidecar fills are per-component live-verified, and
+`blueprint_for/1` is a pure 2-clause map; the only unproven-in-integration link is the HTTP→turn glue.
+
 ## Deferred out (honest — first-exercising instance is Mode B/D, not here)
 
 `off_title_parties[]` (array vs A's scalar `non_buying_partner`), `visa_class`, off-title
 `funder{}`, and B/D publishing `firb_required_any` (the F14 close) ride **Mode B** — they have zero
 exercising instance in Mode C, and `facts_jsonb` makes their later addition migration-free. See
 [`fact-model-unification.md`](fact-model-unification.md) "Mode-C activation".
+
+## Mode-E gap (surfaced at P5-activate onboarding gate)
+
+The P5-activate intent gate (`Onboarding.svelte`) splits owner-occupier (still first-home-gated →
+Mode A) from investor (citizen/PR only → Mode C). That leaves one domestic cell **out of scope by
+construction**: *citizen/PR · NOT first-home · buying to live in* — a **repeat / next-home
+owner-occupier** (upsizer, downsizer, relocator). It maps to none of the four modes: Mode A is
+first-home-only (its FHB schemes — FHG, FHSS, first-home stamp-duty concessions — would assert
+benefits this buyer can't claim), and Mode C is the investor frame (yield / gearing / CGT / tax
+structure — wrong for a home to live in). Routing this segment to either blueprint produces wrong
+figures, so the gate correctly shows the calm "coming soon" out-of-scope note rather than forcing a
+mismatched plan.
+
+Closing it is a **new blueprint** — provisional **Mode E (domestic next-home owner-occupier)**:
+shaped like Mode A minus the first-home schemes, plus equity-from-current-home / bridging finance /
+CGT-on-sale-of-the-existing-home. It is a **roadmap decision, not a wedge task** — logged here so the
+gap is explicit, not silently wired around. No engine, blueprint, or KB work is in scope now.

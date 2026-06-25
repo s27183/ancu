@@ -71,6 +71,12 @@ const messages = {
 
     'onboarding.cta': { vi: 'Lập kế hoạch tại đây', en: 'Make a plan here' },
     'onboarding.title': { vi: 'Lập kế hoạch tại', en: 'Plan for' },
+    'onboarding.intent.label': {
+        vi: 'Bạn mua để ở hay để đầu tư?',
+        en: 'Are you buying to live in or to invest?'
+    },
+    'onboarding.intent.live': { vi: 'Để ở', en: 'To live in' },
+    'onboarding.intent.invest': { vi: 'Để đầu tư', en: 'As an investment' },
     'onboarding.gate.citizen': {
         vi: 'Bạn là công dân hoặc thường trú nhân Úc?',
         en: 'Are you an Australian citizen or permanent resident?'
@@ -79,11 +85,15 @@ const messages = {
         vi: 'Đây có phải ngôi nhà đầu tiên của bạn?',
         en: 'Is this your first home?'
     },
+    'onboarding.outofscope.foreign': {
+        vi: 'Hiện FirstHomey hỗ trợ công dân và thường trú nhân Úc. Trường hợp người mua ở nước ngoài sẽ sớm có.',
+        en: 'Right now FirstHomey supports Australian citizens and permanent residents. Foreign-buyer paths are coming soon.'
+    },
     'onboarding.yes': { vi: 'Có', en: 'Yes' },
     'onboarding.no': { vi: 'Không', en: 'No' },
     'onboarding.outofscope': {
-        vi: 'Hiện FirstHomey hỗ trợ người mua nhà lần đầu là công dân hoặc thường trú nhân Úc. Các trường hợp khác sẽ sớm có.',
-        en: 'Right now FirstHomey supports first-home buyers who are Australian citizens or permanent residents. Other paths are coming soon.'
+        vi: 'Để mua nhà để ở, hiện FirstHomey hỗ trợ người mua nhà lần đầu. Kế hoạch cho người đã từng sở hữu nhà sẽ sớm có.',
+        en: 'For buying a home to live in, FirstHomey currently supports first-home buyers. Plans for next-home buyers are coming soon.'
     },
     'onboarding.budget.label': { vi: 'Ngân sách mục tiêu (AUD)', en: 'Target budget (AUD)' },
     'onboarding.budget.note': {

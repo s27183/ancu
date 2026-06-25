@@ -1,11 +1,15 @@
-// Pure (framework-free) onboarding model — the Wedge-1a Mode-A capture set
-// (CLAUDE.md constraint #1 plan-first; shell-architecture.md §7). The map gives the
-// state + zone (plan cards pin to a zone); onboarding adds the mode-qualifying gate
-// + a target budget band. intent is fixed to owner_occupier — Mode A is a first-home
-// owner-occupier; investment is Mode C, out of Wedge-1a scope, so we don't ask it
-// (one fewer decision, §7.1). Unit-testable; no Svelte/DOM imports.
+// Pure (framework-free) onboarding model — the domestic capture set (CLAUDE.md
+// constraint #1 plan-first; shell-architecture.md §7). The map gives the state + zone
+// (plan cards pin to a zone); onboarding adds the intent choice (owner_occupier → Mode A
+// FHB; investment → Mode C domestic investor — mode-c-wedge.md P5-activate), a
+// mode-qualifying gate, and a target budget band. The chosen intent selects the engine
+// blueprint. Unit-testable; no Svelte/DOM imports.
 
 import type { OnboardingInput } from '$lib/api';
+
+/** The buying intent the gate branches on (engine-contract §9.1). owner_occupier still
+ *  requires a first-home answer (Mode A); investment does not (Mode C). */
+export type Intent = OnboardingInput['intent'];
 
 /** A target price range the buyer picks as a single tap (AUD). A band — not a free
  *  slider — keeps the choice to one low-cognitive-load decision (§7.1). The engine's
@@ -36,13 +40,14 @@ export function buildOnboardingInput(
     stateCode: string,
     suburbName: string,
     suburbSal: string,
-    band: BudgetBand
+    band: BudgetBand,
+    intent: Intent
 ): OnboardingInput {
     return {
         state: stateCode,
         target_price_range: [band.lo, band.hi],
         target_zone: [suburbName],
         target_sal: suburbSal,
-        intent: 'owner_occupier'
+        intent
     };
 }
