@@ -593,8 +593,10 @@ full-stack live, EN+VI, against real Opus.**
 
 ## Phase B — per-property build plan (the `property_assessment` keystone)
 
-**Status: Slice A LIVE-PROVEN 2026-06-25 (full-stack, real Opus); Slice B + the other per-property
-components deferred.** The base spine (P5) owns every property-agnostic
+**Status: Slice A + B0/B1 + B3a/B3b/B3c LIVE-PROVEN 2026-06-25 (full-stack, real Opus); Slice B2
+(tax) + the other per-property components deferred.** The per-property financial spine now computes
+end-to-end for an attached property (acquire → hold → dispose), gated only by the regulated CGT
+`to_verify`. The base spine (P5) owns every property-agnostic
 figure; Phase B is what a *specific property* unblocks. Grounded against the live engine: the artifact
 already carries `property_assessment`'s registry + the `property_fit_investor` outcome schema (validated
 when the investor blueprint went in-scope; all 6 KB anchors resolve). The codebase has Phase-B
@@ -622,11 +624,41 @@ per-property namespace. So Phase B is greenfield *runtime* on an already-compile
   the **Property + Overview tab** content. It defers the figure cluster cleanly behind "`property_fit_investor`
   now exists," and **does not force the banded↔scalar seam** (that bites only when `cash_flow_projection`
   consumes the rent range downstream).
-- **Slice B — the figure cluster (next): #4.** The rent-dependent figures + the banded↔scalar
+- **Slice B — the figure cluster: #4.** The rent-dependent figures + the banded↔scalar
   cross-contract decision. That decision ripples KB ↔ blueprint ↔ registry ↔ `disposition` consumer ↔
   `calculator` renderer — a docs-first, foundation-first sub-unit of its own (per
-  `foundation-first-for-cross-contract-reframe`). Deferring it out of Slice A is honest (the producer is
-  built; the consumers are a separate declared unit), not a rug.
+  `foundation-first-for-cross-contract-reframe`). **Sub-sliced:**
+  - **B0 (the seam) + B1 (the keystone arithmetic) — DONE 2026-06-25** (live-proven, below). B0 decided
+    the banded surface; B1 computes the per-property PRE-LOAN rent-economics.
+  - **B3a — the POST-loan cash flow — DONE 2026-06-25** (live-proven, below). **Resequenced ahead of B2:**
+    grounding showed B2's headline tax figures (negative gearing, tax refund, after-tax cash flow) hang
+    off `cash_flow_before_tax_year_1` — a POST-loan figure — so B2 sits *downstream* of the loan. The DAG
+    runs `yield_modelling`(4) BEFORE `cash_position`(6) (yield → tax → cash), so the cash-flow loan can't be
+    read from cash_position; `yield_modelling` owns a **representative leverage** assumption (price × KB LVR
+    × the investor rate, interest-only — = what mortgage_finance would compute per-property). Completes
+    `cash_flow_projection`: interest, before-tax cash flow (band, signed), per-week, net-post-loan yield,
+    year-5/10 projection, geared position.
+  - **B3b — `cash_position` per-property cash-to-complete — DONE 2026-06-25** (live-proven, below).
+    `actual_property_price`/`loan_amount`/`lvr`/`lmi_payable`/`total_cash_required` (price-point, scalar
+    `money` — NOT banded, the price is exact; same KB 80% LVR convention as B3a). `max_property_price_
+    supported` + the HAVE-side → honest-partial null (capacity/savings = refine facts).
+  - **B3c — `disposition` per-property — DONE 2026-06-25** (live-proven, below). Re-run disposition in
+    the Phase-B turn + **price-aware** (`property_price/2` prefers `property_fit_investor.price` over the
+    profile range). The dispose **gross** figures (sale_proceeds, selling_costs, taxable_gain, loan_payout)
+    now reflect the ATTACHED property. **Finding (the headline reframe):** the net/full-horizon does NOT
+    compute — `cgt_investor` returns `to_verify` whenever the marginal rate is null (income → refine/B2) OR
+    `cost_base_depreciation_clawback = true` (the conservative default — the KB defers the clawback dollar
+    to a tax agent), so `cgt → null → net_proceeds → null → full_horizon → null`. This is the correct
+    ASIC-safe posture, not a gap. So B3c delivered property-specific dispose figures, not "the full-horizon
+    computes" (which is structurally `to_verify` until the clawback posture changes).
+  - **B2 — `tax_structure` income/cash-flow tax figures.** Now unblocked by B3a's cash flow: `negative_
+    gearing_active`, `annual_tax_refund_year_1`, `after_tax_cash_flow_*` (= cash flow × marginal rate). The
+    **ATO brackets KB doc already EXISTS** (`kb.tax.income-tax-resident-2025-26`, full table — the "unauthored"
+    note was stale), so no KB authoring. **Single-owner:** the profile owns `applicants[].tax.marginal_rate`
+    (`derived_from taxable_income`); `tax_structure` PLACES it into `cgt_marginal_rate`. Caveat: income arrives
+    on a **refine turn** (null at property-attach → honest-partial), and `disposition` CGT stays `to_verify`
+    while `cost_base_depreciation_clawback = true` regardless of the rate. Also closes the entity-cost
+    banded↔scalar seam (`setup_costs`/`annual_compliance_cost`, now `money_range`).
 - **Deferred by trigger:** #5 and the real property *sources* (URL-paste = CLAUDE.md item 9; curator push =
   item 8). Slice A proves the contract with a **hand-fed normalized property_card** in a harness — exactly
   how the onboarding turn was proven (`investor_seam_smoke` feeds inputs). The engine's contract is "given a
@@ -694,6 +726,150 @@ Persisted: addendum under `content.addenda.<pid>` (property_card + the component
 Regression: `outcome_conformance` (21+11) and `base_components_investor_conformance` (19) green; `rebar3
 compile` + `erlang-checker` + planner import clean. **Deferred (unchanged):** Slice B (the figure cluster
 + the banded↔scalar seam), the other three per-property components, and the real property *sources*.
+
+### Slice B0 + B1 — LIVE-PROVEN (2026-06-25, full-stack, real Opus)
+
+**The banded↔scalar seam, decided (B0).** Grounding showed the scalar typing was the *anomaly*: the KB
+SOT (`rental-income-modelling`: "surfaced as ranges, not false-precision points"), the shipped
+`calculator` renderer (built for `money_range`, collapses `[x,x]` to a point), and `disposition`'s
+already-banded surface all said *band* — only the registry typed `cash_flow_projection` scalar. So the
+rent-dependent fields are retyped **`money_range`/`percentage_range`** `[lo,hi]` bands (the one exception:
+`annual_interest_year_1` stays scalar `money` — it's `loan × rate`, deterministic, not rent-derived).
+`percentage_range` is a **new validated figure type** added to the compiler `SCALAR_TYPES`/`NUMERIC_TYPES`
++ the outcome validator (`check_scalar`, a `[lo,hi]` list, alongside `money_range`) + **both lockstep
+case-sets** (`tests/outcome_validate.py` + `outcome_conformance.escript`, +4 cases each). The blueprint
+schema documents the decision; the artifact recompiled (verified: the 6 fields now banded).
+
+**The keystone arithmetic (B1).** `yield_modelling`'s resolver now **branches on the per-property
+keystone**: base (no `property_fit_investor`) → the honest-partial all-null scaffold; Phase-B (after
+`property_assessment`) → the banded **PRE-LOAN** rent-economics, each a `[lo,hi]` band **removed from the
+LLM's reach** (resolver-computed, KB-grounded constants citing their owning doc): effective income
+(`rent×52×(1−vacancy)`, vacancy 3% placeholder default), opex (fixed bands + maintenance `0.5–1.0%` of
+value + PM `7.5%` of rent collected), gross yield, net-pre-loan yield. **House/strata branch:** a house
+carries full opex; a strata property **nulls opex** (the body-corporate levy is not carried in
+`property_fit_investor` → honest-partial, the KB no-double-count + conservative discipline) — income +
+gross yield still compute. The **POST-loan figures stay null** (need `budget_envelope_investor.loan_amount`,
+a `cash_position`-per-property figure → Slice B3). `disposition`'s `full_horizon_investor` band-propagates
+the now-banded `cash_flow_before_tax_year_1` via the existing `money_range/1` coercion (scalar→`[v,v]`, so
+**byte-identical for the existing scalar path** — disposition's 79 anchors green). The Phase-B turn's
+`property_components/1` gained `yield_modelling` after `property_assessment` (order/2 keeps the read order).
+
+**Verified — three grades.** (1) `yield_modelling_conformance.escript` **53/53** (33 base + 20 B1: exact
+house bands `income=[31273,36317]`/`opex=[10445,18624]`/`gross=[3.5,4.1]`/`net=[1.4,2.8]`, strata
+income+gross-only, ill-formed→null, post-loan null, Layer-1 conforms with the banded types). (2)
+Regression — `outcome_conformance` **25+11** (the +4 `percentage_range` lockstep cases), `disposition` 79,
+`base_components_investor` 19, FHB `cash_duty` 28 (byte-identical), `mortgage_conformance` 23,
+`resolver_conformance`, `ownership_conformance` 17, `validate_build.py` + `resolver_eval` (8) green; `rebar3
+compile` + `erlang-checker` clean; **no planner.py change** (yield_modelling is a pure resolver). (3)
+**LIVE** — `property_assessment_seam.escript` EXIT 0: the Phase-B turn now runs **two** components, exact
+**11-event** sequence `turn_started, PA[gate×3,filled,usage], yield[gate×3,filled], turn_completed`. Live
+Cabramatta house @ $920k: rent `[580,660]/wk` → income `[29255,33290]`, opex `[10294,18397]`, **gross_yield
+`[3.3,3.7]` = exact `[580,660]×52÷920k`** (the §98 banded proof), net-pre-loan `[1.2,2.5]`; the band
+**brackets** property_fit's `3.5%` scalar (coherence); post-loan null; the banded `cash_flow_projection`
+persisted under `content.addenda.<pid>`, **base `yield_modelling` still null** (addendum didn't leak into
+base).
+
+### Slice B3a — the POST-loan cash flow — LIVE-PROVEN (2026-06-25, full-stack, real Opus)
+
+**Resequencing finding (drove the order).** Grounding B2 showed its headline tax figures depend on
+`cash_flow_before_tax_year_1` (a POST-loan figure), so **B2 sits downstream of the loan** — the tracker's
+"B2 before B3" had the dependency backwards. So B3 (the loan) was built first. A second finding settled
+*where* the loan lives: the DAG runs `yield_modelling`(4) before `cash_position`(6) (chain yield → tax →
+cash, because `tax_structure` reads `cash_flow_projection` and `cash_position` reads `tax_optimised_
+structure`), and yield's `dag_reads` include neither's loan — so the cash-flow loan **can't** be read from
+`cash_position`. The KB (`cash-flow-modelling-methodology`) assigns interest to the financing structure;
+the blueprint's `yield_modelling` params already carry a `loan_costs` block (`loan_amount`,
+`interest_rate_assumed`, `interest_only_period_years: 5`). So `yield_modelling` owns a **representative
+leverage** assumption — = what `mortgage_finance` would compute per-property — flagged, refined when the
+actual deal financing (savings/capacity) is captured.
+
+**What B3a computes.** `yield_modelling`'s per-property branch (house) now completes the POST-loan cluster:
+`loan = price × LVR baseline (80% — `deposit-requirements`)`, `rate = OO product rate (`serviceability-basics`,
+6.0%) + investment premium (`serviceability-investment-loans`, 0.35pp) = 6.35%`, **interest-only** basis
+(`interest-only-vs-pi-investor`) → `annual_interest_year_1 = loan × rate` (a scalar **point** — loan and
+rate are points, so interest is `money` not banded, as B0 kept it). Then `cash_flow_before_tax_year_1 =
+income − opex − interest` (a signed band), `cash_flow_before_tax_per_week` (÷52), `net_yield_post_loan_pre_
+tax` (band %), `year_5`/`year_10` projections (income & opex compounded at the KB 3% growth, interest flat
+— indicative bands), and `is_positive_neutral_or_negative_geared_pre_tax` (band sign: wholly-neg → negative,
+wholly-pos → positive, straddle → neutral). All financing figures are **KB-read** (`param/2` — no magic
+literal, single-source with `disposition`'s amortisation rate). **Strata** stays null for the whole post-loan
+cluster (its opex is null — the levy isn't carried). The post-loan branch adds the **4 financing anchors** to
+`kb_versions` (9 total) and to the blueprint's `yield_modelling` declaration (declaration ⊇ used).
+
+**Verified.** `yield_modelling_conformance` **67/67** (53 + 14 B3a: exact house `interest=46736`,
+`CF=[−34087,−20864]`, `/week=[−656,−401]`, `net-post=[−3.7,−2.3]`, geared=negative; year-5/10 structural —
+bands improving over time as rent grows over fixed interest; 9 anchors; strata post-loan all-null). Regression:
+`disposition` 79 (its band-propagation consumes `cash_flow_before_tax_year_1` unchanged), `outcome` 25+11,
+`base_components_investor` 19, FHB `cash_duty` 28, `mortgage` 23, `ownership_planning_investor` 27,
+`validate_build` (gates green with the 4 new yield anchors) — all green; `rebar3 compile` + `erlang-checker`
+clean; artifact recompiled. **LIVE** (`property_assessment_seam` EXIT 0): same 11-event Phase-B sequence;
+live Cabramatta house — the post-loan cluster asserted resolver-computed (interest = price×80%×6.35%, CF =
+income−opex−interest band, per-week = CF÷52, geared consistent with the band sign, year-10 > year-5, the
+financing provenance in `kb_versions`).
+
+### Slice B3b — `cash_position` per-property cash-to-complete — LIVE-PROVEN (2026-06-25, full-stack, real Opus)
+
+`fh_engine_cash:fill_investor/2` now BRANCHES on the per-property keystone (the same shape-sniff as
+yield_modelling): base (no `property_fit_investor`) → the all-null scaffold (unchanged); per-property → the
+**cash-to-complete POINT figures** off the EXACT attached price (so scalar `money`, not banded — the price
+is a point, unlike the rent band). `actual_property_price` = price; `loan_amount` = price × 80% LVR baseline
+(`deposit-requirements`, the same KB convention B3a uses → they agree by construction); `lvr` = 80;
+`lmi_payable` = 0 (no LMI at the 80% baseline); `total_cash_required` = deposit + full stamp duty (no FHB
+concession — investor; no foreign surcharge for a domestic investor) + acquisition adders. The adders
+(`acquisition_costs_investor`) = registration (exact, per state) + the shared due-diligence/legal lines
+(building+pest inspection, conveyancing, lender application fee) at a representative midpoint, **EXCLUDING**
+the owner-occupier/holding lines (moving, utility, building insurance — the last is a recurring OPERATING
+expense in yield_modelling; no double-count). `max_property_price_supported` (capacity → income) + the
+HAVE-side (`gap_or_surplus`, `verdict` → savings) stay honest-partial null (refine facts). Reuses the
+existing FHB `stamp_duty`/`duty`/`registration_total`/`cost_param` kernels (no new duty logic); the FHB path
+is **byte-identical** (`fill_fhb` untouched). The banded↔scalar seam does NOT bite here — for a specific
+property the price is exact, so the scalar `money` typing is correct (no false precision).
+
+**Verified.** `cash_position_investor_conformance` **43/43** (31 + 12 B3b: `price=920000`, `loan=736000`,
+`lvr=80`, `lmi=0`, `total_cash` a scalar integer = deposit + duty + adders verified against the EXPORTED
+`stamp_duty`/`registration_total` non-tautologically, the HAVE-side null, Layer-1 conforms). Regression: FHB
+`cash_duty` **28** (byte-identical), `base_components_investor` 19, `disposition` 79, `outcome` 25+11,
+`yield_modelling` 67, `mortgage` 23, `ownership_planning_investor` 27, `validate_build` + `resolver` lockstep
+— all green; `rebar3 compile` + `erlang-checker` clean; **no artifact recompile** (no schema/anchor change).
+**LIVE** (`property_assessment_seam` EXIT 0): the Phase-B turn now runs **three** components, exact **15-event**
+sequence `turn_started, PA[gate×3,filled,usage], yield[gate×3,filled], cash[gate×3,filled], turn_completed`.
+Live Cabramatta house @ $920k: `budget_envelope_investor: price=920000 loan=736000 lvr=80 total_cash=222913`
+(= deposit 184000 + NSW duty + adders, asserted); persisted under `content.addenda.<pid>`.
+
+### Slice B3c — `disposition` per-property — LIVE-PROVEN (2026-06-25, full-stack, real Opus)
+
+`fh_engine_disposition:fill_investor/3` is now **price-aware** (`property_price/2` reads
+`property_fit_investor.price` from upstream, falling back to the profile-range ceiling at base — zero base
+regression by construction), and disposition is added to the Phase-B `property_components` (it runs last,
+reading the per-property `cash_flow_projection` (B3a) + `budget_envelope_investor` (B3b)). So the dispose
+**gross** figures reflect the ATTACHED property: `sale_proceeds = price × growth^H`, `selling_costs`,
+`taxable_gain`, and `loan_payout` (which now computes — B3b supplied `loan_amount`).
+
+**The regulated reframe (surfaced before building, Son confirmed).** Grounding showed the headline
+`full_horizon_net_position` does NOT compute, and that is *correct*: `cgt_investor`'s clean (computed) case
+requires `is_number(cgt_marginal_rate)` AND `cost_base_depreciation_clawback =:= false`. Both fail now —
+the marginal rate is null (income → a refine turn / B2) and the clawback is the conservative `true` (the KB
+defers the clawback dollar to a registered tax agent) — so `cgt → to_verify → cgt=null → net_proceeds=null
+→ full_horizon=null`. The ASIC-safe posture: never assert a net sale position when the CGT hinges on an
+unresolved clawback. So B3c is a **correctness improvement for the dispose tab** (property-accurate gross
+figures), not the full-horizon net (which is structurally `to_verify` until the clawback posture changes).
+
+**Verified.** `disposition_conformance` **87/87** (79 + 8 B3c: per-property `sale_proceeds` uses the
+attached 920k — lo > 1.0M vs the base 800k's 975196; `loan_payout`/`taxable_gain` compute; `cgt_status =
+to_verify`; `cgt`/`net_proceeds`/`full_horizon` null; **base unchanged** — no `property_fit_investor` → the
+800k ceiling, lo = 975196). Regression: `cash_position_investor` 43, `base_components_investor` 19, FHB
+`cash_duty` 28, `outcome` 25+11, `yield` 67, `mortgage` 23, `ownership_planning_investor` 27, `validate_build`
++ `resolver` lockstep — all green; `rebar3 compile` + `erlang-checker` clean; no artifact recompile. **LIVE**
+(`property_assessment_seam` EXIT 0): the Phase-B turn now runs **four** components, exact **19-event** sequence
+(PA two-path + yield/cash/disposition resolvers). With the onboarding carrying `hold_horizon_years: 10`,
+live disposition: `sale_proceeds=[1121475,1498583]` (= attached 920k × growth^10 — the price-aware proof),
+`cgt_status=to_verify`, `full_horizon=null` (regulated-gated). *(Observed: the base turn's ~70s of live
+sidecar fills can occasionally trip the harness SSE idle window — a flaky environmental timeout, not a
+defect; the rerun passed EXIT 0.)* **Deferred:** B2 (the income/cash-flow tax figures — negative gearing,
+after-tax cash flow; needs income on a refine turn for the marginal rate), the other three per-property
+components, the real property *sources*. **The per-property financial spine is now complete end-to-end**
+(attach → cash-to-complete + banded cash flow + property-specific dispose), the only gap being the
+regulated CGT `to_verify`.
 
 ## Deferred out (honest — first-exercising instance is Mode B/D, not here)
 

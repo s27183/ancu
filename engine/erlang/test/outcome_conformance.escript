@@ -173,6 +173,7 @@ render({error, R})    -> binary_to_list(<<"reject: ", R/binary>>).
 loc()    -> #{<<"kind">> => <<"localized">>}.
 money()  -> #{<<"kind">> => <<"scalar">>, <<"type">> => <<"money">>}.
 mrange() -> #{<<"kind">> => <<"scalar">>, <<"type">> => <<"money_range">>}.
+prange() -> #{<<"kind">> => <<"scalar">>, <<"type">> => <<"percentage_range">>}.
 str()    -> #{<<"kind">> => <<"scalar">>, <<"type">> => <<"string">>}.
 enum()   -> #{<<"kind">> => <<"enum">>,
               <<"options">> => [<<"a">>, <<"b">>, <<"c">>]}.
@@ -210,6 +211,12 @@ cases() ->
        value => [600000, 700000]},
      #{name => "money_range-string-elem-rejected", tree => mrange(), ok => false,
        value => [600000, <<"700k">>]},
+     #{name => "percentage_range-ok", tree => prange(), ok => true, value => [3.5, 4.1]},
+     #{name => "percentage_range-null-ok", tree => prange(), ok => true, value => null},
+     #{name => "percentage_range-string-elem-rejected", tree => prange(), ok => false,
+       value => [3.5, <<"4.1%">>]},
+     #{name => "percentage_range-bare-number-rejected", tree => prange(), ok => false,
+       value => 3.8},
 
      %% string scalar — graceful (not a figure)
      #{name => "string-graceful", tree => str(), ok => true, value => <<"Cabramatta">>},

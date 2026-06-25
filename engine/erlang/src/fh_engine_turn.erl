@@ -526,7 +526,16 @@ tag_property(Event, PropId)    -> Event#{<<"property_id">> => PropId}.
 %% due_diligence/settlement_prep — trigger-gated) are not yet wired. Engine-owned set, like
 %% base_components/1. A non-investor blueprint has no built per-property turn yet → empty.
 property_components(<<"investor-domestic-au">> = Slug) ->
-    order(Slug, [<<"property_assessment">>]);
+    %% Slice A: property_assessment (the keystone → property_fit_investor).
+    %% Slice B1/B3a: yield_modelling re-fills per-property — its resolver branches on the
+    %% property_fit_investor now in upstream and computes the banded cash_flow_projection.
+    %% Slice B3b: cash_position re-fills per-property — the cash-to-complete off the exact price.
+    %% Slice B3c: disposition re-fills per-property — price-aware (the attached price drives the
+    %% dispose figures); reads cash_position (acquire) + yield_modelling (hold) for the full horizon.
+    %% order/2 keeps the canonical order (property_assessment → yield_modelling → cash_position →
+    %% disposition); each reads property_fit_investor (in upstream after property_assessment).
+    order(Slug, [<<"property_assessment">>, <<"yield_modelling">>,
+                 <<"cash_position">>, <<"disposition">>]);
 property_components(_Slug) ->
     [].
 

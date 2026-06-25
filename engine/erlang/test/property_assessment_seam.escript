@@ -41,7 +41,10 @@ main(_) ->
         <<"state">> => <<"NSW">>,
         <<"target_price_range">> => [800000, 1000000],
         <<"target_zone">> => [<<"Cabramatta">>, <<"Canley Vale">>],
-        <<"intent">> => <<"investment">>
+        <<"intent">> => <<"investment">>,
+        %% the investor's intended hold horizon → profile.hold_horizon_years → disposition's H,
+        %% so the dispose figures (sale_proceeds etc.) compute per-property (Slice B3c).
+        <<"hold_horizon_years">> => 10
     }),
     {202, CreateResp} = req(post, Base ++ "/plan-cards", [Auth], CreateBody),
     #{<<"plan_card_id">> := PlanCardId} = fh_engine_util:json_decode(CreateResp),
@@ -78,17 +81,18 @@ main(_) ->
     expect(is_binary(PropertyId) andalso is_binary(PhaseBTurn), "attach returns property_id + turn_id"),
     io:format("attached property_id=~s~n", [PropertyId]),
 
-    %% --- SSE resumed from the base cursor: the Phase-B turn's events only (one two-path
-    %%     component → 3 gate + 1 filled + 1 usage), wrapped by turn_started/turn_completed. ---
+    %% --- SSE resumed from the base cursor: the Phase-B turn's events only (property_assessment
+    %%     two-path + yield_modelling resolver), wrapped by turn_started/turn_completed. ---
     PhaseBUrl = EvUrl ++ "?last_event_id=" ++ integer_to_list(Cursor),
     PhaseB = collect_sse(PhaseBUrl, Auth),
     io:format("phase-B event sequence: ~p~n", [PhaseB]),
-    expect(PhaseB =:= expected_phase_b(), "Phase-B event sequence matches (one two-path fill)"),
+    expect(PhaseB =:= expected_phase_b(), "Phase-B event sequence matches (two-path + resolver)"),
 
-    %% --- persisted log is the SOT: base + 7 Phase-B events ---
+    %% --- persisted log is the SOT: base + 11 Phase-B events ---
     EventCount = scalar("SELECT count(*) FROM plan_card_events WHERE plan_card_id = $1",
                         [PlanCardId]),
-    expect(EventCount =:= BaseLen + 7, "Phase-B added 7 events (1 + 3 gate + 1 filled + 1 usage + 1)"),
+    expect(EventCount =:= BaseLen + 19,
+           "Phase-B added 19 events (1 + PA[3+1+usage] + yield[3+1] + cash[3+1] + disposition[3+1] + 1)"),
 
     %% --- per-property compliance audit: 3 rows for property_assessment, all clear, two_path,
     %%     ASIC boundary_held (property_assessment is advice_adjacent — it carries a viability verdict) ---
@@ -170,6 +174,121 @@ main(_) ->
               [Lo, Hi, Yield, maps:get(<<"viability_verdict">>, Out), Grade,
                maps:get(<<"capital_growth_outlook">>, Out)]),
 
+    %% --- Slice B1: yield_modelling re-filled per-property in the SAME Phase-B turn, the
+    %%     banded cash_flow_projection (the §B0 banded money surface, resolver-computed) ---
+    YmEntry = maps:get(<<"yield_modelling">>,
+                       maps:get(<<"components">>, Addendum, #{}), undefined),
+    expect(is_map(YmEntry), "yield_modelling snapshotted under the addendum (Slice B1)"),
+    expect(maps:get(<<"scope">>, YmEntry) =:= <<"both">>, "yield_modelling snapshot scope=both"),
+    expect(maps:get(<<"fill_path">>, YmEntry) =:= <<"resolver">>,
+           "yield_modelling fill_path=resolver (pure figure-owner)"),
+    Cfp = maps:get(<<"outcome">>, YmEntry),
+    %% effective income band (rent×52×(1−vacancy)) — a well-formed [lo,hi].
+    [IncLo, IncHi] = maps:get(<<"annual_rental_income_year_1">>, Cfp),
+    expect(is_number(IncLo) andalso IncLo =< IncHi andalso IncLo > 0,
+           "annual_rental_income_year_1 banded [lo,hi] effective income"),
+    %% opex band — established_house → computed (the levy-clean case).
+    [OpLo, OpHi] = maps:get(<<"annual_operating_expenses_year_1">>, Cfp),
+    expect(is_number(OpLo) andalso OpLo =< OpHi andalso OpLo > 0,
+           "annual_operating_expenses_year_1 banded (house opex)"),
+    %% §B0/§98 PROOF: gross_yield is a RESOLVER-COMPUTED band off the SAME rent ÷ price —
+    %% must equal [rent_lo, rent_hi] × 52 ÷ price × 100, one-decimal, exactly.
+    GrossYield = maps:get(<<"gross_yield">>, Cfp),
+    ExpectedGross = [round(Lo * 52 / 920000 * 100 * 10) / 10,
+                     round(Hi * 52 / 920000 * 100 * 10) / 10],
+    expect(GrossYield =:= ExpectedGross,
+           "gross_yield = resolver-computed band [rent_lo,rent_hi]×52÷price (§98 banded)"),
+    %% the two gross-yield figures agree: property_fit's mid-band scalar sits inside the band.
+    [GyLo, GyHi] = GrossYield,
+    expect(GyLo =< Yield andalso Yield =< GyHi,
+           "gross_yield band brackets property_fit rental_yield_gross_estimate (coherent)"),
+    %% net pre-loan yield banded.
+    [_, _] = maps:get(<<"net_yield_pre_loan">>, Cfp),
+    %% --- Slice B3a: the POST-loan cluster, computed at the representative leverage ---
+    %% interest = price × 80% LVR × 6.35% (KB-read), interest-only — a scalar point.
+    Interest = maps:get(<<"annual_interest_year_1">>, Cfp),
+    ExpectedInterest = round(920000 * 0.80 * 6.35 / 100),
+    expect(Interest =:= ExpectedInterest,
+           "annual_interest_year_1 = price×80%×6.35% (resolver-computed point, §98)"),
+    %% before-tax cash flow band = income − opex − interest (interval), SIGNED.
+    [CfLo, CfHi] = maps:get(<<"cash_flow_before_tax_year_1">>, Cfp),
+    expect(CfLo =:= IncLo - OpHi - Interest andalso CfHi =:= IncHi - OpLo - Interest,
+           "cash_flow_before_tax_year_1 = income − opex − interest (interval, resolver-computed)"),
+    %% per-week band = CF ÷ 52.
+    [PwLo, PwHi] = maps:get(<<"cash_flow_before_tax_per_week">>, Cfp),
+    expect(PwLo =:= round(CfLo / 52) andalso PwHi =:= round(CfHi / 52),
+           "cash_flow_before_tax_per_week = CF ÷ 52 band"),
+    %% geared position is one of the enum values, consistent with the CF band sign.
+    Geared = maps:get(<<"is_positive_neutral_or_negative_geared_pre_tax">>, Cfp),
+    expect(lists:member(Geared, [<<"positive">>, <<"neutral">>, <<"negative">>]),
+           "geared position in enum"),
+    expect((CfHi < 0) =:= (Geared =:= <<"negative">>) orelse Geared =/= <<"negative">>,
+           "geared=negative iff the whole CF band is negative"),
+    %% the year-5/10 projections are well-formed bands that improve over time (rent growth).
+    [Y5Lo, _] = maps:get(<<"year_5_projected_cash_flow">>, Cfp),
+    [Y10Lo, _] = maps:get(<<"year_10_projected_cash_flow">>, Cfp),
+    expect(is_integer(Y5Lo) andalso is_integer(Y10Lo) andalso Y10Lo > Y5Lo,
+           "year_10 projected cash flow > year_5 (rent growth over fixed interest)"),
+    %% provenance: the post-loan cluster adds the four financing anchors (9 total).
+    YmKb = [maps:get(<<"slug">>, E) || E <- maps:get(<<"kb_versions">>, YmEntry, [])],
+    expect(lists:member(<<"kb.lender.serviceability-investment-loans">>, YmKb),
+           "yield_modelling kb_versions carries the financing provenance (post-loan)"),
+    %% base yield_modelling untouched (the per-property fill went to the addendum, not base).
+    BaseYm = maps:get(<<"yield_modelling">>, BaseComponents, #{}),
+    expect(maps:get(<<"annual_rental_income_year_1">>,
+                    maps:get(<<"outcome">>, BaseYm, #{}), null) =:= null,
+           "base yield_modelling still null (addendum did not leak into base)"),
+    io:format("live cash_flow_projection: income=[~p,~p] opex=[~p,~p] gross_yield=~p net_pre_loan=~p~n",
+              [IncLo, IncHi, OpLo, OpHi, GrossYield,
+               maps:get(<<"net_yield_pre_loan">>, Cfp)]),
+
+    %% --- Slice B3b: cash_position re-filled per-property in the SAME Phase-B turn — the
+    %%     cash-to-complete POINT figures off the exact price (scalar money, not banded) ---
+    CpEntry = maps:get(<<"cash_position">>,
+                       maps:get(<<"components">>, Addendum, #{}), undefined),
+    expect(is_map(CpEntry), "cash_position snapshotted under the addendum (Slice B3b)"),
+    expect(maps:get(<<"fill_path">>, CpEntry) =:= <<"resolver">>,
+           "cash_position fill_path=resolver (pure figure-owner)"),
+    Bdg = maps:get(<<"outcome">>, CpEntry),
+    expect(maps:get(<<"actual_property_price">>, Bdg) =:= 920000, "actual_property_price = attached price"),
+    expect(maps:get(<<"loan_amount">>, Bdg) =:= 736000, "loan_amount = price × 80% LVR baseline"),
+    expect(maps:get(<<"lvr">>, Bdg) =:= 80, "lvr = 80 (the no-LMI baseline)"),
+    expect(maps:get(<<"lmi_payable">>, Bdg) =:= 0, "lmi_payable = 0 at the 80% baseline"),
+    TotalCash = maps:get(<<"total_cash_required">>, Bdg),
+    expect(is_integer(TotalCash) andalso TotalCash > 920000 - 736000,
+           "total_cash_required = deposit + duty + acquisition adders (scalar point)"),
+    expect(maps:get(<<"max_property_price_supported">>, Bdg) =:= null,
+           "max_property_price_supported null (capacity → income, refine)"),
+    expect(maps:get(<<"verdict">>, Bdg) =:= null, "verdict null (HAVE-side → refine)"),
+    io:format("live budget_envelope_investor: price=~p loan=~p lvr=~p total_cash=~p~n",
+              [maps:get(<<"actual_property_price">>, Bdg), maps:get(<<"loan_amount">>, Bdg),
+               maps:get(<<"lvr">>, Bdg), TotalCash]),
+
+    %% --- Slice B3c: disposition re-filled per-property — the dispose figures use the ATTACHED
+    %%     price; cgt/net/full-horizon stay to_verify-null (the regulated conservative posture) ---
+    DpEntry = maps:get(<<"disposition">>,
+                       maps:get(<<"components">>, Addendum, #{}), undefined),
+    expect(is_map(DpEntry), "disposition snapshotted under the addendum (Slice B3c)"),
+    Disp = maps:get(<<"outcome">>, DpEntry),
+    %% sale_proceeds uses the attached 920k (price × growth^H) — a band off the property, not the
+    %% profile range. The base ceiling (800k) gives lo=975196; the 920k property gives lo > 1.0M.
+    [SaleLo, SaleHi] = maps:get(<<"sale_proceeds">>, Disp),
+    expect(is_integer(SaleLo) andalso SaleLo =< SaleHi andalso SaleLo > 1000000,
+           "sale_proceeds uses the attached 920k (lo > 1.0M, banded growth projection)"),
+    %% loan_payout now computes (cash_position supplied loan_amount=736k, B3b).
+    expect(is_list(maps:get(<<"loan_payout">>, Disp)),
+           "loan_payout computes (amortised off the per-property loan_amount)"),
+    expect(is_list(maps:get(<<"taxable_gain">>, Disp)),
+           "taxable_gain computes (indicative pre-clawback band)"),
+    %% cgt/net/full-horizon are to_verify-null — the regulated posture (clawback + no marginal rate).
+    expect(maps:get(<<"cgt_status">>, Disp) =:= <<"to_verify">>,
+           "cgt_status = to_verify (regulated: clawback true + marginal rate uncaptured)"),
+    expect(maps:get(<<"full_horizon_net_position">>, Disp) =:= null,
+           "full_horizon_net_position null (correctly regulated-gated, not computed)"),
+    io:format("live disposition: sale_proceeds=[~p,~p] cgt_status=~s full_horizon=~p~n",
+              [SaleLo, SaleHi, maps:get(<<"cgt_status">>, Disp),
+               maps:get(<<"full_horizon_net_position">>, Disp)]),
+
     %% --- auth: missing token -> 401; wrong key -> 403 (attach surface too) ---
     {401, _} = req(post, Base ++ "/plan-cards/" ++ binary_to_list(PlanCardId) ++ "/properties",
                    [], PropBody),
@@ -178,16 +297,25 @@ main(_) ->
     {403, _} = req(post, Base ++ "/plan-cards/" ++ binary_to_list(PlanCardId) ++ "/properties",
                    [BadAuth], PropBody),
 
-    io:format("~n==== PROPERTY_ASSESSMENT SEAM (Slice A): ALL ASSERTIONS PASSED ====~n"),
+    io:format("~n==== PROPERTY_ASSESSMENT SEAM (Slice A + B1/B3a yield + B3b cash + B3c disposition): ALL ASSERTIONS PASSED ====~n"),
     halt(0).
 
-%% The Phase-B turn: one two-path component (property_assessment) → 3 compliance_gate, 1
-%% component_filled, 1 usage (the sidecar fill), wrapped by turn_started/turn_completed.
+%% The Phase-B turn (Slice A + B1/B3a + B3b + B3c): four components, in DAG order.
+%%   property_assessment (two_path) → 3 gate, 1 filled, 1 usage (the sidecar fill)
+%%   yield_modelling     (resolver) → 3 gate, 1 filled       (no sidecar, no usage — §98 figure-owner)
+%%   cash_position       (resolver) → 3 gate, 1 filled       (no sidecar, no usage)
+%%   disposition         (resolver) → 3 gate, 1 filled       (no sidecar, no usage)
+%% wrapped by turn_started/turn_completed. 1 + (3+1+1) + (3+1) + (3+1) + (3+1) + 1 = 19.
 expected_phase_b() ->
-    [<<"turn_started">>,
-     <<"compliance_gate">>, <<"compliance_gate">>, <<"compliance_gate">>,
-     <<"component_filled">>, <<"usage">>,
-     <<"turn_completed">>].
+    Gates = [<<"compliance_gate">>, <<"compliance_gate">>, <<"compliance_gate">>],
+    CF = <<"component_filled">>,
+    lists:flatten(
+      [<<"turn_started">>,
+       Gates, CF, <<"usage">>,   %% property_assessment (two_path)
+       Gates, CF,                %% yield_modelling     (resolver — banded cash_flow_projection)
+       Gates, CF,                %% cash_position       (resolver — cash-to-complete)
+       Gates, CF,                %% disposition         (resolver — price-aware dispose figures)
+       <<"turn_completed">>]).
 
 %% --- helpers (identical to investor_seam_smoke) ------------------------------
 

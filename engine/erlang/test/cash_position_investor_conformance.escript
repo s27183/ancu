@@ -35,7 +35,7 @@ main(_) ->
     ok = fh_engine_kb:load(),
     io:format("cash_position investor conformance — fh_engine_cash (Mode-C pure-resolver)~n~n"),
     R = lists:flatten([scaffold_cases(), layer1_cases(), discriminator_cases(),
-                       no_regression_cases()]),
+                       no_regression_cases(), per_property_cases()]),
     Fails = [X || X <- R, X =:= fail],
     io:format("~n================================================================~n"),
     case Fails of
@@ -148,6 +148,42 @@ no_regression_cases() ->
      check("yield_modelling still pure-resolver (no merge → error)", YmErrs, true),
      check("cash_position has_resolver still true",
            fh_engine_fill:has_resolver(<<"cash_position">>), true)].
+
+%% --- 5. per-property cash-to-complete (Slice B3b) ----------------------------
+
+%% the investor upstream + an attached property (NSW established_house @ $920k — the seam fixture).
+pf_upstream() ->
+    (inv_upstream())#{<<"property_fit_investor">> =>
+        #{<<"price">> => 920000, <<"state">> => <<"NSW">>,
+          <<"suburb">> => <<"Cabramatta">>, <<"property_type">> => <<"established_house">>}}.
+
+per_property_cases() ->
+    {O, _, _} = fh_engine_fill:resolver(<<"cash_position">>, #{}, pf_upstream()),
+    %% recompute the regulated components via the EXPORTED helpers (non-tautological):
+    Duty  = maps:get(<<"after_concession">>, fh_engine_cash:stamp_duty(<<"NSW">>, false, 920000)),
+    Reg   = fh_engine_cash:registration_total(<<"NSW">>, 920000),
+    Total = g(O, <<"total_cash_required">>),
+    Deposit = 920000 - 736000,                  %% 20% of price = 184000
+    Acq   = Total - Deposit - Duty,             %% the acquisition adders (reg + conveyancing midpoint)
+    [check("per-property: actual_property_price = 920000", g(O, <<"actual_property_price">>), 920000),
+     check("per-property: loan_amount = 736000 (price × 80% LVR baseline)",
+           g(O, <<"loan_amount">>), 736000),
+     check("per-property: lvr = 80", g(O, <<"lvr">>), 80),
+     check("per-property: lmi_payable = 0 (80% baseline → no LMI)", g(O, <<"lmi_payable">>), 0),
+     check("per-property: total_cash_required is an integer scalar (price-point, NOT banded)",
+           is_integer(Total), true),
+     check("per-property: duty included (NSW standard, no concession) > 0", Duty > 0, true),
+     check("per-property: total = deposit + duty + acquisition adders (acq > 0)",
+           Total > Deposit + Duty, true),
+     check("per-property: acquisition adders = registration + conveyancing/inspection midpoint",
+           Acq > Reg andalso (Acq - Reg) > 500 andalso (Acq - Reg) < 8000, true),
+     check("per-property: max_property_price_supported null (capacity → income/refine)",
+           g(O, <<"max_property_price_supported">>), null),
+     check("per-property: gap_or_surplus null (HAVE-side → refine)",
+           g(O, <<"gap_or_surplus">>), null),
+     check("per-property: verdict null (needs gap_or_surplus)", g(O, <<"verdict">>), null),
+     check("per-property: Layer-1 conforms (scalar money figures)",
+           validate(?INV, <<"budget_envelope_investor">>, O), ok)].
 
 %% --- helpers ----------------------------------------------------------------
 

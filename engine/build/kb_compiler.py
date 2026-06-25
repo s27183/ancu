@@ -86,7 +86,7 @@ EXTERNAL_NS = {"suburb", "property", "property_card", "plan"}
 NUMERIC_TYPES = {
     "integer", "money", "number", "percentage", "money_per_year", "money_per_month",
     "money_per_quarter", "money_per_week", "integer_0_100", "percentage_0_100",
-    "integer_0_10", "money_range", "percentage_0_100",
+    "integer_0_10", "money_range", "percentage_range", "percentage_0_100",
 }
 NUMERIC_OPS = {"gte", "gt", "lte", "lt", "between"}
 SET_OPS = {"in", "nin"}
@@ -267,7 +267,7 @@ def parse_object_entity(tstr):
 LOCALIZED_TYPE = "localized_text"
 SCALAR_TYPES = {
     "string", "bool", "date", "object", "number",
-    "money", "money_range", "money_per_year", "integer", "integer_0_10",
+    "money", "money_range", "percentage_range", "money_per_year", "integer", "integer_0_10",
 }
 
 

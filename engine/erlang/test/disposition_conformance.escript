@@ -33,7 +33,7 @@ main(_) ->
     ok = fh_engine_kb:load(),
     io:format("disposition conformance — fh_engine_disposition (terminal dispose-phase figure-owner)~n~n"),
     R = lists:flatten([figure_cases(), arithmetic_cases(), cgt_cases(),
-                       investor_cases(),
+                       investor_cases(), per_property_cases(),
                        honest_partial_cases(), event_cases(), assumption_cases(),
                        rate_source_cases(), layer1_cases()]),
     Fails = [X || X <- R, X =:= fail],
@@ -170,6 +170,37 @@ cgt_cases() ->
 %% --- 3b. CGT (Mode-C investor — the full-CGT path) --------------------------
 %% COMPUTED for the clean case (resident individual, rate known, no clawback); to_verify (cgt
 %% null → net PENDING) once a trap applies, with the indicative discounted gain still surfaced.
+
+%% --- per-property (Slice B3c): the ATTACHED price drives the dispose figures ----------------
+%% disposition re-runs in the Phase-B turn with property_fit_investor present. The dispose GROSS
+%% figures use the attached price (920k), not the profile-range ceiling (800k); loan_payout
+%% computes off cash_position's loan_amount; but cgt stays to_verify (rate null + clawback true =
+%% the regulated conservative posture) → net + full_horizon null. This is the correct gated state.
+per_property_cases() ->
+    Pf = #{<<"price">> => 920000, <<"state">> => <<"NSW">>,
+           <<"property_type">> => <<"established_house">>},
+    Up = (inv_upstream(inv_profile(<<"resident">>),
+                       inv_tax(<<"personal_sole">>, null, true)))#{   %% rate null + clawback true
+             <<"property_fit_investor">> => Pf},
+    {O, _} = fill(Up),
+    [SaleLo, _] = g(O, <<"sale_proceeds">>),
+    [check("per-property: sale_proceeds uses the ATTACHED 920k (lo > 1.0M; the base 800k gives 975196)",
+           SaleLo > 1000000, true),
+     check("per-property: loan_payout computes (cash_position loan_amount present, B3b)",
+           is_list(g(O, <<"loan_payout">>)), true),
+     check("per-property: taxable_gain computes (indicative pre-clawback band)",
+           is_list(g(O, <<"taxable_gain">>)), true),
+     check("per-property: cgt_status = to_verify (rate null + clawback true — regulated posture)",
+           g(O, <<"cgt_status">>), <<"to_verify">>),
+     check("per-property: cgt null (to_verify)", g(O, <<"cgt">>), null),
+     check("per-property: net_proceeds null (cgt to_verify)", g(O, <<"net_proceeds">>), null),
+     check("per-property: full_horizon_net_position null (net null — correctly regulated-gated)",
+           g(O, <<"full_horizon_net_position">>), null),
+     %% base behaviour unchanged: NO property_fit_investor → the profile ceiling (800k) basis.
+     check("base (no property): sale_proceeds still uses the 800k ceiling (lo = 975196)",
+           begin {B, _} = fill(inv_upstream(inv_profile(<<"resident">>),
+                                            inv_tax(<<"personal_sole">>, null, true))),
+                 [BLo, _] = g(B, <<"sale_proceeds">>), BLo end, 975196)].
 
 investor_cases() ->
     Clean    = inv_upstream(inv_profile(<<"resident">>), inv_tax(<<"personal_sole">>, 37.0, false)),

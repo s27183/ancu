@@ -19,9 +19,10 @@
 %%     here: it is vi-specific and stays in the build/eval layer, never load-bearing at the
 %%     fail-closed seam (outcome-conformance.md §3).
 %%   - enum → value is one of the declared options.
-%%   - figure (money/money_range/money_per_year/number/integer/integer_0_10) → numbers all
-%%     the way down: never a binary ("$500k"), never a {vi,en} map. This IS the §98 guard,
-%%     generalized — the agent cannot smuggle an authored figure past the schema.
+%%   - figure (money/money_range/percentage_range/money_per_year/number/integer/integer_0_10)
+%%     → numbers all the way down: never a binary ("$500k"), never a {vi,en} map. This IS the
+%%     §98 guard, generalized — the agent cannot smuggle an authored figure past the schema.
+%%     The *_range types are a [lo, hi] list (the banded surface, mode-c-wedge Slice B0).
 %%
 %% Nullability is implicit-universal: `null` conforms to ANY field (honest-partial fills
 %% leave genuinely-unknown facts absent). string/bool/date/object scalars and `unknown`
@@ -37,8 +38,8 @@
 
 -export([validate/3, check/3, check_placement/2]).
 
-%% The numeric family (§98). money_range is a [lo, hi] list of numbers; the rest a bare
-%% number. string/bool/date/object are scalars too but are NOT figures (not checked).
+%% The numeric family (§98). money_range / percentage_range are a [lo, hi] list of numbers;
+%% the rest a bare number. string/bool/date/object are scalars too but are NOT figures.
 -define(FIGURE_TYPES,
         [<<"money">>, <<"money_per_year">>, <<"number">>,
          <<"integer">>, <<"integer_0_10">>]).
@@ -153,10 +154,12 @@ collect_locales([Loc | Rest], Value, Acc) ->
             {error, <<"localized locale ", Loc/binary, " non-string">>}
     end.
 
-check_scalar(<<"money_range">>, Value) ->
+check_scalar(Type, Value) when Type =:= <<"money_range">>; Type =:= <<"percentage_range">> ->
+    %% a banded figure — a [lo, hi] list of numbers (the banded money/percentage surface,
+    %% mode-c-wedge Slice B0: rent is a band, so income/yields/cash-flow built on it band too).
     case is_list(Value) andalso lists:all(fun erlang:is_number/1, Value) of
         true  -> ok;
-        false -> {error, reason(<<"money_range must be a list of numbers">>, Value)}
+        false -> {error, reason(<<Type/binary, " must be a list of numbers">>, Value)}
     end;
 check_scalar(Type, Value) ->
     case lists:member(Type, ?FIGURE_TYPES) of

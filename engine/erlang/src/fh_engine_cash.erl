@@ -76,17 +76,19 @@ fill_fhb(Args, Upstream) ->
 %% --- Mode-C investor cash_position (budget_envelope_investor) ----------------
 %% A PURE-resolver figure-owner (agent_leaves = []; no two-path, no merge). The investor outcome
 %% is nine POINT-summary figures (no range/breakdown subtrees, no cash_events — unlike the FHB
-%% budget_envelope). At base (plan-first: no property attached → property_fit_investor absent; no
-%% savings captured) every field is honestly unknowable:
-%%   - property-price-dependent (actual_property_price, total_cash_required, loan_amount, lvr,
-%%     lmi_payable) → wait for the per-property property_assessment turn;
-%%   - max_property_price_supported → needs the investor mortgage_finance capacity (variant
-%%     unbuilt — a documented downstream trigger; the FHB path leaves it null at base too);
+%% budget_envelope). It BRANCHES on the per-property keystone (Slice B3b):
+%%   - BASE (plan-first: no property → property_fit_investor absent) → the all-null scaffold;
+%%   - PER-PROPERTY (Phase-B, property_fit_investor present) → the cash-to-complete POINT figures
+%%     off the EXACT attached price: actual_property_price, loan_amount (price × 80% LVR baseline),
+%%     lvr, lmi_payable (0 at the baseline), total_cash_required (deposit + duty + acquisition adders).
+%% Still honestly unknowable in BOTH cases:
+%%   - max_property_price_supported → needs the investor mortgage_finance capacity (income/borrowing,
+%%     a refine fact; the FHB path leaves it null too);
 %%   - HAVE-side (gap_or_surplus, verdict) → need cash_available, captured on a refine turn.
-%% So this emits the SCAFFOLD: the calculator renderer + the six cash KB anchors (the method/
-%% figure audit trail) + every figure null (mitigation_options_if_short empty). Honest-partial
-%% throughout (base-turn-honest-partial-output); disposition's consumer of loan_amount/
-%% total_cash_required is already null-safe (loan_payout / full_horizon stay null).
+%% The calculator renderer + the six cash KB anchors (method/figure audit trail) are carried
+%% throughout; mitigation_options_if_short empty. Honest-partial (base-turn-honest-partial-output).
+%% disposition's consumer reads total_cash_required via money_range/1 (scalar → [v,v]); it computes
+%% the full-horizon ACQUIRE figure once disposition is re-run per-property (Slice B3c).
 %%
 %% SEAMS (flagged, not patched here):
 %%   1. total_cash_required is typed scalar `money`, but the natural base computation is a
@@ -98,18 +100,13 @@ fill_fhb(Args, Upstream) ->
 %%      financial spine is design-first (§8.5) — only disposition's dispose_cash_events + the
 %%      yield/tax hold events exist on the investor temporal flow.
 -spec fill_investor(map(), map()) -> {map(), binary(), [map()]}.
-fill_investor(_Args, _Upstream) ->
-    Outcome = #{
-        <<"actual_property_price">>        => null,
-        <<"max_property_price_supported">> => null,
-        <<"total_cash_required">>          => null,
-        <<"loan_amount">>                  => null,
-        <<"lvr">>                          => null,
-        <<"lmi_payable">>                  => null,
-        <<"gap_or_surplus">>               => null,
-        <<"verdict">>                      => null,
-        <<"mitigation_options_if_short">>  => []
-    },
+fill_investor(_Args, Upstream) ->
+    %% Branch on the per-property keystone (Slice B3b): at base property_fit_investor is absent →
+    %% the all-null scaffold; per-property (Phase-B) it carries the exact price → the cash-to-complete.
+    Outcome = case maps:get(<<"property_fit_investor">>, Upstream, undefined) of
+                  Pf when is_map(Pf), map_size(Pf) > 0 -> budget_envelope_investor(Pf);
+                  _                                    -> budget_envelope_investor_base()
+              end,
     KbVersions = fh_engine_kb:kb_anchors(
         [<<"kb.stamp-duty.calc-by-state">>,
          <<"kb.investor.deposit-requirements-investment-loans">>,
@@ -118,6 +115,73 @@ fill_investor(_Args, _Upstream) ->
          <<"kb.tax.quantity-surveyor-reports">>,
          <<"kb.tax.entity-setup-costs">>]),
     {Outcome, <<"calculator">>, KbVersions}.
+
+%% base (no property attached): every figure honestly unknowable.
+budget_envelope_investor_base() ->
+    #{<<"actual_property_price">>        => null,
+      <<"max_property_price_supported">> => null,
+      <<"total_cash_required">>          => null,
+      <<"loan_amount">>                  => null,
+      <<"lvr">>                          => null,
+      <<"lmi_payable">>                  => null,
+      <<"gap_or_surplus">>               => null,
+      <<"verdict">>                      => null,
+      <<"mitigation_options_if_short">>  => []}.
+
+%% Slice B3b — the per-property cash-to-complete (NEED side), POINT figures off the attached
+%% property's EXACT price (so scalar `money`, not banded): loan at the LVR baseline (80% — the
+%% 20%-deposit/no-LMI planning baseline, deposit-requirements), the deposit, full stamp duty (no
+%% FHB concession — investor; no foreign surcharge for a domestic investor), and the acquisition
+%% adders. lmi_payable = 0 at the 80% baseline. The HAVE side (gap_or_surplus, verdict) and
+%% max_property_price_supported (borrowing capacity → income, a refine fact) stay null — honest-
+%% partial. Honest-partial too if the price/state are missing or the state's duty isn't modelled.
+budget_envelope_investor(Pf) ->
+    Price = maps:get(<<"price">>, Pf, null),
+    State = maps:get(<<"state">>, Pf, null),
+    case is_integer(Price) andalso Price > 0 andalso is_binary(State) of
+        false -> budget_envelope_investor_base();
+        true ->
+            Lvr  = 100 - param_value(<<"kb.investor.deposit-requirements-investment-loans">>,
+                                     <<"deposit_no_lmi_pct">>),
+            Loan = round(Price * Lvr / 100),
+            Duty = maps:get(<<"after_concession">>, stamp_duty(State, false, Price), null),
+            Acq  = acquisition_costs_investor(State, Price),
+            (budget_envelope_investor_base())#{
+                <<"actual_property_price">> => Price,
+                <<"loan_amount">>           => Loan,
+                <<"lvr">>                   => Lvr,
+                <<"lmi_payable">>           => 0,   %% 80% LVR baseline → no LMI (lmi.calculation 80% threshold)
+                <<"total_cash_required">>   => total_cash_investor(Price - Loan, Duty, Acq)
+            }
+    end.
+
+%% acquisition adders for an investor (kb.buyer-costs.investor-additional-costs): registration
+%% (exact, per state) + the shared due-diligence/legal lines (building+pest inspection,
+%% conveyancing, lender application fee) collapsed to a representative point. EXCLUDES the
+%% owner-occupier / holding lines (moving, utility connections, and building insurance — the last
+%% is a recurring OPERATING expense in yield_modelling, never an acquisition cost; no double-count).
+%% The conditional adders (lease review if tenant-in-situ, QS report, entity setup) are surfaced as
+%% considerations, not summed into the baseline cash. null when the state's registration isn't modelled.
+acquisition_costs_investor(State, Price) ->
+    case registration_total(State, Price) of
+        null -> null;
+        Reg  ->
+            {Lo, Hi} = convention_band_investor(),
+            Reg + round((Lo + Hi) / 2)
+    end.
+
+convention_band_investor() ->
+    Keys = [<<"building_pest_inspection">>, <<"conveyancing">>, <<"lender_application_fee">>],
+    {lists:sum([cost_param(K, <<"_low">>)  || K <- Keys]),
+     lists:sum([cost_param(K, <<"_high">>) || K <- Keys])}.
+
+%% = deposit + duty + acquisition adders; null if any contributing line is pending (honest-partial,
+%% never a partial sum) — e.g. an unmodelled state's duty/registration.
+total_cash_investor(Deposit, Duty, Acq)
+  when is_integer(Deposit), is_integer(Duty), is_integer(Acq) ->
+    Deposit + Duty + Acq;
+total_cash_investor(_, _, _) ->
+    null.
 
 %% --- stamp_duty: the composition contract (§2) -------------------------------
 %% before = standard_duty(V, state); after = concessional_duty (or before, no

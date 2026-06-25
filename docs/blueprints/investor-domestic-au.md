@@ -492,7 +492,9 @@ The `mortgage_plan` outcome feeds `yield_modelling.loan_costs` (the loan cost ca
 
 **Inputs:** `investor_profile.outcome` + `property_fit_investor.outcome` + `strategy_thesis`
 
-**KB anchors:** `kb.investor.rental-income-modelling`, `kb.investor.operating-expenses-typical-ratios`, `kb.investor.vacancy-rate-assumptions`, `kb.investor.cash-flow-modelling-methodology`, `kb.investor.property-management-fees`
+**KB anchors:** `kb.investor.rental-income-modelling`, `kb.investor.operating-expenses-typical-ratios`, `kb.investor.vacancy-rate-assumptions`, `kb.investor.cash-flow-modelling-methodology`, `kb.investor.property-management-fees`, `kb.lender.serviceability-basics`, `kb.lender.serviceability-investment-loans`, `kb.investor.deposit-requirements-investment-loans`, `kb.loan.interest-only-vs-pi-investor`
+
+> The last four anchors are the **post-loan financing provenance** (Slice B3a): the cash-flow interest is computed at a representative leverage — loan = price × the LVR baseline (`deposit-requirements`, 80%), rate = OO product rate (`serviceability-basics`) + the investment premium (`serviceability-investment-loans`), interest-only basis (`interest-only-vs-pi-investor`). This equals the `mortgage_plan`→`yield_modelling.loan_costs` figure the prose below intends, modelled here until `mortgage_finance` runs per-property.
 
 **Renderer:** `calculator`
 
@@ -548,20 +550,22 @@ The `mortgage_plan` outcome feeds `yield_modelling.loan_costs` (the loan cost ca
 {
   "type": "cash_flow_projection",
   "fields": {
-    "annual_rental_income_year_1": "money",
-    "annual_operating_expenses_year_1": "money",
+    "annual_rental_income_year_1": "money_range",
+    "annual_operating_expenses_year_1": "money_range",
     "annual_interest_year_1": "money",
-    "cash_flow_before_tax_year_1": "money",
-    "cash_flow_before_tax_per_week": "money",
-    "gross_yield": "percentage",
-    "net_yield_pre_loan": "percentage",
-    "net_yield_post_loan_pre_tax": "percentage",
-    "year_5_projected_cash_flow": "money",
-    "year_10_projected_cash_flow": "money",
+    "cash_flow_before_tax_year_1": "money_range",
+    "cash_flow_before_tax_per_week": "money_range",
+    "gross_yield": "percentage_range",
+    "net_yield_pre_loan": "percentage_range",
+    "net_yield_post_loan_pre_tax": "percentage_range",
+    "year_5_projected_cash_flow": "money_range",
+    "year_10_projected_cash_flow": "money_range",
     "is_positive_neutral_or_negative_geared_pre_tax": "enum"
   }
 }
 ```
+
+**The banded money surface (Slice B0 — the cross-contract seam, decided).** The weekly rent is an irreducible **range** (`property_fit_investor.estimated_weekly_rent_range`), and the KB methodology carries it as such — *"the income line, and the yields built on it, are surfaced as ranges, not false-precision points"* (`kb.investor.rental-income-modelling`). So every rent-dependent figure here is a **`money_range` / `percentage_range`** `[lo, hi]` band, not a scalar — matching `disposition`'s already-banded surface (`sale_proceeds`, `net_proceeds`, …) and the `calculator` renderer, which renders a band as `$lo – $hi` and **collapses `[x, x]` to a single `$x`** for a point figure. The **one exception is `annual_interest_year_1`** (`money`, scalar): interest is `loan × rate` — deterministic given the loan, *not* rent-derived, so it carries no band. The disposition consumer (`full_horizon_investor`) coerces a scalar to `[x, x]` (`money_range/1`), so the band propagation is backward-compatible. `percentage_range` is a validated figure type (a `[lo, hi]` list of numbers), added to the compiler `SCALAR_TYPES` + the outcome validator alongside `money_range`.
 
 **Hold-phase `cash_events` (full-temporal-flow wiring, design-first — §8.5/§8.6).** `yield_modelling` owns the **recurring hold-phase** flows that the full-horizon financial spine places at phase `own` over the horizon `H`: rental income (`money_in`, `timing: recurring`, `period: year`), operating expenses and loan interest (`money_out`, recurring/year), each `source_component: yield_modelling`, gated by the §13 placement/provenance check. These are the holding-years entries the truncated (acquire-only) model had nowhere to put; `tax_structure` adds the negative-gearing tax effect on the same axis (below).
 

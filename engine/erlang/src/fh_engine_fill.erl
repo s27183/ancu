@@ -484,50 +484,198 @@ tax_structure(_Upstream) ->
 %% field (fh_engine_outcome implicit-universal nullability), so the scaffold passes Layer-1
 %% trivially with NO banded-vs-scalar type decision forced here.
 %%
-%% DEFERRED: THE CASH-FLOW ARITHMETIC. The income→expenses→yields→cash-flow→projection
-%% computation depends on property_assessment's rent leaf (an UNBUILT upstream) — building it
-%% now would assert an ungrounded producer shape ([[place-upstream-figures-dont-recompute]]).
-%% It lands with the property_assessment unit, where a CROSS-CONTRACT decision must be resolved:
-%% cash_flow_projection figures are typed `money`/`percentage` SCALAR in the registry AND
-%% disposition already consumes `cash_flow_before_tax_year_1` as a SCALAR number, but the KB
-%% says BANDED ranges (rent is a range) and every other figure-owner (disposition's
-%% sale_proceeds etc.) is money_range. That seam (KB ↔ blueprint ↔ registry ↔ disposition
-%% consumer ↔ calculator renderer) is decided deliberately when the arithmetic runs, not here.
+%% THE CASH-FLOW ARITHMETIC (Slice B1) — branches on the per-property keystone. At base
+%% property_fit_investor is absent → the honest-partial all-null scaffold (base_cfp/0). In the
+%% Phase-B turn (after property_assessment) it is present → the banded rent-economics below. The
+%% CROSS-CONTRACT seam it forced is decided in Slice B0: the rent is a band, so income/yields/
+%% cash-flow are `money_range`/`percentage_range` `[lo, hi]` bands (not the old scalar typing),
+%% matching disposition's banded surface + the calculator renderer (which collapses `[x,x]` to a
+%% point). disposition's `cash_flow_before_tax_year_1` read coerces a scalar via money_range/1, so
+%% the band propagates backward-compatibly. B1 computes the PRE-LOAN figures (determined by rent +
+%% price + KB ratios); the POST-LOAN figures need budget_envelope_investor.loan_amount (a
+%% cash_position-per-property figure, unbuilt) → null until Slice B3.
 %%
 %% One clause serves BOTH investor blueprints (resolver keys on component name): the Mode-D
 %% `cash_flow_projection_foreign` variant also runs through here — fine at base (null conforms;
 %% its FX-specific fields default null), the Mode-D figures deferred with Mode D. Reads only
 %% upstream (no Args); the base outcome is input-independent (all null) — Upstream is taken for
 %% shape symmetry with the other resolvers and the per-property branch to come.
-yield_modelling(_Upstream) ->
-    %% the cash_flow_projection schema, honest-partial: every figure null at base (no rent input).
-    Outcome = #{
-        %% income lines — null until a property's weekly rent is known.
+yield_modelling(Upstream) ->
+    Outcome = case maps:get(<<"property_fit_investor">>, Upstream, undefined) of
+                  Pf when is_map(Pf), map_size(Pf) > 0 ->
+                      cash_flow_projection(
+                          maps:get(<<"estimated_weekly_rent_range">>, Pf, null),
+                          maps:get(<<"price">>, Pf, null),
+                          maps:get(<<"property_type">>, Pf, null));
+                  _ ->
+                      base_cfp()
+              end,
+    %% the five Cluster-Y anchors — the resolver-owned audit trail (method + bands), carried
+    %% whether the figures are null (base) or computed (per-property) so the methodology is
+    %% provenanced either way. When the POST-loan cluster computes (interest present, Slice B3a),
+    %% add the four financing anchors — the loan/rate/LVR provenance for the regulated figures.
+    YieldAnchors = [<<"kb.investor.rental-income-modelling">>,
+                    <<"kb.investor.operating-expenses-typical-ratios">>,
+                    <<"kb.investor.vacancy-rate-assumptions">>,
+                    <<"kb.investor.cash-flow-modelling-methodology">>,
+                    <<"kb.investor.property-management-fees">>],
+    FinancingAnchors = case maps:get(<<"annual_interest_year_1">>, Outcome, null) of
+                           null -> [];
+                           _    -> [<<"kb.lender.serviceability-basics">>,
+                                    <<"kb.lender.serviceability-investment-loans">>,
+                                    <<"kb.investor.deposit-requirements-investment-loans">>,
+                                    <<"kb.loan.interest-only-vs-pi-investor">>]
+                       end,
+    KbVersions = fh_engine_kb:kb_anchors(YieldAnchors ++ FinancingAnchors),
+    {Outcome, <<"calculator">>, KbVersions}.
+
+%% the honest-partial all-null cash_flow_projection scaffold — at base (no property) and for the
+%% per-property fields B1 does not yet compute (the POST-loan figures need a loan; the geared
+%% verdict + projections follow the post-loan cash flow → Slice B3). null conforms to any field.
+base_cfp() ->
+    #{
         <<"annual_rental_income_year_1">>      => null,
         <<"annual_operating_expenses_year_1">> => null,
         <<"annual_interest_year_1">>           => null,
-        %% headline cash flow (annual + per-week) — null at base.
         <<"cash_flow_before_tax_year_1">>      => null,
         <<"cash_flow_before_tax_per_week">>    => null,
-        %% yields — null at base (gross needs rent; net needs rent + expenses ± loan).
         <<"gross_yield">>                  => null,
         <<"net_yield_pre_loan">>           => null,
         <<"net_yield_post_loan_pre_tax">>  => null,
-        %% multi-year projection — null at base (compounds the year-1 figures, themselves null).
         <<"year_5_projected_cash_flow">>   => null,
         <<"year_10_projected_cash_flow">>  => null,
-        %% the geared-position verdict — null (sign of a null cash flow is undetermined).
         <<"is_positive_neutral_or_negative_geared_pre_tax">> => null
-    },
-    %% the five Cluster-Y anchors — the resolver-owned audit trail (method + bands), carried at
-    %% base so the methodology is provenanced before any figure exists.
-    KbVersions = fh_engine_kb:kb_anchors(
-        [<<"kb.investor.rental-income-modelling">>,
-         <<"kb.investor.operating-expenses-typical-ratios">>,
-         <<"kb.investor.vacancy-rate-assumptions">>,
-         <<"kb.investor.cash-flow-modelling-methodology">>,
-         <<"kb.investor.property-management-fees">>]),
-    {Outcome, <<"calculator">>, KbVersions}.
+    }.
+
+%% The banded rent-economics — every figure a [lo, hi] BAND because the weekly rent is a band
+%% (the §B0 banded surface). Removed from the LLM's reach: resolver-computed, KB-grounded, never
+%% agent-authored. Two layers:
+%%   - PRE-LOAN (Slice B1): income, opex, gross yield, net-pre-loan yield — determined by (rent
+%%     band, price, KB ratios) alone.
+%%   - POST-LOAN (Slice B3a): interest, before-tax cash flow (annual + per-week), net-post-loan
+%%     yield, the year-5/10 projection, and the geared position — they need a LOAN. The DAG runs
+%%     yield BEFORE cash_position (yield → tax → cash), so the loan is not read from there; the KB
+%%     cash-flow-modelling-methodology assigns interest to the financing structure, modelled here
+%%     at a REPRESENTATIVE leverage (price × LVR baseline × the investor product rate, all
+%%     KB-read). This equals what mortgage_finance would compute per-property (price × the same
+%%     KB LVR), so it agrees with the intended mortgage_plan→yield wiring (blueprint §5 loan_costs)
+%%     once that lands; it is honest representative leverage, flagged, refined when the actual deal
+%%     financing (savings/capacity) is captured. [[place-upstream-figures-dont-recompute]]: read
+%%     rent/price off property_fit_investor; never recompute them.
+cash_flow_projection([RLo, RHi], Price, PType)
+  when is_number(RLo), is_number(RHi), is_number(Price), Price > 0 ->
+    %% income (kb.investor.rental-income-modelling): gross = weekly rent × 52; effective =
+    %% gross × (1 − vacancy). EFFECTIVE is the load-bearing line every downstream figure uses.
+    Weeks   = 52,     %% weeks_per_year (rental-income-modelling — the 52-week convention)
+    Vacancy = 0.03,   %% default_vacancy_assumed_pct (vacancy-rate-assumptions; PLACEHOLDER
+                      %% default — property_fit_investor carries no per-suburb vacancy figure)
+    GrossLo = RLo * Weeks,
+    GrossHi = RHi * Weeks,
+    EffLo   = round(GrossLo * (1 - Vacancy)),
+    EffHi   = round(GrossHi * (1 - Vacancy)),
+    GrossYield = [round1(GrossLo / Price * 100), round1(GrossHi / Price * 100)],
+    case opex_band(EffLo, EffHi, Price, PType) of
+        {OpexLo, OpexHi} ->
+            %% net pre-loan = (effective income − opex) ÷ price (interval subtraction:
+            %% [a,b] − [c,d] = [a−d, b−c]).
+            NetYieldPreLoan = [round1((EffLo - OpexHi) / Price * 100),
+                               round1((EffHi - OpexLo) / Price * 100)],
+            PreLoan = (base_cfp())#{
+                <<"annual_rental_income_year_1">>      => [EffLo, EffHi],
+                <<"annual_operating_expenses_year_1">> => [OpexLo, OpexHi],
+                <<"gross_yield">>                      => GrossYield,
+                <<"net_yield_pre_loan">>               => NetYieldPreLoan
+            },
+            post_loan(EffLo, EffHi, OpexLo, OpexHi, Price, PreLoan);
+        none ->
+            %% strata — the body-corporate levy (building cover + structural maintenance) is not
+            %% carried in property_fit_investor, so opex would understate cost; null it (honest-
+            %% partial, the KB no-double-count + conservative discipline). Income + gross yield
+            %% still compute; the POST-loan cluster needs the full opex picture → null too. Strata
+            %% opex (and its post-loan figures) land when the levy is wired (a later slice).
+            (base_cfp())#{
+                <<"annual_rental_income_year_1">> => [EffLo, EffHi],
+                <<"gross_yield">>                 => GrossYield
+            }
+    end;
+cash_flow_projection(_Rent, _Price, _PType) ->
+    %% rent band or price missing/ill-formed → honest-partial null (never a false figure).
+    base_cfp().
+
+%% Slice B3a — the POST-loan cluster. Completes the cash-flow projection with a representative
+%% investment loan: loan = price × LVR baseline (80%, the 20%-deposit/no-LMI planning baseline);
+%% rate = OO representative product rate + the investment premium; interest-only basis (the
+%% blueprint's loan_costs interest_only_period_years), so year-1 interest = loan × rate (a POINT
+%% — loan and rate are points → interest is scalar `money`, not banded). The financing figures are
+%% KB-read (no magic literal; single-source with disposition's amortisation rate).
+post_loan(EffLo, EffHi, OpexLo, OpexHi, Price, Cfp) ->
+    Lvr      = 100 - param(<<"kb.investor.deposit-requirements-investment-loans">>,
+                           <<"deposit_no_lmi_pct">>),
+    Rate     = param(<<"kb.lender.serviceability-basics">>, <<"representative_product_rate_pct">>)
+             + param(<<"kb.lender.serviceability-investment-loans">>, <<"investment_rate_premium_pp">>),
+    Growth   = param(<<"kb.investor.cash-flow-modelling-methodology">>,
+                     <<"rent_growth_assumed_pct_pa">>) / 100,
+    Interest = round(Price * Lvr / 100 * Rate / 100),
+    %% before-tax cash flow = effective income − opex − interest (interval; interest is a point).
+    CfLo = EffLo - OpexHi - Interest,
+    CfHi = EffHi - OpexLo - Interest,
+    Cfp#{
+        <<"annual_interest_year_1">>        => Interest,
+        <<"cash_flow_before_tax_year_1">>   => [CfLo, CfHi],
+        <<"cash_flow_before_tax_per_week">> => [round(CfLo / 52), round(CfHi / 52)],
+        <<"net_yield_post_loan_pre_tax">>   => [round1(CfLo / Price * 100), round1(CfHi / Price * 100)],
+        <<"year_5_projected_cash_flow">>    => projected(EffLo, EffHi, OpexLo, OpexHi, Interest, Growth, 4),
+        <<"year_10_projected_cash_flow">>   => projected(EffLo, EffHi, OpexLo, OpexHi, Interest, Growth, 9),
+        <<"is_positive_neutral_or_negative_geared_pre_tax">> => geared(CfLo, CfHi)
+    }.
+
+%% the year-N projected before-tax cash flow: income & opex compounded at the growth rate for
+%% N years (interest held flat — interest-only, loan constant). A band. Indicative, assumption-
+%% driven (the KB growth convention), per cash-flow-modelling-methodology.
+projected(EffLo, EffHi, OpexLo, OpexHi, Interest, Growth, Years) ->
+    G = math:pow(1 + Growth, Years),
+    [round(EffLo * G - OpexHi * G - Interest),
+     round(EffHi * G - OpexLo * G - Interest)].
+
+%% the pre-tax geared position from the before-tax cash-flow band: wholly negative → negative;
+%% wholly positive → positive; straddling zero → neutral (the band's sign is undetermined).
+geared(_CfLo, CfHi) when CfHi < 0 -> <<"negative">>;
+geared(CfLo, _CfHi) when CfLo > 0 -> <<"positive">>;
+geared(_CfLo, _CfHi)              -> <<"neutral">>.
+
+%% a KB `parameters[Key].value` scalar (the fh_engine_disposition / fh_engine_cash read pattern).
+param(Slug, Key) ->
+    {ok, Cj} = fh_engine_kb:kb_rules(Slug),
+    maps:get(<<"value">>, maps:get(Key, maps:get(<<"parameters">>, Cj))).
+
+%% operating expenses (kb.investor.operating-expenses-typical-ratios + property-management-fees),
+%% banded. A freestanding HOUSE carries its own building insurance + full maintenance; a STRATA
+%% property carries building cover + structural maintenance inside the body-corporate levy (not
+%% carried in property_fit_investor) → return `none` so opex stays null rather than understate cost.
+opex_band(EffLo, EffHi, Price, PType) ->
+    case is_house(PType) of
+        false -> none;
+        true ->
+            %% fixed dollar bands (low/high), from operating-expenses-typical-ratios:
+            %% council 1500–2500, water 700–1500, landlord-ins 300–700, building-ins(house) 1000–2000.
+            FixedLo = 1500 + 700 + 300 + 1000,
+            FixedHi = 2500 + 1500 + 700 + 2000,
+            %% maintenance reserve — 0.5–1.0% of property value (maintenance_reserve_pct_of_value_*).
+            MaintLo = 0.005 * Price,
+            MaintHi = 0.010 * Price,
+            %% property management — 7.5% of rent COLLECTED (effective income); scales with rent.
+            PmLo = 0.075 * EffLo,
+            PmHi = 0.075 * EffHi,
+            {round(FixedLo + MaintLo + PmLo), round(FixedHi + MaintHi + PmHi)}
+    end.
+
+is_house(<<"established_house">>) -> true;
+is_house(<<"new_house">>)        -> true;
+is_house(<<"house_and_land">>)   -> true;
+is_house(_)                      -> false.   %% apartments / off_the_plan → strata (levy-borne)
+
+%% one-decimal rounding for a percentage-band endpoint (e.g. 3.50434 → 3.5).
+round1(X) -> round(X * 10) / 10.
 
 %% --- property_assessment (Mode C, two-path RESOLVER half — Phase-B keystone) --
 %% The per-property pipeline entry (blueprint component 2, scope per-property): analyse a

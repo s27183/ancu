@@ -63,9 +63,11 @@ def _check_localized(value, locales):
 
 
 def _check_scalar(stype, value):
-    if stype == "money_range":
+    if stype in ("money_range", "percentage_range"):
+        # a banded figure — a [lo, hi] list of numbers (the banded money/percentage surface,
+        # mode-c-wedge Slice B0: rent is a band, so income/yields/cash-flow band too).
         if not (isinstance(value, list) and all(_is_num(x) for x in value)):
-            return f"money_range must be a list of numbers, got {value!r}"
+            return f"{stype} must be a list of numbers, got {value!r}"
         return None
     if stype in FIGURE_TYPES:
         if not _is_num(value):
@@ -214,6 +216,7 @@ def check_placement(outcome, components=()):
 LOC = {"kind": "localized"}
 MONEY = {"kind": "scalar", "type": "money"}
 MRANGE = {"kind": "scalar", "type": "money_range"}
+PRANGE = {"kind": "scalar", "type": "percentage_range"}
 STR = {"kind": "scalar", "type": "string"}
 ENUM = {"kind": "enum", "options": ["a", "b", "c"]}
 
@@ -248,6 +251,12 @@ CASES = [
     {"name": "money_range-ok", "tree": MRANGE, "value": [600000, 700000], "ok": True},
     {"name": "money_range-string-elem-rejected", "tree": MRANGE,
      "value": [600000, "700k"], "ok": False, "expect": "list of numbers"},
+    {"name": "percentage_range-ok", "tree": PRANGE, "value": [3.5, 4.1], "ok": True},
+    {"name": "percentage_range-null-ok", "tree": PRANGE, "value": None, "ok": True},
+    {"name": "percentage_range-string-elem-rejected", "tree": PRANGE,
+     "value": [3.5, "4.1%"], "ok": False, "expect": "list of numbers"},
+    {"name": "percentage_range-bare-number-rejected", "tree": PRANGE, "value": 3.8,
+     "ok": False, "expect": "list of numbers"},
 
     # string scalar — graceful (not a figure)
     {"name": "string-graceful", "tree": STR, "value": "Cabramatta", "ok": True},

@@ -126,7 +126,10 @@ fill_investor(Profile, Tax, Upstream) ->
     CashFlow = maps:get(<<"cash_flow_projection">>, Upstream, #{}),
 
     H        = horizon(Profile),
-    Price    = price_basis(Profile),
+    %% per-property (Phase B, Slice B3c): the ATTACHED property's exact price drives every dispose
+    %% figure (sale_proceeds, taxable_gain, the net); at base: the target-range ceiling. So the
+    %% dispose projection reflects THIS property, not the plan-wide range. [[place-upstream-figures-dont-recompute]]
+    Price    = property_price(maps:get(<<"property_fit_investor">>, Upstream, #{}), Profile),
     {GLow, GHigh, _IsPlaceholder} = growth_band(),
 
     Sale                = sale_proceeds(Price, H, GLow, GHigh),
@@ -164,9 +167,17 @@ horizon(Profile) ->
         _                           -> null
     end.
 
-%% the purchase-price basis: the target_price_range CEILING at base (the conservative
-%% upper bound the every-financial-figure narrowing uses); a specific property price
-%% per-property (Phase B). null when no target is set.
+%% the purchase-price basis: per-property (Phase B) the ATTACHED property's exact price (from
+%% property_fit_investor — drives sale_proceeds, taxable_gain, loan, the net); at base the
+%% target_price_range ceiling. The dispose figures thus reflect THIS property once attached.
+property_price(Pf, Profile) ->
+    case maps:get(<<"price">>, Pf, null) of
+        P when is_number(P) -> P;
+        _                   -> price_basis(Profile)
+    end.
+
+%% the base purchase-price basis: the target_price_range CEILING (the conservative upper bound
+%% the every-financial-figure narrowing uses). null when no target is set.
 price_basis(Profile) ->
     case maps:get(<<"target_price_range">>, Profile, null) of
         [_Lo, Hi] when is_number(Hi) -> Hi;
@@ -410,13 +421,16 @@ full_horizon_investor(null, _Budget, _CashFlow, _H) -> null;
 full_horizon_investor(_Net, _Budget, _CashFlow, null) -> null;
 full_horizon_investor([NLo, NHi], Budget, CashFlow, H) when is_integer(H) ->
     Acq = money_range(maps:get(<<"total_cash_required">>, Budget, null)),
-    CF  = maps:get(<<"cash_flow_before_tax_year_1">>, CashFlow, null),
+    %% the hold cash flow is now a BAND (cash_flow_before_tax_year_1, §B0 banded surface), SIGNED.
+    %% money_range/1 coerces a scalar to [v,v] too, so this stays backward-compatible.
+    CF  = money_range(maps:get(<<"cash_flow_before_tax_year_1">>, CashFlow, null)),
     case {Acq, CF} of
-        {null, _}                        -> null;
-        {_, CFv} when not is_number(CFv) -> null;
-        {[AcqLo, AcqHi], CFv} ->
-            Hold = round(CFv * H),
-            [NLo - AcqHi + Hold, NHi - AcqLo + Hold]
+        {null, _} -> null;
+        {_, null} -> null;
+        {[AcqLo, AcqHi], [CFLo, CFHi]} ->
+            HoldLo = round(CFLo * H),
+            HoldHi = round(CFHi * H),
+            [NLo - AcqHi + HoldLo, NHi - AcqLo + HoldHi]
     end.
 
 %% --- dispose_cash_events (the Dispose-phase entries of the shared spine) ------
