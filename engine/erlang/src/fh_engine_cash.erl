@@ -13,7 +13,11 @@
 %% QLD $730k → $6,555). Regulated figures (ASIC decision-support line) — the
 %% postcondition match IS the correctness criterion.
 %%
-%% SCOPE (this unit): the `stamp_duty.*` sub-tree only. The rest of budget_envelope
+%% MODE DISPATCH: fill/2 branches on the `tax_optimised_structure` upstream discriminator
+%% (mirrors fh_engine_disposition) — Mode-A FHB → fill_fhb/2 (budget_envelope, below); Mode-C
+%% investor → fill_investor/2 (budget_envelope_investor, a pure-resolver base scaffold).
+%%
+%% SCOPE (the FHB fill): the `stamp_duty.*` sub-tree only. The rest of budget_envelope
 %% (other_buying_costs, reserve_buffer, deposit, totals, verdict) needs income/
 %% savings facts that arrive on a refine turn → left null/pending here (honest
 %% partial output — base-turn-honest-partial-output). Those are separate fills.
@@ -26,8 +30,22 @@
 
 %% --- entry -------------------------------------------------------------------
 
+%% Mode discriminator (mirrors fh_engine_disposition:fill/2): only the investor blueprint runs
+%% a `tax_structure` component, so its outcome's presence upstream marks the Mode-C investor
+%% cash_position (budget_envelope_investor) vs the Mode-A FHB path (budget_envelope). Shared
+%% component NAME + `calculator` renderer; different outcome TYPE + logic. The FHB body is
+%% renamed fill_fhb/2 verbatim (byte-identical — zero regression); the investor body is new.
 -spec fill(map(), map()) -> {map(), binary(), [map()]}.
 fill(Args, Upstream) ->
+    case maps:get(<<"tax_optimised_structure">>, Upstream, undefined) of
+        undefined -> fill_fhb(Args, Upstream);
+        _Tax      -> fill_investor(Args, Upstream)
+    end.
+
+%% --- Mode-A FHB cash_position (budget_envelope) ------------------------------
+
+-spec fill_fhb(map(), map()) -> {map(), binary(), [map()]}.
+fill_fhb(Args, Upstream) ->
     Profile  = maps:get(<<"profile">>, Upstream, #{}),
     Stack    = maps:get(<<"scheme_stack">>, Upstream, #{}),
     %% mortgage_finance fills BEFORE cash_position in the base DAG, so its outcome is
@@ -53,6 +71,52 @@ fill(Args, Upstream) ->
          <<"kb.buyer-costs.inspections-conveyancing-fees">>,
          <<"kb.cash-reserve.lender-expectations">>, <<"kb.scheme.fhg">>]
         ++ concession_anchor(State, HasConc)),
+    {Outcome, <<"calculator">>, KbVersions}.
+
+%% --- Mode-C investor cash_position (budget_envelope_investor) ----------------
+%% A PURE-resolver figure-owner (agent_leaves = []; no two-path, no merge). The investor outcome
+%% is nine POINT-summary figures (no range/breakdown subtrees, no cash_events — unlike the FHB
+%% budget_envelope). At base (plan-first: no property attached → property_fit_investor absent; no
+%% savings captured) every field is honestly unknowable:
+%%   - property-price-dependent (actual_property_price, total_cash_required, loan_amount, lvr,
+%%     lmi_payable) → wait for the per-property property_assessment turn;
+%%   - max_property_price_supported → needs the investor mortgage_finance capacity (variant
+%%     unbuilt — a documented downstream trigger; the FHB path leaves it null at base too);
+%%   - HAVE-side (gap_or_surplus, verdict) → need cash_available, captured on a refine turn.
+%% So this emits the SCAFFOLD: the calculator renderer + the six cash KB anchors (the method/
+%% figure audit trail) + every figure null (mitigation_options_if_short empty). Honest-partial
+%% throughout (base-turn-honest-partial-output); disposition's consumer of loan_amount/
+%% total_cash_required is already null-safe (loan_payout / full_horizon stay null).
+%%
+%% SEAMS (flagged, not patched here):
+%%   1. total_cash_required is typed scalar `money`, but the natural base computation is a
+%%      money_range over the target price range — the banded-vs-scalar cross-contract seam,
+%%      recurring from yield_modelling/tax_structure. Base parity with the FHB NEED-side ranges
+%%      (deposit/duty/other-costs over the range) would be a registry+blueprint+shell redesign,
+%%      not this resolver.
+%%   2. budget_envelope_investor carries no cash_events field, so the investor acquire-phase
+%%      financial spine is design-first (§8.5) — only disposition's dispose_cash_events + the
+%%      yield/tax hold events exist on the investor temporal flow.
+-spec fill_investor(map(), map()) -> {map(), binary(), [map()]}.
+fill_investor(_Args, _Upstream) ->
+    Outcome = #{
+        <<"actual_property_price">>        => null,
+        <<"max_property_price_supported">> => null,
+        <<"total_cash_required">>          => null,
+        <<"loan_amount">>                  => null,
+        <<"lvr">>                          => null,
+        <<"lmi_payable">>                  => null,
+        <<"gap_or_surplus">>               => null,
+        <<"verdict">>                      => null,
+        <<"mitigation_options_if_short">>  => []
+    },
+    KbVersions = fh_engine_kb:kb_anchors(
+        [<<"kb.stamp-duty.calc-by-state">>,
+         <<"kb.investor.deposit-requirements-investment-loans">>,
+         <<"kb.lmi.calculation">>,
+         <<"kb.buyer-costs.investor-additional-costs">>,
+         <<"kb.tax.quantity-surveyor-reports">>,
+         <<"kb.tax.entity-setup-costs">>]),
     {Outcome, <<"calculator">>, KbVersions}.
 
 %% --- stamp_duty: the composition contract (§2) -------------------------------

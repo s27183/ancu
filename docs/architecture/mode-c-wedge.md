@@ -208,7 +208,7 @@ Status legend: `[ ]` not started · `[~]` drafting · `[v]` facts verified vs pr
 | [ ] | P5-engine | `mortgage_finance` investor variant (branch the shared resolver) — investment-loan serviceability, IO-vs-PI, DTI cap (Cluster-F KB) |
 | [~] | P5-engine | `yield_modelling` resolver — base-spine presence DONE (`fh_engine_fill` inline, honest-partial all-null `cash_flow_projection` + `calculator` + 5 Cluster-Y anchors); the cash-flow **arithmetic** (NEW module) defers to `property_assessment` (its rent-leaf producer) + the banded-vs-scalar seam |
 | [~] | P5-engine | `tax_structure` **two-path** — base-spine presence DONE (`fh_engine_fill` inline: resolver scaffold + `entity_structuring` agent leaf `recommended_entity`, live-verified; the two CGT-determinant **constants** `disposition` reads — `cgt_discount_eligible`/`cost_base_depreciation_clawback` = true; `data-table` + 6 Cluster-T anchors). Deferred to `property_assessment`: `cgt_marginal_rate` (needs an ATO-brackets KB doc + income), `setup_costs`/`annual_compliance_cost` (banded-vs-scalar seam), the 5 property/rent-dependent figures |
-| [ ] | P5-engine | `cash_position` investor variant (branch the shared resolver) — investment deposit, no FHB schemes, investor cost adders (Cluster-Y/F KB) |
+| [~] | P5-engine | `cash_position` investor variant — base presence DONE (`fh_engine_cash:fill_investor/2`, branched on the `tax_optimised_structure` discriminator like `disposition`; **pure-resolver**, `agent_leaves []`). The compiled `budget_envelope_investor` is 9 point-summary figures, all honestly null at base (plan-first: no property, no savings); emits `calculator` + the 6 Cluster-Y/T cash anchors. Deferred to `property_assessment` (per-property): the property-price-dependent figures; `max_property_price_supported` → investor `mortgage_finance` capacity (unbuilt); HAVE-side → refine turn |
 | [ ] | P5-engine | `ownership_planning_investor` resolver (NEW module) — `portfolio_position` (land-tax aggregation, mgmt model, scale-up; Cluster-S KB) + the `opportunities[]` producer seam flagged in P4 |
 | [ ] | P5-activate | per-blueprint `base_components/1` sequence (the P3 follow-on — derive the investor base set + DAG order, replacing the Mode-A `?BASE_COMPONENTS` macro) |
 | [ ] | P5-activate | Onboarding **dispatch** (`fh_engine_h_plan_cards.erl` selects blueprint by `intent`) **+** **intent picker** (`onboarding.ts`), atomic-last |
@@ -412,6 +412,41 @@ refinement needs the input declared. (2) the regulated `recommended_entity` has 
 in the compiled outcome — surfacing its reasoning is a separate outcome-schema unit. **Next P5-engine
 unit:** `cash_position` investor variant (now unblocked — its `tax_optimised_structure` upstream exists),
 `mortgage_finance` investor variant, or `ownership_planning_investor` (NEW module + the P4 `opportunities[]`
+seam) — Son's pick. Then P5-activate (base_components/1 + dispatch + intent picker, atomic-last).
+
+**P5-engine 5/suite COMPLETE (2026-06-25) — `cash_position` investor variant (a pure-resolver
+figure-owner).** Picked next per the DAG order (…→ tax_structure → **cash_position** → …), now
+unblocked since its `tax_optimised_structure` upstream landed in 4/suite. **First shared-component-name
+collision in the suite:** both blueprints have a component literally named `cash_position` (the resolver
+keys on name only), emitting *different* outcome types (`budget_envelope` vs `budget_envelope_investor`).
+**Resolved by the `disposition` pattern** — one module, internal branch on the `tax_optimised_structure`
+upstream discriminator (an investor-only outcome; cash_position's investor `dag_reads` include it and it
+runs after tax_structure, so it's present for the investor path and **never** for FHB). `fh_engine_cash:fill/2`
+now dispatches: absent → `fill_fhb/2` (the existing body, **pure rename — byte-identical**, zero
+regression); present → `fill_investor/2` (new). **Classification:** `budget_envelope_investor` has
+`agent_leaves []` → **pure-resolver** (no two-path, no `merge_agent`), unlike tax_structure. **Base output:**
+the compiled outcome is **9 point-summary figures** (no range/breakdown subtrees, no `cash_events` — unlike
+the richer FHB `budget_envelope`); at base every field is honestly unknowable (property-price-dependent →
+`property_assessment`; `max_property_price_supported` → investor `mortgage_finance` capacity, variant unbuilt;
+HAVE-side `gap_or_surplus`/`verdict` → refine turn). So `fill_investor` emits the **all-null/empty scaffold**
++ `calculator` + the **6 cash anchors** (`kb.stamp-duty.calc-by-state`, `kb.investor.deposit-requirements-
+investment-loans`, `kb.lmi.calculation`, `kb.buyer-costs.investor-additional-costs`,
+`kb.tax.quantity-surveyor-reports`, `kb.tax.entity-setup-costs` — all verified to resolve).
+**Verified:** `cash_position_investor_conformance.escript` **31 anchors** (scaffold: 9-field set, 8 nulls +
+empty mitigation, input-independence, renderer, 6 anchors, `has_resolver`; Layer-1 conformance vs
+`budget_envelope_investor`; **discriminator** — present → investor 9-field set with NO `stamp_duty` key,
+absent → FHB `budget_envelope` with `stamp_duty`, the two never cross; no-regression — FHB validates +
+`stamp_duty` sub-tree intact, `yield_modelling` stays pure-resolver). **No live model** (pure resolver, no
+agent leaf). `cash_duty_conformance` **28/28 byte-identical** (FHB dollar-exact duty unchanged),
+`disposition` 79, `outcome` 21+11 all green; `erlang-checker` clean; no recompile (outcome type + anchors
+already compiled). **Two seams flagged (not patched):** (1) `total_cash_required` is typed scalar `money`
+but the natural base figure is a money_range over the target price range — the **banded-vs-scalar seam**
+recurring from yield_modelling/tax_structure; FHB-parity base NEED-side ranges would be a
+registry+blueprint+shell redesign, not this resolver. (2) `budget_envelope_investor` has no `cash_events`
+field, so the investor acquire-phase financial spine is **design-first (§8.5)** — only disposition's
+`dispose_cash_events` + the yield/tax hold events exist on the investor temporal flow. **Next P5-engine
+unit:** `mortgage_finance` investor variant (also a shared-name branch — unblocks
+`max_property_price_supported`), or `ownership_planning_investor` (NEW module + the P4 `opportunities[]`
 seam) — Son's pick. Then P5-activate (base_components/1 + dispatch + intent picker, atomic-last).
 
 ## Deferred out (honest — first-exercising instance is Mode B/D, not here)
