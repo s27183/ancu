@@ -15,6 +15,7 @@
 -export([append_event/4, events_since/3, usage_events_since/3, max_event_id/2]).
 -export([append_audit/6]).
 -export([snapshot_component/3, get_plan_card/2, get_card_rerun_context/1, set_card_target/2]).
+-export([attach_property/3, snapshot_addendum_component/4]).
 -export([set_checklist_status/4, get_checklist_status/2]).
 -export([set_profile_financials/2, list_plan_card_ids_for_profile/1]).
 -export([deploy_commit_sha/0, projection_state/1, list_active_plan_card_ids/0]).
@@ -167,6 +168,47 @@ snapshot_component(PlanCardId, ComponentId, OutcomeEntry) ->
         "updated_at = now() "
         "WHERE plan_card_id = $1::uuid",
         [PlanCardId, ComponentId, fh_engine_util:json_encode(OutcomeEntry)]),
+    ok.
+
+%% --- per-property addenda (Phase B, constraint #2 base + addenda) ------------
+
+%% Attach a property to a plan card: create/refresh the addendum's property_card under
+%% content.addenda.<property_id>, preserving any components already filled there. This
+%% ESTABLISHES the addenda.<pid>.components object the per-property turn snapshots into —
+%% so it MUST run before the Phase-B turn (the attach handler enforces the order). Addenda
+%% are a SIBLING namespace to the base content.components (so the base refresh/rerun sweep,
+%% which touches only components.*, leaves addenda untouched — the existing
+%% per-property-addenda-preserved reservation, now literal). No new table: addenda live in
+%% the same plan_cards row (properties is "OPTIONAL — not load-bearing", CLAUDE.md item 1).
+-spec attach_property(binary(), binary(), map()) -> ok.
+attach_property(PlanCardId, PropertyId, PropertyCard) ->
+    _ = query(
+        "UPDATE plan_cards SET "
+        "content_jsonb = jsonb_set("
+        "  CASE WHEN content_jsonb ? 'addenda' THEN content_jsonb "
+        "       ELSE jsonb_set(content_jsonb, '{addenda}', '{}'::jsonb, true) END, "
+        "  ARRAY['addenda', $2], "
+        "  jsonb_build_object('property_card', $3::jsonb, 'components', "
+        "    COALESCE(content_jsonb #> ARRAY['addenda', $2, 'components'], '{}'::jsonb)), "
+        "  true), "
+        "updated_at = now() "
+        "WHERE plan_card_id = $1::uuid",
+        [PlanCardId, PropertyId, fh_engine_util:json_encode(PropertyCard)]),
+    ok.
+
+%% Merge a filled per-property component's outcome into content.addenda.<pid>.components.<cid>
+%% — the addendum sibling of snapshot_component/3. The parent addenda.<pid>.components object
+%% is guaranteed by a prior attach_property/3 (which runs before the per-property turn), so a
+%% plain jsonb_set with create_missing on the leaf suffices.
+-spec snapshot_addendum_component(binary(), binary(), binary(), map()) -> ok.
+snapshot_addendum_component(PlanCardId, PropertyId, ComponentId, OutcomeEntry) ->
+    _ = query(
+        "UPDATE plan_cards SET "
+        "content_jsonb = jsonb_set(content_jsonb, "
+        "  ARRAY['addenda', $2, 'components', $3], $4::jsonb, true), "
+        "updated_at = now() "
+        "WHERE plan_card_id = $1::uuid",
+        [PlanCardId, PropertyId, ComponentId, fh_engine_util:json_encode(OutcomeEntry)]),
     ok.
 
 -spec get_plan_card(binary(), binary()) -> {ok, map()} | {error, not_found}.

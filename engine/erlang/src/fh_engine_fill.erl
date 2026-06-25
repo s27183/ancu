@@ -38,6 +38,7 @@ has_resolver(<<"mortgage_finance">>)   -> true;
 has_resolver(<<"investment_strategy">>) -> true;
 has_resolver(<<"yield_modelling">>)    -> true;
 has_resolver(<<"tax_structure">>)      -> true;
+has_resolver(<<"property_assessment">>) -> true;
 has_resolver(<<"purchase_journey">>)   -> true;
 has_resolver(<<"preparation">>)        -> true;
 has_resolver(<<"phase_playbook">>)     -> true;
@@ -65,6 +66,8 @@ resolver(<<"yield_modelling">>, _Args, Upstream) ->
     yield_modelling(Upstream);
 resolver(<<"tax_structure">>, _Args, Upstream) ->
     tax_structure(Upstream);
+resolver(<<"property_assessment">>, Data, _Upstream) ->
+    property_assessment(maps:get(property_card, Data, #{}));
 resolver(<<"purchase_journey">>, Args, Upstream) ->
     fh_engine_journey:fill(Args, Upstream);
 resolver(<<"preparation">>, Args, Upstream) ->
@@ -102,6 +105,27 @@ merge_agent(<<"tax_structure">>, ResolverOutcome, AgentValues) ->
         <<"recommended_entity">> =>
             maps:get(<<"recommended_entity">>, AgentValues, null)
     };
+%% property_assessment (Phase B): fold the rentability + valuation + synthesis leaves the
+%% sidecar authored — the rent BAND, the four qualitative verdicts/scores, and the bilingual
+%% strengths/concerns. Slot-scoped — the agent never touches the neutral facts (state/suburb/
+%% price/property_type, the resolver's copy) nor authors a figure. The ONE derived figure,
+%% rental_yield_gross_estimate, is resolver-COMPUTED here from the agent's rent band + the
+%% price fact (§98 — the yield % is never agent-authored; the rent is an irreducible market
+%% ESTIMATE surfaced as a band, not a regulated calculation [[match-enforcement-grade-to-property-kind]]).
+merge_agent(<<"property_assessment">>, ResolverOutcome, AgentValues) ->
+    Rent  = maps:get(<<"estimated_weekly_rent_range">>, AgentValues, null),
+    Price = maps:get(<<"price">>, ResolverOutcome, null),
+    ResolverOutcome#{
+        <<"estimated_weekly_rent_range">>  => Rent,
+        <<"viability_verdict">>            => maps:get(<<"viability_verdict">>, AgentValues, null),
+        <<"capital_growth_outlook">>       => maps:get(<<"capital_growth_outlook">>, AgentValues, null),
+        <<"depreciation_attractiveness">>  => maps:get(<<"depreciation_attractiveness">>, AgentValues, null),
+        <<"land_quality_score">>           => maps:get(<<"land_quality_score">>, AgentValues, null),
+        <<"investor_grade_overall">>       => maps:get(<<"investor_grade_overall">>, AgentValues, null),
+        <<"key_strengths">>                => maps:get(<<"key_strengths">>, AgentValues, null),
+        <<"key_concerns">>                 => maps:get(<<"key_concerns">>, AgentValues, null),
+        <<"rental_yield_gross_estimate">>  => gross_yield(Rent, Price)
+    };
 merge_agent(Other, _ResolverOutcome, _AgentValues) ->
     erlang:error({no_agent_merge_for, Other}).
 
@@ -127,6 +151,20 @@ agent_values_from_outcome(<<"investment_strategy">>, Stored) ->
 %% call — the agent re-authors nothing.
 agent_values_from_outcome(<<"tax_structure">>, Stored) ->
     #{<<"recommended_entity">> => maps:get(<<"recommended_entity">>, Stored, null)};
+%% property_assessment: recover the eight agent leaves verbatim from the snapshot (the
+%% inverse of merge_agent/3 above). A per-property resolver-only refresh (Slice B+) re-runs
+%% the resolver half (re-copies the facts, RE-COMPUTES the yield from the recovered rent +
+%% price — idempotent) and re-attaches these without a sidecar call. Not exercised by the
+%% base_resolver sweep (base-scope only; addenda untouched), built for symmetry + that path.
+agent_values_from_outcome(<<"property_assessment">>, Stored) ->
+    #{<<"estimated_weekly_rent_range">>  => maps:get(<<"estimated_weekly_rent_range">>, Stored, null),
+      <<"viability_verdict">>            => maps:get(<<"viability_verdict">>, Stored, null),
+      <<"capital_growth_outlook">>       => maps:get(<<"capital_growth_outlook">>, Stored, null),
+      <<"depreciation_attractiveness">>  => maps:get(<<"depreciation_attractiveness">>, Stored, null),
+      <<"land_quality_score">>           => maps:get(<<"land_quality_score">>, Stored, null),
+      <<"investor_grade_overall">>       => maps:get(<<"investor_grade_overall">>, Stored, null),
+      <<"key_strengths">>                => maps:get(<<"key_strengths">>, Stored, null),
+      <<"key_concerns">>                 => maps:get(<<"key_concerns">>, Stored, null)};
 agent_values_from_outcome(Other, _Stored) ->
     erlang:error({no_agent_reattach_for, Other}).
 
@@ -490,6 +528,71 @@ yield_modelling(_Upstream) ->
          <<"kb.investor.cash-flow-modelling-methodology">>,
          <<"kb.investor.property-management-fees">>]),
     {Outcome, <<"calculator">>, KbVersions}.
+
+%% --- property_assessment (Mode C, two-path RESOLVER half — Phase-B keystone) --
+%% The per-property pipeline entry (blueprint component 2, scope per-property): analyse a
+%% SPECIFIC attached property with investor metrics. It produces `property_fit_investor` —
+%% the §11.9 ONE access path through which every downstream per-property component reads
+%% property data (never via basics.* params). Unbuilt until now (no property at base); it
+%% lands with the Phase-B turn (mode-c-wedge.md "Phase B").
+%%
+%% TWO-PATH like the other Mode-C agent components, but with a DIFFERENT figure posture
+%% ([[match-enforcement-grade-to-property-kind]]): the resolver copies the four NEUTRAL
+%% facts the attachment supplies (state/suburb/price/property_type) and computes the ONE
+%% derived figure (rental_yield_gross_estimate, at merge); the SIDECAR authors the
+%% irreducible market judgments — the rent BAND (no deterministic rule pins it; no median-
+%% rent feed is wired → agentic-boundary test #2) and the qualitative verdicts/scores. The
+%% rent is a banded ESTIMATE, KB-grounded (the six property anchors), NOT a regulated
+%% calculation, so it is legitimately agent-authored (unlike capacity/CGT/duty, which are
+%% removed from the LLM's reach). The §98 line still holds: the only DERIVED figure (gross
+%% yield = rent ÷ price) is resolver-computed in merge_agent/3, never agent-authored.
+%%
+%% Reads the attached property_card from the turn Data (threaded by the attach handler), NOT
+%% an upstream outcome — the card is the per-property fact source, the profile is the upstream
+%% (dag_reads = [profile], reached by the sidecar for the investor-lens reasoning). The agent
+%% slots are null here; merge_agent/3 folds the sidecar leaves + computes the yield.
+property_assessment(PropertyCard) ->
+    Outcome = #{
+        %% RESOLVER — neutral property facts copied verbatim from the attached card.
+        <<"state">>         => maps:get(<<"state">>, PropertyCard, null),
+        <<"suburb">>        => maps:get(<<"suburb">>, PropertyCard, null),
+        <<"price">>         => num_or_null(maps:get(<<"price">>, PropertyCard, null)),
+        <<"property_type">> => maps:get(<<"property_type">>, PropertyCard, null),
+        %% AGENT slots (rentability + valuation + synthesis) — null; merge_agent/3 folds them.
+        <<"estimated_weekly_rent_range">> => null,
+        <<"viability_verdict">>           => null,
+        <<"capital_growth_outlook">>      => null,
+        <<"depreciation_attractiveness">> => null,
+        <<"land_quality_score">>          => null,
+        <<"investor_grade_overall">>      => null,
+        <<"key_strengths">>               => null,
+        <<"key_concerns">>                => null,
+        %% RESOLVER-COMPUTED at merge from the agent's rent band + the price fact (§98 — the
+        %% only derived figure, computed not agent-authored). null until merge.
+        <<"rental_yield_gross_estimate">> => null
+    },
+    KbVersions = fh_engine_kb:kb_anchors(
+        [<<"kb.property.rental-market-data-sources">>,
+         <<"kb.property.growth-corridors-au">>,
+         <<"kb.property.depreciation-by-build-year">>,
+         <<"kb.property.investor-grade-features">>,
+         <<"kb.property.comparables-methodology">>,
+         <<"kb.strata.health-indicators-investor-lens">>]),
+    {Outcome, <<"summary-card">>, KbVersions}.
+
+%% Gross rental yield % = annualised mid-band weekly rent ÷ price × 100, 1 dp. null when
+%% either input is missing or the band is malformed (honest-partial). Resolver-owned (§98).
+gross_yield([Lo, Hi], Price)
+  when is_number(Lo), is_number(Hi), is_number(Price), Price > 0 ->
+    Mid = (Lo + Hi) / 2,
+    round(Mid * 52 / Price * 100 * 10) / 10;
+gross_yield(_Rent, _Price) ->
+    null.
+
+%% A number, or null for absent/non-numeric (the attach handler validates price presence;
+%% this is the belt-and-braces so a malformed card never crashes the fill).
+num_or_null(N) when is_number(N) -> N;
+num_or_null(_)                   -> null.
 
 %% A three-valued resolver verdict, made JSON-safe for the outcome snapshot:
 %% true/false stay booleans; `undetermined` becomes an explicit marker (rather than

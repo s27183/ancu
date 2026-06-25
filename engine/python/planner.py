@@ -46,7 +46,7 @@ from pathlib import Path
 
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, Field, StringConstraints, ValidationError
+from pydantic import BaseModel, Field, StringConstraints, ValidationError, model_validator
 
 
 # --- protocol-stream isolation -------------------------------------------------
@@ -244,6 +244,50 @@ class EntityStructuringLeaves(BaseModel):
     recommended_entity: OwnershipEntity  # single-valued enum (schema-as-constraint)
 
 
+# --- the property_fit agent schema: the Phase-B per-property leaves (Slice A) ----
+# property_assessment is TWO-PATH but with a DIFFERENT figure posture from the other Mode-C
+# components ([[match-enforcement-grade-to-property-kind]]): the resolver copies the neutral
+# facts (state/suburb/price/property_type) and computes the ONE derived figure (gross yield,
+# = rent ÷ price, in merge_agent); the agent authors the irreducible MARKET JUDGMENTS — the
+# weekly-rent BAND (no deterministic rule pins it; no median-rent feed is wired → genuinely
+# agent), the qualitative verdicts, the 0–10 scores, and the bilingual strengths/concerns.
+# The rent is an ESTIMATE surfaced as a BAND (not a regulated calculation), so it is
+# legitimately agent-authored — but it is the ONLY number here: there is NO yield / tax /
+# loan / dollar-total field, so every DERIVED figure stays out of the LLM's reach (§98). The
+# enums are Literals (schema-as-constraint) and mirror the property_fit_investor outcome enums.
+ViabilityVerdict = Literal["strong_investment", "acceptable_investment", "marginal",
+                           "reconsider"]
+CapitalGrowthOutlook = Literal["strong", "moderate", "flat", "declining"]
+DepreciationAttractiveness = Literal["strong", "moderate", "weak"]
+Score0to10 = Annotated[int, Field(ge=0, le=10)]
+
+
+class RentBand(BaseModel):
+    # weekly rent $/week, a low/high BAND (honest about uncertainty — never a false-precise
+    # point). 0–10000/wk is a catastrophe-backstop sanity cap, not a market assertion.
+    low: Annotated[int, Field(ge=0, le=10000)]
+    high: Annotated[int, Field(ge=0, le=10000)]
+
+    @model_validator(mode="after")
+    def _ordered(self):
+        if self.high < self.low:
+            raise ValueError("rent band high < low")
+        return self
+
+
+class PropertyFitLeaves(BaseModel):
+    estimated_weekly_rent_range: RentBand
+    viability_verdict: ViabilityVerdict
+    capital_growth_outlook: CapitalGrowthOutlook
+    depreciation_attractiveness: DepreciationAttractiveness
+    land_quality_score: Score0to10
+    investor_grade_overall: Score0to10
+    # a few specific points each, bilingual {vi, en} (bilingual-content.md §1). Hard cap on
+    # the only unbounded list surfaces (a 20-point list is wrong, not just verbose).
+    key_strengths: Annotated[list[LocalizedText], Field(max_length=6)]
+    key_concerns: Annotated[list[LocalizedText], Field(max_length=6)]
+
+
 # --- prompt assembly (agentic-flow.md §5) --------------------------------------
 # 2a builds the scaffold in code; 2b composes it from the artifact's component
 # descriptor + engine-resolved KB. The static/dynamic split is constraint-#9
@@ -317,6 +361,21 @@ _KB_DOCS = {
         _REPO_ROOT / "docs" / "kb" / "loan" / "fixed-rate-roll-off-planning.md",
     "kb.lender.serviceability-investment-loans":
         _REPO_ROOT / "docs" / "kb" / "lender" / "serviceability-investment-loans.md",
+    # property_fit (Mode C, Phase B) — the six property-assessment docs the per-property
+    # fill grounds in: rental-market estimation, growth corridors, depreciation by build
+    # year, investor-grade features, comparables methodology, and the strata health lens.
+    "kb.property.rental-market-data-sources":
+        _REPO_ROOT / "docs" / "kb" / "property" / "rental-market-data-sources.md",
+    "kb.property.growth-corridors-au":
+        _REPO_ROOT / "docs" / "kb" / "property" / "growth-corridors-au.md",
+    "kb.property.depreciation-by-build-year":
+        _REPO_ROOT / "docs" / "kb" / "property" / "depreciation-by-build-year.md",
+    "kb.property.investor-grade-features":
+        _REPO_ROOT / "docs" / "kb" / "property" / "investor-grade-features.md",
+    "kb.property.comparables-methodology":
+        _REPO_ROOT / "docs" / "kb" / "property" / "comparables-methodology.md",
+    "kb.strata.health-indicators-investor-lens":
+        _REPO_ROOT / "docs" / "kb" / "strata" / "health-indicators-investor-lens.md",
 }
 
 
@@ -619,13 +678,91 @@ clearly points elsewhere. Respect the KB's load-bearing drawbacks (trapped losse
 trusts, no CGT discount in a company, SMSF restrictions).
 4. Emit ONLY the single leaf.""",
     },
+    # property_fit is the agent half of the `property_assessment` component (Mode C, Phase B —
+    # the per-property keystone). UNLIKE the other Mode-C fills it DOES author a number: the
+    # weekly-rent BAND, an irreducible market estimate (no rule pins it, no median-rent feed is
+    # wired). But it is the ONLY number — the gross yield is engine-computed from it, and there
+    # is no tax/loan/dollar field. The neutral facts + price are in <resolver_outcome>; the full
+    # property facts (year built, land size, strata) are in <property_card>. [[match-enforcement-
+    # grade-to-property-kind]]: a SOFT estimate (band + schema-bounded scores), not a HARD figure.
+    "property_fit": {
+        "kb_slugs": ["kb.property.rental-market-data-sources",
+                     "kb.property.growth-corridors-au",
+                     "kb.property.depreciation-by-build-year",
+                     "kb.property.investor-grade-features",
+                     "kb.property.comparables-methodology",
+                     "kb.strata.health-indicators-investor-lens"],
+        "output": """\
+Return a single JSON object conforming to the provided output schema — EXACTLY the leaves \
+named in `<goal>`, nothing else. You DO author the weekly-rent BAND (your one numeric \
+judgment, an estimate) and the qualitative verdicts/scores. You author NO DERIVED or \
+REGULATED figure: the gross yield is computed by the engine from your rent band and the \
+price; you produce no yield, no annual figure, no tax figure, no loan figure, no dollar \
+total. Produce only the JSON object.""",
+        "context": """\
+You are the `property_assessment` component (Phase B, reasoning_domain: property_fit), for a \
+Vietnamese-Australian DOMESTIC property investor analysing a SPECIFIC attached property with \
+investor metrics. The neutral facts (state, suburb, price, property type) are in \
+`<resolver_outcome>` (read-only) and the FULL property card (year built, land/internal size, \
+features, strata) is in `<property_card>`. You reason about the property's RENTAL POTENTIAL, \
+CAPITAL GROWTH outlook, DEPRECIATION potential, and overall investor fit — grounded in the \
+property KB and the investor's profile (`<plan_card_state>`).""",
+        "goal": """\
+Produce the property-fit leaves: `estimated_weekly_rent_range` (a low/high $/week BAND), \
+`viability_verdict`, `capital_growth_outlook`, `depreciation_attractiveness` (one enum each), \
+`land_quality_score` and `investor_grade_overall` (0–10 integers), and short bilingual \
+`key_strengths` / `key_concerns`. Nothing else — no gross yield (the engine computes it from \
+your band + the price), no tax/loan/dollar figure.""",
+        "non_negotiables": """\
+1. **The rent band is your ONE numeric judgment — and it is an ESTIMATE, a BAND.** Ground it \
+in the rental-market + comparables KB and the property's attributes; widen it honestly when \
+comparables are thin. Never a single false-precise point. Author NO other number: no yield %, \
+no annual total, no tax/loan/dollar figure — those are the engine resolver's.
+2. **Decision-support, not advice (ASIC).** `viability_verdict` is an ASSESSMENT of the \
+property as an investment, NOT an instruction. Never "you should buy/avoid", never an advice \
+tone. The strengths/concerns inform; they do not direct.
+3. **Pick from the enums, exactly one each.** `viability_verdict` ∈ {strong_investment, \
+acceptable_investment, marginal, reconsider}; `capital_growth_outlook` ∈ {strong, moderate, \
+flat, declining}; `depreciation_attractiveness` ∈ {strong, moderate, weak}.
+4. **Ground each read in its KB.** Rent → rental-market + comparables KB; growth → \
+growth-corridors KB + the suburb; depreciation → build-year KB (post-1987 capital works \
+depreciable; plant & equipment limited to new / substantially-renovated post-May-2017); land \
+quality + investor grade (0–10) → investor-grade-features KB (land-to-asset ratio, layout, \
+parking); strata, if applicable → the strata-health lens.
+5. **key_strengths / key_concerns: 2–4 bilingual {vi, en} points each**, plain and specific \
+to THIS property (author the Vietnamese AND the English, see <style>).
+6. **Emit only the leaves object** (see `<output>`).""",
+        "procedure": """\
+1. Read `<property_card>` (the full facts), `<resolver_outcome>` (the copied facts + price), \
+`<plan_card_state>` (the investor profile), and the KB.
+2. Estimate `estimated_weekly_rent_range` as a low/high $/week BAND from the property's \
+attributes + the rental-market / comparables KB — honest about uncertainty.
+3. Set `capital_growth_outlook` from the growth-corridors KB + the suburb/location, and \
+`depreciation_attractiveness` from the build-year KB (one enum each).
+4. Score `land_quality_score` and `investor_grade_overall` (0–10 integers), grounded in the \
+investor-grade-features KB.
+5. Set `viability_verdict` (one enum) as an honest overall assessment.
+6. Write 2–4 `key_strengths` and `key_concerns` as {vi, en} pairs, specific to this property.
+7. Emit ONLY the leaves.""",
+    },
 }
+
+
+# The default <output> note: the "author no figure" components (lender_fit, investment_thesis,
+# entity_structuring) produce ONLY qualitative leaves — every figure is resolver-computed.
+_DEFAULT_OUTPUT = """\
+Return a single JSON object conforming to the provided output schema — EXACTLY the \
+leaves named in `<goal>`, nothing else. Author NO figure: any dollar / percent / number \
+value is resolver-computed and given to you in `<resolver_outcome>` (where present). \
+Produce only the JSON object."""
 
 
 def build_system_prompt(reasoning_domain, kb_md):
     """Compose the per-turn system prompt: shared fragments + the domain module +
-    injected KB (constraint #9 — rebuilt each turn from current state)."""
+    injected KB (constraint #9 — rebuilt each turn from current state). A domain may
+    override the <output> note (property_fit authors a rent band, not "no figure")."""
     d = _DOMAINS[reasoning_domain]
+    output = d.get("output", _DEFAULT_OUTPUT)
     return f"""{_PREAMBLE}
 
 <context>
@@ -657,10 +794,7 @@ def build_system_prompt(reasoning_domain, kb_md):
 </kb>
 
 <output>
-Return a single JSON object conforming to the provided output schema — EXACTLY the \
-leaves named in `<goal>`, nothing else. Author NO figure: any dollar / percent / number \
-value is resolver-computed and given to you in `<resolver_outcome>` (where present). \
-Produce only the JSON object.
+{output}
 </output>"""
 
 
@@ -729,6 +863,18 @@ _TAX_COMPONENT = {
                "resolver_outcome (the tax_optimised_structure scaffold: the CGT determinants "
                "+ null property/seam-deferred money — the agent fills none of these)"],
     "reads": "upstream DAG outcomes only (not upstream parameters) — §11.9",
+}
+_PROPERTY_COMPONENT = {
+    "component_id": "property_assessment",
+    "goal": "Assess a specific attached property with investor metrics for a domestic investor: "
+            "a weekly-rent BAND (your one estimate), qualitative verdicts/scores, and bilingual "
+            "strengths/concerns. Author no DERIVED figure — the gross yield is engine-computed.",
+    "inputs": ["profile.outcome (investor profile)",
+               "resolver_outcome (property_fit_investor scaffold: the copied facts + price; "
+               "agent slots null)",
+               "property_card (the full attached property facts — year built, size, strata)"],
+    "reads": "upstream DAG outcomes + the attached property card — §11.9 (property_fit_investor "
+             "is the one downstream access path)",
 }
 
 
@@ -958,6 +1104,66 @@ async def fill_tax_structure(upstream_outcomes, resolver_outcome):
     return leaves.model_dump(), usage
 
 
+async def fill_property_assessment(upstream_outcomes, resolver_outcome, property_card):
+    """Two-path agent half of `property_assessment` (Mode C, Phase B, reasoning_domain
+    property_fit): one real Agent-SDK structured one-shot authoring the per-property leaves —
+    the weekly-rent BAND (the one irreducible market estimate), the qualitative verdicts/scores,
+    and the bilingual strengths/concerns. The neutral facts + price are resolver-owned (in
+    `<resolver_outcome>`); the gross yield is engine-computed from the band + price in
+    merge_agent (so the only DERIVED figure stays out of the LLM's reach, §98). The full
+    property facts are handed in as `<property_card>` for the investor-lens reasoning. Returns
+    (leaves_dict, usage_dict) — the rent band re-shaped to a [low, high] list (the
+    money_range_per_week convention the engine's gross_yield/2 + the outcome store expect)."""
+    import time
+    _t0 = time.monotonic()
+    from claude_agent_sdk import ClaudeAgentOptions, ResultMessage, query
+    _t_import = time.monotonic()
+
+    options = ClaudeAgentOptions(
+        model=LEAF_MODEL,
+        effort=LEAF_EFFORT,   # bound reasoning depth (else opus thinks for minutes)
+        system_prompt=build_system_prompt("property_fit", _kb_block("property_fit")),
+        setting_sources=[],   # do NOT load CLAUDE.md / project settings
+        allowed_tools=[],     # leaf-fill pulls no tools
+        env=_credit_env(),    # subscription-credit auth, subprocess-scoped
+        output_format={"type": "json_schema",
+                       "schema": PropertyFitLeaves.model_json_schema()},
+    )
+    user = (build_user_content(_PROPERTY_COMPONENT, upstream_outcomes, resolver_outcome)
+            + "\n\n<property_card>\n"
+            + json.dumps(property_card, indent=2, ensure_ascii=False)
+            + "\n</property_card>")
+
+    async def _consume():
+        structured = None
+        usage = {}
+        async for message in query(prompt=user, options=options):
+            if isinstance(message, ResultMessage):
+                structured = getattr(message, "structured_output", None)
+                usage = getattr(message, "usage", {}) or {}
+        return structured, usage
+
+    try:
+        structured, usage = await asyncio.wait_for(_consume(), timeout=LEAF_TIMEOUT_S)
+    except asyncio.TimeoutError:
+        raise RuntimeError(f"leaf-fill exceeded {LEAF_TIMEOUT_S}s app-side timeout")
+
+    if structured is None:
+        raise RuntimeError("Agent SDK returned no structured_output")
+
+    _t_query = time.monotonic()
+    print(f"[planner] property_assessment(property_fit): "
+          f"sdk_import={_t_import - _t0:.1f}s query={_t_query - _t_import:.1f}s "
+          f"model={LEAF_MODEL} effort={LEAF_EFFORT}", file=sys.stderr, flush=True)
+    leaves = PropertyFitLeaves(**structured)  # raises ValidationError if off
+    out = leaves.model_dump()
+    # The rent band → a [low, high] list: the money_range_per_week shape the engine's
+    # gross_yield/2 pattern-matches and the outcome store expects (money_range = [lo, hi]).
+    band = out.pop("estimated_weekly_rent_range")
+    out["estimated_weekly_rent_range"] = [band["low"], band["high"]]
+    return out, usage
+
+
 # --- fill_component (2b-2b: the sidecar fills ONE agent component) -------------
 # The turn's gen_statem walks the DAG and dispatches resolver components in-process
 # (Erlang); it spawns this disposable sidecar only for an agent / two-path component,
@@ -981,7 +1187,15 @@ async def handle_fill_component(params):
     # Two-path: the resolver figures arrive as read-only grounding. Absent for a
     # (future) pure-agent component, where the filler computes the whole outcome.
     resolver_outcome = params.get("resolver_outcome", {})
-    entry = _FILLERS.get(reasoning_domain)
+    # property_assessment (Phase B) spans TWO reasoning domains (valuation + rentability) and
+    # authors outcome verdicts beyond the leaf list, so it is dispatched by COMPONENT_ID (not
+    # by a single reasoning_domain) and takes the attached property card as extra grounding.
+    if component_id == "property_assessment":
+        property_card = params.get("property_card", {})
+        entry = (component_id,
+                 lambda u, r: fill_property_assessment(u, r, property_card))
+    else:
+        entry = _FILLERS.get(reasoning_domain)
     if entry is None:
         notify("error", {"code": "no_filler_for_domain",
                          "message": f"{component_id}: reasoning_domain "

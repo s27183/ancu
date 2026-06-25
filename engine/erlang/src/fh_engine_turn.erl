@@ -95,6 +95,18 @@ init(#{tenant_id := T, plan_card_id := PC, turn_id := Tn} = Args) ->
             Components = base_components(maps:get(blueprint_slug, Args)),
             Data = Args#{components => Components, outcomes => #{}},
             {ok, running, Data, [{next_event, internal, step}]};
+        property ->
+            %% Phase-B per-property turn (mode-c-wedge.md "Phase B"): walk the per-property
+            %% component set against an ATTACHED property. The base outcomes already exist
+            %% (the base turn ran), so they are seeded as upstream (keyed by outcome_type) —
+            %% property_assessment reads `profile` from here; downstream per-property
+            %% components (Slice B+) read the rest. The attached property_card rides Args and
+            %% reaches the resolver/sidecar; commits snapshot into content.addenda.<pid>.
+            Slug = maps:get(blueprint_slug, Args),
+            Components = property_components(Slug),
+            Seed = outcomes_by_type(Slug, maps:get(base_components_snapshot, Args, #{})),
+            Data = Args#{components => Components, outcomes => Seed},
+            {ok, running, Data, [{next_event, internal, step}]};
         qa ->
             {ok, qa, Args, [{next_event, internal, start}]}
     end.
@@ -371,6 +383,9 @@ terminate(_Reason, _State, #{plan_card_id := PC}) ->
 commit(Comp, FillPath, Renderer, KbVersions, Outcome0,
        #{tenant_id := T, plan_card_id := PC} = Data) ->
     Name = maps:get(<<"name">>, Comp),
+    %% A Phase-B (per-property) turn carries property_id: its commits snapshot into the
+    %% addendum namespace and tag every event so the shell attributes them to that property.
+    PropId = maps:get(property_id, Data, undefined),
     OutcomeType = maps:get(<<"outcome_type">>, Comp, Name),
     %% Layer 1 (outcome-conformance.md): the structural post-condition, BEFORE the
     %% regulated pipeline. Fail-closed — a non-conforming fill crashes this (supervised)
@@ -394,7 +409,7 @@ commit(Comp, FillPath, Renderer, KbVersions, Outcome0,
         fun(G) ->
             ok = fh_engine_store:append_audit(T, PC, Name, FillPath, KbVersions, G),
             emit(T, PC, <<"compliance_gate">>,
-                 G#{<<"plan_card_id">> => PC, <<"component_id">> => Name})
+                 tag_property(G#{<<"plan_card_id">> => PC, <<"component_id">> => Name}, PropId))
         end, Gates),
     case blocking_gate(Gates) of
         {block, G} ->
@@ -410,8 +425,16 @@ commit(Comp, FillPath, Renderer, KbVersions, Outcome0,
                 <<"kb_versions">> => KbVersions,
                 <<"fill_path">> => FillPath
             },
-            fh_engine_store:snapshot_component(PC, Name, Entry),
-            emit(T, PC, <<"component_filled">>, Entry#{<<"plan_card_id">> => PC}),
+            %% Base commit → content.components.<id>; Phase-B commit → the addendum
+            %% namespace content.addenda.<pid>.components.<id> (PropId set on a property turn).
+            case PropId of
+                undefined ->
+                    fh_engine_store:snapshot_component(PC, Name, Entry);
+                _ ->
+                    fh_engine_store:snapshot_addendum_component(PC, PropId, Name, Entry)
+            end,
+            emit(T, PC, <<"component_filled">>,
+                 tag_property(Entry#{<<"plan_card_id">> => PC}, PropId)),
             Outcomes = maps:get(outcomes, Data),
             {ok, Data#{outcomes := Outcomes#{OutcomeType => Outcome}}}
     end.
@@ -489,7 +512,44 @@ component_scope(<<"purchase_journey">>) -> <<"base">>;
 component_scope(<<"preparation">>)      -> <<"base">>;
 component_scope(<<"phase_playbook">>)   -> <<"base">>;
 component_scope(<<"disposition">>)      -> <<"base">>;
+component_scope(<<"property_assessment">>) -> <<"per-property">>;
 component_scope(_) -> <<"both">>.
+
+%% Tag an event with property_id on a Phase-B (per-property) turn; a base turn (undefined)
+%% leaves the event unchanged.
+tag_property(Event, undefined) -> Event;
+tag_property(Event, PropId)    -> Event#{<<"property_id">> => PropId}.
+
+%% The per-property component set for a Phase-B turn, in DAG order. Slice A builds ONLY
+%% property_assessment (the keystone producing property_fit_investor); the downstream
+%% `both`-component re-fills (Slice B) and the other per-property components (buying_strategy/
+%% due_diligence/settlement_prep — trigger-gated) are not yet wired. Engine-owned set, like
+%% base_components/1. A non-investor blueprint has no built per-property turn yet → empty.
+property_components(<<"investor-domestic-au">> = Slug) ->
+    order(Slug, [<<"property_assessment">>]);
+property_components(_Slug) ->
+    [].
+
+%% Rebuild the base turn's accumulated outcomes (keyed by outcome_type, as the walk keys
+%% them) from a card's content.components snapshot (keyed by component_id) — so a Phase-B
+%% turn reads the already-computed base outcomes as upstream without re-running the base
+%% walk. Maps component_id → outcome_type via the artifact component defs.
+outcomes_by_type(BlueprintSlug, ContentComponents) when is_map(ContentComponents) ->
+    {ok, All} = fh_engine_kb:components(BlueprintSlug),
+    TypeOf = maps:from_list(
+        [{maps:get(<<"name">>, C), maps:get(<<"outcome_type">>, C, maps:get(<<"name">>, C))}
+         || C <- All]),
+    maps:fold(
+        fun(CompId, Entry, Acc) ->
+            case maps:find(CompId, TypeOf) of
+                {ok, OutcomeType} ->
+                    Acc#{OutcomeType => maps:get(<<"outcome">>, Entry, #{})};
+                error ->
+                    Acc
+            end
+        end, #{}, ContentComponents);
+outcomes_by_type(_BlueprintSlug, _Other) ->
+    #{}.
 
 %% Spawn a disposable sidecar to fill ONE agent component. The sidecar receives the
 %% component id + reasoning_domain + the upstream outcomes it reads (filtered by the
@@ -506,9 +566,16 @@ start_fill_port(Comp, #{plan_card_id := PC} = Data, ResolverOutcome) ->
                 <<"component_id">> => maps:get(<<"name">>, Comp),
                 <<"reasoning_domain">> => reasoning_domain(Comp),
                 <<"upstream">> => upstream_for(Comp, Data)},
-    Params = case ResolverOutcome of
+    Params1 = case ResolverOutcome of
                  undefined -> Params0;
                  _         -> Params0#{<<"resolver_outcome">> => ResolverOutcome}
+             end,
+    %% A per-property component (property_assessment) reasons over the attached property's
+    %% full facts (year built, land size, strata) — richer than the four neutral facts the
+    %% resolver copies into the outcome. Hand the whole card to the sidecar as grounding.
+    Params = case maps:get(property_card, Data, undefined) of
+                 undefined -> Params1;
+                 Card      -> Params1#{<<"property_card">> => Card}
              end,
     Req = #{<<"method">> => <<"fill_component">>, <<"params">> => Params},
     port_command(Port, fh_engine_util:json_encode(Req)),

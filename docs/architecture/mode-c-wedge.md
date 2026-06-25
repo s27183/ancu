@@ -591,6 +591,110 @@ The ASIC line is held **at the producer** (§98 figure-tightness + schema-as-con
 separate compliance-record refinement, not a gate failure (both clear). **The Mode-C wedge is now proven
 full-stack live, EN+VI, against real Opus.**
 
+## Phase B — per-property build plan (the `property_assessment` keystone)
+
+**Status: Slice A LIVE-PROVEN 2026-06-25 (full-stack, real Opus); Slice B + the other per-property
+components deferred.** The base spine (P5) owns every property-agnostic
+figure; Phase B is what a *specific property* unblocks. Grounded against the live engine: the artifact
+already carries `property_assessment`'s registry + the `property_fit_investor` outcome schema (validated
+when the investor blueprint went in-scope; all 6 KB anchors resolve). The codebase has Phase-B
+*awareness* — `simulate`/`refine` reject `property_type_phase_b`, `refresh`/`rerun` promise "per-property
+addenda preserved/untouched" — but these are **reservations against addenda that nothing creates yet**.
+Absent: any `properties`/addendum table, attach endpoint, per-property turn, `property_assessment` fill.
+`fh_engine_store:snapshot_component/3` writes only `content.components.<id>` (base); there is no
+per-property namespace. So Phase B is greenfield *runtime* on an already-compiled *structure*.
+
+### The full Phase-B surface (5 parts)
+
+| # | Part | State |
+|---|---|---|
+| 1 | **Attachment contract + addendum persistence** — endpoint takes a normalized property_card → writes an addendum | absent (greenfield) |
+| 2 | **Phase-B per-property turn** — gen_statem walk over the per-property component set against an attached property | absent |
+| 3 | **`property_assessment` two-path fill** → `property_fit_investor` | absent (← **the keystone**) |
+| 4 | **Downstream re-fill** of the `both`-scope components now `property_fit_investor` exists — yield cash-flow arithmetic (NEW module), `cash_position` price figures, `tax_structure` rent figures, `disposition` CGT — **+ the banded↔scalar money seam** | resolvers emit null at base; the property branch + the seam decision are absent |
+| 5 | **The other 3 per-property components** (`buying_strategy`, `due_diligence`, `settlement_prep`) | trigger-gated (bid-ready / doc-upload / contract-signed) |
+
+### Decomposition (sliced by mechanism seam)
+
+- **Slice A — the keystone (build first): #1-minimal + #2 + #3.** Attachment contract + Phase-B turn +
+  the `property_assessment` two-path fill. Provable end-to-end: *attach a property → `property_fit_investor`
+  live* (viability verdict, rent range, growth/depreciation outlook, strengths/concerns, grade) — directly
+  the **Property + Overview tab** content. It defers the figure cluster cleanly behind "`property_fit_investor`
+  now exists," and **does not force the banded↔scalar seam** (that bites only when `cash_flow_projection`
+  consumes the rent range downstream).
+- **Slice B — the figure cluster (next): #4.** The rent-dependent figures + the banded↔scalar
+  cross-contract decision. That decision ripples KB ↔ blueprint ↔ registry ↔ `disposition` consumer ↔
+  `calculator` renderer — a docs-first, foundation-first sub-unit of its own (per
+  `foundation-first-for-cross-contract-reframe`). Deferring it out of Slice A is honest (the producer is
+  built; the consumers are a separate declared unit), not a rug.
+- **Deferred by trigger:** #5 and the real property *sources* (URL-paste = CLAUDE.md item 9; curator push =
+  item 8). Slice A proves the contract with a **hand-fed normalized property_card** in a harness — exactly
+  how the onboarding turn was proven (`investor_seam_smoke` feeds inputs). The engine's contract is "given a
+  property_card, run Phase B"; what *produces* the card is a separate concern.
+
+### Refinement vs the grounding map — `property_assessment` is two-path, not pure-agent
+
+Its outcome splits cleanly: a **resolver half** copies the neutral facts the attachment supplies
+(`state/suburb/price/property_type`) and computes the deterministic ratio (`rental_yield_gross_estimate`
+= annualized rent ÷ price, at merge-back once the agent's rent range is known); an **agent half** authors
+the irreducible judgments (`estimated_weekly_rent_range`, the four verdict enums, `key_strengths`/
+`key_concerns`, `investor_grade_overall`). Matches the existing two-path mechanism and keeps the yield
+figure computed-not-authored (out of the LLM's reach, per `verify-regulated-figures-by-postcondition`).
+
+### Slice A design specifics
+
+- **Attachment + persistence:** `POST /api/engine/plan-cards/:id/properties` takes the normalized Property
+  JSON (the `basics` + strata facts a source would supply) → persists it and runs the Phase-B turn.
+  **Addenda as a namespace under `content_jsonb`** — `content.addenda.<property_id> = {property_card,
+  components: {…}}`, sibling to base `content.components`, **not a separate table** (CLAUDE.md marks
+  `properties` "OPTIONAL — not load-bearing"). This makes the existing "addenda preserved" reservations
+  *literal* (the base refresh/rerun sweep touches `content.components`, leaves `content.addenda` alone) and
+  needs no new migration. (Confirm the exact `snapshot_component` merge SQL at build.)
+- **Phase-B turn:** same `gen_statem` mechanism, component set filtered to `[property_assessment]` for
+  Slice A, with the attached property_card threaded into the agent context (planner.py already builds the
+  prompt from state + property context + KB anchors).
+- **Fill:** register `property_assessment` two-path; agent leaves = rent range + verdicts (bilingual
+  `{vi,en}`, constrained enums, KB-grounded); resolver computes the yield ratio at merge-back.
+- **Compliance:** runs the FIRB→ASIC→AML gates like every component. Verdicts are decision-support enums
+  with no authored money — verify it clears ASIC cleanly; note where it lands in `advice_adjacent/1`.
+- **Proof:** a `property_assessment_seam.escript` — attach a hand-fed Cabramatta property_card to a live
+  investor card → assert the Phase-B turn runs, `property_fit_investor` produced live (rent range present,
+  verdict enum valid, yield = rent÷price, bilingual one-liners), persisted under `content.addenda`,
+  audited clear.
+
+### Slice A — LIVE-PROVEN (2026-06-25, full-stack, real Opus)
+
+Built and proven exactly as designed. **Engine:** `property_assessment` is two-path —
+`fh_engine_fill` (resolver copies state/suburb/price/property_type + computes `rental_yield_gross_estimate`
+in `merge_agent/3` from the agent's rent band ÷ price; `has_resolver`/`agent_values_from_outcome` added);
+`fh_engine_turn` gained the `kind => property` init (seeds base outcomes by outcome_type via
+`outcomes_by_type/2`, walks `property_components/1` = `[property_assessment]` for Slice A), an addendum
+commit dispatch (`property_id` → `snapshot_addendum_component`, events `tag_property`-tagged), and threads
+the `property_card` to the sidecar; `fh_engine_store` gained `attach_property/3` (writes
+`content.addenda.<pid>.{property_card, components:{}}`, a sibling to base `content.components`, **no new
+migration**) + `snapshot_addendum_component/4`; a new `fh_engine_h_attach_property` handler on
+`POST /plan-cards/:id/properties` (investor-only gate, price+facts validation, attach-then-turn,
+registry-serialized 409); `property_assessment` added to `advice_adjacent/1` (it carries a viability
+verdict → ASIC records `boundary_held`). **Sidecar (`planner.py`):** a new `property_fit` reasoning_domain
+module + `PropertyFitLeaves` schema (the rent BAND + verdicts/scores/bilingual strengths-concerns —
+dispatched by component_id, since the artifact's 4 agent_leaves span two domains valuation+rentability)
++ the six property KB docs wired; the `<output>` block is now per-domain (property_fit DOES author the
+rent band, unlike the "no figure" components). **Validator seams confirmed:** `money_range_per_week` /
+`percentage` compile to `kind:unknown` (pass gracefully → rent `[lo,hi]`, yield bare number);
+`key_strengths`/`key_concerns` are `array<string>` but the string check is graceful, so `{vi,en}` arrays
+pass (bilingual-always honored, as `buyer_profile` does).
+
+**`property_assessment_seam.escript` — EXIT 0, all assertions passed.** A live Cabramatta `established_house`
+@ $920k attached to a live investor card. Phase-B sequence `turn_started, gate×3, component_filled, usage,
+turn_completed` (7 events; one two-path fill, **38.4s** live Opus). Live outcome: rent `[620,720]`/wk,
+**yield `3.8%` = `round1(670×52÷920000×100)` exactly** (the §98 proof — resolver-computed, not
+agent-authored), verdict `acceptable_investment`, grade `7`, growth `moderate`, bilingual `key_strengths`.
+Persisted: addendum under `content.addenda.<pid>` (property_card + the component), base `content.components`
+**untouched at 8** (addenda is a sibling); 3 audit rows clear/two_path; ASIC `boundary_held`; auth 401/403.
+Regression: `outcome_conformance` (21+11) and `base_components_investor_conformance` (19) green; `rebar3
+compile` + `erlang-checker` + planner import clean. **Deferred (unchanged):** Slice B (the figure cluster
++ the banded↔scalar seam), the other three per-property components, and the real property *sources*.
+
 ## Deferred out (honest — first-exercising instance is Mode B/D, not here)
 
 `off_title_parties[]` (array vs A's scalar `non_buying_partner`), `visa_class`, off-title

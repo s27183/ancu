@@ -76,9 +76,10 @@ asic(ComponentId, _Ctx, Outcome, Layer1Verdict) ->
     {Outcome, gate(<<"asic">>, <<"clear">>, Detail, Layer1Verdict)}.
 
 %% Components whose outcomes carry advice-adjacent content (compliance-pipeline.md §3).
-advice_adjacent(<<"mortgage_finance">>) -> true;   %% lender fit
-advice_adjacent(<<"eligibility">>)      -> true;   %% scheme applicability
-advice_adjacent(_)                      -> false.
+advice_adjacent(<<"mortgage_finance">>)    -> true;   %% lender fit
+advice_adjacent(<<"eligibility">>)         -> true;   %% scheme applicability
+advice_adjacent(<<"property_assessment">>) -> true;   %% investment-viability verdict (Phase B)
+advice_adjacent(_)                         -> false.
 
 %% --- AML --------------------------------------------------------------------
 
