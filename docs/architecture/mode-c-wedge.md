@@ -566,6 +566,31 @@ onboarding turn (HTTP `intent=investment` → gen_statem walk + sidecar + PG + S
 mechanism is blueprint-agnostic + FHB-proven, the two-path sidecar fills are per-component live-verified, and
 `blueprint_for/1` is a pure 2-clause map; the only unproven-in-integration link is the HTTP→turn glue.
 
+**P5-activate LIVE-PROVEN (2026-06-25) — the HTTP→turn glue closed in integration (full-stack, real Opus).**
+The proportionate gap above is now closed. A new `engine/erlang/test/investor_seam_smoke.escript` (clone of
+the Mode-A `seam_smoke` with `intent=investment`) self-boots the engine on `:8092`, mints an ed25519 JWT,
+POSTs plan-card creation, and drives the real `/api/engine/*` HTTP/SSE surface through the **8-component
+investor base spine** end-to-end against live PG **and the real `planner.py` sidecar** (`FH_PLANNER_SCRIPT`
++ `FH_SIDECAR_PYTHON=.venv/bin/python3` + the `.env` `CLAUDE_CODE_OAUTH_TOKEN`). **All assertions passed.**
+Three live Opus fills (metered): `investment_strategy` 27.2s, `mortgage_finance` 51.3s, `tax_structure`
+8.3s (all opus/medium). **Live outcomes coherent end-to-end:** `archetype=capital_growth →
+gearing=negatively_geared → io_vs_pi=interest_only → entity=personal_sole` (a consistent investor thesis,
+no figure leaked, enums constrained). **Asserted:** the 37-event sequence (1 + 8×(3 gate + 1 filled) + **3**
+usage + 1 — the three `usage` events land after the three two-path fills, in the discriminator-load-bearing
+order); 37 events persisted (stream == SOT); 24 audit rows all `clear`, 9 `two_path` rows (3×3), ASIC
+`boundary_held`=1; the 8-component snapshot by investor name; **the Mode-C discriminator proofs** —
+`io_vs_pi_recommendation` + `recommended_entity` present, bilingual `{vi,en}` `one_liner`,
+`disposition.taxable_gain`/`cgt_status` present, and `cash_position` = `budget_envelope_investor` with **no
+`stamp_duty` key** (proves the shared-name discriminator fired investor-side, not FHB); cancel idempotency
+(204) + auth rejection (401/403). **One observation flagged (not patched, recorded in the harness comment):**
+`fh_engine_compliance:advice_adjacent/1` lists only `mortgage_finance`/`eligibility`, so on the investor
+spine `tax_structure` (entity structuring) and `investment_strategy` clear ASIC with `no_advice_surface`
+rather than `decision_support_boundary_held` → `boundary_held`=1 (mortgage only; no `eligibility` in Mode C).
+The ASIC line is held **at the producer** (§98 figure-tightness + schema-as-constraint enums, live-confirmed
+— no figure authored); whether the entity/strategy *attestation* should also record `boundary_held` is a
+separate compliance-record refinement, not a gate failure (both clear). **The Mode-C wedge is now proven
+full-stack live, EN+VI, against real Opus.**
+
 ## Deferred out (honest — first-exercising instance is Mode B/D, not here)
 
 `off_title_parties[]` (array vs A's scalar `non_buying_partner`), `visa_class`, off-title
