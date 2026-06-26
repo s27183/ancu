@@ -186,6 +186,15 @@ const messages = {
         vi: 'Phần này mở ra khi bạn gắn một bất động sản cụ thể vào kế hoạch.',
         en: 'This unlocks once you attach a specific property to your plan.'
     },
+    // The property selector (Mode-C Phase-B shell): switch the whole projection between
+    // the base plan and each attached property (its addendum overlays the per-property
+    // components). Shown only when at least one property is attached.
+    'plan.prop.base': { vi: 'Kế hoạch cơ sở', en: 'Base plan' },
+    'plan.prop.untitled': { vi: 'Bất động sản', en: 'Property' },
+    'plan.prop.viewing': {
+        vi: 'Đang xem số liệu của bất động sản này. Chuyển về “Kế hoạch cơ sở” để thử các kịch bản.',
+        en: "Showing this property's figures. Switch to “Base plan” to explore what-ifs."
+    },
     'plan.qa.pending': {
         vi: 'Phần hỏi đáp sẽ sẵn sàng khi kế hoạch tính xong.',
         en: 'Q&A opens once your plan finishes computing.'

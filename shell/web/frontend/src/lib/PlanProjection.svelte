@@ -29,7 +29,8 @@
         type PhasePlaybookOutcome,
         type BudgetEnvelopeOutcome,
         type DispositionOutcome,
-        type ChecklistStatusMap
+        type ChecklistStatusMap,
+        type PropertyAddendum
     } from '$lib/planCard';
     import { AU_STATES } from '$lib/map';
     import { money, moneyRange } from '$lib/format';
@@ -76,6 +77,12 @@
 
     let phase = $state<'loading' | 'ready' | 'no_card' | 'error'>('loading');
     let components = $state<Record<string, ComponentEntry>>({});
+    // Per-property addenda (engine-contract §12), keyed by property_id — a sibling of the
+    // base `components` map. Seeded from the GET snapshot's content.addenda, then merged by
+    // the SSE (a property_id-tagged component_filled routes here, not into base). The
+    // selected property (null = base plan) overlays its components into viewComponents.
+    let addenda = $state<Record<string, PropertyAddendum>>({});
+    let selectedPropertyId = $state<string | null>(null);
     let cardId = $state<string | null>(null);
     let turnDone = $state(false);
     let turnFailed = $state(false);
@@ -228,10 +235,22 @@
         }
     }
 
-    // The components the tabs render: live outcomes, or — under an active preview — each
-    // entry with its outcome swapped for the previewed one (renderer/scope/etc preserved,
-    // merged by component_id). A component absent from the preview keeps its live outcome.
+    // True when the user has selected an attached property to view (vs the base plan).
+    const viewingProperty = $derived(
+        selectedPropertyId !== null && !!addenda[selectedPropertyId]
+    );
+
+    // The components the tabs render — three projections of ONE map (unify-views):
+    //   • a selected property → base components with that addendum's per-property
+    //     components overlaid ON TOP (the property's real figures win). No what-if overlay:
+    //     a fixed property has no price/state/horizon to sweep.
+    //   • the base plan, under an active preview → each entry with its outcome swapped for
+    //     the previewed one (renderer/scope preserved, merged by component_id).
+    //   • the base plan, no preview → the live base components.
     const viewComponents = $derived.by((): Record<string, ComponentEntry> => {
+        if (viewingProperty && selectedPropertyId) {
+            return { ...components, ...addenda[selectedPropertyId].components };
+        }
         if (!previewOutcomes) return components;
         const pv = previewOutcomes;
         return Object.fromEntries(
@@ -241,6 +260,25 @@
             ])
         );
     });
+
+    // The property selector rail (Mode-C Phase-B): "Base plan" + one entry per attached
+    // property (id '' = base, id = property_id). Labelled from the property_card suburb,
+    // honest-partial to a generic label when a live attach hasn't seeded it yet.
+    const propertyIds = $derived(Object.keys(addenda));
+    const propertyTabs = $derived([
+        { id: '', label: $t('plan.prop.base') },
+        ...propertyIds.map((pid, i) => {
+            const pc = addenda[pid].property_card;
+            return { id: pid, label: pc.suburb || `${$t('plan.prop.untitled')} ${i + 1}` };
+        })
+    ]);
+
+    // Switch the projection between the base plan and an attached property. Choosing a
+    // property clears any base what-if preview (a fixed property has nothing to sweep).
+    function selectProperty(pid: string | null) {
+        selectedPropertyId = pid;
+        if (pid !== null) resetPreview();
+    }
 
     // The budget (Cash-calculator) sub-tabs (§7.3): cockpit + verdict → cash-events table →
     // breakdown detail → the disposition projection. The 4th "Full horizon" tab is present
@@ -370,6 +408,8 @@
         stream = null;
         phase = 'loading';
         components = {};
+        addenda = {};
+        selectedPropertyId = null;
         checklistStatus = {};
         uiTabs = [];
         cardId = null;
@@ -389,6 +429,7 @@
         if (myGen !== gen) return;
         if (res.kind === 'ok') {
             components = res.card.content.components ?? {};
+            addenda = res.card.content.addenda ?? {}; // per-property snapshots (engine §12)
             horizonValue = baselineHorizon; // seed the slider from the card's saved H
             seedFinancials(); // seed income/debts from the card's stored profile facts (IC5)
             checklistStatus = res.card.checklist_status ?? {};
@@ -406,7 +447,23 @@
             stream = subscribePlanCard(match.plan_card_id, {
                 onComponentFilled: (entry) => {
                     if (myGen !== gen) return;
-                    components = { ...components, [entry.component_id]: entry };
+                    if (entry.property_id) {
+                        // A Phase-B (per-property) fill → route into its addendum (engine §12),
+                        // not the base map. Create the addendum if a live attach beat the
+                        // snapshot (its property_card seeds from the snapshot re-read / the
+                        // attach flow, Slice 3); merge is idempotent (keyed by component_id).
+                        const pid = entry.property_id;
+                        const ad = addenda[pid] ?? { property_card: {}, components: {} };
+                        addenda = {
+                            ...addenda,
+                            [pid]: {
+                                ...ad,
+                                components: { ...ad.components, [entry.component_id]: entry }
+                            }
+                        };
+                    } else {
+                        components = { ...components, [entry.component_id]: entry };
+                    }
                 },
                 onDone: (failed) => {
                     if (myGen !== gen) return;
@@ -463,6 +520,18 @@
 {:else}
     {#if running}
         <p class="pp-running"><span class="pp-spinner" aria-hidden="true"></span>{$t('plan.running')}</p>
+    {/if}
+
+    <!-- Property selector (Mode-C Phase-B): base plan vs each attached property. Shown only
+         when ≥1 property is attached; selecting one overlays its addendum into every tab. -->
+    {#if propertyIds.length > 0}
+        <div class="pp-propsel">
+            <Tabs
+                tabs={propertyTabs}
+                active={selectedPropertyId ?? ''}
+                onSelect={(id) => selectProperty(id === '' ? null : id)}
+            />
+        </div>
     {/if}
 
     <!-- Sub-tabs: one per plan section + a Q&A tab — each section shows on its own, so
@@ -537,6 +606,20 @@
                     <Tabs tabs={budgetTabs} active={budgetSub} onSelect={(id) => (budgetSub = id)} />
 
                     {#if budgetSub === 'ready'}
+                        {#if viewingProperty}
+                            <!-- A selected property shows its OWN cash figures (the per-property
+                                 budget_envelope_investor). The base what-if cockpit + financials
+                                 editor are base-plan controls, so they're hidden here; the table/
+                                 detail/horizon sub-tabs already read the per-property outcome. -->
+                            <p class="pp-calc-intro">{$t('plan.prop.viewing')}</p>
+                            <Calculator
+                                outcome={viewComponents.cash_position.outcome}
+                                view="verdict"
+                                {cashOnHand}
+                                components={viewComponents}
+                                density="full"
+                            />
+                        {:else}
                         <!-- Tab 1: the cockpit inputs + the "Bạn đã đủ chưa?" verdict. -->
                         <p class="pp-calc-intro">{$t('plan.cockpit.intro')}</p>
                         <div class="pp-cockpit">
@@ -702,6 +785,7 @@
                             {/if}
                             <p class="pp-fin-disclaimer">{$t('plan.fin.disclaimer')}</p>
                         </section>
+                        {/if}
                     {:else}
                         <!-- Tabs 2/3: the cockpit is on tab 1, so signpost an active preview here. -->
                         {#if previewActive}

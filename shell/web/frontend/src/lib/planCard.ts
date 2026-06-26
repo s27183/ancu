@@ -395,6 +395,33 @@ export interface ComponentEntry {
     outcome: Record<string, unknown>;
     kb_versions: string[];
     fill_path: 'resolver' | 'two_path' | 'agent';
+    /** Present on a Phase-B (per-property) fill (engine-contract §4/§12): the addendum
+     *  this outcome belongs to. Absent on a base fill. The projection routes a tagged
+     *  fill into content.addenda.<property_id>.components, not the base map. */
+    property_id?: string;
+}
+
+/** A normalized property as the engine stores it under content.addenda.<pid>.property_card
+ *  (engine-contract §12) — the neutral facts the attach endpoint accepts. Every field is
+ *  optional so a partially-seeded addendum (a live attach before the snapshot re-read)
+ *  renders honest-partial rather than throwing. */
+export interface PropertyCard {
+    price?: number;
+    state?: string;
+    suburb?: string;
+    property_type?: string;
+    year_built?: number | null;
+    land_size?: number | null;
+    strata?: Record<string, unknown> | null;
+}
+
+/** One attached property's addendum (engine-contract §12): the property_card + its
+ *  per-property component fills (the same ComponentEntry shape as base) + the optional
+ *  transaction slot (settlement_prep B, §11). A sibling of base content.components. */
+export interface PropertyAddendum {
+    property_card: PropertyCard;
+    components: Record<string, ComponentEntry>;
+    transaction?: { contract_signed_date?: string; settlement_date?: string } | null;
 }
 
 /** One lifecycle tab the in-scope blueprint declares (engine artifact `ui_tabs`,
@@ -419,7 +446,12 @@ export interface PlanCard {
     intent: string;
     mode: string;
     status: 'active' | 'retired';
-    content: { components?: Record<string, ComponentEntry> };
+    content: {
+        components?: Record<string, ComponentEntry>;
+        /** Per-property addenda (engine-contract §12), keyed by property_id — a sibling of
+         *  base components, populated once a property is attached. Absent on a base-only card. */
+        addenda?: Record<string, PropertyAddendum>;
+    };
     /** The card user-set layer (sibling of content, never merged): the user's `done`
      *  checklist attestations, overlaid onto phase_playbook actions at render. Absent
      *  / {} on an untouched card (every action reads not_started). */

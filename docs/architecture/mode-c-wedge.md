@@ -596,8 +596,10 @@ full-stack live, EN+VI, against real Opus.**
 **Status: Slice A + B0/B1 + B2 + B3a/B3b/B3c + C + C-settle + C-dd DONE — full-stack live-proven (the
 36-event, eight-component Phase-B turn PASSES against the real planner, exit 0). The three per-property
 structure-halves are built (`buying_strategy` ✓, `settlement_prep` A ✓, `due_diligence` A ✓); the
-`settlement_prep` B contract-date input surface is **pinned docs-first** (Slice C-settle-B docs below —
-the `<from_transaction>` contract + conformed blueprint, compiled+gated; the code is the next `go`),
+`settlement_prep` B contract-date input surface is **pinned docs-first then engine-built** (Slice
+C-settle-B docs + engine below — the `<from_transaction>` contract, conformed blueprint, the resolver
+dated branch + endpoint + store write + turn kind, all compiled+gated; **its shell half is deferred
+design-first**, blocked on the unbuilt Phase-B *shell* surface — see the C-settle-B (engine) section),
 splitting it from `due_diligence` B (the upload pipeline), which remains the heavy deferred half.** The per-property financial
 spine now computes end-to-end for an attached property (acquire → hold → dispose), gated only by the
 regulated CGT `to_verify`, plus the investor **bid plan** (yield-anchored discipline). The base spine
@@ -1194,6 +1196,156 @@ branch (back-calc from `settlement_date`, at-risk detection; reading the `transa
 the transaction endpoint + the `transaction`-slot store write, and the turn loading the slot into Args —
 plus the shell contract-date entry. **Still deferred:** `due_diligence` B (the upload pipeline /
 `<from_document>` extraction + the `lease_interpretation` leaf) — the heavy half of the unit.
+
+### Slice C-settle-B (engine) — DONE (2026-06-26) · shell half deferred design-first
+
+**Engine half — built + committed (`a647e5f`).** The four engine pieces the docs slice pinned:
+- **The resolver dated branch** (`fh_engine_settlement`) — `fill(Args, Upstream)` reads the `transaction`
+  slot from Args; absent → the existing PENDING structure, present → `dates_status: active` with the dated
+  critical path. **Two date tiers, the load-bearing honesty call:** statutory / anchored-exact dates
+  computed precisely (cooling-off business-days per state, settlement-day simultaneity, QLD risk-pass
+  C+1bd); lender-policy dates (finance S−14, loan S−7) back-calculated as **labelled typicals** per
+  `kb.lender-docs` ("vary by lender, must be confirmed") — never asserted as fact (the ASIC line). At-risk
+  is bounded by available signal: due-date strictly before today = "the date has passed, confirm" (there
+  is no per-milestone completion signal — `contract_signed` is always `done`, never at-risk). **Stayed
+  within the committed schema** — the exact-vs-indicative distinction rode the active copy + precise
+  statutory dates + the `status` vocabulary; no new `tier` field (the conformance gate accepts extra
+  fields, but adding undeclared ones is spec drift from the already-pinned blueprint).
+- **The endpoint** `fh_engine_h_transaction` (`POST .../properties/:pid/transaction`) — auth → 404 missing
+  card → **409 if the property isn't attached** (no addendum slot) → 400 typed `code` on malformed/ordered
+  dates → `set_transaction` → reserve turn (409 in-flight) → `start_turn{kind: transaction}` → 202.
+- **The store write** `fh_engine_store:set_transaction/3` — `jsonb_set` into `addenda.<pid>.transaction`,
+  the third per-property slot, sibling of `property_card`/`components`.
+- **The turn** — a `transaction ->` init clause narrowing to the single `settlement_prep` component,
+  re-keying base + addendum snapshots by outcome_type into the Seed; resolver-only (no `usage`).
+- **+1 route** in `fh_engine_http`, **+2 copy templates** in `kb.copy.settlement` (`next_action_active`,
+  `at_risk_reason`).
+
+**Verified.** `settlement_prep_conformance` extended **68/68** — fixed-input statutory dates asserted to
+the day (VIC deposit C+3bd, NSW C+5bd, QLD insurance C+1bd, finance/loan typicals, settlement/title/keys
+at S, entity_setup done at contract); today-relative inputs prove scheduled-vs-at-risk regardless of run
+date; the `transaction` kind's component-narrowing proven as a pure function via the exported
+`property_components/1`. `rebar3 compile` + `erlang-checker` clean; artifact recompiled (9 anchors incl.
+the three date-arithmetic, copy templates present, `agent_leaves []` preserved). **Full-stack deferred
+honestly** — a live transaction smoke needs an *attached* property, whose addendum is seeded by the
+**attach turn → the live-LLM `property_assessment` sidecar** (the same degraded dependency C-dd hit); the
+target infra is up but the *setup path* is blocked, so the genuinely-new logic is proven below the seam
+(the resolver is pure given `Args+Upstream+artifact`) and the wiring decisions as pure functions. See
+[[proportionate-verification-honest-gaps]] (the target-up-but-setup-blocked variant) and
+[[verify-regulated-figures-by-postcondition]] (the two-tier dates posture).
+
+**Shell half — deferred design-first (the form is the tip of an unbuilt Phase-B *shell* surface).**
+Grounding the live shell (2026-06-26) revised the docs slice's "plus the shell contract-date entry" as if
+it were a small form. It isn't — binding "shell half of `settlement_prep` B" into its real layers:
+
+| Layer | What it is | Live state |
+|---|---|---|
+| **A — Attach** | shell proxy (route + handler + client + `api.ts`) + an attach affordance (URL-paste / Tìm Nhà) so an addendum is *created* | **Not built** (CLAUDE.md #8/#9, "defer when ready"). Zero `attach`/`properties` refs in the shell backend or `api.ts`; routes stop at base-card endpoints. |
+| **B — Addendum render** | the shell `PlanCard` type carries `addenda`; `getPlanCard`/`PlanProjection` seed `content.addenda.<pid>.components`; the per-property **Settle phase** surfaces in the Flow | **Not built.** `planCard.ts` type has no `addenda` field (`content: { components? }`, base only); `PlanProjection.svelte:391` seeds `res.card.content.components` (base only). Only the *fallback* scaffolding (the "attach property" calm line in `PhaseSheet`/`PlanProjection`) exists. |
+| **C — The date form** | the two-field contract-date entry on the Settle sheet → POST the transaction endpoint → SSE swaps in the dated checklist | The scoped piece. **Depends on B, which depends on A.** |
+
+So the engine capability is **built-but-unconsumed**; its shell consumer legitimately waits on a *sibling*
+foundation (the Phase-B shell attach + addendum-render surface, #8/#9). Building C alone would be a **rug**
+([[honest-deferral-not-rug]] — a date control the user can never reach: no attach → no addendum → the
+shell type can't represent one → no Settle phase rendered → nowhere to mount the form; the built/unbuilt
+discriminator is built-but-unconsumed vs unbuilt-dependency). The "investor cards live" proofs were
+engine-side seam smokes + the render layer against synthetic outcomes — **not** a wired shell attach path.
+Deferral chosen 2026-06-26 (Son): honest, trigger-gated on #8/#9, not a scope-jump triggered by a small
+form. [[foundation-first-for-cross-contract-reframe]], [[thin-surface-vs-dropped-richness]].
+
+**The deferred shell-half design (recorded so it's not lost):** when the Phase-B shell surface (A+B)
+lands, C is small — on the Settle phase sheet (`PhaseSheet.svelte`, the `settlement_prep` per-property
+phase), a two-field date entry (contract signed + settlement) following the `Onboarding.svelte` form idiom
+(`$state` fields, `$derived` `canSubmit` = both filled + settlement > contract, phase gate, calm error
+messages). It calls a new `api.ts` `setTransactionDates(planCardId, propertyId, dates)` POSTing to
+`/api/plan-cards/:id/properties/:pid/transaction` (a **new shell-backend proxy** — route + handler +
+`fh_shell_engine_client` fn minting the tenant JWT, mirroring the `profile`/`refine` proxy pattern, since
+the shell is explicit-per-endpoint not path-prefix), returns a discriminated outcome (202 accepted /
+409 not-attached / 409 in-flight / 400 invalid), and gates the UI on the existing SSE `onDone` — which
+swaps in the dated `settlement_checklist` (milestone due_dates/status + at-risk lighting up) with **no new
+renderer** (constraint #7). Bilingual via the engine-owned `LocalizedText` + `pick($lang)`; the form chrome
+(field labels) via `$t`.
+
+**Next (a separate `go`):** the Phase-B shell surface (A attach proxy + UI, B addendum-render data path)
+is its own wedge (CLAUDE.md #8/#9), the prerequisite for C above. The unblocked engine units not resting
+on it are the better next pick. **Still deferred:** `due_diligence` B (the upload pipeline /
+`<from_document>` extraction + the `lease_interpretation` leaf) — the heavy half of the cross-contract unit.
+
+### Phase-B shell surface — Slice 1 (contract pin + backend proxy) — DONE (2026-06-26)
+
+The first slice of the Phase-B **shell** surface — the wedge the C-settle-B shell half was deferred onto
+(#8/#9). **Consumer-conforms-to-producer, not a new contract:** the engine side is fully built and ~90%
+pinned (attach + transaction endpoints, addenda in `content_jsonb`, the resolver-only-no-`usage` rule), so
+this builds the shell **consumer** against an already-built producer — *not* a greenfield cross-contract
+reframe. Grounded against the live shell + engine by three Explore maps (backend proxy mechanism, frontend
+data path, engine attach/transaction contract) + two follow-up checks (the SSE `component_filled` carries
+`property_id` on Phase-B turns, turn.erl:464; the engine-contract docs coverage).
+
+- **Docs (the one real gap closed, foundation-first).** `engine-contract.md` gained **§12 Property
+  attachment** (the attach endpoint contract, parallel to §11's transaction: `POST .../properties` body
+  `{price,state,suburb,property_type}` required + `{year_built?,land_size?,strata?}` optional → 202
+  `{plan_card_id,property_id,turn_id}`; investor-only 400, 409 in-flight; the addendum namespace; the
+  consumer render contract). Plus the **§4 `component_filled` `property_id?` field** (the engine tags
+  addendum fills with `property_id`; base turns omit it — previously undocumented) and a §2.1 pointer.
+  Transaction was already pinned (§11, the C-settle-B docs slice); attach lived only in this tracker.
+- **Backend proxy (both endpoints).** The explicit per-endpoint proxy for `POST .../properties` (attach)
+  and `POST .../properties/:pid/transaction` (transaction — engine-built in C-settle-B, same pattern):
+  `fh_shell_http` +2 routes, `fh_shell_h_plan_card` +2 `init/2` clauses + 2 action fns,
+  `fh_shell_engine_client` +2 fns (`attach_property/3`, `set_transaction_dates/4`) minting the tenant JWT.
+  **The meter-gate split (the one billing-policy call, flagged for override):** attach runs the live-LLM
+  `property_assessment` → emits `usage` → it's the agent-turn class, so it carries the `fh_shell_meter:gate/1`
+  402 gate like `ask` (else an over-limit user could trigger unlimited paid attaches); transaction is
+  resolver-only (no `usage`) → **no** gate, like refine/checklist. The transaction action reads the `:pid`
+  binding (a sub-resource of the already-owned card; the engine re-validates the addendum exists → 409).
+
+**Verified.** `plancard_proxy_smoke` extended **19/19** (13 existing + 6 new): attach owned→202 with the
+forwarded body field + the minted tenant JWT proven to travel through (the stub echoes `state` +
+`saw_bearer`), attach unowned→404 / no-JWT→401, attach over-limit→**402** (gated before the engine),
+transaction owned→202 with the `:pid` + body forwarded, transaction unowned→404 / no-JWT→401. Stub-engine
+harness (no PG-engine, no sidecar — the new code is pure proxy wiring; the engine's real attach/transaction
+behaviour is already live-proven). `rebar3 compile` + `erlang-checker` clean.
+
+**Next (a separate `go`):** Slice 2 — the addenda render data path (frontend `PlanCard.content.addenda`
+type, the SSE merge branching on `property_id`, a property selector, the per-property components rendering).
+Render-before-filler: testable against a curl-attached addendum before the attach UI (Slice 3).
+
+### Phase-B shell surface — Slice 2 (addenda render data path) — DONE (2026-06-26)
+
+The render half: a per-property addendum becomes a projection of the **same primitive** the base
+plan + the what-if preview already are (`viewComponents`), so the entire per-property spine surfaces
+through the **existing** tabs + renderers — **zero new renderers** (the tell that the unification is
+right, [[unify-views-as-projections-of-one-primitive]]). Grounded on the dispositive fact that the
+investor blueprint's `ui_tabs` already reference all eight per-property components
+(overview/yield_tax/cash_calculator/journey/property/buying + investment_strategy/portfolio), so a
+selected property's overlay lights them up with no new wiring.
+
+- **Types (`planCard.ts`).** `ComponentEntry` gains `property_id?` (the engine tags Phase-B fills,
+  §4/§12 — the cast at `planCardStream.ts:72` no longer drops it, **no stream code change**); new
+  `PropertyCard` (all-optional → honest-partial) + `PropertyAddendum {property_card, components,
+  transaction?}`; `PlanCard.content` gains `addenda?`.
+- **Data path (`PlanProjection.svelte`).** `addenda` + `selectedPropertyId` state, seeded from
+  `res.card.content.addenda`; the SSE `onComponentFilled` **branches on `entry.property_id`** (routes
+  into `addenda.<pid>.components`; base fills into `components`); `viewComponents` overlays the selected
+  addendum's components on top of base (the property's real figures win; no what-if overlay — a fixed
+  property has nothing to sweep).
+- **The selector (reuses `Tabs`).** A property rail (Base plan | each property, labelled from
+  `property_card.suburb`) shown only when ≥1 attached; `selectProperty` clears the base what-if when a
+  property is chosen. No new control (reuse REDUCES surface area).
+- **Cash tab.** When viewing a property, the base-scope what-if cockpit + financials editor are hidden
+  (base-plan controls); the per-property verdict + the table/detail/horizon sub-tabs read the
+  per-property `budget_envelope_investor`/`disposition` automatically.
+
+**Verified.** `svelte-check` **0 errors / 0 warnings** (incl. Svelte + a11y), `npm run build` green,
+`svelte-autofixer` clean (0 issues). **Residual gap (honest, [[proportionate-verification-honest-gaps]]):**
+no new renderers → no pixel-layout unknown; the new logic is a type-checked reactive overlay + a reused
+control, the data-path contract grounded against the engine. The end-to-end **live render** (attach →
+overlay → per-property render) is best proven as the capstone once Slice 3 lands the attach UI
+(render-before-filler: slots now, filler next, one full-stack live-pixel proves both) — or via a
+curl-attach against Slice 1's proxy now if wanted.
+
+**Next (a separate `go`):** Slice 3 — the attach affordance UI (a property-entry form → `attachProperty()`),
+which makes the selector reachable + enables the capstone. The product decision (manual form vs
+URL-paste/curation) is Slice 3's.
 
 ## Deferred out (honest — first-exercising instance is Mode B/D, not here)
 
