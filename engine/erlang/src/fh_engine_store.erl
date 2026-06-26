@@ -15,7 +15,7 @@
 -export([append_event/4, events_since/3, usage_events_since/3, max_event_id/2]).
 -export([append_audit/6]).
 -export([snapshot_component/3, get_plan_card/2, get_card_rerun_context/1, set_card_target/2]).
--export([attach_property/3, snapshot_addendum_component/4]).
+-export([attach_property/3, snapshot_addendum_component/4, set_transaction/3]).
 -export([set_checklist_status/4, get_checklist_status/2]).
 -export([set_profile_financials/2, list_plan_card_ids_for_profile/1]).
 -export([deploy_commit_sha/0, projection_state/1, list_active_plan_card_ids/0]).
@@ -209,6 +209,23 @@ snapshot_addendum_component(PlanCardId, PropertyId, ComponentId, OutcomeEntry) -
         "updated_at = now() "
         "WHERE plan_card_id = $1::uuid",
         [PlanCardId, PropertyId, ComponentId, fh_engine_util:json_encode(OutcomeEntry)]),
+    ok.
+
+%% Write the user-attested transaction facts into content.addenda.<pid>.transaction — the THIRD
+%% per-property input layer (sibling of property_card + components; engine-contract §11,
+%% `<from_transaction>`). The addendum object is guaranteed by a prior attach_property/3 (the
+%% handler verifies the property is attached → 409 otherwise), so a plain jsonb_set with
+%% create_missing on the leaf suffices. A re-submit overwrites; a later `<from_document>`
+%% extraction writes the SAME slot.
+-spec set_transaction(binary(), binary(), map()) -> ok.
+set_transaction(PlanCardId, PropertyId, Transaction) ->
+    _ = query(
+        "UPDATE plan_cards SET "
+        "content_jsonb = jsonb_set(content_jsonb, "
+        "  ARRAY['addenda', $2, 'transaction'], $3::jsonb, true), "
+        "updated_at = now() "
+        "WHERE plan_card_id = $1::uuid",
+        [PlanCardId, PropertyId, fh_engine_util:json_encode(Transaction)]),
     ok.
 
 -spec get_plan_card(binary(), binary()) -> {ok, map()} | {error, not_found}.

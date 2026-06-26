@@ -33,7 +33,9 @@ main(_) ->
     ok = fh_engine_kb:load(),
     io:format("settlement_prep conformance — fh_engine_settlement (Mode-C resolver-only, Slice C-settle)~n~n"),
     R = lists:flatten([scaffold_cases(), critical_path_cases(), investor_milestone_cases(),
-                       insurance_cases(), layer1_cases(), honest_partial_cases()]),
+                       insurance_cases(), layer1_cases(), honest_partial_cases(),
+                       dated_statutory_cases(), dated_status_cases(),
+                       transaction_wiring_cases()]),
     Fails = [X || X <- R, X =:= fail],
     io:format("~n================================================================~n"),
     case Fails of
@@ -83,14 +85,17 @@ scaffold_cases() ->
      check("at_risk_milestones empty (can't assess risk without dates)",
            g(O, <<"at_risk_milestones">>), []),
      check("next_action_for_user is bilingual", is_loc(g(O, <<"next_action_for_user">>)), true),
-     check("kb_versions = the six read anchors",
+     check("kb_versions = the nine read anchors (incl. the three date-arithmetic anchors — B)",
            lists:sort(KbSlugs),
            lists:sort([<<"kb.settlement.process-by-state">>,
                        <<"kb.insurance.timing-of-risk-pass">>,
                        <<"kb.copy.settlement">>,
                        <<"kb.investor.entity-setup-timeline">>,
                        <<"kb.investor.depreciation-schedule-procurement">>,
-                       <<"kb.investor.property-management-appointment-timeline">>]))].
+                       <<"kb.investor.property-management-appointment-timeline">>,
+                       <<"kb.cooling-off.by-state">>,
+                       <<"kb.pexa.settlement">>,
+                       <<"kb.lender-docs.standard-timeline">>]))].
 
 %% --- 2. the critical path (structure now, dates PENDING) --------------------
 
@@ -213,6 +218,115 @@ honest_partial_cases() ->
      check("no upstream: dates_status still pending_contract",
            g(O, <<"dates_status">>), <<"pending_contract">>),
      check("no upstream: Layer-1 still conforms", validate(O), ok)].
+
+%% --- 7. dated path — STATUTORY-EXACT back-calculation (B) --------------------
+%% Fixed contract/settlement dates so the asserted due-dates are the real statutory/anchored
+%% figures, independent of the run date. C=2026-06-01 (Mon), S=2026-08-01.
+
+scaffold_tx(Upstream, Txn) ->
+    fh_engine_fill:resolver(<<"settlement_prep">>, #{transaction => Txn}, Upstream).
+
+tx(C, S) -> #{<<"contract_signed_date">> => fmt(C), <<"settlement_date">> => fmt(S)}.
+
+fmt({Y, M, D}) -> iolist_to_binary(io_lib:format("~4..0w-~2..0w-~2..0w", [Y, M, D])).
+
+mil_due(O, Field, Id) ->
+    [M] = [M0 || M0 <- g(O, Field), maps:get(<<"id">>, M0) =:= Id],
+    maps:get(<<"due_date">>, M).
+
+dated_statutory_cases() ->
+    C = {2026, 6, 1}, S = {2026, 8, 1},
+    {Ov, _, _} = scaffold_tx(upstream(<<"VIC">>, <<"established_house">>, <<"company">>), tx(C, S)),
+    {On, _, _} = scaffold_tx(upstream(<<"NSW">>, <<"established_house">>, <<"company">>), tx(C, S)),
+    {Oq, _, _} = scaffold_tx(upstream(<<"QLD">>, <<"unit">>, <<"company">>), tx(C, S)),
+    Cp = <<"critical_path_milestones">>,
+    [check("dates present → dates_status = active", g(Ov, <<"dates_status">>), <<"active">>),
+     check("settlement_date echoes the attested date", g(Ov, <<"settlement_date">>), <<"2026-08-01">>),
+     check("contract_signed due = the attested contract date", mil_due(Ov, Cp, <<"contract_signed">>), <<"2026-06-01">>),
+     check("VIC deposit due = C + 3 cooling-off business days (statutory-exact)",
+           mil_due(Ov, Cp, <<"deposit_paid_to_trust">>), <<"2026-06-04">>),
+     check("VIC building/pest due = cooling-off end (within the window)",
+           mil_due(Ov, Cp, <<"building_pest_satisfactory">>), <<"2026-06-04">>),
+     check("NSW deposit due = C + 5 cooling-off business days (statutory-exact, state-conditional)",
+           mil_due(On, Cp, <<"deposit_paid_to_trust">>), <<"2026-06-08">>),
+     check("finance unconditional due = S - 14d (lender-policy typical, clamped in [C,S])",
+           mil_due(Ov, Cp, <<"finance_approval_unconditional">>), <<"2026-07-18">>),
+     check("loan documents due = S - 7d (lender-policy typical)",
+           mil_due(Ov, Cp, <<"loan_documents_signed">>), <<"2026-07-25">>),
+     check("VIC insurance_bound due = settlement (risk passes at completion)",
+           mil_due(Ov, Cp, <<"insurance_bound">>), <<"2026-08-01">>),
+     check("QLD insurance_bound due = C + 1 business day (risk passes day after contract)",
+           mil_due(Oq, Cp, <<"insurance_bound">>), <<"2026-06-02">>),
+     check("settlement_funds_released due = settlement (simultaneous electronic event)",
+           mil_due(Ov, Cp, <<"settlement_funds_released">>), <<"2026-08-01">>),
+     check("title_registered due = settlement", mil_due(Ov, Cp, <<"title_registered">>), <<"2026-08-01">>),
+     check("keys_received due = settlement", mil_due(Ov, Cp, <<"keys_received">>), <<"2026-08-01">>),
+     check("entity_setup (company) due = contract, status done (established pre-contract)",
+           mil_due(Ov, <<"investor_milestones">>, <<"entity_setup">>), <<"2026-06-01">>),
+     check("active outcome conforms (Layer-1)", validate(Ov), ok)].
+
+%% --- 8. dated path — STATUS + AT-RISK (today-relative, run-date-robust) ------
+%% Relative dates so the scheduled/at-risk verdict holds regardless of the run date: an
+%% all-future timeline has no at-risk milestone; an all-past one has every non-`done` milestone
+%% at-risk. contract_signed is always `done` (we hold the signed date), never at-risk.
+
+plus(D, N) -> calendar:gregorian_days_to_date(calendar:date_to_gregorian_days(D) + N).
+
+statuses(O, Field) -> [maps:get(<<"status">>, M) || M <- g(O, Field)].
+
+mil_status(O, Field, Id) ->
+    [M] = [M0 || M0 <- g(O, Field), maps:get(<<"id">>, M0) =:= Id],
+    maps:get(<<"status">>, M).
+
+dated_status_cases() ->
+    Today = erlang:date(),
+    Fut = tx(plus(Today, -2), plus(Today, 120)),   %% contract just signed, settlement far off
+    Past = tx(plus(Today, -90), plus(Today, -1)),  %% whole timeline in the past
+    {Of, _, _} = scaffold_tx(upstream(<<"VIC">>, <<"established_house">>, <<"company">>), Fut),
+    {Op, _, _} = scaffold_tx(upstream(<<"VIC">>, <<"established_house">>, <<"company">>), Past),
+    Cp = <<"critical_path_milestones">>,
+    [check("future timeline: contract_signed status = done (we hold the date)",
+           mil_status(Of, Cp, <<"contract_signed">>), <<"done">>),
+     check("future timeline: no milestone is at_risk (all ahead of today)",
+           lists:member(<<"at_risk">>, statuses(Of, Cp)), false),
+     check("future timeline: at_risk_milestones is empty", g(Of, <<"at_risk_milestones">>), []),
+     check("future timeline: non-contract milestones are scheduled",
+           lists:all(fun(S) -> S =:= <<"scheduled">> end,
+                     statuses(Of, Cp) -- [<<"done">>]), true),
+     check("past timeline: settlement milestone is at_risk (its date has passed)",
+           mil_status(Op, Cp, <<"settlement_funds_released">>), <<"at_risk">>),
+     check("past timeline: contract_signed still done, never at_risk",
+           mil_status(Op, Cp, <<"contract_signed">>), <<"done">>),
+     check("past timeline: at_risk_milestones is non-empty + each entry is {name, reason} bilingual",
+           length(g(Op, <<"at_risk_milestones">>)) > 0
+               andalso lists:all(fun(A) -> is_loc(maps:get(<<"name">>, A))
+                                               andalso is_loc(maps:get(<<"reason">>, A)) end,
+                                 g(Op, <<"at_risk_milestones">>)), true),
+     check("past timeline: at_risk count = milestones with at_risk status (critical + investor)",
+           length(g(Op, <<"at_risk_milestones">>)),
+           length([X || X <- statuses(Op, Cp) ++ statuses(Op, <<"investor_milestones">>),
+                        X =:= <<"at_risk">>])),
+     check("active next_action differs from the pending one (the dated-path copy)",
+           g(Of, <<"next_action_for_user">>) =/=
+               fh_engine_kb:copy(<<"kb.copy.settlement">>, <<"next_action">>), true),
+     check("past timeline active outcome conforms (Layer-1)", validate(Op), ok)].
+
+%% --- 9. transaction-turn wiring (the `transaction` kind, no PG) --------------
+%% The transaction re-fill narrows the per-property set to settlement_prep alone and runs it
+%% resolver-only — proving it never re-runs the agent leaves (property_assessment / buying_strategy)
+%% → no sidecar, no usage. (Mirrors the no-PG decision proof in phase_b_wiring_smoke.)
+
+transaction_wiring_cases() ->
+    All = fh_engine_turn:property_components(?INV),
+    Narrowed = [C || C <- All, maps:get(<<"name">>, C) =:= <<"settlement_prep">>],
+    [check("settlement_prep is in the per-property set",
+           lists:member(<<"settlement_prep">>, [maps:get(<<"name">>, C) || C <- All]), true),
+     check("transaction turn narrows the per-property set to exactly one component",
+           length(Narrowed), 1),
+     check("...and that component is settlement_prep",
+           maps:get(<<"name">>, hd(Narrowed)), <<"settlement_prep">>),
+     check("settlement_prep is resolver-pathed (transaction re-fill runs no sidecar, no usage)",
+           fh_engine_fill:has_resolver(<<"settlement_prep">>), true)].
 
 %% --- helpers ----------------------------------------------------------------
 

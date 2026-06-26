@@ -109,6 +109,23 @@ init(#{tenant_id := T, plan_card_id := PC, turn_id := Tn} = Args) ->
             Seed = outcomes_by_type(Slug, maps:get(base_components_snapshot, Args, #{})),
             Data = Args#{components => Components, outcomes => Seed},
             {ok, running, Data, [{next_event, internal, step}]};
+        transaction ->
+            %% A `<from_transaction>` re-fill (engine-contract §11): the user attested contract
+            %% dates for an ALREADY-ATTACHED property → a RESOLVER-ONLY re-fill of settlement_prep
+            %% alone (no sidecar, no usage). Components is the single settlement_prep def (picked
+            %% from the per-property set). The seed is base ∪ addendum outcomes by outcome_type
+            %% (the addendum wins for per-property types) — settlement_prep reads property_fit_
+            %% investor (state/property_type) + tax_optimised_structure (recommended_entity), both
+            %% in the addendum after the attach turn, NOT recomputed here. `transaction` rides Args
+            %% and reaches the resolver (the dated branch reads it).
+            Slug = maps:get(blueprint_slug, Args),
+            Components = [C || C <- property_components(Slug),
+                              maps:get(<<"name">>, C) =:= <<"settlement_prep">>],
+            BaseSeed = outcomes_by_type(Slug, maps:get(base_components_snapshot, Args, #{})),
+            AddSeed  = outcomes_by_type(Slug, maps:get(addendum_components_snapshot, Args, #{})),
+            Seed = maps:merge(BaseSeed, AddSeed),
+            Data = Args#{components => Components, outcomes => Seed},
+            {ok, running, Data, [{next_event, internal, step}]};
         qa ->
             {ok, qa, Args, [{next_event, internal, start}]}
     end.

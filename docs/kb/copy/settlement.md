@@ -132,6 +132,14 @@ ids the resolver references, each a `{vi, en}` pair.
     "next_action": {
       "vi": "Nhập ngày ký hợp đồng và ngày thanh toán (settlement) để kích hoạt lịch trình thanh toán theo ngày, kèm cảnh báo các mốc có rủi ro.",
       "en": "Enter your contract date and settlement date to activate the dated settlement timeline with at-risk milestone alerts."
+    },
+    "next_action_active": {
+      "vi": "Lịch trình thanh toán đã được kích hoạt. Các ngày luật định (hết hạn cân nhắc rút lui, ngày thanh toán) là chính xác; các mốc về tài chính và kiểm tra chỉ là thời gian ĐIỂN HÌNH — hãy xác nhận với ngân hàng và luật sư/chuyên viên chuyển nhượng của bạn. Ngày được tính theo ngày làm việc (không trừ ngày lễ).",
+      "en": "Your settlement timeline is active. The statutory dates (cooling-off end, settlement) are exact; the finance and inspection milestones are TYPICAL timing only — confirm them with your lender and conveyancer. Dates count business days (public holidays not deducted)."
+    },
+    "at_risk_reason": {
+      "vi": "Ngày dự kiến cho mốc này đã qua — hãy xác nhận tình trạng với luật sư/chuyên viên chuyển nhượng hoặc ngân hàng của bạn.",
+      "en": "The expected date for this milestone has passed — confirm its status with your conveyancer or lender."
     }
   }
 }
