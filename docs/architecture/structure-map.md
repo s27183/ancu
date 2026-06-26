@@ -122,6 +122,7 @@ How a value flows when a plan card fills. Components run in **DAG order**; each 
 flowchart TB
   PC["property_card<br/>(Phase-B ingress)"]:::ext
   UD["uploaded_docs<br/>(extracted facts)"]:::ext
+  TX["transaction_facts<br/>(attested dates)"]:::ext
 
   C1["1 buyer_profile"] -->|"profile"| C2["2 property_assessment"]
   PC --> C2
@@ -142,6 +143,7 @@ flowchart TB
   C2 -->|"property_fit"| C8
   C6 -->|"bid_plan"| C8
   C4 -->|"mortgage_plan"| C8
+  TX --> C8
   C2 -->|"property_fit"| C9["9 ownership_planning"]
   C3 -->|"scheme_stack"| C9
   C5 -->|"budget_envelope"| C9
@@ -150,7 +152,7 @@ flowchart TB
   classDef ext fill:#eee,stroke:#999,stroke-dasharray:3 3;
 ```
 
-*(Mode A's pipeline, acquisition components 1–9. Each arrow is labelled with the **outcome** the downstream component reads — never the upstream parameters. `due_diligence` is parallel to the bidding path. The two grey nodes are external inputs, not components.)*
+*(Mode A's pipeline, acquisition components 1–9. Each arrow is labelled with the **outcome** the downstream component reads — never the upstream parameters. `due_diligence` is parallel to the bidding path. The grey nodes are external Phase-B inputs (`property_card`, `uploaded_docs` extraction, and user-attested `transaction_facts` — the three `<from_*>` ingress mechanisms, architecture §11.9), not components.)*
 
 **The two spines and the shared `cash_events` primitive.** Two further **base-scope projection** components close the pipeline — `purchase_journey` (10) and `preparation` (11). They compute no new figures; they *place* figures the upstream components already own onto the two **spines** of the lifecycle. The financial spine (the `calculator`) and the legal spine (the `swimlane-diagram`) both read **one** shared list — `cash_events` (`{phase, direction, amount, counterparty, source_component}`) — so the two views cannot disagree (one-computer-per-figure extended to *every* consumer, including the client). The DAG constrains where that list can live: `cash_events` is owned by `cash_position` (5) for the phases it can see (Prepare→Settle — the calculator's span), while the whole-lifecycle swimlane is assembled last by `purchase_journey` (10), which alone also reads `ownership_planning`'s (9) Own-phase events. So the calculator legitimately spans fewer phases than the swimlane — by DAG necessity, not omission. Detail: [`lifecycle-simulation-model.md`](lifecycle-simulation-model.md) §2–§3.
 

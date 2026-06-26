@@ -595,9 +595,10 @@ full-stack live, EN+VI, against real Opus.**
 
 **Status: Slice A + B0/B1 + B2 + B3a/B3b/B3c + C + C-settle + C-dd DONE — full-stack live-proven (the
 36-event, eight-component Phase-B turn PASSES against the real planner, exit 0). The three per-property
-structure-halves are built (`buying_strategy` ✓, `settlement_prep` A ✓, `due_diligence` A ✓); the two
-input-surface B-halves (`settlement_prep` B contract dates, `due_diligence` B upload pipeline) remain
-deferred as one cross-contract input-surface unit.** The per-property financial
+structure-halves are built (`buying_strategy` ✓, `settlement_prep` A ✓, `due_diligence` A ✓); the
+`settlement_prep` B contract-date input surface is **pinned docs-first** (Slice C-settle-B docs below —
+the `<from_transaction>` contract + conformed blueprint, compiled+gated; the code is the next `go`),
+splitting it from `due_diligence` B (the upload pipeline), which remains the heavy deferred half.** The per-property financial
 spine now computes end-to-end for an attached property (acquire → hold → dispose), gated only by the
 regulated CGT `to_verify`, plus the investor **bid plan** (yield-anchored discipline). The base spine
 (P5) owns every property-agnostic
@@ -1152,6 +1153,47 @@ gate×3 + filled, NO usage; live NSW property → `docs=pending_upload`, `checkl
 **Still deferred after C-dd:** the **one cross-contract input-surface unit** — `settlement_prep` B (contract
 dates) + `due_diligence` B (upload pipeline) — both per-property transaction/document input, pinned docs-first.
 The three per-property structure-halves are now complete; this is the clean Phase-B closeout boundary.
+
+### Slice C-settle-B (docs) — `settlement_prep` B contract-date input surface, pinned docs-first — DONE (2026-06-26)
+
+The first half of the deferred cross-contract input-surface unit, **pinned on paper before code**
+([[foundation-first-for-cross-contract-reframe]] — the engine↔shell seam is the costliest mismatch
+site, so the contract is fixed in docs first). The defining decision: contract dates reach the dated
+path via a **new light input mechanism, `<from_transaction>`** — facts the user **attests** (a
+two-field structured submit) — *distinct from* `<from_document>` (the heavy extraction/upload pipeline
+the blueprint previously named). One fact layer, two mechanisms; the attested one needs no upload
+pipeline — which is exactly **what lets `settlement_prep` B ship on its own**, split ahead of
+`due_diligence` B.
+
+**The five docs — one at a time, review between:**
+1. **Anchor** — architecture §11.9: the `<from_transaction>` initial-signal row + the "third
+   per-property input layer" paragraph (the addendum gains a `transaction` slot, sibling of
+   `property_card`/`components`; resolver-path → no `usage`; the attested-vs-extracted distinction).
+   *(Also fixed an adjacent drift — the "five upstream-reference signals" miscount, made count-free.)*
+2. **Contract** — engine-contract §11 (new) + a §2.1 surface bullet:
+   `POST /api/engine/plan-cards/:id/properties/:pid/transaction` `{contract_signed_date, settlement_date}`
+   → writes `addenda.<pid>.transaction` → a **resolver-only re-fill** (no `usage`); property must
+   already be attached (`409`), dates validated (well-formed + ordered, clear `error`); **no preview
+   primitive** (a settlement date is attested once, not swept).
+3. **Conforming blueprint** — investor-domestic-au.md `settlement_prep`: the `contract_dates` param
+   (`<from_transaction>` ×2, no agent flag), the posture note recast as **two states, one resolver**
+   (dates absent → structure/PENDING; present → `active`, due-dates **back-calculated from
+   `settlement_date`** via the three date-arithmetic anchors + at-risk). **Compiled + gated:** recompile
+   PASS — `agent_leaves []` preserved, 9 anchors incl. the three date-arithmetic; `validate_build`
+   green. **No new KB** (all three anchors already exist).
+4. **UX** — 04-ux-model.md §13.4: the **Settle phase activates on contract dates** — the same
+   pending-is-an-invitation pattern as the horizon slider; a small contract-date entry in the Settle
+   phase sheet; **no new view/renderer** (constraint #7, rides the existing phase sheet + swimlane);
+   distinct from the document workspace.
+5. **Index** — this section + the structure-map data-plane diagram (a third `transaction_facts` ingress
+   node → `settlement_prep`, parallel to `property_card`/`uploaded_docs`); the grounding-checklist
+   already delegates Mode-C tracking here (item 2).
+
+**Next (the code build — a separate `go`):** the engine side — the `settlement_prep` resolver dated
+branch (back-calc from `settlement_date`, at-risk detection; reading the `transaction` slot from Args),
+the transaction endpoint + the `transaction`-slot store write, and the turn loading the slot into Args —
+plus the shell contract-date entry. **Still deferred:** `due_diligence` B (the upload pipeline /
+`<from_document>` extraction + the `lease_interpretation` leaf) — the heavy half of the unit.
 
 ## Deferred out (honest — first-exercising instance is Mode B/D, not here)
 

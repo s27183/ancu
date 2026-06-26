@@ -909,7 +909,7 @@ input (DAG reads below) — without it the component's most distinctive output w
 
 **Inputs:** `property_fit_investor.outcome` + `bid_plan_investor` + `tax_optimised_structure`
 
-**KB anchors:** `kb.settlement.process-by-state`, `kb.insurance.timing-of-risk-pass`, `kb.copy.settlement`, `kb.investor.entity-setup-timeline`, `kb.investor.depreciation-schedule-procurement`, `kb.investor.property-management-appointment-timeline` (the date-arithmetic anchors `kb.cooling-off.by-state`, `kb.pexa.settlement`, `kb.lender-docs.standard-timeline` activate with the dated path — settlement_prep B)
+**KB anchors:** `kb.settlement.process-by-state`, `kb.insurance.timing-of-risk-pass`, `kb.copy.settlement`, `kb.investor.entity-setup-timeline`, `kb.investor.depreciation-schedule-procurement`, `kb.investor.property-management-appointment-timeline` (the date-arithmetic anchors `kb.cooling-off.by-state`, `kb.pexa.settlement`, `kb.lender-docs.standard-timeline` power the dated path once contract dates are supplied — settlement_prep B, engine-contract §11)
 
 **Renderer:** `swimlane-diagram` + `checklist`
 
@@ -921,6 +921,15 @@ Same as [Mode A settlement_prep](fhb-domestic-au.md#8-settlement_prep) with thes
 
 ```jsonc
 {
+  // user-attested transaction facts — the `<from_transaction>` input layer (architecture §11.9;
+  // engine-contract §11). Supplied POST-ATTACH via the transaction submit, NOT a property fact and
+  // NOT document-extracted. Present → the dated critical path activates (dates_status: active, the
+  // milestone due-dates back-calculated from settlement_date via the date-arithmetic anchors); absent
+  // → dates_status: pending_contract (honest-partial). Resolver-path (no agent_reasoning_required).
+  "contract_dates": {
+    "contract_signed_date": { "type": "date", "value": "<from_transaction>" },
+    "settlement_date":      { "type": "date", "value": "<from_transaction>" }
+  },
   // all Mode A milestones, plus:
   "investor_specific_milestones": {
     "entity_setup_completed_if_applicable": { "type": "milestone", "value": { "status": "<initial>", "due_date": "<initial>" } },
@@ -940,7 +949,7 @@ Same as [Mode A settlement_prep](fhb-domestic-au.md#8-settlement_prep) with thes
   "fields": {
     // honest-partial signal. `pending_contract` until the user supplies the signed-contract dates
     // (contract_signed_date + settlement_date — a per-property transaction-input surface, NOT a
-    // property fact; deferred to a separate cross-contract unit, mode-c-wedge.md "settlement_prep B").
+    // property fact; supplied via the transaction submit, engine-contract §11 / `<from_transaction>`).
     // `active` once dates exist → the dated critical path + at-risk detection + swimlane light up.
     "dates_status": "enum: pending_contract | active",
     "settlement_date": "date | null",                                   // PENDING until contract dates supplied
@@ -966,15 +975,23 @@ Same as [Mode A settlement_prep](fhb-domestic-au.md#8-settlement_prep) with thes
 **Fill-path / honest-partial posture.** `settlement_prep` is **resolver-only** (zero agent leaves
 per the Fill-path classification note below; no `reasoning_domain`). Its defining
 output — the *dated* settlement critical path with at-risk detection — depends on
-`contract_signed_date` + `settlement_date`, which arrive `<from_document>` from a signed contract;
-that per-property transaction-input surface is **not built** (the only Phase-B input today is the
-source-supplied `property_card` of neutral property facts). So this component fills the **knowable
-structure now** — the milestone sequence + dependency DAG, the upstream-conditioned investor
-milestones, and the state-conditional insurance-timing *rule* — and marks every date PENDING
-(`dates_status: pending_contract`), never fabricating a date. Supplying the contract dates
-(mode-c-wedge.md "settlement_prep B") activates the dated path. This resolver is also the
-**state-conditional building-insurance fix** flagged in `kb.insurance.timing-of-risk-pass`
-(the blueprint's single `derived_from: settlement_date` hint is wrong for QLD).
+`contract_signed_date` + `settlement_date`. These arrive via **`<from_transaction>`** — facts the
+user **attests** about their transaction (engine-contract §11), the *light* input surface built as
+**settlement_prep B** (the same dates may *later* also be extracted via `<from_document>` from the
+uploaded signed contract — the heavier upload pipeline, architecture §11.10; one fact layer, two
+mechanisms). **Two states, one resolver:**
+- **Dates absent** → the **knowable structure now**: the milestone sequence + dependency DAG, the
+  upstream-conditioned investor milestones, and the state-conditional insurance-timing *rule*, with
+  every date PENDING (`dates_status: pending_contract`), never fabricating a date.
+- **Dates present** (a `<from_transaction>` submit) → `dates_status: active`: the milestone due-dates
+  **back-calculated from `settlement_date`** via `kb.cooling-off.by-state` + `kb.pexa.settlement` +
+  `kb.lender-docs.standard-timeline`, the dated swimlane, and **at-risk detection** (a milestone whose
+  computed due-date is past / too close to today). Still resolver-only — a transaction submit is a
+  **resolver-only turn** (no `usage`, engine-contract §11).
+
+This resolver is also the **state-conditional building-insurance fix** flagged in
+`kb.insurance.timing-of-risk-pass` (the blueprint's single `derived_from: settlement_date` hint is
+wrong for QLD).
 
 ---
 

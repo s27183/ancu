@@ -321,6 +321,7 @@ The `<initial>` placeholder is the agent's cue that a parameter needs filling. T
 | `<from_eligibility>` | Value comes from upstream `eligibility.outcome` | Same pattern |
 | `<from_suburb>` | Value comes from the suburb enrichment record (§11.10) | Pull from the `suburbs` table by suburb at session-start; no reasoning needed |
 | `<from_document>` | Value comes from facts extracted from an uploaded document | Pull from the extraction sidecar's structured output; no reasoning needed (extraction ran upstream) |
+| `<from_transaction>` | Value comes from a fact the user **attests about their own transaction** (e.g. `contract_signed_date`, `settlement_date`) | Pull from the addendum's `transaction` slot ([engine-contract.md](engine-contract.md) §11); no reasoning needed (user-supplied via a structured submit, not extracted) |
 
 Future signal expansions (deferred to v1.1):
 
@@ -331,7 +332,7 @@ Future signal expansions (deferred to v1.1):
 | `<stale: 90d>` | Was filled but blueprint or property data updated | Flag in UI; offer refresh |
 | `<conflict: user_override>` | User explicitly set a value contrary to agent's recommendation | Preserve user value; note disagreement in decision trail |
 
-V1 implementation uses `<initial>` + the five upstream-reference signals. Pending/stale/conflict signals are added as the agent matures and edge cases emerge.
+V1 implementation uses `<initial>` + the `<from_*>` upstream-reference signals listed above (the external-source and upstream-outcome rows). Pending/stale/conflict signals are added as the agent matures and edge cases emerge.
 
 #### Two fill paths — deterministic resolver vs agent turn
 
@@ -351,6 +352,8 @@ The partition is **derivable from the blueprint**: a leaf is agent-path iff it c
 **A fact with no home feeds the build-time curation loop, never an ad-hoc field.** When an uploaded document contains informative content the blueprint did not anticipate, the wrong fix is letting the card grow an arbitrary field — that breaks the typed-outcome contract every downstream component and renderer depends on. Instead: surface a drop-with-note to the user now ("this document mentioned X, which this plan doesn't track"), *and* emit a curation signal — a no-home fact is evidence the blueprint **schema** is incomplete, routed into the same agent-fallback → KB-curation loop as a silent rule ([agentic-flow.md](agentic-flow.md) §2). The next deploy adds the slot. The runtime stays schema-bounded; the gap becomes a build-time improvement rather than a runtime hack.
 
 Both paths emit `component_filled` ([engine-contract.md](engine-contract.md) §4); a `resolver` fill emits no `usage` of its own — any LLM cost lives in an upstream extraction or a prior agent turn. Keeping money math out of the LLM is deliberate: LLMs do arithmetic unreliably, and a hallucinated stamp-duty figure is both a product defect and a compliance hazard.
+
+**User-attested transaction facts are direct structured input, not extraction — the third per-property input layer.** Some facts the plan needs are neither neutral *property* facts (the `<from_property_card>` selection) nor facts buried in an uploaded *document* (`<from_document>` extraction): they are facts the user simply **attests about their own transaction** — the `contract_signed_date` and `settlement_date` once a contract is signed. These arrive via a small **structured submit** the shell collects directly (two dates), written to a per-property **`transaction` slot** in the addendum — a sibling of `property_card` and `components` ([engine-contract.md](engine-contract.md) §11), per-property because a transaction is the acquisition of *this* property (distinct from journey-level `plan.*` and household-level `profile.*`, §11.9 fact surface). A `<from_transaction>` leaf copies them on the **resolver path** — no LLM — so a transaction-fact submit triggers a **resolver-only** re-fill (no `usage`), exactly like a structural what-if (§10). This is deliberately the **light** counterpart to `<from_document>`: the same transaction facts *could* later be extracted from the uploaded signed contract (the heavy, metered upload pipeline, §11.10), but attestation needs none of that — which is precisely what lets the dated settlement path (`settlement_prep`'s `dates_status: active`) activate **without the upload pipeline being built**. The two are input *mechanisms* for one fact layer; the slot is the same, so a later extracted date *refreshes* the attested leaf rather than accumulating a second value (the same projection-not-accumulation bound as extraction, above).
 
 #### Re-fill triggers
 
