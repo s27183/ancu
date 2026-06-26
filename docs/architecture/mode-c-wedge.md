@@ -1379,6 +1379,45 @@ handler already frames the producer as a deferred, swappable unit, §12). Within
 **Capstone now provable** (attach → overlay → per-property render, EN+VI) — best as a full-stack live
 run with the engine + sidecar up; the unit logic is type-checked and grounded against the §12 contract.
 
+### Phase-B shell surface — Slice 4 (settlement_prep B — date form + dated-path render) — DONE (2026-06-27)
+
+The settlement_prep B shell half: the user attests their two transaction dates → the engine's
+dated critical path activates (engine-contract §11, the engine + backend proxy were built in Slice 1 /
+`a647e5f` / `c8b0044`). **Grounding surfaced a second half:** the engine names renderer `"checklist"` for
+*both* `due_diligence` (a `preparation` outcome) and `settlement_prep` (a `settlement_checklist` outcome),
+but `Checklist.svelte` read only the `preparation` shape — so a filled `settlement_prep` rendered **hollow**
+(zero key overlap). The producer was rich; the consumer dropped all of it ([[thin-surface-vs-dropped-richness]]).
+So Slice 4 is two halves — the form would submit into an invisible result without the render.
+
+- **api (`api.ts`).** `setTransactionDates(planCardId, propertyId, {contract_signed_date, settlement_date})`
+  → `POST /api/plan-cards/:id/properties/:pid/transaction`; discriminated `SetTransactionDatesOutcome`.
+  **Subtlety:** the engine returns *two distinct 409s* — `property_not_attached` vs `turn_in_flight` —
+  disambiguated on the **error body**, not the status code. It is a **resolver-only** re-fill → **no `usage`,
+  no meter gate** (the load-bearing contrast with attach's metered agent turn).
+- **UI form (`PlanProjection.svelte`).** A CTA under the `settlement_prep` card in the journey tab
+  (investor + selected-property only; label tracks `dates_status` — *Enter*/*Update dates*) opens the
+  **existing reusable `Modal`** with two `<input type=date>` fields. Client-side fail-fast (both present;
+  settlement strictly after contract — ISO yyyy-mm-dd sorts lexically, mirroring the engine; the engine
+  re-validates). On 202 it **optimistic-seeds `addenda[pid].transaction` from the submitted dates** (the
+  client's own attested truth, echoed back) + `turnDone=false`; the recomputed `settlement_checklist`
+  streams over the **same open SSE** ([[preview-is-commit-minus-persistence]], the create/optimistic
+  hand-off; `onComponentFilled`'s `...ad` spread preserves the seeded `transaction` slot).
+- **UI render (`Checklist.svelte`).** Shape-branch on `'dates_status' in outcome`: `pending_contract` →
+  the milestone structure as honest-partial (every date blank) + the engine's `next_action_for_user`
+  prompt; `active` → dated critical-path + applicable investor milestones (name · due · status chip) with
+  an at-risk callout. **No new renderer** (constraint #7; the engine already names `checklist`) — same
+  shape-discriminated-view discipline as [[unify-views-as-projections-of-one-primitive]].
+- **Type (`planCard.ts`).** `SettlementChecklistOutcome` + milestone types, grounded field-by-field on
+  `fh_engine_settlement.erl`'s outcome ([[ground-design-choices]]). The settlement cast goes via `unknown`
+  (its `dates_status` is required, unlike the all-optional `preparation`).
+- **Copy (`i18n.ts`).** Bilingual form labels + calm errors (incl. a friendly `settlement_not_after_contract`
+  → order message) + the render headings/status chips.
+
+**Verified.** `svelte-check` **0 errors / 0 warnings**, `npm run build` green, `svelte-autofixer` clean.
+Full-stack live-pixel (submit → dated render, EN+VI) is best proven with the engine + sidecar + PG up;
+the unit logic is type-checked and grounded against the §11 contract end-to-end (route → store → re-fill →
+SSE → render).
+
 ## Deferred out (honest — first-exercising instance is Mode B/D, not here)
 
 `off_title_parties[]` (array vs A's scalar `non_buying_partner`), `visa_class`, off-title

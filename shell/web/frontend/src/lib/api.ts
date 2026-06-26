@@ -479,3 +479,66 @@ export async function attachProperty(
     if (res.status === 404) return { kind: 'not_found' };
     return { kind: 'error', status: res.status };
 }
+
+// --- Per-property transaction dates: settlement_prep B (engine-contract §11) --
+// POST /api/plan-cards/:id/properties/:pid/transaction — submit the two dates the
+// user ATTESTS about their own transaction (contract_signed_date + settlement_date)
+// for an ALREADY-ATTACHED property → the engine activates settlement_prep's dated
+// critical path (a RESOLVER-ONLY re-fill: no agent leaf, no usage → NO meter gate,
+// unlike attach). The engine GENERATES nothing; it re-validates the addendum exists
+// and the dates (well-formed; settlement strictly after contract). 202 {…, turn_id};
+// the recomputed settlement_checklist streams over the SAME /events SSE (no re-subscribe).
+
+/** The two attested transaction dates, ISO yyyy-mm-dd. settlement_date must be strictly
+ *  after contract_signed_date (the engine re-validates; the form fail-fasts client-side). */
+export interface TransactionDatesInput {
+    contract_signed_date: string;
+    settlement_date: string;
+}
+
+/** A discriminated submit outcome. The engine returns TWO distinct 409s — `not_attached`
+ *  (no addendum to write into — attach first) and `busy` (a turn is already running for
+ *  this card) — disambiguated on the error body, not the status code. `invalid` carries
+ *  the engine's typed 400 `code` (contract_signed_date_invalid / settlement_date_invalid /
+ *  settlement_not_after_contract / body_must_be_object). */
+export type SetTransactionDatesOutcome =
+    | { kind: 'accepted'; result: AttachPropertyResult }
+    | { kind: 'not_attached' }
+    | { kind: 'busy' }
+    | { kind: 'invalid'; code: string }
+    | { kind: 'auth_required' }
+    | { kind: 'not_found' }
+    | { kind: 'error'; status: number };
+
+/** POST the transaction dates for an attached property. The recomputed settlement_checklist
+ *  does NOT come back here — it streams over the card's /events; this returns only the turn
+ *  handle (with property_id) so the caller can optimistically seed + route the live re-fill. */
+export async function setTransactionDates(
+    planCardId: string,
+    propertyId: string,
+    dates: TransactionDatesInput,
+    fetchFn: typeof fetch = fetch
+): Promise<SetTransactionDatesOutcome> {
+    const res = await fetchFn(
+        `/api/plan-cards/${encodeURIComponent(planCardId)}/properties/${encodeURIComponent(propertyId)}/transaction`,
+        {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify(dates)
+        }
+    );
+    if (res.status === 202) {
+        return { kind: 'accepted', result: (await res.json()) as AttachPropertyResult };
+    }
+    if (res.status === 409) {
+        const body = (await res.json().catch(() => ({}))) as { error?: string };
+        return body.error === 'turn_in_flight' ? { kind: 'busy' } : { kind: 'not_attached' };
+    }
+    if (res.status === 400) {
+        const body = (await res.json().catch(() => ({}))) as { code?: string };
+        return { kind: 'invalid', code: body.code ?? '' };
+    }
+    if (res.status === 401) return { kind: 'auth_required' };
+    if (res.status === 404) return { kind: 'not_found' };
+    return { kind: 'error', status: res.status };
+}

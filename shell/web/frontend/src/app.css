@@ -1330,6 +1330,12 @@ main {
     color: #fff;
 }
 
+/* settlement_prep B CTA — the dated-path affordance under the settlement card (reuses
+   the dashed .pp-attach-btn idiom; this wrapper just gives it breathing room). */
+.pp-settle-cta {
+    margin: 0.6rem 0 0.2rem;
+}
+
 /* Attach-property form (inside the reusable Modal) — a vertical field stack. */
 .pp-attach-form {
     display: flex;

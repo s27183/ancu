@@ -297,6 +297,53 @@ export interface PreparationOutcome {
     key_assumptions?: LocalizedText[] | null;
 }
 
+// --- settlement_prep → checklist (outcome type `settlement_checklist`) --------
+// The DATED settlement critical path (engine-contract §11; fh_engine_settlement),
+// RESOLVER-ONLY + per-property (Phase B). Two states keyed by dates_status:
+// `pending_contract` (every due_date null — honest-partial, awaiting the user's
+// attested contract dates) and `active` (each milestone back-calculated from the two
+// dates, with at-risk detection). It SHARES the `checklist` renderer with
+// PreparationOutcome — Checklist.svelte branches on dates_status (constraint #7: no new
+// renderer; the engine names "checklist" for both). The dates are submitted via the
+// settlement_prep B form (setTransactionDates, §11).
+
+export type MilestoneStatus = 'pending' | 'done' | 'scheduled' | 'at_risk';
+
+/** A critical-path milestone — name, back-calculated due_date (null when pending), the
+ *  DAG edge to its prerequisite (null for the root, contract_signed). */
+export interface SettlementMilestone {
+    id: string;
+    name: LocalizedText;
+    due_date?: string | null;
+    status: MilestoneStatus;
+    dependency?: string | null;
+}
+/** An investor-specific milestone (entity setup, depreciation schedule, PM appointment,
+ *  landlord insurance). `applicable` is false when the upstream entity needs no setup. */
+export interface InvestorMilestone {
+    id: string;
+    name: LocalizedText;
+    applicable: boolean;
+    why?: LocalizedText | null;
+    due_date?: string | null;
+    status: MilestoneStatus;
+}
+/** A milestone whose due_date has passed (no completion signal exists, so "at-risk" means
+ *  "the date has passed — confirm", per the engine). */
+export interface AtRiskMilestone {
+    name: LocalizedText;
+    reason: LocalizedText;
+}
+export interface SettlementChecklistOutcome {
+    dates_status: 'pending_contract' | 'active';
+    settlement_date?: string | null;
+    critical_path_milestones?: SettlementMilestone[] | null;
+    investor_milestones?: InvestorMilestone[] | null;
+    insurance_timing_rule?: LocalizedText | null;
+    at_risk_milestones?: AtRiskMilestone[] | null;
+    next_action_for_user?: LocalizedText | null;
+}
+
 // --- purchase_journey → swimlane-diagram (outcome type `journey_swimlane`) ---
 // The base lifecycle spine (plan-card-lifecycle-restoration §7): phases × actors ×
 // cells. The engine PLACES already-computed upstream figures on the timeline (it

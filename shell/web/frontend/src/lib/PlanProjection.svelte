@@ -16,9 +16,11 @@
         setProfileFinancials,
         setChecklistStatus,
         attachProperty,
+        setTransactionDates,
         type SimulateOverrides,
         type HouseholdFinancials,
-        type PropertyCardInput
+        type PropertyCardInput,
+        type TransactionDatesInput
     } from '$lib/api';
     import { subscribePlanCard, type PlanCardStream } from '$lib/planCardStream';
     import {
@@ -376,6 +378,74 @@
         }
     }
 
+    // ── Submit transaction dates (settlement_prep B, engine-contract §11) ─────
+    // Once a contract is signed, two dates the user ATTESTS activate settlement_prep's
+    // dated critical path. A per-property submit (not the attach payload, not an upload):
+    // resolver-only → NO meter gate (unlike attach). Offered only for the selected attached
+    // property when its settlement_prep is present (the journey tab). The recomputed
+    // settlement_checklist streams over the SAME open SSE — no re-subscribe.
+    const settleEntry = $derived(viewComponents.settlement_prep);
+    const settleStatus = $derived(
+        (settleEntry?.outcome as { dates_status?: string } | undefined)?.dates_status ?? null
+    );
+    let showSettle = $state(false);
+    let stContract = $state('');
+    let stSettlement = $state('');
+    let savingDates = $state(false);
+    let settleError = $state<
+        null | { kind: 'not_attached' } | { kind: 'busy' } | { kind: 'invalid'; code: string }
+        | { kind: 'error' }
+    >(null);
+
+    function openSettle() {
+        const tx = selectedPropertyId ? addenda[selectedPropertyId]?.transaction : null;
+        stContract = tx?.contract_signed_date ?? '';
+        stSettlement = tx?.settlement_date ?? '';
+        settleError = null;
+        showSettle = true;
+    }
+
+    // Both dates required; settlement strictly after contract (ISO yyyy-mm-dd sorts
+    // lexically, so a string compare mirrors the engine's date check — fail-fast before
+    // the round trip; the engine re-validates authoritatively).
+    function buildTransactionDates(): TransactionDatesInput | null {
+        if (!stContract || !stSettlement) return null;
+        if (!(stSettlement > stContract)) return null;
+        return { contract_signed_date: stContract, settlement_date: stSettlement };
+    }
+    const settleReady = $derived(buildTransactionDates() !== null && !savingDates);
+
+    async function submitSettle() {
+        if (!cardId || !selectedPropertyId) return;
+        const dates = buildTransactionDates();
+        if (!dates) return;
+        savingDates = true;
+        settleError = null;
+        const res = await setTransactionDates(cardId, selectedPropertyId, dates);
+        savingDates = false;
+        if (res.kind === 'accepted') {
+            // Optimistic-seed the addendum's transaction slot from the SUBMITTED dates (the
+            // client's own attested truth, echoed back by the engine); the recomputed
+            // settlement_checklist arrives over the live SSE. turnDone=false surfaces the
+            // running indicator while the resolver-only re-fill runs.
+            const pid = selectedPropertyId;
+            addenda = {
+                ...addenda,
+                [pid]: { ...addenda[pid], transaction: dates }
+            };
+            turnDone = false;
+            showSettle = false;
+        } else if (res.kind === 'not_attached') {
+            settleError = { kind: 'not_attached' };
+        } else if (res.kind === 'busy') {
+            settleError = { kind: 'busy' };
+        } else if (res.kind === 'invalid') {
+            settleError = { kind: 'invalid', code: res.code };
+        } else {
+            settleError = { kind: 'error' };
+        }
+    }
+
     // The budget (Cash-calculator) sub-tabs (§7.3): cockpit + verdict → cash-events table →
     // breakdown detail → the disposition projection. The 4th "Full horizon" tab is present
     // only when the engine emits a disposition component (honest-partial tab presence; its
@@ -710,6 +780,50 @@
         </Modal>
     {/if}
 
+    <!-- settlement_prep B: the two attested transaction dates (engine-contract §11). A
+         resolver-only re-fill (no usage / no meter gate); the recomputed settlement_checklist
+         streams over the live SSE. Opened from the journey tab for a selected property. -->
+    {#if showSettle}
+        <Modal title={$t('plan.settle.title')} onClose={() => (showSettle = false)}>
+            <form class="pp-attach-form" onsubmit={(e) => { e.preventDefault(); submitSettle(); }}>
+                <p class="pp-attach-intro">{$t('plan.settle.intro')}</p>
+                <label class="pp-af-field">
+                    <span class="pp-af-label">{$t('plan.settle.contract_date')}</span>
+                    <input type="date" bind:value={stContract} />
+                </label>
+                <label class="pp-af-field">
+                    <span class="pp-af-label">{$t('plan.settle.settlement_date')}</span>
+                    <input type="date" bind:value={stSettlement} min={stContract || undefined} />
+                </label>
+
+                {#if settleError}
+                    <p class="pp-af-error">
+                        {#if settleError.kind === 'not_attached'}
+                            {$t('plan.settle.err.not_attached')}
+                        {:else if settleError.kind === 'busy'}
+                            {$t('plan.settle.err.busy')}
+                        {:else if settleError.kind === 'invalid'}
+                            {settleError.code === 'settlement_not_after_contract'
+                                ? $t('plan.settle.err.order')
+                                : $t('plan.settle.err.invalid')}
+                        {:else}
+                            {$t('plan.settle.err.generic')}
+                        {/if}
+                    </p>
+                {/if}
+
+                <div class="pp-af-actions">
+                    <button type="button" class="pp-af-cancel" onclick={() => (showSettle = false)}>
+                        {$t('plan.settle.cancel')}
+                    </button>
+                    <button type="submit" class="primary" disabled={!settleReady}>
+                        {savingDates ? $t('plan.settle.submitting') : $t('plan.settle.submit')}
+                    </button>
+                </div>
+            </form>
+        </Modal>
+    {/if}
+
     <!-- Sub-tabs: one per plan section + a Q&A tab — each section shows on its own, so
          the user never scrolls a long plan. Horizontally scrollable on narrow screens. -->
     <div class="pp-subtabs" role="tablist">
@@ -1023,6 +1137,18 @@
                         entry={viewComponents[cid]}
                         filling={running}
                     />
+                    <!-- settlement_prep B affordance: once a contract is signed, attest the two
+                         dates to activate the dated critical path. Investor + selected-property
+                         only; label tracks whether dates are already active. -->
+                    {#if cid === 'settlement_prep' && supportsPhaseB && viewingProperty}
+                        <div class="pp-settle-cta">
+                            <button type="button" class="pp-attach-btn" onclick={openSettle}>
+                                {settleStatus === 'active'
+                                    ? $t('plan.settle.cta_update')
+                                    : $t('plan.settle.cta_enter')}
+                            </button>
+                        </div>
+                    {/if}
                 {:else if turnDone && !turnFailed}
                     <section class="pp-card">
                         <h3 class="pp-card-title">

@@ -241,6 +241,53 @@ const messages = {
         vi: 'Không gắn được bất động sản. Vui lòng thử lại.',
         en: "Couldn't attach the property. Please try again."
     },
+    // settlement_prep B — contract-date form + the dated critical-path render (§11).
+    'plan.settle.cta_enter': { vi: 'Nhập ngày hợp đồng', en: 'Enter contract dates' },
+    'plan.settle.cta_update': { vi: 'Cập nhật ngày', en: 'Update dates' },
+    'plan.settle.title': { vi: 'Ngày giao dịch', en: 'Transaction dates' },
+    'plan.settle.intro': {
+        vi: 'Khi hợp đồng đã ký, nhập hai ngày để kích hoạt lộ trình bàn giao theo ngày.',
+        en: 'Once your contract is signed, enter the two dates to activate the dated settlement path.'
+    },
+    'plan.settle.contract_date': { vi: 'Ngày ký hợp đồng', en: 'Contract signed date' },
+    'plan.settle.settlement_date': { vi: 'Ngày bàn giao', en: 'Settlement date' },
+    'plan.settle.cancel': { vi: 'Hủy', en: 'Cancel' },
+    'plan.settle.submit': { vi: 'Lưu ngày', en: 'Save dates' },
+    'plan.settle.submitting': { vi: 'Đang lưu…', en: 'Saving…' },
+    'plan.settle.err.not_attached': {
+        vi: 'Hãy gắn bất động sản trước khi nhập ngày giao dịch.',
+        en: 'Attach the property before submitting its transaction dates.'
+    },
+    'plan.settle.err.busy': {
+        vi: 'Kế hoạch đang được tính. Vui lòng thử lại sau giây lát.',
+        en: 'The plan is busy computing. Please try again shortly.'
+    },
+    'plan.settle.err.order': {
+        vi: 'Ngày bàn giao phải sau ngày ký hợp đồng.',
+        en: 'The settlement date must be after the contract signed date.'
+    },
+    'plan.settle.err.invalid': {
+        vi: 'Ngày chưa hợp lệ. Kiểm tra lại định dạng.',
+        en: 'Those dates are invalid. Please check them.'
+    },
+    'plan.settle.err.generic': {
+        vi: 'Không lưu được ngày giao dịch. Vui lòng thử lại.',
+        en: "Couldn't save the dates. Please try again."
+    },
+    // The dated-path render headings + status chrome.
+    'plan.settle.awaiting': {
+        vi: 'Đang chờ ngày hợp đồng',
+        en: 'Awaiting contract dates'
+    },
+    'plan.settle.critical_path': { vi: 'Lộ trình bàn giao', en: 'Settlement critical path' },
+    'plan.settle.investor': { vi: 'Mốc dành cho nhà đầu tư', en: 'Investor milestones' },
+    'plan.settle.at_risk': { vi: 'Mốc cần xác nhận (đã qua hạn)', en: 'Milestones to confirm (date passed)' },
+    'plan.settle.insurance': { vi: 'Thời điểm bảo hiểm', en: 'Insurance timing' },
+    'plan.settle.due': { vi: 'Hạn', en: 'Due' },
+    'plan.settle.status.pending': { vi: 'Chờ ngày', en: 'Pending dates' },
+    'plan.settle.status.done': { vi: 'Hoàn tất', en: 'Done' },
+    'plan.settle.status.scheduled': { vi: 'Đã lên lịch', en: 'Scheduled' },
+    'plan.settle.status.at_risk': { vi: 'Quá hạn', en: 'Date passed' },
     'plan.qa.pending': {
         vi: 'Phần hỏi đáp sẽ sẵn sàng khi kế hoạch tính xong.',
         en: 'Q&A opens once your plan finishes computing.'
