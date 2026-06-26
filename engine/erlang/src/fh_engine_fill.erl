@@ -46,6 +46,7 @@ has_resolver(<<"phase_playbook">>)     -> true;
 has_resolver(<<"disposition">>)        -> true;
 has_resolver(<<"buying_strategy">>)    -> true;
 has_resolver(<<"settlement_prep">>)    -> true;
+has_resolver(<<"due_diligence">>)      -> true;
 has_resolver(_)                        -> false.
 
 -spec resolver(binary(), map(), map()) -> {map(), binary(), [map()]}.
@@ -83,6 +84,8 @@ resolver(<<"buying_strategy">>, Args, Upstream) ->
     fh_engine_buying:fill(Args, Upstream);
 resolver(<<"settlement_prep">>, Args, Upstream) ->
     fh_engine_settlement:fill(Args, Upstream);
+resolver(<<"due_diligence">>, Args, Upstream) ->
+    fh_engine_due_diligence:fill(Args, Upstream);
 resolver(Other, _Args, _Upstream) ->
     erlang:error({no_resolver_fill_for, Other}).
 

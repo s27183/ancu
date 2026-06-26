@@ -91,8 +91,8 @@ main(_) ->
     %% --- persisted log is the SOT: base + 11 Phase-B events ---
     EventCount = scalar("SELECT count(*) FROM plan_card_events WHERE plan_card_id = $1",
                         [PlanCardId]),
-    expect(EventCount =:= BaseLen + 32,
-           "Phase-B added 32 events (1 + PA[3+1+usage] + yield[3+1] + tax[3+1] + cash[3+1] + disposition[3+1] + buying[3+1+usage] + settlement[3+1] + 1)"),
+    expect(EventCount =:= BaseLen + 36,
+           "Phase-B added 36 events (1 + PA[3+1+usage] + yield[3+1] + tax[3+1] + cash[3+1] + disposition[3+1] + buying[3+1+usage] + due_diligence[3+1] + settlement[3+1] + 1)"),
 
     %% --- per-property compliance audit: 3 rows for property_assessment, all clear, two_path,
     %%     ASIC boundary_held (property_assessment is advice_adjacent — it carries a viability verdict) ---
@@ -409,6 +409,41 @@ main(_) ->
               [maps:get(<<"dates_status">>, Sp), length(CpMils), length(InvMils),
                maps:get(<<"en">>, InsRule)]),
 
+    %% --- Slice C-dd: due_diligence re-filled per-property in the SAME Phase-B turn —
+    %%     RESOLVER-ONLY AT A (its lease_interpretation leaf needs the uploaded lease → due_diligence
+    %%     B; no sidecar, no usage). HONEST-PARTIAL: document-risk surfacing needs uploaded documents
+    %%     (upload pipeline not built — due_diligence B), so it fills the procurement checklist + the
+    %%     COMPUTABLE yield-vs-thesis flag now, document fields PENDING ---
+    DdEntry = maps:get(<<"due_diligence">>,
+                       maps:get(<<"components">>, Addendum, #{}), undefined),
+    expect(is_map(DdEntry), "due_diligence snapshotted under the addendum (Slice C-dd)"),
+    expect(maps:get(<<"fill_path">>, DdEntry) =:= <<"resolver">>,
+           "due_diligence fill_path=resolver (resolver-only at A, no sidecar)"),
+    Dd = maps:get(<<"outcome">>, DdEntry),
+    expect(maps:get(<<"docs_status">>, Dd) =:= <<"pending_upload">>,
+           "docs_status=pending_upload (honest-partial — no uploaded documents)"),
+    expect(maps:get(<<"high_severity_flags">>, Dd) =:= [],
+           "high_severity_flags empty (needs uploaded documents — B)"),
+    DocChecklist = maps:get(<<"document_checklist">>, Dd),
+    expect(is_list(DocChecklist) andalso length(DocChecklist) =:= 4,
+           "document_checklist = four procurement documents (KB-grounded structure)"),
+    %% the computable yield-vs-thesis flag: a valid bool|null (the live yield/target vary per run),
+    %% with the surfaced concern consistent with it (nothing fabricated).
+    DdFlag = maps:get(<<"rental_yield_below_thesis_threshold">>, Dd),
+    expect(lists:member(DdFlag, [true, false, null]),
+           "rental_yield_below_thesis_threshold is a valid bool|null (resolver-computed, §98)"),
+    DdConcerns = maps:get(<<"investor_specific_concerns">>, Dd),
+    expect((DdFlag =:= true) =:= (length(DdConcerns) =:= 1),
+           "the yield-below-thesis concern fires iff the flag is true (consistent, nothing fabricated)"),
+    %% due_diligence IS advice_adjacent → ASIC records boundary_held (the ACL decision-support hedge).
+    DdAsic = scalar("SELECT count(*) FROM audit_events WHERE plan_card_id = $1 "
+                    "AND component_id = 'due_diligence' "
+                    "AND compliance_jsonb->>'detail' = 'decision_support_boundary_held'",
+                    [PlanCardId]),
+    expect(DdAsic =:= 1, "due_diligence ASIC records boundary_held (advice_adjacent)"),
+    io:format("live due_diligence: docs=~s checklist=~p yield_below_thesis=~p concerns=~p~n",
+              [maps:get(<<"docs_status">>, Dd), length(DocChecklist), DdFlag, length(DdConcerns)]),
+
     %% --- auth: missing token -> 401; wrong key -> 403 (attach surface too) ---
     {401, _} = req(post, Base ++ "/plan-cards/" ++ binary_to_list(PlanCardId) ++ "/properties",
                    [], PropBody),
@@ -417,10 +452,10 @@ main(_) ->
     {403, _} = req(post, Base ++ "/plan-cards/" ++ binary_to_list(PlanCardId) ++ "/properties",
                    [BadAuth], PropBody),
 
-    io:format("~n==== PROPERTY_ASSESSMENT SEAM (Slice A + B1/B3a yield + B3b cash + B3c disposition + C buying + C-settle): ALL ASSERTIONS PASSED ====~n"),
+    io:format("~n==== PROPERTY_ASSESSMENT SEAM (Slice A + B1/B3a yield + B3b cash + B3c disposition + C buying + C-dd + C-settle): ALL ASSERTIONS PASSED ====~n"),
     halt(0).
 
-%% The Phase-B turn (Slice A + B1/B3a + B2 + B3b + B3c + C + C-settle): seven components, DAG order.
+%% The Phase-B turn (Slice A + B1/B3a + B2 + B3b + B3c + C + C-dd + C-settle): eight components, DAG order.
 %%   property_assessment (two_path) → 3 gate, 1 filled, 1 usage (the sidecar fill)
 %%   yield_modelling     (resolver) → 3 gate, 1 filled       (no sidecar, no usage — §98 figure-owner)
 %%   tax_structure       (two_path) → 3 gate, 1 filled       (resolver-only refresh — entity reused
@@ -428,10 +463,12 @@ main(_) ->
 %%   cash_position       (resolver) → 3 gate, 1 filled       (no sidecar, no usage)
 %%   disposition         (resolver) → 3 gate, 1 filled       (no sidecar, no usage)
 %%   buying_strategy     (two_path) → 3 gate, 1 filled, 1 usage (the negotiation leaf via sidecar)
+%%   due_diligence       (resolver) → 3 gate, 1 filled       (RESOLVER-ONLY AT A — zero agent leaves,
+%%                                                            no sidecar/usage; honest-partial checklist)
 %%   settlement_prep     (resolver) → 3 gate, 1 filled       (RESOLVER-ONLY — zero agent leaves, no
 %%                                                            sidecar/usage; honest-partial structure)
 %% wrapped by turn_started/turn_completed.
-%% 1 + (3+1+1) + (3+1) + (3+1) + (3+1) + (3+1) + (3+1+1) + (3+1) + 1 = 32.
+%% 1 + (3+1+1) + (3+1) + (3+1) + (3+1) + (3+1) + (3+1+1) + (3+1) + (3+1) + 1 = 36.
 expected_phase_b() ->
     Gates = [<<"compliance_gate">>, <<"compliance_gate">>, <<"compliance_gate">>],
     CF = <<"component_filled">>,
@@ -443,6 +480,7 @@ expected_phase_b() ->
        Gates, CF,                %% cash_position       (resolver — cash-to-complete)
        Gates, CF,                %% disposition         (resolver — price-aware dispose figures)
        Gates, CF, <<"usage">>,   %% buying_strategy     (two_path fresh — negotiation leaf via sidecar)
+       Gates, CF,                %% due_diligence       (resolver-only at A — honest-partial checklist)
        Gates, CF,                %% settlement_prep     (resolver-only — honest-partial checklist)
        <<"turn_completed">>]).
 

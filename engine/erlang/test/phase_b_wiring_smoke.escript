@@ -54,14 +54,20 @@ position_cases() ->
            lists:member(<<"buying_strategy">>, Names), true),
      check("buying_strategy runs AFTER cash_position (reads budget_envelope_investor)",
            Idx(<<"cash_position">>) < Idx(<<"buying_strategy">>), true),
+     check("property_components includes due_diligence (Slice C-dd)",
+           lists:member(<<"due_diligence">>, Names), true),
+     check("due_diligence runs AFTER buying_strategy (blueprint component 9 follows the bid plan)",
+           Idx(<<"buying_strategy">>) < Idx(<<"due_diligence">>), true),
      check("property_components includes settlement_prep (Slice C-settle)",
            lists:member(<<"settlement_prep">>, Names), true),
      check("settlement_prep runs AFTER tax_structure (reads recommended_entity)",
            Idx(<<"tax_structure">>) < Idx(<<"settlement_prep">>), true),
-     check("canonical order: PA → yield → tax → cash → disposition → buying_strategy → settlement_prep",
+     check("settlement_prep runs AFTER due_diligence (blueprint component 10 > 9)",
+           Idx(<<"due_diligence">>) < Idx(<<"settlement_prep">>), true),
+     check("canonical order: PA → yield → tax → cash → disposition → buying_strategy → due_diligence → settlement_prep",
            Names, [<<"property_assessment">>, <<"yield_modelling">>, <<"tax_structure">>,
                    <<"cash_position">>, <<"disposition">>, <<"buying_strategy">>,
-                   <<"settlement_prep">>])].
+                   <<"due_diligence">>, <<"settlement_prep">>])].
 
 %% --- 2. the reuse-vs-fresh decision -----------------------------------------
 

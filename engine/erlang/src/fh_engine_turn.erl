@@ -557,9 +557,11 @@ tag_property(Event, PropId)    -> Event#{<<"property_id">> => PropId}.
 %% (property_assessment → property_fit_investor); Slice B the downstream `both`-component re-fills
 %% (yield_modelling/tax_structure/cash_position/disposition); Slice C the investor bid plan
 %% (buying_strategy); Slice C-settle the settlement checklist (settlement_prep, resolver-only,
-%% honest-partial — dated path gated on contract dates, structure filled now). The one remaining
-%% per-property component (due_diligence) is trigger-gated (doc upload) and not yet wired. Engine-owned set, like
-%% base_components/1. A non-investor blueprint has no built per-property turn yet → empty.
+%% honest-partial — dated path gated on contract dates, structure filled now); Slice C-dd the
+%% due-diligence assessment (due_diligence, resolver-only at A, honest-partial — document-risk
+%% surfacing gated on the upload pipeline, the procurement checklist + computable yield-vs-thesis
+%% flag filled now). Engine-owned set, like base_components/1. A non-investor blueprint has no
+%% built per-property turn yet → empty.
 property_components(<<"investor-domestic-au">> = Slug) ->
     %% Slice A: property_assessment (the keystone → property_fit_investor).
     %% Slice B1/B3a: yield_modelling re-fills per-property — its resolver branches on the
@@ -580,6 +582,14 @@ property_components(<<"investor-domestic-au">> = Slug) ->
     %% discipline band (removed from the LLM's reach) + thesis_alignment, reading property_fit_investor
     %% (rent/price), strategy_thesis (target_gross_yield), and budget_envelope_investor — all in the
     %% seed/upstream → runs LAST.
+    %% Slice C-dd (due_diligence A): the investor due-diligence assessment re-fills per-property —
+    %% RESOLVER-ONLY AT A (its one lease_interpretation leaf needs the uploaded lease → due_diligence
+    %% B), so two_path_stored_leaf/2 is irrelevant; it never runs the sidecar. HONEST-PARTIAL: the
+    %% document-risk surfacing needs uploaded documents (the upload pipeline not built — due_diligence
+    %% B), so it fills the document PROCUREMENT checklist + the bilingual actions/questions + the
+    %% COMPUTABLE rental_yield_below_thesis_threshold flag (per-property yield vs strategy target),
+    %% marking the document-dependent fields PENDING. Reads property_fit_investor (yield) +
+    %% strategy_thesis (target_gross_yield), both in the seed/upstream.
     %% Slice C-settle (settlement_prep A): the investor settlement checklist re-fills per-property —
     %% RESOLVER-ONLY (zero agent leaves), so two_path_stored_leaf/2 is irrelevant; it never runs the
     %% sidecar. HONEST-PARTIAL: the dated critical path needs contract dates (a transaction-input
@@ -587,10 +597,10 @@ property_components(<<"investor-domestic-au">> = Slug) ->
     %% the upstream-conditioned investor milestones (entity-setup off tax_optimised_structure), and
     %% the state-conditional insurance RULE (off property_fit_investor.state) — every date PENDING.
     %% Reads property_fit_investor (state/property_type) + tax_optimised_structure (recommended_entity),
-    %% both in the seed/upstream → runs LAST.
+    %% both in the seed/upstream → runs LAST (after due_diligence, matching blueprint component 9 < 10).
     order(Slug, [<<"property_assessment">>, <<"yield_modelling">>, <<"tax_structure">>,
                  <<"cash_position">>, <<"disposition">>, <<"buying_strategy">>,
-                 <<"settlement_prep">>]);
+                 <<"due_diligence">>, <<"settlement_prep">>]);
 property_components(_Slug) ->
     [].
 

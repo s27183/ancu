@@ -593,10 +593,11 @@ full-stack live, EN+VI, against real Opus.**
 
 ## Phase B — per-property build plan (the `property_assessment` keystone)
 
-**Status: Slice A + B0/B1 + B2 + B3a/B3b/B3c + C DONE — full-stack live-proven (the 28-event Phase-B
-turn PASSES against the real planner, exit 0; the earlier "environment-blocked" read was a stub-config
-misdiagnosis, corrected in the B2/C notes); `due_diligence` + `settlement_prep` (both prose-only
-schemas) deferred.** The per-property financial
+**Status: Slice A + B0/B1 + B2 + B3a/B3b/B3c + C + C-settle + C-dd DONE — full-stack live-proven (the
+36-event, eight-component Phase-B turn PASSES against the real planner, exit 0). The three per-property
+structure-halves are built (`buying_strategy` ✓, `settlement_prep` A ✓, `due_diligence` A ✓); the two
+input-surface B-halves (`settlement_prep` B contract dates, `due_diligence` B upload pipeline) remain
+deferred as one cross-contract input-surface unit.** The per-property financial
 spine now computes end-to-end for an attached property (acquire → hold → dispose), gated only by the
 regulated CGT `to_verify`, plus the investor **bid plan** (yield-anchored discipline). The base spine
 (P5) owns every property-agnostic
@@ -617,7 +618,7 @@ per-property namespace. So Phase B is greenfield *runtime* on an already-compile
 | 2 | **Phase-B per-property turn** — gen_statem walk over the per-property component set against an attached property | absent |
 | 3 | **`property_assessment` two-path fill** → `property_fit_investor` | absent (← **the keystone**) |
 | 4 | **Downstream re-fill** of the `both`-scope components now `property_fit_investor` exists — yield cash-flow arithmetic (NEW module), `cash_position` price figures, `tax_structure` rent figures, `disposition` CGT — **+ the banded↔scalar money seam** | resolvers emit null at base; the property branch + the seam decision are absent |
-| 5 | **The other 3 per-property components** (`buying_strategy` ✓ Slice C, `settlement_prep` structure-half ✓ Slice C-settle, `due_diligence`) | `buying_strategy` + `settlement_prep` A built; `settlement_prep` B (contract-date input) + `due_diligence` (upload pipeline) deferred |
+| 5 | **The other 3 per-property components** (`buying_strategy` ✓ Slice C, `settlement_prep` structure-half ✓ Slice C-settle, `due_diligence` structure-half ✓ Slice C-dd) | `buying_strategy` + `settlement_prep` A + `due_diligence` A built; the two input-surface B-halves deferred — `settlement_prep` B (contract-date input) + `due_diligence` B (upload pipeline) — one cross-contract input-surface unit |
 
 ### Decomposition (sliced by mechanism seam)
 
@@ -1076,7 +1077,81 @@ artifact recompiled (111 KB entries, +1 for the copy doc) and `settlement_prep` 
 usage; live NSW property → the NSW insurance rule rendered, `dates=pending_contract`, `milestones=9+5`).
 
 **Still deferred after C-settle:** `settlement_prep` **B** (the contract-date input surface — design-first) and
-`due_diligence` (blocked on the upload pipeline) — `due_diligence` still prose-only.
+`due_diligence` (blocked on the upload pipeline) — `due_diligence` still prose-only. *(due_diligence's
+structure-now half is built next — Slice C-dd below.)*
+
+### Slice C-dd — `due_diligence` investor assessment (structure half, A) — DONE (2026-06-26)
+
+**The honest split — A built now, B recorded design-first** (the same shape as C-settle). Grounding revised
+the tracker's "due_diligence genuinely blocked on the upload pipeline" framing — the same over-claim that
+C-settle corrected. The component's *defining risk-surfacing* output (`high_severity_flags`, the negotiation
+lever, the `lease_interpretation` concern) depends on **uploaded documents**, and the upload pipeline is not
+built (CLAUDE.md item 9; the only Phase-B input today is the source-supplied `property_card` of neutral
+property facts, not the user's uploaded documents — a distinct input surface). But a **knowable structure-now
+half** exists — exactly like C-settle. The split:
+
+- **A (built):** the investor document **procurement checklist** (what to gather + why — rental appraisal,
+  depreciation quote, lease-if-tenanted, rental history; KB-grounded, property-generic; `received`/`reviewed`
+  false until the upload pipeline), the bilingual due-diligence **actions** + **vendor questions**, and the
+  one **computable** risk flag `rental_yield_below_thesis_threshold` (the per-property yield vs the strategy
+  target — resolver-computed, removed from the LLM's reach, §8.5). Document-dependent fields PENDING
+  (`docs_status: pending_upload`, `overall_verdict: pending_documents`, `high_severity_flags []`,
+  `estimated_negotiation_lever null`); `next_action_for_user` asks the user to upload the documents.
+- **B (design-first, deferred):** the **upload pipeline** (URL paste / document upload) that flips
+  `received`/`reviewed`, powers the document-risk surfacing, and unblocks the `lease_interpretation` agent
+  leaf. This is the **same input-surface family** as `settlement_prep` B (per-property transaction/document
+  input) → the two fold into **one** cross-contract input-surface unit, pinned docs-first per
+  [[foundation-first-for-cross-contract-reframe]].
+
+**Foundation-first (the schema didn't exist).** `risk_assessment_investor` was prose-only in the blueprint
+("same as Mode A `risk_assessment` + `investor_specific_concerns`"; Mode A `risk_assessment` has a fenced
+5-field block to base it on). Step 1 authored the explicit fenced **10-field** block.
+
+**Resolver-only AT A — and the live-seam regression that proved why classification ≠ resolver output.** The
+conformance escript first passed (32/32) by calling the resolver directly, but the **live turn failed**:
+`due_diligence: reasoning_domain 'lease_interpretation' has no sidecar filler`. The live turn classifies
+fill-path by the **compiled component's `agent_leaves`** (derived from the blueprint PARAMS'
+`agent_reasoning_required: true`, not the outcome schema or the resolver), and the `current_tenancy_unfavourable_terms`
+param still carried the `lease_interpretation` marker → the turn classified due_diligence **two-path** and
+tried to dispatch a filler that doesn't exist. **A direct resolver call bypasses fill-path classification**,
+so the conformance was green while the turn crashed ([[build-time-structure-vs-runtime-data]] "build-green ≠
+loaded/selected", at the fill-path layer). **Fix (the honest A/B move):** defer the agent marker in the params
+(the `lease_interpretation` leaf needs the uploaded lease → it belongs to B), so the compiled component is
+`agent_leaves: []` → resolver-only at A, never dispatching a sidecar. **Coverage fix:** added a conformance
+assertion on the **compiled `agent_leaves`** (the live turn's actual determinant), so the classification is
+caught below the live seam next time.
+
+**The figure posture (§8.5).** `rental_yield_below_thesis_threshold` is a deterministic comparison of two
+upstream numbers (`property_fit_investor.rental_yield_gross_estimate` < `strategy_thesis.target_gross_yield`)
+with no agent slot; null when either input is absent (never false from absent data). It needs
+`strategy_thesis.target_gross_yield`, so `strategy_thesis` was declared a `due_diligence` DAG input (without
+it the component's most distinctive output would be silently null — the C-slice `target_gross_yield` lesson).
+A property risk figure is **not** an ASIC/AFSL matter (real property is not a financial product); the
+constraint is ACL misleading-conduct, met by KB-methodology computation + bilingual decision-support framing
+(`kb.copy.due-diligence`). `due_diligence` is added to `advice_adjacent/1` → ASIC `boundary_held` (consistent
+hedge, like `buying_strategy`/`property_assessment` — unlike `settlement_prep`, whose process facts record
+`no_advice_surface`). Renderer `checklist` (the reachable primary; risk-flag-list is declared first but the
+procurement checklist is the always-populated A content) — both in the §11.9 enum, **no new renderer**.
+
+**Verified.** New **`due_diligence_conformance` 33/33** (scaffold incl. the compiled-`agent_leaves`-empty
+classification guard; the 4-doc procurement checklist with bilingual name+why, received/reviewed false; the
+computable thesis flag true/false/null with the concern firing iff true; bilingual actions+questions; Layer-1
+conformance of enum/array<object>/array<localized_text>/bool|null/money_range|null; honest-partial no-upstream).
+**`phase_b_wiring_smoke` 24/24** (due_diligence after buying_strategy, before settlement_prep; canonical
+8-component order). Regression green: `settlement_prep` 39, `buying_strategy` 37, `tax_structure` 61,
+`outcome` 25+11, `disposition` 87, `base_components_investor` 19, `cash_position_investor` 43, `yield_modelling`
+67, `mortgage_finance_investor` 40, `ownership_planning_investor` 27; FHB `cash_duty` 28, `mortgage` 23,
+`ownership` 17, `serviceability` 22, `resolver` lockstep; `validate_build.py` + `resolver_eval` (8). `rebar3
+compile` + `erlang-checker` (new module) clean; artifact recompiled (112 KB entries, +1 for the copy doc) and
+`due_diligence` PROVEN in the registry (`agent_leaves []`, `risk_assessment_investor` 10 fields, `strategy_thesis`
+in dag_reads). **Full-stack: the live seam PASSES against the real planner** (exit 0; event count moved
+32 → **36**; the eight-component Phase-B turn — `due_diligence` fires after buying_strategy as resolver-only,
+gate×3 + filled, NO usage; live NSW property → `docs=pending_upload`, `checklist=4`, `yield_below_thesis=false`
+(live yield > the capital-growth target 3.0 → no concern, consistent), ASIC `boundary_held`).
+
+**Still deferred after C-dd:** the **one cross-contract input-surface unit** — `settlement_prep` B (contract
+dates) + `due_diligence` B (upload pipeline) — both per-property transaction/document input, pinned docs-first.
+The three per-property structure-halves are now complete; this is the clean Phase-B closeout boundary.
 
 ## Deferred out (honest — first-exercising instance is Mode B/D, not here)
 

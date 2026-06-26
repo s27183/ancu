@@ -814,7 +814,7 @@ Same as [Mode A buying_strategy](fhb-domestic-au.md#6-buying_strategy) with thes
 
 **Inputs:** `property_fit_investor.outcome` + uploaded documents
 
-**KB anchors:** Mode A due_diligence anchors + `kb.investor.rental-appraisal-from-pm-agent`, `kb.investor.depreciation-report-quantity-surveyor`, `kb.investor.tenancy-in-situ-considerations`
+**KB anchors:** `kb.investor.rental-appraisal-from-pm-agent`, `kb.investor.depreciation-report-quantity-surveyor`, `kb.investor.tenancy-in-situ-considerations`, `kb.copy.due-diligence` (the document-risk anchors — building/pest, strata records, conveyancing review — activate with the upload pipeline: due_diligence B)
 
 **Renderer:** `risk-flag-list` + `checklist`
 
@@ -835,13 +835,71 @@ Same as [Mode A due_diligence](fhb-domestic-au.md#7-due_diligence) with these ad
   },
   "investor_specific_flags": {
     "rental_appraisal_significantly_below_expectation": { "type": "bool", "value": "<initial>" },
-    "current_tenancy_unfavourable_terms": { "type": "array<string>", "value": [], "agent_reasoning_required": true, "reasoning_domain": "lease_interpretation" },
+    // lease interpretation is a B feature: the lease_interpretation agent leaf needs the UPLOADED
+    // lease (the upload pipeline is not built — due_diligence B) AND a lease_interpretation sidecar
+    // filler. Its `agent_reasoning_required: true` + `reasoning_domain` markers are DEFERRED to B —
+    // at A the compiled component carries no agent leaf (agent_leaves []), so due_diligence is
+    // resolver-only at A and never dispatches a sidecar. B re-adds the markers + builds the filler.
+    "current_tenancy_unfavourable_terms": { "type": "array<string>", "value": [] },
     "rental_yield_below_thesis_threshold": { "type": "bool", "value": "<initial>" }
   }
 }
 ```
 
-**Outcome schema:** `risk_assessment_investor` (same as Mode A risk_assessment plus `investor_specific_concerns` field)
+**Outcome schema:** `risk_assessment_investor`
+
+```jsonc
+{
+  "type": "risk_assessment_investor",
+  "fields": {
+    // honest-partial signal. `pending_upload` until the user supplies the due-diligence documents
+    // (rental appraisal, depreciation quote, lease) — the upload pipeline is NOT built (CLAUDE.md
+    // item 9; the only Phase-B input today is the source-supplied property_card of neutral property
+    // facts, not the user's uploaded documents). `reviewed` once documents are uploaded + assessed →
+    // the document-risk surfacing (high_severity_flags, the negotiation lever, the lease-interpretation
+    // agent leaf) lights up. Deferred to a separate cross-contract unit (mode-c-wedge.md "due_diligence B").
+    "docs_status": "enum: pending_upload | reviewed",
+    // overall risk verdict. `pending_documents` until docs are uploaded; the substantive verdicts (B).
+    "overall_verdict": "enum: pending_documents | low_risk | proceed_with_actions | high_risk",
+    // the investor document PROCUREMENT checklist (KB-grounded, property-generic): what an investor
+    // must gather (rental appraisal, depreciation quote, lease-if-tenanted, rental history). required +
+    // why are known now; received/reviewed false until the upload pipeline (B).
+    "document_checklist": "array<{ id, name: localized_text, required: bool, received: bool, reviewed: bool, why: localized_text }>",
+    // the COMPUTABLE investor risk flag: property_fit_investor.rental_yield_gross_estimate <
+    // strategy_thesis.target_gross_yield. resolver-computed, removed from the LLM's reach (§8.5).
+    // null until both inputs exist (needs the per-property yield AND the strategy target).
+    "rental_yield_below_thesis_threshold": "bool | null",
+    // surfaced investor concerns (risk-flag-list renderer). At A: the yield-below-thesis concern if it
+    // fires. The document-derived concerns (appraisal below expectation, unfavourable tenancy) follow in B.
+    "investor_specific_concerns": "array<{ id, severity: enum, detail: localized_text }>",
+    // due-diligence ACTIONS the buyer should take before signing — bilingual, investor-generic (A).
+    "actions_before_signing": "array<localized_text>",
+    // questions to ask the vendor / agent — bilingual, investor-generic (A).
+    "questions_for_vendor": "array<localized_text>",
+    // high-severity flags EXTRACTED from uploaded documents — [] until the upload pipeline (B).
+    "high_severity_flags": "array<{ source_doc, item: localized_text, action: localized_text }>",
+    // a negotiation lever estimated from document findings — null until documents reviewed (B).
+    "estimated_negotiation_lever": "money_range | null",
+    // honest: upload the due-diligence documents to complete the assessment (A).
+    "next_action_for_user": "localized_text"
+  }
+}
+```
+
+**Fill-path / honest-partial posture.** `due_diligence` is **resolver-only at A** (its one agent leaf,
+`investor_specific_flags.current_tenancy_unfavourable_terms`, `reasoning_domain: lease_interpretation`,
+needs the *uploaded lease* → it activates with B; no `reasoning_domain` runs at A). Its defining
+risk-*surfacing* output — `high_severity_flags`, the negotiation lever, the lease-interpretation
+concern — depends on **uploaded documents**, and the upload pipeline is **not built** (the only Phase-B
+input today is the source-supplied `property_card` of neutral property facts; uploaded documents are a
+distinct input surface — CLAUDE.md item 9, mode-c-wedge.md "due_diligence B"). So this component fills
+the **knowable structure now** — the investor document *procurement* checklist (what to gather + why),
+the bilingual due-diligence actions + vendor questions, and the **computable** `rental_yield_below_thesis_threshold`
+flag (the per-property yield vs the strategy target, removed from the LLM's reach) — and marks the
+document-dependent fields PENDING (`docs_status: pending_upload`, `overall_verdict: pending_documents`,
+`high_severity_flags []`, `estimated_negotiation_lever null`), never fabricating a finding. The thesis
+flag needs `strategy_thesis.target_gross_yield`, so `strategy_thesis` is declared a `due_diligence`
+input (DAG reads below) — without it the component's most distinctive output would be silently null.
 
 ---
 
@@ -1163,7 +1221,7 @@ yield_modelling          → outcome: cash_flow_projection       (reads: profile
 tax_structure            → outcome: tax_optimised_structure    (reads: profile, cash_flow_projection)
 cash_position            → outcome: budget_envelope_investor   (reads: profile, property_fit_investor, tax_optimised_structure)
 buying_strategy          → outcome: bid_plan_investor          (reads: property_fit_investor, budget_envelope_investor, strategy_thesis)
-due_diligence            → outcome: risk_assessment_investor   (reads: property_fit_investor, uploaded_docs)
+due_diligence            → outcome: risk_assessment_investor   (reads: property_fit_investor, strategy_thesis, uploaded_docs)
 settlement_prep          → outcome: settlement_checklist       (reads: property_fit_investor, bid_plan_investor, tax_optimised_structure)
 ownership_planning_investor → outcome: portfolio_position      (reads: property_fit_investor, tax_optimised_structure, cash_flow_projection)
 disposition              → outcome: disposition              (reads: strategy_thesis, property_fit_investor, cash_flow_projection, tax_optimised_structure, budget_envelope_investor)

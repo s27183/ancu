@@ -80,6 +80,7 @@ advice_adjacent(<<"mortgage_finance">>)    -> true;   %% lender fit
 advice_adjacent(<<"eligibility">>)         -> true;   %% scheme applicability
 advice_adjacent(<<"property_assessment">>) -> true;   %% investment-viability verdict (Phase B)
 advice_adjacent(<<"buying_strategy">>)     -> true;   %% bid plan / negotiation (Phase B) — ACL hedge
+advice_adjacent(<<"due_diligence">>)       -> true;   %% risk surfacing / yield-vs-thesis (Phase B) — ACL hedge
 advice_adjacent(_)                         -> false.
 
 %% --- AML --------------------------------------------------------------------
