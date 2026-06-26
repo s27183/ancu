@@ -851,7 +851,7 @@ Same as [Mode A due_diligence](fhb-domestic-au.md#7-due_diligence) with these ad
 
 **Inputs:** `property_fit_investor.outcome` + `bid_plan_investor` + `tax_optimised_structure`
 
-**KB anchors:** Mode A settlement_prep anchors + `kb.investor.entity-setup-timeline`, `kb.investor.depreciation-schedule-procurement`, `kb.investor.property-management-appointment-timeline`
+**KB anchors:** `kb.settlement.process-by-state`, `kb.insurance.timing-of-risk-pass`, `kb.copy.settlement`, `kb.investor.entity-setup-timeline`, `kb.investor.depreciation-schedule-procurement`, `kb.investor.property-management-appointment-timeline` (the date-arithmetic anchors `kb.cooling-off.by-state`, `kb.pexa.settlement`, `kb.lender-docs.standard-timeline` activate with the dated path — settlement_prep B)
 
 **Renderer:** `swimlane-diagram` + `checklist`
 
@@ -874,7 +874,49 @@ Same as [Mode A settlement_prep](fhb-domestic-au.md#8-settlement_prep) with thes
 }
 ```
 
-**Outcome schema:** `settlement_checklist` (same as Mode A with added investor milestones)
+**Outcome schema:** `settlement_checklist`
+
+```jsonc
+{
+  "type": "settlement_checklist",
+  "fields": {
+    // honest-partial signal. `pending_contract` until the user supplies the signed-contract dates
+    // (contract_signed_date + settlement_date — a per-property transaction-input surface, NOT a
+    // property fact; deferred to a separate cross-contract unit, mode-c-wedge.md "settlement_prep B").
+    // `active` once dates exist → the dated critical path + at-risk detection + swimlane light up.
+    "dates_status": "enum: pending_contract | active",
+    "settlement_date": "date | null",                                   // PENDING until contract dates supplied
+    // the standard settlement milestone sequence + dependency DAG (KB-grounded, property-generic).
+    // due_date null + status `pending` until dates_status=active.
+    "critical_path_milestones": "array<{ id, name: localized_text, due_date: date | null, status, dependency: id | null }>",
+    // investor-specific milestones. entity-setup is CONDITIONED on upstream: applicable iff
+    // tax_optimised_structure.recommended_entity requires establishing a legal entity (∉
+    // {personal_sole, joint, null}). QS engagement, depreciation schedule, PM appointment and
+    // landlord insurance are always-applicable for an investor (whether depreciation is claimable
+    // is a QS judgment, surfaced in `why` — not pre-decided from build-year, which we don't carry).
+    "investor_milestones": "array<{ id, name: localized_text, applicable: bool, why: localized_text, due_date: date | null, status }>",
+    // state-conditional building-insurance timing RULE (resolver-selected from
+    // kb.insurance.timing-of-risk-pass.risk_passing_by_state: QLD → day after contract; NSW/VIC →
+    // settlement). The RULE is knowable without dates; the dated milestone is part of B.
+    "insurance_timing_rule": "localized_text | null",
+    "at_risk_milestones": "array<{ name, reason }>",                     // [] until dates_status=active
+    "next_action_for_user": "localized_text"                            // honest: supply contract dates to activate
+  }
+}
+```
+
+**Fill-path / honest-partial posture.** `settlement_prep` is **resolver-only** (zero agent leaves
+per the Fill-path classification note below; no `reasoning_domain`). Its defining
+output — the *dated* settlement critical path with at-risk detection — depends on
+`contract_signed_date` + `settlement_date`, which arrive `<from_document>` from a signed contract;
+that per-property transaction-input surface is **not built** (the only Phase-B input today is the
+source-supplied `property_card` of neutral property facts). So this component fills the **knowable
+structure now** — the milestone sequence + dependency DAG, the upstream-conditioned investor
+milestones, and the state-conditional insurance-timing *rule* — and marks every date PENDING
+(`dates_status: pending_contract`), never fabricating a date. Supplying the contract dates
+(mode-c-wedge.md "settlement_prep B") activates the dated path. This resolver is also the
+**state-conditional building-insurance fix** flagged in `kb.insurance.timing-of-risk-pass`
+(the blueprint's single `derived_from: settlement_date` hint is wrong for QLD).
 
 ---
 

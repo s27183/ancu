@@ -556,8 +556,9 @@ tag_property(Event, PropId)    -> Event#{<<"property_id">> => PropId}.
 %% The per-property component set for a Phase-B turn, in DAG order. Slice A builds the keystone
 %% (property_assessment → property_fit_investor); Slice B the downstream `both`-component re-fills
 %% (yield_modelling/tax_structure/cash_position/disposition); Slice C the investor bid plan
-%% (buying_strategy). The two remaining per-property components (due_diligence/settlement_prep)
-%% are trigger-gated (doc upload / contract signed) and not yet wired. Engine-owned set, like
+%% (buying_strategy); Slice C-settle the settlement checklist (settlement_prep, resolver-only,
+%% honest-partial — dated path gated on contract dates, structure filled now). The one remaining
+%% per-property component (due_diligence) is trigger-gated (doc upload) and not yet wired. Engine-owned set, like
 %% base_components/1. A non-investor blueprint has no built per-property turn yet → empty.
 property_components(<<"investor-domestic-au">> = Slug) ->
     %% Slice A: property_assessment (the keystone → property_fit_investor).
@@ -579,8 +580,17 @@ property_components(<<"investor-domestic-au">> = Slug) ->
     %% discipline band (removed from the LLM's reach) + thesis_alignment, reading property_fit_investor
     %% (rent/price), strategy_thesis (target_gross_yield), and budget_envelope_investor — all in the
     %% seed/upstream → runs LAST.
+    %% Slice C-settle (settlement_prep A): the investor settlement checklist re-fills per-property —
+    %% RESOLVER-ONLY (zero agent leaves), so two_path_stored_leaf/2 is irrelevant; it never runs the
+    %% sidecar. HONEST-PARTIAL: the dated critical path needs contract dates (a transaction-input
+    %% surface not built — settlement_prep B), so it fills the milestone STRUCTURE + dependency DAG,
+    %% the upstream-conditioned investor milestones (entity-setup off tax_optimised_structure), and
+    %% the state-conditional insurance RULE (off property_fit_investor.state) — every date PENDING.
+    %% Reads property_fit_investor (state/property_type) + tax_optimised_structure (recommended_entity),
+    %% both in the seed/upstream → runs LAST.
     order(Slug, [<<"property_assessment">>, <<"yield_modelling">>, <<"tax_structure">>,
-                 <<"cash_position">>, <<"disposition">>, <<"buying_strategy">>]);
+                 <<"cash_position">>, <<"disposition">>, <<"buying_strategy">>,
+                 <<"settlement_prep">>]);
 property_components(_Slug) ->
     [].
 

@@ -54,9 +54,14 @@ position_cases() ->
            lists:member(<<"buying_strategy">>, Names), true),
      check("buying_strategy runs AFTER cash_position (reads budget_envelope_investor)",
            Idx(<<"cash_position">>) < Idx(<<"buying_strategy">>), true),
-     check("canonical order: PA → yield → tax → cash → disposition → buying_strategy",
+     check("property_components includes settlement_prep (Slice C-settle)",
+           lists:member(<<"settlement_prep">>, Names), true),
+     check("settlement_prep runs AFTER tax_structure (reads recommended_entity)",
+           Idx(<<"tax_structure">>) < Idx(<<"settlement_prep">>), true),
+     check("canonical order: PA → yield → tax → cash → disposition → buying_strategy → settlement_prep",
            Names, [<<"property_assessment">>, <<"yield_modelling">>, <<"tax_structure">>,
-                   <<"cash_position">>, <<"disposition">>, <<"buying_strategy">>])].
+                   <<"cash_position">>, <<"disposition">>, <<"buying_strategy">>,
+                   <<"settlement_prep">>])].
 
 %% --- 2. the reuse-vs-fresh decision -----------------------------------------
 

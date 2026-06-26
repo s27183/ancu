@@ -91,8 +91,8 @@ main(_) ->
     %% --- persisted log is the SOT: base + 11 Phase-B events ---
     EventCount = scalar("SELECT count(*) FROM plan_card_events WHERE plan_card_id = $1",
                         [PlanCardId]),
-    expect(EventCount =:= BaseLen + 28,
-           "Phase-B added 28 events (1 + PA[3+1+usage] + yield[3+1] + tax[3+1] + cash[3+1] + disposition[3+1] + buying[3+1+usage] + 1)"),
+    expect(EventCount =:= BaseLen + 32,
+           "Phase-B added 32 events (1 + PA[3+1+usage] + yield[3+1] + tax[3+1] + cash[3+1] + disposition[3+1] + buying[3+1+usage] + settlement[3+1] + 1)"),
 
     %% --- per-property compliance audit: 3 rows for property_assessment, all clear, two_path,
     %%     ASIC boundary_held (property_assessment is advice_adjacent — it carries a viability verdict) ---
@@ -368,6 +368,47 @@ main(_) ->
               [Anchor, maps:get(<<"thesis_alignment">>, Bs),
                maps:get(<<"negotiation_style">>, Bs)]),
 
+    %% --- Slice C-settle: settlement_prep re-filled per-property in the SAME Phase-B turn —
+    %%     RESOLVER-ONLY (zero agent leaves → no sidecar, no usage). HONEST-PARTIAL: the dated
+    %%     critical path needs contract dates (not built — settlement_prep B), so it fills the
+    %%     milestone STRUCTURE + the state-conditional insurance RULE now, every date PENDING ---
+    SpEntry = maps:get(<<"settlement_prep">>,
+                       maps:get(<<"components">>, Addendum, #{}), undefined),
+    expect(is_map(SpEntry), "settlement_prep snapshotted under the addendum (Slice C-settle)"),
+    expect(maps:get(<<"fill_path">>, SpEntry) =:= <<"resolver">>,
+           "settlement_prep fill_path=resolver (zero agent leaves, no sidecar)"),
+    Sp = maps:get(<<"outcome">>, SpEntry),
+    expect(maps:get(<<"dates_status">>, Sp) =:= <<"pending_contract">>,
+           "dates_status=pending_contract (honest-partial — no contract dates)"),
+    expect(maps:get(<<"settlement_date">>, Sp) =:= null, "settlement_date null (PENDING)"),
+    CpMils = maps:get(<<"critical_path_milestones">>, Sp),
+    expect(is_list(CpMils) andalso length(CpMils) =:= 9,
+           "critical_path_milestones = nine (KB-grounded structure)"),
+    expect(lists:all(fun(M) -> maps:get(<<"due_date">>, M) =:= null end, CpMils),
+           "every critical-path due_date null (dates PENDING)"),
+    InvMils = maps:get(<<"investor_milestones">>, Sp),
+    expect(is_list(InvMils) andalso length(InvMils) =:= 5, "investor_milestones = five"),
+    %% NSW established_house → the regulated NSW insurance rule, bilingual (no strata note).
+    InsRule = maps:get(<<"insurance_timing_rule">>, Sp),
+    expect(is_map(InsRule) andalso is_binary(maps:get(<<"vi">>, InsRule, undefined))
+               andalso is_binary(maps:get(<<"en">>, InsRule, undefined)),
+           "insurance_timing_rule is the bilingual NSW rule (state-conditional)"),
+    %% settlement_prep is NOT advice_adjacent → ASIC records no_advice_surface, never boundary_held.
+    SpNoAdvice = scalar("SELECT count(*) FROM audit_events WHERE plan_card_id = $1 "
+                        "AND component_id = 'settlement_prep' "
+                        "AND compliance_jsonb->>'gate' = 'asic' "
+                        "AND compliance_jsonb->>'detail' = 'no_advice_surface'",
+                        [PlanCardId]),
+    expect(SpNoAdvice =:= 1, "settlement_prep ASIC records no_advice_surface (process, not advice)"),
+    SpBoundary = scalar("SELECT count(*) FROM audit_events WHERE plan_card_id = $1 "
+                        "AND component_id = 'settlement_prep' "
+                        "AND compliance_jsonb->>'detail' = 'decision_support_boundary_held'",
+                        [PlanCardId]),
+    expect(SpBoundary =:= 0, "settlement_prep never records an advice boundary (not advice_adjacent)"),
+    io:format("live settlement_prep: dates=~s milestones=~p+~p insurance=~ts~n",
+              [maps:get(<<"dates_status">>, Sp), length(CpMils), length(InvMils),
+               maps:get(<<"en">>, InsRule)]),
+
     %% --- auth: missing token -> 401; wrong key -> 403 (attach surface too) ---
     {401, _} = req(post, Base ++ "/plan-cards/" ++ binary_to_list(PlanCardId) ++ "/properties",
                    [], PropBody),
@@ -376,17 +417,21 @@ main(_) ->
     {403, _} = req(post, Base ++ "/plan-cards/" ++ binary_to_list(PlanCardId) ++ "/properties",
                    [BadAuth], PropBody),
 
-    io:format("~n==== PROPERTY_ASSESSMENT SEAM (Slice A + B1/B3a yield + B3b cash + B3c disposition + C buying): ALL ASSERTIONS PASSED ====~n"),
+    io:format("~n==== PROPERTY_ASSESSMENT SEAM (Slice A + B1/B3a yield + B3b cash + B3c disposition + C buying + C-settle): ALL ASSERTIONS PASSED ====~n"),
     halt(0).
 
-%% The Phase-B turn (Slice A + B1/B3a + B2 + B3b + B3c): five components, in DAG order.
+%% The Phase-B turn (Slice A + B1/B3a + B2 + B3b + B3c + C + C-settle): seven components, DAG order.
 %%   property_assessment (two_path) → 3 gate, 1 filled, 1 usage (the sidecar fill)
 %%   yield_modelling     (resolver) → 3 gate, 1 filled       (no sidecar, no usage — §98 figure-owner)
 %%   tax_structure       (two_path) → 3 gate, 1 filled       (resolver-only refresh — entity reused
 %%                                                            from the seed, NO sidecar/LLM/usage)
 %%   cash_position       (resolver) → 3 gate, 1 filled       (no sidecar, no usage)
 %%   disposition         (resolver) → 3 gate, 1 filled       (no sidecar, no usage)
-%% wrapped by turn_started/turn_completed. 1 + (3+1+1) + (3+1) + (3+1) + (3+1) + (3+1) + 1 = 23.
+%%   buying_strategy     (two_path) → 3 gate, 1 filled, 1 usage (the negotiation leaf via sidecar)
+%%   settlement_prep     (resolver) → 3 gate, 1 filled       (RESOLVER-ONLY — zero agent leaves, no
+%%                                                            sidecar/usage; honest-partial structure)
+%% wrapped by turn_started/turn_completed.
+%% 1 + (3+1+1) + (3+1) + (3+1) + (3+1) + (3+1) + (3+1+1) + (3+1) + 1 = 32.
 expected_phase_b() ->
     Gates = [<<"compliance_gate">>, <<"compliance_gate">>, <<"compliance_gate">>],
     CF = <<"component_filled">>,
@@ -398,6 +443,7 @@ expected_phase_b() ->
        Gates, CF,                %% cash_position       (resolver — cash-to-complete)
        Gates, CF,                %% disposition         (resolver — price-aware dispose figures)
        Gates, CF, <<"usage">>,   %% buying_strategy     (two_path fresh — negotiation leaf via sidecar)
+       Gates, CF,                %% settlement_prep     (resolver-only — honest-partial checklist)
        <<"turn_completed">>]).
 
 %% --- helpers (identical to investor_seam_smoke) ------------------------------

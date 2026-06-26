@@ -617,7 +617,7 @@ per-property namespace. So Phase B is greenfield *runtime* on an already-compile
 | 2 | **Phase-B per-property turn** — gen_statem walk over the per-property component set against an attached property | absent |
 | 3 | **`property_assessment` two-path fill** → `property_fit_investor` | absent (← **the keystone**) |
 | 4 | **Downstream re-fill** of the `both`-scope components now `property_fit_investor` exists — yield cash-flow arithmetic (NEW module), `cash_position` price figures, `tax_structure` rent figures, `disposition` CGT — **+ the banded↔scalar money seam** | resolvers emit null at base; the property branch + the seam decision are absent |
-| 5 | **The other 3 per-property components** (`buying_strategy`, `due_diligence`, `settlement_prep`) | trigger-gated (bid-ready / doc-upload / contract-signed) |
+| 5 | **The other 3 per-property components** (`buying_strategy` ✓ Slice C, `settlement_prep` structure-half ✓ Slice C-settle, `due_diligence`) | `buying_strategy` + `settlement_prep` A built; `settlement_prep` B (contract-date input) + `due_diligence` (upload pipeline) deferred |
 
 ### Decomposition (sliced by mechanism seam)
 
@@ -672,8 +672,14 @@ per-property namespace. So Phase B is greenfield *runtime* on an already-compile
   Foundation-first: authored the prose-only `bid_plan_investor` outcome_schema (10 fields) + the `negotiation`
   planner domain + `kb.copy.buying-strategy`. Resolver owns the **yield-anchored discipline band** (= annual_rent
   × 100 ÷ target_gross_yield, removed from the LLM's reach) + `thesis_alignment`; the one agent leaf is
-  `negotiation_style`. `due_diligence` (upload pipeline) + `settlement_prep` (reads `bid_plan_investor`) remain
-  prose-only / deferred.
+  `negotiation_style`.
+- **Slice C-settle — `settlement_prep` investor checklist (structure half, A) — DONE 2026-06-26** (detail below).
+  Resolver-only (zero agent leaves). Grounding revised the "unblocked by `bid_plan_investor`" framing: the
+  *dated* path needs contract dates that have no input path (no upload surface built), so A fills the milestone
+  structure + the state-conditional insurance rule with every date PENDING, and B (the contract-date input
+  surface, a cross-contract feature) is recorded design-first. Foundation-first: authored the prose-only
+  `settlement_checklist` schema + `kb.copy.settlement`. `due_diligence` (upload pipeline) + `settlement_prep` **B**
+  remain deferred; `due_diligence` still prose-only.
 - **Deferred by trigger:** #5 and the real property *sources* (URL-paste = CLAUDE.md item 9; curator push =
   item 8). Slice A proves the contract with a **hand-fed normalized property_card** in a harness — exactly
   how the onboarding turn was proven (`investor_seam_smoke` feeds inputs). The engine's contract is "given a
@@ -1015,7 +1021,62 @@ resolver's → the figure stays out of the LLM's reach (§98). This keeps the yi
 at base; the investor's own stated target (a future refine input, option (c)) would override it.
 
 **Still deferred:** `due_diligence` (upload pipeline) and `settlement_prep` (reads `bid_plan_investor`, now
-available) — both prose-only schemas.
+available) — both prose-only schemas. *(settlement_prep's structure-now half is built next — Slice C-settle below.)*
+
+### Slice C-settle — `settlement_prep` investor checklist (structure half, A) — DONE (2026-06-26)
+
+**The honest split — A built now, B recorded design-first.** Grounding revised the plan's "settlement_prep
+unblocked because it reads `bid_plan_investor`" framing. The component's *defining* output — the **dated**
+settlement critical path with at-risk detection — depends on `contract_signed_date` + `settlement_date`, which
+arrive `<from_document>` from a signed contract. A whole-engine grep confirmed **no contract-date / upload input
+path exists**: the only Phase-B input is the source-supplied `property_card` of *neutral property facts*, and
+contract dates are facts about the user's *transaction* (a different layer). So shipping a date-less skeleton as
+"done" would be a rug ([[honest-deferral-not-rug]] — it removes the feature's defining capability). The split:
+
+- **A (built):** the **knowable structure now** — the standard settlement critical-path milestone sequence +
+  dependency DAG (KB-grounded, property-generic), the investor-specific milestones (entity-setup conditioned on
+  the upstream `recommended_entity`; QS / depreciation / PM / landlord-insurance always-applicable), and the
+  **state-conditional building-insurance-timing rule**. Every date PENDING (`dates_status: pending_contract`,
+  `settlement_date` null, `at_risk_milestones` []); `next_action_for_user` asks the user to supply the dates.
+- **B (design-first, deferred):** a **per-property transaction-input surface** (user-attested contract dates, or
+  later document-extraction) that flips `dates_status` to `active` and lights up the dated path + at-risk
+  detection + the swimlane projection. B is a **cross-contract feature** (engine↔shell API for submitting dates,
+  a shell date-entry surface, addendum persistence for transaction facts distinct from the `property_card`) →
+  pin the contract on paper first per [[foundation-first-for-cross-contract-reframe]], not bolt-on.
+
+**Foundation-first (the schema didn't exist).** `settlement_checklist` was prose-only in the investor blueprint
+("same as Mode A with added investor milestones") — never compiled into the registry (Mode-A `settlement_prep`
+is itself unbuilt, so "same as Mode A" pointed at nothing). Step 1 authored the explicit fenced 7-field block
+(`dates_status` enum, `critical_path_milestones`/`investor_milestones` as `array<object>`, `insurance_timing_rule`
+`localized_text|null`, `at_risk_milestones`, `settlement_date date|null`, `next_action_for_user`).
+
+**Resolver-only (zero agent leaves).** Unlike `buying_strategy` (two-path), `settlement_prep` has no
+`reasoning_domain` — the whole outcome is deterministic, so **no planner domain was added**. New
+`fh_engine_settlement` module; `fill_path = resolver` (no sidecar, no `usage`). NOT `advice_adjacent` (milestones
+/ dates / insurance-timing are process & statutory facts) → ASIC records `no_advice_surface`, the catch-all
+pass-through, never `boundary_held`.
+
+**The state-conditional insurance fix.** The insurance rule branches on the property state, resolver-selected
+from `kb.insurance.timing-of-risk-pass.risk_passing_by_state` (NSW/VIC → from settlement; **QLD → the day after
+contract**; a known other state → the universal lender-overlay; unknown → null). This *is* the fix that KB doc
+flagged as "the blueprint's single `derived_from: settlement_date` hint is wrong for QLD — surfaced for a
+separate blueprint fix." Strata lots (apartment/unit) get the contents-only note appended. Bilingual throughout
+via a new `kb.copy.settlement` copy doc (`fills: []`; the milestone names, investor why-lines, per-state
+insurance rules, and `next_action` — Vietnamese authored for register, not transliterated).
+
+**Verified.** New **`settlement_prep_conformance` 39/39** (renderer + the six read anchors + zero agent leaves;
+the nine-milestone DAG with correct dependencies, dates PENDING; entity-setup conditioned company/trust→applicable
+vs personal_sole/joint/null→not; the state-conditional insurance rule incl. SA-generic, null-state, strata-append;
+Layer-1 conformance of enum/array<object>/localized_text|null/date|null; no-upstream honest-partial). **`phase_b_
+wiring_smoke` 21/21** (settlement_prep last, after tax_structure). Regression green: `validate_build`,
+`outcome_conformance` 25+11, `base_components_investor` 19; `rebar3 compile` + `erlang-checker` (new module) clean;
+artifact recompiled (111 KB entries, +1 for the copy doc) and `settlement_prep` PROVEN in the investor registry
+(`agent_leaves: []`, outcome fields present). **Full-stack: the live seam PASSES against the real planner** (exit
+0, real Opus — event count moved 28 → **32**; `settlement_prep` fires last as resolver-only, gate×3 + filled, NO
+usage; live NSW property → the NSW insurance rule rendered, `dates=pending_contract`, `milestones=9+5`).
+
+**Still deferred after C-settle:** `settlement_prep` **B** (the contract-date input surface — design-first) and
+`due_diligence` (blocked on the upload pipeline) — `due_diligence` still prose-only.
 
 ## Deferred out (honest — first-exercising instance is Mode B/D, not here)
 
