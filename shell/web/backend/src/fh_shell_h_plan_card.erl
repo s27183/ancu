@@ -25,6 +25,8 @@ init(Req0, Opts) ->
         {[simulate], <<"POST">>} -> with_owned_card(Req0, Opts, fun simulate/4);
         {[refine], <<"POST">>}   -> with_owned_card(Req0, Opts, fun refine/4);
         {[profile], <<"POST">>}  -> with_owned_card(Req0, Opts, fun profile/4);
+        {[properties], <<"POST">>}  -> with_owned_card(Req0, Opts, fun properties/4);
+        {[transaction], <<"POST">>} -> with_owned_card(Req0, Opts, fun transaction/4);
         {[checklist_status], <<"PATCH">>} ->
             with_owned_card(Req0, Opts, fun checklist_status/4);
         _ ->
@@ -153,6 +155,56 @@ checklist_status(UserId, PlanCardId, Req0, Opts) ->
         {ok, Body, Req1} ->
             {Status, Resp} =
                 fh_shell_engine_client:set_checklist_status(UserId, PlanCardId, Body),
+            {ok, relay(Status, Resp, Req1), Opts};
+        {error, invalid_json} ->
+            {ok, fh_shell_http:reply_json(400,
+                #{<<"error">> => <<"invalid_json">>}, Req0), Opts}
+    end.
+
+%% POST /api/plan-cards/:id/properties — attach a normalized property_card → the engine
+%% writes the addendum and runs the Phase-B per-property turn (engine-contract §12). Unlike
+%% simulate/refine/transaction this is an AGENT turn (property_assessment's two-path fill
+%% invokes the LLM → emits usage), so — like `ask` — it runs the §7 token-limit GATE FIRST:
+%% a user over their tier's period limit is blocked 402 BEFORE any tenant JWT is minted
+%% (metering-not-gating; the engine would run it, the shell decides). The engine owns the
+%% property_card contract (400 invalid_property_card / 400 phase_b_not_supported_for_blueprint
+%% / 409 turn_in_flight); relay verbatim. 202 {plan_card_id, property_id, turn_id}; the
+%% per-property components stream over /events.
+properties(UserId, PlanCardId, Req0, Opts) ->
+    case fh_shell_meter:gate(UserId) of
+        allow ->
+            case fh_shell_http:read_json_body(Req0) of
+                {ok, Body, Req1} ->
+                    {Status, Resp} =
+                        fh_shell_engine_client:attach_property(UserId, PlanCardId, Body),
+                    {ok, relay(Status, Resp, Req1), Opts};
+                {error, invalid_json} ->
+                    {ok, fh_shell_http:reply_json(400,
+                        #{<<"error">> => <<"invalid_json">>}, Req0), Opts}
+            end;
+        {block, #{tier := Tier, used := Used, limit := Limit}} ->
+            {ok, fh_shell_http:reply_json(402,
+                #{<<"error">> => <<"quota_exceeded">>,
+                  <<"tier">> => Tier,
+                  <<"used_tokens">> => Used,
+                  <<"limit_tokens">> => Limit}, Req0), Opts}
+    end.
+
+%% POST /api/plan-cards/:id/properties/:pid/transaction — submit the user-attested
+%% contract_signed_date + settlement_date for an already-attached property → a RESOLVER-ONLY
+%% re-fill that activates settlement_prep's dated path (engine-contract §11). Resolver-only ⇒
+%% NO usage ⇒ NO meter gate (like simulate/refine/checklist, unlike `ask`/properties). The
+%% :pid is a sub-resource of the already-owned card (with_owned_card confirmed the card); the
+%% engine re-validates the addendum exists (409 property_not_attached) and the dates (400 with
+%% a typed `code`). Relay verbatim — the engine owns the transaction contract. 202
+%% {plan_card_id, property_id, turn_id}; the recomputed settlement_checklist streams over /events.
+transaction(UserId, PlanCardId, Req0, Opts) ->
+    PropertyId = cowboy_req:binding(pid, Req0),
+    case fh_shell_http:read_json_body(Req0) of
+        {ok, Body, Req1} ->
+            {Status, Resp} =
+                fh_shell_engine_client:set_transaction_dates(
+                    UserId, PlanCardId, PropertyId, Body),
             {ok, relay(Status, Resp, Req1), Opts};
         {error, invalid_json} ->
             {ok, fh_shell_http:reply_json(400,

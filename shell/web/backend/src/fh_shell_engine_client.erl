@@ -12,7 +12,8 @@
 %% are built (8-S1..8-S4). HTTP via inets httpc (started by the shell app).
 
 -export([create_plan_card/2, get_plan_card/2, post_message/3, simulate/3,
-         refine/3, set_profile_financials/3, set_checklist_status/3, stream_events/3,
+         refine/3, set_profile_financials/3, set_checklist_status/3,
+         attach_property/3, set_transaction_dates/4, stream_events/3,
          list_suburbs/1, get_usage_events/2, start_httpc_profiles/0]).
 
 %% Dedicated httpc profile for the LONG-LIVED SSE stream proxy (stream_events/3).
@@ -182,6 +183,45 @@ set_checklist_status(UserId, PlanCardId, BodyMap) ->
     Body = fh_shell_util:json_encode(BodyMap),
     {ok, {{_, Status, _}, _, Resp}} =
         httpc:request(patch, {Url, Headers, "application/json", Body},
+                      [{timeout, ?RPC_TIMEOUT_MS}], [{body_format, binary}]),
+    {Status, Resp}.
+
+%% Attach a normalized property_card — POST /api/engine/plan-cards/:id/properties (engine-
+%% contract §12). The shell has confirmed ownership + the token-limit gate first. The engine
+%% generates the property_id, writes the addendum (content.addenda.<pid>), and runs the Phase-B
+%% per-property turn — an AGENT turn (property_assessment invokes the LLM, emits usage) — answering
+%% 202 {plan_card_id, property_id, turn_id}; the per-property components stream over the SAME
+%% /events SSE. 400 invalid_property_card / 400 phase_b_not_supported_for_blueprint (Slice A,
+%% investor-only); 409 if a turn is already in flight. Relayed verbatim — the engine owns the
+%% property_card contract.
+-spec attach_property(binary(), binary(), map()) -> {non_neg_integer(), binary()}.
+attach_property(UserId, PlanCardId, BodyMap) ->
+    Token = fh_shell_engine_jwt:mint(#{user_id => UserId}),
+    Url = base_url() ++ "/plan-cards/" ++ binary_to_list(PlanCardId) ++ "/properties",
+    Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
+    Body = fh_shell_util:json_encode(BodyMap),
+    {ok, {{_, Status, _}, _, Resp}} =
+        httpc:request(post, {Url, Headers, "application/json", Body},
+                      [{timeout, ?RPC_TIMEOUT_MS}], [{body_format, binary}]),
+    {Status, Resp}.
+
+%% Submit the user-attested transaction dates — POST /api/engine/plan-cards/:id/properties/
+%% :pid/transaction with {contract_signed_date, settlement_date} (engine-contract §11). The
+%% shell has confirmed the user owns the card; the engine re-validates the addendum :pid exists
+%% (409 property_not_attached) and the dates (400 with a typed code). A RESOLVER-ONLY re-fill:
+%% it activates settlement_prep's dated path, emits NO usage (so the handler runs no meter gate),
+%% and answers 202 {plan_card_id, property_id, turn_id}; the recomputed settlement_checklist
+%% streams over the SAME /events SSE. Relayed verbatim — the engine owns the transaction contract.
+-spec set_transaction_dates(binary(), binary(), binary(), map()) ->
+    {non_neg_integer(), binary()}.
+set_transaction_dates(UserId, PlanCardId, PropertyId, BodyMap) ->
+    Token = fh_shell_engine_jwt:mint(#{user_id => UserId}),
+    Url = base_url() ++ "/plan-cards/" ++ binary_to_list(PlanCardId)
+          ++ "/properties/" ++ binary_to_list(PropertyId) ++ "/transaction",
+    Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
+    Body = fh_shell_util:json_encode(BodyMap),
+    {ok, {{_, Status, _}, _, Resp}} =
+        httpc:request(post, {Url, Headers, "application/json", Body},
                       [{timeout, ?RPC_TIMEOUT_MS}], [{body_format, binary}]),
     {Status, Resp}.
 

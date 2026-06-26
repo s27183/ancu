@@ -44,6 +44,12 @@ routes() ->
         {"/api/plan-cards/:id/refine", fh_shell_h_plan_card, [refine]},
         {"/api/plan-cards/:id/profile", fh_shell_h_plan_card, [profile]},
         {"/api/plan-cards/:id/checklist-status", fh_shell_h_plan_card, [checklist_status]},
+        %% Phase-B per-property surface (Mode-C shell, Slice 1) — attach a property
+        %% (→ an addendum + an AGENT turn, engine-contract §12) and submit its
+        %% transaction dates (→ a resolver-only re-fill, §11). Both more specific than
+        %% the bare `/:id`, so they precede it (cowboy matches in order).
+        {"/api/plan-cards/:id/properties", fh_shell_h_plan_card, [properties]},
+        {"/api/plan-cards/:id/properties/:pid/transaction", fh_shell_h_plan_card, [transaction]},
         {"/api/plan-cards/:id", fh_shell_h_plan_card, []},
         %% Login flow (8-S login slice) — one handler, action per route opt.
         {"/api/auth/magic", fh_shell_h_auth, [magic_request]},

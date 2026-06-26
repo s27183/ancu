@@ -35,6 +35,8 @@ main(_) ->
     StubMod = compile_load("test/plancard_proxy_stub_engine.erl"),
     Dispatch = cowboy_router:compile([{'_', [
         {"/api/engine/plan-cards/:id/messages", StubMod, [messages]},
+        {"/api/engine/plan-cards/:id/properties", StubMod, [properties]},
+        {"/api/engine/plan-cards/:id/properties/:pid/transaction", StubMod, [transaction]},
         {"/api/engine/plan-cards/:id", StubMod, []}
     ]}]),
     {ok, _} = cowboy:start_clear(stub_engine_listener, [{port, ?STUB_PORT}],
@@ -113,6 +115,66 @@ main(_) ->
     {401, _} = req(post, Base ++ "/api/plan-cards/" ++ b2l(CardId) ++ "/messages",
                    [], MsgBody),
     expect(true, "POST .../messages with no user JWT -> 401"),
+
+    %% --- ATTACH (Mode-C Slice 1): a property_card on the owned card -> 202 relayed,
+    %% with the body field + the minted tenant JWT proven to have travelled through ---
+    AttachBody = fh_shell_util:json_encode(#{<<"price">> => 920000,
+                                             <<"state">> => <<"NSW">>,
+                                             <<"suburb">> => <<"Cabramatta">>,
+                                             <<"property_type">> => <<"established_house">>}),
+    {202, AttResp} = req(post, Base ++ "/api/plan-cards/" ++ b2l(CardId) ++ "/properties",
+                         Auth, AttachBody),
+    #{<<"plan_card_id">> := CardId, <<"property_id">> := PropId,
+      <<"echo_state">> := <<"NSW">>, <<"saw_bearer">> := true} =
+        fh_shell_util:json_decode(AttResp),
+    expect(is_binary(PropId),
+           "POST .../properties on an owned card -> 202; body + tenant JWT forwarded, relayed verbatim"),
+
+    %% --- ATTACH: ownership + auth gates (same posture as the other proxies) ---
+    {404, _} = req(post, Base ++ "/api/plan-cards/" ++ b2l(OtherCard) ++ "/properties",
+                   Auth, AttachBody),
+    expect(true, "POST .../properties on an unowned card -> 404"),
+    {401, _} = req(post, Base ++ "/api/plan-cards/" ++ b2l(CardId) ++ "/properties",
+                   [], AttachBody),
+    expect(true, "POST .../properties with no user JWT -> 401"),
+
+    %% --- ATTACH: an over-limit user is GATED 402 before the engine (attach is an
+    %% agent turn → metered, so it gates like `ask`, unlike the resolver-only proxies).
+    %% A fresh user with usage at the default free limit (1.0M); the first gate read
+    %% sees it (no cache to invalidate), short-circuiting before any engine call. ---
+    OverUser = scalar("INSERT INTO users (email) VALUES ($1) RETURNING user_id::text",
+                      [<<"over+", (uuid())/binary, "@example.com">>]),
+    OverCard = uuid(),
+    ok = fh_shell_store:insert_plan_card_view(OverUser, OverCard, <<"Cabramatta">>),
+    _ = pgo:query(<<"INSERT INTO usage_records (user_id, engine_event_id, tokens_total) "
+                    "VALUES ($1::uuid, $2, $3)">>,
+                  [OverUser, erlang:system_time(microsecond), 1000000]),
+    OverJwt = fh_shell_jwt:issue(#{user_id => OverUser, email => <<"over@example.com">>,
+                                   roles => [<<"buyer">>], locale => <<"vi">>}),
+    OverAuth = [{"authorization", "Bearer " ++ binary_to_list(OverJwt)}],
+    {402, OverResp} = req(post, Base ++ "/api/plan-cards/" ++ b2l(OverCard) ++ "/properties",
+                          OverAuth, AttachBody),
+    #{<<"error">> := <<"quota_exceeded">>} = fh_shell_util:json_decode(OverResp),
+    expect(true, "POST .../properties over the token limit -> 402 (attach gated like ask, before the engine)"),
+
+    %% --- TRANSACTION (Mode-C Slice 1): dates on the owned card -> 202; the :pid + the
+    %% body travel through the proxy (resolver-only re-fill, so NO meter gate) ---
+    TxnPid = uuid(),
+    TxnBody = fh_shell_util:json_encode(#{<<"contract_signed_date">> => <<"2026-06-01">>,
+                                          <<"settlement_date">> => <<"2026-09-01">>}),
+    {202, TxnResp} = req(post, Base ++ "/api/plan-cards/" ++ b2l(CardId)
+                         ++ "/properties/" ++ b2l(TxnPid) ++ "/transaction", Auth, TxnBody),
+    #{<<"plan_card_id">> := CardId, <<"property_id">> := TxnPid,
+      <<"echo_settlement">> := <<"2026-09-01">>} = fh_shell_util:json_decode(TxnResp),
+    expect(true, "POST .../properties/:pid/transaction on an owned card -> 202; :pid + body forwarded"),
+
+    %% --- TRANSACTION: ownership + auth gates ---
+    {404, _} = req(post, Base ++ "/api/plan-cards/" ++ b2l(OtherCard)
+                   ++ "/properties/" ++ b2l(uuid()) ++ "/transaction", Auth, TxnBody),
+    expect(true, "POST .../transaction on an unowned card -> 404"),
+    {401, _} = req(post, Base ++ "/api/plan-cards/" ++ b2l(CardId)
+                   ++ "/properties/" ++ b2l(TxnPid) ++ "/transaction", [], TxnBody),
+    expect(true, "POST .../transaction with no user JWT -> 401"),
 
     io:format("~nALL PASSED~n"),
     halt(0).
