@@ -412,7 +412,11 @@ export interface PropertyCard {
     property_type?: string;
     year_built?: number | null;
     land_size?: number | null;
-    strata?: Record<string, unknown> | null;
+    /** A boolean FLAG from the manual attach form ("is this a strata property?"), or a
+     *  richer facts object from a future source (URL paste extracting levies). The engine
+     *  doesn't validate strata (agent grounding), so the stored value is whatever the
+     *  producer wrote — today a boolean. */
+    strata?: boolean | Record<string, unknown> | null;
 }
 
 /** One attached property's addendum (engine-contract §12): the property_card + its

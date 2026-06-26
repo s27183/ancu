@@ -195,6 +195,52 @@ const messages = {
         vi: 'Đang xem số liệu của bất động sản này. Chuyển về “Kế hoạch cơ sở” để thử các kịch bản.',
         en: "Showing this property's figures. Switch to “Base plan” to explore what-ifs."
     },
+    // Attach a property (Mode-C Phase-B): the manual entry form — the first producer of a
+    // normalized property_card (engine §12). Required: price/suburb/state/property_type;
+    // optional: year/land/strata. Surfaces the meter 402 (over_limit) + 409 (busy) calmly.
+    'plan.attach.cta': { vi: 'Gắn bất động sản', en: 'Attach property' },
+    'plan.attach.title': { vi: 'Gắn một bất động sản', en: 'Attach a property' },
+    'plan.attach.intro': {
+        vi: 'Nhập thông tin bất động sản bạn đang cân nhắc. Chúng tôi sẽ tính lợi suất, dòng tiền và phân tích riêng cho bất động sản này.',
+        en: "Enter the property you're considering. We'll compute its yield, cash flow and a per-property analysis."
+    },
+    'plan.attach.price': { vi: 'Giá (AUD)', en: 'Price (AUD)' },
+    'plan.attach.price_ph': { vi: 'ví dụ 850000', en: 'e.g. 850000' },
+    'plan.attach.suburb': { vi: 'Khu vực (suburb)', en: 'Suburb' },
+    'plan.attach.state': { vi: 'Bang', en: 'State' },
+    'plan.attach.ptype': { vi: 'Loại bất động sản', en: 'Property type' },
+    'plan.attach.ptype_ph': { vi: 'Chọn loại…', en: 'Choose a type…' },
+    'plan.attach.ptype.house': { vi: 'Nhà liền thổ', en: 'House' },
+    'plan.attach.ptype.unit': { vi: 'Căn hộ (unit)', en: 'Unit' },
+    'plan.attach.ptype.townhouse': { vi: 'Nhà phố', en: 'Townhouse' },
+    'plan.attach.ptype.apartment': { vi: 'Chung cư', en: 'Apartment' },
+    'plan.attach.ptype.land': { vi: 'Đất', en: 'Land' },
+    'plan.attach.optional': { vi: 'Tùy chọn', en: 'Optional' },
+    'plan.attach.year': { vi: 'Năm xây dựng', en: 'Year built' },
+    'plan.attach.land': { vi: 'Diện tích đất (m²)', en: 'Land size (m²)' },
+    'plan.attach.strata': {
+        vi: 'Có phí strata (chung cư / nhà phố có ban quản lý)',
+        en: 'Has strata fees (managed unit / townhouse)'
+    },
+    'plan.attach.cancel': { vi: 'Hủy', en: 'Cancel' },
+    'plan.attach.submit': { vi: 'Gắn & phân tích', en: 'Attach & analyse' },
+    'plan.attach.submitting': { vi: 'Đang phân tích…', en: 'Analysing…' },
+    'plan.attach.err.over_limit': {
+        vi: 'Bạn đã dùng hết hạn mức của gói hiện tại. Nâng cấp để gắn bất động sản.',
+        en: "You've reached your plan's limit. Upgrade to attach a property."
+    },
+    'plan.attach.err.busy': {
+        vi: 'Kế hoạch đang được tính. Vui lòng thử lại sau giây lát.',
+        en: 'The plan is busy computing. Please try again shortly.'
+    },
+    'plan.attach.err.invalid': {
+        vi: 'Thông tin bất động sản chưa hợp lệ. Kiểm tra lại các trường.',
+        en: 'The property details are invalid. Please check the fields.'
+    },
+    'plan.attach.err.generic': {
+        vi: 'Không gắn được bất động sản. Vui lòng thử lại.',
+        en: "Couldn't attach the property. Please try again."
+    },
     'plan.qa.pending': {
         vi: 'Phần hỏi đáp sẽ sẵn sàng khi kế hoạch tính xong.',
         en: 'Q&A opens once your plan finishes computing.'

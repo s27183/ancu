@@ -1297,6 +1297,122 @@ main {
     box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
 }
 
+/* Property bar (Mode-C Phase-B) — the base-vs-property selector + the attach entry point.
+   The selector (Tabs) takes the available width; the attach button sits at the end. */
+.pp-propbar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0 0 0.75rem;
+    flex-wrap: wrap;
+}
+.pp-propbar .tabrail {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+.pp-attach-btn {
+    flex: 0 0 auto;
+    border: 1px dashed var(--accent);
+    background: transparent;
+    color: var(--accent);
+    border-radius: 0.45rem;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+        background var(--t-fast) var(--ease),
+        color var(--t-fast) var(--ease);
+}
+.pp-attach-btn:hover {
+    background: var(--accent);
+    color: #fff;
+}
+
+/* Attach-property form (inside the reusable Modal) — a vertical field stack. */
+.pp-attach-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+.pp-attach-intro {
+    margin: 0;
+    font-size: 0.82rem;
+    color: var(--muted);
+}
+.pp-af-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+}
+.pp-af-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+.pp-af-field input,
+.pp-af-field select {
+    padding: 0.5rem 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: 0.4rem;
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 0.95rem;
+    width: 100%;
+}
+.pp-af-field input:focus,
+.pp-af-field select:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+.pp-af-optional {
+    margin: 0.3rem 0 0;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+.pp-af-check {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--ink);
+}
+.pp-af-check input {
+    width: auto;
+}
+.pp-af-error {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--danger, #b91c1c);
+}
+.pp-af-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.6rem;
+    margin-top: 0.4rem;
+}
+.pp-af-cancel {
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    border-radius: 0.45rem;
+    padding: 0.5rem 0.9rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+.pp-af-actions .primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 /* Structural what-if bar (W9) — plan-level price/state preview control. */
 .pp-whatif {
     border: 1px solid var(--border);

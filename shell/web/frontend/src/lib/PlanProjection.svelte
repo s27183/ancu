@@ -15,8 +15,10 @@
         refinePlanCard,
         setProfileFinancials,
         setChecklistStatus,
+        attachProperty,
         type SimulateOverrides,
-        type HouseholdFinancials
+        type HouseholdFinancials,
+        type PropertyCardInput
     } from '$lib/api';
     import { subscribePlanCard, type PlanCardStream } from '$lib/planCardStream';
     import {
@@ -40,6 +42,7 @@
     import FlowView from '$lib/renderers/FlowView.svelte';
     import Tabs from '$lib/Tabs.svelte';
     import Chat from '$lib/Chat.svelte';
+    import Modal from '$lib/Modal.svelte';
 
     let { suburbName, suburbState, onplan }: {
         suburbName: string;
@@ -84,6 +87,10 @@
     let addenda = $state<Record<string, PropertyAddendum>>({});
     let selectedPropertyId = $state<string | null>(null);
     let cardId = $state<string | null>(null);
+    // The card's blueprint (engine GET) — gates the attach affordance: only the investor
+    // blueprint has a built per-property turn (engine supports_phase_b/1 is Slice-A-exact),
+    // so the "+ Attach property" entry point shows only for it (a Mode-A card would 400).
+    let blueprintSlug = $state<string>('');
     let turnDone = $state(false);
     let turnFailed = $state(false);
     // The card user-set layer (the Flow checklist done-toggles), seeded from the GET card
@@ -280,6 +287,95 @@
         if (pid !== null) resetPreview();
     }
 
+    // ── Attach a property (Phase B, Mode-C investor) ─────────────────────────
+    // The first PRODUCER of a normalized property_card (engine §12): a manual entry form.
+    // Richer sources (URL paste #9, Tìm Nhà #8, extension) POST the SAME contract when
+    // built; this is the substrate they reduce to. Gated to the investor blueprint — the
+    // engine's per-property turn (property_assessment) is wired for it alone (Slice A).
+    const supportsPhaseB = $derived(blueprintSlug === 'investor-domestic-au');
+    let showAttach = $state(false);
+    let apPrice = $state('');
+    let apSuburb = $state('');
+    let apState = $state('');
+    let apType = $state('');
+    let apYear = $state('');
+    let apLand = $state('');
+    let apStrata = $state(false);
+    let attaching = $state(false);
+    // null = no error; otherwise a calm reason for the modal (the upgrade prompt carries
+    // the tier so the copy can name it). Cleared on each (re)open + each submit.
+    let attachError = $state<null | { kind: 'over_limit'; tier: string } | { kind: 'busy' }
+        | { kind: 'invalid'; detail: string } | { kind: 'error' }>(null);
+
+    // The property_type options the form offers (engine validates only nonempty; these are
+    // the investor-relevant kinds). Labels are bilingual via i18n; the value is the stored fact.
+    const PROPERTY_TYPES = ['house', 'unit', 'townhouse', 'apartment', 'land'] as const;
+
+    function openAttach() {
+        apPrice = '';
+        apSuburb = suburbName; // seed from the projected suburb — the common case
+        apState = suburbState;
+        apType = '';
+        apYear = '';
+        apLand = '';
+        apStrata = false;
+        attachError = null;
+        showAttach = true;
+    }
+
+    // Build the property_card from the form. price + suburb + state + property_type are
+    // required (the submit button is disabled until they're present + price parses); the
+    // three optional facts are sent only when filled (honest-partial — absent ≠ zero).
+    function buildPropertyCard(): PropertyCardInput | null {
+        const price = Number(apPrice.replace(/[^0-9.]/g, ''));
+        if (!(Number.isFinite(price) && price > 0)) return null;
+        if (!apSuburb.trim() || !apState.trim() || !apType) return null;
+        const pc: PropertyCardInput = {
+            price,
+            suburb: apSuburb.trim(),
+            state: apState,
+            property_type: apType
+        };
+        const year = Number(apYear.replace(/[^0-9]/g, ''));
+        if (apYear.trim() !== '' && Number.isFinite(year) && year > 0) pc.year_built = year;
+        const land = Number(apLand.replace(/[^0-9.]/g, ''));
+        if (apLand.trim() !== '' && Number.isFinite(land) && land > 0) pc.land_size = land;
+        if (apStrata) pc.strata = true;
+        return pc;
+    }
+    const attachReady = $derived(buildPropertyCard() !== null && !attaching);
+
+    // Submit → POST the attach. On 202, seed the addendum with the submitted property_card
+    // (so the selector shows the new property immediately, honest-partial: empty components
+    // render PENDING) and SELECT it; the per-property components stream in over the live SSE
+    // (load()'s onComponentFilled routes them by property_id, preserving this property_card).
+    // turnDone=false surfaces the running indicator while the Phase-B turn fills.
+    async function submitAttach() {
+        if (!cardId) return;
+        const pc = buildPropertyCard();
+        if (!pc) return;
+        attaching = true;
+        attachError = null;
+        const res = await attachProperty(cardId, pc);
+        attaching = false;
+        if (res.kind === 'accepted') {
+            const pid = res.result.property_id;
+            addenda = { ...addenda, [pid]: { property_card: pc, components: {} } };
+            selectedPropertyId = pid;
+            resetPreview();
+            turnDone = false;
+            showAttach = false;
+        } else if (res.kind === 'over_limit') {
+            attachError = { kind: 'over_limit', tier: res.tier };
+        } else if (res.kind === 'busy') {
+            attachError = { kind: 'busy' };
+        } else if (res.kind === 'invalid') {
+            attachError = { kind: 'invalid', detail: res.detail };
+        } else {
+            attachError = { kind: 'error' };
+        }
+    }
+
     // The budget (Cash-calculator) sub-tabs (§7.3): cockpit + verdict → cash-events table →
     // breakdown detail → the disposition projection. The 4th "Full horizon" tab is present
     // only when the engine emits a disposition component (honest-partial tab presence; its
@@ -413,6 +509,7 @@
         checklistStatus = {};
         uiTabs = [];
         cardId = null;
+        blueprintSlug = '';
         turnDone = false;
         turnFailed = false;
 
@@ -430,6 +527,7 @@
         if (res.kind === 'ok') {
             components = res.card.content.components ?? {};
             addenda = res.card.content.addenda ?? {}; // per-property snapshots (engine §12)
+            blueprintSlug = res.card.blueprint_slug ?? ''; // gates the attach affordance
             horizonValue = baselineHorizon; // seed the slider from the card's saved H
             seedFinancials(); // seed income/debts from the card's stored profile facts (IC5)
             checklistStatus = res.card.checklist_status ?? {};
@@ -522,16 +620,94 @@
         <p class="pp-running"><span class="pp-spinner" aria-hidden="true"></span>{$t('plan.running')}</p>
     {/if}
 
-    <!-- Property selector (Mode-C Phase-B): base plan vs each attached property. Shown only
-         when ≥1 property is attached; selecting one overlays its addendum into every tab. -->
-    {#if propertyIds.length > 0}
-        <div class="pp-propsel">
-            <Tabs
-                tabs={propertyTabs}
-                active={selectedPropertyId ?? ''}
-                onSelect={(id) => selectProperty(id === '' ? null : id)}
-            />
+    <!-- Property bar (Mode-C Phase-B): the base-vs-property selector (shown once ≥1 property
+         is attached; selecting one overlays its addendum into every tab) + the "+ Attach
+         property" entry point (shown for the investor blueprint — the only one with a built
+         per-property turn). The button is the FIRST attach affordance + a producer of the
+         normalized property_card; richer sources (URL paste, Tìm Nhà) POST the same contract. -->
+    {#if supportsPhaseB}
+        <div class="pp-propbar">
+            {#if propertyIds.length > 0}
+                <Tabs
+                    tabs={propertyTabs}
+                    active={selectedPropertyId ?? ''}
+                    onSelect={(id) => selectProperty(id === '' ? null : id)}
+                />
+            {/if}
+            <button type="button" class="pp-attach-btn" onclick={openAttach}>
+                + {$t('plan.attach.cta')}
+            </button>
         </div>
+    {/if}
+
+    {#if showAttach}
+        <Modal title={$t('plan.attach.title')} onClose={() => (showAttach = false)}>
+            <form class="pp-attach-form" onsubmit={(e) => { e.preventDefault(); submitAttach(); }}>
+                <p class="pp-attach-intro">{$t('plan.attach.intro')}</p>
+                <label class="pp-af-field">
+                    <span class="pp-af-label">{$t('plan.attach.price')}</span>
+                    <input type="text" inputmode="numeric" bind:value={apPrice}
+                        placeholder={$t('plan.attach.price_ph')} />
+                </label>
+                <label class="pp-af-field">
+                    <span class="pp-af-label">{$t('plan.attach.suburb')}</span>
+                    <input type="text" bind:value={apSuburb} />
+                </label>
+                <label class="pp-af-field">
+                    <span class="pp-af-label">{$t('plan.attach.state')}</span>
+                    <select bind:value={apState}>
+                        {#each AU_STATES as s (s)}
+                            <option value={s}>{s}</option>
+                        {/each}
+                    </select>
+                </label>
+                <label class="pp-af-field">
+                    <span class="pp-af-label">{$t('plan.attach.ptype')}</span>
+                    <select bind:value={apType}>
+                        <option value="" disabled>{$t('plan.attach.ptype_ph')}</option>
+                        {#each PROPERTY_TYPES as pt (pt)}
+                            <option value={pt}>{$t(`plan.attach.ptype.${pt}` as 'plan.attach.ptype.house')}</option>
+                        {/each}
+                    </select>
+                </label>
+                <p class="pp-af-optional">{$t('plan.attach.optional')}</p>
+                <label class="pp-af-field">
+                    <span class="pp-af-label">{$t('plan.attach.year')}</span>
+                    <input type="text" inputmode="numeric" bind:value={apYear} />
+                </label>
+                <label class="pp-af-field">
+                    <span class="pp-af-label">{$t('plan.attach.land')}</span>
+                    <input type="text" inputmode="numeric" bind:value={apLand} />
+                </label>
+                <label class="pp-af-check">
+                    <input type="checkbox" bind:checked={apStrata} />
+                    <span>{$t('plan.attach.strata')}</span>
+                </label>
+
+                {#if attachError}
+                    <p class="pp-af-error">
+                        {#if attachError.kind === 'over_limit'}
+                            {$t('plan.attach.err.over_limit')}
+                        {:else if attachError.kind === 'busy'}
+                            {$t('plan.attach.err.busy')}
+                        {:else if attachError.kind === 'invalid'}
+                            {attachError.detail || $t('plan.attach.err.invalid')}
+                        {:else}
+                            {$t('plan.attach.err.generic')}
+                        {/if}
+                    </p>
+                {/if}
+
+                <div class="pp-af-actions">
+                    <button type="button" class="pp-af-cancel" onclick={() => (showAttach = false)}>
+                        {$t('plan.attach.cancel')}
+                    </button>
+                    <button type="submit" class="primary" disabled={!attachReady}>
+                        {attaching ? $t('plan.attach.submitting') : $t('plan.attach.submit')}
+                    </button>
+                </div>
+            </form>
+        </Modal>
     {/if}
 
     <!-- Sub-tabs: one per plan section + a Q&A tab — each section shows on its own, so

@@ -396,3 +396,86 @@ export async function setChecklistStatus(
     if (res.status === 404) return { kind: 'not_found' };
     return { kind: 'error', status: res.status };
 }
+
+// --- Property attachment: Phase B (Mode-C investor) --------------------------
+// POST /api/plan-cards/:id/properties — attach a property to the card and run the
+// per-property (Phase-B) turn (engine-contract §12). The body is a NORMALIZED
+// property_card (the neutral facts a source supplies); who PRODUCES it (URL paste,
+// curator, extension) is a separate deferred unit — this manual form is the first
+// producer (Slice 3). The engine GENERATES the property_id and answers 202; the
+// per-property component_filled events stream over the SAME /events SSE, tagged with
+// property_id (routed into content.addenda.<pid> by the projection). This is an AGENT
+// turn (property_assessment is two-path) → it EMITS usage, so the shell meter-gates it
+// like `ask`: an over-limit user is blocked 402 BEFORE the turn starts (billing.md §7).
+
+/** The normalized property facts the engine's property_assessment resolver reads. The
+ *  four required facts ground the resolver-computed gross yield + verdict; the optional
+ *  facts (year_built, land_size, strata) are agent grounding for the richer fill. */
+export interface PropertyCardInput {
+    price: number;
+    state: string;
+    suburb: string;
+    property_type: string;
+    year_built?: number;
+    land_size?: number;
+    strata?: boolean;
+}
+
+/** The engine's 202 reply: the new property + the Phase-B turn now running async. */
+export interface AttachPropertyResult {
+    plan_card_id: string;
+    property_id: string;
+    turn_id: string;
+}
+
+/** A discriminated attach outcome so the UI branches calmly. `over_limit` is the meter
+ *  402 (carrying the tier + token usage so the modal can prompt an upgrade); `busy` the
+ *  409 (a turn is already running for this card); `invalid` the engine's 400 (a non-
+ *  investor blueprint, or a missing/invalid property fact — `detail` is human-readable). */
+export type AttachOutcome =
+    | { kind: 'accepted'; result: AttachPropertyResult }
+    | { kind: 'over_limit'; tier: string; used: number; limit: number }
+    | { kind: 'busy' }
+    | { kind: 'invalid'; detail: string }
+    | { kind: 'auth_required' }
+    | { kind: 'not_found' }
+    | { kind: 'error'; status: number };
+
+/** POST a property_card to attach + run Phase B. The per-property components do NOT come
+ *  back here — they stream over the card's /events; this returns only the handles (incl.
+ *  property_id) so the caller can select the new property and route its live fills. */
+export async function attachProperty(
+    planCardId: string,
+    property: PropertyCardInput,
+    fetchFn: typeof fetch = fetch
+): Promise<AttachOutcome> {
+    const res = await fetchFn(`/api/plan-cards/${encodeURIComponent(planCardId)}/properties`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(property)
+    });
+    if (res.status === 202) {
+        return { kind: 'accepted', result: (await res.json()) as AttachPropertyResult };
+    }
+    if (res.status === 402) {
+        const body = (await res.json().catch(() => ({}))) as {
+            tier?: string;
+            used_tokens?: number;
+            limit_tokens?: number;
+        };
+        return {
+            kind: 'over_limit',
+            tier: body.tier ?? '',
+            used: body.used_tokens ?? 0,
+            limit: body.limit_tokens ?? 0
+        };
+    }
+    if (res.status === 409) return { kind: 'busy' };
+    if (res.status === 400) {
+        const body = (await res.json().catch(() => ({}))) as { detail?: string };
+        return { kind: 'invalid', detail: body.detail ?? '' };
+    }
+    if (res.status === 401) return { kind: 'auth_required' };
+    if (res.status === 404) return { kind: 'not_found' };
+    return { kind: 'error', status: res.status };
+}

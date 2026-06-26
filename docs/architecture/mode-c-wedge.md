@@ -1347,6 +1347,38 @@ curl-attach against Slice 1's proxy now if wanted.
 which makes the selector reachable + enables the capstone. The product decision (manual form vs
 URL-paste/curation) is Slice 3's.
 
+### Phase-B shell surface — Slice 3 (attach affordance UI) — DONE (2026-06-26)
+
+The filler half: the producer of a normalized `property_card` + the api call that makes the Slice-2
+selector reachable. **Affordance decision = a manual entry form** — the only buildable producer now
+(URL-paste needs engine #9 / Tìm Nhà needs #8, both unbuilt) and the **foundational** one: every richer
+source POSTs the *same* `property_card` contract, so the form is the substrate they reduce to (the engine
+handler already frames the producer as a deferred, swappable unit, §12). Within constraint-3's spirit
+(user-initiated single-property input, not scraping-at-scale).
+
+- **api (`api.ts`).** `attachProperty(planCardId, property)` → `POST /api/plan-cards/:id/properties`;
+  `PropertyCardInput {price, suburb, state, property_type, year_built?, land_size?, strata?}`; discriminated
+  `AttachOutcome` surfacing the meter **402 (`over_limit`, carrying tier/used/limit)**, **409 (`busy`)**,
+  **400 (`invalid`, with engine detail)** distinctly — attach is an **agent turn** (it emits `usage`), so
+  it's gated like `ask` (Slice 1's proxy; [[firsthomey-billing-architecture]]).
+- **UI (`PlanProjection.svelte`).** A `+ Attach property` button in a `pp-propbar` beside the selector,
+  shown only for the investor blueprint (`supportsPhaseB = blueprint_slug === 'investor-domestic-au'`,
+  mirroring the engine's Slice-A-exact `supports_phase_b/1` — a Mode-A card would 400). Opens the
+  **existing reusable `Modal`** with the entry form (required price/suburb/state/property_type seeded from
+  the projected suburb; optional year/land/strata). On 202 it **seeds the addendum with the submitted
+  `property_card`** (selector shows the new property immediately, honest-partial empty components → PENDING)
+  + selects it + `turnDone=false`; the per-property `component_filled` events stream in over the **same
+  open SSE** (Slice 2's `onComponentFilled` routes them by `property_id`, preserving the seeded card). No
+  re-subscribe, no new renderer, no new control (reuse REDUCES surface area).
+- **Type reconcile (`planCard.ts`).** `PropertyCard.strata` widened to `boolean | Record<…> | null` —
+  the manual form writes a boolean flag (the engine echoes the submitted card into the addendum), so the
+  stored type matches what the producer actually writes ([[reason-from-materialized-ground]]).
+- **Copy (`i18n.ts`).** Bilingual form labels + 5 property-type labels + 4 calm error messages.
+
+**Verified.** `svelte-check` **0 errors / 0 warnings**, `npm run build` green, `svelte-autofixer` clean.
+**Capstone now provable** (attach → overlay → per-property render, EN+VI) — best as a full-stack live
+run with the engine + sidecar up; the unit logic is type-checked and grounded against the §12 contract.
+
 ## Deferred out (honest — first-exercising instance is Mode B/D, not here)
 
 `off_title_parties[]` (array vs A's scalar `non_buying_partner`), `visa_class`, off-title
