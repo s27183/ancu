@@ -348,7 +348,7 @@ Mode C's base plan is sharper than Mode A's because investor reasoning often hap
 
 **Inputs:** `investor_profile.outcome` + `property_fit_investor.outcome`
 
-**KB anchors:** `kb.investor.strategy-archetypes`, `kb.investor.gearing-types-and-implications`, `kb.investor.hold-period-considerations`, `kb.investor.exit-strategy-options`
+**KB anchors:** `kb.investor.strategy-archetypes`, `kb.investor.gearing-types-and-implications`, `kb.investor.hold-period-considerations`, `kb.investor.exit-strategy-options`, `kb.investor.target-yield-by-archetype`
 
 **Renderer:** `summary-card`
 
@@ -781,7 +781,30 @@ Same as [Mode A buying_strategy](fhb-domestic-au.md#6-buying_strategy) with thes
 }
 ```
 
-**Outcome schema:** `bid_plan_investor` (same as Mode A bid_plan with added `yield_anchored_max_price` and `thesis_alignment` fields)
+**Outcome schema:** `bid_plan_investor` (Mode A `bid_plan` + the two investor fields `yield_anchored_max_price` and `thesis_alignment`)
+
+```jsonc
+{
+  "type": "bid_plan_investor",
+  "fields": {
+    // --- the investor-specific yield discipline (resolver; removed from the LLM's reach) ---
+    "yield_anchored_max_price": "money_range",   // = annual_rent × 100 ÷ target_gross_yield; a BAND because rent is a band (Slice B0 convention)
+    "thesis_alignment": "enum",                  // actual price vs the anchored band → aligned | stretched | misaligned
+
+    // --- Mode A bid_plan fields, investor-typed ---
+    "max_bid_value": "money_range",              // = the yield-anchored band (the discipline line, NOT "bid this"); resolver
+    "max_bid_confidence": "percentage_0_100",    // honest-partial null (needs market depth not wired)
+    "max_bid_reasoning": "localized_text",       // bilingual yield-anchor frame via kb.copy.buying-strategy (no English literal in code)
+    "walk_away_price": "money_range",            // = the yield-anchored band (walk away above it); resolver
+    "negotiation_style": "enum",                 // the ONE agent leaf (reasoning_domain: negotiation)
+    "live_coach_armed": "bool",                  // false (live-coach feature not built)
+    "conditions_to_request": "array<localized_text>",  // standard investor offer conditions, bilingual via kb.copy
+    "red_flags_to_monitor": "array<localized_text>"    // PLACED from property_fit_investor.key_concerns (already {vi,en}) — place-don't-recompute
+  }
+}
+```
+
+> **The figure posture (§98, [[verify-regulated-figures-by-postcondition]]).** Every money figure here is **resolver-computed and removed from the LLM's reach** — the agent's output schema (`NegotiationLeaves`) carries only `recommended_style`, so it has no slot for a price. `max_bid_value`/`walk_away_price` are the *yield-anchored discipline line* (the price at which the property meets the investor's target gross yield), not an instruction to bid; they are surfaced as **bands** because the rent input is a band. Property price is **not** a financial product (the ASIC/AFSL personal-liability line governs the finance/credit side — `mortgage_finance`/`eligibility`); the relevant constraint here is ACL misleading-conduct, met by computing from KB methodology + the bilingual decision-support framing. `buying_strategy` is nonetheless marked `advice_adjacent` (→ ASIC `boundary_held`) as a consistent decision-support hedge.
 
 ---
 

@@ -244,6 +244,20 @@ class EntityStructuringLeaves(BaseModel):
     recommended_entity: OwnershipEntity  # single-valued enum (schema-as-constraint)
 
 
+# --- the negotiation agent schema: the ONE judgment leaf ONLY (buying_strategy, Mode C) ------
+# buying_strategy is TWO-PATH: the resolver owns every money figure (the yield-anchored price
+# band, max_bid/walk_away, conditions, placed red flags — removed from the LLM's reach, §98) and
+# appears in <resolver_outcome> (read-only). This module suggests ONLY the negotiation STYLE — a
+# single enum, no number field, so the LLM structurally cannot author a price. Options mirror the
+# bid_plan_investor blueprint enum (negotiation_style.recommended_style).
+NegotiationStyle = Literal["assertive", "patient", "early_offer", "low_anchor",
+                           "thesis_walk_away"]
+
+
+class NegotiationLeaves(BaseModel):
+    negotiation_style: NegotiationStyle  # single-valued enum (schema-as-constraint)
+
+
 # --- the property_fit agent schema: the Phase-B per-property leaves (Slice A) ----
 # property_assessment is TWO-PATH but with a DIFFERENT figure posture from the other Mode-C
 # components ([[match-enforcement-grade-to-property-kind]]): the resolver copies the neutral
@@ -376,6 +390,13 @@ _KB_DOCS = {
         _REPO_ROOT / "docs" / "kb" / "property" / "comparables-methodology.md",
     "kb.strata.health-indicators-investor-lens":
         _REPO_ROOT / "docs" / "kb" / "strata" / "health-indicators-investor-lens.md",
+    # negotiation (Mode C, Phase B) — the bid-discipline + market-condition negotiation docs the
+    # buying_strategy negotiation-style leaf grounds in. The yield-anchored pricing figure itself
+    # is resolver-owned (kb.investor.yield-anchored-pricing drives fh_engine_buying, not the agent).
+    "kb.investor.bid-discipline":
+        _REPO_ROOT / "docs" / "kb" / "investor" / "bid-discipline.md",
+    "kb.negotiation.patterns-by-market-condition":
+        _REPO_ROOT / "docs" / "kb" / "negotiation" / "patterns-by-market-condition.md",
 }
 
 
@@ -678,6 +699,54 @@ clearly points elsewhere. Respect the KB's load-bearing drawbacks (trapped losse
 trusts, no CGT discount in a company, SMSF restrictions).
 4. Emit ONLY the single leaf.""",
     },
+    # negotiation is the agent half of the `buying_strategy` component (Mode C, Phase B,
+    # TWO-PATH): the renderer, the kb_versions audit, and EVERY money figure (the yield-anchored
+    # price band, max_bid/walk_away, the conditions, the placed red flags) are resolver-owned (in
+    # <resolver_outcome>, read-only); this module suggests ONLY the single negotiation STYLE. No
+    # number field → no price the LLM could author. Decision-support, never advice.
+    "negotiation": {
+        "kb_slugs": ["kb.investor.bid-discipline",
+                     "kb.negotiation.patterns-by-market-condition"],
+        "context": """\
+You are the agent half of the `buying_strategy` component (reasoning_domain: negotiation), for \
+a Vietnamese-Australian DOMESTIC property investor who has attached a specific property. The \
+renderer and EVERY money figure — the yield-anchored max price band, the max-bid / walk-away \
+lines, the offer conditions, the red flags — are the engine resolver's and appear in \
+`<resolver_outcome>` (read-only). You reason about EXACTLY ONE qualitative thing: the \
+negotiation STYLE that best fits this investor and this property's thesis alignment. Your \
+inputs are the property fit + the investor's thesis (`<plan_card_state>` / \
+`<resolver_outcome>`) grounded in the bid-discipline + negotiation-pattern KB.""",
+        "goal": """\
+Suggest ONLY `negotiation_style` (exactly one of the five styles) — the negotiation approach \
+grounded in the bid-discipline KB, the market-condition patterns, and how the property's price \
+sits against the yield-anchored band (`thesis_alignment` in `<resolver_outcome>`). Nothing \
+else — no price, no max bid, no walk-away figure, no conditions (those are the resolver's and \
+already in `<resolver_outcome>`).""",
+        "non_negotiables": """\
+1. **Decision-support, NEVER advice (ASIC/ACL line).** You suggest a negotiation POSTURE to \
+consider, never an instruction. Never tell the investor what to bid (the resolver owns the \
+yield-anchored discipline band; you do not touch it), never present a style as a directive.
+2. **Author no figure.** You do NOT produce a price, max bid, walk-away, percentage, or dollar. \
+Your output schema has no number field — keep it that way. Every figure is resolver-computed and \
+already in `<resolver_outcome>`.
+3. **Ground the style in the thesis alignment.** Read `thesis_alignment` in `<resolver_outcome>`: \
+`aligned` (price at/below the yield-anchored band) supports a more assertive / early-offer \
+posture; `stretched` (within the band) favours patience or a low anchor; `misaligned` (above the \
+band) points to `thesis_walk_away` — the discipline the KB calls for. Respect the KB's \
+load-bearing point: an investor's edge is walking away, not winning the auction.
+4. **Pick from the enum, exactly one.** `negotiation_style` ∈ {assertive, patient, early_offer, \
+low_anchor, thesis_walk_away}.
+5. **Emit only the single-leaf object** (see `<output>`).""",
+        "procedure": """\
+1. Read `<plan_card_state>` (the investor + their thesis) and `<resolver_outcome>` (the \
+property fit, the yield-anchored band, and `thesis_alignment`), plus the bid-discipline + \
+negotiation-pattern KB.
+2. Weigh how the property's price sits against the yield-anchored band (thesis_alignment) and \
+the prevailing market condition.
+3. Choose the `negotiation_style` that best fits, grounded in the KB — default to discipline \
+(patient / low_anchor / thesis_walk_away) when the price is stretched or misaligned.
+4. Emit ONLY the single leaf.""",
+    },
     # property_fit is the agent half of the `property_assessment` component (Mode C, Phase B —
     # the per-property keystone). UNLIKE the other Mode-C fills it DOES author a number: the
     # weekly-rent BAND, an irreducible market estimate (no rule pins it, no median-rent feed is
@@ -862,6 +931,17 @@ _TAX_COMPONENT = {
     "inputs": ["profile.outcome (investor profile)",
                "resolver_outcome (the tax_optimised_structure scaffold: the CGT determinants "
                "+ null property/seam-deferred money — the agent fills none of these)"],
+    "reads": "upstream DAG outcomes only (not upstream parameters) — §11.9",
+}
+_BUYING_COMPONENT = {
+    "component_id": "buying_strategy",
+    "goal": "Suggest the single negotiation-style leaf (negotiation_style) for a domestic "
+            "investor on an attached property — a posture to consider, grounded in bid "
+            "discipline and the property's thesis alignment. Author no figure — the "
+            "yield-anchored price band + every money figure are resolver-owned.",
+    "inputs": ["property_fit_investor.outcome + strategy_thesis + budget_envelope_investor",
+               "resolver_outcome (the bid_plan_investor scaffold: the yield-anchored band, "
+               "thesis_alignment, conditions, placed red flags — the agent fills none of these)"],
     "reads": "upstream DAG outcomes only (not upstream parameters) — §11.9",
 }
 _PROPERTY_COMPONENT = {
@@ -1104,6 +1184,59 @@ async def fill_tax_structure(upstream_outcomes, resolver_outcome):
     return leaves.model_dump(), usage
 
 
+async def fill_buying_strategy(upstream_outcomes, resolver_outcome):
+    """Two-path agent half of `buying_strategy` (Mode C, Phase B, reasoning_domain negotiation):
+    one real Agent-SDK structured one-shot suggesting ONLY the single negotiation-style leaf
+    (negotiation_style) — a posture to consider, grounded in bid discipline + the property's
+    thesis alignment. The renderer, the kb_versions audit, the yield-anchored price band, and
+    every dollar are resolver-owned and passed in as `resolver_outcome` (read-only grounding).
+    output_format = the single-leaf enum schema (no number field → no price the LLM could author,
+    the §98 posture). Returns (leaves_dict, usage_dict) — same shape the other two-path fills
+    return."""
+    import time
+    _t0 = time.monotonic()
+    from claude_agent_sdk import ClaudeAgentOptions, ResultMessage, query
+    _t_import = time.monotonic()
+
+    options = ClaudeAgentOptions(
+        model=LEAF_MODEL,
+        effort=LEAF_EFFORT,   # bound reasoning depth (else opus thinks for minutes)
+        system_prompt=build_system_prompt("negotiation", _kb_block("negotiation")),
+        setting_sources=[],   # do NOT load CLAUDE.md / project settings
+        allowed_tools=[],     # leaf-fill pulls no tools
+        env=_credit_env(),    # subscription-credit auth, subprocess-scoped
+        output_format={"type": "json_schema",
+                       "schema": NegotiationLeaves.model_json_schema()},
+    )
+
+    async def _consume():
+        structured = None
+        usage = {}
+        async for message in query(
+                prompt=build_user_content(_BUYING_COMPONENT, upstream_outcomes,
+                                          resolver_outcome),
+                options=options):
+            if isinstance(message, ResultMessage):
+                structured = getattr(message, "structured_output", None)
+                usage = getattr(message, "usage", {}) or {}
+        return structured, usage
+
+    try:
+        structured, usage = await asyncio.wait_for(_consume(), timeout=LEAF_TIMEOUT_S)
+    except asyncio.TimeoutError:
+        raise RuntimeError(f"leaf-fill exceeded {LEAF_TIMEOUT_S}s app-side timeout")
+
+    if structured is None:
+        raise RuntimeError("Agent SDK returned no structured_output")
+
+    _t_query = time.monotonic()
+    print(f"[planner] buying_strategy(negotiation): "
+          f"sdk_import={_t_import - _t0:.1f}s query={_t_query - _t_import:.1f}s "
+          f"model={LEAF_MODEL} effort={LEAF_EFFORT}", file=sys.stderr, flush=True)
+    leaves = NegotiationLeaves(**structured)  # raises ValidationError if off
+    return leaves.model_dump(), usage
+
+
 async def fill_property_assessment(upstream_outcomes, resolver_outcome, property_card):
     """Two-path agent half of `property_assessment` (Mode C, Phase B, reasoning_domain
     property_fit): one real Agent-SDK structured one-shot authoring the per-property leaves —
@@ -1170,13 +1303,15 @@ async def fill_property_assessment(upstream_outcomes, resolver_outcome, property
 # sends `fill_component` with the upstream outcomes that component reads, and resumes
 # the walk on `fill_done`. The sidecar is single-shot: fill one, emit, exit (P3).
 
-# reasoning_domain -> the real fill coroutine. lender_fit (mortgage_finance, Mode A) and
-# investment_thesis (investment_strategy, Mode C) are wired; valuation / negotiation /
-# document_significance arrive with the per-property components.
+# reasoning_domain -> the real fill coroutine. lender_fit (mortgage_finance, Mode A),
+# investment_thesis (investment_strategy), entity_structuring (tax_structure) and negotiation
+# (buying_strategy) are wired; document_significance (due_diligence) arrives with the remaining
+# trigger-gated per-property components.
 _FILLERS = {
     "lender_fit": ("mortgage_finance", fill_mortgage_finance),
     "investment_thesis": ("investment_strategy", fill_investment_strategy),
     "entity_structuring": ("tax_structure", fill_tax_structure),
+    "negotiation": ("buying_strategy", fill_buying_strategy),
 }
 
 

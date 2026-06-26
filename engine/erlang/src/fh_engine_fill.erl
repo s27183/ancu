@@ -22,6 +22,7 @@
 -export([resolver/3, has_resolver/1, merge_agent/3, agent_values_from_outcome/2]).
 
 -define(COPY, <<"kb.copy.profile">>).   %% buyer_profile bilingual copy-templates (bilingual-content.md §3b)
+-define(TARGET_YIELD, <<"kb.investor.target-yield-by-archetype">>).  %% labelled-placeholder defaults
 
 %% Does this component have a resolver fill? Empty `agent_leaves` → pure resolver;
 %% non-empty + has_resolver → TWO-PATH (the turn runs the resolver, then folds the
@@ -43,6 +44,7 @@ has_resolver(<<"purchase_journey">>)   -> true;
 has_resolver(<<"preparation">>)        -> true;
 has_resolver(<<"phase_playbook">>)     -> true;
 has_resolver(<<"disposition">>)        -> true;
+has_resolver(<<"buying_strategy">>)    -> true;
 has_resolver(_)                        -> false.
 
 -spec resolver(binary(), map(), map()) -> {map(), binary(), [map()]}.
@@ -76,6 +78,8 @@ resolver(<<"phase_playbook">>, Args, Upstream) ->
     fh_engine_phase_playbook:fill(Args, Upstream);
 resolver(<<"disposition">>, Args, Upstream) ->
     fh_engine_disposition:fill(Args, Upstream);
+resolver(<<"buying_strategy">>, Args, Upstream) ->
+    fh_engine_buying:fill(Args, Upstream);
 resolver(Other, _Args, _Upstream) ->
     erlang:error({no_resolver_fill_for, Other}).
 
@@ -91,10 +95,17 @@ merge_agent(<<"mortgage_finance">>, ResolverOutcome, AgentValues) ->
 %% targets, the alignment verdict, the carried horizon) is the resolver scaffold's and is
 %% left untouched (the agent authors NO figure, NO verdict — the §98 property here too).
 merge_agent(<<"investment_strategy">>, ResolverOutcome, AgentValues) ->
+    Archetype = maps:get(<<"archetype">>, AgentValues, null),
     ResolverOutcome#{
-        <<"archetype">>    => maps:get(<<"archetype">>, AgentValues, null),
+        <<"archetype">>    => Archetype,
         <<"gearing_type">> => maps:get(<<"gearing_type">>, AgentValues, null),
-        <<"one_liner">>    => maps:get(<<"one_liner">>, AgentValues, null)
+        <<"one_liner">>    => maps:get(<<"one_liner">>, AgentValues, null),
+        %% target_gross_yield is DERIVED from the agent's archetype via the labelled-placeholder
+        %% KB defaults (kb.investor.target-yield-by-archetype) — the archetype is the agent's, the
+        %% mapping to a number is the resolver's, so the figure stays out of the LLM's reach (§98).
+        %% This is what makes buying_strategy's yield-anchored discipline non-dormant. null for
+        %% land_banking (not yield-driven) and for an absent archetype (honest-partial).
+        <<"target_gross_yield">> => target_yield_for(Archetype)
     };
 %% tax_structure: the SINGLE entity_structuring leaf the sidecar authored
 %% (recommended_entity). Slot-scoped fold — the agent reach is exactly this one judgment
@@ -126,6 +137,15 @@ merge_agent(<<"property_assessment">>, ResolverOutcome, AgentValues) ->
         <<"key_concerns">>                 => maps:get(<<"key_concerns">>, AgentValues, null),
         <<"rental_yield_gross_estimate">>  => gross_yield(Rent, Price)
     };
+%% buying_strategy: the SINGLE negotiation leaf the sidecar authored (negotiation_style).
+%% Slot-scoped fold — the agent reach is exactly this one judgment field; every money figure
+%% (the yield-anchored band, max_bid/walk_away, the conditions, the placed red flags) is the
+%% resolver's and is left untouched (§98 — the agent authors NO price, NO figure).
+merge_agent(<<"buying_strategy">>, ResolverOutcome, AgentValues) ->
+    ResolverOutcome#{
+        <<"negotiation_style">> =>
+            maps:get(<<"negotiation_style">>, AgentValues, null)
+    };
 merge_agent(Other, _ResolverOutcome, _AgentValues) ->
     erlang:error({no_agent_merge_for, Other}).
 
@@ -151,6 +171,11 @@ agent_values_from_outcome(<<"investment_strategy">>, Stored) ->
 %% call — the agent re-authors nothing.
 agent_values_from_outcome(<<"tax_structure">>, Stored) ->
     #{<<"recommended_entity">> => maps:get(<<"recommended_entity">>, Stored, null)};
+%% buying_strategy: recover the single negotiation leaf verbatim from the snapshot (the inverse
+%% of merge_agent/3) so a resolver-only refresh re-runs the scaffold (fresh anchored band off
+%% the current rent + thesis) and re-attaches the stored style WITHOUT a sidecar call.
+agent_values_from_outcome(<<"buying_strategy">>, Stored) ->
+    #{<<"negotiation_style">> => maps:get(<<"negotiation_style">>, Stored, null)};
 %% property_assessment: recover the eight agent leaves verbatim from the snapshot (the
 %% inverse of merge_agent/3 above). A per-property resolver-only refresh (Slice B+) re-runs
 %% the resolver half (re-copies the facts, RE-COMPUTES the yield from the recovered rent +
@@ -382,7 +407,8 @@ investment_strategy(Upstream) ->
         [<<"kb.investor.strategy-archetypes">>,
          <<"kb.investor.gearing-types-and-implications">>,
          <<"kb.investor.hold-period-considerations">>,
-         <<"kb.investor.exit-strategy-options">>]),
+         <<"kb.investor.exit-strategy-options">>,
+         <<"kb.investor.target-yield-by-archetype">>]),
     {Outcome, <<"summary-card">>, KbVersions}.
 
 %% --- tax_structure (Mode C, two-path RESOLVER half — base-spine presence) ----
@@ -835,3 +861,16 @@ num0(_)                   -> 0.
 -spec copy(binary(), #{binary() => fh_engine_i18n:param()}) -> fh_engine_i18n:localized().
 copy(Id, Params) ->
     fh_engine_i18n:subst(fh_engine_kb:copy(?COPY, Id), Params).
+
+%% the default target gross yield for an archetype, from the labelled-placeholder KB defaults
+%% (kb.investor.target-yield-by-archetype). null for land_banking (not yield-driven) and for an
+%% absent/unknown archetype (honest-partial). The archetype is the agent's; this mapping to a
+%% number is the resolver's (§98 — the figure stays out of the LLM's reach).
+%% the default target gross yield for an archetype, from the labelled-placeholder KB defaults
+%% (kb.investor.target-yield-by-archetype), via the existing param/2. The archetype is schema-
+%% constrained to the six enum values (each has a param; land_banking's value is null = not
+%% yield-driven); a null/absent archetype → null (honest-partial). The archetype is the agent's;
+%% this mapping to a number is the resolver's (§98 — the figure stays out of the LLM's reach).
+target_yield_for(Archetype) when is_binary(Archetype) ->
+    param(?TARGET_YIELD, <<"target_gross_yield_", Archetype/binary>>);
+target_yield_for(_) -> null.

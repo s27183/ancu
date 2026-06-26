@@ -593,11 +593,13 @@ full-stack live, EN+VI, against real Opus.**
 
 ## Phase B — per-property build plan (the `property_assessment` keystone)
 
-**Status: Slice A + B0/B1 + B2 + B3a/B3b/B3c DONE 2026-06-25 (B0/B1/B3* full-stack live-proven; B2
-proven deterministically below the live LLM — the full-stack seam is environment-blocked, see B2
-note); the other per-property components deferred.** The per-property financial spine now computes
-end-to-end for an attached property (acquire → hold → dispose), gated only by the regulated CGT
-`to_verify`. The base spine (P5) owns every property-agnostic
+**Status: Slice A + B0/B1 + B2 + B3a/B3b/B3c + C DONE — full-stack live-proven (the 28-event Phase-B
+turn PASSES against the real planner, exit 0; the earlier "environment-blocked" read was a stub-config
+misdiagnosis, corrected in the B2/C notes); `due_diligence` + `settlement_prep` (both prose-only
+schemas) deferred.** The per-property financial
+spine now computes end-to-end for an attached property (acquire → hold → dispose), gated only by the
+regulated CGT `to_verify`, plus the investor **bid plan** (yield-anchored discipline). The base spine
+(P5) owns every property-agnostic
 figure; Phase B is what a *specific property* unblocks. Grounded against the live engine: the artifact
 already carries `property_assessment`'s registry + the `property_fit_investor` outcome schema (validated
 when the investor blueprint went in-scope; all 6 KB anchors resolve). The codebase has Phase-B
@@ -665,6 +667,13 @@ per-property namespace. So Phase B is greenfield *runtime* on an already-compile
     from the plan):** the entity-cost `setup_costs`/`annual_compliance_cost` are entity-dependent (class b),
     not rent-dependent — left null/scalar, deferred to an entity-cost unit. The announced NG reform flag has
     no outcome field → flagged as a separate blueprint-schema + renderer unit.
+- **Slice C — `buying_strategy` investor bid plan — DONE 2026-06-26** (detail below). The first of the three
+  trigger-gated per-property components, un-deferred (eager-in-attach + honest-partial, like the figure cluster).
+  Foundation-first: authored the prose-only `bid_plan_investor` outcome_schema (10 fields) + the `negotiation`
+  planner domain + `kb.copy.buying-strategy`. Resolver owns the **yield-anchored discipline band** (= annual_rent
+  × 100 ÷ target_gross_yield, removed from the LLM's reach) + `thesis_alignment`; the one agent leaf is
+  `negotiation_style`. `due_diligence` (upload pipeline) + `settlement_prep` (reads `bid_plan_investor`) remain
+  prose-only / deferred.
 - **Deferred by trigger:** #5 and the real property *sources* (URL-paste = CLAUDE.md item 9; curator push =
   item 8). Slice A proves the contract with a **hand-fed normalized property_card** in a harness — exactly
   how the onboarding turn was proven (`investor_seam_smoke` feeds inputs). The engine's contract is "given a
@@ -928,16 +937,85 @@ green: `yield` 67, `cash_position_investor` 43, `disposition` 87, FHB `cash_duty
 base_resolver/resolver-only paths the two-path refactor touches) green; `rebar3 compile` + `erlang-checker`
 clean; artifact recompiled (3 fields → `money_range`).
 
-**Full-stack seam — environment-blocked, NOT a B2 regression.** `property_assessment_seam` fails today at
-`property_assessment`'s **live-LLM** rent band coming back `null` (line 144) — and the **committed baseline
-(d18659b) fails identically** when re-run, so the block is a live-sidecar/Anthropic-environment issue
-independent of B2 (the same flaky/degraded live fill the B3c note observed). Per proportionate verification,
-B2's per-property wiring is proven at the layer below the live model (the wiring smoke + the unit conformance
-driving the real producer). **Residue to close when the live sidecar recovers:** re-run
-`property_assessment_seam` (now expects **23 events** — 5 components; tax_structure adds gate×3 + filled, NO
-usage since it's resolver-only) to confirm the gen_statem end-to-end (the addendum carries `tax_structure`
-with `fill_path=two_path`, the reused entity, and `negative_gearing_active` off the live cash flow). The seam
-assertions are already in place.
+**Full-stack seam — was a STUB-config issue, now PASSES live (corrected 2026-06-26).** `property_assessment_
+seam` was failing at `property_assessment`'s rent band coming back `null` (line 144). The original note here
+called this "environment-blocked / degraded live LLM" — **that was a misdiagnosis** (a cause asserted without
+reading the ground truth, [[debug-ground-truth-before-theorizing]]). The actual cause: the seam was running the
+**stub** sidecar. `fh_engine_turn:planner_script/0` defaults to `planner_stub.py` when `FH_PLANNER_SCRIPT` is
+unset (and `.env` doesn't set it); the stub returns every agent leaf `null` by design (the `usage` event
+recorded `"model": "stub", 0 tokens` the whole time — the tell I should have read). The "committed baseline
+fails identically" fact was real but meant "both ran the stub," not "the model is degraded." **Run against the
+real planner** (`FH_PLANNER_SCRIPT=engine/python/planner.py` + `FH_SIDECAR_PYTHON=.venv/bin/python3`) the seam
+**PASSES** (exit 0; real Opus authored the rent band). The event
+count moved 23 → **28** when Slice C added `buying_strategy` (below).
+
+### Slice C — `buying_strategy` investor bid plan — DONE (2026-06-26)
+
+**The first of the three remaining per-property components — un-deferred.** The plan marked
+`buying_strategy`/`due_diligence`/`settlement_prep` "deferred by trigger" (bid readiness / doc upload /
+contract signed). Grounding showed `buying_strategy` is the dependency-clean head (`settlement_prep` reads its
+`bid_plan_investor`; `due_diligence` is genuinely blocked on the unbuilt upload pipeline) and that it fits the
+figure-cluster pattern: eager in the property-attach turn, honest-partial, the "bid readiness" trigger becoming
+a refine-turn refinement rather than a gate on existence. The defining value is **yield-anchored bid
+discipline**.
+
+**Foundation-first (the schema didn't exist).** `bid_plan_investor` was *prose-only* in the blueprint ("same
+as Mode A `bid_plan` + 2 fields") — no `outcome_schema` fenced block, so the compiler never materialized it
+(not in the registry). Step 1 was authoring the explicit 10-field block; same for the planner (no `negotiation`
+reasoning_domain existed). The two other deferred components are still prose-only by the same token.
+
+**The figure posture (§98, [[verify-regulated-figures-by-postcondition]]).** Every money figure is
+resolver-computed in the new `fh_engine_buying` module and **removed from the LLM's reach** — the agent schema
+(`NegotiationLeaves`) carries only `negotiation_style`, so it has no slot for a price:
+- **`yield_anchored_max_price`** (`money_range`) = `annual_rent × 100 ÷ strategy_thesis.target_gross_yield`, a
+  **band** because rent is a band (the B0 convention). `max_bid_value` / `walk_away_price` ARE this band — the
+  discipline line ("above this your thesis breaks"), **not** "bid this".
+- **`thesis_alignment`** (enum) classifies the attached price against the band: `aligned` (≤ low end),
+  `stretched` (within), `misaligned` (> high end).
+- **`conditions_to_request`** / **`max_bid_reasoning`** are bilingual via the new `kb.copy.buying-strategy`
+  doc (no English/VI literal in code, the `fh_engine_i18n:subst` pattern); **`red_flags_to_monitor`** PLACES
+  `property_fit_investor.key_concerns` ({vi,en} already — place-don't-recompute).
+- **Honest-partial:** absent rent OR yield → anchored figures null; absent price → alignment null;
+  `max_bid_confidence` null (market depth not wired). No figure fabricated.
+
+**The ASIC/ACL grounding (corrected from reflex).** A property bid figure is **not** an ASIC/AFSL matter — real
+property is not a financial product; the AFSL/ACL personal-liability line governs the *finance/credit* side
+(`mortgage_finance`/`eligibility`). The constraint here is **ACL misleading-conduct**, met by computing from KB
+methodology + the bilingual decision-support framing. `buying_strategy` is still added to
+`fh_engine_compliance:advice_adjacent/1` (→ ASIC `boundary_held`) as a consistent decision-support hedge.
+
+**Runtime wiring.** Added to `property_components/1` last (PA → yield → tax → cash → disposition →
+**buying_strategy**); per-property scope → `two_path_stored_leaf/2` returns `fresh` (its `bid_plan_investor`
+outcome_type is not a base seed) → the sidecar runs for the one negotiation leaf. `fill_path = two_path`. The
+planner gains the `negotiation` domain (KB: `kb.investor.bid-discipline` + `kb.negotiation.patterns-by-market-
+condition`; the style grounds in `thesis_alignment` — discipline when stretched/misaligned), `NegotiationLeaves`,
+`_BUYING_COMPONENT`, `fill_buying_strategy`, and the `_FILLERS["negotiation"]` dispatch.
+
+**Verified.** New **`buying_strategy_conformance` 37/37** (the worked example: rent `[620,720]` @ 4.0% target →
+anchored band `[806000, 936000]`; `$920k` → `stretched`; the full aligned/stretched/misaligned classification
+incl. boundaries; honest-partial nulls; Layer-1 conformance of scaffold + merged; two-path merge folds only the
+style, an adversarial stray price key is dropped §98). **`phase_b_wiring_smoke` 19/19** (DAG position + the
+`fresh` decision for `buying_strategy`). Regression green: `tax_structure` 61, `outcome` 25+11, `disposition`
+87, `base_components_investor` 19; `rebar3 compile` + `erlang-checker` (new module) clean; planner imports with
+the negotiation filler; artifact recompiled. **Full-stack: the live seam PASSES against the real planner**
+(exit 0, real Opus — rent `[590,670]`, `negotiation_style` authored live; `buying_strategy` fires last as
+two-path-fresh, gate×3 + filled + usage). The earlier "environment-blocked" read was a stub-config
+misdiagnosis (see the corrected B2 note above).
+
+**The `target_gross_yield` unblock (a) — what made the anchor non-dormant.** Implementing `buying_strategy`
+walked a spec seam: its defining figure (`yield_anchored_max_price`) needs `target_gross_yield`, which was a
+hardcoded scaffold `null` in `investment_strategy` that **nothing computed** (the first live run showed
+`anchor=null` — `buying_strategy` honest-partialled correctly, but the value was dormant). Fix (Son's call,
+option (a)): `target_gross_yield` is now **derived in `merge_agent(investment_strategy)` from the agent's
+archetype** via a new **labelled-placeholder** KB doc `kb.investor.target-yield-by-archetype` (indicative
+planning defaults — `cash_flow` 5.5 / `dual_income` 5.0 / `value_add` 4.5 / `balanced` 4.0 / `capital_growth`
+3.0 / `land_banking` null; `is_placeholder: true`, the [[capital-growth-bands]] pattern — **not** market-
+sourced, a tracked re-ground obligation). The archetype is the agent's; the mapping to a number is the
+resolver's → the figure stays out of the LLM's reach (§98). This keeps the yield discipline from being silent
+at base; the investor's own stated target (a future refine input, option (c)) would override it.
+
+**Still deferred:** `due_diligence` (upload pipeline) and `settlement_prep` (reads `bid_plan_investor`, now
+available) — both prose-only schemas.
 
 ## Deferred out (honest — first-exercising instance is Mode B/D, not here)
 

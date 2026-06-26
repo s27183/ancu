@@ -553,10 +553,11 @@ component_scope(_) -> <<"both">>.
 tag_property(Event, undefined) -> Event;
 tag_property(Event, PropId)    -> Event#{<<"property_id">> => PropId}.
 
-%% The per-property component set for a Phase-B turn, in DAG order. Slice A builds ONLY
-%% property_assessment (the keystone producing property_fit_investor); the downstream
-%% `both`-component re-fills (Slice B) and the other per-property components (buying_strategy/
-%% due_diligence/settlement_prep — trigger-gated) are not yet wired. Engine-owned set, like
+%% The per-property component set for a Phase-B turn, in DAG order. Slice A builds the keystone
+%% (property_assessment → property_fit_investor); Slice B the downstream `both`-component re-fills
+%% (yield_modelling/tax_structure/cash_position/disposition); Slice C the investor bid plan
+%% (buying_strategy). The two remaining per-property components (due_diligence/settlement_prep)
+%% are trigger-gated (doc upload / contract signed) and not yet wired. Engine-owned set, like
 %% base_components/1. A non-investor blueprint has no built per-property turn yet → empty.
 property_components(<<"investor-domestic-au">> = Slug) ->
     %% Slice A: property_assessment (the keystone → property_fit_investor).
@@ -572,8 +573,14 @@ property_components(<<"investor-domestic-au">> = Slug) ->
     %% dispose figures); reads cash_position (acquire) + yield_modelling (hold) for the full horizon.
     %% order/2 keeps the canonical order (property_assessment → yield_modelling → tax_structure →
     %% cash_position → disposition); each reads property_fit_investor (in upstream after property_assessment).
+    %% Slice C (buying_strategy): the investor bid plan re-fills per-property — TWO-PATH (the one
+    %% negotiation_style leaf runs the sidecar, fill_path two_path; bid_plan_investor is NOT a base
+    %% outcome → two_path_stored_leaf/2 returns `fresh`). Its RESOLVER half computes the yield-anchored
+    %% discipline band (removed from the LLM's reach) + thesis_alignment, reading property_fit_investor
+    %% (rent/price), strategy_thesis (target_gross_yield), and budget_envelope_investor — all in the
+    %% seed/upstream → runs LAST.
     order(Slug, [<<"property_assessment">>, <<"yield_modelling">>, <<"tax_structure">>,
-                 <<"cash_position">>, <<"disposition">>]);
+                 <<"cash_position">>, <<"disposition">>, <<"buying_strategy">>]);
 property_components(_Slug) ->
     [].
 

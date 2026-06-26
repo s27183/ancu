@@ -31,7 +31,7 @@
 main(_) ->
     ok = fh_engine_kb:load(),
     io:format("investment_strategy conformance — fh_engine_fill (Mode-C two-path)~n~n"),
-    R = lists:flatten([scaffold_cases(), merge_cases(), refresh_cases(),
+    R = lists:flatten([scaffold_cases(), merge_cases(), target_yield_cases(), refresh_cases(),
                        layer1_cases(), no_regression_cases()]),
     Fails = [X || X <- R, X =:= fail],
     io:format("~n================================================================~n"),
@@ -81,15 +81,38 @@ scaffold_cases() ->
            g(O, <<"is_property_aligned_with_thesis">>), null),
      check("alignment_reasoning null (no property at base)", g(O, <<"alignment_reasoning">>), null),
      check("hold_period_years carried from upstream profile (=10)", g(O, <<"hold_period_years">>), 10),
-     check("kb_versions = the four strategy anchors",
+     check("kb_versions = the five strategy anchors (incl. target-yield-by-archetype)",
            lists:sort(KbSlugs),
            lists:sort([<<"kb.investor.strategy-archetypes">>,
                        <<"kb.investor.gearing-types-and-implications">>,
                        <<"kb.investor.hold-period-considerations">>,
-                       <<"kb.investor.exit-strategy-options">>])),
+                       <<"kb.investor.exit-strategy-options">>,
+                       <<"kb.investor.target-yield-by-archetype">>])),
      %% horizon honest-partial: unset onboarding horizon → null (long/indefinite default).
      check("hold_period_years null when upstream horizon unset",
            g(ONull, <<"hold_period_years">>), null)].
+
+%% --- target_gross_yield derivation (Slice C unblock — the labelled-placeholder defaults) ----
+%% target_gross_yield is DERIVED in merge_agent from the agent's archetype via
+%% kb.investor.target-yield-by-archetype (indicative defaults). This is what makes the downstream
+%% buying_strategy yield-anchored discipline non-dormant. The archetype is the agent's; the mapping
+%% to a number is the resolver's (§98). land_banking (not yield-driven) and an absent archetype → null.
+
+derive_yield(Archetype) ->
+    AV = #{<<"archetype">> => Archetype, <<"gearing_type">> => null, <<"one_liner">> => null},
+    M = fh_engine_fill:merge_agent(<<"investment_strategy">>, element(1, scaffold(10)), AV),
+    g(M, <<"target_gross_yield">>).
+
+target_yield_cases() ->
+    [check("cash_flow → 5.5 (highest yield target)",      derive_yield(<<"cash_flow">>), 5.5),
+     check("dual_income → 5.0",                            derive_yield(<<"dual_income">>), 5.0),
+     check("value_add → 4.5",                              derive_yield(<<"value_add">>), 4.5),
+     check("balanced → 4.0",                               derive_yield(<<"balanced">>), 4.0),
+     check("capital_growth → 3.0 (lowest yield target)",   derive_yield(<<"capital_growth">>), 3.0),
+     check("land_banking → null (not yield-driven)",       derive_yield(<<"land_banking">>), null),
+     check("absent archetype → null (honest-partial)",
+           g(fh_engine_fill:merge_agent(<<"investment_strategy">>, element(1, scaffold(10)), #{}),
+             <<"target_gross_yield">>), null)].
 
 %% --- 2. merge (slot-scoped fold; §98 — no figure moved) ---------------------
 
@@ -102,8 +125,12 @@ merge_cases() ->
      check("merge folds gearing_type", g(M, <<"gearing_type">>), <<"negatively_geared">>),
      check("merge folds one_liner (bilingual {vi,en})",
            {maps:is_key(<<"vi">>, OneLiner), maps:is_key(<<"en">>, OneLiner)}, {true, true}),
-     %% the §98 untouched-figure property: the agent merge moves NONE of the resolver fields.
-     check("merge leaves target_gross_yield untouched (null)", g(M, <<"target_gross_yield">>), null),
+     %% target_gross_yield is DERIVED from the agent's archetype via the labelled-placeholder KB
+     %% defaults (capital_growth → 3.0) — the archetype is the agent's, the number is the resolver's
+     %% (§98 — the LLM never authors the figure; it only picks the enum the resolver maps).
+     check("merge DERIVES target_gross_yield from archetype (capital_growth → 3.0)",
+           g(M, <<"target_gross_yield">>), 3.0),
+     %% the other property-relative targets stay null (no derivation wired — honest-partial).
      check("merge leaves target_lvr untouched (null)", g(M, <<"target_lvr">>), null),
      check("merge leaves hold_period_years untouched (=10)", g(M, <<"hold_period_years">>), 10),
      check("merge leaves alignment verdict untouched (null)",

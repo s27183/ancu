@@ -91,8 +91,8 @@ main(_) ->
     %% --- persisted log is the SOT: base + 11 Phase-B events ---
     EventCount = scalar("SELECT count(*) FROM plan_card_events WHERE plan_card_id = $1",
                         [PlanCardId]),
-    expect(EventCount =:= BaseLen + 23,
-           "Phase-B added 23 events (1 + PA[3+1+usage] + yield[3+1] + tax[3+1] + cash[3+1] + disposition[3+1] + 1)"),
+    expect(EventCount =:= BaseLen + 28,
+           "Phase-B added 28 events (1 + PA[3+1+usage] + yield[3+1] + tax[3+1] + cash[3+1] + disposition[3+1] + buying[3+1+usage] + 1)"),
 
     %% --- per-property compliance audit: 3 rows for property_assessment, all clear, two_path,
     %%     ASIC boundary_held (property_assessment is advice_adjacent — it carries a viability verdict) ---
@@ -325,6 +325,49 @@ main(_) ->
               [SaleLo, SaleHi, maps:get(<<"cgt_status">>, Disp),
                maps:get(<<"full_horizon_net_position">>, Disp)]),
 
+    %% --- Slice C: buying_strategy re-filled per-property in the SAME Phase-B turn — TWO-PATH
+    %%     (the one negotiation_style leaf via the sidecar). The RESOLVER half computes the
+    %%     yield-anchored discipline band (removed from the LLM's reach) + thesis_alignment + the
+    %%     bilingual conditions; every money figure is the resolver's (§98) ---
+    BsEntry = maps:get(<<"buying_strategy">>,
+                       maps:get(<<"components">>, Addendum, #{}), undefined),
+    expect(is_map(BsEntry), "buying_strategy snapshotted under the addendum (Slice C)"),
+    expect(maps:get(<<"fill_path">>, BsEntry) =:= <<"two_path">>,
+           "buying_strategy fill_path=two_path (resolver figures + negotiation leaf)"),
+    Bs = maps:get(<<"outcome">>, BsEntry),
+    %% the yield-anchored band is a [lo,hi] off the live rent ÷ target_gross_yield (null only if
+    %% the live rent band itself is null — the same degraded-env tolerance as the figures above).
+    Anchor = maps:get(<<"yield_anchored_max_price">>, Bs),
+    expect(is_list(Anchor) orelse Anchor =:= null,
+           "yield_anchored_max_price is a band (or null if live rent absent)"),
+    %% max_bid_value / walk_away ARE the yield-anchored band by construction (the discipline line).
+    expect(maps:get(<<"max_bid_value">>, Bs) =:= Anchor,
+           "max_bid_value = the yield-anchored band (resolver-computed, never agent-authored §98)"),
+    expect(maps:get(<<"walk_away_price">>, Bs) =:= Anchor,
+           "walk_away_price = the yield-anchored band"),
+    expect(lists:member(maps:get(<<"thesis_alignment">>, Bs),
+                        [<<"aligned">>, <<"stretched">>, <<"misaligned">>, null]),
+           "thesis_alignment in enum (or null if no anchor)"),
+    %% the conditions are resolver-emitted bilingual copy, independent of the rent → always four.
+    Conds = maps:get(<<"conditions_to_request">>, Bs),
+    expect(is_list(Conds) andalso length(Conds) =:= 4,
+           "conditions_to_request = four (resolver bilingual copy, rent-independent)"),
+    %% the agent leaf: an enum style (or null if the live agent declined — degraded-env tolerance).
+    expect(lists:member(maps:get(<<"negotiation_style">>, Bs),
+                        [<<"assertive">>, <<"patient">>, <<"early_offer">>, <<"low_anchor">>,
+                         <<"thesis_walk_away">>, null]),
+           "negotiation_style in enum (the one agent leaf; null tolerated if live agent declined)"),
+    %% buying_strategy is advice_adjacent → ASIC records boundary_held (the ACL decision-support hedge).
+    BsAsic = scalar("SELECT count(*) FROM audit_events WHERE plan_card_id = $1 "
+                    "AND component_id = 'buying_strategy' "
+                    "AND compliance_jsonb->>'gate' = 'asic' "
+                    "AND compliance_jsonb->>'detail' = 'decision_support_boundary_held'",
+                    [PlanCardId]),
+    expect(BsAsic =:= 1, "buying_strategy ASIC records boundary_held (advice_adjacent)"),
+    io:format("live buying_strategy: anchor=~p alignment=~s style=~p~n",
+              [Anchor, maps:get(<<"thesis_alignment">>, Bs),
+               maps:get(<<"negotiation_style">>, Bs)]),
+
     %% --- auth: missing token -> 401; wrong key -> 403 (attach surface too) ---
     {401, _} = req(post, Base ++ "/plan-cards/" ++ binary_to_list(PlanCardId) ++ "/properties",
                    [], PropBody),
@@ -333,7 +376,7 @@ main(_) ->
     {403, _} = req(post, Base ++ "/plan-cards/" ++ binary_to_list(PlanCardId) ++ "/properties",
                    [BadAuth], PropBody),
 
-    io:format("~n==== PROPERTY_ASSESSMENT SEAM (Slice A + B1/B3a yield + B3b cash + B3c disposition): ALL ASSERTIONS PASSED ====~n"),
+    io:format("~n==== PROPERTY_ASSESSMENT SEAM (Slice A + B1/B3a yield + B3b cash + B3c disposition + C buying): ALL ASSERTIONS PASSED ====~n"),
     halt(0).
 
 %% The Phase-B turn (Slice A + B1/B3a + B2 + B3b + B3c): five components, in DAG order.
@@ -354,6 +397,7 @@ expected_phase_b() ->
        Gates, CF,                %% tax_structure       (two_path resolver-only — tax figures refresh)
        Gates, CF,                %% cash_position       (resolver — cash-to-complete)
        Gates, CF,                %% disposition         (resolver — price-aware dispose figures)
+       Gates, CF, <<"usage">>,   %% buying_strategy     (two_path fresh — negotiation leaf via sidecar)
        <<"turn_completed">>]).
 
 %% --- helpers (identical to investor_seam_smoke) ------------------------------

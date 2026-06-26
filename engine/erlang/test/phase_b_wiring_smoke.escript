@@ -50,15 +50,20 @@ position_cases() ->
            Idx(<<"tax_structure">>) < Idx(<<"cash_position">>), true),
      check("tax_structure runs BEFORE disposition (it reads tax determinants)",
            Idx(<<"tax_structure">>) < Idx(<<"disposition">>), true),
-     check("canonical order: PA → yield → tax → cash → disposition",
+     check("property_components includes buying_strategy (Slice C)",
+           lists:member(<<"buying_strategy">>, Names), true),
+     check("buying_strategy runs AFTER cash_position (reads budget_envelope_investor)",
+           Idx(<<"cash_position">>) < Idx(<<"buying_strategy">>), true),
+     check("canonical order: PA → yield → tax → cash → disposition → buying_strategy",
            Names, [<<"property_assessment">>, <<"yield_modelling">>, <<"tax_structure">>,
-                   <<"cash_position">>, <<"disposition">>])].
+                   <<"cash_position">>, <<"disposition">>, <<"buying_strategy">>])].
 
 %% --- 2. the reuse-vs-fresh decision -----------------------------------------
 
 %% comp maps as the artifact/commit shape them (name + outcome_type).
 tax_comp() -> #{<<"name">> => <<"tax_structure">>, <<"outcome_type">> => <<"tax_optimised_structure">>}.
 pa_comp()  -> #{<<"name">> => <<"property_assessment">>, <<"outcome_type">> => <<"property_fit_investor">>}.
+buying_comp() -> #{<<"name">> => <<"buying_strategy">>, <<"outcome_type">> => <<"bid_plan_investor">>}.
 
 decision_cases() ->
     StoredTax = #{<<"recommended_entity">> => <<"discretionary_trust">>},
@@ -74,6 +79,8 @@ decision_cases() ->
            fh_engine_turn:two_path_stored_leaf(PropData, tax_comp()), {reuse, StoredTax}),
      check("property turn + property_assessment NOT in seed → fresh (sidecar)",
            fh_engine_turn:two_path_stored_leaf(PropData, pa_comp()), fresh),
+     check("property turn + buying_strategy NOT in seed → fresh (sidecar for negotiation leaf)",
+           fh_engine_turn:two_path_stored_leaf(PropData, buying_comp()), fresh),
      check("base_resolver turn → reuse stored leaf from existing_outcomes",
            fh_engine_turn:two_path_stored_leaf(RefreshData, tax_comp()), {reuse, StoredTax}),
      check("base (full) turn → fresh (sidecar authors the leaves)",
