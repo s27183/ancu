@@ -150,6 +150,11 @@ const messages = {
     'plan.c.cash_position': { vi: 'Dòng tiền', en: 'Cash position' },
     'plan.c.ownership_planning': { vi: 'Chi phí sở hữu', en: 'Owning the home' },
     'plan.c.ownership_planning_investor': { vi: 'Danh mục & cơ hội', en: 'Portfolio & opportunities' },
+    // Mode-C (investor) base component titles.
+    'plan.c.investor_profile': { vi: 'Hồ sơ đầu tư', en: 'Your investor profile' },
+    'plan.c.investment_strategy': { vi: 'Chiến lược đầu tư', en: 'Investment strategy' },
+    'plan.c.yield_modelling': { vi: 'Lợi suất cho thuê', en: 'Rental yield' },
+    'plan.c.tax_structure': { vi: 'Cấu trúc thuế', en: 'Tax structure' },
 
     // Plan sub-tab labels (short) — the plan sections + Q&A as tabs inside the Plan view.
     'plan.tab.buyer_profile': { vi: 'Hồ sơ', en: 'Profile' },
@@ -183,6 +188,7 @@ const messages = {
     'plan.c.due_diligence': { vi: 'Thẩm định', en: 'Due diligence' },
     'plan.c.settlement_prep': { vi: 'Chuẩn bị bàn giao', en: 'Settlement prep' },
     'plan.c.buying_strategy': { vi: 'Chiến lược ra giá', en: 'Buying strategy' },
+    'plan.c.property_assessment': { vi: 'Đánh giá bất động sản', en: 'Property assessment' },
     'plan.attach_property': {
         vi: 'Phần này mở ra khi bạn gắn một bất động sản cụ thể vào kế hoạch.',
         en: 'This unlocks once you attach a specific property to your plan.'
@@ -665,4 +671,8 @@ const messages = {
 
 export type MessageKey = keyof typeof messages;
 
-export const t = derived(lang, ($lang) => (key: MessageKey) => messages[key][$lang]);
+// Fail-safe: an unauthored key degrades to the literal key string (visible + debuggable)
+// instead of throwing `undefined[$lang]`, which white-screens the whole SPA. The
+// `$t(`prefix.${id}` as 'literal')` cast hides missing keys from svelte-check, so this is
+// the only backstop against a producer-renamed/never-authored id crashing the projection.
+export const t = derived(lang, ($lang) => (key: MessageKey) => messages[key]?.[$lang] ?? key);
