@@ -1,7 +1,7 @@
 ---
 slug: kb.tax.land-tax-by-state
 effective_from: 2025-07-01
-last_verified: 2026-06-23
+last_verified: 2026-06-28
 ---
 
 # Land tax — by state (investment property)
@@ -16,28 +16,28 @@ A second load-bearing point: the **assessment date differs by state** — NSW an
 
 ## By state — the scales
 
-**Primary-verified (the wedge's core states — NSW, VIC, QLD):**
+**Primary-verified (confirmed against the revenue office — NSW, VIC, QLD, WA, TAS):**
 
 | State | Assess date | General threshold | Rate above threshold | Foreign/absentee surcharge |
 |---|---|---|---|---|
 | **NSW** | 31 Dec | **$1,075,000** | **$100 + 1.6%** of value above the threshold (a higher *premium* tier applies above the premium threshold, then 2%) | **5%** surcharge land tax (foreign persons), **no threshold** |
 | **VIC** | 31 Dec | **$50,000** (the lowest — bites early) | general scale from $50,000 (a temporary COVID-debt levy adds a flat surcharge in the lower bands) | **4%** absentee owner surcharge, on top of general/trust rates |
 | **QLD** | 30 Jun | **$600,000** (individuals) | **$500 + 1c per $1** above $600,000 (first band) | **3%** absentee surcharge on land ≥ $350,000 |
+| **WA** | 30 Jun | **$300,000** | **$300** flat ($300k–$420k); **$300 + 0.25%** above $420k; **$1,750 + 0.9%** above $1M; **$8,950 + 1.8%** above $1.8M; **$66,550 + 2.0%** above $5M; **$186,550 + 2.67%** above $11M — **plus metro MRIT 0.14%** of value above $300,000 | **none** (WA levies no foreign/absentee land-tax surcharge) |
+| **TAS** | 1 Jul | **$125,000** | **$50 + 0.45%** of value above $125,000 ($125k–$500k); **$1,737.50 + 1.5%** above $500,000 | **2%** Foreign Investor Land Tax Surcharge (FILTS) on residential General Land |
 
-**Indicative — pending primary verification (SA, WA, TAS, ACT; secondary sources only, not yet confirmed against the revenue office):**
+**Partial — load-bearing threshold confirmed, marginal detail pending (SA, ACT; primary sites bot-walled this pass):**
 
-| State | General threshold (indicative) | Note |
+| State | Confirmed (primary) | Pending |
 |---|---|---|
-| **SA** | ~$833,000 (RevenueSA, adjusted annually) | resolver → `to_verify`; confirm against RevenueSA |
-| **WA** | ~$300,000 (+ metro MRIT 0.14%) | resolver → `to_verify`; confirm against RevenueWA |
-| **TAS** | ~$125,000 | resolver → `to_verify`; confirm against SRO Tasmania |
-| **ACT** | **no tax-free threshold** for investment land (fixed charge + marginal on Average Unimproved Value) | resolver → `to_verify`; confirm against ACT Revenue Office |
+| **SA** | general threshold **$833,000** (RevenueSA 2025-26; trust threshold $25,000); assess 30 Jun | full marginal bracket scale + foreign-surcharge confirmation — RevenueSA HTML/PDF returned 403; confirm the bands against RevenueSA |
+| **ACT** | **no tax-free threshold** for investment land; assessed **quarterly**; fixed charge + marginal on Average Unimproved Value (AUV, 5-year averaged; $1M AUV threshold from 2024; marginal rates unchanged 2025-26) | exact fixed-charge dollar amount + marginal AUV rate brackets + foreign-surcharge — ACT Revenue HTML returned 403; confirm against ACT Revenue Office |
 
 **No land tax:**
 
 - **NT** — the Northern Territory **does not levy land tax** (a clean, load-bearing fact: land tax is nil for NT land).
 
-The resolver **computes** a land-tax estimate for NSW/VIC/QLD from the verified scales and returns **`to_verify`** (with the indicative threshold noted) for SA/WA/TAS/ACT until those scales are primary-verified — it does not assert an exact figure from a secondary source.
+Each state's **threshold** (the aggregation trigger — the load-bearing fact) is now primary-confirmed. WA and TAS additionally carry full primary-verified scales; **SA's marginal scale and ACT's exact figures remain `to_verify`** (the primary sites bot-walled this pass) — the resolver does not assert an exact figure from a secondary source for those two.
 
 ## Trusts and foreign / absentee surcharges
 
@@ -54,12 +54,12 @@ The **foreign/absentee** surcharges are the diaspora hook: a Vietnamese-Australi
 - **Aggregation is the portfolio trap.** Each new property climbs the whole holding up the state's scale; the plan surfaces the combined-value basis so the second purchase's land tax is not modelled as if the property stood alone.
 - **VIC bites early.** At a **$50,000** threshold, Victorian investment land attracts land tax almost immediately — the sharpest per-state trap (also the trap that flips a former VIC home into taxable land once rented, owned by `kb.land-tax.ppor-exemption`).
 - **Trust and foreign surcharges add up.** A trust structure or absentee status adds a recurring annual surcharge — surfaced so the entity choice and residency are weighed against the land-tax cost.
-- **NT is nil; the smaller states are deferred.** The plan states NT has no land tax and returns `to_verify` for SA/WA/TAS/ACT pending primary verification — it does not fabricate a scale.
+- **NT is nil; WA/TAS now primary-verified; SA/ACT detail deferred.** The plan states NT has no land tax, carries primary-verified scales for WA and TAS, and returns `to_verify` for SA's marginal scale and ACT's exact figures pending primary verification — it does not fabricate a scale.
 - **Information, not advice.** The plan estimates land tax from the verified state schedules and points to the state revenue office; it issues no binding assessment.
 
 ## Rules
 
-The resolver rules the artifact compiler extracts as this doc's `content_json` (schema: [architecture.md §11.9](../../architecture/architecture.md#119-blueprint-as-data-model--presentation-specification)). Everything above is `content_md`. This is a **reference doc** — it fills no slot; the land-tax figure is **resolver-computed** from these per-state scales against the property's state and the aggregated holding value (control flow → code, per §11.9), `to_verify` for the pending states. NSW/VIC/QLD scales are REGULATED primary-verified; SA/WA/TAS/ACT are INDICATIVE pending-primary; NT is nil.
+The resolver rules the artifact compiler extracts as this doc's `content_json` (schema: [architecture.md §11.9](../../architecture/architecture.md#119-blueprint-as-data-model--presentation-specification)). Everything above is `content_md`. This is a **reference doc** — it fills no slot; the land-tax figure is **resolver-computed** from these per-state scales against the property's state and the aggregated holding value (control flow → code, per §11.9), `to_verify` for the pending states. NSW/VIC/QLD/WA/TAS scales are REGULATED primary-verified; SA's threshold and ACT's no-threshold structure are primary-verified with their marginal detail pending (`to_verify`); NT is nil.
 
 ```jsonc
 {
@@ -83,10 +83,10 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
         { "state": "NSW", "assess_date": "31_dec", "general_threshold": 1075000, "rate_note": "$100 + 1.6% above threshold; premium tier then 2%", "foreign_surcharge_pct": 5, "verification": "PRIMARY (Revenue NSW)" },
         { "state": "VIC", "assess_date": "31_dec", "general_threshold": 50000,   "rate_note": "general scale from $50k; trust surcharge +0.375% from $25k; absentee +4%", "foreign_surcharge_pct": 4, "verification": "PRIMARY (SRO VIC)" },
         { "state": "QLD", "assess_date": "30_jun", "general_threshold": 600000,  "rate_note": "$500 + 1c/$ above $600k (first band); company/trust threshold $350k", "foreign_surcharge_pct": 3, "verification": "PRIMARY (QRO)" },
-        { "state": "SA",  "assess_date": "30_jun", "general_threshold": 833000,  "rate_note": "indicative — confirm against RevenueSA", "foreign_surcharge_pct": null, "verification": "INDICATIVE — to_verify" },
-        { "state": "WA",  "assess_date": "30_jun", "general_threshold": 300000,  "rate_note": "indicative; + metro MRIT 0.14% — confirm against RevenueWA", "foreign_surcharge_pct": null, "verification": "INDICATIVE — to_verify" },
-        { "state": "TAS", "assess_date": "01_jul", "general_threshold": 125000,  "rate_note": "indicative — confirm against SRO Tasmania", "foreign_surcharge_pct": null, "verification": "INDICATIVE — to_verify" },
-        { "state": "ACT", "assess_date": "quarterly", "general_threshold": 0,    "rate_note": "no tax-free threshold for investment land; fixed charge + marginal on AUV — confirm against ACT Revenue", "foreign_surcharge_pct": null, "verification": "INDICATIVE — to_verify" },
+        { "state": "SA",  "assess_date": "30_jun", "general_threshold": 833000,  "rate_note": "general threshold $833k (trust threshold $25k); marginal bracket scale to_verify — RevenueSA primary site 403 this pass", "foreign_surcharge_pct": null, "verification": "PRIMARY (threshold; RevenueSA 2025-26) — scale to_verify" },
+        { "state": "WA",  "assess_date": "30_jun", "general_threshold": 300000,  "rate_note": "$300 flat $300k-$420k; $300 + 0.25% above $420k; $1,750 + 0.9% above $1M; $8,950 + 1.8% above $1.8M; $66,550 + 2.0% above $5M; $186,550 + 2.67% above $11M; + metro MRIT 0.14% above $300k", "foreign_surcharge_pct": null, "verification": "PRIMARY (Treasury & Finance WA)" },
+        { "state": "TAS", "assess_date": "01_jul", "general_threshold": 125000,  "rate_note": "$50 + 0.45% above $125k ($125k-$500k); $1,737.50 + 1.5% above $500k", "foreign_surcharge_pct": 2, "verification": "PRIMARY (SRO Tasmania, FILTS guideline 2025-12)" },
+        { "state": "ACT", "assess_date": "quarterly", "general_threshold": 0,    "rate_note": "no tax-free threshold for investment land; fixed charge + marginal on AUV (5-yr averaged, $1M AUV threshold); exact fixed-charge + marginal rates to_verify — ACT Revenue primary site 403 this pass", "foreign_surcharge_pct": null, "verification": "PRIMARY (no-threshold structure; ACT Revenue) — figures to_verify" },
         { "state": "NT",  "assess_date": "n/a",    "general_threshold": null,    "rate_note": "no land tax", "foreign_surcharge_pct": null, "verification": "PRIMARY (nil)" }
       ]
     }
@@ -97,20 +97,26 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
 Notes:
 
 - **No `fills`.** The land-tax figure is resolver-computed from the per-state scale against the property's state and the aggregated holding value; `to_verify` for the pending states. The doc supplies the scales, not a filled leaf.
-- **Two verification tiers, explicitly tagged.** NSW/VIC/QLD are **PRIMARY** (Revenue NSW / SRO VIC / QRO, verified 2026-06-23); SA/WA/TAS/ACT are **INDICATIVE pending-primary** (secondary aggregators only — the resolver returns `to_verify` for them, per the secondary-aggregators-unreliable-on-exact-figures discipline); NT is **nil** (primary). **Re-ground obligation:** verify SA/WA/TAS/ACT scales against RevenueSA / RevenueWA / SRO Tasmania / ACT Revenue (a freshness-pass trigger).
+- **Verification tiers, explicitly tagged.** NSW/VIC/QLD/WA/TAS are **PRIMARY** (Revenue NSW / SRO VIC / QRO verified 2026-06-23; Treasury & Finance WA / SRO Tasmania verified 2026-06-28 against the live primary). SA's **threshold** is **PRIMARY** ($833,000, RevenueSA 2025-26) but its marginal scale is **to_verify**; ACT's **no-threshold structure** is **PRIMARY** but its exact figures are **to_verify** — RevenueSA and ACT Revenue both returned HTTP 403 to direct fetch this pass (bot-walled), so the marginal detail could not be confirmed against the primary. NT is **nil** (primary). **Re-ground obligation (residual):** confirm SA's bracket scale + surcharge against RevenueSA and ACT's fixed-charge + marginal AUV rates against ACT Revenue Office (a freshness-pass trigger) — the bot-wall means a manual/authenticated fetch, not WebFetch.
 - **Annual indexation.** Thresholds and bands are re-set annually (NSW per the 2026 land tax year; QLD per FY; SA gazetted annually) — `last_verified` is the freshness anchor; re-confirm on the annual pass.
 - **Single-owner cross-refs.** PPOR exemption → `kb.land-tax.ppor-exemption`; portfolio aggregation projection → `kb.investor.land-tax-aggregation`; trust land-tax cost → `kb.tax.entity-comparison-personal-trust-company-smsf`; foreign-person status → `kb.firb.*`. This doc owns only the per-state scales + surcharge rates + the aggregation principle.
 - **No federal-reform note.** The 2026-27 Budget CGT/negative-gearing reform is a *federal* change; land tax is a *state* tax and is unaffected by it.
 
 ## Sources
 
-**Canonical (state revenue offices) — primary-verified (NSW/VIC/QLD), 2026-06-23:**
+**Canonical (state revenue offices) — primary-verified NSW/VIC/QLD (2026-06-23):**
 
 - Revenue NSW — *Land tax thresholds and rates* (general threshold $1,075,000; $100 + 1.6% above; aggregation across all land) — https://www.revenue.nsw.gov.au/taxes-duties-levies-royalties/land-tax/understanding-land-tax/thresholds-and-rates
 - Revenue NSW — *Surcharge land tax* (5% for foreign persons, no threshold) — https://www.revenue.nsw.gov.au/taxes-duties-levies-royalties/land-tax/surcharge-land-tax
 - State Revenue Office Victoria — *Land tax (current rates)* (general threshold $50,000; trust surcharge; absentee owner 4%) — https://www.sro.vic.gov.au/about-us/rates-and-statistics/current-rates/land-tax-current-rates
 - Queensland Revenue Office — *Land tax rates for individuals* ($600,000 threshold; $500 + 1c/$ above) and *for absentees* (3% surcharge ≥ $350,000) — https://qro.qld.gov.au/land-tax/calculate/individual/
 
-**Indicative (secondary, pending primary verification — labelled INDICATIVE, verified 2026-06-23):**
+**Canonical (state revenue offices) — primary-verified WA/TAS (2026-06-28):**
 
-- Secondary land-tax guides for SA (~$833,000), WA (~$300,000 + MRIT), TAS (~$125,000), ACT (no threshold) — thresholds only; resolver returns `to_verify`; confirm against RevenueSA / RevenueWA / SRO Tasmania / ACT Revenue Office before asserting an exact scale.
+- Department of Treasury and Finance WA — *Land tax assessment* (threshold $300,000; full bracket scale; MRIT 0.14% above $300,000; no foreign/absentee surcharge) — https://www.wa.gov.au/organisation/department-of-treasury-and-finance/land-tax-assessment
+- State Revenue Office Tasmania — *Rates of land tax* (threshold $125,000; $50 + 0.45% then $1,737.50 + 1.5%) — https://www.sro.tas.gov.au/land-tax/rates-of-land-tax ; *Foreign Investor Land Tax Surcharge guideline* (2% on residential General Land, updated 2025-12) — https://www.sro.tas.gov.au/land-tax/foreign-investor-land-tax-surcharge
+
+**Partial — threshold/structure primary-confirmed, marginal detail to_verify (2026-06-28; primary sites returned HTTP 403 to direct fetch — bot-walled):**
+
+- RevenueSA — *Rates and thresholds* (general threshold **$833,000**, trust threshold $25,000, 2025-26 — confirmed; full bracket scale + surcharge not retrievable via WebFetch, 403) — https://www.revenuesa.sa.gov.au/land-tax/rates-and-thresholds
+- ACT Revenue Office — *How land tax is calculated* (no tax-free threshold, quarterly, fixed charge + marginal AUV 5-yr averaged with $1M AUV threshold — confirmed; exact fixed-charge + marginal rates not retrievable via WebFetch, 403) — https://www.revenue.act.gov.au/rates-and-property-charges/land-tax/how-land-tax-is-calculated
