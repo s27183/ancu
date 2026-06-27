@@ -221,12 +221,12 @@ cash-flow→year-5/10), **B2** the `tax_structure` income/cash-flow tax figures 
 after-tax cash flow, depreciation), **B3b** the per-property `cash_position` cash-to-complete, **B3c** the
 per-property `disposition`, and the `ownership_planning_investor` post-acquisition figures — all full-stack
 live-proven (real Opus; see the Phase-B slice records below). The base-spine presence + the Phase-B figure fill
-are now both done, so the rows are complete. **Two seams remain genuinely open (tracked, not these rows):** the
-**banded-vs-scalar** registry-typing call (recurs across yield/tax/cash; decided where it bites, not patched) and
-the **`opportunity-card` unit** — a 3-part producer + consumer build now scoped and in progress (see "Opportunity-card —
-producer + consumer" below). *(The earlier framing of this as a "low-value consumer half" was wrong on re-grounding:
-the producer is a permanent stub, not closed, and `ownership_planning_investor`'s declared `scope: both` is silently
-not honored — the corrected analysis is in that section.)*
+are now both done, so the rows are complete. **The two seams once tracked here are now both closed:** the
+**banded-vs-scalar** registry-typing call (DECIDED — see the section below) and
+the **`opportunity-card` unit** (BUILT — see "Opportunity-card — producer + consumer" below). *(The earlier framing of
+the opportunity-card as a "low-value consumer half" was wrong on re-grounding: the producer was a permanent stub, not
+closed, and `ownership_planning_investor`'s declared `scope: both` was silently not honored — the corrected analysis is
+in that section.)*
 
 **P2 COMPLETE (2026-06-24).** Two free repoints + the investor CGT branch, all committable now (no
 deploy until P3). **Repoints** in `investor-domestic-au.md`: `kb.investor.tax-brackets-2026` →
@@ -1557,8 +1557,10 @@ Opportunity-card renders **both** renderers EN+VI via the capstone harness-mount
    base components lack a `plan.c.*` title key** (`investor_profile`, `investment_strategy`, `yield_modelling`,
    `tax_structure`, `ownership_planning_investor`). The Mode-C base projection renders each via
    `$t(plan.c.${cid})` → so it **white-screens** on those cards. Never caught because the capstone used harness-mount,
-   not a full live drive. **Fixed only `plan.c.ownership_planning_investor`** (in-scope — the opportunity-card's host card
-   must render); the other 4 + the root `$t` fail-safe are a **separate pre-existing Mode-C-projection bug** to decide on.
+   not a full live drive. **Fixed only `plan.c.ownership_planning_investor`** here (in-scope — the opportunity-card's host
+   card must render). **RESOLVED 2026-06-27 in `d277ded`:** the other 4 title keys were added and the root `$t` was made
+   fail-safe (`i18n.ts:747` — `messages[key]?.[$lang] ?? key`, falls back to the key instead of throwing). No
+   Mode-C-projection white-screen remains.
 2. **The `equity_release` opportunity appears only when a hold horizon is set** (onboarding `hold_horizon_years` or the
    cash-calculator horizon what-if) — `disposition`'s projection is null otherwise → `opportunities: []` (honest-partial,
    by design). At a bare attach with no horizon the card is empty; the figure surfaces when the investor sets a horizon.
@@ -1694,6 +1696,47 @@ data-at-rest, no migration.
   `CLAUDE_CODE_OAUTH_TOKEN`) — that wire is verified by-construction + below-the-seam, and belongs to
   the deploy pass. **The Mode-C wedge's three per-property input surfaces are now all built:**
   `property_card` (attach), `<from_transaction>` (dates), `<from_document>` (lease upload).
+
+## Banded-vs-scalar registry typing — DECIDED (2026-06-28)
+
+The seam recurred per-field (B0 retyped `yield_modelling.cash_flow_projection`; B2 the `tax_structure` after-tax
+trio; B3b confirmed per-property `cash_position` stays scalar) without ever being stated as **one rule** — so it
+re-litigated at each new figure. Stated once, it stops recurring:
+
+**A registry figure field's type follows the figure's *derivation*, not its component.**
+- **`*_range`** (`money_range` / `percentage_range`) iff the figure derives from a range-valued input — the
+  `target_price_range`, a rent band, or a **KB indicative cost band**. A point would be false precision. The KB SOT
+  enforces this directly: `kb.tax.entity-setup-costs` says the resolver "places a **banded figure, never a point
+  quote**."
+- **scalar** (`money` / `percentage`) iff it's an **exact-point computation** — `loan × rate`, an exact
+  attached-property price, a marginal rate off a point income. Banding it would be fake width.
+- **Phase-polymorphic field** (a band at base over a range, an exact point per attached property): type it `*_range`
+  — the band is the supertype — and emit the per-property point as a **degenerate band `[v,v]`**. The outcome
+  validator (`check_scalar`) and the `calculator` renderer both accept and collapse `[v,v]`. *(Already live as the
+  FHB `deposit` / `other_buying_costs` / `total_cash_required` convention — now named as the rule rather than a
+  per-field note.)*
+
+**The validator is strict, which makes the rule self-enforcing:** `fh_engine_outcome:check_scalar/2` rejects a
+`[lo,hi]` list under type `money` (requires a number) *and* rejects a bare number under `money_range` (requires a
+list). So any **currently-emitted** mismatch already fails conformance (green ⟹ no live mismatch). The only latent
+bites are fields that emit `null` today (a deferred producer) but are bands by nature.
+
+**Applied (the complete bite surface, grounded against the live schemas + the KB SOT):**
+
+| Field | Was | Now | Why |
+|---|---|---|---|
+| `tax_structure.setup_costs` | `money` | **`money_range`** | KB `entity-setup-costs`: indicative band, "never a point quote" |
+| `tax_structure.annual_compliance_cost` | `money` | **`money_range`** | KB `entity-setup-costs`: ongoing band |
+| `tax_structure.total_depreciation_year_1` | `money` | `money` (flagged) | band-vs-point pends the deferred QS/cost-basis producer's input shape; B2 deliberately didn't decide. Doesn't bite until that producer lands. |
+| `cash_position` (investor) `total_cash_required` | `money` | `money` (confirmed) | exact price per-property → scalar is correct. The FHB-parity *base* NEED-side band is a deferred **feature** (registry+blueprint+shell), not a typing fix — when built, it becomes phase-polymorphic → `money_range` + `[v,v]` per-property, by the rule above. |
+| `cgt_marginal_rate` | `percentage` | `percentage` (confirmed) | point off income |
+
+Both retyped fields emit `null` today, so the change is **runtime byte-identical** — it only constrains the deferred
+entity-cost producer (the strict validator will reject a scalar slip). **No Erlang / resolver / shell change** — a
+blueprint outcome-schema retype + artifact recompile. **Verified green:** compiler PASS (retype confirmed in the
+artifact), `validate_build` + `outcome_validate` (36), `tax_structure_conformance` (69), `outcome_conformance`
+(25+11), `cash_position_investor_conformance` (43), `disposition_conformance` (87), FHB `cash_duty_conformance` (28,
+byte-identical).
 
 ## Deferred out (honest — first-exercising instance is Mode B/D, not here)
 

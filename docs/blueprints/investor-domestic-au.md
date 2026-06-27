@@ -647,12 +647,12 @@ The `mortgage_plan` outcome feeds `yield_modelling.loan_costs` (the loan cost ca
     "annual_tax_refund_year_1": "money_range",
     "after_tax_cash_flow_year_1": "money_range",
     "after_tax_cash_flow_per_week": "money_range",
-    "total_depreciation_year_1": "money",
+    "total_depreciation_year_1": "money",  // band-vs-point pends the deferred QS/cost-basis producer's input shape (banded-vs-scalar rule); scalar until then
     "cgt_discount_eligible": "bool",
     "cgt_marginal_rate": "percentage",
     "cost_base_depreciation_clawback": "bool",
-    "annual_compliance_cost": "money",
-    "setup_costs": "money",
+    "annual_compliance_cost": "money_range",  // KB entity-setup-costs: indicative cost band, "never a point quote" → banded by the banded-vs-scalar rule
+    "setup_costs": "money_range",  // KB entity-setup-costs: indicative cost band, "never a point quote" → banded by the banded-vs-scalar rule
     // The announced 2026-27 Budget negative-gearing reform (NG limited to new builds from 1 Jul
     // 2027 — kb.tax.negative-gearing-mechanics, PROPOSED not law). A bilingual decision-support
     // caveat, resolver-selected from property_fit_investor.property_type (established → loses the
