@@ -206,12 +206,26 @@ Status legend: `[ ]` not started · `[~]` drafting · `[v]` facts verified vs pr
 | [x] | P5-engine | `investor_profile` resolver (`fh_engine_fill` inline, mirrors `buyer_profile`) — canonical `profile`, investor lens (per-applicant `tax{}`, no owner-occupier leaves, domestic-investor strength); honest-partial |
 | [x] | P5-engine | `investment_strategy` **two-path** (resolver scaffold + 3 `investment_thesis` agent leaves) — `strategy_thesis` from the Cluster-S KB (archetype/gearing/one_liner); first Mode-C agent component |
 | [x] | P5-engine | `mortgage_finance` investor variant (branch the shared resolver) — investment-loan serviceability, IO-vs-PI, DTI cap (Cluster-F KB). **Two-path** (5 `lender_fit` agent leaves); shared-name branch on `strategy_thesis` upstream (FHB body byte-identical); new `lender_fit_investor` sidecar module; live-verified |
-| [~] | P5-engine | `yield_modelling` resolver — base-spine presence DONE (`fh_engine_fill` inline, honest-partial all-null `cash_flow_projection` + `calculator` + 5 Cluster-Y anchors); the cash-flow **arithmetic** (NEW module) defers to `property_assessment` (its rent-leaf producer) + the banded-vs-scalar seam |
-| [~] | P5-engine | `tax_structure` **two-path** — base-spine presence DONE (`fh_engine_fill` inline: resolver scaffold + `entity_structuring` agent leaf `recommended_entity`, live-verified; the two CGT-determinant **constants** `disposition` reads — `cgt_discount_eligible`/`cost_base_depreciation_clawback` = true; `data-table` + 6 Cluster-T anchors). Deferred to `property_assessment`: `cgt_marginal_rate` (needs an ATO-brackets KB doc + income), `setup_costs`/`annual_compliance_cost` (banded-vs-scalar seam), the 5 property/rent-dependent figures |
-| [~] | P5-engine | `cash_position` investor variant — base presence DONE (`fh_engine_cash:fill_investor/2`, branched on the `tax_optimised_structure` discriminator like `disposition`; **pure-resolver**, `agent_leaves []`). The compiled `budget_envelope_investor` is 9 point-summary figures, all honestly null at base (plan-first: no property, no savings); emits `calculator` + the 6 Cluster-Y/T cash anchors. Deferred to `property_assessment` (per-property): the property-price-dependent figures; `max_property_price_supported` → investor `mortgage_finance` capacity (unbuilt); HAVE-side → refine turn |
-| [~] | P5-engine | `ownership_planning_investor` — base presence DONE (`fh_engine_ownership:fill_investor/2`, a clean sibling on the UNIQUE name — no discriminator, FHB `fill/2` untouched; **pure-resolver**, `agent_leaves []`). **Honest-partial:** `annual_tax_obligations` (5, bilingual) + `alert_triggers_armed` (4 investor alerts, bilingual) filled from the 6 Cluster-S KB anchors via a new `kb.copy.ownership-investor` doc; the 6 post-acquisition figure fields null at base. **Producer half of the P4 `opportunities[]` seam CLOSED**: field added to the schema (recompiled), emitted `[]` at base (populates per-property); `annual_tax_obligations` retyped `array<localized_text>` (validator-enforced bilingual). Emits `data-table` (the reachable primary). Deferred: the 6 figure fields → `property_assessment`; the **consumer half** (shell renders only `renderers[0]`) → a shell unit |
+| [x] | P5-engine | `yield_modelling` resolver — base-spine presence DONE (`fh_engine_fill` inline, honest-partial all-null `cash_flow_projection` + `calculator` + 5 Cluster-Y anchors); the cash-flow **arithmetic** (NEW module) defers to `property_assessment` (its rent-leaf producer) + the banded-vs-scalar seam |
+| [x] | P5-engine | `tax_structure` **two-path** — base-spine presence DONE (`fh_engine_fill` inline: resolver scaffold + `entity_structuring` agent leaf `recommended_entity`, live-verified; the two CGT-determinant **constants** `disposition` reads — `cgt_discount_eligible`/`cost_base_depreciation_clawback` = true; `data-table` + 6 Cluster-T anchors). Deferred to `property_assessment`: `cgt_marginal_rate` (needs an ATO-brackets KB doc + income), `setup_costs`/`annual_compliance_cost` (banded-vs-scalar seam), the 5 property/rent-dependent figures |
+| [x] | P5-engine | `cash_position` investor variant — base presence DONE (`fh_engine_cash:fill_investor/2`, branched on the `tax_optimised_structure` discriminator like `disposition`; **pure-resolver**, `agent_leaves []`). The compiled `budget_envelope_investor` is 9 point-summary figures, all honestly null at base (plan-first: no property, no savings); emits `calculator` + the 6 Cluster-Y/T cash anchors. Deferred to `property_assessment` (per-property): the property-price-dependent figures; `max_property_price_supported` → investor `mortgage_finance` capacity (unbuilt); HAVE-side → refine turn |
+| [x] | P5-engine | `ownership_planning_investor` — base presence DONE (`fh_engine_ownership:fill_investor/2`, a clean sibling on the UNIQUE name — no discriminator, FHB `fill/2` untouched; **pure-resolver**, `agent_leaves []`). **Honest-partial:** `annual_tax_obligations` (5, bilingual) + `alert_triggers_armed` (4 investor alerts, bilingual) filled from the 6 Cluster-S KB anchors via a new `kb.copy.ownership-investor` doc; the 6 post-acquisition figure fields null at base. **Producer half of the P4 `opportunities[]` seam CLOSED**: field added to the schema (recompiled), emitted `[]` at base (populates per-property); `annual_tax_obligations` retyped `array<localized_text>` (validator-enforced bilingual). Emits `data-table` (the reachable primary). Deferred: the 6 figure fields → `property_assessment`; the **consumer half** (shell renders only `renderers[0]`) → a shell unit |
 | [x] | P5-activate | per-blueprint `base_components/1` sequence — `?BASE_COMPONENTS_INVESTOR` (8-component property-agnostic investor spine, DISCRIMINATOR-ordered) + a slug clause over a factored `order/2`; FHB macro byte-identical. Verified: `base_components_investor_conformance.escript` 19/19 (set+order, per-property excluded, FHB unchanged, DAG-walk proves each shared-name discriminator fires investor-side) |
 | [x] | P5-activate | Onboarding **dispatch** (`fh_engine_h_plan_cards:blueprint_for/1` selects blueprint+mode by `intent`) **+** **intent picker** (`Onboarding.svelte` gate reshape — intent first, first-home gate owner-occupier-only, branched out-of-scope copy; `buildOnboardingInput` threads intent), atomic-last. Mode-E next-home gap logged |
+
+**P5-engine base-spine `[~]` rows PROMOTED to `[x]` (2026-06-27) — their deferred halves landed in Phase B.**
+The four base figure-owners (`yield_modelling`, `tax_structure`, `cash_position`, `ownership_planning_investor`)
+were marked `[~]` because their property/rent-dependent figures were deferred to `property_assessment`. Phase B
+**built and live-proved** exactly those deferrals: **B1** the yield cash-flow arithmetic (income→opex→yields→
+cash-flow→year-5/10), **B2** the `tax_structure` income/cash-flow tax figures (`cgt_marginal_rate`, gearing,
+after-tax cash flow, depreciation), **B3b** the per-property `cash_position` cash-to-complete, **B3c** the
+per-property `disposition`, and the `ownership_planning_investor` post-acquisition figures — all full-stack
+live-proven (real Opus; see the Phase-B slice records below). The base-spine presence + the Phase-B figure fill
+are now both done, so the rows are complete. **Two seams remain genuinely open (tracked, not these rows):** the
+**banded-vs-scalar** registry-typing call (recurs across yield/tax/cash; decided where it bites, not patched) and
+the `opportunity-card` **consumer half** (the engine snapshot flattens `renderers[]` → a single `renderer`, so a
+component's 2nd renderer is unreached — a cross-contract shell unit, low value as `opportunity-card` only
+populates per-property).
 
 **P2 COMPLETE (2026-06-24).** Two free repoints + the investor CGT branch, all committable now (no
 deploy until P3). **Repoints** in `investor-domestic-au.md`: `kb.investor.tax-brackets-2026` →
@@ -1417,6 +1431,49 @@ So Slice 4 is two halves — the form would submit into an invisible result with
 Full-stack live-pixel (submit → dated render, EN+VI) is best proven with the engine + sidecar + PG up;
 the unit logic is type-checked and grounded against the §11 contract end-to-end (route → store → re-fill →
 SSE → render).
+
+### Capstone — full-stack live run of the Phase-B settle flow — DONE (2026-06-27)
+
+Brought the stack up (engine on **:8090** — `:8080` was occupied by an unrelated local model server, so
+`FH_ENGINE_HTTP_PORT=8090` + the shell's `ENGINE_BASE_URL` repointed; **real** planner sidecar via
+`FH_PLANNER_SCRIPT=engine/python/planner.py` + the venv python — the dev default is `planner_stub.py`).
+Drove the **real shell proxy** (the frontend's exact bytes): dev magic-link login → create investor card
+(real-Opus base turn, 8/8 components, `stub=false`) → attach a Footscray `established_house` (real-Opus
+Phase-B turn, 8 per-property components incl. `settlement_prep`) → **POST `.../transaction`** (the Slice 4
+`setTransactionDates` path).
+
+**Result — the settle delta is proven live.** `settlement_prep` flipped `pending_contract → active` via a
+**resolver-only** re-fill (`fill_path: resolver`, no `usage` — the load-bearing Slice 4 contrast confirmed
+on the wire): 9 critical-path milestones **back-calculated** from settlement `2026-08-30` (contract `done`,
+deposit/B&P +5bd, finance unconditional, loan docs, then insurance/funds/title/keys at settlement), filtered
+to the **4 applicable** investor milestones (QS, depreciation schedule, PM, landlord insurance — honest-partial
+drops the inapplicable), a VIC-specific `insurance_timing_rule`, all **bilingual {vi,en}** end-to-end. The
+optimistic-seed `transaction` slot echoed back exactly as submitted. This is precisely the data
+`Checklist.svelte`'s `active` branch consumes (every read field present + correctly shaped).
+
+**Pixel render — PROVEN (playwright, EN+VI).** A throwaway harness route mounted the **real, unmodified**
+`Checklist.svelte` with the **real captured live outcomes** (pending_contract + active), screenshotted headless
+in both languages. Both shape-branches render correctly: pending → the awaiting banner + bilingual
+`next_action_for_user` + structurally-present milestones with no dates; active → the dated critical path
+(2026-07-01 … 2026-08-30) with DONE/SCHEDULED status chips, applicable investor milestones, the VIC insurance
+rule — all milestone names in EN then VI. Harness removed after; `svelte-check` 0/0 + build green with only the
+fix remaining. (The map-first SPA's suburb-title binding made a full-map drive to this card unreliable in
+headless; mounting the production renderer with live data is the faithful, robust pixel proof — it renders the
+exact Slice 4 component with the exact engine bytes.)
+
+**Bug found AND fixed — Slice 3 attach-form `property_type` enum mismatch.** The capstone caught a real shipped
+defect invisible to type-check: the attach form offered
+`PROPERTY_TYPES = ['house','unit','townhouse','apartment','land']`, but the engine `property_fit_investor`
+outcome enum is `[established_house, established_apartment, new_house, new_apartment, off_the_plan,
+house_and_land]` — **zero overlap**. The attach-time `validate_card` checks only *nonempty*, so the bad value
+rode through to the `property_assessment` outcome and was rejected at the **commit seam** (`outcome_nonconforming`,
+`property_type`) → the Phase-B turn **crashed**, no per-property components rendered. Both sides type as `string`,
+so neither `svelte-check` nor the resolver tests catch it; only a live run through the form's values does. Slice A
+was proven (2026-06-25) before the Slice 3 form existed, so no prior full-stack run exercised the form enum.
+**Fixed (`PlanProjection.svelte` + `i18n.ts`):** `PROPERTY_TYPES` now IS the engine enum (the producer is the
+SOT — [[spec-seams-surface-on-implementation]]), with bilingual labels; the established-vs-new split is also the
+investor-meaningful distinction (depreciation eligibility). The corrected `established_house` value was confirmed
+to attach + run Phase-B end-to-end live. `svelte-check` 0/0, build green, autofixer clean.
 
 ## Deferred out (honest — first-exercising instance is Mode B/D, not here)
 

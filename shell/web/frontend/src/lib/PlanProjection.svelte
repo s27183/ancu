@@ -309,9 +309,16 @@
     let attachError = $state<null | { kind: 'over_limit'; tier: string } | { kind: 'busy' }
         | { kind: 'invalid'; detail: string } | { kind: 'error' }>(null);
 
-    // The property_type options the form offers (engine validates only nonempty; these are
-    // the investor-relevant kinds). Labels are bilingual via i18n; the value is the stored fact.
-    const PROPERTY_TYPES = ['house', 'unit', 'townhouse', 'apartment', 'land'] as const;
+    // The property_type options the form offers. These are NOT free strings: property_type
+    // rides through to the engine's `property_fit_investor` outcome, which validates it against
+    // a CLOSED enum at the commit seam — a value outside it crashes the Phase-B turn
+    // (outcome_nonconforming). So these MUST be exactly the engine enum (the producer is the
+    // SOT). The established-vs-new split is also the load-bearing investor distinction
+    // (depreciation eligibility). Labels are bilingual via i18n; the value is the stored fact.
+    const PROPERTY_TYPES = [
+        'established_house', 'established_apartment', 'new_house',
+        'new_apartment', 'off_the_plan', 'house_and_land'
+    ] as const;
 
     function openAttach() {
         apPrice = '';
@@ -736,7 +743,7 @@
                     <select bind:value={apType}>
                         <option value="" disabled>{$t('plan.attach.ptype_ph')}</option>
                         {#each PROPERTY_TYPES as pt (pt)}
-                            <option value={pt}>{$t(`plan.attach.ptype.${pt}` as 'plan.attach.ptype.house')}</option>
+                            <option value={pt}>{$t(`plan.attach.ptype.${pt}` as 'plan.attach.ptype.established_house')}</option>
                         {/each}
                     </select>
                 </label>

@@ -210,11 +210,15 @@ const messages = {
     'plan.attach.state': { vi: 'Bang', en: 'State' },
     'plan.attach.ptype': { vi: 'Loại bất động sản', en: 'Property type' },
     'plan.attach.ptype_ph': { vi: 'Chọn loại…', en: 'Choose a type…' },
-    'plan.attach.ptype.house': { vi: 'Nhà liền thổ', en: 'House' },
-    'plan.attach.ptype.unit': { vi: 'Căn hộ (unit)', en: 'Unit' },
-    'plan.attach.ptype.townhouse': { vi: 'Nhà phố', en: 'Townhouse' },
-    'plan.attach.ptype.apartment': { vi: 'Chung cư', en: 'Apartment' },
-    'plan.attach.ptype.land': { vi: 'Đất', en: 'Land' },
+    // These values ARE the engine `property_fit_investor` enum (closed; validated at the
+    // commit seam). The established-vs-new split drives depreciation eligibility — an
+    // investor-meaningful label, not a generic dwelling type.
+    'plan.attach.ptype.established_house': { vi: 'Nhà có sẵn (đã qua sử dụng)', en: 'Established house' },
+    'plan.attach.ptype.established_apartment': { vi: 'Căn hộ có sẵn (đã qua sử dụng)', en: 'Established apartment' },
+    'plan.attach.ptype.new_house': { vi: 'Nhà mới', en: 'New house' },
+    'plan.attach.ptype.new_apartment': { vi: 'Căn hộ mới', en: 'New apartment' },
+    'plan.attach.ptype.off_the_plan': { vi: 'Mua theo bản vẽ (off-the-plan)', en: 'Off-the-plan' },
+    'plan.attach.ptype.house_and_land': { vi: 'Gói nhà và đất', en: 'House & land package' },
     'plan.attach.optional': { vi: 'Tùy chọn', en: 'Optional' },
     'plan.attach.year': { vi: 'Năm xây dựng', en: 'Year built' },
     'plan.attach.land': { vi: 'Diện tích đất (m²)', en: 'Land size (m²)' },
