@@ -843,12 +843,14 @@ Same as [Mode A due_diligence](fhb-domestic-au.md#7-due_diligence) with these ad
   },
   "investor_specific_flags": {
     "rental_appraisal_significantly_below_expectation": { "type": "bool", "value": "<initial>" },
-    // lease interpretation is a B feature: the lease_interpretation agent leaf needs the UPLOADED
-    // lease (the upload pipeline is not built — due_diligence B) AND a lease_interpretation sidecar
-    // filler. Its `agent_reasoning_required: true` + `reasoning_domain` markers are DEFERRED to B —
-    // at A the compiled component carries no agent leaf (agent_leaves []), so due_diligence is
-    // resolver-only at A and never dispatches a sidecar. B re-adds the markers + builds the filler.
-    "current_tenancy_unfavourable_terms": { "type": "array<string>", "value": [] },
+    // lease interpretation (due_diligence B, BUILT 2026-06-27): the lease_interpretation agent leaf
+    // reads the UPLOADED lease (the `<from_document>` upload pipeline — DocumentUpload → inline
+    // base64 → the engine `document` turn, bytes transient/never persisted) and authors the
+    // qualitative tenancy-risk judgment grounded in kb.investor.tenancy-in-situ-considerations. The
+    // marker makes the component two-path-CAPABLE; the turn fires the sidecar ONLY when a lease is
+    // present (effective_fill_path/2) — a plain property attach with no lease stays resolver-only at
+    // A (honest-partial, no LLM call), so "resolver-only at A" still holds for the no-lease path.
+    "current_tenancy_unfavourable_terms": { "type": "array<string>", "value": [], "agent_reasoning_required": true, "reasoning_domain": "lease_interpretation" },
     "rental_yield_below_thesis_threshold": { "type": "bool", "value": "<initial>" }
   }
 }
@@ -894,14 +896,21 @@ Same as [Mode A due_diligence](fhb-domestic-au.md#7-due_diligence) with these ad
 }
 ```
 
-**Fill-path / honest-partial posture.** `due_diligence` is **resolver-only at A** (its one agent leaf,
-`investor_specific_flags.current_tenancy_unfavourable_terms`, `reasoning_domain: lease_interpretation`,
-needs the *uploaded lease* → it activates with B; no `reasoning_domain` runs at A). Its defining
-risk-*surfacing* output — `high_severity_flags`, the negotiation lever, the lease-interpretation
-concern — depends on **uploaded documents**, and the upload pipeline is **not built** (the only Phase-B
-input today is the source-supplied `property_card` of neutral property facts; uploaded documents are a
-distinct input surface — CLAUDE.md item 9, mode-c-wedge.md "due_diligence B"). So this component fills
-the **knowable structure now** — the investor document *procurement* checklist (what to gather + why),
+**Fill-path / honest-partial posture.** `due_diligence` is **document-gated two-path** (due_diligence B,
+BUILT 2026-06-27). Its one agent leaf — `investor_specific_flags.current_tenancy_unfavourable_terms`,
+`reasoning_domain: lease_interpretation` — reads the *uploaded lease*, so the turn fires the sidecar
+ONLY when a lease is present (`effective_fill_path/2`): a plain property attach with no lease runs
+**resolver-only** (honest-partial, no LLM), and an uploaded lease (the `<from_document>` upload
+pipeline — DocumentUpload → inline base64 → the engine `document` turn; bytes transient, never
+persisted) runs the leaf, which authors the qualitative tenancy-risk judgment (the
+lease-interpretation concern, the high-severity lease flags, the `overall_verdict`) grounded in
+`kb.investor.tenancy-in-situ-considerations`. `merge_agent` folds them, flips `docs_status` →
+`reviewed` (the non-null `overall_verdict` is the durable reviewed signal, recovered on refresh by
+`agent_values_from_outcome`), and flips the lease checklist entry. The `estimated_negotiation_lever`
+(money) stays resolver/`null` — no KB methodology computes a lever from lease terms (honest-partial),
+and no figure is ever agent-authored (§98). The non-lease document risks (building/pest/strata —
+`document_significance`, Mode A) remain a later input surface. So this component fills the **knowable
+structure now** — the investor document *procurement* checklist (what to gather + why),
 the bilingual due-diligence actions + vendor questions, and the **computable** `rental_yield_below_thesis_threshold`
 flag (the per-property yield vs the strategy target, removed from the LLM's reach) — and marks the
 document-dependent fields PENDING (`docs_status: pending_upload`, `overall_verdict: pending_documents`,

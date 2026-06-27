@@ -152,8 +152,48 @@ merge_agent(<<"buying_strategy">>, ResolverOutcome, AgentValues) ->
         <<"negotiation_style">> =>
             maps:get(<<"negotiation_style">>, AgentValues, null)
     };
+%% due_diligence (Mode C, Phase B — due_diligence B): fold the lease_interpretation leaves the
+%% sidecar authored from the UPLOADED lease — the bilingual concerns, the high-severity lease
+%% flags, the overall verdict, and the closing action. DOCUMENT-GATED two-path: this merge runs
+%% ONLY on a `document` turn (effective_fill_path/2 fires the sidecar only when a lease is present
+%% AND two_path_stored_leaf/2 returns `fresh` for kind=document), so reaching here means the lease
+%% WAS reviewed → flip docs_status → reviewed and the lease checklist entry received/reviewed → true
+%% (the other procurement items are not the uploaded doc). The agent's lease concerns APPEND to the
+%% resolver's computable yield-vs-thesis concern; the resolver re-runs fresh each document turn so
+%% there is no duplication. estimated_negotiation_lever (money) stays the resolver's null — no KB
+%% methodology computes a lever from lease terms, and the agent authors NO figure (§98). The
+%% declared PARAM leaf current_tenancy_unfavourable_terms (machine flags) informs the bilingual
+%% concerns; it is not itself a risk_assessment_investor outcome field. (No agent_values_from_outcome
+%% clause: due_diligence never takes the resolver-only reuse path — base_resolver never sweeps a
+%% per-property component, a plain attach is resolver-only, a document turn is always fresh — so a
+%% refresh that needed to reconstruct these merged lists cannot arise; the catch-all stays
+%% fail-closed if a future trigger ever wrongly reaches it.)
+merge_agent(<<"due_diligence">>, ResolverOutcome, AgentValues) ->
+    ResolverConcerns = maps:get(<<"investor_specific_concerns">>, ResolverOutcome, []),
+    AgentConcerns    = maps:get(<<"investor_specific_concerns">>, AgentValues, []),
+    ResolverOutcome#{
+        <<"docs_status">>                => <<"reviewed">>,
+        <<"overall_verdict">>            => maps:get(<<"overall_verdict">>, AgentValues, null),
+        <<"document_checklist">>         => mark_lease_reviewed(
+                                              maps:get(<<"document_checklist">>, ResolverOutcome, [])),
+        <<"investor_specific_concerns">> => ResolverConcerns ++ AgentConcerns,
+        <<"high_severity_flags">>        => maps:get(<<"high_severity_flags">>, AgentValues, []),
+        <<"next_action_for_user">>       => maps:get(<<"next_action_for_user">>, AgentValues,
+                                              maps:get(<<"next_action_for_user">>, ResolverOutcome, null))
+    };
 merge_agent(Other, _ResolverOutcome, _AgentValues) ->
     erlang:error({no_agent_merge_for, Other}).
+
+%% flip the lease document-checklist entry received/reviewed → true once the uploaded lease has
+%% been interpreted (the other procurement items stay as the resolver set them — they are not the
+%% uploaded doc). Pure list rewrite; an absent lease entry leaves the checklist unchanged.
+mark_lease_reviewed(Checklist) when is_list(Checklist) ->
+    [case maps:get(<<"id">>, Item, undefined) of
+         <<"lease">> -> Item#{<<"received">> => true, <<"reviewed">> => true};
+         _           -> Item
+     end || Item <- Checklist];
+mark_lease_reviewed(Other) ->
+    Other.
 
 %% Recover a two-path component's stored agent-leaf VALUES (in the sidecar-reply shape
 %% merge_agent/3 consumes) from a previously-committed outcome — the inverse of the merge.

@@ -301,6 +301,55 @@ export interface PortfolioPositionOutcome {
     portfolio_diversification_score?: number | null;
 }
 
+// --- due_diligence (Mode C, Phase B) → risk-flag-list + checklist -------------
+// outcome `risk_assessment_investor`. The investor due-diligence assessment. DOCUMENT-GATED
+// two-path (due_diligence B): at A (no lease) the resolver fills the document PROCUREMENT
+// checklist + the computable yield-vs-thesis concern, everything document-derived PENDING;
+// uploading the lease (DocumentUpload → the engine `document` turn → the lease_interpretation
+// leaf) flips docs_status → reviewed and adds the lease concerns/flags + overall_verdict. TWO
+// renderers split the rich shape (constraint #7 — both shape-discriminate, no new renderer):
+// risk-flag-list renders the RISK surface (verdict + concerns + high-severity flags),
+// checklist the PROCUREMENT surface (document_checklist + actions + questions + next_action).
+// estimated_negotiation_lever stays null (no KB methodology — honest-partial); no figure is
+// agent-authored (§98). [[thin-surface-vs-dropped-richness]]: the producer is rich; recover it.
+
+/** One investor due-diligence PROCUREMENT document — what to gather + why; received/reviewed
+ *  flip true once the uploaded lease is interpreted (the lease entry only). */
+export interface DueDiligenceDoc {
+    id: string;
+    name: LocalizedText;
+    required: boolean;
+    received: boolean;
+    reviewed: boolean;
+    why?: LocalizedText | null;
+}
+/** A surfaced investor concern — the computable yield-vs-thesis one at A, plus the lease-derived
+ *  ones after review. id · severity · bilingual detail. */
+export interface InvestorConcern {
+    id: string;
+    severity: 'low' | 'medium' | 'high';
+    detail: LocalizedText;
+}
+/** A high-severity flag extracted from an uploaded document (here the lease) — what it is +
+ *  what to do (both bilingual); source_doc names the document. */
+export interface HighSeverityFlag {
+    source_doc: string;
+    item: LocalizedText;
+    action: LocalizedText;
+}
+export interface RiskAssessmentInvestorOutcome {
+    docs_status: 'pending_upload' | 'reviewed';
+    overall_verdict: 'pending_documents' | 'low_risk' | 'proceed_with_actions' | 'high_risk';
+    document_checklist?: DueDiligenceDoc[] | null;
+    rental_yield_below_thesis_threshold?: boolean | null;
+    investor_specific_concerns?: InvestorConcern[] | null;
+    actions_before_signing?: LocalizedText[] | null;
+    questions_for_vendor?: LocalizedText[] | null;
+    high_severity_flags?: HighSeverityFlag[] | null;
+    estimated_negotiation_lever?: MoneyRange | null;
+    next_action_for_user?: LocalizedText | null;
+}
+
 // --- preparation → checklist (outcome type `readiness`) ---------------------
 // The property-agnostic readiness layer (the prototype's "Before you buy"): documents
 // to gather (with WHY each is needed), people to engage (role · when · why), the money

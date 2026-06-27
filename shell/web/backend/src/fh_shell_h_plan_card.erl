@@ -27,6 +27,7 @@ init(Req0, Opts) ->
         {[profile], <<"POST">>}  -> with_owned_card(Req0, Opts, fun profile/4);
         {[properties], <<"POST">>}  -> with_owned_card(Req0, Opts, fun properties/4);
         {[transaction], <<"POST">>} -> with_owned_card(Req0, Opts, fun transaction/4);
+        {[documents], <<"POST">>}   -> with_owned_card(Req0, Opts, fun documents/4);
         {[checklist_status], <<"PATCH">>} ->
             with_owned_card(Req0, Opts, fun checklist_status/4);
         _ ->
@@ -209,6 +210,38 @@ transaction(UserId, PlanCardId, Req0, Opts) ->
         {error, invalid_json} ->
             {ok, fh_shell_http:reply_json(400,
                 #{<<"error">> => <<"invalid_json">>}, Req0), Opts}
+    end.
+
+%% POST /api/plan-cards/:id/properties/:pid/documents — upload a due-diligence document (the
+%% current lease) for an already-attached property → a DOCUMENT-GATED two-path re-fill that
+%% activates due_diligence's lease_interpretation leaf (due_diligence B, the `<from_document>`
+%% surface). UNLIKE transaction (resolver-only, free) this fires the LLM leaf → emits usage, so —
+%% like `ask`/properties — it runs the §7 token-limit GATE FIRST: a user over their tier's period
+%% limit is blocked 402 BEFORE any tenant JWT is minted (metering-not-gating). The :pid is a
+%% sub-resource of the already-owned card; the engine re-validates the addendum exists (409
+%% property_not_attached) and the document (400 invalid_document with a typed `code`). The bytes
+%% are transient (never persisted, engine-side). Relay verbatim. 202 {plan_card_id, property_id,
+%% turn_id}; the reviewed risk_assessment_investor streams over /events.
+documents(UserId, PlanCardId, Req0, Opts) ->
+    case fh_shell_meter:gate(UserId) of
+        allow ->
+            PropertyId = cowboy_req:binding(pid, Req0),
+            case fh_shell_http:read_json_body(Req0) of
+                {ok, Body, Req1} ->
+                    {Status, Resp} =
+                        fh_shell_engine_client:upload_document(
+                            UserId, PlanCardId, PropertyId, Body),
+                    {ok, relay(Status, Resp, Req1), Opts};
+                {error, invalid_json} ->
+                    {ok, fh_shell_http:reply_json(400,
+                        #{<<"error">> => <<"invalid_json">>}, Req0), Opts}
+            end;
+        {block, #{tier := Tier, used := Used, limit := Limit}} ->
+            {ok, fh_shell_http:reply_json(402,
+                #{<<"error">> => <<"quota_exceeded">>,
+                  <<"tier">> => Tier,
+                  <<"used_tokens">> => Used,
+                  <<"limit_tokens">> => Limit}, Req0), Opts}
     end.
 
 %% Relay the engine's already-encoded JSON body + status verbatim (same as the

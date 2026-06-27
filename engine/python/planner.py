@@ -302,6 +302,52 @@ class PropertyFitLeaves(BaseModel):
     key_concerns: Annotated[list[LocalizedText], Field(max_length=6)]
 
 
+# --- the lease_interpretation agent schema: the tenancy-risk leaves (due_diligence B) -------
+# due_diligence is DOCUMENT-GATED TWO-PATH: the resolver owns the procurement checklist, the
+# computable yield-vs-thesis flag, and the bilingual actions/questions (in <resolver_outcome>);
+# this leaf reads the UPLOADED lease text (<lease_document>) and authors the QUALITATIVE tenancy-
+# risk judgment. There is NO number field — the negotiation lever (money) stays resolver/null (no
+# KB methodology computes a lever from lease terms), so the LLM structurally cannot author a
+# figure (§98). `current_tenancy_unfavourable_terms` is the declared blueprint leaf (machine flags,
+# array<string>); the bilingual concerns/flags surface it; `overall_verdict` (never pending — the
+# agent ran on a real lease) is the DURABLE "lease reviewed" signal merge_agent reads to flip
+# docs_status. The most LEGALLY-adjacent content in the wedge → the prompt holds a hard
+# decision-support line (flag-and-point-to-conveyancer, never a legal opinion).
+LeaseSeverity = Literal["low", "medium", "high"]
+LeaseVerdict = Literal["low_risk", "proceed_with_actions", "high_risk"]
+# Machine-readable unfavourable-term flags (NOT user-facing prose → single-valued enum strings;
+# the bilingual surfacing is in the concerns). Mirrors the tenancy-in-situ KB's risk list.
+UnfavourableTerm = Literal[
+    "rent_below_market", "long_fixed_term_remaining", "below_market_on_long_term",
+    "rent_arrears_history", "no_rent_review_clause", "restrictive_special_conditions",
+    "tenant_break_risk", "bond_not_lodged", "other"]
+
+
+class LeaseConcern(BaseModel):
+    id: str                       # stable machine id (not user-facing)
+    severity: LeaseSeverity       # single-valued enum (schema-as-constraint)
+    detail: LocalizedText         # user-facing prose — {vi, en} (bilingual-content.md §1)
+
+
+class LeaseFlag(BaseModel):
+    source_doc: str               # the document the flag came from (here always "lease")
+    item: LocalizedText           # what the flag is — {vi, en}
+    action: LocalizedText         # what to do about it — {vi, en}
+
+
+class LeaseInterpretationLeaves(BaseModel):
+    # the declared blueprint leaf — machine flags (array<string>); capped (a 20-flag list is
+    # wrong, not just verbose). [] = a clean lease (still REVIEWED — see overall_verdict).
+    current_tenancy_unfavourable_terms: Annotated[list[UnfavourableTerm], Field(max_length=8)]
+    # the durable "lease reviewed" verdict (never pending — the agent ran on a real lease).
+    overall_verdict: LeaseVerdict
+    # bilingual surfacing of the lease-derived risks (the risk-flag-list + the concerns list).
+    investor_specific_concerns: Annotated[list[LeaseConcern], Field(max_length=6)]
+    high_severity_flags: Annotated[list[LeaseFlag], Field(max_length=6)]
+    # the closing bilingual action (decision-support; points to the conveyancer / solicitor).
+    next_action_for_user: LocalizedText
+
+
 # --- prompt assembly (agentic-flow.md §5) --------------------------------------
 # 2a builds the scaffold in code; 2b composes it from the artifact's component
 # descriptor + engine-resolved KB. The static/dynamic split is constraint-#9
@@ -397,6 +443,12 @@ _KB_DOCS = {
         _REPO_ROOT / "docs" / "kb" / "investor" / "bid-discipline.md",
     "kb.negotiation.patterns-by-market-condition":
         _REPO_ROOT / "docs" / "kb" / "negotiation" / "patterns-by-market-condition.md",
+    # lease_interpretation (Mode C, Phase B — due_diligence B) — the tenancy-in-situ doc the
+    # lease-interpretation leaf grounds in: what counts as an unfavourable in-situ lease term for
+    # an incoming investor owner (below-market rent on a long fixed term, arrears, missing
+    # rent-review clause, restrictive special conditions, unlodged bond).
+    "kb.investor.tenancy-in-situ-considerations":
+        _REPO_ROOT / "docs" / "kb" / "investor" / "tenancy-in-situ-considerations.md",
 }
 
 
@@ -814,6 +866,67 @@ investor-grade-features KB.
 6. Write 2–4 `key_strengths` and `key_concerns` as {vi, en} pairs, specific to this property.
 7. Emit ONLY the leaves.""",
     },
+    # lease_interpretation is the agent half of the `due_diligence` component (Mode C, Phase B —
+    # due_diligence B). DOCUMENT-GATED: the engine fires this sidecar ONLY when a lease is uploaded
+    # (a <lease_document> is present). It reads the lease TEXT and authors the QUALITATIVE tenancy-
+    # risk judgment — NO figure (the negotiation lever is resolver/null). The most LEGALLY-adjacent
+    # content in the wedge: lease interpretation edges toward tenancy law, so the posture is hard
+    # decision-support — flag the terms an investor commonly reviews + WHY, never "this lease is
+    # bad / don't buy / this clause is unenforceable", and always point to a conveyancer/solicitor.
+    "lease_interpretation": {
+        "kb_slugs": ["kb.investor.tenancy-in-situ-considerations"],
+        "output": """\
+Return a single JSON object conforming to the provided output schema — EXACTLY the leaves named \
+in `<goal>`, nothing else. Author NO figure: no rent figure, no negotiation lever, no dollar, no \
+percent — the negotiation lever is resolver-owned (and may be null). Produce only the JSON object.""",
+        "context": """\
+You are the agent half of the `due_diligence` component (reasoning_domain: lease_interpretation), \
+for a Vietnamese-Australian DOMESTIC property investor who has UPLOADED the current lease of a \
+tenanted property they are considering buying. An investor buyer INHERITS the in-situ lease on \
+settlement. The procurement checklist, the computable yield-vs-thesis flag, and the bilingual \
+actions/questions are the engine resolver's and appear in `<resolver_outcome>` (read-only). The \
+uploaded lease text is in `<lease_document>`. You reason about EXACTLY ONE thing: which terms of \
+THIS lease are UNFAVOURABLE to the incoming investor owner, grounded in the tenancy-in-situ KB.""",
+        "goal": """\
+Produce the lease-interpretation leaves: `current_tenancy_unfavourable_terms` (machine flags from \
+the enum), `overall_verdict` (one of low_risk / proceed_with_actions / high_risk), bilingual \
+`investor_specific_concerns` and `high_severity_flags` (each grounded in a SPECIFIC lease term), \
+and a bilingual `next_action_for_user`. Nothing else — no rent figure, no negotiation lever, no \
+dollar (those are the resolver's, and the lever may be null).""",
+        "non_negotiables": """\
+1. **Decision-support, NEVER legal/financial advice (ASIC + legal line — load-bearing here).** \
+Lease interpretation edges toward tenancy law. You FLAG terms an investor commonly reviews and \
+WHY they matter to an incoming owner — you never say "this lease is bad", "do not buy", or "this \
+clause is unenforceable". Every concern points the buyer to confirm with their conveyancer / \
+solicitor. Never an advice or legal-opinion tone.
+2. **Author no figure.** No rent, no negotiation lever, no dollar, no percent. Your output schema \
+has no number field — keep it that way. The negotiation lever is resolver-owned and may be null.
+3. **Ground every flag in a SPECIFIC term of the uploaded lease.** Read `<lease_document>`. Flag a \
+risk the KB names (below-market rent on a long fixed term, arrears, a missing rent-review clause, \
+restrictive special conditions, an unlodged bond) ONLY if it is present in THIS lease; if the \
+lease is silent on something, do NOT invent it. A clean lease → `current_tenancy_unfavourable_terms: \
+[]`, `overall_verdict: low_risk` — that is still a REVIEWED result, not a failure.
+4. **Pick from the enums.** `current_tenancy_unfavourable_terms` ⊆ the term enum; `overall_verdict` \
+∈ {low_risk, proceed_with_actions, high_risk}; each concern `severity` ∈ {low, medium, high}.
+5. **Bilingual {vi, en}** for every concern `detail`, flag `item`/`action`, and `next_action_for_user` \
+(author the Vietnamese AND the English — see <style>). `high_severity_flags`: only genuinely \
+high-severity terms (often empty); `source_doc` = "lease".
+6. **Emit only the leaves object** (see `<output>`).""",
+        "procedure": """\
+1. Read `<lease_document>` (the uploaded lease), `<resolver_outcome>` (the checklist + the \
+computable yield-vs-thesis flag), `<plan_card_state>` (the investor + the property fit + thesis), \
+and the tenancy-in-situ KB.
+2. Identify the lease's load-bearing terms: remaining fixed term + end date, current rent vs market \
+(use the property-fit rent estimate in `<plan_card_state>` as the market reference), rent-review \
+clause, special conditions, bond lodgement, and any stated arrears.
+3. For each term unfavourable to an incoming investor owner, add the matching enum flag + a \
+bilingual concern (grounded in that term, with a severity). Promote genuinely high-severity ones \
+to `high_severity_flags` (`source_doc` "lease").
+4. Set `overall_verdict` honestly from the balance of concerns (low_risk if none is material).
+5. Write a bilingual `next_action_for_user` that points to confirming the flagged terms with the \
+conveyancer / solicitor before signing.
+6. Emit ONLY the leaves.""",
+    },
 }
 
 
@@ -955,6 +1068,18 @@ _PROPERTY_COMPONENT = {
                "property_card (the full attached property facts — year built, size, strata)"],
     "reads": "upstream DAG outcomes + the attached property card — §11.9 (property_fit_investor "
              "is the one downstream access path)",
+}
+_LEASE_COMPONENT = {
+    "component_id": "due_diligence",
+    "goal": "Interpret the uploaded lease for a domestic investor: which in-situ terms are "
+            "unfavourable to the incoming owner (machine flags + bilingual concerns/flags), an "
+            "overall verdict, and a closing action. Author no figure — the negotiation lever is "
+            "resolver-owned (and may be null).",
+    "inputs": ["property_fit_investor.outcome + strategy_thesis (the market-rent reference + thesis)",
+               "resolver_outcome (the risk_assessment_investor scaffold: the procurement checklist, "
+               "the computable yield-vs-thesis flag, the bilingual actions/questions)",
+               "lease_document (the uploaded lease text)"],
+    "reads": "upstream DAG outcomes + the uploaded lease document — §11.9",
 }
 
 
@@ -1297,6 +1422,94 @@ async def fill_property_assessment(upstream_outcomes, resolver_outcome, property
     return out, usage
 
 
+def _extract_document_text(document):
+    """Deterministic byte→text normalization for an uploaded lease (architecture §11.9 — the
+    `<from_document>` extraction is INPUT NORMALIZATION, not a fill: NO LLM, NO figure, emits no
+    component_filled). Decodes the inline base64 document and extracts plain text — PDF via pypdf,
+    text/* decoded directly. The bytes are TRANSIENT (handed in on the turn, never persisted). The
+    extracted text is capped (a lease is a few pages) and handed to the leaf as <lease_document>.
+    Raises RuntimeError on an unsupported / empty / unreadable document (surfaced as leaf_fill_failed)."""
+    import base64
+    b64 = document.get("content_base64") or ""
+    mime = (document.get("mime_type") or "").lower()
+    filename = (document.get("filename") or "").lower()
+    try:
+        raw = base64.b64decode(b64, validate=True)
+    except Exception as exc:  # noqa: BLE001 — surface a clear message, never crash the sidecar
+        raise RuntimeError(f"document is not valid base64: {exc}")
+    if not raw:
+        raise RuntimeError("document is empty")
+    is_pdf = "pdf" in mime or filename.endswith(".pdf") or raw[:5] == b"%PDF-"
+    if is_pdf:
+        import io
+        from pypdf import PdfReader
+        reader = PdfReader(io.BytesIO(raw))
+        text = "\n".join((page.extract_text() or "") for page in reader.pages)
+    elif mime.startswith("text/") or filename.endswith((".txt", ".md")):
+        text = raw.decode("utf-8", errors="replace")
+    else:
+        raise RuntimeError(f"unsupported document type (mime={mime!r}, file={filename!r}); "
+                           "upload a PDF or a text lease")
+    text = text.strip()
+    if not text:
+        raise RuntimeError("no extractable text in the document (a scanned image PDF has no text layer)")
+    return text[:60000]
+
+
+async def fill_lease_interpretation(upstream_outcomes, resolver_outcome, lease_document):
+    """Document-gated two-path agent half of `due_diligence` (Mode C, Phase B — due_diligence B):
+    one real Agent-SDK structured one-shot that reads the UPLOADED lease text and authors the
+    qualitative tenancy-risk leaves. The procurement checklist, the computable yield flag, and the
+    bilingual actions/questions are resolver-owned (`<resolver_outcome>`). output_format = the
+    lease-interpretation schema (no number field → the negotiation lever stays resolver/null, §98).
+    The lease bytes are extracted to text DETERMINISTICALLY here (no LLM, no figure) and handed in
+    as `<lease_document>`; the bytes are transient (never persisted). Returns (leaves_dict, usage)."""
+    import time
+    _t0 = time.monotonic()
+    from claude_agent_sdk import ClaudeAgentOptions, ResultMessage, query
+    _t_import = time.monotonic()
+
+    lease_text = _extract_document_text(lease_document or {})
+
+    options = ClaudeAgentOptions(
+        model=LEAF_MODEL,
+        effort=LEAF_EFFORT,   # bound reasoning depth (else opus thinks for minutes)
+        system_prompt=build_system_prompt("lease_interpretation",
+                                          _kb_block("lease_interpretation")),
+        setting_sources=[],   # do NOT load CLAUDE.md / project settings
+        allowed_tools=[],     # leaf-fill pulls no tools
+        env=_credit_env(),    # subscription-credit auth, subprocess-scoped
+        output_format={"type": "json_schema",
+                       "schema": LeaseInterpretationLeaves.model_json_schema()},
+    )
+    user = (build_user_content(_LEASE_COMPONENT, upstream_outcomes, resolver_outcome)
+            + "\n\n<lease_document>\n" + lease_text + "\n</lease_document>")
+
+    async def _consume():
+        structured = None
+        usage = {}
+        async for message in query(prompt=user, options=options):
+            if isinstance(message, ResultMessage):
+                structured = getattr(message, "structured_output", None)
+                usage = getattr(message, "usage", {}) or {}
+        return structured, usage
+
+    try:
+        structured, usage = await asyncio.wait_for(_consume(), timeout=LEAF_TIMEOUT_S)
+    except asyncio.TimeoutError:
+        raise RuntimeError(f"leaf-fill exceeded {LEAF_TIMEOUT_S}s app-side timeout")
+
+    if structured is None:
+        raise RuntimeError("Agent SDK returned no structured_output")
+
+    _t_query = time.monotonic()
+    print(f"[planner] due_diligence(lease_interpretation): "
+          f"sdk_import={_t_import - _t0:.1f}s query={_t_query - _t_import:.1f}s "
+          f"model={LEAF_MODEL} effort={LEAF_EFFORT}", file=sys.stderr, flush=True)
+    leaves = LeaseInterpretationLeaves(**structured)  # raises ValidationError if off
+    return leaves.model_dump(), usage
+
+
 # --- fill_component (2b-2b: the sidecar fills ONE agent component) -------------
 # The turn's gen_statem walks the DAG and dispatches resolver components in-process
 # (Erlang); it spawns this disposable sidecar only for an agent / two-path component,
@@ -1329,6 +1542,14 @@ async def handle_fill_component(params):
         property_card = params.get("property_card", {})
         entry = (component_id,
                  lambda u, r: fill_property_assessment(u, r, property_card))
+    elif component_id == "due_diligence":
+        # due_diligence B (Mode C, Phase B): dispatched by COMPONENT_ID (not reasoning_domain)
+        # because it takes the uploaded lease as extra grounding and authors fields beyond the
+        # single declared leaf — the same shape as property_assessment. The engine only fires
+        # this sidecar when a lease is present (effective_fill_path/2), so `document` is set.
+        lease_document = params.get("document", {})
+        entry = (component_id,
+                 lambda u, r: fill_lease_interpretation(u, r, lease_document))
     else:
         entry = _FILLERS.get(reasoning_domain)
     if entry is None:

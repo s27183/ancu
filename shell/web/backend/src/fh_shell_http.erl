@@ -50,6 +50,10 @@ routes() ->
         %% the bare `/:id`, so they precede it (cowboy matches in order).
         {"/api/plan-cards/:id/properties", fh_shell_h_plan_card, [properties]},
         {"/api/plan-cards/:id/properties/:pid/transaction", fh_shell_h_plan_card, [transaction]},
+        %% due_diligence B (the `<from_document>` surface) — upload the lease for an attached
+        %% property (→ a document-gated two-path re-fill, a metered LLM turn). More specific
+        %% than the bare `/:id`, so it precedes it (cowboy matches in order).
+        {"/api/plan-cards/:id/properties/:pid/documents", fh_shell_h_plan_card, [documents]},
         {"/api/plan-cards/:id", fh_shell_h_plan_card, []},
         %% Login flow (8-S login slice) — one handler, action per route opt.
         {"/api/auth/magic", fh_shell_h_auth, [magic_request]},

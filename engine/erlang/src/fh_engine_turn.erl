@@ -129,6 +129,24 @@ init(#{tenant_id := T, plan_card_id := PC, turn_id := Tn} = Args) ->
             Seed = maps:merge(BaseSeed, AddSeed),
             Data = Args#{components => Components, outcomes => Seed},
             {ok, running, Data, [{next_event, internal, step}]};
+        document ->
+            %% A `<from_document>` re-fill (due_diligence B): the user UPLOADED the current lease
+            %% for an ALREADY-ATTACHED property → a DOCUMENT-GATED two-path re-fill of due_diligence
+            %% alone. Components is the single due_diligence def (picked from the per-property set).
+            %% The seed is base ∪ addendum outcomes by outcome_type — due_diligence reads
+            %% property_fit_investor (the market-rent reference) + strategy_thesis (the target yield),
+            %% both already in the addendum/base after the attach turn, NOT recomputed here. The
+            %% inline `document` rides Args and reaches the resolver-grounded lease_interpretation
+            %% sidecar via start_fill_port; the bytes are transient (never persisted). effective_fill_
+            %% path/2 sees the document present → due_diligence runs two-path (the sidecar fires).
+            Slug = maps:get(blueprint_slug, Args),
+            Components = [C || C <- property_components(Slug),
+                              maps:get(<<"name">>, C) =:= <<"due_diligence">>],
+            BaseSeed = outcomes_by_type(Slug, maps:get(base_components_snapshot, Args, #{})),
+            AddSeed  = outcomes_by_type(Slug, maps:get(addendum_components_snapshot, Args, #{})),
+            Seed = maps:merge(BaseSeed, AddSeed),
+            Data = Args#{components => Components, outcomes => Seed},
+            {ok, running, Data, [{next_event, internal, step}]};
         qa ->
             {ok, qa, Args, [{next_event, internal, start}]}
     end.
@@ -143,7 +161,7 @@ running(internal, step, #{components := []} = Data) ->
     {stop, normal, Data};
 running(internal, step, #{components := [Comp | Rest]} = Data) ->
     Name = maps:get(<<"name">>, Comp),
-    case fill_path(Comp) of
+    case effective_fill_path(Comp, Data) of
         resolver ->
             %% Resolver: fill in-process, commit, accumulate, advance.
             {Outcome, Renderer, KbVersions} =
@@ -551,6 +569,30 @@ fill_path(Comp) ->
               end
     end.
 
+%% The fill path ACTUALLY taken this turn — fill_path/1 (artifact-derived) refined by a runtime
+%% input gate. due_diligence (due_diligence B) carries the lease_interpretation agent leaf, so
+%% fill_path/1 reports two_path wherever it runs; but the leaf's irreducible input is the UPLOADED
+%% lease, so the sidecar may fire only when a lease is present. A plain property attach (no
+%% document in Data) runs due_diligence RESOLVER-ONLY (honest-partial: the procurement checklist +
+%% the computable yield flag, no LLM call, no usage); a `document` turn (lease present) runs it
+%% two-path. This is the one place the engine expresses "an agent leaf whose required input is
+%% absent falls back to resolver-only" — it cannot be an artifact property (document-presence is a
+%% runtime fact), and it preserves "resolver-only at A" for the no-lease path. Every other
+%% component is unaffected (passes fill_path/1 through).
+effective_fill_path(Comp, Data) ->
+    case fill_path(Comp) of
+        two_path ->
+            case maps:get(<<"name">>, Comp) of
+                <<"due_diligence">> ->
+                    case maps:get(document, Data, undefined) of
+                        undefined -> resolver;
+                        _         -> two_path
+                    end;
+                _ -> two_path
+            end;
+        Other -> Other
+    end.
+
 %% reasoning_domain of an agent component = its agent leaves' shared domain.
 reasoning_domain(Comp) ->
     case maps:get(<<"agent_leaves">>, Comp, []) of
@@ -685,9 +727,17 @@ start_fill_port(Comp, #{plan_card_id := PC} = Data, ResolverOutcome) ->
     %% A per-property component (property_assessment) reasons over the attached property's
     %% full facts (year built, land size, strata) — richer than the four neutral facts the
     %% resolver copies into the outcome. Hand the whole card to the sidecar as grounding.
-    Params = case maps:get(property_card, Data, undefined) of
+    Params2 = case maps:get(property_card, Data, undefined) of
                  undefined -> Params1;
                  Card      -> Params1#{<<"property_card">> => Card}
+             end,
+    %% due_diligence B: the uploaded lease (the `<from_document>` input) rides the envelope as
+    %% inline base64 on a `document` turn — the sidecar extracts text deterministically (no LLM)
+    %% and grounds the lease_interpretation leaf in it. Transient: never persisted (architecture
+    %% §11.9). Absent on every other turn → no `document` block.
+    Params = case maps:get(document, Data, undefined) of
+                 undefined -> Params2;
+                 Doc       -> Params2#{<<"document">> => Doc}
              end,
     Req = #{<<"method">> => <<"fill_component">>, <<"params">> => Params},
     port_command(Port, fh_engine_util:json_encode(Req)),

@@ -19,15 +19,35 @@
         pick,
         type PreparationOutcome,
         type SettlementChecklistOutcome,
-        type MilestoneStatus
+        type MilestoneStatus,
+        type RiskAssessmentInvestorOutcome,
+        type DueDiligenceDoc
     } from '$lib/planCard';
     import { money } from '$lib/format';
     import NoteList from './NoteList.svelte';
 
     let { outcome }: { outcome: Record<string, unknown> } = $props();
 
-    // The discriminator: settlement carries `dates_status`; preparation does not.
+    // The discriminators (constraint #7 — one renderer NAME, three outcome shapes): settlement
+    // carries `dates_status`; Mode-C due_diligence (risk_assessment_investor) carries `docs_status`;
+    // preparation (FHB readiness) carries neither.
     const isSettlement = $derived('dates_status' in (outcome ?? {}));
+    const isDueDiligence = $derived('docs_status' in (outcome ?? {}));
+
+    // --- due_diligence (Mode C, Phase B) — the PROCUREMENT surface ------------
+    // The document checklist (what to gather + why; the lease entry flips received/reviewed once
+    // interpreted), the actions-before-signing + vendor questions, and the next action. The RISK
+    // surface (verdict + concerns + high-severity flags) is the sibling risk-flag-list renderer.
+    const dd = $derived(outcome as unknown as RiskAssessmentInvestorOutcome);
+    const ddDocs = $derived(dd.document_checklist ?? []);
+    const ddActions = $derived(dd.actions_before_signing ?? []);
+    const ddQuestions = $derived(dd.questions_for_vendor ?? []);
+    function ddDocStatus(d: DueDiligenceDoc): { cls: string; label: string } {
+        if (d.reviewed) return { cls: 'done', label: $t('plan.dd.doc.reviewed') };
+        if (d.received) return { cls: 'in_progress', label: $t('plan.dd.doc.received') };
+        if (d.required) return { cls: 'pending', label: $t('plan.dd.doc.required') };
+        return { cls: 'pending', label: $t('plan.dd.doc.optional') };
+    }
 
     // --- preparation (due_diligence) -----------------------------------------
     const prep = $derived(outcome as PreparationOutcome);
@@ -121,6 +141,28 @@
         <h4 class="ck-heading">{$t('plan.settle.insurance')}</h4>
         <p class="ck-why">{pick(settle.insurance_timing_rule, $lang)}</p>
     {/if}
+{:else if isDueDiligence}
+    {#if dd.next_action_for_user}
+        <p class="ck-why ck-next">{pick(dd.next_action_for_user, $lang)}</p>
+    {/if}
+
+    {#if ddDocs.length}
+        <h4 class="ck-heading">{$t('plan.dd.docs')}</h4>
+        <ul class="ck-list">
+            {#each ddDocs as d (d.id)}
+                <li class="ck-item">
+                    <div class="ck-item-head">
+                        <span class="ck-item-name">{pick(d.name, $lang)}</span>
+                        <span class="ck-status ck-status-{ddDocStatus(d).cls}">{ddDocStatus(d).label}</span>
+                    </div>
+                    {#if d.why}<p class="ck-why">{pick(d.why, $lang)}</p>{/if}
+                </li>
+            {/each}
+        </ul>
+    {/if}
+
+    <NoteList heading={$t('plan.dd.actions')} notes={ddActions} />
+    <NoteList heading={$t('plan.dd.questions')} notes={ddQuestions} />
 {:else}
     {#if docs.length}
         <h4 class="ck-heading">{$t('plan.prep.docs')}</h4>

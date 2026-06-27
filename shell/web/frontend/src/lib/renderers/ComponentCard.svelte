@@ -13,6 +13,7 @@
     import Checklist from './Checklist.svelte';
     import BuyingStrategyCard from './BuyingStrategyCard.svelte';
     import OpportunityCard from './OpportunityCard.svelte';
+    import RiskFlagList from './RiskFlagList.svelte';
 
     let { componentId, entry, filling, density = 'compact' }: {
         componentId: string;
@@ -50,6 +51,8 @@
                 <SwimlaneDiagram outcome={entry.outcome} {density} />
             {:else if r === 'checklist'}
                 <Checklist outcome={entry.outcome} />
+            {:else if r === 'risk-flag-list'}
+                <RiskFlagList outcome={entry.outcome} />
             {:else if r === 'buying-strategy-card'}
                 <BuyingStrategyCard outcome={entry.outcome} />
             {:else if r === 'opportunity-card'}

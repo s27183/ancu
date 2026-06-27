@@ -13,7 +13,7 @@
 
 -export([create_plan_card/2, get_plan_card/2, post_message/3, simulate/3,
          refine/3, set_profile_financials/3, set_checklist_status/3,
-         attach_property/3, set_transaction_dates/4, stream_events/3,
+         attach_property/3, set_transaction_dates/4, upload_document/4, stream_events/3,
          list_suburbs/1, get_usage_events/2, start_httpc_profiles/0]).
 
 %% Dedicated httpc profile for the LONG-LIVED SSE stream proxy (stream_events/3).
@@ -218,6 +218,28 @@ set_transaction_dates(UserId, PlanCardId, PropertyId, BodyMap) ->
     Token = fh_shell_engine_jwt:mint(#{user_id => UserId}),
     Url = base_url() ++ "/plan-cards/" ++ binary_to_list(PlanCardId)
           ++ "/properties/" ++ binary_to_list(PropertyId) ++ "/transaction",
+    Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
+    Body = fh_shell_util:json_encode(BodyMap),
+    {ok, {{_, Status, _}, _, Resp}} =
+        httpc:request(post, {Url, Headers, "application/json", Body},
+                      [{timeout, ?RPC_TIMEOUT_MS}], [{body_format, binary}]),
+    {Status, Resp}.
+
+%% Upload a due-diligence DOCUMENT (the current lease) — POST /api/engine/plan-cards/:id/
+%% properties/:pid/documents with {content_base64, mime_type?, filename?} (due_diligence B,
+%% the `<from_document>` input surface). The shell has confirmed the user owns the card + the
+%% token-limit gate first (UNLIKE the free transaction submit, this fires the lease_interpretation
+%% leaf — a metered LLM call). The engine re-validates the addendum :pid exists (409
+%% property_not_attached) and the document (400 invalid_document with a typed code), runs the
+%% DOCUMENT-GATED two-path re-fill of due_diligence, and answers 202 {plan_card_id, property_id,
+%% turn_id}; the reviewed risk_assessment_investor streams over the SAME /events SSE. The bytes
+%% are transient (never persisted, engine-side). Relayed verbatim — the engine owns the contract.
+-spec upload_document(binary(), binary(), binary(), map()) ->
+    {non_neg_integer(), binary()}.
+upload_document(UserId, PlanCardId, PropertyId, BodyMap) ->
+    Token = fh_shell_engine_jwt:mint(#{user_id => UserId}),
+    Url = base_url() ++ "/plan-cards/" ++ binary_to_list(PlanCardId)
+          ++ "/properties/" ++ binary_to_list(PropertyId) ++ "/documents",
     Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
     Body = fh_shell_util:json_encode(BodyMap),
     {ok, {{_, Status, _}, _, Resp}} =

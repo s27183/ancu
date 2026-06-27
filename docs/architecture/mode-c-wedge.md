@@ -1637,6 +1637,64 @@ class as the NG/Checklist recoveries).
   intact. Harness removed after. **The two `DataTable.svelte` investor shapes are now both recovered;
   no shared-name renderer on the Mode-C surface still drops a producer's content.**
 
+## `due_diligence` B — the `<from_document>` upload pipeline — DONE (2026-06-27)
+
+The heavy deferred half of the cross-contract input-surface unit: the lease-upload pipeline + the
+`lease_interpretation` agent leaf. The last per-property B-half; built the **whole vertical**
+(transport → extraction → leaf → fold → render) so a user can upload a lease and see analysis.
+Decree 13 does **not** gate it — Mode C is the AU-located citizen/PR investor (it bites at Mode D),
+so there is no data-residency blocker, and the architecture's "bytes never persisted past the
+consuming turn" rule (§11.9) means **inline base64 → extract → discard**: no blob store, no
+data-at-rest, no migration.
+
+- **Engine — blueprint + artifact.** Re-added the `agent_reasoning_required: true,
+  reasoning_domain: "lease_interpretation"` marker to `current_tenancy_unfavourable_terms` (the
+  marker the 8e gotcha had *removed* — the param now carries it AND the filler exists). Recompiled
+  → `due_diligence.agent_leaves = [{leaf: …current_tenancy_unfavourable_terms, lease_interpretation}]`;
+  all gates pass.
+- **Engine — Python sidecar.** New `lease_interpretation` `_DOMAINS` entry (hard decision-support
+  posture — the most LEGALLY-adjacent content; flag-and-point-to-conveyancer, never a legal opinion),
+  `LeaseInterpretationLeaves` schema (NO number field — the negotiation lever stays resolver/null,
+  §98), `fill_lease_interpretation` (dispatched by `component_id` like `property_assessment`, takes
+  the lease as extra grounding), and `_extract_document_text` — **deterministic** byte→text (pypdf
+  for PDF, decode for text; NO LLM, transient). `pypdf` added to `pyproject.toml`.
+- **Engine — Erlang.** `merge_agent(<<"due_diligence">>, …)` folds the leaf (flip
+  `docs_status`→`reviewed` + the lease checklist entry, append the lease concerns to the resolver's
+  yield-vs-thesis concern, place the high-severity flags + verdict; lever stays null). A `document`
+  turn kind (mirrors `transaction`), `effective_fill_path/2` (the document-presence gate: due_diligence
+  is two-path iff a lease is present, else resolver-only — so "resolver-only at A" still holds for the
+  no-lease path, and the sidecar/usage fires only when there's a lease to read), the inline document
+  threaded into `start_fill_port`, the `fh_engine_h_attach_document` handler + route. **No new store
+  function** — the durable "reviewed" signal is the leaf's non-null `overall_verdict` in the snapshotted
+  outcome (refresh-idempotent; `agent_values_from_outcome` is never reached for due_diligence, so the
+  catch-all stays fail-closed). Bytes never persisted.
+- **Shell.** `upload_document` proxy (`fh_shell_engine_client`) + a gated `documents` action
+  (`fh_shell_h_plan_card` — a metered LLM turn, so it runs the §7 token gate like `properties`/`ask`,
+  unlike the free transaction submit) + route. `uploadDocument(planCardId, propertyId, File)` (api.ts,
+  File→base64 inline JSON, not multipart) + a `DocumentUpload` modal/control in `PlanProjection`
+  (sibling to the settlement-dates control). The rich `risk_assessment_investor` outcome is recovered
+  in BOTH its renderers (constraint #7, shape-discriminated, no new renderer): `risk-flag-list` renders
+  the RISK surface (verdict + concerns + high-severity flags — `RiskFlagList` gained an `outcome` prop
+  beside its existing `risks`, discriminated, so `PhaseSheet` is untouched) and `checklist` the
+  PROCUREMENT surface (document_checklist + actions + questions, `docs_status` discriminator).
+  `RiskAssessmentInvestorOutcome` + types in `planCard.ts`; `plan.dd.*` + `plan.lease.*` bilingual
+  chrome in `i18n.ts`.
+- **Verified.** Engine: `rebar3 compile` clean (both halves), `erlang-checker` clean, sidecar parses +
+  schema/domain/dispatch confirmed, `_extract_document_text` proven (text + real reportlab PDF + all
+  error paths). Below-the-seam escript: resolver (no doc) → `pending_upload`/`pending_documents`;
+  merge → `reviewed`/`proceed_with_actions`, concerns 1→2 (no dup), flag placed, lease checklist
+  flipped, **lever null**, and the merged outcome **passes `risk_assessment_investor` conformance**.
+  Shell: `svelte-check` **0/0**, `npm run build` green, `svelte-autofixer` clean. **Pixel-proven EN+VI**
+  (harness-mount of the real `ComponentCard` → `RiskFlagList` + `Checklist` with the **real captured**
+  pending + reviewed outcomes): PENDING → *Awaiting documents* + the yield concern + procurement docs
+  (*To gather*/*Optional*); REVIEWED → *Proceed with actions* + HIGH/MEDIUM concern badges + the red
+  *High-severity flags* section + the lease doc flipped to *Reviewed*; VI mirror with diacritics intact.
+  Harness removed after. **Not yet run on the live full stack** (a real document turn → real
+  `lease_interpretation` LLM call → SSE → render needs the engine+shell+PG up with
+  `CLAUDE_CODE_OAUTH_TOKEN`) — that wire is verified by-construction + below-the-seam, and belongs to
+  the deploy pass. **The Mode-C wedge's three per-property input surfaces are now all built:**
+  `property_card` (attach), `<from_transaction>` (dates), `<from_document>` (lease upload).
+
 ## Deferred out (honest — first-exercising instance is Mode B/D, not here)
 
 `off_title_parties[]` (array vs A's scalar `non_buying_partner`), `visa_class`, off-title

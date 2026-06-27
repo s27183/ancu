@@ -299,6 +299,52 @@ const messages = {
     'plan.settle.status.done': { vi: 'Hoàn tất', en: 'Done' },
     'plan.settle.status.scheduled': { vi: 'Đã lên lịch', en: 'Scheduled' },
     'plan.settle.status.at_risk': { vi: 'Quá hạn', en: 'Date passed' },
+    // due_diligence (Mode C, Phase B) — the risk-flag-list + checklist render chrome (the lease
+    // verdict, the high-severity heading, the procurement-doc status + section headings).
+    'plan.dd.verdict.pending_documents': { vi: 'Chờ tài liệu', en: 'Awaiting documents' },
+    'plan.dd.verdict.low_risk': { vi: 'Rủi ro thấp', en: 'Low risk' },
+    'plan.dd.verdict.proceed_with_actions': { vi: 'Tiến hành kèm lưu ý', en: 'Proceed with actions' },
+    'plan.dd.verdict.high_risk': { vi: 'Rủi ro cao', en: 'High risk' },
+    'plan.dd.high_severity': { vi: 'Cảnh báo nghiêm trọng', en: 'High-severity flags' },
+    'plan.dd.docs': { vi: 'Tài liệu thẩm định cần có', en: 'Due-diligence documents' },
+    'plan.dd.actions': { vi: 'Việc cần làm trước khi ký', en: 'Before you sign' },
+    'plan.dd.questions': { vi: 'Câu hỏi cho bên bán', en: 'Questions for the vendor' },
+    'plan.dd.doc.reviewed': { vi: 'Đã rà soát', en: 'Reviewed' },
+    'plan.dd.doc.received': { vi: 'Đã nhận', en: 'Received' },
+    'plan.dd.doc.required': { vi: 'Cần có', en: 'To gather' },
+    'plan.dd.doc.optional': { vi: 'Tùy chọn', en: 'Optional' },
+    // due_diligence B — the lease-upload control + modal (the `<from_document>` surface).
+    'plan.lease.cta_upload': { vi: 'Tải lên hợp đồng thuê', en: 'Upload the lease' },
+    'plan.lease.cta_update': { vi: 'Cập nhật hợp đồng thuê', en: 'Update the lease' },
+    'plan.lease.title': { vi: 'Hợp đồng thuê hiện tại', en: 'Current lease' },
+    'plan.lease.intro': {
+        vi: 'Nếu bất động sản đang cho thuê, hãy tải lên hợp đồng (PDF hoặc văn bản) để rà soát các điều khoản bất lợi cho người mua đầu tư. Đây là thông tin hỗ trợ quyết định — hãy xác nhận với luật sư chuyển nhượng.',
+        en: 'If the property is tenanted, upload the lease (PDF or text) to review its terms for an incoming investor. This is decision-support — confirm with your conveyancer.'
+    },
+    'plan.lease.file': { vi: 'Tệp hợp đồng (PDF hoặc văn bản)', en: 'Lease file (PDF or text)' },
+    'plan.lease.cancel': { vi: 'Hủy', en: 'Cancel' },
+    'plan.lease.submit': { vi: 'Tải lên & rà soát', en: 'Upload & review' },
+    'plan.lease.uploading': { vi: 'Đang rà soát…', en: 'Reviewing…' },
+    'plan.lease.err.not_attached': {
+        vi: 'Hãy gắn bất động sản trước khi tải hợp đồng.',
+        en: 'Attach the property before uploading the lease.'
+    },
+    'plan.lease.err.busy': {
+        vi: 'Kế hoạch đang được tính. Vui lòng thử lại sau giây lát.',
+        en: 'The plan is busy computing. Please try again shortly.'
+    },
+    'plan.lease.err.over_limit': {
+        vi: 'Bạn đã đạt giới hạn sử dụng của gói. Nâng cấp để tiếp tục.',
+        en: "You've reached your plan's usage limit. Upgrade to continue."
+    },
+    'plan.lease.err.invalid': {
+        vi: 'Không đọc được tệp. Hãy tải lên PDF hoặc văn bản hợp lệ.',
+        en: "Couldn't read that file. Upload a valid PDF or text lease."
+    },
+    'plan.lease.err.generic': {
+        vi: 'Đã xảy ra lỗi. Vui lòng thử lại.',
+        en: 'Something went wrong. Please try again.'
+    },
     'plan.qa.pending': {
         vi: 'Phần hỏi đáp sẽ sẵn sàng khi kế hoạch tính xong.',
         en: 'Q&A opens once your plan finishes computing.'

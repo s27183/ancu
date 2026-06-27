@@ -17,6 +17,7 @@
         setChecklistStatus,
         attachProperty,
         setTransactionDates,
+        uploadDocument,
         type SimulateOverrides,
         type HouseholdFinancials,
         type PropertyCardInput,
@@ -453,6 +454,60 @@
         }
     }
 
+    // ── Upload a lease document (due_diligence B, the `<from_document>` surface) ──
+    // Uploading the current lease of a tenanted property runs due_diligence's lease_interpretation
+    // leaf — a DOCUMENT-GATED two-path re-fill (an AGENT turn → metered → the over_limit gate
+    // applies, UNLIKE the resolver-only transaction submit). Offered for the selected attached
+    // property on its due_diligence card. The reviewed risk_assessment_investor streams over the
+    // SAME open SSE — no re-subscribe. The bytes are sent inline + are never persisted engine-side.
+    const ddEntry = $derived(viewComponents.due_diligence);
+    const ddStatus = $derived(
+        (ddEntry?.outcome as { docs_status?: string } | undefined)?.docs_status ?? null
+    );
+    let showLease = $state(false);
+    let leaseFile = $state<File | null>(null);
+    let uploadingLease = $state(false);
+    let leaseError = $state<
+        null | { kind: 'not_attached' } | { kind: 'busy' } | { kind: 'invalid'; code: string }
+        | { kind: 'over_limit' } | { kind: 'error' }
+    >(null);
+
+    function openLease() {
+        leaseFile = null;
+        leaseError = null;
+        showLease = true;
+    }
+
+    function onLeaseFile(e: Event) {
+        const input = e.target as HTMLInputElement;
+        leaseFile = input.files?.[0] ?? null;
+    }
+    const leaseReady = $derived(leaseFile !== null && !uploadingLease);
+
+    async function submitLease() {
+        if (!cardId || !selectedPropertyId || !leaseFile) return;
+        uploadingLease = true;
+        leaseError = null;
+        const res = await uploadDocument(cardId, selectedPropertyId, leaseFile);
+        uploadingLease = false;
+        if (res.kind === 'accepted') {
+            // The reviewed risk_assessment_investor arrives over the live SSE; surface the
+            // running indicator while the document-gated two-path re-fill runs.
+            turnDone = false;
+            showLease = false;
+        } else if (res.kind === 'not_attached') {
+            leaseError = { kind: 'not_attached' };
+        } else if (res.kind === 'busy') {
+            leaseError = { kind: 'busy' };
+        } else if (res.kind === 'over_limit') {
+            leaseError = { kind: 'over_limit' };
+        } else if (res.kind === 'invalid') {
+            leaseError = { kind: 'invalid', code: res.code };
+        } else {
+            leaseError = { kind: 'error' };
+        }
+    }
+
     // The budget (Cash-calculator) sub-tabs (§7.3): cockpit + verdict → cash-events table →
     // breakdown detail → the disposition projection. The 4th "Full horizon" tab is present
     // only when the engine emits a disposition component (honest-partial tab presence; its
@@ -831,6 +886,47 @@
         </Modal>
     {/if}
 
+    {#if showLease}
+        <Modal title={$t('plan.lease.title')} onClose={() => (showLease = false)}>
+            <form class="pp-attach-form" onsubmit={(e) => { e.preventDefault(); submitLease(); }}>
+                <p class="pp-attach-intro">{$t('plan.lease.intro')}</p>
+                <label class="pp-af-field">
+                    <span class="pp-af-label">{$t('plan.lease.file')}</span>
+                    <input
+                        type="file"
+                        accept=".pdf,.txt,application/pdf,text/plain"
+                        onchange={onLeaseFile}
+                    />
+                </label>
+
+                {#if leaseError}
+                    <p class="pp-af-error">
+                        {#if leaseError.kind === 'not_attached'}
+                            {$t('plan.lease.err.not_attached')}
+                        {:else if leaseError.kind === 'busy'}
+                            {$t('plan.lease.err.busy')}
+                        {:else if leaseError.kind === 'over_limit'}
+                            {$t('plan.lease.err.over_limit')}
+                        {:else if leaseError.kind === 'invalid'}
+                            {$t('plan.lease.err.invalid')}
+                        {:else}
+                            {$t('plan.lease.err.generic')}
+                        {/if}
+                    </p>
+                {/if}
+
+                <div class="pp-af-actions">
+                    <button type="button" class="pp-af-cancel" onclick={() => (showLease = false)}>
+                        {$t('plan.lease.cancel')}
+                    </button>
+                    <button type="submit" class="primary" disabled={!leaseReady}>
+                        {uploadingLease ? $t('plan.lease.uploading') : $t('plan.lease.submit')}
+                    </button>
+                </div>
+            </form>
+        </Modal>
+    {/if}
+
     <!-- Sub-tabs: one per plan section + a Q&A tab — each section shows on its own, so
          the user never scrolls a long plan. Horizontally scrollable on narrow screens. -->
     <div class="pp-subtabs" role="tablist">
@@ -1153,6 +1249,15 @@
                                 {settleStatus === 'active'
                                     ? $t('plan.settle.cta_update')
                                     : $t('plan.settle.cta_enter')}
+                            </button>
+                        </div>
+                    {/if}
+                    {#if cid === 'due_diligence' && supportsPhaseB && viewingProperty}
+                        <div class="pp-settle-cta">
+                            <button type="button" class="pp-attach-btn" onclick={openLease}>
+                                {ddStatus === 'reviewed'
+                                    ? $t('plan.lease.cta_update')
+                                    : $t('plan.lease.cta_upload')}
                             </button>
                         </div>
                     {/if}

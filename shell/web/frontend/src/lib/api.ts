@@ -480,6 +480,95 @@ export async function attachProperty(
     return { kind: 'error', status: res.status };
 }
 
+// --- Per-property document upload: due_diligence B (the `<from_document>` surface) ----
+// POST /api/plan-cards/:id/properties/:pid/documents — upload the current lease for an
+// ALREADY-ATTACHED property → the engine runs a DOCUMENT-GATED two-path re-fill that fires
+// the lease_interpretation leaf (an AGENT turn → emits usage → GATED, like attach, unlike the
+// free transaction submit). The file rides as inline base64 in a JSON body (NOT multipart —
+// the engine contract is {content_base64, mime_type, filename}); the bytes are transient
+// (never persisted). 202 {…, turn_id}; the reviewed risk_assessment_investor streams over the
+// SAME /events SSE (no re-subscribe). Two 409s (busy / not_attached) like transaction; 402
+// over_limit like attach; 400 invalid_document with a typed `code`.
+
+/** A discriminated upload outcome. `over_limit` is the meter 402 (the lease leaf is a metered
+ *  LLM call); the two 409s (`busy` / `not_attached`) disambiguate on the error body; `invalid`
+ *  carries the engine's typed 400 `code` (content_base64_required / document_too_large /
+ *  body_must_be_object) plus the sidecar's extraction failures relayed as a turn_failed event. */
+export type UploadDocumentOutcome =
+    | { kind: 'accepted'; result: AttachPropertyResult }
+    | { kind: 'over_limit'; tier: string; used: number; limit: number }
+    | { kind: 'not_attached' }
+    | { kind: 'busy' }
+    | { kind: 'invalid'; code: string }
+    | { kind: 'auth_required' }
+    | { kind: 'not_found' }
+    | { kind: 'error'; status: number };
+
+/** Read a File as base64 (no `data:<mime>;base64,` prefix — the engine wants the raw payload). */
+function fileToBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+            const result = String(reader.result ?? '');
+            const comma = result.indexOf(',');
+            resolve(comma >= 0 ? result.slice(comma + 1) : result);
+        };
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(file);
+    });
+}
+
+/** POST a lease document (PDF or text) for an attached property. The reviewed
+ *  risk_assessment_investor does NOT come back here — it streams over the card's /events; this
+ *  returns only the turn handle so the caller can show the running indicator + route the re-fill. */
+export async function uploadDocument(
+    planCardId: string,
+    propertyId: string,
+    file: File,
+    fetchFn: typeof fetch = fetch
+): Promise<UploadDocumentOutcome> {
+    const content_base64 = await fileToBase64(file);
+    const res = await fetchFn(
+        `/api/plan-cards/${encodeURIComponent(planCardId)}/properties/${encodeURIComponent(propertyId)}/documents`,
+        {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({
+                content_base64,
+                mime_type: file.type || null,
+                filename: file.name || null
+            })
+        }
+    );
+    if (res.status === 202) {
+        return { kind: 'accepted', result: (await res.json()) as AttachPropertyResult };
+    }
+    if (res.status === 402) {
+        const body = (await res.json().catch(() => ({}))) as {
+            tier?: string;
+            used_tokens?: number;
+            limit_tokens?: number;
+        };
+        return {
+            kind: 'over_limit',
+            tier: body.tier ?? '',
+            used: body.used_tokens ?? 0,
+            limit: body.limit_tokens ?? 0
+        };
+    }
+    if (res.status === 409) {
+        const body = (await res.json().catch(() => ({}))) as { error?: string };
+        return body.error === 'turn_in_flight' ? { kind: 'busy' } : { kind: 'not_attached' };
+    }
+    if (res.status === 400) {
+        const body = (await res.json().catch(() => ({}))) as { code?: string };
+        return { kind: 'invalid', code: body.code ?? '' };
+    }
+    if (res.status === 401) return { kind: 'auth_required' };
+    if (res.status === 404) return { kind: 'not_found' };
+    return { kind: 'error', status: res.status };
+}
+
 // --- Per-property transaction dates: settlement_prep B (engine-contract §11) --
 // POST /api/plan-cards/:id/properties/:pid/transaction — submit the two dates the
 // user ATTESTS about their own transaction (contract_signed_date + settlement_date)
