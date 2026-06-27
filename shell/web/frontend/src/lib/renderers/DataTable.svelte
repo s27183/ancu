@@ -6,7 +6,7 @@
     // attached.
     import { t } from '$lib/i18n';
     import { lang } from '$lib/stores/lang';
-    import { pick, type OngoingObligationsOutcome, type TaxOptimisedStructureOutcome } from '$lib/planCard';
+    import { pick, type OngoingObligationsOutcome, type TaxOptimisedStructureOutcome, type PortfolioPositionOutcome } from '$lib/planCard';
     import { money, moneyRange, num } from '$lib/format';
     import Field from './Field.svelte';
     import Chip from './Chip.svelte';
@@ -20,9 +20,10 @@
     } = $props();
     const o = $derived(outcome as OngoingObligationsOutcome);
 
-    // `data-table` is named by two unrelated outcome shapes. Shape-discriminate so the rich
+    // `data-table` is named by THREE unrelated outcome shapes. Shape-discriminate so each rich
     // producer isn't dropped (the Slice-4 Checklist lesson): tax_structure → tax_optimised_structure
-    // (the investor tax cluster + the NG reform note); else the ownership ongoing_obligations view.
+    // (the investor tax cluster + the NG reform note); ownership_planning_investor → portfolio_position
+    // (below); else the FHB ownership ongoing_obligations view.
     const isTax = $derived('cgt_discount_eligible' in outcome && 'recommended_entity' in outcome);
     const tx = $derived(outcome as TaxOptimisedStructureOutcome);
     // The reform note (the headline of this view) is the engine's bilingual {vi,en}; never recomputed.
@@ -40,6 +41,21 @@
     });
     const marginalRate = $derived(tx.cgt_marginal_rate != null ? `${num(tx.cgt_marginal_rate, $lang)}%` : null);
     const afterTaxCf = $derived(moneyRange(tx.after_tax_cash_flow_year_1, $lang));
+
+    // The third shape on `data-table`: ownership_planning_investor → portfolio_position (the
+    // hold/operate view). Discriminate on annual_tax_obligations (unique to this shape) so the
+    // engine-authored bilingual content isn't dropped — without this, portfolio_position falls
+    // through to the FHB branch below, which renders alert_triggers_armed only by a shared-name
+    // coincidence and silently drops everything else.
+    const isPortfolio = $derived('annual_tax_obligations' in outcome);
+    const pp = $derived(outcome as PortfolioPositionOutcome);
+    // The headline: the annual tax obligations the investor carries — engine-authored {vi,en}.
+    const ppObligations = $derived(pp.annual_tax_obligations ?? []);
+    // The six post-acquisition figures — honest-partial, null until post-settlement actuals.
+    const ppLvr = $derived(pp.current_lvr != null ? `${num(pp.current_lvr, $lang)}%` : null);
+    const ppEquity = $derived(money(pp.equity_built, $lang));
+    const ppCashFlow = $derived(money(pp.monthly_net_cash_flow_actual, $lang));
+    const ppDiversification = $derived(pp.portfolio_diversification_score != null ? `${pp.portfolio_diversification_score}/10` : null);
 
     const LAND_TAX: Record<string, 'good' | 'info' | 'neutral'> = {
         exempt_ppor: 'good',
@@ -106,6 +122,42 @@
 </div>
 <Field label={$t('plan.tx.marginal_rate')} value={marginalRate} />
 <Field label={$t('plan.tx.after_tax_cf')} value={afterTaxCf} />
+
+{:else if isPortfolio}
+<!-- ── ownership_planning_investor (portfolio_position) ────────────────── -->
+{#if ppObligations.length}
+    <div class="pp-sublist">
+        <span class="pp-label">{$t('plan.pp.obligations')}</span>
+        {#each ppObligations as ob, i (i)}
+            {#if pick(ob, $lang)}<p class="pp-obligation">{pick(ob, $lang)}</p>{/if}
+        {/each}
+    </div>
+{/if}
+<Field label={$t('plan.pp.lvr')} value={ppLvr} />
+<Field label={$t('plan.pp.equity')} value={ppEquity} />
+<Field label={$t('plan.pp.cash_flow')} value={ppCashFlow} />
+<div class="pp-field">
+    <span class="pp-label">{$t('plan.pp.ready')}</span>
+    {#if pp.ready_for_next_property === true}
+        <Chip label={$t('plan.pp.ready_yes')} tone="good" />
+    {:else}
+        <Pending />
+    {/if}
+</div>
+<Field label={$t('plan.pp.diversification')} value={ppDiversification} />
+{#if pp.alert_triggers_armed?.length}
+    <div class="pp-sublist">
+        <span class="pp-label">{$t('plan.f.alerts')}</span>
+        {#each pp.alert_triggers_armed as a, i (i)}
+            {#if pick(a.trigger, $lang) || pick(a.action, $lang)}
+                <div class="pp-alert">
+                    {#if pick(a.trigger, $lang)}<span class="pp-alert-trigger">{pick(a.trigger, $lang)}</span>{/if}
+                    {#if pick(a.action, $lang)}<span class="pp-alert-action">{pick(a.action, $lang)}</span>{/if}
+                </div>
+            {/if}
+        {/each}
+    </div>
+{/if}
 
 {:else}
 <!-- ── Outgoings hero ─────────────────────────────────────────────────── -->
@@ -177,6 +229,13 @@
     }
     .tx-reform-body {
         margin: 0.25rem 0 0;
+        font-size: 0.82rem;
+        color: var(--ink);
+        line-height: 1.45;
+    }
+    /* One annual-tax-obligation line (portfolio_position headline) — calm prose. */
+    .pp-obligation {
+        margin: 0.2rem 0 0;
         font-size: 0.82rem;
         color: var(--ink);
         line-height: 1.45;

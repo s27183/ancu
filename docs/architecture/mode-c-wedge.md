@@ -1606,11 +1606,36 @@ change**.
   the concrete note + Personal (sole)/Cá nhân (một người) + Negatively geared + 32% + the after-tax band,
   locale-correct `$`/`AU$`). Harness removed after.
 
-**Adjacent finding (flagged, sibling OUT of scope per Son).** `ownership_planning_investor`'s
-`data-table` (`portfolio_position`) is also rendered by `DataTable.svelte` and still drops
-`annual_tax_obligations` (its `alert_triggers_armed` *do* render — already wired; its `opportunities`
-render via `opportunity-card`). The same shape-branch technique would recover it — a separate small
-shell unit, deliberately not bundled (one-change-at-a-time).
+**Adjacent finding (was flagged sibling OUT of scope; now RECOVERED — see the next section).**
+`ownership_planning_investor`'s `data-table` (`portfolio_position`) was also rendered by `DataTable.svelte`
+and dropped `annual_tax_obligations` (its `alert_triggers_armed` *did* render — by a shared-name
+coincidence; its `opportunities` render via `opportunity-card`). The same shape-branch technique
+recovered it as the separate small shell unit below (one-change-at-a-time, built next).
+
+## `portfolio_position` data-table recovery — DONE (2026-06-27)
+
+The sibling of the NG-reform drop, recovered. `DataTable.svelte` is named by **three** outcome shapes
+(FHB `ongoing_obligations`, `tax_optimised_structure`, `portfolio_position`); before this unit
+`portfolio_position` fell through to the FHB `{:else}` branch, which rendered `alert_triggers_armed`
+**only** by a shared-name coincidence and silently dropped the engine-authored `annual_tax_obligations`
+(5 bilingual lines) + all six figure slots ([[thin-surface-vs-dropped-richness]], the same fourth-drop-mode
+class as the NG/Checklist recoveries).
+
+- **Scope: shell-only, pure consumer recovery.** No KB / blueprint / engine / artifact change — the
+  producer (`fh_engine_ownership:fill_investor/2`) already emits `annual_tax_obligations` +
+  `alert_triggers_armed` correctly (build-but-unconsumed → honest recovery, not an unbuilt dependency).
+- **`DataTable.svelte`** — new `isPortfolio` discriminator (`'annual_tax_obligations' in outcome`, unique
+  to this shape) → a third shape-branch (before the FHB `{:else}`): the obligations as the bilingual prose
+  headline, the alerts block (reused markup), and the six post-acquisition figures as `Field`/`Pending`
+  (honest-partial — null until post-settlement actuals). New `PortfolioPositionOutcome` type in
+  `planCard.ts` (grounded field-by-field on the blueprint schema, lines 1069–1081); `plan.pp.*` bilingual
+  chrome in `i18n.ts`.
+- **Verified.** `svelte-check` **0/0**, `npm run build` green, `svelte-autofixer` clean. **Pixel-proven
+  EN+VI** (harness-mount of the real, unmodified `DataTable.svelte` with the **real captured**
+  `fh_engine_ownership:fill_investor` base outcome): EN → *Annual tax obligations* (5 lines) + figures
+  *Not yet* + *Alerts armed* (4); VI → *Nghĩa vụ thuế hằng năm* + *Chưa có* + *Nhắc nhở đã bật*, diacritics
+  intact. Harness removed after. **The two `DataTable.svelte` investor shapes are now both recovered;
+  no shared-name renderer on the Mode-C surface still drops a producer's content.**
 
 ## Deferred out (honest — first-exercising instance is Mode B/D, not here)
 

@@ -602,6 +602,14 @@ const messages = {
     'plan.entity.company': { vi: 'Công ty', en: 'Company' },
     'plan.entity.smsf': { vi: 'Quỹ hưu tự quản (SMSF)', en: 'Self-managed super fund (SMSF)' },
     'plan.entity.smsf_with_lrba': { vi: 'SMSF có vay LRBA', en: 'SMSF with LRBA' },
+    // portfolio_position (ownership_planning_investor → data-table): the hold/operate view.
+    'plan.pp.obligations': { vi: 'Nghĩa vụ thuế hàng năm', en: 'Annual tax obligations' },
+    'plan.pp.lvr': { vi: 'Tỷ lệ vay hiện tại (LVR)', en: 'Current LVR' },
+    'plan.pp.equity': { vi: 'Vốn tích lũy trong nhà', en: 'Equity built' },
+    'plan.pp.cash_flow': { vi: 'Dòng tiền ròng hàng tháng', en: 'Monthly net cash flow' },
+    'plan.pp.ready': { vi: 'Sẵn sàng mua căn tiếp theo', en: 'Ready for next property' },
+    'plan.pp.ready_yes': { vi: 'Sẵn sàng', en: 'Ready' },
+    'plan.pp.diversification': { vi: 'Điểm đa dạng hóa danh mục', en: 'Portfolio diversification' },
     // opportunity-card (ownership_planning_investor): modelled opportunities to act on.
     'plan.f.modeled_benefit': { vi: 'Lợi ích ước tính', en: 'Modelled benefit' },
     'plan.opp.none': {

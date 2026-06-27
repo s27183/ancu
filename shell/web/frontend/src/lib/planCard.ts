@@ -282,6 +282,25 @@ export interface OpportunityCardOutcome extends Opportunity {
     opportunities?: Opportunity[] | null;
 }
 
+/** ownership_planning_investor → data-table (outcome type `portfolio_position`). The
+ *  hold/operate view. `data-table` is named by THREE outcome shapes (FHB ongoing_obligations,
+ *  tax_optimised_structure, this) — DataTable.svelte shape-discriminates so this rich producer
+ *  isn't dropped ([[thin-surface-vs-dropped-richness]]). Two arrays are filled at base/attach
+ *  (bilingual, engine-authored): annual_tax_obligations (the headline) + alert_triggers_armed.
+ *  `opportunities` rides the SECOND renderer (opportunity-card), not this one. The six figure
+ *  fields are honest-partial — null until post-settlement actuals. */
+export interface PortfolioPositionOutcome {
+    annual_tax_obligations?: LocalizedText[] | null;
+    alert_triggers_armed?: AlertTrigger[] | null;
+    opportunities?: Opportunity[] | null;
+    monthly_net_cash_flow_actual?: number | null;
+    ytd_cash_flow_vs_projection?: string | null;
+    current_lvr?: number | null;
+    equity_built?: number | null;
+    ready_for_next_property?: boolean | null;
+    portfolio_diversification_score?: number | null;
+}
+
 // --- preparation → checklist (outcome type `readiness`) ---------------------
 // The property-agnostic readiness layer (the prototype's "Before you buy"): documents
 // to gather (with WHY each is needed), people to engage (role · when · why), the money
