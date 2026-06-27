@@ -476,9 +476,13 @@ tax_structure(Upstream) ->
     Cfp     = maps:get(<<"cash_flow_projection">>, Upstream, #{}),
     Profile = maps:get(<<"profile">>, Upstream, #{}),
     Income  = maps:get(<<"assessable_income">>, Profile, null),
+    Pf      = maps:get(<<"property_fit_investor">>, Upstream, undefined),
     %% scaffold (all-null figures + the two CGT determinant constants + the agent slot), then
     %% the per-property/income figures override it — base (no cash flow, no income) ⟹ unchanged.
-    Outcome = maps:merge(tax_structure_scaffold(), tax_figures(Cfp, Income)),
+    %% The reform note is property-conditional (ng_reform_note/1) and NEVER null (base ⟹ the
+    %% general caveat), so it overrides the scaffold placeholder regardless of the figure inputs.
+    Outcome = (maps:merge(tax_structure_scaffold(), tax_figures(Cfp, Income)))
+                  #{<<"negative_gearing_reform_note">> => ng_reform_note(Pf)},
     KbVersions = fh_engine_kb:kb_anchors(
         [<<"kb.tax.entity-comparison-personal-trust-company-smsf">>,
          <<"kb.tax.negative-gearing-mechanics">>,
@@ -506,7 +510,8 @@ tax_structure_scaffold() ->
         <<"total_depreciation_year_1">>    => null,  %% QS-deferred (no schedule in reach)
         <<"cgt_marginal_rate">>            => null,
         <<"setup_costs">>                  => null,  %% entity-cost banded-vs-scalar seam (class b)
-        <<"annual_compliance_cost">>       => null   %% entity-cost banded-vs-scalar seam (class b)
+        <<"annual_compliance_cost">>       => null,  %% entity-cost banded-vs-scalar seam (class b)
+        <<"negative_gearing_reform_note">> => null   %% placeholder — tax_structure/1 always overrides
     }.
 
 %% the rent/cash-flow + income-dependent figures (class a), each honest-partial. Returns the
@@ -540,6 +545,29 @@ refund_figures(true, [CfLo, CfHi], Rate) when is_number(Rate) ->
       <<"after_tax_cash_flow_per_week">> => [round(AtLo / 52), round(AtHi / 52)]};
 refund_figures(_, _, _) ->
     #{}.
+
+%% The announced 2026-27 Budget negative-gearing reform (NG limited to new builds from 1 Jul 2027;
+%% PROPOSED, not yet law — kb.tax.negative-gearing-mechanics). Surfaced as a bilingual decision-
+%% support caveat, removed from the LLM's reach (§98 / [[no-judge-ground-the-producer]]): the
+%% resolver SELECTS the note by the attached property's established-vs-new classification; the agent
+%% never authors it. The fact is the KB's (ATO-verified); this only renders it bilingually
+%% (kb.copy.tax-structure). An ESTABLISHED purchase made now loses the wage offset; a NEW build keeps
+%% it; absent a property (base), the applicability is per-property → the general caveat (honest-
+%% partial). NEVER null — the reform is a public fact regardless of the property. Never models the
+%% unenacted law as settled; the copy points to a registered tax agent (the ASIC/TPB line).
+ng_reform_note(undefined) -> tax_copy(<<"reform_base">>);
+ng_reform_note(Pf) ->
+    case maps:get(<<"property_type">>, Pf, undefined) of
+        <<"established_house">>     -> tax_copy(<<"reform_established">>);
+        <<"established_apartment">> -> tax_copy(<<"reform_established">>);
+        undefined                   -> tax_copy(<<"reform_base">>);
+        _NewBuild                   -> tax_copy(<<"reform_new_build">>)
+    end.
+
+%% the tax_structure copy doc (distinct from the module-level ?COPY = kb.copy.profile that
+%% buyer_profile/investor_profile use); read by slug at runtime, no substitution params.
+tax_copy(Id) ->
+    fh_engine_i18n:subst(fh_engine_kb:copy(<<"kb.copy.tax-structure">>, Id), #{}).
 
 %% --- yield_modelling (Mode C, pure RESOLVER — base-spine presence) -----------
 %% The investor base spine (blueprint component 5): the rental cash-flow model. A PURE

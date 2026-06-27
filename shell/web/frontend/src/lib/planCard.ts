@@ -185,6 +185,25 @@ export interface DispositionOutcome {
     key_assumptions?: LocalizedText[] | null;
 }
 
+/** tax_structure → data-table (outcome type `tax_optimised_structure`). The investor tax cluster:
+ *  the recommended ownership entity (agent leaf), the resolver-computed gearing/CGT figures (banded
+ *  where rent-derived; null until their inputs arrive), and the negative-gearing reform note — a
+ *  bilingual decision-support caveat, property-conditional, NEVER null (base → the general caveat). */
+export interface TaxOptimisedStructureOutcome {
+    recommended_entity?: string | null;
+    negative_gearing_active?: boolean | null;
+    annual_tax_refund_year_1?: MoneyRange | null;
+    after_tax_cash_flow_year_1?: MoneyRange | null;
+    after_tax_cash_flow_per_week?: MoneyRange | null;
+    total_depreciation_year_1?: number | null;
+    cgt_discount_eligible?: boolean | null;
+    cgt_marginal_rate?: number | null;
+    cost_base_depreciation_clawback?: boolean | null;
+    annual_compliance_cost?: number | null;
+    setup_costs?: number | null;
+    negative_gearing_reform_note?: LocalizedText | null;
+}
+
 export interface StatutoryBand {
     low?: number | null;
     high?: number | null;

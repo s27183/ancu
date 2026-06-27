@@ -575,7 +575,9 @@ The `mortgage_plan` outcome feeds `yield_modelling.loan_costs` (the loan cost ca
 
 **Goal:** Determine the tax-optimised ownership structure and quantify negative gearing benefit + depreciation + CGT projection.
 
-**Inputs:** `investor_profile.outcome` + `cash_flow_projection`
+**Inputs:** `investor_profile.outcome` + `property_fit_investor` + `cash_flow_projection`
+
+> `property_fit_investor` (its `property_type`) drives the **negative-gearing reform note** (established → loses the wage offset from 1 Jul 2027; new build → keeps it; absent → the general caveat). Absent at base → the general caveat; present per-property → the concrete established-vs-new determination.
 
 **KB anchors:** `kb.tax.entity-comparison-personal-trust-company-smsf`, `kb.tax.negative-gearing-mechanics`, `kb.tax.depreciation-division-43-and-40`, `kb.tax.cgt-50-percent-discount`, `kb.tax.quantity-surveyor-reports`, `kb.tax.land-tax-by-state`
 
@@ -650,7 +652,13 @@ The `mortgage_plan` outcome feeds `yield_modelling.loan_costs` (the loan cost ca
     "cgt_marginal_rate": "percentage",
     "cost_base_depreciation_clawback": "bool",
     "annual_compliance_cost": "money",
-    "setup_costs": "money"
+    "setup_costs": "money",
+    // The announced 2026-27 Budget negative-gearing reform (NG limited to new builds from 1 Jul
+    // 2027 — kb.tax.negative-gearing-mechanics, PROPOSED not law). A bilingual decision-support
+    // caveat, resolver-selected from property_fit_investor.property_type (established → loses the
+    // wage offset; new build → keeps it; no property → general caveat). Never null — at base it is
+    // the general caveat. Copy in kb.copy.tax-structure; the figure itself stays out of the LLM's reach.
+    "negative_gearing_reform_note": "localized_text | null"
   }
 }
 ```
@@ -1235,7 +1243,7 @@ investor_profile         → outcome: profile
 property_assessment      → outcome: property_fit_investor      (reads: profile)
 investment_strategy      → outcome: strategy_thesis            (reads: profile, property_fit_investor)
 yield_modelling          → outcome: cash_flow_projection       (reads: profile, property_fit_investor, strategy_thesis)
-tax_structure            → outcome: tax_optimised_structure    (reads: profile, cash_flow_projection)
+tax_structure            → outcome: tax_optimised_structure    (reads: profile, property_fit_investor, cash_flow_projection)
 cash_position            → outcome: budget_envelope_investor   (reads: profile, property_fit_investor, tax_optimised_structure)
 buying_strategy          → outcome: bid_plan_investor          (reads: property_fit_investor, budget_envelope_investor, strategy_thesis)
 due_diligence            → outcome: risk_assessment_investor   (reads: property_fit_investor, strategy_thesis, uploaded_docs)

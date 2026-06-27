@@ -1563,6 +1563,55 @@ Opportunity-card renders **both** renderers EN+VI via the capstone harness-mount
    cash-calculator horizon what-if) — `disposition`'s projection is null otherwise → `opportunities: []` (honest-partial,
    by design). At a bare attach with no horizon the card is empty; the figure surfaces when the investor sets a horizon.
 
+## Negative-gearing reform flag on `tax_structure` — DONE (2026-06-27)
+
+The 2026-27 Budget **NG reform** (negative gearing limited to new builds from 1 Jul 2027; an
+established post-Budget purchase loses the wage offset) is **material to the wedge's own target
+buyer** (established purchase made now, held long), but `tax_optimised_structure` had no field to
+carry it — the gap the `fh_engine_fill.erl` comment named verbatim. (The **CGT** half was already
+surfaced — `disposition.key_assumptions.assumption_cgt_reform`, P2 — so this unit is NG-only.) Built
+end-to-end so the flag is **visible**; the regulated fact was already authored + ATO-verified
+(`kb.tax.negative-gearing-mechanics`, `announced_reform_not_yet_law`, 2026-06-23) — **no regulated-fact
+change**.
+
+- **Producer (engine).** New field `negative_gearing_reform_note: localized_text | null` on
+  `tax_optimised_structure` (blueprint + recompile). The resolver (`fh_engine_fill:ng_reform_note/1`)
+  **selects** the note by the attached property's `property_type` — removed from the LLM's reach
+  (§98, [[no-judge-ground-the-producer]]): `established_*` → the concrete wage-offset warning;
+  `new_*`/`off_the_plan`/`house_and_land` → the keeps-it note; **no property (base)** → the general
+  caveat (honest-partial — the established-vs-new pivot needs a property). **Never null** — the reform
+  is a public fact. Bilingual `{vi,en}` from a new copy doc **`kb.copy.tax-structure`** (`fills:[]`,
+  3 variants; [[bilingual-first-class-engine-output]]; mirrors `kb.copy.disposition`'s CGT flag).
+  Needed `property_type` → added **`property_fit_investor` to `tax_structure`'s pipeline `reads`** (the
+  `dag_reads` lever; acyclic — `property_assessment` runs first; precedented — Slice C-dd did the same
+  for `strategy_thesis`→`due_diligence`). ASIC/TPB line held: proposed-not-law, never models the
+  unenacted law as settled, points to a registered tax agent.
+- **Consumer (shell) — recovered a pre-existing dropped-richness bug** ([[thin-surface-vs-dropped-richness]],
+  the Slice-4 `Checklist` class). `DataTable.svelte` was hardcoded to the FHB `OngoingObligationsOutcome`
+  shape with no discriminator, so `tax_structure` (and the sibling `ownership_planning_investor`) rendered
+  **hollow**. Added a shape-branch (`'cgt_discount_eligible' in outcome && 'recommended_entity' in
+  outcome`) rendering the tax view — the reform note as a prominent callout (the headline), plus the
+  recovered slots (ownership entity via a guarded enum-`$t`, gearing position, marginal rate, after-tax
+  cash-flow band). Render the slots, then the note rides as one. New `TaxOptimisedStructureOutcome` type;
+  `plan.tx.*` + `plan.entity.*` bilingual chrome.
+- **Verified.** Artifact recompiled + **proven** (field present = 12, copy doc 3 variants, dag_reads
+  edge). `tax_structure_conformance` **69/69** (+8 reform cases: property-conditional established≠new,
+  base caveat, bilingual {vi,en}, never null, established_house≡established_apartment,
+  off_the_plan≡house_and_land, no-type→base). Engine regression all green (`disposition` 87,
+  `base_components_investor` 20, `phase_b_wiring_smoke` 24, `outcome` 25+11, `yield`/`cash`/`ownership`/
+  `mortgage` investor suites; FHB `cash_duty` 28, `mortgage` 23, `ownership` 17, `resolver` lockstep;
+  `validate_build`); `rebar3 compile` + `erlang-checker` clean. Shell `svelte-check` **0/0**, build green,
+  `svelte-autofixer` clean. **Pixel-proven EN+VI** (harness-mount of the real `DataTable.svelte` with the
+  REAL captured engine outcomes — base honest-partial "Not yet"/"Chưa có" + general caveat; established →
+  the concrete note + Personal (sole)/Cá nhân (một người) + Negatively geared + 32% + the after-tax band,
+  locale-correct `$`/`AU$`). Harness removed after.
+
+**Adjacent finding (flagged, sibling OUT of scope per Son).** `ownership_planning_investor`'s
+`data-table` (`portfolio_position`) is also rendered by `DataTable.svelte` and still drops
+`annual_tax_obligations` (its `alert_triggers_armed` *do* render — already wired; its `opportunities`
+render via `opportunity-card`). The same shape-branch technique would recover it — a separate small
+shell unit, deliberately not bundled (one-change-at-a-time).
+
 ## Deferred out (honest — first-exercising instance is Mode B/D, not here)
 
 `off_title_parties[]` (array vs A's scalar `non_buying_partner`), `visa_class`, off-title

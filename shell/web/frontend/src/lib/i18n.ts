@@ -587,6 +587,21 @@ const messages = {
     'plan.style.early_offer': { vi: 'Ra giá sớm', en: 'Early offer' },
     'plan.style.low_anchor': { vi: 'Neo giá thấp', en: 'Low anchor' },
     'plan.style.thesis_walk_away': { vi: 'Kỷ luật, sẵn sàng rút', en: 'Disciplined walk-away' },
+    // tax_structure (tax_optimised_structure): the investor tax cluster + the NG reform note.
+    'plan.tx.reform_title': { vi: 'Negative gearing — đề xuất cải cách', en: 'Negative gearing — proposed reform' },
+    'plan.tx.entity': { vi: 'Cấu trúc sở hữu', en: 'Ownership structure' },
+    'plan.tx.gearing': { vi: 'Tình trạng gearing', en: 'Gearing position' },
+    'plan.tx.geared_negative': { vi: 'Âm dòng tiền (negatively geared)', en: 'Negatively geared' },
+    'plan.tx.marginal_rate': { vi: 'Thuế suất biên', en: 'Marginal tax rate' },
+    'plan.tx.after_tax_cf': { vi: 'Dòng tiền sau thuế (năm 1)', en: 'After-tax cash flow (yr 1)' },
+    'plan.tx.entity_pending': { vi: 'Xác nhận với chuyên viên thuế có đăng ký', en: 'To confirm with a registered tax agent' },
+    'plan.entity.personal_sole': { vi: 'Cá nhân (một người)', en: 'Personal (sole)' },
+    'plan.entity.personal_joint': { vi: 'Cá nhân (đồng sở hữu)', en: 'Personal (joint)' },
+    'plan.entity.discretionary_trust': { vi: 'Quỹ tín thác tùy nghi', en: 'Discretionary trust' },
+    'plan.entity.unit_trust': { vi: 'Quỹ tín thác đơn vị', en: 'Unit trust' },
+    'plan.entity.company': { vi: 'Công ty', en: 'Company' },
+    'plan.entity.smsf': { vi: 'Quỹ hưu tự quản (SMSF)', en: 'Self-managed super fund (SMSF)' },
+    'plan.entity.smsf_with_lrba': { vi: 'SMSF có vay LRBA', en: 'SMSF with LRBA' },
     // opportunity-card (ownership_planning_investor): modelled opportunities to act on.
     'plan.f.modeled_benefit': { vi: 'Lợi ích ước tính', en: 'Modelled benefit' },
     'plan.opp.none': {

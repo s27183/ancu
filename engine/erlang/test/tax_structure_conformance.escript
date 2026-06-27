@@ -33,7 +33,7 @@ main(_) ->
     ok = fh_engine_kb:load(),
     io:format("tax_structure conformance — fh_engine_fill (Mode-C two-path)~n~n"),
     R = lists:flatten([scaffold_cases(), layer1_cases(), two_path_cases(),
-                       per_property_cases(), no_regression_cases()]),
+                       per_property_cases(), reform_cases(), no_regression_cases()]),
     Fails = [X || X <- R, X =:= fail],
     io:format("~n================================================================~n"),
     case Fails of
@@ -50,7 +50,7 @@ fields() ->
      <<"after_tax_cash_flow_per_week">>, <<"total_depreciation_year_1">>,
      <<"cgt_discount_eligible">>, <<"cgt_marginal_rate">>,
      <<"cost_base_depreciation_clawback">>, <<"annual_compliance_cost">>,
-     <<"setup_costs">>].
+     <<"setup_costs">>, <<"negative_gearing_reform_note">>].
 
 %% the eight fields that are null at base (everything except the two CGT determinant constants
 %% and the agent slot — which is also null pre-merge, but tracked separately below).
@@ -85,7 +85,7 @@ scaffold_cases() ->
         [check(<<"input-independent (empty upstream) null: ", F/binary>>, g(OEmpty, F), null)
          || F <- null_at_base()],
     [check("renderer = data-table", Rend, <<"data-table">>),
-     check("outcome has exactly the eleven tax_optimised_structure fields",
+     check("outcome has exactly the twelve tax_optimised_structure fields",
            lists:sort(maps:keys(O)), lists:sort(fields())),
      %% the two KB-grounded CGT determinant CONSTANTS the disposition consumer reads.
      check("cgt_discount_eligible = true (resolver constant)",
@@ -209,7 +209,7 @@ per_property_cases() ->
            g(ONoInc, <<"total_depreciation_year_1">>), null),
      check("no-income: cgt_discount_eligible constant still true",
            g(ONoInc, <<"cgt_discount_eligible">>), true),
-     check("no-income: field set still the eleven",
+     check("no-income: field set still the twelve",
            lists:sort(maps:keys(ONoInc)), lists:sort(fields())),
      check("no-income: Layer-1 conforms", validate(ONoInc), ok),
      %% (b) income → computed
@@ -236,6 +236,34 @@ per_property_cases() ->
            g(OPos, <<"annual_tax_refund_year_1">>), null),
      check("positive-geared: cgt_marginal_rate still computed (income present)",
            g(OPos, <<"cgt_marginal_rate">>), Rate)].
+
+%% --- 6. negative-gearing reform note (property-conditional, bilingual, §98) --
+%% The note is resolver-SELECTED from property_fit_investor.property_type and removed from the
+%% LLM's reach (no agent slot). NEVER null — the reform is a public fact. Three branches: base
+%% (no property) → general caveat; established_* → the concrete wage-offset warning (the wedge's
+%% own target case); new build → the keeps-it note. Each a well-formed bilingual {vi, en}.
+
+pf(Type) -> #{<<"property_fit_investor">> => #{<<"property_type">> => Type}}.
+note(Up) -> {O, _, _} = scaffold(Up), g(O, <<"negative_gearing_reform_note">>).
+bilingual(#{<<"vi">> := V, <<"en">> := E})
+  when is_binary(V), is_binary(E), byte_size(V) > 0, byte_size(E) > 0 -> true;
+bilingual(_) -> false.
+
+reform_cases() ->
+    Base = note(upstream()),                          %% no property_fit_investor → base caveat
+    Est  = note(pf(<<"established_house">>)),
+    EstA = note(pf(<<"established_apartment">>)),
+    New  = note(pf(<<"off_the_plan">>)),
+    HL   = note(pf(<<"house_and_land">>)),
+    PfNoType = note(#{<<"property_fit_investor">> => #{}}),  %% property present, type absent → base
+    [check("reform note present at base (never null — general caveat)", bilingual(Base), true),
+     check("reform note established is bilingual {vi,en}", bilingual(Est), true),
+     check("reform note new-build is bilingual {vi,en}", bilingual(New), true),
+     check("established_house and established_apartment → same established note", Est, EstA),
+     check("off_the_plan and house_and_land → same new-build note", New, HL),
+     check("property-conditional: established =/= new-build", Est =/= New, true),
+     check("base caveat differs from the established note", Base =/= Est, true),
+     check("property present but no type → base caveat (honest-partial)", PfNoType, Base)].
 
 %% --- 4. no regression --------------------------------------------------------
 
