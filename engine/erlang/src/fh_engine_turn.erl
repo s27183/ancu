@@ -68,10 +68,13 @@
 %%   - disposition keys on `tax_optimised_structure` present (cgt_investor path) → after
 %%     tax_structure (+ budget_envelope_investor → after cash_position).
 %% (Mode C has no purchase_journey/preparation/phase_playbook — those are FHB-only.)
+%% ownership_planning_investor runs LAST: its opportunity-card `equity_release` PLACES disposition's
+%% projected sale_proceeds/loan_payout (a read edge added 2026-06-27), so it must follow disposition
+%% (the same "runs last, reads every figure-owner" position as the FHB ownership in the base DAG).
 -define(BASE_COMPONENTS_INVESTOR,
         [<<"investor_profile">>, <<"investment_strategy">>, <<"mortgage_finance">>,
          <<"yield_modelling">>, <<"tax_structure">>, <<"cash_position">>,
-         <<"ownership_planning_investor">>, <<"disposition">>]).
+         <<"disposition">>, <<"ownership_planning_investor">>]).
 
 -spec start_link(map()) -> gen_statem:start_ret().
 start_link(Args) ->
@@ -447,7 +450,11 @@ commit(Comp, FillPath, Renderer, KbVersions, Outcome0,
             Entry = #{
                 <<"component_id">> => Name,
                 <<"scope">> => component_scope(Name),
+                %% renderer = renderers[0] (back-compat); renderers = the blueprint's ordered
+                %% list from the artifact (SOT) so the shell reaches a composed component's 2nd
+                %% renderer (engine-contract §4 — opportunity-card on ownership_planning_investor).
                 <<"renderer">> => Renderer,
+                <<"renderers">> => renderers_for(Comp, Renderer),
                 <<"outcome">> => Outcome,
                 <<"kb_versions">> => KbVersions,
                 <<"fill_path">> => FillPath
@@ -557,6 +564,15 @@ default_renderer(Comp) ->
         _ -> <<"summary-card">>
     end.
 
+%% The component's ordered renderer list for the snapshot/event (engine-contract §4). The
+%% artifact's `renderers` is the SOT; fall back to [Renderer] so a component the artifact
+%% does not enumerate still carries a one-element list (renderer = renderers[0] invariant).
+renderers_for(Comp, Renderer) ->
+    case maps:get(<<"renderers">>, Comp, []) of
+        [_ | _] = Rs -> Rs;
+        _            -> [Renderer]
+    end.
+
 component_scope(<<"buyer_profile">>)    -> <<"base">>;
 component_scope(<<"purchase_journey">>) -> <<"base">>;
 component_scope(<<"preparation">>)      -> <<"base">>;
@@ -615,9 +631,14 @@ property_components(<<"investor-domestic-au">> = Slug) ->
     %% the state-conditional insurance RULE (off property_fit_investor.state) — every date PENDING.
     %% Reads property_fit_investor (state/property_type) + tax_optimised_structure (recommended_entity),
     %% both in the seed/upstream → runs LAST (after due_diligence, matching blueprint component 9 < 10).
+    %% ownership_planning_investor (scope: both) re-fills per-property AT THE END: its opportunity-card
+    %% `equity_release` PLACES disposition's projected sale_proceeds/loan_payout, so it must follow
+    %% disposition. The post-acquisition actuals stay null (not owned yet); the per-property delta is
+    %% the equity_release band — honest-partial, [] when no hold horizon is set (disposition null).
     order(Slug, [<<"property_assessment">>, <<"yield_modelling">>, <<"tax_structure">>,
                  <<"cash_position">>, <<"disposition">>, <<"buying_strategy">>,
-                 <<"due_diligence">>, <<"settlement_prep">>]);
+                 <<"due_diligence">>, <<"settlement_prep">>,
+                 <<"ownership_planning_investor">>]);
 property_components(_Slug) ->
     [].
 

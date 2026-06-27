@@ -46,7 +46,7 @@ main(_) ->
 investor_order() ->
     [<<"investor_profile">>, <<"investment_strategy">>, <<"mortgage_finance">>,
      <<"yield_modelling">>, <<"tax_structure">>, <<"cash_position">>,
-     <<"ownership_planning_investor">>, <<"disposition">>].
+     <<"disposition">>, <<"ownership_planning_investor">>].
 
 fhb_order() ->
     [<<"buyer_profile">>, <<"eligibility">>, <<"mortgage_finance">>,
@@ -109,6 +109,7 @@ dag_walk_cases() ->
      Pre(<<"cash_position">>, <<"tax_optimised_structure">>),
      Pre(<<"disposition">>, <<"tax_optimised_structure">>),
      Pre(<<"disposition">>, <<"budget_envelope_investor">>),
+     Pre(<<"ownership_planning_investor">>, <<"disposition">>),
      Shape(<<"mortgage_finance">>, <<"io_vs_pi_recommendation">>),
      Shape(<<"cash_position">>, <<"lmi_payable">>),
      Shape(<<"disposition">>, <<"taxable_gain">>)

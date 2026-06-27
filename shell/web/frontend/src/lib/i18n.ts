@@ -149,6 +149,7 @@ const messages = {
     'plan.c.mortgage_finance': { vi: 'Vay & tài chính', en: 'Mortgage & finance' },
     'plan.c.cash_position': { vi: 'Dòng tiền', en: 'Cash position' },
     'plan.c.ownership_planning': { vi: 'Chi phí sở hữu', en: 'Owning the home' },
+    'plan.c.ownership_planning_investor': { vi: 'Danh mục & cơ hội', en: 'Portfolio & opportunities' },
 
     // Plan sub-tab labels (short) — the plan sections + Q&A as tabs inside the Plan view.
     'plan.tab.buyer_profile': { vi: 'Hồ sơ', en: 'Profile' },

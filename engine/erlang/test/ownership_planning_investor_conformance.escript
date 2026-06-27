@@ -34,7 +34,7 @@ main(_) ->
     ok = fh_engine_kb:load(),
     io:format("ownership_planning_investor conformance — fh_engine_ownership (Mode-C pure-resolver)~n~n"),
     R = lists:flatten([scaffold_cases(), layer1_cases(), bilingual_cases(),
-                       no_regression_cases()]),
+                       opportunities_cases(), no_regression_cases()]),
     Fails = [X || X <- R, X =:= fail],
     io:format("~n================================================================~n"),
     case Fails of
@@ -83,13 +83,14 @@ scaffold_cases() ->
            length(g(O, <<"alert_triggers_armed">>)), 4),
      check("opportunities = [] at base (producer foundation; populates per-property)",
            g(O, <<"opportunities">>), []),
-     check("kb_versions = the six investor anchors",
+     check("kb_versions = the seven investor anchors",
            lists:sort(KbSlugs),
            lists:sort([<<"kb.investor.property-management-vs-self-managed">>,
                        <<"kb.investor.annual-tax-return-investor">>,
                        <<"kb.investor.cash-flow-tracking">>,
                        <<"kb.investor.portfolio-review-cadence">>,
                        <<"kb.investor.scale-up-using-equity">>,
+                       <<"kb.investor.deposit-requirements-investment-loans">>,
                        <<"kb.investor.land-tax-aggregation">>])),
      check("has_resolver true (classified as resolver, pure)",
            fh_engine_fill:has_resolver(<<"ownership_planning_investor">>), true)]
@@ -122,6 +123,56 @@ bilingual_cases() ->
 localized(#{<<"vi">> := Vi, <<"en">> := En}) when is_binary(Vi), is_binary(En) ->
     byte_size(Vi) > 0 andalso byte_size(En) > 0 andalso Vi =/= En;
 localized(_) -> false.
+
+%% --- 3b. opportunities (the per-property opportunity-card producer) ----------
+%% Per-property, figure-bearing, honest-partial: equity_release is emitted ONLY when
+%% disposition projects a releasable-equity band at the hold horizon; [] otherwise.
+
+%% per-property fill with a disposition upstream (sale/loan bands + horizon present).
+opp_fill(Disp) ->
+    fh_engine_fill:resolver(<<"ownership_planning_investor">>, #{},
+                            #{<<"disposition">> => Disp}).
+
+opportunities_cases() ->
+    %% (a) horizon set + loan known → exactly one equity_release with a positive money band.
+    {O1, _, _} = opp_fill(#{<<"sale_proceeds">> => [800000, 1000000],
+                            <<"loan_payout">>   => [400000, 450000],
+                            <<"horizon_years">> => 10}),
+    Opps = g(O1, <<"opportunities">>),
+    [Opp | _] = Opps ++ [#{}],
+    Band = maps:get(<<"modeled_benefit">>, Opp, undefined),
+    Action = maps:get(<<"action">>, Opp, undefined),
+    %% releasable = 0.8*value - loan, conservative band: [0.8*800k-450k, 0.8*1000k-400k].
+    BandOk = case Band of
+                 [Lo, Hi] when is_integer(Lo), is_integer(Hi), Lo >= 0, Hi > Lo -> true;
+                 _ -> false
+             end,
+    ActionOk = case Action of
+                   #{<<"en">> := En, <<"vi">> := Vi} ->
+                       %% {horizon} substituted (no literal left) + the hold year present.
+                       nomatch =:= binary:match(En, <<"{horizon}">>)
+                           andalso nomatch =/= binary:match(En, <<"10">>)
+                           andalso byte_size(Vi) > 0 andalso Vi =/= En;
+                   _ -> false
+               end,
+    %% (b) no horizon / loan unknown → []  (honest-partial, never fabricated).
+    {O2, _, _} = opp_fill(#{<<"sale_proceeds">> => null,
+                            <<"loan_payout">>   => null,
+                            <<"horizon_years">> => null}),
+    %% (c) base (no disposition upstream at all) → [].
+    {O3, _, _} = fh_engine_fill:resolver(<<"ownership_planning_investor">>, #{}, #{}),
+    [check("equity_release: exactly one opportunity when projection present",
+           length(Opps), 1),
+     check("equity_release: kind = equity_release",
+           maps:get(<<"kind">>, Opp, undefined), <<"equity_release">>),
+     check("equity_release: modeled_benefit is a positive money band [Lo,Hi]", BandOk, true),
+     check("equity_release: action bilingual with {horizon} substituted", ActionOk, true),
+     check("opportunities = [] when disposition figures null (honest-partial)",
+           g(O2, <<"opportunities">>), []),
+     check("opportunities = [] at base (no disposition upstream)",
+           g(O3, <<"opportunities">>), []),
+     check("Layer-1 still conforms with opportunities populated",
+           validate(?INV, <<"portfolio_position">>, O1), ok)].
 
 %% --- 4. no regression --------------------------------------------------------
 

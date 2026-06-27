@@ -223,9 +223,10 @@ per-property `disposition`, and the `ownership_planning_investor` post-acquisiti
 live-proven (real Opus; see the Phase-B slice records below). The base-spine presence + the Phase-B figure fill
 are now both done, so the rows are complete. **Two seams remain genuinely open (tracked, not these rows):** the
 **banded-vs-scalar** registry-typing call (recurs across yield/tax/cash; decided where it bites, not patched) and
-the `opportunity-card` **consumer half** (the engine snapshot flattens `renderers[]` → a single `renderer`, so a
-component's 2nd renderer is unreached — a cross-contract shell unit, low value as `opportunity-card` only
-populates per-property).
+the **`opportunity-card` unit** — a 3-part producer + consumer build now scoped and in progress (see "Opportunity-card —
+producer + consumer" below). *(The earlier framing of this as a "low-value consumer half" was wrong on re-grounding:
+the producer is a permanent stub, not closed, and `ownership_planning_investor`'s declared `scope: both` is silently
+not honored — the corrected analysis is in that section.)*
 
 **P2 COMPLETE (2026-06-24).** Two free repoints + the investor CGT branch, all committable now (no
 deploy until P3). **Repoints** in `investor-domestic-au.md`: `kb.investor.tax-brackets-2026` →
@@ -299,18 +300,16 @@ two spec-derived `planCard.ts` types (`BidPlanInvestorOutcome`, `OpportunityCard
 renderer-internal bilingual `plan.*` labels (en+vi, incl. the thesis/style enum display labels).
 Component **title** keys for investor components stay P5 (they render only when an investor turn runs).
 **Verified:** `svelte-autofixer` clean on both, `svelte-check` 0/0, production build green.
-**One producer seam — producer half CLOSED in P5-engine 6/suite; consumer half is a shell unit.**
+**One producer seam — `opportunities[]` slot added in P5-engine 6/suite; the actual producer + the consumer are the unit scoped below.**
 `opportunity-card`'s §11.9 contract `{ kind, modeled_benefit, action }` had no matching field in
-`portfolio_position`. The seam splits across the engine↔shell contract: (a) **producer** — the
-schema lacked `opportunities[]`; **now added + emitted `[]` at base** by `fill_investor/2` (an
-opportunity is defined by its `modeled_benefit`, a figure off an owned property, so none exist
-plan-first — it populates per-property in Phase B). (b) **consumer** — the shell renders only
-`renderers[0]` per component (`planCard.ts:389` — `entry.renderer` = "first of the blueprint's
-renderers"), so the *second* declared renderer (`opportunity-card`) is **unreached for every
-dual-renderer component**, incl. the already-shipped FHB `ownership_planning` (same
-`['data-table','opportunity-card']`). Dispatching the second renderer changes behaviour for 5+
-shipped components → a scoped **shell** unit, not foldable into a Mode-C engine resolver. Logged
-here + in the `OpportunityCardOutcome` type comment; the renderer is built to its contract meanwhile.
+`portfolio_position`. What P5-engine 6 did: **added the `opportunities[]` field to the schema, emitted `[]`** by
+`fill_investor/2`, and built the `OpportunityCard.svelte` renderer + `OpportunityCardOutcome` type to the §11.9
+contract. **What it did NOT do (re-grounded 2026-06-27, correcting the earlier "producer half CLOSED" claim):** the
+field is emitted `[]` *everywhere* — the comment "populates per-property in Phase B" was aspirational; nothing ever
+fills it, because `ownership_planning_investor` is **not in `property_components/1`** and so runs **base-only**, in
+violation of its declared `scope: both`. So the "producer half" is a permanent stub, not closed. The consumer side is
+real too: the snapshot carried a single `renderer = renderers[0]` (`data-table`), so the second declared renderer
+(`opportunity-card`) was unreached. **Both halves are the unit scoped in "Opportunity-card — producer + consumer" below.**
 
 **P5-engine STARTED (2026-06-24) — `investor_profile` resolver (1st of the suite).** Grounding the
 live engine surfaced that P5 is an investor **resolver suite**, not a dispatch wire (the reshape is in
@@ -1474,6 +1473,95 @@ was proven (2026-06-25) before the Slice 3 form existed, so no prior full-stack 
 SOT — [[spec-seams-surface-on-implementation]]), with bilingual labels; the established-vs-new split is also the
 investor-meaningful distinction (depreciation eligibility). The corrected `established_house` value was confirmed
 to attach + run Phase-B end-to-end live. `svelte-check` 0/0, build green, autofixer clean.
+
+## Opportunity-card — producer + consumer (Mode-C investor) — SCOPED 2026-06-27
+
+The `opportunity-card` surface on `ownership_planning_investor` (§11.9 `data-table + opportunity-card`). Re-grounding
+(2026-06-27) showed the prior "low-value consumer half" framing was wrong on three counts, all from the live code:
+
+1. **The producer is a permanent stub, not closed.** `opportunities[]` is hardcoded `[]` at its one site
+   (`fh_engine_ownership.erl:92`), and `ownership_planning_investor` — blueprint `scope: both` — is **absent from
+   `property_components(<<"investor-domestic-au">>)`** (`fh_engine_turn.erl`), so it runs **base-only**. Its `both`
+   scope is silently unhonored; the "populates per-property" comment never happened.
+2. **No generic two-renderer dispatch existed.** The snapshot carried one `renderer = renderers[0]` (`data-table`);
+   `ComponentCard` dispatches one exact string. `OpportunityCard.svelte` + `OpportunityCardOutcome` are built but
+   unreachable. (phase_playbook's apparent second renderer is folded into the FlowView hero surface, not dispatched —
+   so it is not a precedent; see engine-contract §10.4, corrected.)
+3. The figures an opportunity *places* already exist in Phase B (`cash_position.lvr/loan_amount`,
+   `disposition.full_horizon_net_position/loan_payout`, `yield_modelling.estimated_weekly_rent_range`) — so the
+   producer is mostly **placement, not new modeling** ([[place-upstream-figures-dont-recompute]]).
+
+**Framing decision (Son, 2026-06-27): surface at ATTACH**, as *projected/modeled* decision-support for the acquisition
+(a candidate property, not yet owned) — `modeled_benefit` means projected; banded; honest-partial. The evaluation
+moment is when an investor wants "if I buy this, here's the equity-release / scale-up path." Not gated to
+post-settlement.
+
+### The three parts
+
+**A — Producer (engine), the load-bearing part.** Add `ownership_planning_investor` to `property_components/1`,
+positioned **last** (after `disposition`) so `Upstream` carries every figure it places — this honors `scope: both`.
+Split `fill_investor/2`: base (Upstream empty → `opportunities: []`, unchanged) vs per-property (reads Upstream).
+Post-acquisition actuals (`current_lvr`, `equity_built`, `monthly_net_cash_flow_actual`) stay `null` even per-property
+(need post-settlement actuals) — honest-partial. Compute `opportunities[]` as a **resolver, banded, KB-grounded,
+closed-enum `kind`** (removed from the LLM's reach, [[no-judge-ground-the-producer]]):
+- `scale_up` — releasable equity at the scale-up trigger (disposition horizon + `cash_position.lvr`;
+  `kb.investor.scale-up-using-equity`). Banded `money_range`.
+- `equity_release` — projected equity above the 80% LVR threshold at horizon (`disposition.full_horizon_net_position`/
+  `loan_payout` + `cash_position.loan_amount`; refinance KB anchor). Banded.
+- `rent_review` — **honest-partial**: the in-place-vs-market gap needs the lease (due_diligence B). Pre-lease →
+  surface the action + a market-rent reference band (`yield_modelling.estimated_weekly_rent_range`),
+  `modeled_benefit: null` (no fabrication, [[base-turn-honest-partial-output]]).
+
+`action` = new bilingual `kb.copy.*` keys (the alerts/obligations pattern). `kind ∈ {scale_up, equity_release,
+rent_review}` is a **producer invariant** (resolver-authored, no LLM) → safe without a schema gate; tightening the
+artifact schema to enum-gate it is optional hardening (compiler DSL change — the element fields are `unknown` today).
+
+**B — Consumer (cross-contract).** Per engine-contract §4 (pinned first, 2026-06-27): **additive `renderers: string[]`**
+on the `component_filled` snapshot/event, sourced verbatim from the artifact's `renderers` (the SOT —
+`default_renderer/1` already reads the list, just takes `[0]`). `renderer` stays `= renderers[0]` (back-compat → every
+single-renderer consumer untouched). `ComponentCard` iterates `renderers` in order over the same `outcome` when present,
+single-renderer fallback otherwise. *Rejected:* a contract-wide `renderer→renderers` rename (touches all fills,
+unjustified for one live instance) and the composed `"a + b"` string-split (revives a convention nothing implements).
+The "read renderers from artifact, drop the fill's renderer return" refactor is the principled end-state but
+**orthogonal** — flagged, not bundled (one-change-at-a-time).
+
+**C — Docs.** engine-contract §4 + §10.4 — DONE (doc #1). This section — DONE (doc #2). The blueprint's
+`investor-domestic-au.md` "Populates per-property (Phase B)" comment (line ~1071) becomes accurate at build time.
+
+### Verify
+
+Resolver eval for `opportunities` (banded benefits). Outcome-conformance green; `svelte-check` 0/0; autofixer clean.
+Opportunity-card renders **both** renderers EN+VI via the capstone harness-mount technique
+([[debug-ground-truth-before-theorizing]]).
+
+**Status: BUILT + verified (2026-06-27).**
+- **A — producer:** `fh_engine_ownership:fill_investor/2` now reads `Upstream`, emits `opportunities` via
+  `opportunities/1` → `equity_release_opportunity/1` (releasable equity = `0.8·sale_proceeds − loan_payout`, conservative
+  band, clamped ≥0, the 80% from `kb.investor.deposit-requirements-investment-loans`). `ownership_planning_investor`
+  moved to **last** in both `?BASE_COMPONENTS_INVESTOR` and `property_components/1` (reads `disposition`). New copy key
+  `opportunity_equity_release_action` (`{horizon}` subst) in `kb.copy.ownership-investor`. Blueprint DAG edge
+  `disposition → ownership_planning_investor` recorded. Artifact recompiled (PASS). **Verified:**
+  `ownership_planning_investor_conformance` 34/34 (7 new opportunity cases incl. honest-partial `[]` when no horizon),
+  `base_components_investor_conformance` 20/20 (order + new edge), `phase_b_wiring_smoke` 24/24, FHB `ownership` 17/17
+  untouched. Band math exact (`[216000,413000]` for sale `[820k,1010k]` / loan `[395k,440k]`). Artifact copy is clean
+  UTF-8 (em-dash + VI diacritics + `{horizon}`).
+- **B — consumer:** `component_filled` snapshot/event now carries `renderers` (`renderers_for/2`, from the artifact SOT;
+  `renderer = renderers[0]` back-compat). `ComponentCard.svelte` iterates `renderers` over the same outcome (each-block,
+  single-renderer fallback). `ComponentEntry.renderers?: string[]` typed. `svelte-check` 0/0, build green, autofixer clean.
+  Pixel-proven EN+VI: data-table (honest-partial "Chưa có"/"Not yet") **then** opportunity-card ("Equity release ·
+  216.000–413.000 AUS", substituted bilingual action).
+- **C — docs:** engine-contract §4/§10.4 (doc #1), this section + blueprint (doc #2). Done.
+
+**Two findings surfaced during the build (adjacent, not the unit):**
+1. **`$t` white-screens on a missing key** (`messages[key][$lang]`, i18n.ts:667 — throws on miss), and **five investor
+   base components lack a `plan.c.*` title key** (`investor_profile`, `investment_strategy`, `yield_modelling`,
+   `tax_structure`, `ownership_planning_investor`). The Mode-C base projection renders each via
+   `$t(plan.c.${cid})` → so it **white-screens** on those cards. Never caught because the capstone used harness-mount,
+   not a full live drive. **Fixed only `plan.c.ownership_planning_investor`** (in-scope — the opportunity-card's host card
+   must render); the other 4 + the root `$t` fail-safe are a **separate pre-existing Mode-C-projection bug** to decide on.
+2. **The `equity_release` opportunity appears only when a hold horizon is set** (onboarding `hold_horizon_years` or the
+   cash-calculator horizon what-if) — `disposition`'s projection is null otherwise → `opportunities: []` (honest-partial,
+   by design). At a bare attach with no horizon the card is empty; the figure surfaces when the investor sets a horizon.
 
 ## Deferred out (honest — first-exercising instance is Mode B/D, not here)
 

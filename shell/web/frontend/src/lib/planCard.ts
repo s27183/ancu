@@ -433,12 +433,18 @@ export type ChecklistStatusMap = Record<string, Record<string, string>>;
 // --- the plan-card envelope (fh_engine_store:get_plan_card) ------------------
 
 /** One filled component as the engine snapshots it (fh_engine_turn entry / the
- *  component_filled SSE payload). `renderer` is the singular presentation primitive
- *  (first of the blueprint's `renderers`); `outcome` is the typed result above. */
+ *  component_filled SSE payload). `renderer` is the first presentation primitive (back-compat
+ *  = `renderers[0]`); `renderers` is the blueprint's ordered list — a component may compose two
+ *  (engine-contract §4, e.g. `data-table + opportunity-card` on ownership_planning_investor). The
+ *  shell renders each renderer in `renderers`, in order, over the same `outcome`. `outcome` is the
+ *  typed result above. */
 export interface ComponentEntry {
     component_id: string;
     scope: 'base' | 'both' | 'per-property';
     renderer: string;
+    /** The ordered renderer list from the artifact (SOT). Absent on pre-§4 snapshots → the
+     *  consumer falls back to `[renderer]` (every single-renderer component is unchanged). */
+    renderers?: string[];
     outcome: Record<string, unknown>;
     kb_versions: string[];
     fill_path: 'resolver' | 'two_path' | 'agent';

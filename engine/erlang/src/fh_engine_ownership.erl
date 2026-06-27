@@ -64,19 +64,32 @@ fill(Args, Upstream) ->
 %% diversification across a portfolio, ready-for-next derived from LVR) — plan-first there is
 %% no property and no actuals, so each is null (three-valued for the bool).
 %%
-%% `opportunities` is the producer half of the P4 opportunity-card seam: the field now exists
-%% in the contract and the fill emits [] at base — an opportunity is defined by its
-%% modeled_benefit (equity release, rent review, scale-up), a figure off an OWNED property, so
-%% none exist plan-first; it populates per-property (Phase B). The consumer half (the shell
-%% renders only renderers[0], so opportunity-card is unreached for every dual-renderer
-%% component incl. shipped FHB ownership) is a separate shell unit.
+%% `opportunities` is the opportunity-card surface (§11.9 `{ kind, modeled_benefit, action }`).
+%% PER-PROPERTY + FIGURE-BEARING: emitted only when a figure off THIS property exists — never
+%% padding the generic `alert_triggers_armed` cadences (which are mode-level, property-agnostic).
+%% Base turn (no property) → []. The one such figure at attach is `equity_release`: the projected
+%% releasable equity at the hold horizon (the leverage-into-next thesis made concrete), PLACED from
+%% `disposition`'s growth projection ([[place-upstream-figures-dont-recompute]] — this component
+%% OWNS the modeled_benefit it derives from the placed bands, the same class as disposition deriving
+%% net from sale/selling/loan; no second computer for the placed sale/loan figures). The other two
+%% `kind`s are deferred honest-partial: `rent_review`'s real uplift needs the in-place lease
+%% (due_diligence B), `scale_up`'s readiness needs post-settlement actuals (`current_lvr`/
+%% `equity_built`, null until owned) — both stay in the enum, unemitted at attach so the card never
+%% duplicates the alerts or fabricates a dollar ([[base-turn-honest-partial-output]]).
+%%
+%% This reads `disposition` (a NEW upstream edge, added 2026-06-27 — see the blueprint DAG), so
+%% ownership_planning_investor now runs AFTER disposition in both the base and per-property orders
+%% (fh_engine_turn). The figures are removed from the LLM's reach: equity_release is a deterministic
+%% resolver band off disposition's already-banded, growth-assumption-flagged projection
+%% ([[no-judge-ground-the-producer]], [[verify-regulated-figures-by-postcondition]]).
 %%
 %% Cadences are qualitative, not month-numbered: the owning KB docs frame review intervals as
 %% "a default, not a deadline" — the specific intervals live as editable parameters, not in the
-%% reminder copy. Renderer = data-table (the reachable primary; it renders both array fields).
+%% reminder copy. Renderers = data-table + opportunity-card (the §11.9 pair; the engine now carries
+%% the full renderer list, so the second renderer is reached — engine-contract §4).
 
 -spec fill_investor(map(), map()) -> {map(), binary(), [map()]}.
-fill_investor(_Args, _Upstream) ->
+fill_investor(_Args, Upstream) ->
     Outcome = #{
         %% post-acquisition actuals — no property/actuals at base
         <<"monthly_net_cash_flow_actual">>     => null,
@@ -88,8 +101,8 @@ fill_investor(_Args, _Upstream) ->
         %% base-computable: KB-grounded, property-agnostic
         <<"annual_tax_obligations">>           => annual_obligations(),
         <<"alert_triggers_armed">>             => investor_alerts(),
-        %% producer foundation: [] at base, populates per-property (Phase B)
-        <<"opportunities">>                    => []
+        %% per-property figure-bearing: [] at base / no horizon, the equity_release band otherwise
+        <<"opportunities">>                    => opportunities(Upstream)
     },
     KbVersions = fh_engine_kb:kb_anchors(
         [<<"kb.investor.property-management-vs-self-managed">>,
@@ -97,8 +110,54 @@ fill_investor(_Args, _Upstream) ->
          <<"kb.investor.cash-flow-tracking">>,
          <<"kb.investor.portfolio-review-cadence">>,
          <<"kb.investor.scale-up-using-equity">>,
+         <<"kb.investor.deposit-requirements-investment-loans">>,
          <<"kb.investor.land-tax-aggregation">>]),
     {Outcome, <<"data-table">>, KbVersions}.
+
+%% --- opportunities (the opportunity-card surface) ----------------------------
+%% Per-property, figure-bearing, honest-partial. At attach the only such figure is
+%% equity_release; [] when there is no property (base) or no hold horizon (disposition null).
+-spec opportunities(map()) -> [map()].
+opportunities(Upstream) ->
+    equity_release_opportunity(maps:get(<<"disposition">>, Upstream, #{})).
+
+%% equity_release: releasable equity projected at the hold horizon H, placed from disposition's
+%% sale_proceeds (projected value at H) + loan_payout (loan balance at H). [] unless both bands
+%% are present (H set + loan known) — honest-partial, never fabricated.
+equity_release_opportunity(Disp) when is_map(Disp) ->
+    Sale = maps:get(<<"sale_proceeds">>, Disp, null),
+    Loan = maps:get(<<"loan_payout">>, Disp, null),
+    H    = maps:get(<<"horizon_years">>, Disp, null),
+    case releasable_equity(Sale, Loan) of
+        null -> [];
+        Band -> [#{<<"kind">>            => <<"equity_release">>,
+                   <<"modeled_benefit">> => Band,
+                   <<"action">>          =>
+                       cip(<<"opportunity_equity_release_action">>,
+                           #{<<"horizon">> => H})}]
+    end;
+equity_release_opportunity(_) -> [].
+
+%% releasable at an 80% refinance LVR = 0.8 * projected value - projected loan balance, as a
+%% conservative band (low value with high loan, high value with low loan), clamped >= 0. The
+%% value basis is sale_proceeds (a refinance pays no selling cost / CGT). null unless both inputs
+%% are bands and the high end is positive (no opportunity to surface otherwise).
+-spec releasable_equity([integer()] | null, [integer()] | null) -> [integer()] | null.
+releasable_equity([SLo, SHi], [LLo, LHi])
+  when is_integer(SLo), is_integer(SHi), is_integer(LLo), is_integer(LHi) ->
+    Pct = release_lvr_pct(),
+    Lo = max(0, round(SLo * Pct / 100) - LHi),
+    Hi = max(0, round(SHi * Pct / 100) - LLo),
+    case Hi > 0 of
+        true  -> [Lo, Hi];
+        false -> null
+    end;
+releasable_equity(_, _) -> null.
+
+%% the no-LMI refinance LVR (100 - the no-LMI deposit %), KB-grounded (shared with cash_position).
+release_lvr_pct() ->
+    100 - kb_param(<<"kb.investor.deposit-requirements-investment-loans">>,
+                   <<"deposit_no_lmi_pct">>).
 
 %% the standing annual obligations of an investment property — bilingual prose, KB-grounded
 %% (annual-tax-return-investor + land-tax-aggregation + property-management). Static copy.
@@ -123,6 +182,10 @@ alert(TriggerId, ActionId) ->
 %% the investor copy doc — static templates (no params), so the localized value is used as-is.
 -spec ci(binary()) -> fh_engine_i18n:localized().
 ci(Id) -> fh_engine_kb:copy(?COPY_INV, Id).
+
+%% the investor copy doc WITH {param} substitution (the opportunity-card action carries {horizon}).
+-spec cip(binary(), #{binary() => fh_engine_i18n:param()}) -> fh_engine_i18n:localized().
+cip(Id, Params) -> fh_engine_i18n:subst(fh_engine_kb:copy(?COPY_INV, Id), Params).
 
 %% --- the ongoing_obligations outcome (honest partial) ------------------------
 %% Filled: maintenance_reserve_target, recurring_costs_estimate.statutory_band,

@@ -1068,7 +1068,7 @@ wrong for QLD).
     "alert_triggers_armed": "array<{ trigger, action }>",
     "annual_tax_obligations": "array<localized_text>",  // user-facing prose → bilingual {vi,en}, validator-enforced (matches disposition.key_assumptions)
     "portfolio_diversification_score": "integer_0_10",
-    "opportunities": "array<{ kind, modeled_benefit, action }>"  // the opportunity-card surface (§11.9). [] at base — an opportunity is defined by its modeled_benefit, a figure off an OWNED property (equity release, rent review, scale-up); none exist plan-first. Populates per-property (Phase B). The producer half of the P4 opportunity-card seam, closed here; the consumer half (shell renders only renderers[0]) is a separate shell unit.
+    "opportunities": "array<{ kind, modeled_benefit, action }>"  // the opportunity-card surface (§11.9). [] at base. PER-PROPERTY + figure-bearing: emitted only when a figure off THIS property exists (never padding the property-agnostic alert_triggers_armed). At attach the one such figure is kind=equity_release — releasable equity projected at the hold horizon, modeled_benefit a resolver money band placed from disposition.sale_proceeds/loan_payout; [] when no hold horizon is set. kind ∈ {equity_release, rent_review, scale_up}: rent_review (in-place-vs-market gap, needs the lease → due_diligence B) and scale_up (readiness, needs post-settlement actuals) stay in the enum, deferred honest-partial. modeled_benefit is removed from the LLM's reach (resolver-computed band). Both halves of the seam are now built: producer = fh_engine_ownership:fill_investor/2; consumer reached via the renderers[] carry (engine-contract §4).
   }
 }
 ```
@@ -1240,11 +1240,11 @@ cash_position            → outcome: budget_envelope_investor   (reads: profile
 buying_strategy          → outcome: bid_plan_investor          (reads: property_fit_investor, budget_envelope_investor, strategy_thesis)
 due_diligence            → outcome: risk_assessment_investor   (reads: property_fit_investor, strategy_thesis, uploaded_docs)
 settlement_prep          → outcome: settlement_checklist       (reads: property_fit_investor, bid_plan_investor, tax_optimised_structure)
-ownership_planning_investor → outcome: portfolio_position      (reads: property_fit_investor, tax_optimised_structure, cash_flow_projection)
 disposition              → outcome: disposition              (reads: strategy_thesis, property_fit_investor, cash_flow_projection, tax_optimised_structure, budget_envelope_investor)
+ownership_planning_investor → outcome: portfolio_position      (reads: property_fit_investor, tax_optimised_structure, cash_flow_projection, disposition)
 ```
 
-No cycles. `tax_structure` is on the critical path because it informs `cash_position` (entity setup costs) and `ownership_planning_investor` (annual compliance). `disposition` is a **pure sink** — it reads the upstream figure-owners (`strategy_thesis` for the horizon `H`, the yield/tax/cash outcomes for the acquire+hold flows it places and the CGT determinants it consumes) and is read by no one, so it adds a leaf, not a cycle.
+No cycles. `tax_structure` is on the critical path because it informs `cash_position` (entity setup costs) and `ownership_planning_investor` (annual compliance). `ownership_planning_investor` runs **last** — its `portfolio_position.opportunities[]` (the opportunity-card surface) carries `equity_release`, which **places** `disposition`'s projected `sale_proceeds`/`loan_payout` to model the releasable equity at the hold horizon (one-computer-per-figure: it derives the band, it does not recompute the placed figures). So `disposition` is read by exactly one downstream component (`ownership_planning_investor`); the edge `disposition → ownership_planning_investor` is acyclic (`disposition` reads the acquire/hold figure-owners and is read only by the terminal ownership component, which is read by none).
 
 ---
 

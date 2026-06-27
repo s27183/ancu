@@ -64,10 +64,11 @@ position_cases() ->
            Idx(<<"tax_structure">>) < Idx(<<"settlement_prep">>), true),
      check("settlement_prep runs AFTER due_diligence (blueprint component 10 > 9)",
            Idx(<<"due_diligence">>) < Idx(<<"settlement_prep">>), true),
-     check("canonical order: PA → yield → tax → cash → disposition → buying_strategy → due_diligence → settlement_prep",
+     check("canonical order: PA → yield → tax → cash → disposition → buying_strategy → due_diligence → settlement_prep → ownership_planning_investor",
            Names, [<<"property_assessment">>, <<"yield_modelling">>, <<"tax_structure">>,
                    <<"cash_position">>, <<"disposition">>, <<"buying_strategy">>,
-                   <<"due_diligence">>, <<"settlement_prep">>])].
+                   <<"due_diligence">>, <<"settlement_prep">>,
+                   <<"ownership_planning_investor">>])].
 
 %% --- 2. the reuse-vs-fresh decision -----------------------------------------
 
