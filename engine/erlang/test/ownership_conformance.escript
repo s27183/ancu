@@ -21,7 +21,8 @@ main(_) ->
     io:format("ownership conformance — fh_engine_ownership vs the KB params (SOT)~n~n"),
     R = lists:flatten(
           [maint_cases(), band_case(), lvr_case(),
-           threshold_cases(), land_tax_cases(), fhg_cases(), alert_cases()]),
+           threshold_cases(), land_tax_cases(), fhg_cases(),
+           alert_cases(), wa_alert_case()]),
     Fails = [X || X <- R, X =:= fail],
     io:format("~n================================================================~n"),
     case Fails of
@@ -58,7 +59,12 @@ lvr_case() ->
 threshold_cases() ->
     [check("land_tax_threshold(NSW)", fh_engine_ownership:land_tax_threshold(<<"NSW">>), 1075000),
      check("land_tax_threshold(VIC)", fh_engine_ownership:land_tax_threshold(<<"VIC">>), 50000),
-     check("land_tax_threshold(QLD)", fh_engine_ownership:land_tax_threshold(<<"QLD">>), 600000)].
+     check("land_tax_threshold(QLD)", fh_engine_ownership:land_tax_threshold(<<"QLD">>), 600000),
+     check("land_tax_threshold(WA)", fh_engine_ownership:land_tax_threshold(<<"WA">>), 300000),
+     check("land_tax_threshold(TAS)", fh_engine_ownership:land_tax_threshold(<<"TAS">>), 125000),
+     %% honest-partial fallback: a state we hold no threshold for stays null (→ the
+     %% no-threshold alert copy), never a fabricated figure.
+     check("land_tax_threshold(SA) null-fallback", fh_engine_ownership:land_tax_threshold(<<"SA">>), null)].
 
 %% --- land-tax status derivation (the regulated postcondition) ---------------
 
@@ -97,6 +103,28 @@ alert_cases() ->
     [check("base fill: 3 alerts armed (FHG+review+land-tax)", length(Alerts), 3),
      check("base fill: land_tax_check = exempt_ppor", LandTax, <<"exempt_ppor">>),
      check("base fill: maintenance at ceiling (1% of 700k)", Maint, 7000)].
+
+%% --- WA mode-switch alert renders the threshold (end-to-end) -----------------
+%% A WA owner-occupier now gets a concrete threshold in the "if you rent this out"
+%% alert (was the no-threshold copy before WA was added to land_tax_threshold/1).
+%% The land-tax alert is last (fhg ++ review ++ land_tax); assert its action names
+%% $300,000 in both halves — proves the new clause reaches the rendered surface.
+
+wa_alert_case() ->
+    {Outcome, _R, _Kb} = fh_engine_ownership:fill(
+        #{onboarding => #{<<"state">> => <<"WA">>,
+                          <<"target_price_range">> => [600000, 700000]},
+          intent => <<"owner_occupier">>},
+        #{<<"scheme_stack">> =>
+              #{<<"applicable_schemes">> => [#{<<"role">> => <<"deposit_guarantee">>}]}}),
+    Alerts = maps:get(<<"alert_triggers_armed">>, Outcome),
+    Action = maps:get(<<"action">>, lists:last(Alerts)),
+    En = maps:get(<<"en">>, Action),
+    Vi = maps:get(<<"vi">>, Action),
+    Names = binary:match(En, <<"300,000">>) =/= nomatch
+        andalso binary:match(Vi, <<"300,000">>) =/= nomatch,
+    [check("WA fill: 3 alerts armed", length(Alerts), 3),
+     check("WA land-tax alert names $300,000 (en+vi)", Names, true)].
 
 %% --- helper -----------------------------------------------------------------
 

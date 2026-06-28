@@ -260,6 +260,10 @@ land_tax_threshold(<<"VIC">>) ->
     kb_param(<<"kb.land-tax.ppor-exemption">>, <<"vic_threshold_aud">>);
 land_tax_threshold(<<"QLD">>) ->
     kb_param(<<"kb.land-tax.ppor-exemption">>, <<"qld_threshold_individual_aud">>);
+land_tax_threshold(<<"WA">>) ->
+    kb_param(<<"kb.land-tax.ppor-exemption">>, <<"wa_general_threshold_aud">>);
+land_tax_threshold(<<"TAS">>) ->
+    kb_param(<<"kb.land-tax.ppor-exemption">>, <<"tas_general_threshold_aud">>);
 land_tax_threshold(_) -> null.
 
 %% --- lifecycle alerts (the opportunity-card surface) -------------------------
