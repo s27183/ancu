@@ -124,7 +124,7 @@ that the rest of Mode B reads).
 | Status | Item |
 |---|---|
 | `[x]` | **Anchor** — `fact-model-unification.md` "Mode-B activation" section (2026-06-28): `off_title_parties[]`, `funder{}`, `visa_class`, F14 → active; VN-side `funder{}` regulated content = placeholder; Mode-A retrofit bound to now; top status line updated (both triggers fired) |
-| `[ ]` | **Contracts** — engine-contract §9.1 (`facts_jsonb` adds the slots, no migration) + architecture §11.9 (off-title read convention; `funder{}` consumer = `family_context`/`cross_border_funding`) |
+| `[x]` | **Contracts** (2026-06-28) — engine-contract §9.1 `profiles` row flipped to Mode-B-active (`off_title_parties[]`/`funder{}`/`visa_class` populate now, VN-side regulated `funder{}` = placeholder; in-scope-set flip left to P3) + architecture §11.9 new **`off_title.*` namespace** (array projection, read **by role flag**: `eligibility` ← `counts_for_couple_as_one`, `funder{}` consumers `family_context`/`cross_border_funding` ← `funder`) + canonical-slot-reads flipped (Mode B activates cross-border slots + closes F14) |
 | `[ ]` | **Blueprint conform** — Mode B `buyer_profile` `profile_foreign → profile` (foreign lens: `applicants[]` AU member, `off_title_parties[]` VN funder, per-applicant `tax{}`, `derived.firb_required_any=true`) |
 | `[ ]` | **Mode-A retrofit** — `non_buying_partner → off_title_parties[]` (A's single party = head element); re-verify `eligibility` couple-as-one read; conformance escript green, artifact diff reviewed |
 | `[ ]` | **Compiler gate** — recompile; structural gates green over all blueprints; prove the slots materialize in the registry |
