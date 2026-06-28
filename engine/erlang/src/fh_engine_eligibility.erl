@@ -24,6 +24,8 @@
 %% Scope (Wedge 1): NSW state concessions are wired; VIC/QLD get federal-only here +
 %% their own walk-through (decision 6/7) — flagged, not silently dropped. HELD for
 %% sign-off (G2): the non_buying_partner couple-as-one fold-in (decision 4).
+%% non_buying_partner is now the DERIVED dyadic read-model of off_title_parties[] (P0.4);
+%% the read is unchanged — only its producer-side shape generalized.
 
 -export([fill/2]).
 
@@ -45,8 +47,11 @@ fill(Args, Upstream) ->
     GlobalRules = fh_engine_kb:rules(),
     Facts = #{<<"applicants">> => Applicants,
               <<"property_fit">> => #{<<"state">> => State},
-              %% the couple-as-one partner gate (F4/G2) reads non_buying_partner.*;
-              %% buyer_profile defaults it to #{exists => false} (single-buyer).
+              %% the couple-as-one partner gate (F4/G2) reads non_buying_partner.* — the
+              %% DERIVED dyadic read-model buyer_profile projects from the off_title_parties[]
+              %% SOT (P0.4; fh_engine_fill:couple_as_one_view/1). #{exists => false} for the
+              %% single-buyer base. The role-flag filter + dyadic enforcement live at the
+              %% producer; this gate just reads the flat view.
               <<"non_buying_partner">> =>
                   maps:get(<<"non_buying_partner">>, Profile, #{<<"exists">> => false})},
     Schemes = catalog(State),

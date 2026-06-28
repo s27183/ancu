@@ -296,11 +296,18 @@ buyer_profile(Args) ->
         %% conservative / fail-closed for FIRB: flag unless EVERY applicant is
         %% definitely non-foreign (`undetermined` errs toward requiring FIRB). Mode A → false.
         <<"firb_required_any">> => lists:any(fun(F) -> F =/= false end, FirbTri),
-        %% single-buyer default (consistent with the single-lead onboarding): no
-        %% non-buying partner declared. The couple-as-one schemes' partner gate (F4/G2)
-        %% reads this — exists=false makes the gate pass; a refine turn that reveals a
-        %% partner narrows it. (Their ownership facts arrive then, not at onboarding.)
-        <<"non_buying_partner">> => #{<<"exists">> => false},
+        %% off_title_parties[] is the canonical fact SOT (P0.4 / fact-model-unification.md
+        %% "Mode-B activation"): people linked to the purchase but not on title — a
+        %% non-buying partner (couple-as-one role) and/or a funder (Mode B). Base default
+        %% is [] (single-lead onboarding); a refine turn that reveals an off-title party
+        %% populates it. Read BY ROLE FLAG, not position (architecture §11.9 off_title.*).
+        <<"off_title_parties">> => [],
+        %% non_buying_partner is the DERIVED couple-as-one read-model the KB scheme gates
+        %% read (F4/G2) — the dyadic ≤1 head of off_title_parties[] filtered by role flag.
+        %% The role-flag FILTER lives here (Erlang), keeping the KB predicate language
+        %% simple; exists=false makes the gate pass (base, no partner). couple_as_one_view/1
+        %% enforces the dyadic invariant fail-closed.
+        <<"non_buying_partner">> => couple_as_one_view([]),
         <<"intended_occupancy_use">> => <<"sole_occupier">>,
         %% CGT-exemption determinants for disposition (kb.tax.cgt-main-residence-exemption):
         %% Mode-A definitional projection — a Vietnamese-AU citizen/PR buying a home to live
@@ -929,6 +936,38 @@ debts(Financials) ->
 %% a number, or 0 for absent/non-numeric (matches fh_engine_mortgage:num0/1).
 num0(N) when is_number(N) -> N;
 num0(_)                   -> 0.
+
+%% Derive the couple-as-one read-model from the canonical off_title_parties[] SOT
+%% (P0.4 / fact-model-unification.md "Mode-B activation"). The KB couple-as-one scheme
+%% gates (F4/G2) read the flat `non_buying_partner.*` view; the role-flag FILTER lives
+%% HERE (Erlang), not in the declarative KB predicate language — complex array-filtering
+%% belongs in the resolver, the predicate language stays simple. The couple-as-one subset
+%% is DYADIC (a married/de-facto spouse is ≤1) — a domain law, not a Mode-A convenience —
+%% so it is enforced FAIL-CLOSED: >1 flagged party is a contradiction (crash), never a
+%% silent drop. The funder role (N-valued, Mode B) is read directly off the array by its
+%% own consumers; it does not pass through this view.
+-spec couple_as_one_view([map()]) -> map().
+couple_as_one_view(OffTitleParties) ->
+    Couple = [P || P <- OffTitleParties,
+                   maps:get(<<"counts_for_couple_as_one">>, P, false) =:= true],
+    case Couple of
+        []       -> #{<<"exists">> => false};
+        [Party]  -> couple_view(Party);
+        _        -> error({couple_as_one_not_dyadic, length(Couple)})
+    end.
+
+%% project one off-title couple party's ownership_history into the flat non_buying_partner
+%% fields the KB gates read (exists + the three ownership predicates).
+-spec couple_view(map()) -> map().
+couple_view(Party) ->
+    OH = maps:get(<<"ownership_history">>, Party, #{}),
+    #{<<"exists">> => true,
+      <<"ever_owned_au_property">> =>
+          maps:get(<<"ever_owned_au_property">>, OH, false),
+      <<"ever_owned_and_occupied_residence">> =>
+          maps:get(<<"ever_owned_and_occupied_residence">>, OH, false),
+      <<"currently_owns_property">> =>
+          maps:get(<<"currently_owns_property">>, OH, false)}.
 
 %% subst a kb.copy.profile template into a bilingual {vi,en} value (no Vietnamese
 %% in Erlang literals; same mechanism as fh_engine_cash).

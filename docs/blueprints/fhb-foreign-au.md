@@ -69,22 +69,22 @@ The base plan for Mode B captures the most regulatory complexity even before a s
 
 ```
 [1] buyer_profile (foreign-person variant)
-       │   outcome: profile_foreign
+       │   outcome: profile
        ▼
 [2] family_context ★
-       │   inputs: profile_foreign
+       │   inputs: profile
        │   outcome: family_funding_plan
        ▼
 [3] property_assessment (foreign-person filter: new-build only)
-       │   inputs: profile_foreign, family_funding_plan
+       │   inputs: profile, family_funding_plan
        │   outcome: property_fit
        ▼
 [4] firb_workflow ★ (replaces Mode A eligibility)
-       │   inputs: profile_foreign, property_fit
+       │   inputs: profile, property_fit
        │   outcome: firb_status
        ▼
 [5] cash_position (no schemes + foreign-buyer surcharge + FIRB fees + FX)
-       │   inputs: profile_foreign, family_funding_plan, property_fit, firb_status
+       │   inputs: profile, family_funding_plan, property_fit, firb_status
        │   outcome: budget_envelope
        ▼
 [6] cross_border_funding ★
@@ -104,7 +104,7 @@ The base plan for Mode B captures the most regulatory complexity even before a s
        │   outcome: settlement_checklist
        ▼
 [10] ownership_planning (vacancy fee + non-resident tax)
-        inputs: property_fit, profile_foreign
+        inputs: property_fit, profile
         outcome: ongoing_obligations
 ```
 
@@ -165,22 +165,58 @@ Mode B activates two new surfaces (Family view, FIRB & Funding) that don't appea
     "physical_state": { "type": "enum", "options": ["NSW", "VIC", "QLD", "WA", "SA", "TAS", "ACT", "NT", "n/a"], "value": "<initial>" },
     "language_preference": { "type": "enum", "options": ["vi", "en"], "value": "vi" }
   },
-  "au_member": {
-    "present": { "type": "bool", "value": "<initial>" },
-    "visa_class": { "type": "enum", "options": ["student_500", "graduate_485", "skilled_482", "skilled_186", "spouse_309", "spouse_820", "other_temporary", "non_resident", "permanent_resident", "citizen"], "value": "<initial>" },
-    "visa_grant_date": { "type": "date", "value": "<initial>" },
-    "residency_duration_months": { "type": "integer", "value": "<initial>", "derived_from": "visa_grant_date" },
-    "firb_classification": { "type": "enum", "options": ["foreign_person", "not_foreign_person"], "value": "<initial>", "derived_from": "visa_class" },
-    "employment_status": { "type": "enum", "options": ["full_time_au", "part_time_au", "studying_only", "not_employed_au"], "value": "<initial>" },
-    "annual_income_aud": { "type": "money_per_year", "value": "<initial>" },
-    "au_savings_aud": { "type": "money", "value": "<initial>" },
-    "hecs_balance": { "type": "money", "value": 0 }
+  "applicants": {
+    "type": "array<applicant>",
+    "note": "F1 — one entry per person taking a legal/ownership interest (canonical applicant element, shared with Mode A/C). Mode B: 1..N AU-SIDE members (the buyer(s) on title/loan). The eligibility- and tax-bearing facts are PER-APPLICANT. For Mode B EVERY applicant is a foreign person under FIRB — firb_required = true per applicant, and the household aggregate profile.firb_required_any = true (the single FIRB fact read across modes; the F14 close). visa_class is the B-activated finer detail (drives non-resident lending + FIRB nuance). The VN funding parent is NOT in this array (they take no title/loan interest) — they are an off_title_parties[] entry with the funder role.",
+    "value": [
+      {
+        "role": { "type": "enum", "options": ["primary", "co_buyer"], "value": "primary" },
+        "citizenship_status": { "type": "enum", "options": ["temporary_resident", "non_resident"], "value": "<initial>", "note": "Mode B = foreign person; citizen/PR route to Mode A. A PR/citizen co-buyer in an otherwise-foreign purchase still has the household trip the FIRB gate via the foreign co-applicant." },
+        "firb_status": { "type": "enum", "options": ["foreign_person"], "value": "foreign_person", "note": "Mode B entry assumption — every applicant is a foreign person." },
+        "firb_required": { "type": "bool", "value": true, "derived_from": "firb_status", "note": "true for every Mode B applicant; the household aggregate profile.firb_required_any is the single FIRB fact read across modes (the F14 close)." },
+        "visa_class": { "type": "enum", "options": ["student_500", "graduate_485", "skilled_482", "skilled_186", "spouse_309", "spouse_820", "other_temporary", "non_resident", "permanent_resident", "citizen"], "value": "<initial>", "note": "B-activated (fact-model-unification.md 'Mode-B activation') — finer detail when temporary_resident; read as applicant.visa_class by mortgage_finance (non-resident lending policy) and firb_workflow (classification nuance)." },
+        "visa_grant_date": { "type": "date", "value": "<initial>" },
+        "residency_duration_months": { "type": "integer", "value": "<initial>", "derived_from": "visa_grant_date" },
+        "taxable_income_aud": { "type": "money_per_year", "value": "<initial>", "note": "per-applicant AU-source assessable income; the household assessable_income aggregates the array." },
+        "tax": {
+          "residency_for_tax": { "type": "enum", "options": ["resident", "non_resident", "temporary_resident_for_tax"], "value": "<initial>", "note": "B-activated tax{} (foreign lens) — DISTINCT from FIRB status: a foreign person is commonly a non_resident or temporary_resident_for_tax (no CGT main-residence exemption, withholding on rental income), read by ownership_planning / cash_position." },
+          "marginal_rate": { "type": "percentage", "value": "<initial>", "derived_from": "taxable_income_aud" },
+          "jurisdiction": { "type": "enum", "options": ["AU"], "value": "AU", "note": "Mode B reasons on the AU-side tax position; VN-side parent tax is a labelled placeholder (AU-side-full / VN-side-placeholder scope)." }
+        },
+        "employment_status": { "type": "enum", "options": ["full_time_au", "part_time_au", "studying_only", "not_employed_au"], "value": "<initial>" }
+      }
+    ],
+    "_item_note": "Each array entry is one AU-side member with the shape shown; the single example entry illustrates the per-applicant leaf schema. At runtime the array has one entry per AU-side buyer."
   },
-  "vn_family_member": {
-    "present": { "type": "bool", "value": "<initial>" },
-    "relationship_to_au_member": { "type": "enum", "options": ["parent", "spouse_in_vn", "sibling", "other_family", "self_funding_from_vn"], "value": "<initial>" },
-    "vn_residency_state_or_city": { "type": "string", "value": "<initial>" },
-    "expected_to_fund": { "type": "bool", "value": "<initial>" }
+  "off_title_parties": {
+    "type": "array<off_title_party>",
+    "note": "F4/F14 — people LINKED to the purchase but NOT on title or the loan (so not in applicants[]). Canonical array shared with Mode A (a non-buying partner) — Mode B is the first to populate the funder role (the Vietnam funding parent / family pool). One party can carry TWO roles at once, so each consumer reads BY ROLE FLAG, not by position (architecture §11.9 off_title.* namespace; fact-model-unification.md sub-question 1 MERGE): eligibility reads counts_for_couple_as_one; the funder consumers (family_context, cross_border_funding) read funder.*.",
+    "value": [
+      {
+        "relationship": { "type": "enum", "options": ["spouse", "de_facto", "parent", "sibling", "other_family", "self_funding", "none"], "value": "parent", "note": "canonical relationship enum (union across modes; shared with Mode A). Mode B's canonical party is the Vietnam funding parent (location is on funder.residence_country, not the relationship enum)." },
+        "counts_for_couple_as_one": { "type": "bool", "value": false, "note": "role flag → eligibility (the dyadic ≤1 couple-as-one subset). false for the funding parent; canonical so a foreign-mode spouse is captured the same way as Mode A (Mode B replaces eligibility with firb_workflow, so the gate is dormant here, but the flag stays canonical)." },
+        "ownership_history": {
+          "ever_owned_au_property": { "type": "bool", "value": "<initial>", "note": "couple-as-one input — left unfilled for a pure funder (honest-partial); populated only when counts_for_couple_as_one = true." },
+          "ever_owned_and_occupied_residence": { "type": "bool", "value": "<initial>" },
+          "currently_owns_property": { "type": "bool", "value": "<initial>" }
+        },
+        "funder": {
+          "expected_to_fund": { "type": "bool", "value": "<initial>", "note": "role flag — true marks this party as a funder; the funder consumers (family_context, cross_border_funding) filter the array on this. Mode B's first real use of the funder role." },
+          "residence_country": { "type": "enum", "options": ["VN", "AU", "other"], "value": "VN", "note": "where the funding originates — VN for the canonical Vietnam parent. Gates the cross-border (VN-side) compliance block, whose regulated content is a labelled placeholder." },
+          "contribution_capacity_aud": { "type": "money", "value": "<initial>", "note": "AUD-equivalent the party can contribute — the AU-side-buildable funder fact. The VN-side REGULATED content the funder triggers (SBV thresholds / VN-PDP / VN-side parent tax) is a labelled placeholder, not built here (AU-side-full / VN-side-placeholder scope)." }
+        }
+      }
+    ],
+    "_item_note": "Each array entry is one off-title party with the canonical shape (shared with Mode A); the single example illustrates the role-tagged leaf schema. Mode B's canonical entry is the VN funding parent (funder.expected_to_fund = true, residence_country = VN; ownership_history left off — funder role, not couple-as-one)."
+  },
+  "income": {
+    "income_stability": { "type": "enum", "options": ["permanent_payg", "contractor", "self_employed", "casual", "studying_only", "mixed"], "value": "<initial>" }
+  },
+  "savings_and_deposit": {
+    "au_savings_aud": { "type": "money", "value": "<initial>" }
+  },
+  "debts": {
+    "hecs_balance": { "type": "money", "value": 0 }
   },
   "intent": {
     "intended_use": { "type": "enum", "options": ["personal_residence_for_au_member", "future_personal_when_pr_granted", "family_investment", "mixed"], "value": "<initial>" },
@@ -190,24 +226,33 @@ Mode B activates two new surfaces (Family view, FIRB & Funding) that don't appea
 }
 ```
 
-**Outcome schema:** `profile_foreign`
+**Outcome schema:** `profile`
 
 ```jsonc
 {
-  "type": "profile_foreign",
+  "type": "profile",   // canonical, mode-independent identity shape — Mode B projects the foreign-person subset (fact-model-unification.md "Mode-B activation"); NOT a private profile_foreign type
   "fields": {
-    "firb_required": "bool",                       // always true for Mode B
-    "au_member_present": "bool",
-    "vn_funding_member_present": "bool",
-    "established_property_eligible": "bool",       // false while the ban is in force — derived from kb.firb.established-dwelling-ban (single owner of the window)
-    "new_build_only_constraint": "bool",
-    "approx_au_side_contribution_capacity": "money",
-    "approx_vn_side_contribution_capacity": "money",
-    "key_constraints": "array<string>",
-    "key_strengths": "array<string>"
+    // legal-status & tax facts — PER-APPLICANT (read as applicant.*). Mode B: 1..N foreign-person AU-side members.
+    "applicants": "array<{ role, citizenship_status, firb_required, visa_class, tax }>",  // every entry firb_required = true; visa_class (B-activated) feeds non-resident lending + FIRB classification; per-applicant tax{ residency_for_tax, marginal_rate, jurisdiction: AU } (foreign lens — commonly non_resident / temporary_resident_for_tax). No first-home ownership_history / owner_occupier_intent — Mode B has no FHB schemes.
+    "applicant_count": "integer",
+    "firb_required_any": "bool",                      // = TRUE for Mode B (foreign mode) — the SINGLE household FIRB fact, read uniformly across all modes. Published from a foreign mode (true definitionally) = the F14 close; the aggregate kb.firb.established-dwelling-ban already reads it. Per-applicant firb_required lives inside applicants[].
+    "off_title_parties": "array<{ relationship, counts_for_couple_as_one, ownership_history, funder }> | null",  // F4/F14 canonical array (shared with Mode A — identical element shape). Mode B is the first to populate the funder role: funder{ expected_to_fund, residence_country, contribution_capacity_aud } — the VN funding parent / family pool. Read BY ROLE FLAG (architecture §11.9 off_title.* namespace): eligibility ← counts_for_couple_as_one (the dyadic ≤1 subset); family_context / cross_border_funding ← funder. ownership_history left off for a pure funder (honest-partial). The VN-side REGULATED funder content (SBV/PDP/VN tax) is a labelled placeholder. null until captured (honest-partial).
+    // neutral derived financials (facts, not verdicts) — household-level
+    "assessable_income": "money_per_year",            // aggregate of applicants[].taxable_income_aud (AU-source)
+    "approx_borrowing_capacity": "money_range",       // non-resident-lender flavoured (stricter serviceability) — banded, resolver-computed; refined in mortgage_finance
+    "deposit_ready_for_purchase_amount": "money",     // AU-side savings + expected funder contributions available
+    "debts": "{ hecs_balance, credit_card_limits_total, personal_loans_balance, car_loan_balance, buy_now_pay_later_balance } | null",  // raw debt facts the serviceability resolver reads (profile HOLDS facts; mortgage_finance reasons over them, §11.9). null until captured (honest-partial).
+    // narrative
+    "key_constraints": "array<localized_text>",       // bilingual (engine-output), canonical type — was array<string>
+    "key_strengths": "array<localized_text>"
+    // REMOVED firb_required (scalar) → now per-applicant + the household firb_required_any aggregate
+    // REMOVED established_property_eligible / new_build_only_constraint — FIRB verdicts; owned by firb_workflow (outcomes carry facts, not verdicts; §11.9)
+    // REMOVED approx_*_side_contribution_capacity — funder capacity now lives per-party in off_title_parties[].funder.contribution_capacity_aud
   }
 }
 ```
+
+> **Identity-layer conformance (2026-06-28).** This component's outcome is now the **canonical `profile`** (not a per-mode `profile_foreign`), projecting the Mode-B-activated generalizations — per-applicant `visa_class` + `tax{}` (foreign lens), the canonical `off_title_parties[]` with the **funder role** (the Vietnam funding parent), and `firb_required_any = true` published from a foreign mode (**the F14 close**) ([`../architecture/fact-model-unification.md`](../architecture/fact-model-unification.md) "Mode-B activation"). Downstream components read `profile.*` / `applicant.*` / `off_title.*` / `plan.*` (architecture §11.9 read-namespace convention; off-title parties read **by role flag**, not position). **Deferred to later Mode-B phases:** the downstream components' precise field-path reads → **P2** (engine resolvers — `firb_workflow`, `mortgage_finance`/`cash_position`/`ownership_planning` foreign variants, `family_context` + `cross_border_funding`); the AU-side KB (`kb.firb.*`, `kb.lender.non-resident-*`, `kb.foreign-buyer-surcharge.*`, …) → **P1**; flipping Mode B **in-scope** + the compiler's **semantic**-gate extension → **P3**; the VN-side *regulated* `funder{}` content stays a **labelled placeholder**. This unit conforms the identity layer and keeps the **structural** gates green.
 
 ---
 
@@ -215,7 +260,7 @@ Mode B activates two new surfaces (Family view, FIRB & Funding) that don't appea
 
 **Goal:** Establish the cross-border family funding plan — who contributes how much from where, and who holds decision authority. Enables the Family view surface.
 
-**Inputs:** `buyer_profile.outcome` (profile_foreign)
+**Inputs:** `buyer_profile.outcome` (profile)
 
 **KB anchors:** `kb.vietnamese-family.financial-patterns`, `kb.cross-border.decision-authority-cultural`, `kb.bilingual.coordination-norms`
 
@@ -279,7 +324,7 @@ Mode B activates two new surfaces (Family view, FIRB & Funding) that don't appea
 
 **Goal:** Analyse the selected property for fit — *with explicit foreign-person eligibility filtering*. Refuses established dwellings; flags new-build / off-the-plan eligibility and FIRB fee tier.
 
-**Inputs:** `property_card` (from selection) + `buyer_profile.outcome` (profile_foreign) + `family_context.outcome`
+**Inputs:** `property_card` (from selection) + `buyer_profile.outcome` (profile) + `family_context.outcome`
 
 **KB anchors:** `kb.firb.eligible-property-types-foreign-persons`, `kb.firb.fee-tiers-by-value`, `kb.property.suburb-risk-factors`, `kb.property.comparables-methodology`, `kb.strata.health-indicators`, `kb.building-types.risk-by-type`, `kb.off-the-plan.risk-considerations`
 
@@ -434,7 +479,7 @@ The `blocking_for_contract` field is the critical gate downstream — `buying_st
 
 **Goal:** Determine the **non-resident-friendly lender shortlist**, deposit structure (typically 30%+ for foreign-person investment / temp-resident FHB), and loan path — with explicit FIRB-approval-precedes-unconditional-offer gating.
 
-**Inputs:** `buyer_profile.outcome` (profile_foreign — including debts, visa class) + `firb_workflow.outcome` (firb_status — applicable; fee tier)
+**Inputs:** `buyer_profile.outcome` (profile — including debts, visa class) + `firb_workflow.outcome` (firb_status — applicable; fee tier)
 
 **KB anchors:** `kb.lender.non-resident-friendly-shortlist`, `kb.lender.temp-resident-lending-policies`, `kb.lender.485-visa-treatment`, `kb.lender.foreign-buyer-deposit-requirements`, `kb.lender.firb-approval-as-condition-precedent`, `kb.lender.documentation-non-resident`, `kb.fx.loan-currency-considerations`
 
@@ -979,16 +1024,16 @@ This blueprint uses the same signal placeholders as Mode A, with one addition fo
 ## Cross-component output dependency graph
 
 ```
-buyer_profile          → outcome: profile_foreign
-family_context         → outcome: family_funding_plan       (reads: profile_foreign)
-property_assessment    → outcome: property_fit              (reads: profile_foreign, family_funding_plan)
-firb_workflow          → outcome: firb_status               (reads: profile_foreign, property_fit)
-cash_position          → outcome: budget_envelope           (reads: profile_foreign, family_funding_plan, property_fit, firb_status)
+buyer_profile          → outcome: profile
+family_context         → outcome: family_funding_plan       (reads: profile)
+property_assessment    → outcome: property_fit              (reads: profile, family_funding_plan)
+firb_workflow          → outcome: firb_status               (reads: profile, property_fit)
+cash_position          → outcome: budget_envelope           (reads: profile, family_funding_plan, property_fit, firb_status)
 cross_border_funding   → outcome: transfer_plan             (reads: family_funding_plan, budget_envelope)
 buying_strategy        → outcome: bid_plan                  (reads: property_fit, budget_envelope, firb_status)
 due_diligence          → outcome: risk_assessment           (reads: property_fit, uploaded_docs)
 settlement_prep        → outcome: settlement_checklist      (reads: property_fit, bid_plan, firb_status, transfer_plan)
-ownership_planning     → outcome: ongoing_obligations       (reads: property_fit, profile_foreign)
+ownership_planning     → outcome: ongoing_obligations       (reads: property_fit, profile)
 ```
 
 No cycles. Mode B specifically adds two critical-path dependencies: `firb_status` blocks `buying_strategy` (no unconditional bid without FIRB approval) and `transfer_plan` is a critical-path input to `settlement_prep` (currency transfer is on the settlement critical path).

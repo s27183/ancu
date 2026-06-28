@@ -144,7 +144,7 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
   },
   "applicants": {
     "type": "array<applicant>",
-    "note": "F1 — one entry per person taking a legal/ownership interest (on title and/or the loan). The eligibility-bearing facts (citizenship, FIRB status, owner-occupier intent, ownership history) are PER-APPLICANT — they vary by person. The FIRB gate (constraint #10) and every FHB scheme's all-applicants test resolve over THIS ARRAY, not over a single primary buyer: a foreign co-applicant in an otherwise Mode-A purchase still trips the gate, and most FHB schemes require EVERY applicant to satisfy the first-home + residency tests. Mode A is ENTERED by a non-foreign lead applicant; a foreign co-applicant's interest is routed to the FIRB path (see eligibility + fhb-foreign-au). A non-buying spouse/partner is NOT in this array — that fact is captured separately (couple-as-one schemes) [F4, pending].",
+    "note": "F1 — one entry per person taking a legal/ownership interest (on title and/or the loan). The eligibility-bearing facts (citizenship, FIRB status, owner-occupier intent, ownership history) are PER-APPLICANT — they vary by person. The FIRB gate (constraint #10) and every FHB scheme's all-applicants test resolve over THIS ARRAY, not over a single primary buyer: a foreign co-applicant in an otherwise Mode-A purchase still trips the gate, and most FHB schemes require EVERY applicant to satisfy the first-home + residency tests. Mode A is ENTERED by a non-foreign lead applicant; a foreign co-applicant's interest is routed to the FIRB path (see eligibility + fhb-foreign-au). A non-buying spouse/partner is NOT in this array — they take no legal interest; that party is captured in `off_title_parties[]` flagged `counts_for_couple_as_one` (couple-as-one schemes) [F4].",
     "value": [
       {
         "role": { "type": "enum", "options": ["primary", "co_buyer"], "value": "primary" },
@@ -166,14 +166,26 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
     ],
     "_item_note": "Each array entry is one applicant with the shape shown above; the single example entry illustrates the per-applicant leaf schema. At runtime the array has one entry per buyer."
   },
-  "non_buying_partner": {
-    "exists": { "type": "bool", "value": false, "note": "F4 — a spouse / de-facto partner who is NOT on title or the loan (so not in applicants[]). FHOG and most state concessions test a married / de-facto COUPLE as one, so this partner's ownership can disqualify the buyer even though they take no legal interest. Captured separately for exactly that reason." },
-    "relationship": { "type": "enum", "options": ["spouse", "de_facto", "none"], "value": "none" },
-    "ownership_history": {
-      "ever_owned_au_property": { "type": "bool", "value": "<initial>" },
-      "ever_owned_and_occupied_residence": { "type": "bool", "value": "<initial>", "note": "F4 — same occupation-based distinction as the per-applicant field (F3); some couple-as-one tests turn on occupation, not mere ownership." },
-      "currently_owns_property": { "type": "bool", "value": "<initial>", "note": "CURRENT ownership AU or overseas — feeds the couple-as-one current-ownership test (e.g. FHG, Help to Buy)." }
-    }
+  "off_title_parties": {
+    "type": "array<off_title_party>",
+    "note": "F4/F14 — canonical array (shared with Mode B) of people LINKED to the purchase but NOT on title or the loan (so not in applicants[]). Read BY ROLE FLAG, not position (architecture §11.9 off_title.* namespace) — a party can carry two roles at once. Mode A populates AT MOST ONE element: the non-buying spouse / de-facto partner flagged counts_for_couple_as_one (FHOG and most state concessions test a married/de-facto COUPLE as one, so this partner's ownership can disqualify the buyer even though they take no legal interest). The couple-as-one subset is DYADIC (≤1 — a spouse — enforced fail-closed at the producer). Mode A does not use the funder role (no cross-border funder; that is Mode B).",
+    "value": [
+      {
+        "relationship": { "type": "enum", "options": ["spouse", "de_facto", "parent", "sibling", "other_family", "self_funding", "none"], "value": "none", "note": "canonical relationship enum (union across modes); Mode A uses spouse / de_facto for the couple-as-one partner." },
+        "counts_for_couple_as_one": { "type": "bool", "value": false, "note": "role flag → eligibility. true ⇒ this party's ownership_history folds into the couple-as-one all-applicants test (FHOG + state concessions). The flagged subset is ≤1 (dyadic)." },
+        "ownership_history": {
+          "ever_owned_au_property": { "type": "bool", "value": "<initial>" },
+          "ever_owned_and_occupied_residence": { "type": "bool", "value": "<initial>", "note": "F4 — same occupation-based distinction as the per-applicant field (F3); some couple-as-one tests turn on occupation, not mere ownership." },
+          "currently_owns_property": { "type": "bool", "value": "<initial>", "note": "CURRENT ownership AU or overseas — feeds the couple-as-one current-ownership test (e.g. FHG, Help to Buy)." }
+        },
+        "funder": {
+          "expected_to_fund": { "type": "bool", "value": false, "note": "role flag → funder consumers (Mode B family_context / cross_border_funding). false for Mode A (no cross-border funder)." },
+          "residence_country": { "type": "enum", "options": ["AU", "VN", "other"], "value": "AU" },
+          "contribution_capacity_aud": { "type": "money", "value": 0 }
+        }
+      }
+    ],
+    "_item_note": "Each entry is one off-title party with the canonical shape shown; Mode A's single optional entry is the couple-as-one partner (funder role left off). At runtime the array is [] (single buyer) or one couple party (on a refine turn that reveals a partner)."
   },
   "income": {
     "primary_taxable_income": { "type": "money_per_year", "value": "<initial>" },
@@ -222,7 +234,8 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
     "applicants": "array<{ role, citizenship_status, firb_required, tax_residency, current_residence_country, age, owner_occupier_intent, ever_owned_au_property, ever_owned_and_occupied_residence, years_since_last_au_property_interest, prior_overseas_property_ownership, prior_fhss_release, currently_owns_property }>",  // each entry's facts feed FHG 10-yr re-entry, FHSS one-release, Help to Buy current-ownership, the worldwide-ownership state tests, occupation-based first-home tests [F3], and non-resident tax / occupancy feasibility [F2]
     "applicant_count": "integer",
     "firb_required_any": "bool",                      // derived: TRUE if ANY applicant is a foreign person — fires the FIRB gate (constraint #10) and routes that applicant's interest to the foreign-person path (fhb-foreign-au). Per-applicant firb_required lives inside applicants[].
-    "non_buying_partner": "{ exists, relationship, ever_owned_au_property, ever_owned_and_occupied_residence, currently_owns_property } | null",  // F4 — couple-as-one: the eligibility resolver folds this partner's ownership into the all-applicants test even though they hold no legal interest
+    "off_title_parties": "array<{ relationship, counts_for_couple_as_one, ownership_history, funder }> | null",  // F4/F14 — canonical SOT for off-title parties (shared with Mode B). Read BY ROLE FLAG (architecture §11.9 off_title.*): eligibility ← counts_for_couple_as_one (dyadic ≤1 subset); the funder consumers ← funder (Mode B only). Mode A populates ≤1 couple party. null until captured (honest-partial).
+    "non_buying_partner": "{ exists: bool, relationship: enum, ever_owned_au_property: bool, ever_owned_and_occupied_residence: bool, currently_owns_property: bool } | null",  // F4 — DERIVED read-model (a view, NOT a second fact): the dyadic couple-as-one head of off_title_parties[] projected to the flat shape the KB scheme gates read. The role-flag filter + ≤1 dyadic enforcement live at the producer (fh_engine_fill:couple_as_one_view/1); the eligibility resolver reads this view unchanged (P0.4). exists=false ⇒ no couple party (gate moot). Inline-typed so the registry singleton projection keeps types without a param block.
     "intended_occupancy_use": "enum [sole_occupier, partial_rental, granny_flat, not_occupied]",  // F12 — dwelling-use; feeds land_tax_check, CGT main-residence, and scheme occupancy compliance
     // neutral derived financials (facts, not verdicts) — household-level
     "assessable_income": "money_per_year",            // combined; per-scheme income caps (Help to Buy) decide individual-vs-combined
@@ -333,7 +346,7 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
 
 **Scope:** `both` — base: provisional eligibility from profile facts + `target_price_range` (which schemes apply; FHG / FHSS / state-concession predicates; target-range-vs-cap check) **plus each scheme's benefit as a `money_range` quantified from the price range** (Decision 8 in [`eligibility-resolution.md`](../architecture/eligibility-resolution.md): duty saving via the shared `fh_engine_cash`, FHOG fixed, FHG LMI band; FHSS/Help-to-Buy honestly null). Refined per-property once the specific property's location + price are known (`applicable_cap_for_location_property`, `fhog.applicable`) — the ranges narrow to points.
 
-**All-applicants resolution (F1).** Every scheme predicate resolves as the **AND over all `profile.applicants`** — a scheme is applicable to the joint application only if *every* applicant satisfies its first-home + residency + ownership tests. Two consequences: (a) if `profile.firb_required_any` is true (a foreign co-applicant), FHB schemes are unavailable to the joint application and that applicant's interest follows the FIRB path (`fhb-foreign-au`); (b) where the joint application fails an all-applicants test but a subset would qualify (e.g. the eligible applicant buying alone), the alternative is surfaced in `scheme_stack.structuring_options` rather than silently dropped. Per-scheme individual-vs-combined nuances (e.g. Help to Buy income caps) are resolved against the relevant applicants, not assumed joint. The test also folds in `profile.non_buying_partner` where present — a married / de-facto partner's ownership counts for FHOG and state concessions even when they take no legal interest (F4).
+**All-applicants resolution (F1).** Every scheme predicate resolves as the **AND over all `profile.applicants`** — a scheme is applicable to the joint application only if *every* applicant satisfies its first-home + residency + ownership tests. Two consequences: (a) if `profile.firb_required_any` is true (a foreign co-applicant), FHB schemes are unavailable to the joint application and that applicant's interest follows the FIRB path (`fhb-foreign-au`); (b) where the joint application fails an all-applicants test but a subset would qualify (e.g. the eligible applicant buying alone), the alternative is surfaced in `scheme_stack.structuring_options` rather than silently dropped. Per-scheme individual-vs-combined nuances (e.g. Help to Buy income caps) are resolved against the relevant applicants, not assumed joint. The test also folds in the off-title party flagged `counts_for_couple_as_one` where present — a married / de-facto partner's ownership counts for FHOG and state concessions even when they take no legal interest (F4). The resolver filters `profile.off_title_parties[]` by that role flag (the dyadic ≤1 subset, enforced fail-closed) and projects the flat `non_buying_partner.*` read-model the KB scheme criteria read — keeping the role-flag filter in the resolver and the KB predicate language simple (architecture §11.9 off_title.* namespace; P0.4).
 
 **Inputs:** base — `buyer_profile.outcome` (incl. `target_price_range`, `target_zone`); per-property — adds `property_assessment.outcome`
 
