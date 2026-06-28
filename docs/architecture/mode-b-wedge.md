@@ -175,9 +175,9 @@ Three divergences were found and dispositioned:
 - [x] `kb.firb.contract-conditional-on-approval` *(R3, 2026-06-28 — pure-ref; STRATEGY — when/why conditional vs approve-then-sign, auction trap; owns route decision; GN6 v4 fn3)*
 - [x] `kb.foreign-buyer.subject-to-firb-clauses` *(R3, 2026-06-28 — pure-ref; new foreign-buyer/ namespace; clause ANATOMY — approval-by date/termination/deposit-treatment/good-faith; no drafting)*
 - [x] `kb.firb.contract-clauses-required` *(R3, 2026-06-28 — pure-ref; due-diligence pre-signing CHECKLIST; the three contract docs form decide→understand→confirm chain; FIRB-checklist≠bank-AML)*
-- [ ] `kb.firb.approval-to-settlement-timeline`
-- [ ] `kb.firb.vacancy-fee-rules-2026`
-- [ ] `kb.firb.vacancy-fee-double-from-2024`
+- [x] `kb.firb.approval-to-settlement-timeline` *(R4, 2026-06-28 — pure-ref; the SECOND FIRB clock (validity 12mo unless Treasurer extends; lapse→fresh application+fee); distinct from timelines-standard's 30-day decision clock; carries the window the OTP-completion trap turns on; GN38 + GN6 v4)*
+- [x] `kb.firb.vacancy-fee-rules-2026` *(R4, 2026-06-28 — pure-ref; the REGIME — Part 6A, 183-day/≥30-day-continuous test (short-stay<30d excluded), 12mo vacancy year from right-to-occupy, 30-day return, Register reference; LODGEMENT TRAP (no return→liable regardless); amount application-fee-linked → removed-from-reach (dollars owned by fee-schedule-current); GN6 v4 §J + GN10 v5 §G)*
+- [x] `kb.firb.vacancy-fee-double-from-2024` *(R4, 2026-06-28 — pure-ref; owns the MULTIPLIER+cutover (2× on/after 9 Apr 2024, 1× before); non-obvious: keys on VACANCY-YEAR start not purchase → pre-2024 holdings also pay double; multiplier not dollars (reindex-immune, penalty-units split); GN10 v5 §G + Fees Regs s67(2))*
 - [x] `kb.off-the-plan.risk-considerations` *(R1, 2026-06-28 — pure-ref; OTP risk catalogue; owns the foreign-person FIRB-window-vs-completion trap; valuation-gap/sunset → building-types, cooling-off → cooling-off.by-state)*
 
 ### Cluster L — Non-resident lending — source: lender published policy + APRA (ACL: informational only)
