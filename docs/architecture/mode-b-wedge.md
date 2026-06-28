@@ -164,11 +164,11 @@ Three divergences were found and dispositioned:
 - [x] `kb.visas.au-temporary-residency-classes` *(R1, 2026-06-28 — pure-ref; per-class catalogue + FIRB/lending signal; status owned by status-determination)*
 - [x] `kb.au-temp-residents.banking-and-tax-basics` *(R1, 2026-06-28 — pure-ref; 3 tax-residency categories; tax≠FIRB; Subdiv 768-R; foreign-resident no-threshold/Medicare)*
 - [x] `kb.firb.eligible-property-types-foreign-persons` *(R1, 2026-06-28 — pure-ref; positive taxonomy + 4yr vacant-land; complement of established-dwelling-ban)*
-- [ ] `kb.firb.fee-tiers-by-value`
-- [ ] `kb.firb.fee-schedule-current`
-- [ ] `kb.firb.application-process`
-- [ ] `kb.firb.documents-required`
-- [ ] `kb.firb.timelines-standard`
+- [x] `kb.firb.fee-tiers-by-value` *(R2, 2026-06-28 — pure-ref; owns the banding selection rule (price→band→table), asserts no figure so reindex-immune)*
+- [x] `kb.firb.fee-schedule-current` *(R2, 2026-06-28 — pure-ref; owns the dated dollar figures, Schedule of Fees v6 2-Jan-2026 / FY25-26 Table 2; ⚠ 1-July reindex flag + named re-ground obligation (last_verified 3 days before the 2026-27 reindex); est-dwelling 3× off-path)*
+- [x] `kb.firb.application-process` *(R2, 2026-06-28 — pure-ref; the spine: notify-before-settle / conditional-contract route, ATO Online Services portal, fee→30-day-clock; references fee/docs/timing/conditions owners, restates none)*
+- [x] `kb.firb.documents-required` *(R2, 2026-06-28 — pure-ref; application field checklist; load-bearing FIRB-docs≠bank-AML-source-of-funds separation)*
+- [x] `kb.firb.timelines-standard` *(R2, 2026-06-28 — pure-ref; owns the 30-day-from-full-fee decision clock; distinct from R4's approval-validity window (two clocks, single owners))*
 - [ ] `kb.firb.exemption-certificates-developer`
 - [ ] `kb.firb.approval-conditions-typical`
 - [ ] `kb.firb.penalties-non-compliance`
