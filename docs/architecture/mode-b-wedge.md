@@ -132,19 +132,38 @@ that the rest of Mode B reads).
 ## P1 — AU-side KB authoring tracker
 
 Status legend (Mode-C convention): `[ ]` not started · `[~]` drafting · `[v]` facts verified vs
-primary · `[x]` done (bilingual, in-cluster, compiles when in-scope). **Counts are provisional** — the
-blueprint's component-level anchor lists and its index table diverge (e.g. component 5's
-`kb.lender.non-resident-*` slugs are not all in the 42-slug index); a **P1-opening anchor
-reconciliation** pins the exact set first (the Mode-C precedent: 47 → 45 after seam reconciliation).
-Shared-with-Mode-A anchors (non-italic in the blueprint index — `status-determination`,
-`established-dwelling-ban`, suburb/strata/contract/settlement commons) are **already authored**; only
-the Mode-B-only set below is new.
+primary · `[x]` done (bilingual, in-cluster, compiles when in-scope). Shared-with-Mode-A anchors
+(non-italic in the blueprint index — `status-determination`, `established-dwelling-ban`,
+suburb/strata/contract/settlement commons) are **already authored**; only the Mode-B-only set below is
+new.
+
+**P1-open anchor reconciliation — done (2026-06-28).** Ground truth is the **compiler's gate
+surface**, not the index prose: `kb_compiler.py` extracts anchors only from each component's
+`**KB anchors:**` line (regex `kb\.[a-z0-9.\-]+`) — it does **not** read the index table and does
+**not** expand "All Mode A … anchors" prose. The gate surface is **52 tokens**; **42 have no file** =
+the P1 author set, confirmed by the build's own inventory (`[inventory] fhb-foreign-au: 42 unbuilt
+anchor(s)`). The 42 map **exactly** onto the clusters below (R 18 + L 8 + X 10 + M 3 + VN 3 = 42); the
+**+1 VN parent-tax** placeholder (open-Q #2) is introduced with its cluster, bringing P1 to **43 docs**.
+Three divergences were found and dispositioned:
+- **Fixed — gate-surface defect.** Component 11's line read "All Mode A anchors **except**
+  `kb.land-tax.ppor-exemption`", but the regex captured the excluded slug as a positive anchor
+  (passing GATE 2 only because the file exists, while polluting Mode-B's leaf map). Rewrote to drop the
+  bare token; the unbuilt count is unchanged (that doc exists).
+- **Fixed — index drift (human-doc only; the compiler ignores the index).** Header `42 → 67` (the
+  table actually lists 67 distinct slugs after repair); added the 8 component-referenced rows missing
+  from the index (the 7 component-5 lender/fx slugs + `established-dwelling-ban`); fixed the
+  `kb.refi.windows-and-triggers` → `kb.refinance.windows-and-triggers` typo (Mode A references it
+  correctly). Recompiled + `validate_build` four-mode **PASS**; Mode-A/C in-scope registries byte-stable.
+- **Tracked as a P3 seam (not a P1 blocker).** Four components declare anchors as "All Mode A …
+  anchors + X" prose; the regex captures only the foreign-specific extras and **silently drops the
+  inherited shared anchors** from Mode-B's set. The shared docs exist (in scope via Mode A) so P1 is
+  unaffected; the P3 in-scope flip must decide whether to expand the literal lists (see Open seams).
 
 ### Cluster R — FIRB / regulatory (the centerpiece) — source: FIRB / ATO foreign-investor / Treasury
 
-- [ ] `kb.visas.au-temporary-residency-classes`
-- [ ] `kb.au-temp-residents.banking-and-tax-basics`
-- [ ] `kb.firb.eligible-property-types-foreign-persons`
+- [x] `kb.visas.au-temporary-residency-classes` *(R1, 2026-06-28 — pure-ref; per-class catalogue + FIRB/lending signal; status owned by status-determination)*
+- [x] `kb.au-temp-residents.banking-and-tax-basics` *(R1, 2026-06-28 — pure-ref; 3 tax-residency categories; tax≠FIRB; Subdiv 768-R; foreign-resident no-threshold/Medicare)*
+- [x] `kb.firb.eligible-property-types-foreign-persons` *(R1, 2026-06-28 — pure-ref; positive taxonomy + 4yr vacant-land; complement of established-dwelling-ban)*
 - [ ] `kb.firb.fee-tiers-by-value`
 - [ ] `kb.firb.fee-schedule-current`
 - [ ] `kb.firb.application-process`
@@ -159,7 +178,7 @@ the Mode-B-only set below is new.
 - [ ] `kb.firb.approval-to-settlement-timeline`
 - [ ] `kb.firb.vacancy-fee-rules-2026`
 - [ ] `kb.firb.vacancy-fee-double-from-2024`
-- [ ] `kb.off-the-plan.risk-considerations`
+- [x] `kb.off-the-plan.risk-considerations` *(R1, 2026-06-28 — pure-ref; OTP risk catalogue; owns the foreign-person FIRB-window-vs-completion trap; valuation-gap/sunset → building-types, cooling-off → cooling-off.by-state)*
 
 ### Cluster L — Non-resident lending — source: lender published policy + APRA (ACL: informational only)
 
@@ -217,7 +236,14 @@ the Mode-B-only set below is new.
 
 ## Open seams (surface-and-track, reconcile in-phase)
 
-- **Anchor index vs component lists diverge** — reconcile at P1-open (count + the lender slugs).
+- **Anchor index vs component lists diverge** — ~~reconcile at P1-open~~ **done 2026-06-28** (header
+  42→67, 8 missing rows added, `refi→refinance` typo fixed; see the P1-open reconciliation note above).
+- **"All Mode A … anchors" prose under-populates Mode-B's anchor set (P3)** — the compiler captures
+  only literal `kb.*` tokens, so the 4 prose-inheritance components (`buying_strategy`, `due_diligence`,
+  `settlement_prep`, `ownership_planning`) drop their inherited shared anchors from Mode-B's registry.
+  Harmless while out-of-scope (the docs exist via Mode A). At the **P3 in-scope flip**, decide: expand
+  the literal lists (so Mode-B's registry + leaf-filler map carry the inherited anchors) or accept the
+  drop. Verify Mode-B coverage (GATE 7) green either way.
 - **`profile_foreign` → `profile` repoint** ripples Mode B's downstream `<from_buyer_profile>` reads;
   reconcile all consumers when P0 conforms the blueprint ([[spec-seams-surface-on-implementation]]).
 - **VN-side parent tax** is blueprint open-Q #2 (not yet an anchor) — created as a placeholder in P1.

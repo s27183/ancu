@@ -851,7 +851,7 @@ Same as [Mode A settlement_prep](fhb-domestic-au.md#8-settlement_prep) plus:
 
 **Inputs:** `property_assessment.outcome` + `buyer_profile.outcome`
 
-**KB anchors:** All Mode A ownership_planning anchors except `kb.land-tax.ppor-exemption` (not applicable). Plus: `kb.firb.vacancy-fee-rules-2026`, `kb.firb.vacancy-fee-double-from-2024`, `kb.non-resident-tax.cgt-no-ppor-exemption`, `kb.non-resident-tax.withholding-on-rental-income`, `kb.non-resident-tax.foreign-resident-cgt-withholding`
+**KB anchors:** All Mode A ownership_planning anchors except the PPOR land-tax exemption (not applicable to foreign persons). Plus: `kb.firb.vacancy-fee-rules-2026`, `kb.firb.vacancy-fee-double-from-2024`, `kb.non-resident-tax.cgt-no-ppor-exemption`, `kb.non-resident-tax.withholding-on-rental-income`, `kb.non-resident-tax.foreign-resident-cgt-withholding`
 
 **Renderer:** `data-table` + `opportunity-card`
 
@@ -916,11 +916,12 @@ The `mode_switch_eligible` field signals when the user's status has changed (e.g
 
 ## KB anchor index (for this blueprint)
 
-42 slugs referenced. Italics mark Mode B-only anchors (not in Mode A).
+67 slugs referenced. Italics mark Mode B-only anchors (not in Mode A).
 
 | Slug | Component(s) | Owns |
 |---|---|---|
 | `kb.firb.status-determination` | 1, 4 | How to determine FIRB classification from visa/citizenship status |
+| `kb.firb.established-dwelling-ban` | 1, 4 | The 1 Apr 2025 – 30 Jun 2029 established-dwelling ban on foreign persons |
 | *`kb.visas.au-temporary-residency-classes`* | 1 | AU temporary residency visa classes and their FIRB implications |
 | *`kb.au-temp-residents.banking-and-tax-basics`* | 1 | Banking and tax basics for AU temporary residents |
 | *`kb.vietnamese-family.financial-patterns`* | 2 | Vietnamese family financial pooling patterns, decision authority norms |
@@ -946,6 +947,13 @@ The `mode_switch_eligible` field signals when the user's status has changed (e.g
 | `kb.buyer-costs.inspections-conveyancing-fees` | 5 | Typical buyer-side costs |
 | `kb.cash-reserve.lender-expectations` | 5 | Lender expectations (higher buffer for non-resident) |
 | *`kb.lmi.calculation-for-foreign-persons`* | 5 | LMI calculation when LVR >80% for foreign person |
+| *`kb.lender.non-resident-friendly-shortlist`* | 5 | Non-resident-friendly lender criteria (not a named-lender recommendation) |
+| *`kb.lender.temp-resident-lending-policies`* | 5 | Temporary-resident lending policies |
+| *`kb.lender.485-visa-treatment`* | 5 | 485 graduate-visa lending treatment |
+| *`kb.lender.foreign-buyer-deposit-requirements`* | 5 | Foreign-buyer deposit requirements (typically 30%+) |
+| *`kb.lender.firb-approval-as-condition-precedent`* | 5 | FIRB approval as loan condition precedent |
+| *`kb.lender.documentation-non-resident`* | 5 | Non-resident loan documentation requirements |
+| *`kb.fx.loan-currency-considerations`* | 5 | Loan-currency considerations (AUD-denominated loan; FX is on VN-side capital flow) |
 | *`kb.fx-providers.wise-ofx-bank-comparison`* | 6 | FX provider comparison for VN-AU transfers |
 | *`kb.vn-capital-controls.sbv-thresholds-2026`* | 6 | SBV outbound transfer thresholds requiring approval |
 | *`kb.vn-capital-controls.declared-purpose-categories`* | 6 | Declared-purpose categories for SBV transfers |
@@ -972,7 +980,7 @@ The `mode_switch_eligible` field signals when the user's status has changed (e.g
 | *`kb.firb.approval-to-settlement-timeline`* | 9 | FIRB approval to settlement timeline |
 | *`kb.cross-border-settlement.coordination-best-practices`* | 9 | Cross-border settlement coordination |
 | `kb.ongoing-costs.rates-water-strata` | 10 | Ongoing cost ranges |
-| `kb.refi.windows-and-triggers` | 10 | Refi windows |
+| `kb.refinance.windows-and-triggers` | 10 | Refi windows |
 | `kb.maintenance.budget-by-property-type` | 10 | Maintenance budget heuristics |
 | *`kb.firb.vacancy-fee-rules-2026`* | 10 | FIRB vacancy fee rules |
 | *`kb.firb.vacancy-fee-double-from-2024`* | 10 | Doubled vacancy fee from 9 April 2024 |
