@@ -169,12 +169,12 @@ Three divergences were found and dispositioned:
 - [x] `kb.firb.application-process` *(R2, 2026-06-28 — pure-ref; the spine: notify-before-settle / conditional-contract route, ATO Online Services portal, fee→30-day-clock; references fee/docs/timing/conditions owners, restates none)*
 - [x] `kb.firb.documents-required` *(R2, 2026-06-28 — pure-ref; application field checklist; load-bearing FIRB-docs≠bank-AML-source-of-funds separation)*
 - [x] `kb.firb.timelines-standard` *(R2, 2026-06-28 — pure-ref; owns the 30-day-from-full-fee decision clock; distinct from R4's approval-validity window (two clocks, single owners))*
-- [ ] `kb.firb.exemption-certificates-developer`
-- [ ] `kb.firb.approval-conditions-typical`
-- [ ] `kb.firb.penalties-non-compliance`
-- [ ] `kb.firb.contract-conditional-on-approval`
-- [ ] `kb.foreign-buyer.subject-to-firb-clauses`
-- [ ] `kb.firb.contract-clauses-required`
+- [x] `kb.firb.exemption-certificates-developer` *(R3, 2026-06-28 — pure-ref; developer New/Near-New Dwelling Exemption Certificate path; owns the $3M buyer cap + 50% developer cap; path-selector before application-process)*
+- [x] `kb.firb.approval-conditions-typical` *(R3, 2026-06-28 — pure-ref; NON condition catalogue by property type; new=light, vacant=4yr-construction/30-day-evidence/no-disposal; Register of Foreign Ownership; GN6 v4)*
+- [x] `kb.firb.penalties-non-compliance` *(R3, 2026-06-28 — pure-ref; REGULATED, figures in penalty units (s4AA dollar value indexes → re-ground flag); criminal 10yr/15,000PU, civil greatest-of value-linked, tiers 12/60/300, self-disclosure→Tier1, disposal orders; GN14 v4; removed-from-reach)*
+- [x] `kb.firb.contract-conditional-on-approval` *(R3, 2026-06-28 — pure-ref; STRATEGY — when/why conditional vs approve-then-sign, auction trap; owns route decision; GN6 v4 fn3)*
+- [x] `kb.foreign-buyer.subject-to-firb-clauses` *(R3, 2026-06-28 — pure-ref; new foreign-buyer/ namespace; clause ANATOMY — approval-by date/termination/deposit-treatment/good-faith; no drafting)*
+- [x] `kb.firb.contract-clauses-required` *(R3, 2026-06-28 — pure-ref; due-diligence pre-signing CHECKLIST; the three contract docs form decide→understand→confirm chain; FIRB-checklist≠bank-AML)*
 - [ ] `kb.firb.approval-to-settlement-timeline`
 - [ ] `kb.firb.vacancy-fee-rules-2026`
 - [ ] `kb.firb.vacancy-fee-double-from-2024`
