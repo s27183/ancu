@@ -195,9 +195,9 @@ Three divergences were found and dispositioned:
 
 ### Cluster X — Cross-border (AU-side), FX, surcharge, non-resident tax — source: ATO + state revenue + provider data
 
-- [ ] `kb.foreign-buyer-surcharge.by-state` *(regulated, per-state — the Mode-A land-tax discipline)*
-- [ ] `kb.fx.typical-spreads-vnd-aud`
-- [ ] `kb.fx-providers.wise-ofx-bank-comparison`
+- [x] `kb.foreign-buyer-surcharge.by-state` *(X1, 2026-07-02 — pure-ref, REGULATED per-state (Mode-A land-tax discipline); owns the ONE-OFF duty surcharge rate only — NSW 9% (Jan-2025), VIC 8%, QLD 8% (AFAD, Jul-2024), WA 7%, SA 7%, TAS 8% (FIDS, Jul-2024), ACT/NT none; three-owner split (standard duty→stamp-duty.calc-by-state, annual land-tax surcharge→tax.land-tax-by-state, FIRB fee→firb.fee-schedule-current) so regulatory_imposts_total never double-counts; resolver computes amount=value×rate, postcondition vs state calculator; QLD+TAS rate-history primary-confirmed to effective date)*
+- [x] `kb.fx.typical-spreads-vnd-aud` *(X1, 2026-07-02 — pure-ref, CONVENTION; owns the spread MAGNITUDE only (specialist 0.5–1.5%, bank 2.5–4%+, planning default 1.5%); VND managed/less-liquid → wider end; loan carries no FX (loan is AUD); seeds cash_position estimated_fx_spread_percentage + cross_border_funding fx_cost; framework→fx-providers.*, VN process→vn-capital-controls.*; banded, live-quote caveat, never an asserted rate)*
+- [x] `kb.fx-providers.wise-ofx-bank-comparison` *(X1, 2026-07-02 — pure-ref, CONVENTION; new fx-providers/ namespace; FX analogue of non-resident-friendly-shortlist tuned to AFSL not ACL — owns the comparison FRAMEWORK (dimensions + rank-by-total-landed-cost rule + crossover: small→flat-%-specialist, large→margin-based) + 6 machine-checkable boundary flags; naming publicly-priced utilities + cost-ranking IS legit decision-support (blueprint enum names wise/ofx/bank_wire_*), boundary = no suitability opinion + no referral fee; spread magnitudes owned by fx.typical-spreads-vnd-aud, not restated)*
 - [ ] `kb.au-aml-ctf.bank-due-diligence-expectations`
 - [ ] `kb.au-aml-ctf.source-of-funds-documentation`
 - [ ] `kb.cross-border.source-of-funds-letter-template`
