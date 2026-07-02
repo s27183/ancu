@@ -208,9 +208,9 @@ Three divergences were found and dispositioned:
 
 ### Cluster M — Family / cultural coordination — source: reference / behavioural (decision-support framed)
 
-- [ ] `kb.vietnamese-family.financial-patterns`
-- [ ] `kb.cross-border.decision-authority-cultural`
-- [ ] `kb.bilingual.coordination-norms`
+- [x] `kb.vietnamese-family.financial-patterns` *(M, 2026-07-02 — pure-ref, CONVENTION/behavioural; first fully-behavioural Mode-B doc, consumer family_context (2); owns the funding-PATTERN set → contribution_source enums + funding_complexity_score/documentation_gaps, patterns-as-PROMPTS-not-predictions (honest-partial on cultural behaviour); keeper param = the informal REPAYABLE family pool reads to a lender as a borrowed deposit (gift-vs-loan is the collision), regulated handling cross-ref'd not restated (au-aml-ctf.source-of-funds-documentation, cross-border.source-of-funds-letter-template, cash-reserve.lender-expectations, vn-capital-controls.*); "deposit achievable, paperwork is the risk" inversion)*
+- [x] `kb.cross-border.decision-authority-cultural` *(M, 2026-07-02 — pure-ref, CONVENTION/behavioural; consumer family_context (2) decision_authority.* enums; keeper param = the three-way conflation buyers make — decision authority (cultural) ≠ legal TITLE ≠ FIRB exposure; putting the VN funding parent ON TITLE silently adds a SECOND foreign person + FIRB app + surcharge (or breaches the ban), a funder OFF title carries none; disentanglement PROMPT, FIRB/title consequences cross-ref'd to firb.status-determination/established-dwelling-ban/foreign-buyer-surcharge.by-state + the off_title_parties funder role; consultation = a timing input to the coordination layer)*
+- [x] `kb.bilingual.coordination-norms` *(M, 2026-07-02 — pure-ref, CONVENTION/coordination; new bilingual/ namespace; consumer family_context (2) coordination.* + bilingual_coordination_required; owns the COMMUNICATION layer (who's invited, which language, co-equal {vi,en} at source so the VN funder is a first-class reader not a translated afterthought) — single-owner split from cross-border-settlement.coordination-best-practices which owns the settlement SEQUENCING (the conversation vs the money/legal critical path); load-bearing not cosmetic (bilingual is what carries the consultation + source-of-funds trail on time); carries NO copy (kb.copy.* + engine produce {vi,en}); language captured-not-assumed, cross-timezone sign-off needs lead time)*
 
 ### VN-side — labelled placeholders (structure now, datum pending; buyer-pointer copy)
 
