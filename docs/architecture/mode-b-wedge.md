@@ -182,16 +182,16 @@ Three divergences were found and dispositioned:
 
 ### Cluster L — Non-resident lending — source: lender published policy + APRA (ACL: informational only)
 
-- [ ] `kb.lender.non-resident-friendly-shortlist` *(criteria, not a named-lender recommendation)*
-- [ ] `kb.lender.temp-resident-lending-policies`
-- [ ] `kb.lender.485-visa-treatment`
-- [ ] `kb.lender.foreign-buyer-deposit-requirements`
-- [ ] `kb.lender.firb-approval-as-condition-precedent`
-- [ ] `kb.lender.documentation-non-resident`
-- [ ] `kb.fx.loan-currency-considerations`
-- [ ] `kb.lmi.calculation-for-foreign-persons`
+- [x] `kb.lender.non-resident-friendly-shortlist` *(L1, 2026-07-02 — pure-ref; ACL-boundary CRITERIA doc, the Mode-B mirror of investor-friendly-shortlist; 4 machine-checkable ACL flags (decision-support/user-picks/no-named-recommendation/defer-to-broker) + criterion→owner lookup; NO named lenders; rate premium ~50–150bp as CONVENTION band)*
+- [x] `kb.lender.temp-resident-lending-policies` *(L1, 2026-07-02 — pure-ref; the foreign-axis HUB-DELTA, analogue of serviceability-basics — owns ONLY what changes for a foreign borrower (foreign-income shading ~20% [range 10–40%], acceptable-currency lists, ~5–10 lender pool, visa tenure), cross-refs serviceability-basics for the unchanged buffer/HEM/DTI; load-bearing axis = AU-income vs foreign-income, not visa label; CONVENTION-flagged, removed-from-reach)*
+- [x] `kb.lender.485-visa-treatment` *(L1, 2026-07-02 — pure-ref; the FAVOURABLE branch — 485/student earning AUD in AU assessed near-domestic (up to 80% LVR solo, no foreign shading), 95% + FIRB/surcharge/ban all removed via joint-tenant AU-partner purchase; FIRB/ban facts are REGULATED but cross-ref'd to kb.firb.* owners, not restated)*
+- [x] `kb.lender.foreign-buyer-deposit-requirements` *(L1, 2026-07-02 — pure-ref; owns the DEPOSIT/LVR bands only — non-resident 30–40% (LVR 60–70%), temp-AU-income 20%, AU-partner 5%; deposit ≠ total-cash-to-settle (FIRB fee/surcharge/FX owned by cash_position anchors, don't double-count); genuine-savings still applies (lump-sum overseas gift trap))*
+- [ ] `kb.lender.firb-approval-as-condition-precedent` *(L2)*
+- [ ] `kb.lender.documentation-non-resident` *(L2)*
+- [ ] `kb.fx.loan-currency-considerations` *(L2)*
+- [ ] `kb.lmi.calculation-for-foreign-persons` *(L2)*
 
-*(Reconcile against the index at P1-open; the Mode-A `kb.lender.serviceability-basics` may be the shared keeper for the serviceability core.)*
+*(**Reconciliation settled at P1-open (2026-07-02):** `kb.lender.serviceability-basics` STAYS the shared keeper of the universal serviceability core (APRA buffer, HEM, DTI, shading, genuine savings) — it already declares itself owner of "the universal framework every lender shares". The Mode-B lending docs own only the **non-resident DELTAS** and cross-ref it; none fold away → all 8 L docs stand. `temp-resident-lending-policies` is the foreign-axis hub-delta.)*
 
 ### Cluster X — Cross-border (AU-side), FX, surcharge, non-resident tax — source: ATO + state revenue + provider data
 
