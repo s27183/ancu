@@ -39,12 +39,12 @@ The architecture was deliberately built **mode-generic** (one `profile.*` fact b
 
 | Wedge | Mode | Depends on (code) | External (non-code) prereqs | Buildable to completion now? |
 |---|---|---|---|---|
-| **Identity-layer unification** | — (foundation) | item 1 (done) only | none | **Yes — the root for B, C, D** |
-| **Wedge 3 — domestic investor** | C | unification + investor-tax KB (`kb.tax.*` / `kb.investor.*`, authorable) + extend semantic gates + the drafted `investor-domestic-au` blueprint | **none** — no FIRB, no cross-border | **Yes, fully** |
-| **Wedge 2 — Vietnam-parent** | B | unification + `firb_workflow` + `cross_border_funding` + `family_context` | VN legal counsel (day 1), money-transfer partner (pre-launch), VN-PDP data-residency capability — strategy §9 | code-yes, **launch-gated on external** |
-| **Wedge 3 — foreign investor** | D | unification **+ Mode C** (investor machinery) **+ Mode B** (FIRB / residency) | all of Mode B's | No — 13-component pipeline sits on both B and C |
-| **Wedge 1b / 1c** — Tìm Nhà / URL-paste + extension | A | Wedge 1a (done) + Phase-B addenda activation | 1b: curator ops; 1c: none | Yes — **orthogonal track**, no mode-foundation dependency |
-| **Wedge 4 — multi-CALD** | — | everything above | — | No |
+| **Identity-layer unification** | — (foundation) | item 1 (done) only | none | **Done** |
+| **Wedge 3 — domestic investor** | C | unification + investor-tax KB (`kb.tax.*` / `kb.investor.*`, authorable) + extend semantic gates + the drafted `investor-domestic-au` blueprint | **none** — no FIRB, no cross-border | **Done — build-complete, full-stack live-verified (2026-06-27/28)** |
+| **Wedge 2 — Vietnam-parent** | B | unification + `firb_workflow` + `cross_border_funding` + `family_context` | VN legal counsel (day 1), money-transfer partner (pre-launch), VN-PDP data-residency capability — strategy §9 | **Code done, live-turn-verified (2026-07-03)** — launch still gated on the external prereqs |
+| **Wedge 3 — foreign investor** | D | unification **+ Mode C** (investor machinery, done) **+ Mode B** (FIRB / residency, done) | all of Mode B's (inherited via `cross_border_funding` reuse) | **Now genuinely unblocked — both dependencies closed.** Planning opened 2026-07-03: [`mode-d-wedge.md`](mode-d-wedge.md) |
+| **Wedge 1b / 1c** — Tìm Nhà / URL-paste + extension | A | Wedge 1a (done) + Phase-B addenda activation | 1b: curator ops; 1c: none | Yes — **orthogonal track**, no mode-foundation dependency; noted for future, not started |
+| **Wedge 4 — multi-CALD** | — | everything above | — | No — noted for future |
 
 The investor-tax KB that Mode C needs is the same `kb.tax.*` / `kb.investor.*` set [grounding-checklist item 10](../grounding-checklist.md) (full-temporal-flow, T-doc 6) records as **trigger-gated to "when Mode C ships."** Authoring it *is* part of the Mode-C wedge.
 
@@ -69,6 +69,8 @@ The investor-tax KB that Mode C needs is the same `kb.tax.*` / `kb.investor.*` s
 **Rationale.** Of the two full wedges unblocked by the shared foundation, Mode C is buildable end-to-end with no external dependencies (no FIRB, no cross-border funding, no VN data-residency review, no legal/partnership prerequisites), whereas Mode B is *code*-buildable but *launch*-gated on work outside the codebase. Building the fully-buildable wedge first maximizes shippable surface and exercises the mode-generic architecture against a genuinely-unlike second instance ([[prove-generality-against-unlike-instances]]) before the regulated cross-border machinery lands.
 
 **This deliberately diverges from the strategy §10 GTM order**, which puts Mode B second for willingness-to-pay and parent cross-sell. That GTM logic is unchanged and still governs *go-to-market*; it is a market-priority argument, not a foundationality one. When Mode B's external prerequisites (VN legal counsel, money-transfer partner, data-residency capability) are in motion, revisit whether GTM should re-assert and pull Mode B forward. **Revisit trigger:** Mode B's external prerequisites begin, or a paying-customer signal makes Vietnam-parent WTP the binding constraint.
+
+**Actual build order superseded this decision in practice (2026-06-23 → 2026-07-03): Mode B was built to completion before Mode D was even opened, i.e. B *and* C both landed, not strictly C-then-B-then-pause.** Both wedges are now build-complete and live-verified; the divergence didn't cost anything (no rework, no regression) because the runtime is genuinely multi-blueprint (item 2) — landing order among already-unblocked wedges was a scheduling choice, not a dependency violation. The foundationality *logic* above still holds and now governs the next call: with B and C both done, **Mode D is the next foundational wedge** (both its dependencies are closed) — see [`mode-d-wedge.md`](mode-d-wedge.md), opened 2026-07-03. Production deploy and Mode B's launch-gate externals are explicitly deferred behind it (Son, 2026-07-03).
 
 ---
 

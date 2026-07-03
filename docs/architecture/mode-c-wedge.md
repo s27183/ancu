@@ -1,9 +1,15 @@
 # Mode-C wedge — build plan + progress tracker
 
-**Status: planning (authoring not started). Opened 2026-06-23.** This doc is the durable plan
-*and* the task tracker for the Mode-C (Vietnamese-AU domestic investor) wedge. The Claude Code
-Task list is ephemeral (it does not survive compaction); this file is the source of truth for
-"what's left." The grounding-checklist carries a one-line pointer here.
+**Status: build-complete AND full-stack live-verified (P1–P5 + Phase B all closed 2026-06-27/28).**
+Opened 2026-06-23. **Stale-header correction (2026-07-03):** this line previously read "planning
+(authoring not started)" — wrong; every phase below is `[x]`/DONE, including a live-pixel EN+VI
+capstone. Only two things remain open, both narrow: (1) the `<from_document>` lease-upload path's
+full-stack live run (verified below-the-seam; the live run belongs to the deploy pass, same as any
+mode), and (2) the newly-surfaced **Mode-E gap** (see that section) — a roadmap decision, not a
+wedge task. This doc is the durable plan *and* the task tracker for the Mode-C (Vietnamese-AU
+domestic investor) wedge. The Claude Code Task list is ephemeral (it does not survive compaction);
+this file is the source of truth for "what's left." The grounding-checklist carries a one-line
+pointer here.
 
 Anchor / upstream: [`fact-model-unification.md`](fact-model-unification.md) ("Mode-C activation"),
 [`wedge-build-sequence.md`](wedge-build-sequence.md) (C-before-B by foundationality),
