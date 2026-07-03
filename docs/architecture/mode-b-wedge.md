@@ -1,10 +1,11 @@
 # Mode-B wedge — build plan + progress tracker
 
-**Status: build-complete, not yet live-turn-verified (P0–P5 all closed 2026-07-03).** Opened
-2026-06-28. Engine + shell built and conformance-tested below the HTTP/PG seam (no-PG escripts,
-`svelte-check`); a real end-to-end `POST /api/plan-cards` → live sidecar turn for a Mode-B card has
-not yet been run (Docker/engine PG was down throughout this build) — do that first before calling
-this wedge deploy-ready. This doc is the durable plan
+**Status: build-complete AND live-turn-verified (P0–P5 all closed 2026-07-03; live HTTP proof
+2026-07-03).** Opened 2026-06-28. Engine + shell built and conformance-tested below the HTTP/PG
+seam (no-PG escripts, `svelte-check`); Docker came back up 2026-07-03 and a real end-to-end
+`POST /api/plan-cards` → sidecar turn → `plan_card_events` walk for a Mode-B card has now been run
+and passed (`test/mode_b_seam_smoke.escript`, see P5-close addendum below). This doc is the durable
+plan
 *and* the task tracker for the Mode-B (Vietnam-parent-funded / AU-temp-resident foreign-person FHB)
 wedge. The Claude Code Task list is ephemeral (it does not survive compaction); this file is the
 source of truth for "what's left." The grounding-checklist carries a one-line pointer here.
@@ -272,11 +273,38 @@ not-yet-built investment+foreign / Mode-D combination) + `Onboarding.svelte`'s f
 (reuses the existing citizen/PR + first-home questions already on screen, no new tap-through step,
 no visa_class capture — deferred to chat per P2's own discipline). Zero regression: Mode A (9) / Mode
 C (8) base sequences byte-identical; 41-escript sweep + `validate_build.py` both clean (same
-pre-existing unrelated `due_diligence_conformance` failure). **What "build-complete" does NOT yet
-mean:** no live HTTP turn has been run for a Mode-B card — Docker/engine PG was down for this entire
-build (P2 through P5), so every proof here is a no-PG escript / `svelte-check`, never a real
-`POST /api/plan-cards` → sidecar → `plan_card_events` walk. That live-turn smoke test is the honest
-next step, not a formality — it's the one thing this wedge has NOT yet exercised.
+pre-existing unrelated `due_diligence_conformance` failure).
+
+**Live-turn verification CLOSED (2026-07-03).** Docker came back up; ran
+`test/mode_b_seam_smoke.escript` (clone of `investor_seam_smoke.escript`, the Mode-C precedent) —
+real HTTP `POST /api/plan-cards` (`intent=owner_occupier`, `foreign_person=true`) against a live
+engine + Postgres (:5433), SSE-streamed the full turn, and asserted against both the live stream and
+the persisted DB rows. **ALL ASSERTIONS PASSED:** 30/30 events (`1 + 7×(3 gate + 1 filled) + 1`,
+zero `usage` — see structural note below), 21/21 `audit_events` rows `disposition=clear` (3 gates ×
+7 components), FIRB gate detail correctly `firb_approval_pending` on `firb_workflow` itself and
+`pre_contract_planning` on the other 6, ASIC `decision_support_boundary_held` on exactly
+`mortgage_finance` + `firb_workflow` (the two `advice_adjacent/1` components in the Mode-B base set),
+all 21 rows `fill_path=resolver`, all 7 components snapshotted into `content_jsonb`, the
+Mode-B-discriminated outcome fields present and live (`firb_status.foreign_person_eligible` /
+`blocking_for_contract`, `mortgage_plan.firb_dependency_acknowledged`,
+`budget_envelope.regulatory_imposts_total`, `ongoing_obligations.vacancy_fee_at_risk_amount`), cancel
+idempotency (204), auth rejection (401/403), and the `investment+foreign` fail-closed 400 — all live,
+not simulated. One honest finding, not a bug: `firb_status.foreign_person_eligible` lands `null` at
+the base turn (the eligibility predicate needs `property_fit.property_type`, unknown before a
+property addendum attaches) — correct three-valued-bool honest-partial output, per
+[[base-turn-honest-partial-output]], not a gap.
+
+**Structural note, not an oversight:** every Mode-B base component is resolver-only — the blueprint
+(`fhb-foreign-au.md:1028`) states Mode B's FIRB mechanics and cross-border compliance are "all
+resolver"; the only Mode-B-specific agent leaves live in `property_assessment`/`due_diligence`, both
+Phase-B-only, outside the 7-component base set. So the base turn needs no
+`CLAUDE_CODE_OAUTH_TOKEN` / sidecar call and emits zero `usage` events — a genuine difference from
+Mode A/C's two-path base components (which do carry agent leaves at base scope), confirmed live here,
+not just asserted in the blueprint prose.
+
+**Mode-B wedge is now genuinely deploy-ready** on this axis — the one gap P5 flagged as open is
+closed. (AU-side full-build scope holds; VN-side regulated content remains the labelled placeholder
+by Son's original scope call, unrelated to this gap.)
 
 ## Open seams (surface-and-track, reconcile in-phase)
 

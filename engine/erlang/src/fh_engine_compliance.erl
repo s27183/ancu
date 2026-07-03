@@ -67,10 +67,11 @@ run(ComponentId, Ctx, Outcome, Layer1Verdict) ->
 %% that reads firb_workflow's STORED blocking_for_contract across components and
 %% actually refuses a buying_strategy bid_plan / settlement_prep milestone commit while
 %% unapproved. Those Mode-B per-property resolvers don't exist yet (P2 tracker scope is
-%% base-turn only) and base_components/1 has no Mode-B clause yet (P5, atomic-last), so
-%% no live turn can reach that surface today regardless — nothing is left unguarded by
-%% this change; the loud "not_implemented" block that used to cover it is superseded by
-%% the same base_components/1 gap that already prevents a live Mode-B turn from existing.
+%% base-turn only) — Phase B (property addenda) isn't built for Mode B, so no live turn
+%% can reach the per-property surface. (P5, 2026-07-03, added the base_components/1
+%% Mode-B clause and a live HTTP turn now exercises this base-turn clause — proven by
+%% mode_b_seam_smoke.escript, 21/21 audit rows clear — but that's the base-turn path
+%% above, not the per-property CONTRACT gate this note is about.)
 firb(<<"firb_workflow">>, #{firb_required_any := true}, Outcome, _Verdict) ->
     Detail = case maps:get(<<"blocking_for_contract">>, Outcome, true) of
                  true  -> <<"firb_approval_pending">>;
