@@ -10,7 +10,10 @@ User-facing copy-templates for the `disposition` resolver (`fh_engine_dispositio
 dispose-phase `dispose_cash_events` labels (sale proceeds, selling costs, loan payout, CGT)
 and the `key_assumptions` lines (the hold horizon, the **placeholder** capital-growth band,
 the CGT basis — owner-occupier exemption *or* the Mode-C/D investor computed/to_verify lines plus
-the 2026-27 reform flag — the selling-cost basis, the representative loan-rate basis). Each template is filled via
+the 2026-27 reform flag — the selling-cost basis, the representative loan-rate basis, and
+(Mode D only) the FRCGW prepayment note `assumption_frcgw`). `vn_side_cgt_note` is Mode-D's
+informational VN-side pointer (never a VN tax figure — points to the buyer's own VN-based tax
+advisor, per the AU-side-full/VN-side-placeholder scoping decision). Each template is filled via
 `fh_engine_i18n:subst/2` — no Vietnamese literal in Erlang (the `io:format ~s` >255-codepoint
 trap; bilingual-content.md §3b).
 
@@ -85,6 +88,14 @@ basis — decision-support, never a forecast or advice.
     "assumption_cgt_reform": {
       "vi": "Phần này áp dụng luật hiện hành (giảm 50% thuế lãi vốn). Một đề xuất cải cách trong Ngân sách 2026-27 — chưa thành luật — có thể thay đổi từ ngày 1/7/2027; hãy xác nhận với chuyên viên thuế.",
       "en": "This uses current law (the 50% CGT discount). A proposed 2026-27 Budget reform — not yet law — may change it from 1 July 2027; confirm with a registered tax agent."
+    },
+    "assumption_frcgw": {
+      "vi": "Khi bán, người mua sẽ giữ lại 15% giá bán để nộp cho Sở Thuế Úc (ATO) — đây là khoản TẠM ỨNG được khấu trừ vào thuế lãi vốn thực tế của bạn khi quyết toán, không phải là một khoản phí thêm.",
+      "en": "At sale, the purchaser withholds 15% of the sale price and remits it to the ATO — a PREPAYMENT credited against your actual capital gains tax on assessment, not an additional cost."
+    },
+    "vn_side_cgt_note": {
+      "vi": "Khoản lãi từ việc bán bất động sản tại Úc có thể phải chịu thuế tại Việt Nam theo quy định thuế Việt Nam — nội dung cụ thể (bao gồm khả năng khấu trừ thuế đã nộp tại Úc theo hiệp định thuế Việt Nam - Úc) chưa được xây dựng đầy đủ; hãy tham khảo chuyên viên thuế tại Việt Nam của bạn.",
+      "en": "The gain on selling AU property may also be taxable in Vietnam under VN tax law — the specifics (including a possible credit for AU tax paid, under the AU-VN tax treaty) are not yet fully built out here; consult your own VN-based tax advisor."
     }
   }
 }

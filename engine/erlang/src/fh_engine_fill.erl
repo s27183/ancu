@@ -31,6 +31,7 @@
 -spec has_resolver(binary()) -> boolean().
 has_resolver(<<"buyer_profile">>)      -> true;
 has_resolver(<<"investor_profile">>)   -> true;
+has_resolver(<<"investor_profile_foreign">>) -> true;
 has_resolver(<<"eligibility">>)        -> true;
 has_resolver(<<"cash_position">>)      -> true;
 has_resolver(<<"ownership_planning">>) -> true;
@@ -42,6 +43,8 @@ has_resolver(<<"cross_border_funding">>) -> true;
 has_resolver(<<"investment_strategy">>) -> true;
 has_resolver(<<"yield_modelling">>)    -> true;
 has_resolver(<<"tax_structure">>)      -> true;
+has_resolver(<<"tax_structure_non_resident">>) -> true;
+has_resolver(<<"ownership_planning_foreign_investor">>) -> true;
 has_resolver(<<"property_assessment">>) -> true;
 has_resolver(<<"purchase_journey">>)   -> true;
 has_resolver(<<"preparation">>)        -> true;
@@ -57,6 +60,8 @@ resolver(<<"buyer_profile">>, Args, _Upstream) ->
     buyer_profile(Args);
 resolver(<<"investor_profile">>, Args, _Upstream) ->
     investor_profile(Args);
+resolver(<<"investor_profile_foreign">>, Args, _Upstream) ->
+    investor_profile_foreign(Args);
 resolver(<<"eligibility">>, Args, Upstream) ->
     fh_engine_eligibility:fill(Args, Upstream);
 resolver(<<"cash_position">>, Args, Upstream) ->
@@ -65,6 +70,8 @@ resolver(<<"ownership_planning">>, Args, Upstream) ->
     fh_engine_ownership:fill(Args, Upstream);
 resolver(<<"ownership_planning_investor">>, Args, Upstream) ->
     fh_engine_ownership:fill_investor(Args, Upstream);
+resolver(<<"ownership_planning_foreign_investor">>, Args, Upstream) ->
+    fh_engine_ownership:fill_foreign_investor(Args, Upstream);
 resolver(<<"mortgage_finance">>, Args, Upstream) ->
     fh_engine_mortgage:fill(Args, Upstream);
 resolver(<<"firb_workflow">>, Args, Upstream) ->
@@ -73,12 +80,14 @@ resolver(<<"family_context">>, Args, Upstream) ->
     fh_engine_family:fill(Args, Upstream);
 resolver(<<"cross_border_funding">>, Args, Upstream) ->
     fh_engine_cross_border:fill(Args, Upstream);
-resolver(<<"investment_strategy">>, _Args, Upstream) ->
-    investment_strategy(Upstream);
+resolver(<<"investment_strategy">>, Args, Upstream) ->
+    investment_strategy(Args, Upstream);
 resolver(<<"yield_modelling">>, _Args, Upstream) ->
     yield_modelling(Upstream);
 resolver(<<"tax_structure">>, _Args, Upstream) ->
     tax_structure(Upstream);
+resolver(<<"tax_structure_non_resident">>, _Args, Upstream) ->
+    tax_structure_non_resident(Upstream);
 resolver(<<"property_assessment">>, Data, _Upstream) ->
     property_assessment(maps:get(property_card, Data, #{}));
 resolver(<<"purchase_journey">>, Args, Upstream) ->
@@ -127,6 +136,15 @@ merge_agent(<<"investment_strategy">>, ResolverOutcome, AgentValues) ->
 %% field; every figure (the CGT determinants, the null property/seam-deferred money) is the
 %% resolver scaffold's and is left untouched (§98 — the agent authors NO figure, NO verdict).
 merge_agent(<<"tax_structure">>, ResolverOutcome, AgentValues) ->
+    ResolverOutcome#{
+        <<"recommended_entity">> =>
+            maps:get(<<"recommended_entity">>, AgentValues, null)
+    };
+%% tax_structure_non_resident (Mode D): identical single-leaf fold to tax_structure/2 above —
+%% distinct component name, same shared `tax_optimised_structure` outcome type + agent-slot
+%% shape, so the fold logic is byte-identical (a distinct clause keeps the outcome TYPE legible
+%% at the call site, same discipline as fh_engine_mortgage's merge_agent_fhb_foreign/2).
+merge_agent(<<"tax_structure_non_resident">>, ResolverOutcome, AgentValues) ->
     ResolverOutcome#{
         <<"recommended_entity">> =>
             maps:get(<<"recommended_entity">>, AgentValues, null)
@@ -225,6 +243,10 @@ agent_values_from_outcome(<<"investment_strategy">>, Stored) ->
 %% renderer/kb_versions/CGT determinants) and re-attaches the stored entity WITHOUT a sidecar
 %% call — the agent re-authors nothing.
 agent_values_from_outcome(<<"tax_structure">>, Stored) ->
+    #{<<"recommended_entity">> => maps:get(<<"recommended_entity">>, Stored, null)};
+%% tax_structure_non_resident: inverse of merge_agent(<<"tax_structure_non_resident">>, ...) —
+%% byte-identical recovery shape to tax_structure's, distinct clause for the same reason as above.
+agent_values_from_outcome(<<"tax_structure_non_resident">>, Stored) ->
     #{<<"recommended_entity">> => maps:get(<<"recommended_entity">>, Stored, null)};
 %% buying_strategy: recover the single negotiation leaf verbatim from the snapshot (the inverse
 %% of merge_agent/3) so a resolver-only refresh re-runs the scaffold (fresh anchored band off
@@ -516,6 +538,88 @@ investor_profile(Args) ->
          <<"kb.investor.experience-levels">>]),
     {Outcome, <<"summary-card">>, KbVersions}.
 
+%% --- investor_profile_foreign (Mode D, real) ----------------------------------
+%% The Mode-D pipeline entry (blueprint investor-foreign-au.md component 1 — a straight
+%% MERGE of Mode B's buyer_profile foreign-person lens + Mode C's investor_profile tax{}
+%% lens, per fact-model-unification.md "Mode D adds no new identity-layer generalization —
+%% only content"). Canonical `profile` outcome shape (2026-07-03 outcome-type conformance
+%% reconciliation) — NOT a private investor_profile_foreign_summary type, same discipline as
+%% buyer_profile_foreign. Distinct component name from both buyer_profile and investor_profile
+%% ⟹ zero Mode-A/B/C reach.
+%%
+%% CRITICAL: applicant.tax.residency_for_tax = non_resident is DEFINITIONAL for Mode D — a
+%% genuinely Vietnam-located investor is never an AU tax resident, not a possibility-set
+%% projection the way Mode A/C project citizenship. This is the field
+%% fh_engine_disposition:all_resident/1 reads to route the shared investor CGT path
+%% (cgt_investor/4) to `to_verify` — never the resident "computed" path — for every Mode D
+%% turn, by construction (misadvice-critical; see the blueprint's own "outcome-type
+%% conformance" §cgt_status note). jurisdiction stays AU-only (the AU-side-full/VN-side-
+%% placeholder scoping decision, mode-d-wedge.md 2026-07-03) — Mode D reasons on the AU tax
+%% position; VN-side tax on the AU-sourced income is the buyer's own VN tax advisor's job.
+investor_profile_foreign(Args) ->
+    Onboarding = maps:get(onboarding, Args, #{}),
+    Financials = maps:get(household_financials, Args, #{}),
+    TargetRange = maps:get(<<"target_price_range">>, Onboarding, null),
+    TargetZone = maps:get(<<"target_zone">>, Onboarding, []),
+    %% Mode-D definitional applicant: a foreign person under FIRB (mirrors buyer_profile_
+    %% foreign) AND non-resident for AU tax (definitional — never assessed for MODE C's
+    %% resident possibility-set). The deep applicant facts (VN citizenship class, co-investor
+    %% detail) are genuinely unknown at onboarding — captured via chat on a refine turn.
+    Applicant = #{
+        <<"role">> => <<"primary">>,
+        <<"citizenship_status">> => null,
+        <<"firb_status">> => <<"foreign_person">>,
+        <<"firb_required">> => true,
+        <<"tax">> => #{
+            <<"residency_for_tax">> => <<"non_resident">>,
+            <<"jurisdiction">> => <<"AU">>
+        }
+    },
+    Outcome = #{
+        <<"applicants">> => [Applicant],
+        <<"applicant_count">> => 1,
+        %% definitional for Mode D (the household aggregate, mirrors buyer_profile_foreign's
+        %% F14 close) — no resolver derivation needed, unlike Mode A/C's possibility-set
+        %% projection over citizenship.
+        <<"firb_required_any">> => true,
+        %% single-owner: the established-dwelling-ban window is fh_engine_firb's (ban_applies/0,
+        %% exported for exactly this early-display read — [[place-upstream-figures-dont-recompute]],
+        %% no second window-date literal here). firb_workflow (component 3) remains the
+        %% AUTHORITATIVE per-property eligibility verdict once a property attaches.
+        <<"established_property_eligible">> => not fh_engine_firb:ban_applies(),
+        <<"new_build_only_constraint">> => true,
+        %% co-investor (spouse/business-partner/family-pool) captured on a refine turn — []
+        %% mirrors every other mode's honest-partial single-lead-onboarding base default.
+        <<"off_title_parties">> => [],
+        <<"assessable_income">> => assessable_income(Financials),
+        <<"foreign_sourced_income_component">> => foreign_sourced(Financials),
+        <<"debts">> => debts(Financials),
+        <<"target_price_range">> => TargetRange,
+        <<"target_zone">> => TargetZone,
+        <<"hold_horizon_years">> => maps:get(<<"hold_horizon_years">>, Onboarding, null),
+        %% Mode-D-specific (blueprint params: value "<initial>", no derivation rule) — genuinely
+        %% unset at onboarding; captured on a refine turn (VN tax bracket, available capital,
+        %% experience, goal, FX-volatility comfort).
+        <<"vn_marginal_tax_rate">> => null,
+        <<"available_capital_aud_equivalent">> => null,
+        <<"experience_level">> => null,
+        <<"primary_investment_goal">> => null,
+        <<"currency_volatility_concern">> => null,
+        %% bilingual {vi,en} via kb.copy.profile. financials-pending is mode-neutral (reused);
+        %% the Mode-D strength states the definitional position (FIRB + non-resident tax +
+        %% cross-border funding surfaced from day one) — decision-support tone, not "you
+        %% should invest" (ASIC line).
+        <<"key_constraints">> => [copy(<<"constraint_financials_pending">>, #{})],
+        <<"key_strengths">>   => [copy(<<"strength_foreign_investor">>, #{})]
+        %% ABSENT (→ null → honest-partial): existing_portfolio detail, prior_firb_approvals,
+        %% source_of_funds_documentation_ready — gathered on a refine turn (profiles SOT).
+    },
+    KbVersions = fh_engine_kb:kb_anchors(
+        [<<"kb.firb.status-determination">>, <<"kb.firb.established-dwelling-ban">>,
+         <<"kb.vn-tax.brackets-2026">>, <<"kb.vn-tax.income-from-foreign-property">>,
+         <<"kb.lender.non-resident-friendly-shortlist">>, <<"kb.investor.experience-levels">>]),
+    {Outcome, <<"summary-card">>, KbVersions}.
+
 %% --- investment_strategy (Mode C, two-path RESOLVER half) -------------------
 %% The investor base spine (blueprint component 3 — replaces FHB eligibility): the
 %% investment thesis. This is the FIRST Mode-C agent-path component, built TWO-PATH
@@ -538,7 +642,20 @@ investor_profile(Args) ->
 %% (§98 / [[match-enforcement-grade-to-property-kind]]: the thesis is SOFT quality, forced
 %% bilingual + enum by the sidecar's output schema; the targets are removed from its reach
 %% by being resolver-null). Reads only the upstream `profile` outcome (dag_reads).
-investment_strategy(Upstream) ->
+%%
+%% MODE DISPATCH (mirrors fh_engine_mortgage/fh_engine_cash): `investment_strategy` is the
+%% SAME component name across Mode C and Mode D, both producing the canonical `strategy_thesis`
+%% type (investor-foreign-au.md "outcome-type conformance" note, 2026-07-03 reconciliation).
+%% Discriminated by Args.firb_required_any — the same flag buyer_profile/1, mortgage_finance,
+%% cash_position key on. The Mode-C body is renamed investment_strategy_domestic/1 VERBATIM
+%% (byte-identical — zero regression); investment_strategy_foreign/1 is new.
+investment_strategy(Args, Upstream) ->
+    case maps:get(firb_required_any, Args, false) of
+        true  -> investment_strategy_foreign(Upstream);
+        false -> investment_strategy_domestic(Upstream)
+    end.
+
+investment_strategy_domestic(Upstream) ->
     Profile = maps:get(<<"profile">>, Upstream, #{}),
     Outcome = #{
         %% AGENT slots (investment_thesis) — null here; merge_agent/3 folds the sidecar's
@@ -565,6 +682,43 @@ investment_strategy(Upstream) ->
          <<"kb.investor.hold-period-considerations">>,
          <<"kb.investor.exit-strategy-options">>,
          <<"kb.investor.target-yield-by-archetype">>]),
+    {Outcome, <<"summary-card">>, KbVersions}.
+
+%% --- investment_strategy (Mode D, two-path RESOLVER half) --------------------
+%% The Mode-D investment thesis (blueprint investor-foreign-au.md component 4): identical
+%% two-path shape to investment_strategy_domestic/1 (same three agent leaves, same
+%% merge_agent/3 + agent_values_from_outcome/2 clauses — no mode branch needed there), plus
+%% two Mode-D-specific RESOLVER fields the blueprint does NOT mark agent_reasoning_required
+%% (migration_pathway_alignment, currency_hedging_strategy — user-preference facts, not agent
+%% judgment): honest-partial null at base, same as every other onboarding-captured leaf
+%% (base-turn-honest-partial-output). hold_period_years carries the SAME upstream horizon
+%% carry as the domestic variant (profile.hold_horizon_years — canonical across A/B/C/D).
+investment_strategy_foreign(Upstream) ->
+    Profile = maps:get(<<"profile">>, Upstream, #{}),
+    Outcome = #{
+        <<"archetype">>    => null,
+        <<"gearing_type">> => null,
+        <<"one_liner">>    => null,
+        <<"target_gross_yield">>    => null,
+        <<"target_capital_growth">> => null,
+        <<"target_lvr">>            => null,
+        <<"hold_period_years">> => maps:get(<<"hold_horizon_years">>, Profile, null),
+        <<"exit_strategy">> => null,
+        %% Mode-D-specific — genuinely unset at onboarding (blueprint params: value "<initial>",
+        %% no derivation rule); captured on a refine turn.
+        <<"migration_pathway_alignment">>  => null,
+        <<"currency_hedging_strategy">>    => null,
+        <<"is_property_aligned_with_thesis">> => null
+    },
+    KbVersions = fh_engine_kb:kb_anchors(
+        [<<"kb.investor.strategy-archetypes">>,
+         <<"kb.investor.gearing-types-and-implications">>,
+         <<"kb.investor.hold-period-considerations">>,
+         <<"kb.investor.exit-strategy-options">>,
+         <<"kb.investor.target-yield-by-archetype">>,
+         <<"kb.foreign-investor.thesis-archetypes">>,
+         <<"kb.foreign-investor.currency-hedging-considerations">>,
+         <<"kb.foreign-investor.future-migration-pathway-considerations">>]),
     {Outcome, <<"summary-card">>, KbVersions}.
 
 %% --- tax_structure (Mode C, two-path RESOLVER half — base-spine presence) ----
@@ -718,6 +872,86 @@ ng_reform_note(Pf) ->
 %% buyer_profile/investor_profile use); read by slug at runtime, no substitution params.
 tax_copy(Id) ->
     fh_engine_i18n:subst(fh_engine_kb:copy(<<"kb.copy.tax-structure">>, Id), #{}).
+
+%% --- tax_structure_non_resident (Mode D, two-path RESOLVER half) -------------
+%% The Mode-D investor base spine (blueprint investor-foreign-au.md component 7): the
+%% non-resident tax-optimised ownership structure. TWO-PATH like tax_structure/1: the
+%% SIDECAR (reasoning_domain entity_structuring, same domain, a non-resident-flavoured
+%% entity enum) authors the ONE irreducible judgment leaf — recommended_entity — folded by
+%% merge_agent(<<"tax_structure_non_resident">>, ...) below. DISTINCT component name from
+%% Mode C's tax_structure (no shared-name collision — the two coexist, unlike mortgage_
+%% finance/cash_position's within-name branching), but the SAME canonical `tax_optimised_
+%% structure` outcome TYPE (2026-07-03 outcome-type conformance reconciliation) — this is
+%% what lets the ALREADY-BUILT fh_engine_disposition/fh_engine_cash investor dispatch (which
+%% sniffs `tax_optimised_structure`'s PRESENCE, not the producing component's name) route a
+%% Mode-D turn onto the SAME investor path Mode C uses, with zero disposition/cash_position
+%% mode-branch needed for that routing decision.
+%%
+%% RESOLVER computes (KB-grounded, DEFINITIONAL — no holding-period conditional the way Mode
+%% C's cgt_discount_eligible is, per kb.tax.cgt-50-percent-discount's own foreign-resident
+%% carve-out from 8 May 2012):
+%%   - cgt_discount_eligible = false: NEVER available to a foreign resident (definitional).
+%%   - ppor_exemption_eligible = false: MOOT, not removed — the property was never a main
+%%     residence for a Mode-D investor (kb.non-resident.tax-treatment-overview's PPOR-moot
+%%     reasoning; contrast Mode B's owner-occupier-turned-foreign-resident case, where the
+%%     exemption WAS removed).
+%%   - frcgw_applicable = true: definitional (kb.non-resident-tax.foreign-resident-cgt-
+%%     withholding) — every foreign-resident vendor's sale is subject to the withholding
+%%     mechanism; read by fh_engine_disposition to add the FRCGW figure.
+%%   - cost_base_depreciation_clawback = true: Div 43 capital works claimed reduces the cost
+%%     base (kb.tax.depreciation-division-43-and-40), same reasoning as Mode C's constant.
+%%   - negative_gearing_available_against_au_income = true: a non-resident's AU-source rental
+%%     loss can offset OTHER AU-source income (never foreign income) — structural, not
+%%     figure-dependent (kb.non-resident.tax-treatment-overview).
+%%   - rental_withholding_rate = null, WITH AN ASSESSMENT NOTE, not a rate: directly-held AU
+%%     rental income is NOT subject to a final withholding tax — it is taxed by ASSESSMENT
+%%     via a lodged return (kb.non-resident-tax.withholding-on-rental-income's own P1
+%%     correction — see mode-d-wedge.md; do NOT hardcode a rate here, that would assert the
+%%     wrong mechanism). annual_au_tax_payable_on_rental therefore needs the ASSESSED figure,
+%%     which needs income + the non-resident marginal schedule — both absent at base.
+%%
+%% HONEST-PARTIAL NULL (no non-resident income-tax-bracket KB doc exists yet — flagged, not
+%% invented; and the property/rent-dependent figures are absent at base, mirroring Mode C's
+%% own tax_figures/2 deferral): cgt_marginal_rate, annual_au_tax_payable_on_rental,
+%% annual_depreciation_year_1 (QS-deferred, same as Mode C's total_depreciation_year_1),
+%% annual_compliance_cost_au (the entity-cost banded-vs-scalar seam, same class as Mode C's
+%% setup_costs). vn_tax_treaty_relief_applicable stays null — VN-side tax relief is explicitly
+%% out of the AU-side-full/VN-side-placeholder scope (mode-d-wedge.md 2026-07-03 scoping
+%% decision); no AU-side treaty rate modification was identified during P1 authoring.
+%%
+%% The agent's reach is exactly the one entity leaf — no figure, no verdict (§98). Every
+%% figure/boolean above is resolver-computed, removed from the LLM's reach.
+tax_structure_non_resident(_Upstream) ->
+    Outcome = #{
+        %% AGENT slot (entity_structuring) — null here; merge_agent/3 folds the sidecar's
+        %% one leaf (a non-resident-flavoured entity enum — personal_sole_non_resident etc.).
+        <<"recommended_entity">> => null,
+        %% RESOLVER — KB-grounded, definitional booleans (the CGT determinants disposition/
+        %% cash_position read).
+        <<"cgt_discount_eligible">>           => false,
+        <<"ppor_exemption_eligible">>         => false,
+        <<"frcgw_applicable">>                => true,
+        <<"cost_base_depreciation_clawback">> => true,
+        <<"negative_gearing_available_against_au_income">> => true,
+        %% honest-partial null — no non-resident marginal-rate KB table built yet; no income
+        %% captured at base regardless (household_financials empty at onboarding).
+        <<"cgt_marginal_rate">> => null,
+        %% assessment, not withholding — no rate applies (see the module note above).
+        <<"rental_withholding_rate">> => null,
+        <<"annual_au_tax_payable_on_rental">> => null,
+        <<"annual_depreciation_year_1">> => null,
+        <<"annual_compliance_cost_au">> => null,
+        <<"vn_tax_treaty_relief_applicable">> => null
+    },
+    KbVersions = fh_engine_kb:kb_anchors(
+        [<<"kb.non-resident.tax-treatment-overview">>,
+         <<"kb.tax.cgt-50-percent-discount">>,
+         <<"kb.non-resident.entity-options-au-property">>,
+         <<"kb.au-vn-tax-treaty">>,
+         <<"kb.tax.depreciation-division-43-and-40">>,
+         <<"kb.non-resident-tax.withholding-on-rental-income">>,
+         <<"kb.non-resident-tax.foreign-resident-cgt-withholding">>]),
+    {Outcome, <<"data-table">>, KbVersions}.
 
 %% --- yield_modelling (Mode C, pure RESOLVER — base-spine presence) -----------
 %% The investor base spine (blueprint component 5): the rental cash-flow model. A PURE

@@ -63,6 +63,8 @@
 -define(CGT_INV,  <<"kb.tax.cgt-50-percent-discount">>).
 -define(DEPR,     <<"kb.tax.depreciation-division-43-and-40">>).
 -define(SERV_INV, <<"kb.lender.serviceability-investment-loans">>).
+%% Mode-D foreign-resident-investor anchors (the FRCGW withholding + VN-side note):
+-define(FRCGW,    <<"kb.non-resident-tax.foreign-resident-cgt-withholding">>).
 
 -define(LOAN_TERM_YEARS, 30).   %% standard P&I term; the amortisation default (mortgage_plan
                                 %% carries no term at base — a documented constant, not a magic figure).
@@ -140,6 +142,11 @@ fill_investor(Profile, Tax, Upstream) ->
     Net                 = net_proceeds(Sale, Selling, Loan, Cgt),
     Full                = full_horizon_investor(Net, Budget, CashFlow, H),
     Events              = dispose_cash_events(Sale, Selling, Loan, Cgt),
+    %% Mode-D-only fields (frcgw_applicable is absent/false on Mode C's tax_optimised_structure
+    %% ⟹ both null there — one function serves both modes, see frcgw_withheld/2's header note).
+    FrcgwApplicable     = maps:get(<<"frcgw_applicable">>, Tax, false),
+    Frcgw               = frcgw_withheld(Sale, FrcgwApplicable),
+    VnNote              = vn_side_cgt_note(FrcgwApplicable),
 
     Outcome = #{
         <<"horizon_years">>             => H,
@@ -149,12 +156,22 @@ fill_investor(Profile, Tax, Upstream) ->
         <<"taxable_gain">>              => Gain,
         <<"cgt">>                       => Cgt,
         <<"cgt_status">>                => Status,
+        %% Mode-D-only outcome fields — null (absent-equivalent) for Mode C, per the shared
+        %% `disposition` type's field-superset precedent (investor-foreign-au.md
+        %% "outcome-type conformance" note).
+        <<"frcgw_withheld_at_settlement">> => Frcgw,
+        <<"vn_side_cgt_note">>             => VnNote,
         <<"net_proceeds">>              => Net,
         <<"full_horizon_net_position">> => Full,
         <<"dispose_cash_events">>       => Events,
-        <<"key_assumptions">>           => assumptions_investor(H, GLow, GHigh, Status, Loan)
+        <<"key_assumptions">>           => assumptions_investor(H, GLow, GHigh, Status, Loan, Frcgw)
     },
-    KbVersions = fh_engine_kb:kb_anchors([?GROWTH, ?SELLING, ?CGT_INV, ?DEPR, ?SERV_INV, ?COPY]),
+    FrcgwAnchors = case FrcgwApplicable of
+                       true -> [?FRCGW];
+                       _    -> []
+                   end,
+    KbVersions = fh_engine_kb:kb_anchors(
+        [?GROWTH, ?SELLING, ?CGT_INV, ?DEPR, ?SERV_INV, ?COPY] ++ FrcgwAnchors),
     {Outcome, <<"calculator">>, KbVersions}.
 
 %% --- inputs ------------------------------------------------------------------
@@ -489,23 +506,53 @@ cgt_assumption(<<"to_verify">>) -> copy(<<"assumption_cgt_to_verify">>, #{}).
 %% reuses horizon / growth-placeholder / selling-cost / loan-rate lines (the loan-rate line
 %% carries the investor rate via {rate} substitution); swaps in the investor CGT basis and adds
 %% the 2026-27 Budget reform flag (current law computed; the reform may change it from 1 Jul 2027).
-assumptions_investor(null, _GLow, _GHigh, _Status, _Loan) ->
+%% The FRCGW line (Mode D only) is appended LAST, only when the withheld figure is actually
+%% shown — never asserting a basis for a null figure (mirrors the loan-rate line's own gate).
+assumptions_investor(null, _GLow, _GHigh, _Status, _Loan, _Frcgw) ->
     [copy(<<"assumption_set_horizon">>, #{})];
-assumptions_investor(H, GLow, GHigh, Status, Loan) ->
+assumptions_investor(H, GLow, GHigh, Status, Loan, Frcgw) ->
     Base = [copy(<<"assumption_horizon">>, #{<<"years">> => H}),
             copy(<<"assumption_growth_placeholder">>, #{<<"low">> => GLow, <<"high">> => GHigh}),
             cgt_assumption_investor(Status),
             copy(<<"assumption_cgt_reform">>, #{}),
             copy(<<"assumption_selling_costs">>, #{})],
-    case Loan of
+    WithLoan = case Loan of
         null -> Base;
         _    -> Base ++ [copy(<<"assumption_loan_rate">>,
                               #{<<"rate">> => investor_rate(),
                                 <<"term">> => ?LOAN_TERM_YEARS})]
+    end,
+    case Frcgw of
+        null -> WithLoan;
+        _    -> WithLoan ++ [copy(<<"assumption_frcgw">>, #{})]
     end.
 
 cgt_assumption_investor(<<"computed">>)  -> copy(<<"assumption_cgt_computed">>, #{});
 cgt_assumption_investor(<<"to_verify">>) -> copy(<<"assumption_cgt_investor_to_verify">>, #{}).
+
+%% --- Mode-D: FRCGW withheld at settlement + the VN-side CGT note -------------
+%% 15% of the PROJECTED sale-proceeds band (kb.non-resident-tax.foreign-resident-cgt-
+%% withholding's frcgw_rate_percent — the rate/threshold-removal are REGULATED constants;
+%% the doc's own "figures deferred to a registered tax agent" caveat is about the ACTUAL
+%% settlement-day amount, which does not exist yet — this is the SAME indicative-projection
+%% class as taxable_gain/sale_proceeds themselves: banded, assumption-flagged, resolver-
+%% computed, never asserted as the real figure [[verify-regulated-figures-by-postcondition]]).
+%% A mechanical function of the sale price alone (never the uncertain gain), so it is shown
+%% even while cgt itself stays to_verify — "what's computable is shown", same discipline as
+%% taxable_gain. null when FRCGW doesn't apply (Mode C) or sale_proceeds is unparameterised.
+-spec frcgw_withheld([integer()] | null, boolean()) -> [integer()] | null.
+frcgw_withheld(_Sale, false) -> null;
+frcgw_withheld(null, true)   -> null;
+frcgw_withheld([SLo, SHi], true) ->
+    Pct = param(?FRCGW, <<"frcgw_rate_percent">>),
+    [round(Pct / 100 * SLo), round(Pct / 100 * SHi)].
+
+%% VN-side informational note (kb.au-vn-tax-treaty) — never a VN tax figure, points to the
+%% buyer's own VN-based tax advisor (AU-side-full/VN-side-placeholder scoping decision). null
+%% for Mode C (not a foreign-resident disposal at all).
+-spec vn_side_cgt_note(boolean()) -> fh_engine_i18n:localized() | null.
+vn_side_cgt_note(false) -> null;
+vn_side_cgt_note(true)  -> copy(<<"vn_side_cgt_note">>, #{}).
 
 %% --- helpers -----------------------------------------------------------------
 

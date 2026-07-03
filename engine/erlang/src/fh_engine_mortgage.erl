@@ -30,6 +30,8 @@
 %% KB param or a stated function of one.
 
 -export([fill/2, merge_agent/2, agent_values_from_outcome/1]).
+%% exported for the Mode-D non-resident-investor conformance suite:
+-export([fill_investor_foreign/2, rate_estimate_foreign/0, deposit_pct_foreign/0]).
 %% exported for cross-language conformance (tests/mortgage_eval.py mirrors these):
 -export([recommended_path/1, has_fhg/1, loan_structure_base/0, key_assumptions/2,
          pre_approval_action_plan/0]).
@@ -59,7 +61,11 @@
 -spec fill(map(), map()) -> {map(), binary(), [map()]}.
 fill(Args, Upstream) ->
     case maps:is_key(<<"strategy_thesis">>, Upstream) of
-        true  -> fill_investor(Args, Upstream);
+        true  ->
+            case maps:get(firb_required_any, Args, false) of
+                true  -> fill_investor_foreign(Args, Upstream);
+                false -> fill_investor(Args, Upstream)
+            end;
         false ->
             case maps:get(firb_required_any, Args, false) of
                 true  -> fill_fhb_foreign(Args, Upstream);
@@ -267,6 +273,82 @@ refinance_plan_base() ->
       <<"io_period_expiry_date">> => null,
       <<"next_property_equity_release_target_date">> => null}.
 
+%% --- fill_investor_foreign (resolver half, Mode-D non-resident-investor mortgage_plan) --
+%% The Mode-D `mortgage_plan` (10 fields, investor-foreign-au.md component 5) — a FOURTH,
+%% different shape from Mode A's/B's/C's, dispatched by the SAME strategy_thesis-presence
+%% + firb_required_any compound discriminator fill/2 already uses. `recommended_lender` is
+%% a single top-pick string (not an array like Mode A/B's shortlist) — the compiled outcome
+%% schema's own field, agent-authored (folded by merge_agent_investor_foreign/2 below);
+%% `io_vs_pi_recommendation` is the SAME agent leaf Mode C uses (reasoning_domain lender_fit).
+%%
+%% §98: `rate_estimate` (percentage_range) is a NUMERIC figure — never the agent's rate-
+%% STRUCTURE enum the way Mode A/B/C's `loan_structure_recommendation.rate` is. It is
+%% resolver-computed from KB conventions (representative product rate + the domestic-
+%% investor premium + the non-resident-investment combination's own further premium band,
+%% kb.lender.non-resident-investment-loan-shortlist — flagged as an indicative CONVENTION,
+%% not a live quote) — removed from the LLM's reach, same discipline as every other rate/
+%% capacity figure in this module. `expected_borrowing_capacity` reuses borrowing_capacity/1
+%% UNCHANGED (honest-partial: no non-resident income-tax-bracket KB table exists yet, and no
+%% income is captured at base regardless — same deferral tax_structure_non_resident makes).
+%% `vn_income_acceptance_confirmed` / `fx_risk_acknowledged` are USER-confirmation states,
+%% honestly false until a refine turn confirms them — never asserted true by the resolver.
+-spec fill_investor_foreign(map(), map()) -> {map(), binary(), [map()]}.
+fill_investor_foreign(_Args, Upstream) ->
+    Profile = maps:get(<<"profile">>, Upstream, #{}),
+    Ceiling = ceiling(maps:get(<<"target_price_range">>, Profile, null)),
+    DepositPct = deposit_pct_foreign(),
+    Outcome = #{
+        %% AGENT slots (lender_fit) — filled by merge_agent_investor_foreign/2.
+        <<"recommended_lender">> => null,
+        <<"io_vs_pi_recommendation">> => null,
+        <<"expected_borrowing_capacity">> => borrowing_capacity(Profile),
+        <<"deposit_required_percentage">> => DepositPct,
+        <<"deposit_required_amount">> => deposit_amount_foreign(Ceiling, DepositPct),
+        <<"rate_estimate">> => rate_estimate_foreign(),
+        %% Mode D is ALWAYS FIRB-dependent (kb.lender.firb-approval-as-condition-precedent) —
+        %% definitional, mirrors buyer_profile_foreign's / fill_fhb_foreign's firb_required=true.
+        <<"firb_dependency_acknowledged">> => true,
+        <<"vn_income_acceptance_confirmed">> => false,
+        <<"fx_risk_acknowledged">> => false,
+        %% PENDING — needs the loan amount (a property/Phase-B figure). §98: never LLM-set.
+        <<"loan_cost_estimate_year_1">> => null
+    },
+    KbVersions = fh_engine_kb:kb_anchors(
+        [<<"kb.lender.non-resident-investment-loan-shortlist">>,
+         <<"kb.non-resident.investment-loan-deposit-requirements">>,
+         <<"kb.lender.temp-resident-lending-policies">>,
+         <<"kb.loan.interest-only-vs-pi-investor">>,
+         <<"kb.lender.firb-approval-as-condition-precedent">>,
+         <<"kb.fx.loan-currency-considerations">>]),
+    {Outcome, <<"summary-card">>, KbVersions}.
+
+%% the non-resident-investment deposit % (kb.non-resident.investment-loan-deposit-requirements):
+%% midpoint of the 30-40% band — matches the blueprint's own stated default (35).
+-spec deposit_pct_foreign() -> number().
+deposit_pct_foreign() ->
+    Slug = <<"kb.non-resident.investment-loan-deposit-requirements">>,
+    Lo = kb_param(Slug, <<"non_resident_investment_deposit_pct_low">>),
+    Hi = kb_param(Slug, <<"non_resident_investment_deposit_pct_high">>),
+    (Lo + Hi) / 2.
+
+-spec deposit_amount_foreign(integer() | null, number()) -> integer() | null.
+deposit_amount_foreign(null, _Pct) -> null;
+deposit_amount_foreign(Ceiling, Pct) -> round(Ceiling * Pct / 100).
+
+%% domestic-investor rate + the non-resident-investment combination's further premium band
+%% (kb.lender.non-resident-investment-loan-shortlist, ~100-200bp, flagged CONVENTION —
+%% "not independently primary-verified this pass" per the doc's own Notes).
+-spec rate_estimate_foreign() -> [number()].
+rate_estimate_foreign() ->
+    Base = kb_param(?SERVICEABILITY, <<"representative_product_rate_pct">>)
+         + kb_param(<<"kb.lender.serviceability-investment-loans">>, <<"investment_rate_premium_pp">>),
+    Slug = <<"kb.lender.non-resident-investment-loan-shortlist">>,
+    LowBp  = kb_param(Slug, <<"rate_premium_above_domestic_investor_bp_low">>),
+    HighBp = kb_param(Slug, <<"rate_premium_above_domestic_investor_bp_high">>),
+    [round1(Base + LowBp / 100), round1(Base + HighBp / 100)].
+
+round1(X) -> round(X * 10) / 10.
+
 %% --- merge_agent (fold the two lender_fit leaves into the resolver outcome) --
 %% AgentValues carries ONLY the two qualitative leaves the sidecar authored; the merge
 %% is slot-scoped, so the LLM cannot author or overwrite any figure (the §98 property,
@@ -274,17 +356,17 @@ refinance_plan_base() ->
 
 -spec merge_agent(map(), map()) -> map().
 merge_agent(ResolverOutcome, AgentValues) ->
-    %% RO-shape discriminator: only the investor mortgage_plan carries io_vs_pi_recommendation;
-    %% only the Mode-B mortgage_plan carries firb_dependency_acknowledged (the Mode-A FHB
-    %% outcome has neither — just recommended_path / loan_structure_recommendation). Local
-    %% sniff — no signature change, mirrors the fill/2 + cash discriminators.
-    case maps:is_key(<<"io_vs_pi_recommendation">>, ResolverOutcome) of
-        true  -> merge_agent_investor(ResolverOutcome, AgentValues);
-        false ->
-            case maps:is_key(<<"firb_dependency_acknowledged">>, ResolverOutcome) of
-                true  -> merge_agent_fhb_foreign(ResolverOutcome, AgentValues);
-                false -> merge_agent_fhb(ResolverOutcome, AgentValues)
-            end
+    %% RO-shape discriminator, a 2x2 over two independent axis flags (mirrors fh_engine_cash's
+    %% compound investor+foreign dispatch): io_vs_pi_recommendation marks the investor axis
+    %% (Mode C or D); firb_dependency_acknowledged marks the foreign axis (Mode B or D). The
+    %% Mode-A FHB outcome carries neither. Local sniff — no signature change.
+    HasIoPi = maps:is_key(<<"io_vs_pi_recommendation">>, ResolverOutcome),
+    HasFirb = maps:is_key(<<"firb_dependency_acknowledged">>, ResolverOutcome),
+    case {HasIoPi, HasFirb} of
+        {true,  true}  -> merge_agent_investor_foreign(ResolverOutcome, AgentValues);
+        {true,  false} -> merge_agent_investor(ResolverOutcome, AgentValues);
+        {false, true}  -> merge_agent_fhb_foreign(ResolverOutcome, AgentValues);
+        {false, false} -> merge_agent_fhb(ResolverOutcome, AgentValues)
     end.
 
 -spec merge_agent_fhb(map(), map()) -> map().
@@ -336,6 +418,17 @@ merge_agent_investor(ResolverOutcome, AgentValues) ->
         }
     }.
 
+%% fold the two Mode-D agent leaves (recommended_lender: a single top-pick string, not an
+%% array — the compiled outcome schema's own shape; io_vs_pi_recommendation: the same
+%% lender_fit leaf Mode C uses). Slot-scoped (§98): every figure (capacity, deposit,
+%% rate_estimate, the firb/vn/fx acknowledgement flags) is the resolver's, untouched.
+-spec merge_agent_investor_foreign(map(), map()) -> map().
+merge_agent_investor_foreign(ResolverOutcome, AgentValues) ->
+    ResolverOutcome#{
+        <<"recommended_lender">> => maps:get(<<"recommended_lender">>, AgentValues, null),
+        <<"io_vs_pi_recommendation">> => maps:get(<<"io_vs_pi_recommendation">>, AgentValues, null)
+    }.
+
 %% The INVERSE of merge_agent/2: recover the agent-leaf VALUES (in the sidecar-reply
 %% shape merge_agent/2 consumes) from a previously-committed outcome. A base_resolver
 %% refresh re-runs the resolver half (fresh capacity from the current income facts) and
@@ -345,13 +438,14 @@ merge_agent_investor(ResolverOutcome, AgentValues) ->
 %% (§98); the qualitative leaves are preserved verbatim from the snapshot.
 -spec agent_values_from_outcome(map()) -> map().
 agent_values_from_outcome(Stored) ->
-    case maps:is_key(<<"io_vs_pi_recommendation">>, Stored) of
-        true  -> agent_values_from_outcome_investor(Stored);
-        false ->
-            case maps:is_key(<<"firb_dependency_acknowledged">>, Stored) of
-                true  -> agent_values_from_outcome_fhb_foreign(Stored);
-                false -> agent_values_from_outcome_fhb(Stored)
-            end
+    %% same 2x2 compound discriminator as merge_agent/2 — see that function's comment.
+    HasIoPi = maps:is_key(<<"io_vs_pi_recommendation">>, Stored),
+    HasFirb = maps:is_key(<<"firb_dependency_acknowledged">>, Stored),
+    case {HasIoPi, HasFirb} of
+        {true,  true}  -> agent_values_from_outcome_investor_foreign(Stored);
+        {true,  false} -> agent_values_from_outcome_investor(Stored);
+        {false, true}  -> agent_values_from_outcome_fhb_foreign(Stored);
+        {false, false} -> agent_values_from_outcome_fhb(Stored)
     end.
 
 -spec agent_values_from_outcome_fhb(map()) -> map().
@@ -385,6 +479,14 @@ agent_values_from_outcome_investor(Stored) ->
       <<"fixed_vs_variable">> => maps:get(<<"rate">>, LS, null),
       <<"uses_existing_ppor_equity">> =>
           maps:get(<<"uses_existing_ppor_equity">>, LS, null)}.
+
+%% inverse of merge_agent_investor_foreign/2: recover the two Mode-D leaves verbatim
+%% (both top-level, no nested loan_structure wrapper — Mode D's own outcome shape).
+-spec agent_values_from_outcome_investor_foreign(map()) -> map().
+agent_values_from_outcome_investor_foreign(Stored) ->
+    #{<<"recommended_lender">> => maps:get(<<"recommended_lender">>, Stored, null),
+      <<"io_vs_pi_recommendation">> =>
+          maps:get(<<"io_vs_pi_recommendation">>, Stored, null)}.
 
 %% --- structure (KB-grounded, determinate) -----------------------------------
 

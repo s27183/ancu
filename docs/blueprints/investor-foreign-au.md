@@ -64,38 +64,38 @@ This base-heavy structure is genuinely well-suited to Mode D's audience: Vietnam
 
 ```
 [1] investor_profile_foreign ★ (combines Mode B buyer_profile + Mode C investor_profile)
-       │   outcome: investor_profile_foreign_summary
+       │   outcome: profile
        ▼
 [2] property_assessment (investor lens + foreign-person filter: new-build only)
-       │   inputs: investor_profile_foreign_summary
+       │   inputs: profile
        │   outcome: property_fit_investor_foreign
        ▼
 [3] firb_workflow (from Mode B — mandatory)
-       │   inputs: investor_profile_foreign_summary, property_fit_investor_foreign
+       │   inputs: profile, property_fit_investor_foreign
        │   outcome: firb_status
        ▼
 [4] investment_strategy (investor — yield/growth/gearing; foreign-investor specific)
-       │   inputs: investor_profile_foreign_summary, property_fit_investor_foreign
-       │   outcome: strategy_thesis_foreign
+       │   inputs: profile, property_fit_investor_foreign
+       │   outcome: strategy_thesis
        ▼
 [5] yield_modelling (from Mode C — non-resident tax aware)
-       │   inputs: property_fit_investor_foreign, strategy_thesis_foreign
-       │   outcome: cash_flow_projection_foreign
+       │   inputs: property_fit_investor_foreign, strategy_thesis
+       │   outcome: cash_flow_projection
        ▼
 [6] tax_structure_non_resident ★ (non-resident tax variant of Mode C)
-       │   inputs: investor_profile_foreign_summary, cash_flow_projection_foreign
-       │   outcome: tax_structure_non_resident_summary
+       │   inputs: profile, cash_flow_projection
+       │   outcome: tax_optimised_structure
        ▼
 [7] cash_position (Mode B foreign-buyer costs + Mode C investor costs)
-       │   inputs: investor_profile_foreign_summary, property_fit_investor_foreign, firb_status, tax_structure_non_resident_summary
-       │   outcome: budget_envelope_foreign_investor
+       │   inputs: profile, property_fit_investor_foreign, firb_status, tax_optimised_structure
+       │   outcome: budget_envelope_investor
        ▼
 [8] cross_border_funding (from Mode B)
-       │   inputs: investor_profile_foreign_summary, budget_envelope_foreign_investor
+       │   inputs: profile, budget_envelope_investor
        │   outcome: transfer_plan
        ▼
 [9] buying_strategy (Mode C investor discipline + Mode B FIRB gate)
-       │   inputs: property_fit_investor_foreign, budget_envelope_foreign_investor, firb_status, strategy_thesis_foreign
+       │   inputs: property_fit_investor_foreign, budget_envelope_investor, firb_status, strategy_thesis
        │   outcome: bid_plan_foreign_investor
        ▼
 [10] due_diligence (Mode C investor + Mode B cross-border docs)
@@ -103,17 +103,17 @@ This base-heavy structure is genuinely well-suited to Mode D's audience: Vietnam
         outcome: risk_assessment_foreign_investor
        ▼
 [11] settlement_prep (Mode C investor + Mode B FIRB + transfer milestones)
-        inputs: property_fit_investor_foreign, bid_plan_foreign_investor, firb_status, transfer_plan, tax_structure_non_resident_summary
+        inputs: property_fit_investor_foreign, bid_plan_foreign_investor, firb_status, transfer_plan, tax_optimised_structure
         outcome: settlement_checklist_foreign
        ▼
 [12] ownership_planning_foreign_investor ★ (Mode C portfolio + Mode B vacancy/tax)
-        inputs: property_fit_investor_foreign, tax_structure_non_resident_summary, cash_flow_projection_foreign
+        inputs: property_fit_investor_foreign, tax_optimised_structure, cash_flow_projection
         outcome: portfolio_position_foreign
        │
        ▼
 [13] disposition ★ (NEW — dispose-phase figure-owner, foreign-resident CGT + FRCGW, full-horizon net position)
-        inputs: strategy_thesis_foreign (hold_period_years = H, exit_strategy), property_fit_investor_foreign,
-                cash_flow_projection_foreign, tax_structure_non_resident_summary, budget_envelope_foreign_investor
+        inputs: strategy_thesis (hold_period_years = H, exit_strategy), property_fit_investor_foreign,
+                cash_flow_projection, tax_optimised_structure, budget_envelope_investor
         outcome: disposition
 ```
 
@@ -123,7 +123,7 @@ This base-heavy structure is genuinely well-suited to Mode D's audience: Vietnam
 
 | UI tab | Components rendered |
 |---|---|
-| Overview | `investor_profile_foreign` + `property_assessment` + `strategy_thesis_foreign` summary |
+| Overview | `investor_profile_foreign` + `property_assessment` + `strategy_thesis` summary |
 | Investment strategy | `investment_strategy` (central) |
 | FIRB & Funding | `firb_workflow` + `cross_border_funding` |
 | Yield & Tax | `yield_modelling` + `tax_structure_non_resident` |
@@ -224,11 +224,16 @@ Note: Mode D does NOT activate Mode B's Family view tab by default — Vietnam-l
 }
 ```
 
-**Outcome schema:** `investor_profile_foreign_summary`
+**Outcome schema:** `profile` (canonical, mode-independent identity shape — Mode D projects the
+foreign-investor subset, the same discipline as `buyer_profile_foreign`/`investor_profile`; NOT a
+private `profile` type. *Reconciled 2026-07-03 — see the "outcome-type
+conformance" note at the end of this blueprint: the shared-component-name outcome-TYPE-stability
+discipline established for Mode B/C requires this, since `firb_workflow`/`mortgage_finance`/
+`cash_position`/`disposition` all dispatch by sniffing the canonical `profile` key upstream.*)
 
 ```jsonc
 {
-  "type": "investor_profile_foreign_summary",
+  "type": "profile",
   "fields": {
     "firb_required": "bool",                       // always true for Mode D
     "established_property_eligible": "bool",       // false while the ban is in force — derived from kb.firb.established-dwelling-ban (single owner of the window)
@@ -356,11 +361,13 @@ Same as [Mode C investment_strategy](investor-domestic-au.md#3-investment_strate
 }
 ```
 
-**Outcome schema:** `strategy_thesis_foreign`
+**Outcome schema:** `strategy_thesis` (reused key — `investment_strategy` is the SAME component
+name as Mode C's; `mortgage_finance`/`disposition` dispatch by sniffing this key upstream, so the
+type must stay canonical. *Reconciled 2026-07-03, see the outcome-type conformance note.*)
 
 ```jsonc
 {
-  "type": "strategy_thesis_foreign",
+  "type": "strategy_thesis",
   "fields": {
     "archetype": "enum",
     "one_liner": "string",
@@ -383,7 +390,7 @@ Same as [Mode C investment_strategy](investor-domestic-au.md#3-investment_strate
 
 **Goal:** Determine the **non-resident investor loan path** — the most restrictive lender pool in the AU market — with investor-grade loan structure (IO vs P&I), foreign-buyer-specific deposit requirements, and FIRB-approval-precedes-unconditional-offer gating.
 
-**Inputs:** `investor_profile_foreign.outcome` (investor_profile_foreign_summary — including existing portfolio, VN-side income) + `firb_workflow.outcome` (firb_status) + `investment_strategy.outcome` (strategy_thesis_foreign — gearing type, target LVR)
+**Inputs:** `investor_profile_foreign.outcome` (profile — including existing portfolio, VN-side income) + `firb_workflow.outcome` (firb_status) + `investment_strategy.outcome` (strategy_thesis — gearing type, target LVR)
 
 **KB anchors:** `kb.lender.non-resident-investment-loan-shortlist`, `kb.non-resident.investment-loan-deposit-requirements`, `kb.lender.temp-resident-lending-policies`, `kb.loan.interest-only-vs-pi-investor`, `kb.lender.firb-approval-as-condition-precedent`, `kb.fx.loan-currency-considerations`
 
@@ -469,7 +476,7 @@ The `mortgage_plan` outcome feeds `yield_modelling.loan_costs`, `tax_structure_n
 
 **Goal:** Model rental income, expenses, cash flow — *with non-resident tax treatment*.
 
-**Inputs:** `property_fit_investor_foreign.outcome` + `strategy_thesis_foreign`
+**Inputs:** `property_fit_investor_foreign.outcome` + `strategy_thesis`
 
 **KB anchors:** Mode C yield_modelling anchors + `kb.non-resident-tax.withholding-on-rental-income`
 
@@ -499,11 +506,13 @@ Same as [Mode C yield_modelling](investor-domestic-au.md#5-yield_modelling--new)
 }
 ```
 
-**Outcome schema:** `cash_flow_projection_foreign`
+**Outcome schema:** `cash_flow_projection` (reused key — `yield_modelling` is the SAME component
+name as Mode C's; `tax_structure_non_resident`/`disposition` read this key upstream. *Reconciled
+2026-07-03, see the outcome-type conformance note.*)
 
 ```jsonc
 {
-  "type": "cash_flow_projection_foreign",
+  "type": "cash_flow_projection",
   "fields": {
     "annual_rental_income_year_1": "money",
     "annual_operating_expenses_year_1": "money",
@@ -528,7 +537,7 @@ Same as [Mode C yield_modelling](investor-domestic-au.md#5-yield_modelling--new)
 
 **Goal:** Determine the tax-optimised structure for a *non-resident investor* — typically more constrained than Mode C (negative gearing limited; no CGT discount on properties held by foreign residents from May 2012; no PPOR exemption).
 
-**Inputs:** `investor_profile_foreign.outcome` + `cash_flow_projection_foreign`
+**Inputs:** `investor_profile_foreign.outcome` + `cash_flow_projection`
 
 **KB anchors:** `kb.non-resident.tax-treatment-overview`, `kb.tax.cgt-50-percent-discount`, `kb.non-resident.entity-options-au-property`, `kb.au-vn-tax-treaty`, `kb.tax.depreciation-division-43-and-40`
 
@@ -584,11 +593,15 @@ Same as [Mode C yield_modelling](investor-domestic-au.md#5-yield_modelling--new)
 }
 ```
 
-**Outcome schema:** `tax_structure_non_resident_summary`
+**Outcome schema:** `tax_optimised_structure` (reused key, NOT a private
+`tax_optimised_structure` type — `tax_structure_non_resident` is a distinct component
+NAME from Mode C's `tax_structure`, but `disposition`/`cash_position` dispatch their investor path
+by sniffing `tax_optimised_structure`'s PRESENCE upstream, so the type must stay canonical across
+both component names. *Reconciled 2026-07-03, see the outcome-type conformance note.*)
 
 ```jsonc
 {
-  "type": "tax_structure_non_resident_summary",
+  "type": "tax_optimised_structure",
   "fields": {
     "recommended_entity": "enum",
     "rental_withholding_rate": "percentage",
@@ -613,7 +626,7 @@ Same as [Mode C yield_modelling](investor-domestic-au.md#5-yield_modelling--new)
 
 **Goal:** Compute cash needs — *combines Mode B foreign-buyer regulatory imposts (FIRB + surcharge + FX) with Mode C investor costs (entity setup, larger deposit, QS report)*.
 
-**Inputs:** `investor_profile_foreign.outcome` + `property_fit_investor_foreign.outcome` + `firb_status` + `tax_structure_non_resident_summary`
+**Inputs:** `investor_profile_foreign.outcome` + `property_fit_investor_foreign.outcome` + `firb_status` + `tax_optimised_structure`
 
 **KB anchors:** Mode B cash_position anchors + Mode C cash_position anchors + `kb.non-resident.investment-loan-deposit-requirements`
 
@@ -679,11 +692,13 @@ Same as [Mode C yield_modelling](investor-domestic-au.md#5-yield_modelling--new)
 }
 ```
 
-**Outcome schema:** `budget_envelope_foreign_investor`
+**Outcome schema:** `budget_envelope_investor` (reused key — `cash_position` is the SAME component
+name as Mode C's; `disposition` dispatches its investor acquire-figure placement by reading THIS
+key. *Reconciled 2026-07-03, see the outcome-type conformance note.*)
 
 ```jsonc
 {
-  "type": "budget_envelope_foreign_investor",
+  "type": "budget_envelope_investor",
   "fields": {
     "max_property_price_supported": "money",
     "actual_property_price": "money",
@@ -706,7 +721,7 @@ Mode D regulatory imposts on a $1M property typically run $130–200k (FIRB appl
 
 **Goal:** Plan cross-border capital flow — Wise/OFX, VN capital control compliance, AU AML/CTF documentation.
 
-**Inputs:** `investor_profile_foreign.outcome` + `budget_envelope_foreign_investor`
+**Inputs:** `investor_profile_foreign.outcome` + `budget_envelope_investor`
 
 **Same as [Mode B cross_border_funding](fhb-foreign-au.md#7-cross_border_funding--new)** with one note: Mode D `declared_purpose_category` typically defaults to `property_investment_foreign_direct_investment` rather than `student_tuition_and_living_expenses` (which is Mode B's typical category for student-funding scenarios).
 
@@ -718,7 +733,7 @@ Mode D regulatory imposts on a $1M property typically run $130–200k (FIRB appl
 
 **Goal:** Investor-disciplined bid plan *with FIRB approval gate*.
 
-**Inputs:** `property_fit_investor_foreign.outcome` + `budget_envelope_foreign_investor` + `firb_status` + `strategy_thesis_foreign`
+**Inputs:** `property_fit_investor_foreign.outcome` + `budget_envelope_investor` + `firb_status` + `strategy_thesis`
 
 **KB anchors:** Mode C buying_strategy anchors + Mode B FIRB gate anchors
 
@@ -778,7 +793,7 @@ Combines [Mode C investor_specific_documents](investor-domestic-au.md#9-due_dili
 
 **Goal:** Coordinate settlement *with entity setup, depreciation procurement, PM appointment, FIRB approval milestone, currency transfer milestone*.
 
-**Inputs:** `property_fit_investor_foreign.outcome` + `bid_plan_foreign_investor` + `firb_status` + `transfer_plan` + `tax_structure_non_resident_summary`
+**Inputs:** `property_fit_investor_foreign.outcome` + `bid_plan_foreign_investor` + `firb_status` + `transfer_plan` + `tax_optimised_structure`
 
 **KB anchors:** Mode C settlement_prep anchors + Mode B FIRB/transfer milestone anchors
 
@@ -796,7 +811,7 @@ Combines [Mode C investor_specific_documents](investor-domestic-au.md#9-due_dili
 
 **Goal:** Plan ongoing investment operations — *property management + portfolio growth + vacancy fee monitoring + non-resident tax compliance + currency repatriation strategy*.
 
-**Inputs:** `property_fit_investor_foreign.outcome` + `tax_structure_non_resident_summary` + `cash_flow_projection_foreign`
+**Inputs:** `property_fit_investor_foreign.outcome` + `tax_optimised_structure` + `cash_flow_projection`
 
 **KB anchors:** Mode C ownership_planning_investor anchors + Mode B ownership_planning foreign-person anchors + `kb.foreign-investor.repatriation-strategy`, `kb.non-resident-tax.foreign-resident-cgt-withholding`, `kb.foreign-investor.absentee-owner-management`
 
@@ -889,7 +904,7 @@ Combines Mode C `ownership_planning_investor` (property management, tax reportin
 
 **Goal:** Project the position at sale over the hold horizon `H` and own the dispose-phase figures the old `cgt_projection_non_resident` / `ownership_planning.exit_planning` placeholders lacked a single home for: sale proceeds (growth-projected), selling costs, loan payout, **foreign-resident CGT** (no 50% discount, no PPOR exemption, at the marginal rate), the **FRCGW withheld at settlement** (a prepayment credited against the final CGT — *not* an additional cost), and the **full-horizon net position**. Surface the VN-side CGT / treaty-relief note for completeness.
 
-**Inputs:** `strategy_thesis_foreign` (`hold_period_years` = the horizon `H`, `exit_strategy`) + `property_fit_investor_foreign.outcome` (growth indicators, purchase price) + `cash_flow_projection_foreign` (the hold-phase recurring flows to roll up) + `tax_structure_non_resident_summary` (the **CGT determinants**: `cgt_discount_eligible: false`, `ppor_exemption_eligible: false`, `cgt_marginal_rate`, `frcgw_applicable`) + `budget_envelope_foreign_investor` (acquisition cash to roll up; loan amount for the payout)
+**Inputs:** `strategy_thesis` (`hold_period_years` = the horizon `H`, `exit_strategy`) + `property_fit_investor_foreign.outcome` (growth indicators, purchase price) + `cash_flow_projection` (the hold-phase recurring flows to roll up) + `tax_optimised_structure` (the **CGT determinants**: `cgt_discount_eligible: false`, `ppor_exemption_eligible: false`, `cgt_marginal_rate`, `frcgw_applicable`) + `budget_envelope_investor` (acquisition cash to roll up; loan amount for the payout)
 
 **KB anchors:** `kb.property.capital-growth-bands` (banded growth — **labelled placeholder**, re-ground before surfacing), `kb.selling-costs.agent-legal` (selling-cost bands), `kb.tax.cgt-50-percent-discount`, `kb.tax.cgt-main-residence-exemption`, `kb.non-resident-tax.foreign-resident-cgt-withholding`
 
@@ -924,6 +939,25 @@ Combines Mode C `ownership_planning_investor` (property management, tax reportin
 
 - **One-computer-per-figure.** `disposition` owns the dispose figures + the full-horizon roll-up; it **places** acquire (from `cash_position`) and hold (from `yield_modelling`/`tax_structure_non_resident` over `H`) figures, never recomputing them ([place-upstream-figures-dont-recompute]). FRCGW is modelled as a withholding *inside* the CGT figure, **not** added on top of `net_proceeds` (no double-count). It emits the dispose-phase `cash_events`, gated by §13.
 - **ASIC.** CGT, FRCGW, and growth are KB-grounded estimates surfaced as ranges with the basis stated, `cgt_status: to_verify` directing the user to a registered tax agent — decision support, never tax advice.
+- **`cgt_status` is always `to_verify` for Mode D by construction, not by special-casing.** `disposition`'s shared `cgt_investor/4` (the same function Mode C uses) treats a purchase as CGT-"clean"-computable only when every applicant is resident-for-tax; `investor_profile_foreign`'s canonical `profile.applicants[].tax.residency_for_tax` is always `non_resident`, so the Clean check fails unconditionally and `taxable_gain` is shown undiscounted (`cgt_discount_eligible: false` from `tax_optimised_structure`) while `cgt` stays `to_verify`. This is the intended, asserted Mode D behaviour (a conformance escript covers it), not an accident of the entity-enum mismatch.
+
+## Outcome-type conformance (P2, 2026-07-03)
+
+Five components share a component NAME (or a mode-independent dispatch discriminator) with an
+existing Mode B/C component: `investor_profile_foreign`→`profile`, `investment_strategy`→
+`strategy_thesis`, `yield_modelling`→`cash_flow_projection`, `tax_structure_non_resident`→
+`tax_optimised_structure`, `cash_position`→`budget_envelope_investor`. `firb_workflow` /
+`cross_border_funding` / `disposition` already declared their canonical shared types. Per the
+established discipline (`fh_engine_mortgage`/`fh_engine_cash`/`fh_engine_disposition`'s own module
+headers: "shared component NAME... DIFFERENT outcome shapes... same TYPE, mode-appropriate
+computation"), the outcome-schema `type` field is the runtime Upstream dispatch key — the compiler
+UNIONS `outcome_fields` per type across every producer (`kb_compiler.py` `build_registry`), so a
+mode-specific field superset is expected and safe (Mode B's `budget_envelope`/`mortgage_plan`
+already do this live). This blueprint's five "Outcome schema" jsonc blocks above were drafted with
+private per-mode type names before this discipline was consistently re-applied here; reconciled to
+the canonical keys 2026-07-03 (mode-d-wedge.md P2). `property_fit_investor_foreign`,
+`bid_plan_foreign_investor`, `risk_assessment_foreign_investor`, `settlement_checklist_foreign`,
+`portfolio_position_foreign` stay private (per-property/no shared discriminator dependency).
 
 ---
 
@@ -987,22 +1021,22 @@ All Mode A + B + C signals apply. Mode D introduces:
 ## Cross-component output dependency graph
 
 ```
-investor_profile_foreign       → outcome: investor_profile_foreign_summary
-property_assessment            → outcome: property_fit_investor_foreign      (reads: investor_profile_foreign_summary)
-firb_workflow                  → outcome: firb_status                         (reads: investor_profile_foreign_summary, property_fit_investor_foreign)
-investment_strategy            → outcome: strategy_thesis_foreign             (reads: investor_profile_foreign_summary, property_fit_investor_foreign)
-yield_modelling                → outcome: cash_flow_projection_foreign        (reads: property_fit_investor_foreign, strategy_thesis_foreign)
-tax_structure_non_resident     → outcome: tax_structure_non_resident_summary  (reads: investor_profile_foreign_summary, cash_flow_projection_foreign)
-cash_position                  → outcome: budget_envelope_foreign_investor    (reads: investor_profile_foreign_summary, property_fit_investor_foreign, firb_status, tax_structure_non_resident_summary)
-cross_border_funding           → outcome: transfer_plan                       (reads: investor_profile_foreign_summary, budget_envelope_foreign_investor)
-buying_strategy                → outcome: bid_plan_foreign_investor           (reads: property_fit_investor_foreign, budget_envelope_foreign_investor, firb_status, strategy_thesis_foreign)
+investor_profile_foreign       → outcome: profile
+property_assessment            → outcome: property_fit_investor_foreign      (reads: profile)
+firb_workflow                  → outcome: firb_status                         (reads: profile, property_fit_investor_foreign)
+investment_strategy            → outcome: strategy_thesis             (reads: profile, property_fit_investor_foreign)
+yield_modelling                → outcome: cash_flow_projection        (reads: property_fit_investor_foreign, strategy_thesis)
+tax_structure_non_resident     → outcome: tax_optimised_structure  (reads: profile, cash_flow_projection)
+cash_position                  → outcome: budget_envelope_investor    (reads: profile, property_fit_investor_foreign, firb_status, tax_optimised_structure)
+cross_border_funding           → outcome: transfer_plan                       (reads: profile, budget_envelope_investor)
+buying_strategy                → outcome: bid_plan_foreign_investor           (reads: property_fit_investor_foreign, budget_envelope_investor, firb_status, strategy_thesis)
 due_diligence                  → outcome: risk_assessment_foreign_investor    (reads: property_fit_investor_foreign, uploaded_docs)
-settlement_prep                → outcome: settlement_checklist_foreign        (reads: property_fit_investor_foreign, bid_plan_foreign_investor, firb_status, transfer_plan, tax_structure_non_resident_summary)
-ownership_planning_foreign_investor → outcome: portfolio_position_foreign     (reads: property_fit_investor_foreign, tax_structure_non_resident_summary, cash_flow_projection_foreign)
-disposition                    → outcome: disposition                       (reads: strategy_thesis_foreign, property_fit_investor_foreign, cash_flow_projection_foreign, tax_structure_non_resident_summary, budget_envelope_foreign_investor)
+settlement_prep                → outcome: settlement_checklist_foreign        (reads: property_fit_investor_foreign, bid_plan_foreign_investor, firb_status, transfer_plan, tax_optimised_structure)
+ownership_planning_foreign_investor → outcome: portfolio_position_foreign     (reads: property_fit_investor_foreign, tax_optimised_structure, cash_flow_projection)
+disposition                    → outcome: disposition                       (reads: strategy_thesis, property_fit_investor_foreign, cash_flow_projection, tax_optimised_structure, budget_envelope_investor)
 ```
 
-No cycles. Mode D's pipeline has the deepest dependency graph of the four blueprints — `cash_position` reads four upstream outcomes (investor profile, property fit, FIRB status, tax structure) reflecting the combinatorial complexity of foreign + investor. `disposition` is a **pure sink** — it reads the upstream figure-owners (the horizon from `strategy_thesis_foreign`, the acquire/hold flows and CGT determinants from the cash/yield/tax outcomes) and is read by none, so it adds a leaf, not a cycle.
+No cycles. Mode D's pipeline has the deepest dependency graph of the four blueprints — `cash_position` reads four upstream outcomes (investor profile, property fit, FIRB status, tax structure) reflecting the combinatorial complexity of foreign + investor. `disposition` is a **pure sink** — it reads the upstream figure-owners (the horizon from `strategy_thesis`, the acquire/hold flows and CGT determinants from the cash/yield/tax outcomes) and is read by none, so it adds a leaf, not a cycle.
 
 ---
 

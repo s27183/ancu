@@ -27,6 +27,8 @@
 -export([duty/2, stamp_duty/3, registration_total/2]).
 %% exported for the Mode-B foreign-person conformance suite:
 -export([surcharge_pct/1, surcharge_amount/2, sum_or_null/1, channel_costs/2]).
+%% exported for the Mode-D foreign-investor conformance suite:
+-export([fill_investor_foreign/2]).
 
 -define(COPY, <<"kb.copy.cash">>).   %% bilingual copy-templates (bilingual-content.md §3b)
 -define(SURCHARGE, <<"kb.foreign-buyer-surcharge.by-state">>).
@@ -50,7 +52,11 @@ fill(Args, Upstream) ->
                 true  -> fill_fhb_foreign(Args, Upstream);
                 false -> fill_fhb(Args, Upstream)
             end;
-        _Tax -> fill_investor(Args, Upstream)
+        _Tax ->
+            case maps:get(firb_required_any, Args, false) of
+                true  -> fill_investor_foreign(Args, Upstream);
+                false -> fill_investor(Args, Upstream)
+            end
     end.
 
 %% --- Mode-A FHB cash_position (budget_envelope) ------------------------------
@@ -351,6 +357,74 @@ total_cash_investor(Deposit, Duty, Acq)
     Deposit + Duty + Acq;
 total_cash_investor(_, _, _) ->
     null.
+
+%% --- Mode-D foreign-investor cash_position (budget_envelope_investor, 9-field shape) --
+%% investor-foreign-au.md component 8 — combines Mode B's foreign-buyer regulatory-impost
+%% stack (FIRB fee + surcharge, no concession) with Mode C's investor cost stack, under the
+%% REUSED `budget_envelope_investor` key (2026-07-03 outcome-type conformance reconciliation)
+%% so fh_engine_disposition's existing full_horizon_investor/loan_payout_investor (which read
+%% `total_cash_required`/`loan_amount` off exactly this key) route Mode D onto the SAME
+%% acquire-figure placement Mode C uses, with zero disposition change for this seam.
+%%
+%% Mode D's declared field set drops Mode C's lmi_payable/mitigation_options_if_short and adds
+%% regulatory_imposts_total/channel_costs_total (Mode B's own two rollup fields) — the same
+%% "shared type, mode-specific field superset" pattern mortgage_plan/budget_envelope already
+%% use live. loan_amount/lvr stay null at base (Slice-B3b-style per-property figures, unbuilt
+%% for Mode D in P2 — mirrors Mode C's own budget_envelope_investor_base()).
+%%
+%% NAMING DISCIPLINE (honest-partial, mirrors fill_fhb_foreign/2's own note): actual_property_
+%% price / max_property_price_supported stay null (no property attached; capacity unknown).
+%% The NEED side (regulatory_imposts_total, channel_costs_total, total_cash_required) is
+%% honestly COMPUTABLE at base off the CONSERVATIVE ceiling of profile.target_price_range —
+%% the same convention firb_workflow / mortgage_finance / fill_fhb_foreign already use.
+%%
+%% PLACE, DON'T RECOMPUTE: the FIRB fee is READ from firb_workflow's outcome
+%% (Upstream.firb_status.total_firb_fee_payable); the deposit is READ from mortgage_finance's
+%% Mode-D outcome (Upstream.mortgage_plan.deposit_required_amount) — never re-derived here.
+-spec fill_investor_foreign(map(), map()) -> {map(), binary(), [map()]}.
+fill_investor_foreign(Args, Upstream) ->
+    Profile    = maps:get(<<"profile">>, Upstream, #{}),
+    FirbStatus = maps:get(<<"firb_status">>, Upstream, #{}),
+    Mortgage   = maps:get(<<"mortgage_plan">>, Upstream, #{}),
+    State   = fh_engine_store:projection_state(maps:get(onboarding, Args, #{})),
+    Ceiling = ceiling(maps:get(<<"target_price_range">>, Profile, null)),
+    %% no FHB concession — never available to an investor purchase (Mode C's own investor
+    %% duty convention, HasConc=false); no foreign-buyer surcharge relief either.
+    Duty      = stamp_duty(State, false, Ceiling),
+    DutyAfter = maps:get(<<"after_concession">>, Duty, null),
+    Surcharge = surcharge_amount(State, Ceiling),
+    FirbFee   = maps:get(<<"total_firb_fee_payable">>, FirbStatus, null),
+    RegulatoryImposts = sum_or_null([DutyAfter, Surcharge, FirbFee]),
+    %% reuses the SAME due-diligence/legal + registration convention band Mode B's
+    %% channel_costs/2 already sums (building/pest inspection, conveyancing, lender
+    %% application fee + per-state registration) — investor-agnostic, no double build.
+    ChannelCosts = channel_costs(State, Ceiling),
+    Deposit = maps:get(<<"deposit_required_amount">>, Mortgage, null),
+    TotalCashRequired = sum_or_null([Deposit, RegulatoryImposts, ChannelCosts]),
+    %% the VN-side available capital (investor_profile_foreign's own field) is the HAVE side —
+    %% null at base (genuinely uncaptured), same honest-partial call as Mode B's family
+    %% capacity read.
+    Capital = maps:get(<<"available_capital_aud_equivalent">>, Profile, null),
+    {GapOrSurplus, Verdict} = gap_and_verdict(Capital, TotalCashRequired),
+    Outcome = #{
+        <<"max_property_price_supported">> => null,
+        <<"actual_property_price">>        => null,
+        <<"total_cash_required">>          => TotalCashRequired,
+        <<"regulatory_imposts_total">>     => RegulatoryImposts,
+        <<"channel_costs_total">>          => ChannelCosts,
+        <<"loan_amount">>                  => null,
+        <<"lvr">>                          => null,
+        <<"gap_or_surplus">>               => GapOrSurplus,
+        <<"verdict">>                      => Verdict
+    },
+    KbVersions = fh_engine_kb:kb_anchors(
+        [<<"kb.stamp-duty.calc-by-state">>, <<"kb.foreign-buyer-surcharge.by-state">>,
+         <<"kb.firb.fee-schedule-current">>, <<"kb.fx.typical-spreads-vnd-aud">>,
+         <<"kb.buyer-costs.inspections-conveyancing-fees">>,
+         <<"kb.cash-reserve.lender-expectations">>,
+         <<"kb.non-resident.investment-loan-deposit-requirements">>,
+         <<"kb.tax.quantity-surveyor-reports">>, <<"kb.tax.entity-setup-costs">>]),
+    {Outcome, <<"calculator">>, KbVersions}.
 
 %% --- stamp_duty: the composition contract (§2) -------------------------------
 %% before = standard_duty(V, state); after = concessional_duty (or before, no

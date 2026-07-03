@@ -1,6 +1,6 @@
 # Mode-D wedge — build plan + progress tracker
 
-**Status: P1 (KB) done and compiler-verified (2026-07-03). Opened 2026-07-03.** This doc is the
+**Status: P1 (KB) + P2 (engine resolvers) done and verified (2026-07-03). Opened 2026-07-03.** This doc is the
 durable plan *and* the task tracker for the Mode-D (Vietnam-located foreign investor) wedge. The
 Claude Code Task list is ephemeral (it does not survive compaction); this file is the source of
 truth for "what's left." The grounding-checklist carries a one-line pointer here.
@@ -285,18 +285,55 @@ the 2026-07-03 scoping decision above.
 
 ## P2–P5 — engine + shell tracker
 
+**P2 done and verified (2026-07-03).** All ten base-turn resolver items landed. A prerequisite
+surfaced mid-phase and is now closed: **five of the blueprint's own "Outcome schema" `type`
+fields were private per-mode names** (`investor_profile_foreign_summary`, `strategy_thesis_foreign`,
+`cash_flow_projection_foreign`, `tax_structure_non_resident_summary`, `budget_envelope_foreign_investor`)
+that would have broken the shared-component-name dispatch discipline `fh_engine_mortgage`/
+`fh_engine_cash`/`fh_engine_disposition` already establish live for Mode B/C (a component NAME can
+differ per mode; the outcome-schema `type` — the runtime Upstream dispatch key — must stay
+canonical). Reconciled to `profile` / `strategy_thesis` / `cash_flow_projection` /
+`tax_optimised_structure` / `budget_envelope_investor` respectively (investor-foreign-au.md's own
+"Outcome-type conformance" section, added 2026-07-03, records the full rationale). This is what let
+four of the ten items land as **near-zero-code reuse** (firb_workflow, yield_modelling both
+unchanged; cross_border_funding + cash_position's investor-path routing needed no new dispatch
+logic) rather than new modules.
+
+One tracker claim was wrong and is corrected here: **`cross_border_funding` DID need a real
+branch**, not zero-delta reuse — Mode D has no `family_context` component (solo/couple investors,
+no parent-funding-child pattern), so `family_funding_plan` is never in Upstream; added a fallback
+to `profile.available_capital_aud_equivalent`.
+
+The misadvice-critical correctness point: `investor_profile_foreign` sets
+`applicant.tax.residency_for_tax = non_resident` DEFINITIONALLY (not a possibility-set projection
+the way Mode A/C project citizenship). This is what makes `fh_engine_disposition`'s ALREADY-BUILT
+`cgt_investor/4` (the SAME function Mode C uses, unmodified) route every Mode-D turn to
+`cgt_status = to_verify` by construction — proven in `mode_d_p2_conformance.escript` with a
+deliberately "clean-looking" entity/rate/clawback fixture (to show the routing is residency-driven,
+not an accident of a messy fixture). `tax_structure_non_resident` sets `cgt_discount_eligible: false`
+DEFINITIONALLY too (not holding-period-conditional, unlike Mode C's constant) and
+`frcgw_applicable: true`; `fh_engine_disposition:fill_investor/3` (shared with Mode C) was extended
+with `frcgw_withheld_at_settlement` (15% of the projected sale-proceeds band, KB-grounded,
+resolver-computed, never LLM-authored) and `vn_side_cgt_note` — both null/absent-equivalent for
+Mode C (regression-proven).
+
+Verified: `rebar3 compile` clean (0 warnings); `python3 tests/validate_build.py` PASS (structural +
+semantic gates, investor-foreign-au still correctly out-of-scope, 0 unbuilt anchors carried from
+P1); all 19 pre-existing Mode A/B/C conformance escripts still PASS (zero regression); the new
+`test/mode_d_p2_conformance.escript` — 82 assertions across all ten P2 items — PASSES.
+
 | Status | Phase | Item |
 |---|---|---|
-| [ ] | P2 | `investor_profile_foreign` resolver (merge of `buyer_profile` foreign lens + `investor_profile`) |
-| [ ] | P2 | `firb_workflow` reuse — confirm outcome-shape compatibility with Mode B, wire the dispatch clause |
-| [ ] | P2 | `investment_strategy` foreign-investor agent-leaf variant (new `_DOMAINS` entry, mirrors `investment_thesis`) |
-| [ ] | P2 | `mortgage_finance` non-resident-investor branch (3rd/4th branch on the shared module) |
-| [ ] | P2 | `yield_modelling` non-resident-tax-aware variant |
-| [ ] | P2 | `tax_structure_non_resident` ★ two-path component (entity-structuring leaf + non-resident CGT/FRCGW constants — most regulated surface) |
-| [ ] | P2 | `cash_position` foreign+investor branch (4th discriminator branch) |
-| [ ] | P2 | `cross_border_funding` reuse — confirm no Mode-D-specific delta beyond Mode B's build |
-| [ ] | P2 | `ownership_planning_foreign_investor` ★ new sibling module (vacancy fee + non-resident tax + portfolio) |
-| [ ] | P2 | `disposition` foreign-resident branch (3rd branch — no discount, no PPOR exemption, FRCGW inside CGT) |
+| [x] | P2 | `investor_profile_foreign` resolver (merge of `buyer_profile` foreign lens + `investor_profile`; canonical `profile` outcome; `residency_for_tax=non_resident` definitional) |
+| [x] | P2 | `firb_workflow` reuse — confirmed unchanged at base turn (reads `profile.*`; no property yet regardless of the future `property_fit` vs `property_fit_investor` key-naming seam, flagged below for P2-property-scope) |
+| [x] | P2 | `investment_strategy` foreign-investor variant (`fh_engine_fill:investment_strategy/2` — new Args-based dispatch mirroring `mortgage_finance`; same 3-leaf agent-slot discipline, shared `strategy_thesis` type, 2 Mode-D-only resolver fields) |
+| [x] | P2 | `mortgage_finance` non-resident-investor branch (4th branch: `strategy_thesis` present AND `firb_required_any`; new 2×2 compound discriminator in `merge_agent`/`agent_values_from_outcome` — also fixed a latent single-key-priority bug the 2×2 replaces) |
+| [x] | P2 | `yield_modelling` — confirmed unchanged (property-absent base scaffold is mode-agnostic under the renamed canonical `cash_flow_projection` key) |
+| [x] | P2 | `tax_structure_non_resident` ★ two-path component (entity-structuring leaf + non-resident CGT/FRCGW constants, all definitional not holding-period-conditional — most regulated surface) |
+| [x] | P2 | `cash_position` foreign+investor branch (4th discriminator branch, reused `budget_envelope_investor` key so `disposition`'s existing investor placement needed zero change) |
+| [x] | P2 | `cross_border_funding` — real branch needed (tracker's "no delta" claim corrected above): falls back to `profile.available_capital_aud_equivalent` when `family_funding_plan` is absent |
+| [x] | P2 | `ownership_planning_foreign_investor` ★ new sibling module (vacancy fee + AU/VN tax obligation prose + portfolio; no `disposition`/`opportunities` edge — confirmed against the blueprint's own declared inputs/outcome fields, simpler than Mode C's sibling) |
+| [x] | P2 | `disposition` foreign-resident branch — NOT a new branch: extended the shared `fill_investor/3` (Mode C's own function) with FRCGW + the VN-side note, gated on `tax_optimised_structure.frcgw_applicable`; the CGT no-discount/no-PPOR-exemption/to_verify routing needed zero new code (falls out of `residency_for_tax=non_resident` + `cgt_discount_eligible=false`) |
 | [ ] | P3 | Add `investor-foreign-au` to `IN_SCOPE_BLUEPRINTS`; green semantic gates; re-emit artifact; prove per-card selection (A/B/C unchanged) |
 | [ ] | P4 | Dispatcher branches for the 4 new outcome shapes onto existing renderer components (no new `.svelte` expected — verify at P4-open) |
 | [ ] | P5 | `?BASE_COMPONENTS_FOREIGN_INVESTOR` per-blueprint `base_components/1` sequence + DAG-walk conformance |
@@ -308,9 +345,20 @@ the 2026-07-03 scoping decision above.
   against the compiler's literal per-blueprint unbuilt-anchor inventory (`python3 tests/validate_build.py`),
   not just the tracker's provisional "~77"/"~87" counts — see the P1 section above for the full table.
   0 unbuilt anchors, all gates green.
-- **`firb_status` shape compatibility** — Mode D's component 3 claims direct reuse "from Mode B," but
-  hasn't been diffed field-by-field against Mode B's live `firb_status` outcome; confirm at P2-open,
-  don't assume identical.
+- ~~**`firb_status` shape compatibility**~~ — **RESOLVED at P2 (2026-07-03).** `fh_engine_firb:fill/2`
+  reused verbatim (zero code change) — confirmed against its live source: it reads
+  `Upstream.profile.*` and `Upstream.property_fit` (undefined at every Mode-D base turn regardless,
+  same as every other mode pre-property), so the shape question was moot for P2's base scope. A NEW
+  seam surfaced instead, deferred honestly (not this wedge's P2, but flagged for whenever
+  `property_assessment` — per-property, out of P2 scope — gets built): `fh_engine_firb:fill/2` reads
+  the property outcome under the key `property_fit` (Mode B's), while Mode D's other per-property
+  consumers (yield_modelling, disposition, cash_position's investor path) read `property_fit_investor`
+  (Mode C's, and Mode D's `property_assessment` blueprint component is itself typed
+  `property_fit_investor_foreign`, a THIRD name, not reconciled to either canonical key in this P2
+  pass since the component isn't built yet). Whichever key `property_assessment` lands under, either
+  `fh_engine_firb:fill/2` needs a small fallback read (`property_fit` orelse `property_fit_investor`)
+  or the Mode-D property outcome needs to reuse `property_fit_investor` verbatim (matching this P2's
+  own "reuse the canonical key" discipline) — decide at that component's build, not here.
 - **`property_type` enum drift** (grounding-checklist item 3's recorded Wedge-2 reconciliation) —
   `investor-foreign-au:262` still carries the pre-`vacant_land` 6-value enum; adopt `vacant_land` when
   this wedge's `property_assessment` component is built.

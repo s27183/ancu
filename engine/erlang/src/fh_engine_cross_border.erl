@@ -6,6 +6,15 @@
 %% `family_context`'s outcome (VN-side contribution) and `cash_position`'s outcome
 %% (the AU-side cash picture) — Inputs: family_context.outcome + cash_position.outcome.
 %%
+%% MODE-D DELTA (2026-07-03, flagged — the tracker's "no new decision needed" claim was
+%% incomplete): Mode D has no `family_context` component (investor-foreign-au.md — Vietnam-
+%% located investors are typically solo/couple, not parent-funding-child), so
+%% `family_funding_plan` is never in Upstream on a Mode-D turn. transfer_amount/1 falls back
+%% to `profile.available_capital_aud_equivalent` (investor_profile_foreign's own field) when
+%% family_funding_plan is absent — the natural Mode-D substitute source, still PLACED never
+%% recomputed. Both null at base regardless (no facts captured yet), so this is a genuine
+%% code delta, not an observable-at-base one.
+%%
 %% VN-HALF PLACEHOLDER-BACKED (mode-b-wedge.md P1's own framing): `vn_compliance_steps`
 %% draws on the three labelled-placeholder VN docs (kb.vn-capital-controls.*,
 %% kb.vn-pdp.cross-border-data-transfer) — each PROCESS STEP (engage a licensed bank,
@@ -32,9 +41,16 @@
 
 -spec fill(map(), map()) -> {map(), binary(), [map()]}.
 fill(_Args, Upstream) ->
-    FamilyPlan = maps:get(<<"family_funding_plan">>, Upstream, #{}),
-    Breakdown = maps:get(<<"contribution_breakdown">>, FamilyPlan, []),
-    TransferAmount = transfer_amount(Breakdown),
+    TransferAmount = case maps:is_key(<<"family_funding_plan">>, Upstream) of
+        true ->
+            FamilyPlan = maps:get(<<"family_funding_plan">>, Upstream, #{}),
+            transfer_amount(maps:get(<<"contribution_breakdown">>, FamilyPlan, []));
+        false ->
+            %% Mode D: no family_context component — PLACE investor_profile_foreign's own
+            %% capital fact instead (see the module header's "MODE-D DELTA" note).
+            Profile = maps:get(<<"profile">>, Upstream, #{}),
+            maps:get(<<"available_capital_aud_equivalent">>, Profile, null)
+    end,
     Outcome = #{
         %% genuinely unknown without a live quote comparison across providers — the KB
         %% doc's own framing (kb.fx-providers.wise-ofx-bank-comparison) is a SELECTION

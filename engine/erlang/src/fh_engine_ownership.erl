@@ -20,7 +20,7 @@
 %% totals, estimated graduation year, refi-window date, strata (needs property type),
 %% utilities + building insurance (no KB band / property-specific).
 
--export([fill/2, fill_investor/2]).
+-export([fill/2, fill_investor/2, fill_foreign_investor/2]).
 %% exported for the conformance harness (same anchors as the Python spec):
 -export([maintenance_target/1, statutory_band/0, land_tax_check/1,
          graduation_target_lvr/0, land_tax_threshold/1, has_fhg/1]).
@@ -30,6 +30,7 @@
 -define(COPY, <<"kb.copy.ownership">>).   %% bilingual copy-templates (bilingual-content.md §3b)
 -define(COPY_INV, <<"kb.copy.ownership-investor">>).  %% Mode-C investor copy doc
 -define(COPY_FOREIGN, <<"kb.copy.ownership-foreign">>).  %% Mode-B foreign-person copy doc
+-define(COPY_FOREIGN_INV, <<"kb.copy.ownership-foreign-investor">>).  %% Mode-D copy doc
 
 %% --- entry -------------------------------------------------------------------
 
@@ -281,6 +282,90 @@ cf(Id) -> fh_engine_kb:copy(?COPY_FOREIGN, Id).
 
 -spec cfp(binary(), #{binary() => fh_engine_i18n:param()}) -> fh_engine_i18n:localized().
 cfp(Id, Params) -> fh_engine_i18n:subst(fh_engine_kb:copy(?COPY_FOREIGN, Id), Params).
+
+%% --- Mode-D ownership_planning_foreign_investor (portfolio_position_foreign) -
+%% investor-foreign-au.md component 13. A PURE-resolver figure-owner (agent_leaves = []; same
+%% class as fill_investor/2). UNIQUE component name — no shared-name collision, so this is a
+%% clean sibling dispatched directly by fh_engine_fill (like fill_investor/2's own
+%% ownership_planning_investor); the FHB fill/2 and fill_investor/2 stay untouched.
+%%
+%% Per the blueprint's OWN declared inputs (property_fit_investor_foreign + tax_optimised_
+%% structure + cash_flow_projection — NO `disposition` edge, unlike Mode C's own
+%% ownership_planning_investor), this component does NOT place disposition's equity_release
+%% figure and its `portfolio_position_foreign` outcome schema carries no `opportunities`
+%% field at all — genuinely simpler than Mode C's own sibling, not an oversight (flagged +
+%% confirmed against the blueprint's own outcome-schema field list, mode-d-wedge.md P2).
+%%
+%% HONEST-PARTIAL, not all-null: like Mode C's ownership_planning_investor, the two obligation
+%% arrays + the alert cadences are mode-level, property-agnostic, KB-grounded prose, so they
+%% fill at base. The vacancy-fee alert PLACES firb_workflow's own fee figure (vacancy_fee_
+%% at_risk/1, reused verbatim from fill_foreign/2 above — [[place-upstream-figures-dont-
+%% recompute]], no second computer). The post-acquisition actuals (cash flow after
+%% withholding, FRCGW reserve, ready-for-next, vacancy status) are null at base — no property,
+%% no actuals. mode_switch_eligible_on_pr starts false, the same honest starting value as
+%% Mode B's mode_switch_eligible (no PR/citizenship-grant evidence exists at base).
+-spec fill_foreign_investor(map(), map()) -> {map(), binary(), [map()]}.
+fill_foreign_investor(_Args, Upstream) ->
+    FirbStatus = maps:get(<<"firb_status">>, Upstream, #{}),
+    Fee = maps:get(<<"total_firb_fee_payable">>, FirbStatus, null),
+    Outcome = #{
+        %% post-acquisition actuals — no property/actuals at base.
+        <<"monthly_net_cash_flow_after_withholding">> => null,
+        <<"vacancy_fee_at_risk_status">>               => null,
+        <<"frcgw_reserve_at_exit">>                    => null,
+        <<"ready_for_next_property">>                  => null,   %% three-valued; needs actuals
+        %% base-computable: KB-grounded, property-agnostic prose.
+        <<"annual_au_tax_obligations">> => annual_au_obligations(),
+        <<"annual_vn_tax_obligations">> => annual_vn_obligations(),
+        <<"alert_triggers_armed">>      => foreign_investor_alerts(Fee),
+        %% honest starting value — no status-change evidence yet (mirrors fill_foreign/2's
+        %% own mode_switch_eligible default; the change-detection mechanism is a later unit).
+        <<"mode_switch_eligible_on_pr">> => false
+    },
+    KbVersions = fh_engine_kb:kb_anchors(
+        [<<"kb.investor.property-management-vs-self-managed">>,
+         <<"kb.investor.annual-tax-return-investor">>,
+         <<"kb.investor.cash-flow-tracking">>,
+         <<"kb.investor.portfolio-review-cadence">>,
+         <<"kb.firb.vacancy-fee-rules-2026">>,
+         <<"kb.firb.vacancy-fee-double-from-2024">>,
+         <<"kb.foreign-investor.repatriation-strategy">>,
+         <<"kb.non-resident-tax.foreign-resident-cgt-withholding">>,
+         <<"kb.foreign-investor.absentee-owner-management">>]),
+    {Outcome, <<"data-table">>, KbVersions}.
+
+%% AU-side standing obligations — bilingual prose, KB-grounded (annual tax return by
+%% assessment not withholding, land tax + foreign/absentee surcharge, PM review reused from
+%% the investor copy doc — single-owner, no duplication of an already-owned line).
+annual_au_obligations() ->
+    [cfi(<<"obligation_au_tax_return">>),
+     cfi(<<"obligation_land_tax_foreign_surcharge">>),
+     ci(<<"obligation_pm_review">>)].
+
+%% VN-side obligation — structurally knowable (a filing obligation exists) even though the
+%% specific VN rule is a labelled placeholder (kb.vn-tax.*); points to the buyer's own VN tax
+%% advisor, never states a VN tax rule (the AU-side-full/VN-side-placeholder scoping decision).
+annual_vn_obligations() ->
+    [cfi(<<"obligation_vn_tax_filing">>)].
+
+%% Mode-D lifecycle alerts: the vacancy-declaration reminder (reused verbatim from
+%% fill_foreign/2 — armed unconditionally, same lodgement-trap discipline) + the periodic
+%% loan-review reminder (mode-neutral, reused) + AU/VN tax filing deadlines + the FX
+%% repatriation opportunity + the PR-grant mode-switch reminder.
+foreign_investor_alerts(Fee) ->
+    [vacancy_alert(Fee), review_alert(),
+     alert_fi(<<"alert_au_tax_filing_deadline_trigger">>, <<"alert_au_tax_filing_deadline_action">>),
+     alert_fi(<<"alert_vn_tax_filing_deadline_trigger">>, <<"alert_vn_tax_filing_deadline_action">>),
+     alert_fi(<<"alert_fx_repatriation_trigger">>, <<"alert_fx_repatriation_action">>),
+     alert_fi(<<"alert_pr_mode_switch_trigger">>, <<"alert_pr_mode_switch_action">>)].
+
+%% {trigger, action} pair from the Mode-D copy doc (mirrors alert/2, distinct doc source).
+alert_fi(TriggerId, ActionId) ->
+    #{<<"trigger">> => cfi(TriggerId), <<"action">> => cfi(ActionId)}.
+
+%% the Mode-D copy doc — static templates (no params).
+-spec cfi(binary()) -> fh_engine_i18n:localized().
+cfi(Id) -> fh_engine_kb:copy(?COPY_FOREIGN_INV, Id).
 
 %% --- the ongoing_obligations outcome (honest partial) ------------------------
 %% Filled: maintenance_reserve_target, recurring_costs_estimate.statutory_band,
