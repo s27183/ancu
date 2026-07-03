@@ -163,7 +163,9 @@ Note: Mode D does NOT activate Mode B's Family view tab by default — Vietnam-l
 
 **Inputs:** User questions; uploaded documents (Vietnamese passport, residency proof, prior AU FIRB approvals if any, financial statements).
 
-**KB anchors:** `kb.firb.status-determination`, `kb.firb.established-dwelling-ban`, `kb.vn-tax.brackets-2026`, `kb.vn-tax.income-from-foreign-property`, `kb.non-resident.serviceability-au-lenders`, `kb.investor.experience-levels`
+**KB anchors:** `kb.firb.status-determination`, `kb.firb.established-dwelling-ban`, `kb.vn-tax.brackets-2026`, `kb.vn-tax.income-from-foreign-property`, `kb.lender.non-resident-friendly-shortlist`, `kb.investor.experience-levels`
+
+*(Reconciled 2026-07-03 — the serviceability anchor was drafted as `kb.non-resident.serviceability-au-lenders` before P1 found the mode-agnostic equivalent already built for Mode B.)*
 
 **Renderer:** `summary-card`
 
@@ -250,7 +252,9 @@ Note: Mode D does NOT activate Mode B's Family view tab by default — Vietnam-l
 
 **Inputs:** `property_card` + `investor_profile_foreign.outcome`
 
-**KB anchors:** Mode C property_assessment anchors + Mode B foreign-person filter anchors + `kb.firb.eligible-property-types-foreign-persons`, `kb.firb.fee-tiers-by-value`, `kb.off-the-plan.foreign-investor-considerations`
+**KB anchors:** Mode C property_assessment anchors + Mode B foreign-person filter anchors + `kb.firb.eligible-property-types-foreign-persons`, `kb.firb.fee-tiers-by-value`, `kb.off-the-plan.risk-considerations`
+
+*(Reconciled 2026-07-03 — was `kb.off-the-plan.foreign-investor-considerations`; the existing doc already grounds Mode B's `property_assessment` on off-the-plan risk for a foreign buyer restricted to new-build stock, an investor-agnostic constraint that applies identically to Mode D.)*
 
 **Renderer:** `summary-card`
 
@@ -381,7 +385,9 @@ Same as [Mode C investment_strategy](investor-domestic-au.md#3-investment_strate
 
 **Inputs:** `investor_profile_foreign.outcome` (investor_profile_foreign_summary — including existing portfolio, VN-side income) + `firb_workflow.outcome` (firb_status) + `investment_strategy.outcome` (strategy_thesis_foreign — gearing type, target LVR)
 
-**KB anchors:** `kb.lender.non-resident-investment-loan-shortlist`, `kb.lender.foreign-investor-deposit-requirements`, `kb.lender.vn-income-treatment`, `kb.lender.investment-loan-policies-non-resident`, `kb.loan.interest-only-non-resident-investor`, `kb.lender.firb-approval-as-condition-precedent`, `kb.fx.loan-currency-considerations`, `kb.lender.foreign-investor-rate-premiums`
+**KB anchors:** `kb.lender.non-resident-investment-loan-shortlist`, `kb.non-resident.investment-loan-deposit-requirements`, `kb.lender.temp-resident-lending-policies`, `kb.loan.interest-only-vs-pi-investor`, `kb.lender.firb-approval-as-condition-precedent`, `kb.fx.loan-currency-considerations`
+
+*(Reconciled 2026-07-03 — 4 anchors drafted for this component (`kb.lender.foreign-investor-deposit-requirements`, `kb.lender.vn-income-treatment`, `kb.lender.investment-loan-policies-non-resident`, `kb.loan.interest-only-non-resident-investor`, `kb.lender.foreign-investor-rate-premiums`) reconciled onto 3 existing/new anchors: the deposit band → `kb.non-resident.investment-loan-deposit-requirements` (shared with component 8); VN income treatment → the already-general `kb.lender.temp-resident-lending-policies`; the IO trade-off framing → the already-general `kb.loan.interest-only-vs-pi-investor`; the combination-specific facts (narrower shortlist, rental-income shading, the further rate premium, IO-availability-by-lender) folded into the new `kb.lender.non-resident-investment-loan-shortlist`.)*
 
 **Renderer:** `summary-card` + `data-table`
 
@@ -465,7 +471,9 @@ The `mortgage_plan` outcome feeds `yield_modelling.loan_costs`, `tax_structure_n
 
 **Inputs:** `property_fit_investor_foreign.outcome` + `strategy_thesis_foreign`
 
-**KB anchors:** Mode C yield_modelling anchors + `kb.non-resident.rental-income-withholding-tax`, `kb.non-resident.no-cgt-ppor-exemption`
+**KB anchors:** Mode C yield_modelling anchors + `kb.non-resident-tax.withholding-on-rental-income`
+
+*(Reconciled 2026-07-03 — this anchor was drafted as `kb.non-resident.rental-income-withholding-tax` before P1 found the equivalent already built for Mode B, mode-agnostic. The PPOR-exemption anchor originally listed here belongs to the dispose-phase, not the hold-phase — dropped from this component; see component 7/14.)*
 
 **Renderer:** `calculator`
 
@@ -479,7 +487,7 @@ Same as [Mode C yield_modelling](investor-domestic-au.md#5-yield_modelling--new)
 {
   // all Mode C yield_modelling parameters, plus:
   "non_resident_tax_withholding": {
-    "rental_income_withholding_applicable": { "type": "bool", "value": true },
+    "rental_income_withholding_applicable": { "type": "bool", "value": "<initial>", "note": "resolver-set to false with an assessment note per kb.non-resident-tax.withholding-on-rental-income — directly-held AU rent is NOT subject to a final withholding tax, it is taxed by assessment via a lodged return; do not hardcode true" },
     "withholding_rate_applicable": { "type": "percentage", "value": "<initial>" },
     "annual_withholding_amount": { "type": "money_per_year", "value": "<initial>" },
     "net_rental_income_after_withholding": { "type": "money_per_year", "value": "<initial>" }
@@ -522,7 +530,9 @@ Same as [Mode C yield_modelling](investor-domestic-au.md#5-yield_modelling--new)
 
 **Inputs:** `investor_profile_foreign.outcome` + `cash_flow_projection_foreign`
 
-**KB anchors:** `kb.non-resident.tax-treatment-overview`, `kb.non-resident.cgt-no-50-percent-discount-from-2012`, `kb.non-resident.cgt-no-ppor-exemption`, `kb.non-resident.entity-options-au-property`, `kb.au-vn-tax-treaty`, `kb.tax.depreciation-non-resident`
+**KB anchors:** `kb.non-resident.tax-treatment-overview`, `kb.tax.cgt-50-percent-discount`, `kb.non-resident.entity-options-au-property`, `kb.au-vn-tax-treaty`, `kb.tax.depreciation-division-43-and-40`
+
+*(Reconciled 2026-07-03 — 3 of these anchors already existed under a different, mode-agnostic slug. The standalone PPOR-exemption anchor was dropped as moot for an investor who never held a main residence — folded into `kb.non-resident.tax-treatment-overview`'s reasoning instead of a standalone anchor.)*
 
 **Renderer:** `data-table` + `calculator`
 
@@ -555,11 +565,11 @@ Same as [Mode C yield_modelling](investor-domestic-au.md#5-yield_modelling--new)
     // phase, no cash_event, no owner) is reframed here as the foreign-resident CGT *determinants*.
     // The dispose-phase CGT FIGURE (gain, payable, FRCGW) is computed and OWNED by `disposition`
     // (component 14) at the `dispose` phase, where it lands as cash_events — one-computer-per-figure.
-    "fifty_percent_discount_eligible": { "type": "bool", "value": false, "note": "Removed for foreign residents from 8 May 2012 (kb.non-resident.cgt-no-50-percent-discount-from-2012); read by disposition" },
-    "ppor_exemption_eligible": { "type": "bool", "value": false, "note": "Removed for foreign residents on disposal from 1 July 2020 with limited transition (kb.non-resident.cgt-no-ppor-exemption); read by disposition" },
+    "fifty_percent_discount_eligible": { "type": "bool", "value": false, "note": "Removed for foreign residents from 8 May 2012 (kb.tax.cgt-50-percent-discount); read by disposition" },
+    "ppor_exemption_eligible": { "type": "bool", "value": false, "note": "Moot, not removed — the property was never a main residence, so the exemption in kb.tax.cgt-main-residence-exemption never applied in the first place (an investor from acquisition, unlike Mode B's owner-occupier-turned-foreign-resident case); read by disposition" },
     "cgt_marginal_rate": { "type": "percentage", "value": "<initial>", "note": "foreign-resident marginal rate the gain is taxed at; read by disposition" },
     "frcgw_applicable": { "type": "bool", "value": true, "note": "Federal (ATO) foreign-resident CGT withholding applies at settlement of sale; read by disposition" },
-    "frcgw_rate_and_threshold": { "type": "string", "value": "<from kb.foreign-investor.frcgw-on-sale>", "note": "rate + any value threshold resolve from KB, NOT hardcoded; disposition applies them to compute the withheld amount" }
+    "frcgw_rate_and_threshold": { "type": "string", "value": "<from kb.non-resident-tax.foreign-resident-cgt-withholding>", "note": "rate + any value threshold resolve from KB, NOT hardcoded; disposition applies them to compute the withheld amount" }
   },
   "vn_side_tax_implications": {
     "vn_tax_on_au_rental_income": { "type": "string", "value": "<initial>" },
@@ -788,7 +798,9 @@ Combines [Mode C investor_specific_documents](investor-domestic-au.md#9-due_dili
 
 **Inputs:** `property_fit_investor_foreign.outcome` + `tax_structure_non_resident_summary` + `cash_flow_projection_foreign`
 
-**KB anchors:** Mode C ownership_planning_investor anchors + Mode B ownership_planning foreign-person anchors + `kb.foreign-investor.repatriation-strategy`, `kb.foreign-investor.frcgw-on-sale`, `kb.foreign-investor.absentee-owner-management`
+**KB anchors:** Mode C ownership_planning_investor anchors + Mode B ownership_planning foreign-person anchors + `kb.foreign-investor.repatriation-strategy`, `kb.non-resident-tax.foreign-resident-cgt-withholding`, `kb.foreign-investor.absentee-owner-management`
+
+*(Reconciled 2026-07-03 — the FRCGW anchor was drafted as `kb.foreign-investor.frcgw-on-sale` before P1 found the equivalent already built for Mode B.)*
 
 **Renderer:** `data-table` + `opportunity-card`
 
@@ -873,13 +885,15 @@ Combines Mode C `ownership_planning_investor` (property management, tax reportin
 
 ### 14. disposition ★ (NEW — the dispose-phase figure-owner)
 
-> **Design-first / dormant.** Added by the full-temporal-flow reframe ([`../architecture/lifecycle-simulation-model.md` §8.5](../architecture/lifecycle-simulation-model.md)). The *structure* is built across all modes now; the **Mode-D foreign-resident tax content** — the removed discount/exemption, FRCGW, and the VN-side treaty interplay — is authored when Mode D enters scope, against the currently-dangling `kb.non-resident.*` / `kb.foreign-investor.*` anchors (§8.7). This is the **foreign-resident** path of the same dispose-phase owner: Mode-A is main-residence-exempt (`cgt: null`), Mode-C is full-CGT-with-discount, Mode-D is **full-CGT, no discount, no PPOR exemption, plus FRCGW** withheld at settlement.
+> **Was design-first / dormant; now active (P1, 2026-07-03).** Added by the full-temporal-flow reframe ([`../architecture/lifecycle-simulation-model.md` §8.5](../architecture/lifecycle-simulation-model.md)). This is the **foreign-resident** path of the same dispose-phase owner: Mode-A is main-residence-exempt (`cgt: null`), Mode-C is full-CGT-with-discount, Mode-D is **full-CGT, no discount, no PPOR exemption (moot, not removed — never a main residence), plus FRCGW** withheld at settlement.
 
 **Goal:** Project the position at sale over the hold horizon `H` and own the dispose-phase figures the old `cgt_projection_non_resident` / `ownership_planning.exit_planning` placeholders lacked a single home for: sale proceeds (growth-projected), selling costs, loan payout, **foreign-resident CGT** (no 50% discount, no PPOR exemption, at the marginal rate), the **FRCGW withheld at settlement** (a prepayment credited against the final CGT — *not* an additional cost), and the **full-horizon net position**. Surface the VN-side CGT / treaty-relief note for completeness.
 
 **Inputs:** `strategy_thesis_foreign` (`hold_period_years` = the horizon `H`, `exit_strategy`) + `property_fit_investor_foreign.outcome` (growth indicators, purchase price) + `cash_flow_projection_foreign` (the hold-phase recurring flows to roll up) + `tax_structure_non_resident_summary` (the **CGT determinants**: `cgt_discount_eligible: false`, `ppor_exemption_eligible: false`, `cgt_marginal_rate`, `frcgw_applicable`) + `budget_envelope_foreign_investor` (acquisition cash to roll up; loan amount for the payout)
 
-**KB anchors:** `kb.property.capital-growth-bands` (banded growth — **labelled placeholder**, re-ground before surfacing), `kb.selling-costs.agent-legal` (selling-cost bands), `kb.non-resident.cgt-no-50-percent-discount-from-2012` *(dangling — Mode-D, design-first)*, `kb.non-resident.cgt-no-ppor-exemption` *(dangling — design-first)*, `kb.foreign-investor.frcgw-on-sale` *(dangling — the FRCGW rate/threshold, design-first)*
+**KB anchors:** `kb.property.capital-growth-bands` (banded growth — **labelled placeholder**, re-ground before surfacing), `kb.selling-costs.agent-legal` (selling-cost bands), `kb.tax.cgt-50-percent-discount`, `kb.tax.cgt-main-residence-exemption`, `kb.non-resident-tax.foreign-resident-cgt-withholding`
+
+*(Reconciled 2026-07-03 — the discount anchor was drafted as `kb.non-resident.cgt-no-50-percent-discount-from-2012`; the main-residence anchor (grounding the PPOR-moot reasoning) was the dangling `kb.non-resident.cgt-no-ppor-exemption`; the FRCGW anchor was `kb.foreign-investor.frcgw-on-sale` — all three reconciled to the mode-agnostic slugs already built for Mode B/C.)*
 
 **Renderer:** `calculator` (the full-horizon net position; no new renderer — constraint #7, §8.8)
 
@@ -922,7 +936,18 @@ Mode D references ~77 KB slugs:
 - 2 shared with Mode A — `kb.property.capital-growth-bands` + `kb.selling-costs.agent-legal` (component 14 `disposition`; the FRCGW-specific anchors stay Mode-D-exclusive, below)
 - ~10 Mode-D-exclusive (non-resident tax, FRCGW, repatriation, VN-AU treaty, foreign-investor strategy)
 
-Mode-D-exclusive slugs include: `kb.vn-tax.brackets-2026`, `kb.vn-tax.income-from-foreign-property`, `kb.non-resident.serviceability-au-lenders`, `kb.non-resident.rental-income-withholding-tax`, `kb.non-resident.cgt-no-50-percent-discount-from-2012`, `kb.non-resident.cgt-no-ppor-exemption`, `kb.non-resident.entity-options-au-property`, `kb.au-vn-tax-treaty`, `kb.foreign-investor.thesis-archetypes`, `kb.foreign-investor.currency-hedging-considerations`, `kb.foreign-investor.future-migration-pathway-considerations`, `kb.foreign-investor.repatriation-strategy`, `kb.foreign-investor.frcgw-on-sale`, `kb.foreign-investor.absentee-owner-management`, `kb.non-resident.investment-loan-deposit-requirements`.
+**Reconciled 2026-07-03 (P1-open pass) — see `mode-d-wedge.md` P1 for the full table.** Genuinely
+new (7 docs + `kb.non-resident.tax-treatment-overview` synthesis): `kb.non-resident.tax-treatment-overview`,
+`kb.non-resident.entity-options-au-property`, `kb.non-resident.investment-loan-deposit-requirements`,
+`kb.foreign-investor.thesis-archetypes`, `kb.foreign-investor.currency-hedging-considerations`,
+`kb.foreign-investor.future-migration-pathway-considerations`, `kb.foreign-investor.repatriation-strategy`,
+`kb.foreign-investor.absentee-owner-management`. VN-side placeholders (3, per the scoping decision):
+`kb.vn-tax.brackets-2026`, `kb.vn-tax.income-from-foreign-property`, `kb.au-vn-tax-treaty`. Reused under
+an existing slug (not new files — anchor renamed in this blueprint): `kb.lender.non-resident-friendly-shortlist`,
+`kb.non-resident-tax.withholding-on-rental-income`, `kb.tax.cgt-50-percent-discount`,
+`kb.non-resident-tax.foreign-resident-cgt-withholding`, `kb.tax.depreciation-division-43-and-40`. Dropped
+as moot: the standalone PPOR-exemption anchor (an investor never held a main residence to lose the
+exemption on — folded into the tax-treatment-overview doc's reasoning, grounded in `kb.tax.cgt-main-residence-exemption`).
 
 The offline KB agent's Mode D onboarding workstream is the largest of the four — these are the most legally and operationally sensitive content domains across the blueprint set.
 

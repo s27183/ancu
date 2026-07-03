@@ -1,9 +1,20 @@
 # Mode-D wedge — build plan + progress tracker
 
-**Status: planning (authoring not started). Opened 2026-07-03.** This doc is the durable plan
-*and* the task tracker for the Mode-D (Vietnam-located foreign investor) wedge. The Claude Code
-Task list is ephemeral (it does not survive compaction); this file is the source of truth for
-"what's left." The grounding-checklist carries a one-line pointer here.
+**Status: P1 (KB) done and compiler-verified (2026-07-03). Opened 2026-07-03.** This doc is the
+durable plan *and* the task tracker for the Mode-D (Vietnam-located foreign investor) wedge. The
+Claude Code Task list is ephemeral (it does not survive compaction); this file is the source of
+truth for "what's left." The grounding-checklist carries a one-line pointer here.
+
+**P1 close-out note.** The compiler (`python3 tests/validate_build.py`) is the ground truth for
+anchor resolution, not manual grep — it caught 5 stale slug references my first reconciliation
+pass left in explanatory parentheticals (backtick-quoted tokens inside a `**KB anchors:**` line get
+scanned as real anchors regardless of surrounding prose) and surfaced **7 more unbuilt anchors**
+(component 3's off-the-plan anchor, component 5's mortgage-finance anchor cluster) my manual
+grep-based sweep of the blueprint had not caught at all. Ran the compiler after the first pass,
+fixed against its literal unbuilt-anchor list, re-ran to confirm 0 unbuilt / all gates green. **12
+new KB files total** (1 more than the ~11 estimated): the synthesis + 7 new-content docs, the 3 VN
+placeholders, plus `kb.lender.non-resident-investment-loan-shortlist` (surfaced only by the
+compiler pass, not by the original blueprint-grep reconciliation).
 
 Anchor / upstream: [`fact-model-unification.md`](fact-model-unification.md) ("Mode D adds no new
 identity-layer generalization — it reuses B's `funder{}`/`off_title_parties[]` + C's
@@ -154,27 +165,106 @@ Mirrors Mode B/C, compressed — no P0 fact-model phase (nothing to generalize; 
 ## P1 — Mode-D-exclusive KB authoring tracker
 
 Status legend (Mode-B/C convention): `[ ]` not started · `[~]` drafting · `[v]` facts verified vs
-primary · `[x]` done (bilingual, in-cluster, compiles when in-scope). **Provisional** — the blueprint's
-"~77 reused / ~10 exclusive" split needs a P1-opening reconciliation pass against the live 3-blueprint
-artifact (same caveat every prior wedge's P1-open hit).
+primary · `[x]` done (bilingual, in-cluster, compiles when in-scope).
 
-### Cluster FI — Foreign-investor-specific (non-resident AU tax + strategy) — source: ATO foreign-investor + FIRB
+**P1-open anchor-index reconciliation (2026-07-03) — done, and it moved most of the work.** Read the
+live content of every candidate overlap before authoring anything. Result: **6 of the tracker's
+original 12 items already exist under a different slug** — built generically during Mode B/C (a
+non-resident-tax / investor-tax fact that doesn't actually depend on owner-occupier vs investor
+framing), not duplicated for Mode D. **1 item is moot** for an investor (never had a PPOR to lose the
+exemption on). The blueprint body also references **2 more anchors not in the original 12** (spotted
+via grep, not just the tracker list) — one reconciles the same way, one is genuinely new. Net: the
+"~10 exclusive" estimate holds (11 new files: 1 synthesis + 7 new-content docs + 3 VN placeholders),
+but the *composition* changed — more reuse, one genuinely-new item surfaced the blueprint didn't
+originally name.
 
-- [ ] `kb.non-resident.serviceability-au-lenders`
-- [ ] `kb.non-resident.rental-income-withholding-tax`
-- [ ] `kb.non-resident.cgt-no-50-percent-discount-from-2012`
-- [ ] `kb.non-resident.cgt-no-ppor-exemption`
-- [ ] `kb.non-resident.entity-options-au-property`
-- [ ] `kb.non-resident.investment-loan-deposit-requirements`
-- [ ] `kb.foreign-investor.thesis-archetypes`
-- [ ] `kb.foreign-investor.currency-hedging-considerations`
-- [ ] `kb.foreign-investor.future-migration-pathway-considerations`
-- [ ] `kb.foreign-investor.repatriation-strategy`
-- [ ] `kb.foreign-investor.frcgw-on-sale`
-- [ ] `kb.foreign-investor.absentee-owner-management`
+**RECONCILE — blueprint anchor rename, zero new KB doc** (fix `investor-foreign-au.md`'s anchor
+references to point at the existing slug; the underlying fact is single-owned and mode-agnostic
+already):
 
-*(Reconcile against the blueprint's KB anchor index summary + the component-level anchor lists at
-P1-open — the Mode-B/C precedent found these diverge slightly on first pass.)*
+| Tracker anchor (as written) | Actual existing slug | Why it's already general, not Mode-B-specific |
+|---|---|---|
+| `kb.non-resident.serviceability-au-lenders` | `kb.lender.non-resident-friendly-shortlist` | criteria doc keyed on residency/visa, not on buyer intent (occupy vs invest) |
+| `kb.non-resident.rental-income-withholding-tax` | `kb.non-resident-tax.withholding-on-rental-income` | assessment-not-withholding treatment is residency-driven, not occupancy-driven |
+| `kb.non-resident.cgt-no-50-percent-discount-from-2012` | `kb.tax.cgt-50-percent-discount` | already explicitly scoped "Mode C/D" in its own header — authored investor-general from the start |
+| `kb.foreign-investor.frcgw-on-sale` | `kb.non-resident-tax.foreign-resident-cgt-withholding` | FRCGW mechanism (15%, no threshold) is a residency fact, not an occupancy fact |
+| `kb.tax.depreciation-non-resident` (blueprint line 525, not in original 12) | `kb.tax.depreciation-division-43-and-40` | Div 43/40 rates have no residency dependency at all — non-resident owners claim the identical schedule |
+
+**MOOT — drop, no doc, fold into the new synthesis doc's reasoning:**
+
+- `kb.non-resident.cgt-no-ppor-exemption` — Mode B's version of this doc is a genuine "the exemption
+  the buyer *would have had* is removed" synthesis (an owner-occupier who becomes a foreign resident).
+  Mode D's buyer is an **investor from day one** — the property was never a main residence, so the
+  exemption never applied in the first place ([`kb.tax.cgt-main-residence-exemption`](../kb/tax/cgt-main-residence-exemption.md)'s
+  base conditions already require "was the home... for the whole period"). Not a new regulated fact —
+  a corollary of an existing one. Recorded as a note in the new synthesis doc, not a standalone anchor.
+
+**NEW — genuinely net-new content** (7 docs, all AU-side per the scoping decision above):
+
+- [x] `kb.non-resident.tax-treatment-overview` — the Mode-D synthesis/pointer doc (mirrors Mode B's
+  per-topic synthesis pattern, consolidated to one doc since there's no exemption to invert): ties
+  together the 4 reused docs above + the PPOR-moot note + this doc's own entity-restriction content,
+  as the anchor `tax_structure_non_resident` actually reads first.
+- [x] `kb.non-resident.entity-options-au-property` — non-resident-specific entity restrictions the
+  base [`kb.tax.entity-comparison-personal-trust-company-smsf`](../kb/tax/entity-comparison-personal-trust-company-smsf.md)
+  doesn't cover: FIRB applies regardless of entity look-through, SMSF generally unavailable to a
+  non-resident (super residency test — CMC ordinarily in Australia, ≥50% AU-resident active-member
+  value), foreign/absentee trust land-tax surcharges (cross-ref `kb.tax.land-tax-by-state`, already
+  primary-verified per-state). **Resolves open-seam "SMSF exclusion confirmation" below** — verified
+  against the ATO's CMC/active-member residency tests (2026-07-03).
+- [x] `kb.non-resident.investment-loan-deposit-requirements` — synthesis of the foreign-buyer deposit
+  band ([`kb.lender.foreign-buyer-deposit-requirements`](../kb/lender/foreign-buyer-deposit-requirements.md),
+  30–40%) with the investment-purpose delta (no FHB schemes, no owner-occupier LMI leniency) the pure
+  foreign-buyer doc doesn't state.
+- [x] `kb.foreign-investor.thesis-archetypes` — a FIRB-driven viability overlay on the existing
+  archetype vocabulary ([`kb.investor.strategy-archetypes`](../kb/investor/strategy-archetypes.md)):
+  the established-dwelling ban narrows which archetypes are practically reachable for a foreign buyer
+  (new-build / off-the-plan / vacant-land-for-build stay open; established-property `value_add` does not).
+- [x] `kb.foreign-investor.currency-hedging-considerations` — VND/AUD exposure across the hold (rental
+  income conversion timing, eventual repatriation); informational, no retail hedging product assumed;
+  states the AUD-loan natural-hedge structure as the primary lever ahead of any product idea.
+- [x] `kb.foreign-investor.future-migration-pathway-considerations` — the mode-switch structural doc
+  (PR/citizenship grant moves the investor off the non-resident tax/FIRB track — echoes Mode B/C's
+  mode-switch design, mostly cross-referencing the docs that already carry the individual consequences).
+- [x] `kb.foreign-investor.repatriation-strategy` — AU-side only per the scoping decision: sending
+  rental income / sale proceeds back to Vietnam through a licensed provider (cross-ref the `fx` docs +
+  `au-aml-ctf` docs); the VN-receiving-side rule is a placeholder pointer to the existing
+  `vn-capital-controls` docs, not new VN-side content.
+- [x] `kb.foreign-investor.absentee-owner-management` — remote-management practicalities (POA, PM
+  selection from overseas), cross-referencing the existing
+  [`kb.investor.property-management-vs-self-managed`](../kb/investor/property-management-vs-self-managed.md),
+  [`kb.firb.vacancy-fee-rules-2026`](../kb/firb/vacancy-fee-rules-2026.md), and the land-tax absentee
+  surcharges already in `kb.tax.land-tax-by-state`.
+
+**NEW — surfaced only by the compiler pass, not the original blueprint-grep sweep** (component 3's
+off-the-plan anchor and component 5's mortgage-finance anchor cluster — 7 anchors the original P1-open
+reconciliation missed entirely because it worked from the tracker's 12-item list + a manual grep, not
+the compiler's literal per-blueprint unbuilt-anchor inventory):
+
+- [x] `kb.off-the-plan.foreign-investor-considerations` → **RECONCILED**, no new doc — the existing
+  [`kb.off-the-plan.risk-considerations`](../kb/off-the-plan/risk-considerations.md) already grounds
+  Mode B's `property_assessment` on off-the-plan risk for a foreign buyer restricted to new-build
+  stock, an investor-agnostic constraint identical for Mode D.
+- [x] `kb.lender.foreign-investor-deposit-requirements` → **RECONCILED** to
+  `kb.non-resident.investment-loan-deposit-requirements` (shared across components 5 and 8 — single-owner).
+- [x] `kb.lender.vn-income-treatment` → **RECONCILED** to the already-general
+  [`kb.lender.temp-resident-lending-policies`](../kb/lender/temp-resident-lending-policies.md).
+- [x] `kb.loan.interest-only-non-resident-investor` → **RECONCILED** to the already-general
+  [`kb.loan.interest-only-vs-pi-investor`](../kb/loan/interest-only-vs-pi-investor.md) for the trade-off
+  framing; the IO-availability-by-lender caveat folded into the new shortlist doc below.
+- [x] `kb.lender.investment-loan-policies-non-resident` + `kb.lender.foreign-investor-rate-premiums` +
+  `kb.lender.non-resident-investment-loan-shortlist` → **ONE new doc**,
+  [`kb.lender.non-resident-investment-loan-shortlist`](../kb/lender/non-resident-investment-loan-shortlist.md) —
+  the combination-specific facts a non-resident-**investment** lender pool needs beyond either the
+  non-resident-owner-occupier criteria or the domestic-investor criteria alone (narrower pool,
+  70–80% rental-income shading, a further ~100–200bp rate premium above the domestic-investor rate
+  **flagged as an indicative CONVENTION band, not independently primary-verified this pass**, and the
+  IO-availability-by-lender caveat).
+
+**Total: 12 new KB files** (1 more than the ~11 first estimated — the shortlist doc above was invisible
+to the manual reconciliation and only surfaced via `python3 tests/validate_build.py`'s literal
+unbuilt-anchor inventory). **Verified 2026-07-03: 0 unbuilt anchors for `investor-foreign-au`, all
+compiler gates green (`--no-emit`).**
 
 ### VN-side — labelled placeholders (structure now, datum pending; buyer-pointer copy)
 
@@ -183,11 +273,15 @@ the genuinely-VN-side datum marked pending, bilingual copy points the buyer to t
 advisor. No GDT-Vietnam or DTA primary-source verification work — that's explicitly out of scope per
 the 2026-07-03 scoping decision above.
 
-- [ ] `kb.vn-tax.brackets-2026` — ⚠ placeholder + buyer pointer ("consult your VN-based tax advisor")
-- [ ] `kb.vn-tax.income-from-foreign-property` — ⚠ placeholder + buyer pointer
-- [ ] `kb.au-vn-tax-treaty` — ⚠ placeholder, **except** any AU-side withholding-rate effect discovered
+- [x] `kb.vn-tax.brackets-2026` — ⚠ placeholder + buyer pointer ("consult your VN-based tax advisor")
+- [x] `kb.vn-tax.income-from-foreign-property` — ⚠ placeholder + buyer pointer
+- [x] `kb.au-vn-tax-treaty` — ⚠ placeholder, **except** any AU-side withholding-rate effect discovered
   while authoring Cluster FI's non-resident withholding docs — that piece is AU-side and belongs there,
-  not here (verify whether the treaty actually changes an AU figure before assuming it does)
+  not here. **Checked while authoring `kb.non-resident.tax-treatment-overview`: no AU-side treaty rate
+  modification identified this pass** — FRCGW (15%) and the rental-assessment treatment are stated as
+  ordinary domestic-law rates. Flagged as a live open item inside the treaty placeholder (not a closed
+  deferral) for a future pass to re-check specifically, distinct from the rest of the placeholder's
+  content which is deferred per the scoping decision.
 
 ## P2–P5 — engine + shell tracker
 
@@ -210,7 +304,10 @@ the 2026-07-03 scoping decision above.
 
 ## Open seams (surface-and-track, reconcile in-phase)
 
-- **Anchor index vs component-level lists diverge** — reconcile at P1-open (the blueprint's own "~77"/"~87" are provisional counts).
+- ~~**Anchor index vs component-level lists diverge**~~ — **RESOLVED at P1 (2026-07-03).** Reconciled
+  against the compiler's literal per-blueprint unbuilt-anchor inventory (`python3 tests/validate_build.py`),
+  not just the tracker's provisional "~77"/"~87" counts — see the P1 section above for the full table.
+  0 unbuilt anchors, all gates green.
 - **`firb_status` shape compatibility** — Mode D's component 3 claims direct reuse "from Mode B," but
   hasn't been diffed field-by-field against Mode B's live `firb_status` outcome; confirm at P2-open,
   don't assume identical.
@@ -223,6 +320,11 @@ the 2026-07-03 scoping decision above.
   residency status changes; design-first when it triggers, not in this wedge's scope.
 - **Multi-property portfolio-level FIRB tracking** (blueprint open-Q #1) — current design is
   per-property; portfolio-level compliance tracking is future iteration, not this wedge.
-- **SMSF exclusion confirmation** (blueprint open-Q #5) — likely unavailable to VN-resident investors
-  (AU-residency sole-purpose test); needs explicit confirm-and-exclude in `tax_structure_non_resident`'s
-  entity options, not a silent omission.
+- ~~**SMSF exclusion confirmation**~~ (blueprint open-Q #5) — **RESOLVED at P1 (2026-07-03)**, by
+  [`kb.non-resident.entity-options-au-property`](../kb/non-resident/entity-options-au-property.md).
+  Not the sole-purpose test (that applies to every SMSF) — the actual disqualifier is **fund
+  residency**: the central-management-and-control test (ordinarily in Australia; permanent offshore
+  CMC fails it) and the active-member test (≥50% AU-resident active-member value), verified against
+  the ATO. A fund controlled from Vietnam by someone who was never an AU resident cannot ordinarily
+  satisfy either — `recommended_entity`'s agent-path comparison should not present SMSF as live for a
+  genuinely Vietnam-located investor absent an existing AU-resident-controlled fund.
