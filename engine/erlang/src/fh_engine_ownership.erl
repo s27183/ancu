@@ -24,14 +24,30 @@
 %% exported for the conformance harness (same anchors as the Python spec):
 -export([maintenance_target/1, statutory_band/0, land_tax_check/1,
          graduation_target_lvr/0, land_tax_threshold/1, has_fhg/1]).
+%% exported for the Mode-B foreign-person conformance suite:
+-export([fill_foreign/2, vacancy_fee_at_risk/1]).
 
 -define(COPY, <<"kb.copy.ownership">>).   %% bilingual copy-templates (bilingual-content.md §3b)
 -define(COPY_INV, <<"kb.copy.ownership-investor">>).  %% Mode-C investor copy doc
+-define(COPY_FOREIGN, <<"kb.copy.ownership-foreign">>).  %% Mode-B foreign-person copy doc
 
 %% --- entry -------------------------------------------------------------------
 
+%% Mode DISPATCH (the FIRST real branch fill/2 has ever had — mode-b-wedge.md P2 slice 5):
+%% Mode B reuses the SAME component name `ownership_planning` (unlike Mode C's distinct
+%% `ownership_planning_investor`, dispatched separately by fh_engine_fill), discriminated
+%% by Args.firb_required_any — the SAME flag buyer_profile/1, mortgage_finance, cash_
+%% position, and the compliance FIRB gate all key on. fill_domestic/2 is the pre-existing
+%% body, renamed verbatim (byte-identical — zero regression); fill_foreign/2 is new.
 -spec fill(map(), map()) -> {map(), binary(), [map()]}.
 fill(Args, Upstream) ->
+    case maps:get(firb_required_any, Args, false) of
+        true  -> fill_foreign(Args, Upstream);
+        false -> fill_domestic(Args, Upstream)
+    end.
+
+-spec fill_domestic(map(), map()) -> {map(), binary(), [map()]}.
+fill_domestic(Args, Upstream) ->
     Onboarding = maps:get(onboarding, Args, #{}),
     Ceiling = ceiling(maps:get(<<"target_price_range">>, Onboarding, null)),
     Intent  = maps:get(intent, Args, <<"owner_occupier">>),
@@ -47,6 +63,78 @@ fill(Args, Upstream) ->
          <<"kb.graduation.lvr80">>,
          <<"kb.refinance.windows-and-triggers">>]),
     {Outcome, <<"data-table">>, KbVersions}.
+
+%% --- Mode-B foreign-person ownership_planning (ongoing_obligations, 7-field) --
+%% blueprint fhb-foreign-au.md component 11 (mode-b-wedge.md P2 slice 5) — vacancy-fee
+%% monitoring + non-resident tax awareness, replacing Mode A's land-tax/graduation/FHG
+%% framing (not applicable to a foreign person).
+%%
+%% PLACE, DON'T RECOMPUTE: vacancy_fee_at_risk_amount = the vacancy-fee MULTIPLIER
+%% (kb.firb.vacancy-fee-double-from-2024, currently 2× for any vacancy year starting
+%% on/after 9 Apr 2024 — every Mode-B purchase today) applied to firb_workflow's OWN
+%% total_firb_fee_payable (Upstream.firb_status) — the dollar base is never re-derived
+%% from price here, only the multiplier is code's job ([[place-upstream-figures-dont-recompute]]).
+%%
+%% HONEST-PARTIAL, a flagged gap not invented around: current_year_occupancy_status and
+%% non_resident_tax_filing_required both depend on the property's OCCUPANCY INTENT
+%% (kb.non-resident-tax.withholding-on-rental-income: filing is required only when the
+%% property produces income) — but buyer_profile_foreign's outcome carries no occupancy-
+%% intent field yet (the blueprint's own component-1 params has `intent.intended_use`,
+%% never wired into the profile OUTCOME schema I built in P2 slice 1). Rather than guess
+%% a default, both stay null (undetermined) until a refine turn captures occupancy intent.
+%% mode_switch_eligible starts false — no PR/citizenship-grant evidence exists at base
+%% (buyer_profile_foreign's applicant.citizenship_status/visa_class are null); it flips
+%% true only on a future refine/event turn that reveals the status change (the tracker's
+%% "mode_switch_eligible on PR grant" — that event-detection mechanism is itself a later
+%% unit, not built here; this fill only sets the honest starting value).
+-spec fill_foreign(map(), map()) -> {map(), binary(), [map()]}.
+fill_foreign(_Args, Upstream) ->
+    FirbStatus = maps:get(<<"firb_status">>, Upstream, #{}),
+    Fee = maps:get(<<"total_firb_fee_payable">>, FirbStatus, null),
+    Outcome = #{
+        <<"total_monthly_outgoings_estimate">> => null,   %% pending: mortgage P&I unknown at base
+        <<"total_annual_outgoings_estimate">>  => null,   %% pending: as above
+        <<"vacancy_fee_at_risk_amount">>       => vacancy_fee_at_risk(Fee),
+        <<"current_year_occupancy_status">>    => null,   %% pending: occupancy intent not yet captured
+        <<"non_resident_tax_filing_required">> => null,   %% pending: as above
+        <<"alert_triggers_armed">>             => foreign_alerts(Fee),
+        <<"mode_switch_eligible">>             => false   %% honest starting value; no status-change evidence yet
+    },
+    KbVersions = fh_engine_kb:kb_anchors(
+        [<<"kb.ongoing-costs.rates-water-strata">>,
+         <<"kb.maintenance.budget-by-property-type">>,
+         <<"kb.graduation.lvr80">>, <<"kb.refinance.windows-and-triggers">>,
+         <<"kb.firb.vacancy-fee-rules-2026">>,
+         <<"kb.firb.vacancy-fee-double-from-2024">>,
+         <<"kb.non-resident-tax.cgt-no-ppor-exemption">>,
+         <<"kb.non-resident-tax.withholding-on-rental-income">>,
+         <<"kb.non-resident-tax.foreign-resident-cgt-withholding">>]),
+    {Outcome, <<"data-table">>, KbVersions}.
+
+%% kb.firb.vacancy-fee-double-from-2024: multiplier applied to firb_workflow's own fee
+%% figure (kb.firb.fee-schedule-current, PLACED not recomputed). null if the fee itself
+%% is unknown (honest-partial — never a fabricated amount).
+-spec vacancy_fee_at_risk(integer() | null) -> integer() | null.
+vacancy_fee_at_risk(null) -> null;
+vacancy_fee_at_risk(Fee) when is_integer(Fee) ->
+    Multiplier = kb_param(<<"kb.firb.vacancy-fee-double-from-2024">>,
+                          <<"multiplier_on_or_after_cutover">>),
+    Fee * Multiplier.
+
+%% the vacancy-declaration reminder (armed unconditionally — every Mode-B owner is
+%% liable to the regime, kb.firb.vacancy-fee-rules-2026's lodgement trap) + the SAME
+%% periodic loan-review reminder Mode A arms (mode-neutral, kb.refinance.windows-and-
+%% triggers — reused via review_alert/0, no duplication).
+foreign_alerts(Fee) ->
+    [vacancy_alert(Fee), review_alert()].
+
+vacancy_alert(null) ->
+    #{<<"trigger">> => cf(<<"alert_vacancy_trigger">>),
+      <<"action">>  => cf(<<"alert_vacancy_action_amount_pending">>)};
+vacancy_alert(Fee) when is_integer(Fee) ->
+    #{<<"trigger">> => cf(<<"alert_vacancy_trigger">>),
+      <<"action">>  => cfp(<<"alert_vacancy_action">>,
+                           #{<<"amount">> => fh_engine_money:money(vacancy_fee_at_risk(Fee))})}.
 
 %% --- Mode-C investor ownership_planning_investor (portfolio_position) --------
 %%
@@ -186,6 +274,13 @@ ci(Id) -> fh_engine_kb:copy(?COPY_INV, Id).
 %% the investor copy doc WITH {param} substitution (the opportunity-card action carries {horizon}).
 -spec cip(binary(), #{binary() => fh_engine_i18n:param()}) -> fh_engine_i18n:localized().
 cip(Id, Params) -> fh_engine_i18n:subst(fh_engine_kb:copy(?COPY_INV, Id), Params).
+
+%% the Mode-B foreign-person copy doc — static / with {param} substitution (mirrors ci/cip).
+-spec cf(binary()) -> fh_engine_i18n:localized().
+cf(Id) -> fh_engine_kb:copy(?COPY_FOREIGN, Id).
+
+-spec cfp(binary(), #{binary() => fh_engine_i18n:param()}) -> fh_engine_i18n:localized().
+cfp(Id, Params) -> fh_engine_i18n:subst(fh_engine_kb:copy(?COPY_FOREIGN, Id), Params).
 
 %% --- the ongoing_obligations outcome (honest partial) ------------------------
 %% Filled: maintenance_reserve_target, recurring_costs_estimate.statutory_band,

@@ -25,21 +25,32 @@
 -export([fill/2]).
 %% exported for the conformance harness (same anchors as the Python spec):
 -export([duty/2, stamp_duty/3, registration_total/2]).
+%% exported for the Mode-B foreign-person conformance suite:
+-export([surcharge_pct/1, surcharge_amount/2, sum_or_null/1, channel_costs/2]).
 
 -define(COPY, <<"kb.copy.cash">>).   %% bilingual copy-templates (bilingual-content.md §3b)
+-define(SURCHARGE, <<"kb.foreign-buyer-surcharge.by-state">>).
 
 %% --- entry -------------------------------------------------------------------
 
 %% Mode discriminator (mirrors fh_engine_disposition:fill/2): only the investor blueprint runs
 %% a `tax_structure` component, so its outcome's presence upstream marks the Mode-C investor
-%% cash_position (budget_envelope_investor) vs the Mode-A FHB path (budget_envelope). Shared
-%% component NAME + `calculator` renderer; different outcome TYPE + logic. The FHB body is
-%% renamed fill_fhb/2 verbatim (byte-identical — zero regression); the investor body is new.
+%% cash_position (budget_envelope_investor). Within the non-investor path, Args.firb_required_any
+%% (the SAME flag buyer_profile/1, mortgage_finance's third branch, and the compliance FIRB
+%% gate key on) orthogonally marks Mode B's foreign-person cash_position (a THIRD, different
+%% budget_envelope shape — fill_fhb_foreign/2, below) vs Mode A's FHB path. Shared component
+%% NAME + `calculator` renderer throughout; different outcome TYPE + logic per branch. The FHB
+%% body is renamed fill_fhb/2 verbatim (byte-identical — zero regression); the investor body
+%% and the Mode-B body are new/newer.
 -spec fill(map(), map()) -> {map(), binary(), [map()]}.
 fill(Args, Upstream) ->
     case maps:get(<<"tax_optimised_structure">>, Upstream, undefined) of
-        undefined -> fill_fhb(Args, Upstream);
-        _Tax      -> fill_investor(Args, Upstream)
+        undefined ->
+            case maps:get(firb_required_any, Args, false) of
+                true  -> fill_fhb_foreign(Args, Upstream);
+                false -> fill_fhb(Args, Upstream)
+            end;
+        _Tax -> fill_investor(Args, Upstream)
     end.
 
 %% --- Mode-A FHB cash_position (budget_envelope) ------------------------------
@@ -72,6 +83,164 @@ fill_fhb(Args, Upstream) ->
          <<"kb.cash-reserve.lender-expectations">>, <<"kb.scheme.fhg">>]
         ++ concession_anchor(State, HasConc)),
     {Outcome, <<"calculator">>, KbVersions}.
+
+%% --- Mode-B foreign-person cash_position (budget_envelope, 10-field shape) --
+%% blueprint fhb-foreign-au.md component 6 (mode-b-wedge.md P2 slice 4). A THIRD,
+%% different budget_envelope shape from both Mode A's (duty subtree + cash_events) and
+%% Mode C's investor point-summary (loan_amount/lvr/lmi_payable) — ten fields:
+%% max_property_price_supported, actual_property_price, total_cash_required,
+%% regulatory_imposts_total, channel_costs_total, family_capacity_available,
+%% gap_or_surplus, verdict, mitigation_options_if_short, key_assumptions.
+%%
+%% NAMING DISCIPLINE (honest-partial): actual_property_price / max_property_price_supported
+%% stay null at base — "actual" means an ATTACHED property (none yet; mirrors Mode C's own
+%% base scaffold literally) and "supported" needs borrowing capacity (null until income
+%% arrives via mortgage_finance's foreign variant). But the NEED side (regulatory_imposts_
+%% total, channel_costs_total, total_cash_required) is honestly COMPUTABLE at base off the
+%% CONSERVATIVE upper bound of profile.target_price_range — the same ceiling-estimate
+%% convention firb_workflow / mortgage_finance already use, and exactly what the blueprint's
+%% own component scope calls for ("Base estimate against target price range").
+%%
+%% PLACE, DON'T RECOMPUTE: the FIRB fee is READ from firb_workflow's own outcome
+%% (Upstream.firb_status.total_firb_fee_payable), never re-derived here
+%% ([[place-upstream-figures-dont-recompute]]); the deposit is READ from mortgage_finance's
+%% outcome (Upstream.mortgage_plan.deposit_required) the same way.
+%%
+%% A RESOLVED SEAM (flagged, not silently built both ways): the blueprint's own params
+%% block names TWO capacity inputs (au_member_cash_aud <from_buyer_profile>,
+%% vn_family_contribution_aud_equivalent <from_family_context>) that this component's
+%% params would sum — but buyer_profile_foreign's OWN outcome schema already defines
+%% profile.deposit_ready_for_purchase_amount as "AU-side savings + expected funder
+%% contributions available" (a blueprint-authored COMBINED figure). Reading BOTH that and
+%% family_context.family_funding_plan.total_capacity_aud would double-count the same
+%% funds under two names. This fill reads profile.deposit_ready_for_purchase_amount as the
+%% sole family_capacity_available source (single-owner); family_context's outcome is not
+%% re-summed on top. Currently both are null at base regardless (no savings/funder facts
+%% captured yet), so the choice has no observable effect until a refine turn — but it
+%% decides which field a future refine-turn write lands on.
+-spec fill_fhb_foreign(map(), map()) -> {map(), binary(), [map()]}.
+fill_fhb_foreign(Args, Upstream) ->
+    Profile    = maps:get(<<"profile">>, Upstream, #{}),
+    FirbStatus = maps:get(<<"firb_status">>, Upstream, #{}),
+    Mortgage   = maps:get(<<"mortgage_plan">>, Upstream, #{}),
+    State   = fh_engine_store:projection_state(maps:get(onboarding, Args, #{})),
+    Ceiling = ceiling(maps:get(<<"target_price_range">>, Profile, null)),
+    %% no FHB concession — not available to a foreign person (blueprint:
+    %% first_home_concession_applicable_for_foreign_person = false, definitional).
+    Duty      = stamp_duty(State, false, Ceiling),
+    DutyAfter = maps:get(<<"after_concession">>, Duty, null),
+    Surcharge = surcharge_amount(State, Ceiling),
+    FirbFee   = maps:get(<<"total_firb_fee_payable">>, FirbStatus, null),
+    %% base convention: the mortgage variant's own deposit_required default (30%,
+    %% kb.lender.foreign-buyer-deposit-requirements) is well above the 80%-LVR/20%-deposit
+    %% LMI trigger, so LMI is not applicable at the base estimate (kb.lmi.calculation-for-
+    %% foreign-persons: "typically $0" for a foreign-income borrower) — a KB-grounded
+    %% convention, not a code-invented zero.
+    Lmi = 0,
+    RegulatoryImposts = sum_or_null([DutyAfter, Surcharge, FirbFee, Lmi]),
+    ChannelCosts = channel_costs(State, Ceiling),
+    Deposit = maps:get(<<"deposit_required">>, Mortgage, null),
+    TotalCashRequired = sum_or_null([Deposit, RegulatoryImposts, ChannelCosts]),
+    FamilyCapacity = maps:get(<<"deposit_ready_for_purchase_amount">>, Profile, null),
+    {GapOrSurplus, Verdict} = gap_and_verdict(FamilyCapacity, TotalCashRequired),
+    Outcome = #{
+        <<"max_property_price_supported">> => null,
+        <<"actual_property_price">>        => null,
+        <<"total_cash_required">>          => TotalCashRequired,
+        <<"regulatory_imposts_total">>     => RegulatoryImposts,
+        <<"channel_costs_total">>          => ChannelCosts,
+        <<"family_capacity_available">>    => FamilyCapacity,
+        <<"gap_or_surplus">>               => GapOrSurplus,
+        <<"verdict">>                      => Verdict,
+        <<"mitigation_options_if_short">>  => [],
+        <<"key_assumptions">>              => key_assumptions_foreign(Ceiling, State)
+    },
+    KbVersions = fh_engine_kb:kb_anchors(
+        [<<"kb.stamp-duty.calc-by-state">>, <<"kb.foreign-buyer-surcharge.by-state">>,
+         <<"kb.firb.fee-schedule-current">>, <<"kb.fx.typical-spreads-vnd-aud">>,
+         <<"kb.buyer-costs.inspections-conveyancing-fees">>,
+         <<"kb.cash-reserve.lender-expectations">>,
+         <<"kb.lmi.calculation-for-foreign-persons">>]),
+    {Outcome, <<"calculator">>, KbVersions}.
+
+%% kb.foreign-buyer-surcharge.by-state: amount = dutiable value × rate (postcondition
+%% vs the state revenue calculator, same discipline as stamp_duty/3). null for an
+%% unmodelled/unknown state or price, honest-partial.
+-spec surcharge_amount(binary() | undefined, integer() | null) -> integer() | null.
+surcharge_amount(State, V) when is_integer(V) ->
+    case surcharge_pct(State) of
+        null -> null;
+        Pct  -> dollars(V * Pct / 100)
+    end;
+surcharge_amount(_State, _V) -> null.
+
+-spec surcharge_pct(binary() | undefined) -> number() | null.
+surcharge_pct(<<"NSW">>) -> param_value(?SURCHARGE, <<"nsw_surcharge_pct">>);
+surcharge_pct(<<"VIC">>) -> param_value(?SURCHARGE, <<"vic_surcharge_pct">>);
+surcharge_pct(<<"QLD">>) -> param_value(?SURCHARGE, <<"qld_surcharge_pct">>);
+surcharge_pct(<<"WA">>)  -> param_value(?SURCHARGE, <<"wa_surcharge_pct">>);
+surcharge_pct(<<"SA">>)  -> param_value(?SURCHARGE, <<"sa_surcharge_pct">>);
+surcharge_pct(<<"TAS">>) -> param_value(?SURCHARGE, <<"tas_surcharge_pct">>);
+surcharge_pct(<<"ACT">>) -> 0;
+surcharge_pct(<<"NT">>)  -> 0;
+surcharge_pct(_)         -> null.
+
+%% registration (exact, per state) + the shared due-diligence/legal convention band
+%% (building/pest inspection, conveyancing, lender application fee — the SAME three
+%% lines the investor variant sums, convention_band_investor/0). The FX transfer cost
+%% is a real add-on but its amount is unknowable until the transfer sum is known (a
+%% cross_border_funding fact) — deliberately EXCLUDED here and disclosed via
+%% key_assumptions (assume_fx_not_included) rather than silently understated-without-
+%% comment or blocking the whole total on one unknown line.
+-spec channel_costs(binary() | undefined, integer() | null) -> integer() | null.
+channel_costs(State, V) when is_integer(V) ->
+    case registration_total(State, V) of
+        null -> null;
+        Reg  ->
+            {Lo, Hi} = convention_band_investor(),
+            Reg + round((Lo + Hi) / 2)
+    end;
+channel_costs(_State, _V) -> null.
+
+%% sum a list of contributing lines; null (never a partial sum) if ANY is unknown —
+%% the honest-partial discipline for an aggregate total (mirrors total_cash_investor/3's
+%% "null if any contributing line is pending").
+-spec sum_or_null([number() | null]) -> number() | null.
+sum_or_null(Lines) ->
+    case lists:any(fun(L) -> L =:= null end, Lines) of
+        true  -> null;
+        false -> lists:sum(Lines)
+    end.
+
+%% surplus = capacity − required (positive = surplus); null/null when either side is
+%% unknown (never a partial verdict). Bands are the same tight/short framing as Mode A's
+%% own verdict; a real threshold-tuned "tight" band is a refine-turn concern once both
+%% sides are consistently populated — base honestly resolves surplus/short only.
+gap_and_verdict(null, _Required)         -> {null, null};
+gap_and_verdict(_Capacity, null)         -> {null, null};
+gap_and_verdict(Capacity, Required) ->
+    Gap = Capacity - Required,
+    Verdict = case Gap >= 0 of
+                  true  -> <<"surplus">>;
+                  false -> <<"short">>
+              end,
+    {Gap, Verdict}.
+
+%% Mode-B key_assumptions: the shared ceiling-estimate framing (assume_ceiling, reused
+%% from Mode A — no mode-specific claim) plus the three foreign-person-specific
+%% disclosures (no first-home concession, FX not yet included, the no-LMI base
+%% convention). Bilingual via kb.copy.cash; interpolated params only.
+-spec key_assumptions_foreign(integer() | null, binary() | undefined) ->
+          [fh_engine_i18n:localized()].
+key_assumptions_foreign(null, _State) ->
+    [copy(<<"note_set_range">>, #{})];
+key_assumptions_foreign(Ceiling, _State) ->
+    DepositPct = param_value(<<"kb.lender.foreign-buyer-deposit-requirements">>,
+                             <<"non_resident_deposit_pct_typical">>),
+    [copy(<<"assume_ceiling">>, #{<<"ceiling">> => money(Ceiling)}),
+     copy(<<"assume_no_concession_foreign_person">>, #{}),
+     copy(<<"assume_fx_not_included">>, #{}),
+     copy(<<"assume_no_lmi_at_conservative_deposit">>, #{<<"pct">> => DepositPct})].
 
 %% --- Mode-C investor cash_position (budget_envelope_investor) ----------------
 %% A PURE-resolver figure-owner (agent_leaves = []; no two-path, no merge). The investor outcome

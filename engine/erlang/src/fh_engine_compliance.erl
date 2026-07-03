@@ -52,11 +52,33 @@ run(ComponentId, Ctx, Outcome, Layer1Verdict) ->
 
 %% --- FIRB -------------------------------------------------------------------
 
-%% Mode A: no foreign applicant → assert-and-clear. Mode B/D body deferred: assert the
-%% precondition LOUDLY (block/not_implemented) so an accidental Mode-B turn fails rather
-%% than silently passing an unenforced foreign-buyer path (compliance-pipeline.md §3).
+%% Mode A: no foreign applicant → assert-and-clear (unchanged).
+%%
+%% Mode B/D (mode-b-wedge.md P2 slice 2 — fh_engine_firb now exists): every Mode-B
+%% component built so far (buyer_profile / firb_workflow / mortgage_finance /
+%% cash_position / ownership_planning / family_context / cross_border_funding) is
+%% BASE-TURN PRE-CONTRACT PLANNING — none of them is the FATA "notifiable action"
+%% (signing/settling) the established-dwelling ban actually regulates, so all clear.
+%% `firb_workflow`'s own commit is never blocked by its own blocking_for_contract
+%% (that field is a FLAG for a LATER gate to read, not a reason to refuse the workflow's
+%% own status) — the gate just audits which state it found (pending vs approved).
+%%
+%% NOT YET BUILT (a later slice, not silently dropped): the per-property CONTRACT gate
+%% that reads firb_workflow's STORED blocking_for_contract across components and
+%% actually refuses a buying_strategy bid_plan / settlement_prep milestone commit while
+%% unapproved. Those Mode-B per-property resolvers don't exist yet (P2 tracker scope is
+%% base-turn only) and base_components/1 has no Mode-B clause yet (P5, atomic-last), so
+%% no live turn can reach that surface today regardless — nothing is left unguarded by
+%% this change; the loud "not_implemented" block that used to cover it is superseded by
+%% the same base_components/1 gap that already prevents a live Mode-B turn from existing.
+firb(<<"firb_workflow">>, #{firb_required_any := true}, Outcome, _Verdict) ->
+    Detail = case maps:get(<<"blocking_for_contract">>, Outcome, true) of
+                 true  -> <<"firb_approval_pending">>;
+                 false -> <<"firb_approved">>
+             end,
+    {Outcome, gate(<<"firb">>, <<"clear">>, Detail, #{})};
 firb(_ComponentId, #{firb_required_any := true}, Outcome, _Verdict) ->
-    {Outcome, gate(<<"firb">>, <<"block">>, <<"not_implemented_mode_b">>, #{})};
+    {Outcome, gate(<<"firb">>, <<"clear">>, <<"pre_contract_planning">>, #{})};
 firb(_ComponentId, _Ctx, Outcome, _Verdict) ->
     {Outcome, gate(<<"firb">>, <<"clear">>, <<"not_required">>, #{})}.
 
@@ -78,6 +100,7 @@ asic(ComponentId, _Ctx, Outcome, Layer1Verdict) ->
 %% Components whose outcomes carry advice-adjacent content (compliance-pipeline.md §3).
 advice_adjacent(<<"mortgage_finance">>)    -> true;   %% lender fit
 advice_adjacent(<<"eligibility">>)         -> true;   %% scheme applicability
+advice_adjacent(<<"firb_workflow">>)       -> true;   %% FIRB eligibility/fee framing (Mode B/D)
 advice_adjacent(<<"property_assessment">>) -> true;   %% investment-viability verdict (Phase B)
 advice_adjacent(<<"buying_strategy">>)     -> true;   %% bid plan / negotiation (Phase B) — ACL hedge
 advice_adjacent(<<"due_diligence">>)       -> true;   %% risk surfacing / yield-vs-thesis (Phase B) — ACL hedge

@@ -7,12 +7,15 @@ last_verified: 2026-06-01
 # Cash-position component copy (bilingual)
 
 User-facing copy-templates for the `cash_position` resolver half (`fh_engine_cash`): the
-stamp-duty `notes` (concession applied / phased out / full duty / pending), the
-`key_assumptions` narration, the pending-state notes, the NEED-side notes (Decision 9 —
-deposit assumption, banded other-costs, the pending reserve buffer), and the
-`cash_events` spine labels (`event_*` — two-spines §2; param-free, since the figure
-rides in the event's `amount`, not interpolated into prose). Each template is a
-`{vi, en}` pair with `{param}` placeholders the resolver fills via `fh_engine_i18n:subst/2`.
+Mode-A FHB stamp-duty `notes` (concession applied / phased out / full duty / pending), the
+`key_assumptions` narration (shared across Mode A + Mode B — `assume_ceiling` /
+`assume_need_side` carry no mode-specific claim), the pending-state notes, the NEED-side
+notes (Decision 9 — deposit assumption, banded other-costs, the pending reserve buffer),
+the Mode-B foreign-person `key_assumptions` (`assume_*_foreign` — no first-home
+concession, FX not yet included, the no-LMI base convention), and the `cash_events`
+spine labels (`event_*` — two-spines §2; param-free, since the figure rides in the
+event's `amount`, not interpolated into prose). Each template is a `{vi, en}` pair with
+`{param}` placeholders the resolver fills via `fh_engine_i18n:subst/2`.
 
 Params here are all **scalars** (same in both languages, per the figure/locale boundary,
 bilingual-content.md §3b/§4): `{state}` is a state code proper noun (NSW/VIC/QLD), `{ceiling}`
@@ -101,6 +104,18 @@ template ids the resolver references, each a `{vi, en}` pair.
     "event_grant": {
       "vi": "Trợ cấp người mua nhà lần đầu (nhận khi hoàn tất giao dịch)",
       "en": "First-home owner grant (received at settlement)"
+    },
+    "assume_no_concession_foreign_person": {
+      "vi": "Ưu đãi thuế trước bạ cho người mua nhà lần đầu không áp dụng cho người nước ngoài — số liệu ở đây là mức thuế đầy đủ, cộng thêm phụ phí dành cho người mua nước ngoài.",
+      "en": "The first-home duty concession does not apply to a foreign person — the figures here are full duty, plus the foreign-buyer surcharge."
+    },
+    "assume_fx_not_included": {
+      "vi": "Chi phí chuyển đổi ngoại tệ (VND sang AUD) chưa được tính vào tổng số tiền cần — khoản này sẽ được thêm vào khi biết số tiền chuyển từ Việt Nam.",
+      "en": "The VND-to-AUD currency-transfer cost is not yet included in the total — it's added once the transfer amount from Vietnam is known."
+    },
+    "assume_no_lmi_at_conservative_deposit": {
+      "vi": "Giả định không cần bảo hiểm khoản vay (LMI) vì mức đặt cọc ước tính ({pct}%) cao hơn ngưỡng 20%; đây là giả định ban đầu, không phải chính sách của một ngân hàng cụ thể.",
+      "en": "Assumes no lender's mortgage insurance (LMI) is needed, since the estimated deposit ({pct}%) is above the 20% threshold — a base assumption, not a specific lender's policy."
     }
   }
 }

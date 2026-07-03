@@ -36,6 +36,9 @@ has_resolver(<<"cash_position">>)      -> true;
 has_resolver(<<"ownership_planning">>) -> true;
 has_resolver(<<"ownership_planning_investor">>) -> true;
 has_resolver(<<"mortgage_finance">>)   -> true;
+has_resolver(<<"firb_workflow">>)      -> true;
+has_resolver(<<"family_context">>)     -> true;
+has_resolver(<<"cross_border_funding">>) -> true;
 has_resolver(<<"investment_strategy">>) -> true;
 has_resolver(<<"yield_modelling">>)    -> true;
 has_resolver(<<"tax_structure">>)      -> true;
@@ -64,6 +67,12 @@ resolver(<<"ownership_planning_investor">>, Args, Upstream) ->
     fh_engine_ownership:fill_investor(Args, Upstream);
 resolver(<<"mortgage_finance">>, Args, Upstream) ->
     fh_engine_mortgage:fill(Args, Upstream);
+resolver(<<"firb_workflow">>, Args, Upstream) ->
+    fh_engine_firb:fill(Args, Upstream);
+resolver(<<"family_context">>, Args, Upstream) ->
+    fh_engine_family:fill(Args, Upstream);
+resolver(<<"cross_border_funding">>, Args, Upstream) ->
+    fh_engine_cross_border:fill(Args, Upstream);
 resolver(<<"investment_strategy">>, _Args, Upstream) ->
     investment_strategy(Upstream);
 resolver(<<"yield_modelling">>, _Args, Upstream) ->
@@ -239,7 +248,22 @@ agent_values_from_outcome(<<"property_assessment">>, Stored) ->
 agent_values_from_outcome(Other, _Stored) ->
     erlang:error({no_agent_reattach_for, Other}).
 
-%% --- buyer_profile (real) ---------------------------------------------------
+%% --- buyer_profile (dispatcher) ----------------------------------------------
+%% Mode B (foreign-person) reuses the SAME component name as Mode A (unlike Mode C's
+%% distinct `investor_profile`), and buyer_profile is the pipeline entry — no upstream
+%% outcome exists yet to sniff a shape from (the mechanism mortgage_finance/cash_position
+%% use to tell Mode A from Mode C). Discriminator: Args.firb_required_any — the SAME flag
+%% the compliance FIRB gate already keys on (fh_engine_compliance:firb/4, gated on
+%% Ctx.firb_required_any) and the one Mode-B/D onboarding sets today via
+%% fh_engine_h_messages:firb_required_any/1. Reusing it gives resolver dispatch and the
+%% compliance gate one definition of "a foreign-person turn" (mode-b-wedge.md P2).
+buyer_profile(Args) ->
+    case maps:get(firb_required_any, Args, false) of
+        true  -> buyer_profile_foreign(Args);
+        false -> buyer_profile_domestic(Args)
+    end.
+
+%% --- buyer_profile (Mode A, real) --------------------------------------------
 %% The pipeline entry: project the onboarding fact base into the `profile` outcome.
 %% At the onboarding turn the deep applicant facts (citizenship, age, income,
 %% ownership history) are not yet gathered — those arrive via chat/uploads on a
@@ -247,7 +271,7 @@ agent_values_from_outcome(Other, _Stored) ->
 %% So the base projection carries the onboarding subset + a minimal lead applicant;
 %% FIRB derives conservatively (Mode A enters via a non-foreign lead → false).
 
-buyer_profile(Args) ->
+buyer_profile_domestic(Args) ->
     Onboarding = maps:get(onboarding, Args, #{}),
     %% IC3: the enriched household financial facts, loaded from the profiles SOT
     %% (facts_jsonb.household_financials — the canonical fact-model key, fact-model-
@@ -337,6 +361,85 @@ buyer_profile(Args) ->
     KbVersions = fh_engine_kb:kb_anchors(
         [<<"kb.hecs.thresholds">>, <<"kb.firb.status-determination">>,
          <<"kb.lender.serviceability-basics">>]),
+    {Outcome, <<"summary-card">>, KbVersions}.
+
+%% --- buyer_profile (Mode B, foreign-person variant, real) --------------------
+%% The Mode-B pipeline entry (blueprint fhb-foreign-au.md component 1). EVERY Mode-B
+%% applicant is a foreign person under FIRB BY DEFINITION — this is a mode-selection
+%% constant, not a resolver derivation over a possibility set the way Mode A/C project
+%% citizenship (there is no "might be foreign" branch inside Mode B; entering this
+%% branch at all already means Args.firb_required_any = true). So firb_status =
+%% foreign_person / firb_required = true / firb_required_any = true are asserted
+%% directly (blueprint outcome note: "Published from a foreign mode (true
+%% definitionally) = the F14 close"), and fh_engine_resolver:eval_applicants is not
+%% invoked here (nothing to resolve — the fact is given, not derived).
+%% The deep applicant facts (exact citizenship_status enum, visa_class, tax residency,
+%% income) are genuinely UNKNOWN at onboarding — arrive via chat on a refine turn
+%% (same honest-partial discipline as Mode A/C, applied to a foreign-person applicant
+%% instead of a possibility-set one). Canonical `profile` outcome shape (identity-layer
+%% conformance note, fhb-foreign-au.md component 1) — NOT a private profile_foreign
+%% type, same as Mode A/C; target_price_range/target_zone/hold_horizon_years carried
+%% through even though the blueprint's own outcome-fields listing omits them (every
+%% other mode's profile carries them and downstream Mode-B components need them —
+%% flagged as a blueprint-doc gap, not fixed here; see mode-b-wedge.md P2 notes).
+buyer_profile_foreign(Args) ->
+    Onboarding = maps:get(onboarding, Args, #{}),
+    Financials = maps:get(household_financials, Args, #{}),
+    TargetRange = maps:get(<<"target_price_range">>, Onboarding, null),
+    TargetZone = maps:get(<<"target_zone">>, Onboarding, []),
+    %% Mode-B definitional applicant: a foreign person under FIRB. The eligibility- and
+    %% tax-bearing specifics (exact citizenship_status, visa_class, tax.residency_for_tax,
+    %% taxable_income_aud, employment_status) are unfilled at onboarding — honest-partial
+    %% null, captured on a refine turn. jurisdiction is fixed AU (Mode B reasons on the
+    %% AU-side tax position only; VN-side parent tax is a labelled placeholder).
+    Applicant = #{
+        <<"role">> => <<"primary">>,
+        <<"citizenship_status">> => null,
+        <<"firb_status">> => <<"foreign_person">>,
+        <<"firb_required">> => true,
+        <<"visa_class">> => null,
+        <<"visa_grant_date">> => null,
+        <<"residency_duration_months">> => null,
+        <<"taxable_income_aud">> => null,
+        <<"tax">> => #{
+            <<"residency_for_tax">> => null,
+            <<"marginal_rate">> => null,
+            <<"jurisdiction">> => <<"AU">>
+        },
+        <<"employment_status">> => null
+    },
+    Outcome = #{
+        <<"applicants">> => [Applicant],
+        <<"applicant_count">> => 1,
+        %% definitional for Mode B (the household aggregate, the F14 close) — no
+        %% resolver derivation needed, unlike Mode A/C's possibility-set projection.
+        <<"firb_required_any">> => true,
+        %% the VN funding parent (funder role, off_title_parties[].funder) is captured
+        %% on a refine turn, not at onboarding — [] mirrors Mode A/C's honest-partial
+        %% base default (single-lead onboarding).
+        <<"off_title_parties">> => [],
+        <<"assessable_income">> => assessable_income(Financials),
+        %% non-resident-lender-flavoured borrowing capacity is computed downstream by
+        %% mortgage_finance's foreign variant (blueprint note) — PENDING here.
+        <<"approx_borrowing_capacity">> => null,
+        %% AU-side savings + funder contributions are both unset at base (no savings
+        %% captured, off_title_parties empty) — PENDING, refines once either arrives.
+        <<"deposit_ready_for_purchase_amount">> => null,
+        <<"debts">> => debts(Financials),
+        <<"target_price_range">> => TargetRange,
+        <<"target_zone">> => TargetZone,
+        <<"hold_horizon_years">> => maps:get(<<"hold_horizon_years">>, Onboarding, null),
+        %% bilingual {vi,en} via kb.copy.profile. financials-pending is mode-neutral
+        %% (reused from A/C); the Mode-B strength states the definitional position
+        %% (a structured, FIRB-aware plan from day one) — decision-support tone, not
+        %% "you should", same discipline as strength_domestic_investor.
+        <<"key_constraints">> => [copy(<<"constraint_financials_pending">>, #{})],
+        <<"key_strengths">>   => [copy(<<"strength_cross_border_family_plan">>, #{})]
+    },
+    KbVersions = fh_engine_kb:kb_anchors(
+        [<<"kb.firb.status-determination">>, <<"kb.firb.established-dwelling-ban">>,
+         <<"kb.visas.au-temporary-residency-classes">>,
+         <<"kb.au-temp-residents.banking-and-tax-basics">>]),
     {Outcome, <<"summary-card">>, KbVersions}.
 
 %% --- investor_profile (Mode C, real) ----------------------------------------

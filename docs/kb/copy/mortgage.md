@@ -7,10 +7,13 @@ last_verified: 2026-06-01
 # Mortgage component copy (bilingual)
 
 User-facing copy-templates for the `mortgage_finance` resolver half (`fh_engine_mortgage`):
-the `key_assumptions` and `pre_approval_action_plan` narration. Each template is a
-`{vi, en}` pair with `{param}` placeholders the resolver fills via
+the `key_assumptions` and `pre_approval_action_plan` narration for both the Mode-A FHB
+path (`fill_fhb/2`) and the Mode-B foreign-person path (`fill_fhb_foreign/2`). Each
+template is a `{vi, en}` pair with `{param}` placeholders the resolver fills via
 `fh_engine_i18n:subst/2`; the numeric params (the APRA buffer, the genuine-savings
-convention) come from [`kb.lender.serviceability-basics`](../lender/serviceability-basics.md)
+convention, the foreign-deposit convention) come from
+[`kb.lender.serviceability-basics`](../lender/serviceability-basics.md) /
+[`kb.lender.foreign-buyer-deposit-requirements`](../lender/foreign-buyer-deposit-requirements.md)
 — facts stay in the fact doc, presentation copy lives here (bilingual-content.md §3b).
 
 This is a **copy doc**: it fills no slot and is not a blueprint anchor (reference-exempt;
@@ -59,6 +62,26 @@ kind (bilingual-content.md §3b).
     "assume_fhg": {
       "vi": "Chương trình First Home Guarantee cho phép bạn vay với khoản đặt cọc 5% và không phải mua bảo hiểm LMI; không có khoản lãi suất cộng thêm khi sử dụng chương trình này.",
       "en": "The First Home Guarantee lets you borrow with a 5% deposit and no LMI; there is no rate premium for using the guarantee."
+    },
+    "action_gather_visa_and_documents": {
+      "vi": "Chuẩn bị hồ sơ thị thực, hộ chiếu và giấy tờ tùy thân (cho cả người mua tại Úc và người tài trợ ở Việt Nam nếu có) — hồ sơ dành cho người không thường trú thường cần nhiều giấy tờ hơn.",
+      "en": "Gather visa grant evidence, passport, and identity documents (for the AU-side buyer and the Vietnam-side funder if applicable) — the non-resident document pack typically asks for more than a domestic application."
+    },
+    "action_start_firb_in_parallel": {
+      "vi": "Bắt đầu nộp đơn FIRB song song với việc xin phê duyệt vay trước — hai quy trình chạy đồng thời, không cần chờ cái này xong mới làm cái kia.",
+      "en": "Start the FIRB application alongside loan pre-approval — the two run in parallel, not one after the other."
+    },
+    "action_source_of_funds_evidence": {
+      "vi": "Nếu một phần tiền đến từ Việt Nam, chuẩn bị sớm bằng chứng nguồn tiền (có thể cần bản dịch công chứng) — đây là yêu cầu của cả ngân hàng và quy định phòng chống rửa tiền.",
+      "en": "If any of the funds come from Vietnam, prepare source-of-funds evidence early (a certified translation may be needed) — both a lender requirement and an AML/CTF obligation."
+    },
+    "action_compare_non_resident_lenders": {
+      "vi": "So sánh nhóm nhỏ các ngân hàng chấp nhận cho người không thường trú vay (thường khoảng 5–10 ngân hàng), tốt nhất là qua một chuyên viên vay vốn có kinh nghiệm với hồ sơ nước ngoài.",
+      "en": "Compare the small pool of non-resident-friendly lenders (typically 5–10), ideally through a broker experienced with foreign-person applications."
+    },
+    "action_understand_deposit_convention": {
+      "vi": "Hiểu rằng khoản đặt cọc {pct}% là thông lệ phổ biến dành cho người mua nước ngoài (không phải chính sách của một ngân hàng cụ thể) — con số này có thể giảm khi biết rõ thị thực và thu nhập của bạn.",
+      "en": "Understand that the {pct}% deposit is the typical non-resident convention (not a specific lender's policy) — it may reduce once your visa and income situation is known."
     }
   }
 }
