@@ -214,10 +214,12 @@ Three divergences were found and dispositioned:
 
 ### VN-side — labelled placeholders (structure now, datum pending; buyer-pointer copy)
 
-- [ ] `kb.vn-capital-controls.sbv-thresholds-2026` — ⚠ placeholder + buyer pointer (SBV / VN bank)
-- [ ] `kb.vn-capital-controls.declared-purpose-categories` — ⚠ placeholder + buyer pointer
-- [ ] `kb.vn-pdp.cross-border-data-transfer` — ⚠ placeholder + named re-ground obligation
-- [ ] *(VN-side parent tax — new placeholder anchor; blueprint open-Q #2)*
+- [x] `kb.vn-capital-controls.sbv-thresholds-2026` *(VN, 2026-07-03 — ⚠ LABELLED PLACEHOLDER, pure-ref; consumer cross_border_funding (7) `vn_capital_control_compliance.amount_exceeds_sbv_threshold`/`.sbv_approval_required`; asserts the STABLE PRINCIPLE now (capital-account not current-account transaction; licensed-channel-only, never informal) while the quantitative threshold is PENDING, `is_placeholder: true`; honest-partial default = surface the open question to the buyer, never silently `false`; named re-ground obligation = SBV circular / a licensed VN bank / VN legal counsel (strategy §9 blocker))*
+- [x] `kb.vn-capital-controls.declared-purpose-categories` *(VN, 2026-07-03 — ⚠ LABELLED PLACEHOLDER, pure-ref; consumer cross_border_funding (7) `.declared_purpose_category`/`.purpose_documentation_required`; asserts the category-SELECTION principle (property funding declares as investment/FDI-analogue by purpose-of-funds, not as family_remittance by relationship — a funder-side compliance risk if mis-declared) while the exact per-category document list is PENDING; same re-ground obligation as the threshold doc)*
+- [x] `kb.vn-pdp.cross-border-data-transfer` *(VN, 2026-07-03 — ⚠ LABELLED PLACEHOLDER, pure-ref, figure-free/boundary doc; the one VN placeholder that is also a PLATFORM-architecture deferral not just a buyer-info gap — restates CLAUDE.md's own standing constraint (Decree 13 applies to VN-located participants' data; cross-border transfer needs an Impact Assessment + govt notification; VN-side data residency is an explicit Wedge-2 item) rather than inventing a data-handling answer now; buyer disclosure states practices are under active compliance review, asserts no residency guarantee not yet built; named re-ground obligation = the Wedge-2 data-residency review + VN legal counsel)*
+- [ ] *(VN-side parent tax — new placeholder anchor; blueprint open-Q #2 — NOT YET AUTHORED: needs a component/sub-component attachment decision first (the blueprint's own open-Q suggests a new `vn_side_tax_implications` component/sub-component), Son's call, not yet greenlit)*
+
+**P1 CLOSED (2026-07-03).** All Mode-B AU-side + labelled-placeholder VN-side anchors authored — Clusters R (17) + L (8) + X (10) + M (3) + VN placeholders (3) = 41 docs. Compiler inventory: `fhb-foreign-au` no longer appears in the unbuilt-anchor list (0 remaining). Four-mode guard held (Mode A/C in-scope unchanged; Mode D `investor-foreign-au` unchanged at 25 unbuilt). Copy templates flat at 314 (placeholder + behavioural docs carry no copy, by design). Next: **P2 — engine resolvers.**
 
 ## P2–P5 — engine + shell tracker
 
