@@ -32,22 +32,26 @@ export const BUDGET_BANDS: readonly BudgetBand[] = [
 
 /** Build the engine onboarding payload (the body of POST /api/plan-cards). Shapes
  *  exactly the fields the base turn reads: state, target_price_range [lo,hi],
- *  target_zone, target_sal, intent (fh_engine_h_plan_cards + the base-turn fills).
- *  target_sal is the stable opaque state key (the suburb is always map-selected, so
- *  the SAL is in hand); it decouples state resolution from the name string, which is
- *  also the title + match key. target_zone/state stay for display + as fallbacks. */
+ *  target_zone, target_sal, intent, foreign_person (fh_engine_h_plan_cards + the
+ *  base-turn fills). target_sal is the stable opaque state key (the suburb is always
+ *  map-selected, so the SAL is in hand); it decouples state resolution from the name
+ *  string, which is also the title + match key. target_zone/state stay for display +
+ *  as fallbacks. foreign_person defaults false (domestic, unchanged) — mode-b-wedge.md
+ *  P5's foreign-person gate is the only caller that passes true. */
 export function buildOnboardingInput(
     stateCode: string,
     suburbName: string,
     suburbSal: string,
     band: BudgetBand,
-    intent: Intent
+    intent: Intent,
+    foreignPerson = false
 ): OnboardingInput {
     return {
         state: stateCode,
         target_price_range: [band.lo, band.hi],
         target_zone: [suburbName],
         target_sal: suburbSal,
-        intent
+        intent,
+        foreign_person: foreignPerson
     };
 }

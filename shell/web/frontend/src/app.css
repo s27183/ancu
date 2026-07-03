@@ -1012,6 +1012,12 @@ main {
     font-size: 0.85rem;
     color: #b5341f;
 }
+.ob-note-foreign {
+    text-align: left;
+    border-left: 3px solid var(--accent);
+    background: var(--accent-soft);
+    color: var(--ink);
+}
 .ob-foot {
     padding: 0.75rem 1rem 1rem;
     border-top: 1px solid var(--border);

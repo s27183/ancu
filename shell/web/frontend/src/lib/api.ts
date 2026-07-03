@@ -92,6 +92,12 @@ export interface OnboardingInput {
      *  title + the frontend's card match key). target_zone/state stay as fallbacks. */
     target_sal: string;
     intent: 'owner_occupier' | 'investment';
+    /** The FIRB axis (mode-b-wedge.md P5) — ORTHOGONAL to intent, never folded into it
+     *  (engine-contract §9.1's two independent onboarding axes). true routes to the
+     *  fhb-foreign-au blueprint (Mode B, owner_occupier only today — the engine's
+     *  fh_engine_h_plan_cards:blueprint_for/2 fails closed on investment+true, Mode D
+     *  not yet in scope). Omitted/false → domestic (unchanged default). */
+    foreign_person?: boolean;
 }
 
 /** The engine's 202 reply: the new plan card + the base turn now running async. */

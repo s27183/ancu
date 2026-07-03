@@ -76,6 +76,31 @@
          <<"yield_modelling">>, <<"tax_structure">>, <<"cash_position">>,
          <<"disposition">>, <<"ownership_planning_investor">>]).
 
+%% Mode-B (fhb-foreign-au) base turn — 7 of the blueprint's 11 components; EXCLUDES the
+%% same 4 per-property components Mode A/C already exclude (property_assessment,
+%% buying_strategy, due_diligence, settlement_prep — per the blueprint's own §-table
+%% Scope column, mode-b-wedge.md P5). Order is topological AND satisfies the actual
+%% resolver code reads (not just the blueprint's declared Inputs prose, which diverges
+%% from code in two places — grounded directly against each fh_engine_*.erl module):
+%%   - firb_workflow reads profile (buyer_profile) — no live property yet, so its
+%%     property_fit read is honestly undefined at base;
+%%   - mortgage_finance reads only profile (its blueprint-declared firb_status read is
+%%     unused by fill_fhb_foreign/2 — doc/code divergence, harmless to order);
+%%   - cash_position reads BOTH firb_status (firb_workflow) AND mortgage_plan
+%%     (mortgage_finance) — a real code dependency on both preceding components;
+%%   - cross_border_funding reads only family_funding_plan (family_context) — its
+%%     blueprint-declared budget_envelope read is likewise unused by fill/2;
+%%   - ownership_planning (foreign branch) reads firb_status (firb_workflow), not
+%%     property_fit/profile as the blueprint prose implies.
+%% Unlike Mode C's three shared-name branches (which sniff an upstream outcome_type),
+%% Mode B's shared-name branches (mortgage_finance/cash_position/ownership_planning) key
+%% on Args.firb_required_any — a turn-level flag, not upstream presence — so order here
+%% is genuine DATA-dependency, not discriminator-selection.
+-define(BASE_COMPONENTS_FOREIGN,
+        [<<"buyer_profile">>, <<"family_context">>, <<"firb_workflow">>,
+         <<"mortgage_finance">>, <<"cash_position">>, <<"cross_border_funding">>,
+         <<"ownership_planning">>]).
+
 -spec start_link(map()) -> gen_statem:start_ret().
 start_link(Args) ->
     gen_statem:start_link(?MODULE, Args, []).
@@ -518,12 +543,15 @@ fail(#{tenant_id := T, plan_card_id := PC, turn_id := Tn}, Code, Msg) ->
 %% drift on which components run or in what order (engine-contract §10.1).
 %% BlueprintSlug selects BOTH the blueprint's component definitions AND the per-blueprint
 %% base SET+ORDER (P5-activate, mode-c-wedge.md): fhb-domestic-au → the Mode-A sequence;
-%% investor-domestic-au → the Mode-C investor spine (the discriminator-ordered set above).
-%% The base set+order is an engine-owned concern (these macros, not the artifact) — the
-%% blueprint declares dag_reads, not the base/per-property split. An unknown slug falls
-%% through to the FHB sequence (the only blueprint that created base turns pre-P5).
+%% investor-domestic-au → the Mode-C investor spine (the discriminator-ordered set above);
+%% fhb-foreign-au → the Mode-B foreign spine (mode-b-wedge.md P5). The base set+order is
+%% an engine-owned concern (these macros, not the artifact) — the blueprint declares
+%% dag_reads, not the base/per-property split. An unknown slug falls through to the FHB
+%% sequence (the only blueprint that created base turns pre-P5).
 base_components(<<"investor-domestic-au">> = Slug) ->
     order(Slug, ?BASE_COMPONENTS_INVESTOR);
+base_components(<<"fhb-foreign-au">> = Slug) ->
+    order(Slug, ?BASE_COMPONENTS_FOREIGN);
 base_components(Slug) ->
     order(Slug, ?BASE_COMPONENTS).
 
@@ -620,6 +648,7 @@ component_scope(<<"purchase_journey">>) -> <<"base">>;
 component_scope(<<"preparation">>)      -> <<"base">>;
 component_scope(<<"phase_playbook">>)   -> <<"base">>;
 component_scope(<<"disposition">>)      -> <<"base">>;
+component_scope(<<"family_context">>)   -> <<"base">>;   %% Mode-B (fhb-foreign-au §-table)
 component_scope(<<"property_assessment">>) -> <<"per-property">>;
 component_scope(_) -> <<"both">>.
 

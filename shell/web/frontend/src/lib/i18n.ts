@@ -86,8 +86,16 @@ const messages = {
         en: 'Is this your first home?'
     },
     'onboarding.outofscope.foreign': {
-        vi: 'Hiện FirstHomey hỗ trợ công dân và thường trú nhân Úc. Trường hợp người mua ở nước ngoài sẽ sớm có.',
-        en: 'Right now FirstHomey supports Australian citizens and permanent residents. Foreign-buyer paths are coming soon.'
+        vi: 'FirstHomey hiện hỗ trợ người mua nước ngoài mua căn nhà ĐẦU TIÊN để ở. Kế hoạch cho nhà đầu tư nước ngoài hoặc người đã từng sở hữu nhà sẽ sớm có.',
+        en: 'FirstHomey currently supports foreign-person FIRST-HOME buyers only. Plans for foreign investors or next-home buyers are coming soon.'
+    },
+    'onboarding.gate.firsthome.foreign': {
+        vi: 'Người mua ở Việt Nam hoặc giữ visa tạm trú thường mua nhà đầu tiên tại Úc — hỏi để xác nhận.',
+        en: 'Vietnam-based or temporary-visa buyers are usually buying their first Australian home — asking to confirm.'
+    },
+    'onboarding.foreign.note': {
+        vi: 'Vì bạn không phải công dân/thường trú nhân Úc, kế hoạch của bạn sẽ theo lộ trình FIRB — bao gồm phí FIRB, thời hạn phê duyệt và chuyển tiền xuyên biên giới. Chi tiết về visa sẽ được hỏi sau qua trò chuyện.',
+        en: "Because you're not an Australian citizen or PR, your plan follows the FIRB path — including the FIRB fee, approval timeline, and cross-border funding. We'll ask about your visa details later in chat."
     },
     'onboarding.yes': { vi: 'Có', en: 'Yes' },
     'onboarding.no': { vi: 'Không', en: 'No' },
@@ -155,6 +163,10 @@ const messages = {
     'plan.c.investment_strategy': { vi: 'Chiến lược đầu tư', en: 'Investment strategy' },
     'plan.c.yield_modelling': { vi: 'Lợi suất cho thuê', en: 'Rental yield' },
     'plan.c.tax_structure': { vi: 'Cấu trúc thuế', en: 'Tax structure' },
+    // Mode-B (foreign buyer) component titles.
+    'plan.c.family_context': { vi: 'Kế hoạch tài chính gia đình', en: 'Family funding plan' },
+    'plan.c.firb_workflow': { vi: 'Phê duyệt FIRB', en: 'FIRB approval' },
+    'plan.c.cross_border_funding': { vi: 'Chuyển tiền xuyên biên giới', en: 'Cross-border funding' },
 
     // Plan sub-tab labels (short) — the plan sections + Q&A as tabs inside the Plan view.
     'plan.tab.buyer_profile': { vi: 'Hồ sơ', en: 'Profile' },
@@ -662,6 +674,102 @@ const messages = {
         vi: 'Chưa có cơ hội nào được mô hình hoá.',
         en: 'No opportunities modelled yet.'
     },
+
+    // --- Mode-B (foreign buyer) renderers -------------------------------------
+    // family_context (family_funding_plan) → family-view-card. None of these array
+    // codes are engine bilingual prose (fh_engine_family.erl grounded directly) —
+    // closed-set $t + raw-fallback humanize, mirroring thesisLabel/styleLabel.
+    'plan.f.family_capacity': { vi: 'Khả năng tài chính gia đình', en: 'Family capacity' },
+    'plan.f.contributions': { vi: 'Các khoản đóng góp', en: 'Contributions' },
+    'plan.f.decision_authority': { vi: 'Người quyết định', en: 'Decision authority' },
+    'plan.f.bilingual_coordination': { vi: 'Cần phối hợp song ngữ', en: 'Bilingual coordination' },
+    'plan.f.complexity': { vi: 'Độ phức tạp tài trợ', en: 'Funding complexity' },
+    'plan.f.doc_gaps': { vi: 'Giấy tờ còn thiếu', en: 'Documentation gaps' },
+    'plan.family.relationship.spouse': { vi: 'Vợ/chồng', en: 'Spouse' },
+    'plan.family.relationship.de_facto': { vi: 'Bạn đời (de facto)', en: 'De facto partner' },
+    'plan.family.relationship.parent': { vi: 'Cha/mẹ', en: 'Parent' },
+    'plan.family.relationship.sibling': { vi: 'Anh/chị/em', en: 'Sibling' },
+    'plan.family.relationship.other_family': { vi: 'Người thân khác', en: 'Other family' },
+    'plan.family.relationship.self_funding': { vi: 'Tự tài trợ', en: 'Self-funding' },
+    'plan.family.relationship.none': { vi: 'Không có', en: 'None' },
+    'plan.family.authority.au_member': { vi: 'Thành viên tại Úc', en: 'AU member' },
+    'plan.family.authority.vn_parent': { vi: 'Cha/mẹ tại Việt Nam', en: 'VN parent' },
+    'plan.family.authority.joint': { vi: 'Cùng quyết định', en: 'Joint' },
+    'plan.family.authority.family_council': { vi: 'Hội đồng gia đình', en: 'Family council' },
+    'plan.family.bilingual_yes': { vi: 'Cần', en: 'Required' },
+    'plan.family.bilingual_no': { vi: 'Chưa cần', en: 'Not yet needed' },
+    'plan.family.gap.funding_source_and_documentation_pending': {
+        vi: 'Nguồn tiền & giấy tờ liên quan chưa được xác định',
+        en: 'Funding source & documentation pending'
+    },
+    'plan.family.none': {
+        vi: 'Chưa có thông tin đóng góp gia đình.',
+        en: 'No family contribution captured yet.'
+    },
+
+    // firb_workflow (firb_status) → firb-workflow-card. The approval state machine.
+    'plan.f.stage': { vi: 'Giai đoạn hồ sơ', en: 'Application stage' },
+    'plan.f.eligible': { vi: 'Đủ điều kiện FIRB', en: 'FIRB eligible' },
+    'plan.f.firb_fee': { vi: 'Phí FIRB phải nộp', en: 'FIRB fee payable' },
+    'plan.f.fee_tier': { vi: 'Bậc phí', en: 'Fee tier' },
+    'plan.f.approval_received': { vi: 'Đã có phê duyệt', en: 'Approval received' },
+    'plan.f.days_to_decision': { vi: 'Số ngày dự kiến có quyết định', en: 'Days to expected decision' },
+    'plan.f.approval_conditions': { vi: 'Điều kiện phê duyệt', en: 'Approval conditions' },
+    'plan.f.documents_outstanding': { vi: 'Giấy tờ còn thiếu', en: 'Documents outstanding' },
+    'plan.firb.yes': { vi: 'Có', en: 'Yes' },
+    'plan.firb.no': { vi: 'Chưa', en: 'Not yet' },
+    'plan.firb.stage.not_started': { vi: 'Chưa bắt đầu', en: 'Not started' },
+    'plan.firb.stage.in_preparation': { vi: 'Đang chuẩn bị', en: 'In preparation' },
+    'plan.firb.stage.submitted': { vi: 'Đã nộp', en: 'Submitted' },
+    'plan.firb.stage.under_review': { vi: 'Đang xét duyệt', en: 'Under review' },
+    'plan.firb.stage.approved': { vi: 'Đã phê duyệt', en: 'Approved' },
+    'plan.firb.stage.approved_with_conditions': { vi: 'Phê duyệt kèm điều kiện', en: 'Approved with conditions' },
+    'plan.firb.stage.rejected': { vi: 'Bị từ chối', en: 'Rejected' },
+    'plan.firb.stage.withdrawn': { vi: 'Đã rút hồ sơ', en: 'Withdrawn' },
+    'plan.firb.tier.under_1m': { vi: 'Dưới 1 triệu AUD', en: 'Under $1m' },
+    'plan.firb.tier.1m_to_2m': { vi: '1–2 triệu AUD', en: '$1m – $2m' },
+    'plan.firb.tier.2m_to_3m': { vi: '2–3 triệu AUD', en: '$2m – $3m' },
+    'plan.firb.tier.3m_to_5m': { vi: '3–5 triệu AUD', en: '$3m – $5m' },
+    'plan.firb.tier.over_5m': { vi: 'Trên 5 triệu AUD', en: 'Over $5m' },
+    'plan.firb.blocking': {
+        vi: 'Chưa thể ký hợp đồng cho đến khi FIRB phê duyệt.',
+        en: 'Cannot sign a contract until FIRB approval is confirmed.'
+    },
+    'plan.firb.doc.passport_au_member': { vi: 'Hộ chiếu thành viên tại Úc', en: 'AU member passport' },
+    'plan.firb.doc.passport_vn_funder_if_applicable': { vi: 'Hộ chiếu người tài trợ VN (nếu có)', en: 'VN funder passport (if applicable)' },
+    'plan.firb.doc.visa_grant_evidence': { vi: 'Bằng chứng cấp visa', en: 'Visa grant evidence' },
+    'plan.firb.doc.property_details_contract_or_listing': { vi: 'Thông tin bất động sản (hợp đồng/tin đăng)', en: 'Property details (contract or listing)' },
+    'plan.firb.doc.source_of_funds_evidence': { vi: 'Bằng chứng nguồn tiền', en: 'Source-of-funds evidence' },
+    'plan.firb.doc.vendor_or_developer_details': { vi: 'Thông tin bên bán/chủ đầu tư', en: 'Vendor or developer details' },
+
+    // cross_border_funding (transfer_plan) → firb-workflow-card (transfer state) + checklist
+    // (compliance-step + critical-path sub-lists — Checklist.svelte's third shape).
+    'plan.f.provider': { vi: 'Đơn vị chuyển tiền', en: 'Transfer provider' },
+    'plan.f.transfer_amount': { vi: 'Tổng số tiền chuyển', en: 'Total transfer amount' },
+    'plan.f.fx_cost': { vi: 'Chi phí quy đổi ước tính', en: 'Estimated FX cost' },
+    'plan.f.transfer_initiated': { vi: 'Ngày dự kiến bắt đầu chuyển', en: 'Transfer initiated by' },
+    'plan.f.transfer_received': { vi: 'Ngày dự kiến nhận tiền', en: 'Transfer received by' },
+    'plan.transfer.provider.wise': { vi: 'Wise', en: 'Wise' },
+    'plan.transfer.provider.ofx': { vi: 'OFX', en: 'OFX' },
+    'plan.transfer.provider.bank_wire_anz': { vi: 'Chuyển khoản ngân hàng ANZ', en: 'Bank wire (ANZ)' },
+    'plan.transfer.provider.bank_wire_cba': { vi: 'Chuyển khoản ngân hàng CBA', en: 'Bank wire (CBA)' },
+    'plan.transfer.provider.bank_wire_nab': { vi: 'Chuyển khoản ngân hàng NAB', en: 'Bank wire (NAB)' },
+    'plan.transfer.provider.bank_wire_westpac': { vi: 'Chuyển khoản ngân hàng Westpac', en: 'Bank wire (Westpac)' },
+    'plan.transfer.provider.other': { vi: 'Khác', en: 'Other' },
+    'plan.transfer.vn_steps': { vi: 'Bước thực hiện tại Việt Nam', en: 'VN-side steps' },
+    'plan.transfer.au_steps': { vi: 'Bước thực hiện tại Úc', en: 'AU-side steps' },
+    'plan.transfer.critical_path': { vi: 'Chuỗi phụ thuộc quan trọng', en: 'Critical path' },
+    'plan.transfer.step.engage_licensed_vn_bank_or_provider': { vi: 'Liên hệ ngân hàng/đơn vị chuyển tiền được cấp phép tại VN', en: 'Engage a licensed VN bank or provider' },
+    'plan.transfer.step.declare_transfer_purpose_as_property_investment': { vi: 'Khai báo mục đích chuyển tiền là đầu tư bất động sản', en: 'Declare transfer purpose as property investment' },
+    'plan.transfer.step.confirm_current_sbv_threshold_and_documentation_with_bank': { vi: 'Xác nhận ngưỡng SBV hiện hành & giấy tờ cần thiết với ngân hàng', en: 'Confirm current SBV threshold & documentation with bank' },
+    'plan.transfer.step.pre_engage_au_bank_before_transfer': { vi: 'Liên hệ trước với ngân hàng tại Úc trước khi chuyển', en: 'Pre-engage the AU bank before transfer' },
+    'plan.transfer.step.prepare_source_of_funds_letter': { vi: 'Chuẩn bị thư xác nhận nguồn tiền', en: 'Prepare a source-of-funds letter' },
+    'plan.transfer.step.expect_enhanced_due_diligence': { vi: 'Dự kiến ngân hàng sẽ thẩm định tăng cường', en: 'Expect enhanced due diligence' },
+    'plan.transfer.step.firb_approval_in_force_through_settlement': { vi: 'Phê duyệt FIRB còn hiệu lực đến khi hoàn tất giao dịch', en: 'FIRB approval in force through settlement' },
+    'plan.transfer.step.vn_outbound_transfer_initiated': { vi: 'Đã khởi tạo lệnh chuyển tiền ra khỏi Việt Nam', en: 'VN outbound transfer initiated' },
+    'plan.transfer.step.transfer_received_with_buffer': { vi: 'Nhận tiền với thời gian dự phòng', en: 'Transfer received with buffer' },
+    'plan.transfer.step.au_ecdd_clearance': { vi: 'Hoàn tất thẩm định tăng cường tại Úc (ECDD)', en: 'AU enhanced due diligence (ECDD) clearance' },
+    'plan.transfer.step.funds_in_aud_trust': { vi: 'Tiền đã vào tài khoản uỷ thác AUD', en: 'Funds in AUD trust' },
 
     // --- Chat / Q&A (8-S4d) --------------------------------------------------
     // Chrome only. The answer prose is engine-authored {vi,en} (pick()), never $t.

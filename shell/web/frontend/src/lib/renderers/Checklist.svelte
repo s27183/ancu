@@ -1,6 +1,6 @@
 <script lang="ts">
-    // The `checklist` renderer — used by TWO components with different outcome shapes
-    // (the engine names "checklist" for both; constraint #7 = no new renderer). We branch
+    // The `checklist` renderer — used by FOUR components with different outcome shapes
+    // (the engine names "checklist" for all; constraint #7 = no new renderer). We branch
     // on the outcome's discriminator:
     //
     //  • PreparationOutcome (due_diligence) — the prototype's "Before you buy": the
@@ -9,6 +9,11 @@
     //    `pending_contract` (structure, every date null, awaiting the attested contract
     //    dates) or `active` (back-calculated milestones + at-risk detection). The dates
     //    are submitted via the settlement_prep B form (setTransactionDates).
+    //  • TransferPlanOutcome (cross_border_funding, Mode B) — the compliance-step + critical-
+    //    path SUB-LISTS only (the workflow/financial half rides the sibling firb-workflow-card
+    //    renderer this component also composes, per the blueprint's own dual-renderer line).
+    //    Array items are snake_case CODES (no engine bilingual prose here — grounded against
+    //    fh_engine_cross_border.erl directly), so this branch label-maps locally, not via pick().
     //
     // The engine PLACES this content; the renderer only lays it out. R2 honest-partial:
     // an absent section is omitted, never an empty heading. R4 bilingual: engine prose via
@@ -21,18 +26,37 @@
         type SettlementChecklistOutcome,
         type MilestoneStatus,
         type RiskAssessmentInvestorOutcome,
-        type DueDiligenceDoc
+        type DueDiligenceDoc,
+        type TransferPlanOutcome
     } from '$lib/planCard';
     import { money } from '$lib/format';
     import NoteList from './NoteList.svelte';
 
     let { outcome }: { outcome: Record<string, unknown> } = $props();
 
-    // The discriminators (constraint #7 — one renderer NAME, three outcome shapes): settlement
+    // The discriminators (constraint #7 — one renderer NAME, four outcome shapes): settlement
     // carries `dates_status`; Mode-C due_diligence (risk_assessment_investor) carries `docs_status`;
-    // preparation (FHB readiness) carries neither.
+    // transfer_plan carries `vn_compliance_steps`; preparation (FHB readiness) carries none of these.
     const isSettlement = $derived('dates_status' in (outcome ?? {}));
     const isDueDiligence = $derived('docs_status' in (outcome ?? {}));
+    const isTransfer = $derived('vn_compliance_steps' in (outcome ?? {}));
+
+    // --- transfer_plan (cross_border_funding, Mode B) ------------------------
+    const tp = $derived(outcome as TransferPlanOutcome);
+    const vnSteps = $derived(tp.vn_compliance_steps ?? []);
+    const auSteps = $derived(tp.au_compliance_steps ?? []);
+    const criticalPathCodes = $derived(tp.critical_path_dependencies ?? []);
+    const STEP = new Set([
+        'engage_licensed_vn_bank_or_provider', 'declare_transfer_purpose_as_property_investment',
+        'confirm_current_sbv_threshold_and_documentation_with_bank', 'pre_engage_au_bank_before_transfer',
+        'prepare_source_of_funds_letter', 'expect_enhanced_due_diligence',
+        'firb_approval_in_force_through_settlement', 'vn_outbound_transfer_initiated',
+        'transfer_received_with_buffer', 'au_ecdd_clearance', 'funds_in_aud_trust'
+    ]);
+    function stepLabel(v: string): string {
+        if (STEP.has(v)) return $t(`plan.transfer.step.${v}` as 'plan.transfer.step.expect_enhanced_due_diligence');
+        return v.replace(/_/g, ' ').replace(/^\w/, (c) => c.toUpperCase());
+    }
 
     // --- due_diligence (Mode C, Phase B) — the PROCUREMENT surface ------------
     // The document checklist (what to gather + why; the lease entry flips received/reviewed once
@@ -140,6 +164,34 @@
     {#if settle.insurance_timing_rule}
         <h4 class="ck-heading">{$t('plan.settle.insurance')}</h4>
         <p class="ck-why">{pick(settle.insurance_timing_rule, $lang)}</p>
+    {/if}
+{:else if isTransfer}
+    <!-- ── transfer_plan (cross_border_funding) — compliance steps + critical path ── -->
+    {#if criticalPathCodes.length}
+        <h4 class="ck-heading">{$t('plan.transfer.critical_path')}</h4>
+        <ul class="ck-list">
+            {#each criticalPathCodes as c, i (i)}
+                <li class="ck-item"><span class="ck-item-name">{stepLabel(c)}</span></li>
+            {/each}
+        </ul>
+    {/if}
+
+    {#if vnSteps.length}
+        <h4 class="ck-heading">{$t('plan.transfer.vn_steps')}</h4>
+        <ul class="ck-list">
+            {#each vnSteps as s, i (i)}
+                <li class="ck-item"><span class="ck-item-name">{stepLabel(s)}</span></li>
+            {/each}
+        </ul>
+    {/if}
+
+    {#if auSteps.length}
+        <h4 class="ck-heading">{$t('plan.transfer.au_steps')}</h4>
+        <ul class="ck-list">
+            {#each auSteps as s, i (i)}
+                <li class="ck-item"><span class="ck-item-name">{stepLabel(s)}</span></li>
+            {/each}
+        </ul>
     {/if}
 {:else if isDueDiligence}
     {#if dd.next_action_for_user}

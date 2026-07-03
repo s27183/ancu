@@ -301,6 +301,76 @@ export interface PortfolioPositionOutcome {
     portfolio_diversification_score?: number | null;
 }
 
+// --- Foreign-buyer (Mode B) outcome types -----------------------------------
+// The two renderers Mode B adds (family-view-card, firb-workflow-card — §11.9). Both
+// producers are real and conformance-tested (mode-b-wedge.md P2/P3 CLOSED); no live turn
+// reaches them yet (P5, base_components/1 has no Mode-B clause). None of these three
+// modules emit bilingual {vi,en} prose (fh_engine_family/firb/cross_border.erl grounded
+// directly) — every array field is a snake_case CODE, not free text; the shell owns the
+// code→label lookup ($t, closed set + raw-fallback, mirroring thesisLabel/styleLabel).
+
+/** One family funding contribution line. `amount_aud` is always in AUD (the field name
+ *  is explicit) regardless of `currency_origin`, which names the funder's home currency
+ *  (fh_engine_family:residence_currency/1 — exhaustively VND | AUD | null). `source` is
+ *  always null at base (captured on a later refine turn; honest-partial). */
+export interface ContributionLine {
+    party?: string | null;
+    amount_aud?: number | null;
+    source?: string | null;
+    currency_origin?: 'VND' | 'AUD' | string | null;
+}
+/** family_context → family-view-card (outcome type `family_funding_plan`). The
+ *  cross-border family funding plan: who contributes how much from where, and who
+ *  holds decision authority. `decision_authority` is always null at base (undetermined,
+ *  prompt don't profile); `funding_complexity_score` floors at 1 (never guesses a
+ *  family's pattern — kb.vietnamese-family.financial-patterns' own discipline extended
+ *  to the resolver side). */
+export interface FamilyFundingPlanOutcome {
+    total_capacity_aud?: number | null;
+    contribution_breakdown?: ContributionLine[] | null;
+    decision_authority?: 'au_member' | 'vn_parent' | 'joint' | 'family_council' | string | null;
+    bilingual_coordination_required?: boolean | null;
+    funding_complexity_score?: number | null;
+    documentation_gaps?: string[] | null;
+}
+
+/** firb_workflow → firb-workflow-card (outcome type `firb_status`). The FIRB approval
+ *  state machine — mandatory gate before contract signing (blueprint §4). `blocking_for_
+ *  contract` is the critical downstream gate: true while not approved OR foreign_person_
+ *  eligible == false. */
+export interface FirbStatusOutcome {
+    foreign_person_eligible?: boolean | null;
+    firb_fee_tier?: string | null;
+    total_firb_fee_payable?: number | null;
+    current_stage?:
+        | 'not_started' | 'in_preparation' | 'submitted' | 'under_review'
+        | 'approved' | 'approved_with_conditions' | 'rejected' | 'withdrawn'
+        | string | null;
+    approval_received?: boolean | null;
+    approval_conditions?: string[] | null;
+    days_to_expected_decision?: number | null;
+    blocking_for_contract?: boolean | null;
+    documents_outstanding?: string[] | null;
+}
+
+/** cross_border_funding → firb-workflow-card (used here as a state-machine renderer for
+ *  the transfer workflow, per the blueprint's own note) + checklist (the compliance-step
+ *  + critical-path sub-lists — Checklist.svelte's third shape). `provider`/dates stay
+ *  null at base (live-quote / settlement-date dependent, not resolver-computable from
+ *  facts alone). */
+export interface TransferPlanOutcome {
+    provider?:
+        | 'wise' | 'ofx' | 'bank_wire_anz' | 'bank_wire_cba' | 'bank_wire_nab'
+        | 'bank_wire_westpac' | 'other' | string | null;
+    total_transfer_amount_aud?: number | null;
+    estimated_fx_cost?: number | null;
+    vn_compliance_steps?: string[] | null;
+    au_compliance_steps?: string[] | null;
+    transfer_initiated_by_date?: string | null;
+    transfer_received_by_date?: string | null;
+    critical_path_dependencies?: string[] | null;
+}
+
 // --- due_diligence (Mode C, Phase B) → risk-flag-list + checklist -------------
 // outcome `risk_assessment_investor`. The investor due-diligence assessment. DOCUMENT-GATED
 // two-path (due_diligence B): at A (no lease) the resolver fills the document PROCUREMENT

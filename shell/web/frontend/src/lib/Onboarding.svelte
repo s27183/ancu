@@ -28,19 +28,29 @@
     let band = $state<BudgetBand | null>(null);
     let phase = $state<'form' | 'submitting' | 'created' | 'auth' | 'error'>('form');
 
-    // The gate branches on intent (mode-c-wedge.md P5-activate): owner_occupier still
-    // requires a first-home answer (Mode A); investment needs only citizen/PR (Mode C —
-    // first-home is meaningless for an investor). The "citizen/PR yes · not first home ·
-    // live-in" cell is the Mode-E next-home gap, out of scope (calm note, not an error).
+    // The gate branches on intent (mode-c-wedge.md P5-activate) AND, orthogonally, on
+    // citizen/PR (mode-b-wedge.md P5): owner_occupier still requires a first-home answer
+    // (Mode A domestic / Mode B foreign — both are FHB blueprints); investment needs only
+    // citizen/PR (Mode C — first-home is meaningless for an investor). Two cells remain
+    // out of scope (calm note, not an error): investment + !citizenPr (Mode D, foreign
+    // investor — the engine's blueprint_for/2 fails closed on this combination) and
+    // citizenPr === true + !firstHome + live-in (the Mode-E next-home gap).
     const ooNeedsFirstHome = $derived(intent === 'owner_occupier');
     const gateAnswered = $derived(
         intent !== null && citizenPr !== null && (!ooNeedsFirstHome || firstHome !== null)
     );
-    const eligible = $derived(
+    const eligibleDomestic = $derived(
         intent !== null &&
             citizenPr === true &&
             (intent === 'investment' || firstHome === true)
     );
+    // Mode B: foreign person, buying to live in, first home — the blueprint's own scope
+    // (fhb-foreign-au.md — a Vietnam-parent-funded / temp-resident FHB, not an investor
+    // or next-home purchase; those combinations are Mode D / the Mode-E gap, both deferred).
+    const eligibleForeign = $derived(
+        intent === 'owner_occupier' && citizenPr === false && firstHome === true
+    );
+    const eligible = $derived(eligibleDomestic || eligibleForeign);
     const canSubmit = $derived(eligible && band !== null && phase === 'form');
 
     const nf = $derived(
@@ -60,7 +70,7 @@
         if (band === null || intent === null) return;
         phase = 'submitting';
         const outcome = await createPlanCard(
-            buildOnboardingInput(stateCode, suburbName, suburbSal, band, intent)
+            buildOnboardingInput(stateCode, suburbName, suburbSal, band, intent, eligibleForeign)
         );
         phase =
             outcome.kind === 'created' ? 'created'
@@ -133,9 +143,14 @@
             </fieldset>
 
             {#if ooNeedsFirstHome}
-                <!-- First-home gate is Mode-A only — meaningless for an investor (Mode C). -->
+                <!-- First-home gate applies to BOTH owner-occupier blueprints — Mode A
+                     (domestic) and Mode B (foreign, mode-b-wedge.md P5); meaningless for an
+                     investor (Mode C). -->
                 <fieldset class="gate">
                     <legend>{$t('onboarding.gate.firsthome')}</legend>
+                    {#if citizenPr === false}
+                        <p class="ob-hint">{$t('onboarding.gate.firsthome.foreign')}</p>
+                    {/if}
                     <div class="choice">
                         <button
                             type="button"
@@ -162,6 +177,9 @@
                         : $t('onboarding.outofscope')}
                 </p>
             {:else if eligible}
+                {#if eligibleForeign}
+                    <p class="ob-note ob-note-foreign">{$t('onboarding.foreign.note')}</p>
+                {/if}
                 <fieldset class="budget">
                     <legend>{$t('onboarding.budget.label')}</legend>
                     <div class="bands">

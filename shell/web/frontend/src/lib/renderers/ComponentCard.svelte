@@ -14,6 +14,8 @@
     import BuyingStrategyCard from './BuyingStrategyCard.svelte';
     import OpportunityCard from './OpportunityCard.svelte';
     import RiskFlagList from './RiskFlagList.svelte';
+    import FamilyViewCard from './FamilyViewCard.svelte';
+    import FirbWorkflowCard from './FirbWorkflowCard.svelte';
 
     let { componentId, entry, filling, density = 'compact' }: {
         componentId: string;
@@ -57,6 +59,10 @@
                 <BuyingStrategyCard outcome={entry.outcome} />
             {:else if r === 'opportunity-card'}
                 <OpportunityCard outcome={entry.outcome} />
+            {:else if r === 'family-view-card'}
+                <FamilyViewCard outcome={entry.outcome} />
+            {:else if r === 'firb-workflow-card'}
+                <FirbWorkflowCard outcome={entry.outcome} />
             {/if}
         {/each}
     {:else if filling}
