@@ -1,14 +1,29 @@
 <script lang="ts">
-    // The `summary-card` renderer (constraint #7 vocabulary). It serves the two base
-    // components whose blueprint lists summary-card first — buyer_profile (profile) and
-    // mortgage_finance (mortgage_plan) — so it hosts TWO heroes, branched on componentId
-    // (plan-card-visual-spec §2/§3.1/§3.3): a REACH BAR (target vs borrowing reach) and a
-    // PATH PICKER (the recommended financing lane). Both are deterministic outcome→geometry
-    // (R1), honest-partial (R2: the reach/capacity ghosts until income arrives on a refine
-    // turn — financials aren't captured at onboarding), bilingual at the source (R4).
+    // The `summary-card` renderer (constraint #7 vocabulary). Every blueprint's profile
+    // component lists summary-card first, but the componentId is NOT a single literal —
+    // Mode A/B share `buyer_profile`, Mode C is `investor_profile`, Mode D is
+    // `investor_profile_foreign`, all three emitting the canonical `profile` outcome. It
+    // hosts THREE heroes, branched on componentId (plan-card-visual-spec §2/§3.1/§3.3): a
+    // REACH BAR (profile: target vs borrowing reach), a PATH PICKER (mortgage_finance: the
+    // recommended financing lane, one stable id across all four blueprints), and a STRATEGY
+    // hero (investment_strategy, Mode C/D only — outcome `strategy_thesis`). Anything else
+    // reaching this renderer (e.g. `property_assessment`'s `property_fit`, per-property scope,
+    // no dedicated hero yet) renders NOTHING rather than guessing a hero for a shape it
+    // wasn't built for — an unmapped componentId used to silently fall into the path-picker
+    // branch and read undefined mortgage fields (Mode-D P4 finding, 2026-07-04).
+    // All heroes are deterministic outcome→geometry (R1), honest-partial (R2: fields the
+    // base turn can't yet know ghost via `Field`'s Pending, or the reach bar's own hint —
+    // financials/thesis reasoning arrive on a refine turn), bilingual at the source (R4).
     import { t } from '$lib/i18n';
     import { lang } from '$lib/stores/lang';
-    import { pick, type ProfileOutcome, type MortgagePlanOutcome, type MoneyRange } from '$lib/planCard';
+    import {
+        pick,
+        PROFILE_COMPONENT_IDS,
+        type ProfileOutcome,
+        type MortgagePlanOutcome,
+        type StrategyThesisOutcome,
+        type MoneyRange
+    } from '$lib/planCard';
     import { money, moneyRange, num } from '$lib/format';
     import Field from './Field.svelte';
     import Chip from './Chip.svelte';
@@ -21,6 +36,8 @@
 
     const profile = $derived(outcome as ProfileOutcome);
     const mortgage = $derived(outcome as MortgagePlanOutcome);
+    const strategy = $derived(outcome as StrategyThesisOutcome);
+    const isProfile = $derived((PROFILE_COMPONENT_IDS as readonly string[]).includes(componentId));
 
     // recommended_path is a known enum → a display label via $t; unknown values fall
     // back to the raw value so nothing is silently dropped.
@@ -54,9 +71,18 @@
     const LANES: string[] = ['twenty_plus', 'fhg_backed', 'lmi_5_to_20'];
     const recPath = $derived(mortgage.recommended_path ?? null);
     const recIsCustom = $derived(!!recPath && !LANES.includes(recPath));
+
+    // --- strategy hero (investment_strategy, Mode C/D, strategy_thesis) -----
+    // Mostly agent-filled — null at base except hold_period_years (resolver-carried off
+    // profile.hold_horizon_years); every field ghosts via Field's own Pending until a
+    // refine turn. No bilingual label table for these enums (would be ~30 option pairs
+    // for a mostly-null base card) — same raw-value fallback as pathLabel above.
+    const pct = (v: number | null | undefined) => (v != null ? `${num(v, $lang)}%` : null);
+    const years = (v: number | null | undefined) =>
+        v != null ? `${num(v, $lang)} ${$t('plan.whatif.years_unit')}` : null;
 </script>
 
-{#if componentId === 'buyer_profile'}
+{#if isProfile}
     <!-- ── Reach bar hero ─────────────────────────────────────────────── -->
     <div class="rb-hero">
         <div class="rb-chips">
@@ -112,7 +138,7 @@
     />
     <NoteList heading={$t('plan.f.strengths')} notes={profile.key_strengths} />
     <NoteList heading={$t('plan.f.constraints')} notes={profile.key_constraints} />
-{:else}
+{:else if componentId === 'mortgage_finance'}
     <!-- ── Path picker hero ───────────────────────────────────────────── -->
     <div class="pk-hero">
         <ul class="pk-lanes">
@@ -154,7 +180,32 @@
     {/if}
     <NoteList heading={$t('plan.f.preapproval')} notes={mortgage.pre_approval_action_plan} />
     <NoteList heading={$t('plan.f.assumptions')} notes={mortgage.key_assumptions} />
+{:else if componentId === 'investment_strategy'}
+    <!-- ── Strategy hero ───────────────────────────────────────────────── -->
+    <div class="st-hero">
+        {#if strategy.archetype}
+            <Chip label={strategy.archetype} tone="info" />
+        {/if}
+        {#if strategy.one_liner}
+            <p class="st-oneliner">{strategy.one_liner}</p>
+        {/if}
+    </div>
+
+    <Field label={$t('plan.f.yield_target')} value={pct(strategy.target_gross_yield)} />
+    <Field label={$t('plan.f.growth_target')} value={pct(strategy.target_capital_growth)} />
+    <Field label={$t('plan.f.gearing_type')} value={strategy.gearing_type} />
+    <Field label={$t('plan.f.target_lvr')} value={pct(strategy.target_lvr)} />
+    <Field label={$t('plan.f.hold_period')} value={years(strategy.hold_period_years)} />
+    <Field label={$t('plan.f.exit_strategy')} value={strategy.exit_strategy} />
+    {#if strategy.migration_pathway_alignment}
+        <Field label={$t('plan.f.migration_alignment')} value={strategy.migration_pathway_alignment} />
+    {/if}
+    {#if strategy.currency_hedging_strategy}
+        <Field label={$t('plan.f.currency_hedging')} value={strategy.currency_hedging_strategy} />
+    {/if}
 {/if}
+<!-- else: an unmapped componentId (e.g. property_assessment's property_fit) reaches
+     summary-card with no dedicated hero — render nothing rather than guess one. -->
 
 <style>
     /* reach bar */
@@ -264,5 +315,19 @@
         text-transform: uppercase;
         letter-spacing: 0.03em;
         color: var(--accent);
+    }
+
+    /* strategy hero */
+    .st-hero {
+        margin-bottom: 0.6rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+    }
+    .st-oneliner {
+        margin: 0;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--ink);
     }
 </style>

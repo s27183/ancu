@@ -1,7 +1,7 @@
 # Mode-D wedge — build plan + progress tracker
 
-**Status: P1 (KB) + P2 (engine resolvers) + P3 (multi-blueprint activation) done and verified
-(2026-07-04). Opened 2026-07-03.** This doc is the
+**Status: P1 (KB) + P2 (engine resolvers) + P3 (multi-blueprint activation) + P4 (shell dispatcher
+branches) done and verified (2026-07-04). Opened 2026-07-03.** This doc is the
 durable plan *and* the task tracker for the Mode-D (Vietnam-located foreign investor) wedge. The
 Claude Code Task list is ephemeral (it does not survive compaction); this file is the source of
 truth for "what's left." The grounding-checklist carries a one-line pointer here.
@@ -375,6 +375,79 @@ assertion) — PASSES; `mode_d_p2_conformance.escript` — still 82/82; full esc
 by `git stash`-ing this session's two changed files, re-emitting, recompiling, and re-running each;
 all four fail identically pre-change) — zero regression.
 
+**P4 done and verified (2026-07-04).** The wedge's own pre-flag ("check at P4-open, don't assume")
+paid off: this was not the pure formality "0 net-new renderers" implied. **The wire outcome never
+carries a `type` discriminator** (confirmed by reading `fh_engine_fill.erl`'s resolver bodies — the
+returned maps are flat field maps, no `"type"` key; `ComponentEntry.outcome` on the shell side is
+untyped `Record<string, unknown>` for the same reason) — so any shell code that needs to tell outcome
+*shapes* apart has no choice but to key off `componentId`, and `SummaryCard.svelte` and
+`OverviewCard.svelte` both did, hardcoded to the single literal `'buyer_profile'`. That literal is
+correct for Mode A/B (both name the component `buyer_profile`), but Mode C names it `investor_profile`
+and Mode D names it `investor_profile_foreign` — **a bug that predates this wedge**, latent since
+Mode-C wedge P3 (2026-06-27) and never caught because Mode B/C's own "full-stack live-verified" P4/P5
+claims were HTTP/SSE/JSON-level (creating a card via the API, polling events, asserting outcome
+shape), not actual browser-rendered pixels — the shell's own onboarding form is still Mode-A-only
+(per `CLAUDE.md`), so nobody had loaded an `investor_profile` card in a real browser until this pass.
+Two fixes, both mechanical bug fixes proceeded directly (reversible local edits, not a design call):
+
+1. **`SummaryCard.svelte`'s reach-bar branch** was `{#if componentId === 'buyer_profile'}` / else =
+   the mortgage path-picker hero — so `investor_profile` (Mode C) and `investor_profile_foreign`
+   (Mode D) both fell into the `:else` and rendered the wrong hero (reading undefined
+   `mortgage.recommended_path`/`expected_borrowing_capacity` off a `profile`-shaped outcome — no
+   crash, just silently blank/wrong). Fixed: `planCard.ts` now exports `PROFILE_COMPONENT_IDS =
+   ['buyer_profile', 'investor_profile', 'investor_profile_foreign']`; the branch checks membership,
+   not one literal.
+2. **`OverviewCard.svelte`'s Overview-tab headline tiles** read `components.buyer_profile` directly
+   for the same reason — target price and borrowing reach silently pending-forever for Mode C/D
+   (correctly ghosted, so no crash, but wrong: the data exists under a different key). Fixed via a
+   new `firstComponentEntry(components, PROFILE_COMPONENT_IDS)` helper (first present alias wins);
+   `OverviewCard`'s `components.eligibility`/`components.mortgage_finance` lookups are untouched —
+   `mortgage_finance` is a stable id across all four blueprints, and `eligibility` genuinely doesn't
+   exist for Mode C/D (no scheme_stack for an investor) — that stat correctly ghosts forever for
+   those modes, not a bug.
+
+**A third, genuinely-new gap, not a bug in existing code**: `investment_strategy` (Mode C *and* D,
+base scope) also declares `summary-card` — a third outcome shape (`strategy_thesis`) the renderer had
+literally never had a branch for (its `:else` silently ate it as the mortgage hero too, same failure
+mode as above). This is the wedge doc's own anticipated case ("unless an outcome shape genuinely
+doesn't fit an existing component's props"). Built a third hero in the same file: an archetype chip +
+one-liner headline, then `Field` rows for yield/growth targets, gearing/LVR, hold period, exit
+strategy, and (Mode-D-only, conditionally rendered) migration-pathway alignment + currency-hedging
+strategy. No bilingual label table for the enum values (~30 option pairs for a card that's ~90%
+agent-filled-null at base) — raw value shown, same precedent as `pathLabel`'s own unknown-value
+fallback. Added `StrategyThesisOutcome` to `planCard.ts` and the missing `plan.f.*`/`plan.c.*` i18n
+keys (`investor_profile_foreign`, `tax_structure_non_resident`, `ownership_planning_foreign_investor`
+title keys were also missing — `plan.c.${componentId}` falls back to the raw untranslated key string
+when absent, the same "cast hides a producer-renamed-id break" class of gap as
+[[firsthomey-svelte-conventions]] already documents, one layer down at `components[id]` lookups
+instead of `$t` keys).
+
+**Contained the blast radius before fixing**: grepped every `.svelte`/`.ts` file for a hardcoded
+`buyer_profile`/`investor_profile`/etc. reference. `SummaryCard`/`OverviewCard` were the only two
+*card-rendering* hits — `PlanProjection.svelte`'s `seedFinancials()` (the finance-cockpit edit form)
+also hardcodes `components.buyer_profile`, but that's a genuinely Mode-A-only FEATURE (editing
+income/debts) that was never built for Mode C/D at all, not a dispatch bug in an already-generic
+renderer — left alone, correctly out of scope for a dispatcher-branch phase, and unreachable today
+regardless (Mode D onboarding isn't wired — P5 atomic-last, not started). `property_assessment`'s
+`property_fit` outcome (per-property scope, all four blueprints) also rides `summary-card` with no
+hero — rather than let it silently re-hit the mortgage `:else` (the exact bug just fixed), the
+restructured branch chain now ends with no catch-all, so an unmapped componentId renders nothing.
+Honest-partial, not garbage; building its hero is a future phase's job, not invented here.
+
+**A cross-doc fact this surfaced**: `mode-c-wedge.md`'s own P4 ("shell renderers... COMPLETE
+2026-06-24") only ever meant "2 net-new renderer *components* built" (`buying-strategy-card`,
+`opportunity-card`) — it did not mean "every componentId Mode C introduces renders correctly," since
+`investor_profile`'s and `investment_strategy`'s dispatch bugs (fixed here) were exactly this same
+gap, just never exercised. Flagged, not silently patched over — worth a one-line cross-reference in
+`mode-c-wedge.md` when that doc is next touched, per [[surface-adjacent-doc-drift]].
+
+Verified: `svelte-autofixer` clean on both edited components; `npx svelte-check` — **0 errors, 0
+warnings** across the whole frontend (not just the two touched files — confirms no cross-file type
+regression from the new `StrategyThesisOutcome`/`PROFILE_COMPONENT_IDS`/`firstComponentEntry`
+exports). Not yet pixel-verified in a live browser (no Mode C/D onboarding path exists to reach these
+cards yet — that's P5's job); the fix is verified by reading each componentId group against the
+fields it now resolves to, not merely a green build.
+
 | Status | Phase | Item |
 |---|---|---|
 | [x] | P2 | `investor_profile_foreign` resolver (merge of `buyer_profile` foreign lens + `investor_profile`; canonical `profile` outcome; `residency_for_tax=non_resident` definitional) |
@@ -388,7 +461,7 @@ all four fail identically pre-change) — zero regression.
 | [x] | P2 | `ownership_planning_foreign_investor` ★ new sibling module (vacancy fee + AU/VN tax obligation prose + portfolio; no `disposition`/`opportunities` edge — confirmed against the blueprint's own declared inputs/outcome fields, simpler than Mode C's sibling) |
 | [x] | P2 | `disposition` foreign-resident branch — NOT a new branch: extended the shared `fill_investor/3` (Mode C's own function) with FRCGW + the VN-side note, gated on `tax_optimised_structure.frcgw_applicable`; the CGT no-discount/no-PPOR-exemption/to_verify routing needed zero new code (falls out of `residency_for_tax=non_resident` + `cgt_discount_eligible=false`) |
 | [x] | P3 | Add `investor-foreign-au` to `IN_SCOPE_BLUEPRINTS`; green semantic gates; re-emit artifact; prove per-card selection (A/B/C unchanged) |
-| [ ] | P4 | Dispatcher branches for the 4 new outcome shapes onto existing renderer components (no new `.svelte` expected — verify at P4-open) |
+| [x] | P4 | Dispatcher branches for the new outcome shapes onto existing renderer components (0 new `.svelte` — but 2 real dispatch bugs found+fixed, not a pure formality; see below) |
 | [ ] | P5 | `?BASE_COMPONENTS_FOREIGN_INVESTOR` per-blueprint `base_components/1` sequence + DAG-walk conformance |
 | [ ] | P5 | Onboarding dispatch (`blueprint_for/1` — foreign-person AND investor-intent predicate) + onboarding picker — atomic-last |
 

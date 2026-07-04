@@ -18,7 +18,9 @@
         type SchemeStackOutcome,
         type MortgagePlanOutcome,
         type BudgetEnvelopeOutcome,
-        type MoneyRange
+        type MoneyRange,
+        firstComponentEntry,
+        PROFILE_COMPONENT_IDS
     } from '$lib/planCard';
     import { moneyRange } from '$lib/format';
     import Pending from './Pending.svelte';
@@ -28,7 +30,11 @@
         filling: boolean;
     } = $props();
 
-    const profile = $derived(components.buyer_profile?.outcome as ProfileOutcome | undefined);
+    // Mode A/B share `buyer_profile`; Mode C is `investor_profile`; Mode D is
+    // `investor_profile_foreign` — all three emit the same `profile` outcome shape.
+    const profile = $derived(
+        firstComponentEntry(components, PROFILE_COMPONENT_IDS)?.outcome as ProfileOutcome | undefined
+    );
     const scheme = $derived(components.eligibility?.outcome as SchemeStackOutcome | undefined);
     const mortgage = $derived(components.mortgage_finance?.outcome as MortgagePlanOutcome | undefined);
     const budget = $derived(components.cash_position?.outcome as BudgetEnvelopeOutcome | undefined);

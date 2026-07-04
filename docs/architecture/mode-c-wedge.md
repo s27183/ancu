@@ -306,6 +306,18 @@ two spec-derived `planCard.ts` types (`BidPlanInvestorOutcome`, `OpportunityCard
 renderer-internal bilingual `plan.*` labels (en+vi, incl. the thesis/style enum display labels).
 Component **title** keys for investor components stay P5 (they render only when an investor turn runs).
 **Verified:** `svelte-autofixer` clean on both, `svelte-check` 0/0, production build green.
+
+**Cross-doc note (added at Mode-D wedge P4, 2026-07-04):** "P4 COMPLETE" above scoped to the 2
+net-new renderer *components* only — it did not audit whether `investor_profile`'s componentId
+dispatches correctly through the *pre-existing* `summary-card` renderer. It doesn't: `SummaryCard
+.svelte`'s reach-bar branch was hardcoded to the literal `buyer_profile`, so `investor_profile`
+(and `investment_strategy`, sharing `summary-card` with no branch of its own at all) silently fell
+into the wrong hero — never caught because this component never rendered in an actual browser
+(Mode C's live-verification was HTTP/SSE/JSON-level; the shell onboarding form is still Mode-A-only).
+Fixed as part of Mode-D's own P4 (`mode-d-wedge.md`) since Mode D shares the same componentIds —
+`SummaryCard.svelte`/`OverviewCard.svelte` now dispatch off a `PROFILE_COMPONENT_IDS` alias set, and
+`investment_strategy` has a real hero. No action needed here; recorded so this doc doesn't overstate
+what P4 verified.
 **One producer seam — `opportunities[]` slot added in P5-engine 6/suite; the actual producer + the consumer are the unit scoped below.**
 `opportunity-card`'s §11.9 contract `{ kind, modeled_benefit, action }` had no matching field in
 `portfolio_position`. What P5-engine 6 did: **added the `opportunities[]` field to the schema, emitted `[]`** by

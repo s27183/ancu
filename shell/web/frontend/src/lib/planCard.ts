@@ -96,6 +96,25 @@ export interface MortgagePlanOutcome {
     key_assumptions?: LocalizedText[] | null;
 }
 
+/** investment_strategy (Mode C/D) → summary-card (outcome type `strategy_thesis`). Base-scope
+ *  fields are mostly agent-filled (archetype/one_liner/targets/gearing/exit) — null until a
+ *  refine turn; hold_period_years is resolver-carried off profile.hold_horizon_years at base.
+ *  migration_pathway_alignment/currency_hedging_strategy are Mode-D-only (absent on Mode C's
+ *  investor-domestic-au — no foreign-investor lens there). */
+export interface StrategyThesisOutcome {
+    archetype?: string | null;
+    one_liner?: string | null;
+    target_gross_yield?: number | null;
+    target_capital_growth?: number | null;
+    gearing_type?: string | null;
+    target_lvr?: number | null;
+    hold_period_years?: number | null;
+    exit_strategy?: string | null;
+    migration_pathway_alignment?: string | null;
+    currency_hedging_strategy?: string | null;
+    is_property_aligned_with_thesis?: boolean | null;
+}
+
 export interface StampDuty {
     before_concession?: number | null;
     concession_applied?: number | null;
@@ -609,6 +628,29 @@ export interface ComponentEntry {
      *  this outcome belongs to. Absent on a base fill. The projection routes a tagged
      *  fill into content.addenda.<property_id>.components, not the base map. */
     property_id?: string;
+}
+
+/** componentIds whose outcome is the canonical `profile` shape across all four blueprints
+ *  (fact-model-unification.md "Mode-C activation" + Mode-D's straight merge): Mode A/B share
+ *  `buyer_profile`, Mode C is `investor_profile`, Mode D is `investor_profile_foreign`. Any
+ *  consumer that reads the profile outcome by a fixed componentId must resolve through this
+ *  list, not a single literal — a lesson from `plan.c.${id}` id-cast key drift applied one
+ *  layer down, to `components[id]` lookups themselves. */
+export const PROFILE_COMPONENT_IDS = [
+    'buyer_profile',
+    'investor_profile',
+    'investor_profile_foreign'
+] as const;
+
+/** The first present entry among a set of alias componentIds (e.g. `PROFILE_COMPONENT_IDS`). */
+export function firstComponentEntry(
+    components: Record<string, ComponentEntry>,
+    ids: readonly string[]
+): ComponentEntry | undefined {
+    for (const id of ids) {
+        if (components[id]) return components[id];
+    }
+    return undefined;
 }
 
 /** A normalized property as the engine stores it under content.addenda.<pid>.property_card

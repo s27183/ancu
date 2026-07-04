@@ -167,6 +167,10 @@ const messages = {
     'plan.c.family_context': { vi: 'Kế hoạch tài chính gia đình', en: 'Family funding plan' },
     'plan.c.firb_workflow': { vi: 'Phê duyệt FIRB', en: 'FIRB approval' },
     'plan.c.cross_border_funding': { vi: 'Chuyển tiền xuyên biên giới', en: 'Cross-border funding' },
+    // Mode-D (foreign investor) component titles not already covered by a Mode-B/C alias.
+    'plan.c.investor_profile_foreign': { vi: 'Hồ sơ đầu tư', en: 'Your investor profile' },
+    'plan.c.tax_structure_non_resident': { vi: 'Cấu trúc thuế (không cư trú)', en: 'Tax structure (non-resident)' },
+    'plan.c.ownership_planning_foreign_investor': { vi: 'Danh mục & cơ hội', en: 'Portfolio & opportunities' },
 
     // Plan sub-tab labels (short) — the plan sections + Q&A as tabs inside the Plan view.
     'plan.tab.buyer_profile': { vi: 'Hồ sơ', en: 'Profile' },
@@ -408,6 +412,17 @@ const messages = {
     'plan.path.twenty_plus': { vi: 'Cọc từ 20% trở lên', en: '20%+ deposit' },
     'plan.path.user_specific_alternative': { vi: 'Phương án riêng', en: 'Tailored option' },
     'plan.path.recommended': { vi: 'đề xuất', en: 'recommended' },
+
+    // investment_strategy (Mode C/D) → summary-card's third hero (strategy_thesis).
+    'plan.f.archetype': { vi: 'Chiến lược đầu tư', en: 'Strategy archetype' },
+    'plan.f.yield_target': { vi: 'Lợi suất mục tiêu', en: 'Target yield' },
+    'plan.f.growth_target': { vi: 'Tăng trưởng vốn mục tiêu', en: 'Target capital growth' },
+    'plan.f.gearing_type': { vi: 'Loại đòn bẩy', en: 'Gearing' },
+    'plan.f.target_lvr': { vi: 'Tỷ lệ vay mục tiêu (LVR)', en: 'Target LVR' },
+    'plan.f.hold_period': { vi: 'Thời gian nắm giữ dự kiến', en: 'Hold period' },
+    'plan.f.exit_strategy': { vi: 'Chiến lược thoái vốn', en: 'Exit strategy' },
+    'plan.f.migration_alignment': { vi: 'Liên quan kế hoạch định cư', en: 'Migration pathway alignment' },
+    'plan.f.currency_hedging': { vi: 'Chiến lược phòng ngừa tỷ giá', en: 'Currency hedging strategy' },
     'plan.reach.label': { vi: 'Khả năng với tới', en: 'Your reach' },
     'plan.reach.capacity_pending': {
         vi: 'Khả năng vay sẽ tính khi bạn thêm thu nhập và tiền tiết kiệm.',
