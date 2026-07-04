@@ -116,6 +116,10 @@ main(_) ->
     Mort = Out(<<"mortgage_finance">>),
     expect(is_binary(maps:get(<<"io_vs_pi_recommendation">>, Mort, undefined)),
            "mortgage io_vs_pi_recommendation filled (live)"),
+    RateOptionsNonResident = [<<"variable">>, <<"fixed_1yr">>, <<"fixed_2yr">>, <<"fixed_3yr">>],
+    expect(lists:member(maps:get(<<"fixed_vs_variable">>, Mort, undefined), RateOptionsNonResident),
+           "mortgage fixed_vs_variable filled (live, reconciled 2026-07-05 — was silently "
+           "discarded; Mode D's own 4-option enum, no split_fixed_variable)"),
     Shortlist = maps:get(<<"recommended_lender_shortlist">>, Mort, undefined),
     expect(is_list(Shortlist) andalso length(Shortlist) > 0,
            "mortgage recommended_lender_shortlist filled (live, shortlist shape, not a singular pick)"),
@@ -146,9 +150,10 @@ main(_) ->
            "cash_position has Mode-D regulatory_imposts_total (FIRB fee + surcharge + duty rollup)"),
     expect(not maps:is_key(<<"lmi_payable">>, Cash),
            "cash_position drops Mode-C's lmi_payable (Mode-D field-set divergence)"),
-    io:format("live foreign-investor outcomes: archetype=~s gearing=~s io_vs_pi=~s entity=~s cgt_status=~s~n",
+    io:format("live foreign-investor outcomes: archetype=~s gearing=~s io_vs_pi=~s rate=~s entity=~s cgt_status=~s~n",
               [maps:get(<<"archetype">>, Strat), maps:get(<<"gearing_type">>, Strat),
                maps:get(<<"io_vs_pi_recommendation">>, Mort),
+               maps:get(<<"fixed_vs_variable">>, Mort),
                maps:get(<<"recommended_entity">>, Tax),
                maps:get(<<"cgt_status">>, Disp)]),
 

@@ -134,12 +134,18 @@ mortgage_cases() ->
     [DepLo, DepHi] = fh_engine_mortgage:rate_estimate_foreign(),
     %% merge_agent + agent_values_from_outcome round-trip (§98 slot-scoped fold). Shortlist
     %% shape matches Mode C's (reconciled 2026-07-04 — see fh_engine_mortgage.erl comment).
+    %% THREE leaves, not Mode C's five — fixed_vs_variable added 2026-07-05 (was drafted as a
+    %% blueprint Parameter + already computed by the shared leaf-fill, but silently discarded
+    %% here); no offset/PPOR-equity leaves (Mode D has no AU PPOR, its own Python schema
+    %% never authors them).
     Shortlist = [#{<<"lender">> => <<"Lender X">>,
                    <<"reasoning">> => #{<<"vi">> => <<"Phù hợp với nhà đầu tư không cư trú."/utf8>>,
                                         <<"en">> => <<"Fits a non-resident investor profile.">>},
                    <<"approval_likelihood">> => <<"moderate">>}],
-    Merged = fh_engine_mortgage:merge_agent(O, #{<<"recommended_lender_shortlist">> => Shortlist,
-                                                 <<"io_vs_pi_recommendation">> => <<"interest_only">>}),
+    AgentValues = #{<<"recommended_lender_shortlist">> => Shortlist,
+                    <<"io_vs_pi_recommendation">> => <<"interest_only">>,
+                    <<"fixed_vs_variable">> => <<"fixed_2yr">>},
+    Merged = fh_engine_mortgage:merge_agent(O, AgentValues),
     Recovered = fh_engine_mortgage:agent_values_from_outcome(Merged),
     [check("renderer = summary-card", Renderer, <<"summary-card">>),
      check("dispatched via fh_engine_fill matches direct fh_engine_mortgage:fill/2", O, O2),
@@ -158,17 +164,19 @@ mortgage_cases() ->
            g(O, <<"recommended_lender_shortlist">>), null),
      check("io_vs_pi_recommendation null (agent slot, pre-merge)",
            g(O, <<"io_vs_pi_recommendation">>), null),
+     check("fixed_vs_variable null (agent slot, pre-merge)",
+           g(O, <<"fixed_vs_variable">>), null),
      check("loan_cost_estimate_year_1 null (needs a loan amount, absent at base)",
            g(O, <<"loan_cost_estimate_year_1">>), null),
      check("Mode-D KB anchors present", has_anchor(Kb, <<"kb.lender.non-resident-investment-loan-shortlist">>), true),
-     check("merge_agent folds the two Mode-D agent leaves",
-           {g(Merged, <<"recommended_lender_shortlist">>), g(Merged, <<"io_vs_pi_recommendation">>)},
-           {Shortlist, <<"interest_only">>}),
+     check("merge_agent folds the three Mode-D agent leaves",
+           {g(Merged, <<"recommended_lender_shortlist">>), g(Merged, <<"io_vs_pi_recommendation">>),
+            g(Merged, <<"fixed_vs_variable">>)},
+           {Shortlist, <<"interest_only">>, <<"fixed_2yr">>}),
      check("merge_agent leaves every figure untouched (§98)",
            g(Merged, <<"deposit_required_amount">>), g(O, <<"deposit_required_amount">>)),
-     check("agent_values_from_outcome round-trips the two leaves verbatim",
-           Recovered, #{<<"recommended_lender_shortlist">> => Shortlist,
-                        <<"io_vs_pi_recommendation">> => <<"interest_only">>})].
+     check("agent_values_from_outcome round-trips the three leaves verbatim",
+           Recovered, AgentValues)].
 
 %% --- 5. yield_modelling reuse (unchanged at base) -----------------------------
 

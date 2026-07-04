@@ -5,19 +5,23 @@
 %% and loan-path structure deterministically; the `lender_fit` leaves are left `null`
 %% for the agent and folded in by merge_agent/2 after the sidecar replies.
 %%
-%% THREE VARIANTS, shared component NAME (`mortgage_finance`): the Mode-A FHB path
+%% FOUR VARIANTS, shared component NAME (`mortgage_finance`): the Mode-A FHB path
 %% (fill_fhb/2, two leaves: shortlist + rate), the Mode-B foreign-person path
 %% (fill_fhb_foreign/2, two leaves: shortlist + rate — a DIFFERENT `mortgage_plan` shape,
-%% blueprint fhb-foreign-au.md component 5, mode-b-wedge.md P2 slice 3), and the Mode-C
-%% investor path (fill_investor/2, five leaves: io/PI, rate, offset strategy,
-%% uses_existing_ppor_equity, investor lender shortlist). fill/2 routes FIRST on the
+%% blueprint fhb-foreign-au.md component 5, mode-b-wedge.md P2 slice 3), the Mode-C
+%% domestic-investor path (fill_investor/2, five leaves: io/PI, rate, offset strategy,
+%% uses_existing_ppor_equity, investor lender shortlist), and the Mode-D non-resident-investor
+%% path (fill_investor_foreign/2, THREE leaves: io/PI, rate, non-resident lender shortlist —
+%% no offset/PPOR-equity leaves, reconciled 2026-07-05: Mode D has no AU PPOR to release
+%% equity from or point an offset at, see mode-d-wedge.md). fill/2 routes FIRST on the
 %% `strategy_thesis` upstream (investor-only, unchanged), THEN — orthogonally, within the
 %% non-investor path — on Args.firb_required_any (the SAME flag fh_engine_fill:buyer_profile/1
 %% and the compliance FIRB gate key on). merge_agent/2 + agent_values_from_outcome/1 route on
-%% the `io_vs_pi_recommendation` (investor) then `firb_dependency_acknowledged` (Mode B)
-%% outcome keys. All three discriminators are local shape/context sniffs — no signature
-%% change, the FHB body is byte-identical (zero regression). Mirrors fh_engine_cash /
-%% fh_engine_disposition (investor axis) and fh_engine_fill:buyer_profile/1 (foreign axis).
+%% the 2x2 `io_vs_pi_recommendation` (investor axis: C or D) x `firb_dependency_acknowledged`
+%% (foreign axis: B or D) outcome keys. All discriminators are local shape/context sniffs —
+%% no signature change, the FHB body is byte-identical (zero regression). Mirrors
+%% fh_engine_cash / fh_engine_disposition (investor axis) and fh_engine_fill:buyer_profile/1
+%% (foreign axis).
 %%
 %% §98 (agentic-boundary): borrowing capacity is a COMPLIANCE-sensitive figure and must
 %% be computed, never LLM-asserted. At the base turn income + committed debts are ABSENT
@@ -302,9 +306,12 @@ fill_investor_foreign(_Args, Upstream) ->
     Ceiling = ceiling(maps:get(<<"target_price_range">>, Profile, null)),
     DepositPct = deposit_pct_foreign(),
     Outcome = #{
-        %% AGENT slots (lender_fit) — filled by merge_agent_investor_foreign/2.
+        %% AGENT slots (lender_fit) — filled by merge_agent_investor_foreign/2. Three, not
+        %% Mode C's five: no offset/PPOR-equity leaves (Mode D has no AU PPOR) — reconciled
+        %% 2026-07-05, see LenderFitNonResidentInvestorLeaves in planner.py.
         <<"recommended_lender_shortlist">> => null,
         <<"io_vs_pi_recommendation">> => null,
+        <<"fixed_vs_variable">> => null,
         <<"expected_borrowing_capacity">> => borrowing_capacity(Profile),
         <<"deposit_required_percentage">> => DepositPct,
         <<"deposit_required_amount">> => deposit_amount_foreign(Ceiling, DepositPct),
@@ -422,18 +429,25 @@ merge_agent_investor(ResolverOutcome, AgentValues) ->
         }
     }.
 
-%% fold the two Mode-D agent leaves (recommended_lender_shortlist: the SAME shortlist
+%% fold the THREE Mode-D agent leaves (recommended_lender_shortlist: the SAME shortlist
 %% shape + fold as Mode C's merge_agent_investor/2 — reconciled 2026-07-04, was a singular
 %% top-pick string that collapsed the agent's judgment to one named lender, the ACL-line
 %% pattern CLAUDE.md's guardrail warns against; io_vs_pi_recommendation: the same
-%% lender_fit leaf Mode C uses). Slot-scoped (§98): every figure (capacity, deposit,
-%% rate_estimate, the firb/vn/fx acknowledgement flags) is the resolver's, untouched.
+%% lender_fit leaf Mode C uses; fixed_vs_variable: reconciled 2026-07-05 — was already a
+%% Mode-D blueprint Parameter and already computed by the shared Python leaf-fill, but was
+%% silently discarded here, see mode-d-wedge.md). Deliberately only THREE, not Mode C's
+%% five — merge_agent_investor/2's offset_strategy_recommendation + uses_existing_ppor_equity
+%% presume an AU PPOR this investor does not have, so Mode D's OWN Python schema
+%% (LenderFitNonResidentInvestorLeaves) never authors them; there is nothing to fold. Slot-
+%% scoped (§98): every figure (capacity, deposit, rate_estimate, the firb/vn/fx acknowledgement
+%% flags) is the resolver's, untouched.
 -spec merge_agent_investor_foreign(map(), map()) -> map().
 merge_agent_investor_foreign(ResolverOutcome, AgentValues) ->
     ResolverOutcome#{
         <<"recommended_lender_shortlist">> =>
             maps:get(<<"recommended_lender_shortlist">>, AgentValues, []),
-        <<"io_vs_pi_recommendation">> => maps:get(<<"io_vs_pi_recommendation">>, AgentValues, null)
+        <<"io_vs_pi_recommendation">> => maps:get(<<"io_vs_pi_recommendation">>, AgentValues, null),
+        <<"fixed_vs_variable">> => maps:get(<<"fixed_vs_variable">>, AgentValues, null)
     }.
 
 %% The INVERSE of merge_agent/2: recover the agent-leaf VALUES (in the sidecar-reply
@@ -487,14 +501,16 @@ agent_values_from_outcome_investor(Stored) ->
       <<"uses_existing_ppor_equity">> =>
           maps:get(<<"uses_existing_ppor_equity">>, LS, null)}.
 
-%% inverse of merge_agent_investor_foreign/2: recover the two Mode-D leaves verbatim
-%% (both top-level, no nested loan_structure wrapper — Mode D's own outcome shape).
+%% inverse of merge_agent_investor_foreign/2: recover the three Mode-D leaves verbatim
+%% (all top-level, no nested loan_structure wrapper — Mode D's own outcome shape).
 -spec agent_values_from_outcome_investor_foreign(map()) -> map().
 agent_values_from_outcome_investor_foreign(Stored) ->
     #{<<"recommended_lender_shortlist">> =>
           maps:get(<<"recommended_lender_shortlist">>, Stored, []),
       <<"io_vs_pi_recommendation">> =>
-          maps:get(<<"io_vs_pi_recommendation">>, Stored, null)}.
+          maps:get(<<"io_vs_pi_recommendation">>, Stored, null),
+      <<"fixed_vs_variable">> =>
+          maps:get(<<"fixed_vs_variable">>, Stored, null)}.
 
 %% --- structure (KB-grounded, determinate) -----------------------------------
 

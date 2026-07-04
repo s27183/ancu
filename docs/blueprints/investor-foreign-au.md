@@ -515,10 +515,10 @@ type must stay canonical. *Reconciled 2026-07-03, see the outcome-type conforman
     "rate_premium_above_domestic_investor": { "type": "percentage_range", "value": "<initial>", "note": "Typically 100–200bp above domestic investor rates" }
   },
   "loan_structure": {
-    "principal_and_interest_vs_interest_only": { "type": "enum", "options": ["interest_only", "principal_and_interest"], "value": "interest_only", "note": "Investor-typical IO for tax efficiency; non-resident IO availability varies by lender" },
+    "principal_and_interest_vs_interest_only": { "type": "enum", "options": ["interest_only", "principal_and_interest"], "value": "<initial>", "agent_reasoning_required": true, "reasoning_domain": "lender_fit", "note": "Investor-typical IO for tax efficiency; non-resident IO availability varies by lender — agent reasons based on strategy thesis + lender-pool availability" },
     "interest_only_period_years": { "type": "integer", "value": "<initial>" },
-    "fixed_vs_variable": { "type": "enum", "options": ["variable", "fixed_1yr", "fixed_2yr", "fixed_3yr"], "value": "<initial>" },
-    "offset_account_available_for_non_resident": { "type": "bool", "value": "<initial>", "note": "Some non-resident loans don't include offset; check per lender" }
+    "fixed_vs_variable": { "type": "enum", "options": ["variable", "fixed_1yr", "fixed_2yr", "fixed_3yr"], "value": "<initial>", "agent_reasoning_required": true, "reasoning_domain": "lender_fit" },
+    "offset_account_available_for_non_resident": { "type": "bool", "value": "<initial>", "note": "Some non-resident loans don't include offset; check per lender — a lender-capability FACT, not an agent strategy recommendation (Mode D has no AU PPOR to point an offset at, unlike Mode C's offset_strategy_recommendation)" }
   },
   "firb_gate": {
     "firb_approval_must_precede_unconditional_offer": { "type": "bool", "value": true },
@@ -551,6 +551,7 @@ type must stay canonical. *Reconciled 2026-07-03, see the outcome-type conforman
     "deposit_required_percentage": "percentage",
     "deposit_required_amount": "money",
     "io_vs_pi_recommendation": "enum",
+    "fixed_vs_variable": "enum",
     "rate_estimate": "percentage_range",
     "firb_dependency_acknowledged": "bool",
     "vn_income_acceptance_confirmed": "bool",
@@ -561,6 +562,8 @@ type must stay canonical. *Reconciled 2026-07-03, see the outcome-type conforman
 ```
 
 *(Reconciled 2026-07-04 — the first-drafted `recommended_lender`/`recommended_lender_reasoning` singular-pick pair collapsed the agent's lender_fit judgment to ONE named lender with no visible alternative, which is the exact "let the agent decide which lender to recommend" pattern the project's own ACL/credit-advice guardrail warns against (CLAUDE.md common pitfalls). Modes A/B/C all surface a `recommended_lender_shortlist` — an array of `{lender, reasoning, approval_likelihood}` the user compares and picks from, never a bare directive — and Mode D's own `non_resident_investor_loan_shortlist` Parameter already intended a shortlist; the Outcome schema just never carried it through. Reconciled onto the same `recommended_lender_shortlist` shape Mode C's `mortgage_plan` uses (same shared Python `lender_fit_investor` reasoning-domain schema, `LenderFitInvestorLeaves.recommended_lender_shortlist`) — caught live, mode-d-wedge.md P5 live-turn check.)*
+
+*(Reconciled 2026-07-05 — the same live-turn check surfaced a second gap: this Outcome schema never carried `fixed_vs_variable` through even though it was already a drafted Parameter (`loan_structure.fixed_vs_variable` above) and the shared Python leaf-fill already computed it every turn — silently discarded by `fh_engine_mortgage:merge_agent_investor_foreign/2`, costing tokens for no rendered value. Reconciling it exposed a DEEPER issue: the fill that computed it, `fill_mortgage_finance_investor` (Mode C's function), was being reused verbatim for Mode D and told the agent it was reasoning "for a domestic investor" while asking it to judge `uses_existing_ppor_equity` — a concept that presumes an existing AU principal residence this Vietnam-located non-resident investor does not have (CLAUDE.md #9 — the agent must ground in current state, not a reused frame). Fixed by giving Mode D its OWN Python schema/prompt/domain (`LenderFitNonResidentInvestorLeaves`, reasoning_domain `lender_fit_investor_foreign`, `planner.py`) authoring only the THREE leaves that actually apply here — `io_vs_pi_recommendation`, `fixed_vs_variable`, `recommended_lender_shortlist` — correctly grounded as a non-resident foreign investor, with NO offset-strategy or PPOR-equity leaves (Mode D's blueprint has no PPOR concept at all; the VN-side capital analogue is the separate `cross_border_funding` component). `fixed_vs_variable` also uses its own 4-option enum here (`variable | fixed_1yr | fixed_2yr | fixed_3yr`, no `split_fixed_variable` — matches this component's own `loan_structure.fixed_vs_variable` Parameter above, a domestic-lender product not offered in the non-resident pool), not Mode C's 5-option `RateStructure`.)*
 
 The `mortgage_plan` outcome feeds `yield_modelling.loan_costs`, `tax_structure_non_resident.depreciation_strategy_non_resident` (depreciation is offset against rental income which is net of loan interest), `cash_position.deposit + loan amount`, `cross_border_funding.transfer_amount` (deposit + buying costs determines transfer), `buying_strategy.firb_gate + financing condition`, `settlement_prep` (lender + FIRB + transfer milestones).
 

@@ -159,6 +159,14 @@ _RATE_OPTIONS = ("variable", "fixed_1yr", "fixed_2yr", "fixed_3yr", "split_fixed
 RateStructure = Literal["variable", "fixed_1yr", "fixed_2yr", "fixed_3yr",
                         "split_fixed_variable"]
 
+# Mode D's own blueprint (investor-foreign-au.md `loan_structure.fixed_vs_variable`) declares
+# only FOUR options — no `split_fixed_variable` (a domestic-lender product not offered in the
+# non-resident pool per kb.lender.non-resident-investment-loan-shortlist). A narrower Literal,
+# not RateStructure reused, so the schema itself (not just a runtime check) forbids the model
+# from picking an option Mode D's lender pool doesn't actually offer.
+_RATE_OPTIONS_NON_RESIDENT = ("variable", "fixed_1yr", "fixed_2yr", "fixed_3yr")
+RateStructureNonResident = Literal["variable", "fixed_1yr", "fixed_2yr", "fixed_3yr"]
+
 
 # Same enforcement-by-schema as RateStructure: a Literal (not a bare str) so the enum
 # lands IN the JSON schema — the model must pick one option and cannot put prose
@@ -202,6 +210,23 @@ class LenderFitInvestorLeaves(BaseModel):
     fixed_vs_variable: RateStructure            # single-valued enum (reused from FHB)
     offset_strategy_recommendation: OffsetStrategy   # single-valued enum
     # A shortlist to CONSIDER is 3–5 lenders; same hard cap as the FHB list surface.
+    recommended_lender_shortlist: Annotated[list[LenderRec], Field(max_length=5)]
+
+
+# Mode-D's own THREE-leaf schema (reconciled 2026-07-05 — see mode-d-wedge.md). Deliberately
+# NOT LenderFitInvestorLeaves reused as-is: `uses_existing_ppor_equity` and
+# `offset_strategy_recommendation` presume an existing AU PPOR to release equity from or point
+# an offset at, which a Vietnam-located non-resident investor does not have by construction
+# (Mode D has no PPOR concept anywhere in its blueprint — the VN-side capital analogue is the
+# separate cross_border_funding component). Asking the LLM those two questions for Mode D was
+# mis-grounding it (CLAUDE.md #9 — the agent must ground in current state, not a reused frame)
+# and paying for two leaves fh_engine_mortgage then silently discarded.
+class LenderFitNonResidentInvestorLeaves(BaseModel):
+    io_vs_pi_recommendation: IoVsPi             # single-valued enum (schema-as-constraint)
+    fixed_vs_variable: RateStructureNonResident  # Mode D's own 4-option enum (no split_fixed)
+    # kb.lender.non-resident-investment-loan-shortlist: the combined non-resident+investor
+    # pool is narrower than either axis alone ("typically 3–5 lenders") — same cap as the
+    # other lender_fit variants, the KB doc's own procedure will naturally return fewer.
     recommended_lender_shortlist: Annotated[list[LenderRec], Field(max_length=5)]
 
 
@@ -421,6 +446,14 @@ _KB_DOCS = {
         _REPO_ROOT / "docs" / "kb" / "loan" / "fixed-rate-roll-off-planning.md",
     "kb.lender.serviceability-investment-loans":
         _REPO_ROOT / "docs" / "kb" / "lender" / "serviceability-investment-loans.md",
+    # lender_fit_investor_foreign (Mode D) — adds the two non-resident-specific docs the
+    # foreign-investor mortgage_finance leaf-fill grounds in beyond the shared
+    # kb.loan.interest-only-vs-pi-investor above (the combined non-resident+investor lender
+    # pool, and VN-income lending-policy treatment).
+    "kb.lender.non-resident-investment-loan-shortlist":
+        _REPO_ROOT / "docs" / "kb" / "lender" / "non-resident-investment-loan-shortlist.md",
+    "kb.lender.temp-resident-lending-policies":
+        _REPO_ROOT / "docs" / "kb" / "lender" / "temp-resident-lending-policies.md",
     # property_fit (Mode C, Phase B) — the six property-assessment docs the per-property
     # fill grounds in: rental-market estimation, growth corridors, depreciation by build
     # year, investor-grade features, comparables methodology, and the strata health lens.
@@ -641,6 +674,75 @@ with equity is present; false when no PPOR equity is evident at the base stage.
 the Vietnamese AND the English, see <style>) and an honest `approval_likelihood` \
 (`indicative` when facts are pending). Keep each rationale ~2 sentences per language.
 7. Emit ONLY the five leaves.""",
+    },
+    # lender_fit_investor_foreign is the agent half of the `mortgage_finance` NON-RESIDENT
+    # investor variant (Mode D, TWO-PATH): reconciled 2026-07-05 as its OWN domain rather than
+    # reusing lender_fit_investor's five-leaf schema unadapted (mode-d-wedge.md) — a Vietnam-
+    # located non-resident investor has no AU PPOR by construction, so the PPOR-equity-release
+    # and offset-placement leaves that domain asks don't apply and were being silently
+    # discarded downstream while still costing an LLM judgment call. This domain authors ONLY
+    # the three leaves that DO apply to a non-resident investor.
+    "lender_fit_investor_foreign": {
+        "kb_slugs": ["kb.lender.non-resident-investment-loan-shortlist",
+                     "kb.loan.interest-only-vs-pi-investor",
+                     "kb.lender.temp-resident-lending-policies"],
+        "context": """\
+You are the agent half of the `mortgage_finance` component (reasoning_domain: \
+lender_fit_investor_foreign), for a Vietnam-located NON-RESIDENT property INVESTOR (FIRB- \
+dependent, no existing AU principal residence). The borrowing capacity, deposit requirement, \
+rate estimate, and every figure have ALREADY been computed by the engine's resolver and are \
+given in `<resolver_outcome>` (read-only). You do NOT compute or restate any figure. You \
+reason about exactly THREE qualitative things: (1) the repayment type (interest-only vs \
+principal-and-interest), (2) the rate structure (fixed vs variable), and (3) a short \
+NON-RESIDENT-INVESTOR LENDER SHORTLIST. You do NOT reason about PPOR equity release or \
+offset placement — this investor has no AU PPOR to release equity from or point an offset \
+at; those questions do not apply here. Your inputs are the investor's profile + investment \
+thesis (`<plan_card_state>`) and the resolver figures, grounded in the non-resident-investor \
+lender KB.""",
+        "goal": """\
+Produce ONLY the three non-resident-investor lender-fit leaves: `io_vs_pi_recommendation` \
+(interest_only or principal_and_interest), `fixed_vs_variable` (the rate-structure option), \
+and `recommended_lender_shortlist` (a short list of lenders that clear BOTH the non-resident \
+AND investment criteria, to CONSIDER, each with plain reasoning + an approval-likelihood \
+read). Nothing else — no figures, no capacity, no deposit, no PPOR/offset judgment (those \
+either don't apply or are already in `<resolver_outcome>`).""",
+        "non_negotiables": """\
+1. **Author no figure.** You do NOT produce borrowing capacity, deposit amount, a rate \
+number, or an LVR. Those are resolver-computed and given to you. Your output schema has no \
+number field — keep it that way.
+2. **At the base turn, income / debts / property are PENDING.** If `<plan_card_state>` shows \
+them absent (the base plan, plan-first), you CANNOT assess true approval likelihood. The \
+shortlist is then non-resident-investor-friendly lenders relevant to the strategy thesis with \
+`approval_likelihood: "indicative"` and reasoning that says it confirms once income, debts, \
+and a property are entered. Never invent an approval outcome or a portfolio from absent facts.
+3. **This investor has NO AU PPOR.** Do not reason about existing-equity release or offset \
+placement — those presume a domestic principal residence this investor does not have. If the \
+schema does not ask for them, that is deliberate; do not smuggle a PPOR/offset judgment into \
+another field.
+4. **IO availability is lender-specific for a non-resident, not a given (from the KB).** \
+Some lenders in the non-resident-friendly pool restrict non-resident loans to P&I only — \
+confirm IO availability as a shortlist criterion rather than assuming every shortlisted \
+lender offers it.
+5. **The lender pool is genuinely narrow (from the KB).** A lender must clear BOTH the \
+non-resident AND the investment-purpose criteria simultaneously — materially fewer than \
+either pool alone. Set that expectation in the reasoning rather than implying the broader \
+pool applies unchanged.
+6. **Decision-support, not advice (ASIC/ACL).** Options with reasoning — never a \
+recommendation to act, never directing the investor to a specific broker or lender.
+7. **Emit only the three-leaf object** (see `<output>`).""",
+        "procedure": """\
+1. Read `<resolver_outcome>` (the computed figures + deposit/rate estimate) and \
+`<plan_card_state>` (investor profile + strategy_thesis) and the KB.
+2. Set `io_vs_pi_recommendation` to EXACTLY ONE of: principal_and_interest | interest_only \
+— grounded in the thesis (gearing type + horizon), the IO-vs-P&I KB trade-offs, and whether \
+IO is realistically available to a non-resident in the shortlisted pool.
+3. Set `fixed_vs_variable` to EXACTLY ONE of: variable | fixed_1yr | fixed_2yr | fixed_3yr. \
+Default to `variable` for flexibility at the base stage; never assert a rate number.
+4. Build a shortlist of up to 5 lenders that clear both the non-resident AND investment \
+criteria (typically 3–5 in practice — a genuinely narrow pool), each with {vi, en} reasoning \
+(author the Vietnamese AND the English, see <style>) and an honest `approval_likelihood` \
+(`indicative` when facts are pending). Keep each rationale ~2 sentences per language.
+5. Emit ONLY the three leaves.""",
     },
     # investment_thesis is the agent half of the `investment_strategy` component (Mode C,
     # TWO-PATH like lender_fit): the renderer, the kb_versions audit, the carried horizon,
@@ -1027,6 +1129,18 @@ _INVESTOR_MORTGAGE_COMPONENT = {
                "resolver_outcome (the computed mortgage_plan structure + refinance framing)"],
     "reads": "upstream DAG outcomes only (not upstream parameters) — §11.9",
 }
+_NON_RESIDENT_INVESTOR_MORTGAGE_COMPONENT = {
+    "component_id": "mortgage_finance",
+    "goal": "Author the three non-resident-investor lender-fit leaves (IO-vs-P&I, "
+            "fixed-vs-variable, non-resident-investor lender shortlist) for a Vietnam-located "
+            "non-resident foreign investor, given the resolver-computed figures. Author no "
+            "figure. No PPOR-equity or offset-placement leaves — this investor has no AU PPOR.",
+    "inputs": ["investor_profile_foreign.outcome",
+               "investment_strategy.outcome (strategy_thesis — gearing_type, horizon)",
+               "resolver_outcome (the computed mortgage_plan figures: deposit, rate estimate, "
+               "FIRB dependency)"],
+    "reads": "upstream DAG outcomes only (not upstream parameters) — §11.9",
+}
 _STRATEGY_COMPONENT = {
     "component_id": "investment_strategy",
     "goal": "Author the three thesis leaves (archetype, gearing_type, one_liner) for a "
@@ -1089,11 +1203,18 @@ async def fill_mortgage_finance(upstream_outcomes, resolver_outcome):
     computed and passed in as `resolver_outcome` (read-only grounding). output_format =
     the two-leaf schema (no money field → §98 enforced by schema). Returns
     (leaves_dict, usage_dict)."""
-    # Shared component NAME, two blueprints: the Mode-C investor mortgage_plan resolver
-    # outcome carries `io_vs_pi_recommendation` (the FHB one does not). Mirror the engine's
-    # RO-shape discriminator (fh_engine_mortgage) — delegate the investor path to its own
-    # 5-leaf fill. No new reasoning_domain on the wire (both arrive as lender_fit).
+    # Shared component NAME, FOUR blueprints: the Mode-C/D investor mortgage_plan resolver
+    # outcomes carry `io_vs_pi_recommendation` (the Mode-A/B FHB ones do not). Mirror the
+    # engine's RO-shape 2x2 discriminator (fh_engine_mortgage:merge_agent/2 — io_vs_pi marks
+    # the investor axis, firb_dependency_acknowledged marks the foreign axis) — delegate to
+    # the matching investor fill: Mode C's 5-leaf (has an AU PPOR) or Mode D's OWN 3-leaf
+    # (no AU PPOR — reconciled 2026-07-05, was wrongly reusing Mode C's schema/prompt
+    # unadapted, see LenderFitNonResidentInvestorLeaves). No new reasoning_domain on the wire
+    # (all four arrive as lender_fit).
     if "io_vs_pi_recommendation" in resolver_outcome:
+        if "firb_dependency_acknowledged" in resolver_outcome:
+            return await fill_mortgage_finance_non_resident_investor(
+                upstream_outcomes, resolver_outcome)
         return await fill_mortgage_finance_investor(upstream_outcomes, resolver_outcome)
     import time
     _t0 = time.monotonic()
@@ -1198,6 +1319,69 @@ async def fill_mortgage_finance_investor(upstream_outcomes, resolver_outcome):
     # belt-and-braces §98: reject any rate option outside the blueprint enum (the IO/PI +
     # offset enums are already Literal-enforced by the schema).
     if leaves.fixed_vs_variable not in _RATE_OPTIONS:
+        raise RuntimeError(f"fixed_vs_variable {leaves.fixed_vs_variable!r} not in enum")
+    return leaves.model_dump(), usage
+
+
+async def fill_mortgage_finance_non_resident_investor(upstream_outcomes, resolver_outcome):
+    """Two-path agent half of the `mortgage_finance` NON-RESIDENT INVESTOR variant (Mode D,
+    reasoning_domain lender_fit_investor_foreign): one real Agent-SDK structured one-shot
+    authoring ONLY the three non-resident-investor lender_fit leaves (IO-vs-P&I,
+    fixed-vs-variable, non-resident-investor lender shortlist). Deliberately its OWN
+    function/schema/prompt, NOT fill_mortgage_finance_investor reused — that domain's
+    uses_existing_ppor_equity + offset_strategy_recommendation leaves presume an AU PPOR
+    this investor does not have (reconciled 2026-07-05, mode-d-wedge.md; the prior reuse
+    mis-grounded the agent as "a domestic investor" on every Mode-D turn). The renderer, the
+    kb_versions audit, the deposit/rate figures, and the FIRB dependency flag are
+    resolver-owned and passed in as `resolver_outcome` (read-only grounding). output_format =
+    the three-leaf schema (no number field → every figure stays out of the LLM's reach, the
+    §98 posture). Returns (leaves_dict, usage_dict) — same shape fill_mortgage_finance
+    returns."""
+    import time
+    _t0 = time.monotonic()
+    from claude_agent_sdk import ClaudeAgentOptions, ResultMessage, query
+    _t_import = time.monotonic()
+
+    options = ClaudeAgentOptions(
+        model=LEAF_MODEL,
+        effort=LEAF_EFFORT,   # bound reasoning depth (else opus thinks for minutes)
+        system_prompt=build_system_prompt("lender_fit_investor_foreign",
+                                          _kb_block("lender_fit_investor_foreign")),
+        setting_sources=[],   # do NOT load CLAUDE.md / project settings
+        allowed_tools=[],     # leaf-fill pulls no tools
+        env=_credit_env(),    # subscription-credit auth, subprocess-scoped
+        output_format={"type": "json_schema",
+                       "schema": LenderFitNonResidentInvestorLeaves.model_json_schema()},
+    )
+
+    async def _consume():
+        structured = None
+        usage = {}
+        async for message in query(
+                prompt=build_user_content(_NON_RESIDENT_INVESTOR_MORTGAGE_COMPONENT,
+                                          upstream_outcomes, resolver_outcome),
+                options=options):
+            if isinstance(message, ResultMessage):
+                structured = getattr(message, "structured_output", None)
+                usage = getattr(message, "usage", {}) or {}
+        return structured, usage
+
+    try:
+        structured, usage = await asyncio.wait_for(_consume(), timeout=LEAF_TIMEOUT_S)
+    except asyncio.TimeoutError:
+        raise RuntimeError(f"leaf-fill exceeded {LEAF_TIMEOUT_S}s app-side timeout")
+
+    if structured is None:
+        raise RuntimeError("Agent SDK returned no structured_output")
+
+    _t_query = time.monotonic()
+    print(f"[planner] mortgage_finance(lender_fit_investor_foreign): "
+          f"sdk_import={_t_import - _t0:.1f}s query={_t_query - _t_import:.1f}s "
+          f"model={LEAF_MODEL} effort={LEAF_EFFORT}", file=sys.stderr, flush=True)
+    leaves = LenderFitNonResidentInvestorLeaves(**structured)  # raises ValidationError if off
+    # belt-and-braces §98: reject any rate option outside MODE D's narrower 4-option blueprint
+    # enum (the IO/PI enum is already Literal-enforced by the schema).
+    if leaves.fixed_vs_variable not in _RATE_OPTIONS_NON_RESIDENT:
         raise RuntimeError(f"fixed_vs_variable {leaves.fixed_vs_variable!r} not in enum")
     return leaves.model_dump(), usage
 
