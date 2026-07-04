@@ -512,9 +512,7 @@ type must stay canonical. *Reconciled 2026-07-03, see the outcome-type conforman
   },
   "loan_path": {
     "non_resident_investor_loan_shortlist": { "type": "array<{ lender, rate_range, deposit_min, vn_income_accepted, processing_time }>", "value": [], "agent_reasoning_required": true, "reasoning_domain": "lender_fit" },
-    "rate_premium_above_domestic_investor": { "type": "percentage_range", "value": "<initial>", "note": "Typically 100–200bp above domestic investor rates" },
-    "recommended_lender": { "type": "string", "value": "<initial>" },
-    "recommended_lender_reasoning": { "type": "string", "value": "<initial>" }
+    "rate_premium_above_domestic_investor": { "type": "percentage_range", "value": "<initial>", "note": "Typically 100–200bp above domestic investor rates" }
   },
   "loan_structure": {
     "principal_and_interest_vs_interest_only": { "type": "enum", "options": ["interest_only", "principal_and_interest"], "value": "interest_only", "note": "Investor-typical IO for tax efficiency; non-resident IO availability varies by lender" },
@@ -548,7 +546,7 @@ type must stay canonical. *Reconciled 2026-07-03, see the outcome-type conforman
 {
   "type": "mortgage_plan",
   "fields": {
-    "recommended_lender": "string",
+    "recommended_lender_shortlist": "array<{ lender, reasoning, approval_likelihood }>",
     "expected_borrowing_capacity": "money_range",
     "deposit_required_percentage": "percentage",
     "deposit_required_amount": "money",
@@ -561,6 +559,8 @@ type must stay canonical. *Reconciled 2026-07-03, see the outcome-type conforman
   }
 }
 ```
+
+*(Reconciled 2026-07-04 — the first-drafted `recommended_lender`/`recommended_lender_reasoning` singular-pick pair collapsed the agent's lender_fit judgment to ONE named lender with no visible alternative, which is the exact "let the agent decide which lender to recommend" pattern the project's own ACL/credit-advice guardrail warns against (CLAUDE.md common pitfalls). Modes A/B/C all surface a `recommended_lender_shortlist` — an array of `{lender, reasoning, approval_likelihood}` the user compares and picks from, never a bare directive — and Mode D's own `non_resident_investor_loan_shortlist` Parameter already intended a shortlist; the Outcome schema just never carried it through. Reconciled onto the same `recommended_lender_shortlist` shape Mode C's `mortgage_plan` uses (same shared Python `lender_fit_investor` reasoning-domain schema, `LenderFitInvestorLeaves.recommended_lender_shortlist`) — caught live, mode-d-wedge.md P5 live-turn check.)*
 
 The `mortgage_plan` outcome feeds `yield_modelling.loan_costs`, `tax_structure_non_resident.depreciation_strategy_non_resident` (depreciation is offset against rental income which is net of loan interest), `cash_position.deposit + loan amount`, `cross_border_funding.transfer_amount` (deposit + buying costs determines transfer), `buying_strategy.firb_gate + financing condition`, `settlement_prep` (lender + FIRB + transfer milestones).
 

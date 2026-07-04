@@ -276,10 +276,14 @@ refinance_plan_base() ->
 %% --- fill_investor_foreign (resolver half, Mode-D non-resident-investor mortgage_plan) --
 %% The Mode-D `mortgage_plan` (10 fields, investor-foreign-au.md component 5) — a FOURTH,
 %% different shape from Mode A's/B's/C's, dispatched by the SAME strategy_thesis-presence
-%% + firb_required_any compound discriminator fill/2 already uses. `recommended_lender` is
-%% a single top-pick string (not an array like Mode A/B's shortlist) — the compiled outcome
-%% schema's own field, agent-authored (folded by merge_agent_investor_foreign/2 below);
-%% `io_vs_pi_recommendation` is the SAME agent leaf Mode C uses (reasoning_domain lender_fit).
+%% + firb_required_any compound discriminator fill/2 already uses. `recommended_lender_shortlist`
+%% is the SAME shortlist shape Mode C's mortgage_plan uses (reconciled 2026-07-04 — the
+%% blueprint originally drafted a singular `recommended_lender` top-pick string, which
+%% collapsed the agent's lender_fit judgment to one named lender with no visible
+%% alternative, the exact pattern CLAUDE.md's ACL/credit-advice guardrail warns against;
+%% every other mode already surfaces a shortlist the user compares and picks from) —
+%% agent-authored (folded by merge_agent_investor_foreign/2 below); `io_vs_pi_recommendation`
+%% is the SAME agent leaf Mode C uses (reasoning_domain lender_fit).
 %%
 %% §98: `rate_estimate` (percentage_range) is a NUMERIC figure — never the agent's rate-
 %% STRUCTURE enum the way Mode A/B/C's `loan_structure_recommendation.rate` is. It is
@@ -299,7 +303,7 @@ fill_investor_foreign(_Args, Upstream) ->
     DepositPct = deposit_pct_foreign(),
     Outcome = #{
         %% AGENT slots (lender_fit) — filled by merge_agent_investor_foreign/2.
-        <<"recommended_lender">> => null,
+        <<"recommended_lender_shortlist">> => null,
         <<"io_vs_pi_recommendation">> => null,
         <<"expected_borrowing_capacity">> => borrowing_capacity(Profile),
         <<"deposit_required_percentage">> => DepositPct,
@@ -418,14 +422,17 @@ merge_agent_investor(ResolverOutcome, AgentValues) ->
         }
     }.
 
-%% fold the two Mode-D agent leaves (recommended_lender: a single top-pick string, not an
-%% array — the compiled outcome schema's own shape; io_vs_pi_recommendation: the same
+%% fold the two Mode-D agent leaves (recommended_lender_shortlist: the SAME shortlist
+%% shape + fold as Mode C's merge_agent_investor/2 — reconciled 2026-07-04, was a singular
+%% top-pick string that collapsed the agent's judgment to one named lender, the ACL-line
+%% pattern CLAUDE.md's guardrail warns against; io_vs_pi_recommendation: the same
 %% lender_fit leaf Mode C uses). Slot-scoped (§98): every figure (capacity, deposit,
 %% rate_estimate, the firb/vn/fx acknowledgement flags) is the resolver's, untouched.
 -spec merge_agent_investor_foreign(map(), map()) -> map().
 merge_agent_investor_foreign(ResolverOutcome, AgentValues) ->
     ResolverOutcome#{
-        <<"recommended_lender">> => maps:get(<<"recommended_lender">>, AgentValues, null),
+        <<"recommended_lender_shortlist">> =>
+            maps:get(<<"recommended_lender_shortlist">>, AgentValues, []),
         <<"io_vs_pi_recommendation">> => maps:get(<<"io_vs_pi_recommendation">>, AgentValues, null)
     }.
 
@@ -484,7 +491,8 @@ agent_values_from_outcome_investor(Stored) ->
 %% (both top-level, no nested loan_structure wrapper — Mode D's own outcome shape).
 -spec agent_values_from_outcome_investor_foreign(map()) -> map().
 agent_values_from_outcome_investor_foreign(Stored) ->
-    #{<<"recommended_lender">> => maps:get(<<"recommended_lender">>, Stored, null),
+    #{<<"recommended_lender_shortlist">> =>
+          maps:get(<<"recommended_lender_shortlist">>, Stored, []),
       <<"io_vs_pi_recommendation">> =>
           maps:get(<<"io_vs_pi_recommendation">>, Stored, null)}.
 
