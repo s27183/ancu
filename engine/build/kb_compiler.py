@@ -67,7 +67,8 @@ ARTIFACT_OUT = ROOT / "engine" / "erlang" / "priv" / "kb" / "artifact.json"
 # blueprint per plan-card from its blueprint_slug; activating one mode never dormants
 # another. A blueprint outside this set is still structurally gated, but its semantic
 # gates are deferred and its anchors reported as inventory.
-IN_SCOPE_BLUEPRINTS = {"fhb-domestic-au", "investor-domestic-au", "fhb-foreign-au"}
+IN_SCOPE_BLUEPRINTS = {"fhb-domestic-au", "investor-domestic-au", "fhb-foreign-au",
+                       "investor-foreign-au"}
 
 # architecture.md §11.9 renderer enum (13 members).
 RENDERER_ENUM = {

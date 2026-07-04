@@ -1,6 +1,7 @@
 # Mode-D wedge — build plan + progress tracker
 
-**Status: P1 (KB) + P2 (engine resolvers) done and verified (2026-07-03). Opened 2026-07-03.** This doc is the
+**Status: P1 (KB) + P2 (engine resolvers) + P3 (multi-blueprint activation) done and verified
+(2026-07-04). Opened 2026-07-03.** This doc is the
 durable plan *and* the task tracker for the Mode-D (Vietnam-located foreign investor) wedge. The
 Claude Code Task list is ephemeral (it does not survive compaction); this file is the source of
 truth for "what's left." The grounding-checklist carries a one-line pointer here.
@@ -322,6 +323,58 @@ semantic gates, investor-foreign-au still correctly out-of-scope, 0 unbuilt anch
 P1); all 19 pre-existing Mode A/B/C conformance escripts still PASS (zero regression); the new
 `test/mode_d_p2_conformance.escript` — 82 assertions across all ten P2 items — PASSES.
 
+**P3 done and verified (2026-07-04).** `investor-foreign-au` added to `IN_SCOPE_BLUEPRINTS` (now a
+4-member set); the per-card multi-blueprint runtime (Mode-C wedge P3) and its N-blueprint
+generalization (Mode-B wedge P3) needed **zero engine code change** — both already key registries
+and validation by `blueprint_slug`, built for an open-ended set.
+
+But the flip itself was not a mechanical one-liner, unlike Mode B's: **flipping in-scope turns on
+SEMANTIC gates for the first time**, and those caught two real prerequisite gaps P2 (structural-gates-
+only) couldn't see:
+
+1. **The compiler parses each blueprint file independently — no cross-file JSON stitching.**
+   `firb_workflow` (component 3) and `cross_border_funding` (component 9) were written prose-only
+   ("Same as Mode B — no changes", a markdown link, no inline JSON), because their Erlang resolvers
+   really are reused verbatim. But `build_registry` only materializes fields from JSON blocks present
+   in *this* blueprint's *own* file — a prose-only component contributes nothing to its blueprint's
+   registry, even when the underlying code is genuinely shared. This broke the shared anchors
+   `kb.firb.established-dwelling-ban` / `kb.firb.status-determination` (both `firb_workflow`-scoped)
+   the moment semantic gates ran against investor-foreign-au. **Fix: inlined Mode B's Parameters +
+   Outcome-schema JSON verbatim into both components** (doc-only; zero engine change — the resolvers
+   were already correct). Mode B's own `bid_plan`/`risk_assessment`/`settlement_checklist` use the
+   same prose-only pattern successfully *only* because no KB anchor's `fills` rule happens to
+   reference their fields — the gap is latent there too, just not yet triggered.
+2. **`property_assessment`'s outcome was wrongly kept private.** P2's outcome-type-conformance pass
+   (2026-07-03) explicitly reasoned `property_fit_investor_foreign` "stays private (per-property/no
+   shared discriminator dependency)" — true only because P2 never ran this blueprint's semantic
+   gates to check. It does have a shared-discriminator dependency: `firb_workflow` is Mode B's
+   `fh_engine_firb` reused verbatim, and it reads `Upstream.property_fit` (confirmed by source read,
+   not assumption) — plus the established-dwelling-ban anchor's own `fills` rule hardcodes
+   `property_fit.property_type` literally. **Reconciled to the canonical `property_fit`** (matching
+   Mode A/B, who already declare it), superseding the P2 note. **Correctly left open** (not decided
+   at P3, nothing regresses today because no property resolver runs until P2-continuation/property-
+   scope): `fh_engine_disposition`/`fh_engine_cash`'s already-built Mode-D investor paths read
+   `property_fit_investor` (Mode C's key) — a third name. Whichever key `property_assessment`
+   actually emits under, one of the two reader sets needs a fallback; decide when that component is
+   built, not here (advisor-checked before implementing — the temptation was to "fix" this by editing
+   `fh_engine_firb`/`fh_engine_disposition` now, which would have been scope creep with zero P3
+   benefit, since neither module is exercised by any P3 selection proof).
+
+Also fixed: `mode_b_p3_scope_conformance.escript`'s own `in_scope_blueprints` assertion was a
+hardcoded "exactly the three bare stems" — now stale by construction. Updated to four, matching the
+same "activation is additive" discipline the escript itself proves for A/B/C.
+
+Verified: `python3 tests/validate_build.py` PASS (4 in-scope registries, 0 fails); artifact re-emitted
+(169 KB entries, 4 blueprints, 4 in-scope registries); `rebar3 compile` clean; new
+`test/mode_d_p3_scope_conformance.escript` (23 assertions: scope set, registry materialization,
+Layer-1 conformance for all 10 P2 outcome types against the investor-foreign-au registry specifically,
+and a 4-way A/B/C/D modes-coexist proof) — PASSES; `mode_b_p3_scope_conformance.escript` (fixed
+assertion) — PASSES; `mode_d_p2_conformance.escript` — still 82/82; full escript sweep (51 files) —
+47 pass, the same 4 pre-existing failures confirmed **identical on the unmodified baseline**
+(`due_diligence_conformance`, `investor_seam_smoke`, `property_assessment_seam`, `qa_smoke` — verified
+by `git stash`-ing this session's two changed files, re-emitting, recompiling, and re-running each;
+all four fail identically pre-change) — zero regression.
+
 | Status | Phase | Item |
 |---|---|---|
 | [x] | P2 | `investor_profile_foreign` resolver (merge of `buyer_profile` foreign lens + `investor_profile`; canonical `profile` outcome; `residency_for_tax=non_resident` definitional) |
@@ -334,7 +387,7 @@ P1); all 19 pre-existing Mode A/B/C conformance escripts still PASS (zero regres
 | [x] | P2 | `cross_border_funding` — real branch needed (tracker's "no delta" claim corrected above): falls back to `profile.available_capital_aud_equivalent` when `family_funding_plan` is absent |
 | [x] | P2 | `ownership_planning_foreign_investor` ★ new sibling module (vacancy fee + AU/VN tax obligation prose + portfolio; no `disposition`/`opportunities` edge — confirmed against the blueprint's own declared inputs/outcome fields, simpler than Mode C's sibling) |
 | [x] | P2 | `disposition` foreign-resident branch — NOT a new branch: extended the shared `fill_investor/3` (Mode C's own function) with FRCGW + the VN-side note, gated on `tax_optimised_structure.frcgw_applicable`; the CGT no-discount/no-PPOR-exemption/to_verify routing needed zero new code (falls out of `residency_for_tax=non_resident` + `cgt_discount_eligible=false`) |
-| [ ] | P3 | Add `investor-foreign-au` to `IN_SCOPE_BLUEPRINTS`; green semantic gates; re-emit artifact; prove per-card selection (A/B/C unchanged) |
+| [x] | P3 | Add `investor-foreign-au` to `IN_SCOPE_BLUEPRINTS`; green semantic gates; re-emit artifact; prove per-card selection (A/B/C unchanged) |
 | [ ] | P4 | Dispatcher branches for the 4 new outcome shapes onto existing renderer components (no new `.svelte` expected — verify at P4-open) |
 | [ ] | P5 | `?BASE_COMPONENTS_FOREIGN_INVESTOR` per-blueprint `base_components/1` sequence + DAG-walk conformance |
 | [ ] | P5 | Onboarding dispatch (`blueprint_for/1` — foreign-person AND investor-intent predicate) + onboarding picker — atomic-last |
@@ -345,22 +398,26 @@ P1); all 19 pre-existing Mode A/B/C conformance escripts still PASS (zero regres
   against the compiler's literal per-blueprint unbuilt-anchor inventory (`python3 tests/validate_build.py`),
   not just the tracker's provisional "~77"/"~87" counts — see the P1 section above for the full table.
   0 unbuilt anchors, all gates green.
-- ~~**`firb_status` shape compatibility**~~ — **RESOLVED at P2 (2026-07-03).** `fh_engine_firb:fill/2`
-  reused verbatim (zero code change) — confirmed against its live source: it reads
-  `Upstream.profile.*` and `Upstream.property_fit` (undefined at every Mode-D base turn regardless,
-  same as every other mode pre-property), so the shape question was moot for P2's base scope. A NEW
-  seam surfaced instead, deferred honestly (not this wedge's P2, but flagged for whenever
-  `property_assessment` — per-property, out of P2 scope — gets built): `fh_engine_firb:fill/2` reads
-  the property outcome under the key `property_fit` (Mode B's), while Mode D's other per-property
-  consumers (yield_modelling, disposition, cash_position's investor path) read `property_fit_investor`
-  (Mode C's, and Mode D's `property_assessment` blueprint component is itself typed
-  `property_fit_investor_foreign`, a THIRD name, not reconciled to either canonical key in this P2
-  pass since the component isn't built yet). Whichever key `property_assessment` lands under, either
-  `fh_engine_firb:fill/2` needs a small fallback read (`property_fit` orelse `property_fit_investor`)
-  or the Mode-D property outcome needs to reuse `property_fit_investor` verbatim (matching this P2's
-  own "reuse the canonical key" discipline) — decide at that component's build, not here.
+- ~~**`firb_status` shape compatibility**~~ — **RESOLVED at P2 (2026-07-03), NARROWED at P3
+  (2026-07-04).** `fh_engine_firb:fill/2` reused verbatim (zero code change) — confirmed against its
+  live source: it reads `Upstream.profile.*` and `Upstream.property_fit` (undefined at every Mode-D
+  base turn regardless, same as every other mode pre-property), so the shape question was moot for
+  P2's base scope. P2 flagged a 3-way property-key naming split (`property_fit` / `property_fit_investor`
+  / `property_fit_investor_foreign`) and deferred it to `property_assessment`'s own build. Flipping
+  investor-foreign-au in-scope at P3 forced part of that decision early — not by choice, by the
+  compiler's semantic gate: the shared anchor `kb.firb.established-dwelling-ban`'s own `fills` rule
+  reads `property_fit.property_type`, and that string must resolve to a real registry namespace for
+  ANY in-scope blueprint referencing it. **Reconciled `property_assessment`'s declared outcome type
+  to the canonical `property_fit`** (matching Mode A/B — doc-only, no engine change, no resolver
+  exists for this component yet so nothing runtime-regresses). **Still correctly open, NOT decided at
+  P3** (advisor-checked: editing `fh_engine_firb`/`fh_engine_disposition` now would be scope creep with
+  zero P3 benefit, since P3's selection proof never exercises a property-attached turn): the
+  already-built `fh_engine_disposition`/`fh_engine_cash` Mode-D investor paths still read
+  `property_fit_investor` (Mode C's key) — a second name that doesn't match `property_fit`. Whichever
+  key `property_assessment` actually emits under, one of the two reader sets needs a small fallback
+  read — decide at that component's build, not here.
 - **`property_type` enum drift** (grounding-checklist item 3's recorded Wedge-2 reconciliation) —
-  `investor-foreign-au:262` still carries the pre-`vacant_land` 6-value enum; adopt `vacant_land` when
+  `investor-foreign-au:313` still carries the pre-`vacant_land` 6-value enum; adopt `vacant_land` when
   this wedge's `property_assessment` component is built.
 - **FIRB naming** (same grounding-checklist item 3 note) — map `vacant_residential_land` (FIRB's term)
   to the neutral `vacant_land` enum when the permitted-purchase-types content is authored for this mode.
