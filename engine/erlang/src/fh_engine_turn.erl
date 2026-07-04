@@ -101,6 +101,38 @@
          <<"mortgage_finance">>, <<"cash_position">>, <<"cross_border_funding">>,
          <<"ownership_planning">>]).
 
+%% Mode-D (investor-foreign-au) base turn — the 10 `base`/`both`-scope components of the
+%% blueprint's 14 (mode-d-wedge.md P5), EXCLUDING the 4 per-property-only ones
+%% (property_assessment, buying_strategy, due_diligence, settlement_prep — same exclusion
+%% discipline as A/B/C). Order is real-code-dependency order, grounded against each
+%% fh_engine_*.erl module's actual Upstream reads (investor-foreign-au.md's own component
+%% Inputs lines, not the blueprint's ASCII sketch — which itself omits mortgage_finance,
+%% see the blueprint's own note under the diagram):
+%%   - firb_workflow / investment_strategy both read only profile (property_fit is
+%%     honestly absent at base, same treatment as Mode B's firb_workflow);
+%%   - mortgage_finance (fill_investor_foreign) reads firb_status (firb_workflow) AND
+%%     strategy_thesis (investment_strategy) — must follow both;
+%%   - yield_modelling reads strategy_thesis only; ordered after mortgage_finance to match
+%%     Mode C's existing convention (no data dependency between the two, but consistent
+%%     placement avoids an arbitrary divergence);
+%%   - tax_structure_non_resident reads cash_flow_projection (yield_modelling) — must
+%%     follow it;
+%%   - cash_position (fill_investor_foreign) reads firb_status AND tax_optimised_structure
+%%     — must follow firb_workflow AND tax_structure_non_resident;
+%%   - cross_border_funding reads budget_envelope_investor (cash_position) — must follow it;
+%%   - ownership_planning_foreign_investor reads tax_optimised_structure + cash_flow_
+%%     projection — must follow tax_structure_non_resident + yield_modelling; does NOT read
+%%     disposition's figures (unlike Mode C's ownership_planning_investor/equity_release),
+%%     so it need not precede disposition;
+%%   - disposition reads strategy_thesis, cash_flow_projection, tax_optimised_structure,
+%%     budget_envelope_investor — runs LAST among the base figure-owners (same position as
+%%     every other mode's disposition).
+-define(BASE_COMPONENTS_FOREIGN_INVESTOR,
+        [<<"investor_profile_foreign">>, <<"firb_workflow">>, <<"investment_strategy">>,
+         <<"mortgage_finance">>, <<"yield_modelling">>, <<"tax_structure_non_resident">>,
+         <<"cash_position">>, <<"cross_border_funding">>,
+         <<"ownership_planning_foreign_investor">>, <<"disposition">>]).
+
 -spec start_link(map()) -> gen_statem:start_ret().
 start_link(Args) ->
     gen_statem:start_link(?MODULE, Args, []).
@@ -544,14 +576,17 @@ fail(#{tenant_id := T, plan_card_id := PC, turn_id := Tn}, Code, Msg) ->
 %% BlueprintSlug selects BOTH the blueprint's component definitions AND the per-blueprint
 %% base SET+ORDER (P5-activate, mode-c-wedge.md): fhb-domestic-au → the Mode-A sequence;
 %% investor-domestic-au → the Mode-C investor spine (the discriminator-ordered set above);
-%% fhb-foreign-au → the Mode-B foreign spine (mode-b-wedge.md P5). The base set+order is
-%% an engine-owned concern (these macros, not the artifact) — the blueprint declares
+%% fhb-foreign-au → the Mode-B foreign spine (mode-b-wedge.md P5); investor-foreign-au →
+%% the Mode-D foreign-investor spine (mode-d-wedge.md P5). The base set+order is an
+%% engine-owned concern (these macros, not the artifact) — the blueprint declares
 %% dag_reads, not the base/per-property split. An unknown slug falls through to the FHB
 %% sequence (the only blueprint that created base turns pre-P5).
 base_components(<<"investor-domestic-au">> = Slug) ->
     order(Slug, ?BASE_COMPONENTS_INVESTOR);
 base_components(<<"fhb-foreign-au">> = Slug) ->
     order(Slug, ?BASE_COMPONENTS_FOREIGN);
+base_components(<<"investor-foreign-au">> = Slug) ->
+    order(Slug, ?BASE_COMPONENTS_FOREIGN_INVESTOR);
 base_components(Slug) ->
     order(Slug, ?BASE_COMPONENTS).
 

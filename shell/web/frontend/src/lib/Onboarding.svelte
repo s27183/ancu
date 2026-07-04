@@ -29,12 +29,13 @@
     let phase = $state<'form' | 'submitting' | 'created' | 'auth' | 'error'>('form');
 
     // The gate branches on intent (mode-c-wedge.md P5-activate) AND, orthogonally, on
-    // citizen/PR (mode-b-wedge.md P5): owner_occupier still requires a first-home answer
-    // (Mode A domestic / Mode B foreign — both are FHB blueprints); investment needs only
-    // citizen/PR (Mode C — first-home is meaningless for an investor). Two cells remain
-    // out of scope (calm note, not an error): investment + !citizenPr (Mode D, foreign
-    // investor — the engine's blueprint_for/2 fails closed on this combination) and
-    // citizenPr === true + !firstHome + live-in (the Mode-E next-home gap).
+    // citizen/PR (mode-b-wedge.md P5 / mode-d-wedge.md P5): owner_occupier still requires
+    // a first-home answer (Mode A domestic / Mode B foreign — both are FHB blueprints);
+    // investment needs only citizen/PR (Mode C domestic / Mode D foreign — first-home is
+    // meaningless for an investor either way). One cell remains out of scope (calm note,
+    // not an error): citizenPr === true + !firstHome + live-in (the Mode-E next-home gap;
+    // its foreign twin, owner_occupier + !citizenPr + !firstHome, is also out of scope but
+    // has no engine-level backstop — see fh_engine_h_plan_cards:blueprint_for/2).
     const ooNeedsFirstHome = $derived(intent === 'owner_occupier');
     const gateAnswered = $derived(
         intent !== null && citizenPr !== null && (!ooNeedsFirstHome || firstHome !== null)
@@ -46,11 +47,17 @@
     );
     // Mode B: foreign person, buying to live in, first home — the blueprint's own scope
     // (fhb-foreign-au.md — a Vietnam-parent-funded / temp-resident FHB, not an investor
-    // or next-home purchase; those combinations are Mode D / the Mode-E gap, both deferred).
+    // or next-home purchase; those combinations are Mode D / the Mode-E gap).
     const eligibleForeign = $derived(
         intent === 'owner_occupier' && citizenPr === false && firstHome === true
     );
-    const eligible = $derived(eligibleDomestic || eligibleForeign);
+    // Mode D (mode-d-wedge.md P5): foreign person, investing — no first-home question,
+    // same as Mode C. Newly in scope; previously fell into the "out of scope" note above.
+    const eligibleForeignInvestor = $derived(
+        intent === 'investment' && citizenPr === false
+    );
+    const isForeign = $derived(eligibleForeign || eligibleForeignInvestor);
+    const eligible = $derived(eligibleDomestic || eligibleForeign || eligibleForeignInvestor);
     const canSubmit = $derived(eligible && band !== null && phase === 'form');
 
     const nf = $derived(
@@ -70,7 +77,7 @@
         if (band === null || intent === null) return;
         phase = 'submitting';
         const outcome = await createPlanCard(
-            buildOnboardingInput(stateCode, suburbName, suburbSal, band, intent, eligibleForeign)
+            buildOnboardingInput(stateCode, suburbName, suburbSal, band, intent, isForeign)
         );
         phase =
             outcome.kind === 'created' ? 'created'
@@ -170,7 +177,9 @@
 
             {#if gateAnswered && !eligible}
                 <!-- Out of scope — calm, not an error (§7.1). Two distinct reasons:
-                     foreign (Mode B/D) vs domestic next-home owner-occupier (Mode-E gap). -->
+                     foreign next-home owner-occupier vs domestic next-home owner-occupier
+                     (the Mode-E gap and its foreign twin — investor combinations are both
+                     in scope now, Mode C/D). -->
                 <p class="ob-note">
                     {citizenPr === false
                         ? $t('onboarding.outofscope.foreign')
@@ -179,6 +188,8 @@
             {:else if eligible}
                 {#if eligibleForeign}
                     <p class="ob-note ob-note-foreign">{$t('onboarding.foreign.note')}</p>
+                {:else if eligibleForeignInvestor}
+                    <p class="ob-note ob-note-foreign">{$t('onboarding.foreign.investor.note')}</p>
                 {/if}
                 <fieldset class="budget">
                     <legend>{$t('onboarding.budget.label')}</legend>

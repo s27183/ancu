@@ -86,8 +86,8 @@ const messages = {
         en: 'Is this your first home?'
     },
     'onboarding.outofscope.foreign': {
-        vi: 'FirstHomey hiện hỗ trợ người mua nước ngoài mua căn nhà ĐẦU TIÊN để ở. Kế hoạch cho nhà đầu tư nước ngoài hoặc người đã từng sở hữu nhà sẽ sớm có.',
-        en: 'FirstHomey currently supports foreign-person FIRST-HOME buyers only. Plans for foreign investors or next-home buyers are coming soon.'
+        vi: 'Để mua nhà để ở, FirstHomey hiện hỗ trợ người mua nước ngoài mua căn nhà ĐẦU TIÊN. Kế hoạch cho người nước ngoài đã từng sở hữu nhà sẽ sớm có. (Nhà đầu tư nước ngoài đã được hỗ trợ — hãy chọn "Để đầu tư".)',
+        en: 'For buying a home to live in, FirstHomey currently supports foreign-person FIRST-HOME buyers only. Plans for foreign next-home buyers are coming soon. (Foreign investors are already supported — choose "As an investment".)'
     },
     'onboarding.gate.firsthome.foreign': {
         vi: 'Người mua ở Việt Nam hoặc giữ visa tạm trú thường mua nhà đầu tiên tại Úc — hỏi để xác nhận.',
@@ -96,6 +96,10 @@ const messages = {
     'onboarding.foreign.note': {
         vi: 'Vì bạn không phải công dân/thường trú nhân Úc, kế hoạch của bạn sẽ theo lộ trình FIRB — bao gồm phí FIRB, thời hạn phê duyệt và chuyển tiền xuyên biên giới. Chi tiết về visa sẽ được hỏi sau qua trò chuyện.',
         en: "Because you're not an Australian citizen or PR, your plan follows the FIRB path — including the FIRB fee, approval timeline, and cross-border funding. We'll ask about your visa details later in chat."
+    },
+    'onboarding.foreign.investor.note': {
+        vi: 'Vì bạn là nhà đầu tư ở nước ngoài, kế hoạch của bạn sẽ bao gồm lộ trình FIRB, thuế dành cho người không cư trú (không giảm 50% CGT, có khấu trừ FRCGW khi bán) và chuyển tiền xuyên biên giới. Chi tiết về visa và tài chính sẽ được hỏi sau qua trò chuyện.',
+        en: "Because you're a Vietnam-located investor, your plan will cover the FIRB path, non-resident tax treatment (no 50% CGT discount, FRCGW withheld on sale), and cross-border funding. We'll ask about your visa and financial details later in chat."
     },
     'onboarding.yes': { vi: 'Có', en: 'Yes' },
     'onboarding.no': { vi: 'Không', en: 'No' },

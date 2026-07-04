@@ -26,7 +26,29 @@ built the genuinely-new `investment_strategy` (`strategy_thesis`) hero the wedge
 possibly needed; removed the silent catch-all so an unmapped componentId (`property_assessment`'s
 `property_fit`) renders nothing instead of the wrong hero. `npx svelte-check` 0 errors/0 warnings
 whole-frontend. Full detail + the Mode-C cross-doc-drift note in `mode-d-wedge.md`. **P5 (base engine
-+ onboarding activation) not started.** *Depends on 1.*
++ onboarding activation) done and verified (2026-07-04) — Mode-D wedge BUILD-COMPLETE (P0–P5 all
+closed).** `fh_engine_turn.erl` gained `?BASE_COMPONENTS_FOREIGN_INVESTOR` (10 of the blueprint's 14
+components, `base`/`both`-scope, the 4 per-property ones excluded) + a new `base_components/1` clause
+for `investor-foreign-au`, order grounded against each resolver module's real Upstream reads (the
+blueprint's own ASCII sketch omits `mortgage_finance` entirely, flagged in its own text).
+`fh_engine_h_plan_cards.erl`'s `blueprint_for/2` gained an `investment`+foreign clause routing to
+`investor-foreign-au`/Mode D — the exact combination it used to fail closed on; every `intent` × foreign
+combination is now in scope (one disclosed asymmetry: `firstHome` was never seen at this layer, so a
+foreign next-home buyer still resolves to Mode B here — a shell-only gate, no engine backstop, unlike
+the investment+foreign case this clause used to structurally gate). Shell (`Onboarding.svelte`,
+`i18n.ts`): new `eligibleForeignInvestor` predicate unlocks the shared budget picker + a new bilingual
+note; `isForeign` generalizes the flag into `buildOnboardingInput` (previously only `eligibleForeign`
+reached it — would have silently sent `foreign_person: false` for a Mode-D submission had it not been
+generalized alongside `eligible`). **A real regression found by the sweep, not just new code**:
+`mode_b_seam_smoke.escript` asserted `investment+foreign → 400` — exactly what P5 changes — fixed to
+assert `202` instead, Mode D's own turn proven elsewhere. New DAG-order conformance escript (33/33
+PASS: set+order, no-regression on A/B/C, 15 real-data-dependency checks +
+10 Layer-1 checks via a live DAG walk, discriminator-load-bearing). Full 52-escript sweep — same 4
+pre-existing failures as a clean-HEAD baseline (need a live Python sidecar/LLM, confirmed via `git
+stash`, unrelated). `validate_build.py` all gates green. **Honest gap:** no live browser/HTTP turn
+verification — two Mode-D base components are two-path (agent leaf), and the live sidecar fill is the
+same pre-existing environmental gap the sweep's 4 known failures already show; first check once a
+live sidecar environment is available. Full detail in `mode-d-wedge.md`.
 3. `[x]` **Property model foundation** *(both halves done — the second foundation, parallel to #1).* Unlike the buyer model, the property layer was never forked per mode (`property_fit` is already shared), so this is **completion, not unification**: build the property *structure* fully now, separated from specific property *data*. The structure = the `property_type` enum, the neutral per-property fact surface (`property_fit`), the `suburb.*` enrichment surface, and the **property-dependent scheme structure** (the schemes that branch on property type). Surfaced by the compiler's first finding — the dangling `kb.scheme.qld.fh-vacant-land` stacking ref is a hole in the build-time structure, *not* a data-deferral. Scope:
     - **(3a) Design doc — DONE:** [`architecture/property-model-foundation.md`](architecture/property-model-foundation.md), parallel to [`architecture/fact-model-unification.md`](architecture/fact-model-unification.md). Records the inverted asymmetry (property shared / buyer forked), the structure/data governing principle, the three structural holes, and three resolved Decisions: **add `vacant_land` as a distinct enum value** (grounded in three regulated consumers — QLD `fh-vacant-land`, NSW FHBAS land bands, FIRB permitted-types — that already treat it as distinct from `house_and_land`); **one canonical enum, blueprints reference not re-declare** (investor `dual_occupancy`/`nrass` deferred to Mode C); **author the lean `kb.scheme.qld.fh-vacant-land` and wire it**. Plus the human structure-completeness pass the compiler can't substitute for.
     - **(3b) — DONE.** Completed the structure the compiler can't see is missing (it gates *reference* integrity, not absent-but-needed structure): added `vacant_land` to Mode A's `property_assessment` param ([`fhb-domestic-au.md`](blueprints/fhb-domestic-au.md) `:251`) + `property_fit` outcome (`:298`); authored [`kb.scheme.qld.fh-vacant-land`](kb/scheme/qld/fh-vacant-land.md) (*lean*, QRO-verified — nil duty / no value cap from 1 May 2025, worldwide prior-ownership test, **2-year build-and-move-in window** as the distinguishing param) with the symmetric `alternative_to: [fhc, fhnhc]` edge on its own side + wired into the `eligibility` anchors (`:321`); re-pointed the NSW FHBAS land-only-bands note ([`nsw/fhbas.md`](kb/scheme/nsw/fhbas.md) `:80`) now that `vacant_land` exists. **Structure-completeness pass:** the three QLD concessions form a *complete, disjoint partition* of the 7-value enum (fhc = 2 established, fhnhc = 4 new incl. `house_and_land` package, fh-vacant-land = `vacant_land`); FHBAS stays type-agnostic. Compiler **green** — 46 in-scope anchors, 59 type-checks, 47 KB docs. (This took the **structure half of F9**; F9's per-property *data* depth — split-contract draws, completion-valuation gap — stays deferred.)

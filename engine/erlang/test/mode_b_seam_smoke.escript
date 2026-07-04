@@ -155,17 +155,22 @@ main(_) ->
     {403, _} = req(get, Base ++ "/plan-cards/" ++ binary_to_list(PlanCardId),
                    [BadAuth], <<>>),
 
-    %% --- fail-closed check: investment + foreign (Mode D, unbuilt) -> 400, never silently
-    %%     misroutes to the domestic investor blueprint (constraint #10 compliance risk) ---
-    BadCombo = fh_engine_util:json_encode(#{
+    %% --- investment + foreign now routes LIVE to Mode D (mode-d-wedge.md P5), not a
+    %%     400 fail-closed — the fail-closed check this used to assert here is superseded;
+    %%     Mode D's own creation/turn-completion path is covered by
+    %%     test/base_components_foreign_investor_conformance.escript (DAG order + Layer-1)
+    %%     and test/investor_seam_smoke.escript's live-turn walk. Only smoke that the
+    %%     combination is ACCEPTED (202) and lands on the right blueprint/mode here — this
+    %%     escript's job is Mode-B regression, not re-proving Mode-D's own turn. ---
+    GoodCombo = fh_engine_util:json_encode(#{
         <<"state">> => <<"NSW">>,
         <<"target_price_range">> => [700000, 900000],
         <<"intent">> => <<"investment">>,
         <<"foreign_person">> => true
     }),
-    {400, BadComboResp} = req(post, Base ++ "/plan-cards", [Auth], BadCombo),
-    #{<<"error">> := <<"unsupported_combination">>} = fh_engine_util:json_decode(BadComboResp),
-    io:format("fail-closed confirmed: investment+foreign -> 400 unsupported_combination~n"),
+    {202, GoodComboResp} = req(post, Base ++ "/plan-cards", [Auth], GoodCombo),
+    #{<<"plan_card_id">> := _} = fh_engine_util:json_decode(GoodComboResp),
+    io:format("investment+foreign now live (Mode D, mode-d-wedge.md P5) — no regression here~n"),
 
     io:format("~n==== MODE-B SEAM SMOKE: ALL ASSERTIONS PASSED ====~n"),
     halt(0).

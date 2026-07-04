@@ -11,8 +11,8 @@
 %% (engine-contract §9.1): `intent` (owner_occupier | investment) and a foreign-person
 %% signal. owner_occupier+domestic → Mode A / fhb-domestic-au; investment+domestic →
 %% Mode C / investor-domestic-au; owner_occupier+foreign → Mode B / fhb-foreign-au
-%% (mode-b-wedge.md P5). investment+foreign (Mode D) is NOT YET IN SCOPE — see
-%% blueprint_for/2's fail-closed clause.
+%% (mode-b-wedge.md P5); investment+foreign → Mode D / investor-foreign-au
+%% (mode-d-wedge.md P5). Every combination of the two axes is now in scope.
 
 init(Req0, State) ->
     case cowboy_req:method(Req0) of
@@ -93,12 +93,21 @@ foreign_of(Params) ->
 %% Select the blueprint + derived mode label from the two onboarding axes (mode-c-wedge.md
 %% P5-activate + mode-b-wedge.md P5).
 blueprint_for(<<"owner_occupier">>, true) -> {<<"fhb-foreign-au">>, <<"B">>};
-%% Foreign investor (Mode D) is NOT YET IN SCOPE — only Mode B (foreign owner-occupier
-%% FHB) is built this wedge. Fail closed rather than silently routing a foreign investor
-%% onto the DOMESTIC investor blueprint, which reasons about neither FIRB eligibility nor
-%% the foreign-buyer surcharge — a compliance-misadvice risk (constraint 10), not a UX
-%% nicety. Onboarding.svelte is the primary backstop (never offers this combination past
-%% the picker); this is the fail-closed structural gate behind it.
+%% Foreign investor (Mode D, mode-d-wedge.md P5) — investment intent + foreign person.
+%% Previously failed closed here (investment+foreign routed to {error,
+%% unsupported_combination} rather than silently landing on the DOMESTIC investor
+%% blueprint, which reasons about neither FIRB eligibility nor the foreign-buyer surcharge
+%% — a compliance-misadvice risk, constraint 10). Now built and in scope.
+blueprint_for(<<"investment">>, true) -> {<<"investor-foreign-au">>, <<"D">>};
+%% Both `true`-foreign Intent values (owner_occupier, investment — intent_of/1 admits no
+%% third) are now matched above; this is unreachable given today's two-value Intent axis,
+%% kept as a defensive fallback should that axis ever grow. NOTE what this does NOT gate:
+%% blueprint_for/2 only sees intent × foreign, never first-home — so a foreign NEXT-home
+%% buyer (owner_occupier + foreign + not-first-home, the Mode-E gap's foreign twin) still
+%% resolves to Mode B at this layer. The first-home restriction is a SHELL-ONLY gate
+%% (Onboarding.svelte's `eligibleForeign` requires firstHome===true before submit) — there
+%% is no engine-level backstop for that cell, unlike the investment+foreign case this
+%% clause used to fail closed on.
 blueprint_for(_, true) -> {error, unsupported_combination};
 blueprint_for(<<"investment">>, false) -> {<<"investor-domestic-au">>, <<"C">>};
 blueprint_for(_, false) -> {<<"fhb-domestic-au">>, <<"A">>}.

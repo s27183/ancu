@@ -1,7 +1,6 @@
 # Mode-D wedge — build plan + progress tracker
 
-**Status: P1 (KB) + P2 (engine resolvers) + P3 (multi-blueprint activation) + P4 (shell dispatcher
-branches) done and verified (2026-07-04). Opened 2026-07-03.** This doc is the
+**Status: P0–P5 all closed (2026-07-04) — Mode-D wedge BUILD-COMPLETE. Opened 2026-07-03.** This doc is the
 durable plan *and* the task tracker for the Mode-D (Vietnam-located foreign investor) wedge. The
 Claude Code Task list is ephemeral (it does not survive compaction); this file is the source of
 truth for "what's left." The grounding-checklist carries a one-line pointer here.
@@ -448,6 +447,84 @@ exports). Not yet pixel-verified in a live browser (no Mode C/D onboarding path 
 cards yet — that's P5's job); the fix is verified by reading each componentId group against the
 fields it now resolves to, not merely a green build.
 
+**P5 done and verified (2026-07-04) — Mode-D wedge BUILD-COMPLETE.** The atomic-last activation
+slice: `fh_engine_turn.erl` gained `?BASE_COMPONENTS_FOREIGN_INVESTOR` (10 of the blueprint's 14
+components — the `base`/`both`-scope set, excluding the 4 per-property-only ones) + a
+`base_components(<<"investor-foreign-au">>)` clause. **The order is grounded against each
+`fh_engine_*.erl` module's real Upstream reads, not the blueprint's own ASCII pipeline sketch** —
+that sketch omits `mortgage_finance` entirely (the doc says so explicitly under the diagram) and,
+being "sequential reading order" rather than a dependency graph, doesn't by itself prove anything
+about actual read-before-write safety. Grounded order: `investor_profile_foreign` → `firb_workflow`
+→ `investment_strategy` → `mortgage_finance` (reads `firb_status` + `strategy_thesis` — must follow
+both) → `yield_modelling` (reads `strategy_thesis`) → `tax_structure_non_resident` (reads
+`cash_flow_projection` — must follow `yield_modelling`) → `cash_position` (reads `firb_status` +
+`tax_optimised_structure`) → `cross_border_funding` (reads `budget_envelope_investor`) →
+`ownership_planning_foreign_investor` (reads `tax_optimised_structure` + `cash_flow_projection`,
+does NOT read `disposition`'s figures unlike Mode C's `ownership_planning_investor`/`equity_release`,
+so it need not precede `disposition`) → `disposition` (reads every upstream figure-owner, runs last).
+
+**Onboarding dispatch**: `fh_engine_h_plan_cards.erl`'s `blueprint_for/2` gained
+`blueprint_for(<<"investment">>, true) -> {<<"investor-foreign-au">>, <<"D">>}` — the exact
+combination the function used to fail closed on (`{error, unsupported_combination}` → HTTP 400),
+now built and routed. Every combination of the two onboarding axes (`intent` × foreign-person) is
+now in scope; the `blueprint_for(_, true) -> error` catch-all is unreachable given today's two-value
+`intent` axis (kept as a defensive fallback). **Named, not silently left implicit**: this clause
+never saw `firstHome` at all — it only ever dispatched on `intent` × `foreign`, so a foreign
+*next-home* buyer (`owner_occupier` + foreign + not-first-home, the Mode-E gap's foreign twin) still
+resolves to Mode B at the engine layer. There is no engine-level backstop for that cell — it is a
+**shell-only** gate (`Onboarding.svelte`'s `eligibleForeign` already required `firstHome === true`
+before submit, unchanged by this wedge). This is a real, disclosed asymmetry with the
+investment+foreign case this same clause used to gate: that one had a structural backstop; this one
+never did, before or after P5.
+
+**Shell (`Onboarding.svelte`, `i18n.ts`)**: a new `eligibleForeignInvestor` predicate
+(`intent === 'investment' && citizenPr === false` — no first-home question, mirroring how Mode C
+needs none either) unlocks the same budget-band picker Mode A/B/C already share, plus a new
+bilingual note (`onboarding.foreign.investor.note` — FIRB path, non-resident tax treatment, FRCGW,
+cross-border funding; visa/financial detail deferred to chat, same honest-partial precedent as
+Mode B's own `onboarding.foreign.note`). `isForeign` generalizes the flag threaded into
+`buildOnboardingInput` (`eligibleForeign || eligibleForeignInvestor`) — previously only
+`eligibleForeign` reached it, which would have silently sent `foreign_person: false` for a Mode-D
+submission had the predicate not been generalized alongside `eligible`. `onboarding.outofscope.foreign`'s
+copy narrowed to match what's actually still out of scope (foreign next-home only — investors are no
+longer lumped into that message).
+
+**A real regression found and fixed, not just new code added**: `test/mode_b_seam_smoke.escript`
+had its own live assertion that `investment+foreign` returns `400 unsupported_combination` — exactly
+the behavior P5 exists to change. Running the full escript sweep caught this immediately (the only
+failure among 52 that differed from a clean-HEAD baseline run). Fixed by replacing the assertion with
+one that confirms the combination is now `202`-accepted (Mode D's own turn-completion is proven
+elsewhere — the new `base_components_foreign_investor_conformance.escript` and the pre-existing
+`investor_seam_smoke.escript` — so this escript's job stays Mode-B regression, not re-proving Mode D).
+
+**Conformance**: new `test/base_components_foreign_investor_conformance.escript` (33/33 PASS) proves,
+mirroring Mode-B's own `base_components_foreign_conformance.escript` pattern: (1) SET+ORDER —
+`base_components(investor-foreign-au)` is exactly the 10-component spine, per-property components
+excluded; (2) NO REGRESSION — Mode A/B/C sequences byte-identical; (3) DAG WALK — walking the real
+resolver chain with `firb_required_any=true`, every real data dependency (15 checked pairs) is
+present before the component that reads it, and every outcome validates against the
+`investor-foreign-au` registry (Layer-1 gate, 10 checks); (4) DISCRIMINATOR LOAD-BEARING — the SAME
+order/slug with `firb_required_any=false` flipped makes `mortgage_finance`/`cash_position` produce
+the Mode-C shapes instead, proving the flag drives the branch, not the registry/order alone.
+**Zero regression**: full 52-escript sweep, same 4 pre-existing failures as a clean-HEAD baseline
+(`due_diligence_conformance`, `investor_seam_smoke`, `property_assessment_seam`, `qa_smoke` — all
+require a live Python sidecar + LLM credentials this environment doesn't have; confirmed identical
+on clean HEAD via `git stash`, unrelated to this wedge). `python3 tests/validate_build.py` — all
+gates green.
+
+**Honest gap, not silently claimed**: this closes the BUILD (engine dispatch + DAG order + shell UI,
+all conformance-tested below the HTTP/PG seam) via `svelte-autofixer` clean, `svelte-check` 0/0,
+production build green, and the escript sweep above. It does **not** include a live end-to-end HTTP
+turn verification through a real browser — Docker PG was up this session (unlike prior Mode-B/C P5
+sessions), but two of Mode D's base components (`mortgage_finance`, `tax_structure_non_resident`) are
+two-path (resolver + one agent leaf each), and the live agent-leaf fill is the SAME pre-existing
+environmental gap the sweep's 4 known failures already surface (no live Python sidecar / Claude
+credentials in this shell session) — reproducing it via a fresh browser onboarding submission would
+hit the identical wall, not prove anything the escripts haven't already. A real `POST
+/api/plan-cards` → live sidecar → `plan_card_events` walk for a Mode-D card, and a pixel check of the
+new onboarding gate + the P4 renderers together, should be the first check once a live sidecar
+environment is available — before this wedge is called deploy-ready.
+
 | Status | Phase | Item |
 |---|---|---|
 | [x] | P2 | `investor_profile_foreign` resolver (merge of `buyer_profile` foreign lens + `investor_profile`; canonical `profile` outcome; `residency_for_tax=non_resident` definitional) |
@@ -462,8 +539,8 @@ fields it now resolves to, not merely a green build.
 | [x] | P2 | `disposition` foreign-resident branch — NOT a new branch: extended the shared `fill_investor/3` (Mode C's own function) with FRCGW + the VN-side note, gated on `tax_optimised_structure.frcgw_applicable`; the CGT no-discount/no-PPOR-exemption/to_verify routing needed zero new code (falls out of `residency_for_tax=non_resident` + `cgt_discount_eligible=false`) |
 | [x] | P3 | Add `investor-foreign-au` to `IN_SCOPE_BLUEPRINTS`; green semantic gates; re-emit artifact; prove per-card selection (A/B/C unchanged) |
 | [x] | P4 | Dispatcher branches for the new outcome shapes onto existing renderer components (0 new `.svelte` — but 2 real dispatch bugs found+fixed, not a pure formality; see below) |
-| [ ] | P5 | `?BASE_COMPONENTS_FOREIGN_INVESTOR` per-blueprint `base_components/1` sequence + DAG-walk conformance |
-| [ ] | P5 | Onboarding dispatch (`blueprint_for/1` — foreign-person AND investor-intent predicate) + onboarding picker — atomic-last |
+| [x] | P5 | `?BASE_COMPONENTS_FOREIGN_INVESTOR` per-blueprint `base_components/1` sequence + DAG-walk conformance |
+| [x] | P5 | Onboarding dispatch (`blueprint_for/2` — investment+foreign predicate) + onboarding foreign-investor picker — atomic-last |
 
 ## Open seams (surface-and-track, reconcile in-phase)
 
