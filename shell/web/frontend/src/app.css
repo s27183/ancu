@@ -1012,7 +1012,10 @@ main {
     font-size: 0.85rem;
     color: #b5341f;
 }
-.ob-note-foreign {
+/* Generic accent-tinted callout — foreign-buyer, foreign-investor, and (mode-e-wedge.md
+   P5) domestic next-home informational notes all share this look; nothing foreign-
+   specific about the styling itself, hence the mode-agnostic name. */
+.ob-note-info {
     text-align: left;
     border-left: 3px solid var(--accent);
     background: var(--accent-soft);

@@ -42,13 +42,16 @@ main(_) ->
     Token = mint(TenantId, UserId, Priv),
     Auth = {"authorization", "Bearer " ++ binary_to_list(Token)},
 
-    %% --- POST create plan card: intent=owner_occupier + foreign_person=true ->
-    %%     Mode B (fhb-foreign-au), per fh_engine_h_plan_cards:blueprint_for/2 ---
+    %% --- POST create plan card: intent=owner_occupier + foreign_person=true + buyer_stage
+    %%     =first_home -> Mode B (fhb-foreign-au), per
+    %%     fh_engine_h_plan_cards:blueprint_for/3 (mode-e-wedge.md P5 — buyer_stage is now
+    %%     REQUIRED for owner_occupier; the engine fails closed on absent, never guesses) ---
     CreateBody = fh_engine_util:json_encode(#{
         <<"state">> => <<"NSW">>,
         <<"target_price_range">> => [700000, 900000],
         <<"intent">> => <<"owner_occupier">>,
-        <<"foreign_person">> => true
+        <<"foreign_person">> => true,
+        <<"buyer_stage">> => <<"first_home">>
     }),
     {202, CreateResp} = req(post, Base ++ "/plan-cards", [Auth], CreateBody),
     #{<<"plan_card_id">> := PlanCardId, <<"turn_id">> := TurnId} =

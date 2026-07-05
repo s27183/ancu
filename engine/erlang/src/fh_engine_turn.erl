@@ -133,6 +133,30 @@
          <<"cash_position">>, <<"cross_border_funding">>,
          <<"ownership_planning_foreign_investor">>, <<"disposition">>]).
 
+%% Mode-E (nexthome-domestic-au) base turn — 9 of the blueprint's 13 components (mode-e-
+%% wedge.md P5), EXCLUDING the same 4 per-property components every mode already excludes
+%% (property_assessment, buying_strategy, due_diligence, settlement_prep). A near-verbatim
+%% mirror of the Mode-A nine (?BASE_COMPONENTS) with `eligibility` swapped for
+%% `existing_home_disposal` in the SAME slot — grounded against the real resolver reads,
+%% not just position-copied:
+%%   - existing_home_disposal (fh_engine_existing_home_disposal:fill/2) reads only profile
+%%     (buyer_profile) — same single upstream read as eligibility had in that slot;
+%%   - cash_position's fill_fhb_nexthome/2 (fh_engine_cash.erl) discriminates on
+%%     existing_home_disposal's PRESENCE in Upstream (mirrors how tax_optimised_structure
+%%     marks Mode C's investor path) and folds its net_sale_proceeds into the HAVE side —
+%%     a real data dependency, so existing_home_disposal MUST precede cash_position;
+%%   - mortgage_finance/disposition are verified-reused-unchanged (mode-e-wedge.md P2) and
+%%     read nothing existing_home_disposal-specific, so their position mirrors Mode A's
+%%     precedent order rather than being data-forced.
+%% Before this clause existed, an unknown slug fell through to ?BASE_COMPONENTS (the Mode-A
+%% sequence), which silently DROPS existing_home_disposal (order/2 filters to names present
+%% in the blueprint — `eligibility` isn't one of nexthome-domestic-au's components) —
+%% the base turn would have run without it, a genuine gap this clause closes.
+-define(BASE_COMPONENTS_NEXTHOME,
+        [<<"buyer_profile">>, <<"existing_home_disposal">>, <<"mortgage_finance">>,
+         <<"cash_position">>, <<"ownership_planning">>, <<"disposition">>,
+         <<"purchase_journey">>, <<"preparation">>, <<"phase_playbook">>]).
+
 -spec start_link(map()) -> gen_statem:start_ret().
 start_link(Args) ->
     gen_statem:start_link(?MODULE, Args, []).
@@ -577,16 +601,19 @@ fail(#{tenant_id := T, plan_card_id := PC, turn_id := Tn}, Code, Msg) ->
 %% base SET+ORDER (P5-activate, mode-c-wedge.md): fhb-domestic-au → the Mode-A sequence;
 %% investor-domestic-au → the Mode-C investor spine (the discriminator-ordered set above);
 %% fhb-foreign-au → the Mode-B foreign spine (mode-b-wedge.md P5); investor-foreign-au →
-%% the Mode-D foreign-investor spine (mode-d-wedge.md P5). The base set+order is an
-%% engine-owned concern (these macros, not the artifact) — the blueprint declares
-%% dag_reads, not the base/per-property split. An unknown slug falls through to the FHB
-%% sequence (the only blueprint that created base turns pre-P5).
+%% the Mode-D foreign-investor spine (mode-d-wedge.md P5); nexthome-domestic-au → the
+%% Mode-E next-home spine (mode-e-wedge.md P5). The base set+order is an engine-owned
+%% concern (these macros, not the artifact) — the blueprint declares dag_reads, not the
+%% base/per-property split. An unknown slug falls through to the FHB sequence (the only
+%% blueprint that created base turns pre-P5).
 base_components(<<"investor-domestic-au">> = Slug) ->
     order(Slug, ?BASE_COMPONENTS_INVESTOR);
 base_components(<<"fhb-foreign-au">> = Slug) ->
     order(Slug, ?BASE_COMPONENTS_FOREIGN);
 base_components(<<"investor-foreign-au">> = Slug) ->
     order(Slug, ?BASE_COMPONENTS_FOREIGN_INVESTOR);
+base_components(<<"nexthome-domestic-au">> = Slug) ->
+    order(Slug, ?BASE_COMPONENTS_NEXTHOME);
 base_components(Slug) ->
     order(Slug, ?BASE_COMPONENTS).
 

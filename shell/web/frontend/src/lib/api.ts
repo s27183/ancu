@@ -93,11 +93,21 @@ export interface OnboardingInput {
     target_sal: string;
     intent: 'owner_occupier' | 'investment';
     /** The FIRB axis (mode-b-wedge.md P5) — ORTHOGONAL to intent, never folded into it
-     *  (engine-contract §9.1's two independent onboarding axes). true routes to the
-     *  fhb-foreign-au blueprint (Mode B, owner_occupier only today — the engine's
-     *  fh_engine_h_plan_cards:blueprint_for/2 fails closed on investment+true, Mode D
-     *  not yet in scope). Omitted/false → domestic (unchanged default). */
+     *  (engine-contract §9.1's three onboarding axes). true routes to fhb-foreign-au
+     *  (Mode B) when combined with intent=owner_occupier + buyer_stage=first_home, or to
+     *  investor-foreign-au (Mode D) when combined with intent=investment (mode-d-wedge.md
+     *  P5). Omitted/false → domestic (unchanged default). */
     foreign_person?: boolean;
+    /** The buyer-stage axis (mode-e-wedge.md P0/P5) — ORTHOGONAL to intent/foreign,
+     *  meaningful ONLY when intent=owner_occupier (investment has no first-home concept).
+     *  first_home routes to fhb-domestic-au (Mode A) / fhb-foreign-au (Mode B); next_home
+     *  routes to nexthome-domestic-au (Mode E) when domestic — foreign+next_home fails
+     *  closed engine-side (mode-e-wedge.md decision #4), so the shell's onboarding gate
+     *  never offers that combination. Omitted degrades to next_home at the engine
+     *  (fh_engine_h_plan_cards:stage_of/1) — never silently first_home, since that
+     *  direction risks asserting unearned FHG/FHSS entitlement (misadvice, constraint 10).
+     *  The shell always sends this explicitly for owner_occupier submissions. */
+    buyer_stage?: 'first_home' | 'next_home';
 }
 
 /** The engine's 202 reply: the new plan card + the base turn now running async. */

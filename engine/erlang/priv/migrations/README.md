@@ -12,6 +12,9 @@ into `persistent_term` at boot — *not* Postgres) are out of scope here.
 | `001_init_engine.sql` | Core runtime state: `tenants`, `tenant_signing_keys`, `profiles` (the household fact base — Decision 1), `plan_cards` (per journey, FK → `profiles`), `plan_card_events`, `sessions` + `session_turns`, `audit_events`, `artifacts` |
 | `002_audit_fill_path_two_path.sql` | Widens `audit_events.fill_path` CHECK to `{resolver, two_path, agent}` (the two-path fill added `two_path` — slice 2f) |
 | `003_suburbs.sql` | The `suburb.*` reference surface: `suburbs` (SAL-keyed, **global — no `tenant_id`**, `facts_jsonb` metric set) + `suburb_sources` (per-feed license/redistribution register). Shared reference data, the third bucket — see [`suburb-data-foundation.md`](../../../../docs/architecture/suburb-data-foundation.md) |
+| `004_plan_target_overlay.sql` | The `plan.target` overlay fields (Decision 1's plan-layer split) |
+| `005_checklist_status.sql` | Checklist-status tracking columns |
+| `006_mode_e.sql` | Widens `plan_cards.mode` CHECK to admit `'E'` (mode-e-wedge.md — 001's inline CHECK only anticipated the four modes known when it was authored) |
 
 Deferred to later migrations: the optional `properties` table (narrow-path
 property data; addenda otherwise live in `plan_cards.content_jsonb` —

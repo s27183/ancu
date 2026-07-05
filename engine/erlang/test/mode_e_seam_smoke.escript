@@ -1,41 +1,52 @@
 #!/usr/bin/env escript
-%%! -sname fh_seam_smoke
+%%! -sname fh_mode_e_seam_smoke
 %%
-%% End-to-end smoke test for Wedge-1a #8 slice 1 (the Erlang<->Python seam).
-%% Boots the engine, seeds a tenant + ed25519 signing key, mints a JWT, and drives
-%% the real /api/engine/* HTTP/SSE surface — asserting the full event sequence, the
-%% persisted event log, the content_jsonb snapshot, cancellation idempotency, and
-%% auth rejection. Run from engine/erlang with the build libs on the path:
+%% End-to-end smoke test for Mode E (mode-e-wedge.md P5) — the missing HALF of P5's
+%% "live-verified" claim: base_components_nexthome_conformance.escript and
+%% blueprint_for_conformance.escript both prove below-the-seam correctness (DAG order,
+%% resolver output, dispatch truth table) but neither exercises the two-path sidecar
+%% fill, the FIRB→ASIC→AML compliance pipeline on Mode-E's OWN components, the
+%% outcome-conformance gate at the commit seam, or SSE/PG persistence — the same real
+%% HTTP/PG walk seam_smoke.escript (Mode A) / mode_b_seam_smoke.escript (Mode B) /
+%% mode_d_seam_smoke.escript (Mode D) each already prove for their own mode. Mirrors
+%% seam_smoke.escript's structure exactly; the only inputs that differ are
+%% buyer_stage=next_home (no foreign_person) and the Mode-E component set/ASIC-adjacency
+%% counts below.
+%%
+%% Boots the engine, seeds a tenant + ed25519 signing key, mints a JWT, and drives the
+%% real /api/engine/* HTTP/SSE surface for a genuine domestic + owner_occupier +
+%% next_home submission (fh_engine_h_plan_cards:blueprint_for/3 → nexthome-domestic-au).
+%% Run from engine/erlang with the build libs on the path:
 %%
 %%   ENGINE_DATABASE_URL=postgres://engine:engine_dev_pw@localhost:5433/firsthomey_engine?sslmode=disable \
-%%   ERL_LIBS=_build/default/lib escript test/seam_smoke.escript
+%%   ERL_LIBS=_build/default/lib escript test/mode_e_seam_smoke.escript
 
 -mode(compile).
 
 main(_) ->
-    os:putenv("FH_ENGINE_HTTP_PORT", "8091"),
+    os:putenv("FH_ENGINE_HTTP_PORT", "8095"),
     {ok, _} = application:ensure_all_started(fh_engine),
     {ok, _} = application:ensure_all_started(inets),
-    Base = "http://localhost:8091/api/engine",
+    Base = "http://localhost:8095/api/engine",
 
     %% --- seed tenant + ed25519 signing key (the shell's role in production) ---
     TenantId = fh_engine_util:uuid4(),
     UserId = fh_engine_util:uuid4(),
     {Pub, Priv} = crypto:generate_key(eddsa, ed25519),
-    ok = fh_engine_store:upsert_tenant(TenantId, <<"smoke-tenant">>),
+    ok = fh_engine_store:upsert_tenant(TenantId, <<"mode-e-smoke-tenant">>),
     ok = fh_engine_store:add_signing_key(TenantId, <<"ed25519">>, base64:encode(Pub)),
     Token = mint(TenantId, UserId, Priv),
     Auth = {"authorization", "Bearer " ++ binary_to_list(Token)},
 
-    %% --- POST create plan card (plan-first: no property) ---
+    %% --- POST create plan card: intent=owner_occupier + buyer_stage=next_home ->
+    %%     Mode E (nexthome-domestic-au), per fh_engine_h_plan_cards:blueprint_for/3
+    %%     (mode-e-wedge.md P5) ---
     CreateBody = fh_engine_util:json_encode(#{
         <<"state">> => <<"NSW">>,
-        <<"target_price_range">> => [600000, 700000],
+        <<"target_price_range">> => [900000, 1100000],
         <<"target_zone">> => [<<"Cabramatta">>, <<"Canley Vale">>],
         <<"intent">> => <<"owner_occupier">>,
-        %% Required since mode-e-wedge.md P5 (blueprint_for/3 fails closed on an absent
-        %% buyer_stage for owner_occupier — this is the Mode-A first-home smoke).
-        <<"buyer_stage">> => <<"first_home">>
+        <<"buyer_stage">> => <<"next_home">>
     }),
     {202, CreateResp} = req(post, Base ++ "/plan-cards", [Auth], CreateBody),
     #{<<"plan_card_id">> := PlanCardId, <<"turn_id">> := TurnId} =
@@ -52,39 +63,56 @@ main(_) ->
     %% --- persisted event log is the SOT (count matches the stream) ---
     EventCount = scalar("SELECT count(*) FROM plan_card_events WHERE plan_card_id = $1",
                         [PlanCardId]),
-    expect(EventCount =:= 39, "39 events persisted (1 + 9×(3 gate + 1 filled) + usage + 1)"),
+    expect(EventCount =:= 39, "39 events persisted (1 + 9×(3 gate + 1 filled) + usage + 1) "
+          "— structurally identical to Mode A's count: existing_home_disposal is a pure "
+          "resolver in eligibility's exact slot, mortgage_finance is the sole two_path"),
 
-    %% --- compliance audit trail (2b-4c, compliance-pipeline.md §5): one audit_events
-    %%     row per (component, gate) = 3 × 9 = 27, every one `clear` on the Mode-A healthy
-    %%     path; ASIC attests decision_support_boundary_held on the 2 advice-adjacent
-    %%     components (mortgage_finance, eligibility). disposition is NOT advice-adjacent
-    %%     (resolver, removed-from-reach figures, cgt to_verify defers to a professional) →
-    %%     it clears with no_advice_surface. The audit trail is the regulated record
-    %%     constraint #10 demands — a gate with no audit row is still a disclaimer. ---
+    %% --- compliance audit trail: 3 gates × 9 components = 27 rows, all clear. Mode E has
+    %%     only ONE advice-adjacent component (mortgage_finance) — existing_home_disposal
+    %%     is NOT in fh_engine_compliance:advice_adjacent/1 (it mirrors disposition's own
+    %%     treatment: a resolver-computed CGT/figure component with a to_verify flag, not a
+    %%     scheme-applicability or lender-fit judgment) — so ASIC boundary_held is 1, not
+    %%     Mode A's 2. ---
     AuditCount = scalar("SELECT count(*) FROM audit_events WHERE plan_card_id = $1",
                         [PlanCardId]),
     expect(AuditCount =:= 27, "27 audit_events rows (3 gates × 9 components)"),
     ClearCount = scalar("SELECT count(*) FROM audit_events WHERE plan_card_id = $1 "
                         "AND compliance_jsonb->>'disposition' = 'clear'", [PlanCardId]),
-    expect(ClearCount =:= 27, "all 27 audit rows disposition=clear (Mode-A healthy)"),
+    expect(ClearCount =:= 27, "all 27 audit rows disposition=clear (Mode-E healthy)"),
     AsicHeld = scalar("SELECT count(*) FROM audit_events WHERE plan_card_id = $1 "
                       "AND compliance_jsonb->>'gate' = 'asic' "
                       "AND compliance_jsonb->>'detail' = 'decision_support_boundary_held'",
                       [PlanCardId]),
-    expect(AsicHeld =:= 2, "ASIC boundary_held on the 2 advice-adjacent components"),
+    expect(AsicHeld =:= 1, "ASIC boundary_held on the ONE advice-adjacent component "
+          "(mortgage_finance only — existing_home_disposal is not advice-adjacent)"),
     TwoPathAudit = scalar("SELECT count(*) FROM audit_events WHERE plan_card_id = $1 "
                           "AND fill_path = 'two_path'", [PlanCardId]),
-    expect(TwoPathAudit =:= 3, "two_path fill_path audited (migration 002 widened the CHECK)"),
+    expect(TwoPathAudit =:= 3, "two_path fill_path audited (3 gate rows for the one "
+          "two_path component, mortgage_finance)"),
 
-    %% --- content_jsonb snapshot holds all 9 base components ---
+    %% --- content_jsonb snapshot holds all 9 base components, including the Mode-E-only
+    %%     existing_home_disposal (NOT eligibility, which this blueprint has none of) ---
     {200, CardResp} = req(get, Base ++ "/plan-cards/" ++ binary_to_list(PlanCardId),
                           [Auth], <<>>),
     #{<<"content">> := #{<<"components">> := Components}} =
         fh_engine_util:json_decode(CardResp),
     expect(map_size(Components) =:= 9, "9 components snapshotted into content_jsonb"),
-    expect(maps:is_key(<<"eligibility">>, Components), "eligibility component present"),
+    expect(not maps:is_key(<<"eligibility">>, Components),
+          "eligibility ABSENT — Mode E has no eligibility component (decision #2)"),
+    expect(maps:is_key(<<"existing_home_disposal">>, Components),
+          "existing_home_disposal component present (the Mode-E-only component)"),
     expect(maps:is_key(<<"purchase_journey">>, Components), "purchase_journey component present"),
     expect(maps:is_key(<<"disposition">>, Components), "disposition component present (terminal dispose figure-owner)"),
+    %% Mode-E's genuine HAVE-side extension (mode-e-wedge.md P2/P3): cash_position's
+    %% verdict/gap_or_surplus/cash_available fold in existing_home_disposal's
+    %% net_sale_proceeds. At base every fact is honestly null (no onboarding capture of the
+    %% existing home's sale price) — proving the FIELD is present (not its value), per the
+    %% honest-partial convention this whole engine follows.
+    #{<<"cash_position">> := #{<<"outcome">> := CashOutcome}} = Components,
+    expect(maps:is_key(<<"cash_available">>, CashOutcome),
+          "cash_position carries the Mode-E HAVE-side field (honestly null at base)"),
+    expect(maps:get(<<"cash_available">>, CashOutcome) =:= null,
+          "cash_available is honestly null at base (no existing-home facts yet)"),
 
     %% --- cancel is idempotent: turn already finished -> 204 ---
     {204, _} = req(post, Base ++ "/plan-cards/" ++ binary_to_list(PlanCardId) ++ "/cancel",
@@ -98,31 +126,31 @@ main(_) ->
     {403, _} = req(get, Base ++ "/plan-cards/" ++ binary_to_list(PlanCardId),
                    [BadAuth], <<>>),
 
-    io:format("~n==== SEAM SMOKE: ALL ASSERTIONS PASSED ====~n"),
+    io:format("~n==== MODE-E SEAM SMOKE: ALL ASSERTIONS PASSED ====~n"),
     halt(0).
 
 %% Base turn with Layer 2 live (2b-4c): each component emits THREE compliance_gate
 %% events (firb · asic · aml, each audited) immediately before its component_filled.
-%% Order = the ?BASE_COMPONENTS DAG (9 base-scope components): buyer_profile → eligibility →
-%% mortgage_finance (two_path; its `usage` lands right after its component_filled, from the
-%% sidecar fill) → cash_position → ownership_planning → disposition (the terminal dispose
-%% figure-owner, lifecycle-simulation-model §8) → purchase_journey → preparation →
-%% phase_playbook → turn_completed.
+%% Order = ?BASE_COMPONENTS_NEXTHOME (fh_engine_turn.erl, mode-e-wedge.md P5) — the
+%% Mode-A nine with `eligibility` swapped for `existing_home_disposal` in the same slot:
+%% buyer_profile → existing_home_disposal → mortgage_finance (two_path; its `usage` lands
+%% right after its component_filled) → cash_position → ownership_planning → disposition →
+%% purchase_journey → preparation → phase_playbook → turn_completed.
 %% 1 + 9×(3 gate + 1 filled) + usage + 1 = 39.
 expected_sequence() ->
     Gates = [<<"compliance_gate">>, <<"compliance_gate">>, <<"compliance_gate">>],
     CF = <<"component_filled">>,
     lists:flatten(
       [<<"turn_started">>,
-       Gates, CF,                      %% buyer_profile     (resolver)
-       Gates, CF,                      %% eligibility       (resolver)
-       Gates, CF, <<"usage">>,         %% mortgage_finance  (two_path) + its usage
-       Gates, CF,                      %% cash_position     (resolver)
-       Gates, CF,                      %% ownership_planning (resolver)
-       Gates, CF,                      %% disposition       (resolver)
-       Gates, CF,                      %% purchase_journey  (resolver)
-       Gates, CF,                      %% preparation       (resolver)
-       Gates, CF,                      %% phase_playbook    (resolver)
+       Gates, CF,                      %% buyer_profile          (resolver)
+       Gates, CF,                      %% existing_home_disposal (resolver)
+       Gates, CF, <<"usage">>,         %% mortgage_finance       (two_path) + its usage
+       Gates, CF,                      %% cash_position          (resolver)
+       Gates, CF,                      %% ownership_planning     (resolver)
+       Gates, CF,                      %% disposition            (resolver)
+       Gates, CF,                      %% purchase_journey       (resolver)
+       Gates, CF,                      %% preparation            (resolver)
+       Gates, CF,                      %% phase_playbook         (resolver)
        <<"turn_completed">>]).
 
 %% --- helpers ---------------------------------------------------------------

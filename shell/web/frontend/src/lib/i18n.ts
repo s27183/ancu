@@ -101,12 +101,15 @@ const messages = {
         vi: 'Vì bạn là nhà đầu tư ở nước ngoài, kế hoạch của bạn sẽ bao gồm lộ trình FIRB, thuế dành cho người không cư trú (không giảm 50% CGT, có khấu trừ FRCGW khi bán) và chuyển tiền xuyên biên giới. Chi tiết về visa và tài chính sẽ được hỏi sau qua trò chuyện.',
         en: "Because you're a Vietnam-located investor, your plan will cover the FIRB path, non-resident tax treatment (no 50% CGT discount, FRCGW withheld on sale), and cross-border funding. We'll ask about your visa and financial details later in chat."
     },
+    // Mode E (mode-e-wedge.md P5): domestic, citizen/PR, buying to live in but NOT a
+    // first home — next-home upsizer/downsizer/relocator. Explains what's different from
+    // Mode A (no FHG/FHSS) and what's new (the current-home sale feeds cash).
+    'onboarding.nexthome.note': {
+        vi: 'Vì đây không phải là nhà đầu tiên của bạn, kế hoạch sẽ không bao gồm Bảo lãnh Nhà Ở Đầu Tiên hay ưu đãi thuế trước bạ dành cho người mua nhà lần đầu. Thay vào đó, kế hoạch sẽ tính số tiền thu về từ việc bán ngôi nhà hiện tại để dùng cho lần mua này.',
+        en: "Since this isn't your first home, your plan won't include the First Home Guarantee or first-home stamp-duty concessions. Instead, it will work out the net proceeds from selling your current home to fund this purchase."
+    },
     'onboarding.yes': { vi: 'Có', en: 'Yes' },
     'onboarding.no': { vi: 'Không', en: 'No' },
-    'onboarding.outofscope': {
-        vi: 'Để mua nhà để ở, hiện FirstHomey hỗ trợ người mua nhà lần đầu. Kế hoạch cho người đã từng sở hữu nhà sẽ sớm có.',
-        en: 'For buying a home to live in, FirstHomey currently supports first-home buyers. Plans for next-home buyers are coming soon.'
-    },
     'onboarding.budget.label': { vi: 'Ngân sách mục tiêu (AUD)', en: 'Target budget (AUD)' },
     'onboarding.budget.note': {
         vi: 'Quy đổi sang VND sẽ có khi tỉ giá được kết nối.',

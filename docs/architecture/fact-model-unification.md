@@ -200,11 +200,22 @@ stage_axis  = plan.buyer_stage                     →  first_home | next_home  
   foreign           B      unsupported_combination               D
                            (fails closed — see
                             mode-e-wedge.md scoping
-                            decision #4; today
-                            blueprint_for/2 has no
-                            engine-level backstop
-                            here, shell-only gate)
+                            decision #4; blueprint_for/3
+                            fails closed at the ENGINE
+                            layer too as of mode-e-
+                            wedge.md P5 — the shell
+                            gate is now a backstop on
+                            top of this, not the only
+                            control)
 ```
+
+A missing/malformed `buyer_stage` for `owner_occupier` is a FOURTH failure mode, distinct from
+the table above (which assumes `stage_axis` resolved to one of its two values): `blueprint_for/3`
+fails closed on it too (`{error, missing_buyer_stage}`), rather than guessing either value —
+mode-e-wedge.md P5 found that a silent default (in either direction) creates its own misadvice-
+adjacent risk, not just first_home defaulting does (see that doc's P5 phase note for the
+reasoning). `intent = investment` is unaffected — the axis is genuinely irrelevant there, so an
+absent/malformed `buyer_stage` for an investor onboarding is not an error.
 
 Adding `stage_axis` does not touch the existing 2×2 for `intent_axis = investment` (C/D are unchanged — the axis is simply irrelevant there); it only subdivides the `domestic × owner_occupier` and `foreign × owner_occupier` cells that used to be single-valued. `domestic × owner_occupier × first_home` = A (unchanged); `domestic × owner_occupier × next_home` = **E** (new); `foreign × owner_occupier × first_home` = B (unchanged); `foreign × owner_occupier × next_home` = out of scope, fails closed (new — see mode-e-wedge.md).
 

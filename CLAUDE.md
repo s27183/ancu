@@ -10,7 +10,7 @@ This is a **lifecycle planning service**, NOT a property tech platform. The data
 
 ## Status
 
-**All four modes (A/B/C/D) build-complete and live-verified; not yet deployed.** Each mode's lifecycle plan works end-to-end — **Engine:** cowboy `/api/engine/*` gateway, `fh_engine_turn` gen_statem driving a supervised Python sidecar (real Anthropic Agent-SDK planner), resolver/agent two-path fill, FIRB→ASIC→AML compliance + outcome-conformance gates, `usage` metering, bilingual Q&A, `plan_card_events` SOT + SSE fan-out. **Shell:** the 8-S chain — SvelteKit SPA (map-first home, onboarding, plan projection + chat, the two-spine lifecycle + full buy→hold→sell temporal flow), Erlang/OTP backend (two-JWT identity, magic-link + Google login, commerce). **Roadmap SOT (what's left, kept current):** [`docs/architecture/wedge-build-sequence.md`](docs/architecture/wedge-build-sequence.md) "What's left" table — deploy pass, Mode B's launch (external, non-code prereqs), the newly-scoped **Mode E** (domestic next-home owner-occupier), Wedge 1b/1c (Tìm Nhà/URL-paste), Wedge 4 (multi-CALD). Item-level consistency findings (narrower, non-blocking) live in [`docs/grounding-checklist.md`](docs/grounding-checklist.md) §2/§3.
+**All five modes (A/B/C/D/E) build-complete and live-verified; not yet deployed.** Each mode's lifecycle plan works end-to-end — **Engine:** cowboy `/api/engine/*` gateway, `fh_engine_turn` gen_statem driving a supervised Python sidecar (real Anthropic Agent-SDK planner), resolver/agent two-path fill, FIRB→ASIC→AML compliance + outcome-conformance gates, `usage` metering, bilingual Q&A, `plan_card_events` SOT + SSE fan-out. **Shell:** the 8-S chain — SvelteKit SPA (map-first home, onboarding, plan projection + chat, the two-spine lifecycle + full buy→hold→sell temporal flow), Erlang/OTP backend (two-JWT identity, magic-link + Google login, commerce). **Roadmap SOT (what's left, kept current):** [`docs/architecture/wedge-build-sequence.md`](docs/architecture/wedge-build-sequence.md) "What's left" table — deploy pass, Mode B's launch (external, non-code prereqs), Wedge 1b/1c (Tìm Nhà/URL-paste), Wedge 4 (multi-CALD). Item-level consistency findings (narrower, non-blocking) live in [`docs/grounding-checklist.md`](docs/grounding-checklist.md) §2/§3.
 
 ## Documentation
 
@@ -62,7 +62,9 @@ These are not preferences. They are decisions locked into the architecture. Viol
 
 11. **Engine / shell split.** Two independently-deployable halves: an Erlang/OTP + Python **engine** that runs the planning agent and exposes primitives (`/api/engine/*`, typed events), and **shell(s)** (web, extension, curator console) that own UX, identity, and commerce. The engine **meters** (emits `usage`); shells **gate** on commerce — keeping billing *and* ASIC liability out of the agent loop. Compliance (FIRB/ASIC/AML) is a gate on agent behavior → engine-owned. If two shells would render the same data differently, it's shell-owned. See [`docs/architecture/engine-contract.md`](docs/architecture/engine-contract.md).
 
-## Four user modes
+## Five user modes
+
+Mode is derived from three onboarding axes, not chosen directly: `intent` (owner_occupier | investment) × foreign-person (domestic | foreign) × — meaningful only for owner_occupier — `buyer_stage` (first_home | next_home). See [`docs/architecture/fact-model-unification.md`](docs/architecture/fact-model-unification.md) "Mode is derived — three axes."
 
 | Mode | Audience | FIRB | Blueprint |
 |---|---|---|---|
@@ -70,8 +72,9 @@ These are not preferences. They are decisions locked into the architecture. Viol
 | B | Vietnam-parent funding AU child / AU temp resident FHB | Yes | [`blueprints/fhb-foreign-au.md`](docs/blueprints/fhb-foreign-au.md) |
 | C | Vietnamese-AU investor (citizen / PR) | No | [`blueprints/investor-domestic-au.md`](docs/blueprints/investor-domestic-au.md) |
 | D | Vietnam-located investor | Yes | [`blueprints/investor-foreign-au.md`](docs/blueprints/investor-foreign-au.md) |
+| E | Vietnamese-AU citizen / PR, buying to live in but NOT a first home (upsizer/downsizer/relocator) | No | [`blueprints/nexthome-domestic-au.md`](docs/blueprints/nexthome-domestic-au.md) |
 
-Wedge 1 targets Mode A only. Mode B / C / D blueprints are drafted but not in scope for Wedge 1a.
+Wedge 1 targets Mode A only. Modes B/C/D/E are all build-complete but not in scope for Wedge 1a.
 
 ## Where to start building (Wedge 1a)
 
@@ -204,4 +207,4 @@ This file should evolve as the project evolves. Specifically:
 - Update the "Don't" list when a new pitfall is encountered.
 - Keep this file under ~200 lines. If it grows, refactor — link out to docs/ instead.
 
-Last updated: 2026-07-05 — Modes A/B/C/D all build-complete and live-verified; roadmap SOT moved to `docs/architecture/wedge-build-sequence.md` "What's left"; next is Mode E, then a deploy pass.
+Last updated: 2026-07-05 — Modes A/B/C/D/E all build-complete and live-verified; roadmap SOT moved to `docs/architecture/wedge-build-sequence.md` "What's left"; next is a deploy pass.
