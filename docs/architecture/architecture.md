@@ -265,7 +265,7 @@ Some values a rule consumes are *derived* rather than collected. Two cases, kept
 
 #### Four blueprints — one per user mode
 
-The platform ships four blueprints, one for each user mode (§13.2):
+The platform ships four blueprints, one for each user mode (§13.2), plus a fifth (Mode E) scoped and named but not yet drafted:
 
 | Blueprint | Mode | Audience | FIRB applies | Status |
 |---|---|---|---|---|
@@ -273,8 +273,11 @@ The platform ships four blueprints, one for each user mode (§13.2):
 | `fhb-foreign-au` | B | Vietnam-parent funding AU child; AU student / 485 holder | Yes | drafted |
 | `investor-domestic-au` | C | Vietnamese-AU investor (citizen / PR) | No | drafted |
 | `investor-foreign-au` | D | Vietnam-located investor | Yes | drafted |
+| `nexthome-domestic-au` | E | Vietnamese-AU citizen / PR, not first-home, buying to live in (upsizer/downsizer/relocator) | No | **planned, not yet drafted** — see [`mode-e-wedge.md`](mode-e-wedge.md) |
 
 Each Mode gets its own blueprint rather than activating FIRB conditionally in a shared blueprint because ~50% of components differ structurally between domestic and foreign-person modes (FHG/FHSS not eligible for foreign persons; established-dwelling ban; foreign-buyer surcharge; FIRB approval workflow; currency transfer; cross-border family coordination). Shared component patterns (`property_assessment`, `due_diligence`, `decision_trail`) are imported by reference rather than duplicated, keeping authoring efficient without entangling reasoning.
+
+**Mode E's slug deliberately drops the `fhb`/`investor` segment prefixes.** The existing pattern names each blueprint `{segment}-{firb-axis}-au`, where the segment is the buyer's *kind of transaction* — `fhb` (first-home buyer) or `investor`. Mode E is neither: it is a repeat owner-occupier, so `fhb` would misname it (asserting a first-home segment a scheme-eligibility reader could misconstrue) and `investor` is simply wrong. `nexthome` names the actual segment, keeping the `{segment}-{firb-axis}-au` shape intact. There is no `nexthome-foreign-au` today — a foreign next-home buyer is a distinct, separately-regulated combination (established-dwelling-ban interaction with an already-owned AU property) that `blueprint_for/N` fails closed on rather than silently absorbing into Mode E or Mode D (`fh_engine_h_plan_cards:blueprint_for/2`; mode-e-wedge.md scoping decision #4).
 
 #### Storage and deployment
 

@@ -1,6 +1,6 @@
 # Fact model vs. pipeline — a design finding and direction
 
-**Status:** Direction accepted; the plan-card-unit decision is **resolved** (see Decisions); the **concrete schema is drafted and reconciled to the live Mode A source** (see "The unified fact-base schema"); the four modeling sub-questions are **resolved against the canonical ground** (not open). Grounding revealed Mode A is *already* the canonical identity shape, so **item 2's executable-now work is this spec reconciliation, not a blueprint rewrite** — the structural generalizations and B/C/D authoring are deferred to their real triggers (`target → plan.*` rides the item-4 storage split). **The first such trigger is now firing: the Mode-C build (2026-06-23) activates the C-exercised generalizations — `tax{}`, `existing_portfolio`, `traits`, the `plan` investment fields; `off_title_parties[]`/`visa_class`/off-title `funder{}` were deferred to Mode B, their first-exercising instance. See ["Mode-C activation"](#mode-c-activation--which-generalizations-build-now-2026-06-23) below.** **The second trigger is now firing: the Mode-B build (2026-06-28) activates the remaining generalizations — `off_title_parties[]`, off-title `funder{}`, `visa_class`, and the F14 `firb_required_any` publish — plus the Mode-A `non_buying_partner → off_title_parties[]` retrofit; the VN-side *regulated* `funder{}` content (SBV/PDP/VN tax) is a labelled placeholder per the AU-side-full/VN-side-placeholder scope. See ["Mode-B activation"](#mode-b-activation--the-remaining-generalizations-build-now-2026-06-28) below.** With both triggers fired, the *built / gated / populated* surface equals the full canonical schema; what stays deferred by design is the table-layout sub-question (to the PG-schema step) and **Mode D** blueprint adoption (content only — D reuses B's `funder{}` + C's `existing_portfolio`, adding no new identity generalization).
+**Status:** Direction accepted; the plan-card-unit decision is **resolved** (see Decisions); the **concrete schema is drafted and reconciled to the live Mode A source** (see "The unified fact-base schema"); the four modeling sub-questions are **resolved against the canonical ground** (not open). Grounding revealed Mode A is *already* the canonical identity shape, so **item 2's executable-now work is this spec reconciliation, not a blueprint rewrite** — the structural generalizations and B/C/D authoring are deferred to their real triggers (`target → plan.*` rides the item-4 storage split). **The first such trigger is now firing: the Mode-C build (2026-06-23) activates the C-exercised generalizations — `tax{}`, `existing_portfolio`, `traits`, the `plan` investment fields; `off_title_parties[]`/`visa_class`/off-title `funder{}` were deferred to Mode B, their first-exercising instance. See ["Mode-C activation"](#mode-c-activation--which-generalizations-build-now-2026-06-23) below.** **The second trigger is now firing: the Mode-B build (2026-06-28) activates the remaining generalizations — `off_title_parties[]`, off-title `funder{}`, `visa_class`, and the F14 `firb_required_any` publish — plus the Mode-A `non_buying_partner → off_title_parties[]` retrofit; the VN-side *regulated* `funder{}` content (SBV/PDP/VN tax) is a labelled placeholder per the AU-side-full/VN-side-placeholder scope. See ["Mode-B activation"](#mode-b-activation--the-remaining-generalizations-build-now-2026-06-28) below.** With both triggers fired, the *built / gated / populated* surface equals the full canonical schema; what stays deferred by design is the table-layout sub-question (to the PG-schema step) and **Mode D** blueprint adoption (content only — D reuses B's `funder{}` + C's `existing_portfolio`, adding no new identity generalization). **Mode D shipped build-complete 2026-07-04. A third trigger is now firing: Mode-E's P0 (2026-07-05) adds `plan.buyer_stage` — the first genuinely new *derivation-axis* addition since Decision 1's two axes (mode was previously believed a closed 2×2); see ["Mode is derived — three axes"](#mode-is-derived--three-axes-buyer_stage-added-2026-07-05-mode-e-p0) below and [`mode-e-wedge.md`](mode-e-wedge.md) for the full scoping decision.**
 
 **Why this exists.** While grounding the cross-mode data flow (the §0 pass in [`grounding-checklist.md`](../grounding-checklist.md)), a single root cause surfaced under a string of seemingly-separate bugs. This doc records the finding, why the *strategy* (not taste) adjudicates it, and the direction — so the analysis is an artifact to decide against, not something reassembled from memory each time.
 
@@ -169,6 +169,12 @@ Everything *about a specific purchase* — therefore mutable per journey — mov
 plan {                                     // one purchase journey; 1..N per profile (first home → later investment = two plans, one fact base)
   applicant_subset,                        // which profile.applicants are on THIS purchase
   intent,                                  // owner_occupier | investment   ← the intent axis of mode
+  buyer_stage,                             // first_home | next_home ← the THIRD mode axis (Mode-E, 2026-07-05).
+                                           //   Meaningful only when intent=owner_occupier — investment has no
+                                           //   first-home concept, C/D ignore it. SELF-DECLARED at onboarding,
+                                           //   NEVER derived from ownership_history: a repeat buyer mis-flagged
+                                           //   first_home would wrongly assert FHG/FHSS entitlement (misadvice
+                                           //   risk, mode-e-wedge.md).
   intended_occupancy_use,                  // sole_occupier | partial_rental | granny_flat | not_occupied (F12) — only when intent=owner_occupier
   target { price_range, zone, state, timeline },                        // MOVED out of profile (mutable per journey — S24)
   risk_tolerance { negative_gearing_comfort, vacancy_months_comfort,    // per-journey posture (sub-question 2); was C/D investor_profile params
@@ -179,33 +185,48 @@ plan {                                     // one purchase journey; 1..N per pro
 }
 ```
 
-### Mode is derived — two axes
+### Mode is derived — three axes (buyer_stage added 2026-07-05, Mode-E P0)
 
 ```
 firb_axis   = profile.derived.firb_required_any   →  domestic | foreign    (COMPOSITIONAL: per-applicant firb_required picks each person's sub-path)
-intent_axis = plan.intent                         →  fhb | investor        (per-plan)
+intent_axis = plan.intent                         →  owner_occupier | investment  (per-plan)
+stage_axis  = plan.buyer_stage                     →  first_home | next_home      (per-plan; meaningful ONLY when
+                                                       intent_axis = owner_occupier — investment has no
+                                                       first-home concept, C/D read it as n/a)
 
-              owner_occupier      investment
-  domestic         A                  C
-  foreign          B                  D
+                    owner_occupier                          investment
+              first_home      next_home
+  domestic         A              E                             C
+  foreign           B      unsupported_combination               D
+                           (fails closed — see
+                            mode-e-wedge.md scoping
+                            decision #4; today
+                            blueprint_for/2 has no
+                            engine-level backstop
+                            here, shell-only gate)
 ```
+
+Adding `stage_axis` does not touch the existing 2×2 for `intent_axis = investment` (C/D are unchanged — the axis is simply irrelevant there); it only subdivides the `domestic × owner_occupier` and `foreign × owner_occupier` cells that used to be single-valued. `domestic × owner_occupier × first_home` = A (unchanged); `domestic × owner_occupier × next_home` = **E** (new); `foreign × owner_occupier × first_home` = B (unchanged); `foreign × owner_occupier × next_home` = out of scope, fails closed (new — see mode-e-wedge.md).
 
 A **mixed-status plan** (S1 citizen + 482 partner; S4 citizen + foreign parent on title) is exactly "one plan, two modes": `intent_axis` is fixed for the plan (e.g. `fhb`), while `firb_axis` varies **by applicant** — the domestic applicant runs the A sub-path, the foreign applicant's interest routes to the B (FIRB) sub-path. That is why mode cannot be a row key (it is multi-valued here) and the partition is `applicants[]` + journey instead.
 
 ### How each mode populates the one schema
 
-| Branch | A (dom FHB) | B (foreign FHB) | C (dom investor) | D (foreign investor) |
-|---|---|---|---|---|
-| `applicants[]` | 1..N, mixed status | AU member (1) | 1..N citizen/PR | 1..N foreign |
-| `off_title_parties[]` | non-buying partner | VN funder | — | family pool |
-| `household_financials.income` | ✓ | au-side | ✓ | vn-side → AUD |
-| `…existing_portfolio` | ppor only (rentvestor) | — | ✓ | ✓ global |
-| `traits` | — | — | ✓ | ✓ |
-| `derived.firb_required_any` | computed | = true | = false | = true |
-| `derived.new_build_only_constraint` | (false) | = true | (false) | = true |
-| `plan.intent` | owner_occupier | owner_occupier / future-PPOR | investment | investment |
-| `plan.risk_tolerance` | — | — | ✓ | ✓ |
-| `plan.investment_goals` | — | — | ✓ | ✓ |
+| Branch | A (dom FHB) | B (foreign FHB) | C (dom investor) | D (foreign investor) | E (dom next-home)† |
+|---|---|---|---|---|---|
+| `applicants[]` | 1..N, mixed status | AU member (1) | 1..N citizen/PR | 1..N foreign | 1..N citizen/PR |
+| `off_title_parties[]` | non-buying partner | VN funder | — | family pool | non-buying partner |
+| `household_financials.income` | ✓ | au-side | ✓ | vn-side → AUD | ✓ |
+| `…existing_portfolio` | ppor only (rentvestor) | — | ✓ | ✓ global | ✓ — the seller-side PPOR being sold now |
+| `traits` | — | — | ✓ | ✓ | — |
+| `derived.firb_required_any` | computed | = true | = false | = true | = false |
+| `derived.new_build_only_constraint` | (false) | = true | (false) | = true | (false) |
+| `plan.intent` | owner_occupier | owner_occupier / future-PPOR | investment | investment | owner_occupier |
+| `plan.buyer_stage` | first_home | first_home | n/a | n/a | **next_home** |
+| `plan.risk_tolerance` | — | — | ✓ | ✓ | — |
+| `plan.investment_goals` | — | — | ✓ | ✓ | — |
+
+† **E's `existing_portfolio` row is the one genuinely new content need** — not just activating the existing `ppor_owned`/`ppor_estimated_equity` slots (A already can for a rentvestor), but computing *net sale proceeds of that PPOR being sold now* (sale price − loan payout − selling costs − CGT via the main-residence exemption) as a new `cash_position` input. Not yet built — mode-e-wedge.md P1/P2. All other E cells are P0-designed only (this axis + table), pending P1–P5.
 
 ### What this collapses (the bug class that becomes structurally absent)
 

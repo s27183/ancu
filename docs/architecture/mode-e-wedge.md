@@ -1,6 +1,6 @@
 # Mode-E wedge — build plan + progress tracker
 
-**Status: OPENED (2026-07-05) — scoping decision made, no phases started.** This doc is the durable
+**Status: P0 DONE (2026-07-05) — mode-derivation axis + blueprint slug landed; P1 (KB authoring) next.** This doc is the durable
 plan *and* the task tracker for the Mode-E (Vietnamese-AU citizen/PR, **not** first-home, buying to
 live in — upsizer/downsizer/relocator) wedge. The Claude Code Task list is ephemeral (it does not
 survive compaction); this file is the source of truth for "what's left." `wedge-build-sequence.md`
@@ -76,10 +76,12 @@ mismatch. Mode E closes it.
    regulated question). `blueprint_for/N` must fail closed on this combination (`{error,
    unsupported_combination}`), mirroring Mode D's SMSF-exclusion precedent — logged as a future cell,
    not silently absorbed into Mode E or Mode D.
-5. **Blueprint slug — proposed `fhb-nexthome-domestic-au.md`.** Doesn't fit the existing
-   `{intent}-{firb-axis}-au` pattern cleanly (`fhb` = first-home-buyer, which this explicitly is not)
-   — flagged as an open naming question to revisit at P0/blueprint-draft time, not blocking the plan
-   below.
+5. **Blueprint slug — RESOLVED at P0 (2026-07-05): `nexthome-domestic-au.md`.** Drops the `fhb`/
+   `investor` segment prefixes entirely rather than forcing a fit — `fhb` would misname a repeat buyer
+   (asserting a first-home segment), `investor` is simply wrong. `nexthome` names the actual segment,
+   keeping the `{segment}-{firb-axis}-au` shape. No `nexthome-foreign-au` exists (or is planned) — that
+   cell is decision #4's fail-closed combination, not a fifth-plus blueprint. See
+   [`architecture.md`](architecture.md) §11.9 "Four blueprints."
 
 ## Regulated design concern (inherits Mode A's + Mode C's, adds one new surface)
 
@@ -95,11 +97,11 @@ mismatch. Mode E closes it.
   established-dwelling-ban gate) — `buyer_stage` must be a hard onboarding gate input, never inferred
   or defaulted to `first_home`.
 
-## Phases (none started)
+## Phases
 
 | Status | Phase | Item |
 |---|---|---|
-| `[ ]` | P0 | Mode-derivation axis: add `plan.buyer_stage` to `fact-model-unification.md` + the derivation table in `architecture.md` §11.9; resolve the blueprint slug naming question above; anchor the scoping decision (this doc) as the record |
+| `[x]` | P0 | Mode-derivation axis: `plan.buyer_stage` added to [`fact-model-unification.md`](fact-model-unification.md) (the `plan{}` schema + the "Mode is derived — three axes" section, replacing the old 2×2) and the blueprint table in [`architecture.md`](architecture.md) §11.9 (Mode E row + naming rationale added); blueprint slug resolved to `nexthome-domestic-au` (decision #5 above); scoping decision anchored as this doc. **Done 2026-07-05.** Not yet touched at P0 (by design — no code changes until P2/P5): `fh_engine_h_plan_cards:blueprint_for/2` (still 2-arg; the foreign+next-home cell still has no engine-level backstop, shell-only gate) and `engine-contract.md` §9.1's `mode` derivation prose (still says `firb_required_any × intent`) — both ride P5. |
 | `[ ]` | P1 | KB authoring: existing-home-sale net-proceeds doc(s), per-state dual-ownership land-tax survey (VIC confirmed, other states unconfirmed), the bridging-finance placeholder doc (flag + `is_placeholder`, no mechanics) |
 | `[ ]` | P2 | Engine resolvers: new existing-home-disposal resolver (net proceeds → `cash_position` input); `eligibility` component dropped/branched (no FHG/FHSS/first-home concessions); `disposition`'s owner-occupier path reused for the *new* home's future exit unchanged |
 | `[ ]` | P3 | Multi-blueprint activation: add the new blueprint to `IN_SCOPE_BLUEPRINTS`, run the compiler, resolve any shared-anchor/outcome-key conformance gaps (expect the same class of surprise P3 found for Mode B/D — prose-only cross-references, private outcome-type names) |
