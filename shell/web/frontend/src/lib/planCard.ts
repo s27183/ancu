@@ -204,6 +204,33 @@ export interface DispositionOutcome {
     key_assumptions?: LocalizedText[] | null;
 }
 
+/** existing_home_disposal → calculator (outcome type `existing_home_disposal`). Mode-E ONLY
+ *  (nexthome-domestic-au.md component 3): the net proceeds of selling the buyer's CURRENT
+ *  home (already owned, lived in) to fund THIS purchase — feeds cash_position's HAVE side.
+ *  DISTINCT from DispositionOutcome (the future exit of the property this plan is FOR); both
+ *  share the `calculator` renderer and both carry a `cgt_status` field of the same shape, so
+ *  the renderer discriminates on `bridging_finance_is_placeholder` (unique to this outcome),
+ *  never on `cgt_status` alone. Honest-partial: no onboarding capture of the existing home's
+ *  sale price / loan balance (plan-first) — every figure is null until a refine turn supplies
+ *  the buyer's own attested facts. */
+export interface ExistingHomeDisposalOutcome {
+    estimated_sale_price?: number | null;
+    loan_payout?: {
+        outstanding_balance?: number | null;
+        discharge_fee?: MoneyRange | null;
+        break_cost_status?: 'not_applicable' | 'to_verify' | string | null;
+        total_payout?: MoneyRange | null;
+    } | null;
+    selling_costs?: MoneyRange | null;
+    cgt?: MoneyRange | null;
+    cgt_status?: 'exempt' | 'to_verify' | string | null;
+    net_sale_proceeds?: MoneyRange | null;
+    settlement_timing_mismatch?: boolean | null;
+    bridging_finance_considered?: boolean | null;
+    bridging_finance_is_placeholder?: boolean | null;
+    key_assumptions?: LocalizedText[] | null;
+}
+
 /** tax_structure → data-table (outcome type `tax_optimised_structure`). The investor tax cluster:
  *  the recommended ownership entity (agent leaf), the resolver-computed gearing/CGT figures (banded
  *  where rent-derived; null until their inputs arrive), and the negative-gearing reform note — a

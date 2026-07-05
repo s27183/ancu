@@ -205,6 +205,7 @@ const messages = {
     // component appears once a property is attached). Base components already have plan.c.*.
     'plan.c.purchase_journey': { vi: 'Hành trình mua nhà', en: 'Your buying journey' },
     'plan.c.disposition': { vi: 'Khi bán nhà', en: 'When you sell' },
+    'plan.c.existing_home_disposal': { vi: 'Bán nhà hiện tại', en: 'Selling your current home' },
     'plan.c.due_diligence': { vi: 'Thẩm định', en: 'Due diligence' },
     'plan.c.settlement_prep': { vi: 'Chuẩn bị bàn giao', en: 'Settlement prep' },
     'plan.c.buying_strategy': { vi: 'Chiến lược ra giá', en: 'Buying strategy' },
@@ -494,6 +495,36 @@ const messages = {
     'plan.disp.loan_pending': {
         vi: 'Khoản tất toán vay và tiền ròng sẽ được tính khi biết số tiền vay — bổ sung thu nhập của bạn trong phần trò chuyện.',
         en: 'Loan payout and net proceeds compute once your loan amount is known — add your income in chat.'
+    },
+    // existing_home_disposal (Mode E ONLY, calculator renderer): net proceeds of selling the
+    // buyer's CURRENT home to fund THIS purchase. Distinct hero from disposition's (a future
+    // exit) even though both share the calculator — cgt/net labels reused from plan.disp.*
+    // where the concept is identical (cgtLabel()/CGT_TONE), new keys only for what differs.
+    'plan.xhd.net_proceeds': { vi: 'Tiền ròng từ nhà hiện tại', en: 'Net proceeds from your current home' },
+    'plan.xhd.net_proceeds_sub': {
+        vi: 'Giá bán − tất toán khoản vay − chi phí bán − thuế lãi vốn (nếu có).',
+        en: 'Sale price − loan payout − selling costs − CGT (if any).'
+    },
+    'plan.xhd.sale_price': { vi: 'Giá bán ước tính', en: 'Estimated sale price' },
+    'plan.xhd.loan_payout': { vi: 'Tất toán khoản vay', en: 'Loan payout' },
+    'plan.xhd.discharge_fee': { vi: 'Phí giải chấp', en: 'Discharge fee' },
+    'plan.xhd.break_cost.not_applicable': {
+        vi: 'Không phí thoát (lãi suất thả nổi)', en: 'No exit fee (variable rate)'
+    },
+    'plan.xhd.break_cost.to_verify': {
+        vi: 'Cần hỏi bên cho vay', en: 'To verify with your lender'
+    },
+    'plan.xhd.add_facts': {
+        vi: 'Nhập giá bán ước tính và số dư nợ vay của nhà hiện tại để biết tiền ròng.',
+        en: 'Add your current home’s estimated sale price and loan balance to see net proceeds.'
+    },
+    'plan.xhd.settlement_mismatch': {
+        vi: 'Nhà mới có thể bàn giao trước khi nhà hiện tại bán xong.',
+        en: 'Your new home may settle before your current home sells.'
+    },
+    'plan.xhd.bridging_placeholder': {
+        vi: 'Phương án vay bắc cầu chưa được tính toán ở đây — trao đổi với chuyên viên vay để biết chi tiết nếu thời gian bị chồng lấn.',
+        en: 'Bridging finance options aren’t modelled here yet — discuss with a broker if the timing overlaps.'
     },
     'plan.phase.prepare': { vi: 'Chuẩn bị', en: 'Prepare' },
     'plan.phase.pre_approve': { vi: 'Phê duyệt sơ bộ', en: 'Pre-approval' },

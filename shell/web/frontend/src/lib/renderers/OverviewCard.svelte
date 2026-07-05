@@ -18,6 +18,7 @@
         type SchemeStackOutcome,
         type MortgagePlanOutcome,
         type BudgetEnvelopeOutcome,
+        type ExistingHomeDisposalOutcome,
         type MoneyRange,
         firstComponentEntry,
         PROFILE_COMPONENT_IDS
@@ -38,6 +39,12 @@
     const scheme = $derived(components.eligibility?.outcome as SchemeStackOutcome | undefined);
     const mortgage = $derived(components.mortgage_finance?.outcome as MortgagePlanOutcome | undefined);
     const budget = $derived(components.cash_position?.outcome as BudgetEnvelopeOutcome | undefined);
+    // Mode-E ONLY: no other mode has this component, so the tile below is present/absent by
+    // component presence (not honest-partial-null) — Modes A/B/C/D never grow a dead
+    // "Pending" tile for a figure that doesn't apply to them.
+    const existingHome = $derived(
+        components.existing_home_disposal?.outcome as ExistingHomeDisposalOutcome | undefined
+    );
 
     const hasRange = (v: MoneyRange | null | undefined): v is MoneyRange =>
         Array.isArray(v) && v.length === 2 && typeof v[0] === 'number' && typeof v[1] === 'number';
@@ -56,14 +63,21 @@
     const benefit = $derived(range(scheme?.total_benefit_value));
     const cashNeed = $derived(range(budget?.total_cash_required));
     const capacity = $derived(range(profile?.approx_borrowing_capacity));
+    const existingHomeNet = $derived(existingHome ? range(existingHome.net_sale_proceeds) : null);
 
     // Four headline tiles, in journey order: where you're aiming → how you finance →
-    // what help stacks → what cash gets you in. Each ghosts honest-partial when null.
+    // what help stacks → what cash gets you in. Each ghosts honest-partial when null. A
+    // FIFTH tile (existing-home net proceeds) appends only for Mode E's own component —
+    // reuses the Calculator's own label (plan.xhd.net_proceeds) rather than forking a
+    // second string for the same figure.
     const stats = $derived([
         { key: 'target', label: $t('plan.f.target_price'), value: target },
         { key: 'path', label: $t('plan.f.path'), value: pathLabel },
         { key: 'benefit', label: $t('plan.f.total_benefit'), value: benefit },
-        { key: 'cash', label: $t('plan.cash.need'), value: cashNeed }
+        { key: 'cash', label: $t('plan.cash.need'), value: cashNeed },
+        ...(existingHome
+            ? [{ key: 'existing_home_net', label: $t('plan.xhd.net_proceeds'), value: existingHomeNet }]
+            : [])
     ]);
 </script>
 

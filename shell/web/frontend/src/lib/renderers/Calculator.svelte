@@ -26,6 +26,7 @@
         type CashEvent,
         type ComponentEntry,
         type DispositionOutcome,
+        type ExistingHomeDisposalOutcome,
         type MoneyRange
     } from '$lib/planCard';
     import { money, moneyRange } from '$lib/format';
@@ -211,12 +212,18 @@
     // Honest-partial: H null → invitation; H set + loan unknown (no income captured, the
     // common simulate-only state) → sale/selling banded, loan/net/full PENDING with a CTA.
     const d = $derived(outcome as DispositionOutcome);
-    // The `calculator` renderer is mapped to BOTH outcome types (cash_position's
-    // budget_envelope AND disposition); a standalone render (ComponentCard / export dossier /
-    // the PhaseSheet component_ref drill) hands view='full', so the renderer must discriminate
-    // by outcome shape — `cgt_status` is always a non-null string for disposition and absent
-    // for budget_envelope (robust even if the JSON drops null-valued keys).
-    const isDisposition = $derived(typeof d.cgt_status === 'string');
+    // The `calculator` renderer is mapped to THREE outcome types (cash_position's
+    // budget_envelope, disposition, and Mode-E-only existing_home_disposal); a standalone
+    // render (ComponentCard / export dossier / the PhaseSheet component_ref drill) hands
+    // view='full', so the renderer must discriminate by outcome shape. `cgt_status` alone is
+    // NOT a safe disposition discriminator: existing_home_disposal also carries a non-null
+    // `cgt_status` string (same enum, same main-residence-exemption concept applied to the
+    // CURRENT home) — so existing_home_disposal is checked FIRST, on a field unique to it
+    // (`bridging_finance_is_placeholder`, always a bool for that shape, absent from
+    // disposition), and disposition's own check excludes it.
+    const xhd = $derived(outcome as ExistingHomeDisposalOutcome);
+    const isExistingHomeDisposal = $derived(typeof xhd.bridging_finance_is_placeholder === 'boolean');
+    const isDisposition = $derived(typeof d.cgt_status === 'string' && !isExistingHomeDisposal);
     const hasHorizon = $derived(typeof d.horizon_years === 'number' && d.horizon_years > 0);
     const loanPending = $derived(hasHorizon && !hasRange(d.loan_payout));
     const fullHorizon = $derived(hasRange(d.full_horizon_net_position) ? d.full_horizon_net_position : null);
@@ -226,6 +233,12 @@
     function cgtLabel(s: string): string {
         if (s === 'exempt') return $t('plan.disp.cgt.exempt');
         if (s === 'to_verify') return $t('plan.disp.cgt.to_verify');
+        return s;
+    }
+    // existing_home_disposal's break_cost_status — same literal-key discipline as cgtLabel.
+    function breakCostLabel(s: string): string {
+        if (s === 'not_applicable') return $t('plan.xhd.break_cost.not_applicable');
+        if (s === 'to_verify') return $t('plan.xhd.break_cost.to_verify');
         return s;
     }
 </script>
@@ -276,7 +289,7 @@
 {/snippet}
 
 <!-- ── (1) "Am I ready?" verdict hero ───────────────────────────────────── -->
-{#if view === 'verdict' || (view === 'full' && !isDisposition)}
+{#if view === 'verdict' || (view === 'full' && !isDisposition && !isExistingHomeDisposal)}
 <div class="cw-hero" class:cw-full={density === 'full'}>
     <div class="cw-head">
         <span class="cw-need-label">{$t('plan.cash.need')}</span>
@@ -310,7 +323,7 @@
 <!-- ── (2) The financial spine — cash_events across the lifecycle phases ──── -->
 <!-- A clean Item/Amount table (the prototype's design language). Each phase is a sub-header
      band; each event row drills to its source_component (§7.3) when that owner is filled. -->
-{#if (view === 'table' || (view === 'full' && !isDisposition)) && hasSpine}
+{#if (view === 'table' || (view === 'full' && !isDisposition && !isExistingHomeDisposal)) && hasSpine}
     <div class="cw-spine">
         <h4 class="cw-spine-title">{$t('plan.cash.spine')}</h4>
         <table class="cw-table">
@@ -361,7 +374,7 @@
 {/if}
 
 <!-- full mode: the breakdown sits behind a modal opener under the table. -->
-{#if view === 'full' && !isDisposition && hasBreakdown}
+{#if view === 'full' && !isDisposition && !isExistingHomeDisposal && hasBreakdown}
     <button type="button" class="cw-breakdown-btn" onclick={() => (showBreakdown = true)}>
         {$t('plan.cash.breakdown')}
     </button>
@@ -446,6 +459,88 @@
             <span class="cw-need-label">{$t('plan.disp.set_horizon')}</span>
         </div>
         <NoteList notes={d.key_assumptions} />
+    {/if}
+{/if}
+
+<!-- ── (5) existing_home_disposal (Mode E ONLY) — net proceeds of selling the buyer's
+     CURRENT home to fund THIS purchase. A separate outcome from disposition (which projects
+     the FUTURE exit of the new property); both use the calculator renderer, self-discriminated
+     above. Honest-partial: no onboarding capture of the sale price / loan balance (plan-first),
+     so the breakdown only shows once a refine turn supplies at least the sale price. -->
+{#if view === 'full' && isExistingHomeDisposal}
+    {#if typeof xhd.estimated_sale_price === 'number'}
+        <div class="cw-hero cw-full">
+            <div class="cw-head">
+                <span class="cw-need-label">{$t('plan.xhd.net_proceeds')}</span>
+                {#if hasRange(xhd.net_sale_proceeds)}
+                    <span class="cw-need-total">{rangeLabel(xhd.net_sale_proceeds)}</span>
+                {:else}
+                    <Pending />
+                {/if}
+            </div>
+            <p class="cw-disp-sub">{$t('plan.xhd.net_proceeds_sub')}</p>
+        </div>
+
+        <div class="cw-spine">
+            <h4 class="cw-spine-title">{$t('plan.c.existing_home_disposal')}</h4>
+            <table class="cw-table">
+                <tbody>
+                    <tr class="cw-trevent">
+                        <td class="cw-td-item"><span class="cw-ev-label">{$t('plan.xhd.sale_price')}</span></td>
+                        <td class="num cw-ev-amt cw-in">+{money(xhd.estimated_sale_price, $lang) ?? '—'}</td>
+                    </tr>
+                    <tr class="cw-trevent">
+                        <td class="cw-td-item">
+                            <span class="cw-ev-label">{$t('plan.xhd.loan_payout')}</span>
+                            {#if xhd.loan_payout?.break_cost_status}
+                                <Chip label={breakCostLabel(xhd.loan_payout.break_cost_status)} tone="neutral" />
+                            {/if}
+                        </td>
+                        <td class="num cw-ev-amt" class:cw-out={hasRange(xhd.loan_payout?.total_payout)}
+                            >{hasRange(xhd.loan_payout?.total_payout)
+                                ? '−' + rangeLabel(xhd.loan_payout?.total_payout)
+                                : '—'}</td
+                        >
+                    </tr>
+                    <tr class="cw-trevent">
+                        <td class="cw-td-item"><span class="cw-ev-label">{$t('plan.disp.selling')}</span></td>
+                        <td class="num cw-ev-amt" class:cw-out={hasRange(xhd.selling_costs)}
+                            >{hasRange(xhd.selling_costs) ? '−' + rangeLabel(xhd.selling_costs) : '—'}</td
+                        >
+                    </tr>
+                    <tr class="cw-trevent">
+                        <td class="cw-td-item"><span class="cw-ev-label">{$t('plan.disp.cgt')}</span></td>
+                        <td class="num">
+                            {#if xhd.cgt_status}
+                                <Chip label={cgtLabel(xhd.cgt_status)} tone={CGT_TONE[xhd.cgt_status] ?? 'neutral'} />
+                            {:else}
+                                —
+                            {/if}
+                        </td>
+                    </tr>
+                    <tr class="cw-trevent cw-trnet">
+                        <td class="cw-td-item"><span class="cw-ev-label">{$t('plan.disp.net')}</span></td>
+                        <td class="num cw-ev-amt">{rangeLabel(xhd.net_sale_proceeds)}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        {#if xhd.settlement_timing_mismatch}
+            <p class="cw-cta">{$t('plan.xhd.settlement_mismatch')}</p>
+            {#if xhd.bridging_finance_is_placeholder}
+                <p class="cw-cta">{$t('plan.xhd.bridging_placeholder')}</p>
+            {/if}
+        {/if}
+
+        <NoteList heading={$t('plan.f.assumptions')} notes={xhd.key_assumptions} />
+    {:else}
+        <!-- No sale-price fact yet (base turn, plan-first — honest-partial, mirrors
+             disposition's own set_horizon invitation). -->
+        <div class="cw-hero">
+            <span class="cw-need-label">{$t('plan.xhd.add_facts')}</span>
+        </div>
+        <NoteList notes={xhd.key_assumptions} />
     {/if}
 {/if}
 
