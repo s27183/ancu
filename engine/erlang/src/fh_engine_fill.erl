@@ -53,6 +53,7 @@ has_resolver(<<"disposition">>)        -> true;
 has_resolver(<<"buying_strategy">>)    -> true;
 has_resolver(<<"settlement_prep">>)    -> true;
 has_resolver(<<"due_diligence">>)      -> true;
+has_resolver(<<"existing_home_disposal">>) -> true;
 has_resolver(_)                        -> false.
 
 -spec resolver(binary(), map(), map()) -> {map(), binary(), [map()]}.
@@ -98,6 +99,8 @@ resolver(<<"phase_playbook">>, Args, Upstream) ->
     fh_engine_phase_playbook:fill(Args, Upstream);
 resolver(<<"disposition">>, Args, Upstream) ->
     fh_engine_disposition:fill(Args, Upstream);
+resolver(<<"existing_home_disposal">>, Args, Upstream) ->
+    fh_engine_existing_home_disposal:fill(Args, Upstream);
 resolver(<<"buying_strategy">>, Args, Upstream) ->
     fh_engine_buying:fill(Args, Upstream);
 resolver(<<"settlement_prep">>, Args, Upstream) ->

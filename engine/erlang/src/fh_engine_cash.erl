@@ -29,6 +29,8 @@
 -export([surcharge_pct/1, surcharge_amount/2, sum_or_null/1, channel_costs/2]).
 %% exported for the Mode-D foreign-investor conformance suite:
 -export([fill_investor_foreign/2]).
+%% exported for the Mode-E next-home conformance suite:
+-export([fill_fhb_nexthome/2, gap_range/2, verdict_from_gap/1]).
 
 -define(COPY, <<"kb.copy.cash">>).   %% bilingual copy-templates (bilingual-content.md §3b)
 -define(SURCHARGE, <<"kb.foreign-buyer-surcharge.by-state">>).
@@ -44,8 +46,19 @@
 %% NAME + `calculator` renderer throughout; different outcome TYPE + logic per branch. The FHB
 %% body is renamed fill_fhb/2 verbatim (byte-identical — zero regression); the investor body
 %% and the Mode-B body are new/newer.
+%% MODE-E DISCRIMINATOR: only the nexthome-domestic-au blueprint runs an
+%% `existing_home_disposal` component upstream (nexthome-domestic-au.md component 3) — its
+%% presence marks the Mode-E next-home path (fill_fhb_nexthome/2), checked BEFORE the
+%% investor/foreign branches below since Mode E is domestic + owner-occupier, the same 2x2
+%% cell as Mode A (mirrors how `tax_optimised_structure` presence marks the investor path).
 -spec fill(map(), map()) -> {map(), binary(), [map()]}.
 fill(Args, Upstream) ->
+    case maps:is_key(<<"existing_home_disposal">>, Upstream) of
+        true  -> fill_fhb_nexthome(Args, Upstream);
+        false -> fill_dispatch(Args, Upstream)
+    end.
+
+fill_dispatch(Args, Upstream) ->
     case maps:get(<<"tax_optimised_structure">>, Upstream, undefined) of
         undefined ->
             case maps:get(firb_required_any, Args, false) of
@@ -89,6 +102,73 @@ fill_fhb(Args, Upstream) ->
          <<"kb.cash-reserve.lender-expectations">>, <<"kb.scheme.fhg">>]
         ++ concession_anchor(State, HasConc)),
     {Outcome, <<"calculator">>, KbVersions}.
+
+%% --- Mode-E next-home cash_position (budget_envelope, SAME shape as Mode A) --
+%% nexthome-domestic-au.md component 5. Reuses fill_fhb/2's entire NEED side unchanged
+%% (deposit, stamp duty, other_buying_costs, reserve_buffer — computed by budget_envelope/6,
+%% one computer) since a repeat buyer's transaction costs are structurally identical to a
+%% first-home buyer's, less any concession. `Stack` naturally defaults to `#{}` (no
+%% `eligibility` component exists for Mode E), so `has_state_concession(#{})` already
+%% returns false — full stamp duty, which is the correct regulatory answer (every state's
+%% first-home concession requires first-home status), not a gap.
+%%
+%% The ONE genuine extension: the HAVE side. Mode A's own budget_envelope/6 hardcodes
+%% cash_available/gap_or_surplus/verdict to null (no source at base — honest-partial); Mode
+%% E has a genuine source, existing_home_disposal.net_sale_proceeds (component 3, mode-e-
+%% wedge.md P2) — folded in here via budget_envelope_nexthome/7, which calls budget_envelope/6
+%% for the NEED side unchanged and only overrides the three HAVE-side fields.
+-spec fill_fhb_nexthome(map(), map()) -> {map(), binary(), [map()]}.
+fill_fhb_nexthome(Args, Upstream) ->
+    Profile      = maps:get(<<"profile">>, Upstream, #{}),
+    Stack        = maps:get(<<"scheme_stack">>, Upstream, #{}),
+    Mortgage     = maps:get(<<"mortgage_plan">>, Upstream, #{}),
+    ExistingHome = maps:get(<<"existing_home_disposal">>, Upstream, #{}),
+    State   = fh_engine_store:projection_state(maps:get(onboarding, Args, #{})),
+    Range   = maps:get(<<"target_price_range">>, Profile, null),
+    Ceiling = ceiling(Range),
+    HasConc = has_state_concession(Stack),
+    RecPath = maps:get(<<"recommended_path">>, Mortgage, null),
+    Sd = stamp_duty(State, HasConc, Ceiling),
+    ExistingNet = maps:get(<<"net_sale_proceeds">>, ExistingHome, null),
+    Outcome = budget_envelope_nexthome(Sd, State, RecPath, Range, Ceiling, Stack, ExistingNet),
+    %% no kb.scheme.fhg / concession_anchor — a repeat buyer is never FHG-eligible or
+    %% state-concession-eligible (both first-home-only), so no misleading anchor is listed.
+    KbVersions = fh_engine_kb:kb_anchors(
+        [<<"kb.stamp-duty.calc-by-state">>,
+         <<"kb.buyer-costs.inspections-conveyancing-fees">>,
+         <<"kb.cash-reserve.lender-expectations">>]),
+    {Outcome, <<"calculator">>, KbVersions}.
+
+%% budget_envelope/6 computes the NEED side (unchanged, one computer); this overrides only
+%% the three HAVE-side fields it hardcodes to null, using existing_home_disposal's net
+%% proceeds as the HAVE-side source.
+budget_envelope_nexthome(Sd, State, RecPath, Range, Ceiling, Stack, ExistingNet) ->
+    Base  = budget_envelope(Sd, State, RecPath, Range, Ceiling, Stack),
+    Total = maps:get(<<"total_cash_required">>, Base),
+    Gap   = gap_range(ExistingNet, Total),
+    Base#{
+        <<"cash_available">> => ExistingNet,
+        <<"gap_or_surplus">> => Gap,
+        <<"verdict">>        => verdict_from_gap(Gap)
+    }.
+
+%% conservative interval gap: worst-case low = least proceeds − most cost; worst-case high =
+%% most proceeds − least cost. null when either side is unknown (honest-partial, mirrors
+%% net_proceeds/4's own interval-arithmetic convention in fh_engine_disposition).
+-spec gap_range([number()] | null, [number()] | null) -> [number()] | null.
+gap_range(null, _Total) -> null;
+gap_range(_ExistingNet, null) -> null;
+gap_range([ELo, EHi], [TLo, THi]) ->
+    [round(ELo - THi), round(EHi - TLo)].
+
+%% three-way verdict — the budget_envelope schema's verdict enum is [surplus, tight, short]
+%% (unlike Mode B/D's scalar-gap two-way surplus/short): a gap range spanning zero is
+%% honestly "tight", not forced to either extreme.
+-spec verdict_from_gap([number()] | null) -> binary() | null.
+verdict_from_gap(null) -> null;
+verdict_from_gap([GLo, _GHi]) when GLo >= 0 -> <<"surplus">>;
+verdict_from_gap([_GLo, GHi]) when GHi < 0  -> <<"short">>;
+verdict_from_gap(_) -> <<"tight">>.
 
 %% --- Mode-B foreign-person cash_position (budget_envelope, 10-field shape) --
 %% blueprint fhb-foreign-au.md component 6 (mode-b-wedge.md P2 slice 4). A THIRD,

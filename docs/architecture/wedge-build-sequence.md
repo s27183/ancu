@@ -45,7 +45,7 @@ The architecture was deliberately built **mode-generic** (one `profile.*` fact b
 | **Wedge 3 — foreign investor** | D | unification **+ Mode C** (investor machinery, done) **+ Mode B** (FIRB / residency, done) | all of Mode B's (inherited via `cross_border_funding` reuse) | **Done — build-complete (P1–P5, 2026-07-04), live-verified; grounding fix 2026-07-05.** See [`mode-d-wedge.md`](mode-d-wedge.md) |
 | **Wedge 1b / 1c** — Tìm Nhà / URL-paste + extension | A | Wedge 1a (done) + Phase-B addenda activation | 1b: curator ops; 1c: none | Yes — **orthogonal track**, no mode-foundation dependency; noted for future, not started |
 | **Wedge 4 — multi-CALD** | — | everything above | — | No — noted for future |
-| **Mode E — domestic next-home owner-occupier** *(new, surfaced 2026-07-04)* | E | unification (done) + `plan.buyer_stage` derivation axis (**done, P0**) + KB (**done, P1**) + a new blueprint (not drafted) | none known | **P0+P1 done 2026-07-05** — derivation axis, blueprint slug (`nexthome-domestic-au`), and 3 new KB docs landed; P2 (engine resolvers) next. See [`mode-e-wedge.md`](mode-e-wedge.md) |
+| **Mode E — domestic next-home owner-occupier** *(new, surfaced 2026-07-04)* | E | unification (done) + `plan.buyer_stage` axis (**done, P0**) + KB (**done, P1**) + blueprint + resolvers (**done, P2**) | none known | **P0–P2 done 2026-07-05** — axis, 3 KB docs, blueprint draft (`nexthome-domestic-au.md`), and engine resolvers landed; P3 (multi-blueprint activation) next. See [`mode-e-wedge.md`](mode-e-wedge.md) |
 
 The investor-tax KB that Mode C needed was the same `kb.tax.*` / `kb.investor.*` set [grounding-checklist item 10](../grounding-checklist.md) (full-temporal-flow, T-doc 6) recorded as trigger-gated to "when Mode C ships" — **authored and shipped as part of the Mode-C wedge** (45 KB docs, P1).
 
@@ -59,7 +59,7 @@ This section is the single forward-looking "what's left" answer. It replaces the
 |---|---|---|
 | **Deploy pass** | Not done | Nothing is in production; env `CLAUDE_CODE_OAUTH_TOKEN` needed for the Q&A sidecar (dev `qa_smoke` green with it set) |
 | **Mode B launch** (vs. build, which is done) | Code done, launch blocked | External: VN legal counsel, a money-transfer partner, VN-PDP data-residency capability (strategy §9) |
-| **Mode E — domestic next-home owner-occupier** | P0+P1 done 2026-07-05, P2 next | `plan.buyer_stage` derivation axis + 3 KB docs (existing-home-sale net-proceeds, dual-ownership land-tax survey, bridging-finance placeholder) landed; new blueprint `nexthome-domestic-au` named, not yet drafted — see [`mode-e-wedge.md`](mode-e-wedge.md) (scoping decision + P0–P5 plan) |
+| **Mode E — domestic next-home owner-occupier** | P0–P2 done 2026-07-05, P3 next | `plan.buyer_stage` axis, 3 KB docs, blueprint draft (`nexthome-domestic-au.md`), and engine resolvers (`fh_engine_existing_home_disposal` new + `fh_engine_cash` extended; `mortgage_finance`/`disposition` verified-reused unchanged) all landed; not yet in `IN_SCOPE_BLUEPRINTS` — see [`mode-e-wedge.md`](mode-e-wedge.md) (scoping decision + P0–P5 plan) |
 | **Wedge 1b/1c** — Tìm Nhà curation + browser-extension URL-paste | Not started | Orthogonal track, no mode-foundation dependency |
 | **Wedge 4 — multi-CALD** | Not started | Depends on everything above |
 | Grounding-checklist §2 — F1 (`applicants[]` cross-mode scope), `applicant.*` namespace confirm | Open, non-blocking | Design/verification nits, no trigger |
