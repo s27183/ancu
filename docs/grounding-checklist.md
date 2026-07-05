@@ -267,11 +267,11 @@ Note: `validate_build.py` does **not** parse `content_json` — so "validated, 4
 
 ## 2. Open consistency work (decide *after* §0 gives the whole picture — do not pre-guess)
 
-> **Update.** §0 resolved the root: the buyer fact model is forked per mode at the identity layer, and the plan-card unit is now decided — **not** keyed on mode (mode is derived, mutable, heterogeneous); the persistent unit is a per-user/household **fact base** + journey-keyed plan cards. See [`architecture/fact-model-unification.md`](architecture/fact-model-unification.md) (Decision 1). The three items below are now **subsumed by that unification refactor** — F14 / F1-cross-mode / `applicant.*` all resolve when the four blueprints' identity layer moves onto the one shared fact base, rather than as separate patches. They stay parked until the unification is planned.
+> **Update (2026-07-05).** §0's unification refactor is no longer pending — it shipped (item 2 in the Next-actions list, `[x]`). F14 closed as a side effect (Mode B's `buyer_profile_foreign` projects `firb_required_any=true`, verified in `mode-b-wedge.md`); the other two items below turned out **not** to need the `applicants[]` port at all — B, C, and D each shipped with their own asymmetric household model (B: `off_title_parties[]`; C: unchanged; D: `co_investor_count`) and no live gap surfaced. They're left open as narrow, non-blocking design/verification nits, not as blocked-on-unification items. **Wedge-level "what's left" now lives in [`architecture/wedge-build-sequence.md`](architecture/wedge-build-sequence.md)** — don't re-narrate per-wedge status here; this section stays scoped to fact-surface consistency findings only.
 
-- [ ] **F14 — `firb_required_any` in B/D.** `established-dwelling-ban`'s rule reads `profile.firb_required_any`; modes B & D publish flat `firb_required` (always true), not the aggregate → ref doesn't resolve in B/D's registry. Leading fix: publish `firb_required_any` per-mode (B/D = `true` definitionally) **rather than** porting Mode A's `applicants[]` — B/D are status-homogeneous (all foreign), so the array earns nothing there. *Decision pending §0.*
-- [ ] **F1 cross-mode propagation.** Is `applicants[]` a Mode-A-only model or a 4-mode one? Current read: Mode A needs it (mixed citizen/foreign status); B (`au_member`+`vn_funder`) and D (`co_investor_count`) have different, asymmetric household models. Mode B's real heterogeneity case (foreign buyer + citizen spouse, FIRB joint-tenant carve-out) is a *future* Mode-B design question, not a mechanical port.
-- [ ] **`applicant.*` namespace correctness.** Added to architecture §11.9 + applied to 10 Mode-A KB docs. Confirm it holds up against the materialized registry (§0) and that the ∀/map semantics are right per consuming component.
+- [x] **F14 — `firb_required_any` in B/D.** Closed via Mode B's P2 build (2026-07-03): `buyer_profile_foreign` projects `firb_required_any=true` definitionally (status-homogeneous, no `applicants[]` needed). Mode D inherits the same discriminator. See `mode-b-wedge.md` P2 `buyer_profile` entry.
+- [ ] **F1 cross-mode propagation.** Is `applicants[]` a Mode-A-only model or a 4-mode one? Now empirically answered **no** for B/C/D (each ships its own shape, no port needed) — the remaining open question is narrower: Mode B's real heterogeneity case (foreign buyer + citizen spouse, FIRB joint-tenant carve-out) is a *future* Mode-B design question, not a mechanical port. Low priority, no trigger yet.
+- [ ] **`applicant.*` namespace correctness.** Added to architecture §11.9 + applied to 10 Mode-A KB docs. Confirm it holds up against the materialized registry (§0) and that the ∀/map semantics are right per consuming component. Verification task, not blocking.
 
 ---
 
@@ -282,7 +282,7 @@ Note: `validate_build.py` does **not** parse `content_json` — so "validated, 4
 - `[defer]` **F9** — house-and-land split contract. Med, Phase B, lean-cover.
 - `[defer]` **F10** — postcode/security-type LVR caps. Low, KB-confirm only.
 - `[x]` **F13 — CLOSED.** FHSS modelled as one joint bool; it's an individual scheme. Closed via the auditable KB `resolution: per_applicant` marker on FHSS + per-applicant evaluation ([`fh_engine_resolver:eval_node_applicants`](../engine/erlang/src/fh_engine_resolver.erl), three-valued) → `eligible_applicants[]` in [`fh_engine_eligibility`](../engine/erlang/src/fh_engine_eligibility.erl). The conformance case `fhss-two-applicants-one-qualifies` now asserts `[true, false]` per-applicant and **passes** in both `resolver_eval.py` and `resolver_conformance.escript` (the close-signal). Summed-release amount stays a per-property/refine concern.
-- `[ ]` **F14** — see §2.
+- `[x]` **F14 — CLOSED.** See §2.
 
 F1–F6, F11, F12: applied (Mode A). F5 residue (AUSTRAC source-of-funds + VN capital-controls grounding for `funds_provenance`) = compliance gate / Wedge 2, not a Mode-A KB doc.
 

@@ -5,6 +5,8 @@
 > **This document covers:** Recommended next steps for a builder pursuing this — user research, regulatory scoping, MVP scope, distribution test, partnership exploration.
 >
 > **Related documents:** [03-strategy.md](03-strategy.md) (the wedge sequence these next steps execute), [architecture/architecture.md](architecture/architecture.md) (Claude Code build implications).
+>
+> **Superseded (2026-07-05).** This is the pre-build strategic wish list (single MVP page, $20 price point, 6-week ship) — overtaken by the actual build, which is now four full mode wedges (A/B/C/D) complete. For **current** "what's left," see [`architecture/wedge-build-sequence.md`](architecture/wedge-build-sequence.md)'s "What's left" table. Kept here as historical record of the original thinking, not as an active list.
 
 ---
 
