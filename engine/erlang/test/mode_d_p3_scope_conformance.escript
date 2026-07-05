@@ -54,12 +54,15 @@ main(_) ->
 
 scope_cases() ->
     InScope = fh_engine_kb:in_scope_blueprints(),
-    [check("in_scope_blueprints has exactly the four bare stems",
+    %% Mode-E P3 (2026-07-05) added a 5th stem (nexthome-domestic-au) — updated to match,
+    %% same "activation is additive, never replaces" discipline this escript proves below.
+    [check("in_scope_blueprints has exactly the five bare stems",
            lists:sort(InScope),
            lists:sort([<<"fhb-domestic-au">>,
                        <<"fhb-foreign-au">>,
                        <<"investor-domestic-au">>,
-                       <<"investor-foreign-au">>])),
+                       <<"investor-foreign-au">>,
+                       <<"nexthome-domestic-au">>])),
      check("investor-foreign-au blueprint resolves",
            element(1, fh_engine_kb:blueprint(?INV_FOREIGN)), ok)].
 

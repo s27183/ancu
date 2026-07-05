@@ -92,18 +92,18 @@ fill(_Args, Upstream) ->
 %% cost-of-funds, never a fixed %, so total_payout stays null rather than guessed).
 
 -spec total_payout(number() | null, binary() | null) ->
-          {atom(), [number()], [number()] | null}.
+          {binary(), [number()], [number()] | null}.
 total_payout(Balance, RateType) ->
     Status = break_status(RateType),
     Fee = discharge_fee_band(),
     Total = payout_total(Balance, Status, Fee),
     {Status, Fee, Total}.
 
--spec break_status(binary() | null) -> atom().
-break_status(<<"variable">>) -> not_applicable;
-break_status(_)              -> to_verify.   %% fixed | unknown | absent → the safer default
+-spec break_status(binary() | null) -> binary().
+break_status(<<"variable">>) -> <<"not_applicable">>;
+break_status(_)              -> <<"to_verify">>.   %% fixed | unknown | absent → the safer default
 
-payout_total(Balance, not_applicable, [Lo, Hi]) when is_number(Balance) ->
+payout_total(Balance, <<"not_applicable">>, [Lo, Hi]) when is_number(Balance) ->
     [Balance + Lo, Balance + Hi];
 payout_total(_Balance, _Status, _Fee) ->
     null.
@@ -152,12 +152,12 @@ settlement_mismatch(_Date, _Status) -> true.
 %% --- key_assumptions (bilingual via kb.copy.existing-home-disposal + reused disposition copy)
 key_assumptions(null, _Status, _Fee, _CgtStatus) ->
     [copy(<<"assumption_no_existing_home_facts">>, #{})];
-key_assumptions(_Price, not_applicable, [Lo, Hi], CgtStatus) ->
+key_assumptions(_Price, <<"not_applicable">>, [Lo, Hi], CgtStatus) ->
     [copy(<<"assumption_no_exit_fee_variable">>, #{}),
      copy(<<"assumption_discharge_fee">>, #{<<"low">> => money(Lo), <<"high">> => money(Hi)})]
     ++ [copy_disposition(<<"assumption_selling_costs">>, #{})]
     ++ cgt_assumption(CgtStatus);
-key_assumptions(_Price, to_verify, [Lo, Hi], CgtStatus) ->
+key_assumptions(_Price, <<"to_verify">>, [Lo, Hi], CgtStatus) ->
     [copy(<<"assumption_break_cost_to_verify">>, #{}),
      copy(<<"assumption_discharge_fee">>, #{<<"low">> => money(Lo), <<"high">> => money(Hi)})]
     ++ [copy_disposition(<<"assumption_selling_costs">>, #{})]

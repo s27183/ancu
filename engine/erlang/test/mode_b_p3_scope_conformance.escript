@@ -46,15 +46,17 @@ main(_) ->
 
 scope_cases() ->
     InScope = fh_engine_kb:in_scope_blueprints(),
-    %% Mode-D P3 (2026-07-04) added a 4th stem (investor-foreign-au) to this SET — this
-    %% escript's own assertion is updated to match, same "activation is additive, never
-    %% replaces" discipline it itself proves for A/B/C below.
-    [check("in_scope_blueprints has exactly the four bare stems",
+    %% Mode-D P3 (2026-07-04) added a 4th stem (investor-foreign-au), and Mode-E P3
+    %% (2026-07-05) added a 5th (nexthome-domestic-au) — this escript's own assertion is
+    %% updated to match each time, same "activation is additive, never replaces"
+    %% discipline it itself proves for A/B/C below.
+    [check("in_scope_blueprints has exactly the five bare stems",
            lists:sort(InScope),
            lists:sort([<<"fhb-domestic-au">>,
                        <<"fhb-foreign-au">>,
                        <<"investor-domestic-au">>,
-                       <<"investor-foreign-au">>])),
+                       <<"investor-foreign-au">>,
+                       <<"nexthome-domestic-au">>])),
      check("fhb-foreign-au blueprint resolves", element(1, fh_engine_kb:blueprint(?FHB_FOREIGN)), ok)].
 
 %% --- 2. the materialized registry itself ----------------------------------------
