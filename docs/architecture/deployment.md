@@ -24,8 +24,8 @@
 **Decisions locked for this spec** (see the slice's AskUserQuestion): region **`sgp1`**
 (co-locate with existing bigsmallai infra; planning isn't latency-critical and it's
 closest to future VN-located Mode-B/D users), frontend on **Cloudflare Pages**, a
-**dedicated apex**. Throughout, **`<apex>`** is your registered domain — placeholder
-**`firsthomey.com.au`**; substitute your real apex everywhere it appears.
+**dedicated apex — `ancu.ai`** (registered 2026-07-06; the earlier `firsthomey.com.au`
+placeholder is superseded). GitHub source: **`s27183/ancu`**.
 
 ---
 
@@ -55,9 +55,9 @@ Cloudflare Pages, secrets in the dashboard, `deploy_on_push`.
 
 | Service | Host | Domain | Spec |
 |---|---|---|---|
-| Frontend (SvelteKit `adapter-static` SPA) | Cloudflare Pages | `app.<apex>` | `shell/web/frontend/svelte.config.js` |
-| Engine (Erlang gateway + **per-turn Python sidecar**) | DO App `firsthomey-engine`, **`basic-s` 1vcpu/2gb**, port 8080 | `engine.<apex>` | `engine/app.yaml` *(to author)* |
-| Shell backend (Erlang; cowboy + pgo only) | DO App `firsthomey-shell`, `apps-s-1vcpu-1gb-fixed`, port 8081 | `api.<apex>` | `shell/web/app.yaml` *(to author)* |
+| Frontend (SvelteKit `adapter-static` SPA) | Cloudflare Pages | `app.ancu.ai` | `shell/web/frontend/svelte.config.js` |
+| Engine (Erlang gateway + **per-turn Python sidecar**) | DO App `firsthomey-engine`, **`basic-s` 1vcpu/2gb**, port 8080 | `engine.ancu.ai` | `engine/app.yaml` |
+| Shell backend (Erlang; cowboy + pgo only) | DO App `firsthomey-shell`, `apps-s-1vcpu-1gb-fixed`, port 8081 | `api.ancu.ai` | `shell/web/app.yaml` |
 | Databases `firsthomey_engine` + `firsthomey_shell` | DO Managed PG cluster `firsthomey-pg` (PG 16), **one cluster, two databases** — provisioned **out-of-band** (`doctl databases create`), NOT from an app spec | — | created out-of-band; reached via `ENGINE_DATABASE_URL` / `SHELL_DATABASE_URL` secrets |
 
 **Compute is split, the PG cluster is shared, the databases are not.** Engine and shell
@@ -165,10 +165,10 @@ CORS** (no browser calls it directly).
 | Var | Kind | Value / note |
 |---|---|---|
 | `FH_SHELL_HTTP_PORT` | config | `8081` |
-| `ENGINE_BASE_URL` | config | `https://engine.<apex>` (pre-DNS: the engine's `*.ondigitalocean.app` ingress) |
-| `APP_BASE_URL` | config | `https://app.<apex>` — base for the magic-link + Google redirect URIs |
+| `ENGINE_BASE_URL` | config | `https://engine.ancu.ai` (pre-DNS: the engine's `*.ondigitalocean.app` ingress) |
+| `APP_BASE_URL` | config | `https://app.ancu.ai` — base for the magic-link + Google redirect URIs |
 | `COOKIE_SECURE` | config | `1` (prod) — `fh_session` gets `Secure` |
-| `EMAIL_FROM` / `EMAIL_FROM_NAME` | config | magic-link sender, e.g. `no-reply@<apex>` / `FirstHomey` |
+| `EMAIL_FROM` / `EMAIL_FROM_NAME` | config | magic-link sender, e.g. `no-reply@ancu.ai` / `FirstHomey` |
 | `STRIPE_API_BASE` | config | `https://api.stripe.com` (live default; explicit for clarity — never set the test stub in prod). |
 | `ADDON_AMOUNT_DOC_REVIEW` | config | doc_review add-on price in cents (`4000` = $40). Optional; code defaults to 4000 (8-S5f). |
 | `ADMIN_EMAILS` | config | comma-separated admin allowlist (charge-exempt, still metered — 8-S5e). Emails aren't secret but leave empty in-repo; set the real list in the Dashboard. |
@@ -176,7 +176,7 @@ CORS** (no browser calls it directly).
 | `SHELL_JWT_SECRET` | **secret** | user-JWT HMAC (`openssl rand -hex 32`) |
 | `SHELL_TENANT_ID` / `SHELL_TENANT_PRIVKEY` | **secret** | the ed25519 tenant identity — `SHELL_TENANT_PRIVKEY` is base64 of the private key; its **public** half is registered with the engine (§4 step 5). |
 | `RESEND_API_KEY` | **secret** | `re_…` — set → magic-link emails via Resend; unset → link logged. |
-| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | **secret** | OAuth; redirect URI `https://app.<apex>/api/auth/google/callback`. |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | **secret** | OAuth; redirect URI `https://app.ancu.ai/api/auth/google/callback`. |
 | `STRIPE_SECRET_KEY` | **secret** | Stripe API key (8-S5e/8-S5f) — checkout create + webhook. |
 | `STRIPE_WEBHOOK_SECRET` | **secret** | `whsec_…` — raw-body HMAC verification of Stripe webhooks. |
 | `STRIPE_PRICE_PLUS` / `STRIPE_PRICE_PRO` | **secret** | recurring Price ids → tier reverse-map (8-S5e). |
@@ -194,10 +194,10 @@ CORS** (no browser calls it directly).
 |---|---|---|
 | `NODE_VERSION` | build | `20` |
 | `VITE_PMTILES_URL` | **build** | Protomaps pmtiles basemap URL (8-S2d). Vite inlines `import.meta.env.VITE_*` at **build** time, so this is a Pages **build** env var. Unset → the `minimalStyle` fallback (no basemap, no regression). Prod target: the R2 pmtiles extract. |
-| `SHELL_ORIGIN` | **runtime** | the shell backend origin the Pages **Function** proxies to (e.g. `https://api.<apex>`, or the shell `*.ondigitalocean.app` ingress pre-DNS). Read by `functions/api/[[path]].js` + `functions/health.js` at request time — a Pages **runtime** env var, NOT a `VITE_` build var. Unset → the proxy 503s. |
+| `SHELL_ORIGIN` | **runtime** | the shell backend origin the Pages **Function** proxies to (e.g. `https://api.ancu.ai`, or the shell `*.ondigitalocean.app` ingress pre-DNS). Read by `functions/api/[[path]].js` + `functions/health.js` at request time — a Pages **runtime** env var, NOT a `VITE_` build var. Unset → the proxy 503s. |
 
 The frontend calls **relative `/api/*`** (no API-base env), so the browser sees **one
-origin** (`app.<apex>`). Cloudflare Pages **cannot** proxy `/api/*` to an external origin
+origin** (`app.ancu.ai`). Cloudflare Pages **cannot** proxy `/api/*` to an external origin
 via `_redirects` (CF: *"Proxying will only support relative URLs on your site. You cannot
 proxy external domains"*; 200-rewrites are unsupported), so the proxy is a **Pages
 Function** — `shell/web/frontend/functions/api/[[path]].js` (catch-all) + `functions/health.js`
@@ -272,19 +272,20 @@ already-existing databases. All `doctl … create` steps are **billable + your-g
    `doctl apps create --spec`. Boots → `firsthomey_shell` migrations →
    `maybe_autoprovision` no-ops (static key present). **Before DNS:** override
    `ENGINE_BASE_URL` to the engine's `*.ondigitalocean.app` ingress; revert to
-   `engine.<apex>` once DNS lands.
+   `engine.ancu.ai` once DNS lands.
 7. **Frontend** on Cloudflare Pages — root dir `shell/web/frontend`, build
    `npm install && npm run build`, output `build`. The `/api/*` + `/health` proxy is the
    committed **Pages Function** (`functions/api/[[path]].js` + `functions/health.js`) — it
    is **not** a `_redirects` rule (CF can't proxy external origins via `_redirects`). Set
    the dashboard env vars from the §3 frontend table: `NODE_VERSION` + `VITE_PMTILES_URL`
    (**build**) and `SHELL_ORIGIN` (**runtime**, the shell origin the Function forwards to —
-   the shell `*.ondigitalocean.app` ingress pre-DNS, `https://api.<apex>` after). This is
+   the shell `*.ondigitalocean.app` ingress pre-DNS, `https://api.ancu.ai` after). This is
    what makes the relative-`/api` SPA + same-origin cookie work without CORS.
-8. **Domains / DNS.** Add DNS for `app.` (Cloudflare Pages custom domain), `api.`, and
-   `engine.<apex>` (the two DO apps' `domains:` blocks). The sender domain `<apex>` needs
+8. **Domains / DNS.** Add DNS for `app.ancu.ai` (Cloudflare Pages custom domain),
+   `api.ancu.ai`, and `engine.ancu.ai` (the two DO apps' `domains:` blocks). The sender
+   domain `ancu.ai` needs
    its **own DKIM/SPF** verified in Resend (a dedicated apex, not the pre-verified
-   bigsmallai.com). Register the Google redirect URI `https://app.<apex>/api/auth/google/callback`.
+   bigsmallai.com). Register the Google redirect URI `https://app.ancu.ai/api/auth/google/callback`.
    Wait for HTTPS certs.
 
 `deploy_on_push: true` on both DO apps (branch `main`) + Cloudflare's git build mean
@@ -294,12 +295,12 @@ already-existing databases. All `doctl … create` steps are **billable + your-g
 
 ## 5. Post-deploy smoke
 
-- [ ] `GET https://engine.<apex>/health` → 200; `GET https://api.<apex>/health` → 200.
-- [ ] `https://app.<apex>/` loads the SPA; a deep link resolves via the SPA fallback
+- [ ] `GET https://engine.ancu.ai/health` → 200; `GET https://api.ancu.ai/health` → 200.
+- [ ] `https://app.ancu.ai/` loads the SPA; a deep link resolves via the SPA fallback
       (no 404 on refresh).
 - [ ] **Magic-link login:** request a link, pull the token from the **shell DO log
       stream** (until Resend's `RESEND_API_KEY` is set), verify, confirm the `fh_session`
-      cookie is set on `app.<apex>` with `Secure`.
+      cookie is set on `app.ancu.ai` with `Secure`.
 - [ ] **Google login** (if configured): consent → callback → session cookie; an
       already-magic-linked email lands the **same** account (keyed by email).
 - [ ] **Map** loads via the shell→engine proxy (`GET /api/engine/suburbs` through the
@@ -325,7 +326,7 @@ already-existing databases. All `doctl … create` steps are **billable + your-g
 | **SSE through the Pages Function** | **watch — verify in prod** | the 8-S4b plan-card SSE stream now rides `/api/*` through the Pages Function. Workers stream `fetch` bodies, but **verify long-lived SSE duration/streaming** against CF Pages Function limits in the post-deploy smoke (§5); if capped, consider a dedicated SSE route. |
 | **Prod tenant-pubkey provisioning** | manual `psql` insert (§4 step 5) | works; an authenticated admin endpoint is the future nicety (carried 8-S0b gap). |
 | **`FH_DEPLOY_COMMIT_SHA` injection** | image defaults `"unknown"` | DO can't auto-inject the git SHA on `deploy_on_push`; build via CI with `--build-arg` for a real audit SHA (constraint #6). |
-| **DNS + custom domains + DKIM/SPF** | none (your-go) | `app.`/`api.`/`engine.<apex>` + Resend domain verification for the dedicated apex. |
+| **DNS + custom domains + DKIM/SPF** | none (your-go) | `app.ancu.ai`/`api.ancu.ai`/`engine.ancu.ai` + Resend domain verification for the dedicated apex. |
 | **PG connection ceiling** | `db-s-1vcpu-1gb` ≈ 22 non-superuser slots | engine + shell pools consume most; bump cluster size if pools error under load. |
 | **VN data residency (Decree 13/2023)** | out of Wedge-1a scope | Wedge 1a is Mode A (AU users); plan VN-side residency from Wedge 2 before onboarding VN-located users (CLAUDE.md). |
 | **Stripe / commerce** | **landed (8-S5)** | shell-only secrets (`STRIPE_SECRET_KEY`/`STRIPE_WEBHOOK_SECRET`/`STRIPE_PRICE_*`) now in `shell/web/app.yaml` §3; engine carries none (it meters; the shell gates). |

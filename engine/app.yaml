@@ -22,8 +22,7 @@ services:
     source_dir: /
     dockerfile_path: engine/Dockerfile
     github:
-      # TODO(operator): set to your GitHub repo (FH has no remote yet).
-      repo: <github-owner>/firsthomey
+      repo: s27183/ancu
       branch: main
       deploy_on_push: true
     http_port: 8080
@@ -77,5 +76,5 @@ services:
       # (tenant_signing_keys), not env.
 
 domains:
-  - domain: engine.firsthomey.com.au  # <apex> placeholder — substitute your real apex
+  - domain: engine.ancu.ai
     type: PRIMARY

@@ -15,8 +15,7 @@ services:
     source_dir: shell/web
     dockerfile_path: shell/web/Dockerfile
     github:
-      # TODO(operator): set to your GitHub repo (FH has no remote yet).
-      repo: <github-owner>/firsthomey
+      repo: s27183/ancu
       branch: main
       deploy_on_push: true
     http_port: 8081
@@ -39,17 +38,17 @@ services:
       # override to the engine app's *.ondigitalocean.app ingress, then revert to the
       # apex once DNS is up (deployment.md §4 step 6).
       - key: ENGINE_BASE_URL
-        value: "https://engine.firsthomey.com.au"  # <apex> placeholder
+        value: "https://engine.ancu.ai"
       # Base for magic-link + Google redirect URIs and the SPA origin. The browser
       # only ever talks to this origin; /api/* is proxied here by a Pages Function.
       - key: APP_BASE_URL
-        value: "https://app.firsthomey.com.au"  # <apex> placeholder
+        value: "https://app.ancu.ai"
       # fh_session gets Secure in prod (HTTPS-only). Host-only, SameSite=Lax cookie.
       - key: COOKIE_SECURE
         value: "1"
       # Magic-link sender — must be on the Resend-verified domain (deployment.md §4 step 8).
       - key: EMAIL_FROM
-        value: "no-reply@firsthomey.com.au"  # <apex> placeholder
+        value: "no-reply@ancu.ai"
       - key: EMAIL_FROM_NAME
         value: "FirstHomey"
       # Stripe API base — live default; explicit for clarity. (Tests override it to a
@@ -80,7 +79,7 @@ services:
       # re_… → magic-link emails via Resend; unset → link logged (DO log stream).
       - key: RESEND_API_KEY
         type: SECRET
-      # Google OAuth — redirect URI https://app.<apex>/api/auth/google/callback.
+      # Google OAuth — redirect URI https://app.ancu.ai/api/auth/google/callback.
       - key: GOOGLE_CLIENT_ID
         type: SECRET
       - key: GOOGLE_CLIENT_SECRET
@@ -103,5 +102,5 @@ services:
       # Do NOT add these here.
 
 domains:
-  - domain: api.firsthomey.com.au  # <apex> placeholder — substitute your real apex
+  - domain: api.ancu.ai
     type: PRIMARY
