@@ -56,8 +56,8 @@ Cloudflare Pages, secrets in the dashboard, `deploy_on_push`.
 | Service | Host | Domain | Spec |
 |---|---|---|---|
 | Frontend (SvelteKit `adapter-static` SPA) | Cloudflare Pages | `app.ancu.ai` | `shell/web/frontend/svelte.config.js` |
-| Engine (Erlang gateway + **per-turn Python sidecar**) | DO App `firsthomey-engine`, **`basic-s` 1vcpu/2gb**, port 8080 | `engine.ancu.ai` | `engine/app.yaml` |
-| Shell backend (Erlang; cowboy + pgo only) | DO App `firsthomey-shell`, `apps-s-1vcpu-1gb-fixed`, port 8081 | `api.ancu.ai` | `shell/web/app.yaml` |
+| Engine (Erlang gateway + **per-turn Python sidecar**) | DO App `ancu-engine`, **`basic-s` 1vcpu/2gb**, port 8080 | `engine.ancu.ai` | `engine/app.yaml` |
+| Shell backend (Erlang; cowboy + pgo only) | DO App `ancu-shell`, `apps-s-1vcpu-1gb-fixed`, port 8081 | `api.ancu.ai` | `shell/web/app.yaml` |
 | Databases `firsthomey_engine` + `firsthomey_shell` | DO Managed PG cluster `firsthomey-pg` (PG 16), **one cluster, two databases** — provisioned **out-of-band** (`doctl databases create`), NOT from an app spec | — | created out-of-band; reached via `ENGINE_DATABASE_URL` / `SHELL_DATABASE_URL` secrets |
 
 **Compute is split, the PG cluster is shared, the databases are not.** Engine and shell
@@ -137,7 +137,7 @@ Non-secret config is committed in the app specs; **secrets are set in the DO Das
 (`App → Settings → Environment Variables`), **never** in git. Frontend env is set in the
 Cloudflare Pages dashboard.
 
-### Engine (`firsthomey-engine`) — `engine/app.yaml`
+### Engine (`ancu-engine`) — `engine/app.yaml`
 
 | Var | Kind | Value / note |
 |---|---|---|
@@ -160,7 +160,7 @@ Tenant **public** keys are NOT env vars — they live in the engine DB
 (`tenant_signing_keys`), provisioned out-of-band (§4 step 5). The engine needs **no
 CORS** (no browser calls it directly).
 
-### Shell backend (`firsthomey-shell`) — `shell/web/app.yaml`
+### Shell backend (`ancu-shell`) — `shell/web/app.yaml`
 
 | Var | Kind | Value / note |
 |---|---|---|

@@ -8,7 +8,7 @@
 # DO doesn't cross-inject DB refs across apps). HTTP-only to the engine; never a
 # cross-DB JOIN (constraint #11 / engine-contract §9.2).
 
-name: firsthomey-shell
+name: ancu-shell
 region: sgp
 services:
   - name: shell

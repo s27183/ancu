@@ -13,7 +13,7 @@
 #
 # Region slugs: the APP region is `sgp`; the PG CLUSTER region is `sgp1`.
 
-name: firsthomey-engine
+name: ancu-engine
 region: sgp
 services:
   - name: engine
