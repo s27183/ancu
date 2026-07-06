@@ -1,7 +1,13 @@
 ---
 slug: kb.firb.fee-tiers-by-value
 effective_from: 2025-07-01
-last_verified: 2026-06-28
+last_verified: 2026-07-06
+sources:
+  - url: https://foreigninvestment.gov.au/guidance/general/fees
+    retrieved: 2026-07-06
+  - url: https://foreigninvestment.gov.au/sites/foreigninvestment.gov.au/files/2026-06/schedule-of-fees-v8.pdf
+    retrieved: 2026-07-06
+    path: docs/sources/firb/schedule-of-fees-v8-2026-27.pdf
 ---
 
 # How the FIRB fee is set by purchase value — the banding rule
@@ -46,5 +52,5 @@ Notes:
 ## Sources
 
 - Foreign Investment in Australia (Treasury/FIRB) — *Fees* (the fee depends on the value and kind of investment; banded structure) — https://foreigninvestment.gov.au/guidance/general/fees
-- Foreign Investment in Australia — *Schedule of Fees*, Version 6 (2 January 2026) — the banded tables this rule selects across — https://foreigninvestment.gov.au/sites/foreigninvestment.gov.au/files/2026-01/schedule-of-fees.pdf
+- Foreign Investment in Australia — *Schedule of Fees*, Version 8 (1 July 2026) — the banded tables this rule selects across — https://foreigninvestment.gov.au/sites/foreigninvestment.gov.au/files/2026-06/schedule-of-fees-v8.pdf (archived: docs/sources/firb/schedule-of-fees-v8-2026-27.pdf)
 - *Foreign Acquisitions and Takeovers Fees Imposition Regulations 2020* — the fee-setting instrument (fees set by consideration band) — https://www.legislation.gov.au/Details/F2020L00563

@@ -1,7 +1,15 @@
 ---
 slug: kb.lender.serviceability-investment-loans
 effective_from: 2026-02-01
-last_verified: 2026-06-23
+last_verified: 2026-07-06
+sources:
+  - url: https://www.apra.gov.au/activating-debt-to-income-limits-as-a-macroprudential-policy-tool
+    retrieved: 2026-07-06
+    note: 27 Nov 2025 — APRA activating a binding DTI limit; ADIs must limit new lending at DTI ≥6 to 20% of all new mortgage lending from Feb 2026, applied to owner-occupier and investor portfolios separately
+  - url: https://handbook.apra.gov.au/ppg/apg-223
+    retrieved: 2026-07-06
+    path: docs/sources/apra/apg-223-residential-mortgage-lending_0.pdf
+    note: APG 223 — interest-only assessed on P&I over the residual term; prudent IO practices
 ---
 
 # Serviceability — investment loans

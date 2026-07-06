@@ -1,7 +1,18 @@
 ---
 slug: kb.lender.bnpl-treatment-2026
 effective_from: 2025-06-10
-last_verified: 2026-06-01
+last_verified: 2026-07-06
+sources:
+  - url: https://www.asic.gov.au/regulatory-resources/credit/buy-now-pay-later-credit-contracts-credit-licensing/
+    retrieved: 2026-07-06
+    note: "ASIC — from 10 June 2025 anyone in credit activities involving BNPL contracts must hold an Australian Credit Licence and become an AFCA member"
+  - url: https://www.asic.gov.au/about-asic/news-centre/find-a-media-release/2025-releases/25-069mr-asic-releases-new-regulatory-guidance-to-support-buy-now-pay-later-industry-reforms/
+    retrieved: 2026-07-06
+    note: "ASIC 25-069MR (8 May 2025) — releases Regulatory Guide 281 Low cost credit contracts"
+  - url: https://download.asic.gov.au/media/2sgcg0y5/rg281-published-8-may-2025.pdf
+    retrieved: 2026-07-06
+    path: docs/sources/asics/rg281-published-8-may-2025.pdf
+    note: "RG 281 — LCCC regime; rebuttable presumption an LCCC with a credit limit ≤$2,000 is 'not unsuitable'"
 ---
 
 # Buy-now-pay-later treatment in serviceability (2026)

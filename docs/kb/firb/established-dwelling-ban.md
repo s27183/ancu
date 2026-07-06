@@ -1,7 +1,10 @@
 ---
 slug: kb.firb.established-dwelling-ban
 effective_from: 2025-04-01
-last_verified: 2026-06-01
+last_verified: 2026-07-06
+sources:
+  - url: https://foreigninvestment.gov.au/guidance/types-investments/residential-land
+    retrieved: 2026-07-06
 ---
 
 # Foreign-person ban on purchasing established dwellings (1 Apr 2025 – 30 Jun 2029)

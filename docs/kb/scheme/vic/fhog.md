@@ -1,7 +1,10 @@
 ---
 slug: kb.scheme.vic.fhog
 effective_from: 2013-07-01
-last_verified: 2026-06-01
+last_verified: 2026-07-06
+sources:
+  - url: https://www.sro.vic.gov.au/buying-property/first-home-owner-grant
+    retrieved: 2026-07-06
 ---
 
 # Victoria First Home Owner Grant (FHOG)

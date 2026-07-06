@@ -1,7 +1,12 @@
 ---
 slug: kb.tax.cgt-main-residence-exemption
 effective_from: 2025-07-01
-last_verified: 2026-06-21
+last_verified: 2026-07-06
+sources:
+  - url: https://www.ato.gov.au/individuals-and-families/investments-and-assets/capital-gains-tax/property-and-capital-gains-tax/your-main-residence-home
+    retrieved: 2026-06-21
+  - url: https://www.ato.gov.au/individuals-and-families/investments-and-assets/capital-gains-tax/foreign-residents-and-capital-gains-tax/main-residence-exemption-for-foreign-residents
+    retrieved: 2026-06-21
 ---
 
 # CGT — the main residence exemption
@@ -63,7 +68,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
 Notes:
 
 - **No `fills`.** No outcome leaf is set by a KB rule. `disposition.cgt` is resolver-derived from main-residence status against these rules — `null` (exempt) for the Mode A base case, `to_verify` once a trap applies. The doc supplies the conditions and the loss-of-exemption triggers, not a computed gain.
-- **REGULATED — verified against the ATO.** The full-exemption conditions, the 2-hectare cap, the income-production rule, the 6-year absence rule, and the foreign-resident removal were confirmed against the ATO directly (see Sources, verified 2026-06-21).
+- **REGULATED — verified against the ATO.** The full-exemption conditions, the 2-hectare cap, the income-production rule, the 6-year absence rule, and the foreign-resident removal were confirmed against the ATO directly (see Sources, verified 2026-06-21). The core eligibility conditions (2-hectare cap, income-production rule) were **re-confirmed 2026-07-06** via the archived snapshot of the ATO eligibility page (unchanged); ATO blocks automated fetch, so the 6-year-rule and foreign-resident pages carry the 2026-06-21 verification.
 - **Scope discipline.** The owner-occupier exemption and its loss-triggers are owned here (what a Mode A owner needs). The **investor CGT mechanics** — the 50% discount for assets held > 12 months, cost-base / depreciation, partial-exemption apportionment math — are out of scope for Mode A and belong to the investor blueprints, authored design-first (lifecycle-simulation-model §8.7); not duplicated here.
 - **The two load-bearing traps are diaspora-shaped.** Renting the first home (6-year clock / partial exemption) and moving overseas (non-resident removal) are exactly the Vietnamese-Australian lifecycle — captured explicitly so a future mode switch surfaces the CGT consequence rather than letting a "clean exemption" assertion mislead.
 

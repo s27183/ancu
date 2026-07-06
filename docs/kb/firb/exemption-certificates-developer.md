@@ -1,7 +1,11 @@
 ---
 slug: kb.firb.exemption-certificates-developer
 effective_from: 2025-04-01
-last_verified: 2026-06-28
+last_verified: 2026-07-06
+sources:
+  - url: https://foreigninvestment.gov.au/sites/firb.gov.au/files/guidance-notes/08_GN_FIRB.pdf
+    retrieved: 2026-07-06
+    path: docs/sources/firb/gn8-new-near-new-dwelling-exemption-certificate.pdf
 ---
 
 # FIRB — developer new-dwelling exemption certificate

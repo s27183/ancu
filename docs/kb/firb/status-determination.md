@@ -1,14 +1,17 @@
 ---
 slug: kb.firb.status-determination
 effective_from: 2015-12-01
-last_verified: 2026-06-01
+last_verified: 2026-07-06
+sources:
+  - url: https://foreigninvestment.gov.au/guidance/general/key-concepts
+    retrieved: 2026-07-06
 ---
 
 # Determining FIRB status — is the buyer a foreign person?
 
 **FIRB status** is the single fact every flow branches on (constraint #10): whether a buyer is a **foreign person** under the *Foreign Acquisitions and Takeovers Act 1975* (FATA). The classification decides which mode applies — a non-foreign buyer (Mode A / C) is unaffected by the foreign-investment framework, while a foreign person (Mode B / D) must obtain approval **before** signing an unconditional contract and is caught by the [established-dwelling ban](established-dwelling-ban.md). This doc owns the *classification* (who is a foreign person); the ban doc owns the *prohibition* (what a foreign person may then buy).
 
-The test is **residency, not nationality**: a **foreign person** is a natural person who is **not ordinarily resident in Australia**. An Australian citizen is never a foreign person. Everyone else is classified by the **ordinarily-resident** test.
+The test is **residency, not nationality**: a **foreign person** is a natural person who is **not ordinarily resident in Australia** — citizenship alone does not settle it (a citizen living overseas can, in principle, fail the ordinarily-resident test). This doc's predicate treats every citizen as not-foreign regardless of residency — a **Mode A simplification**, not the strict rule; see the citizen bullet below and Notes.
 
 ## The ordinarily-resident test
 
@@ -19,7 +22,7 @@ A non-citizen is **ordinarily resident in Australia** at a given time only if **
 
 The second limb is what separates permanent from temporary residents:
 
-- **Australian citizen** — **never** a foreign person, regardless of where they live. No FIRB.
+- **Australian citizen** — not subject to a time limitation, so if ordinarily resident (200-day limb) they are **not** a foreign person — the common diaspora case, and the one this predicate assumes always holds (a **Mode A simplification**, treated the same way as the PR case below). Strictly, a citizen who is *not* ordinarily resident (e.g. settled long-term overseas, fewer than 200 days in Australia) **can** still be a foreign person under the Act — a Mode-D-shaped edge, not yet backed by a fact on the Mode A surface (see Notes).
 - **Permanent resident** (permanent-entry visa) — **not** subject to a time limitation, so if ordinarily resident (200-day limb) they are **not** a foreign person. A PR who is *not* ordinarily resident (e.g. living overseas, fewer than 200 days in Australia) **can** still be a foreign person.
 - **Temporary resident** (a temporary visa permitting a continuous stay of more than 12 months, or a bridging visa with a pending permanent-visa application) — their presence **is** time-limited, so they fail the second limb and **are foreign persons** even if physically present 200+ days. This is the counter-intuitive result that catches many AU-based temporary-visa holders (Mode B).
 - **Non-resident** (living overseas, no Australian visa entitlement) — a foreign person.
@@ -41,6 +44,7 @@ Both turn on facts not yet on the Mode A profile surface (there is no NZ-citizen
 - **Mode B (Vietnam-parent funding an AU child; AU temporary resident): the child on a student / graduate / skilled *temporary* visa IS a foreign person**, even living in Australia full-time — the time-limited visa fails the ordinarily-resident test. They need approval and are caught by the established-dwelling ban (new-build / vacant-land only) unless the spouse-joint-tenant carve-out applies.
 - **Mode D (Vietnam-located investor): a foreign person** (non-resident). Approval required; new-build / vacant-land only.
 - **PR living in Vietnam:** a permanent resident who has spent fewer than 200 days in Australia in the past year is **not ordinarily resident** and can be a foreign person despite holding PR — relevant where a diaspora buyer holds AU PR but lives in Vietnam (a Mode-D-shaped case).
+- **Citizen living in Vietnam long-term:** the same edge applies to citizenship — a dual Vietnamese-Australian citizen settled in Vietnam for years, rarely in Australia, is not automatically excluded from foreign-person status by citizenship alone. This predicate currently resolves every citizen to not-foreign regardless of residency (see Notes); a citizen genuinely not ordinarily resident is the same class of deferred edge as the PR case above, not yet backed by a fact on the Mode A surface.
 
 ## Rules
 
@@ -61,7 +65,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
     "ordinarily_resident_min_days":   { "type": "integer", "value": 200, "note": "physically in Australia ≥200 of the preceding 365 days — limb 1 of the ordinarily-resident test" },
     "ordinarily_resident_requires_no_time_limit": { "type": "bool", "value": true, "note": "limb 2 — continued presence not subject to a visa time limit; the limb temporary residents fail" },
     "foreign_person_citizenship_statuses": { "type": "array<string>", "value": ["temporary_resident", "non_resident"], "note": "the citizenship_status values that resolve firb_required=true for Mode A's surface" },
-    "not_foreign_person_citizenship_statuses": { "type": "array<string>", "value": ["citizen", "permanent_resident"], "note": "PR assumes ordinarily-resident (Mode A); a non-ordinarily-resident PR is the documented edge case" },
+    "not_foreign_person_citizenship_statuses": { "type": "array<string>", "value": ["citizen", "permanent_resident"], "note": "both assume ordinarily-resident (Mode A); a non-ordinarily-resident citizen or PR is the documented edge case (Mode D-shaped)" },
     "status_level_carveouts": { "type": "array<string>", "value": [
       "New Zealand citizen / Special Category Visa (subclass 444) holder — no foreign-investment approval required",
       "Spouse of an Australian citizen, PR, or NZ citizen acquiring the property as joint tenants"
@@ -73,7 +77,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
 Notes:
 
 - **`firb_required` is filled here, not in `buyer_profile` logic.** `buyer_profile` collects the raw `citizenship_status` fact; this doc supplies the *rule* that derives `firb_required` from it (the blueprint marks `firb_status` as `derived_from: citizenship_status`). Giving the regulated classification exactly one home is the same single-owner discipline as the ban window living once in [`kb.firb.established-dwelling-ban`](established-dwelling-ban.md).
-- **The predicate treats PR as not-foreign — a Mode A simplification.** The strict test also requires the PR to be *ordinarily resident* (the 200-day limb). For Mode A (a PR settled in Australia) that always holds, so the predicate uses `citizenship_status` alone. The PR-not-ordinarily-resident case (PR living in Vietnam) is real but is a **Mode D-shaped** edge — promote a `days_in_australia_last_12mo` / `ordinarily_resident` fact to the surface only when the foreign-person blueprints need it. Documented, not dangled (same treatment as the ban doc's commercial-scale exceptions).
+- **The predicate treats citizen and PR as not-foreign — a Mode A simplification, symmetric for both.** The strict test requires *ordinarily resident* (the 200-day limb) regardless of citizen vs. PR status. For Mode A (settled in Australia) that always holds for either, so the predicate uses `citizenship_status` alone. The not-ordinarily-resident case (living in Vietnam long-term) is real for **both** citizens and PRs but is a **Mode D-shaped** edge — promote a `days_in_australia_last_12mo` / `ordinarily_resident` fact to the surface only when the foreign-person blueprints need it. Documented, not dangled (same treatment as the ban doc's commercial-scale exceptions). (Corrected 2026-07-06: the citizen half of this symmetry was previously stated as an absolute — "never a foreign person, regardless of where they live" — which overreaches the primary source; foreigninvestment.gov.au's Key Concepts page states a citizen living overseas "may be a foreign person.")
 - **`ordinarily_resident_min_days` is a parameter, not a `criteria` field.** There is no day-count fact on the Mode A surface and the comparison would be control flow; per §11.9 the 200-day test, when it becomes load-bearing (B / D), is **resolver code** consuming this number — not a declarative rule. Same pattern as the ban-window date comparison.
 - **The carve-outs are not `fills`.** They would set `firb_required=false` but turn on facts absent from the Mode A surface (NZ citizenship is not a `citizenship_status` option; no spouse / joint-tenancy facts). Encoding them now would dangle unbacked references. They are recorded as a parameter for the agent to surface and wired into the predicate when the B / D surface exists.
 - **No `firb_status` enum fill.** The blueprint carries both `firb_status` (enum `not_foreign_person` / `foreign_person`) and `firb_required` (bool) as two views of one classification. The bool is the resolver-consumed form (it is what the ban predicate and every downstream branch read), so only `firb_required` is filled; the enum is its presentational mirror.

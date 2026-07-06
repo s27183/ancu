@@ -1,7 +1,11 @@
 ---
 slug: kb.firb.penalties-non-compliance
 effective_from: 2025-04-01
-last_verified: 2026-06-28
+last_verified: 2026-07-06
+sources:
+  - url: https://foreigninvestment.gov.au/sites/foreigninvestment.gov.au/files/2025-03/guidance-note-14-residential-compliance-v4.pdf
+    retrieved: 2026-07-06
+    path: docs/sources/firb/gn14-residential-compliance-v4.pdf
 ---
 
 # FIRB — penalties for non-compliance
@@ -10,7 +14,7 @@ This doc owns the **consequences of breaching the foreign-investment law** for r
 
 ## Penalties are expressed in penalty units (not dollars)
 
-Penalty amounts in the *Foreign Acquisitions and Takeovers Act 1975* (FATA) are set in **penalty units** — the stable regulated constant. The **dollar value of one penalty unit** is set by **s4AA(1) of the *Crimes Act 1914*** and is **periodically indexed** (CPI, on a roughly three-yearly cadence). This doc records penalties in **penalty units**; the dollar conversion is the resolver's job at fill time, against the current s4AA value (as at 2025, one penalty unit ≈ A$330 — ⚠ **this dollar value indexes; re-ground the s4AA value before quoting any dollar amount**). Recording in penalty units keeps the regulated figure correct across indexations; only the conversion factor ages.
+Penalty amounts in the *Foreign Acquisitions and Takeovers Act 1975* (FATA) are set in **penalty units** — the stable regulated constant. The **dollar value of one penalty unit** is set by **s4AA(1) of the *Crimes Act 1914*** and is **periodically indexed** (CPI, on a roughly three-yearly cadence). This doc records penalties in **penalty units**; the dollar conversion is the resolver's job at fill time, against the current s4AA value (as at 2025, one penalty unit was ≈ A$330 — ⚠ **the penalty-unit value is CPI-indexed on a ~3-yearly 1 July cadence and a triennial indexation took effect 1 July 2026, so the ≈A$330 figure is now stale; re-ground the current s4AA value against a primary source before quoting any dollar amount**). Recording in penalty units keeps the regulated figure correct across indexations; only the conversion factor ages.
 
 ## Criminal penalties — the headline
 

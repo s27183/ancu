@@ -1,7 +1,19 @@
 ---
 slug: kb.tax.negative-gearing-mechanics
 effective_from: 2025-07-01
-last_verified: 2026-06-23
+last_verified: 2026-07-06
+sources:
+  - url: https://www.ato.gov.au/forms-and-instructions/rental-properties-2025/other-tax-considerations
+    retrieved: 2026-06-23
+  - url: https://www.ato.gov.au/individuals-and-families/investments-and-assets/property-and-land/residential-rental-properties/rental-expenses/how-to-claim-rental-expenses
+    retrieved: 2026-06-23
+  - url: https://www.ato.gov.au/forms-and-instructions/individual-tax-return-2025-instructions/income-test-it1-it8-individual-tax-return-2025/it6-net-rental-property-loss-2025
+    retrieved: 2026-06-23
+  - url: https://www.legislation.gov.au/C2026A00049/latest/text
+    retrieved: 2026-07-06
+    path: docs/sources/legislation/treasury-laws-amendment-tax-reform-no-1-act-2026-no49.pdf
+  - url: https://www.aph.gov.au/Parliamentary_Business/Bills_Legislation/Bills_Search_Results/Result?bId=r7493
+    retrieved: 2026-07-06
 ---
 
 # Negative gearing — the mechanics
@@ -26,9 +38,9 @@ When a property is negatively geared, the **full net rental loss** (rental incom
 
 A negatively geared property delivers a tax saving **only because it is making a loss**: the investor is out-of-pocket on cash each year and recovers the after-tax shortfall **only if capital growth exceeds the accumulated holding losses** on disposal. The strategy therefore **depends on capital growth** (a forward-looking, uncertain quantity — see [`kb.property.growth-corridors-au`](../property/growth-corridors-au.md), a labelled placeholder) and is sensitive to interest-rate movements. The plan **surfaces** this dependency rather than presenting the tax deduction as a free benefit — the tax saving is real, but it is the wrong figure to optimise in isolation.
 
-## Announced reform — 2026-27 Federal Budget (proposed, not yet law)
+## Enacted reform — Tax Reform No. 1 Act 2026 (takes effect 1 July 2027)
 
-The 2026-27 Federal Budget (Budget night **7:30pm AEST, 12 May 2026**) announced that negative gearing for residential property would be **limited to new builds** from **1 July 2027**. As of authoring this is **proposed, not enacted** — the *Treasury Laws Amendment (Tax Reform No. 1) Bill 2026* has been **introduced but has not passed Parliament**. Current full negative gearing (a net rental loss deductible against other income) **remains law** through the transition.
+The 2026-27 Federal Budget (Budget night **7:30pm AEST, 12 May 2026**) announced that negative gearing for residential property would be **limited to new builds** from **1 July 2027**. It is now **law**: the *Treasury Laws Amendment (Tax Reform No. 1) Act 2026* (**Act No. 49 of 2026**) passed both Houses on **25 June 2026** (amended in the Senate that day) and received **Royal Assent on 26 June 2026**, effective **1 July 2027**. Current full negative gearing (a net rental loss deductible against other income) **remains the applicable law through the transition**. The specifics below reflect the reform's announced design; because the Bill was amended in the Senate on 25 June 2026, reconfirm the fine detail against the enacted Act before it is relied on.
 
 What the reform would do:
 
@@ -36,7 +48,7 @@ What the reform would do:
 - For an **established** property **purchased after Budget night**, from 1 July 2027 a net rental loss can **no longer be deducted against salary or other personal income** — only against **residential rental income or future capital gains from rental property**, with **unused losses carried forward** to later years.
 - **New builds remain fully negatively gearable** (losses deductible against other income) — the reform's deliberate steer toward new supply.
 
-This **directly reshapes the wedge's target case**: a Vietnamese-Australian investor buying an **established** property **now** (after Budget night) would, from 1 July 2027, lose the offset against wages — a material change to the after-tax cash-flow story that the headline "negative gearing" benefit assumes. The plan **computes the current-law position** and **flags the announced reform prominently** for any established post-Budget purchase; it neither models unenacted law as settled nor stays silent on a public change that removes the headline benefit for the wedge's own buyer. Re-confirm enactment with a registered tax agent / the ATO.
+This **directly reshapes the wedge's target case**: a Vietnamese-Australian investor buying an **established** property **now** (after Budget night) would, from 1 July 2027, lose the offset against wages — a material change to the after-tax cash-flow story that the headline "negative gearing" benefit assumes. The plan **computes the current-law position** and **flags the enacted reform prominently** for any established post-Budget purchase; the reform is now law (Act No. 49 of 2026) but does not take effect until 1 July 2027. Confirm the reform's application against the enacted Act with a registered tax agent / the ATO.
 
 ## Relevance for Vietnamese-Australian investors (Mode C)
 
@@ -57,7 +69,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
     "unused_loss_carried_forward":       { "type": "bool", "value": true, "note": "REGULATED (ATO) — where other income is insufficient to absorb the loss, the unused amount is carried forward to the next income year" },
     "interest_is_deductible_expense":    { "type": "bool", "value": true, "note": "REGULATED (ATO) — interest on money borrowed to acquire/maintain the rental property is a deductible rental expense and is counted in the gearing test" },
     "gearing_position_is_decision_support": { "type": "bool", "value": true, "note": "POLICY (ASIC line) — the plan reports the gearing position and net loss/income as computed facts; it never recommends a gearing strategy or calls one 'attractive'" },
-    "announced_reform_not_yet_law":      { "type": "string", "value": "2026-27 Budget (12 May 2026): proposed limiting of negative gearing to new builds from 1 July 2027 (Treasury Laws Amendment (Tax Reform No. 1) Bill 2026 — introduced, NOT yet passed); properties held at 7:30pm AEST 12 May 2026 grandfathered; established property purchased after Budget night loses the offset against wages from 1 July 2027 (losses only vs rental income / future capital gains, carried forward); new builds remain fully negatively gearable", "note": "PROPOSED — not enacted; full negative gearing remains current law through the transition. Resolver computes current law and flags the reform prominently for an established post-Budget purchase. Re-confirm enactment." }
+    "announced_reform_not_yet_law":      { "type": "string", "value": "2026-27 Budget (12 May 2026): limiting of negative gearing to new builds from 1 July 2027 — now ENACTED as Treasury Laws Amendment (Tax Reform No. 1) Act 2026 (Act No. 49 of 2026), passed both Houses 25 Jun 2026 (amended in the Senate that day), assented 26 Jun 2026, effective 1 July 2027; properties held at 7:30pm AEST 12 May 2026 grandfathered; established property purchased after Budget night loses the offset against wages from 1 July 2027 (losses only vs rental income / future capital gains, carried forward); new builds remain fully negatively gearable", "note": "ENACTED (Act No. 49 of 2026) but not yet in effect — full negative gearing remains the applicable law through the transition to 1 July 2027. Resolver computes current law and flags the enacted reform prominently for an established post-Budget purchase. Bill amended in the Senate 25 Jun 2026 — reconfirm the fine detail against the enacted Act (key name retained for reference stability)." }
   },
   "lookup": {
     "gearing_positions": {
@@ -87,8 +99,8 @@ Notes:
 - ATO — *How to claim rental expenses* (a net rental loss may be claimed against rental and other income; where other income is insufficient the loss is carried forward) — https://www.ato.gov.au/individuals-and-families/investments-and-assets/property-and-land/residential-rental-properties/rental-expenses/how-to-claim-rental-expenses
 - ATO — *IT6 Net rental property loss* (definition and treatment of the net rental property loss) — https://www.ato.gov.au/forms-and-instructions/individual-tax-return-2025-instructions/income-test-it1-it8-individual-tax-return-2025/it6-net-rental-property-loss-2025
 
-**Announced reform (proposed, not yet law — verified 2026-06-23):**
+**Enacted reform (now law — verified 2026-07-06):**
 
-- ATO — *Tax reform – Boosting home ownership – Reforming negative gearing and capital gains tax* (negative gearing limited to new builds from 1 July 2027; established post-Budget purchases lose the offset against other income; not yet law) — https://www.ato.gov.au/about-ato/new-legislation/in-detail/individuals/tax-reform-boosting-home-ownership-reforming-negative-gearing-and-capital-gains-tax
-- Treasury — *Budget 2026-27 tax system changes* — https://treasury.gov.au/policy-topics/taxation/budget2026-27
-- Parliament of Australia — *Treasury Laws Amendment (Tax Reform No. 1) Bill 2026* (introduced; not yet passed) — https://www.aph.gov.au/Parliamentary_Business/Bills_Legislation/bd/bd2526/26bd067
+- Federal Register of Legislation — *Treasury Laws Amendment (Tax Reform No. 1) Act 2026* (**Act No. 49 of 2026**, registered 26 June 2026; negative gearing limited to new builds from 1 July 2027) — https://www.legislation.gov.au/C2026A00049/latest/text (archived: `docs/sources/legislation/treasury-laws-amendment-tax-reform-no-1-act-2026-no49.pdf`)
+- Parliament of Australia — *Treasury Laws Amendment (Tax Reform No. 1) Bill 2026* (progress: passed both Houses 25 Jun 2026, amended in the Senate that day; assent 26 Jun 2026, Act No. 49, 2026) — https://www.aph.gov.au/Parliamentary_Business/Bills_Legislation/Bills_Search_Results/Result?bId=r7493
+- ATO — *Tax reform – Boosting home ownership – Reforming negative gearing and capital gains tax* (negative gearing limited to new builds from 1 July 2027; established post-Budget purchases lose the offset against other income) — https://www.ato.gov.au/about-ato/new-legislation/in-detail/individuals/tax-reform-boosting-home-ownership-reforming-negative-gearing-and-capital-gains-tax (verified 2026-06-23; ATO blocks automated fetch)

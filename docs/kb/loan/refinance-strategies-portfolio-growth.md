@@ -1,7 +1,13 @@
 ---
 slug: kb.loan.refinance-strategies-portfolio-growth
 effective_from: 2025-07-01
-last_verified: 2026-06-23
+last_verified: 2026-07-06
+sources:
+  - url: https://handbook.apra.gov.au/ppg/apg-223
+    retrieved: 2026-07-06
+    path: docs/sources/apra/apg-223-residential-mortgage-lending_0.pdf
+  - url: https://www.apra.gov.au/activating-debt-to-income-limits-as-a-macroprudential-policy-tool
+    retrieved: 2026-07-06
 ---
 
 # Refinance strategies — portfolio growth via equity

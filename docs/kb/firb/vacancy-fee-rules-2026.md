@@ -1,7 +1,11 @@
 ---
 slug: kb.firb.vacancy-fee-rules-2026
 effective_from: 2017-05-09
-last_verified: 2026-06-28
+last_verified: 2026-07-06
+sources:
+  - url: https://foreigninvestment.gov.au/sites/foreigninvestment.gov.au/files/2024-08/gn-10-fees-fi-apps-aug-2024.pdf
+    retrieved: 2026-07-06
+    path: docs/sources/firb/gn10-fees-fi-apps-v5-aug-2024.pdf
 ---
 
 # FIRB — annual vacancy fee (the regime)
@@ -39,7 +43,7 @@ A dwelling is treated as residentially occupied **or** genuinely available for r
 
 ## The amount
 
-The fee amount is **derived, not flat**: it equals the foreign-investment **application fee** for that purchase (doubled for vacancy years starting on or after 9 April 2024 — [`kb.firb.vacancy-fee-double-from-2024`](vacancy-fee-double-from-2024.md)). The dollar figures live in [`kb.firb.fee-schedule-current`](fee-schedule-current.md). Where the original application fee was waived, the vacancy fee falls back to a fixed Fees-Regulations amount (≈A$29,400 ⚠ indexes — owned by the fee schedule). This doc states only that the fee is application-fee-linked; it asserts no dollar figure.
+The fee amount is **derived, not flat**: it equals the foreign-investment **application fee** for that purchase (doubled for vacancy years starting on or after 9 April 2024 — [`kb.firb.vacancy-fee-double-from-2024`](vacancy-fee-double-from-2024.md)). The dollar figures live in [`kb.firb.fee-schedule-current`](fee-schedule-current.md). Where the original application fee was waived, the vacancy fee falls back to a fixed Fees-Regulations amount (≈A$29,400 per *GN 10 v5*, 2 Aug 2024 — ⚠ **this figure indexes each 1 July and has not been re-grounded since GN 10 v5; confirm the current Fees-Regulations amount before quoting** — owned by the fee schedule). This doc states only that the fee is application-fee-linked; it asserts no dollar figure.
 
 ## Rules
 

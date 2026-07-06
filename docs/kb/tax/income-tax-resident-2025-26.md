@@ -1,7 +1,14 @@
 ---
 slug: kb.tax.income-tax-resident-2025-26
 effective_from: 2025-07-01
-last_verified: 2026-06-22
+last_verified: 2026-07-06
+sources:
+  - url: https://www.ato.gov.au/tax-rates-and-codes/tax-rates-australian-residents
+    retrieved: 2026-07-06
+  - url: https://www.ato.gov.au/individuals-and-families/medicare-and-private-health-insurance/medicare-levy
+    retrieved: 2026-06-22
+  - url: https://www.ato.gov.au/about-ato/new-legislation/in-detail/individuals/personal-income-tax-new-tax-cuts-for-every-australian-taxpayer
+    retrieved: 2026-06-22
 ---
 
 # Resident individual income tax — 2025-26 schedule
@@ -74,6 +81,6 @@ Notes:
 
 ## Sources
 
-- Australian Taxation Office — *Tax rates – Australian resident* (2025-26 resident rates; Medicare levy excluded from the schedule) — https://www.ato.gov.au/tax-rates-and-codes/tax-rates-australian-residents
+- Australian Taxation Office — *Tax rates – Australian resident* (2025-26 resident rates; Medicare levy excluded from the schedule) — https://www.ato.gov.au/tax-rates-and-codes/tax-rates-australian-residents (2025-26 schedule re-confirmed 2026-07-06, unchanged; ATO blocks automated fetch — read via the archived snapshot of this page)
 - Australian Taxation Office — *Medicare levy* (2% of taxable income) — https://www.ato.gov.au/individuals-and-families/medicare-and-private-health-insurance/medicare-levy
 - ATO — *Personal income tax — new tax cuts for every Australian taxpayer* (Stage-3 rates from 1 Jul 2024, continuing 2025-26; 15%/14% steps from 1 Jul 2026 / 2027) — https://www.ato.gov.au/about-ato/new-legislation/in-detail/individuals/personal-income-tax-new-tax-cuts-for-every-australian-taxpayer

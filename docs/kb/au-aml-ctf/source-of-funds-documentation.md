@@ -1,7 +1,16 @@
 ---
 slug: kb.au-aml-ctf.source-of-funds-documentation
 effective_from: 2025-07-01
-last_verified: 2026-07-02
+last_verified: 2026-07-06
+sources:
+  - url: https://www.austrac.gov.au/industry-and-business/obligations-and-guidance/your-amlctf-program/customer-due-diligence/enhanced-customer-due-diligence
+    retrieved: 2026-07-06
+  - url: https://www.homeloanexperts.com.au/home-loan-documents/gift-letter-template/
+    retrieved: 2026-07-06
+  - url: https://www.canstar.com.au/home-loans/gifted-deposits/
+    retrieved: 2026-07-06
+  - url: https://www.homeloanexperts.com.au/non-resident-mortgages/proving-foreign-income/
+    retrieved: 2026-07-06
 ---
 
 # Source-of-funds documentation — evidencing an overseas-sourced deposit

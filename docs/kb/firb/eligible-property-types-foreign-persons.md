@@ -1,7 +1,10 @@
 ---
 slug: kb.firb.eligible-property-types-foreign-persons
 effective_from: 2025-04-01
-last_verified: 2026-06-28
+last_verified: 2026-07-06
+sources:
+  - url: https://foreigninvestment.gov.au/guidance/types-investments/residential-land
+    retrieved: 2026-07-06
 ---
 
 # What property types a foreign person may buy — the positive taxonomy

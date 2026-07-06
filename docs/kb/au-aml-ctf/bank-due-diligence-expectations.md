@@ -1,7 +1,14 @@
 ---
 slug: kb.au-aml-ctf.bank-due-diligence-expectations
 effective_from: 2025-07-01
-last_verified: 2026-07-02
+last_verified: 2026-07-06
+sources:
+  - url: https://www.austrac.gov.au/business/core-guidance/reporting/money-transferred-and-overseas-international-funds-transfer-instruction-ifti-reports
+    retrieved: 2026-07-06
+  - url: https://www.austrac.gov.au/industry-and-business/obligations-and-guidance/your-amlctf-program/reporting-us/threshold-transaction-reports
+    retrieved: 2026-07-06
+  - url: https://www.austrac.gov.au/industry-and-business/obligations-and-guidance/your-amlctf-program/customer-due-diligence/enhanced-customer-due-diligence
+    retrieved: 2026-07-06
 ---
 
 # AU bank AML/CTF due-diligence expectations — inbound cross-border funds

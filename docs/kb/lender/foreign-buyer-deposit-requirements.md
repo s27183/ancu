@@ -1,7 +1,14 @@
 ---
 slug: kb.lender.foreign-buyer-deposit-requirements
 effective_from: 2025-07-01
-last_verified: 2026-07-02
+last_verified: 2026-07-06
+sources:
+  - url: https://www.canstar.com.au/home-loans/non-resident-home-loans/
+    retrieved: 2026-07-06
+    note: "Non-residents typically face 60-70% LVR (30-40% deposit); restricted lender pool (mostly non-bank); higher rates. Lender-policy convention (aggregator source)"
+  - url: https://www.homeloanexperts.com.au/non-resident-mortgages/temporary-resident-mortgage/
+    retrieved: 2026-07-06
+    note: "Temp resident with AU income ~80% LVR; up to 95% LVR with a citizen/PR partner (5% deposit). Lender-policy convention (aggregator source)"
 ---
 
 # Deposit requirements for foreign buyers and temporary residents

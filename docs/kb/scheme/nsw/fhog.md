@@ -1,7 +1,10 @@
 ---
 slug: kb.scheme.nsw.fhog
 effective_from: 2016-01-01
-last_verified: 2026-06-01
+last_verified: 2026-07-06
+sources:
+  - url: https://www.nsw.gov.au/housing-and-construction/buying-and-selling-property/home-buying-assistance/first-home-owner-new-home-grant
+    retrieved: 2026-07-06
 ---
 
 # NSW First Home Owner (New Homes) Grant (FHOG)
