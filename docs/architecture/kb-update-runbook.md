@@ -155,12 +155,35 @@ record; there is no scrape/archive requirement (this stays inside the
 no-property-scraping-pipeline posture — citing one regulator page for
 provenance is not the same market as scraping property listings at scale).
 
-**Enforcement is advisory, not fail-closed, until the backfill is done.** The
-compiler's GATE 10 (`kb_compiler.py`) warns on a missing `sources:` list but does
-not fail the build — flipping it to fail-closed before every existing doc
-complies would break `validate_build.py`/deploy for reasons unrelated to whatever
-change triggered that run. Once the 2026-07 backfill (below) closes out, flip
-the gate.
+**A synthesis doc that asserts no figure of its own cites a `note:`, not a `url:`.**
+A doc that ties together facts each single-owned elsewhere (its own figures are
+all cross-refs, nothing here is asserted independently) has no primary of its
+own to point at — forcing a `url:` onto it would just cite one of its cross-refs
+arbitrarily, or worse, prompt a fabricated one. Instead its `sources:` entry is a
+one-line self-declaration:
+
+```
+sources:
+  - note: "SYNTHESIS DOC — asserts no standalone figure; every figure is owned
+      and sourced by its cross-referenced docs (kb.some.owner, kb.other.owner).
+      Load-bearing synthesis claims sanity-checked 2026-07-06 against those
+      docs' own sources and hold."
+```
+
+GATE 10 accepts this as a citation (`kb_compiler.py`'s `parse_sources_block`
+parses a `- note:`-only entry) — the discipline being enforced is *a recorded,
+reasoned trail*, not a URL for its own sake. This is narrower than the
+`kb.copy.*`/`kb.bilingual.*`/`kb.journey.*` namespace exemption (which needs no
+`sources:` entry at all): a synthesis doc still names which docs it depends on
+and confirms it re-checked its own claims against them.
+
+**Enforcement is fail-closed (flipped 2026-07-06).** The compiler's GATE 10
+(`kb_compiler.py`) now fails the build on a missing `sources:` list. It ran
+advisory (warn-only) from schema introduction until the 2026-07 backfill
+(below) closed out — every one of the 173 KB docs now carries `sources:` (a
+url/path citation, or a documented `- note:`-only deferral for a synthesis doc
+or an intentional placeholder). A new doc that skips this from here on is a
+real gap, not backfill debt.
 
 **Backfilling the 156 pre-existing docs (2026-07 initiative).** The KB was
 authored across five modes before this citation discipline existed; Mode A's

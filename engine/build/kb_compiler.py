@@ -508,9 +508,16 @@ def frontmatter_end(text):
 
 def parse_sources_block(text):
     """Hand-rolled parse of the frontmatter `sources:` list — a YAML-list-of-maps
-    SUBSET (url/retrieved/path scalars only), not a general YAML parser. Kept
-    stdlib-only (no PyYAML dep) to match the compiler's pure-stdlib build-tool
-    posture (proportionate-verification memory: kb_compiler runs in seconds).
+    SUBSET (url/retrieved/path scalars, or a standalone note: string), not a
+    general YAML parser. Kept stdlib-only (no PyYAML dep) to match the
+    compiler's pure-stdlib build-tool posture (proportionate-verification
+    memory: kb_compiler runs in seconds). A `- note: "..."` entry (no url) is
+    a doc's explicit self-declaration that no independent external source
+    applies — e.g. a synthesis doc whose every figure is owned by a
+    cross-referenced doc's own sources (kb-src-vn-tax backfill finding,
+    2026-07-06: kb.non-resident.tax-treatment-overview). It still counts as a
+    citation for GATE 10 — the point is a recorded, reasoned trail, not
+    forcing a url onto a doc that doesn't own one.
     Returns [] if the doc has no `sources:` block (distinguished from "gate
     hasn't run yet" by the caller, not by this parser)."""
     fm_end = frontmatter_end(text)
@@ -530,6 +537,11 @@ def parse_sources_block(text):
         m = re.match(r"^\s*-\s*url:\s*(\S+)\s*$", line)
         if m:
             cur = {"url": m.group(1)}
+            out.append(cur)
+            continue
+        m = re.match(r'^\s*-\s*note:\s*(.+?)\s*$', line)
+        if m:
+            cur = {"note": m.group(1).strip('"')}
             out.append(cur)
             continue
         m = re.match(r"^\s+(retrieved|path):\s*(\S+)\s*$", line)
@@ -803,22 +815,25 @@ def run(emit=False):
             fails.append(f"[content_json] {doc['slug']}: parse error: {doc['parse_error']}")
     stats["kb_docs"] = len(kb_docs)
 
-    # ---- GATE 10: sources citation (ADVISORY — warns, not fails) ---------- #
+    # ---- GATE 10: sources citation (FAIL-CLOSED) --------------------------- #
     # kb-update-runbook.md Phase 1: a fact doc must cite the primary source it was
     # verified against (url + retrieved date; +path when archived under docs/sources/),
-    # so a rerun of the KB update process is reproducible, not just re-fetchable.
-    # Excluded: derived/synthesis namespaces that interpolate or compose OTHER
-    # already-sourced KB docs rather than asserting a fact of their own (copy
-    # templates, bilingual coordination norms, journey checklists).
-    # ADVISORY until the 2026-07 backfill (173 pre-existing docs) completes — flip
-    # to a `fails.append` once every non-excluded doc carries `sources:` (per the
-    # backfill's own tracking; see kb-update-runbook.md Phase 1).
+    # or, for a synthesis doc asserting no standalone figure / an intentional
+    # placeholder, a `- note:`-only self-declaration — so a rerun of the KB update
+    # process is reproducible, not just re-fetchable. Excluded: derived/synthesis
+    # namespaces that interpolate or compose OTHER already-sourced KB docs rather
+    # than asserting a fact of their own (copy templates, bilingual coordination
+    # norms, journey checklists).
+    # Flipped fail-closed 2026-07-06: the 2026-07 backfill (173 pre-existing docs,
+    # Phase A regulated tier + Phase B soft tier) closed out — every non-exempt doc
+    # now carries `sources:` (a url/path citation, or a documented note-only
+    # deferral). A new doc with neither is a real gap, not backfill debt.
     SOURCES_EXEMPT_PREFIXES = ("kb.copy.", "kb.bilingual.", "kb.journey.")
     for slug, doc in sorted(kb_docs.items()):
         if slug.startswith(SOURCES_EXEMPT_PREFIXES):
             continue
         if not doc.get("sources"):
-            warns.append(f"[sources] {slug}: no `sources:` citation (kb-update-runbook.md Phase 1)")
+            fails.append(f"[sources] {slug}: no `sources:` citation (kb-update-runbook.md Phase 1)")
 
     # ---- GATE 8: bilingual copy-template well-formedness (all docs) -------- #
     # Every `copy` template is localized in every LOCALES locale (outcome-conformance.md
