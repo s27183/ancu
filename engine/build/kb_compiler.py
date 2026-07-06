@@ -490,11 +490,60 @@ def build_registry(components):
 # --------------------------------------------------------------------------- #
 # KB doc parsing
 # --------------------------------------------------------------------------- #
+def frontmatter_end(text):
+    """Position of the CLOSING `---` frontmatter delimiter — a line that is
+    exactly `---` (+ optional trailing whitespace), not a bare substring match.
+    `text.find("---", 3)` truncates early the instant a frontmatter value
+    contains a literal `---` (e.g. an ATO URL slug like
+    `.../your-main-residence---home`), leaking trailing YAML into content_md
+    and mis-parsing `sources:` (kb-src-tax backfill finding, 2026-07-06 — latent
+    since parse_kb_doc's original body-split, newly live once sources: URLs
+    could contain the substring). Returns -1 if the doc isn't well-formed
+    frontmatter (opening `---` not on line 1, or no closing line found)."""
+    matches = list(re.finditer(r"^---[ \t]*$", text, re.M))
+    if len(matches) < 2 or matches[0].start() != 0:
+        return -1
+    return matches[1].start()
+
+
+def parse_sources_block(text):
+    """Hand-rolled parse of the frontmatter `sources:` list — a YAML-list-of-maps
+    SUBSET (url/retrieved/path scalars only), not a general YAML parser. Kept
+    stdlib-only (no PyYAML dep) to match the compiler's pure-stdlib build-tool
+    posture (proportionate-verification memory: kb_compiler runs in seconds).
+    Returns [] if the doc has no `sources:` block (distinguished from "gate
+    hasn't run yet" by the caller, not by this parser)."""
+    fm_end = frontmatter_end(text)
+    fm = text[:fm_end] if fm_end > 0 else text
+    lines = fm.splitlines()
+    out = []
+    in_block = False
+    cur = None
+    for line in lines:
+        if re.match(r"^sources:\s*$", line):
+            in_block = True
+            continue
+        if not in_block:
+            continue
+        if re.match(r"^\S", line):  # dedent out of the block
+            break
+        m = re.match(r"^\s*-\s*url:\s*(\S+)\s*$", line)
+        if m:
+            cur = {"url": m.group(1)}
+            out.append(cur)
+            continue
+        m = re.match(r"^\s+(retrieved|path):\s*(\S+)\s*$", line)
+        if m and cur is not None:
+            cur[m.group(1)] = m.group(2)
+    return out
+
+
 def parse_kb_doc(path):
     text = path.read_text()
     slug_m = re.search(r"^slug:\s*(\S+)", text, re.M)
     eff_m = re.search(r"^effective_from:\s*(\S+)", text, re.M)
     ver_m = re.search(r"^last_verified:\s*(\S+)", text, re.M)
+    sources = parse_sources_block(text)
     rb = rules_block(text)
     content_json = None
     parse_error = None
@@ -505,13 +554,14 @@ def parse_kb_doc(path):
             parse_error = str(e)
     # content_md = everything before "## Rules"
     cut = text.find("## Rules")
-    fm_end = text.find("---", 3)
+    fm_end = frontmatter_end(text)
     body_start = text.find("\n", fm_end) + 1 if fm_end > 0 else 0
     content_md = (text[body_start:cut] if cut > 0 else text[body_start:]).strip()
     return {
         "slug": slug_m.group(1) if slug_m else None,
         "effective_from": eff_m.group(1) if eff_m else None,
         "last_verified": ver_m.group(1) if ver_m else None,
+        "sources": sources,
         "content_md": content_md,
         "content_json": content_json,
         "parse_error": parse_error,
@@ -753,6 +803,23 @@ def run(emit=False):
             fails.append(f"[content_json] {doc['slug']}: parse error: {doc['parse_error']}")
     stats["kb_docs"] = len(kb_docs)
 
+    # ---- GATE 10: sources citation (ADVISORY — warns, not fails) ---------- #
+    # kb-update-runbook.md Phase 1: a fact doc must cite the primary source it was
+    # verified against (url + retrieved date; +path when archived under docs/sources/),
+    # so a rerun of the KB update process is reproducible, not just re-fetchable.
+    # Excluded: derived/synthesis namespaces that interpolate or compose OTHER
+    # already-sourced KB docs rather than asserting a fact of their own (copy
+    # templates, bilingual coordination norms, journey checklists).
+    # ADVISORY until the 2026-07 backfill (173 pre-existing docs) completes — flip
+    # to a `fails.append` once every non-excluded doc carries `sources:` (per the
+    # backfill's own tracking; see kb-update-runbook.md Phase 1).
+    SOURCES_EXEMPT_PREFIXES = ("kb.copy.", "kb.bilingual.", "kb.journey.")
+    for slug, doc in sorted(kb_docs.items()):
+        if slug.startswith(SOURCES_EXEMPT_PREFIXES):
+            continue
+        if not doc.get("sources"):
+            warns.append(f"[sources] {slug}: no `sources:` citation (kb-update-runbook.md Phase 1)")
+
     # ---- GATE 8: bilingual copy-template well-formedness (all docs) -------- #
     # Every `copy` template is localized in every LOCALES locale (outcome-conformance.md
     # §9 step 1 — the build-time half of the bilingual invariant, fail-closed at deploy).
@@ -896,6 +963,7 @@ def build_artifact(blueprints, registries, kb_docs):
         slug: {
             "effective_from": d["effective_from"],
             "last_verified": d["last_verified"],
+            "sources": d.get("sources") or [],
             "content_md": d["content_md"],
             "content_json": d["content_json"],
         }

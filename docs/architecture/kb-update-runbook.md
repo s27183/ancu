@@ -121,6 +121,69 @@ For each in-scope `docs/kb/<area>/<slug>.md`:
 - Keep the **slug == path** invariant (the compiler enforces it; don't rename a
   file without renaming the slug, and vice-versa).
 
+**Cite the source, persistently — the `sources:` frontmatter field.** A KB update
+is only rerunnable if a rerun can tell what was checked last time. Re-verifying
+"against the primary source" and then not recording *which* source, *when*, is a
+process that only ever looks rerunnable — a fresh pass has nothing to diff
+against and no way to tell a stale citation from a live one. So every fact doc
+(everything except the derived/synthesis namespaces `kb.copy.*`, `kb.bilingual.*`,
+`kb.journey.*` — see architecture.md's frontmatter block) carries:
+
+```
+sources:
+  - url: https://firb.gov.au/guidance-resources/guidance-notes/gn1
+    retrieved: 2026-07-06
+  - url: https://www.legislation.gov.au/Details/C2015C00608
+    retrieved: 2026-07-06
+    path: docs/sources/firb/fata-1975.pdf   # only when archived (below)
+```
+
+`retrieved:` is the date the fact was actually checked against that URL — the
+same discipline as `last_verified:`, just per-source rather than per-doc. A
+`sources:` entry is an audit-trail *claim*; never write one for a source you did
+not actually open this pass (a plausible-looking URL you didn't check is a
+fabricated citation, worse than no citation — [[no-judge-ground-the-producer]]
+applies here too: an LLM skimming a search result is not a substitute for a
+verified figure).
+
+**Archive when the source is a stable document.** If the primary source is a
+PDF, gazette notice, or downloadable guide (not a page that changes without
+versioning), save it under `docs/sources/<area>/` — the convention the Mode-A
+NSW/QLD/VIC/ASIC/APRA/QBE set already used — and add `path:` pointing to it. If
+it's a live-only regulator webpage, the `url` + `retrieved:` citation *is* the
+record; there is no scrape/archive requirement (this stays inside the
+no-property-scraping-pipeline posture — citing one regulator page for
+provenance is not the same market as scraping property listings at scale).
+
+**Enforcement is advisory, not fail-closed, until the backfill is done.** The
+compiler's GATE 10 (`kb_compiler.py`) warns on a missing `sources:` list but does
+not fail the build — flipping it to fail-closed before every existing doc
+complies would break `validate_build.py`/deploy for reasons unrelated to whatever
+change triggered that run. Once the 2026-07 backfill (below) closes out, flip
+the gate.
+
+**Backfilling the 156 pre-existing docs (2026-07 initiative).** The KB was
+authored across five modes before this citation discipline existed; Mode A's
+`docs/sources/` archive was an unmandated convention, and Modes B–D–E verified
+live without recording it. Closing that gap means a *real* re-verification pass
+— not a metadata-only patch — over every non-exempt doc, tiered by stakes:
+
+- **Regulated figures** (FIRB fees, duty scales, scheme caps/thresholds, AUSTRAC
+  reporting figures — anything a user acts on financially) — archive the primary
+  document locally *and* verify the figure to the dollar/date, matching the hard
+  "verify against the official calculator" bar in the Regulated figures
+  discipline above ([[verify-regulated-figures-by-postcondition]],
+  [[match-enforcement-grade-to-property-kind]]).
+- **Soft/informational content** (process guidance, checklists, market color) —
+  `url` + `retrieved:` is sufficient; no archive requirement.
+
+Dispatch this as area-scoped passes (one KB folder/cluster at a time), regulated
+areas first. Because a citation with today's date is a claim that the content
+was actually checked today, **spot-check a sample of any delegated pass's
+citations** — confirm the URL resolves and actually supports the cited fact —
+before trusting a batch as done; a subagent reporting "all cited" is not proof
+the citations are real.
+
 **Regulated figures discipline:** a duty/grant/threshold figure that a user acts
 on must be verified to the dollar against the official calculator, or kept out of
 the LLM's reach entirely (resolver-filled from the KB rule). KB *estimates*
@@ -269,6 +332,8 @@ python3 tests/outcome_validate.py
 | Artifact | When | Owner doc |
 |---|---|---|
 | `docs/kb/<area>/<slug>.md` fact docs | The trigger (always, Track A) | this doc, Phase 1 |
+| `docs/kb/<area>/<slug>.md` `sources:` frontmatter | Every fact-doc edit (non-exempt namespaces) | this doc, Phase 1 |
+| `docs/sources/<area>/` archived primary docs | When the source is a stable document (PDF/gazette) | this doc, Phase 1 |
 | `docs/kb/copy/*.md` bilingual templates | When a figure/note changed | [bilingual-content.md](bilingual-content.md) |
 | `docs/blueprints/*.md` | Only on a structural change | [architecture.md §11.9](architecture.md) |
 | Renderer enum (`RENDERER_ENUM` + §11.9 table) **and** `shell/.../renderers/*.svelte` | Only when a blueprint adds a renderer | this doc, Phase 3 |

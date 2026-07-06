@@ -388,7 +388,16 @@ Components reference curated KB content via **slug-based references** rather tha
      slug: kb.scheme.qld.fhnhc
      effective_from: 2025-05-01
      last_verified: 2026-05-19
+     sources:
+       - url: https://www.qld.gov.au/housing/buying-owning-home/financial-help-concessions/first-home-owner-grant
+         retrieved: 2026-05-19
+         path: docs/sources/qld/...  # only when the source is a stable document (PDF/gazette)
      ---
+   `sources:` is the audit trail a KB update reruns against (kb-update-runbook.md
+   Phase 1) — a dated citation of what was actually checked, not a guess at what
+   probably grounds the fact. Exempt: derived/synthesis docs that interpolate or
+   compose other already-sourced KB docs rather than asserting a fact of their
+   own (`kb.copy.*`, `kb.bilingual.*`, `kb.journey.*`).
 
 2. Artifact compiler (run at deploy, build-time):
    - Walks docs/kb/ and docs/blueprints/
@@ -398,7 +407,7 @@ Components reference curated KB content via **slug-based references** rather tha
    - Parses frontmatter; splits the body — the `## Rules` fenced `jsonc` block is `content_json`, the remaining prose is `content_md`
    - Compiles a versioned KB + blueprint artifact shipped with the engine
      release; each KB entry is:
-       (slug, effective_from, last_verified, content_md, content_json)
+       (slug, effective_from, last_verified, sources, content_md, content_json)
    - NOT a Postgres write: git is SOT, the artifact is a deterministic,
      rebuildable projection (rebuild from the deploy commit SHA)
 
