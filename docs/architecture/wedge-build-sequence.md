@@ -8,11 +8,11 @@
 
 ## Two orderings, one wedge set
 
-The same four wedges can be ordered on two independent axes:
+The same three wedges can be ordered on two independent axes:
 
 | Axis | Lives in | Orders by | Result |
 |---|---|---|---|
-| **GTM time** | strategy §10 | willingness-to-pay, parent cross-sell, trust earned by the prior wedge | Wedge 1 → 2 (Vietnam-parent) → 3 (investor) → 4 |
+| **GTM time** | strategy §10 | willingness-to-pay, parent cross-sell, trust earned by the prior wedge | Wedge 1 → 2 (Vietnam-parent) → 3 (investor) |
 | **Build dependency** | *this doc* | foundationality — fewest open upstream deps, unblocks the most | unification → Mode **C** → Mode **B** → Mode **D** |
 
 The divergence is real and deliberate: GTM puts **Mode B before Mode C** (Vietnam-parent has the highest WTP and a built-in cross-sell from Wedge-1 customers' parents); build-dependency puts **Mode C before Mode B** (Mode C carries *no external prerequisites*, Mode B's launch is gated on legal/partnership work that isn't code). Which axis governs is a **decision** (below), not a default.
@@ -44,7 +44,6 @@ The architecture was deliberately built **mode-generic** (one `profile.*` fact b
 | **Wedge 2 — Vietnam-parent** | B | unification + `firb_workflow` + `cross_border_funding` + `family_context` | VN legal counsel (day 1), money-transfer partner (pre-launch), VN-PDP data-residency capability — strategy §9 | **Code done, live-turn-verified (2026-07-03)** — launch still gated on the external prereqs |
 | **Wedge 3 — foreign investor** | D | unification **+ Mode C** (investor machinery, done) **+ Mode B** (FIRB / residency, done) | all of Mode B's (inherited via `cross_border_funding` reuse) | **Done — build-complete (P1–P5, 2026-07-04), live-verified; grounding fix 2026-07-05.** See [`mode-d-wedge.md`](mode-d-wedge.md) |
 | **Wedge 1b / 1c** — Tìm Nhà / URL-paste + extension | A | Wedge 1a (done) + Phase-B addenda activation | 1b: curator ops; 1c: none | Yes — **orthogonal track**, no mode-foundation dependency; noted for future, not started |
-| **Wedge 4 — multi-CALD** | — | everything above | — | No — noted for future |
 | **Mode E — domestic next-home owner-occupier** *(new, surfaced 2026-07-04)* | E | unification (done) + `plan.buyer_stage` axis (**done, P0**) + KB (**done, P1**) + blueprint + resolvers (**done, P2**) + multi-blueprint activation (**done, P3**) + shell dispatcher (**done, P4**) + onboarding dispatch (**done, P5**) | none known | **P0–P5 done 2026-07-05 — build-complete.** Axis, 3 KB docs, blueprint draft (`nexthome-domestic-au.md`, fully inlined per-component), engine resolvers, `IN_SCOPE_BLUEPRINTS` activation, the shell dispatcher (Calculator shape-collision fix + OverviewCard tab-surfacing fix), and onboarding dispatch (`base_components/1`'s missing nexthome clause + `blueprint_for/3`'s 3-axis dispatch, fail-closed on both foreign+next-home and a missing `buyer_stage` + the shell's `Onboarding.svelte` gate widened) all landed. See [`mode-e-wedge.md`](mode-e-wedge.md) |
 
 The investor-tax KB that Mode C needed was the same `kb.tax.*` / `kb.investor.*` set [grounding-checklist item 10](../grounding-checklist.md) (full-temporal-flow, T-doc 6) recorded as trigger-gated to "when Mode C ships" — **authored and shipped as part of the Mode-C wedge** (45 KB docs, P1).
@@ -61,7 +60,6 @@ This section is the single forward-looking "what's left" answer. It replaces the
 | **Mode B launch** (vs. build, which is done) | Code done, launch blocked | External: VN legal counsel, a money-transfer partner, VN-PDP data-residency capability (strategy §9) |
 | **Mode E — domestic next-home owner-occupier** | **Build-complete, P0–P5 done 2026-07-05** | `plan.buyer_stage` axis, 3 KB docs, blueprint draft (`nexthome-domestic-au.md`), engine resolvers (`fh_engine_existing_home_disposal` new + `fh_engine_cash` extended; `mortgage_finance`/`disposition` verified-reused unchanged), `IN_SCOPE_BLUEPRINTS` activation, the shell dispatcher, and onboarding dispatch all landed. P3 also fully inlined 10 previously prose-only components' schemas (a larger-than-expected registry gap) and fixed two real bugs it surfaced (an atom/binary enum mismatch, a scalar/range type mismatch); P4 found + fixed a shape-collision bug (`existing_home_disposal` misread as `disposition` by `Calculator.svelte`'s discriminator) and a tab-surfacing gap (its own card was never reachable via any live tab — `OverviewCard.svelte` extended with a 5th, presence-gated headline tile); P5 found + fixed a missing `base_components/1` clause (the base turn would have silently run without `existing_home_disposal`), corrected its own first design draft mid-phase — `buyer_stage` now fails closed (400 `missing_buyer_stage`) rather than silently defaulting either direction when absent, after a silent-default draft was caught misrouting the Mode-A seam smoke to Mode E — and, building the live seam smoke a second `advisor()` call insisted on, found a real production bug no escript could reach: `plan_cards.mode`'s Postgres CHECK never admitted `'E'` (fixed via new migration `006_mode_e.sql`). `mode_e_seam_smoke.escript` now passes end-to-end against the real sidecar, alongside the other four modes' own seam smokes (re-verified post-migration) — Mode E is genuinely live-verified, not just escript-verified below the seam — see [`mode-e-wedge.md`](mode-e-wedge.md) (scoping decision + full P0–P5 detail) |
 | **Wedge 1b/1c** — Tìm Nhà curation + browser-extension URL-paste | Not started | Orthogonal track, no mode-foundation dependency |
-| **Wedge 4 — multi-CALD** | Not started | Depends on everything above |
 | Grounding-checklist §2 — F1 (`applicants[]` cross-mode scope), `applicant.*` namespace confirm | Open, non-blocking | Design/verification nits, no trigger |
 | Grounding-checklist §3 — F8/F9(data half)/F10 | Deliberately deferred | Trigger-gated: Phase-B property data / KB-confirm |
 
@@ -75,10 +73,9 @@ Per-wedge build detail stays in the mode-X-wedge docs; this table is the only pl
 2. **Mode C — domestic investor** — the lowest-dependency *full wedge*: unification + authorable KB + the drafted blueprint. **Zero external blockers. Done.**
 3. **Mode B — Vietnam-parent** — code-buildable on the unification, but its *launch* is gated on legal/partnership prerequisites that are not code. **Code done; launch still gated.**
 4. **Mode D — foreign investor** — sits on top of both B and C. **Done (2026-07-04).**
-5. **Mode E — domestic next-home owner-occupier** — new blueprint, no mode-foundation blockers (unification already covers it). **Next**, per the 2026-07-05 decision (see "What's left" above).
-6. **Wedge 4 — multi-CALD** — depends on everything.
+5. **Mode E — domestic next-home owner-occupier** — new blueprint, no mode-foundation blockers (unification already covers it). **Done, P0–P5, 2026-07-05.**
 
-All four original wedges (unification, C, B-code, D) are now closed — the topological order above is history for 1–4 and forward-looking only for 5–6.
+All five wedges (unification, C, B-code, D, E) are now closed — the topological order above is history.
 
 **Orthogonal:** Mode A's **Wedge 1b/1c** (Tìm Nhà, URL-paste + extension) don't touch the mode foundation — they activate the Phase-B per-property path and can slot into any point of the sequence on their own track.
 

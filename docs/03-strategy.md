@@ -288,8 +288,8 @@ The product is built on a unified platform with mode-switching by user location 
 ### 10.1 The 30-month wedge sequence
 
 ```
-                          0─────6─────12────18────24────30+ months
-                          │     │     │     │     │     │
+                          0─────6─────12────18────24 months
+                          │     │     │     │     │
 Wedge 1: Vietnamese-AU    ████████████████              
          FHB property                                    
          analysis                                        
@@ -299,12 +299,9 @@ Wedge 2: Vietnam-parent          ███████████████�
                                                           
 Wedge 3: AU + VN investor                  ████████████████  
          platform                                        
-                                                          
-Wedge 4: Multi-CALD                              ████████████  
-         expansion                                       
 ```
 
-Each wedge layers on cultural + linguistic + product trust earned by the previous. By month 30 the Vietnamese diaspora platform is mature; multi-CALD extension begins.
+Each wedge layers on cultural + linguistic + product trust earned by the previous. The scope is the Vietnamese diaspora — no expansion beyond it is planned.
 
 > **This is the GTM-time order** (willingness-to-pay, cross-sell, trust earned). For the **build-dependency order** — what each wedge depends on, which external prerequisites gate it, and the chosen build sequence (which currently puts Mode C before Mode B on foundationality grounds) — see [`architecture/wedge-build-sequence.md`](architecture/wedge-build-sequence.md). The two orderings diverge deliberately.
 
@@ -396,29 +393,9 @@ Wedge 1 is **sub-phased** to match the property-data-light architecture. The bas
 
 **Competitive position vs HTAG:** Vietnamese language + Vietnamese family financial pattern fluency + cross-border tax planning. HTAG is English/professional/AU-resident-focused.
 
-### 10.5 Wedge 4 — Multi-CALD expansion (months 22–30+)
+### 10.5 Full lifecycle vision (year 3+)
 
-**Target segments:** Other large CALD communities in Australia using the proven Vietnamese playbook — Mandarin (largest, but most competitive), Cantonese, Punjabi, Hindi, Arabic, Filipino.
-
-**What it does:** Same product framework, additional language + cultural layers. Each CALD expansion is incremental — same Layer 1 KB, additional translation + cultural curation, additional community-specific flows.
-
-**Why last:**
-
-- Vietnamese playbook must be proven first
-- Each CALD addition requires significant cultural curation (not just translation)
-- Different communities have different financial patterns, family structures, regulatory exposures
-- Brand positioning needs to extend from "Vietnamese diaspora" to "CALD diaspora" deliberately
-
-**Recommended sequence within Wedge 4:**
-
-1. Mandarin (largest TAM but most competitive — Chinese investors are #1 foreign buyers)
-2. Punjabi / Hindi (large communities, growing student volumes, less competition)
-3. Arabic, Filipino, Cantonese
-4. Long tail of smaller communities
-
-### 10.6 Full lifecycle vision (year 3+)
-
-Once Wedges 1–4 are proven, the lifecycle continuity moat fully compounds. A single Vietnamese-Australian customer might pass through:
+Once Wedges 1–3 are proven, the lifecycle continuity moat fully compounds. A single Vietnamese-Australian customer might pass through:
 
 - Student in AU (Wedge 1 lite — content + free tier)
 - 485 graduate + first home (Wedge 1 paid)
@@ -429,14 +406,13 @@ Once Wedges 1–4 are proven, the lifecycle continuity moat fully compounds. A s
 
 10–25 year customer relationships within one cultural community, with cross-segment customer flows (Wedge 1 customers refer Wedge 2 parents; Wedge 1 graduates become Wedge 3 investors).
 
-### 10.7 Why this sequence (and not another)
+### 10.6 Why this sequence (and not another)
 
 - **Vietnamese-AU FHB first** — lowest regulatory exposure, established community, validates the language/cultural play before adding cross-border complexity. Best place to fail cheaply if the cultural product fit isn't there.
 - **Vietnam-parent second** — highest-WTP but adds FIRB/AML/cross-border complexity. Best built on top of proven Wedge 1 customers who naturally refer their parents.
 - **Investor third** — different product surface, direct competition, requires deeper financial sophistication. Built on top of Wedge 1 graduates who naturally become investors.
-- **Multi-CALD last** — extends the proven playbook to adjacent communities only after Vietnamese version works.
 
-Launching all four simultaneously fails because: (a) regulatory complexity multiplies, (b) product surfaces diverge too much, (c) marketing/distribution channels split attention, (d) no single segment is excellent. The wedge sequence is the discipline that protects focus while building toward the full vision.
+Launching all three simultaneously fails because: (a) regulatory complexity multiplies, (b) product surfaces diverge too much, (c) marketing/distribution channels split attention, (d) no single segment is excellent. The wedge sequence is the discipline that protects focus while building toward the full vision — a Vietnamese-diaspora platform, not a multi-CALD one.
 
 > See `first_home_buyer_plan.html` (Strategy tab) for an interactive visualisation of the wedge timeline alongside the differentiation matrix and REA partnership economics.
 

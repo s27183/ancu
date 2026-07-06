@@ -185,7 +185,7 @@ The pattern across all four modes:
 - **Information asymmetry is the underlying driver in all four.** The chain expands to bridge whatever gaps the buyer has — language, regulation, market familiarity, family-coordination complexity.
 - **The platform's value increases with chain length.** Mode D buyers gain the most absolute dollar value from the platform; Mode A buyers gain less in dollar terms but still meaningfully improve property selection and avoid sub-optimal loan terms.
 
-This is also why the wedge sequence ([§10 in 03-strategy.md](03-strategy.md#10-build-strategy--wedge-sequence)) matters in this specific order: Wedge 1 (Mode A — shortest chain, lowest regulatory complexity) validates the language / cultural product; Wedge 2 (Mode B — extreme cross-border chain) leverages that trust to handle the highest-value cross-border flow; Wedge 3 (Modes C + D — investor analytics + foreign-investor compliance) extends to the investment product surface; Wedge 4 (multi-CALD) replicates the playbook for other communities.
+This is also why the wedge sequence ([§10 in 03-strategy.md](03-strategy.md#10-build-strategy--wedge-sequence)) matters in this specific order: Wedge 1 (Mode A — shortest chain, lowest regulatory complexity) validates the language / cultural product; Wedge 2 (Mode B — extreme cross-border chain) leverages that trust to handle the highest-value cross-border flow; Wedge 3 (Modes C + D — investor analytics + foreign-investor compliance) extends to the investment product surface — the full scope of the Vietnamese-diaspora platform.
 
 #### Why these chains persist
 
