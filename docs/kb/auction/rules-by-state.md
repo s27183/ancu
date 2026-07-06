@@ -1,7 +1,16 @@
 ---
 slug: kb.auction.rules-by-state
 effective_from: 2025-08-01
-last_verified: 2026-06-02
+last_verified: 2026-07-06
+sources:
+  - url: https://www.legislation.vic.gov.au/in-force/acts/sale-land-act-1962
+    retrieved: 2026-07-06
+    path: docs/sources/vic/sales_of_land_act_1962.pdf
+    note: "VIC Sale of Land Act 1962 Div 4 ss37-47 public auctions — s38 dummy-bidding ban, s41 permissible vendor bid (declared before each bid); read via archived PDF, Authorised Version No. 172 as at 25 Nov 2025"
+  - url: https://www.legislation.qld.gov.au/view/pdf/inforce/current/act-2014-022
+    retrieved: 2026-07-06
+    path: docs/sources/qld/property_occupations_act_2014.pdf
+    note: "QLD Property Occupations Act 2014 s229A seller's right to bid, s214 no reserve/price-guide disclosure, s159 registered bidder; read via archived PDF, current as at 1 Aug 2025. NSW (Property and Stock Agents Act 2002) stays at Act-name granularity — legislation.nsw.gov.au 403s WebFetch."
 ---
 
 # Auction conduct rules, by state

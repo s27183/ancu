@@ -2,6 +2,8 @@
 slug: kb.vn-tax.brackets-2026
 effective_from: 2026-07-03
 last_verified: 2026-07-03
+sources:
+  - note: "PLACEHOLDER — VN-side tax content is out of scope per the 2026-07-03 Mode-D scoping decision; a Vietnam-located investor's own VN tax advisor handles VN-side filing. Doc exists as a structural anchor only (fills: [], pure-reference), asserting no VN tax law. Reconfirmed as an intentional, locked deferral during the 2026-07-06 Phase B backfill — not to be de-placeholdered without revisiting that scoping decision."
 ---
 
 # ⚠ PLACEHOLDER — Vietnamese personal income tax brackets (NOT SOURCE-GROUNDED)

@@ -1,7 +1,11 @@
 ---
 slug: kb.fx-providers.wise-ofx-bank-comparison
 effective_from: 2025-07-01
-last_verified: 2026-07-02
+last_verified: 2026-07-06
+sources:
+  - url: https://wise.com/au/currency-converter/vnd-to-aud-rate
+    retrieved: 2026-07-06
+    note: "Wise VND→AUD — transparent upfront fee on the real mid-market rate ('no sneaky mark-up'), the model this doc contrasts against banks that embed the margin in the exchange rate. Confirms the 'rank by transparent landed cost' comparison dimension. Spread magnitudes remain owned by kb.fx.typical-spreads-vnd-aud."
 ---
 
 # FX / money-transfer provider comparison — VN→AU transfers

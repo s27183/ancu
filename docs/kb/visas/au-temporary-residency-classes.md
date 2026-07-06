@@ -1,8 +1,17 @@
 ---
 slug: kb.visas.au-temporary-residency-classes
 effective_from: 2024-12-07
-last_verified: 2026-06-28
----
+last_verified: 2026-07-06
+sources:
+  - url: https://www.minterellison.com/articles/delays-to-governments-new-skills-in-demand-visa
+    retrieved: 2026-07-06
+    note: "SECONDARY (MinterEllison) — appeared in WebSearch 2026-07-06 and CONFIRMS the load-bearing date: the Skills in Demand (subclass 482) visa replaced the Temporary Skill Shortage (TSS) visa on 7 December 2024 (up to 4 years, three streams, PR pathway via subclass 186; corroborated by Lexology)."
+  - url: https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/skills-in-demand-visa-subclass-482
+    note: "POINTER (canonical Home Affairs page; not directly re-fetched this session) — Skills in Demand (subclass 482) detail."
+  - url: https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/temporary-graduate-485
+    note: "POINTER (canonical Home Affairs page; not directly re-fetched this session) — Temporary Graduate (subclass 485): streams, duration by qualification, unrestricted work rights."
+  - url: https://foreigninvestment.gov.au/sites/foreigninvestment.gov.au/files/2025-03/guidance-note-2-key-concepts-v3.pdf
+    note: "POINTER (canonical Treasury/FIRB Guidance Note 2; not re-fetched this session) — temporary-resident definition (visa permitting >12 months' continuous stay, or bridging visa with pending PR = foreign person)."
 
 # AU temporary-residency visa classes and their FIRB implications
 

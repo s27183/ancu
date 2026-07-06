@@ -1,7 +1,12 @@
 ---
 slug: kb.ongoing-costs.rates-water-strata
 effective_from: 2025-07-01
-last_verified: 2026-06-01
+last_verified: 2026-07-06
+sources:
+  - url: https://moneysmart.gov.au/home-loans/buying-a-house
+    retrieved: 2026-07-06
+  - url: https://www.nsw.gov.au/housing-and-construction/strata/living/levies-finances-insurance
+    retrieved: 2026-07-06
 ---
 
 # Ongoing ownership costs — council rates, water, and strata levies

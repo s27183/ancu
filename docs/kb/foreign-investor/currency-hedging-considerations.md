@@ -1,7 +1,11 @@
 ---
 slug: kb.foreign-investor.currency-hedging-considerations
 effective_from: 2025-07-01
-last_verified: 2026-07-03
+last_verified: 2026-07-06
+sources:
+  - url: https://wise.com/au/currency-converter/vnd-to-aud-rate
+    retrieved: 2026-07-06
+    note: "Wise VND→AUD — grounds the FX-cost basis (mid-market rate + transparent fee) the exposure is measured against. This doc is informational (no retail hedging product assumed); the source supports the transfer-cost anchor, not a hedging instrument."
 ---
 
 # VND/AUD currency exposure across the investment hold — considerations, not a hedging product

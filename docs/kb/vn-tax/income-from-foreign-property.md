@@ -2,6 +2,8 @@
 slug: kb.vn-tax.income-from-foreign-property
 effective_from: 2026-07-03
 last_verified: 2026-07-03
+sources:
+  - note: "PLACEHOLDER — VN-side tax content is out of scope per the 2026-07-03 Mode-D scoping decision, sibling of kb.vn-tax.brackets-2026. A Vietnam-located investor's own VN tax advisor handles VN-side filing. Reconfirmed as an intentional, locked deferral during the 2026-07-06 Phase B backfill — not to be de-placeholdered without revisiting that scoping decision."
 ---
 
 # ⚠ PLACEHOLDER — Vietnam's tax treatment of foreign (AU) property income (NOT SOURCE-GROUNDED)

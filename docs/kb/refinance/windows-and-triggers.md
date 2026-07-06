@@ -1,7 +1,11 @@
 ---
 slug: kb.refinance.windows-and-triggers
 effective_from: 2025-07-01
-last_verified: 2026-06-01
+last_verified: 2026-07-06
+sources:
+  - url: https://www.commbank.com.au/home-loans/refinance-home-loan.html
+    retrieved: 2026-07-06
+    note: "CommBank refinancing — triggers (lower rate, restructure, access equity, fixed-rate expiry) and switching costs (application/valuation/legal fees, discharge fee, fixed-rate break costs, LMI if LVR > 80%). Confirms the triggers-and-mechanics framing this doc arms alerts on."
 ---
 
 # Refinancing — the triggers (when) and the switching mechanics (how)

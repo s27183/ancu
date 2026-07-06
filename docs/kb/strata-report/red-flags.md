@@ -1,7 +1,14 @@
 ---
 slug: kb.strata-report.red-flags
 effective_from: 2025-07-01
-last_verified: 2026-06-02
+last_verified: 2026-07-06
+sources:
+  - url: https://www.nsw.gov.au/housing-and-construction/strata/strata-publications/section-184-certificate-strata-schemes
+    retrieved: 2026-07-06
+    note: "NSW Government — s184 strata information certificate (Strata Schemes Management Act 2015 s184); the buyer's window into the scheme's financial and governance records. Form last updated 19 Mar 2026 (extra mandated content from 1 Apr 2026)."
+  - url: https://www.consumer.vic.gov.au/housing/owners-corporations/finance-insurance-and-record-keeping/records
+    retrieved: 2026-07-06
+    note: "Consumer Affairs Victoria — owners corporation certificate under Owners Corporations Act 2006 s151 discloses fees, funds, insurance and disputes to a prospective purchaser"
 ---
 
 # Strata report — red flags and what they mean

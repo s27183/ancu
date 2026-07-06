@@ -1,7 +1,11 @@
 ---
 slug: kb.bridging-finance.mechanics
 effective_from: 2026-07-05
-last_verified: 2026-07-05
+last_verified: 2026-07-06
+sources:
+  - url: https://www.westpac.com.au/personal-banking/home-loans/bridging-loan/
+    retrieved: 2026-07-06
+    note: "Westpac bridging loan — confirms ONLY the stable principle: a short-term (~12-month) facility to buy before selling, carrying combined 'peak debt' then 'end debt' after the sale, generally interest-only/capitalised. The doc's QUANTITATIVE content (peak-debt calc, capitalised-interest estimate, lender shortlist) REMAINS a deliberate placeholder — deferred on ACL-caution grounds per mode-e-wedge.md #3; this source does not ground those figures."
 ---
 
 # ⚠ PLACEHOLDER — bridging finance mechanics (NOT SOURCE-GROUNDED)

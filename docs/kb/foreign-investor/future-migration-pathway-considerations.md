@@ -1,7 +1,12 @@
 ---
 slug: kb.foreign-investor.future-migration-pathway-considerations
 effective_from: 2025-04-01
-last_verified: 2026-07-03
+last_verified: 2026-07-06
+sources:
+  - url: https://foreigninvestment.gov.au/sites/foreigninvestment.gov.au/files/2025-03/guidance-note-6-residential-land-v3.pdf
+    retrieved: 2026-07-06
+    path: docs/sources/firb/guidance-note-6-residential-land-v3.pdf
+    note: "FIRB GN6 v3 — Australian permanent residents and citizens are NOT foreign persons; acquiring PR/citizenship removes the foreign-person restrictions. Confirms the mode-switch trigger this doc owns. (Tax-residency change follows the separate ATO residency test, as the doc states.)"
 ---
 
 # Future migration pathway — the Mode-D mode-switch structural doc

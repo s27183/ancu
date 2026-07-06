@@ -1,7 +1,15 @@
 ---
 slug: kb.investor.gearing-types-and-implications
 effective_from: 2025-07-01
-last_verified: 2026-06-23
+last_verified: 2026-07-06
+sources:
+  - url: https://www.ato.gov.au/individuals-and-families/investments-and-assets/property-and-land/residential-rental-properties
+    retrieved: 2026-07-06
+  - url: https://moneysmart.gov.au/glossary/negative-gearing
+    retrieved: 2026-07-06
+  - url: https://www.aph.gov.au/Parliamentary_Business/Bills_Legislation/bd/bd2526/26bd067
+    retrieved: 2026-07-06
+    path: docs/sources/legislation/treasury-laws-amendment-tax-reform-no-1-act-2026-no49.pdf
 ---
 
 # Gearing types and their implications
@@ -23,15 +31,15 @@ Gearing type is decided by the sign of the **net holding position**: rental inco
 - **Tax is a discount, not a reason.** A loss that saves tax is still a loss. The plan never frames negative gearing as attractive *because* of the tax benefit — the tax effect reduces the cost of a strategy chosen on its merits.
 - **Interest-only vs P&I and offset** interact with gearing — owned by [`kb.lender.serviceability-investment-loans`](../lender/serviceability-investment-loans.md) and the F-cluster loan-policy docs.
 
-## The 2026-27 Budget reform (proposed, not yet law)
+## The 2026-27 Budget reform (now law, not yet in effect)
 
-The *Treasury Laws Amendment (Tax Reform No. 1) Bill 2026* (introduced 12 May 2026, **not yet passed**) proposes, from **1 July 2027**, to **limit negative gearing to new builds** — established properties purchased after Budget night would lose the wage-offset; holdings before Budget night are grandfathered. The plan computes **current law** (negative gearing available), **flags the proposed change**, and marks any post-1-July-2027 position as `to_verify`. It does **not** model unenacted law as settled. The detail and status are owned by [`kb.tax.negative-gearing-mechanics`](../tax/negative-gearing-mechanics.md).
+The *Treasury Laws Amendment (Tax Reform No. 1) Act 2026* (Act No. 49 of 2026, assented **26 June 2026**) **limits negative gearing to new builds** from **1 July 2027** — established properties purchased after Budget night (7:30pm AEST 12 May 2026) lose the wage-offset from that date; holdings before Budget night are grandfathered. The plan computes **current law** (full negative gearing available through the transition), **flags the enacted reform** prominently, and marks any post-1-July-2027 position as `to_verify`. The detail and status are owned by [`kb.tax.negative-gearing-mechanics`](../tax/negative-gearing-mechanics.md).
 
 ## Relevance for Vietnamese-Australian investors (Mode C)
 
 - **Gearing is a cash-flow decision first.** The plan frames the gearing type by what it demands of the household's monthly cash flow, not by the tax headline — a household carrying its own mortgage feels a negative-gearing shortfall directly.
 - **The tax saving never justifies a loss.** The plan presents negative gearing as a cost partly offset by tax, never as a benefit in itself.
-- **Reform is flagged, not modelled as law.** If negative gearing is part of the thesis, the plan notes the proposed 1 July 2027 new-builds-only change and marks the post-2027 position to-verify.
+- **Reform is enacted but not yet in effect.** If negative gearing is part of the thesis, the plan notes the enacted 1 July 2027 new-builds-only change and marks the post-2027 position to-verify.
 - **Decision-support, not advice.** The plan lays out the gearing trade-offs and the household's capacity to carry them; the investor decides. No financial advice.
 
 ## Rules
@@ -56,7 +64,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
     "tax_mechanism_owner": { "type": "string", "value": "kb.tax.negative-gearing-mechanics", "note": "OWNED ELSEWHERE — how a rental loss offsets other income; referenced, not re-derived" },
     "tax_saving_never_justifies_a_loss": { "type": "bool", "value": true, "note": "negative gearing is a cost partly offset by tax, never a benefit in itself; never frame the tax saving as the reason to gear negatively (ASIC line)" },
     "negative_gearing_reliant_on_growth": { "type": "bool", "value": true, "note": "the more negative the gearing, the more the return depends on growth materialising — growth is NOT assured (kb.property.capital-growth-bands, labelled placeholder)" },
-    "ng_reform_proposed_not_law": { "type": "bool", "value": true, "note": "2026-27 Budget proposes NG limited to new builds from 1 Jul 2027 (not yet law); compute current law, flag the change, to_verify post-2027 — detail owned by kb.tax.negative-gearing-mechanics" }
+    "ng_reform_proposed_not_law": { "type": "bool", "value": true, "note": "2026-27 Budget reform (NG limited to new builds from 1 Jul 2027) is now ENACTED — Tax Reform No. 1 Act 2026 (Act No. 49/2026), assented 26 Jun 2026 — but not yet in effect; compute current law, flag the enacted change, to_verify post-2027 — detail owned by kb.tax.negative-gearing-mechanics (key name retained for reference stability)" }
   }
 }
 ```
@@ -65,11 +73,12 @@ Notes:
 
 - **No `fills`.** `gearing_type` is agent-reasoned; the net cash-flow position is computed by `yield_modelling`/`cash_position`. This doc supplies the taxonomy and trade-offs.
 - **Single-owner via cross-ref.** Tax mechanism → `kb.tax.negative-gearing-mechanics`; growth uncertainty → `kb.property.capital-growth-bands`; loan-structure interaction → `kb.lender.serviceability-investment-loans`. This doc owns the gearing taxonomy and its decision-support implications.
-- **Reform: proposed, not law.** Current law computed, reform flagged, post-1-July-2027 → `to_verify`; status owned by the negative-gearing doc.
+- **Reform: enacted, not yet in effect.** Current law computed, enacted reform flagged, post-1-July-2027 → `to_verify`; status owned by the negative-gearing doc.
 - **ASIC line.** Decision-support only — the trade-offs and the household's capacity to carry them; no recommended gearing level.
 
 ## Sources
 
 - ATO — *Rental properties – claiming a loss (negative gearing)* (the gearing position and how a loss is treated) — https://www.ato.gov.au/individuals-and-families/investments-and-assets/property-and-land/residential-rental-properties
 - ASIC Moneysmart — *Property investment* (positive vs negative gearing as a cash-flow and risk trade-off; the loss is real) — https://moneysmart.gov.au/property-investment
-- Parliament of Australia — *Treasury Laws Amendment (Tax Reform No. 1) Bill 2026* (proposed negative-gearing change from 1 July 2027; introduced, not yet passed) — https://www.aph.gov.au/Parliamentary_Business/Bills_Legislation
+- Parliament of Australia — *Treasury Laws Amendment (Tax Reform No. 1) Bill 2026* bill digest (negative-gearing change from 1 July 2027; passed both Houses 25 Jun 2026, assented 26 Jun 2026 — Act No. 49 of 2026) — https://www.aph.gov.au/Parliamentary_Business/Bills_Legislation/bd/bd2526/26bd067
+- Federal Register of Legislation — *Treasury Laws Amendment (Tax Reform No. 1) Act 2026* (Act No. 49 of 2026) — https://www.legislation.gov.au/C2026A00049/latest/text (archived: `docs/sources/legislation/treasury-laws-amendment-tax-reform-no-1-act-2026-no49.pdf`)

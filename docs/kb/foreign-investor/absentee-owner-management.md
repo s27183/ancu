@@ -1,7 +1,12 @@
 ---
 slug: kb.foreign-investor.absentee-owner-management
 effective_from: 2025-07-01
-last_verified: 2026-07-03
+last_verified: 2026-07-06
+sources:
+  - url: https://foreigninvestment.gov.au/sites/foreigninvestment.gov.au/files/2025-03/guidance-note-6-residential-land-v3.pdf
+    retrieved: 2026-07-06
+    path: docs/sources/firb/guidance-note-6-residential-land-v3.pdf
+    note: "FIRB GN6 v3 — residential foreign-owner framework (approval + ongoing obligations) underpinning the absentee overlay. The vacancy-fee specifics (183-day test, annual return, fee = 2x application fee) are ATO-owned and cross-referenced to the FIRB/ATO KB docs, not re-derived here; the ATO vacancy-fee page was Cloudflare-blocked this session, verified via corroborating search only."
 ---
 
 # Managing the property from Vietnam — the absentee-owner overlay

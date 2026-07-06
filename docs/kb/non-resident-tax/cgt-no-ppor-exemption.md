@@ -1,8 +1,14 @@
 ---
 slug: kb.non-resident-tax.cgt-no-ppor-exemption
 effective_from: 2025-07-01
-last_verified: 2026-07-02
----
+last_verified: 2026-07-06
+sources:
+  - url: https://www.ato.gov.au/individuals-and-families/investments-and-assets/capital-gains-tax/foreign-residents-and-capital-gains-tax/main-residence-exemption-for-foreign-residents
+    retrieved: 2026-07-06
+    note: "PRIMARY (ATO). Verified via WebSearch corroboration 2026-07-06 (ATO WebFetch 403 in-sandbox): main-residence exemption removed for foreign residents from 9 May 2017 — CONFIRMED."
+  - url: https://www.ato.gov.au/individuals-and-families/investments-and-assets/capital-gains-tax/foreign-residents-and-capital-gains-tax/cgt-discount-for-foreign-residents
+    retrieved: 2026-07-06
+    note: "PRIMARY (ATO). 50% CGT discount not available for the foreign/temporary-resident period after 8 May 2012; apportioned for any Australian-resident period — CONFIRMED via WebSearch corroboration. WATCH: a further CGT-discount reform for foreign residents is flagged by secondary sources as commencing 1 July 2027 — not yet in effect, re-verify before that date."
 
 # Foreign-resident CGT on the eventual sale — no main-residence exemption
 

@@ -1,7 +1,12 @@
 ---
 slug: kb.investor.tenancy-in-situ-considerations
 effective_from: 2025-07-01
-last_verified: 2026-06-23
+last_verified: 2026-07-06
+sources:
+  - url: https://www.rta.qld.gov.au/during-a-tenancy/events-that-impact-the-agreement/when-a-property-is-for-sale
+    retrieved: 2026-07-06
+  - url: https://www.consumer.vic.gov.au/housing/renting
+    retrieved: 2026-07-06
 ---
 
 # Tenancy-in-situ considerations

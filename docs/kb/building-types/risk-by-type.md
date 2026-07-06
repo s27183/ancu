@@ -1,7 +1,19 @@
 ---
 slug: kb.building-types.risk-by-type
 effective_from: 2025-08-01
-last_verified: 2026-06-02
+last_verified: 2026-07-06
+sources:
+  - url: https://www.qbcc.qld.gov.au/home-owner-hub/queensland-home-warranty-scheme/what-home-warranty-insurance
+    retrieved: 2026-07-06
+    note: "QBCC Queensland Home Warranty Scheme — compulsory for residential construction over $3,300 (incl materials/labour/GST); excludes multi-dwelling buildings over three storeys"
+  - url: https://legislation.nsw.gov.au/view/html/inforce/current/act-1919-006
+    retrieved: 2026-07-06
+    path: docs/sources/nsw/conveyancing_act_1919_no_6.pdf
+    note: "NSW Conveyancing Act 1919 s66ZS — off-the-plan sunset-clause rescission requires every purchaser's consent or a Supreme Court order; read via archived PDF, current for 15 Aug 2025"
+  - url: https://www.legislation.vic.gov.au/in-force/acts/sale-land-act-1962
+    retrieved: 2026-07-06
+    path: docs/sources/vic/sales_of_land_act_1962.pdf
+    note: "VIC Sale of Land Act 1962 ss10A-10F off-the-plan sunset clauses (inserted by No. 14/2019); read via archived PDF, Authorised Version No. 172 as at 25 Nov 2025"
 ---
 
 # Risk profiles by property type

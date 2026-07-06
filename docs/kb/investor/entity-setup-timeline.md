@@ -1,7 +1,12 @@
 ---
 slug: kb.investor.entity-setup-timeline
 effective_from: 2025-07-01
-last_verified: 2026-06-23
+last_verified: 2026-07-06
+sources:
+  - url: https://www.ato.gov.au/individuals-and-families/super-for-individuals-and-families/self-managed-super-funds-smsf/smsf-investing/ownership-of-smsf-investments
+    retrieved: 2026-07-06
+  - url: https://moneysmart.gov.au/property-investment/smsfs-and-property
+    retrieved: 2026-07-06
 ---
 
 # Entity setup — timeline and sequencing

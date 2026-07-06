@@ -1,7 +1,14 @@
 ---
 slug: kb.investor.land-tax-aggregation
 effective_from: 2025-07-01
-last_verified: 2026-06-23
+last_verified: 2026-07-06
+sources:
+  - url: https://www.revenue.nsw.gov.au/taxes-duties-levies-royalties/land-tax/understanding-land-tax/how-land-tax-is-calculated
+    retrieved: 2026-07-06
+  - url: https://www.sro.vic.gov.au/land-tax
+    retrieved: 2026-07-06
+  - url: https://qro.qld.gov.au/land-tax/about/overview/
+    retrieved: 2026-07-06
 ---
 
 # Land-tax aggregation

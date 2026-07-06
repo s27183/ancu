@@ -1,7 +1,11 @@
 ---
 slug: kb.lender-docs.standard-timeline
 effective_from: 2025-08-01
-last_verified: 2026-06-02
+last_verified: 2026-07-06
+sources:
+  - url: https://www.commbank.com.au/home-loans/understanding-the-home-loan-process.html
+    retrieved: 2026-07-06
+    note: "CommBank home-loan process — conditional pre-approval → (contract) → formal/unconditional approval → loan docs → settlement, and the conditional-vs-unconditional distinction. DRIFT (minor): CBA states conditional pre-approval is valid 90 days; this doc's '3-6 months' upper bound is generous for a major bank — lender-varying, not wrong, but tighten toward ~3 months on next revision."
 ---
 
 # Lender document timeline — approval to settlement

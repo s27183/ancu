@@ -1,8 +1,15 @@
 ---
 slug: kb.non-resident.entity-options-au-property
 effective_from: 2025-07-01
-last_verified: 2026-07-03
----
+last_verified: 2026-07-06
+sources:
+  - url: https://www.ato.gov.au/individuals-and-families/super-for-individuals-and-families/self-managed-super-funds-smsf/setting-up-an-smsf/check-your-smsf-is-an-australian-super-fund
+    note: "POINTER (not re-fetched this session; canonical ATO home of the fact) — SMSF residency: central management and control ordinarily in Australia (temporary absence up to 2 years); active-member test (no active members, or AU-resident active members ≥50% of value). Settled ATO law; not independently corroborated in a search this session, carried from the doc's markdown Sources block."
+  - url: https://www.allens.com.au/insights-news/explore/2022/overview-of-australias-foreign-investment-approval-regime/introduction/
+    retrieved: 2026-07-06
+    note: "SECONDARY (Allens) for the FATA foreign-person look-through. Verified via WebSearch corroboration 2026-07-06: a corporation/trust/partnership is a foreign person if a single foreign person holds a substantial interest of ≥20%, or two-or-more hold an aggregate substantial interest of ≥40% — CONFIRMED (ordinarily-resident = 200+ days in preceding 12 months)."
+  - url: https://www.legislation.gov.au/C2004A00289/latest/text
+    note: "POINTER (not re-fetched this session; canonical home of the fact) — Foreign Acquisitions and Takeovers Act 1975 (Cth): foreign-person definition and substantial-interest thresholds. The 20%/40% thresholds were corroborated this session via the Allens overview above."
 
 # Ownership entity — the non-resident-specific restrictions
 

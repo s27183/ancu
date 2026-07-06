@@ -1,7 +1,14 @@
 ---
 slug: kb.pexa.settlement
 effective_from: 2023-02-20
-last_verified: 2026-06-02
+last_verified: 2026-07-06
+sources:
+  - url: https://www.arnecc.gov.au/regulation/electronic_conveyancing_national_law/
+    retrieved: 2026-07-06
+    note: "ARNECC — Electronic Conveyancing National Law; per-jurisdiction adoption (NSW proclaimed 1 Jan 2013, VIC 14 Mar 2013, QLD 17 May 2013); ELNOs, Model Operating/Participation Rules"
+  - url: https://www.titlesqld.com.au/econveyancing/
+    retrieved: 2026-07-06
+    note: "Titles Queensland — eConveyancing mandate commenced 20 Feb 2023 for prescribed instruments; PEXA and Sympli are the approved ELNOs"
 ---
 
 # Electronic settlement (PEXA / e-conveyancing) — mechanics

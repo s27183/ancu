@@ -2,6 +2,8 @@
 slug: kb.property.capital-growth-bands
 effective_from: 2026-06-21
 last_verified: 2026-06-21
+sources:
+  - note: "PLACEHOLDER — deliberately unsourced (Son's call, 2026-06-21); see the doc's own PLACEHOLDER banner for the re-ground requirement. Checked 2026-07-06 during the Phase B backfill: the body's re-ground candidate 'ABS Residential Property Price Index (RPPI)' is stale for capital-city long-run growth (ABS discontinued RPPI's 'Eight Capital Cities' series after Dec 2021) — re-ground against ABS Total Value of Dwellings (RPPI's successor) or CoreLogic HVI instead when this placeholder is finally resolved. Not fixed here — it's the sibling of the still-open re-ground task, not a citation to add."
 ---
 
 # Capital growth assumption bands — PLACEHOLDER (pending authoritative source)

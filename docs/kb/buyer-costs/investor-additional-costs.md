@@ -1,7 +1,14 @@
 ---
 slug: kb.buyer-costs.investor-additional-costs
 effective_from: 2024-09-01
-last_verified: 2026-06-23
+last_verified: 2026-07-06
+sources:
+  - url: https://www.consumer.vic.gov.au/housing/renting/repairs-alterations-safety-and-pets/minimum-standards/minimum-standards-for-rental-properties
+    retrieved: 2026-07-06
+  - url: https://www.rta.qld.gov.au/during-a-tenancy/minimum-housing-standards
+    retrieved: 2026-07-06
+  - url: https://moneysmart.gov.au/property-investment/buying-an-investment-property
+    retrieved: 2026-07-06
 ---
 
 # Buyer-side costs — additional costs specific to investors
