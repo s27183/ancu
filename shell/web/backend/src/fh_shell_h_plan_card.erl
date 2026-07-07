@@ -30,6 +30,8 @@ init(Req0, Opts) ->
         {[documents], <<"POST">>}   -> with_owned_card(Req0, Opts, fun documents/4);
         {[checklist_status], <<"PATCH">>} ->
             with_owned_card(Req0, Opts, fun checklist_status/4);
+        {[news], <<"GET">>}   -> with_owned_card(Req0, Opts, fun news/4);
+        {[news], <<"PATCH">>} -> with_owned_card(Req0, Opts, fun dismiss_news/4);
         _ ->
             {ok, fh_shell_http:reply_json(405,
                 #{<<"error">> => <<"method_not_allowed">>}, Req0), Opts}
@@ -156,6 +158,29 @@ checklist_status(UserId, PlanCardId, Req0, Opts) ->
         {ok, Body, Req1} ->
             {Status, Resp} =
                 fh_shell_engine_client:set_checklist_status(UserId, PlanCardId, Body),
+            {ok, relay(Status, Resp, Req1), Opts};
+        {error, invalid_json} ->
+            {ok, fh_shell_http:reply_json(400,
+                #{<<"error">> => <<"invalid_json">>}, Req0), Opts}
+    end.
+
+%% GET /api/plan-cards/:id/news — the KB news notes relevant to the card, minus its own
+%% dismissed set (kb-news-feature.md). Zero-cost read (no usage, no turn); the engine
+%% computes relevance over kb_versions provenance already stamped on the card's fills.
+%% Just authenticate → own → relay.
+news(UserId, PlanCardId, Req0, Opts) ->
+    {Status, Body} = fh_shell_engine_client:get_news(UserId, PlanCardId),
+    {ok, relay(Status, Body, Req0), Opts}.
+
+%% PATCH /api/plan-cards/:id/news — dismiss one news note (the card's dismissed_news
+%% user-set layer, migration 007). USER-ATTESTED, NOT a computed figure: no recompute,
+%% no usage — like checklist-status, NO meter gate. The engine returns the AUTHORITATIVE
+%% dismissed_news map (400 on a missing news_slug); relay verbatim.
+dismiss_news(UserId, PlanCardId, Req0, Opts) ->
+    case fh_shell_http:read_json_body(Req0) of
+        {ok, Body, Req1} ->
+            {Status, Resp} =
+                fh_shell_engine_client:dismiss_news(UserId, PlanCardId, Body),
             {ok, relay(Status, Resp, Req1), Opts};
         {error, invalid_json} ->
             {ok, fh_shell_http:reply_json(400,

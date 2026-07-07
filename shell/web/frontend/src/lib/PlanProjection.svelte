@@ -18,10 +18,12 @@
         attachProperty,
         setTransactionDates,
         uploadDocument,
+        getNews,
         type SimulateOverrides,
         type HouseholdFinancials,
         type PropertyCardInput,
-        type TransactionDatesInput
+        type TransactionDatesInput,
+        type NewsNote
     } from '$lib/api';
     import { subscribePlanCard, type PlanCardStream } from '$lib/planCardStream';
     import {
@@ -100,6 +102,12 @@
     // and overlaid onto phase_playbook actions at render. The engine is SOT: a toggle is
     // optimistic for immediacy, then reconciled from the PATCH response (revert on failure).
     let checklistStatus = $state<ChecklistStatusMap>({});
+
+    // KB news notes relevant to this card (kb-news-feature.md) — the ticker's data
+    // source (task 29); this slice (task 27) only fetches + holds them. A separate
+    // resource from the GET card (relevance is computed over kb_versions provenance,
+    // not part of the content snapshot), so it's fetched alongside, not embedded.
+    let news = $state<NewsNote[]>([]);
 
     let stream: PlanCardStream | null = null;
     // A generation token so a retry's async can't be clobbered by a stale in-flight one.
@@ -629,6 +637,16 @@
         horizonValue = baselineHorizon;
     }
 
+    // Fetch the card's relevant KB news notes (kb-news-feature.md), independently of the
+    // card GET — a 401/404/error here degrades to no ticker (never blocks the plan), since
+    // news is a nice-to-know, not load-bearing for the plan itself. myGen guards against a
+    // stale response landing after the user has navigated to a different suburb/card.
+    async function loadNews(id: string, myGen: number) {
+        const res = await getNews(id);
+        if (myGen !== gen) return;
+        news = res.kind === 'ok' ? res.news : [];
+    }
+
     async function load() {
         resetPreview();
         const myGen = ++gen;
@@ -640,6 +658,7 @@
         selectedPropertyId = null;
         checklistStatus = {};
         uiTabs = [];
+        news = [];
         cardId = null;
         blueprintSlug = '';
         turnDone = false;
@@ -667,6 +686,7 @@
             if (!uiTabs.some((t) => t.tab_id === sub)) sub = uiTabs[0]?.tab_id ?? '';
             cardId = match.plan_card_id;
             phase = 'ready';
+            loadNews(match.plan_card_id, myGen); // fire-and-forget: never blocks the plan render
             // The GET snapshot is the authoritative latest projection. Take the done-state
             // from turn_running (a settled card has no terminal to replay once we subscribe
             // from the cursor), and subscribe the SSE FROM the snapshot's event_cursor so the

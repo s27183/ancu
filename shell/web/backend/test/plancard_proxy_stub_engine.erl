@@ -50,6 +50,23 @@ init(Req0, Opts) ->
                     <<"property_id">>     => Pid,
                     <<"turn_id">>         => fh_shell_util:uuid4(),
                     <<"echo_settlement">> => maps:get(<<"settlement_date">>, Dates, null)}};
+        {[news], <<"GET">>} ->
+            %% news: one fixed relevant note (kb-news-feature.md shape) — proves the
+            %% proxy relays the engine's news-note contract verbatim.
+            {200, #{<<"news">> => [#{
+                <<"news_slug">> => <<"kb.news.2026-07-hecs-thresholds-2026-27">>,
+                <<"kb_slug">> => <<"kb.hecs.thresholds">>,
+                <<"affected_components">> => #{
+                    <<"blueprints.fhb-domestic-au">> => [<<"buyer_profile">>]},
+                <<"sources">> => [#{<<"url">> => <<"https://www.ato.gov.au/example">>}],
+                <<"summary_en">> => <<"HECS thresholds updated for 2026-27.">>,
+                <<"summary_vi">> => <<"Ngu\304\251ng HECS \304\221\303\243 c\341\272\255p nh\341\272\255t cho 2026-27.">>
+            }]}};
+        {[news], <<"PATCH">>} ->
+            %% dismiss: echo the dismissed slug into the authoritative map.
+            Body = decode(BodyBin),
+            Slug = maps:get(<<"news_slug">>, Body, null),
+            {200, #{<<"dismissed_news">> => #{Slug => true}}};
         _ ->
             {405, #{<<"error">> => <<"method_not_allowed">>}}
     end,

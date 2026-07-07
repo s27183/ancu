@@ -413,6 +413,98 @@ export async function setChecklistStatus(
     return { kind: 'error', status: res.status };
 }
 
+// --- News: KB fact changes relevant to this card (kb-news-feature.md) --------
+// GET/PATCH /api/plan-cards/:id/news — surfaces a KB threshold/cap/rate change to the
+// buyer whose plan actually depends on it. GET is a zero-cost read (relevance is a set
+// intersection over kb_versions provenance already stamped on the card's fills); PATCH
+// dismisses one note into the card's user-set dismissed_news layer (no recompute, no
+// usage). A news note is authored offline at KB-update time, never live-detected.
+
+/** One corroborating citation, the same `url`/`retrieved`/`path`/`note` shape as a KB
+ *  fact doc's own `sources:` (parse_sources_block) — but here it PINS what the author
+ *  had open for this specific dated diff (kb-news-feature.md "Source citation"), not a
+ *  duplicate of the fact doc's live-tracking sources. Never drifts: the note is immutable. */
+export interface NewsSource {
+    url?: string;
+    retrieved?: string;
+    path?: string;
+    note?: string;
+}
+
+/** A KB news note (kb_compiler.py `parse_news_doc`, artifact["news"][slug]). Bilingual
+ *  summary + a machine diff, reverse-indexed at compile time to the blueprint components
+ *  it affects (`affected_components`) so a tap can scroll to/highlight the right tile. */
+export interface NewsNote {
+    news_slug: string;
+    kb_slug: string;
+    affected_kb_slugs?: string[];
+    /** {blueprint_slug: [component_name, ...]} — this card's own blueprint_slug names
+     *  which tile(s) to scroll to/highlight (kb-news-feature.md "UX shape"). */
+    affected_components?: Record<string, string[]>;
+    effective_from?: string;
+    authored_date?: string;
+    sources?: NewsSource[];
+    summary_en?: string;
+    summary_vi?: string;
+    diff?: Record<string, unknown>;
+}
+
+/** A discriminated fetch outcome so the caller branches calmly (§7.1). `not_found` mirrors
+ *  the card-read posture (unowned/unknown/malformed id — no existence disclosure). */
+export type NewsOutcome =
+    | { kind: 'ok'; news: NewsNote[] }
+    | { kind: 'auth_required' }
+    | { kind: 'not_found' }
+    | { kind: 'error'; status: number };
+
+/** GET the card's relevant, non-dismissed news notes. Called when the plan projection
+ *  loads (and may be re-called on SSE reconnect — the engine primitive is pull-only,
+ *  kb-news-feature.md "Push vs pull"). */
+export async function getNews(
+    planCardId: string,
+    fetchFn: typeof fetch = fetch
+): Promise<NewsOutcome> {
+    const res = await fetchFn(`/api/plan-cards/${encodeURIComponent(planCardId)}/news`);
+    if (res.ok) {
+        const body = (await res.json()) as { news?: NewsNote[] };
+        return { kind: 'ok', news: body.news ?? [] };
+    }
+    if (res.status === 401) return { kind: 'auth_required' };
+    if (res.status === 404) return { kind: 'not_found' };
+    return { kind: 'error', status: res.status };
+}
+
+/** A discriminated dismiss outcome. `ok` carries the engine's authoritative dismissed_news
+ *  map (mirrors setChecklistStatus's posture — the caller renders engine state, not its
+ *  optimistic guess, on failure). */
+export type DismissNewsOutcome =
+    | { kind: 'ok'; dismissedNews: Record<string, boolean> }
+    | { kind: 'invalid' }
+    | { kind: 'auth_required' }
+    | { kind: 'not_found' }
+    | { kind: 'error'; status: number };
+
+/** PATCH-dismiss one news note by slug. */
+export async function dismissNews(
+    planCardId: string,
+    newsSlug: string,
+    fetchFn: typeof fetch = fetch
+): Promise<DismissNewsOutcome> {
+    const res = await fetchFn(`/api/plan-cards/${encodeURIComponent(planCardId)}/news`, {
+        method: 'PATCH',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ news_slug: newsSlug })
+    });
+    if (res.ok) {
+        const body = (await res.json()) as { dismissed_news?: Record<string, boolean> };
+        return { kind: 'ok', dismissedNews: body.dismissed_news ?? {} };
+    }
+    if (res.status === 400) return { kind: 'invalid' };
+    if (res.status === 401) return { kind: 'auth_required' };
+    if (res.status === 404) return { kind: 'not_found' };
+    return { kind: 'error', status: res.status };
+}
+
 // --- Property attachment: Phase B (Mode-C investor) --------------------------
 // POST /api/plan-cards/:id/properties — attach a property to the card and run the
 // per-property (Phase-B) turn (engine-contract §12). The body is a NORMALIZED

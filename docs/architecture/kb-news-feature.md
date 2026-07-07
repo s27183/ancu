@@ -3,7 +3,8 @@
 **Status:** backend built + live-verified 2026-07-07 (`news_smoke.escript`, all
 assertions pass against Docker PG). Compiler now reverse-indexes each note's
 `affected_components`, and every note now carries a `sources:` citation
-(both resolved 2026-07-07 — see below). Shell rendering not started.
+(both resolved 2026-07-07 — see below). Shell: the fetch layer (task 27) is
+built and proxy-verified 2026-07-07; the ticker UI (tasks 28-34) not started.
 
 ## The problem
 
@@ -76,9 +77,18 @@ advance/reverse by swipe or arrow buttons; tapping a headline opens a
 popup sheet/modal with the full bilingual summary + diff + source link, AND
 scrolls to/highlights the `affected_components` tile.
 
-- [ ] **Fetch layer.** Call `GET /api/engine/plan-cards/:id/news` when the plan
-      projection loads (and/or on SSE reconnect — see the push-vs-pull open
-      question below).
+- [x] **Fetch layer** (2026-07-07). `PlanProjection.svelte`'s `load()` calls
+      `getNews(cardId)` (fire-and-forget, `lib/api.ts`) once the card is
+      `ready`, holding the result in a `news` state array consumed by task 29's
+      ticker. This needed a NEW shell-backend proxy (none existed): `GET`/
+      `PATCH /api/plan-cards/:id/news` (`fh_shell_h_plan_card.erl`, router
+      entry in `fh_shell_http.erl`, `fh_shell_engine_client:get_news/2` +
+      `dismiss_news/3`), same ownership-gate + zero-meter posture as
+      `checklist-status`. Proven end-to-end against a stub engine
+      (`plancard_proxy_smoke.escript`, 6 new assertions: relay, ownership 404,
+      auth 401, for both GET and PATCH). `dismissNews` (frontend) is also
+      built here since it's the same endpoint's other verb — task 31 wires it
+      to a UI action.
 - [ ] **Ticker component (Svelte).** Sticky auto-sliding strip, one headline
       visible at a time, swipe/arrow-button navigation; not a separate feed
       screen (per the map-first-home / plan-card-as-central-artifact

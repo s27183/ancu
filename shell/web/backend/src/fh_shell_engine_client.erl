@@ -14,7 +14,8 @@
 -export([create_plan_card/2, get_plan_card/2, post_message/3, simulate/3,
          refine/3, set_profile_financials/3, set_checklist_status/3,
          attach_property/3, set_transaction_dates/4, upload_document/4, stream_events/3,
-         list_suburbs/1, get_usage_events/2, start_httpc_profiles/0]).
+         list_suburbs/1, get_usage_events/2, start_httpc_profiles/0,
+         get_news/2, dismiss_news/3]).
 
 %% Dedicated httpc profile for the LONG-LIVED SSE stream proxy (stream_events/3).
 %% SSE requests run with {timeout, infinity} and hold an httpc session for the entire
@@ -179,6 +180,39 @@ set_profile_financials(UserId, PlanCardId, BodyMap) ->
 set_checklist_status(UserId, PlanCardId, BodyMap) ->
     Token = fh_shell_engine_jwt:mint(#{user_id => UserId}),
     Url = base_url() ++ "/plan-cards/" ++ binary_to_list(PlanCardId) ++ "/checklist-status",
+    Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
+    Body = fh_shell_util:json_encode(BodyMap),
+    {ok, {{_, Status, _}, _, Resp}} =
+        httpc:request(patch, {Url, Headers, "application/json", Body},
+                      [{timeout, ?RPC_TIMEOUT_MS}], [{body_format, binary}]),
+    {Status, Resp}.
+
+%% Fetch the KB news notes relevant to a card's consulted KB slugs, minus its own
+%% dismissed set — GET /api/engine/plan-cards/:id/news (kb-news-feature.md). The
+%% shell has confirmed ownership first. Zero-cost read (no usage, no turn): the
+%% engine computes the relevance filter over already-stamped kb_versions
+%% provenance, nothing new to compute. Relayed verbatim — the engine owns the
+%% news-note contract (bilingual summary, affected_components, sources).
+-spec get_news(binary(), binary()) -> {non_neg_integer(), binary()}.
+get_news(UserId, PlanCardId) ->
+    Token = fh_shell_engine_jwt:mint(#{user_id => UserId}),
+    Url = base_url() ++ "/plan-cards/" ++ binary_to_list(PlanCardId) ++ "/news",
+    Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
+    {ok, {{_, Status, _}, _, Resp}} =
+        httpc:request(get, {Url, Headers},
+                      [{timeout, ?RPC_TIMEOUT_MS}], [{body_format, binary}]),
+    {Status, Resp}.
+
+%% Dismiss one news note — PATCH /api/engine/plan-cards/:id/news with
+%% {news_slug}. The shell has confirmed ownership first. USER-ATTESTED state
+%% (the card's dismissed_news_jsonb user-set layer, migration 007), not a
+%% computed figure: NO usage, so — like checklist-status — NO meter gate. The
+%% engine answers 200 with the AUTHORITATIVE dismissed_news map; 400 on a
+%% missing news_slug. Relayed verbatim.
+-spec dismiss_news(binary(), binary(), map()) -> {non_neg_integer(), binary()}.
+dismiss_news(UserId, PlanCardId, BodyMap) ->
+    Token = fh_shell_engine_jwt:mint(#{user_id => UserId}),
+    Url = base_url() ++ "/plan-cards/" ++ binary_to_list(PlanCardId) ++ "/news",
     Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
     Body = fh_shell_util:json_encode(BodyMap),
     {ok, {{_, Status, _}, _, Resp}} =

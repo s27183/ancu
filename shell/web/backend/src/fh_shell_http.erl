@@ -44,6 +44,7 @@ routes() ->
         {"/api/plan-cards/:id/refine", fh_shell_h_plan_card, [refine]},
         {"/api/plan-cards/:id/profile", fh_shell_h_plan_card, [profile]},
         {"/api/plan-cards/:id/checklist-status", fh_shell_h_plan_card, [checklist_status]},
+        {"/api/plan-cards/:id/news", fh_shell_h_plan_card, [news]},
         %% Phase-B per-property surface (Mode-C shell, Slice 1) — attach a property
         %% (→ an addendum + an AGENT turn, engine-contract §12) and submit its
         %% transaction dates (→ a resolver-only re-fill, §11). Both more specific than
