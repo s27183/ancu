@@ -902,7 +902,12 @@ const messages = {
     // non-dismissed news notes above the lifecycle sub-tab rail.
     'plan.news.aria': { vi: 'Cập nhật liên quan đến kế hoạch', en: 'Plan-relevant updates' },
     'plan.news.prev': { vi: 'Tin trước', en: 'Previous update' },
-    'plan.news.next': { vi: 'Tin sau', en: 'Next update' }
+    'plan.news.next': { vi: 'Tin sau', en: 'Next update' },
+
+    // News detail sheet (kb-news-feature.md, task 28): opened by tapping a ticker headline.
+    'plan.news.detail_title': { vi: 'Cập nhật kế hoạch', en: 'Plan update' },
+    'plan.news.diff_heading': { vi: 'Chi tiết thay đổi', en: 'What changed' },
+    'plan.news.source': { vi: 'Nguồn', en: 'Source' }
 } as const;
 
 export type MessageKey = keyof typeof messages;

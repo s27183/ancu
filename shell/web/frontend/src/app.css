@@ -1358,6 +1358,42 @@ main {
     padding: 0.1rem 0;
 }
 
+/* News detail sheet (kb-news-feature.md task 28) — content inside NewsDetailSheet.svelte's
+   Modal. summary reuses .pp-card's ink/font sizing conventions rather than inventing new
+   ones; the diff is a generic JSON dump (no fixed schema — see NewsDetailSheet.svelte). */
+.pp-news-summary {
+    margin: 0 0 0.75rem;
+    color: var(--ink);
+    font-size: 0.92rem;
+    line-height: 1.45;
+}
+.pp-news-subhead {
+    margin: 0 0 0.4rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+.pp-news-diff {
+    margin: 0 0 0.75rem;
+    padding: 0.6rem 0.7rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 0.78rem;
+    line-height: 1.4;
+    overflow-x: auto;
+    white-space: pre;
+}
+.pp-news-source {
+    display: inline-block;
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: underline;
+}
+
 /* Property bar (Mode-C Phase-B) — the base-vs-property selector + the attach entry point.
    The selector (Tabs) takes the available width; the attach button sits at the end. */
 .pp-propbar {
@@ -1729,6 +1765,14 @@ main {
     border-radius: var(--radius);
     padding: 0.75rem 0.85rem;
     background: var(--surface);
+    transition: border-color var(--t-fast, 0.15s) var(--ease, ease), box-shadow var(--t-fast, 0.15s) var(--ease, ease);
+}
+/* A news-ticker tap (kb-news-feature.md task 28) names this tile via affected_components;
+   PlanProjection.svelte scrolls it into view and toggles this class off after a few
+   seconds — a transient flash, not a persistent state this component owns. */
+.pp-card-highlight {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
 }
 /* Borderless variant — the Flow + Budget containers (their spine renderers carry their own
    framing: the swimlane grid, the budget table). */

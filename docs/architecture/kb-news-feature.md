@@ -3,12 +3,13 @@
 **Status:** backend built + live-verified 2026-07-07 (`news_smoke.escript`, all
 assertions pass against Docker PG). Compiler now reverse-indexes each note's
 `affected_components`, and every note now carries a `sources:` citation
-(both resolved 2026-07-07 — see below). Shell: the fetch layer (task 27) is
-built and proxy-verified 2026-07-07; the ticker component (task 29) built
-2026-07-07 (svelte-check 0/0 + autofixer clean; no live browser walkthrough —
-see task 29's note), and its bilingual pick already covers task 30's need
-(left open pending task 28's detail sheet reusing it); tasks 28, 31-34 not
-started.
+(both resolved 2026-07-07 — see below). Shell: fetch (27), ticker (29), and
+tap → detail sheet + tile highlight (28) all built 2026-07-07 (svelte-check
+0/0 + autofixer clean each time; no live browser walkthrough — see each
+task's note). Task 28's `NewsDetailSheet.svelte` is the second consumer that
+closes both 30 (bilingual pick) and 32 (source link) — see their entries.
+Tasks 31, 33, 34 not started (33's default is already true, not yet closed
+as its own line item).
 
 ## The problem
 
@@ -130,26 +131,62 @@ scrolls to/highlights the `affected_components` tile.
       card whose consulted KB slugs match a real note) is disproportionate to
       stand up for a chrome-only layout change with no new backend dependency.
       Honest gap, not a claim of full verification.
-- [ ] **Bilingual rendering.** `NewsTicker.svelte`'s `headline` already picks
-      `$lang === 'vi' ? summary_vi : summary_en` (falling back to whichever
-      summary IS present — honest-partial, not a blank headline), reusing the
-      exact inline pattern already used elsewhere (`Onboarding.svelte`,
-      `SuburbSheet.svelte`) — no new picker mechanism needed. Left **open**
-      rather than checked off (task-27 precedent: don't close a task whose
-      other real consumer doesn't exist yet) — task 28's detail sheet is that
-      other consumer (summary + diff text) and should reuse this same one-line
-      ternary, not reinvent it; only once that's built does this item close.
-- [ ] **Tap → detail sheet + tile highlight.** Tapping a headline opens a
-      popup sheet/modal (summary + diff + source link) and, using that note's
-      `affected_components: {blueprint_slug: [component_name, ...]}` for the
-      card's own `blueprint_slug`, scrolls to and highlights the matching
-      plan tile. No further backend work; this is a pure shell lookup over
-      an already-compiler-built field. `NewsTicker.svelte`'s `onSelect` prop
-      is the wire-up point.
-- [ ] **Source link.** Render `sources[0].url` (first entry; a note may carry
-      more than one corroborating source, but the sheet needs only the
-      primary) as a link in the detail sheet — no new backend, `sources` is
-      already on the GET response.
+- [x] **Bilingual rendering** (2026-07-07). Closes now that `NewsDetailSheet.svelte`
+      (task 28) is the second real consumer: it reuses the exact same
+      `$lang === 'vi' ? summary_vi : summary_en` (honest-partial fallback)
+      ternary `NewsTicker.svelte` already had, not a reinvented mechanism.
+- [x] **Tap → detail sheet + tile highlight** (2026-07-07). `NewsDetailSheet.svelte`
+      (built on `Modal.svelte`, the existing drill-down surface — attach-
+      property/settlement/lease all open into it — not `SuburbSheet.svelte`'s
+      bespoke tab-bearing panel, since this is a "small popup with a few
+      facts", not an outer container) renders the bilingual summary, a
+      generic `JSON.stringify(diff, null, 2)` dump (no fixed schema — see
+      below), and the source link (closes task 32 too — see its entry).
+      `PlanProjection.svelte`: `NewsTicker`'s `onSelect` → `onNewsSelect` just
+      opens the sheet (`selectedNews` state); a `data-component={componentId}`
+      attribute was added to `ComponentCard.svelte`'s root `<section>` (no
+      such DOM hook existed before) so a component can be found; `onNewsClose`
+      (the sheet's `onClose`) does the actual work — looks up
+      `note.affected_components[blueprintSlug]`, switches `sub` to whichever
+      `uiTabs` entry contains the first named component, `await tick()`,
+      `scrollIntoView({behavior:'smooth', block:'center'})`, and flashes a
+      `.pp-card-highlight` class (a `highlighted` prop threaded into
+      `ComponentCard.svelte`) for 3s (`clearTimeout`'d and re-armed on a rapid
+      re-tap so an earlier timer can't clear a later highlight early).
+
+      **Caught by advisor before commit: the scroll+highlight must fire on
+      sheet DISMISSAL, not on open.** The first draft did the scroll +
+      3s-flash inside `onNewsSelect`, at the same moment the sheet opens.
+      `Modal.svelte` is a full-screen scrim overlay — the entire flash
+      lifecycle would play out **behind** it while the user is still reading
+      summary+diff+source (routinely >3s), so by the time they closed the
+      sheet the highlight had already expired unseen — "tile highlight," a
+      named half of this task's deliverable, would be silently dropped in the
+      actual usage path even though `svelte-check`/autofixer both passed.
+      Same class of bug as task 29's stacked-sticky regression: invisible to
+      any static check, only manifests at realistic runtime dwell time. Fixed
+      by moving the tab-switch/scroll/highlight into `onNewsClose` (the
+      sheet's `onClose`) so the user sees it the instant they dismiss the
+      sheet, not before.
+
+      **Known-thin rendering, not yet revisited:** the diff is rendered as a
+      raw `JSON.stringify` dump (e.g. the HECS note's `old_value`/`new_value`/
+      `bands` blob verbatim) rather than a friendlier before→after line,
+      because `diff` has no fixed schema today (`kb_compiler.py`'s
+      `parse_news_doc` parses whatever JSON follows `## Diff`) — inventing a
+      bespoke old/new-value UI would assume a shape no gate enforces. The
+      `{old_value, new_value}` shape is the only one that exists in practice
+      so far; worth a friendlier renderer if/when a second note's shape
+      confirms it's the norm, not a one-off.
+
+      Verified via `svelte-check` (0/0) and the Svelte MCP autofixer (no
+      issues) on every touched file; **not** walked through in a live browser
+      (same honest-gap reasoning as task 29 — full stack stand-up is
+      disproportionate for shell-only wiring with no new backend dependency).
+- [x] **Source link** (2026-07-07, via task 28). `NewsDetailSheet.svelte`
+      renders `sources[0].url` (first entry only — a note may carry more than
+      one corroborating source, but the sheet needs only the primary) as a
+      link — no new backend, `sources` was already on the GET response.
 - [ ] **Dismiss wiring.** On user dismissal, call
       `PATCH /api/engine/plan-cards/:id/news` with `{"news_slug": ...}`;
       optimistically remove from the local ticker rotation rather than

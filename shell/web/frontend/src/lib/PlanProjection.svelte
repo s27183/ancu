@@ -5,7 +5,7 @@
     // seeds from the GET snapshot, then merges live component_filled frames over the
     // SSE proxy. The zone→suburb gradient (per-suburb overlay) is deferred — this shows
     // the property-agnostic BASE components, identical across suburbs.
-    import { onMount } from 'svelte';
+    import { onMount, tick } from 'svelte';
     import { t } from '$lib/i18n';
     import { lang } from '$lib/stores/lang';
     import {
@@ -49,6 +49,7 @@
     import Chat from '$lib/Chat.svelte';
     import Modal from '$lib/Modal.svelte';
     import NewsTicker from '$lib/NewsTicker.svelte';
+    import NewsDetailSheet from '$lib/NewsDetailSheet.svelte';
 
     let { suburbName, suburbState, onplan }: {
         suburbName: string;
@@ -114,6 +115,11 @@
     // sticky offset tracks the ticker's real, variable height instead of a stale
     // hardcoded rem (see the .pp-sticky-top / .pp-subcontent markup below).
     let stickyTopHeight = $state(0);
+    // The note behind an open NewsDetailSheet (task 28), or null when none is open.
+    let selectedNews = $state<NewsNote | null>(null);
+    // component_names briefly flashed after the news sheet is dismissed (see
+    // onNewsClose) — cleared a few seconds later.
+    let highlightedComponents = $state<string[]>([]);
 
     let stream: PlanCardStream | null = null;
     // A generation token so a retry's async can't be clobbered by a stale in-flight one.
@@ -653,6 +659,42 @@
         news = res.kind === 'ok' ? res.news : [];
     }
 
+    // Tapping a ticker headline (task 28) just opens the sheet — the scroll/highlight is
+    // deferred to onNewsClose (below). Modal.svelte is a full-screen scrim overlay, so
+    // doing the flash on OPEN would play out entirely behind it and expire (3s) before a
+    // realistic reading of summary+diff+source finishes: the deliverable would be
+    // technically wired but invisible in the actual usage path (advisor caught this).
+    function onNewsSelect(note: NewsNote) {
+        selectedNews = note;
+    }
+
+    let highlightTimer: ReturnType<typeof setTimeout> | undefined;
+
+    // On dismissing the sheet: using this card's own blueprint_slug as the key into the
+    // note's affected_components map, switch to whichever lifecycle tab holds the first
+    // named component, scroll it into view, and flash-highlight every named component (a
+    // note may name more than one). No backend call — affected_components already rode
+    // the GET response (compile-time work, kb-news-feature.md "Resolved design
+    // questions"). clearTimeout before re-arming so a rapid re-tap's timer can't clear a
+    // LATER highlight early.
+    async function onNewsClose() {
+        const note = selectedNews;
+        selectedNews = null;
+        const targets = note?.affected_components?.[blueprintSlug] ?? [];
+        if (!targets.length) return;
+        highlightedComponents = targets;
+        const primary = targets[0];
+        const targetTab = uiTabs.find((tb) => tb.components.includes(primary));
+        if (targetTab && targetTab.tab_id !== sub) sub = targetTab.tab_id;
+        await tick();
+        document.querySelector(`[data-component="${CSS.escape(primary)}"]`)
+            ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        clearTimeout(highlightTimer);
+        highlightTimer = setTimeout(() => {
+            highlightedComponents = [];
+        }, 3000);
+    }
+
     async function load() {
         resetPreview();
         const myGen = ++gen;
@@ -962,10 +1004,11 @@
          Budget sub-rail (Tabs.svelte) — which stacks its own sticky rail just below
          this region — tracks the ticker's presence instead of a stale hand-picked rem
          (that hardcoded value predates the ticker and only happened to match subtabs
-         alone). Tapping a headline is a no-op until task 28 wires the detail sheet +
-         tile highlight. -->
+         alone). Tapping a headline opens the detail sheet; dismissing it scrolls to and
+         highlights the affected tile (task 28, onNewsSelect/onNewsClose above — deferred
+         to close so the flash isn't wasted behind the modal's scrim). -->
     <div class="pp-sticky-top" bind:clientHeight={stickyTopHeight}>
-        <NewsTicker {news} />
+        <NewsTicker {news} onSelect={onNewsSelect} />
 
         <!-- Sub-tabs: one per plan section + a Q&A tab — each section shows on its own,
              so the user never scrolls a long plan. Horizontally scrollable on narrow
@@ -990,6 +1033,10 @@
             >
         </div>
     </div>
+
+    {#if selectedNews}
+        <NewsDetailSheet note={selectedNews} onClose={onNewsClose} />
+    {/if}
 
     <!-- Cross-tab what-if indicator: the price/state cockpit lives in the Cash-calculator
          tab (the financial spine is where you reason about money), but a scenario re-renders
@@ -1281,6 +1328,7 @@
                         componentId={cid}
                         entry={viewComponents[cid]}
                         filling={running}
+                        highlighted={highlightedComponents.includes(cid)}
                     />
                     <!-- settlement_prep B affordance: once a contract is signed, attest the two
                          dates to activate the dated critical path. Investor + selected-property
@@ -1304,7 +1352,7 @@
                         </div>
                     {/if}
                 {:else if turnDone && !turnFailed}
-                    <section class="pp-card">
+                    <section class="pp-card" data-component={cid}>
                         <h3 class="pp-card-title">
                             {$t(`plan.c.${cid}` as 'plan.c.buyer_profile')}
                         </h3>
