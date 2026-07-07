@@ -175,8 +175,11 @@ kb_anchors(Slugs) ->
         end, Slugs).
 
 %% --- news accessors ----------------------------------------------------------
-%% A news entry: {kb_slug, affected_kb_slugs, effective_from, authored_date,
-%% summary_en, summary_vi, diff} (kb-update-runbook.md "authoring a news note").
+%% A news entry: {kb_slug, affected_kb_slugs, affected_components, effective_from,
+%% authored_date, summary_en, summary_vi, diff} (kb-update-runbook.md "authoring a
+%% news note"). affected_components ({blueprint_slug: [component_name, ...]}) is
+%% reverse-indexed at compile time from Component.anchors (kb-news-feature.md "Open
+%% design questions" #1) — read-only pass-through here, never re-derived at runtime.
 %% Never anchored by a blueprint. `maps:get(..., #{})` defaults so an older
 %% artifact predating this key reads as "no news", never a crash (the ui_tabs
 %% missing-key posture).

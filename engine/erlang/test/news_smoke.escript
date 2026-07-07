@@ -6,9 +6,11 @@
 %% applies at boot; a card's accumulated kb_versions (via a real
 %% fh_engine_kb:kb_anchors/1 shape) correctly matches the compiled
 %% kb.news.2026-07-hecs-thresholds-2026-27 note (whose affected_kb_slugs is
-%% [kb.hecs.thresholds]); the GET relevance filter; the PATCH dismiss round-trip
-%% (jsonb_set, the news_dismissed audit/SSE event); and fail-closed auth/tenant/
-%% method/field cases.
+%% [kb.hecs.thresholds]); the GET relevance filter; that GET's entry carries the
+%% compile-time affected_components reverse-index (compute_affected_components,
+%% kb-news-feature.md "Open design questions" #1 — the shell's component-target
+%% lookup); the PATCH dismiss round-trip (jsonb_set, the news_dismissed audit/SSE
+%% event); and fail-closed auth/tenant/method/field cases.
 %%
 %% SIDECAR-FREE: the card is seeded directly in PG, and its kb_versions
 %% provenance is seeded via a direct append_audit/6 call (no turn → no Python) —
@@ -76,6 +78,10 @@ main(_) ->
     expect(maps:get(<<"kb_slug">>, Item) =:= ?KB_SLUG, "note carries its kb_slug"),
     expect(maps:is_key(<<"summary_en">>, Item) andalso maps:is_key(<<"summary_vi">>, Item),
            "note carries bilingual summaries"),
+    AffectedComponents = maps:get(<<"affected_components">>, Item, #{}),
+    BpComponents = maps:get(<<"blueprints.fhb-domestic-au">>, AffectedComponents, []),
+    expect(lists:member(<<"buyer_profile">>, BpComponents),
+           "affected_components names buyer_profile under blueprints.fhb-domestic-au"),
 
     %% === 4. PATCH dismiss → 200, dismissed_news reflects it ===
     {200, R4} = req(patch, Url, [Auth], body(?NEWS_SLUG)),

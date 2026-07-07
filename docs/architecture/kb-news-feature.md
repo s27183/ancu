@@ -1,7 +1,9 @@
 # KB news feature — surfacing KB changes to the buyer they affect
 
 **Status:** backend built + live-verified 2026-07-07 (`news_smoke.escript`, all
-assertions pass against Docker PG). Shell rendering not started.
+assertions pass against Docker PG). Compiler now reverse-indexes each note's
+`affected_components` (open question #1 resolved, 2026-07-07 — see below).
+Shell rendering not started.
 
 ## The problem
 
@@ -32,21 +34,35 @@ new detection mechanism, no scraping, no LLM diffing step. See
   `plan_cards.dismissed_news_jsonb`, the same card-user-set-layer pattern as
   `checklist_status_jsonb` (005). Store functions: `card_kb_slugs/1`,
   `get_news_status/2`, `dismiss_news/2`.
+- **Component-target mapping** — `kb_compiler.py`: `compute_affected_components`
+  reverse-indexes each note's `affected_kb_slugs` against every blueprint's
+  already-parsed `Component.anchors`, emitting `affected_components:
+  {blueprint_slug: [component_name, ...]}` into `artifact["news"][slug]`
+  (computed over every blueprint, not just in-scope, so a dormant B/D-mode
+  match is ready the instant that mode activates). GATE 11 reports an INFO
+  (not a fail) if a note's `affected_kb_slugs` match no component anchor
+  anywhere — a real gap to notice, not a build blocker. `fh_engine_kb`/
+  `fh_engine_h_news` pass the field straight through — no runtime change
+  needed, it rides the existing `Entry` map. This was open design question #1;
+  now resolved.
 - **Proof** — `engine/erlang/test/news_smoke.escript`: migration applies at
   boot, a fill's real `kb_versions` provenance correctly matches the compiled
-  HECS note, GET/PATCH round-trip, the `news_dismissed` audit/SSE event fires,
-  and the fail-closed cases (missing field, no auth, wrong tenant, wrong
-  method) all hold — against real Docker Postgres, not a mock.
+  HECS note, GET/PATCH round-trip, `affected_components` names
+  `buyer_profile` under `blueprints.fhb-domestic-au` in the GET response, the
+  `news_dismissed` audit/SSE event fires, and the fail-closed cases (missing
+  field, no auth, wrong tenant, wrong method) all hold — against real Docker
+  Postgres, not a mock.
 
 ## What's left (shell) — detailed checklist
 
 - [ ] **Fetch layer.** Call `GET /api/engine/plan-cards/:id/news` when the plan
       projection loads (and/or on SSE reconnect — see the push-vs-pull open
       question below).
-- [ ] **Placement.** Decide how a returned news item maps to a specific
-      plan-card component to badge (see "Open question: component-target
-      mapping" below — this likely needs a small compiler addition before the
-      shell can do this cleanly).
+- [ ] **Placement.** Each GET item now carries `affected_components:
+      {blueprint_slug: [component_name, ...]}` (compiler-built, see below) —
+      the shell reads the current card's `blueprint_slug`, looks up its
+      component list, and badges each named component tile. No further
+      backend work; this is now a pure shell lookup.
 - [ ] **Badge component (Svelte).** Small, dismissible indicator inline in the
       plan projection — not a separate feed screen (per the map-first-home /
       plan-card-as-central-artifact constraints). Expandable on tap to show
@@ -66,21 +82,26 @@ new detection mechanism, no scraping, no LLM diffing step. See
       other plan-card UI on small viewports (the original ask this feature
       grew from).
 
+## Resolved design questions
+
+**Component-target mapping (resolved 2026-07-07).** A news note's
+`affected_kb_slugs` names a *KB doc*, not a *blueprint component* — the shell
+needs the latter to know which tile to badge. `kb_compiler.py`'s
+`compute_affected_components` now reverse-indexes each note's
+`affected_kb_slugs` against every blueprint's already-parsed
+`Component.anchors` (computed once at compile time, over every blueprint —
+not just in-scope), emitting `affected_components: {blueprint_slug:
+[component_name, ...]}` into `artifact["news"][slug]`. A KB slug anchored by
+more than one component (`multi-fill`, an already-known shape) lists every
+matching name. GATE 11 reports an INFO (not a fail) when a note's
+`affected_kb_slugs` match no component anywhere, so an unreachable note is
+noticed at compile time, not silently shipped with nothing to badge.
+`fh_engine_kb:news_for_slugs/1` and `fh_engine_h_news` pass the field straight
+through (no runtime change) — verified in `news_smoke.escript`.
+
 ## Open design questions (real gaps, not yet resolved)
 
-**1. Component-target mapping.** A news note's `affected_kb_slugs` names a
-*KB doc*, not a *blueprint component* — but the shell needs to know which
-component tile to badge. A KB slug can be anchored by more than one component
-(`multi-fill` is already a known shape, `kb_compiler.py`'s reg.leaves), so this
-isn't a 1:1 lookup the shell can hardcode. The clean fix is a **small compiler
-addition**: `kb_compiler.py` already parses each component's `**KB anchors:**`
-during blueprint parsing (`Component.anchors`) — GATE 11 (or `build_artifact`)
-could reverse-index this into each news item's `affected_components:
-{blueprint_slug: [component_name, ...]}`, computed once at compile time from
-data already in hand. Not built — flagged here rather than having the shell
-improvise a client-side lookup against the raw KB anchors.
-
-**2. Push vs pull.** The engine primitive is pull-only (the shell calls GET).
+**1. Push vs pull.** The engine primitive is pull-only (the shell calls GET).
 There is no SSE push for "a news note just became relevant" the way
 `component_filled`/`checklist_status_changed` are pushed — because a news note
 is authored **offline, at deploy time**, not during a live turn. A card open
@@ -89,7 +110,7 @@ in a session when a deploy lands won't see the new note until the next GET
 but is a deliberate limitation, not an oversight — noting it so it isn't
 rediscovered as a "bug."
 
-**3. Interaction on tap — do NOT wire to "refresh my plan" yet.** It's tempting
+**2. Interaction on tap — do NOT wire to "refresh my plan" yet.** It's tempting
 to make tapping a news badge trigger a real recompute via
 [`plan-card-refresh.md`](plan-card-refresh.md). That mechanism is **dev-only
 today** (`ENGINE_DEV_PROVISION`-gated, production policy deferred) and its

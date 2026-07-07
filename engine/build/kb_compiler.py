@@ -747,6 +747,24 @@ def kb_exists(slug):
     return (ROOT / "docs" / (slug.replace(".", "/") + ".md")).is_file()
 
 
+def compute_affected_components(affected_kb_slugs, blueprints):
+    """A news note's `affected_kb_slugs` (KB docs) -> `{blueprint_slug: [component_name,
+    ...]}` — the reverse index the shell needs to know which component tile to badge
+    (kb-news-feature.md "Open design questions" #1). Computed from data already parsed
+    per blueprint (`Component.anchors`), over EVERY blueprint (not just the in-scope
+    set) — a B/D-mode component can anchor the same KB doc as an in-scope one, and the
+    news feature should surface that too once that mode activates, no recompute needed.
+    A slug matched by more than one component within a blueprint (multi-fill, already a
+    known shape) lists every matching component name, sorted."""
+    affected = set(affected_kb_slugs)
+    out = {}
+    for _stem, (bslug, comps, _producer, _reads, _ui_tabs) in blueprints.items():
+        matched = sorted({c.name for c in comps if affected & set(c.anchors)})
+        if matched:
+            out[bslug] = matched
+    return out
+
+
 def semantic_gates(stem, comps, kb_docs, fails, info):
     """Materialize ONE blueprint's registry and run its SEMANTIC gates (architecture
     §11.9 "the registry is per-blueprint"): GATE 6 reference-integrity + GATE 7 coverage
@@ -951,6 +969,11 @@ def run(emit=False):
         err = check_copy_template({"en": doc.get("summary_en"), "vi": doc.get("summary_vi")})
         if err:
             fails.append(f"[news] {slug}: bilingual summary: {err}")
+        if doc.get("affected_kb_slugs"):
+            affected_components = compute_affected_components(doc["affected_kb_slugs"], blueprints)
+            if not affected_components:
+                info.append(f"[news] {slug}: affected_kb_slugs match no blueprint component "
+                            f"anchor — the shell will have nothing to badge")
 
     # ---- GATE 8: bilingual copy-template well-formedness (all docs) -------- #
     # Every `copy` template is localized in every LOCALES locale (outcome-conformance.md
@@ -1108,6 +1131,12 @@ def build_artifact(blueprints, registries, kb_docs, news_docs):
         slug: {
             "kb_slug": d["kb_slug"],
             "affected_kb_slugs": d["affected_kb_slugs"],
+            # Reverse-indexed at compile time from data already in hand (Component.anchors)
+            # — the shell's placement lookup (kb-news-feature.md "Open design questions" #1):
+            # which component tile, on which blueprint, to badge. Computed over every
+            # blueprint (not just in-scope), so a dormant B/D-mode match is ready the
+            # instant that mode activates.
+            "affected_components": compute_affected_components(d["affected_kb_slugs"], blueprints),
             "effective_from": d["effective_from"],
             "authored_date": d["authored_date"],
             "summary_en": d["summary_en"],
