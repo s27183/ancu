@@ -9,8 +9,10 @@
 %% [kb.hecs.thresholds]); the GET relevance filter; that GET's entry carries the
 %% compile-time affected_components reverse-index (compute_affected_components,
 %% kb-news-feature.md "Open design questions" #1 — the shell's component-target
-%% lookup); the PATCH dismiss round-trip (jsonb_set, the news_dismissed audit/SSE
-%% event); and fail-closed auth/tenant/method/field cases.
+%% lookup) AND a non-empty sources list (GATE 11, kb-update-runbook.md
+%% "authoring a news note" — the shell's source-link render); the PATCH dismiss
+%% round-trip (jsonb_set, the news_dismissed audit/SSE event); and fail-closed
+%% auth/tenant/method/field cases.
 %%
 %% SIDECAR-FREE: the card is seeded directly in PG, and its kb_versions
 %% provenance is seeded via a direct append_audit/6 call (no turn → no Python) —
@@ -82,6 +84,9 @@ main(_) ->
     BpComponents = maps:get(<<"blueprints.fhb-domestic-au">>, AffectedComponents, []),
     expect(lists:member(<<"buyer_profile">>, BpComponents),
            "affected_components names buyer_profile under blueprints.fhb-domestic-au"),
+    Sources = maps:get(<<"sources">>, Item, []),
+    expect(length(Sources) > 0 andalso maps:is_key(<<"url">>, hd(Sources)),
+           "note carries a non-empty sources list with a url"),
 
     %% === 4. PATCH dismiss → 200, dismissed_news reflects it ===
     {200, R4} = req(patch, Url, [Auth], body(?NEWS_SLUG)),

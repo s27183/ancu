@@ -5,6 +5,13 @@ affected_kb_slugs:
   - kb.hecs.thresholds
 effective_from: 2026-07-01
 authored_date: 2026-07-06
+sources:
+  - url: https://www.ato.gov.au/tax-rates-and-codes/study-and-training-support-loans-rates-and-repayment-thresholds
+    note: "PRIMARY (ATO) — same corroboration caveat as kb.hecs.thresholds's own citation: 403 Forbidden to WebFetch in-sandbox 2026-07-06; figures corroborated to the digit against the two secondary sources below."
+  - url: https://www.scalesuite.com.au/resources/understanding-stsl-tax-a-comprehensive-guide
+    retrieved: 2026-07-06
+  - url: https://www.wagecalculator.com.au/guides/hecs-help-repayment
+    retrieved: 2026-07-06
 ---
 
 ## Summary (EN)
@@ -42,10 +49,13 @@ năng lực vay — có thể hiện đã cao hơn một chút so với con số
 
 Notes:
 
-- **No independent `sources:` block.** This note re-states a fact already
-  verified and cited in `kb_slug` (`kb.hecs.thresholds`'s own `sources:` is the
-  citation of record) — duplicating the citation here would only invite it to
-  drift out of sync with the fact doc's next re-verify.
+- **`sources:` pins this specific diff, not a live citation.** It's the same
+  primary + corroborating URLs as `kb_slug` (`kb.hecs.thresholds`)'s own
+  `sources:` at the moment this note was authored — copied at zero extra
+  gathering cost since the author already had them open for Phase 1. This does
+  NOT drift when the fact doc is next re-verified: the note is immutable, so
+  it stays a correct historical record of what was checked for *this* change,
+  never a live pointer that needs to track the doc's current state.
 - **`affected_kb_slugs` is the relevance-filter key.** The engine intersects
   this list against a plan card's per-fill `kb_versions` provenance
   (`plan-card-refresh.md`) — already-recorded data, no new lookup mechanism —

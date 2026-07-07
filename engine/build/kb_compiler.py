@@ -595,11 +595,15 @@ def parse_news_doc(path):
     """Parse a `docs/kb/news/*.md` note (kb-update-runbook.md "authoring a news
     note") — a dated, IMMUTABLE announcement of a KB fact change, distinct from a
     living fact doc (kb_doc-authoring.md). Frontmatter: slug / kb_slug /
-    affected_kb_slugs / effective_from / authored_date. Body: bilingual
+    affected_kb_slugs / effective_from / authored_date / sources. Body: bilingual
     `## Summary (EN|VI)` + a `## Diff` fenced jsonc block (old_value/new_value).
-    No `sources:` of its own — `kb_slug` points back to the fact doc whose own
-    `sources:` stays the citation of record; duplicating it here would only
-    invite drift the next time that doc is re-verified."""
+    `sources:` cites what the author actually had open when writing THIS diff
+    (reuses parse_sources_block, the same fact-doc shape) — it does not
+    duplicate kb_slug's fact-doc sources going forward, it pins the citation for
+    a specific past event. A news note is immutable, so this never drifts the
+    way a live doc's citation could (kb-news-feature.md "Resolved design
+    questions").
+    """
     text = path.read_text()
     slug_m = re.search(r"^slug:\s*(\S+)", text, re.M)
     kb_slug_m = re.search(r"^kb_slug:\s*(\S+)", text, re.M)
@@ -619,6 +623,7 @@ def parse_news_doc(path):
         "affected_kb_slugs": parse_frontmatter_list(text, "affected_kb_slugs"),
         "effective_from": eff_m.group(1) if eff_m else None,
         "authored_date": auth_m.group(1) if auth_m else None,
+        "sources": parse_sources_block(text),
         "summary_en": markdown_section(text, "Summary (EN)"),
         "summary_vi": markdown_section(text, "Summary (VI)"),
         "diff": diff,
@@ -947,9 +952,13 @@ def run(emit=False):
     # ---- GATE 11: news-note well-formedness (docs/kb/news/*.md) ------------ #
     # kb-update-runbook.md "authoring a news note": kb_slug + every affected_kb_slugs
     # entry must resolve to a real KB doc (the relevance-filter key has to point at
-    # something real); effective_from/authored_date required; the diff block must be
-    # present and parse; the EN/VI summary must be bilingual-well-formed (reusing the
-    # same check as a KB doc's `copy` templates — same {locale: text} shape).
+    # something real); effective_from/authored_date required; sources required
+    # (FAIL-CLOSED, same discipline as GATE 10 — a news note is a user-facing claim
+    # and deserves the same citation bar as a fact doc; not exempt the way
+    # kb.copy.*/kb.bilingual.*/kb.journey.* are, since every news note asserts a
+    # specific dated fact of its own); the diff block must be present and parse;
+    # the EN/VI summary must be bilingual-well-formed (reusing the same check as a
+    # KB doc's `copy` templates — same {locale: text} shape).
     for slug, doc in sorted(news_docs.items()):
         if not doc.get("kb_slug") or not kb_exists(doc["kb_slug"]):
             fails.append(f"[news] {slug}: kb_slug {doc.get('kb_slug')!r} does not resolve to a KB doc")
@@ -963,6 +972,9 @@ def run(emit=False):
             fails.append(f"[news] {slug}: missing effective_from")
         if not doc.get("authored_date"):
             fails.append(f"[news] {slug}: missing authored_date")
+        if not doc.get("sources"):
+            fails.append(f"[news] {slug}: no `sources:` citation (kb-update-runbook.md "
+                        f"\"authoring a news note\")")
         if doc.get("diff") is None:
             suffix = f" ({doc['diff_error']})" if doc.get("diff_error") else ""
             fails.append(f"[news] {slug}: missing or unparsed '## Diff' jsonc block{suffix}")
@@ -1124,9 +1136,12 @@ def build_artifact(blueprints, registries, kb_docs, news_docs):
         }
         for slug, d in kb_docs.items()
     }
-    # A news note is NEVER anchored by a blueprint and carries no `sources:` of its
-    # own (kb_slug's fact-doc sources are the record) — a parallel, simpler array,
-    # not folded into `kb` (kb-update-runbook.md "authoring a news note").
+    # A news note is NEVER anchored by a blueprint — a parallel, simpler array, not
+    # folded into `kb` (kb-update-runbook.md "authoring a news note"). It DOES carry
+    # its own `sources:` (required, GATE 11) — pinned to what the author actually
+    # checked for THIS diff, which never drifts because the note is immutable; this
+    # is distinct from a fact doc's `sources:`, which tracks the doc's own next
+    # re-verify.
     news = {
         slug: {
             "kb_slug": d["kb_slug"],
@@ -1139,6 +1154,7 @@ def build_artifact(blueprints, registries, kb_docs, news_docs):
             "affected_components": compute_affected_components(d["affected_kb_slugs"], blueprints),
             "effective_from": d["effective_from"],
             "authored_date": d["authored_date"],
+            "sources": d.get("sources") or [],
             "summary_en": d["summary_en"],
             "summary_vi": d["summary_vi"],
             "diff": d["diff"],

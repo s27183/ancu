@@ -2,8 +2,8 @@
 
 **Status:** backend built + live-verified 2026-07-07 (`news_smoke.escript`, all
 assertions pass against Docker PG). Compiler now reverse-indexes each note's
-`affected_components` (open question #1 resolved, 2026-07-07 — see below).
-Shell rendering not started.
+`affected_components`, and every note now carries a `sources:` citation
+(both resolved 2026-07-07 — see below). Shell rendering not started.
 
 ## The problem
 
@@ -21,7 +21,8 @@ new detection mechanism, no scraping, no LLM diffing step. See
 - **Compiler** — `docs/kb/news/*.md` parsed as a distinct artifact class
   (`engine/build/kb_compiler.py`: `parse_news_doc`, `parse_frontmatter_list`,
   `markdown_section`), GATE 11 (`kb_slug`/`affected_kb_slugs` resolve,
-  bilingual summary, diff block present), compiled into `artifact["news"]`
+  bilingual summary, diff block present, `sources:` non-empty — see below),
+  compiled into `artifact["news"]`
   (never mixed into `artifact["kb"]` — no blueprint ever anchors a news slug).
   One real note landed as the worked example:
   `docs/kb/news/2026-07-hecs-thresholds-2026-27.md`.
@@ -45,42 +46,65 @@ new detection mechanism, no scraping, no LLM diffing step. See
   `fh_engine_h_news` pass the field straight through — no runtime change
   needed, it rides the existing `Entry` map. This was open design question #1;
   now resolved.
+- **Source citation** — `kb_compiler.py`: news notes now carry `sources:`
+  frontmatter (same `url`/`retrieved`/`path` shape as a KB fact doc, reusing
+  `parse_sources_block`), required and FAIL-CLOSED at GATE 11 (same discipline
+  as GATE 10 for fact docs — a news note is a user-facing claim, no exemption).
+  This is **not** the fact doc's own `sources:` duplicated forward — it pins
+  what the author actually had open when writing *this* diff. That never
+  drifts, because a news note is immutable (unlike a fact doc's `sources:`,
+  which tracks that doc's own next re-verify). Zero extra gathering cost: the
+  Phase-1 author already has the primary open at authoring time
+  (kb-update-runbook.md "Authoring a news note"). Emitted into
+  `artifact["news"][slug]["sources"]`; `fh_engine_kb`/`fh_engine_h_news` pass
+  it straight through, no runtime change. This was open design question #2
+  (below the fold of #1's original numbering); now resolved.
 - **Proof** — `engine/erlang/test/news_smoke.escript`: migration applies at
   boot, a fill's real `kb_versions` provenance correctly matches the compiled
   HECS note, GET/PATCH round-trip, `affected_components` names
   `buyer_profile` under `blueprints.fhb-domestic-au` in the GET response, the
-  `news_dismissed` audit/SSE event fires, and the fail-closed cases (missing
-  field, no auth, wrong tenant, wrong method) all hold — against real Docker
-  Postgres, not a mock.
+  note carries a non-empty `sources` list, the `news_dismissed` audit/SSE
+  event fires, and the fail-closed cases (missing field, no auth, wrong
+  tenant, wrong method) all hold — against real Docker Postgres, not a mock.
 
 ## What's left (shell) — detailed checklist
+
+UX direction settled 2026-07-07 (see "Resolved design questions" below): a
+**sticky auto-sliding ticker strip** (top or bottom of the plan projection),
+not per-tile badges — headlines wrap to the available width; the user can
+advance/reverse by swipe or arrow buttons; tapping a headline opens a
+popup sheet/modal with the full bilingual summary + diff + source link, AND
+scrolls to/highlights the `affected_components` tile.
 
 - [ ] **Fetch layer.** Call `GET /api/engine/plan-cards/:id/news` when the plan
       projection loads (and/or on SSE reconnect — see the push-vs-pull open
       question below).
-- [ ] **Placement.** Each GET item now carries `affected_components:
-      {blueprint_slug: [component_name, ...]}` (compiler-built, see below) —
-      the shell reads the current card's `blueprint_slug`, looks up its
-      component list, and badges each named component tile. No further
-      backend work; this is now a pure shell lookup.
-- [ ] **Badge component (Svelte).** Small, dismissible indicator inline in the
-      plan projection — not a separate feed screen (per the map-first-home /
-      plan-card-as-central-artifact constraints). Expandable on tap to show
-      the `summary_en`/`summary_vi` text.
+- [ ] **Ticker component (Svelte).** Sticky auto-sliding strip, one headline
+      visible at a time, swipe/arrow-button navigation; not a separate feed
+      screen (per the map-first-home / plan-card-as-central-artifact
+      constraints — the ticker is chrome, not a competing primary surface).
+- [ ] **Tap → detail sheet + tile highlight.** Tapping a headline opens a
+      popup sheet/modal (summary + diff + source link) and, using that note's
+      `affected_components: {blueprint_slug: [component_name, ...]}` for the
+      card's own `blueprint_slug`, scrolls to and highlights the matching
+      plan tile. No further backend work; this is a pure shell lookup over
+      an already-compiler-built field.
 - [ ] **Bilingual rendering.** Pick `summary_en` vs `summary_vi` by the active
       locale, reusing the existing i18n picker pattern (no new mechanism).
+- [ ] **Source link.** Render `sources[0].url` (first entry; a note may carry
+      more than one corroborating source, but the sheet needs only the
+      primary) as a link in the detail sheet — no new backend, `sources` is
+      already on the GET response.
 - [ ] **Dismiss wiring.** On user dismissal, call
       `PATCH /api/engine/plan-cards/:id/news` with `{"news_slug": ...}`;
-      optimistically remove from the local view rather than waiting on a
-      round-trip.
-- [ ] **Multi-item behavior.** Decide the stacking UI when more than one
-      relevant, non-dismissed note attaches to the same component (a count
-      badge? most-recent-only? a small list?) — not decided.
-- [ ] **Empty state.** No relevant news → no UI at all (already the API's
-      default; the shell just needs to not render a badge for `[]`).
-- [ ] **Mobile layout pass.** Confirm the badge doesn't compete with or cover
-      other plan-card UI on small viewports (the original ask this feature
-      grew from).
+      optimistically remove from the local ticker rotation rather than
+      waiting on a round-trip.
+- [ ] **Empty state.** No relevant news → no ticker at all (already the API's
+      default; the shell just needs to not render the strip for `[]`).
+- [ ] **Mobile layout pass.** A persistent sticky strip claims vertical space
+      on every viewport, more than a per-tile badge would — confirm it
+      doesn't compete with or cover other plan-card UI on small viewports
+      (the original ask this feature grew from).
 
 ## Resolved design questions
 
@@ -99,6 +123,32 @@ noticed at compile time, not silently shipped with nothing to badge.
 `fh_engine_kb:news_for_slugs/1` and `fh_engine_h_news` pass the field straight
 through (no runtime change) — verified in `news_smoke.escript`.
 
+**Source citation (resolved 2026-07-07).** A news note originally carried no
+`sources:` of its own — the reasoning was that `kb_slug`'s fact-doc `sources:`
+is the citation of record, and duplicating it would drift out of sync at that
+doc's next re-verify. That reasoning didn't hold: a news note is **immutable**,
+so pinning it to what was actually checked for *this* diff is a historical
+citation, not a live pointer — it can't drift because it never gets
+re-evaluated against the fact doc's current state. `kb_compiler.py`'s
+`parse_news_doc` now parses `sources:` (reusing `parse_sources_block`, the
+same shape as a fact doc), GATE 11 fails the build if it's empty (same
+fail-closed bar as GATE 10, no exemption — a news note is as user-facing as a
+fact doc), and it's emitted into `artifact["news"][slug]["sources"]`. Zero new
+gathering cost: the Phase-1 author already has the primary source open when
+writing the note. The one existing note was backfilled with the same
+ATO+corroborating URLs already cited by `kb.hecs.thresholds.md`.
+
+**UX shape — ticker, not per-tile badges (resolved 2026-07-07).** Considered
+and rejected: small dismissible badges inline per affected component tile.
+Chosen instead: a single sticky auto-sliding ticker strip (top or bottom of
+the plan projection) cycling through all relevant, non-dismissed notes,
+swipe/arrow-navigable, tapping opens a detail sheet. This also resolves what
+was previously an open "multi-item behavior" question (the carousel *is* the
+answer to more-than-one-relevant-note). The `affected_components` mapping
+isn't made redundant by this — it's repurposed from "which tile gets a badge"
+to "which tile does tapping this headline scroll to and highlight," so the
+compile-time work still does real work at read time.
+
 ## Open design questions (real gaps, not yet resolved)
 
 **1. Push vs pull.** The engine primitive is pull-only (the shell calls GET).
@@ -111,13 +161,13 @@ but is a deliberate limitation, not an oversight — noting it so it isn't
 rediscovered as a "bug."
 
 **2. Interaction on tap — do NOT wire to "refresh my plan" yet.** It's tempting
-to make tapping a news badge trigger a real recompute via
+to make tapping a ticker headline trigger a real recompute via
 [`plan-card-refresh.md`](plan-card-refresh.md). That mechanism is **dev-only
 today** (`ENGINE_DEV_PROVISION`-gated, production policy deferred) and its
 resolver-only sweep explicitly skips the agentic `mortgage_finance` leaf. Until
-that mechanism has a real production trigger, the badge should only show the
-diff/explanation text — never a "refresh now" action a production user could
-click.
+that mechanism has a real production trigger, the detail sheet should only show
+the diff/explanation text + source link and the tile scroll/highlight — never
+a "refresh now" action a production user could click.
 
 ## Related
 

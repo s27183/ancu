@@ -241,6 +241,13 @@ effective_from: 2026-07-01          # when the underlying fact takes effect
 authored_date: 2026-07-06           # when this note was written — a news note
                                     # is IMMUTABLE once authored; a later change
                                     # gets a NEW note, this one is never edited
+sources:                            # what you had open to write THIS diff — same
+  - url: https://example.gov.au/... # shape as a fact doc's sources:, zero extra
+    retrieved: 2026-07-06           # gathering cost (you already opened it for
+                                    # Phase 1). Pins a historical citation for this
+                                    # specific change; never drifts, because the
+                                    # note is immutable (unlike a fact doc's sources:,
+                                    # which tracks that doc's own next re-verify).
 ---
 
 ## Summary (EN)
@@ -256,12 +263,15 @@ Same content in Vietnamese — bilingual is required, not optional (constraint #
 ```
 
 GATE 11 (`kb_compiler.py`) fail-closes on: `kb_slug` and every `affected_kb_slugs`
-entry resolving to a real KB doc, `effective_from`/`authored_date` present, the
-`## Diff` block present and parseable, and the EN/VI summary bilingual-well-formed
-(the same check as a KB doc's `copy` templates). A news note is **never** anchored
-by a blueprint and carries no `sources:` of its own — it is parsed into its own
-artifact array (`artifact["news"]`), never mixed into `kb`, so it never enters
-GATE 2/6/7/10 or a blueprint's registry.
+entry resolving to a real KB doc, `effective_from`/`authored_date` present,
+`sources:` non-empty (same fail-closed discipline as GATE 10 — a news note is a
+user-facing claim and gets the same citation bar as a fact doc, no exemption),
+the `## Diff` block present and parseable, and the EN/VI summary
+bilingual-well-formed (the same check as a KB doc's `copy` templates). A news
+note is **never** anchored by a blueprint; it is parsed into its own artifact
+array (`artifact["news"]`), never mixed into `kb`, so it never enters GATE 2/6/7
+or a blueprint's registry (GATE 10 itself doesn't apply — GATE 11's own
+`sources:` check is the news-note-scoped equivalent).
 
 **Relevance is a lookup, not new machinery.** Each fill already records which KB
 slugs it consulted (`kb_versions`, `plan-card-refresh.md`) — the engine

@@ -176,13 +176,16 @@ kb_anchors(Slugs) ->
 
 %% --- news accessors ----------------------------------------------------------
 %% A news entry: {kb_slug, affected_kb_slugs, affected_components, effective_from,
-%% authored_date, summary_en, summary_vi, diff} (kb-update-runbook.md "authoring a
-%% news note"). affected_components ({blueprint_slug: [component_name, ...]}) is
-%% reverse-indexed at compile time from Component.anchors (kb-news-feature.md "Open
-%% design questions" #1) — read-only pass-through here, never re-derived at runtime.
-%% Never anchored by a blueprint. `maps:get(..., #{})` defaults so an older
-%% artifact predating this key reads as "no news", never a crash (the ui_tabs
-%% missing-key posture).
+%% authored_date, sources, summary_en, summary_vi, diff} (kb-update-runbook.md
+%% "authoring a news note"). affected_components ({blueprint_slug: [component_name,
+%% ...]}) is reverse-indexed at compile time from Component.anchors
+%% (kb-news-feature.md "Resolved design questions") — read-only pass-through here,
+%% never re-derived at runtime. `sources` (GATE 11, fail-closed) pins the citation
+%% the author had open for this specific dated diff — distinct from a fact doc's
+%% own `sources:`, which tracks that doc's next re-verify; a news note is
+%% immutable so its sources never go stale. Never anchored by a blueprint.
+%% `maps:get(..., #{})` defaults so an older artifact predating this key reads as
+%% "no news", never a crash (the ui_tabs missing-key posture).
 
 %% News items relevant to a set of KB slugs a card has actually consulted (its
 %% accumulated kb_versions across fills, plan-card-refresh.md) — the relevance
