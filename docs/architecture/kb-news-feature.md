@@ -4,12 +4,13 @@
 assertions pass against Docker PG). Compiler now reverse-indexes each note's
 `affected_components`, and every note now carries a `sources:` citation
 (both resolved 2026-07-07 — see below). Shell: fetch (27), ticker (29),
-tap → detail sheet + tile highlight (28), and dismiss wiring (31) all built
-2026-07-07 (svelte-check 0/0 + autofixer clean each time; no live browser
-walkthrough — see each task's note). Task 28's `NewsDetailSheet.svelte` is the
-second consumer that closes both 30 (bilingual pick) and 32 (source link) —
-see their entries. Tasks 33, 34 not started (33's default is already true,
-not yet closed as its own line item).
+tap → detail sheet + tile highlight (28), dismiss wiring (31), and empty
+state (33, confirmed with no code change) all closed 2026-07-07 (svelte-check
+0/0 + autofixer clean each time; no live browser walkthrough — see each
+task's note). Task 28's `NewsDetailSheet.svelte` is the second consumer that
+closes both 30 (bilingual pick) and 32 (source link) — see their entries.
+Task 34 (mobile layout pass) remains open — it needs a live/visual check,
+not just static verification.
 
 ## The problem
 
@@ -223,8 +224,16 @@ scrolls to/highlights the `affected_components` tile.
       Verified via `svelte-check` (0/0) and the Svelte MCP autofixer (clean)
       after both the initial implementation and the advisor-caught fix; no
       live browser walkthrough (same honest-gap reasoning as tasks 28/29).
-- [ ] **Empty state.** No relevant news → no ticker at all (already the API's
-      default; the shell just needs to not render the strip for `[]`).
+- [x] **Empty state (confirmed 2026-07-07, no code change).** Verified rather
+      than built: `NewsTicker.svelte`'s `{#if news.length > 0}` guard (task 29)
+      already suppresses the entire strip for `[]`, and `.pp-sticky-top`
+      (`app.css`) carries no margin/padding of its own — it's pure
+      `position/z-index/background`, so with the ticker rendering nothing the
+      container collapses to just the sub-tab rail's height. `stickyTopHeight`
+      (`bind:clientHeight` on `.pp-sticky-top`, feeding `--tabrail-top`) tracks
+      that collapse automatically, so the Budget tab's nested sub-rail doesn't
+      leave a gap either. No dead space, no separate empty-state branch was
+      ever needed.
 - [ ] **Mobile layout pass.** A persistent sticky strip claims vertical space
       on every viewport, more than a per-tile badge would — confirm it
       doesn't compete with or cover other plan-card UI on small viewports
