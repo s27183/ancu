@@ -222,6 +222,54 @@ the LLM's reach entirely (resolver-filled from the KB rule). KB *estimates*
 (ranges) are surfaced as ranges. Don't let a verified figure regress into prose
 the agent paraphrases.
 
+**Authoring a news note (optional, when a change is user-relevant).** Whoever
+runs Phase 1 already opens the primary, compares it to what the doc said, and
+writes the new value — the diff is known at the moment it's made, no separate
+detection mechanism needed. When that diff is the kind a buyer would want
+surfaced (a threshold/cap/rate a real plan depends on, not a wording tidy-up),
+author a companion file under `docs/kb/news/<yyyy-mm>-<short-slug>.md`:
+
+```yaml
+---
+slug: kb.news.2026-07-hecs-thresholds-2026-27
+kb_slug: kb.hecs.thresholds        # the fact doc this note is about — ITS
+                                    # sources: stays the citation of record;
+                                    # never duplicate a citation here
+affected_kb_slugs:                  # the relevance-filter key (usually == kb_slug;
+  - kb.hecs.thresholds              # can span >1 doc if one change ripples)
+effective_from: 2026-07-01          # when the underlying fact takes effect
+authored_date: 2026-07-06           # when this note was written — a news note
+                                    # is IMMUTABLE once authored; a later change
+                                    # gets a NEW note, this one is never edited
+---
+
+## Summary (EN)
+Plain-language, one or two sentences — what changed and why a buyer might care.
+
+## Summary (VI)
+Same content in Vietnamese — bilingual is required, not optional (constraint #9).
+
+## Diff
+​```jsonc
+{ "old_value": { ... }, "new_value": { ... } }
+​```
+```
+
+GATE 11 (`kb_compiler.py`) fail-closes on: `kb_slug` and every `affected_kb_slugs`
+entry resolving to a real KB doc, `effective_from`/`authored_date` present, the
+`## Diff` block present and parseable, and the EN/VI summary bilingual-well-formed
+(the same check as a KB doc's `copy` templates). A news note is **never** anchored
+by a blueprint and carries no `sources:` of its own — it is parsed into its own
+artifact array (`artifact["news"]`), never mixed into `kb`, so it never enters
+GATE 2/6/7/10 or a blueprint's registry.
+
+**Relevance is a lookup, not new machinery.** Each fill already records which KB
+slugs it consulted (`kb_versions`, `plan-card-refresh.md`) — the engine
+(`fh_engine_kb:news_for_slugs/1`) intersects that against `affected_kb_slugs` to
+decide which cards see a given note. Full mechanism, engine primitive
+(`GET`/`PATCH /api/engine/plan-cards/:id/news`), and the shell-side build status:
+[kb-news-feature.md](kb-news-feature.md).
+
 ### Phase 2 — Co-update the bilingual copy (when a figure or note changed)
 
 *Applies when a ruled component's facts changed.* The VI/EN copy templates live in

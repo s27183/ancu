@@ -42,6 +42,7 @@ routes() ->
         {"/api/engine/plan-cards/:id/refine",   fh_engine_h_refine,     []},
         {"/api/engine/plan-cards/:id/profile",  fh_engine_h_profile,    []},
         {"/api/engine/plan-cards/:id/checklist-status", fh_engine_h_checklist_status, []},
+        {"/api/engine/plan-cards/:id/news",     fh_engine_h_news,       []},
         {"/api/engine/plan-cards/:id/properties", fh_engine_h_attach_property, []},
         {"/api/engine/plan-cards/:id/properties/:pid/transaction", fh_engine_h_transaction, []},
         {"/api/engine/plan-cards/:id/properties/:pid/documents", fh_engine_h_attach_document, []},

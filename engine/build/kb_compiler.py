@@ -60,6 +60,7 @@ import pathlib
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 KB = ROOT / "docs" / "kb"
 BP = ROOT / "docs" / "blueprints"
+NEWS_DIR = KB / "news"
 ARTIFACT_OUT = ROOT / "engine" / "erlang" / "priv" / "kb" / "artifact.json"
 
 # The in-scope SET — every blueprint whose registry is materialized + semantically
@@ -550,6 +551,82 @@ def parse_sources_block(text):
     return out
 
 
+def parse_frontmatter_list(text, field):
+    """A simple frontmatter `field:\\n  - item\\n  - item` YAML list -> [item, ...].
+    Same hand-rolled-subset posture as parse_sources_block (stdlib only, no PyYAML);
+    breaks at the first line that dedents back to column 0 (the next scalar field).
+    Used for a news note's `affected_kb_slugs:` (kb-update-runbook.md "authoring a
+    news note")."""
+    fm_end = frontmatter_end(text)
+    fm = text[:fm_end] if fm_end > 0 else text
+    lines = fm.splitlines()
+    out = []
+    in_block = False
+    for line in lines:
+        if re.match(rf"^{re.escape(field)}:\s*$", line):
+            in_block = True
+            continue
+        if not in_block:
+            continue
+        if re.match(r"^\S", line):
+            break
+        m = re.match(r"^\s*-\s*(\S+)\s*$", line)
+        if m:
+            out.append(m.group(1))
+    return out
+
+
+def markdown_section(text, heading):
+    """Content between a `## {heading}` line and the next H2 (or EOF), stripped.
+    None if the heading is absent. Used to pull a news note's bilingual
+    `## Summary (EN|VI)` bodies apart at compile time (so the shell gets clean
+    {en, vi} strings, not a blob it has to regex itself)."""
+    marker = f"## {heading}"
+    pos = text.find(marker)
+    if pos < 0:
+        return None
+    start = text.find("\n", pos) + 1
+    nxt = text.find("\n## ", start)
+    end = nxt if nxt >= 0 else len(text)
+    return text[start:end].strip()
+
+
+def parse_news_doc(path):
+    """Parse a `docs/kb/news/*.md` note (kb-update-runbook.md "authoring a news
+    note") — a dated, IMMUTABLE announcement of a KB fact change, distinct from a
+    living fact doc (kb_doc-authoring.md). Frontmatter: slug / kb_slug /
+    affected_kb_slugs / effective_from / authored_date. Body: bilingual
+    `## Summary (EN|VI)` + a `## Diff` fenced jsonc block (old_value/new_value).
+    No `sources:` of its own — `kb_slug` points back to the fact doc whose own
+    `sources:` stays the citation of record; duplicating it here would only
+    invite drift the next time that doc is re-verified."""
+    text = path.read_text()
+    slug_m = re.search(r"^slug:\s*(\S+)", text, re.M)
+    kb_slug_m = re.search(r"^kb_slug:\s*(\S+)", text, re.M)
+    eff_m = re.search(r"^effective_from:\s*(\S+)", text, re.M)
+    auth_m = re.search(r"^authored_date:\s*(\S+)", text, re.M)
+    diff_block = fenced_jsonc_after(text, "## Diff")
+    diff = None
+    diff_error = None
+    if diff_block is not None:
+        try:
+            diff = parse_jsonc(diff_block)
+        except Exception as e:  # noqa: BLE001 - report, do not crash the build
+            diff_error = str(e)
+    return {
+        "slug": slug_m.group(1) if slug_m else None,
+        "kb_slug": kb_slug_m.group(1) if kb_slug_m else None,
+        "affected_kb_slugs": parse_frontmatter_list(text, "affected_kb_slugs"),
+        "effective_from": eff_m.group(1) if eff_m else None,
+        "authored_date": auth_m.group(1) if auth_m else None,
+        "summary_en": markdown_section(text, "Summary (EN)"),
+        "summary_vi": markdown_section(text, "Summary (VI)"),
+        "diff": diff,
+        "diff_error": diff_error,
+        "path": path,
+    }
+
+
 def parse_kb_doc(path):
     text = path.read_text()
     slug_m = re.search(r"^slug:\s*(\S+)", text, re.M)
@@ -801,12 +878,25 @@ def run(emit=False):
             fails.append(f"in-scope blueprint {b} not found")
         return fails, warns, info, stats, None
 
-    # ---- parse all KB docs (GATE 1 slug==path, GATE 5 parse — mode-independent) #
+    # ---- parse all KB docs + news notes (GATE 1 slug==path, GATE 5 parse) ---- #
+    # docs/kb/news/*.md is a DISTINCT artifact class (kb-update-runbook.md
+    # "authoring a news note") — a dated announcement of a KB change, never
+    # anchored by a blueprint, never independently sourced (kb_slug's own
+    # sources: is the record). Routed to its own dict + GATE 11 below, never
+    # mixed into kb_docs (so it never enters GATE 2/6/7/10 or the registries).
     kb_docs = {}
+    news_docs = {}
     for f in sorted(KB.rglob("*.md")):
-        doc = parse_kb_doc(f)
         rel = f.relative_to(ROOT / "docs").with_suffix("")
         expect = str(rel).replace("/", ".")
+        if NEWS_DIR in f.parents:
+            doc = parse_news_doc(f)
+            if doc["slug"] != expect:
+                fails.append(f"[slug] {f}: slug={doc['slug']} expect={expect}")
+            if doc["slug"]:
+                news_docs[doc["slug"]] = doc
+            continue
+        doc = parse_kb_doc(f)
         if doc["slug"] != expect:
             fails.append(f"[slug] {f}: slug={doc['slug']} expect={expect}")
         if doc["slug"]:
@@ -814,6 +904,7 @@ def run(emit=False):
         if doc["parse_error"]:
             fails.append(f"[content_json] {doc['slug']}: parse error: {doc['parse_error']}")
     stats["kb_docs"] = len(kb_docs)
+    stats["news_docs"] = len(news_docs)
 
     # ---- GATE 10: sources citation (FAIL-CLOSED) --------------------------- #
     # kb-update-runbook.md Phase 1: a fact doc must cite the primary source it was
@@ -834,6 +925,32 @@ def run(emit=False):
             continue
         if not doc.get("sources"):
             fails.append(f"[sources] {slug}: no `sources:` citation (kb-update-runbook.md Phase 1)")
+
+    # ---- GATE 11: news-note well-formedness (docs/kb/news/*.md) ------------ #
+    # kb-update-runbook.md "authoring a news note": kb_slug + every affected_kb_slugs
+    # entry must resolve to a real KB doc (the relevance-filter key has to point at
+    # something real); effective_from/authored_date required; the diff block must be
+    # present and parse; the EN/VI summary must be bilingual-well-formed (reusing the
+    # same check as a KB doc's `copy` templates — same {locale: text} shape).
+    for slug, doc in sorted(news_docs.items()):
+        if not doc.get("kb_slug") or not kb_exists(doc["kb_slug"]):
+            fails.append(f"[news] {slug}: kb_slug {doc.get('kb_slug')!r} does not resolve to a KB doc")
+        if not doc.get("affected_kb_slugs"):
+            fails.append(f"[news] {slug}: affected_kb_slugs is empty — nothing to filter relevance by")
+        else:
+            bad = [s for s in doc["affected_kb_slugs"] if not kb_exists(s)]
+            if bad:
+                fails.append(f"[news] {slug}: affected_kb_slugs resolve to no KB doc: {bad}")
+        if not doc.get("effective_from"):
+            fails.append(f"[news] {slug}: missing effective_from")
+        if not doc.get("authored_date"):
+            fails.append(f"[news] {slug}: missing authored_date")
+        if doc.get("diff") is None:
+            suffix = f" ({doc['diff_error']})" if doc.get("diff_error") else ""
+            fails.append(f"[news] {slug}: missing or unparsed '## Diff' jsonc block{suffix}")
+        err = check_copy_template({"en": doc.get("summary_en"), "vi": doc.get("summary_vi")})
+        if err:
+            fails.append(f"[news] {slug}: bilingual summary: {err}")
 
     # ---- GATE 8: bilingual copy-template well-formedness (all docs) -------- #
     # Every `copy` template is localized in every LOCALES locale (outcome-conformance.md
@@ -943,7 +1060,7 @@ def run(emit=False):
 
     artifact = None
     if not fails:
-        artifact = build_artifact(blueprints, registries, kb_docs)
+        artifact = build_artifact(blueprints, registries, kb_docs, news_docs)
         if emit:
             ARTIFACT_OUT.parent.mkdir(parents=True, exist_ok=True)
             ARTIFACT_OUT.write_text(
@@ -973,7 +1090,7 @@ def registry_payload(reg):
     }
 
 
-def build_artifact(blueprints, registries, kb_docs):
+def build_artifact(blueprints, registries, kb_docs, news_docs):
     kb = {
         slug: {
             "effective_from": d["effective_from"],
@@ -983,6 +1100,21 @@ def build_artifact(blueprints, registries, kb_docs):
             "content_json": d["content_json"],
         }
         for slug, d in kb_docs.items()
+    }
+    # A news note is NEVER anchored by a blueprint and carries no `sources:` of its
+    # own (kb_slug's fact-doc sources are the record) — a parallel, simpler array,
+    # not folded into `kb` (kb-update-runbook.md "authoring a news note").
+    news = {
+        slug: {
+            "kb_slug": d["kb_slug"],
+            "affected_kb_slugs": d["affected_kb_slugs"],
+            "effective_from": d["effective_from"],
+            "authored_date": d["authored_date"],
+            "summary_en": d["summary_en"],
+            "summary_vi": d["summary_vi"],
+            "diff": d["diff"],
+        }
+        for slug, d in news_docs.items()
     }
     bps = {}
     for stem, (slug, comps, producer, reads, ui_tabs) in blueprints.items():
@@ -1028,6 +1160,7 @@ def build_artifact(blueprints, registries, kb_docs):
         # against.
         "locales": list(LOCALES),
         "kb": kb,
+        "news": news,
         "blueprints": bps,
     }
 
@@ -1046,7 +1179,7 @@ def main():
               f"ui_tabs={json.dumps(stats.get('ui_tabs', {}).get(stem, []))}")
     print(f"in-scope blueprints: {sorted(IN_SCOPE_BLUEPRINTS)} | deferred docs: "
           f"{stats.get('deferred_docs')}")
-    print(f"kb docs: {stats.get('kb_docs')}")
+    print(f"kb docs: {stats.get('kb_docs')} | news notes: {stats.get('news_docs')}")
     print(f"copy templates: {stats.get('copy_templates')} (bilingual gate, "
           f"locales={'+'.join(LOCALES)})")
     if info:
@@ -1065,7 +1198,7 @@ def main():
         return 1
     if emit and artifact is not None:
         print(f"PASS — artifact emitted: {ARTIFACT_OUT.relative_to(ROOT)}")
-        print(f"       {len(artifact['kb'])} KB entries, "
+        print(f"       {len(artifact['kb'])} KB entries, {len(artifact['news'])} news notes, "
               f"{len(artifact['blueprints'])} blueprints, "
               f"{len(stats.get('registry', {}))} in-scope registries")
     else:

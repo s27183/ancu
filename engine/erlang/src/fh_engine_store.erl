@@ -17,6 +17,7 @@
 -export([snapshot_component/3, get_plan_card/2, get_card_rerun_context/1, set_card_target/2]).
 -export([attach_property/3, snapshot_addendum_component/4, set_transaction/3]).
 -export([set_checklist_status/4, get_checklist_status/2]).
+-export([card_kb_slugs/1, get_news_status/2, dismiss_news/2]).
 -export([set_profile_financials/2, list_plan_card_ids_for_profile/1]).
 -export([deploy_commit_sha/0, projection_state/1, list_active_plan_card_ids/0]).
 -export([list_suburbs_by_state/1, list_all_suburbs/0, list_suburb_sources/0]).
@@ -383,6 +384,52 @@ get_checklist_status(TenantId, PlanCardId) ->
         [{Checklist}] -> {ok, decode_jsonb(Checklist)};
         []            -> {error, not_found}
     end.
+
+%% --- news relevance + dismissed state (kb-update-runbook.md "authoring a news
+%% note", plan-card-refresh.md kb_versions provenance) -----------------------
+
+%% Every KB slug consulted across this card's fills, deduped — the relevance-
+%% filter input fh_engine_kb:news_for_slugs/1 intersects against each news
+%% note's affected_kb_slugs. No tenant filter here (plan_card_id is globally
+%% unique); the caller enforces ownership via get_news_status/2 first.
+-spec card_kb_slugs(binary()) -> [binary()].
+card_kb_slugs(PlanCardId) ->
+    Res = query(
+        "SELECT DISTINCT elem->>'slug' AS slug FROM audit_events, "
+        "  LATERAL jsonb_array_elements(kb_versions_jsonb) AS elem "
+        "WHERE plan_card_id = $1::uuid",
+        [PlanCardId]),
+    [Slug || {Slug} <- rows(Res), is_binary(Slug)].
+
+%% The dismissed-news slice of the card user-set layer (007, same pattern as
+%% checklist_status): {"<news_slug>": true}. Tenant-scoped — the ownership
+%% check for the whole news read (GET .../news calls this first).
+-spec get_news_status(binary(), binary()) -> {ok, map()} | {error, not_found}.
+get_news_status(TenantId, PlanCardId) ->
+    Res = query(
+        "SELECT dismissed_news_jsonb FROM plan_cards "
+        "WHERE tenant_id = $1::uuid AND plan_card_id = $2::uuid",
+        [TenantId, PlanCardId]),
+    case rows(Res) of
+        [{Dismissed}] -> {ok, decode_jsonb(Dismissed)};
+        []            -> {error, not_found}
+    end.
+
+%% Mark one news note dismissed for a card. One-way (no "undismiss" surfaced —
+%% no product need for it yet); the same jsonb_set-with-create-missing pattern
+%% as set_checklist_status/4's "done" clause. Tenant-scope is enforced by the
+%% handler's prior get_news_status/2 ownership check, so the UPDATE keys on
+%% plan_card_id alone.
+-spec dismiss_news(binary(), binary()) -> {ok, map()}.
+dismiss_news(PlanCardId, NewsSlug) ->
+    Res = query(
+        "UPDATE plan_cards SET "
+        "dismissed_news_jsonb = jsonb_set(dismissed_news_jsonb, ARRAY[$2], 'true'::jsonb, true), "
+        "updated_at = now() "
+        "WHERE plan_card_id = $1::uuid "
+        "RETURNING dismissed_news_jsonb",
+        [PlanCardId, NewsSlug]),
+    {ok, decode_jsonb(single(Res))}.
 
 %% The PROJECTION state for the base plan (eligibility-resolution.md 2026-06-17 / G4):
 %% state-specific schemes resolve from the SUBURB being planned, not the map browse-

@@ -24,6 +24,7 @@
 -export([kb/1, kb_content_md/1, kb_rules/1, kb_anchors/1, copy/2]).
 -export([rules/0]).
 -export([registry/1, registry/2]).
+-export([news_for_slugs/1]).
 
 -define(PT_KEY, {?MODULE, artifact}).
 
@@ -172,6 +173,31 @@ kb_anchors(Slugs) ->
                 {error, _} -> false
             end
         end, Slugs).
+
+%% --- news accessors ----------------------------------------------------------
+%% A news entry: {kb_slug, affected_kb_slugs, effective_from, authored_date,
+%% summary_en, summary_vi, diff} (kb-update-runbook.md "authoring a news note").
+%% Never anchored by a blueprint. `maps:get(..., #{})` defaults so an older
+%% artifact predating this key reads as "no news", never a crash (the ui_tabs
+%% missing-key posture).
+
+%% News items relevant to a set of KB slugs a card has actually consulted (its
+%% accumulated kb_versions across fills, plan-card-refresh.md) — the relevance
+%% filter is a set intersection over affected_kb_slugs; no new lookup, the
+%% provenance already exists. The caller (the news handler) subtracts the
+%% card's dismissed set before replying.
+-spec news_for_slugs([binary()]) -> [map()].
+news_for_slugs(Slugs) ->
+    SlugSet = sets:from_list(Slugs),
+    News = maps:get(<<"news">>, artifact(), #{}),
+    maps:fold(
+        fun(NewsSlug, Entry, Acc) ->
+            Affected = maps:get(<<"affected_kb_slugs">>, Entry, []),
+            case lists:any(fun(S) -> sets:is_element(S, SlugSet) end, Affected) of
+                true  -> [Entry#{<<"news_slug">> => NewsSlug} | Acc];
+                false -> Acc
+            end
+        end, [], News).
 
 %% Every fill across all KB docs merged into one leaf -> rule map, the form the
 %% resolver interprets (fh_engine_resolver). Refs resolve globally across docs;
