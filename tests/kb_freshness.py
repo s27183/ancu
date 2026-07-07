@@ -13,9 +13,11 @@ The cadence tiers are NOT invented here — they come straight from the update
 cadence table in `docs/architecture/architecture.md §11.2`:
 
   - Monthly   — lender policy, RBA cash rate, FHG panel / participating lenders.
-  - Per-event — FIRB regime changes, budgets, ASIC bulletins (calendar / RSS
-                triggered, no fixed period); we still apply a long *safety-net*
-                re-verify budget so a doc can't drift unbounded between events.
+  - Per-event — FIRB regime changes, budgets, ASIC bulletins (no fixed period —
+                triggered on demand when the maintainer notices the event, not
+                by any scheduler/RSS watcher); we still apply a long
+                *safety-net* re-verify budget so a doc can't drift unbounded
+                between events.
   - Quarterly — everything else: scheme structures, state duty schedules, FHOG,
                 HECS thresholds, process knowledge, document templates. This is
                 §11.2's catch-all, so it is the DEFAULT here.

@@ -148,6 +148,6 @@
 
 - **Verified through:** May 2026
 - **Source recency target:** All scheme rules and statistics drawn from sources dated 2025 or 2026 wherever possible
-- **Maintenance need:** Scheme rules change frequently; recommend quarterly re-verification of sections 1 and 2
+- **Maintenance need:** Scheme rules change frequently, but this set re-verifies **on demand** (Son + Claude Code, together), not on a fixed calendar — trigger is a noticed scheme/rule change, or before this doc set is next relied on for a decision. No scheduled re-verification runs automatically.
 - **Companion artefact:** `first_home_buyer_plan.html` (interactive plan with calculator and swimlane diagram)
 - **Disclaimer:** This document is general information only, not financial, legal, or mortgage advice. All scheme eligibility and stamp duty calculations should be confirmed with a licensed broker, the relevant state revenue office, and a qualified conveyancer before commitment.

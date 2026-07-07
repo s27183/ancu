@@ -24,14 +24,23 @@ most "update the KB" asks are Track A.
 
 ## When it runs — triggers and cadence
 
-Triggers and their cadences are defined in
-[architecture.md §11.2](architecture.md) (the update-cadence table). In short:
+**This runs on demand, not on a schedule.** A Track A pass happens when the
+maintainer (Son + Claude Code, in a session together) says *"let's update the
+KB"* — prompted by the freshness scanner's overdue report (Phase 0) or by
+either of us noticing an external event (a Budget, a regime change, a
+bulletin). There is no cron job, no RSS watcher, no automation that runs this
+without a person starting it.
 
-| Cadence | What moves | Track |
+The Monthly/Quarterly/Per-event labels below (defined in
+[architecture.md §11.2](architecture.md)) are **re-verification budgets** — the
+longest a doc may go before it's flagged overdue — not automated triggers. In
+short:
+
+| Budget | What moves | Track |
 |---|---|---|
 | **Monthly** | Lender policy, RBA cash rate, FHG panel / participating lenders | A |
 | **Quarterly** | Scheme structures, state duty schedules, FHOG, HECS thresholds, process knowledge, document templates | A |
-| **Per-event** | Federal/State Budgets (May/June), Housing Australia rule changes, ASIC bulletins, FIRB regime changes — calendar / RSS triggered; **triggers a blueprint review** | A |
+| **Per-event** | Federal/State Budgets (May/June), Housing Australia rule changes, ASIC bulletins, FIRB regime changes — no fixed period, just a long safety-net budget; **triggers a blueprint review** | A |
 | **Per-release** | ABS Census/SEIFA (5-yearly), state price reports (quarterly), crime (quarterly), RBA FX (daily for Mode D) | B |
 
 To find *what* is overdue without waiting for an external trigger, run the
