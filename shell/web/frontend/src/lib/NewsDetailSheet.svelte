@@ -3,15 +3,17 @@
     // headline. Built on Modal.svelte (the existing drill-down surface — attach-property,
     // settlement dates, lease upload all open into it), not SuburbSheet's bespoke
     // tab-bearing panel, since this is the "small popup with a few facts" idiom, not an
-    // outer container. Bilingual summary + a generic diff dump + the primary source link —
-    // no dismiss action here (task 31, separate slice); the ticker keeps cycling until
-    // that's wired.
+    // outer container. Bilingual summary + a generic diff dump + the primary source link +
+    // an explicit dismiss action (task 31) — distinct from onClose: closing (✕/backdrop/
+    // Escape) just puts the sheet away and still scrolls/highlights the affected tile;
+    // dismiss additionally retires the note from this card's rotation for good.
     import { lang } from '$lib/stores/lang';
     import { t } from '$lib/i18n';
     import Modal from '$lib/Modal.svelte';
     import type { NewsNote } from '$lib/api';
 
-    let { note, onClose }: { note: NewsNote; onClose: () => void } = $props();
+    let { note, onClose, onDismiss }: { note: NewsNote; onClose: () => void; onDismiss: () => void } =
+        $props();
 
     // Same inline bilingual-pick idiom as NewsTicker.svelte/Onboarding.svelte/
     // SuburbSheet.svelte — task 30 stays open until a second real consumer reuses it;
@@ -38,4 +40,7 @@
             >{$t('plan.news.source')}</a
         >
     {/if}
+    <button type="button" class="primary pp-news-dismiss" onclick={onDismiss}>
+        {$t('plan.news.dismiss')}
+    </button>
 </Modal>

@@ -3,13 +3,13 @@
 **Status:** backend built + live-verified 2026-07-07 (`news_smoke.escript`, all
 assertions pass against Docker PG). Compiler now reverse-indexes each note's
 `affected_components`, and every note now carries a `sources:` citation
-(both resolved 2026-07-07 — see below). Shell: fetch (27), ticker (29), and
-tap → detail sheet + tile highlight (28) all built 2026-07-07 (svelte-check
-0/0 + autofixer clean each time; no live browser walkthrough — see each
-task's note). Task 28's `NewsDetailSheet.svelte` is the second consumer that
-closes both 30 (bilingual pick) and 32 (source link) — see their entries.
-Tasks 31, 33, 34 not started (33's default is already true, not yet closed
-as its own line item).
+(both resolved 2026-07-07 — see below). Shell: fetch (27), ticker (29),
+tap → detail sheet + tile highlight (28), and dismiss wiring (31) all built
+2026-07-07 (svelte-check 0/0 + autofixer clean each time; no live browser
+walkthrough — see each task's note). Task 28's `NewsDetailSheet.svelte` is the
+second consumer that closes both 30 (bilingual pick) and 32 (source link) —
+see their entries. Tasks 33, 34 not started (33's default is already true,
+not yet closed as its own line item).
 
 ## The problem
 
@@ -187,10 +187,42 @@ scrolls to/highlights the `affected_components` tile.
       renders `sources[0].url` (first entry only — a note may carry more than
       one corroborating source, but the sheet needs only the primary) as a
       link — no new backend, `sources` was already on the GET response.
-- [ ] **Dismiss wiring.** On user dismissal, call
-      `PATCH /api/engine/plan-cards/:id/news` with `{"news_slug": ...}`;
-      optimistically remove from the local ticker rotation rather than
-      waiting on a round-trip.
+- [x] **Dismiss wiring** (2026-07-07). `NewsDetailSheet.svelte` gained an
+      explicit "Got it, dismiss" button (`.primary`, the shared full-width
+      affirmative-action style) alongside the existing ✕/backdrop/Escape
+      close. `PlanProjection.svelte`'s `onNewsDismiss`: removes the note from
+      the local `news` array immediately (no round-trip wait — the task's own
+      wording), then PATCHes `{"news_slug": ...}` in the background and
+      restores the note on any non-`ok` outcome — the same optimistic-then-
+      reconcile posture as `toggleChecklist`. `NewsTicker.svelte`'s `safeIdx`
+      already wraps a shrinking array cleanly (task 29's design), so no extra
+      index-clamping was needed on top.
+
+      **Caught by advisor before commit: dismiss must NOT reuse `onNewsClose`'s
+      tab-switch.** The first draft called `onNewsClose()` from inside
+      `onNewsDismiss` to get the existing scroll/highlight "for free." Async
+      correctness was fine — but `onNewsClose` also does `sub =
+      targetTab.tab_id`, i.e. it can switch the user to a *different lifecycle
+      tab*. That's the right reaction to "closed without deciding anything"
+      (task 28), but the wrong one for "I explicitly dismissed this" — being
+      yanked to another tab as a side effect of an unrelated decision is
+      unrequested motion. `advisor()` flagged this as a UX call worth making
+      deliberately rather than inheriting from code reuse. Fixed: `onNewsDismiss`
+      no longer calls `onNewsClose` at all — it closes the sheet quietly
+      (`selectedNews = null`) with no tab-switch/scroll/highlight. Renamed the
+      overloaded language in `onNewsClose`'s own comment (it said "on
+      dismissing the sheet," which now collides with the task-31 dismiss
+      action) to "on closing the sheet," with an explicit note that dismiss
+      has its own handler and does not call it.
+
+      **General lesson, a variant of task 28's:** reusing another handler for
+      its side effect is only safe if ALL of that handler's side effects are
+      wanted at the new call site — check the full list, not just the one you
+      came for.
+
+      Verified via `svelte-check` (0/0) and the Svelte MCP autofixer (clean)
+      after both the initial implementation and the advisor-caught fix; no
+      live browser walkthrough (same honest-gap reasoning as tasks 28/29).
 - [ ] **Empty state.** No relevant news → no ticker at all (already the API's
       default; the shell just needs to not render the strip for `[]`).
 - [ ] **Mobile layout pass.** A persistent sticky strip claims vertical space

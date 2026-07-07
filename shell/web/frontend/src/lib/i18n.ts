@@ -907,7 +907,11 @@ const messages = {
     // News detail sheet (kb-news-feature.md, task 28): opened by tapping a ticker headline.
     'plan.news.detail_title': { vi: 'Cập nhật kế hoạch', en: 'Plan update' },
     'plan.news.diff_heading': { vi: 'Chi tiết thay đổi', en: 'What changed' },
-    'plan.news.source': { vi: 'Nguồn', en: 'Source' }
+    'plan.news.source': { vi: 'Nguồn', en: 'Source' },
+
+    // Dismiss action (kb-news-feature.md, task 31): "I've seen this" — removes the note
+    // from this card's rotation for good, not just closes the sheet.
+    'plan.news.dismiss': { vi: 'Đã xem, bỏ qua', en: 'Got it, dismiss' }
 } as const;
 
 export type MessageKey = keyof typeof messages;

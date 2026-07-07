@@ -1393,6 +1393,11 @@ main {
     font-weight: 600;
     text-decoration: underline;
 }
+/* Dismiss (task 31) reuses .primary (the shared full-width affirmative-action style) —
+   just needs breathing room above it when a source link precedes it. */
+.pp-news-dismiss {
+    margin-top: 1rem;
+}
 
 /* Property bar (Mode-C Phase-B) — the base-vs-property selector + the attach entry point.
    The selector (Tabs) takes the available width; the attach button sits at the end. */

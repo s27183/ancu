@@ -19,6 +19,7 @@
         setTransactionDates,
         uploadDocument,
         getNews,
+        dismissNews,
         type SimulateOverrides,
         type HouseholdFinancials,
         type PropertyCardInput,
@@ -670,13 +671,14 @@
 
     let highlightTimer: ReturnType<typeof setTimeout> | undefined;
 
-    // On dismissing the sheet: using this card's own blueprint_slug as the key into the
-    // note's affected_components map, switch to whichever lifecycle tab holds the first
-    // named component, scroll it into view, and flash-highlight every named component (a
-    // note may name more than one). No backend call — affected_components already rode
-    // the GET response (compile-time work, kb-news-feature.md "Resolved design
-    // questions"). clearTimeout before re-arming so a rapid re-tap's timer can't clear a
-    // LATER highlight early.
+    // On closing the sheet (✕/backdrop/Escape — Modal's onClose, NOT the task-31 "dismiss"
+    // action below, which has its own distinct handler and does not call this): using this
+    // card's own blueprint_slug as the key into the note's affected_components map, switch
+    // to whichever lifecycle tab holds the first named component, scroll it into view, and
+    // flash-highlight every named component (a note may name more than one). No backend
+    // call — affected_components already rode the GET response (compile-time work,
+    // kb-news-feature.md "Resolved design questions"). clearTimeout before re-arming so a
+    // rapid re-tap's timer can't clear a LATER highlight early.
     async function onNewsClose() {
         const note = selectedNews;
         selectedNews = null;
@@ -693,6 +695,26 @@
         highlightTimer = setTimeout(() => {
             highlightedComponents = [];
         }, 3000);
+    }
+
+    // Dismiss (task 31): "I've seen this, don't show it again" — retires the note from the
+    // card's rotation for good. Deliberately does NOT reuse onNewsClose's tab-switch/scroll/
+    // highlight: that sequence is the right reaction to "closed without deciding anything,"
+    // but here the user has just made an explicit, different choice, and being yanked to
+    // another lifecycle tab as a side effect of dismissing would be surprising, unrequested
+    // motion (advisor caught this before commit — reusing onNewsClose read fine at the
+    // async-correctness level but was the wrong UX call). Just closes the sheet quietly.
+    // Optimistic-then-reconcile, same posture as toggleChecklist: remove locally first (no
+    // round-trip wait — the task's own wording), PATCH in the background, and restore the
+    // note if the engine rejects it.
+    async function onNewsDismiss() {
+        const note = selectedNews;
+        if (!note || !cardId) return;
+        selectedNews = null;
+        const prevNews = news;
+        news = news.filter((n) => n.news_slug !== note.news_slug);
+        const res = await dismissNews(cardId, note.news_slug);
+        if (res.kind !== 'ok') news = prevNews;
     }
 
     async function load() {
@@ -1035,7 +1057,7 @@
     </div>
 
     {#if selectedNews}
-        <NewsDetailSheet note={selectedNews} onClose={onNewsClose} />
+        <NewsDetailSheet note={selectedNews} onClose={onNewsClose} onDismiss={onNewsDismiss} />
     {/if}
 
     <!-- Cross-tab what-if indicator: the price/state cockpit lives in the Cash-calculator
