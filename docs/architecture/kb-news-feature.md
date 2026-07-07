@@ -4,7 +4,11 @@
 assertions pass against Docker PG). Compiler now reverse-indexes each note's
 `affected_components`, and every note now carries a `sources:` citation
 (both resolved 2026-07-07 — see below). Shell: the fetch layer (task 27) is
-built and proxy-verified 2026-07-07; the ticker UI (tasks 28-34) not started.
+built and proxy-verified 2026-07-07; the ticker component (task 29) built
+2026-07-07 (svelte-check 0/0 + autofixer clean; no live browser walkthrough —
+see task 29's note), and its bilingual pick already covers task 30's need
+(left open pending task 28's detail sheet reusing it); tasks 28, 31-34 not
+started.
 
 ## The problem
 
@@ -89,18 +93,59 @@ scrolls to/highlights the `affected_components` tile.
       auth 401, for both GET and PATCH). `dismissNews` (frontend) is also
       built here since it's the same endpoint's other verb — task 31 wires it
       to a UI action.
-- [ ] **Ticker component (Svelte).** Sticky auto-sliding strip, one headline
-      visible at a time, swipe/arrow-button navigation; not a separate feed
-      screen (per the map-first-home / plan-card-as-central-artifact
-      constraints — the ticker is chrome, not a competing primary surface).
+- [x] **Ticker component (Svelte)** (2026-07-07). `NewsTicker.svelte`: a sticky
+      strip (mounted above the lifecycle sub-tab rail inside a new shared
+      `.pp-sticky-top` wrapper in `PlanProjection.svelte` — ONE sticky
+      container rather than each element sticking independently, so the rail
+      simply flows below the ticker with no magic offset math for that pairing,
+      and the region is free to grow with the ticker's wrapped headline text).
+      One headline visible at a time; auto-advances every 6s (paused/reset by
+      manual nav); arrow buttons + swipe (touchstart/touchend, threshold 40px,
+      `preventDefault` on a real swipe suppresses the trailing synthetic click)
+      both work. Renders nothing for an empty `news` array (task 33's default,
+      already true here). Tapping the headline calls an `onSelect` prop —
+      currently unwired (task 28 will pass a real handler).
+
+      **Regression caught by advisor review before commit, then fixed in the
+      same slice:** the Budget tab's own nested sub-rail (`Tabs.svelte`) sticks
+      just below the top-level sticky region via a `--tabrail-top` CSS var,
+      previously a **hardcoded `2.2rem`** on `.pp-calc` calibrated to the bare
+      `.pp-subtabs` rail's height alone. Wrapping the ticker into the same
+      sticky region made that constant stale — whenever news is present (i.e.
+      exactly when this feature is active, not an edge case), the budget rail
+      would stick 2.2rem down when the real region was taller, hiding it behind
+      the opaque header while scrolling. Fixed by measuring the region's real
+      height (`bind:clientHeight` on `.pp-sticky-top` → `stickyTopHeight`
+      state) and feeding it to `--tabrail-top` as an inline style on
+      `.pp-subcontent`, replacing the hardcoded rem entirely. This is exactly
+      the class of bug `svelte-check`/autofixer/the no-news path all structurally
+      miss — worth remembering: **a CSS var hand-calibrated to one sibling's
+      height goes stale the moment a NEW sibling is inserted above it in the
+      same sticky region; prefer a measured height over a hardcoded rem for any
+      such stacked-sticky offset.**
+
+      Verified via `svelte-check` (0/0) and the Svelte MCP autofixer (no
+      issues); **not** walked through in a live browser — the full stack (shell
+      backend + engine + both Postgres instances + an authed session + a plan
+      card whose consulted KB slugs match a real note) is disproportionate to
+      stand up for a chrome-only layout change with no new backend dependency.
+      Honest gap, not a claim of full verification.
+- [ ] **Bilingual rendering.** `NewsTicker.svelte`'s `headline` already picks
+      `$lang === 'vi' ? summary_vi : summary_en` (falling back to whichever
+      summary IS present — honest-partial, not a blank headline), reusing the
+      exact inline pattern already used elsewhere (`Onboarding.svelte`,
+      `SuburbSheet.svelte`) — no new picker mechanism needed. Left **open**
+      rather than checked off (task-27 precedent: don't close a task whose
+      other real consumer doesn't exist yet) — task 28's detail sheet is that
+      other consumer (summary + diff text) and should reuse this same one-line
+      ternary, not reinvent it; only once that's built does this item close.
 - [ ] **Tap → detail sheet + tile highlight.** Tapping a headline opens a
       popup sheet/modal (summary + diff + source link) and, using that note's
       `affected_components: {blueprint_slug: [component_name, ...]}` for the
       card's own `blueprint_slug`, scrolls to and highlights the matching
       plan tile. No further backend work; this is a pure shell lookup over
-      an already-compiler-built field.
-- [ ] **Bilingual rendering.** Pick `summary_en` vs `summary_vi` by the active
-      locale, reusing the existing i18n picker pattern (no new mechanism).
+      an already-compiler-built field. `NewsTicker.svelte`'s `onSelect` prop
+      is the wire-up point.
 - [ ] **Source link.** Render `sources[0].url` (first entry; a note may carry
       more than one corroborating source, but the sheet needs only the
       primary) as a link in the detail sheet — no new backend, `sources` is

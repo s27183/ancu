@@ -896,7 +896,13 @@ const messages = {
     'status.title': { vi: 'Trạng thái hệ thống', en: 'System status' },
     'status.checking': { vi: 'Đang kiểm tra…', en: 'Checking…' },
     'status.ok': { vi: 'Backend đang hoạt động', en: 'Backend is up' },
-    'status.fail': { vi: 'Không kết nối được backend', en: 'Backend unreachable' }
+    'status.fail': { vi: 'Không kết nối được backend', en: 'Backend unreachable' },
+
+    // KB-news ticker (kb-news-feature.md, task 29): the sticky strip cycling relevant,
+    // non-dismissed news notes above the lifecycle sub-tab rail.
+    'plan.news.aria': { vi: 'Cập nhật liên quan đến kế hoạch', en: 'Plan-relevant updates' },
+    'plan.news.prev': { vi: 'Tin trước', en: 'Previous update' },
+    'plan.news.next': { vi: 'Tin sau', en: 'Next update' }
 } as const;
 
 export type MessageKey = keyof typeof messages;

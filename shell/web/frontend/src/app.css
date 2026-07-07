@@ -1257,6 +1257,19 @@ main {
     gap: 1rem;
 }
 
+/* Sticky region atop the scrolling sheet body (.sheet .body is the scroll region): the
+   KB-news ticker (if any relevant, non-dismissed notes — kb-news-feature.md task 29)
+   followed by the lifecycle sub-tab rail. ONE sticky container rather than each
+   sticking independently, so the rail simply flows below the ticker in normal layout
+   — no magic offset math, and the region's total height is free to vary with the
+   ticker's wrapped headline text. */
+.pp-sticky-top {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: var(--bg);
+}
+
 /* Plan sub-tabs — a horizontally-scrollable pill row; one section shows at a time. */
 /* Segmented control — one container guiding the lifecycle flow (the prototype's nav),
    not separate pills. Scrolls horizontally on narrow surfaces; the buttons grow to fill
@@ -1265,12 +1278,6 @@ main {
     display: flex;
     gap: 0.2rem;
     overflow-x: auto;
-    /* Sticky to the top of the scrolling sheet body (.sheet .body is the scroll region),
-       so the view switcher (Overview/Flow/Budget/Q&A) stays reachable while the plan
-       scrolls. The solid --bg + z-index keep scrolled content from showing through. */
-    position: sticky;
-    top: 0;
-    z-index: 5;
     margin: 0 0 0.85rem;
     padding: 0.25rem;
     background: var(--bg);
@@ -1304,6 +1311,51 @@ main {
     background: var(--surface);
     color: var(--ink);
     box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
+/* KB-news ticker (kb-news-feature.md, task 29) — a slim strip cycling one relevant,
+   non-dismissed news headline at a time, sitting above the sub-tab rail inside the
+   shared .pp-sticky-top region. Arrow buttons flank the headline when there's more
+   than one note; swipe works too (NewsTicker.svelte). Tapping the headline is wired
+   to task 28's detail sheet + tile highlight (a no-op until that's built). */
+.pp-ticker {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin: 0.25rem 0.25rem 0.6rem;
+    padding: 0.45rem 0.6rem;
+    background: var(--accent-soft);
+    border: 1px solid var(--accent);
+    border-radius: 0.5rem;
+}
+.pp-ticker-nav {
+    flex: none;
+    border: none;
+    background: transparent;
+    color: var(--accent);
+    font-size: 1.1rem;
+    line-height: 1;
+    padding: 0.1rem 0.4rem;
+    border-radius: 0.35rem;
+    cursor: pointer;
+}
+.pp-ticker-nav:hover {
+    background: var(--accent);
+    color: #fff;
+}
+.pp-ticker-headline {
+    flex: 1 1 auto;
+    min-width: 0;
+    border: none;
+    background: transparent;
+    color: var(--ink);
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-align: left;
+    white-space: normal;
+    overflow-wrap: break-word;
+    cursor: pointer;
+    padding: 0.1rem 0;
 }
 
 /* Property bar (Mode-C Phase-B) — the base-vs-property selector + the attach entry point.
@@ -1532,12 +1584,13 @@ main {
 }
 
 /* The Budget tab's sub-rail (Tabs.svelte) shares the .sheet .body scroll with the sticky
-   top-level .pp-subtabs, so it must stick just BELOW that rail. --tabrail-top ≈ the
-   .pp-subtabs height; slightly under-set so the budget rail tucks under (never a gap —
-   .pp-subtabs has the higher z-index and an opaque bg, so the small overlap is hidden). */
-.pp-calc {
-    --tabrail-top: 2.2rem;
-}
+   .pp-sticky-top region (ticker + top-level .pp-subtabs), so it must stick just BELOW
+   that region. --tabrail-top is set inline on .pp-subcontent (PlanProjection.svelte)
+   from that region's REAL measured height (bind:clientHeight) — not a hardcoded rem —
+   because the ticker's presence/height varies (no news → 0; a wrapped headline → taller
+   than the bare subtabs rail a fixed value was once calibrated to). .pp-sticky-top's
+   higher z-index + opaque bg keep the small intentional overlap invisible.
+*/
 
 /* Cash-calculator cockpit — the prototype's interactive input form (engine-driven). */
 .pp-calc-intro {

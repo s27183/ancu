@@ -48,6 +48,7 @@
     import Tabs from '$lib/Tabs.svelte';
     import Chat from '$lib/Chat.svelte';
     import Modal from '$lib/Modal.svelte';
+    import NewsTicker from '$lib/NewsTicker.svelte';
 
     let { suburbName, suburbState, onplan }: {
         suburbName: string;
@@ -108,6 +109,11 @@
     // resource from the GET card (relevance is computed over kb_versions provenance,
     // not part of the content snapshot), so it's fetched alongside, not embedded.
     let news = $state<NewsNote[]>([]);
+    // The rendered height of the sticky ticker+subtabs region (0 when NewsTicker
+    // renders nothing), fed to --tabrail-top so the nested Budget sub-rail's own
+    // sticky offset tracks the ticker's real, variable height instead of a stale
+    // hardcoded rem (see the .pp-sticky-top / .pp-subcontent markup below).
+    let stickyTopHeight = $state(0);
 
     let stream: PlanCardStream | null = null;
     // A generation token so a retry's async can't be clobbered by a stale in-flight one.
@@ -947,26 +953,42 @@
         </Modal>
     {/if}
 
-    <!-- Sub-tabs: one per plan section + a Q&A tab — each section shows on its own, so
-         the user never scrolls a long plan. Horizontally scrollable on narrow screens. -->
-    <div class="pp-subtabs" role="tablist">
-        {#each railTabs as tab (tab.tab_id)}
+    <!-- Sticky region atop the scrolling plan body: the KB-news ticker (task 29, only
+         when there are relevant non-dismissed notes) above the lifecycle sub-tab rail.
+         ONE sticky container rather than each sticking independently — the rail just
+         flows below the ticker, no magic offset math for THIS pairing. Its real
+         rendered height (variable: 0 with no news, taller with a wrapped headline) is
+         measured via bind:clientHeight and fed to --tabrail-top below, so the nested
+         Budget sub-rail (Tabs.svelte) — which stacks its own sticky rail just below
+         this region — tracks the ticker's presence instead of a stale hand-picked rem
+         (that hardcoded value predates the ticker and only happened to match subtabs
+         alone). Tapping a headline is a no-op until task 28 wires the detail sheet +
+         tile highlight. -->
+    <div class="pp-sticky-top" bind:clientHeight={stickyTopHeight}>
+        <NewsTicker {news} />
+
+        <!-- Sub-tabs: one per plan section + a Q&A tab — each section shows on its own,
+             so the user never scrolls a long plan. Horizontally scrollable on narrow
+             screens. -->
+        <div class="pp-subtabs" role="tablist">
+            {#each railTabs as tab (tab.tab_id)}
+                <button
+                    type="button"
+                    role="tab"
+                    aria-selected={sub === tab.tab_id}
+                    class:active={sub === tab.tab_id}
+                    onclick={() => (sub = tab.tab_id)}
+                    >{$t(`plan.ltab.${tab.tab_id}` as 'plan.ltab.overview')}</button
+                >
+            {/each}
             <button
                 type="button"
                 role="tab"
-                aria-selected={sub === tab.tab_id}
-                class:active={sub === tab.tab_id}
-                onclick={() => (sub = tab.tab_id)}
-                >{$t(`plan.ltab.${tab.tab_id}` as 'plan.ltab.overview')}</button
+                aria-selected={sub === 'qa'}
+                class:active={sub === 'qa'}
+                onclick={() => (sub = 'qa')}>{$t('plan.tab.qa')}</button
             >
-        {/each}
-        <button
-            type="button"
-            role="tab"
-            aria-selected={sub === 'qa'}
-            class:active={sub === 'qa'}
-            onclick={() => (sub = 'qa')}>{$t('plan.tab.qa')}</button
-        >
+        </div>
     </div>
 
     <!-- Cross-tab what-if indicator: the price/state cockpit lives in the Cash-calculator
@@ -982,7 +1004,7 @@
         </div>
     {/if}
 
-    <div class="pp-subcontent">
+    <div class="pp-subcontent" style="--tabrail-top: {stickyTopHeight}px">
         {#if sub === 'qa'}
             <!-- Chat runs over the FILLED card; the engine 409s a qa turn while the base
                  turn is still running, so gate it on the base turn having finished. -->
