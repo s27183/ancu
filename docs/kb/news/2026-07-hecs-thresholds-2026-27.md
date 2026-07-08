@@ -1,6 +1,7 @@
 ---
 slug: kb.news.2026-07-hecs-thresholds-2026-27
 kb_slug: kb.hecs.thresholds
+category: finance
 affected_kb_slugs:
   - kb.hecs.thresholds
 effective_from: 2026-07-01

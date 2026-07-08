@@ -35,6 +35,7 @@
     import Onboarding from '$lib/Onboarding.svelte';
     import Login from '$lib/Login.svelte';
     import NewsTicker from '$lib/NewsTicker.svelte';
+    import NewsListSheet from '$lib/NewsListSheet.svelte';
     import NewsDetailSheet from '$lib/NewsDetailSheet.svelte';
     import { t, type MessageKey } from '$lib/i18n';
 
@@ -71,6 +72,10 @@
     // compiled news note, unfiltered — distinct from PlanProjection's per-card,
     // relevance-filtered ticker, which is unchanged. No dismiss here (see NewsDetailSheet).
     let homeNews = $state<NewsNote[]>([]);
+    // Two-layer flow ("News overview sheet", 2026-07-09): tapping the ticker opens the
+    // categorized overview (layer 1, homeNewsListOpen); tapping a headline in it opens the
+    // detail sheet (layer 2, selectedHomeNews) — same detail sheet the per-card ticker uses.
+    let homeNewsListOpen = $state(false);
     let selectedHomeNews = $state<NewsNote | null>(null);
     // Real measured height of the ticker band, fed into --home-news-h so the
     // controls-cluster/signin-banner offsets never hardcode a magic constant
@@ -153,7 +158,16 @@
         getAllNews().then((news) => (homeNews = news));
     });
 
-    function onHomeNewsSelect(note: NewsNote) {
+    // Ticker tap opens the overview, not a specific note's detail — "which headline was
+    // showing" doesn't matter, the friend's suggested flow always goes ticker -> list first.
+    function onHomeTickerTap() {
+        homeNewsListOpen = true;
+    }
+    function onHomeNewsListClose() {
+        homeNewsListOpen = false;
+    }
+    function onHomeNewsListSelect(note: NewsNote) {
+        homeNewsListOpen = false;
         selectedHomeNews = note;
     }
     function onHomeNewsClose() {
@@ -192,7 +206,7 @@
         <div class="home-news-band" bind:clientHeight={newsBandHeight}>
             <NewsTicker
                 news={homeNews}
-                onSelect={onHomeNewsSelect}
+                onSelect={onHomeTickerTap}
                 variant="marquee"
                 ariaLabel={$t('home.news.aria')}
             />
@@ -430,6 +444,10 @@
 
     {#if $loginOpen}
         <Login onclose={() => loginOpen.set(false)} />
+    {/if}
+
+    {#if homeNewsListOpen}
+        <NewsListSheet news={homeNews} onSelectNote={onHomeNewsListSelect} onClose={onHomeNewsListClose} />
     {/if}
 
     {#if selectedHomeNews}

@@ -235,6 +235,10 @@ slug: kb.news.2026-07-hecs-thresholds-2026-27
 kb_slug: kb.hecs.thresholds        # the fact doc this note is about — ITS
                                     # sources: stays the citation of record;
                                     # never duplicate a citation here
+category: finance                  # one of NEWS_CATEGORIES (kb_compiler.py) —
+                                    # visa | finance | scheme | tax | property |
+                                    # market. Which section it sorts under in the
+                                    # News overview sheet (kb-news-feature.md).
 affected_kb_slugs:                  # the relevance-filter key (usually == kb_slug;
   - kb.hecs.thresholds              # can span >1 doc if one change ripples)
 effective_from: 2026-07-01          # when the underlying fact takes effect
@@ -273,7 +277,8 @@ Same content in Vietnamese — bilingual is required, not optional (constraint #
 ```
 
 GATE 11 (`kb_compiler.py`) fail-closes on: `kb_slug` and every `affected_kb_slugs`
-entry resolving to a real KB doc, `effective_from`/`authored_date` present,
+entry resolving to a real KB doc, `category` being one of `NEWS_CATEGORIES`,
+`effective_from`/`authored_date` present,
 `sources:` non-empty (same fail-closed discipline as GATE 10 — a news note is a
 user-facing claim and gets the same citation bar as a fact doc, no exemption),
 the `## Diff` block present and parseable, the EN/VI summary

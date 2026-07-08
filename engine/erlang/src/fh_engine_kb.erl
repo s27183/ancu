@@ -175,11 +175,14 @@ kb_anchors(Slugs) ->
         end, Slugs).
 
 %% --- news accessors ----------------------------------------------------------
-%% A news entry: {kb_slug, affected_kb_slugs, affected_components, effective_from,
-%% authored_date, sources, headline_en, headline_vi, summary_en, summary_vi, diff}
-%% (kb-update-runbook.md "authoring a news note") — headline is short ticker copy
-%% (<=100 chars, GATE 11 fail-closed), summary is the full explanation read in the
-%% detail sheet. affected_components ({blueprint_slug: [component_name,
+%% A news entry: {kb_slug, category, affected_kb_slugs, affected_components,
+%% effective_from, authored_date, sources, headline_en, headline_vi, summary_en,
+%% summary_vi, diff} (kb-update-runbook.md "authoring a news note") — headline is
+%% short ticker copy (<=100 chars, GATE 11 fail-closed), summary is the full
+%% explanation read in the detail sheet, category is one of NEWS_CATEGORIES
+%% (kb_compiler.py) — which section a note sorts under in the News overview sheet
+%% (kb-news-feature.md), display grouping only, read-only pass-through here.
+%% affected_components ({blueprint_slug: [component_name,
 %% ...]}) is reverse-indexed at compile time from Component.anchors
 %% (kb-news-feature.md "Resolved design questions") — read-only pass-through here,
 %% never re-derived at runtime. `sources` (GATE 11, fail-closed) pins the citation

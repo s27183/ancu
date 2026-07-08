@@ -434,9 +434,14 @@ export interface NewsSource {
 /** A KB news note (kb_compiler.py `parse_news_doc`, artifact["news"][slug]). Bilingual
  *  summary + a machine diff, reverse-indexed at compile time to the blueprint components
  *  it affects (`affected_components`) so a tap can scroll to/highlight the right tile. */
+/** One of NEWS_CATEGORIES (kb_compiler.py, GATE 11 fail-closed) — which section a
+ *  note sorts under in the News overview sheet (kb-news-feature.md). */
+export type NewsCategory = 'visa' | 'finance' | 'scheme' | 'tax' | 'property' | 'market';
+
 export interface NewsNote {
     news_slug: string;
     kb_slug: string;
+    category?: NewsCategory;
     affected_kb_slugs?: string[];
     /** {blueprint_slug: [component_name, ...]} — this card's own blueprint_slug names
      *  which tile(s) to scroll to/highlight (kb-news-feature.md "UX shape"). */

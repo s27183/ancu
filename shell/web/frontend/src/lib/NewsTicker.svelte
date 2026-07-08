@@ -108,13 +108,7 @@
 
 {#if news.length > 0 && variant === 'marquee'}
     <div class="pp-ticker pp-ticker-marquee" role="region" aria-label={regionLabel}>
-        <button
-            type="button"
-            class="pp-ticker-pause"
-            onclick={togglePaused}
-            aria-label={paused ? $t('plan.news.play') : $t('plan.news.pause')}
-            >{paused ? '▶' : '❚❚'}</button
-        >
+        <span class="pp-ticker-label" aria-hidden="true">{$t('home.news.label')}</span>
         <div class="pp-ticker-marquee-viewport">
             <!-- Decorative: the moving copy is aria-hidden; the sr-only list below is
                  the real, non-moving, keyboard/AT-reachable equivalent. -->
@@ -139,6 +133,27 @@
                 {/each}
             </div>
         </div>
+        <!-- WCAG 2.2.2 (Pause, Stop, Hide): motion lasting >5s needs a stop control
+             reachable without hover — touch/keyboard users have no hover state, so
+             CSS-only :hover-pause below isn't enough on its own. Icon is an inline SVG,
+             not a Unicode glyph (❚❚/▶ render as a tofu box in some fonts — confirmed
+             via a headless-Chromium screenshot). -->
+        <button
+            type="button"
+            class="pp-ticker-pause"
+            onclick={togglePaused}
+            aria-label={paused ? $t('plan.news.play') : $t('plan.news.pause')}
+        >
+            {#if paused}
+                <svg viewBox="0 0 16 16" width="11" height="11" fill="currentColor" aria-hidden="true"
+                    ><path d="M3.5 2v12l10-6-10-6z" /></svg
+                >
+            {:else}
+                <svg viewBox="0 0 16 16" width="11" height="11" fill="currentColor" aria-hidden="true"
+                    ><rect x="3" y="2" width="3.2" height="12" /><rect x="9.8" y="2" width="3.2" height="12" /></svg
+                >
+            {/if}
+        </button>
         <ul class="sr-only">
             {#each news as note (note.news_slug)}
                 <li><button type="button" onclick={() => onSelect?.(note)}>{headlineFor(note)}</button></li>

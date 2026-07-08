@@ -906,7 +906,6 @@ const messages = {
 
     // News detail sheet (kb-news-feature.md, task 28): opened by tapping a ticker headline.
     'plan.news.detail_title': { vi: 'Cập nhật kế hoạch', en: 'Plan update' },
-    'plan.news.diff_heading': { vi: 'Chi tiết thay đổi', en: 'What changed' },
     'plan.news.source': { vi: 'Nguồn', en: 'Source' },
 
     // Dismiss action (kb-news-feature.md, task 31): "I've seen this" — removes the note
@@ -917,8 +916,20 @@ const messages = {
     // with a CNBC/Bloomberg-style continuous scroll — distinct aria label from the
     // per-card ticker since this one is unfiltered, not "plan-relevant").
     'home.news.aria': { vi: 'Tin tức mới nhất', en: 'Latest updates' },
+    'home.news.label': { vi: 'TIN TỨC', en: 'NEWS' },
     'plan.news.pause': { vi: 'Tạm dừng', en: 'Pause' },
-    'plan.news.play': { vi: 'Tiếp tục', en: 'Resume' }
+    'plan.news.play': { vi: 'Tiếp tục', en: 'Resume' },
+
+    // News overview sheet (kb-news-feature.md "News overview sheet") — layer 1 of the
+    // two-layer homepage news flow: tapping the ticker opens this categorized, scrollable
+    // list; tapping a headline in it opens the existing detail sheet (layer 2).
+    'home.news.sheet_title': { vi: 'Tin tức', en: 'News' },
+    'home.news.category.visa': { vi: 'Visa & cư trú', en: 'Visa & residency' },
+    'home.news.category.finance': { vi: 'Tài chính', en: 'Finance' },
+    'home.news.category.scheme': { vi: 'Chương trình hỗ trợ', en: 'Government schemes' },
+    'home.news.category.tax': { vi: 'Thuế', en: 'Tax' },
+    'home.news.category.property': { vi: 'Bất động sản', en: 'Property' },
+    'home.news.category.market': { vi: 'Thị trường', en: 'Market' }
 } as const;
 
 export type MessageKey = keyof typeof messages;

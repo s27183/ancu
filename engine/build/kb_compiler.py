@@ -116,6 +116,14 @@ LOCALE_VALIDATORS = {
 # after it, so this is structural, not a style nit).
 NEWS_HEADLINE_MAX_CHARS = 100
 
+# A news note's display category (kb-news-feature.md "News overview sheet") — a small,
+# closed enum grounded in the five modes' concerns, NOT derived from docs/kb/*'s ~40
+# fine-grained slug namespaces (too granular, not user-facing groupings). Explicit
+# authored field, same posture as headline: HARD, fail-closed, easy to extend when a
+# real note needs a 7th bucket (match enforcement grade to property kind — this is
+# display grouping, not a compliance gate, so the enum itself can grow on demand).
+NEWS_CATEGORIES = ("visa", "finance", "scheme", "tax", "property", "market")
+
 
 def check_copy_template(pair, locales=LOCALES):
     """Return an error string if a `copy` template is not well-formed in every locale,
@@ -600,11 +608,13 @@ def markdown_section(text, heading):
 def parse_news_doc(path):
     """Parse a `docs/kb/news/*.md` note (kb-update-runbook.md "authoring a news
     note") — a dated, IMMUTABLE announcement of a KB fact change, distinct from a
-    living fact doc (kb_doc-authoring.md). Frontmatter: slug / kb_slug /
+    living fact doc (kb_doc-authoring.md). Frontmatter: slug / kb_slug / category /
     affected_kb_slugs / effective_from / authored_date / sources. Body: bilingual
     `## Headline (EN|VI)` (a short, one-line ticker string — kb-news-feature.md
     "Homepage ticker"), bilingual `## Summary (EN|VI)` (the full explanation, read
     in the detail sheet), + a `## Diff` fenced jsonc block (old_value/new_value).
+    `category:` (kb-news-feature.md "News overview sheet") is the section a note
+    sorts under in the News overview sheet — one of NEWS_CATEGORIES.
     `sources:` cites what the author actually had open when writing THIS diff
     (reuses parse_sources_block, the same fact-doc shape) — it does not
     duplicate kb_slug's fact-doc sources going forward, it pins the citation for
@@ -615,6 +625,7 @@ def parse_news_doc(path):
     text = path.read_text()
     slug_m = re.search(r"^slug:\s*(\S+)", text, re.M)
     kb_slug_m = re.search(r"^kb_slug:\s*(\S+)", text, re.M)
+    category_m = re.search(r"^category:\s*(\S+)", text, re.M)
     eff_m = re.search(r"^effective_from:\s*(\S+)", text, re.M)
     auth_m = re.search(r"^authored_date:\s*(\S+)", text, re.M)
     diff_block = fenced_jsonc_after(text, "## Diff")
@@ -628,6 +639,7 @@ def parse_news_doc(path):
     return {
         "slug": slug_m.group(1) if slug_m else None,
         "kb_slug": kb_slug_m.group(1) if kb_slug_m else None,
+        "category": category_m.group(1) if category_m else None,
         "affected_kb_slugs": parse_frontmatter_list(text, "affected_kb_slugs"),
         "effective_from": eff_m.group(1) if eff_m else None,
         "authored_date": auth_m.group(1) if auth_m else None,
@@ -962,7 +974,9 @@ def run(emit=False):
     # ---- GATE 11: news-note well-formedness (docs/kb/news/*.md) ------------ #
     # kb-update-runbook.md "authoring a news note": kb_slug + every affected_kb_slugs
     # entry must resolve to a real KB doc (the relevance-filter key has to point at
-    # something real); effective_from/authored_date required; sources required
+    # something real); category must be one of NEWS_CATEGORIES (the News overview
+    # sheet has nowhere else to sort an unrecognized value); effective_from/
+    # authored_date required; sources required
     # (FAIL-CLOSED, same discipline as GATE 10 — a news note is a user-facing claim
     # and deserves the same citation bar as a fact doc; not exempt the way
     # kb.copy.*/kb.bilingual.*/kb.journey.* are, since every news note asserts a
@@ -972,6 +986,9 @@ def run(emit=False):
     for slug, doc in sorted(news_docs.items()):
         if not doc.get("kb_slug") or not kb_exists(doc["kb_slug"]):
             fails.append(f"[news] {slug}: kb_slug {doc.get('kb_slug')!r} does not resolve to a KB doc")
+        if doc.get("category") not in NEWS_CATEGORIES:
+            fails.append(f"[news] {slug}: category {doc.get('category')!r} not one of "
+                        f"{NEWS_CATEGORIES} (kb-news-feature.md \"News overview sheet\")")
         if not doc.get("affected_kb_slugs"):
             fails.append(f"[news] {slug}: affected_kb_slugs is empty — nothing to filter relevance by")
         else:
@@ -1165,6 +1182,7 @@ def build_artifact(blueprints, registries, kb_docs, news_docs):
     news = {
         slug: {
             "kb_slug": d["kb_slug"],
+            "category": d["category"],
             "affected_kb_slugs": d["affected_kb_slugs"],
             # Reverse-indexed at compile time from data already in hand (Component.anchors)
             # — the shell's placement lookup (kb-news-feature.md "Open design questions" #1):
