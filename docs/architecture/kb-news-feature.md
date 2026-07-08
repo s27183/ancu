@@ -37,9 +37,22 @@ two duplicated runs), with a pause/play control, hover/focus-pause,
 keyboard/AT users. See "Homepage ticker" below for the full record.
 Committed `730196f`. **Backend smoke-tested live against Docker PG
 (`news_smoke.escript`, `news_proxy_smoke.escript`, both re-run clean); shell
-validated (`svelte-autofixer`, `svelte-check` 0/0) but NOT YET re-verified
-visually in-browser** — flag this open until a Playwright pass confirms the
-marquee actually renders/scrolls as intended.
+validated (`svelte-autofixer`, `svelte-check` 0/0)**, and since visually
+re-verified in-browser — see the 2026-07-09 ticker-polish entry below, whose
+Playwright pass covered the marquee too.
+
+**Extended a third time 2026-07-09 with ticker polish + a two-layer News
+overview sheet** — feedback on the marquee itself (looked plain, the pause
+icon rendered as a blank box in some fonts, the detail popup showed raw
+markdown asterisks and a JSON diff dump), plus a friend's suggestion (relayed
+by Son) that tapping the ticker should open a categorized overview of every
+note rather than jump straight to one. Fix: solid-band ticker chrome with a
+"NEWS" label chip, an inline-SVG pause icon, a small markdown renderer for
+the detail sheet's summary (`$lib/markdown.ts`), the diff dump dropped
+entirely (audit content, not buyer-facing), a new `category` news-note field
+(GATE 11 fail-closed), and `NewsListSheet.svelte` as a new layer-1 sheet.
+Committed `c35639c`. **Live-verified in-browser** — see "Ticker polish + News
+overview sheet" below for the full record.
 
 ## The problem
 
@@ -463,10 +476,76 @@ check (`PASS — artifact emitted`, `headline_en`/`headline_vi` present in
 `+page.svelte`; `svelte-check` 0 errors/0 warnings; `rebar3 compile` clean
 (engine + shell); both `news_smoke.escript` and `news_proxy_smoke.escript`
 re-run live against Docker PG, all assertions passing with the rebuilt
-artifact. **Not yet visually re-verified in-browser** — the dev engine/shell
-processes were running in the user's own foreground terminal (not tmux, not
-restartable by the agent), so the Playwright pass that closed the first
-extension has not yet been repeated for this one.
+artifact. Visually re-verified in-browser in the next round below (the same
+Playwright pass covers both extensions, since by the time it ran both had
+landed).
+
+**Ticker polish + News overview sheet (added 2026-07-09, commit `c35639c`).**
+Three independent fixes plus one new feature, landed together:
+
+- **Ticker chrome, modernized.** `.pp-ticker-marquee` is now a solid
+  `var(--ink)` band with no border (previously `--accent-soft` background +
+  a 1px `--accent` border, which read as a form field, not a news strip), a
+  small rounded "NEWS"/"TIN TỨC" label chip ahead of the scrolling text
+  (CNBC-style), and white text/separators instead of ink-on-light.
+- **Pause icon: a real bug, not just a style nit.** The pause/play control
+  used the Unicode glyphs `❚❚`/`▶` — confirmed via a headless-Chromium
+  screenshot to render as a blank tofu box (no font fallback covers those
+  code points reliably). Replaced with a small inline SVG (two bars / a
+  triangle), which also let it be restyled as a subtle end-of-strip icon
+  rather than a headline-weight element. The control itself stays — it is
+  the WCAG 2.2.2 non-hover-only stop for continuously-moving content, needed
+  because touch/keyboard users have no hover state to trigger the CSS-only
+  pause.
+- **Detail-sheet markdown, actually rendered.** `NewsDetailSheet.svelte` was
+  interpolating `summary_en/vi` as plain text, so a KB-authored `**bold**`
+  showed as literal asterisks (confirmed against the live HECS note, whose
+  summary bolds the two dollar figures). New `$lib/markdown.ts`:
+  HTML-escapes first, then converts a small inline subset
+  (`**bold**`/`*italic*`/`` `code` ``/`[text](url)`, http(s)-only hrefs) to
+  safe tags, rendered via `{@html}`. Deliberately not a markdown library
+  dependency — these fields are single-paragraph prose, never block content
+  (headers/lists/code fences), so four inline patterns is the actual
+  surface area, not a placeholder for more.
+- **Raw JSON diff dump, removed from the sheet.** `note.diff` is
+  `kb_compiler.py`'s build-time audit artifact for what a note changed
+  (`old_value`/`new_value`, no fixed schema) — authored for KB QA, not for a
+  buyer to read. The sheet no longer renders it at all (the human-readable
+  version is already the summary above it); `.pp-news-diff`/
+  `.pp-news-subhead` CSS and the `plan.news.diff_heading` i18n key were dead
+  after the removal and were deleted, not left as unused scaffolding.
+  `note.diff` itself is untouched in the data model — only the display was
+  cut.
+- **New: the News overview sheet (a friend's suggestion, relayed by Son).**
+  Previously tapping any homepage ticker headline opened `NewsDetailSheet`
+  directly for *that* note. Now it opens `NewsListSheet.svelte` — every
+  current note (reuses the already-fetched, unfiltered `homeNews` array, no
+  new API call) grouped into category sections, scrollable via `Modal`'s
+  existing `.mo-body`. Tapping a headline inside it opens the same
+  `NewsDetailSheet` as before (layer 2, unchanged). Backed by a new
+  `category` frontmatter field on `docs/kb/news/*.md` — a small closed enum
+  (`visa | finance | scheme | tax | property | market`, `NEWS_CATEGORIES` in
+  `kb_compiler.py`), GATE 11 fail-closed same as `headline`, **explicit and
+  authored, not derived from `docs/kb/`'s slug namespace** (~40 namespaces,
+  too fine-grained and not grouped into user-facing buckets). **Scope:
+  homepage ticker only** — the per-card ticker in `PlanProjection` (discrete
+  variant) keeps its exact tested direct-tap-to-detail + dismiss flow;
+  changing it wasn't requested and dismiss doesn't belong in a general
+  browse-everything list.
+
+**Proof:** `svelte-check` 0 errors/0 warnings and `svelte-autofixer` clean on
+every touched/new component; `kb_compiler.py` re-run clean
+(`PASS — artifact emitted`, `category: "finance"` present in
+`artifact.json`); confirmed `fh_engine_kb.erl`'s news accessors need no
+functional change (the entry map is a generic pass-through, no field
+whitelist). **Live-verified in-browser via Playwright** against the full
+local stack (engine/shell/frontend restarted under tmux — the prior
+foreground-terminal processes had stopped): the pause icon renders correctly
+(previously confirmed as a tofu box, now two clean SVG bars); tapping a
+ticker headline opens the overview sheet showing a "TÀI CHÍNH" (Finance)
+section header with the HECS note; tapping that headline swaps to the
+detail sheet, which renders `**67.000 đô la**`/`**69.528 đô la**` as real
+bold text and shows no diff block (`.pp-news-diff` DOM count: 0).
 
 ## Open design questions (real gaps, not yet resolved)
 
