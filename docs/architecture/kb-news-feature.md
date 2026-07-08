@@ -1,16 +1,16 @@
 # KB news feature — surfacing KB changes to the buyer they affect
 
-**Status:** backend built + live-verified 2026-07-07 (`news_smoke.escript`, all
-assertions pass against Docker PG). Compiler now reverse-indexes each note's
-`affected_components`, and every note now carries a `sources:` citation
-(both resolved 2026-07-07 — see below). Shell: fetch (27), ticker (29),
-tap → detail sheet + tile highlight (28), dismiss wiring (31), and empty
-state (33, confirmed with no code change) all closed 2026-07-07 (svelte-check
-0/0 + autofixer clean each time; no live browser walkthrough — see each
-task's note). Task 28's `NewsDetailSheet.svelte` is the second consumer that
-closes both 30 (bilingual pick) and 32 (source link) — see their entries.
-Task 34 (mobile layout pass) remains open — it needs a live/visual check,
-not just static verification.
+**Status:** feature COMPLETE as of 2026-07-08 — backend built + live-verified
+2026-07-07 (`news_smoke.escript`, all assertions pass against Docker PG).
+Compiler reverse-indexes each note's `affected_components`, and every note
+carries a `sources:` citation (both resolved 2026-07-07 — see below). Shell:
+fetch (27), ticker (29), tap → detail sheet + tile highlight (28), dismiss
+wiring (31), and empty state (33) all closed 2026-07-07 (svelte-check 0/0 +
+autofixer clean each time). Task 28's `NewsDetailSheet.svelte` is the second
+consumer that closes both 30 (bilingual pick) and 32 (source link) — see
+their entries. Task 34 (mobile layout pass), the one item needing a real
+browser rather than static checks, closed 2026-07-08 — live-verified at a
+375px viewport against the full local stack. All 8 checklist items done.
 
 ## The problem
 
@@ -234,10 +234,32 @@ scrolls to/highlights the `affected_components` tile.
       that collapse automatically, so the Budget tab's nested sub-rail doesn't
       leave a gap either. No dead space, no separate empty-state branch was
       ever needed.
-- [ ] **Mobile layout pass.** A persistent sticky strip claims vertical space
-      on every viewport, more than a per-tile badge would — confirm it
-      doesn't compete with or cover other plan-card UI on small viewports
-      (the original ask this feature grew from).
+- [x] **Mobile layout pass (2026-07-08, live-verified).** Confirmed in a real
+      browser, not statically: stood up the full local stack (`docs/local-dev.md`
+      — engine + shell backend + frontend, each in its own tmux session so
+      `rebar3 shell` gets a real TTY) and drove it headless with Playwright at a
+      375×812 viewport. Signed in via the dev-exposed magic link, then seeded a
+      Mode-A plan card whose `audit_events.kb_versions_jsonb` provenance matches
+      the compiled HECS note (cloned from an existing dev-DB fixture's
+      `profiles`/`plan_cards`/`audit_events` rows onto a fresh test user +
+      `plan_card_views` title — the news relevance test needs real provenance
+      rows, not just `content_jsonb`; a first attempt that only cloned
+      `content_jsonb` produced an empty `GET .../news`, tracing to
+      `fh_engine_store:card_kb_slugs/1` reading `audit_events`, not the card's
+      own JSON). Walked the real UI path (map → suburb search → suburb sheet →
+      Plan tab, not a direct URL — this shell has no per-card route) and
+      screenshotted four states: ticker at rest, ticker scrolled (inside
+      `.sheet .body`, the sheet's actual scroll region — `window` doesn't
+      scroll here), the Budget tab's nested sub-rail stacked under the ticker+
+      outer rail, and that same nested state scrolled. All four: the ticker,
+      the outer sub-tab rail, and the Budget tab's nested sub-rail stack
+      cleanly with no overlap, no dead space, and no collision with the sheet
+      header — confirming task 29's `stickyTopHeight`/`--tabrail-top` measured-
+      offset fix holds at a real small-viewport width, not just in reasoning.
+      Tapping the ticker headline also opens `NewsDetailSheet` cleanly as a
+      full overlay with no layout collision. No console errors from the news
+      UI itself (one unrelated `pmtiles.js` 404 — local dev has no real map
+      tile data, pre-existing and orthogonal to this feature).
 
 ## Resolved design questions
 
