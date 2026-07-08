@@ -22,6 +22,25 @@ proxy) and shell (`+page.svelte` mount, `NewsDetailSheet`'s now-optional
 new `news_proxy_smoke.escript`, Playwright screenshots at desktop + 375px
 mobile — see "Homepage ticker" for the full record).
 
+**Extended again 2026-07-09 with a required headline field + a real marquee**
+— the shipped homepage ticker rendered the full `summary_en/vi` paragraph in
+a discrete swap-every-6s box, which looked like a static wrapped banner, not
+a ticker, and only carried one item (a content gap — one KB news doc
+authored, not a bug). Fix: a new required `## Headline (EN|VI)` news-note
+field (<=100 chars, GATE 11 fail-closed) supplies short ticker copy,
+preferred over `summary_en/vi` in both ticker variants; `NewsTicker.svelte`
+gained a `variant: 'discrete' | 'marquee'` prop — `discrete` (per-card,
+default) is byte-for-byte unchanged, `marquee` (homepage only) is a real
+continuously-scrolling single-line strip (CSS `translateX(-50%)` loop over
+two duplicated runs), with a pause/play control, hover/focus-pause,
+`prefers-reduced-motion` fallback, and a non-moving `.sr-only` list for
+keyboard/AT users. See "Homepage ticker" below for the full record.
+Committed `730196f`. **Backend smoke-tested live against Docker PG
+(`news_smoke.escript`, `news_proxy_smoke.escript`, both re-run clean); shell
+validated (`svelte-autofixer`, `svelte-check` 0/0) but NOT YET re-verified
+visually in-browser** — flag this open until a Playwright pass confirms the
+marquee actually renders/scrolls as intended.
+
 ## The problem
 
 A KB update pass (`kb-update-runbook.md` Phase 1) changes a fact a buyer's plan
@@ -369,8 +388,9 @@ doesn't render. No new storage, no per-user global dismiss layer.
   failure rather than a discriminated outcome type (this is ambient
   chrome, not load-bearing, same "nice-to-know" posture already established
   for the per-card ticker's empty state).
-- **Shell UI:** `+page.svelte` fetches on `onMount`, mounts the existing
-  `NewsTicker.svelte` unmodified inside a new `.home-news-band` wrapper
+- **Shell UI:** `+page.svelte` fetches on `onMount`, mounts `NewsTicker.svelte`
+  (at the time, unmodified — see "Headline + marquee" below for the
+  2026-07-09 `variant` prop addition) inside a new `.home-news-band` wrapper
   (full-width, floating just below the fixed header). Tapping a headline
   opens the existing `NewsDetailSheet` with no `onDismiss`. The band's real
   height is measured (`bind:clientHeight` → `newsBandHeight` →
@@ -396,6 +416,57 @@ doesn't render. No new storage, no per-user global dismiss layer.
   `.controls-cluster` (shifted correctly via `--home-news-h`) or the legend;
   tapping the headline opens the detail sheet with **zero** `.pp-news-dismiss`
   buttons present (confirmed via DOM count, not just visual read).
+
+**Headline + marquee (added 2026-07-09).** After the above shipped, Son looked
+at it and flagged two things: only one item showed, and it didn't look or
+move like a ticker — it read as a static wrapped green banner.
+
+- **Only one item: a content gap, not a bug.** The feed is unfiltered by
+  design; exactly one `docs/kb/news/*.md` doc existed
+  (`kb.news.2026-07-hecs-thresholds-2026-27`). More KB news docs → more
+  ticker items automatically, no code change.
+- **The look/motion complaint was real.** `.pp-ticker-headline` used
+  `white-space: normal` and rendered `summary_en/summary_vi` — a full
+  4-sentence paragraph authored for the detail sheet — inside a discrete
+  swap-every-6s box built for a narrow per-card sidebar strip. Full-width on
+  the homepage, that wrapped to several lines and never visibly "moved" with
+  only one item to swap to.
+- **New required news-note field: `## Headline (EN|VI)`.** Short ticker copy
+  (<=100 chars, `NEWS_HEADLINE_MAX_CHARS` in `kb_compiler.py`), GATE 11
+  fail-closed, bilingual-well-formed via the same `check_copy_template` used
+  for Summary. `## Summary (EN|VI)` is unchanged — still the full explanation,
+  read only in the detail sheet. Applied to **both** ticker variants
+  (headline now preferred over summary everywhere) since it matches
+  `NewsTicker.svelte`'s own original design intent ("chrome... one headline
+  visible") without touching either variant's interaction model.
+- **`NewsTicker.svelte` gained a `variant: 'discrete' | 'marquee'` prop**
+  rather than being redesigned in place. `discrete` (default, per-card) is
+  byte-for-byte the task-29/31 behavior — deliberately untouched, since Son's
+  complaint was scoped to the homepage surface and changing the already-tested
+  per-card model would have been unrequested scope creep. `marquee`
+  (homepage only) is a real continuous single-line scroll: every headline
+  concatenated into one strip, rendered twice back to back and looped via a
+  CSS `translateX(-50%)` keyframe animation (the standard seamless-marquee
+  technique) — reading speed is a length-based heuristic
+  (`marqueeDurationS`), not a measured value. Accessibility: an explicit
+  pause/play button plus CSS hover/focus-pause (WCAG 2.2.2 — auto-moving
+  content lasting >5s needs a non-hover-only stop control), a
+  `prefers-reduced-motion` override more specific than the app's existing
+  blanket `* { animation-duration: 0.01ms }` catch-all (so it actually stops
+  rather than flickering near-instantly), and a non-moving `.sr-only <ul>` of
+  the same headlines as the real keyboard/AT-reachable path (the moving copy
+  is `aria-hidden`).
+
+**Proof (2026-07-09):** `kb_compiler.py` re-run clean with the new GATE 11
+check (`PASS — artifact emitted`, `headline_en`/`headline_vi` present in
+`artifact.json`); `svelte-autofixer` clean on `NewsTicker.svelte` and
+`+page.svelte`; `svelte-check` 0 errors/0 warnings; `rebar3 compile` clean
+(engine + shell); both `news_smoke.escript` and `news_proxy_smoke.escript`
+re-run live against Docker PG, all assertions passing with the rebuilt
+artifact. **Not yet visually re-verified in-browser** — the dev engine/shell
+processes were running in the user's own foreground terminal (not tmux, not
+restartable by the agent), so the Playwright pass that closed the first
+extension has not yet been repeated for this one.
 
 ## Open design questions (real gaps, not yet resolved)
 
