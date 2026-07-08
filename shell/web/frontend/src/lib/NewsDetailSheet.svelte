@@ -7,12 +7,17 @@
     // an explicit dismiss action (task 31) — distinct from onClose: closing (✕/backdrop/
     // Escape) just puts the sheet away and still scrolls/highlights the affected tile;
     // dismiss additionally retires the note from this card's rotation for good.
+    //
+    // `onDismiss` is OPTIONAL (kb-news-feature.md "Homepage ticker", 2026-07-08): the
+    // homepage's unfiltered ticker has no card to retire a note FROM, so it opens this
+    // same sheet with no onDismiss — the Dismiss button just doesn't render. Dismiss
+    // was always a per-card action surfaced here, never a property of the sheet itself.
     import { lang } from '$lib/stores/lang';
     import { t } from '$lib/i18n';
     import Modal from '$lib/Modal.svelte';
     import type { NewsNote } from '$lib/api';
 
-    let { note, onClose, onDismiss }: { note: NewsNote; onClose: () => void; onDismiss: () => void } =
+    let { note, onClose, onDismiss }: { note: NewsNote; onClose: () => void; onDismiss?: () => void } =
         $props();
 
     // Same inline bilingual-pick idiom as NewsTicker.svelte/Onboarding.svelte/
@@ -40,7 +45,9 @@
             >{$t('plan.news.source')}</a
         >
     {/if}
-    <button type="button" class="primary pp-news-dismiss" onclick={onDismiss}>
-        {$t('plan.news.dismiss')}
-    </button>
+    {#if onDismiss}
+        <button type="button" class="primary pp-news-dismiss" onclick={onDismiss}>
+            {$t('plan.news.dismiss')}
+        </button>
+    {/if}
 </Modal>

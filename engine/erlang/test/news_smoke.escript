@@ -11,8 +11,11 @@
 %% kb-news-feature.md "Open design questions" #1 — the shell's component-target
 %% lookup) AND a non-empty sources list (GATE 11, kb-update-runbook.md
 %% "authoring a news note" — the shell's source-link render); the PATCH dismiss
-%% round-trip (jsonb_set, the news_dismissed audit/SSE event); and fail-closed
-%% auth/tenant/method/field cases.
+%% round-trip (jsonb_set, the news_dismissed audit/SSE event); fail-closed
+%% auth/tenant/method/field cases; AND (2026-07-08) GET /api/engine/news, the
+%% homepage feed (fh_engine_h_news_feed, fh_engine_kb:all_news/0) — unfiltered
+%% by relevance/card, unauthenticated → 401, and provably UNCHANGED by a card's
+%% own dismiss (the two reads are genuinely decoupled, not the same data twice).
 %%
 %% SIDECAR-FREE: the card is seeded directly in PG, and its kb_versions
 %% provenance is seeded via a direct append_audit/6 call (no turn → no Python) —
@@ -88,6 +91,17 @@ main(_) ->
     expect(length(Sources) > 0 andalso maps:is_key(<<"url">>, hd(Sources)),
            "note carries a non-empty sources list with a url"),
 
+    %% === 3b. GET /api/engine/news — the homepage feed (kb-news-feature.md "Homepage
+    %%    ticker"): unfiltered by relevance to any card's provenance, so the HECS
+    %%    note appears regardless of what (if anything) a given card has consulted ===
+    NewsFeedUrl = Base ++ "/news",
+    {200, R3b} = req(get, NewsFeedUrl, [Auth], <<>>),
+    #{<<"news">> := AllNews} = fh_engine_util:json_decode(R3b),
+    expect(lists:any(fun(E) -> maps:get(<<"news_slug">>, E) =:= ?NEWS_SLUG end, AllNews),
+           "GET /api/engine/news includes the HECS note, unfiltered"),
+    {S3c, _} = req(get, NewsFeedUrl, [], <<>>),
+    expect(S3c =:= 401, "GET /api/engine/news with no token → 401"),
+
     %% === 4. PATCH dismiss → 200, dismissed_news reflects it ===
     {200, R4} = req(patch, Url, [Auth], body(?NEWS_SLUG)),
     #{<<"dismissed_news">> := Dismissed} = fh_engine_util:json_decode(R4),
@@ -98,6 +112,13 @@ main(_) ->
     {200, R5} = req(get, Url, [Auth], <<>>),
     #{<<"news">> := []} = fh_engine_util:json_decode(R5),
     io:format("  PASS   after dismiss: GET returns [] (relevant-but-dismissed filtered)~n"),
+
+    %% === 5b. the homepage feed is UNCHANGED by this card's dismiss — dismiss is a
+    %%    per-card fact (dismissed_news_jsonb), the feed has no card to read it from ===
+    {200, R5b} = req(get, NewsFeedUrl, [Auth], <<>>),
+    #{<<"news">> := AllNewsAfterDismiss} = fh_engine_util:json_decode(R5b),
+    expect(lists:any(fun(E) -> maps:get(<<"news_slug">>, E) =:= ?NEWS_SLUG end, AllNewsAfterDismiss),
+           "GET /api/engine/news still includes the HECS note after this card dismissed it"),
 
     %% === 6. the audit/SSE event trail — one news_dismissed row ===
     EvCount = scalar("SELECT count(*) FROM plan_card_events WHERE plan_card_id = $1 "

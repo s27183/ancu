@@ -15,7 +15,7 @@
          refine/3, set_profile_financials/3, set_checklist_status/3,
          attach_property/3, set_transaction_dates/4, upload_document/4, stream_events/3,
          list_suburbs/1, get_usage_events/2, start_httpc_profiles/0,
-         get_news/2, dismiss_news/3]).
+         get_news/2, dismiss_news/3, list_all_news/0]).
 
 %% Dedicated httpc profile for the LONG-LIVED SSE stream proxy (stream_events/3).
 %% SSE requests run with {timeout, infinity} and hold an httpc session for the entire
@@ -217,6 +217,20 @@ dismiss_news(UserId, PlanCardId, BodyMap) ->
     Body = fh_shell_util:json_encode(BodyMap),
     {ok, {{_, Status, _}, _, Resp}} =
         httpc:request(patch, {Url, Headers, "application/json", Body},
+                      [{timeout, ?RPC_TIMEOUT_MS}], [{body_format, binary}]),
+    {Status, Resp}.
+
+%% Fetch every compiled KB news note, unfiltered — GET /api/engine/news
+%% (kb-news-feature.md "Homepage ticker"). PUBLIC, same posture as list_suburbs/1:
+%% the anonymous system principal, since this is global KB content and the homepage
+%% ticker is pre-login chrome, not a per-buyer read. Relayed verbatim.
+-spec list_all_news() -> {non_neg_integer(), binary()}.
+list_all_news() ->
+    Token = fh_shell_engine_jwt:mint(#{user_id => ?ANON_USER_ID}),
+    Url = base_url() ++ "/news",
+    Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
+    {ok, {{_, Status, _}, _, Resp}} =
+        httpc:request(get, {Url, Headers},
                       [{timeout, ?RPC_TIMEOUT_MS}], [{body_format, binary}]),
     {Status, Resp}.
 

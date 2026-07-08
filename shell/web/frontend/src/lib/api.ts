@@ -505,6 +505,16 @@ export async function dismissNews(
     return { kind: 'error', status: res.status };
 }
 
+/** GET every compiled KB news note, unfiltered by relevance to any one plan card —
+ *  the homepage ticker's data source (kb-news-feature.md "Homepage ticker"). PUBLIC,
+ *  same posture as getSuburbs: pre-login chrome, no card/tenant scoping. */
+export async function getAllNews(fetchFn: typeof fetch = fetch): Promise<NewsNote[]> {
+    const res = await fetchFn('/api/news');
+    if (!res.ok) return [];
+    const body = (await res.json()) as { news?: NewsNote[] };
+    return body.news ?? [];
+}
+
 // --- Property attachment: Phase B (Mode-C investor) --------------------------
 // POST /api/plan-cards/:id/properties — attach a property to the card and run the
 // per-property (Phase-B) turn (engine-contract §12). The body is a NORMALIZED

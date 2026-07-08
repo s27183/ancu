@@ -5,7 +5,14 @@
     // strip (§6.1), and the click-sheet. Mobile-native: full-bleed canvas, the
     // sheet is a bottom-sheet on phone / side-panel on desktop (§7.1).
     import { onMount } from 'svelte';
-    import { getSuburbs, listPlanCards, type Suburb, type SuburbSource } from '$lib/api';
+    import {
+        getSuburbs,
+        listPlanCards,
+        getAllNews,
+        type Suburb,
+        type SuburbSource,
+        type NewsNote
+    } from '$lib/api';
     import {
         MAP_SCOPES,
         STATE_NAMES,
@@ -27,6 +34,8 @@
     import SuburbSheet from '$lib/SuburbSheet.svelte';
     import Onboarding from '$lib/Onboarding.svelte';
     import Login from '$lib/Login.svelte';
+    import NewsTicker from '$lib/NewsTicker.svelte';
+    import NewsDetailSheet from '$lib/NewsDetailSheet.svelte';
     import { t, type MessageKey } from '$lib/i18n';
 
     // NB: never name a $state var `state` — svelte-check reads it as a store subscribe.
@@ -57,6 +66,16 @@
     // The calm feedback banner the backend redirects back with (the login sheet's
     // open state now lives in the shared `loginOpen` store, opened from the header).
     let banner = $state<SigninFlag | null>(null);
+
+    // Homepage KB-news ticker (kb-news-feature.md "Homepage ticker", 2026-07-08): every
+    // compiled news note, unfiltered — distinct from PlanProjection's per-card,
+    // relevance-filtered ticker, which is unchanged. No dismiss here (see NewsDetailSheet).
+    let homeNews = $state<NewsNote[]>([]);
+    let selectedHomeNews = $state<NewsNote | null>(null);
+    // Real measured height of the ticker band, fed into --home-news-h so the
+    // controls-cluster/signin-banner offsets never hardcode a magic constant
+    // (kb-news-feature.md task 29's regression is the lesson here — measure, don't guess).
+    let newsBandHeight = $state(0);
     // CC-BY attribution is required (§6.1) but space-cheap when collapsed to a chip.
     let attrOpen = $state(false);
 
@@ -131,7 +150,15 @@
             banner = flag;
             history.replaceState(null, '', window.location.pathname);
         }
+        getAllNews().then((news) => (homeNews = news));
     });
+
+    function onHomeNewsSelect(note: NewsNote) {
+        selectedHomeNews = note;
+    }
+    function onHomeNewsClose() {
+        selectedHomeNews = null;
+    }
 
     async function load(st: MapScope) {
         loading = true;
@@ -160,7 +187,13 @@
     });
 </script>
 
-<div class="map-shell">
+<div class="map-shell" style="--home-news-h: {newsBandHeight}px">
+    {#if homeNews.length > 0}
+        <div class="home-news-band" bind:clientHeight={newsBandHeight}>
+            <NewsTicker news={homeNews} onSelect={onHomeNewsSelect} />
+        </div>
+    {/if}
+
     {#if !loading && !errored}
         <SuburbMap
             bind:this={mapRef}
@@ -392,5 +425,9 @@
 
     {#if $loginOpen}
         <Login onclose={() => loginOpen.set(false)} />
+    {/if}
+
+    {#if selectedHomeNews}
+        <NewsDetailSheet note={selectedHomeNews} onClose={onHomeNewsClose} />
     {/if}
 </div>

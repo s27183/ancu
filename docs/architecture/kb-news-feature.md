@@ -12,6 +12,16 @@ their entries. Task 34 (mobile layout pass), the one item needing a real
 browser rather than static checks, closed 2026-07-08 — live-verified at a
 375px viewport against the full local stack. All 8 checklist items done.
 
+**Extended 2026-07-08 with a homepage ticker** — a second, deliberately
+different surface (see "Homepage ticker" below): the per-card ticker inside
+`PlanProjection` stays exactly as built (relevance-filtered, dismissable);
+the homepage adds an unfiltered, non-dismissable ambient strip. Backend
+(`fh_engine_kb:all_news/0`, `GET /api/engine/news`, `GET /api/news` shell
+proxy) and shell (`+page.svelte` mount, `NewsDetailSheet`'s now-optional
+`onDismiss`) both live-verified 2026-07-08 (`news_smoke.escript` extended,
+new `news_proxy_smoke.escript`, Playwright screenshots at desktop + 375px
+mobile — see "Homepage ticker" for the full record).
+
 ## The problem
 
 A KB update pass (`kb-update-runbook.md` Phase 1) changes a fact a buyer's plan
@@ -303,6 +313,89 @@ answer to more-than-one-relevant-note). The `affected_components` mapping
 isn't made redundant by this — it's repurposed from "which tile gets a badge"
 to "which tile does tapping this headline scroll to and highlight," so the
 compile-time work still does real work at read time.
+
+## Homepage ticker (added 2026-07-08)
+
+**The gap this closes.** The shipped feature (tasks 27-34) was always
+relevance-filtered and per-card: `GET /api/engine/plan-cards/:id/news`
+intersects a note's `affected_kb_slugs` against the KB slugs *that specific
+card* has consulted (`audit_events.kb_versions_jsonb`). Opening a saved card
+only ever shows news that card's own fills touched — e.g. a Mode-A card whose
+fill touched `kb.hecs.thresholds` shows the HECS note and nothing else. Son
+flagged this didn't match his mental model of a homepage ticker showing "a
+variety of news from the latest KB run," not a single card's dependency.
+
+**Two independent axes, resolved separately:**
+
+- **Location:** the per-card ticker stays exactly as built, unchanged. A
+  *second*, separate ticker now also renders on the map-first home
+  (`+page.svelte`), visible pre-login. This does not reopen the original
+  "not a separate feed screen" call from the feature's first draft
+  (`c14fd9a`) — that rejected a dedicated, navigable news *page*; a floating
+  ambient *strip* (identical chrome to the per-card ticker) is the same kind
+  of surface already shipped, just relocated, not a new navigation target.
+- **Filtering:** the homepage ticker is deliberately **unfiltered** — every
+  compiled news note, regardless of any card's relevance. This is a
+  genuinely different read from the per-card one, not a relaxed version of
+  it: "what's new in the KB lately" (ambient, buyer-agnostic) vs. "what
+  changed that affects *your* plan" (targeted, per-card). Both stay live
+  side by side; neither replaces the other.
+
+**Dismiss does NOT apply to the homepage ticker — resolved, not deferred.**
+The ticker strip itself is never dismissed (it's always there when there's
+news, same `{#if news.length > 0}` empty-state posture as the per-card one).
+What the per-card feature calls "dismiss" (task 31) was already narrower
+than it sounds: `NewsDetailSheet.svelte`'s `onClose` (✕/backdrop/Escape) just
+closes the popup, ephemeral, nothing persisted; a separate, explicit
+"Dismiss" button inside the modal is the only thing that writes state — it
+retires one note from *that card's* future rotation
+(`plan_cards.dismissed_news_jsonb`, migration 007). The homepage ticker has
+no card to retire a note *from*, so `NewsDetailSheet`'s `onDismiss` prop is
+now optional — the homepage passes none, and the Dismiss button simply
+doesn't render. No new storage, no per-user global dismiss layer.
+
+**What's built:**
+
+- **Engine:** `fh_engine_kb:all_news/0` — every note from `artifact["news"]`,
+  sorted `authored_date` desc, no card/tenant filter (mirrors `rules/0`'s
+  posture: global KB content). `GET /api/engine/news`
+  (`fh_engine_h_news_feed.erl`) — authenticates the tenant JWT but does NOT
+  scope by it, same pattern as `fh_engine_h_suburbs` (global reference data).
+  No PATCH — no dismiss primitive at this level.
+- **Shell:** `GET /api/news` (`fh_shell_h_news.erl`,
+  `fh_shell_engine_client:list_all_news/0`) — PUBLIC, no user JWT, mints the
+  anonymous system principal (`?ANON_USER_ID`), identical posture to
+  `/api/suburbs`. `getAllNews()` in `lib/api.ts` — returns `[]` on any
+  failure rather than a discriminated outcome type (this is ambient
+  chrome, not load-bearing, same "nice-to-know" posture already established
+  for the per-card ticker's empty state).
+- **Shell UI:** `+page.svelte` fetches on `onMount`, mounts the existing
+  `NewsTicker.svelte` unmodified inside a new `.home-news-band` wrapper
+  (full-width, floating just below the fixed header). Tapping a headline
+  opens the existing `NewsDetailSheet` with no `onDismiss`. The band's real
+  height is measured (`bind:clientHeight` → `newsBandHeight` →
+  `--home-news-h` CSS var) and fed into `.controls-cluster`/`.signin-banner`'s
+  `top` offset (`calc(var(--header-h) + var(--home-news-h, 0px) + 0.75rem)`)
+  so they shift down when the band is present — never a hardcoded constant.
+  This mirrors the exact discipline task 29's regression already taught this
+  codebase once (a hardcoded offset silently goes stale the moment the
+  sticky region's real height changes).
+
+**Proof (2026-07-08):**
+- `news_smoke.escript` extended: `GET /api/engine/news` returns the HECS
+  note unfiltered; unauthenticated → 401; and — the load-bearing assertion —
+  the note **still appears in the homepage feed after the per-card ticker
+  dismissed it**, proving the two reads are genuinely decoupled, not the
+  same data filtered twice.
+- New `news_proxy_smoke.escript` (mirrors `suburbs_proxy_smoke.escript`):
+  drives the real cowboy handler over HTTP, confirms the public (no-JWT)
+  relay and the bilingual summary survive the proxy hop, POST → 405.
+- Playwright screenshots at 1280px and 375px against the full local stack
+  (tmux-launched engine + shell, pre-existing vite): the band renders
+  full-width directly below the header with no overlap with
+  `.controls-cluster` (shifted correctly via `--home-news-h`) or the legend;
+  tapping the headline opens the detail sheet with **zero** `.pp-news-dismiss`
+  buttons present (confirmed via DOM count, not just visual read).
 
 ## Open design questions (real gaps, not yet resolved)
 

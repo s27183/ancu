@@ -37,6 +37,7 @@ routes() ->
     [{'_', [
         {"/health", fh_shell_health_handler, []},
         {"/api/suburbs", fh_shell_h_suburbs, []},
+        {"/api/news", fh_shell_h_news, []},
         {"/api/plan-cards", fh_shell_h_plan_cards, []},
         {"/api/plan-cards/:id/events", fh_shell_h_events, []},
         {"/api/plan-cards/:id/messages", fh_shell_h_plan_card, [messages]},

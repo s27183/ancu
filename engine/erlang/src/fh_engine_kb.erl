@@ -24,7 +24,7 @@
 -export([kb/1, kb_content_md/1, kb_rules/1, kb_anchors/1, copy/2]).
 -export([rules/0]).
 -export([registry/1, registry/2]).
--export([news_for_slugs/1]).
+-export([news_for_slugs/1, all_news/0]).
 
 -define(PT_KEY, {?MODULE, artifact}).
 
@@ -204,6 +204,22 @@ news_for_slugs(Slugs) ->
                 false -> Acc
             end
         end, [], News).
+
+%% Every compiled news note, unfiltered by relevance to any one card — the homepage
+%% ticker's data source (kb-news-feature.md "Homepage ticker", 2026-07-08). Global
+%% KB content, no card/tenant scoping (same posture as rules/0). Sorted newest
+%% authored_date first so the ticker reads as "what's new," not compiler-map
+%% insertion order.
+-spec all_news() -> [map()].
+all_news() ->
+    News = maps:get(<<"news">>, artifact(), #{}),
+    Entries = maps:fold(
+        fun(NewsSlug, Entry, Acc) -> [Entry#{<<"news_slug">> => NewsSlug} | Acc] end,
+        [], News),
+    lists:sort(
+        fun(A, B) ->
+            maps:get(<<"authored_date">>, A, <<>>) >= maps:get(<<"authored_date">>, B, <<>>)
+        end, Entries).
 
 %% Every fill across all KB docs merged into one leaf -> rule map, the form the
 %% resolver interprets (fh_engine_resolver). Refs resolve globally across docs;

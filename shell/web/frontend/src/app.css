@@ -341,7 +341,7 @@ main {
    normal-flow child so it stacks under the toggle. */
 .controls-cluster {
     position: absolute;
-    top: calc(var(--header-h) + 0.75rem);
+    top: calc(var(--header-h) + var(--home-news-h, 0px) + 0.75rem);
     left: 0.75rem;
     z-index: 12;
     display: flex;
@@ -1084,7 +1084,7 @@ main {
 /* Calm sign-in banner — top-centre, status not alarm; emerald when ok. */
 .signin-banner {
     position: absolute;
-    top: calc(var(--header-h) + 0.75rem);
+    top: calc(var(--header-h) + var(--home-news-h, 0px) + 0.75rem);
     left: 50%;
     transform: translateX(-50%);
     z-index: 36;
@@ -1356,6 +1356,28 @@ main {
     overflow-wrap: break-word;
     cursor: pointer;
     padding: 0.1rem 0;
+}
+
+/* Homepage KB-news ticker band (kb-news-feature.md "Homepage ticker", 2026-07-08): the
+   SAME NewsTicker.svelte / .pp-ticker chrome, unfiltered by relevance, floating full-
+   width just below the header — distinct from the per-card .pp-sticky-top ticker inside
+   PlanProjection, which is untouched. Height is measured (bind:clientHeight in
+   +page.svelte) into --home-news-h, which .controls-cluster/.signin-banner read to shift
+   down when present — never a hardcoded offset (that's exactly the task-29 regression
+   this codebase already learned from once). */
+.home-news-band {
+    position: absolute;
+    top: var(--header-h);
+    left: 0;
+    right: 0;
+    z-index: 15;
+}
+.home-news-band .pp-ticker {
+    margin: 0;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    border-top: none;
 }
 
 /* News detail sheet (kb-news-feature.md task 28) — content inside NewsDetailSheet.svelte's
