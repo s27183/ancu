@@ -14,6 +14,14 @@ sources:
     retrieved: 2026-07-06
 ---
 
+## Headline (EN)
+
+HECS-HELP repayment threshold rises to $69,528 for 2026-27
+
+## Headline (VI)
+
+Ngưỡng hoàn trả HECS-HELP tăng lên 69.528 đô la cho năm 2026-27
+
 ## Summary (EN)
 
 The compulsory HECS-HELP repayment threshold rose from **$67,000** (2025-26) to

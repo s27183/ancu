@@ -190,7 +190,12 @@
 <div class="map-shell" style="--home-news-h: {newsBandHeight}px">
     {#if homeNews.length > 0}
         <div class="home-news-band" bind:clientHeight={newsBandHeight}>
-            <NewsTicker news={homeNews} onSelect={onHomeNewsSelect} />
+            <NewsTicker
+                news={homeNews}
+                onSelect={onHomeNewsSelect}
+                variant="marquee"
+                ariaLabel={$t('home.news.aria')}
+            />
         </div>
     {/if}
 

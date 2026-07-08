@@ -250,8 +250,18 @@ sources:                            # what you had open to write THIS diff — s
                                     # which tracks that doc's own next re-verify).
 ---
 
+## Headline (EN)
+ONE line, <=100 chars — this is ticker copy (kb-news-feature.md "Homepage
+ticker"), not prose. "HECS-HELP repayment threshold rises to $69,528 for 2026-27",
+not a sentence explaining why it matters — that's what Summary is for.
+
+## Headline (VI)
+Same fact, in Vietnamese, same length bar.
+
 ## Summary (EN)
 Plain-language, one or two sentences — what changed and why a buyer might care.
+Read in the detail sheet after tapping the ticker headline, never in the ticker
+strip itself.
 
 ## Summary (VI)
 Same content in Vietnamese — bilingual is required, not optional (constraint #9).
@@ -266,9 +276,12 @@ GATE 11 (`kb_compiler.py`) fail-closes on: `kb_slug` and every `affected_kb_slug
 entry resolving to a real KB doc, `effective_from`/`authored_date` present,
 `sources:` non-empty (same fail-closed discipline as GATE 10 — a news note is a
 user-facing claim and gets the same citation bar as a fact doc, no exemption),
-the `## Diff` block present and parseable, and the EN/VI summary
-bilingual-well-formed (the same check as a KB doc's `copy` templates). A news
-note is **never** anchored by a blueprint; it is parsed into its own artifact
+the `## Diff` block present and parseable, the EN/VI summary
+bilingual-well-formed (the same check as a KB doc's `copy` templates), and the
+EN/VI **headline** bilingual-well-formed AND <=100 chars each (`NEWS_HEADLINE_MAX_CHARS`)
+— a headline is ticker copy, a hard contract, so an over-length headline fails
+the build rather than silently degrading the ticker UI for every note after it.
+A news note is **never** anchored by a blueprint; it is parsed into its own artifact
 array (`artifact["news"]`), never mixed into `kb`, so it never enters GATE 2/6/7
 or a blueprint's registry (GATE 10 itself doesn't apply — GATE 11's own
 `sources:` check is the news-note-scoped equivalent).

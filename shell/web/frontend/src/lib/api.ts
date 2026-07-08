@@ -444,6 +444,10 @@ export interface NewsNote {
     effective_from?: string;
     authored_date?: string;
     sources?: NewsSource[];
+    /** Short (<=100 char) ticker copy (GATE 11 fail-closed) — what the ticker strip
+     *  shows. summary_en/summary_vi is the full explanation, read in the detail sheet. */
+    headline_en?: string;
+    headline_vi?: string;
     summary_en?: string;
     summary_vi?: string;
     diff?: Record<string, unknown>;

@@ -911,7 +911,14 @@ const messages = {
 
     // Dismiss action (kb-news-feature.md, task 31): "I've seen this" — removes the note
     // from this card's rotation for good, not just closes the sheet.
-    'plan.news.dismiss': { vi: 'Đã xem, bỏ qua', en: 'Got it, dismiss' }
+    'plan.news.dismiss': { vi: 'Đã xem, bỏ qua', en: 'Got it, dismiss' },
+
+    // Homepage KB-news marquee (kb-news-feature.md "Homepage ticker", extended 2026-07-09
+    // with a CNBC/Bloomberg-style continuous scroll — distinct aria label from the
+    // per-card ticker since this one is unfiltered, not "plan-relevant").
+    'home.news.aria': { vi: 'Tin tức mới nhất', en: 'Latest updates' },
+    'plan.news.pause': { vi: 'Tạm dừng', en: 'Pause' },
+    'plan.news.play': { vi: 'Tiếp tục', en: 'Resume' }
 } as const;
 
 export type MessageKey = keyof typeof messages;

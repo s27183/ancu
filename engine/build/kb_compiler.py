@@ -110,6 +110,12 @@ LOCALE_VALIDATORS = {
            "vi has no non-ASCII char (English copied into the vi slot?)"),
 }
 
+# A news note's headline is ticker copy, not prose (kb-news-feature.md "Homepage
+# ticker") — HARD contract, fail-closed at compile time (match enforcement grade to
+# property kind: a long "headline" silently degrades the ticker UI for every note
+# after it, so this is structural, not a style nit).
+NEWS_HEADLINE_MAX_CHARS = 100
+
 
 def check_copy_template(pair, locales=LOCALES):
     """Return an error string if a `copy` template is not well-formed in every locale,
@@ -596,7 +602,9 @@ def parse_news_doc(path):
     note") — a dated, IMMUTABLE announcement of a KB fact change, distinct from a
     living fact doc (kb_doc-authoring.md). Frontmatter: slug / kb_slug /
     affected_kb_slugs / effective_from / authored_date / sources. Body: bilingual
-    `## Summary (EN|VI)` + a `## Diff` fenced jsonc block (old_value/new_value).
+    `## Headline (EN|VI)` (a short, one-line ticker string — kb-news-feature.md
+    "Homepage ticker"), bilingual `## Summary (EN|VI)` (the full explanation, read
+    in the detail sheet), + a `## Diff` fenced jsonc block (old_value/new_value).
     `sources:` cites what the author actually had open when writing THIS diff
     (reuses parse_sources_block, the same fact-doc shape) — it does not
     duplicate kb_slug's fact-doc sources going forward, it pins the citation for
@@ -624,6 +632,8 @@ def parse_news_doc(path):
         "effective_from": eff_m.group(1) if eff_m else None,
         "authored_date": auth_m.group(1) if auth_m else None,
         "sources": parse_sources_block(text),
+        "headline_en": markdown_section(text, "Headline (EN)"),
+        "headline_vi": markdown_section(text, "Headline (VI)"),
         "summary_en": markdown_section(text, "Summary (EN)"),
         "summary_vi": markdown_section(text, "Summary (VI)"),
         "diff": diff,
@@ -981,6 +991,16 @@ def run(emit=False):
         err = check_copy_template({"en": doc.get("summary_en"), "vi": doc.get("summary_vi")})
         if err:
             fails.append(f"[news] {slug}: bilingual summary: {err}")
+        hl_err = check_copy_template({"en": doc.get("headline_en"), "vi": doc.get("headline_vi")})
+        if hl_err:
+            fails.append(f"[news] {slug}: bilingual headline: {hl_err}")
+        else:
+            too_long = [loc for loc, v in (("en", doc["headline_en"]), ("vi", doc["headline_vi"]))
+                        if len(v) > NEWS_HEADLINE_MAX_CHARS]
+            if too_long:
+                fails.append(f"[news] {slug}: headline too long for a ticker ({too_long}, "
+                            f"max {NEWS_HEADLINE_MAX_CHARS} chars) — put the explanation in "
+                            f"'## Summary' instead")
         if doc.get("affected_kb_slugs"):
             affected_components = compute_affected_components(doc["affected_kb_slugs"], blueprints)
             if not affected_components:
@@ -1155,6 +1175,8 @@ def build_artifact(blueprints, registries, kb_docs, news_docs):
             "effective_from": d["effective_from"],
             "authored_date": d["authored_date"],
             "sources": d.get("sources") or [],
+            "headline_en": d["headline_en"],
+            "headline_vi": d["headline_vi"],
             "summary_en": d["summary_en"],
             "summary_vi": d["summary_vi"],
             "diff": d["diff"],

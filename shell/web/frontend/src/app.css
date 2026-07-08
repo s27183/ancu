@@ -1380,6 +1380,104 @@ main {
     border-top: none;
 }
 
+/* Screen-reader-only utility: visually hidden, still in the accessibility tree.
+   Used by the marquee ticker's non-moving equivalent list (below). */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Marquee variant (kb-news-feature.md "Homepage ticker", extended 2026-07-09):
+   CNBC/Bloomberg-style continuous single-line scroll, distinct from the discrete
+   per-card swap above. Two identical .pp-ticker-marquee-run copies back to back;
+   the track scrolls exactly one run's width (translateX(-50%) of the two-run
+   track) for a seamless loop — see NewsTicker.svelte for why. */
+.pp-ticker-marquee {
+    gap: 0.5rem;
+}
+.pp-ticker-pause {
+    flex: none;
+    border: none;
+    background: transparent;
+    color: var(--accent);
+    font-size: 0.75rem;
+    line-height: 1;
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.35rem;
+    cursor: pointer;
+}
+.pp-ticker-pause:hover {
+    background: var(--accent);
+    color: #fff;
+}
+.pp-ticker-marquee-viewport {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+}
+.pp-ticker-marquee-track {
+    display: flex;
+    width: max-content;
+    animation-name: pp-ticker-scroll;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+.pp-ticker-marquee:hover .pp-ticker-marquee-track,
+.pp-ticker-marquee:focus-within .pp-ticker-marquee-track {
+    animation-play-state: paused;
+}
+.pp-ticker-marquee-run {
+    display: flex;
+    align-items: center;
+    flex: none;
+    white-space: nowrap;
+}
+.pp-ticker-marquee-item {
+    flex: none;
+    border: none;
+    background: transparent;
+    color: var(--ink);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+}
+.pp-ticker-sep {
+    flex: none;
+    color: var(--accent);
+    margin: 0 1rem;
+}
+@keyframes pp-ticker-scroll {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(-50%);
+    }
+}
+/* Reduced motion: stop the loop and let the (now single, un-duplicated-looking)
+   run be scrolled manually instead of forcing continuous motion. More specific
+   than the app-wide `* { animation-duration: 0.01ms }` catch-all, so this wins
+   cleanly rather than leaving a near-zero-duration animation flickering. */
+@media (prefers-reduced-motion: reduce) {
+    .pp-ticker-marquee-track {
+        animation: none !important;
+    }
+    .pp-ticker-marquee-viewport {
+        overflow-x: auto;
+    }
+    .pp-ticker-marquee-run:nth-child(2) {
+        display: none;
+    }
+}
+
 /* News detail sheet (kb-news-feature.md task 28) — content inside NewsDetailSheet.svelte's
    Modal. summary reuses .pp-card's ink/font sizing conventions rather than inventing new
    ones; the diff is a generic JSON dump (no fixed schema — see NewsDetailSheet.svelte). */
