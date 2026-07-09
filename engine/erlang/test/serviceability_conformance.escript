@@ -49,23 +49,32 @@ tax_cases() ->
     , chk("net $95,000 = 95,000 - 19,020 - 1,900",   fh_engine_mortgage:net_annual_income(95000), 74080)
     ].
 
-%% --- 2. HECS compulsory repayment (income-contingent) ------------------------
+%% --- 2. HECS compulsory repayment (income-contingent, 2026-27 schedule) ------
+%% kb.hecs.thresholds' ENTRIES already carry the 2026-27 figures ($69,528 threshold,
+%% per docs/kb/news/2026-07-hecs-thresholds-2026-27.md) — only its lookup KEY NAME
+%% stays "repayment_schedule_2025_26" by deliberate choice (see that doc's own
+%% "Rules" note: renaming it needs a coordinated fh_engine_mortgage.erl change,
+%% flagged, not done in that citation pass). This escript's own fixtures below were
+%% the actually-stale part — still asserting the OLD 2025-26 ($67,000 threshold)
+%% figures against a resolver that was already computing the correct 2026-27 ones.
+%% Re-verified 2026-07-09 by reading the live resolver output, not hand-derived:
+%% hecs_repayment(95000) = 15% x (95000-69528) = 3,820.80 (was 4,200 @ $67,000);
+%% hecs_repayment(125000) = 15% x (125000-69528) = 8,320.80 (was 8,700).
+%% The $200,000 case is unchanged either way (flat 10% of total, threshold-independent).
 hecs_cases() ->
     [ chk("hecs $60,000 (below threshold) = 0",      fh_engine_mortgage:hecs_repayment(60000),  0)
-    , chk("hecs $95,000 (15% band) = 4,200",         fh_engine_mortgage:hecs_repayment(95000),  4200)
-    , chk("hecs $125,000 (band edge) = 8,700",       fh_engine_mortgage:hecs_repayment(125000), 8700)
+    , chk("hecs $95,000 (15% band, $69,528 threshold) = 3,820.80", fh_engine_mortgage:hecs_repayment(95000),  3820.80)
+    , chk("hecs $125,000 (band edge, $69,528 threshold) = 8,320.80", fh_engine_mortgage:hecs_repayment(125000), 8320.80)
     , chk("hecs $200,000 (10% flat top band) = 20,000", fh_engine_mortgage:hecs_repayment(200000), 20000)
     ].
 
 %% --- 3. capacity (the IC0 worked example, reproduced exactly) ----------------
 %% Re-verified 2026-07-09 against the 2026-27 tax schedule (was 2025-26/16%; every
-%% figure below is higher by the ~$268/yr net-income gain from the 15% second bracket).
-%% NOTE: the two cases that include a hecs_balance (IC0, 200k-top-band) still reflect
-%% kb.hecs.thresholds' PRE-2026-27-uplift schedule ($67,000 threshold) — a pre-existing
-%% drift from this repo's earlier HECS-news-feature work
-%% (docs/kb/news/2026-07-hecs-thresholds-2026-27.md), unrelated to this tax-bracket
-%% pass and out of its scope; confirmed present before this change too (git-stash-
-%% verified). Re-verify these two again once that HECS fixture drift is fixed.
+%% figure below is higher by the ~$268/yr net-income gain from the 15% second
+%% bracket). The two cases with a hecs_balance (IC0, 200k-top-band) were ALREADY
+%% computed against the correct 2026-27 HECS schedule (see the hecs_cases() note
+%% above — the resolver/KB were never wrong; only this escript's own direct HECS
+%% fixture was) — no further change needed here now that hecs_cases() is fixed too.
 capacity_cases() ->
     [ chkL("IC0 [95k, card 10k, HECS] = [357302, 466670]",
            fh_engine_mortgage:borrowing_capacity(prof(95000, ic0_debts())), [357302, 466670])
