@@ -7,7 +7,9 @@ build checks it — `kb_compiler.py` validates structure + references, never age
 This script fills that gap: it reads the `last_verified` frontmatter of every
 `docs/kb/**.md` doc, compares it against a per-cadence re-verification budget,
 and reports which docs are overdue for a re-verify pass against their primary
-source.
+source. `docs/kb/news/*.md` is excluded — those are dated, immutable
+announcements with `authored_date` (kb_compiler.py's `parse_news_doc`), not
+living fact docs with a re-verification cadence.
 
 The cadence tiers are NOT invented here — they come straight from the update
 cadence table in `docs/architecture/architecture.md §11.2`:
@@ -45,6 +47,7 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 KB_DIR = ROOT / "docs" / "kb"
+NEWS_DIR = KB_DIR / "news"
 
 # Re-verification budget per cadence tier, in days. Grounded in architecture
 # §11.2; the day counts give a small grace over the nominal period.
@@ -103,6 +106,13 @@ def main():
     errors = []    # docs missing slug / last_verified — a real problem
 
     for path in sorted(KB_DIR.rglob("*.md")):
+        if NEWS_DIR in path.parents:
+            # docs/kb/news/*.md is a different doc class (kb_compiler.py's
+            # parse_news_doc / GATE 11): a dated, IMMUTABLE announcement with
+            # authored_date, not a living fact doc with last_verified. It never
+            # gets re-verified — there's nothing to be "stale" relative to, so
+            # no cadence budget applies. Skip rather than flag.
+            continue
         slug, last_verified = parse_frontmatter(path)
         rel = path.relative_to(ROOT)
         if not slug or not last_verified:
