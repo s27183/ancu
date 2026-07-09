@@ -18,13 +18,10 @@
         attachProperty,
         setTransactionDates,
         uploadDocument,
-        getNews,
-        dismissNews,
         type SimulateOverrides,
         type HouseholdFinancials,
         type PropertyCardInput,
-        type TransactionDatesInput,
-        type NewsNote
+        type TransactionDatesInput
     } from '$lib/api';
     import { subscribePlanCard, type PlanCardStream } from '$lib/planCardStream';
     import {
@@ -49,8 +46,6 @@
     import Tabs from '$lib/Tabs.svelte';
     import Chat from '$lib/Chat.svelte';
     import Modal from '$lib/Modal.svelte';
-    import NewsTicker from '$lib/NewsTicker.svelte';
-    import NewsDetailSheet from '$lib/NewsDetailSheet.svelte';
 
     let { suburbName, suburbState, onplan }: {
         suburbName: string;
@@ -79,6 +74,61 @@
     // (there is deliberately no plan.ltab.qa label — qa uses plan.tab.qa).
     const railTabs = $derived(uiTabs.filter((t) => t.kind !== 'qa'));
 
+    // Sub-tab rail grouping (2026-07-09, Son's request): investor-foreign-au.md alone
+    // declares 9 rail tabs (10 incl. Q&A) — one flat scrollable pill row at that count
+    // reads as clutter, not navigation. Modes A/E (2 rail tabs: flow, budget) don't have
+    // this problem, so grouping only kicks in past RAIL_GROUP_THRESHOLD — an ungrouped
+    // mode's rail renders byte-for-byte the original flat row. `overview` and `qa` are
+    // never grouped (always-visible anchors); everything else buckets into the coarse
+    // halves of this project's buy→hold→sell mental model (see the swimlane's own
+    // finer-grained `plan.phase.*` labels below for the 6-step version this coarsens).
+    // Grounded in each blueprint's own component semantics — tab_ids are shared
+    // vocabulary across blueprints, not per-mode, so one static map covers all of them:
+    //  - buy (pre-purchase decision/execution): flow, family_view, firb_funding,
+    //    journey (settlement_prep), property (assessment+due-diligence), buying,
+    //    investment_strategy (deciding overall strategy shapes WHICH property to
+    //    pursue — both investor blueprints order it right after overview, upstream of
+    //    firb/property/buying).
+    //  - hold (post-purchase / ongoing): budget, cash_calculator, after_you_buy,
+    //    yield_tax, portfolio.
+    // An unmapped future tab_id defaults into 'buy' rather than silently vanishing.
+    const TAB_GROUP: Record<string, 'buy' | 'hold'> = {
+        flow: 'buy',
+        family_view: 'buy',
+        firb_funding: 'buy',
+        journey: 'buy',
+        property: 'buy',
+        buying: 'buy',
+        investment_strategy: 'buy',
+        budget: 'hold',
+        cash_calculator: 'hold',
+        after_you_buy: 'hold',
+        yield_tax: 'hold',
+        portfolio: 'hold'
+    };
+    const RAIL_GROUP_THRESHOLD = 5;
+    const overviewTab = $derived(railTabs.find((t) => t.tab_id === 'overview'));
+    const nonOverviewRailTabs = $derived(railTabs.filter((t) => t.tab_id !== 'overview'));
+    const railGrouped = $derived(nonOverviewRailTabs.length > RAIL_GROUP_THRESHOLD);
+    // Pure derivation from `sub`, not a $state mutated in an $effect (the autofixer
+    // flags that pattern) — this also means the group toggle always follows `sub`
+    // automatically, including any programmatic jump elsewhere in this file, same
+    // "derive, don't clamp" idiom as NewsTicker's safeIdx. Defaults to 'buy' while
+    // `sub` is 'overview'/'qa' (group-less) or on first render.
+    const railGroup = $derived(TAB_GROUP[sub] ?? 'buy');
+    const groupedRailTabs = $derived(
+        nonOverviewRailTabs.filter((t) => (TAB_GROUP[t.tab_id] ?? 'buy') === railGroup)
+    );
+    // Selecting a group the current tab isn't in jumps to that group's first tab —
+    // railGroup then follows for free (it's derived from `sub`, not set here).
+    // Re-clicking the group `sub` is already in is a no-op, matching the toggle's
+    // "already active" visual state.
+    function selectGroup(g: 'buy' | 'hold') {
+        if ((TAB_GROUP[sub] ?? 'buy') === g) return;
+        const first = nonOverviewRailTabs.find((t) => (TAB_GROUP[t.tab_id] ?? 'buy') === g);
+        if (first) sub = first.tab_id;
+    }
+
     // The budget (Cash-calculator) tab's three sub-tabs (§7.3): the cockpit inputs + the
     // "Bạn đã đủ chưa?" verdict → the cash-events table → the breakdown detail. Labels reuse
     // the existing calculator keys. A self-owned table row routes here to 'detail'.
@@ -106,21 +156,11 @@
     // optimistic for immediacy, then reconciled from the PATCH response (revert on failure).
     let checklistStatus = $state<ChecklistStatusMap>({});
 
-    // KB news notes relevant to this card (kb-news-feature.md) — the ticker's data
-    // source (task 29); this slice (task 27) only fetches + holds them. A separate
-    // resource from the GET card (relevance is computed over kb_versions provenance,
-    // not part of the content snapshot), so it's fetched alongside, not embedded.
-    let news = $state<NewsNote[]>([]);
-    // The rendered height of the sticky ticker+subtabs region (0 when NewsTicker
-    // renders nothing), fed to --tabrail-top so the nested Budget sub-rail's own
-    // sticky offset tracks the ticker's real, variable height instead of a stale
-    // hardcoded rem (see the .pp-sticky-top / .pp-subcontent markup below).
+    // The rendered height of the sticky sub-tab rail region, fed to --tabrail-top so
+    // the nested Budget sub-rail's own sticky offset tracks the rail's real, variable
+    // height (it grows a row when the rail is grouped) instead of a stale hardcoded
+    // rem (see the .pp-sticky-top / .pp-subcontent markup below).
     let stickyTopHeight = $state(0);
-    // The note behind an open NewsDetailSheet (task 28), or null when none is open.
-    let selectedNews = $state<NewsNote | null>(null);
-    // component_names briefly flashed after the news sheet is dismissed (see
-    // onNewsClose) — cleared a few seconds later.
-    let highlightedComponents = $state<string[]>([]);
 
     let stream: PlanCardStream | null = null;
     // A generation token so a retry's async can't be clobbered by a stale in-flight one.
@@ -650,73 +690,6 @@
         horizonValue = baselineHorizon;
     }
 
-    // Fetch the card's relevant KB news notes (kb-news-feature.md), independently of the
-    // card GET — a 401/404/error here degrades to no ticker (never blocks the plan), since
-    // news is a nice-to-know, not load-bearing for the plan itself. myGen guards against a
-    // stale response landing after the user has navigated to a different suburb/card.
-    async function loadNews(id: string, myGen: number) {
-        const res = await getNews(id);
-        if (myGen !== gen) return;
-        news = res.kind === 'ok' ? res.news : [];
-    }
-
-    // Tapping a ticker headline (task 28) just opens the sheet — the scroll/highlight is
-    // deferred to onNewsClose (below). Modal.svelte is a full-screen scrim overlay, so
-    // doing the flash on OPEN would play out entirely behind it and expire (3s) before a
-    // realistic reading of summary+diff+source finishes: the deliverable would be
-    // technically wired but invisible in the actual usage path (advisor caught this).
-    function onNewsSelect(note: NewsNote) {
-        selectedNews = note;
-    }
-
-    let highlightTimer: ReturnType<typeof setTimeout> | undefined;
-
-    // On closing the sheet (✕/backdrop/Escape — Modal's onClose, NOT the task-31 "dismiss"
-    // action below, which has its own distinct handler and does not call this): using this
-    // card's own blueprint_slug as the key into the note's affected_components map, switch
-    // to whichever lifecycle tab holds the first named component, scroll it into view, and
-    // flash-highlight every named component (a note may name more than one). No backend
-    // call — affected_components already rode the GET response (compile-time work,
-    // kb-news-feature.md "Resolved design questions"). clearTimeout before re-arming so a
-    // rapid re-tap's timer can't clear a LATER highlight early.
-    async function onNewsClose() {
-        const note = selectedNews;
-        selectedNews = null;
-        const targets = note?.affected_components?.[blueprintSlug] ?? [];
-        if (!targets.length) return;
-        highlightedComponents = targets;
-        const primary = targets[0];
-        const targetTab = uiTabs.find((tb) => tb.components.includes(primary));
-        if (targetTab && targetTab.tab_id !== sub) sub = targetTab.tab_id;
-        await tick();
-        document.querySelector(`[data-component="${CSS.escape(primary)}"]`)
-            ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        clearTimeout(highlightTimer);
-        highlightTimer = setTimeout(() => {
-            highlightedComponents = [];
-        }, 3000);
-    }
-
-    // Dismiss (task 31): "I've seen this, don't show it again" — retires the note from the
-    // card's rotation for good. Deliberately does NOT reuse onNewsClose's tab-switch/scroll/
-    // highlight: that sequence is the right reaction to "closed without deciding anything,"
-    // but here the user has just made an explicit, different choice, and being yanked to
-    // another lifecycle tab as a side effect of dismissing would be surprising, unrequested
-    // motion (advisor caught this before commit — reusing onNewsClose read fine at the
-    // async-correctness level but was the wrong UX call). Just closes the sheet quietly.
-    // Optimistic-then-reconcile, same posture as toggleChecklist: remove locally first (no
-    // round-trip wait — the task's own wording), PATCH in the background, and restore the
-    // note if the engine rejects it.
-    async function onNewsDismiss() {
-        const note = selectedNews;
-        if (!note || !cardId) return;
-        selectedNews = null;
-        const prevNews = news;
-        news = news.filter((n) => n.news_slug !== note.news_slug);
-        const res = await dismissNews(cardId, note.news_slug);
-        if (res.kind !== 'ok') news = prevNews;
-    }
-
     async function load() {
         resetPreview();
         const myGen = ++gen;
@@ -728,7 +701,6 @@
         selectedPropertyId = null;
         checklistStatus = {};
         uiTabs = [];
-        news = [];
         cardId = null;
         blueprintSlug = '';
         turnDone = false;
@@ -756,7 +728,6 @@
             if (!uiTabs.some((t) => t.tab_id === sub)) sub = uiTabs[0]?.tab_id ?? '';
             cardId = match.plan_card_id;
             phase = 'ready';
-            loadNews(match.plan_card_id, myGen); // fire-and-forget: never blocks the plan render
             // The GET snapshot is the authoritative latest projection. Take the done-state
             // from turn_running (a settled card has no terminal to replay once we subscribe
             // from the cursor), and subscribe the SSE FROM the snapshot's event_cursor so the
@@ -1017,48 +988,99 @@
         </Modal>
     {/if}
 
-    <!-- Sticky region atop the scrolling plan body: the KB-news ticker (task 29, only
-         when there are relevant non-dismissed notes) above the lifecycle sub-tab rail.
-         ONE sticky container rather than each sticking independently — the rail just
-         flows below the ticker, no magic offset math for THIS pairing. Its real
-         rendered height (variable: 0 with no news, taller with a wrapped headline) is
-         measured via bind:clientHeight and fed to --tabrail-top below, so the nested
-         Budget sub-rail (Tabs.svelte) — which stacks its own sticky rail just below
-         this region — tracks the ticker's presence instead of a stale hand-picked rem
-         (that hardcoded value predates the ticker and only happened to match subtabs
-         alone). Tapping a headline opens the detail sheet; dismissing it scrolls to and
-         highlights the affected tile (task 28, onNewsSelect/onNewsClose above — deferred
-         to close so the flash isn't wasted behind the modal's scrim). -->
+    <!-- Sticky region atop the scrolling plan body: the lifecycle sub-tab rail. Its real
+         rendered height is measured via bind:clientHeight and fed to --tabrail-top below,
+         so the nested Budget sub-rail (Tabs.svelte) — which stacks its own sticky rail
+         just below this region — tracks the rail's presence instead of a stale
+         hand-picked rem. (A per-card KB-news ticker used to live here, then as a sticky
+         footer below the tab content — removed 2026-07-09, Son's call: the homepage's
+         unfiltered ticker is enough, and the per-card fetch/render/dismiss UI added
+         clutter for little payoff. Backend untouched — GET/PATCH .../news, GATE 11, the
+         compiled artifact's news entries are all still live; this was a shell-only
+         removal, easy to re-wire if wanted later.) -->
     <div class="pp-sticky-top" bind:clientHeight={stickyTopHeight}>
-        <NewsTicker {news} onSelect={onNewsSelect} />
-
         <!-- Sub-tabs: one per plan section + a Q&A tab — each section shows on its own,
              so the user never scrolls a long plan. Horizontally scrollable on narrow
-             screens. -->
-        <div class="pp-subtabs" role="tablist">
-            {#each railTabs as tab (tab.tab_id)}
-                <button
-                    type="button"
-                    role="tab"
-                    aria-selected={sub === tab.tab_id}
-                    class:active={sub === tab.tab_id}
-                    onclick={() => (sub = tab.tab_id)}
-                    >{$t(`plan.ltab.${tab.tab_id}` as 'plan.ltab.overview')}</button
+             screens. Past RAIL_GROUP_THRESHOLD rail tabs (Modes B/C/D), a second row
+             appears: Overview/group-toggle/Q&A always visible on top, the active
+             group's tabs below — under the threshold (Modes A/E) this renders the
+             original single flat row, unchanged. -->
+        <div class="pp-subtabs-outer">
+            {#if railGrouped}
+                <div class="pp-subtabs" role="tablist">
+                    {#if overviewTab}
+                        <button
+                            type="button"
+                            role="tab"
+                            aria-selected={sub === overviewTab.tab_id}
+                            class:active={sub === overviewTab.tab_id}
+                            onclick={() => overviewTab && (sub = overviewTab.tab_id)}
+                            >{$t('plan.ltab.overview')}</button
+                        >
+                    {/if}
+                    <button
+                        type="button"
+                        role="tab"
+                        class="pp-railgroup-btn"
+                        aria-selected={railGroup === 'buy'}
+                        class:active={railGroup === 'buy'}
+                        onclick={() => selectGroup('buy')}>{$t('plan.railgroup.buy')}</button
+                    >
+                    <button
+                        type="button"
+                        role="tab"
+                        class="pp-railgroup-btn"
+                        aria-selected={railGroup === 'hold'}
+                        class:active={railGroup === 'hold'}
+                        onclick={() => selectGroup('hold')}>{$t('plan.railgroup.hold')}</button
+                    >
+                    <button
+                        type="button"
+                        role="tab"
+                        aria-selected={sub === 'qa'}
+                        class:active={sub === 'qa'}
+                        onclick={() => (sub = 'qa')}>{$t('plan.tab.qa')}</button
+                    >
+                </div>
+                <div
+                    class="pp-subtabs pp-subtabs-group"
+                    role="tablist"
+                    aria-label={$t(`plan.railgroup.${railGroup}` as 'plan.railgroup.buy')}
                 >
-            {/each}
-            <button
-                type="button"
-                role="tab"
-                aria-selected={sub === 'qa'}
-                class:active={sub === 'qa'}
-                onclick={() => (sub = 'qa')}>{$t('plan.tab.qa')}</button
-            >
+                    {#each groupedRailTabs as tab (tab.tab_id)}
+                        <button
+                            type="button"
+                            role="tab"
+                            aria-selected={sub === tab.tab_id}
+                            class:active={sub === tab.tab_id}
+                            onclick={() => (sub = tab.tab_id)}
+                            >{$t(`plan.ltab.${tab.tab_id}` as 'plan.ltab.overview')}</button
+                        >
+                    {/each}
+                </div>
+            {:else}
+                <div class="pp-subtabs" role="tablist">
+                    {#each railTabs as tab (tab.tab_id)}
+                        <button
+                            type="button"
+                            role="tab"
+                            aria-selected={sub === tab.tab_id}
+                            class:active={sub === tab.tab_id}
+                            onclick={() => (sub = tab.tab_id)}
+                            >{$t(`plan.ltab.${tab.tab_id}` as 'plan.ltab.overview')}</button
+                        >
+                    {/each}
+                    <button
+                        type="button"
+                        role="tab"
+                        aria-selected={sub === 'qa'}
+                        class:active={sub === 'qa'}
+                        onclick={() => (sub = 'qa')}>{$t('plan.tab.qa')}</button
+                    >
+                </div>
+            {/if}
         </div>
     </div>
-
-    {#if selectedNews}
-        <NewsDetailSheet note={selectedNews} onClose={onNewsClose} onDismiss={onNewsDismiss} />
-    {/if}
 
     <!-- Cross-tab what-if indicator: the price/state cockpit lives in the Cash-calculator
          tab (the financial spine is where you reason about money), but a scenario re-renders
@@ -1346,12 +1368,7 @@
                  affordance, never a perpetual "computing". -->
             {#each activeTab.components as cid (cid)}
                 {#if viewComponents[cid]}
-                    <ComponentCard
-                        componentId={cid}
-                        entry={viewComponents[cid]}
-                        filling={running}
-                        highlighted={highlightedComponents.includes(cid)}
-                    />
+                    <ComponentCard componentId={cid} entry={viewComponents[cid]} filling={running} />
                     <!-- settlement_prep B affordance: once a contract is signed, attest the two
                          dates to activate the dated critical path. Investor + selected-property
                          only; label tracks whether dates are already active. -->

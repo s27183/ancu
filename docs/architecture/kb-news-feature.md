@@ -1,5 +1,19 @@
 # KB news feature — surfacing KB changes to the buyer they affect
 
+**Status update (2026-07-09): the per-card ticker UI described below (tasks
+27-34 — fetch, ticker, tap → detail sheet + tile highlight, dismiss, empty
+state, mobile pass) was REMOVED from `PlanProjection.svelte`, shell-only, on
+Son's call — the homepage's unfiltered ticker (below) is enough on its own;
+the per-card fetch/render/dismiss UI added clutter for little payoff. The
+backend is fully untouched and still live** (`GET`/`PATCH
+/api/plan-cards/:id/news`, `fh_engine_kb:news_for_slugs/1`, GATE 11,
+`affected_components` reverse-indexing, the `sources:`/`headline`/`category`
+fields) — **and so is `lib/api.ts`'s `getNews`/`dismissNews` client**, just
+currently uncalled. Re-wiring is a `PlanProjection.svelte`-only change if
+wanted again. The section below is left as the historical record of what was
+built and verified; treat every "live" / "closed" claim in it as "was true
+as shipped, UI since removed," not current shell behavior.
+
 **Status:** feature COMPLETE as of 2026-07-08 — backend built + live-verified
 2026-07-07 (`news_smoke.escript`, all assertions pass against Docker PG).
 Compiler reverse-indexes each note's `affected_components`, and every note
@@ -53,6 +67,64 @@ entirely (audit content, not buyer-facing), a new `category` news-note field
 (GATE 11 fail-closed), and `NewsListSheet.svelte` as a new layer-1 sheet.
 Committed `c35639c`. **Live-verified in-browser** — see "Ticker polish + News
 overview sheet" below for the full record.
+
+**Extended a fourth time 2026-07-09 — per-card ticker moved to a sticky
+footer, then restyled to match the homepage marquee's chrome.** Son asked to
+move the in-plan (per-card, `PlanProjection`) ticker from the top of the
+plan sheet to the bottom — top-of-sheet real estate goes to the lifecycle
+sub-tab rail, news is a lower-urgency aside. Resolves the "top or bottom"
+open question left in "What's left (shell)" since 2026-07-07.
+`.pp-sticky-top` now holds only the sub-tab rail; a new `.pp-sticky-bottom`
+(same `position: sticky` technique, opposite edge of the same `.sheet .body`
+scroll region) holds `NewsTicker` at the bottom of `PlanProjection`, after
+all tab content. Follow-up same day: Son asked for it to match the homepage
+marquee's look — solid `var(--ink)`, full width, no border — instead of the
+base `.pp-ticker` accent-soft chip. Since `.sheet .body` carries its own
+padding, true edge-to-edge required the standard breakout trick (negative
+margin cancelling the parent's padding, re-added as padding on the inner
+ticker); `overflow: hidden` on `.sheet` clips it to the panel's rounded
+corners on desktop for free. Homepage marquee (`+page.svelte`) untouched —
+this is the per-card `discrete` variant only. `svelte-check` 0 errors/0
+warnings, `svelte-autofixer` clean; **not live-verified in-browser** (Son had
+just asked to free :8080/:8081 and opted to skip a restart-to-verify round
+for this contained CSS/layout change — code-review + type-check only).
+
+**Same day, scope note (not a KB-news change): the plan sheet's lifecycle
+sub-tab rail was also decluttered.** Son separately asked to reduce
+clustering in the sub-tab rail once glassy-effect styling was explicitly
+dropped as a direction; `investor-foreign-au.md` alone declares 9 rail tabs
+(10 incl. Q&A) — one flat scrollable pill row at that count. Fixed in
+`PlanProjection.svelte` by grouping non-overview/qa tabs into the project's
+buy/hold halves (`TAB_GROUP`, a static tab_id→group map grounded in each
+blueprint's own component semantics) once `railTabs.length` exceeds
+`RAIL_GROUP_THRESHOLD` (5) — under the threshold (Modes A/E) the rail is
+byte-for-byte the original single row. Full detail — the grouping map, the
+threshold reasoning, the pure-`$derived` fix after the autofixer flagged an
+initial `$state`-in-`$effect` draft — is in code comments at the top of
+`railTabs`'s declaration; not covered further here since it's outside this
+doc's KB-news scope and isn't a blueprint/schema change (presentational
+grouping over already-declared `ui_tabs`, shell-owned per engine-contract
+§11).
+
+**Extended a fifth time 2026-07-09 — the per-card ticker UI removed
+entirely.** Son: "remove the news feed from the plan card (just the UI, not
+the backend). The live ticker on the homepage is enough." Removed from
+`PlanProjection.svelte`: the `news`/`selectedNews`/`highlightedComponents`
+state, `loadNews`/`onNewsSelect`/`onNewsClose`/`onNewsDismiss`, the
+`<NewsTicker>` footer and `<NewsDetailSheet>` render blocks, the `getNews`/
+`dismissNews`/`NewsNote` imports, and the `.pp-sticky-bottom`/
+`.pp-card-highlight` CSS those left behind (dead once their only caller was
+gone). Also removed the single-purpose `highlighted` prop from the shared
+`ComponentCard.svelte` — it existed only for this feature's tile-flash effect
+and had no other caller. **Deliberately NOT touched:** `NewsTicker.svelte`,
+`NewsDetailSheet.svelte`, `NewsListSheet.svelte`, their shared `.pp-ticker*`/
+`.pp-news-*` CSS, and every `plan.news.*`/`home.news.*` i18n key — all still
+load-bearing for the homepage marquee + two-layer overview sheet
+(`+page.svelte`), which is completely unaffected. The backend (engine
+primitive, shell proxy, migration, GATE 11) is untouched and still live, so
+this is a clean, reversible shell-only removal — re-adding the per-card
+ticker later is a `PlanProjection.svelte`-only change, not a re-plumbing job.
+`svelte-check` 0/0, `svelte-autofixer` clean on both changed components.
 
 ## The problem
 

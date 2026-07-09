@@ -1258,11 +1258,10 @@ main {
 }
 
 /* Sticky region atop the scrolling sheet body (.sheet .body is the scroll region): the
-   KB-news ticker (if any relevant, non-dismissed notes — kb-news-feature.md task 29)
-   followed by the lifecycle sub-tab rail. ONE sticky container rather than each
-   sticking independently, so the rail simply flows below the ticker in normal layout
-   — no magic offset math, and the region's total height is free to vary with the
-   ticker's wrapped headline text. */
+   lifecycle sub-tab rail. (Used to also carry the KB-news ticker, first above this
+   region then as a .pp-sticky-bottom footer below the tab content — removed
+   2026-07-09, Son's call: the homepage's unfiltered ticker is enough. See
+   PlanProjection.svelte for the removal note; backend untouched.) */
 .pp-sticky-top {
     position: sticky;
     top: 0;
@@ -1313,6 +1312,28 @@ main {
     box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
 }
 
+/* Grouped rail (2026-07-09, Son's request): a two-row layout past
+   RAIL_GROUP_THRESHOLD rail tabs (PlanProjection.svelte) — row 1 is always-visible
+   navigation (Overview / Buy-Hold group toggle / Q&A), row 2 is the active group's
+   tabs. Under the threshold, .pp-subtabs-outer wraps a single unchanged row. */
+.pp-subtabs-outer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin: 0 0 0.85rem;
+}
+.pp-subtabs-outer .pp-subtabs {
+    margin: 0;
+}
+/* The group toggle gets its own active look (soft accent wash, not the white
+   raised-chip look of a destination tab) so it visually reads as "currently filtered
+   to," not "currently open" — that distinction is the row split's whole point. */
+.pp-railgroup-btn.active {
+    background: var(--accent-soft);
+    color: var(--accent);
+    box-shadow: none;
+}
+
 /* KB-news ticker (kb-news-feature.md, task 29) — a slim strip cycling one relevant,
    non-dismissed news headline at a time, sitting above the sub-tab rail inside the
    shared .pp-sticky-top region. Arrow buttons flank the headline when there's more
@@ -1360,11 +1381,12 @@ main {
 
 /* Homepage KB-news ticker band (kb-news-feature.md "Homepage ticker", 2026-07-08): the
    SAME NewsTicker.svelte / .pp-ticker chrome, unfiltered by relevance, floating full-
-   width just below the header — distinct from the per-card .pp-sticky-top ticker inside
-   PlanProjection, which is untouched. Height is measured (bind:clientHeight in
-   +page.svelte) into --home-news-h, which .controls-cluster/.signin-banner read to shift
-   down when present — never a hardcoded offset (that's exactly the task-29 regression
-   this codebase already learned from once). */
+   width just below the header. (A separate, relevance-filtered per-card ticker used to
+   live inside PlanProjection too — removed 2026-07-09, Son's call, homepage-only now.)
+   Height is measured (bind:clientHeight in +page.svelte) into --home-news-h, which
+   .controls-cluster/.signin-banner read to shift down when present — never a hardcoded
+   offset (that's exactly the task-29 regression this codebase already learned from
+   once). */
 .home-news-band {
     position: absolute;
     top: var(--header-h);
@@ -1940,13 +1962,6 @@ main {
     padding: 0.75rem 0.85rem;
     background: var(--surface);
     transition: border-color var(--t-fast, 0.15s) var(--ease, ease), box-shadow var(--t-fast, 0.15s) var(--ease, ease);
-}
-/* A news-ticker tap (kb-news-feature.md task 28) names this tile via affected_components;
-   PlanProjection.svelte scrolls it into view and toggles this class off after a few
-   seconds — a transient flash, not a persistent state this component owns. */
-.pp-card-highlight {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-soft);
 }
 /* Borderless variant — the Flow + Budget containers (their spine renderers carry their own
    framing: the swimlane grid, the budget table). */

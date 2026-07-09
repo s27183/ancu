@@ -204,6 +204,11 @@ const messages = {
     'plan.ltab.buying': { vi: 'Ra giá & Mua', en: 'Buying' },
     'plan.ltab.after_you_buy': { vi: 'Sau khi mua', en: 'After you buy' },
     'plan.ltab.portfolio': { vi: 'Danh mục', en: 'Portfolio' },
+    // Rail group toggle (2026-07-09) — the coarse buy/hold halves shown above a
+    // grouped rail (PlanProjection.svelte TAB_GROUP), distinct from the swimlane's
+    // finer plan.phase.* labels below.
+    'plan.railgroup.buy': { vi: 'Mua', en: 'Buy' },
+    'plan.railgroup.hold': { vi: 'Sở hữu', en: 'Hold' },
     // Per-property component titles — shown as affordance cards at base (the full
     // component appears once a property is attached). Base components already have plan.c.*.
     'plan.c.purchase_journey': { vi: 'Hành trình mua nhà', en: 'Your buying journey' },

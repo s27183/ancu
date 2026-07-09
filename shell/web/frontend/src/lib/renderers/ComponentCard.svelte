@@ -17,7 +17,7 @@
     import FamilyViewCard from './FamilyViewCard.svelte';
     import FirbWorkflowCard from './FirbWorkflowCard.svelte';
 
-    let { componentId, entry, filling, density = 'compact', highlighted = false }: {
+    let { componentId, entry, filling, density = 'compact' }: {
         componentId: string;
         entry: ComponentEntry | undefined;
         filling: boolean;
@@ -25,9 +25,6 @@
         // model, two surfaces (plan-card-visual-spec §1). Only the hero renderers read
         // it; the rest are density-agnostic for now.
         density?: 'compact' | 'full';
-        // Briefly true after a news-ticker tap names this tile (kb-news-feature.md task
-        // 28) — a transient flash, not persistent state owned by this component.
-        highlighted?: boolean;
     } = $props();
 
     const title = $derived($t(`plan.c.${componentId}` as 'plan.c.buyer_profile'));
@@ -40,7 +37,7 @@
     );
 </script>
 
-<section class="pp-card" class:pp-card-highlight={highlighted} data-component={componentId}>
+<section class="pp-card" data-component={componentId}>
     <h3 class="pp-card-title">{title}</h3>
     {#if entry}
         {#each renderers as r (r)}
