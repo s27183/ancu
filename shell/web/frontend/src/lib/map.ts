@@ -342,6 +342,11 @@ export const minimalStyle: StyleSpecification = {
 // bubble layer — svelte-maplibre-gl adds the CircleLayer after the style loads, so the
 // data layer stays on top of the basemap.
 const PROTOMAPS_ASSETS = 'https://protomaps.github.io/basemaps-assets';
+// The vector source id, shared between `sources` (below) and `layers()`'s first arg
+// (which bakes `"source": BASEMAP_SOURCE_ID` into every generated layer) — also the id
+// SuburbMap.svelte matches a MapLibre 'error' event's `sourceId` against to detect a
+// failed basemap and fall back to `minimalStyle` (see its runtime-fallback comment).
+export const BASEMAP_SOURCE_ID = 'protomaps';
 
 /** A Protomaps-backed MapLibre style for a given `.pmtiles` archive URL. The caller must
  *  have registered the `pmtiles://` protocol first (ensurePmtilesProtocol, lib/pmtiles.ts).
@@ -352,7 +357,7 @@ const PROTOMAPS_ASSETS = 'https://protomaps.github.io/basemaps-assets';
  *  the data gets. Returns undefined if the flavor somehow has no symbol layer (then the
  *  data sits on top, the no-basemap behaviour). */
 export function firstLabelLayerId(): string | undefined {
-    return layers('protomaps', namedFlavor('light'), { lang: 'en' }).find(
+    return layers(BASEMAP_SOURCE_ID, namedFlavor('light'), { lang: 'en' }).find(
         (l) => l.type === 'symbol'
     )?.id;
 }
@@ -363,13 +368,13 @@ export function basemapStyle(pmtilesUrl: string): StyleSpecification {
         glyphs: `${PROTOMAPS_ASSETS}/fonts/{fontstack}/{range}.pbf`,
         sprite: `${PROTOMAPS_ASSETS}/sprites/v4/light`,
         sources: {
-            protomaps: {
+            [BASEMAP_SOURCE_ID]: {
                 type: 'vector',
                 url: `pmtiles://${pmtilesUrl}`,
                 attribution:
                     '<a href="https://protomaps.com">Protomaps</a> © <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>'
             }
         },
-        layers: layers('protomaps', namedFlavor('light'), { lang: 'en' })
+        layers: layers(BASEMAP_SOURCE_ID, namedFlavor('light'), { lang: 'en' })
     };
 }

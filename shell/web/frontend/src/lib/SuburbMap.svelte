@@ -7,9 +7,26 @@
     // Basemap (8-S2d): VITE_PMTILES_URL set → a Protomaps pmtiles basemap; unset → the
     // no-basemap minimalStyle (the original 8-S2 behaviour — dev/build never regresses).
     // Dev/eval points at a Protomaps daily build; prod at the owned R2 AU extract.
+    //
+    // Runtime basemap-error fallback (2026-07-09): svelte-maplibre-gl gates EVERY
+    // source/layer — including our own suburb-bubbles GeoJSON, unrelated to the basemap
+    // — on the base style reaching MapLibre's internal `loaded()` state (contexts.svelte.js
+    // waitForStyleLoaded). If the Protomaps vector source can't load for ANY reason (a
+    // transient CORS/edge-cache glitch on the public daily build, an ad blocker, a flaky
+    // network, a corp proxy stripping Range headers — this is not incognito-specific and
+    // can hit the owned R2 extract in prod too), `loaded()` never becomes true and NOTHING
+    // renders, not just the basemap. Catch the map's 'error' event for that source and
+    // drop to `minimalStyle` — already this codebase's first-class, zero-network-dependency
+    // rendering (used whenever VITE_PMTILES_URL is unset), not a degraded error state.
     import 'maplibre-gl/dist/maplibre-gl.css'; // self-hosted, not the CDN autoload
     import { MapLibre, GeoJSONSource, CircleLayer, HeatmapLayer } from 'svelte-maplibre-gl';
-    import type { MapLayerMouseEvent, Map as MlMap, CircleLayerSpecification } from 'maplibre-gl';
+    import type {
+        MapLayerMouseEvent,
+        Map as MlMap,
+        CircleLayerSpecification,
+        MapLibreEvent,
+        ErrorEvent as MlErrorEvent
+    } from 'maplibre-gl';
     import type { FeatureCollection, Point } from 'geojson';
     import type { Suburb } from '$lib/api';
     import {
@@ -19,6 +36,7 @@
         minimalStyle,
         basemapStyle,
         firstLabelLayerId,
+        BASEMAP_SOURCE_ID,
         DEFAULT_SIZE_BY,
         type SizeBy
     } from '$lib/map';
@@ -27,10 +45,18 @@
     // Build-time: Vite statically replaces this; unset → undefined → no-basemap fallback.
     const PMTILES_URL = import.meta.env.VITE_PMTILES_URL;
     if (PMTILES_URL) ensurePmtilesProtocol();
-    const mapStyle = PMTILES_URL ? basemapStyle(PMTILES_URL) : minimalStyle;
+    // Flips once, permanently, on a basemap source error — never flips back (a retry
+    // would re-trigger the same failure class for a still-broken network/CDN state).
+    let basemapFailed = $state(false);
+    const usingBasemap = $derived(!!PMTILES_URL && !basemapFailed);
+    const mapStyle = $derived(usingBasemap ? basemapStyle(PMTILES_URL) : minimalStyle);
     // Insert the data BELOW the basemap's labels so place names stay on top of the dots
     // (undefined with no basemap → data on top, which is fine: there are no labels).
-    const labelBeforeId = PMTILES_URL ? firstLabelLayerId() : undefined;
+    const labelBeforeId = $derived(usingBasemap ? firstLabelLayerId() : undefined);
+
+    function onMapError(e: MapLibreEvent<MlErrorEvent> & { sourceId?: string }) {
+        if (e.sourceId === BASEMAP_SOURCE_ID) basemapFailed = true;
+    }
 
     let {
         suburbs,
@@ -164,9 +190,10 @@
     style={mapStyle}
     {center}
     {zoom}
-    attributionControl={PMTILES_URL ? { compact: true } : false}
+    attributionControl={usingBasemap ? { compact: true } : false}
     autoloadGlobalCss={false}
     inlineStyle="position:absolute;inset:0"
+    onerror={onMapError}
 >
     <GeoJSONSource id="suburbs" {data}>
         {#if pulseSaved}
