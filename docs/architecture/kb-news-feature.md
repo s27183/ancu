@@ -126,6 +126,31 @@ this is a clean, reversible shell-only removal — re-adding the per-card
 ticker later is a `PlanProjection.svelte`-only change, not a re-plumbing job.
 `svelte-check` 0/0, `svelte-autofixer` clean on both changed components.
 
+**Extended a sixth time 2026-07-09 — the "only one item" content gap closed
+(`b31e226`).** Son: "it's time to expand the news content." Rather than
+author filler, this pass ran a real `kb-update-runbook.md` Track A cycle:
+scanned the KB for genuine, verifiable regulatory diffs, found the resident
+income-tax second bracket cut (16%→15% from 1 Jul 2026 — the outgoing
+`kb.tax.income-tax-resident-2025-26` doc had already flagged and deferred
+this exact change) was overdue and load-bearing (feeds `mortgage_finance`'s
+net-income calc for Modes A/C/E), and treated it as the kind-1 point-figure
+update it is: new `kb.tax.income-tax-resident-2026-27.md` (verified against
+two secondary sources, ATO itself 403s), re-anchored the 3 domestic
+blueprints **and** `fh_engine_mortgage.erl`'s hardcoded `?TAX`
+slug/`resident_rates_2025_26` lookup key (re-anchoring the blueprint alone
+would not have picked up the new schedule — the resolver macro is a second,
+independent pointer), re-verified `serviceability_conformance.escript`'s
+tax/capacity fixtures against live resolver output, all Track-A evals green.
+Plus 2 zero-new-research notes reusing already-verified in-repo facts: the
+FHG's 1 Oct 2025 expansion and FIRB's vacancy-fee doubling from 9 Apr 2024
+(dormant until Mode B/D activate). Four notes now compiled (was one).
+**Incidentally surfaced, left alone (out of this pass's scope):** two
+`serviceability_conformance.escript` HECS-repayment fixtures ($95k/$125k
+cases) are stale against `kb.hecs.thresholds`' current ($69,528 threshold)
+schedule — a pre-existing drift from the earlier HECS-news-feature work,
+confirmed present before this pass too (`git stash`-verified), flagged
+inline in the escript for a future pass.
+
 ## The problem
 
 A KB update pass (`kb-update-runbook.md` Phase 1) changes a fact a buyer's plan
