@@ -298,6 +298,26 @@ decide which cards see a given note. Full mechanism, engine primitive
 (`GET`/`PATCH /api/engine/plan-cards/:id/news`), and the shell-side build status:
 [kb-news-feature.md](kb-news-feature.md).
 
+**Retrospective sweep (finding candidates you didn't just create).** The above
+assumes you're mid-Phase-1, actively updating a doc, and notice the diff right
+then. A separate, occasional pass finds candidates already sitting in the KB:
+docs that narrate a real, dated, cited transition in plain prose — "X was A,
+became B on [date]" — but were never turned into a note, because no one was
+touching that doc at the time. **A keyword grep for self-flagged FUTURE pending
+changes (the pattern a doc uses to flag its own known successor, e.g. "author a
+sibling doc when that year opens") will miss these** — a transition already
+narrated as settled PAST fact carries no such flag. The only reliable method is
+a full read of each doc, not a grep. Worked example (2026-07-09,
+[kb-news-feature.md](kb-news-feature.md) "seventh extension"): 5 parallel
+read-only passes across every `docs/kb/**` category directory found 11
+zero-new-research candidates this way — visa, property, tax, finance, and
+scheme all had at least one. Exclude while sweeping: internal doc-reorg /
+seam-reconciliation notes (not real-world facts), facts with no discrete
+transition (always been true), vague/unconfirmed possibilities, future-dated
+reforms not yet enacted law, and — do not fabricate — any candidate whose
+old_value isn't itself stated in-repo (flag it for a future Phase-1 pass with
+real research instead).
+
 ### Phase 2 — Co-update the bilingual copy (when a figure or note changed)
 
 *Applies when a ruled component's facts changed.* The VI/EN copy templates live in

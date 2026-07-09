@@ -151,6 +151,50 @@ schedule — a pre-existing drift from the earlier HECS-news-feature work,
 confirmed present before this pass too (`git stash`-verified), flagged
 inline in the escript for a future pass.
 
+**Correction (2026-07-09, `5f87af9`) — the paragraph above was wrong.** On a
+direct follow-up ask ("fix the pre-existing HECS fixture drift too"),
+re-reading `kb.hecs.thresholds` showed its `lookup.entries` were already
+correct 2026-27 figures ($69,528 threshold) — only its lookup KEY NAME had
+been deliberately kept as `repayment_schedule_2025_26` (documented in the
+doc's own Rules note, pending a coordinated `fh_engine_mortgage.erl`
+rename). The KB doc and resolver were never wrong. The actually-stale thing
+was the escript's own `hecs_cases()` fixture, still asserting old
+2025-26/$67,000-threshold figures. Fixed to the live-resolver values
+($95k→$3,820.80, $125k→$8,320.80); all 22 anchors green.
+
+**Extended a seventh time 2026-07-09 — full-tree sweep, ticker 4→15 notes
+(`eb78524`, `28d8244`, `3d36e59`).** Son: "what about other types of news
+(visa, etc)?" then, after a first-pass "nothing to restock" answer for
+visa/property was wrong, "there are KB docs there... why not?" — correct
+pushback: that first pass only grepped for phrases self-flagging a FUTURE
+pending change (the pattern the tax-bracket doc used), missing docs that
+already narrate a PAST transition in plain prose with a citation, no
+forward flag at all (the FHG/FIRB shape). Re-ran as a full parallel read
+(5 forks, ~57 KB category dirs, zero grep) hunting for "X was A, became B
+on [date]" prose with an existing in-repo citation. Found 11 qualifying,
+zero-new-research candidates across every category: visa (Skills in Demand
+482 replaced TSS, 7 Dec 2024), property (foreign-buyer surcharge NSW
+8%→9%/QLD 7%→8%; QLD mandatory seller disclosure from 1 Aug 2025), tax (CGT
+discount reform enacted 26 Jun 2026, takes effect 1 Jul 2027; NSW land-tax
+PPOR exemption's new 25%-interest condition), finance (FRCGW 12.5%→15% +
+threshold removed; ASIC entity fee indexation), scheme (VIC FHOG regional
+grant closed; QLD FHC/FHNHC/vacant-land concessions expanded/overhauled).
+Explicitly excluded: 2017/2019-vintage transitions (real, cited, too stale
+to read as "news" today) and candidates whose old value isn't stated
+in-repo (TAS surcharge, FIRB fee schedule v8 — would need new research, not
+curation, so flagged rather than fabricated). Authored all 11 (3 parallel
+writer forks + the CGT-reform note by hand), each reusing its source doc's
+own `sources:` citation verbatim. Byproduct: caught and fixed a real KB
+inconsistency — `interest-only-vs-pi-investor.md` still said the CGT reform
+was "proposed, not yet law" while a sibling doc correctly said "enacted"
+(`eb78524`). Also fixed a pre-existing `tests/kb_freshness.py`
+false-positive that flagged every `docs/kb/news/*.md` note as "missing
+last_verified" — news notes use `authored_date` by design (immutable,
+no re-verification cadence applies); the scanner now skips
+`docs/kb/news/` (`3d36e59`). `kb_compiler.py` GATE 11 clean (15 news
+notes, all resolve), full eval suite + all 3 mortgage-touching Erlang
+escripts green throughout.
+
 ## The problem
 
 A KB update pass (`kb-update-runbook.md` Phase 1) changes a fact a buyer's plan
