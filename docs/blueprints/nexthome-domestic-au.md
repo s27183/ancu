@@ -410,7 +410,7 @@ At base, `estimated_sale_price` / `outstanding_balance` are honestly null (no on
 
 **Inputs:** `buyer_profile.outcome` only (profile, including debts). Mode A's own inputs line additionally names `eligibility.outcome` (scheme_stack) solely to detect FHG eligibility for `recommended_path`; Mode E has no `eligibility` component, so this read is simply absent. **No code or schema change is required**: the resolver's own `fill_fhb/2` already defaults `Stack = maps:get(<<"scheme_stack">>, Upstream, #{})` to `#{}` when the key is absent, and `has_fhg(#{})` correctly returns false — routing every Mode E buyer to the LMI-backed or 20%+-deposit path, never a spuriously-FHG-backed one. This is the correct answer independent of the missing component: a repeat buyer is never FHG-eligible either (First Home Guarantee is first-home-only), so the honest default and the regulatory fact agree.
 
-**KB anchors:** `kb.lender.serviceability-basics`, `kb.lender.fhg-panel-list`, `kb.lender.hecs-treatment-by-lender`, `kb.lender.credit-card-treatment`, `kb.lender.bnpl-treatment-2026`, `kb.lender.hem-living-expenses`, `kb.tax.income-tax-resident-2025-26`, `kb.hecs.thresholds`, `kb.lmi.calculation`, `kb.lmi.providers`, `kb.offset-account.basics`, `kb.refinance.windows-and-triggers`
+**KB anchors:** `kb.lender.serviceability-basics`, `kb.lender.fhg-panel-list`, `kb.lender.hecs-treatment-by-lender`, `kb.lender.credit-card-treatment`, `kb.lender.bnpl-treatment-2026`, `kb.lender.hem-living-expenses`, `kb.tax.income-tax-resident-2026-27`, `kb.hecs.thresholds`, `kb.lmi.calculation`, `kb.lmi.providers`, `kb.offset-account.basics`, `kb.refinance.windows-and-triggers`
 
 **Renderer:** `summary-card` + `data-table`
 

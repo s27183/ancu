@@ -536,7 +536,7 @@ investor_profile(Args) ->
         %% approx_borrowing_capacity — gathered on a refine turn (profiles SOT).
     },
     KbVersions = fh_engine_kb:kb_anchors(
-        [<<"kb.tax.income-tax-resident-2025-26">>,
+        [<<"kb.tax.income-tax-resident-2026-27">>,
          <<"kb.lender.serviceability-investment-loans">>,
          <<"kb.investor.experience-levels">>]),
     {Outcome, <<"summary-card">>, KbVersions}.

@@ -59,7 +59,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json`. 
 Notes:
 
 - **No `fills`.** `expected_borrowing_capacity` is **resolver-computed** from this band plus the tax schedule and debt commitments — a formula, kept in code per §11.9. The doc supplies the band and the method note, not a figure.
-- **PLACEHOLDER, not verified.** Unlike the regulated docs in this set (`kb.lender.serviceability-basics` buffer, `kb.tax.income-tax-resident-2025-26`), the figures here are **deliberately unverified** and labelled throughout — an honest placeholder, the sibling of `kb.property.capital-growth-bands`.
+- **PLACEHOLDER, not verified.** Unlike the regulated docs in this set (`kb.lender.serviceability-basics` buffer, `kb.tax.income-tax-resident-2026-27`), the figures here are **deliberately unverified** and labelled throughout — an honest placeholder, the sibling of `kb.property.capital-growth-bands`.
 - **The band IS the capacity band.** The two ends are not a measurement error to be averaged away — they are the surfaced uncertainty; the resolver reports both bounds.
 
 ## Sources

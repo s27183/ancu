@@ -27,7 +27,7 @@ profile.debts.car_loan_balance       : money
 profile.debts.buy_now_pay_later_balance : money
 ```
 
-**KB anchors** (declared on the component): `kb.lender.serviceability-basics` (the APRA buffer + the rate/term/consumer-loan conventions), `kb.tax.income-tax-resident-2025-26` (the marginal schedule + Medicare), `kb.hecs.thresholds` (the income-contingent repayment schedule), `kb.lender.hem-living-expenses` (the placeholder living-expenses band), `kb.lender.credit-card-treatment` (the card-limit repayment band).
+**KB anchors** (declared on the component): `kb.lender.serviceability-basics` (the APRA buffer + the rate/term/consumer-loan conventions), `kb.tax.income-tax-resident-2026-27` (the marginal schedule + Medicare), `kb.hecs.thresholds` (the income-contingent repayment schedule), `kb.lender.hem-living-expenses` (the placeholder living-expenses band), `kb.lender.credit-card-treatment` (the card-limit repayment band).
 
 **Workflow.** `mortgage_finance` has a non-empty `agent_leaves` (the `lender_fit` leaf), so it is a **two-path** component. The resolver half — this computation — runs in-process on **every base-DAG walk** (`fh_engine_fill:resolver(<<"mortgage_finance">>, …)` → `fh_engine_mortgage:fill/2`), independent of whether the agent leaf is sourced from the sidecar (a `base` turn), a stored snapshot (a `base_resolver` refresh), or absent. This is the **resolver-half-always-fresh** invariant established in IC6 ([[preview-is-commit-minus-persistence]]): a §98 figure must equal `f(current facts)` at every turn kind; only the agent-leaf *source* varies.
 
@@ -166,14 +166,14 @@ Never assert capacity from absent income. The band is the uncertainty of the *co
 ## 9. Code shape & verification
 
 - **Module:** [`fh_engine_mortgage.erl`](../../engine/erlang/src/fh_engine_mortgage.erl) — `borrowing_capacity/1` (the band), `income_tax/1`, `hecs_repayment/1`, `net_annual_income/1` exported for conformance; `capacity_band/2`, `pv_factor/0`, `dti_ceiling/2` internal.
-- **KB data:** `kb.lender.serviceability-basics`, `kb.tax.income-tax-resident-2025-26`, `kb.hecs.thresholds`, `kb.lender.hem-living-expenses`, `kb.lender.credit-card-treatment` — all compiled into `artifact.json` (the `persistent_term` boot input).
+- **KB data:** `kb.lender.serviceability-basics`, `kb.tax.income-tax-resident-2026-27`, `kb.hecs.thresholds`, `kb.lender.hem-living-expenses`, `kb.lender.credit-card-treatment` — all compiled into `artifact.json` (the `persistent_term` boot input).
 - **Verification:** [`serviceability_conformance.escript`](../../engine/erlang/test/serviceability_conformance.escript) (22 anchors — tax/HECS to the dollar, the IC0 band exactly, honest-partial null, ordering/clamp/monotonicity/DTI bound). The full-horizon link is guarded end-to-end by [`full_horizon_integration.escript`](../../engine/erlang/test/full_horizon_integration.escript) (income set ⟹ capacity → loan_payout → net → full all non-null/banded/ordered; income absent ⟹ all null).
 
 ---
 
 ## Sources (primary)
 
-- **ATO** — 2025-26 resident income-tax rates; Medicare levy 2%. (ATO bot-walls direct fetch; web-corroborated across secondary sources and cited in `kb.tax.income-tax-resident-2025-26`.)
+- **ATO** — 2026-27 resident income-tax rates (15% second bracket, from 1 Jul 2026); Medicare levy 2%. (ATO bot-walls direct fetch; web-corroborated across secondary sources and cited in `kb.tax.income-tax-resident-2026-27`.)
 - **APRA** — serviceability buffer 3.0pp (set 6 Oct 2021, reaffirmed Nov 2025); high-DTI (≥6×) macroprudential guidance.
 - **ATO / StudyAssist** — HECS-HELP 2025-26 income-contingent repayment schedule (`kb.hecs.thresholds`).
 - HEM band, representative product rate, consumer-loan and credit-card repayment percentages are **labelled conventions / a placeholder** — see the `note` fields in their KB docs and §3 above.

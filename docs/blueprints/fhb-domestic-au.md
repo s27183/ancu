@@ -418,7 +418,7 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
 
 **Inputs:** `buyer_profile.outcome` (profile — including debts) + `eligibility.outcome` (scheme_stack — particularly FHG eligibility and slot reservation availability)
 
-**KB anchors:** `kb.lender.serviceability-basics`, `kb.lender.fhg-panel-list`, `kb.lender.hecs-treatment-by-lender`, `kb.lender.credit-card-treatment`, `kb.lender.bnpl-treatment-2026`, `kb.lender.hem-living-expenses`, `kb.tax.income-tax-resident-2025-26`, `kb.hecs.thresholds`, `kb.lmi.calculation`, `kb.lmi.providers`, `kb.offset-account.basics`, `kb.refinance.windows-and-triggers`
+**KB anchors:** `kb.lender.serviceability-basics`, `kb.lender.fhg-panel-list`, `kb.lender.hecs-treatment-by-lender`, `kb.lender.credit-card-treatment`, `kb.lender.bnpl-treatment-2026`, `kb.lender.hem-living-expenses`, `kb.tax.income-tax-resident-2026-27`, `kb.hecs.thresholds`, `kb.lmi.calculation`, `kb.lmi.providers`, `kb.offset-account.basics`, `kb.refinance.windows-and-triggers`
 
 **Renderer:** `summary-card` + `data-table`
 

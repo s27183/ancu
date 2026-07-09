@@ -147,7 +147,7 @@ narration_cases() ->
                      unicode:characters_to_list(maps:get(<<"vi">>, Strength, <<>>))), true),
      %% audit anchors recorded (the blueprint's investor_profile KB anchors).
      check("kb anchor: income-tax bracket table recorded",
-           lists:member(<<"kb.tax.income-tax-resident-2025-26">>, KbSlugs), true),
+           lists:member(<<"kb.tax.income-tax-resident-2026-27">>, KbSlugs), true),
      check("kb anchor: investment-loan serviceability recorded",
            lists:member(<<"kb.lender.serviceability-investment-loans">>, KbSlugs), true),
      check("kb anchor: investor experience levels recorded",

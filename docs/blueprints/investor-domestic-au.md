@@ -143,7 +143,7 @@ Mode C's base plan is sharper than Mode A's because investor reasoning often hap
 
 **Inputs:** User questions answered in chat; uploaded documents (NOA, payslips, depreciation schedules from existing properties if any).
 
-**KB anchors:** `kb.tax.income-tax-resident-2025-26`, `kb.lender.serviceability-investment-loans`, `kb.investor.experience-levels`
+**KB anchors:** `kb.tax.income-tax-resident-2026-27`, `kb.lender.serviceability-investment-loans`, `kb.investor.experience-levels`
 
 **Renderer:** `summary-card`
 
@@ -169,7 +169,7 @@ Mode C's base plan is sharper than Mode A's because investor reasoning often hap
         "taxable_income": { "type": "money_per_year", "value": "<initial>", "note": "per-applicant assessable income; the household assessable_income aggregates the array." },
         "tax": {
           "residency_for_tax": { "type": "enum", "options": ["resident", "non_resident", "temporary_resident_for_tax"], "value": "resident", "note": "Mode-C-activated tax{} (fact-model-unification.md 'Mode-C activation'). Drives the CGT 50% discount + main-residence interactions read by tax_structure / disposition." },
-          "marginal_rate": { "type": "percentage", "value": "<initial>", "derived_from": "taxable_income", "note": "per-applicant marginal rate (kb.tax.income-tax-resident-2025-26); read as applicant.tax.marginal_rate by tax_structure / disposition." },
+          "marginal_rate": { "type": "percentage", "value": "<initial>", "derived_from": "taxable_income", "note": "per-applicant marginal rate (kb.tax.income-tax-resident-2026-27); read as applicant.tax.marginal_rate by tax_structure / disposition." },
           "jurisdiction": { "type": "enum", "options": ["AU"], "value": "AU", "note": "Mode C = AU tax jurisdiction; Mode D adds VN." }
         }
       }
@@ -1156,7 +1156,7 @@ wrong for QLD).
 
 | Slug | Component(s) | Owns |
 |---|---|---|
-| `kb.tax.income-tax-resident-2025-26` | 1 | Resident income-tax brackets + marginal rates (shared with Mode A) |
+| `kb.tax.income-tax-resident-2026-27` | 1 | Resident income-tax brackets + marginal rates (shared with Mode A) |
 | *`kb.lender.serviceability-investment-loans`* | 1, 4 | Investment-loan serviceability assessment (approx borrowing capacity) |
 | *`kb.investor.experience-levels`* | 1 | How investor experience affects lender treatment |
 | `kb.property.suburb-risk-factors` | 2 | Suburb risk factors |
