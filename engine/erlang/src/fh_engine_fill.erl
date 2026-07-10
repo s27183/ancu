@@ -788,8 +788,9 @@ tax_structure(Upstream) ->
     %% the per-property/income figures override it — base (no cash flow, no income) ⟹ unchanged.
     %% The reform note is property-conditional (ng_reform_note/1) and NEVER null (base ⟹ the
     %% general caveat), so it overrides the scaffold placeholder regardless of the figure inputs.
-    Outcome = (maps:merge(tax_structure_scaffold(), tax_figures(Cfp, Income)))
-                  #{<<"negative_gearing_reform_note">> => ng_reform_note(Pf)},
+    Outcome0 = (maps:merge(tax_structure_scaffold(), tax_figures(Cfp, Income)))
+                   #{<<"negative_gearing_reform_note">> => ng_reform_note(Pf)},
+    Outcome  = Outcome0#{<<"cash_events">> => tax_cash_events(Outcome0)},
     KbVersions = fh_engine_kb:kb_anchors(
         [<<"kb.tax.entity-comparison-personal-trust-company-smsf">>,
          <<"kb.tax.negative-gearing-mechanics">>,
@@ -852,6 +853,38 @@ refund_figures(true, [CfLo, CfHi], Rate) when is_number(Rate) ->
       <<"after_tax_cash_flow_per_week">> => [round(AtLo / 52), round(AtHi / 52)]};
 refund_figures(_, _, _) ->
     #{}.
+
+%% --- cash_events (investor hold-phase spine, the tax-refund leg) -------------
+%% Mirrors fh_engine_cash's event shape; purchase_journey's generic multi-source harvest
+%% places this on the swimlane's Own/Hold column with zero Mode-C-specific journey code
+%% ([[unify-views-as-projections-of-one-primitive]]). Recurring/year (the Own phase is a
+%% steady state, not a one-off). Honest-partial: no event when the refund is null (base, or
+%% not negatively geared / income not yet captured).
+tax_cash_events(Outcome) ->
+    Out = [hold_event(<<"tax_refund">>, <<"event_tax_refund">>, <<"in">>,
+                      maps:get(<<"annual_tax_refund_year_1">>, Outcome, null),
+                      <<"government">>, <<"tax_structure">>, <<"kb.copy.tax-structure">>)],
+    [E || E <- Out, maps:get(<<"amount">>, E) =/= null].
+
+%% shared by tax_structure's/yield_modelling's Own-phase (recurring/year) cash events —
+%% the counterpart to fh_engine_cash's event/8 (which builds the one_off acquisition
+%% events); a scalar figure collapses to [v, v] (money_range, matching the registry type),
+%% a band passes through as-is, null passes through (the caller filters it).
+hold_event(Id, LabelCopyId, Dir, Amount, Counterparty, Source, CopyDoc) ->
+    #{<<"id">>               => Id,
+      <<"phase">>            => <<"own">>,
+      <<"label">>            => fh_engine_kb:copy(CopyDoc, LabelCopyId),
+      <<"direction">>        => Dir,
+      <<"amount">>           => hold_amount(Amount),
+      <<"is_estimate">>      => true,
+      <<"timing">>           => <<"recurring">>,
+      <<"period">>           => <<"year">>,
+      <<"counterparty">>     => Counterparty,
+      <<"source_component">> => Source}.
+
+hold_amount([Lo, Hi]) when is_number(Lo), is_number(Hi) -> [Lo, Hi];
+hold_amount(V) when is_number(V) -> [V, V];
+hold_amount(_) -> null.
 
 %% The announced 2026-27 Budget negative-gearing reform (NG limited to new builds from 1 Jul 2027;
 %% PROPOSED, not yet law — kb.tax.negative-gearing-mechanics). Surfaced as a bilingual decision-
@@ -993,7 +1026,7 @@ tax_structure_non_resident(_Upstream) ->
 %% upstream (no Args); the base outcome is input-independent (all null) — Upstream is taken for
 %% shape symmetry with the other resolvers and the per-property branch to come.
 yield_modelling(Upstream) ->
-    Outcome = case maps:get(<<"property_fit_investor">>, Upstream, undefined) of
+    Outcome0 = case maps:get(<<"property_fit_investor">>, Upstream, undefined) of
                   Pf when is_map(Pf), map_size(Pf) > 0 ->
                       cash_flow_projection(
                           maps:get(<<"estimated_weekly_rent_range">>, Pf, null),
@@ -1002,6 +1035,7 @@ yield_modelling(Upstream) ->
                   _ ->
                       base_cfp()
               end,
+    Outcome = Outcome0#{<<"cash_events">> => yield_cash_events(Outcome0)},
     %% the five Cluster-Y anchors — the resolver-owned audit trail (method + bands), carried
     %% whether the figures are null (base) or computed (per-property) so the methodology is
     %% provenanced either way. When the POST-loan cluster computes (interest present, Slice B3a),
@@ -1038,6 +1072,28 @@ base_cfp() ->
         <<"year_10_projected_cash_flow">>  => null,
         <<"is_positive_neutral_or_negative_geared_pre_tax">> => null
     }.
+
+%% --- cash_events (investor hold-phase spine, the rent/opex/interest legs) ----
+%% Mirrors fh_engine_cash's event shape (via the shared hold_event/7); purchase_journey's
+%% generic multi-source harvest places these on the swimlane's Own/Hold column with zero
+%% Mode-C-specific journey code ([[unify-views-as-projections-of-one-primitive]]).
+%% rental_income/operating_expenses are BANDS (the rent input is a band, §B0);
+%% loan_interest is a POINT (representative-leverage interest) — hold_amount/1 collapses
+%% either into the registry's money_range shape. Honest-partial: a null figure (base, or
+%% the strata opex gap) drops its event, never a fabricated one.
+yield_cash_events(Cfp) ->
+    Out = [
+        hold_event(<<"rental_income">>, <<"event_rental_income">>, <<"in">>,
+                   maps:get(<<"annual_rental_income_year_1">>, Cfp, null),
+                   <<"tenant">>, <<"yield_modelling">>, <<"kb.copy.yield">>),
+        hold_event(<<"operating_expenses">>, <<"event_operating_expenses">>, <<"out">>,
+                   maps:get(<<"annual_operating_expenses_year_1">>, Cfp, null),
+                   <<"property_manager">>, <<"yield_modelling">>, <<"kb.copy.yield">>),
+        hold_event(<<"loan_interest">>, <<"event_loan_interest">>, <<"out">>,
+                   maps:get(<<"annual_interest_year_1">>, Cfp, null),
+                   <<"lender">>, <<"yield_modelling">>, <<"kb.copy.yield">>)
+    ],
+    [E || E <- Out, maps:get(<<"amount">>, E) =/= null].
 
 %% The banded rent-economics — every figure a [lo, hi] BAND because the weekly rent is a band
 %% (the §B0 banded surface). Removed from the LLM's reach: resolver-computed, KB-grounded, never

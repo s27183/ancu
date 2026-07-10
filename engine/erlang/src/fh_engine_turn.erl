@@ -67,14 +67,19 @@
 %%   - cash_position keys on `tax_optimised_structure` present → after tax_structure;
 %%   - disposition keys on `tax_optimised_structure` present (cgt_investor path) → after
 %%     tax_structure (+ budget_envelope_investor → after cash_position).
-%% (Mode C has no purchase_journey/preparation/phase_playbook — those are FHB-only.)
-%% ownership_planning_investor runs LAST: its opportunity-card `equity_release` PLACES disposition's
-%% projected sale_proceeds/loan_payout (a read edge added 2026-06-27), so it must follow disposition
-%% (the same "runs last, reads every figure-owner" position as the FHB ownership in the base DAG).
+%% purchase_journey/phase_playbook landed 2026-07-10 (the B/C/D lifecycle-spine restructure,
+%% task 4) — no preparation equivalent (Mode C has no FHB readiness layer). They run LAST,
+%% after ownership_planning_investor, mirroring the FHB base DAG's "figure-owners, then the
+%% spine that places them" position: purchase_journey harvests `cash_events` off cash_position/
+%% yield_modelling/tax_structure + disposition.dispose_cash_events (fh_engine_journey's generic
+%% multi-source harvest — no read of ownership_planning_investor.portfolio_position, which
+%% carries no cash_events); phase_playbook then validates its budget_refs against the same
+%% harvest and reads purchase_journey's phase set.
 -define(BASE_COMPONENTS_INVESTOR,
         [<<"investor_profile">>, <<"investment_strategy">>, <<"mortgage_finance">>,
          <<"yield_modelling">>, <<"tax_structure">>, <<"cash_position">>,
-         <<"disposition">>, <<"ownership_planning_investor">>]).
+         <<"disposition">>, <<"ownership_planning_investor">>,
+         <<"purchase_journey">>, <<"phase_playbook">>]).
 
 %% Mode-B (fhb-foreign-au) base turn — 7 of the blueprint's 11 components; EXCLUDES the
 %% same 4 per-property components Mode A/C already exclude (property_assessment,

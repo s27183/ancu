@@ -406,4 +406,46 @@ restructure lands, mode by mode per §11.5 — not worth a standalone patch to a
     `entity_setup_costs`/`lmi` acquisition; `rental_income`/`operating_expenses`/`loan_interest`/
     `tax_refund` hold, recurring/year) task #4 (engine wiring) must expose those outcomes under —
     the forward declaration Mode A's own build order (§7, blueprint/KB before engine) already
-    established as the normal sequencing, not a shortcut.
+    established as the normal sequencing, not a shortcut. **Resolved by task 4, below.**
+
+- **Mode C engine wiring — done 2026-07-10 (task 4).** `budget_envelope_investor` (`fh_engine_cash:
+  cash_events_investor/4`), `cash_flow_projection` (`fh_engine_fill:yield_cash_events/1`), and
+  `tax_optimised_structure` (`fh_engine_fill:tax_cash_events/1`) now emit `cash_events` — 8 of the 9
+  declared ids resolve to real events (`entity_setup_costs` stays unemitted: the underlying
+  `tax_optimised_structure.setup_costs` figure is permanently null, a separate still-open entity-cost
+  seam, flagged not patched here). `fh_engine_journey`/`fh_engine_phase_playbook` gained
+  `fill_investor/1` (investor-specific actors/phases/prose cells, hand-derived flow markers against
+  `kb.journey.investor-path`'s authored `cell_<phase>_<actor>` keys — one authored key,
+  `cell_own_recurring`, is intentionally left unreferenced: the four hold-phase money cells already
+  carry that content per-counterparty, so a combined prose cell would duplicate them).
+  - **Design call: generic multi-source harvest, not a Mode-C branch** (advisor-flagged before
+    writing any event builder). `harvest_cash_events/1` concatenates the `cash_events` field off
+    *every* upstream outcome that exposes it, rather than reading one hardcoded key. Mode A has
+    exactly one source (`budget_envelope`) so this is behaviourally identical to before (verified —
+    both Mode-A conformance escripts pass unchanged); Mode C has three. The KB-slug selection stays
+    genuinely mode-specific (unavoidable — different bilingual content per mode); the figure-harvest
+    does not. This means Modes D and B (tasks 8/12) need **zero** change to `fh_engine_journey`/
+    `fh_engine_phase_playbook` — they only need their own components to emit `cash_events`.
+  - **Design call: `cash_event.amount` needed no widening.** The registry already types it
+    `money_range`, and the codebase's existing convention (`point/1` in `fh_engine_cash`,
+    `money_range/1` in `fh_engine_disposition`) already collapses scalar figures to `[v,v]` — so the
+    mix of banded (`rental_income`/`operating_expenses`) and scalar (`loan_interest`/`lmi`/
+    `tax_refund`) hold-phase figures needed no schema change, just the same collapse-to-range
+    convention (`hold_amount/1` in `fh_engine_fill.erl`).
+  - `purchase_journey`/`phase_playbook` added to `investor-domestic-au.md` as components 13/14
+    (mode-general `journey_swimlane`/`phase_playbook` outcome types reused verbatim, per §3.3) and to
+    `?BASE_COMPONENTS_INVESTOR`; the compiled artifact recompiled clean (no gate failures).
+  - **Verified, not just implemented:** a new end-to-end investor smoke run (synthetic
+    `budget_envelope_investor`/`cash_flow_projection`/`tax_optimised_structure`/`disposition`
+    upstream) places all 10 harvested cash_events at the correct `(phase, actor)` with
+    `fh_engine_outcome:validate/3` returning `ok` for both outcomes; a negative test confirms
+    `cash_events` is genuinely schema-gated (the §13 placement check — "money flow has no
+    counterparty" — fires on a malformed event), not silently passed (the known `validate/3`
+    fail-open gap did not apply here because the field is now declared).
+  - **Adjacent drift fixed en route.** The same "reform not yet law" staleness already caught once
+    this session (`interest-only-vs-pi-investor.md`) recurred in `kb.copy.tax-structure` and
+    `kb.copy.disposition` — both corrected to the Act's actual enacted status (Act No. 49 of 2026,
+    Royal Assent 26 June 2026, effective 1 July 2027). A repo-wide grep confirmed no further
+    instances remain.
+  - **Next: task 5**, the blueprint `ui_tabs` rewrite — `purchase_journey`/`phase_playbook` are wired
+    and fill correctly but are not yet routed to a shell tab (the restructure's five-view spine).

@@ -1,7 +1,7 @@
 ---
 slug: kb.copy.disposition
 effective_from: 2026-06-22
-last_verified: 2026-06-22
+last_verified: 2026-07-10
 ---
 
 # Disposition component copy (bilingual)
@@ -86,8 +86,8 @@ basis — decision-support, never a forecast or advice.
       "en": "Capital gains tax here needs a registered tax agent — it depends on depreciation claimed (which raises the gain), the ownership entity, and your tax residency, so we don't estimate the figure."
     },
     "assumption_cgt_reform": {
-      "vi": "Phần này áp dụng luật hiện hành (giảm 50% thuế lãi vốn). Một đề xuất cải cách trong Ngân sách 2026-27 — chưa thành luật — có thể thay đổi từ ngày 1/7/2027; hãy xác nhận với chuyên viên thuế.",
-      "en": "This uses current law (the 50% CGT discount). A proposed 2026-27 Budget reform — not yet law — may change it from 1 July 2027; confirm with a registered tax agent."
+      "vi": "Phần này áp dụng luật hiện hành (giảm 50% thuế lãi vốn). Một cải cách trong Ngân sách 2026-27 — thay bằng cách điều chỉnh theo lạm phát trên giá vốn cộng thuế tối thiểu 30% — nay đã thành luật (có hiệu lực từ 26/6/2026) nhưng chưa áp dụng cho đến 1/7/2027; hãy xác nhận với chuyên viên thuế có đăng ký.",
+      "en": "This uses current law (the 50% CGT discount). A 2026-27 Budget reform replacing it with cost-base indexation plus a 30% minimum tax is now law (enacted 26 June 2026) but does not take effect until 1 July 2027; confirm the position with a registered tax agent."
     },
     "assumption_frcgw": {
       "vi": "Khi bán, người mua sẽ giữ lại 15% giá bán để nộp cho Sở Thuế Úc (ATO) — đây là khoản TẠM ỨNG được khấu trừ vào thuế lãi vốn thực tế của bạn khi quyết toán, không phải là một khoản phí thêm.",

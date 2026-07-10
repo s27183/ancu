@@ -351,9 +351,13 @@ key_assumptions_foreign(Ceiling, _State) ->
 %%      recurring from yield_modelling/tax_structure. Base parity with the FHB NEED-side ranges
 %%      (deposit/duty/other-costs over the range) would be a registry+blueprint+shell redesign,
 %%      not this resolver.
-%%   2. budget_envelope_investor carries no cash_events field, so the investor acquire-phase
-%%      financial spine is design-first (§8.5) — only disposition's dispose_cash_events + the
-%%      yield/tax hold events exist on the investor temporal flow.
+%%   2. RESOLVED (2026-07-10, the B/C/D lifecycle-spine restructure, task 4): budget_envelope_
+%%      investor now carries `cash_events` (deposit/stamp_duty/other_buying_costs/lmi — see
+%%      cash_events_investor/4 below), so purchase_journey's generic multi-source harvest can
+%%      place the investor acquire-phase spine with zero Mode-C-specific journey code
+%%      ([[unify-views-as-projections-of-one-primitive]]). entity_setup_costs is NOT yet an
+%%      event: the underlying tax_optimised_structure.setup_costs figure is permanently null
+%%      (a separate, still-open entity-cost seam) — honest-partial (no event without a figure).
 -spec fill_investor(map(), map()) -> {map(), binary(), [map()]}.
 fill_investor(_Args, Upstream) ->
     %% Branch on the per-property keystone (Slice B3b): at base property_fit_investor is absent →
@@ -381,7 +385,8 @@ budget_envelope_investor_base() ->
       <<"lmi_payable">>                  => null,
       <<"gap_or_surplus">>               => null,
       <<"verdict">>                      => null,
-      <<"mitigation_options_if_short">>  => []}.
+      <<"mitigation_options_if_short">>  => [],
+      <<"cash_events">>                  => []}.
 
 %% Slice B3b — the per-property cash-to-complete (NEED side), POINT figures off the attached
 %% property's EXACT price (so scalar `money`, not banded): loan at the LVR baseline (80% — the
@@ -396,19 +401,42 @@ budget_envelope_investor(Pf) ->
     case is_integer(Price) andalso Price > 0 andalso is_binary(State) of
         false -> budget_envelope_investor_base();
         true ->
-            Lvr  = 100 - param_value(<<"kb.investor.deposit-requirements-investment-loans">>,
-                                     <<"deposit_no_lmi_pct">>),
-            Loan = round(Price * Lvr / 100),
-            Duty = maps:get(<<"after_concession">>, stamp_duty(State, false, Price), null),
-            Acq  = acquisition_costs_investor(State, Price),
+            Lvr     = 100 - param_value(<<"kb.investor.deposit-requirements-investment-loans">>,
+                                        <<"deposit_no_lmi_pct">>),
+            Loan    = round(Price * Lvr / 100),
+            Duty    = maps:get(<<"after_concession">>, stamp_duty(State, false, Price), null),
+            Acq     = acquisition_costs_investor(State, Price),
+            Deposit = Price - Loan,
+            Lmi     = 0,   %% 80% LVR baseline → no LMI (lmi.calculation 80% threshold)
             (budget_envelope_investor_base())#{
                 <<"actual_property_price">> => Price,
                 <<"loan_amount">>           => Loan,
                 <<"lvr">>                   => Lvr,
-                <<"lmi_payable">>           => 0,   %% 80% LVR baseline → no LMI (lmi.calculation 80% threshold)
-                <<"total_cash_required">>   => total_cash_investor(Price - Loan, Duty, Acq)
+                <<"lmi_payable">>           => Lmi,
+                <<"total_cash_required">>   => total_cash_investor(Deposit, Duty, Acq),
+                <<"cash_events">>           => cash_events_investor(Deposit, Duty, Acq, Lmi)
             }
     end.
+
+%% --- cash_events_investor (the investor ACQUISITION financial spine) ---------
+%% Mirrors cash_events/4's shape exactly (same event/8 builder) so purchase_journey's
+%% generic multi-source harvest places these on the swimlane with zero Mode-C-specific
+%% journey code. Counterparty swaps Mode A's generic "other" row for "services"
+%% (kb.journey.investor-path's six-actor set — the deposit/other-buying-costs settlement
+%% chain runs through the conveyancer/trust, not a party Mode A already has a row for).
+%% Honest-partial: an event is emitted only when its figure is non-null.
+cash_events_investor(Deposit, Duty, Acq, Lmi) ->
+    Out = [
+        event(<<"deposit">>, <<"contract">>, <<"event_deposit">>, <<"out">>,
+              point(Deposit), false, <<"services">>, <<"cash_position">>),
+        event(<<"stamp_duty">>, <<"settle">>, <<"event_stamp_duty">>, <<"out">>,
+              point(Duty), false, <<"government">>, <<"cash_position">>),
+        event(<<"other_buying_costs">>, <<"settle">>, <<"event_other_costs">>, <<"out">>,
+              point(Acq), true, <<"services">>, <<"cash_position">>),
+        event(<<"lmi">>, <<"settle">>, <<"event_lmi">>, <<"out">>,
+              point(Lmi), false, <<"lender">>, <<"cash_position">>)
+    ],
+    [E || E <- Out, maps:get(<<"amount">>, E) =/= null].
 
 %% acquisition adders for an investor (kb.buyer-costs.investor-additional-costs): registration
 %% (exact, per state) + the shared due-diligence/legal lines (building+pest inspection,
