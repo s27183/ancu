@@ -105,32 +105,26 @@ Mode C's base plan is sharper than Mode A's because investor reasoning often hap
 
 > The diagram numbers are sequential reading order, not component IDs (the IDs are the scope table's 1–12; `mortgage_finance` is omitted from the sketch above). `disposition` runs **last among the base figure-owners** — it places acquire figures (from `cash_position`), hold figures (from `yield_modelling`/`tax_structure` over `H`), and owns the dispose figures, so it reads every upstream figure-owner and is read by none (acyclic).
 
-**UI tab mapping** for Mode C:
+**UI tab mapping** — the fourteen components surface through **four top-level views + a Q&A tab** ([`../architecture/plan-card-lifecycle-restoration.md`](../architecture/plan-card-lifecycle-restoration.md) §11.3), not the earlier flat eight-tab rail. Applying §11.2's placement test to Mode C: `investment_strategy` is phase-shaped (a pre-Contract one-time thesis step) → folds into a Flow phase's action checklist (visible in Overview as a synthesis read, not its own tab); `yield_modelling`/`tax_structure` are money-shaped → fold into Budget as hold-phase cash rows; `ownership_planning_investor` is state-shaped with no completion point (persists across the whole plan, forward + recurring, multi-property) → earns its own **Portfolio** view, same as Mode D. `property_assessment`, `buying_strategy`, `due_diligence` are per-property and reached as backing detail via `phase_playbook.actions[].component_ref`, not as tabs.
 
-| UI tab | Components rendered |
-|---|---|
-| Overview | `investor_profile` + `property_assessment` + `strategy_thesis` summary |
-| Investment strategy | `investment_strategy` (central) |
-| Yield & Tax | `yield_modelling` + `tax_structure` |
-| Property | `property_assessment` + `due_diligence` |
-| Cash calculator | `cash_position` + `disposition` (full-horizon net position: acquire → hold over `H` → dispose; horizon slider = structural what-if) |
-| Buying | `buying_strategy` |
-| Temporal flow | `settlement_prep` |
-| Portfolio | `ownership_planning_investor` (single-property view + portfolio-aggregate view) |
+| # | View | `kind` | What it shows |
+|---|---|---|---|
+| 1 | Overview | `synthesis` | "what this is" + aggregated read of `investor_profile` + `investment_strategy` + `mortgage_finance` + `cash_position` |
+| 2 | Flow | `flow` | the legal/temporal spine — `purchase_journey` (swimlane, Prepare → … → Own → **Dispose**) as navigation; each phase opens a sheet = swimlane slice + `phase_playbook` actions (ordered, budget-linked — including `investment_strategy`'s pre-Contract thesis step) + `phase_playbook` risks; `settlement_prep` enriches the Settle phase per-property |
+| 3 | Budget | `components` (interactive) | the financial spine — `cash_position` as the phased acquisition cash-flow + what-if cockpit; `yield_modelling`/`tax_structure` as the hold-phase rental-income/expense/loan-interest/tax-refund rows; `disposition` as the full-horizon net position (buy → hold over `H` → sell) + horizon slider; each cash-event row drills to its `source_component` |
+| 4 | Portfolio | `components` | `ownership_planning_investor` — single-property view + portfolio-aggregate view; the only Mode-C concept that's state-shaped with no completion point, so it doesn't fold into Flow or Budget |
+| 5 | Q&A | `qa` | bilingual planning-agent chat (a shell surface over the engine Q&A stream — not a `component_filled`) |
 
-**Machine-readable form** — compiled to `ui_tabs` in the artifact, **canonical for the runtime** (the table above is the human view). `investor-domestic-au` is already `in_scope_blueprint()` — **this block is stale, not dormant**: it's the pre-restructure flat vocabulary (`plan-card-lifecycle-restoration.md` §3.2, superseded). The resolved target (§11, 2026-07-10) is a five-view spine — Overview/Flow/Budget/**Portfolio**/Q&A — with `purchase_journey` becoming base-scope (currently missing entirely) and `investment_strategy`/`yield_modelling`/`tax_structure` folding into a Flow phase + Budget rows rather than their own tabs; C is the first mode slated for this restructure (§11.5 — no FIRB/cross-border complexity). Not yet rewritten to match; tracked in [`../architecture/wedge-build-sequence.md`](../architecture/wedge-build-sequence.md) "B/C/D lifecycle-spine restructure."
+**Machine-readable form** — compiled to `ui_tabs` in the artifact, **canonical for the runtime** (the table above is the human view). Rewritten 2026-07-10 (task 5, `plan-card-lifecycle-restoration.md` §11.5) from the stale pre-restructure flat vocabulary to this five-view spine, mirroring [`fhb-domestic-au.md`](fhb-domestic-au.md)'s `overview`/`flow`/`budget`/`qa` shape exactly, plus `portfolio`.
 
 ```jsonc
 {
   "ui_tabs": [
-    { "tab_id": "overview",            "kind": "synthesis",  "components": ["investor_profile", "property_assessment", "investment_strategy"] },
-    { "tab_id": "investment_strategy", "kind": "components", "components": ["investment_strategy"] },
-    { "tab_id": "yield_tax",           "kind": "components", "components": ["yield_modelling", "tax_structure"] },
-    { "tab_id": "cash_calculator",     "kind": "components", "interactive": true, "components": ["cash_position", "disposition"] },
-    { "tab_id": "journey",             "kind": "components", "components": ["settlement_prep"] },
-    { "tab_id": "property",            "kind": "components", "components": ["property_assessment", "due_diligence"] },
-    { "tab_id": "buying",              "kind": "components", "components": ["buying_strategy"] },
-    { "tab_id": "portfolio",           "kind": "components", "components": ["ownership_planning_investor"] }
+    { "tab_id": "overview",  "kind": "synthesis",  "components": ["investor_profile", "investment_strategy", "mortgage_finance", "cash_position"] },
+    { "tab_id": "flow",      "kind": "flow",        "components": ["purchase_journey", "phase_playbook", "settlement_prep"] },
+    { "tab_id": "budget",    "kind": "components", "interactive": true, "components": ["cash_position", "yield_modelling", "tax_structure", "disposition"] },
+    { "tab_id": "portfolio", "kind": "components", "components": ["ownership_planning_investor"] },
+    { "tab_id": "qa",        "kind": "qa",          "components": [] }
   ]
 }
 ```

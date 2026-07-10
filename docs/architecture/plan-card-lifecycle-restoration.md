@@ -447,5 +447,22 @@ restructure lands, mode by mode per §11.5 — not worth a standalone patch to a
     `kb.copy.disposition` — both corrected to the Act's actual enacted status (Act No. 49 of 2026,
     Royal Assent 26 June 2026, effective 1 July 2027). A repo-wide grep confirmed no further
     instances remain.
-  - **Next: task 5**, the blueprint `ui_tabs` rewrite — `purchase_journey`/`phase_playbook` are wired
-    and fill correctly but are not yet routed to a shell tab (the restructure's five-view spine).
+- **Mode C `ui_tabs` rewrite — done 2026-07-10 (task 5).** `investor-domestic-au.md`'s machine-readable
+  `ui_tabs` block rewritten from the stale flat eight-tab rail to the §11.3 five-view spine —
+  `overview` (`investor_profile`/`investment_strategy`/`mortgage_finance`/`cash_position`), `flow`
+  (`purchase_journey`/`phase_playbook`/`settlement_prep`), `budget` (`cash_position`/
+  `yield_modelling`/`tax_structure`/`disposition`, interactive), `portfolio`
+  (`ownership_planning_investor`), `qa` (empty) — mirroring `fhb-domestic-au.md`'s
+  `overview`/`flow`/`budget`/`qa` shape exactly, plus `portfolio` for the one state-shaped concept
+  §11.2 doesn't fold. `property_assessment`/`buying_strategy`/`due_diligence` (per-property) are
+  dropped from the tab list entirely, same treatment as Mode A's dropped set — reached only via
+  `phase_playbook.actions[].component_ref`. `investment_strategy` appears in `overview` (a visible
+  synthesis read) but not in `flow`'s components array, mirroring how Mode A's `eligibility` folds
+  into a phase's action checklist without being a literal Flow-tab component. The human-readable "UI
+  tab mapping" table above it rewritten to match (5 rows, `#`/View/`kind`/What-it-shows), same format
+  as `fhb-domestic-au.md`'s. `engine/build/kb_compiler.py` recompiled clean — GATE 9 (`ui_tabs`
+  reference-integrity: every `tab_id` unique, every `kind` in the enum, every listed component real)
+  passed for all 5 in-scope blueprints; the emitted artifact's `blueprints.investor-domestic-au.ui_tabs`
+  inspected directly and matches the five tabs above.
+  - **Next: task 6**, the shell renders this five-view spine (currently still rendering — or not yet
+    wired to render — the old flat tab set for Mode C plan cards).
