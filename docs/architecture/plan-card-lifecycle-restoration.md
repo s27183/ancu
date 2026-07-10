@@ -545,6 +545,12 @@ restructure lands, mode by mode per §11.5 — not worth a standalone patch to a
     not have caught here). Neither touches `cash_events`/`journey`/`phase_playbook`/`ui_tabs`; not
     investigated further here — a separate, later pass.
   - **Task 7 closes out the Mode C restructure** (tasks 3–7 all done). Next: task 8, Mode D.
+    **Caveat added retroactively (found during task 10):** the dispose swimlane's
+    `sale_proceeds`/`selling_costs` money cells silently never render for Mode C either (the same
+    `fh_engine_disposition` counterparty-`other` bug documented in full under task 10) — neither
+    live seam-smoke run (this one or Mode D's) set a hold horizon, so the gap was invisible to both.
+    "Closed out" above means the 10-component spine and its wiring, not the dispose swimlane at a
+    set horizon — see task 10's write-up for the standalone open item.
 
 - **Mode D KB content + engine wiring — done 2026-07-10 (task 8).** Three new bilingual copy docs
   mirroring Mode C's shape exactly: `kb.journey.investor-foreign-path` (the swimlane), `kb.journey.
@@ -646,3 +652,64 @@ restructure lands, mode by mode per §11.5 — not worth a standalone patch to a
     (expected to need the same fixture-staleness fixes task 7 made for Mode C: the base SET+ORDER
     fixture already confirmed stale in task 8's sanity check) plus `mode_d_seam_smoke.escript`
     rewritten for the 12-component spine and run live against the real sidecar.
+
+- **Mode D conformance + live seam-smoke — done 2026-07-10 (task 10) — Mode D restructure CLOSED
+  OUT (tasks 8–10).** Full sweep of all 54 non-seam-smoke conformance escripts: found exactly the
+  predicted staleness, nothing new. Fixed 2 fixtures: `base_components_foreign_investor_
+  conformance.escript`'s own SET+ORDER fixture (10 → 12, label "ten" → "twelve"; also added 5 new
+  DAG-order `Pre/2` checks for `purchase_journey`/`phase_playbook`'s upstream reads) and
+  `base_components_nexthome_conformance.escript`'s cross-mode "Mode-D ten" mirror (same class as
+  task 7's 3 cross-mode fixes — Mode E's own conformance file incidentally asserts Mode D's
+  component list). Both PASS after the fix; a full re-sweep confirms exactly the 2 already-flagged,
+  pre-existing, unrelated failures remain (`due_diligence_conformance`, `profile_enrichment_
+  conformance` — same as task 7's finding, still out of scope).
+  - **`mode_d_seam_smoke.escript` rewritten for the 12-component spine**: 53 events
+    (`1 + 12×4 + 3 usage + 1`), 36 audit rows, ASIC `boundary_held` still 2 (`firb_workflow` +
+    `mortgage_finance` — neither new component is `advice_adjacent`), 12-component snapshot.
+    Added three new live assertions: the six-actor set (reused from Mode C unchanged), the
+    `contract` phase present + `dispose` phase honestly absent (no hold horizon at base), and —
+    the load-bearing discriminator — the `contract`-phase `submit_firb_application` playbook action,
+    an id that exists ONLY in `kb.journey.investor-foreign-phase-actions`, not Mode C's
+    `kb.journey.investor-phase-actions`. This proves the Mode-D `phase_playbook` branch fired for
+    real, not a silent fallthrough to Mode A's default (the fail-*silent* risk task 8 flagged).
+  - **Ran LIVE** (real `claude-sonnet-5` sidecar fills, metered): `investment_strategy`/
+    `mortgage_finance`/`tax_structure_non_resident` all filled live; event sequence matched (53
+    events); live outcomes `archetype=balanced gearing=neutral_geared io_vs_pi=principal_and_
+    interest rate=variable entity=personal_sole cgt_status=to_verify`; live journey/playbook
+    `actors=[you,government,lender,property_manager,tenant,services]
+    phases=[prepare,pre_approve,contract,settle,own]` (no `dispose`, honestly) and
+    `contract_actions` includes `submit_firb_application`. **ALL ASSERTIONS PASSED.**
+  - **A new, real bug found via `advisor()` review before closing out — flagged, not fixed
+    (affects Mode C too, retroactively; a shared-code fix, not a Mode-D-scoped one).**
+    `fh_engine_disposition:dispose_cash_events/4` hardcodes the `sale_proceeds`/`selling_costs`
+    dispose events' counterparty to `<<"other">>` (`loan_payout`→`lender`, `cgt`→`government` are
+    fine — both real actors in every mode). Mode A's four-actor set has an `other` row, so this is
+    correct there. But Mode C/D's six-actor set **renamed that row to `services`** — there is no
+    `other` actor. Confirmed by reading `SwimlaneDiagram.svelte`: the render grid iterates the
+    DECLARED `actors[]` array and looks up cells per `(phase, actor.id)`; a cell whose `actor`
+    field matches no declared actor id is never looked up by any row, so it silently never renders.
+    **Consequence: `dispose_sale_proceeds`/`dispose_selling_costs` money cells vanish from the
+    Dispose column for both Mode C and Mode D, the moment a user sets a hold horizon** (the Budget
+    tab's horizon slider — a shipping feature, not a hypothetical). Invisible to every check run so
+    far because conformance never sets a horizon and both live seam-smokes (Mode C's task 7, Mode
+    D's task 10) create cards with no `hold_horizon_years` — `HasDispose` is false in both, so
+    dispose events never fire in either live run. Not fixed here: the correct fix needs
+    mode-awareness (`other` is right for Mode A, wrong for the six-actor modes — a remap in
+    `fh_engine_journey`'s placement or a mode-conditional counterparty in `fh_engine_disposition`,
+    not a blind rename that would break Mode A). **This retroactively qualifies task 7's "Mode C
+    restructure CLOSED OUT" — the dispose swimlane itself was never live-verified with a horizon
+    set, in either mode.** Tracked as a standalone open item, not folded into either mode's "done."
+  - **Two narrower verification gaps, disclosed rather than silently accepted (proportionate
+    verification, not exhaustive):** (1) the live run proves `phase_playbook`'s Mode-D branch fired
+    (the FIRB-specific action id) but does not independently prove `purchase_journey`'s own
+    dispatch — its cell prose is the only Mode-D-specific signal and isn't asserted on. The static
+    code read (`fh_engine_journey:fill/2`'s `<<"investor-foreign-au">>` clause) plus the shared
+    phase/actor structure make this low-risk; a second live (metered) run wasn't spent chasing it.
+    (2) `OverviewCard.svelte`'s new FIRB-stage tile (task 9) has NOT been eyeballed in a browser —
+    `svelte-check`/`autofixer`/`build` verify types and compilation, not rendering. It reuses the
+    exact `ov-stat` markup/CSS three already-tested tiles use, so risk is low, but per CLAUDE.md's
+    own UI-verification instruction this is disclosed as an honest gap, not implied as covered by
+    "build clean."
+  - **Task 10 closes out the Mode D restructure** (tasks 8–10 all done), with one caveat carried
+    forward: the dispose-cell counterparty bug above, affecting Mode C too. Next: task 11, Mode B
+    (`disposition` component for parity).

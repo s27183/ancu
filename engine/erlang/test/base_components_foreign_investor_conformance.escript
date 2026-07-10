@@ -71,7 +71,8 @@ foreign_investor_order() ->
     [<<"investor_profile_foreign">>, <<"firb_workflow">>, <<"investment_strategy">>,
      <<"mortgage_finance">>, <<"yield_modelling">>, <<"tax_structure_non_resident">>,
      <<"cash_position">>, <<"cross_border_funding">>,
-     <<"ownership_planning_foreign_investor">>, <<"disposition">>].
+     <<"ownership_planning_foreign_investor">>, <<"disposition">>,
+     <<"purchase_journey">>, <<"phase_playbook">>].
 
 fhb_order() ->
     [<<"buyer_profile">>, <<"eligibility">>, <<"mortgage_finance">>,
@@ -114,7 +115,7 @@ set_order_cases() ->
     Comps = fh_engine_turn:base_components(?FHB_FOREIGN_INV),
     Got = names(Comps),
     Excluded = [N || N <- per_property(), lists:member(N, Got)],
-    [check("foreign-investor base SET+ORDER = the ten-component Mode-D spine",
+    [check("foreign-investor base SET+ORDER = the twelve-component Mode-D spine",
            Got, foreign_investor_order()),
      check("per-property components EXCLUDED from the foreign-investor base set",
            Excluded, []),
@@ -159,7 +160,15 @@ dag_walk_cases() ->
      Pre(<<"disposition">>, <<"strategy_thesis">>),
      Pre(<<"disposition">>, <<"cash_flow_projection">>),
      Pre(<<"disposition">>, <<"tax_optimised_structure">>),
-     Pre(<<"disposition">>, <<"budget_envelope_investor">>)
+     Pre(<<"disposition">>, <<"budget_envelope_investor">>),
+     %% purchase_journey/phase_playbook (task 8) — the multi-source cash_events harvest
+     %% needs all three figure-owners + disposition to have already run; phase_playbook
+     %% needs purchase_journey's own outcome (journey_swimlane) to share the phase set.
+     Pre(<<"purchase_journey">>, <<"budget_envelope_investor">>),
+     Pre(<<"purchase_journey">>, <<"cash_flow_projection">>),
+     Pre(<<"purchase_journey">>, <<"tax_optimised_structure">>),
+     Pre(<<"purchase_journey">>, <<"disposition">>),
+     Pre(<<"phase_playbook">>, <<"journey_swimlane">>)
      | ValCases].
 
 %% --- 4. discriminator load-bearing (SAME order, firb_required_any=false) -----

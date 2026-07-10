@@ -78,7 +78,8 @@ foreign_investor_order() ->
     [<<"investor_profile_foreign">>, <<"firb_workflow">>, <<"investment_strategy">>,
      <<"mortgage_finance">>, <<"yield_modelling">>, <<"tax_structure_non_resident">>,
      <<"cash_position">>, <<"cross_border_funding">>,
-     <<"ownership_planning_foreign_investor">>, <<"disposition">>].
+     <<"ownership_planning_foreign_investor">>, <<"disposition">>,
+     <<"purchase_journey">>, <<"phase_playbook">>].
 
 per_property() ->
     [<<"property_assessment">>, <<"buying_strategy">>,
@@ -119,7 +120,7 @@ no_regression_cases() ->
            names(fh_engine_turn:base_components(?INV)), investor_order()),
      check("Foreign-FHB base SET+ORDER byte-identical to the Mode-B seven",
            names(fh_engine_turn:base_components(?FHB_FOREIGN)), foreign_order()),
-     check("Foreign-investor base SET+ORDER byte-identical to the Mode-D ten",
+     check("Foreign-investor base SET+ORDER byte-identical to the Mode-D twelve",
            names(fh_engine_turn:base_components(?INV_FOREIGN)), foreign_investor_order())].
 
 %% --- 3. DAG walk (data availability + discriminator-firing proof) ------------
