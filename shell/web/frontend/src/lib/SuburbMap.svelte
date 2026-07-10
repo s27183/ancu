@@ -25,7 +25,8 @@
         Map as MlMap,
         CircleLayerSpecification,
         MapLibreEvent,
-        ErrorEvent as MlErrorEvent
+        ErrorEvent as MlErrorEvent,
+        GeoJSONSource as MlGeoJSONSource
     } from 'maplibre-gl';
     import type { FeatureCollection, Point } from 'geojson';
     import type { Suburb } from '$lib/api';
@@ -33,6 +34,10 @@
         toFeatureCollection,
         circlePaintFor,
         heatmapPaintFor,
+        clusterPaintFor,
+        clusterPropertiesFor,
+        CLUSTER_RADIUS_PX,
+        CLUSTER_MAX_ZOOM,
         minimalStyle,
         basemapStyle,
         firstLabelLayerId,
@@ -108,6 +113,10 @@
     // + colour adapting to the criterion) shows the distribution; it cross-fades to the
     // dots as you zoom in. See the measurement note in lib/map.ts.
     const heatPaint = $derived(heatmapPaintFor(sizeBy));
+    // INTENSIVE criteria (no heatPaint — a rate/decile can't honestly density-sum) get a
+    // cluster-average overview instead: bubble colour = average, size = suburb count.
+    const clusterPaint = $derived(clusterPaintFor(sizeBy));
+    const clusterProps = $derived(clusterPropertiesFor(sizeBy));
 
     // --- Pulse highlight -----------------------------------------------------
     // ONE bright pulse signal — a solid centre dot + an expanding ring animated by rAF
@@ -180,6 +189,21 @@
         const sal = ev.features?.[0]?.properties?.sal_code as string | undefined;
         onselect(sal ? (index.get(sal) ?? null) : null);
     }
+    // Cluster bubbles have no sal_code (they're an aggregate, not one suburb) — click
+    // zooms into the cluster instead of selecting. Leaf points (unclustered — a lone
+    // suburb far from any other) fall through to the normal select behaviour.
+    async function handleClusterClick(ev: MapLayerMouseEvent) {
+        const f = ev.features?.[0];
+        if (!f?.properties?.cluster) {
+            handleClick(ev);
+            return;
+        }
+        const src = map?.getSource<MlGeoJSONSource>('suburbs-cluster');
+        if (!src || f.properties.cluster_id == null) return;
+        const expandZoom = await src.getClusterExpansionZoom(f.properties.cluster_id as number);
+        const [lon, lat] = (f.geometry as Point).coordinates;
+        map?.easeTo({ center: [lon, lat], zoom: expandZoom });
+    }
     function setPointer(ev: MapLayerMouseEvent, on: boolean) {
         ev.target.getCanvas().style.cursor = on ? 'pointer' : '';
     }
@@ -195,10 +219,10 @@
     inlineStyle="position:absolute;inset:0"
     onerror={onMapError}
 >
-    <GeoJSONSource id="suburbs" {data}>
-        {#if pulseSaved}
-            <!-- Saved-plans mode: an expanding ring (declared first → below the dot) and
-                 a solid bright centre dot. Uniform bright highlight, no criterion ramp. -->
+    {#if pulseSaved}
+        <!-- Saved-plans mode: an expanding ring (declared first → below the dot) and
+             a solid bright centre dot. Uniform bright highlight, no criterion ramp. -->
+        <GeoJSONSource id="suburbs" {data}>
             <CircleLayer id="suburb-pulse" paint={ringPaint} beforeId={labelBeforeId} />
             <CircleLayer
                 id="suburb-saved"
@@ -208,12 +232,13 @@
                 onmouseenter={(e: MapLayerMouseEvent) => setPointer(e, true)}
                 onmouseleave={(e: MapLayerMouseEvent) => setPointer(e, false)}
             />
-        {:else}
-            <!-- KDE heatmap for the overplotted overview; sits below the dots. Only for
-                 extensive criteria — null (omitted) for intensive ones (SEIFA/crime). -->
-            {#if heatPaint}
-                <HeatmapLayer id="suburb-heat" paint={heatPaint} beforeId={labelBeforeId} />
-            {/if}
+        </GeoJSONSource>
+    {:else if heatPaint}
+        <!-- EXTENSIVE criteria (population/vietnamese): a KDE density heatmap honestly
+             represents the overplotted overview, cross-fading to individual dots as
+             you zoom in. See the measurement note in lib/map.ts. -->
+        <GeoJSONSource id="suburbs" {data}>
+            <HeatmapLayer id="suburb-heat" paint={heatPaint} beforeId={labelBeforeId} />
             <CircleLayer
                 id="suburb-bubbles"
                 {paint}
@@ -222,8 +247,40 @@
                 onmouseenter={(e: MapLayerMouseEvent) => setPointer(e, true)}
                 onmouseleave={(e: MapLayerMouseEvent) => setPointer(e, false)}
             />
-        {/if}
-    </GeoJSONSource>
+        </GeoJSONSource>
+    {:else}
+        <!-- INTENSIVE criteria (SEIFA/crime): a density-sum heatmap would be dishonest
+             for a rate, so the overview is a cluster-AVERAGE proportional-symbol map
+             instead (bubble colour = average, size = suburb count) — cross-fading to
+             the same individual dots at the same handoff. See lib/map.ts. -->
+        <GeoJSONSource
+            id="suburbs-cluster"
+            data={data}
+            cluster={true}
+            clusterRadius={CLUSTER_RADIUS_PX}
+            clusterMaxZoom={CLUSTER_MAX_ZOOM}
+            clusterProperties={clusterProps}
+        >
+            <CircleLayer
+                id="suburb-cluster-bubbles"
+                paint={clusterPaint}
+                filter={['has', 'point_count']}
+                beforeId={labelBeforeId}
+                onclick={handleClusterClick}
+                onmouseenter={(e: MapLayerMouseEvent) => setPointer(e, true)}
+                onmouseleave={(e: MapLayerMouseEvent) => setPointer(e, false)}
+            />
+            <CircleLayer
+                id="suburb-cluster-leaves"
+                {paint}
+                filter={['!', ['has', 'point_count']]}
+                beforeId={labelBeforeId}
+                onclick={handleClick}
+                onmouseenter={(e: MapLayerMouseEvent) => setPointer(e, true)}
+                onmouseleave={(e: MapLayerMouseEvent) => setPointer(e, false)}
+            />
+        </GeoJSONSource>
+    {/if}
 
     <!-- The selected suburb's own pulse — always on (saved or not), sitting on its own
          single-feature source so it shows over any base layer. No click handler: the

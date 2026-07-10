@@ -21,8 +21,6 @@
         SIZE_CRITERIA,
         DEFAULT_SIZE_BY,
         legendFor,
-        heatmapEnabled,
-        OVERVIEW_MAX_ZOOM,
         type MapScope,
         type SizeBy
     } from '$lib/map';
@@ -50,10 +48,6 @@
         crime: 'map.size.crime'
     } as const;
     const legend = $derived(legendFor(sizeBy));
-    // Live map zoom (reported by SuburbMap). Drives the overview hint for intensive
-    // criteria, which have no heatmap and only reveal their dots once you zoom in.
-    let mapZoom = $state(STATE_VIEW[DEFAULT_STATE].zoom);
-    const showZoomHint = $derived(!heatmapEnabled(sizeBy) && mapZoom < OVERVIEW_MAX_ZOOM);
     let suburbs = $state<Suburb[]>([]);
     let attribution = $state<SuburbSource[]>([]);
     let loading = $state(true);
@@ -223,7 +217,6 @@
             pulseSaved={savedOnly}
             {selected}
             onselect={(s) => (selected = s)}
-            onzoom={(z) => (mapZoom = z)}
         />
     {/if}
 
@@ -377,12 +370,6 @@
             <div class="legend-scale"><span>{legend.min}</span><span>{legend.max}</span></div>
             <div class="legend-nodata"><span class="swatch"></span>{$t('map.legend.nodata')}</div>
         </div>
-    {/if}
-
-    <!-- Intensive criteria (a rate / an index) get no overview heatmap — a density sum
-         would be dishonest — so prompt to zoom in where the per-suburb dots read. -->
-    {#if showZoomHint && !savedOnly}
-        <div class="zoom-hint">{$t('map.zoomhint')}</div>
     {/if}
 
     {#if loading}
