@@ -713,3 +713,58 @@ restructure lands, mode by mode per §11.5 — not worth a standalone patch to a
   - **Task 10 closes out the Mode D restructure** (tasks 8–10 all done), with one caveat carried
     forward: the dispose-cell counterparty bug above, affecting Mode C too. Next: task 11, Mode B
     (`disposition` component for parity).
+
+- **Dispose-cell counterparty bug fixed + both narrower task-10 gaps closed — done 2026-07-10
+  (task 15).** Ground truth for the fix, established by reading `fh_engine_journey.erl`'s three
+  `fill_*` clauses before touching anything: the mode split that determines the swimlane actor set
+  (`actors/0` four-actor vs `investor_actors/0` six-actor) is EXACTLY the same split
+  `fh_engine_disposition:fill/2` already dispatches on (`tax_optimised_structure` presence —
+  owner-occupier A/B/E vs investor C/D). No new discriminator needed; the existing dispatch already
+  carries the information the fix requires.
+  - **Fix**: `dispose_cash_events/4` → `/5`, threading a `MoneyPartyId` param for the
+    sale_proceeds/selling_costs counterparty (`loan_payout`→`lender`, `cgt`→`government` untouched
+    — both actor sets carry those ids unchanged). `fill_owner_occupier/2` passes `<<"other">>`;
+    `fill_investor/3` (the one function serving both Mode C and Mode D) passes `<<"services">>`.
+    Fixes both modes with a single call-site change each — no mode-conditional branching inside
+    `dispose_cash_events` itself, since the caller already knows which set it's building for.
+  - **Verification, matched to what this bug is**: `fh_engine_disposition`/`fh_engine_journey` are
+    both explicitly NO-agent-leaf, fully deterministic resolver code
+    ([[no-judge-ground-the-producer]]) — a live LLM run adds no confidence a direct function call
+    doesn't already give exhaustively, and metered spend on one would be the "yak-shaving"
+    [[proportionate-verification-honest-gaps]] warns against. Verified instead by:
+    (a) `disposition_conformance.escript` — 2 new assertions, sale/selling counterparty = `services`
+    on the investor clean-case fixture (89 anchors, PASS);
+    (b) `mode_d_p2_conformance.escript` — 1 new assertion on the REAL Mode-D fixture (84 anchors,
+    PASS);
+    (c) the load-bearing one, `journey_conformance.escript`'s new `investor_dispose_cases/0` — calls
+    the ACTUAL `fh_engine_disposition:fill/2` then feeds its real output through the ACTUAL
+    `fh_engine_journey:fill/2` for both `investor-domestic-au` and `investor-foreign-au` (no
+    synthetic fixture standing in for either module), and asserts the exact invariant that broke:
+    every dispose money cell's `actor` field resolves inside the outcome's own declared `actors[]`
+    list — the precise lookup `SwimlaneDiagram.svelte` performs. Pre-fix this assertion fails with
+    `OrphanedActors = [<<"other">>, <<"other">>]`; post-fix it's `[]` for both modes (41 anchors,
+    PASS). Full 65-file non-live conformance re-sweep after the fix: only the same 2 already-flagged
+    pre-existing unrelated failures remain (`due_diligence_conformance`,
+    `profile_enrichment_conformance`).
+  - **Gap 1 (purchase_journey's own Mode-D dispatch) closed by the same test**: `investor_dispose_
+    cases/0` calls `fh_engine_journey:fill/2` with `blueprint_slug = investor-foreign-au` directly
+    and asserts the six-actor set + real dispose placement — a deterministic, exhaustive proof of
+    the dispatch clause firing, stronger than an LLM-dependent live run would have been for
+    non-agentic code.
+  - **Gap 2 (OverviewCard FIRB tile, task 9) — partially closed, honestly**: no browser/screenshot
+    tool was available in this session, so a literal visual eyeball per CLAUDE.md's UI-verification
+    instruction was NOT possible — disclosed rather than silently claimed. Closed what's checkable
+    without one: `FirbStatusOutcome.current_stage`'s 8-value union (`fh_shell` `planCard.ts`) matches
+    the 8 `plan.firb.stage.*` i18n keys the tile reads exactly, 1:1, no drift; `plan.f.stage` (the
+    tile's label key) exists; `npm run build` clean. Still open: an actual rendered screenshot.
+  - **New, adjacent, deliberately out-of-scope finding**: no test anywhere in the repo — for ANY
+    mode — exercises the horizon structural what-if (engine-contract §10.5, a refine-turn setting
+    `hold_horizon_years`) through the full commit-seam/SSE pipeline; every proof of the Dispose
+    column (this fix included) is at the module level, not integration level. This is a pre-existing
+    gap in the refine-turn test surface, not created by or required to close this bug — flagged for
+    awareness, not taken on here.
+  - Files: `fh_engine_disposition.erl` (the fix), `disposition_conformance.escript`,
+    `mode_d_p2_conformance.escript`, `journey_conformance.escript` (the 3 conformance additions).
+    No blueprint/KB/shell changes — this was engine-internal.
+  - **Next: task 11**, Mode B (`disposition` component for parity) — now unblocked with no
+    outstanding caveat from tasks 7/10.

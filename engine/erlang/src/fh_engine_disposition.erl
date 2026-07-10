@@ -49,7 +49,7 @@
 -export([fill/2]).
 %% exported for the conformance harness:
 -export([sale_proceeds/4, selling_costs/1, loan_payout/2, cgt/1,
-         net_proceeds/4, full_horizon/4, dispose_cash_events/4]).
+         net_proceeds/4, full_horizon/4, dispose_cash_events/5]).
 %% the Mode-C/D investor path (full CGT):
 -export([cgt_investor/4, taxable_gain/3, loan_payout_investor/2, full_horizon_investor/4]).
 
@@ -100,7 +100,9 @@ fill_owner_occupier(Profile, Upstream) ->
     CgtContrib    = cgt_contribution(Cgt, Status),
     Net           = net_proceeds(Sale, Selling, Loan, CgtContrib),
     Full          = full_horizon(Net, Budget, Ownership, H),
-    Events        = dispose_cash_events(Sale, Selling, Loan, Cgt),
+    %% Mode-A/B/E four-actor swimlane (fh_engine_journey:actors/0) — the money-flow party for
+    %% sale/selling is "other" there.
+    Events        = dispose_cash_events(Sale, Selling, Loan, Cgt, <<"other">>),
 
     Outcome = #{
         <<"horizon_years">>             => H,
@@ -141,7 +143,13 @@ fill_investor(Profile, Tax, Upstream) ->
     %% cgt IS the contribution: a money_range when computed, null (→ net PENDING) when to_verify.
     Net                 = net_proceeds(Sale, Selling, Loan, Cgt),
     Full                = full_horizon_investor(Net, Budget, CashFlow, H),
-    Events              = dispose_cash_events(Sale, Selling, Loan, Cgt),
+    %% Mode-C/D six-actor swimlane (fh_engine_journey:investor_actors/0) RENAMES "other" to
+    %% "services" — a money cell counterparty of "other" is an actor id that doesn't exist in
+    %% that set, so SwimlaneDiagram.svelte's by-declared-actor-id lookup silently drops the
+    %% sale_proceeds/selling_costs cells the moment a hold horizon is set (found via review,
+    %% 2026-07-10 — [[firsthomey-bcd-lifecycle-restructure]] task 10). Fixed at the source: the
+    %% investor path (the ONLY caller of the six-actor set) passes "services" here.
+    Events              = dispose_cash_events(Sale, Selling, Loan, Cgt, <<"services">>),
     %% Mode-D-only fields (frcgw_applicable is absent/false on Mode C's tax_optimised_structure
     %% ⟹ both null there — one function serves both modes, see frcgw_withheld/2's header note).
     FrcgwApplicable     = maps:get(<<"frcgw_applicable">>, Tax, false),
@@ -457,12 +465,19 @@ full_horizon_investor([NLo, NHi], Budget, CashFlow, H) when is_integer(H) ->
 
 %% Cgt is null on the Mode-A/owner-occupier path (exempt/to_verify) and on the investor
 %% to_verify path; a money_range on the investor computed path (the cgt event is then emitted).
+%%
+%% MoneyPartyId: the counterparty for sale_proceeds/selling_costs — MUST be an actor id that
+%% exists in the caller's rendered swimlane actor set, since SwimlaneDiagram.svelte looks up
+%% cells strictly by declared actor id and silently drops an orphaned one. "other" for the
+%% Mode-A/B/E four-actor set (fh_engine_journey:actors/0); "services" for the Mode-C/D
+%% six-actor set (fh_engine_journey:investor_actors/0). loan_payout/cgt use "lender"/
+%% "government", which both actor sets carry unchanged.
 -spec dispose_cash_events([integer()] | null, [integer()] | null,
-                          [integer()] | null, [integer()] | null) -> [map()].
-dispose_cash_events(Sale, Selling, Loan, Cgt) ->
+                          [integer()] | null, [integer()] | null, binary()) -> [map()].
+dispose_cash_events(Sale, Selling, Loan, Cgt, MoneyPartyId) ->
     Candidates = [
-        event(<<"sale_proceeds">>, <<"event_sale_proceeds">>, <<"in">>,  Sale,    <<"other">>),
-        event(<<"selling_costs">>, <<"event_selling_costs">>, <<"out">>, Selling, <<"other">>),
+        event(<<"sale_proceeds">>, <<"event_sale_proceeds">>, <<"in">>,  Sale,    MoneyPartyId),
+        event(<<"selling_costs">>, <<"event_selling_costs">>, <<"out">>, Selling, MoneyPartyId),
         event(<<"loan_payout">>,   <<"event_loan_payout">>,   <<"out">>, Loan,    <<"lender">>),
         event(<<"cgt">>,           <<"event_cgt">>,           <<"out">>, Cgt,     <<"government">>)
     ],

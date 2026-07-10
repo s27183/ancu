@@ -343,6 +343,14 @@ disposition_cases() ->
      check("dispose_cash_events: no cgt event (cgt null, honest-partial drop)",
            lists:member(<<"dispose_cgt">>, [maps:get(<<"id">>, E) || E <- g(O, <<"dispose_cash_events">>)]),
            false),
+     %% Mode D's swimlane is the six-actor investor_actors() set (no "other" — renamed
+     %% "services"); the sale/selling counterparty MUST resolve there or
+     %% SwimlaneDiagram.svelte silently drops the cell (2026-07-10 fix).
+     check("dispose_sale_proceeds counterparty = services (resolves in the Mode-D 6-actor set)",
+           maps:get(<<"counterparty">>,
+               hd([E || E <- g(O, <<"dispose_cash_events">>),
+                        maps:get(<<"id">>, E) =:= <<"dispose_sale_proceeds">>])),
+           <<"services">>),
      check("Mode-C regression: frcgw_withheld_at_settlement null when frcgw_applicable absent",
            g(OC, <<"frcgw_withheld_at_settlement">>), null),
      check("Mode-C regression: vn_side_cgt_note null when frcgw_applicable absent",
