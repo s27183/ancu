@@ -29,7 +29,7 @@
         type ExistingHomeDisposalOutcome,
         type MoneyRange
     } from '$lib/planCard';
-    import { money, moneyRange } from '$lib/format';
+    import { money, moneyRange, asRange } from '$lib/format';
     import Field from './Field.svelte';
     import Chip from './Chip.svelte';
     import NoteList from './NoteList.svelte';
@@ -99,7 +99,11 @@
                 : null
         ] as (Seg | null)[]).filter((s): s is Seg => s !== null)
     );
-    const needTotal = $derived(hasRange(o.total_cash_required) ? rangeLabel(o.total_cash_required) : null);
+    // total_cash_required is a range for Modes A/B/E, a scalar point for Modes C/D
+    // (fh_engine_cash.erl SEAMS note) — asRange() upgrades a scalar to [v,v] rather than
+    // treating it as absent (the bug: hasRange() alone rejects a bare number).
+    const needRange = $derived(asRange(o.total_cash_required));
+    const needTotal = $derived(needRange ? rangeLabel(needRange) : null);
 
     const VERDICTS: Record<string, 'good' | 'warn'> = { surplus: 'good', tight: 'warn', short: 'warn' };
     const GSV: Record<string, 'good' | 'warn' | 'neutral'> = {
@@ -117,7 +121,7 @@
     // engine keeps verdict=null until savings persist (a refine fact), so this is the
     // ephemeral what-if; once cash_available is a stored fact, the engine's own verdict
     // shows instead. Never recomputes duty (a second, unverified computer).
-    const need = $derived(hasRange(o.total_cash_required) ? o.total_cash_required : null);
+    const need = $derived(needRange);
     type Assess = { tone: 'good' | 'warn' | 'bad'; verdict: string; label: string; amount: string };
     const assessment = $derived.by((): Assess | null => {
         if (cashOnHand !== null && need) {

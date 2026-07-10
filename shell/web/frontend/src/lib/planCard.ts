@@ -96,9 +96,11 @@ export interface MortgagePlanOutcome {
     key_assumptions?: LocalizedText[] | null;
 }
 
-/** investment_strategy (Mode C/D) → summary-card (outcome type `strategy_thesis`). Base-scope
- *  fields are mostly agent-filled (archetype/one_liner/targets/gearing/exit) — null until a
- *  refine turn; hold_period_years is resolver-carried off profile.hold_horizon_years at base.
+/** investment_strategy (Mode C/D) → summary-card (outcome type `strategy_thesis`). Two-path:
+ *  `archetype`/`gearing_type`/`one_liner` are the three agent-authored leaves, merged into the
+ *  resolver scaffold in the SAME base turn (fh_engine_fill.erl merge_agent/3) — real at base,
+ *  not deferred to a refine turn. `target_gross_yield` is resolver-derived from `archetype` via
+ *  KB defaults; `hold_period_years` is resolver-carried off profile.hold_horizon_years at base.
  *  migration_pathway_alignment/currency_hedging_strategy are Mode-D-only (absent on Mode C's
  *  investor-domestic-au — no foreign-investor lens there). */
 export interface StrategyThesisOutcome {
@@ -167,8 +169,13 @@ export interface BudgetEnvelopeOutcome {
     deposit?: Deposit | null;
     other_buying_costs?: OtherBuyingCosts | null;
     reserve_buffer?: ReserveBuffer | null;
-    /** NEED total AT SETTLEMENT = deposit + duty + other costs. money_range at base. */
-    total_cash_required?: MoneyRange | null;
+    /** NEED total AT SETTLEMENT = deposit + duty + other costs. money_range at base for
+     *  Modes A/B/E's `budget_envelope`; a scalar `money` point for Modes C/D's
+     *  `budget_envelope_investor` (fh_engine_cash.erl SEAMS note — a known cross-contract
+     *  seam, not yet reconciled to a single shape). Consumers must accept either — see
+     *  `asRange()` in `$lib/format`, which mirrors the Erlang-side `money_range/1` scalar→
+     *  [v,v] upgrade `fh_engine_disposition` already applies when reading this same field. */
+    total_cash_required?: MoneyRange | number | null;
     max_property_price_supported?: number | null;
     actual_property_price?: number | null;
     // HAVE side + verdict — null at base (no savings captured at onboarding; refine turn).

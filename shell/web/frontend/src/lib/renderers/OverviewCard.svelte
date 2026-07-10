@@ -19,11 +19,12 @@
         type MortgagePlanOutcome,
         type BudgetEnvelopeOutcome,
         type ExistingHomeDisposalOutcome,
+        type StrategyThesisOutcome,
         type MoneyRange,
         firstComponentEntry,
         PROFILE_COMPONENT_IDS
     } from '$lib/planCard';
-    import { moneyRange } from '$lib/format';
+    import { moneyRange, asRange } from '$lib/format';
     import Pending from './Pending.svelte';
 
     let { components, filling }: {
@@ -36,9 +37,16 @@
     const profile = $derived(
         firstComponentEntry(components, PROFILE_COMPONENT_IDS)?.outcome as ProfileOutcome | undefined
     );
+    // `eligibility` doesn't exist for Modes C/D (no FHB scheme stack for investors) — `scheme`
+    // is honestly undefined there, not "not yet computed"; the `benefit` tile below is
+    // presence-gated on it rather than reading a permanent null forever.
     const scheme = $derived(components.eligibility?.outcome as SchemeStackOutcome | undefined);
     const mortgage = $derived(components.mortgage_finance?.outcome as MortgagePlanOutcome | undefined);
     const budget = $derived(components.cash_position?.outcome as BudgetEnvelopeOutcome | undefined);
+    // Mode C/D only — investment_strategy replaces eligibility as the "what's the plan" component.
+    const strategy = $derived(
+        components.investment_strategy?.outcome as StrategyThesisOutcome | undefined
+    );
     // Mode-E ONLY: no other mode has this component, so the tile below is present/absent by
     // component presence (not honest-partial-null) — Modes A/B/C/D never grow a dead
     // "Pending" tile for a figure that doesn't apply to them.
@@ -52,28 +60,45 @@
         hasRange(v) ? moneyRange(v, $lang) : null;
 
     // recommended_path is a known enum → a label; an unknown value shows verbatim so
-    // nothing is silently dropped (mirrors SummaryCard).
+    // nothing is silently dropped (mirrors SummaryCard). mortgage.recommended_path is an
+    // FHB-only concept — `fill_investor_domestic`/`fill_investor_foreign` never set it, so
+    // it's permanently undefined for Modes C/D (not "not yet"). Fall back to the investor
+    // archetype (investment_strategy's agent-filled headline, real at base for C/D — an
+    // interim substitute for the same tile slot until the Mode C/D Overview restructure
+    // gives investors their own copy, plan-card-lifecycle-restoration.md §11).
     const PATHS = new Set(['fhg_backed', 'lmi_5_to_20', 'twenty_plus', 'user_specific_alternative']);
-    const path = $derived(mortgage?.recommended_path ?? null);
+    const path = $derived(mortgage?.recommended_path ?? strategy?.archetype ?? null);
     const pathLabel = $derived(
         path ? (PATHS.has(path) ? $t(`plan.path.${path}` as 'plan.path.fhg_backed') : path) : null
     );
 
     const target = $derived(range(profile?.target_price_range));
+    // eligibility (and its total_benefit_value) doesn't exist for Modes C/D — see `stats`
+    // below, where this tile is presence-gated on `scheme` rather than shown as a
+    // perpetual "Not yet" for a figure that structurally can't apply.
     const benefit = $derived(range(scheme?.total_benefit_value));
-    const cashNeed = $derived(range(budget?.total_cash_required));
+    // total_cash_required is a range for Modes A/B/E, a scalar point for Modes C/D
+    // (fh_engine_cash.erl SEAMS note) — asRange() upgrades a scalar to [v,v] instead of the
+    // bare hasRange() check treating it as absent.
+    const cashNeed = $derived.by(() => {
+        const r = asRange(budget?.total_cash_required);
+        return r ? moneyRange(r, $lang) : null;
+    });
     const capacity = $derived(range(profile?.approx_borrowing_capacity));
     const existingHomeNet = $derived(existingHome ? range(existingHome.net_sale_proceeds) : null);
 
-    // Four headline tiles, in journey order: where you're aiming → how you finance →
-    // what help stacks → what cash gets you in. Each ghosts honest-partial when null. A
-    // FIFTH tile (existing-home net proceeds) appends only for Mode E's own component —
-    // reuses the Calculator's own label (plan.xhd.net_proceeds) rather than forking a
-    // second string for the same figure.
+    // Headline tiles, in journey order: where you're aiming → how you finance → what help
+    // stacks → what cash gets you in. Each ghosts honest-partial when null (its component
+    // ran but hasn't filled the figure yet). `benefit` is different: it's presence-gated on
+    // `scheme` (component-presence, not honest-partial) since Modes C/D have no eligibility
+    // component at all — same treatment the existing-home tile already gets for Mode E, so
+    // C/D never carry a tile for a figure that can't structurally exist for them.
     const stats = $derived([
         { key: 'target', label: $t('plan.f.target_price'), value: target },
         { key: 'path', label: $t('plan.f.path'), value: pathLabel },
-        { key: 'benefit', label: $t('plan.f.total_benefit'), value: benefit },
+        ...(scheme
+            ? [{ key: 'benefit', label: $t('plan.f.total_benefit'), value: benefit }]
+            : []),
         { key: 'cash', label: $t('plan.cash.need'), value: cashNeed },
         ...(existingHome
             ? [{ key: 'existing_home_net', label: $t('plan.xhd.net_proceeds'), value: existingHomeNet }]

@@ -30,6 +30,19 @@ export function moneyRange(r: MoneyRange | null | undefined, lang: Lang): string
     return `${lo} – ${hi}`;
 }
 
+/** Upgrades a scalar `money` point to a degenerate `[v, v]` range; passes a real range
+ *  through unchanged; null/undefined/malformed → null. Mirrors the Erlang-side
+ *  `money_range/1` helper `fh_engine_disposition` already uses to read Mode C/D's
+ *  `total_cash_required` (typed scalar for those modes — fh_engine_cash.erl SEAMS note) —
+ *  use this instead of a bare `Array.isArray` check for any field typed `MoneyRange | number | null`. */
+export function asRange(v: MoneyRange | number | null | undefined): MoneyRange | null {
+    if (Array.isArray(v) && v.length === 2 && typeof v[0] === 'number' && typeof v[1] === 'number') {
+        return v;
+    }
+    if (typeof v === 'number' && Number.isFinite(v)) return [v, v];
+    return null;
+}
+
 /** A plain grouped integer (no currency), e.g. a count. */
 export function num(n: number | null | undefined, lang: Lang): string | null {
     if (typeof n !== 'number' || !Number.isFinite(n)) return null;
