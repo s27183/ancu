@@ -9,7 +9,7 @@ import { derived } from 'svelte/store';
 import { lang } from '$lib/stores/lang';
 
 const messages = {
-    'brand.name': { vi: 'FirstHomey', en: 'FirstHomey' },
+    'brand.name': { vi: 'Rau', en: 'Rau' },
     'brand.tagline': {
         vi: 'Kế hoạch mua nhà đầu tiên tại Úc',
         en: 'Your first-home plan in Australia'
@@ -36,10 +36,6 @@ const messages = {
         en: 'No saved plans yet. Create a plan to pin a suburb here.'
     },
     'map.sources': { vi: 'Nguồn dữ liệu', en: 'Data sources' },
-    'map.zoomhint': {
-        vi: 'Phóng to vào một thành phố để so sánh từng khu vực',
-        en: 'Zoom into a city to compare suburbs'
-    },
     'map.loading': { vi: 'Đang tải bản đồ…', en: 'Loading the map…' },
     'map.error': {
         vi: 'Không tải được dữ liệu khu vực. Vui lòng thử lại.',
@@ -86,8 +82,8 @@ const messages = {
         en: 'Is this your first home?'
     },
     'onboarding.outofscope.foreign': {
-        vi: 'Để mua nhà để ở, FirstHomey hiện hỗ trợ người mua nước ngoài mua căn nhà ĐẦU TIÊN. Kế hoạch cho người nước ngoài đã từng sở hữu nhà sẽ sớm có. (Nhà đầu tư nước ngoài đã được hỗ trợ — hãy chọn "Để đầu tư".)',
-        en: 'For buying a home to live in, FirstHomey currently supports foreign-person FIRST-HOME buyers only. Plans for foreign next-home buyers are coming soon. (Foreign investors are already supported — choose "As an investment".)'
+        vi: 'Để mua nhà để ở, Rau hiện hỗ trợ người mua nước ngoài mua căn nhà ĐẦU TIÊN. Kế hoạch cho người nước ngoài đã từng sở hữu nhà sẽ sớm có. (Nhà đầu tư nước ngoài đã được hỗ trợ — hãy chọn "Để đầu tư".)',
+        en: 'For buying a home to live in, Rau currently supports foreign-person FIRST-HOME buyers only. Plans for foreign next-home buyers are coming soon. (Foreign investors are already supported — choose "As an investment".)'
     },
     'onboarding.gate.firsthome.foreign': {
         vi: 'Người mua ở Việt Nam hoặc giữ visa tạm trú thường mua nhà đầu tiên tại Úc — hỏi để xác nhận.',
@@ -856,7 +852,7 @@ const messages = {
     'auth.signout': { vi: 'Đăng xuất', en: 'Sign out' },
     'account.title': { vi: 'Tài khoản', en: 'Account' },
     'account.menu': { vi: 'Menu tài khoản', en: 'Account menu' },
-    'auth.title': { vi: 'Đăng nhập vào FirstHomey', en: 'Sign in to FirstHomey' },
+    'auth.title': { vi: 'Đăng nhập vào Rau', en: 'Sign in to Rau' },
     'auth.email.label': { vi: 'Email', en: 'Email' },
     'auth.email.placeholder': { vi: 'ban@example.com', en: 'you@example.com' },
     'auth.email.invalid': {
