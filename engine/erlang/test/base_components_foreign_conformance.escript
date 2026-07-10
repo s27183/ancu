@@ -72,7 +72,8 @@ fhb_order() ->
 investor_order() ->
     [<<"investor_profile">>, <<"investment_strategy">>, <<"mortgage_finance">>,
      <<"yield_modelling">>, <<"tax_structure">>, <<"cash_position">>,
-     <<"disposition">>, <<"ownership_planning_investor">>].
+     <<"disposition">>, <<"ownership_planning_investor">>,
+     <<"purchase_journey">>, <<"phase_playbook">>].
 
 per_property() ->
     [<<"property_assessment">>, <<"buying_strategy">>,
@@ -112,7 +113,7 @@ set_order_cases() ->
 no_regression_cases() ->
     [check("FHB base SET+ORDER byte-identical to the Mode-A nine",
            names(fh_engine_turn:base_components(?FHB)), fhb_order()),
-     check("Investor base SET+ORDER byte-identical to the Mode-C eight",
+     check("Investor base SET+ORDER byte-identical to the Mode-C ten",
            names(fh_engine_turn:base_components(?INV)), investor_order())].
 
 %% --- 3. DAG walk (firb_required_any=true — the real Mode-B turn) -------------

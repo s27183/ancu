@@ -494,3 +494,54 @@ restructure lands, mode by mode per §11.5 — not worth a standalone patch to a
   - **Verified:** `npm run check` (svelte-check) 0 errors / 0 warnings; `npm run build` succeeds
     clean. Full live-browser verification against a real filled Mode C card is task 7's job (the
     seam-smoke gate), not duplicated here.
+
+- **Mode C conformance + live seam-smoke — done 2026-07-10 (task 7).** Found and fixed a real
+  authoring bug, not just staleness: `investor-domestic-au.md`'s `purchase_journey`/`phase_playbook`
+  sections (13/14) declared their `**Outcome schema:**` type inline (`journey_swimlane`/
+  `phase_playbook`, prose "identical to Mode A's, not repeated here") instead of the fenced
+  ` ```jsonc ` block `kb_compiler.py` actually parses (it materializes `outcome_type` per-blueprint,
+  never by cross-reference) — so both components compiled with `outcome_type: null`. Consequence:
+  `fh_engine_outcome:validate/3` silently no-ops for both (the known fail-open registry gap,
+  §grounding-checklist item, now concretely instantiated for 2 more components) and both components
+  collided under the SAME `null` accumulator key in `fh_engine_turn`'s DAG walk (harmless today only
+  because `harvest_cash_events/1` reads by value not key — a latent landmine for any future consumer
+  that reads `Upstream` keyed by outcome_type). Fixed by adding the fenced schema blocks (mirroring
+  Mode A's `fhb-domestic-au.md` components 10/12 exactly, six-actor set noted for `journey_swimlane`);
+  recompiled — `outcome_type` now resolves to `journey_swimlane`/`phase_playbook` correctly.
+  - **Conformance sweep found + fixed 5 more stale fixtures** (all the same class: written before
+    task 4 added purchase_journey/phase_playbook + cash_events, never updated) —
+    `base_components_investor_conformance.escript` (SET+ORDER fixture missing the 2 new components),
+    its 3 mirrored no-regression cross-checks in `base_components_foreign_investor_conformance.escript`
+    / `base_components_foreign_conformance.escript` / `base_components_nexthome_conformance.escript`
+    (each asserts Mode C's set byte-identical to a fixture that still said 8), and
+    `cash_position_investor_conformance.escript` / `tax_structure_conformance.escript` /
+    `yield_modelling_conformance.escript` (each missing `cash_events` from their exact-field-set
+    assertion — extended with an honest-empty-at-base check + a per-property/discriminator check
+    that the harvested `cash_events` actually carry `source_component: <owner>`). Full sweep of all
+    58 non-seam-smoke conformance escripts: 56 pass; 2 unrelated pre-existing failures flagged
+    separately below (not fixed here — out of this task's scope).
+  - **`investor_seam_smoke.escript` rewritten for the 10-component spine** (was still asserting the
+    original 8: wrong event count, wrong audit count, wrong order — it had `ownership_planning_investor`
+    before `disposition`, but the real order is the reverse, a staleness independent of task 4).
+    New counts: 45 events (`1 + 10×4 + 3 usage + 1`), 30 audit rows, ASIC `boundary_held` still 1
+    (purchase_journey/phase_playbook are not `advice_adjacent`). Added two live assertions specific
+    to the restructure: the six-actor investor set (`property_manager`/`tenant`, not Mode A's four)
+    and the `own`-phase `lodge_annual_return` action (`kb.journey.investor-phase-actions`) — both
+    proving the investor KB branch fired over the real HTTP/SSE surface, not Mode A's. Cash-amount
+    placement itself isn't asserted here (this is a property-less, income-less onboarding turn, so
+    every upstream `cash_events` source is honestly empty — that positive case is what
+    `cash_position_investor_conformance.escript`'s new per-property check proves instead).
+  - **Ran LIVE** (real `claude-sonnet-5` sidecar fills, metered, via `CLAUDE_CODE_OAUTH_TOKEN`):
+    `investment_strategy`/`mortgage_finance`/`tax_structure` all filled live; all 45 events matched;
+    all 30 audit rows `clear`; both new journey/playbook assertions passed
+    (`archetype=balanced gearing=neutral_geared io_vs_pi=principal_and_interest entity=personal_sole`;
+    `actors=[you,government,lender,property_manager,tenant,services]`;
+    `own_actions` includes `lodge_annual_return`). **ALL ASSERTIONS PASSED.**
+  - **Flagged, not fixed (out of scope):** two pre-existing, unrelated conformance failures surfaced
+    by the full sweep — `due_diligence_conformance.escript` (`agent_leaves` classification mismatch
+    for the deferred `lease_interpretation` leaf) and `profile_enrichment_conformance.escript`
+    (`mortgage.expected_borrowing_capacity` IC0 fixture off "to the dollar" — likely tax-bracket
+    fixture drift from the 2026-27 update, the same class `5f87af9` already fixed for HECS but may
+    not have caught here). Neither touches `cash_events`/`journey`/`phase_playbook`/`ui_tabs`; not
+    investigated further here — a separate, later pass.
+  - **Task 7 closes out the Mode C restructure** (tasks 3–7 all done). Next: task 8, Mode D.

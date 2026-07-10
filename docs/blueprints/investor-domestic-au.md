@@ -1167,7 +1167,20 @@ wrong for QLD).
 
 **Fill path:** resolver. The journey structure + bilingual cell prose are generic KB content (`kb.journey.investor-path`); the figures are upstream outcomes placed on the timeline. No agent leaf.
 
-**Outcome schema:** `journey_swimlane` — identical to Mode A's (`fhb-domestic-au.md` component 10's fenced schema); not repeated here (mode-general type, [`../architecture/plan-card-lifecycle-restoration.md`](../architecture/plan-card-lifecycle-restoration.md) §3.3). `actors` carries six entries (`you`, `government`, `lender`, `property_manager`, `tenant`, `services`) instead of Mode A's four.
+**Outcome schema:** `journey_swimlane` — same shape as Mode A's (`fhb-domestic-au.md` component 10); the compiler parses the fenced block per-blueprint (it does not inherit across files), so it is repeated below rather than only cross-referenced. `actors` carries six entries (`you`, `government`, `lender`, `property_manager`, `tenant`, `services`) instead of Mode A's four.
+
+```jsonc
+{
+  "type": "journey_swimlane",
+  "fields": {
+    "phases": "array<{ id: string, label: localized_text }>",   // ordered lifecycle phases (prepare → pre_approve → contract → settle → own → dispose); own is labelled 'Hold' (tenanted) but keeps the own phase id, matching yield_modelling/tax_structure's own outcome text. The terminal dispose phase is present only when a hold horizon H is set.
+    "actors": "array<{ id: string, label: localized_text }>",   // the swimlane rows: you / government / lender / property_manager / tenant / services — six, not Mode A's four, since a landlord relationship has two real actor-attributable cash-flow counterparties (kb.journey.investor-path's own rationale)
+    "cells": "array<{ phase: string, actor: string, item: localized_text, flow_marker: enum [none, money_out, money_in, document, milestone], amount: money_range, counterparty: string|null, source_component: string }>",  // one action per (phase, actor) that has one; amount is an upstream figure PLACED on the timeline — NEVER computed here. source_component traces the cell to the figure's owner (cash_position / yield_modelling / tax_structure / disposition) for the outcome-conformance gate.
+    "interactions": "array<{ from_actor: string, to_actor: string, phase: string, flows: array<{ label: localized_text, direction: enum [out, in], amount: money_range }> }>",  // the who-pays/talks-to-whom view, derived by PLACEMENT from the same cash_events, not recomputed
+    "key_assumptions": "array<localized_text>"
+  }
+}
+```
 
 ---
 
@@ -1189,7 +1202,20 @@ wrong for QLD).
 
 **Fill path:** resolver. Actions, ordering, risks, and mitigations are bilingual KB content keyed by phase; the only upstream read is `cash_event.id` resolution for `budget_ref`. No agent leaf — the risks are KB-grounded, never LLM-generated.
 
-**Outcome schema:** `phase_playbook` — identical to Mode A's (`fhb-domestic-au.md` component 12's fenced schema); not repeated here (mode-general type).
+**Outcome schema:** `phase_playbook` — identical shape to Mode A's (`fhb-domestic-au.md` component 12); repeated below since the compiler parses this fenced block per-blueprint, not by cross-reference.
+
+```jsonc
+{
+  "type": "phase_playbook",
+  "fields": {
+    "phases": "array<{ phase: string, actions: array<{ id: string, label: localized_text, detail: localized_text, order: integer, budget_ref: string|null, component_ref: string|null, status: enum [not_started, done] }>, risks: array<{ severity: enum [low, medium, high], item: localized_text, action: localized_text }> }>",
+    // one entry per lifecycle phase (prepare → pre_approve → contract → settle → own → dispose); phase ids align with purchase_journey.phases + cash_event.phase.
+    //   ACTION: order = temporal sequence within the phase. budget_ref → a cash_event.id (harvested off cash_position/yield_modelling/tax_structure; null when no cash consequence). component_ref → a component id (e.g. tax_structure behind 'Lodge annual return'; null when none). status is USER-ATTESTED via the §10.4 toggle-write, overlaid at read.
+    //   RISK: item = the risk; action = the mitigation. KB-grounded (kb.risks.investor-by-phase), never generated. Honest-partial: a phase with no substantiated risk emits NO risk.
+    "key_assumptions": "array<localized_text>"
+  }
+}
+```
 
 ---
 
