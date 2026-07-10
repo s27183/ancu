@@ -101,10 +101,28 @@
 %% Mode B's shared-name branches (mortgage_finance/cash_position/ownership_planning) key
 %% on Args.firb_required_any — a turn-level flag, not upstream presence — so order here
 %% is genuine DATA-dependency, not discriminator-selection.
+%%
+%% disposition added 2026-07-11 (task 11, plan-card-lifecycle-restoration.md §11.4 — Mode
+%% B was the only mode with no dispose-phase figure owner). fh_engine_disposition:fill/2
+%% dispatches Mode B onto the SAME fill_owner_occupier/2 path Mode A uses (keyed on the
+%% absence of tax_optimised_structure upstream — Mode B never runs a tax_structure
+%% component), so no new resolver code was needed, only the wiring + the buyer_profile
+%% intended_occupancy_use field it reads (see fh_engine_fill.erl's buyer_profile_foreign/1).
+%% Runs LAST, after cash_position + ownership_planning (it places their total_cash_required
+%% + hold-cost figures into the full-horizon roll-up — same position as every other mode's
+%% disposition). full_horizon_net_position stays honestly null for Mode B: ownership_
+%% planning's foreign variant (fill_foreign/2) never computes a recurring_costs_estimate.
+%% statutory_band the way Mode A's does — it is built around FIRB compliance monitoring
+%% (vacancy fee, alerts), not a cost estimate, and a correct one would need the foreign-
+%% owner land-tax surcharge, which kb.tax.land-tax-by-state deliberately never resolver-
+%% computes for ANY mode ("a per-property estimate would mislead without the portfolio-
+%% wide aggregate land value"). A disclosed, permanent gap, not a bug — the dispose-phase
+%% figures (sale_proceeds/selling_costs/loan_payout/cgt/net_proceeds) this component was
+%% added FOR all compute correctly regardless.
 -define(BASE_COMPONENTS_FOREIGN,
         [<<"buyer_profile">>, <<"family_context">>, <<"firb_workflow">>,
          <<"mortgage_finance">>, <<"cash_position">>, <<"cross_border_funding">>,
-         <<"ownership_planning">>]).
+         <<"ownership_planning">>, <<"disposition">>]).
 
 %% Mode-D (investor-foreign-au) base turn — the 10 `base`/`both`-scope components of the
 %% blueprint's 14 (mode-d-wedge.md P5), EXCLUDING the 4 per-property-only ones

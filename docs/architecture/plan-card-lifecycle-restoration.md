@@ -766,5 +766,56 @@ restructure lands, mode by mode per §11.5 — not worth a standalone patch to a
   - Files: `fh_engine_disposition.erl` (the fix), `disposition_conformance.escript`,
     `mode_d_p2_conformance.escript`, `journey_conformance.escript` (the 3 conformance additions).
     No blueprint/KB/shell changes — this was engine-internal.
-  - **Next: task 11**, Mode B (`disposition` component for parity) — now unblocked with no
-    outstanding caveat from tasks 7/10.
+
+- **Task 11 (Mode B gains `disposition`, §11.4) done 2026-07-11.** No new resolver code —
+  `fh_engine_disposition:fill/2` already dispatches Mode B onto the same `fill_owner_occupier/2`
+  path Mode A uses (keyed on the absence of `tax_optimised_structure` upstream; Mode B never runs
+  a `tax_structure` component). Grounded against every field `fill_owner_occupier/2` reads before
+  wiring, which surfaced two real gaps requiring explicit calls (not silent defaults), both
+  presented to and approved by Son:
+  - **`cgt/1` needs `profile.intended_occupancy_use` + `profile.tax_residency`; Mode B's
+    `buyer_profile_foreign` set neither.** Added `intended_occupancy_use: sole_occupier`
+    (definitional — Mode B is an owner-occupier FHB by mode definition, same call Mode A makes).
+    **Deliberately did NOT add `tax_residency`** — a foreign applicant's tax residency is
+    genuinely unknown at base and CGT-consequential (the 2019 reform removed the non-resident
+    main-residence exemption). Left unset, `cgt/1` falls through to `to_verify` unconditionally —
+    `cgt_status` is always `to_verify` for Mode B, never `exempt`, by construction (mirrors how
+    Mode D's `cgt_status` is always `to_verify`, `investor-foreign-au.md` component 14).
+  - **`full_horizon_net_position` would be permanently null, not honest-partial-pending.**
+    `full_horizon/4` places `ownership_planning.ongoing_obligations.recurring_costs_estimate.
+    statutory_band` — a field Mode B's `fill_foreign/2` never computes (built around FIRB
+    compliance monitoring, not a cost estimate). Explored extending it (Option 2) and rejected:
+    a correct Mode-B statutory band would need the foreign-owner land-tax surcharge, and
+    `kb.tax.land-tax-by-state` states outright "No resolver computes a land-tax dollar figure —
+    deliberately... kept out of the agent's reach", for **any** mode. A naive reuse of Mode A's
+    band (rates+water only) would silently omit that surcharge and understate a foreign owner's
+    true holding cost — actively misleading, not merely incomplete, on a regulated decision-
+    support surface. Shipped Option 1: `full_horizon_net_position` stays honestly null for Mode B,
+    permanently, disclosed in the blueprint (component 12's own note) and the conformance tests,
+    not silently absorbed as a "pending" the way a temporal gap would be. The dispose-phase
+    figures this component was added FOR (`sale_proceeds`/`selling_costs`/`loan_payout`/`cgt`/
+    `net_proceeds`/`dispose_cash_events`) are unaffected and compute correctly.
+  - Wired `disposition` last in `?BASE_COMPONENTS_FOREIGN` (after `cash_position` +
+    `ownership_planning`, mirroring every other mode's position) — 7 → 8 components.
+  - Verified: `base_components_foreign_conformance.escript` (+11 anchors: SET+ORDER,
+    3 new Pre-dependency checks, a new `disposition_cases()` block asserting `cgt_status`/`cgt`/
+    `full_horizon_net_position`/`sale_proceeds`/`dispose_cash_events`/counterparty — 33 anchors,
+    all PASS), `buyer_profile_foreign_conformance.escript` (field-count fixture updated 13→14,
+    `intended_occupancy_use` assertion added — 33 anchors, PASS), plus the two OTHER blueprints'
+    own copies of Mode B's expected order (`base_components_foreign_investor_conformance.escript`,
+    `base_components_nexthome_conformance.escript` — both cross-check Mode B's order as a
+    no-regression fixture; both updated, both PASS). Full non-live conformance re-sweep: zero
+    regressions (only the 2 already-known, already-flagged, unrelated pre-existing failures —
+    `due_diligence_conformance`, `profile_enrichment_conformance` — remain). **Live seam-smoke**
+    (`mode_b_seam_smoke.escript`, real Docker PG, real HTTP/SSE) also updated and run: 7→8
+    components, 21→24 audit rows, 30→34 events, plus new live assertions for `cgt_status`,
+    `full_horizon_net_position`, `sale_proceeds`, `dispose_cash_events` — all PASS. Unlike task 10
+    (which deferred live-smoke to its own task 14-equivalent), this task's live-smoke update was
+    done now — cheap, mechanical, and the strongest available evidence the wiring works end-to-end.
+  - Files: `fh_engine_fill.erl` (the `intended_occupancy_use` field), `fh_engine_turn.erl` (the
+    DAG wiring), `docs/blueprints/fhb-foreign-au.md` (component 12 + scope table + KB anchor
+    index + dependency graph + renderer table — the `ui_tabs` block deliberately NOT touched,
+    that's task 13), `base_components_foreign_conformance.escript`,
+    `buyer_profile_foreign_conformance.escript`, `base_components_foreign_investor_conformance.
+    escript`, `base_components_nexthome_conformance.escript`, `mode_b_seam_smoke.escript`.
+  - **Next: task 12**, Mode B journey/phase_playbook KB + engine wiring.

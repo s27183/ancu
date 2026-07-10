@@ -88,7 +88,7 @@ investor_order() ->
 foreign_order() ->
     [<<"buyer_profile">>, <<"family_context">>, <<"firb_workflow">>,
      <<"mortgage_finance">>, <<"cash_position">>, <<"cross_border_funding">>,
-     <<"ownership_planning">>].
+     <<"ownership_planning">>, <<"disposition">>].
 
 per_property() ->
     [<<"property_assessment">>, <<"buying_strategy">>,

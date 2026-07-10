@@ -18,8 +18,15 @@
 %%      produces the MODE-A shapes instead (not just a different order), proving the flag,
 %%      not the blueprint_slug/order alone, drives which branch fires.
 %%
+%% disposition (added 2026-07-11, task 11 — plan-card-lifecycle-restoration.md §11.4) runs
+%% LAST: fh_engine_disposition:fill/2 dispatches Mode B onto the same fill_owner_occupier/2
+%% path Mode A uses (no tax_optimised_structure upstream), reading profile.hold_horizon_years/
+%% target_price_range/intended_occupancy_use + mortgage_plan.expected_borrowing_capacity +
+%% budget_envelope.total_cash_required (cash_position) + ongoing_obligations
+%% (ownership_planning) — so it must run after both.
+%%
 %% Loads the SAME materialized artifact the engine loads (priv/kb/artifact.json) and asserts:
-%%   1. SET + ORDER — base_components(fhb-foreign-au) is exactly the seven components in
+%%   1. SET + ORDER — base_components(fhb-foreign-au) is exactly the eight components in
 %%      the blueprint's own Scope=base/both column, in dependency order; the four
 %%      per-property components are EXCLUDED.
 %%   2. NO REGRESSION — base_components(fhb-domestic-au) / base_components(investor-domestic-au)
@@ -49,7 +56,7 @@ main(_) ->
     ok = fh_engine_kb:load(),
     io:format("base_components foreign conformance — fh_engine_turn:base_components/1 (Mode-B P5)~n~n"),
     R = lists:flatten([set_order_cases(), no_regression_cases(), dag_walk_cases(),
-                       discriminator_cases()]),
+                       disposition_cases(), discriminator_cases()]),
     Fails = [X || X <- R, X =:= fail],
     io:format("~n================================================================~n"),
     case Fails of
@@ -62,7 +69,7 @@ main(_) ->
 foreign_order() ->
     [<<"buyer_profile">>, <<"family_context">>, <<"firb_workflow">>,
      <<"mortgage_finance">>, <<"cash_position">>, <<"cross_border_funding">>,
-     <<"ownership_planning">>].
+     <<"ownership_planning">>, <<"disposition">>].
 
 fhb_order() ->
     [<<"buyer_profile">>, <<"eligibility">>, <<"mortgage_finance">>,
@@ -87,9 +94,12 @@ names(Comps) -> [maps:get(<<"name">>, C) || C <- Comps].
 %% projection_state/1 resolves via the PURE explicit_state/1 branch — target_zone
 %% resolves via a suburbs-table DB lookup (zone_state/1), unavailable to this no-PG
 %% escript (fh_engine_store.erl's own doc comment on projection_state/1).
+%% hold_horizon_years set (10y) so the DAG walk exercises disposition's real computed path,
+%% not just the H-unset null path every other component's honest-partial default would hide.
 args(FirbRequiredAny) ->
     #{onboarding => #{<<"target_price_range">> => [700000, 900000],
-                      <<"state">> => <<"NSW">>},
+                      <<"state">> => <<"NSW">>,
+                      <<"hold_horizon_years">> => 10},
       intent => <<"owner_occupier">>,
       blueprint_slug => ?FHB_FOREIGN, mode => <<"B">>,
       firb_required_any => FirbRequiredAny}.
@@ -100,7 +110,7 @@ set_order_cases() ->
     Comps = fh_engine_turn:base_components(?FHB_FOREIGN),
     Got = names(Comps),
     Excluded = [N || N <- per_property(), lists:member(N, Got)],
-    [check("foreign base SET+ORDER = the seven-component Mode-B spine",
+    [check("foreign base SET+ORDER = the eight-component Mode-B spine",
            Got, foreign_order()),
      check("per-property components EXCLUDED from the foreign base set",
            Excluded, []),
@@ -135,8 +145,41 @@ dag_walk_cases() ->
      Pre(<<"cash_position">>, <<"firb_status">>),
      Pre(<<"cash_position">>, <<"mortgage_plan">>),
      Pre(<<"cross_border_funding">>, <<"family_funding_plan">>),
-     Pre(<<"ownership_planning">>, <<"firb_status">>)
+     Pre(<<"ownership_planning">>, <<"firb_status">>),
+     Pre(<<"disposition">>, <<"mortgage_plan">>),
+     Pre(<<"disposition">>, <<"budget_envelope">>),
+     Pre(<<"disposition">>, <<"ongoing_obligations">>)
      | ValCases].
+
+%% --- 3b. disposition figures (task 11 — the dispose-phase-parity addition) ---
+%% Proves the two grounded Mode-B-specific calls documented in fhb-foreign-au.md
+%% component 12: cgt_status is ALWAYS to_verify (tax_residency deliberately unset —
+%% never the exempt path), and full_horizon_net_position is ALWAYS null (ownership_
+%% planning's foreign variant carries no statutory_band). The dispose-phase figures
+%% (sale_proceeds/selling_costs/net_proceeds/dispose_cash_events) this component was
+%% added for compute normally with H=10 set (args/1's fixture).
+
+disposition_cases() ->
+    Comps = fh_engine_turn:base_components(?FHB_FOREIGN),
+    {_Acc, Steps} = walk(args(true), Comps),
+    Disp = maps:get(outcome, step(<<"disposition">>, Steps)),
+    SaleCell = [E || E <- maps:get(<<"dispose_cash_events">>, Disp, []),
+                     maps:get(<<"id">>, E) =:= <<"dispose_sale_proceeds">>],
+    [check("disposition: cgt_status always to_verify for Mode B (tax_residency unset)",
+           maps:get(<<"cgt_status">>, Disp), <<"to_verify">>),
+     check("disposition: cgt always null on the to_verify path",
+           maps:get(<<"cgt">>, Disp), null),
+     check("disposition: full_horizon_net_position always null (ownership_planning "
+           "foreign variant carries no statutory_band — a disclosed permanent gap, "
+           "not a bug)",
+           maps:get(<<"full_horizon_net_position">>, Disp), null),
+     check("disposition: sale_proceeds computed (H=10, price known)",
+           maps:get(<<"sale_proceeds">>, Disp) =/= null, true),
+     check("disposition: dispose_cash_events non-empty",
+           length(maps:get(<<"dispose_cash_events">>, Disp, [])) > 0, true),
+     check("disposition: sale_proceeds cell counterparty is \"other\" (Mode B uses the "
+           "four-actor owner_occupier swimlane, not the six-actor investor one)",
+           [maps:get(<<"counterparty">>, E) || E <- SaleCell], [<<"other">>])].
 
 %% --- 4. discriminator load-bearing (SAME order, firb_required_any=false) -----
 %% Not merely re-checking order — this proves the FLAG drives the branch. The same seven

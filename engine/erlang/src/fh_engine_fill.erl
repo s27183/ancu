@@ -454,6 +454,18 @@ buyer_profile_foreign(Args) ->
         <<"target_price_range">> => TargetRange,
         <<"target_zone">> => TargetZone,
         <<"hold_horizon_years">> => maps:get(<<"hold_horizon_years">>, Onboarding, null),
+        %% disposition's CGT determinants (task 11, plan-card-lifecycle-restoration.md §11.4):
+        %% intended_occupancy_use is DEFINITIONAL for Mode B, same call as Mode A's own —
+        %% Mode B is an owner-occupier FHB by mode definition (sole_occupier), not a
+        %% possibility-set projection. tax_residency is DELIBERATELY OMITTED, unlike Mode A's
+        %% (which asserts "resident" — a citizen/PR is definitionally an AU tax resident).
+        %% A Mode-B applicant's tax residency is genuinely unknown at base (foreign person,
+        %% possibly a temp resident, possibly not yet in Australia) and CGT-consequential
+        %% (the 2019 non-resident CGT main-residence-exemption removal — kb.tax.cgt-main-
+        %% residence-exemption) — asserting "resident" would be an unsafe default exactly
+        %% where the trap applies. Left unset, fh_engine_disposition:cgt/1 falls through to
+        %% its to_verify branch (never exempt) — the honest, safe-by-construction result.
+        <<"intended_occupancy_use">> => <<"sole_occupier">>,
         %% bilingual {vi,en} via kb.copy.profile. financials-pending is mode-neutral
         %% (reused from A/C); the Mode-B strength states the definitional position
         %% (a structured, FIRB-aware plan from day one) — decision-support tone, not
