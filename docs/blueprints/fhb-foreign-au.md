@@ -123,7 +123,7 @@ The base plan for Mode B captures the most regulatory complexity even before a s
 
 Mode B activates two new surfaces (Family view, FIRB & Funding) that don't appear in Mode A. The remaining tabs map similarly but with foreign-person-aware content.
 
-**Machine-readable form** — compiled to `ui_tabs` in the artifact, **canonical for the runtime** (the table above is the human view), in the canonical lifecycle order. `kind: synthesis` is a shell-composed summary; `interactive: true` is the client-side cash what-if. The `journey` tab gains `purchase_journey` (per-mode base swimlane) when Mode B content is built. Structure is authored now; **Mode B content is dormant** until `fhb-foreign-au` comes in scope (see [`../architecture/plan-card-lifecycle-restoration.md`](../architecture/plan-card-lifecycle-restoration.md) §4).
+**Machine-readable form** — compiled to `ui_tabs` in the artifact, **canonical for the runtime** (the table above is the human view). `fhb-foreign-au` is already `in_scope_blueprint()` — **this block is stale, not dormant**: it's the pre-restructure flat vocabulary (`plan-card-lifecycle-restoration.md` §3.2, superseded). The resolved target (§11, 2026-07-10) is a five-view spine — Overview/Flow/Budget/**Family**/Q&A — with `purchase_journey` becoming base-scope (currently missing entirely) and `firb_workflow`/`cross_border_funding` folding into Flow phases/milestones + Budget rows rather than their own tabs. Not yet rewritten to match; tracked in [`../architecture/wedge-build-sequence.md`](../architecture/wedge-build-sequence.md) "B/C/D lifecycle-spine restructure."
 
 ```jsonc
 {

@@ -1,6 +1,7 @@
 # Plan-card lifecycle restoration (A + B1 + B2), mode-general
 
-**Status:** planned, 2026-06-17 (rev 2 — extended to all four modes per Son). Sibling to
+**Status:** planned, 2026-06-17 (rev 2 — extended to all four modes per Son); **rev 3,
+2026-07-10 — B/C/D restructure target redefined, see §11.** Sibling to
 [`plan-card-visual-spec.md`](./plan-card-visual-spec.md) (per-component *heroes*). This doc
 governs the *spine* — re-assembling filled components into the buyer's **lifecycle journey**,
 the structure the prototype [`../first_home_buyer_plan.html`](../first_home_buyer_plan.html) led
@@ -68,6 +69,12 @@ declares.** (Workstream A, now validated rather than asserted.)
 
 ### 3.2 The lifecycle tab vocabulary (union of all four), in canonical journey order
 
+**Superseded by §11 (rev 3).** This table was the first design pass's result — a 12-tab
+vocabulary, each mode declaring an ordered subset. What actually shipped for A, then E, was a
+*second*, tighter collapse (`lifecycle-simulation-model.md` §7) down to four views
+(Overview/Flow/Budget/Q&A), never propagated back to this table or to B/C/D. Kept below as the
+historical record of the first pass; §11 is the current target.
+
 | # | Lifecycle tab | A | B | C | D | Base content (component → tab) |
 |---|---|:-:|:-:|:-:|:-:|---|
 | 1 | **Overview** | ✓ | ✓ | ✓ | ✓ | synthesis over the mode's base outcomes (no engine change) |
@@ -108,6 +115,13 @@ cells). Confirmed general — build Mode A's journey now, the rest are KB+resolv
 ---
 
 ## 4. Mode scope — structure all four now, build Mode-A content first
+
+**Historical note (superseded by facts on the ground):** this section's premise — "only Mode A is
+`in_scope_blueprint()`, B/C/D are dormant" — was true 2026-06-17 but is **no longer true**. The
+Mode C/B/D wedges (`mode-c-wedge.md`, `mode-b-wedge.md`, `mode-d-wedge.md`) each went to
+build-complete and activated their blueprint in scope; nobody revisited this doc's deferred
+content when that happened, which is *why* B/C/D still carry the stale, never-collapsed §3.2 tab
+shape today. §11 picks this back up as a live restructure, not a still-dormant one.
 
 The split that resolves "design all modes vs. build the wedge":
 
@@ -256,3 +270,112 @@ One change at a time; each phase green by its own gate before the next.
 - No new renderer vocabulary entries (all needed renderers already in the enum — §2 R3).
 - No expansion of onboarding capture to force a stored cash verdict (honest-partial base is finished).
 - No change to `settlement_prep` (it stays the per-property settlement detail — §7).
+
+---
+
+## 11. Rev 3 — B/C/D lifecycle-spine restructure (2026-07-10)
+
+### 11.1 What triggered this
+
+Son reviewed a live Mode D card (Melbourne VIC, investor-foreign-au) and found: Overview and Buy
+both highlighted at once (a real shell bug, §11.6); the Journey tab showing almost nothing (§3.2's
+`purchase_journey` was never built for B/C/D — still `settlement_prep` only, gated on a property
+that doesn't exist yet); the cash calculator sitting under "Hold" and not responding to input
+(a real engine shape bug, §11.6); and — the question this section answers — **why does B/C/D's
+tab structure look nothing like A/E's four-view spine.** §4's "content-only follow-on" was never
+picked up (§4 historical note above); this section replaces the stale §3.2 target with the one
+actually proven on A/E.
+
+### 11.2 The placement test
+
+A/E's four-view spine (Overview/Flow/Budget/Q&A — `lifecycle-simulation-model.md` §7) works because
+every A/E component is either **phase-shaped** (has a temporal position with a completion point
+the purchase passes through — `eligibility`, `mortgage_finance`, `buying_strategy`, `due_diligence`,
+`ownership_planning` all fold into a Flow phase's action checklist) or **money-shaped** (a cash
+row — `cash_position`, `disposition` fold into Budget). Nothing in A/E is a persistent, no-completion-
+point surface, so four views was enough.
+
+B/C/D introduce concepts that must be tested the same way, not assumed to need their own tab:
+
+- **Phase-shaped → Flow.** `firb_workflow` is a literal gate ("cannot sign a contract until FIRB
+  approval is confirmed") between Pre-approve and Contract, with a knowable fee — this is exactly
+  what §3.3 already called a **"FIRB-approval gating phase"** for Mode B and a **"FIRB gate"** for
+  Mode D, before this doc's tab table (§3.2) contradicted its own journey design by giving FIRB a
+  separate tab instead. `cross_border_funding` is §3.3's own **"currency-transfer milestone"** —
+  funds must land by Contract (deposit) and Settle (balance). `investment_strategy` and entity
+  setup (C/D) are pre-Contract one-time steps. All four → Flow phases/milestones, not tabs.
+- **Money-shaped → Budget.** FIRB's fee, cross-border transfer cost/FX risk, `yield_modelling`'s
+  cash-flow projection, `tax_structure(_non_resident)`'s after-tax figures — all become Budget rows,
+  the same treatment `disposition` already gets in A/C/D.
+- **State-shaped, no completion point → its own view.** `family_context` (Mode B's parent+child
+  coordination dashboard) and `ownership_planning_investor`/`_foreign` (Portfolio — forward,
+  recurring, multi-property) persist across the *whole* plan with no single completion point;
+  folding either into a phase action would make it disappear exactly when it's needed. These are
+  the only concepts that earn a dedicated tab beyond Overview/Flow/Budget/Q&A.
+
+### 11.3 Target `ui_tabs` per mode
+
+| Mode | Tabs | What moved off the old flat list |
+|---|---|---|
+| **A** | Overview / Flow / Budget / Q&A | unchanged |
+| **E** | Overview / Flow / Budget / Q&A | unchanged |
+| **B** | Overview / Flow / Budget / **Family** / Q&A | `firb_workflow` → Flow gating phase + Budget fee row; `cross_border_funding` → Flow milestone + Budget row; `property_assessment`/`buying_strategy`/`due_diligence` → Flow Contract/Settle drill-down (no more flat "Property"/"Buying" tabs) |
+| **C** | Overview / Flow / Budget / **Portfolio** / Q&A | `investment_strategy` → Flow phase + Overview synthesis; `yield_modelling`/`tax_structure` → Budget rows; property components → Flow drill-down |
+| **D** | Overview / Flow / Budget / **Portfolio** / Q&A (Family opt-in only, per the blueprint's existing note — investors are typically solo/couple) | same as B (FIRB/cross-border) + same as C (investment strategy/tax/entity), all folded; property components → Flow drill-down |
+
+`purchase_journey` + `phase_playbook` become base-scope for B/C/D exactly as they are for A/E —
+this is the piece that was designed in §3.3 and never built (KB doc + resolver branch + a
+`?BASE_COMPONENTS_*` entry per mode), not a new design.
+
+### 11.4 Mode B gains `disposition`
+
+Mode B is the only mode with no dispose-phase figure owner at all. Adding it for parity: a foreign
+FHB can still face a forced or voluntary sale (visa status change, relocation), and the FIRB
+vacancy-fee obligation makes "what if I need to sell" a live question, not a hypothetical. Same
+shape as A/C/D's `disposition` — base scope, resolver-filled, runs after `cash_position`.
+
+### 11.5 Build sequencing
+
+**C first, then D, then B.** C is domestic — no FIRB, no cross-border, no family view — the closest
+remaining gap to A/E's already-proven shape, so it validates the restructure pattern (Flow
+phases/milestones absorbing what used to be tabs, Portfolio as the one addition) with the least new
+surface. D adds FIRB/cross-border/Family(opt-in) on top of a proven Portfolio pattern. B lands last
+and gains `disposition` (§11.4) alongside its own FIRB/cross-border/Family work. Each mode is its
+own gated pass (blueprint → KB → engine resolver → artifact recompile → shell → conformance),
+matching how A's B1/B2 workstreams were verified independently before being called done.
+
+### 11.6 Independent bug fixes — do now, not gated on the restructure
+
+Two bugs found on the live Mode D card are unrelated to the tab restructure and should not wait
+for it:
+
+- **Mode D `total_cash_required` is a scalar, not a `[lo,hi]` money_range.** `fh_engine_cash.erl`'s
+  `fill_investor_foreign` computes it via `sum_or_null` as a plain integer; `Calculator.svelte` and
+  `OverviewCard.svelte` both gate on `hasRange()`, so the value is silently treated as absent — the
+  cash-what-if input has nothing to write to, and Overview's "Cash to get in" shows "Not yet" for a
+  figure the engine actually computed. Fix: emit `[v, v]` like every other mode's point figures.
+- **`OverviewCard.svelte` reads `components.eligibility` and `mortgage.recommended_path`** for its
+  benefit tile and recommended-path tile. Neither exists for Mode C/D (`eligibility` isn't a C/D
+  component; `fill_investor_foreign`/`fill_investor_domestic` never set `recommended_path`, an
+  FHB-only concept) — these tiles will read "Not yet" forever for C/D, not "pending." Fix: make the
+  Overview synthesis mode-conditional on which fields actually exist for that blueprint, or supply a
+  C/D-appropriate substitute (e.g. `investment_strategy`'s thesis headline in place of a scheme
+  benefit).
+
+The Overview/Buy double-highlight bug (`PlanProjection.svelte:118`, `TAB_GROUP[sub] ?? 'buy'`
+defaulting Overview into the Buy group) is **not** fixed separately — it only exists because B/C/D
+currently exceed `RAIL_GROUP_THRESHOLD` (5 tabs); §11.3's target drops every mode to ≤5 tabs, which
+removes the grouped-rail mechanism's precondition entirely. It self-resolves as each mode's
+restructure lands, mode by mode per §11.5 — not worth a standalone patch to a UI path being deleted.
+
+### 11.7 Non-goals (rev 3)
+
+- No new renderer vocabulary — `family-view-card`, `firb-workflow-card` etc. are already in the R3
+  enum (§2); this is placement, not new rendering primitives.
+- No change to A/E — they're already at the §11.3 target.
+- No fabricated journey/phase content — `purchase_journey` for B/C/D is a copy doc (`fills:[]`,
+  place-not-compute per §7); any figure it surfaces must still be placed from an already-verified
+  upstream outcome, never authored fresh (`verify-regulated-figures-by-postcondition`).
+- No resolving Mode-specific open questions silently — Mode B's `disposition` addition (§11.4) was
+  an explicit call, not a default; any similarly-shaped judgment call surfacing during C/D/B builds
+  gets the same treatment.

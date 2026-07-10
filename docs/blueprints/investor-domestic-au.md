@@ -116,7 +116,7 @@ Mode C's base plan is sharper than Mode A's because investor reasoning often hap
 | Temporal flow | `settlement_prep` |
 | Portfolio | `ownership_planning_investor` (single-property view + portfolio-aggregate view) |
 
-**Machine-readable form** — compiled to `ui_tabs` in the artifact, **canonical for the runtime** (the table above is the human view), in the canonical lifecycle order. `kind: synthesis` is a shell-composed summary; `interactive: true` is the client-side cash what-if. The `journey` tab gains `purchase_journey` (per-mode base swimlane) when Mode C content is built. Structure is authored now; **Mode C content is dormant** until `investor-domestic-au` comes in scope (see [`../architecture/plan-card-lifecycle-restoration.md`](../architecture/plan-card-lifecycle-restoration.md) §4).
+**Machine-readable form** — compiled to `ui_tabs` in the artifact, **canonical for the runtime** (the table above is the human view). `investor-domestic-au` is already `in_scope_blueprint()` — **this block is stale, not dormant**: it's the pre-restructure flat vocabulary (`plan-card-lifecycle-restoration.md` §3.2, superseded). The resolved target (§11, 2026-07-10) is a five-view spine — Overview/Flow/Budget/**Portfolio**/Q&A — with `purchase_journey` becoming base-scope (currently missing entirely) and `investment_strategy`/`yield_modelling`/`tax_structure` folding into a Flow phase + Budget rows rather than their own tabs; C is the first mode slated for this restructure (§11.5 — no FIRB/cross-border complexity). Not yet rewritten to match; tracked in [`../architecture/wedge-build-sequence.md`](../architecture/wedge-build-sequence.md) "B/C/D lifecycle-spine restructure."
 
 ```jsonc
 {
