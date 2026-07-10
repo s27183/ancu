@@ -379,3 +379,31 @@ restructure lands, mode by mode per §11.5 — not worth a standalone patch to a
 - No resolving Mode-specific open questions silently — Mode B's `disposition` addition (§11.4) was
   an explicit call, not a default; any similarly-shaped judgment call surfacing during C/D/B builds
   gets the same treatment.
+
+### 11.8 Build progress
+
+- **Mode C KB content — done 2026-07-10.** `kb.journey.investor-path` (the swimlane copy doc),
+  `kb.journey.investor-phase-actions` (the per-phase checklist), `kb.risks.investor-by-phase` (the
+  per-phase risk-flag-list) — same three-doc shape as Mode A's `kb.journey.fhg-path` /
+  `kb.journey.phase-actions` / `kb.risks.fhb-by-phase`. Structurally verified (each `content_json`
+  parses; every `layout.phases[].actions[]`/`risks[]` id resolves to a matching `{vi,en}` copy pair
+  with no orphans). Two design calls made and grounded rather than defaulted:
+  - **Six actors, not four.** You / Government / Lender / Property manager / Tenant / Services —
+    Property manager and Tenant earn their own row because rent is a real actor-attributable cash
+    flow (`counterparty: tenant` for the inflow, `counterparty: property_manager` for the fee
+    outflow); collapsing them into a generic "Other" would blur the who-pays-whom `interactions`
+    view cell counterparties drive.
+  - **Entity-setup DECISION (Prepare-phase content, this doc) vs. entity-setup EXECUTION (a Settle-
+    phase milestone `settlement_prep.investor_milestones` already owns, per-property, unchanged).**
+    §11.2's "entity setup is a pre-Contract one-time step" is about `tax_structure`'s base-scope
+    `recommended_entity` call, not the act of establishing it — that stays where
+    `settlement_prep` (component 10) already placed it. Not a conflict to resolve, a distinction to
+    keep.
+  - **Open engine dependency, not a KB gap.** `budget_envelope_investor` / `cash_flow_projection` /
+    `tax_optimised_structure` don't yet carry a `cash_events[]` array (only `disposition` does
+    today) — the underlying figures exist as params but aren't exposed under stable event ids. This
+    doc's preamble declares the full id vocabulary (`deposit`/`stamp_duty`/`other_buying_costs`/
+    `entity_setup_costs`/`lmi` acquisition; `rental_income`/`operating_expenses`/`loan_interest`/
+    `tax_refund` hold, recurring/year) task #4 (engine wiring) must expose those outcomes under —
+    the forward declaration Mode A's own build order (§7, blueprint/KB before engine) already
+    established as the normal sequencing, not a shortcut.
