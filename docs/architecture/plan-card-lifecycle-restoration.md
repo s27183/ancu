@@ -545,3 +545,63 @@ restructure lands, mode by mode per §11.5 — not worth a standalone patch to a
     not have caught here). Neither touches `cash_events`/`journey`/`phase_playbook`/`ui_tabs`; not
     investigated further here — a separate, later pass.
   - **Task 7 closes out the Mode C restructure** (tasks 3–7 all done). Next: task 8, Mode D.
+
+- **Mode D KB content + engine wiring — done 2026-07-10 (task 8).** Three new bilingual copy docs
+  mirroring Mode C's shape exactly: `kb.journey.investor-foreign-path` (the swimlane), `kb.journey.
+  investor-foreign-phase-actions` (the per-phase checklist), `kb.risks.investor-foreign-by-phase`
+  (the per-phase risk-flag-list) — layering §3.3's FIRB gate + cross-border transfer milestone +
+  entity + non-resident tax + repatriation onto Mode C's phase/actor skeleton, not a new design.
+  One design call made and grounded, not defaulted:
+  - **Reuses Mode C's six actors unchanged — no seventh row for the FX/transfer provider.** The
+    swimlane's actor set must be a superset of every cash_event counterparty Mode D's figure-owners
+    emit (government/lender/tenant/property_manager), and all of them already sit inside the six.
+    The cross-border transfer provider is a service the investor engages once, not a party with a
+    recurring relationship the way tenant/property_manager are — the same `services` bucket already
+    holds the conveyancer/QS. VN-side capital-control steps are `you`/`services` prose, not a
+    jurisdiction-ambiguous `government` cell (AU FIRB and VN SBV are different governments).
+  - **The FIRB gate and the transfer milestone are not new phases.** Both are narrated across the
+    existing `pre_approve → contract → settle` span on the government/lender/services rows —
+    matching how §11.2 places `firb_workflow` as a Flow *gating phase*, not its own tab.
+  - Learned from task 7 and applied proactively this time: both new components carry the full
+    fenced ` ```jsonc ` `type` blocks in the blueprint (not a prose "same as Mode A/C" reference) —
+    verified post-recompile by inspecting the artifact directly: `purchase_journey` → `outcome_type:
+    journey_swimlane`, `phase_playbook` → `outcome_type: phase_playbook` (neither `null`).
+  - **Engine wiring is smaller than Mode C's was**, because two of the three cash_events sources
+    are already generic/shared code: `yield_modelling` is the SAME resolver function for Mode C and
+    D (one component name, name-keyed dispatch in `fh_engine_fill.erl`) and already emits
+    `cash_events` — no change needed. `disposition`'s `fill_investor/3` is likewise shared C/D and
+    already emits `dispose_cash_events` — no change needed. Only `fh_engine_cash:fill_investor_
+    foreign/2` (cash_position) and `fh_engine_fill:tax_structure_non_resident/1` needed a
+    `cash_events => []` addition — a **literal, not a helper**: Mode D's `cash_position` has no
+    per-property branch yet (flagged below), and `tax_structure_non_resident`'s candidate figure
+    (`annual_au_tax_payable_on_rental`) is null at base *and* per-property (no non-resident
+    marginal-rate KB table exists yet), so a real event-builder would be permanently-dead code.
+    `fh_engine_journey`/`fh_engine_phase_playbook` gained a Mode-D dispatch branch each
+    (`investor-foreign-au` → `fill_investor_foreign/1` / the new actions+risks doc pair) — verified
+    the dispatch is genuinely wired, not silently falling through to Mode A's `_ -> fill_fhb`/
+    `_ -> {?ACTIONS,?RISKS}` default (a fail-*silent* class of bug, distinct from task 7's fail-open
+    validate gap). `purchase_journey`/`phase_playbook` added to `?BASE_COMPONENTS_FOREIGN_INVESTOR`
+    (10 → 12) — appended at the END, not copying Mode C's exact tail: Mode D's `ownership_planning_
+    foreign_investor` already runs *before* `disposition` (the reverse of Mode C's order, because
+    unlike Mode C's `ownership_planning_investor` it never reads `disposition`'s figures for an
+    `equity_release` opportunity), so simply appending the two new components after the existing 10
+    is correct without reordering anything.
+  - **Flagged, not fixed (a `cash_position` build, explicitly out of scope for this task).** Mode
+    D's `fill_investor_foreign/2` has no per-property branch (unlike Mode C's, which lights up a
+    real acquisition spine once a property attaches) — so `purchase_journey`'s acquisition-phase
+    money cells (deposit, stamp duty + surcharge, FIRB fee) stay empty even per-property, today.
+    `yield_modelling`'s hold-phase cells DO light up per-property (shared code with Mode C). The
+    swimlane therefore renders the full legal/prose spine now but a sparse money spine until that
+    seam closes — disclosed in the KB doc's own preamble, not silently implied as complete.
+  - **Not run yet: the full conformance sweep + live seam-smoke** (task 10, after task 9's `ui_tabs`
+    rewrite). A quick sanity pass this task: every individual per-component registry check + every
+    real-code-dependency DAG-order check in `base_components_foreign_investor_conformance.escript`
+    passes (incl. `purchase_journey`/`phase_playbook`); its own SET+ORDER fixture now fails as
+    **expected** (still asserts the pre-task-8 ten-component list) — task 7's precedent (the same
+    fixture-staleness class hit three files) predicts this will recur in Mode D's own conformance
+    files and `mode_d_seam_smoke.escript`'s `expected_sequence()`; task 10 owns fixing all of it,
+    not patched ad hoc here.
+  - **Next: task 9**, Mode D's `ui_tabs` rewrite to the five-view spine (Overview/Flow/Budget/
+    Portfolio/Q&A) + shell restructure — folding `firb_workflow`/`cross_border_funding`/
+    `investment_strategy`/`tax_structure_non_resident` into Flow phases + Budget rows, same
+    placement test Mode C's task 5 already proved.

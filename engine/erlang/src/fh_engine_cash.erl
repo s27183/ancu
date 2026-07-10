@@ -523,7 +523,13 @@ fill_investor_foreign(Args, Upstream) ->
         <<"loan_amount">>                  => null,
         <<"lvr">>                          => null,
         <<"gap_or_surplus">>               => GapOrSurplus,
-        <<"verdict">>                      => Verdict
+        <<"verdict">>                      => Verdict,
+        %% Honest empty (task 8, 2026-07-10): unlike Mode C's cash_events_investor/4, this
+        %% fill has no per-property branch yet (no attached-property price to build a real
+        %% acquisition spine off) — a separate, already-flagged cash_position build, out of
+        %% scope here. [] is conformant with the shared budget_envelope_investor type
+        %% (Mode C's own base scaffold emits the same []) and honest — never a fabricated event.
+        <<"cash_events">>                  => []
     },
     KbVersions = fh_engine_kb:kb_anchors(
         [<<"kb.stamp-duty.calc-by-state">>, <<"kb.foreign-buyer-surcharge.by-state">>,

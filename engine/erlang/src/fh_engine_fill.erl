@@ -977,7 +977,14 @@ tax_structure_non_resident(_Upstream) ->
         <<"annual_au_tax_payable_on_rental">> => null,
         <<"annual_depreciation_year_1">> => null,
         <<"annual_compliance_cost_au">> => null,
-        <<"vn_tax_treaty_relief_applicable">> => null
+        <<"vn_tax_treaty_relief_applicable">> => null,
+        %% Honest empty (task 8, 2026-07-10): the hold-phase figure this would place an
+        %% event from — annual_au_tax_payable_on_rental — is null at base AND per-property
+        %% (no non-resident marginal-rate KB table exists yet, per this function's own note
+        %% above). A helper here would be permanently-dead code; [] is conformant with the
+        %% shared tax_optimised_structure type (Mode C's tax_structure emits the analogous
+        %% empty array at base too) and honest — never a fabricated event.
+        <<"cash_events">> => []
     },
     KbVersions = fh_engine_kb:kb_anchors(
         [<<"kb.non-resident.tax-treatment-overview">>,

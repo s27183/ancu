@@ -37,7 +37,7 @@ Mode D is the **most complex of the four blueprints** because it combines:
 
 ## Component pipeline
 
-14 components. Borrows from Mode B (foreign-person) and Mode C (investor) with Mode D-specific adaptations marked `★`. `disposition` (14) is added by the full-temporal-flow reframe ([`../architecture/lifecycle-simulation-model.md` §8](../architecture/lifecycle-simulation-model.md)) — **design-first / dormant**, the foreign-resident-CGT path of the same dispose-phase owner.
+16 components. Borrows from Mode B (foreign-person) and Mode C (investor) with Mode D-specific adaptations marked `★`. `disposition` (14) is added by the full-temporal-flow reframe ([`../architecture/lifecycle-simulation-model.md` §8](../architecture/lifecycle-simulation-model.md)) — the foreign-resident-CGT path of the same dispose-phase owner, active (not dormant) since P1, 2026-07-03. `purchase_journey` (15) and `phase_playbook` (16) were added 2026-07-10 (the B/C/D lifecycle-spine restructure, `plan-card-lifecycle-restoration.md` §11, task 8) as the whole-of-journey swimlane + its actionable per-phase layer — mode-general schema/renderers reused from Modes A/C, Mode-D-specific KB content (the FIRB gate, the cross-border transfer milestone, entity setup, non-resident tax, and repatriation §3.3 named for this mode's journey).
 
 ### Component scope (base plan vs property addendum)
 
@@ -58,7 +58,9 @@ Mode D's base plan captures the deepest pre-property reasoning of all four bluep
 | 11 due_diligence (investor + cross-border) | `per-property` | When user uploads docs |
 | 12 settlement_prep (investor + FIRB + transfer) | `per-property` | Activated when contract signed |
 | 13 ownership_planning_foreign_investor ★ | `both` | Base estimate of vacancy/tax/repatriation obligations; refined per-property post-settlement |
-| 14 disposition ★ | `base` | Dispose-phase figure-owner — sale proceeds, selling costs, loan payout, and **foreign-resident CGT** (no 50% discount, no PPOR exemption, plus FRCGW withheld at settlement of sale) over the hold horizon `H`; the full-horizon net position. Resolver, no agent leaf. *Design-first* (§8.5). |
+| 14 disposition ★ | `base` | Dispose-phase figure-owner — sale proceeds, selling costs, loan payout, and **foreign-resident CGT** (no 50% discount, no PPOR exemption, plus FRCGW withheld at settlement of sale) over the hold horizon `H`; the full-horizon net position. Resolver, no agent leaf. |
+| 15 purchase_journey | `base` | Whole-of-journey lifecycle swimlane — six-actor phases × cells (Mode C's six, reused), harvests `cash_events` off components 6/7/8/14, places them, computes nothing. Resolver, no agent leaf. |
+| 16 phase_playbook | `base` | Per-phase actionable checklist + risks (FIRB, transfer, entity, non-resident tax, repatriation), behind each Flow phase sheet. Resolver, no agent leaf. |
 
 This base-heavy structure is genuinely well-suited to Mode D's audience: Vietnam-located investors making major capital allocation decisions across borders. They need to validate the strategic shape (entity, FIRB path, currency transfer plan, tax structure, target yield) before they're ready to commit to a specific property.
 
@@ -111,13 +113,25 @@ This base-heavy structure is genuinely well-suited to Mode D's audience: Vietnam
         outcome: portfolio_position_foreign
        │
        ▼
-[13] disposition ★ (NEW — dispose-phase figure-owner, foreign-resident CGT + FRCGW, full-horizon net position)
+[13] disposition ★ (dispose-phase figure-owner, foreign-resident CGT + FRCGW, full-horizon net position)
         inputs: strategy_thesis (hold_period_years = H, exit_strategy), property_fit,
                 cash_flow_projection, tax_optimised_structure, budget_envelope_investor
         outcome: disposition
+       │
+       ▼
+[14] purchase_journey (whole-of-journey lifecycle swimlane — added 2026-07-10, task 8)
+        inputs: budget_envelope_investor, cash_flow_projection, tax_optimised_structure,
+                dispose_cash_events (harvests cash_events off all four; places, computes nothing)
+        outcome: journey_swimlane
+       │
+       ▼
+[15] phase_playbook (per-phase actionable checklist + risks — added 2026-07-10, task 8)
+        inputs: budget_envelope_investor, cash_flow_projection, tax_optimised_structure,
+                journey_swimlane
+        outcome: phase_playbook
 ```
 
-> The diagram numbers are sequential reading order, not component IDs (the IDs are the scope table's 1–14; `mortgage_finance` is omitted from the sketch). `disposition` runs **last among the base figure-owners** — a pure sink reading every upstream figure-owner (acquire from `cash_position`, hold from `yield_modelling`/`tax_structure_non_resident` over `H`, the CGT determinants from `tax_structure_non_resident`) and read by none (acyclic). The foreign-resident path strips the main-residence exemption and the 50% discount and adds FRCGW (see component 14).
+> The diagram numbers are sequential reading order, not component IDs (the IDs are the scope table's 1–16; `mortgage_finance` is omitted from the sketch). `disposition` runs **last among the base figure-owners** — a pure sink reading every upstream figure-owner (acquire from `cash_position`, hold from `yield_modelling`/`tax_structure_non_resident` over `H`, the CGT determinants from `tax_structure_non_resident`) and read by none among the figure-owners (acyclic). The foreign-resident path strips the main-residence exemption and the 50% discount and adds FRCGW (see component 14). `purchase_journey`/`phase_playbook` (components 15/16) run **last of all** — they read no `ownership_planning_foreign_investor` output (unlike Mode C, this component carries no `cash_events`, so it need not precede either) but are positioned after every figure-owner including `disposition`, mirroring every other mode's "figure-owners, then the spine that places them" DAG shape.
 
 **UI tab mapping** for Mode D:
 
@@ -1099,6 +1113,80 @@ Combines Mode C `ownership_planning_investor` (property management, tax reportin
 - **ASIC.** CGT, FRCGW, and growth are KB-grounded estimates surfaced as ranges with the basis stated, `cgt_status: to_verify` directing the user to a registered tax agent — decision support, never tax advice.
 - **`cgt_status` is always `to_verify` for Mode D by construction, not by special-casing.** `disposition`'s shared `cgt_investor/4` (the same function Mode C uses) treats a purchase as CGT-"clean"-computable only when every applicant is resident-for-tax; `investor_profile_foreign`'s canonical `profile.applicants[].tax.residency_for_tax` is always `non_resident`, so the Clean check fails unconditionally and `taxable_gain` is shown undiscounted (`cgt_discount_eligible: false` from `tax_optimised_structure`) while `cgt` stays `to_verify`. This is the intended, asserted Mode D behaviour (a conformance escript covers it), not an accident of the entity-enum mismatch.
 
+---
+
+### 15. purchase_journey (NEW — the whole-of-journey lifecycle swimlane)
+
+> **Added 2026-07-10** (the B/C/D lifecycle-spine restructure, `plan-card-lifecycle-restoration.md` §11, task 8). Same shape as Mode C's `purchase_journey` ([`investor-domestic-au.md`](investor-domestic-au.md#13-purchase_journey-new--the-whole-of-journey-lifecycle-swimlane)) — the `journey_swimlane` outcome type, the six-actor set, and the `swimlane-diagram` renderer are all reused unchanged; only the KB content differs, layering the FIRB gate, the cross-border transfer milestone, entity setup, non-resident tax, and repatriation onto Mode C's phase/actor skeleton (§3.3's own description of Mode D's journey content).
+
+**Goal:** Present the whole-of-journey lifecycle as a swimlane — the phases of a foreign-investor purchase across time (Prepare → Pre-approve → Contract → Settle → Hold → **Dispose**) against the actors who act in each (You / Government / Lender / Property manager / Tenant / Services), with the buyer's already-computed money flows placed on the timeline. Reuses Mode C's six actor rows unchanged (`kb.journey.investor-foreign-path`'s own rationale): every cash_event counterparty this mode's figure-owners emit — government (FIRB fee, stamp duty + surcharge, land tax, FRCGW), lender, tenant, property_manager — already sits inside the six; the cross-border transfer provider is a `services` cell (a one-time-engaged service, not a recurring-relationship party), not a seventh actor row.
+
+**Scope:** `base` — the journey structure is generic to a Mode-D foreign-investor purchase; it does not depend on a specific property.
+
+**Inputs:** `cash_position.outcome` (`budget_envelope_investor`, incl. its `cash_events` — `[]` today, see the "known limitation" note below) + `yield_modelling.outcome` (`cash_flow_projection`, incl. its `cash_events` — live, shared code with Mode C) + `tax_structure_non_resident.outcome` (`tax_optimised_structure`, incl. its `cash_events` — `[]` today, no non-resident bracket KB yet) + `disposition.outcome` (the Dispose-phase `dispose_cash_events`). It runs **last** so it can place figures every upstream component already computed — it computes **no figure of its own**. Harvests `cash_events` from all four sources via the SAME generic multi-source concatenation Mode C uses (`fh_engine_journey:harvest_cash_events/1` — zero Mode-D-specific harvest code).
+
+**KB anchors:** `kb.journey.investor-foreign-path`
+
+**Renderer:** `swimlane-diagram`
+
+**UI tab hint:** Flow (leads the tab; folds into the restructure's five-view spine, §11.3 — not yet rewritten, tracked in `wedge-build-sequence.md`, task 9)
+
+**Fill path:** resolver. The journey structure + bilingual cell prose are generic KB content (`kb.journey.investor-foreign-path`); the figures are upstream outcomes placed on the timeline. No agent leaf.
+
+**Known limitation (flagged, not fixed here — a `cash_position` build, out of scope for task 8).** Unlike Mode C's `cash_position`, Mode D's `fill_investor_foreign/2` has no per-property branch yet, so `budget_envelope_investor.cash_events` stays `[]` even once a property is attached — the acquisition-phase money cells (deposit, stamp duty + surcharge, FIRB fee) will not render until that seam closes. `tax_structure_non_resident.cash_events` is `[]` too (no non-resident marginal-rate KB table exists yet — the same honest-partial gap component 7's own note discloses). `yield_modelling` is shared code with Mode C and already lights up per-property, so the hold-phase rent/opex/interest cells DO render once a property is attached. The swimlane therefore renders the **full legal/prose spine** today (every phase, every actor cell) with a **sparse money spine** — an honest, not a broken, state.
+
+**Outcome schema:** `journey_swimlane` — same shape as Modes A/C's (`fhb-domestic-au.md` component 10, `investor-domestic-au.md` component 13); the compiler parses the fenced block per-blueprint (it does not inherit across files), so it is repeated below rather than only cross-referenced. `actors` carries the same six entries as Mode C (`you`, `government`, `lender`, `property_manager`, `tenant`, `services`).
+
+```jsonc
+{
+  "type": "journey_swimlane",
+  "fields": {
+    "phases": "array<{ id: string, label: localized_text }>",   // ordered lifecycle phases (prepare → pre_approve → contract → settle → own → dispose); own is labelled 'Hold' (tenanted) but keeps the own phase id, matching yield_modelling/tax_structure_non_resident's own outcome text. The terminal dispose phase is present only when a hold horizon H is set. The FIRB gate and the cross-border transfer milestone are NOT extra phases — they are narrated across pre_approve→contract→settle on the existing government/lender/services rows (kb.journey.investor-foreign-path's own "Phases" rationale).
+    "actors": "array<{ id: string, label: localized_text }>",   // the swimlane rows: you / government / lender / property_manager / tenant / services — reused unchanged from Mode C; the FX/transfer provider renders as a services cell, not a new row
+    "cells": "array<{ phase: string, actor: string, item: localized_text, flow_marker: enum [none, money_out, money_in, document, milestone], amount: money_range, counterparty: string|null, source_component: string }>",  // one action per (phase, actor) that has one; amount is an upstream figure PLACED on the timeline — NEVER computed here. source_component traces the cell to the figure's owner (cash_position / yield_modelling / tax_structure_non_resident / disposition) for the outcome-conformance gate.
+    "interactions": "array<{ from_actor: string, to_actor: string, phase: string, flows: array<{ label: localized_text, direction: enum [out, in], amount: money_range }> }>",  // the who-pays/talks-to-whom view, derived by PLACEMENT from the same cash_events, not recomputed
+    "key_assumptions": "array<localized_text>"
+  }
+}
+```
+
+---
+
+### 16. phase_playbook (NEW — the actionable per-phase checklist + risks)
+
+> **Added 2026-07-10**, same restructure (task 8). Same schema + renderers as Mode C's `phase_playbook` ([`investor-domestic-au.md`](investor-domestic-au.md#14-phase_playbook-new--the-actionable-per-phase-checklist--risks)); only the KB content differs.
+
+**Goal:** Behind each Flow-view phase sheet, present the actionable, temporally-ordered checklist for that phase and the often-seen risks + mitigations — foreign-investor-specific (FIRB application timing, non-resident lender pool, cross-border transfer/FX timing, entity setup, vacancy-fee exposure, no-CGT-discount, FRCGW, repatriation) rather than Mode C's domestic-investor content.
+
+**Scope:** `base` — phase-keyed, property-agnostic. Per-property components (`property_assessment`, `buying_strategy`, `due_diligence`, `settlement_prep`) enrich a phase via their own outcomes, reached through an action's `component_ref`; `phase_playbook` itself stays base.
+
+**Inputs:** `cash_position.outcome` + `yield_modelling.outcome` + `tax_structure_non_resident.outcome` (so each action's `budget_ref` resolves to a real `cash_event.id` — harvested the same way `purchase_journey` harvests them, `fh_engine_phase_playbook:harvest_cash_events/1`) + `purchase_journey.outcome` (to share the phase set). Runs **last** (after `purchase_journey`).
+
+**KB anchors:** `kb.journey.investor-foreign-phase-actions`, `kb.risks.investor-foreign-by-phase`
+
+**Renderer:** `checklist` + `risk-flag-list`
+
+**UI tab hint:** Flow (the per-phase drill-down sheet)
+
+**Fill path:** resolver. Actions, ordering, risks, and mitigations are bilingual KB content keyed by phase; the only upstream read is `cash_event.id` resolution for `budget_ref`. No agent leaf — the risks are KB-grounded, never LLM-generated.
+
+**Outcome schema:** `phase_playbook` — identical shape to Modes A/C's; repeated below since the compiler parses this fenced block per-blueprint, not by cross-reference.
+
+```jsonc
+{
+  "type": "phase_playbook",
+  "fields": {
+    "phases": "array<{ phase: string, actions: array<{ id: string, label: localized_text, detail: localized_text, order: integer, budget_ref: string|null, component_ref: string|null, status: enum [not_started, done] }>, risks: array<{ severity: enum [low, medium, high], item: localized_text, action: localized_text }> }>",
+    // one entry per lifecycle phase (prepare → pre_approve → contract → settle → own → dispose); phase ids align with purchase_journey.phases + cash_event.phase.
+    //   ACTION: order = temporal sequence within the phase. budget_ref → a cash_event.id (harvested off cash_position/yield_modelling/tax_structure_non_resident; null when no cash consequence, or when honestly not-yet-live per component 15's "known limitation" note). component_ref → a component id (e.g. firb_workflow behind 'Submit the FIRB application'; null when none). status is USER-ATTESTED via the §10.4 toggle-write, overlaid at read.
+    //   RISK: item = the risk; action = the mitigation. KB-grounded (kb.risks.investor-foreign-by-phase), never generated. Honest-partial: a phase with no substantiated risk emits NO risk.
+    "key_assumptions": "array<localized_text>"
+  }
+}
+```
+
+---
+
 ## Outcome-type conformance (P2, 2026-07-03)
 
 Five components share a component NAME (or a mode-independent dispatch discriminator) with an
@@ -1136,12 +1224,13 @@ under, one of the two reader sets needs a fallback — decide when that componen
 
 ## KB anchor index summary
 
-Mode D references ~77 KB slugs:
+Mode D references ~78 KB slugs:
 
 - 35 shared with Mode B (foreign-person components)
 - 40 shared with Mode C (investor components)
 - 2 shared with Mode A — `kb.property.capital-growth-bands` + `kb.selling-costs.agent-legal` (component 14 `disposition`; the FRCGW-specific anchors stay Mode-D-exclusive, below)
 - ~10 Mode-D-exclusive (non-resident tax, FRCGW, repatriation, VN-AU treaty, foreign-investor strategy)
+- 3 new Mode-D-exclusive journey/phase docs (components 15/16, added 2026-07-10 task 8): `kb.journey.investor-foreign-path`, `kb.journey.investor-foreign-phase-actions`, `kb.risks.investor-foreign-by-phase`
 
 **Reconciled 2026-07-03 (P1-open pass) — see `mode-d-wedge.md` P1 for the full table.** Genuinely
 new (7 docs + `kb.non-resident.tax-treatment-overview` synthesis): `kb.non-resident.tax-treatment-overview`,
@@ -1169,9 +1258,9 @@ The offline KB agent's Mode D onboarding workstream is the largest of the four �
 | `calculator` | 5 yield_modelling, 6 tax_structure_non_resident, 7 cash_position, 14 disposition |
 | `data-table` | 6 tax_structure_non_resident, 12 ownership_planning_foreign_investor |
 | `buying-strategy-card` | 9 buying_strategy |
-| `risk-flag-list` | 10 due_diligence |
-| `checklist` | 8 cross_border_funding, 10 due_diligence, 11 settlement_prep |
-| `swimlane-diagram` | 11 settlement_prep |
+| `risk-flag-list` | 10 due_diligence, 16 phase_playbook |
+| `checklist` | 8 cross_border_funding, 10 due_diligence, 11 settlement_prep, 16 phase_playbook |
+| `swimlane-diagram` | 11 settlement_prep, 15 purchase_journey |
 | `opportunity-card` | 12 ownership_planning_foreign_investor |
 
 Note: Mode D does NOT use `family-view-card` by default (no parent-funding-child pattern), though it remains available as an opt-in for joint-investor or family-pool scenarios.
@@ -1187,7 +1276,7 @@ All Mode A + B + C signals apply. Mode D introduces:
 | `<from_investor_profile>` | From `investor_profile_foreign.outcome` (note: signal name reused from Mode C; resolves to Mode D variant based on blueprint context) |
 | `<from_tax_structure>` | From `tax_structure_non_resident.outcome` (Mode D variant) |
 
-**Fill-path classification.** Per [agentic-boundary.md](../architecture/agentic-boundary.md), `agent_reasoning_required: true` marks agent-path leaves. Mode-D-specific agent leaves: off-the-plan foreign-investor judgment (`property_assessment.off_the_plan_specific_considerations_for_foreign_investor.*`), investment thesis (`investment_strategy.strategy_archetype`), non-resident lender fit (`mortgage_finance.non_resident_investor_loan_shortlist`), and entity structuring (`tax_structure_non_resident.recommended_entity`). All FIRB fees / surcharges / predicates, VN tax rates / treatment / filing, withholding rates, non-resident deposit minimums, and the FX-risk note are **resolver** — rule-governed (VN cross-border tax is complex but determined by tax law + the VN–AU DTA; encode it in KB rather than reason it per turn). Valuation, strategy, and loan-structure judgment are inherited from Mode C; cross-border document-gap flags from Mode B. **All of `disposition`** (component 14) is **resolver** — growth projection, selling costs, loan payout, taxable gain, foreign-resident CGT, FRCGW, and the full-horizon roll-up are KB-grounded computations deliberately removed from the agent's reach (§8.5); the VN-side treaty note is a resolver KB lookup, not a per-turn judgment.
+**Fill-path classification.** Per [agentic-boundary.md](../architecture/agentic-boundary.md), `agent_reasoning_required: true` marks agent-path leaves. Mode-D-specific agent leaves: off-the-plan foreign-investor judgment (`property_assessment.off_the_plan_specific_considerations_for_foreign_investor.*`), investment thesis (`investment_strategy.strategy_archetype`), non-resident lender fit (`mortgage_finance.non_resident_investor_loan_shortlist`), and entity structuring (`tax_structure_non_resident.recommended_entity`). All FIRB fees / surcharges / predicates, VN tax rates / treatment / filing, withholding rates, non-resident deposit minimums, and the FX-risk note are **resolver** — rule-governed (VN cross-border tax is complex but determined by tax law + the VN–AU DTA; encode it in KB rather than reason it per turn). Valuation, strategy, and loan-structure judgment are inherited from Mode C; cross-border document-gap flags from Mode B. **All of `disposition`** (component 14) is **resolver** — growth projection, selling costs, loan payout, taxable gain, foreign-resident CGT, FRCGW, and the full-horizon roll-up are KB-grounded computations deliberately removed from the agent's reach (§8.5); the VN-side treaty note is a resolver KB lookup, not a per-turn judgment. **`purchase_journey`/`phase_playbook`** (components 15/16, added 2026-07-10 task 8) are **entirely resolver** too — the journey structure, cell prose, checklist actions, and risks are bilingual KB content (`kb.journey.investor-foreign-path`, `kb.journey.investor-foreign-phase-actions`, `kb.risks.investor-foreign-by-phase`); the only figures either component touches are upstream outcomes PLACED on the timeline, never computed or LLM-authored.
 
 ---
 
@@ -1207,9 +1296,11 @@ due_diligence                  → outcome: risk_assessment_foreign_investor    
 settlement_prep                → outcome: settlement_checklist_foreign        (reads: property_fit, bid_plan_foreign_investor, firb_status, transfer_plan, tax_optimised_structure)
 ownership_planning_foreign_investor → outcome: portfolio_position_foreign     (reads: property_fit, tax_optimised_structure, cash_flow_projection)
 disposition                    → outcome: disposition                       (reads: strategy_thesis, property_fit, cash_flow_projection, tax_optimised_structure, budget_envelope_investor)
+purchase_journey                → outcome: journey_swimlane          (reads: budget_envelope_investor, cash_flow_projection, tax_optimised_structure, disposition)   // harvests cash_events off the three figure-owners + dispose_cash_events; places, computes nothing
+phase_playbook                  → outcome: phase_playbook            (reads: budget_envelope_investor, cash_flow_projection, tax_optimised_structure, journey_swimlane)  // links cash_event.id via budget_ref; runs last
 ```
 
-No cycles. Mode D's pipeline has the deepest dependency graph of the four blueprints — `cash_position` reads four upstream outcomes (investor profile, property fit, FIRB status, tax structure) reflecting the combinatorial complexity of foreign + investor. `disposition` is a **pure sink** — it reads the upstream figure-owners (the horizon from `strategy_thesis`, the acquire/hold flows and CGT determinants from the cash/yield/tax outcomes) and is read by none, so it adds a leaf, not a cycle.
+No cycles. Mode D's pipeline has the deepest dependency graph of the four blueprints — `cash_position` reads four upstream outcomes (investor profile, property fit, FIRB status, tax structure) reflecting the combinatorial complexity of foreign + investor. `disposition` is a **pure sink** among the figure-owners — it reads the upstream figure-owners (the horizon from `strategy_thesis`, the acquire/hold flows and CGT determinants from the cash/yield/tax outcomes) and is read by none of them, so it adds a leaf, not a cycle. `purchase_journey`/`phase_playbook` (added 2026-07-10, task 8) run **last of all**: `purchase_journey` reads no `ownership_planning_foreign_investor` output (`portfolio_position_foreign` carries no `cash_events`, unlike Mode C's `portfolio_position` which carries none either — neither mode's ownership component needs to precede the journey on that basis) but is positioned after every figure-owner including `disposition`, mirroring every other mode's "figure-owners, then the spine that places them" DAG shape; `phase_playbook` follows, reading `purchase_journey`'s phase set. Acyclic throughout.
 
 ---
 

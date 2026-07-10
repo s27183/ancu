@@ -45,6 +45,8 @@
 -define(RISKS,            <<"kb.risks.fhb-by-phase">>).      %% Mode A risks + bilingual copy
 -define(INVESTOR_ACTIONS, <<"kb.journey.investor-phase-actions">>).  %% Mode C actions + copy
 -define(INVESTOR_RISKS,   <<"kb.risks.investor-by-phase">>).         %% Mode C risks + copy
+-define(INVESTOR_FOREIGN_ACTIONS, <<"kb.journey.investor-foreign-phase-actions">>).  %% Mode D actions + copy
+-define(INVESTOR_FOREIGN_RISKS,   <<"kb.risks.investor-foreign-by-phase">>).         %% Mode D risks + copy
 
 %% The canonical lifecycle phase order (fh_engine_journey:phases/0; cash_event.phase),
 %% incl. the terminal `dispose` (lifecycle-simulation-model §8.1). The dispose phase carries
@@ -61,6 +63,7 @@ fill(Args, Upstream) ->
     {ActionsDoc, RisksDoc} =
         case maps:get(blueprint_slug, Args, <<"fhb-domestic-au">>) of
             <<"investor-domestic-au">> -> {?INVESTOR_ACTIONS, ?INVESTOR_RISKS};
+            <<"investor-foreign-au">>  -> {?INVESTOR_FOREIGN_ACTIONS, ?INVESTOR_FOREIGN_RISKS};
             _                          -> {?ACTIONS, ?RISKS}
         end,
     %% The only upstream read: the set of cash_event ids, for budget_ref validation —

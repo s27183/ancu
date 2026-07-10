@@ -132,11 +132,24 @@
 %%   - disposition reads strategy_thesis, cash_flow_projection, tax_optimised_structure,
 %%     budget_envelope_investor — runs LAST among the base figure-owners (same position as
 %%     every other mode's disposition).
+%% purchase_journey/phase_playbook landed 2026-07-10 (task 8, the B/C/D lifecycle-spine
+%% restructure). They run LAST, after disposition — mirroring every other mode's "figure-
+%% owners, then the spine that places them" position, NOT Mode C's order verbatim: Mode D's
+%% own ownership_planning_foreign_investor already runs BEFORE disposition here (unlike
+%% Mode C, where ownership_planning_investor reads disposition's projected figures for its
+%% equity_release opportunity — Mode D's ownership component has no such read, per the note
+%% above), so simply appending the two new components at the end is correct without
+%% reordering anything else. purchase_journey harvests cash_events off cash_position/
+%% yield_modelling/tax_structure_non_resident + disposition.dispose_cash_events (the same
+%% generic multi-source harvest Mode C uses, fh_engine_journey:harvest_cash_events/1 — no
+%% Mode-D-specific journey code needed for this wiring); phase_playbook then validates its
+%% budget_refs against the same harvest and reads purchase_journey's phase set.
 -define(BASE_COMPONENTS_FOREIGN_INVESTOR,
         [<<"investor_profile_foreign">>, <<"firb_workflow">>, <<"investment_strategy">>,
          <<"mortgage_finance">>, <<"yield_modelling">>, <<"tax_structure_non_resident">>,
          <<"cash_position">>, <<"cross_border_funding">>,
-         <<"ownership_planning_foreign_investor">>, <<"disposition">>]).
+         <<"ownership_planning_foreign_investor">>, <<"disposition">>,
+         <<"purchase_journey">>, <<"phase_playbook">>]).
 
 %% Mode-E (nexthome-domestic-au) base turn — 9 of the blueprint's 13 components (mode-e-
 %% wedge.md P5), EXCLUDING the same 4 per-property components every mode already excludes
