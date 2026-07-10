@@ -464,5 +464,33 @@ restructure lands, mode by mode per §11.5 — not worth a standalone patch to a
   reference-integrity: every `tab_id` unique, every `kind` in the enum, every listed component real)
   passed for all 5 in-scope blueprints; the emitted artifact's `blueprints.investor-domestic-au.ui_tabs`
   inspected directly and matches the five tabs above.
-  - **Next: task 6**, the shell renders this five-view spine (currently still rendering — or not yet
-    wired to render — the old flat tab set for Mode C plan cards).
+
+- **Mode C shell rendering — done 2026-07-10 (task 6).** Traced the render path
+  (`PlanProjection.svelte` → `OverviewCard`/`FlowView`/`Calculator`) before writing anything: it
+  already renders any `ui_tabs` the engine declares generically — `kind: synthesis`/`flow`/
+  `components`/`qa` dispatch, `TAB_GROUP`/`plan.ltab.*` i18n already cover `flow`/`budget`/
+  `portfolio`, and `OverviewCard` was already fixed for Modes C/D's `investor_profile`/
+  `investment_strategy` fields (task 2). So the five-view spine needed **no new UI**, only a
+  data-completeness fix surfaced by tracing it:
+  - **Bug found: two consumers read `cash_events` off a single hardcoded component, not the
+    harvested set.** `PlanProjection.svelte`'s `flowCashEvents` (feeds `FlowView`'s budget_ref → amount
+    join) and `Calculator.svelte`'s `events` (feeds the Budget tab's cash-events table) both read only
+    `cash_position.outcome.cash_events`. For Mode A this is harmless (`cash_position` is the only
+    source). For Mode C it silently drops the amount for every hold-phase action/row sourced from
+    `yield_modelling`/`tax_structure` — concretely, `kb.journey.investor-phase-actions`' `own`-phase
+    `lodge_annual_return` action links `budget_ref: "tax_refund"` (a `tax_structure` event); the engine
+    validates it fine (its own `harvest_cash_events/1` already covers all three sources, task 4), but
+    the shell would show no amount chip and the Budget spine table would show only 4 of 8 rows — a
+    silent shell-side regression from the engine's own fix, not a new engine gap.
+  - **Fix: `harvestCashEvents(components)` added to `planCard.ts`**, mirroring
+    `fh_engine_journey:harvest_cash_events/1` exactly (concatenate `cash_events` off every component's
+    outcome; `dispose_cash_events` deliberately excluded — the engine harvest excludes it too, so no
+    authored action ever links a dispose-phase `budget_ref`). `flowCashEvents` now calls it directly;
+    `Calculator.svelte`'s `events` calls it when `components` is non-empty, falling back to the
+    outcome's own `cash_events` for the componentless standalone render (`ComponentCard`'s bare
+    `<Calculator outcome={entry.outcome} />`, which has no siblings to harvest). Verified inert for
+    Mode A: `cash_position` is its only `cash_events`-bearing component at runtime, so the harvested
+    set is byte-identical to the old single-source read.
+  - **Verified:** `npm run check` (svelte-check) 0 errors / 0 warnings; `npm run build` succeeds
+    clean. Full live-browser verification against a real filled Mode C card is task 7's job (the
+    seam-smoke gate), not duplicated here.

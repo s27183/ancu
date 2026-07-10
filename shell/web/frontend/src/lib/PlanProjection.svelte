@@ -32,10 +32,10 @@
         type MoneyRange,
         type JourneySwimlaneOutcome,
         type PhasePlaybookOutcome,
-        type BudgetEnvelopeOutcome,
         type DispositionOutcome,
         type ChecklistStatusMap,
-        type PropertyAddendum
+        type PropertyAddendum,
+        harvestCashEvents
     } from '$lib/planCard';
     import { AU_STATES } from '$lib/map';
     import { money, moneyRange } from '$lib/format';
@@ -591,10 +591,11 @@
     const flowPlaybook = $derived(
         viewComponents.phase_playbook?.outcome as PhasePlaybookOutcome | undefined
     );
-    const flowCashEvents = $derived(
-        (viewComponents.cash_position?.outcome as BudgetEnvelopeOutcome | undefined)
-            ?.cash_events ?? []
-    );
+    // Harvested from every viewComponents entry exposing cash_events (not just
+    // cash_position) — mirrors the engine's own multi-source harvest so a Mode-C hold-phase
+    // action's budget_ref (e.g. lodge_annual_return → tax_refund, sourced from tax_structure)
+    // resolves to an amount chip here too. See harvestCashEvents in $lib/planCard.
+    const flowCashEvents = $derived(harvestCashEvents(viewComponents));
 
     // Toggle one phase action's done-state. The engine is SOT: flip optimistically for
     // immediacy, PATCH, then set checklistStatus from the AUTHORITATIVE returned map;

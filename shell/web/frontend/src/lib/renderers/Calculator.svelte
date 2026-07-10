@@ -27,7 +27,8 @@
         type ComponentEntry,
         type DispositionOutcome,
         type ExistingHomeDisposalOutcome,
-        type MoneyRange
+        type MoneyRange,
+        harvestCashEvents
     } from '$lib/planCard';
     import { money, moneyRange, asRange } from '$lib/format';
     import Field from './Field.svelte';
@@ -152,7 +153,17 @@
     // engine-computed — one-computer-per-figure). Empty phases say so (honest-partial:
     // recurring Own-phase costs are PENDING until profile facts arrive).
     const PHASE_ORDER = ['prepare', 'pre_approve', 'contract', 'settle', 'own'] as const;
-    const events = $derived((o.cash_events ?? []) as CashEvent[]);
+    // Harvested across every passed component (mirrors the engine's own multi-source
+    // harvest, [[unify-views-as-projections-of-one-primitive]]) so Mode C's hold-phase
+    // events (yield_modelling/tax_structure) show on the spine alongside cash_position's —
+    // not just this outcome's own cash_events. `components` is empty only for the
+    // standalone ComponentCard render (a single component's own card, no siblings to
+    // harvest), where the outcome's own array is already complete.
+    const events = $derived(
+        Object.keys(components).length > 0
+            ? harvestCashEvents(components)
+            : ((o.cash_events ?? []) as CashEvent[])
+    );
     const hasSpine = $derived(events.length > 0);
     const byPhase = $derived.by((): Array<{ phase: string; events: CashEvent[] }> => {
         // Canonical phases first, then any unexpected phase the engine sends (forward-

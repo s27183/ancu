@@ -687,6 +687,22 @@ export function firstComponentEntry(
     return undefined;
 }
 
+/** Harvest every `cash_events` array across all live components — mirrors the engine's own
+ *  `harvest_cash_events/1` (fh_engine_journey.erl / fh_engine_phase_playbook.erl,
+ *  [[unify-views-as-projections-of-one-primitive]]) so a `phase_playbook` action's
+ *  `budget_ref` — validated against that SAME harvest at fill time — always resolves to an
+ *  amount here too, not just the ones on `cash_position`. Mode A has one source
+ *  (`cash_position`); Mode C adds `yield_modelling`/`tax_structure` — reading only
+ *  `cash_position` would silently drop the amount chip on their hold-phase actions even
+ *  though the engine already validated the link. `dispose_cash_events` (disposition) is
+ *  deliberately excluded — the engine harvest excludes it too (no authored action links a
+ *  dispose-phase budget_ref), so including it here would diverge from what was validated. */
+export function harvestCashEvents(components: Record<string, ComponentEntry>): CashEvent[] {
+    return Object.values(components).flatMap(
+        (c) => (c.outcome as { cash_events?: CashEvent[] | null }).cash_events ?? []
+    );
+}
+
 /** A normalized property as the engine stores it under content.addenda.<pid>.property_card
  *  (engine-contract §12) — the neutral facts the attach endpoint accepts. Every field is
  *  optional so a partially-seeded addendum (a live attach before the snapshot re-read)
