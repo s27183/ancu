@@ -20,6 +20,7 @@
         type BudgetEnvelopeOutcome,
         type ExistingHomeDisposalOutcome,
         type StrategyThesisOutcome,
+        type FirbStatusOutcome,
         type MoneyRange,
         firstComponentEntry,
         PROFILE_COMPONENT_IDS
@@ -46,6 +47,18 @@
     // Mode C/D only — investment_strategy replaces eligibility as the "what's the plan" component.
     const strategy = $derived(
         components.investment_strategy?.outcome as StrategyThesisOutcome | undefined
+    );
+    // Modes B/D only — firb_workflow doesn't exist for A/C/E. FIRB status is a first-class
+    // headline (CLAUDE.md #10 — "build the gate into the architecture, not as a disclaimer"),
+    // so it's presence-gated onto the Overview grid the same way `scheme`/`existingHome` are,
+    // not left for the Flow tab alone to surface (task 9, plan-card-lifecycle-restoration §11.3
+    // "overview" now lists firb_workflow for Mode D, mirroring how Mode A's overview lists
+    // `eligibility` for the same reason — a gate the buyer needs to see in the 90-second read).
+    const firbStatus = $derived(components.firb_workflow?.outcome as FirbStatusOutcome | undefined);
+    const firbStageLabel = $derived(
+        firbStatus?.current_stage
+            ? $t(`plan.firb.stage.${firbStatus.current_stage}` as 'plan.firb.stage.not_started')
+            : null
     );
     // Mode-E ONLY: no other mode has this component, so the tile below is present/absent by
     // component presence (not honest-partial-null) — Modes A/B/C/D never grow a dead
@@ -95,6 +108,9 @@
     // C/D never carry a tile for a figure that can't structurally exist for them.
     const stats = $derived([
         { key: 'target', label: $t('plan.f.target_price'), value: target },
+        ...(firbStatus
+            ? [{ key: 'firb', label: $t('plan.f.stage'), value: firbStageLabel }]
+            : []),
         { key: 'path', label: $t('plan.f.path'), value: pathLabel },
         ...(scheme
             ? [{ key: 'benefit', label: $t('plan.f.total_benefit'), value: benefit }]

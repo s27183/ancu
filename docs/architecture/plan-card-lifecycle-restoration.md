@@ -605,3 +605,44 @@ restructure lands, mode by mode per §11.5 — not worth a standalone patch to a
     Portfolio/Q&A) + shell restructure — folding `firb_workflow`/`cross_border_funding`/
     `investment_strategy`/`tax_structure_non_resident` into Flow phases + Budget rows, same
     placement test Mode C's task 5 already proved.
+
+- **Mode D `ui_tabs` rewrite + shell restructure — done 2026-07-10 (task 9).**
+  `investor-foreign-au.md`'s machine-readable `ui_tabs` rewritten from the stale flat 9-tab rail to
+  the five-view spine, mirroring Mode C's shape exactly with `firb_workflow`/`cross_border_funding`
+  added where Mode C has no equivalent: `overview` (`investor_profile_foreign` + `firb_workflow` +
+  `investment_strategy` + `mortgage_finance` + `cash_position` — `firb_workflow` included as a
+  headline the same way Mode A's `overview` includes `eligibility`); `flow` (`purchase_journey` +
+  `phase_playbook` + `settlement_prep`, with the FIRB gate and transfer milestone narrated across
+  Pre-approve→Contract→Settle, not new phases); `budget` (`cash_position` + `firb_workflow` +
+  `cross_border_funding` + `yield_modelling` + `tax_structure_non_resident` + `disposition`);
+  `portfolio` (`ownership_planning_foreign_investor`); `qa`. **No default Family tab** — Mode D
+  stays solo/couple by default per §11.3's own note, offered as opt-in only. `kb_compiler.py`
+  recompiled clean, GATE 9 (`ui_tabs` reference-integrity) passed, artifact's `ui_tabs` inspected
+  directly and matches the declared 5 tabs/16 components exactly.
+  - **Shell verification (mostly confirmation, like Mode C's task 6): the render path is already
+    fully mode-general** — `PlanProjection.svelte` dispatches purely on `ui_tabs[].kind`
+    (`synthesis`/`flow`/`interactive`/generic), never on blueprint slug; `FlowView`'s
+    `flowJourney`/`flowPlaybook`/`flowCashEvents` derive from `viewComponents.purchase_journey`/
+    `phase_playbook` + the harvested `cash_events` (task 6's `harvestCashEvents()`), with no mode
+    gating; the interactive Budget tab renders `cash_position`'s `Calculator` directly and never
+    actually iterates `activeTab.components` (that array is declarative/GATE-9-validated, not
+    consumed for rendering — true for Mode C's budget tab too, confirmed by reading the code, not
+    assumed). The Overview/Buy double-highlight bug (§11.6) self-resolved as predicted:
+    `nonOverviewRailTabs.length` is now 3 for Mode D (well under `RAIL_GROUP_THRESHOLD=5`), so the
+    grouped-rail mechanism no longer engages.
+  - **One real gap found and fixed**: `OverviewCard.svelte` didn't read `firb_workflow` at all,
+    even though task 9's own `ui_tabs` rewrite just declared it as an Overview-tab component — the
+    doc would have said "Overview shows FIRB status" while the shell silently didn't. FIRB status is
+    a first-class user attribute (CLAUDE.md #10 — "build the gate into the architecture, not as a
+    disclaimer"), not optional headline chrome, so this was fixed rather than left as a documentation/
+    behavior mismatch: added a `firbStatus`-presence-gated tile (mirrors the existing `scheme`/
+    `existingHome` presence-gating pattern) showing the `current_stage` label via the already-existing
+    `plan.firb.stage.*` i18n keys — no new copy needed. Presence-gated on the component, not
+    mode-name, so it activates automatically once Mode B's own `firb_workflow` restructure lands
+    (task 13) with zero further OverviewCard change.
+  - **Verified:** `svelte-autofixer` clean, `npm run check` 0 errors/0 warnings, `npm run build`
+    clean (pre-existing >500kB chunk-size warning unrelated).
+  - **Next: task 10**, Mode D conformance + live seam-smoke verification — the full 58-file sweep
+    (expected to need the same fixture-staleness fixes task 7 made for Mode C: the base SET+ORDER
+    fixture already confirmed stale in task 8's sanity check) plus `mode_d_seam_smoke.escript`
+    rewritten for the 12-component spine and run live against the real sidecar.

@@ -133,34 +133,26 @@ This base-heavy structure is genuinely well-suited to Mode D's audience: Vietnam
 
 > The diagram numbers are sequential reading order, not component IDs (the IDs are the scope table's 1–16; `mortgage_finance` is omitted from the sketch). `disposition` runs **last among the base figure-owners** — a pure sink reading every upstream figure-owner (acquire from `cash_position`, hold from `yield_modelling`/`tax_structure_non_resident` over `H`, the CGT determinants from `tax_structure_non_resident`) and read by none among the figure-owners (acyclic). The foreign-resident path strips the main-residence exemption and the 50% discount and adds FRCGW (see component 14). `purchase_journey`/`phase_playbook` (components 15/16) run **last of all** — they read no `ownership_planning_foreign_investor` output (unlike Mode C, this component carries no `cash_events`, so it need not precede either) but are positioned after every figure-owner including `disposition`, mirroring every other mode's "figure-owners, then the spine that places them" DAG shape.
 
-**UI tab mapping** for Mode D:
+**UI tab mapping** — the sixteen components surface through **four top-level views + a Q&A tab** ([`../architecture/plan-card-lifecycle-restoration.md`](../architecture/plan-card-lifecycle-restoration.md) §11.3), rewritten 2026-07-10 (task 9) from the stale pre-restructure flat nine-tab rail. Applying §11.2's placement test to Mode D: `firb_workflow` is phase-shaped (a literal gate between Pre-approve and Contract) → its approval-state narrative folds into a Flow phase, while its **fee** is money-shaped → also a Budget row (same dual placement `eligibility` gets in Mode A's Overview+Flow). `cross_border_funding` is §3.3's own "currency-transfer milestone" → Flow milestone + Budget row (FX cost). `investment_strategy` is a pre-Contract one-time thesis step → folds into Flow (visible in Overview as a synthesis read, not its own tab). `yield_modelling`/`tax_structure_non_resident` are money-shaped → Budget hold-phase rows. `ownership_planning_foreign_investor` is state-shaped with no completion point (persists across the whole plan, vacancy/tax/repatriation obligations, forward + recurring, multi-property) → earns its own **Portfolio** view, same as Mode C. `property_assessment`, `buying_strategy`, `due_diligence`, `settlement_prep` are per-property and reached as backing detail via `phase_playbook.actions[].component_ref`, not as tabs. **No default Family tab** — Mode D users are typically solo/couple investors, not parent-funding-child (§11.3's own note); offered as an opt-in, not a blueprint-declared tab.
 
-| UI tab | Components rendered |
-|---|---|
-| Overview | `investor_profile_foreign` + `property_assessment` + `strategy_thesis` summary |
-| Investment strategy | `investment_strategy` (central) |
-| FIRB & Funding | `firb_workflow` + `cross_border_funding` |
-| Yield & Tax | `yield_modelling` + `tax_structure_non_resident` |
-| Property | `property_assessment` + `due_diligence` |
-| Cash calculator | `cash_position` + `disposition` (full-horizon net position: acquire → hold over `H` → dispose; horizon slider = structural what-if) |
-| Buying | `buying_strategy` |
-| Temporal flow | `settlement_prep` |
-| Portfolio | `ownership_planning_foreign_investor` |
+| # | View | `kind` | What it shows |
+|---|---|---|---|
+| 1 | Overview | `synthesis` | "what this is" + aggregated read of `investor_profile_foreign` + `firb_workflow` (the FIRB gate headline — same treatment Mode A gives `eligibility`) + `investment_strategy` + `mortgage_finance` + `cash_position` |
+| 2 | Flow | `flow` | the legal/temporal spine — `purchase_journey` (swimlane, Prepare → … → Hold → **Dispose**, FIRB gate + transfer milestone narrated across Pre-approve→Contract→Settle) as navigation; each phase opens a sheet = swimlane slice + `phase_playbook` actions (ordered, budget-linked — including `firb_workflow`'s application/approval steps, `cross_border_funding`'s transfer steps, and `investment_strategy`'s pre-Contract thesis step) + `phase_playbook` risks; `settlement_prep` enriches the Settle phase per-property |
+| 3 | Budget | `components` (interactive) | the financial spine — `cash_position` as the phased acquisition cash-flow + what-if cockpit (deposit, stamp duty + foreign-buyer surcharge, FIRB fee); `firb_workflow`'s fee as its own row; `cross_border_funding`'s FX/transfer cost as its own row; `yield_modelling`/`tax_structure_non_resident` as the hold-phase rental-income/expense/loan-interest/AU-tax rows; `disposition` as the full-horizon net position (buy → hold over `H` → sell, no CGT discount, FRCGW) + horizon slider; each cash-event row drills to its `source_component` |
+| 4 | Portfolio | `components` | `ownership_planning_foreign_investor` — vacancy-fee monitoring, AU+VN tax obligations, repatriation strategy, mode-switch-on-PR-grant signal; the only Mode-D concept that's state-shaped with no completion point, so it doesn't fold into Flow or Budget |
+| 5 | Q&A | `qa` | bilingual planning-agent chat (a shell surface over the engine Q&A stream — not a `component_filled`) |
 
-**Machine-readable form** — compiled to `ui_tabs` in the artifact, **canonical for the runtime** (the table above is the human view). `investor-foreign-au` is already `in_scope_blueprint()` — **this block is stale, not dormant**: it's the pre-restructure flat vocabulary (`plan-card-lifecycle-restoration.md` §3.2, superseded). The resolved target (§11, 2026-07-10) is a five-view spine — Overview/Flow/Budget/**Portfolio**/Q&A (Family opt-in only, not default) — with `purchase_journey` becoming base-scope (currently missing entirely) and `firb_workflow`/`cross_border_funding`/`investment_strategy`/`tax_structure_non_resident` folding into Flow phases/milestones + Budget rows rather than their own tabs; D is sequenced after C (§11.5). Not yet rewritten to match; tracked in [`../architecture/wedge-build-sequence.md`](../architecture/wedge-build-sequence.md) "B/C/D lifecycle-spine restructure." Also carries two independent bugs found on a live card (§11.6): `total_cash_required` emitted as a scalar not a range, and Overview reading fields (`eligibility`, `recommended_path`) that don't exist for this mode.
+**Machine-readable form** — compiled to `ui_tabs` in the artifact, **canonical for the runtime** (the table above is the human view). Rewritten 2026-07-10 (task 9, `plan-card-lifecycle-restoration.md` §11.5) from the stale pre-restructure flat vocabulary to this five-view spine, mirroring [`investor-domestic-au.md`](investor-domestic-au.md)'s `overview`/`flow`/`budget`/`portfolio`/`qa` shape exactly, with `firb_workflow`/`cross_border_funding` added to `overview`/`budget` where Mode C has no equivalent. Also fixes the two independent bugs flagged on a live card (§11.6) — `total_cash_required` scalar-vs-range and the Overview field-mismatch — both already resolved shell-side in `03b1478` (task 1/2), predating this blueprint rewrite; noted here only because the stale prose above used to reference them as still-open.
 
 ```jsonc
 {
   "ui_tabs": [
-    { "tab_id": "overview",            "kind": "synthesis",  "components": ["investor_profile_foreign", "property_assessment", "investment_strategy"] },
-    { "tab_id": "investment_strategy", "kind": "components", "components": ["investment_strategy"] },
-    { "tab_id": "firb_funding",        "kind": "components", "components": ["firb_workflow", "cross_border_funding"] },
-    { "tab_id": "yield_tax",           "kind": "components", "components": ["yield_modelling", "tax_structure_non_resident"] },
-    { "tab_id": "cash_calculator",     "kind": "components", "interactive": true, "components": ["cash_position", "disposition"] },
-    { "tab_id": "journey",             "kind": "components", "components": ["settlement_prep"] },
-    { "tab_id": "property",            "kind": "components", "components": ["property_assessment", "due_diligence"] },
-    { "tab_id": "buying",              "kind": "components", "components": ["buying_strategy"] },
-    { "tab_id": "portfolio",           "kind": "components", "components": ["ownership_planning_foreign_investor"] }
+    { "tab_id": "overview",  "kind": "synthesis",  "components": ["investor_profile_foreign", "firb_workflow", "investment_strategy", "mortgage_finance", "cash_position"] },
+    { "tab_id": "flow",      "kind": "flow",        "components": ["purchase_journey", "phase_playbook", "settlement_prep"] },
+    { "tab_id": "budget",    "kind": "components", "interactive": true, "components": ["cash_position", "firb_workflow", "cross_border_funding", "yield_modelling", "tax_structure_non_resident", "disposition"] },
+    { "tab_id": "portfolio", "kind": "components", "components": ["ownership_planning_foreign_investor"] },
+    { "tab_id": "qa",        "kind": "qa",          "components": [] }
   ]
 }
 ```
