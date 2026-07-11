@@ -86,14 +86,59 @@ export interface LenderEntry {
     reasoning?: LocalizedText | null;
     approval_likelihood?: string | null;
 }
-/** mortgage_finance → summary-card (outcome type `mortgage_plan`). */
+/** mortgage_finance → summary-card + data-table (outcome type `mortgage_plan`). FOUR
+ *  different field sets share this one type (fh_engine_mortgage.erl fill_fhb / fill_fhb_
+ *  foreign / fill_investor / fill_investor_foreign) — all fields optional, union of all
+ *  four shapes, exactly like ProfileOutcome above. A consumer reads only the fields its
+ *  mode's shape actually populates; the rest are honestly absent, not null-by-mistake. */
 export interface MortgagePlanOutcome {
+    // Mode A/B (fill_fhb / fill_fhb_foreign)
     recommended_path?: string | null;
-    expected_borrowing_capacity?: MoneyRange | null;
-    recommended_lender_shortlist?: LenderEntry[] | null;
     pre_approval_action_plan?: LocalizedText[] | null;
     pre_approval_expiry?: string | null;
+    reapplication_required?: boolean | null;
     key_assumptions?: LocalizedText[] | null;
+    loan_structure_recommendation?: {
+        type?: string | null;
+        currency?: string | null;
+        rate?: string | null;
+        offset?: string | null;
+    } | null;
+    // Mode B/D (foreign axis)
+    deposit_required?: number | null;
+    firb_dependency_acknowledged?: boolean | null;
+    // Mode C (fill_investor)
+    recommended_loan_structure?: {
+        repayment_type?: string | null;
+        rate?: string | null;
+        offset?: string | null;
+        uses_existing_ppor_equity?: boolean | null;
+        interest_only_period_years?: number | null;
+    } | null;
+    offset_strategy_recommendation?: string | null;
+    refinance_plan_for_portfolio_growth?: {
+        usable_equity_target_lvr_pct?: number | null;
+        usable_equity_with_lmi_lvr_pct?: number | null;
+        equity_release_triggers_serviceability_retest?: boolean | null;
+        interest_only_term_years_typical?: number | null;
+        usable_equity_estimate?: number | null;
+        io_period_expiry_date?: string | null;
+        next_property_equity_release_target_date?: string | null;
+    } | null;
+    debt_optimisations_to_action?: LocalizedText[] | null;
+    // Mode C/D (investor axis)
+    io_vs_pi_recommendation?: string | null;
+    loan_cost_estimate_year_1?: number | null;
+    // Mode D (fill_investor_foreign)
+    fixed_vs_variable?: string | null;
+    deposit_required_percentage?: number | null;
+    deposit_required_amount?: number | null;
+    rate_estimate?: MoneyRange | null;
+    vn_income_acceptance_confirmed?: boolean | null;
+    fx_risk_acknowledged?: boolean | null;
+    // shared
+    expected_borrowing_capacity?: MoneyRange | null;
+    recommended_lender_shortlist?: LenderEntry[] | null;
 }
 
 /** investment_strategy (Mode C/D) → summary-card (outcome type `strategy_thesis`). Two-path:
@@ -185,6 +230,25 @@ export interface BudgetEnvelopeOutcome {
     genuine_savings_verdict?: string | null;
     mitigation_options_if_short?: string[] | null;
     key_assumptions?: LocalizedText[] | null;
+}
+
+/** yield_modelling → calculator (outcome type `cash_flow_projection`, Mode C/D). All
+ *  null at base until a property is attached (fh_engine_fill.erl base_cfp/0) — every
+ *  figure is a money_range EXCEPT the geared verdict (a closed 3-value enum) and
+ *  annual_interest_year_1 (a scalar, representative-leverage POINT, not a band). */
+export interface CashFlowProjectionOutcome {
+    annual_rental_income_year_1?: MoneyRange | null;
+    annual_operating_expenses_year_1?: MoneyRange | null;
+    annual_interest_year_1?: number | null;
+    cash_flow_before_tax_year_1?: MoneyRange | null;
+    cash_flow_before_tax_per_week?: MoneyRange | null;
+    gross_yield?: MoneyRange | null;
+    net_yield_pre_loan?: MoneyRange | null;
+    net_yield_post_loan_pre_tax?: MoneyRange | null;
+    year_5_projected_cash_flow?: MoneyRange | null;
+    year_10_projected_cash_flow?: MoneyRange | null;
+    is_positive_neutral_or_negative_geared_pre_tax?: string | null;
+    cash_events?: CashEvent[] | null;
 }
 
 /** disposition → calculator (outcome type `disposition`). The TERMINAL dispose-phase
@@ -293,30 +357,33 @@ export interface OngoingObligationsOutcome {
 }
 
 // --- Investor (Mode C) outcome types ----------------------------------------
-// The two renderers Mode C adds (buying-strategy-card, opportunity-card). No live
-// producer yet — buying_strategy and ownership_planning_investor are Phase-B/agent
-// components, unwired in both modes — so these are typed against the §11.9 renderer
-// CONTRACT, honest-partial (every field nullable). See mode-c-wedge.md P4.
+// The two renderers Mode C adds (buying-strategy-card, opportunity-card). Both have live
+// producers (fh_engine_buying.erl / fh_engine_ownership.erl fill_investor/2), reachable
+// today via property-attach — the "no live producer yet" claim this comment carried until
+// 2026-07-11 was stale (found in the same audit that fixed the field-name drift below).
 
-/** One comparable sale backing the bid plan. */
-export interface Comparable {
-    address?: string | null;
-    price?: number | null;
-    note?: LocalizedText | null;
-}
-/** buying_strategy → buying-strategy-card (outcome type `bid_plan_investor`). The
- *  investor bid-discipline plan: §11.9 { max_bid, walk_away, comparables[], style } +
- *  the blueprint's yield_anchored_max_price / thesis_alignment. Decision-support: the
- *  yield ceiling + walk-away frame the max bid; the engine owns the figures. */
+/** buying_strategy → buying-strategy-card (outcome type `bid_plan_investor`,
+ *  fh_engine_buying.erl). Corrected 2026-07-11 — the renderer had drifted onto a
+ *  never-real §11.9 draft shape (max_bid/walk_away/comparables/style/conditions/
+ *  key_assumptions); NONE of those keys exist on the real outcome. The real shape below
+ *  is grounded against fh_engine_buying.erl directly + a live filled card. Every money
+ *  field is a yield-anchored BAND (the rent input is a band); max_bid_confidence is
+ *  currently always null (no producer wires it yet — no merge_agent slot exists for it,
+ *  unlike negotiation_style). */
 export interface BidPlanInvestorOutcome {
-    max_bid?: number | null;
-    walk_away?: number | null;
-    yield_anchored_max_price?: number | null;
+    yield_anchored_max_price?: MoneyRange | null;
     thesis_alignment?: 'aligned' | 'stretched' | 'misaligned' | string | null;
-    style?: string | null;
-    comparables?: Comparable[] | null;
-    conditions?: LocalizedText[] | null;
-    key_assumptions?: LocalizedText[] | null;
+    max_bid_value?: MoneyRange | null;
+    max_bid_confidence?: number | string | null;
+    max_bid_reasoning?: LocalizedText | null;
+    walk_away_price?: MoneyRange | null;
+    negotiation_style?: 'assertive' | 'patient' | 'early_offer' | 'low_anchor' | 'thesis_walk_away' | string | null;
+    live_coach_armed?: boolean | null;
+    conditions_to_request?: LocalizedText[] | null;
+    /** PLACED verbatim from property_fit_investor.key_concerns — real, populated content
+     *  the renderer dropped entirely before this fix (never read at all, not honest-
+     *  partial-pending). */
+    red_flags_to_monitor?: LocalizedText[] | null;
 }
 
 /** One modelled opportunity (rent review, equity release, scale-up). `modeled_benefit`
@@ -352,6 +419,23 @@ export interface PortfolioPositionOutcome {
     equity_built?: number | null;
     ready_for_next_property?: boolean | null;
     portfolio_diversification_score?: number | null;
+}
+
+/** ownership_planning_foreign_investor → data-table (outcome type `portfolio_position_
+ *  foreign`, Mode D). NOT PortfolioPositionOutcome reused — fh_engine_ownership.erl's
+ *  fill_foreign_investor/2 is its own 8-field shape (AU/VN split tax obligations, FIRB
+ *  vacancy/FRCGW figures, PR-mode-switch eligibility), all null at base pending
+ *  post-acquisition actuals except the two obligation lists + alerts (KB-grounded,
+ *  property-agnostic, so base-computable). */
+export interface PortfolioPositionForeignOutcome {
+    monthly_net_cash_flow_after_withholding?: number | null;
+    vacancy_fee_at_risk_status?: string | null;
+    frcgw_reserve_at_exit?: number | null;
+    ready_for_next_property?: boolean | null;
+    annual_au_tax_obligations?: LocalizedText[] | null;
+    annual_vn_tax_obligations?: LocalizedText[] | null;
+    alert_triggers_armed?: AlertTrigger[] | null;
+    mode_switch_eligible_on_pr?: boolean | null;
 }
 
 // --- Foreign-buyer (Mode B) outcome types -----------------------------------

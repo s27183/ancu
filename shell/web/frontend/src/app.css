@@ -1984,6 +1984,13 @@ main {
 .pp-value.pp-neg {
     color: #b91c1c; /* red-700 — a cash gap reads as attention, calmly */
 }
+/* a wrapping row of Chip atoms (mirrors SummaryCard's .rb-chips) */
+.pp-chips-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0.4rem 0;
+}
 .pp-pending {
     font-size: 0.9rem;
     font-style: italic;

@@ -24,6 +24,7 @@
         pick,
         type BudgetEnvelopeOutcome,
         type CashEvent,
+        type CashFlowProjectionOutcome,
         type ComponentEntry,
         type DispositionOutcome,
         type ExistingHomeDisposalOutcome,
@@ -256,6 +257,30 @@
         if (s === 'to_verify') return $t('plan.xhd.break_cost.to_verify');
         return s;
     }
+
+    // ── yield_modelling (view='full' only) — the FIFTH shape `calculator` renders ──────
+    // Found in the same 2026-07-11 audit as the DataTable gaps: yield_modelling's sole
+    // renderer is `calculator`, but its cash_flow_projection outcome has none of budget_
+    // envelope's fields, so without this it fell into the default verdict-hero branch
+    // below and showed an empty/misleading "cash needed" card instead of yield figures.
+    // gross_yield is unique to this shape (absent from budget_envelope/disposition/
+    // existing_home_disposal/tax_optimised_structure).
+    const cf = $derived(outcome as CashFlowProjectionOutcome);
+    const isYield = $derived('gross_yield' in outcome);
+    const GEARED: Record<string, 'good' | 'warn' | 'neutral'> = {
+        positive: 'good', neutral: 'neutral', negative: 'warn'
+    };
+    function gearedLabel(v: string): string {
+        return v in GEARED ? $t(`plan.geared.${v}` as 'plan.geared.positive') : v;
+    }
+
+    // tax_structure (tax_optimised_structure) also composes `calculator` as its SECOND
+    // renderer (after data-table, which already shows its real content correctly) — with
+    // no branch of its own it ALSO fell into the default verdict-hero below, appending a
+    // noisy empty "cash needed" card under content that's already complete. Same
+    // discriminator DataTable.svelte uses (cgt_discount_eligible + recommended_entity).
+    // This shape renders NOTHING from Calculator — intentionally, not a gap.
+    const isTax = $derived('cgt_discount_eligible' in outcome && 'recommended_entity' in outcome);
 </script>
 
 <!-- The breakdown detail — the line breakdown + summary. Rendered INLINE in the Detail tab
@@ -304,7 +329,7 @@
 {/snippet}
 
 <!-- ── (1) "Am I ready?" verdict hero ───────────────────────────────────── -->
-{#if view === 'verdict' || (view === 'full' && !isDisposition && !isExistingHomeDisposal)}
+{#if view === 'verdict' || (view === 'full' && !isDisposition && !isExistingHomeDisposal && !isYield && !isTax)}
 <div class="cw-hero" class:cw-full={density === 'full'}>
     <div class="cw-head">
         <span class="cw-need-label">{$t('plan.cash.need')}</span>
@@ -338,7 +363,7 @@
 <!-- ── (2) The financial spine — cash_events across the lifecycle phases ──── -->
 <!-- A clean Item/Amount table (the prototype's design language). Each phase is a sub-header
      band; each event row drills to its source_component (§7.3) when that owner is filled. -->
-{#if (view === 'table' || (view === 'full' && !isDisposition && !isExistingHomeDisposal)) && hasSpine}
+{#if (view === 'table' || (view === 'full' && !isDisposition && !isExistingHomeDisposal && !isYield && !isTax)) && hasSpine}
     <div class="cw-spine">
         <h4 class="cw-spine-title">{$t('plan.cash.spine')}</h4>
         <table class="cw-table">
@@ -389,7 +414,7 @@
 {/if}
 
 <!-- full mode: the breakdown sits behind a modal opener under the table. -->
-{#if view === 'full' && !isDisposition && !isExistingHomeDisposal && hasBreakdown}
+{#if view === 'full' && !isDisposition && !isExistingHomeDisposal && !isYield && !isTax && hasBreakdown}
     <button type="button" class="cw-breakdown-btn" onclick={() => (showBreakdown = true)}>
         {$t('plan.cash.breakdown')}
     </button>
@@ -556,6 +581,48 @@
             <span class="cw-need-label">{$t('plan.xhd.add_facts')}</span>
         </div>
         <NoteList notes={xhd.key_assumptions} />
+    {/if}
+{/if}
+
+<!-- ── (6) yield_modelling (view='full' only) — the rent-economics hero. ──────────── -->
+<!-- A separate outcome (cash_flow_projection); all-null at base (needs a property, per
+     the class comment above cf/isYield). Honest-partial: the pre-loan cluster (income,
+     opex, gross/net-pre-loan yield) populates once a property attaches; the post-loan
+     cluster (interest, cash flow, net-post-loan yield, year 5/10, geared position) needs
+     the representative-leverage financing too — both arrive together in practice. -->
+{#if view === 'full' && isYield}
+    <div class="cw-hero cw-full">
+        <div class="cw-head">
+            <span class="cw-need-label">{$t('plan.yield.gross')}</span>
+            {#if hasRange(cf.gross_yield)}
+                <span class="cw-need-total">{rangeLabel(cf.gross_yield)}</span>
+            {:else}
+                <Pending />
+            {/if}
+        </div>
+    </div>
+
+    {#if !hasRange(cf.gross_yield)}
+        <p class="cw-cta">{$t('plan.yield.pending')}</p>
+    {/if}
+
+    <Field label={$t('plan.yield.net_pre_loan')} value={hasRange(cf.net_yield_pre_loan) ? rangeLabel(cf.net_yield_pre_loan) : null} />
+    <Field label={$t('plan.yield.net_post_loan')} value={hasRange(cf.net_yield_post_loan_pre_tax) ? rangeLabel(cf.net_yield_post_loan_pre_tax) : null} />
+    <Field label={$t('plan.yield.rental_income')} value={hasRange(cf.annual_rental_income_year_1) ? rangeLabel(cf.annual_rental_income_year_1) : null} />
+    <Field label={$t('plan.yield.opex')} value={hasRange(cf.annual_operating_expenses_year_1) ? rangeLabel(cf.annual_operating_expenses_year_1) : null} />
+    <Field label={$t('plan.yield.interest')} value={money(cf.annual_interest_year_1, $lang)} />
+    <Field label={$t('plan.yield.cf_annual')} value={hasRange(cf.cash_flow_before_tax_year_1) ? rangeLabel(cf.cash_flow_before_tax_year_1) : null} />
+    <Field label={$t('plan.yield.cf_weekly')} value={hasRange(cf.cash_flow_before_tax_per_week) ? rangeLabel(cf.cash_flow_before_tax_per_week) : null} />
+    <Field label={$t('plan.yield.year5')} value={hasRange(cf.year_5_projected_cash_flow) ? rangeLabel(cf.year_5_projected_cash_flow) : null} />
+    <Field label={$t('plan.yield.year10')} value={hasRange(cf.year_10_projected_cash_flow) ? rangeLabel(cf.year_10_projected_cash_flow) : null} />
+    {#if cf.is_positive_neutral_or_negative_geared_pre_tax}
+        <div class="pp-field">
+            <span class="pp-label">{$t('plan.yield.geared')}</span>
+            <Chip
+                label={gearedLabel(cf.is_positive_neutral_or_negative_geared_pre_tax)}
+                tone={GEARED[cf.is_positive_neutral_or_negative_geared_pre_tax] ?? 'neutral'}
+            />
+        </div>
     {/if}
 {/if}
 
