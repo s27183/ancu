@@ -62,15 +62,19 @@ run(Id, Body, Req, State) ->
             %% IC3: the enriched financials from the SOT (canonical household_financials
             %% key) — preview parity with the turn.
             Financials = maps:get(<<"household_financials">>, Facts, #{}),
+            %% The SAME derived-flag read fh_engine_h_rerun.erl uses — see fh_engine_simulate
+            %% :run/5's comment for why this must travel into the preview too.
+            Firb = maps:get(<<"firb_required_any">>,
+                            maps:get(<<"derived">>, Facts, #{}), false),
             case fh_engine_simulate:apply_overrides(Overrides, Onboarding0) of
                 {ok, Onboarding} ->
-                    preview(Id, Slug, Overrides, Onboarding, Intent, Financials, Req, State);
+                    preview(Id, Slug, Overrides, Onboarding, Intent, Financials, Firb, Req, State);
                 {error, Reason}  -> reject(Reason, Req, State)
             end
     end.
 
-preview(Id, Slug, Overrides, Onboarding, Intent, Financials, Req, State) ->
-    try fh_engine_simulate:run(Slug, Onboarding, Intent, Financials) of
+preview(Id, Slug, Overrides, Onboarding, Intent, Financials, Firb, Req, State) ->
+    try fh_engine_simulate:run(Slug, Onboarding, Intent, Financials, Firb) of
         {ok, Outcomes} ->
             Resp = #{<<"plan_card_id">> => Id,
                      <<"overrides">> => Overrides,

@@ -27,7 +27,7 @@
 %% (target_price / state / horizon) is deterministic and cannot move a FIRB/ASIC/AML
 %% branch — the full pipeline runs at COMMIT (the refine turn, W7b), never here.
 
--export([apply_overrides/2, run/3, run/4]).
+-export([apply_overrides/2, run/3, run/4, run/5]).
 
 %% --- override mapping (engine-contract §10.1/§10.2) -------------------------
 %%
@@ -100,8 +100,21 @@ run(BlueprintSlug, Onboarding, Intent) ->
 %% are a profile fact, NOT a what-if dimension — they pass through unchanged.
 -spec run(binary(), map(), binary(), map()) -> {ok, map()}.
 run(BlueprintSlug, Onboarding, Intent, Financials) ->
+    run(BlueprintSlug, Onboarding, Intent, Financials, false).
+
+%% firb_required_any: the SAME turn-level flag every Mode-B/D resolver dispatch keys on
+%% (fh_engine_fill/mortgage/cash/ownership.erl) — derived once at plan-card creation
+%% (facts_jsonb.derived.firb_required_any, fh_engine_h_plan_cards.erl) and re-read by
+%% every other recompute path (fh_engine_h_rerun.erl, fh_engine_refresh.erl). Without it
+%% here, a Mode-B/D card's structural preview silently mis-dispatched to the DOMESTIC
+%% resolver branch (missing deposit_required_amount etc, cascading into a null
+%% cash_position) — found 2026-07-11 auditing a live Mode-D what-if. Defaults to false
+%% (run/4's existing callers are all Mode-A escripts) so no other call site changes.
+-spec run(binary(), map(), binary(), map(), boolean()) -> {ok, map()}.
+run(BlueprintSlug, Onboarding, Intent, Financials, FirbRequiredAny) ->
     Args = #{blueprint_slug => BlueprintSlug, onboarding => Onboarding,
-             intent => Intent, household_financials => Financials},
+             intent => Intent, household_financials => Financials,
+             firb_required_any => FirbRequiredAny},
     Components = fh_engine_turn:base_components(BlueprintSlug),
     Outcomes =
         lists:foldl(
