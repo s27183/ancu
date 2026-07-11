@@ -72,7 +72,8 @@ investor_order() ->
 foreign_order() ->
     [<<"buyer_profile">>, <<"family_context">>, <<"firb_workflow">>,
      <<"mortgage_finance">>, <<"cash_position">>, <<"cross_border_funding">>,
-     <<"ownership_planning">>, <<"disposition">>].
+     <<"ownership_planning">>, <<"disposition">>,
+     <<"purchase_journey">>, <<"phase_playbook">>].
 
 foreign_investor_order() ->
     [<<"investor_profile_foreign">>, <<"firb_workflow">>, <<"investment_strategy">>,
@@ -118,7 +119,7 @@ no_regression_cases() ->
            names(fh_engine_turn:base_components(?FHB)), fhb_order()),
      check("Investor base SET+ORDER byte-identical to the Mode-C ten",
            names(fh_engine_turn:base_components(?INV)), investor_order()),
-     check("Foreign-FHB base SET+ORDER byte-identical to the Mode-B seven",
+     check("Foreign-FHB base SET+ORDER byte-identical to the Mode-B ten",
            names(fh_engine_turn:base_components(?FHB_FOREIGN)), foreign_order()),
      check("Foreign-investor base SET+ORDER byte-identical to the Mode-D twelve",
            names(fh_engine_turn:base_components(?INV_FOREIGN)), foreign_investor_order())].

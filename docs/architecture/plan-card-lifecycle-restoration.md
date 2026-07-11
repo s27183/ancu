@@ -955,3 +955,69 @@ restructure lands, mode by mode per §11.5 — not worth a standalone patch to a
     in task 12 (`base_components_foreign_investor_conformance.escript`,
     `base_components_nexthome_conformance.escript`, and `mode_b_seam_smoke.escript`'s
     `expected_sequence()`).
+
+- **Task 14 (Mode B conformance + live seam-smoke verification) done 2026-07-11 — the closing
+  task for the ENTIRE B/C/D lifecycle-spine restructure (tasks 3–14 all done).**
+  - **Found the two flagged mirror fixtures stale, plus a third — Mode B's OWN conformance
+    escript hadn't been updated either.** `base_components_foreign_conformance.escript`'s
+    `foreign_order()` fixture still declared the pre-task-12 eight-component sequence (missing
+    `purchase_journey`/`phase_playbook`) — task 12's engine-wiring commit updated
+    `fh_engine_turn.erl`'s `?BASE_COMPONENTS_FOREIGN` macro to 10 components but never touched
+    its own conformance escript's fixture. Caught by re-reading the `.erl` source directly
+    (grounding the fixture against the real macro, not trusting the escript's own stale
+    "eight-component" comment) before touching the two mirrors task 12 had explicitly flagged.
+    Fixed all three: added `purchase_journey`/`phase_playbook` to each `foreign_order()` fixture,
+    added `Pre()` DAG-walk checks proving `purchase_journey` genuinely needs `budget_envelope`
+    (cash_position) + `ongoing_obligations` (ownership_planning) + `disposition` upstream and
+    `phase_playbook` needs `purchase_journey`'s own `journey_swimlane` outcome — grounded against
+    `fh_engine_journey:fill_fhb_foreign/1`'s actual reads, not copied from Mode D's shape.
+    **Takeaway:** a "fix the two flagged mirrors" instruction is itself a claim to verify, not
+    execute blindly — the component under test's own conformance file is the first place drift
+    hides, precisely because everyone assumes task 12 already touched it.
+  - **`mode_b_seam_smoke.escript` needed the fuller set of count updates** tasks 7/10 already
+    worked out the shape for (event count, audit-row count, resolver-count, `content_jsonb`
+    component count, `expected_sequence/0`) — mechanically recomputed from Mode B's real
+    structural facts: 10 components, zero agent leaves (all-resolver, so no `usage` events,
+    unlike Mode D's two-path components), 3 compliance gates each → `EventCount=42`,
+    `AuditCount=30`, `ResolverCount=30`. Added a live `purchase_journey`/`phase_playbook`
+    outcome-shape assertion block mirroring task 10's Mode-D addition, adapted for two real
+    differences: Mode B reuses Mode A's **four-actor** set (`you`/`government`/`lender`/`other`),
+    not Mode C/D's six-actor investor set; and because this smoke's create-body already sets
+    `hold_horizon_years=10` (task 11's own precedent, to exercise `disposition`'s real dispose-
+    phase figures), `purchase_journey`'s dispose phase is asserted **present** here — the
+    opposite of Mode D's own smoke, which leaves the horizon unset and asserts dispose absent.
+    Confirmed the `submit_firb_application` contract-phase action id (the load-bearing
+    discriminator proving `kb.journey.fhb-foreign-phase-actions` resolved, not a fallthrough) by
+    reading the KB doc's `layout.phases[]` directly rather than assuming symmetry with Mode D's
+    identically-named action.
+  - **Ran LIVE** over the real HTTP/SSE seam (Docker Postgres up, no sidecar needed — Mode B's
+    base spine is 100% resolver): 42-event sequence matched exactly; 30 audit rows all `clear`;
+    live outcomes `foreign_person_eligible=null blocking=true firb_dependency_acknowledged=true
+    vacancy_fee_at_risk=30200 cgt_status=to_verify`; live journey/playbook `actors=[you,
+    government,lender,other] phases=[prepare,pre_approve,contract,settle,own,dispose]` (dispose
+    phase present, as expected with H=10) and `contract_actions` includes
+    `submit_firb_application`. **ALL ASSERTIONS PASSED.** Also re-ran Mode D's own live seam-
+    smoke as a regression check (no code shared between the two turns, but both touch
+    `fh_engine_journey`/`fh_engine_phase_playbook` — confirmed unaffected, **ALL ASSERTIONS
+    PASSED** there too).
+  - **Full regression sweep, not just the touched files**: `kb_compiler.py` (PASS, 184 KB
+    entries), `base_components_foreign_conformance.escript` (39/39), the two fixed mirrors
+    (40/40, 18/18), `mode_b_p3_scope_conformance.escript` (19/19, confirming Phase-B scope
+    untouched by the base-spine change), `journey_conformance.escript` (41/41),
+    `phase_playbook_conformance.escript` (21/21), `outcome_conformance.escript` (25+11 cases +
+    seam fail-closed), `disposition_conformance.escript` (89/89). The two pre-existing,
+    documented-as-out-of-scope failures (`due_diligence_conformance`'s `agent_leaves`
+    classification mismatch, `profile_enrichment_conformance`'s IC0 mortgage-capacity fixture
+    drift) re-ran and still fail identically — confirmed unchanged, not newly broken, before
+    calling this task done.
+  - Files: `engine/erlang/test/base_components_foreign_conformance.escript`,
+    `base_components_foreign_investor_conformance.escript`,
+    `base_components_nexthome_conformance.escript`, `mode_b_seam_smoke.escript`.
+  - **Task 14 closes out the whole B/C/D lifecycle-spine restructure.** All five modes (A/B/C/D/E)
+    now share the same Overview/Flow/Budget/[Portfolio|Family]/Q&A five-view spine, live-verified
+    end-to-end. One standing caveat carried over from task 10, NOT resolved by this task (out of
+    its scope — a shared-code bug across Mode C/D, not Mode B): the dispose-cell counterparty bug
+    flagged there was already fixed separately in task 15, and this task's own live run (H=10 set)
+    is the first live confirmation that Mode B's own dispose column renders correctly under the
+    fix (Mode B uses the four-actor `other` counterparty, which task 15's fix left untouched by
+    design — only Mode C/D's `services` rename needed the remap).

@@ -19,14 +19,25 @@
 %%      not the blueprint_slug/order alone, drives which branch fires.
 %%
 %% disposition (added 2026-07-11, task 11 — plan-card-lifecycle-restoration.md §11.4) runs
-%% LAST: fh_engine_disposition:fill/2 dispatches Mode B onto the same fill_owner_occupier/2
-%% path Mode A uses (no tax_optimised_structure upstream), reading profile.hold_horizon_years/
-%% target_price_range/intended_occupancy_use + mortgage_plan.expected_borrowing_capacity +
-%% budget_envelope.total_cash_required (cash_position) + ongoing_obligations
-%% (ownership_planning) — so it must run after both.
+%% AFTER cash_position + ownership_planning: fh_engine_disposition:fill/2 dispatches Mode B
+%% onto the same fill_owner_occupier/2 path Mode A uses (no tax_optimised_structure upstream),
+%% reading profile.hold_horizon_years/target_price_range/intended_occupancy_use +
+%% mortgage_plan.expected_borrowing_capacity + budget_envelope.total_cash_required
+%% (cash_position) + ongoing_obligations (ownership_planning) — so it must run after both.
+%%
+%% purchase_journey/phase_playbook (added 2026-07-11, task 12 — plan-card-lifecycle-
+%% restoration.md §11.5/§11.8) run LAST, after disposition: fh_engine_journey:fill_fhb_foreign/1
+%% reads ongoing_obligations (ownership_planning) + disposition.dispose_cash_events +
+%% harvest_cash_events/1's generic sweep of every upstream outcome exposing a `cash_events`
+%% field (Mode B's cash_position.budget_envelope carries them — task 12's real
+%% cash_events_foreign/5 builder, not a permanently-null stub); phase_playbook then reads
+%% purchase_journey's own outcome (journey_swimlane) to share its phase set. Zero new
+%% resolver code beyond each component's own Mode-B dispatch branch + prose — Mode A's
+%% phases/actors/money-cell builders are reused verbatim (§3.3: "B = A's shape + a FIRB gate
+%% + a currency-transfer milestone + surcharge").
 %%
 %% Loads the SAME materialized artifact the engine loads (priv/kb/artifact.json) and asserts:
-%%   1. SET + ORDER — base_components(fhb-foreign-au) is exactly the eight components in
+%%   1. SET + ORDER — base_components(fhb-foreign-au) is exactly the ten components in
 %%      the blueprint's own Scope=base/both column, in dependency order; the four
 %%      per-property components are EXCLUDED.
 %%   2. NO REGRESSION — base_components(fhb-domestic-au) / base_components(investor-domestic-au)
@@ -69,7 +80,8 @@ main(_) ->
 foreign_order() ->
     [<<"buyer_profile">>, <<"family_context">>, <<"firb_workflow">>,
      <<"mortgage_finance">>, <<"cash_position">>, <<"cross_border_funding">>,
-     <<"ownership_planning">>, <<"disposition">>].
+     <<"ownership_planning">>, <<"disposition">>,
+     <<"purchase_journey">>, <<"phase_playbook">>].
 
 fhb_order() ->
     [<<"buyer_profile">>, <<"eligibility">>, <<"mortgage_finance">>,
@@ -110,7 +122,7 @@ set_order_cases() ->
     Comps = fh_engine_turn:base_components(?FHB_FOREIGN),
     Got = names(Comps),
     Excluded = [N || N <- per_property(), lists:member(N, Got)],
-    [check("foreign base SET+ORDER = the eight-component Mode-B spine",
+    [check("foreign base SET+ORDER = the ten-component Mode-B spine",
            Got, foreign_order()),
      check("per-property components EXCLUDED from the foreign base set",
            Excluded, []),
@@ -148,7 +160,15 @@ dag_walk_cases() ->
      Pre(<<"ownership_planning">>, <<"firb_status">>),
      Pre(<<"disposition">>, <<"mortgage_plan">>),
      Pre(<<"disposition">>, <<"budget_envelope">>),
-     Pre(<<"disposition">>, <<"ongoing_obligations">>)
+     Pre(<<"disposition">>, <<"ongoing_obligations">>),
+     %% purchase_journey/phase_playbook (task 12) — the generic cash_events harvest needs
+     %% cash_position's budget_envelope to have already run; fill_fhb_foreign/1 also reads
+     %% ongoing_obligations + disposition directly; phase_playbook needs purchase_journey's
+     %% own outcome (journey_swimlane) to share the phase set.
+     Pre(<<"purchase_journey">>, <<"budget_envelope">>),
+     Pre(<<"purchase_journey">>, <<"ongoing_obligations">>),
+     Pre(<<"purchase_journey">>, <<"disposition">>),
+     Pre(<<"phase_playbook">>, <<"journey_swimlane">>)
      | ValCases].
 
 %% --- 3b. disposition figures (task 11 — the dispose-phase-parity addition) ---

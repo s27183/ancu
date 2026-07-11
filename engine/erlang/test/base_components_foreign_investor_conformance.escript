@@ -88,7 +88,8 @@ investor_order() ->
 foreign_order() ->
     [<<"buyer_profile">>, <<"family_context">>, <<"firb_workflow">>,
      <<"mortgage_finance">>, <<"cash_position">>, <<"cross_border_funding">>,
-     <<"ownership_planning">>, <<"disposition">>].
+     <<"ownership_planning">>, <<"disposition">>,
+     <<"purchase_journey">>, <<"phase_playbook">>].
 
 per_property() ->
     [<<"property_assessment">>, <<"buying_strategy">>,
@@ -130,7 +131,7 @@ no_regression_cases() ->
            names(fh_engine_turn:base_components(?FHB)), fhb_order()),
      check("Investor base SET+ORDER byte-identical to the Mode-C ten",
            names(fh_engine_turn:base_components(?INV)), investor_order()),
-     check("Foreign-FHB base SET+ORDER byte-identical to the Mode-B seven",
+     check("Foreign-FHB base SET+ORDER byte-identical to the Mode-B ten",
            names(fh_engine_turn:base_components(?FHB_FOREIGN)), foreign_order())].
 
 %% --- 3. DAG walk (firb_required_any=true — the real Mode-D turn) -------------
