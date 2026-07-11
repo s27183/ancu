@@ -31,7 +31,7 @@
         type MoneyRange,
         harvestCashEvents
     } from '$lib/planCard';
-    import { money, moneyRange, asRange } from '$lib/format';
+    import { money, moneyRange, asRange, num } from '$lib/format';
     import Field from './Field.svelte';
     import Chip from './Chip.svelte';
     import NoteList from './NoteList.svelte';
@@ -208,6 +208,24 @@
     const selectedOwner = $derived(selectedEvent ? ownerOf(selectedEvent) : null);
     // The below-table breakdown + summary now live in a modal; show the opener only when
     // there is something to show (honest-partial).
+    // The FLAT summary-totals sibling shape (Mode B's budget_envelope, Modes C/D's
+    // budget_envelope_investor) has none of stamp_duty/deposit/other_buying_costs/
+    // reserve_buffer — found 2026-07-11 via the renderer conformance check: hasBreakdown
+    // was false for these modes even with real figures present (channel_costs_total etc.),
+    // so the whole Detail tab silently rendered Pending. hasSummaryTotals is its own gate
+    // (regulatory_imposts_total/channel_costs_total/family_capacity_available/loan_amount/
+    // lvr/lmi_payable — each field means the same thing regardless of which mode's
+    // resolver produced it, so ONE generic block below covers all three modes at once).
+    const hasSummaryTotals = $derived(
+        !!(
+            o.regulatory_imposts_total != null ||
+            o.channel_costs_total != null ||
+            o.family_capacity_available != null ||
+            o.loan_amount != null ||
+            o.lvr != null ||
+            o.lmi_payable != null
+        )
+    );
     const hasBreakdown = $derived(
         !!(
             o.stamp_duty ||
@@ -217,7 +235,8 @@
             o.max_property_price_supported != null ||
             o.genuine_savings_verdict ||
             o.mitigation_options_if_short?.length ||
-            o.key_assumptions?.length
+            o.key_assumptions?.length ||
+            hasSummaryTotals
         )
     );
 
@@ -306,6 +325,20 @@
     {/if}
 
     <Field label={$t('plan.f.max_price')} value={money(o.max_property_price_supported, $lang)} />
+
+    {#if hasSummaryTotals}
+    <!-- The flat summary-totals shape (Mode B budget_envelope, Mode C/D budget_envelope_
+         investor) — no itemized stamp_duty/deposit/other_buying_costs objects, just these
+         totals. Each Field is independently guarded (honest-partial): a mode only fills
+         the subset that applies to it (Mode B has regulatory/channel/family_capacity; Mode
+         C has loan_amount/lvr/lmi; Mode D has regulatory/channel/loan_amount/lvr). -->
+    <Field label={$t('plan.f.regulatory_imposts')} value={money(o.regulatory_imposts_total, $lang)} />
+    <Field label={$t('plan.f.channel_costs')} value={money(o.channel_costs_total, $lang)} />
+    <Field label={$t('plan.f.family_capacity')} value={money(o.family_capacity_available, $lang)} />
+    <Field label={$t('plan.f.loan_amount')} value={money(o.loan_amount, $lang)} />
+    <Field label={$t('plan.f.lvr')} value={o.lvr != null ? `${num(o.lvr, $lang)}%` : null} />
+    <Field label={$t('plan.f.lmi_payable')} value={money(o.lmi_payable, $lang)} />
+    {/if}
 
     {#if o.genuine_savings_verdict}
         <div class="pp-field">

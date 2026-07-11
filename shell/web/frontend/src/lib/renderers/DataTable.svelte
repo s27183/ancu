@@ -10,6 +10,7 @@
         pick,
         type OngoingObligationsOutcome,
         type TaxOptimisedStructureOutcome,
+        type TaxOptimisedStructureForeignOutcome,
         type PortfolioPositionOutcome,
         type PortfolioPositionForeignOutcome,
         type MortgagePlanOutcome
@@ -27,12 +28,12 @@
     } = $props();
     const o = $derived(outcome as OngoingObligationsOutcome);
 
-    // `data-table` is named by SIX unrelated outcome shapes (2026-07-11 audit added three
-    // — mortgage_plan/portfolio_position_foreign/preparation_plan — beyond the original
-    // three below). Shape-discriminate so each rich producer isn't dropped (the Slice-4
-    // Checklist lesson): tax_structure → tax_optimised_structure (the investor tax cluster
-    // + the NG reform note); ownership_planning_investor → portfolio_position (below); else
-    // the FHB ownership ongoing_obligations view.
+    // `data-table` is named by SEVEN unrelated outcome shapes (2026-07-11 audit added three
+    // — mortgage_plan/portfolio_position_foreign/preparation_plan — then a fourth on a second
+    // pass the same day, below). Shape-discriminate so each rich producer isn't dropped (the
+    // Slice-4 Checklist lesson): tax_structure → tax_optimised_structure (the investor tax
+    // cluster + the NG reform note); ownership_planning_investor → portfolio_position (below);
+    // else the FHB ownership ongoing_obligations view.
     const isTax = $derived('cgt_discount_eligible' in outcome && 'recommended_entity' in outcome);
     const tx = $derived(outcome as TaxOptimisedStructureOutcome);
     // The reform note (the headline of this view) is the engine's bilingual {vi,en}; never recomputed.
@@ -50,6 +51,27 @@
     });
     const marginalRate = $derived(tx.cgt_marginal_rate != null ? `${num(tx.cgt_marginal_rate, $lang)}%` : null);
     const afterTaxCf = $derived(moneyRange(tx.after_tax_cash_flow_year_1, $lang));
+
+    // tax_structure_non_resident (Mode D) — the SEVENTH shape, found 2026-07-11 auditing a
+    // live investor-foreign-au card: it shares tax_optimised_structure's type name AND both
+    // of isTax's discriminator fields (cgt_discount_eligible, recommended_entity), so isTax
+    // fires true for this shape too — but the rest of Mode C's field names don't exist here
+    // (negative_gearing_active → negative_gearing_available_against_au_income; no
+    // after_tax_cash_flow_year_1 at all, per the blueprint's own outcome schema). Without
+    // this, the branch above silently rendered Pending for gearing/cash-flow instead of this
+    // shape's real fields. Checked BEFORE isTax in the template (more specific first);
+    // rental_withholding_rate is unique to Mode D (absent from Mode C's schema).
+    const isTaxForeign = $derived('rental_withholding_rate' in outcome);
+    const txf = $derived(outcome as TaxOptimisedStructureForeignOutcome);
+    const txfEntityLabel = $derived.by(() => {
+        const e = txf.recommended_entity;
+        if (!e) return $t('plan.tx.entity_pending');
+        return ENTITY.has(e) ? $t(`plan.entity.${e}` as 'plan.entity.personal_sole') : e;
+    });
+    const txfMarginalRate = $derived(txf.cgt_marginal_rate != null ? `${num(txf.cgt_marginal_rate, $lang)}%` : null);
+    const txfWithholdingRate = $derived(
+        txf.rental_withholding_rate != null ? `${num(txf.rental_withholding_rate, $lang)}%` : null
+    );
 
     // The third shape on `data-table`: ownership_planning_investor → portfolio_position (the
     // hold/operate view). Discriminate on annual_tax_obligations (unique to this shape) so the
@@ -190,7 +212,46 @@
     );
 </script>
 
-{#if isTax}
+{#if isTaxForeign}
+<!-- ── tax_structure_non_resident (tax_optimised_structure, Mode D) ─────── -->
+<Field label={$t('plan.tx.entity')} value={txfEntityLabel} />
+<div class="pp-field">
+    <span class="pp-label">{$t('plan.tx.gearing')}</span>
+    {#if txf.negative_gearing_available_against_au_income === true}
+        <Chip label={$t('plan.tx.geared_negative')} tone="info" />
+    {:else if txf.negative_gearing_available_against_au_income === false}
+        <Chip label={$t('plan.tx.geared_not_available')} tone="neutral" />
+    {:else}
+        <Pending />
+    {/if}
+</div>
+<Field label={$t('plan.tx.marginal_rate')} value={txfMarginalRate} />
+<Field label={$t('plan.tx.withholding_rate')} value={txfWithholdingRate} />
+<Field label={$t('plan.tx.annual_tax_payable')} value={money(txf.annual_au_tax_payable_on_rental, $lang)} />
+<Field label={$t('plan.tx.annual_depreciation')} value={money(txf.annual_depreciation_year_1, $lang)} />
+<Field label={$t('plan.tx.annual_compliance_cost')} value={money(txf.annual_compliance_cost_au, $lang)} />
+<div class="pp-chips-row">
+    {#if typeof txf.ppor_exemption_eligible === 'boolean'}
+        <Chip
+            label={`${$t('plan.tx.ppor_exemption')} ${txf.ppor_exemption_eligible ? $t('onboarding.yes') : $t('onboarding.no')}`}
+            tone={txf.ppor_exemption_eligible ? 'good' : 'neutral'}
+        />
+    {/if}
+    {#if typeof txf.frcgw_applicable === 'boolean'}
+        <Chip
+            label={`${$t('plan.tx.frcgw_applicable')} ${txf.frcgw_applicable ? $t('onboarding.yes') : $t('onboarding.no')}`}
+            tone={txf.frcgw_applicable ? 'warn' : 'neutral'}
+        />
+    {/if}
+    {#if typeof txf.vn_tax_treaty_relief_applicable === 'boolean'}
+        <Chip
+            label={`${$t('plan.tx.vn_treaty_relief')} ${txf.vn_tax_treaty_relief_applicable ? $t('onboarding.yes') : $t('onboarding.no')}`}
+            tone={txf.vn_tax_treaty_relief_applicable ? 'good' : 'neutral'}
+        />
+    {/if}
+</div>
+
+{:else if isTax}
 <!-- ── tax_structure (tax_optimised_structure) ────────────────────────── -->
 {#if reformNote}
     <div class="tx-reform">
@@ -254,8 +315,17 @@
         {#if structureType}<Chip label={iovspiLabel(structureType) ?? structureType} tone="info" />{/if}
     </div>
 {/if}
-<Field label={$t('plan.f.loan_rate_type')} value={rateLabel(loanStructure?.rate)} />
-<Field label={$t('plan.f.loan_offset')} value={offsetLabel(loanStructure?.offset)} />
+{#if loanStructure}
+<!-- loan_structure_recommendation/recommended_loan_structure (Mode A/B/C only) — Mode D
+     (investor-foreign-au) has NO loan-structure-scaffold or offset concept at all (its
+     blueprint: "no offset-strategy or PPOR-equity leaves... Mode D has no AU PPOR to point
+     an offset at"), so loanStructure is null there. Found 2026-07-11: these two Fields
+     rendered unconditionally, showing "Chưa có" for a mode where the field will NEVER
+     exist — honest-partial (Pending) is for a value not yet known, not for a concept that
+     doesn't apply; the fix is to not render the row at all, gated on the scaffold's presence. -->
+<Field label={$t('plan.f.loan_rate_type')} value={rateLabel(loanStructure.rate)} />
+<Field label={$t('plan.f.loan_offset')} value={offsetLabel(loanStructure.offset)} />
+{/if}
 {#if loanStructure && 'currency' in loanStructure}
     <Field label={$t('plan.f.loan_currency')} value={loanStructure.currency ?? null} />
 {/if}
@@ -290,7 +360,11 @@
     <Field label={$t('plan.f.rate_estimate')} value={rateEstimateLabel} />
 {/if}
 <Field label={$t('plan.f.io_vs_pi')} value={iovspiLabel(mp.io_vs_pi_recommendation)} />
+{#if 'offset_strategy_recommendation' in outcome}
+<!-- Mode C only (offset_strategy_recommendation) — same "doesn't apply, don't render"
+     call as loanStructure above; Mode D has no offset concept at all. -->
 <Field label={$t('plan.f.offset_strategy')} value={offsetLabel(mp.offset_strategy_recommendation)} />
+{/if}
 {#if 'fixed_vs_variable' in outcome}
     <Field label={$t('plan.f.fixed_vs_variable')} value={rateLabel(mp.fixed_vs_variable)} />
 {/if}

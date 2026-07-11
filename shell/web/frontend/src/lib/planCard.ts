@@ -230,6 +230,20 @@ export interface BudgetEnvelopeOutcome {
     genuine_savings_verdict?: string | null;
     mitigation_options_if_short?: string[] | null;
     key_assumptions?: LocalizedText[] | null;
+    // The FLAT summary-totals sibling shape (Mode B's `budget_envelope` and Modes C/D's
+    // `budget_envelope_investor` — SAME outcome type names as the itemized fields above,
+    // but NONE of stamp_duty/deposit/other_buying_costs/reserve_buffer: found 2026-07-11,
+    // the renderer conformance check showed these never appearing anywhere in the shell for
+    // 3 of the 5 blueprints. regulatory_imposts_total/channel_costs_total replace the
+    // itemized breakdown with one FIRB+surcharge total and one everything-else total
+    // (Mode B/D); family_capacity_available is Mode B's HAVE side (vs cash_available for
+    // Mode A/E); loan_amount/lvr/lmi_payable are Modes C/D's loan-sizing figures.
+    regulatory_imposts_total?: number | null;
+    channel_costs_total?: number | null;
+    family_capacity_available?: number | null;
+    loan_amount?: number | null;
+    lvr?: number | null;
+    lmi_payable?: number | null;
 }
 
 /** yield_modelling → calculator (outcome type `cash_flow_projection`, Mode C/D). All
@@ -319,6 +333,27 @@ export interface TaxOptimisedStructureOutcome {
     annual_compliance_cost?: number | null;
     setup_costs?: number | null;
     negative_gearing_reform_note?: LocalizedText | null;
+}
+
+/** tax_structure_non_resident → data-table (SAME outcome type `tax_optimised_structure`,
+ *  a DIFFERENT field set — Mode D's non-resident-investor tax cluster: FRCGW/PPOR-exemption
+ *  determinants disposition reads, no discount for foreign residents, VN treaty relief.
+ *  Found 2026-07-11: DataTable's isTax branch read only TaxOptimisedStructureOutcome's Mode-C
+ *  field names (negative_gearing_active/after_tax_cash_flow_year_1), neither of which exists
+ *  on this shape — real content (gearing status, marginal rate is shared, compliance cost)
+ *  silently rendered as Pending. */
+export interface TaxOptimisedStructureForeignOutcome {
+    recommended_entity?: string | null;
+    rental_withholding_rate?: number | null;
+    annual_au_tax_payable_on_rental?: number | null;
+    negative_gearing_available_against_au_income?: boolean | null;
+    annual_depreciation_year_1?: number | null;
+    cgt_discount_eligible?: boolean | null;
+    ppor_exemption_eligible?: boolean | null;
+    cgt_marginal_rate?: number | null;
+    frcgw_applicable?: boolean | null;
+    vn_tax_treaty_relief_applicable?: boolean | null;
+    annual_compliance_cost_au?: number | null;
 }
 
 export interface StatutoryBand {
