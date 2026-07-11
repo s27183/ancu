@@ -74,36 +74,20 @@
     // (there is deliberately no plan.ltab.qa label — qa uses plan.tab.qa).
     const railTabs = $derived(uiTabs.filter((t) => t.kind !== 'qa'));
 
-    // Sub-tab rail grouping (2026-07-09, Son's request): investor-foreign-au.md alone
-    // declares 9 rail tabs (10 incl. Q&A) — one flat scrollable pill row at that count
-    // reads as clutter, not navigation. Modes A/E (2 rail tabs: flow, budget) don't have
-    // this problem, so grouping only kicks in past RAIL_GROUP_THRESHOLD — an ungrouped
-    // mode's rail renders byte-for-byte the original flat row. `overview` and `qa` are
-    // never grouped (always-visible anchors); everything else buckets into the coarse
-    // halves of this project's buy→hold→sell mental model (see the swimlane's own
-    // finer-grained `plan.phase.*` labels below for the 6-step version this coarsens).
-    // Grounded in each blueprint's own component semantics — tab_ids are shared
-    // vocabulary across blueprints, not per-mode, so one static map covers all of them:
-    //  - buy (pre-purchase decision/execution): flow, family_view, firb_funding,
-    //    journey (settlement_prep), property (assessment+due-diligence), buying,
-    //    investment_strategy (deciding overall strategy shapes WHICH property to
-    //    pursue — both investor blueprints order it right after overview, upstream of
-    //    firb/property/buying).
-    //  - hold (post-purchase / ongoing): budget, cash_calculator, after_you_buy,
-    //    yield_tax, portfolio.
+    // Sub-tab rail grouping (2026-07-09, Son's request), updated 2026-07-11 once Mode B's
+    // task-13 rewrite retired the last blueprint on the pre-restructure flat tab vocabulary
+    // (plan-card-lifecycle-restoration.md §11.3) — every in-scope blueprint now declares at
+    // most 5 rail tabs (overview/flow/budget/[portfolio|family]/qa), under RAIL_GROUP_THRESHOLD,
+    // so grouping is currently dormant everywhere; kept as a static map (not deleted) since a
+    // future blueprint growing past the threshold again just needs an entry added here.
+    // `overview` and `qa` are never grouped (always-visible anchors); everything else buckets
+    // into the coarse halves of this project's buy→hold→sell mental model (see the swimlane's
+    // own finer-grained `plan.phase.*` labels below for the 6-step version this coarsens).
     // An unmapped future tab_id defaults into 'buy' rather than silently vanishing.
     const TAB_GROUP: Record<string, 'buy' | 'hold'> = {
         flow: 'buy',
-        family_view: 'buy',
-        firb_funding: 'buy',
-        journey: 'buy',
-        property: 'buy',
-        buying: 'buy',
-        investment_strategy: 'buy',
+        family: 'buy',
         budget: 'hold',
-        cash_calculator: 'hold',
-        after_you_buy: 'hold',
-        yield_tax: 'hold',
         portfolio: 'hold'
     };
     const RAIL_GROUP_THRESHOLD = 5;

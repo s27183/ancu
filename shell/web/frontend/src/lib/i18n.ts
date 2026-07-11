@@ -183,23 +183,18 @@ const messages = {
     'plan.tab.ownership_planning': { vi: 'Sở hữu', en: 'Owning' },
     'plan.tab.qa': { vi: 'Hỏi đáp', en: 'Q&A' },
     // Lifecycle tab labels — the blueprint-declared spine (plan-card-lifecycle-restoration.md
-    // §3.2). The full mode-general vocabulary (Mode A renders a 6-tab subset; B/C/D tabs are
-    // present for when those blueprints come in scope).
+    // §11.3). Every in-scope blueprint now shares this five-view shape: overview/flow/budget/qa
+    // (all five modes) plus one state-shaped view — portfolio (C/D) or family (B, always-on;
+    // D's own Family layer is opt-in, not blueprint-declared). Mode B's task-13 rewrite (2026-07-11)
+    // retired the last blueprint on the pre-restructure flat vocabulary, so the legacy tab_ids
+    // this comment used to list (family_view, investment_strategy, firb_funding, before_you_buy,
+    // yield_tax, cash_calculator, journey, property, buying, after_you_buy) are now dead — see
+    // git history if reviving a pre-restructure card shape is ever needed.
     'plan.ltab.overview': { vi: 'Tổng quan', en: 'Overview' },
-    // Mode-A three-view spine: Flow (legal/temporal journey) + Budget (financial spine).
     'plan.ltab.flow': { vi: 'Hành trình', en: 'Flow' },
     'plan.ltab.budget': { vi: 'Ngân sách', en: 'Budget' },
-    'plan.ltab.family_view': { vi: 'Gia đình', en: 'Family view' },
-    'plan.ltab.investment_strategy': { vi: 'Chiến lược đầu tư', en: 'Investment strategy' },
-    'plan.ltab.firb_funding': { vi: 'FIRB & Chuyển tiền', en: 'FIRB & Funding' },
-    'plan.ltab.before_you_buy': { vi: 'Trước khi mua', en: 'Before you buy' },
-    'plan.ltab.yield_tax': { vi: 'Lợi suất & Thuế', en: 'Yield & Tax' },
-    'plan.ltab.cash_calculator': { vi: 'Tính tiền mặt', en: 'Cash calculator' },
-    'plan.ltab.journey': { vi: 'Hành trình', en: 'Journey' },
-    'plan.ltab.property': { vi: 'Bất động sản', en: 'Property' },
-    'plan.ltab.buying': { vi: 'Ra giá & Mua', en: 'Buying' },
-    'plan.ltab.after_you_buy': { vi: 'Sau khi mua', en: 'After you buy' },
     'plan.ltab.portfolio': { vi: 'Danh mục', en: 'Portfolio' },
+    'plan.ltab.family': { vi: 'Gia đình', en: 'Family' },
     // Rail group toggle (2026-07-09) — the coarse buy/hold halves shown above a
     // grouped rail (PlanProjection.svelte TAB_GROUP), distinct from the swimlane's
     // finer plan.phase.* labels below.

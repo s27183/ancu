@@ -892,3 +892,66 @@ restructure lands, mode by mode per §11.5 — not worth a standalone patch to a
   - **Next: task 13**, Mode B `ui_tabs` rewrite to the five-view spine (Overview/Flow/Budget/
     Family/Q&A) + shell restructure — folding `firb_workflow`/`cross_border_funding` into Flow
     phases + Budget rows, the same placement test Modes C/D's tasks 5/9 already proved.
+
+- **Task 13 (Mode B `ui_tabs` rewrite + shell restructure) done 2026-07-11.** Applied §11.2's
+  placement test to Mode B exactly as tasks 5/9 applied it to C/D: `firb_workflow` phase-shaped
+  (gate) → Flow phase + Budget fee row (dual placement, mirroring `eligibility` in Mode A);
+  `cross_border_funding` → Flow milestone + Budget row; `family_context` state-shaped, no
+  completion point → its own **Family** view — the same treatment Portfolio gets in C/D, but
+  **always-on** (not opt-in like Mode D's Family layer) since Mode B's entry assumption IS a
+  cross-border family purchase. `property_assessment`/`buying_strategy`/`due_diligence`/
+  `settlement_prep`/`ownership_planning` dropped from the tab list entirely, reached only via
+  `phase_playbook.actions[].component_ref` — confirmed against task 12's own authored
+  `fhb-foreign-phase-actions.md`, which already `component_ref`s all four.
+  - **One placement question that isn't free: does `family_context` also headline in Overview,
+    like Mode A's `eligibility` double-places into Overview+Flow?** Checked the precedent
+    directly rather than assuming symmetry: Mode C/D's `ownership_planning_investor`/`_foreign`
+    (the other state-shaped, own-tab concept) does **not** appear in either mode's `overview.
+    components` — Portfolio is reached only via its own tab, never duplicated into the synthesis
+    read. Mode B's `family_context` gets the same treatment for consistency: Overview lists
+    `buyer_profile`, `firb_workflow`, `mortgage_finance`, `cash_position` only (mirroring Mode D's
+    overview minus `investment_strategy`, which Mode B has no equivalent of) — no `family_context`
+    tile. The asymmetry with `eligibility` isn't a contradiction: `eligibility` is phase-shaped
+    (folds into Flow *and* headlines in Overview), while `family_context`/`ownership_planning_*`
+    are state-shaped (own tab only) — different §11.2 category, different placement rule.
+  - **`ownership_planning`'s obligations don't become a Budget row**, unlike `firb_workflow`'s fee
+    and `cross_border_funding`'s transfer cost. Checked against Mode A's own precedent first:
+    Mode A's `ownership_planning` is *also* absent from Budget (backing detail only, reached via
+    the Own phase's `phase_playbook` actions) — Budget rows are for pre-settlement acquisition
+    cash-events, not post-settlement recurring obligations, in every mode including A. Mode B
+    follows the same rule; its `recurring_costs_estimate` honest-partial gap (task 12) narrates
+    through the Own phase's actions rather than surfacing as a missing Budget row.
+  - **Shell: traced the actual render mechanism instead of assuming new code was needed** (task
+    9's own lesson, reapplied). `PlanProjection.svelte` dispatches purely on `ui_tabs[].kind`, and
+    `ComponentCard.svelte` already dispatches `family-view-card` generically — both were wired
+    for Mode B's Family surface back when it lived on the stale `family_view` tab_id, so
+    renaming the tab_id to `family` needed zero renderer code. `OverviewCard.svelte` already
+    reads `components.firb_workflow?.outcome` presence-gated off the full components map (task
+    9), not off `activeTab.components` — so it already rendered the FIRB tile correctly even
+    before this task's Overview declaration formally added `firb_workflow` to it. The Budget
+    tab's "Full horizon" 4th sub-tab is gated on `components.disposition` presence (not a mode
+    check) — task 11 already added `disposition` for Mode B, so it activates for free.
+  - **One real cleanup found and made, not scope creep**: `PlanProjection.svelte`'s `TAB_GROUP`
+    map and `i18n.ts`'s `plan.ltab.*` block still carried the full pre-restructure flat
+    vocabulary (`family_view`, `firb_funding`, `journey`, `property`, `buying`, `after_you_buy`,
+    `cash_calculator`, `yield_tax`, `investment_strategy`, `before_you_buy`) as a comment-
+    documented "mode-general" set — stale since tasks 5/9 already moved C/D onto `flow`/`budget`/
+    `portfolio`/`qa` without anyone touching this file. Mode B's rewrite makes fhb-foreign-au.md
+    the last blueprint off the legacy vocabulary, so every one of those tab_ids is now dead
+    repo-wide (grepped `docs/blueprints/*.md` to confirm zero remaining declarations before
+    removing). Trimmed both to the five real tab_ids in use (`overview`/`flow`/`budget`/
+    `portfolio`/`family`/`qa`) rather than leave a misleading comment next to the exact code this
+    task was editing anyway.
+  - Verification: `python3 engine/build/kb_compiler.py` — GATE 9 (ui_tabs reference-integrity)
+    passed, `PASS` overall; inspected the emitted artifact directly — `ui_tabs=["overview",
+    "flow", "budget", "family", "qa"]` with the exact component lists declared. `svelte-check`:
+    0 errors, 0 warnings.
+  - Files: `docs/blueprints/fhb-foreign-au.md` (UI tab mapping table + `ui_tabs` jsonc block
+    rewritten), `shell/web/frontend/src/lib/i18n.ts` (`plan.ltab.*` trimmed to 5 live keys, added
+    `plan.ltab.family`), `shell/web/frontend/src/lib/PlanProjection.svelte` (`TAB_GROUP` trimmed
+    to 4 live entries, added `family: 'buy'`).
+  - **Next: task 14**, Mode B conformance + live seam-smoke verification — the same closing pass
+    tasks 7/10 already ran for C/D, plus fixing the two stale cross-mode mirror fixtures flagged
+    in task 12 (`base_components_foreign_investor_conformance.escript`,
+    `base_components_nexthome_conformance.escript`, and `mode_b_seam_smoke.escript`'s
+    `expected_sequence()`).

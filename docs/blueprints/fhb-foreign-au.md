@@ -131,34 +131,26 @@ The base plan for Mode B captures the most regulatory complexity even before a s
 > `purchase_journey`/`phase_playbook` are numbered `[11]`/`[12]`/`[13]` continuing this diagram's
 > own numbering, not the 14-row scope table above.
 
-**UI tab mapping** — the 10 components are presented across additional UI tabs that activate for Mode B:
+**UI tab mapping** — the fourteen components surface through **four top-level views + a Q&A tab** ([`../architecture/plan-card-lifecycle-restoration.md`](../architecture/plan-card-lifecycle-restoration.md) §11.3), not the earlier flat eight-tab rail. Applying §11.2's placement test to Mode B: `firb_workflow` is phase-shaped (a literal gate between Pre-approve and Contract) → its approval-state narrative folds into a Flow phase, while its **fee** is money-shaped → also a Budget row (same dual placement `eligibility` gets in Mode A's Overview+Flow). `cross_border_funding` is §3.3's own "currency-transfer milestone" → Flow milestone + Budget row (FX/transfer cost). `family_context` is state-shaped with no completion point (persists across the whole plan — who contributes how much from where, decision authority) → earns its own **Family** view, the same treatment Portfolio gets in Modes C/D, and unlike Mode D's opt-in Family layer this one is **always on** (Mode B's entry assumption is a cross-border family purchase, not solo). `property_assessment`, `buying_strategy`, `due_diligence`, `settlement_prep`, `ownership_planning` are per-property or phase-recurring and reached as backing detail via `phase_playbook.actions[].component_ref`, not as tabs — `ownership_planning`'s vacancy-fee/non-resident-tax obligations narrate through the Own phase's actions rather than a standalone tab or Budget row (its `recurring_costs_estimate` is an honest-partial gap at base, per task 12).
 
-| UI tab | Components rendered | Notes |
-|---|---|---|
-| Overview | `buyer_profile` + `family_context` + `property_assessment` (summaries) | Bilingual headline |
-| **Family view ★ (NEW for Mode B)** | `family_context` (central) — parent + child shared dashboard | Bilingual |
-| **FIRB & Funding ★ (NEW for Mode B)** | `firb_workflow` + `cross_border_funding` | State machines + checklists |
-| Property | `property_assessment` + `due_diligence` | New-build filter active |
-| Cash calculator | `cash_position` (interactive form) | Foreign-buyer surcharge + FIRB fee + FX |
-| Buying | `buying_strategy` | FIRB-approval gate enforced |
-| Temporal flow | `settlement_prep` | Includes FIRB + transfer milestones |
-| After you buy | `ownership_planning` | Vacancy fee + non-resident tax |
+| # | View | `kind` | What it shows |
+|---|---|---|---|
+| 1 | Overview | `synthesis` | "what this is" + aggregated read of `buyer_profile` + `firb_workflow` (the FIRB gate headline — same treatment Mode A gives `eligibility`) + `mortgage_finance` + `cash_position` |
+| 2 | Flow | `flow` | the legal/temporal spine — `purchase_journey` (swimlane, Prepare → … → Own → **Dispose**, FIRB gate + transfer milestone narrated across Pre-approve→Contract→Settle) as navigation; each phase opens a sheet = swimlane slice + `phase_playbook` actions (ordered, budget-linked — including `firb_workflow`'s application/approval steps and `cross_border_funding`'s transfer steps) + `phase_playbook` risks; `settlement_prep` enriches the Settle phase per-property |
+| 3 | Budget | `components` (interactive) | the financial spine — `cash_position` as the phased acquisition cash-flow + what-if cockpit (deposit, stamp duty + foreign-buyer surcharge, FIRB fee); `firb_workflow`'s fee as its own row; `cross_border_funding`'s FX/transfer cost as its own row; `disposition` as the dispose-phase figure owner; each cash-event row drills to its `source_component` |
+| 4 | Family | `components` | `family_context` — the parent + child cross-border funding dashboard; the only Mode-B concept that's state-shaped with no completion point, so it doesn't fold into Flow or Budget |
+| 5 | Q&A | `qa` | bilingual planning-agent chat (a shell surface over the engine Q&A stream — not a `component_filled`) |
 
-Mode B activates two new surfaces (Family view, FIRB & Funding) that don't appear in Mode A. The remaining tabs map similarly but with foreign-person-aware content.
-
-**Machine-readable form** — compiled to `ui_tabs` in the artifact, **canonical for the runtime** (the table above is the human view). `fhb-foreign-au` is already `in_scope_blueprint()` — **this block is stale, not dormant**: it's the pre-restructure flat vocabulary (`plan-card-lifecycle-restoration.md` §3.2, superseded). The resolved target (§11, 2026-07-10) is a five-view spine — Overview/Flow/Budget/**Family**/Q&A — with `purchase_journey` becoming base-scope (currently missing entirely) and `firb_workflow`/`cross_border_funding` folding into Flow phases/milestones + Budget rows rather than their own tabs. Not yet rewritten to match; tracked in [`../architecture/wedge-build-sequence.md`](../architecture/wedge-build-sequence.md) "B/C/D lifecycle-spine restructure."
+**Machine-readable form** — compiled to `ui_tabs` in the artifact, **canonical for the runtime** (the table above is the human view). Rewritten 2026-07-11 (task 13, `plan-card-lifecycle-restoration.md` §11.5) from the stale pre-restructure flat eight-tab rail to this five-view spine, mirroring [`investor-foreign-au.md`](investor-foreign-au.md)'s `overview`/`flow`/`budget`/`family`/`qa` shape (Family replacing Portfolio as the state-shaped view — Mode B has no portfolio concept, Mode D has no default family concept).
 
 ```jsonc
 {
   "ui_tabs": [
-    { "tab_id": "overview",            "kind": "synthesis",  "components": ["buyer_profile", "family_context", "property_assessment"] },
-    { "tab_id": "family_view",         "kind": "components", "components": ["family_context"], "note": "Mode B central surface; bilingual" },
-    { "tab_id": "firb_funding",        "kind": "components", "components": ["firb_workflow", "cross_border_funding"] },
-    { "tab_id": "cash_calculator",     "kind": "components", "interactive": true, "components": ["cash_position"] },
-    { "tab_id": "journey",             "kind": "components", "components": ["settlement_prep"] },
-    { "tab_id": "property",            "kind": "components", "components": ["property_assessment", "due_diligence"] },
-    { "tab_id": "buying",              "kind": "components", "components": ["buying_strategy"] },
-    { "tab_id": "after_you_buy",       "kind": "components", "components": ["ownership_planning"] }
+    { "tab_id": "overview", "kind": "synthesis",  "components": ["buyer_profile", "firb_workflow", "mortgage_finance", "cash_position"] },
+    { "tab_id": "flow",     "kind": "flow",        "components": ["purchase_journey", "phase_playbook", "settlement_prep"] },
+    { "tab_id": "budget",   "kind": "components", "interactive": true, "components": ["cash_position", "firb_workflow", "cross_border_funding", "disposition"] },
+    { "tab_id": "family",   "kind": "components", "components": ["family_context"], "note": "Mode B central surface; bilingual; always-on (unlike Mode D's opt-in Family layer)" },
+    { "tab_id": "qa",       "kind": "qa",          "components": [] }
   ]
 }
 ```
