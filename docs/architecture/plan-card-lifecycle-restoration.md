@@ -818,4 +818,77 @@ restructure lands, mode by mode per §11.5 — not worth a standalone patch to a
     that's task 13), `base_components_foreign_conformance.escript`,
     `buyer_profile_foreign_conformance.escript`, `base_components_foreign_investor_conformance.
     escript`, `base_components_nexthome_conformance.escript`, `mode_b_seam_smoke.escript`.
-  - **Next: task 12**, Mode B journey/phase_playbook KB + engine wiring.
+
+- **Task 12 (Mode B journey/phase_playbook KB + engine wiring) done 2026-07-11.** Mirrors Mode
+  D's task-8 shape, not Mode C's: three new bilingual copy docs — `kb.journey.fhb-foreign-path`
+  (the swimlane), `kb.journey.fhb-foreign-phase-actions` (the per-phase checklist),
+  `kb.risks.fhb-foreign-by-phase` (the per-phase risk-flag-list) — layering §3.3's FIRB gate +
+  cross-border transfer milestone + surcharge onto **Mode A's own four-actor phase/actor
+  skeleton**, not Mode C/D's six-actor investor set (Mode B is an owner-occupier FHB by mode
+  definition; the same call task 11 already made for `disposition`'s `intended_occupancy_use`).
+  One design call made and grounded, not defaulted:
+  - **Reuses Mode A's four actors unchanged — no seventh row, and no `services` rename.** This
+    is forced, not a preference: `fh_engine_disposition:fill/2` already dispatches Mode B onto
+    `fill_owner_occupier/2` (the same function Mode A uses), which — after task 15's fix — passes
+    counterparty `<<"other">>` for the dispose money cells, not Mode C/D's `<<"services">>`. A
+    six-actor swimlane would silently drop those cells (task 10's own counterparty bug, now
+    understood well enough to avoid reintroducing it in a new mode). The cross-border transfer
+    provider narrates as `other`/services cells, the same placement Mode D's six-actor doc uses
+    for the same reason (a service engaged once, not a recurring-relationship actor).
+  - **`firb_fee`'s cash_event phase is `contract`, not `settle`** — grounded in
+    `kb.firb.application-process` ("Pay the application fee ... the 30-day statutory decision
+    clock does not start until the correct fee is paid in full"): the fee is paid at application
+    lodgement, which happens at or shortly after exchange, well before settlement. This is a real
+    grounded call, not a guess — it also matches `kb.journey.fhb-foreign-phase-actions`' own
+    `submit_firb_application` action, placed at `contract`.
+  - **Engine wiring needed one real (not stub) `cash_events` builder**, unlike Mode D's honest
+    `cash_events => []` stub for `fill_investor_foreign/2`. Mode D's cash_position is
+    permanently null pre-property (no per-property branch built yet), so a real event-builder
+    there would be dead code. Mode B's `fill_fhb_foreign/2` is different: its ceiling-estimate
+    convention (documented in the function's own pre-existing header comment) means
+    `Deposit`/`DutyAfter`/`Surcharge`/`FirbFee`/`ChannelCosts` are ALL honestly computable from
+    `profile.target_price_range` alone, with no property attached — so `cash_events_foreign/5`
+    (new, `fh_engine_cash.erl`) is live money from base onward, not a placeholder. Two new
+    bilingual copy keys added to `kb.copy.cash` (`event_firb_fee`, `event_foreign_buyer_surcharge`);
+    `event_deposit`/`event_stamp_duty`/`event_other_costs` reused unchanged (already
+    mode-neutral wording). `purchase_journey`/`phase_playbook` themselves needed zero new
+    resolver code beyond their own Mode-B dispatch branch + prose (`fh_engine_journey:
+    fill_fhb_foreign/1` reuses Mode A's `phases/0`/`actors/0`/`rendered_phases/1`/`money_cells/2`
+    verbatim; `fh_engine_phase_playbook`'s dispatch is a one-line case clause addition).
+  - **One more honest gap surfaced and disclosed, not silently absorbed**: Mode B's foreign-person
+    `ownership_planning` outcome (built around FIRB vacancy-fee/alert monitoring) carries no
+    `recurring_costs_estimate.statutory_band` the way Mode A's does — the same field task 11
+    already found missing for `disposition`'s `full_horizon_net_position`. `purchase_journey`'s
+    `own_recurring_cells/1` is reused unchanged; it simply emits no Own-phase recurring cell for
+    Mode B (honest-partial — the shared builder already handles an absent band by emitting `[]`,
+    no Mode-B-specific code needed), documented in the blueprint's own component-13 note rather
+    than left as an unexplained silent gap.
+  - `?BASE_COMPONENTS_FOREIGN` extended 8 → 10 components, appended at the end (both new
+    components read only components already earlier in the list — `cash_position`,
+    `ownership_planning`, `disposition` — so no reordering needed, the same "figure-owners, then
+    the spine that places them" DAG shape every other mode uses).
+  - **Verified:** `kb_compiler.py` recompiled clean (`fhb-foreign-au: dag={"components": 13}` —
+    the 13-line dependency-graph section, `mortgage_finance` still the one pre-existing omission
+    flagged since task 11, unrelated), artifact inspected directly —
+    `purchase_journey → outcome_type: journey_swimlane`, `phase_playbook → outcome_type:
+    phase_playbook` (neither null), 14 components total. A quick sanity pass (learned from tasks
+    4/8, not the full sweep — that's task 14): `base_components_foreign_conformance.escript`'s
+    every per-component registry check + every real-code-dependency DAG-order check passes
+    (including the new `purchase_journey`/`phase_playbook` validate-vs-registry checks); its own
+    SET+ORDER fixture now fails as **expected** (still asserts the pre-task-12 eight-component
+    list — the same fixture-staleness class tasks 7/10 already fixed for their modes) — predicted
+    to recur in the two cross-mode mirror fixtures
+    (`base_components_foreign_investor_conformance.escript`,
+    `base_components_nexthome_conformance.escript`) and `mode_b_seam_smoke.escript`'s
+    `expected_sequence()`; task 14 owns fixing all of it, not patched ad hoc here.
+  - Files: `fh_engine_cash.erl` (`cash_events_foreign/5` + the `cash_events` field on
+    `fill_fhb_foreign/2`'s Outcome), `fh_engine_journey.erl` (`fill_fhb_foreign/1` + the Mode-B
+    prose builders), `fh_engine_phase_playbook.erl` (the Mode-B dispatch clause), `fh_engine_turn.
+    erl` (`?BASE_COMPONENTS_FOREIGN` extended), `docs/blueprints/fhb-foreign-au.md` (components
+    13/14 + `cash_events` on component 6's schema + scope table + ASCII diagram + KB anchor index
+    + renderer table + dependency graph — `ui_tabs` deliberately NOT touched, that's task 13),
+    `docs/kb/journey/fhb-foreign-path.md`, `docs/kb/journey/fhb-foreign-phase-actions.md`,
+    `docs/kb/risks/fhb-foreign-by-phase.md` (new), `docs/kb/copy/cash.md` (+2 copy keys).
+  - **Next: task 13**, Mode B `ui_tabs` rewrite to the five-view spine (Overview/Flow/Budget/
+    Family/Q&A) + shell restructure — folding `firb_workflow`/`cross_border_funding` into Flow
+    phases + Budget rows, the same placement test Modes C/D's tasks 5/9 already proved.

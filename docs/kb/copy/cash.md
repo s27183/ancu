@@ -15,7 +15,10 @@ the Mode-B foreign-person `key_assumptions` (`assume_*_foreign` — no first-hom
 concession, FX not yet included, the no-LMI base convention), and the `cash_events`
 spine labels (`event_*` — two-spines §2; param-free, since the figure rides in the
 event's `amount`, not interpolated into prose — `event_lmi` added 2026-07-10 for Mode
-C's investor acquire-phase spine, `cash_events_investor/4`). Each template is a `{vi, en}` pair with
+C's investor acquire-phase spine, `cash_events_investor/4`; `event_firb_fee` /
+`event_foreign_buyer_surcharge` added 2026-07-11 for Mode B's own acquisition spine,
+`cash_events_foreign/5` — `event_deposit`/`event_stamp_duty`/`event_other_costs` are
+reused unchanged, no mode-specific wording needed). Each template is a `{vi, en}` pair with
 `{param}` placeholders the resolver fills via `fh_engine_i18n:subst/2`.
 
 Params here are all **scalars** (same in both languages, per the figure/locale boundary,
@@ -109,6 +112,14 @@ template ids the resolver references, each a `{vi, en}` pair.
     "event_lmi": {
       "vi": "Bảo hiểm khoản vay (LMI) khi hoàn tất giao dịch",
       "en": "Lenders mortgage insurance (LMI) at settlement"
+    },
+    "event_firb_fee": {
+      "vi": "Phí FIRB khi nộp hồ sơ",
+      "en": "FIRB application fee at lodgement"
+    },
+    "event_foreign_buyer_surcharge": {
+      "vi": "Phụ phí người mua nước ngoài khi hoàn tất giao dịch",
+      "en": "Foreign-buyer surcharge at settlement"
     },
     "assume_no_concession_foreign_person": {
       "vi": "Ưu đãi thuế trước bạ cho người mua nhà lần đầu không áp dụng cho người nước ngoài — số liệu ở đây là mức thuế đầy đủ, cộng thêm phụ phí dành cho người mua nước ngoài.",

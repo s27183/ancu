@@ -45,7 +45,7 @@ Compared to Mode A (`fhb-domestic-au`), this blueprint **replaces** the `eligibi
 
 ## Component pipeline
 
-The blueprint is a directed pipeline of twelve components. Four are new vs Mode A (marked `★`) — `family_context`, `firb_workflow`, `cross_border_funding`, and `disposition` (added 2026-07-11 for dispose-phase parity, §11.4 below); the rest are adapted.
+The blueprint is a directed pipeline of fourteen components. Six carry a `★` (marked new — either unique to Mode B, or added to this document after the original May 2026 draft) — `family_context`, `firb_workflow`, `cross_border_funding` (Mode-B-exclusive), `disposition` (added 2026-07-11 for dispose-phase parity, §11.4 below), and `purchase_journey`/`phase_playbook` (added 2026-07-11 alongside `disposition`'s wiring, task 12 — the whole-of-journey swimlane + its actionable checklist; both exist in Mode A too, base-scope in every mode, just newly wired into THIS blueprint); the rest are adapted.
 
 ### Component scope (base plan vs property addendum)
 
@@ -65,6 +65,8 @@ Each component has a `scope` indicating when it runs in the plan card lifecycle:
 | 10 settlement_prep (FIRB + transfer milestones) | `per-property` | Activated when contract signed |
 | 11 ownership_planning (vacancy fee + non-resident tax) | `both` | Base estimate of ongoing obligations at onboarding; refined per-property post-settlement |
 | 12 disposition ★ | `base` | Onboarding; the dispose-phase figure-owner — added 2026-07-11 for parity with Modes A/C/D (`plan-card-lifecycle-restoration.md` §11.4) — a foreign FHB can still face a forced or voluntary sale (visa status change, relocation), and the FIRB vacancy-fee obligation makes "what if I need to sell" a live question |
+| 13 purchase_journey ★ | `base` | Onboarding; the whole-of-journey lifecycle swimlane — Mode A's own four-actor phases × cells, harvests `cash_events` off components 6 (`cash_position`) + 11 (`ownership_planning`) + 12 (`disposition`), places them, computes nothing. Resolver, no agent leaf. Added 2026-07-11 (task 12, `plan-card-lifecycle-restoration.md` §11.5) |
+| 14 phase_playbook ★ | `base` | Onboarding; the actionable per-phase checklist + risk-flag-list behind the swimlane. Resolver, no agent leaf. Added 2026-07-11 (task 12) |
 
 The base plan for Mode B captures the most regulatory complexity even before a specific property: FIRB classification, family-funding capacity, cross-border transfer feasibility, foreign-buyer cost estimates. This makes Mode B's base plan genuinely valuable on its own — Vietnamese parents can validate the cross-border path before committing to a specific property.
 
@@ -112,11 +114,22 @@ The base plan for Mode B captures the most regulatory complexity even before a s
 [11] disposition ★ (NEW — the dispose-phase figure-owner, added 2026-07-11)
         inputs: profile, mortgage_plan, budget_envelope, ongoing_obligations
         outcome: disposition
+       │
+       ▼
+[12] purchase_journey ★ (NEW — the whole-of-journey swimlane, added 2026-07-11)
+        inputs: budget_envelope (cash_events), ongoing_obligations, disposition (dispose_cash_events)
+        outcome: journey_swimlane
+       │
+       ▼
+[13] phase_playbook ★ (NEW — the per-phase checklist + risks, added 2026-07-11)
+        inputs: budget_envelope (cash_events, for budget_ref validation)
+        outcome: phase_playbook
 ```
 
 > This diagram omits `mortgage_finance` (a pre-existing doc/code divergence, harmless to
-> order — see `fh_engine_turn.erl`'s `?BASE_COMPONENTS_FOREIGN` macro comment); `disposition`
-> is numbered `[11]` continuing this diagram's own numbering, not the 12-row scope table above.
+> order — see `fh_engine_turn.erl`'s `?BASE_COMPONENTS_FOREIGN` macro comment); `disposition`/
+> `purchase_journey`/`phase_playbook` are numbered `[11]`/`[12]`/`[13]` continuing this diagram's
+> own numbering, not the 14-row scope table above.
 
 **UI tab mapping** — the 10 components are presented across additional UI tabs that activate for Mode B:
 
@@ -653,6 +666,7 @@ The `mortgage_plan` outcome feeds `cash_position` (loan amount + deposit), `cros
     "gap_or_surplus": "money",
     "verdict": "enum [surplus, tight, short]",
     "mitigation_options_if_short": "array<string>",
+    "cash_events": "array<{ id: string, phase: string, label: localized_text, direction: enum [out, in], amount: money_range|null, is_estimate: bool, timing: enum [one_off, recurring], period: enum [once, monthly, quarterly, annual]|null, counterparty: string, source_component: string }>",  // Mode B's ACQUISITION financial spine (task 12, 2026-07-11) — deposit + firb_fee (contract), stamp_duty + foreign_buyer_surcharge + other_buying_costs (settle); a scalar figure collapses to [v,v]. Live at base (Mode B's ceiling-estimate convention computes these figures from target_price_range alone, unlike Mode D's cash_position which is permanently null pre-property). Implemented by `fh_engine_cash:cash_events_foreign/5`; `purchase_journey`'s generic multi-source harvest places these on the swimlane
     "key_assumptions": "array<string>"
   }
 }
@@ -969,9 +983,78 @@ The `mode_switch_eligible` field signals when the user's status has changed (e.g
 
 ---
 
+### 13. purchase_journey ★ (NEW — the whole-of-journey swimlane, added 2026-07-11)
+
+> **Added for lifecycle-spine parity** (`plan-card-lifecycle-restoration.md` §11.5, task 12). Mode B is an owner-occupier FHB by mode definition, so this component reuses **Mode A's own four-actor swimlane shape** (You / Government / Lender / Services), not Modes C/D's six-actor investor set (§3.3: "B = A's shape + a FIRB gate + a currency-transfer milestone + surcharge"). Same shape as [Mode A's `purchase_journey`](fhb-domestic-au.md#10-purchase_journey); see that component for the full mechanism (two-spines, lifecycle-simulation-model §2/§7). This entry documents only where Mode B's content diverges.
+
+**Goal:** Render the whole-of-journey lifecycle swimlane — phases × actors × cells, the legal/prose spine plus the money flows PLACED from every upstream figure-owner. Computes no figure of its own (one-computer-per-figure).
+
+**Scope:** `base` — runs at onboarding; the terminal Dispose phase/column renders only once a hold horizon `H` is set (honest-partial, same rule as every mode).
+
+**Inputs:** `cash_position.outcome` (`budget_envelope`, incl. its `cash_events`) + `ownership_planning.outcome` (`ongoing_obligations` — for the Own-phase recurring costs, honestly empty for Mode B; see below) + `disposition.outcome` (the Dispose-phase `dispose_cash_events`). Runs **last among the base figure-owners**, after `disposition`.
+
+**KB anchors:** `kb.journey.fhb-foreign-path` — Mode B's own bilingual swimlane copy doc (layers the FIRB gate + transfer milestone + surcharge onto Mode A's four-actor/six-phase structure; no new KB anchors otherwise, same discipline as Mode A's `purchase_journey`).
+
+**Renderer:** `swimlane-diagram`
+
+**UI tab hint:** Temporal flow (pending §11.3's Flow/Budget restructure, task 13)
+
+**Fill path:** resolver. No agent leaf — the journey structure is generic KB content; the money cells are placed, never recomputed (`fh_engine_journey:fill_fhb_foreign/1`).
+
+**One grounded call, not a silent default: Mode B's Own-phase recurring cell stays honestly absent.** Mode A's `own_recurring_cells/1` places a yearly council-rates/water band from `ongoing_obligations.recurring_costs_estimate.statutory_band` — a field Mode B's foreign-person `ownership_planning` outcome (component 11) does not carry (built around FIRB vacancy-fee/alert monitoring, not a cost estimate — the same gap `disposition`'s `full_horizon_net_position` already discloses, task 11). The shared `money_cells/2` builder is reused unchanged; it simply emits no recurring cell when the band is absent (honest-partial, not a fabricated figure).
+
+**Outcome schema:** `journey_swimlane` — identical shape to [Mode A's](fhb-domestic-au.md#10-purchase_journey); repeated below since the compiler parses this fenced block per-blueprint, not by cross-reference.
+
+```jsonc
+{
+  "type": "journey_swimlane",
+  "fields": {
+    "phases": "array<{ id: string, label: localized_text }>",
+    "actors": "array<{ id: string, label: localized_text }>",
+    "cells": "array<{ phase: string, actor: string, item: localized_text, flow_marker: enum [none, document, milestone, money_out, money_in], amount: money_range|null, counterparty: string|null, source_component: string }>",
+    "interactions": "array<{ from_actor: string, to_actor: string, phase: string, flows: array<{ label: localized_text, direction: enum [out, in], amount: money_range }> }>",
+    "key_assumptions": "array<localized_text>"
+  }
+}
+```
+
+---
+
+### 14. phase_playbook ★ (NEW — the per-phase checklist + risks, added 2026-07-11)
+
+> **Added for lifecycle-spine parity** (`plan-card-lifecycle-restoration.md` §11.5, task 12). Same shape as [Mode A's `phase_playbook`](fhb-domestic-au.md#12-phase_playbook); see that component for the full mechanism. This entry documents only where Mode B's content diverges.
+
+**Goal:** Render, per lifecycle phase, the ordered "what you do, in what order" action checklist plus the often-seen risks + mitigations — the actionable layer behind `purchase_journey`'s swimlane.
+
+**Scope:** `base` — runs at onboarding, alongside every phase (the terminal `dispose` phase's actions/risks are always present in the outcome; the swimlane's own Dispose column is what's honest-partial-gated on `H`).
+
+**Inputs:** `cash_position.outcome` (`budget_envelope.cash_events`, for `budget_ref` validation only — the same harvested-id-set mechanism every mode uses).
+
+**KB anchors:** `kb.journey.fhb-foreign-phase-actions` (the per-phase action checklist — FIRB application + cross-border transfer steps layered onto Mode A's own action set; no `preparation`/`eligibility` component_refs since Mode B has neither, replaced by `firb_workflow`/`mortgage_finance`), `kb.risks.fhb-foreign-by-phase` (the per-phase risk-flag-list — compounding Mode A's owner-occupier risks with FIRB/cross-border risks, each grounded in an owning KB doc per that document's own "Risk provenance" section).
+
+**Renderer:** `checklist` + `risk-flag-list`
+
+**UI tab hint:** Temporal flow (pending §11.3's Flow/Budget restructure, task 13)
+
+**Fill path:** resolver. No agent leaf — actions, ordering, risks and mitigations are bilingual KB content keyed by phase; the model never authors the risk list (reliability is structural, not a judge).
+
+**Outcome schema:** `phase_playbook` — identical shape to [Mode A's](fhb-domestic-au.md#12-phase_playbook); repeated below since the compiler parses this fenced block per-blueprint, not by cross-reference.
+
+```jsonc
+{
+  "type": "phase_playbook",
+  "fields": {
+    "phases": "array<{ phase: string, actions: array<{ id: string, order: integer, budget_ref: string|null, component_ref: string|null, label: localized_text, detail: localized_text, status: enum [not_started, done] }>, risks: array<{ severity: enum [low, medium, high], item: localized_text, action: localized_text }> }>",
+    "key_assumptions": "array<localized_text>"
+  }
+}
+```
+
+---
+
 ## KB anchor index (for this blueprint)
 
-71 slugs referenced. Italics mark Mode B-only anchors (not in Mode A).
+74 slugs referenced. Italics mark Mode B-only anchors (not in Mode A).
 
 | Slug | Component(s) | Owns |
 |---|---|---|
@@ -1046,6 +1129,9 @@ The `mode_switch_eligible` field signals when the user's status has changed (e.g
 | `kb.selling-costs.agent-legal` | 12 | Agent commission + legal/marketing bands at sale |
 | `kb.tax.cgt-main-residence-exemption` | 12 | Main-residence CGT exemption + the non-resident-at-disposal trap (Mode B always routes to `to_verify` via this trap) |
 | `kb.lender.serviceability-basics` | 12 | The representative product rate `disposition` amortises `expected_borrowing_capacity` at, for the loan-payout-at-horizon figure |
+| *`kb.journey.fhb-foreign-path`* | 13 | Mode B's bilingual swimlane copy — FIRB gate + transfer milestone + surcharge layered onto Mode A's four-actor shape |
+| *`kb.journey.fhb-foreign-phase-actions`* | 14 | Mode B's per-phase action checklist — FIRB application + cross-border transfer steps |
+| *`kb.risks.fhb-foreign-by-phase`* | 14 | Mode B's per-phase risk-flag-list — FIRB/cross-border risks compounding Mode A's owner-occupier risks |
 
 ---
 
@@ -1060,9 +1146,9 @@ This blueprint uses 10 of the constrained renderer vocabulary defined in [§11.9
 | `firb-workflow-card` | 4 firb_workflow (Mode B exclusive), 6 cross_border_funding |
 | `calculator` | 5 cash_position, 12 disposition |
 | `buying-strategy-card` | 7 buying_strategy |
-| `risk-flag-list` | 8 due_diligence |
-| `checklist` | 6 cross_border_funding, 8 due_diligence, 9 settlement_prep |
-| `swimlane-diagram` | 9 settlement_prep |
+| `risk-flag-list` | 8 due_diligence, 14 phase_playbook |
+| `checklist` | 6 cross_border_funding, 8 due_diligence, 9 settlement_prep, 14 phase_playbook |
+| `swimlane-diagram` | 9 settlement_prep, 13 purchase_journey |
 | `data-table` | 10 ownership_planning |
 | `opportunity-card` | 10 ownership_planning |
 
@@ -1102,9 +1188,11 @@ due_diligence          → outcome: risk_assessment           (reads: property_f
 settlement_prep        → outcome: settlement_checklist      (reads: property_fit, bid_plan, firb_status, transfer_plan)
 ownership_planning     → outcome: ongoing_obligations       (reads: property_fit, profile)
 disposition            → outcome: disposition               (reads: profile, budget_envelope, ongoing_obligations)
+purchase_journey       → outcome: journey_swimlane          (reads: budget_envelope, ongoing_obligations, disposition)   // harvests cash_events off budget_envelope + disposition's dispose_cash_events; places, computes nothing
+phase_playbook         → outcome: phase_playbook            (reads: budget_envelope)   // harvests cash_events off budget_envelope only, to validate action budget_refs
 ```
 
-No cycles. Mode B specifically adds two critical-path dependencies: `firb_status` blocks `buying_strategy` (no unconditional bid without FIRB approval) and `transfer_plan` is a critical-path input to `settlement_prep` (currency transfer is on the settlement critical path).
+No cycles. Mode B specifically adds two critical-path dependencies: `firb_status` blocks `buying_strategy` (no unconditional bid without FIRB approval) and `transfer_plan` is a critical-path input to `settlement_prep` (currency transfer is on the settlement critical path). `purchase_journey`/`phase_playbook` (added 2026-07-11, task 12) run **last of all** — `purchase_journey` reads `ongoing_obligations` even though Mode B's own foreign-person outcome carries no `recurring_costs_estimate` (the Own-phase recurring cell simply stays absent, honest-partial — see component 13's own note); `phase_playbook` follows, reading no journey output directly (it harvests `cash_events` independently, the same generic mechanism every mode uses). Both positioned after every figure-owner including `disposition`, mirroring every other mode's "figure-owners, then the spine that places them" DAG shape.
 
 ---
 

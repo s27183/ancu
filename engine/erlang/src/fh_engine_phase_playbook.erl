@@ -28,7 +28,10 @@
 %%
 %% Mode-general (phase-keyed actions + risks); Modes B/C/D reuse the schema + the same
 %% checklist + risk-flag-list renderers with their own kb.journey.*/kb.risks.* content.
-%% Mode C landed 2026-07-10 (kb.journey.investor-phase-actions / kb.risks.investor-by-phase).
+%% Mode C landed 2026-07-10 (kb.journey.investor-phase-actions / kb.risks.investor-by-phase);
+%% Mode D landed 2026-07-10 (kb.journey.investor-foreign-phase-actions / kb.risks.investor-
+%% foreign-by-phase); Mode B landed 2026-07-11 (kb.journey.fhb-foreign-phase-actions /
+%% kb.risks.fhb-foreign-by-phase — task 12).
 %%
 %% MULTI-SOURCE HARVEST (2026-07-10, matches fh_engine_journey's harvest_cash_events/1,
 %% [[unify-views-as-projections-of-one-primitive]]): ValidRefs is built from every upstream
@@ -47,6 +50,8 @@
 -define(INVESTOR_RISKS,   <<"kb.risks.investor-by-phase">>).         %% Mode C risks + copy
 -define(INVESTOR_FOREIGN_ACTIONS, <<"kb.journey.investor-foreign-phase-actions">>).  %% Mode D actions + copy
 -define(INVESTOR_FOREIGN_RISKS,   <<"kb.risks.investor-foreign-by-phase">>).         %% Mode D risks + copy
+-define(FHB_FOREIGN_ACTIONS, <<"kb.journey.fhb-foreign-phase-actions">>).  %% Mode B actions + copy
+-define(FHB_FOREIGN_RISKS,   <<"kb.risks.fhb-foreign-by-phase">>).         %% Mode B risks + copy
 
 %% The canonical lifecycle phase order (fh_engine_journey:phases/0; cash_event.phase),
 %% incl. the terminal `dispose` (lifecycle-simulation-model §8.1). The dispose phase carries
@@ -64,6 +69,7 @@ fill(Args, Upstream) ->
         case maps:get(blueprint_slug, Args, <<"fhb-domestic-au">>) of
             <<"investor-domestic-au">> -> {?INVESTOR_ACTIONS, ?INVESTOR_RISKS};
             <<"investor-foreign-au">>  -> {?INVESTOR_FOREIGN_ACTIONS, ?INVESTOR_FOREIGN_RISKS};
+            <<"fhb-foreign-au">>       -> {?FHB_FOREIGN_ACTIONS, ?FHB_FOREIGN_RISKS};
             _                          -> {?ACTIONS, ?RISKS}
         end,
     %% The only upstream read: the set of cash_event ids, for budget_ref validation —

@@ -119,10 +119,23 @@
 %% wide aggregate land value"). A disclosed, permanent gap, not a bug — the dispose-phase
 %% figures (sale_proceeds/selling_costs/loan_payout/cgt/net_proceeds) this component was
 %% added FOR all compute correctly regardless.
+%% purchase_journey/phase_playbook appended 2026-07-11 (task 12, plan-card-lifecycle-
+%% restoration.md §11.5/§11.8) — reuse Mode A's OWN four-actor swimlane shape (§3.3: "B =
+%% A's shape + a FIRB gate + a transfer milestone + surcharge", not Mode C/D's six-actor
+%% investor set), each with zero new resolver code beyond its own Mode-B prose/dispatch
+%% branch (fh_engine_journey:fill_fhb_foreign/1, fh_engine_phase_playbook's fhb-foreign-au
+%% clause). purchase_journey reads ongoing_obligations + disposition (both already earlier
+%% in this list) plus cash_position's cash_events (task 12 also added a real
+%% cash_events_foreign/5 to fh_engine_cash:fill_fhb_foreign/2 — Mode B's ceiling-estimate
+%% figures are honestly computable at base, unlike Mode D's fill_investor_foreign/2, so
+%% this is live money, not a permanently-null stub); phase_playbook reads only the
+%% harvested cash_event id set. Both run LAST, after disposition — the same "figure-owners,
+%% then the spine that places them" DAG shape every other mode uses.
 -define(BASE_COMPONENTS_FOREIGN,
         [<<"buyer_profile">>, <<"family_context">>, <<"firb_workflow">>,
          <<"mortgage_finance">>, <<"cash_position">>, <<"cross_border_funding">>,
-         <<"ownership_planning">>, <<"disposition">>]).
+         <<"ownership_planning">>, <<"disposition">>,
+         <<"purchase_journey">>, <<"phase_playbook">>]).
 
 %% Mode-D (investor-foreign-au) base turn — the 10 `base`/`both`-scope components of the
 %% blueprint's 14 (mode-d-wedge.md P5), EXCLUDING the 4 per-property-only ones

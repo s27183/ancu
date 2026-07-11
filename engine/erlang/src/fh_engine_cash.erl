@@ -239,6 +239,7 @@ fill_fhb_foreign(Args, Upstream) ->
         <<"gap_or_surplus">>               => GapOrSurplus,
         <<"verdict">>                      => Verdict,
         <<"mitigation_options_if_short">>  => [],
+        <<"cash_events">>                  => cash_events_foreign(Deposit, DutyAfter, Surcharge, FirbFee, ChannelCosts),
         <<"key_assumptions">>              => key_assumptions_foreign(Ceiling, State)
     },
     KbVersions = fh_engine_kb:kb_anchors(
@@ -248,6 +249,47 @@ fill_fhb_foreign(Args, Upstream) ->
          <<"kb.cash-reserve.lender-expectations">>,
          <<"kb.lmi.calculation-for-foreign-persons">>]),
     {Outcome, <<"calculator">>, KbVersions}.
+
+%% --- cash_events_foreign (Mode B's ACQUISITION financial spine, task 12) -----
+%% Same placement discipline as cash_events/4 (Mode A): PLACES this function's own
+%% already-computed figures as phased money events — computes nothing new. Unlike Mode
+%% D's cash_position (fill_investor_foreign/2, permanently null at base — no cash_events
+%% built there, an honest stub), Mode B's ceiling-estimate convention means Deposit/
+%% DutyAfter/Surcharge/FirbFee/ChannelCosts are ALL honestly computable from
+%% profile.target_price_range alone (no property attached yet) — so a real event-builder
+%% is live, not dead, code.
+%%
+%% firb_fee is placed at CONTRACT, not settle: grounded in kb.firb.application-process
+%% ("Pay the application fee ... the 30-day statutory decision clock does not start
+%% until the correct fee is paid in full") — the fee is paid when the application is
+%% lodged, which happens at or shortly after exchange (mirrors
+%% kb.journey.fhb-foreign-phase-actions' own submit_firb_application action at
+%% `contract`), well before settlement. deposit is placed at CONTRACT with counterparty
+%% `other` (held in trust, not paid to the lender) — identical to Mode A's own deposit
+%% event. stamp_duty / foreign_buyer_surcharge / other_buying_costs fall due at SETTLE,
+%% same phase Mode A places its own stamp_duty/other_buying_costs events.
+%%
+%% Lmi is NOT an event: it is always 0 by the base convention (deposit_required is well
+%% above the 80%-LVR/20%-deposit LMI trigger at this conservative estimate,
+%% key_assumptions_foreign's own assume_no_lmi_at_conservative_deposit) — a zero-value
+%% event would carry no real information, unlike Mode C's cash_events_investor/4 (where
+%% LMI can genuinely be non-zero per-property).
+-spec cash_events_foreign(number() | null, number() | null, number() | null,
+                          number() | null, number() | null) -> [map()].
+cash_events_foreign(Deposit, DutyAfter, Surcharge, FirbFee, ChannelCosts) ->
+    Out = [
+        event(<<"deposit">>, <<"contract">>, <<"event_deposit">>, <<"out">>,
+              point(Deposit), false, <<"other">>, <<"cash_position">>),
+        event(<<"firb_fee">>, <<"contract">>, <<"event_firb_fee">>, <<"out">>,
+              point(FirbFee), false, <<"government">>, <<"cash_position">>),
+        event(<<"stamp_duty">>, <<"settle">>, <<"event_stamp_duty">>, <<"out">>,
+              point(DutyAfter), false, <<"government">>, <<"cash_position">>),
+        event(<<"foreign_buyer_surcharge">>, <<"settle">>, <<"event_foreign_buyer_surcharge">>, <<"out">>,
+              point(Surcharge), false, <<"government">>, <<"cash_position">>),
+        event(<<"other_buying_costs">>, <<"settle">>, <<"event_other_costs">>, <<"out">>,
+              point(ChannelCosts), true, <<"other">>, <<"cash_position">>)
+    ],
+    [E || E <- Out, maps:get(<<"amount">>, E) =/= null].
 
 %% kb.foreign-buyer-surcharge.by-state: amount = dutiable value × rate (postcondition
 %% vs the state revenue calculator, same discipline as stamp_duty/3). null for an
