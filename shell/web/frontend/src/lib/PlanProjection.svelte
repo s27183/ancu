@@ -35,7 +35,9 @@
         type DispositionOutcome,
         type ChecklistStatusMap,
         type PropertyAddendum,
-        harvestCashEvents
+        harvestCashEvents,
+        firstComponentEntry,
+        PROFILE_COMPONENT_IDS
     } from '$lib/planCard';
     import { AU_STATES } from '$lib/map';
     import { money, moneyRange } from '$lib/format';
@@ -216,12 +218,16 @@
     let finErrorDetail = $state('');
     const finBusy = $derived(running || finSaving || finRecomputing);
 
-    // Seed the finance fields from the live buyer_profile outcome (engine SOT). LOAD-BEARING
+    // Seed the finance fields from the live profile outcome (engine SOT). LOAD-BEARING
     // for correctness, not just UX: the write is FULL-REPLACE, so the form must hold the
     // whole financials object — seeding keeps untouched figures intact across an edit (else
     // editing income would wipe stored debts). Honest-partial: a null/absent figure → blank.
+    // Resolved via PROFILE_COMPONENT_IDS, not a literal `buyer_profile` — Mode C/D name
+    // this component investor_profile / investor_profile_foreign (planCard.ts comment).
     function seedFinancials() {
-        const o = components.buyer_profile?.outcome as ProfileOutcome | undefined;
+        const o = firstComponentEntry(components, PROFILE_COMPONENT_IDS)?.outcome as
+            | ProfileOutcome
+            | undefined;
         const num = (v: unknown): string => (typeof v === 'number' ? String(v) : '');
         finIncome = num(o?.assessable_income);
         finForeign = num(o?.foreign_sourced_income_component);
@@ -603,8 +609,11 @@
     }
 
     // The card's current target price (band or point), shown as the what-if baseline hint.
+    // Resolved via PROFILE_COMPONENT_IDS — see seedFinancials above for why.
     const currentPriceLabel = $derived.by((): string | null => {
-        const o = components.buyer_profile?.outcome as ProfileOutcome | undefined;
+        const o = firstComponentEntry(components, PROFILE_COMPONENT_IDS)?.outcome as
+            | ProfileOutcome
+            | undefined;
         const r = o?.target_price_range as MoneyRange | null | undefined;
         if (!Array.isArray(r) || r.length !== 2) return null;
         return r[0] === r[1] ? money(r[0], $lang) : moneyRange(r, $lang);
@@ -700,27 +709,17 @@
             return;
         }
 
-        const res = await getPlanCard(match.plan_card_id);
-        if (myGen !== gen) return;
-        if (res.kind === 'ok') {
-            components = res.card.content.components ?? {};
-            addenda = res.card.content.addenda ?? {}; // per-property snapshots (engine §12)
-            blueprintSlug = res.card.blueprint_slug ?? ''; // gates the attach affordance
-            horizonValue = baselineHorizon; // seed the slider from the card's saved H
-            seedFinancials(); // seed income/debts from the card's stored profile facts (IC5)
-            checklistStatus = res.card.checklist_status ?? {};
-            uiTabs = res.card.ui_tabs?.length ? res.card.ui_tabs : FALLBACK_TABS;
-            if (!uiTabs.some((t) => t.tab_id === sub)) sub = uiTabs[0]?.tab_id ?? '';
-            cardId = match.plan_card_id;
-            phase = 'ready';
-            // The GET snapshot is the authoritative latest projection. Take the done-state
-            // from turn_running (a settled card has no terminal to replay once we subscribe
-            // from the cursor), and subscribe the SSE FROM the snapshot's event_cursor so the
-            // replay carries only post-snapshot (live) events — never an OLD turn from the
-            // append-only log replayed over the fresh snapshot.
-            turnDone = res.card.turn_running === false;
-            // Live fill from the cursor. Merge is idempotent (keyed by component_id).
-            stream = subscribePlanCard(match.plan_card_id, {
+        // Live fill from a cursor. Merge is idempotent (keyed by component_id). Opens a
+        // FRESH EventSource each call rather than being called once: subscribePlanCard
+        // closes its stream on every terminal event by design (correct for chat's
+        // single-turn use — subscribeConversation stays open instead). This card's page
+        // visit spans MANY turns (scenario save, financials commit, checklist toggle,
+        // property attach, ...) all reusing the same `stream` var, so onDone below
+        // reopens from the terminal's own event id — without this, the channel dies
+        // after the visit's first turn and every later action's spinner never resolves
+        // (turnDone flips false but nothing is left alive to flip it back to true).
+        function subscribeLive(cid: string, cursor?: number) {
+            stream = subscribePlanCard(cid, {
                 onComponentFilled: (entry) => {
                     if (myGen !== gen) return;
                     if (entry.property_id) {
@@ -741,7 +740,7 @@
                         components = { ...components, [entry.component_id]: entry };
                     }
                 },
-                onDone: (failed) => {
+                onDone: (failed, lastEventId) => {
                     if (myGen !== gen) return;
                     if (failed) turnFailed = true;
                     turnDone = true;
@@ -761,9 +760,34 @@
                         finRecomputing = false;
                         seedFinancials();
                     }
+                    // Reopen from this terminal's own id so the NEXT action in this visit
+                    // has a live channel too (see the comment above subscribeLive).
+                    subscribeLive(cid, lastEventId ?? undefined);
                 }
                 // onError: EventSource auto-reconnects; stay calm (no banner).
-            }, res.card.event_cursor);
+            }, cursor);
+        }
+
+        const res = await getPlanCard(match.plan_card_id);
+        if (myGen !== gen) return;
+        if (res.kind === 'ok') {
+            components = res.card.content.components ?? {};
+            addenda = res.card.content.addenda ?? {}; // per-property snapshots (engine §12)
+            blueprintSlug = res.card.blueprint_slug ?? ''; // gates the attach affordance
+            horizonValue = baselineHorizon; // seed the slider from the card's saved H
+            seedFinancials(); // seed income/debts from the card's stored profile facts (IC5)
+            checklistStatus = res.card.checklist_status ?? {};
+            uiTabs = res.card.ui_tabs?.length ? res.card.ui_tabs : FALLBACK_TABS;
+            if (!uiTabs.some((t) => t.tab_id === sub)) sub = uiTabs[0]?.tab_id ?? '';
+            cardId = match.plan_card_id;
+            phase = 'ready';
+            // The GET snapshot is the authoritative latest projection. Take the done-state
+            // from turn_running (a settled card has no terminal to replay once we subscribe
+            // from the cursor), and subscribe the SSE FROM the snapshot's event_cursor so the
+            // replay carries only post-snapshot (live) events — never an OLD turn from the
+            // append-only log replayed over the fresh snapshot.
+            turnDone = res.card.turn_running === false;
+            subscribeLive(match.plan_card_id, res.card.event_cursor);
         } else if (res.kind === 'error') {
             phase = 'error';
         } else {
