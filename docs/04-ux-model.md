@@ -66,6 +66,8 @@ Six original surfaces (see [§11.5 in architecture/architecture.md](architecture
 | **Background monitor** | Email/push alerts, weekly digest, annual review nudges, FIRB vacancy fee reminders | Ownership phase | All modes |
 | **Quick question (chat)** | Threaded chat layered over plan + KB context | Throughout | All modes |
 
+**News ticker (build-complete, added 2026-07-08/09) — ambient KB-change awareness on the home surface.** A scrolling marquee strip, visible pre-login just below the header on the suburb-intelligence map (home), surfaces every compiled `docs/kb/news/*.md` note (unfiltered — "what changed in the KB lately," not scoped to any one plan) as short bilingual headlines. Tapping opens a two-layer sheet: a categorized overview of every note, then a detail view with the full bilingual summary + source link. This is deliberately the *only* live news surface today — an earlier per-card variant (relevance-filtered to a specific plan's consulted KB slugs) was built, live-verified, then its UI removed on Son's call 2026-07-09 as redundant with the homepage strip; the backend and components were kept, so re-adding it is a small, scoped change if ever wanted. Full build record, the two open design questions (no SSE push on a live deploy; tapping never triggers a plan refresh), and the KB-authoring workflow that feeds it: [`architecture/kb-news-feature.md`](architecture/kb-news-feature.md).
+
 ### 13.4 Entry point: plan-first onboarding (with property added later)
 
 Users enter the platform by describing their situation, not by selecting a specific property. The base plan generates immediately. Specific properties are added later, when the user is ready, via one of three paths.

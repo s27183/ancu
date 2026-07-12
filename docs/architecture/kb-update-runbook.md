@@ -463,6 +463,7 @@ python3 tests/outcome_validate.py
 | `docs/kb/<area>/<slug>.md` `sources:` frontmatter | Every fact-doc edit (non-exempt namespaces) | this doc, Phase 1 |
 | `docs/sources/<area>/` archived primary docs | When the source is a stable document (PDF/gazette) | this doc, Phase 1 |
 | `docs/kb/copy/*.md` bilingual templates | When a figure/note changed | [bilingual-content.md](bilingual-content.md) |
+| `docs/kb/news/<yyyy-mm>-<slug>.md` news notes + `sources:` | Optional — when the diff is user-relevant | this doc, Phase 1 "Authoring a news note" / [kb-news-feature.md](kb-news-feature.md) |
 | `docs/blueprints/*.md` | Only on a structural change | [architecture.md §11.9](architecture.md) |
 | Renderer enum (`RENDERER_ENUM` + §11.9 table) **and** `shell/.../renderers/*.svelte` | Only when a blueprint adds a renderer | this doc, Phase 3 |
 | `engine/erlang/priv/kb/artifact.json` | Always (re-emit + prove) | [engine-contract.md §9.1](engine-contract.md) |
