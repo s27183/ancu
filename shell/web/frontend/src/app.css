@@ -1501,6 +1501,23 @@ main {
    ones; it's rendered via renderInlineMarkdown (2026-07-09) since KB summaries carry
    **bold**/*italic* — the raw diff JSON is intentionally NOT shown here (it's a build-time
    audit artifact, not buyer-facing content; see NewsDetailSheet.svelte). */
+/* Category + date meta line (2026-08) — sits between the Modal's own headline title and
+   the summary body, so a note's "what kind of update, how recent" reads before its "what
+   changed" without repeating the headline (Modal already shows that as the sheet title). */
+.pp-news-meta {
+    margin: 0 0 0.6rem;
+    font-size: 0.75rem;
+    line-height: 1.3;
+}
+.pp-news-meta-cat {
+    font-weight: 800;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+.pp-news-meta-date {
+    color: var(--muted);
+}
 .pp-news-summary {
     margin: 0 0 0.75rem;
     color: var(--ink);
@@ -1537,12 +1554,24 @@ main {
     margin-top: 1.1rem;
 }
 .pp-news-list-heading {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
     margin: 0 0 0.4rem;
     font-size: 0.72rem;
     font-weight: 800;
     color: var(--accent);
     text-transform: uppercase;
     letter-spacing: 0.05em;
+}
+/* The section's item count — volume is real information (a "Tax" section with 1 note
+   reads differently than one with 6), not decoration, so it earns a spot next to the
+   heading rather than requiring the buyer to count rows themselves. */
+.pp-news-list-count {
+    color: var(--muted);
+    font-weight: 700;
+    text-transform: none;
+    letter-spacing: normal;
 }
 .pp-news-list-items {
     list-style: none;
@@ -1553,20 +1582,29 @@ main {
     border-top: 1px solid var(--border);
 }
 .pp-news-list-item {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
     width: 100%;
     text-align: left;
     border: none;
     background: transparent;
+    padding: 0.6rem 0.1rem;
+    cursor: pointer;
+}
+.pp-news-list-item-headline {
     color: var(--ink);
     font-size: 0.88rem;
     font-weight: 600;
     line-height: 1.4;
-    padding: 0.6rem 0.1rem;
-    cursor: pointer;
 }
-.pp-news-list-item:hover {
+.pp-news-list-item:hover .pp-news-list-item-headline {
     color: var(--accent);
+}
+.pp-news-list-item-date {
+    color: var(--muted);
+    font-size: 0.72rem;
+    line-height: 1.3;
 }
 
 /* Property bar (Mode-C Phase-B) — the base-vs-property selector + the attach entry point.

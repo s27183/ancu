@@ -48,3 +48,13 @@ export function num(n: number | null | undefined, lang: Lang): string | null {
     if (typeof n !== 'number' || !Number.isFinite(n)) return null;
     return new Intl.NumberFormat(locale(lang)).format(n);
 }
+
+/** A short locale date, e.g. "9 Jul 2026" / "9 thg 7, 2026", from an ISO date string
+ *  (`NewsNote.authored_date`/`effective_from`). Malformed/missing input → null, never
+ *  "Invalid Date" text. */
+export function date(iso: string | null | undefined, lang: Lang): string | null {
+    if (!iso) return null;
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return null;
+    return new Intl.DateTimeFormat(locale(lang), { dateStyle: 'medium' }).format(d);
+}

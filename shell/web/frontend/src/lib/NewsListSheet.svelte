@@ -14,6 +14,7 @@
     import { t, type MessageKey } from '$lib/i18n';
     import Modal from '$lib/Modal.svelte';
     import type { NewsNote, NewsCategory } from '$lib/api';
+    import { date as formatDate } from '$lib/format';
 
     let { news, onSelectNote, onClose }: {
         news: NewsNote[];
@@ -26,6 +27,11 @@
         const primary = $lang === 'vi' ? note.headline_vi : note.headline_en;
         const fallback = $lang === 'vi' ? note.headline_en : note.headline_vi;
         return primary ?? fallback ?? note.summary_en ?? note.summary_vi ?? '';
+    }
+    // A row was a bare headline with no sense of recency — every item in a category read
+    // as equally new. authored_date is the "how fresh" figure (mirrors NewsDetailSheet.svelte).
+    function dateFor(note: NewsNote): string | null {
+        return formatDate(note.authored_date ?? note.effective_from, $lang);
     }
 
     // Fixed display order (not alphabetical/insertion) — visa/finance first since FIRB +
@@ -40,6 +46,13 @@
         market: 'home.news.category.market'
     };
 
+    // Newest first within a category — the API gives no ordering guarantee, and now that
+    // each row shows its own date (below), an unordered list would read as internally
+    // inconsistent (a "3 days ago" row above a "today" row in the same section).
+    function sortKey(note: NewsNote): string {
+        return note.authored_date ?? note.effective_from ?? '';
+    }
+
     const sections = $derived.by((): { category: NewsCategory; notes: NewsNote[] }[] => {
         const byCategory = new Map<NewsCategory, NewsNote[]>();
         for (const note of news) {
@@ -52,7 +65,7 @@
         }
         return CATEGORY_ORDER.filter((cat) => byCategory.has(cat)).map((cat) => ({
             category: cat,
-            notes: byCategory.get(cat) ?? []
+            notes: (byCategory.get(cat) ?? []).slice().sort((a, b) => sortKey(b).localeCompare(sortKey(a)))
         }));
     });
 </script>
@@ -61,7 +74,10 @@
     <div class="pp-news-list">
         {#each sections as section (section.category)}
             <section class="pp-news-list-section">
-                <h4 class="pp-news-list-heading">{$t(CATEGORY_LABEL_KEY[section.category])}</h4>
+                <h4 class="pp-news-list-heading">
+                    {$t(CATEGORY_LABEL_KEY[section.category])}
+                    <span class="pp-news-list-count">{section.notes.length}</span>
+                </h4>
                 <ul class="pp-news-list-items">
                     {#each section.notes as note (note.news_slug)}
                         <li>
@@ -70,7 +86,10 @@
                                 class="pp-news-list-item"
                                 onclick={() => onSelectNote(note)}
                             >
-                                {headlineFor(note)}
+                                <span class="pp-news-list-item-headline">{headlineFor(note)}</span>
+                                {#if dateFor(note)}
+                                    <span class="pp-news-list-item-date">{dateFor(note)}</span>
+                                {/if}
                             </button>
                         </li>
                     {/each}

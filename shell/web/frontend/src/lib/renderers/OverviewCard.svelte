@@ -100,13 +100,16 @@
     const capacity = $derived(range(profile?.approx_borrowing_capacity));
     const existingHomeNet = $derived(existingHome ? range(existingHome.net_sale_proceeds) : null);
 
-    // Headline tiles, in journey order: where you're aiming → how you finance → what help
-    // stacks → what cash gets you in. Each ghosts honest-partial when null (its component
-    // ran but hasn't filled the figure yet). `benefit` is different: it's presence-gated on
-    // `scheme` (component-presence, not honest-partial) since Modes C/D have no eligibility
+    // Headline tiles. Cash-to-get-in leads (2026-08, Son's call): it's the number a buyer
+    // asks first ("can I actually afford this?"), ahead of the journey-order framing
+    // (where you're aiming → how you finance → what help stacks) the rest of the grid
+    // still follows. Each ghosts honest-partial when null (its component ran but hasn't
+    // filled the figure yet). `benefit` is different: it's presence-gated on `scheme`
+    // (component-presence, not honest-partial) since Modes C/D have no eligibility
     // component at all — same treatment the existing-home tile already gets for Mode E, so
     // C/D never carry a tile for a figure that can't structurally exist for them.
     const stats = $derived([
+        { key: 'cash', label: $t('plan.cash.need'), value: cashNeed },
         { key: 'target', label: $t('plan.f.target_price'), value: target },
         ...(firbStatus
             ? [{ key: 'firb', label: $t('plan.f.stage'), value: firbStageLabel }]
@@ -115,7 +118,6 @@
         ...(scheme
             ? [{ key: 'benefit', label: $t('plan.f.total_benefit'), value: benefit }]
             : []),
-        { key: 'cash', label: $t('plan.cash.need'), value: cashNeed },
         ...(existingHome
             ? [{ key: 'existing_home_net', label: $t('plan.xhd.net_proceeds'), value: existingHomeNet }]
             : [])

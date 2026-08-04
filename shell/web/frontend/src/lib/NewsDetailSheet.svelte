@@ -13,13 +13,41 @@
     // same sheet with no onDismiss — the Dismiss button just doesn't render. Dismiss
     // was always a per-card action surfaced here, never a property of the sheet itself.
     import { lang } from '$lib/stores/lang';
-    import { t } from '$lib/i18n';
+    import { t, type MessageKey } from '$lib/i18n';
     import Modal from '$lib/Modal.svelte';
-    import type { NewsNote } from '$lib/api';
+    import type { NewsNote, NewsCategory } from '$lib/api';
     import { renderInlineMarkdown } from '$lib/markdown';
+    import { date as formatDate } from '$lib/format';
 
     let { note, onClose, onDismiss }: { note: NewsNote; onClose: () => void; onDismiss?: () => void } =
         $props();
+
+    // Same inline bilingual-pick idiom as NewsTicker.svelte/NewsListSheet.svelte — kept
+    // duplicated (task 30 note) rather than newly extracted here. Was previously read only
+    // for the ticker strip; the sheet title used a generic "Plan update" chrome string
+    // instead, so opening any note showed the same title regardless of which one — this
+    // sheet now titles itself with the note's own headline, the thing the buyer actually
+    // tapped.
+    function headlineFor(n: NewsNote): string {
+        const primary = $lang === 'vi' ? n.headline_vi : n.headline_en;
+        const fallback = $lang === 'vi' ? n.headline_en : n.headline_vi;
+        return primary ?? fallback ?? n.summary_en ?? n.summary_vi ?? '';
+    }
+    const headline = $derived(headlineFor(note) || $t('plan.news.detail_title'));
+
+    const CATEGORY_LABEL_KEY: Record<NewsCategory, MessageKey> = {
+        visa: 'home.news.category.visa',
+        finance: 'home.news.category.finance',
+        scheme: 'home.news.category.scheme',
+        tax: 'home.news.category.tax',
+        property: 'home.news.category.property',
+        market: 'home.news.category.market'
+    };
+    const categoryLabel = $derived(note.category ? $t(CATEGORY_LABEL_KEY[note.category]) : null);
+    // authored_date (when the KB note was written) is the more meaningful "how fresh is
+    // this" figure for a buyer; effective_from (when the change takes legal/policy effect)
+    // is the fallback for a note authored without it.
+    const dateLabel = $derived(formatDate(note.authored_date ?? note.effective_from, $lang));
 
     // Same inline bilingual-pick idiom as NewsTicker.svelte/Onboarding.svelte/
     // SuburbSheet.svelte — task 30 stays open until a second real consumer reuses it;
@@ -38,7 +66,14 @@
     const sourceUrl = $derived(note.sources?.[0]?.url ?? '');
 </script>
 
-<Modal title={$t('plan.news.detail_title')} {onClose}>
+<Modal title={headline} {onClose}>
+    {#if categoryLabel || dateLabel}
+        <p class="pp-news-meta">
+            {#if categoryLabel}<span class="pp-news-meta-cat">{categoryLabel}</span>{/if}
+            {#if categoryLabel && dateLabel}<span aria-hidden="true"> · </span>{/if}
+            {#if dateLabel}<span class="pp-news-meta-date">{dateLabel}</span>{/if}
+        </p>
+    {/if}
     <p class="pp-news-summary">{@html summaryHtml}</p>
     {#if sourceUrl}
         <a class="pp-news-source" href={sourceUrl} target="_blank" rel="noopener noreferrer"
