@@ -1548,31 +1548,9 @@ main {
 }
 
 /* News overview sheet (kb-news-feature.md "News overview sheet") — content inside
-   NewsListSheet.svelte's Modal. Scrolling comes free from Modal's .mo-body; sections
-   are just stacked, no inner scroll container of their own. */
-.pp-news-list-section + .pp-news-list-section {
-    margin-top: 1.1rem;
-}
-.pp-news-list-heading {
-    display: flex;
-    align-items: baseline;
-    gap: 0.4rem;
-    margin: 0 0 0.4rem;
-    font-size: 0.72rem;
-    font-weight: 800;
-    color: var(--accent);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-/* The section's item count — volume is real information (a "Tax" section with 1 note
-   reads differently than one with 6), not decoration, so it earns a spot next to the
-   heading rather than requiring the buyer to count rows themselves. */
-.pp-news-list-count {
-    color: var(--muted);
-    font-weight: 700;
-    text-transform: none;
-    letter-spacing: normal;
-}
+   NewsListSheet.svelte's Modal. Category tabs (Tabs.svelte, 2026-08) sit above a single
+   item list — the item count that used to sit in a section heading now rides in each
+   tab's own label ("Category · N"). Scrolling comes free from Modal's .mo-body. */
 .pp-news-list-items {
     list-style: none;
     margin: 0;
@@ -1616,7 +1594,7 @@ main {
     margin: 0 0 0.75rem;
     flex-wrap: wrap;
 }
-.pp-propbar .tabrail {
+.pp-propbar .tabrail-wrap {
     flex: 1 1 auto;
     min-width: 0;
 }

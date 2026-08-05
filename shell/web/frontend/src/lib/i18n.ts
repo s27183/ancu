@@ -999,6 +999,7 @@ const messages = {
     // two-layer homepage news flow: tapping the ticker opens this categorized, scrollable
     // list; tapping a headline in it opens the existing detail sheet (layer 2).
     'home.news.sheet_title': { vi: 'Tin tức', en: 'News' },
+    'home.news.category.all': { vi: 'Tất cả', en: 'All' },
     'home.news.category.visa': { vi: 'Visa & cư trú', en: 'Visa & residency' },
     'home.news.category.finance': { vi: 'Tài chính', en: 'Finance' },
     'home.news.category.scheme': { vi: 'Chương trình hỗ trợ', en: 'Government schemes' },

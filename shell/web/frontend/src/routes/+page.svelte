@@ -71,6 +71,14 @@
     // detail sheet (layer 2, selectedHomeNews) — same detail sheet the per-card ticker uses.
     let homeNewsListOpen = $state(false);
     let selectedHomeNews = $state<NewsNote | null>(null);
+    // Lifted out of NewsListSheet (rather than local $state there) because the sheet is
+    // conditionally mounted ({#if homeNewsListOpen} below) — closing a detail note and
+    // reopening the list (onHomeNewsClose) remounts NewsListSheet fresh, which would
+    // silently drop a local active-tab selection back to 'all' right after the back-nav
+    // fix restored "return to where you were." Tabs.svelte's own contract is "the parent
+    // owns the active id" — this makes +page.svelte that parent across remounts, not just
+    // within one mount.
+    let homeNewsActiveCategory = $state('all');
     // Real measured height of the ticker band, fed into --home-news-h so the
     // controls-cluster/signin-banner offsets never hardcode a magic constant
     // (kb-news-feature.md task 29's regression is the lesson here — measure, don't guess).
@@ -440,7 +448,13 @@
     {/if}
 
     {#if homeNewsListOpen}
-        <NewsListSheet news={homeNews} onSelectNote={onHomeNewsListSelect} onClose={onHomeNewsListClose} />
+        <NewsListSheet
+            news={homeNews}
+            active={homeNewsActiveCategory}
+            onSelectCategory={(id) => (homeNewsActiveCategory = id)}
+            onSelectNote={onHomeNewsListSelect}
+            onClose={onHomeNewsListClose}
+        />
     {/if}
 
     {#if selectedHomeNews}
