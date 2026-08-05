@@ -109,9 +109,9 @@ Mode C's base plan is sharper than Mode A's because investor reasoning often hap
 
 | # | View | `kind` | What it shows |
 |---|---|---|---|
-| 1 | Overview | `synthesis` | "what this is" + aggregated read of `investor_profile` + `investment_strategy` + `mortgage_finance` + `cash_position` |
-| 2 | Flow | `flow` | the legal/temporal spine — `purchase_journey` (swimlane, Prepare → … → Own → **Dispose**) as navigation; each phase opens a sheet = swimlane slice + `phase_playbook` actions (ordered, budget-linked — including `investment_strategy`'s pre-Contract thesis step) + `phase_playbook` risks; `settlement_prep` enriches the Settle phase per-property |
-| 3 | Budget | `components` (interactive) | the financial spine — `cash_position` as the phased acquisition cash-flow + what-if cockpit; `yield_modelling`/`tax_structure` as the hold-phase rental-income/expense/loan-interest/tax-refund rows; `disposition` as the full-horizon net position (buy → hold over `H` → sell) + horizon slider; each cash-event row drills to its `source_component` |
+| 1 | Budget | `components` (interactive) | the financial spine — `cash_position` as the phased acquisition cash-flow + what-if cockpit; `yield_modelling`/`tax_structure` as the hold-phase rental-income/expense/loan-interest/tax-refund rows; `disposition` as the full-horizon net position (buy → hold over `H` → sell) + horizon slider; each cash-event row drills to its `source_component` — lands first (2026-08, Son's call) so the buyer goes straight into cash planning |
+| 2 | Overview | `synthesis` | "what this is" + aggregated read of `investor_profile` + `investment_strategy` + `mortgage_finance` + `cash_position` |
+| 3 | Flow | `flow` | the legal/temporal spine — `purchase_journey` (swimlane, Prepare → … → Own → **Dispose**) as navigation; each phase opens a sheet = swimlane slice + `phase_playbook` actions (ordered, budget-linked — including `investment_strategy`'s pre-Contract thesis step) + `phase_playbook` risks; `settlement_prep` enriches the Settle phase per-property |
 | 4 | Portfolio | `components` | `ownership_planning_investor` — single-property view + portfolio-aggregate view; the only Mode-C concept that's state-shaped with no completion point, so it doesn't fold into Flow or Budget |
 | 5 | Q&A | `qa` | bilingual planning-agent chat (a shell surface over the engine Q&A stream — not a `component_filled`) |
 
@@ -120,9 +120,9 @@ Mode C's base plan is sharper than Mode A's because investor reasoning often hap
 ```jsonc
 {
   "ui_tabs": [
+    { "tab_id": "budget",    "kind": "components", "interactive": true, "components": ["cash_position", "yield_modelling", "tax_structure", "disposition"] },
     { "tab_id": "overview",  "kind": "synthesis",  "components": ["investor_profile", "investment_strategy", "mortgage_finance", "cash_position"] },
     { "tab_id": "flow",      "kind": "flow",        "components": ["purchase_journey", "phase_playbook", "settlement_prep"] },
-    { "tab_id": "budget",    "kind": "components", "interactive": true, "components": ["cash_position", "yield_modelling", "tax_structure", "disposition"] },
     { "tab_id": "portfolio", "kind": "components", "components": ["ownership_planning_investor"] },
     { "tab_id": "qa",        "kind": "qa",          "components": [] }
   ]

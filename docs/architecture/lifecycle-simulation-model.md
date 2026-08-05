@@ -153,9 +153,9 @@ The plan card presents **three views** (plus the Q&A surface), and nothing else 
 
 | View | Kind | What it is |
 |---|---|---|
-| **Overview** | synthesis | The 90-second landing — a shell-composed read over the filled spines ("what this is, where you stand"). Not a spine; a synthesis. |
+| **Budget** | the financial spine | Lands first (2026-08, Son's call — the user goes straight into cash planning, before any synthesis read). The phased cash-flow (§2) + the simulation cockpit (§4). Renamed from "cash calculator" (§7.3). Presented as **three tabs** (cockpit + verdict / table / breakdown); each cash-event row is clickable and drills to its `source_component` (§7.3). |
+| **Overview** | synthesis | The 90-second synthesis — a shell-composed read over the filled spines ("what this is, where you stand"). Not a spine; a synthesis. |
 | **Flow** | the legal/temporal spine | The swimlane (§1) *is* the navigation. Each phase (`prepare → pre_approve → contract → settle → own`) — **and every item cell within it** — is clickable and opens that phase's **phase sheet** (§7.2). (Item cells route to the *phase* sheet because a journey `cell` carries no per-cell backing id; the finer item→component drill lives inside the sheet's checklist, where `phase_playbook` actions carry `component_ref`.) The top-level swimlane is **grid-only navigation** — its all-phases "who deals with whom" (`interactions`) list is **not** shown here; it moves into each phase sheet's Overview tab as a *focused* per-phase slice (§7.2), so the top-level view stays pure navigation. |
-| **Budget** | the financial spine | The phased cash-flow (§2) + the simulation cockpit (§4). Renamed from "cash calculator" (§7.3). Presented as **three tabs** (cockpit + verdict / table / breakdown); each cash-event row is clickable and drills to its `source_component` (§7.3). |
 | Q&A | qa | The shell's chat surface over the engine's bilingual Q&A stream (no component fills it). |
 
 Everything previously scattered across `before-you-buy`/`buying`/`after-you-buy` is **not** a top-level tab. It is reached *through a spine*: a legal step's detail through its phase sheet (§7.2), a figure's detail through its budget row (§7.3). This is the correction — the surface mirrors the user's lifecycle, not the engine's component list.

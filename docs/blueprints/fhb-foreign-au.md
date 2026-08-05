@@ -135,9 +135,9 @@ The base plan for Mode B captures the most regulatory complexity even before a s
 
 | # | View | `kind` | What it shows |
 |---|---|---|---|
-| 1 | Overview | `synthesis` | "what this is" + aggregated read of `buyer_profile` + `firb_workflow` (the FIRB gate headline — same treatment Mode A gives `eligibility`) + `mortgage_finance` + `cash_position` |
-| 2 | Flow | `flow` | the legal/temporal spine — `purchase_journey` (swimlane, Prepare → … → Own → **Dispose**, FIRB gate + transfer milestone narrated across Pre-approve→Contract→Settle) as navigation; each phase opens a sheet = swimlane slice + `phase_playbook` actions (ordered, budget-linked — including `firb_workflow`'s application/approval steps and `cross_border_funding`'s transfer steps) + `phase_playbook` risks; `settlement_prep` enriches the Settle phase per-property |
-| 3 | Budget | `components` (interactive) | the financial spine — `cash_position` as the phased acquisition cash-flow + what-if cockpit (deposit, stamp duty + foreign-buyer surcharge, FIRB fee); `firb_workflow`'s fee as its own row; `cross_border_funding`'s FX/transfer cost as its own row; `disposition` as the dispose-phase figure owner; each cash-event row drills to its `source_component` |
+| 1 | Budget | `components` (interactive) | the financial spine — `cash_position` as the phased acquisition cash-flow + what-if cockpit (deposit, stamp duty + foreign-buyer surcharge, FIRB fee); `firb_workflow`'s fee as its own row; `cross_border_funding`'s FX/transfer cost as its own row; `disposition` as the dispose-phase figure owner; each cash-event row drills to its `source_component` — lands first (2026-08, Son's call) so the buyer goes straight into cash planning |
+| 2 | Overview | `synthesis` | "what this is" + aggregated read of `buyer_profile` + `firb_workflow` (the FIRB gate headline — same treatment Mode A gives `eligibility`) + `mortgage_finance` + `cash_position` |
+| 3 | Flow | `flow` | the legal/temporal spine — `purchase_journey` (swimlane, Prepare → … → Own → **Dispose**, FIRB gate + transfer milestone narrated across Pre-approve→Contract→Settle) as navigation; each phase opens a sheet = swimlane slice + `phase_playbook` actions (ordered, budget-linked — including `firb_workflow`'s application/approval steps and `cross_border_funding`'s transfer steps) + `phase_playbook` risks; `settlement_prep` enriches the Settle phase per-property |
 | 4 | Family | `components` | `family_context` — the parent + child cross-border funding dashboard; the only Mode-B concept that's state-shaped with no completion point, so it doesn't fold into Flow or Budget |
 | 5 | Q&A | `qa` | bilingual planning-agent chat (a shell surface over the engine Q&A stream — not a `component_filled`) |
 
@@ -146,9 +146,9 @@ The base plan for Mode B captures the most regulatory complexity even before a s
 ```jsonc
 {
   "ui_tabs": [
+    { "tab_id": "budget",   "kind": "components", "interactive": true, "components": ["cash_position", "firb_workflow", "cross_border_funding", "disposition"] },
     { "tab_id": "overview", "kind": "synthesis",  "components": ["buyer_profile", "firb_workflow", "mortgage_finance", "cash_position"] },
     { "tab_id": "flow",     "kind": "flow",        "components": ["purchase_journey", "phase_playbook", "settlement_prep"] },
-    { "tab_id": "budget",   "kind": "components", "interactive": true, "components": ["cash_position", "firb_workflow", "cross_border_funding", "disposition"] },
     { "tab_id": "family",   "kind": "components", "components": ["family_context"], "note": "Mode B central surface; bilingual; always-on (unlike Mode D's opt-in Family layer)" },
     { "tab_id": "qa",       "kind": "qa",          "components": [] }
   ]

@@ -137,9 +137,9 @@ This base-heavy structure is genuinely well-suited to Mode D's audience: Vietnam
 
 | # | View | `kind` | What it shows |
 |---|---|---|---|
-| 1 | Overview | `synthesis` | "what this is" + aggregated read of `investor_profile_foreign` + `firb_workflow` (the FIRB gate headline — same treatment Mode A gives `eligibility`) + `investment_strategy` + `mortgage_finance` + `cash_position` |
-| 2 | Flow | `flow` | the legal/temporal spine — `purchase_journey` (swimlane, Prepare → … → Hold → **Dispose**, FIRB gate + transfer milestone narrated across Pre-approve→Contract→Settle) as navigation; each phase opens a sheet = swimlane slice + `phase_playbook` actions (ordered, budget-linked — including `firb_workflow`'s application/approval steps, `cross_border_funding`'s transfer steps, and `investment_strategy`'s pre-Contract thesis step) + `phase_playbook` risks; `settlement_prep` enriches the Settle phase per-property |
-| 3 | Budget | `components` (interactive) | the financial spine — `cash_position` as the phased acquisition cash-flow + what-if cockpit (deposit, stamp duty + foreign-buyer surcharge, FIRB fee); `firb_workflow`'s fee as its own row; `cross_border_funding`'s FX/transfer cost as its own row; `yield_modelling`/`tax_structure_non_resident` as the hold-phase rental-income/expense/loan-interest/AU-tax rows; `disposition` as the full-horizon net position (buy → hold over `H` → sell, no CGT discount, FRCGW) + horizon slider; each cash-event row drills to its `source_component` |
+| 1 | Budget | `components` (interactive) | the financial spine — `cash_position` as the phased acquisition cash-flow + what-if cockpit (deposit, stamp duty + foreign-buyer surcharge, FIRB fee); `firb_workflow`'s fee as its own row; `cross_border_funding`'s FX/transfer cost as its own row; `yield_modelling`/`tax_structure_non_resident` as the hold-phase rental-income/expense/loan-interest/AU-tax rows; `disposition` as the full-horizon net position (buy → hold over `H` → sell, no CGT discount, FRCGW) + horizon slider; each cash-event row drills to its `source_component` — lands first (2026-08, Son's call) so the buyer goes straight into cash planning |
+| 2 | Overview | `synthesis` | "what this is" + aggregated read of `investor_profile_foreign` + `firb_workflow` (the FIRB gate headline — same treatment Mode A gives `eligibility`) + `investment_strategy` + `mortgage_finance` + `cash_position` |
+| 3 | Flow | `flow` | the legal/temporal spine — `purchase_journey` (swimlane, Prepare → … → Hold → **Dispose**, FIRB gate + transfer milestone narrated across Pre-approve→Contract→Settle) as navigation; each phase opens a sheet = swimlane slice + `phase_playbook` actions (ordered, budget-linked — including `firb_workflow`'s application/approval steps, `cross_border_funding`'s transfer steps, and `investment_strategy`'s pre-Contract thesis step) + `phase_playbook` risks; `settlement_prep` enriches the Settle phase per-property |
 | 4 | Portfolio | `components` | `ownership_planning_foreign_investor` — vacancy-fee monitoring, AU+VN tax obligations, repatriation strategy, mode-switch-on-PR-grant signal; the only Mode-D concept that's state-shaped with no completion point, so it doesn't fold into Flow or Budget |
 | 5 | Q&A | `qa` | bilingual planning-agent chat (a shell surface over the engine Q&A stream — not a `component_filled`) |
 
@@ -148,9 +148,9 @@ This base-heavy structure is genuinely well-suited to Mode D's audience: Vietnam
 ```jsonc
 {
   "ui_tabs": [
+    { "tab_id": "budget",    "kind": "components", "interactive": true, "components": ["cash_position", "firb_workflow", "cross_border_funding", "yield_modelling", "tax_structure_non_resident", "disposition"] },
     { "tab_id": "overview",  "kind": "synthesis",  "components": ["investor_profile_foreign", "firb_workflow", "investment_strategy", "mortgage_finance", "cash_position"] },
     { "tab_id": "flow",      "kind": "flow",        "components": ["purchase_journey", "phase_playbook", "settlement_prep"] },
-    { "tab_id": "budget",    "kind": "components", "interactive": true, "components": ["cash_position", "firb_workflow", "cross_border_funding", "yield_modelling", "tax_structure_non_resident", "disposition"] },
     { "tab_id": "portfolio", "kind": "components", "components": ["ownership_planning_foreign_investor"] },
     { "tab_id": "qa",        "kind": "qa",          "components": [] }
   ]
