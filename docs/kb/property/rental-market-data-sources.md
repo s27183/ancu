@@ -28,7 +28,7 @@ The rental and growth figures an investor plan relies on — weekly rents, gross
 - **Free / public:** ABS (Total Value of Dwellings [successor to the discontinued RPPI], Census, Regional Population), SQM Research (vacancy), state bond authorities, state Valuer-General.
 - **Paid / proprietary:** CoreLogic, PropTrack/REA Insights, Domain analytics — richer suburb-level coverage, but licensed.
 
-This doc is **provenance, not a pipeline**. Per the project's narrow-data-paths constraint, FirstHomey does **not** scrape listing portals; rental/growth figures enter via **public feeds (ABS, bond authorities, SQM)**, **suburb enrichment**, **user-provided** data (a PM's rental appraisal, a listing the user pastes), and, where licensed, **partner/commercial feeds** — never a scraping pipeline.
+This doc is **provenance, not a pipeline**. Per the project's narrow-data-paths constraint, Rau does **not** scrape listing portals; rental/growth figures enter via **public feeds (ABS, bond authorities, SQM)**, **suburb enrichment**, **user-provided** data (a PM's rental appraisal, a listing the user pastes), and, where licensed, **partner/commercial feeds** — never a scraping pipeline.
 
 ## Reliability labelling
 

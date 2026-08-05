@@ -500,7 +500,7 @@ def _kb_content_md(path):
 # tool-pulled — §6); those return for the tool-using Q&A path in slice 2c.
 
 _PREAMBLE = """\
-You are a single component of FirstHomey's planning engine, which helps \
+You are a single component of Rau's planning engine, which helps \
 Vietnamese-Australian buyers plan an Australian property purchase (first home or \
 investment). You fill ONE component of a plan and return a structured object that \
 downstream components and the user-facing card consume.
@@ -1843,7 +1843,7 @@ def _kb_search(kb, slug, topic, max_docs=3, snippet=1400):
 
 
 _QA_PREAMBLE = """\
-You are FirstHomey's planning assistant, answering a Vietnamese-Australian first home \
+You are Rau's planning assistant, answering a Vietnamese-Australian first home \
 buyer's question about THEIR plan. You will be provided with:
 - **Context** — your role. `<context>`.
 - **Goal** — what a good answer achieves. `<goal>`.
@@ -1883,7 +1883,7 @@ are involved) — NOT a transliteration of the English, NOT machine-translation 
 not leave `vi` as an English string."""
 
 _QA_TOOLS = """\
-You have ONE tool, `kb_lookup`, over FirstHomey's curated knowledge base:
+You have ONE tool, `kb_lookup`, over Rau's curated knowledge base:
 - `kb_lookup(topic: "...")` — search by plain topic (e.g. "first home guarantee", \
 "stamp duty concession NSW", "FIRB established dwelling"). Use this when the plan-card \
 grounding doesn't already contain the rule/figure/definition you need.
@@ -1956,7 +1956,7 @@ async def handle_qa(params):
     # the args and the result — and SANITIZED (display_name + summaries, never the raw
     # KB text or the slug) before they reach the shell (engine-contract §4).
     @tool("kb_lookup",
-          "Search FirstHomey's curated knowledge base for a scheme rule, figure, or "
+          "Search Rau's curated knowledge base for a scheme rule, figure, or "
           "definition. Use when the plan-card grounding lacks what you need to answer "
           "accurately. Pass a plain `topic` to search, or a known `slug` to fetch one doc.",
           {"topic": str, "slug": str})
