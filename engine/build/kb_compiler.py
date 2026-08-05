@@ -983,18 +983,39 @@ def run(emit=False):
     # specific dated fact of its own); the diff block must be present and parse;
     # the EN/VI summary must be bilingual-well-formed (reusing the same check as a
     # KB doc's `copy` templates — same {locale: text} shape).
+    #
+    # A note that OMITS `kb_slug` is exempt from kb_slug / affected_kb_slugs / Diff
+    # (2026-08, Adgemis private-credit + migration-cuts notes): those three exist for
+    # the DIFF case — "a regulated figure this KB cites just changed" — which needs
+    # an anchor doc to diff against and a component to badge. A standalone factual
+    # citation (a macro/systemic event, a still-developing policy story) has no
+    # regulated old_value→new_value pair and nothing of ours to diff against —
+    # forcing a fake anchor/diff onto it would be the fabrication
+    # kb-doc-authoring.md forbids. This is orthogonal to `category`: category is
+    # only which section the News overview sheet sorts it under (any of
+    # NEWS_CATEGORIES can carry a standalone note — a visa story doesn't stop being
+    # about visas just because it isn't a diff). It still owes the full citation bar
+    # (sources/effective_from/authored_date/bilingual headline+summary) — only the
+    # diff-specific requirements are waived, and — same as any note — it can only
+    # ever reach the public, unfiltered `/api/news` homepage ticker: with no
+    # affected_kb_slugs there's nothing to intersect against a plan card's
+    # consulted-slugs list, so it never enters the (currently dormant) per-card
+    # relevance filter.
     for slug, doc in sorted(news_docs.items()):
-        if not doc.get("kb_slug") or not kb_exists(doc["kb_slug"]):
-            fails.append(f"[news] {slug}: kb_slug {doc.get('kb_slug')!r} does not resolve to a KB doc")
+        standalone = doc.get("kb_slug") is None
+        if not standalone:
+            if not kb_exists(doc["kb_slug"]):
+                fails.append(f"[news] {slug}: kb_slug {doc.get('kb_slug')!r} does not resolve to a KB doc")
         if doc.get("category") not in NEWS_CATEGORIES:
             fails.append(f"[news] {slug}: category {doc.get('category')!r} not one of "
                         f"{NEWS_CATEGORIES} (kb-news-feature.md \"News overview sheet\")")
-        if not doc.get("affected_kb_slugs"):
-            fails.append(f"[news] {slug}: affected_kb_slugs is empty — nothing to filter relevance by")
-        else:
-            bad = [s for s in doc["affected_kb_slugs"] if not kb_exists(s)]
-            if bad:
-                fails.append(f"[news] {slug}: affected_kb_slugs resolve to no KB doc: {bad}")
+        if not standalone:
+            if not doc.get("affected_kb_slugs"):
+                fails.append(f"[news] {slug}: affected_kb_slugs is empty — nothing to filter relevance by")
+            else:
+                bad = [s for s in doc["affected_kb_slugs"] if not kb_exists(s)]
+                if bad:
+                    fails.append(f"[news] {slug}: affected_kb_slugs resolve to no KB doc: {bad}")
         if not doc.get("effective_from"):
             fails.append(f"[news] {slug}: missing effective_from")
         if not doc.get("authored_date"):
@@ -1002,7 +1023,7 @@ def run(emit=False):
         if not doc.get("sources"):
             fails.append(f"[news] {slug}: no `sources:` citation (kb-update-runbook.md "
                         f"\"authoring a news note\")")
-        if doc.get("diff") is None:
+        if not standalone and doc.get("diff") is None:
             suffix = f" ({doc['diff_error']})" if doc.get("diff_error") else ""
             fails.append(f"[news] {slug}: missing or unparsed '## Diff' jsonc block{suffix}")
         err = check_copy_template({"en": doc.get("summary_en"), "vi": doc.get("summary_vi")})

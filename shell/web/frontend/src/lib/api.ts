@@ -440,7 +440,9 @@ export type NewsCategory = 'visa' | 'finance' | 'scheme' | 'tax' | 'property' | 
 
 export interface NewsNote {
     news_slug: string;
-    kb_slug: string;
+    /** Absent for `category: 'market'` notes — a standalone factual citation with
+     *  no regulated KB figure to diff against (kb-news-feature.md "market" notes). */
+    kb_slug?: string;
     category?: NewsCategory;
     affected_kb_slugs?: string[];
     /** {blueprint_slug: [component_name, ...]} — this card's own blueprint_slug names

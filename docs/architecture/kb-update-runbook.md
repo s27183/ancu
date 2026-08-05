@@ -291,6 +291,26 @@ array (`artifact["news"]`), never mixed into `kb`, so it never enters GATE 2/6/7
 or a blueprint's registry (GATE 10 itself doesn't apply — GATE 11's own
 `sources:` check is the news-note-scoped equivalent).
 
+**Standalone notes — omit `kb_slug`, no diff required (2026-08).** The shape above
+assumes a diff against one of *our own* KB fact docs (a threshold changed, a rate
+moved). Some user-relevant news is a real, dated, sourced event with **no** regulated
+old_value→new_value pair to diff and no existing KB doc to anchor to — a private-credit
+lender collapse, a still-developing policy story (a minister's speech postponed,
+measures reported as "under consideration" rather than law). Forcing a fake `kb_slug`
+or `## Diff` onto that would be fabrication. **Omit `kb_slug` and `affected_kb_slugs`**
+and the note is exempt from both those checks and from requiring `## Diff` — this is
+orthogonal to `category` (any of `NEWS_CATEGORIES` can carry a standalone note; a
+migration story is still `category: visa` even with no KB doc to diff). Everything
+else is unchanged: bilingual headline (<=100 chars)/summary, `sources:`,
+`effective_from`, `authored_date` are still required and fail-closed. A standalone
+note carries the source's own claims and their actual epistemic status (e.g. "ABC
+reports the government is *considering* X; nothing is yet enacted") rather than
+asserting them as this platform's conclusion or as settled fact — report what was
+reported, at the certainty it was reported at. Since there's no `kb_slug`/
+`affected_kb_slugs`, a standalone note is **homepage-ticker-only** — it has nothing
+to intersect against a plan card's consulted-slugs list, so it never surfaces in the
+per-card relevance filter, only the public `/api/news` feed.
+
 **Relevance is a lookup, not new machinery.** Each fill already records which KB
 slugs it consulted (`kb_versions`, `plan-card-refresh.md`) — the engine
 (`fh_engine_kb:news_for_slugs/1`) intersects that against `affected_kb_slugs` to
