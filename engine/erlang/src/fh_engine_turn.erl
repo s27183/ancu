@@ -476,10 +476,9 @@ commit_qa(P, #{tenant_id := T, user_id := U, plan_card_id := PC, turn_id := Tn,
         none ->
             %% Cleared: NOW emit the answer, one text_delta per language (§4).
             emit_answer(T, PC, Answer),
-            %% Persist the vendor-neutral glue pair. EN is the canonical coherence text
-            %% (the full bilingual answer persists in the text_delta events for replay).
-            ok = fh_engine_store:append_session_turn(
-                   T, U, PC, Tn, Msg, maps:get(<<"en">>, Answer, <<"">>)),
+            %% Persist the turn — full bilingual Answer (read_conversation/3 serves it
+            %% to the shell; read_glue/3 still reads only the EN half for prompt glue).
+            ok = fh_engine_store:append_session_turn(T, U, PC, Tn, Msg, Answer),
             {ok, Data}
     end.
 

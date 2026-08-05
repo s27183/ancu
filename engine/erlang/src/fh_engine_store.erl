@@ -21,7 +21,7 @@
 -export([set_profile_financials/2, list_plan_card_ids_for_profile/1]).
 -export([deploy_commit_sha/0, projection_state/1, list_active_plan_card_ids/0]).
 -export([list_suburbs_by_state/1, list_all_suburbs/0, list_suburb_sources/0]).
--export([read_glue/3, append_session_turn/6]).
+-export([read_glue/3, append_session_turn/6, read_conversation/3]).
 
 %% --- tenancy / auth ---------------------------------------------------------
 
@@ -540,14 +540,16 @@ centroid(Lat, Lon) -> #{<<"lat">> => Lat, <<"lon">> => Lon}.
 
 %% --- Q&A conversation glue (sessions / session_turns; isolation-model §4) ----
 
-%% The prior (user_text, assistant_text) pairs for this (user × plan card), oldest→
+%% The prior (user_text, assistant_text_en) pairs for this (user × plan card), oldest→
 %% newest, bounded to a short recent window. GLUE for conversational coherence (pronoun
 %% resolution), NOT agent grounding — the card re-grounds each turn (constraint #9,
-%% agentic-flow §8). Empty list before the first Q&A turn.
+%% agentic-flow §8). EN-only on purpose: this text only ever reaches the prompt, never
+%% the user, so bilingual storage buys nothing here (unlike read_conversation/3 below).
+%% Empty list before the first Q&A turn.
 -spec read_glue(binary(), binary(), binary()) -> [map()].
 read_glue(TenantId, UserId, PlanCardId) ->
     Res = query(
-        "SELECT st.user_text, st.assistant_text FROM session_turns st "
+        "SELECT st.user_text, st.assistant_text_en FROM session_turns st "
         "JOIN sessions s ON s.session_id = st.session_id "
         "WHERE s.tenant_id = $1::uuid AND s.user_id = $2::uuid "
         "  AND s.plan_card_id = $3::uuid "
@@ -555,23 +557,51 @@ read_glue(TenantId, UserId, PlanCardId) ->
         [TenantId, UserId, PlanCardId]),
     [#{<<"user_text">> => U, <<"assistant_text">> => A} || {U, A} <- rows(Res)].
 
-%% Append one vendor-neutral glue pair after a Q&A turn's answer has been gated +
-%% emitted. Ensures the (user × plan_card) session row first (session_id is one per
-%% pair, engine-contract §9.1). Stores text only — never reasoning items / vendor format.
--spec append_session_turn(binary(), binary(), binary(), binary(), binary(), binary())
+%% Append one turn after a Q&A turn's answer has been gated + emitted. Ensures the
+%% (user × plan_card) session row first (session_id is one per pair, engine-contract
+%% §9.1). `Answer` is the full bilingual {vi, en} map (commit_qa already has it in
+%% hand) — persisted in BOTH locales so read_conversation/3 can hand the shell a real
+%% history (bilingual-content.md: VI is co-equal, forced by schema at the source).
+%% Stores text only — never reasoning items / vendor format.
+-spec append_session_turn(binary(), binary(), binary(), binary(), binary(), map())
         -> ok.
-append_session_turn(TenantId, UserId, PlanCardId, TurnId, UserText, AssistantText) ->
+append_session_turn(TenantId, UserId, PlanCardId, TurnId, UserText, Answer) ->
+    AssistantEn = maps:get(<<"en">>, Answer, <<"">>),
+    AssistantVi = maps:get(<<"vi">>, Answer, <<"">>),
     _ = query(
         "INSERT INTO sessions (tenant_id, user_id, plan_card_id) "
         "VALUES ($1::uuid, $2::uuid, $3::uuid) "
         "ON CONFLICT (user_id, plan_card_id) DO NOTHING",
         [TenantId, UserId, PlanCardId]),
     _ = query(
-        "INSERT INTO session_turns (turn_id, session_id, user_text, assistant_text) "
-        "SELECT $1::uuid, s.session_id, $2, $3 FROM sessions s "
-        "WHERE s.user_id = $4::uuid AND s.plan_card_id = $5::uuid",
-        [TurnId, UserText, AssistantText, UserId, PlanCardId]),
+        "INSERT INTO session_turns "
+        "  (turn_id, session_id, user_text, assistant_text_en, assistant_text_vi) "
+        "SELECT $1::uuid, s.session_id, $2, $3, $4 FROM sessions s "
+        "WHERE s.user_id = $5::uuid AND s.plan_card_id = $6::uuid",
+        [TurnId, UserText, AssistantEn, AssistantVi, UserId, PlanCardId]),
     ok.
+
+%% The full Q&A conversation for this (user × plan card), oldest→newest, UNCAPPED —
+%% the shell-facing history read (GET .../conversation, fh_engine_h_conversation),
+%% distinct from read_glue/3's capped internal-coherence read above. Each turn's
+%% answer is bilingual {vi, en}; the shell picks display language same as text_delta.
+%% Empty list before the first Q&A turn.
+-spec read_conversation(binary(), binary(), binary()) -> [map()].
+read_conversation(TenantId, UserId, PlanCardId) ->
+    Res = query(
+        "SELECT st.turn_id::text, st.user_text, "
+        "  st.assistant_text_en, st.assistant_text_vi, "
+        "  to_char(st.ts AT TIME ZONE 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') "
+        "FROM session_turns st "
+        "JOIN sessions s ON s.session_id = st.session_id "
+        "WHERE s.tenant_id = $1::uuid AND s.user_id = $2::uuid "
+        "  AND s.plan_card_id = $3::uuid "
+        "ORDER BY st.ts ASC",
+        [TenantId, UserId, PlanCardId]),
+    [#{<<"turn_id">> => Tid, <<"user_text">> => U,
+       <<"answer">> => #{<<"en">> => En, <<"vi">> => Vi},
+       <<"ts">> => Ts}
+     || {Tid, U, En, Vi, Ts} <- rows(Res)].
 
 %% --- internals --------------------------------------------------------------
 

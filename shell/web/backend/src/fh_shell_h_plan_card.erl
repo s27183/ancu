@@ -22,6 +22,7 @@ init(Req0, Opts) ->
     case {Opts, cowboy_req:method(Req0)} of
         {[], <<"GET">>}          -> with_owned_card(Req0, Opts, fun read/4);
         {[messages], <<"POST">>} -> with_owned_card(Req0, Opts, fun ask/4);
+        {[conversation], <<"GET">>} -> with_owned_card(Req0, Opts, fun conversation/4);
         {[simulate], <<"POST">>} -> with_owned_card(Req0, Opts, fun simulate/4);
         {[refine], <<"POST">>}   -> with_owned_card(Req0, Opts, fun refine/4);
         {[profile], <<"POST">>}  -> with_owned_card(Req0, Opts, fun profile/4);
@@ -94,6 +95,14 @@ ask(UserId, PlanCardId, Req0, Opts) ->
                   <<"used_tokens">> => Used,
                   <<"limit_tokens">> => Limit}, Req0), Opts}
     end.
+
+%% GET /api/plan-cards/:id/conversation — the Q&A thread's persisted history (bilingual
+%% {vi,en} per turn). Chat.svelte hydrates its message list from this on mount, before
+%% subscribing to the live SSE stream. A read of already-metered history emits no NEW
+%% usage, so — like simulate/refine/profile, unlike `ask` — it carries no meter gate.
+conversation(UserId, PlanCardId, Req0, Opts) ->
+    {Status, Resp} = fh_shell_engine_client:get_conversation(UserId, PlanCardId),
+    {ok, relay(Status, Resp, Req0), Opts}.
 
 %% POST /api/plan-cards/:id/simulate — preview a structural what-if (W9) → the engine
 %% recomputes the base plan resolver-only and returns the outcomes in the body. NO meter

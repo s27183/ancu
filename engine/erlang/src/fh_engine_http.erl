@@ -37,6 +37,7 @@ routes() ->
         {"/api/engine/plan-cards",              fh_engine_h_plan_cards, []},
         {"/api/engine/plan-cards/:id/events",   fh_engine_h_events,     []},
         {"/api/engine/plan-cards/:id/messages", fh_engine_h_messages,   []},
+        {"/api/engine/plan-cards/:id/conversation", fh_engine_h_conversation, []},
         {"/api/engine/plan-cards/:id/cancel",   fh_engine_h_cancel,     []},
         {"/api/engine/plan-cards/:id/rerun",    fh_engine_h_rerun,      []},
         {"/api/engine/plan-cards/:id/simulate", fh_engine_h_simulate,   []},

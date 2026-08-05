@@ -126,7 +126,8 @@ process_events([Ev | Rest], Acc) ->
 
 handle_event(#{<<"usage_event_id">> := Id, <<"user_id">> := UserId} = Ev)
   when is_binary(UserId) ->
-    case user_email(UserId) of
+    %% fh_shell_store:user_email/1 — shared with the §7 gate's admin exemption.
+    case fh_shell_store:user_email(UserId) of
         {ok, Email} -> book_usage(Id, UserId, Email, Ev);
         not_found ->
             logger:debug("[usage-consumer] unknown user_id=~s (skip usage_event_id=~p)",
@@ -136,21 +137,6 @@ handle_event(#{<<"usage_event_id">> := Id, <<"user_id">> := UserId} = Ev)
 handle_event(Ev) ->
     logger:warning("[usage-consumer] malformed usage event: ~p", [Ev]),
     {skip, malformed}.
-
-%% The shell user's email for this usage event's user_id, or not_found. The user_id is
-%% the acting user from the engine JWT; it should already exist in the shell (it
-%% authenticated here). A not_found is skipped — the usage_records FK to users would
-%% reject it anyway. The email is needed to test the ADMIN_EMAILS allowlist (§9): an
-%% admin's row books billed = false (attribution without charge). A DB error is treated
-%% as not_found (fail-soft — the event re-fetches next tick; never crash the consumer).
-user_email(UserId) ->
-    case pgo:query(<<"SELECT email FROM users WHERE user_id = $1::uuid">>, [UserId]) of
-        #{rows := [{Email} | _]} -> {ok, Email};
-        #{rows := []}            -> not_found;
-        {error, Reason} ->
-            logger:warning("[usage-consumer] user_email(~s) failed: ~p", [UserId, Reason]),
-            not_found
-    end.
 
 %% Mirror one usage event into usage_records, idempotently. tokens_total is the
 %% metered unit = the sum of the four token slices (billing.md §3); shadow_cost is the

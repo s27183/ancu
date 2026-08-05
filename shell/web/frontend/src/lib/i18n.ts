@@ -973,6 +973,25 @@ const messages = {
     'status.ok': { vi: 'Backend đang hoạt động', en: 'Backend is up' },
     'status.fail': { vi: 'Không kết nối được backend', en: 'Backend unreachable' },
 
+    // Usage summary (8-S5g), inside the EXISTING account-sheet (+layout.svelte) —
+    // between the user-email row and the sign-out button. Not a new page: the sheet
+    // is already the account surface.
+    'account.usage.loading': { vi: 'Đang tải…', en: 'Loading…' },
+    'account.usage.error': {
+        vi: 'Không tải được dữ liệu sử dụng.',
+        en: 'Couldn’t load usage data.'
+    },
+    'account.usage.tier.free': { vi: 'Miễn phí', en: 'Free' },
+    'account.usage.tier.plus': { vi: 'Plus', en: 'Plus' },
+    'account.usage.tier.pro': { vi: 'Pro', en: 'Pro' },
+    'account.usage.tokens_used': { vi: 'Token đã dùng kỳ này', en: 'Tokens used this period' },
+    'account.usage.tokens_unlimited': {
+        vi: 'không giới hạn (quản trị viên)',
+        en: 'unlimited (admin)'
+    },
+    'account.usage.period': { vi: 'Kỳ hiện tại', en: 'Current period' },
+    'account.usage.cost': { vi: 'Chi phí hạ tầng ước tính', en: 'Estimated infrastructure cost' },
+
     // KB-news ticker (kb-news-feature.md, task 29): the sticky strip cycling relevant,
     // non-dismissed news notes above the lifecycle sub-tab rail.
     'plan.news.aria': { vi: 'Cập nhật liên quan đến kế hoạch', en: 'Plan-relevant updates' },

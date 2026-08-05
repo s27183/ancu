@@ -11,7 +11,8 @@
 %% (fetch state, SSE event proxy, messages, suburbs) lands as the shell UX surfaces
 %% are built (8-S1..8-S4). HTTP via inets httpc (started by the shell app).
 
--export([create_plan_card/2, get_plan_card/2, post_message/3, simulate/3,
+-export([create_plan_card/2, get_plan_card/2, post_message/3, get_conversation/2,
+         simulate/3,
          refine/3, set_profile_financials/3, set_checklist_status/3,
          attach_property/3, set_transaction_dates/4, upload_document/4, stream_events/3,
          list_suburbs/1, get_usage_events/2, start_httpc_profiles/0,
@@ -111,6 +112,20 @@ post_message(UserId, PlanCardId, BodyMap) ->
     Body = fh_shell_util:json_encode(BodyMap),
     {ok, {{_, Status, _}, _, Resp}} =
         httpc:request(post, {Url, Headers, "application/json", Body},
+                      [{timeout, ?RPC_TIMEOUT_MS}], [{body_format, binary}]),
+    {Status, Resp}.
+
+%% Fetch the Q&A thread's persisted history — GET
+%% /api/engine/plan-cards/:id/conversation. The shell has confirmed ownership first.
+%% Returns {StatusCode, ResponseBodyBinary}: 200 with {turns: [...]} (oldest→newest,
+%% bilingual answers), empty before the first Q&A turn. Relayed verbatim.
+-spec get_conversation(binary(), binary()) -> {non_neg_integer(), binary()}.
+get_conversation(UserId, PlanCardId) ->
+    Token = fh_shell_engine_jwt:mint(#{user_id => UserId}),
+    Url = base_url() ++ "/plan-cards/" ++ binary_to_list(PlanCardId) ++ "/conversation",
+    Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
+    {ok, {{_, Status, _}, _, Resp}} =
+        httpc:request(get, {Url, Headers},
                       [{timeout, ?RPC_TIMEOUT_MS}], [{body_format, binary}]),
     {Status, Resp}.
 

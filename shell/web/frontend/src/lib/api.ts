@@ -148,7 +148,7 @@ export async function createPlanCard(
 // (plan_card_views) before touching the engine — the engine treats user_id as opaque
 // (§9.3, no cross-DB join). An unowned/unknown/malformed id is a uniform 404. Live
 // fill streams over SSE separately (planCardStream.ts).
-import type { PlanCard, PlanCardSummary, ChecklistStatusMap } from '$lib/planCard';
+import type { PlanCard, PlanCardSummary, ChecklistStatusMap, LocalizedText } from '$lib/planCard';
 
 /** A discriminated read outcome so the projection branches calmly (§7.1). 404 is the
  *  EXPECTED "no plan for this zone yet / not signed in" path → onboarding CTA. */
@@ -365,6 +365,50 @@ export async function postMessage(
         return { kind: 'accepted', turnId: body.turn_id };
     }
     if (res.status === 409) return { kind: 'busy' };
+    if (res.status === 401) return { kind: 'auth_required' };
+    if (res.status === 404) return { kind: 'not_found' };
+    return { kind: 'error', status: res.status };
+}
+
+// --- Conversation: the Q&A thread's persisted history (8-S4e) ---------------
+// GET /api/plan-cards/:id/conversation — session_turns, oldest→newest, bilingual.
+// Chat.svelte hydrates its message list from this on mount, before subscribeConversation
+// takes over live — a plain fetch (no meter gate, no SSE) since it reads already-metered
+// history.
+
+/** One past (question, answer) pair. `answer` is bilingual, same shape as a live turn's
+ *  buffered text_delta accumulation, so the chat layer renders both identically. */
+export interface ConversationTurn {
+    turnId: string;
+    userText: string;
+    answer: LocalizedText;
+    ts: string;
+}
+
+export type ConversationOutcome =
+    | { kind: 'ok'; turns: ConversationTurn[] }
+    | { kind: 'auth_required' }
+    | { kind: 'not_found' }
+    | { kind: 'error'; status: number };
+
+/** GET the card's Q&A history. Empty `turns` before the first Q&A turn — not an error. */
+export async function getConversation(
+    planCardId: string,
+    fetchFn: typeof fetch = fetch
+): Promise<ConversationOutcome> {
+    const res = await fetchFn(`/api/plan-cards/${encodeURIComponent(planCardId)}/conversation`);
+    if (res.ok) {
+        const body = (await res.json()) as {
+            turns?: Array<{ turn_id: string; user_text: string; answer: LocalizedText; ts: string }>;
+        };
+        const turns = (body.turns ?? []).map((t) => ({
+            turnId: t.turn_id,
+            userText: t.user_text,
+            answer: t.answer,
+            ts: t.ts
+        }));
+        return { kind: 'ok', turns };
+    }
     if (res.status === 401) return { kind: 'auth_required' };
     if (res.status === 404) return { kind: 'not_found' };
     return { kind: 'error', status: res.status };
@@ -758,5 +802,52 @@ export async function setTransactionDates(
     }
     if (res.status === 401) return { kind: 'auth_required' };
     if (res.status === 404) return { kind: 'not_found' };
+    return { kind: 'error', status: res.status };
+}
+
+// --- Usage: current-period tokens/cost (8-S5g, the account page) ------------
+// GET /api/billing/usage — the authenticated user's tier + this-period token usage
+// (billing.md §6/§7), read fresh (no client cache) on each page load.
+
+/** `limitTokens` is `'unlimited'` for an admin (fh_shell_meter exempts them from the
+ *  gate entirely) rather than a numeric cap that would misreport what governs them. */
+export interface UsageSummary {
+    tier: 'free' | 'plus' | 'pro';
+    usedTokens: number;
+    limitTokens: number | 'unlimited';
+    shadowCost: number;
+    periodStart: string;
+    periodEnd: string;
+}
+
+export type UsageOutcome =
+    | { kind: 'ok'; usage: UsageSummary }
+    | { kind: 'auth_required' }
+    | { kind: 'error'; status: number };
+
+export async function getUsage(fetchFn: typeof fetch = fetch): Promise<UsageOutcome> {
+    const res = await fetchFn('/api/billing/usage');
+    if (res.ok) {
+        const body = (await res.json()) as {
+            tier: 'free' | 'plus' | 'pro';
+            used_tokens: number;
+            limit_tokens: number | 'unlimited';
+            shadow_cost: number;
+            period_start: string;
+            period_end: string;
+        };
+        return {
+            kind: 'ok',
+            usage: {
+                tier: body.tier,
+                usedTokens: body.used_tokens,
+                limitTokens: body.limit_tokens,
+                shadowCost: body.shadow_cost,
+                periodStart: body.period_start,
+                periodEnd: body.period_end
+            }
+        };
+    }
+    if (res.status === 401) return { kind: 'auth_required' };
     return { kind: 'error', status: res.status };
 }

@@ -27,7 +27,7 @@
 %% for the gate. A cold/empty cache never gives a wrong answer, only a slower one.
 
 -export([start_link/0]).
--export([period_tokens/1, invalidate/1, gate/1]).
+-export([period_tokens/1, invalidate/1, gate/1, usage_summary/1]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
          terminate/2, code_change/3]).
 
@@ -74,15 +74,72 @@ invalidate(UserId) when is_binary(UserId) ->
 %% construction — period_tokens/1 returns 0 on a DB hiccup, so a metering outage
 %% lets turns through rather than locking everyone out (the conservative direction
 %% for a quota: under-count, never over-block).
+%%
+%% ADMIN EXEMPTION (billing.md §9's ADMIN_EMAILS allowlist): an admin is exempt from
+%% the quota entirely, not just billed=false — before this, is_admin/1 only suppressed
+%% the CHARGE (fh_shell_usage_consumer:book_usage/4); the gate itself never consulted
+%% it, so an admin with no active paid subscription fell to the free tier's 1M-token
+%% limit like anyone else. Usage still meters normally (attribution is unaffected,
+%% billed stays false) — only the block is skipped.
 -spec gate(binary()) ->
     allow | {block, #{tier := binary(), used := integer(), limit := integer()}}.
 gate(UserId) when is_binary(UserId) ->
-    Tier  = fh_shell_store:user_tier(UserId),
-    Limit = fh_shell_pricing:tier_token_limit(Tier),
-    Used  = period_tokens(UserId),
-    case Used >= Limit of
-        true  -> {block, #{tier => Tier, used => Used, limit => Limit}};
-        false -> allow
+    case is_admin(UserId) of
+        true -> allow;
+        false ->
+            Tier  = fh_shell_store:user_tier(UserId),
+            Limit = fh_shell_pricing:tier_token_limit(Tier),
+            Used  = period_tokens(UserId),
+            case Used >= Limit of
+                true  -> {block, #{tier => Tier, used => Used, limit => Limit}};
+                false -> allow
+            end
+    end.
+
+%% UserId -> admin?, via the same email lookup the usage consumer uses. A DB miss (no
+%% such user, or a transient error) is fail-SAFE the other direction from
+%% period_tokens/1: treated as false (not-admin), so a lookup hiccup never over-exempts
+%% a normal user from their quota — it only ever costs a real admin one gate check's
+%% worth of the ordinary tier limit, self-healing on the next call.
+-spec is_admin(binary()) -> boolean().
+is_admin(UserId) ->
+    case fh_shell_store:user_email(UserId) of
+        {ok, Email} -> fh_shell_billing:is_admin(Email);
+        not_found   -> false
+    end.
+
+%% The account-page read (8-S5g, the minimal usage view): tier, this-period tokens +
+%% shadow cost, limit, period bounds. A FRESH SQL read (not the ETS-cached
+%% period_tokens/1 path) — this is a once-per-page-load display, not the hot-path
+%% gate, so the extra query is cheap and the display is never stale-by-cache-TTL. An
+%% admin's `limit` reads as the atom `unlimited` (gate/1 exempts them; a numeric
+%% limit here would misreport what actually governs their usage).
+-spec usage_summary(binary()) -> map().
+usage_summary(UserId) ->
+    Tier = fh_shell_store:user_tier(UserId),
+    Limit = case is_admin(UserId) of
+        true  -> unlimited;
+        false -> fh_shell_pricing:tier_token_limit(Tier)
+    end,
+    SQL = <<"SELECT COALESCE(SUM(u.tokens_total), 0), COALESCE(SUM(u.shadow_cost), 0), "
+            "  to_char(p.start AT TIME ZONE 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"'), "
+            "  to_char(p.stop  AT TIME ZONE 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') "
+            "FROM (SELECT "
+            "  COALESCE((SELECT s.current_period_start FROM subscriptions s "
+            "             WHERE s.user_id = $1::uuid), date_trunc('month', now())) AS start, "
+            "  COALESCE((SELECT s.current_period_end FROM subscriptions s "
+            "             WHERE s.user_id = $1::uuid), "
+            "           date_trunc('month', now()) + interval '1 month') AS stop"
+            ") p "
+            "LEFT JOIN usage_records u ON u.user_id = $1::uuid AND u.created_at >= p.start "
+            "GROUP BY p.start, p.stop">>,
+    case pgo:query(SQL, [UserId]) of
+        #{rows := [{Tokens, Cost, Start, Stop}]} ->
+            #{tier => Tier, used_tokens => trunc_num(Tokens), shadow_cost => Cost,
+              limit_tokens => Limit, period_start => Start, period_end => Stop};
+        _ ->
+            #{tier => Tier, used_tokens => 0, shadow_cost => 0.0,
+              limit_tokens => Limit, period_start => null, period_end => null}
     end.
 
 %% ── gen_server ──────────────────────────────────────────────────────────────
