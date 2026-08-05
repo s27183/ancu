@@ -2132,6 +2132,11 @@ main {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    /* Fixed viewport share so the composer stays put as the transcript grows — the
+       log scrolls internally instead of pushing the input down the sheet. */
+    max-height: 45vh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
 }
 .chat-msg {
     max-width: 85%;
@@ -2151,8 +2156,6 @@ main {
 }
 .chat-msg.assistant {
     align-self: flex-start;
-    background: var(--surface);
-    border: 1px solid var(--border);
     color: var(--ink);
 }
 .chat-status {
@@ -2180,6 +2183,11 @@ main {
 }
 .chat-input input:disabled {
     opacity: 0.6;
+}
+.chat-input button {
+    width: auto;
+    flex: 0 0 auto;
+    white-space: nowrap;
 }
 .chat-input button:disabled {
     opacity: 0.5;

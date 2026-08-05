@@ -30,6 +30,7 @@
     let input = $state('');
     // A turn is in flight → block another send (the engine 409s a concurrent turn anyway).
     let sending = $state(false);
+    let logEl = $state<HTMLDivElement | null>(null);
 
     let stream: PlanCardStream | null = null;
     // Race guard: an answer can in principle arrive before postMessage's 202 registers
@@ -106,13 +107,20 @@
         });
         return () => stream?.close();
     });
+
+    // The log is a fixed-height scroll region (CSS); pin it to the newest message on
+    // every push AND on in-place phase/answer updates (thinking → looking → done).
+    $effect(() => {
+        for (const m of messages) if (m.role === 'assistant') void m.phase;
+        if (logEl) logEl.scrollTop = logEl.scrollHeight;
+    });
 </script>
 
 <section class="chat" aria-label={$t('chat.title')}>
     <h3 class="chat-title">{$t('chat.title')}</h3>
 
     {#if messages.length > 0}
-        <div class="chat-log">
+        <div class="chat-log" bind:this={logEl}>
             {#each messages as m, i (i)}
                 {#if m.role === 'user'}
                     <div class="chat-msg user"><p>{m.text}</p></div>
