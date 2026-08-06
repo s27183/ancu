@@ -1880,7 +1880,11 @@ Vietnamese (`vi`) AND English (`en`) — carrying the SAME meaning. The Vietname
 natural, register-appropriate Vietnamese for a first home buyer and their family (warm \
 but precise; the respectful register a Vietnamese reader expects when money and family \
 are involved) — NOT a transliteration of the English, NOT machine-translation tone. Do \
-not leave `vi` as an English string."""
+not leave `vi` as an English string.
+DUPLICATE QUESTIONS: if `<conversation_glue>` shows you already answered this same \
+question — even reworded, even in the other language — do NOT redo the full analysis. \
+Give a short pointer back to what you already said (one or two sentences), and only add \
+new substance if this phrasing actually asks something the earlier answer didn't cover."""
 
 _QA_TOOLS = """\
 You have ONE tool, `kb_lookup`, over Rau's curated knowledge base:
@@ -1925,13 +1929,35 @@ answer in both languages. Nothing else.
 </output>"""
 
 
+def _strip_vi_for_qa(obj):
+    """Drop the `vi` half of every {en, vi} bilingual leaf before a card goes into
+    the QA prompt (~30% of the card's tokens, measured). Safe because _QA_STYLE
+    already requires the agent to AUTHOR its own natural Vietnamese from the
+    grounding facts, not transliterate the card's pre-baked vi text — so the
+    pre-translated copy is pure redundancy for this call, not lost grounding.
+    (The persisted card / shell rendering are untouched — this only shapes what
+    THIS prompt sends.)"""
+    if isinstance(obj, dict):
+        if (obj.keys() >= {"en", "vi"}
+                and isinstance(obj.get("en"), str) and isinstance(obj.get("vi"), str)):
+            return {"en": obj["en"]}
+        return {k: _strip_vi_for_qa(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_strip_vi_for_qa(v) for v in obj]
+    return obj
+
+
 def build_qa_user_content(card, glue, message):
+    # Compact, not pretty-printed: this JSON is re-sent (and, per handle_qa's
+    # disposable-sidecar-per-turn design, largely re-cached rather than cache-hit)
+    # on every single question — indent=2 whitespace was ~32% of the card's tokens
+    # for no reasoning benefit.
     parts = ["<plan_card_state>\n"
-             + json.dumps(card, indent=2, ensure_ascii=False)
+             + json.dumps(_strip_vi_for_qa(card), separators=(",", ":"), ensure_ascii=False)
              + "\n</plan_card_state>"]
     if glue:
         parts.append("<conversation_glue>\n"
-                     + json.dumps(glue, indent=2, ensure_ascii=False)
+                     + json.dumps(glue, separators=(",", ":"), ensure_ascii=False)
                      + "\n</conversation_glue>")
     parts.append("<user_query>\n" + message + "\n</user_query>")
     return "\n\n".join(parts)
