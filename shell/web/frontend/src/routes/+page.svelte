@@ -160,10 +160,11 @@
         getAllNews().then((news) => (homeNews = news));
     });
 
-    // Ticker tap opens the overview, not a specific note's detail — "which headline was
-    // showing" doesn't matter, the friend's suggested flow always goes ticker -> list first.
-    function onHomeTickerTap() {
-        homeNewsListOpen = true;
+    // Ticker tap opens that specific note's detail directly (2026-08-06, Son) — the list
+    // stays reachable as the fallback closing a ticker-opened note lands on
+    // (onHomeNewsClose, unchanged), it's just no longer the ticker's own first stop.
+    function onHomeTickerTap(note: NewsNote) {
+        selectedHomeNews = note;
     }
     function onHomeNewsListClose() {
         homeNewsListOpen = false;

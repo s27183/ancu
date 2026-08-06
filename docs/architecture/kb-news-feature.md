@@ -688,6 +688,18 @@ section header with the HECS note; tapping that headline swaps to the
 detail sheet, which renders `**67.000 đô la**`/`**69.528 đô la**` as real
 bold text and shows no diff block (`.pp-news-diff` DOM count: 0).
 
+**Homepage ticker tap reverted to direct-to-detail (2026-08-06, Son).** The
+list-first flow above was itself a reversal of the original direct-tap
+behavior; this reverses it again, on Son's explicit request — a UX
+improvement to skip an extra tap for "the headline you can already read on
+the ticker." `onHomeTickerTap` (`+page.svelte`) now receives the specific
+`NewsNote` `NewsTicker`'s `onSelect` already passed (the plumbing existed
+unused) and opens `NewsDetailSheet` directly for it, instead of always
+opening `NewsListSheet`. **The list is NOT removed** — closing a
+ticker-opened detail sheet still lands on it (`onHomeNewsClose`,
+unchanged), so "browse everything" stays one tap away, just no longer the
+ticker's own first stop. `svelte-check` 0/0, `svelte-autofixer` clean.
+
 ## Open design questions (real gaps, not yet resolved)
 
 **1. Push vs pull.** The engine primitive is pull-only (the shell calls GET).
