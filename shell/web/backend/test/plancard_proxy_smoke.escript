@@ -147,9 +147,13 @@ main(_) ->
                       [<<"over+", (uuid())/binary, "@example.com">>]),
     OverCard = uuid(),
     ok = fh_shell_store:insert_plan_card_view(OverUser, OverCard, <<"Cabramatta">>),
+    %% engine_event_id must be NEGATIVE: fh_shell_usage_consumer bootstraps its poll
+    %% cursor from MAX(engine_event_id) across this whole table (002_commerce.sql),
+    %% so a positive fixture id — even a huge one meant only to be "unique" — can jump
+    %% the real consumer's cursor past every future real event and silently wedge it.
     _ = pgo:query(<<"INSERT INTO usage_records (user_id, engine_event_id, tokens_total) "
                     "VALUES ($1::uuid, $2, $3)">>,
-                  [OverUser, erlang:system_time(microsecond), 1000000]),
+                  [OverUser, -erlang:system_time(microsecond), 1000000]),
     OverJwt = fh_shell_jwt:issue(#{user_id => OverUser, email => <<"over@example.com">>,
                                    roles => [<<"buyer">>], locale => <<"vi">>}),
     OverAuth = [{"authorization", "Bearer " ++ binary_to_list(OverJwt)}],

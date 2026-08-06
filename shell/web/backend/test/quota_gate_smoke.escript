@@ -118,9 +118,12 @@ new_user() ->
 %% insert one usage_records row with a globally-unique engine_event_id, in-period.
 %% engine_event_id is bigint UNIQUE and we INSERT without ON CONFLICT, so the key
 %% must be unique across re-runs: system_time(microsecond) advances every call (a
-%% full pgo round-trip separates them) and across VM restarts (wall clock).
+%% full pgo round-trip separates them) and across VM restarts (wall clock). NEGATED:
+%% fh_shell_usage_consumer bootstraps its poll cursor from MAX(engine_event_id) across
+%% this whole table (002_commerce.sql) — a positive fixture id can jump the real
+%% consumer's cursor past every future real event and silently wedge it.
 ins_usage(UserId, Tok) ->
-    Ev = erlang:system_time(microsecond),
+    Ev = -erlang:system_time(microsecond),
     pgo:query(<<"INSERT INTO usage_records (user_id, engine_event_id, tokens_total) "
                 "VALUES ($1::uuid, $2, $3)">>, [UserId, Ev, Tok]).
 
