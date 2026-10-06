@@ -368,6 +368,37 @@ table, or calling an `/api/engine/*` path the engine does not register.
 engine-DB access, and match every `/api/engine/*` path they call against the
 engine's registered routes.
 
+## P-7 · One declaration per outcome shape
+
+**Each component's outcome shape is declared once, in its blueprint's
+`outcome_schema`, compiled by `engine/build/kb_compiler.py`; the shell's
+types for it are checked against that declaration, never maintained as an
+independent copy.** (Son, 2026-10-06, adapting the erlang-engine prior's
+"one declaration per primitive": its generator is a separate SDK project this
+repo does not use, so the declaration here is the blueprint and the hold is a
+check, not generation.)
+
+**Fails when** a shell type and the outcome it reads diverge — a field the
+engine emits that no renderer reads, or a field a renderer reads with a shape
+the engine does not emit.
+
+**Proof, shown in this system.** Renderers dropped fields the producer
+computed, and `Calculator.svelte`'s unguarded default branch rendered a
+"cash needed" hero onto `cash_flow_projection` and `tax_optimised_structure`
+outcomes it was not built for; `tests/renderer_conformance.py`, added after,
+reports a 30-field backlog. `shell/web/frontend/src/lib/planCard.ts` holds 68
+hand-written types mirroring engine outcomes.
+
+**Held by** the blueprint `outcome_schema` as the single declaration, gated
+by the compiler's reference-integrity and type-compat gates;
+`tests/renderer_conformance.py` on the shell side.
+
+**Falsifier:** an `outcome_schema` field absent from, or typed differently
+in, the shell's types.
+
+**Checked by** `tests/renderer_conformance.py` — presence only today; holding
+this needs it extended to compare field types against `planCard.ts`.
+
 ---
 
 ## The shape of failure
