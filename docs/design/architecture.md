@@ -194,6 +194,34 @@ a coupling held by nothing is a hope, and naming it here does not make it hold.
 | When this changes | This must follow | By what route | Held by |
 |---|---|---|---|
 | a verified step completes | it lands as a commit, one concern each | once the `checks:` line passes | prompt, rule 3 |
+| a blueprint/mode is added | a `fh_engine_turn:base_components/1` clause, onboarding `blueprint_for`, a `plan_cards.mode` CHECK migration, every shared renderer's shape branch, the `ui_tabs` kind it lands under, and a live seam smoke | by hand, as the mode is built | nothing: a missing slug falls through to Mode A (`fh_engine_turn.erl`), and `006_mode_e.sql` was found missing only by a live POST |
+| a KB doc is re-anchored to a new slug or lookup key | every blueprint `KB anchors:` line, plus resolver literals (`fh_engine_mortgage.erl` `?TAX`/`?HECS` and lookup keys, `fh_engine_fill.erl`'s provenance list) and the conformance escripts | grep the old slug across `engine/erlang` | nothing: the compiler cannot see Erlang literals |
+
+Rows two and three: Son agreed 2026-10-06, homed from earlier sessions' memory.
+
+## Design rules
+
+Hold everywhere in this repo (Son agreed 2026-10-06, homed from the harness
+memory of earlier sessions):
+
+- **Enforce at chokepoints.** A rule is enforced where every artifact crosses
+  (the compiler; the turn's commit seam). The check discovers what to check
+  from declared schema rather than an enumerated list, fails closed, and fails
+  if it discovers nothing.
+- **A unification is a projection.** A new view of the plan is a projection — a
+  filter, tab, zoom or overlay — of an existing outcome through an existing
+  renderer. A change that needs new renderers to unify views has not found the
+  shared primitive.
+- **Admission to the decision layer.** A data layer enters the plan or resolver
+  only if a component reads it and banding it would not mislead; otherwise it
+  stays raw on the surface, for the user to interpret.
+- **An honest-partial null carries its reason.** An honest-partial `null` is set
+  with a comment at that line saying why the value is absent; a null with no
+  reason beside it is treated as a dropped value, not as honest-partial.
+- **Non-ASCII Erlang binaries carry `/utf8`.** Every Erlang binary literal
+  holding non-ASCII text carries `/utf8`; without it each codepoint truncates
+  to one byte and `json:encode` crashes, so VI copy is byte-fragile in both
+  Erlang parts. Nothing checks this today.
 
 ## What is deliberately not coupled
 
