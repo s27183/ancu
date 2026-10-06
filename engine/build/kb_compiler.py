@@ -403,9 +403,9 @@ def parse_blueprint(path):
         # Mode X" compiles to outcome_type null / zero fields, and since the registry unions
         # fields per type a wrong type name passes every gate. The type string is also the
         # runtime Upstream dispatch key. Measured 2026-07 (Mode C task 7; Mode D P2/P3) and
-        # 2026-07-10 (purchase_journey/phase_playbook compiled null); measured 2026-10-06:
-        # artifact.json still has null outcome_type for buying_strategy, due_diligence and
-        # settlement_prep in fhb-foreign-au and investor-foreign-au.
+        # 2026-07-10 (purchase_journey/phase_playbook compiled null) and 2026-10-06 (six
+        # foreign-mode components). A missing block now fails the build at GATE 12 (P-7,
+        # #25); a wrong type NAME still passes, which no gate catches.
         ob = fenced_jsonc_after(body, "**Outcome schema:**")
         if ob:
             o = parse_jsonc(ob)
@@ -1123,6 +1123,20 @@ def run(emit=False):
             bad = [r for r in c.renderers if r not in RENDERER_ENUM]
             if bad:
                 fails.append(f"[renderer] {stem}/{c.name}: not in enum: {bad}")
+
+    # ---- GATE 12: every component declares its outcome shape (all blueprints) -- #
+    # Reproducible -> P-7 · One declaration per outcome shape -> The KB compiler -> undeclared outcome refused
+    # A component whose `**Outcome schema:**` has no fenced ```jsonc block (a type named
+    # only in prose) compiles to outcome_type null, and fh_engine_outcome:validate/3 then
+    # had nothing to check its fill against. Refused here, so it never reaches a deploy
+    # (Son, 2026-10-06, #25); validate/3 refusing an undeclared type is the backstop.
+    # Measured 2026-10-06: before this gate, 6 of 70 components compiled null
+    # (buying_strategy/due_diligence/settlement_prep in fhb-foreign-au, investor-foreign-au).
+    for stem, (_, bcomps, _, _, _) in blueprints.items():
+        for c in bcomps:
+            if not c.outcome_type:
+                fails.append(f"[outcome_schema] {stem}/{c.name}: no fenced ```jsonc "
+                             f"outcome schema with a \"type\" — declare its shape (P-7)")
 
     # ---- GATE 4: pipeline acyclic (all blueprints — structural, mode-independent) #
     stats["dag"] = {}

@@ -931,6 +931,29 @@ Combines [Mode C buying_strategy investor_anchoring](investor-domestic-au.md#8-b
 
 **Outcome schema:** `bid_plan_foreign_investor` (combines bid_plan_investor + firb_approval_status fields)
 
+Declared as Mode C's `bid_plan_investor` ([`investor-domestic-au.md`](investor-domestic-au.md)), the shape the shared investor resolver emits; the foreign-only type and fields named above are not emitted by any resolver yet, so they are not declared (Son, 2026-10-06, P-7: an undeclared shape fails the build).
+
+```jsonc
+{
+  "type": "bid_plan_investor",
+  "fields": {
+    // --- the investor-specific yield discipline (resolver; removed from the LLM's reach) ---
+    "yield_anchored_max_price": "money_range",   // = annual_rent × 100 ÷ target_gross_yield; a BAND because rent is a band (Slice B0 convention)
+    "thesis_alignment": "enum",                  // actual price vs the anchored band → aligned | stretched | misaligned
+
+    // --- Mode A bid_plan fields, investor-typed ---
+    "max_bid_value": "money_range",              // = the yield-anchored band (the discipline line, NOT "bid this"); resolver
+    "max_bid_confidence": "percentage_0_100",    // honest-partial null (needs market depth not wired)
+    "max_bid_reasoning": "localized_text",       // bilingual yield-anchor frame via kb.copy.buying-strategy (no English literal in code)
+    "walk_away_price": "money_range",            // = the yield-anchored band (walk away above it); resolver
+    "negotiation_style": "enum",                 // the ONE agent leaf (reasoning_domain: negotiation)
+    "live_coach_armed": "bool",                  // false (live-coach feature not built)
+    "conditions_to_request": "array<localized_text>",  // standard investor offer conditions, bilingual via kb.copy
+    "red_flags_to_monitor": "array<localized_text>"    // PLACED from property_fit_investor.key_concerns (already {vi,en}) — place-don't-recompute
+  }
+}
+```
+
 ---
 
 ### 11. due_diligence (investor + cross-border docs)
@@ -951,6 +974,46 @@ Combines [Mode C investor_specific_documents](investor-domestic-au.md#9-due_dili
 
 **Outcome schema:** `risk_assessment_foreign_investor`
 
+Declared as Mode C's `risk_assessment_investor` ([`investor-domestic-au.md`](investor-domestic-au.md)), the shape the shared investor resolver emits; the foreign-only type and fields named above are not emitted by any resolver yet, so they are not declared (Son, 2026-10-06, P-7: an undeclared shape fails the build).
+
+```jsonc
+{
+  "type": "risk_assessment_investor",
+  "fields": {
+    // honest-partial signal. `pending_upload` until the user supplies the due-diligence documents
+    // (rental appraisal, depreciation quote, lease) — the upload pipeline is NOT built (CLAUDE.md
+    // item 9; the only Phase-B input today is the source-supplied property_card of neutral property
+    // facts, not the user's uploaded documents). `reviewed` once documents are uploaded + assessed →
+    // the document-risk surfacing (high_severity_flags, the negotiation lever, the lease-interpretation
+    // agent leaf) lights up. Deferred to a separate cross-contract unit (mode-c-wedge.md "due_diligence B").
+    "docs_status": "enum: pending_upload | reviewed",
+    // overall risk verdict. `pending_documents` until docs are uploaded; the substantive verdicts (B).
+    "overall_verdict": "enum: pending_documents | low_risk | proceed_with_actions | high_risk",
+    // the investor document PROCUREMENT checklist (KB-grounded, property-generic): what an investor
+    // must gather (rental appraisal, depreciation quote, lease-if-tenanted, rental history). required +
+    // why are known now; received/reviewed false until the upload pipeline (B).
+    "document_checklist": "array<{ id, name: localized_text, required: bool, received: bool, reviewed: bool, why: localized_text }>",
+    // the COMPUTABLE investor risk flag: property_fit_investor.rental_yield_gross_estimate <
+    // strategy_thesis.target_gross_yield. resolver-computed, removed from the LLM's reach (§8.5).
+    // null until both inputs exist (needs the per-property yield AND the strategy target).
+    "rental_yield_below_thesis_threshold": "bool | null",
+    // surfaced investor concerns (risk-flag-list renderer). At A: the yield-below-thesis concern if it
+    // fires. The document-derived concerns (appraisal below expectation, unfavourable tenancy) follow in B.
+    "investor_specific_concerns": "array<{ id, severity: enum, detail: localized_text }>",
+    // due-diligence ACTIONS the buyer should take before signing — bilingual, investor-generic (A).
+    "actions_before_signing": "array<localized_text>",
+    // questions to ask the vendor / agent — bilingual, investor-generic (A).
+    "questions_for_vendor": "array<localized_text>",
+    // high-severity flags EXTRACTED from uploaded documents — [] until the upload pipeline (B).
+    "high_severity_flags": "array<{ source_doc, item: localized_text, action: localized_text }>",
+    // a negotiation lever estimated from document findings — null until documents reviewed (B).
+    "estimated_negotiation_lever": "money_range | null",
+    // honest: upload the due-diligence documents to complete the assessment (A).
+    "next_action_for_user": "localized_text"
+  }
+}
+```
+
 ---
 
 ### 12. settlement_prep (Mode C investor + Mode B FIRB/transfer)
@@ -967,7 +1030,38 @@ Combines [Mode C investor_specific_documents](investor-domestic-au.md#9-due_dili
 
 **Parameters:** Combines [Mode C investor_specific_milestones](investor-domestic-au.md#10-settlement_prep-similar-to-mode-a--entity-setup) with [Mode B firb_milestones + currency_transfer_milestones](fhb-foreign-au.md#10-settlement_prep--firb-approval-milestone--currency-transfer-milestone).
 
-**Outcome:** `settlement_checklist_foreign` (combines investor + cross-border milestones)
+**Outcome schema:** `settlement_checklist_foreign` (combines investor + cross-border milestones)
+
+Declared as Mode C's `settlement_checklist` ([`investor-domestic-au.md`](investor-domestic-au.md)), the shape the shared investor resolver emits; the foreign-only type and fields named above are not emitted by any resolver yet, so they are not declared (Son, 2026-10-06, P-7: an undeclared shape fails the build).
+
+```jsonc
+{
+  "type": "settlement_checklist",
+  "fields": {
+    // honest-partial signal. `pending_contract` until the user supplies the signed-contract dates
+    // (contract_signed_date + settlement_date — a per-property transaction-input surface, NOT a
+    // property fact; supplied via the transaction submit, engine-contract §11 / `<from_transaction>`).
+    // `active` once dates exist → the dated critical path + at-risk detection + swimlane light up.
+    "dates_status": "enum: pending_contract | active",
+    "settlement_date": "date | null",                                   // PENDING until contract dates supplied
+    // the standard settlement milestone sequence + dependency DAG (KB-grounded, property-generic).
+    // due_date null + status `pending` until dates_status=active.
+    "critical_path_milestones": "array<{ id, name: localized_text, due_date: date | null, status, dependency: id | null }>",
+    // investor-specific milestones. entity-setup is CONDITIONED on upstream: applicable iff
+    // tax_optimised_structure.recommended_entity requires establishing a legal entity (∉
+    // {personal_sole, joint, null}). QS engagement, depreciation schedule, PM appointment and
+    // landlord insurance are always-applicable for an investor (whether depreciation is claimable
+    // is a QS judgment, surfaced in `why` — not pre-decided from build-year, which we don't carry).
+    "investor_milestones": "array<{ id, name: localized_text, applicable: bool, why: localized_text, due_date: date | null, status }>",
+    // state-conditional building-insurance timing RULE (resolver-selected from
+    // kb.insurance.timing-of-risk-pass.risk_passing_by_state: QLD → day after contract; NSW/VIC →
+    // settlement). The RULE is knowable without dates; the dated milestone is part of B.
+    "insurance_timing_rule": "localized_text | null",
+    "at_risk_milestones": "array<{ name, reason }>",                     // [] until dates_status=active
+    "next_action_for_user": "localized_text"                            // honest: supply contract dates to activate
+  }
+}
+```
 
 ---
 

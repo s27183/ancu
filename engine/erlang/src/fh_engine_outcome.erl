@@ -59,22 +59,27 @@
 %% --- seam entry -------------------------------------------------------------
 
 %% Look up the component's declared outcome type-tree from the artifact and walk the
-%% fill against it. A missing schema (e.g. a per-property outcome type not yet declared)
-%% passes gracefully — consistent with the {kind:unknown} pass-through; base components
-%% all carry a schema (verified at build).
+%% fill against it. A type the artifact does not declare is refused
+%% ({outcome_undeclared, Slug, Type}); every component's shape is declared, which
+%% the compiler's GATE 12 enforces at build (P-7).
 %%
-%% Honest-partial -> P-7 · One declaration per outcome shape -> The engine -> missing-schema graceful pass
-%% "Verified at build" above does not hold: the compiler does not require every base
-%% component to declare an outcome schema, so this graceful pass also covers an author's
-%% omission, unvalidated. Measured 2026-07-05: the registry returned 2 of 13 types for
-%% nexthome-domestic-au; measured 2026-10-06: artifact.json has null outcome_type for
-%% buying_strategy, due_diligence, settlement_prep in fhb-foreign-au and investor-foreign-au.
+%% Reproducible -> P-7 · One declaration per outcome shape -> The engine -> undeclared outcome refused
+%% Until 2026-10-06 an undeclared type passed here unchecked, and the compiler did not
+%% require a declaration: measured 2026-07-05, the registry held 2 of 13 types for
+%% nexthome-domestic-au; measured 2026-10-06, six foreign-mode components compiled null.
+%% Now GATE 12 fails the build on any of them (measured 2026-10-06: one schema block
+%% removed → exit 1, artifact untouched), so this refusal is the backstop for a stale
+%% artifact or a renamed type (Son, 2026-10-06, #25).
 -spec validate(binary(), binary(), map()) -> ok.
 validate(BlueprintSlug, OutcomeType, Outcome) ->
     OutcomeTypes = fh_engine_kb:registry(BlueprintSlug, <<"outcome_types">>),
     case maps:find(OutcomeType, OutcomeTypes) of
         error ->
-            ok;
+            %% Undeclared: refused, not passed (P-7; Son, 2026-10-06, #25). The compiler's
+            %% GATE 12 already fails the build on a component with no declared shape, so
+            %% this is the backstop — reached only by a type the turn names that the
+            %% loaded artifact does not declare (a stale artifact, a renamed type).
+            error({outcome_undeclared, BlueprintSlug, OutcomeType});
         {ok, Fields} ->
             Locales = fh_engine_kb:locales(),
             case validate_fields(maps:to_list(Fields), Outcome, Locales) of
