@@ -18,7 +18,7 @@ compiler pass, not by the original blueprint-grep reconciliation).
 
 Anchor / upstream: [`fact-model-unification.md`](fact-model-unification.md) ("Mode D adds no new
 identity-layer generalization — it reuses B's `funder{}`/`off_title_parties[]` + C's
-`existing_portfolio`/`tax{}`, content only"), [`wedge-build-sequence.md`](wedge-build-sequence.md)
+`existing_portfolio`/`tax{}`, content only"), [`wedge-build-sequence.md`](../design/archive/wedge-build-sequence.md)
 (Mode D sits on top of both B and C — both now built, so Mode D is the next genuinely-unblocked
 foundational wedge), [`mode-b-wedge.md`](mode-b-wedge.md) + [`mode-c-wedge.md`](mode-c-wedge.md)
 (the two precedents this wedge combines — phasing, the multi-blueprint runtime, the resolver

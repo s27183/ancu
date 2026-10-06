@@ -81,3 +81,27 @@ docs/scratch/
 # output. Re-include it (its own __pycache__ etc. stay ignored by their rules).
 !engine/build/
 !engine/build/**/*.py
+
+# enacs seed
+CLAUDE.md
+CLAUDE.local.md
+AGENTS.md
+.claude/settings.local.json
+.claude/worktrees/
+.envrc
+*.iml
+/_build/
+/dist/
+ios/App/Pods/
+*.pyc
+.build/
+DerivedData/
+xcuserdata/
+.swiftpm/
+Pods/
+.gradle/
+/build/
+app/build/
+local.properties
+.kotlin/
+/captures/

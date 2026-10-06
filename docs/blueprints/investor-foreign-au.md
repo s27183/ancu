@@ -1215,7 +1215,7 @@ Combines Mode C `ownership_planning_investor` (property management, tax reportin
 
 **Renderer:** `swimlane-diagram`
 
-**UI tab hint:** Flow (leads the tab; folds into the restructure's five-view spine, §11.3 — not yet rewritten, tracked in `wedge-build-sequence.md`, task 9)
+**UI tab hint:** Flow (leads the tab; part of the five-view spine, §11.3 — rewritten 2026-07-10, task 9)
 
 **Fill path:** resolver. The journey structure + bilingual cell prose are generic KB content (`kb.journey.investor-foreign-path`); the figures are upstream outcomes placed on the timeline. No agent leaf.
 

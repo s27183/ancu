@@ -10,6 +10,12 @@
 %% any >255 codepoint (Vietnamese is saturated with them: ầ ư ọ ễ …). That UTF-8 trap is
 %% exactly why the resolver's Vietnamese copy lives in KB templates read as binaries, not in
 %% Erlang literals (bilingual-content.md §3b).
+%%
+%% Bilingual -> R-4 · Reasoning within its runtime -> The engine -> utf8 binary literal flag
+%% Any non-ASCII Erlang binary literal needs `/utf8`, or it truncates each codepoint to a
+%% byte and crashes json:encode ({invalid_byte,…}) as well as io:format ~s. Measured 2026-06:
+%% it broke fh_shell_mail sign-in and an fh_shell_billing label. Re-checked 2026-10-06 with
+%% `rg -n '<<"[^"]*[^\x00-\x7F][^"]*"(>>|,)' engine/erlang/src shell/web/backend/src`: none.
 
 -export([loc/2, subst/2]).
 

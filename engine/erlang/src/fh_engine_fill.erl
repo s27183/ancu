@@ -56,6 +56,11 @@ has_resolver(<<"due_diligence">>)      -> true;
 has_resolver(<<"existing_home_disposal">>) -> true;
 has_resolver(_)                        -> false.
 
+%% Honest-partial -> P-2 · The database is the single source of truth -> The engine -> firb_required_any defaults false
+%% Args.firb_required_any discriminates FIRB/foreign paths in several resolvers, and a
+%% missing key reads as `false` with no error. Every new turn starter must thread it from
+%% facts_jsonb.derived, as fh_engine_h_rerun does. Measured 2026-07-11 on a live Mode-D
+%% what-if turn that did not thread it.
 -spec resolver(binary(), map(), map()) -> {map(), binary(), [map()]}.
 resolver(<<"buyer_profile">>, Args, _Upstream) ->
     buyer_profile(Args);

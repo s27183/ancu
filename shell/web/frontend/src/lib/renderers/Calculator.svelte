@@ -189,6 +189,11 @@
     //    Budget-breakdown modal (where its line detail + notes live) instead;
     //  - a row with no resolvable owner stays static (honest-partial — never a dead link).
     // A dangling selected id (e.g. after a preview swaps the events) resolves to null → closed.
+    //
+    // Regulated figures are grounded -> P-7 · One declaration per outcome shape -> The web frontend -> drill-to-self guard
+    // A self-owned row never opens its own renderer inside itself; it opens a focused
+    // breakdown (or the owning tab). Check the real `source_component` values before adding
+    // a drill: measured June 2026, 3 of 4 budget rows were self-owned (cash_position).
     let selectedEventId = $state<string | null>(null);
     let showBreakdown = $state(false);
     function ownerOf(e: CashEvent): string | null {

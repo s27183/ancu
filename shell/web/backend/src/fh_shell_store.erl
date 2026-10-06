@@ -183,6 +183,12 @@ link_subscription(UserId, StripeSubId, Tier) ->
 %% to_timestamp's overload and maps null → null. Returns {ok, updated} when a row matched,
 %% {ok, no_match} for an unknown subscription (e.g. an event before its session.completed,
 %% or a subscription not created through our checkout) — the caller logs + acks either way.
+%%
+%% Honest-partial -> P-2 · The database is the single source of truth -> The shell database -> pgo timestamptz text param
+%% pgo will not encode a text parameter cast `$n::timestamptz` inside extract(epoch …): it
+%% raises badarg_encoding. Compute epochs in SQL or pass numbers, as the
+%% to_timestamp($n::double precision) shape below does. Measured June 2026:
+%% billing_webhook_smoke failed on the text form.
 -spec update_subscription(binary(), binary(), binary(),
                           integer() | null, integer() | null) ->
     {ok, updated | no_match}.

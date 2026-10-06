@@ -120,6 +120,11 @@ version_of(Filename) ->
         [Whole]          -> Whole   %% no underscore — use the whole name
     end.
 
+%% Reproducible -> P-2 · The database is the single source of truth -> The engine database -> uppercase migration checksum
+%% binary:encode_hex/1 is UPPERCASE, so a hand-applied schema_migrations row must use this
+%% function, not `shasum` (lowercase), or boot aborts with migration_checksum_mismatch.
+%% Measured 2026-08: a hand-applied lowercase row aborted boot; re-measured 2026-10-06
+%% (OTP 29): `erl -noshell -eval 'io:format("~s~n",[binary:encode_hex(<<171,205>>)]),halt().'` -> ABCD.
 -spec checksum(binary()) -> binary().
 checksum(Bin) ->
     binary:encode_hex(crypto:hash(sha256, Bin)).

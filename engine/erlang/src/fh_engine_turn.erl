@@ -665,6 +665,11 @@ base_components(<<"nexthome-domestic-au">> = Slug) ->
 base_components(Slug) ->
     order(Slug, ?BASE_COMPONENTS).
 
+%% Whole lifecycle -> P-7 · One declaration per outcome shape -> The engine -> unknown component silently dropped
+%% A name in a component list that the loaded artifact lacks is dropped without error
+%% (the maps:is_key filter), so a new component needs a re-emitted artifact AND a test
+%% asserting it is selected — otherwise its phase is simply missing from the plan.
+%% Concluded 2026-10-06 from reading this function; no check guards it today.
 order(BlueprintSlug, Names) ->
     {ok, All} = fh_engine_kb:components(BlueprintSlug),
     ByName = maps:from_list([{maps:get(<<"name">>, C), C} || C <- All]),
@@ -928,6 +933,11 @@ close_port(#{port := Port}) ->
 close_port(_Data) ->
     ok.
 
+%% Reproducible -> P-3 · The sidecar is stateless and disposable -> The engine -> sidecar paths resolve against engine cwd
+%% FH_SIDECAR_PYTHON and FH_PLANNER_SCRIPT are passed to open_port as given, so a relative
+%% value resolves against the engine's cwd (engine/erlang), not the repo root: a
+%% repo-root-relative value crashes open_port with enoent on the first fill. Measured
+%% 2026-07-04: investor_seam_smoke with real sonnet.
 python_exe() ->
     case os:getenv("FH_SIDECAR_PYTHON") of
         false ->
@@ -938,6 +948,12 @@ python_exe() ->
         P -> P
     end.
 
+%% Reproducible -> P-3 · The sidecar is stateless and disposable -> The sidecar -> stub sidecar default
+%% With FH_PLANNER_SCRIPT unset the sidecar is planner_stub.py, not planner.py: no model
+%% runs, and a `usage` event with model `stub` / 0 tokens says so. The stub must mirror
+%% planner.py's reply protocol. Measured 2026-06: 2b-2b stub drift surfaced as "sidecar
+%% exit 0 before reply"; the Mode-C Slice C seam and property_assessment_seam both
+%% misattributed stub output to a "degraded LLM".
 planner_script() ->
     case os:getenv("FH_PLANNER_SCRIPT") of
         false ->

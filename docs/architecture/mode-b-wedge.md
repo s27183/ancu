@@ -12,7 +12,7 @@ source of truth for "what's left." The grounding-checklist carries a one-line po
 
 Anchor / upstream: [`fact-model-unification.md`](fact-model-unification.md) (the deferred Mode-B
 slots — `off_title_parties[]`, `visa_class`, off-title `funder{}`, the F14 close),
-[`wedge-build-sequence.md`](wedge-build-sequence.md) (Mode B = the next foundation layer; unblocks
+[`wedge-build-sequence.md`](../design/archive/wedge-build-sequence.md) (Mode B = the next foundation layer; unblocks
 Mode D), [`mode-c-wedge.md`](mode-c-wedge.md) (the precedent this wedge mirrors — phasing, the
 multi-blueprint runtime it reuses), [`engine-contract.md`](engine-contract.md) §9.1,
 [`architecture.md`](architecture.md) §11.9. Conforming artifact:

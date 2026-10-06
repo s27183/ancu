@@ -8,7 +8,7 @@
 
 ## 1. Separation of concerns
 
-Billing lives in the shell backend (`fh_shell_billing`, `fh_shell_usage_consumer`), never the engine. The engine never reads a balance, never gates on a quota, never charges. This is constraint #11 (engine meters, shell gates) and [`principles.md`](principles.md) Principle 5, and it keeps **ASIC liability out of the agent loop** — the engine never decides whether work proceeds based on money.
+Billing lives in the shell backend (`fh_shell_billing`, `fh_shell_usage_consumer`), never the engine. The engine never reads a balance, never gates on a quota, never charges. This is constraint #11 (engine meters, shell gates) and [`docs/design/invariants.md`](../design/invariants.md) P-5, and it keeps **ASIC liability out of the agent loop** — the engine never decides whether work proceeds based on money.
 
 | Layer | What it does |
 |---|---|
@@ -233,6 +233,6 @@ The **period meter** is derived, not stored: `SELECT sum(tokens_total) FROM usag
 - [`engine-contract.md`](engine-contract.md) §8 (commerce out of scope), §9 (`usage` event schema + the pull-model outbox), §1 (metering-not-gating) — the engine side of this boundary.
 - [`shell-architecture.md`](shell-architecture.md) §5–§6 — the modules and tables this doc details; §2 ownership.
 - [`03-strategy.md`](../03-strategy.md) §8.4 (pricing direction), §8.5 (REA economics), Wedge 1a §321 / §337 (the GTM numbers these tiers implement).
-- [`principles.md`](principles.md) Principle 5 — metering, not gating.
+- [`docs/design/invariants.md`](../design/invariants.md) P-5 — metering, not gating.
 - [`compliance-pipeline.md`](compliance-pipeline.md) §5 — `audit_events` (attribution, no cost), the sibling of `usage`.
 - [`structure-map.md`](structure-map.md) Plane 5 — situates commerce in the engine/shell node-set.

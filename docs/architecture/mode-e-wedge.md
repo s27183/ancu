@@ -9,7 +9,7 @@ carries a one-line pointer here.
 Anchor / upstream: [`fact-model-unification.md`](fact-model-unification.md) (the unified `profile.*`
 fact base — Mode E needs no new fact-model generalization, only activation of the already-defined
 `existing_portfolio.ppor_*` / `derived.ppor_equity_available_for_leverage` slots, same "content only"
-position Mode D was in), [`wedge-build-sequence.md`](wedge-build-sequence.md) ("What's left" — Mode E
+position Mode D was in), [`wedge-build-sequence.md`](../design/archive/wedge-build-sequence.md) ("What's left" — Mode E
 is the next foundational item, no external prerequisites), [`mode-c-wedge.md`](mode-c-wedge.md)
 ("Mode-E gap" section — where this was surfaced, at the P5-activate onboarding intent gate),
 [`mode-b-wedge.md`](mode-b-wedge.md) + [`mode-d-wedge.md`](mode-d-wedge.md) (the two precedents this
@@ -110,7 +110,7 @@ mismatch. Mode E closes it.
 
 ## Cross-references
 
-- **Roadmap SOT:** [`wedge-build-sequence.md`](wedge-build-sequence.md) "What's left."
+- **Roadmap SOT:** `git issue list` (the archived [`wedge-build-sequence.md`](../design/archive/wedge-build-sequence.md) "What's left" became issues #7–#14, 2026-10-06).
 - **Where the gap was found:** [`mode-c-wedge.md`](mode-c-wedge.md) "Mode-E gap."
 - **The shared foundation:** [`fact-model-unification.md`](fact-model-unification.md).
 - **Phasing precedent:** [`mode-b-wedge.md`](mode-b-wedge.md), [`mode-d-wedge.md`](mode-d-wedge.md).

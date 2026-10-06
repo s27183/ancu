@@ -41,6 +41,12 @@ _MON = {"JAN": 1, "FEB": 2, "MAR": 3, "APR": 4, "MAY": 5, "JUN": 6,
         "JUL": 7, "AUG": 8, "SEP": 9, "OCT": 10, "NOV": 11, "DEC": 12}
 _MON_NAME = {v: k.title() for k, v in _MON.items()}
 
+# Honest-partial -> R-1 · Context from action -> The suburb adapters -> source grain skip threshold
+# A coarse-grain source ships best-effort only when one source unit is close to one SAL by
+# name (QPS: ~335 divisions, many named for a suburb). Coarser than that is skipped to null:
+# WA Police publishes bulk crime only by District (~15 for ~1,700 SALs; suburb-level is
+# interactive-only), so there is no WA adapter and WA crime stays null. WA measured June
+# 2026 by a WebSearch sweep; the threshold itself is concluded, not measured.
 SOURCE = {
     "source_id": "qps",
     "name": "Reported Offences by police division, monthly",

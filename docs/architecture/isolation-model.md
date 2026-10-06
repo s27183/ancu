@@ -2,7 +2,7 @@
 
 This document defines **what is isolated from what** in the FirstHomey engine, and the two concepts that carry that isolation: the **plan card** (persistent state) and the **turn** (ephemeral execution). It is the FirstHomey counterpart to a "per-thread architecture" doc, but the answer is deliberately *not* "one universal key per thread" — FirstHomey's own constraints decompose isolation across several axes.
 
-Companion references: [`engine-contract.md`](engine-contract.md) (the events, identity, and `sessions`/`plan_cards` tables this model populates), [`agentic-flow.md`](agentic-flow.md) (the agent types and run modes a turn dispatches), [`agentic-boundary.md`](agentic-boundary.md) (resolver vs agent — what a turn fills deterministically vs by LLM), [`principles.md`](principles.md) (process isolation, DB-as-SOT, stateless sidecar). The pattern is adapted from the ATP / `plc_agent` lineage; where a borrowed mechanism is deliberately reshaped or dropped, the reason is recorded.
+Companion references: [`engine-contract.md`](engine-contract.md) (the events, identity, and `sessions`/`plan_cards` tables this model populates), [`agentic-flow.md`](agentic-flow.md) (the agent types and run modes a turn dispatches), [`agentic-boundary.md`](agentic-boundary.md) (resolver vs agent — what a turn fills deterministically vs by LLM), [`docs/design/invariants.md`](../design/invariants.md) P-1–P-3 (process isolation, DB-as-SOT, stateless sidecar). The pattern is adapted from the ATP / `plc_agent` lineage; where a borrowed mechanism is deliberately reshaped or dropped, the reason is recorded.
 
 ---
 
