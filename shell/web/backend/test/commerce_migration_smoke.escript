@@ -51,8 +51,12 @@ main(_) ->
            "subscriptions.tier CHECK rejects an unknown tier"),
 
     %% --- usage_records: idempotent on engine_event_id (a bigint — the engine's
-    %%     plan_card_events.event_id; unique per run via the monotonic clock) ---
-    Ev = erlang:system_time(microsecond),
+    %%     plan_card_events.event_id; unique per run via the monotonic clock).
+    %%     NEGATED: fh_shell_usage_consumer bootstraps its poll cursor from
+    %%     MAX(engine_event_id) across this whole table (002_commerce.sql) — a
+    %%     positive fixture id can jump the real consumer's cursor past every
+    %%     future real event and silently wedge it. ---
+    Ev = -erlang:system_time(microsecond),
     Ins = <<"INSERT INTO usage_records "
             "(user_id, engine_event_id, tokens_total, shadow_cost) "
             "VALUES ($1, $2, $3, $4) ON CONFLICT (engine_event_id) DO NOTHING">>,

@@ -1,7 +1,12 @@
 ---
 slug: kb.foreign-investor.thesis-archetypes
 effective_from: 2025-04-01
-last_verified: 2026-07-03
+last_verified: 2026-07-06
+sources:
+  - url: https://foreigninvestment.gov.au/sites/foreigninvestment.gov.au/files/2025-03/guidance-note-6-residential-land-v3.pdf
+    retrieved: 2026-07-06
+    path: docs/sources/firb/guidance-note-6-residential-land-v3.pdf
+    note: "FIRB GN6 v3 §E — foreign persons generally banned from purchasing established dwellings; permitted paths are new dwellings, off-the-plan, and vacant land to develop. Confirms the FIRB-driven viability overlay. NOTE: GN6 v3 (14 Mar 2025) states the ban ends 31 Mar 2027; it was subsequently EXTENDED to 30 Jun 2029 (2026-27 Budget) — the doc's 30 Jun 2029 date is current/correct, GN6 v3's 2027 is superseded."
 ---
 
 # Foreign-investor strategy archetypes — the FIRB-driven viability overlay

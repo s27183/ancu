@@ -1,7 +1,12 @@
 ---
 slug: kb.property.comparables-methodology
 effective_from: 2025-08-01
-last_verified: 2026-06-02
+last_verified: 2026-07-06
+sources:
+  - url: https://qro.qld.gov.au/resource/da505-1/
+    retrieved: 2026-07-06
+  - url: https://moneysmart.gov.au/home-loans/buying-a-house
+    retrieved: 2026-07-06
 ---
 
 # Comparable-sales methodology

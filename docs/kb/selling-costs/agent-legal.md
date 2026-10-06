@@ -1,7 +1,10 @@
 ---
 slug: kb.selling-costs.agent-legal
 effective_from: 2026-06-21
-last_verified: 2026-06-21
+last_verified: 2026-07-06
+sources:
+  - url: https://whichrealestateagent.com.au/agent-fees/how-much-do-real-estate-agents-charge/
+    retrieved: 2026-07-06
 ---
 
 # Selling costs — agent commission, legal, and marketing

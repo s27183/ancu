@@ -43,14 +43,16 @@ main(_) ->
 
 %% --- fixtures ----------------------------------------------------------------
 
-%% the tax_optimised_structure figure fields (the eleven the registry declares).
+%% the tax_optimised_structure figure fields — the twelve the registry declares plus
+%% cash_events (added 2026-07-10, task 4: the hold-phase tax-refund leg
+%% purchase_journey/phase_playbook's generic harvest reads, fh_engine_fill:tax_cash_events/1).
 fields() ->
     [<<"recommended_entity">>, <<"negative_gearing_active">>,
      <<"annual_tax_refund_year_1">>, <<"after_tax_cash_flow_year_1">>,
      <<"after_tax_cash_flow_per_week">>, <<"total_depreciation_year_1">>,
      <<"cgt_discount_eligible">>, <<"cgt_marginal_rate">>,
      <<"cost_base_depreciation_clawback">>, <<"annual_compliance_cost">>,
-     <<"setup_costs">>, <<"negative_gearing_reform_note">>].
+     <<"setup_costs">>, <<"negative_gearing_reform_note">>, <<"cash_events">>].
 
 %% the eight fields that are null at base (everything except the two CGT determinant constants
 %% and the agent slot — which is also null pre-merge, but tracked separately below).
@@ -85,8 +87,10 @@ scaffold_cases() ->
         [check(<<"input-independent (empty upstream) null: ", F/binary>>, g(OEmpty, F), null)
          || F <- null_at_base()],
     [check("renderer = data-table", Rend, <<"data-table">>),
-     check("outcome has exactly the twelve tax_optimised_structure fields",
+     check("outcome has exactly the thirteen tax_optimised_structure fields",
            lists:sort(maps:keys(O)), lists:sort(fields())),
+     check("cash_events = [] at base (honest empty, refund null pre-income)",
+           g(O, <<"cash_events">>), []),
      %% the two KB-grounded CGT determinant CONSTANTS the disposition consumer reads.
      check("cgt_discount_eligible = true (resolver constant)",
            g(O, <<"cgt_discount_eligible">>), true),
@@ -209,7 +213,7 @@ per_property_cases() ->
            g(ONoInc, <<"total_depreciation_year_1">>), null),
      check("no-income: cgt_discount_eligible constant still true",
            g(ONoInc, <<"cgt_discount_eligible">>), true),
-     check("no-income: field set still the twelve",
+     check("no-income: field set still the thirteen",
            lists:sort(maps:keys(ONoInc)), lists:sort(fields())),
      check("no-income: Layer-1 conforms", validate(ONoInc), ok),
      %% (b) income → computed

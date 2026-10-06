@@ -5,6 +5,8 @@
     import { t } from '$lib/i18n';
     import { session, sessionLoaded, refreshSession, signOut } from '$lib/stores/session';
     import { loginOpen } from '$lib/stores/ui';
+    import { getUsage, type UsageSummary } from '$lib/api';
+    import { num, date } from '$lib/format';
 
     let { children }: { children: import('svelte').Snippet } = $props();
 
@@ -13,6 +15,42 @@
 
     // The account side-sheet (slides in from the right).
     let accountOpen = $state(false);
+
+    // Usage summary (8-S5g, billing.md §6/§7) — fetched fresh each time the sheet
+    // opens (a low-frequency, cheap read; no point caching a per-visit glance).
+    type UsagePhase = 'idle' | 'loading' | 'ok' | 'error';
+    let usagePhase: UsagePhase = $state('idle');
+    let usage: UsageSummary | null = $state(null);
+
+    const costFormat = $derived(
+        new Intl.NumberFormat($lang === 'vi' ? 'vi-VN' : 'en-AU', {
+            style: 'currency',
+            currency: 'USD',
+            maximumFractionDigits: 2
+        })
+    );
+
+    async function openAccount() {
+        accountOpen = true;
+        usagePhase = 'loading';
+        const out = await getUsage();
+        if (out.kind === 'ok') {
+            usage = out.usage;
+            usagePhase = 'ok';
+        } else {
+            usagePhase = 'error';
+        }
+    }
+
+    function tierKey(
+        tier: UsageSummary['tier']
+    ): 'account.usage.tier.free' | 'account.usage.tier.plus' | 'account.usage.tier.pro' {
+        return tier === 'plus'
+            ? 'account.usage.tier.plus'
+            : tier === 'pro'
+              ? 'account.usage.tier.pro'
+              : 'account.usage.tier.free';
+    }
 </script>
 
 <header class="app-header">
@@ -43,7 +81,7 @@
                 type="button"
                 class="account-trigger"
                 aria-label={$t('account.menu')}
-                onclick={() => (accountOpen = true)}
+                onclick={openAccount}
             >
                 <svg
                     viewBox="0 0 24 24"
@@ -112,6 +150,37 @@
                 </svg>
                 <span class="account-user-email">{$session.email}</span>
             </div>
+
+            <div class="account-usage">
+                {#if usagePhase === 'loading'}
+                    <p class="placeholder">{$t('account.usage.loading')}</p>
+                {:else if usagePhase === 'error'}
+                    <p class="placeholder">{$t('account.usage.error')}</p>
+                {:else if usagePhase === 'ok' && usage}
+                    <div class="account-usage-tier">{$t(tierKey(usage.tier))}</div>
+                    <div class="account-usage-row">
+                        <span class="account-usage-label">{$t('account.usage.tokens_used')}</span>
+                        <span class="account-usage-value">
+                            {#if usage.limitTokens === 'unlimited'}
+                                {num(usage.usedTokens, $lang)} · {$t('account.usage.tokens_unlimited')}
+                            {:else}
+                                {num(usage.usedTokens, $lang)} / {num(usage.limitTokens, $lang)}
+                            {/if}
+                        </span>
+                    </div>
+                    <div class="account-usage-row">
+                        <span class="account-usage-label">{$t('account.usage.period')}</span>
+                        <span class="account-usage-value">
+                            {date(usage.periodStart, $lang)} – {date(usage.periodEnd, $lang)}
+                        </span>
+                    </div>
+                    <div class="account-usage-row">
+                        <span class="account-usage-label">{$t('account.usage.cost')}</span>
+                        <span class="account-usage-value">{costFormat.format(usage.shadowCost)}</span>
+                    </div>
+                {/if}
+            </div>
+
             <button
                 type="button"
                 class="account-action"

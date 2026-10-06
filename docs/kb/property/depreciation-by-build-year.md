@@ -1,7 +1,12 @@
 ---
 slug: kb.property.depreciation-by-build-year
 effective_from: 2025-07-01
-last_verified: 2026-06-23
+last_verified: 2026-07-06
+sources:
+  - url: https://www.ato.gov.au/businesses-and-organisations/income-deductions-and-concessions/depreciation-and-capital-expenses-and-allowances/capital-works-deductions
+    retrieved: 2026-07-06
+  - url: https://www.ato.gov.au/individuals-and-families/investments-and-assets/property-and-land/residential-rental-properties/rental-expenses/depreciating-assets-in-rental-properties/second-hand-depreciating-assets
+    retrieved: 2026-07-06
 ---
 
 # Depreciation by build year — the property-attribute classification

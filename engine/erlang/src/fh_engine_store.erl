@@ -17,10 +17,11 @@
 -export([snapshot_component/3, get_plan_card/2, get_card_rerun_context/1, set_card_target/2]).
 -export([attach_property/3, snapshot_addendum_component/4, set_transaction/3]).
 -export([set_checklist_status/4, get_checklist_status/2]).
+-export([card_kb_slugs/1, get_news_status/2, dismiss_news/2]).
 -export([set_profile_financials/2, list_plan_card_ids_for_profile/1]).
 -export([deploy_commit_sha/0, projection_state/1, list_active_plan_card_ids/0]).
 -export([list_suburbs_by_state/1, list_all_suburbs/0, list_suburb_sources/0]).
--export([read_glue/3, append_session_turn/6]).
+-export([read_glue/3, append_session_turn/6, read_conversation/3]).
 
 %% --- tenancy / auth ---------------------------------------------------------
 
@@ -384,6 +385,52 @@ get_checklist_status(TenantId, PlanCardId) ->
         []            -> {error, not_found}
     end.
 
+%% --- news relevance + dismissed state (kb-update-runbook.md "authoring a news
+%% note", plan-card-refresh.md kb_versions provenance) -----------------------
+
+%% Every KB slug consulted across this card's fills, deduped — the relevance-
+%% filter input fh_engine_kb:news_for_slugs/1 intersects against each news
+%% note's affected_kb_slugs. No tenant filter here (plan_card_id is globally
+%% unique); the caller enforces ownership via get_news_status/2 first.
+-spec card_kb_slugs(binary()) -> [binary()].
+card_kb_slugs(PlanCardId) ->
+    Res = query(
+        "SELECT DISTINCT elem->>'slug' AS slug FROM audit_events, "
+        "  LATERAL jsonb_array_elements(kb_versions_jsonb) AS elem "
+        "WHERE plan_card_id = $1::uuid",
+        [PlanCardId]),
+    [Slug || {Slug} <- rows(Res), is_binary(Slug)].
+
+%% The dismissed-news slice of the card user-set layer (007, same pattern as
+%% checklist_status): {"<news_slug>": true}. Tenant-scoped — the ownership
+%% check for the whole news read (GET .../news calls this first).
+-spec get_news_status(binary(), binary()) -> {ok, map()} | {error, not_found}.
+get_news_status(TenantId, PlanCardId) ->
+    Res = query(
+        "SELECT dismissed_news_jsonb FROM plan_cards "
+        "WHERE tenant_id = $1::uuid AND plan_card_id = $2::uuid",
+        [TenantId, PlanCardId]),
+    case rows(Res) of
+        [{Dismissed}] -> {ok, decode_jsonb(Dismissed)};
+        []            -> {error, not_found}
+    end.
+
+%% Mark one news note dismissed for a card. One-way (no "undismiss" surfaced —
+%% no product need for it yet); the same jsonb_set-with-create-missing pattern
+%% as set_checklist_status/4's "done" clause. Tenant-scope is enforced by the
+%% handler's prior get_news_status/2 ownership check, so the UPDATE keys on
+%% plan_card_id alone.
+-spec dismiss_news(binary(), binary()) -> {ok, map()}.
+dismiss_news(PlanCardId, NewsSlug) ->
+    Res = query(
+        "UPDATE plan_cards SET "
+        "dismissed_news_jsonb = jsonb_set(dismissed_news_jsonb, ARRAY[$2], 'true'::jsonb, true), "
+        "updated_at = now() "
+        "WHERE plan_card_id = $1::uuid "
+        "RETURNING dismissed_news_jsonb",
+        [PlanCardId, NewsSlug]),
+    {ok, decode_jsonb(single(Res))}.
+
 %% The PROJECTION state for the base plan (eligibility-resolution.md 2026-06-17 / G4):
 %% state-specific schemes resolve from the SUBURB being planned, not the map browse-
 %% filter `onboarding.state` (which may be "ALL"). Precedence, most-specific first:
@@ -493,14 +540,16 @@ centroid(Lat, Lon) -> #{<<"lat">> => Lat, <<"lon">> => Lon}.
 
 %% --- Q&A conversation glue (sessions / session_turns; isolation-model §4) ----
 
-%% The prior (user_text, assistant_text) pairs for this (user × plan card), oldest→
+%% The prior (user_text, assistant_text_en) pairs for this (user × plan card), oldest→
 %% newest, bounded to a short recent window. GLUE for conversational coherence (pronoun
 %% resolution), NOT agent grounding — the card re-grounds each turn (constraint #9,
-%% agentic-flow §8). Empty list before the first Q&A turn.
+%% agentic-flow §8). EN-only on purpose: this text only ever reaches the prompt, never
+%% the user, so bilingual storage buys nothing here (unlike read_conversation/3 below).
+%% Empty list before the first Q&A turn.
 -spec read_glue(binary(), binary(), binary()) -> [map()].
 read_glue(TenantId, UserId, PlanCardId) ->
     Res = query(
-        "SELECT st.user_text, st.assistant_text FROM session_turns st "
+        "SELECT st.user_text, st.assistant_text_en FROM session_turns st "
         "JOIN sessions s ON s.session_id = st.session_id "
         "WHERE s.tenant_id = $1::uuid AND s.user_id = $2::uuid "
         "  AND s.plan_card_id = $3::uuid "
@@ -508,23 +557,51 @@ read_glue(TenantId, UserId, PlanCardId) ->
         [TenantId, UserId, PlanCardId]),
     [#{<<"user_text">> => U, <<"assistant_text">> => A} || {U, A} <- rows(Res)].
 
-%% Append one vendor-neutral glue pair after a Q&A turn's answer has been gated +
-%% emitted. Ensures the (user × plan_card) session row first (session_id is one per
-%% pair, engine-contract §9.1). Stores text only — never reasoning items / vendor format.
--spec append_session_turn(binary(), binary(), binary(), binary(), binary(), binary())
+%% Append one turn after a Q&A turn's answer has been gated + emitted. Ensures the
+%% (user × plan_card) session row first (session_id is one per pair, engine-contract
+%% §9.1). `Answer` is the full bilingual {vi, en} map (commit_qa already has it in
+%% hand) — persisted in BOTH locales so read_conversation/3 can hand the shell a real
+%% history (bilingual-content.md: VI is co-equal, forced by schema at the source).
+%% Stores text only — never reasoning items / vendor format.
+-spec append_session_turn(binary(), binary(), binary(), binary(), binary(), map())
         -> ok.
-append_session_turn(TenantId, UserId, PlanCardId, TurnId, UserText, AssistantText) ->
+append_session_turn(TenantId, UserId, PlanCardId, TurnId, UserText, Answer) ->
+    AssistantEn = maps:get(<<"en">>, Answer, <<"">>),
+    AssistantVi = maps:get(<<"vi">>, Answer, <<"">>),
     _ = query(
         "INSERT INTO sessions (tenant_id, user_id, plan_card_id) "
         "VALUES ($1::uuid, $2::uuid, $3::uuid) "
         "ON CONFLICT (user_id, plan_card_id) DO NOTHING",
         [TenantId, UserId, PlanCardId]),
     _ = query(
-        "INSERT INTO session_turns (turn_id, session_id, user_text, assistant_text) "
-        "SELECT $1::uuid, s.session_id, $2, $3 FROM sessions s "
-        "WHERE s.user_id = $4::uuid AND s.plan_card_id = $5::uuid",
-        [TurnId, UserText, AssistantText, UserId, PlanCardId]),
+        "INSERT INTO session_turns "
+        "  (turn_id, session_id, user_text, assistant_text_en, assistant_text_vi) "
+        "SELECT $1::uuid, s.session_id, $2, $3, $4 FROM sessions s "
+        "WHERE s.user_id = $5::uuid AND s.plan_card_id = $6::uuid",
+        [TurnId, UserText, AssistantEn, AssistantVi, UserId, PlanCardId]),
     ok.
+
+%% The full Q&A conversation for this (user × plan card), oldest→newest, UNCAPPED —
+%% the shell-facing history read (GET .../conversation, fh_engine_h_conversation),
+%% distinct from read_glue/3's capped internal-coherence read above. Each turn's
+%% answer is bilingual {vi, en}; the shell picks display language same as text_delta.
+%% Empty list before the first Q&A turn.
+-spec read_conversation(binary(), binary(), binary()) -> [map()].
+read_conversation(TenantId, UserId, PlanCardId) ->
+    Res = query(
+        "SELECT st.turn_id::text, st.user_text, "
+        "  st.assistant_text_en, st.assistant_text_vi, "
+        "  to_char(st.ts AT TIME ZONE 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') "
+        "FROM session_turns st "
+        "JOIN sessions s ON s.session_id = st.session_id "
+        "WHERE s.tenant_id = $1::uuid AND s.user_id = $2::uuid "
+        "  AND s.plan_card_id = $3::uuid "
+        "ORDER BY st.ts ASC",
+        [TenantId, UserId, PlanCardId]),
+    [#{<<"turn_id">> => Tid, <<"user_text">> => U,
+       <<"answer">> => #{<<"en">> => En, <<"vi">> => Vi},
+       <<"ts">> => Ts}
+     || {Tid, U, En, Vi, Ts} <- rows(Res)].
 
 %% --- internals --------------------------------------------------------------
 

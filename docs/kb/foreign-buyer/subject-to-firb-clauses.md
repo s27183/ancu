@@ -1,7 +1,12 @@
 ---
 slug: kb.foreign-buyer.subject-to-firb-clauses
 effective_from: 2025-04-01
-last_verified: 2026-06-28
+last_verified: 2026-07-06
+sources:
+  - url: https://foreigninvestment.gov.au/sites/foreigninvestment.gov.au/files/2025-03/guidance-note-6-residential-land-v3.pdf
+    retrieved: 2026-07-06
+    path: docs/sources/firb/guidance-note-6-residential-land-v3.pdf
+    note: "FIRB GN6 v3 — a foreign person must hold approval (No Objection Notification) before acquiring an interest in residential land; supports the 'subject to FIRB approval' conditional-contract rationale (sign to secure without settling before approval). The clause anatomy itself is legal drafting, not a FIRB-stated figure."
 ---
 
 # Foreign buyer — anatomy of a "subject to FIRB approval" clause

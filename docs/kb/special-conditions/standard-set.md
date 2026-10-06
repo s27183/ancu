@@ -1,7 +1,11 @@
 ---
 slug: kb.special-conditions.standard-set
 effective_from: 2025-07-01
-last_verified: 2026-06-01
+last_verified: 2026-07-06
+sources:
+  - url: https://www.nsw.gov.au/housing-and-construction/buying-and-selling-property/buying-property-nsw/making-an-offer-on-a-property
+    retrieved: 2026-07-06
+    note: "NSW Government — private-treaty offers can be made subject to conditions; ~10% deposit at exchange; auction purchases are unconditional with no cooling-off. The specific condition set and the typical 14-21 day finance window are contract-drafting convention."
 ---
 
 # Special conditions — the standard set to request

@@ -5,7 +5,7 @@
     // seeds from the GET snapshot, then merges live component_filled frames over the
     // SSE proxy. The zone→suburb gradient (per-suburb overlay) is deferred — this shows
     // the property-agnostic BASE components, identical across suburbs.
-    import { onMount } from 'svelte';
+    import { onMount, tick } from 'svelte';
     import { t } from '$lib/i18n';
     import { lang } from '$lib/stores/lang';
     import {
@@ -32,10 +32,12 @@
         type MoneyRange,
         type JourneySwimlaneOutcome,
         type PhasePlaybookOutcome,
-        type BudgetEnvelopeOutcome,
         type DispositionOutcome,
         type ChecklistStatusMap,
-        type PropertyAddendum
+        type PropertyAddendum,
+        harvestCashEvents,
+        firstComponentEntry,
+        PROFILE_COMPONENT_IDS
     } from '$lib/planCard';
     import { AU_STATES } from '$lib/map';
     import { money, moneyRange } from '$lib/format';
@@ -74,6 +76,45 @@
     // (there is deliberately no plan.ltab.qa label — qa uses plan.tab.qa).
     const railTabs = $derived(uiTabs.filter((t) => t.kind !== 'qa'));
 
+    // Sub-tab rail grouping (2026-07-09, Son's request), updated 2026-07-11 once Mode B's
+    // task-13 rewrite retired the last blueprint on the pre-restructure flat tab vocabulary
+    // (plan-card-lifecycle-restoration.md §11.3) — every in-scope blueprint now declares at
+    // most 5 rail tabs (overview/flow/budget/[portfolio|family]/qa), under RAIL_GROUP_THRESHOLD,
+    // so grouping is currently dormant everywhere; kept as a static map (not deleted) since a
+    // future blueprint growing past the threshold again just needs an entry added here.
+    // `overview` and `qa` are never grouped (always-visible anchors); everything else buckets
+    // into the coarse halves of this project's buy→hold→sell mental model (see the swimlane's
+    // own finer-grained `plan.phase.*` labels below for the 6-step version this coarsens).
+    // An unmapped future tab_id defaults into 'buy' rather than silently vanishing.
+    const TAB_GROUP: Record<string, 'buy' | 'hold'> = {
+        flow: 'buy',
+        family: 'buy',
+        budget: 'hold',
+        portfolio: 'hold'
+    };
+    const RAIL_GROUP_THRESHOLD = 5;
+    const overviewTab = $derived(railTabs.find((t) => t.tab_id === 'overview'));
+    const nonOverviewRailTabs = $derived(railTabs.filter((t) => t.tab_id !== 'overview'));
+    const railGrouped = $derived(nonOverviewRailTabs.length > RAIL_GROUP_THRESHOLD);
+    // Pure derivation from `sub`, not a $state mutated in an $effect (the autofixer
+    // flags that pattern) — this also means the group toggle always follows `sub`
+    // automatically, including any programmatic jump elsewhere in this file, same
+    // "derive, don't clamp" idiom as NewsTicker's safeIdx. Defaults to 'buy' while
+    // `sub` is 'overview'/'qa' (group-less) or on first render.
+    const railGroup = $derived(TAB_GROUP[sub] ?? 'buy');
+    const groupedRailTabs = $derived(
+        nonOverviewRailTabs.filter((t) => (TAB_GROUP[t.tab_id] ?? 'buy') === railGroup)
+    );
+    // Selecting a group the current tab isn't in jumps to that group's first tab —
+    // railGroup then follows for free (it's derived from `sub`, not set here).
+    // Re-clicking the group `sub` is already in is a no-op, matching the toggle's
+    // "already active" visual state.
+    function selectGroup(g: 'buy' | 'hold') {
+        if ((TAB_GROUP[sub] ?? 'buy') === g) return;
+        const first = nonOverviewRailTabs.find((t) => (TAB_GROUP[t.tab_id] ?? 'buy') === g);
+        if (first) sub = first.tab_id;
+    }
+
     // The budget (Cash-calculator) tab's three sub-tabs (§7.3): the cockpit inputs + the
     // "Bạn đã đủ chưa?" verdict → the cash-events table → the breakdown detail. Labels reuse
     // the existing calculator keys. A self-owned table row routes here to 'detail'.
@@ -100,6 +141,12 @@
     // and overlaid onto phase_playbook actions at render. The engine is SOT: a toggle is
     // optimistic for immediacy, then reconciled from the PATCH response (revert on failure).
     let checklistStatus = $state<ChecklistStatusMap>({});
+
+    // The rendered height of the sticky sub-tab rail region, fed to --tabrail-top so
+    // the nested Budget sub-rail's own sticky offset tracks the rail's real, variable
+    // height (it grows a row when the rail is grouped) instead of a stale hardcoded
+    // rem (see the .pp-sticky-top / .pp-subcontent markup below).
+    let stickyTopHeight = $state(0);
 
     let stream: PlanCardStream | null = null;
     // A generation token so a retry's async can't be clobbered by a stale in-flight one.
@@ -171,12 +218,16 @@
     let finErrorDetail = $state('');
     const finBusy = $derived(running || finSaving || finRecomputing);
 
-    // Seed the finance fields from the live buyer_profile outcome (engine SOT). LOAD-BEARING
+    // Seed the finance fields from the live profile outcome (engine SOT). LOAD-BEARING
     // for correctness, not just UX: the write is FULL-REPLACE, so the form must hold the
     // whole financials object — seeding keeps untouched figures intact across an edit (else
     // editing income would wipe stored debts). Honest-partial: a null/absent figure → blank.
+    // Resolved via PROFILE_COMPONENT_IDS, not a literal `buyer_profile` — Mode C/D name
+    // this component investor_profile / investor_profile_foreign (planCard.ts comment).
     function seedFinancials() {
-        const o = components.buyer_profile?.outcome as ProfileOutcome | undefined;
+        const o = firstComponentEntry(components, PROFILE_COMPONENT_IDS)?.outcome as
+            | ProfileOutcome
+            | undefined;
         const num = (v: unknown): string => (typeof v === 'number' ? String(v) : '');
         finIncome = num(o?.assessable_income);
         finForeign = num(o?.foreign_sourced_income_component);
@@ -530,10 +581,11 @@
     const flowPlaybook = $derived(
         viewComponents.phase_playbook?.outcome as PhasePlaybookOutcome | undefined
     );
-    const flowCashEvents = $derived(
-        (viewComponents.cash_position?.outcome as BudgetEnvelopeOutcome | undefined)
-            ?.cash_events ?? []
-    );
+    // Harvested from every viewComponents entry exposing cash_events (not just
+    // cash_position) — mirrors the engine's own multi-source harvest so a Mode-C hold-phase
+    // action's budget_ref (e.g. lodge_annual_return → tax_refund, sourced from tax_structure)
+    // resolves to an amount chip here too. See harvestCashEvents in $lib/planCard.
+    const flowCashEvents = $derived(harvestCashEvents(viewComponents));
 
     // Toggle one phase action's done-state. The engine is SOT: flip optimistically for
     // immediacy, PATCH, then set checklistStatus from the AUTHORITATIVE returned map;
@@ -557,8 +609,11 @@
     }
 
     // The card's current target price (band or point), shown as the what-if baseline hint.
+    // Resolved via PROFILE_COMPONENT_IDS — see seedFinancials above for why.
     const currentPriceLabel = $derived.by((): string | null => {
-        const o = components.buyer_profile?.outcome as ProfileOutcome | undefined;
+        const o = firstComponentEntry(components, PROFILE_COMPONENT_IDS)?.outcome as
+            | ProfileOutcome
+            | undefined;
         const r = o?.target_price_range as MoneyRange | null | undefined;
         if (!Array.isArray(r) || r.length !== 2) return null;
         return r[0] === r[1] ? money(r[0], $lang) : moneyRange(r, $lang);
@@ -654,27 +709,17 @@
             return;
         }
 
-        const res = await getPlanCard(match.plan_card_id);
-        if (myGen !== gen) return;
-        if (res.kind === 'ok') {
-            components = res.card.content.components ?? {};
-            addenda = res.card.content.addenda ?? {}; // per-property snapshots (engine §12)
-            blueprintSlug = res.card.blueprint_slug ?? ''; // gates the attach affordance
-            horizonValue = baselineHorizon; // seed the slider from the card's saved H
-            seedFinancials(); // seed income/debts from the card's stored profile facts (IC5)
-            checklistStatus = res.card.checklist_status ?? {};
-            uiTabs = res.card.ui_tabs?.length ? res.card.ui_tabs : FALLBACK_TABS;
-            if (!uiTabs.some((t) => t.tab_id === sub)) sub = uiTabs[0]?.tab_id ?? '';
-            cardId = match.plan_card_id;
-            phase = 'ready';
-            // The GET snapshot is the authoritative latest projection. Take the done-state
-            // from turn_running (a settled card has no terminal to replay once we subscribe
-            // from the cursor), and subscribe the SSE FROM the snapshot's event_cursor so the
-            // replay carries only post-snapshot (live) events — never an OLD turn from the
-            // append-only log replayed over the fresh snapshot.
-            turnDone = res.card.turn_running === false;
-            // Live fill from the cursor. Merge is idempotent (keyed by component_id).
-            stream = subscribePlanCard(match.plan_card_id, {
+        // Live fill from a cursor. Merge is idempotent (keyed by component_id). Opens a
+        // FRESH EventSource each call rather than being called once: subscribePlanCard
+        // closes its stream on every terminal event by design (correct for chat's
+        // single-turn use — subscribeConversation stays open instead). This card's page
+        // visit spans MANY turns (scenario save, financials commit, checklist toggle,
+        // property attach, ...) all reusing the same `stream` var, so onDone below
+        // reopens from the terminal's own event id — without this, the channel dies
+        // after the visit's first turn and every later action's spinner never resolves
+        // (turnDone flips false but nothing is left alive to flip it back to true).
+        function subscribeLive(cid: string, cursor?: number) {
+            stream = subscribePlanCard(cid, {
                 onComponentFilled: (entry) => {
                     if (myGen !== gen) return;
                     if (entry.property_id) {
@@ -695,7 +740,7 @@
                         components = { ...components, [entry.component_id]: entry };
                     }
                 },
-                onDone: (failed) => {
+                onDone: (failed, lastEventId) => {
                     if (myGen !== gen) return;
                     if (failed) turnFailed = true;
                     turnDone = true;
@@ -715,9 +760,34 @@
                         finRecomputing = false;
                         seedFinancials();
                     }
+                    // Reopen from this terminal's own id so the NEXT action in this visit
+                    // has a live channel too (see the comment above subscribeLive).
+                    subscribeLive(cid, lastEventId ?? undefined);
                 }
                 // onError: EventSource auto-reconnects; stay calm (no banner).
-            }, res.card.event_cursor);
+            }, cursor);
+        }
+
+        const res = await getPlanCard(match.plan_card_id);
+        if (myGen !== gen) return;
+        if (res.kind === 'ok') {
+            components = res.card.content.components ?? {};
+            addenda = res.card.content.addenda ?? {}; // per-property snapshots (engine §12)
+            blueprintSlug = res.card.blueprint_slug ?? ''; // gates the attach affordance
+            horizonValue = baselineHorizon; // seed the slider from the card's saved H
+            seedFinancials(); // seed income/debts from the card's stored profile facts (IC5)
+            checklistStatus = res.card.checklist_status ?? {};
+            uiTabs = res.card.ui_tabs?.length ? res.card.ui_tabs : FALLBACK_TABS;
+            if (!uiTabs.some((t) => t.tab_id === sub)) sub = uiTabs[0]?.tab_id ?? '';
+            cardId = match.plan_card_id;
+            phase = 'ready';
+            // The GET snapshot is the authoritative latest projection. Take the done-state
+            // from turn_running (a settled card has no terminal to replay once we subscribe
+            // from the cursor), and subscribe the SSE FROM the snapshot's event_cursor so the
+            // replay carries only post-snapshot (live) events — never an OLD turn from the
+            // append-only log replayed over the fresh snapshot.
+            turnDone = res.card.turn_running === false;
+            subscribeLive(match.plan_card_id, res.card.event_cursor);
         } else if (res.kind === 'error') {
             phase = 'error';
         } else {
@@ -927,26 +997,98 @@
         </Modal>
     {/if}
 
-    <!-- Sub-tabs: one per plan section + a Q&A tab — each section shows on its own, so
-         the user never scrolls a long plan. Horizontally scrollable on narrow screens. -->
-    <div class="pp-subtabs" role="tablist">
-        {#each railTabs as tab (tab.tab_id)}
-            <button
-                type="button"
-                role="tab"
-                aria-selected={sub === tab.tab_id}
-                class:active={sub === tab.tab_id}
-                onclick={() => (sub = tab.tab_id)}
-                >{$t(`plan.ltab.${tab.tab_id}` as 'plan.ltab.overview')}</button
-            >
-        {/each}
-        <button
-            type="button"
-            role="tab"
-            aria-selected={sub === 'qa'}
-            class:active={sub === 'qa'}
-            onclick={() => (sub = 'qa')}>{$t('plan.tab.qa')}</button
-        >
+    <!-- Sticky region atop the scrolling plan body: the lifecycle sub-tab rail. Its real
+         rendered height is measured via bind:clientHeight and fed to --tabrail-top below,
+         so the nested Budget sub-rail (Tabs.svelte) — which stacks its own sticky rail
+         just below this region — tracks the rail's presence instead of a stale
+         hand-picked rem. (A per-card KB-news ticker used to live here, then as a sticky
+         footer below the tab content — removed 2026-07-09, Son's call: the homepage's
+         unfiltered ticker is enough, and the per-card fetch/render/dismiss UI added
+         clutter for little payoff. Backend untouched — GET/PATCH .../news, GATE 11, the
+         compiled artifact's news entries are all still live; this was a shell-only
+         removal, easy to re-wire if wanted later.) -->
+    <div class="pp-sticky-top" bind:clientHeight={stickyTopHeight}>
+        <!-- Sub-tabs: one per plan section + a Q&A tab — each section shows on its own,
+             so the user never scrolls a long plan. Horizontally scrollable on narrow
+             screens. Past RAIL_GROUP_THRESHOLD rail tabs (Modes B/C/D), a second row
+             appears: Overview/group-toggle/Q&A always visible on top, the active
+             group's tabs below — under the threshold (Modes A/E) this renders the
+             original single flat row, unchanged. -->
+        <div class="pp-subtabs-outer">
+            {#if railGrouped}
+                <div class="pp-subtabs" role="tablist">
+                    {#if overviewTab}
+                        <button
+                            type="button"
+                            role="tab"
+                            aria-selected={sub === overviewTab.tab_id}
+                            class:active={sub === overviewTab.tab_id}
+                            onclick={() => overviewTab && (sub = overviewTab.tab_id)}
+                            >{$t('plan.ltab.overview')}</button
+                        >
+                    {/if}
+                    <button
+                        type="button"
+                        role="tab"
+                        class="pp-railgroup-btn"
+                        aria-selected={railGroup === 'buy'}
+                        class:active={railGroup === 'buy'}
+                        onclick={() => selectGroup('buy')}>{$t('plan.railgroup.buy')}</button
+                    >
+                    <button
+                        type="button"
+                        role="tab"
+                        class="pp-railgroup-btn"
+                        aria-selected={railGroup === 'hold'}
+                        class:active={railGroup === 'hold'}
+                        onclick={() => selectGroup('hold')}>{$t('plan.railgroup.hold')}</button
+                    >
+                    <button
+                        type="button"
+                        role="tab"
+                        aria-selected={sub === 'qa'}
+                        class:active={sub === 'qa'}
+                        onclick={() => (sub = 'qa')}>{$t('plan.tab.qa')}</button
+                    >
+                </div>
+                <div
+                    class="pp-subtabs pp-subtabs-group"
+                    role="tablist"
+                    aria-label={$t(`plan.railgroup.${railGroup}` as 'plan.railgroup.buy')}
+                >
+                    {#each groupedRailTabs as tab (tab.tab_id)}
+                        <button
+                            type="button"
+                            role="tab"
+                            aria-selected={sub === tab.tab_id}
+                            class:active={sub === tab.tab_id}
+                            onclick={() => (sub = tab.tab_id)}
+                            >{$t(`plan.ltab.${tab.tab_id}` as 'plan.ltab.overview')}</button
+                        >
+                    {/each}
+                </div>
+            {:else}
+                <div class="pp-subtabs" role="tablist">
+                    {#each railTabs as tab (tab.tab_id)}
+                        <button
+                            type="button"
+                            role="tab"
+                            aria-selected={sub === tab.tab_id}
+                            class:active={sub === tab.tab_id}
+                            onclick={() => (sub = tab.tab_id)}
+                            >{$t(`plan.ltab.${tab.tab_id}` as 'plan.ltab.overview')}</button
+                        >
+                    {/each}
+                    <button
+                        type="button"
+                        role="tab"
+                        aria-selected={sub === 'qa'}
+                        class:active={sub === 'qa'}
+                        onclick={() => (sub = 'qa')}>{$t('plan.tab.qa')}</button
+                    >
+                </div>
+            {/if}
+        </div>
     </div>
 
     <!-- Cross-tab what-if indicator: the price/state cockpit lives in the Cash-calculator
@@ -962,7 +1104,7 @@
         </div>
     {/if}
 
-    <div class="pp-subcontent">
+    <div class="pp-subcontent" style="--tabrail-top: {stickyTopHeight}px">
         {#if sub === 'qa'}
             <!-- Chat runs over the FILLED card; the engine 409s a qa turn while the base
                  turn is still running, so gate it on the base turn having finished. -->
@@ -1235,11 +1377,7 @@
                  affordance, never a perpetual "computing". -->
             {#each activeTab.components as cid (cid)}
                 {#if viewComponents[cid]}
-                    <ComponentCard
-                        componentId={cid}
-                        entry={viewComponents[cid]}
-                        filling={running}
-                    />
+                    <ComponentCard componentId={cid} entry={viewComponents[cid]} filling={running} />
                     <!-- settlement_prep B affordance: once a contract is signed, attest the two
                          dates to activate the dated critical path. Investor + selected-property
                          only; label tracks whether dates are already active. -->
@@ -1262,7 +1400,7 @@
                         </div>
                     {/if}
                 {:else if turnDone && !turnFailed}
-                    <section class="pp-card">
+                    <section class="pp-card" data-component={cid}>
                         <h3 class="pp-card-title">
                             {$t(`plan.c.${cid}` as 'plan.c.buyer_profile')}
                         </h3>

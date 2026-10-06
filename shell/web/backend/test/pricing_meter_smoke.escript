@@ -58,7 +58,11 @@ main(_) ->
     Email = <<"meter+", (uuid())/binary, "@example.com">>,
     UserId = scalar("INSERT INTO users (email) VALUES ($1) RETURNING user_id::text", [Email]),
     _ = pgo:query(<<"DELETE FROM usage_records WHERE user_id = $1::uuid">>, [UserId]),
-    Base = erlang:system_time(microsecond),
+    %% NEGATED: fh_shell_usage_consumer bootstraps its poll cursor from
+    %% MAX(engine_event_id) across this whole table (002_commerce.sql) — a positive
+    %% fixture id can jump the real consumer's cursor past every future real event
+    %% and silently wedge it.
+    Base = -erlang:system_time(microsecond),
 
     expect(fh_shell_meter:period_tokens(UserId) =:= 0,
            "empty period meter = 0 (and caches the 0)"),

@@ -60,6 +60,7 @@ import pathlib
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 KB = ROOT / "docs" / "kb"
 BP = ROOT / "docs" / "blueprints"
+NEWS_DIR = KB / "news"
 ARTIFACT_OUT = ROOT / "engine" / "erlang" / "priv" / "kb" / "artifact.json"
 
 # The in-scope SET — every blueprint whose registry is materialized + semantically
@@ -108,6 +109,20 @@ LOCALE_VALIDATORS = {
     "vi": (lambda s: any(ord(c) > 127 for c in s),
            "vi has no non-ASCII char (English copied into the vi slot?)"),
 }
+
+# A news note's headline is ticker copy, not prose (kb-news-feature.md "Homepage
+# ticker") — HARD contract, fail-closed at compile time (match enforcement grade to
+# property kind: a long "headline" silently degrades the ticker UI for every note
+# after it, so this is structural, not a style nit).
+NEWS_HEADLINE_MAX_CHARS = 100
+
+# A news note's display category (kb-news-feature.md "News overview sheet") — a small,
+# closed enum grounded in the five modes' concerns, NOT derived from docs/kb/*'s ~40
+# fine-grained slug namespaces (too granular, not user-facing groupings). Explicit
+# authored field, same posture as headline: HARD, fail-closed, easy to extend when a
+# real note needs a 7th bucket (match enforcement grade to property kind — this is
+# display grouping, not a compliance gate, so the enum itself can grow on demand).
+NEWS_CATEGORIES = ("visa", "finance", "scheme", "tax", "property", "market")
 
 
 def check_copy_template(pair, locales=LOCALES):
@@ -490,11 +505,161 @@ def build_registry(components):
 # --------------------------------------------------------------------------- #
 # KB doc parsing
 # --------------------------------------------------------------------------- #
+def frontmatter_end(text):
+    """Position of the CLOSING `---` frontmatter delimiter — a line that is
+    exactly `---` (+ optional trailing whitespace), not a bare substring match.
+    `text.find("---", 3)` truncates early the instant a frontmatter value
+    contains a literal `---` (e.g. an ATO URL slug like
+    `.../your-main-residence---home`), leaking trailing YAML into content_md
+    and mis-parsing `sources:` (kb-src-tax backfill finding, 2026-07-06 — latent
+    since parse_kb_doc's original body-split, newly live once sources: URLs
+    could contain the substring). Returns -1 if the doc isn't well-formed
+    frontmatter (opening `---` not on line 1, or no closing line found)."""
+    matches = list(re.finditer(r"^---[ \t]*$", text, re.M))
+    if len(matches) < 2 or matches[0].start() != 0:
+        return -1
+    return matches[1].start()
+
+
+def parse_sources_block(text):
+    """Hand-rolled parse of the frontmatter `sources:` list — a YAML-list-of-maps
+    SUBSET (url/retrieved/path scalars, or a standalone note: string), not a
+    general YAML parser. Kept stdlib-only (no PyYAML dep) to match the
+    compiler's pure-stdlib build-tool posture (proportionate-verification
+    memory: kb_compiler runs in seconds). A `- note: "..."` entry (no url) is
+    a doc's explicit self-declaration that no independent external source
+    applies — e.g. a synthesis doc whose every figure is owned by a
+    cross-referenced doc's own sources (kb-src-vn-tax backfill finding,
+    2026-07-06: kb.non-resident.tax-treatment-overview). It still counts as a
+    citation for GATE 10 — the point is a recorded, reasoned trail, not
+    forcing a url onto a doc that doesn't own one.
+    Returns [] if the doc has no `sources:` block (distinguished from "gate
+    hasn't run yet" by the caller, not by this parser)."""
+    fm_end = frontmatter_end(text)
+    fm = text[:fm_end] if fm_end > 0 else text
+    lines = fm.splitlines()
+    out = []
+    in_block = False
+    cur = None
+    for line in lines:
+        if re.match(r"^sources:\s*$", line):
+            in_block = True
+            continue
+        if not in_block:
+            continue
+        if re.match(r"^\S", line):  # dedent out of the block
+            break
+        m = re.match(r"^\s*-\s*url:\s*(\S+)\s*$", line)
+        if m:
+            cur = {"url": m.group(1)}
+            out.append(cur)
+            continue
+        m = re.match(r'^\s*-\s*note:\s*(.+?)\s*$', line)
+        if m:
+            cur = {"note": m.group(1).strip('"')}
+            out.append(cur)
+            continue
+        m = re.match(r"^\s+(retrieved|path):\s*(\S+)\s*$", line)
+        if m and cur is not None:
+            cur[m.group(1)] = m.group(2)
+    return out
+
+
+def parse_frontmatter_list(text, field):
+    """A simple frontmatter `field:\\n  - item\\n  - item` YAML list -> [item, ...].
+    Same hand-rolled-subset posture as parse_sources_block (stdlib only, no PyYAML);
+    breaks at the first line that dedents back to column 0 (the next scalar field).
+    Used for a news note's `affected_kb_slugs:` (kb-update-runbook.md "authoring a
+    news note")."""
+    fm_end = frontmatter_end(text)
+    fm = text[:fm_end] if fm_end > 0 else text
+    lines = fm.splitlines()
+    out = []
+    in_block = False
+    for line in lines:
+        if re.match(rf"^{re.escape(field)}:\s*$", line):
+            in_block = True
+            continue
+        if not in_block:
+            continue
+        if re.match(r"^\S", line):
+            break
+        m = re.match(r"^\s*-\s*(\S+)\s*$", line)
+        if m:
+            out.append(m.group(1))
+    return out
+
+
+def markdown_section(text, heading):
+    """Content between a `## {heading}` line and the next H2 (or EOF), stripped.
+    None if the heading is absent. Used to pull a news note's bilingual
+    `## Summary (EN|VI)` bodies apart at compile time (so the shell gets clean
+    {en, vi} strings, not a blob it has to regex itself)."""
+    marker = f"## {heading}"
+    pos = text.find(marker)
+    if pos < 0:
+        return None
+    start = text.find("\n", pos) + 1
+    nxt = text.find("\n## ", start)
+    end = nxt if nxt >= 0 else len(text)
+    return text[start:end].strip()
+
+
+def parse_news_doc(path):
+    """Parse a `docs/kb/news/*.md` note (kb-update-runbook.md "authoring a news
+    note") — a dated, IMMUTABLE announcement of a KB fact change, distinct from a
+    living fact doc (kb_doc-authoring.md). Frontmatter: slug / kb_slug / category /
+    affected_kb_slugs / effective_from / authored_date / sources. Body: bilingual
+    `## Headline (EN|VI)` (a short, one-line ticker string — kb-news-feature.md
+    "Homepage ticker"), bilingual `## Summary (EN|VI)` (the full explanation, read
+    in the detail sheet), + a `## Diff` fenced jsonc block (old_value/new_value).
+    `category:` (kb-news-feature.md "News overview sheet") is the section a note
+    sorts under in the News overview sheet — one of NEWS_CATEGORIES.
+    `sources:` cites what the author actually had open when writing THIS diff
+    (reuses parse_sources_block, the same fact-doc shape) — it does not
+    duplicate kb_slug's fact-doc sources going forward, it pins the citation for
+    a specific past event. A news note is immutable, so this never drifts the
+    way a live doc's citation could (kb-news-feature.md "Resolved design
+    questions").
+    """
+    text = path.read_text()
+    slug_m = re.search(r"^slug:\s*(\S+)", text, re.M)
+    kb_slug_m = re.search(r"^kb_slug:\s*(\S+)", text, re.M)
+    category_m = re.search(r"^category:\s*(\S+)", text, re.M)
+    eff_m = re.search(r"^effective_from:\s*(\S+)", text, re.M)
+    auth_m = re.search(r"^authored_date:\s*(\S+)", text, re.M)
+    diff_block = fenced_jsonc_after(text, "## Diff")
+    diff = None
+    diff_error = None
+    if diff_block is not None:
+        try:
+            diff = parse_jsonc(diff_block)
+        except Exception as e:  # noqa: BLE001 - report, do not crash the build
+            diff_error = str(e)
+    return {
+        "slug": slug_m.group(1) if slug_m else None,
+        "kb_slug": kb_slug_m.group(1) if kb_slug_m else None,
+        "category": category_m.group(1) if category_m else None,
+        "affected_kb_slugs": parse_frontmatter_list(text, "affected_kb_slugs"),
+        "effective_from": eff_m.group(1) if eff_m else None,
+        "authored_date": auth_m.group(1) if auth_m else None,
+        "sources": parse_sources_block(text),
+        "headline_en": markdown_section(text, "Headline (EN)"),
+        "headline_vi": markdown_section(text, "Headline (VI)"),
+        "summary_en": markdown_section(text, "Summary (EN)"),
+        "summary_vi": markdown_section(text, "Summary (VI)"),
+        "diff": diff,
+        "diff_error": diff_error,
+        "path": path,
+    }
+
+
 def parse_kb_doc(path):
     text = path.read_text()
     slug_m = re.search(r"^slug:\s*(\S+)", text, re.M)
     eff_m = re.search(r"^effective_from:\s*(\S+)", text, re.M)
     ver_m = re.search(r"^last_verified:\s*(\S+)", text, re.M)
+    sources = parse_sources_block(text)
     rb = rules_block(text)
     content_json = None
     parse_error = None
@@ -505,13 +670,14 @@ def parse_kb_doc(path):
             parse_error = str(e)
     # content_md = everything before "## Rules"
     cut = text.find("## Rules")
-    fm_end = text.find("---", 3)
+    fm_end = frontmatter_end(text)
     body_start = text.find("\n", fm_end) + 1 if fm_end > 0 else 0
     content_md = (text[body_start:cut] if cut > 0 else text[body_start:]).strip()
     return {
         "slug": slug_m.group(1) if slug_m else None,
         "effective_from": eff_m.group(1) if eff_m else None,
         "last_verified": ver_m.group(1) if ver_m else None,
+        "sources": sources,
         "content_md": content_md,
         "content_json": content_json,
         "parse_error": parse_error,
@@ -606,6 +772,24 @@ def detect_cycle(producer, reads):
 def kb_exists(slug):
     """A `kb.*` slug resolves to a docs/ file (slug == path, GATE 1's inverse)."""
     return (ROOT / "docs" / (slug.replace(".", "/") + ".md")).is_file()
+
+
+def compute_affected_components(affected_kb_slugs, blueprints):
+    """A news note's `affected_kb_slugs` (KB docs) -> `{blueprint_slug: [component_name,
+    ...]}` — the reverse index the shell needs to know which component tile to badge
+    (kb-news-feature.md "Open design questions" #1). Computed from data already parsed
+    per blueprint (`Component.anchors`), over EVERY blueprint (not just the in-scope
+    set) — a B/D-mode component can anchor the same KB doc as an in-scope one, and the
+    news feature should surface that too once that mode activates, no recompute needed.
+    A slug matched by more than one component within a blueprint (multi-fill, already a
+    known shape) lists every matching component name, sorted."""
+    affected = set(affected_kb_slugs)
+    out = {}
+    for _stem, (bslug, comps, _producer, _reads, _ui_tabs) in blueprints.items():
+        matched = sorted({c.name for c in comps if affected & set(c.anchors)})
+        if matched:
+            out[bslug] = matched
+    return out
 
 
 def semantic_gates(stem, comps, kb_docs, fails, info):
@@ -739,12 +923,25 @@ def run(emit=False):
             fails.append(f"in-scope blueprint {b} not found")
         return fails, warns, info, stats, None
 
-    # ---- parse all KB docs (GATE 1 slug==path, GATE 5 parse — mode-independent) #
+    # ---- parse all KB docs + news notes (GATE 1 slug==path, GATE 5 parse) ---- #
+    # docs/kb/news/*.md is a DISTINCT artifact class (kb-update-runbook.md
+    # "authoring a news note") — a dated announcement of a KB change, never
+    # anchored by a blueprint, never independently sourced (kb_slug's own
+    # sources: is the record). Routed to its own dict + GATE 11 below, never
+    # mixed into kb_docs (so it never enters GATE 2/6/7/10 or the registries).
     kb_docs = {}
+    news_docs = {}
     for f in sorted(KB.rglob("*.md")):
-        doc = parse_kb_doc(f)
         rel = f.relative_to(ROOT / "docs").with_suffix("")
         expect = str(rel).replace("/", ".")
+        if NEWS_DIR in f.parents:
+            doc = parse_news_doc(f)
+            if doc["slug"] != expect:
+                fails.append(f"[slug] {f}: slug={doc['slug']} expect={expect}")
+            if doc["slug"]:
+                news_docs[doc["slug"]] = doc
+            continue
+        doc = parse_kb_doc(f)
         if doc["slug"] != expect:
             fails.append(f"[slug] {f}: slug={doc['slug']} expect={expect}")
         if doc["slug"]:
@@ -752,6 +949,101 @@ def run(emit=False):
         if doc["parse_error"]:
             fails.append(f"[content_json] {doc['slug']}: parse error: {doc['parse_error']}")
     stats["kb_docs"] = len(kb_docs)
+    stats["news_docs"] = len(news_docs)
+
+    # ---- GATE 10: sources citation (FAIL-CLOSED) --------------------------- #
+    # kb-update-runbook.md Phase 1: a fact doc must cite the primary source it was
+    # verified against (url + retrieved date; +path when archived under docs/sources/),
+    # or, for a synthesis doc asserting no standalone figure / an intentional
+    # placeholder, a `- note:`-only self-declaration — so a rerun of the KB update
+    # process is reproducible, not just re-fetchable. Excluded: derived/synthesis
+    # namespaces that interpolate or compose OTHER already-sourced KB docs rather
+    # than asserting a fact of their own (copy templates, bilingual coordination
+    # norms, journey checklists).
+    # Flipped fail-closed 2026-07-06: the 2026-07 backfill (173 pre-existing docs,
+    # Phase A regulated tier + Phase B soft tier) closed out — every non-exempt doc
+    # now carries `sources:` (a url/path citation, or a documented note-only
+    # deferral). A new doc with neither is a real gap, not backfill debt.
+    SOURCES_EXEMPT_PREFIXES = ("kb.copy.", "kb.bilingual.", "kb.journey.")
+    for slug, doc in sorted(kb_docs.items()):
+        if slug.startswith(SOURCES_EXEMPT_PREFIXES):
+            continue
+        if not doc.get("sources"):
+            fails.append(f"[sources] {slug}: no `sources:` citation (kb-update-runbook.md Phase 1)")
+
+    # ---- GATE 11: news-note well-formedness (docs/kb/news/*.md) ------------ #
+    # kb-update-runbook.md "authoring a news note": kb_slug + every affected_kb_slugs
+    # entry must resolve to a real KB doc (the relevance-filter key has to point at
+    # something real); category must be one of NEWS_CATEGORIES (the News overview
+    # sheet has nowhere else to sort an unrecognized value); effective_from/
+    # authored_date required; sources required
+    # (FAIL-CLOSED, same discipline as GATE 10 — a news note is a user-facing claim
+    # and deserves the same citation bar as a fact doc; not exempt the way
+    # kb.copy.*/kb.bilingual.*/kb.journey.* are, since every news note asserts a
+    # specific dated fact of its own); the diff block must be present and parse;
+    # the EN/VI summary must be bilingual-well-formed (reusing the same check as a
+    # KB doc's `copy` templates — same {locale: text} shape).
+    #
+    # A note that OMITS `kb_slug` is exempt from kb_slug / affected_kb_slugs / Diff
+    # (2026-08, Adgemis private-credit + migration-cuts notes): those three exist for
+    # the DIFF case — "a regulated figure this KB cites just changed" — which needs
+    # an anchor doc to diff against and a component to badge. A standalone factual
+    # citation (a macro/systemic event, a still-developing policy story) has no
+    # regulated old_value→new_value pair and nothing of ours to diff against —
+    # forcing a fake anchor/diff onto it would be the fabrication
+    # kb-doc-authoring.md forbids. This is orthogonal to `category`: category is
+    # only which section the News overview sheet sorts it under (any of
+    # NEWS_CATEGORIES can carry a standalone note — a visa story doesn't stop being
+    # about visas just because it isn't a diff). It still owes the full citation bar
+    # (sources/effective_from/authored_date/bilingual headline+summary) — only the
+    # diff-specific requirements are waived, and — same as any note — it can only
+    # ever reach the public, unfiltered `/api/news` homepage ticker: with no
+    # affected_kb_slugs there's nothing to intersect against a plan card's
+    # consulted-slugs list, so it never enters the (currently dormant) per-card
+    # relevance filter.
+    for slug, doc in sorted(news_docs.items()):
+        standalone = doc.get("kb_slug") is None
+        if not standalone:
+            if not kb_exists(doc["kb_slug"]):
+                fails.append(f"[news] {slug}: kb_slug {doc.get('kb_slug')!r} does not resolve to a KB doc")
+        if doc.get("category") not in NEWS_CATEGORIES:
+            fails.append(f"[news] {slug}: category {doc.get('category')!r} not one of "
+                        f"{NEWS_CATEGORIES} (kb-news-feature.md \"News overview sheet\")")
+        if not standalone:
+            if not doc.get("affected_kb_slugs"):
+                fails.append(f"[news] {slug}: affected_kb_slugs is empty — nothing to filter relevance by")
+            else:
+                bad = [s for s in doc["affected_kb_slugs"] if not kb_exists(s)]
+                if bad:
+                    fails.append(f"[news] {slug}: affected_kb_slugs resolve to no KB doc: {bad}")
+        if not doc.get("effective_from"):
+            fails.append(f"[news] {slug}: missing effective_from")
+        if not doc.get("authored_date"):
+            fails.append(f"[news] {slug}: missing authored_date")
+        if not doc.get("sources"):
+            fails.append(f"[news] {slug}: no `sources:` citation (kb-update-runbook.md "
+                        f"\"authoring a news note\")")
+        if not standalone and doc.get("diff") is None:
+            suffix = f" ({doc['diff_error']})" if doc.get("diff_error") else ""
+            fails.append(f"[news] {slug}: missing or unparsed '## Diff' jsonc block{suffix}")
+        err = check_copy_template({"en": doc.get("summary_en"), "vi": doc.get("summary_vi")})
+        if err:
+            fails.append(f"[news] {slug}: bilingual summary: {err}")
+        hl_err = check_copy_template({"en": doc.get("headline_en"), "vi": doc.get("headline_vi")})
+        if hl_err:
+            fails.append(f"[news] {slug}: bilingual headline: {hl_err}")
+        else:
+            too_long = [loc for loc, v in (("en", doc["headline_en"]), ("vi", doc["headline_vi"]))
+                        if len(v) > NEWS_HEADLINE_MAX_CHARS]
+            if too_long:
+                fails.append(f"[news] {slug}: headline too long for a ticker ({too_long}, "
+                            f"max {NEWS_HEADLINE_MAX_CHARS} chars) — put the explanation in "
+                            f"'## Summary' instead")
+        if doc.get("affected_kb_slugs"):
+            affected_components = compute_affected_components(doc["affected_kb_slugs"], blueprints)
+            if not affected_components:
+                info.append(f"[news] {slug}: affected_kb_slugs match no blueprint component "
+                            f"anchor — the shell will have nothing to badge")
 
     # ---- GATE 8: bilingual copy-template well-formedness (all docs) -------- #
     # Every `copy` template is localized in every LOCALES locale (outcome-conformance.md
@@ -805,6 +1097,20 @@ def run(emit=False):
             bad = [r for r in c.renderers if r not in RENDERER_ENUM]
             if bad:
                 fails.append(f"[renderer] {stem}/{c.name}: not in enum: {bad}")
+
+    # ---- GATE 12: every component declares its outcome shape (all blueprints) -- #
+    # Reproducible -> P-7 · One declaration per outcome shape -> The KB compiler -> undeclared outcome refused
+    # A component whose `**Outcome schema:**` has no fenced ```jsonc block (a type named
+    # only in prose) compiles to outcome_type null, and fh_engine_outcome:validate/3 then
+    # had nothing to check its fill against. Refused here, so it never reaches a deploy
+    # (Son, 2026-10-06, #25); validate/3 refusing an undeclared type is the backstop.
+    # Measured 2026-10-06: before this gate, 6 of 70 components compiled null
+    # (buying_strategy/due_diligence/settlement_prep in fhb-foreign-au, investor-foreign-au).
+    for stem, (_, bcomps, _, _, _) in blueprints.items():
+        for c in bcomps:
+            if not c.outcome_type:
+                fails.append(f"[outcome_schema] {stem}/{c.name}: no fenced ```jsonc "
+                             f"outcome schema with a \"type\" — declare its shape (P-7)")
 
     # ---- GATE 4: pipeline acyclic (all blueprints — structural, mode-independent) #
     stats["dag"] = {}
@@ -861,7 +1167,7 @@ def run(emit=False):
 
     artifact = None
     if not fails:
-        artifact = build_artifact(blueprints, registries, kb_docs)
+        artifact = build_artifact(blueprints, registries, kb_docs, news_docs)
         if emit:
             ARTIFACT_OUT.parent.mkdir(parents=True, exist_ok=True)
             ARTIFACT_OUT.write_text(
@@ -891,15 +1197,44 @@ def registry_payload(reg):
     }
 
 
-def build_artifact(blueprints, registries, kb_docs):
+def build_artifact(blueprints, registries, kb_docs, news_docs):
     kb = {
         slug: {
             "effective_from": d["effective_from"],
             "last_verified": d["last_verified"],
+            "sources": d.get("sources") or [],
             "content_md": d["content_md"],
             "content_json": d["content_json"],
         }
         for slug, d in kb_docs.items()
+    }
+    # A news note is NEVER anchored by a blueprint — a parallel, simpler array, not
+    # folded into `kb` (kb-update-runbook.md "authoring a news note"). It DOES carry
+    # its own `sources:` (required, GATE 11) — pinned to what the author actually
+    # checked for THIS diff, which never drifts because the note is immutable; this
+    # is distinct from a fact doc's `sources:`, which tracks the doc's own next
+    # re-verify.
+    news = {
+        slug: {
+            "kb_slug": d["kb_slug"],
+            "category": d["category"],
+            "affected_kb_slugs": d["affected_kb_slugs"],
+            # Reverse-indexed at compile time from data already in hand (Component.anchors)
+            # — the shell's placement lookup (kb-news-feature.md "Open design questions" #1):
+            # which component tile, on which blueprint, to badge. Computed over every
+            # blueprint (not just in-scope), so a dormant B/D-mode match is ready the
+            # instant that mode activates.
+            "affected_components": compute_affected_components(d["affected_kb_slugs"], blueprints),
+            "effective_from": d["effective_from"],
+            "authored_date": d["authored_date"],
+            "sources": d.get("sources") or [],
+            "headline_en": d["headline_en"],
+            "headline_vi": d["headline_vi"],
+            "summary_en": d["summary_en"],
+            "summary_vi": d["summary_vi"],
+            "diff": d["diff"],
+        }
+        for slug, d in news_docs.items()
     }
     bps = {}
     for stem, (slug, comps, producer, reads, ui_tabs) in blueprints.items():
@@ -945,6 +1280,7 @@ def build_artifact(blueprints, registries, kb_docs):
         # against.
         "locales": list(LOCALES),
         "kb": kb,
+        "news": news,
         "blueprints": bps,
     }
 
@@ -963,7 +1299,7 @@ def main():
               f"ui_tabs={json.dumps(stats.get('ui_tabs', {}).get(stem, []))}")
     print(f"in-scope blueprints: {sorted(IN_SCOPE_BLUEPRINTS)} | deferred docs: "
           f"{stats.get('deferred_docs')}")
-    print(f"kb docs: {stats.get('kb_docs')}")
+    print(f"kb docs: {stats.get('kb_docs')} | news notes: {stats.get('news_docs')}")
     print(f"copy templates: {stats.get('copy_templates')} (bilingual gate, "
           f"locales={'+'.join(LOCALES)})")
     if info:
@@ -982,7 +1318,7 @@ def main():
         return 1
     if emit and artifact is not None:
         print(f"PASS — artifact emitted: {ARTIFACT_OUT.relative_to(ROOT)}")
-        print(f"       {len(artifact['kb'])} KB entries, "
+        print(f"       {len(artifact['kb'])} KB entries, {len(artifact['news'])} news notes, "
               f"{len(artifact['blueprints'])} blueprints, "
               f"{len(stats.get('registry', {}))} in-scope registries")
     else:

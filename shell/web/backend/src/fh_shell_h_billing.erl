@@ -7,6 +7,7 @@
 %%   webhook   POST /api/billing/webhook   (8-S5e-2) Stripe-signed event → tier state
 %%   subscribe POST /api/billing/subscribe (8-S5e-3) authed user → Stripe Checkout URL
 %%   charge    POST /api/billing/charge    (8-S5f)   authed user → one-time add-on URL
+%%   usage     GET  /api/billing/usage     (8-S5g)   authed user → this-period tokens/cost
 %%
 %% AUTH posture differs per action and is deliberate:
 %%   * webhook is NOT user-authenticated — Stripe has no shell session. It is authenticated
@@ -23,11 +24,18 @@ init(Req0, [Action] = State) ->
 dispatch(webhook, Req)   -> post_only(Req, fun webhook/1);
 dispatch(subscribe, Req) -> post_only(Req, fun subscribe/1);
 dispatch(charge, Req)    -> post_only(Req, fun charge/1);
+dispatch(usage, Req)     -> get_only(Req, fun usage/1);
 dispatch(_, Req)         -> fh_shell_http:reply_json(404, #{<<"error">> => <<"not_found">>}, Req).
 
 post_only(Req, Fun) ->
     case cowboy_req:method(Req) of
         <<"POST">> -> Fun(Req);
+        _ -> fh_shell_http:reply_json(405, #{<<"error">> => <<"method_not_allowed">>}, Req)
+    end.
+
+get_only(Req, Fun) ->
+    case cowboy_req:method(Req) of
+        <<"GET">> -> Fun(Req);
         _ -> fh_shell_http:reply_json(405, #{<<"error">> => <<"method_not_allowed">>}, Req)
     end.
 
@@ -104,6 +112,32 @@ charge_kind(UserId, Kind, PlanCardId, Req)
     end;
 charge_kind(_UserId, _Kind, _PlanCardId, Req) ->
     fh_shell_http:reply_json(400, #{<<"error">> => <<"invalid_kind">>}, Req).
+
+%% GET /api/billing/usage — the authenticated user's current-period usage (the
+%% account page's data source, 8-S5g): tier, tokens used/limit, shadow cost, period
+%% bounds. `limit_tokens` is the JSON string "unlimited" for an admin (fh_shell_meter
+%% exempts them from the §7 gate entirely) rather than a numeric cap that would
+%% misreport what actually governs their usage.
+usage(Req0) ->
+    case fh_shell_http:authenticate_user(Req0) of
+        {ok, #{<<"user_id">> := UserId}} ->
+            #{tier := Tier, used_tokens := Used, limit_tokens := Limit,
+              shadow_cost := Cost, period_start := Start, period_end := Stop} =
+                fh_shell_meter:usage_summary(UserId),
+            fh_shell_http:reply_json(200, #{
+                <<"tier">> => Tier,
+                <<"used_tokens">> => Used,
+                <<"limit_tokens">> => limit_json(Limit),
+                <<"shadow_cost">> => Cost,
+                <<"period_start">> => Start,
+                <<"period_end">> => Stop
+            }, Req0);
+        {error, Status, ErrBody} ->
+            fh_shell_http:reply_json(Status, ErrBody, Req0)
+    end.
+
+limit_json(unlimited) -> <<"unlimited">>;
+limit_json(N) -> N.
 
 plan_card(P) when is_binary(P) -> P;
 plan_card(_) -> undefined.

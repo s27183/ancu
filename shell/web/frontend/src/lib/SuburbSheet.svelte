@@ -36,10 +36,10 @@
 <div class="sheet" role="dialog" aria-modal="false" aria-label={suburb.name}>
     <header class="sheet-head">
         <div class="title">
-            <h2>{suburb.name}</h2>
-            <p class="sub">
-                {suburb.state}{#if suburb.lga_name} · {suburb.lga_name}{/if}
-            </p>
+            <h2>{suburb.name} - {suburb.state}</h2>
+            {#if suburb.lga_name}
+                <p class="sub">{suburb.lga_name}</p>
+            {/if}
         </div>
         <button type="button" class="close" onclick={onclose} aria-label={$t('sheet.close')}
             >✕</button

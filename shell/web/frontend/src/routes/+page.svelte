@@ -5,7 +5,14 @@
     // strip (§6.1), and the click-sheet. Mobile-native: full-bleed canvas, the
     // sheet is a bottom-sheet on phone / side-panel on desktop (§7.1).
     import { onMount } from 'svelte';
-    import { getSuburbs, listPlanCards, type Suburb, type SuburbSource } from '$lib/api';
+    import {
+        getSuburbs,
+        listPlanCards,
+        getAllNews,
+        type Suburb,
+        type SuburbSource,
+        type NewsNote
+    } from '$lib/api';
     import {
         MAP_SCOPES,
         STATE_NAMES,
@@ -14,8 +21,6 @@
         SIZE_CRITERIA,
         DEFAULT_SIZE_BY,
         legendFor,
-        heatmapEnabled,
-        OVERVIEW_MAX_ZOOM,
         type MapScope,
         type SizeBy
     } from '$lib/map';
@@ -27,6 +32,9 @@
     import SuburbSheet from '$lib/SuburbSheet.svelte';
     import Onboarding from '$lib/Onboarding.svelte';
     import Login from '$lib/Login.svelte';
+    import NewsTicker from '$lib/NewsTicker.svelte';
+    import NewsListSheet from '$lib/NewsListSheet.svelte';
+    import NewsDetailSheet from '$lib/NewsDetailSheet.svelte';
     import { t, type MessageKey } from '$lib/i18n';
 
     // NB: never name a $state var `state` — svelte-check reads it as a store subscribe.
@@ -40,10 +48,6 @@
         crime: 'map.size.crime'
     } as const;
     const legend = $derived(legendFor(sizeBy));
-    // Live map zoom (reported by SuburbMap). Drives the overview hint for intensive
-    // criteria, which have no heatmap and only reveal their dots once you zoom in.
-    let mapZoom = $state(STATE_VIEW[DEFAULT_STATE].zoom);
-    const showZoomHint = $derived(!heatmapEnabled(sizeBy) && mapZoom < OVERVIEW_MAX_ZOOM);
     let suburbs = $state<Suburb[]>([]);
     let attribution = $state<SuburbSource[]>([]);
     let loading = $state(true);
@@ -57,6 +61,28 @@
     // The calm feedback banner the backend redirects back with (the login sheet's
     // open state now lives in the shared `loginOpen` store, opened from the header).
     let banner = $state<SigninFlag | null>(null);
+
+    // Homepage KB-news ticker (kb-news-feature.md "Homepage ticker", 2026-07-08): every
+    // compiled news note, unfiltered — distinct from PlanProjection's per-card,
+    // relevance-filtered ticker, which is unchanged. No dismiss here (see NewsDetailSheet).
+    let homeNews = $state<NewsNote[]>([]);
+    // Two-layer flow ("News overview sheet", 2026-07-09): tapping the ticker opens the
+    // categorized overview (layer 1, homeNewsListOpen); tapping a headline in it opens the
+    // detail sheet (layer 2, selectedHomeNews) — same detail sheet the per-card ticker uses.
+    let homeNewsListOpen = $state(false);
+    let selectedHomeNews = $state<NewsNote | null>(null);
+    // Lifted out of NewsListSheet (rather than local $state there) because the sheet is
+    // conditionally mounted ({#if homeNewsListOpen} below) — closing a detail note and
+    // reopening the list (onHomeNewsClose) remounts NewsListSheet fresh, which would
+    // silently drop a local active-tab selection back to 'all' right after the back-nav
+    // fix restored "return to where you were." Tabs.svelte's own contract is "the parent
+    // owns the active id" — this makes +page.svelte that parent across remounts, not just
+    // within one mount.
+    let homeNewsActiveCategory = $state('all');
+    // Real measured height of the ticker band, fed into --home-news-h so the
+    // controls-cluster/signin-banner offsets never hardcode a magic constant
+    // (kb-news-feature.md task 29's regression is the lesson here — measure, don't guess).
+    let newsBandHeight = $state(0);
     // CC-BY attribution is required (§6.1) but space-cheap when collapsed to a chip.
     let attrOpen = $state(false);
 
@@ -131,7 +157,31 @@
             banner = flag;
             history.replaceState(null, '', window.location.pathname);
         }
+        getAllNews().then((news) => (homeNews = news));
     });
+
+    // Ticker tap opens that specific note's detail directly (2026-08-06, Son) — the list
+    // stays reachable as the fallback closing a ticker-opened note lands on
+    // (onHomeNewsClose, unchanged), it's just no longer the ticker's own first stop.
+    function onHomeTickerTap(note: NewsNote) {
+        selectedHomeNews = note;
+    }
+    function onHomeNewsListClose() {
+        homeNewsListOpen = false;
+    }
+    function onHomeNewsListSelect(note: NewsNote) {
+        homeNewsListOpen = false;
+        selectedHomeNews = note;
+    }
+    // Closing the detail sheet (✕/backdrop/Escape) returns to the list it was opened
+    // from, rather than dropping the buyer back to the bare homepage — every path into
+    // selectedHomeNews goes through the list first (onHomeNewsListSelect above), so there
+    // is always a list to go back to. Previously this fully closed, so re-opening a
+    // different note required tapping the ticker again to re-open the list from scratch.
+    function onHomeNewsClose() {
+        selectedHomeNews = null;
+        homeNewsListOpen = true;
+    }
 
     async function load(st: MapScope) {
         loading = true;
@@ -160,7 +210,18 @@
     });
 </script>
 
-<div class="map-shell">
+<div class="map-shell" style="--home-news-h: {newsBandHeight}px">
+    {#if homeNews.length > 0}
+        <div class="home-news-band" bind:clientHeight={newsBandHeight}>
+            <NewsTicker
+                news={homeNews}
+                onSelect={onHomeTickerTap}
+                variant="marquee"
+                ariaLabel={$t('home.news.aria')}
+            />
+        </div>
+    {/if}
+
     {#if !loading && !errored}
         <SuburbMap
             bind:this={mapRef}
@@ -171,7 +232,6 @@
             pulseSaved={savedOnly}
             {selected}
             onselect={(s) => (selected = s)}
-            onzoom={(z) => (mapZoom = z)}
         />
     {/if}
 
@@ -327,12 +387,6 @@
         </div>
     {/if}
 
-    <!-- Intensive criteria (a rate / an index) get no overview heatmap — a density sum
-         would be dishonest — so prompt to zoom in where the per-suburb dots read. -->
-    {#if showZoomHint && !savedOnly}
-        <div class="zoom-hint">{$t('map.zoomhint')}</div>
-    {/if}
-
     {#if loading}
         <div class="overlay"><p>{$t('map.loading')}</p></div>
     {:else if errored}
@@ -392,5 +446,19 @@
 
     {#if $loginOpen}
         <Login onclose={() => loginOpen.set(false)} />
+    {/if}
+
+    {#if homeNewsListOpen}
+        <NewsListSheet
+            news={homeNews}
+            active={homeNewsActiveCategory}
+            onSelectCategory={(id) => (homeNewsActiveCategory = id)}
+            onSelectNote={onHomeNewsListSelect}
+            onClose={onHomeNewsListClose}
+        />
+    {/if}
+
+    {#if selectedHomeNews}
+        <NewsDetailSheet note={selectedHomeNews} onClose={onHomeNewsClose} />
     {/if}
 </div>

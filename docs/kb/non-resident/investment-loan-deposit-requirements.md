@@ -1,8 +1,16 @@
 ---
 slug: kb.non-resident.investment-loan-deposit-requirements
 effective_from: 2025-07-01
-last_verified: 2026-07-03
----
+last_verified: 2026-07-06
+sources:
+  - url: https://www.canstar.com.au/home-loans/non-resident-home-loans/
+    retrieved: 2026-07-06
+    note: "SECONDARY — WebFetched 2026-07-06. NOTE: the page uses 30% deposit @ 70% LVR / 40% @ 60% LVR only as an ILLUSTRATIVE explanation of how LVR works, and states deposit/LVR terms are lender-dependent — it does NOT assert the 30-40% band as a firm non-resident requirement. This is a synthesis doc (fills: []); the firm band is OWNED by kb.lender.foreign-buyer-deposit-requirements, which is where the authoritative citation belongs."
+  - url: https://www.odinmortgage.com/resources/7-australian-banks-and-lenders-that-finance-investment-properties-for-non-residents-what-each-one-requires-in-2026/
+    retrieved: 2026-07-06
+    note: "SECONDARY — WebFetched 2026-07-06. Confirms non-resident investment lending has tighter/individualized LVR policies and foreign-income shading, but gives no single firm deposit %/LVR figure (borrower-profile dependent)."
+  - url: https://moneysmart.gov.au/how-to-invest/borrowing-to-invest
+    note: "POINTER (not re-fetched this session) — ASIC Moneysmart general borrowing-to-invest / investment-loan risk context (not a non-resident-specific figure); carried from the doc's markdown Sources block."
 
 # Deposit requirements — non-resident investment loans
 

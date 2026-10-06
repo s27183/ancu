@@ -1,7 +1,16 @@
 ---
 slug: kb.stamp-duty.calc-by-state
 effective_from: 2025-07-01
-last_verified: 2026-06-01
+last_verified: 2026-07-06
+sources:
+  - url: https://qro.qld.gov.au/duties/transfer-duty/calculate/rates/
+    retrieved: 2026-07-06
+  - url: https://qro.qld.gov.au/duties/transfer-duty/calculate/concession-rates/
+    retrieved: 2026-07-06
+  - url: https://www.sro.vic.gov.au/about-us/rates-and-statistics/current-rates/land-transfer-duty-non-principal-place-residence-current-rates
+    retrieved: 2026-07-06
+  - url: https://www.sro.vic.gov.au/about-us/rates-and-statistics/current-rates/land-transfer-duty-principal-place-residence-current-rates
+    retrieved: 2026-07-06
 ---
 
 # Transfer (stamp) duty — the statutory rate scale, by state
@@ -22,7 +31,7 @@ The result is the duty **before** any concession. The first-home concession (if 
 
 ## NSW — transfer duty (Revenue NSW, *Duties Act 1997*)
 
-A single standard scale; **the top two thresholds are indexed to CPI each 1 July**, so the figures below are the **2025–26** values and must be re-verified annually.
+A single standard scale; **the top two thresholds are indexed to CPI each 1 July**, so the figures below are the **2025–26** values and must be re-verified annually. **⚠ The 2026-07-06 verification pass could not confirm the 2026–27 indexed figures against the Revenue NSW primary (automated retrieval blocked); the two CPI-indexed top thresholds ($1,240,000 and $3,721,000) may have moved on 1 July 2026.** All Mode-A-relevant brackets (≤ $1,240,000 dutiable value — including the `$11,152 + 4.5% over $372,000` band that governs the typical FHB purchase) were corroborated as unchanged across current secondary NSW calculators; the QLD and VIC scales below were re-verified to the dollar against the QRO/SRO primaries this pass.
 
 | Dutiable value | Duty |
 |---|---|

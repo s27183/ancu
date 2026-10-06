@@ -1,7 +1,11 @@
 ---
 slug: kb.cash-reserve.lender-expectations
 effective_from: 2025-01-01
-last_verified: 2026-06-01
+last_verified: 2026-07-06
+sources:
+  - url: https://www.peppermoney.com.au/resources/what-does-non-genuine-savings-mean
+    retrieved: 2026-07-06
+    note: "Genuine-savings convention — 5% held/accumulated ~3 months for high-LVR loans, but explicitly lender-varying ('some lenders', 'may be enough'; some lenders waive it). DRIFT to watch: the 3-month hold is loosening — corroborating search this session indicates Helia dropped the holding period and CommBank moved to ~1 month. The doc's 'held for at least 3 months' is the conservative end, not a universal rule; soften to 'up to 3 months, lender-varying' on next revision."
 ---
 
 # Cash reserves — genuine savings and the post-settlement buffer

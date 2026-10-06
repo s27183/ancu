@@ -24,14 +24,23 @@ most "update the KB" asks are Track A.
 
 ## When it runs — triggers and cadence
 
-Triggers and their cadences are defined in
-[architecture.md §11.2](architecture.md) (the update-cadence table). In short:
+**This runs on demand, not on a schedule.** A Track A pass happens when the
+maintainer (Son + Claude Code, in a session together) says *"let's update the
+KB"* — prompted by the freshness scanner's overdue report (Phase 0) or by
+either of us noticing an external event (a Budget, a regime change, a
+bulletin). There is no cron job, no RSS watcher, no automation that runs this
+without a person starting it.
 
-| Cadence | What moves | Track |
+The Monthly/Quarterly/Per-event labels below (defined in
+[architecture.md §11.2](architecture.md)) are **re-verification budgets** — the
+longest a doc may go before it's flagged overdue — not automated triggers. In
+short:
+
+| Budget | What moves | Track |
 |---|---|---|
 | **Monthly** | Lender policy, RBA cash rate, FHG panel / participating lenders | A |
 | **Quarterly** | Scheme structures, state duty schedules, FHOG, HECS thresholds, process knowledge, document templates | A |
-| **Per-event** | Federal/State Budgets (May/June), Housing Australia rule changes, ASIC bulletins, FIRB regime changes — calendar / RSS triggered; **triggers a blueprint review** | A |
+| **Per-event** | Federal/State Budgets (May/June), Housing Australia rule changes, ASIC bulletins, FIRB regime changes — no fixed period, just a long safety-net budget; **triggers a blueprint review** | A |
 | **Per-release** | ABS Census/SEIFA (5-yearly), state price reports (quarterly), crime (quarterly), RBA FX (daily for Mode D) | B |
 
 To find *what* is overdue without waiting for an external trigger, run the
@@ -121,11 +130,213 @@ For each in-scope `docs/kb/<area>/<slug>.md`:
 - Keep the **slug == path** invariant (the compiler enforces it; don't rename a
   file without renaming the slug, and vice-versa).
 
+**Cite the source, persistently — the `sources:` frontmatter field.** A KB update
+is only rerunnable if a rerun can tell what was checked last time. Re-verifying
+"against the primary source" and then not recording *which* source, *when*, is a
+process that only ever looks rerunnable — a fresh pass has nothing to diff
+against and no way to tell a stale citation from a live one. So every fact doc
+(everything except the derived/synthesis namespaces `kb.copy.*`, `kb.bilingual.*`,
+`kb.journey.*` — see architecture.md's frontmatter block) carries:
+
+```
+sources:
+  - url: https://firb.gov.au/guidance-resources/guidance-notes/gn1
+    retrieved: 2026-07-06
+  - url: https://www.legislation.gov.au/Details/C2015C00608
+    retrieved: 2026-07-06
+    path: docs/sources/firb/fata-1975.pdf   # only when archived (below)
+```
+
+`retrieved:` is the date the fact was actually checked against that URL — the
+same discipline as `last_verified:`, just per-source rather than per-doc. A
+`sources:` entry is an audit-trail *claim*; never write one for a source you did
+not actually open this pass (a plausible-looking URL you didn't check is a
+fabricated citation, worse than no citation — [[no-judge-ground-the-producer]]
+applies here too: an LLM skimming a search result is not a substitute for a
+verified figure).
+
+**Archive when the source is a stable document.** If the primary source is a
+PDF, gazette notice, or downloadable guide (not a page that changes without
+versioning), save it under `docs/sources/<area>/` — the convention the Mode-A
+NSW/QLD/VIC/ASIC/APRA/QBE set already used — and add `path:` pointing to it. If
+it's a live-only regulator webpage, the `url` + `retrieved:` citation *is* the
+record; there is no scrape/archive requirement (this stays inside the
+no-property-scraping-pipeline posture — citing one regulator page for
+provenance is not the same market as scraping property listings at scale).
+
+**A synthesis doc that asserts no figure of its own cites a `note:`, not a `url:`.**
+A doc that ties together facts each single-owned elsewhere (its own figures are
+all cross-refs, nothing here is asserted independently) has no primary of its
+own to point at — forcing a `url:` onto it would just cite one of its cross-refs
+arbitrarily, or worse, prompt a fabricated one. Instead its `sources:` entry is a
+one-line self-declaration:
+
+```
+sources:
+  - note: "SYNTHESIS DOC — asserts no standalone figure; every figure is owned
+      and sourced by its cross-referenced docs (kb.some.owner, kb.other.owner).
+      Load-bearing synthesis claims sanity-checked 2026-07-06 against those
+      docs' own sources and hold."
+```
+
+GATE 10 accepts this as a citation (`kb_compiler.py`'s `parse_sources_block`
+parses a `- note:`-only entry) — the discipline being enforced is *a recorded,
+reasoned trail*, not a URL for its own sake. This is narrower than the
+`kb.copy.*`/`kb.bilingual.*`/`kb.journey.*` namespace exemption (which needs no
+`sources:` entry at all): a synthesis doc still names which docs it depends on
+and confirms it re-checked its own claims against them.
+
+**Enforcement is fail-closed (flipped 2026-07-06).** The compiler's GATE 10
+(`kb_compiler.py`) now fails the build on a missing `sources:` list. It ran
+advisory (warn-only) from schema introduction until the 2026-07 backfill
+(below) closed out — every one of the 173 KB docs now carries `sources:` (a
+url/path citation, or a documented `- note:`-only deferral for a synthesis doc
+or an intentional placeholder). A new doc that skips this from here on is a
+real gap, not backfill debt.
+
+**Backfilling the 156 pre-existing docs (2026-07 initiative).** The KB was
+authored across five modes before this citation discipline existed; Mode A's
+`docs/sources/` archive was an unmandated convention, and Modes B–D–E verified
+live without recording it. Closing that gap means a *real* re-verification pass
+— not a metadata-only patch — over every non-exempt doc, tiered by stakes:
+
+- **Regulated figures** (FIRB fees, duty scales, scheme caps/thresholds, AUSTRAC
+  reporting figures — anything a user acts on financially) — archive the primary
+  document locally *and* verify the figure to the dollar/date, matching the hard
+  "verify against the official calculator" bar in the Regulated figures
+  discipline above ([[verify-regulated-figures-by-postcondition]],
+  [[match-enforcement-grade-to-property-kind]]).
+- **Soft/informational content** (process guidance, checklists, market color) —
+  `url` + `retrieved:` is sufficient; no archive requirement.
+
+Dispatch this as area-scoped passes (one KB folder/cluster at a time), regulated
+areas first. Because a citation with today's date is a claim that the content
+was actually checked today, **spot-check a sample of any delegated pass's
+citations** — confirm the URL resolves and actually supports the cited fact —
+before trusting a batch as done; a subagent reporting "all cited" is not proof
+the citations are real.
+
 **Regulated figures discipline:** a duty/grant/threshold figure that a user acts
 on must be verified to the dollar against the official calculator, or kept out of
 the LLM's reach entirely (resolver-filled from the KB rule). KB *estimates*
 (ranges) are surfaced as ranges. Don't let a verified figure regress into prose
 the agent paraphrases.
+
+**Authoring a news note (optional, when a change is user-relevant).** Whoever
+runs Phase 1 already opens the primary, compares it to what the doc said, and
+writes the new value — the diff is known at the moment it's made, no separate
+detection mechanism needed. When that diff is the kind a buyer would want
+surfaced (a threshold/cap/rate a real plan depends on, not a wording tidy-up),
+author a companion file under `docs/kb/news/<yyyy-mm>-<short-slug>.md`:
+
+```yaml
+---
+slug: kb.news.2026-07-hecs-thresholds-2026-27
+kb_slug: kb.hecs.thresholds        # the fact doc this note is about — ITS
+                                    # sources: stays the citation of record;
+                                    # never duplicate a citation here
+category: finance                  # one of NEWS_CATEGORIES (kb_compiler.py) —
+                                    # visa | finance | scheme | tax | property |
+                                    # market. Which section it sorts under in the
+                                    # News overview sheet (kb-news-feature.md).
+affected_kb_slugs:                  # the relevance-filter key (usually == kb_slug;
+  - kb.hecs.thresholds              # can span >1 doc if one change ripples)
+effective_from: 2026-07-01          # when the underlying fact takes effect
+authored_date: 2026-07-06           # when this note was written — a news note
+                                    # is IMMUTABLE once authored; a later change
+                                    # gets a NEW note, this one is never edited
+sources:                            # what you had open to write THIS diff — same
+  - url: https://example.gov.au/... # shape as a fact doc's sources:, zero extra
+    retrieved: 2026-07-06           # gathering cost (you already opened it for
+                                    # Phase 1). Pins a historical citation for this
+                                    # specific change; never drifts, because the
+                                    # note is immutable (unlike a fact doc's sources:,
+                                    # which tracks that doc's own next re-verify).
+---
+
+## Headline (EN)
+ONE line, <=100 chars — this is ticker copy (kb-news-feature.md "Homepage
+ticker"), not prose. "HECS-HELP repayment threshold rises to $69,528 for 2026-27",
+not a sentence explaining why it matters — that's what Summary is for.
+
+## Headline (VI)
+Same fact, in Vietnamese, same length bar.
+
+## Summary (EN)
+Plain-language, one or two sentences — what changed and why a buyer might care.
+Read in the detail sheet after tapping the ticker headline, never in the ticker
+strip itself.
+
+## Summary (VI)
+Same content in Vietnamese — bilingual is required, not optional (constraint #9).
+
+## Diff
+​```jsonc
+{ "old_value": { ... }, "new_value": { ... } }
+​```
+```
+
+GATE 11 (`kb_compiler.py`) fail-closes on: `kb_slug` and every `affected_kb_slugs`
+entry resolving to a real KB doc, `category` being one of `NEWS_CATEGORIES`,
+`effective_from`/`authored_date` present,
+`sources:` non-empty (same fail-closed discipline as GATE 10 — a news note is a
+user-facing claim and gets the same citation bar as a fact doc, no exemption),
+the `## Diff` block present and parseable, the EN/VI summary
+bilingual-well-formed (the same check as a KB doc's `copy` templates), and the
+EN/VI **headline** bilingual-well-formed AND <=100 chars each (`NEWS_HEADLINE_MAX_CHARS`)
+— a headline is ticker copy, a hard contract, so an over-length headline fails
+the build rather than silently degrading the ticker UI for every note after it.
+A news note is **never** anchored by a blueprint; it is parsed into its own artifact
+array (`artifact["news"]`), never mixed into `kb`, so it never enters GATE 2/6/7
+or a blueprint's registry (GATE 10 itself doesn't apply — GATE 11's own
+`sources:` check is the news-note-scoped equivalent).
+
+**Standalone notes — omit `kb_slug`, no diff required (2026-08).** The shape above
+assumes a diff against one of *our own* KB fact docs (a threshold changed, a rate
+moved). Some user-relevant news is a real, dated, sourced event with **no** regulated
+old_value→new_value pair to diff and no existing KB doc to anchor to — a private-credit
+lender collapse, a still-developing policy story (a minister's speech postponed,
+measures reported as "under consideration" rather than law). Forcing a fake `kb_slug`
+or `## Diff` onto that would be fabrication. **Omit `kb_slug` and `affected_kb_slugs`**
+and the note is exempt from both those checks and from requiring `## Diff` — this is
+orthogonal to `category` (any of `NEWS_CATEGORIES` can carry a standalone note; a
+migration story is still `category: visa` even with no KB doc to diff). Everything
+else is unchanged: bilingual headline (<=100 chars)/summary, `sources:`,
+`effective_from`, `authored_date` are still required and fail-closed. A standalone
+note carries the source's own claims and their actual epistemic status (e.g. "ABC
+reports the government is *considering* X; nothing is yet enacted") rather than
+asserting them as this platform's conclusion or as settled fact — report what was
+reported, at the certainty it was reported at. Since there's no `kb_slug`/
+`affected_kb_slugs`, a standalone note is **homepage-ticker-only** — it has nothing
+to intersect against a plan card's consulted-slugs list, so it never surfaces in the
+per-card relevance filter, only the public `/api/news` feed.
+
+**Relevance is a lookup, not new machinery.** Each fill already records which KB
+slugs it consulted (`kb_versions`, `plan-card-refresh.md`) — the engine
+(`fh_engine_kb:news_for_slugs/1`) intersects that against `affected_kb_slugs` to
+decide which cards see a given note. Full mechanism, engine primitive
+(`GET`/`PATCH /api/engine/plan-cards/:id/news`), and the shell-side build status:
+[kb-news-feature.md](kb-news-feature.md).
+
+**Retrospective sweep (finding candidates you didn't just create).** The above
+assumes you're mid-Phase-1, actively updating a doc, and notice the diff right
+then. A separate, occasional pass finds candidates already sitting in the KB:
+docs that narrate a real, dated, cited transition in plain prose — "X was A,
+became B on [date]" — but were never turned into a note, because no one was
+touching that doc at the time. **A keyword grep for self-flagged FUTURE pending
+changes (the pattern a doc uses to flag its own known successor, e.g. "author a
+sibling doc when that year opens") will miss these** — a transition already
+narrated as settled PAST fact carries no such flag. The only reliable method is
+a full read of each doc, not a grep. Worked example (2026-07-09,
+[kb-news-feature.md](kb-news-feature.md) "seventh extension"): 5 parallel
+read-only passes across every `docs/kb/**` category directory found 11
+zero-new-research candidates this way — visa, property, tax, finance, and
+scheme all had at least one. Exclude while sweeping: internal doc-reorg /
+seam-reconciliation notes (not real-world facts), facts with no discrete
+transition (always been true), vague/unconfirmed possibilities, future-dated
+reforms not yet enacted law, and — do not fabricate — any candidate whose
+old_value isn't itself stated in-repo (flag it for a future Phase-1 pass with
+real research instead).
 
 ### Phase 2 — Co-update the bilingual copy (when a figure or note changed)
 
@@ -269,7 +480,10 @@ python3 tests/outcome_validate.py
 | Artifact | When | Owner doc |
 |---|---|---|
 | `docs/kb/<area>/<slug>.md` fact docs | The trigger (always, Track A) | this doc, Phase 1 |
+| `docs/kb/<area>/<slug>.md` `sources:` frontmatter | Every fact-doc edit (non-exempt namespaces) | this doc, Phase 1 |
+| `docs/sources/<area>/` archived primary docs | When the source is a stable document (PDF/gazette) | this doc, Phase 1 |
 | `docs/kb/copy/*.md` bilingual templates | When a figure/note changed | [bilingual-content.md](bilingual-content.md) |
+| `docs/kb/news/<yyyy-mm>-<slug>.md` news notes + `sources:` | Optional — when the diff is user-relevant | this doc, Phase 1 "Authoring a news note" / [kb-news-feature.md](kb-news-feature.md) |
 | `docs/blueprints/*.md` | Only on a structural change | [architecture.md §11.9](architecture.md) |
 | Renderer enum (`RENDERER_ENUM` + §11.9 table) **and** `shell/.../renderers/*.svelte` | Only when a blueprint adds a renderer | this doc, Phase 3 |
 | `engine/erlang/priv/kb/artifact.json` | Always (re-emit + prove) | [engine-contract.md §9.1](engine-contract.md) |

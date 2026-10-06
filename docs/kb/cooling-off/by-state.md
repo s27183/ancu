@@ -1,7 +1,20 @@
 ---
 slug: kb.cooling-off.by-state
 effective_from: 2025-07-01
-last_verified: 2026-06-02
+last_verified: 2026-07-06
+sources:
+  - url: https://legislation.nsw.gov.au/view/html/inforce/current/act-1919-006
+    retrieved: 2026-07-06
+    path: docs/sources/nsw/conveyancing_act_1919_no_6.pdf
+    note: "NSW Conveyancing Act 1919 ss66S-66W — 5 business days (10 off-the-plan), 0.25% forfeiture, s66W certificate; read via archived PDF (landing page blocks automated fetch), current for 15 Aug 2025"
+  - url: https://www.legislation.vic.gov.au/in-force/acts/sale-land-act-1962
+    retrieved: 2026-07-06
+    path: docs/sources/vic/sales_of_land_act_1962.pdf
+    note: "VIC Sale of Land Act 1962 s31 — 3 clear business days, retain greater of $100 or 0.2%; read via archived PDF, Authorised Version No. 172 as at 25 Nov 2025"
+  - url: https://www.legislation.qld.gov.au/view/pdf/inforce/current/act-2014-022
+    retrieved: 2026-07-06
+    path: docs/sources/qld/property_occupations_act_2014.pdf
+    note: "QLD Property Occupations Act 2014 ss166-168 — 5 business days, 0.25% penalty; read via archived PDF, current as at 1 Aug 2025"
 ---
 
 # Cooling-off periods, by state and transaction mode

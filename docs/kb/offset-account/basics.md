@@ -1,7 +1,11 @@
 ---
 slug: kb.offset-account.basics
 effective_from: 2025-07-01
-last_verified: 2026-06-01
+last_verified: 2026-07-06
+sources:
+  - url: https://www.commbank.com.au/home-loans/interest-offset.html
+    retrieved: 2026-07-06
+    note: "CommBank Everyday Offset — a transaction account linked to an eligible variable-rate home loan whose balance reduces the amount interest is charged on (100% offset), fully accessible. Confirms the offset mechanism, the variable-rate pairing, and the offset-vs-redraw framing."
 ---
 
 # Offset accounts — how they work and the offset-vs-redraw choice

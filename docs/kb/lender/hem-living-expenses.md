@@ -1,7 +1,12 @@
 ---
 slug: kb.lender.hem-living-expenses
 effective_from: 2026-06-22
-last_verified: 2026-06-22
+last_verified: 2026-07-06
+sources:
+  - url: https://download.asic.gov.au/media/hyeofbni/rg209-published-9-december-2019-20250306.pdf
+    retrieved: 2026-07-06
+    path: docs/sources/asics/rg209-published-9-december-2019.pdf
+    note: "ASIC RG 209 §142-147 — HEM is the most-commonly-used expense benchmark, published by the Melbourne Institute, must be adjusted for income and not merely reflect 'low end' spending; a benchmark is 'a substitute for making reasonable inquiries', NOT a required floor. Confirms the band here has no single public figure → deliberate placeholder stands."
 ---
 
 # Living-expenses benchmark (HEM) — PLACEHOLDER convention band
@@ -54,7 +59,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json`. 
 Notes:
 
 - **No `fills`.** `expected_borrowing_capacity` is **resolver-computed** from this band plus the tax schedule and debt commitments — a formula, kept in code per §11.9. The doc supplies the band and the method note, not a figure.
-- **PLACEHOLDER, not verified.** Unlike the regulated docs in this set (`kb.lender.serviceability-basics` buffer, `kb.tax.income-tax-resident-2025-26`), the figures here are **deliberately unverified** and labelled throughout — an honest placeholder, the sibling of `kb.property.capital-growth-bands`.
+- **PLACEHOLDER, not verified.** Unlike the regulated docs in this set (`kb.lender.serviceability-basics` buffer, `kb.tax.income-tax-resident-2026-27`), the figures here are **deliberately unverified** and labelled throughout — an honest placeholder, the sibling of `kb.property.capital-growth-bands`.
 - **The band IS the capacity band.** The two ends are not a measurement error to be averaged away — they are the surfaced uncertainty; the resolver reports both bounds.
 
 ## Sources

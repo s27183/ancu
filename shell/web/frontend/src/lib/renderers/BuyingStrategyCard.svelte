@@ -6,16 +6,21 @@
     // (kb.investor.bid-discipline / yield-anchored-pricing). Decision-support only: it
     // surfaces the engine's figures honest-partial, never a "you should pay X".
     //
-    // No live producer yet (buying_strategy is a Phase-B agent component, unwired in both
-    // modes); built against the §11.9 renderer contract { max_bid, walk_away,
-    // comparables[], style } + the blueprint's yield_anchored_max_price / thesis_alignment.
+    // Corrected 2026-07-11: this renderer had drifted onto a never-real §11.9 draft shape
+    // (max_bid/walk_away/comparables[]/style/conditions/key_assumptions) — buying_strategy
+    // IS live today (Mode C, reachable via property-attach; fh_engine_buying.erl), and
+    // NONE of those keys exist on its real bid_plan_investor outcome. Every price is a
+    // BAND (yield_anchored_max_price/max_bid_value/walk_away_price — the rent input is a
+    // band); red_flags_to_monitor (PLACED from property_fit_investor.key_concerns) was
+    // real, populated content this renderer never read at all before this fix.
     import { t } from '$lib/i18n';
     import { lang } from '$lib/stores/lang';
-    import { pick, type BidPlanInvestorOutcome } from '$lib/planCard';
-    import { money } from '$lib/format';
+    import { pick, type BidPlanInvestorOutcome, type MoneyRange } from '$lib/planCard';
+    import { money, moneyRange } from '$lib/format';
     import Chip from './Chip.svelte';
     import NoteList from './NoteList.svelte';
     import Pending from './Pending.svelte';
+    import Field from './Field.svelte';
 
     let { outcome }: { outcome: Record<string, unknown> } = $props();
     const o = $derived(outcome as BidPlanInvestorOutcome);
@@ -36,16 +41,24 @@
         return STYLES.has(v) ? $t(`plan.style.${v}` as 'plan.style.assertive') : v;
     }
 
-    const isNum = (v: number | null | undefined): v is number => typeof v === 'number';
+    const hasRange = (v: MoneyRange | null | undefined): v is MoneyRange =>
+        Array.isArray(v) && v.length === 2 && typeof v[0] === 'number' && typeof v[1] === 'number';
+    const mid = (r: MoneyRange) => (r[0] + r[1]) / 2;
+    function rangeLabel(v: MoneyRange | null | undefined): string {
+        if (!hasRange(v)) return '—';
+        return v[0] === v[1] ? (money(v[0], $lang) ?? '—') : (moneyRange(v, $lang) ?? '—');
+    }
     // The price ladder: walk-away ≤ yield ceiling ≤ max bid, plotted on a shared axis so
     // the discipline gap reads at a glance. Render only when at least one is a real figure.
+    // Each is a BAND — the ladder plots the band's midpoint (matches SummaryCard's own
+    // range-to-scale convention elsewhere).
     const prices = $derived([
-        { key: 'walk_away', label: $t('plan.f.walk_away'), v: o.walk_away ?? null, tone: 'floor' },
+        { key: 'walk_away', label: $t('plan.f.walk_away'), v: o.walk_away_price ?? null, tone: 'floor' },
         { key: 'yield', label: $t('plan.f.yield_ceiling'), v: o.yield_anchored_max_price ?? null, tone: 'anchor' },
-        { key: 'max', label: $t('plan.f.max_bid'), v: o.max_bid ?? null, tone: 'cap' }
+        { key: 'max', label: $t('plan.f.max_bid'), v: o.max_bid_value ?? null, tone: 'cap' }
     ]);
-    const scale = $derived(Math.max(0, ...prices.map((p) => (isNum(p.v) ? p.v : 0))));
-    const anyPrice = $derived(prices.some((p) => isNum(p.v)));
+    const scale = $derived(Math.max(0, ...prices.map((p) => (hasRange(p.v) ? mid(p.v) : 0))));
+    const anyPrice = $derived(prices.some((p) => hasRange(p.v)));
     const pctOf = (v: number) => (scale > 0 ? Math.max(0, Math.min(100, (v / scale) * 100)) : 0);
 </script>
 
@@ -56,18 +69,22 @@
             <div class="bs-row">
                 <span class="bs-rowlabel">{p.label}</span>
                 <div class="bs-track" aria-hidden="true">
-                    {#if isNum(p.v)}
-                        <span class="bs-fill bs-{p.tone}" style="width:{pctOf(p.v)}%"></span>
+                    {#if hasRange(p.v)}
+                        <span class="bs-fill bs-{p.tone}" style="width:{pctOf(mid(p.v))}%"></span>
                     {/if}
                 </div>
-                <span class="bs-val" class:bs-muted={!isNum(p.v)}>
-                    {isNum(p.v) ? money(p.v, $lang) : '—'}
+                <span class="bs-val" class:bs-muted={!hasRange(p.v)}>
+                    {rangeLabel(p.v)}
                 </span>
             </div>
         {/each}
     </div>
 {:else}
     <Pending />
+{/if}
+
+{#if pick(o.max_bid_reasoning, $lang)}
+    <p class="bs-reasoning">{pick(o.max_bid_reasoning, $lang)}</p>
 {/if}
 
 <!-- discipline chips -->
@@ -77,31 +94,26 @@
         <Chip label={thesisLabel(o.thesis_alignment)} tone={THESIS_TONE[o.thesis_alignment] ?? 'neutral'} />
     </div>
 {/if}
-{#if o.style}
+{#if o.negotiation_style}
     <div class="pp-field">
         <span class="pp-label">{$t('plan.f.nego_style')}</span>
-        <Chip label={styleLabel(o.style)} tone="info" />
+        <Chip label={styleLabel(o.negotiation_style)} tone="info" />
     </div>
 {/if}
+<Field label={$t('plan.f.max_bid_confidence')} value={o.max_bid_confidence != null ? String(o.max_bid_confidence) : null} />
 
-<!-- comparables -->
-{#if o.comparables?.length}
+<!-- red flags — PLACED from property_fit_investor.key_concerns (real content this
+     renderer dropped entirely before the 2026-07-11 fix). -->
+{#if o.red_flags_to_monitor?.length}
     <div class="pp-sublist">
-        <span class="pp-label">{$t('plan.f.comparables')}</span>
-        {#each o.comparables as c, i (i)}
-            <div class="bs-comp">
-                <div class="bs-comp-head">
-                    {#if c.address}<span class="bs-comp-addr">{c.address}</span>{/if}
-                    {#if isNum(c.price)}<span class="bs-comp-price">{money(c.price, $lang)}</span>{/if}
-                </div>
-                {#if pick(c.note, $lang)}<p class="bs-comp-note">{pick(c.note, $lang)}</p>{/if}
-            </div>
+        <span class="pp-label">{$t('plan.f.red_flags')}</span>
+        {#each o.red_flags_to_monitor as flag, i (i)}
+            {#if pick(flag, $lang)}<p class="bs-comp-note">{pick(flag, $lang)}</p>{/if}
         {/each}
     </div>
 {/if}
 
-<NoteList heading={$t('plan.f.conditions')} notes={o.conditions} />
-<NoteList heading={$t('plan.f.assumptions')} notes={o.key_assumptions} />
+<NoteList heading={$t('plan.f.conditions')} notes={o.conditions_to_request} />
 
 <style>
     .bs-hero {
@@ -155,30 +167,17 @@
         color: var(--muted);
         font-weight: 400;
     }
-    .bs-comp {
-        padding: 0.35rem 0;
-        border-top: 1px solid var(--border);
-    }
-    .bs-comp-head {
-        display: flex;
-        align-items: baseline;
-        justify-content: space-between;
-        gap: 0.5rem;
-    }
-    .bs-comp-addr {
+    .bs-reasoning {
+        margin: 0 0 0.6rem;
         font-size: 0.85rem;
         color: var(--ink);
-    }
-    .bs-comp-price {
-        font-size: 0.8rem;
-        font-weight: 600;
-        color: var(--accent);
-        font-variant-numeric: tabular-nums;
+        line-height: 1.45;
+        font-style: italic;
     }
     .bs-comp-note {
-        margin: 0.15rem 0 0;
-        font-size: 0.78rem;
-        color: var(--muted);
-        line-height: 1.4;
+        margin: 0.2rem 0 0;
+        font-size: 0.82rem;
+        color: var(--ink);
+        line-height: 1.45;
     }
 </style>

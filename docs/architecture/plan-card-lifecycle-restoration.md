@@ -1,6 +1,7 @@
 # Plan-card lifecycle restoration (A + B1 + B2), mode-general
 
-**Status:** planned, 2026-06-17 (rev 2 — extended to all four modes per Son). Sibling to
+**Status:** planned, 2026-06-17 (rev 2 — extended to all four modes per Son); **rev 3,
+2026-07-10 — B/C/D restructure target redefined, see §11.** Sibling to
 [`plan-card-visual-spec.md`](./plan-card-visual-spec.md) (per-component *heroes*). This doc
 governs the *spine* — re-assembling filled components into the buyer's **lifecycle journey**,
 the structure the prototype [`../first_home_buyer_plan.html`](../first_home_buyer_plan.html) led
@@ -68,6 +69,12 @@ declares.** (Workstream A, now validated rather than asserted.)
 
 ### 3.2 The lifecycle tab vocabulary (union of all four), in canonical journey order
 
+**Superseded by §11 (rev 3).** This table was the first design pass's result — a 12-tab
+vocabulary, each mode declaring an ordered subset. What actually shipped for A, then E, was a
+*second*, tighter collapse (`lifecycle-simulation-model.md` §7) down to four views
+(Overview/Flow/Budget/Q&A), never propagated back to this table or to B/C/D. Kept below as the
+historical record of the first pass; §11 is the current target.
+
 | # | Lifecycle tab | A | B | C | D | Base content (component → tab) |
 |---|---|:-:|:-:|:-:|:-:|---|
 | 1 | **Overview** | ✓ | ✓ | ✓ | ✓ | synthesis over the mode's base outcomes (no engine change) |
@@ -108,6 +115,13 @@ cells). Confirmed general — build Mode A's journey now, the rest are KB+resolv
 ---
 
 ## 4. Mode scope — structure all four now, build Mode-A content first
+
+**Historical note (superseded by facts on the ground):** this section's premise — "only Mode A is
+`in_scope_blueprint()`, B/C/D are dormant" — was true 2026-06-17 but is **no longer true**. The
+Mode C/B/D wedges (`mode-c-wedge.md`, `mode-b-wedge.md`, `mode-d-wedge.md`) each went to
+build-complete and activated their blueprint in scope; nobody revisited this doc's deferred
+content when that happened, which is *why* B/C/D still carry the stale, never-collapsed §3.2 tab
+shape today. §11 picks this back up as a live restructure, not a still-dormant one.
 
 The split that resolves "design all modes vs. build the wedge":
 
@@ -256,3 +270,754 @@ One change at a time; each phase green by its own gate before the next.
 - No new renderer vocabulary entries (all needed renderers already in the enum — §2 R3).
 - No expansion of onboarding capture to force a stored cash verdict (honest-partial base is finished).
 - No change to `settlement_prep` (it stays the per-property settlement detail — §7).
+
+---
+
+## 11. Rev 3 — B/C/D lifecycle-spine restructure (2026-07-10)
+
+### 11.1 What triggered this
+
+Son reviewed a live Mode D card (Melbourne VIC, investor-foreign-au) and found: Overview and Buy
+both highlighted at once (a real shell bug, §11.6); the Journey tab showing almost nothing (§3.2's
+`purchase_journey` was never built for B/C/D — still `settlement_prep` only, gated on a property
+that doesn't exist yet); the cash calculator sitting under "Hold" and not responding to input
+(a real engine shape bug, §11.6); and — the question this section answers — **why does B/C/D's
+tab structure look nothing like A/E's four-view spine.** §4's "content-only follow-on" was never
+picked up (§4 historical note above); this section replaces the stale §3.2 target with the one
+actually proven on A/E.
+
+### 11.2 The placement test
+
+A/E's four-view spine (Overview/Flow/Budget/Q&A — `lifecycle-simulation-model.md` §7) works because
+every A/E component is either **phase-shaped** (has a temporal position with a completion point
+the purchase passes through — `eligibility`, `mortgage_finance`, `buying_strategy`, `due_diligence`,
+`ownership_planning` all fold into a Flow phase's action checklist) or **money-shaped** (a cash
+row — `cash_position`, `disposition` fold into Budget). Nothing in A/E is a persistent, no-completion-
+point surface, so four views was enough.
+
+B/C/D introduce concepts that must be tested the same way, not assumed to need their own tab:
+
+- **Phase-shaped → Flow.** `firb_workflow` is a literal gate ("cannot sign a contract until FIRB
+  approval is confirmed") between Pre-approve and Contract, with a knowable fee — this is exactly
+  what §3.3 already called a **"FIRB-approval gating phase"** for Mode B and a **"FIRB gate"** for
+  Mode D, before this doc's tab table (§3.2) contradicted its own journey design by giving FIRB a
+  separate tab instead. `cross_border_funding` is §3.3's own **"currency-transfer milestone"** —
+  funds must land by Contract (deposit) and Settle (balance). `investment_strategy` and entity
+  setup (C/D) are pre-Contract one-time steps. All four → Flow phases/milestones, not tabs.
+- **Money-shaped → Budget.** FIRB's fee, cross-border transfer cost/FX risk, `yield_modelling`'s
+  cash-flow projection, `tax_structure(_non_resident)`'s after-tax figures — all become Budget rows,
+  the same treatment `disposition` already gets in A/C/D.
+- **State-shaped, no completion point → its own view.** `family_context` (Mode B's parent+child
+  coordination dashboard) and `ownership_planning_investor`/`_foreign` (Portfolio — forward,
+  recurring, multi-property) persist across the *whole* plan with no single completion point;
+  folding either into a phase action would make it disappear exactly when it's needed. These are
+  the only concepts that earn a dedicated tab beyond Overview/Flow/Budget/Q&A.
+
+### 11.3 Target `ui_tabs` per mode
+
+| Mode | Tabs | What moved off the old flat list |
+|---|---|---|
+| **A** | Overview / Flow / Budget / Q&A | unchanged |
+| **E** | Overview / Flow / Budget / Q&A | unchanged |
+| **B** | Overview / Flow / Budget / **Family** / Q&A | `firb_workflow` → Flow gating phase + Budget fee row; `cross_border_funding` → Flow milestone + Budget row; `property_assessment`/`buying_strategy`/`due_diligence` → Flow Contract/Settle drill-down (no more flat "Property"/"Buying" tabs) |
+| **C** | Overview / Flow / Budget / **Portfolio** / Q&A | `investment_strategy` → Flow phase + Overview synthesis; `yield_modelling`/`tax_structure` → Budget rows; property components → Flow drill-down |
+| **D** | Overview / Flow / Budget / **Portfolio** / Q&A (Family opt-in only, per the blueprint's existing note — investors are typically solo/couple) | same as B (FIRB/cross-border) + same as C (investment strategy/tax/entity), all folded; property components → Flow drill-down |
+
+`purchase_journey` + `phase_playbook` become base-scope for B/C/D exactly as they are for A/E —
+this is the piece that was designed in §3.3 and never built (KB doc + resolver branch + a
+`?BASE_COMPONENTS_*` entry per mode), not a new design.
+
+### 11.4 Mode B gains `disposition`
+
+Mode B is the only mode with no dispose-phase figure owner at all. Adding it for parity: a foreign
+FHB can still face a forced or voluntary sale (visa status change, relocation), and the FIRB
+vacancy-fee obligation makes "what if I need to sell" a live question, not a hypothetical. Same
+shape as A/C/D's `disposition` — base scope, resolver-filled, runs after `cash_position`.
+
+### 11.5 Build sequencing
+
+**C first, then D, then B.** C is domestic — no FIRB, no cross-border, no family view — the closest
+remaining gap to A/E's already-proven shape, so it validates the restructure pattern (Flow
+phases/milestones absorbing what used to be tabs, Portfolio as the one addition) with the least new
+surface. D adds FIRB/cross-border/Family(opt-in) on top of a proven Portfolio pattern. B lands last
+and gains `disposition` (§11.4) alongside its own FIRB/cross-border/Family work. Each mode is its
+own gated pass (blueprint → KB → engine resolver → artifact recompile → shell → conformance),
+matching how A's B1/B2 workstreams were verified independently before being called done.
+
+### 11.6 Independent bug fixes — do now, not gated on the restructure
+
+Two bugs found on the live Mode D card are unrelated to the tab restructure and should not wait
+for it:
+
+- **Mode D `total_cash_required` is a scalar, not a `[lo,hi]` money_range.** `fh_engine_cash.erl`'s
+  `fill_investor_foreign` computes it via `sum_or_null` as a plain integer; `Calculator.svelte` and
+  `OverviewCard.svelte` both gate on `hasRange()`, so the value is silently treated as absent — the
+  cash-what-if input has nothing to write to, and Overview's "Cash to get in" shows "Not yet" for a
+  figure the engine actually computed. Fix: emit `[v, v]` like every other mode's point figures.
+- **`OverviewCard.svelte` reads `components.eligibility` and `mortgage.recommended_path`** for its
+  benefit tile and recommended-path tile. Neither exists for Mode C/D (`eligibility` isn't a C/D
+  component; `fill_investor_foreign`/`fill_investor_domestic` never set `recommended_path`, an
+  FHB-only concept) — these tiles will read "Not yet" forever for C/D, not "pending." Fix: make the
+  Overview synthesis mode-conditional on which fields actually exist for that blueprint, or supply a
+  C/D-appropriate substitute (e.g. `investment_strategy`'s thesis headline in place of a scheme
+  benefit).
+
+The Overview/Buy double-highlight bug (`PlanProjection.svelte:118`, `TAB_GROUP[sub] ?? 'buy'`
+defaulting Overview into the Buy group) is **not** fixed separately — it only exists because B/C/D
+currently exceed `RAIL_GROUP_THRESHOLD` (5 tabs); §11.3's target drops every mode to ≤5 tabs, which
+removes the grouped-rail mechanism's precondition entirely. It self-resolves as each mode's
+restructure lands, mode by mode per §11.5 — not worth a standalone patch to a UI path being deleted.
+
+### 11.7 Non-goals (rev 3)
+
+- No new renderer vocabulary — `family-view-card`, `firb-workflow-card` etc. are already in the R3
+  enum (§2); this is placement, not new rendering primitives.
+- No change to A/E — they're already at the §11.3 target.
+- No fabricated journey/phase content — `purchase_journey` for B/C/D is a copy doc (`fills:[]`,
+  place-not-compute per §7); any figure it surfaces must still be placed from an already-verified
+  upstream outcome, never authored fresh (`verify-regulated-figures-by-postcondition`).
+- No resolving Mode-specific open questions silently — Mode B's `disposition` addition (§11.4) was
+  an explicit call, not a default; any similarly-shaped judgment call surfacing during C/D/B builds
+  gets the same treatment.
+
+### 11.8 Build progress
+
+- **Mode C KB content — done 2026-07-10.** `kb.journey.investor-path` (the swimlane copy doc),
+  `kb.journey.investor-phase-actions` (the per-phase checklist), `kb.risks.investor-by-phase` (the
+  per-phase risk-flag-list) — same three-doc shape as Mode A's `kb.journey.fhg-path` /
+  `kb.journey.phase-actions` / `kb.risks.fhb-by-phase`. Structurally verified (each `content_json`
+  parses; every `layout.phases[].actions[]`/`risks[]` id resolves to a matching `{vi,en}` copy pair
+  with no orphans). Two design calls made and grounded rather than defaulted:
+  - **Six actors, not four.** You / Government / Lender / Property manager / Tenant / Services —
+    Property manager and Tenant earn their own row because rent is a real actor-attributable cash
+    flow (`counterparty: tenant` for the inflow, `counterparty: property_manager` for the fee
+    outflow); collapsing them into a generic "Other" would blur the who-pays-whom `interactions`
+    view cell counterparties drive.
+  - **Entity-setup DECISION (Prepare-phase content, this doc) vs. entity-setup EXECUTION (a Settle-
+    phase milestone `settlement_prep.investor_milestones` already owns, per-property, unchanged).**
+    §11.2's "entity setup is a pre-Contract one-time step" is about `tax_structure`'s base-scope
+    `recommended_entity` call, not the act of establishing it — that stays where
+    `settlement_prep` (component 10) already placed it. Not a conflict to resolve, a distinction to
+    keep.
+  - **Open engine dependency, not a KB gap.** `budget_envelope_investor` / `cash_flow_projection` /
+    `tax_optimised_structure` don't yet carry a `cash_events[]` array (only `disposition` does
+    today) — the underlying figures exist as params but aren't exposed under stable event ids. This
+    doc's preamble declares the full id vocabulary (`deposit`/`stamp_duty`/`other_buying_costs`/
+    `entity_setup_costs`/`lmi` acquisition; `rental_income`/`operating_expenses`/`loan_interest`/
+    `tax_refund` hold, recurring/year) task #4 (engine wiring) must expose those outcomes under —
+    the forward declaration Mode A's own build order (§7, blueprint/KB before engine) already
+    established as the normal sequencing, not a shortcut. **Resolved by task 4, below.**
+
+- **Mode C engine wiring — done 2026-07-10 (task 4).** `budget_envelope_investor` (`fh_engine_cash:
+  cash_events_investor/4`), `cash_flow_projection` (`fh_engine_fill:yield_cash_events/1`), and
+  `tax_optimised_structure` (`fh_engine_fill:tax_cash_events/1`) now emit `cash_events` — 8 of the 9
+  declared ids resolve to real events (`entity_setup_costs` stays unemitted: the underlying
+  `tax_optimised_structure.setup_costs` figure is permanently null, a separate still-open entity-cost
+  seam, flagged not patched here). `fh_engine_journey`/`fh_engine_phase_playbook` gained
+  `fill_investor/1` (investor-specific actors/phases/prose cells, hand-derived flow markers against
+  `kb.journey.investor-path`'s authored `cell_<phase>_<actor>` keys — one authored key,
+  `cell_own_recurring`, is intentionally left unreferenced: the four hold-phase money cells already
+  carry that content per-counterparty, so a combined prose cell would duplicate them).
+  - **Design call: generic multi-source harvest, not a Mode-C branch** (advisor-flagged before
+    writing any event builder). `harvest_cash_events/1` concatenates the `cash_events` field off
+    *every* upstream outcome that exposes it, rather than reading one hardcoded key. Mode A has
+    exactly one source (`budget_envelope`) so this is behaviourally identical to before (verified —
+    both Mode-A conformance escripts pass unchanged); Mode C has three. The KB-slug selection stays
+    genuinely mode-specific (unavoidable — different bilingual content per mode); the figure-harvest
+    does not. This means Modes D and B (tasks 8/12) need **zero** change to `fh_engine_journey`/
+    `fh_engine_phase_playbook` — they only need their own components to emit `cash_events`.
+  - **Design call: `cash_event.amount` needed no widening.** The registry already types it
+    `money_range`, and the codebase's existing convention (`point/1` in `fh_engine_cash`,
+    `money_range/1` in `fh_engine_disposition`) already collapses scalar figures to `[v,v]` — so the
+    mix of banded (`rental_income`/`operating_expenses`) and scalar (`loan_interest`/`lmi`/
+    `tax_refund`) hold-phase figures needed no schema change, just the same collapse-to-range
+    convention (`hold_amount/1` in `fh_engine_fill.erl`).
+  - `purchase_journey`/`phase_playbook` added to `investor-domestic-au.md` as components 13/14
+    (mode-general `journey_swimlane`/`phase_playbook` outcome types reused verbatim, per §3.3) and to
+    `?BASE_COMPONENTS_INVESTOR`; the compiled artifact recompiled clean (no gate failures).
+  - **Verified, not just implemented:** a new end-to-end investor smoke run (synthetic
+    `budget_envelope_investor`/`cash_flow_projection`/`tax_optimised_structure`/`disposition`
+    upstream) places all 10 harvested cash_events at the correct `(phase, actor)` with
+    `fh_engine_outcome:validate/3` returning `ok` for both outcomes; a negative test confirms
+    `cash_events` is genuinely schema-gated (the §13 placement check — "money flow has no
+    counterparty" — fires on a malformed event), not silently passed (the known `validate/3`
+    fail-open gap did not apply here because the field is now declared).
+  - **Adjacent drift fixed en route.** The same "reform not yet law" staleness already caught once
+    this session (`interest-only-vs-pi-investor.md`) recurred in `kb.copy.tax-structure` and
+    `kb.copy.disposition` — both corrected to the Act's actual enacted status (Act No. 49 of 2026,
+    Royal Assent 26 June 2026, effective 1 July 2027). A repo-wide grep confirmed no further
+    instances remain.
+- **Mode C `ui_tabs` rewrite — done 2026-07-10 (task 5).** `investor-domestic-au.md`'s machine-readable
+  `ui_tabs` block rewritten from the stale flat eight-tab rail to the §11.3 five-view spine —
+  `overview` (`investor_profile`/`investment_strategy`/`mortgage_finance`/`cash_position`), `flow`
+  (`purchase_journey`/`phase_playbook`/`settlement_prep`), `budget` (`cash_position`/
+  `yield_modelling`/`tax_structure`/`disposition`, interactive), `portfolio`
+  (`ownership_planning_investor`), `qa` (empty) — mirroring `fhb-domestic-au.md`'s
+  `overview`/`flow`/`budget`/`qa` shape exactly, plus `portfolio` for the one state-shaped concept
+  §11.2 doesn't fold. `property_assessment`/`buying_strategy`/`due_diligence` (per-property) are
+  dropped from the tab list entirely, same treatment as Mode A's dropped set — reached only via
+  `phase_playbook.actions[].component_ref`. `investment_strategy` appears in `overview` (a visible
+  synthesis read) but not in `flow`'s components array, mirroring how Mode A's `eligibility` folds
+  into a phase's action checklist without being a literal Flow-tab component. The human-readable "UI
+  tab mapping" table above it rewritten to match (5 rows, `#`/View/`kind`/What-it-shows), same format
+  as `fhb-domestic-au.md`'s. `engine/build/kb_compiler.py` recompiled clean — GATE 9 (`ui_tabs`
+  reference-integrity: every `tab_id` unique, every `kind` in the enum, every listed component real)
+  passed for all 5 in-scope blueprints; the emitted artifact's `blueprints.investor-domestic-au.ui_tabs`
+  inspected directly and matches the five tabs above.
+
+- **Mode C shell rendering — done 2026-07-10 (task 6).** Traced the render path
+  (`PlanProjection.svelte` → `OverviewCard`/`FlowView`/`Calculator`) before writing anything: it
+  already renders any `ui_tabs` the engine declares generically — `kind: synthesis`/`flow`/
+  `components`/`qa` dispatch, `TAB_GROUP`/`plan.ltab.*` i18n already cover `flow`/`budget`/
+  `portfolio`, and `OverviewCard` was already fixed for Modes C/D's `investor_profile`/
+  `investment_strategy` fields (task 2). So the five-view spine needed **no new UI**, only a
+  data-completeness fix surfaced by tracing it:
+  - **Bug found: two consumers read `cash_events` off a single hardcoded component, not the
+    harvested set.** `PlanProjection.svelte`'s `flowCashEvents` (feeds `FlowView`'s budget_ref → amount
+    join) and `Calculator.svelte`'s `events` (feeds the Budget tab's cash-events table) both read only
+    `cash_position.outcome.cash_events`. For Mode A this is harmless (`cash_position` is the only
+    source). For Mode C it silently drops the amount for every hold-phase action/row sourced from
+    `yield_modelling`/`tax_structure` — concretely, `kb.journey.investor-phase-actions`' `own`-phase
+    `lodge_annual_return` action links `budget_ref: "tax_refund"` (a `tax_structure` event); the engine
+    validates it fine (its own `harvest_cash_events/1` already covers all three sources, task 4), but
+    the shell would show no amount chip and the Budget spine table would show only 4 of 8 rows — a
+    silent shell-side regression from the engine's own fix, not a new engine gap.
+  - **Fix: `harvestCashEvents(components)` added to `planCard.ts`**, mirroring
+    `fh_engine_journey:harvest_cash_events/1` exactly (concatenate `cash_events` off every component's
+    outcome; `dispose_cash_events` deliberately excluded — the engine harvest excludes it too, so no
+    authored action ever links a dispose-phase `budget_ref`). `flowCashEvents` now calls it directly;
+    `Calculator.svelte`'s `events` calls it when `components` is non-empty, falling back to the
+    outcome's own `cash_events` for the componentless standalone render (`ComponentCard`'s bare
+    `<Calculator outcome={entry.outcome} />`, which has no siblings to harvest). Verified inert for
+    Mode A: `cash_position` is its only `cash_events`-bearing component at runtime, so the harvested
+    set is byte-identical to the old single-source read.
+  - **Verified:** `npm run check` (svelte-check) 0 errors / 0 warnings; `npm run build` succeeds
+    clean. Full live-browser verification against a real filled Mode C card is task 7's job (the
+    seam-smoke gate), not duplicated here.
+
+- **Mode C conformance + live seam-smoke — done 2026-07-10 (task 7).** Found and fixed a real
+  authoring bug, not just staleness: `investor-domestic-au.md`'s `purchase_journey`/`phase_playbook`
+  sections (13/14) declared their `**Outcome schema:**` type inline (`journey_swimlane`/
+  `phase_playbook`, prose "identical to Mode A's, not repeated here") instead of the fenced
+  ` ```jsonc ` block `kb_compiler.py` actually parses (it materializes `outcome_type` per-blueprint,
+  never by cross-reference) — so both components compiled with `outcome_type: null`. Consequence:
+  `fh_engine_outcome:validate/3` silently no-ops for both (the known fail-open registry gap,
+  §grounding-checklist item, now concretely instantiated for 2 more components) and both components
+  collided under the SAME `null` accumulator key in `fh_engine_turn`'s DAG walk (harmless today only
+  because `harvest_cash_events/1` reads by value not key — a latent landmine for any future consumer
+  that reads `Upstream` keyed by outcome_type). Fixed by adding the fenced schema blocks (mirroring
+  Mode A's `fhb-domestic-au.md` components 10/12 exactly, six-actor set noted for `journey_swimlane`);
+  recompiled — `outcome_type` now resolves to `journey_swimlane`/`phase_playbook` correctly.
+  - **Conformance sweep found + fixed 5 more stale fixtures** (all the same class: written before
+    task 4 added purchase_journey/phase_playbook + cash_events, never updated) —
+    `base_components_investor_conformance.escript` (SET+ORDER fixture missing the 2 new components),
+    its 3 mirrored no-regression cross-checks in `base_components_foreign_investor_conformance.escript`
+    / `base_components_foreign_conformance.escript` / `base_components_nexthome_conformance.escript`
+    (each asserts Mode C's set byte-identical to a fixture that still said 8), and
+    `cash_position_investor_conformance.escript` / `tax_structure_conformance.escript` /
+    `yield_modelling_conformance.escript` (each missing `cash_events` from their exact-field-set
+    assertion — extended with an honest-empty-at-base check + a per-property/discriminator check
+    that the harvested `cash_events` actually carry `source_component: <owner>`). Full sweep of all
+    58 non-seam-smoke conformance escripts: 56 pass; 2 unrelated pre-existing failures flagged
+    separately below (not fixed here — out of this task's scope).
+  - **`investor_seam_smoke.escript` rewritten for the 10-component spine** (was still asserting the
+    original 8: wrong event count, wrong audit count, wrong order — it had `ownership_planning_investor`
+    before `disposition`, but the real order is the reverse, a staleness independent of task 4).
+    New counts: 45 events (`1 + 10×4 + 3 usage + 1`), 30 audit rows, ASIC `boundary_held` still 1
+    (purchase_journey/phase_playbook are not `advice_adjacent`). Added two live assertions specific
+    to the restructure: the six-actor investor set (`property_manager`/`tenant`, not Mode A's four)
+    and the `own`-phase `lodge_annual_return` action (`kb.journey.investor-phase-actions`) — both
+    proving the investor KB branch fired over the real HTTP/SSE surface, not Mode A's. Cash-amount
+    placement itself isn't asserted here (this is a property-less, income-less onboarding turn, so
+    every upstream `cash_events` source is honestly empty — that positive case is what
+    `cash_position_investor_conformance.escript`'s new per-property check proves instead).
+  - **Ran LIVE** (real `claude-sonnet-5` sidecar fills, metered, via `CLAUDE_CODE_OAUTH_TOKEN`):
+    `investment_strategy`/`mortgage_finance`/`tax_structure` all filled live; all 45 events matched;
+    all 30 audit rows `clear`; both new journey/playbook assertions passed
+    (`archetype=balanced gearing=neutral_geared io_vs_pi=principal_and_interest entity=personal_sole`;
+    `actors=[you,government,lender,property_manager,tenant,services]`;
+    `own_actions` includes `lodge_annual_return`). **ALL ASSERTIONS PASSED.**
+  - **Flagged, not fixed (out of scope):** two pre-existing, unrelated conformance failures surfaced
+    by the full sweep — `due_diligence_conformance.escript` (`agent_leaves` classification mismatch
+    for the deferred `lease_interpretation` leaf) and `profile_enrichment_conformance.escript`
+    (`mortgage.expected_borrowing_capacity` IC0 fixture off "to the dollar" — likely tax-bracket
+    fixture drift from the 2026-27 update, the same class `5f87af9` already fixed for HECS but may
+    not have caught here). Neither touches `cash_events`/`journey`/`phase_playbook`/`ui_tabs`; not
+    investigated further here — a separate, later pass.
+  - **Task 7 closes out the Mode C restructure** (tasks 3–7 all done). Next: task 8, Mode D.
+    **Caveat added retroactively (found during task 10):** the dispose swimlane's
+    `sale_proceeds`/`selling_costs` money cells silently never render for Mode C either (the same
+    `fh_engine_disposition` counterparty-`other` bug documented in full under task 10) — neither
+    live seam-smoke run (this one or Mode D's) set a hold horizon, so the gap was invisible to both.
+    "Closed out" above means the 10-component spine and its wiring, not the dispose swimlane at a
+    set horizon — see task 10's write-up for the standalone open item.
+
+- **Mode D KB content + engine wiring — done 2026-07-10 (task 8).** Three new bilingual copy docs
+  mirroring Mode C's shape exactly: `kb.journey.investor-foreign-path` (the swimlane), `kb.journey.
+  investor-foreign-phase-actions` (the per-phase checklist), `kb.risks.investor-foreign-by-phase`
+  (the per-phase risk-flag-list) — layering §3.3's FIRB gate + cross-border transfer milestone +
+  entity + non-resident tax + repatriation onto Mode C's phase/actor skeleton, not a new design.
+  One design call made and grounded, not defaulted:
+  - **Reuses Mode C's six actors unchanged — no seventh row for the FX/transfer provider.** The
+    swimlane's actor set must be a superset of every cash_event counterparty Mode D's figure-owners
+    emit (government/lender/tenant/property_manager), and all of them already sit inside the six.
+    The cross-border transfer provider is a service the investor engages once, not a party with a
+    recurring relationship the way tenant/property_manager are — the same `services` bucket already
+    holds the conveyancer/QS. VN-side capital-control steps are `you`/`services` prose, not a
+    jurisdiction-ambiguous `government` cell (AU FIRB and VN SBV are different governments).
+  - **The FIRB gate and the transfer milestone are not new phases.** Both are narrated across the
+    existing `pre_approve → contract → settle` span on the government/lender/services rows —
+    matching how §11.2 places `firb_workflow` as a Flow *gating phase*, not its own tab.
+  - Learned from task 7 and applied proactively this time: both new components carry the full
+    fenced ` ```jsonc ` `type` blocks in the blueprint (not a prose "same as Mode A/C" reference) —
+    verified post-recompile by inspecting the artifact directly: `purchase_journey` → `outcome_type:
+    journey_swimlane`, `phase_playbook` → `outcome_type: phase_playbook` (neither `null`).
+  - **Engine wiring is smaller than Mode C's was**, because two of the three cash_events sources
+    are already generic/shared code: `yield_modelling` is the SAME resolver function for Mode C and
+    D (one component name, name-keyed dispatch in `fh_engine_fill.erl`) and already emits
+    `cash_events` — no change needed. `disposition`'s `fill_investor/3` is likewise shared C/D and
+    already emits `dispose_cash_events` — no change needed. Only `fh_engine_cash:fill_investor_
+    foreign/2` (cash_position) and `fh_engine_fill:tax_structure_non_resident/1` needed a
+    `cash_events => []` addition — a **literal, not a helper**: Mode D's `cash_position` has no
+    per-property branch yet (flagged below), and `tax_structure_non_resident`'s candidate figure
+    (`annual_au_tax_payable_on_rental`) is null at base *and* per-property (no non-resident
+    marginal-rate KB table exists yet), so a real event-builder would be permanently-dead code.
+    `fh_engine_journey`/`fh_engine_phase_playbook` gained a Mode-D dispatch branch each
+    (`investor-foreign-au` → `fill_investor_foreign/1` / the new actions+risks doc pair) — verified
+    the dispatch is genuinely wired, not silently falling through to Mode A's `_ -> fill_fhb`/
+    `_ -> {?ACTIONS,?RISKS}` default (a fail-*silent* class of bug, distinct from task 7's fail-open
+    validate gap). `purchase_journey`/`phase_playbook` added to `?BASE_COMPONENTS_FOREIGN_INVESTOR`
+    (10 → 12) — appended at the END, not copying Mode C's exact tail: Mode D's `ownership_planning_
+    foreign_investor` already runs *before* `disposition` (the reverse of Mode C's order, because
+    unlike Mode C's `ownership_planning_investor` it never reads `disposition`'s figures for an
+    `equity_release` opportunity), so simply appending the two new components after the existing 10
+    is correct without reordering anything.
+  - **Flagged, not fixed (a `cash_position` build, explicitly out of scope for this task).** Mode
+    D's `fill_investor_foreign/2` has no per-property branch (unlike Mode C's, which lights up a
+    real acquisition spine once a property attaches) — so `purchase_journey`'s acquisition-phase
+    money cells (deposit, stamp duty + surcharge, FIRB fee) stay empty even per-property, today.
+    `yield_modelling`'s hold-phase cells DO light up per-property (shared code with Mode C). The
+    swimlane therefore renders the full legal/prose spine now but a sparse money spine until that
+    seam closes — disclosed in the KB doc's own preamble, not silently implied as complete.
+  - **Not run yet: the full conformance sweep + live seam-smoke** (task 10, after task 9's `ui_tabs`
+    rewrite). A quick sanity pass this task: every individual per-component registry check + every
+    real-code-dependency DAG-order check in `base_components_foreign_investor_conformance.escript`
+    passes (incl. `purchase_journey`/`phase_playbook`); its own SET+ORDER fixture now fails as
+    **expected** (still asserts the pre-task-8 ten-component list) — task 7's precedent (the same
+    fixture-staleness class hit three files) predicts this will recur in Mode D's own conformance
+    files and `mode_d_seam_smoke.escript`'s `expected_sequence()`; task 10 owns fixing all of it,
+    not patched ad hoc here.
+  - **Next: task 9**, Mode D's `ui_tabs` rewrite to the five-view spine (Overview/Flow/Budget/
+    Portfolio/Q&A) + shell restructure — folding `firb_workflow`/`cross_border_funding`/
+    `investment_strategy`/`tax_structure_non_resident` into Flow phases + Budget rows, same
+    placement test Mode C's task 5 already proved.
+
+- **Mode D `ui_tabs` rewrite + shell restructure — done 2026-07-10 (task 9).**
+  `investor-foreign-au.md`'s machine-readable `ui_tabs` rewritten from the stale flat 9-tab rail to
+  the five-view spine, mirroring Mode C's shape exactly with `firb_workflow`/`cross_border_funding`
+  added where Mode C has no equivalent: `overview` (`investor_profile_foreign` + `firb_workflow` +
+  `investment_strategy` + `mortgage_finance` + `cash_position` — `firb_workflow` included as a
+  headline the same way Mode A's `overview` includes `eligibility`); `flow` (`purchase_journey` +
+  `phase_playbook` + `settlement_prep`, with the FIRB gate and transfer milestone narrated across
+  Pre-approve→Contract→Settle, not new phases); `budget` (`cash_position` + `firb_workflow` +
+  `cross_border_funding` + `yield_modelling` + `tax_structure_non_resident` + `disposition`);
+  `portfolio` (`ownership_planning_foreign_investor`); `qa`. **No default Family tab** — Mode D
+  stays solo/couple by default per §11.3's own note, offered as opt-in only. `kb_compiler.py`
+  recompiled clean, GATE 9 (`ui_tabs` reference-integrity) passed, artifact's `ui_tabs` inspected
+  directly and matches the declared 5 tabs/16 components exactly.
+  - **Shell verification (mostly confirmation, like Mode C's task 6): the render path is already
+    fully mode-general** — `PlanProjection.svelte` dispatches purely on `ui_tabs[].kind`
+    (`synthesis`/`flow`/`interactive`/generic), never on blueprint slug; `FlowView`'s
+    `flowJourney`/`flowPlaybook`/`flowCashEvents` derive from `viewComponents.purchase_journey`/
+    `phase_playbook` + the harvested `cash_events` (task 6's `harvestCashEvents()`), with no mode
+    gating; the interactive Budget tab renders `cash_position`'s `Calculator` directly and never
+    actually iterates `activeTab.components` (that array is declarative/GATE-9-validated, not
+    consumed for rendering — true for Mode C's budget tab too, confirmed by reading the code, not
+    assumed). The Overview/Buy double-highlight bug (§11.6) self-resolved as predicted:
+    `nonOverviewRailTabs.length` is now 3 for Mode D (well under `RAIL_GROUP_THRESHOLD=5`), so the
+    grouped-rail mechanism no longer engages.
+  - **One real gap found and fixed**: `OverviewCard.svelte` didn't read `firb_workflow` at all,
+    even though task 9's own `ui_tabs` rewrite just declared it as an Overview-tab component — the
+    doc would have said "Overview shows FIRB status" while the shell silently didn't. FIRB status is
+    a first-class user attribute (CLAUDE.md #10 — "build the gate into the architecture, not as a
+    disclaimer"), not optional headline chrome, so this was fixed rather than left as a documentation/
+    behavior mismatch: added a `firbStatus`-presence-gated tile (mirrors the existing `scheme`/
+    `existingHome` presence-gating pattern) showing the `current_stage` label via the already-existing
+    `plan.firb.stage.*` i18n keys — no new copy needed. Presence-gated on the component, not
+    mode-name, so it activates automatically once Mode B's own `firb_workflow` restructure lands
+    (task 13) with zero further OverviewCard change.
+  - **Verified:** `svelte-autofixer` clean, `npm run check` 0 errors/0 warnings, `npm run build`
+    clean (pre-existing >500kB chunk-size warning unrelated).
+  - **Next: task 10**, Mode D conformance + live seam-smoke verification — the full 58-file sweep
+    (expected to need the same fixture-staleness fixes task 7 made for Mode C: the base SET+ORDER
+    fixture already confirmed stale in task 8's sanity check) plus `mode_d_seam_smoke.escript`
+    rewritten for the 12-component spine and run live against the real sidecar.
+
+- **Mode D conformance + live seam-smoke — done 2026-07-10 (task 10) — Mode D restructure CLOSED
+  OUT (tasks 8–10).** Full sweep of all 54 non-seam-smoke conformance escripts: found exactly the
+  predicted staleness, nothing new. Fixed 2 fixtures: `base_components_foreign_investor_
+  conformance.escript`'s own SET+ORDER fixture (10 → 12, label "ten" → "twelve"; also added 5 new
+  DAG-order `Pre/2` checks for `purchase_journey`/`phase_playbook`'s upstream reads) and
+  `base_components_nexthome_conformance.escript`'s cross-mode "Mode-D ten" mirror (same class as
+  task 7's 3 cross-mode fixes — Mode E's own conformance file incidentally asserts Mode D's
+  component list). Both PASS after the fix; a full re-sweep confirms exactly the 2 already-flagged,
+  pre-existing, unrelated failures remain (`due_diligence_conformance`, `profile_enrichment_
+  conformance` — same as task 7's finding, still out of scope).
+  - **`mode_d_seam_smoke.escript` rewritten for the 12-component spine**: 53 events
+    (`1 + 12×4 + 3 usage + 1`), 36 audit rows, ASIC `boundary_held` still 2 (`firb_workflow` +
+    `mortgage_finance` — neither new component is `advice_adjacent`), 12-component snapshot.
+    Added three new live assertions: the six-actor set (reused from Mode C unchanged), the
+    `contract` phase present + `dispose` phase honestly absent (no hold horizon at base), and —
+    the load-bearing discriminator — the `contract`-phase `submit_firb_application` playbook action,
+    an id that exists ONLY in `kb.journey.investor-foreign-phase-actions`, not Mode C's
+    `kb.journey.investor-phase-actions`. This proves the Mode-D `phase_playbook` branch fired for
+    real, not a silent fallthrough to Mode A's default (the fail-*silent* risk task 8 flagged).
+  - **Ran LIVE** (real `claude-sonnet-5` sidecar fills, metered): `investment_strategy`/
+    `mortgage_finance`/`tax_structure_non_resident` all filled live; event sequence matched (53
+    events); live outcomes `archetype=balanced gearing=neutral_geared io_vs_pi=principal_and_
+    interest rate=variable entity=personal_sole cgt_status=to_verify`; live journey/playbook
+    `actors=[you,government,lender,property_manager,tenant,services]
+    phases=[prepare,pre_approve,contract,settle,own]` (no `dispose`, honestly) and
+    `contract_actions` includes `submit_firb_application`. **ALL ASSERTIONS PASSED.**
+  - **A new, real bug found via `advisor()` review before closing out — flagged, not fixed
+    (affects Mode C too, retroactively; a shared-code fix, not a Mode-D-scoped one).**
+    `fh_engine_disposition:dispose_cash_events/4` hardcodes the `sale_proceeds`/`selling_costs`
+    dispose events' counterparty to `<<"other">>` (`loan_payout`→`lender`, `cgt`→`government` are
+    fine — both real actors in every mode). Mode A's four-actor set has an `other` row, so this is
+    correct there. But Mode C/D's six-actor set **renamed that row to `services`** — there is no
+    `other` actor. Confirmed by reading `SwimlaneDiagram.svelte`: the render grid iterates the
+    DECLARED `actors[]` array and looks up cells per `(phase, actor.id)`; a cell whose `actor`
+    field matches no declared actor id is never looked up by any row, so it silently never renders.
+    **Consequence: `dispose_sale_proceeds`/`dispose_selling_costs` money cells vanish from the
+    Dispose column for both Mode C and Mode D, the moment a user sets a hold horizon** (the Budget
+    tab's horizon slider — a shipping feature, not a hypothetical). Invisible to every check run so
+    far because conformance never sets a horizon and both live seam-smokes (Mode C's task 7, Mode
+    D's task 10) create cards with no `hold_horizon_years` — `HasDispose` is false in both, so
+    dispose events never fire in either live run. Not fixed here: the correct fix needs
+    mode-awareness (`other` is right for Mode A, wrong for the six-actor modes — a remap in
+    `fh_engine_journey`'s placement or a mode-conditional counterparty in `fh_engine_disposition`,
+    not a blind rename that would break Mode A). **This retroactively qualifies task 7's "Mode C
+    restructure CLOSED OUT" — the dispose swimlane itself was never live-verified with a horizon
+    set, in either mode.** Tracked as a standalone open item, not folded into either mode's "done."
+  - **Two narrower verification gaps, disclosed rather than silently accepted (proportionate
+    verification, not exhaustive):** (1) the live run proves `phase_playbook`'s Mode-D branch fired
+    (the FIRB-specific action id) but does not independently prove `purchase_journey`'s own
+    dispatch — its cell prose is the only Mode-D-specific signal and isn't asserted on. The static
+    code read (`fh_engine_journey:fill/2`'s `<<"investor-foreign-au">>` clause) plus the shared
+    phase/actor structure make this low-risk; a second live (metered) run wasn't spent chasing it.
+    (2) `OverviewCard.svelte`'s new FIRB-stage tile (task 9) has NOT been eyeballed in a browser —
+    `svelte-check`/`autofixer`/`build` verify types and compilation, not rendering. It reuses the
+    exact `ov-stat` markup/CSS three already-tested tiles use, so risk is low, but per CLAUDE.md's
+    own UI-verification instruction this is disclosed as an honest gap, not implied as covered by
+    "build clean."
+  - **Task 10 closes out the Mode D restructure** (tasks 8–10 all done), with one caveat carried
+    forward: the dispose-cell counterparty bug above, affecting Mode C too. Next: task 11, Mode B
+    (`disposition` component for parity).
+
+- **Dispose-cell counterparty bug fixed + both narrower task-10 gaps closed — done 2026-07-10
+  (task 15).** Ground truth for the fix, established by reading `fh_engine_journey.erl`'s three
+  `fill_*` clauses before touching anything: the mode split that determines the swimlane actor set
+  (`actors/0` four-actor vs `investor_actors/0` six-actor) is EXACTLY the same split
+  `fh_engine_disposition:fill/2` already dispatches on (`tax_optimised_structure` presence —
+  owner-occupier A/B/E vs investor C/D). No new discriminator needed; the existing dispatch already
+  carries the information the fix requires.
+  - **Fix**: `dispose_cash_events/4` → `/5`, threading a `MoneyPartyId` param for the
+    sale_proceeds/selling_costs counterparty (`loan_payout`→`lender`, `cgt`→`government` untouched
+    — both actor sets carry those ids unchanged). `fill_owner_occupier/2` passes `<<"other">>`;
+    `fill_investor/3` (the one function serving both Mode C and Mode D) passes `<<"services">>`.
+    Fixes both modes with a single call-site change each — no mode-conditional branching inside
+    `dispose_cash_events` itself, since the caller already knows which set it's building for.
+  - **Verification, matched to what this bug is**: `fh_engine_disposition`/`fh_engine_journey` are
+    both explicitly NO-agent-leaf, fully deterministic resolver code
+    ([[no-judge-ground-the-producer]]) — a live LLM run adds no confidence a direct function call
+    doesn't already give exhaustively, and metered spend on one would be the "yak-shaving"
+    [[proportionate-verification-honest-gaps]] warns against. Verified instead by:
+    (a) `disposition_conformance.escript` — 2 new assertions, sale/selling counterparty = `services`
+    on the investor clean-case fixture (89 anchors, PASS);
+    (b) `mode_d_p2_conformance.escript` — 1 new assertion on the REAL Mode-D fixture (84 anchors,
+    PASS);
+    (c) the load-bearing one, `journey_conformance.escript`'s new `investor_dispose_cases/0` — calls
+    the ACTUAL `fh_engine_disposition:fill/2` then feeds its real output through the ACTUAL
+    `fh_engine_journey:fill/2` for both `investor-domestic-au` and `investor-foreign-au` (no
+    synthetic fixture standing in for either module), and asserts the exact invariant that broke:
+    every dispose money cell's `actor` field resolves inside the outcome's own declared `actors[]`
+    list — the precise lookup `SwimlaneDiagram.svelte` performs. Pre-fix this assertion fails with
+    `OrphanedActors = [<<"other">>, <<"other">>]`; post-fix it's `[]` for both modes (41 anchors,
+    PASS). Full 65-file non-live conformance re-sweep after the fix: only the same 2 already-flagged
+    pre-existing unrelated failures remain (`due_diligence_conformance`,
+    `profile_enrichment_conformance`).
+  - **Gap 1 (purchase_journey's own Mode-D dispatch) closed by the same test**: `investor_dispose_
+    cases/0` calls `fh_engine_journey:fill/2` with `blueprint_slug = investor-foreign-au` directly
+    and asserts the six-actor set + real dispose placement — a deterministic, exhaustive proof of
+    the dispatch clause firing, stronger than an LLM-dependent live run would have been for
+    non-agentic code.
+  - **Gap 2 (OverviewCard FIRB tile, task 9) — partially closed, honestly**: no browser/screenshot
+    tool was available in this session, so a literal visual eyeball per CLAUDE.md's UI-verification
+    instruction was NOT possible — disclosed rather than silently claimed. Closed what's checkable
+    without one: `FirbStatusOutcome.current_stage`'s 8-value union (`fh_shell` `planCard.ts`) matches
+    the 8 `plan.firb.stage.*` i18n keys the tile reads exactly, 1:1, no drift; `plan.f.stage` (the
+    tile's label key) exists; `npm run build` clean. Still open: an actual rendered screenshot.
+  - **New, adjacent, deliberately out-of-scope finding**: no test anywhere in the repo — for ANY
+    mode — exercises the horizon structural what-if (engine-contract §10.5, a refine-turn setting
+    `hold_horizon_years`) through the full commit-seam/SSE pipeline; every proof of the Dispose
+    column (this fix included) is at the module level, not integration level. This is a pre-existing
+    gap in the refine-turn test surface, not created by or required to close this bug — flagged for
+    awareness, not taken on here.
+  - Files: `fh_engine_disposition.erl` (the fix), `disposition_conformance.escript`,
+    `mode_d_p2_conformance.escript`, `journey_conformance.escript` (the 3 conformance additions).
+    No blueprint/KB/shell changes — this was engine-internal.
+
+- **Task 11 (Mode B gains `disposition`, §11.4) done 2026-07-11.** No new resolver code —
+  `fh_engine_disposition:fill/2` already dispatches Mode B onto the same `fill_owner_occupier/2`
+  path Mode A uses (keyed on the absence of `tax_optimised_structure` upstream; Mode B never runs
+  a `tax_structure` component). Grounded against every field `fill_owner_occupier/2` reads before
+  wiring, which surfaced two real gaps requiring explicit calls (not silent defaults), both
+  presented to and approved by Son:
+  - **`cgt/1` needs `profile.intended_occupancy_use` + `profile.tax_residency`; Mode B's
+    `buyer_profile_foreign` set neither.** Added `intended_occupancy_use: sole_occupier`
+    (definitional — Mode B is an owner-occupier FHB by mode definition, same call Mode A makes).
+    **Deliberately did NOT add `tax_residency`** — a foreign applicant's tax residency is
+    genuinely unknown at base and CGT-consequential (the 2019 reform removed the non-resident
+    main-residence exemption). Left unset, `cgt/1` falls through to `to_verify` unconditionally —
+    `cgt_status` is always `to_verify` for Mode B, never `exempt`, by construction (mirrors how
+    Mode D's `cgt_status` is always `to_verify`, `investor-foreign-au.md` component 14).
+  - **`full_horizon_net_position` would be permanently null, not honest-partial-pending.**
+    `full_horizon/4` places `ownership_planning.ongoing_obligations.recurring_costs_estimate.
+    statutory_band` — a field Mode B's `fill_foreign/2` never computes (built around FIRB
+    compliance monitoring, not a cost estimate). Explored extending it (Option 2) and rejected:
+    a correct Mode-B statutory band would need the foreign-owner land-tax surcharge, and
+    `kb.tax.land-tax-by-state` states outright "No resolver computes a land-tax dollar figure —
+    deliberately... kept out of the agent's reach", for **any** mode. A naive reuse of Mode A's
+    band (rates+water only) would silently omit that surcharge and understate a foreign owner's
+    true holding cost — actively misleading, not merely incomplete, on a regulated decision-
+    support surface. Shipped Option 1: `full_horizon_net_position` stays honestly null for Mode B,
+    permanently, disclosed in the blueprint (component 12's own note) and the conformance tests,
+    not silently absorbed as a "pending" the way a temporal gap would be. The dispose-phase
+    figures this component was added FOR (`sale_proceeds`/`selling_costs`/`loan_payout`/`cgt`/
+    `net_proceeds`/`dispose_cash_events`) are unaffected and compute correctly.
+  - Wired `disposition` last in `?BASE_COMPONENTS_FOREIGN` (after `cash_position` +
+    `ownership_planning`, mirroring every other mode's position) — 7 → 8 components.
+  - Verified: `base_components_foreign_conformance.escript` (+11 anchors: SET+ORDER,
+    3 new Pre-dependency checks, a new `disposition_cases()` block asserting `cgt_status`/`cgt`/
+    `full_horizon_net_position`/`sale_proceeds`/`dispose_cash_events`/counterparty — 33 anchors,
+    all PASS), `buyer_profile_foreign_conformance.escript` (field-count fixture updated 13→14,
+    `intended_occupancy_use` assertion added — 33 anchors, PASS), plus the two OTHER blueprints'
+    own copies of Mode B's expected order (`base_components_foreign_investor_conformance.escript`,
+    `base_components_nexthome_conformance.escript` — both cross-check Mode B's order as a
+    no-regression fixture; both updated, both PASS). Full non-live conformance re-sweep: zero
+    regressions (only the 2 already-known, already-flagged, unrelated pre-existing failures —
+    `due_diligence_conformance`, `profile_enrichment_conformance` — remain). **Live seam-smoke**
+    (`mode_b_seam_smoke.escript`, real Docker PG, real HTTP/SSE) also updated and run: 7→8
+    components, 21→24 audit rows, 30→34 events, plus new live assertions for `cgt_status`,
+    `full_horizon_net_position`, `sale_proceeds`, `dispose_cash_events` — all PASS. Unlike task 10
+    (which deferred live-smoke to its own task 14-equivalent), this task's live-smoke update was
+    done now — cheap, mechanical, and the strongest available evidence the wiring works end-to-end.
+  - Files: `fh_engine_fill.erl` (the `intended_occupancy_use` field), `fh_engine_turn.erl` (the
+    DAG wiring), `docs/blueprints/fhb-foreign-au.md` (component 12 + scope table + KB anchor
+    index + dependency graph + renderer table — the `ui_tabs` block deliberately NOT touched,
+    that's task 13), `base_components_foreign_conformance.escript`,
+    `buyer_profile_foreign_conformance.escript`, `base_components_foreign_investor_conformance.
+    escript`, `base_components_nexthome_conformance.escript`, `mode_b_seam_smoke.escript`.
+
+- **Task 12 (Mode B journey/phase_playbook KB + engine wiring) done 2026-07-11.** Mirrors Mode
+  D's task-8 shape, not Mode C's: three new bilingual copy docs — `kb.journey.fhb-foreign-path`
+  (the swimlane), `kb.journey.fhb-foreign-phase-actions` (the per-phase checklist),
+  `kb.risks.fhb-foreign-by-phase` (the per-phase risk-flag-list) — layering §3.3's FIRB gate +
+  cross-border transfer milestone + surcharge onto **Mode A's own four-actor phase/actor
+  skeleton**, not Mode C/D's six-actor investor set (Mode B is an owner-occupier FHB by mode
+  definition; the same call task 11 already made for `disposition`'s `intended_occupancy_use`).
+  One design call made and grounded, not defaulted:
+  - **Reuses Mode A's four actors unchanged — no seventh row, and no `services` rename.** This
+    is forced, not a preference: `fh_engine_disposition:fill/2` already dispatches Mode B onto
+    `fill_owner_occupier/2` (the same function Mode A uses), which — after task 15's fix — passes
+    counterparty `<<"other">>` for the dispose money cells, not Mode C/D's `<<"services">>`. A
+    six-actor swimlane would silently drop those cells (task 10's own counterparty bug, now
+    understood well enough to avoid reintroducing it in a new mode). The cross-border transfer
+    provider narrates as `other`/services cells, the same placement Mode D's six-actor doc uses
+    for the same reason (a service engaged once, not a recurring-relationship actor).
+  - **`firb_fee`'s cash_event phase is `contract`, not `settle`** — grounded in
+    `kb.firb.application-process` ("Pay the application fee ... the 30-day statutory decision
+    clock does not start until the correct fee is paid in full"): the fee is paid at application
+    lodgement, which happens at or shortly after exchange, well before settlement. This is a real
+    grounded call, not a guess — it also matches `kb.journey.fhb-foreign-phase-actions`' own
+    `submit_firb_application` action, placed at `contract`.
+  - **Engine wiring needed one real (not stub) `cash_events` builder**, unlike Mode D's honest
+    `cash_events => []` stub for `fill_investor_foreign/2`. Mode D's cash_position is
+    permanently null pre-property (no per-property branch built yet), so a real event-builder
+    there would be dead code. Mode B's `fill_fhb_foreign/2` is different: its ceiling-estimate
+    convention (documented in the function's own pre-existing header comment) means
+    `Deposit`/`DutyAfter`/`Surcharge`/`FirbFee`/`ChannelCosts` are ALL honestly computable from
+    `profile.target_price_range` alone, with no property attached — so `cash_events_foreign/5`
+    (new, `fh_engine_cash.erl`) is live money from base onward, not a placeholder. Two new
+    bilingual copy keys added to `kb.copy.cash` (`event_firb_fee`, `event_foreign_buyer_surcharge`);
+    `event_deposit`/`event_stamp_duty`/`event_other_costs` reused unchanged (already
+    mode-neutral wording). `purchase_journey`/`phase_playbook` themselves needed zero new
+    resolver code beyond their own Mode-B dispatch branch + prose (`fh_engine_journey:
+    fill_fhb_foreign/1` reuses Mode A's `phases/0`/`actors/0`/`rendered_phases/1`/`money_cells/2`
+    verbatim; `fh_engine_phase_playbook`'s dispatch is a one-line case clause addition).
+  - **One more honest gap surfaced and disclosed, not silently absorbed**: Mode B's foreign-person
+    `ownership_planning` outcome (built around FIRB vacancy-fee/alert monitoring) carries no
+    `recurring_costs_estimate.statutory_band` the way Mode A's does — the same field task 11
+    already found missing for `disposition`'s `full_horizon_net_position`. `purchase_journey`'s
+    `own_recurring_cells/1` is reused unchanged; it simply emits no Own-phase recurring cell for
+    Mode B (honest-partial — the shared builder already handles an absent band by emitting `[]`,
+    no Mode-B-specific code needed), documented in the blueprint's own component-13 note rather
+    than left as an unexplained silent gap.
+  - `?BASE_COMPONENTS_FOREIGN` extended 8 → 10 components, appended at the end (both new
+    components read only components already earlier in the list — `cash_position`,
+    `ownership_planning`, `disposition` — so no reordering needed, the same "figure-owners, then
+    the spine that places them" DAG shape every other mode uses).
+  - **Verified:** `kb_compiler.py` recompiled clean (`fhb-foreign-au: dag={"components": 13}` —
+    the 13-line dependency-graph section, `mortgage_finance` still the one pre-existing omission
+    flagged since task 11, unrelated), artifact inspected directly —
+    `purchase_journey → outcome_type: journey_swimlane`, `phase_playbook → outcome_type:
+    phase_playbook` (neither null), 14 components total. A quick sanity pass (learned from tasks
+    4/8, not the full sweep — that's task 14): `base_components_foreign_conformance.escript`'s
+    every per-component registry check + every real-code-dependency DAG-order check passes
+    (including the new `purchase_journey`/`phase_playbook` validate-vs-registry checks); its own
+    SET+ORDER fixture now fails as **expected** (still asserts the pre-task-12 eight-component
+    list — the same fixture-staleness class tasks 7/10 already fixed for their modes) — predicted
+    to recur in the two cross-mode mirror fixtures
+    (`base_components_foreign_investor_conformance.escript`,
+    `base_components_nexthome_conformance.escript`) and `mode_b_seam_smoke.escript`'s
+    `expected_sequence()`; task 14 owns fixing all of it, not patched ad hoc here.
+  - Files: `fh_engine_cash.erl` (`cash_events_foreign/5` + the `cash_events` field on
+    `fill_fhb_foreign/2`'s Outcome), `fh_engine_journey.erl` (`fill_fhb_foreign/1` + the Mode-B
+    prose builders), `fh_engine_phase_playbook.erl` (the Mode-B dispatch clause), `fh_engine_turn.
+    erl` (`?BASE_COMPONENTS_FOREIGN` extended), `docs/blueprints/fhb-foreign-au.md` (components
+    13/14 + `cash_events` on component 6's schema + scope table + ASCII diagram + KB anchor index
+    + renderer table + dependency graph — `ui_tabs` deliberately NOT touched, that's task 13),
+    `docs/kb/journey/fhb-foreign-path.md`, `docs/kb/journey/fhb-foreign-phase-actions.md`,
+    `docs/kb/risks/fhb-foreign-by-phase.md` (new), `docs/kb/copy/cash.md` (+2 copy keys).
+  - **Next: task 13**, Mode B `ui_tabs` rewrite to the five-view spine (Overview/Flow/Budget/
+    Family/Q&A) + shell restructure — folding `firb_workflow`/`cross_border_funding` into Flow
+    phases + Budget rows, the same placement test Modes C/D's tasks 5/9 already proved.
+
+- **Task 13 (Mode B `ui_tabs` rewrite + shell restructure) done 2026-07-11.** Applied §11.2's
+  placement test to Mode B exactly as tasks 5/9 applied it to C/D: `firb_workflow` phase-shaped
+  (gate) → Flow phase + Budget fee row (dual placement, mirroring `eligibility` in Mode A);
+  `cross_border_funding` → Flow milestone + Budget row; `family_context` state-shaped, no
+  completion point → its own **Family** view — the same treatment Portfolio gets in C/D, but
+  **always-on** (not opt-in like Mode D's Family layer) since Mode B's entry assumption IS a
+  cross-border family purchase. `property_assessment`/`buying_strategy`/`due_diligence`/
+  `settlement_prep`/`ownership_planning` dropped from the tab list entirely, reached only via
+  `phase_playbook.actions[].component_ref` — confirmed against task 12's own authored
+  `fhb-foreign-phase-actions.md`, which already `component_ref`s all four.
+  - **One placement question that isn't free: does `family_context` also headline in Overview,
+    like Mode A's `eligibility` double-places into Overview+Flow?** Checked the precedent
+    directly rather than assuming symmetry: Mode C/D's `ownership_planning_investor`/`_foreign`
+    (the other state-shaped, own-tab concept) does **not** appear in either mode's `overview.
+    components` — Portfolio is reached only via its own tab, never duplicated into the synthesis
+    read. Mode B's `family_context` gets the same treatment for consistency: Overview lists
+    `buyer_profile`, `firb_workflow`, `mortgage_finance`, `cash_position` only (mirroring Mode D's
+    overview minus `investment_strategy`, which Mode B has no equivalent of) — no `family_context`
+    tile. The asymmetry with `eligibility` isn't a contradiction: `eligibility` is phase-shaped
+    (folds into Flow *and* headlines in Overview), while `family_context`/`ownership_planning_*`
+    are state-shaped (own tab only) — different §11.2 category, different placement rule.
+  - **`ownership_planning`'s obligations don't become a Budget row**, unlike `firb_workflow`'s fee
+    and `cross_border_funding`'s transfer cost. Checked against Mode A's own precedent first:
+    Mode A's `ownership_planning` is *also* absent from Budget (backing detail only, reached via
+    the Own phase's `phase_playbook` actions) — Budget rows are for pre-settlement acquisition
+    cash-events, not post-settlement recurring obligations, in every mode including A. Mode B
+    follows the same rule; its `recurring_costs_estimate` honest-partial gap (task 12) narrates
+    through the Own phase's actions rather than surfacing as a missing Budget row.
+  - **Shell: traced the actual render mechanism instead of assuming new code was needed** (task
+    9's own lesson, reapplied). `PlanProjection.svelte` dispatches purely on `ui_tabs[].kind`, and
+    `ComponentCard.svelte` already dispatches `family-view-card` generically — both were wired
+    for Mode B's Family surface back when it lived on the stale `family_view` tab_id, so
+    renaming the tab_id to `family` needed zero renderer code. `OverviewCard.svelte` already
+    reads `components.firb_workflow?.outcome` presence-gated off the full components map (task
+    9), not off `activeTab.components` — so it already rendered the FIRB tile correctly even
+    before this task's Overview declaration formally added `firb_workflow` to it. The Budget
+    tab's "Full horizon" 4th sub-tab is gated on `components.disposition` presence (not a mode
+    check) — task 11 already added `disposition` for Mode B, so it activates for free.
+  - **One real cleanup found and made, not scope creep**: `PlanProjection.svelte`'s `TAB_GROUP`
+    map and `i18n.ts`'s `plan.ltab.*` block still carried the full pre-restructure flat
+    vocabulary (`family_view`, `firb_funding`, `journey`, `property`, `buying`, `after_you_buy`,
+    `cash_calculator`, `yield_tax`, `investment_strategy`, `before_you_buy`) as a comment-
+    documented "mode-general" set — stale since tasks 5/9 already moved C/D onto `flow`/`budget`/
+    `portfolio`/`qa` without anyone touching this file. Mode B's rewrite makes fhb-foreign-au.md
+    the last blueprint off the legacy vocabulary, so every one of those tab_ids is now dead
+    repo-wide (grepped `docs/blueprints/*.md` to confirm zero remaining declarations before
+    removing). Trimmed both to the five real tab_ids in use (`overview`/`flow`/`budget`/
+    `portfolio`/`family`/`qa`) rather than leave a misleading comment next to the exact code this
+    task was editing anyway.
+  - Verification: `python3 engine/build/kb_compiler.py` — GATE 9 (ui_tabs reference-integrity)
+    passed, `PASS` overall; inspected the emitted artifact directly — `ui_tabs=["overview",
+    "flow", "budget", "family", "qa"]` with the exact component lists declared. `svelte-check`:
+    0 errors, 0 warnings.
+  - Files: `docs/blueprints/fhb-foreign-au.md` (UI tab mapping table + `ui_tabs` jsonc block
+    rewritten), `shell/web/frontend/src/lib/i18n.ts` (`plan.ltab.*` trimmed to 5 live keys, added
+    `plan.ltab.family`), `shell/web/frontend/src/lib/PlanProjection.svelte` (`TAB_GROUP` trimmed
+    to 4 live entries, added `family: 'buy'`).
+  - **Next: task 14**, Mode B conformance + live seam-smoke verification — the same closing pass
+    tasks 7/10 already ran for C/D, plus fixing the two stale cross-mode mirror fixtures flagged
+    in task 12 (`base_components_foreign_investor_conformance.escript`,
+    `base_components_nexthome_conformance.escript`, and `mode_b_seam_smoke.escript`'s
+    `expected_sequence()`).
+
+- **Task 14 (Mode B conformance + live seam-smoke verification) done 2026-07-11 — the closing
+  task for the ENTIRE B/C/D lifecycle-spine restructure (tasks 3–14 all done).**
+  - **Found the two flagged mirror fixtures stale, plus a third — Mode B's OWN conformance
+    escript hadn't been updated either.** `base_components_foreign_conformance.escript`'s
+    `foreign_order()` fixture still declared the pre-task-12 eight-component sequence (missing
+    `purchase_journey`/`phase_playbook`) — task 12's engine-wiring commit updated
+    `fh_engine_turn.erl`'s `?BASE_COMPONENTS_FOREIGN` macro to 10 components but never touched
+    its own conformance escript's fixture. Caught by re-reading the `.erl` source directly
+    (grounding the fixture against the real macro, not trusting the escript's own stale
+    "eight-component" comment) before touching the two mirrors task 12 had explicitly flagged.
+    Fixed all three: added `purchase_journey`/`phase_playbook` to each `foreign_order()` fixture,
+    added `Pre()` DAG-walk checks proving `purchase_journey` genuinely needs `budget_envelope`
+    (cash_position) + `ongoing_obligations` (ownership_planning) + `disposition` upstream and
+    `phase_playbook` needs `purchase_journey`'s own `journey_swimlane` outcome — grounded against
+    `fh_engine_journey:fill_fhb_foreign/1`'s actual reads, not copied from Mode D's shape.
+    **Takeaway:** a "fix the two flagged mirrors" instruction is itself a claim to verify, not
+    execute blindly — the component under test's own conformance file is the first place drift
+    hides, precisely because everyone assumes task 12 already touched it.
+  - **`mode_b_seam_smoke.escript` needed the fuller set of count updates** tasks 7/10 already
+    worked out the shape for (event count, audit-row count, resolver-count, `content_jsonb`
+    component count, `expected_sequence/0`) — mechanically recomputed from Mode B's real
+    structural facts: 10 components, zero agent leaves (all-resolver, so no `usage` events,
+    unlike Mode D's two-path components), 3 compliance gates each → `EventCount=42`,
+    `AuditCount=30`, `ResolverCount=30`. Added a live `purchase_journey`/`phase_playbook`
+    outcome-shape assertion block mirroring task 10's Mode-D addition, adapted for two real
+    differences: Mode B reuses Mode A's **four-actor** set (`you`/`government`/`lender`/`other`),
+    not Mode C/D's six-actor investor set; and because this smoke's create-body already sets
+    `hold_horizon_years=10` (task 11's own precedent, to exercise `disposition`'s real dispose-
+    phase figures), `purchase_journey`'s dispose phase is asserted **present** here — the
+    opposite of Mode D's own smoke, which leaves the horizon unset and asserts dispose absent.
+    Confirmed the `submit_firb_application` contract-phase action id (the load-bearing
+    discriminator proving `kb.journey.fhb-foreign-phase-actions` resolved, not a fallthrough) by
+    reading the KB doc's `layout.phases[]` directly rather than assuming symmetry with Mode D's
+    identically-named action.
+  - **Ran LIVE** over the real HTTP/SSE seam (Docker Postgres up, no sidecar needed — Mode B's
+    base spine is 100% resolver): 42-event sequence matched exactly; 30 audit rows all `clear`;
+    live outcomes `foreign_person_eligible=null blocking=true firb_dependency_acknowledged=true
+    vacancy_fee_at_risk=30200 cgt_status=to_verify`; live journey/playbook `actors=[you,
+    government,lender,other] phases=[prepare,pre_approve,contract,settle,own,dispose]` (dispose
+    phase present, as expected with H=10) and `contract_actions` includes
+    `submit_firb_application`. **ALL ASSERTIONS PASSED.** Also re-ran Mode D's own live seam-
+    smoke as a regression check (no code shared between the two turns, but both touch
+    `fh_engine_journey`/`fh_engine_phase_playbook` — confirmed unaffected, **ALL ASSERTIONS
+    PASSED** there too).
+  - **Full regression sweep, not just the touched files**: `kb_compiler.py` (PASS, 184 KB
+    entries), `base_components_foreign_conformance.escript` (39/39), the two fixed mirrors
+    (40/40, 18/18), `mode_b_p3_scope_conformance.escript` (19/19, confirming Phase-B scope
+    untouched by the base-spine change), `journey_conformance.escript` (41/41),
+    `phase_playbook_conformance.escript` (21/21), `outcome_conformance.escript` (25+11 cases +
+    seam fail-closed), `disposition_conformance.escript` (89/89). The two pre-existing,
+    documented-as-out-of-scope failures (`due_diligence_conformance`'s `agent_leaves`
+    classification mismatch, `profile_enrichment_conformance`'s IC0 mortgage-capacity fixture
+    drift) re-ran and still fail identically — confirmed unchanged, not newly broken, before
+    calling this task done.
+  - Files: `engine/erlang/test/base_components_foreign_conformance.escript`,
+    `base_components_foreign_investor_conformance.escript`,
+    `base_components_nexthome_conformance.escript`, `mode_b_seam_smoke.escript`.
+  - **Task 14 closes out the whole B/C/D lifecycle-spine restructure.** All five modes (A/B/C/D/E)
+    now share the same Overview/Flow/Budget/[Portfolio|Family]/Q&A five-view spine, live-verified
+    end-to-end. One standing caveat carried over from task 10, NOT resolved by this task (out of
+    its scope — a shared-code bug across Mode C/D, not Mode B): the dispose-cell counterparty bug
+    flagged there was already fixed separately in task 15, and this task's own live run (H=10 set)
+    is the first live confirmation that Mode B's own dispose column renders correctly under the
+    fix (Mode B uses the four-actor `other` counterparty, which task 15's fix left untouched by
+    design — only Mode C/D's `services` rename needed the remap).

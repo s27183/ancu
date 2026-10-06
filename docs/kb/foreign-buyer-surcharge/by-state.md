@@ -1,7 +1,19 @@
 ---
 slug: kb.foreign-buyer-surcharge.by-state
 effective_from: 2025-07-01
-last_verified: 2026-07-02
+last_verified: 2026-07-06
+sources:
+  - url: https://www.sro.vic.gov.au/rates-taxes-duties-and-levies/foreign-purchaser-additional-duty-current-rates
+    retrieved: 2026-07-06
+  - url: https://qro.qld.gov.au/duties/investors/afad/
+    retrieved: 2026-07-06
+  - url: https://www.wa.gov.au/government/publications/foreign-transfer-duty
+    retrieved: 2026-07-06
+  - url: https://sro.tas.gov.au/property-transfer-duties/foreign-investor-duty-surcharge/rates-of-surcharge
+    retrieved: 2026-07-06
+  - url: https://www.pwc.com.au/tax/assets/stamp-duty/australian-stamp-duty-and-land-tax-maps.pdf
+    retrieved: 2026-07-06
+    path: docs/sources/foreign-buyer-surcharge/pwc-australian-stamp-duty-and-land-tax-maps.pdf
 ---
 
 # Foreign purchaser stamp-duty surcharge — by state
@@ -25,7 +37,7 @@ A foreign person pays an **additional transfer-duty surcharge** on residential p
 | **QLD** | **8%** (AFAD residential) | increased from 7% on **1 Jul 2024** (aligning with NSW/VIC) | PRIMARY (QRO — 3% 2016–18, 7% 2018–24, 8% from 1 Jul 2024) |
 | **WA** | **7%** (foreign transfer duty) | stable | PRIMARY (RevenueWA) |
 | **SA** | **7%** (foreign ownership surcharge) | stable | PRIMARY (RevenueSA) |
-| **TAS** | **8%** (FIDS, residential) | increased to 8% on **1 Jul 2024** (1.5% for primary-production land) | PRIMARY (SRO Tasmania) |
+| **TAS** | **8%** (FIDS, residential) | 8% from **1 Apr 2020** (1.5% for primary-production land) | PRIMARY (SRO Tasmania) |
 | **ACT** | **none** | ACT levies **no** foreign purchaser *duty* surcharge | PRIMARY (nil) |
 | **NT** | **none** | NT levies **no** foreign purchaser duty surcharge | PRIMARY (nil) |
 
@@ -58,7 +70,7 @@ Pure-reference (`fills: []`). The `cash_position` resolver reads the surcharge *
     "qld_surcharge_pct": { "type": "percentage", "value": 8, "provenance": "REGULATED", "note": "QRO additional foreign acquirer duty (AFAD) residential; increased from 7% to 8% on 1 Jul 2024." },
     "wa_surcharge_pct": { "type": "percentage", "value": 7, "provenance": "REGULATED", "note": "RevenueWA foreign transfer duty." },
     "sa_surcharge_pct": { "type": "percentage", "value": 7, "provenance": "REGULATED", "note": "RevenueSA foreign ownership surcharge." },
-    "tas_surcharge_pct": { "type": "percentage", "value": 8, "provenance": "REGULATED", "note": "SRO Tasmania foreign investor duty surcharge (FIDS) residential; increased to 8% on 1 Jul 2024 (1.5% primary-production land)." },
+    "tas_surcharge_pct": { "type": "percentage", "value": 8, "provenance": "REGULATED", "note": "SRO Tasmania foreign investor duty surcharge (FIDS) residential; 8% from 1 Apr 2020 (1.5% primary-production land)." },
     "act_has_no_duty_surcharge": { "type": "bool", "value": true, "provenance": "REGULATED", "note": "ACT levies no foreign purchaser DUTY surcharge (a separate annual land-tax foreign surcharge is owned by kb.tax.land-tax-by-state)." },
     "nt_has_no_duty_surcharge": { "type": "bool", "value": true, "provenance": "REGULATED", "note": "NT levies no foreign purchaser stamp-duty surcharge." }
   },
@@ -71,7 +83,7 @@ Pure-reference (`fills: []`). The `cash_position` resolver reads the surcharge *
         { "state": "QLD", "surcharge_pct": 8, "effective": "2024-07-01", "label": "additional foreign acquirer duty (AFAD)", "verification": "PRIMARY (QRO)" },
         { "state": "WA", "surcharge_pct": 7, "effective": "stable", "label": "foreign transfer duty", "verification": "PRIMARY (RevenueWA)" },
         { "state": "SA", "surcharge_pct": 7, "effective": "stable", "label": "foreign ownership surcharge", "verification": "PRIMARY (RevenueSA)" },
-        { "state": "TAS", "surcharge_pct": 8, "effective": "2024-07-01", "label": "foreign investor duty surcharge (FIDS), residential", "verification": "PRIMARY (SRO Tasmania)" },
+        { "state": "TAS", "surcharge_pct": 8, "effective": "2020-04-01", "label": "foreign investor duty surcharge (FIDS), residential", "verification": "PRIMARY (SRO Tasmania)" },
         { "state": "ACT", "surcharge_pct": 0, "effective": "n/a", "label": "no duty surcharge", "verification": "PRIMARY (nil)" },
         { "state": "NT", "surcharge_pct": 0, "effective": "n/a", "label": "no duty surcharge", "verification": "PRIMARY (nil)" }
       ]
@@ -84,7 +96,7 @@ Notes:
 
 - **No `fills`; the resolver computes the amount, not this doc.** The doc supplies the regulated **rate schedule**; `cash_position` computes `foreign_buyer_surcharge_amount` = dutiable value × rate and verifies it to the dollar against the state revenue calculator ([[verify-regulated-figures-by-postcondition]]). A regulated dollar figure is not stored in the KB.
 - **Single-owner cross-refs.** Standard duty → [`kb.stamp-duty.calc-by-state`](../stamp-duty/calc-by-state.md); annual land-tax foreign/absentee surcharge → [`kb.tax.land-tax-by-state`](../tax/land-tax-by-state.md); FIRB fee → [`kb.firb.fee-schedule-current`](../firb/fee-schedule-current.md). This doc owns only the one-off duty surcharge rate.
-- **Annual reindexation / rate change.** Rates change by state budget (NSW 8→9% Jan-2025; QLD 7→8% and TAS →8% both Jul-2024). `last_verified` is the freshness anchor; re-confirm each rate against the state revenue office on the annual pass.
+- **Annual reindexation / rate change.** Rates change by state budget (NSW 8→9% Jan-2025; QLD 7→8% Jul-2024; TAS →8% Apr-2020). `last_verified` is the freshness anchor; re-confirm each rate against the state revenue office on the annual pass.
 - **"Foreign person" is a per-state ruling, deferred.** The resolver applies the rate; the eligibility/exemption determination (PR, SCV, temp resident) is confirmed with the state revenue office.
 
 ## Sources
@@ -96,7 +108,7 @@ Notes:
 - Queensland Revenue Office — *Additional foreign acquirer duty (AFAD)* (8% residential from 1 Jul 2024; 3% 2016–18, 7% 2018–24) — https://qro.qld.gov.au/duties/investors/afad/
 - RevenueWA (Department of Treasury and Finance WA) — *Foreign transfer duty* (7%) — https://www.wa.gov.au/organisation/department-of-treasury-and-finance/foreign-transfer-duty
 - RevenueSA — *Foreign ownership surcharge* (7%) — https://www.revenuesa.sa.gov.au/stampduty/stamp-duty-and-land-tax-changes/foreign-ownership-surcharge
-- State Revenue Office Tasmania — *Foreign investor duty surcharge* (8% residential from 1 Jul 2024; 1.5% primary-production) — https://www.sro.tas.gov.au/property-transfer-duties/foreign-investor-duty-surcharge
+- State Revenue Office Tasmania — *Foreign investor duty surcharge — rates of surcharge* (8% residential from 1 Apr 2020; 1.5% primary-production) — https://sro.tas.gov.au/property-transfer-duties/foreign-investor-duty-surcharge/rates-of-surcharge
 
 **Cross-source (professional / secondary, for the by-state consolidation):**
 

@@ -1,7 +1,16 @@
 ---
 slug: kb.tax.depreciation-division-43-and-40
 effective_from: 2025-07-01
-last_verified: 2026-06-23
+last_verified: 2026-07-06
+sources:
+  - url: https://www.ato.gov.au/businesses-and-organisations/income-deductions-and-concessions/depreciation-and-capital-expenses-and-allowances/capital-works-deductions
+    retrieved: 2026-07-06
+  - url: https://www.ato.gov.au/individuals-and-families/investments-and-assets/property-and-land/residential-rental-properties/rental-expenses/depreciating-assets-in-rental-properties
+    retrieved: 2026-06-23
+  - url: https://www.ato.gov.au/individuals-and-families/investments-and-assets/property-and-land/residential-rental-properties/rental-expenses/depreciating-assets-in-rental-properties/second-hand-depreciating-assets
+    retrieved: 2026-06-23
+  - url: https://www.ato.gov.au/individuals-and-families/investments-and-assets/property-and-land/residential-rental-properties/rental-expenses/capital-expenses/work-out-your-capital-works-deductions
+    retrieved: 2026-06-23
 ---
 
 # Depreciation — capital works (Div 43) and plant & equipment (Div 40)
@@ -56,7 +65,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
 Notes:
 
 - **No `fills`.** The depreciation figure is resolver-computed from the rates and the QS/construction-cost basis; the disposition clawback is flagged with the precise figure deferred to `to_verify`. The doc supplies the rates and rules, not a schedule.
-- **REGULATED — verified against the ATO.** The Div 43 rate (2.5% / 40 years, 4% alternative), the Div 40 decline-in-value method, the 9 May 2017 second-hand-plant restriction, and the capital-works cost-base reduction were confirmed against the ATO *Capital works deductions*, *Depreciating assets in rental properties*, and *Second-hand depreciating assets* pages (verified 2026-06-23).
+- **REGULATED — verified against the ATO.** The Div 43 rate (2.5% / 40 years, 4% alternative), the Div 40 decline-in-value method, the 9 May 2017 second-hand-plant restriction, and the capital-works cost-base reduction were confirmed against the ATO *Capital works deductions*, *Depreciating assets in rental properties*, and *Second-hand depreciating assets* pages (verified 2026-06-23). The Div 43 rate (2.5% / 4.0%) was **re-confirmed 2026-07-06** via the archived snapshot of the ATO *Capital works deductions* page (unchanged); ATO blocks automated fetch, so the Div 40 / second-hand-plant / cost-base pages carry the 2026-06-23 verification.
 - **The 2017 restriction is the load-bearing branch.** Whether a property carries second-hand plant depreciation depends on the acquisition date and new/established status — the resolver branches on it rather than assuming a generic Div 40 benefit.
 - **The clawback links to disposition.** Depreciation claimed reduces the CGT cost base (increases the gain); `fh_engine_disposition` consumes this flag in the investor cgt branch alongside `kb.tax.cgt-50-percent-discount`, deferring the precise dollar clawback to `to_verify`.
 

@@ -2,6 +2,11 @@
 slug: kb.tax.quantity-surveyor-reports
 effective_from: 2025-07-01
 last_verified: 2026-06-23
+sources:
+  - url: https://www.ato.gov.au/individuals-and-families/investments-and-assets/property-and-land/residential-rental-properties/rental-expenses/depreciating-assets-in-rental-properties
+    retrieved: 2026-06-23
+  - url: https://www.ato.gov.au/law/view/document?docid=TXR/TR9725/NAT/ATO/00001
+    retrieved: 2026-06-23
 ---
 
 # Quantity surveyor tax depreciation schedules

@@ -68,10 +68,17 @@ seam_cases() ->
                          {'EXIT', {{outcome_nonconforming, <<"budget_envelope">>, <<"placement">>, _}, _}} -> true;
                          _ -> false
                      end,
+    %% P-7 backstop (Son, 2026-10-06, #25): a type the artifact does not declare is
+    %% REFUSED at the seam, no longer passed gracefully unchecked.
+    UndeclaredCrash = case catch fh_engine_outcome:validate(<<"fhb-domestic-au">>, <<"no_such_outcome_type">>, Good) of
+                          {'EXIT', {{outcome_undeclared, <<"fhb-domestic-au">>, <<"no_such_outcome_type">>}, _}} -> true;
+                          _ -> false
+                      end,
     F1 = assert("seam-conforming-profile-passes", GoodOk),
     F2 = assert("seam-nonconforming-crashes-fail-closed", BadCrash),
     F3 = assert("seam-placement-violation-crashes-fail-closed", PlacementCrash),
-    F1 ++ F2 ++ F3.
+    F4 = assert("seam-undeclared-type-refused", UndeclaredCrash),
+    F1 ++ F2 ++ F3 ++ F4.
 
 %% --- §13 placement cases (mirror tests/outcome_validate.py PLACEMENT_CASES) --
 

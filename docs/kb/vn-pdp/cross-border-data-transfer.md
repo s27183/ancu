@@ -1,7 +1,14 @@
 ---
 slug: kb.vn-pdp.cross-border-data-transfer
 effective_from: 2026-07-03
-last_verified: 2026-07-03
+last_verified: 2026-07-06
+sources:
+  - url: https://www.dlapiper.com/en-us/insights/publications/crossroads-icr-insights/2023/vietnam-decree-13-and-the-new-regulations-on-personal-data-protection
+    retrieved: 2026-07-06
+    note: "SECONDARY (DLA Piper) — verifies the BOUNDARY facts only: Decree 13/2023/ND-CP took effect 1 July 2023; cross-border transfer of Vietnamese personal data requires a Transfer Impact Assessment dossier submitted to the Ministry of Public Security (A05) and is subject to notification/inspection. The platform-specific application (whether Rau's VN-funder data handling triggers the Decree, and the resulting obligation) REMAINS a labelled placeholder — deferred to the Wedge-2 data-residency review + VN counsel; this citation does not de-placeholder that."
+  - url: https://eurochamvn.org/wp-content/uploads/2023/02/Decree-13-2023-PDPD_EN_clean.pdf
+    retrieved: 2026-07-06
+    note: "PRIMARY (official English translation of Decree 13/2023/ND-CP) — re-verify anchor for the Decree's cross-border-transfer + impact-assessment mechanism."
 ---
 
 # ⚠ PLACEHOLDER — Vietnamese PDP (Decree 13/2023) cross-border data transfer (NOT SOURCE-GROUNDED)
@@ -18,7 +25,7 @@ This is not a new finding — it restates the working agreement already recorded
 
 ## What is PENDING (the placeholder — and why it stays a placeholder, not an assertion)
 
-- **Whether/how the current engine's handling of a VN-side funder's documents (identity, source-of-funds evidence, uploaded under `family_context`/`cross_border_funding`) constitutes a "cross-border transfer" under the Decree**, and if so, what the Impact Assessment / notification obligation looks like for FirstHomey specifically. This is a legal-compliance determination, not something a KB doc can assert.
+- **Whether/how the current engine's handling of a VN-side funder's documents (identity, source-of-funds evidence, uploaded under `family_context`/`cross_border_funding`) constitutes a "cross-border transfer" under the Decree**, and if so, what the Impact Assessment / notification obligation looks like for Rau specifically. This is a legal-compliance determination, not something a KB doc can assert.
 - **The data-residency architecture** for VN-located user data (where it is collected, processed, and stored) — named as a Wedge-2 item in CLAUDE.md, not yet decided.
 - Asserting "here is how the platform handles your data" before that review would **bury an unmade compliance decision** behind KB content ([[honest-deferral-not-rug]]) — this doc deliberately does not do that.
 

@@ -86,11 +86,13 @@ All three roles produce **batch-updated context** that the user-facing planning 
 
 | Cadence | Content | Mechanism |
 |---|---|---|
-| Quarterly | Scheme structures (FHG, Help to Buy, FHSS), state duty schedules, FHOG amounts, process knowledge, document templates, HECS thresholds | Scripted re-fetch + diff + review |
-| Monthly | Lender policy updates, RBA cash rate, FHG panel changes, participating lender lists | Scripted monitor + diff + alerts |
+| Quarterly (budget) | Scheme structures (FHG, Help to Buy, FHSS), state duty schedules, FHOG amounts, process knowledge, document templates, HECS thresholds | On-demand — Son + Claude Code, prompted by the freshness scanner's overdue report or a noticed change |
+| Monthly (budget) | Lender policy updates, RBA cash rate, FHG panel changes, participating lender lists | On-demand — Son + Claude Code, prompted by the freshness scanner's overdue report or a noticed change |
 | Weekly / daily | Partner REA inventory sync, user URL paste cache, FX rates for Mode D | Scripted ingestion (no scraping, §11.10) |
-| Per-event | Federal Budget (May annually), State Budgets (June annually), Housing Australia rule changes, ABS quarterly releases, ASIC bulletins, FIRB regime changes | Calendar-triggered + RSS / news watchers; triggers blueprint review |
+| Per-event (budget) | Federal Budget (May annually), State Budgets (June annually), Housing Australia rule changes, ABS quarterly releases, ASIC bulletins, FIRB regime changes | On-demand — Son + Claude Code, triggered by noticing the event (no calendar/RSS automation exists); triggers blueprint review |
 | Real-time | Buyer's situation, specific property selection, uploaded document, live negotiation, current chat message | Never batchable — Layer 3 territory |
+
+The Quarterly/Monthly/Per-event cadences are **re-verification budgets** (how long a doc may go without being re-checked against its primary — enforced by `tests/kb_freshness.py`), not automation schedules. Nothing in the repo runs on a calendar or watches RSS for this track; every KB update pass is on-demand — "let's update the KB," Son + Claude Code together, working `kb-update-runbook.md` (see [kb-update-runbook.md](kb-update-runbook.md)) — informed by the freshness scanner's overdue report or by either of us noticing an external event. Weekly/daily property-data ingestion is a separate, genuinely scripted mechanism (§11.10) — not this track.
 
 Almost nothing in this domain requires sub-day knowledge freshness. What needs to be real-time is **the buyer's situation against the knowledge**, not the knowledge itself. This is a structural cost advantage if architected correctly — Layer 1 ops are predictable scripts, not data engineering.
 
@@ -388,7 +390,16 @@ Components reference curated KB content via **slug-based references** rather tha
      slug: kb.scheme.qld.fhnhc
      effective_from: 2025-05-01
      last_verified: 2026-05-19
+     sources:
+       - url: https://www.qld.gov.au/housing/buying-owning-home/financial-help-concessions/first-home-owner-grant
+         retrieved: 2026-05-19
+         path: docs/sources/qld/...  # only when the source is a stable document (PDF/gazette)
      ---
+   `sources:` is the audit trail a KB update reruns against (kb-update-runbook.md
+   Phase 1) — a dated citation of what was actually checked, not a guess at what
+   probably grounds the fact. Exempt: derived/synthesis docs that interpolate or
+   compose other already-sourced KB docs rather than asserting a fact of their
+   own (`kb.copy.*`, `kb.bilingual.*`, `kb.journey.*`).
 
 2. Artifact compiler (run at deploy, build-time):
    - Walks docs/kb/ and docs/blueprints/
@@ -398,7 +409,7 @@ Components reference curated KB content via **slug-based references** rather tha
    - Parses frontmatter; splits the body — the `## Rules` fenced `jsonc` block is `content_json`, the remaining prose is `content_md`
    - Compiles a versioned KB + blueprint artifact shipped with the engine
      release; each KB entry is:
-       (slug, effective_from, last_verified, content_md, content_json)
+       (slug, effective_from, last_verified, sources, content_md, content_json)
    - NOT a Postgres write: git is SOT, the artifact is a deterministic,
      rebuildable projection (rebuild from the deploy commit SHA)
 

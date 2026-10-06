@@ -1,7 +1,17 @@
 ---
 slug: kb.strata.health-indicators
 effective_from: 2025-07-01
-last_verified: 2026-06-02
+last_verified: 2026-07-06
+sources:
+  - url: https://www.nsw.gov.au/housing-and-construction/strata/strata-publications/10-year-capital-works-fund-plan-strata
+    retrieved: 2026-07-06
+    note: "NSW Government — mandatory 10-year capital works fund plan (standard form)"
+  - url: https://www.consumer.vic.gov.au/housing/owners-corporations/property-maintenance/maintenance-plan
+    retrieved: 2026-07-06
+    note: "Consumer Affairs Victoria — tier 1 and tier 2 owners corporations must have a maintenance plan and a maintenance fund"
+  - url: https://www.legislation.qld.gov.au/view/pdf/inforce/current/sl-2020-0233
+    retrieved: 2026-07-06
+    note: "QLD Body Corporate and Community Management (Standard Module) Regulation 2020 s160 — sinking fund budget must reserve amounts to meet anticipated major expenditure over at least the next 9 years; current as at 1 Aug 2025 (read via WebFetch-to-disk + pdftotext)"
 ---
 
 # Strata / owners-corporation health — the adequacy rubric

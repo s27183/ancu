@@ -1,7 +1,13 @@
 ---
 slug: kb.investor.scale-up-using-equity
 effective_from: 2025-07-01
-last_verified: 2026-06-23
+last_verified: 2026-07-06
+sources:
+  - url: https://moneysmart.gov.au/how-to-invest/borrowing-to-invest
+    retrieved: 2026-07-06
+  - url: https://www.apra.gov.au/prudential-practice-guide-apg-223-residential-mortgage-lending
+    retrieved: 2026-07-06
+    path: docs/sources/apra/apg-223-residential-mortgage-lending_0.pdf
 ---
 
 # Scaling up using equity

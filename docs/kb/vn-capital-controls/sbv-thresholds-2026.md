@@ -2,6 +2,8 @@
 slug: kb.vn-capital-controls.sbv-thresholds-2026
 effective_from: 2026-07-03
 last_verified: 2026-07-03
+sources:
+  - note: "PLACEHOLDER — VN-legal-counsel-gated blocker (strategy §9). SBV outbound-transfer approval threshold(s), registration mechanics, and the current governing circular for an individual funding an offshore property purchase have not been verified against an SBV primary or VN legal counsel. Reconfirmed as an open, intentional deferral during the 2026-07-06 Phase B backfill — not resolved here."
 ---
 
 # ⚠ PLACEHOLDER — SBV outbound transfer thresholds (NOT SOURCE-GROUNDED)
@@ -26,7 +28,7 @@ Before this doc's quantitative content can leave placeholder status, verify agai
 
 1. The current **SBV circular governing foreign-exchange management for outward remittance / overseas investment by residents** (the FX management law + its implementing circulars — cite the specific circular number and effective date once sourced).
 2. A **licensed VN bank's own compliance/FX desk** guidance for outward property-investment remittances (a provider-primary, per [[kb-doc-authoring]]'s "ask Son for the source doc before resigning to placeholder" move).
-3. **VN legal counsel** engaged for the Mode-B wedge (strategy §9's named blocker) — the authoritative source for a regulated determination this specific, in a jurisdiction FirstHomey does not operate a licensed presence in.
+3. **VN legal counsel** engaged for the Mode-B wedge (strategy §9's named blocker) — the authoritative source for a regulated determination this specific, in a jurisdiction Rau does not operate a licensed presence in.
 
 ## Buyer / funder pointer (what the plan says today)
 

@@ -1,14 +1,16 @@
 #!/usr/bin/env escript
 %%! -sname fh_investor_seam_smoke
 %%
-%% Full-stack LIVE smoke for the Mode-C investor turn (P5-activate close-out).
+%% Full-stack LIVE smoke for the Mode-C investor turn (P5-activate close-out; extended
+%% 2026-07-10 to the 10-component spine — the B/C/D lifecycle-spine restructure, task 7).
 %% Clones seam_smoke (the Mode-A harness) with intent=investment: boots the engine,
 %% seeds a tenant + ed25519 signing key, mints a JWT, POSTs plan-card creation, and
-%% drives the real /api/engine/* HTTP/SSE surface through the 8-component investor base
+%% drives the real /api/engine/* HTTP/SSE surface through the 10-component investor base
 %% spine end-to-end — asserting the event sequence, the persisted log, the compliance
 %% audit trail, the content_jsonb snapshot (incl. the live LLM-backed investor outcome
-%% shapes), cancel idempotency, and auth rejection. Proves the HTTP->turn glue for Mode C
-%% (the one link P5-activate left unproven-in-integration).
+%% shapes AND the resolver-placed purchase_journey/phase_playbook), cancel idempotency,
+%% and auth rejection. Proves the HTTP->turn glue for Mode C's restructured spine — the
+%% link task 5/6 (ui_tabs + shell) built on top of but didn't themselves prove live.
 %%
 %% Run LIVE (real Opus sidecar fills — metered) from engine/erlang:
 %%
@@ -57,22 +59,24 @@ main(_) ->
     %% --- persisted event log is the SOT (count matches the stream) ---
     EventCount = scalar("SELECT count(*) FROM plan_card_events WHERE plan_card_id = $1",
                         [PlanCardId]),
-    expect(EventCount =:= 37, "37 events persisted (1 + 8×(3 gate + 1 filled) + 3 usage + 1)"),
+    expect(EventCount =:= 45, "45 events persisted (1 + 10×(3 gate + 1 filled) + 3 usage + 1)"),
 
-    %% --- compliance audit trail: one audit_events row per (component, gate) = 3 × 8 = 24,
+    %% --- compliance audit trail: one audit_events row per (component, gate) = 3 × 10 = 30,
     %%     every one `clear` on the Mode-C healthy path. ASIC boundary_held lands ONLY on
     %%     mortgage_finance: the investor spine carries no `eligibility` (FHB-only), and
-    %%     advice_adjacent/1 lists only mortgage_finance + eligibility. tax_structure and
-    %%     investment_strategy clear with no_advice_surface — the ASIC line is held at the
-    %%     producer (§98 figure-tightness, schema-as-constraint enums), the audit `detail`
-    %%     is the attestation record. (Flagged: whether the entity/strategy attestation
-    %%     should also record boundary_held is a separate compliance-record refinement.) ---
+    %%     advice_adjacent/1 lists only mortgage_finance + eligibility. tax_structure,
+    %%     investment_strategy, purchase_journey, and phase_playbook all clear with
+    %%     no_advice_surface — the ASIC line is held at the producer (§98 figure-tightness,
+    %%     schema-as-constraint enums; phase_playbook's risks are KB-grounded, never
+    %%     LLM-authored), the audit `detail` is the attestation record. (Flagged: whether the
+    %%     entity/strategy attestation should also record boundary_held is a separate
+    %%     compliance-record refinement.) ---
     AuditCount = scalar("SELECT count(*) FROM audit_events WHERE plan_card_id = $1",
                         [PlanCardId]),
-    expect(AuditCount =:= 24, "24 audit_events rows (3 gates × 8 components)"),
+    expect(AuditCount =:= 30, "30 audit_events rows (3 gates × 10 components)"),
     ClearCount = scalar("SELECT count(*) FROM audit_events WHERE plan_card_id = $1 "
                         "AND compliance_jsonb->>'disposition' = 'clear'", [PlanCardId]),
-    expect(ClearCount =:= 24, "all 24 audit rows disposition=clear (Mode-C healthy)"),
+    expect(ClearCount =:= 30, "all 30 audit rows disposition=clear (Mode-C healthy)"),
     AsicHeld = scalar("SELECT count(*) FROM audit_events WHERE plan_card_id = $1 "
                       "AND compliance_jsonb->>'gate' = 'asic' "
                       "AND compliance_jsonb->>'detail' = 'decision_support_boundary_held'",
@@ -82,16 +86,17 @@ main(_) ->
                           "AND fill_path = 'two_path'", [PlanCardId]),
     expect(TwoPathAudit =:= 9, "9 two_path audit rows (3 two-path components × 3 gates)"),
 
-    %% --- content_jsonb snapshot holds all 8 investor base components ---
+    %% --- content_jsonb snapshot holds all 10 investor base components ---
     {200, CardResp} = req(get, Base ++ "/plan-cards/" ++ binary_to_list(PlanCardId),
                           [Auth], <<>>),
     #{<<"content">> := #{<<"components">> := Components}} =
         fh_engine_util:json_decode(CardResp),
-    expect(map_size(Components) =:= 8, "8 components snapshotted into content_jsonb"),
+    expect(map_size(Components) =:= 10, "10 components snapshotted into content_jsonb"),
     [expect(maps:is_key(N, Components), binary_to_list(N) ++ " component present")
      || N <- [<<"investor_profile">>, <<"investment_strategy">>, <<"mortgage_finance">>,
               <<"yield_modelling">>, <<"tax_structure">>, <<"cash_position">>,
-              <<"ownership_planning_investor">>, <<"disposition">>]],
+              <<"ownership_planning_investor">>, <<"disposition">>,
+              <<"purchase_journey">>, <<"phase_playbook">>]],
 
     %% --- the genuine Mode-C proof: the LIVE LLM-backed investor outcomes actually landed
     %%     (not just that 8 slots exist). Each two-path component's agent leaf surfaced its
@@ -122,6 +127,32 @@ main(_) ->
                maps:get(<<"io_vs_pi_recommendation">>, Mort),
                maps:get(<<"recommended_entity">>, Tax)]),
 
+    %% --- the restructure's own proof: purchase_journey/phase_playbook fired the Mode-C
+    %%     (not Mode-A) branch, live. At this base, property-less, income-less turn every
+    %%     upstream cash_events source is honestly empty (no property, no income captured),
+    %%     so cell amounts and budget_refs are correctly null throughout — that positive case
+    %%     (a real amount/ref landing) is proven by cash_position_investor_conformance.escript's
+    %%     per-property harvest assertions instead. What THIS live turn proves is that the
+    %%     investor-specific KB content — not Mode A's — actually rendered through the real
+    %%     resolver over HTTP/SSE: the six-actor set and the investor phase_playbook content. ---
+    Journey = Out(<<"purchase_journey">>),
+    JActorIds = [maps:get(<<"id">>, A) || A <- maps:get(<<"actors">>, Journey, [])],
+    expect(lists:sort(JActorIds) =:=
+             lists:sort([<<"you">>, <<"government">>, <<"lender">>,
+                         <<"property_manager">>, <<"tenant">>, <<"services">>]),
+           "purchase_journey six-actor investor set (property_manager/tenant, live)"),
+    JPhaseIds = [maps:get(<<"id">>, P) || P <- maps:get(<<"phases">>, Journey, [])],
+    expect(lists:member(<<"own">>, JPhaseIds), "purchase_journey has the own/Hold phase"),
+    Playbook = Out(<<"phase_playbook">>),
+    PbPhases = maps:get(<<"phases">>, Playbook, []),
+    expect(length(PbPhases) > 0, "phase_playbook has phases (investor KB content live)"),
+    OwnPbPhase = hd([P || P <- PbPhases, maps:get(<<"phase">>, P) =:= <<"own">>]),
+    OwnActionIds = [maps:get(<<"id">>, A) || A <- maps:get(<<"actions">>, OwnPbPhase, [])],
+    expect(lists:member(<<"lodge_annual_return">>, OwnActionIds),
+           "phase_playbook own-phase carries the investor lodge_annual_return action (kb.journey.investor-phase-actions, live)"),
+
+    io:format("live journey/playbook: actors=~p own_actions=~p~n", [JActorIds, OwnActionIds]),
+
     %% --- cancel is idempotent: turn already finished -> 204 ---
     {204, _} = req(post, Base ++ "/plan-cards/" ++ binary_to_list(PlanCardId) ++ "/cancel",
                    [Auth], <<>>),
@@ -137,12 +168,15 @@ main(_) ->
     io:format("~n==== INVESTOR SEAM SMOKE: ALL ASSERTIONS PASSED ====~n"),
     halt(0).
 
-%% The investor base spine (?BASE_COMPONENTS_INVESTOR, 8 components). Each emits THREE
-%% compliance_gate events before its component_filled; the THREE two-path components
-%% (investment_strategy, mortgage_finance, tax_structure) each emit a `usage` right after
-%% their fill, from the sidecar. Order is discriminator-load-bearing (strategy before
-%% mortgage; tax_structure + budget_envelope_investor before disposition; tax before cash).
-%% 1 + 8×(3 gate + 1 filled) + 3 usage + 1 = 37.
+%% The investor base spine (?BASE_COMPONENTS_INVESTOR, 10 components — purchase_journey/
+%% phase_playbook added 2026-07-10, task 4). Each emits THREE compliance_gate events before
+%% its component_filled; the THREE two-path components (investment_strategy, mortgage_finance,
+%% tax_structure) each emit a `usage` right after their fill, from the sidecar. Order is
+%% discriminator-load-bearing (strategy before mortgage; tax_structure + budget_envelope_investor
+%% before disposition; tax before cash; disposition before ownership_planning_investor — NOT the
+%% reverse); purchase_journey/phase_playbook run LAST (resolvers, no usage), mirroring the
+%% Mode-E harness (mode_e_seam_smoke.escript).
+%% 1 + 10×(3 gate + 1 filled) + 3 usage + 1 = 45.
 expected_sequence() ->
     Gates = [<<"compliance_gate">>, <<"compliance_gate">>, <<"compliance_gate">>],
     CF = <<"component_filled">>,
@@ -155,8 +189,10 @@ expected_sequence() ->
        Gates, CF,           %% yield_modelling             (resolver)
        Gates, CF, U,        %% tax_structure               (two_path)
        Gates, CF,           %% cash_position               (resolver)
-       Gates, CF,           %% ownership_planning_investor (resolver)
        Gates, CF,           %% disposition                 (resolver)
+       Gates, CF,           %% ownership_planning_investor (resolver)
+       Gates, CF,           %% purchase_journey            (resolver)
+       Gates, CF,           %% phase_playbook              (resolver)
        <<"turn_completed">>]).
 
 %% --- helpers (identical to seam_smoke) ---------------------------------------

@@ -2,6 +2,12 @@
 slug: kb.investor.target-yield-by-archetype
 effective_from: 2026-06-26
 last_verified: 2026-06-26
+sources:
+  # PLACEHOLDER doc — figures are NOT source-grounded (Son's call 2026-06-26). The entry below
+  # is the named re-grounding candidate (CoreLogic/Cotality gross-yield-by-dwelling-type), not a
+  # validation of the archetype defaults. Re-ground and bump last_verified before surfacing as authoritative.
+  - url: https://propertyinvestmentprofessionals.com.au/research-insights/cotality-housing-chart-pack-april-2026-investor-analysis
+    retrieved: 2026-07-06
 ---
 
 # Default target gross yield by strategy archetype — PLACEHOLDER (pending authoritative source)

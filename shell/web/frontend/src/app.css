@@ -230,6 +230,34 @@ body {
     color: var(--ink);
     word-break: break-all;
 }
+
+/* Usage summary (8-S5g) — tier + this-period tokens/cost, inside the account sheet. */
+.account-usage {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 0.85rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg);
+}
+.account-usage-tier {
+    font-weight: 600;
+    font-size: 0.92rem;
+}
+.account-usage-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    font-size: 0.85rem;
+}
+.account-usage-label {
+    color: var(--muted);
+}
+.account-usage-value {
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+}
 .account-action {
     display: inline-flex;
     align-items: center;
@@ -341,7 +369,7 @@ main {
    normal-flow child so it stacks under the toggle. */
 .controls-cluster {
     position: absolute;
-    top: calc(var(--header-h) + 0.75rem);
+    top: calc(var(--header-h) + var(--home-news-h, 0px) + 0.75rem);
     left: 0.75rem;
     z-index: 12;
     display: flex;
@@ -600,27 +628,6 @@ main {
     border-radius: 999px;
     background: #cbd5e1;
     border: 1px solid #fff;
-}
-
-/* Overview hint for intensive criteria (no heatmap) — a calm centred glass pill. */
-.zoom-hint {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 10;
-    padding: 0.5rem 0.9rem;
-    border-radius: 999px;
-    background: var(--glass-bg);
-    -webkit-backdrop-filter: var(--glass-blur);
-    backdrop-filter: var(--glass-blur);
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--shadow-1);
-    font-size: 0.82rem;
-    font-weight: 500;
-    color: var(--ink);
-    pointer-events: none;
-    white-space: nowrap;
 }
 
 /* Loading / error — calm, centred, never alarming (§7.1). */
@@ -1084,7 +1091,7 @@ main {
 /* Calm sign-in banner — top-centre, status not alarm; emerald when ok. */
 .signin-banner {
     position: absolute;
-    top: calc(var(--header-h) + 0.75rem);
+    top: calc(var(--header-h) + var(--home-news-h, 0px) + 0.75rem);
     left: 50%;
     transform: translateX(-50%);
     z-index: 36;
@@ -1257,6 +1264,18 @@ main {
     gap: 1rem;
 }
 
+/* Sticky region atop the scrolling sheet body (.sheet .body is the scroll region): the
+   lifecycle sub-tab rail. (Used to also carry the KB-news ticker, first above this
+   region then as a .pp-sticky-bottom footer below the tab content — removed
+   2026-07-09, Son's call: the homepage's unfiltered ticker is enough. See
+   PlanProjection.svelte for the removal note; backend untouched.) */
+.pp-sticky-top {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: var(--bg);
+}
+
 /* Plan sub-tabs — a horizontally-scrollable pill row; one section shows at a time. */
 /* Segmented control — one container guiding the lifecycle flow (the prototype's nav),
    not separate pills. Scrolls horizontally on narrow surfaces; the buttons grow to fill
@@ -1265,12 +1284,6 @@ main {
     display: flex;
     gap: 0.2rem;
     overflow-x: auto;
-    /* Sticky to the top of the scrolling sheet body (.sheet .body is the scroll region),
-       so the view switcher (Overview/Flow/Budget/Q&A) stays reachable while the plan
-       scrolls. The solid --bg + z-index keep scrolled content from showing through. */
-    position: sticky;
-    top: 0;
-    z-index: 5;
     margin: 0 0 0.85rem;
     padding: 0.25rem;
     background: var(--bg);
@@ -1306,6 +1319,300 @@ main {
     box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
 }
 
+/* Grouped rail (2026-07-09, Son's request): a two-row layout past
+   RAIL_GROUP_THRESHOLD rail tabs (PlanProjection.svelte) — row 1 is always-visible
+   navigation (Overview / Buy-Hold group toggle / Q&A), row 2 is the active group's
+   tabs. Under the threshold, .pp-subtabs-outer wraps a single unchanged row. */
+.pp-subtabs-outer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin: 0 0 0.85rem;
+}
+.pp-subtabs-outer .pp-subtabs {
+    margin: 0;
+}
+/* The group toggle gets its own active look (soft accent wash, not the white
+   raised-chip look of a destination tab) so it visually reads as "currently filtered
+   to," not "currently open" — that distinction is the row split's whole point. */
+.pp-railgroup-btn.active {
+    background: var(--accent-soft);
+    color: var(--accent);
+    box-shadow: none;
+}
+
+/* KB-news ticker (kb-news-feature.md, task 29) — a slim strip cycling one relevant,
+   non-dismissed news headline at a time, sitting above the sub-tab rail inside the
+   shared .pp-sticky-top region. Arrow buttons flank the headline when there's more
+   than one note; swipe works too (NewsTicker.svelte). Tapping the headline is wired
+   to task 28's detail sheet + tile highlight (a no-op until that's built). */
+.pp-ticker {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin: 0.25rem 0.25rem 0.6rem;
+    padding: 0.45rem 0.6rem;
+    background: var(--accent-soft);
+    border: 1px solid var(--accent);
+    border-radius: 0.5rem;
+}
+.pp-ticker-nav {
+    flex: none;
+    border: none;
+    background: transparent;
+    color: var(--accent);
+    font-size: 1.1rem;
+    line-height: 1;
+    padding: 0.1rem 0.4rem;
+    border-radius: 0.35rem;
+    cursor: pointer;
+}
+.pp-ticker-nav:hover {
+    background: var(--accent);
+    color: #fff;
+}
+.pp-ticker-headline {
+    flex: 1 1 auto;
+    min-width: 0;
+    border: none;
+    background: transparent;
+    color: var(--ink);
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-align: left;
+    white-space: normal;
+    overflow-wrap: break-word;
+    cursor: pointer;
+    padding: 0.1rem 0;
+}
+
+/* Homepage KB-news ticker band (kb-news-feature.md "Homepage ticker", 2026-07-08): the
+   SAME NewsTicker.svelte / .pp-ticker chrome, unfiltered by relevance, floating full-
+   width just below the header. (A separate, relevance-filtered per-card ticker used to
+   live inside PlanProjection too — removed 2026-07-09, Son's call, homepage-only now.)
+   Height is measured (bind:clientHeight in +page.svelte) into --home-news-h, which
+   .controls-cluster/.signin-banner read to shift down when present — never a hardcoded
+   offset (that's exactly the task-29 regression this codebase already learned from
+   once). */
+.home-news-band {
+    position: absolute;
+    top: var(--header-h);
+    left: 0;
+    right: 0;
+    z-index: 15;
+}
+.home-news-band .pp-ticker {
+    margin: 0;
+    border-radius: 0;
+    border: none;
+}
+
+/* Screen-reader-only utility: visually hidden, still in the accessibility tree.
+   Used by the marquee ticker's non-moving equivalent list (below). */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Marquee variant (kb-news-feature.md "Homepage ticker", extended 2026-07-09;
+   restyled 2026-07-09 to a solid, borderless CNBC/Bloomberg-style band per feedback
+   that the old accent-soft/bordered chrome read as a form field, not a news strip).
+   Two identical .pp-ticker-marquee-run copies back to back; the track scrolls
+   exactly one run's width (translateX(-50%) of the two-run track) for a seamless
+   loop — see NewsTicker.svelte for why. */
+.pp-ticker-marquee {
+    gap: 0.6rem;
+    background: var(--ink);
+    border: none;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.18);
+}
+.pp-ticker-label {
+    flex: none;
+    padding: 0.2rem 0.55rem;
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    border-radius: 999px;
+}
+/* Pause/play (WCAG 2.2.2 — see NewsTicker.svelte): kept, but demoted to a small,
+   low-contrast icon at the strip's end so it reads as a utility control, not a
+   headline-level element — it's there for touch/keyboard users who can't hover to
+   pause, not a feature to draw the eye. */
+.pp-ticker-pause {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.65);
+    padding: 0.3rem;
+    border-radius: 0.35rem;
+    cursor: pointer;
+}
+.pp-ticker-pause:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+}
+.pp-ticker-marquee-viewport {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+}
+.pp-ticker-marquee-track {
+    display: flex;
+    width: max-content;
+    animation-name: pp-ticker-scroll;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+.pp-ticker-marquee:hover .pp-ticker-marquee-track,
+.pp-ticker-marquee:focus-within .pp-ticker-marquee-track {
+    animation-play-state: paused;
+}
+.pp-ticker-marquee-run {
+    display: flex;
+    align-items: center;
+    flex: none;
+    white-space: nowrap;
+}
+.pp-ticker-marquee-item {
+    flex: none;
+    border: none;
+    background: transparent;
+    color: #fff;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+}
+.pp-ticker-sep {
+    flex: none;
+    color: rgba(255, 255, 255, 0.4);
+    margin: 0 1rem;
+}
+@keyframes pp-ticker-scroll {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(-50%);
+    }
+}
+/* Reduced motion: stop the loop and let the (now single, un-duplicated-looking)
+   run be scrolled manually instead of forcing continuous motion. More specific
+   than the app-wide `* { animation-duration: 0.01ms }` catch-all, so this wins
+   cleanly rather than leaving a near-zero-duration animation flickering. */
+@media (prefers-reduced-motion: reduce) {
+    .pp-ticker-marquee-track {
+        animation: none !important;
+    }
+    .pp-ticker-marquee-viewport {
+        overflow-x: auto;
+    }
+    .pp-ticker-marquee-run:nth-child(2) {
+        display: none;
+    }
+}
+
+/* News detail sheet (kb-news-feature.md task 28) — content inside NewsDetailSheet.svelte's
+   Modal. summary reuses .pp-card's ink/font sizing conventions rather than inventing new
+   ones; it's rendered via renderInlineMarkdown (2026-07-09) since KB summaries carry
+   **bold**/*italic* — the raw diff JSON is intentionally NOT shown here (it's a build-time
+   audit artifact, not buyer-facing content; see NewsDetailSheet.svelte). */
+/* Category + date meta line (2026-08) — sits between the Modal's own headline title and
+   the summary body, so a note's "what kind of update, how recent" reads before its "what
+   changed" without repeating the headline (Modal already shows that as the sheet title). */
+.pp-news-meta {
+    margin: 0 0 0.6rem;
+    font-size: 0.75rem;
+    line-height: 1.3;
+}
+.pp-news-meta-cat {
+    font-weight: 800;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+.pp-news-meta-date {
+    color: var(--muted);
+}
+.pp-news-summary {
+    margin: 0 0 0.75rem;
+    color: var(--ink);
+    font-size: 0.92rem;
+    line-height: 1.45;
+}
+.pp-news-summary strong {
+    font-weight: 700;
+}
+.pp-news-summary code {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 0.25rem;
+    padding: 0.05rem 0.3rem;
+    font-size: 0.85em;
+}
+.pp-news-source {
+    display: inline-block;
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: underline;
+}
+/* Dismiss (task 31) reuses .primary (the shared full-width affirmative-action style) —
+   just needs breathing room above it when a source link precedes it. */
+.pp-news-dismiss {
+    margin-top: 1rem;
+}
+
+/* News overview sheet (kb-news-feature.md "News overview sheet") — content inside
+   NewsListSheet.svelte's Modal. Category tabs (Tabs.svelte, 2026-08) sit above a single
+   item list — the item count that used to sit in a section heading now rides in each
+   tab's own label ("Category · N"). Scrolling comes free from Modal's .mo-body. */
+.pp-news-list-items {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.pp-news-list-items li + li {
+    border-top: 1px solid var(--border);
+}
+.pp-news-list-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    width: 100%;
+    text-align: left;
+    border: none;
+    background: transparent;
+    padding: 0.6rem 0.1rem;
+    cursor: pointer;
+}
+.pp-news-list-item-headline {
+    color: var(--ink);
+    font-size: 0.88rem;
+    font-weight: 600;
+    line-height: 1.4;
+}
+.pp-news-list-item:hover .pp-news-list-item-headline {
+    color: var(--accent);
+}
+.pp-news-list-item-date {
+    color: var(--muted);
+    font-size: 0.72rem;
+    line-height: 1.3;
+}
+
 /* Property bar (Mode-C Phase-B) — the base-vs-property selector + the attach entry point.
    The selector (Tabs) takes the available width; the attach button sits at the end. */
 .pp-propbar {
@@ -1315,7 +1622,7 @@ main {
     margin: 0 0 0.75rem;
     flex-wrap: wrap;
 }
-.pp-propbar .tabrail {
+.pp-propbar .tabrail-wrap {
     flex: 1 1 auto;
     min-width: 0;
 }
@@ -1532,12 +1839,13 @@ main {
 }
 
 /* The Budget tab's sub-rail (Tabs.svelte) shares the .sheet .body scroll with the sticky
-   top-level .pp-subtabs, so it must stick just BELOW that rail. --tabrail-top ≈ the
-   .pp-subtabs height; slightly under-set so the budget rail tucks under (never a gap —
-   .pp-subtabs has the higher z-index and an opaque bg, so the small overlap is hidden). */
-.pp-calc {
-    --tabrail-top: 2.2rem;
-}
+   .pp-sticky-top region (ticker + top-level .pp-subtabs), so it must stick just BELOW
+   that region. --tabrail-top is set inline on .pp-subcontent (PlanProjection.svelte)
+   from that region's REAL measured height (bind:clientHeight) — not a hardcoded rem —
+   because the ticker's presence/height varies (no news → 0; a wrapped headline → taller
+   than the bare subtabs rail a fixed value was once calibrated to). .pp-sticky-top's
+   higher z-index + opaque bg keep the small intentional overlap invisible.
+*/
 
 /* Cash-calculator cockpit — the prototype's interactive input form (engine-driven). */
 .pp-calc-intro {
@@ -1676,6 +1984,7 @@ main {
     border-radius: var(--radius);
     padding: 0.75rem 0.85rem;
     background: var(--surface);
+    transition: border-color var(--t-fast, 0.15s) var(--ease, ease), box-shadow var(--t-fast, 0.15s) var(--ease, ease);
 }
 /* Borderless variant — the Flow + Budget containers (their spine renderers carry their own
    framing: the swimlane grid, the budget table). */
@@ -1718,6 +2027,13 @@ main {
 }
 .pp-value.pp-neg {
     color: #b91c1c; /* red-700 — a cash gap reads as attention, calmly */
+}
+/* a wrapping row of Chip atoms (mirrors SummaryCard's .rb-chips) */
+.pp-chips-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0.4rem 0;
 }
 .pp-pending {
     font-size: 0.9rem;
@@ -1844,6 +2160,11 @@ main {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    /* Fixed viewport share so the composer stays put as the transcript grows — the
+       log scrolls internally instead of pushing the input down the sheet. */
+    max-height: 45vh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
 }
 .chat-msg {
     max-width: 85%;
@@ -1863,8 +2184,6 @@ main {
 }
 .chat-msg.assistant {
     align-self: flex-start;
-    background: var(--surface);
-    border: 1px solid var(--border);
     color: var(--ink);
 }
 .chat-status {
@@ -1892,6 +2211,11 @@ main {
 }
 .chat-input input:disabled {
     opacity: 0.6;
+}
+.chat-input button {
+    width: auto;
+    flex: 0 0 auto;
+    white-space: nowrap;
 }
 .chat-input button:disabled {
     opacity: 0.5;

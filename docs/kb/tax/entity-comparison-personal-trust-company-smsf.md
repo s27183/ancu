@@ -1,7 +1,19 @@
 ---
 slug: kb.tax.entity-comparison-personal-trust-company-smsf
 effective_from: 2025-07-01
-last_verified: 2026-06-23
+last_verified: 2026-07-06
+sources:
+  - url: https://www.ato.gov.au/individuals-and-families/investments-and-assets/capital-gains-tax/cgt-discount
+    retrieved: 2026-07-06
+  - url: https://www.ato.gov.au/individuals-and-families/super-for-individuals-and-families/self-managed-super-funds-smsf/smsf-investing/restrictions-on-smsf-investments/smsf-borrowing-restrictions/limited-recourse-borrowing-arrangements
+    retrieved: 2026-06-23
+  - url: https://www.ato.gov.au/individuals-and-families/super-for-individuals-and-families/self-managed-super-funds-smsf/smsf-investing/restrictions-on-smsf-investments/smsf-borrowing-restrictions
+    retrieved: 2026-06-23
+  - url: https://www.legislation.gov.au/C2026A00049/latest/text
+    retrieved: 2026-07-06
+    path: docs/sources/legislation/treasury-laws-amendment-tax-reform-no-1-act-2026-no49.pdf
+  - url: https://www.aph.gov.au/Parliamentary_Business/Bills_Legislation/Bills_Search_Results/Result?bId=r7493
+    retrieved: 2026-07-06
 ---
 
 # Ownership entity — comparison for property investment
@@ -26,7 +38,7 @@ An investment property can be held in several **ownership structures**, each wit
 | **SMSF** | 33⅓% (complying super fund) | stays in the fund; cannot offset personal income | strong (super law) | **high** (strict compliance) | sole-purpose test; **no member/related-party use**; can't acquire residential from a related party; arm's length |
 | **SMSF with LRBA** | 33⅓% | stays in the fund | strong | **highest** | borrowing only via a Limited Recourse Borrowing Arrangement (single acquirable asset in a holding trust) |
 
-† Negative-gearing deductibility against other income is **current law** and is subject to the announced 2026-27 Budget reform (limited to new builds from 1 July 2027, proposed, not yet law — see the reform note below).
+† Negative-gearing deductibility against other income is **current law** and is subject to the enacted 2026-27 Budget reform (limited to new builds from 1 July 2027 — Act No. 49 of 2026, now law, effective 1 July 2027; see the reform note below).
 
 ## Personal ownership (sole / joint)
 
@@ -55,14 +67,14 @@ A self-managed super fund can hold investment property inside the concessional s
 
 Because SMSF tax and compliance are complex and member-specific, the plan **does not compute** an SMSF tax position — it surfaces the structure and its restrictions and defers the assessment to a licensed SMSF specialist.
 
-## Announced reform — 2026-27 Federal Budget (proposed, not yet law)
+## Enacted reform — Tax Reform No. 1 Act 2026 (takes effect 1 July 2027)
 
-The reform that replaces the **50% CGT discount with cost-base indexation + a 30% minimum tax** (individuals, trusts and partnerships) and **limits negative gearing to new builds** from **1 July 2027** (*Treasury Laws Amendment (Tax Reform No. 1) Bill 2026* — introduced, not yet passed) **shifts this comparison** for any purchase after Budget night (7:30pm AEST 12 May 2026):
+The reform that replaces the **50% CGT discount with cost-base indexation + a 30% minimum tax** (individuals, trusts and partnerships) and **limits negative gearing to new builds** from **1 July 2027** is now **law** — the *Treasury Laws Amendment (Tax Reform No. 1) Act 2026* (**Act No. 49 of 2026**, passed both Houses 25 June 2026, assented 26 June 2026, effective 1 July 2027) — and **shifts this comparison** for any purchase after Budget night (7:30pm AEST 12 May 2026):
 
 - The **CGT-discount advantage** of personal/trust ownership over a company narrows — the discount that distinguished them would become indexation for individuals/trusts/partnerships. (Company and SMSF treatment under the reform: confirm with a registered tax agent.)
 - The **loss-offset advantage** of personal ownership over a trust narrows for **established** property — the wage offset is removed for established post-Budget purchases, leaving losses to carry forward (closer to the trust's already-trapped treatment).
 
-The comparison above reflects **current law**; the agent flags the reform when it suggests a structure and defers the post-2027 implications to a registered tax agent.
+The comparison above reflects **current law** (which applies until 1 July 2027); the agent flags the enacted reform (Act No. 49 of 2026, in effect from 1 July 2027) when it suggests a structure and defers the post-2027 implications to a registered tax agent. The specific mechanics reflect the reform's announced design; the Bill was amended in the Senate on 25 June 2026, so the fine detail must be reconfirmed against the enacted Act.
 
 ## Relevance for Vietnamese-Australian investors (Mode C)
 
@@ -119,6 +131,8 @@ Notes:
 - ATO — *Limited recourse borrowing arrangements* (an SMSF may borrow only via an LRBA — a single acquirable asset held in a holding trust, limited recourse) — https://www.ato.gov.au/individuals-and-families/super-for-individuals-and-families/self-managed-super-funds-smsf/smsf-investing/restrictions-on-smsf-investments/smsf-borrowing-restrictions/limited-recourse-borrowing-arrangements
 - ATO — *SMSF borrowing restrictions* (related-party acquisition restrictions; arm's-length dealing) — https://www.ato.gov.au/individuals-and-families/super-for-individuals-and-families/self-managed-super-funds-smsf/smsf-investing/restrictions-on-smsf-investments/smsf-borrowing-restrictions
 
-**Announced reform (proposed, not yet law — verified 2026-06-23):**
+**Enacted reform (now law — verified 2026-07-06):**
 
-- ATO — *Tax reform – Boosting home ownership – Reforming negative gearing and capital gains tax* (50% discount → indexation + 30% minimum tax; negative gearing limited to new builds from 1 July 2027; not yet law) — https://www.ato.gov.au/about-ato/new-legislation/in-detail/individuals/tax-reform-boosting-home-ownership-reforming-negative-gearing-and-capital-gains-tax
+- Federal Register of Legislation — *Treasury Laws Amendment (Tax Reform No. 1) Act 2026* (**Act No. 49 of 2026**, registered 26 June 2026; 50% discount → indexation + 30% minimum tax; negative gearing limited to new builds from 1 July 2027) — https://www.legislation.gov.au/C2026A00049/latest/text (archived: `docs/sources/legislation/treasury-laws-amendment-tax-reform-no-1-act-2026-no49.pdf`)
+- Parliament of Australia — *Treasury Laws Amendment (Tax Reform No. 1) Bill 2026* (passed both Houses 25 Jun 2026; assent 26 Jun 2026, Act No. 49, 2026) — https://www.aph.gov.au/Parliamentary_Business/Bills_Legislation/Bills_Search_Results/Result?bId=r7493
+- ATO — *Tax reform – Boosting home ownership – Reforming negative gearing and capital gains tax* (50% discount → indexation + 30% minimum tax; negative gearing limited to new builds from 1 July 2027) — https://www.ato.gov.au/about-ato/new-legislation/in-detail/individuals/tax-reform-boosting-home-ownership-reforming-negative-gearing-and-capital-gains-tax (verified 2026-06-23; ATO blocks automated fetch)

@@ -1,7 +1,10 @@
 ---
 slug: kb.scheme.fhss
 effective_from: 2024-09-15
-last_verified: 2026-05-30
+last_verified: 2026-07-06
+sources:
+  - url: https://firsthomebuyers.gov.au/first-home-super-saver-scheme
+    retrieved: 2026-07-06
 ---
 
 # First Home Super Saver scheme (FHSS)

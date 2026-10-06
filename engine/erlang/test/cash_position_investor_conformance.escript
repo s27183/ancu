@@ -45,11 +45,14 @@ main(_) ->
 
 %% --- fixtures ----------------------------------------------------------------
 
-%% the nine budget_envelope_investor figure fields the registry declares.
+%% the ten budget_envelope_investor fields the registry declares — the original nine
+%% figures plus cash_events (added 2026-07-10, task 4: cash_position emits the acquire-phase
+%% cash_events purchase_journey/phase_playbook harvest).
 fields() ->
     [<<"actual_property_price">>, <<"max_property_price_supported">>,
      <<"total_cash_required">>, <<"loan_amount">>, <<"lvr">>, <<"lmi_payable">>,
-     <<"gap_or_surplus">>, <<"verdict">>, <<"mitigation_options_if_short">>].
+     <<"gap_or_surplus">>, <<"verdict">>, <<"mitigation_options_if_short">>,
+     <<"cash_events">>].
 
 %% the eight fields that are null at base (everything except the empty mitigation list).
 null_at_base() ->
@@ -92,10 +95,12 @@ scaffold_cases() ->
         [check(<<"input-independent (bare upstream) null: ", F/binary>>, g(OBare, F), null)
          || F <- null_at_base()],
     [check("renderer = calculator", Rend, <<"calculator">>),
-     check("outcome has exactly the nine budget_envelope_investor fields",
+     check("outcome has exactly the ten budget_envelope_investor fields",
            lists:sort(maps:keys(O)), lists:sort(fields())),
      check("mitigation_options_if_short = [] (honest empty, no shortfall known)",
            g(O, <<"mitigation_options_if_short">>), []),
+     check("cash_events = [] (honest empty, no acquisition figures known at base)",
+           g(O, <<"cash_events">>), []),
      check("kb_versions = the six cash anchors",
            lists:sort(KbSlugs),
            lists:sort([<<"kb.stamp-duty.calc-by-state">>,
@@ -124,7 +129,7 @@ validate(Bp, Type, O) ->
 discriminator_cases() ->
     {Inv, _, _} = fh_engine_fill:resolver(<<"cash_position">>, #{}, inv_upstream()),
     {Fhb, FhbRend, _} = fh_engine_fill:resolver(<<"cash_position">>, #{}, fhb_upstream()),
-    [check("present → investor branch (nine-field set)",
+    [check("present → investor branch (ten-field set)",
            lists:sort(maps:keys(Inv)), lists:sort(fields())),
      check("present → investor branch has NO FHB stamp_duty key",
            maps:is_key(<<"stamp_duty">>, Inv), false),
@@ -183,7 +188,16 @@ per_property_cases() ->
            g(O, <<"gap_or_surplus">>), null),
      check("per-property: verdict null (needs gap_or_surplus)", g(O, <<"verdict">>), null),
      check("per-property: Layer-1 conforms (scalar money figures)",
-           validate(?INV, <<"budget_envelope_investor">>, O), ok)].
+           validate(?INV, <<"budget_envelope_investor">>, O), ok),
+     %% the acquire-phase cash_events purchase_journey's generic harvest places on the swimlane
+     %% (task 4) — cash_events_investor/4 filters amount =/= null, not =/= 0, so all four events
+     %% land here (lmi_payable = 0 at the 80% baseline LVR is still a non-null point figure).
+     check("per-property: cash_events carries deposit/stamp_duty/other_buying_costs/lmi ids",
+           lists:sort([maps:get(<<"id">>, E) || E <- g(O, <<"cash_events">>)]),
+           lists:sort([<<"deposit">>, <<"stamp_duty">>, <<"other_buying_costs">>, <<"lmi">>])),
+     check("per-property: every cash_event source_component = cash_position",
+           lists:usort([maps:get(<<"source_component">>, E) || E <- g(O, <<"cash_events">>)]),
+           [<<"cash_position">>])].
 
 %% --- helpers ----------------------------------------------------------------
 

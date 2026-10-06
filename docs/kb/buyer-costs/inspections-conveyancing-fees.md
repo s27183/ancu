@@ -1,7 +1,14 @@
 ---
 slug: kb.buyer-costs.inspections-conveyancing-fees
 effective_from: 2025-07-01
-last_verified: 2026-06-01
+last_verified: 2026-07-06
+sources:
+  - url: https://moneysmart.gov.au/home-loans/buying-a-house
+    retrieved: 2026-07-06
+  - url: https://www.canstar.com.au/home-loans/building-inspection-cost/
+    retrieved: 2026-07-06
+  - url: https://whichrealestateagent.com.au/agent-fees/how-much-do-real-estate-agents-charge/
+    retrieved: 2026-07-06
 ---
 
 # Buyer-side transaction costs — inspections, conveyancing, and registration fees

@@ -28,6 +28,7 @@
     import Field from './Field.svelte';
     import Chip from './Chip.svelte';
     import NoteList from './NoteList.svelte';
+    import Pending from './Pending.svelte';
 
     let { componentId, outcome }: {
         componentId: string;
@@ -71,6 +72,21 @@
     const LANES: string[] = ['twenty_plus', 'fhg_backed', 'lmi_5_to_20'];
     const recPath = $derived(mortgage.recommended_path ?? null);
     const recIsCustom = $derived(!!recPath && !LANES.includes(recPath));
+    // Mode C/D's mortgage_plan has NO recommended_path at all (fh_engine_mortgage.erl's
+    // fill_investor/fill_investor_foreign never emit it — not merely null) — the FHB path
+    // picker has no lanes to highlight there. isInvestorMortgage discriminates on
+    // io_vs_pi_recommendation (present as a key, even when its value is still null pre-
+    // agent-fill, on both investor shapes; absent from Mode A/B's). Found 2026-07-11: the
+    // lane list rendered with nothing ever lit up for every Mode C/D card — silently
+    // uninformative, not a crash. DataTable's mortgage_plan branch already shows the full
+    // figures (deposit %, rate, io/pi, offset) — this hero stays a HERO: just the headline
+    // financing snapshot, not a duplicate of that detail.
+    const isInvestorMortgage = $derived('io_vs_pi_recommendation' in outcome);
+    const IOVSPI = new Set(['interest_only', 'principal_and_interest']);
+    function iovspiLabel(v: string | null | undefined): string | null {
+        if (!v) return null;
+        return IOVSPI.has(v) ? $t(`plan.iovspi.${v}` as 'plan.iovspi.interest_only') : v;
+    }
 
     // --- strategy hero (investment_strategy, Mode C/D, strategy_thesis) -----
     // Mostly agent-filled — null at base except hold_period_years (resolver-carried off
@@ -139,26 +155,43 @@
     <NoteList heading={$t('plan.f.strengths')} notes={profile.key_strengths} />
     <NoteList heading={$t('plan.f.constraints')} notes={profile.key_constraints} />
 {:else if componentId === 'mortgage_finance'}
-    <!-- ── Path picker hero ───────────────────────────────────────────── -->
-    <div class="pk-hero">
-        <ul class="pk-lanes">
-            {#each LANES as lane (lane)}
-                <li class="pk-lane" class:pk-on={lane === recPath}>
-                    <span class="pk-marker" aria-hidden="true">{lane === recPath ? '●' : '○'}</span>
-                    <span class="pk-name">{pathLabel(lane)}</span>
-                    {#if lane === recPath}
-                        <span class="pk-rec">{$t('plan.path.recommended')}</span>
-                    {/if}
-                </li>
-            {/each}
-        </ul>
-        {#if recIsCustom}
-            <div class="pp-field">
-                <span class="pp-label">{$t('plan.f.path')}</span>
-                <Chip label={pathLabel(recPath) ?? ''} tone="info" />
+    {#if isInvestorMortgage}
+        <!-- ── Financing snapshot hero (Mode C/D — no FHB path lanes to light up) ──── -->
+        <div class="pk-hero">
+            <div class="pp-chips-row">
+                {#if mortgage.io_vs_pi_recommendation}
+                    <Chip label={iovspiLabel(mortgage.io_vs_pi_recommendation) ?? mortgage.io_vs_pi_recommendation} tone="info" />
+                {/if}
+                {#if mortgage.deposit_required_percentage != null}
+                    <Chip label={`${$t('plan.f.deposit_pct')}: ${num(mortgage.deposit_required_percentage, $lang)}%`} tone="neutral" />
+                {/if}
             </div>
-        {/if}
-    </div>
+            {#if !mortgage.io_vs_pi_recommendation && mortgage.deposit_required_percentage == null}
+                <Pending />
+            {/if}
+        </div>
+    {:else}
+        <!-- ── Path picker hero (Mode A/B) ─────────────────────────────────── -->
+        <div class="pk-hero">
+            <ul class="pk-lanes">
+                {#each LANES as lane (lane)}
+                    <li class="pk-lane" class:pk-on={lane === recPath}>
+                        <span class="pk-marker" aria-hidden="true">{lane === recPath ? '●' : '○'}</span>
+                        <span class="pk-name">{pathLabel(lane)}</span>
+                        {#if lane === recPath}
+                            <span class="pk-rec">{$t('plan.path.recommended')}</span>
+                        {/if}
+                    </li>
+                {/each}
+            </ul>
+            {#if recIsCustom}
+                <div class="pp-field">
+                    <span class="pp-label">{$t('plan.f.path')}</span>
+                    <Chip label={pathLabel(recPath) ?? ''} tone="info" />
+                </div>
+            {/if}
+        </div>
+    {/if}
 
     <!-- detail -->
     <Field

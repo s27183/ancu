@@ -1,7 +1,24 @@
 ---
 slug: kb.tax.land-tax-by-state
 effective_from: 2025-07-01
-last_verified: 2026-06-28
+last_verified: 2026-07-06
+sources:
+  - url: https://qro.qld.gov.au/land-tax/calculate/individual/
+    retrieved: 2026-07-06
+  - url: https://www.sro.vic.gov.au/land-tax-current-rates
+    retrieved: 2026-07-06
+  - url: https://www.wa.gov.au/organisation/department-of-treasury-and-finance/land-tax-assessment
+    retrieved: 2026-07-06
+  - url: https://www.sro.tas.gov.au/land-tax/rates-of-land-tax
+    retrieved: 2026-07-06
+  - url: https://www.revenue.nsw.gov.au/taxes-duties-levies-royalties/land-tax/understanding-land-tax/thresholds-and-rates
+    retrieved: 2026-06-23
+  - url: https://www.sro.tas.gov.au/land-tax/foreign-investor-land-tax-surcharge
+    retrieved: 2026-06-28
+  - url: https://www.revenuesa.sa.gov.au/land-tax/rates-and-thresholds
+    retrieved: 2026-06-28
+  - url: https://www.revenue.act.gov.au/rates-and-property-charges/land-tax/how-land-tax-is-calculated
+    retrieved: 2026-06-28
 ---
 
 # Land tax — by state (investment property)
@@ -97,7 +114,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
 Notes:
 
 - **No `fills`, and no computed figure.** No resolver derives a land-tax dollar figure from these scales — they are audit-anchored reasoning context (`tax_structure` records the anchor; `ownership_planning_investor` raises the aggregation principle as a qualitative alert). A per-property estimate is deliberately withheld (it needs the portfolio-wide aggregate value; a regulated figure stays out of the agent's reach). The doc supplies the scales, not a filled leaf or a computed assessment. Pending states carry `verification: to_verify`.
-- **Verification tiers, explicitly tagged.** NSW/VIC/QLD/WA/TAS are **PRIMARY** (Revenue NSW / SRO VIC / QRO verified 2026-06-23; Treasury & Finance WA / SRO Tasmania verified 2026-06-28 against the live primary). SA's **threshold** is **PRIMARY** ($833,000, RevenueSA 2025-26) but its marginal scale is **to_verify**; ACT's **no-threshold structure** is **PRIMARY** but its exact figures are **to_verify** — RevenueSA and ACT Revenue both returned HTTP 403 to direct fetch this pass (bot-walled), so the marginal detail could not be confirmed against the primary. NT is **nil** (primary). **Re-ground obligation (residual):** confirm SA's bracket scale + surcharge against RevenueSA and ACT's fixed-charge + marginal AUV rates against ACT Revenue Office (a freshness-pass trigger) — the bot-wall means a manual/authenticated fetch, not WebFetch.
+- **Verification tiers, explicitly tagged.** NSW/VIC/QLD/WA/TAS are **PRIMARY** (Revenue NSW / SRO VIC / QRO verified 2026-06-23; Treasury & Finance WA / SRO Tasmania verified 2026-06-28 against the live primary). **Re-verified 2026-07-06:** VIC ($50k), QLD ($600k), WA ($300k) and TAS ($125k) thresholds/scales were re-confirmed against the live primary (their revenue-office pages were reachable), unchanged after the 1 July 2026 reset; NSW ($1,075,000, assessed 31 Dec — already settled) was not reachable this pass (403), so its 2026-06-23 verification is carried. SA's **threshold** is **PRIMARY** ($833,000, RevenueSA 2025-26) but its marginal scale is **to_verify**; ACT's **no-threshold structure** is **PRIMARY** but its exact figures are **to_verify** — RevenueSA and ACT Revenue both returned HTTP 403 to direct fetch this pass (bot-walled), so the marginal detail could not be confirmed against the primary. NT is **nil** (primary). **Re-ground obligation (residual):** confirm SA's bracket scale + surcharge against RevenueSA and ACT's fixed-charge + marginal AUV rates against ACT Revenue Office (a freshness-pass trigger) — the bot-wall means a manual/authenticated fetch, not WebFetch.
 - **Annual indexation.** Thresholds and bands are re-set annually (NSW per the 2026 land tax year; QLD per FY; SA gazetted annually) — `last_verified` is the freshness anchor; re-confirm on the annual pass.
 - **Single-owner cross-refs.** PPOR exemption → `kb.land-tax.ppor-exemption`; portfolio aggregation projection → `kb.investor.land-tax-aggregation`; trust land-tax cost → `kb.tax.entity-comparison-personal-trust-company-smsf`; foreign-person status → `kb.firb.*`. This doc owns only the per-state scales + surcharge rates + the aggregation principle.
 - **No federal-reform note.** The 2026-27 Budget CGT/negative-gearing reform is a *federal* change; land tax is a *state* tax and is unaffected by it.

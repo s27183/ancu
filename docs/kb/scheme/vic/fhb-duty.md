@@ -1,7 +1,10 @@
 ---
 slug: kb.scheme.vic.fhb-duty
 effective_from: 2017-07-01
-last_verified: 2026-06-01
+last_verified: 2026-07-06
+sources:
+  - url: https://www.sro.vic.gov.au/buying-property/land-transfer-stamp-duty/concessions-exemptions-and-waivers/first-home-buyers/first-home-buyer-duty-exemption-or-concession
+    retrieved: 2026-07-06
 ---
 
 # Victoria First Home Buyer Duty Exemption / Concession

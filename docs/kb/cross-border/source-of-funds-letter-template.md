@@ -1,7 +1,10 @@
 ---
 slug: kb.cross-border.source-of-funds-letter-template
 effective_from: 2025-07-01
-last_verified: 2026-07-02
+last_verified: 2026-07-06
+sources:
+  - url: https://www.canstar.com.au/home-loans/gifted-deposits/
+    retrieved: 2026-07-06
 ---
 
 # Source-of-funds / gift letter — required elements (anatomy, not drafting)

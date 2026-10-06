@@ -2,6 +2,8 @@
 slug: kb.cross-border.decision-authority-cultural
 effective_from: 2025-07-01
 last_verified: 2026-07-02
+sources:
+  - note: "NOT VERIFIED — cultural decision-authority patterns (who decides, who owns, who is FIRB-exposed within a Vietnamese diaspora family) have no external regulator/primary to cite; this is internal domain knowledge, not a sourceable fact. The regulated consequences these patterns touch (FIRB exposure, ownership structure) are sourced in their owning docs (kb.firb.status-determination, kb.non-resident.entity-options-au-property), not re-derived here. Checked 2026-07-06 during the Phase B backfill — declined to force a citation rather than fabricate one."
 ---
 
 # Cross-border decision authority — who decides, who owns, who is exposed to FIRB (three things families conflate)

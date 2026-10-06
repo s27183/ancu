@@ -1,16 +1,17 @@
 #!/usr/bin/env escript
 %%! -sname fh_mode_d_seam_smoke
 %%
-%% Full-stack LIVE smoke for the Mode-D foreign-investor turn (mode-d-wedge.md P5
-%% close-out — the live-turn check the wedge left unrun). Clones investor_seam_smoke
+%% Full-stack LIVE smoke for the Mode-D foreign-investor turn. Clones investor_seam_smoke
 %% (Mode C) with intent=investment + foreign_person=true: boots the engine, seeds a
 %% tenant + ed25519 signing key, mints a JWT, POSTs plan-card creation, and drives the
-%% real /api/engine/* HTTP/SSE surface through the 10-component investor-foreign-au base
+%% real /api/engine/* HTTP/SSE surface through the 12-component investor-foreign-au base
 %% spine end-to-end — asserting the event sequence, the persisted log, the compliance
 %% audit trail (incl. the TWO advice-adjacent ASIC holds Mode D carries that Mode C
 %% doesn't — firb_workflow + mortgage_finance), the content_jsonb snapshot (incl. the
 %% live LLM-backed foreign-investor outcome shapes + the Mode-D-only misadvice-critical
-%% disposition assertion), cancel idempotency, and auth rejection.
+%% disposition assertion), the live purchase_journey/phase_playbook Mode-D KB branch
+%% (2026-07-10, task 10 — extends the spine from 10 to 12 components), cancel
+%% idempotency, and auth rejection.
 %%
 %% Run LIVE (real sidecar fills — metered) from engine/erlang:
 %%
@@ -61,21 +62,23 @@ main(_) ->
     %% --- persisted event log is the SOT (count matches the stream) ---
     EventCount = scalar("SELECT count(*) FROM plan_card_events WHERE plan_card_id = $1",
                         [PlanCardId]),
-    expect(EventCount =:= 45, "45 events persisted (1 + 10x(3 gate + 1 filled) + 3 usage + 1)"),
+    expect(EventCount =:= 53, "53 events persisted (1 + 12x(3 gate + 1 filled) + 3 usage + 1)"),
 
-    %% --- compliance audit trail: one audit_events row per (component, gate) = 3 x 10 = 30,
+    %% --- compliance audit trail: one audit_events row per (component, gate) = 3 x 12 = 36,
     %%     every one `clear` on the Mode-D healthy path. ASIC boundary_held lands on BOTH
     %%     firb_workflow (FIRB eligibility/fee framing) AND mortgage_finance (lender fit) —
     %%     advice_adjacent/1 lists both for Mode B/D, unlike Mode C which carries no
     %%     firb_workflow component. tax_structure_non_resident and investment_strategy
     %%     clear with no_advice_surface — the ASIC line is held at the producer (§98
-    %%     figure-tightness, schema-as-constraint enums). ---
+    %%     figure-tightness, schema-as-constraint enums). purchase_journey/phase_playbook
+    %%     (added task 8) also clear with no_advice_surface — same treatment Mode C's
+    %%     equivalents get, neither is in advice_adjacent/1. ---
     AuditCount = scalar("SELECT count(*) FROM audit_events WHERE plan_card_id = $1",
                         [PlanCardId]),
-    expect(AuditCount =:= 30, "30 audit_events rows (3 gates x 10 components)"),
+    expect(AuditCount =:= 36, "36 audit_events rows (3 gates x 12 components)"),
     ClearCount = scalar("SELECT count(*) FROM audit_events WHERE plan_card_id = $1 "
                         "AND compliance_jsonb->>'disposition' = 'clear'", [PlanCardId]),
-    expect(ClearCount =:= 30, "all 30 audit rows disposition=clear (Mode-D healthy)"),
+    expect(ClearCount =:= 36, "all 36 audit rows disposition=clear (Mode-D healthy)"),
     AsicHeld = scalar("SELECT count(*) FROM audit_events WHERE plan_card_id = $1 "
                       "AND compliance_jsonb->>'gate' = 'asic' "
                       "AND compliance_jsonb->>'detail' = 'decision_support_boundary_held'",
@@ -95,12 +98,13 @@ main(_) ->
                           [Auth], <<>>),
     #{<<"content">> := #{<<"components">> := Components}} =
         fh_engine_util:json_decode(CardResp),
-    expect(map_size(Components) =:= 10, "10 components snapshotted into content_jsonb"),
+    expect(map_size(Components) =:= 12, "12 components snapshotted into content_jsonb"),
     [expect(maps:is_key(N, Components), binary_to_list(N) ++ " component present")
      || N <- [<<"investor_profile_foreign">>, <<"firb_workflow">>, <<"investment_strategy">>,
               <<"mortgage_finance">>, <<"yield_modelling">>, <<"tax_structure_non_resident">>,
               <<"cash_position">>, <<"cross_border_funding">>,
-              <<"ownership_planning_foreign_investor">>, <<"disposition">>]],
+              <<"ownership_planning_foreign_investor">>, <<"disposition">>,
+              <<"purchase_journey">>, <<"phase_playbook">>]],
 
     %% --- the genuine Mode-D proof: the LIVE LLM-backed foreign-investor outcomes actually
     %%     landed (not just that 10 slots exist), AND the misadvice-critical Mode-D-only
@@ -157,6 +161,37 @@ main(_) ->
                maps:get(<<"recommended_entity">>, Tax),
                maps:get(<<"cgt_status">>, Disp)]),
 
+    %% --- purchase_journey/phase_playbook (task 8): proves the Mode-D KB branch actually
+    %%     fires over the real HTTP/SSE surface, not a silent fallthrough to Mode A's
+    %%     fill_fhb/{?ACTIONS,?RISKS} default (the fail-*silent* risk task 8 flagged and
+    %%     verified statically — this is the live confirmation). Six-actor set is REUSED
+    %%     from Mode C unchanged (kb.journey.investor-foreign-path's own rationale); the
+    %%     dispose phase is honestly absent (no hold horizon set at base, same honest-
+    %%     partial rule every mode's journey follows); the contract-phase action proves
+    %%     the FIRB-specific phase-actions doc (kb.journey.investor-foreign-phase-actions),
+    %%     not Mode C's investor-domestic content, is what actually resolved. ---
+    Journey = Out(<<"purchase_journey">>),
+    JActorIds = [maps:get(<<"id">>, A) || A <- maps:get(<<"actors">>, Journey, [])],
+    expect(lists:sort(JActorIds) =:=
+             lists:sort([<<"you">>, <<"government">>, <<"lender">>,
+                         <<"property_manager">>, <<"tenant">>, <<"services">>]),
+           "purchase_journey six-actor set, reused from Mode C unchanged (live)"),
+    JPhaseIds = [maps:get(<<"id">>, P) || P <- maps:get(<<"phases">>, Journey, [])],
+    expect(lists:member(<<"contract">>, JPhaseIds),
+           "purchase_journey has the contract phase (FIRB gate narrated here)"),
+    expect(not lists:member(<<"dispose">>, JPhaseIds),
+           "purchase_journey has NO dispose phase (no hold horizon set at base, honest-partial)"),
+    Playbook = Out(<<"phase_playbook">>),
+    PbPhases = maps:get(<<"phases">>, Playbook, []),
+    expect(length(PbPhases) > 0, "phase_playbook has phases (Mode-D foreign-investor KB content live)"),
+    ContractPbPhase = hd([P || P <- PbPhases, maps:get(<<"phase">>, P) =:= <<"contract">>]),
+    ContractActionIds = [maps:get(<<"id">>, A) || A <- maps:get(<<"actions">>, ContractPbPhase, [])],
+    expect(lists:member(<<"submit_firb_application">>, ContractActionIds),
+           "phase_playbook contract-phase carries the Mode-D submit_firb_application action "
+           "(kb.journey.investor-foreign-phase-actions, live — not Mode C's content)"),
+    io:format("live journey/playbook: actors=~p phases=~p contract_actions=~p~n",
+              [JActorIds, JPhaseIds, ContractActionIds]),
+
     %% --- cancel is idempotent: turn already finished -> 204 ---
     {204, _} = req(post, Base ++ "/plan-cards/" ++ binary_to_list(PlanCardId) ++ "/cancel",
                    [Auth], <<>>),
@@ -172,13 +207,17 @@ main(_) ->
     io:format("~n==== MODE-D SEAM SMOKE: ALL ASSERTIONS PASSED ====~n"),
     halt(0).
 
-%% The Mode-D foreign-investor base spine (?BASE_COMPONENTS_FOREIGN_INVESTOR, 10 components).
-%% Each emits THREE compliance_gate events before its component_filled; the THREE two-path
-%% components (investment_strategy, mortgage_finance, tax_structure_non_resident) each emit a
-%% `usage` right after their fill, from the sidecar. Order is discriminator-load-bearing
-%% (firb_workflow before mortgage/cash so their FIRB reads are grounded; strategy before
-%% mortgage; tax before cash/disposition).
-%% 1 + 10x(3 gate + 1 filled) + 3 usage + 1 = 45.
+%% The Mode-D foreign-investor base spine (?BASE_COMPONENTS_FOREIGN_INVESTOR, 12 components
+%% since task 8 appended purchase_journey/phase_playbook). Each emits THREE compliance_gate
+%% events before its component_filled; the THREE two-path components (investment_strategy,
+%% mortgage_finance, tax_structure_non_resident) each emit a `usage` right after their fill,
+%% from the sidecar. Order is discriminator-load-bearing (firb_workflow before mortgage/cash
+%% so their FIRB reads are grounded; strategy before mortgage; tax before cash/disposition);
+%% purchase_journey/phase_playbook run LAST, after disposition — appended at the tail per
+%% task 8's own DAG note (Mode D's ownership_planning_foreign_investor already runs BEFORE
+%% disposition here, the reverse of Mode C's order, so no reordering of the existing 10 was
+%% needed, only an append).
+%% 1 + 12x(3 gate + 1 filled) + 3 usage + 1 = 53.
 expected_sequence() ->
     Gates = [<<"compliance_gate">>, <<"compliance_gate">>, <<"compliance_gate">>],
     CF = <<"component_filled">>,
@@ -195,6 +234,8 @@ expected_sequence() ->
        Gates, CF,           %% cross_border_funding                 (resolver)
        Gates, CF,           %% ownership_planning_foreign_investor  (resolver)
        Gates, CF,           %% disposition                          (resolver)
+       Gates, CF,           %% purchase_journey                     (resolver)
+       Gates, CF,           %% phase_playbook                       (resolver)
        <<"turn_completed">>]).
 
 %% --- helpers (identical to investor_seam_smoke) ------------------------------

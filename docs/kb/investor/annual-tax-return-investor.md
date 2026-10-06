@@ -1,7 +1,14 @@
 ---
 slug: kb.investor.annual-tax-return-investor
 effective_from: 2025-07-01
-last_verified: 2026-06-23
+last_verified: 2026-07-06
+sources:
+  - url: https://www.ato.gov.au/individuals-and-families/investments-and-assets/property-and-land/residential-rental-properties
+    retrieved: 2026-07-06
+  - url: https://www.ato.gov.au/individuals-and-families/jobs-and-employment-types/varying-your-payg-withholding
+    retrieved: 2026-07-06
+  - url: https://moneysmart.gov.au/property-investment
+    retrieved: 2026-07-06
 ---
 
 # Annual tax return — the investor's obligations

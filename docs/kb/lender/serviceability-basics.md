@@ -1,7 +1,14 @@
 ---
 slug: kb.lender.serviceability-basics
 effective_from: 2021-10-06
-last_verified: 2026-06-01
+last_verified: 2026-07-06
+sources:
+  - url: https://www.apra.gov.au/activating-debt-to-income-limits-as-a-macroprudential-policy-tool
+    retrieved: 2026-07-06
+    note: 27 Nov 2025 announcement — serviceability buffer remains steady at 3 per cent; DTI ≥6 = high-DTI, capped at 20% of new lending from Feb 2026
+  - url: https://www.apra.gov.au/news-and-publications/apra-announces-update-on-macroprudential-settings
+    retrieved: 2026-07-06
+    note: 23 Jul 2025 update — "the mortgage serviceability buffer will remain at 3 percentage points"
 ---
 
 # Lender serviceability basics

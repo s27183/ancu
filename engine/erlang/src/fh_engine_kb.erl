@@ -24,6 +24,7 @@
 -export([kb/1, kb_content_md/1, kb_rules/1, kb_anchors/1, copy/2]).
 -export([rules/0]).
 -export([registry/1, registry/2]).
+-export([news_for_slugs/1, all_news/0]).
 
 -define(PT_KEY, {?MODULE, artifact}).
 
@@ -172,6 +173,58 @@ kb_anchors(Slugs) ->
                 {error, _} -> false
             end
         end, Slugs).
+
+%% --- news accessors ----------------------------------------------------------
+%% A news entry: {kb_slug, category, affected_kb_slugs, affected_components,
+%% effective_from, authored_date, sources, headline_en, headline_vi, summary_en,
+%% summary_vi, diff} (kb-update-runbook.md "authoring a news note") — headline is
+%% short ticker copy (<=100 chars, GATE 11 fail-closed), summary is the full
+%% explanation read in the detail sheet, category is one of NEWS_CATEGORIES
+%% (kb_compiler.py) — which section a note sorts under in the News overview sheet
+%% (kb-news-feature.md), display grouping only, read-only pass-through here.
+%% affected_components ({blueprint_slug: [component_name,
+%% ...]}) is reverse-indexed at compile time from Component.anchors
+%% (kb-news-feature.md "Resolved design questions") — read-only pass-through here,
+%% never re-derived at runtime. `sources` (GATE 11, fail-closed) pins the citation
+%% the author had open for this specific dated diff — distinct from a fact doc's
+%% own `sources:`, which tracks that doc's next re-verify; a news note is
+%% immutable so its sources never go stale. Never anchored by a blueprint.
+%% `maps:get(..., #{})` defaults so an older artifact predating this key reads as
+%% "no news", never a crash (the ui_tabs missing-key posture).
+
+%% News items relevant to a set of KB slugs a card has actually consulted (its
+%% accumulated kb_versions across fills, plan-card-refresh.md) — the relevance
+%% filter is a set intersection over affected_kb_slugs; no new lookup, the
+%% provenance already exists. The caller (the news handler) subtracts the
+%% card's dismissed set before replying.
+-spec news_for_slugs([binary()]) -> [map()].
+news_for_slugs(Slugs) ->
+    SlugSet = sets:from_list(Slugs),
+    News = maps:get(<<"news">>, artifact(), #{}),
+    maps:fold(
+        fun(NewsSlug, Entry, Acc) ->
+            Affected = maps:get(<<"affected_kb_slugs">>, Entry, []),
+            case lists:any(fun(S) -> sets:is_element(S, SlugSet) end, Affected) of
+                true  -> [Entry#{<<"news_slug">> => NewsSlug} | Acc];
+                false -> Acc
+            end
+        end, [], News).
+
+%% Every compiled news note, unfiltered by relevance to any one card — the homepage
+%% ticker's data source (kb-news-feature.md "Homepage ticker", 2026-07-08). Global
+%% KB content, no card/tenant scoping (same posture as rules/0). Sorted newest
+%% authored_date first so the ticker reads as "what's new," not compiler-map
+%% insertion order.
+-spec all_news() -> [map()].
+all_news() ->
+    News = maps:get(<<"news">>, artifact(), #{}),
+    Entries = maps:fold(
+        fun(NewsSlug, Entry, Acc) -> [Entry#{<<"news_slug">> => NewsSlug} | Acc] end,
+        [], News),
+    lists:sort(
+        fun(A, B) ->
+            maps:get(<<"authored_date">>, A, <<>>) >= maps:get(<<"authored_date">>, B, <<>>)
+        end, Entries).
 
 %% Every fill across all KB docs merged into one leaf -> rule map, the form the
 %% resolver interprets (fh_engine_resolver). Refs resolve globally across docs;

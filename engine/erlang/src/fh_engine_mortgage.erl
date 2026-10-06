@@ -48,7 +48,7 @@
 
 -define(SERVICEABILITY, <<"kb.lender.serviceability-basics">>).
 -define(HEM,    <<"kb.lender.hem-living-expenses">>).
--define(TAX,    <<"kb.tax.income-tax-resident-2025-26">>).
+-define(TAX,    <<"kb.tax.income-tax-resident-2026-27">>).
 -define(HECS,   <<"kb.hecs.thresholds">>).
 -define(CARD,   <<"kb.lender.credit-card-treatment">>).
 -define(COPY, <<"kb.copy.mortgage">>).   %% bilingual copy-templates (bilingual-content.md §3b)
@@ -627,10 +627,10 @@ net_annual_income(Income) ->
 medicare_levy(Income) ->
     Income * sparam(?TAX, <<"medicare_levy_pct">>) / 100.
 
-%% income tax from the 2025-26 resident marginal schedule (kb.tax lookup).
+%% income tax from the 2026-27 resident marginal schedule (kb.tax lookup).
 -spec income_tax(number()) -> number().
 income_tax(Income) ->
-    case find_band(Income, lookup_entries(?TAX, <<"resident_rates_2025_26">>)) of
+    case find_band(Income, lookup_entries(?TAX, <<"resident_rates_2026_27">>)) of
         none -> 0;
         B    -> num(maps:get(<<"base_amount">>, B, 0))
                 + num(maps:get(<<"marginal_rate_pct">>, B, 0)) / 100
@@ -639,13 +639,13 @@ income_tax(Income) ->
 
 %% the marginal tax rate (%) on the next dollar of income, INCLUDING the Medicare levy —
 %% the rate at which a rental loss is refunded (negative gearing) and a discounted capital
-%% gain is taxed (CGT). The 2025-26 resident bracket marginal rate + the 2% Medicare levy
+%% gain is taxed (CGT). The 2026-27 resident bracket marginal rate + the 2% Medicare levy
 %% (applied above the low-income phase-in; 0 below it, where the levy phases out and the
 %% refund is immaterial). Schedule indexing stays in the one module that owns the TAX anchor
-%% (kb.tax.income-tax-resident-2025-26); tax_structure / disposition read this, never re-index.
+%% (kb.tax.income-tax-resident-2026-27); tax_structure / disposition read this, never re-index.
 -spec marginal_rate(number()) -> number().
 marginal_rate(Income) when is_number(Income) ->
-    Bracket = case find_band(Income, lookup_entries(?TAX, <<"resident_rates_2025_26">>)) of
+    Bracket = case find_band(Income, lookup_entries(?TAX, <<"resident_rates_2026_27">>)) of
                   none -> 0;
                   B    -> num(maps:get(<<"marginal_rate_pct">>, B, 0))
               end,

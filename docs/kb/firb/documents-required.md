@@ -1,7 +1,10 @@
 ---
 slug: kb.firb.documents-required
 effective_from: 2025-04-01
-last_verified: 2026-06-28
+last_verified: 2026-07-06
+sources:
+  - url: https://foreigninvestment.gov.au/getting-started/where-to-submit
+    retrieved: 2026-07-06
 ---
 
 # FIRB application — information and documents required

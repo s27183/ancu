@@ -24,12 +24,14 @@
         pick,
         type BudgetEnvelopeOutcome,
         type CashEvent,
+        type CashFlowProjectionOutcome,
         type ComponentEntry,
         type DispositionOutcome,
         type ExistingHomeDisposalOutcome,
-        type MoneyRange
+        type MoneyRange,
+        harvestCashEvents
     } from '$lib/planCard';
-    import { money, moneyRange } from '$lib/format';
+    import { money, moneyRange, asRange, num } from '$lib/format';
     import Field from './Field.svelte';
     import Chip from './Chip.svelte';
     import NoteList from './NoteList.svelte';
@@ -99,7 +101,11 @@
                 : null
         ] as (Seg | null)[]).filter((s): s is Seg => s !== null)
     );
-    const needTotal = $derived(hasRange(o.total_cash_required) ? rangeLabel(o.total_cash_required) : null);
+    // total_cash_required is a range for Modes A/B/E, a scalar point for Modes C/D
+    // (fh_engine_cash.erl SEAMS note) — asRange() upgrades a scalar to [v,v] rather than
+    // treating it as absent (the bug: hasRange() alone rejects a bare number).
+    const needRange = $derived(asRange(o.total_cash_required));
+    const needTotal = $derived(needRange ? rangeLabel(needRange) : null);
 
     const VERDICTS: Record<string, 'good' | 'warn'> = { surplus: 'good', tight: 'warn', short: 'warn' };
     const GSV: Record<string, 'good' | 'warn' | 'neutral'> = {
@@ -117,7 +123,7 @@
     // engine keeps verdict=null until savings persist (a refine fact), so this is the
     // ephemeral what-if; once cash_available is a stored fact, the engine's own verdict
     // shows instead. Never recomputes duty (a second, unverified computer).
-    const need = $derived(hasRange(o.total_cash_required) ? o.total_cash_required : null);
+    const need = $derived(needRange);
     type Assess = { tone: 'good' | 'warn' | 'bad'; verdict: string; label: string; amount: string };
     const assessment = $derived.by((): Assess | null => {
         if (cashOnHand !== null && need) {
@@ -148,7 +154,17 @@
     // engine-computed — one-computer-per-figure). Empty phases say so (honest-partial:
     // recurring Own-phase costs are PENDING until profile facts arrive).
     const PHASE_ORDER = ['prepare', 'pre_approve', 'contract', 'settle', 'own'] as const;
-    const events = $derived((o.cash_events ?? []) as CashEvent[]);
+    // Harvested across every passed component (mirrors the engine's own multi-source
+    // harvest, [[unify-views-as-projections-of-one-primitive]]) so Mode C's hold-phase
+    // events (yield_modelling/tax_structure) show on the spine alongside cash_position's —
+    // not just this outcome's own cash_events. `components` is empty only for the
+    // standalone ComponentCard render (a single component's own card, no siblings to
+    // harvest), where the outcome's own array is already complete.
+    const events = $derived(
+        Object.keys(components).length > 0
+            ? harvestCashEvents(components)
+            : ((o.cash_events ?? []) as CashEvent[])
+    );
     const hasSpine = $derived(events.length > 0);
     const byPhase = $derived.by((): Array<{ phase: string; events: CashEvent[] }> => {
         // Canonical phases first, then any unexpected phase the engine sends (forward-
@@ -192,6 +208,24 @@
     const selectedOwner = $derived(selectedEvent ? ownerOf(selectedEvent) : null);
     // The below-table breakdown + summary now live in a modal; show the opener only when
     // there is something to show (honest-partial).
+    // The FLAT summary-totals sibling shape (Mode B's budget_envelope, Modes C/D's
+    // budget_envelope_investor) has none of stamp_duty/deposit/other_buying_costs/
+    // reserve_buffer — found 2026-07-11 via the renderer conformance check: hasBreakdown
+    // was false for these modes even with real figures present (channel_costs_total etc.),
+    // so the whole Detail tab silently rendered Pending. hasSummaryTotals is its own gate
+    // (regulatory_imposts_total/channel_costs_total/family_capacity_available/loan_amount/
+    // lvr/lmi_payable — each field means the same thing regardless of which mode's
+    // resolver produced it, so ONE generic block below covers all three modes at once).
+    const hasSummaryTotals = $derived(
+        !!(
+            o.regulatory_imposts_total != null ||
+            o.channel_costs_total != null ||
+            o.family_capacity_available != null ||
+            o.loan_amount != null ||
+            o.lvr != null ||
+            o.lmi_payable != null
+        )
+    );
     const hasBreakdown = $derived(
         !!(
             o.stamp_duty ||
@@ -201,7 +235,8 @@
             o.max_property_price_supported != null ||
             o.genuine_savings_verdict ||
             o.mitigation_options_if_short?.length ||
-            o.key_assumptions?.length
+            o.key_assumptions?.length ||
+            hasSummaryTotals
         )
     );
 
@@ -241,6 +276,30 @@
         if (s === 'to_verify') return $t('plan.xhd.break_cost.to_verify');
         return s;
     }
+
+    // ── yield_modelling (view='full' only) — the FIFTH shape `calculator` renders ──────
+    // Found in the same 2026-07-11 audit as the DataTable gaps: yield_modelling's sole
+    // renderer is `calculator`, but its cash_flow_projection outcome has none of budget_
+    // envelope's fields, so without this it fell into the default verdict-hero branch
+    // below and showed an empty/misleading "cash needed" card instead of yield figures.
+    // gross_yield is unique to this shape (absent from budget_envelope/disposition/
+    // existing_home_disposal/tax_optimised_structure).
+    const cf = $derived(outcome as CashFlowProjectionOutcome);
+    const isYield = $derived('gross_yield' in outcome);
+    const GEARED: Record<string, 'good' | 'warn' | 'neutral'> = {
+        positive: 'good', neutral: 'neutral', negative: 'warn'
+    };
+    function gearedLabel(v: string): string {
+        return v in GEARED ? $t(`plan.geared.${v}` as 'plan.geared.positive') : v;
+    }
+
+    // tax_structure (tax_optimised_structure) also composes `calculator` as its SECOND
+    // renderer (after data-table, which already shows its real content correctly) — with
+    // no branch of its own it ALSO fell into the default verdict-hero below, appending a
+    // noisy empty "cash needed" card under content that's already complete. Same
+    // discriminator DataTable.svelte uses (cgt_discount_eligible + recommended_entity).
+    // This shape renders NOTHING from Calculator — intentionally, not a gap.
+    const isTax = $derived('cgt_discount_eligible' in outcome && 'recommended_entity' in outcome);
 </script>
 
 <!-- The breakdown detail — the line breakdown + summary. Rendered INLINE in the Detail tab
@@ -267,6 +326,20 @@
 
     <Field label={$t('plan.f.max_price')} value={money(o.max_property_price_supported, $lang)} />
 
+    {#if hasSummaryTotals}
+    <!-- The flat summary-totals shape (Mode B budget_envelope, Mode C/D budget_envelope_
+         investor) — no itemized stamp_duty/deposit/other_buying_costs objects, just these
+         totals. Each Field is independently guarded (honest-partial): a mode only fills
+         the subset that applies to it (Mode B has regulatory/channel/family_capacity; Mode
+         C has loan_amount/lvr/lmi; Mode D has regulatory/channel/loan_amount/lvr). -->
+    <Field label={$t('plan.f.regulatory_imposts')} value={money(o.regulatory_imposts_total, $lang)} />
+    <Field label={$t('plan.f.channel_costs')} value={money(o.channel_costs_total, $lang)} />
+    <Field label={$t('plan.f.family_capacity')} value={money(o.family_capacity_available, $lang)} />
+    <Field label={$t('plan.f.loan_amount')} value={money(o.loan_amount, $lang)} />
+    <Field label={$t('plan.f.lvr')} value={o.lvr != null ? `${num(o.lvr, $lang)}%` : null} />
+    <Field label={$t('plan.f.lmi_payable')} value={money(o.lmi_payable, $lang)} />
+    {/if}
+
     {#if o.genuine_savings_verdict}
         <div class="pp-field">
             <span class="pp-label">{$t('plan.f.genuine_savings')}</span>
@@ -289,7 +362,7 @@
 {/snippet}
 
 <!-- ── (1) "Am I ready?" verdict hero ───────────────────────────────────── -->
-{#if view === 'verdict' || (view === 'full' && !isDisposition && !isExistingHomeDisposal)}
+{#if view === 'verdict' || (view === 'full' && !isDisposition && !isExistingHomeDisposal && !isYield && !isTax)}
 <div class="cw-hero" class:cw-full={density === 'full'}>
     <div class="cw-head">
         <span class="cw-need-label">{$t('plan.cash.need')}</span>
@@ -323,7 +396,7 @@
 <!-- ── (2) The financial spine — cash_events across the lifecycle phases ──── -->
 <!-- A clean Item/Amount table (the prototype's design language). Each phase is a sub-header
      band; each event row drills to its source_component (§7.3) when that owner is filled. -->
-{#if (view === 'table' || (view === 'full' && !isDisposition && !isExistingHomeDisposal)) && hasSpine}
+{#if (view === 'table' || (view === 'full' && !isDisposition && !isExistingHomeDisposal && !isYield && !isTax)) && hasSpine}
     <div class="cw-spine">
         <h4 class="cw-spine-title">{$t('plan.cash.spine')}</h4>
         <table class="cw-table">
@@ -374,7 +447,7 @@
 {/if}
 
 <!-- full mode: the breakdown sits behind a modal opener under the table. -->
-{#if view === 'full' && !isDisposition && !isExistingHomeDisposal && hasBreakdown}
+{#if view === 'full' && !isDisposition && !isExistingHomeDisposal && !isYield && !isTax && hasBreakdown}
     <button type="button" class="cw-breakdown-btn" onclick={() => (showBreakdown = true)}>
         {$t('plan.cash.breakdown')}
     </button>
@@ -541,6 +614,48 @@
             <span class="cw-need-label">{$t('plan.xhd.add_facts')}</span>
         </div>
         <NoteList notes={xhd.key_assumptions} />
+    {/if}
+{/if}
+
+<!-- ── (6) yield_modelling (view='full' only) — the rent-economics hero. ──────────── -->
+<!-- A separate outcome (cash_flow_projection); all-null at base (needs a property, per
+     the class comment above cf/isYield). Honest-partial: the pre-loan cluster (income,
+     opex, gross/net-pre-loan yield) populates once a property attaches; the post-loan
+     cluster (interest, cash flow, net-post-loan yield, year 5/10, geared position) needs
+     the representative-leverage financing too — both arrive together in practice. -->
+{#if view === 'full' && isYield}
+    <div class="cw-hero cw-full">
+        <div class="cw-head">
+            <span class="cw-need-label">{$t('plan.yield.gross')}</span>
+            {#if hasRange(cf.gross_yield)}
+                <span class="cw-need-total">{rangeLabel(cf.gross_yield)}</span>
+            {:else}
+                <Pending />
+            {/if}
+        </div>
+    </div>
+
+    {#if !hasRange(cf.gross_yield)}
+        <p class="cw-cta">{$t('plan.yield.pending')}</p>
+    {/if}
+
+    <Field label={$t('plan.yield.net_pre_loan')} value={hasRange(cf.net_yield_pre_loan) ? rangeLabel(cf.net_yield_pre_loan) : null} />
+    <Field label={$t('plan.yield.net_post_loan')} value={hasRange(cf.net_yield_post_loan_pre_tax) ? rangeLabel(cf.net_yield_post_loan_pre_tax) : null} />
+    <Field label={$t('plan.yield.rental_income')} value={hasRange(cf.annual_rental_income_year_1) ? rangeLabel(cf.annual_rental_income_year_1) : null} />
+    <Field label={$t('plan.yield.opex')} value={hasRange(cf.annual_operating_expenses_year_1) ? rangeLabel(cf.annual_operating_expenses_year_1) : null} />
+    <Field label={$t('plan.yield.interest')} value={money(cf.annual_interest_year_1, $lang)} />
+    <Field label={$t('plan.yield.cf_annual')} value={hasRange(cf.cash_flow_before_tax_year_1) ? rangeLabel(cf.cash_flow_before_tax_year_1) : null} />
+    <Field label={$t('plan.yield.cf_weekly')} value={hasRange(cf.cash_flow_before_tax_per_week) ? rangeLabel(cf.cash_flow_before_tax_per_week) : null} />
+    <Field label={$t('plan.yield.year5')} value={hasRange(cf.year_5_projected_cash_flow) ? rangeLabel(cf.year_5_projected_cash_flow) : null} />
+    <Field label={$t('plan.yield.year10')} value={hasRange(cf.year_10_projected_cash_flow) ? rangeLabel(cf.year_10_projected_cash_flow) : null} />
+    {#if cf.is_positive_neutral_or_negative_geared_pre_tax}
+        <div class="pp-field">
+            <span class="pp-label">{$t('plan.yield.geared')}</span>
+            <Chip
+                label={gearedLabel(cf.is_positive_neutral_or_negative_geared_pre_tax)}
+                tone={GEARED[cf.is_positive_neutral_or_negative_geared_pre_tax] ?? 'neutral'}
+            />
+        </div>
     {/if}
 {/if}
 

@@ -1,7 +1,12 @@
 ---
 slug: kb.investor.property-management-appointment-timeline
 effective_from: 2025-07-01
-last_verified: 2026-06-23
+last_verified: 2026-07-06
+sources:
+  - url: https://www.fairtrading.nsw.gov.au/housing-and-property/property-professionals/managing-a-property
+    retrieved: 2026-07-06
+  - url: https://moneysmart.gov.au/property-investment/buying-an-investment-property
+    retrieved: 2026-07-06
 ---
 
 # Property management appointment — timeline

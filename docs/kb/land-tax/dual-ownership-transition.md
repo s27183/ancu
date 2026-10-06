@@ -1,7 +1,12 @@
 ---
 slug: kb.land-tax.dual-ownership-transition
 effective_from: 2026-07-05
-last_verified: 2026-07-05
+last_verified: 2026-07-06
+sources:
+  - url: https://qro.qld.gov.au/land-tax/relief/transitional-home-exemption/
+    retrieved: 2026-07-06
+  - url: https://www.sro.tas.gov.au/land-tax/exemptions-and-rebates/Two-residences-owned-in-transitional-circumstances-rebate
+    retrieved: 2026-07-06
 ---
 
 # Land tax — dual-ownership treatment during a home-upgrade transition

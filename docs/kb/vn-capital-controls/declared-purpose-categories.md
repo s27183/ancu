@@ -2,6 +2,8 @@
 slug: kb.vn-capital-controls.declared-purpose-categories
 effective_from: 2026-07-03
 last_verified: 2026-07-03
+sources:
+  - note: "PLACEHOLDER — VN-legal-counsel-gated blocker (strategy §9), sibling of kb.vn-capital-controls.sbv-thresholds-2026. SBV declared-purpose categories/mechanics for an individual funding an offshore property purchase have not been verified against an SBV primary or VN legal counsel. Reconfirmed as an open, intentional deferral during the 2026-07-06 Phase B backfill — not resolved here."
 ---
 
 # ⚠ PLACEHOLDER — declared-purpose categories for SBV transfers (NOT SOURCE-GROUNDED)

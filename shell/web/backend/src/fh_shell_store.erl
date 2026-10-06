@@ -13,7 +13,7 @@
 -export([insert_plan_card_view/3, owns_plan_card/2, list_plan_card_views/1]).
 -export([upsert_user_by_email/1, insert_magic_token/2, redeem_magic_token/1]).
 -export([link_oauth/3]).
--export([user_tier/1, link_subscription/3, update_subscription/5]).
+-export([user_tier/1, user_email/1, link_subscription/3, update_subscription/5]).
 -export([record_charge/5]).
 
 %% --- identity (login flow) --------------------------------------------------
@@ -135,6 +135,22 @@ user_tier(UserId) ->
     of
         #{rows := [{Tier} | _]} -> Tier;
         #{rows := []}           -> <<"free">>
+    end.
+
+%% This user's email, for the ADMIN_EMAILS allowlist test (fh_shell_billing:is_admin/1,
+%% billing.md §9) — used by both the usage consumer (billed=false attribution) and the
+%% §7 pre-call gate (admin exemption). Calls pgo directly (NOT the raising query/2
+%% above) so a DB error is fail-soft (-> not_found, the caller's admin check then
+%% defaults to false) rather than crashing the caller — the same posture as
+%% fh_shell_meter:sum_period/1's direct pgo call.
+-spec user_email(binary()) -> {ok, binary()} | not_found.
+user_email(UserId) ->
+    case pgo:query("SELECT email FROM users WHERE user_id = $1::uuid", [UserId]) of
+        #{rows := [{Email} | _]} -> {ok, Email};
+        #{rows := []}            -> not_found;
+        {error, Reason} ->
+            logger:warning("[store] user_email(~s) failed: ~p", [UserId, Reason]),
+            not_found
     end.
 
 %% Bind a user to a Stripe subscription (billing.md §9, the checkout.session.completed

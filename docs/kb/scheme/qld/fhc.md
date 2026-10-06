@@ -1,7 +1,12 @@
 ---
 slug: kb.scheme.qld.fhc
 effective_from: 2024-06-09
-last_verified: 2026-06-01
+last_verified: 2026-07-06
+sources:
+  - url: https://qro.qld.gov.au/duties/transfer-duty/concessions/homes/first-home/
+    retrieved: 2026-07-06
+  - url: https://qro.qld.gov.au/duties/transfer-duty/calculate/concession-rates/
+    retrieved: 2026-07-06
 ---
 
 # Queensland First Home Concession (FHC)

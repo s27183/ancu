@@ -1,7 +1,11 @@
 ---
 slug: kb.settlement.process-by-state
 effective_from: 2025-08-01
-last_verified: 2026-06-02
+last_verified: 2026-07-06
+sources:
+  - url: https://www.nsw.gov.au/housing-and-construction/buying-and-selling-property/buying-residential-property-nsw/exchanging-contracts-and-settlement
+    retrieved: 2026-07-06
+    note: "NSW Government — settlement usually ~6 weeks after exchange; 0.25% cooling-off penalty; electronic settlement via ELN. QLD gov settlement page 403s WebFetch; the NSW/VIC/QLD settlement-period defaults are conveyancing-practice conventions (per the doc body), read against the specific contract."
 ---
 
 # Settlement — process and timeline, by state

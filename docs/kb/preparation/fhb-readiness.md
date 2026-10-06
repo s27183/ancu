@@ -2,6 +2,8 @@
 slug: kb.preparation.fhb-readiness
 effective_from: 2026-06-01
 last_verified: 2026-06-18
+sources:
+  - note: "NOT VERIFIED — bilingual copy/checklist doc (kb.copy.*-adjacent in kind, though not in that namespace): every readiness item is grounded internally in its owning KB doc (the scheme, FIRB, or lender fact it points to), not asserted independently here. No external Sources section by design. Checked 2026-07-06 during the Phase B backfill."
 ---
 
 # Mode-A FHB readiness template (bilingual)

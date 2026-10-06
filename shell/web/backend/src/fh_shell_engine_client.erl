@@ -11,10 +11,12 @@
 %% (fetch state, SSE event proxy, messages, suburbs) lands as the shell UX surfaces
 %% are built (8-S1..8-S4). HTTP via inets httpc (started by the shell app).
 
--export([create_plan_card/2, get_plan_card/2, post_message/3, simulate/3,
+-export([create_plan_card/2, get_plan_card/2, post_message/3, get_conversation/2,
+         simulate/3,
          refine/3, set_profile_financials/3, set_checklist_status/3,
          attach_property/3, set_transaction_dates/4, upload_document/4, stream_events/3,
-         list_suburbs/1, get_usage_events/2, start_httpc_profiles/0]).
+         list_suburbs/1, get_usage_events/2, start_httpc_profiles/0,
+         get_news/2, dismiss_news/3, list_all_news/0]).
 
 %% Dedicated httpc profile for the LONG-LIVED SSE stream proxy (stream_events/3).
 %% SSE requests run with {timeout, infinity} and hold an httpc session for the entire
@@ -113,6 +115,20 @@ post_message(UserId, PlanCardId, BodyMap) ->
                       [{timeout, ?RPC_TIMEOUT_MS}], [{body_format, binary}]),
     {Status, Resp}.
 
+%% Fetch the Q&A thread's persisted history — GET
+%% /api/engine/plan-cards/:id/conversation. The shell has confirmed ownership first.
+%% Returns {StatusCode, ResponseBodyBinary}: 200 with {turns: [...]} (oldest→newest,
+%% bilingual answers), empty before the first Q&A turn. Relayed verbatim.
+-spec get_conversation(binary(), binary()) -> {non_neg_integer(), binary()}.
+get_conversation(UserId, PlanCardId) ->
+    Token = fh_shell_engine_jwt:mint(#{user_id => UserId}),
+    Url = base_url() ++ "/plan-cards/" ++ binary_to_list(PlanCardId) ++ "/conversation",
+    Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
+    {ok, {{_, Status, _}, _, Resp}} =
+        httpc:request(get, {Url, Headers},
+                      [{timeout, ?RPC_TIMEOUT_MS}], [{body_format, binary}]),
+    {Status, Resp}.
+
 %% Preview a structural what-if (W9) — POST /api/engine/plan-cards/:id/simulate with
 %% {overrides: {target_price|state}}. The shell has confirmed ownership first. The engine
 %% recomputes the base plan resolver-only and returns the recomputed outcomes (keyed by
@@ -183,6 +199,53 @@ set_checklist_status(UserId, PlanCardId, BodyMap) ->
     Body = fh_shell_util:json_encode(BodyMap),
     {ok, {{_, Status, _}, _, Resp}} =
         httpc:request(patch, {Url, Headers, "application/json", Body},
+                      [{timeout, ?RPC_TIMEOUT_MS}], [{body_format, binary}]),
+    {Status, Resp}.
+
+%% Fetch the KB news notes relevant to a card's consulted KB slugs, minus its own
+%% dismissed set — GET /api/engine/plan-cards/:id/news (kb-news-feature.md). The
+%% shell has confirmed ownership first. Zero-cost read (no usage, no turn): the
+%% engine computes the relevance filter over already-stamped kb_versions
+%% provenance, nothing new to compute. Relayed verbatim — the engine owns the
+%% news-note contract (bilingual summary, affected_components, sources).
+-spec get_news(binary(), binary()) -> {non_neg_integer(), binary()}.
+get_news(UserId, PlanCardId) ->
+    Token = fh_shell_engine_jwt:mint(#{user_id => UserId}),
+    Url = base_url() ++ "/plan-cards/" ++ binary_to_list(PlanCardId) ++ "/news",
+    Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
+    {ok, {{_, Status, _}, _, Resp}} =
+        httpc:request(get, {Url, Headers},
+                      [{timeout, ?RPC_TIMEOUT_MS}], [{body_format, binary}]),
+    {Status, Resp}.
+
+%% Dismiss one news note — PATCH /api/engine/plan-cards/:id/news with
+%% {news_slug}. The shell has confirmed ownership first. USER-ATTESTED state
+%% (the card's dismissed_news_jsonb user-set layer, migration 007), not a
+%% computed figure: NO usage, so — like checklist-status — NO meter gate. The
+%% engine answers 200 with the AUTHORITATIVE dismissed_news map; 400 on a
+%% missing news_slug. Relayed verbatim.
+-spec dismiss_news(binary(), binary(), map()) -> {non_neg_integer(), binary()}.
+dismiss_news(UserId, PlanCardId, BodyMap) ->
+    Token = fh_shell_engine_jwt:mint(#{user_id => UserId}),
+    Url = base_url() ++ "/plan-cards/" ++ binary_to_list(PlanCardId) ++ "/news",
+    Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
+    Body = fh_shell_util:json_encode(BodyMap),
+    {ok, {{_, Status, _}, _, Resp}} =
+        httpc:request(patch, {Url, Headers, "application/json", Body},
+                      [{timeout, ?RPC_TIMEOUT_MS}], [{body_format, binary}]),
+    {Status, Resp}.
+
+%% Fetch every compiled KB news note, unfiltered — GET /api/engine/news
+%% (kb-news-feature.md "Homepage ticker"). PUBLIC, same posture as list_suburbs/1:
+%% the anonymous system principal, since this is global KB content and the homepage
+%% ticker is pre-login chrome, not a per-buyer read. Relayed verbatim.
+-spec list_all_news() -> {non_neg_integer(), binary()}.
+list_all_news() ->
+    Token = fh_shell_engine_jwt:mint(#{user_id => ?ANON_USER_ID}),
+    Url = base_url() ++ "/news",
+    Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
+    {ok, {{_, Status, _}, _, Resp}} =
+        httpc:request(get, {Url, Headers},
                       [{timeout, ?RPC_TIMEOUT_MS}], [{body_format, binary}]),
     {Status, Resp}.
 

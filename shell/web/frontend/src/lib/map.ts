@@ -132,8 +132,8 @@ const CRITERIA: Record<SizeBy, Criterion> = {
         field: 'se',
         domain: [1, 10],
         stops: [
-            [1, '#dbe3ef'],
-            [4, '#9fb6d4'],
+            [1, '#aec2de'],
+            [4, '#89a6cc'],
             [7, '#5781b4'],
             [10, '#234e86']
         ],
@@ -170,11 +170,16 @@ const CRITERIA: Record<SizeBy, Criterion> = {
     crime: {
         field: 'cr',
         domain: [0, 150],
+        // Pure achromatic greys (R=G=B) — deliberately zero hue, so this never reads as
+        // "a duller blue" next to seifa's ramp. Distinct BY HUE FAMILY (chromatic blue
+        // vs neutral grey), not just by saturation, so the two stay tellable apart at a
+        // glance with only one on screen at a time. Still non-valenced (no shift toward
+        // alarm-red) — see the comment on CRITERIA above.
         stops: [
-            [0, '#dde2e8'],
-            [40, '#abb4c1'],
-            [90, '#6b7686'],
-            [150, '#3a4452']
+            [0, '#b5b5b5'],
+            [40, '#8f8f8f'],
+            [90, '#666666'],
+            [150, '#3a3a3a']
         ],
         min: '0',
         max: '150+'
@@ -183,9 +188,14 @@ const CRITERIA: Record<SizeBy, Criterion> = {
 
 const NO_DATA = '#cbd5e1'; // slate-300 — present on the map, visibly "no data", not zero
 
-function colorExpr(c: Criterion): ExpressionSpecification {
-    const interp: unknown[] = ['interpolate', ['linear'], ['get', c.field]];
+function interpolateStops(c: Criterion, valueExpr: unknown): unknown[] {
+    const interp: unknown[] = ['interpolate', ['linear'], valueExpr];
     for (const [v, col] of c.stops) interp.push(v, col);
+    return interp;
+}
+
+function colorExpr(c: Criterion): ExpressionSpecification {
+    const interp = interpolateStops(c, ['get', c.field]);
     return ['case', ['has', c.field], interp, NO_DATA] as unknown as ExpressionSpecification;
 }
 
@@ -298,15 +308,80 @@ export function heatmapPaintFor(sizeBy: SizeBy): HeatmapLayerSpecification['pain
     };
 }
 
-/** Does this criterion get an overview heatmap? (false → intensive → dots-on-zoom-in,
- *  with the "zoom in to compare" hint at the overview.) */
-export function heatmapEnabled(sizeBy: SizeBy): boolean {
-    return CRITERIA[sizeBy].heat != null;
+// --- Overview for INTENSIVE criteria: cluster-average bubbles ----------------
+// A rate/decile can't honestly feed a density-sum heatmap (heatmapPaintFor above) —
+// summing SEIFA deciles across a dense area would just reproduce population density,
+// not the economic character of the area. The honest aggregate of a rate is an
+// AVERAGE, not a sum. MapLibre's GeoJSON source can cluster points natively and
+// accumulate `clusterProperties` per cluster; we accumulate a sum + a count (over
+// only the points that HAVE the field, so "no data" suburbs don't drag the average
+// down) and divide at paint time. This gives seifa/crime a real overview — a
+// proportional-symbol map (bubble size = suburb count, colour = average) — instead
+// of literal nothing below the dot-resolvable zoom.
+export const CLUSTER_RADIUS_PX = 60; // screen px; bigger than the 50 default for a chunkier continental read
+export const CLUSTER_MAX_ZOOM = Z_FADE_HI - 1; // clusters give way to leaf dots by the existing handoff
+
+/** clusterProperties for a GeoJSON cluster source, aggregating ONE intensive
+ *  criterion's field into `<field>_sum` / `<field>_cnt` (points lacking the field
+ *  contribute 0 to both, so the average is over real data only). */
+export function clusterPropertiesFor(sizeBy: SizeBy): Record<string, unknown> {
+    const { field } = CRITERIA[sizeBy];
+    const has = ['has', field];
+    return {
+        [`${field}_sum`]: ['+', ['case', has, ['get', field], 0]],
+        [`${field}_cnt`]: ['+', ['case', has, 1, 0]]
+    };
 }
 
-/** Below this zoom the dots aren't yet resolvable (the heatmap's job). Used to show the
- *  "zoom in to compare suburbs" hint for intensive criteria that have no heatmap. */
-export const OVERVIEW_MAX_ZOOM = Z_FADE_LO;
+// Fades out across the same handoff the dots fade in across (Z_FADE_LO→Z_FADE_HI),
+// so cluster bubbles cross-fade into leaf dots exactly where they become resolvable.
+const clusterOpacityByZoom: ExpressionSpecification = [
+    'interpolate',
+    ['linear'],
+    ['zoom'],
+    3, 0.82,
+    Z_FADE_LO, 0.78,
+    Z_FADE_HI, 0
+] as unknown as ExpressionSpecification;
+
+// A proportional-symbol radius: bubble size carries HOW MANY suburbs were folded in.
+// This layer only ever receives cluster features (the caller filters on
+// `['has', 'point_count']`) — unclustered leaf points render through the normal
+// per-point `circlePaintFor` layer instead, so they get its finer zoom/value-driven
+// sizing rather than a flat "cluster of one" radius.
+const clusterRadiusExpr: ExpressionSpecification = [
+    'interpolate',
+    ['linear'],
+    ['get', 'point_count'],
+    1, 6,
+    10, 10,
+    50, 14,
+    200, 19,
+    1000, 25,
+    5000, 32
+] as unknown as ExpressionSpecification;
+
+/** The CircleLayer paint for the cluster-average overview of an INTENSIVE criterion —
+ *  colour = cluster average, radius = how many suburbs the bubble represents. Apply to
+ *  a layer filtered on `['has', 'point_count']`, on a source created with
+ *  `cluster: true` + `clusterPropertiesFor(sizeBy)`. */
+export function clusterPaintFor(sizeBy: SizeBy): CircleLayerSpecification['paint'] {
+    const c = CRITERIA[sizeBy];
+    const sumField = `${c.field}_sum`;
+    const cntField = `${c.field}_cnt`;
+    const avgInterp = interpolateStops(c, ['/', ['get', sumField], ['max', ['get', cntField], 1]]);
+    const color = [
+        'case',
+        ['>', ['get', cntField], 0],
+        avgInterp,
+        NO_DATA
+    ] as unknown as ExpressionSpecification;
+    return {
+        'circle-color': color,
+        'circle-radius': clusterRadiusExpr,
+        'circle-opacity': clusterOpacityByZoom
+    };
+}
 
 /** Legend descriptor for a criterion — the gradient + endpoint labels the +page
  *  legend renders (the title is chrome → i18n in the component). */
@@ -342,6 +417,11 @@ export const minimalStyle: StyleSpecification = {
 // bubble layer — svelte-maplibre-gl adds the CircleLayer after the style loads, so the
 // data layer stays on top of the basemap.
 const PROTOMAPS_ASSETS = 'https://protomaps.github.io/basemaps-assets';
+// The vector source id, shared between `sources` (below) and `layers()`'s first arg
+// (which bakes `"source": BASEMAP_SOURCE_ID` into every generated layer) — also the id
+// SuburbMap.svelte matches a MapLibre 'error' event's `sourceId` against to detect a
+// failed basemap and fall back to `minimalStyle` (see its runtime-fallback comment).
+export const BASEMAP_SOURCE_ID = 'protomaps';
 
 /** A Protomaps-backed MapLibre style for a given `.pmtiles` archive URL. The caller must
  *  have registered the `pmtiles://` protocol first (ensurePmtilesProtocol, lib/pmtiles.ts).
@@ -352,7 +432,7 @@ const PROTOMAPS_ASSETS = 'https://protomaps.github.io/basemaps-assets';
  *  the data gets. Returns undefined if the flavor somehow has no symbol layer (then the
  *  data sits on top, the no-basemap behaviour). */
 export function firstLabelLayerId(): string | undefined {
-    return layers('protomaps', namedFlavor('light'), { lang: 'en' }).find(
+    return layers(BASEMAP_SOURCE_ID, namedFlavor('light'), { lang: 'en' }).find(
         (l) => l.type === 'symbol'
     )?.id;
 }
@@ -363,13 +443,13 @@ export function basemapStyle(pmtilesUrl: string): StyleSpecification {
         glyphs: `${PROTOMAPS_ASSETS}/fonts/{fontstack}/{range}.pbf`,
         sprite: `${PROTOMAPS_ASSETS}/sprites/v4/light`,
         sources: {
-            protomaps: {
+            [BASEMAP_SOURCE_ID]: {
                 type: 'vector',
                 url: `pmtiles://${pmtilesUrl}`,
                 attribution:
                     '<a href="https://protomaps.com">Protomaps</a> © <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>'
             }
         },
-        layers: layers('protomaps', namedFlavor('light'), { lang: 'en' })
+        layers: layers(BASEMAP_SOURCE_ID, namedFlavor('light'), { lang: 'en' })
     };
 }

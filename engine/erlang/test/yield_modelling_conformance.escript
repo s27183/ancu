@@ -47,7 +47,10 @@ main(_) ->
 
 %% --- fixtures ----------------------------------------------------------------
 
-%% the cash_flow_projection figure fields (the eleven the registry declares).
+%% the cash_flow_projection figure fields (the eleven the registry declares) — these are the
+%% ones that are null at base, so they double as the null-check fixture. cash_events (added
+%% 2026-07-10, task 4) is NOT one of these: it's honest-EMPTY ([]) at base, not null, so it's
+%% tracked separately via all_fields() below rather than folded into the null-check loop.
 fields() ->
     [<<"annual_rental_income_year_1">>, <<"annual_operating_expenses_year_1">>,
      <<"annual_interest_year_1">>, <<"cash_flow_before_tax_year_1">>,
@@ -55,6 +58,11 @@ fields() ->
      <<"net_yield_pre_loan">>, <<"net_yield_post_loan_pre_tax">>,
      <<"year_5_projected_cash_flow">>, <<"year_10_projected_cash_flow">>,
      <<"is_positive_neutral_or_negative_geared_pre_tax">>].
+
+%% the full field set the registry declares — fields() plus cash_events (the hold-phase
+%% rent/opex/interest spine purchase_journey/phase_playbook's generic harvest reads,
+%% fh_engine_fill:yield_cash_events/1).
+all_fields() -> fields() ++ [<<"cash_events">>].
 
 %% a realistic base investor upstream (profile + strategy_thesis present; property absent).
 upstream() ->
@@ -81,8 +89,10 @@ scaffold_cases() ->
         [check(<<"input-independent (empty upstream) null: ", F/binary>>, g(OEmpty, F), null)
          || F <- fields()],
     [check("renderer = calculator", Rend, <<"calculator">>),
-     check("outcome has exactly the eleven cash_flow_projection fields",
-           lists:sort(maps:keys(O)), lists:sort(fields())),
+     check("outcome has exactly the twelve cash_flow_projection fields",
+           lists:sort(maps:keys(O)), lists:sort(all_fields())),
+     check("cash_events = [] at base (honest empty, every figure null)",
+           g(O, <<"cash_events">>), []),
      check("kb_versions = the five Cluster-Y anchors",
            lists:sort(KbSlugs),
            lists:sort([<<"kb.investor.rental-income-modelling">>,
