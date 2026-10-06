@@ -44,7 +44,8 @@
 
 -export([validate/3, check/3, check_placement/2]).
 
-%% The numeric family (§98). money_range / percentage_range are a [lo, hi] list of numbers;
+%% The numeric family (§98). money_range / percentage_range are a [lo, hi] list of numbers
+%% ([lo, null] an open-ended floor — check_scalar/2);
 %% the rest a bare number. string/bool/date/object are scalars too but are NOT figures.
 -define(FIGURE_TYPES,
         [<<"money">>, <<"money_per_year">>, <<"number">>,
@@ -180,9 +181,16 @@ collect_locales([Loc | Rest], Value, Acc) ->
 check_scalar(Type, Value) when Type =:= <<"money_range">>; Type =:= <<"percentage_range">> ->
     %% a banded figure — a [lo, hi] list of numbers (the banded money/percentage surface,
     %% mode-c-wedge Slice B0: rent is a band, so income/yields/cash-flow built on it band too).
-    case is_list(Value) andalso lists:all(fun erlang:is_number/1, Value) of
-        true  -> ok;
-        false -> {error, reason(<<Type/binary, " must be a list of numbers">>, Value)}
+    %% [Lo, null] is an open-ended floor ("from $636"): a band whose provider-priced top no
+    %% source bounds (kb.tax.entity-setup-costs' company and SMSF-with-LRBA rows; behavior 11,
+    %% 2026-10-06). A null top is the only null allowed; a null floor is not a band.
+    case Value of
+        [Lo, null] when is_number(Lo) -> ok;
+        _ ->
+            case is_list(Value) andalso lists:all(fun erlang:is_number/1, Value) of
+                true  -> ok;
+                false -> {error, reason(<<Type/binary, " must be a list of numbers">>, Value)}
+            end
     end;
 check_scalar(Type, Value) ->
     case lists:member(Type, ?FIGURE_TYPES) of
