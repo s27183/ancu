@@ -32,6 +32,15 @@ waiting for a session end.
 | **Inline documentation** — every design decision, implementation decision and capability, in the code it governs | beside the mechanism, in this project's own source | whoever writes the mechanism, in the same commit | the four-slot block below |
 | **Secrets** | this repo's `.env`, never committed | each developer, by hand | never in the repo or a model's context |
 | **Mechanisms** — the checks that hold the design: tests, lint, CI, hooks | the repo's own tooling; a developer's local tools besides | code; no model in the loop | what a document cannot hold is code: a check, a hook |
+| **The engine** — the planning engine: `/api/engine/*` HTTP/SSE, one `fh_engine_turn` per card turn, resolver and agent fills, the compliance pipeline, `usage` metering | `engine/erlang/` | its developers, in commits | P-1–P-6; `docs/architecture/engine-contract.md` |
+| **The sidecar** — the planner the engine spawns per fill, over a `{packet,4}` port | `engine/python/` | its developers, in commits | P-3 |
+| **The engine database** — `plan_card_events` (the record), `plan_cards`, `usage` events, the `suburbs` + `suburb_sources` tables | Postgres, `ENGINE_DATABASE_URL`; migrations in `engine/erlang/priv/migrations/` | the engine; the suburb tables by the suburb adapters | P-2; `engine-contract.md` §9.1 |
+| **The KB** — fact docs, bilingual copy, news notes, blueprints, and the archived primaries they cite | `docs/kb/`, `docs/blueprints/`, `docs/sources/` | the KB update, by hand (`docs/architecture/kb-update-runbook.md`, Track A) | the goal's *regulated figures are grounded* and *bilingual* properties; P-7 |
+| **The KB compiler** — gates the KB and emits the artifact the engine loads at boot | `engine/build/kb_compiler.py` → `engine/erlang/priv/kb/artifact.json` | its developers; the artifact by the compiler only, committed with the docs it was built from | P-7; the goal's *reproducible* property |
+| **The suburb adapters** — per-source batch ingest into the suburb tables | `engine/build/suburbs/` | their developers (`docs/architecture/suburb-adapter-workflow.md`, Track B) | the goal's *honest-partial* property |
+| **The shell backend** — identity, commerce, the usage gate, the engine proxy | `shell/web/backend/` | its developers, in commits | P-4–P-6; `docs/architecture/billing.md` |
+| **The shell database** — subscriptions, `usage_records`, charges, users | Postgres, `SHELL_DATABASE_URL`; migrations in `shell/web/backend/priv/migrations/`, sha256-guarded | the shell backend | P-2, P-5 |
+| **The web frontend** — the SvelteKit SPA: map-first home, onboarding, plan projection, chat, the news ticker | `shell/web/frontend/` | its developers, in commits | P-4, P-6, P-7 |
 
 **Where the code is.** One repo: the ground at `docs/design/`, the code
 beside it, and the rest of `docs/` the team's (Son, 2026-09-28). The tools read
