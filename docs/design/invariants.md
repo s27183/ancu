@@ -340,6 +340,34 @@ price, or an engine route that returns a refusal on usage.
 the shell's) and `tests/engine_no_gating.py` — unbuilt: fail the build on a
 credit/quota table or call under `engine/`.
 
+## P-6 · Shells reach the engine only through the contract
+
+**Every engine capability is reachable only through a surface
+`engine-contract.md` §2 declares — `/api/engine/*` HTTP/SSE now, `/mcp`
+deferred — and no shell touches an engine table, queue or function any other
+way. Where a protocol already defines a mechanism (vendor SDK events,
+JSON-RPC to the sidecar, SSE), the contract implements it rather than
+inventing a parallel one.** (Son, 2026-10-06, from the erlang-engine prior;
+`principles.md` §6 states the second sentence.)
+
+**Fails when** a shell reaches engine state around the contract, or the
+engine grows a homegrown mechanism where a protocol already defines one.
+
+**Proof, shown in this system:** none yet (probed 2026-10-06: the shell
+backend uses only `SHELL_DATABASE_URL`, `fh_shell_db.erl` saying so; the
+SvelteKit frontend reaches the engine only through the shell backend's proxy,
+`lib/api.ts`).
+
+**Held by** the two-database split (`engine-contract.md` §9) and the shell's
+engine client (`fh_shell_engine_client`) as its one path to the engine.
+
+**Falsifier:** a shell module reading `ENGINE_DATABASE_URL` or an engine
+table, or calling an `/api/engine/*` path the engine does not register.
+
+**Checked by** `tests/shell_contract_check.py` — unbuilt: grep the shells for
+engine-DB access, and match every `/api/engine/*` path they call against the
+engine's registered routes.
+
 ---
 
 ## The shape of failure
