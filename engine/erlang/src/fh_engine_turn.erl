@@ -37,6 +37,9 @@
 -export([base_components/1]).
 %% exported for the Phase-B wiring smoke (no-PG integration of the per-property turn):
 -export([property_components/1, two_path_stored_leaf/2]).
+%% exported for due_diligence_conformance: the document gate that keeps due_diligence's
+%% lease_interpretation leaf resolver-only until a lease is uploaded.
+-export([effective_fill_path/2]).
 
 %% Mode-A base turn: the resolver/agent components in DAG (topological) order. The
 %% per-property components (property_assessment, buying_strategy, due_diligence,
