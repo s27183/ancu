@@ -780,6 +780,24 @@ The agent enforces the FIRB gate: it refuses to recommend an unconditional bid u
 
 **Outcome schema:** `bid_plan` (same as Mode A, plus `firb_approval_status` field)
 
+Declared as Mode A's `bid_plan` ([`fhb-domestic-au.md`](fhb-domestic-au.md)), the shape the shared resolver emits; the foreign-only additions named above are not emitted by any resolver yet, so they are not declared (Son, 2026-10-06, P-7: an undeclared shape fails the build).
+
+```jsonc
+{
+  "type": "bid_plan",
+  "fields": {
+    "max_bid_value": "money",
+    "max_bid_confidence": "percentage_0_100",
+    "max_bid_reasoning": "string",
+    "walk_away_price": "money",
+    "negotiation_style": "enum",
+    "live_coach_armed": "bool",
+    "conditions_to_request": "array<string>",
+    "red_flags_to_monitor": "array<string>"
+  }
+}
+```
+
 ---
 
 ### 9. due_diligence (similar to Mode A + cross-border documentation)
@@ -817,6 +835,21 @@ Same as [Mode A due_diligence](fhb-domestic-au.md#7-due_diligence) plus:
 ```
 
 **Outcome schema:** `risk_assessment` (same as Mode A, plus `cross_border_risks` field)
+
+Declared as Mode A's `risk_assessment` ([`fhb-domestic-au.md`](fhb-domestic-au.md)), the shape the shared resolver emits; the foreign-only additions named above are not emitted by any resolver yet, so they are not declared (Son, 2026-10-06, P-7: an undeclared shape fails the build).
+
+```jsonc
+{
+  "type": "risk_assessment",
+  "fields": {
+    "overall_verdict": "enum",
+    "high_severity_flags": "array<{ source_doc, item, action }>",
+    "actions_before_signing": "array<string>",
+    "questions_for_vendor": "array<string>",
+    "estimated_negotiation_lever": "money_range"
+  }
+}
+```
 
 ---
 
@@ -858,6 +891,20 @@ Same as [Mode A settlement_prep](fhb-domestic-au.md#8-settlement_prep) plus:
 ```
 
 **Outcome schema:** `settlement_checklist` (same as Mode A, plus `firb_critical_path_status` and `transfer_critical_path_status` fields)
+
+Declared as Mode A's `settlement_checklist` ([`fhb-domestic-au.md`](fhb-domestic-au.md)), the shape the shared resolver emits; the foreign-only additions named above are not emitted by any resolver yet, so they are not declared (Son, 2026-10-06, P-7: an undeclared shape fails the build).
+
+```jsonc
+{
+  "type": "settlement_checklist",
+  "fields": {
+    "settlement_date": "date",
+    "critical_path_milestones": "array<{ name, due_date, status, dependency }>",
+    "at_risk_milestones": "array<{ name, reason }>",
+    "next_action_for_user": "string"
+  }
+}
+```
 
 ---
 

@@ -1098,6 +1098,20 @@ def run(emit=False):
             if bad:
                 fails.append(f"[renderer] {stem}/{c.name}: not in enum: {bad}")
 
+    # ---- GATE 12: every component declares its outcome shape (all blueprints) -- #
+    # Reproducible -> P-7 · One declaration per outcome shape -> The KB compiler -> undeclared outcome refused
+    # A component whose `**Outcome schema:**` has no fenced ```jsonc block (a type named
+    # only in prose) compiles to outcome_type null, and fh_engine_outcome:validate/3 then
+    # had nothing to check its fill against. Refused here, so it never reaches a deploy
+    # (Son, 2026-10-06, #25); validate/3 refusing an undeclared type is the backstop.
+    # Measured 2026-10-06: before this gate, 6 of 70 components compiled null
+    # (buying_strategy/due_diligence/settlement_prep in fhb-foreign-au, investor-foreign-au).
+    for stem, (_, bcomps, _, _, _) in blueprints.items():
+        for c in bcomps:
+            if not c.outcome_type:
+                fails.append(f"[outcome_schema] {stem}/{c.name}: no fenced ```jsonc "
+                             f"outcome schema with a \"type\" — declare its shape (P-7)")
+
     # ---- GATE 4: pipeline acyclic (all blueprints — structural, mode-independent) #
     stats["dag"] = {}
     for stem, (_, _, bproducer, breads, _) in blueprints.items():
