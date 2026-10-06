@@ -165,7 +165,7 @@ The base plan for Mode B captures the most regulatory complexity even before a s
 
 **Inputs:** User questions answered in chat; any uploaded documents (visa grant letter, passport, employer letter if employed in AU, NOA if filed). No upstream component dependency — this is the pipeline entry.
 
-**KB anchors:** `kb.firb.status-determination`, `kb.firb.established-dwelling-ban`, `kb.visas.au-temporary-residency-classes`, `kb.au-temp-residents.banking-and-tax-basics`
+**KB anchors:** `kb.firb.established-dwelling-ban`, `kb.visas.au-temporary-residency-classes`, `kb.au-temp-residents.banking-and-tax-basics`
 
 **Renderer:** `summary-card`
 
@@ -1093,11 +1093,10 @@ The `mode_switch_eligible` field signals when the user's status has changed (e.g
 
 ## KB anchor index (for this blueprint)
 
-74 slugs referenced. Italics mark Mode B-only anchors (not in Mode A).
+73 slugs referenced (kb.firb.status-determination dropped 2026-10-06: Mode B sets firb_required by definition and never evaluates it, #6). Italics mark Mode B-only anchors (not in Mode A).
 
 | Slug | Component(s) | Owns |
 |---|---|---|
-| `kb.firb.status-determination` | 1, 4 | How to determine FIRB classification from visa/citizenship status |
 | `kb.firb.established-dwelling-ban` | 1, 4 | The 1 Apr 2025 – 30 Jun 2029 established-dwelling ban on foreign persons |
 | *`kb.visas.au-temporary-residency-classes`* | 1 | AU temporary residency visa classes and their FIRB implications |
 | *`kb.au-temp-residents.banking-and-tax-basics`* | 1 | Banking and tax basics for AU temporary residents |

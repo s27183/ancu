@@ -479,7 +479,7 @@ buyer_profile_foreign(Args) ->
         <<"key_strengths">>   => [copy(<<"strength_cross_border_family_plan">>, #{})]
     },
     KbVersions = fh_engine_kb:kb_anchors(
-        [<<"kb.firb.status-determination">>, <<"kb.firb.established-dwelling-ban">>,
+        [<<"kb.firb.established-dwelling-ban">>,
          <<"kb.visas.au-temporary-residency-classes">>,
          <<"kb.au-temp-residents.banking-and-tax-basics">>]),
     {Outcome, <<"summary-card">>, KbVersions}.
@@ -553,7 +553,7 @@ investor_profile(Args) ->
         %% approx_borrowing_capacity — gathered on a refine turn (profiles SOT).
     },
     KbVersions = fh_engine_kb:kb_anchors(
-        [<<"kb.tax.income-tax-resident-2026-27">>,
+        [<<"kb.firb.status-determination">>, <<"kb.tax.income-tax-resident-2026-27">>,
          <<"kb.lender.serviceability-investment-loans">>,
          <<"kb.investor.experience-levels">>]),
     {Outcome, <<"summary-card">>, KbVersions}.
@@ -635,7 +635,7 @@ investor_profile_foreign(Args) ->
         %% source_of_funds_documentation_ready — gathered on a refine turn (profiles SOT).
     },
     KbVersions = fh_engine_kb:kb_anchors(
-        [<<"kb.firb.status-determination">>, <<"kb.firb.established-dwelling-ban">>,
+        [<<"kb.firb.established-dwelling-ban">>,
          <<"kb.vn-tax.brackets-2026">>, <<"kb.vn-tax.income-from-foreign-property">>,
          <<"kb.lender.non-resident-friendly-shortlist">>, <<"kb.investor.experience-levels">>]),
     {Outcome, <<"summary-card">>, KbVersions}.

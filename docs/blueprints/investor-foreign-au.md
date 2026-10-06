@@ -169,7 +169,7 @@ Note: Mode D does NOT activate Mode B's Family view tab by default — Vietnam-l
 
 **Inputs:** User questions; uploaded documents (Vietnamese passport, residency proof, prior AU FIRB approvals if any, financial statements).
 
-**KB anchors:** `kb.firb.status-determination`, `kb.firb.established-dwelling-ban`, `kb.vn-tax.brackets-2026`, `kb.vn-tax.income-from-foreign-property`, `kb.lender.non-resident-friendly-shortlist`, `kb.investor.experience-levels`
+**KB anchors:** `kb.firb.established-dwelling-ban`, `kb.vn-tax.brackets-2026`, `kb.vn-tax.income-from-foreign-property`, `kb.lender.non-resident-friendly-shortlist`, `kb.investor.experience-levels`
 
 *(Reconciled 2026-07-03 — the serviceability anchor was drafted as `kb.non-resident.serviceability-au-lenders` before P1 found the mode-agnostic equivalent already built for Mode B.)*
 

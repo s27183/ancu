@@ -139,7 +139,7 @@ Mode C's base plan is sharper than Mode A's because investor reasoning often hap
 
 **Inputs:** User questions answered in chat; uploaded documents (NOA, payslips, depreciation schedules from existing properties if any).
 
-**KB anchors:** `kb.tax.income-tax-resident-2026-27`, `kb.lender.serviceability-investment-loans`, `kb.investor.experience-levels`
+**KB anchors:** `kb.firb.status-determination`, `kb.tax.income-tax-resident-2026-27`, `kb.lender.serviceability-investment-loans`, `kb.investor.experience-levels`
 
 **Renderer:** `summary-card`
 
@@ -156,12 +156,12 @@ Mode C's base plan is sharper than Mode A's because investor reasoning often hap
   },
   "applicants": {
     "type": "array<applicant>",
-    "note": "F1 — one entry per person taking an ownership interest. Mode C: 1..N citizen/PR investors. The tax-bearing facts (marginal rate, tax residency) are PER-APPLICANT — a joint investment is assessed per owner. citizenship_status is citizen/PR only; a foreign co-investor routes to the FIRB path (→ Mode D). No first-home ownership_history / owner_occupier_intent — not eligibility-bearing for an investor (the canonical applicant element carries them; an investor simply does not fill them).",
+    "note": "F1 — one entry per person taking an ownership interest. Mode C: 1..N citizen/PR investors. The tax-bearing facts (marginal rate, tax residency) are PER-APPLICANT — a joint investment is assessed per owner. citizenship_status declares all four values, as Modes A and E do, so kb.firb.status-determination type-checks here; the engine projects citizen/PR, and an applicant it classifies FIRB-required routes to the FIRB path (→ Mode D) (#6, 2026-10-06). No first-home ownership_history / owner_occupier_intent — not eligibility-bearing for an investor (the canonical applicant element carries them; an investor simply does not fill them).",
     "value": [
       {
         "role": { "type": "enum", "options": ["primary", "co_investor"], "value": "primary" },
-        "citizenship_status": { "type": "enum", "options": ["citizen", "permanent_resident"], "value": "<initial>" },
-        "firb_required": { "type": "bool", "value": false, "derived_from": "citizenship_status", "note": "Mode C = domestic; false for every applicant. The household aggregate profile.firb_required_any is the single FIRB fact read across modes." },
+        "citizenship_status": { "type": "enum", "options": ["citizen", "permanent_resident", "temporary_resident", "non_resident"], "value": "<initial>" },
+        "firb_required": { "type": "bool", "value": false, "derived_from": "citizenship_status", "note": "Mode C = domestic: kb.firb.status-determination derives false over the projected citizen/PR set. The household aggregate profile.firb_required_any is the single FIRB fact read across modes." },
         "taxable_income": { "type": "money_per_year", "value": "<initial>", "note": "per-applicant assessable income; the household assessable_income aggregates the array." },
         "tax": {
           "residency_for_tax": { "type": "enum", "options": ["resident", "non_resident", "temporary_resident_for_tax"], "value": "resident", "note": "Mode-C-activated tax{} (fact-model-unification.md 'Mode-C activation'). Drives the CGT 50% discount + main-residence interactions read by tax_structure / disposition." },
@@ -1221,10 +1221,11 @@ wrong for QLD).
 
 ## KB anchor index (for this blueprint)
 
-58 slugs referenced (corrected 2026-07-10 — a stale count; the table itself was already larger than the previously-stated "42" before this pass's three additions). Italics mark Mode C-only anchors (not in Mode A FHB); the two growth/selling-cost anchors at component 12 are **shared with Mode A** (non-italic).
+59 slugs referenced (corrected 2026-07-10 — a stale count; the table itself was already larger than the previously-stated "42" before this pass's three additions). Italics mark Mode C-only anchors (not in Mode A FHB); the two growth/selling-cost anchors at component 12 are **shared with Mode A** (non-italic).
 
 | Slug | Component(s) | Owns |
 |---|---|---|
+| `kb.firb.status-determination` | 1 | Per-applicant FIRB classification from citizenship status (evaluated by investor_profile, #6) |
 | `kb.tax.income-tax-resident-2026-27` | 1 | Resident income-tax brackets + marginal rates (shared with Mode A) |
 | *`kb.lender.serviceability-investment-loans`* | 1, 4 | Investment-loan serviceability assessment (approx borrowing capacity) |
 | *`kb.investor.experience-levels`* | 1 | How investor experience affects lender treatment |
