@@ -207,7 +207,7 @@ falsifier.
 stream — runs in its own supervised process, sharing no resource whose
 exhaustion would stall another; a crash or a hang takes down only that
 concern.** (Son, 2026-10-06, from the erlang-engine prior;
-`docs/architecture/principles.md` §1 states it too.)
+carried from the archived `principles.md` §1.)
 
 **Fails when** a failure in one concern stalls or fails a request that does
 not touch it.
@@ -237,7 +237,7 @@ stream open while plain calls return.
 **Every fact that survives a restart lives in Postgres — `plan_card_events`,
 `usage_records`, the suburb tables — and process state is a cache rebuilt
 from it.** (Son, 2026-10-06, from the erlang-engine prior;
-`docs/architecture/principles.md` §2 states it too.)
+carried from the archived `principles.md` §2.)
 
 **Fails when** a restart loses or changes what a user saw committed, or a
 process cache diverges from the database and does not recover by itself.
@@ -263,7 +263,7 @@ stream a card's events, kill and restart the engine, replay, compare.
 exiting when done; any sidecar can be killed at any moment and the engine
 turns that into a `turn_failed` or a retry — nothing lost, no caller left
 waiting.** (Son, 2026-10-06, from the erlang-engine prior;
-`docs/architecture/principles.md` §3 states it too.)
+carried from the archived `principles.md` §3.)
 
 **Fails when** a killed sidecar corrupts `plan_card_events` or leaves a turn
 hanging, or state carries from one fill into the next.
@@ -292,7 +292,7 @@ kill the sidecar mid-fill, assert one `turn_failed` and no partial component.
 name; UX, presentation, identity and commerce are the shells'. If two shells
 (the web app, a browser extension, the Tìm Nhà console) would render a thing
 differently, it is the shell's.** (Son, 2026-10-06, from the erlang-engine
-prior; `engine-contract.md` §1 and `principles.md` §4 state it too.)
+prior; `engine-contract.md` §1 and the archived `principles.md` §4 stated it.)
 
 The one declared exception: `ui_tabs`, a tab grouping declared in the
 blueprint (`architecture.md` §11.9) that the engine passes through unshaped
@@ -321,7 +321,7 @@ the check is the §1 review question at every engine route or field change.
 whether work proceeds on money; the shell prices usage and gates the next
 call.** Compliance gates (FIRB, ASIC, AML) are the engine's: they protect the
 agent's behavior, not commerce. (Son, 2026-10-06, from the erlang-engine
-prior; `engine-contract.md` §1 and `principles.md` §5 state it too.)
+prior; `engine-contract.md` §1 and the archived `principles.md` §5 stated it.)
 
 **Fails when** an engine path refuses or shapes a call on a price, quota or
 credit rule, or the engine DB holds a credit or quota table.
@@ -349,7 +349,7 @@ deferred — and no shell touches an engine table, queue or function any other
 way. Where a protocol already defines a mechanism (vendor SDK events,
 JSON-RPC to the sidecar, SSE), the contract implements it rather than
 inventing a parallel one.** (Son, 2026-10-06, from the erlang-engine prior;
-`principles.md` §6 states the second sentence.)
+the archived `principles.md` §6 stated the second sentence.)
 
 **Fails when** a shell reaches engine state around the contract, or the
 engine grows a homegrown mechanism where a protocol already defines one.

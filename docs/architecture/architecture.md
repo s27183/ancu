@@ -14,7 +14,7 @@ The product cleanly separates into three layers with different update cadences a
 
 ### 11.0 Engine / shell split (deployable shape)
 
-The three layers below are the *logical* model. Physically, the platform is two independently-deployable halves — a pattern adapted from the ATP project (see [`engine-contract.md`](engine-contract.md) for the full contract and [`principles.md`](principles.md) for the six principles that govern it):
+The three layers below are the *logical* model. Physically, the platform is two independently-deployable halves — a pattern adapted from the ATP project (see [`engine-contract.md`](engine-contract.md) for the full contract and [`docs/design/invariants.md`](../design/invariants.md) P-1–P-6 for the six principles that govern it):
 
 - **Engine** — Erlang/OTP gateway + stateless Python sidecars. Runs the agentic planning workload: resolves the blueprint + KB anchors, runs the planning agent over current plan-card state, fills components, enforces the compliance gate, persists, and streams typed events. Exposes **primitives** (`/api/engine/*`), never views. Owns Layer 1 and Layer 2 as the source of truth, and the Layer 3 runtime.
 - **Shell(s)** — web app, browser extension, Tìm Nhà curator console (Svelte frontend + Erlang backend). Own UX, identity, commerce, and display projection. Consume engine primitives and render the typed component outcomes via the constrained renderer vocabulary (§11.9).

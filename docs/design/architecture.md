@@ -203,8 +203,7 @@ reader can tell a plan from a mechanism.
 Migration input, by path; what is still true moves into these two documents or
 into a block beside its mechanism (`/migrate`), and nothing here is ground until it does.
 
-- `docs/architecture/` — 37 design docs; `architecture.md`, `principles.md`,
-  `engine-contract.md` and `structure-map.md` are the hubs, and
+- `docs/architecture/` — 37 design docs; `architecture.md`, `engine-contract.md` and `structure-map.md` are the hubs, and
   `kb-update-runbook.md` + `suburb-adapter-workflow.md` the canonical KB and
   suburb-data processes
 - `docs/01-market.md`, `02-competitive-landscape.md`, `03-strategy.md`, `04-ux-model.md` — the strategy set
