@@ -541,6 +541,22 @@ def frontmatter_end(text):
     return matches[1].start()
 
 
+# Reproducible -> P-7 · One declaration per outcome shape -> KB compiler -> refuses a KB doc whose frontmatter does not close
+# A doc whose opening `---` has no closing `---` used to compile with no error: frontmatter_end
+# returned -1, the whole file (YAML and source URLs) became content_md, and slug, dates and
+# sources still parsed from the raw text, so nothing noticed. 1432ad4 (2026-07-06) left nine
+# docs that way, and the Q&A agent read their YAML as KB text (#15, measured 2026-10-06).
+# Every KB doc and news note carries frontmatter (all 184 open with `---`), so a missing
+# opening line fails too.
+def frontmatter_fail(text):
+    """Why `text` is not well-formed frontmatter, or None if it is."""
+    if not re.match(r"---[ \t]*\n", text):
+        return "line 1 is not '---' (every KB doc opens with frontmatter)"
+    if frontmatter_end(text) == -1:
+        return "opening '---' has no closing '---'"
+    return None
+
+
 def parse_sources_block(text):
     """Hand-rolled parse of the frontmatter `sources:` list — a YAML-list-of-maps
     SUBSET (url/retrieved/path scalars, or a standalone note: string), not a
@@ -960,6 +976,9 @@ def run(emit=False):
     for f in sorted(KB.rglob("*.md")):
         rel = f.relative_to(ROOT / "docs").with_suffix("")
         expect = str(rel).replace("/", ".")
+        fm_fail = frontmatter_fail(f.read_text())
+        if fm_fail:
+            fails.append(f"[frontmatter] {f}: {fm_fail}")
         if NEWS_DIR in f.parents:
             doc = parse_news_doc(f)
             if doc["slug"] != expect:

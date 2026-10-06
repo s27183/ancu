@@ -9,6 +9,7 @@ sources:
   - url: https://www.ato.gov.au/law/view/pdf/mli/vietnam.pdf
     retrieved: 2026-07-06
     note: "PRIMARY (ATO) — synthesised text of the MLI and the AU–Vietnam agreement (treaty as modified over time); the anchor for checking the AU-rate carve-out when the deferred re-ground runs."
+---
 
 # ⚠ PLACEHOLDER — the Australia–Vietnam Double Tax Agreement (NOT SOURCE-GROUNDED)
 
