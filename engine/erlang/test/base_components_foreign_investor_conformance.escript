@@ -57,7 +57,7 @@ main(_) ->
     ok = fh_engine_kb:load(),
     io:format("base_components foreign-investor conformance — fh_engine_turn:base_components/1 (Mode-D P5)~n~n"),
     R = lists:flatten([set_order_cases(), no_regression_cases(), dag_walk_cases(),
-                       discriminator_cases()]),
+                       discriminator_cases(), money_spine_cases()]),
     Fails = [X || X <- R, X =:= fail],
     io:format("~n================================================================~n"),
     case Fails of
@@ -189,6 +189,50 @@ discriminator_cases() ->
            maps:is_key(<<"firb_dependency_acknowledged">>, Mortgage), false),
      check("firb_required_any=false: cash_position drops the Mode-D-only field",
            maps:is_key(<<"regulatory_imposts_total">>, Cash), false)].
+
+%% --- 5. acquisition money spine (#13) ---------------------------------------------
+%% cash_position emits the five acquisition events at base, each a figure its own total
+%% sums (place, don't recompute), and purchase_journey puts each on the swimlane in the
+%% same phase, on a row of Mode D's six actors. With no state, the state-dependent three
+%% are absent, never zero.
+
+money_spine_cases() ->
+    Comps = fh_engine_turn:base_components(?FHB_FOREIGN_INV),
+    {Acc, _} = walk(args(true), Comps),
+    Cash = maps:get(<<"budget_envelope_investor">>, Acc),
+    Events = maps:get(<<"cash_events">>, Cash),
+    Ids = [maps:get(<<"id">>, E) || E <- Events],
+    Sum = lists:sum([hd(maps:get(<<"amount">>, E)) || E <- Events]),
+    Cells = maps:get(<<"cells">>, maps:get(<<"journey_swimlane">>, Acc)),
+    Actors = [maps:get(<<"id">>, A)
+              || A <- maps:get(<<"actors">>, maps:get(<<"journey_swimlane">>, Acc))],
+    Placed = lists:all(
+               fun(E) ->
+                   lists:any(fun(C) ->
+                                 maps:get(<<"phase">>, C) =:= maps:get(<<"phase">>, E) andalso
+                                 maps:get(<<"actor">>, C) =:= maps:get(<<"counterparty">>, E) andalso
+                                 maps:get(<<"amount">>, C, null) =:= maps:get(<<"amount">>, E)
+                             end, Cells)
+               end, Events),
+    {NoState, _} = walk(#{onboarding => #{<<"target_price_range">> => [600000, 800000],
+                                          <<"hold_horizon_years">> => 10},
+                          intent => <<"investment">>, blueprint_slug => ?FHB_FOREIGN_INV,
+                          mode => <<"D">>, firb_required_any => true}, Comps),
+    NoStateIds = [maps:get(<<"id">>, E) || E <- maps:get(<<"cash_events">>,
+                                       maps:get(<<"budget_envelope_investor">>, NoState))],
+    [check("cash_position emits the five acquisition events at base",
+           Ids, [<<"deposit">>, <<"firb_fee">>, <<"stamp_duty">>,
+                 <<"foreign_buyer_surcharge">>, <<"other_buying_costs">>]),
+     check("each is cash_position's own figure",
+           lists:usort([maps:get(<<"source_component">>, E) || E <- Events]),
+           [<<"cash_position">>]),
+     check("they sum to total_cash_required", Sum, maps:get(<<"total_cash_required">>, Cash)),
+     check("every counterparty is one of Mode D's swimlane actors",
+           [maps:get(<<"counterparty">>, E) || E <- Events,
+            not lists:member(maps:get(<<"counterparty">>, E), Actors)], []),
+     check("purchase_journey places each event as a money cell", Placed, true),
+     check("no state: only the state-independent deposit and FIRB fee remain",
+           NoStateIds, [<<"deposit">>, <<"firb_fee">>])].
 
 %% Walk the ordered components through the resolver, accumulating by outcome_type exactly
 %% as fh_engine_turn does. Returns the final accumulator + the per-step record (run order).
