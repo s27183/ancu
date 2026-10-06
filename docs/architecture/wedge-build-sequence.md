@@ -52,7 +52,7 @@ The investor-tax KB that Mode C needed was the same `kb.tax.*` / `kb.investor.*`
 
 ## What's left (the roadmap SOT — 2026-07-05)
 
-This section is the single forward-looking "what's left" answer. It replaces the overlapping copies that used to live in `grounding-checklist.md` §2/§3 prose, CLAUDE.md's Status paragraph, and `05-roadmap.md` (all now point here instead of re-narrating).
+This section is the single forward-looking "what's left" answer. It replaces the overlapping copies that used to live in `design/archive/grounding-checklist.md` §2/§3 prose, CLAUDE.md's Status paragraph, and `design/archive/05-roadmap.md` (both archived 2026-10-06; CLAUDE.md now points here instead of re-narrating).
 
 | Item | State | Gate |
 |---|---|---|
