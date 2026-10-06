@@ -1163,7 +1163,7 @@ wrong for QLD).
 
 **Renderer:** `swimlane-diagram`
 
-**UI tab hint:** Flow (leads the tab; folds into the restructure's five-view spine, §5 above — not yet rewritten, tracked in `wedge-build-sequence.md`)
+**UI tab hint:** Flow (leads the tab; part of the five-view spine, §5 above — rewritten 2026-07-10, task 5)
 
 **Fill path:** resolver. The journey structure + bilingual cell prose are generic KB content (`kb.journey.investor-path`); the figures are upstream outcomes placed on the timeline. No agent leaf.
 

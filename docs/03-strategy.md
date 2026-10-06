@@ -303,7 +303,7 @@ Wedge 3: AU + VN investor                  ████████████�
 
 Each wedge layers on cultural + linguistic + product trust earned by the previous. The scope is the Vietnamese diaspora — no expansion beyond it is planned.
 
-> **This is the GTM-time order** (willingness-to-pay, cross-sell, trust earned). For the **build-dependency order** — what each wedge depends on, which external prerequisites gate it, and the chosen build sequence (which currently puts Mode C before Mode B on foundationality grounds) — see [`architecture/wedge-build-sequence.md`](architecture/wedge-build-sequence.md). The two orderings diverge deliberately.
+> **This is the GTM-time order** (willingness-to-pay, cross-sell, trust earned). For the **build-dependency order** — what each wedge depends on, which external prerequisites gate it, and the chosen build sequence (which currently puts Mode C before Mode B on foundationality grounds) — see [`design/archive/wedge-build-sequence.md`](design/archive/wedge-build-sequence.md). The two orderings diverge deliberately.
 
 ### 10.2 Wedge 1 — Vietnamese-Australian FHB lifecycle planning (months 0–14)
 

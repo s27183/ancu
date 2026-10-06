@@ -262,7 +262,7 @@ Mode A is **already** authored as this canonical identity shape ([`../blueprints
 
 ## Mode-C activation — which generalizations build now (2026-06-23)
 
-The build order ([`wedge-build-sequence.md`](wedge-build-sequence.md)) puts **Mode C first** after the unification, so building it fires the first real trigger on this schema. Not all of the canonical generalizations activate at once — each rides its **first-exercising instance**:
+The build order ([`wedge-build-sequence.md`](../design/archive/wedge-build-sequence.md)) puts **Mode C first** after the unification, so building it fires the first real trigger on this schema. Not all of the canonical generalizations activate at once — each rides its **first-exercising instance**:
 
 | Generalization | First exercised by | Status as of 2026-06-23 |
 |---|---|---|
@@ -281,7 +281,7 @@ The build order ([`wedge-build-sequence.md`](wedge-build-sequence.md)) puts **Mo
 
 ## Mode-B activation — the remaining generalizations build now (2026-06-28)
 
-The build order ([`wedge-build-sequence.md`](wedge-build-sequence.md)) puts **Mode B** next after Mode C, so building it fires the **second and final** trigger on this schema: the slots the Mode-C section explicitly deferred to "Mode B, its first-exercising instance." Mode B (Vietnam-parent-funded / AU-temp-resident foreign-person FHB) is exactly that instance — its `buyer_profile` carries a visa-classed AU applicant + an off-title VN funder. With Mode B activated, every canonical generalization has a real exerciser; nothing in the schema text above remains canonical-target-only.
+The build order ([`wedge-build-sequence.md`](../design/archive/wedge-build-sequence.md)) puts **Mode B** next after Mode C, so building it fires the **second and final** trigger on this schema: the slots the Mode-C section explicitly deferred to "Mode B, its first-exercising instance." Mode B (Vietnam-parent-funded / AU-temp-resident foreign-person FHB) is exactly that instance — its `buyer_profile` carries a visa-classed AU applicant + an off-title VN funder. With Mode B activated, every canonical generalization has a real exerciser; nothing in the schema text above remains canonical-target-only.
 
 | Generalization | First exercised by | Status as of 2026-06-28 |
 |---|---|---|

@@ -725,4 +725,4 @@ a "refresh now" action a production user could click.
 [`kb-update-runbook.md`](kb-update-runbook.md) (the authoring workflow),
 [`plan-card-refresh.md`](plan-card-refresh.md) (the separate recompute
 mechanism this deliberately does NOT trigger yet),
-[`wedge-build-sequence.md`](wedge-build-sequence.md) (aggregate status row).
+[`wedge-build-sequence.md`](../design/archive/wedge-build-sequence.md) (aggregate status row).
