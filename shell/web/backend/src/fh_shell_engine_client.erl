@@ -29,6 +29,14 @@
 %% stream gets its own connection rather than queueing behind another (which would just
 %% move the same wedge into this profile). EVERY streaming / infinity-timeout request
 %% MUST use this profile; plain RPC stays on the default profile.
+%% Measured 2026-10-06 (OTP 29.1.1, inets 9.8, at b3-invariant-checks): with this split
+%% ablated — streams on `default`, max_sessions 2 — test/sse_isolation_smoke.escript
+%% still passes (4 held streams, get_plan_card and list_suburbs 200 in <5 ms). Read in
+%% inets 9.8: a session stays `available = false` until its answer is sent
+%% (httpc_internal.hrl:157, httpc_handler.erl:1366), so no request queues behind a
+%% stream, and past max_sessions httpc_manager.erl:795 opens a `connection: close`
+%% handler instead of waiting. So on this OTP the wedge described above does not occur
+%% and the split is defence in depth; the smoke guards the outcome either way.
 -define(SSE_PROFILE, fh_shell_sse).
 -define(SSE_MAX_SESSIONS, 1024).
 %% Headroom for concurrent plain RPC on the default profile (the map + plan + chat all
