@@ -333,10 +333,17 @@ read-only passes across every `docs/kb/**` category directory found 11
 zero-new-research candidates this way — visa, property, tax, finance, and
 scheme all had at least one. Exclude while sweeping: internal doc-reorg /
 seam-reconciliation notes (not real-world facts), facts with no discrete
-transition (always been true), vague/unconfirmed possibilities, future-dated
-reforms not yet enacted law, and — do not fabricate — any candidate whose
+transition (always been true), and — do not fabricate — any candidate whose
 old_value isn't itself stated in-repo (flag it for a future Phase-1 pass with
-real research instead).
+real research instead). **Include** unconfirmed or developing stories and
+announced reforms not yet law when they bear on a buyer's decision (Son,
+2026-08, reaffirmed 2026-10-06: "this news help users to prepare for
+possibilities"): report each at the certainty its source reported it, state
+confirmed parts as plain fact, and end every forward-looking passage with its
+attribution and status — e.g. "This is ABC's analysis, not a determined
+outcome" or "None of these measures are enacted or confirmed." Never present a
+forecast as the platform's own conclusion (the ASIC line), and exclude only
+content with no real connection to a buyer's decision.
 
 ### Phase 2 — Co-update the bilingual copy (when a figure or note changed)
 
