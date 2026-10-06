@@ -257,6 +257,34 @@ events, or a user's usage total, differ from what was streamed before it.
 **Checked by** `engine/erlang/test/restart_replay_smoke.escript` — unbuilt:
 stream a card's events, kill and restart the engine, replay, compare.
 
+## P-3 · The sidecar is stateless and disposable
+
+**Each fill runs in its own Python port, given its full context on stdin,
+exiting when done; any sidecar can be killed at any moment and the engine
+turns that into a `turn_failed` or a retry — nothing lost, no caller left
+waiting.** (Son, 2026-10-06, from the erlang-engine prior;
+`docs/architecture/principles.md` §3 states it too.)
+
+**Fails when** a killed sidecar corrupts `plan_card_events` or leaves a turn
+hanging, or state carries from one fill into the next.
+
+**Proof, shown in this system.** The Agent SDK's bundled `claude` binary
+wrote to fd 1 — the `{packet,4}` port — corrupting frames and crashing the
+decoder (fixed by re-pointing fd 1 at stderr at sidecar start). A stub that
+exited before replying became a clean `turn_failed` ("sidecar exit 0 before
+reply"), not a hang: the hold below working.
+
+**Held by** one disposable port per fill in `fh_engine_turn`; its
+`exit_status` as the structural death signal (no wall-clock timeout,
+`erlang-design-checklist` §15); a hung LLM call bounded in the sidecar by
+`asyncio.wait_for`.
+
+**Falsifier:** `kill -9` on a sidecar mid-fill leaves the turn without a
+`turn_failed`, or leaves a partial component in `plan_card_events`.
+
+**Checked by** `engine/erlang/test/sidecar_kill_smoke.escript` — unbuilt:
+kill the sidecar mid-fill, assert one `turn_failed` and no partial component.
+
 ---
 
 ## The shape of failure
