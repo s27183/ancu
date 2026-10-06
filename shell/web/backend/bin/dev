@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 #
+# Whole-stack walkthrough (start order, the three terminals, the tenant handshake): docs/local-dev.md
+#
 # Shell-backend local-dev launcher. Run from THIS dir:
 #   cd shell/web/backend && bin/dev
 #
