@@ -9,18 +9,22 @@ decision lives beside the mechanism it governs, in the four-slot block
 
 ## The goal
 
-*Empty at plant. This is the designer's, with the attended seat, and it is
-written before anything else — the invariants are derived from it, which is
-why an invariant found wrong means the **goal** is wrong and the goal is
-what gets rewritten.*
-
-**One sentence naming what this system is for.** Then the properties that
-sentence claims, each with a **falsifier a run of this system can trip** — not a
-measure of success, but the observation that would show the property absent:
+**This system gives a Vietnamese buyer of Australian property — first-home,
+investor, or funded from Vietnam — a bilingual plan for the whole property
+lifecycle, built from their own situation, whose every regulated figure traces
+to a verified, cited source.** (Son, 2026-10-06. The product name is left out
+on purpose: it is not settled, and renaming must not touch the ground.)
 
 | Property | Falsified by |
 |---|---|
-| | |
+| Regulated figures are grounded | a duty, grant, cap or fee on a plan card that differs from the official calculator, was written by the LLM rather than the resolver, or traces to a KB doc with no `sources:` |
+| Bilingual | a rendered card, Q&A answer or news item missing its VI or EN text |
+| Reproducible | a filled card with no `deploy_commit_sha` or `kb_versions`, or one that changes silently after a deploy |
+| Honest-partial | a figure shown for an input the user never gave, or a null `suburb.*` value filled in |
+| Whole lifecycle | a mode whose plan has no phase for where the user actually is (buy, hold or sell) |
+
+The invariants are derived from this; an invariant found wrong means the goal
+is wrong, and the goal is what gets rewritten.
 
 Two things make this a goal rather than an invariant wearing a goal's clothes.
 It can be **achieved** — a system reaching every property is done, where
