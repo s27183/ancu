@@ -164,9 +164,19 @@ answers about the runtime, not about the code.
 author*. A claim about what the design intends, or what a decision chooses, has
 no thing to ask and is not covered.
 
-## The couplings
+## How this repo takes changes
 
-*Empty at plant. This is the designer's.*
+A branch per behavior, a draft PR, Son merges; no CI, CONTRIBUTING or PR
+template (probed 2026-10-06). The done checks run from the repo root, offline —
+no LLM, no live stack, a few seconds each (all passed at 26f811d). The escript
+smokes under `engine/erlang/test/` and `shell/web/backend/test/` need Postgres
+and some the planner; a behavior runs the ones it touches.
+
+    checks: `.venv/bin/python tests/validate_build.py`; `.venv/bin/python tests/resolver_eval.py`; `.venv/bin/python tests/eligibility_benefit_eval.py`; `.venv/bin/python tests/cash_duty_eval.py`; `.venv/bin/python tests/mortgage_eval.py`; `.venv/bin/python tests/ownership_eval.py`; `.venv/bin/python tests/bilingual_eval.py`; `.venv/bin/python tests/outcome_validate.py`; `(cd engine/erlang && rebar3 compile)`; `(cd shell/web/backend && rebar3 compile)`; `(cd shell/web/frontend && npm run check)`
+    attribution: co-author+session
+    behaviors: none yet
+
+## The couplings
 
 Read each row as: *when the left changes, the right must follow, by this route,
 and this is what makes it follow.* The "Held by" column is the one that matters —
@@ -174,7 +184,7 @@ a coupling held by nothing is a hope, and naming it here does not make it hold.
 
 | When this changes | This must follow | By what route | Held by |
 |---|---|---|---|
-| | | | |
+| a verified step completes | it lands as a commit, one concern each | once the `checks:` line passes | prompt, rule 3 |
 
 ## What is deliberately not coupled
 
