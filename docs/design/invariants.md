@@ -198,15 +198,39 @@ that passed at task start followed by a failure whose cause was the runtime.
 
 ## This project's invariants
 
-*None yet. The designer states them; the attended seat writes them in the form
-above — statement, fails when, proof, held by, falsifier — and each needs a
-failure shown in this system, not an aspiration. Each is headed
-`## <ID> · <title>` and ends with the check that holds it, the test that
-would trip its falsifier — in an Erlang or Elixir project, a PropEr property
-where it ranges over inputs or states — one or more backticked paths or
-commands; until one exists, the linter warns (W25):*
+Written in the form above; each ends with the check that would trip its
+falsifier.
 
-    **Checked by** `<path or command>`
+## P-1 · One process per concern
+
+**Every long-lived concern — a plan card's turn, a sidecar call, an SSE
+stream — runs in its own supervised process, sharing no resource whose
+exhaustion would stall another; a crash or a hang takes down only that
+concern.** (Son, 2026-10-06, from the erlang-engine prior;
+`docs/architecture/principles.md` §1 states it too.)
+
+**Fails when** a failure in one concern stalls or fails a request that does
+not touch it.
+
+**Proof, shown in this system (June 2026).** The shell proxied the engine's
+SSE stream on httpc's default profile with `{timeout, infinity}`, and its
+plain calls (`get_plan_card`, `simulate`, `refine`, `list_suburbs`) ran on
+the same pool with no timeout: the never-ending stream held a pooled
+session, calls routed onto it hung forever, intermittently — two concurrent
+identical GETs, one 200 in 7 ms, the other hung 8 s. Separate processes, one
+shared pool: the concern boundary leaked through the resource.
+
+**Held by** one `fh_engine_turn` gen_statem per card under
+`fh_engine_turn_sup`; the shell's stream on its own httpc profile
+(`fh_shell_engine_client`, `?SSE_PROFILE`) with a finite timeout on every
+plain call.
+
+**Falsifier:** killing one card's sidecar mid-turn, or holding one stream
+open, makes another card's turn or call fail or hang.
+
+**Checked by** `engine/erlang/test/concern_isolation_smoke.escript` — unbuilt:
+kill card A's sidecar mid-turn while card B's turn completes, and hold an SSE
+stream open while plain calls return.
 
 ---
 
