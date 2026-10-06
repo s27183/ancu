@@ -818,6 +818,33 @@ def compute_affected_components(affected_kb_slugs, blueprints):
     return out
 
 
+# Regulated figures are grounded -> P-7 · One declaration per outcome shape -> KB compiler -> refuses an applicant.* use the resolver cannot honour
+# The resolver reads applicant.* per element, flat: a criterion is tested for every applicant
+# and AND-ed, a fill is mapped over them (fh_engine_resolver eval_joint / eval_applicants). It
+# has no path for a nested applicant.<obj>.<leaf> (maps:get on the flat key gives undefined)
+# and no single value to key a lookup by; and fh_engine_eligibility reads `resolution` as
+# per_applicant or, for any other value, joint, so a misspelt marker silently went joint
+# (#6, measured 2026-10-06: no rule uses any of the three today).
+RESOLUTIONS = ("joint", "per_applicant")
+
+
+def applicant_rule_fails(slug, cj, fails):
+    res = cj.get("resolution", "joint")
+    if res not in RESOLUTIONS:
+        fails.append(f"[resolution] {slug}: {res!r} is not one of {list(RESOLUTIONS)}")
+    for fill in cj.get("fills", []):
+        for item in iter_rule_fields(fill.get("rule", {})):
+            tag, tok = item[0], item[1]
+            if tag not in ("field", "keydim") or not tok.startswith("applicant."):
+                continue
+            if "." in tok[len("applicant."):]:
+                fails.append(f"[applicant-nested] {slug}: {tok!r} — the resolver reads "
+                             f"applicant.* fields flat, per element (architecture §11.9)")
+            elif tag == "keydim":
+                fails.append(f"[applicant-keydim] {slug}: {tok!r} keys a lookup, but "
+                             f"applicant.* has one value per applicant (architecture §11.9)")
+
+
 def semantic_gates(stem, comps, kb_docs, fails, info):
     """Materialize ONE blueprint's registry and run its SEMANTIC gates (architecture
     §11.9 "the registry is per-blueprint"): GATE 6 reference-integrity + GATE 7 coverage
@@ -974,6 +1001,8 @@ def run(emit=False):
             kb_docs[doc["slug"]] = doc
         if doc["parse_error"]:
             fails.append(f"[content_json] {doc['slug']}: parse error: {doc['parse_error']}")
+        elif doc.get("content_json"):
+            applicant_rule_fails(doc["slug"], doc["content_json"], fails)
     stats["kb_docs"] = len(kb_docs)
     stats["news_docs"] = len(news_docs)
 
