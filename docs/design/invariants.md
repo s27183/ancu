@@ -314,6 +314,32 @@ or that the engine shapes for one shell's layout.
 **Checked by** `docs/architecture/engine-contract.md` — unbuilt as a test:
 the check is the §1 review question at every engine route or field change.
 
+## P-5 · Metering, not gating
+
+**The engine emits `usage` at each LLM-call boundary and never decides
+whether work proceeds on money; the shell prices usage and gates the next
+call.** Compliance gates (FIRB, ASIC, AML) are the engine's: they protect the
+agent's behavior, not commerce. (Son, 2026-10-06, from the erlang-engine
+prior; `engine-contract.md` §1 and `principles.md` §5 state it too.)
+
+**Fails when** an engine path refuses or shapes a call on a price, quota or
+credit rule, or the engine DB holds a credit or quota table.
+
+**Proof, shown in this system:** none yet as an engine-side gate (probed
+2026-10-06: no quota/credit/deny-on-usage logic in `engine/erlang/src`). The
+metering seam itself has failed shell-side — P-2's usage-cursor proof.
+
+**Held by** the gate in the shell (`fh_shell_h_plan_card`, `fh_shell_meter`),
+pricing in `fh_shell_pricing` and `fh_shell_billing`, and
+`fh_shell_usage_consumer` tailing `/api/engine/usage_events`.
+
+**Falsifier:** an engine module or migration that names a quota, credit or
+price, or an engine route that returns a refusal on usage.
+
+**Checked by** `shell/web/backend/test/quota_gate_smoke.escript` (the gate is
+the shell's) and `tests/engine_no_gating.py` — unbuilt: fail the build on a
+credit/quota table or call under `engine/`.
+
 ---
 
 ## The shape of failure
