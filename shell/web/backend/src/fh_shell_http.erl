@@ -17,7 +17,7 @@
 child_spec() ->
     Dispatch = cowboy_router:compile(routes()),
     ranch:child_spec(fh_shell_listener, ranch_tcp,
-        #{socket_opts => [{port, port()}], max_connections => 1024},
+        #{socket_opts => [{port, port()} | ip_opt()], max_connections => 1024},
         cowboy_clear,
         %% reset_idle_timeout_on_send: cowboy's idle_timeout (default 60s) is reset
         %% only on data RECEIVED, not sent, unless this is true (cowboy_http
@@ -73,6 +73,18 @@ routes() ->
         {"/api/billing/charge", fh_shell_h_billing, [charge]},
         {"/api/billing/usage", fh_shell_h_billing, [usage]}
     ]}].
+
+%% Reproducible -> P-2 · The database is the single source of truth -> the dev stack -> a loopback-only listener
+%% FH_HTTP_IP (e.g. 127.0.0.1) binds the listener to that address; unset, ranch binds every
+%% interface as before, so prod is unchanged. scripts/dev_stack.sh sets it: the seat's dev
+%% stack runs outside the sandbox and must not serve the LAN (behavior 24, 2026-10-07).
+-spec ip_opt() -> [{ip, inet:ip_address()}].
+ip_opt() ->
+    case os:getenv("FH_HTTP_IP") of
+        false -> [];
+        ""    -> [];
+        S     -> {ok, Ip} = inet:parse_address(S), [{ip, Ip}]
+    end.
 
 -spec port() -> inet:port_number().
 port() ->
