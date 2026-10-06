@@ -25,6 +25,36 @@ the name users read today, is temporary until a final one is chosen — Son,
 | **Honest-partial** | a figure shown for an input the user never gave, or a null `suburb.*` value filled in |
 | **Whole lifecycle** | a mode whose plan has no phase for where the user actually is (buy, hold or sell) |
 
+What the properties hold this project to (Son agreed 2026-10-06, homed from
+the harness memory of earlier sessions):
+
+- **Regulated figures are grounded — scope.** Regulated figures are grounded
+  for what the buyer owes in Australia. Vietnam-side regulated content (SBV,
+  PDP, VN tax) is a labelled placeholder, because the buyer's own Vietnamese
+  counsel owns it — except a treaty term that changes an AU-side figure.
+- **Regulated figures are grounded — honesty tiers.** Every KB figure carries
+  its provenance: REGULATED (exact, from a primary), CONVENTION or
+  LENDER-POLICY (a band, labelled), or PLACEHOLDER (with a named re-ground
+  source). A figure no primary supports is labelled or `to_verify`, never
+  stated as fact. That covers per-row tiers in a multi-state table, and
+  announced reform that is not yet law.
+- **Regulated figures are grounded — one owner per fact.** Each regulated fact
+  has exactly one owning KB doc. Every other doc cross-references it by slug,
+  and a variant doc owns only its deltas. Before writing a new doc, grep for an
+  existing owner.
+- **Regulated figures are grounded — one computer per figure.** Each figure is
+  computed once, by its owning component. Every other component, preview and
+  shell places it read-only, and a placed figure carries `source_component` =
+  its owner.
+- **Regulated figures are grounded — the advice boundary.** A KB doc that
+  reaches toward advice (ASIC/AFSL, ACL credit, legal drafting, AML/CTF) states
+  its regime's boundary as policy parameters (e.g.
+  `no_named_lender_recommendation`) and gives options and criteria, never a
+  verdict, ranking or drafted wording.
+- **Regulated figures are grounded — the residual loop.** A failure that slips
+  past the producer's grounding becomes a deterministic rule in the next
+  deploy, never a standing LLM check.
+
 The invariants are derived from this; an invariant found wrong means the goal
 is wrong, and the goal is what gets rewritten.
 
