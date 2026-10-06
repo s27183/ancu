@@ -13,7 +13,9 @@ decision lives beside the mechanism it governs, in the four-slot block
 investor, or funded from Vietnam — a bilingual plan for the whole property
 lifecycle, built from their own situation, whose every regulated figure traces
 to a verified, cited source.** (Son, 2026-10-06. The product name is left out
-on purpose: it is not settled, and renaming must not touch the ground.)
+on purpose: it is not settled, and renaming must not touch the ground. "Rau",
+the name users read today, is temporary until a final one is chosen — Son,
+2026-10-06.)
 
 | Property | Falsified by |
 |---|---|
