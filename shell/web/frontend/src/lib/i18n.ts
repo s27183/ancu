@@ -771,6 +771,9 @@ const messages = {
     'plan.tx.geared_negative': { vi: 'Âm dòng tiền (negatively geared)', en: 'Negatively geared' },
     'plan.tx.marginal_rate': { vi: 'Thuế suất biên', en: 'Marginal tax rate' },
     'plan.tx.after_tax_cf': { vi: 'Dòng tiền sau thuế (năm 1)', en: 'After-tax cash flow (yr 1)' },
+    'plan.tx.setup_costs': { vi: 'Chi phí thành lập pháp nhân', en: 'Entity setup' },
+    'plan.tx.setup_from': { vi: 'từ {amount}', en: 'from {amount}' },
+    'plan.tx.indicative': { vi: '(ước tính tham khảo)', en: '(indicative)' },
     'plan.tx.entity_pending': { vi: 'Xác nhận với chuyên viên thuế có đăng ký', en: 'To confirm with a registered tax agent' },
     // tax_structure_non_resident (Mode D — same tax_optimised_structure type, different fields).
     'plan.tx.geared_not_available': { vi: 'Không đủ điều kiện gearing', en: 'Not gearing-eligible' },

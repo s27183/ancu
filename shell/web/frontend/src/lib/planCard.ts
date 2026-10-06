@@ -331,7 +331,8 @@ export interface TaxOptimisedStructureOutcome {
     cgt_marginal_rate?: number | null;
     cost_base_depreciation_clawback?: boolean | null;
     annual_compliance_cost?: number | null;
-    setup_costs?: number | null;
+    /** entity setup, INDICATIVE band from kb.tax.entity-setup-costs; [lo, null] = "from lo". */
+    setup_costs?: [number, number | null] | null;
     negative_gearing_reform_note?: LocalizedText | null;
 }
 
