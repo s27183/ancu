@@ -6,8 +6,8 @@
 # Reproducible -> P-2 · The database is the single source of truth -> Mechanisms -> a live smoke named, not a free command
 # A seat's granted Need may not start with `VAR=` (Claude Code exempts a command from the
 # sandbox only after stripping a leading assignment on its safe list; ENGINE_DATABASE_URL and
-# ERL_LIBS are not on it — read in the 2.1.291 binary by enacs, 2026-10-06; measured here the
-# same day: the VAR= form ran sandboxed, `inet_tcp` listen eperm). So the variables live in
+# ERL_LIBS are not on it — read in the 2.1.292 binary 2026-10-07 (its a1 set; enacs read the
+# prior release 2026-10-06 the same); measured here 2026-10-06: the VAR= form ran sandboxed, `inet_tcp` listen eperm). So the variables live in
 # this script, and the allowlist below keeps the grant to the named smokes: a confirm pins
 # this file, so adding a smoke here is a change Son re-confirms.
 set -euo pipefail
