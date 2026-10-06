@@ -744,6 +744,7 @@ The `mortgage_plan` outcome feeds `yield_modelling.loan_costs` (the loan cost ca
     "gap_or_surplus": "money",
     "verdict": "enum",
     "mitigation_options_if_short": "array<string>",
+    "key_assumptions": "array<localized_text>",  // CONVENTION caveats on the 80% baseline — an attached apartment adds assumption_security_lvr_cap (lenders may cap LVR for this security; kb.lender.investment-loan-policies, #3); the figures stay at the baseline
     "cash_events": "array<{ id: string, phase: enum [contract, settle], label: localized_text, direction: 'out', amount: money_range, is_estimate: bool, timing: 'one_off', period: null, counterparty: string, source_component: 'cash_position' }>"  // the investor ACQUISITION spine (RESOLVED 2026-07-10, task 4) — deposit (contract, counterparty services), stamp_duty (settle, government), other_buying_costs (settle, services), lmi (settle, lender); a scalar figure collapses to [v,v]. entity_setup_costs is NOT yet an event (the underlying tax_optimised_structure.setup_costs figure is permanently null — a separate, still-open entity-cost seam). Implemented by `fh_engine_cash:cash_events_investor/4`; purchase_journey's generic multi-source harvest places these on the swimlane
   }
 }
