@@ -275,8 +275,9 @@ exited before replying became a clean `turn_failed` ("sidecar exit 0 before
 reply"), not a hang: the hold below working.
 
 **Held by** one disposable port per fill in `fh_engine_turn`; its
-`exit_status` as the structural death signal (no wall-clock timeout,
-`erlang-design-checklist` §15); a hung LLM call bounded in the sidecar by
+`exit_status` as the structural death signal (no wall-clock timeout:
+`docs/architecture/erlang-design-checklist.md`, "15. No Wall-Clock Timeouts
+on Supervised Ports"); a hung LLM call bounded in the sidecar by
 `asyncio.wait_for`.
 
 **Falsifier:** `kill -9` on a sidecar mid-fill leaves the turn without a
