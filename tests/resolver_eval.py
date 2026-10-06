@@ -417,6 +417,28 @@ CASES = [
         ]},
         "expect_per_applicant": {"eligibility.fhss.eligible": [True, False]},
     },
+    # -- #6: applicant.* ∀ / map on a mixed household (mirrors resolver_conformance).
+    {
+        "name": "mixed-household-citizen-and-temporary-resident",
+        "note": ("A citizen and a temporary resident who already released FHSS. Joint FHG is "
+                 "∀ over citizenship → False; FHSS per applicant → [True, False]; "
+                 "firb_required maps per applicant → [False, True]."),
+        "facts": {
+            "applicants": [
+                {"citizenship_status": "citizen", "age": 30, "ever_owned_au_property": False,
+                 "years_since_last_au_property_interest": 0, "owner_occupier_intent": True,
+                 "prior_fhss_release": False},
+                {"citizenship_status": "temporary_resident", "age": 31,
+                 "ever_owned_au_property": False, "years_since_last_au_property_interest": 0,
+                 "owner_occupier_intent": True, "prior_fhss_release": True},
+            ],
+            "property_fit": {"state": "NSW", "price": 1200000},
+            "locals": {"location_tier": "capital_or_regional_centre"},
+        },
+        "expect": {"eligibility.fhg.eligible": False},
+        "expect_per_applicant": {"eligibility.fhss.eligible": [True, False],
+                                 "applicant.firb_required": [False, True]},
+    },
 ]
 
 
