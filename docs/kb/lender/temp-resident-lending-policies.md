@@ -1,7 +1,17 @@
 ---
 slug: kb.lender.temp-resident-lending-policies
 effective_from: 2025-07-01
-last_verified: 2026-07-02
+last_verified: 2026-07-06
+sources:
+  - url: https://www.homeloanexperts.com.au/non-resident-mortgages/temporary-resident-mortgage/
+    retrieved: 2026-07-06
+    note: "AU-income temp residents assessed near-domestic (usually 80% LVR, 95% with a citizen/PR partner); foreign income counted only by select lenders at a reduced shading rate. Lender-policy convention (aggregator source)"
+  - url: https://www.canstar.com.au/home-loans/non-resident-home-loans/
+    retrieved: 2026-07-06
+    note: "Foreign-person 60-70% LVR / 30-40% deposit; only a select few lenders lend to non-residents (mostly non-banks). Lender-policy convention (aggregator source)"
+  - url: https://www.apra.gov.au/news-and-publications/apra-announces-update-on-macroprudential-settings
+    retrieved: 2026-07-06
+    note: "Serviceability buffer remains at 3 percentage points — applies identically to foreign borrowers (the buffer is not the source of lower foreign capacity)"
 ---
 
 # Lender policies for temporary residents and non-residents (the foreign-axis delta)

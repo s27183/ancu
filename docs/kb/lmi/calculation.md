@@ -1,7 +1,11 @@
 ---
 slug: kb.lmi.calculation
 effective_from: 2025-07-01
-last_verified: 2026-06-01
+last_verified: 2026-07-06
+sources:
+  - url: https://www.qbe.com/lmi
+    retrieved: 2026-07-06
+    path: docs/sources/qbe_lmi/qbe-lmi-guide.pdf
 ---
 
 # Lenders Mortgage Insurance — how the premium is calculated

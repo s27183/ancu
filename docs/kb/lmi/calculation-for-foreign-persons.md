@@ -1,7 +1,10 @@
 ---
 slug: kb.lmi.calculation-for-foreign-persons
 effective_from: 2025-07-01
-last_verified: 2026-07-02
+last_verified: 2026-07-06
+sources:
+  - url: https://www.homeloanexperts.com.au/non-resident-mortgages/temporary-resident-mortgage/
+    retrieved: 2026-07-06
 ---
 
 # LMI for foreign persons — the availability delta

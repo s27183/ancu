@@ -30,8 +30,12 @@ export interface PlanCardStreamHandlers {
     onTextDelta?: (delta: TextDelta) => void;
     onUsage?: (usage: unknown) => void;
     /** A terminal event arrived (turn_completed | turn_failed). The stream is closed
-     *  before this fires; `failed` carries the engine's failure payload when present. */
-    onDone?: (failed: unknown | null) => void;
+     *  before this fires; `failed` carries the engine's failure payload when present.
+     *  `lastEventId` is the terminal's own SSE id (fh_engine_h_events emits `id: N` per
+     *  frame) — a caller that reopens a fresh EventSource (subscribePlanCard closes on
+     *  every terminal by design) passes it back as `lastEventId` so the replay picks up
+     *  from here instead of replaying the whole append-only log from event 0. */
+    onDone?: (failed: unknown | null, lastEventId: number | null) => void;
     /** A transport-level error (the EventSource errored before a terminal event). */
     onError?: () => void;
 }
@@ -82,14 +86,20 @@ export function subscribePlanCard(
 
     // Terminal events: close FIRST so the browser doesn't auto-reconnect on the
     // upstream's stream end, then notify.
-    es.addEventListener('turn_completed', () => {
+    const terminalEventId = (e: MessageEvent): number | null => {
+        const n = Number(e.lastEventId);
+        return Number.isFinite(n) && n > 0 ? n : null;
+    };
+    es.addEventListener('turn_completed', (e) => {
+        const id = terminalEventId(e as MessageEvent);
         close();
-        handlers.onDone?.(null);
+        handlers.onDone?.(null, id);
     });
     es.addEventListener('turn_failed', (e) => {
         const failed = parse(e as MessageEvent);
+        const id = terminalEventId(e as MessageEvent);
         close();
-        handlers.onDone?.(failed);
+        handlers.onDone?.(failed, id);
     });
 
     // EventSource auto-reconnects on a dropped connection; surface it once. If we have

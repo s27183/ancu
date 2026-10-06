@@ -1,7 +1,10 @@
 ---
 slug: kb.firb.approval-conditions-typical
 effective_from: 2025-04-01
-last_verified: 2026-06-28
+last_verified: 2026-07-06
+sources:
+  - url: https://foreigninvestment.gov.au/guidance/types-investments/residential-land
+    retrieved: 2026-07-06
 ---
 
 # FIRB — typical approval conditions

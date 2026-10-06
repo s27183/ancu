@@ -44,11 +44,18 @@ main(_) ->
 
 %% --- fixtures ----------------------------------------------------------------
 
+%% fourteen fields (was thirteen) — intended_occupancy_use added 2026-07-11 (task 11,
+%% plan-card-lifecycle-restoration.md §11.4): disposition's cgt/1 reads it as one of its
+%% two CGT-exemption determinants. Definitionally "sole_occupier" for Mode B (same call
+%% as Mode A's own profile — an owner-occupier FHB by mode definition); tax_residency,
+%% the OTHER determinant, is deliberately NOT added here (genuinely unknown for a foreign
+%% applicant at base — see fh_engine_fill.erl's buyer_profile_foreign/1 comment).
 fields() ->
     [<<"applicants">>, <<"applicant_count">>, <<"firb_required_any">>,
      <<"off_title_parties">>, <<"assessable_income">>, <<"approx_borrowing_capacity">>,
      <<"deposit_ready_for_purchase_amount">>, <<"debts">>, <<"target_price_range">>,
-     <<"target_zone">>, <<"hold_horizon_years">>, <<"key_constraints">>, <<"key_strengths">>].
+     <<"target_zone">>, <<"hold_horizon_years">>, <<"intended_occupancy_use">>,
+     <<"key_constraints">>, <<"key_strengths">>].
 
 applicant_null_at_base() ->
     [<<"citizenship_status">>, <<"visa_class">>, <<"visa_grant_date">>,
@@ -109,6 +116,9 @@ scaffold_cases() ->
            g(O, <<"target_price_range">>), [700000, 900000]),
      check("target_zone carried from onboarding",
            g(O, <<"target_zone">>), [<<"Footscray">>]),
+     check("intended_occupancy_use = sole_occupier (definitional, mirrors Mode A's own "
+           "call — an owner-occupier FHB by mode definition)",
+           g(O, <<"intended_occupancy_use">>), <<"sole_occupier">>),
      check("kb_versions = the four Mode-B profile anchors",
            lists:sort(KbSlugs),
            lists:sort([<<"kb.firb.status-determination">>,

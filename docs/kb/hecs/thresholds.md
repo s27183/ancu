@@ -1,7 +1,14 @@
 ---
 slug: kb.hecs.thresholds
-effective_from: 2025-07-01
-last_verified: 2026-06-01
+effective_from: 2026-07-01
+last_verified: 2026-07-06
+sources:
+  - url: https://www.ato.gov.au/tax-rates-and-codes/study-and-training-support-loans-rates-and-repayment-thresholds
+    note: "PRIMARY (ATO) — 403 Forbidden to WebFetch in-sandbox this session; the 2026-27 figures below were corroborated to the digit against two independent secondary sources that cite it. Re-verify directly against this page when a non-blocked fetch is available."
+  - url: https://www.scalesuite.com.au/resources/understanding-stsl-tax-a-comprehensive-guide
+    retrieved: 2026-07-06
+  - url: https://www.wagecalculator.com.au/guides/hecs-help-repayment
+    retrieved: 2026-07-06
 ---
 
 # HECS-HELP repayment thresholds and lender treatment
@@ -12,23 +19,23 @@ A **HECS-HELP** (Higher Education Loan Program) debt is a compulsory study-loan 
 
 From the **2025-26 income year (1 July 2025)** the repayment rules changed substantially, and the change **inverts** older guidance:
 
-- **Minimum repayment threshold raised to $67,000** (from $54,435 in 2024-25). Below this, no compulsory repayment.
+- **Minimum repayment threshold raised to $67,000** in 2025-26 (from $54,435 in 2024-25), then **indexed to $69,528 for 2026-27** (the current income year, from 1 July 2026). Below the threshold, no compulsory repayment.
 - **Marginal calculation.** Repayment is now charged **only on income above the threshold**, not as a flat percentage of total income. This removes the old "cliff" where crossing a bracket taxed the whole income.
 - **One-off 20% debt reduction.** Every HELP balance was cut by **20% as at 1 June 2025** (applied before that year's indexation). A balance quoted from before this date overstates the debt.
-- **Indexation reform (context).** Since 2023 HELP is indexed to the **lower of CPI or the Wage Price Index**, capping runaway indexation.
+- **Indexation reform (context).** Since 2023 HELP is indexed to the **lower of CPI or the Wage Price Index**, capping runaway indexation (the 1 June 2026 balance indexation was 2.8%). The repayment *thresholds* are separately indexed each year, which is why the $67,000 (2025-26) minimum rose to $69,528 (2026-27).
 
-## Repayment schedule (2025-26)
+## Repayment schedule (2026-27)
 
 Compulsory repayment is computed from **repayment income** (broadly taxable income plus some add-backs):
 
 | Repayment income | Compulsory repayment |
 |---|---|
-| $0 – $67,000 | Nil |
-| $67,001 – $125,000 | 15c per $1 **over $67,000** |
-| $125,001 – $179,285 | $8,700 + 17c per $1 **over $125,000** |
-| $179,286 + | **10% of total** repayment income |
+| $0 – $69,528 | Nil |
+| $69,529 – $129,717 | 15c per $1 **over $69,528** |
+| $129,718 – $186,050 | $9,028 + 17c per $1 **over $129,717** |
+| $186,051 + | **10% of total** repayment income |
 
-The bands meet cleanly: at $179,285 the marginal calculation ($8,700 + 17% × $54,285 ≈ $17,928) equals 10% of total, after which the top band charges a flat 10% of the **whole** income (the one place the system is not marginal — a catch-up for high earners).
+The bands meet cleanly: at $186,050 the marginal calculation ($9,028 + 17% × $56,333 ≈ $18,605) equals 10% of total, after which the top band charges a flat 10% of the **whole** income (the one place the system is not marginal — a catch-up for high earners).
 
 ## Why it matters to borrowing capacity
 
@@ -40,7 +47,7 @@ A lender treats the **annual compulsory repayment at the borrower's income** as 
 ## Relevance for Vietnamese-Australian buyers (Mode A)
 
 - Many Mode A buyers are university-educated professionals carrying a HECS balance; it is one of the most common capacity drags after credit-card limits.
-- The reform **helps** these buyers: the higher $67,000 threshold and marginal rates mean a smaller compulsory repayment at typical FHB incomes, so the same income now services a larger loan than under the old flat system. Surface this when income sits in the $67k–$90k band, where the change is largest.
+- The reform **helps** these buyers: the higher $69,528 threshold (2026-27) and marginal rates mean a smaller compulsory repayment at typical FHB incomes, so the same income now services a larger loan than under the old flat system. Surface this when income sits in the $69.5k–$90k band, where the change is largest.
 - The 20% cut means a balance the buyer remembers may be materially lower now — re-pull the current ATO balance rather than relying on the user's figure.
 
 ## Rules
@@ -51,26 +58,26 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
 {
   "fills": [],
   "parameters": {
-    "minimum_repayment_threshold":   { "type": "money",      "value": 67000,  "note": "2025-26; below this no compulsory repayment (was $54,435 in 2024-25)" },
-    "prior_year_threshold":          { "type": "money",      "value": 54435,  "note": "2024-25 minimum — kept for context; do not use for current calcs" },
-    "second_band_floor":             { "type": "money",      "value": 125000, "note": "15%→17% marginal transition" },
-    "top_band_floor":                { "type": "money",      "value": 179285, "note": "above this: flat 10% of TOTAL income (not marginal)" },
-    "marginal_rate_band1":           { "type": "percentage", "value": 15,     "note": "on income $67,001–$125,000" },
-    "marginal_rate_band2":           { "type": "percentage", "value": 17,     "note": "on income $125,001–$179,285, plus $8,700 base" },
-    "band2_base_amount":             { "type": "money",      "value": 8700,   "note": "= 15% × ($125,000 − $67,000)" },
-    "top_band_rate_of_total_income": { "type": "percentage", "value": 10,     "note": "flat, applied to whole repayment income above $179,285" },
+    "minimum_repayment_threshold":   { "type": "money",      "value": 69528,  "note": "2026-27; below this no compulsory repayment (was $67,000 in 2025-26)" },
+    "prior_year_threshold":          { "type": "money",      "value": 67000,  "note": "2025-26 minimum — kept for context; do not use for current calcs" },
+    "second_band_floor":             { "type": "money",      "value": 129717, "note": "15%→17% marginal transition (2026-27)" },
+    "top_band_floor":                { "type": "money",      "value": 186050, "note": "above this: flat 10% of TOTAL income (not marginal) (2026-27)" },
+    "marginal_rate_band1":           { "type": "percentage", "value": 15,     "note": "on income $69,529–$129,717" },
+    "marginal_rate_band2":           { "type": "percentage", "value": 17,     "note": "on income $129,718–$186,050, plus $9,028 base" },
+    "band2_base_amount":             { "type": "money",      "value": 9028,   "note": "= 15% × ($129,717 − $69,528)" },
+    "top_band_rate_of_total_income": { "type": "percentage", "value": 10,     "note": "flat, applied to whole repayment income above $186,050" },
     "one_off_debt_reduction_pct":    { "type": "percentage", "value": 20,     "note": "all HELP balances cut by 20% as at this date, before indexation" },
     "one_off_debt_reduction_date":   { "type": "date",       "value": "2025-06-01" },
     "indexation_basis":              { "type": "string",     "value": "lower of CPI or Wage Price Index", "note": "since 2023; caps indexation" }
   },
   "lookup": {
     "repayment_schedule_2025_26": {
-      "note": "ordered marginal bands; resolver selects the band for the borrower's repayment income and computes the compulsory repayment — schedule supplied here, arithmetic in resolver code",
+      "note": "KEY NAME retained as _2025_26 to preserve the resolver contract (fh_engine_mortgage.erl reads this exact lookup key); the ENTRIES below carry the current 2026-27 figures. Renaming the key would require a coordinated change to the Erlang resolver + artifact recompile — flagged for the team, not done in this citation pass. Ordered marginal bands; resolver selects the band for the borrower's repayment income and computes the compulsory repayment — schedule supplied here, arithmetic in resolver code",
       "entries": [
-        { "band": "nil",       "income_from": 0,      "income_to": 67000,  "marginal_rate_pct": 0,  "base_amount": 0 },
-        { "band": "lower",     "income_from": 67001,  "income_to": 125000, "marginal_rate_pct": 15, "base_amount": 0,    "marginal_over": 67000 },
-        { "band": "upper",     "income_from": 125001, "income_to": 179285, "marginal_rate_pct": 17, "base_amount": 8700, "marginal_over": 125000 },
-        { "band": "top_flat",  "income_from": 179286, "income_to": null,   "flat_rate_of_total_pct": 10 }
+        { "band": "nil",       "income_from": 0,      "income_to": 69528,  "marginal_rate_pct": 0,  "base_amount": 0 },
+        { "band": "lower",     "income_from": 69529,  "income_to": 129717, "marginal_rate_pct": 15, "base_amount": 0,    "marginal_over": 69528 },
+        { "band": "upper",     "income_from": 129718, "income_to": 186050, "marginal_rate_pct": 17, "base_amount": 9028, "marginal_over": 129717 },
+        { "band": "top_flat",  "income_from": 186051, "income_to": null,   "flat_rate_of_total_pct": 10 }
       ]
     }
   }
@@ -80,12 +87,14 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
 Notes:
 
 - **No `fills`.** Nothing in `buyer_profile`'s or `mortgage_finance`'s outcome is set directly by this doc — `hecs_balance` is a raw user fact, and the compulsory repayment / capacity uplift are **resolver-computed** from this schedule (the same "computed, not asserted" discipline as stamp duty and LMI). The doc is reference data the resolver and agent read.
-- **The top band is the one non-marginal step.** Above $179,285 the charge is 10% of *total* income, not a marginal slice — encoded as `flat_rate_of_total_pct` so the resolver branches correctly. The other bands carry `marginal_over` (the income floor the rate applies above) plus a `base_amount`.
-- **`lookup` not `parameter` for the schedule** because it is a keyed/ordered band table the resolver indexes into — the vocabulary's intended use for a table of bands. The scalar thresholds are duplicated as `parameter`s for direct reference (e.g. the agent surfacing "$67,000 threshold") without parsing the lookup.
+- **The top band is the one non-marginal step.** Above $186,050 the charge is 10% of *total* income, not a marginal slice — encoded as `flat_rate_of_total_pct` so the resolver branches correctly. The other bands carry `marginal_over` (the income floor the rate applies above) plus a `base_amount`.
+- **`lookup` not `parameter` for the schedule** because it is a keyed/ordered band table the resolver indexes into — the vocabulary's intended use for a table of bands. The scalar thresholds are duplicated as `parameter`s for direct reference (e.g. the agent surfacing "$69,528 threshold") without parsing the lookup.
 - **Balance freshness.** The 20% cut (1 Jun 2025) means a user-remembered balance is likely stale; the agent should reason against the current ATO balance, not the figure the user volunteers. This is a data-currency note, not a rule.
 
 ## Sources
 
-- Australian Taxation Office — *Study and training support loans — rates and repayment thresholds* (2025-26 marginal schedule; $67,000 minimum threshold) — https://www.ato.gov.au/tax-rates-and-codes/study-and-training-support-loans-rates-and-repayment-thresholds
-- Department of Education — *Making HELP and student loan repayments fairer* (marginal system, $67,000 threshold, effective 2025-26) — https://www.education.gov.au/higher-education-loan-program/making-help-and-student-loan-repayments-fairer
+- Australian Taxation Office — *Study and training support loans — rates and repayment thresholds* (PRIMARY for the marginal schedule + minimum threshold) — https://www.ato.gov.au/tax-rates-and-codes/study-and-training-support-loans-rates-and-repayment-thresholds — **NOTE: 403 Forbidden to WebFetch in this sandbox on 2026-07-06; the 2026-27 figures below were corroborated to the digit against the two independent secondary sources that cite it. Re-verify directly against this page when a non-blocked fetch is available.**
+- ScaleSuite — *Understanding STSL Tax: 2026-27 thresholds and marginal rates* ($69,528 minimum; bands $69,529–$129,717 @ 15c, $129,718–$186,050 @ $9,028 + 17c, $186,051+ @ 10% of total; confirms rise from $67,000 in 2025-26) — https://www.scalesuite.com.au/resources/understanding-stsl-tax-a-comprehensive-guide (retrieved 2026-07-06)
+- WageCalculator — *HECS/HELP Repayment Thresholds 2026–2027* (same four-band 2026-27 schedule; $69,528 threshold) — https://www.wagecalculator.com.au/guides/hecs-help-repayment (retrieved 2026-07-06)
+- Department of Education — *Making HELP and student loan repayments fairer* (marginal-system reform, effective 2025-26) — https://www.education.gov.au/higher-education-loan-program/making-help-and-student-loan-repayments-fairer
 - Australian Taxation Office — *Study and training loans — what's new* (20% one-off reduction as at 1 June 2025; indexation reform) — https://www.ato.gov.au/individuals-and-families/study-and-training-support-loans/study-and-training-loans-what-s-new

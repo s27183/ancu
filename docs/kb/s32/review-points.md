@@ -1,7 +1,12 @@
 ---
 slug: kb.s32.review-points
 effective_from: 2020-03-01
-last_verified: 2026-06-02
+last_verified: 2026-07-06
+sources:
+  - url: https://www.legislation.vic.gov.au/in-force/acts/sale-land-act-1962
+    retrieved: 2026-07-06
+    path: docs/sources/vic/sales_of_land_act_1962.pdf
+    note: "VIC Sale of Land Act 1962 ss32-32I vendor-statement contents (s32A financial, s32B insurance ... s32I title) + s32M purchaser rescission; read via archived PDF, Authorised Version No. 172 as at 25 Nov 2025"
 ---
 
 # Section 32 vendor statement — review points (VIC)

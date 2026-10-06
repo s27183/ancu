@@ -1,7 +1,11 @@
 ---
 slug: kb.lender.credit-card-treatment
 effective_from: 2019-01-01
-last_verified: 2026-06-01
+last_verified: 2026-07-06
+sources:
+  - url: https://www.asic.gov.au/about-asic/news-centre/find-a-media-release/2018-releases/18-257mr-asic-prescribes-three-year-period-for-credit-card-responsible-lending-assessments/
+    retrieved: 2026-07-06
+    note: "ASIC 18-257MR — prescribed a three-year period (ASIC Credit (Unsuitability—Credit Cards) Instrument 2018/753) for credit-card responsible-lending assessments; commences 1 January 2019"
 ---
 
 # Credit-card treatment in serviceability — by lender
@@ -53,6 +57,6 @@ Notes:
 
 ## Sources
 
-- ASIC — *Credit cards: Responsible lending assessments* (CP 303; from 1 January 2019 issuers assess ability to repay the credit limit within a prescribed period — set at three years) — https://download.asic.gov.au/media/4801736/cp303-published-4-july-2018.pdf
-- ASIC Instrument 20-0746 (prescribed period for credit-card responsible-lending assessment) — https://download.asic.gov.au/media/5734771/asic-instrument-20-0746.pdf
+- ASIC — *18-257MR ASIC prescribes three-year period for credit card responsible lending assessments* (creates *ASIC Credit (Unsuitability—Credit Cards) Instrument 2018/753*; from 1 January 2019 issuers assess ability to repay the credit limit within three years) — https://www.asic.gov.au/about-asic/news-centre/find-a-media-release/2018-releases/18-257mr-asic-prescribes-three-year-period-for-credit-card-responsible-lending-assessments/
+- ASIC — *Consultation Paper 303: Credit card lending* (background; proposed the prescribed period) — https://download.asic.gov.au/media/4801736/cp303-published-4-july-2018.pdf
 - ASIC Moneysmart — *How much you can borrow* (lenders assess existing debts including credit-card limits against borrowing capacity) — https://moneysmart.gov.au/home-loans/how-much-you-can-borrow

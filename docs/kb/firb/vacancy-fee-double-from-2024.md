@@ -1,7 +1,11 @@
 ---
 slug: kb.firb.vacancy-fee-double-from-2024
 effective_from: 2024-04-09
-last_verified: 2026-06-28
+last_verified: 2026-07-06
+sources:
+  - url: https://foreigninvestment.gov.au/sites/foreigninvestment.gov.au/files/2024-08/gn-10-fees-fi-apps-aug-2024.pdf
+    retrieved: 2026-07-06
+    path: docs/sources/firb/gn10-fees-fi-apps-v5-aug-2024.pdf
 ---
 
 # FIRB — vacancy fee doubled from 9 April 2024

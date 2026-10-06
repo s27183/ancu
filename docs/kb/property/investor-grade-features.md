@@ -1,7 +1,10 @@
 ---
 slug: kb.property.investor-grade-features
 effective_from: 2025-07-01
-last_verified: 2026-06-23
+last_verified: 2026-07-06
+sources:
+  - url: https://moneysmart.gov.au/property-investment/buying-an-investment-property
+    retrieved: 2026-07-06
 ---
 
 # Investor-grade features — what makes a property fit for investment

@@ -26,7 +26,7 @@ main(_) ->
     io:format("journey conformance — fh_engine_journey (two-spines place-never-compute)~n~n"),
     R = lists:flatten([structure_cases(), conformance_cases(), placement_cases(),
                        interaction_cases(), honest_partial_cases(), bilingual_case(),
-                       dispose_cases()]),
+                       dispose_cases(), investor_dispose_cases()]),
     Fails = [X || X <- R, X =:= fail],
     io:format("~n================================================================~n"),
     case Fails of
@@ -226,6 +226,57 @@ dispose_cases() ->
      check("honest-partial: empty dispose_cash_events ⟹ no Dispose column (5 phases)",
            EmptyIds,
            [<<"prepare">>, <<"pre_approve">>, <<"contract">>, <<"settle">>, <<"own">>])].
+
+%% --- investor dispose: every cell's actor MUST resolve in the declared actor set -----------
+%% The bug this guards against (found 2026-07-10, [[firsthomey-bcd-lifecycle-restructure]]
+%% task 10): fh_engine_disposition used to hardcode the sale_proceeds/selling_costs
+%% counterparty to "other" — an actor id ABSENT from the Mode-C/D six-actor swimlane
+%% (investor_actors() renames it "services"). SwimlaneDiagram.svelte iterates the DECLARED
+%% actors array and looks up cells strictly by actor id — a cell whose actor isn't in that
+%% array is silently never rendered, no crash, no error. A per-event counterparty-string check
+%% (mode_d_p2_conformance.escript) doesn't catch this class of bug; only asserting the cell's
+%% `actor` resolves inside the outcome's own `actors` list does — the exact invariant the
+%% frontend relies on. Exercises the REAL fh_engine_disposition output (not a synthetic fixture)
+%% so a regression in either module's actor-id vocabulary trips this.
+investor_dispose_cases() ->
+    lists:flatten([investor_dispose_case(<<"investor-domestic-au">>, false),
+                   investor_dispose_case(<<"investor-foreign-au">>, true)]).
+
+investor_dispose_case(Slug, ForeignInvestor) ->
+    DispUpstream = #{<<"profile">> => #{<<"hold_horizon_years">> => 10,
+                                        <<"target_price_range">> => [600000, 800000],
+                                        <<"intended_occupancy_use">> => <<"rented">>,
+                                        <<"tax_residency">> => <<"resident">>},
+                     <<"tax_optimised_structure">> =>
+                         #{<<"recommended_entity">> => <<"personal_sole">>,
+                           <<"cgt_discount_eligible">> => true,
+                           <<"cgt_marginal_rate">> => 37.0,
+                           <<"cost_base_depreciation_clawback">> => false,
+                           <<"frcgw_applicable">> => ForeignInvestor},
+                     <<"budget_envelope_investor">> => #{<<"loan_amount">> => 480000},
+                     <<"cash_flow_projection">> => #{}},
+    {DispOutcome, _, _} = fh_engine_disposition:fill(#{}, DispUpstream),
+    Up = #{<<"disposition">> => DispOutcome},
+    {Outcome, _, _} = fh_engine_journey:fill(#{blueprint_slug => Slug}, Up),
+    ActorIds = [maps:get(<<"id">>, A) || A <- maps:get(<<"actors">>, Outcome)],
+    Cells    = maps:get(<<"cells">>, Outcome),
+    DisposeMoney = [C || C <- Cells, maps:get(<<"phase">>, C) =:= <<"dispose">>,
+                        lists:member(maps:get(<<"flow_marker">>, C),
+                                     [<<"money_out">>, <<"money_in">>])],
+    OrphanedActors = [maps:get(<<"actor">>, C) || C <- DisposeMoney,
+                                                  not lists:member(maps:get(<<"actor">>, C), ActorIds)],
+    Sale = money_at(Cells, <<"dispose">>, <<"services">>, <<"money_in">>),
+    [check(<<Slug/binary, ": six-actor set includes \"services\", not \"other\"">>,
+           {lists:member(<<"services">>, ActorIds), lists:member(<<"other">>, ActorIds)},
+           {true, false}),
+     check(<<Slug/binary, ": at least one dispose money cell rendered "
+             "(sale/selling survived disposition-to-journey)">>,
+           length(DisposeMoney) > 0, true),
+     check(<<Slug/binary, ": every dispose money cell's actor resolves in the declared actor set "
+             "(none silently dropped by SwimlaneDiagram's by-id lookup)">>,
+           OrphanedActors, []),
+     check(<<Slug/binary, ": sale_proceeds cell actually placed at (dispose, services)">>,
+           amount(Sale) =/= undefined, true)].
 
 %% --- helpers ----------------------------------------------------------------
 

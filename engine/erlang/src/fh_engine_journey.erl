@@ -33,22 +33,45 @@
 %%
 %% The journey_swimlane outcome is mode-general (phases × actors × cells); Modes B/C/D reuse
 %% the schema + the mode-agnostic swimlane-diagram renderer with their own kb.journey.* doc +
-%% resolver (plan-card-lifecycle-restoration.md §3.3). Mode A only here.
+%% resolver (plan-card-lifecycle-restoration.md §3.3). Mode C landed 2026-07-10 (fill_investor/1,
+%% kb.journey.investor-path — six actors, not Mode A's four); Mode D landed 2026-07-10
+%% (fill_investor_foreign/1, Mode C's six actors reused); Mode B landed 2026-07-11
+%% (fill_fhb_foreign/1, Mode A's own four actors reused — task 12).
+%%
+%% MULTI-SOURCE HARVEST (2026-07-10, [[unify-views-as-projections-of-one-primitive]]): `Events`
+%% is no longer read off one hardcoded outcome key. `harvest_cash_events/1` concatenates the
+%% `cash_events` field off EVERY upstream outcome that exposes it — Mode A has exactly one
+%% source (budget_envelope, unchanged behaviour); Mode C has four (budget_envelope_investor,
+%% cash_flow_projection, tax_optimised_structure, + dispose_cash_events read separately below).
+%% This is what lets a mode add a new cash_events-bearing component with ZERO change here —
+%% the root fix, not a per-mode branch (advisor review, 2026-07-10 wiring pass).
 
 -export([fill/2]).
-%% exported for the conformance harness:
+%% exported for the conformance harness (Mode-A shape, UNCHANGED signatures):
 -export([phases/0, actors/0, prose_cells/0, money_cells/2, interactions/1]).
 
--define(COPY, <<"kb.journey.fhg-path">>).   %% bilingual labels + cell prose (no params)
+-define(COPY,          <<"kb.journey.fhg-path">>).       %% Mode A bilingual labels + cell prose
+-define(INVESTOR_COPY, <<"kb.journey.investor-path">>).  %% Mode C bilingual labels + cell prose
+-define(INVESTOR_FOREIGN_COPY, <<"kb.journey.investor-foreign-path">>).  %% Mode D bilingual labels + cell prose
+-define(FHB_FOREIGN_COPY, <<"kb.journey.fhb-foreign-path">>).  %% Mode B bilingual labels + cell prose
 
-%% --- entry -------------------------------------------------------------------
+%% --- entry ---------------------------------------------------------------
 
 -spec fill(map(), map()) -> {map(), binary(), [map()]}.
-fill(_Args, Upstream) ->
-    Budget        = maps:get(<<"budget_envelope">>, Upstream, #{}),
+fill(Args, Upstream) ->
+    case maps:get(blueprint_slug, Args, <<"fhb-domestic-au">>) of
+        <<"investor-domestic-au">> -> fill_investor(Upstream);
+        <<"investor-foreign-au">>  -> fill_investor_foreign(Upstream);
+        <<"fhb-foreign-au">>       -> fill_fhb_foreign(Upstream);
+        _                          -> fill_fhb(Upstream)
+    end.
+
+%% --- Mode A (FHB) ----------------------------------------------------------
+
+fill_fhb(Upstream) ->
     Ownership     = maps:get(<<"ongoing_obligations">>, Upstream, #{}),
     Disposition   = maps:get(<<"disposition">>, Upstream, #{}),
-    Events        = maps:get(<<"cash_events">>, Budget, []),
+    Events        = harvest_cash_events(Upstream),
     DisposeEvents = maps:get(<<"dispose_cash_events">>, Disposition, []),
     %% Honest-partial: the terminal Dispose column (its prose + the placed dispose money
     %% cells) renders ONLY when a hold horizon H is set — disposition then emits
@@ -71,6 +94,110 @@ fill(_Args, Upstream) ->
     },
     KbVersions = fh_engine_kb:kb_anchors([?COPY]),
     {Outcome, <<"swimlane-diagram">>, KbVersions}.
+
+%% --- Mode B (foreign FHB) ----------------------------------------------------
+%% Same placement discipline + same FOUR-actor structure as fill_fhb/1 (Mode A) — the
+%% phases/0, actors/0, rendered_phases/1, money_cells/2 builders are REUSED unchanged
+%% (plan-card-lifecycle-restoration.md §3.3: "B = A's shape + a FIRB gate + a
+%% currency-transfer milestone + surcharge", not Mode C/D's six-actor investor set).
+%% This also matches disposition's own dispatch: fh_engine_disposition:fill/2 routes
+%% Mode B onto fill_owner_occupier/2 (the SAME function Mode A uses, keyed on the
+%% absence of tax_optimised_structure upstream), which passes counterparty=<<"other">>
+%% for the dispose money cells (task 15) — Mode A's actor set, not Mode C/D's `services`
+%% rename. Only the authored prose cells + the KB copy doc differ
+%% (kb.journey.fhb-foreign-path — the FIRB gate + transfer milestone are narrated on
+%% government/lender/other cells, not new phases or a new actor row, same convention
+%% Mode D's journey doc established). Harvests cash_events the SAME generic way
+%% (cash_position.budget_envelope.cash_events, task 12's cash_events_foreign/5, +
+%% disposition.dispose_cash_events) — ZERO Mode-B-specific journey code beyond the prose.
+fill_fhb_foreign(Upstream) ->
+    Ownership     = maps:get(<<"ongoing_obligations">>, Upstream, #{}),
+    Disposition   = maps:get(<<"disposition">>, Upstream, #{}),
+    Events        = harvest_cash_events(Upstream),
+    DisposeEvents = maps:get(<<"dispose_cash_events">>, Disposition, []),
+    HasDispose    = DisposeEvents =/= [],
+    DisposeCells  = case HasDispose of
+                        true  -> fhb_foreign_dispose_prose_cells()
+                                 ++ [money_cell_from_event(E) || E <- DisposeEvents];
+                        false -> []
+                    end,
+    Cells = fhb_foreign_prose_cells() ++ money_cells(Events, Ownership) ++ DisposeCells,
+    Outcome = #{
+        <<"phases">>       => rendered_phases(HasDispose),
+        <<"actors">>       => actors(),
+        <<"cells">>        => Cells,
+        <<"interactions">> => interactions(Cells),
+        <<"key_assumptions">> =>
+            [fhb_foreign_copy(<<"assumption_indicative">>), fhb_foreign_copy(<<"assumption_figures">>),
+             fhb_foreign_copy(<<"assumption_no_fhb_schemes">>)]
+    },
+    KbVersions = fh_engine_kb:kb_anchors([?FHB_FOREIGN_COPY]),
+    {Outcome, <<"swimlane-diagram">>, KbVersions}.
+
+%% --- Mode C (investor) ------------------------------------------------------
+%% Same placement discipline as fill_fhb/1: no figure computed here, every money cell IS a
+%% harvested cash_event. No `ongoing_obligations` upstream (investor DAG has no equivalent
+%% component) — money_cells/2's own_recurring_cells/1 half no-ops on an empty map, so it is
+%% reused as-is (no Mode-C-specific money-cell code needed at all).
+fill_investor(Upstream) ->
+    Disposition   = maps:get(<<"disposition">>, Upstream, #{}),
+    Events        = harvest_cash_events(Upstream),
+    DisposeEvents = maps:get(<<"dispose_cash_events">>, Disposition, []),
+    HasDispose    = DisposeEvents =/= [],
+    DisposeCells  = case HasDispose of
+                        true  -> investor_dispose_prose_cells()
+                                 ++ [money_cell_from_event(E) || E <- DisposeEvents];
+                        false -> []
+                    end,
+    Cells = investor_prose_cells() ++ money_cells(Events, #{}) ++ DisposeCells,
+    Outcome = #{
+        <<"phases">>       => investor_rendered_phases(HasDispose),
+        <<"actors">>       => investor_actors(),
+        <<"cells">>        => Cells,
+        <<"interactions">> => interactions(Cells),
+        <<"key_assumptions">> =>
+            [investor_copy(<<"assumption_indicative">>), investor_copy(<<"assumption_figures">>),
+             investor_copy(<<"assumption_no_fhb_schemes">>)]
+    },
+    KbVersions = fh_engine_kb:kb_anchors([?INVESTOR_COPY]),
+    {Outcome, <<"swimlane-diagram">>, KbVersions}.
+
+%% --- Mode D (foreign investor) ----------------------------------------------
+%% Same placement discipline + same six-actor structure as fill_investor/1 (Mode C) — the
+%% phases/actors builders are REUSED unchanged (investor_phases/0, investor_rendered_phases/1,
+%% investor_actors/0), only the KB copy doc and the authored prose cells differ
+%% (kb.journey.investor-foreign-path §"Actors" — the FX/transfer provider is a `services` cell,
+%% not a new actor row; see that doc's rationale). Harvests cash_events the SAME generic way —
+%% cash_position/yield_modelling/tax_structure_non_resident + disposition.dispose_cash_events —
+%% with ZERO Mode-D-specific journey code beyond the prose (2026-07-10, task 8).
+fill_investor_foreign(Upstream) ->
+    Disposition   = maps:get(<<"disposition">>, Upstream, #{}),
+    Events        = harvest_cash_events(Upstream),
+    DisposeEvents = maps:get(<<"dispose_cash_events">>, Disposition, []),
+    HasDispose    = DisposeEvents =/= [],
+    DisposeCells  = case HasDispose of
+                        true  -> investor_foreign_dispose_prose_cells()
+                                 ++ [money_cell_from_event(E) || E <- DisposeEvents];
+                        false -> []
+                    end,
+    Cells = investor_foreign_prose_cells() ++ money_cells(Events, #{}) ++ DisposeCells,
+    Outcome = #{
+        <<"phases">>       => investor_rendered_phases(HasDispose),
+        <<"actors">>       => investor_actors(),
+        <<"cells">>        => Cells,
+        <<"interactions">> => interactions(Cells),
+        <<"key_assumptions">> =>
+            [investor_foreign_copy(<<"assumption_indicative">>),
+             investor_foreign_copy(<<"assumption_figures">>),
+             investor_foreign_copy(<<"assumption_no_fhb_schemes">>)]
+    },
+    KbVersions = fh_engine_kb:kb_anchors([?INVESTOR_FOREIGN_COPY]),
+    {Outcome, <<"swimlane-diagram">>, KbVersions}.
+
+%% every upstream outcome that carries a `cash_events` field, concatenated (order does not
+%% matter for correctness — interactions/1 re-sorts by lifecycle phase regardless).
+harvest_cash_events(Upstream) ->
+    lists:flatten([maps:get(<<"cash_events">>, V, []) || V <- maps:values(Upstream), is_map(V)]).
 
 %% --- the swimlane structure (Mode-A FHB: Prepare → … → Own → Dispose) --------
 
@@ -253,3 +380,193 @@ band_range(_) -> null.
 -spec copy(binary()) -> fh_engine_i18n:localized().
 copy(Id) ->
     fh_engine_kb:copy(?COPY, Id).
+
+%% --- Mode C (investor) structure: phases, actors, prose ----------------------
+%% Same shape as the Mode-A builders above (phase/actor/prose/cell), pointed at
+%% kb.journey.investor-path instead of kb.journey.fhg-path. Phase IDS are identical to
+%% Mode A's (yield_modelling/tax_structure's own outcome text places figures "at phase
+%% own" regardless of mode); only the actor set and the authored cell prose differ — six
+%% actors (Property manager, Tenant added; "Other" renamed "Services") because rent is a
+%% real actor-attributable cash flow (kb.journey.investor-path's own rationale).
+
+investor_phases() ->
+    [iphase(<<"prepare">>,     <<"phase_prepare">>),
+     iphase(<<"pre_approve">>, <<"phase_pre_approve">>),
+     iphase(<<"contract">>,    <<"phase_contract">>),
+     iphase(<<"settle">>,      <<"phase_settle">>),
+     iphase(<<"own">>,         <<"phase_own">>),
+     iphase(<<"dispose">>,     <<"phase_dispose">>)].
+
+investor_rendered_phases(true)  -> investor_phases();
+investor_rendered_phases(false) -> [P || P <- investor_phases(), maps:get(<<"id">>, P) =/= <<"dispose">>].
+
+investor_actors() ->
+    [iactor(<<"you">>,              <<"actor_you">>),
+     iactor(<<"government">>,       <<"actor_government">>),
+     iactor(<<"lender">>,           <<"actor_lender">>),
+     iactor(<<"property_manager">>, <<"actor_property_manager">>),
+     iactor(<<"tenant">>,           <<"actor_tenant">>),
+     iactor(<<"services">>,         <<"actor_services">>)].
+
+%% The legal/prose spine (kb.journey.investor-path's authored `cell_<phase>_<actor>` keys).
+%% flow_marker is a narrative-significance judgment (none = informational, document =
+%% paperwork exchanged, milestone = a significant one-time event/payment), assigned by
+%% the same reading each Mode-A cell already got — not KB-declared (the KB doc carries no
+%% marker field). `cell_own_recurring` (authored, general "how the hold phase nets out"
+%% prose) is intentionally NOT placed here: the four hold-phase money cells (rental_income/
+%% operating_expenses/loan_interest/tax_refund, harvested from cash_events) already carry
+%% this content per-counterparty; a fifth combined prose cell would duplicate them with no
+%% actor slot of its own. Flagged, not silently dropped.
+investor_prose_cells() ->
+    [iprose(<<"prepare">>, <<"you">>,      <<"cell_prepare_you">>,       <<"none">>),
+     iprose(<<"prepare">>, <<"lender">>,   <<"cell_prepare_lender">>,   <<"none">>),
+     iprose(<<"prepare">>, <<"services">>, <<"cell_prepare_services">>, <<"none">>),
+
+     iprose(<<"pre_approve">>, <<"you">>,      <<"cell_pre_approve_you">>,      <<"document">>),
+     iprose(<<"pre_approve">>, <<"lender">>,   <<"cell_pre_approve_lender">>,   <<"milestone">>),
+     iprose(<<"pre_approve">>, <<"services">>, <<"cell_pre_approve_services">>, <<"none">>),
+
+     iprose(<<"contract">>, <<"you">>,             <<"cell_contract_you">>,              <<"milestone">>),
+     iprose(<<"contract">>, <<"government">>,      <<"cell_contract_government">>,       <<"document">>),
+     iprose(<<"contract">>, <<"lender">>,          <<"cell_contract_lender">>,           <<"document">>),
+     iprose(<<"contract">>, <<"property_manager">>,<<"cell_contract_property_manager">>, <<"document">>),
+     iprose(<<"contract">>, <<"tenant">>,          <<"cell_contract_tenant">>,           <<"document">>),
+     iprose(<<"contract">>, <<"services">>,        <<"cell_contract_services">>,         <<"document">>),
+
+     iprose(<<"settle">>, <<"you">>,              <<"cell_settle_you">>,              <<"milestone">>),
+     iprose(<<"settle">>, <<"government">>,       <<"cell_settle_government">>,       <<"milestone">>),
+     iprose(<<"settle">>, <<"lender">>,           <<"cell_settle_lender">>,           <<"milestone">>),
+     iprose(<<"settle">>, <<"property_manager">>, <<"cell_settle_property_manager">>, <<"milestone">>),
+     iprose(<<"settle">>, <<"services">>,         <<"cell_settle_services">>,         <<"milestone">>),
+
+     iprose(<<"own">>, <<"you">>,              <<"cell_own_you">>,              <<"milestone">>),
+     iprose(<<"own">>, <<"government">>,       <<"cell_own_government">>,       <<"none">>),
+     iprose(<<"own">>, <<"lender">>,           <<"cell_own_lender">>,           <<"none">>),
+     iprose(<<"own">>, <<"property_manager">>, <<"cell_own_property_manager">>, <<"none">>),
+     iprose(<<"own">>, <<"tenant">>,           <<"cell_own_tenant">>,           <<"none">>),
+     iprose(<<"own">>, <<"services">>,         <<"cell_own_services">>,         <<"none">>)].
+
+%% The Dispose-phase legal/prose spine (added only when a horizon is set), same role as
+%% Mode A's dispose_prose_cells/0. No `tenant` row — kb.journey.investor-path authors none
+%% (a tenancy either ends before sale or transfers with the property; not a distinct
+%% dispose-phase narrative beat the way property_manager's notice-period coordination is).
+investor_dispose_prose_cells() ->
+    [iprose(<<"dispose">>, <<"you">>,              <<"cell_dispose_you">>,              <<"milestone">>),
+     iprose(<<"dispose">>, <<"government">>,       <<"cell_dispose_government">>,       <<"none">>),
+     iprose(<<"dispose">>, <<"lender">>,           <<"cell_dispose_lender">>,           <<"milestone">>),
+     iprose(<<"dispose">>, <<"property_manager">>, <<"cell_dispose_property_manager">>, <<"document">>),
+     iprose(<<"dispose">>, <<"services">>,         <<"cell_dispose_services">>,         <<"milestone">>)].
+
+iphase(Id, CopyId) -> #{<<"id">> => Id, <<"label">> => investor_copy(CopyId)}.
+iactor(Id, CopyId) -> #{<<"id">> => Id, <<"label">> => investor_copy(CopyId)}.
+
+iprose(Phase, Actor, CopyId, Marker) ->
+    cell(Phase, Actor, investor_copy(CopyId), Marker, null, null, <<"purchase_journey">>).
+
+investor_copy(Id) -> fh_engine_kb:copy(?INVESTOR_COPY, Id).
+
+%% --- Mode D (foreign investor) structure: prose only -------------------------
+%% phases/actors are the SAME builders as Mode C (investor_phases/0, investor_actors/0,
+%% investor_rendered_phases/1) — reused unchanged, not redefined. Only the authored cell
+%% prose differs, drawn from kb.journey.investor-foreign-path — FIRB gate content lands on
+%% government/lender cells across pre_approve→contract→settle; the cross-border transfer
+%% milestone lands on services cells across the same span (kb.journey.investor-foreign-
+%% path's own "Phases" rationale — neither is a new phase or a new actor row).
+
+investor_foreign_prose_cells() ->
+    [diprose(<<"prepare">>, <<"you">>,      <<"cell_prepare_you">>,      <<"none">>),
+     diprose(<<"prepare">>, <<"lender">>,   <<"cell_prepare_lender">>,   <<"none">>),
+     diprose(<<"prepare">>, <<"services">>, <<"cell_prepare_services">>, <<"none">>),
+
+     diprose(<<"pre_approve">>, <<"you">>,      <<"cell_pre_approve_you">>,      <<"document">>),
+     diprose(<<"pre_approve">>, <<"lender">>,   <<"cell_pre_approve_lender">>,   <<"milestone">>),
+     diprose(<<"pre_approve">>, <<"services">>, <<"cell_pre_approve_services">>, <<"document">>),
+
+     diprose(<<"contract">>, <<"you">>,             <<"cell_contract_you">>,              <<"milestone">>),
+     diprose(<<"contract">>, <<"government">>,      <<"cell_contract_government">>,       <<"document">>),
+     diprose(<<"contract">>, <<"lender">>,          <<"cell_contract_lender">>,           <<"document">>),
+     diprose(<<"contract">>, <<"property_manager">>,<<"cell_contract_property_manager">>, <<"document">>),
+     diprose(<<"contract">>, <<"tenant">>,          <<"cell_contract_tenant">>,           <<"none">>),
+     diprose(<<"contract">>, <<"services">>,        <<"cell_contract_services">>,         <<"milestone">>),
+
+     diprose(<<"settle">>, <<"you">>,              <<"cell_settle_you">>,              <<"milestone">>),
+     diprose(<<"settle">>, <<"government">>,       <<"cell_settle_government">>,       <<"milestone">>),
+     diprose(<<"settle">>, <<"lender">>,           <<"cell_settle_lender">>,           <<"milestone">>),
+     diprose(<<"settle">>, <<"property_manager">>, <<"cell_settle_property_manager">>, <<"milestone">>),
+     diprose(<<"settle">>, <<"services">>,         <<"cell_settle_services">>,         <<"milestone">>),
+
+     diprose(<<"own">>, <<"you">>,              <<"cell_own_you">>,              <<"milestone">>),
+     diprose(<<"own">>, <<"government">>,       <<"cell_own_government">>,       <<"none">>),
+     diprose(<<"own">>, <<"lender">>,           <<"cell_own_lender">>,           <<"none">>),
+     diprose(<<"own">>, <<"property_manager">>, <<"cell_own_property_manager">>, <<"none">>),
+     diprose(<<"own">>, <<"tenant">>,           <<"cell_own_tenant">>,           <<"none">>),
+     diprose(<<"own">>, <<"services">>,         <<"cell_own_services">>,         <<"none">>)].
+
+%% The Dispose-phase legal/prose spine, same role as Mode C's investor_dispose_prose_cells/0.
+%% No `tenant` row (same rationale as Mode C — a tenancy ends before sale or transfers with
+%% the property, not a distinct dispose-phase narrative beat).
+investor_foreign_dispose_prose_cells() ->
+    [diprose(<<"dispose">>, <<"you">>,              <<"cell_dispose_you">>,              <<"milestone">>),
+     diprose(<<"dispose">>, <<"government">>,       <<"cell_dispose_government">>,       <<"none">>),
+     diprose(<<"dispose">>, <<"lender">>,           <<"cell_dispose_lender">>,           <<"milestone">>),
+     diprose(<<"dispose">>, <<"property_manager">>, <<"cell_dispose_property_manager">>, <<"document">>),
+     diprose(<<"dispose">>, <<"services">>,         <<"cell_dispose_services">>,         <<"milestone">>)].
+
+%% Mode-D's own prose builder (distinct from Mode C's iprose/4, which hardcodes
+%% ?INVESTOR_COPY) — points at kb.journey.investor-foreign-path instead.
+diprose(Phase, Actor, CopyId, Marker) ->
+    cell(Phase, Actor, investor_foreign_copy(CopyId), Marker, null, null, <<"purchase_journey">>).
+
+investor_foreign_copy(Id) -> fh_engine_kb:copy(?INVESTOR_FOREIGN_COPY, Id).
+
+%% --- Mode B (foreign FHB) structure: prose only -------------------------------
+%% phases/actors are the SAME builders as Mode A (phases/0, actors/0, rendered_phases/1)
+%% — reused unchanged, not redefined (Mode B is an owner-occupier FHB, not an investor;
+%% §3.3's own framing). Only the authored cell prose differs, drawn from
+%% kb.journey.fhb-foreign-path — FIRB gate content lands on government/lender cells
+%% across pre_approve→contract→settle, the cross-border transfer milestone lands on
+%% `other` (services) cells across the same span, and the foreign-buyer surcharge is
+%% disclosed alongside standard duty at contract/settle (kb.journey.fhb-foreign-path's
+%% own "Phases" rationale — none of these is a new phase or a new actor row).
+
+fhb_foreign_prose_cells() ->
+    [bprose(<<"prepare">>, <<"you">>,        <<"cell_prepare_you">>,        <<"none">>),
+     bprose(<<"prepare">>, <<"government">>, <<"cell_prepare_government">>, <<"none">>),
+     bprose(<<"prepare">>, <<"lender">>,     <<"cell_prepare_lender">>,     <<"none">>),
+     bprose(<<"prepare">>, <<"other">>,      <<"cell_prepare_other">>,      <<"none">>),
+
+     bprose(<<"pre_approve">>, <<"you">>,        <<"cell_pre_approve_you">>,        <<"document">>),
+     bprose(<<"pre_approve">>, <<"government">>, <<"cell_pre_approve_government">>, <<"milestone">>),
+     bprose(<<"pre_approve">>, <<"lender">>,     <<"cell_pre_approve_lender">>,     <<"milestone">>),
+     bprose(<<"pre_approve">>, <<"other">>,      <<"cell_pre_approve_other">>,      <<"none">>),
+
+     bprose(<<"contract">>, <<"you">>,        <<"cell_contract_you">>,        <<"milestone">>),
+     bprose(<<"contract">>, <<"government">>, <<"cell_contract_government">>, <<"document">>),
+     bprose(<<"contract">>, <<"lender">>,     <<"cell_contract_lender">>,     <<"document">>),
+     bprose(<<"contract">>, <<"other">>,      <<"cell_contract_other">>,      <<"document">>),
+
+     bprose(<<"settle">>, <<"you">>,        <<"cell_settle_you">>,        <<"milestone">>),
+     bprose(<<"settle">>, <<"government">>, <<"cell_settle_government">>, <<"milestone">>),
+     bprose(<<"settle">>, <<"lender">>,     <<"cell_settle_lender">>,     <<"milestone">>),
+     bprose(<<"settle">>, <<"other">>,      <<"cell_settle_other">>,      <<"milestone">>),
+
+     bprose(<<"own">>, <<"you">>,        <<"cell_own_you">>,        <<"milestone">>),
+     bprose(<<"own">>, <<"government">>, <<"cell_own_government">>, <<"none">>),
+     bprose(<<"own">>, <<"lender">>,     <<"cell_own_lender">>,     <<"none">>)].
+
+%% The Dispose-phase legal/prose spine, same role as Mode A's dispose_prose_cells/0. The
+%% government cell deliberately never asserts CGT exemption (unlike Mode A's) — grounded
+%% in task 11: buyer_profile_foreign leaves tax_residency unset, so
+%% fh_engine_disposition:cgt/1 always returns to_verify for Mode B, never exempt.
+fhb_foreign_dispose_prose_cells() ->
+    [bprose(<<"dispose">>, <<"you">>,        <<"cell_dispose_you">>,        <<"milestone">>),
+     bprose(<<"dispose">>, <<"government">>, <<"cell_dispose_government">>, <<"none">>),
+     bprose(<<"dispose">>, <<"lender">>,     <<"cell_dispose_lender">>,     <<"milestone">>),
+     bprose(<<"dispose">>, <<"other">>,      <<"cell_dispose_other">>,      <<"milestone">>)].
+
+%% Mode-B's own prose builder (distinct from Mode A's prose/4, which hardcodes ?COPY) —
+%% points at kb.journey.fhb-foreign-path instead.
+bprose(Phase, Actor, CopyId, Marker) ->
+    cell(Phase, Actor, fhb_foreign_copy(CopyId), Marker, null, null, <<"purchase_journey">>).
+
+fhb_foreign_copy(Id) -> fh_engine_kb:copy(?FHB_FOREIGN_COPY, Id).

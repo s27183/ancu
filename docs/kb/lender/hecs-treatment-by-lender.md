@@ -1,7 +1,14 @@
 ---
 slug: kb.lender.hecs-treatment-by-lender
 effective_from: 2025-09-30
-last_verified: 2026-06-01
+last_verified: 2026-07-06
+sources:
+  - url: https://www.apra.gov.au/clarifying-treatment-of-higher-education-loan-program-debt-obligations
+    retrieved: 2026-07-06
+    note: "APRA: on 19 June 2025 finalised targeted changes to how ADIs consider HELP debt (APG 223 / ARS 223.0); near-term-payoff exclusion by exception"
+  - url: https://www.nab.com.au/personal/life-moments/home-property/buy-first-home/hecs-home-loan
+    retrieved: 2026-07-06
+    note: "NAB own page — \"If your student debt is $20,000 or less, it won't impact how much you can borrow with us\" (ATO evidence required)"
 ---
 
 # HECS-HELP treatment in serviceability — by lender

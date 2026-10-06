@@ -500,7 +500,7 @@ def _kb_content_md(path):
 # tool-pulled — §6); those return for the tool-using Q&A path in slice 2c.
 
 _PREAMBLE = """\
-You are a single component of FirstHomey's planning engine, which helps \
+You are a single component of Rau's planning engine, which helps \
 Vietnamese-Australian buyers plan an Australian property purchase (first home or \
 investment). You fill ONE component of a plan and return a structured object that \
 downstream components and the user-facing card consume.
@@ -1843,7 +1843,7 @@ def _kb_search(kb, slug, topic, max_docs=3, snippet=1400):
 
 
 _QA_PREAMBLE = """\
-You are FirstHomey's planning assistant, answering a Vietnamese-Australian first home \
+You are Rau's planning assistant, answering a Vietnamese-Australian first home \
 buyer's question about THEIR plan. You will be provided with:
 - **Context** — your role. `<context>`.
 - **Goal** — what a good answer achieves. `<goal>`.
@@ -1880,10 +1880,14 @@ Vietnamese (`vi`) AND English (`en`) — carrying the SAME meaning. The Vietname
 natural, register-appropriate Vietnamese for a first home buyer and their family (warm \
 but precise; the respectful register a Vietnamese reader expects when money and family \
 are involved) — NOT a transliteration of the English, NOT machine-translation tone. Do \
-not leave `vi` as an English string."""
+not leave `vi` as an English string.
+DUPLICATE QUESTIONS: if `<conversation_glue>` shows you already answered this same \
+question — even reworded, even in the other language — do NOT redo the full analysis. \
+Give a short pointer back to what you already said (one or two sentences), and only add \
+new substance if this phrasing actually asks something the earlier answer didn't cover."""
 
 _QA_TOOLS = """\
-You have ONE tool, `kb_lookup`, over FirstHomey's curated knowledge base:
+You have ONE tool, `kb_lookup`, over Rau's curated knowledge base:
 - `kb_lookup(topic: "...")` — search by plain topic (e.g. "first home guarantee", \
 "stamp duty concession NSW", "FIRB established dwelling"). Use this when the plan-card \
 grounding doesn't already contain the rule/figure/definition you need.
@@ -1925,13 +1929,56 @@ answer in both languages. Nothing else.
 </output>"""
 
 
+def _strip_vi_for_qa(obj):
+    """Drop the `vi` half of every {en, vi} bilingual leaf before a card goes into
+    the QA prompt (~30% of the card's tokens, measured). Safe because _QA_STYLE
+    already requires the agent to AUTHOR its own natural Vietnamese from the
+    grounding facts, not transliterate the card's pre-baked vi text — so the
+    pre-translated copy is pure redundancy for this call, not lost grounding.
+    (The persisted card / shell rendering are untouched — this only shapes what
+    THIS prompt sends.)"""
+    if isinstance(obj, dict):
+        if (obj.keys() >= {"en", "vi"}
+                and isinstance(obj.get("en"), str) and isinstance(obj.get("vi"), str)):
+            return {"en": obj["en"]}
+        return {k: _strip_vi_for_qa(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_strip_vi_for_qa(v) for v in obj]
+    return obj
+
+
+_QA_ENVELOPE_KEYS = {"renderer", "fill_path", "renderers", "kb_versions", "component_id"}
+
+
+def _strip_envelope_for_qa(obj):
+    """Drop each component's shell-rendering/provenance envelope
+    (renderer/renderers/fill_path/component_id/kb_versions) before a card goes
+    into the QA prompt (~23% of the already vi-stripped card's tokens,
+    measured). Safe: these fields tell the SHELL how to draw a component and
+    audit-trail how it was filled — the agent never reasons over them for a
+    QA answer, and kb_versions' slugs are redundant with the agent's own
+    `kb_lookup` tool, which can fetch the same (and current, not snapshotted)
+    KB content by slug or topic search if a question actually needs it."""
+    if isinstance(obj, dict):
+        return {k: _strip_envelope_for_qa(v) for k, v in obj.items()
+                if k not in _QA_ENVELOPE_KEYS}
+    if isinstance(obj, list):
+        return [_strip_envelope_for_qa(v) for v in obj]
+    return obj
+
+
 def build_qa_user_content(card, glue, message):
+    # Compact, not pretty-printed: this JSON is re-sent (and, per handle_qa's
+    # disposable-sidecar-per-turn design, largely re-cached rather than cache-hit)
+    # on every single question — indent=2 whitespace was ~32% of the card's tokens
+    # for no reasoning benefit.
+    qa_card = _strip_envelope_for_qa(_strip_vi_for_qa(card))
     parts = ["<plan_card_state>\n"
-             + json.dumps(card, indent=2, ensure_ascii=False)
+             + json.dumps(qa_card, separators=(",", ":"), ensure_ascii=False)
              + "\n</plan_card_state>"]
     if glue:
         parts.append("<conversation_glue>\n"
-                     + json.dumps(glue, indent=2, ensure_ascii=False)
+                     + json.dumps(glue, separators=(",", ":"), ensure_ascii=False)
                      + "\n</conversation_glue>")
     parts.append("<user_query>\n" + message + "\n</user_query>")
     return "\n\n".join(parts)
@@ -1956,7 +2003,7 @@ async def handle_qa(params):
     # the args and the result — and SANITIZED (display_name + summaries, never the raw
     # KB text or the slug) before they reach the shell (engine-contract §4).
     @tool("kb_lookup",
-          "Search FirstHomey's curated knowledge base for a scheme rule, figure, or "
+          "Search Rau's curated knowledge base for a scheme rule, figure, or "
           "definition. Use when the plan-card grounding lacks what you need to answer "
           "accurately. Pass a plain `topic` to search, or a known `slug` to fetch one doc.",
           {"topic": str, "slug": str})

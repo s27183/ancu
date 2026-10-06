@@ -1,7 +1,11 @@
 ---
 slug: kb.foreign-investor.repatriation-strategy
 effective_from: 2025-07-01
-last_verified: 2026-07-03
+last_verified: 2026-07-06
+sources:
+  - url: https://wise.com/au/currency-converter/vnd-to-aud-rate
+    retrieved: 2026-07-06
+    note: "Wise (AUD↔VND) — the AU-side outbound-transfer provider mechanics (licensed money-transfer channel, transparent cost). The AU bank AML/CTF reporting obligation on the outbound leg is owned/cross-referenced by kb.au-aml-ctf.bank-due-diligence-expectations (Phase A); the AUSTRAC IFTI primary timed out repeatedly this session — NOT independently re-opened here."
 ---
 
 # Repatriating rental income and sale proceeds — the AU-side outbound transfer

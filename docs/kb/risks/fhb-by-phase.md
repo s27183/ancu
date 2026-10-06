@@ -2,6 +2,8 @@
 slug: kb.risks.fhb-by-phase
 effective_from: 2026-06-01
 last_verified: 2026-06-20
+sources:
+  - note: "NOT VERIFIED — bilingual copy/checklist doc: each risk is grounded in a named owning KB doc, not asserted independently here. No external Sources section by design. Checked 2026-07-06 during the Phase B backfill."
 ---
 
 # Mode-A FHB per-phase risks and mitigations (bilingual)

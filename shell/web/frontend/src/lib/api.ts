@@ -148,7 +148,7 @@ export async function createPlanCard(
 // (plan_card_views) before touching the engine — the engine treats user_id as opaque
 // (§9.3, no cross-DB join). An unowned/unknown/malformed id is a uniform 404. Live
 // fill streams over SSE separately (planCardStream.ts).
-import type { PlanCard, PlanCardSummary, ChecklistStatusMap } from '$lib/planCard';
+import type { PlanCard, PlanCardSummary, ChecklistStatusMap, LocalizedText } from '$lib/planCard';
 
 /** A discriminated read outcome so the projection branches calmly (§7.1). 404 is the
  *  EXPECTED "no plan for this zone yet / not signed in" path → onboarding CTA. */
@@ -370,6 +370,50 @@ export async function postMessage(
     return { kind: 'error', status: res.status };
 }
 
+// --- Conversation: the Q&A thread's persisted history (8-S4e) ---------------
+// GET /api/plan-cards/:id/conversation — session_turns, oldest→newest, bilingual.
+// Chat.svelte hydrates its message list from this on mount, before subscribeConversation
+// takes over live — a plain fetch (no meter gate, no SSE) since it reads already-metered
+// history.
+
+/** One past (question, answer) pair. `answer` is bilingual, same shape as a live turn's
+ *  buffered text_delta accumulation, so the chat layer renders both identically. */
+export interface ConversationTurn {
+    turnId: string;
+    userText: string;
+    answer: LocalizedText;
+    ts: string;
+}
+
+export type ConversationOutcome =
+    | { kind: 'ok'; turns: ConversationTurn[] }
+    | { kind: 'auth_required' }
+    | { kind: 'not_found' }
+    | { kind: 'error'; status: number };
+
+/** GET the card's Q&A history. Empty `turns` before the first Q&A turn — not an error. */
+export async function getConversation(
+    planCardId: string,
+    fetchFn: typeof fetch = fetch
+): Promise<ConversationOutcome> {
+    const res = await fetchFn(`/api/plan-cards/${encodeURIComponent(planCardId)}/conversation`);
+    if (res.ok) {
+        const body = (await res.json()) as {
+            turns?: Array<{ turn_id: string; user_text: string; answer: LocalizedText; ts: string }>;
+        };
+        const turns = (body.turns ?? []).map((t) => ({
+            turnId: t.turn_id,
+            userText: t.user_text,
+            answer: t.answer,
+            ts: t.ts
+        }));
+        return { kind: 'ok', turns };
+    }
+    if (res.status === 401) return { kind: 'auth_required' };
+    if (res.status === 404) return { kind: 'not_found' };
+    return { kind: 'error', status: res.status };
+}
+
 // --- Checklist status: attest a phase action done/not (Flow view) ------------
 // PATCH /api/plan-cards/:id/checklist-status — the user-set layer (task 7). USER-ATTESTED
 // state, not a computed figure: a small jsonb patch, NO recompute and NO usage (zero-cost,
@@ -411,6 +455,119 @@ export async function setChecklistStatus(
     if (res.status === 401) return { kind: 'auth_required' };
     if (res.status === 404) return { kind: 'not_found' };
     return { kind: 'error', status: res.status };
+}
+
+// --- News: KB fact changes relevant to this card (kb-news-feature.md) --------
+// GET/PATCH /api/plan-cards/:id/news — surfaces a KB threshold/cap/rate change to the
+// buyer whose plan actually depends on it. GET is a zero-cost read (relevance is a set
+// intersection over kb_versions provenance already stamped on the card's fills); PATCH
+// dismisses one note into the card's user-set dismissed_news layer (no recompute, no
+// usage). A news note is authored offline at KB-update time, never live-detected.
+
+/** One corroborating citation, the same `url`/`retrieved`/`path`/`note` shape as a KB
+ *  fact doc's own `sources:` (parse_sources_block) — but here it PINS what the author
+ *  had open for this specific dated diff (kb-news-feature.md "Source citation"), not a
+ *  duplicate of the fact doc's live-tracking sources. Never drifts: the note is immutable. */
+export interface NewsSource {
+    url?: string;
+    retrieved?: string;
+    path?: string;
+    note?: string;
+}
+
+/** A KB news note (kb_compiler.py `parse_news_doc`, artifact["news"][slug]). Bilingual
+ *  summary + a machine diff, reverse-indexed at compile time to the blueprint components
+ *  it affects (`affected_components`) so a tap can scroll to/highlight the right tile. */
+/** One of NEWS_CATEGORIES (kb_compiler.py, GATE 11 fail-closed) — which section a
+ *  note sorts under in the News overview sheet (kb-news-feature.md). */
+export type NewsCategory = 'visa' | 'finance' | 'scheme' | 'tax' | 'property' | 'market';
+
+export interface NewsNote {
+    news_slug: string;
+    /** Absent for `category: 'market'` notes — a standalone factual citation with
+     *  no regulated KB figure to diff against (kb-news-feature.md "market" notes). */
+    kb_slug?: string;
+    category?: NewsCategory;
+    affected_kb_slugs?: string[];
+    /** {blueprint_slug: [component_name, ...]} — this card's own blueprint_slug names
+     *  which tile(s) to scroll to/highlight (kb-news-feature.md "UX shape"). */
+    affected_components?: Record<string, string[]>;
+    effective_from?: string;
+    authored_date?: string;
+    sources?: NewsSource[];
+    /** Short (<=100 char) ticker copy (GATE 11 fail-closed) — what the ticker strip
+     *  shows. summary_en/summary_vi is the full explanation, read in the detail sheet. */
+    headline_en?: string;
+    headline_vi?: string;
+    summary_en?: string;
+    summary_vi?: string;
+    diff?: Record<string, unknown>;
+}
+
+/** A discriminated fetch outcome so the caller branches calmly (§7.1). `not_found` mirrors
+ *  the card-read posture (unowned/unknown/malformed id — no existence disclosure). */
+export type NewsOutcome =
+    | { kind: 'ok'; news: NewsNote[] }
+    | { kind: 'auth_required' }
+    | { kind: 'not_found' }
+    | { kind: 'error'; status: number };
+
+/** GET the card's relevant, non-dismissed news notes. Called when the plan projection
+ *  loads (and may be re-called on SSE reconnect — the engine primitive is pull-only,
+ *  kb-news-feature.md "Push vs pull"). */
+export async function getNews(
+    planCardId: string,
+    fetchFn: typeof fetch = fetch
+): Promise<NewsOutcome> {
+    const res = await fetchFn(`/api/plan-cards/${encodeURIComponent(planCardId)}/news`);
+    if (res.ok) {
+        const body = (await res.json()) as { news?: NewsNote[] };
+        return { kind: 'ok', news: body.news ?? [] };
+    }
+    if (res.status === 401) return { kind: 'auth_required' };
+    if (res.status === 404) return { kind: 'not_found' };
+    return { kind: 'error', status: res.status };
+}
+
+/** A discriminated dismiss outcome. `ok` carries the engine's authoritative dismissed_news
+ *  map (mirrors setChecklistStatus's posture — the caller renders engine state, not its
+ *  optimistic guess, on failure). */
+export type DismissNewsOutcome =
+    | { kind: 'ok'; dismissedNews: Record<string, boolean> }
+    | { kind: 'invalid' }
+    | { kind: 'auth_required' }
+    | { kind: 'not_found' }
+    | { kind: 'error'; status: number };
+
+/** PATCH-dismiss one news note by slug. */
+export async function dismissNews(
+    planCardId: string,
+    newsSlug: string,
+    fetchFn: typeof fetch = fetch
+): Promise<DismissNewsOutcome> {
+    const res = await fetchFn(`/api/plan-cards/${encodeURIComponent(planCardId)}/news`, {
+        method: 'PATCH',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ news_slug: newsSlug })
+    });
+    if (res.ok) {
+        const body = (await res.json()) as { dismissed_news?: Record<string, boolean> };
+        return { kind: 'ok', dismissedNews: body.dismissed_news ?? {} };
+    }
+    if (res.status === 400) return { kind: 'invalid' };
+    if (res.status === 401) return { kind: 'auth_required' };
+    if (res.status === 404) return { kind: 'not_found' };
+    return { kind: 'error', status: res.status };
+}
+
+/** GET every compiled KB news note, unfiltered by relevance to any one plan card —
+ *  the homepage ticker's data source (kb-news-feature.md "Homepage ticker"). PUBLIC,
+ *  same posture as getSuburbs: pre-login chrome, no card/tenant scoping. */
+export async function getAllNews(fetchFn: typeof fetch = fetch): Promise<NewsNote[]> {
+    const res = await fetchFn('/api/news');
+    if (!res.ok) return [];
+    const body = (await res.json()) as { news?: NewsNote[] };
+    return body.news ?? [];
 }
 
 // --- Property attachment: Phase B (Mode-C investor) --------------------------
@@ -645,5 +802,52 @@ export async function setTransactionDates(
     }
     if (res.status === 401) return { kind: 'auth_required' };
     if (res.status === 404) return { kind: 'not_found' };
+    return { kind: 'error', status: res.status };
+}
+
+// --- Usage: current-period tokens/cost (8-S5g, the account page) ------------
+// GET /api/billing/usage — the authenticated user's tier + this-period token usage
+// (billing.md §6/§7), read fresh (no client cache) on each page load.
+
+/** `limitTokens` is `'unlimited'` for an admin (fh_shell_meter exempts them from the
+ *  gate entirely) rather than a numeric cap that would misreport what governs them. */
+export interface UsageSummary {
+    tier: 'free' | 'plus' | 'pro';
+    usedTokens: number;
+    limitTokens: number | 'unlimited';
+    shadowCost: number;
+    periodStart: string;
+    periodEnd: string;
+}
+
+export type UsageOutcome =
+    | { kind: 'ok'; usage: UsageSummary }
+    | { kind: 'auth_required' }
+    | { kind: 'error'; status: number };
+
+export async function getUsage(fetchFn: typeof fetch = fetch): Promise<UsageOutcome> {
+    const res = await fetchFn('/api/billing/usage');
+    if (res.ok) {
+        const body = (await res.json()) as {
+            tier: 'free' | 'plus' | 'pro';
+            used_tokens: number;
+            limit_tokens: number | 'unlimited';
+            shadow_cost: number;
+            period_start: string;
+            period_end: string;
+        };
+        return {
+            kind: 'ok',
+            usage: {
+                tier: body.tier,
+                usedTokens: body.used_tokens,
+                limitTokens: body.limit_tokens,
+                shadowCost: body.shadow_cost,
+                periodStart: body.period_start,
+                periodEnd: body.period_end
+            }
+        };
+    }
+    if (res.status === 401) return { kind: 'auth_required' };
     return { kind: 'error', status: res.status };
 }

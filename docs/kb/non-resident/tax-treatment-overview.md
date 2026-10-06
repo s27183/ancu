@@ -1,8 +1,9 @@
 ---
 slug: kb.non-resident.tax-treatment-overview
 effective_from: 2025-07-01
-last_verified: 2026-07-03
----
+last_verified: 2026-07-06
+sources:
+  - note: "SYNTHESIS DOC — asserts no standalone figure; every figure is owned and sourced by its cross-referenced doc (kb.non-resident-tax.withholding-on-rental-income, kb.tax.cgt-50-percent-discount, kb.tax.cgt-main-residence-exemption, kb.non-resident-tax.foreign-resident-cgt-withholding, kb.non-resident.entity-options-au-property). No independent source is cited here by design; re-verification runs against those docs' own sources. Load-bearing synthesis claims (FRCGW at sale, no discount, no PPOR) were sanity-checked 2026-07-06 against the cross-ref primaries and hold."
 
 # Non-resident investor — AU tax treatment overview (the Mode-D synthesis)
 

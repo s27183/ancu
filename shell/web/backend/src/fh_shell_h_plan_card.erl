@@ -22,6 +22,7 @@ init(Req0, Opts) ->
     case {Opts, cowboy_req:method(Req0)} of
         {[], <<"GET">>}          -> with_owned_card(Req0, Opts, fun read/4);
         {[messages], <<"POST">>} -> with_owned_card(Req0, Opts, fun ask/4);
+        {[conversation], <<"GET">>} -> with_owned_card(Req0, Opts, fun conversation/4);
         {[simulate], <<"POST">>} -> with_owned_card(Req0, Opts, fun simulate/4);
         {[refine], <<"POST">>}   -> with_owned_card(Req0, Opts, fun refine/4);
         {[profile], <<"POST">>}  -> with_owned_card(Req0, Opts, fun profile/4);
@@ -30,6 +31,8 @@ init(Req0, Opts) ->
         {[documents], <<"POST">>}   -> with_owned_card(Req0, Opts, fun documents/4);
         {[checklist_status], <<"PATCH">>} ->
             with_owned_card(Req0, Opts, fun checklist_status/4);
+        {[news], <<"GET">>}   -> with_owned_card(Req0, Opts, fun news/4);
+        {[news], <<"PATCH">>} -> with_owned_card(Req0, Opts, fun dismiss_news/4);
         _ ->
             {ok, fh_shell_http:reply_json(405,
                 #{<<"error">> => <<"method_not_allowed">>}, Req0), Opts}
@@ -92,6 +95,14 @@ ask(UserId, PlanCardId, Req0, Opts) ->
                   <<"used_tokens">> => Used,
                   <<"limit_tokens">> => Limit}, Req0), Opts}
     end.
+
+%% GET /api/plan-cards/:id/conversation — the Q&A thread's persisted history (bilingual
+%% {vi,en} per turn). Chat.svelte hydrates its message list from this on mount, before
+%% subscribing to the live SSE stream. A read of already-metered history emits no NEW
+%% usage, so — like simulate/refine/profile, unlike `ask` — it carries no meter gate.
+conversation(UserId, PlanCardId, Req0, Opts) ->
+    {Status, Resp} = fh_shell_engine_client:get_conversation(UserId, PlanCardId),
+    {ok, relay(Status, Resp, Req0), Opts}.
 
 %% POST /api/plan-cards/:id/simulate — preview a structural what-if (W9) → the engine
 %% recomputes the base plan resolver-only and returns the outcomes in the body. NO meter
@@ -156,6 +167,29 @@ checklist_status(UserId, PlanCardId, Req0, Opts) ->
         {ok, Body, Req1} ->
             {Status, Resp} =
                 fh_shell_engine_client:set_checklist_status(UserId, PlanCardId, Body),
+            {ok, relay(Status, Resp, Req1), Opts};
+        {error, invalid_json} ->
+            {ok, fh_shell_http:reply_json(400,
+                #{<<"error">> => <<"invalid_json">>}, Req0), Opts}
+    end.
+
+%% GET /api/plan-cards/:id/news — the KB news notes relevant to the card, minus its own
+%% dismissed set (kb-news-feature.md). Zero-cost read (no usage, no turn); the engine
+%% computes relevance over kb_versions provenance already stamped on the card's fills.
+%% Just authenticate → own → relay.
+news(UserId, PlanCardId, Req0, Opts) ->
+    {Status, Body} = fh_shell_engine_client:get_news(UserId, PlanCardId),
+    {ok, relay(Status, Body, Req0), Opts}.
+
+%% PATCH /api/plan-cards/:id/news — dismiss one news note (the card's dismissed_news
+%% user-set layer, migration 007). USER-ATTESTED, NOT a computed figure: no recompute,
+%% no usage — like checklist-status, NO meter gate. The engine returns the AUTHORITATIVE
+%% dismissed_news map (400 on a missing news_slug); relay verbatim.
+dismiss_news(UserId, PlanCardId, Req0, Opts) ->
+    case fh_shell_http:read_json_body(Req0) of
+        {ok, Body, Req1} ->
+            {Status, Resp} =
+                fh_shell_engine_client:dismiss_news(UserId, PlanCardId, Body),
             {ok, relay(Status, Resp, Req1), Opts};
         {error, invalid_json} ->
             {ok, fh_shell_http:reply_json(400,

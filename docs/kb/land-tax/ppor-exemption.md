@@ -1,7 +1,12 @@
 ---
 slug: kb.land-tax.ppor-exemption
 effective_from: 2025-01-01
-last_verified: 2026-06-28
+last_verified: 2026-07-06
+sources:
+  - url: https://www.sro.vic.gov.au/about-us/rates-and-statistics/current-rates/land-tax-current-rates
+    retrieved: 2026-07-06
+  - url: https://qro.qld.gov.au/land-tax/relief/home-exemption-individuals/
+    retrieved: 2026-07-06
 ---
 
 # Land tax — the principal-place-of-residence exemption

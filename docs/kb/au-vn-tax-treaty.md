@@ -1,8 +1,14 @@
 ---
 slug: kb.au-vn-tax-treaty
 effective_from: 2026-07-03
-last_verified: 2026-07-03
----
+last_verified: 2026-07-06
+sources:
+  - url: https://www.austlii.edu.au/cgi-bin/viewdoc/au/other/dfat/treaties/1992/44.html
+    retrieved: 2026-07-06
+    note: "PRIMARY (AustLII) — full text of the Australia–Vietnam DTA [1992] ATS 44 (signed Hanoi 13 April 1992, in force 30 December 1992). Verifies ONLY the boundary param treaty_exists_between_au_and_vn=true and names the exact re-ground anchor. All quantitative/relief/withholding-modification content (incl. the AU-rate carve-out) REMAINS a labelled placeholder, deferred per the 2026-07-03 Mode-D scoping decision — this citation does not de-placeholder it."
+  - url: https://www.ato.gov.au/law/view/pdf/mli/vietnam.pdf
+    retrieved: 2026-07-06
+    note: "PRIMARY (ATO) — synthesised text of the MLI and the AU–Vietnam agreement (treaty as modified over time); the anchor for checking the AU-rate carve-out when the deferred re-ground runs."
 
 # ⚠ PLACEHOLDER — the Australia–Vietnam Double Tax Agreement (NOT SOURCE-GROUNDED)
 

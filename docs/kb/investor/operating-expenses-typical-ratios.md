@@ -1,7 +1,14 @@
 ---
 slug: kb.investor.operating-expenses-typical-ratios
 effective_from: 2025-07-01
-last_verified: 2026-06-23
+last_verified: 2026-07-06
+sources:
+  - url: https://moneysmart.gov.au/property-investment/buying-an-investment-property
+    retrieved: 2026-07-06
+  - url: https://www.ato.gov.au/individuals-and-families/investments-and-assets/property-and-land/residential-rental-properties/rental-expenses/common-property-expenses
+    retrieved: 2026-07-06
+  - url: https://www.canstar.com.au/home-insurance/the-cost-of-landlord-insurance/
+    retrieved: 2026-07-06
 ---
 
 # Operating expenses — typical ratios for an investment property

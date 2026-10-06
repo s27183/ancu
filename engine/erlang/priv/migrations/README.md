@@ -15,6 +15,7 @@ into `persistent_term` at boot — *not* Postgres) are out of scope here.
 | `004_plan_target_overlay.sql` | The `plan.target` overlay fields (Decision 1's plan-layer split) |
 | `005_checklist_status.sql` | Checklist-status tracking columns |
 | `006_mode_e.sql` | Widens `plan_cards.mode` CHECK to admit `'E'` (mode-e-wedge.md — 001's inline CHECK only anticipated the four modes known when it was authored) |
+| `007_news_dismissed.sql` | `plan_cards.dismissed_news_jsonb` — per-card dismissed-news state (kb-update-runbook.md "authoring a news note"), the same card-user-set-layer pattern as 005 |
 
 Deferred to later migrations: the optional `properties` table (narrow-path
 property data; addenda otherwise live in `plan_cards.content_jsonb` —

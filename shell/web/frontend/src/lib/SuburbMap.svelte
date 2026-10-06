@@ -7,18 +7,41 @@
     // Basemap (8-S2d): VITE_PMTILES_URL set → a Protomaps pmtiles basemap; unset → the
     // no-basemap minimalStyle (the original 8-S2 behaviour — dev/build never regresses).
     // Dev/eval points at a Protomaps daily build; prod at the owned R2 AU extract.
+    //
+    // Runtime basemap-error fallback (2026-07-09): svelte-maplibre-gl gates EVERY
+    // source/layer — including our own suburb-bubbles GeoJSON, unrelated to the basemap
+    // — on the base style reaching MapLibre's internal `loaded()` state (contexts.svelte.js
+    // waitForStyleLoaded). If the Protomaps vector source can't load for ANY reason (a
+    // transient CORS/edge-cache glitch on the public daily build, an ad blocker, a flaky
+    // network, a corp proxy stripping Range headers — this is not incognito-specific and
+    // can hit the owned R2 extract in prod too), `loaded()` never becomes true and NOTHING
+    // renders, not just the basemap. Catch the map's 'error' event for that source and
+    // drop to `minimalStyle` — already this codebase's first-class, zero-network-dependency
+    // rendering (used whenever VITE_PMTILES_URL is unset), not a degraded error state.
     import 'maplibre-gl/dist/maplibre-gl.css'; // self-hosted, not the CDN autoload
     import { MapLibre, GeoJSONSource, CircleLayer, HeatmapLayer } from 'svelte-maplibre-gl';
-    import type { MapLayerMouseEvent, Map as MlMap, CircleLayerSpecification } from 'maplibre-gl';
+    import type {
+        MapLayerMouseEvent,
+        Map as MlMap,
+        CircleLayerSpecification,
+        MapLibreEvent,
+        ErrorEvent as MlErrorEvent,
+        GeoJSONSource as MlGeoJSONSource
+    } from 'maplibre-gl';
     import type { FeatureCollection, Point } from 'geojson';
     import type { Suburb } from '$lib/api';
     import {
         toFeatureCollection,
         circlePaintFor,
         heatmapPaintFor,
+        clusterPaintFor,
+        clusterPropertiesFor,
+        CLUSTER_RADIUS_PX,
+        CLUSTER_MAX_ZOOM,
         minimalStyle,
         basemapStyle,
         firstLabelLayerId,
+        BASEMAP_SOURCE_ID,
         DEFAULT_SIZE_BY,
         type SizeBy
     } from '$lib/map';
@@ -27,10 +50,18 @@
     // Build-time: Vite statically replaces this; unset → undefined → no-basemap fallback.
     const PMTILES_URL = import.meta.env.VITE_PMTILES_URL;
     if (PMTILES_URL) ensurePmtilesProtocol();
-    const mapStyle = PMTILES_URL ? basemapStyle(PMTILES_URL) : minimalStyle;
+    // Flips once, permanently, on a basemap source error — never flips back (a retry
+    // would re-trigger the same failure class for a still-broken network/CDN state).
+    let basemapFailed = $state(false);
+    const usingBasemap = $derived(!!PMTILES_URL && !basemapFailed);
+    const mapStyle = $derived(usingBasemap ? basemapStyle(PMTILES_URL) : minimalStyle);
     // Insert the data BELOW the basemap's labels so place names stay on top of the dots
     // (undefined with no basemap → data on top, which is fine: there are no labels).
-    const labelBeforeId = PMTILES_URL ? firstLabelLayerId() : undefined;
+    const labelBeforeId = $derived(usingBasemap ? firstLabelLayerId() : undefined);
+
+    function onMapError(e: MapLibreEvent<MlErrorEvent> & { sourceId?: string }) {
+        if (e.sourceId === BASEMAP_SOURCE_ID) basemapFailed = true;
+    }
 
     let {
         suburbs,
@@ -82,6 +113,10 @@
     // + colour adapting to the criterion) shows the distribution; it cross-fades to the
     // dots as you zoom in. See the measurement note in lib/map.ts.
     const heatPaint = $derived(heatmapPaintFor(sizeBy));
+    // INTENSIVE criteria (no heatPaint — a rate/decile can't honestly density-sum) get a
+    // cluster-average overview instead: bubble colour = average, size = suburb count.
+    const clusterPaint = $derived(clusterPaintFor(sizeBy));
+    const clusterProps = $derived(clusterPropertiesFor(sizeBy));
 
     // --- Pulse highlight -----------------------------------------------------
     // ONE bright pulse signal — a solid centre dot + an expanding ring animated by rAF
@@ -154,6 +189,21 @@
         const sal = ev.features?.[0]?.properties?.sal_code as string | undefined;
         onselect(sal ? (index.get(sal) ?? null) : null);
     }
+    // Cluster bubbles have no sal_code (they're an aggregate, not one suburb) — click
+    // zooms into the cluster instead of selecting. Leaf points (unclustered — a lone
+    // suburb far from any other) fall through to the normal select behaviour.
+    async function handleClusterClick(ev: MapLayerMouseEvent) {
+        const f = ev.features?.[0];
+        if (!f?.properties?.cluster) {
+            handleClick(ev);
+            return;
+        }
+        const src = map?.getSource<MlGeoJSONSource>('suburbs-cluster');
+        if (!src || f.properties.cluster_id == null) return;
+        const expandZoom = await src.getClusterExpansionZoom(f.properties.cluster_id as number);
+        const [lon, lat] = (f.geometry as Point).coordinates;
+        map?.easeTo({ center: [lon, lat], zoom: expandZoom });
+    }
     function setPointer(ev: MapLayerMouseEvent, on: boolean) {
         ev.target.getCanvas().style.cursor = on ? 'pointer' : '';
     }
@@ -164,14 +214,15 @@
     style={mapStyle}
     {center}
     {zoom}
-    attributionControl={PMTILES_URL ? { compact: true } : false}
+    attributionControl={usingBasemap ? { compact: true } : false}
     autoloadGlobalCss={false}
     inlineStyle="position:absolute;inset:0"
+    onerror={onMapError}
 >
-    <GeoJSONSource id="suburbs" {data}>
-        {#if pulseSaved}
-            <!-- Saved-plans mode: an expanding ring (declared first → below the dot) and
-                 a solid bright centre dot. Uniform bright highlight, no criterion ramp. -->
+    {#if pulseSaved}
+        <!-- Saved-plans mode: an expanding ring (declared first → below the dot) and
+             a solid bright centre dot. Uniform bright highlight, no criterion ramp. -->
+        <GeoJSONSource id="suburbs" {data}>
             <CircleLayer id="suburb-pulse" paint={ringPaint} beforeId={labelBeforeId} />
             <CircleLayer
                 id="suburb-saved"
@@ -181,12 +232,13 @@
                 onmouseenter={(e: MapLayerMouseEvent) => setPointer(e, true)}
                 onmouseleave={(e: MapLayerMouseEvent) => setPointer(e, false)}
             />
-        {:else}
-            <!-- KDE heatmap for the overplotted overview; sits below the dots. Only for
-                 extensive criteria — null (omitted) for intensive ones (SEIFA/crime). -->
-            {#if heatPaint}
-                <HeatmapLayer id="suburb-heat" paint={heatPaint} beforeId={labelBeforeId} />
-            {/if}
+        </GeoJSONSource>
+    {:else if heatPaint}
+        <!-- EXTENSIVE criteria (population/vietnamese): a KDE density heatmap honestly
+             represents the overplotted overview, cross-fading to individual dots as
+             you zoom in. See the measurement note in lib/map.ts. -->
+        <GeoJSONSource id="suburbs" {data}>
+            <HeatmapLayer id="suburb-heat" paint={heatPaint} beforeId={labelBeforeId} />
             <CircleLayer
                 id="suburb-bubbles"
                 {paint}
@@ -195,8 +247,40 @@
                 onmouseenter={(e: MapLayerMouseEvent) => setPointer(e, true)}
                 onmouseleave={(e: MapLayerMouseEvent) => setPointer(e, false)}
             />
-        {/if}
-    </GeoJSONSource>
+        </GeoJSONSource>
+    {:else}
+        <!-- INTENSIVE criteria (SEIFA/crime): a density-sum heatmap would be dishonest
+             for a rate, so the overview is a cluster-AVERAGE proportional-symbol map
+             instead (bubble colour = average, size = suburb count) — cross-fading to
+             the same individual dots at the same handoff. See lib/map.ts. -->
+        <GeoJSONSource
+            id="suburbs-cluster"
+            data={data}
+            cluster={true}
+            clusterRadius={CLUSTER_RADIUS_PX}
+            clusterMaxZoom={CLUSTER_MAX_ZOOM}
+            clusterProperties={clusterProps}
+        >
+            <CircleLayer
+                id="suburb-cluster-bubbles"
+                paint={clusterPaint}
+                filter={['has', 'point_count']}
+                beforeId={labelBeforeId}
+                onclick={handleClusterClick}
+                onmouseenter={(e: MapLayerMouseEvent) => setPointer(e, true)}
+                onmouseleave={(e: MapLayerMouseEvent) => setPointer(e, false)}
+            />
+            <CircleLayer
+                id="suburb-cluster-leaves"
+                {paint}
+                filter={['!', ['has', 'point_count']]}
+                beforeId={labelBeforeId}
+                onclick={handleClick}
+                onmouseenter={(e: MapLayerMouseEvent) => setPointer(e, true)}
+                onmouseleave={(e: MapLayerMouseEvent) => setPointer(e, false)}
+            />
+        </GeoJSONSource>
+    {/if}
 
     <!-- The selected suburb's own pulse — always on (saved or not), sitting on its own
          single-feature source so it shows over any base layer. No click handler: the

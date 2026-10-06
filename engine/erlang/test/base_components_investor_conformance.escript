@@ -10,8 +10,9 @@
 %% producing its discriminating outcome or it would silently take the FHB branch.
 %%
 %% Loads the SAME materialized artifact the engine loads (priv/kb/artifact.json) and asserts:
-%%   1. SET + ORDER — base_components(investor-domestic-au) is exactly the eight property-
-%%      AGNOSTIC investor components in the discriminator-respecting order; the four
+%%   1. SET + ORDER — base_components(investor-domestic-au) is exactly the ten property-
+%%      AGNOSTIC investor components in the discriminator-respecting order (the original
+%%      eight plus purchase_journey/phase_playbook, wired 2026-07-10 task 4); the four
 %%      per-property components (property_assessment, buying_strategy, due_diligence,
 %%      settlement_prep) are EXCLUDED.
 %%   2. NO REGRESSION — base_components(fhb-domestic-au) is byte-identical to the Mode-A nine.
@@ -46,7 +47,8 @@ main(_) ->
 investor_order() ->
     [<<"investor_profile">>, <<"investment_strategy">>, <<"mortgage_finance">>,
      <<"yield_modelling">>, <<"tax_structure">>, <<"cash_position">>,
-     <<"disposition">>, <<"ownership_planning_investor">>].
+     <<"disposition">>, <<"ownership_planning_investor">>,
+     <<"purchase_journey">>, <<"phase_playbook">>].
 
 fhb_order() ->
     [<<"buyer_profile">>, <<"eligibility">>, <<"mortgage_finance">>,
@@ -70,7 +72,7 @@ set_order_cases() ->
     Comps = fh_engine_turn:base_components(?INV),
     Got = names(Comps),
     Excluded = [N || N <- per_property(), lists:member(N, Got)],
-    [check("investor base SET+ORDER = the eight-component investor spine",
+    [check("investor base SET+ORDER = the ten-component investor spine",
            Got, investor_order()),
      check("per-property components EXCLUDED from the investor base set",
            Excluded, []),

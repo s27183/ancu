@@ -1,7 +1,14 @@
 ---
 slug: kb.tax.entity-setup-costs
 effective_from: 2025-07-01
-last_verified: 2026-06-23
+last_verified: 2026-07-06
+sources:
+  - url: https://asic.gov.au/for-business/payments-fees-and-invoices/asic-fees/fees-for-commonly-lodged-documents/
+    retrieved: 2026-07-06
+  - url: https://www.asic.gov.au/for-business-and-companies/forms-and-fees/all-fees/fee-indexation/
+    retrieved: 2026-07-06
+  - url: https://www.ato.gov.au/tax-rates-and-codes/smsf-supervisory-levy
+    retrieved: 2026-06-23
 ---
 
 # Entity setup costs — by ownership structure
@@ -23,9 +30,9 @@ The bands are wide because they depend on provider, complexity, and state — th
 
 A handful of components are **government fees**, not service charges, and are **indexed annually (1 July)** — confirm the current figure:
 
-- **ASIC company registration** — a one-off fee to register a company (relevant for a corporate trustee or a company owner); ~$611 (FY2025-26), indexed.
-- **ASIC annual review** — for a company; a **special-purpose company** (e.g. an SMSF corporate trustee) pays a reduced review fee (~$67), an ordinary company more.
-- **ATO SMSF supervisory levy** — ~$259 per year for an SMSF.
+- **ASIC company registration** — a one-off fee to register a company (relevant for a corporate trustee or a company owner); **$636 (FY2026-27, from 1 July 2026)**, indexed (was $611 in FY2025-26).
+- **ASIC annual review** — for a company; a **special-purpose company** (e.g. an SMSF corporate trustee) pays a reduced review fee (**$70 FY2026-27**, was $67), an ordinary proprietary company more (~$342).
+- **ATO SMSF supervisory levy** — **$259 per year** for an SMSF (unchanged since FY2014-15).
 
 These are the **EXACT** regulated portion; the surrounding accounting/deed/audit charges are the indicative market portion.
 
@@ -49,9 +56,9 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
   "fills": [],
   "parameters": {
     "setup_cost_is_capital_not_deductible": { "type": "bool", "value": true, "note": "REGULATED (ATO) — entity establishment costs are capital expenses, generally not deductible; placed as upfront cash, not a deduction" },
-    "asic_company_registration_fee":        { "type": "money", "value": 611, "note": "REGULATED (ASIC) — one-off company registration fee; ~$611 FY2025-26, INDEXED annually 1 July — confirm current. Relevant for a corporate trustee or company owner" },
-    "asic_special_purpose_company_review":  { "type": "money", "value": 67, "note": "REGULATED (ASIC) — reduced annual review fee for a special-purpose company (e.g. SMSF corporate trustee); indexed — confirm current" },
-    "ato_smsf_supervisory_levy":            { "type": "money", "value": 259, "note": "REGULATED (ATO) — annual SMSF supervisory levy; confirm current" }
+    "asic_company_registration_fee":        { "type": "money", "value": 636, "note": "REGULATED (ASIC) — one-off company registration fee; $636 FY2026-27 (from 1 July 2026, was $611 FY2025-26), INDEXED annually 1 July by CPI — confirm current. Relevant for a corporate trustee or company owner" },
+    "asic_special_purpose_company_review":  { "type": "money", "value": 70, "note": "REGULATED (ASIC) — reduced annual review fee for a special-purpose company (e.g. SMSF corporate trustee); $70 FY2026-27 (was $67), indexed — confirm current" },
+    "ato_smsf_supervisory_levy":            { "type": "money", "value": 259, "note": "REGULATED (ATO) — annual SMSF supervisory levy; $259, unchanged since FY2014-15 — confirm current" }
   },
   "lookup": {
     "entity_setup_cost_bands": {
@@ -61,7 +68,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
         { "entity": "personal_joint",     "setup_first_year": "~0",        "ongoing_annual": "~0",          "tier": "n/a" },
         { "entity": "discretionary_trust","setup_first_year": "1500-4000", "ongoing_annual": "1000-3500+",  "tier": "INDICATIVE" },
         { "entity": "unit_trust",         "setup_first_year": "1500-4000", "ongoing_annual": "1000-3500+",  "tier": "INDICATIVE" },
-        { "entity": "company",            "setup_first_year": "611+",      "ongoing_annual": "review fee + accounting", "tier": "INDICATIVE (ASIC fee regulated)" },
+        { "entity": "company",            "setup_first_year": "636+",      "ongoing_annual": "review fee + accounting", "tier": "INDICATIVE (ASIC fee regulated)" },
         { "entity": "smsf",               "setup_first_year": "400-2000",  "ongoing_annual": "accounting + audit + levies", "tier": "INDICATIVE (levies regulated)" },
         { "entity": "smsf_with_lrba",     "setup_first_year": "400-2000 + LRBA/holding-trust setup", "ongoing_annual": "accounting + audit + levies", "tier": "INDICATIVE" }
       ]
@@ -79,10 +86,10 @@ Notes:
 
 ## Sources
 
-**Canonical (regulator):**
+**Canonical (regulator) — verified 2026-07-06:**
 
-- ASIC — *Fees for commonly lodged documents* (company registration; annual review; special-purpose company reduced fee; indexed annually 1 July) — https://asic.gov.au/for-business/payments-fees-and-invoices/asic-fees/
-- ATO — *SMSF supervisory levy* — https://www.ato.gov.au/individuals-and-families/super-for-individuals-and-families/self-managed-super-funds-smsf/administering-and-reporting/paying-the-smsf-supervisory-levy
+- ASIC — *Fees for commonly lodged documents* / *Fee indexation* (company registration; annual review; special-purpose company reduced fee; indexed annually 1 July by CPI) — https://asic.gov.au/for-business/payments-fees-and-invoices/asic-fees/fees-for-commonly-lodged-documents/ and https://www.asic.gov.au/for-business-and-companies/forms-and-fees/all-fees/fee-indexation/ (pages opened 2026-07-06; ASIC renders the dollar values client-side (JavaScript), so the FY2026-27 figures — company registration $636, special-purpose company annual review $70, proprietary company annual review $342, effective 1 July 2026 — were confirmed via convergent independent professional fee schedules, not read directly off the ASIC page; confirm to the dollar on the ASIC portal)
+- ATO — *SMSF supervisory levy* ($259/yr, unchanged since FY2014-15) — https://www.ato.gov.au/tax-rates-and-codes/smsf-supervisory-levy (verified 2026-06-23; ATO blocks automated fetch — $259 re-confirmed via convergent sources 2026-07-06)
 
 **Indicative market ranges (point-in-time, labelled INDICATIVE — verified 2026-06-23):**
 

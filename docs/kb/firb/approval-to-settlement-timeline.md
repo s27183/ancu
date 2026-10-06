@@ -1,7 +1,11 @@
 ---
 slug: kb.firb.approval-to-settlement-timeline
 effective_from: 2021-01-01
-last_verified: 2026-06-28
+last_verified: 2026-07-06
+sources:
+  - url: https://foreigninvestment.gov.au/sites/firb.gov.au/files/guidance-notes/GN_38-No_objection_notif.pdf
+    retrieved: 2026-07-06
+    path: docs/sources/firb/gn38-no-objection-notifications.pdf
 ---
 
 # FIRB — approval-to-settlement validity window

@@ -1,7 +1,10 @@
 ---
 slug: kb.scheme.help-to-buy
 effective_from: 2025-12-05
-last_verified: 2026-06-01
+last_verified: 2026-07-06
+sources:
+  - url: https://firsthomebuyers.gov.au/australian-government-help-buy-scheme
+    retrieved: 2026-07-06
 ---
 
 # Help to Buy (federal shared-equity scheme)
@@ -25,7 +28,7 @@ To be eligible, the buyer must:
 - Be **at least 18 years old**.
 - **Not currently own** any property (residential or otherwise) **in Australia or overseas**. This is a **current**-ownership test, not a historical one — a buyer who previously owned a home and has since **sold** it can qualify ("returning to home ownership"). (A single parent who jointly owns and is buying out the other party's share is a specific permitted exception.)
 - Buy the home as an **owner-occupier** — it must be the **principal place of residence**; investment properties are excluded.
-- Have a taxable income at or below the **income cap**: **$100,000** for a single applicant, **$160,000** for joint applicants or a single parent (assessed on the financial year preceding application).
+- Have a taxable income at or below the **income cap**: **$103,000** for a single applicant, **$165,000** for joint applicants or a single parent (assessed on the financial year preceding application). These caps rose from $100,000 / $160,000 on **1 July 2026** and are **wage-indexed annually** each 1 July.
 - Buy a home at or below the **property price cap** for the location (see [Property price caps](#property-price-caps)).
 - Secure one of the limited **places** — **10,000 per financial year**, **40,000 over the four-year program** (unlike FHG, Help to Buy is **capped**, not unlimited).
 
@@ -43,7 +46,7 @@ Price caps vary by state/territory and by capital-city vs regional location; Hou
 
 - **Citizenship-only is the first filter.** Help to Buy requires Australian **citizenship**; a Vietnamese-Australian **permanent resident** — squarely a Mode A user — is **not eligible**, even though they qualify for FHG, FHSS, and state concessions. Surface this early so the plan does not present Help to Buy to a PR.
 - **The ownership test is *current*, not historical — and that cuts both ways for the diaspora.** A buyer who **currently owns** a home in Vietnam (or anywhere) is **disqualified**; but one who **previously owned and has since sold** is fine. This differs from FHG/FHSS (which look at Australian history only) and from the QLD concessions (which disqualify on *any* prior overseas residence). The neutral `currently_owns_property` fact decides it here.
-- **The income caps bite.** $100k single / $160k joint is low for a dual-income metropolitan household; many diaspora couples will exceed $160k and fall out, even where FHG (no income-driven exclusion of this kind) still applies.
+- **The income caps bite.** $103k single / $165k joint is low for a dual-income metropolitan household; many diaspora couples will exceed $165k and fall out, even where FHG (no income-driven exclusion of this kind) still applies.
 - **Frame the FHG-vs-Help-to-Buy fork as decision support, not advice.** Help to Buy means a far smaller mortgage and no LMI, but the government **shares the capital gain** and the buyer must eventually buy back or repay the share — a real trade-off against FHG's "keep 100% of the upside, pay LMI-free with a 5% deposit." Lay out the trade-off; the buyer chooses (ASIC line — informational only).
 
 ## Rules
@@ -66,8 +69,8 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
     "citizenship_required":           { "type": "string",  "value": "citizen" },             // PRs not eligible
     "min_age":                        { "type": "integer", "value": 18 },
     "min_deposit_percentage":         { "type": "percentage", "value": 2 },
-    "income_cap_single":              { "type": "money_per_year", "value": 100000 },
-    "income_cap_joint":               { "type": "money_per_year", "value": 160000 },          // also single parents
+    "income_cap_single":              { "type": "money_per_year", "value": 103000 },          // rose from 100000 on 1 Jul 2026; wage-indexed annually
+    "income_cap_joint":               { "type": "money_per_year", "value": 165000 },          // also single parents; rose from 160000 on 1 Jul 2026; wage-indexed annually
     "equity_share_existing_home_max": { "type": "percentage", "value": 30 },
     "equity_share_new_home_max":      { "type": "percentage", "value": 40 },
     "annual_places":                  { "type": "integer", "value": 10000 },

@@ -1,7 +1,10 @@
 ---
 slug: kb.scheme.qld.fh-vacant-land
 effective_from: 2025-05-01
-last_verified: 2026-06-03
+last_verified: 2026-07-06
+sources:
+  - url: https://qro.qld.gov.au/duties/transfer-duty/concessions/homes/first-home-vacant-land/
+    retrieved: 2026-07-06
 ---
 
 # Queensland First Home Vacant Land Concession

@@ -2,6 +2,8 @@
 slug: kb.vietnamese-family.financial-patterns
 effective_from: 2025-07-01
 last_verified: 2026-07-02
+sources:
+  - note: "NOT VERIFIED — a 2026-07-06 search (Phase B backfill) for Vietnamese-diaspora-specific funding-pattern research surfaced only generic AU 'bank of mum and dad' material, nothing Vietnamese-diaspora-specific; declined to force a weak/mismatched citation. This is behavioural domain knowledge, not a sourceable regulator fact — the regulated consequences it touches (FIRB exposure, capital-control thresholds) are sourced in their owning docs, not re-derived here."
 ---
 
 # Vietnamese family financial patterns — how a cross-border purchase is funded, and where the pattern collides with the lender

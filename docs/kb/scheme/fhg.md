@@ -1,7 +1,12 @@
 ---
 slug: kb.scheme.fhg
 effective_from: 2025-10-01
-last_verified: 2026-05-30
+last_verified: 2026-07-06
+sources:
+  - url: https://firsthomebuyers.gov.au/australian-government-5-percent-deposit-scheme/property-price-caps
+    retrieved: 2026-07-06
+  - url: https://firsthomebuyers.gov.au/australian-government-5-percent-deposit-scheme
+    retrieved: 2026-07-06
 ---
 
 # First Home Guarantee (FHG)
@@ -42,7 +47,7 @@ The cap is set by location. The higher "city / regional centre" cap applies to e
 | SA | $900,000 | $500,000 |
 | TAS | $700,000 | $550,000 |
 | ACT | $1,000,000 | — |
-| NT | $600,000 | — |
+| NT | $750,000 | $600,000 |
 | Jervis Bay Territory / Norfolk Island | $550,000 | — |
 | Christmas Island / Cocos (Keeling) Islands | $400,000 | — |
 
@@ -95,7 +100,8 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
           { "when": ["TAS", "capital_or_regional_centre"], "value": 700000  },
           { "when": ["TAS", "rest_of_state"],              "value": 550000  },
           { "when": ["ACT", "capital_or_regional_centre"], "value": 1000000 },
-          { "when": ["NT",  "capital_or_regional_centre"], "value": 600000  }
+          { "when": ["NT",  "capital_or_regional_centre"], "value": 750000  },   // Darwin cap raised to $750k; NT now split (was a single $600k territory-wide cap)
+          { "when": ["NT",  "rest_of_state"],              "value": 600000  }
         ],
         "default": null } },                            // unmapped (state, tier) ⇒ resolver flags a curation gap
 
@@ -126,7 +132,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
 Notes on the cap lookup:
 
 - **`location_tier`** is a *resolver-local intermediate*, **not** a published registry field (§11.9): region tiering is per-scheme, so there is no single shared tier. The FHG resolver derives it from neutral published geo facts — `location_tier = capital_or_regional_centre` if `property_fit.is_capital_city` **or** `property_fit.lga ∈ designated_regional_centre_lgas` (the parameter above), else `rest_of_state` — then uses it as the cap-lookup key. The designated-centre list is FHG-specific data and lives in this doc's `parameters` (not in the neutral `property_fit` surface, and not a separate slug — nothing else references it); the classification is resolver code.
-- **ACT and NT** have a single territory-wide cap, mapped to the `capital_or_regional_centre` tier.
+- **ACT** has a single territory-wide cap, mapped to the `capital_or_regional_centre` tier. **NT** is split ($750k Darwin/capital tier, $600k rest-of-NT) as of the current firsthomebuyers.gov.au caps.
 - **External territories** (Jervis Bay / Norfolk Island $550k; Christmas / Cocos $400k) are in the prose but **out of the current `property.state` enum** (NSW…NT), so they are not in the lookup.
 - `eligibility.fhg.lmi_savings_estimate` is **not** filled here — it is resolver arithmetic against the specific purchase using `kb.lmi.calculation` (cross-doc orchestration).
 

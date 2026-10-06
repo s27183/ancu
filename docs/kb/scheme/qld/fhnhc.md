@@ -1,7 +1,10 @@
 ---
 slug: kb.scheme.qld.fhnhc
 effective_from: 2025-05-01
-last_verified: 2026-05-31
+last_verified: 2026-07-06
+sources:
+  - url: https://qro.qld.gov.au/duties/transfer-duty/concessions/homes/first-home-new-home/
+    retrieved: 2026-07-06
 ---
 
 # Queensland First Home (New Home) Concession (FHNHC)

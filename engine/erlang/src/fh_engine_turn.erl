@@ -67,14 +67,19 @@
 %%   - cash_position keys on `tax_optimised_structure` present → after tax_structure;
 %%   - disposition keys on `tax_optimised_structure` present (cgt_investor path) → after
 %%     tax_structure (+ budget_envelope_investor → after cash_position).
-%% (Mode C has no purchase_journey/preparation/phase_playbook — those are FHB-only.)
-%% ownership_planning_investor runs LAST: its opportunity-card `equity_release` PLACES disposition's
-%% projected sale_proceeds/loan_payout (a read edge added 2026-06-27), so it must follow disposition
-%% (the same "runs last, reads every figure-owner" position as the FHB ownership in the base DAG).
+%% purchase_journey/phase_playbook landed 2026-07-10 (the B/C/D lifecycle-spine restructure,
+%% task 4) — no preparation equivalent (Mode C has no FHB readiness layer). They run LAST,
+%% after ownership_planning_investor, mirroring the FHB base DAG's "figure-owners, then the
+%% spine that places them" position: purchase_journey harvests `cash_events` off cash_position/
+%% yield_modelling/tax_structure + disposition.dispose_cash_events (fh_engine_journey's generic
+%% multi-source harvest — no read of ownership_planning_investor.portfolio_position, which
+%% carries no cash_events); phase_playbook then validates its budget_refs against the same
+%% harvest and reads purchase_journey's phase set.
 -define(BASE_COMPONENTS_INVESTOR,
         [<<"investor_profile">>, <<"investment_strategy">>, <<"mortgage_finance">>,
          <<"yield_modelling">>, <<"tax_structure">>, <<"cash_position">>,
-         <<"disposition">>, <<"ownership_planning_investor">>]).
+         <<"disposition">>, <<"ownership_planning_investor">>,
+         <<"purchase_journey">>, <<"phase_playbook">>]).
 
 %% Mode-B (fhb-foreign-au) base turn — 7 of the blueprint's 11 components; EXCLUDES the
 %% same 4 per-property components Mode A/C already exclude (property_assessment,
@@ -96,10 +101,41 @@
 %% Mode B's shared-name branches (mortgage_finance/cash_position/ownership_planning) key
 %% on Args.firb_required_any — a turn-level flag, not upstream presence — so order here
 %% is genuine DATA-dependency, not discriminator-selection.
+%%
+%% disposition added 2026-07-11 (task 11, plan-card-lifecycle-restoration.md §11.4 — Mode
+%% B was the only mode with no dispose-phase figure owner). fh_engine_disposition:fill/2
+%% dispatches Mode B onto the SAME fill_owner_occupier/2 path Mode A uses (keyed on the
+%% absence of tax_optimised_structure upstream — Mode B never runs a tax_structure
+%% component), so no new resolver code was needed, only the wiring + the buyer_profile
+%% intended_occupancy_use field it reads (see fh_engine_fill.erl's buyer_profile_foreign/1).
+%% Runs LAST, after cash_position + ownership_planning (it places their total_cash_required
+%% + hold-cost figures into the full-horizon roll-up — same position as every other mode's
+%% disposition). full_horizon_net_position stays honestly null for Mode B: ownership_
+%% planning's foreign variant (fill_foreign/2) never computes a recurring_costs_estimate.
+%% statutory_band the way Mode A's does — it is built around FIRB compliance monitoring
+%% (vacancy fee, alerts), not a cost estimate, and a correct one would need the foreign-
+%% owner land-tax surcharge, which kb.tax.land-tax-by-state deliberately never resolver-
+%% computes for ANY mode ("a per-property estimate would mislead without the portfolio-
+%% wide aggregate land value"). A disclosed, permanent gap, not a bug — the dispose-phase
+%% figures (sale_proceeds/selling_costs/loan_payout/cgt/net_proceeds) this component was
+%% added FOR all compute correctly regardless.
+%% purchase_journey/phase_playbook appended 2026-07-11 (task 12, plan-card-lifecycle-
+%% restoration.md §11.5/§11.8) — reuse Mode A's OWN four-actor swimlane shape (§3.3: "B =
+%% A's shape + a FIRB gate + a transfer milestone + surcharge", not Mode C/D's six-actor
+%% investor set), each with zero new resolver code beyond its own Mode-B prose/dispatch
+%% branch (fh_engine_journey:fill_fhb_foreign/1, fh_engine_phase_playbook's fhb-foreign-au
+%% clause). purchase_journey reads ongoing_obligations + disposition (both already earlier
+%% in this list) plus cash_position's cash_events (task 12 also added a real
+%% cash_events_foreign/5 to fh_engine_cash:fill_fhb_foreign/2 — Mode B's ceiling-estimate
+%% figures are honestly computable at base, unlike Mode D's fill_investor_foreign/2, so
+%% this is live money, not a permanently-null stub); phase_playbook reads only the
+%% harvested cash_event id set. Both run LAST, after disposition — the same "figure-owners,
+%% then the spine that places them" DAG shape every other mode uses.
 -define(BASE_COMPONENTS_FOREIGN,
         [<<"buyer_profile">>, <<"family_context">>, <<"firb_workflow">>,
          <<"mortgage_finance">>, <<"cash_position">>, <<"cross_border_funding">>,
-         <<"ownership_planning">>]).
+         <<"ownership_planning">>, <<"disposition">>,
+         <<"purchase_journey">>, <<"phase_playbook">>]).
 
 %% Mode-D (investor-foreign-au) base turn — the 10 `base`/`both`-scope components of the
 %% blueprint's 14 (mode-d-wedge.md P5), EXCLUDING the 4 per-property-only ones
@@ -127,11 +163,24 @@
 %%   - disposition reads strategy_thesis, cash_flow_projection, tax_optimised_structure,
 %%     budget_envelope_investor — runs LAST among the base figure-owners (same position as
 %%     every other mode's disposition).
+%% purchase_journey/phase_playbook landed 2026-07-10 (task 8, the B/C/D lifecycle-spine
+%% restructure). They run LAST, after disposition — mirroring every other mode's "figure-
+%% owners, then the spine that places them" position, NOT Mode C's order verbatim: Mode D's
+%% own ownership_planning_foreign_investor already runs BEFORE disposition here (unlike
+%% Mode C, where ownership_planning_investor reads disposition's projected figures for its
+%% equity_release opportunity — Mode D's ownership component has no such read, per the note
+%% above), so simply appending the two new components at the end is correct without
+%% reordering anything else. purchase_journey harvests cash_events off cash_position/
+%% yield_modelling/tax_structure_non_resident + disposition.dispose_cash_events (the same
+%% generic multi-source harvest Mode C uses, fh_engine_journey:harvest_cash_events/1 — no
+%% Mode-D-specific journey code needed for this wiring); phase_playbook then validates its
+%% budget_refs against the same harvest and reads purchase_journey's phase set.
 -define(BASE_COMPONENTS_FOREIGN_INVESTOR,
         [<<"investor_profile_foreign">>, <<"firb_workflow">>, <<"investment_strategy">>,
          <<"mortgage_finance">>, <<"yield_modelling">>, <<"tax_structure_non_resident">>,
          <<"cash_position">>, <<"cross_border_funding">>,
-         <<"ownership_planning_foreign_investor">>, <<"disposition">>]).
+         <<"ownership_planning_foreign_investor">>, <<"disposition">>,
+         <<"purchase_journey">>, <<"phase_playbook">>]).
 
 %% Mode-E (nexthome-domestic-au) base turn — 9 of the blueprint's 13 components (mode-e-
 %% wedge.md P5), EXCLUDING the same 4 per-property components every mode already excludes
@@ -427,10 +476,9 @@ commit_qa(P, #{tenant_id := T, user_id := U, plan_card_id := PC, turn_id := Tn,
         none ->
             %% Cleared: NOW emit the answer, one text_delta per language (§4).
             emit_answer(T, PC, Answer),
-            %% Persist the vendor-neutral glue pair. EN is the canonical coherence text
-            %% (the full bilingual answer persists in the text_delta events for replay).
-            ok = fh_engine_store:append_session_turn(
-                   T, U, PC, Tn, Msg, maps:get(<<"en">>, Answer, <<"">>)),
+            %% Persist the turn — full bilingual Answer (read_conversation/3 serves it
+            %% to the shell; read_glue/3 still reads only the EN half for prompt glue).
+            ok = fh_engine_store:append_session_turn(T, U, PC, Tn, Msg, Answer),
             {ok, Data}
     end.
 

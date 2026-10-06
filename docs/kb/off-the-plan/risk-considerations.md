@@ -1,7 +1,17 @@
 ---
 slug: kb.off-the-plan.risk-considerations
 effective_from: 2025-08-01
-last_verified: 2026-06-28
+last_verified: 2026-07-06
+sources:
+  - url: https://foreigninvestment.gov.au/guidance/types-investments/residential-land
+    retrieved: 2026-07-06
+    note: "FIRB/Treasury — new (or near-new) dwellings are the permitted foreign-person path; established-dwelling ban 1 Apr 2025 - 30 Jun 2029"
+  - url: https://www.consumer.vic.gov.au/housing/buying-and-selling-property/buying-property/buying-off-the-plan
+    retrieved: 2026-07-06
+    note: "Consumer Affairs Victoria — off-the-plan meaning; deposit capped at 10%; sunset default 18 months, buyer may end the contract and recover the deposit"
+  - url: https://www.nsw.gov.au/housing-and-construction/buying-and-selling-property/buying-property-nsw/buying-property-off-plan
+    retrieved: 2026-07-06
+    note: "NSW Government — 10 business day cooling-off; developer's sunset-clause rescission needs buyer consent or a NSW Supreme Court order; deposit held in trust. Corrected link: the prior body URL .../buying-off-the-plan now returns 404."
 ---
 
 # Off-the-plan purchase — risk considerations
@@ -67,5 +77,5 @@ Notes:
 
 - Moneysmart (ASIC) — *Buying off the plan* (completion risk, valuation at settlement, deposit, developer risk) — https://moneysmart.gov.au/property/buying-off-the-plan
 - Foreign Investment in Australia (Treasury/FIRB) — *Residential land* (new dwellings as the permitted foreign-person path) — https://foreigninvestment.gov.au/guidance/types-investments/residential-land
-- NSW Fair Trading — *Off the plan purchases* (off-the-plan cooling-off; sunset-clause protections; deposit holding) — https://www.nsw.gov.au/housing-and-construction/buying-and-selling-property/buying-off-the-plan
+- NSW Government — *Buying property off the plan* (10 business day cooling-off; sunset-clause protection — developer needs buyer consent or a NSW Supreme Court order; deposit held in trust) — https://www.nsw.gov.au/housing-and-construction/buying-and-selling-property/buying-property-nsw/buying-property-off-plan
 - Consumer Affairs Victoria — *Buying off the plan* (sunset clauses; what off-the-plan means) — https://www.consumer.vic.gov.au/housing/buying-and-selling-property/buying-property/buying-off-the-plan

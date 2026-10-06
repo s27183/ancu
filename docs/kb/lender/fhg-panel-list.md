@@ -1,7 +1,14 @@
 ---
 slug: kb.lender.fhg-panel-list
 effective_from: 2025-10-01
-last_verified: 2026-06-01
+last_verified: 2026-07-06
+sources:
+  - url: https://firsthomebuyers.gov.au/australian-government-5-percent-deposit-scheme/5-percent-participating-lenders
+    retrieved: 2026-07-06
+    note: "Participating-lender list (Housing Australia) — all four majors (ANZ, CBA, NAB, Westpac incl. St George / Bank of Melbourne / BankSA) plus many customer-owned / regional lenders. NOTE: post-1-Oct-2025 the list appears to have grown beyond ~30; panel_size_approx (32) may now understate — see report NEEDS REVIEW"
+  - url: https://www.housingaustralia.gov.au/media/unlimited-places-higher-property-price-caps-first-home-buyers-1-october-2025
+    retrieved: 2026-07-06
+    note: "From 1 October 2025 the Scheme removes limits on the number of guarantees (unlimited places); 5% deposit; higher price caps"
 ---
 
 # First Home Guarantee — participating-lender panel

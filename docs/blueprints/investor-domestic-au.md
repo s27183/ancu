@@ -33,7 +33,7 @@ Compared to Mode A FHB, this blueprint **replaces** four FHB-specific components
 
 ## Component pipeline
 
-12 components. Two are new vs Mode A FHB (marked `★`); `disposition` (12) is added by the full-temporal-flow reframe ([`../architecture/lifecycle-simulation-model.md` §8](../architecture/lifecycle-simulation-model.md)) as the dispose-phase figure-owner — **design-first / dormant** until Mode C ships, the same as the rest of this blueprint; the remainder are adapted for investor reasoning.
+14 components. Two are new vs Mode A FHB (marked `★`); `disposition` (12) is added by the full-temporal-flow reframe ([`../architecture/lifecycle-simulation-model.md` §8](../architecture/lifecycle-simulation-model.md)) as the dispose-phase figure-owner; `purchase_journey` (13) and `phase_playbook` (14) were added 2026-07-10 (the B/C/D lifecycle-spine restructure, `plan-card-lifecycle-restoration.md` §11, task 4) as the whole-of-journey swimlane + its actionable per-phase layer — mode-general schema/renderers reused from Mode A, investor-specific KB content. The remainder are adapted for investor reasoning.
 
 ### Component scope (base plan vs property addendum)
 
@@ -50,7 +50,9 @@ Compared to Mode A FHB, this blueprint **replaces** four FHB-specific components
 | 9 due_diligence (investor focus) | `per-property` | When user uploads docs |
 | 10 settlement_prep (+ entity setup) | `per-property` | Activated when contract signed |
 | 11 ownership_planning_investor | `both` | Base estimate of portfolio fit + ongoing operations; refined per-property post-settlement |
-| 12 disposition | `base` | Dispose-phase figure-owner — projected sale proceeds, selling costs, loan payout, and **full CGT** (50%-discount-if-held-over-12-months, depreciation clawback) over the hold horizon `H`; the full-horizon net position. Resolver, no agent leaf. *Design-first* (§8.5). |
+| 12 disposition | `base` | Dispose-phase figure-owner — projected sale proceeds, selling costs, loan payout, and **full CGT** (50%-discount-if-held-over-12-months, depreciation clawback) over the hold horizon `H`; the full-horizon net position. Resolver, no agent leaf. |
+| 13 purchase_journey | `base` | Whole-of-journey lifecycle swimlane — six-actor phases × cells, harvests `cash_events` off components 5/6/7/12, places them, computes nothing. Resolver, no agent leaf. |
+| 14 phase_playbook | `base` | Per-phase actionable checklist + risks, behind each Flow phase sheet. Resolver, no agent leaf. |
 
 Mode C's base plan is sharper than Mode A's because investor reasoning often happens *before* property identification — the user decides their thesis, entity, target yield, target suburb characteristics, then looks for properties matching. This makes the base plan the central decision artifact for investors.
 
@@ -103,32 +105,26 @@ Mode C's base plan is sharper than Mode A's because investor reasoning often hap
 
 > The diagram numbers are sequential reading order, not component IDs (the IDs are the scope table's 1–12; `mortgage_finance` is omitted from the sketch above). `disposition` runs **last among the base figure-owners** — it places acquire figures (from `cash_position`), hold figures (from `yield_modelling`/`tax_structure` over `H`), and owns the dispose figures, so it reads every upstream figure-owner and is read by none (acyclic).
 
-**UI tab mapping** for Mode C:
+**UI tab mapping** — the fourteen components surface through **four top-level views + a Q&A tab** ([`../architecture/plan-card-lifecycle-restoration.md`](../architecture/plan-card-lifecycle-restoration.md) §11.3), not the earlier flat eight-tab rail. Applying §11.2's placement test to Mode C: `investment_strategy` is phase-shaped (a pre-Contract one-time thesis step) → folds into a Flow phase's action checklist (visible in Overview as a synthesis read, not its own tab); `yield_modelling`/`tax_structure` are money-shaped → fold into Budget as hold-phase cash rows; `ownership_planning_investor` is state-shaped with no completion point (persists across the whole plan, forward + recurring, multi-property) → earns its own **Portfolio** view, same as Mode D. `property_assessment`, `buying_strategy`, `due_diligence` are per-property and reached as backing detail via `phase_playbook.actions[].component_ref`, not as tabs.
 
-| UI tab | Components rendered |
-|---|---|
-| Overview | `investor_profile` + `property_assessment` + `strategy_thesis` summary |
-| Investment strategy | `investment_strategy` (central) |
-| Yield & Tax | `yield_modelling` + `tax_structure` |
-| Property | `property_assessment` + `due_diligence` |
-| Cash calculator | `cash_position` + `disposition` (full-horizon net position: acquire → hold over `H` → dispose; horizon slider = structural what-if) |
-| Buying | `buying_strategy` |
-| Temporal flow | `settlement_prep` |
-| Portfolio | `ownership_planning_investor` (single-property view + portfolio-aggregate view) |
+| # | View | `kind` | What it shows |
+|---|---|---|---|
+| 1 | Budget | `components` (interactive) | the financial spine — `cash_position` as the phased acquisition cash-flow + what-if cockpit; `yield_modelling`/`tax_structure` as the hold-phase rental-income/expense/loan-interest/tax-refund rows; `disposition` as the full-horizon net position (buy → hold over `H` → sell) + horizon slider; each cash-event row drills to its `source_component` — lands first (2026-08, Son's call) so the buyer goes straight into cash planning |
+| 2 | Overview | `synthesis` | "what this is" + aggregated read of `investor_profile` + `investment_strategy` + `mortgage_finance` + `cash_position` |
+| 3 | Flow | `flow` | the legal/temporal spine — `purchase_journey` (swimlane, Prepare → … → Own → **Dispose**) as navigation; each phase opens a sheet = swimlane slice + `phase_playbook` actions (ordered, budget-linked — including `investment_strategy`'s pre-Contract thesis step) + `phase_playbook` risks; `settlement_prep` enriches the Settle phase per-property |
+| 4 | Portfolio | `components` | `ownership_planning_investor` — single-property view + portfolio-aggregate view; the only Mode-C concept that's state-shaped with no completion point, so it doesn't fold into Flow or Budget |
+| 5 | Q&A | `qa` | bilingual planning-agent chat (a shell surface over the engine Q&A stream — not a `component_filled`) |
 
-**Machine-readable form** — compiled to `ui_tabs` in the artifact, **canonical for the runtime** (the table above is the human view), in the canonical lifecycle order. `kind: synthesis` is a shell-composed summary; `interactive: true` is the client-side cash what-if. The `journey` tab gains `purchase_journey` (per-mode base swimlane) when Mode C content is built. Structure is authored now; **Mode C content is dormant** until `investor-domestic-au` comes in scope (see [`../architecture/plan-card-lifecycle-restoration.md`](../architecture/plan-card-lifecycle-restoration.md) §4).
+**Machine-readable form** — compiled to `ui_tabs` in the artifact, **canonical for the runtime** (the table above is the human view). Rewritten 2026-07-10 (task 5, `plan-card-lifecycle-restoration.md` §11.5) from the stale pre-restructure flat vocabulary to this five-view spine, mirroring [`fhb-domestic-au.md`](fhb-domestic-au.md)'s `overview`/`flow`/`budget`/`qa` shape exactly, plus `portfolio`.
 
 ```jsonc
 {
   "ui_tabs": [
-    { "tab_id": "overview",            "kind": "synthesis",  "components": ["investor_profile", "property_assessment", "investment_strategy"] },
-    { "tab_id": "investment_strategy", "kind": "components", "components": ["investment_strategy"] },
-    { "tab_id": "yield_tax",           "kind": "components", "components": ["yield_modelling", "tax_structure"] },
-    { "tab_id": "cash_calculator",     "kind": "components", "interactive": true, "components": ["cash_position", "disposition"] },
-    { "tab_id": "journey",             "kind": "components", "components": ["settlement_prep"] },
-    { "tab_id": "property",            "kind": "components", "components": ["property_assessment", "due_diligence"] },
-    { "tab_id": "buying",              "kind": "components", "components": ["buying_strategy"] },
-    { "tab_id": "portfolio",           "kind": "components", "components": ["ownership_planning_investor"] }
+    { "tab_id": "budget",    "kind": "components", "interactive": true, "components": ["cash_position", "yield_modelling", "tax_structure", "disposition"] },
+    { "tab_id": "overview",  "kind": "synthesis",  "components": ["investor_profile", "investment_strategy", "mortgage_finance", "cash_position"] },
+    { "tab_id": "flow",      "kind": "flow",        "components": ["purchase_journey", "phase_playbook", "settlement_prep"] },
+    { "tab_id": "portfolio", "kind": "components", "components": ["ownership_planning_investor"] },
+    { "tab_id": "qa",        "kind": "qa",          "components": [] }
   ]
 }
 ```
@@ -143,7 +139,7 @@ Mode C's base plan is sharper than Mode A's because investor reasoning often hap
 
 **Inputs:** User questions answered in chat; uploaded documents (NOA, payslips, depreciation schedules from existing properties if any).
 
-**KB anchors:** `kb.tax.income-tax-resident-2025-26`, `kb.lender.serviceability-investment-loans`, `kb.investor.experience-levels`
+**KB anchors:** `kb.tax.income-tax-resident-2026-27`, `kb.lender.serviceability-investment-loans`, `kb.investor.experience-levels`
 
 **Renderer:** `summary-card`
 
@@ -169,7 +165,7 @@ Mode C's base plan is sharper than Mode A's because investor reasoning often hap
         "taxable_income": { "type": "money_per_year", "value": "<initial>", "note": "per-applicant assessable income; the household assessable_income aggregates the array." },
         "tax": {
           "residency_for_tax": { "type": "enum", "options": ["resident", "non_resident", "temporary_resident_for_tax"], "value": "resident", "note": "Mode-C-activated tax{} (fact-model-unification.md 'Mode-C activation'). Drives the CGT 50% discount + main-residence interactions read by tax_structure / disposition." },
-          "marginal_rate": { "type": "percentage", "value": "<initial>", "derived_from": "taxable_income", "note": "per-applicant marginal rate (kb.tax.income-tax-resident-2025-26); read as applicant.tax.marginal_rate by tax_structure / disposition." },
+          "marginal_rate": { "type": "percentage", "value": "<initial>", "derived_from": "taxable_income", "note": "per-applicant marginal rate (kb.tax.income-tax-resident-2026-27); read as applicant.tax.marginal_rate by tax_structure / disposition." },
           "jurisdiction": { "type": "enum", "options": ["AU"], "value": "AU", "note": "Mode C = AU tax jurisdiction; Mode D adds VN." }
         }
       }
@@ -560,14 +556,15 @@ The `mortgage_plan` outcome feeds `yield_modelling.loan_costs` (the loan cost ca
     "net_yield_post_loan_pre_tax": "percentage_range",
     "year_5_projected_cash_flow": "money_range",
     "year_10_projected_cash_flow": "money_range",
-    "is_positive_neutral_or_negative_geared_pre_tax": "enum"
+    "is_positive_neutral_or_negative_geared_pre_tax": "enum",
+    "cash_events": "array<{ id: string, phase: 'own', label: localized_text, direction: enum [out, in], amount: money_range, is_estimate: bool, timing: 'recurring', period: 'year', counterparty: string, source_component: 'yield_modelling' }>"  // the hold-phase recurring spine (rental_income in/tenant, operating_expenses out/property_manager, loan_interest out/lender) — purchase_journey's generic multi-source harvest places these at phase `own`; a scalar figure (loan_interest) collapses to [v,v], matching the registry's money_range type (2026-07-10, task 4)
   }
 }
 ```
 
 **The banded money surface (Slice B0 — the cross-contract seam, decided).** The weekly rent is an irreducible **range** (`property_fit_investor.estimated_weekly_rent_range`), and the KB methodology carries it as such — *"the income line, and the yields built on it, are surfaced as ranges, not false-precision points"* (`kb.investor.rental-income-modelling`). So every rent-dependent figure here is a **`money_range` / `percentage_range`** `[lo, hi]` band, not a scalar — matching `disposition`'s already-banded surface (`sale_proceeds`, `net_proceeds`, …) and the `calculator` renderer, which renders a band as `$lo – $hi` and **collapses `[x, x]` to a single `$x`** for a point figure. The **one exception is `annual_interest_year_1`** (`money`, scalar): interest is `loan × rate` — deterministic given the loan, *not* rent-derived, so it carries no band. The disposition consumer (`full_horizon_investor`) coerces a scalar to `[x, x]` (`money_range/1`), so the band propagation is backward-compatible. `percentage_range` is a validated figure type (a `[lo, hi]` list of numbers), added to the compiler `SCALAR_TYPES` + the outcome validator alongside `money_range`.
 
-**Hold-phase `cash_events` (full-temporal-flow wiring, design-first — §8.5/§8.6).** `yield_modelling` owns the **recurring hold-phase** flows that the full-horizon financial spine places at phase `own` over the horizon `H`: rental income (`money_in`, `timing: recurring`, `period: year`), operating expenses and loan interest (`money_out`, recurring/year), each `source_component: yield_modelling`, gated by the §13 placement/provenance check. These are the holding-years entries the truncated (acquire-only) model had nowhere to put; `tax_structure` adds the negative-gearing tax effect on the same axis (below).
+**Hold-phase `cash_events` (full-temporal-flow wiring — RESOLVED 2026-07-10, task 4).** `yield_modelling` owns the **recurring hold-phase** flows that the full-horizon financial spine places at phase `own` over the horizon `H`: rental income (`money_in`, `timing: recurring`, `period: year`), operating expenses and loan interest (`money_out`, recurring/year), each `source_component: yield_modelling`, gated by the §13 placement/provenance check. These are the holding-years entries the truncated (acquire-only) model had nowhere to put; `tax_structure` adds the negative-gearing tax effect on the same axis (below). Implemented by `fh_engine_fill:yield_cash_events/1` (`engine/erlang/src/fh_engine_fill.erl`); an event is emitted only when its figure is non-null (honest-partial — the strata opex gap, or no property attached, drop the corresponding event, never fabricate one).
 
 ---
 
@@ -658,12 +655,13 @@ The `mortgage_plan` outcome feeds `yield_modelling.loan_costs` (the loan cost ca
     // caveat, resolver-selected from property_fit_investor.property_type (established → loses the
     // wage offset; new build → keeps it; no property → general caveat). Never null — at base it is
     // the general caveat. Copy in kb.copy.tax-structure; the figure itself stays out of the LLM's reach.
-    "negative_gearing_reform_note": "localized_text | null"
+    "negative_gearing_reform_note": "localized_text | null",
+    "cash_events": "array<{ id: 'tax_refund', phase: 'own', label: localized_text, direction: 'in', amount: money_range, is_estimate: bool, timing: 'recurring', period: 'year', counterparty: 'government', source_component: 'tax_structure' }>"  // the negative-gearing tax-refund leg of the hold-phase spine — emitted only when negatively geared AND the marginal rate is known (honest-partial); purchase_journey's generic multi-source harvest places it at phase `own` (2026-07-10, task 4)
   }
 }
 ```
 
-**Hold-phase + dispose wiring (full-temporal-flow, design-first — §8.5).** `tax_structure` owns the **recurring hold-phase** negative-gearing tax effect — the annual tax refund (`money_in`, `timing: recurring`, `period: year`, `source_component: tax_structure`) placed at phase `own` over `H` — and supplies the **CGT determinants** (`cgt_determinants` block above: discount eligibility, marginal rate, depreciation clawback) to `disposition` (component 12), which owns the **dispose-phase CGT figure** and its cash_event. The previously-homeless `cgt_projection` is thus resolved: hold-phase tax effects stay here; the dispose-phase gain/payable lands at the `dispose` phase, owned by the one computer for that figure.
+**Hold-phase + dispose wiring (full-temporal-flow — RESOLVED 2026-07-10, task 4).** `tax_structure` owns the **recurring hold-phase** negative-gearing tax effect — the annual tax refund (`money_in`, `timing: recurring`, `period: year`, `source_component: tax_structure`) placed at phase `own` over `H` — and supplies the **CGT determinants** (`cgt_determinants` block above: discount eligibility, marginal rate, depreciation clawback) to `disposition` (component 12), which owns the **dispose-phase CGT figure** and its cash_event. The previously-homeless `cgt_projection` is thus resolved: hold-phase tax effects stay here; the dispose-phase gain/payable lands at the `dispose` phase, owned by the one computer for that figure. Implemented by `fh_engine_fill:tax_cash_events/1`.
 
 ---
 
@@ -745,7 +743,8 @@ The `mortgage_plan` outcome feeds `yield_modelling.loan_costs` (the loan cost ca
     "lmi_payable": "money",
     "gap_or_surplus": "money",
     "verdict": "enum",
-    "mitigation_options_if_short": "array<string>"
+    "mitigation_options_if_short": "array<string>",
+    "cash_events": "array<{ id: string, phase: enum [contract, settle], label: localized_text, direction: 'out', amount: money_range, is_estimate: bool, timing: 'one_off', period: null, counterparty: string, source_component: 'cash_position' }>"  // the investor ACQUISITION spine (RESOLVED 2026-07-10, task 4) — deposit (contract, counterparty services), stamp_duty (settle, government), other_buying_costs (settle, services), lmi (settle, lender); a scalar figure collapses to [v,v]. entity_setup_costs is NOT yet an event (the underlying tax_optimised_structure.setup_costs figure is permanently null — a separate, still-open entity-cost seam). Implemented by `fh_engine_cash:cash_events_investor/4`; purchase_journey's generic multi-source harvest places these on the swimlane
   }
 }
 ```
@@ -1150,13 +1149,83 @@ wrong for QLD).
 
 ---
 
+### 13. purchase_journey (NEW — the whole-of-journey lifecycle swimlane)
+
+> **Added 2026-07-10** (the B/C/D lifecycle-spine restructure, `plan-card-lifecycle-restoration.md` §11, task 4). Same shape as Mode A's `purchase_journey` ([`fhb-domestic-au.md`](fhb-domestic-au.md) component 10) — the `journey_swimlane` outcome type and the `swimlane-diagram` renderer are mode-general and reused unchanged; only the KB content and the actor set differ.
+
+**Goal:** Present the whole-of-journey lifecycle as a swimlane — the phases of an investor purchase across time (Prepare → Pre-approve → Contract → Settle → Hold → **Dispose**) against the actors who act in each (You / Government / Lender / **Property manager** / **Tenant** / Services), with the buyer's already-computed money flows placed on the timeline. Six actor rows, not Mode A's four — a landlord relationship has two real, actor-attributable cash-flow counterparties (the tenant paying rent, the property manager collecting the management fee) that a generic "Other" row would blur (`kb.journey.investor-path`'s own rationale). The `own` phase is labelled "Hold" (tenanted, not lived in) but keeps the `own` phase id, matching `yield_modelling`/`tax_structure`'s own outcome text.
+
+**Scope:** `base` — the journey structure is generic to a Mode-C investor purchase; it does not depend on a specific property.
+
+**Inputs:** `cash_position.outcome` (`budget_envelope_investor`, incl. its `cash_events`) + `yield_modelling.outcome` (`cash_flow_projection`, incl. its `cash_events`) + `tax_structure.outcome` (`tax_optimised_structure`, incl. its `cash_events`) + `disposition.outcome` (the Dispose-phase `dispose_cash_events`). It runs **last** so it can place figures every upstream component already computed — it computes **no figure of its own**. Unlike Mode A (one acquisition-spine source), Mode C harvests `cash_events` from **three** upstream outcomes (`fh_engine_journey:harvest_cash_events/1`, a generic multi-source concatenation — not a Mode-C-specific read).
+
+**KB anchors:** `kb.journey.investor-path`
+
+**Renderer:** `swimlane-diagram`
+
+**UI tab hint:** Flow (leads the tab; folds into the restructure's five-view spine, §5 above — not yet rewritten, tracked in `wedge-build-sequence.md`)
+
+**Fill path:** resolver. The journey structure + bilingual cell prose are generic KB content (`kb.journey.investor-path`); the figures are upstream outcomes placed on the timeline. No agent leaf.
+
+**Outcome schema:** `journey_swimlane` — same shape as Mode A's (`fhb-domestic-au.md` component 10); the compiler parses the fenced block per-blueprint (it does not inherit across files), so it is repeated below rather than only cross-referenced. `actors` carries six entries (`you`, `government`, `lender`, `property_manager`, `tenant`, `services`) instead of Mode A's four.
+
+```jsonc
+{
+  "type": "journey_swimlane",
+  "fields": {
+    "phases": "array<{ id: string, label: localized_text }>",   // ordered lifecycle phases (prepare → pre_approve → contract → settle → own → dispose); own is labelled 'Hold' (tenanted) but keeps the own phase id, matching yield_modelling/tax_structure's own outcome text. The terminal dispose phase is present only when a hold horizon H is set.
+    "actors": "array<{ id: string, label: localized_text }>",   // the swimlane rows: you / government / lender / property_manager / tenant / services — six, not Mode A's four, since a landlord relationship has two real actor-attributable cash-flow counterparties (kb.journey.investor-path's own rationale)
+    "cells": "array<{ phase: string, actor: string, item: localized_text, flow_marker: enum [none, money_out, money_in, document, milestone], amount: money_range, counterparty: string|null, source_component: string }>",  // one action per (phase, actor) that has one; amount is an upstream figure PLACED on the timeline — NEVER computed here. source_component traces the cell to the figure's owner (cash_position / yield_modelling / tax_structure / disposition) for the outcome-conformance gate.
+    "interactions": "array<{ from_actor: string, to_actor: string, phase: string, flows: array<{ label: localized_text, direction: enum [out, in], amount: money_range }> }>",  // the who-pays/talks-to-whom view, derived by PLACEMENT from the same cash_events, not recomputed
+    "key_assumptions": "array<localized_text>"
+  }
+}
+```
+
+---
+
+### 14. phase_playbook (NEW — the actionable per-phase checklist + risks)
+
+> **Added 2026-07-10**, same restructure. Same schema + renderers as Mode A's `phase_playbook` ([`fhb-domestic-au.md`](fhb-domestic-au.md) component 12); only the KB content differs.
+
+**Goal:** Behind each Flow-view phase sheet, present the actionable, temporally-ordered checklist for that phase and the often-seen risks + mitigations — investor-specific (entity setup, serviceability haircut, negative-gearing-reform exposure, CGT-on-sale risk) rather than Mode A's FHB content.
+
+**Scope:** `base` — phase-keyed, property-agnostic. Per-property components (`property_assessment`, `buying_strategy`, `due_diligence`, `settlement_prep`) enrich a phase via their own outcomes, reached through an action's `component_ref`; `phase_playbook` itself stays base.
+
+**Inputs:** `cash_position.outcome` + `yield_modelling.outcome` + `tax_structure.outcome` (so each action's `budget_ref` resolves to a real `cash_event.id` — harvested the same way `purchase_journey` harvests them, `fh_engine_phase_playbook:harvest_cash_events/1`) + `purchase_journey.outcome` (to share the phase set). Runs **last** (after `purchase_journey`).
+
+**KB anchors:** `kb.journey.investor-phase-actions`, `kb.risks.investor-by-phase`
+
+**Renderer:** `checklist` + `risk-flag-list`
+
+**UI tab hint:** Flow (the per-phase drill-down sheet)
+
+**Fill path:** resolver. Actions, ordering, risks, and mitigations are bilingual KB content keyed by phase; the only upstream read is `cash_event.id` resolution for `budget_ref`. No agent leaf — the risks are KB-grounded, never LLM-generated.
+
+**Outcome schema:** `phase_playbook` — identical shape to Mode A's (`fhb-domestic-au.md` component 12); repeated below since the compiler parses this fenced block per-blueprint, not by cross-reference.
+
+```jsonc
+{
+  "type": "phase_playbook",
+  "fields": {
+    "phases": "array<{ phase: string, actions: array<{ id: string, label: localized_text, detail: localized_text, order: integer, budget_ref: string|null, component_ref: string|null, status: enum [not_started, done] }>, risks: array<{ severity: enum [low, medium, high], item: localized_text, action: localized_text }> }>",
+    // one entry per lifecycle phase (prepare → pre_approve → contract → settle → own → dispose); phase ids align with purchase_journey.phases + cash_event.phase.
+    //   ACTION: order = temporal sequence within the phase. budget_ref → a cash_event.id (harvested off cash_position/yield_modelling/tax_structure; null when no cash consequence). component_ref → a component id (e.g. tax_structure behind 'Lodge annual return'; null when none). status is USER-ATTESTED via the §10.4 toggle-write, overlaid at read.
+    //   RISK: item = the risk; action = the mitigation. KB-grounded (kb.risks.investor-by-phase), never generated. Honest-partial: a phase with no substantiated risk emits NO risk.
+    "key_assumptions": "array<localized_text>"
+  }
+}
+```
+
+---
+
 ## KB anchor index (for this blueprint)
 
-42 slugs referenced. Italics mark Mode C-only anchors (not in Mode A FHB); the two growth/selling-cost anchors at component 12 are **shared with Mode A** (non-italic).
+58 slugs referenced (corrected 2026-07-10 — a stale count; the table itself was already larger than the previously-stated "42" before this pass's three additions). Italics mark Mode C-only anchors (not in Mode A FHB); the two growth/selling-cost anchors at component 12 are **shared with Mode A** (non-italic).
 
 | Slug | Component(s) | Owns |
 |---|---|---|
-| `kb.tax.income-tax-resident-2025-26` | 1 | Resident income-tax brackets + marginal rates (shared with Mode A) |
+| `kb.tax.income-tax-resident-2026-27` | 1 | Resident income-tax brackets + marginal rates (shared with Mode A) |
 | *`kb.lender.serviceability-investment-loans`* | 1, 4 | Investment-loan serviceability assessment (approx borrowing capacity) |
 | *`kb.investor.experience-levels`* | 1 | How investor experience affects lender treatment |
 | `kb.property.suburb-risk-factors` | 2 | Suburb risk factors |
@@ -1211,6 +1280,9 @@ wrong for QLD).
 | *`kb.investor.land-tax-aggregation`* | 10 | Land tax aggregation rules across portfolio |
 | `kb.property.capital-growth-bands` | 12 | Banded capital-growth assumption for sale-proceeds projection (**labelled placeholder** — re-ground vs ABS RPPI / CoreLogic / Valuer-General; shared with Mode A) |
 | `kb.selling-costs.agent-legal` | 12 | Selling-cost bands — agent commission + legal + marketing at the dispose phase (shared with Mode A) |
+| *`kb.journey.investor-path`* | 13 | The whole-of-journey swimlane — six-actor phases × cells, bilingual prose |
+| *`kb.journey.investor-phase-actions`* | 14 | Per-phase actionable checklist, bilingual |
+| *`kb.risks.investor-by-phase`* | 14 | Per-phase risks + mitigations, bilingual |
 
 ---
 
@@ -1222,9 +1294,9 @@ wrong for QLD).
 | `calculator` | 4 yield_modelling, 5 tax_structure, 6 cash_position, 12 disposition |
 | `data-table` | 5 tax_structure, 10 ownership_planning_investor |
 | `buying-strategy-card` | 7 buying_strategy |
-| `risk-flag-list` | 8 due_diligence |
-| `checklist` | 8 due_diligence, 9 settlement_prep |
-| `swimlane-diagram` | 9 settlement_prep |
+| `risk-flag-list` | 8 due_diligence, 14 phase_playbook |
+| `checklist` | 8 due_diligence, 9 settlement_prep, 14 phase_playbook |
+| `swimlane-diagram` | 9 settlement_prep, 13 purchase_journey |
 | `opportunity-card` | 10 ownership_planning_investor |
 
 ---
@@ -1259,9 +1331,11 @@ due_diligence            → outcome: risk_assessment_investor   (reads: propert
 settlement_prep          → outcome: settlement_checklist       (reads: property_fit_investor, bid_plan_investor, tax_optimised_structure)
 disposition              → outcome: disposition              (reads: strategy_thesis, property_fit_investor, cash_flow_projection, tax_optimised_structure, budget_envelope_investor)
 ownership_planning_investor → outcome: portfolio_position      (reads: property_fit_investor, tax_optimised_structure, cash_flow_projection, disposition)
+purchase_journey          → outcome: journey_swimlane          (reads: budget_envelope_investor, cash_flow_projection, tax_optimised_structure, disposition)   // harvests cash_events off the three figure-owners + dispose_cash_events; places, computes nothing
+phase_playbook            → outcome: phase_playbook            (reads: budget_envelope_investor, cash_flow_projection, tax_optimised_structure, journey_swimlane)  // links cash_event.id via budget_ref; runs last
 ```
 
-No cycles. `tax_structure` is on the critical path because it informs `cash_position` (entity setup costs) and `ownership_planning_investor` (annual compliance). `ownership_planning_investor` runs **last** — its `portfolio_position.opportunities[]` (the opportunity-card surface) carries `equity_release`, which **places** `disposition`'s projected `sale_proceeds`/`loan_payout` to model the releasable equity at the hold horizon (one-computer-per-figure: it derives the band, it does not recompute the placed figures). So `disposition` is read by exactly one downstream component (`ownership_planning_investor`); the edge `disposition → ownership_planning_investor` is acyclic (`disposition` reads the acquire/hold figure-owners and is read only by the terminal ownership component, which is read by none).
+No cycles. `tax_structure` is on the critical path because it informs `cash_position` (entity setup costs) and `ownership_planning_investor` (annual compliance). `ownership_planning_investor` runs before the new spine — its `portfolio_position.opportunities[]` (the opportunity-card surface) carries `equity_release`, which **places** `disposition`'s projected `sale_proceeds`/`loan_payout` to model the releasable equity at the hold horizon (one-computer-per-figure: it derives the band, it does not recompute the placed figures). `purchase_journey`/`phase_playbook` (added 2026-07-10, task 4) run **last**: `purchase_journey` reads no `ownership_planning_investor` output (`portfolio_position` carries no `cash_events`) but is positioned after it, mirroring Mode A's "figure-owners, then the spine that places them" DAG shape; `phase_playbook` follows, reading `purchase_journey`'s phase set. Acyclic throughout.
 
 ---
 

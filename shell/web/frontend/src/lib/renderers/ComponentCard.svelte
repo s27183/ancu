@@ -37,7 +37,7 @@
     );
 </script>
 
-<section class="pp-card">
+<section class="pp-card" data-component={componentId}>
     <h3 class="pp-card-title">{title}</h3>
     {#if entry}
         {#each renderers as r (r)}

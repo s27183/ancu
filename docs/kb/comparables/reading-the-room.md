@@ -1,7 +1,15 @@
 ---
 slug: kb.comparables.reading-the-room
 effective_from: 2025-08-01
-last_verified: 2026-06-02
+last_verified: 2026-07-06
+sources:
+  - url: https://www.consumer.vic.gov.au/underquoting
+    retrieved: 2026-07-06
+    note: "Consumer Affairs Victoria — Statement of Information: indicative price + 3 comparable sales + suburb median; range no more than 10%; qualifying words ('from', 'offers above', '+') banned"
+  - url: https://www.legislation.qld.gov.au/view/pdf/inforce/current/act-2014-022
+    retrieved: 2026-07-06
+    path: docs/sources/qld/property_occupations_act_2014.pdf
+    note: "QLD Property Occupations Act 2014 ss214(2)(c)/216(2)(c) — no price guide for an auction property, with electronic-listings carve-out ss214(4)-(5)/216(4)-(5); read via archived PDF, current as at 1 Aug 2025. NSW (Property and Stock Agents Act 2002) underquoting stays at Act-name granularity — legislation.nsw.gov.au 403s WebFetch."
 ---
 
 # Reading the room — advertised price vs the real market

@@ -4,15 +4,13 @@
     // shape this:
     //   - The answer is engine-authored {vi,en} (bilingual-content.md) — we pick() the
     //     display language, never route it through chrome i18n. Labels/status are $t.
-    //   - There is no conversation-read endpoint, and the user's question text is not on
-    //     the stream — so the transcript is IN-MEMORY only (lost on remount / reload).
-    //     A persistent thread is a later backend slice (engine GET conversation + proxy).
-    // The answer + machinery (tool_use → "looking up…") arrive over subscribeConversation,
-    // attributed to the turn_id returned by postMessage.
+    //   - Past turns hydrate from GET .../conversation (session_turns; 8-S4e) on mount —
+    //     bilingual, oldest→newest. Live turns still arrive over subscribeConversation,
+    //     attributed to the turn_id returned by postMessage.
     import { onMount } from 'svelte';
     import { t } from '$lib/i18n';
     import { lang } from '$lib/stores/lang';
-    import { postMessage } from '$lib/api';
+    import { postMessage, getConversation } from '$lib/api';
     import { subscribeConversation, type PlanCardStream } from '$lib/planCardStream';
     import { pick, type LocalizedText } from '$lib/planCard';
 
@@ -30,6 +28,7 @@
     let input = $state('');
     // A turn is in flight → block another send (the engine 409s a concurrent turn anyway).
     let sending = $state(false);
+    let logEl = $state<HTMLDivElement | null>(null);
 
     let stream: PlanCardStream | null = null;
     // Race guard: an answer can in principle arrive before postMessage's 202 registers
@@ -91,6 +90,19 @@
     }
 
     onMount(() => {
+        // History hydration races nothing: Chat only mounts once turnDone (no turn can
+        // be in flight), and a hydrated bubble's turnId simply won't match any later
+        // live turn_id, so the two never collide.
+        (async () => {
+            const hist = await getConversation(planCardId);
+            if (hist.kind === 'ok' && hist.turns.length > 0 && messages.length === 0) {
+                messages = hist.turns.flatMap((turn) => [
+                    { role: 'user', text: turn.userText },
+                    { role: 'assistant', turnId: turn.turnId, phase: 'done', answer: turn.answer }
+                ]);
+            }
+        })();
+
         stream = subscribeConversation(planCardId, {
             onTool: (turnId) => {
                 const i = indexOfTurn(turnId);
@@ -106,13 +118,20 @@
         });
         return () => stream?.close();
     });
+
+    // The log is a fixed-height scroll region (CSS); pin it to the newest message on
+    // every push AND on in-place phase/answer updates (thinking → looking → done).
+    $effect(() => {
+        for (const m of messages) if (m.role === 'assistant') void m.phase;
+        if (logEl) logEl.scrollTop = logEl.scrollHeight;
+    });
 </script>
 
 <section class="chat" aria-label={$t('chat.title')}>
     <h3 class="chat-title">{$t('chat.title')}</h3>
 
     {#if messages.length > 0}
-        <div class="chat-log">
+        <div class="chat-log" bind:this={logEl}>
             {#each messages as m, i (i)}
                 {#if m.role === 'user'}
                     <div class="chat-msg user"><p>{m.text}</p></div>

@@ -1,7 +1,10 @@
 ---
 slug: kb.existing-home-sale.net-proceeds
 effective_from: 2026-07-05
-last_verified: 2026-07-05
+last_verified: 2026-07-06
+sources:
+  - url: https://www.mozo.com.au/home-loans/resources/guides/how-to-discharge-your-mortgage-and-what-it-means.html
+    retrieved: 2026-07-06
 ---
 
 # Existing-home sale — net proceeds funding the next purchase

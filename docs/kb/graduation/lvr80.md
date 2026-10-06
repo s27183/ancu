@@ -1,7 +1,11 @@
 ---
 slug: kb.graduation.lvr80
 effective_from: 2025-07-01
-last_verified: 2026-06-01
+last_verified: 2026-07-06
+sources:
+  - url: https://www.commbank.com.au/home-loans/lenders-mortgage-insurance.html
+    retrieved: 2026-07-06
+    note: "CommBank LMI page — 'LMI is usually required if your Loan-to-Value Ratio (LVR) is above 80%, meaning you have a deposit of less than 20% of the property's value.' Confirms the 80% LVR trigger as an LMI/lender convention (NOT an APRA figure — APRA APG 223 leaves 'high LVR' undefined, flags 90%+; the 80% line is the LMI market convention this doc relies on)."
 ---
 
 # The 80% LVR graduation event — when the FHG falls away

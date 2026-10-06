@@ -1,7 +1,12 @@
 ---
 slug: kb.fx.loan-currency-considerations
 effective_from: 2025-07-01
-last_verified: 2026-07-02
+last_verified: 2026-07-06
+sources:
+  - url: https://www.homeloanexperts.com.au/non-resident-mortgages/foreign-currency-mortgages/
+    retrieved: 2026-07-06
+  - url: https://www.homeloanexperts.com.au/non-resident-mortgages/proving-foreign-income/
+    retrieved: 2026-07-06
 ---
 
 # Loan currency and FX exposure — where the risk actually sits

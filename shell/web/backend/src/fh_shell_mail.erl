@@ -43,7 +43,7 @@ resend_send(Key, Email, Url) ->
     Body = fh_shell_util:json_encode(#{
         <<"from">>    => from_address(),
         <<"to">>      => [Email],
-        <<"subject">> => <<"Sign in to FirstHomey / Đăng nhập FirstHomey"/utf8>>,
+        <<"subject">> => <<"Sign in to Rau / Đăng nhập Rau"/utf8>>,
         <<"html">>    => html_body(Url),
         <<"text">>    => text_body(Url)
     }),
@@ -70,8 +70,8 @@ resend_send(Key, Email, Url) ->
 -spec from_address() -> binary().
 from_address() ->
     case os:getenv("EMAIL_FROM") of
-        false -> <<"FirstHomey <onboarding@resend.dev>">>;
-        ""    -> <<"FirstHomey <onboarding@resend.dev>">>;
+        false -> <<"Rau <onboarding@resend.dev>">>;
+        ""    -> <<"Rau <onboarding@resend.dev>">>;
         Addr  -> with_name(list_to_binary(Addr))
     end.
 
@@ -87,15 +87,15 @@ with_name(Addr) ->
 %% leads in Vietnamese with the English line beneath.
 -spec html_body(binary()) -> binary().
 html_body(Url) ->
-    <<"<p>Nhấp vào liên kết bên dưới để đăng nhập vào FirstHomey "
+    <<"<p>Nhấp vào liên kết bên dưới để đăng nhập vào Rau "
       "(liên kết hết hạn sau 15 phút):</p>"
       "<p><a href=\""/utf8, Url/binary,
       "\">Đăng nhập / Sign in</a></p>"
       "<p style=\"color:#666;font-size:13px\">Click the link above to sign in to "
-      "FirstHomey. The link expires in 15 minutes. If you did not request this, "
+      "Rau. The link expires in 15 minutes. If you did not request this, "
       "you can ignore this email.</p>"/utf8>>.
 
 -spec text_body(binary()) -> binary().
 text_body(Url) ->
-    <<"Đăng nhập vào FirstHomey / Sign in to FirstHomey:\n"/utf8, Url/binary,
+    <<"Đăng nhập vào Rau / Sign in to Rau:\n"/utf8, Url/binary,
       "\n\nLiên kết hết hạn sau 15 phút. / The link expires in 15 minutes."/utf8>>.

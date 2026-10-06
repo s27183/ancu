@@ -1,7 +1,11 @@
 ---
 slug: kb.lender.documentation-non-resident
 effective_from: 2025-07-01
-last_verified: 2026-07-02
+last_verified: 2026-07-06
+sources:
+  - url: https://wise.com/us/blog/getting-a-mortgage-in-australia
+    retrieved: 2026-07-06
+    note: "Non-resident document pack (passport/ID, FIRB proof, residence proof, credit/bank statements, wages, tax returns for the last three years, employer letter) and that non-residents should expect a longer timeline than the 3-5 business days for residents. Lender-practice convention (aggregator source)"
 ---
 
 # Loan documentation for non-residents and temporary residents

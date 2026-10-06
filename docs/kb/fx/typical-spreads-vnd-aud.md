@@ -1,7 +1,10 @@
 ---
 slug: kb.fx.typical-spreads-vnd-aud
 effective_from: 2025-07-01
-last_verified: 2026-07-02
+last_verified: 2026-07-06
+sources:
+  - url: https://wise.com/au/send-money/send-money-to-vietnam
+    retrieved: 2026-07-06
 ---
 
 # Typical VND→AUD FX spreads — by provider category

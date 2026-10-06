@@ -1,7 +1,11 @@
 ---
 slug: kb.loan.offset-vs-redraw-investor
 effective_from: 2025-07-01
-last_verified: 2026-06-23
+last_verified: 2026-07-06
+sources:
+  - url: https://aintreegroup.com.au/insights/warning-for-those-redrawing-investment-loans/
+    retrieved: 2026-07-06
+    note: "Accounting-firm explainer of ATO TR 2000/2 — redraw is a new borrowing, deductibility follows the USE of redrawn funds; private redraw makes the loan mixed-purpose and contaminates deductibility; an offset withdrawal is NOT a new borrowing so it does not. Confirms the doc's core distinction. (Secondary source — the ATO TR 2000/2 primary at ato.gov.au was Cloudflare-blocked this session.)"
 ---
 
 # Offset vs redraw — for investors

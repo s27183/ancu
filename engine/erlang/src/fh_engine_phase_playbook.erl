@@ -28,13 +28,30 @@
 %%
 %% Mode-general (phase-keyed actions + risks); Modes B/C/D reuse the schema + the same
 %% checklist + risk-flag-list renderers with their own kb.journey.*/kb.risks.* content.
+%% Mode C landed 2026-07-10 (kb.journey.investor-phase-actions / kb.risks.investor-by-phase);
+%% Mode D landed 2026-07-10 (kb.journey.investor-foreign-phase-actions / kb.risks.investor-
+%% foreign-by-phase); Mode B landed 2026-07-11 (kb.journey.fhb-foreign-phase-actions /
+%% kb.risks.fhb-foreign-by-phase — task 12).
+%%
+%% MULTI-SOURCE HARVEST (2026-07-10, matches fh_engine_journey's harvest_cash_events/1,
+%% [[unify-views-as-projections-of-one-primitive]]): ValidRefs is built from every upstream
+%% outcome's `cash_events` field, not one hardcoded key — the same root fix, for the same
+%% reason (a mode with more than one cash_events-bearing component, e.g. Mode C's
+%% cash_position + yield_modelling + tax_structure, needs its budget_refs validated against
+%% ALL of them, not just one).
 
 -export([fill/2]).
 %% exported for the conformance harness:
--export([phase_order/0, build_phase/4]).
+-export([phase_order/0, build_phase/4, build_phase/6]).
 
--define(ACTIONS, <<"kb.journey.phase-actions">>).  %% ordered actions per phase + bilingual copy
--define(RISKS,   <<"kb.risks.fhb-by-phase">>).     %% per-phase risks + mitigations + bilingual copy
+-define(ACTIONS,          <<"kb.journey.phase-actions">>).   %% Mode A actions + bilingual copy
+-define(RISKS,            <<"kb.risks.fhb-by-phase">>).      %% Mode A risks + bilingual copy
+-define(INVESTOR_ACTIONS, <<"kb.journey.investor-phase-actions">>).  %% Mode C actions + copy
+-define(INVESTOR_RISKS,   <<"kb.risks.investor-by-phase">>).         %% Mode C risks + copy
+-define(INVESTOR_FOREIGN_ACTIONS, <<"kb.journey.investor-foreign-phase-actions">>).  %% Mode D actions + copy
+-define(INVESTOR_FOREIGN_RISKS,   <<"kb.risks.investor-foreign-by-phase">>).         %% Mode D risks + copy
+-define(FHB_FOREIGN_ACTIONS, <<"kb.journey.fhb-foreign-phase-actions">>).  %% Mode B actions + copy
+-define(FHB_FOREIGN_RISKS,   <<"kb.risks.fhb-foreign-by-phase">>).         %% Mode B risks + copy
 
 %% The canonical lifecycle phase order (fh_engine_journey:phases/0; cash_event.phase),
 %% incl. the terminal `dispose` (lifecycle-simulation-model §8.1). The dispose phase carries
@@ -47,30 +64,40 @@
 %% --- entry -------------------------------------------------------------------
 
 -spec fill(map(), map()) -> {map(), binary(), [map()]}.
-fill(_Args, Upstream) ->
-    %% The only upstream read: the set of cash_event ids, for budget_ref validation.
-    Budget    = maps:get(<<"budget_envelope">>, Upstream, #{}),
-    Events    = maps:get(<<"cash_events">>, Budget, []),
-    ValidRefs = sets:from_list([maps:get(<<"id">>, E) || E <- Events]),
+fill(Args, Upstream) ->
+    {ActionsDoc, RisksDoc} =
+        case maps:get(blueprint_slug, Args, <<"fhb-domestic-au">>) of
+            <<"investor-domestic-au">> -> {?INVESTOR_ACTIONS, ?INVESTOR_RISKS};
+            <<"investor-foreign-au">>  -> {?INVESTOR_FOREIGN_ACTIONS, ?INVESTOR_FOREIGN_RISKS};
+            <<"fhb-foreign-au">>       -> {?FHB_FOREIGN_ACTIONS, ?FHB_FOREIGN_RISKS};
+            _                          -> {?ACTIONS, ?RISKS}
+        end,
+    %% The only upstream read: the set of cash_event ids, for budget_ref validation —
+    %% harvested from every upstream outcome that exposes the field.
+    ValidRefs = sets:from_list([maps:get(<<"id">>, E) || E <- harvest_cash_events(Upstream)]),
     %% The authored structure (layout) + bilingual prose (copy) from the two KB docs.
-    {ok, ActionsCj} = fh_engine_kb:kb_rules(?ACTIONS),
-    {ok, RisksCj}   = fh_engine_kb:kb_rules(?RISKS),
+    {ok, ActionsCj} = fh_engine_kb:kb_rules(ActionsDoc),
+    {ok, RisksCj}   = fh_engine_kb:kb_rules(RisksDoc),
     ActionsByPhase  = index(ActionsCj, <<"actions">>),
     RisksByPhase    = index(RisksCj, <<"risks">>),
     %% One entry per lifecycle phase, merging its actions + risks by phase id.
     Phases = [build_phase(P,
                           maps:get(P, ActionsByPhase, []),
                           maps:get(P, RisksByPhase, []),
-                          ValidRefs)
+                          ValidRefs, ActionsDoc, RisksDoc)
               || P <- ?PHASE_ORDER],
     Outcome = #{
         <<"phases">> => Phases,
         <<"key_assumptions">> =>
-            [actions_copy(<<"assumption_indicative">>),
-             actions_copy(<<"assumption_informational">>)]
+            [copy(ActionsDoc, <<"assumption_indicative">>),
+             copy(ActionsDoc, <<"assumption_informational">>)]
     },
-    KbVersions = fh_engine_kb:kb_anchors([?ACTIONS, ?RISKS]),
+    KbVersions = fh_engine_kb:kb_anchors([ActionsDoc, RisksDoc]),
     {Outcome, <<"checklist">>, KbVersions}.
+
+%% every upstream outcome that carries a `cash_events` field, concatenated.
+harvest_cash_events(Upstream) ->
+    lists:flatten([maps:get(<<"cash_events">>, V, []) || V <- maps:values(Upstream), is_map(V)]).
 
 -spec phase_order() -> [binary()].
 phase_order() -> ?PHASE_ORDER.
@@ -79,13 +106,19 @@ phase_order() -> ?PHASE_ORDER.
 
 %% Merge one phase's actions + risks into a single phase entry. Actions are sorted by
 %% `order` (temporal sequence within the phase); a phase with no authored risk emits an
-%% empty list (honest-partial — never a fabricated risk).
+%% empty list (honest-partial — never a fabricated risk). ActionsDoc/RisksDoc select which
+%% mode's KB doc the bilingual copy resolves against (default Mode A's ?ACTIONS/?RISKS via
+%% the two extra clauses below, for callers that predate the mode-dispatch).
 -spec build_phase(binary(), [map()], [map()], sets:set()) -> map().
 build_phase(Phase, ActionDefs, RiskDefs, ValidRefs) ->
+    build_phase(Phase, ActionDefs, RiskDefs, ValidRefs, ?ACTIONS, ?RISKS).
+
+-spec build_phase(binary(), [map()], [map()], sets:set(), binary(), binary()) -> map().
+build_phase(Phase, ActionDefs, RiskDefs, ValidRefs, ActionsDoc, RisksDoc) ->
     Actions = lists:sort(
                 fun(A, B) -> maps:get(<<"order">>, A) =< maps:get(<<"order">>, B) end,
-                [action(Phase, D, ValidRefs) || D <- ActionDefs]),
-    Risks   = [risk(Phase, D) || D <- RiskDefs],
+                [action(Phase, D, ValidRefs, ActionsDoc) || D <- ActionDefs]),
+    Risks   = [risk(Phase, D, RisksDoc) || D <- RiskDefs],
     #{<<"phase">>   => Phase,
       <<"actions">> => Actions,
       <<"risks">>   => Risks}.
@@ -95,23 +128,23 @@ build_phase(Phase, ActionDefs, RiskDefs, ValidRefs) ->
 %% user-set layer overlays the effective value at read). budget_ref is kept only if it
 %% names a real cash_event in this plan; component_ref is passed through verbatim (it may
 %% point at a per-property component reached as backing detail — not validated here).
-action(Phase, Def, ValidRefs) ->
+action(Phase, Def, ValidRefs, ActionsDoc) ->
     Id = maps:get(<<"id">>, Def),
     #{<<"id">>            => Id,
       <<"order">>         => maps:get(<<"order">>, Def),
       <<"budget_ref">>    => keep_valid(maps:get(<<"budget_ref">>, Def, null), ValidRefs),
       <<"component_ref">> => maps:get(<<"component_ref">>, Def, null),
-      <<"label">>         => actions_copy(ckey(<<"action">>, Phase, Id, <<"label">>)),
-      <<"detail">>        => actions_copy(ckey(<<"action">>, Phase, Id, <<"detail">>)),
+      <<"label">>         => copy(ActionsDoc, ckey(<<"action">>, Phase, Id, <<"label">>)),
+      <<"detail">>        => copy(ActionsDoc, ckey(<<"action">>, Phase, Id, <<"detail">>)),
       <<"status">>        => <<"not_started">>}.
 
 %% An often-seen risk + its mitigation (risk-flag-list shape). item/action are bilingual
 %% copy keyed by convention (risk_<phase>_<id>_{item,action}); severity from the layout.
-risk(Phase, Def) ->
+risk(Phase, Def, RisksDoc) ->
     Id = maps:get(<<"id">>, Def),
     #{<<"severity">> => maps:get(<<"severity">>, Def),
-      <<"item">>     => risks_copy(ckey(<<"risk">>, Phase, Id, <<"item">>)),
-      <<"action">>   => risks_copy(ckey(<<"risk">>, Phase, Id, <<"action">>))}.
+      <<"item">>     => copy(RisksDoc, ckey(<<"risk">>, Phase, Id, <<"item">>)),
+      <<"action">>   => copy(RisksDoc, ckey(<<"risk">>, Phase, Id, <<"action">>))}.
 
 %% --- helpers -----------------------------------------------------------------
 
@@ -133,5 +166,4 @@ keep_valid(Ref, ValidRefs) ->
 ckey(Prefix, Phase, Id, Suffix) ->
     <<Prefix/binary, "_", Phase/binary, "_", Id/binary, "_", Suffix/binary>>.
 
-actions_copy(Id) -> fh_engine_kb:copy(?ACTIONS, Id).
-risks_copy(Id)   -> fh_engine_kb:copy(?RISKS, Id).
+copy(Doc, Id) -> fh_engine_kb:copy(Doc, Id).

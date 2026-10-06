@@ -37,6 +37,7 @@ main(_) ->
         {"/api/engine/plan-cards/:id/messages", StubMod, [messages]},
         {"/api/engine/plan-cards/:id/properties", StubMod, [properties]},
         {"/api/engine/plan-cards/:id/properties/:pid/transaction", StubMod, [transaction]},
+        {"/api/engine/plan-cards/:id/news", StubMod, [news]},
         {"/api/engine/plan-cards/:id", StubMod, []}
     ]}]),
     {ok, _} = cowboy:start_clear(stub_engine_listener, [{port, ?STUB_PORT}],
@@ -146,9 +147,13 @@ main(_) ->
                       [<<"over+", (uuid())/binary, "@example.com">>]),
     OverCard = uuid(),
     ok = fh_shell_store:insert_plan_card_view(OverUser, OverCard, <<"Cabramatta">>),
+    %% engine_event_id must be NEGATIVE: fh_shell_usage_consumer bootstraps its poll
+    %% cursor from MAX(engine_event_id) across this whole table (002_commerce.sql),
+    %% so a positive fixture id — even a huge one meant only to be "unique" — can jump
+    %% the real consumer's cursor past every future real event and silently wedge it.
     _ = pgo:query(<<"INSERT INTO usage_records (user_id, engine_event_id, tokens_total) "
                     "VALUES ($1::uuid, $2, $3)">>,
-                  [OverUser, erlang:system_time(microsecond), 1000000]),
+                  [OverUser, -erlang:system_time(microsecond), 1000000]),
     OverJwt = fh_shell_jwt:issue(#{user_id => OverUser, email => <<"over@example.com">>,
                                    roles => [<<"buyer">>], locale => <<"vi">>}),
     OverAuth = [{"authorization", "Bearer " ++ binary_to_list(OverJwt)}],
@@ -175,6 +180,36 @@ main(_) ->
     {401, _} = req(post, Base ++ "/api/plan-cards/" ++ b2l(CardId)
                    ++ "/properties/" ++ b2l(TxnPid) ++ "/transaction", [], TxnBody),
     expect(true, "POST .../transaction with no user JWT -> 401"),
+
+    %% --- NEWS (task 27): GET relays the engine's relevant-notes list verbatim ---
+    {200, NewsResp} = req(get, Base ++ "/api/plan-cards/" ++ b2l(CardId) ++ "/news",
+                          Auth, <<>>),
+    #{<<"news">> := [NewsItem]} = fh_shell_util:json_decode(NewsResp),
+    #{<<"news_slug">> := <<"kb.news.2026-07-hecs-thresholds-2026-27">>,
+      <<"sources">> := [_ | _]} = NewsItem,
+    expect(true, "GET .../news on an owned card -> 200; relayed verbatim"),
+
+    {404, _} = req(get, Base ++ "/api/plan-cards/" ++ b2l(OtherCard) ++ "/news",
+                   Auth, <<>>),
+    expect(true, "GET .../news on an unowned card -> 404"),
+    {401, _} = req(get, Base ++ "/api/plan-cards/" ++ b2l(CardId) ++ "/news", [], <<>>),
+    expect(true, "GET .../news with no user JWT -> 401"),
+
+    %% --- NEWS: PATCH dismiss relays the engine's authoritative dismissed_news map ---
+    DismissBody = fh_shell_util:json_encode(
+        #{<<"news_slug">> => <<"kb.news.2026-07-hecs-thresholds-2026-27">>}),
+    {200, DismissResp} = req(patch, Base ++ "/api/plan-cards/" ++ b2l(CardId) ++ "/news",
+                             Auth, DismissBody),
+    #{<<"dismissed_news">> :=
+        #{<<"kb.news.2026-07-hecs-thresholds-2026-27">> := true}} =
+        fh_shell_util:json_decode(DismissResp),
+    expect(true, "PATCH .../news on an owned card -> 200; dismissed_news relayed verbatim"),
+
+    {404, _} = req(patch, Base ++ "/api/plan-cards/" ++ b2l(OtherCard) ++ "/news",
+                   Auth, DismissBody),
+    expect(true, "PATCH .../news on an unowned card -> 404"),
+    {401, _} = req(patch, Base ++ "/api/plan-cards/" ++ b2l(CardId) ++ "/news", [], DismissBody),
+    expect(true, "PATCH .../news with no user JWT -> 401"),
 
     io:format("~nALL PASSED~n"),
     halt(0).

@@ -1,7 +1,10 @@
 ---
 slug: kb.scheme.nsw.fhbas
 effective_from: 2023-07-01
-last_verified: 2026-06-01
+last_verified: 2026-07-06
+sources:
+  - url: https://www.nsw.gov.au/housing-and-construction/buying-and-selling-property/home-buying-assistance/first-home-buyers-assistance-scheme
+    retrieved: 2026-07-06
 ---
 
 # NSW First Home Buyers Assistance Scheme (FHBAS)
@@ -18,7 +21,7 @@ To claim the benefit, the buyer must:
 - Not have **previously received** an exemption or concession under this scheme (and the same applies to a spouse/partner — see Notes).
 - Be buying a **new or existing home, or vacant land, in NSW** within the [threshold amounts](#concession-amount).
 - Have at least one of the first home buyers who is an **Australian citizen or permanent resident**.
-- **Move into the home** within **12 months** of settlement (or completion of a new build) and live there as the **principal place of residence for at least 6 continuous months**.
+- **Move into the home** within **12 months** of settlement (or completion of a new build) and live there as the **principal place of residence for at least 12 continuous months**.
 
 ## Concession amount
 
@@ -54,7 +57,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
           { "field": "non_buying_partner.exists",                 "op": "eq", "value": false },    // no partner → gate moot
           { "field": "non_buying_partner.ever_owned_au_property", "op": "eq", "value": false } ] },
         { "field": "applicant.citizenship_status",     "op": "in",  "value": ["citizen", "permanent_resident"] },
-        { "field": "applicant.owner_occupier_intent",  "op": "eq",  "value": true },              // move in within 12 mo, live 6 continuous mo
+        { "field": "applicant.owner_occupier_intent",  "op": "eq",  "value": true },              // move in within 12 mo, live 12 continuous mo
         { "field": "property_fit.price",             "op": "lte", "value": 1000000 } ] } },     // outer bound for a HOME; above $1M no concession. Vacant-land bands are lower — see Notes
         // property_fit.* criteria activate in per-property scope; base scope evaluates the profile-only criteria → provisional
 
@@ -67,7 +70,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
     "vacant_land_exemption_threshold":        { "type": "money",   "value": 350000 },
     "vacant_land_concession_cap":             { "type": "money",   "value": 450000 },
     "move_in_window_months_after_settlement": { "type": "integer", "value": 12 },
-    "min_continuous_occupancy_months":        { "type": "integer", "value": 6 }
+    "min_continuous_occupancy_months":        { "type": "integer", "value": 12 }
   },
   "stacking": {
     "combines_with": ["kb.scheme.fhg", "kb.scheme.fhss", "kb.scheme.help-to-buy"],   // state doc declares federal↔state edges (symmetric, §11.9); Help to Buy explicitly allows stacking stamp-duty concessions. The NSW FHOG↔FHBAS edge is declared on fhog.md.
@@ -87,5 +90,5 @@ Notes:
 ## Sources
 
 - Revenue NSW — *First Home Buyers Assistance scheme* (thresholds, eligibility, residence requirement, Australia-only prior-ownership test) — https://www.revenue.nsw.gov.au/grants-schemes/assistance-scheme
-- NSW Government — *First Home Buyers Assistance Scheme* (home $800k exemption / $1M concession; vacant land $350k/$450k; citizen-or-PR; move-in 12 months, 6 continuous months) — https://www.nsw.gov.au/housing-and-construction/buying-and-selling-property/home-buying-assistance/first-home-buyers-assistance-scheme
+- NSW Government — *First Home Buyers Assistance Scheme* (home $800k exemption / $1M concession; vacant land $350k/$450k; citizen-or-PR; move-in within 12 months, live there 12 continuous months) — https://www.nsw.gov.au/housing-and-construction/buying-and-selling-property/home-buying-assistance/first-home-buyers-assistance-scheme
 - Revenue NSW — *First Home Buyers Assistance Scheme guide* — https://www.revenue.nsw.gov.au/property-professionals-resource-centre/duties-guides/first-home-buyers-assistance-scheme-guide

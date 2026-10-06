@@ -1,8 +1,13 @@
 ---
 slug: kb.au-temp-residents.banking-and-tax-basics
 effective_from: 2025-07-01
-last_verified: 2026-06-28
----
+last_verified: 2026-07-06
+sources:
+  - url: https://www.ato.gov.au/individuals-and-families/coming-to-australia-or-going-overseas/your-tax-residency/foreign-and-temporary-residents
+    retrieved: 2026-07-06
+    note: "PRIMARY (ATO) — residency-for-tax categories; foreign residents have no tax-free threshold and no Medicare levy. Verified via WebSearch corroboration 2026-07-06 (ATO WebFetch 403 in-sandbox) — CONFIRMED."
+  - url: https://classic.austlii.edu.au/au/legis/cth/consol_act/itaa1997240/s768.900.html
+    note: "POINTER (not re-fetched this session; canonical home of the fact) — ITAA 1997 Subdiv 768-R (temporary-resident foreign-income exemption, except net capital gains). Settled law; re-verify anchor for the temporary-resident row."
 
 # Banking and tax basics for AU temporary residents
 
@@ -16,7 +21,7 @@ This doc grounds the **`applicant.tax`** facts captured at `buyer_profile` for M
 
 | `residency_for_tax` | Who | What is taxed | Key features |
 |---|---|---|---|
-| **`resident`** | Meets an ATO residency test (resides / domicile / 183-day / superannuation test) — common for a 485 or 482 holder living and working in AU. | Worldwide income. | Tax-free threshold + resident marginal rates ([`kb.tax.income-tax-resident-2025-26`](../tax/income-tax-resident-2025-26.md)); Medicare levy applies (unless a foreign-resident exemption). |
+| **`resident`** | Meets an ATO residency test (resides / domicile / 183-day / superannuation test) — common for a 485 or 482 holder living and working in AU. | Worldwide income. | Tax-free threshold + resident marginal rates ([`kb.tax.income-tax-resident-2026-27`](../tax/income-tax-resident-2026-27.md)); Medicare levy applies (unless a foreign-resident exemption). |
 | **`temporary_resident_for_tax`** | Holds a temporary visa (Migration Act) **and** is not an Australian resident in the social-security sense (and spouse not). | AU-source income + AU employment income; **most foreign-source income is exempt** (ITAA 1997 **Subdiv 768-R** — foreign ordinary + statutory income, *except net capital gains*, is non-assessable non-exempt). | Taxed broadly like a resident on AU income, but VN-source income is generally not assessable in AU. **Net capital gains are not exempt** — see CGT below. |
 | **`non_resident`** (foreign resident for tax) | Does not meet a residency test — typically the **Vietnam-located funding parent**, or an applicant not living in AU. | **AU-source income only.** | **No tax-free threshold** — tax on every dollar of AU income, at foreign-resident rates; **no Medicare levy** (exemption for foreign-resident days). |
 
@@ -49,8 +54,8 @@ Pure-reference (`fills: []`). The profile's `residency_for_tax` is a user/agent-
       "keydim": ["residency_for_tax"],
       "provenance": "REGULATED (ATO / ITAA 1997)",
       "rows": [
-        { "residency_for_tax": "resident",                    "taxed_on": "worldwide income", "tax_free_threshold": true,  "medicare_levy": true,  "rate_owner": "kb.tax.income-tax-resident-2025-26" },
-        { "residency_for_tax": "temporary_resident_for_tax",  "taxed_on": "AU-source + AU employment income; most foreign-source income exempt (Subdiv 768-R, except net capital gains)", "tax_free_threshold": true, "medicare_levy": true, "rate_owner": "kb.tax.income-tax-resident-2025-26" },
+        { "residency_for_tax": "resident",                    "taxed_on": "worldwide income", "tax_free_threshold": true,  "medicare_levy": true,  "rate_owner": "kb.tax.income-tax-resident-2026-27" },
+        { "residency_for_tax": "temporary_resident_for_tax",  "taxed_on": "AU-source + AU employment income; most foreign-source income exempt (Subdiv 768-R, except net capital gains)", "tax_free_threshold": true, "medicare_levy": true, "rate_owner": "kb.tax.income-tax-resident-2026-27" },
         { "residency_for_tax": "non_resident",                "taxed_on": "AU-source income only", "tax_free_threshold": false, "medicare_levy": false, "rate_owner": "foreign-resident rates (Cluster-X / income-tax doc)" }
       ]
     }
@@ -60,7 +65,7 @@ Pure-reference (`fills: []`). The profile's `residency_for_tax` is a user/agent-
 
 Notes:
 
-- **Single-owner.** FIRB status → [`kb.firb.status-determination`](../firb/status-determination.md). Resident rate table → [`kb.tax.income-tax-resident-2025-26`](../tax/income-tax-resident-2025-26.md). Foreign-resident CGT / withholding / no-PPOR-exemption → the Cluster-X `kb.non-resident-tax.*` docs (authored in Cluster X; referenced as code-span slugs until then). Lending → Cluster-L. AML source-of-funds → Cluster-X `kb.au-aml-ctf.*`. This doc owns only the **tax-residency framework + the FIRB-vs-tax distinction** and the banking-prerequisite basics.
+- **Single-owner.** FIRB status → [`kb.firb.status-determination`](../firb/status-determination.md). Resident rate table → [`kb.tax.income-tax-resident-2026-27`](../tax/income-tax-resident-2026-27.md). Foreign-resident CGT / withholding / no-PPOR-exemption → the Cluster-X `kb.non-resident-tax.*` docs (authored in Cluster X; referenced as code-span slugs until then). Lending → Cluster-L. AML source-of-funds → Cluster-X `kb.au-aml-ctf.*`. This doc owns only the **tax-residency framework + the FIRB-vs-tax distinction** and the banking-prerequisite basics.
 - **`residency_for_tax` is captured, not derived here.** The ATO residency tests (resides / domicile / 183-day / superannuation) are applied by the agent/resolver to the applicant's facts; this doc grounds what each resulting category *means*, it does not run the test.
 - **No financial/tax advice (ASIC line).** This is informational framework only; an individual's residency and liability are confirmed with a registered tax agent. No figure is asserted here — the rates live in their owning docs.
 

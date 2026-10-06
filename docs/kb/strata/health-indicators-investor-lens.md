@@ -1,7 +1,11 @@
 ---
 slug: kb.strata.health-indicators-investor-lens
 effective_from: 2025-07-01
-last_verified: 2026-06-23
+last_verified: 2026-07-06
+sources:
+  - url: https://www.nsw.gov.au/housing-and-construction/strata/living/levies-finances-insurance
+    retrieved: 2026-07-06
+    note: "NSW Government — administrative fund + capital works fund; levies as the owner's recurring cost; special levies for major works. The ATO rental-expense deductibility page and the Moneysmart strata-levy glossary both block automated fetch this session; body citations retained."
 ---
 
 # Strata / owners-corporation health — the investor lens

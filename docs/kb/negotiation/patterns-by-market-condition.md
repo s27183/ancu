@@ -1,7 +1,11 @@
 ---
 slug: kb.negotiation.patterns-by-market-condition
 effective_from: 2025-08-01
-last_verified: 2026-06-02
+last_verified: 2026-07-06
+sources:
+  - url: https://www.nsw.gov.au/housing-and-construction/buying-and-selling-property/buying-property-nsw/making-an-offer-on-a-property
+    retrieved: 2026-07-06
+    note: "NSW Government — making an offer, conditions and deposit (the regulated backdrop). The negotiation patterns themselves are buyer's-agent/consumer-guidance convention; the hard edges are owned by kb.auction.rules-by-state and kb.comparables.reading-the-room. Moneysmart /property (the general pointer) blocks automated fetch this session."
 ---
 
 # Negotiation patterns, by market condition

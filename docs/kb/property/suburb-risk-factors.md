@@ -1,7 +1,12 @@
 ---
 slug: kb.property.suburb-risk-factors
 effective_from: 2025-08-01
-last_verified: 2026-06-02
+last_verified: 2026-07-06
+sources:
+  - url: https://www.abs.gov.au/census/guide-census-data/census-dictionary/2021/variables-topic/cultural-diversity/ancestry-multi-response-ancp
+    retrieved: 2026-07-06
+  - url: https://moneysmart.gov.au/home-insurance/storm-flood-and-fire-insurance
+    retrieved: 2026-07-06
 ---
 
 # Suburb-level risk and amenity factors

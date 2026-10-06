@@ -238,6 +238,16 @@ investor_cases() ->
      check("clean: 2026-27 reform flag surfaced (1 Jul 2027)", Reform, true),
      check("clean: every investor assumption bilingual {vi,en}", AllBilin, true),
      check("clean: cgt dispose event emitted (out/government)", lists:member(<<"dispose_cgt">>, ev_ids(C)), true),
+     %% Mode-C/D six-actor swimlane (fh_engine_journey:investor_actors/0) has NO "other" actor
+     %% (renamed "services") — sale/selling MUST carry a counterparty that resolves in that set,
+     %% or SwimlaneDiagram.svelte's by-declared-actor-id lookup silently drops the cell
+     %% (2026-07-10 fix — see fh_engine_disposition:dispose_cash_events/5).
+     check("clean: sale event counterparty = services (resolves in the investor 6-actor set)",
+           maps:get(<<"counterparty">>, ev_by_id(g(C, <<"dispose_cash_events">>), <<"dispose_sale_proceeds">>)),
+           <<"services">>),
+     check("clean: selling_costs event counterparty = services",
+           maps:get(<<"counterparty">>, ev_by_id(g(C, <<"dispose_cash_events">>), <<"dispose_selling_costs">>)),
+           <<"services">>),
      %% exported cgt_investor/4 verdict surface
      check("cgt_investor/4 clean → {gain, cgt, computed}",
            fh_engine_disposition:cgt_investor(inv_profile(<<"resident">>),

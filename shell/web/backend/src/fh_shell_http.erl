@@ -37,13 +37,16 @@ routes() ->
     [{'_', [
         {"/health", fh_shell_health_handler, []},
         {"/api/suburbs", fh_shell_h_suburbs, []},
+        {"/api/news", fh_shell_h_news, []},
         {"/api/plan-cards", fh_shell_h_plan_cards, []},
         {"/api/plan-cards/:id/events", fh_shell_h_events, []},
         {"/api/plan-cards/:id/messages", fh_shell_h_plan_card, [messages]},
+        {"/api/plan-cards/:id/conversation", fh_shell_h_plan_card, [conversation]},
         {"/api/plan-cards/:id/simulate", fh_shell_h_plan_card, [simulate]},
         {"/api/plan-cards/:id/refine", fh_shell_h_plan_card, [refine]},
         {"/api/plan-cards/:id/profile", fh_shell_h_plan_card, [profile]},
         {"/api/plan-cards/:id/checklist-status", fh_shell_h_plan_card, [checklist_status]},
+        {"/api/plan-cards/:id/news", fh_shell_h_plan_card, [news]},
         %% Phase-B per-property surface (Mode-C shell, Slice 1) — attach a property
         %% (→ an addendum + an AGENT turn, engine-contract §12) and submit its
         %% transaction dates (→ a resolver-only re-fill, §11). Both more specific than
@@ -67,7 +70,8 @@ routes() ->
         %% caller's account.
         {"/api/billing/webhook", fh_shell_h_billing, [webhook]},
         {"/api/billing/subscribe", fh_shell_h_billing, [subscribe]},
-        {"/api/billing/charge", fh_shell_h_billing, [charge]}
+        {"/api/billing/charge", fh_shell_h_billing, [charge]},
+        {"/api/billing/usage", fh_shell_h_billing, [usage]}
     ]}].
 
 -spec port() -> inet:port_number().

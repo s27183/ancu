@@ -9,7 +9,7 @@ import { derived } from 'svelte/store';
 import { lang } from '$lib/stores/lang';
 
 const messages = {
-    'brand.name': { vi: 'FirstHomey', en: 'FirstHomey' },
+    'brand.name': { vi: 'Rau', en: 'Rau' },
     'brand.tagline': {
         vi: 'Kế hoạch mua nhà đầu tiên tại Úc',
         en: 'Your first-home plan in Australia'
@@ -36,10 +36,6 @@ const messages = {
         en: 'No saved plans yet. Create a plan to pin a suburb here.'
     },
     'map.sources': { vi: 'Nguồn dữ liệu', en: 'Data sources' },
-    'map.zoomhint': {
-        vi: 'Phóng to vào một thành phố để so sánh từng khu vực',
-        en: 'Zoom into a city to compare suburbs'
-    },
     'map.loading': { vi: 'Đang tải bản đồ…', en: 'Loading the map…' },
     'map.error': {
         vi: 'Không tải được dữ liệu khu vực. Vui lòng thử lại.',
@@ -86,8 +82,8 @@ const messages = {
         en: 'Is this your first home?'
     },
     'onboarding.outofscope.foreign': {
-        vi: 'Để mua nhà để ở, FirstHomey hiện hỗ trợ người mua nước ngoài mua căn nhà ĐẦU TIÊN. Kế hoạch cho người nước ngoài đã từng sở hữu nhà sẽ sớm có. (Nhà đầu tư nước ngoài đã được hỗ trợ — hãy chọn "Để đầu tư".)',
-        en: 'For buying a home to live in, FirstHomey currently supports foreign-person FIRST-HOME buyers only. Plans for foreign next-home buyers are coming soon. (Foreign investors are already supported — choose "As an investment".)'
+        vi: 'Để mua nhà để ở, Rau hiện hỗ trợ người mua nước ngoài mua căn nhà ĐẦU TIÊN. Kế hoạch cho người nước ngoài đã từng sở hữu nhà sẽ sớm có. (Nhà đầu tư nước ngoài đã được hỗ trợ — hãy chọn "Để đầu tư".)',
+        en: 'For buying a home to live in, Rau currently supports foreign-person FIRST-HOME buyers only. Plans for foreign next-home buyers are coming soon. (Foreign investors are already supported — choose "As an investment".)'
     },
     'onboarding.gate.firsthome.foreign': {
         vi: 'Người mua ở Việt Nam hoặc giữ visa tạm trú thường mua nhà đầu tiên tại Úc — hỏi để xác nhận.',
@@ -187,23 +183,23 @@ const messages = {
     'plan.tab.ownership_planning': { vi: 'Sở hữu', en: 'Owning' },
     'plan.tab.qa': { vi: 'Hỏi đáp', en: 'Q&A' },
     // Lifecycle tab labels — the blueprint-declared spine (plan-card-lifecycle-restoration.md
-    // §3.2). The full mode-general vocabulary (Mode A renders a 6-tab subset; B/C/D tabs are
-    // present for when those blueprints come in scope).
+    // §11.3). Every in-scope blueprint now shares this five-view shape: overview/flow/budget/qa
+    // (all five modes) plus one state-shaped view — portfolio (C/D) or family (B, always-on;
+    // D's own Family layer is opt-in, not blueprint-declared). Mode B's task-13 rewrite (2026-07-11)
+    // retired the last blueprint on the pre-restructure flat vocabulary, so the legacy tab_ids
+    // this comment used to list (family_view, investment_strategy, firb_funding, before_you_buy,
+    // yield_tax, cash_calculator, journey, property, buying, after_you_buy) are now dead — see
+    // git history if reviving a pre-restructure card shape is ever needed.
     'plan.ltab.overview': { vi: 'Tổng quan', en: 'Overview' },
-    // Mode-A three-view spine: Flow (legal/temporal journey) + Budget (financial spine).
     'plan.ltab.flow': { vi: 'Hành trình', en: 'Flow' },
     'plan.ltab.budget': { vi: 'Ngân sách', en: 'Budget' },
-    'plan.ltab.family_view': { vi: 'Gia đình', en: 'Family view' },
-    'plan.ltab.investment_strategy': { vi: 'Chiến lược đầu tư', en: 'Investment strategy' },
-    'plan.ltab.firb_funding': { vi: 'FIRB & Chuyển tiền', en: 'FIRB & Funding' },
-    'plan.ltab.before_you_buy': { vi: 'Trước khi mua', en: 'Before you buy' },
-    'plan.ltab.yield_tax': { vi: 'Lợi suất & Thuế', en: 'Yield & Tax' },
-    'plan.ltab.cash_calculator': { vi: 'Tính tiền mặt', en: 'Cash calculator' },
-    'plan.ltab.journey': { vi: 'Hành trình', en: 'Journey' },
-    'plan.ltab.property': { vi: 'Bất động sản', en: 'Property' },
-    'plan.ltab.buying': { vi: 'Ra giá & Mua', en: 'Buying' },
-    'plan.ltab.after_you_buy': { vi: 'Sau khi mua', en: 'After you buy' },
     'plan.ltab.portfolio': { vi: 'Danh mục', en: 'Portfolio' },
+    'plan.ltab.family': { vi: 'Gia đình', en: 'Family' },
+    // Rail group toggle (2026-07-09) — the coarse buy/hold halves shown above a
+    // grouped rail (PlanProjection.svelte TAB_GROUP), distinct from the swimlane's
+    // finer plan.phase.* labels below.
+    'plan.railgroup.buy': { vi: 'Mua', en: 'Buy' },
+    'plan.railgroup.hold': { vi: 'Sở hữu', en: 'Hold' },
     // Per-property component titles — shown as affordance cards at base (the full
     // component appears once a property is attached). Base components already have plan.c.*.
     'plan.c.purchase_journey': { vi: 'Hành trình mua nhà', en: 'Your buying journey' },
@@ -421,6 +417,68 @@ const messages = {
     'plan.path.user_specific_alternative': { vi: 'Phương án riêng', en: 'Tailored option' },
     'plan.path.recommended': { vi: 'đề xuất', en: 'recommended' },
 
+    // mortgage_finance (mortgage_plan) → data-table detail, beyond summary-card's hero
+    // (fh_engine_mortgage.erl's four fill_* shapes — a field group per mode axis).
+    'plan.f.loan_type': { vi: 'Hình thức trả nợ', en: 'Repayment type' },
+    'plan.f.loan_rate_type': { vi: 'Kỳ hạn lãi suất', en: 'Rate type' },
+    'plan.f.loan_offset': { vi: 'Tài khoản offset', en: 'Offset account' },
+    'plan.f.loan_currency': { vi: 'Loại tiền vay', en: 'Loan currency' },
+    'plan.f.ppor_equity': { vi: 'Dùng vốn từ nhà đang ở', en: 'Uses existing home equity' },
+    'plan.f.io_period': { vi: 'Thời hạn chỉ trả lãi', en: 'Interest-only period' },
+    'plan.f.deposit_required': { vi: 'Đặt cọc cần có', en: 'Deposit required' },
+    'plan.f.deposit_pct': { vi: 'Tỷ lệ đặt cọc', en: 'Deposit %' },
+    'plan.f.rate_estimate': { vi: 'Lãi suất ước tính', en: 'Estimated rate' },
+    'plan.f.io_vs_pi': { vi: 'Chỉ lãi hay gốc + lãi', en: 'Interest-only vs P&I' },
+    'plan.f.offset_strategy': { vi: 'Chiến lược offset', en: 'Offset strategy' },
+    'plan.f.fixed_vs_variable': { vi: 'Lãi cố định hay thả nổi', en: 'Fixed vs variable' },
+    'plan.f.firb_dependency': { vi: 'Phụ thuộc phê duyệt FIRB', en: 'FIRB-dependent' },
+    'plan.f.vn_income_confirmed': { vi: 'Đã xác nhận thu nhập VN', en: 'VN income accepted' },
+    'plan.f.fx_risk_ack': { vi: 'Đã xác nhận rủi ro tỷ giá', en: 'FX risk acknowledged' },
+    'plan.f.loan_cost_y1': { vi: 'Chi phí vay năm đầu', en: 'Loan cost (year 1)' },
+    'plan.f.preapproval_expiry': { vi: 'Hạn duyệt sơ bộ', en: 'Pre-approval expiry' },
+    'plan.f.reapplication': { vi: 'Cần nộp lại hồ sơ', en: 'Reapplication required' },
+    'plan.f.debt_optimisations': { vi: 'Tối ưu khoản nợ', en: 'Debt optimisations' },
+    'plan.f.refinance': { vi: 'Kế hoạch tái cấp vốn', en: 'Refinance plan (portfolio growth)' },
+    'plan.f.usable_equity': { vi: 'Vốn chủ sở hữu khả dụng', en: 'Usable equity' },
+    'plan.f.usable_equity_lvr': { vi: 'LVR mục tiêu khi rút vốn', en: 'Target LVR to release equity' },
+    'plan.f.frcgw_reserve': { vi: 'Dự phòng khấu trừ FRCGW khi bán', en: 'FRCGW withholding reserve (at exit)' },
+    'plan.mode_switch.title': { vi: 'Chuyển chế độ khi có PR/quốc tịch', en: 'Switches mode on PR/citizenship' },
+
+    // yield_modelling (cash_flow_projection, Mode C/D) → calculator, its own hero — ALL
+    // null at base (needs a property); attaching one populates these (fh_engine_fill.erl).
+    'plan.yield.gross': { vi: 'Lợi suất gộp', en: 'Gross yield' },
+    'plan.yield.net_pre_loan': { vi: 'Lợi suất ròng (trước vay)', en: 'Net yield (pre-loan)' },
+    'plan.yield.net_post_loan': { vi: 'Lợi suất ròng (sau vay, trước thuế)', en: 'Net yield (post-loan, pre-tax)' },
+    'plan.yield.rental_income': { vi: 'Thu nhập cho thuê (năm 1)', en: 'Rental income (year 1)' },
+    'plan.yield.opex': { vi: 'Chi phí vận hành (năm 1)', en: 'Operating expenses (year 1)' },
+    'plan.yield.interest': { vi: 'Lãi vay (năm 1, ước tính)', en: 'Loan interest (year 1, indicative)' },
+    'plan.yield.cf_annual': { vi: 'Dòng tiền trước thuế (năm 1)', en: 'Cash flow before tax (year 1)' },
+    'plan.yield.cf_weekly': { vi: 'Dòng tiền trước thuế / tuần', en: 'Cash flow before tax / week' },
+    'plan.yield.year5': { vi: 'Dòng tiền dự phóng năm 5', en: 'Year 5 projected cash flow' },
+    'plan.yield.year10': { vi: 'Dòng tiền dự phóng năm 10', en: 'Year 10 projected cash flow' },
+    'plan.yield.geared': { vi: 'Trạng thái đòn bẩy (trước thuế)', en: 'Gearing position (pre-tax)' },
+    'plan.yield.pending': {
+        vi: 'Cần gắn một bất động sản để tính lợi suất.',
+        en: 'Attach a property to compute yield.'
+    },
+    'plan.geared.positive': { vi: 'Dương', en: 'Positive' },
+    'plan.geared.neutral': { vi: 'Trung tính', en: 'Neutral' },
+    'plan.geared.negative': { vi: 'Âm', en: 'Negative' },
+    'plan.iovspi.interest_only': { vi: 'Chỉ trả lãi', en: 'Interest-only' },
+    'plan.iovspi.principal_and_interest': { vi: 'Gốc + lãi', en: 'Principal & interest' },
+    'plan.rate.variable': { vi: 'Thả nổi', en: 'Variable' },
+    'plan.rate.fixed_1yr': { vi: 'Cố định 1 năm', en: 'Fixed 1yr' },
+    'plan.rate.fixed_2yr': { vi: 'Cố định 2 năm', en: 'Fixed 2yr' },
+    'plan.rate.fixed_3yr': { vi: 'Cố định 3 năm', en: 'Fixed 3yr' },
+    'plan.rate.split_fixed_variable': { vi: 'Kết hợp cố định + thả nổi', en: 'Split fixed/variable' },
+    'plan.offset.full_offset_on_this_property': { vi: 'Offset toàn phần cho BĐS này', en: 'Full offset on this property' },
+    'plan.offset.offset_pointed_at_ppor_for_tax_efficiency': {
+        vi: 'Offset hướng vào nhà đang ở (tối ưu thuế)',
+        en: 'Offset pointed at your home (tax-efficient)'
+    },
+    'plan.offset.redraw_only': { vi: 'Chỉ rút lại (redraw)', en: 'Redraw only' },
+    'plan.offset.no_offset': { vi: 'Không dùng offset', en: 'No offset' },
+
     // investment_strategy (Mode C/D) → summary-card's third hero (strategy_thesis).
     'plan.f.archetype': { vi: 'Chiến lược đầu tư', en: 'Strategy archetype' },
     'plan.f.yield_target': { vi: 'Lợi suất mục tiêu', en: 'Target yield' },
@@ -441,6 +499,12 @@ const messages = {
     'plan.f.duty_before': { vi: 'Trước ưu đãi', en: 'Before concession' },
     'plan.f.duty_after': { vi: 'Sau ưu đãi', en: 'After concession' },
     'plan.f.max_price': { vi: 'Giá nhà tối đa hỗ trợ', en: 'Max price supported' },
+    // The flat summary-totals shape (Mode B budget_envelope, Mode C/D budget_envelope_investor).
+    'plan.f.regulatory_imposts': { vi: 'Tổng phí quy định (FIRB, phụ phí...)', en: 'Regulatory imposts (FIRB, surcharge...)' },
+    'plan.f.channel_costs': { vi: 'Tổng chi phí giao dịch khác', en: 'Other transaction costs' },
+    'plan.f.loan_amount': { vi: 'Số tiền vay', en: 'Loan amount' },
+    'plan.f.lvr': { vi: 'Tỷ lệ vay trên giá trị (LVR)', en: 'Loan-to-value ratio (LVR)' },
+    'plan.f.lmi_payable': { vi: 'Bảo hiểm khoản vay (LMI) phải trả', en: 'LMI payable' },
     'plan.f.cash_required': { vi: 'Tổng tiền mặt cần', en: 'Total cash needed' },
     'plan.f.cash_available': { vi: 'Tiền mặt hiện có', en: 'Cash available' },
     'plan.f.gap': { vi: 'Chênh lệch', en: 'Gap / surplus' },
@@ -688,8 +752,10 @@ const messages = {
     'plan.f.yield_ceiling': { vi: 'Trần giá theo lợi suất', en: 'Yield-anchored ceiling' },
     'plan.f.thesis': { vi: 'Mức phù hợp chiến lược', en: 'Thesis alignment' },
     'plan.f.nego_style': { vi: 'Phong cách thương lượng', en: 'Negotiation style' },
-    'plan.f.comparables': { vi: 'Giao dịch so sánh', en: 'Comparable sales' },
     'plan.f.conditions': { vi: 'Điều kiện trong đề nghị', en: 'Offer conditions' },
+    'plan.f.max_bid_reasoning': { vi: 'Cơ sở neo giá theo lợi suất', en: 'Yield-anchor reasoning' },
+    'plan.f.max_bid_confidence': { vi: 'Độ tin cậy của mức giá tối đa', en: 'Max bid confidence' },
+    'plan.f.red_flags': { vi: 'Điểm cần lưu ý', en: 'Red flags to monitor' },
     'plan.thesis.aligned': { vi: 'Phù hợp', en: 'Aligned' },
     'plan.thesis.stretched': { vi: 'Hơi quá tầm', en: 'Stretched' },
     'plan.thesis.misaligned': { vi: 'Lệch chiến lược', en: 'Misaligned' },
@@ -706,6 +772,15 @@ const messages = {
     'plan.tx.marginal_rate': { vi: 'Thuế suất biên', en: 'Marginal tax rate' },
     'plan.tx.after_tax_cf': { vi: 'Dòng tiền sau thuế (năm 1)', en: 'After-tax cash flow (yr 1)' },
     'plan.tx.entity_pending': { vi: 'Xác nhận với chuyên viên thuế có đăng ký', en: 'To confirm with a registered tax agent' },
+    // tax_structure_non_resident (Mode D — same tax_optimised_structure type, different fields).
+    'plan.tx.geared_not_available': { vi: 'Không đủ điều kiện gearing', en: 'Not gearing-eligible' },
+    'plan.tx.withholding_rate': { vi: 'Thuế khấu trừ tiền thuê', en: 'Rental withholding rate' },
+    'plan.tx.annual_tax_payable': { vi: 'Thuế Úc phải nộp / năm (tiền thuê)', en: 'AU tax payable / yr (rental)' },
+    'plan.tx.annual_depreciation': { vi: 'Khấu hao ước tính năm 1', en: 'Estimated depreciation (yr 1)' },
+    'plan.tx.annual_compliance_cost': { vi: 'Chi phí tuân thủ thuế / năm', en: 'Tax compliance cost / yr' },
+    'plan.tx.ppor_exemption': { vi: 'Miễn thuế nhà ở chính', en: 'PPOR exemption' },
+    'plan.tx.frcgw_applicable': { vi: 'Áp dụng khấu trừ FRCGW', en: 'FRCGW applies' },
+    'plan.tx.vn_treaty_relief': { vi: 'Được giảm trừ theo hiệp định thuế VN', en: 'VN treaty relief' },
     'plan.entity.personal_sole': { vi: 'Cá nhân (một người)', en: 'Personal (sole)' },
     'plan.entity.personal_joint': { vi: 'Cá nhân (đồng sở hữu)', en: 'Personal (joint)' },
     'plan.entity.discretionary_trust': { vi: 'Quỹ tín thác tùy nghi', en: 'Discretionary trust' },
@@ -851,7 +926,7 @@ const messages = {
     'auth.signout': { vi: 'Đăng xuất', en: 'Sign out' },
     'account.title': { vi: 'Tài khoản', en: 'Account' },
     'account.menu': { vi: 'Menu tài khoản', en: 'Account menu' },
-    'auth.title': { vi: 'Đăng nhập vào FirstHomey', en: 'Sign in to FirstHomey' },
+    'auth.title': { vi: 'Đăng nhập vào Rau', en: 'Sign in to Rau' },
     'auth.email.label': { vi: 'Email', en: 'Email' },
     'auth.email.placeholder': { vi: 'ban@example.com', en: 'you@example.com' },
     'auth.email.invalid': {
@@ -896,7 +971,60 @@ const messages = {
     'status.title': { vi: 'Trạng thái hệ thống', en: 'System status' },
     'status.checking': { vi: 'Đang kiểm tra…', en: 'Checking…' },
     'status.ok': { vi: 'Backend đang hoạt động', en: 'Backend is up' },
-    'status.fail': { vi: 'Không kết nối được backend', en: 'Backend unreachable' }
+    'status.fail': { vi: 'Không kết nối được backend', en: 'Backend unreachable' },
+
+    // Usage summary (8-S5g), inside the EXISTING account-sheet (+layout.svelte) —
+    // between the user-email row and the sign-out button. Not a new page: the sheet
+    // is already the account surface.
+    'account.usage.loading': { vi: 'Đang tải…', en: 'Loading…' },
+    'account.usage.error': {
+        vi: 'Không tải được dữ liệu sử dụng.',
+        en: 'Couldn’t load usage data.'
+    },
+    'account.usage.tier.free': { vi: 'Miễn phí', en: 'Free' },
+    'account.usage.tier.plus': { vi: 'Plus', en: 'Plus' },
+    'account.usage.tier.pro': { vi: 'Pro', en: 'Pro' },
+    'account.usage.tokens_used': { vi: 'Token đã dùng kỳ này', en: 'Tokens used this period' },
+    'account.usage.tokens_unlimited': {
+        vi: 'không giới hạn (quản trị viên)',
+        en: 'unlimited (admin)'
+    },
+    'account.usage.period': { vi: 'Kỳ hiện tại', en: 'Current period' },
+    'account.usage.cost': { vi: 'Chi phí hạ tầng ước tính', en: 'Estimated infrastructure cost' },
+
+    // KB-news ticker (kb-news-feature.md, task 29): the sticky strip cycling relevant,
+    // non-dismissed news notes above the lifecycle sub-tab rail.
+    'plan.news.aria': { vi: 'Cập nhật liên quan đến kế hoạch', en: 'Plan-relevant updates' },
+    'plan.news.prev': { vi: 'Tin trước', en: 'Previous update' },
+    'plan.news.next': { vi: 'Tin sau', en: 'Next update' },
+
+    // News detail sheet (kb-news-feature.md, task 28): opened by tapping a ticker headline.
+    'plan.news.detail_title': { vi: 'Cập nhật kế hoạch', en: 'Plan update' },
+    'plan.news.source': { vi: 'Nguồn', en: 'Source' },
+
+    // Dismiss action (kb-news-feature.md, task 31): "I've seen this" — removes the note
+    // from this card's rotation for good, not just closes the sheet.
+    'plan.news.dismiss': { vi: 'Đã xem, bỏ qua', en: 'Got it, dismiss' },
+
+    // Homepage KB-news marquee (kb-news-feature.md "Homepage ticker", extended 2026-07-09
+    // with a CNBC/Bloomberg-style continuous scroll — distinct aria label from the
+    // per-card ticker since this one is unfiltered, not "plan-relevant").
+    'home.news.aria': { vi: 'Tin tức mới nhất', en: 'Latest updates' },
+    'home.news.label': { vi: 'TIN TỨC', en: 'NEWS' },
+    'plan.news.pause': { vi: 'Tạm dừng', en: 'Pause' },
+    'plan.news.play': { vi: 'Tiếp tục', en: 'Resume' },
+
+    // News overview sheet (kb-news-feature.md "News overview sheet") — layer 1 of the
+    // two-layer homepage news flow: tapping the ticker opens this categorized, scrollable
+    // list; tapping a headline in it opens the existing detail sheet (layer 2).
+    'home.news.sheet_title': { vi: 'Tin tức', en: 'News' },
+    'home.news.category.all': { vi: 'Tất cả', en: 'All' },
+    'home.news.category.visa': { vi: 'Visa & cư trú', en: 'Visa & residency' },
+    'home.news.category.finance': { vi: 'Tài chính', en: 'Finance' },
+    'home.news.category.scheme': { vi: 'Chương trình hỗ trợ', en: 'Government schemes' },
+    'home.news.category.tax': { vi: 'Thuế', en: 'Tax' },
+    'home.news.category.property': { vi: 'Bất động sản', en: 'Property' },
+    'home.news.category.market': { vi: 'Thị trường', en: 'Market' }
 } as const;
 
 export type MessageKey = keyof typeof messages;

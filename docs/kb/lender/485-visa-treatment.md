@@ -1,7 +1,11 @@
 ---
 slug: kb.lender.485-visa-treatment
 effective_from: 2025-07-01
-last_verified: 2026-07-02
+last_verified: 2026-07-06
+sources:
+  - url: https://www.homeloanexperts.com.au/non-resident-mortgages/temporary-resident-mortgage/
+    retrieved: 2026-07-06
+    note: "Temp resident with AU income assessed near-domestic — capped LVR usually 80% (sometimes 90% for strong applicants); up to 95% LVR when married/de facto with a citizen/PR; buying in an AU partner's name avoids FIRB and surcharges. Lender-policy convention (aggregator source), not a regulator figure"
 ---
 
 # Lending treatment of the 485 graduate visa (and student-with-AU-income)

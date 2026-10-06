@@ -1,7 +1,19 @@
 ---
 slug: kb.insurance.timing-of-risk-pass
 effective_from: 2025-08-01
-last_verified: 2026-06-02
+last_verified: 2026-07-06
+sources:
+  - url: https://legislation.nsw.gov.au/view/html/inforce/current/act-1919-006
+    retrieved: 2026-07-06
+    path: docs/sources/nsw/conveyancing_act_1919_no_6.pdf
+    note: "NSW Conveyancing Act 1919 ss66J-66M — s66K postponement of passing of risk, s66L 28-day rescission for substantial damage; read via archived PDF, current for 15 Aug 2025"
+  - url: https://www.legislation.vic.gov.au/in-force/acts/sale-land-act-1962
+    retrieved: 2026-07-06
+    path: docs/sources/vic/sales_of_land_act_1962.pdf
+    note: "VIC Sale of Land Act 1962 ss34-36 — s34 14-day rescission if dwelling unfit, s35 vendor insurance enures for the buyer; read via archived PDF, Authorised Version No. 172 as at 25 Nov 2025"
+  - url: https://www.legislation.qld.gov.au/view/pdf/inforce/current/act-2023-027
+    retrieved: 2026-07-06
+    note: "QLD Property Law Act 2023 s77 — buyer may rescind if residential dwelling unfit for occupation before the earliest of settlement/possession/restoration; Act No. 27, current as at 28 Apr 2026 (read via WebFetch-to-disk + pdftotext)"
 ---
 
 # When risk passes to the buyer, and when insurance must be in force
