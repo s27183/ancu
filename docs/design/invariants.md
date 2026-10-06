@@ -397,8 +397,9 @@ by the compiler's reference-integrity and type-compat gates;
 `tests/renderer_conformance.py` on the shell side.
 A component with no declared `outcome_schema` is refused **at the compiler** —
 the build fails, so it never reaches a user — and `fh_engine_outcome:validate/3`
-refuses a missing schema only as a backstop (Son, 2026-10-06). Unbuilt: today
-both pass it (issues #16, #25).
+refuses a missing schema only as a backstop (Son, 2026-10-06). Built
+2026-10-06 (PR #3): the compiler's GATE 12 and validate/3's
+`{outcome_undeclared, Slug, Type}`; a wrong type *name* still passes both.
 
 **Falsifier:** an `outcome_schema` field absent from, or typed differently
 in, the shell's types.
