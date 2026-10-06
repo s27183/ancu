@@ -232,6 +232,31 @@ open, makes another card's turn or call fail or hang.
 kill card A's sidecar mid-turn while card B's turn completes, and hold an SSE
 stream open while plain calls return.
 
+## P-2 · The database is the single source of truth
+
+**Every fact that survives a restart lives in Postgres — `plan_card_events`,
+`usage_records`, the suburb tables — and process state is a cache rebuilt
+from it.** (Son, 2026-10-06, from the erlang-engine prior;
+`docs/architecture/principles.md` §2 states it too.)
+
+**Fails when** a restart loses or changes what a user saw committed, or a
+process cache diverges from the database and does not recover by itself.
+
+**Proof, shown in this system (2026-08-06).** Son's usage read `0 / 1,000,000`
+after real Q&A turns: `fh_shell_usage_consumer` bootstraps its cursor once,
+at `init/1`, from `MAX(engine_event_id)`, and smoke-test fixture rows had
+pushed that past every real event. Deleting the rows did not recover it; the
+running process held the stale cursor until the backend restarted.
+
+**Held by** `plan_card_events` as the record SSE fans out from and replays;
+the usage cursor re-derived from the mirror table at start.
+
+**Falsifier:** after a forced engine or shell restart, a card's replayed
+events, or a user's usage total, differ from what was streamed before it.
+
+**Checked by** `engine/erlang/test/restart_replay_smoke.escript` — unbuilt:
+stream a card's events, kill and restart the engine, replay, compare.
+
 ---
 
 ## The shape of failure
