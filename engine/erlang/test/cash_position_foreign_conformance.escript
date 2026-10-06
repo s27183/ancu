@@ -47,10 +47,9 @@ main(_) ->
 %% --- fixtures ----------------------------------------------------------------
 
 fields() ->
-    [<<"max_property_price_supported">>, <<"actual_property_price">>,
-     <<"total_cash_required">>, <<"regulatory_imposts_total">>, <<"channel_costs_total">>,
-     <<"family_capacity_available">>, <<"gap_or_surplus">>, <<"verdict">>,
-     <<"mitigation_options_if_short">>, <<"key_assumptions">>].
+    {ok, C} = fh_engine_kb:component(<<"fhb-foreign-au">>, <<"cash_position">>),
+    Types = fh_engine_kb:registry(<<"fhb-foreign-au">>, <<"outcome_types">>),
+    maps:keys(maps:get(maps:get(<<"outcome_type">>, C), Types)).
 
 fixture_upstream(Capacity) ->
     #{<<"profile">> => #{<<"target_price_range">> => [700000, 900000],
@@ -78,7 +77,10 @@ scaffold_cases() ->
     ExpectedChannel = fh_engine_cash:channel_costs(<<"NSW">>, 900000),
     ExpectedTotal = fh_engine_cash:sum_or_null([270000, ExpectedImposts, ExpectedChannel]),
     [check("renderer = calculator", Rend, <<"calculator">>),
-     check("outcome has exactly the ten Mode-B budget_envelope fields",
+     %% the field set is the blueprint's declaration (P-7: one declaration per outcome shape),
+     %% read from the compiled artifact — not a list kept here, which drifted when task 12
+     %% (2026-07-11) declared `cash_events` (#11).
+     check("outcome has exactly the declared Mode-B budget_envelope fields",
            lists:sort(maps:keys(O)), lists:sort(fields())),
      check("actual_property_price = null (no property attached — honest naming)",
            g(O, <<"actual_property_price">>), null),
