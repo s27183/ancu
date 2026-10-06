@@ -285,6 +285,35 @@ reply"), not a hang: the hold below working.
 **Checked by** `engine/erlang/test/sidecar_kill_smoke.escript` — unbuilt:
 kill the sidecar mid-fill, assert one `turn_failed` and no partial component.
 
+## P-4 · The engine is coupled to no shell
+
+**The engine exposes primitives — typed component outcomes and a renderer
+name; UX, presentation, identity and commerce are the shells'. If two shells
+(the web app, a browser extension, the Tìm Nhà console) would render a thing
+differently, it is the shell's.** (Son, 2026-10-06, from the erlang-engine
+prior; `engine-contract.md` §1 and `principles.md` §4 state it too.)
+
+The one declared exception: `ui_tabs`, a tab grouping declared in the
+blueprint (`architecture.md` §11.9) that the engine passes through unshaped
+(`fh_engine_kb:ui_tabs/1`, `[]` when absent) and a shell may ignore.
+
+**Fails when** the engine carries a field, route, branch or name that exists
+for one shell, or a new shell needs an engine change beyond a new primitive.
+
+**Proof, shown in this system:** none yet — confirmed on the design
+(Son, 2026-10-06), not on a failure seen here; the first instance found
+becomes its proof, or shows the boundary drawn in the wrong place.
+
+**Held by** `engine-contract.md` §1's forcing function, applied at each engine
+route or response-field change; the engine returning raw typed outcomes, the
+shell projecting them.
+
+**Falsifier:** an engine response field or route that only one shell reads,
+or that the engine shapes for one shell's layout.
+
+**Checked by** `docs/architecture/engine-contract.md` — unbuilt as a test:
+the check is the §1 review question at every engine route or field change.
+
 ---
 
 ## The shape of failure
