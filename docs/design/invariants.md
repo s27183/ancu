@@ -230,9 +230,12 @@ plain call.
 **Falsifier:** killing one card's sidecar mid-turn, or holding one stream
 open, makes another card's turn or call fail or hang.
 
-**Checked by** `engine/erlang/test/concern_isolation_smoke.escript` — unbuilt:
-kill card A's sidecar mid-turn while card B's turn completes, and hold an SSE
-stream open while plain calls return.
+**Checked by** `engine/erlang/test/concern_isolation_smoke.escript` (built
+2026-10-06): card A's sidecar hangs mid-fill and is then `kill -9`ed while card
+B's turn completes with all its components; and, for the shell,
+`shell/web/backend/test/sse_isolation_smoke.escript`: four SSE streams held
+open through the shell while plain proxied calls answer in milliseconds. Both
+run with `bash scripts/live_smoke.sh <name>`.
 
 ## P-2 · The database is the single source of truth
 
@@ -256,8 +259,11 @@ the usage cursor re-derived from the mirror table at start.
 **Falsifier:** after a forced engine or shell restart, a card's replayed
 events, or a user's usage total, differ from what was streamed before it.
 
-**Checked by** `engine/erlang/test/restart_replay_smoke.escript` — unbuilt:
-stream a card's events, kill and restart the engine, replay, compare.
+**Checked by** `engine/erlang/test/restart_replay_smoke.escript` (built
+2026-10-06): a card's events streamed, the engine and its pool stopped and
+started, the replay from `Last-Event-ID: 0` and the projection compared byte
+for byte. The usage-total half is unchecked: usage events come only from
+metered planner fills.
 
 ## P-3 · The sidecar is stateless and disposable
 
@@ -285,8 +291,9 @@ on Supervised Ports"); a hung LLM call bounded in the sidecar by
 **Falsifier:** `kill -9` on a sidecar mid-fill leaves the turn without a
 `turn_failed`, or leaves a partial component in `plan_card_events`.
 
-**Checked by** `engine/erlang/test/sidecar_kill_smoke.escript` — unbuilt:
-kill the sidecar mid-fill, assert one `turn_failed` and no partial component.
+**Checked by** `engine/erlang/test/sidecar_kill_smoke.escript` (built
+2026-10-06): a stub sidecar (`test/hang_sidecar.py`) is `kill -9`ed mid-fill;
+the turn has exactly one `turn_failed` and no partial component or usage.
 
 ## P-4 · The engine is coupled to no shell
 
@@ -367,9 +374,11 @@ engine client (`fh_shell_engine_client`) as its one path to the engine.
 **Falsifier:** a shell module reading `ENGINE_DATABASE_URL` or an engine
 table, or calling an `/api/engine/*` path the engine does not register.
 
-**Checked by** `tests/shell_contract_check.py` — unbuilt: grep the shells for
-engine-DB access, and match every `/api/engine/*` path they call against the
-engine's registered routes.
+**Checked by** `tests/shell_contract_check.py` (built 2026-10-06, a done
+check): the shell sources, comments stripped, for `ENGINE_DATABASE_URL` or an
+engine table, and every engine path they build matched against
+`fh_engine_http:routes/0`; it plants one of each violation in a scratch copy
+and fails if any goes uncaught.
 
 ## P-7 · One declaration per outcome shape
 
