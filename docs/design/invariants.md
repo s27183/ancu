@@ -17,11 +17,11 @@ on purpose: it is not settled, and renaming must not touch the ground.)
 
 | Property | Falsified by |
 |---|---|
-| Regulated figures are grounded | a duty, grant, cap or fee on a plan card that differs from the official calculator, was written by the LLM rather than the resolver, or traces to a KB doc with no `sources:` |
-| Bilingual | a rendered card, Q&A answer or news item missing its VI or EN text |
-| Reproducible | a filled card with no `deploy_commit_sha` or `kb_versions`, or one that changes silently after a deploy |
-| Honest-partial | a figure shown for an input the user never gave, or a null `suburb.*` value filled in |
-| Whole lifecycle | a mode whose plan has no phase for where the user actually is (buy, hold or sell) |
+| **Regulated figures are grounded** | a duty, grant, cap or fee on a plan card that differs from the official calculator, was written by the LLM rather than the resolver, or traces to a KB doc with no `sources:` |
+| **Bilingual** | a rendered card, Q&A answer or news item missing its VI or EN text |
+| **Reproducible** | a filled card with no `deploy_commit_sha` or `kb_versions`, or one that changes silently after a deploy |
+| **Honest-partial** | a figure shown for an input the user never gave, or a null `suburb.*` value filled in |
+| **Whole lifecycle** | a mode whose plan has no phase for where the user actually is (buy, hold or sell) |
 
 The invariants are derived from this; an invariant found wrong means the goal
 is wrong, and the goal is what gets rewritten.
