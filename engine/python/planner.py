@@ -213,6 +213,11 @@ class LenderFitInvestorLeaves(BaseModel):
     recommended_lender_shortlist: Annotated[list[LenderRec], Field(max_length=5)]
 
 
+# Regulated figures are grounded -> R-2 · Context–reasoning inseparability -> The sidecar -> non-resident lender_fit schema
+# Mode D first reused Mode C's domestic-investor prompt verbatim; it now has its own
+# non-resident schema with three leaves (no PPOR equity, no offset). Concluded 2026-07-05,
+# commit d4c7cf2; the reasoning is the paragraph below.
+#
 # Mode-D's own THREE-leaf schema (reconciled 2026-07-05 — see mode-d-wedge.md). Deliberately
 # NOT LenderFitInvestorLeaves reused as-is: `uses_existing_ppor_equity` and
 # `offset_strategy_recommendation` presume an existing AU PPOR to release equity from or point
@@ -1950,6 +1955,10 @@ def _strip_vi_for_qa(obj):
 _QA_ENVELOPE_KEYS = {"renderer", "fill_path", "renderers", "kb_versions", "component_id"}
 
 
+# Regulated figures are grounded -> R-2 · Context–reasoning inseparability -> The sidecar -> QA payload keeps journey components
+# Only the envelope keys are stripped; phase_playbook and purchase_journey are deliberately
+# KEPT in the QA payload. Measured 2026-08-06 on card ec794865: dropping them too would cut
+# 79.6% instead of 65.5%; declined as a real loss of grounding for Q&A answers.
 def _strip_envelope_for_qa(obj):
     """Drop each component's shell-rendering/provenance envelope
     (renderer/renderers/fill_path/component_id/kb_versions) before a card goes

@@ -19,6 +19,10 @@
 %% accumulates only the rotating keys, which all stay active and all verify).
 -define(DEFAULT_DEV_TENANT, <<"11111111-1111-1111-1111-111111111111">>).
 
+%% Reproducible -> P-6 · Shells reach the engine only through the contract -> The shell backend -> boot-time key registration
+%% The shell registers its public key once, at its own boot. A shell left running against
+%% a different (or wiped) engine gets `no_signing_key` (fh_engine_auth) on every call until
+%% the shell is restarted. Measured 2026-08: curl after an engine swap.
 -spec maybe_autoprovision() -> ok.
 maybe_autoprovision() ->
     case enabled() andalso not has_static_key() of

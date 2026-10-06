@@ -22,6 +22,11 @@
 
 -mode(compile).
 
+%% Regulated figures are grounded -> P-7 · One declaration per outcome shape -> The engine -> live smoke catches fixture drift
+%% This live full-stack run caught `recommended_lender` vs `recommended_lender_shortlist`
+%% AFTER resolver conformance passed, because the conformance fixtures were hand-written to
+%% match the buggy Erlang. Measured 2026-07-04 by this smoke (commit 5527b41).
+
 main(_) ->
     os:putenv("FH_ENGINE_HTTP_PORT", "8093"),
     {ok, _} = application:ensure_all_started(fh_engine),

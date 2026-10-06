@@ -83,6 +83,12 @@ RENDERER_ENUM = {
 # input facts (§11.9 "the plan.* namespace" — sourced from plan_cards journey state,
 # engine-contract §9.1, not a component outcome). Referenced fields under these
 # resolve-as-external (existence unverifiable here), never a failure.
+#
+# Regulated figures are grounded -> P-7 · One declaration per outcome shape -> The KB compiler -> external read namespaces
+# `property_card` is a real external provenance namespace (the attached property's card),
+# not prose drift to "fix" to `property`: removing it turns every `property_card.*` read
+# into a GATE-6 missing_ns failure. Measured 2026-10-06 by reading this line:
+# EXTERNAL_NS = {suburb, property, property_card, plan}.
 EXTERNAL_NS = {"suburb", "property", "property_card", "plan"}
 
 NUMERIC_TYPES = {
@@ -382,10 +388,24 @@ def parse_blueprint(path):
         end = heads[idx + 1].start() if idx + 1 < len(heads) else len(text)
         body = text[h.end():end]
         c = Component(name)
+        # Regulated figures are grounded -> P-7 · One declaration per outcome shape -> The KB compiler -> anchor-line token capture
+        # Anchors come ONLY from the `**KB anchors:**` line, and every `kb.*` token on it is
+        # captured — prose included: "All Mode A … except `kb.X`" makes kb.X a POSITIVE anchor.
+        # Index tables and prose elsewhere are never read. So a reconciliation note goes in a
+        # separate sentence, and a reconcile is done when the compiler says so, not a grep.
+        # Measured 2026-07-03 (Mode-D P1 run); regex re-read 2026-10-06 (this loop).
         for line in re.findall(r"^\*\*KB anchors:\*\*(.*)$", body, re.M):
             c.anchors += re.findall(r"kb\.[a-z0-9.\-]+", line)
         for line in re.findall(r"^\*\*Renderer:\*\*(.*)$", body, re.M):
             c.renderers += re.findall(r"`([a-z\-]+)`", line)
+        # Regulated figures are grounded -> P-7 · One declaration per outcome shape -> The KB compiler -> prose-declared outcome type
+        # Only a fenced `**Outcome schema:**` JSON block in THIS file counts: a prose "same as
+        # Mode X" compiles to outcome_type null / zero fields, and since the registry unions
+        # fields per type a wrong type name passes every gate. The type string is also the
+        # runtime Upstream dispatch key. Measured 2026-07 (Mode C task 7; Mode D P2/P3) and
+        # 2026-07-10 (purchase_journey/phase_playbook compiled null); measured 2026-10-06:
+        # artifact.json still has null outcome_type for buying_strategy, due_diligence and
+        # settlement_prep in fhb-foreign-au and investor-foreign-au.
         ob = fenced_jsonc_after(body, "**Outcome schema:**")
         if ob:
             o = parse_jsonc(ob)
@@ -654,6 +674,12 @@ def parse_news_doc(path):
     }
 
 
+# Regulated figures are grounded -> P-7 · One declaration per outcome shape -> The KB compiler -> KB doc shape follows its consumer
+# A doc's shape follows what the consuming component does with the value: fills-a-slot
+# (eligibility rules with `fills`), pure reference `fills: []` (computed or agent-reasoned
+# components), a derived fact on its own outcome (firb.status-determination), or a copy doc
+# split into `layout` + `copy` because GATE 8 iterates only `content_json.copy`.
+# Concluded from authoring Modes A–D; GATE 8 scope measured 2026-10-06 by reading run().
 def parse_kb_doc(path):
     text = path.read_text()
     slug_m = re.search(r"^slug:\s*(\S+)", text, re.M)

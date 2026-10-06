@@ -35,6 +35,12 @@
 %% live in tests/outcome_validate.py; engine/erlang/test/outcome_conformance.escript runs the
 %% SAME cases through check/3 and asserts identical conform/reject verdicts (the cross-language
 %% lockstep — reason text is informative, the VERDICT is contractual).
+%%
+%% Bilingual -> P-7 · One declaration per outcome shape -> The engine -> fail-closed retype limit
+%% Because this validator is fail-closed, a declaration can only be tightened as far as the
+%% producer already emits: re-type a field `string` -> `localized_text` only where the
+%% producer already writes a {vi, en} pair, or every fill of that component crashes its turn.
+%% Concluded at 2b-4a from the fail-closed clause above (no runtime probe).
 
 -export([validate/3, check/3, check_placement/2]).
 
@@ -56,6 +62,13 @@
 %% fill against it. A missing schema (e.g. a per-property outcome type not yet declared)
 %% passes gracefully — consistent with the {kind:unknown} pass-through; base components
 %% all carry a schema (verified at build).
+%%
+%% Honest-partial -> P-7 · One declaration per outcome shape -> The engine -> missing-schema graceful pass
+%% "Verified at build" above does not hold: the compiler does not require every base
+%% component to declare an outcome schema, so this graceful pass also covers an author's
+%% omission, unvalidated. Measured 2026-07-05: the registry returned 2 of 13 types for
+%% nexthome-domestic-au; measured 2026-10-06: artifact.json has null outcome_type for
+%% buying_strategy, due_diligence, settlement_prep in fhb-foreign-au and investor-foreign-au.
 -spec validate(binary(), binary(), map()) -> ok.
 validate(BlueprintSlug, OutcomeType, Outcome) ->
     OutcomeTypes = fh_engine_kb:registry(BlueprintSlug, <<"outcome_types">>),
@@ -154,6 +167,11 @@ collect_locales([Loc | Rest], Value, Acc) ->
             {error, <<"localized locale ", Loc/binary, " non-string">>}
     end.
 
+%% Regulated figures are grounded -> P-7 · One declaration per outcome shape -> The engine -> figure type follows derivation
+%% A registry figure is typed `*_range` iff it is derived from a range input, and scalar iff
+%% it is an exact-point computation; a phase-polymorphic field is typed `*_range` and emits
+%% [V, V] when exact. This strict two-way check bounds where a mismatch can surface.
+%% Concluded 2026-06 (stated before only in mode-c-wedge.md).
 check_scalar(Type, Value) when Type =:= <<"money_range">>; Type =:= <<"percentage_range">> ->
     %% a banded figure — a [lo, hi] list of numbers (the banded money/percentage surface,
     %% mode-c-wedge Slice B0: rent is a band, so income/yields/cash-flow built on it band too).

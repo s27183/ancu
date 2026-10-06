@@ -308,6 +308,10 @@
     //   • the base plan, under an active preview → each entry with its outcome swapped for
     //     the previewed one (renderer/scope preserved, merged by component_id).
     //   • the base plan, no preview → the live base components.
+    //
+    // Whole lifecycle -> P-4 · The engine is coupled to no shell -> The web frontend -> per-property addendum overlay
+    // A per-property addendum overlays viewComponents with zero new renderers, and selecting
+    // a property suppresses the what-if cockpit. Concluded at Mode-C Phase B.
     const viewComponents = $derived.by((): Record<string, ComponentEntry> => {
         if (viewingProperty && selectedPropertyId) {
             return { ...components, ...addenda[selectedPropertyId].components };

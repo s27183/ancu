@@ -24,6 +24,10 @@ if [ "${1:-}" = "reset" ]; then
     exit 0
 fi
 
+# Reproducible -> P-2 · The database is the single source of truth -> The engine database -> docker-only dev Postgres
+# This runs `docker compose up` unconditionally, so on a machine with docker down it fails
+# here: run `rebar3 shell` from engine/erlang directly instead, with ENGINE_DATABASE_URL
+# pointed at a local (brew) Postgres on :5432. Concluded 2026-10-06 from reading this script.
 echo "→ engine Postgres (docker :5433)…"
 docker compose -f "$COMPOSE" up -d
 tries=30
