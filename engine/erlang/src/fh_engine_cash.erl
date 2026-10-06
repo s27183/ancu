@@ -32,6 +32,7 @@
 %% exported for the Mode-E next-home conformance suite:
 -export([fill_fhb_nexthome/2, gap_range/2, verdict_from_gap/1]).
 
+-define(LENDER_POLICY, <<"kb.lender.investment-loan-policies">>).  %% security-category caps
 -define(COPY, <<"kb.copy.cash">>).   %% bilingual copy-templates (bilingual-content.md §3b)
 -define(SURCHARGE, <<"kb.foreign-buyer-surcharge.by-state">>).
 
@@ -414,7 +415,8 @@ fill_investor(_Args, Upstream) ->
          <<"kb.lmi.calculation">>,
          <<"kb.buyer-costs.investor-additional-costs">>,
          <<"kb.tax.quantity-surveyor-reports">>,
-         <<"kb.tax.entity-setup-costs">>]),
+         <<"kb.tax.entity-setup-costs">>,
+         ?LENDER_POLICY]),
     {Outcome, <<"calculator">>, KbVersions}.
 
 %% base (no property attached): every figure honestly unknowable.
@@ -428,6 +430,7 @@ budget_envelope_investor_base() ->
       <<"gap_or_surplus">>               => null,
       <<"verdict">>                      => null,
       <<"mitigation_options_if_short">>  => [],
+      <<"key_assumptions">>              => [],
       <<"cash_events">>                  => []}.
 
 %% Slice B3b — the per-property cash-to-complete (NEED side), POINT figures off the attached
@@ -456,9 +459,24 @@ budget_envelope_investor(Pf) ->
                 <<"lvr">>                   => Lvr,
                 <<"lmi_payable">>           => Lmi,
                 <<"total_cash_required">>   => total_cash_investor(Deposit, Duty, Acq),
+                <<"key_assumptions">>       =>
+                    security_lvr_caveat(maps:get(<<"property_type">>, Pf, null)),
                 <<"cash_events">>           => cash_events_investor(Deposit, Duty, Acq, Lmi)
             }
     end.
+
+%% Goal: regulated figures are grounded, honest about their tier -> a CONVENTION is stated as a
+%% caveat, never folded into a figure -> Mode C cash_position -> flag a lender security cap.
+%% Lenders commonly cap LVR at ~70-80% on high-density apartments (kb.lender.investment-loan-
+%% policies, security_category_policy; CONVENTION — no primary source, policies sit behind broker
+%% portals). The loan and deposit stay at the 80% baseline; an attached property whose type the
+%% KB lists in lvr_cap_property_types adds one bilingual line, no lender named (#3, behavior 13).
+security_lvr_caveat(PType) when is_binary(PType) ->
+    case lists:member(PType, param_value(?LENDER_POLICY, <<"lvr_cap_property_types">>)) of
+        true  -> [copy(<<"assumption_security_lvr_cap">>, #{})];
+        false -> []
+    end;
+security_lvr_caveat(_) -> [].
 
 %% --- cash_events_investor (the investor ACQUISITION financial spine) ---------
 %% Mirrors cash_events/4's shape exactly (same event/8 builder) so purchase_journey's
