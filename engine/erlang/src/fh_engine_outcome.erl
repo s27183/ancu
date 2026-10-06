@@ -53,15 +53,19 @@
 %% --- seam entry -------------------------------------------------------------
 
 %% Look up the component's declared outcome type-tree from the artifact and walk the
-%% fill against it. A missing schema (e.g. a per-property outcome type not yet declared)
-%% passes gracefully — consistent with the {kind:unknown} pass-through; base components
-%% all carry a schema (verified at build).
+%% fill against it. A type the artifact does not declare is refused
+%% ({outcome_undeclared, Slug, Type}); every component's shape is declared, which
+%% the compiler's GATE 12 enforces at build (P-7).
 -spec validate(binary(), binary(), map()) -> ok.
 validate(BlueprintSlug, OutcomeType, Outcome) ->
     OutcomeTypes = fh_engine_kb:registry(BlueprintSlug, <<"outcome_types">>),
     case maps:find(OutcomeType, OutcomeTypes) of
         error ->
-            ok;
+            %% Undeclared: refused, not passed (P-7; Son, 2026-10-06, #25). The compiler's
+            %% GATE 12 already fails the build on a component with no declared shape, so
+            %% this is the backstop — reached only by a type the turn names that the
+            %% loaded artifact does not declare (a stale artifact, a renamed type).
+            error({outcome_undeclared, BlueprintSlug, OutcomeType});
         {ok, Fields} ->
             Locales = fh_engine_kb:locales(),
             case validate_fields(maps:to_list(Fields), Outcome, Locales) of
