@@ -36,7 +36,7 @@ parse_database_url(Url) ->
             {User, Pass} = parse_userinfo(maps:get(userinfo, Parsed, <<>>)),
             Query = maps:get(query, Parsed, <<>>),
             Config0 = #{
-                host => Host,
+                host => decode_host(Host),
                 port => Port,
                 user => User,
                 password => Pass,
@@ -51,6 +51,18 @@ parse_database_url(Url) ->
         _ ->
             {error, {invalid_database_url, Url}}
     end.
+
+%% A host percent-encoded as a unix-socket directory reaches pgo decoded.
+%%
+%% Reproducible -> P-2 · The database is the single source of truth -> The engine database -> unix-socket host decoded
+%% uri_string:parse/1 leaves a host like `%2FUsers%2Fson%2F...%2Fenacs-pg` encoded
+%% (measured 2026-10-06: OTP's parse kept "%2FUsers%2Fson%2Fenacs-pg" as host), and pgo
+%% treats a host starting "/" as a socket directory (pgo 0.20.0 pgo_handler.erl), so the
+%% decoded host is what lets a dev seat's private Postgres socket be named in the URL.
+%% A plain hostname has no `%` and passes through unchanged.
+-spec decode_host(string() | binary()) -> string().
+decode_host(Host) ->
+    unicode:characters_to_list(uri_string:percent_decode(Host)).
 
 -spec requires_ssl(binary() | string()) -> boolean().
 requires_ssl(Query) when is_binary(Query) ->
