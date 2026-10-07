@@ -1308,32 +1308,9 @@ under, one of the two reader sets needs a fallback — decide when that componen
 
 ---
 
-## KB anchor index summary
+## KB anchors
 
-Mode D references ~78 KB slugs:
-
-- 35 shared with Mode B (foreign-person components)
-- 40 shared with Mode C (investor components)
-- 2 shared with Mode A — `kb.property.capital-growth-bands` + `kb.selling-costs.agent-legal` (component 14 `disposition`; the FRCGW-specific anchors stay Mode-D-exclusive, below)
-- ~10 Mode-D-exclusive (non-resident tax, FRCGW, repatriation, VN-AU treaty, foreign-investor strategy)
-- 3 new Mode-D-exclusive journey/phase docs (components 15/16, added 2026-07-10 task 8): `kb.journey.investor-foreign-path`, `kb.journey.investor-foreign-phase-actions`, `kb.risks.investor-foreign-by-phase`
-
-**Reconciled 2026-07-03 (P1-open pass) — see `mode-d-wedge.md` P1 for the full table.** Genuinely
-new (7 docs + `kb.non-resident.tax-treatment-overview` synthesis): `kb.non-resident.tax-treatment-overview`,
-`kb.non-resident.entity-options-au-property`, `kb.non-resident.investment-loan-deposit-requirements`,
-`kb.foreign-investor.thesis-archetypes`, `kb.foreign-investor.currency-hedging-considerations`,
-`kb.foreign-investor.future-migration-pathway-considerations`, `kb.foreign-investor.repatriation-strategy`,
-`kb.foreign-investor.absentee-owner-management`. VN-side placeholders (3, per the scoping decision):
-`kb.vn-tax.brackets-2026`, `kb.vn-tax.income-from-foreign-property`, `kb.au-vn-tax-treaty`. Reused under
-an existing slug (not new files — anchor renamed in this blueprint): `kb.lender.non-resident-friendly-shortlist`,
-`kb.non-resident-tax.withholding-on-rental-income`, `kb.tax.cgt-50-percent-discount`,
-`kb.non-resident-tax.foreign-resident-cgt-withholding`, `kb.tax.depreciation-division-43-and-40`. Dropped
-as moot: the standalone PPOR-exemption anchor (an investor never held a main residence to lose the
-exemption on — folded into the tax-treatment-overview doc's reasoning, grounded in `kb.tax.cgt-main-residence-exemption`).
-
-The offline KB agent's Mode D onboarding workstream is the largest of the four — these are the most legally and operationally sensitive content domains across the blueprint set.
-
----
+The compiled anchors are each component's `**KB anchors:**` line above — the KB compiler reads those lines and nothing else (`engine/build/kb_compiler.py`, `parse_blueprint`). This blueprint keeps no separate index table: a hand-kept copy drifted from what the compiler reads (stale rows and wrong component numbers, measured 2026-10-06), so the lines are the only list.
 
 ## Renderer vocabulary used
 

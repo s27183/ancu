@@ -1219,72 +1219,9 @@ wrong for QLD).
 
 ---
 
-## KB anchor index (for this blueprint)
+## KB anchors
 
-58 slugs referenced (corrected 2026-07-10 — a stale count; the table itself was already larger than the previously-stated "42" before this pass's three additions). Italics mark Mode C-only anchors (not in Mode A FHB); the two growth/selling-cost anchors at component 12 are **shared with Mode A** (non-italic).
-
-| Slug | Component(s) | Owns |
-|---|---|---|
-| `kb.tax.income-tax-resident-2026-27` | 1 | Resident income-tax brackets + marginal rates (shared with Mode A) |
-| *`kb.lender.serviceability-investment-loans`* | 1, 4 | Investment-loan serviceability assessment (approx borrowing capacity) |
-| *`kb.investor.experience-levels`* | 1 | How investor experience affects lender treatment |
-| `kb.property.suburb-risk-factors` | 2 | Suburb risk factors |
-| `kb.property.comparables-methodology` | 2 | Comparable sales methodology |
-| *`kb.property.rental-market-data-sources`* | 2 | Where to source rental market data (CoreLogic, REA Insights, etc.) |
-| *`kb.property.growth-corridors-au`* | 2 | Australian growth corridor analysis methodology |
-| *`kb.property.depreciation-by-build-year`* | 2 | Build-year implications for depreciation eligibility |
-| *`kb.property.investor-grade-features`* | 2 | Features that make property investor-grade |
-| *`kb.strata.health-indicators-investor-lens`* | 2 | Strata health from investor perspective |
-| *`kb.investor.strategy-archetypes`* | 3 | Investment strategy archetypes (cash flow, growth, balanced, etc.) |
-| *`kb.investor.gearing-types-and-implications`* | 3 | Positive / neutral / negative gearing |
-| *`kb.investor.hold-period-considerations`* | 3 | Hold period strategy |
-| *`kb.investor.exit-strategy-options`* | 3 | Exit strategy options for investors |
-| *`kb.investor.rental-income-modelling`* | 4 | Rental income modelling methodology |
-| *`kb.investor.operating-expenses-typical-ratios`* | 4 | Typical operating expense ratios by property type |
-| *`kb.investor.vacancy-rate-assumptions`* | 4 | Vacancy rate assumptions by suburb / property type |
-| *`kb.investor.cash-flow-modelling-methodology`* | 4 | Cash flow modelling methodology |
-| *`kb.investor.property-management-fees`* | 4, 10 | PM fee structures and benchmarks |
-| *`kb.tax.entity-comparison-personal-trust-company-smsf`* | 5 | Entity comparison for property investment |
-| *`kb.tax.negative-gearing-mechanics`* | 5 | Negative gearing tax mechanics |
-| *`kb.tax.depreciation-division-43-and-40`* | 5, 12 | Capital works (Div 43) and plant & equipment (Div 40) depreciation; the cost-base clawback at disposition |
-| *`kb.tax.cgt-50-percent-discount`* | 5, 12 | CGT 50% discount eligibility; the dispose-phase CGT figure at disposition |
-| *`kb.tax.quantity-surveyor-reports`* | 5, 6 | Quantity surveyor depreciation reports |
-| *`kb.tax.land-tax-by-state`* | 5 | Land tax thresholds and rates by state |
-| *`kb.tax.entity-setup-costs`* | 6 | Entity setup cost ranges |
-| `kb.stamp-duty.calc-by-state` | 6 | Stamp duty by state |
-| *`kb.investor.deposit-requirements-investment-loans`* | 6 | Deposit requirements for investment loans |
-| `kb.lmi.calculation` | 6 | LMI calculation |
-| *`kb.buyer-costs.investor-additional-costs`* | 6 | Additional costs specific to investors |
-| `kb.auction.rules-by-state` | 7 | Auction rules |
-| `kb.cooling-off.by-state` | 7, 9 | Cooling-off periods |
-| `kb.negotiation.patterns-by-market-condition` | 7 | Negotiation patterns |
-| `kb.agent-tactics.detection` | 7 | Agent tactics |
-| *`kb.investor.bid-discipline`* | 7 | Investor bidding discipline |
-| *`kb.investor.yield-anchored-pricing`* | 7 | Yield-anchored max-price methodology |
-| `kb.contract-of-sale.review-points-by-state` | 8 | CoS review |
-| `kb.building-pest.interpretation` | 8 | Building / pest report interpretation |
-| `kb.strata-report.red-flags` | 8 | Strata red flags |
-| *`kb.investor.rental-appraisal-from-pm-agent`* | 8 | Rental appraisal procurement |
-| *`kb.investor.depreciation-report-quantity-surveyor`* | 8 | QS depreciation report procurement |
-| *`kb.investor.tenancy-in-situ-considerations`* | 8 | Considerations when buying with tenant in place |
-| `kb.settlement.process-by-state` | 9 | Settlement process |
-| `kb.pexa.settlement` | 9 | PEXA mechanics |
-| *`kb.investor.entity-setup-timeline`* | 9 | Entity setup timeline relative to settlement |
-| *`kb.investor.depreciation-schedule-procurement`* | 9 | Depreciation schedule procurement workflow |
-| *`kb.investor.property-management-appointment-timeline`* | 9 | PM agent appointment workflow |
-| *`kb.investor.property-management-vs-self-managed`* | 10 | PM vs self-managed comparison |
-| *`kb.investor.annual-tax-return-investor`* | 10 | Annual tax return workflow for investors |
-| *`kb.investor.cash-flow-tracking`* | 10 | Cash flow tracking methodology |
-| *`kb.investor.portfolio-review-cadence`* | 10 | Portfolio review cadence |
-| *`kb.investor.scale-up-using-equity`* | 10 | Equity release for next property |
-| *`kb.investor.land-tax-aggregation`* | 10 | Land tax aggregation rules across portfolio |
-| `kb.property.capital-growth-bands` | 12 | Banded capital-growth assumption for sale-proceeds projection (**labelled placeholder** — re-ground vs ABS RPPI / CoreLogic / Valuer-General; shared with Mode A) |
-| `kb.selling-costs.agent-legal` | 12 | Selling-cost bands — agent commission + legal + marketing at the dispose phase (shared with Mode A) |
-| *`kb.journey.investor-path`* | 13 | The whole-of-journey swimlane — six-actor phases × cells, bilingual prose |
-| *`kb.journey.investor-phase-actions`* | 14 | Per-phase actionable checklist, bilingual |
-| *`kb.risks.investor-by-phase`* | 14 | Per-phase risks + mitigations, bilingual |
-
----
+The compiled anchors are each component's `**KB anchors:**` line above — the KB compiler reads those lines and nothing else (`engine/build/kb_compiler.py`, `parse_blueprint`). This blueprint keeps no separate index table: a hand-kept copy drifted from what the compiler reads (stale rows and wrong component numbers, measured 2026-10-06), so the lines are the only list.
 
 ## Renderer vocabulary used
 
