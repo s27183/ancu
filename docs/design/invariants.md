@@ -10,9 +10,10 @@ decision lives beside the mechanism it governs, in the four-slot block
 ## The goal
 
 **This system gives a Vietnamese buyer of Australian property — first-home,
-investor, or funded from Vietnam — a bilingual plan for the whole property
-lifecycle, built from their own situation, whose every regulated figure traces
-to a verified, cited source.** (Son, 2026-10-06. The product name is left out
+investor, or funded from Vietnam — a bilingual budget plan for the whole
+property lifecycle (buy, hold, sell), built from their own situation, whose every
+regulated figure traces to a verified, cited source.** (Son, 2026-10-06; "budget
+plan … (buy, hold, sell)" Son, 2026-10-08. The product name is left out
 on purpose: it is not settled, and renaming must not touch the ground. "Rau",
 the name users read today, is temporary until a final one is chosen — Son,
 2026-10-06.)
