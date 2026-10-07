@@ -112,13 +112,21 @@
             : outcome.kind === 'auth_required' ? 'auth'
             : 'error';
     }
+
+    // ✕ once the plan exists is the same exit as the "created" button (behavior 28): the
+    // parent reloads the sheet's plan on oncreated only, so closing with ✕ after a create
+    // left the new plan missing until a page refresh (read 2026-10-08, +page.svelte).
+    function close() {
+        if (phase === 'created') oncreated();
+        else onclose();
+    }
 </script>
 
 <div class="ob-backdrop">
 <div class="onboarding" role="dialog" aria-modal="true" aria-label={suburbName}>
     <header class="ob-head">
         <h2>{$t('onboarding.title')} {suburbName}</h2>
-        <button type="button" class="close" onclick={onclose} aria-label={$t('sheet.close')}
+        <button type="button" class="close" onclick={close} aria-label={$t('sheet.close')}
             >✕</button
         >
     </header>
