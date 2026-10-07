@@ -574,6 +574,19 @@
         ...(viewComponents.disposition ? [{ id: 'horizon', label: $t('plan.cash.horizon') }] : [])
     ]);
 
+    // Whole lifecycle -> P-7 · One declaration per outcome shape -> The web frontend -> the Budget breakdown draws the declared cards
+    // The interactive Budget tab drew only the Calculator, so every other component its ui_tabs
+    // entry declares was computed and never shown (measured 2026-10-07 in Chrome: a Mode C
+    // card's tax_structure, with its setup band, on no tab; B and D drop firb_workflow,
+    // cross_border_funding, yield and non-resident tax the same way). The breakdown sub-tab
+    // now draws them below the Calculator; cash_position and disposition keep their own
+    // sub-tabs, and an uncomputed card is skipped, not shown pending (behavior 11).
+    const budgetCards = $derived(
+        (activeTab?.interactive ? activeTab.components : []).filter(
+            (cid) => cid !== 'cash_position' && cid !== 'disposition' && viewComponents[cid]
+        )
+    );
+
     // ── Flow view (task 10) ────────────────────────────────────────────────
     // The legal/temporal spine's three live inputs, read from viewComponents so a what-if
     // preview re-renders the Flow too: the journey (swimlane spine), the playbook (per-phase
@@ -1366,6 +1379,9 @@
                                 components={viewComponents}
                                 density="full"
                             />
+                            {#each budgetCards as cid (cid)}
+                                <ComponentCard componentId={cid} entry={viewComponents[cid]} filling={running} />
+                            {/each}
                         {/if}
                     {/if}
                 {:else if running}
