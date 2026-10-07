@@ -652,10 +652,14 @@ const messages = {
         en: 'The timing becomes clearer once you add your loan and savings.'
     },
     // Overview → "What this is" intro (the prototype's lead card).
+    // Behavior 27: one body for every blueprint — the goal's "budget plan for the whole
+    // property lifecycle (buy, hold, sell)" (invariants.md, Son 2026-10-08) — naming only the
+    // tabs every blueprint's ui_tabs share (budget, overview, flow, qa; measured 2026-10-08 in
+    // priv/kb/artifact.json). Portfolio / Family are per-mode and left unnamed.
     'plan.ov.what.title': { vi: 'Đây là gì', en: 'What this is' },
     'plan.ov.what.body': {
-        vi: 'Đây là kế hoạch mua căn nhà đầu tiên được cá nhân hoá cho bạn. Hãy đi qua các thẻ: Tổng quan để xem bức tranh lớn, Tính tiền mặt để nhập số liệu của bạn, Hành trình để xem ai làm gì khi nào, Trước/Sau khi mua cho các bước cụ thể, và Hỏi đáp để hỏi thêm.',
-        en: 'This is your personalised plan for buying your first home. Walk the tabs: Overview for the big picture, Cash calculator to plug in your own numbers, Journey for who does what when, Before/After you buy for the concrete steps, and Q&A to ask anything.'
+        vi: 'Đây là kế hoạch ngân sách cho việc mua, giữ và bán bất động sản, lập từ thông tin của chính bạn. Hãy đi qua các thẻ: Ngân sách để xem chi phí và số tiền còn thiếu, Tổng quan để xem bức tranh lớn, Hành trình để xem từng giai đoạn và ai làm gì khi nào, và Hỏi đáp để hỏi thêm về kế hoạch.',
+        en: 'This is your budget plan for buying, holding and selling a property, built from your own situation. Walk the tabs: Budget for your costs and cash gap, Overview for the big picture, Flow for each phase and who does what when, and Q&A to ask about your plan.'
     },
     // Structural what-if (W9) — vary target price / state → engine preview, no save.
     'plan.whatif.title': { vi: 'Thử kịch bản khác', en: 'Try a different scenario' },
