@@ -355,7 +355,23 @@ assumption_cases() ->
      check("every key_assumption is bilingual {vi,en}, both non-empty + distinct", AllBilingual, true),
      check("a key_assumption carries real Vietnamese (non-ASCII)", AnyDiacritic, true),
      check("growth assumption surfaces the placeholder band (2 / 5 %)", GrowthMentionsBand, true),
-     check("loan-rate assumption stated (representative rate, a labelled convention)", LoanRateStated, true)].
+     check("loan-rate assumption stated (representative rate, a labelled convention)", LoanRateStated, true)]
+    ++ growth_key_cases().
+
+%% the growth line's copy key follows is_placeholder: a placeholder band says PLACEHOLDER and
+%% never names a source; a sourced band names ABS and never says PLACEHOLDER (behavior 12).
+growth_key_cases() ->
+    Pl  = fh_engine_disposition:growth_assumption(2, 5, true),
+    Src = fh_engine_disposition:growth_assumption(3, 6, false),
+    Has = fun(L, Lang, Sub) -> binary:match(maps:get(Lang, L), Sub) =/= nomatch end,
+    [check("is_placeholder=true: the line says PLACEHOLDER, names no ABS source",
+           {Has(Pl, <<"en">>, <<"PLACEHOLDER">>), Has(Pl, <<"en">>, <<"ABS">>)}, {true, false}),
+     check("is_placeholder=false: the line names ABS Total Value of Dwellings (en + vi), no PLACEHOLDER",
+           {Has(Src, <<"en">>, <<"ABS Total Value of Dwellings">>), Has(Src, <<"vi">>, <<"ABS">>),
+            Has(Src, <<"en">>, <<"PLACEHOLDER">>), Has(Src, <<"vi">>, <<"TẠM"/utf8>>)},
+           {true, true, false, false}),
+     check("is_placeholder=false: the band ends substituted (3–6)",
+           Has(Src, <<"en">>, <<"3–6%"/utf8>>), true)].
 
 %% --- 8. seam (B): loan_payout is KB-rate-driven, NOT the agent rate field ----
 %% loan_structure_recommendation.rate holds the agent's rate-STRUCTURE enum, never a numeric
