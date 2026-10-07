@@ -1024,7 +1024,7 @@ The `mortgage_plan` outcome feeds `cash_position` (loan amount + buffer requirem
 {
   "horizon": {
     "hold_horizon_years": { "type": "integer", "value": "<from_buyer_profile>", "note": "H; null = no disposal projection." },
-    "growth_band_used": { "type": "string", "value": "<initial>", "note": "PLACEHOLDER band from kb.property.capital-growth-bands" }
+    "growth_band_used": { "type": "string", "value": "<initial>", "note": "the ABS-sourced band from kb.property.capital-growth-bands" }
   },
   "proceeds": {
     "purchase_price_basis": { "type": "money", "value": "<initial>" },
@@ -1120,7 +1120,7 @@ The `mortgage_plan` outcome feeds `cash_position` (loan amount + buffer requirem
 | `kb.preparation.fhb-readiness` | 11 | Reused readiness template — generic document/people checklist; the FHB-specific items degrade to empty per component 11's note |
 | `kb.journey.phase-actions` | 12 | Reused per-phase action template |
 | `kb.risks.fhb-by-phase` | 12 | Reused per-phase risk template |
-| `kb.property.capital-growth-bands` | 13 | Reused capital-growth placeholder band |
+| `kb.property.capital-growth-bands` | 13 | Reused capital-growth band (ABS Total Value of Dwellings) |
 
 ---
 

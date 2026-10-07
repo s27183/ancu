@@ -1099,7 +1099,7 @@ wrong for QLD).
 
 **Inputs:** `strategy_thesis` (`hold_period_years` = the horizon `H`, `exit_strategy`) + `property_fit_investor.outcome` (growth indicators, purchase price) + `cash_flow_projection` (yield_modelling — the hold-phase recurring flows to roll up) + `tax_optimised_structure` (tax_structure — the **CGT determinants**: `cgt_discount_eligible`, `cgt_marginal_rate`, `cost_base_depreciation_clawback`) + `budget_envelope_investor` (cash_position — acquisition cash to roll up; loan amount for the payout)
 
-**KB anchors:** `kb.property.capital-growth-bands` (the banded growth assumption — **labelled placeholder**, re-ground before surfacing), `kb.selling-costs.agent-legal` (selling-cost bands), `kb.tax.cgt-50-percent-discount` *(dangling — Mode-C, design-first)*, `kb.tax.depreciation-division-43-and-40` *(dangling — the cost-base clawback, design-first)*
+**KB anchors:** `kb.property.capital-growth-bands` (the banded growth assumption — ABS Total Value of Dwellings, historical, not a forecast), `kb.selling-costs.agent-legal` (selling-cost bands), `kb.tax.cgt-50-percent-discount` *(dangling — Mode-C, design-first)*, `kb.tax.depreciation-division-43-and-40` *(dangling — the cost-base clawback, design-first)*
 
 **Renderer:** `calculator` (the full-horizon net position; no new renderer — constraint #7, §8.8)
 
@@ -1113,7 +1113,7 @@ wrong for QLD).
     "hold_horizon_years": { "type": "integer", "value": "<from strategy_thesis.hold_period_years>", "note": "the §8.3 horizon H; a structural what-if (simulate/refine override on the plan-target overlay), not an agent leaf" }
   },
   "growth_assumption": {
-    "capital_growth_band_pct_pa": { "type": "percentage_range", "value": "<from kb.property.capital-growth-bands>", "note": "PLACEHOLDER band — re-ground vs ABS RPPI / CoreLogic / Valuer-General before any figure is surfaced; banded, honest-partial" }
+    "capital_growth_band_pct_pa": { "type": "percentage_range", "value": "<from kb.property.capital-growth-bands>", "note": "the ABS Total Value of Dwellings band (CONVENTION, historical, not a forecast); banded, honest-partial" }
   },
   "cgt": {
     "50_percent_discount_applied": { "type": "bool", "value": "<from tax_structure.cgt_determinants>", "note": "true if held >12 months — read from tax_structure, not re-derived" },
@@ -1278,7 +1278,7 @@ wrong for QLD).
 | *`kb.investor.portfolio-review-cadence`* | 10 | Portfolio review cadence |
 | *`kb.investor.scale-up-using-equity`* | 10 | Equity release for next property |
 | *`kb.investor.land-tax-aggregation`* | 10 | Land tax aggregation rules across portfolio |
-| `kb.property.capital-growth-bands` | 12 | Banded capital-growth assumption for sale-proceeds projection (**labelled placeholder** — re-ground vs ABS RPPI / CoreLogic / Valuer-General; shared with Mode A) |
+| `kb.property.capital-growth-bands` | 12 | Banded capital-growth assumption for sale-proceeds projection (ABS Total Value of Dwellings, CONVENTION; shared with Mode A) |
 | `kb.selling-costs.agent-legal` | 12 | Selling-cost bands — agent commission + legal + marketing at the dispose phase (shared with Mode A) |
 | *`kb.journey.investor-path`* | 13 | The whole-of-journey swimlane — six-actor phases × cells, bilingual prose |
 | *`kb.journey.investor-phase-actions`* | 14 | Per-phase actionable checklist, bilingual |

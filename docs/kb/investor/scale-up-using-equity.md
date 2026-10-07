@@ -47,7 +47,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
     "serviceability_is_the_real_ceiling": { "type": "bool", "value": true, "note": "equity gets the deposit; servicing the larger total debt gets the loan — assessed at the buffered rate; the APRA DTI cap (Feb 2026) is the binding scale-up limit (kb.lender.serviceability-investment-loans)" },
     "cross_collateralisation_risk": { "type": "bool", "value": true, "note": "if the lender holds both properties as security for both loans, the investor loses flexibility + concentrates risk; stand-alone facilities preserve flexibility — a structuring point for the broker, not advice" },
     "over_leverage_amplifies_downside": { "type": "bool", "value": true, "note": "recycling raises total portfolio LVR; a value fall / rate rise hits a larger, more-leveraged base — scale-up multiplies upside AND fragility" },
-    "equity_is_borrowed_growth_not_assured": { "type": "bool", "value": true, "note": "released equity is borrowed money with an interest cost, against growth that is unrealised and uncertain (kb.property.capital-growth-bands, labelled placeholder)" },
+    "equity_is_borrowed_growth_not_assured": { "type": "bool", "value": true, "note": "released equity is borrowed money with an interest cost, against growth that is unrealised and uncertain (kb.property.capital-growth-bands is historical, not a forecast)" },
     "ready_at_lvr_trigger": { "type": "bool", "value": true, "note": "ready_for_next_property_at_lvr (blueprint default 70%) is the self-set trigger checked at the valuation review (kb.investor.portfolio-review-cadence)" }
   }
 }

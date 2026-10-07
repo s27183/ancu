@@ -58,7 +58,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
 Notes:
 
 - **No `fills`.** No outcome leaf is set by a KB rule; the vacancy rate is an input to the resolver's effective-income formula (owned by `kb.investor.rental-income-modelling`).
-- **Sourced path vs placeholder path.** The suburb-specific figure is sourced and used as-is; only the *default fallback band* is the labelled placeholder. Same honesty discipline as `kb.property.capital-growth-bands` — build the structure, label the unsourced datum.
+- **Sourced path vs placeholder path.** The suburb-specific figure is sourced and used as-is; only the *default fallback band* is the labelled placeholder. Build the structure, label the unsourced datum — the discipline `kb.property.capital-growth-bands` followed until it was re-grounded on ABS data.
 - **Conservative default.** The default sits above current tight-market actuals so the income line under-promises; it is a planning assumption, not a per-property forecast.
 - **Re-grounding obligation.** Replace the default band with a named per-suburb series and update `last_verified`; treat as stale-by-construction until then.
 

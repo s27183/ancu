@@ -27,7 +27,7 @@ Gearing type is decided by the sign of the **net holding position**: rental inco
 ## What each implies
 
 - **Cash flow demand.** Negative gearing requires the household to carry a recurring shortfall — the binding question is *can the household fund it through vacancy, a rate rise, or a job loss?* The deal-breaker `maximum_negative_gearing_loss_acceptable` exists for exactly this.
-- **Reliance on growth.** The more negative the gearing, the more the return depends on growth materialising — and growth is **not assured** ([`kb.property.capital-growth-bands`](../property/capital-growth-bands.md), a labelled placeholder). A negatively-geared property in a flat market loses money on both legs.
+- **Reliance on growth.** The more negative the gearing, the more the return depends on growth materialising — and growth is **not assured** ([`kb.property.capital-growth-bands`](../property/capital-growth-bands.md) is a historical band, not a forecast). A negatively-geared property in a flat market loses money on both legs.
 - **Tax is a discount, not a reason.** A loss that saves tax is still a loss. The plan never frames negative gearing as attractive *because* of the tax benefit — the tax effect reduces the cost of a strategy chosen on its merits.
 - **Interest-only vs P&I and offset** interact with gearing — owned by [`kb.lender.serviceability-investment-loans`](../lender/serviceability-investment-loans.md) and the F-cluster loan-policy docs.
 
@@ -63,7 +63,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
     "gearing_type_is_agent_reasoned": { "type": "bool", "value": true, "note": "gearing_type is agent-reasoned; the underlying net position is computed by yield_modelling/cash_position" },
     "tax_mechanism_owner": { "type": "string", "value": "kb.tax.negative-gearing-mechanics", "note": "OWNED ELSEWHERE — how a rental loss offsets other income; referenced, not re-derived" },
     "tax_saving_never_justifies_a_loss": { "type": "bool", "value": true, "note": "negative gearing is a cost partly offset by tax, never a benefit in itself; never frame the tax saving as the reason to gear negatively (ASIC line)" },
-    "negative_gearing_reliant_on_growth": { "type": "bool", "value": true, "note": "the more negative the gearing, the more the return depends on growth materialising — growth is NOT assured (kb.property.capital-growth-bands, labelled placeholder)" },
+    "negative_gearing_reliant_on_growth": { "type": "bool", "value": true, "note": "the more negative the gearing, the more the return depends on growth materialising — growth is NOT assured (kb.property.capital-growth-bands is historical, not a forecast)" },
     "ng_reform_proposed_not_law": { "type": "bool", "value": true, "note": "2026-27 Budget reform (NG limited to new builds from 1 Jul 2027) is now ENACTED — Tax Reform No. 1 Act 2026 (Act No. 49/2026), assented 26 Jun 2026 — but not yet in effect; compute current law, flag the enacted change, to_verify post-2027 — detail owned by kb.tax.negative-gearing-mechanics (key name retained for reference stability)" }
   }
 }

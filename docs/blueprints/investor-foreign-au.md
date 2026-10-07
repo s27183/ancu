@@ -1164,7 +1164,7 @@ Combines Mode C `ownership_planning_investor` (property management, tax reportin
 
 **Inputs:** `strategy_thesis` (`hold_period_years` = the horizon `H`, `exit_strategy`) + `property_fit.outcome` (growth indicators, purchase price) + `cash_flow_projection` (the hold-phase recurring flows to roll up) + `tax_optimised_structure` (the **CGT determinants**: `cgt_discount_eligible: false`, `ppor_exemption_eligible: false`, `cgt_marginal_rate`, `frcgw_applicable`) + `budget_envelope_investor` (acquisition cash to roll up; loan amount for the payout)
 
-**KB anchors:** `kb.property.capital-growth-bands` (banded growth — **labelled placeholder**, re-ground before surfacing), `kb.selling-costs.agent-legal` (selling-cost bands), `kb.tax.cgt-50-percent-discount`, `kb.tax.cgt-main-residence-exemption`, `kb.non-resident-tax.foreign-resident-cgt-withholding`
+**KB anchors:** `kb.property.capital-growth-bands` (banded growth — ABS Total Value of Dwellings, historical, not a forecast), `kb.selling-costs.agent-legal` (selling-cost bands), `kb.tax.cgt-50-percent-discount`, `kb.tax.cgt-main-residence-exemption`, `kb.non-resident-tax.foreign-resident-cgt-withholding`
 
 *(Reconciled 2026-07-03 — the discount anchor was drafted as `kb.non-resident.cgt-no-50-percent-discount-from-2012`; the main-residence anchor (grounding the PPOR-moot reasoning) was the dangling `kb.non-resident.cgt-no-ppor-exemption`; the FRCGW anchor was `kb.foreign-investor.frcgw-on-sale` — all three reconciled to the mode-agnostic slugs already built for Mode B/C.)*
 

@@ -21,8 +21,8 @@ sources:
 > defaults **must** be re-grounded (candidates: a buyer's-agent / investment-advisory yield-target
 > convention; SQM Research / CoreLogic gross-yield-by-dwelling-type series as a market anchor) and
 > `last_verified` updated. Until then the resolver surfaces the derived anchor as **decision-support /
-> indicative**, never as a target the investor must adopt. (Mirrors the [[capital-growth-bands]]
-> labelled-placeholder pattern, Son's call 2026-06-26.)
+> indicative**, never as a target the investor must adopt. (The labelled-placeholder pattern
+> [[capital-growth-bands]] used until its 2026-10-07 ABS re-grounding; Son's call 2026-06-26.)
 
 ## Why a default at all
 
