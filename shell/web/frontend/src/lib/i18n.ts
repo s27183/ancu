@@ -938,8 +938,8 @@ const messages = {
         en: 'The FIRB rules here are general information from cited sources, provided as is — not legal advice. What applies to you depends on your residency and the type of property; confirm with FIRB or a lawyer before you sign a contract.'
     },
     'chat.disclaimer': {
-        vi: 'Thông tin hỗ trợ quyết định — không phải tư vấn tài chính hay pháp lý.',
-        en: 'Decision-support information — not financial or legal advice.'
+        vi: 'Câu trả lời là thông tin để lập ngân sách, cung cấp nguyên trạng — không phải dịch vụ tư vấn pháp lý, thuế hay tài chính.',
+        en: 'Answers are information for budget planning, provided as is — not a legal, tax or financial advice service.'
     },
 
     'auth.signin': { vi: 'Đăng nhập', en: 'Sign in' },
