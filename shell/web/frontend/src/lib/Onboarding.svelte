@@ -19,21 +19,40 @@
     } from '$lib/onboarding';
     import { t } from '$lib/i18n';
     import { lang } from '$lib/stores/lang';
+    import type { OnboardingAnswers } from '$lib/pendingOnboarding';
 
-    let { stateCode, suburbName, suburbSal, onclose, onsignin, oncreated }: {
+    let { stateCode, suburbName, suburbSal, initial, onclose, onsignin, oncreated }: {
         stateCode: string;
         suburbName: string;
         suburbSal: string;
+        /** Answers restored after the sign-in round-trip (pendingOnboarding.ts). */
+        initial?: OnboardingAnswers;
         onclose: () => void;
-        onsignin: () => void;
+        /** Sign-in is needed; the answers so far ride along so they survive the redirect. */
+        onsignin: (answers: OnboardingAnswers) => void;
         /** The plan card was created — close the modal and reveal it in the Plan tab. */
         oncreated: () => void;
     } = $props();
 
-    let intent = $state<Intent | null>(null);
-    let citizenPr = $state<boolean | null>(null);
-    let firstHome = $state<boolean | null>(null);
-    let band = $state<BudgetBand | null>(null);
+    // Seeded once from `initial` (a restore), never re-synced — the user's taps own them after.
+    // svelte-ignore state_referenced_locally
+    let intent = $state<Intent | null>(initial?.intent ?? null);
+    // svelte-ignore state_referenced_locally
+    let citizenPr = $state<boolean | null>(initial?.citizenPr ?? null);
+    // svelte-ignore state_referenced_locally
+    let firstHome = $state<boolean | null>(initial?.firstHome ?? null);
+    // svelte-ignore state_referenced_locally
+    let band = $state.raw<BudgetBand | null>(
+        initial?.band != null ? (BUDGET_BANDS[initial.band] ?? null) : null
+    );
+    function answers(): OnboardingAnswers {
+        return {
+            intent,
+            citizenPr,
+            firstHome,
+            band: band === null ? null : BUDGET_BANDS.indexOf(band)
+        };
+    }
     let phase = $state<'form' | 'submitting' | 'created' | 'auth' | 'error'>('form');
 
     // The gate branches on intent (mode-c-wedge.md P5-activate) AND, orthogonally, on
@@ -133,7 +152,7 @@
         <div class="ob-terminal">
             <h3>{$t('onboarding.auth.title')}</h3>
             <p>{$t('onboarding.auth.body')}</p>
-            <button type="button" class="primary" onclick={onsignin}
+            <button type="button" class="primary" onclick={() => onsignin(answers())}
                 >{$t('onboarding.auth.cta')}</button
             >
         </div>

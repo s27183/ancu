@@ -9,7 +9,7 @@
     import { lang } from '$lib/stores/lang';
     import PlanProjection from '$lib/PlanProjection.svelte';
 
-    let { suburb, onclose, onplan, reloadPlan = 0 }: {
+    let { suburb, onclose, onplan, reloadPlan = 0, initialTab = 'zone' }: {
         suburb: Suburb;
         onclose: () => void;
         onplan: () => void;
@@ -17,13 +17,17 @@
          *  `{#key reloadPlan}`) so the Plan tab shows the new plan without a close/reopen.
          *  The user is already on the Plan tab here (the create CTA lives there). */
         reloadPlan?: number;
+        /** 'plan' when onboarding is restored after sign-in (behavior 18): the user left
+         *  from the Plan tab's create CTA, so they come back to it. */
+        initialTab?: 'zone' | 'plan';
     } = $props();
 
-    // Opens on the zone tab. The parent remounts this component per suburb
+    // Opens on the zone tab unless the parent says otherwise. The parent remounts this component per suburb
     // ({#key suburb.sal_code}), so `tab` resets naturally on a new selection —
     // no reset-in-$effect needed.
     type Tab = 'zone' | 'plan';
-    let tab = $state<Tab>('zone');
+    // svelte-ignore state_referenced_locally
+    let tab = $state<Tab>(initialTab);
 
     const nf = $derived(new Intl.NumberFormat($lang === 'vi' ? 'vi-VN' : 'en-AU'));
     const f = $derived(suburb.facts);
