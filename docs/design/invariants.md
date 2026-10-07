@@ -17,6 +17,10 @@ on purpose: it is not settled, and renaming must not touch the ground. "Rau",
 the name users read today, is temporary until a final one is chosen — Son,
 2026-10-06.)
 
+The plan is information provided as is, for budget planning across that
+lifecycle; the platform gives no legal, tax or financial advice service, and
+every disclaimer the user reads says so in those terms (Son, 2026-10-08).
+
 | Property | Falsified by |
 |---|---|
 | **Regulated figures are grounded** | a duty, grant, cap or fee on a plan card that differs from the official calculator, was written by the LLM rather than the resolver, or traces to a KB doc with no `sources:` |

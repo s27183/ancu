@@ -926,14 +926,16 @@ const messages = {
         vi: 'Chưa trả lời được câu hỏi này. Vui lòng thử lại.',
         en: 'Couldn’t answer that just now. Please try again.'
     },
-    // Behavior 20: the standing disclaimers on the plan projection and onboarding.
+    // Behavior 20: the standing disclaimers on the plan projection and onboarding. Their
+    // terms follow invariants.md (information as is, for budget planning; no legal, tax or
+    // financial advice service — Son 2026-10-08).
     'disclaimer.asic': {
-        vi: 'Thông tin hỗ trợ quyết định — không phải tư vấn tài chính, thuế hay pháp lý cá nhân. Hãy hỏi chuyên gia được cấp phép trước khi quyết định.',
-        en: 'Decision-support information — not personal financial, tax or legal advice. Talk to a licensed professional before you decide.'
+        vi: 'Thông tin để lập ngân sách mua, giữ và bán bất động sản, cung cấp nguyên trạng — không phải dịch vụ tư vấn pháp lý, thuế hay tài chính. Mỗi số liệu quy định đều ghi nguồn; hãy kiểm tra với chuyên gia có giấy phép trước khi hành động.',
+        en: 'Information for budgeting your property purchase, hold and sale, provided as is — not a legal, tax or financial advice service. Each regulated figure cites its source; check with a licensed professional before you act.'
     },
     'disclaimer.firb': {
-        vi: 'Yêu cầu FIRB phụ thuộc vào tình trạng cư trú và loại bất động sản của bạn; kế hoạch này không thay thế quyết định của FIRB. Hãy xác nhận với FIRB hoặc luật sư trước khi ký hợp đồng.',
-        en: 'FIRB requirements depend on your residency and the type of property; this plan does not replace FIRB’s decision. Confirm with FIRB or a lawyer before you sign a contract.'
+        vi: 'Các quy định FIRB ở đây là thông tin chung từ nguồn được trích dẫn, cung cấp nguyên trạng — không phải tư vấn pháp lý. Quy định áp dụng cho bạn tùy vào tình trạng cư trú và loại bất động sản; hãy xác nhận với FIRB hoặc luật sư trước khi ký hợp đồng.',
+        en: 'The FIRB rules here are general information from cited sources, provided as is — not legal advice. What applies to you depends on your residency and the type of property; confirm with FIRB or a lawyer before you sign a contract.'
     },
     'chat.disclaimer': {
         vi: 'Thông tin hỗ trợ quyết định — không phải tư vấn tài chính hay pháp lý.',
