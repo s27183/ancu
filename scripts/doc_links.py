@@ -4,8 +4,8 @@
 Usage: .venv/bin/python scripts/doc_links.py [root ...]   (default: docs)
 Exit 0 when every link resolves, 1 when any is broken.
 """
-# Reproducible -> P-7 analogue (a hand-kept copy drifts from what it copies) -> the docs tree -> a done check fails on a link that no longer lands
-# A link's target is a file in this repo and, after '#', a heading slug in it; both rot silently
+# Reproducible -> P-7 · One declaration per outcome shape -> Mechanisms -> a done check fails on a doc link that no longer lands
+# Analogue of P-7: a link is a hand-kept copy of a path and a heading. Its target is a file in this repo and, after '#', a heading slug in it; both rot silently
 # when a doc moves or a heading is reworded (measured 2026-10-06: 1889 links over 257 docs, 16
 # live broken targets). docs/design/archive is history, kept as written, so it is not checked
 # as a source; links INTO it are still checked. External URLs are not fetched. Slugs follow
