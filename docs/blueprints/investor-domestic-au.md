@@ -225,7 +225,8 @@ Mode C's base plan is sharper than Mode A's because investor reasoning often hap
     "traits": "{ experience_level } | null",          // Mode-C-activated — persistent disposition, accumulates across journeys (per-journey posture is plan.risk_tolerance, NOT here)
     // narrative
     "key_constraints": "array<localized_text>",       // bilingual (engine-output), canonical type — was array<string>
-    "key_strengths": "array<localized_text>"
+    "key_strengths": "array<localized_text>",
+    "key_assumptions": "array<localized_text>"         // the ordinarily-resident assumption for a household that may include a permanent resident (kb.copy.profile assume_pr_ordinarily_resident; kb.firb.status-determination) — [] when every applicant is a citizen
     // DROPPED primary_investment_goal → plan.investment_goals.primary (a plan fact, not an identity fact)
     // DROPPED negative_gearing_attractive → a tax_structure verdict (outcomes carry facts, not verdicts; §11.9)
   }

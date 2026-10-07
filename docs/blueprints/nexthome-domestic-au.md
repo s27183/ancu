@@ -240,6 +240,7 @@ The blueprint is a directed pipeline of thirteen components — the same count a
     "hold_horizon_years": "integer",
     "key_constraints": "array<localized_text>",
     "key_strengths": "array<localized_text>",
+    "key_assumptions": "array<localized_text>",        // the ordinarily-resident assumption for a household that may include a permanent resident (kb.copy.profile assume_pr_ordinarily_resident; kb.firb.status-determination) — [] when every applicant is a citizen
     "existing_home_ownership": "{ currently_owns_ppor: bool, ppor_estimated_value: money|null, ppor_outstanding_loan_balance: money|null, ppor_loan_rate_type: enum [fixed, variable, unknown]|null, ppor_rental_history: bool }"
   }
 }
