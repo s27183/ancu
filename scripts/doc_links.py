@@ -8,7 +8,8 @@ Exit 0 when every link resolves, 1 when any is broken.
 # Analogue of P-7: a link is a hand-kept copy of a path and a heading. Its target is a file in this repo and, after '#', a heading slug in it; both rot silently
 # when a doc moves or a heading is reworded (measured 2026-10-06: 1889 links over 257 docs, 16
 # live broken targets). docs/design/archive is history, kept as written, so it is not checked
-# as a source; links INTO it are still checked. External URLs are not fetched. Slugs follow
+# as a source; links INTO it are still checked. External URLs are not fetched, and a path
+# that leaves the repo (a sibling project's doc) is skipped: it resolves only on one machine. Slugs follow
 # GitHub's rendering: lowercase, punctuation dropped except '-' and '_', spaces to '-', letters
 # of any script kept (Vietnamese headings included), a repeated heading gets -1, -2 (behavior 16).
 import re
@@ -92,6 +93,8 @@ def check(md: Path):
             if path_part:
                 base = REPO if path_part.startswith("/") else md.parent
                 dest = (base / path_part.lstrip("/")).resolve()
+                if not dest.is_relative_to(REPO):
+                    continue  # a sibling repo's doc: not intra-repo, depends on the checkout's neighbours
                 if not dest.exists():
                     yield "file", n, t
                     continue
