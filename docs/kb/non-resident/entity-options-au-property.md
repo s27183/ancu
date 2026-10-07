@@ -10,6 +10,7 @@ sources:
     note: "SECONDARY (Allens) for the FATA foreign-person look-through. Verified via WebSearch corroboration 2026-07-06: a corporation/trust/partnership is a foreign person if a single foreign person holds a substantial interest of ≥20%, or two-or-more hold an aggregate substantial interest of ≥40% — CONFIRMED (ordinarily-resident = 200+ days in preceding 12 months)."
   - url: https://www.legislation.gov.au/C2004A00289/latest/text
     note: "POINTER (not re-fetched this session; canonical home of the fact) — Foreign Acquisitions and Takeovers Act 1975 (Cth): foreign-person definition and substantial-interest thresholds. The 20%/40% thresholds were corroborated this session via the Allens overview above."
+---
 
 # Ownership entity — the non-resident-specific restrictions
 
