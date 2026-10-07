@@ -64,6 +64,31 @@ run (autoprovision + zero-inbox magic-link on, both DB URLs set); no edits neede
 Real LLM planning is optional — the engine defaults to a stub sidecar that needs no API key
 (see [the bottom](#optional-real-llm-planning)).
 
+### The seat's path — `scripts/dev_stack.sh`, one command, no docker
+
+<!-- Reproducible -> P-2 · The database is the single source of truth -> the dev stack -> one script, loopback, private socket
+A Claude seat has no docker and must not touch the shared :5432, so it runs all three
+from one script instead: both databases on the clone's private Postgres socket
+(`.git/enacs-pg`), every listener on 127.0.0.1 (`FH_HTTP_IP`, vite `--host`). Measured
+2026-10-07 (behavior 24): stack up, magic-link sign-in, a Mode C plan filled in Chrome. -->
+
+```
+bash scripts/dev_stack.sh     # engine :8080, shell :8081, frontend :5173 — all 127.0.0.1; logs in .git/enacs-dev-stack/
+```
+
+A fresh engine DB has no suburbs, so the map has nothing to open. Load them with the
+repo's own adapters (they fetch from the ABS; the VIC prices are committed):
+
+```
+export ENGINE_DATABASE_URL="host=$PWD/.git/enacs-pg dbname=firsthomey_engine"
+.venv/bin/python -m engine.build.suburbs.abs_census   # the spine, ~15k suburbs
+.venv/bin/python -m engine.build.suburbs.abs_asgs     # centroids
+.venv/bin/python -m engine.build.suburbs.vic_vpsr     # VIC median prices
+```
+
+The dev sign-in link names `APP_BASE_URL` from `.env` (`http://localhost:5173`); open the
+app at `localhost:5173` too, so the session cookie and the page share a host.
+
 ---
 
 ## Try it
