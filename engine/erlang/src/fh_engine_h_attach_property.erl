@@ -15,6 +15,7 @@
 %% flight) — so a base turn and a Phase-B turn never race on the same card.
 
 -export([init/2]).
+-export([validate_card/2]).  %% the attach gate, exported for its conformance escript
 
 init(Req0, State) ->
     case cowboy_req:method(Req0) of
@@ -55,7 +56,7 @@ attach(T, U, PlanCardId, Card, PropertyCard, Req, State) ->
                   <<"detail">> => <<"per-property attachment is wired for "
                                     "investor-domestic-au (Slice A) only">>}, Req), State};
         true ->
-            case validate_card(PropertyCard) of
+            case validate_card(Slug, PropertyCard) of
                 {error, Field} ->
                     {ok, fh_engine_http:reply_json(400,
                         #{<<"error">> => <<"invalid_property_card">>,
@@ -110,19 +111,42 @@ supports_phase_b(_)                          -> false.
 %% The four neutral facts the property_assessment resolver copies into property_fit_investor;
 %% price must be a number (it grounds the resolver-computed gross yield). The richer facts
 %% (year_built, land_size, strata) are agent grounding — optional, validated by the fill.
-validate_card(Card) when is_map(Card) ->
+%%
+%% Honest-partial -> P-7 · One declaration per outcome shape -> The engine -> property_type gated by the compiled enum
+%% A property is attached only if its plan's outcome can hold its property_type: the allowed
+%% set is the blueprint's compiled property_fit outcome enum, read here — never a list kept
+%% beside this module — so dual_occupancy, nrass, vacant_land or any unknown string gets a 400
+%% naming the allowed types instead of a turn whose fill must fail on the enum (behavior 26,
+%% #32). Measured 2026-10-08: test/attach_property_type_conformance.escript, 10 anchors pass
+%% against priv/kb/artifact.json.
+validate_card(Slug, Card) when is_map(Card) ->
     case maps:get(<<"price">>, Card, undefined) of
         P when is_number(P), P > 0 ->
             Required = [<<"state">>, <<"suburb">>, <<"property_type">>],
             case [F || F <- Required, not is_nonempty_binary(maps:get(F, Card, undefined))] of
-                []      -> ok;
+                []      -> check_property_type(Slug, maps:get(<<"property_type">>, Card));
                 [F | _] -> {error, <<F/binary, " is required">>}
             end;
         _ ->
             {error, <<"price (a positive number) is required">>}
     end;
-validate_card(_) ->
+validate_card(_, _) ->
     {error, <<"property_card must be a JSON object">>}.
+
+check_property_type(Slug, Type) ->
+    Allowed = allowed_property_types(Slug),
+    case lists:member(Type, Allowed) of
+        true  -> ok;
+        false -> {error, iolist_to_binary([<<"property_type must be one of ">>,
+                                           lists:join(<<", ">>, Allowed)])}
+    end.
+
+%% The property_type options of the blueprint's property_fit outcome (the one outcome type
+%% whose name starts property_fit, e.g. property_fit_investor), from the compiled registry.
+allowed_property_types(Slug) ->
+    Types = fh_engine_kb:registry(Slug, <<"outcome_types">>),
+    [Fit] = [V || {K, V} <- maps:to_list(Types), binary:match(K, <<"property_fit">>) =:= {0, 12}],
+    maps:get(<<"options">>, maps:get(<<"property_type">>, Fit)).
 
 is_nonempty_binary(B) when is_binary(B), B =/= <<>> -> true;
 is_nonempty_binary(_)                               -> false.
