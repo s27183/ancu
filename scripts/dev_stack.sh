@@ -4,7 +4,7 @@
 #
 #   bash scripts/dev_stack.sh        (Ctrl-C, or killing it, stops all three)
 #
-# Reproducible -> P-2 · The database is the single source of truth -> the dev stack -> one script, loopback, private socket
+# Reproducible -> P-2 · The database is the single source of truth -> Mechanisms -> one script, loopback, private socket
 # The per-component bin/dev launchers need docker (engine) and Son's shared :5432 (shell);
 # a seat has neither, and runs this instead (behavior 24, 2026-10-07). It runs outside the
 # sandbox as a granted Need because the root .env (the planner's token, sign-in settings)
