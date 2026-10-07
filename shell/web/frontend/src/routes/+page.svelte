@@ -89,9 +89,10 @@
     // --- Saved-plans + name filter (state × saved × name) --------------------
     // "Suburbs with a saved plan" = those whose name matches a plan-card title — the
     // SAME binding PlanProjection uses (title === suburb name). Signed-in only
-    // (listPlanCards 401 → []). KNOWN LIMIT: a title is just the name, so under ALL
-    // scope a duplicate name (Richmond Vic/NSW) matches in both states; fixing needs
-    // state in the card title (a data-model change) — out of scope here.
+    // (listPlanCards 401 → []). The name is a sound key under ALL scope: ABS SAL names
+    // are nationally unique, state-tagged where they collide ("Richmond (Vic.)" vs
+    // "Richmond (NSW)"); measured 2026-10-07, 15,345 suburbs, 0 duplicate names
+    // (behavior 19). If a future source ever drops the tag, bind on sal_code instead.
     let savedTitles = $state<Set<string>>(new Set());
     let savedOnly = $state(false);
     let nameQuery = $state('');
