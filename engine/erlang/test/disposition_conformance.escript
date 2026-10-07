@@ -20,7 +20,8 @@
 %%   5. dispose_cash_events — mirror the cash_event shape (phase=dispose, timing=one_off,
 %%      source_component=disposition), honest-partial drop on null amount (purchase_journey
 %%      PLACES these on the swimlane's Dispose column, TW3).
-%%   6. GROWTH PLACEHOLDER surfaced + bilingual key_assumptions (the §8.4 ASIC discipline).
+%%   6. GROWTH BASIS surfaced (ABS-sourced band, or PLACEHOLDER when the doc says so) +
+%%      bilingual key_assumptions (the §8.4 ASIC discipline).
 %%   7. LAYER-1 CONFORMANCE — every state passes fh_engine_outcome:validate/2 against the
 %%      compiled `disposition` schema (the fail-closed commit-seam check is strict now).
 %%
@@ -115,15 +116,15 @@ figure_cases() ->
     [check("renderer = calculator", Renderer, <<"calculator">>),
      check("horizon_years = 10", g(Outcome, <<"horizon_years">>), 10),
      check("sale_proceeds = ceiling 800000 × growth band over H=10", g(Outcome, <<"sale_proceeds">>),
-           [975196, 1303116]),
+           [1075133, 1432678]),
      check("selling_costs = commission band × sale + legal + marketing", g(Outcome, <<"selling_costs">>),
-           [16428, 56109]),
+           [17927, 60644]),
      check("loan_payout = P&I remaining balance at year 10 (560000 @ 6.0%)", g(Outcome, <<"loan_payout">>),
            [468640, 468640]),
      check("net_proceeds = sale − selling − loan − cgt (interval arithmetic)", g(Outcome, <<"net_proceeds">>),
-           [450447, 818048]),
+           [545849, 946111]),
      check("full_horizon_net_position = net − acquire − hold×H (placed)",
-           g(Outcome, <<"full_horizon_net_position">>), [209447, 596048])].
+           g(Outcome, <<"full_horizon_net_position">>), [304849, 724111])].
 
 %% --- 2. place-never-recompute: net/full are the exported interval arithmetic ---
 
@@ -141,9 +142,9 @@ arithmetic_cases() ->
            g(Outcome, <<"full_horizon_net_position">>), FullFromExport),
      %% interval discipline: net_lo subtracts the HIGH cost ends, net_hi the LOW ends
      check("net_lo = sale_lo − selling_hi − loan_hi − cgt_hi",
-           hd(g(Outcome, <<"net_proceeds">>)), 975196 - 56109 - 468640 - 0),
+           hd(g(Outcome, <<"net_proceeds">>)), 1075133 - 60644 - 468640 - 0),
      check("net_hi = sale_hi − selling_lo − loan_lo − cgt_lo",
-           lists:last(g(Outcome, <<"net_proceeds">>)), 1303116 - 16428 - 468640 - 0)].
+           lists:last(g(Outcome, <<"net_proceeds">>)), 1432678 - 17927 - 468640 - 0)].
 
 %% --- 3. CGT (Mode-A main residence) -----------------------------------------
 
@@ -184,8 +185,8 @@ per_property_cases() ->
              <<"property_fit_investor">> => Pf},
     {O, _} = fill(Up),
     [SaleLo, _] = g(O, <<"sale_proceeds">>),
-    [check("per-property: sale_proceeds uses the ATTACHED 920k (lo > 1.0M; the base 800k gives 975196)",
-           SaleLo > 1000000, true),
+    [check("per-property: sale_proceeds uses the ATTACHED 920k (lo = 920k × 1.03^10 = 1236403; the base 800k gives 1075133)",
+           SaleLo, 1236403),
      check("per-property: loan_payout computes (cash_position loan_amount present, B3b)",
            is_list(g(O, <<"loan_payout">>)), true),
      check("per-property: taxable_gain computes (indicative pre-clawback band)",
@@ -197,10 +198,10 @@ per_property_cases() ->
      check("per-property: full_horizon_net_position null (net null — correctly regulated-gated)",
            g(O, <<"full_horizon_net_position">>), null),
      %% base behaviour unchanged: NO property_fit_investor → the profile ceiling (800k) basis.
-     check("base (no property): sale_proceeds still uses the 800k ceiling (lo = 975196)",
+     check("base (no property): sale_proceeds still uses the 800k ceiling (lo = 1075133)",
            begin {B, _} = fill(inv_upstream(inv_profile(<<"resident">>),
                                             inv_tax(<<"personal_sole">>, null, true))),
-                 [BLo, _] = g(B, <<"sale_proceeds">>), BLo end, 975196)].
+                 [BLo, _] = g(B, <<"sale_proceeds">>), BLo end, 1075133)].
 
 investor_cases() ->
     Clean    = inv_upstream(inv_profile(<<"resident">>), inv_tax(<<"personal_sole">>, 37.0, false)),
@@ -225,8 +226,8 @@ investor_cases() ->
     {TV4, _} = fill(inv_upstream(inv_profile(<<"resident">>),     inv_tax(<<"personal_sole">>, null, false))),
     [check("investor renderer = calculator", CR, <<"calculator">>),
      check("clean: taxable_gain = (sale − 800000 cost base) × 50% discount", g(C, <<"taxable_gain">>),
-           [87598, 251558]),
-     check("clean: cgt = taxable_gain × 37% marginal rate", Cgt, [32411, 93076]),
+           [137567, 316339]),
+     check("clean: cgt = taxable_gain × 37% marginal rate", Cgt, [50900, 117045]),
      check("clean: cgt_status = computed", g(C, <<"cgt_status">>), <<"computed">>),
      check("clean: loan_payout = investment-loan amortised @6.35% (no second computer)", Loan, LoanExp),
      check("clean: net_proceeds = exported interval arithmetic (sale−sell−loan−cgt)",
@@ -251,18 +252,18 @@ investor_cases() ->
      %% exported cgt_investor/4 verdict surface
      check("cgt_investor/4 clean → {gain, cgt, computed}",
            fh_engine_disposition:cgt_investor(inv_profile(<<"resident">>),
-               inv_tax(<<"personal_sole">>, 37.0, false), [975196, 1303116], 800000),
-           {[87598, 251558], [32411, 93076], <<"computed">>}),
+               inv_tax(<<"personal_sole">>, 37.0, false), [1075133, 1432678], 800000),
+           {[137567, 316339], [50900, 117045], <<"computed">>}),
      %% held < 12 months: undiscounted, still computed
-     check("held <12mo: taxable_gain undiscounted (0% discount)", g(U, <<"taxable_gain">>), [175196, 503116]),
-     check("held <12mo: cgt = full gain × 37%", g(U, <<"cgt">>), [64823, 186153]),
+     check("held <12mo: taxable_gain undiscounted (0% discount)", g(U, <<"taxable_gain">>), [275133, 632678]),
+     check("held <12mo: cgt = full gain × 37%", g(U, <<"cgt">>), [101799, 234091]),
      check("held <12mo: cgt_status = computed", g(U, <<"cgt_status">>), <<"computed">>),
      %% clawback trap: to_verify ⟹ cgt null ⟹ net/full PENDING; indicative gain STILL surfaced
      check("clawback: cgt_status = to_verify", g(TV1, <<"cgt_status">>), <<"to_verify">>),
      check("clawback: cgt = null (dollar deferred to a tax agent)", g(TV1, <<"cgt">>), null),
      check("clawback: net_proceeds PENDING", g(TV1, <<"net_proceeds">>), null),
      check("clawback: full_horizon PENDING", g(TV1, <<"full_horizon_net_position">>), null),
-     check("clawback: indicative taxable_gain STILL surfaced", g(TV1, <<"taxable_gain">>), [87598, 251558]),
+     check("clawback: indicative taxable_gain STILL surfaced", g(TV1, <<"taxable_gain">>), [137567, 316339]),
      check("clawback: cgt dispose event dropped (honest-partial)", lists:member(<<"dispose_cgt">>, ev_ids(TV1)), false),
      %% other traps: to_verify, cgt null
      check("non-resident period: cgt_status = to_verify", g(TV2, <<"cgt_status">>), <<"to_verify">>),
@@ -291,8 +292,8 @@ honest_partial_cases() ->
      check("H=null: only the set-horizon invitation assumption",
            length(g(A, <<"key_assumptions">>)), 1),
      %% loan-pending: sale/selling banded, loan/net/full PENDING — no fabricated point.
-     check("H set, loan unknown: sale banded", g(B, <<"sale_proceeds">>), [975196, 1303116]),
-     check("H set, loan unknown: selling banded", g(B, <<"selling_costs">>), [16428, 56109]),
+     check("H set, loan unknown: sale banded", g(B, <<"sale_proceeds">>), [1075133, 1432678]),
+     check("H set, loan unknown: selling banded", g(B, <<"selling_costs">>), [17927, 60644]),
      check("H set, loan unknown: loan PENDING", g(B, <<"loan_payout">>), null),
      check("H set, loan unknown: net PENDING", g(B, <<"net_proceeds">>), null),
      check("H set, loan unknown: full PENDING", g(B, <<"full_horizon_net_position">>), null)].
@@ -318,18 +319,18 @@ event_cases() ->
      check("sale event: timing=one_off, is_estimate=true, amount carried",
            {maps:get(<<"timing">>, Sale), maps:get(<<"is_estimate">>, Sale),
             maps:get(<<"amount">>, Sale)},
-           {<<"one_off">>, true, [975196, 1303116]}),
+           {<<"one_off">>, true, [1075133, 1432678]}),
      check("loan event: out / lender", {maps:get(<<"direction">>, Loan),
             maps:get(<<"counterparty">>, Loan)}, {<<"out">>, <<"lender">>}),
      check("loan-pending: loan event dropped (honest-partial), sale+selling remain", NoLoanIds,
            [<<"dispose_sale_proceeds">>, <<"dispose_selling_costs">>])].
 
-%% --- 6. growth placeholder surfaced + bilingual assumptions ------------------
+%% --- 6. growth basis surfaced + bilingual assumptions -------------------------
 
 assumption_cases() ->
     {Full, _} = fill(full_upstream()),
     Assumptions = g(Full, <<"key_assumptions">>),
-    %% 5 lines when H set + loan known: horizon, growth placeholder, cgt basis, selling
+    %% 5 lines when H set + loan known: horizon, growth basis, cgt basis, selling
     %% costs, the representative loan-rate basis (seam B — the amortisation rate is a
     %% labelled KB convention, surfaced).
     AllBilingual = lists:all(fun bilingual/1, Assumptions),
@@ -338,12 +339,17 @@ assumption_cases() ->
             Vi = maps:get(<<"vi">>, L, <<>>),
             lists:any(fun(C) -> C > 127 end, unicode:characters_to_list(Vi))
         end, Assumptions),
-    %% the growth placeholder line carries the band ends (2 / 5) substituted into prose.
+    %% the growth line carries the ABS-sourced band ends (3–6) and names its series; no line
+    %% says PLACEHOLDER (the band doc's is_placeholder is false — behavior 12).
     GrowthMentionsBand = lists:any(
         fun(L) ->
             En = maps:get(<<"en">>, L, <<>>),
-            binary:match(En, <<"2">>) =/= nomatch andalso binary:match(En, <<"5">>) =/= nomatch
+            binary:match(En, <<"3–6%"/utf8>>) =/= nomatch andalso
+            binary:match(En, <<"ABS Total Value of Dwellings">>) =/= nomatch
         end, Assumptions),
+    NoPlaceholder = lists:all(
+        fun(L) -> binary:match(maps:get(<<"en">>, L, <<>>), <<"PLACEHOLDER">>) =:= nomatch end,
+        Assumptions),
     LoanRateStated = lists:any(
         fun(L) ->
             En = maps:get(<<"en">>, L, <<>>),
@@ -354,7 +360,8 @@ assumption_cases() ->
            length(Assumptions), 5),
      check("every key_assumption is bilingual {vi,en}, both non-empty + distinct", AllBilingual, true),
      check("a key_assumption carries real Vietnamese (non-ASCII)", AnyDiacritic, true),
-     check("growth assumption surfaces the placeholder band (2 / 5 %)", GrowthMentionsBand, true),
+     check("growth assumption names ABS Total Value of Dwellings with the 3–6% band", GrowthMentionsBand, true),
+     check("no key_assumption says PLACEHOLDER", NoPlaceholder, true),
      check("loan-rate assumption stated (representative rate, a labelled convention)", LoanRateStated, true)]
     ++ growth_key_cases().
 

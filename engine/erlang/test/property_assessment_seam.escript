@@ -307,10 +307,11 @@ main(_) ->
     expect(is_map(DpEntry), "disposition snapshotted under the addendum (Slice B3c)"),
     Disp = maps:get(<<"outcome">>, DpEntry),
     %% sale_proceeds uses the attached 920k (price × growth^H) — a band off the property, not the
-    %% profile range. The base ceiling (800k) gives lo=975196; the 920k property gives lo > 1.0M.
+    %% profile range. The base ceiling (800k) gives lo=1075133; the 920k property gives
+    %% lo = 920k × 1.03^10 = 1236403 (the ABS-sourced 3–6% band, behavior 12).
     [SaleLo, SaleHi] = maps:get(<<"sale_proceeds">>, Disp),
-    expect(is_integer(SaleLo) andalso SaleLo =< SaleHi andalso SaleLo > 1000000,
-           "sale_proceeds uses the attached 920k (lo > 1.0M, banded growth projection)"),
+    expect(SaleLo =:= 1236403 andalso SaleLo =< SaleHi,
+           "sale_proceeds uses the attached 920k (lo = 1236403, banded growth projection)"),
     %% loan_payout now computes (cash_position supplied loan_amount=736k, B3b).
     expect(is_list(maps:get(<<"loan_payout">>, Disp)),
            "loan_payout computes (amortised off the per-property loan_amount)"),
