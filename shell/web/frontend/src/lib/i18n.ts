@@ -926,6 +926,15 @@ const messages = {
         vi: 'Chưa trả lời được câu hỏi này. Vui lòng thử lại.',
         en: 'Couldn’t answer that just now. Please try again.'
     },
+    // Behavior 20: the standing disclaimers on the plan projection and onboarding.
+    'disclaimer.asic': {
+        vi: 'Thông tin hỗ trợ quyết định — không phải tư vấn tài chính, thuế hay pháp lý cá nhân. Hãy hỏi chuyên gia được cấp phép trước khi quyết định.',
+        en: 'Decision-support information — not personal financial, tax or legal advice. Talk to a licensed professional before you decide.'
+    },
+    'disclaimer.firb': {
+        vi: 'Yêu cầu FIRB phụ thuộc vào tình trạng cư trú và loại bất động sản của bạn; kế hoạch này không thay thế quyết định của FIRB. Hãy xác nhận với FIRB hoặc luật sư trước khi ký hợp đồng.',
+        en: 'FIRB requirements depend on your residency and the type of property; this plan does not replace FIRB’s decision. Confirm with FIRB or a lawyer before you sign a contract.'
+    },
     'chat.disclaimer': {
         vi: 'Thông tin hỗ trợ quyết định — không phải tư vấn tài chính hay pháp lý.',
         en: 'Decision-support information — not financial or legal advice.'

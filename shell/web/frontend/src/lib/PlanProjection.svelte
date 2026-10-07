@@ -1426,4 +1426,10 @@
             {#if failure.retry}<button type="button" onclick={load}>{$t('plan.retry')}</button>{/if}
         </div>
     {/if}
+    <!-- Behavior 20: every plan carries the ASIC decision-support line; a foreign-buyer
+         plan (Mode B fhb-foreign-au, Mode D investor-foreign-au) also the FIRB line. -->
+    <footer class="pp-disclaimers">
+        <p>{$t('disclaimer.asic')}</p>
+        {#if blueprintSlug.includes('-foreign-')}<p>{$t('disclaimer.firb')}</p>{/if}
+    </footer>
 {/if}
