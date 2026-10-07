@@ -26,7 +26,7 @@
 %%   HTTP — POST /api/billing/webhook with a signed body returns 200 and persists the
 %%   row (proves the route + raw-body read + handler, fh_shell_h_billing).
 %%
-%%   SHELL_DATABASE_URL=postgres://shell:shell_dev_pw@localhost:5434/firsthomey_shell?sslmode=disable \
+%%   SHELL_DATABASE_URL=postgres://shell:shell_dev_pw@localhost:5434/ancu_shell?sslmode=disable \
 %%   ERL_LIBS=_build/default/lib escript test/billing_webhook_smoke.escript
 
 -mode(compile).

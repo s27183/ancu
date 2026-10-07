@@ -12,7 +12,7 @@
 %% SIDECAR-FREE (resolver-only), like refine_smoke: the card is SEEDED directly in PG (a
 %% real create would run a full base turn needing the Python planner). Run from
 %% engine/erlang with PG up (engine/compose.yaml :5433, or the brew :5432 fallback):
-%%   ENGINE_DATABASE_URL=postgres://engine:engine_dev_pw@localhost:5433/firsthomey_engine?sslmode=disable \
+%%   ENGINE_DATABASE_URL=postgres://engine:engine_dev_pw@localhost:5433/ancu_engine?sslmode=disable \
 %%   ENGINE_DEV_PROVISION=0 ERL_LIBS=_build/default/lib escript test/simulate_http_smoke.escript
 
 -mode(compile).

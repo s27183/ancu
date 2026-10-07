@@ -19,7 +19,7 @@
 %% the engine's dev Postgres (5433, populated by the build adapters). Run from
 %% shell/web/backend:
 %%
-%%   ENGINE_DATABASE_URL=postgres://engine:engine_dev_pw@localhost:5433/firsthomey_engine?sslmode=disable \
+%%   ENGINE_DATABASE_URL=postgres://engine:engine_dev_pw@localhost:5433/ancu_engine?sslmode=disable \
 %%   ERL_LIBS=_build/default/lib:../../../engine/erlang/_build/default/lib \
 %%   escript test/suburbs_proxy_smoke.escript
 

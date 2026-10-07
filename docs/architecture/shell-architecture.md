@@ -20,7 +20,7 @@ The frontend never talks to the engine directly — it always goes through the E
                           │  Engine  (already built)            │
                           │    Erlang gateway (Cowboy)  :8080   │
                           │    Python sidecars (per-turn)       │
-                          │    Postgres: firsthomey_engine      │
+                          │    Postgres: ancu_engine      │
                           │      profiles, plan_cards,          │
                           │      plan_card_events, sessions,    │
                           │      audit_events, suburbs          │
@@ -41,7 +41,7 @@ The frontend never talks to the engine directly — it always goes through the E
                         │       mints engine tenant JWT          │
                         │       proxies /api/engine/* + SSE       │
                         │       commerce · usage consumer        │
-                        │    Postgres: firsthomey_shell          │
+                        │    Postgres: ancu_shell          │
                         │       users(+role), magic_tokens,      │
                         │       subscriptions, charges,          │
                         │       usage_records, timnha_requests   │
@@ -119,9 +119,9 @@ shell/
 │   │       │   ├── curator/             Tìm Nhà console (role-gated: curator)
 │   │       │   └── admin/               user/role mgmt (role-gated: admin)
 │   │       └── lib/                     components, stores (auth + locale), i18n (vi default, en)
-│   ├── backend/                        Erlang/OTP (port 8081, Postgres firsthomey_shell)
+│   ├── backend/                        Erlang/OTP (port 8081, Postgres ancu_shell)
 │   │   ├── src/                        fh_shell_*  (see §5)
-│   │   ├── priv/migrations/            firsthomey_shell schema
+│   │   ├── priv/migrations/            ancu_shell schema
 │   │   └── rebar.config
 │   └── README.md
 └── extension/                          ← Phase B browser extension (property capture); own tenant
@@ -136,10 +136,10 @@ The curator console is a role-gated *route group* inside the one web shell (alea
 Mirrors aleap's `aleap_shell_*` naming so the two backends read alike. Wedge-1a-essential modules first; commerce + curator land later.
 
 ```
-shell/web/backend/src/                  ← Erlang (port 8081, Postgres firsthomey_shell)
+shell/web/backend/src/                  ← Erlang (port 8081, Postgres ancu_shell)
 ├── fh_shell_app.erl                    application entry, .env loader, cowboy routes
 ├── fh_shell_sup.erl                    root supervisor
-├── fh_shell_db.erl                     PGO pool — firsthomey_shell
+├── fh_shell_db.erl                     PGO pool — ancu_shell
 ├── fh_shell_http.erl                   cowboy listener + routing + request helpers
 ├── fh_shell_health_handler.erl         /health
 ├── fh_shell_login.erl                  Resend magic-link, Google OAuth
@@ -171,7 +171,7 @@ The shell-backend is a **proxy + identity/commerce layer** in front of the engin
 
 ---
 
-## 6. Shell database — `firsthomey_shell`
+## 6. Shell database — `ancu_shell`
 
 One Postgres, owned entirely by the shell. Never read by the engine; never joined cross-DB ([`engine-contract.md`](engine-contract.md) §9.2/§9.3). Holds identity, display state, and commerce — **never** canonical plan content (that's engine `plan_cards`).
 
@@ -222,11 +222,11 @@ Aleap-aligned: two backends + one frontend. Not yet provisioned.
 
 | Service | Source | Runtime | Port | DB | Hosting (target) |
 |---|---|---|---|---|---|
-| Engine | `engine/` | Erlang/OTP + Python (one container) | 8080 | `firsthomey_engine` | TBD (aleap uses DO App Platform) |
-| Shell backend | `shell/web/backend/` | Erlang/OTP | 8081 | `firsthomey_shell` | TBD |
+| Engine | `engine/` | Erlang/OTP + Python (one container) | 8080 | `ancu_engine` | TBD (aleap uses DO App Platform) |
+| Shell backend | `shell/web/backend/` | Erlang/OTP | 8081 | `ancu_shell` | TBD |
 | Shell frontend | `shell/web/frontend/` | SvelteKit (Cloudflare Pages adapter) | n/a | — | Cloudflare Pages |
 
-**Local dev.** Engine against local `firsthomey_engine`; shell backend against `firsthomey_shell` (created when the shell lands). Each backend reads its own `DATABASE_URL` from `.env`. The shell-backend additionally holds `SHELL_JWT_SECRET` (user JWT), the engine tenant signing keypair, and Resend/Google credentials.
+**Local dev.** Engine against local `ancu_engine`; shell backend against `ancu_shell` (created when the shell lands). Each backend reads its own `DATABASE_URL` from `.env`. The shell-backend additionally holds `SHELL_JWT_SECRET` (user JWT), the engine tenant signing keypair, and Resend/Google credentials.
 
 ---
 

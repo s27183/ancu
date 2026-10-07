@@ -22,11 +22,11 @@ mkdir -p "$logs"
 
 export FH_HTTP_IP=127.0.0.1
 export FH_ENGINE_HTTP_PORT=8080 FH_SHELL_HTTP_PORT=8081
-export ENGINE_DATABASE_URL="postgres://$user@$enc/firsthomey_engine"
-export SHELL_DATABASE_URL="postgres://$user@$enc/firsthomey_shell"
+export ENGINE_DATABASE_URL="postgres://$user@$enc/ancu_engine"
+export SHELL_DATABASE_URL="postgres://$user@$enc/ancu_shell"
 export ENGINE_BASE_URL="http://127.0.0.1:8080/api/engine"   # the shell appends /dev/tenants, /plan-cards…
 
-for db in firsthomey_engine firsthomey_shell; do
+for db in ancu_engine ancu_shell; do
     createdb -h "$sock" "$db" 2>/dev/null || true   # exists → no-op
 done
 

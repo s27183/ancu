@@ -7,7 +7,7 @@ import { browser } from '$app/environment';
 
 export type Lang = 'vi' | 'en';
 
-const KEY = 'firsthomey-lang';
+const KEY = 'ancu-lang';
 
 function initial(): Lang {
     if (!browser) return 'vi';

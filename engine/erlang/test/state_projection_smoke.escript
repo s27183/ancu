@@ -8,7 +8,7 @@
 %% (state="ALL") yields the full VIC scheme stack — the East-Melbourne fix. Needs the
 %% suburbs table populated (build adapters) + the engine DB. Run from engine/erlang:
 %%
-%%   ENGINE_DATABASE_URL=postgres://engine:engine_dev_pw@localhost:5433/firsthomey_engine?sslmode=disable \
+%%   ENGINE_DATABASE_URL=postgres://engine:engine_dev_pw@localhost:5433/ancu_engine?sslmode=disable \
 %%     ERL_LIBS=_build/default/lib escript test/state_projection_smoke.escript
 
 -mode(compile).

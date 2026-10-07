@@ -20,10 +20,10 @@ user="$(id -un)"
 case "${1:-}" in
   mode_b_seam_smoke|mode_d_seam_smoke|sidecar_kill_smoke|concern_isolation_smoke|restart_replay_smoke)
     dir="$root/engine/erlang"
-    export ENGINE_DATABASE_URL="postgres://$user@$enc/firsthomey_engine" ;;
+    export ENGINE_DATABASE_URL="postgres://$user@$enc/ancu_engine" ;;
   sse_isolation_smoke)
     dir="$root/shell/web/backend"
-    export SHELL_DATABASE_URL="postgres://$user@$enc/firsthomey_shell" ;;
+    export SHELL_DATABASE_URL="postgres://$user@$enc/ancu_shell" ;;
   *)
     echo "usage: bash scripts/live_smoke.sh <mode_b_seam_smoke|mode_d_seam_smoke|sidecar_kill_smoke|concern_isolation_smoke|restart_replay_smoke|sse_isolation_smoke>" >&2
     exit 2 ;;
