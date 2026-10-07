@@ -88,7 +88,7 @@ Notes:
 - **`amount` is a flat $10,000** — not means tested, not value-scaled (a grant, unlike the duty concessions whose benefit scales with price). It is filled directly; no resolver arithmetic.
 - **`ever_owned_au_property` only** — Australia-only test, so `prior_overseas_property_ownership` is deliberately not consulted (the same neutral fact that disqualifies under QLD is not in this predicate).
 - **`fhog.applicable` already carries `derived_from: property_fit.property_type`** in the blueprint — the new-homes-only restriction is the substance of that derivation, encoded here as the `property_type in [...new...]` criterion.
-- **Spouse ownership history IS now encoded** as a couple-as-one predicate (`non_buying_partner.ever_owned_au_property`, F4/G2). The earlier "no spouse facts on the surface" rationale no longer holds — `non_buying_partner` is now a typed namespace on the resolver-input registry ([`registry-projection.md`](../../architecture/registry-projection.md)), so the "promote to facts when load-bearing" threshold is met. A buyer with no partner declared (`non_buying_partner.exists = false`) passes the gate.
+- **Spouse ownership history IS now encoded** as a couple-as-one predicate (`non_buying_partner.ever_owned_au_property`, F4/G2). The earlier "no spouse facts on the surface" rationale no longer holds — `non_buying_partner` is now a typed namespace on the resolver-input registry ([`registry-projection.md`](../../../architecture/registry-projection.md)), so the "promote to facts when load-bearing" threshold is met. A buyer with no partner declared (`non_buying_partner.exists = false`) passes the gate.
 
 ## Sources
 

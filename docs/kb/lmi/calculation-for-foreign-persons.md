@@ -23,7 +23,7 @@ For a domestic FHB, LMI is the standard way to borrow above 80% LVR with a small
 
 ## Where LMI *does* re-enter
 
-- **Temporary resident earning AUD in Australia.** Assessed near-domestic, some lenders will lend above 80% LVR **with LMI** — the ordinary mechanics of [`kb.lmi.calculation`](calculation.md) then apply, subject to the lender/insurer accepting the visa profile ([`kb.lender.485-visa-treatment`](485-visa-treatment.md)).
+- **Temporary resident earning AUD in Australia.** Assessed near-domestic, some lenders will lend above 80% LVR **with LMI** — the ordinary mechanics of [`kb.lmi.calculation`](calculation.md) then apply, subject to the lender/insurer accepting the visa profile ([`kb.lender.485-visa-treatment`](../lender/485-visa-treatment.md)).
 - **Buying with an Australian citizen / PR / NZ-citizen partner.** The purchase is assessed on the domestic co-borrower's footing, up to 95% LVR, and **LMI applies as it would for any local** high-LVR loan — sized per [`kb.lmi.calculation`](calculation.md). This is the main route by which a Mode-B buyer meets LMI at all.
 
 In both re-entry cases the **premium is sized by the universal doc, not here** — this doc only determines *whether* LMI applies to the profile.
