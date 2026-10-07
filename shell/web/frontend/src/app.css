@@ -2294,3 +2294,18 @@ main {
         animation-duration: 0.01ms !important;
     }
 }
+
+/* Behavior 20: the standing ASIC / FIRB lines under the plan and onboarding. */
+.pp-disclaimers,
+.ob-disclaimer {
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    font-size: 0.75rem;
+    line-height: 1.4;
+    opacity: 0.75;
+}
+.pp-disclaimers p,
+.ob-disclaimer {
+    margin-bottom: 0.25rem;
+}

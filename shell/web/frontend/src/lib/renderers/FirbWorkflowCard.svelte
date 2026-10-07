@@ -21,7 +21,7 @@
     import { t } from '$lib/i18n';
     import { lang } from '$lib/stores/lang';
     import { type FirbStatusOutcome, type TransferPlanOutcome } from '$lib/planCard';
-    import { money } from '$lib/format';
+    import { money, date } from '$lib/format';
     import Field from './Field.svelte';
     import Chip from './Chip.svelte';
     import Pending from './Pending.svelte';
@@ -96,8 +96,8 @@
     </div>
     <Field label={$t('plan.f.transfer_amount')} value={money(tp.total_transfer_amount_aud, $lang)} />
     <Field label={$t('plan.f.fx_cost')} value={money(tp.estimated_fx_cost, $lang)} />
-    <Field label={$t('plan.f.transfer_initiated')} value={tp.transfer_initiated_by_date ?? null} />
-    <Field label={$t('plan.f.transfer_received')} value={tp.transfer_received_by_date ?? null} />
+    <Field label={$t('plan.f.transfer_initiated')} value={date(tp.transfer_initiated_by_date, $lang) ?? tp.transfer_initiated_by_date ?? null} />
+    <Field label={$t('plan.f.transfer_received')} value={date(tp.transfer_received_by_date, $lang) ?? tp.transfer_received_by_date ?? null} />
 {:else}
     <!-- ── firb_status (firb_workflow) ──────────────────────────────────── -->
     {#if f.blocking_for_contract}
