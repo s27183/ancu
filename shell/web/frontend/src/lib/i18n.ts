@@ -11,8 +11,8 @@ import { lang } from '$lib/stores/lang';
 const messages = {
     'brand.name': { vi: 'Rau', en: 'Rau' },
     'brand.tagline': {
-        vi: 'Kế hoạch mua nhà đầu tiên tại Úc',
-        en: 'Your first-home plan in Australia'
+        vi: 'Kế hoạch ngân sách bất động sản tại Úc — mua, giữ, bán',
+        en: 'Your Australian property budget plan — buy, hold, sell'
     },
     'lang.label': { vi: 'Ngôn ngữ', en: 'Language' },
 
@@ -407,7 +407,7 @@ const messages = {
     },
     'plan.basis.ineligible': { vi: 'Chưa đủ điều kiện', en: 'Not yet eligible' },
 
-    'plan.f.path': { vi: 'Hướng vay đề xuất', en: 'Recommended path' },
+    'plan.f.path': { vi: 'Hướng vay phù hợp với số liệu của bạn', en: 'Path that fits your inputs' },
     'plan.f.lenders': { vi: 'Ngân hàng phù hợp', en: 'Lender shortlist' },
     'plan.f.preapproval': { vi: 'Chuẩn bị duyệt sơ bộ', en: 'Pre-approval steps' },
     'plan.f.assumptions': { vi: 'Giả định', en: 'Assumptions' },
@@ -415,7 +415,9 @@ const messages = {
     'plan.path.lmi_5_to_20': { vi: 'Vay kèm bảo hiểm LMI (cọc 5–20%)', en: 'LMI (5–20% deposit)' },
     'plan.path.twenty_plus': { vi: 'Cọc từ 20% trở lên', en: '20%+ deposit' },
     'plan.path.user_specific_alternative': { vi: 'Phương án riêng', en: 'Tailored option' },
-    'plan.path.recommended': { vi: 'đề xuất', en: 'recommended' },
+    // Behavior 27: the first-ranked path is labelled by fit, not as advice (invariants.md: no
+    // financial advice service, Son 2026-10-08).
+    'plan.path.recommended': { vi: 'phù hợp với số liệu của bạn', en: 'fits your inputs' },
 
     // mortgage_finance (mortgage_plan) → data-table detail, beyond summary-card's hero
     // (fh_engine_mortgage.erl's four fill_* shapes — a field group per mode axis).
@@ -602,8 +604,8 @@ const messages = {
     // Budget cockpit (the prototype's input form, engine-driven).
     'plan.cockpit.title': { vi: 'Ngân sách — bạn đã sẵn sàng?', en: 'Budget — am I ready?' },
     'plan.cockpit.intro': {
-        vi: 'Đổi giá hoặc tiểu bang để tính lại toàn bộ kế hoạch; nhập tiền mặt bạn có để xem còn thiếu bao nhiêu. Phí trước bạ do hệ thống tính chính xác, không phải ước lượng.',
-        en: 'Change the price or state to recompute the whole plan; enter your cash on hand to see the gap. Stamp duty is computed exactly, not estimated.'
+        vi: 'Đổi giá hoặc tiểu bang để tính lại toàn bộ kế hoạch; nhập tiền mặt bạn có để xem còn thiếu bao nhiêu. Phí trước bạ được tính theo biểu phí tiểu bang công bố, không phải ước lượng.',
+        en: 'Change the price or state to recompute the whole plan; enter your cash on hand to see the gap. Stamp duty is calculated from the state’s published rates, not estimated.'
     },
     'plan.cockpit.ptype': { vi: 'Loại bất động sản', en: 'Property type' },
     'plan.cockpit.ptype.locked': {
