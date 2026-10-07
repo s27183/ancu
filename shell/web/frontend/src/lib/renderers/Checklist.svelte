@@ -20,6 +20,7 @@
     // pick()/$lang; headings + status chrome via $t.
     import { t } from '$lib/i18n';
     import { lang } from '$lib/stores/lang';
+    import { date } from '$lib/format';
     import {
         pick,
         type PreparationOutcome,
@@ -134,7 +135,7 @@
                         {/if}
                     </div>
                     {#if m.due_date}
-                        <p class="ck-meta"><span class="ck-meta-k">{$t('plan.settle.due')}:</span> {m.due_date}</p>
+                        <p class="ck-meta"><span class="ck-meta-k">{$t('plan.settle.due')}:</span> {date(m.due_date, $lang) ?? m.due_date}</p>
                     {/if}
                 </li>
             {/each}
@@ -154,7 +155,7 @@
                     </div>
                     {#if m.why}<p class="ck-why">{pick(m.why, $lang)}</p>{/if}
                     {#if m.due_date}
-                        <p class="ck-meta"><span class="ck-meta-k">{$t('plan.settle.due')}:</span> {m.due_date}</p>
+                        <p class="ck-meta"><span class="ck-meta-k">{$t('plan.settle.due')}:</span> {date(m.due_date, $lang) ?? m.due_date}</p>
                     {/if}
                 </li>
             {/each}
