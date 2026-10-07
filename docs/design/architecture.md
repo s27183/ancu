@@ -184,7 +184,7 @@ and some the planner; a behavior runs the ones it touches. The conformance escri
 8 s, measured 2026-10-06), after `kb_compiler.py` has emitted the artifact it
 reads.
 
-    checks: `.venv/bin/python tests/validate_build.py`; `.venv/bin/python tests/resolver_eval.py`; `.venv/bin/python tests/eligibility_benefit_eval.py`; `.venv/bin/python tests/cash_duty_eval.py`; `.venv/bin/python tests/mortgage_eval.py`; `.venv/bin/python tests/ownership_eval.py`; `.venv/bin/python tests/bilingual_eval.py`; `.venv/bin/python tests/outcome_validate.py`; `.venv/bin/python tests/shell_contract_check.py`; `(cd engine/erlang && rebar3 compile)`; `(cd shell/web/backend && rebar3 compile)`; `(cd shell/web/frontend && npm run check)`; `bash scripts/conformance_sweep.sh`
+    checks: `.venv/bin/python tests/validate_build.py`; `.venv/bin/python tests/resolver_eval.py`; `.venv/bin/python tests/eligibility_benefit_eval.py`; `.venv/bin/python tests/cash_duty_eval.py`; `.venv/bin/python tests/mortgage_eval.py`; `.venv/bin/python tests/ownership_eval.py`; `.venv/bin/python tests/bilingual_eval.py`; `.venv/bin/python tests/outcome_validate.py`; `.venv/bin/python tests/shell_contract_check.py`; `.venv/bin/python scripts/doc_links.py docs`; `(cd engine/erlang && rebar3 compile)`; `(cd shell/web/backend && rebar3 compile)`; `(cd shell/web/frontend && npm run check)`; `bash scripts/conformance_sweep.sh`
     attribution: co-author+session
     behaviors: none yet
 
