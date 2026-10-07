@@ -24,6 +24,7 @@
         type TransactionDatesInput
     } from '$lib/api';
     import { subscribePlanCard, type PlanCardStream } from '$lib/planCardStream';
+    import { describeFailure, type FailureView } from '$lib/turnFailure';
     import {
         BASE_COMPONENT_ORDER,
         type ComponentEntry,
@@ -136,7 +137,9 @@
     // so the "+ Attach property" entry point shows only for it (a Mode-A card would 400).
     let blueprintSlug = $state<string>('');
     let turnDone = $state(false);
-    let turnFailed = $state(false);
+    // The turn_failed payload mapped to what the user sees (turnFailure.ts); null = no failure.
+    let failure = $state<FailureView | null>(null);
+    const turnFailed = $derived(failure !== null);
     // The card user-set layer (the Flow checklist done-toggles), seeded from the GET card
     // and overlaid onto phase_playbook actions at render. The engine is SOT: a toggle is
     // optimistic for immediacy, then reconciled from the PATCH response (revert on failure).
@@ -702,7 +705,7 @@
         cardId = null;
         blueprintSlug = '';
         turnDone = false;
-        turnFailed = false;
+        failure = null;
 
         // Signed-out or no cards → listPlanCards() returns []; no zone match → the CTA.
         const cards = await listPlanCards();
@@ -746,7 +749,7 @@
                 },
                 onDone: (failed, lastEventId) => {
                     if (myGen !== gen) return;
-                    if (failed) turnFailed = true;
+                    if (failed) failure = describeFailure(failed);
                     turnDone = true;
                     // A just-committed save (W8): the recomputed components are now merged
                     // live (== what was previewed), so drop the preview overlay and reset
@@ -1417,10 +1420,10 @@
         {/if}
     </div>
 
-    {#if turnFailed}
+    {#if failure}
         <div class="pp-state">
-            <p>{$t('plan.failed')}</p>
-            <button type="button" onclick={load}>{$t('plan.retry')}</button>
+            <p>{$t(failure.key)}</p>
+            {#if failure.retry}<button type="button" onclick={load}>{$t('plan.retry')}</button>{/if}
         </div>
     {/if}
 {/if}

@@ -147,6 +147,15 @@ const messages = {
         vi: 'Kế hoạch chưa tính xong. Vui lòng thử lại.',
         en: 'Your plan didn’t finish computing. Please try again.'
     },
+    // A turn the compliance gate blocked (behavior 20, turnFailure.ts): calm, no retry.
+    'turn.blocked': {
+        vi: 'Phần này không thể hiển thị vì vượt quá giới hạn thông tin hỗ trợ quyết định.',
+        en: 'This part can’t be shown — it would go beyond decision-support information.'
+    },
+    'turn.blocked.asic_advice': {
+        vi: 'Câu trả lời này sẽ trở thành tư vấn tài chính cá nhân, nên chúng tôi không hiển thị. Hãy hỏi về dữ kiện hoặc các lựa chọn thay vì việc bạn nên làm gì.',
+        en: 'That answer would have been personal financial advice, so it isn’t shown. Try asking about the facts or the options rather than what you should do.'
+    },
     'plan.running': {
         vi: 'Đang lập kế hoạch cơ bản cho bạn…',
         en: 'Preparing your base plan…'
