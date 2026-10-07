@@ -458,7 +458,6 @@
             <SuburbSheet
                 suburb={selected}
                 reloadPlan={planReload}
-                initialTab={restoreAnswers ? 'plan' : 'zone'}
                 onclose={() => (selected = null)}
                 onplan={() => {
                     restoreAnswers = undefined;
