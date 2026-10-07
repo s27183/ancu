@@ -818,6 +818,62 @@ def compute_affected_components(affected_kb_slugs, blueprints):
     return out
 
 
+# Regulated figures are grounded -> P-7 · One declaration per outcome shape -> KB compiler -> refuses same-state schemes whose property types overlap or leave a gap
+# Where one state's scheme docs fill the same criteria leaf and split it by
+# property_fit.property_type (QLD: fhc established, fhnhc new, fh-vacant-land land), the
+# split must be a partition of the field's enum: an overlap computes two concessions for
+# one purchase, a gap none. Grouped per `property_fit.state eq` value, since fillers in
+# different states never compete (#17, measured 2026-10-06: QLD is the only such group).
+# A member with no property_type criterion covers the whole enum. Only top-level
+# all_of criteria are read; no filler today nests one.
+def property_type_partition(stem, reg, anchors, kb_docs, fails, info):
+    st, meta = reg.field_meta("property_fit", "property_type")
+    enum = set((meta or {}).get("options") or [])
+    if st != "field" or not enum:
+        return
+    groups = {}
+    for slug in sorted(anchors):
+        cj = (kb_docs.get(slug) or {}).get("content_json") or {}
+        for fill in cj.get("fills", []):
+            rule = fill.get("rule") or {}
+            if rule.get("kind") != "criteria" or rule.get("combine") != "all_of":
+                continue
+            crits = rule.get("criteria") or []
+            states = [c.get("value") for c in crits
+                      if c.get("field") == "property_fit.state" and c.get("op") == "eq"]
+            if len(states) != 1:
+                continue
+            types = set(enum)
+            restricted = False
+            for c in crits:
+                if c.get("field") != "property_fit.property_type":
+                    continue
+                restricted = True
+                op, v = c.get("op"), c.get("value")
+                vals = set(v) if isinstance(v, list) else {v}
+                if op in ("eq", "in"):
+                    types &= vals
+                elif op in ("neq", "nin"):
+                    types -= vals
+            groups.setdefault((fill["leaf"], states[0]), []).append((slug, types, restricted))
+    for (leaf, state), members in sorted(groups.items()):
+        if len(members) < 2 or not any(r for _, _, r in members):
+            continue
+        where = f"[partition] {stem}/{leaf} {state}"
+        bad = False
+        for i, (s1, t1, _) in enumerate(members):
+            for s2, t2, _ in members[i + 1:]:
+                if t1 & t2:
+                    fails.append(f"{where}: {s1} and {s2} overlap {sorted(t1 & t2)}")
+                    bad = True
+        covered = set().union(*(t for _, t, _ in members))
+        if enum - covered:
+            fails.append(f"{where}: {[s for s, _, _ in members]} gap {sorted(enum - covered)}")
+            bad = True
+        if not bad:
+            info.append(f"{where}: {len(members)} docs, {len(covered)}/{len(enum)} covered")
+
+
 def semantic_gates(stem, comps, kb_docs, fails, info):
     """Materialize ONE blueprint's registry and run its SEMANTIC gates (architecture
     §11.9 "the registry is per-blueprint"): GATE 6 reference-integrity + GATE 7 coverage
@@ -905,6 +961,8 @@ def semantic_gates(stem, comps, kb_docs, fails, info):
     # a same-component non-slot collision would be a smell — surfaced, not auto-failed).
     for leaf, fillers in sorted({k: v for k, v in reg.leaves.items() if len(v) > 1}.items()):
         info.append(f"[multi-fill] {stem}/{leaf} <- {sorted(fillers)}")
+
+    property_type_partition(stem, reg, anchors, kb_docs, fails, info)
 
     reg_stats = {
         "outcome_namespaces": sorted(reg.outcome_fields),
