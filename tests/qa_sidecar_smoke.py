@@ -3,11 +3,22 @@
 
 Drives engine/python/planner.py with a real `qa` request frame over the {packet,4}
 seam and asserts the reply frames: tool_use/tool_result (the KB-lookup machinery),
-a bilingual qa_answer {vi,en}, usage, qa_done. Makes a REAL opus call — needs
-CLAUDE_CODE_OAUTH_TOKEN in the environment (the subscription credit). Run:
+a bilingual qa_answer {vi,en}, usage, qa_done. Makes a REAL model call — needs
+CLAUDE_CODE_OAUTH_TOKEN in the environment (the subscription credit). Run, with .env:
 
   set -a; source .env; set +a
   python tests/qa_sidecar_smoke.py
+
+or from an enacs seat through Son's key socket (the token never reaches the seat):
+
+  ANTHROPIC_UNIX_SOCKET=$ENACS_KEYS_DIR/CLAUDE_CODE_OAUTH_TOKEN.sock \
+  ANTHROPIC_BASE_URL=http://enacs-key CLAUDE_CODE_OAUTH_TOKEN=placeholder \
+  .venv/bin/python tests/qa_sidecar_smoke.py
+
+The smoke runs on Claude Sonnet 5.5 unless FH_QA_MODEL says otherwise (Son
+2026-10-09: "use sonnet 5.5 for the test not opus"); prod's QA model stays the
+planner's default. The full id, not the `sonnet` alias: the CLI bundled with
+claude-agent-sdk 0.2.159 (2.1.281) still maps `sonnet` to Sonnet 5 (measured).
 """
 import json
 import os
@@ -15,6 +26,7 @@ import struct
 import subprocess
 import sys
 
+SMOKE_MODEL = "claude-sonnet-5-5"
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PLANNER = os.path.join(REPO, "engine", "python", "planner.py")
 
@@ -55,8 +67,10 @@ def main():
     if not os.environ.get("CLAUDE_CODE_OAUTH_TOKEN"):
         print("SKIP: CLAUDE_CODE_OAUTH_TOKEN not set (need the subscription credit)")
         return 2
+    env = os.environ.copy()
+    env.setdefault("FH_QA_MODEL", SMOKE_MODEL)
     p = subprocess.run([sys.executable, PLANNER], input=frame(REQ),
-                       capture_output=True, env=os.environ.copy(), timeout=700)
+                       capture_output=True, env=env, timeout=700)
     frames = read_frames(p.stdout)
     methods = [f.get("method") for f in frames]
     print("frames:", methods)
@@ -76,6 +90,7 @@ def main():
     ok("qa_answer" in by, "qa_answer frame present")
     ok("qa_done" in by, "qa_done frame present")
     ok("usage" in by, "usage frame present")
+    print("  model:", by["usage"][0].get("model"))
 
     ans = by["qa_answer"][0]["answer"]
     vi, en = ans.get("vi", ""), ans.get("en", "")
@@ -84,7 +99,7 @@ def main():
     ok(any(ord(c) > 127 for c in vi), "vi carries a diacritic (real Vietnamese)")
     ok(len(vi) <= 4000 and len(en) <= 4000, "answer within the prose backstop")
 
-    # The tool is available; opus MAY or may not call it. If it did, the events must be
+    # The tool is available; the model MAY or may not call it. If it did, the events must be
     # sanitized (no raw slug in the user-facing summary).
     if "tool_use" in by:
         tu = by["tool_use"][0]
@@ -93,7 +108,7 @@ def main():
         ok("kb." not in json.dumps(tu), "tool_use carries no raw kb slug")
         print("  (KB lookup fired; consulted:", by["qa_answer"][0].get("kb_slugs"), ")")
     else:
-        print("  (opus answered from grounding without a KB lookup — allowed)")
+        print("  (the model answered from grounding without a KB lookup — allowed)")
 
     print("\nVI:", vi[:160])
     print("EN:", en[:160])
