@@ -306,4 +306,4 @@ into a block beside its mechanism (`/migrate`), and nothing here is ground until
 - `git issue list` — the open findings carried out of `grounding-checklist.md` (#1–#6)
 - harness memory, `~/.claude*/projects/-Users-son-s2718-firsthomey/memory/` — 76 files,
   no longer loaded; 40 of them are cited from tracked docs as `[[name]]` links
-- each contributor's own `CLAUDE.md` (personal, not read by enacs; this repo still tracks one)
+- each contributor's own `CLAUDE.md` (personal, not read by enacs; untracked 2026-10-08, its project facts moved to Design rules above)
