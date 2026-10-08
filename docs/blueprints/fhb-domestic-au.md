@@ -1071,66 +1071,9 @@ The `disposition` shape is **mode-general** (a horizon-parameterised disposal pr
 
 ---
 
-## KB anchor index (for this blueprint)
+## KB anchors
 
-The following kb_anchor slugs are referenced by components in this blueprint. The offline KB agent must ensure each slug resolves to a curated KB document. Slugs use dot-notation; lookups are case-sensitive.
-
-| Slug | Component(s) | Owns |
-|---|---|---|
-| `kb.hecs.thresholds` | 1 | HECS repayment thresholds, treatment by lenders |
-| `kb.firb.status-determination` | 1 | How to determine FIRB classification from visa/citizenship status |
-| `kb.lender.serviceability-basics` | 1, 4 | Lender serviceability assessment basics (income, debts, buffer rate) |
-| `kb.property.suburb-risk-factors` | 2 | Suburb-level risk (flood, planning, school catchment data sources) |
-| `kb.property.comparables-methodology` | 2 | How to identify and weight comparable sales |
-| `kb.strata.health-indicators` | 2 | Strata report red flags, sinking fund interpretation |
-| `kb.building-types.risk-by-type` | 2 | Risk profiles for established house, apartment, off-the-plan |
-| `kb.scheme.fhg` | 3 | Federal First Home Guarantee — rules, caps by location, mechanics |
-| `kb.scheme.fhss` | 3 | First Home Super Saver — contribution limits, release process, tax |
-| `kb.scheme.help-to-buy` | 3 | Federal Help to Buy shared equity scheme |
-| `kb.scheme.qld.fhc` | 3 | QLD First Home Concession (established homes) |
-| `kb.scheme.qld.fhnhc` | 3 | QLD First Home (New Home) Concession |
-| `kb.scheme.vic.fhb-duty` | 3 | VIC First Home Buyer Duty Exemption / Concession |
-| `kb.scheme.vic.fhog` | 3 | VIC First Home Owner Grant |
-| `kb.scheme.nsw.fhbas` | 3 | NSW First Home Buyer Assistance Scheme |
-| `kb.scheme.nsw.fhog` | 3 | NSW First Home Owner Grant |
-| `kb.lender.fhg-panel-list` | 4 | FHG participating-lender panel (closed list; no rate premium) |
-| `kb.lender.hecs-treatment-by-lender` | 4 | Per-lender HECS/HELP treatment in serviceability |
-| `kb.lender.credit-card-treatment` | 4 | Credit-card limit treatment in serviceability |
-| `kb.lender.bnpl-treatment-2026` | 4 | BNPL treatment in serviceability (NCCP commencement 2025) |
-| `kb.lmi.providers` | 4 | LMI provider landscape; lender (not borrower) selects the insurer |
-| `kb.offset-account.basics` | 4 | Offset account mechanics |
-| `kb.stamp-duty.calc-by-state` | 5 | Stamp duty calculation methodology per state |
-| `kb.buyer-costs.inspections-conveyancing-fees` | 5 | Typical ranges for buyer-side transaction costs |
-| `kb.cash-reserve.lender-expectations` | 5 | Lender expectations for post-settlement cash reserves |
-| `kb.lmi.calculation` | 4, 5 | LMI estimation when not using FHG |
-| `kb.auction.rules-by-state` | 6 | Auction rules, cooling-off applicability, bidder registration |
-| `kb.cooling-off.by-state` | 6, 8 | Cooling-off periods by state and transaction mode |
-| `kb.negotiation.patterns-by-market-condition` | 6 | Negotiation patterns in hot vs cold markets |
-| `kb.agent-tactics.detection` | 6 | Common real estate agent tactics and counters |
-| `kb.comparables.reading-the-room` | 6 | Interpreting comparables in the context of an active offer |
-| `kb.contract-of-sale.review-points-by-state` | 7 | Standard CoS review points per state |
-| `kb.s32.review-points` | 7 | Section 32 review points (VIC) |
-| `kb.building-pest.interpretation` | 7 | Interpreting building and pest reports |
-| `kb.strata-report.red-flags` | 7 | Strata report red flags and what they mean |
-| `kb.special-conditions.standard-set` | 7 | Standard special conditions to request |
-| `kb.settlement.process-by-state` | 8 | Settlement process and timelines per state |
-| `kb.pexa.settlement` | 8 | PEXA electronic settlement mechanics |
-| `kb.insurance.timing-of-risk-pass` | 8 | When risk passes to buyer; insurance binding timing |
-| `kb.lender-docs.standard-timeline` | 8 | Lender document timeline from approval to settlement |
-| `kb.ongoing-costs.rates-water-strata` | 9 | Council rates, water rates, strata levy ranges |
-| `kb.refinance.windows-and-triggers` | 4, 9 | When and how to refinance; lender switching mechanics |
-| `kb.graduation.lvr80` | 9 | The 80% LVR graduation event and FHG implications |
-| `kb.land-tax.ppor-exemption` | 9 | Land tax PPOR exemption rules |
-| `kb.maintenance.budget-by-property-type` | 9 | Maintenance budget heuristics by property type |
-| `kb.journey.fhg-path` | 10 | The Mode-A FHB lifecycle template — phase + actor labels, per-cell bilingual prose, journey assumptions (the swimlane's structure + copy; figures are placed from upstream, not stored here) |
-| `kb.preparation.fhb-readiness` | 11 | The Mode-A FHB readiness template — generic document checklist + people-to-engage roles + bilingual prose (buffer figures are placed from upstream, not stored here) |
-| `kb.journey.phase-actions` | 12 | The Mode-A per-phase **action** template — ordered actions per phase with `budget_ref`/`component_ref` links + bilingual prose (figures linked by id from upstream, not stored here). Slice 2. |
-| `kb.risks.fhb-by-phase` | 12 | The Mode-A per-phase **risk + mitigation** template — often-seen risks per lifecycle phase with severity + bilingual mitigation; verified against the transactional risk KB (`kb.s32.review-points`, `kb.cooling-off.by-state`, `kb.special-conditions.standard-set`, `kb.auction.rules-by-state`, `kb.agent-tactics.detection`). Slice 3. |
-| `kb.property.capital-growth-bands` | 13 | The capital-growth assumption band the disposition resolver compounds over the hold horizon H to project sale proceeds — 3–6% p.a. nominal, derived from ABS Total Value of Dwellings (20-year capital-city median growth; CONVENTION). |
-| `kb.selling-costs.agent-legal` | 13 | Conventional **sale-side** cost bands (agent commission %, legal/conveyancing, marketing) — estimates, surfaced as ranges. Distinct from the buyer-side `kb.buyer-costs.inspections-conveyancing-fees`. |
-| `kb.tax.cgt-main-residence-exemption` | 13 | The CGT **main-residence exemption** rules (full-exemption conditions, 2-ha cap, income-production / 6-year absence / foreign-resident triggers) — REGULATED, ATO-verified. Mode-A owner-occupier → exempt (`cgt: null`); investor CGT is Modes C/D, design-first. |
-
----
+The compiled anchors are each component's `**KB anchors:**` line above — the KB compiler reads those lines and nothing else (`engine/build/kb_compiler.py`, `parse_blueprint`). This blueprint keeps no separate index table: a hand-kept copy drifted from what the compiler reads (stale rows and wrong component numbers, measured 2026-10-06), so the lines are the only list.
 
 ## Renderer vocabulary used
 

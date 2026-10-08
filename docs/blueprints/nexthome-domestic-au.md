@@ -1073,57 +1073,9 @@ The `mortgage_plan` outcome feeds `cash_position` (loan amount + buffer requirem
 
 ---
 
-## KB anchor index (for this blueprint)
+## KB anchors
 
-| Slug | Component(s) | Owns |
-|---|---|---|
-| `kb.hecs.thresholds` | 1 | HECS repayment thresholds, treatment by lenders |
-| `kb.firb.status-determination` | 1 | How to determine FIRB classification from visa/citizenship status |
-| `kb.lender.serviceability-basics` | 1, 4 | Lender serviceability assessment basics |
-| `kb.property.suburb-risk-factors` | 2 | Suburb-level risk factors |
-| `kb.property.comparables-methodology` | 2 | Comparable-sales methodology |
-| `kb.strata.health-indicators` | 2 | Strata report red flags |
-| `kb.building-types.risk-by-type` | 2 | Risk profiles by property type |
-| `kb.existing-home-sale.net-proceeds` | 3 | **NEW** — loan-payout mechanics (discharge fee, break-cost framing, exit-fee ban) for the current home sold now; the reused selling-costs/CGT figures are pointed to, not re-derived here |
-| `kb.selling-costs.agent-legal` | 3, 13 | Sale-side cost bands — REUSED by both the current-sale (3) and future-exit (13) computations, one computer |
-| `kb.tax.cgt-main-residence-exemption` | 3, 13 | Main-residence CGT exemption — REUSED by both computations |
-| `kb.bridging-finance.mechanics` | 3 | **NEW, placeholder** — settlement-timing-mismatch detection only; economics gated |
-| `kb.lender.fhg-panel-list` | 4 | Referenced defensively (never applies — no FHG for a repeat buyer; the resolver's own scheme_stack-absence default already routes correctly) |
-| `kb.lender.hecs-treatment-by-lender` | 4 | Per-lender HECS treatment |
-| `kb.lender.credit-card-treatment` | 4 | Credit-card treatment |
-| `kb.lender.bnpl-treatment-2026` | 4 | BNPL treatment |
-| `kb.lmi.calculation` | 4, 5 | LMI estimation (no FHG path for Mode E — always the LMI-backed or 20%+-deposit path) |
-| `kb.offset-account.basics` | 4 | Offset account mechanics |
-| `kb.stamp-duty.calc-by-state` | 5 | Stamp duty — always the FULL (no-concession) rate for Mode E |
-| `kb.buyer-costs.inspections-conveyancing-fees` | 5 | Buyer-side transaction costs |
-| `kb.cash-reserve.lender-expectations` | 5 | Post-settlement reserve expectations |
-| `kb.auction.rules-by-state` | 6 | Auction rules |
-| `kb.cooling-off.by-state` | 6, 8 | Cooling-off periods |
-| `kb.negotiation.patterns-by-market-condition` | 6 | Negotiation patterns |
-| `kb.agent-tactics.detection` | 6 | Agent tactics and counters |
-| `kb.comparables.reading-the-room` | 6 | Interpreting comparables |
-| `kb.contract-of-sale.review-points-by-state` | 7 | CoS review points |
-| `kb.s32.review-points` | 7 | Section 32 review points (VIC) |
-| `kb.building-pest.interpretation` | 7 | Building/pest report interpretation |
-| `kb.strata-report.red-flags` | 7 | Strata report red flags |
-| `kb.special-conditions.standard-set` | 7 | Standard special conditions |
-| `kb.settlement.process-by-state` | 8 | Settlement process per state |
-| `kb.pexa.settlement` | 8 | PEXA mechanics |
-| `kb.insurance.timing-of-risk-pass` | 8 | Risk-pass timing |
-| `kb.lender-docs.standard-timeline` | 8 | Lender document timeline |
-| `kb.ongoing-costs.rates-water-strata` | 9 | Council/water/strata ranges |
-| `kb.refinance.windows-and-triggers` | 4, 9 | Refinance mechanics |
-| `kb.graduation.lvr80` | 9 | 80% LVR graduation |
-| `kb.land-tax.ppor-exemption` | 9 | Land-tax PPOR exemption — the NEW home only |
-| `kb.land-tax.dual-ownership-transition` | *(not yet wired — deferred, see component 9's scope note)* | Per-state transition-window land tax when holding both properties |
-| `kb.maintenance.budget-by-property-type` | 9 | Maintenance budget heuristics |
-| `kb.journey.fhg-path` | 10 | Reused lifecycle template — bilingual prose is generic to the purchase lifecycle, not first-home-specific; `kb.journey.*` naming stays as-is (content-only reuse, same as Mode B/C/D) |
-| `kb.preparation.fhb-readiness` | 11 | Reused readiness template — generic document/people checklist; the FHB-specific items degrade to empty per component 11's note |
-| `kb.journey.phase-actions` | 12 | Reused per-phase action template |
-| `kb.risks.fhb-by-phase` | 12 | Reused per-phase risk template |
-| `kb.property.capital-growth-bands` | 13 | Reused capital-growth band (ABS Total Value of Dwellings) |
-
----
+The compiled anchors are each component's `**KB anchors:**` line above — the KB compiler reads those lines and nothing else (`engine/build/kb_compiler.py`, `parse_blueprint`). This blueprint keeps no separate index table: a hand-kept copy drifted from what the compiler reads (stale rows and wrong component numbers, measured 2026-10-06), so the lines are the only list.
 
 ## Renderer vocabulary used
 
