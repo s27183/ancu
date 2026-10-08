@@ -1,5 +1,5 @@
 #!/usr/bin/env escript
-%%! -sname fh_shell_sse_cancel_smoke
+%%! -sname fh_shell_sse_cancel_conformance
 %%
 %% Behavior 29's check: a browser stream cancelled at any point through the shell
 %% never freezes the next one, and never leaves its engine stream open behind it.
@@ -7,22 +7,25 @@
 %% Reproducible -> P-1 · One process per concern -> The shell backend -> a cancelled SSE stream and the one after it
 %% Falsifier: after browser streams are cut — before the shell's first byte, mid-way
 %% through slow upstream headers, or once live — a new stream through the shell does
-%% not reach 200 and its first frame (a finished plan: its terminal frame) within
+%% not reach its first frame (a finished plan: its terminal frame and close) within
 %% ?BOUND_MS; or the engine-side stream a cut browser stream opened is still running
 %% ?LEAK_MS later. The browser is a raw TCP socket so a cut can land before any byte
 %% comes back, which httpc cannot do. The engine is sse_cancel_stub_engine, which
-%% reports each stream's process so the smoke can watch it end.
+%% reports each stream's process so this can watch it end.
 %%
-%% Run from shell/web/backend (needs local ports and a shell database on the seat's
-%% private Postgres; it boots the full shell app, migrations included):
+%% Offline, so scripts/conformance_sweep.sh runs it: no Postgres, no .env. It does not
+%% boot the fh_shell app (its boot needs the database); it starts the shell's own
+%% listener from fh_shell_http:child_spec() — the same routes and cowboy options as a
+%% deploy — and the shell's httpc profiles, and shadows fh_shell_store with an
+%% ownership check that answers true (ownership is events_proxy_smoke's to test).
+%% Both listeners take a free loopback port. Measured 2026-10-08 (OTP 29, inets 9.8,
+%% cowboy 2.14.2): on the relay before behavior 29's fix the stream after a cut got
+%% no byte for 30 s+.
 %%
-%%   SHELL_DATABASE_URL=postgres://<user>@<socket dir, %2F-escaped>/<db> \
-%%   ERL_LIBS=_build/default/lib escript test/sse_cancel_smoke.escript
+%%   cd shell/web/backend && ERL_LIBS=_build/default/lib escript test/sse_cancel_conformance.escript
 
 -mode(compile).
 
--define(SHELL_PORT, 8086).
--define(STUB_PORT, 8087).
 -define(BOUND_MS, 2000).
 -define(LEAK_MS, 3000).
 -define(CUTS, 20).
@@ -30,38 +33,37 @@
 
 main(_) ->
     os:putenv("FH_HTTP_IP", "127.0.0.1"),
-    os:putenv("FH_SHELL_HTTP_PORT", integer_to_list(?SHELL_PORT)),
-    os:putenv("SHELL_JWT_SECRET", "sse-cancel-smoke-secret"),
+    os:putenv("FH_SHELL_HTTP_PORT", "0"),
+    os:putenv("SHELL_JWT_SECRET", "sse-cancel-conformance-secret"),
     {_Pub, Priv} = crypto:generate_key(eddsa, ed25519),
     os:putenv("SHELL_TENANT_ID", binary_to_list(uuid())),
     os:putenv("SHELL_TENANT_PRIVKEY", binary_to_list(base64:encode(Priv))),
-    os:putenv("ENGINE_BASE_URL",
-              "http://127.0.0.1:" ++ integer_to_list(?STUB_PORT) ++ "/api/engine"),
-    ok = logger:set_handler_config(default, level, notice),
-
-    {ok, _} = application:ensure_all_started(fh_shell),
-    {ok, _} = application:ensure_all_started(inets),
-    {ok, _} = inets:start(httpc, [{profile, ?CLIENT}]),
-    ok = httpc:set_options([{max_sessions, 64}], ?CLIENT),
+    {ok, _} = application:ensure_all_started([crypto, inets, cowboy]),
+    shadow_store(),
 
     register(sse_cancel_collector, spawn(fun() -> collect(#{}) end)),
     StubMod = compile_load("test/sse_cancel_stub_engine.erl"),
     Dispatch = cowboy_router:compile([{'_', [
         {"/api/engine/plan-cards/:id/events", StubMod, events}
     ]}]),
-    {ok, _} = cowboy:start_clear(sse_cancel_stub,
-                                 [{ip, {127, 0, 0, 1}}, {port, ?STUB_PORT}],
+    {ok, _} = cowboy:start_clear(sse_cancel_stub, [{ip, {127, 0, 0, 1}}, {port, 0}],
                                  #{env => #{dispatch => Dispatch}}),
+    os:putenv("ENGINE_BASE_URL", "http://127.0.0.1:"
+              ++ integer_to_list(ranch:get_port(sse_cancel_stub)) ++ "/api/engine"),
 
-    Email = <<"sse-cancel+", (uuid())/binary, "@example.com">>,
-    UserId = scalar("INSERT INTO users (email) VALUES ($1) RETURNING user_id::text", [Email]),
-    Jwt = fh_shell_jwt:issue(#{user_id => UserId, email => Email,
+    ok = fh_shell_engine_client:start_httpc_profiles(),
+    #{start := {M, F, A}} = fh_shell_http:child_spec(),
+    {ok, _} = apply(M, F, A),
+    persistent_term:put(shell_port, ranch:get_port(fh_shell_listener)),
+    {ok, _} = inets:start(httpc, [{profile, ?CLIENT}]),
+    ok = httpc:set_options([{max_sessions, 64}], ?CLIENT),
+
+    UserId = uuid(),
+    Jwt = fh_shell_jwt:issue(#{user_id => UserId, email => <<"sse-cancel@example.test">>,
                                roles => [<<"buyer">>], locale => <<"vi">>}),
     Card = fun(Prefix) ->
         <<_:8/binary, Rest/binary>> = uuid(),
-        C = <<Prefix:8/binary, Rest/binary>>,
-        ok = fh_shell_store:insert_plan_card_view(UserId, C, <<"Kew">>),
-        C
+        <<Prefix:8/binary, Rest/binary>>
     end,
     Live = fun() -> Card(<<"0c0c0c0c">>) end,
     Slow = fun() -> Card(<<"aaaaaaaa">>) end,
@@ -90,13 +92,13 @@ main(_) ->
     expect(Running =:= [],
            "no engine stream outlives the browser stream that opened it"),
 
-    io:format("~n==== SSE-CANCEL SMOKE (behavior 29): ALL ASSERTIONS PASSED ====~n"),
+    io:format("~n==== SSE-CANCEL CONFORMANCE (behavior 29): ALL ASSERTIONS PASSED ====~n"),
     halt(0).
 
 %% A browser stream over raw TCP, cut at `0` (right after the request is written),
 %% after N ms, or once turn_started has come back.
 cut(CardId, Jwt, When) ->
-    {ok, S} = gen_tcp:connect({127, 0, 0, 1}, ?SHELL_PORT,
+    {ok, S} = gen_tcp:connect({127, 0, 0, 1}, persistent_term:get(shell_port),
                               [binary, {active, false}, {nodelay, true}]),
     ok = gen_tcp:send(S, ["GET /api/plan-cards/", CardId, "/events HTTP/1.1\r\n",
                           "host: 127.0.0.1\r\naccept: text/event-stream\r\n",
@@ -133,7 +135,7 @@ next_streams_answer(Live, Done, Jwt, What) ->
 
 timed_stream(CardId, Auth, Want) ->
     T0 = erlang:monotonic_time(millisecond),
-    Url = "http://127.0.0.1:" ++ integer_to_list(?SHELL_PORT)
+    Url = "http://127.0.0.1:" ++ integer_to_list(persistent_term:get(shell_port))
           ++ "/api/plan-cards/" ++ binary_to_list(CardId) ++ "/events",
     {ok, ReqId} = httpc:request(get, {Url, [Auth]}, [],
                                 [{sync, false}, {stream, self}], ?CLIENT),
@@ -181,9 +183,21 @@ compile_load(File) ->
 
 uuid() -> fh_shell_util:uuid4().
 
-scalar(SQL, Params) ->
-    #{rows := [{Val}]} = pgo:query(SQL, Params),
-    Val.
+%% fh_shell_store without Postgres: every plan belongs to the caller.
+shadow_store() ->
+    Src = "-module(fh_shell_store).\n-export([owns_plan_card/2]).\n"
+          "owns_plan_card(_UserId, _PlanCardId) -> true.\n",
+    {ok, Toks, _} = erl_scan:string(Src),
+    Forms = split_forms(Toks, [], []),
+    {ok, fh_shell_store, Bin} = compile:forms(Forms, [binary]),
+    {module, _} = code:load_binary(fh_shell_store, "fh_shell_store_shadow", Bin),
+    ok.
+
+split_forms([], [], Acc) -> lists:reverse(Acc);
+split_forms([{dot, _} = D | T], Cur, Acc) ->
+    {ok, F} = erl_parse:parse_form(lists:reverse([D | Cur])),
+    split_forms(T, [], [F | Acc]);
+split_forms([Tok | T], Cur, Acc) -> split_forms(T, [Tok | Cur], Acc).
 
 expect(true, Label)  -> io:format("  ok  ~s~n", [Label]);
 expect(false, Label) -> io:format("FAIL  ~s~n", [Label]), halt(1).

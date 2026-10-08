@@ -1,10 +1,10 @@
 -module(sse_cancel_stub_engine).
 
-%% Stub engine for sse_cancel_smoke (behavior 29).
+%% Stub engine for sse_cancel_conformance (behavior 29).
 %%
 %% Reproducible -> P-1 · One process per concern -> The shell backend -> engine streams a cancelled browser stream leaves behind
-%% Every events handler registers its pid with the smoke's collector (registered
-%% `sse_cancel_collector`), so the smoke can watch whether the upstream stream a
+%% Every events handler registers its pid with the escript's collector (registered
+%% `sse_cancel_collector`), so the escript can watch whether the upstream stream a
 %% cancelled browser request opened ever closes. The plan id's first eight hex
 %% digits pick the stream's shape:
 %%   ffffffff… — finished: turn_started, turn_completed, fin (a plan already built);

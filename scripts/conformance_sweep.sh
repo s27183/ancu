@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
-# Run every engine conformance escript; exit 1 naming each one that fails.
+# Run every conformance escript, engine and shell; exit 1 naming each one that fails.
 #
 #   bash scripts/conformance_sweep.sh [<dir holding *_conformance.escript>]
 #
 # Reproducible -> P-7 · One declaration per outcome shape -> Mechanisms -> every conformance escript, every done check
-# The conformance escripts are offline (no port, no Postgres, no LLM): they load the compiled
-# KB artifact and call the resolvers directly. Three of them failed unnoticed from July to
+# The conformance escripts are offline (no Postgres, no LLM, no .env): the engine's load the
+# compiled KB artifact and call the resolvers directly; the shell's start the shell's own
+# listener and a stub engine on loopback ports. Three of them failed unnoticed from July to
 # 2026-10-06 (#11) because nothing ran them all; this script is in architecture.md's
 # `checks:` line so a failing anchor fails a step. Each escript's `%%! -sname` line is
 # stripped into a temp copy: a distribution name needs a listen socket, refused in the seat's
@@ -31,25 +32,36 @@ if [ -n "$newer" ]; then
   echo "run: .venv/bin/python engine/build/kb_compiler.py"; exit 1
 fi
 
-cd "$root/engine/erlang"
-export ERL_LIBS=_build/default/lib
-
+# Each escript runs from its component's root, with that component's compiled libs:
+# the engine's (resolvers, KB artifact) and, since behavior 29, the shell's
+# (sse_cancel_conformance: the SSE relay against a stub engine on loopback ports, which the
+# sandbox allows; only a distribution name is refused).
 pass=0; failed=()
-for f in "$dir"/*_conformance.escript; do
-  name="$(basename "$f" .escript)"
-  sed 's/^%%! -sname.*$/%%!/' "$f" > "$tmp/$name.escript"
-  if escript "$tmp/$name.escript" > "$tmp/$name.log" 2>&1; then
-    pass=$((pass + 1))
-  else
-    failed+=("$name")
-    echo "FAIL $name"
-    grep -E "FAIL|error|exception" "$tmp/$name.log" | head -5 | sed 's/^/    /'
-  fi
-done
+sweep() {  # <component dir> <escript dir>
+  local f name
+  for f in "$2"/*_conformance.escript; do
+    [ -e "$f" ] || continue
+    name="$(basename "$f" .escript)"
+    sed 's/^%%! -sname.*$/%%!/' "$f" > "$tmp/$name.escript"
+    if (cd "$1" && ERL_LIBS=_build/default/lib escript "$tmp/$name.escript") > "$tmp/$name.log" 2>&1; then
+      pass=$((pass + 1))
+    else
+      failed+=("$name")
+      echo "FAIL $name"
+      grep -E "FAIL|error|exception" "$tmp/$name.log" | head -5 | sed 's/^/    /'
+    fi
+  done
+}
+if [ -n "${1:-}" ]; then
+  sweep "$root/engine/erlang" "$dir"
+else
+  sweep "$root/engine/erlang" "$root/engine/erlang/test"
+  sweep "$root/shell/web/backend" "$root/shell/web/backend/test"
+fi
 
 total=$((pass + ${#failed[@]}))
 if [ "$total" -eq 0 ]; then
-  echo "conformance sweep: no *_conformance.escript found in $dir"; exit 1
+  echo "conformance sweep: no *_conformance.escript found"; exit 1
 fi
 echo "conformance sweep: $pass/$total passed"
 [ "${#failed[@]}" -eq 0 ]
