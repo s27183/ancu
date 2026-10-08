@@ -27,6 +27,7 @@
     import { money, moneyRange, num } from '$lib/format';
     import Field from './Field.svelte';
     import Chip from './Chip.svelte';
+    import { archetypeLabel } from './archetype';
     import NoteList from './NoteList.svelte';
     import Pending from './Pending.svelte';
 
@@ -220,7 +221,7 @@
     <!-- ── Strategy hero ───────────────────────────────────────────────── -->
     <div class="st-hero">
         {#if strategy.archetype}
-            <Chip label={strategy.archetype} tone="info" />
+            <Chip label={archetypeLabel(strategy.archetype, $t)} tone="info" />
         {/if}
         {#if strategy.one_liner}
             <p class="st-oneliner">{strategy.one_liner}</p>

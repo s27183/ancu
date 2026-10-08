@@ -498,6 +498,19 @@ const messages = {
 
     // investment_strategy (Mode C/D) → summary-card's third hero (strategy_thesis).
     'plan.f.archetype': { vi: 'Chiến lược đầu tư', en: 'Strategy archetype' },
+    // Behavior 28: an investor's strategy reads in the viewer's language, never as its
+    // enum code. One key per strategy_archetype option in investor-domestic-au.md and
+    // investor-foreign-au.md (9 in all); archetype.ts maps a value to its key.
+    'plan.f.strategy': { vi: 'Chiến lược đầu tư', en: 'Strategy' },
+    'plan.archetype.cash_flow': { vi: 'Dòng tiền', en: 'Cash flow' },
+    'plan.archetype.capital_growth': { vi: 'Tăng trưởng vốn', en: 'Capital growth' },
+    'plan.archetype.balanced': { vi: 'Cân bằng', en: 'Balanced' },
+    'plan.archetype.dual_income': { vi: 'Hai nguồn thu tiền thuê', en: 'Dual income' },
+    'plan.archetype.value_add': { vi: 'Gia tăng giá trị', en: 'Value-add' },
+    'plan.archetype.land_banking': { vi: 'Tích trữ đất', en: 'Land banking' },
+    'plan.archetype.wealth_diversification': { vi: 'Đa dạng hóa tài sản', en: 'Wealth diversification' },
+    'plan.archetype.future_migration_pathway': { vi: 'Chuẩn bị định cư', en: 'Future migration pathway' },
+    'plan.archetype.child_education_property': { vi: 'Nhà cho con đi học', en: 'Home for a child’s studies' },
     'plan.f.yield_target': { vi: 'Lợi suất mục tiêu', en: 'Target yield' },
     'plan.f.growth_target': { vi: 'Tăng trưởng vốn mục tiêu', en: 'Target capital growth' },
     'plan.f.gearing_type': { vi: 'Loại đòn bẩy', en: 'Gearing' },
