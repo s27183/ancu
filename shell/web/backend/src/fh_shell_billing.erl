@@ -182,6 +182,10 @@ route_event(#{<<"type">> := Type,
         false ->
             <<"missing_subscription_id">>
     end;
+%% Every other type is acked 200 and ignored, invoice.* included (measured 2026-10-08:
+%% read the clauses above). A renewal still lands through customer.subscription.updated,
+%% which carries the new period; docs/architecture/billing.md:161 lists invoice.paid among
+%% the handled events, which this code does not do (concluded: that line is the stale one).
 route_event(#{<<"type">> := Type}) ->
     logger:debug("[billing] ignoring event type ~s", [Type]),
     <<"ignored">>;
