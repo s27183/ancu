@@ -53,6 +53,11 @@
     }
 </script>
 
+<!-- The tab title is the product name from i18n's one BRAND constant (behavior 17). -->
+<svelte:head>
+    <title>{$t('brand.name')}</title>
+</svelte:head>
+
 <header class="app-header">
     <a class="brand" href="/">{$t('brand.name')}</a>
 

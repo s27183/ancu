@@ -43,7 +43,7 @@ resend_send(Key, Email, Url) ->
     Body = fh_shell_util:json_encode(#{
         <<"from">>    => from_address(),
         <<"to">>      => [Email],
-        <<"subject">> => <<"Sign in to Rau / Đăng nhập Rau"/utf8>>,
+        <<"subject">> => subject(),
         <<"html">>    => html_body(Url),
         <<"text">>    => text_body(Url)
     }),
@@ -70,8 +70,8 @@ resend_send(Key, Email, Url) ->
 -spec from_address() -> binary().
 from_address() ->
     case os:getenv("EMAIL_FROM") of
-        false -> <<"Rau <onboarding@resend.dev>">>;
-        ""    -> <<"Rau <onboarding@resend.dev>">>;
+        false -> <<(fh_shell_util:brand())/binary, " <onboarding@resend.dev>">>;
+        ""    -> <<(fh_shell_util:brand())/binary, " <onboarding@resend.dev>">>;
         Addr  -> with_name(list_to_binary(Addr))
     end.
 
@@ -85,17 +85,24 @@ with_name(Addr) ->
 
 %% Bilingual (VI-first, bilingual-content.md): the product is VI-first, so the email
 %% leads in Vietnamese with the English line beneath.
+-spec subject() -> binary().
+subject() ->
+    B = fh_shell_util:brand(),
+    <<"Sign in to ", B/binary, " / Đăng nhập "/utf8, B/binary>>.
+
 -spec html_body(binary()) -> binary().
 html_body(Url) ->
-    <<"<p>Nhấp vào liên kết bên dưới để đăng nhập vào Rau "
-      "(liên kết hết hạn sau 15 phút):</p>"
+    B = fh_shell_util:brand(),
+    <<"<p>Nhấp vào liên kết bên dưới để đăng nhập vào "/utf8, B/binary,
+      " (liên kết hết hạn sau 15 phút):</p>"
       "<p><a href=\""/utf8, Url/binary,
       "\">Đăng nhập / Sign in</a></p>"
-      "<p style=\"color:#666;font-size:13px\">Click the link above to sign in to "
-      "Rau. The link expires in 15 minutes. If you did not request this, "
-      "you can ignore this email.</p>"/utf8>>.
+      "<p style=\"color:#666;font-size:13px\">Click the link above to sign in to "/utf8,
+      B/binary, ". The link expires in 15 minutes. If you did not request this, "
+      "you can ignore this email.</p>">>.
 
 -spec text_body(binary()) -> binary().
 text_body(Url) ->
-    <<"Đăng nhập vào Rau / Sign in to Rau:\n"/utf8, Url/binary,
+    B = fh_shell_util:brand(),
+    <<"Đăng nhập vào "/utf8, B/binary, " / Sign in to ", B/binary, ":\n", Url/binary,
       "\n\nLiên kết hết hạn sau 15 phút. / The link expires in 15 minutes."/utf8>>.

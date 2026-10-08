@@ -8,8 +8,14 @@
 import { derived } from 'svelte/store';
 import { lang } from '$lib/stores/lang';
 
+// Bilingual -> P-7 · One declaration per outcome shape -> The web frontend -> the product name, set once
+// The product's name is temporary (invariants.md, Son 2026-10-06). It is declared here once; brand.name
+// and every chrome string that names the product interpolate it, as does the tab title
+// (+layout.svelte), so a rename is this one line (behavior 17). Same in VI and EN: a name.
+const BRAND = 'Rau';
+
 const messages = {
-    'brand.name': { vi: 'Rau', en: 'Rau' },
+    'brand.name': { vi: BRAND, en: BRAND },
     'brand.tagline': {
         vi: 'Kế hoạch mua nhà đầu tiên tại Úc',
         en: 'Your first-home plan in Australia'
@@ -82,8 +88,8 @@ const messages = {
         en: 'Is this your first home?'
     },
     'onboarding.outofscope.foreign': {
-        vi: 'Để mua nhà để ở, Rau hiện hỗ trợ người mua nước ngoài mua căn nhà ĐẦU TIÊN. Kế hoạch cho người nước ngoài đã từng sở hữu nhà sẽ sớm có. (Nhà đầu tư nước ngoài đã được hỗ trợ — hãy chọn "Để đầu tư".)',
-        en: 'For buying a home to live in, Rau currently supports foreign-person FIRST-HOME buyers only. Plans for foreign next-home buyers are coming soon. (Foreign investors are already supported — choose "As an investment".)'
+        vi: `Để mua nhà để ở, ${BRAND} hiện hỗ trợ người mua nước ngoài mua căn nhà ĐẦU TIÊN. Kế hoạch cho người nước ngoài đã từng sở hữu nhà sẽ sớm có. (Nhà đầu tư nước ngoài đã được hỗ trợ — hãy chọn "Để đầu tư".)`,
+        en: `For buying a home to live in, ${BRAND} currently supports foreign-person FIRST-HOME buyers only. Plans for foreign next-home buyers are coming soon. (Foreign investors are already supported — choose "As an investment".)`
     },
     'onboarding.gate.firsthome.foreign': {
         vi: 'Người mua ở Việt Nam hoặc giữ visa tạm trú thường mua nhà đầu tiên tại Úc — hỏi để xác nhận.',
@@ -929,7 +935,7 @@ const messages = {
     'auth.signout': { vi: 'Đăng xuất', en: 'Sign out' },
     'account.title': { vi: 'Tài khoản', en: 'Account' },
     'account.menu': { vi: 'Menu tài khoản', en: 'Account menu' },
-    'auth.title': { vi: 'Đăng nhập vào Rau', en: 'Sign in to Rau' },
+    'auth.title': { vi: `Đăng nhập vào ${BRAND}`, en: `Sign in to ${BRAND}` },
     'auth.email.label': { vi: 'Email', en: 'Email' },
     'auth.email.placeholder': { vi: 'ban@example.com', en: 'you@example.com' },
     'auth.email.invalid': {
