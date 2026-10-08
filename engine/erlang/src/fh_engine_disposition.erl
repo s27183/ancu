@@ -278,6 +278,10 @@ principal_band(_) -> null.
 %% capacity-assessment BASE WITHOUT the APRA stress buffer (the buffer is a serviceability
 %% stress overlay, not the rate at which the loan actually amortises). A labelled CONVENTION
 %% (surfaced in key_assumptions), never this buyer's actual product rate.
+%% Regulated figures are grounded -> no LLM in a regulated figure's inputs -> disposition
+%% -> loan payout rate. The rate is a KB param, never an agent field: loan_payout once read
+%% the agent's rate-structure enum as its interest rate (memory, mid-2026; concluded, the
+%% code now reads only ?SERVICEABILITY, measured 2026-10-08).
 representative_rate() ->
     param(?SERVICEABILITY, <<"representative_product_rate_pct">>).
 
