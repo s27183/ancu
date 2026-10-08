@@ -187,10 +187,10 @@
         selectedHomeNews = note;
     }
     // Closing the detail sheet (✕/backdrop/Escape) returns to the list it was opened
-    // from, rather than dropping the buyer back to the bare homepage — every path into
-    // selectedHomeNews goes through the list first (onHomeNewsListSelect above), so there
-    // is always a list to go back to. Previously this fully closed, so re-opening a
-    // different note required tapping the ticker again to re-open the list from scratch.
+    // from, or to the list when the note came straight from the ticker
+    // (onHomeTickerTap above opens the detail without the list, so "back" lands on a list
+    // the buyer never saw — the fallback Son chose 2026-08-06). Previously this fully
+    // closed, so re-opening a different note required tapping the ticker again.
     function onHomeNewsClose() {
         selectedHomeNews = null;
         homeNewsListOpen = true;

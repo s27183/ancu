@@ -9,6 +9,11 @@
 
 -export([money/1]).
 
+%% Honest-partial -> an honest-partial null carries its reason -> outcome notes -> money string
+%% The last clause formats anything that is not an integer with ~p, so money(null) is the
+%% binary "$null" (measured 2026-10-08: read this clause). It is the caller that decides a
+%% figure is absent and says why; pass money/1 only a known amount. A "$null" in a note once
+%% reached the user from fh_engine_ownership (fixed there, :472-476).
 %% money as a plain "$1,500,000" string.
 -spec money(integer() | number()) -> binary().
 money(N) when is_integer(N), N < 0 -> iolist_to_binary([<<"-">>, money(-N)]);

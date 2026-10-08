@@ -230,6 +230,24 @@ memory of earlier sessions):
   to one byte and `json:encode` crashes, so VI copy is byte-fragile in both
   Erlang parts. Nothing checks this today.
 
+Added 2026-10-08 from the rest of that memory (Son left the choice to the goal):
+
+- **A fail-closed check is proven by a planted violation.** A check that fails
+  closed is shown to fail on a violation planted for it (as
+  `tests/shell_contract_check.py` does), not only by a green run.
+- **General means checked against unlike modes.** A mechanism called general is
+  run against at least two unlike modes (across intent × foreign) before it
+  lands; per-mode content follows by wedge.
+- **A deferral is honest only when it is trigger-gated.** The deferred piece is
+  not yet needed and has a named trigger; it rests on no invariant that can
+  break, buries no unmade decision, removes no defining capability, and leaves
+  no input without a reader.
+- **A coarse source never stands in for a suburb.** A source coarser than
+  district grain is skipped, not apportioned to suburbs.
+- **An exact regulated figure comes from its primary source.** It is cited from
+  the issuing body with its currency marker (an Authorised Version No., a dated
+  schedule); a secondary aggregator never supplies the figure.
+
 ## What is deliberately not coupled
 
 *Empty at plant.* A thing that looks like it should be coupled and is not is

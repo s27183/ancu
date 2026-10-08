@@ -701,6 +701,13 @@ two_path_stored_leaf(Data, Comp) ->
             fresh
     end.
 
+%% Reproducible -> P-7 · One declaration per outcome shape -> the turn -> fill-path classification
+%% fill_path/1 reads agent_leaves (from the blueprint params' agent_reasoning_required) and
+%% picks resolver / two_path / agent. A conformance escript that calls
+%% fh_engine_fill:resolver/3 directly never passes through here, so it cannot see a component
+%% the live turn sends to the agent or two_path: due_diligence's escript passed 32/32 while
+%% the live turn crashed (memory, mid-2026; concluded from reading this path 2026-10-08).
+%% A component whose leaves change is checked through a turn smoke, not only its escript.
 %% The fill path of a base component (mortgage-finance-two-path.md §2): empty
 %% `agent_leaves` → resolver (in-process); non-empty + a resolver exists → two_path
 %% (resolver figures + agent leaves, Erlang-merged); non-empty + no resolver → agent
@@ -957,6 +964,10 @@ python_exe() ->
 %% planner.py's reply protocol. Measured 2026-06: 2b-2b stub drift surfaced as "sidecar
 %% exit 0 before reply"; the Mode-C Slice C seam and property_assessment_seam both
 %% misattributed stub output to a "degraded LLM".
+%% A set FH_PLANNER_SCRIPT is used as given, not joined to anything (measured 2026-10-08:
+%% read this function); a relative value resolves against the engine's cwd, which is
+%% engine/erlang under rebar3 shell, so a repo-root-relative path fails with enoent. Give it
+%% relative to engine/erlang (docs/local-dev.md:209: ../python/planner.py) or absolute.
 planner_script() ->
     case os:getenv("FH_PLANNER_SCRIPT") of
         false ->
