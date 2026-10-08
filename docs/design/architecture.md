@@ -248,6 +248,37 @@ Added 2026-10-08 from the rest of that memory (Son left the choice to the goal):
   the issuing body with its currency marker (an Authorised Version No., a dated
   schedule); a secondary aggregator never supplies the figure.
 
+Added 2026-10-08 from the tracked `CLAUDE.md`, whose project facts the ground
+did not yet hold (Son: "deal with CLAUDE.md in enacs way"):
+
+- **The plan card is the central artifact; properties are addenda.** Each plan
+  card has one property-agnostic base plan and zero or more property addenda;
+  a component's `scope` is `base`, `per-property` or `both`. The base plan
+  never needs a property.
+- **No property scraping.** Property data enters only by narrow paths: public
+  suburb feeds (ABS), a user-initiated single-page URL paste, the browser
+  extension, Tìm Nhà curation, and later partner REA push. A feature that seems
+  to need a scraping pipeline means its design is wrong.
+- **The agent grounds in current state, not conversation history.** Its context
+  is built from the plan card's state, property context, uploads and KB
+  anchors; the conversation log is kept for the user to re-read.
+- **The renderer vocabulary is closed.** A blueprint uses only renderers in
+  `RENDERER_ENUM` (`engine/build/kb_compiler.py`, held by its GATE 3); a new
+  renderer is a design decision, not an addition.
+- **A KB slug is its path.** `docs/kb/scheme/qld/fhnhc.md` is
+  `kb.scheme.qld.fhnhc`, held by the compiler's GATE 1; KB and blueprints carry
+  no version numbers — a filled card records the deploy commit and the resolved
+  KB it used.
+- **Independence.** The buyer is the customer: no commission share, no
+  per-sale fee, and a partner's fee never biases a recommendation.
+- **Never a custodian of funds.** Money moves only through licensed partners
+  (AUSTRAC AML/CTF).
+- **Sidecars call the model through the Claude Agent SDK**, with
+  Pydantic-validated output and no LangChain; with `CLAUDE_CODE_OAUTH_TOKEN`
+  set and `ANTHROPIC_API_KEY` empty it draws the subscription credit
+  (measured 2026-10-08: `engine/python/planner.py` imports `claude_agent_sdk`;
+  `CLAUDE.md` still says "Anthropic SDK", which is stale).
+
 ## What is deliberately not coupled
 
 *Empty at plant.* A thing that looks like it should be coupled and is not is
