@@ -179,7 +179,7 @@ REA-side commerce (Tier 1/2 subscriptions, connection fees — strategy §8.5) r
 
 ## 10. Shell DB — commerce tables
 
-Owned entirely by `firsthomey_shell` (never read by the engine, [`shell-architecture.md`](shell-architecture.md) §6). Fleshing out the commerce rows named there:
+Owned entirely by `ancu_shell` (never read by the engine, [`shell-architecture.md`](shell-architecture.md) §6). Fleshing out the commerce rows named there:
 
 ```sql
 subscriptions

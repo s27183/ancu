@@ -5,11 +5,11 @@
 # (The "Create App from repo" wizard reports "No components detected" because the
 #  Dockerfiles live in subdirs — use the App Spec editor / doctl, deployment.md §4.)
 #
-# The managed PG cluster (firsthomey-pg, PG 16, sgp1) is provisioned OUT-OF-BAND
+# The managed PG cluster (ancu-pg, PG 16, sgp1) is provisioned OUT-OF-BAND
 # via `doctl databases create` — NOT from a `databases:` block here. App Platform
 # won't create a cluster from-spec, and an attached block hands a restricted user
 # that can't CREATE DATABASE. The engine connects via ENGINE_DATABASE_URL (doadmin
-# creds, db firsthomey_engine, ?sslmode=require) — set as a SECRET below.
+# creds, db ancu_engine, ?sslmode=require) — set as a SECRET below.
 #
 # Region slugs: the APP region is `sgp`; the PG CLUSTER region is `sgp1`.
 
@@ -54,7 +54,7 @@ services:
       - key: FH_DEPLOY_COMMIT_SHA
         value: "unknown"
       # ── Secrets (set in DO Dashboard → Settings → Environment Variables) ─────────
-      # Full doadmin string, db firsthomey_engine, ?sslmode=require. Derive from the
+      # Full doadmin string, db ancu_engine, ?sslmode=require. Derive from the
       # out-of-band cluster (deployment.md §4 step 2/4). Not DO-injected.
       - key: ENGINE_DATABASE_URL
         type: SECRET

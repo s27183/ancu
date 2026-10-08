@@ -5,8 +5,8 @@
 # Shell-backend local-dev launcher. Run from THIS dir:
 #   cd shell/web/backend && bin/dev
 #
-#   bin/dev          homebrew Postgres (:5432) + firsthomey_shell + shell on :8081
-#   bin/dev reset    drop the firsthomey_shell dev DB
+#   bin/dev          homebrew Postgres (:5432) + ancu_shell + shell on :8081
+#   bin/dev reset    drop the ancu_shell dev DB
 #
 # At boot the backend auto-mints + registers its ed25519 tenant key with the
 # engine (SHELL_DEV_AUTOPROVISION) — start the engine FIRST so registration lands.
@@ -23,8 +23,8 @@ PG_BIN="/opt/homebrew/opt/postgresql@18/bin"
 command -v createdb >/dev/null 2>&1 || { [ -d "$PG_BIN" ] && export PATH="$PG_BIN:$PATH"; }
 
 if [ "${1:-}" = "reset" ]; then
-    echo "dropping firsthomey_shell…"
-    dropdb -h localhost --if-exists firsthomey_shell
+    echo "dropping ancu_shell…"
+    dropdb -h localhost --if-exists ancu_shell
     echo "✓ reset — the next boot recreates the schema"
     exit 0
 fi
@@ -39,8 +39,8 @@ if ! nc -z localhost 5432 2>/dev/null; then
         sleep 1
     done
 fi
-if createdb -h localhost firsthomey_shell 2>/dev/null; then
-    echo "→ created firsthomey_shell"
+if createdb -h localhost ancu_shell 2>/dev/null; then
+    echo "→ created ancu_shell"
 fi  # already exists → no-op
 
 echo "→ shell backend on :8081 (reads root .env; auto-provisions its tenant key)…"

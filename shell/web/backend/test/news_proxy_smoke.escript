@@ -21,7 +21,7 @@
 %% Postgres (5433) with the KB artifact compiled (so it carries the HECS note).
 %% Run from shell/web/backend:
 %%
-%%   ENGINE_DATABASE_URL=postgres://engine:engine_dev_pw@localhost:5433/firsthomey_engine?sslmode=disable \
+%%   ENGINE_DATABASE_URL=postgres://engine:engine_dev_pw@localhost:5433/ancu_engine?sslmode=disable \
 %%   ERL_LIBS=_build/default/lib:../../../engine/erlang/_build/default/lib \
 %%   escript test/news_proxy_smoke.escript
 

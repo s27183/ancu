@@ -16,7 +16,7 @@
 %%
 %%   FH_PLANNER_SCRIPT=$(pwd)/../python/planner.py \
 %%   FH_SIDECAR_PYTHON=$(pwd)/../../.venv/bin/python3 \
-%%   ENGINE_DATABASE_URL=postgres://engine:engine_dev_pw@localhost:5433/firsthomey_engine?sslmode=disable \
+%%   ENGINE_DATABASE_URL=postgres://engine:engine_dev_pw@localhost:5433/ancu_engine?sslmode=disable \
 %%   ERL_LIBS=_build/default/lib escript test/property_assessment_seam.escript
 
 -mode(compile).

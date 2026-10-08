@@ -1,4 +1,4 @@
-name: firsthomey-shell
+name: ancu-shell
 
 # Dev Postgres for the shell's identity/commerce DB (shell-architecture.md §6).
 # A SEPARATE database from the engine's (engine-contract §9.2) — different host
@@ -9,7 +9,7 @@ services:
   postgres:
     image: postgres:16-alpine
     environment:
-      POSTGRES_DB: firsthomey_shell
+      POSTGRES_DB: ancu_shell
       POSTGRES_USER: shell
       POSTGRES_PASSWORD: shell_dev_pw
     ports:
@@ -17,7 +17,7 @@ services:
     volumes:
       - shell_pg:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U shell -d firsthomey_shell"]
+      test: ["CMD-SHELL", "pg_isready -U shell -d ancu_shell"]
       interval: 5s
       timeout: 3s
       retries: 10
