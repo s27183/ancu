@@ -27,6 +27,7 @@
     } from '$lib/planCard';
     import { moneyRange, asRange } from '$lib/format';
     import Pending from './Pending.svelte';
+    import { archetypeLabel } from './archetype';
 
     let { components, filling }: {
         components: Record<string, ComponentEntry>;
@@ -75,14 +76,20 @@
     // recommended_path is a known enum → a label; an unknown value shows verbatim so
     // nothing is silently dropped (mirrors SummaryCard). mortgage.recommended_path is an
     // FHB-only concept — `fill_investor_domestic`/`fill_investor_foreign` never set it, so
-    // it's permanently undefined for Modes C/D (not "not yet"). Fall back to the investor
-    // archetype (investment_strategy's agent-filled headline, real at base for C/D — an
-    // interim substitute for the same tile slot until the Mode C/D Overview restructure
-    // gives investors their own copy, plan-card-lifecycle-restoration.md §11).
+    // it's permanently undefined for Modes C/D (not "not yet").
     const PATHS = new Set(['fhg_backed', 'lmi_5_to_20', 'twenty_plus', 'user_specific_alternative']);
-    const path = $derived(mortgage?.recommended_path ?? strategy?.archetype ?? null);
+    const path = $derived(mortgage?.recommended_path ?? null);
     const pathLabel = $derived(
         path ? (PATHS.has(path) ? $t(`plan.path.${path}` as 'plan.path.fhg_backed') : path) : null
+    );
+    // The tile's investor form (behavior 28). An investor plan has no loan path, so the
+    // slot names the plan's strategy instead — under its own label ("Strategy"), with the
+    // archetype in the viewer's language. Shown raw under "Recommended path" before
+    // (measured 2026-10-08, Chrome, Box Hill: capital_growth). Investor = the plan has an
+    // investment_strategy component and no recommended_path.
+    const investorTile = $derived(!path && !!strategy);
+    const strategyLabel = $derived(
+        strategy?.archetype ? archetypeLabel(strategy.archetype, $t) : null
     );
 
     const target = $derived(range(profile?.target_price_range));
@@ -114,7 +121,9 @@
         ...(firbStatus
             ? [{ key: 'firb', label: $t('plan.f.stage'), value: firbStageLabel }]
             : []),
-        { key: 'path', label: $t('plan.f.path'), value: pathLabel },
+        investorTile
+            ? { key: 'path', label: $t('plan.f.strategy'), value: strategyLabel }
+            : { key: 'path', label: $t('plan.f.path'), value: pathLabel },
         ...(scheme
             ? [{ key: 'benefit', label: $t('plan.f.total_benefit'), value: benefit }]
             : []),
