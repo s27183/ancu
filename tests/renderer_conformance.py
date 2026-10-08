@@ -68,6 +68,50 @@ ALLOWLIST = {
         "entry exists only because 'document_checklist' as a literal string isn't in "
         "Checklist.svelte (it destructures the array directly) — the other four "
         "preparation_plan fields ARE literal substrings there already.",
+    # Profile input facts other components read — the buyer's own answers, shown through
+    # the components that reason on them, not echoed as a profile row (behavior 30, each
+    # consumer read 2026-10-08).
+    ("buyer_profile", "off_title_parties"): "the off-title funders/partners list; "
+        "fh_engine_family reads it into family_coordination (FamilyViewCard) and "
+        "fh_engine_firb into firb_workflow's documents_outstanding.",
+    ("investor_profile_foreign", "off_title_parties"): "same list as buyer_profile's; read "
+        "by fh_engine_family (FamilyViewCard) and fh_engine_firb (documents_outstanding).",
+    ("buyer_profile", "non_buying_partner"): "the derived couple-as-one read of "
+        "off_title_parties; fh_engine_eligibility reads it for the partner income gate, "
+        "shown through eligibility's applicable/rejected schemes.",
+    ("buyer_profile", "existing_home_ownership"): "the current home's facts; "
+        "fh_engine_existing_home_disposal reads it into existing_home_disposal "
+        "(Calculator's net-proceeds view).",
+    ("investor_profile_foreign", "established_property_eligible"): "a calendar fact of "
+        "kb.firb.established-dwelling-ban; the same fact reaches the screen as "
+        "firb_workflow.foreign_person_eligible (FirbWorkflowCard).",
+    ("investor_profile_foreign", "new_build_only_constraint"): "the inverse of "
+        "established_property_eligible; shown as firb_workflow.foreign_person_eligible.",
+    ("investor_profile_foreign", "available_capital_aud_equivalent"): "an input read by "
+        "fh_engine_cash (cash_position) and fh_engine_cross_border; reaches the screen as "
+        "their cash figures.",
+}
+
+# Outcome fields the blueprint designs but the engine emits no value for yet (absent, or
+# always null / []): reported as INVENTORY like UNBUILT_COMPONENTS — visible, not gated,
+# never claimed to reach the user. Measured 2026-10-08 against engine src and live plans
+# (behavior 30). Remove an entry the day its producer fills it — then it is a gap again
+# until a renderer shows it.
+UNBUILT_FIELDS = {
+    ("investor_profile", "existing_portfolio"): "Mode-C-activated household portfolio; "
+        "not emitted (investor-domestic-au.md defers it to the Mode-C wedge).",
+    ("investor_profile", "ppor_equity_available_for_leverage"): "not emitted; deferred "
+        "with existing_portfolio.",
+    ("investor_profile", "traits"): "not emitted; deferred with existing_portfolio.",
+    ("investor_profile_foreign", "experience_level"): "always null "
+        "(fh_engine_fill.erl base fill; no capture turn yet).",
+    ("investor_profile_foreign", "primary_investment_goal"): "always null; no capture yet.",
+    ("investor_profile_foreign", "currency_volatility_concern"): "always null; no capture yet.",
+    ("investor_profile_foreign", "vn_marginal_tax_rate"): "always null; no capture yet.",
+    ("investment_strategy", "alignment_reasoning"): "always null "
+        "(investment_strategy_conformance asserts it at base; no producer fills it).",
+    ("eligibility", "structuring_options"): "always [] "
+        "(fh_engine_eligibility.erl, multi-applicant refine-turn concern not built).",
 }
 
 # Components whose renderer is a documented, not-yet-built gap — reported separately as
@@ -93,6 +137,9 @@ def load_tree():
     return "\n".join(parts)
 
 
+field_inventory = set()
+
+
 def check_blueprint(path, tree):
     slug, comps, _producer, _reads, _tabs = kb_compiler.parse_blueprint(path)
     gaps, inventory = [], []
@@ -106,6 +153,9 @@ def check_blueprint(path, tree):
             if field in tree:
                 continue
             if (c.name, field) in ALLOWLIST:
+                continue
+            if (c.name, field) in UNBUILT_FIELDS:
+                field_inventory.add((c.name, field))
                 continue
             gaps.append((slug, c.name, field))
     return gaps, inventory
@@ -125,6 +175,13 @@ def main():
               f"skipped as documented-unbuilt (not gated, not silently dropped):")
         for c in seen:
             print(f"  {c}: {UNBUILT_COMPONENTS[c]}")
+        print()
+
+    if field_inventory:
+        print(f"renderer_conformance: {len(field_inventory)} outcome field(s) skipped as "
+              f"not-yet-produced (not gated, not silently dropped):")
+        for key in sorted(field_inventory):
+            print(f"  {key[0]}.{key[1]}: {UNBUILT_FIELDS[key]}")
         print()
 
     if not all_gaps:

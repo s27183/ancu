@@ -620,17 +620,19 @@ name as Mode C's; `tax_structure_non_resident`/`disposition` read this key upstr
     "annual_rental_income_year_1": "money",
     "annual_operating_expenses_year_1": "money",
     "annual_interest_year_1": "money",
-    "annual_withholding_tax": "money",
-    "vacancy_fee_at_risk": "money",
-    "cash_flow_before_au_income_tax_year_1": "money",
-    "cash_flow_per_week_aud": "money",
+    "cash_flow_before_tax_year_1": "money",
+    "cash_flow_before_tax_per_week": "money",
     "gross_yield": "percentage",
-    "net_yield_post_loan_post_withholding": "percentage",
+    "net_yield_pre_loan": "percentage",
+    "net_yield_post_loan_pre_tax": "percentage",
     "year_5_projected_cash_flow": "money",
-    "year_10_projected_cash_flow": "money"
+    "year_10_projected_cash_flow": "money",
+    "is_positive_neutral_or_negative_geared_pre_tax": "enum"
   }
 }
 ```
+
+*(Reconciled 2026-10-08, behavior 30 — the fields above are the ones the engine emits for Mode D, the same `cash_flow_projection` filler as Mode C (read from live Mode-D plans). Dropped: `annual_withholding_tax` and `net_yield_post_loan_post_withholding` — directly-held AU rent carries no final withholding, it is taxed by assessment (`kb.non-resident-tax.withholding-on-rental-income`, as this component's own params say); `vacancy_fee_at_risk` — owned and shown by `ownership_planning_foreign_investor`. Renamed to the emitted names: `cash_flow_before_au_income_tax_year_1` → `cash_flow_before_tax_year_1`, `cash_flow_per_week_aud` → `cash_flow_before_tax_per_week`.)*
 
 **Hold-phase `cash_events` (full-temporal-flow wiring, design-first — §8.5/§8.6).** `yield_modelling` owns the **recurring hold-phase** flows the full-horizon financial spine places at phase `own` over `H`: rental income (`money_in`, recurring/year), operating expenses, loan interest, and the **non-resident rental withholding** (`money_out`, recurring/year), each `source_component: yield_modelling`, gated by the §13 placement check. `tax_structure_non_resident` adds the negative-gearing tax effect (offset against AU-source income only) on the same axis.
 

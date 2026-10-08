@@ -267,6 +267,12 @@
     const hasHorizon = $derived(typeof d.horizon_years === 'number' && d.horizon_years > 0);
     const loanPending = $derived(hasHorizon && !hasRange(d.loan_payout));
     const fullHorizon = $derived(hasRange(d.full_horizon_net_position) ? d.full_horizon_net_position : null);
+    // Investor exits (Mode C/D) carry taxable_gain; a foreign-resident exit (Mode D) carries
+    // the VN-side note from the base turn on, horizon or not — so both rows below show as
+    // pending before a horizon is set rather than vanishing (behavior 30).
+    const isInvestorExit = $derived('taxable_gain' in outcome);
+    const isForeignExit = $derived(d.vn_side_cgt_note != null);
+    const vnNote = $derived(d.vn_side_cgt_note ? [d.vn_side_cgt_note] : []);
     const CGT_TONE: Record<string, 'good' | 'warn' | 'neutral'> = { exempt: 'good', to_verify: 'warn' };
     // Map the closed cgt_status enum to literal i18n keys (no dynamic-key cast that would
     // hide a producer rename — firsthomey-svelte-conventions).
@@ -507,10 +513,18 @@
                             >{hasRange(d.loan_payout) ? '−' + rangeLabel(d.loan_payout) : '—'}</td
                         >
                     </tr>
+                    {#if isInvestorExit}
+                        <tr class="cw-trevent">
+                            <td class="cw-td-item"><span class="cw-ev-label">{$t('plan.disp.taxable_gain')}</span></td>
+                            <td class="num cw-ev-amt">{#if hasRange(d.taxable_gain)}{rangeLabel(d.taxable_gain)}{:else}<Pending />{/if}</td>
+                        </tr>
+                    {/if}
                     <tr class="cw-trevent">
                         <td class="cw-td-item"><span class="cw-ev-label">{$t('plan.disp.cgt')}</span></td>
                         <td class="num">
-                            {#if d.cgt_status}
+                            {#if hasRange(d.cgt)}
+                                <span class="cw-ev-amt cw-out">−{rangeLabel(d.cgt)}</span>
+                            {:else if d.cgt_status}
                                 <Chip label={cgtLabel(d.cgt_status)} tone={CGT_TONE[d.cgt_status] ?? 'neutral'} />
                             {:else}
                                 —
@@ -529,6 +543,15 @@
             <p class="cw-cta">{$t('plan.disp.loan_pending')}</p>
         {/if}
 
+        {#if isForeignExit}
+            <!-- FRCGW: withheld from the price at settlement and credited on the return —
+                 a sale-day cash fact, NOT a deduction in net (net subtracts the assessed CGT). -->
+            <Field label={$t('plan.disp.frcgw')}
+                value={hasRange(d.frcgw_withheld_at_settlement) ? rangeLabel(d.frcgw_withheld_at_settlement) : null} />
+            <p class="cw-disp-sub">{$t('plan.disp.frcgw_sub')}</p>
+            <NoteList heading={$t('plan.disp.vn_note')} notes={vnNote} />
+        {/if}
+
         <NoteList heading={$t('plan.f.assumptions')} notes={d.key_assumptions} />
     {:else}
         <!-- H null → no projection (Mode-A long/indefinite default); the engine emits the
@@ -537,6 +560,14 @@
             <span class="cw-need-label">{$t('plan.disp.set_horizon')}</span>
         </div>
         <NoteList notes={d.key_assumptions} />
+        {#if isInvestorExit}
+            <Field label={$t('plan.disp.taxable_gain')} value={null} />
+        {/if}
+        {#if isForeignExit}
+            <Field label={$t('plan.disp.frcgw')} value={null} />
+            <p class="cw-disp-sub">{$t('plan.disp.frcgw_sub')}</p>
+            <NoteList heading={$t('plan.disp.vn_note')} notes={vnNote} />
+        {/if}
     {/if}
 {/if}
 

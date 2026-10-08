@@ -177,7 +177,9 @@ no thing to ask and is not covered.
 
 A branch per behavior, a draft PR, Son merges; no CI, CONTRIBUTING or PR
 template (probed 2026-10-06). The done checks run from the repo root, offline —
-no LLM, no live stack, a few seconds each (all passed at 26f811d). The escript
+no LLM, no live stack, a few seconds each (all passed at 26f811d). `renderer_conformance.py`
+joined them with behavior 30 (2026-10-08): an outcome field no frontend file names fails
+it, unless it is allowlisted with the component that reads it or listed as not yet produced. The escript
 smokes under `engine/erlang/test/` and `shell/web/backend/test/` need Postgres
 and some the planner; a behavior runs the ones it touches. The conformance escripts are the exception: offline, so
 `scripts/conformance_sweep.sh` runs all of them as the last done check (about
@@ -186,7 +188,7 @@ reads. Offline means no Postgres, no planner, no `.env`: a conformance escript m
 open loopback ports for its own stubs, as the shell's `sse_cancel_conformance` does
 (behavior 29; the sweep took 13 s with it, measured 2026-10-08).
 
-    checks: `.venv/bin/python tests/validate_build.py`; `.venv/bin/python tests/resolver_eval.py`; `.venv/bin/python tests/eligibility_benefit_eval.py`; `.venv/bin/python tests/cash_duty_eval.py`; `.venv/bin/python tests/mortgage_eval.py`; `.venv/bin/python tests/ownership_eval.py`; `.venv/bin/python tests/bilingual_eval.py`; `.venv/bin/python tests/outcome_validate.py`; `.venv/bin/python tests/shell_contract_check.py`; `.venv/bin/python scripts/doc_links.py docs`; `(cd engine/erlang && rebar3 compile)`; `(cd shell/web/backend && rebar3 compile)`; `(cd shell/web/frontend && npm run check)`; `bash scripts/conformance_sweep.sh`
+    checks: `.venv/bin/python tests/validate_build.py`; `.venv/bin/python tests/resolver_eval.py`; `.venv/bin/python tests/eligibility_benefit_eval.py`; `.venv/bin/python tests/cash_duty_eval.py`; `.venv/bin/python tests/mortgage_eval.py`; `.venv/bin/python tests/ownership_eval.py`; `.venv/bin/python tests/bilingual_eval.py`; `.venv/bin/python tests/outcome_validate.py`; `.venv/bin/python tests/shell_contract_check.py`; `.venv/bin/python tests/renderer_conformance.py`; `.venv/bin/python scripts/doc_links.py docs`; `(cd engine/erlang && rebar3 compile)`; `(cd shell/web/backend && rebar3 compile)`; `(cd shell/web/frontend && npm run check)`; `bash scripts/conformance_sweep.sh`
     attribution: co-author+session
     behaviors: none yet
 
