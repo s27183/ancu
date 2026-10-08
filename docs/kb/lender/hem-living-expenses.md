@@ -36,7 +36,7 @@ The plan already captures `application.applicant_count` and `application.depende
 
 - **Conservative by design.** A high expense floor keeps the capacity (and therefore the full-horizon net position it feeds) honest; an optimistic HEM would inflate the loan, the dispose-phase loan payout, and the graduation story.
 - **Multi-generational households** common in the diaspora may have living-expense patterns the flat band does not capture — another reason the figure is surfaced as a labelled convention, not a verdict, and re-grounding is tracked.
-- **Re-grounding is a tracked obligation.** Like [`kb.property.capital-growth-bands`](../property/capital-growth-bands.md), this doc is **stale-by-construction** until a named series replaces the band; the freshness pass treats it as such.
+- **Re-grounding is a tracked obligation.** This doc is **stale-by-construction** until a named series replaces the band; the freshness pass treats it as such. ([`kb.property.capital-growth-bands`](../property/capital-growth-bands.md) was the same kind of placeholder until 2026-10-07, when it was re-grounded on ABS Total Value of Dwellings — the path this doc follows.)
 
 ## Rules
 
@@ -59,7 +59,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json`. 
 Notes:
 
 - **No `fills`.** `expected_borrowing_capacity` is **resolver-computed** from this band plus the tax schedule and debt commitments — a formula, kept in code per §11.9. The doc supplies the band and the method note, not a figure.
-- **PLACEHOLDER, not verified.** Unlike the regulated docs in this set (`kb.lender.serviceability-basics` buffer, `kb.tax.income-tax-resident-2026-27`), the figures here are **deliberately unverified** and labelled throughout — an honest placeholder, the sibling of `kb.property.capital-growth-bands`.
+- **PLACEHOLDER, not verified.** Unlike the regulated docs in this set (`kb.lender.serviceability-basics` buffer, `kb.tax.income-tax-resident-2026-27`), the figures here are **deliberately unverified** and labelled throughout — an honest placeholder, as `kb.property.capital-growth-bands` was before its ABS re-grounding.
 - **The band IS the capacity band.** The two ends are not a measurement error to be averaged away — they are the surfaced uncertainty; the resolver reports both bounds.
 
 ## Sources

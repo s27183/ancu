@@ -1019,7 +1019,7 @@ The `phase_playbook` shape is **mode-general** (phase-keyed actions + risks); Mo
 {
   "horizon": {
     "hold_horizon_years": { "type": "integer", "value": "<from_buyer_profile>", "note": "H; null = no disposal projection (Mode-A long/indefinite default). A structural what-if dimension — varying it re-runs this component free (resolver-only simulate, engine-contract §10.5)." },
-    "growth_band_used": { "type": "string", "value": "<initial>", "note": "the capital-growth band applied from kb.property.capital-growth-bands (currently a PLACEHOLDER), compounded over H; stated in key_assumptions" }
+    "growth_band_used": { "type": "string", "value": "<initial>", "note": "the capital-growth band applied from kb.property.capital-growth-bands (ABS Total Value of Dwellings, CONVENTION), compounded over H; stated in key_assumptions" }
   },
   "proceeds": {
     "purchase_price_basis": { "type": "money", "value": "<initial>", "note": "target_price_range ceiling at base; the specific property price per-property" },
@@ -1052,7 +1052,7 @@ The `phase_playbook` shape is **mode-general** (phase-keyed actions + risks); Mo
   "type": "disposition",
   "fields": {
     "horizon_years": "integer|null",                  // H; null = no disposal projection set (Mode-A long/indefinite default)
-    "sale_proceeds": "money_range|null",              // growth-projected over H (kb.property.capital-growth-bands — PLACEHOLDER band); null/PENDING when H or price unparameterised
+    "sale_proceeds": "money_range|null",              // growth-projected over H (kb.property.capital-growth-bands — ABS-sourced band); null/PENDING when H or price unparameterised
     "selling_costs": "money_range|null",              // commission + legal + marketing (kb.selling-costs.agent-legal); money_out at dispose
     "loan_payout": "money_range|null",                // remaining loan principal discharged at sale settlement; null until the loan is known (honest-partial)
     "cgt": "money_range|null",                        // tax on the gain; null on the Mode-A main-residence-exempt path
@@ -1060,14 +1060,14 @@ The `phase_playbook` shape is **mode-general** (phase-keyed actions + risks); Mo
     "net_proceeds": "money_range|null",               // sale_proceeds − selling_costs − loan_payout − cgt — the equity realised at sale (→ the next purchase, the graduation story)
     "full_horizon_net_position": "money_range|null",  // §8.6 — the buy→hold→sell roll-up: PLACES acquire (budget_envelope.total_cash_required) + hold (ongoing_obligations annualised × H) + this dispose net. One-computer-per-figure: the acquire/hold figures are referenced from their owners, never recomputed; only this roll-up and the dispose figures are owned here.
     "dispose_cash_events": "array<{ id: string, phase: string, label: localized_text, direction: enum [out, in], amount: money_range|null, is_estimate: bool, timing: enum [one_off, recurring], period: enum [once, monthly, quarterly, annual]|null, counterparty: string, source_component: string }>",  // the Dispose-phase entries of the shared financial spine (phase = "dispose", timing = one_off): sale_proceeds (in, counterparty: buyer/market), selling_costs + loan_payout + cgt (out, counterparty: agent / lender / government). Each source_component: disposition. purchase_journey PLACES these on the swimlane's Dispose column; the Budget calculator groups them by phase into the full-horizon cash-flow — the SAME placement discipline as budget_envelope.cash_events. is_estimate true (growth-projected / banded).
-    "key_assumptions": "array<localized_text>"        // the growth band used (WITH the PLACEHOLDER caveat), the held period H, the CGT exemption basis, the selling-cost basis. ASIC: decision-support with the assumption stated, never a forecast or advice.
+    "key_assumptions": "array<localized_text>"        // the growth band used (WITH its basis — the named series, or the PLACEHOLDER caveat while the band doc's is_placeholder is true), the held period H, the CGT exemption basis, the selling-cost basis. ASIC: decision-support with the assumption stated, never a forecast or advice.
   }
 }
 ```
 
 The `disposition` shape is **mode-general** (a horizon-parameterised disposal projection). Mode A is built here on the **main-residence-exemption** path (`cgt: null` / `to_verify`, no taxable-gain estimate). Modes C/D reuse the same schema + the `calculator` renderer with the **investor** CGT computation (50% discount for assets held > 12 months, cost base / depreciation, partial-exemption apportionment) and the recurring holding-phase gearing events — authored **design-first** when those modes enter scope (lifecycle-simulation-model §8.7); the `kb.tax.*` / `kb.investor.*` anchors they need are dangling in `investor-domestic-au.md` until then.
 
-> **Build order.** The structure (phase enum `dispose`, the horizon param, the `disposition` outcome shape, the full-horizon roll-up) is built now for all modes. Mode-A content is authored now (`kb.tax.cgt-main-residence-exemption`, `kb.selling-costs.agent-legal`, and the **placeholder** `kb.property.capital-growth-bands` — to be re-grounded against a named series before any figure is surfaced). Investor tax content is design-first (§8.7).
+> **Build order.** The structure (phase enum `dispose`, the horizon param, the `disposition` outcome shape, the full-horizon roll-up) is built now for all modes. Mode-A content is authored now (`kb.tax.cgt-main-residence-exemption`, `kb.selling-costs.agent-legal`, and `kb.property.capital-growth-bands` — re-grounded on ABS Total Value of Dwellings 2026-10-07). Investor tax content is design-first (§8.7).
 
 ---
 
@@ -1126,7 +1126,7 @@ The following kb_anchor slugs are referenced by components in this blueprint. Th
 | `kb.preparation.fhb-readiness` | 11 | The Mode-A FHB readiness template — generic document checklist + people-to-engage roles + bilingual prose (buffer figures are placed from upstream, not stored here) |
 | `kb.journey.phase-actions` | 12 | The Mode-A per-phase **action** template — ordered actions per phase with `budget_ref`/`component_ref` links + bilingual prose (figures linked by id from upstream, not stored here). Slice 2. |
 | `kb.risks.fhb-by-phase` | 12 | The Mode-A per-phase **risk + mitigation** template — often-seen risks per lifecycle phase with severity + bilingual mitigation; verified against the transactional risk KB (`kb.s32.review-points`, `kb.cooling-off.by-state`, `kb.special-conditions.standard-set`, `kb.auction.rules-by-state`, `kb.agent-tactics.detection`). Slice 3. |
-| `kb.property.capital-growth-bands` | 13 | The capital-growth assumption band the disposition resolver compounds over the hold horizon H to project sale proceeds — **PLACEHOLDER**, to be re-grounded against a named series (ABS RPPI / CoreLogic / state Valuer-General) before any figure is surfaced. |
+| `kb.property.capital-growth-bands` | 13 | The capital-growth assumption band the disposition resolver compounds over the hold horizon H to project sale proceeds — 3–6% p.a. nominal, derived from ABS Total Value of Dwellings (20-year capital-city median growth; CONVENTION). |
 | `kb.selling-costs.agent-legal` | 13 | Conventional **sale-side** cost bands (agent commission %, legal/conveyancing, marketing) — estimates, surfaced as ranges. Distinct from the buyer-side `kb.buyer-costs.inspections-conveyancing-fees`. |
 | `kb.tax.cgt-main-residence-exemption` | 13 | The CGT **main-residence exemption** rules (full-exemption conditions, 2-ha cap, income-production / 6-year absence / foreign-resident triggers) — REGULATED, ATO-verified. Mode-A owner-occupier → exempt (`cgt: null`); investor CGT is Modes C/D, design-first. |
 

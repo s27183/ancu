@@ -1164,7 +1164,7 @@ The `mode_switch_eligible` field signals when the user's status has changed (e.g
 | *`kb.non-resident-tax.cgt-no-ppor-exemption`* | 10 | Foreign resident CGT — no PPOR exemption |
 | *`kb.non-resident-tax.withholding-on-rental-income`* | 10 | Non-resident rental income withholding |
 | *`kb.non-resident-tax.foreign-resident-cgt-withholding`* | 10 | Foreign resident CGT withholding on sale |
-| `kb.property.capital-growth-bands` | 12 | The capital-growth assumption band `disposition` compounds over the hold horizon H — PLACEHOLDER, shared with Mode A |
+| `kb.property.capital-growth-bands` | 12 | The capital-growth assumption band `disposition` compounds over the hold horizon H — 3–6% p.a. from ABS Total Value of Dwellings (CONVENTION), shared with Mode A |
 | `kb.selling-costs.agent-legal` | 12 | Agent commission + legal/marketing bands at sale |
 | `kb.tax.cgt-main-residence-exemption` | 12 | Main-residence CGT exemption + the non-resident-at-disposal trap (Mode B always routes to `to_verify` via this trap) |
 | `kb.lender.serviceability-basics` | 12 | The representative product rate `disposition` amortises `expected_borrowing_capacity` at, for the loan-payout-at-horizon figure |
