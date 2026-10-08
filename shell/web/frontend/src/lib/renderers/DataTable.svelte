@@ -51,6 +51,19 @@
     });
     const marginalRate = $derived(tx.cgt_marginal_rate != null ? `${num(tx.cgt_marginal_rate, $lang)}%` : null);
     const afterTaxCf = $derived(moneyRange(tx.after_tax_cash_flow_year_1, $lang));
+    // Entity setup is an INDICATIVE band the engine places from the KB (never the agent's):
+    // [0, 0] → "$0", [lo, hi] → "lo – hi", [lo, null] → "from lo" (an open-ended floor), each
+    // labelled indicative; null (no entity yet) → Pending. Not part of the cash total.
+    const setupCosts = $derived.by(() => {
+        const r = tx.setup_costs;
+        if (!Array.isArray(r) || typeof r[0] !== 'number') return null;
+        const [lo, hi] = r;
+        const lo$ = money(lo, $lang) ?? '';
+        const band = hi === null ? $t('plan.tx.setup_from').replace('{amount}', lo$)
+            : hi === lo ? lo$
+            : moneyRange([lo, hi], $lang);
+        return `${band} ${$t('plan.tx.indicative')}`;
+    });
 
     // tax_structure_non_resident (Mode D) — the SEVENTH shape, found 2026-07-11 auditing a
     // live investor-foreign-au card: it shares tax_optimised_structure's type name AND both
@@ -166,6 +179,21 @@
     // shape at all, not duplicating content, so it stops falling through to the FHB branch.
     const isPreparation = $derived('scheme_applications_to_prepare' in outcome);
 
+    // ownership_planning (Mode B, fhb-foreign-au component 11) shares ongoing_obligations
+    // with Mode A but adds the foreign-person rows; vacancy_fee_at_risk_amount is unique to
+    // it. Each row shows Pending while null (occupancy intent not captured yet) — never
+    // dropped (behavior 30).
+    const isOwnershipForeign = $derived('vacancy_fee_at_risk_amount' in outcome);
+    const OCCUPANCY: Record<string, 'good' | 'warn' | 'neutral'> = {
+        compliant_owner_occupier: 'good',
+        compliant_genuinely_rented: 'good',
+        at_risk: 'warn',
+        non_compliant: 'warn'
+    };
+    function occupancyLabel(v: string): string {
+        return v in OCCUPANCY ? $t(`plan.f.occupancy.${v}` as 'plan.f.occupancy.at_risk') : v;
+    }
+
     const LAND_TAX: Record<string, 'good' | 'info' | 'neutral'> = {
         exempt_ppor: 'good',
         applicable: 'info',
@@ -270,6 +298,7 @@
 </div>
 <Field label={$t('plan.tx.marginal_rate')} value={marginalRate} />
 <Field label={$t('plan.tx.after_tax_cf')} value={afterTaxCf} />
+<Field label={$t('plan.tx.setup_costs')} value={setupCosts} />
 
 {:else if isPortfolio}
 <!-- ── ownership_planning_investor (portfolio_position) ────────────────── -->
@@ -501,6 +530,23 @@
 <Field label={$t('plan.f.maintenance')} value={money(o.maintenance_reserve_target, $lang)} />
 <Field label={$t('plan.f.monthly')} value={money(o.total_monthly_outgoings_estimate, $lang)} />
 <Field label={$t('plan.f.annual')} value={money(o.total_annual_outgoings_estimate, $lang)} />
+
+{#if isOwnershipForeign}
+    <Field label={$t('plan.f.vacancy_fee_at_risk')} value={money(o.vacancy_fee_at_risk_amount, $lang)} />
+    {#if o.current_year_occupancy_status}
+        <div class="pp-field">
+            <span class="pp-label">{$t('plan.f.occupancy_status')}</span>
+            <Chip label={occupancyLabel(o.current_year_occupancy_status)}
+                tone={OCCUPANCY[o.current_year_occupancy_status] ?? 'neutral'} />
+        </div>
+    {:else}
+        <Field label={$t('plan.f.occupancy_status')} value={null} />
+    {/if}
+    <Field label={$t('plan.f.nr_filing')}
+        value={typeof o.non_resident_tax_filing_required === 'boolean'
+            ? (o.non_resident_tax_filing_required ? $t('plan.f.yes') : $t('plan.f.no'))
+            : null} />
+{/if}
 
 <NoteList notes={o.recurring_costs_estimate?.notes} />
 

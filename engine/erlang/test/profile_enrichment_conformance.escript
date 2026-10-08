@@ -59,8 +59,11 @@ projection_checks() ->
            10000),
      check("mortgage.expected_borrowing_capacity is no longer null (income known)",
            maps:get(<<"expected_borrowing_capacity">>, Mort) =/= null, true),
+     %% the same IC0 figure serviceability_conformance asserts for fh_engine_mortgage, re-verified
+     %% there 2026-07-09 against the 2026-27 schedule (the 15% bracket, b31e226); this anchor
+     %% still held the 2025-26 figure [350599, 459967] until 2026-10-06 (#11).
      check("mortgage.expected_borrowing_capacity matches the IC0 fixture to the dollar",
-           maps:get(<<"expected_borrowing_capacity">>, Mort), [350599, 459967])].
+           maps:get(<<"expected_borrowing_capacity">>, Mort), [357302, 466670])].
 
 %% --- 2. regression: no financials → honest-partial PENDING ------------------
 
@@ -95,7 +98,7 @@ link_checks() ->
 
 %% --- fixtures ---------------------------------------------------------------
 
-%% the IC0 worked case: $95k assessable, $20k HECS, $10k card limit → [350599,459967].
+%% the IC0 worked case: $95k assessable, $20k HECS, $10k card limit → [357302,466670] (2026-27).
 %% Canonical fact-base shape (household_financials.income.assessable_income).
 ic0_financials() ->
     #{<<"income">> => #{<<"assessable_income">> => 95000},

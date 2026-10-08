@@ -55,6 +55,9 @@ export interface ProfileOutcome {
     target_zone?: string[] | null;
     key_constraints?: LocalizedText[] | null;
     key_strengths?: LocalizedText[] | null;
+    // Domestic profiles (Mode A/C/E): the ordinarily-resident assumption when an applicant
+    // may be a permanent resident (kb.copy.profile assume_pr_ordinarily_resident).
+    key_assumptions?: LocalizedText[] | null;
 }
 
 export interface SchemeEntry {
@@ -287,6 +290,15 @@ export interface DispositionOutcome {
     /** The Dispose-phase entries of the shared spine (same shape as cash_events). */
     dispose_cash_events?: CashEvent[] | null;
     key_assumptions?: LocalizedText[] | null;
+    /** Mode C/D only (fh_engine_disposition.erl fill_investor/3): the gain after any CGT
+     *  discount, before tax; absent on the Mode-A/B main-residence path. */
+    taxable_gain?: MoneyRange | null;
+    /** Mode D only: the foreign-resident CGT withholding taken from the sale price at
+     *  settlement (kb.frcgw); null on Mode C and until a horizon is set. Not part of net. */
+    frcgw_withheld_at_settlement?: MoneyRange | null;
+    /** Mode D only: the VN-side note — never a VN tax figure (kb.au-vn-tax-treaty). Its
+     *  presence marks a foreign-resident exit, horizon or not. */
+    vn_side_cgt_note?: LocalizedText | null;
 }
 
 /** existing_home_disposal → calculator (outcome type `existing_home_disposal`). Mode-E ONLY
@@ -331,7 +343,8 @@ export interface TaxOptimisedStructureOutcome {
     cgt_marginal_rate?: number | null;
     cost_base_depreciation_clawback?: boolean | null;
     annual_compliance_cost?: number | null;
-    setup_costs?: number | null;
+    /** entity setup, INDICATIVE band from kb.tax.entity-setup-costs; [lo, null] = "from lo". */
+    setup_costs?: [number, number | null] | null;
     negative_gearing_reform_note?: LocalizedText | null;
 }
 
@@ -389,6 +402,15 @@ export interface OngoingObligationsOutcome {
     land_tax_check?: string | null;
     graduation_milestone?: GraduationMilestone | null;
     alert_triggers_armed?: AlertTrigger[] | null;
+    // Mode B only (fh_engine_ownership.erl fill_foreign/2): the vacancy fee at risk is
+    // firb_workflow's own fee × the KB multiplier; occupancy status and the non-resident
+    // filing flag stay null until occupancy intent is captured (honest-partial).
+    vacancy_fee_at_risk_amount?: number | null;
+    current_year_occupancy_status?:
+        | 'compliant_owner_occupier' | 'compliant_genuinely_rented' | 'at_risk' | 'non_compliant'
+        | string | null;
+    non_resident_tax_filing_required?: boolean | null;
+    mode_switch_eligible?: boolean | null;
 }
 
 // --- Investor (Mode C) outcome types ----------------------------------------

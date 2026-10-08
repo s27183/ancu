@@ -55,6 +55,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
     "investment_lvr_ceiling_pct":   { "type": "percentage", "value": 90, "note": "CONVENTION — above ~90% LVR investment lending is restricted; many lenders will not write it" },
     "io_initial_term_years_typical":{ "type": "integer", "value": 5, "note": "CONVENTION — typical maximum initial interest-only term (sometimes extendable on reassessment); reverts to P&I over the residual term thereafter" },
     "smsf_lrba_max_lvr_pct_typical":{ "type": "percentage", "value": 80, "note": "CONVENTION — SMSF limited-recourse borrowing offered by few lenders at lower max LVR (commonly ~70–80%) and higher rates" },
+    "lvr_cap_property_types":       { "type": "array<string>", "value": ["established_apartment", "new_apartment"], "note": "CONVENTION — the attached property_type values that fall in security_category_policy.high_density_apartment (LVR cap ~70–80%); the resolver adds a caveat line and keeps the figures at the 80% baseline, never a lender's own cap" },
     "entity_borrower_narrows_lender_set": { "type": "bool", "value": true, "note": "company/trust/SMSF borrowers are accepted by fewer lenders on tighter terms — the entity choice constrains financing; surfaced as a tax↔finance interaction, never as a recommendation" }
   },
   "lookup": {

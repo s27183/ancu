@@ -392,6 +392,9 @@ get_checklist_status(TenantId, PlanCardId) ->
 %% filter input fh_engine_kb:news_for_slugs/1 intersects against each news
 %% note's affected_kb_slugs. No tenant filter here (plan_card_id is globally
 %% unique); the caller enforces ownership via get_news_status/2 first.
+%% Generic over any slug in audit_events.kb_versions_jsonb: a new news topic needs only a
+%% KB doc the card's fills anchor and a note naming it in affected_kb_slugs — no change
+%% here or in the pipeline (concluded 2026-10-08 from reading this query).
 -spec card_kb_slugs(binary()) -> [binary()].
 card_kb_slugs(PlanCardId) ->
     Res = query(

@@ -20,8 +20,13 @@
 %% fh_engine_ownership:fill_investor/2 (a clean sibling — unique name, FHB fill/2 untouched).
 
 -export([resolver/3, has_resolver/1, merge_agent/3, agent_values_from_outcome/2]).
+%% residence_assumptions/1 is exported for firb_residence_conformance: the base turn only ever
+%% projects the {citizen, PR} set, so the scalar-PR and citizen-only households are exercised
+%% through the same function the profiles call.
+-export([residence_assumptions/1]).
 
 -define(COPY, <<"kb.copy.profile">>).   %% buyer_profile bilingual copy-templates (bilingual-content.md §3b)
+-define(ENTITY_SETUP, <<"kb.tax.entity-setup-costs">>).  %% INDICATIVE setup bands by entity
 -define(TARGET_YIELD, <<"kb.investor.target-yield-by-archetype">>).  %% labelled-placeholder defaults
 
 %% Does this component have a resolver fill? Empty `agent_leaves` → pure resolver;
@@ -56,6 +61,11 @@ has_resolver(<<"due_diligence">>)      -> true;
 has_resolver(<<"existing_home_disposal">>) -> true;
 has_resolver(_)                        -> false.
 
+%% Honest-partial -> P-2 · The database is the single source of truth -> The engine -> firb_required_any defaults false
+%% Args.firb_required_any discriminates FIRB/foreign paths in several resolvers, and a
+%% missing key reads as `false` with no error. Every new turn starter must thread it from
+%% facts_jsonb.derived, as fh_engine_h_rerun does. Measured 2026-07-11 on a live Mode-D
+%% what-if turn that did not thread it.
 -spec resolver(binary(), map(), map()) -> {map(), binary(), [map()]}.
 resolver(<<"buyer_profile">>, Args, _Upstream) ->
     buyer_profile(Args);
@@ -138,10 +148,14 @@ merge_agent(<<"investment_strategy">>, ResolverOutcome, AgentValues) ->
 %% (recommended_entity). Slot-scoped fold — the agent reach is exactly this one judgment
 %% field; every figure (the CGT determinants, the null property/seam-deferred money) is the
 %% resolver scaffold's and is left untouched (§98 — the agent authors NO figure, NO verdict).
+%% setup_costs is DERIVED from the agent's entity via the KB band (entity_setup_band/1) — the
+%% entity is the agent's, the band is the resolver's, so the figure stays out of the LLM's reach
+%% (a stray setup_costs in AgentValues is ignored), the same split as target_gross_yield above.
 merge_agent(<<"tax_structure">>, ResolverOutcome, AgentValues) ->
+    Entity = maps:get(<<"recommended_entity">>, AgentValues, null),
     ResolverOutcome#{
-        <<"recommended_entity">> =>
-            maps:get(<<"recommended_entity">>, AgentValues, null)
+        <<"recommended_entity">> => Entity,
+        <<"setup_costs">>        => entity_setup_band(Entity)
     };
 %% tax_structure_non_resident (Mode D): identical single-leaf fold to tax_structure/2 above —
 %% distinct component name, same shared `tax_optimised_structure` outcome type + agent-slot
@@ -381,7 +395,8 @@ buyer_profile_domestic(Args) ->
         %% bilingual {vi,en} via kb.copy.profile (no Vietnamese in Erlang literals —
         %% the io:format ~s >255-codepoint trap; bilingual-content.md §3b).
         <<"key_constraints">> => [copy(<<"constraint_financials_pending">>, #{})],
-        <<"key_strengths">>   => [copy(<<"strength_first_home_buyer">>, #{})]
+        <<"key_strengths">>   => [copy(<<"strength_first_home_buyer">>, #{})],
+        <<"key_assumptions">> => residence_assumptions(Applicants)
     },
     KbVersions = fh_engine_kb:kb_anchors(
         [<<"kb.hecs.thresholds">>, <<"kb.firb.status-determination">>,
@@ -474,7 +489,7 @@ buyer_profile_foreign(Args) ->
         <<"key_strengths">>   => [copy(<<"strength_cross_border_family_plan">>, #{})]
     },
     KbVersions = fh_engine_kb:kb_anchors(
-        [<<"kb.firb.status-determination">>, <<"kb.firb.established-dwelling-ban">>,
+        [<<"kb.firb.established-dwelling-ban">>,
          <<"kb.visas.au-temporary-residency-classes">>,
          <<"kb.au-temp-residents.banking-and-tax-basics">>]),
     {Outcome, <<"summary-card">>, KbVersions}.
@@ -542,13 +557,14 @@ investor_profile(Args) ->
         %% FIRB / no foreign-buyer surcharge / resident CGT-discount eligible). Decision-
         %% support tone — states the position, not "you should invest" (ASIC line).
         <<"key_constraints">> => [copy(<<"constraint_financials_pending">>, #{})],
-        <<"key_strengths">>   => [copy(<<"strength_domestic_investor">>, #{})]
+        <<"key_strengths">>   => [copy(<<"strength_domestic_investor">>, #{})],
+        <<"key_assumptions">> => residence_assumptions(Applicants)
         %% ABSENT (→ null → honest-partial): existing_portfolio, traits,
         %% deposit_ready_for_purchase_amount, ppor_equity_available_for_leverage,
         %% approx_borrowing_capacity — gathered on a refine turn (profiles SOT).
     },
     KbVersions = fh_engine_kb:kb_anchors(
-        [<<"kb.tax.income-tax-resident-2026-27">>,
+        [<<"kb.firb.status-determination">>, <<"kb.tax.income-tax-resident-2026-27">>,
          <<"kb.lender.serviceability-investment-loans">>,
          <<"kb.investor.experience-levels">>]),
     {Outcome, <<"summary-card">>, KbVersions}.
@@ -630,7 +646,7 @@ investor_profile_foreign(Args) ->
         %% source_of_funds_documentation_ready — gathered on a refine turn (profiles SOT).
     },
     KbVersions = fh_engine_kb:kb_anchors(
-        [<<"kb.firb.status-determination">>, <<"kb.firb.established-dwelling-ban">>,
+        [<<"kb.firb.established-dwelling-ban">>,
          <<"kb.vn-tax.brackets-2026">>, <<"kb.vn-tax.income-from-foreign-property">>,
          <<"kb.lender.non-resident-friendly-shortlist">>, <<"kb.investor.experience-levels">>]),
     {Outcome, <<"summary-card">>, KbVersions}.
@@ -777,9 +793,9 @@ investment_strategy_foreign(Upstream) ->
 %%       when absent → disposition CGT to_verify (the conservative net). total_depreciation stays
 %%       null — the KB defers the Div-43/40 dollar to a QS (kb.tax.depreciation-division-43-and-40),
 %%       never asserts it.
-%%   (b) entity-structure banded-vs-scalar seam: setup_costs + annual_compliance_cost (the KB gives
-%%       BANDS — entity setup $1.5k–$4k, kb.tax.entity-setup-costs) are entity-dependent, not
-%%       rent-dependent — out of B2's scope, deferred to the entity-cost unit.
+%%   (b) entity-dependent: setup_costs is placed at merge from the agent's entity as the KB band
+%%       (entity_setup_band/1, kb.tax.entity-setup-costs; #12). annual_compliance_cost stays null —
+%%       the KB's ongoing figures are text ("1000-3500+", "accounting + audit"), not a band yet.
 %%
 %% The agent's reach is exactly the one entity leaf — no figure, no verdict (the
 %% entity-comparison KB is the most regulated content in the wedge; the sidecar's single-enum
@@ -809,7 +825,8 @@ tax_structure(Upstream) ->
          <<"kb.tax.depreciation-division-43-and-40">>,
          <<"kb.tax.cgt-50-percent-discount">>,
          <<"kb.tax.quantity-surveyor-reports">>,
-         <<"kb.tax.land-tax-by-state">>]),
+         <<"kb.tax.land-tax-by-state">>,
+         ?ENTITY_SETUP]),
     {Outcome, <<"data-table">>, KbVersions}.
 
 %% the input-independent scaffold: the entity agent slot (null pre-merge), the two KB-grounded CGT
@@ -829,7 +846,7 @@ tax_structure_scaffold() ->
         <<"after_tax_cash_flow_per_week">> => null,
         <<"total_depreciation_year_1">>    => null,  %% QS-deferred (no schedule in reach)
         <<"cgt_marginal_rate">>            => null,
-        <<"setup_costs">>                  => null,  %% entity-cost banded-vs-scalar seam (class b)
+        <<"setup_costs">>                  => null,  %% placed at merge from the entity (class b)
         <<"annual_compliance_cost">>       => null,  %% entity-cost banded-vs-scalar seam (class b)
         <<"negative_gearing_reform_note">> => null   %% placeholder — tax_structure/1 always overrides
     }.
@@ -1384,6 +1401,31 @@ couple_view(Party) ->
       <<"currently_owns_property">> =>
           maps:get(<<"currently_owns_property">>, OH, false)}.
 
+%% Regulated figures are grounded -> P-7 · One declaration per outcome shape -> The engine -> FATR reg 35(1)(a) exempts citizens only
+%% applicant.firb_required = false is exact for a citizen wherever they live, and for a
+%% permanent resident only while they are ordinarily resident in Australia (200+ days of the
+%% past 12 months) — kb.firb.status-determination. Onboarding asks "citizen or PR?" and never
+%% where the buyer lives, so a domestic profile whose applicants MAY include a PR (the base
+%% {citizen, PR} possibility set, or a scalar PR) states that assumption as a key_assumption,
+%% EN + VI from kb.copy.profile. A residence question routing a PR abroad to Mode B/D was the
+%% alternative; those modes are not launched (behavior 7). A citizen-only household gets [].
+%% Read on legislation.gov.au 2026-10-07 (F2015L01854, compilation No. 20, 1 Nov 2025):
+%% reg 35(1)(a) "an Australian citizen not ordinarily resident in Australia" — no PR limb.
+residence_assumptions(Applicants) ->
+    case lists:any(fun may_be_permanent_resident/1, Applicants) of
+        true  -> [copy(<<"assume_pr_ordinarily_resident">>, #{})];
+        false -> []
+    end.
+
+%% an absent / null citizenship on a domestic profile is unknown → may be a PR (state it).
+may_be_permanent_resident(Applicant) ->
+    case maps:get(<<"citizenship_status">>, Applicant, null) of
+        #{<<"oneof">> := Set}       -> lists:member(<<"permanent_resident">>, Set);
+        <<"permanent_resident">>    -> true;
+        null                        -> true;
+        _                           -> false
+    end.
+
 %% subst a kb.copy.profile template into a bilingual {vi,en} value (no Vietnamese
 %% in Erlang literals; same mechanism as fh_engine_cash).
 -spec copy(binary(), #{binary() => fh_engine_i18n:param()}) -> fh_engine_i18n:localized().
@@ -1402,3 +1444,20 @@ copy(Id, Params) ->
 target_yield_for(Archetype) when is_binary(Archetype) ->
     param(?TARGET_YIELD, <<"target_gross_yield_", Archetype/binary>>);
 target_yield_for(_) -> null.
+
+%% Goal: regulated figures are grounded -> one computer per figure, honest about its tier ->
+%% tax_structure's merge -> place the entity's setup band from kb.tax.entity-setup-costs.
+%% The band is INDICATIVE market pricing, [lo, hi] AUD; hi null is an open-ended floor (company,
+%% SMSF with LRBA). It stays a band and is not summed into total_cash_required: a range added to
+%% a point total would change that figure's type (behavior 11, #12). An entity the KB does not
+%% list, or none yet, is null (pending), never a guess.
+entity_setup_band(Entity) when is_binary(Entity) ->
+    {ok, Cj} = fh_engine_kb:kb_rules(?ENTITY_SETUP),
+    Entries = maps:get(<<"entries">>,
+                       maps:get(<<"entity_setup_cost_bands">>, maps:get(<<"lookup">>, Cj))),
+    case [maps:get(<<"setup_first_year">>, E) || E <- Entries,
+                                                 maps:get(<<"entity">>, E) =:= Entity] of
+        [[Lo, Hi]] -> [Lo, Hi];
+        _          -> null
+    end;
+entity_setup_band(_) -> null.

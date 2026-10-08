@@ -165,7 +165,7 @@ The base plan for Mode B captures the most regulatory complexity even before a s
 
 **Inputs:** User questions answered in chat; any uploaded documents (visa grant letter, passport, employer letter if employed in AU, NOA if filed). No upstream component dependency — this is the pipeline entry.
 
-**KB anchors:** `kb.firb.status-determination`, `kb.firb.established-dwelling-ban`, `kb.visas.au-temporary-residency-classes`, `kb.au-temp-residents.banking-and-tax-basics`
+**KB anchors:** `kb.firb.established-dwelling-ban`, `kb.visas.au-temporary-residency-classes`, `kb.au-temp-residents.banking-and-tax-basics`
 
 **Renderer:** `summary-card`
 
@@ -1091,88 +1091,9 @@ The `mode_switch_eligible` field signals when the user's status has changed (e.g
 
 ---
 
-## KB anchor index (for this blueprint)
+## KB anchors
 
-74 slugs referenced. Italics mark Mode B-only anchors (not in Mode A).
-
-| Slug | Component(s) | Owns |
-|---|---|---|
-| `kb.firb.status-determination` | 1, 4 | How to determine FIRB classification from visa/citizenship status |
-| `kb.firb.established-dwelling-ban` | 1, 4 | The 1 Apr 2025 – 30 Jun 2029 established-dwelling ban on foreign persons |
-| *`kb.visas.au-temporary-residency-classes`* | 1 | AU temporary residency visa classes and their FIRB implications |
-| *`kb.au-temp-residents.banking-and-tax-basics`* | 1 | Banking and tax basics for AU temporary residents |
-| *`kb.vietnamese-family.financial-patterns`* | 2 | Vietnamese family financial pooling patterns, decision authority norms |
-| *`kb.cross-border.decision-authority-cultural`* | 2 | Cultural patterns of cross-border family decision-making |
-| *`kb.bilingual.coordination-norms`* | 2 | Bilingual coordination patterns for VN-AU families |
-| *`kb.firb.eligible-property-types-foreign-persons`* | 3 | What property types foreign persons can buy (new build / vacant land only) |
-| *`kb.firb.fee-tiers-by-value`* | 3, 4 | FIRB application fee tiers by property value |
-| `kb.property.suburb-risk-factors` | 3 | Suburb-level risk |
-| `kb.property.comparables-methodology` | 3 | Comparable sales methodology |
-| `kb.strata.health-indicators` | 3, 8 | Strata report red flags |
-| `kb.building-types.risk-by-type` | 3 | Risk profiles by property type |
-| *`kb.off-the-plan.risk-considerations`* | 3 | Off-the-plan specific risks (relevant since foreign persons restricted to new builds) |
-| *`kb.firb.application-process`* | 4 | FIRB application end-to-end process |
-| *`kb.firb.fee-schedule-current`* | 4, 5 | Current FIRB fee schedule (2025–26 cycle) |
-| *`kb.firb.documents-required`* | 4 | Standard FIRB application document list |
-| *`kb.firb.timelines-standard`* | 4 | Standard FIRB decision timelines |
-| *`kb.firb.exemption-certificates-developer`* | 4 | Developer new-dwelling exemption certificate pathway |
-| *`kb.firb.approval-conditions-typical`* | 4 | Typical FIRB approval conditions |
-| *`kb.firb.penalties-non-compliance`* | 4 | Penalties for FIRB non-compliance |
-| `kb.stamp-duty.calc-by-state` | 5 | Stamp duty by state |
-| *`kb.foreign-buyer-surcharge.by-state`* | 5 | Foreign-buyer stamp duty surcharge by state |
-| *`kb.fx.typical-spreads-vnd-aud`* | 5, 6 | Typical VND/AUD FX spreads by provider |
-| `kb.buyer-costs.inspections-conveyancing-fees` | 5 | Typical buyer-side costs |
-| `kb.cash-reserve.lender-expectations` | 5 | Lender expectations (higher buffer for non-resident) |
-| *`kb.lmi.calculation-for-foreign-persons`* | 5 | LMI calculation when LVR >80% for foreign person |
-| *`kb.lender.non-resident-friendly-shortlist`* | 5 | Non-resident-friendly lender criteria (not a named-lender recommendation) |
-| *`kb.lender.temp-resident-lending-policies`* | 5 | Temporary-resident lending policies |
-| *`kb.lender.485-visa-treatment`* | 5 | 485 graduate-visa lending treatment |
-| *`kb.lender.foreign-buyer-deposit-requirements`* | 5 | Foreign-buyer deposit requirements (typically 30%+) |
-| *`kb.lender.firb-approval-as-condition-precedent`* | 5 | FIRB approval as loan condition precedent |
-| *`kb.lender.documentation-non-resident`* | 5 | Non-resident loan documentation requirements |
-| *`kb.fx.loan-currency-considerations`* | 5 | Loan-currency considerations (AUD-denominated loan; FX is on VN-side capital flow) |
-| *`kb.fx-providers.wise-ofx-bank-comparison`* | 6 | FX provider comparison for VN-AU transfers |
-| *`kb.vn-capital-controls.sbv-thresholds-2026`* | 6 | SBV outbound transfer thresholds requiring approval |
-| *`kb.vn-capital-controls.declared-purpose-categories`* | 6 | Declared-purpose categories for SBV transfers |
-| *`kb.au-aml-ctf.bank-due-diligence-expectations`* | 6 | AU bank enhanced due diligence on cross-border funds |
-| *`kb.au-aml-ctf.source-of-funds-documentation`* | 6 | Source-of-funds documentation standards |
-| *`kb.vn-pdp.cross-border-data-transfer`* | 6 | Vietnamese PDP Decree 13/2023 cross-border transfer requirements |
-| `kb.auction.rules-by-state` | 7 | Auction rules |
-| `kb.cooling-off.by-state` | 7, 9 | Cooling-off periods |
-| `kb.negotiation.patterns-by-market-condition` | 7 | Negotiation patterns |
-| `kb.agent-tactics.detection` | 7 | Agent tactics detection |
-| *`kb.firb.contract-conditional-on-approval`* | 7 | Subject-to-FIRB-approval contract clauses |
-| *`kb.foreign-buyer.subject-to-firb-clauses`* | 7 | Standard FIRB contract conditions |
-| `kb.contract-of-sale.review-points-by-state` | 8 | Standard CoS review |
-| `kb.s32.review-points` | 8 | Section 32 review (VIC) |
-| `kb.building-pest.interpretation` | 8 | Building and pest report interpretation |
-| `kb.strata-report.red-flags` | 8 | Strata report red flags |
-| `kb.special-conditions.standard-set` | 8 | Standard special conditions |
-| *`kb.firb.contract-clauses-required`* | 8 | FIRB-required contract clauses for foreign person |
-| *`kb.cross-border.source-of-funds-letter-template`* | 8 | Source-of-funds letter template |
-| `kb.settlement.process-by-state` | 9 | Settlement process by state |
-| `kb.pexa.settlement` | 9 | PEXA mechanics |
-| `kb.insurance.timing-of-risk-pass` | 9 | Insurance timing |
-| `kb.lender-docs.standard-timeline` | 9 | Lender document timeline |
-| *`kb.firb.approval-to-settlement-timeline`* | 9 | FIRB approval to settlement timeline |
-| *`kb.cross-border-settlement.coordination-best-practices`* | 9 | Cross-border settlement coordination |
-| `kb.ongoing-costs.rates-water-strata` | 10 | Ongoing cost ranges |
-| `kb.refinance.windows-and-triggers` | 10 | Refi windows |
-| `kb.maintenance.budget-by-property-type` | 10 | Maintenance budget heuristics |
-| *`kb.firb.vacancy-fee-rules-2026`* | 10 | FIRB vacancy fee rules |
-| *`kb.firb.vacancy-fee-double-from-2024`* | 10 | Doubled vacancy fee from 9 April 2024 |
-| *`kb.non-resident-tax.cgt-no-ppor-exemption`* | 10 | Foreign resident CGT — no PPOR exemption |
-| *`kb.non-resident-tax.withholding-on-rental-income`* | 10 | Non-resident rental income withholding |
-| *`kb.non-resident-tax.foreign-resident-cgt-withholding`* | 10 | Foreign resident CGT withholding on sale |
-| `kb.property.capital-growth-bands` | 12 | The capital-growth assumption band `disposition` compounds over the hold horizon H — PLACEHOLDER, shared with Mode A |
-| `kb.selling-costs.agent-legal` | 12 | Agent commission + legal/marketing bands at sale |
-| `kb.tax.cgt-main-residence-exemption` | 12 | Main-residence CGT exemption + the non-resident-at-disposal trap (Mode B always routes to `to_verify` via this trap) |
-| `kb.lender.serviceability-basics` | 12 | The representative product rate `disposition` amortises `expected_borrowing_capacity` at, for the loan-payout-at-horizon figure |
-| *`kb.journey.fhb-foreign-path`* | 13 | Mode B's bilingual swimlane copy — FIRB gate + transfer milestone + surcharge layered onto Mode A's four-actor shape |
-| *`kb.journey.fhb-foreign-phase-actions`* | 14 | Mode B's per-phase action checklist — FIRB application + cross-border transfer steps |
-| *`kb.risks.fhb-foreign-by-phase`* | 14 | Mode B's per-phase risk-flag-list — FIRB/cross-border risks compounding Mode A's owner-occupier risks |
-
----
+The compiled anchors are each component's `**KB anchors:**` line above — the KB compiler reads those lines and nothing else (`engine/build/kb_compiler.py`, `parse_blueprint`). This blueprint keeps no separate index table: a hand-kept copy drifted from what the compiler reads (stale rows and wrong component numbers, measured 2026-10-06), so the lines are the only list.
 
 ## Renderer vocabulary used
 

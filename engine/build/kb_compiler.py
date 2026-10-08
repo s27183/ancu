@@ -83,6 +83,12 @@ RENDERER_ENUM = {
 # input facts (§11.9 "the plan.* namespace" — sourced from plan_cards journey state,
 # engine-contract §9.1, not a component outcome). Referenced fields under these
 # resolve-as-external (existence unverifiable here), never a failure.
+#
+# Regulated figures are grounded -> P-7 · One declaration per outcome shape -> The KB compiler -> external read namespaces
+# `property_card` is a real external provenance namespace (the attached property's card),
+# not prose drift to "fix" to `property`: removing it turns every `property_card.*` read
+# into a GATE-6 missing_ns failure. Measured 2026-10-06 by reading this line:
+# EXTERNAL_NS = {suburb, property, property_card, plan}.
 EXTERNAL_NS = {"suburb", "property", "property_card", "plan"}
 
 NUMERIC_TYPES = {
@@ -382,10 +388,24 @@ def parse_blueprint(path):
         end = heads[idx + 1].start() if idx + 1 < len(heads) else len(text)
         body = text[h.end():end]
         c = Component(name)
+        # Regulated figures are grounded -> P-7 · One declaration per outcome shape -> The KB compiler -> anchor-line token capture
+        # Anchors come ONLY from the `**KB anchors:**` line, and every `kb.*` token on it is
+        # captured — prose included: "All Mode A … except `kb.X`" makes kb.X a POSITIVE anchor.
+        # Index tables and prose elsewhere are never read. So a reconciliation note goes in a
+        # separate sentence, and a reconcile is done when the compiler says so, not a grep.
+        # Measured 2026-07-03 (Mode-D P1 run); regex re-read 2026-10-06 (this loop).
         for line in re.findall(r"^\*\*KB anchors:\*\*(.*)$", body, re.M):
             c.anchors += re.findall(r"kb\.[a-z0-9.\-]+", line)
         for line in re.findall(r"^\*\*Renderer:\*\*(.*)$", body, re.M):
             c.renderers += re.findall(r"`([a-z\-]+)`", line)
+        # Regulated figures are grounded -> P-7 · One declaration per outcome shape -> The KB compiler -> prose-declared outcome type
+        # Only a fenced `**Outcome schema:**` JSON block in THIS file counts: a prose "same as
+        # Mode X" compiles to outcome_type null / zero fields, and since the registry unions
+        # fields per type a wrong type name passes every gate. The type string is also the
+        # runtime Upstream dispatch key. Measured 2026-07 (Mode C task 7; Mode D P2/P3) and
+        # 2026-07-10 (purchase_journey/phase_playbook compiled null) and 2026-10-06 (six
+        # foreign-mode components). A missing block now fails the build at GATE 12 (P-7,
+        # #25); a wrong type NAME still passes, which no gate catches.
         ob = fenced_jsonc_after(body, "**Outcome schema:**")
         if ob:
             o = parse_jsonc(ob)
@@ -521,6 +541,22 @@ def frontmatter_end(text):
     return matches[1].start()
 
 
+# Reproducible -> P-7 · One declaration per outcome shape -> KB compiler -> refuses a KB doc whose frontmatter does not close
+# A doc whose opening `---` has no closing `---` used to compile with no error: frontmatter_end
+# returned -1, the whole file (YAML and source URLs) became content_md, and slug, dates and
+# sources still parsed from the raw text, so nothing noticed. 1432ad4 (2026-07-06) left nine
+# docs that way, and the Q&A agent read their YAML as KB text (#15, measured 2026-10-06).
+# Every KB doc and news note carries frontmatter (all 184 open with `---`), so a missing
+# opening line fails too.
+def frontmatter_fail(text):
+    """Why `text` is not well-formed frontmatter, or None if it is."""
+    if not re.match(r"---[ \t]*\n", text):
+        return "line 1 is not '---' (every KB doc opens with frontmatter)"
+    if frontmatter_end(text) == -1:
+        return "opening '---' has no closing '---'"
+    return None
+
+
 def parse_sources_block(text):
     """Hand-rolled parse of the frontmatter `sources:` list — a YAML-list-of-maps
     SUBSET (url/retrieved/path scalars, or a standalone note: string), not a
@@ -654,6 +690,12 @@ def parse_news_doc(path):
     }
 
 
+# Regulated figures are grounded -> P-7 · One declaration per outcome shape -> The KB compiler -> KB doc shape follows its consumer
+# A doc's shape follows what the consuming component does with the value: fills-a-slot
+# (eligibility rules with `fills`), pure reference `fills: []` (computed or agent-reasoned
+# components), a derived fact on its own outcome (firb.status-determination), or a copy doc
+# split into `layout` + `copy` because GATE 8 iterates only `content_json.copy`.
+# Concluded from authoring Modes A–D; GATE 8 scope measured 2026-10-06 by reading run().
 def parse_kb_doc(path):
     text = path.read_text()
     slug_m = re.search(r"^slug:\s*(\S+)", text, re.M)
@@ -792,6 +834,89 @@ def compute_affected_components(affected_kb_slugs, blueprints):
     return out
 
 
+# Regulated figures are grounded -> P-7 · One declaration per outcome shape -> KB compiler -> refuses an applicant.* use the resolver cannot honour
+# The resolver reads applicant.* per element, flat: a criterion is tested for every applicant
+# and AND-ed, a fill is mapped over them (fh_engine_resolver eval_joint / eval_applicants). It
+# has no path for a nested applicant.<obj>.<leaf> (maps:get on the flat key gives undefined)
+# and no single value to key a lookup by; and fh_engine_eligibility reads `resolution` as
+# per_applicant or, for any other value, joint, so a misspelt marker silently went joint
+# (#6, measured 2026-10-06: no rule uses any of the three today).
+RESOLUTIONS = ("joint", "per_applicant")
+
+
+def applicant_rule_fails(slug, cj, fails):
+    res = cj.get("resolution", "joint")
+    if res not in RESOLUTIONS:
+        fails.append(f"[resolution] {slug}: {res!r} is not one of {list(RESOLUTIONS)}")
+    for fill in cj.get("fills", []):
+        for item in iter_rule_fields(fill.get("rule", {})):
+            tag, tok = item[0], item[1]
+            if tag not in ("field", "keydim") or not tok.startswith("applicant."):
+                continue
+            if "." in tok[len("applicant."):]:
+                fails.append(f"[applicant-nested] {slug}: {tok!r} — the resolver reads "
+                             f"applicant.* fields flat, per element (architecture §11.9)")
+            elif tag == "keydim":
+                fails.append(f"[applicant-keydim] {slug}: {tok!r} keys a lookup, but "
+                             f"applicant.* has one value per applicant (architecture §11.9)")
+
+
+# Regulated figures are grounded -> P-7 · One declaration per outcome shape -> KB compiler -> refuses same-state schemes whose property types overlap or leave a gap
+# Where one state's scheme docs fill the same criteria leaf and split it by
+# property_fit.property_type (QLD: fhc established, fhnhc new, fh-vacant-land land), the
+# split must be a partition of the field's enum: an overlap computes two concessions for
+# one purchase, a gap none. Grouped per `property_fit.state eq` value, since fillers in
+# different states never compete (#17, measured 2026-10-06: QLD is the only such group).
+# A member with no property_type criterion covers the whole enum. Only top-level
+# all_of criteria are read; no filler today nests one.
+def property_type_partition(stem, reg, anchors, kb_docs, fails, info):
+    st, meta = reg.field_meta("property_fit", "property_type")
+    enum = set((meta or {}).get("options") or [])
+    if st != "field" or not enum:
+        return
+    groups = {}
+    for slug in sorted(anchors):
+        cj = (kb_docs.get(slug) or {}).get("content_json") or {}
+        for fill in cj.get("fills", []):
+            rule = fill.get("rule") or {}
+            if rule.get("kind") != "criteria" or rule.get("combine") != "all_of":
+                continue
+            crits = rule.get("criteria") or []
+            states = [c.get("value") for c in crits
+                      if c.get("field") == "property_fit.state" and c.get("op") == "eq"]
+            if len(states) != 1:
+                continue
+            types = set(enum)
+            restricted = False
+            for c in crits:
+                if c.get("field") != "property_fit.property_type":
+                    continue
+                restricted = True
+                op, v = c.get("op"), c.get("value")
+                vals = set(v) if isinstance(v, list) else {v}
+                if op in ("eq", "in"):
+                    types &= vals
+                elif op in ("neq", "nin"):
+                    types -= vals
+            groups.setdefault((fill["leaf"], states[0]), []).append((slug, types, restricted))
+    for (leaf, state), members in sorted(groups.items()):
+        if len(members) < 2 or not any(r for _, _, r in members):
+            continue
+        where = f"[partition] {stem}/{leaf} {state}"
+        bad = False
+        for i, (s1, t1, _) in enumerate(members):
+            for s2, t2, _ in members[i + 1:]:
+                if t1 & t2:
+                    fails.append(f"{where}: {s1} and {s2} overlap {sorted(t1 & t2)}")
+                    bad = True
+        covered = set().union(*(t for _, t, _ in members))
+        if enum - covered:
+            fails.append(f"{where}: {[s for s, _, _ in members]} gap {sorted(enum - covered)}")
+            bad = True
+        if not bad:
+            info.append(f"{where}: {len(members)} docs, {len(covered)}/{len(enum)} covered")
+
+
 def semantic_gates(stem, comps, kb_docs, fails, info):
     """Materialize ONE blueprint's registry and run its SEMANTIC gates (architecture
     §11.9 "the registry is per-blueprint"): GATE 6 reference-integrity + GATE 7 coverage
@@ -880,6 +1005,8 @@ def semantic_gates(stem, comps, kb_docs, fails, info):
     for leaf, fillers in sorted({k: v for k, v in reg.leaves.items() if len(v) > 1}.items()):
         info.append(f"[multi-fill] {stem}/{leaf} <- {sorted(fillers)}")
 
+    property_type_partition(stem, reg, anchors, kb_docs, fails, info)
+
     reg_stats = {
         "outcome_namespaces": sorted(reg.outcome_fields),
         "outcome_field_count": sum(len(v) for v in reg.outcome_fields.values()),
@@ -934,6 +1061,9 @@ def run(emit=False):
     for f in sorted(KB.rglob("*.md")):
         rel = f.relative_to(ROOT / "docs").with_suffix("")
         expect = str(rel).replace("/", ".")
+        fm_fail = frontmatter_fail(f.read_text())
+        if fm_fail:
+            fails.append(f"[frontmatter] {f}: {fm_fail}")
         if NEWS_DIR in f.parents:
             doc = parse_news_doc(f)
             if doc["slug"] != expect:
@@ -948,6 +1078,8 @@ def run(emit=False):
             kb_docs[doc["slug"]] = doc
         if doc["parse_error"]:
             fails.append(f"[content_json] {doc['slug']}: parse error: {doc['parse_error']}")
+        elif doc.get("content_json"):
+            applicant_rule_fails(doc["slug"], doc["content_json"], fails)
     stats["kb_docs"] = len(kb_docs)
     stats["news_docs"] = len(news_docs)
 
@@ -1080,6 +1212,10 @@ def run(emit=False):
         all_in_scope_anchors |= anchors
         stats["registry"][stem] = reg_stats
 
+    # ---- GATE 13: property_type options fit the property_fit outcome enum ---- #
+    for stem in sorted(registries):
+        property_type_gate(stem, registries[stem], fails)
+
     # ---- GATE 2: every blueprint kb_anchor resolves ----------------------- #
     for stem, (_, bcomps, _, _, _) in blueprints.items():
         anchors = set(a for c in bcomps for a in c.anchors)
@@ -1175,6 +1311,32 @@ def run(emit=False):
             )
 
     return fails, warns, info, stats, artifact
+
+
+def property_type_gate(stem, reg, fails):
+    """GATE 13. Each property_type param slot's options are a subset of the blueprint's
+    property_fit* outcome enum for property_type.
+
+    Honest-partial -> P-7 · One declaration per outcome shape -> The KB compiler -> param options outside the outcome enum refused
+    A param that offers a type the outcome cannot hold lets a property in whose fill must
+    then fail on the enum (#32: investor-domestic-au offered dual_occupancy and nrass).
+    The attach gate (fh_engine_h_attach_property:validate_card/2) reads the same compiled
+    enum, so the two cannot drift once this holds (behavior 26). Measured 2026-10-08:
+    tests/validate_build.py fails with [property_type] when an option is planted, passes
+    on the real blueprints."""
+    enums = {}
+    for otype, fields in reg.outcome_fields.items():
+        if otype.startswith("property_fit") and "property_type" in fields:
+            enums[otype] = set(parse_type_string(fields["property_type"])[1] or [])
+    for slot, meta in sorted(reg.param_slots.items()):
+        if not slot.endswith(".property_type") or not isinstance(meta, dict):
+            continue
+        opts = meta.get("options") or []
+        for otype, allowed in sorted(enums.items()):
+            extra = [o for o in opts if o not in allowed]
+            if extra:
+                fails.append(f"[property_type] {stem}/{slot}: options {extra} are not in "
+                             f"{otype}.property_type {sorted(allowed)} — the outcome cannot hold them")
 
 
 def registry_payload(reg):

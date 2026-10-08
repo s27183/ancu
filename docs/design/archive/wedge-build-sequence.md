@@ -1,6 +1,6 @@
 # Wedge build sequence — the dependency order
 
-> **What this is.** The **build-dependency** view of the remaining wedges: what each one depends on, which external (non-code) prerequisites gate it, and the resulting topological build order. This is a *different lens* on the same wedges that [§10 in 03-strategy.md](../03-strategy.md#10-build-strategy--wedge-sequence) sequences by **go-to-market time** (willingness-to-pay, cross-sell, trust earned). Both orderings are valid; they **diverge** (see the decision below). Per-item status lives in [`grounding-checklist.md`](../grounding-checklist.md) — this doc holds the wedge-level map, not the item detail.
+> **What this is.** The **build-dependency** view of the remaining wedges: what each one depends on, which external (non-code) prerequisites gate it, and the resulting topological build order. This is a *different lens* on the same wedges that [§10 in 03-strategy.md](../03-strategy.md#10-build-strategy--wedge-sequence) sequences by **go-to-market time** (willingness-to-pay, cross-sell, trust earned). Both orderings are valid; they **diverge** (see the decision below). Per-item status lives in [`grounding-checklist.md`](../design/archive/grounding-checklist.md) — this doc holds the wedge-level map, not the item detail.
 >
 > **Audience:** anyone deciding what to build next, or why the build order is what it is.
 
@@ -46,13 +46,13 @@ The architecture was deliberately built **mode-generic** (one `profile.*` fact b
 | **Wedge 1b / 1c** — Tìm Nhà / URL-paste + extension | A | Wedge 1a (done) + Phase-B addenda activation | 1b: curator ops; 1c: none | Yes — **orthogonal track**, no mode-foundation dependency; noted for future, not started |
 | **Mode E — domestic next-home owner-occupier** *(new, surfaced 2026-07-04)* | E | unification (done) + `plan.buyer_stage` axis (**done, P0**) + KB (**done, P1**) + blueprint + resolvers (**done, P2**) + multi-blueprint activation (**done, P3**) + shell dispatcher (**done, P4**) + onboarding dispatch (**done, P5**) | none known | **P0–P5 done 2026-07-05 — build-complete.** Axis, 3 KB docs, blueprint draft (`nexthome-domestic-au.md`, fully inlined per-component), engine resolvers, `IN_SCOPE_BLUEPRINTS` activation, the shell dispatcher (Calculator shape-collision fix + OverviewCard tab-surfacing fix), and onboarding dispatch (`base_components/1`'s missing nexthome clause + `blueprint_for/3`'s 3-axis dispatch, fail-closed on both foreign+next-home and a missing `buyer_stage` + the shell's `Onboarding.svelte` gate widened) all landed. See [`mode-e-wedge.md`](mode-e-wedge.md) |
 
-The investor-tax KB that Mode C needed was the same `kb.tax.*` / `kb.investor.*` set [grounding-checklist item 10](../grounding-checklist.md) (full-temporal-flow, T-doc 6) recorded as trigger-gated to "when Mode C ships" — **authored and shipped as part of the Mode-C wedge** (45 KB docs, P1).
+The investor-tax KB that Mode C needed was the same `kb.tax.*` / `kb.investor.*` set [grounding-checklist item 10](../design/archive/grounding-checklist.md) (full-temporal-flow, T-doc 6) recorded as trigger-gated to "when Mode C ships" — **authored and shipped as part of the Mode-C wedge** (45 KB docs, P1).
 
 ---
 
 ## What's left (the roadmap SOT — 2026-07-05)
 
-This section is the single forward-looking "what's left" answer. It replaces the overlapping copies that used to live in `grounding-checklist.md` §2/§3 prose, CLAUDE.md's Status paragraph, and `05-roadmap.md` (all now point here instead of re-narrating).
+This section is the single forward-looking "what's left" answer. It replaces the overlapping copies that used to live in `design/archive/grounding-checklist.md` §2/§3 prose, CLAUDE.md's Status paragraph, and `design/archive/05-roadmap.md` (both archived 2026-10-06; CLAUDE.md now points here instead of re-narrating).
 
 | Item | State | Gate |
 |---|---|---|
@@ -113,7 +113,7 @@ Split discipline: build the mode-generic **mechanism** now (the unification); au
 ## Cross-references
 
 - **GTM order (complementary):** [§10 Build strategy & wedge sequence in 03-strategy.md](../03-strategy.md#10-build-strategy--wedge-sequence); external Wedge-2 prerequisites in [§9](../03-strategy.md).
-- **Item status:** [`grounding-checklist.md`](../grounding-checklist.md) — items 1–5 (foundations, all closed), §2/§3 (narrow fact-surface findings only — wedge-level status lives here, not there).
+- **Item status:** the narrow fact-surface findings still open (F8/F9/F10, F1 cross-mode, `applicant.*` correctness, the capital-growth-bands re-ground) are `git issue`s #1–#6 (2026-10-06); the closed record is [`grounding-checklist.md`](../design/archive/grounding-checklist.md), archived. Wedge-level status lives here, not there.
 - **The shared foundation:** [`fact-model-unification.md`](fact-model-unification.md) (Decision 1 + the unified schema).
 - **The four modes / blueprints:** [`blueprints/investor-domestic-au.md`](../blueprints/investor-domestic-au.md) (C), [`fhb-foreign-au.md`](../blueprints/fhb-foreign-au.md) (B), [`investor-foreign-au.md`](../blueprints/investor-foreign-au.md) (D).
 - **The Mode-E gap:** [`mode-c-wedge.md`](mode-c-wedge.md) "Mode-E gap" section (where it was surfaced); [`mode-e-wedge.md`](mode-e-wedge.md) (the durable plan + tracker, opened 2026-07-05).

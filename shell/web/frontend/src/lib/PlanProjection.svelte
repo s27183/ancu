@@ -24,6 +24,7 @@
         type TransactionDatesInput
     } from '$lib/api';
     import { subscribePlanCard, type PlanCardStream } from '$lib/planCardStream';
+    import { describeFailure, type FailureView } from '$lib/turnFailure';
     import {
         BASE_COMPONENT_ORDER,
         type ComponentEntry,
@@ -136,7 +137,9 @@
     // so the "+ Attach property" entry point shows only for it (a Mode-A card would 400).
     let blueprintSlug = $state<string>('');
     let turnDone = $state(false);
-    let turnFailed = $state(false);
+    // The turn_failed payload mapped to what the user sees (turnFailure.ts); null = no failure.
+    let failure = $state<FailureView | null>(null);
+    const turnFailed = $derived(failure !== null);
     // The card user-set layer (the Flow checklist done-toggles), seeded from the GET card
     // and overlaid onto phase_playbook actions at render. The engine is SOT: a toggle is
     // optimistic for immediacy, then reconciled from the PATCH response (revert on failure).
@@ -308,6 +311,10 @@
     //   • the base plan, under an active preview → each entry with its outcome swapped for
     //     the previewed one (renderer/scope preserved, merged by component_id).
     //   • the base plan, no preview → the live base components.
+    //
+    // Whole lifecycle -> P-4 · The engine is coupled to no shell -> The web frontend -> per-property addendum overlay
+    // A per-property addendum overlays viewComponents with zero new renderers, and selecting
+    // a property suppresses the what-if cockpit. Concluded at Mode-C Phase B.
     const viewComponents = $derived.by((): Record<string, ComponentEntry> => {
         if (viewingProperty && selectedPropertyId) {
             return { ...components, ...addenda[selectedPropertyId].components };
@@ -570,6 +577,19 @@
         ...(viewComponents.disposition ? [{ id: 'horizon', label: $t('plan.cash.horizon') }] : [])
     ]);
 
+    // Whole lifecycle -> P-7 · One declaration per outcome shape -> The web frontend -> the Budget breakdown draws the declared cards
+    // The interactive Budget tab drew only the Calculator, so every other component its ui_tabs
+    // entry declares was computed and never shown (measured 2026-10-07 in Chrome: a Mode C
+    // card's tax_structure, with its setup band, on no tab; B and D drop firb_workflow,
+    // cross_border_funding, yield and non-resident tax the same way). The breakdown sub-tab
+    // now draws them below the Calculator; cash_position and disposition keep their own
+    // sub-tabs, and an uncomputed card is skipped, not shown pending (behavior 11).
+    const budgetCards = $derived(
+        (activeTab?.interactive ? activeTab.components : []).filter(
+            (cid) => cid !== 'cash_position' && cid !== 'disposition' && viewComponents[cid]
+        )
+    );
+
     // ── Flow view (task 10) ────────────────────────────────────────────────
     // The legal/temporal spine's three live inputs, read from viewComponents so a what-if
     // preview re-renders the Flow too: the journey (swimlane spine), the playbook (per-phase
@@ -698,7 +718,7 @@
         cardId = null;
         blueprintSlug = '';
         turnDone = false;
-        turnFailed = false;
+        failure = null;
 
         // Signed-out or no cards → listPlanCards() returns []; no zone match → the CTA.
         const cards = await listPlanCards();
@@ -742,7 +762,7 @@
                 },
                 onDone: (failed, lastEventId) => {
                     if (myGen !== gen) return;
-                    if (failed) turnFailed = true;
+                    if (failed) failure = describeFailure(failed);
                     turnDone = true;
                     // A just-committed save (W8): the recomputed components are now merged
                     // live (== what was previewed), so drop the preview overlay and reset
@@ -911,6 +931,16 @@
             </form>
         </Modal>
     {/if}
+
+    {#snippet settleCta()}
+        <div class="pp-settle-cta">
+            <button type="button" class="pp-attach-btn" onclick={openSettle}>
+                {settleStatus === 'active'
+                    ? $t('plan.settle.cta_update')
+                    : $t('plan.settle.cta_enter')}
+            </button>
+        </div>
+    {/snippet}
 
     <!-- settlement_prep B: the two attested transaction dates (engine-contract §11). A
          resolver-only re-fill (no usage / no meter gate); the recomputed settlement_checklist
@@ -1130,6 +1160,21 @@
                 onToggle={toggleChecklist}
                 filling={running}
             />
+            <!-- Whole lifecycle -> P-4 · The engine is coupled to no shell -> The web
+                 frontend -> settlement_prep under the swimlane (behavior 25, #35)
+                 Every blueprint lists settlement_prep in the flow tab (docs/blueprints/*.md
+                 ui_tabs) and FlowView draws only journey + playbook, so the per-property card
+                 and its date CTA render here, with the components branch's guard. Measured
+                 2026-10-07: Box Hill attach → settlement_prep filled (event 8411), and before
+                 this nothing showed it. -->
+            {#if supportsPhaseB && viewingProperty && viewComponents.settlement_prep}
+                <ComponentCard
+                    componentId="settlement_prep"
+                    entry={viewComponents.settlement_prep}
+                    filling={running}
+                />
+                {@render settleCta()}
+            {/if}
         {:else if activeTab?.interactive}
             <!-- The Cash-calculator tab: the financial spine + the cockpit that drives it
                  (the prototype's interactive calculator, engine-driven). price/state →
@@ -1362,6 +1407,9 @@
                                 components={viewComponents}
                                 density="full"
                             />
+                            {#each budgetCards as cid (cid)}
+                                <ComponentCard componentId={cid} entry={viewComponents[cid]} filling={running} />
+                            {/each}
                         {/if}
                     {/if}
                 {:else if running}
@@ -1382,13 +1430,7 @@
                          dates to activate the dated critical path. Investor + selected-property
                          only; label tracks whether dates are already active. -->
                     {#if cid === 'settlement_prep' && supportsPhaseB && viewingProperty}
-                        <div class="pp-settle-cta">
-                            <button type="button" class="pp-attach-btn" onclick={openSettle}>
-                                {settleStatus === 'active'
-                                    ? $t('plan.settle.cta_update')
-                                    : $t('plan.settle.cta_enter')}
-                            </button>
-                        </div>
+                        {@render settleCta()}
                     {/if}
                     {#if cid === 'due_diligence' && supportsPhaseB && viewingProperty}
                         <div class="pp-settle-cta">
@@ -1413,10 +1455,16 @@
         {/if}
     </div>
 
-    {#if turnFailed}
+    {#if failure}
         <div class="pp-state">
-            <p>{$t('plan.failed')}</p>
-            <button type="button" onclick={load}>{$t('plan.retry')}</button>
+            <p>{$t(failure.key)}</p>
+            {#if failure.retry}<button type="button" onclick={load}>{$t('plan.retry')}</button>{/if}
         </div>
     {/if}
+    <!-- Behavior 20: every plan carries the ASIC decision-support line; a foreign-buyer
+         plan (Mode B fhb-foreign-au, Mode D investor-foreign-au) also the FIRB line. -->
+    <footer class="pp-disclaimers">
+        <p>{$t('disclaimer.asic')}</p>
+        {#if blueprintSlug.includes('-foreign-')}<p>{$t('disclaimer.firb')}</p>{/if}
+    </footer>
 {/if}

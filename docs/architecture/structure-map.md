@@ -299,7 +299,7 @@ flowchart TB
   GATE -.->|"gates access (engine never gates)"| REND
 ```
 
-The two things the engine deliberately keeps and keeps *out*: **compliance** (FIRB/ASIC/AML) is a gate on agent behaviour → engine-owned and structural (constraint #10), not a shell disclaimer; **commerce** is shell-owned, so the engine only meters — keeping billing *and* ASIC liability out of the agent loop. Detail: [§11.0](architecture.md#110-engine--shell-split-deployable-shape), [`engine-contract.md`](engine-contract.md) (the boundary from the engine side), [`shell-architecture.md`](shell-architecture.md) (what sits behind the shell edge — two-JWT, backend modules, shell DB), [`billing.md`](billing.md) (the commerce mechanism — tiered subscription, metering→billing outbox, measured cost basis, Stripe), [`principles.md`](principles.md).
+The two things the engine deliberately keeps and keeps *out*: **compliance** (FIRB/ASIC/AML) is a gate on agent behaviour → engine-owned and structural (constraint #10), not a shell disclaimer; **commerce** is shell-owned, so the engine only meters — keeping billing *and* ASIC liability out of the agent loop. Detail: [§11.0](architecture.md#110-engine--shell-split-deployable-shape), [`engine-contract.md`](engine-contract.md) (the boundary from the engine side), [`shell-architecture.md`](shell-architecture.md) (what sits behind the shell edge — two-JWT, backend modules, shell DB), [`billing.md`](billing.md) (the commerce mechanism — tiered subscription, metering→billing outbox, measured cost basis, Stripe), [`docs/design/invariants.md`](../design/invariants.md) (P-1–P-7).
 
 ---
 

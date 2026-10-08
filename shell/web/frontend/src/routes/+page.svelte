@@ -31,6 +31,12 @@
     import SuburbMap from '$lib/SuburbMap.svelte';
     import SuburbSheet from '$lib/SuburbSheet.svelte';
     import Onboarding from '$lib/Onboarding.svelte';
+    import {
+        savePending,
+        takePending,
+        type OnboardingAnswers,
+        type PendingOnboarding
+    } from '$lib/pendingOnboarding';
     import Login from '$lib/Login.svelte';
     import NewsTicker from '$lib/NewsTicker.svelte';
     import NewsListSheet from '$lib/NewsListSheet.svelte';
@@ -58,6 +64,12 @@
     // Bumped when a plan card is created → the sheet's Plan tab reloads in place to show
     // it (no close/reopen). Passed to SuburbSheet as `reloadPlan`.
     let planReload = $state(0);
+    // The sign-in round-trip (pendingOnboarding.ts): answers to reopen onboarding with, the
+    // pending restore waiting for its scope's suburbs, and the scope those suburbs are for.
+    let restoreAnswers = $state<OnboardingAnswers | undefined>(undefined);
+    let pendingRestore = $state<PendingOnboarding | null>(null);
+    let loadedScope = $state<MapScope | null>(null);
+    let pendingTaken = false;
     // The calm feedback banner the backend redirects back with (the login sheet's
     // open state now lives in the shared `loginOpen` store, opened from the header).
     let banner = $state<SigninFlag | null>(null);
@@ -89,9 +101,10 @@
     // --- Saved-plans + name filter (state × saved × name) --------------------
     // "Suburbs with a saved plan" = those whose name matches a plan-card title — the
     // SAME binding PlanProjection uses (title === suburb name). Signed-in only
-    // (listPlanCards 401 → []). KNOWN LIMIT: a title is just the name, so under ALL
-    // scope a duplicate name (Richmond Vic/NSW) matches in both states; fixing needs
-    // state in the card title (a data-model change) — out of scope here.
+    // (listPlanCards 401 → []). The name is a sound key under ALL scope: ABS SAL names
+    // are nationally unique, state-tagged where they collide ("Richmond (Vic.)" vs
+    // "Richmond (NSW)"); measured 2026-10-07, 15,345 suburbs, 0 duplicate names
+    // (behavior 19). If a future source ever drops the tag, bind on sal_code instead.
     let savedTitles = $state<Set<string>>(new Set());
     let savedOnly = $state(false);
     let nameQuery = $state('');
@@ -174,10 +187,10 @@
         selectedHomeNews = note;
     }
     // Closing the detail sheet (✕/backdrop/Escape) returns to the list it was opened
-    // from, rather than dropping the buyer back to the bare homepage — every path into
-    // selectedHomeNews goes through the list first (onHomeNewsListSelect above), so there
-    // is always a list to go back to. Previously this fully closed, so re-opening a
-    // different note required tapping the ticker again to re-open the list from scratch.
+    // from, or to the list when the note came straight from the ticker
+    // (onHomeTickerTap above opens the detail without the list, so "back" lands on a list
+    // the buyer never saw — the fallback Son chose 2026-08-06). Previously this fully
+    // closed, so re-opening a different note required tapping the ticker again.
     function onHomeNewsClose() {
         selectedHomeNews = null;
         homeNewsListOpen = true;
@@ -187,10 +200,12 @@
         loading = true;
         errored = false;
         selected = null;
+        loadedScope = null;
         try {
             const res = await getSuburbs(st);
             suburbs = res.suburbs;
             attribution = res.attribution;
+            loadedScope = st;
         } catch {
             errored = true;
             suburbs = [];
@@ -207,6 +222,29 @@
     // retry below is the calm, never-blank-wait surface §7.1 calls for.
     $effect(() => {
         load(auState);
+    });
+
+    // Once signed in, take any onboarding the user left for the sign-in (read once, so a
+    // reload never reopens it) and switch to the scope they were on…
+    $effect(() => {
+        if (!$session || pendingTaken) return;
+        pendingTaken = true;
+        const p = takePending();
+        if (p && (MAP_SCOPES as string[]).includes(p.scope)) {
+            pendingRestore = p;
+            auState = p.scope as MapScope;
+        }
+    });
+    // …then, when that scope's suburbs are in, reopen the suburb and onboarding prefilled.
+    $effect(() => {
+        const p = pendingRestore;
+        if (!p || loading || loadedScope !== p.scope) return;
+        pendingRestore = null;
+        const s = suburbs.find((x) => x.sal_code === p.sal);
+        if (!s) return;
+        pickSuburb(s);
+        restoreAnswers = p.answers;
+        planning = true;
     });
 </script>
 
@@ -422,7 +460,10 @@
                 suburb={selected}
                 reloadPlan={planReload}
                 onclose={() => (selected = null)}
-                onplan={() => (planning = true)}
+                onplan={() => {
+                    restoreAnswers = undefined;
+                    planning = true;
+                }}
             />
         {/key}
     {/if}
@@ -432,12 +473,20 @@
             stateCode={auState}
             suburbName={selected.name}
             suburbSal={selected.sal_code}
+            initial={restoreAnswers}
             oncreated={() => {
                 planning = false;
                 planReload++;
             }}
             onclose={() => (planning = false)}
-            onsignin={() => {
+            onsignin={(answers) => {
+                if (selected)
+                    savePending({
+                        sal: selected.sal_code,
+                        scope: auState,
+                        answers,
+                        ts: Date.now()
+                    });
                 planning = false;
                 loginOpen.set(true);
             }}

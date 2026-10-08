@@ -7,6 +7,9 @@
     // Basemap (8-S2d): VITE_PMTILES_URL set → a Protomaps pmtiles basemap; unset → the
     // no-basemap minimalStyle (the original 8-S2 behaviour — dev/build never regresses).
     // Dev/eval points at a Protomaps daily build; prod at the owned R2 AU extract.
+    // A daily-build URL carries its date and was seen to 404 within about 4 weeks
+    // (memory, mid-2026; unmeasured since): a dev map with no basemap is first a stale
+    // VITE_PMTILES_URL, and the fallback below then renders minimalStyle.
     //
     // Runtime basemap-error fallback (2026-07-09): svelte-maplibre-gl gates EVERY
     // source/layer — including our own suburb-bubbles GeoJSON, unrelated to the basemap

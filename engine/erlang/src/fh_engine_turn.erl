@@ -37,6 +37,9 @@
 -export([base_components/1]).
 %% exported for the Phase-B wiring smoke (no-PG integration of the per-property turn):
 -export([property_components/1, two_path_stored_leaf/2]).
+%% exported for due_diligence_conformance: the document gate that keeps due_diligence's
+%% lease_interpretation leaf resolver-only until a lease is uploaded.
+-export([effective_fill_path/2]).
 
 %% Mode-A base turn: the resolver/agent components in DAG (topological) order. The
 %% per-property components (property_assessment, buying_strategy, due_diligence,
@@ -665,6 +668,11 @@ base_components(<<"nexthome-domestic-au">> = Slug) ->
 base_components(Slug) ->
     order(Slug, ?BASE_COMPONENTS).
 
+%% Whole lifecycle -> P-7 · One declaration per outcome shape -> The engine -> unknown component silently dropped
+%% A name in a component list that the loaded artifact lacks is dropped without error
+%% (the maps:is_key filter), so a new component needs a re-emitted artifact AND a test
+%% asserting it is selected — otherwise its phase is simply missing from the plan.
+%% Concluded 2026-10-06 from reading this function; no check guards it today.
 order(BlueprintSlug, Names) ->
     {ok, All} = fh_engine_kb:components(BlueprintSlug),
     ByName = maps:from_list([{maps:get(<<"name">>, C), C} || C <- All]),
@@ -693,6 +701,13 @@ two_path_stored_leaf(Data, Comp) ->
             fresh
     end.
 
+%% Reproducible -> P-7 · One declaration per outcome shape -> the turn -> fill-path classification
+%% fill_path/1 reads agent_leaves (from the blueprint params' agent_reasoning_required) and
+%% picks resolver / two_path / agent. A conformance escript that calls
+%% fh_engine_fill:resolver/3 directly never passes through here, so it cannot see a component
+%% the live turn sends to the agent or two_path: due_diligence's escript passed 32/32 while
+%% the live turn crashed (memory, mid-2026; concluded from reading this path 2026-10-08).
+%% A component whose leaves change is checked through a turn smoke, not only its escript.
 %% The fill path of a base component (mortgage-finance-two-path.md §2): empty
 %% `agent_leaves` → resolver (in-process); non-empty + a resolver exists → two_path
 %% (resolver figures + agent leaves, Erlang-merged); non-empty + no resolver → agent
@@ -928,6 +943,11 @@ close_port(#{port := Port}) ->
 close_port(_Data) ->
     ok.
 
+%% Reproducible -> P-3 · The sidecar is stateless and disposable -> The engine -> sidecar paths resolve against engine cwd
+%% FH_SIDECAR_PYTHON and FH_PLANNER_SCRIPT are passed to open_port as given, so a relative
+%% value resolves against the engine's cwd (engine/erlang), not the repo root: a
+%% repo-root-relative value crashes open_port with enoent on the first fill. Measured
+%% 2026-07-04: investor_seam_smoke with real sonnet.
 python_exe() ->
     case os:getenv("FH_SIDECAR_PYTHON") of
         false ->
@@ -938,6 +958,16 @@ python_exe() ->
         P -> P
     end.
 
+%% Reproducible -> P-3 · The sidecar is stateless and disposable -> The sidecar -> stub sidecar default
+%% With FH_PLANNER_SCRIPT unset the sidecar is planner_stub.py, not planner.py: no model
+%% runs, and a `usage` event with model `stub` / 0 tokens says so. The stub must mirror
+%% planner.py's reply protocol. Measured 2026-06: 2b-2b stub drift surfaced as "sidecar
+%% exit 0 before reply"; the Mode-C Slice C seam and property_assessment_seam both
+%% misattributed stub output to a "degraded LLM".
+%% A set FH_PLANNER_SCRIPT is used as given, not joined to anything (measured 2026-10-08:
+%% read this function); a relative value resolves against the engine's cwd, which is
+%% engine/erlang under rebar3 shell, so a repo-root-relative path fails with enoent. Give it
+%% relative to engine/erlang (docs/local-dev.md:209: ../python/planner.py) or absolute.
 planner_script() ->
     case os:getenv("FH_PLANNER_SCRIPT") of
         false ->

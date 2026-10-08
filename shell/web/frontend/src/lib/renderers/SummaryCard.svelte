@@ -27,6 +27,7 @@
     import { money, moneyRange, num } from '$lib/format';
     import Field from './Field.svelte';
     import Chip from './Chip.svelte';
+    import { archetypeLabel } from './archetype';
     import NoteList from './NoteList.svelte';
     import Pending from './Pending.svelte';
 
@@ -154,6 +155,9 @@
     />
     <NoteList heading={$t('plan.f.strengths')} notes={profile.key_strengths} />
     <NoteList heading={$t('plan.f.constraints')} notes={profile.key_constraints} />
+    <!-- e.g. the ordinarily-resident assumption a household that may include a PR rests on
+         (behavior 7, kb.firb.status-determination); absent/[] for a citizen-only household -->
+    <NoteList heading={$t('plan.f.assumptions')} notes={profile.key_assumptions} />
 {:else if componentId === 'mortgage_finance'}
     {#if isInvestorMortgage}
         <!-- ── Financing snapshot hero (Mode C/D — no FHB path lanes to light up) ──── -->
@@ -217,7 +221,7 @@
     <!-- ── Strategy hero ───────────────────────────────────────────────── -->
     <div class="st-hero">
         {#if strategy.archetype}
-            <Chip label={strategy.archetype} tone="info" />
+            <Chip label={archetypeLabel(strategy.archetype, $t)} tone="info" />
         {/if}
         {#if strategy.one_liner}
             <p class="st-oneliner">{strategy.one_liner}</p>

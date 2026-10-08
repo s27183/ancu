@@ -52,6 +52,8 @@
          net_proceeds/4, full_horizon/4, dispose_cash_events/5]).
 %% the Mode-C/D investor path (full CGT):
 -export([cgt_investor/4, taxable_gain/3, loan_payout_investor/2, full_horizon_investor/4]).
+%% the growth assumption line (copy key chosen by the band's is_placeholder flag):
+-export([growth_assumption/3]).
 
 -define(COPY,    <<"kb.copy.disposition">>).
 -define(GROWTH,  <<"kb.property.capital-growth-bands">>).
@@ -91,7 +93,7 @@ fill_owner_occupier(Profile, Upstream) ->
 
     H        = horizon(Profile),
     Price    = price_basis(Profile),
-    {GLow, GHigh, _IsPlaceholder} = growth_band(),
+    {GLow, GHigh, IsPlaceholder} = growth_band(),
 
     Sale          = sale_proceeds(Price, H, GLow, GHigh),
     Selling       = selling_costs(Sale),
@@ -114,7 +116,7 @@ fill_owner_occupier(Profile, Upstream) ->
         <<"net_proceeds">>              => Net,
         <<"full_horizon_net_position">> => Full,
         <<"dispose_cash_events">>       => Events,
-        <<"key_assumptions">>           => assumptions(H, GLow, GHigh, Status, Loan)
+        <<"key_assumptions">>           => assumptions(H, GLow, GHigh, IsPlaceholder, Status, Loan)
     },
     KbVersions = fh_engine_kb:kb_anchors([?GROWTH, ?SELLING, ?CGT, ?SERVICEABILITY, ?COPY]),
     {Outcome, <<"calculator">>, KbVersions}.
@@ -134,7 +136,7 @@ fill_investor(Profile, Tax, Upstream) ->
     %% figure (sale_proceeds, taxable_gain, the net); at base: the target-range ceiling. So the
     %% dispose projection reflects THIS property, not the plan-wide range. [[place-upstream-figures-dont-recompute]]
     Price    = property_price(maps:get(<<"property_fit_investor">>, Upstream, #{}), Profile),
-    {GLow, GHigh, _IsPlaceholder} = growth_band(),
+    {GLow, GHigh, IsPlaceholder} = growth_band(),
 
     Sale                = sale_proceeds(Price, H, GLow, GHigh),
     Selling             = selling_costs(Sale),
@@ -172,7 +174,7 @@ fill_investor(Profile, Tax, Upstream) ->
         <<"net_proceeds">>              => Net,
         <<"full_horizon_net_position">> => Full,
         <<"dispose_cash_events">>       => Events,
-        <<"key_assumptions">>           => assumptions_investor(H, GLow, GHigh, Status, Loan, Frcgw)
+        <<"key_assumptions">>           => assumptions_investor(H, GLow, GHigh, IsPlaceholder, Status, Loan, Frcgw)
     },
     FrcgwAnchors = case FrcgwApplicable of
                        true -> [?FRCGW];
@@ -209,7 +211,8 @@ price_basis(Profile) ->
         _                            -> null
     end.
 
-%% --- growth band (kb.property.capital-growth-bands — PLACEHOLDER) -------------
+%% --- growth band (kb.property.capital-growth-bands) ---------------------------
+%% {low %, high %, is_placeholder} — the flag selects the assumption line's copy key.
 
 growth_band() ->
     {param(?GROWTH, <<"growth_band_low_pct_pa_nominal">>),
@@ -275,6 +278,10 @@ principal_band(_) -> null.
 %% capacity-assessment BASE WITHOUT the APRA stress buffer (the buffer is a serviceability
 %% stress overlay, not the rate at which the loan actually amortises). A labelled CONVENTION
 %% (surfaced in key_assumptions), never this buyer's actual product rate.
+%% Regulated figures are grounded -> no LLM in a regulated figure's inputs -> disposition
+%% -> loan payout rate. The rate is a KB param, never an agent field: loan_payout once read
+%% the agent's rate-structure enum as its interest rate (memory, mid-2026; concluded, the
+%% code now reads only ?SERVICEABILITY, measured 2026-10-08).
 representative_rate() ->
     param(?SERVICEABILITY, <<"representative_product_rate_pct">>).
 
@@ -497,12 +504,12 @@ event(Id, LabelCopyId, Dir, Amount, Counterparty) ->
 
 %% --- key_assumptions (bilingual, every line states a basis) ------------------
 
-assumptions(null, _GLow, _GHigh, _Status, _Loan) ->
+assumptions(null, _GLow, _GHigh, _IsPlaceholder, _Status, _Loan) ->
     %% no horizon set → the only assumption is the invitation to set one.
     [copy(<<"assumption_set_horizon">>, #{})];
-assumptions(H, GLow, GHigh, Status, Loan) ->
+assumptions(H, GLow, GHigh, IsPlaceholder, Status, Loan) ->
     Base = [copy(<<"assumption_horizon">>, #{<<"years">> => H}),
-            copy(<<"assumption_growth_placeholder">>, #{<<"low">> => GLow, <<"high">> => GHigh}),
+            growth_assumption(GLow, GHigh, IsPlaceholder),
             cgt_assumption(Status),
             copy(<<"assumption_selling_costs">>, #{})],
     %% the loan-rate basis is stated ONLY when a loan payout is actually shown (capacity
@@ -514,22 +521,33 @@ assumptions(H, GLow, GHigh, Status, Loan) ->
                                 <<"term">> => ?LOAN_TERM_YEARS})]
     end.
 
+%% The growth line's copy key follows the doc's `is_placeholder` flag: an unsourced band says
+%% PLACEHOLDER; a band grounded in a named series names that series. So the flag, not this
+%% module, decides what the user is told about the band's basis — re-grounding (or reverting)
+%% the doc changes the prose with no engine edit, and a placeholder band can never reach a
+%% user labelled as sourced (behavior 12; kb.copy.disposition).
+-spec growth_assumption(number(), number(), boolean()) -> fh_engine_i18n:localized().
+growth_assumption(GLow, GHigh, true) ->
+    copy(<<"assumption_growth_placeholder">>, #{<<"low">> => GLow, <<"high">> => GHigh});
+growth_assumption(GLow, GHigh, false) ->
+    copy(<<"assumption_growth_sourced">>, #{<<"low">> => GLow, <<"high">> => GHigh}).
+
 cgt_assumption(<<"exempt">>)    -> copy(<<"assumption_cgt_exempt">>, #{});
 cgt_assumption(<<"to_verify">>) -> copy(<<"assumption_cgt_to_verify">>, #{}).
 
 %% --- investor key_assumptions (bilingual; the §8.4 ASIC discipline) ----------
-%% reuses horizon / growth-placeholder / selling-cost / loan-rate lines (the loan-rate line
+%% reuses horizon / growth / selling-cost / loan-rate lines (the loan-rate line
 %% carries the investor rate via {rate} substitution); swaps in the investor CGT basis and adds
 %% the 2026-27 Budget reform flag (current law computed; the reform may change it from 1 Jul 2027).
 %% The FRCGW line (Mode D only) is appended LAST, only when the withheld figure is actually
 %% shown — never asserting a basis for a null figure (mirrors the loan-rate line's own gate).
-assumptions_investor(null, _GLow, _GHigh, _Status, _Loan, _Frcgw) ->
+assumptions_investor(null, _GLow, _GHigh, _IsPlaceholder, _Status, _Loan, _Frcgw) ->
     [copy(<<"assumption_set_horizon">>, #{})];
-assumptions_investor(H, GLow, GHigh, Status, Loan, Frcgw) ->
+assumptions_investor(H, GLow, GHigh, IsPlaceholder, Status, Loan, Frcgw) ->
     Base = [copy(<<"assumption_horizon">>, #{<<"years">> => H}),
-            copy(<<"assumption_growth_placeholder">>, #{<<"low">> => GLow, <<"high">> => GHigh}),
+            growth_assumption(GLow, GHigh, IsPlaceholder),
             cgt_assumption_investor(Status),
-            copy(<<"assumption_cgt_reform">>, #{}),
+            cgt_reform_assumption(Frcgw),
             copy(<<"assumption_selling_costs">>, #{})],
     WithLoan = case Loan of
         null -> Base;
@@ -541,6 +559,19 @@ assumptions_investor(H, GLow, GHigh, Status, Loan, Frcgw) ->
         null -> WithLoan;
         _    -> WithLoan ++ [copy(<<"assumption_frcgw">>, #{})]
     end.
+
+%% Regulated figures are grounded -> a tax line matches its KB doc -> the reform flag
+%% -> picks the resident or the foreign-resident wording.
+%% A foreign resident gets no 50% discount for the foreign-resident period
+%% (kb.tax.cgt-50-percent-discount; kb.non-resident-tax.cgt-no-ppor-exemption), so the
+%% resident line "This uses current law (the 50% CGT discount)" is wrong on a Mode D plan
+%% (seen 2026-10-08 in Chrome on an investor-foreign plan, behavior 31). Frcgw is non-null
+%% exactly when tax_optimised_structure.frcgw_applicable is true, i.e. Mode D: the same
+%% signal as the FRCGW line, so the two foreign lines appear together. The KB holds nothing
+%% on the 1 Jul 2027 reform's foreign-resident terms, so the foreign line names the date and
+%% defers to a tax agent (concluded).
+cgt_reform_assumption(null) -> copy(<<"assumption_cgt_reform">>, #{});
+cgt_reform_assumption(_)    -> copy(<<"assumption_cgt_reform_foreign">>, #{}).
 
 cgt_assumption_investor(<<"computed">>)  -> copy(<<"assumption_cgt_computed">>, #{});
 cgt_assumption_investor(<<"to_verify">>) -> copy(<<"assumption_cgt_investor_to_verify">>, #{}).

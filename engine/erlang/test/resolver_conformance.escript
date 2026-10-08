@@ -137,7 +137,31 @@ cases() ->
              <<"owner_occupier_intent">> => true, <<"prior_fhss_release">> => false},
            #{<<"age">> => 32, <<"ever_owned_au_property">> => true,
              <<"owner_occupier_intent">> => true, <<"prior_fhss_release">> => false}]},
-       expect_per_applicant => [{<<"eligibility.fhss.eligible">>, [true, false]}]}
+       expect_per_applicant => [{<<"eligibility.fhss.eligible">>, [true, false]}]},
+
+     %% #6: the applicant.* ∀/map semantics on a mixed household. A is a citizen; B is a
+     %% temporary resident who already made an FHSS release. Joint FHG is ∀ over
+     %% citizenship → false; FHSS is per_applicant → eligible_applicants [0] through
+     %% fh_engine_eligibility's own collapse; firb_required maps per applicant → [false,
+     %% true], and the household aggregate buyer_profile publishes is true.
+     #{name => <<"mixed-household-citizen-and-temporary-resident">>,
+       facts => #{
+           <<"applicants">> => [
+               #{<<"citizenship_status">> => <<"citizen">>, <<"age">> => 30,
+                 <<"ever_owned_au_property">> => false,
+                 <<"years_since_last_au_property_interest">> => 0,
+                 <<"owner_occupier_intent">> => true, <<"prior_fhss_release">> => false},
+               #{<<"citizenship_status">> => <<"temporary_resident">>, <<"age">> => 31,
+                 <<"ever_owned_au_property">> => false,
+                 <<"years_since_last_au_property_interest">> => 0,
+                 <<"owner_occupier_intent">> => true, <<"prior_fhss_release">> => true}],
+           <<"property_fit">> => #{<<"state">> => <<"NSW">>, <<"price">> => 1200000},
+           <<"locals">> => #{<<"location_tier">> => <<"capital_or_regional_centre">>}},
+       expect => [{<<"eligibility.fhg.eligible">>, false}],
+       expect_per_applicant => [{<<"eligibility.fhss.eligible">>, [true, false]},
+                                {<<"applicant.firb_required">>, [false, true]}],
+       expect_household => [{eligible_applicants, <<"eligibility.fhss.eligible">>, [0]},
+                            {firb_required_any, <<"applicant.firb_required">>, true}]}
     ].
 
 %% --- runner -----------------------------------------------------------------
@@ -153,7 +177,21 @@ run_case(#{name := Name} = Case, Rules) ->
         fun({Leaf, Want}) ->
             mismatch(Leaf, fh_engine_resolver:eval_applicants(Leaf, Rules, Facts), Want)
         end, maps:get(expect_per_applicant, Case, [])),
-    report(Name, Xfail, Joint ++ PerAppl).
+    Household = lists:filtermap(
+        fun({Derived, Leaf, Want}) ->
+            mismatch(Derived, household(Derived, Leaf, Rules, Facts), Want)
+        end, maps:get(expect_household, Case, [])),
+    report(Name, Xfail, Joint ++ PerAppl ++ Household).
+
+%% The household facts the engine derives from per-applicant verdicts, by its own code
+%% (eligibility's per_applicant collapse) or its own rule (buyer_profile's fail-closed any).
+household(eligible_applicants, Leaf, Rules, Facts) ->
+    Disp = fh_engine_eligibility:per_applicant_disp(
+        fh_engine_resolver:eval_applicants(Leaf, Rules, Facts)),
+    maps:get(eligible_applicants, Disp, undefined);
+household(firb_required_any, Leaf, Rules, Facts) ->
+    lists:any(fun(F) -> F =/= false end,
+              fh_engine_resolver:eval_applicants(Leaf, Rules, Facts)).
 
 mismatch(Leaf, Got, Want) ->
     case Got =:= Want of

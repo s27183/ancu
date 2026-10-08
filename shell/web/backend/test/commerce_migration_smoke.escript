@@ -7,7 +7,7 @@
 %% key + CHECK constraints behave, and the runner's "already applied" path is a
 %% clean no-op on a second run. Run from shell/web/backend:
 %%
-%%   SHELL_DATABASE_URL=postgres://shell:shell_dev_pw@localhost:5434/firsthomey_shell?sslmode=disable \
+%%   SHELL_DATABASE_URL=postgres://shell:shell_dev_pw@localhost:5434/ancu_shell?sslmode=disable \
 %%   ERL_LIBS=_build/default/lib escript test/commerce_migration_smoke.escript
 
 -mode(compile).

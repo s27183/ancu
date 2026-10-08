@@ -125,6 +125,10 @@ template ids the resolver references, each a `{vi, en}` pair.
       "vi": "Ưu đãi thuế trước bạ cho người mua nhà lần đầu không áp dụng cho người nước ngoài — số liệu ở đây là mức thuế đầy đủ, cộng thêm phụ phí dành cho người mua nước ngoài.",
       "en": "The first-home duty concession does not apply to a foreign person — the figures here are full duty, plus the foreign-buyer surcharge."
     },
+    "assumption_security_lvr_cap": {
+      "vi": "Khoản vay và tiền đặt cọc tính theo mức chuẩn LVR 80%. Với căn hộ, một số ngân hàng có thể giới hạn LVR thấp hơn (thường khoảng 70–80%) — khi đó cần đặt cọc nhiều hơn. Hãy hỏi môi giới tín dụng về loại tài sản này.",
+      "en": "Loan and deposit use the 80% LVR baseline. For an apartment, some lenders may cap the LVR lower (commonly about 70–80%), which would need a larger deposit. Ask a mortgage broker about this security type."
+    },
     "assume_fx_not_included": {
       "vi": "Chi phí chuyển đổi ngoại tệ (VND sang AUD) chưa được tính vào tổng số tiền cần — khoản này sẽ được thêm vào khi biết số tiền chuyển từ Việt Nam.",
       "en": "The VND-to-AUD currency-transfer cost is not yet included in the total — it's added once the transfer amount from Vietnam is known."

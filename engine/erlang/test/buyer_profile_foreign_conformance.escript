@@ -119,10 +119,9 @@ scaffold_cases() ->
      check("intended_occupancy_use = sole_occupier (definitional, mirrors Mode A's own "
            "call — an owner-occupier FHB by mode definition)",
            g(O, <<"intended_occupancy_use">>), <<"sole_occupier">>),
-     check("kb_versions = the four Mode-B profile anchors",
+     check("kb_versions = the three Mode-B profile anchors (status-determination is not evaluated: firb_required is definitional, #6)",
            lists:sort(KbSlugs),
-           lists:sort([<<"kb.firb.status-determination">>,
-                       <<"kb.firb.established-dwelling-ban">>,
+           lists:sort([<<"kb.firb.established-dwelling-ban">>,
                        <<"kb.visas.au-temporary-residency-classes">>,
                        <<"kb.au-temp-residents.banking-and-tax-basics">>])),
      check("has_resolver true", fh_engine_fill:has_resolver(<<"buyer_profile">>), true),

@@ -14,7 +14,7 @@
 %%   an unauthenticated POST is 401; a missing STRIPE_SECRET_KEY is 503 (config gap,
 %%   not the user's fault). create_checkout_session/2 directly reports the config errors.
 %%
-%%   SHELL_DATABASE_URL=postgres://shell:shell_dev_pw@localhost:5434/firsthomey_shell?sslmode=disable \
+%%   SHELL_DATABASE_URL=postgres://shell:shell_dev_pw@localhost:5434/ancu_shell?sslmode=disable \
 %%   ERL_LIBS=_build/default/lib escript test/billing_checkout_smoke.escript
 
 -mode(compile).

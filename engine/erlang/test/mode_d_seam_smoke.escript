@@ -22,6 +22,11 @@
 
 -mode(compile).
 
+%% Regulated figures are grounded -> P-7 · One declaration per outcome shape -> The engine -> live smoke catches fixture drift
+%% This live full-stack run caught `recommended_lender` vs `recommended_lender_shortlist`
+%% AFTER resolver conformance passed, because the conformance fixtures were hand-written to
+%% match the buggy Erlang. Measured 2026-07-04 by this smoke (commit 5527b41).
+
 main(_) ->
     os:putenv("FH_ENGINE_HTTP_PORT", "8093"),
     {ok, _} = application:ensure_all_started(fh_engine),
@@ -69,8 +74,8 @@ main(_) ->
     %%     firb_workflow (FIRB eligibility/fee framing) AND mortgage_finance (lender fit) —
     %%     advice_adjacent/1 lists both for Mode B/D, unlike Mode C which carries no
     %%     firb_workflow component. tax_structure_non_resident and investment_strategy
-    %%     clear with no_advice_surface — the ASIC line is held at the producer (§98
-    %%     figure-tightness, schema-as-constraint enums). purchase_journey/phase_playbook
+    %%     record boundary_held too: their agent-authored entity and strategy leaves are
+    %%     advice-adjacent (#27, 2026-10-06). purchase_journey/phase_playbook
     %%     (added task 8) also clear with no_advice_surface — same treatment Mode C's
     %%     equivalents get, neither is in advice_adjacent/1. ---
     AuditCount = scalar("SELECT count(*) FROM audit_events WHERE plan_card_id = $1",
@@ -83,7 +88,7 @@ main(_) ->
                       "AND compliance_jsonb->>'gate' = 'asic' "
                       "AND compliance_jsonb->>'detail' = 'decision_support_boundary_held'",
                       [PlanCardId]),
-    expect(AsicHeld =:= 2, "ASIC boundary_held on firb_workflow + mortgage_finance (Mode D carries both)"),
+    expect(AsicHeld =:= 4, "ASIC boundary_held on firb_workflow, mortgage_finance, tax_structure_non_resident, investment_strategy"),
     TwoPathAudit = scalar("SELECT count(*) FROM audit_events WHERE plan_card_id = $1 "
                           "AND fill_path = 'two_path'", [PlanCardId]),
     expect(TwoPathAudit =:= 9, "9 two_path audit rows (3 two-path components x 3 gates)"),

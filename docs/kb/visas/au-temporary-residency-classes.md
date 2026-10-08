@@ -12,6 +12,7 @@ sources:
     note: "POINTER (canonical Home Affairs page; not directly re-fetched this session) — Temporary Graduate (subclass 485): streams, duration by qualification, unrestricted work rights."
   - url: https://foreigninvestment.gov.au/sites/foreigninvestment.gov.au/files/2025-03/guidance-note-2-key-concepts-v3.pdf
     note: "POINTER (canonical Treasury/FIRB Guidance Note 2; not re-fetched this session) — temporary-resident definition (visa permitting >12 months' continuous stay, or bridging visa with pending PR = foreign person)."
+---
 
 # AU temporary-residency visa classes and their FIRB implications
 

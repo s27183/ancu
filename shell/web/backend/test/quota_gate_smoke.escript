@@ -18,7 +18,7 @@
 %%   The under-limit ALLOW path through this same handler is already proven by
 %%   plancard_proxy_smoke (fresh user, default 1.0M limit, 0 usage → 202 relayed).
 %%
-%%   SHELL_DATABASE_URL=postgres://shell:shell_dev_pw@localhost:5434/firsthomey_shell?sslmode=disable \
+%%   SHELL_DATABASE_URL=postgres://shell:shell_dev_pw@localhost:5434/ancu_shell?sslmode=disable \
 %%   ERL_LIBS=_build/default/lib escript test/quota_gate_smoke.escript
 
 -mode(compile).
@@ -137,5 +137,10 @@ req(Method, Url, Headers, Body) ->
         httpc:request(Method, Request, [], [{body_format, binary}]),
     {Status, Resp}.
 
+%% Bilingual -> R-4 · Reasoning within its runtime -> The shell backend -> escript stdout is latin1
+%% Escript stdout is latin1: `~s` of a UTF-8 binary double-encodes it (café -> cafÃ©), and a
+%% codepoint above 255 (an em-dash) in a `~s` label raises badarg; use `~ts` for any
+%% non-ASCII label. Measured June 2026 (8-S5d, portfolio_position capture); re-measured
+%% 2026-10-06 on OTP 29 by an escript printing <<"café"/utf8>> and [8212] with ~s and ~ts.
 expect(true, Label)  -> io:format("  ok  ~s~n", [Label]);
 expect(false, Label) -> io:format("FAIL  ~s~n", [Label]), halt(1).

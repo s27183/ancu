@@ -8,7 +8,7 @@
 %% `tax_optimised_structure` upstream discriminator (mirrors fh_engine_disposition) — present →
 %% the investor budget_envelope_investor; absent → the Mode-A FHB budget_envelope. Loads the SAME
 %% materialized artifact the engine loads (priv/kb/artifact.json) and asserts:
-%%   1. SCAFFOLD — the investor branch owns the `calculator` renderer + the six cash KB anchors,
+%%   1. SCAFFOLD — the investor branch owns the `calculator` renderer + the seven cash KB anchors,
 %%      and (plan-first: no property, no savings at base) leaves every one of the nine
 %%      budget_envelope_investor figures null, mitigation_options_if_short empty. Input-independent
 %%      at base. has_resolver true.
@@ -45,14 +45,15 @@ main(_) ->
 
 %% --- fixtures ----------------------------------------------------------------
 
-%% the ten budget_envelope_investor fields the registry declares — the original nine
+%% the eleven budget_envelope_investor fields the registry declares — the original nine
 %% figures plus cash_events (added 2026-07-10, task 4: cash_position emits the acquire-phase
-%% cash_events purchase_journey/phase_playbook harvest).
+%% cash_events purchase_journey/phase_playbook harvest) and key_assumptions (2026-10-07,
+%% behavior 13: the apartment security LVR-cap caveat; [] at base).
 fields() ->
     [<<"actual_property_price">>, <<"max_property_price_supported">>,
      <<"total_cash_required">>, <<"loan_amount">>, <<"lvr">>, <<"lmi_payable">>,
      <<"gap_or_surplus">>, <<"verdict">>, <<"mitigation_options_if_short">>,
-     <<"cash_events">>].
+     <<"key_assumptions">>, <<"cash_events">>].
 
 %% the eight fields that are null at base (everything except the empty mitigation list).
 null_at_base() ->
@@ -95,20 +96,21 @@ scaffold_cases() ->
         [check(<<"input-independent (bare upstream) null: ", F/binary>>, g(OBare, F), null)
          || F <- null_at_base()],
     [check("renderer = calculator", Rend, <<"calculator">>),
-     check("outcome has exactly the ten budget_envelope_investor fields",
+     check("outcome has exactly the eleven budget_envelope_investor fields",
            lists:sort(maps:keys(O)), lists:sort(fields())),
      check("mitigation_options_if_short = [] (honest empty, no shortfall known)",
            g(O, <<"mitigation_options_if_short">>), []),
      check("cash_events = [] (honest empty, no acquisition figures known at base)",
            g(O, <<"cash_events">>), []),
-     check("kb_versions = the six cash anchors",
+     check("kb_versions = the six cash anchors + lender policies",
            lists:sort(KbSlugs),
            lists:sort([<<"kb.stamp-duty.calc-by-state">>,
                        <<"kb.investor.deposit-requirements-investment-loans">>,
                        <<"kb.lmi.calculation">>,
                        <<"kb.buyer-costs.investor-additional-costs">>,
                        <<"kb.tax.quantity-surveyor-reports">>,
-                       <<"kb.tax.entity-setup-costs">>])),
+                       <<"kb.tax.entity-setup-costs">>,
+                       <<"kb.lender.investment-loan-policies">>])),
      check("has_resolver true (classified as resolver, pure)",
            fh_engine_fill:has_resolver(<<"cash_position">>), true)]
     ++ NullChecks ++ BareChecks.
@@ -129,7 +131,7 @@ validate(Bp, Type, O) ->
 discriminator_cases() ->
     {Inv, _, _} = fh_engine_fill:resolver(<<"cash_position">>, #{}, inv_upstream()),
     {Fhb, FhbRend, _} = fh_engine_fill:resolver(<<"cash_position">>, #{}, fhb_upstream()),
-    [check("present → investor branch (ten-field set)",
+    [check("present → investor branch (eleven-field set)",
            lists:sort(maps:keys(Inv)), lists:sort(fields())),
      check("present → investor branch has NO FHB stamp_duty key",
            maps:is_key(<<"stamp_duty">>, Inv), false),

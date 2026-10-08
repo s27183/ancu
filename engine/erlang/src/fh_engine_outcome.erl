@@ -35,10 +35,17 @@
 %% live in tests/outcome_validate.py; engine/erlang/test/outcome_conformance.escript runs the
 %% SAME cases through check/3 and asserts identical conform/reject verdicts (the cross-language
 %% lockstep — reason text is informative, the VERDICT is contractual).
+%%
+%% Bilingual -> P-7 · One declaration per outcome shape -> The engine -> fail-closed retype limit
+%% Because this validator is fail-closed, a declaration can only be tightened as far as the
+%% producer already emits: re-type a field `string` -> `localized_text` only where the
+%% producer already writes a {vi, en} pair, or every fill of that component crashes its turn.
+%% Concluded at 2b-4a from the fail-closed clause above (no runtime probe).
 
 -export([validate/3, check/3, check_placement/2]).
 
-%% The numeric family (§98). money_range / percentage_range are a [lo, hi] list of numbers;
+%% The numeric family (§98). money_range / percentage_range are a [lo, hi] list of numbers
+%% ([lo, null] an open-ended floor — check_scalar/2);
 %% the rest a bare number. string/bool/date/object are scalars too but are NOT figures.
 -define(FIGURE_TYPES,
         [<<"money">>, <<"money_per_year">>, <<"number">>,
@@ -56,6 +63,14 @@
 %% fill against it. A type the artifact does not declare is refused
 %% ({outcome_undeclared, Slug, Type}); every component's shape is declared, which
 %% the compiler's GATE 12 enforces at build (P-7).
+%%
+%% Reproducible -> P-7 · One declaration per outcome shape -> The engine -> undeclared outcome refused
+%% Until 2026-10-06 an undeclared type passed here unchecked, and the compiler did not
+%% require a declaration: measured 2026-07-05, the registry held 2 of 13 types for
+%% nexthome-domestic-au; measured 2026-10-06, six foreign-mode components compiled null.
+%% Now GATE 12 fails the build on any of them (measured 2026-10-06: one schema block
+%% removed → exit 1, artifact untouched), so this refusal is the backstop for a stale
+%% artifact or a renamed type (Son, 2026-10-06, #25).
 -spec validate(binary(), binary(), map()) -> ok.
 validate(BlueprintSlug, OutcomeType, Outcome) ->
     OutcomeTypes = fh_engine_kb:registry(BlueprintSlug, <<"outcome_types">>),
@@ -158,12 +173,24 @@ collect_locales([Loc | Rest], Value, Acc) ->
             {error, <<"localized locale ", Loc/binary, " non-string">>}
     end.
 
+%% Regulated figures are grounded -> P-7 · One declaration per outcome shape -> The engine -> figure type follows derivation
+%% A registry figure is typed `*_range` iff it is derived from a range input, and scalar iff
+%% it is an exact-point computation; a phase-polymorphic field is typed `*_range` and emits
+%% [V, V] when exact. This strict two-way check bounds where a mismatch can surface.
+%% Concluded 2026-06 (stated before only in mode-c-wedge.md).
 check_scalar(Type, Value) when Type =:= <<"money_range">>; Type =:= <<"percentage_range">> ->
     %% a banded figure — a [lo, hi] list of numbers (the banded money/percentage surface,
     %% mode-c-wedge Slice B0: rent is a band, so income/yields/cash-flow built on it band too).
-    case is_list(Value) andalso lists:all(fun erlang:is_number/1, Value) of
-        true  -> ok;
-        false -> {error, reason(<<Type/binary, " must be a list of numbers">>, Value)}
+    %% [Lo, null] is an open-ended floor ("from $636"): a band whose provider-priced top no
+    %% source bounds (kb.tax.entity-setup-costs' company and SMSF-with-LRBA rows; behavior 11,
+    %% 2026-10-06). A null top is the only null allowed; a null floor is not a band.
+    case Value of
+        [Lo, null] when is_number(Lo) -> ok;
+        _ ->
+            case is_list(Value) andalso lists:all(fun erlang:is_number/1, Value) of
+                true  -> ok;
+                false -> {error, reason(<<Type/binary, " must be a list of numbers">>, Value)}
+            end
     end;
 check_scalar(Type, Value) ->
     case lists:member(Type, ?FIGURE_TYPES) of

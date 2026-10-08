@@ -48,15 +48,13 @@ amounts (rental income, operating expenses, loan interest, the AU tax on rental)
 structure`; the dispose-phase amounts (sale proceeds, selling costs, loan payout, the full-CGT +
 FRCGW figure) come from `disposition`'s `dispose_cash_events`.
 
-**Known limitation (flagged, not fixed here — a `cash_position` build, out of scope for this
-KB/wiring pass).** Unlike Mode C's `cash_position`, Mode D's `fill_investor_foreign/2` has no
-per-property branch yet — every acquisition figure is null even once a property is attached, so
-`budget_envelope_investor.cash_events` is `[]` at base **and** stays `[]` today. `yield_modelling`
-is shared code with Mode C and already lights up per-property; `tax_structure_non_resident`'s hold-
-phase tax figure needs a non-resident marginal-rate KB table that does not exist yet (same honest-
-partial gap the blueprint's own component 7 note already discloses). So today's swimlane renders
-the full **legal/prose spine** (every phase, every actor cell) but the **money spine** stays
-sparse until those two seams close — an honest, not a broken, state.
+**Acquisition figures (#13, 2026-10-06).** Mode D's `cash_position` places the acquisition
+spine at the base turn, at the target range's ceiling: `deposit` and `firb_fee` at `contract`,
+`stamp_duty`, `foreign_buyer_surcharge` and `other_buying_costs` at `settle`, each the figure its
+total sums; an unknown figure is absent, never zero. `yield_modelling` is shared code with Mode C and
+lights up per-property; `tax_structure_non_resident`'s hold-phase tax figure needs a non-resident
+marginal-rate KB table that does not exist yet (the blueprint's component 7 note discloses it), so
+that one cell stays empty — an honest, not a broken, state.
 
 This is a **copy doc** (it fills no slot). It is a blueprint anchor (component 15, added
 2026-07-10 alongside `phase_playbook`), so it must resolve; structurally only slug==path +

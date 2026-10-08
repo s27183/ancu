@@ -8,6 +8,7 @@ sources:
     note: "PRIMARY (ATO) — residency-for-tax categories; foreign residents have no tax-free threshold and no Medicare levy. Verified via WebSearch corroboration 2026-07-06 (ATO WebFetch 403 in-sandbox) — CONFIRMED."
   - url: https://classic.austlii.edu.au/au/legis/cth/consol_act/itaa1997240/s768.900.html
     note: "POINTER (not re-fetched this session; canonical home of the fact) — ITAA 1997 Subdiv 768-R (temporary-resident foreign-income exemption, except net capital gains). Settled law; re-verify anchor for the temporary-resident row."
+---
 
 # Banking and tax basics for AU temporary residents
 

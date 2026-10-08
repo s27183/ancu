@@ -1,16 +1,17 @@
 ---
 slug: kb.copy.disposition
 effective_from: 2026-06-22
-last_verified: 2026-07-10
+last_verified: 2026-10-08
 ---
 
 # Disposition component copy (bilingual)
 
 User-facing copy-templates for the `disposition` resolver (`fh_engine_disposition`): the
 dispose-phase `dispose_cash_events` labels (sale proceeds, selling costs, loan payout, CGT)
-and the `key_assumptions` lines (the hold horizon, the **placeholder** capital-growth band,
+and the `key_assumptions` lines (the hold horizon, the capital-growth band,
 the CGT basis — owner-occupier exemption *or* the Mode-C/D investor computed/to_verify lines plus
-the 2026-27 reform flag — the selling-cost basis, the representative loan-rate basis, and
+the 2026-27 reform flag (Mode D gets `assumption_cgt_reform_foreign` instead: no 50% discount for the
+foreign-resident period, [`kb.tax.cgt-50-percent-discount`](../tax/cgt-50-percent-discount.md)) — the selling-cost basis, the representative loan-rate basis, and
 (Mode D only) the FRCGW prepayment note `assumption_frcgw`). `vn_side_cgt_note` is Mode-D's
 informational VN-side pointer (never a VN tax figure — points to the buyer's own VN-based tax
 advisor, per the AU-side-full/VN-side-placeholder scoping decision). Each template is filled via
@@ -61,6 +62,10 @@ basis — decision-support, never a forecast or advice.
       "vi": "Mức tăng giá {low}–{high}%/năm là GIẢ ĐỊNH TẠM, chưa lấy từ nguồn chính thức — chỉ để tham khảo, không phải dự báo.",
       "en": "The {low}–{high}% per-year capital-growth band is a PLACEHOLDER, not yet drawn from an authoritative series — a planning aid, not a forecast."
     },
+    "assumption_growth_sourced": {
+      "vi": "Mức tăng giá {low}–{high}%/năm dựa trên số liệu Tổng giá trị nhà ở (Total Value of Dwellings) của Cục Thống kê Úc (ABS): mức tăng giá trung vị trong 20 năm tại các thành phố thủ phủ. Đây là số liệu quá khứ, không phải dự báo — chỉ để tham khảo khi lập kế hoạch.",
+      "en": "The {low}–{high}% per-year capital-growth band is based on ABS Total Value of Dwellings: 20-year median price growth across the capital cities. It is historical, not a forecast — a planning aid."
+    },
     "assumption_cgt_exempt": {
       "vi": "Nhà ở chính mà bạn sinh sống thường được miễn thuế lãi vốn — hãy xác nhận với chuyên viên thuế.",
       "en": "A main residence you live in is generally exempt from capital gains tax — confirm with a registered tax agent."
@@ -89,6 +94,10 @@ basis — decision-support, never a forecast or advice.
       "vi": "Phần này áp dụng luật hiện hành (giảm 50% thuế lãi vốn). Một cải cách trong Ngân sách 2026-27 — thay bằng cách điều chỉnh theo lạm phát trên giá vốn cộng thuế tối thiểu 30% — nay đã thành luật (có hiệu lực từ 26/6/2026) nhưng chưa áp dụng cho đến 1/7/2027; hãy xác nhận với chuyên viên thuế có đăng ký.",
       "en": "This uses current law (the 50% CGT discount). A 2026-27 Budget reform replacing it with cost-base indexation plus a 30% minimum tax is now law (enacted 26 June 2026) but does not take effect until 1 July 2027; confirm the position with a registered tax agent."
     },
+    "assumption_cgt_reform_foreign": {
+      "vi": "Bạn là người không cư trú thuế tại Úc, nên theo luật hiện hành bạn không được giảm 50% thuế lãi vốn cho phần lãi phát sinh trong thời gian không cư trú — phần lãi chịu thuế ở đây không được giảm. Một cải cách thuế lãi vốn trong Ngân sách 2026-27, nay đã thành luật, áp dụng từ 1/7/2027 và có thể thay đổi cách tính thuế khi bạn bán; hãy xác nhận với chuyên viên thuế có đăng ký.",
+      "en": "As a foreign resident for tax, current law gives you no 50% CGT discount on the gain from your foreign-resident period — the taxable gain here is not discounted. A 2026-27 Budget CGT reform, now law, takes effect from 1 July 2027 and may change how your sale is taxed; confirm the position with a registered tax agent."
+    },
     "assumption_frcgw": {
       "vi": "Khi bán, người mua sẽ giữ lại 15% giá bán để nộp cho Sở Thuế Úc (ATO) — đây là khoản TẠM ỨNG được khấu trừ vào thuế lãi vốn thực tế của bạn khi quyết toán, không phải là một khoản phí thêm.",
       "en": "At sale, the purchaser withholds 15% of the sale price and remits it to the ATO — a PREPAYMENT credited against your actual capital gains tax on assessment, not an additional cost."
@@ -106,6 +115,10 @@ Notes:
 - **No `fills`.** No outcome leaf is set by a KB rule. The dispose figures are resolver-computed
   from `kb.property.capital-growth-bands` + `kb.selling-costs.agent-legal` + the upstream figures;
   this doc supplies only labels and assumption prose.
-- **The growth-band caveat is load-bearing.** `assumption_growth_placeholder` carries the
-  PLACEHOLDER warning into the user-facing plan — the band must be re-grounded against a named
-  series before any figure is surfaced as more than a banded planning aid (Son, 2026-06-21).
+- **The growth line follows the band's `is_placeholder` flag.** The resolver picks
+  `assumption_growth_sourced` when `kb.property.capital-growth-bands` is grounded in a named
+  series (it names that series — ABS Total Value of Dwellings — and says *historical, not a
+  forecast*), and `assumption_growth_placeholder` (the PLACEHOLDER warning) when it is not. The
+  flag, not the engine, decides the label, so a placeholder band can never reach a user labelled
+  as sourced (behavior 12). If the band doc's series ever changes, this sourced line changes with
+  it.

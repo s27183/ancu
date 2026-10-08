@@ -32,6 +32,7 @@
 %% exported for the Mode-E next-home conformance suite:
 -export([fill_fhb_nexthome/2, gap_range/2, verdict_from_gap/1]).
 
+-define(LENDER_POLICY, <<"kb.lender.investment-loan-policies">>).  %% security-category caps
 -define(COPY, <<"kb.copy.cash">>).   %% bilingual copy-templates (bilingual-content.md §3b)
 -define(SURCHARGE, <<"kb.foreign-buyer-surcharge.by-state">>).
 
@@ -274,12 +275,20 @@ fill_fhb_foreign(Args, Upstream) ->
 %% key_assumptions_foreign's own assume_no_lmi_at_conservative_deposit) — a zero-value
 %% event would carry no real information, unlike Mode C's cash_events_investor/4 (where
 %% LMI can genuinely be non-zero per-property).
+%%
+%% Mode D reuses it (#13, 2026-10-06) with Other = <<"services">>: its swimlane is Mode C's
+%% six actors, which hold the conveyancer/trust chain as `services`, not Mode A/B's `other`.
 -spec cash_events_foreign(number() | null, number() | null, number() | null,
                           number() | null, number() | null) -> [map()].
 cash_events_foreign(Deposit, DutyAfter, Surcharge, FirbFee, ChannelCosts) ->
+    cash_events_foreign(Deposit, DutyAfter, Surcharge, FirbFee, ChannelCosts, <<"other">>).
+
+-spec cash_events_foreign(number() | null, number() | null, number() | null,
+                          number() | null, number() | null, binary()) -> [map()].
+cash_events_foreign(Deposit, DutyAfter, Surcharge, FirbFee, ChannelCosts, Other) ->
     Out = [
         event(<<"deposit">>, <<"contract">>, <<"event_deposit">>, <<"out">>,
-              point(Deposit), false, <<"other">>, <<"cash_position">>),
+              point(Deposit), false, Other, <<"cash_position">>),
         event(<<"firb_fee">>, <<"contract">>, <<"event_firb_fee">>, <<"out">>,
               point(FirbFee), false, <<"government">>, <<"cash_position">>),
         event(<<"stamp_duty">>, <<"settle">>, <<"event_stamp_duty">>, <<"out">>,
@@ -287,7 +296,7 @@ cash_events_foreign(Deposit, DutyAfter, Surcharge, FirbFee, ChannelCosts) ->
         event(<<"foreign_buyer_surcharge">>, <<"settle">>, <<"event_foreign_buyer_surcharge">>, <<"out">>,
               point(Surcharge), false, <<"government">>, <<"cash_position">>),
         event(<<"other_buying_costs">>, <<"settle">>, <<"event_other_costs">>, <<"out">>,
-              point(ChannelCosts), true, <<"other">>, <<"cash_position">>)
+              point(ChannelCosts), true, Other, <<"cash_position">>)
     ],
     [E || E <- Out, maps:get(<<"amount">>, E) =/= null].
 
@@ -397,9 +406,10 @@ key_assumptions_foreign(Ceiling, _State) ->
 %%      investor now carries `cash_events` (deposit/stamp_duty/other_buying_costs/lmi — see
 %%      cash_events_investor/4 below), so purchase_journey's generic multi-source harvest can
 %%      place the investor acquire-phase spine with zero Mode-C-specific journey code
-%%      ([[unify-views-as-projections-of-one-primitive]]). entity_setup_costs is NOT yet an
-%%      event: the underlying tax_optimised_structure.setup_costs figure is permanently null
-%%      (a separate, still-open entity-cost seam) — honest-partial (no event without a figure).
+%%      ([[unify-views-as-projections-of-one-primitive]]). entity_setup_costs is NOT an
+%%      event: tax_optimised_structure.setup_costs is an INDICATIVE band placed after the
+%%      entity agent runs (behavior 11, #12), shown on the tax card and kept out of the point
+%%      cash total and its events.
 -spec fill_investor(map(), map()) -> {map(), binary(), [map()]}.
 fill_investor(_Args, Upstream) ->
     %% Branch on the per-property keystone (Slice B3b): at base property_fit_investor is absent →
@@ -414,7 +424,8 @@ fill_investor(_Args, Upstream) ->
          <<"kb.lmi.calculation">>,
          <<"kb.buyer-costs.investor-additional-costs">>,
          <<"kb.tax.quantity-surveyor-reports">>,
-         <<"kb.tax.entity-setup-costs">>]),
+         <<"kb.tax.entity-setup-costs">>,
+         ?LENDER_POLICY]),
     {Outcome, <<"calculator">>, KbVersions}.
 
 %% base (no property attached): every figure honestly unknowable.
@@ -428,6 +439,7 @@ budget_envelope_investor_base() ->
       <<"gap_or_surplus">>               => null,
       <<"verdict">>                      => null,
       <<"mitigation_options_if_short">>  => [],
+      <<"key_assumptions">>              => [],
       <<"cash_events">>                  => []}.
 
 %% Slice B3b — the per-property cash-to-complete (NEED side), POINT figures off the attached
@@ -456,9 +468,24 @@ budget_envelope_investor(Pf) ->
                 <<"lvr">>                   => Lvr,
                 <<"lmi_payable">>           => Lmi,
                 <<"total_cash_required">>   => total_cash_investor(Deposit, Duty, Acq),
+                <<"key_assumptions">>       =>
+                    security_lvr_caveat(maps:get(<<"property_type">>, Pf, null)),
                 <<"cash_events">>           => cash_events_investor(Deposit, Duty, Acq, Lmi)
             }
     end.
+
+%% Goal: regulated figures are grounded, honest about their tier -> a CONVENTION is stated as a
+%% caveat, never folded into a figure -> Mode C cash_position -> flag a lender security cap.
+%% Lenders commonly cap LVR at ~70-80% on high-density apartments (kb.lender.investment-loan-
+%% policies, security_category_policy; CONVENTION — no primary source, policies sit behind broker
+%% portals). The loan and deposit stay at the 80% baseline; an attached property whose type the
+%% KB lists in lvr_cap_property_types adds one bilingual line, no lender named (#3, behavior 13).
+security_lvr_caveat(PType) when is_binary(PType) ->
+    case lists:member(PType, param_value(?LENDER_POLICY, <<"lvr_cap_property_types">>)) of
+        true  -> [copy(<<"assumption_security_lvr_cap">>, #{})];
+        false -> []
+    end;
+security_lvr_caveat(_) -> [].
 
 %% --- cash_events_investor (the investor ACQUISITION financial spine) ---------
 %% Mirrors cash_events/4's shape exactly (same event/8 builder) so purchase_journey's
@@ -566,12 +593,13 @@ fill_investor_foreign(Args, Upstream) ->
         <<"lvr">>                          => null,
         <<"gap_or_surplus">>               => GapOrSurplus,
         <<"verdict">>                      => Verdict,
-        %% Honest empty (task 8, 2026-07-10): unlike Mode C's cash_events_investor/4, this
-        %% fill has no per-property branch yet (no attached-property price to build a real
-        %% acquisition spine off) — a separate, already-flagged cash_position build, out of
-        %% scope here. [] is conformant with the shared budget_envelope_investor type
-        %% (Mode C's own base scaffold emits the same []) and honest — never a fabricated event.
-        <<"cash_events">>                  => []
+        %% The acquisition spine at the range ceiling, the figures summed above and placed
+        %% by Mode B's builder (#13, 2026-10-06; it was [] since task 8). Each event appears
+        %% only when its figure is known, so an unknown state drops duty, surcharge and
+        %% other costs. Mode D has no per-property cash_position turn in launch scope.
+        <<"cash_events">>                  =>
+            cash_events_foreign(Deposit, DutyAfter, Surcharge, FirbFee, ChannelCosts,
+                                <<"services">>)
     },
     KbVersions = fh_engine_kb:kb_anchors(
         [<<"kb.stamp-duty.calc-by-state">>, <<"kb.foreign-buyer-surcharge.by-state">>,

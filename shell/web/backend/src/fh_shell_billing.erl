@@ -182,6 +182,10 @@ route_event(#{<<"type">> := Type,
         false ->
             <<"missing_subscription_id">>
     end;
+%% Every other type is acked 200 and ignored, invoice.* included (measured 2026-10-08:
+%% read the clauses above). A renewal still lands through customer.subscription.updated,
+%% which carries the new period; docs/architecture/billing.md:161 lists invoice.paid among
+%% the handled events, which this code does not do (concluded: that line is the stale one).
 route_event(#{<<"type">> := Type}) ->
     logger:debug("[billing] ignoring event type ~s", [Type]),
     <<"ignored">>;
@@ -342,9 +346,9 @@ addon_amount_cents(_)                -> undefined.
 
 %% The product name shown on the Stripe-hosted checkout page (bilingual-friendly UTF-8 —
 %% compose_query encodes it utf8, not via a byte-fragile formatter).
-addon_label(<<"doc_review">>) -> <<"Rau — Contract & Section 32 review"/utf8>>;
-addon_label(<<"timnha">>)     -> <<"Rau — Tìm Nhà property search"/utf8>>;
-addon_label(_)                -> <<"Rau add-on">>.
+addon_label(<<"doc_review">>) -> <<(fh_shell_util:brand())/binary, " — Contract & Section 32 review"/utf8>>;
+addon_label(<<"timnha">>)     -> <<(fh_shell_util:brand())/binary, " — Tìm Nhà property search"/utf8>>;
+addon_label(_)                -> <<(fh_shell_util:brand())/binary, " add-on">>.
 
 %% AUD, lowercase ISO per Stripe's unit_amount currency convention.
 addon_currency() -> <<"aud">>.

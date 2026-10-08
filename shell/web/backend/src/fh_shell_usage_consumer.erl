@@ -146,6 +146,11 @@ handle_event(Ev) ->
 %% charged); a non-admin (the common case) is billed true. After a row actually lands,
 %% the user's period meter cache is invalidated (billing.md §6) so the next gate read
 %% reflects this turn immediately.
+%%
+%% Honest-partial -> P-5 · Metering, not gating -> The shell backend -> unweighted token quota
+%% tokens_total is UNWEIGHTED: a cache_read token counts the same as a cache_creation
+%% token, so prompt caching cuts the $ cost (shadow_cost) but never the quota a user uses.
+%% Measured 2026-08-06 by reading this function (Total = In + Out + CacheR + CacheC).
 book_usage(Id, UserId, Email, Ev) ->
     In = int(maps:get(<<"input_tokens">>, Ev, 0)),
     Out = int(maps:get(<<"output_tokens">>, Ev, 0)),
@@ -180,6 +185,12 @@ book_usage(Id, UserId, Email, Ev) ->
 
 %% Bootstrap the cursor from the mirror (no separate cursor table), floored by the
 %% optional forward-seed env. Fresh DB → MAX is 0 → walk from the start.
+%%
+%% Honest-partial -> P-2 · The database is the single source of truth -> The shell database -> usage cursor from MAX(engine_event_id)
+%% Any row written to usage_records outside this consumer (a smoke test, a fixture) must
+%% carry a NEGATIVE engine_event_id, or MAX() jumps the cursor past real events and they
+%% are never booked. Measured 2026-08-06: psql against both dev DBs showed fixture rows
+%% ahead of real events (usage read 0 after real turns); the escripts now negate.
 bootstrap_cursor() ->
     max(mirror_max(), env_int("USAGE_CONSUMER_START_CURSOR", 0)).
 

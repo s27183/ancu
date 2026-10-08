@@ -15,7 +15,7 @@
 %% deferred decision, not on this ablation's path).
 %%
 %% Needs BOTH build libs on the path + the engine's dev Postgres (5433):
-%%   ENGINE_DATABASE_URL=postgres://engine:engine_dev_pw@localhost:5433/firsthomey_engine?sslmode=disable \
+%%   ENGINE_DATABASE_URL=postgres://engine:engine_dev_pw@localhost:5433/ancu_engine?sslmode=disable \
 %%   ERL_LIBS=_build/default/lib:../../../engine/erlang/_build/default/lib \
 %%   escript test/seam_roundtrip.escript
 

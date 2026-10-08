@@ -12,7 +12,7 @@ this file is the source of truth for "what's left." The grounding-checklist carr
 pointer here.
 
 Anchor / upstream: [`fact-model-unification.md`](fact-model-unification.md) ("Mode-C activation"),
-[`wedge-build-sequence.md`](wedge-build-sequence.md) (C-before-B by foundationality),
+[`wedge-build-sequence.md`](../design/archive/wedge-build-sequence.md) (C-before-B by foundationality),
 [`engine-contract.md`](engine-contract.md) §9.1, [`architecture.md`](architecture.md) §11.9.
 Conforming artifact: [`../blueprints/investor-domestic-au.md`](../blueprints/investor-domestic-au.md).
 

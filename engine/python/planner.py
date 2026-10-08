@@ -57,6 +57,12 @@ from pydantic import BaseModel, Field, StringConstraints, ValidationError, model
 # Called once at startup (not at import — keeps the module importable for tests).
 _PROTO = None
 
+# Bilingual -> P-7 · One declaration per outcome shape -> The sidecar -> the product name, set once
+# The product's name is temporary (invariants.md, Son 2026-10-06). The agent prompts that name
+# the product (_PREAMBLE, _QA_PREAMBLE, _QA_TOOLS, the kb_lookup tool description) read it
+# from here, so a rename is this one line (behavior 17).
+BRAND = "Rau"
+
 
 def _isolate_protocol_stream():
     global _PROTO
@@ -213,6 +219,11 @@ class LenderFitInvestorLeaves(BaseModel):
     recommended_lender_shortlist: Annotated[list[LenderRec], Field(max_length=5)]
 
 
+# Regulated figures are grounded -> R-2 · Context–reasoning inseparability -> The sidecar -> non-resident lender_fit schema
+# Mode D first reused Mode C's domestic-investor prompt verbatim; it now has its own
+# non-resident schema with three leaves (no PPOR equity, no offset). Concluded 2026-07-05,
+# commit d4c7cf2; the reasoning is the paragraph below.
+#
 # Mode-D's own THREE-leaf schema (reconciled 2026-07-05 — see mode-d-wedge.md). Deliberately
 # NOT LenderFitInvestorLeaves reused as-is: `uses_existing_ppor_equity` and
 # `offset_strategy_recommendation` presume an existing AU PPOR to release equity from or point
@@ -485,13 +496,33 @@ _KB_DOCS = {
 }
 
 
-def _kb_content_md(path):
-    """The doc's content_md = everything above the `## Rules` block (the Rules
-    JSON is for the resolver, not an agent fill — agentic-flow.md §6). 2a reads it
-    from the repo; 2b receives it resolved + injected by the engine."""
-    text = path.read_text(encoding="utf-8")
-    body = text.split("\n---\n", 2)[-1] if text.startswith("---") else text
-    return body.split("## Rules", 1)[0].strip()
+# Reproducible -> P-7 · One declaration per outcome shape -> planner fill -> reads a KB doc's text as the compiler parsed it
+# A fill's <kb> block is the compiled artifact's content_md for each slug (everything above
+# `## Rules`, frontmatter cut by kb_compiler's frontmatter_end). planner.py once split the doc
+# itself on "\n---\n", a second parser that kept the YAML of an unclosed doc and cut at a
+# horizontal rule in the body; one parser now, the one the gate guards (#15, measured
+# 2026-10-06: all 26 slugs equal the artifact's). A slug missing from the artifact raises.
+def _kb_content_md(slug):
+    """The compiled artifact's content_md for `slug` (agentic-flow.md §6)."""
+    kb = _fill_kb_corpus()
+    if slug not in kb:
+        raise KeyError(f"{slug} is not in the compiled KB artifact — run engine/build/kb_compiler.py")
+    return kb[slug]["content_md"]
+
+
+_FILL_KB = None
+
+
+def _fill_kb_corpus():
+    """The artifact's `kb` map, loaded once per process; unlike _load_kb_corpus a
+    miss is an error, since a fill without its KB is ungrounded."""
+    global _FILL_KB
+    if _FILL_KB is None:
+        path = os.environ.get("FH_ARTIFACT_PATH") or str(
+            _REPO_ROOT / "engine" / "erlang" / "priv" / "kb" / "artifact.json")
+        with open(path, encoding="utf-8") as f:
+            _FILL_KB = json.load(f)["kb"]
+    return _FILL_KB
 
 
 # Shared fragments — reused across every reasoning_domain (the ATP SAFETY/STYLE
@@ -499,8 +530,8 @@ def _kb_content_md(path):
 # no-tool one-shot fill: NO <tools>/<retrieval_strategy>/<tags> (KB is injected, not
 # tool-pulled — §6); those return for the tool-using Q&A path in slice 2c.
 
-_PREAMBLE = """\
-You are a single component of Rau's planning engine, which helps \
+_PREAMBLE = f"""\
+You are a single component of {BRAND}'s planning engine, which helps \
 Vietnamese-Australian buyers plan an Australian property purchase (first home or \
 investment). You fill ONE component of a plan and return a structured object that \
 downstream components and the user-facing card consume.
@@ -1105,7 +1136,8 @@ def _kb_block(reasoning_domain):
     `<kb>` content (§6 — KB is injected, not tool-pulled)."""
     parts = []
     for slug in _DOMAINS[reasoning_domain]["kb_slugs"]:
-        parts.append(f"[{slug}]\n{_kb_content_md(_KB_DOCS[slug])}")
+        _KB_DOCS[slug]  # the slug is declared for fills
+        parts.append(f"[{slug}]\n{_kb_content_md(slug)}")
     return "\n\n".join(parts)
 
 
@@ -1842,13 +1874,13 @@ def _kb_search(kb, slug, topic, max_docs=3, snippet=1400):
             "'stamp duty concession', 'FIRB established dwelling'."), []
 
 
-_QA_PREAMBLE = """\
-You are Rau's planning assistant, answering a Vietnamese-Australian first home \
+_QA_PREAMBLE = f"""\
+You are {BRAND}'s planning assistant, answering a Vietnamese-Australian first home \
 buyer's question about THEIR plan. You will be provided with:
 - **Context** — your role. `<context>`.
 - **Goal** — what a good answer achieves. `<goal>`.
 - **Safety** — input-handling, the ASIC decision-support boundary, machinery hiding. `<safety>`.
-- **Style** — bilingual ({vi, en}) and concise. `<style>`.
+- **Style** — bilingual ({{vi, en}}) and concise. `<style>`.
 - **Tools** — how to look up reference knowledge you don't already have. `<tools>`.
 - **Output** — the final structured object. `<output>`.
 
@@ -1886,8 +1918,8 @@ question — even reworded, even in the other language — do NOT redo the full 
 Give a short pointer back to what you already said (one or two sentences), and only add \
 new substance if this phrasing actually asks something the earlier answer didn't cover."""
 
-_QA_TOOLS = """\
-You have ONE tool, `kb_lookup`, over Rau's curated knowledge base:
+_QA_TOOLS = f"""\
+You have ONE tool, `kb_lookup`, over {BRAND}'s curated knowledge base:
 - `kb_lookup(topic: "...")` — search by plain topic (e.g. "first home guarantee", \
 "stamp duty concession NSW", "FIRB established dwelling"). Use this when the plan-card \
 grounding doesn't already contain the rule/figure/definition you need.
@@ -1950,6 +1982,10 @@ def _strip_vi_for_qa(obj):
 _QA_ENVELOPE_KEYS = {"renderer", "fill_path", "renderers", "kb_versions", "component_id"}
 
 
+# Regulated figures are grounded -> R-2 · Context–reasoning inseparability -> The sidecar -> QA payload keeps journey components
+# Only the envelope keys are stripped; phase_playbook and purchase_journey are deliberately
+# KEPT in the QA payload. Measured 2026-08-06 on card ec794865: dropping them too would cut
+# 79.6% instead of 65.5%; declined as a real loss of grounding for Q&A answers.
 def _strip_envelope_for_qa(obj):
     """Drop each component's shell-rendering/provenance envelope
     (renderer/renderers/fill_path/component_id/kb_versions) before a card goes
@@ -2003,7 +2039,7 @@ async def handle_qa(params):
     # the args and the result — and SANITIZED (display_name + summaries, never the raw
     # KB text or the slug) before they reach the shell (engine-contract §4).
     @tool("kb_lookup",
-          "Search Rau's curated knowledge base for a scheme rule, figure, or "
+          f"Search {BRAND}'s curated knowledge base for a scheme rule, figure, or "
           "definition. Use when the plan-card grounding lacks what you need to answer "
           "accurately. Pass a plain `topic` to search, or a known `slug` to fetch one doc.",
           {"topic": str, "slug": str})

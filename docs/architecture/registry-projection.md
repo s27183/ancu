@@ -1,6 +1,6 @@
 # Schema-driven registry surface — projecting structured fact entities
 
-**Status:** Design pass (define → simulate → document), pending review before implementation. Specifies how the **resolver-input registry** derives its *referenceable, type-checked token surface* from the fact-model schema **systematically**, replacing the per-entity special-casing that exists today. It unifies the hardcoded `applicant.*` projection with nested objects like `non_buying_partner.*`, and makes every future structured entity automatic.
+**Status:** Implemented in `engine/build/kb_compiler.py` (`build_registry`, the structured-entity namespaces at ~:424 and ~:482; checked 2026-10-06). Specifies how the **resolver-input registry** derives its *referenceable, type-checked token surface* from the fact-model schema **systematically**, replacing the per-entity special-casing that exists today. It unifies the hardcoded `applicant.*` projection with nested objects like `non_buying_partner.*`, and makes every future structured entity automatic.
 
 This is a change to the **materialized foundation** (`engine/build/kb_compiler.py`'s `build_registry`) — the registry every KB rule binds to, and the thing whose hand-reconstruction the registry was built to kill ([[reason-from-materialized-ground]]). It is consumed by the compiler's reference-integrity + type-compat gates and defines what any criterion can reference, so it gets the standalone-rules treatment. Referenced from [`architecture.md` §11.9](architecture.md) (the registry definition) and the compiler header.
 

@@ -67,9 +67,12 @@ scaffold(Upstream) -> fh_engine_fill:resolver(<<"due_diligence">>, #{}, Upstream
 
 %% the compiled component's agent_leaves (the live turn's fill-path determinant).
 agent_leaves(Name) ->
+    maps:get(<<"agent_leaves">>, component(Name), undefined).
+
+component(Name) ->
     {ok, All} = fh_engine_kb:components(?INV),
     [C] = [C0 || C0 <- All, maps:get(<<"name">>, C0) =:= Name],
-    maps:get(<<"agent_leaves">>, C, undefined).
+    C.
 
 g(O, K) -> maps:get(K, O, undefined).
 
@@ -87,12 +90,20 @@ scaffold_cases() ->
      check("outcome has exactly the ten risk_assessment_investor fields",
            lists:sort(maps:keys(O)), lists:sort(fields())),
      check("has_resolver true", fh_engine_fill:has_resolver(<<"due_diligence">>), true),
-     %% the LIVE turn classifies fill_path by the compiled component's agent_leaves — a direct
-     %% resolver call bypasses this, so assert it here: [] → resolver-only at A (the
-     %% lease_interpretation leaf is deferred to B; a non-empty list would make the turn dispatch a
-     %% sidecar filler that does not exist → turn_failed, the C-dd live-seam regression).
-     check("compiled agent_leaves = [] → resolver-only at A (lease_interpretation leaf deferred to B)",
-           agent_leaves(<<"due_diligence">>), []),
+     %% the LIVE turn classifies fill_path by the compiled component's agent_leaves, refined by
+     %% fh_engine_turn:effective_fill_path/2: due_diligence carries the lease_interpretation leaf
+     %% (due_diligence B), and the document gate keeps it resolver-only until a lease is uploaded.
+     %% Without the gate a plain property attach would dispatch the sidecar with no lease → the
+     %% C-dd live-seam regression the old `agent_leaves = []` anchor guarded.
+     check("compiled agent_leaves = the one lease_interpretation leaf",
+           [maps:get(<<"reasoning_domain">>, L) || L <- agent_leaves(<<"due_diligence">>)],
+           [<<"lease_interpretation">>]),
+     check("no uploaded document → effective fill path resolver (no sidecar, no usage)",
+           fh_engine_turn:effective_fill_path(component(<<"due_diligence">>), #{}), resolver),
+     check("an uploaded lease → effective fill path two_path (the leaf fires)",
+           fh_engine_turn:effective_fill_path(component(<<"due_diligence">>),
+                                              #{document => #{<<"content_base64">> => <<"eA==">>}}),
+           two_path),
      check("docs_status = pending_upload (honest-partial — no uploaded documents)",
            g(O, <<"docs_status">>), <<"pending_upload">>),
      check("overall_verdict = pending_documents", g(O, <<"overall_verdict">>), <<"pending_documents">>),

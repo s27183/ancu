@@ -14,16 +14,20 @@
 %% Mode-A asymmetry (compliance-pipeline.md §1) — bind "what does this gate enforce?"
 %% of each gate, in Mode A (domestic FHB, no foreign person, no fund custody):
 %%   - FIRB → no body: firb_required_any is false, so there is no foreign applicant to
-%%     branch. It asserts the precondition and writes a `clear`/not_required row. A Mode-B
-%%     turn (firb_required_any = true) hits the DEFERRED body — guarded with a loud
-%%     `block`/not_implemented so an accidental Mode-B turn fails, never passes silently.
+%%     branch. It asserts the precondition and writes a `clear`/not_required row. A
+%%     foreign turn (Mode B/D, firb_required_any = true) clears with a detail instead:
+%%     firb_approval_pending / firb_approved on firb_workflow, pre_contract_planning
+%%     elsewhere (firb/4 below). The old `block`/not_implemented guard this header
+%%     described is gone (measured 2026-10-08: read firb/4).
 %%   - ASIC → substantive: the decision-support boundary. It CONSUMES Layer 1's
 %%     figure-type verdict (never re-derives §98 — one source of truth) and attests the
 %%     boundary held. Substance is scoped to advice-adjacent components (lender fit,
 %%     scheme applicability); a pure-arithmetic outcome has no advice surface.
 %%   - AML → no body: the base turn has no fund custody / cross-border transfer. Asserts
 %%     and writes a `clear`/no_fund_custody row; the deferred body keys on
-%%     funds_provenance (Mode B/D or a refine turn carrying deposit facts).
+%%     funds_provenance (Mode B/D or a refine turn carrying deposit facts). Unlike FIRB's
+%%     old guard, aml/4 clears no_fund_custody for every mode today, Mode B/D included,
+%%     with no guard naming the unbuilt body (measured 2026-10-08: read aml/4).
 %%
 %% The deferred FIRB/AML bodies are structurally present but NOT built speculatively
 %% ([[build-time-structure-vs-runtime-data]]) — they assert-and-clear in Mode A and flip
@@ -105,6 +109,9 @@ advice_adjacent(<<"firb_workflow">>)       -> true;   %% FIRB eligibility/fee fr
 advice_adjacent(<<"property_assessment">>) -> true;   %% investment-viability verdict (Phase B)
 advice_adjacent(<<"buying_strategy">>)     -> true;   %% bid plan / negotiation (Phase B) — ACL hedge
 advice_adjacent(<<"due_diligence">>)       -> true;   %% risk surfacing / yield-vs-thesis (Phase B) — ACL hedge
+advice_adjacent(<<"tax_structure">>)       -> true;   %% agent-authored recommended_entity (Mode C) — #27
+advice_adjacent(<<"tax_structure_non_resident">>) -> true;  %% entity structuring for a non-resident (Mode D) — #27
+advice_adjacent(<<"investment_strategy">>) -> true;   %% agent-authored archetype / gearing / thesis (C, D) — #27
 advice_adjacent(_)                         -> false.
 
 %% --- AML --------------------------------------------------------------------

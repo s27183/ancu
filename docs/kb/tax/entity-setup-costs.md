@@ -62,15 +62,15 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
   },
   "lookup": {
     "entity_setup_cost_bands": {
-      "note": "INDICATIVE first-year setup + ongoing annual bands by structure (market, no regulator publishes service-provider fees); resolver places a banded figure, never a point quote",
+      "note": "INDICATIVE first-year setup + ongoing annual bands by structure (market, no regulator publishes service-provider fees); resolver places a banded figure, never a point quote. setup_first_year is [lo, hi] AUD; hi null = open-ended (a floor, not a ceiling)",
       "entries": [
-        { "entity": "personal_sole",      "setup_first_year": "~0",        "ongoing_annual": "~0",          "tier": "n/a" },
-        { "entity": "personal_joint",     "setup_first_year": "~0",        "ongoing_annual": "~0",          "tier": "n/a" },
-        { "entity": "discretionary_trust","setup_first_year": "1500-4000", "ongoing_annual": "1000-3500+",  "tier": "INDICATIVE" },
-        { "entity": "unit_trust",         "setup_first_year": "1500-4000", "ongoing_annual": "1000-3500+",  "tier": "INDICATIVE" },
-        { "entity": "company",            "setup_first_year": "636+",      "ongoing_annual": "review fee + accounting", "tier": "INDICATIVE (ASIC fee regulated)" },
-        { "entity": "smsf",               "setup_first_year": "400-2000",  "ongoing_annual": "accounting + audit + levies", "tier": "INDICATIVE (levies regulated)" },
-        { "entity": "smsf_with_lrba",     "setup_first_year": "400-2000 + LRBA/holding-trust setup", "ongoing_annual": "accounting + audit + levies", "tier": "INDICATIVE" }
+        { "entity": "personal_sole",      "setup_first_year": [0, 0],       "ongoing_annual": "~0",          "tier": "n/a" },
+        { "entity": "personal_joint",     "setup_first_year": [0, 0],       "ongoing_annual": "~0",          "tier": "n/a" },
+        { "entity": "discretionary_trust","setup_first_year": [1500, 4000], "ongoing_annual": "1000-3500+",  "tier": "INDICATIVE" },
+        { "entity": "unit_trust",         "setup_first_year": [1500, 4000], "ongoing_annual": "1000-3500+",  "tier": "INDICATIVE" },
+        { "entity": "company",            "setup_first_year": [636, null],  "setup_note": "ASIC registration $636 + provider setup", "ongoing_annual": "review fee + accounting", "tier": "INDICATIVE (ASIC fee regulated)" },
+        { "entity": "smsf",               "setup_first_year": [400, 2000],  "ongoing_annual": "accounting + audit + levies", "tier": "INDICATIVE (levies regulated)" },
+        { "entity": "smsf_with_lrba",     "setup_first_year": [400, null],  "setup_note": "SMSF setup + LRBA/holding-trust setup", "ongoing_annual": "accounting + audit + levies", "tier": "INDICATIVE" }
       ]
     }
   }

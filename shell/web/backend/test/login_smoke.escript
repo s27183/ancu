@@ -19,7 +19,7 @@
 %%
 %% Run from shell/web/backend with a shell Postgres reachable, e.g. the homebrew one:
 %%
-%%   SHELL_DATABASE_URL='postgres://son@localhost:5432/firsthomey_shell?sslmode=disable' \
+%%   SHELL_DATABASE_URL='postgres://son@localhost:5432/ancu_shell?sslmode=disable' \
 %%   ERL_LIBS=_build/default/lib escript test/login_smoke.escript
 
 -mode(compile).
