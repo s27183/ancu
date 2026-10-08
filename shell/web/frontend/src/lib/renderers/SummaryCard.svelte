@@ -70,6 +70,10 @@
     // --- path picker (mortgage, §3.3) ---------------------------------------
     // the three standard lanes, recommended one highlighted. A non-standard recommended
     // path (e.g. a tailored option) shows as a chip below rather than a phantom lane.
+    // mortgage_finance has no tab of its own, but this hero is live, not orphaned: the
+    // Flow's PhaseSheet "Xem chi tiết" drill opens it through ComponentCard
+    // (component_ref "mortgage_finance" in all four journey/*phase-actions.md; read
+    // 2026-10-08) — so it stays, and needs no tab.
     const LANES: string[] = ['twenty_plus', 'fhg_backed', 'lmi_5_to_20'];
     const recPath = $derived(mortgage.recommended_path ?? null);
     const recIsCustom = $derived(!!recPath && !LANES.includes(recPath));
