@@ -22,7 +22,7 @@
 %% and keep the connection alive (the listener's reset_idle_timeout_on_send lets an
 %% outbound keepalive reset cowboy's idle_timeout — see fh_shell_http). The stream
 %% ends on the engine's terminal event (stream_end → fin), an upstream error, or the
-%% client disconnecting (terminate cancels the upstream request).
+%% client disconnecting (terminate cancels the upstream request — see terminate/3).
 
 -export([init/2, info/3, terminate/3]).
 
@@ -52,6 +52,8 @@ start_relay(UserId, PlanCardId, Req0) ->
     LastEventId = last_event_id(Req0),
     case fh_shell_engine_client:stream_events(UserId, PlanCardId, LastEventId) of
         {ok, ReqId} ->
+            %% Trap exits so a client disconnect reaches terminate/3 (see there).
+            process_flag(trap_exit, true),
             {cowboy_loop, Req0, #{req_id => ReqId, replied => false}};
         {error, _Reason} ->
             {ok, fh_shell_http:reply_json(502,
@@ -99,10 +101,20 @@ info({http, {ReqId, {error, _Reason}}}, Req, #{req_id := ReqId, replied := Repli
 info(_Other, Req, State) ->
     {ok, Req, State}.
 
-%% Client disconnect (or any termination): cancel the upstream request so we don't
-%% leak the engine-side connection. httpc:cancel_request is a no-op if already done.
+%% Reproducible -> P-1 · One process per concern -> The shell backend -> a cancelled browser stream ends its engine stream
+%% A browser stream that closes — the user leaving a plan, a reload, an EventSource
+%% close — cancels the engine stream it opened, so the next stream never waits behind
+%% it. Two things make that true, and each alone is not enough (measured 2026-10-08,
+%% test/sse_cancel_smoke.escript, OTP 29, inets 9.8, cowboy 2.14.2): cowboy stops a
+%% loop handler on client disconnect with exit(Pid, shutdown), which kills it without
+%% terminate/3 unless it traps exits (start_relay sets trap_exit, and cowboy_loop turns
+%% the parent's 'EXIT' into terminate/3); and the cancel must name the profile the
+%% request was opened on (fh_shell_sse) — on the default profile it is a no-op. Without
+%% either, the orphaned engine stream holds its httpc keep-alive session and httpc
+%% queues the next request to that host behind it: a new stream got no byte for 30 s+
+%% (the smoke's freeze; 2026-10-07's "plan stuck computing until reload").
 terminate(_Reason, _Req, #{req_id := ReqId}) ->
-    _ = httpc:cancel_request(ReqId),
+    _ = httpc:cancel_request(ReqId, fh_shell_sse),
     ok;
 terminate(_Reason, _Req, _State) ->
     ok.
