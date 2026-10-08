@@ -274,12 +274,20 @@ fill_fhb_foreign(Args, Upstream) ->
 %% key_assumptions_foreign's own assume_no_lmi_at_conservative_deposit) — a zero-value
 %% event would carry no real information, unlike Mode C's cash_events_investor/4 (where
 %% LMI can genuinely be non-zero per-property).
+%%
+%% Mode D reuses it (#13, 2026-10-06) with Other = <<"services">>: its swimlane is Mode C's
+%% six actors, which hold the conveyancer/trust chain as `services`, not Mode A/B's `other`.
 -spec cash_events_foreign(number() | null, number() | null, number() | null,
                           number() | null, number() | null) -> [map()].
 cash_events_foreign(Deposit, DutyAfter, Surcharge, FirbFee, ChannelCosts) ->
+    cash_events_foreign(Deposit, DutyAfter, Surcharge, FirbFee, ChannelCosts, <<"other">>).
+
+-spec cash_events_foreign(number() | null, number() | null, number() | null,
+                          number() | null, number() | null, binary()) -> [map()].
+cash_events_foreign(Deposit, DutyAfter, Surcharge, FirbFee, ChannelCosts, Other) ->
     Out = [
         event(<<"deposit">>, <<"contract">>, <<"event_deposit">>, <<"out">>,
-              point(Deposit), false, <<"other">>, <<"cash_position">>),
+              point(Deposit), false, Other, <<"cash_position">>),
         event(<<"firb_fee">>, <<"contract">>, <<"event_firb_fee">>, <<"out">>,
               point(FirbFee), false, <<"government">>, <<"cash_position">>),
         event(<<"stamp_duty">>, <<"settle">>, <<"event_stamp_duty">>, <<"out">>,
@@ -287,7 +295,7 @@ cash_events_foreign(Deposit, DutyAfter, Surcharge, FirbFee, ChannelCosts) ->
         event(<<"foreign_buyer_surcharge">>, <<"settle">>, <<"event_foreign_buyer_surcharge">>, <<"out">>,
               point(Surcharge), false, <<"government">>, <<"cash_position">>),
         event(<<"other_buying_costs">>, <<"settle">>, <<"event_other_costs">>, <<"out">>,
-              point(ChannelCosts), true, <<"other">>, <<"cash_position">>)
+              point(ChannelCosts), true, Other, <<"cash_position">>)
     ],
     [E || E <- Out, maps:get(<<"amount">>, E) =/= null].
 
@@ -566,12 +574,13 @@ fill_investor_foreign(Args, Upstream) ->
         <<"lvr">>                          => null,
         <<"gap_or_surplus">>               => GapOrSurplus,
         <<"verdict">>                      => Verdict,
-        %% Honest empty (task 8, 2026-07-10): unlike Mode C's cash_events_investor/4, this
-        %% fill has no per-property branch yet (no attached-property price to build a real
-        %% acquisition spine off) — a separate, already-flagged cash_position build, out of
-        %% scope here. [] is conformant with the shared budget_envelope_investor type
-        %% (Mode C's own base scaffold emits the same []) and honest — never a fabricated event.
-        <<"cash_events">>                  => []
+        %% The acquisition spine at the range ceiling, the figures summed above and placed
+        %% by Mode B's builder (#13, 2026-10-06; it was [] since task 8). Each event appears
+        %% only when its figure is known, so an unknown state drops duty, surcharge and
+        %% other costs. Mode D has no per-property cash_position turn in launch scope.
+        <<"cash_events">>                  =>
+            cash_events_foreign(Deposit, DutyAfter, Surcharge, FirbFee, ChannelCosts,
+                                <<"services">>)
     },
     KbVersions = fh_engine_kb:kb_anchors(
         [<<"kb.stamp-duty.calc-by-state">>, <<"kb.foreign-buyer-surcharge.by-state">>,
