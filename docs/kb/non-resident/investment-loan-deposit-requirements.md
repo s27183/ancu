@@ -11,6 +11,7 @@ sources:
     note: "SECONDARY — WebFetched 2026-07-06. Confirms non-resident investment lending has tighter/individualized LVR policies and foreign-income shading, but gives no single firm deposit %/LVR figure (borrower-profile dependent)."
   - url: https://moneysmart.gov.au/how-to-invest/borrowing-to-invest
     note: "POINTER (not re-fetched this session) — ASIC Moneysmart general borrowing-to-invest / investment-loan risk context (not a non-resident-specific figure); carried from the doc's markdown Sources block."
+---
 
 # Deposit requirements — non-resident investment loans
 

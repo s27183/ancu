@@ -12,6 +12,7 @@ sources:
   - url: https://www.ato.gov.au/individuals-and-families/coming-to-australia-or-going-overseas/australian-income-of-foreign-residents/foreign-resident-payg-withholding-individual-entities
     retrieved: 2026-07-06
     note: "RE-VERIFY ANCHOR for the doc's central 'no final withholding on directly-held residential rent' claim. Several commercial expat-tax sources (Odin, expat blogs) assert a property manager MUST withhold on non-resident rent; the doc's position is that directly-held residential rent is NOT a prescribed foreign-resident withholding payment (assessed by return instead). This ATO page is the primary to confirm the letter of it — could not be WebFetched (403) this session. See NEEDS REVIEW in the backfill report."
+---
 
 # Non-resident rental income — taxed by assessment, not final withholding
 

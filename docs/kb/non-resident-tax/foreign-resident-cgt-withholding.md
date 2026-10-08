@@ -6,6 +6,7 @@ sources:
   - url: https://www.ato.gov.au/individuals-and-families/investments-and-assets/capital-gains-tax/foreign-residents-and-capital-gains-tax/foreign-resident-capital-gains-withholding/foreign-resident-capital-gains-withholding-overview
     retrieved: 2026-07-06
     note: "PRIMARY (ATO). Verified via WebSearch corroboration 2026-07-06 (ATO direct WebFetch returns 403 in-sandbox); the sub-pages for clearance certificates, variations, and paying the withholding are listed in the markdown Sources block below. 15% rate + removal of the A$750,000 threshold for contracts entered on/after 1 January 2025 confirmed UNCHANGED (was 12.5% / $750k floor to 31 Dec 2024)."
+---
 
 # Foreign resident capital gains withholding (FRCGW) — the collection mechanism at sale
 

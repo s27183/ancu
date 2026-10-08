@@ -490,13 +490,33 @@ _KB_DOCS = {
 }
 
 
-def _kb_content_md(path):
-    """The doc's content_md = everything above the `## Rules` block (the Rules
-    JSON is for the resolver, not an agent fill — agentic-flow.md §6). 2a reads it
-    from the repo; 2b receives it resolved + injected by the engine."""
-    text = path.read_text(encoding="utf-8")
-    body = text.split("\n---\n", 2)[-1] if text.startswith("---") else text
-    return body.split("## Rules", 1)[0].strip()
+# Reproducible -> P-7 · One declaration per outcome shape -> planner fill -> reads a KB doc's text as the compiler parsed it
+# A fill's <kb> block is the compiled artifact's content_md for each slug (everything above
+# `## Rules`, frontmatter cut by kb_compiler's frontmatter_end). planner.py once split the doc
+# itself on "\n---\n", a second parser that kept the YAML of an unclosed doc and cut at a
+# horizontal rule in the body; one parser now, the one the gate guards (#15, measured
+# 2026-10-06: all 26 slugs equal the artifact's). A slug missing from the artifact raises.
+def _kb_content_md(slug):
+    """The compiled artifact's content_md for `slug` (agentic-flow.md §6)."""
+    kb = _fill_kb_corpus()
+    if slug not in kb:
+        raise KeyError(f"{slug} is not in the compiled KB artifact — run engine/build/kb_compiler.py")
+    return kb[slug]["content_md"]
+
+
+_FILL_KB = None
+
+
+def _fill_kb_corpus():
+    """The artifact's `kb` map, loaded once per process; unlike _load_kb_corpus a
+    miss is an error, since a fill without its KB is ungrounded."""
+    global _FILL_KB
+    if _FILL_KB is None:
+        path = os.environ.get("FH_ARTIFACT_PATH") or str(
+            _REPO_ROOT / "engine" / "erlang" / "priv" / "kb" / "artifact.json")
+        with open(path, encoding="utf-8") as f:
+            _FILL_KB = json.load(f)["kb"]
+    return _FILL_KB
 
 
 # Shared fragments — reused across every reasoning_domain (the ATP SAFETY/STYLE
@@ -1110,7 +1130,8 @@ def _kb_block(reasoning_domain):
     `<kb>` content (§6 — KB is injected, not tool-pulled)."""
     parts = []
     for slug in _DOMAINS[reasoning_domain]["kb_slugs"]:
-        parts.append(f"[{slug}]\n{_kb_content_md(_KB_DOCS[slug])}")
+        _KB_DOCS[slug]  # the slug is declared for fills
+        parts.append(f"[{slug}]\n{_kb_content_md(slug)}")
     return "\n\n".join(parts)
 
 

@@ -22,6 +22,13 @@ The plan is information provided as is, for budget planning across that
 lifecycle; the platform gives no legal, tax or financial advice service, and
 every disclaimer the user reads says so in those terms (Son, 2026-10-08).
 
+**The launch scope is the system as built** (Son, 2026-10-06: "stop at the
+current scope which is good enough for production launch"): Modes A-E with
+their base plans, Mode C's per-property path, and Wedge 1a. Wedge 1b (Tìm Nhà),
+Wedge 1c (URL paste, extension), a per-property path for Modes A and D, and
+the work waiting on it come after launch; work before launch fixes what is
+built and adds no mode or wedge.
+
 | Property | Falsified by |
 |---|---|
 | **Regulated figures are grounded** | a duty, grant, cap or fee on a plan card that differs from the official calculator, was written by the LLM rather than the resolver, or traces to a KB doc with no `sources:` |
