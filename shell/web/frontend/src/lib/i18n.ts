@@ -17,8 +17,8 @@ const BRAND = 'Rau';
 const messages = {
     'brand.name': { vi: BRAND, en: BRAND },
     'brand.tagline': {
-        vi: 'Kế hoạch mua nhà đầu tiên tại Úc',
-        en: 'Your first-home plan in Australia'
+        vi: 'Kế hoạch ngân sách bất động sản tại Úc — mua, giữ, bán',
+        en: 'Your Australian property budget plan — buy, hold, sell'
     },
     'lang.label': { vi: 'Ngôn ngữ', en: 'Language' },
 
@@ -422,7 +422,7 @@ const messages = {
     },
     'plan.basis.ineligible': { vi: 'Chưa đủ điều kiện', en: 'Not yet eligible' },
 
-    'plan.f.path': { vi: 'Hướng vay đề xuất', en: 'Recommended path' },
+    'plan.f.path': { vi: 'Hướng vay phù hợp với số liệu của bạn', en: 'Path that fits your inputs' },
     'plan.f.lenders': { vi: 'Ngân hàng phù hợp', en: 'Lender shortlist' },
     'plan.f.preapproval': { vi: 'Chuẩn bị duyệt sơ bộ', en: 'Pre-approval steps' },
     'plan.f.assumptions': { vi: 'Giả định', en: 'Assumptions' },
@@ -430,7 +430,9 @@ const messages = {
     'plan.path.lmi_5_to_20': { vi: 'Vay kèm bảo hiểm LMI (cọc 5–20%)', en: 'LMI (5–20% deposit)' },
     'plan.path.twenty_plus': { vi: 'Cọc từ 20% trở lên', en: '20%+ deposit' },
     'plan.path.user_specific_alternative': { vi: 'Phương án riêng', en: 'Tailored option' },
-    'plan.path.recommended': { vi: 'đề xuất', en: 'recommended' },
+    // Behavior 27: the first-ranked path is labelled by fit, not as advice (invariants.md: no
+    // financial advice service, Son 2026-10-08).
+    'plan.path.recommended': { vi: 'phù hợp với số liệu của bạn', en: 'fits your inputs' },
 
     // mortgage_finance (mortgage_plan) → data-table detail, beyond summary-card's hero
     // (fh_engine_mortgage.erl's four fill_* shapes — a field group per mode axis).
@@ -617,8 +619,8 @@ const messages = {
     // Budget cockpit (the prototype's input form, engine-driven).
     'plan.cockpit.title': { vi: 'Ngân sách — bạn đã sẵn sàng?', en: 'Budget — am I ready?' },
     'plan.cockpit.intro': {
-        vi: 'Đổi giá hoặc tiểu bang để tính lại toàn bộ kế hoạch; nhập tiền mặt bạn có để xem còn thiếu bao nhiêu. Phí trước bạ do hệ thống tính chính xác, không phải ước lượng.',
-        en: 'Change the price or state to recompute the whole plan; enter your cash on hand to see the gap. Stamp duty is computed exactly, not estimated.'
+        vi: 'Đổi giá hoặc tiểu bang để tính lại toàn bộ kế hoạch; nhập tiền mặt bạn có để xem còn thiếu bao nhiêu. Phí trước bạ được tính theo biểu phí tiểu bang công bố, không phải ước lượng.',
+        en: 'Change the price or state to recompute the whole plan; enter your cash on hand to see the gap. Stamp duty is calculated from the state’s published rates, not estimated.'
     },
     'plan.cockpit.ptype': { vi: 'Loại bất động sản', en: 'Property type' },
     'plan.cockpit.ptype.locked': {
@@ -667,10 +669,14 @@ const messages = {
         en: 'The timing becomes clearer once you add your loan and savings.'
     },
     // Overview → "What this is" intro (the prototype's lead card).
+    // Behavior 27: one body for every blueprint — the goal's "budget plan for the whole
+    // property lifecycle (buy, hold, sell)" (invariants.md, Son 2026-10-08) — naming only the
+    // tabs every blueprint's ui_tabs share (budget, overview, flow, qa; measured 2026-10-08 in
+    // priv/kb/artifact.json). Portfolio / Family are per-mode and left unnamed.
     'plan.ov.what.title': { vi: 'Đây là gì', en: 'What this is' },
     'plan.ov.what.body': {
-        vi: 'Đây là kế hoạch mua căn nhà đầu tiên được cá nhân hoá cho bạn. Hãy đi qua các thẻ: Tổng quan để xem bức tranh lớn, Tính tiền mặt để nhập số liệu của bạn, Hành trình để xem ai làm gì khi nào, Trước/Sau khi mua cho các bước cụ thể, và Hỏi đáp để hỏi thêm.',
-        en: 'This is your personalised plan for buying your first home. Walk the tabs: Overview for the big picture, Cash calculator to plug in your own numbers, Journey for who does what when, Before/After you buy for the concrete steps, and Q&A to ask anything.'
+        vi: 'Đây là kế hoạch ngân sách cho việc mua, giữ và bán bất động sản, lập từ thông tin của chính bạn. Hãy đi qua các thẻ: Ngân sách để xem chi phí và số tiền còn thiếu, Tổng quan để xem bức tranh lớn, Hành trình để xem từng giai đoạn và ai làm gì khi nào, và Hỏi đáp để hỏi thêm về kế hoạch.',
+        en: 'This is your budget plan for buying, holding and selling a property, built from your own situation. Walk the tabs: Budget for your costs and cash gap, Overview for the big picture, Flow for each phase and who does what when, and Q&A to ask about your plan.'
     },
     // Structural what-if (W9) — vary target price / state → engine preview, no save.
     'plan.whatif.title': { vi: 'Thử kịch bản khác', en: 'Try a different scenario' },
