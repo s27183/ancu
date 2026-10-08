@@ -258,7 +258,7 @@ Mode C's base plan is sharper than Mode A's because investor reasoning often hap
     "suburb": { "type": "string", "value": "<from_property_card>" },
     "state": { "type": "enum", "value": "<from_property_card>" },
     "price": { "type": "money", "value": "<from_property_card>" },
-    "property_type": { "type": "enum", "options": ["established_house", "established_apartment", "new_house", "new_apartment", "off_the_plan", "house_and_land", "dual_occupancy", "nrass"], "value": "<from_property_card>" },
+    "property_type": { "type": "enum", "options": ["established_house", "established_apartment", "new_house", "new_apartment", "off_the_plan", "house_and_land"], "value": "<from_property_card>" },
     "year_built": { "type": "integer", "value": "<initial>" },
     "land_size_sqm": { "type": "integer", "value": "<initial>" },
     "internal_area_sqm": { "type": "integer", "value": "<initial>" }
