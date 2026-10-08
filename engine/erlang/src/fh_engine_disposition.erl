@@ -543,7 +543,7 @@ assumptions_investor(H, GLow, GHigh, IsPlaceholder, Status, Loan, Frcgw) ->
     Base = [copy(<<"assumption_horizon">>, #{<<"years">> => H}),
             growth_assumption(GLow, GHigh, IsPlaceholder),
             cgt_assumption_investor(Status),
-            copy(<<"assumption_cgt_reform">>, #{}),
+            cgt_reform_assumption(Frcgw),
             copy(<<"assumption_selling_costs">>, #{})],
     WithLoan = case Loan of
         null -> Base;
@@ -555,6 +555,19 @@ assumptions_investor(H, GLow, GHigh, IsPlaceholder, Status, Loan, Frcgw) ->
         null -> WithLoan;
         _    -> WithLoan ++ [copy(<<"assumption_frcgw">>, #{})]
     end.
+
+%% Regulated figures are grounded -> a tax line matches its KB doc -> the reform flag
+%% -> picks the resident or the foreign-resident wording.
+%% A foreign resident gets no 50% discount for the foreign-resident period
+%% (kb.tax.cgt-50-percent-discount; kb.non-resident-tax.cgt-no-ppor-exemption), so the
+%% resident line "This uses current law (the 50% CGT discount)" is wrong on a Mode D plan
+%% (seen 2026-10-08 in Chrome on an investor-foreign plan, behavior 31). Frcgw is non-null
+%% exactly when tax_optimised_structure.frcgw_applicable is true, i.e. Mode D: the same
+%% signal as the FRCGW line, so the two foreign lines appear together. The KB holds nothing
+%% on the 1 Jul 2027 reform's foreign-resident terms, so the foreign line names the date and
+%% defers to a tax agent (concluded).
+cgt_reform_assumption(null) -> copy(<<"assumption_cgt_reform">>, #{});
+cgt_reform_assumption(_)    -> copy(<<"assumption_cgt_reform_foreign">>, #{}).
 
 cgt_assumption_investor(<<"computed">>)  -> copy(<<"assumption_cgt_computed">>, #{});
 cgt_assumption_investor(<<"to_verify">>) -> copy(<<"assumption_cgt_investor_to_verify">>, #{}).
