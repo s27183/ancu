@@ -183,13 +183,13 @@ bilingual_case() ->
 %% PLACES them on the Dispose column (same place-never-compute discipline). Honest-partial
 %% §8.2: no disposition events ⟹ no Dispose column (the empty-upstream/empty-events cases).
 
-%% a synthetic disposition outcome carrying the H=10 loan-known dispose flows (TW1 figures):
+%% a synthetic disposition outcome carrying the H=10 loan-known dispose flows (the 3–6% band, behavior 12):
 %% sale_proceeds (in, other), selling_costs (out, other), loan_payout (out, lender); CGT
 %% exempt ⟹ no cgt event. Mirrors the cash_event shape disposition emits.
 disposition_outcome() ->
     #{<<"dispose_cash_events">> =>
-          [disp_ev(<<"sale_proceeds">>, <<"in">>,  [975196, 1303116], <<"other">>),
-           disp_ev(<<"selling_costs">>, <<"out">>, [16428, 56109],    <<"other">>),
+          [disp_ev(<<"sale_proceeds">>, <<"in">>,  [1075133, 1432678], <<"other">>),
+           disp_ev(<<"selling_costs">>, <<"out">>, [17927, 60644],    <<"other">>),
            disp_ev(<<"loan_payout">>,   <<"out">>, [468640, 468640],  <<"lender">>)]}.
 
 disp_ev(Id, Dir, Amount, Counterparty) ->
@@ -218,8 +218,8 @@ dispose_cases() ->
            [<<"prepare">>, <<"pre_approve">>, <<"contract">>, <<"settle">>, <<"own">>,
             <<"dispose">>]),
      check("dispose set: 4 dispose prose cells (the legal narrative)", length(DisposeProse), 4),
-     check("dispose set: sale placed at (dispose, other) money_in [975196,1303116], src=disposition",
-           {amount(Sale), src(Sale)}, {[975196, 1303116], <<"disposition">>}),
+     check("dispose set: sale placed at (dispose, other) money_in [1075133,1432678], src=disposition",
+           {amount(Sale), src(Sale)}, {[1075133, 1432678], <<"disposition">>}),
      check("dispose set: loan payout placed at (dispose, lender) money_out [468640,468640]",
            amount(Loan), [468640, 468640]),
      check("dispose set: Layer-1 conforms with the Dispose column", Conform, ok),

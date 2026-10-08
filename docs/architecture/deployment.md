@@ -38,7 +38,7 @@ auth divergence. Carry over the *shape*, not these specifics:
 |---|---|---|
 | Engine background work | long-running **job worker** (`engine_jobs`, claim→dispatch loop, `ALEAP_WORKER_COUNT`) | **none** — turns are ephemeral `gen_statem` (sup tree = `pubsub` + `turn_sup` + `http`); the Python sidecar is **stateless, spawned per-turn** via a `{packet,4}` port and exits |
 | Object storage | DO Spaces (curator uploads + vendor PDF mirror) | **none in Wedge 1a** — Tìm Nhà curator flow deferred; user-URL-paste is synchronous, no bytes stored |
-| Databases | `aleap_engine` + `aleap_shell` + **`lawdb`** | `firsthomey_engine` + `firsthomey_shell` — **two**, no `lawdb` |
+| Databases | `aleap_engine` + `aleap_shell` + **`lawdb`** | `ancu_engine` + `ancu_shell` — **two**, no `lawdb` |
 | KB / corpus | `lawdb` vendor corpus | **compiled KB artifact** `priv/kb/artifact.json` baked into the engine image (git is SOT; rebuildable projection — constraint #6); fail-closed at boot |
 | Engine runtime | Erlang + Python sidecar + worker | Erlang + **Python sidecar venv** (claude-agent-sdk / psycopg / pydantic) spawned per turn |
 | Tenant seam | **HS256 shared secret** (`TENANT_SLUG`/`TENANT_SIGNING_KEY`, symmetric, no provisioning) | **ed25519** — shell holds the private key, engine holds the **registered public key** in `tenant_signing_keys`; the pubkey is provisioned **out-of-band** (§4 step 5) |
@@ -58,7 +58,7 @@ Cloudflare Pages, secrets in the dashboard, `deploy_on_push`.
 | Frontend (SvelteKit `adapter-static` SPA) | Cloudflare Pages | `app.ancu.ai` | `shell/web/frontend/svelte.config.js` |
 | Engine (Erlang gateway + **per-turn Python sidecar**) | DO App `ancu-engine`, **`basic-s` 1vcpu/2gb**, port 8080 | `engine.ancu.ai` | `engine/app.yaml` |
 | Shell backend (Erlang; cowboy + pgo only) | DO App `ancu-shell`, `apps-s-1vcpu-1gb-fixed`, port 8081 | `api.ancu.ai` | `shell/web/app.yaml` |
-| Databases `firsthomey_engine` + `firsthomey_shell` | DO Managed PG cluster `firsthomey-pg` (PG 16), **one cluster, two databases** — provisioned **out-of-band** (`doctl databases create`), NOT from an app spec | — | created out-of-band; reached via `ENGINE_DATABASE_URL` / `SHELL_DATABASE_URL` secrets |
+| Databases `ancu_engine` + `ancu_shell` | DO Managed PG cluster `ancu-pg` (PG 16), **one cluster, two databases** — provisioned **out-of-band** (`doctl databases create`), NOT from an app spec | — | created out-of-band; reached via `ENGINE_DATABASE_URL` / `SHELL_DATABASE_URL` secrets |
 
 **Compute is split, the PG cluster is shared, the databases are not.** Engine and shell
 run as two independent DO Apps. The engine is the heavier one — it carries the **Python
@@ -95,7 +95,7 @@ is pre-created out-of-band (§4), and the pool connects straight to it.
 1. `load_dotenv/0` — reads OS env (the root `.env` path resolution is a dev affordance;
    in prod all config arrives as container env vars, which win).
 2. `fh_engine_db:start_pool/0` — **fatal** if `ENGINE_DATABASE_URL` is unset.
-3. `fh_engine_migrations:run/0` — idempotent forward replay against `firsthomey_engine`,
+3. `fh_engine_migrations:run/0` — idempotent forward replay against `ancu_engine`,
    gated by the tracking table. **A migration failure is fatal.**
 4. `fh_engine_kb:load/0` — loads the compiled **KB artifact** (`priv/kb/artifact.json`)
    into `persistent_term`. **An unreadable/absent artifact is fatal** (every planning
@@ -106,7 +106,7 @@ is pre-created out-of-band (§4), and the pool connects straight to it.
 **Shell** (`fh_shell_app:start/2`):
 1. `load_dotenv/0`.
 2. `fh_shell_db:start_pool/0` — **fatal** if `SHELL_DATABASE_URL` is unset.
-3. `fh_shell_migrations:run/0` — idempotent forward replay against `firsthomey_shell`.
+3. `fh_shell_migrations:run/0` — idempotent forward replay against `ancu_shell`.
    **Fatal on failure.**
 4. `fh_shell_provision:maybe_autoprovision/0` — **a no-op in prod**: with
    `SHELL_DEV_AUTOPROVISION` unset and a static `SHELL_TENANT_PRIVKEY` set, it returns
@@ -145,7 +145,7 @@ Cloudflare Pages dashboard.
 | `FH_PLANNER_SCRIPT` | config | path to the real `planner.py` (NOT the stub default) |
 | `FH_SIDECAR_PYTHON` | config | path to the bundled venv's `python` (the SDK deps) |
 | `FH_DEPLOY_COMMIT_SHA` | config | audit trail (constraint #6). DO does **not** auto-inject the git SHA; the Dockerfile defaults it to `"unknown"`. For a real SHA, build via CI with `--build-arg FH_DEPLOY_COMMIT_SHA=$(git rev-parse HEAD)` — plain `deploy_on_push` builds stay `"unknown"`. |
-| `ENGINE_DATABASE_URL` | **secret** | full `doadmin` string, db `firsthomey_engine`, `?sslmode=require`. Not DO-injected (App Platform won't provision the cluster from-spec). Derive from the out-of-band cluster (§4). |
+| `ENGINE_DATABASE_URL` | **secret** | full `doadmin` string, db `ancu_engine`, `?sslmode=require`. Not DO-injected (App Platform won't provision the cluster from-spec). Derive from the out-of-band cluster (§4). |
 | `CLAUDE_CODE_OAUTH_TOKEN` | **secret** | Anthropic Max subscription credit for the Agent-SDK planner (the prod runner; see billing.md). |
 | `ANTHROPIC_API_KEY` | **secret** *(optional)* | only if a cash-billed fallback / shadow-costing path is enabled. |
 | `ENGINE_DEV_PROVISION` | — | **MUST be unset** (dev-only tenant registration endpoint). |
@@ -172,7 +172,7 @@ CORS** (no browser calls it directly).
 | `STRIPE_API_BASE` | config | `https://api.stripe.com` (live default; explicit for clarity — never set the test stub in prod). |
 | `ADDON_AMOUNT_DOC_REVIEW` | config | doc_review add-on price in cents (`4000` = $40). Optional; code defaults to 4000 (8-S5f). |
 | `ADMIN_EMAILS` | config | comma-separated admin allowlist (charge-exempt, still metered — 8-S5e). Emails aren't secret but leave empty in-repo; set the real list in the Dashboard. |
-| `SHELL_DATABASE_URL` | **secret** | `firsthomey_shell` DB on the shared cluster, `?sslmode=require`. Set manually post-cluster (DO doesn't cross-inject DB refs across apps). |
+| `SHELL_DATABASE_URL` | **secret** | `ancu_shell` DB on the shared cluster, `?sslmode=require`. Set manually post-cluster (DO doesn't cross-inject DB refs across apps). |
 | `SHELL_JWT_SECRET` | **secret** | user-JWT HMAC (`openssl rand -hex 32`) |
 | `SHELL_TENANT_ID` / `SHELL_TENANT_PRIVKEY` | **secret** | the ed25519 tenant identity — `SHELL_TENANT_PRIVKEY` is base64 of the private key; its **public** half is registered with the engine (§4 step 5). |
 | `RESEND_API_KEY` | **secret** | `re_…` — set → magic-link emails via Resend; unset → link logged. |
@@ -243,14 +243,14 @@ already-existing databases. All `doctl … create` steps are **billable + your-g
    `GLIBC_2.38 not found` crash loop). Both `app.yaml`s set a `health_check` on `/health`
    with `initial_delay_seconds: 60` — both apps run migrations (engine also loads the KB
    artifact) before serving, so a short delay avoids a boot-time failure flap.
-2. **Cluster (out-of-band).** `doctl databases create firsthomey-pg --engine pg
+2. **Cluster (out-of-band).** `doctl databases create ancu-pg --engine pg
    --version 16 --size db-s-1vcpu-1gb --num-nodes 1 --region sgp1`. Wait for `online`.
    DO clusters expose `doadmin` / `defaultdb` / `:25060` / `sslmode=require`.
 3. **Databases (out-of-band).** Connect as `doadmin` (to `defaultdb`) and
-   `CREATE DATABASE firsthomey_engine; CREATE DATABASE firsthomey_shell;` — both must
+   `CREATE DATABASE ancu_engine; CREATE DATABASE ancu_shell;` — both must
    pre-exist (FH has no `ensure_db_exists`; §2).
 4. **Engine app.** Build `ENGINE_DATABASE_URL` from the cluster string (db segment →
-   `firsthomey_engine`), inject it + the §3 engine secrets into a temp copy of
+   `ancu_engine`), inject it + the §3 engine secrets into a temp copy of
    `engine/app.yaml`, `doctl apps spec validate` → `doctl apps create --spec`. Boots →
    pool → migrations → KB artifact → sup tree.
    > **Don't fight autodetect.** The DO "Create App from repo" wizard scans the repo root
@@ -262,14 +262,14 @@ already-existing databases. All `doctl … create` steps are **billable + your-g
    ed25519 keypair once; set `SHELL_TENANT_ID` + base64(`SHELL_TENANT_PRIVKEY`) as shell
    secrets (step 6). Insert the **public** half into the engine DB — a `tenants` row +
    `tenant_signing_keys (tenant_id, public_key, algo='ed25519', status='active')` — via a
-   one-off `psql` against `firsthomey_engine` (the same rows `fh_engine_store:upsert_tenant`
+   one-off `psql` against `ancu_engine` (the same rows `fh_engine_store:upsert_tenant`
    + `ensure_signing_key` write in dev). This replaces aleap's "matching shared secret"
    step; it is the prod form of the handshake that `SHELL_DEV_AUTOPROVISION` does in dev.
    *(Future nicety: an authenticated admin provisioning endpoint — the carried-over
    8-S0b gap. Until then this manual insert is the procedure.)*
-6. **Shell app.** Derive `SHELL_DATABASE_URL` (db segment → `firsthomey_shell`), inject it
+6. **Shell app.** Derive `SHELL_DATABASE_URL` (db segment → `ancu_shell`), inject it
    + the §3 shell secrets (the tenant id/privkey from step 5), validate,
-   `doctl apps create --spec`. Boots → `firsthomey_shell` migrations →
+   `doctl apps create --spec`. Boots → `ancu_shell` migrations →
    `maybe_autoprovision` no-ops (static key present). **Before DNS:** override
    `ENGINE_BASE_URL` to the engine's `*.ondigitalocean.app` ingress; revert to
    `engine.ancu.ai` once DNS lands.

@@ -35,7 +35,7 @@ Erlang dir wipes *that* component's dev DB.
 
 **Prereqs** (one-time, all handled by the scripts except the runtimes themselves):
 `rebar3`, `node`/`npm`, `docker`, `python3` on PATH, and homebrew `postgresql@18`. The shell
-launcher starts the homebrew Postgres if it's down and creates `firsthomey_shell` if missing;
+launcher starts the homebrew Postgres if it's down and creates `ancu_shell` if missing;
 the engine launcher brings up the engine's docker Postgres — you don't run `createdb` or
 `docker compose` by hand.
 
@@ -63,6 +63,31 @@ run (autoprovision + zero-inbox magic-link on, both DB URLs set); no edits neede
 
 Real LLM planning is optional — the engine defaults to a stub sidecar that needs no API key
 (see [the bottom](#optional-real-llm-planning)).
+
+### The seat's path — `scripts/dev_stack.sh`, one command, no docker
+
+<!-- Reproducible -> P-2 · The database is the single source of truth -> the dev stack -> one script, loopback, private socket
+A Claude seat has no docker and must not touch the shared :5432, so it runs all three
+from one script instead: both databases on the clone's private Postgres socket
+(`.git/enacs-pg`), every listener on 127.0.0.1 (`FH_HTTP_IP`, vite `--host`). Measured
+2026-10-07 (behavior 24): stack up, magic-link sign-in, a Mode C plan filled in Chrome. -->
+
+```
+bash scripts/dev_stack.sh     # engine :8080, shell :8081, frontend :5173 — all 127.0.0.1; logs in .git/enacs-dev-stack/
+```
+
+A fresh engine DB has no suburbs, so the map has nothing to open. Load them with the
+repo's own adapters (they fetch from the ABS; the VIC prices are committed):
+
+```
+export ENGINE_DATABASE_URL="host=$PWD/.git/enacs-pg dbname=ancu_engine"
+.venv/bin/python -m engine.build.suburbs.abs_census   # the spine, ~15k suburbs
+.venv/bin/python -m engine.build.suburbs.abs_asgs     # centroids
+.venv/bin/python -m engine.build.suburbs.vic_vpsr     # VIC median prices
+```
+
+The dev sign-in link names `APP_BASE_URL` from `.env` (`http://localhost:5173`); open the
+app at `localhost:5173` too, so the session cookie and the page share a host.
 
 ---
 
@@ -190,7 +215,7 @@ FH_SIDECAR_PYTHON=../../.venv/bin/python      # the venv with the SDK
 
 ```
 cd engine/erlang     && bin/dev reset    # wipes the engine docker DB (down -v)
-cd shell/web/backend && bin/dev reset    # drops firsthomey_shell
+cd shell/web/backend && bin/dev reset    # drops ancu_shell
 ```
 
 The next `bin/dev` in each dir recreates that component's schema on boot.

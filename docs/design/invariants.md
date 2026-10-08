@@ -10,12 +10,17 @@ decision lives beside the mechanism it governs, in the four-slot block
 ## The goal
 
 **This system gives a Vietnamese buyer of Australian property — first-home,
-investor, or funded from Vietnam — a bilingual plan for the whole property
-lifecycle, built from their own situation, whose every regulated figure traces
-to a verified, cited source.** (Son, 2026-10-06. The product name is left out
+investor, or funded from Vietnam — a bilingual budget plan for the whole
+property lifecycle (buy, hold, sell), built from their own situation, whose every
+regulated figure traces to a verified, cited source.** (Son, 2026-10-06; "budget
+plan … (buy, hold, sell)" Son, 2026-10-08. The product name is left out
 on purpose: it is not settled, and renaming must not touch the ground. "Rau",
 the name users read today, is temporary until a final one is chosen — Son,
 2026-10-06.)
+
+The plan is information provided as is, for budget planning across that
+lifecycle; the platform gives no legal, tax or financial advice service, and
+every disclaimer the user reads says so in those terms (Son, 2026-10-08).
 
 **The launch scope is the system as built** (Son, 2026-10-06: "stop at the
 current scope which is good enough for production launch"): Modes A-E with

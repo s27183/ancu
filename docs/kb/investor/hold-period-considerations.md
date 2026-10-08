@@ -17,7 +17,7 @@ How long an investor intends to hold a property shapes almost every other figure
 
 - **The CGT 12-month threshold (regulated — owned elsewhere).** Holding an asset for **more than 12 months** before the CGT event qualifies an individual/trust for the **50% CGT discount** — the single sharpest hold-length cliff. The rule, eligibility, and the proposed post-2027 change are owned by [`kb.tax.cgt-50-percent-discount`](../tax/cgt-50-percent-discount.md); this doc only flags that a sub-12-month sale forfeits the discount. The discount itself is applied by `disposition`, not here.
 - **Amortising transaction costs.** Stamp duty, conveyancing, LMI, and selling costs are large, one-off, and **not recoverable** — spread over a short hold they can erase years of net return. A longer hold dilutes them. The acquisition cost bands are owned by [`kb.buyer-costs.investor-additional-costs`](../buyer-costs/investor-additional-costs.md) and the selling-cost bands by `disposition`'s anchors.
-- **Time for growth to compound — and to be uncertain.** A capital-growth or land-banking thesis needs years; a short horizon exposes the investor to the timing risk that growth simply hasn't arrived. The projection band is the labelled placeholder [`kb.property.capital-growth-bands`](../property/capital-growth-bands.md) — explicitly not a forecast.
+- **Time for growth to compound — and to be uncertain.** A capital-growth or land-banking thesis needs years; a short horizon exposes the investor to the timing risk that growth simply hasn't arrived. The projection band [`kb.property.capital-growth-bands`](../property/capital-growth-bands.md) is historical (ABS Total Value of Dwellings) — explicitly not a forecast.
 - **Averaging out shocks.** Vacancy and maintenance are lumpy; over a longer hold the modelled rates ([`kb.investor.vacancy-rate-assumptions`](vacancy-rate-assumptions.md), [`kb.investor.operating-expenses-typical-ratios`](operating-expenses-typical-ratios.md)) are more representative of the actual experience.
 - **The exit must be coherent with the hold.** The intended hold and the exit strategy ([`kb.investor.exit-strategy-options`](exit-strategy-options.md)) are two sides of one decision — a 3-year hold with a "hold perpetually" exit is internally inconsistent.
 
@@ -31,7 +31,7 @@ How long an investor intends to hold a property shapes almost every other figure
 
 - **The 12-month cliff is flagged, not buried.** The plan notes that selling under 12 months forfeits the CGT 50% discount, pointing to the tax doc for the rule.
 - **Short holds are expensive.** The plan shows how one-off acquisition and selling costs erode return over a short hold, so the horizon is set with eyes open.
-- **Growth needs time and isn't promised.** A growth thesis is paired with a realistic horizon and the explicit caveat that the projection band is a placeholder, not a forecast.
+- **Growth needs time and isn't promised.** A growth thesis is paired with a realistic horizon and the explicit caveat that the projection band is historical, not a forecast.
 - **Hold and exit must agree.** The plan checks that the chosen hold length and exit strategy are coherent. Information, not advice.
 
 ## Rules
@@ -44,7 +44,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
   "parameters": {
     "cgt_12_month_threshold_owner": { "type": "string", "value": "kb.tax.cgt-50-percent-discount", "note": "OWNED ELSEWHERE — holding >12 months qualifies for the 50% CGT discount; a sub-12-month sale forfeits it; the rule + post-2027 reform live in the tax doc; the discount is applied by disposition" },
     "transaction_costs_amortise_over_hold": { "type": "bool", "value": true, "note": "one-off, non-recoverable acquisition + selling costs are diluted by a longer hold; bands owned by kb.buyer-costs.investor-additional-costs (acquisition) and disposition's anchors (selling)" },
-    "growth_needs_time_and_is_uncertain": { "type": "bool", "value": true, "note": "a growth thesis needs years; the projection band is a labelled placeholder (kb.property.capital-growth-bands), not a forecast" },
+    "growth_needs_time_and_is_uncertain": { "type": "bool", "value": true, "note": "a growth thesis needs years; the projection band (kb.property.capital-growth-bands) is historical, not a forecast" },
     "hold_and_exit_must_be_coherent": { "type": "bool", "value": true, "note": "hold_period_years and exit strategy (kb.investor.exit-strategy-options) are one decision; the agent flags an inconsistent pairing" }
   },
   "lookup": {

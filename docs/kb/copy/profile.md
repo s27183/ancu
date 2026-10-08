@@ -1,7 +1,7 @@
 ---
 slug: kb.copy.profile
 effective_from: 2026-06-01
-last_verified: 2026-06-01
+last_verified: 2026-10-07
 ---
 
 # Profile component copy (bilingual)
@@ -22,6 +22,16 @@ person → a structured, FIRB-aware cross-border plan from day one
 tax + cross-border funding surfaced from day one (`strength_foreign_investor`). Each template
 is a `{vi, en}` pair; these carry no `{param}` placeholders.
 
+One `key_assumptions` line, `assume_pr_ordinarily_resident`, is stated by the domestic
+profiles (`buyer_profile` Mode A / E, `investor_profile` Mode C) whenever an applicant may be
+a permanent resident: onboarding asks "citizen or PR?" but not where the buyer lives, and
+`applicant.firb_required = false` for a PR holds only while they are ordinarily resident in
+Australia. The line names the assumption and its consequence (a PR living abroad is a foreign
+person: approval needed, established dwellings barred) and notes that a citizen needs no
+approval wherever they live (FATR reg 35(1)(a)). The law it restates is owned by
+[`kb.firb.status-determination`](../firb/status-determination.md); this doc owns only the
+wording.
+
 This is a **copy doc**: it fills no slot and is not a blueprint anchor (reference-exempt; only
 slug==path + content_json-parse gates apply). Vietnamese is authored for register — not a
 transliteration of the English (trap #4). Decision-support tone, never advice (ASIC): the
@@ -39,6 +49,10 @@ template ids the resolver references, each a `{vi, en}` pair.
     "constraint_financials_pending": {
       "vi": "Thông tin tài chính của bạn (thu nhập, tiền tiết kiệm, các khoản nợ) chưa có — kế hoạch sẽ được hoàn thiện dần khi bạn cung cấp thêm.",
       "en": "Applicant financial details (income, savings, debts) pending — the base plan refines as you answer."
+    },
+    "assume_pr_ordinarily_resident": {
+      "vi": "Kế hoạch này giả định rằng thường trú nhân (PR) trong hồ sơ đang sinh sống tại Úc — có mặt ở Úc từ 200 ngày trở lên trong 12 tháng qua. Nếu một thường trú nhân đang sống ở nước ngoài, người đó bị coi là người nước ngoài theo quy định FIRB: phải xin phê duyệt FIRB trước khi mua và không được mua nhà đã qua sử dụng (chỉ được mua nhà xây mới hoặc đất trống). Công dân Úc thì không cần phê duyệt, dù đang sống ở đâu.",
+      "en": "This plan assumes any permanent resident on it lives in Australia — in Australia for 200 or more days of the past 12 months. A permanent resident living overseas is a foreign person under FIRB rules: they need FIRB approval before buying and cannot buy an established home (new builds or vacant land only). Australian citizens need no approval wherever they live."
     },
     "strength_first_home_buyer": {
       "vi": "Người mua nhà lần đầu — đủ điều kiện tiếp cận đầy đủ các chương trình hỗ trợ thuộc nhóm A (còn chờ kiểm tra điều kiện chi tiết).",

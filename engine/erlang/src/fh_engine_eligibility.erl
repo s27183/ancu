@@ -28,6 +28,8 @@
 %% the read is unchanged — only its producer-side shape generalized.
 
 -export([fill/2]).
+%% per_applicant_disp/1: exported for resolver_conformance's household case (#6).
+-export([per_applicant_disp/1]).
 
 %% bilingual copy-templates (bilingual-content.md §3b) — user-facing notes/reasons are
 %% {vi,en} via fh_engine_i18n:subst/2; no Vietnamese literal in this module.

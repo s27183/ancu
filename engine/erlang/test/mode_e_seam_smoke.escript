@@ -18,7 +18,7 @@
 %% next_home submission (fh_engine_h_plan_cards:blueprint_for/3 → nexthome-domestic-au).
 %% Run from engine/erlang with the build libs on the path:
 %%
-%%   ENGINE_DATABASE_URL=postgres://engine:engine_dev_pw@localhost:5433/firsthomey_engine?sslmode=disable \
+%%   ENGINE_DATABASE_URL=postgres://engine:engine_dev_pw@localhost:5433/ancu_engine?sslmode=disable \
 %%   ERL_LIBS=_build/default/lib escript test/mode_e_seam_smoke.escript
 
 -mode(compile).

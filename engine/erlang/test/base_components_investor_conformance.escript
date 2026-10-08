@@ -34,7 +34,8 @@
 main(_) ->
     ok = fh_engine_kb:load(),
     io:format("base_components investor conformance — fh_engine_turn:base_components/1 (P5-activate)~n~n"),
-    R = lists:flatten([set_order_cases(), no_regression_cases(), dag_walk_cases()]),
+    R = lists:flatten([set_order_cases(), no_regression_cases(), dag_walk_cases(),
+                        security_cap_cases()]),
     Fails = [X || X <- R, X =:= fail],
     io:format("~n================================================================~n"),
     case Fails of
@@ -137,6 +138,41 @@ step(Name, Steps) ->
 validates(OutcomeType, Outcome) ->
     try fh_engine_outcome:validate(?INV, OutcomeType, Outcome)
     catch C:E -> {C, E} end.
+
+%% --- 4. security LVR cap caveat (#3, behavior 13) ----------------------------
+%% An attached apartment adds the CONVENTION caveat (lenders may cap LVR for this security) to
+%% cash_position's key_assumptions, EN and VI; a house does not; the loan and LVR stay at the
+%% 80% baseline either way (the caveat is copy, never a figure change).
+
+security_cap_cases() ->
+    Cash = fun(PType) ->
+               Pf = #{<<"price">> => 750000, <<"state">> => <<"NSW">>,
+                      <<"property_type">> => PType},
+               {O, _, _} = fh_engine_fill:resolver(<<"cash_position">>, args(),
+                                                   #{<<"property_fit_investor">> => Pf,
+                                                     %% its presence routes to Mode C's fill
+                                                     <<"tax_optimised_structure">> => #{}}),
+               O
+           end,
+    Apt = Cash(<<"established_apartment">>),
+    House = Cash(<<"established_house">>),
+    Lines = maps:get(<<"key_assumptions">>, Apt),
+    Line = case Lines of [L] -> L; _ -> #{} end,
+    [check("apartment → one key_assumption", length(Lines), 1),
+     check("apartment caveat is the KB copy assumption_security_lvr_cap",
+           Line, fh_engine_kb:copy(<<"kb.copy.cash">>, <<"assumption_security_lvr_cap">>)),
+     check("caveat carries EN and VI",
+           {is_binary(maps:get(<<"en">>, Line, nil)), is_binary(maps:get(<<"vi">>, Line, nil))},
+           {true, true}),
+     check("house → no key_assumptions", maps:get(<<"key_assumptions">>, House), []),
+     check("loan_amount unchanged by the caveat",
+           maps:get(<<"loan_amount">>, Apt), maps:get(<<"loan_amount">>, House)),
+     check("lvr stays at the 80% baseline", {maps:get(<<"lvr">>, Apt), maps:get(<<"lvr">>, House)},
+           {80, 80}),
+     check("new_apartment also flagged",
+           length(maps:get(<<"key_assumptions">>, Cash(<<"new_apartment">>))), 1),
+     check("apartment outcome conforms to budget_envelope_investor",
+           validates(<<"budget_envelope_investor">>, Apt), ok)].
 
 %% --- helpers ----------------------------------------------------------------
 

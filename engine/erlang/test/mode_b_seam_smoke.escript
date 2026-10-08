@@ -31,7 +31,7 @@
 %%
 %% Run from engine/erlang:
 %%
-%%   ENGINE_DATABASE_URL=postgres://engine:engine_dev_pw@localhost:5433/firsthomey_engine?sslmode=disable \
+%%   ENGINE_DATABASE_URL=postgres://engine:engine_dev_pw@localhost:5433/ancu_engine?sslmode=disable \
 %%   ERL_LIBS=_build/default/lib escript test/mode_b_seam_smoke.escript
 
 -mode(compile).

@@ -169,7 +169,7 @@ Note: Mode D does NOT activate Mode B's Family view tab by default — Vietnam-l
 
 **Inputs:** User questions; uploaded documents (Vietnamese passport, residency proof, prior AU FIRB approvals if any, financial statements).
 
-**KB anchors:** `kb.firb.status-determination`, `kb.firb.established-dwelling-ban`, `kb.vn-tax.brackets-2026`, `kb.vn-tax.income-from-foreign-property`, `kb.lender.non-resident-friendly-shortlist`, `kb.investor.experience-levels`
+**KB anchors:** `kb.firb.established-dwelling-ban`, `kb.vn-tax.brackets-2026`, `kb.vn-tax.income-from-foreign-property`, `kb.lender.non-resident-friendly-shortlist`, `kb.investor.experience-levels`
 
 *(Reconciled 2026-07-03 — the serviceability anchor was drafted as `kb.non-resident.serviceability-au-lenders` before P1 found the mode-agnostic equivalent already built for Mode B.)*
 
@@ -1164,7 +1164,7 @@ Combines Mode C `ownership_planning_investor` (property management, tax reportin
 
 **Inputs:** `strategy_thesis` (`hold_period_years` = the horizon `H`, `exit_strategy`) + `property_fit.outcome` (growth indicators, purchase price) + `cash_flow_projection` (the hold-phase recurring flows to roll up) + `tax_optimised_structure` (the **CGT determinants**: `cgt_discount_eligible: false`, `ppor_exemption_eligible: false`, `cgt_marginal_rate`, `frcgw_applicable`) + `budget_envelope_investor` (acquisition cash to roll up; loan amount for the payout)
 
-**KB anchors:** `kb.property.capital-growth-bands` (banded growth — **labelled placeholder**, re-ground before surfacing), `kb.selling-costs.agent-legal` (selling-cost bands), `kb.tax.cgt-50-percent-discount`, `kb.tax.cgt-main-residence-exemption`, `kb.non-resident-tax.foreign-resident-cgt-withholding`
+**KB anchors:** `kb.property.capital-growth-bands` (banded growth — ABS Total Value of Dwellings, historical, not a forecast), `kb.selling-costs.agent-legal` (selling-cost bands), `kb.tax.cgt-50-percent-discount`, `kb.tax.cgt-main-residence-exemption`, `kb.non-resident-tax.foreign-resident-cgt-withholding`
 
 *(Reconciled 2026-07-03 — the discount anchor was drafted as `kb.non-resident.cgt-no-50-percent-discount-from-2012`; the main-residence anchor (grounding the PPOR-moot reasoning) was the dangling `kb.non-resident.cgt-no-ppor-exemption`; the FRCGW anchor was `kb.foreign-investor.frcgw-on-sale` — all three reconciled to the mode-agnostic slugs already built for Mode B/C.)*
 
@@ -1219,7 +1219,7 @@ Combines Mode C `ownership_planning_investor` (property management, tax reportin
 
 **Fill path:** resolver. The journey structure + bilingual cell prose are generic KB content (`kb.journey.investor-foreign-path`); the figures are upstream outcomes placed on the timeline. No agent leaf.
 
-**Known limitation (flagged, not fixed here — a `cash_position` build, out of scope for task 8).** Unlike Mode C's `cash_position`, Mode D's `fill_investor_foreign/2` has no per-property branch yet, so `budget_envelope_investor.cash_events` stays `[]` even once a property is attached — the acquisition-phase money cells (deposit, stamp duty + surcharge, FIRB fee) will not render until that seam closes. `tax_structure_non_resident.cash_events` is `[]` too (no non-resident marginal-rate KB table exists yet — the same honest-partial gap component 7's own note discloses). `yield_modelling` is shared code with Mode C and already lights up per-property, so the hold-phase rent/opex/interest cells DO render once a property is attached. The swimlane therefore renders the **full legal/prose spine** today (every phase, every actor cell) with a **sparse money spine** — an honest, not a broken, state.
+**Acquisition money cells (#13, 2026-10-06).** Mode D's `fill_investor_foreign/2` emits the acquisition spine at the base turn, at the target range's ceiling, through Mode B's `cash_events_foreign` builder: `deposit` and `firb_fee` at `contract`, `stamp_duty`, `foreign_buyer_surcharge` and `other_buying_costs` at `settle`, each the figure `total_cash_required` sums (deposit and other costs on the `services` row, the rest on `government`). An event whose figure is unknown is absent: with no state, duty, surcharge and other costs drop. Mode D has no per-property `cash_position` turn in launch scope. **Known limitation.** `tax_structure_non_resident.cash_events` is `[]` (no non-resident marginal-rate KB table exists yet — the same honest-partial gap component 7's own note discloses). `yield_modelling` is shared code with Mode C and lights up per-property, so the hold-phase rent/opex/interest cells render once a property is attached.
 
 **Outcome schema:** `journey_swimlane` — same shape as Modes A/C's (`fhb-domestic-au.md` component 10, `investor-domestic-au.md` component 13); the compiler parses the fenced block per-blueprint (it does not inherit across files), so it is repeated below rather than only cross-referenced. `actors` carries the same six entries as Mode C (`you`, `government`, `lender`, `property_manager`, `tenant`, `services`).
 
@@ -1308,32 +1308,9 @@ under, one of the two reader sets needs a fallback — decide when that componen
 
 ---
 
-## KB anchor index summary
+## KB anchors
 
-Mode D references ~78 KB slugs:
-
-- 35 shared with Mode B (foreign-person components)
-- 40 shared with Mode C (investor components)
-- 2 shared with Mode A — `kb.property.capital-growth-bands` + `kb.selling-costs.agent-legal` (component 14 `disposition`; the FRCGW-specific anchors stay Mode-D-exclusive, below)
-- ~10 Mode-D-exclusive (non-resident tax, FRCGW, repatriation, VN-AU treaty, foreign-investor strategy)
-- 3 new Mode-D-exclusive journey/phase docs (components 15/16, added 2026-07-10 task 8): `kb.journey.investor-foreign-path`, `kb.journey.investor-foreign-phase-actions`, `kb.risks.investor-foreign-by-phase`
-
-**Reconciled 2026-07-03 (P1-open pass) — see `mode-d-wedge.md` P1 for the full table.** Genuinely
-new (7 docs + `kb.non-resident.tax-treatment-overview` synthesis): `kb.non-resident.tax-treatment-overview`,
-`kb.non-resident.entity-options-au-property`, `kb.non-resident.investment-loan-deposit-requirements`,
-`kb.foreign-investor.thesis-archetypes`, `kb.foreign-investor.currency-hedging-considerations`,
-`kb.foreign-investor.future-migration-pathway-considerations`, `kb.foreign-investor.repatriation-strategy`,
-`kb.foreign-investor.absentee-owner-management`. VN-side placeholders (3, per the scoping decision):
-`kb.vn-tax.brackets-2026`, `kb.vn-tax.income-from-foreign-property`, `kb.au-vn-tax-treaty`. Reused under
-an existing slug (not new files — anchor renamed in this blueprint): `kb.lender.non-resident-friendly-shortlist`,
-`kb.non-resident-tax.withholding-on-rental-income`, `kb.tax.cgt-50-percent-discount`,
-`kb.non-resident-tax.foreign-resident-cgt-withholding`, `kb.tax.depreciation-division-43-and-40`. Dropped
-as moot: the standalone PPOR-exemption anchor (an investor never held a main residence to lose the
-exemption on — folded into the tax-treatment-overview doc's reasoning, grounded in `kb.tax.cgt-main-residence-exemption`).
-
-The offline KB agent's Mode D onboarding workstream is the largest of the four — these are the most legally and operationally sensitive content domains across the blueprint set.
-
----
+The compiled anchors are each component's `**KB anchors:**` line above — the KB compiler reads those lines and nothing else (`engine/build/kb_compiler.py`, `parse_blueprint`). This blueprint keeps no separate index table: a hand-kept copy drifted from what the compiler reads (stale rows and wrong component numbers, measured 2026-10-06), so the lines are the only list.
 
 ## Renderer vocabulary used
 

@@ -55,6 +55,9 @@ export interface ProfileOutcome {
     target_zone?: string[] | null;
     key_constraints?: LocalizedText[] | null;
     key_strengths?: LocalizedText[] | null;
+    // Domestic profiles (Mode A/C/E): the ordinarily-resident assumption when an applicant
+    // may be a permanent resident (kb.copy.profile assume_pr_ordinarily_resident).
+    key_assumptions?: LocalizedText[] | null;
 }
 
 export interface SchemeEntry {
@@ -331,7 +334,8 @@ export interface TaxOptimisedStructureOutcome {
     cgt_marginal_rate?: number | null;
     cost_base_depreciation_clawback?: boolean | null;
     annual_compliance_cost?: number | null;
-    setup_costs?: number | null;
+    /** entity setup, INDICATIVE band from kb.tax.entity-setup-costs; [lo, null] = "from lo". */
+    setup_costs?: [number, number | null] | null;
     negative_gearing_reform_note?: LocalizedText | null;
 }
 

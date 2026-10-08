@@ -9,7 +9,7 @@
 %% the `after` filter pages correctly, and the endpoint is tenant-authenticated. No
 %% LLM: usage events are seeded directly, so this is deterministic + opus-free.
 %%
-%%   ENGINE_DATABASE_URL=postgres://engine:engine_dev_pw@localhost:5433/firsthomey_engine?sslmode=disable \
+%%   ENGINE_DATABASE_URL=postgres://engine:engine_dev_pw@localhost:5433/ancu_engine?sslmode=disable \
 %%   ERL_LIBS=_build/default/lib escript test/usage_events_smoke.escript
 
 -mode(compile).

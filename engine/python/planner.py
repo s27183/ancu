@@ -57,6 +57,12 @@ from pydantic import BaseModel, Field, StringConstraints, ValidationError, model
 # Called once at startup (not at import — keeps the module importable for tests).
 _PROTO = None
 
+# Bilingual -> P-7 · One declaration per outcome shape -> The sidecar -> the product name, set once
+# The product's name is temporary (invariants.md, Son 2026-10-06). The agent prompts that name
+# the product (_PREAMBLE, _QA_PREAMBLE, _QA_TOOLS, the kb_lookup tool description) read it
+# from here, so a rename is this one line (behavior 17).
+BRAND = "Rau"
+
 
 def _isolate_protocol_stream():
     global _PROTO
@@ -524,8 +530,8 @@ def _fill_kb_corpus():
 # no-tool one-shot fill: NO <tools>/<retrieval_strategy>/<tags> (KB is injected, not
 # tool-pulled — §6); those return for the tool-using Q&A path in slice 2c.
 
-_PREAMBLE = """\
-You are a single component of Rau's planning engine, which helps \
+_PREAMBLE = f"""\
+You are a single component of {BRAND}'s planning engine, which helps \
 Vietnamese-Australian buyers plan an Australian property purchase (first home or \
 investment). You fill ONE component of a plan and return a structured object that \
 downstream components and the user-facing card consume.
@@ -1868,13 +1874,13 @@ def _kb_search(kb, slug, topic, max_docs=3, snippet=1400):
             "'stamp duty concession', 'FIRB established dwelling'."), []
 
 
-_QA_PREAMBLE = """\
-You are Rau's planning assistant, answering a Vietnamese-Australian first home \
+_QA_PREAMBLE = f"""\
+You are {BRAND}'s planning assistant, answering a Vietnamese-Australian first home \
 buyer's question about THEIR plan. You will be provided with:
 - **Context** — your role. `<context>`.
 - **Goal** — what a good answer achieves. `<goal>`.
 - **Safety** — input-handling, the ASIC decision-support boundary, machinery hiding. `<safety>`.
-- **Style** — bilingual ({vi, en}) and concise. `<style>`.
+- **Style** — bilingual ({{vi, en}}) and concise. `<style>`.
 - **Tools** — how to look up reference knowledge you don't already have. `<tools>`.
 - **Output** — the final structured object. `<output>`.
 
@@ -1912,8 +1918,8 @@ question — even reworded, even in the other language — do NOT redo the full 
 Give a short pointer back to what you already said (one or two sentences), and only add \
 new substance if this phrasing actually asks something the earlier answer didn't cover."""
 
-_QA_TOOLS = """\
-You have ONE tool, `kb_lookup`, over Rau's curated knowledge base:
+_QA_TOOLS = f"""\
+You have ONE tool, `kb_lookup`, over {BRAND}'s curated knowledge base:
 - `kb_lookup(topic: "...")` — search by plain topic (e.g. "first home guarantee", \
 "stamp duty concession NSW", "FIRB established dwelling"). Use this when the plan-card \
 grounding doesn't already contain the rule/figure/definition you need.
@@ -2033,7 +2039,7 @@ async def handle_qa(params):
     # the args and the result — and SANITIZED (display_name + summaries, never the raw
     # KB text or the slug) before they reach the shell (engine-contract §4).
     @tool("kb_lookup",
-          "Search Rau's curated knowledge base for a scheme rule, figure, or "
+          f"Search {BRAND}'s curated knowledge base for a scheme rule, figure, or "
           "definition. Use when the plan-card grounding lacks what you need to answer "
           "accurately. Pass a plain `topic` to search, or a known `slug` to fetch one doc.",
           {"topic": str, "slug": str})

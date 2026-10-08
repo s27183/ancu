@@ -18,7 +18,7 @@
 %%   The under-limit ALLOW path through this same handler is already proven by
 %%   plancard_proxy_smoke (fresh user, default 1.0M limit, 0 usage → 202 relayed).
 %%
-%%   SHELL_DATABASE_URL=postgres://shell:shell_dev_pw@localhost:5434/firsthomey_shell?sslmode=disable \
+%%   SHELL_DATABASE_URL=postgres://shell:shell_dev_pw@localhost:5434/ancu_shell?sslmode=disable \
 %%   ERL_LIBS=_build/default/lib escript test/quota_gate_smoke.escript
 
 -mode(compile).

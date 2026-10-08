@@ -38,7 +38,7 @@ from psycopg.types.json import Jsonb
 def connect() -> psycopg.Connection:
     dsn = os.environ.get("ENGINE_DATABASE_URL")
     if not dsn:
-        raise SystemExit("ENGINE_DATABASE_URL not set (e.g. postgres://engine:…@localhost:5433/firsthomey_engine)")
+        raise SystemExit("ENGINE_DATABASE_URL not set (e.g. postgres://engine:…@localhost:5433/ancu_engine)")
     return psycopg.connect(dsn)
 
 

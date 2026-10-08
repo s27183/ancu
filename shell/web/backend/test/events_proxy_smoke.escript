@@ -10,7 +10,7 @@
 %%
 %% Run from shell/web/backend with the shell's dev Postgres up:
 %%
-%%   SHELL_DATABASE_URL=postgres://...@localhost:5432/firsthomey_shell?sslmode=disable \
+%%   SHELL_DATABASE_URL=postgres://...@localhost:5432/ancu_shell?sslmode=disable \
 %%   ERL_LIBS=_build/default/lib escript test/events_proxy_smoke.escript
 
 -mode(compile).

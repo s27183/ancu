@@ -151,7 +151,10 @@ narration_cases() ->
      check("kb anchor: investment-loan serviceability recorded",
            lists:member(<<"kb.lender.serviceability-investment-loans">>, KbSlugs), true),
      check("kb anchor: investor experience levels recorded",
-           lists:member(<<"kb.investor.experience-levels">>, KbSlugs), true)].
+           lists:member(<<"kb.investor.experience-levels">>, KbSlugs), true),
+     %% firb_required is evaluated through kb.firb.status-determination, so it is anchored (#6).
+     check("kb anchor: FIRB status determination recorded",
+           lists:member(<<"kb.firb.status-determination">>, KbSlugs), true)].
 
 %% --- 5. Layer-1 conformance (the fail-closed seam) --------------------------
 

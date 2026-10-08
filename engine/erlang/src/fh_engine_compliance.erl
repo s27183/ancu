@@ -105,6 +105,9 @@ advice_adjacent(<<"firb_workflow">>)       -> true;   %% FIRB eligibility/fee fr
 advice_adjacent(<<"property_assessment">>) -> true;   %% investment-viability verdict (Phase B)
 advice_adjacent(<<"buying_strategy">>)     -> true;   %% bid plan / negotiation (Phase B) — ACL hedge
 advice_adjacent(<<"due_diligence">>)       -> true;   %% risk surfacing / yield-vs-thesis (Phase B) — ACL hedge
+advice_adjacent(<<"tax_structure">>)       -> true;   %% agent-authored recommended_entity (Mode C) — #27
+advice_adjacent(<<"tax_structure_non_resident">>) -> true;  %% entity structuring for a non-resident (Mode D) — #27
+advice_adjacent(<<"investment_strategy">>) -> true;   %% agent-authored archetype / gearing / thesis (C, D) — #27
 advice_adjacent(_)                         -> false.
 
 %% --- AML --------------------------------------------------------------------

@@ -13,7 +13,7 @@ sources:
 
 A property's **capital-growth outlook** is driven less by the dwelling than by the **location's growth fundamentals**: population growth, the infrastructure pipeline, employment access, and the supply pipeline that can either validate or swamp demand. This doc owns the **methodology** for reading those location factors into the `property_assessment.growth_indicators.*` parameters and the resulting `capital_growth_outlook` enum — *not* a list of which suburbs will grow (that would be a forecast). The **quantitative sale-value projection band** is owned separately by [`kb.property.capital-growth-bands`](capital-growth-bands.md) and consumed by `disposition`; this doc owns the **qualitative location assessment** that informs the outlook. Decision-support, never a prediction or a "hot suburb" tip.
 
-> **Forward-looking, framed as decision-support — not a forecast.** Any statement about *future* growth is inherently uncertain and, asserted as a number, is an ASIC forecast risk. This doc therefore owns a **framework of factors** and a **qualitative outlook enum**, not a predicted growth rate. Where a quantitative figure is needed (sale value over the hold horizon), it comes from the labelled-placeholder band in `kb.property.capital-growth-bands`, surfaced banded and PENDING — never a point forecast from here.
+> **Forward-looking, framed as decision-support — not a forecast.** Any statement about *future* growth is inherently uncertain and, asserted as a number, is an ASIC forecast risk. This doc therefore owns a **framework of factors** and a **qualitative outlook enum**, not a predicted growth rate. Where a quantitative figure is needed (sale value over the hold horizon), it comes from the ABS-sourced historical band in `kb.property.capital-growth-bands`, surfaced banded (PENDING until a horizon is set) — never a point forecast from here.
 
 ## The growth-fundamental factors
 
@@ -33,7 +33,7 @@ A **growth corridor** is a band of locations on the urban fringe or along a tran
 - **Outlook is a qualitative read, not a number.** The plan surfaces `capital_growth_outlook` (strong / moderate / flat / declining) from the location fundamentals, with the factors shown — the investor sees *why*, not a fabricated growth percentage.
 - **Supply is the counterweight.** The plan flags a high supply pipeline as a brake on growth even where population is rising — the most common reason a "growth area" disappoints (oversupplied apartment markets).
 - **Land content and corridor characteristics matter for growth.** Consistent with [`kb.property.investor-grade-features`](investor-grade-features.md) (land-to-asset ratio), the plan reads corridor land content as a growth factor, distinct from yield.
-- **The number, when needed, is banded and PENDING.** Sale-value projection over the hold horizon uses the conservative placeholder band (`kb.property.capital-growth-bands`), surfaced as a range with the assumption stated — never a point forecast.
+- **The number, when needed, is banded and PENDING.** Sale-value projection over the hold horizon uses the conservative historical band (`kb.property.capital-growth-bands`, ABS Total Value of Dwellings), surfaced as a range with the assumption stated — never a point forecast.
 
 ## Rules
 
@@ -49,7 +49,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
     "committed_beats_announced": { "type": "bool", "value": true, "note": "a committed/funded infrastructure project is a stronger growth signal than an announced one" },
     "historical_growth_is_context": { "type": "bool", "value": true, "note": "5/10-yr suburb growth is HISTORICAL (from kb.property.rental-market-data-sources) — context for the read, never a forward guarantee" },
     "no_named_corridor_shortlist": { "type": "bool", "value": true, "note": "this doc supplies the assessment FRAMEWORK, not a list of 'the next growth suburbs' — naming future corridors is a speculative forecast, not grounded information" },
-    "quantitative_projection_owner": { "type": "string", "value": "kb.property.capital-growth-bands", "note": "OWNED ELSEWHERE — the numeric sale-value projection band (labelled placeholder, banded + PENDING) consumed by disposition; this doc owns only the qualitative outlook" }
+    "quantitative_projection_owner": { "type": "string", "value": "kb.property.capital-growth-bands", "note": "OWNED ELSEWHERE — the numeric sale-value projection band (ABS-sourced historical band, banded + PENDING) consumed by disposition; this doc owns only the qualitative outlook" }
   }
 }
 ```
@@ -57,7 +57,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
 Notes:
 
 - **No `fills`.** No outcome leaf is set by a KB rule; the growth-indicator facts come from suburb/property data and `capital_growth_outlook` is agent-reasoned against this framework.
-- **Qualitative here, quantitative elsewhere.** This doc owns the *factor framework → outlook enum*; the *numeric growth band* (for sale-value projection) is owned by `kb.property.capital-growth-bands` as a labelled placeholder. Single-owner — no growth figure is duplicated or asserted here.
+- **Qualitative here, quantitative elsewhere.** This doc owns the *factor framework → outlook enum*; the *numeric growth band* (for sale-value projection) is owned by `kb.property.capital-growth-bands` (an ABS-sourced historical band). Single-owner — no growth figure is duplicated or asserted here.
 - **Forecast discipline.** The outlook is decision-support reasoning over observable fundamentals; future growth is never asserted as a number, and no "hot suburb" prediction is made.
 
 ## Sources

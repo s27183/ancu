@@ -3,8 +3,8 @@
 # Deploy:  doctl apps spec validate --spec shell/web/app.yaml
 #          doctl apps create --spec shell/web/app.yaml
 #
-# Shares the firsthomey-pg cluster (provisioned out-of-band; see engine/app.yaml)
-# but a DIFFERENT database — firsthomey_shell — via SHELL_DATABASE_URL (set manually;
+# Shares the ancu-pg cluster (provisioned out-of-band; see engine/app.yaml)
+# but a DIFFERENT database — ancu_shell — via SHELL_DATABASE_URL (set manually;
 # DO doesn't cross-inject DB refs across apps). HTTP-only to the engine; never a
 # cross-DB JOIN (constraint #11 / engine-contract §9.2).
 
@@ -64,7 +64,7 @@ services:
       - key: ADMIN_EMAILS
         value: ""
       # ── Secrets (set in DO Dashboard → Settings → Environment Variables) ─────────
-      # firsthomey_shell on the shared cluster, ?sslmode=require (deployment.md §4 step 6).
+      # ancu_shell on the shared cluster, ?sslmode=require (deployment.md §4 step 6).
       - key: SHELL_DATABASE_URL
         type: SECRET
       # User-JWT HMAC (openssl rand -hex 32).

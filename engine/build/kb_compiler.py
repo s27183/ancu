@@ -834,6 +834,33 @@ def compute_affected_components(affected_kb_slugs, blueprints):
     return out
 
 
+# Regulated figures are grounded -> P-7 · One declaration per outcome shape -> KB compiler -> refuses an applicant.* use the resolver cannot honour
+# The resolver reads applicant.* per element, flat: a criterion is tested for every applicant
+# and AND-ed, a fill is mapped over them (fh_engine_resolver eval_joint / eval_applicants). It
+# has no path for a nested applicant.<obj>.<leaf> (maps:get on the flat key gives undefined)
+# and no single value to key a lookup by; and fh_engine_eligibility reads `resolution` as
+# per_applicant or, for any other value, joint, so a misspelt marker silently went joint
+# (#6, measured 2026-10-06: no rule uses any of the three today).
+RESOLUTIONS = ("joint", "per_applicant")
+
+
+def applicant_rule_fails(slug, cj, fails):
+    res = cj.get("resolution", "joint")
+    if res not in RESOLUTIONS:
+        fails.append(f"[resolution] {slug}: {res!r} is not one of {list(RESOLUTIONS)}")
+    for fill in cj.get("fills", []):
+        for item in iter_rule_fields(fill.get("rule", {})):
+            tag, tok = item[0], item[1]
+            if tag not in ("field", "keydim") or not tok.startswith("applicant."):
+                continue
+            if "." in tok[len("applicant."):]:
+                fails.append(f"[applicant-nested] {slug}: {tok!r} — the resolver reads "
+                             f"applicant.* fields flat, per element (architecture §11.9)")
+            elif tag == "keydim":
+                fails.append(f"[applicant-keydim] {slug}: {tok!r} keys a lookup, but "
+                             f"applicant.* has one value per applicant (architecture §11.9)")
+
+
 # Regulated figures are grounded -> P-7 · One declaration per outcome shape -> KB compiler -> refuses same-state schemes whose property types overlap or leave a gap
 # Where one state's scheme docs fill the same criteria leaf and split it by
 # property_fit.property_type (QLD: fhc established, fhnhc new, fh-vacant-land land), the
@@ -1051,6 +1078,8 @@ def run(emit=False):
             kb_docs[doc["slug"]] = doc
         if doc["parse_error"]:
             fails.append(f"[content_json] {doc['slug']}: parse error: {doc['parse_error']}")
+        elif doc.get("content_json"):
+            applicant_rule_fails(doc["slug"], doc["content_json"], fails)
     stats["kb_docs"] = len(kb_docs)
     stats["news_docs"] = len(news_docs)
 
@@ -1183,6 +1212,10 @@ def run(emit=False):
         all_in_scope_anchors |= anchors
         stats["registry"][stem] = reg_stats
 
+    # ---- GATE 13: property_type options fit the property_fit outcome enum ---- #
+    for stem in sorted(registries):
+        property_type_gate(stem, registries[stem], fails)
+
     # ---- GATE 2: every blueprint kb_anchor resolves ----------------------- #
     for stem, (_, bcomps, _, _, _) in blueprints.items():
         anchors = set(a for c in bcomps for a in c.anchors)
@@ -1278,6 +1311,32 @@ def run(emit=False):
             )
 
     return fails, warns, info, stats, artifact
+
+
+def property_type_gate(stem, reg, fails):
+    """GATE 13. Each property_type param slot's options are a subset of the blueprint's
+    property_fit* outcome enum for property_type.
+
+    Honest-partial -> P-7 · One declaration per outcome shape -> The KB compiler -> param options outside the outcome enum refused
+    A param that offers a type the outcome cannot hold lets a property in whose fill must
+    then fail on the enum (#32: investor-domestic-au offered dual_occupancy and nrass).
+    The attach gate (fh_engine_h_attach_property:validate_card/2) reads the same compiled
+    enum, so the two cannot drift once this holds (behavior 26). Measured 2026-10-08:
+    tests/validate_build.py fails with [property_type] when an option is planted, passes
+    on the real blueprints."""
+    enums = {}
+    for otype, fields in reg.outcome_fields.items():
+        if otype.startswith("property_fit") and "property_type" in fields:
+            enums[otype] = set(parse_type_string(fields["property_type"])[1] or [])
+    for slot, meta in sorted(reg.param_slots.items()):
+        if not slot.endswith(".property_type") or not isinstance(meta, dict):
+            continue
+        opts = meta.get("options") or []
+        for otype, allowed in sorted(enums.items()):
+            extra = [o for o in opts if o not in allowed]
+            if extra:
+                fails.append(f"[property_type] {stem}/{slot}: options {extra} are not in "
+                             f"{otype}.property_type {sorted(allowed)} — the outcome cannot hold them")
 
 
 def registry_payload(reg):

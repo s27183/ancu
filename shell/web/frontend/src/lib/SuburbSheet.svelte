@@ -15,7 +15,8 @@
         onplan: () => void;
         /** Bumped by the parent when a plan is created → remounts PlanProjection (via
          *  `{#key reloadPlan}`) so the Plan tab shows the new plan without a close/reopen.
-         *  The user is already on the Plan tab here (the create CTA lives there). */
+         *  A bump also switches to the Plan tab: after a sign-in restore (behavior 18) the
+         *  sheet reopens on Zone, not on the Plan tab where the create CTA was. */
         reloadPlan?: number;
     } = $props();
 
@@ -24,6 +25,21 @@
     // no reset-in-$effect needed.
     type Tab = 'zone' | 'plan';
     let tab = $state<Tab>('zone');
+
+    // Why not open the restored sheet on Plan: measured 2026-10-07 (Chrome, dev stack,
+    // twice): opened on Plan over an existing plan, the new plan stayed "Computing…" — its
+    // /events got no headers while the engine had the turn completed, and the shell hung
+    // up ~60 s later; opened on Zone it filled. Concluded cause: the old projection's
+    // stream (nothing to replay) is cancelled by the remount before its first byte, and
+    // that wedges the shell's stream relay. Switching only once the plan exists avoids it.
+    // svelte-ignore state_referenced_locally
+    let seenReload = reloadPlan;
+    $effect(() => {
+        if (reloadPlan !== seenReload) {
+            seenReload = reloadPlan;
+            tab = 'plan';
+        }
+    });
 
     const nf = $derived(new Intl.NumberFormat($lang === 'vi' ? 'vi-VN' : 'en-AU'));
     const f = $derived(suburb.facts);
