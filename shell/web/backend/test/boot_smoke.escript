@@ -6,7 +6,7 @@
 %% cowboy listener answers /health 200, and the migrated schema round-trips a user
 %% insert/select. Run from shell/web/backend with the build libs on the path:
 %%
-%%   SHELL_DATABASE_URL=postgres://shell:shell_dev_pw@localhost:5434/firsthomey_shell?sslmode=disable \
+%%   SHELL_DATABASE_URL=postgres://shell:shell_dev_pw@localhost:5434/ancu_shell?sslmode=disable \
 %%   ERL_LIBS=_build/default/lib escript test/boot_smoke.escript
 
 -mode(compile).

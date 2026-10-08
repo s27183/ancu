@@ -7,7 +7,7 @@
 %% text_delta, the audit trail, and glue persistence + reuse on a second turn. Makes
 %% REAL opus calls — needs CLAUDE_CODE_OAUTH_TOKEN. Run from engine/erlang:
 %%   set -a; source ../../.env; set +a
-%%   ENGINE_DATABASE_URL=postgres://engine:engine_dev_pw@localhost:5433/firsthomey_engine?sslmode=disable \
+%%   ENGINE_DATABASE_URL=postgres://engine:engine_dev_pw@localhost:5433/ancu_engine?sslmode=disable \
 %%   ERL_LIBS=_build/default/lib escript test/qa_smoke.escript
 
 -mode(compile).

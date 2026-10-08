@@ -22,7 +22,7 @@ A Mode-D investor who is granted **Australian permanent residency or citizenship
 - **The state land-tax foreign/absentee surcharge stops accruing** from the point residency status changes (state-specific timing; the *general* land-tax position, aggregated across all AU land held, continues regardless) — [`kb.tax.land-tax-by-state`](../tax/land-tax-by-state.md).
 - **The CGT discount becomes available for the resident period going forward.** [`kb.tax.cgt-50-percent-discount`](../tax/cgt-50-percent-discount.md)'s foreign-resident apportionment means the discount is unavailable *for the portion of the gain accruing while a foreign/temporary resident* — a later disposal, after a sustained period of Australian tax residency, can access the discount for that later span. The pre-grant, foreign-resident-period gain remains undiscounted; this is an apportionment, not a clean switch.
 - **FRCGW no longer applies at a future sale**, once the investor can supply a **clearance certificate** as an Australian resident for tax at the time of that sale — [`kb.non-resident-tax.foreign-resident-cgt-withholding`](../non-resident-tax/foreign-resident-cgt-withholding.md).
-- **The vacancy fee's foreign-owner basis and the entity-structuring restrictions (SMSF residency, FIRB look-through) fall away** — [`kb.firb.vacancy-fee-rules-2026`](../firb/vacancy-fee-rules-2026.md), [`kb.non-resident.entity-options-au-property`](entity-options-au-property.md).
+- **The vacancy fee's foreign-owner basis and the entity-structuring restrictions (SMSF residency, FIRB look-through) fall away** — [`kb.firb.vacancy-fee-rules-2026`](../firb/vacancy-fee-rules-2026.md), [`kb.non-resident.entity-options-au-property`](../non-resident/entity-options-au-property.md).
 
 ## What does not change
 

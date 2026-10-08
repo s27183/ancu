@@ -35,7 +35,7 @@ Erlang dir wipes *that* component's dev DB.
 
 **Prereqs** (one-time, all handled by the scripts except the runtimes themselves):
 `rebar3`, `node`/`npm`, `docker`, `python3` on PATH, and homebrew `postgresql@18`. The shell
-launcher starts the homebrew Postgres if it's down and creates `firsthomey_shell` if missing;
+launcher starts the homebrew Postgres if it's down and creates `ancu_shell` if missing;
 the engine launcher brings up the engine's docker Postgres — you don't run `createdb` or
 `docker compose` by hand.
 
@@ -80,7 +80,7 @@ A fresh engine DB has no suburbs, so the map has nothing to open. Load them with
 repo's own adapters (they fetch from the ABS; the VIC prices are committed):
 
 ```
-export ENGINE_DATABASE_URL="host=$PWD/.git/enacs-pg dbname=firsthomey_engine"
+export ENGINE_DATABASE_URL="host=$PWD/.git/enacs-pg dbname=ancu_engine"
 .venv/bin/python -m engine.build.suburbs.abs_census   # the spine, ~15k suburbs
 .venv/bin/python -m engine.build.suburbs.abs_asgs     # centroids
 .venv/bin/python -m engine.build.suburbs.vic_vpsr     # VIC median prices
@@ -215,7 +215,7 @@ FH_SIDECAR_PYTHON=../../.venv/bin/python      # the venv with the SDK
 
 ```
 cd engine/erlang     && bin/dev reset    # wipes the engine docker DB (down -v)
-cd shell/web/backend && bin/dev reset    # drops firsthomey_shell
+cd shell/web/backend && bin/dev reset    # drops ancu_shell
 ```
 
 The next `bin/dev` in each dir recreates that component's schema on boot.

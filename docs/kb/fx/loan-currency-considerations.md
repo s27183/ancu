@@ -22,7 +22,7 @@ A consequence worth surfacing: because the loan is AUD, the **loan repayments ca
 ## Where FX risk actually sits
 
 1. **On the capital transfer (one-off).** Moving the deposit and buying costs from VND to AUD incurs an FX spread — the cost owned by [`kb.fx.typical-spreads-vnd-aud`](typical-spreads-vnd-aud.md) and optimised by the `cross_border_funding` plan. This is the largest single FX cost and it is a *transfer* cost, not a *loan* cost.
-2. **On ongoing servicing, only if income is foreign (recurring).** A borrower who **services an AUD loan from VND income** carries genuine ongoing FX risk: the income is earned in VND, the repayment is due in AUD, and the exchange rate moves between them. Lenders price this risk in advance through **foreign-income shading** ([`kb.lender.temp-resident-lending-policies`](temp-resident-lending-policies.md)) — which is *why* foreign income is shaded. A **485/AU-income** borrower earning AUD locally has **no** servicing FX risk, which is part of why that path is favourable ([`kb.lender.485-visa-treatment`](485-visa-treatment.md)).
+2. **On ongoing servicing, only if income is foreign (recurring).** A borrower who **services an AUD loan from VND income** carries genuine ongoing FX risk: the income is earned in VND, the repayment is due in AUD, and the exchange rate moves between them. Lenders price this risk in advance through **foreign-income shading** ([`kb.lender.temp-resident-lending-policies`](../lender/temp-resident-lending-policies.md)) — which is *why* foreign income is shaded. A **485/AU-income** borrower earning AUD locally has **no** servicing FX risk, which is part of why that path is favourable ([`kb.lender.485-visa-treatment`](../lender/485-visa-treatment.md)).
 
 So the plan's FX story is: **loan = AUD (no choice, no loan-side FX)**; **transfer = the one-off spread (owned by the FX-spread doc)**; **servicing = ongoing FX risk only for a foreign-income borrower, already priced via shading.**
 
@@ -51,7 +51,7 @@ Pure-reference (`fills: []`). The `mortgage_finance` resolver holds `loan_struct
 
 Notes:
 
-- **Single-owner.** This doc owns the *loan-currency boundary* (loan is AUD; where FX risk falls). The FX **spread** → [`kb.fx.typical-spreads-vnd-aud`](typical-spreads-vnd-aud.md); the **foreign-income shading** that prices servicing risk → [`kb.lender.temp-resident-lending-policies`](temp-resident-lending-policies.md); the **transfer plan** → the `cross_border_funding` component.
+- **Single-owner.** This doc owns the *loan-currency boundary* (loan is AUD; where FX risk falls). The FX **spread** → [`kb.fx.typical-spreads-vnd-aud`](typical-spreads-vnd-aud.md); the **foreign-income shading** that prices servicing risk → [`kb.lender.temp-resident-lending-policies`](../lender/temp-resident-lending-policies.md); the **transfer plan** → the `cross_border_funding` component.
 - **No figures.** Deliberately quotes no spread or rate — it settles the *structure* (AUD loan, three places FX can sit), which is a stable convention.
 - **Feeds the path decision.** The servicing-currency distinction is an input to `recommended_path` alongside the deposit and shading deltas.
 

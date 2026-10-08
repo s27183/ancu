@@ -8,11 +8,17 @@
 import { derived } from 'svelte/store';
 import { lang } from '$lib/stores/lang';
 
+// Bilingual -> P-7 · One declaration per outcome shape -> The web frontend -> the product name, set once
+// The product's name is temporary (invariants.md, Son 2026-10-06). It is declared here once; brand.name
+// and every chrome string that names the product interpolate it, as does the tab title
+// (+layout.svelte), so a rename is this one line (behavior 17). Same in VI and EN: a name.
+const BRAND = 'Rau';
+
 const messages = {
-    'brand.name': { vi: 'Rau', en: 'Rau' },
+    'brand.name': { vi: BRAND, en: BRAND },
     'brand.tagline': {
-        vi: 'Kế hoạch mua nhà đầu tiên tại Úc',
-        en: 'Your first-home plan in Australia'
+        vi: 'Kế hoạch ngân sách bất động sản tại Úc — mua, giữ, bán',
+        en: 'Your Australian property budget plan — buy, hold, sell'
     },
     'lang.label': { vi: 'Ngôn ngữ', en: 'Language' },
 
@@ -82,8 +88,8 @@ const messages = {
         en: 'Is this your first home?'
     },
     'onboarding.outofscope.foreign': {
-        vi: 'Để mua nhà để ở, Rau hiện hỗ trợ người mua nước ngoài mua căn nhà ĐẦU TIÊN. Kế hoạch cho người nước ngoài đã từng sở hữu nhà sẽ sớm có. (Nhà đầu tư nước ngoài đã được hỗ trợ — hãy chọn "Để đầu tư".)',
-        en: 'For buying a home to live in, Rau currently supports foreign-person FIRST-HOME buyers only. Plans for foreign next-home buyers are coming soon. (Foreign investors are already supported — choose "As an investment".)'
+        vi: `Để mua nhà để ở, ${BRAND} hiện hỗ trợ người mua nước ngoài mua căn nhà ĐẦU TIÊN. Kế hoạch cho người nước ngoài đã từng sở hữu nhà sẽ sớm có. (Nhà đầu tư nước ngoài đã được hỗ trợ — hãy chọn "Để đầu tư".)`,
+        en: `For buying a home to live in, ${BRAND} currently supports foreign-person FIRST-HOME buyers only. Plans for foreign next-home buyers are coming soon. (Foreign investors are already supported — choose "As an investment".)`
     },
     'onboarding.gate.firsthome.foreign': {
         vi: 'Người mua ở Việt Nam hoặc giữ visa tạm trú thường mua nhà đầu tiên tại Úc — hỏi để xác nhận.',
@@ -146,6 +152,15 @@ const messages = {
     'plan.failed': {
         vi: 'Kế hoạch chưa tính xong. Vui lòng thử lại.',
         en: 'Your plan didn’t finish computing. Please try again.'
+    },
+    // A turn the compliance gate blocked (behavior 20, turnFailure.ts): calm, no retry.
+    'turn.blocked': {
+        vi: 'Phần này không thể hiển thị vì vượt quá giới hạn thông tin hỗ trợ quyết định.',
+        en: 'This part can’t be shown — it would go beyond decision-support information.'
+    },
+    'turn.blocked.asic_advice': {
+        vi: 'Câu trả lời này sẽ trở thành tư vấn tài chính cá nhân, nên chúng tôi không hiển thị. Hãy hỏi về dữ kiện hoặc các lựa chọn thay vì việc bạn nên làm gì.',
+        en: 'That answer would have been personal financial advice, so it isn’t shown. Try asking about the facts or the options rather than what you should do.'
     },
     'plan.running': {
         vi: 'Đang lập kế hoạch cơ bản cho bạn…',
@@ -407,7 +422,7 @@ const messages = {
     },
     'plan.basis.ineligible': { vi: 'Chưa đủ điều kiện', en: 'Not yet eligible' },
 
-    'plan.f.path': { vi: 'Hướng vay đề xuất', en: 'Recommended path' },
+    'plan.f.path': { vi: 'Hướng vay phù hợp với số liệu của bạn', en: 'Path that fits your inputs' },
     'plan.f.lenders': { vi: 'Ngân hàng phù hợp', en: 'Lender shortlist' },
     'plan.f.preapproval': { vi: 'Chuẩn bị duyệt sơ bộ', en: 'Pre-approval steps' },
     'plan.f.assumptions': { vi: 'Giả định', en: 'Assumptions' },
@@ -415,7 +430,9 @@ const messages = {
     'plan.path.lmi_5_to_20': { vi: 'Vay kèm bảo hiểm LMI (cọc 5–20%)', en: 'LMI (5–20% deposit)' },
     'plan.path.twenty_plus': { vi: 'Cọc từ 20% trở lên', en: '20%+ deposit' },
     'plan.path.user_specific_alternative': { vi: 'Phương án riêng', en: 'Tailored option' },
-    'plan.path.recommended': { vi: 'đề xuất', en: 'recommended' },
+    // Behavior 27: the first-ranked path is labelled by fit, not as advice (invariants.md: no
+    // financial advice service, Son 2026-10-08).
+    'plan.path.recommended': { vi: 'phù hợp với số liệu của bạn', en: 'fits your inputs' },
 
     // mortgage_finance (mortgage_plan) → data-table detail, beyond summary-card's hero
     // (fh_engine_mortgage.erl's four fill_* shapes — a field group per mode axis).
@@ -602,8 +619,8 @@ const messages = {
     // Budget cockpit (the prototype's input form, engine-driven).
     'plan.cockpit.title': { vi: 'Ngân sách — bạn đã sẵn sàng?', en: 'Budget — am I ready?' },
     'plan.cockpit.intro': {
-        vi: 'Đổi giá hoặc tiểu bang để tính lại toàn bộ kế hoạch; nhập tiền mặt bạn có để xem còn thiếu bao nhiêu. Phí trước bạ do hệ thống tính chính xác, không phải ước lượng.',
-        en: 'Change the price or state to recompute the whole plan; enter your cash on hand to see the gap. Stamp duty is computed exactly, not estimated.'
+        vi: 'Đổi giá hoặc tiểu bang để tính lại toàn bộ kế hoạch; nhập tiền mặt bạn có để xem còn thiếu bao nhiêu. Phí trước bạ được tính theo biểu phí tiểu bang công bố, không phải ước lượng.',
+        en: 'Change the price or state to recompute the whole plan; enter your cash on hand to see the gap. Stamp duty is calculated from the state’s published rates, not estimated.'
     },
     'plan.cockpit.ptype': { vi: 'Loại bất động sản', en: 'Property type' },
     'plan.cockpit.ptype.locked': {
@@ -652,10 +669,14 @@ const messages = {
         en: 'The timing becomes clearer once you add your loan and savings.'
     },
     // Overview → "What this is" intro (the prototype's lead card).
+    // Behavior 27: one body for every blueprint — the goal's "budget plan for the whole
+    // property lifecycle (buy, hold, sell)" (invariants.md, Son 2026-10-08) — naming only the
+    // tabs every blueprint's ui_tabs share (budget, overview, flow, qa; measured 2026-10-08 in
+    // priv/kb/artifact.json). Portfolio / Family are per-mode and left unnamed.
     'plan.ov.what.title': { vi: 'Đây là gì', en: 'What this is' },
     'plan.ov.what.body': {
-        vi: 'Đây là kế hoạch mua căn nhà đầu tiên được cá nhân hoá cho bạn. Hãy đi qua các thẻ: Tổng quan để xem bức tranh lớn, Tính tiền mặt để nhập số liệu của bạn, Hành trình để xem ai làm gì khi nào, Trước/Sau khi mua cho các bước cụ thể, và Hỏi đáp để hỏi thêm.',
-        en: 'This is your personalised plan for buying your first home. Walk the tabs: Overview for the big picture, Cash calculator to plug in your own numbers, Journey for who does what when, Before/After you buy for the concrete steps, and Q&A to ask anything.'
+        vi: 'Đây là kế hoạch ngân sách cho việc mua, giữ và bán bất động sản, lập từ thông tin của chính bạn. Hãy đi qua các thẻ: Ngân sách để xem chi phí và số tiền còn thiếu, Tổng quan để xem bức tranh lớn, Hành trình để xem từng giai đoạn và ai làm gì khi nào, và Hỏi đáp để hỏi thêm về kế hoạch.',
+        en: 'This is your budget plan for buying, holding and selling a property, built from your own situation. Walk the tabs: Budget for your costs and cash gap, Overview for the big picture, Flow for each phase and who does what when, and Q&A to ask about your plan.'
     },
     // Structural what-if (W9) — vary target price / state → engine preview, no save.
     'plan.whatif.title': { vi: 'Thử kịch bản khác', en: 'Try a different scenario' },
@@ -771,6 +792,9 @@ const messages = {
     'plan.tx.geared_negative': { vi: 'Âm dòng tiền (negatively geared)', en: 'Negatively geared' },
     'plan.tx.marginal_rate': { vi: 'Thuế suất biên', en: 'Marginal tax rate' },
     'plan.tx.after_tax_cf': { vi: 'Dòng tiền sau thuế (năm 1)', en: 'After-tax cash flow (yr 1)' },
+    'plan.tx.setup_costs': { vi: 'Chi phí thành lập pháp nhân', en: 'Entity setup' },
+    'plan.tx.setup_from': { vi: 'từ {amount}', en: 'from {amount}' },
+    'plan.tx.indicative': { vi: '(ước tính tham khảo)', en: '(indicative)' },
     'plan.tx.entity_pending': { vi: 'Xác nhận với chuyên viên thuế có đăng ký', en: 'To confirm with a registered tax agent' },
     // tax_structure_non_resident (Mode D — same tax_optimised_structure type, different fields).
     'plan.tx.geared_not_available': { vi: 'Không đủ điều kiện gearing', en: 'Not gearing-eligible' },
@@ -917,16 +941,27 @@ const messages = {
         vi: 'Chưa trả lời được câu hỏi này. Vui lòng thử lại.',
         en: 'Couldn’t answer that just now. Please try again.'
     },
+    // Behavior 20: the standing disclaimers on the plan projection and onboarding. Their
+    // terms follow invariants.md (information as is, for budget planning; no legal, tax or
+    // financial advice service — Son 2026-10-08).
+    'disclaimer.asic': {
+        vi: 'Thông tin để lập ngân sách mua, giữ và bán bất động sản, cung cấp nguyên trạng — không phải dịch vụ tư vấn pháp lý, thuế hay tài chính. Mỗi số liệu quy định đều ghi nguồn; hãy kiểm tra với chuyên gia có giấy phép trước khi hành động.',
+        en: 'Information for budgeting your property purchase, hold and sale, provided as is — not a legal, tax or financial advice service. Each regulated figure cites its source; check with a licensed professional before you act.'
+    },
+    'disclaimer.firb': {
+        vi: 'Các quy định FIRB ở đây là thông tin chung từ nguồn được trích dẫn, cung cấp nguyên trạng — không phải tư vấn pháp lý. Quy định áp dụng cho bạn tùy vào tình trạng cư trú và loại bất động sản; hãy xác nhận với FIRB hoặc luật sư trước khi ký hợp đồng.',
+        en: 'The FIRB rules here are general information from cited sources, provided as is — not legal advice. What applies to you depends on your residency and the type of property; confirm with FIRB or a lawyer before you sign a contract.'
+    },
     'chat.disclaimer': {
-        vi: 'Thông tin hỗ trợ quyết định — không phải tư vấn tài chính hay pháp lý.',
-        en: 'Decision-support information — not financial or legal advice.'
+        vi: 'Câu trả lời là thông tin để lập ngân sách, cung cấp nguyên trạng — không phải dịch vụ tư vấn pháp lý, thuế hay tài chính.',
+        en: 'Answers are information for budget planning, provided as is — not a legal, tax or financial advice service.'
     },
 
     'auth.signin': { vi: 'Đăng nhập', en: 'Sign in' },
     'auth.signout': { vi: 'Đăng xuất', en: 'Sign out' },
     'account.title': { vi: 'Tài khoản', en: 'Account' },
     'account.menu': { vi: 'Menu tài khoản', en: 'Account menu' },
-    'auth.title': { vi: 'Đăng nhập vào Rau', en: 'Sign in to Rau' },
+    'auth.title': { vi: `Đăng nhập vào ${BRAND}`, en: `Sign in to ${BRAND}` },
     'auth.email.label': { vi: 'Email', en: 'Email' },
     'auth.email.placeholder': { vi: 'ban@example.com', en: 'you@example.com' },
     'auth.email.invalid': {

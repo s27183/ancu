@@ -186,7 +186,7 @@ reads. Offline means no Postgres, no planner, no `.env`: a conformance escript m
 open loopback ports for its own stubs, as the shell's `sse_cancel_conformance` does
 (behavior 29; the sweep took 13 s with it, measured 2026-10-08).
 
-    checks: `.venv/bin/python tests/validate_build.py`; `.venv/bin/python tests/resolver_eval.py`; `.venv/bin/python tests/eligibility_benefit_eval.py`; `.venv/bin/python tests/cash_duty_eval.py`; `.venv/bin/python tests/mortgage_eval.py`; `.venv/bin/python tests/ownership_eval.py`; `.venv/bin/python tests/bilingual_eval.py`; `.venv/bin/python tests/outcome_validate.py`; `.venv/bin/python tests/shell_contract_check.py`; `(cd engine/erlang && rebar3 compile)`; `(cd shell/web/backend && rebar3 compile)`; `(cd shell/web/frontend && npm run check)`; `bash scripts/conformance_sweep.sh`
+    checks: `.venv/bin/python tests/validate_build.py`; `.venv/bin/python tests/resolver_eval.py`; `.venv/bin/python tests/eligibility_benefit_eval.py`; `.venv/bin/python tests/cash_duty_eval.py`; `.venv/bin/python tests/mortgage_eval.py`; `.venv/bin/python tests/ownership_eval.py`; `.venv/bin/python tests/bilingual_eval.py`; `.venv/bin/python tests/outcome_validate.py`; `.venv/bin/python tests/shell_contract_check.py`; `.venv/bin/python scripts/doc_links.py docs`; `(cd engine/erlang && rebar3 compile)`; `(cd shell/web/backend && rebar3 compile)`; `(cd shell/web/frontend && npm run check)`; `bash scripts/conformance_sweep.sh`
     attribution: co-author+session
     behaviors: none yet
 

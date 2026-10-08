@@ -123,7 +123,13 @@ already crashed.
     `reframed_as_information` — the gate **flags**, it does not silently rewrite the LLM's
     prose (rewriting model prose would itself be an un-audited content change).
 - **Component scoping:** ASIC's substance is the components whose outcomes carry advice-adjacent
-  content — `mortgage_finance` (lender fit), `eligibility` (scheme applicability). A pure
+  content, listed in `fh_engine_compliance:advice_adjacent/1`: `mortgage_finance` (lender
+  fit), `eligibility` (scheme applicability), `firb_workflow` (FIRB eligibility and fee
+  framing), `property_assessment` (investment-viability verdict), `buying_strategy` (bid
+  plan), `due_diligence` (risk surfacing), and `tax_structure`, `tax_structure_non_resident`,
+  `investment_strategy` (agent-authored entity and strategy leaves; #27, 2026-10-06). Each
+  records `decision_support_boundary_held`; every other component records
+  `no_advice_surface`. A pure
   arithmetic outcome (`cash_position` duty) has no advice surface → `clear` by construction,
   still audited.
 

@@ -9,7 +9,7 @@
 %% cursor. The consumer is auto-started under fh_shell_sup; the poll interval is set
 %% huge so only the synchronous poll_now/0 drives it (no timer interference).
 %%
-%%   SHELL_DATABASE_URL=postgres://shell:shell_dev_pw@localhost:5434/firsthomey_shell?sslmode=disable \
+%%   SHELL_DATABASE_URL=postgres://shell:shell_dev_pw@localhost:5434/ancu_shell?sslmode=disable \
 %%   ERL_LIBS=_build/default/lib escript test/usage_consumer_smoke.escript
 
 -mode(compile).

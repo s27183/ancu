@@ -342,9 +342,9 @@ addon_amount_cents(_)                -> undefined.
 
 %% The product name shown on the Stripe-hosted checkout page (bilingual-friendly UTF-8 —
 %% compose_query encodes it utf8, not via a byte-fragile formatter).
-addon_label(<<"doc_review">>) -> <<"Rau — Contract & Section 32 review"/utf8>>;
-addon_label(<<"timnha">>)     -> <<"Rau — Tìm Nhà property search"/utf8>>;
-addon_label(_)                -> <<"Rau add-on">>.
+addon_label(<<"doc_review">>) -> <<(fh_shell_util:brand())/binary, " — Contract & Section 32 review"/utf8>>;
+addon_label(<<"timnha">>)     -> <<(fh_shell_util:brand())/binary, " — Tìm Nhà property search"/utf8>>;
+addon_label(_)                -> <<(fh_shell_util:brand())/binary, " add-on">>.
 
 %% AUD, lowercase ISO per Stripe's unit_amount currency convention.
 addon_currency() -> <<"aud">>.

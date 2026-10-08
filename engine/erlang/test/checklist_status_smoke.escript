@@ -12,7 +12,7 @@
 %% SIDECAR-FREE: the card is seeded directly in PG (no create turn → no Python).
 %%
 %% Run from engine/erlang with Docker PG up (engine/compose.yaml, :5433):
-%%   ENGINE_DATABASE_URL=postgres://engine:engine_dev_pw@localhost:5433/firsthomey_engine?sslmode=disable \
+%%   ENGINE_DATABASE_URL=postgres://engine:engine_dev_pw@localhost:5433/ancu_engine?sslmode=disable \
 %%   ENGINE_DEV_PROVISION=0 ERL_LIBS=_build/default/lib escript test/checklist_status_smoke.escript
 
 -mode(compile).

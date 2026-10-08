@@ -17,7 +17,7 @@
 %%   an unauthenticated POST -> 401; a missing STRIPE_SECRET_KEY -> 503 (config gap).
 %%   create_addon_checkout/3 directly reports the config errors.
 %%
-%%   SHELL_DATABASE_URL=postgres://shell:shell_dev_pw@localhost:5434/firsthomey_shell?sslmode=disable \
+%%   SHELL_DATABASE_URL=postgres://shell:shell_dev_pw@localhost:5434/ancu_shell?sslmode=disable \
 %%   ERL_LIBS=_build/default/lib escript test/billing_charge_smoke.escript
 
 -mode(compile).

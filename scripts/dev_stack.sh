@@ -4,7 +4,7 @@
 #
 #   bash scripts/dev_stack.sh        (Ctrl-C, or killing it, stops all three)
 #
-# Reproducible -> P-2 · The database is the single source of truth -> the dev stack -> one script, loopback, private socket
+# Reproducible -> P-2 · The database is the single source of truth -> Mechanisms -> one script, loopback, private socket
 # The per-component bin/dev launchers need docker (engine) and Son's shared :5432 (shell);
 # a seat has neither, and runs this instead (behavior 24, 2026-10-07). It runs outside the
 # sandbox as a granted Need because the root .env (the planner's token, sign-in settings)
@@ -22,11 +22,11 @@ mkdir -p "$logs"
 
 export FH_HTTP_IP=127.0.0.1
 export FH_ENGINE_HTTP_PORT=8080 FH_SHELL_HTTP_PORT=8081
-export ENGINE_DATABASE_URL="postgres://$user@$enc/firsthomey_engine"
-export SHELL_DATABASE_URL="postgres://$user@$enc/firsthomey_shell"
+export ENGINE_DATABASE_URL="postgres://$user@$enc/ancu_engine"
+export SHELL_DATABASE_URL="postgres://$user@$enc/ancu_shell"
 export ENGINE_BASE_URL="http://127.0.0.1:8080/api/engine"   # the shell appends /dev/tenants, /plan-cards…
 
-for db in firsthomey_engine firsthomey_shell; do
+for db in ancu_engine ancu_shell; do
     createdb -h "$sock" "$db" 2>/dev/null || true   # exists → no-op
 done
 

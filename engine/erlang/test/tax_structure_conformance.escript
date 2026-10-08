@@ -103,9 +103,10 @@ scaffold_cases() ->
            g(OEmpty, <<"cost_base_depreciation_clawback">>), true),
      check("recommended_entity null pre-merge (agent slot)",
            g(O, <<"recommended_entity">>), null),
-     check("kb_versions = the six tax anchors",
+     check("kb_versions = the six tax anchors + entity-setup-costs",
            lists:sort(KbSlugs),
-           lists:sort([<<"kb.tax.entity-comparison-personal-trust-company-smsf">>,
+           lists:sort([<<"kb.tax.entity-setup-costs">>,
+                       <<"kb.tax.entity-comparison-personal-trust-company-smsf">>,
                        <<"kb.tax.negative-gearing-mechanics">>,
                        <<"kb.tax.depreciation-division-43-and-40">>,
                        <<"kb.tax.cgt-50-percent-discount">>,
@@ -146,14 +147,29 @@ two_path_cases() ->
            g(Merged, <<"recommended_entity">>), <<"discretionary_trust">>),
      check("merge leaves cgt_discount_eligible untouched (§98 — agent can't flip a determinant)",
            g(Merged, <<"cgt_discount_eligible">>), true),
-     check("merge leaves setup_costs null (§98 — agent can't author a figure)",
-           g(Merged, <<"setup_costs">>), null),
+     check("merge places setup_costs from the KB band, not the agent's 9999 (§98, #12)",
+           g(Merged, <<"setup_costs">>), [1500, 4000]),
+     check("personal ownership's setup band is [0, 0]",
+           setup_for(O, <<"personal_sole">>), [0, 0]),
+     check("a company's band is an open-ended floor (from the ASIC fee)",
+           setup_for(O, <<"company">>), [636, null]),
+     check("no entity yet → setup_costs null (pending)",
+           setup_for(O, null), null),
+     check("an entity the KB does not list → null, never a guess",
+           setup_for(O, <<"not_an_entity">>), null),
+     check("Layer-1 conforms with an open-ended band",
+           validate(fh_engine_fill:merge_agent(<<"tax_structure">>, O,
+                      #{<<"recommended_entity">> => <<"company">>})), ok),
      check("merge leaves cost_base_depreciation_clawback untouched",
            g(Merged, <<"cost_base_depreciation_clawback">>), true),
      check("merge does not add stray keys (field set unchanged)",
            lists:sort(maps:keys(Merged)), lists:sort(fields())),
      check("agent_values_from_outcome round-trips the entity",
            maps:get(<<"recommended_entity">>, AV), <<"discretionary_trust">>)].
+
+setup_for(O, Entity) ->
+    g(fh_engine_fill:merge_agent(<<"tax_structure">>, O,
+                                 #{<<"recommended_entity">> => Entity}), <<"setup_costs">>).
 
 %% --- 5. per-property figures (Slice B2 — class (a) rent/income-dependent) ----
 %% Drives the REAL yield_modelling producer (no fabricated cash-flow band — the producer→consumer

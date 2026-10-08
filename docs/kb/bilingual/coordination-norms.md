@@ -12,7 +12,7 @@ This doc owns the **communication-coordination pattern set** for a cross-border 
 
 **Owns:** the *communication* coordination layer — who is invited to the shared plan, in which language each party reads it, and the norm that the plan surface is co-equally bilingual so a Vietnam-side participant is a first-class reader, not a translated afterthought.
 
-**Does NOT own** the *settlement sequencing* layer — the two-country critical-path order and the 14-day buffer (VN outbound → transfer → AU ECDD → funds-in-trust) is single-owned by [`kb.cross-border-settlement.coordination-best-practices`](../cross-border-settlement/coordination-best-practices.md). That doc orders the *money/legal milestones*; this doc orders the *conversation*. A required decision or sign-off has a **timing** input (owned by [`kb.cross-border.decision-authority-cultural`](decision-authority-cultural.md)) and a **channel** input (owned here).
+**Does NOT own** the *settlement sequencing* layer — the two-country critical-path order and the 14-day buffer (VN outbound → transfer → AU ECDD → funds-in-trust) is single-owned by [`kb.cross-border-settlement.coordination-best-practices`](../cross-border-settlement/coordination-best-practices.md). That doc orders the *money/legal milestones*; this doc orders the *conversation*. A required decision or sign-off has a **timing** input (owned by [`kb.cross-border.decision-authority-cultural`](../cross-border/decision-authority-cultural.md)) and a **channel** input (owned here).
 
 ## The coordination patterns (→ the `coordination.*` parameters)
 
@@ -55,7 +55,7 @@ Pure-reference (`fills: []`). `family_context` reasons over these norms to set `
 
 Notes:
 
-- **No `fills`; a coordination-norm doc.** It owns the *communication* layer; settlement sequencing → [`kb.cross-border-settlement.coordination-best-practices`](../cross-border-settlement/coordination-best-practices.md); decision authority/timing → [`kb.cross-border.decision-authority-cultural`](decision-authority-cultural.md); source-of-funds substance → [`kb.au-aml-ctf.source-of-funds-documentation`](../au-aml-ctf/source-of-funds-documentation.md).
+- **No `fills`; a coordination-norm doc.** It owns the *communication* layer; settlement sequencing → [`kb.cross-border-settlement.coordination-best-practices`](../cross-border-settlement/coordination-best-practices.md); decision authority/timing → [`kb.cross-border.decision-authority-cultural`](../cross-border/decision-authority-cultural.md); source-of-funds substance → [`kb.au-aml-ctf.source-of-funds-documentation`](../au-aml-ctf/source-of-funds-documentation.md).
 - **Bilingual is load-bearing, not cosmetic.** Co-equal {vi,en} is what makes the cross-border family a single, timely decision unit — the norm carries the consultation and the documentation, not just the display.
 - **Carries no copy.** Coordination norms only; the bilingual copy itself is produced by the `kb.copy.*` templates + engine, as for every KB doc.
 
@@ -64,5 +64,5 @@ Notes:
 Behavioural / reference doc — no regulator publishes bilingual coordination norms. The related regulated/sequencing substance is sourced in its single owners:
 
 - [`kb.cross-border-settlement.coordination-best-practices`](../cross-border-settlement/coordination-best-practices.md) — the two-country settlement critical path + buffer.
-- [`kb.cross-border.decision-authority-cultural`](decision-authority-cultural.md) — decision authority / consultation timing.
+- [`kb.cross-border.decision-authority-cultural`](../cross-border/decision-authority-cultural.md) — decision authority / consultation timing.
 - [`kb.au-aml-ctf.source-of-funds-documentation`](../au-aml-ctf/source-of-funds-documentation.md) — source-of-funds evidence (kept legible in one shared place).

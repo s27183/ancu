@@ -74,7 +74,7 @@ routes() ->
         {"/api/billing/usage", fh_shell_h_billing, [usage]}
     ]}].
 
-%% Reproducible -> P-2 · The database is the single source of truth -> the dev stack -> a loopback-only listener
+%% Reproducible -> P-2 · The database is the single source of truth -> The shell backend -> a loopback-only listener
 %% FH_HTTP_IP (e.g. 127.0.0.1) binds the listener to that address; unset, ranch binds every
 %% interface as before, so prod is unchanged. scripts/dev_stack.sh sets it: the seat's dev
 %% stack runs outside the sandbox and must not serve the LAN (behavior 24, 2026-10-07).

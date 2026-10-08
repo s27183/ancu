@@ -13,7 +13,7 @@
 %%
 %% Run from shell/web/backend with the shell's dev Postgres up:
 %%
-%%   SHELL_DATABASE_URL=postgres://shell:shell_dev_pw@localhost:5434/firsthomey_shell?sslmode=disable \
+%%   SHELL_DATABASE_URL=postgres://shell:shell_dev_pw@localhost:5434/ancu_shell?sslmode=disable \
 %%   ERL_LIBS=_build/default/lib escript test/plancard_proxy_smoke.escript
 
 -mode(compile).

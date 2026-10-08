@@ -82,7 +82,7 @@ Notes:
 - **`ever_owned_au_property` only** — Australia-only test, so `prior_overseas_property_ownership` is deliberately not consulted.
 - **`fhog.applicable` carries `derived_from: property_fit.property_type`** in the blueprint — the new-homes-only restriction is the substance of that derivation, encoded here as the `property_type in [...new...]` criterion.
 - **The regional $20,000 grant is closed** (`regional_grant_closed: 2025-06-30`); only the $10,000 statewide grant applies now. Recorded as a parameter so the resolver/agent does not surface the lapsed higher regional figure.
-- **Spouse OWNERSHIP history IS now encoded** (`non_buying_partner.ever_owned_au_property`, F4/G2) — `non_buying_partner` is now a typed namespace on the resolver-input registry ([`registry-projection.md`](../../architecture/registry-projection.md)), so the "promote to facts when load-bearing" threshold is met (a buyer with no partner, `non_buying_partner.exists = false`, passes). **Prior-FHOG-receipt** (buyer or spouse) is still **not** encoded (no backing fact); rare for a fresh Mode A FHB, documented rather than dangled.
+- **Spouse OWNERSHIP history IS now encoded** (`non_buying_partner.ever_owned_au_property`, F4/G2) — `non_buying_partner` is now a typed namespace on the resolver-input registry ([`registry-projection.md`](../../../architecture/registry-projection.md)), so the "promote to facts when load-bearing" threshold is met (a buyer with no partner, `non_buying_partner.exists = false`, passes). **Prior-FHOG-receipt** (buyer or spouse) is still **not** encoded (no backing fact); rare for a fresh Mode A FHB, documented rather than dangled.
 
 ## Sources
 

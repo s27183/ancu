@@ -25,7 +25,7 @@ docker compose -f compose.yaml up -d
 rebar3 compile
 
 # 3. boot smoke — boots the app, applies 001, hits /health, round-trips a user
-SHELL_DATABASE_URL='postgres://shell:shell_dev_pw@localhost:5434/firsthomey_shell?sslmode=disable' \
+SHELL_DATABASE_URL='postgres://shell:shell_dev_pw@localhost:5434/ancu_shell?sslmode=disable' \
   ERL_LIBS=_build/default/lib escript test/boot_smoke.escript
 ```
 
@@ -35,7 +35,7 @@ Proves the shell's tenant-JWT mint path verifies against the **real engine**. Ne
 the engine's dev Postgres (5433) up and BOTH build libs on the path:
 
 ```sh
-ENGINE_DATABASE_URL='postgres://engine:engine_dev_pw@localhost:5433/firsthomey_engine?sslmode=disable' \
+ENGINE_DATABASE_URL='postgres://engine:engine_dev_pw@localhost:5433/ancu_engine?sslmode=disable' \
   ERL_LIBS=_build/default/lib:../../../engine/erlang/_build/default/lib \
   escript test/seam_roundtrip.escript
 ```

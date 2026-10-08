@@ -1,14 +1,14 @@
 ---
 slug: kb.copy.disposition
 effective_from: 2026-06-22
-last_verified: 2026-07-10
+last_verified: 2026-10-07
 ---
 
 # Disposition component copy (bilingual)
 
 User-facing copy-templates for the `disposition` resolver (`fh_engine_disposition`): the
 dispose-phase `dispose_cash_events` labels (sale proceeds, selling costs, loan payout, CGT)
-and the `key_assumptions` lines (the hold horizon, the **placeholder** capital-growth band,
+and the `key_assumptions` lines (the hold horizon, the capital-growth band,
 the CGT basis — owner-occupier exemption *or* the Mode-C/D investor computed/to_verify lines plus
 the 2026-27 reform flag — the selling-cost basis, the representative loan-rate basis, and
 (Mode D only) the FRCGW prepayment note `assumption_frcgw`). `vn_side_cgt_note` is Mode-D's
@@ -61,6 +61,10 @@ basis — decision-support, never a forecast or advice.
       "vi": "Mức tăng giá {low}–{high}%/năm là GIẢ ĐỊNH TẠM, chưa lấy từ nguồn chính thức — chỉ để tham khảo, không phải dự báo.",
       "en": "The {low}–{high}% per-year capital-growth band is a PLACEHOLDER, not yet drawn from an authoritative series — a planning aid, not a forecast."
     },
+    "assumption_growth_sourced": {
+      "vi": "Mức tăng giá {low}–{high}%/năm dựa trên số liệu Tổng giá trị nhà ở (Total Value of Dwellings) của Cục Thống kê Úc (ABS): mức tăng giá trung vị trong 20 năm tại các thành phố thủ phủ. Đây là số liệu quá khứ, không phải dự báo — chỉ để tham khảo khi lập kế hoạch.",
+      "en": "The {low}–{high}% per-year capital-growth band is based on ABS Total Value of Dwellings: 20-year median price growth across the capital cities. It is historical, not a forecast — a planning aid."
+    },
     "assumption_cgt_exempt": {
       "vi": "Nhà ở chính mà bạn sinh sống thường được miễn thuế lãi vốn — hãy xác nhận với chuyên viên thuế.",
       "en": "A main residence you live in is generally exempt from capital gains tax — confirm with a registered tax agent."
@@ -106,6 +110,10 @@ Notes:
 - **No `fills`.** No outcome leaf is set by a KB rule. The dispose figures are resolver-computed
   from `kb.property.capital-growth-bands` + `kb.selling-costs.agent-legal` + the upstream figures;
   this doc supplies only labels and assumption prose.
-- **The growth-band caveat is load-bearing.** `assumption_growth_placeholder` carries the
-  PLACEHOLDER warning into the user-facing plan — the band must be re-grounded against a named
-  series before any figure is surfaced as more than a banded planning aid (Son, 2026-06-21).
+- **The growth line follows the band's `is_placeholder` flag.** The resolver picks
+  `assumption_growth_sourced` when `kb.property.capital-growth-bands` is grounded in a named
+  series (it names that series — ABS Total Value of Dwellings — and says *historical, not a
+  forecast*), and `assumption_growth_placeholder` (the PLACEHOLDER warning) when it is not. The
+  flag, not the engine, decides the label, so a placeholder band can never reach a user labelled
+  as sourced (behavior 12). If the band doc's series ever changes, this sourced line changes with
+  it.

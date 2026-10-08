@@ -7,6 +7,14 @@
 -export([json_encode/1, json_decode/1]).
 -export([uuid4/0, is_uuid/1]).
 -export([b64url_encode/1, b64url_decode/1]).
+-export([brand/0]).
+
+%% Bilingual -> P-7 · One declaration per outcome shape -> The shell backend -> the product name, set once
+%% The product's name is temporary (invariants.md, Son 2026-10-06). The sign-in email
+%% (subject, bodies, sender) and the Stripe line items read it from here, so a rename is
+%% this one clause (behavior 17). The same in VI and EN: it is a name.
+-spec brand() -> binary().
+brand() -> <<"Rau">>.
 
 -spec json_encode(term()) -> binary().
 json_encode(Term) ->

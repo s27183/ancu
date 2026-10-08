@@ -15,12 +15,12 @@ resolver (Mode-D branch) renders as a `checklist` behind each Flow-view phase sh
 
 **It stores no figures.** An action may carry a `budget_ref` — the `id` of a `cash_event` the
 investor's calculators already computed. `kb.journey.investor-foreign-path`'s preamble declares
-the id vocabulary: acquisition (`deposit`, `stamp_duty`, `firb_fee`, `other_buying_costs`,
+the id vocabulary: acquisition (`deposit`, `stamp_duty`, `foreign_buyer_surcharge`, `firb_fee`, `other_buying_costs`,
 `entity_setup_costs`, `lmi`), hold (`rental_income`, `operating_expenses`, `loan_interest`),
 dispose (`dispose_sale_proceeds`, `dispose_selling_costs`, `dispose_loan_payout`, `dispose_cgt` —
-reused unchanged from `disposition`, same ids as every other mode). **Not every id is live yet**
-— `cash_position`'s Mode-D fill has no per-property branch (a separate, already-flagged
-`cash_position` build, out of scope here), so the acquisition ids resolve to nothing today; the
+reused unchanged from `disposition`, same ids as every other mode). **Not every id is live yet** — `cash_position`'s Mode-D fill emits `deposit`, `firb_fee`,
+`stamp_duty`, `foreign_buyer_surcharge` and `other_buying_costs` at the base turn (#13), but not
+`entity_setup_costs` or `lmi`, and a figure it cannot compute is absent; the
 resolver's honest-partial rule (`fh_engine_phase_playbook:keep_valid/2`) drops any `budget_ref`
 with no matching live `cash_event.id` to `null` rather than fabricate a figure — exactly Mode
 A/C's rule, and exactly why the `dispose` phase's actions below carry no `budget_ref` at all
