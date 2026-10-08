@@ -458,6 +458,15 @@ const messages = {
     'plan.f.refinance': { vi: 'Kế hoạch tái cấp vốn', en: 'Refinance plan (portfolio growth)' },
     'plan.f.usable_equity': { vi: 'Vốn chủ sở hữu khả dụng', en: 'Usable equity' },
     'plan.f.usable_equity_lvr': { vi: 'LVR mục tiêu khi rút vốn', en: 'Target LVR to release equity' },
+    'plan.f.vacancy_fee_at_risk': { vi: 'Phí bỏ trống có thể phải trả (mỗi năm)', en: 'Vacancy fee at risk (per year)' },
+    'plan.f.occupancy_status': { vi: 'Tình trạng sử dụng năm nay', en: 'Occupancy status this year' },
+    'plan.f.occupancy.compliant_owner_occupier': { vi: 'Đạt — bạn ở', en: 'Compliant — you live there' },
+    'plan.f.occupancy.compliant_genuinely_rented': { vi: 'Đạt — cho thuê thực sự', en: 'Compliant — genuinely rented' },
+    'plan.f.occupancy.at_risk': { vi: 'Có nguy cơ bị tính phí bỏ trống', en: 'At risk of the vacancy fee' },
+    'plan.f.occupancy.non_compliant': { vi: 'Không đạt', en: 'Not compliant' },
+    'plan.f.nr_filing': { vi: 'Phải khai thuế Úc (người không cư trú)', en: 'AU tax return required (non-resident)' },
+    'plan.f.yes': { vi: 'Có', en: 'Yes' },
+    'plan.f.no': { vi: 'Không', en: 'No' },
     'plan.f.frcgw_reserve': { vi: 'Dự phòng khấu trừ FRCGW khi bán', en: 'FRCGW withholding reserve (at exit)' },
     'plan.mode_switch.title': { vi: 'Chuyển chế độ khi có PR/quốc tịch', en: 'Switches mode on PR/citizenship' },
 
@@ -588,6 +597,15 @@ const messages = {
     'plan.disp.cgt': { vi: 'Thuế lãi vốn (CGT)', en: 'Capital gains tax (CGT)' },
     'plan.disp.cgt.exempt': { vi: 'Được miễn', en: 'Exempt' },
     'plan.disp.cgt.to_verify': { vi: 'Cần kiểm tra', en: 'To verify' },
+    // FRCGW sub-line: kb.non-resident-tax.foreign-resident-cgt-withholding
+    // withheld_amount_credited_against_cgt (a prepayment, excess refunded on assessment).
+    'plan.disp.taxable_gain': { vi: 'Lãi vốn chịu thuế (dự phóng)', en: 'Taxable capital gain (projected)' },
+    'plan.disp.frcgw': { vi: 'Khấu trừ FRCGW khi tất toán', en: 'FRCGW withheld at settlement' },
+    'plan.disp.frcgw_sub': {
+        vi: 'Bị giữ lại từ tiền bán khi tất toán, không phải một khoản thuế riêng — được trừ vào thuế lãi vốn khi bạn khai thuế Úc; phần dư được hoàn lại.',
+        en: 'Held back from the sale price at settlement, not a separate tax — credited against your CGT when you lodge your AU return; any excess is refunded.'
+    },
+    'plan.disp.vn_note': { vi: 'Thuế tại Việt Nam', en: 'Tax in Vietnam' },
     'plan.disp.set_horizon': { vi: 'Chưa có dự phóng khi bán', en: 'No sell-side projection yet' },
     'plan.disp.loan_pending': {
         vi: 'Khoản tất toán vay và tiền ròng sẽ được tính khi biết số tiền vay — bổ sung thu nhập của bạn trong phần trò chuyện.',
