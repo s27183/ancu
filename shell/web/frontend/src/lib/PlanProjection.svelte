@@ -932,6 +932,16 @@
         </Modal>
     {/if}
 
+    {#snippet settleCta()}
+        <div class="pp-settle-cta">
+            <button type="button" class="pp-attach-btn" onclick={openSettle}>
+                {settleStatus === 'active'
+                    ? $t('plan.settle.cta_update')
+                    : $t('plan.settle.cta_enter')}
+            </button>
+        </div>
+    {/snippet}
+
     <!-- settlement_prep B: the two attested transaction dates (engine-contract §11). A
          resolver-only re-fill (no usage / no meter gate); the recomputed settlement_checklist
          streams over the live SSE. Opened from the journey tab for a selected property. -->
@@ -1150,6 +1160,21 @@
                 onToggle={toggleChecklist}
                 filling={running}
             />
+            <!-- Whole lifecycle -> P-4 · The engine is coupled to no shell -> The web
+                 frontend -> settlement_prep under the swimlane (behavior 25, #35)
+                 Every blueprint lists settlement_prep in the flow tab (docs/blueprints/*.md
+                 ui_tabs) and FlowView draws only journey + playbook, so the per-property card
+                 and its date CTA render here, with the components branch's guard. Measured
+                 2026-10-07: Box Hill attach → settlement_prep filled (event 8411), and before
+                 this nothing showed it. -->
+            {#if supportsPhaseB && viewingProperty && viewComponents.settlement_prep}
+                <ComponentCard
+                    componentId="settlement_prep"
+                    entry={viewComponents.settlement_prep}
+                    filling={running}
+                />
+                {@render settleCta()}
+            {/if}
         {:else if activeTab?.interactive}
             <!-- The Cash-calculator tab: the financial spine + the cockpit that drives it
                  (the prototype's interactive calculator, engine-driven). price/state →
@@ -1405,13 +1430,7 @@
                          dates to activate the dated critical path. Investor + selected-property
                          only; label tracks whether dates are already active. -->
                     {#if cid === 'settlement_prep' && supportsPhaseB && viewingProperty}
-                        <div class="pp-settle-cta">
-                            <button type="button" class="pp-attach-btn" onclick={openSettle}>
-                                {settleStatus === 'active'
-                                    ? $t('plan.settle.cta_update')
-                                    : $t('plan.settle.cta_enter')}
-                            </button>
-                        </div>
+                        {@render settleCta()}
                     {/if}
                     {#if cid === 'due_diligence' && supportsPhaseB && viewingProperty}
                         <div class="pp-settle-cta">
