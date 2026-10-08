@@ -89,8 +89,12 @@ USER app
 ENV FH_SIDECAR_PYTHON=python3
 ENV FH_PLANNER_SCRIPT=/app/engine/python/planner.py
 
-# Claude Code CLI — the Agent SDK (claude-agent-sdk) shells out to the `claude`
-# binary via shutil.which("claude"). Installed as the STANDALONE NATIVE BINARY (no
+# Claude Code CLI — the Agent SDK (claude-agent-sdk) shells out to a `claude` binary.
+# It prefers the CLI bundled in its own wheel (claude_agent_sdk/_bundled/claude) and
+# falls back to shutil.which("claude") only when the wheel has none (read in 0.2.159,
+# subprocess_cli.py:254-260; on macOS the bundled one ran — 2.1.222 under 0.2.130,
+# 2.1.281 under 0.2.159). So this pin is the fallback; the SDK version in uv.lock is
+# what moves the CLI that actually runs. Installed as the STANDALONE NATIVE BINARY (no
 # Node) via the official installer, as the app user (lands in /home/app/.local).
 # Pinned (bump CLAUDE_CODE_VERSION deliberately); DISABLE_AUTOUPDATER keeps the image
 # on the pin. The credit token (CLAUDE_CODE_OAUTH_TOKEN) is injected at runtime as a
