@@ -150,7 +150,7 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
         "role": { "type": "enum", "options": ["primary", "co_buyer"], "value": "primary" },
         "citizenship_status": { "type": "enum", "options": ["citizen", "permanent_resident", "temporary_resident", "non_resident"], "value": "<initial>" },
         "firb_status": { "type": "enum", "options": ["not_foreign_person", "foreign_person"], "value": "<initial>", "derived_from": "citizenship_status" },
-        "tax_residency": { "type": "enum", "options": ["resident", "non_resident", "temporary_resident_for_tax"], "value": "<initial>", "note": "F2 — current tax residency, DISTINCT from citizenship/FIRB: a citizen living overseas is a non-foreign person (FIRB) yet may be a non-resident for tax (no CGT main-residence exemption, no 50% discount, possible land-tax surcharge) and may not be able to meet a scheme's occupancy requirement. Pairs with current_residence_country." },
+        "tax_residency": { "type": "enum", "options": ["resident", "non_resident", "temporary_resident_for_tax"], "value": "<initial>", "note": "F2 — current tax residency, DISTINCT from citizenship/FIRB: a citizen living overseas needs no FIRB approval (FATR reg 35(1)(a); kb.firb.status-determination) yet may be a non-resident for tax (no CGT main-residence exemption, no 50% discount, possible land-tax surcharge) and may not be able to meet a scheme's occupancy requirement. Pairs with current_residence_country." },
         "current_residence_country": { "type": "string", "value": "<initial>", "note": "F2 — ISO country of current residence. AU vs overseas gates the feasibility of scheme occupancy requirements (move in within 12 months, reside 6–12)." },
         "age": { "type": "integer", "value": "<initial>" },
         "owner_occupier_intent": { "type": "bool", "value": true },
@@ -249,7 +249,8 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
     "hold_horizon_years": "integer",                  // §8.3 — the dispose-phase hold horizon H; a plan-target-overlay fact (mutable per journey, a structural what-if); null = no disposal projection (Mode-A long/indefinite default). Read by disposition.
     // narrative
     "key_constraints": "array<localized_text>",
-    "key_strengths": "array<localized_text>"
+    "key_strengths": "array<localized_text>",
+    "key_assumptions": "array<localized_text>"         // the ordinarily-resident assumption for a household that may include a permanent resident (kb.copy.profile assume_pr_ordinarily_resident; kb.firb.status-determination) — [] when every applicant is a citizen
     // REMOVED fhg_eligible_basic — a scheme verdict; now computed in `eligibility` (zero downstream readers, confirmed)
   }
 }

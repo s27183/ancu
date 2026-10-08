@@ -55,6 +55,9 @@ export interface ProfileOutcome {
     target_zone?: string[] | null;
     key_constraints?: LocalizedText[] | null;
     key_strengths?: LocalizedText[] | null;
+    // Domestic profiles (Mode A/C/E): the ordinarily-resident assumption when an applicant
+    // may be a permanent resident (kb.copy.profile assume_pr_ordinarily_resident).
+    key_assumptions?: LocalizedText[] | null;
 }
 
 export interface SchemeEntry {

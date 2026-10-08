@@ -20,6 +20,10 @@
 %% fh_engine_ownership:fill_investor/2 (a clean sibling — unique name, FHB fill/2 untouched).
 
 -export([resolver/3, has_resolver/1, merge_agent/3, agent_values_from_outcome/2]).
+%% residence_assumptions/1 is exported for firb_residence_conformance: the base turn only ever
+%% projects the {citizen, PR} set, so the scalar-PR and citizen-only households are exercised
+%% through the same function the profiles call.
+-export([residence_assumptions/1]).
 
 -define(COPY, <<"kb.copy.profile">>).   %% buyer_profile bilingual copy-templates (bilingual-content.md §3b)
 -define(TARGET_YIELD, <<"kb.investor.target-yield-by-archetype">>).  %% labelled-placeholder defaults
@@ -386,7 +390,8 @@ buyer_profile_domestic(Args) ->
         %% bilingual {vi,en} via kb.copy.profile (no Vietnamese in Erlang literals —
         %% the io:format ~s >255-codepoint trap; bilingual-content.md §3b).
         <<"key_constraints">> => [copy(<<"constraint_financials_pending">>, #{})],
-        <<"key_strengths">>   => [copy(<<"strength_first_home_buyer">>, #{})]
+        <<"key_strengths">>   => [copy(<<"strength_first_home_buyer">>, #{})],
+        <<"key_assumptions">> => residence_assumptions(Applicants)
     },
     KbVersions = fh_engine_kb:kb_anchors(
         [<<"kb.hecs.thresholds">>, <<"kb.firb.status-determination">>,
@@ -547,7 +552,8 @@ investor_profile(Args) ->
         %% FIRB / no foreign-buyer surcharge / resident CGT-discount eligible). Decision-
         %% support tone — states the position, not "you should invest" (ASIC line).
         <<"key_constraints">> => [copy(<<"constraint_financials_pending">>, #{})],
-        <<"key_strengths">>   => [copy(<<"strength_domestic_investor">>, #{})]
+        <<"key_strengths">>   => [copy(<<"strength_domestic_investor">>, #{})],
+        <<"key_assumptions">> => residence_assumptions(Applicants)
         %% ABSENT (→ null → honest-partial): existing_portfolio, traits,
         %% deposit_ready_for_purchase_amount, ppor_equity_available_for_leverage,
         %% approx_borrowing_capacity — gathered on a refine turn (profiles SOT).
@@ -1388,6 +1394,31 @@ couple_view(Party) ->
           maps:get(<<"ever_owned_and_occupied_residence">>, OH, false),
       <<"currently_owns_property">> =>
           maps:get(<<"currently_owns_property">>, OH, false)}.
+
+%% Regulated figures are grounded -> P-7 · One declaration per outcome shape -> The engine -> FATR reg 35(1)(a) exempts citizens only
+%% applicant.firb_required = false is exact for a citizen wherever they live, and for a
+%% permanent resident only while they are ordinarily resident in Australia (200+ days of the
+%% past 12 months) — kb.firb.status-determination. Onboarding asks "citizen or PR?" and never
+%% where the buyer lives, so a domestic profile whose applicants MAY include a PR (the base
+%% {citizen, PR} possibility set, or a scalar PR) states that assumption as a key_assumption,
+%% EN + VI from kb.copy.profile. A residence question routing a PR abroad to Mode B/D was the
+%% alternative; those modes are not launched (behavior 7). A citizen-only household gets [].
+%% Read on legislation.gov.au 2026-10-07 (F2015L01854, compilation No. 20, 1 Nov 2025):
+%% reg 35(1)(a) "an Australian citizen not ordinarily resident in Australia" — no PR limb.
+residence_assumptions(Applicants) ->
+    case lists:any(fun may_be_permanent_resident/1, Applicants) of
+        true  -> [copy(<<"assume_pr_ordinarily_resident">>, #{})];
+        false -> []
+    end.
+
+%% an absent / null citizenship on a domestic profile is unknown → may be a PR (state it).
+may_be_permanent_resident(Applicant) ->
+    case maps:get(<<"citizenship_status">>, Applicant, null) of
+        #{<<"oneof">> := Set}       -> lists:member(<<"permanent_resident">>, Set);
+        <<"permanent_resident">>    -> true;
+        null                        -> true;
+        _                           -> false
+    end.
 
 %% subst a kb.copy.profile template into a bilingual {vi,en} value (no Vietnamese
 %% in Erlang literals; same mechanism as fh_engine_cash).
