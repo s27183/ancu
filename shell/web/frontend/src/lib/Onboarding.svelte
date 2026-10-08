@@ -255,6 +255,7 @@
             {#if phase === 'error'}
                 <p class="ob-error">{$t('onboarding.error')}</p>
             {/if}
+            <p class="ob-disclaimer">{$t('disclaimer.asic')}</p>
         </div>
 
         <footer class="ob-foot">

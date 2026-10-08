@@ -56,5 +56,11 @@ export function date(iso: string | null | undefined, lang: Lang): string | null 
     if (!iso) return null;
     const d = new Date(iso);
     if (Number.isNaN(d.getTime())) return null;
-    return new Intl.DateTimeFormat(locale(lang), { dateStyle: 'medium' }).format(d);
+    // A bare YYYY-MM-DD parses as UTC midnight: format it in UTC so the calendar day
+    // never shifts with the viewer's zone (behavior 20 — checklist and FIRB dates).
+    const dateOnly = /^\d{4}-\d{2}-\d{2}$/.test(iso);
+    return new Intl.DateTimeFormat(locale(lang), {
+        dateStyle: 'medium',
+        ...(dateOnly ? { timeZone: 'UTC' } : {})
+    }).format(d);
 }

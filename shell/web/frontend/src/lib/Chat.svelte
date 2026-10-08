@@ -8,11 +8,12 @@
     //     bilingual, oldest→newest. Live turns still arrive over subscribeConversation,
     //     attributed to the turn_id returned by postMessage.
     import { onMount } from 'svelte';
-    import { t } from '$lib/i18n';
+    import { t, type MessageKey } from '$lib/i18n';
     import { lang } from '$lib/stores/lang';
     import { postMessage, getConversation } from '$lib/api';
     import { subscribeConversation, type PlanCardStream } from '$lib/planCardStream';
     import { pick, type LocalizedText } from '$lib/planCard';
+    import { describeFailure } from '$lib/turnFailure';
 
     let { planCardId }: { planCardId: string } = $props();
 
@@ -21,6 +22,8 @@
         turnId: string | null;
         phase: 'thinking' | 'looking' | 'done' | 'error' | 'busy';
         answer: LocalizedText | null;
+        // A gate-blocked turn's localized reason (turnFailure.ts); null = generic error.
+        blocked?: MessageKey | null;
     };
     type Msg = { role: 'user'; text: string } | Assistant;
 
@@ -37,6 +40,12 @@
     // it needs no reactivity (the autofixer's SvelteMap advisory doesn't apply here).
     const early = new Map<string, { answer: LocalizedText | null; failed: unknown }>();
 
+    // Only a gate block gets its own reason in chat; anything else keeps chat.error.
+    function blockedKey(failed: unknown): MessageKey | null {
+        const f = describeFailure(failed);
+        return f.retry ? null : f.key;
+    }
+
     function indexOfTurn(turnId: string): number {
         return messages.findIndex((m) => m.role === 'assistant' && m.turnId === turnId);
     }
@@ -52,7 +61,8 @@
             role: 'assistant',
             turnId,
             phase: failed || empty ? 'error' : 'done',
-            answer: failed || empty ? null : answer
+            answer: failed || empty ? null : answer,
+            blocked: failed ? blockedKey(failed) : null
         };
         sending = false;
     }
@@ -146,7 +156,7 @@
                     </div>
                 {:else}
                     <div class="chat-msg assistant">
-                        <p class="chat-err">{m.phase === 'busy' ? $t('chat.busy') : $t('chat.error')}</p>
+                        <p class="chat-err">{m.phase === 'busy' ? $t('chat.busy') : m.blocked ? $t(m.blocked) : $t('chat.error')}</p>
                     </div>
                 {/if}
             {/each}
