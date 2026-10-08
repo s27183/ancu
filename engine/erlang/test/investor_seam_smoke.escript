@@ -62,15 +62,12 @@ main(_) ->
     expect(EventCount =:= 45, "45 events persisted (1 + 10×(3 gate + 1 filled) + 3 usage + 1)"),
 
     %% --- compliance audit trail: one audit_events row per (component, gate) = 3 × 10 = 30,
-    %%     every one `clear` on the Mode-C healthy path. ASIC boundary_held lands ONLY on
-    %%     mortgage_finance: the investor spine carries no `eligibility` (FHB-only), and
-    %%     advice_adjacent/1 lists only mortgage_finance + eligibility. tax_structure,
-    %%     investment_strategy, purchase_journey, and phase_playbook all clear with
-    %%     no_advice_surface — the ASIC line is held at the producer (§98 figure-tightness,
-    %%     schema-as-constraint enums; phase_playbook's risks are KB-grounded, never
-    %%     LLM-authored), the audit `detail` is the attestation record. (Flagged: whether the
-    %%     entity/strategy attestation should also record boundary_held is a separate
-    %%     compliance-record refinement.) ---
+    %%     every one `clear` on the Mode-C healthy path. ASIC boundary_held lands on
+    %%     mortgage_finance (lender fit) and, since #27 (2026-10-06), on tax_structure and
+    %%     investment_strategy, whose agent-authored entity and strategy leaves are
+    %%     advice-adjacent; the investor spine carries no `eligibility` (FHB-only).
+    %%     purchase_journey and phase_playbook clear with no_advice_surface (phase_playbook's
+    %%     risks are KB-grounded, never LLM-authored). ---
     AuditCount = scalar("SELECT count(*) FROM audit_events WHERE plan_card_id = $1",
                         [PlanCardId]),
     expect(AuditCount =:= 30, "30 audit_events rows (3 gates × 10 components)"),
@@ -81,7 +78,7 @@ main(_) ->
                       "AND compliance_jsonb->>'gate' = 'asic' "
                       "AND compliance_jsonb->>'detail' = 'decision_support_boundary_held'",
                       [PlanCardId]),
-    expect(AsicHeld =:= 1, "ASIC boundary_held on mortgage_finance only (no eligibility in Mode C)"),
+    expect(AsicHeld =:= 3, "ASIC boundary_held on mortgage_finance, tax_structure, investment_strategy (#27)"),
     TwoPathAudit = scalar("SELECT count(*) FROM audit_events WHERE plan_card_id = $1 "
                           "AND fill_path = 'two_path'", [PlanCardId]),
     expect(TwoPathAudit =:= 9, "9 two_path audit rows (3 two-path components × 3 gates)"),
