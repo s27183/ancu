@@ -237,6 +237,10 @@ investor_cases() ->
      check("clean: 6 key_assumptions (horizon, growth, cgt, reform, selling, loan-rate)",
            length(Assumps), 6),
      check("clean: 2026-27 reform flag surfaced (1 Jul 2027)", Reform, true),
+     check("clean (Mode C): the resident reform line, not the foreign one (behavior 31)",
+           {lists:member(fh_engine_kb:copy(<<"kb.copy.disposition">>, <<"assumption_cgt_reform">>), Assumps),
+            lists:member(fh_engine_kb:copy(<<"kb.copy.disposition">>, <<"assumption_cgt_reform_foreign">>), Assumps)},
+           {true, false}),
      check("clean: every investor assumption bilingual {vi,en}", AllBilin, true),
      check("clean: cgt dispose event emitted (out/government)", lists:member(<<"dispose_cgt">>, ev_ids(C)), true),
      %% Mode-C/D six-actor swimlane (fh_engine_journey:investor_actors/0) has NO "other" actor

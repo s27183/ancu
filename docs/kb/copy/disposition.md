@@ -1,7 +1,7 @@
 ---
 slug: kb.copy.disposition
 effective_from: 2026-06-22
-last_verified: 2026-10-07
+last_verified: 2026-10-08
 ---
 
 # Disposition component copy (bilingual)
@@ -10,7 +10,8 @@ User-facing copy-templates for the `disposition` resolver (`fh_engine_dispositio
 dispose-phase `dispose_cash_events` labels (sale proceeds, selling costs, loan payout, CGT)
 and the `key_assumptions` lines (the hold horizon, the capital-growth band,
 the CGT basis — owner-occupier exemption *or* the Mode-C/D investor computed/to_verify lines plus
-the 2026-27 reform flag — the selling-cost basis, the representative loan-rate basis, and
+the 2026-27 reform flag (Mode D gets `assumption_cgt_reform_foreign` instead: no 50% discount for the
+foreign-resident period, [`kb.tax.cgt-50-percent-discount`](../tax/cgt-50-percent-discount.md)) — the selling-cost basis, the representative loan-rate basis, and
 (Mode D only) the FRCGW prepayment note `assumption_frcgw`). `vn_side_cgt_note` is Mode-D's
 informational VN-side pointer (never a VN tax figure — points to the buyer's own VN-based tax
 advisor, per the AU-side-full/VN-side-placeholder scoping decision). Each template is filled via
@@ -92,6 +93,10 @@ basis — decision-support, never a forecast or advice.
     "assumption_cgt_reform": {
       "vi": "Phần này áp dụng luật hiện hành (giảm 50% thuế lãi vốn). Một cải cách trong Ngân sách 2026-27 — thay bằng cách điều chỉnh theo lạm phát trên giá vốn cộng thuế tối thiểu 30% — nay đã thành luật (có hiệu lực từ 26/6/2026) nhưng chưa áp dụng cho đến 1/7/2027; hãy xác nhận với chuyên viên thuế có đăng ký.",
       "en": "This uses current law (the 50% CGT discount). A 2026-27 Budget reform replacing it with cost-base indexation plus a 30% minimum tax is now law (enacted 26 June 2026) but does not take effect until 1 July 2027; confirm the position with a registered tax agent."
+    },
+    "assumption_cgt_reform_foreign": {
+      "vi": "Bạn là người không cư trú thuế tại Úc, nên theo luật hiện hành bạn không được giảm 50% thuế lãi vốn cho phần lãi phát sinh trong thời gian không cư trú — phần lãi chịu thuế ở đây không được giảm. Một cải cách thuế lãi vốn trong Ngân sách 2026-27, nay đã thành luật, áp dụng từ 1/7/2027 và có thể thay đổi cách tính thuế khi bạn bán; hãy xác nhận với chuyên viên thuế có đăng ký.",
+      "en": "As a foreign resident for tax, current law gives you no 50% CGT discount on the gain from your foreign-resident period — the taxable gain here is not discounted. A 2026-27 Budget CGT reform, now law, takes effect from 1 July 2027 and may change how your sale is taxed; confirm the position with a registered tax agent."
     },
     "assumption_frcgw": {
       "vi": "Khi bán, người mua sẽ giữ lại 15% giá bán để nộp cho Sở Thuế Úc (ATO) — đây là khoản TẠM ỨNG được khấu trừ vào thuế lãi vốn thực tế của bạn khi quyết toán, không phải là một khoản phí thêm.",
