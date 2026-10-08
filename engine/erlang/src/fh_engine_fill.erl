@@ -26,6 +26,7 @@
 -export([residence_assumptions/1]).
 
 -define(COPY, <<"kb.copy.profile">>).   %% buyer_profile bilingual copy-templates (bilingual-content.md §3b)
+-define(ENTITY_SETUP, <<"kb.tax.entity-setup-costs">>).  %% INDICATIVE setup bands by entity
 -define(TARGET_YIELD, <<"kb.investor.target-yield-by-archetype">>).  %% labelled-placeholder defaults
 
 %% Does this component have a resolver fill? Empty `agent_leaves` → pure resolver;
@@ -147,10 +148,14 @@ merge_agent(<<"investment_strategy">>, ResolverOutcome, AgentValues) ->
 %% (recommended_entity). Slot-scoped fold — the agent reach is exactly this one judgment
 %% field; every figure (the CGT determinants, the null property/seam-deferred money) is the
 %% resolver scaffold's and is left untouched (§98 — the agent authors NO figure, NO verdict).
+%% setup_costs is DERIVED from the agent's entity via the KB band (entity_setup_band/1) — the
+%% entity is the agent's, the band is the resolver's, so the figure stays out of the LLM's reach
+%% (a stray setup_costs in AgentValues is ignored), the same split as target_gross_yield above.
 merge_agent(<<"tax_structure">>, ResolverOutcome, AgentValues) ->
+    Entity = maps:get(<<"recommended_entity">>, AgentValues, null),
     ResolverOutcome#{
-        <<"recommended_entity">> =>
-            maps:get(<<"recommended_entity">>, AgentValues, null)
+        <<"recommended_entity">> => Entity,
+        <<"setup_costs">>        => entity_setup_band(Entity)
     };
 %% tax_structure_non_resident (Mode D): identical single-leaf fold to tax_structure/2 above —
 %% distinct component name, same shared `tax_optimised_structure` outcome type + agent-slot
@@ -788,9 +793,9 @@ investment_strategy_foreign(Upstream) ->
 %%       when absent → disposition CGT to_verify (the conservative net). total_depreciation stays
 %%       null — the KB defers the Div-43/40 dollar to a QS (kb.tax.depreciation-division-43-and-40),
 %%       never asserts it.
-%%   (b) entity-structure banded-vs-scalar seam: setup_costs + annual_compliance_cost (the KB gives
-%%       BANDS — entity setup $1.5k–$4k, kb.tax.entity-setup-costs) are entity-dependent, not
-%%       rent-dependent — out of B2's scope, deferred to the entity-cost unit.
+%%   (b) entity-dependent: setup_costs is placed at merge from the agent's entity as the KB band
+%%       (entity_setup_band/1, kb.tax.entity-setup-costs; #12). annual_compliance_cost stays null —
+%%       the KB's ongoing figures are text ("1000-3500+", "accounting + audit"), not a band yet.
 %%
 %% The agent's reach is exactly the one entity leaf — no figure, no verdict (the
 %% entity-comparison KB is the most regulated content in the wedge; the sidecar's single-enum
@@ -820,7 +825,8 @@ tax_structure(Upstream) ->
          <<"kb.tax.depreciation-division-43-and-40">>,
          <<"kb.tax.cgt-50-percent-discount">>,
          <<"kb.tax.quantity-surveyor-reports">>,
-         <<"kb.tax.land-tax-by-state">>]),
+         <<"kb.tax.land-tax-by-state">>,
+         ?ENTITY_SETUP]),
     {Outcome, <<"data-table">>, KbVersions}.
 
 %% the input-independent scaffold: the entity agent slot (null pre-merge), the two KB-grounded CGT
@@ -840,7 +846,7 @@ tax_structure_scaffold() ->
         <<"after_tax_cash_flow_per_week">> => null,
         <<"total_depreciation_year_1">>    => null,  %% QS-deferred (no schedule in reach)
         <<"cgt_marginal_rate">>            => null,
-        <<"setup_costs">>                  => null,  %% entity-cost banded-vs-scalar seam (class b)
+        <<"setup_costs">>                  => null,  %% placed at merge from the entity (class b)
         <<"annual_compliance_cost">>       => null,  %% entity-cost banded-vs-scalar seam (class b)
         <<"negative_gearing_reform_note">> => null   %% placeholder — tax_structure/1 always overrides
     }.
@@ -1438,3 +1444,20 @@ copy(Id, Params) ->
 target_yield_for(Archetype) when is_binary(Archetype) ->
     param(?TARGET_YIELD, <<"target_gross_yield_", Archetype/binary>>);
 target_yield_for(_) -> null.
+
+%% Goal: regulated figures are grounded -> one computer per figure, honest about its tier ->
+%% tax_structure's merge -> place the entity's setup band from kb.tax.entity-setup-costs.
+%% The band is INDICATIVE market pricing, [lo, hi] AUD; hi null is an open-ended floor (company,
+%% SMSF with LRBA). It stays a band and is not summed into total_cash_required: a range added to
+%% a point total would change that figure's type (behavior 11, #12). An entity the KB does not
+%% list, or none yet, is null (pending), never a guess.
+entity_setup_band(Entity) when is_binary(Entity) ->
+    {ok, Cj} = fh_engine_kb:kb_rules(?ENTITY_SETUP),
+    Entries = maps:get(<<"entries">>,
+                       maps:get(<<"entity_setup_cost_bands">>, maps:get(<<"lookup">>, Cj))),
+    case [maps:get(<<"setup_first_year">>, E) || E <- Entries,
+                                                 maps:get(<<"entity">>, E) =:= Entity] of
+        [[Lo, Hi]] -> [Lo, Hi];
+        _          -> null
+    end;
+entity_setup_band(_) -> null.

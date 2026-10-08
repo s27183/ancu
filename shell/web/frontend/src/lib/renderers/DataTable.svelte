@@ -51,6 +51,19 @@
     });
     const marginalRate = $derived(tx.cgt_marginal_rate != null ? `${num(tx.cgt_marginal_rate, $lang)}%` : null);
     const afterTaxCf = $derived(moneyRange(tx.after_tax_cash_flow_year_1, $lang));
+    // Entity setup is an INDICATIVE band the engine places from the KB (never the agent's):
+    // [0, 0] → "$0", [lo, hi] → "lo – hi", [lo, null] → "from lo" (an open-ended floor), each
+    // labelled indicative; null (no entity yet) → Pending. Not part of the cash total.
+    const setupCosts = $derived.by(() => {
+        const r = tx.setup_costs;
+        if (!Array.isArray(r) || typeof r[0] !== 'number') return null;
+        const [lo, hi] = r;
+        const lo$ = money(lo, $lang) ?? '';
+        const band = hi === null ? $t('plan.tx.setup_from').replace('{amount}', lo$)
+            : hi === lo ? lo$
+            : moneyRange([lo, hi], $lang);
+        return `${band} ${$t('plan.tx.indicative')}`;
+    });
 
     // tax_structure_non_resident (Mode D) — the SEVENTH shape, found 2026-07-11 auditing a
     // live investor-foreign-au card: it shares tax_optimised_structure's type name AND both
@@ -270,6 +283,7 @@
 </div>
 <Field label={$t('plan.tx.marginal_rate')} value={marginalRate} />
 <Field label={$t('plan.tx.after_tax_cf')} value={afterTaxCf} />
+<Field label={$t('plan.tx.setup_costs')} value={setupCosts} />
 
 {:else if isPortfolio}
 <!-- ── ownership_planning_investor (portfolio_position) ────────────────── -->

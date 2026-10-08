@@ -66,6 +66,9 @@ def _check_scalar(stype, value):
     if stype in ("money_range", "percentage_range"):
         # a banded figure — a [lo, hi] list of numbers (the banded money/percentage surface,
         # mode-c-wedge Slice B0: rent is a band, so income/yields/cash-flow band too).
+        # [lo, None] is an open-ended floor ("from $636") — mirrors fh_engine_outcome.
+        if isinstance(value, list) and len(value) == 2 and _is_num(value[0]) and value[1] is None:
+            return None
         if not (isinstance(value, list) and all(_is_num(x) for x in value)):
             return f"{stype} must be a list of numbers, got {value!r}"
         return None
@@ -249,6 +252,9 @@ CASES = [
     {"name": "money-as-bool-rejected", "tree": MONEY, "value": True, "ok": False,
      "expect": "must be a number"},
     {"name": "money_range-ok", "tree": MRANGE, "value": [600000, 700000], "ok": True},
+    {"name": "money_range-open-floor-ok", "tree": MRANGE, "value": [636, None], "ok": True},
+    {"name": "money_range-null-floor-rejected", "tree": MRANGE, "value": [None, 4000],
+     "ok": False, "expect": "list of numbers"},
     {"name": "money_range-string-elem-rejected", "tree": MRANGE,
      "value": [600000, "700k"], "ok": False, "expect": "list of numbers"},
     {"name": "percentage_range-ok", "tree": PRANGE, "value": [3.5, 4.1], "ok": True},

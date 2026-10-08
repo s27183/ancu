@@ -405,9 +405,10 @@ key_assumptions_foreign(Ceiling, _State) ->
 %%      investor now carries `cash_events` (deposit/stamp_duty/other_buying_costs/lmi — see
 %%      cash_events_investor/4 below), so purchase_journey's generic multi-source harvest can
 %%      place the investor acquire-phase spine with zero Mode-C-specific journey code
-%%      ([[unify-views-as-projections-of-one-primitive]]). entity_setup_costs is NOT yet an
-%%      event: the underlying tax_optimised_structure.setup_costs figure is permanently null
-%%      (a separate, still-open entity-cost seam) — honest-partial (no event without a figure).
+%%      ([[unify-views-as-projections-of-one-primitive]]). entity_setup_costs is NOT an
+%%      event: tax_optimised_structure.setup_costs is an INDICATIVE band placed after the
+%%      entity agent runs (behavior 11, #12), shown on the tax card and kept out of the point
+%%      cash total and its events.
 -spec fill_investor(map(), map()) -> {map(), binary(), [map()]}.
 fill_investor(_Args, Upstream) ->
     %% Branch on the per-property keystone (Slice B3b): at base property_fit_investor is absent →
