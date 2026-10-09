@@ -276,7 +276,8 @@ Status at any time: `python3 scripts/do_deploy.py status`; a deployment's log:
 **every push to `main` redeploys** — after the one-time setup, deploys are just merges.
 PRs therefore target `main` directly, one branch per behavior cut from `main`: merging a
 PR is the deploy (Son 2026-10-09, retiring the `dev-son` integration branch). The gate
-before a merge is the done checks run on the branch; there is no CI.
+before a merge is CI's required status "done checks" (architecture.md's `checks:` line;
+behavior 38).
 
 ---
 
