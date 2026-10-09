@@ -93,7 +93,8 @@
                 role: 'assistant',
                 turnId: null,
                 phase: out.kind === 'busy' ? 'busy' : 'error',
-                answer: null
+                answer: null,
+                blocked: out.kind === 'daily_limit' ? 'chat.daily_limit' : null
             };
             sending = false;
         }
