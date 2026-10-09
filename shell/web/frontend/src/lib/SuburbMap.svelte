@@ -6,7 +6,8 @@
     //
     // Basemap (8-S2d): VITE_PMTILES_URL set → a Protomaps pmtiles basemap; unset → the
     // no-basemap minimalStyle (the original 8-S2 behaviour — dev/build never regresses).
-    // Dev/eval points at a Protomaps daily build; prod at the owned R2 AU extract.
+    // Dev/eval points at a Protomaps daily build; prod at the owned R2 planet
+    // (https://tiles.maiancu.com/planet.pmtiles, behavior 40).
     // A daily-build URL carries its date and was seen to 404 within about 4 weeks
     // (memory, mid-2026; unmeasured since): a dev map with no basemap is first a stale
     // VITE_PMTILES_URL, and the fallback below then renders minimalStyle.
@@ -62,8 +63,14 @@
     // (undefined with no basemap → data on top, which is fine: there are no labels).
     const labelBeforeId = $derived(usingBasemap ? firstLabelLayerId() : undefined);
 
+    // Only BEFORE the map's first `load`: that is the gate the fallback exists for. After
+    // it, swapping the whole style to minimalStyle would drop the suburb sources and
+    // layers with it (seen in prod, behavior 40, 2026-10-09: tiles blocked mid-session →
+    // an empty grey map); a tile that fails then just stays a gap and the suburbs keep
+    // drawing.
+    let mapLoaded = false;
     function onMapError(e: MapLibreEvent<MlErrorEvent> & { sourceId?: string }) {
-        if (e.sourceId === BASEMAP_SOURCE_ID) basemapFailed = true;
+        if (!mapLoaded && e.sourceId === BASEMAP_SOURCE_ID) basemapFailed = true;
     }
 
     let {
@@ -221,6 +228,7 @@
     autoloadGlobalCss={false}
     inlineStyle="position:absolute;inset:0"
     onerror={onMapError}
+    onload={() => (mapLoaded = true)}
 >
     {#if pulseSaved}
         <!-- Saved-plans mode: an expanding ring (declared first → below the dot) and
