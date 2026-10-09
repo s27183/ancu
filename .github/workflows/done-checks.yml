@@ -1,0 +1,55 @@
+# Reproducible -> P-7 · One declaration per outcome shape -> Mechanisms -> the done checks, run by CI
+# main deploys on every push (deployment.md §4), so this job is the gate before a deploy:
+# a ruleset on main requires the status "done checks" (behavior 38, 2026-10-09). It runs
+# architecture.md's `checks:` line through scripts/done_checks.sh — never a copy of it —
+# after building what a clean checkout lacks (.venv, the KB artifact, node_modules).
+# Toolchain = the dev seat's, measured 2026-10-09: OTP 29.1.1 / rebar3 3.27.0, Node 26,
+# Python per uv.lock (requires-python >=3.14). Offline checks only: no Postgres, no keys.
+name: done checks
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: done-checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  done-checks:
+    name: done checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: "29.1.1"
+          rebar3-version: "3.27.0"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "26"
+          cache: npm
+          cache-dependency-path: shell/web/frontend/package-lock.json
+
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Python deps (uv.lock)
+        run: uv sync --frozen
+
+      - name: KB artifact
+        run: .venv/bin/python engine/build/kb_compiler.py
+
+      - name: Frontend deps
+        working-directory: shell/web/frontend
+        run: npm ci
+
+      - name: Done checks (architecture.md `checks:`)
+        run: bash scripts/done_checks.sh
