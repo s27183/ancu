@@ -64,7 +64,10 @@ resend_send(Key, Email, Url) ->
 
 %% Sender, from EMAIL_FROM (+ optional EMAIL_FROM_NAME) — the aleap/atp convention,
 %% so one .env serves every platform. EMAIL_FROM is the verified address (e.g.
-%% login@mail.firsthomey.com); EMAIL_FROM_NAME, when set, composes "Name <addr>".
+%% login@mail.firsthomey.com). The display name is the brand (fh_shell_util:brand/0) so a
+%% rename reaches the sender too (behavior 35); EMAIL_FROM_NAME, when set, overrides it.
+%% Env values arrive as code-point lists ("ư" is 432), so they are converted as Unicode:
+%% list_to_binary/1 crashed on "Mai An Cư" (probed 2026-10-09).
 %% A dev default keeps the call well-formed; Resend rejects an unverified domain,
 %% which is logged, not fatal.
 -spec from_address() -> binary().
@@ -78,9 +81,16 @@ from_address() ->
 -spec with_name(binary()) -> binary().
 with_name(Addr) ->
     case os:getenv("EMAIL_FROM_NAME") of
-        false -> Addr;
-        ""    -> Addr;
-        Name  -> <<(list_to_binary(Name))/binary, " <", Addr/binary, ">">>
+        false -> named(fh_shell_util:brand(), Addr);
+        ""    -> named(fh_shell_util:brand(), Addr);
+        Name  -> named(unicode:characters_to_binary(Name), Addr)
+    end.
+
+-spec named(binary(), binary()) -> binary().
+named(Name, Addr) ->
+    case binary:match(Addr, <<"<">>) of
+        nomatch -> <<Name/binary, " <", Addr/binary, ">">>;
+        _       -> Addr
     end.
 
 %% Bilingual (VI-first, bilingual-content.md): the product is VI-first, so the email

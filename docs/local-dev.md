@@ -162,7 +162,7 @@ the shell launcher after editing.
    ```
    RESEND_API_KEY=re_xxxxxxxx
    EMAIL_FROM=no-reply@yourdomain.com     # the verified sender address
-   EMAIL_FROM_NAME=FirstHomey             # optional → "FirstHomey <no-reply@…>"
+   EMAIL_FROM_NAME=…                      # optional; unset → the brand, "Mai An Cư <no-reply@…>"
    ```
 5. Restart the shell launcher. Magic-link requests now actually email. (Leaving
    `AUTH_DEV_EXPOSE_LINK=1` also still echoes the link; delete it to force real inbox use.)

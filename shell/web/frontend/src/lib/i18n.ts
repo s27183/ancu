@@ -12,7 +12,7 @@ import { lang } from '$lib/stores/lang';
 // The product's name is temporary (invariants.md, Son 2026-10-06). It is declared here once; brand.name
 // and every chrome string that names the product interpolate it, as does the tab title
 // (+layout.svelte), so a rename is this one line (behavior 17). Same in VI and EN: a name.
-const BRAND = 'Rau';
+const BRAND = 'Mai An Cư';
 
 const messages = {
     'brand.name': { vi: BRAND, en: BRAND },
@@ -967,6 +967,11 @@ const messages = {
     'chat.busy': {
         vi: 'Kế hoạch đang được cập nhật. Vui lòng đợi một chút rồi hỏi lại.',
         en: 'Your plan is updating. Please wait a moment, then ask again.'
+    },
+    // Behavior 36: one assistant question per user per (Sydney) day; the shell's 429.
+    'chat.daily_limit': {
+        vi: 'Bạn đã dùng câu hỏi của hôm nay. Hãy hỏi lại vào ngày mai.',
+        en: 'You’ve used today’s question. You can ask again tomorrow.'
     },
     'chat.error': {
         vi: 'Chưa trả lời được câu hỏi này. Vui lòng thử lại.',

@@ -134,6 +134,7 @@ on POST /api/plan-cards/:id/messages (or any agent-triggering call):
 
 - **Resolver-only turns are never blocked** — they emit no `usage` and cost nothing (e.g. a `cash_position` recompute). The gate only guards agent (LLM) turns. The shell can't always know in advance whether a turn will be resolver-only, so the conservative gate is: *block new agent-eligible turns at the limit*; a turn that turns out resolver-only simply adds nothing to the meter.
 - **At-limit behaviour** (soft grace vs hard stop) is a product decision; the recommended default is a **hard stop with an upgrade prompt + period-reset date**, since an unbounded overage reintroduces the per-user cost risk §3 exists to remove.
+- **The daily question cap** (behavior 36) follows the token gate on `POST /api/plan-cards/:id/messages` only: one assistant question per user per Sydney calendar day (`FH_QA_DAILY_LIMIT`, default 1), claimed atomically in `qa_daily_asks` before the engine call and given back when the engine does not accept the turn (busy, failed). A blocked ask is `429 daily_question_limit {limit, resets_at}` (next Sydney midnight, UTC) with no engine call; `ADMIN_EMAILS` users are exempt. Plan building, properties and documents stay under the token limit alone.
 - **Document-review turns** (attachments present → an extraction LLM-call boundary, [`engine-contract.md`](engine-contract.md) §5) are gated separately on the user's per-addendum entitlement (§9), *before* and independently of the chat quota.
 
 ---

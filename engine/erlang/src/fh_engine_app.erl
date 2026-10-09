@@ -22,6 +22,7 @@ start(_StartType, _StartArgs) ->
         {ok, _PoolPid} ->
             logger:info("engine Postgres pool started"),
             ok = fh_engine_migrations:run(),  %% raises on failure -> boot aborts
+            ok = seed_shell_tenant(),         %% raises on a malformed seed -> aborts
             ok = fh_engine_kb:load(),         %% raises on failure -> boot aborts
             case fh_engine_sup:start_link() of
                 {ok, SupPid} ->
@@ -42,6 +43,34 @@ start(_StartType, _StartArgs) ->
 -spec stop(term()) -> ok.
 stop(_State) ->
     ok.
+
+%% Reproducible -> P-6 · Shells reach the engine only through the contract -> The engine -> the shell tenant seeded at boot
+%% With SHELL_TENANT_ID and SHELL_TENANT_PUBKEY set (prod: do_deploy.py derives the
+%% public key from the shell's SHELL_TENANT_PRIVKEY), the engine registers that tenant
+%% and key itself, after migrations, idempotently (ensure_signing_key: one active row
+%% per key, boot after boot). Why here: the engine's App Platform dev database is
+%% reachable from the engine app only, so no out-of-band psql can register the key
+%% (behavior 33, 2026-10-09). Only a PUBLIC key enters through env — a forged one
+%% verifies nothing the private half did not sign. Both unset (dev, tests) -> a
+%% no-op; one set without the other, a non-uuid id or a key that is not 32 bytes of
+%% base64 aborts boot rather than serve a shell whose every call would 401.
+-spec seed_shell_tenant() -> ok.
+seed_shell_tenant() ->
+    case {os:getenv("SHELL_TENANT_ID", ""), os:getenv("SHELL_TENANT_PUBKEY", "")} of
+        {"", ""} ->
+            ok;
+        {Id, Pub} when Id =/= "", Pub =/= "" ->
+            TenantId = list_to_binary(Id),
+            PubB64 = list_to_binary(Pub),
+            match = re:run(TenantId, "^[0-9a-fA-F-]{36}$", [{capture, none}]),
+            32 = byte_size(base64:decode(PubB64)),
+            ok = fh_engine_store:upsert_tenant(TenantId, <<"ancu-shell">>),
+            ok = fh_engine_store:ensure_signing_key(TenantId, <<"ed25519">>, PubB64),
+            logger:notice("shell tenant ~s seeded (ed25519 ~s)", [TenantId, PubB64]),
+            ok;
+        _ ->
+            error({incomplete_tenant_seed, "set both SHELL_TENANT_ID and SHELL_TENANT_PUBKEY"})
+    end.
 
 %% DEV-ONLY (gated on ENGINE_DEV_PROVISION): after the tree is up, refresh saved cards
 %% in place so a rebuild + restart picks up resolver/KB changes without a manual re-run

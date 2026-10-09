@@ -344,6 +344,7 @@ export async function setProfileFinancials(
 export type MessageOutcome =
     | { kind: 'accepted'; turnId: string }
     | { kind: 'busy' }
+    | { kind: 'daily_limit'; resetsAt: string }
     | { kind: 'auth_required' }
     | { kind: 'not_found' }
     | { kind: 'error'; status: number };
@@ -365,6 +366,13 @@ export async function postMessage(
         return { kind: 'accepted', turnId: body.turn_id };
     }
     if (res.status === 409) return { kind: 'busy' };
+    // 429 daily_question_limit: today's (Sydney) question is used — behavior 36, the
+    // shell's daily cap (fh_shell_meter:claim_question/1); resets_at is the next
+    // Sydney midnight in UTC.
+    if (res.status === 429) {
+        const body = (await res.json()) as { resets_at?: string };
+        return { kind: 'daily_limit', resetsAt: body.resets_at ?? '' };
+    }
     if (res.status === 401) return { kind: 'auth_required' };
     if (res.status === 404) return { kind: 'not_found' };
     return { kind: 'error', status: res.status };

@@ -1,0 +1,340 @@
+#!/usr/bin/env python3
+"""Stand Mai An Cư up on DigitalOcean from the repo's `.env`, printing no secret.
+
+    python3 scripts/do_deploy.py propose engine|shell   read-only check, no .env
+    python3 scripts/do_deploy.py apply engine|shell [--dry-run]
+                                    fill from .env, validate, create/update (dry: validate)
+    python3 scripts/do_deploy.py status                 the ancu-* apps, phase, ingress
+    python3 scripts/do_deploy.py logs engine|shell [run|build|deploy]
+
+(`apply` runs through scripts/do_apply.sh, the command Son's confirm of behavior 33
+grants outside the sandbox: only it reads .env. The rest run in the sandbox.)
+
+reproducible -> P-6 -> deploy scripts -> fill a DO app spec from .env, validate,
+  create-or-update, over the DO API through the DO_API_KEY key socket.
+  Why a script: deployment.md §4 is a hand runbook whose every secret step would put
+  a value on screen; here the values go .env -> the spec in memory -> the DO API and
+  nowhere else. stdout carries names, ids, ingress URLs and the tenant PUBLIC key
+  only; any API error is redacted of every value read before it is shown.
+  Why the socket: Son's /bounds serves DO_API_KEY at $ENACS_KEYS_DIR/DO_API_KEY.sock
+  with the key added (api.digitalocean.com), so no token is on disk or handed to a
+  CLI; doctl is no longer used (Son 2026-10-09). Measured 2026-10-09: GET /v2/account
+  and POST /v2/apps/propose answer through the socket from the sandbox.
+  Why dev databases: each app owns an App Platform dev database bound as
+  ${db.DATABASE_URL} (the specs' `databases:`), reachable from that app only — so the
+  shell's tenant public key reaches the engine as env (SHELL_TENANT_PUBKEY) and the
+  engine registers it at boot; there is no psql step (behavior 33).
+  The specs parse with PyYAML from the `deploy` dependency group (pyproject.toml;
+  a bare python3 without it re-runs itself under `uv run --group deploy`),
+  kept out of the engine image (its Dockerfile exports the default groups only).
+"""
+from __future__ import annotations
+
+import http.client
+import json
+import os
+import re
+import socket
+import subprocess
+import sys
+import urllib.request
+from pathlib import Path
+from typing import NoReturn
+
+ROOT = Path(__file__).resolve().parents[1]
+
+try:
+    import yaml
+except ImportError:
+    # scripts/do_apply.sh runs a bare `python3` (its text is what Son's confirm
+    # pinned): re-run under the project's locked env with the deploy group.
+    if os.environ.get("DO_DEPLOY_REEXEC"):
+        die_early = "PyYAML missing even under `uv run --group deploy`"
+        sys.exit(f"do_deploy: {die_early}")
+    os.environ["DO_DEPLOY_REEXEC"] = "1"
+    os.chdir(ROOT)
+    os.execvp("uv", ["uv", "run", "--frozen", "--group", "deploy", "python",
+                     str(Path(__file__).resolve()), *sys.argv[1:]])
+
+APPS = {
+    "engine": {
+        "spec": ROOT / "engine" / "app.yaml",
+        "name": "ancu-engine",
+        "required": ["CLAUDE_CODE_OAUTH_TOKEN", "SHELL_TENANT_ID", "SHELL_TENANT_PRIVKEY"],
+    },
+    "shell": {
+        "spec": ROOT / "shell" / "web" / "app.yaml",
+        "name": "ancu-shell",
+        "required": ["SHELL_JWT_SECRET", "SHELL_TENANT_ID", "SHELL_TENANT_PRIVKEY",
+                     "RESEND_API_KEY"],
+    },
+}
+# Plain config the spec commits empty: taken from .env when it holds one.
+CONFIG_FROM_ENV = {"ADMIN_EMAILS"}
+
+SECRETS: list[str] = []          # every value read, for redaction
+
+
+def die(msg: str) -> NoReturn:
+    print(f"do_deploy: {msg}", file=sys.stderr)
+    sys.exit(1)
+
+
+def redact(text: str) -> str:
+    for v in sorted(SECRETS, key=len, reverse=True):
+        if len(v) >= 6:
+            text = text.replace(v, "«redacted»")
+    return text
+
+
+def read_env() -> dict[str, str]:
+    """KEY=VALUE lines as python-dotenv / `source` read them: last one wins."""
+    p = Path(os.environ.get("DO_DEPLOY_ENV_FILE") or ROOT / ".env")  # override: tests only
+    if not p.exists():
+        die(".env not found at the repo root")
+    env: dict[str, str] = {}
+    for raw in p.read_text().splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#"):
+            continue
+        if line.startswith("export "):
+            line = line[7:].lstrip()
+        k, sep, v = line.partition("=")
+        if not sep or not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", k.strip()):
+            continue
+        v = v.strip()
+        if len(v) >= 2 and v[0] == v[-1] and v[0] in "'\"":
+            v = v[1:-1]
+        else:
+            v = re.split(r"\s+#", v, maxsplit=1)[0].strip()
+        env[k.strip()] = v
+    for v in env.values():
+        if v:
+            SECRETS.append(v)
+    return env
+
+
+# --- the DO API through the key socket ------------------------------------------
+
+class _UnixHTTP(http.client.HTTPConnection):
+    def __init__(self, path: str):
+        super().__init__("enacs-key", timeout=120)
+        self._path = path
+
+    def connect(self) -> None:
+        s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        s.settimeout(120)
+        s.connect(self._path)
+        self.sock = s
+
+
+def key_socket(name: str) -> str:
+    d = os.environ.get("ENACS_KEYS_DIR")
+    if not d or not Path(d, f"{name}.sock").exists():
+        die(f"no {name} key socket (ENACS_KEYS_DIR) — Son's `/bounds key {name}@…`")
+    return str(Path(d, f"{name}.sock"))
+
+
+def api(key: str, method: str, path: str, body: dict | None = None) -> dict:
+    """One call through the key socket; the forwarder adds the real key."""
+    conn = _UnixHTTP(key_socket(key))
+    headers = {"Authorization": "Bearer placeholder", "Content-Type": "application/json"}
+    conn.request(method, path, body=None if body is None else json.dumps(body),
+                 headers=headers)
+    r = conn.getresponse()
+    data = r.read().decode("utf-8", "replace")
+    conn.close()
+    if r.status >= 300:
+        die(f"{method} {path.split('?')[0]} -> {r.status}: {redact(data)[:1500]}")
+    return json.loads(data) if data.strip() else {}
+
+
+def do(method: str, path: str, body: dict | None = None) -> dict:
+    return api("DO_API_KEY", method, path, body)
+
+
+def app_by_name(name: str) -> dict | None:
+    for a in do("GET", "/v2/apps?per_page=200").get("apps") or []:
+        if a.get("spec", {}).get("name") == name:
+            return a
+    return None
+
+
+# --- the spec --------------------------------------------------------------------
+
+def load_spec(which: str) -> dict:
+    return yaml.safe_load(APPS[which]["spec"].read_text())
+
+
+def envs(spec: dict) -> list[dict]:
+    return spec["services"][0].setdefault("envs", [])
+
+
+def fill(spec: dict, values: dict[str, str], drop: set[str]) -> dict:
+    """Give each named env its value (a SECRET keeps its type); drop the named ones."""
+    out = []
+    for e in envs(spec):
+        k = e["key"]
+        if k in drop:
+            continue
+        if k in values:
+            e = {**e, "value": values[k]}
+        out.append(e)
+    spec["services"][0]["envs"] = out
+    return spec
+
+
+def secret_keys(spec: dict) -> list[str]:
+    return [e["key"] for e in envs(spec) if e.get("type") == "SECRET"]
+
+
+def engine_ingress() -> str:
+    a = app_by_name(APPS["engine"]["name"])
+    url = (a or {}).get("live_url") or (a or {}).get("default_ingress")
+    if not url:
+        die("ancu-engine has no ingress yet — apply the engine first and let it deploy")
+    return url.rstrip("/")
+
+
+def tenant_pubkey(priv_b64: str) -> str:
+    """The ed25519 public half of SHELL_TENANT_PRIVKEY (base64 of the raw private
+    key, fh_shell_engine_jwt), derived by OTP's crypto as the shell signs with it.
+    The private key reaches erl through its environment, never argv."""
+    expr = ('P=base64:decode(os:getenv("FH_PRIV")),'
+            '{Pub,_}=crypto:generate_key(eddsa,ed25519,P),'
+            'io:format("~s",[base64:encode(Pub)]),halt().')
+    p = subprocess.run(["erl", "-noshell", "-eval", expr],
+                       env={**os.environ, "FH_PRIV": priv_b64},
+                       capture_output=True, text=True)
+    if p.returncode != 0 or not p.stdout.strip():
+        die("SHELL_TENANT_PRIVKEY does not decode to an ed25519 key:\n" + redact(p.stderr))
+    return p.stdout.strip()
+
+
+def propose(spec: dict) -> dict:
+    """POST /v2/apps/propose: DO validates the spec and prices it; changes nothing."""
+    return do("POST", "/v2/apps/propose", {"spec": spec})
+
+
+def report_proposal(name: str, res: dict) -> None:
+    print(f"{name}: spec valid — app_cost US${res.get('app_cost')}/mo, "
+          f"tier {res.get('app_tier_slug') or '?'}")
+
+
+def cmd_propose(which: str) -> None:
+    """Read-only, no .env: secrets get a placeholder, the derived values a stand-in."""
+    spec = load_spec(which)
+    values = {k: "placeholder" for k in secret_keys(spec)}
+    if which == "engine":
+        values |= {"SHELL_TENANT_ID": "00000000-0000-0000-0000-000000000000",
+                   "SHELL_TENANT_PUBKEY": "placeholder"}
+    else:
+        values["ENGINE_BASE_URL"] = "https://placeholder.ondigitalocean.app"
+    report_proposal(APPS[which]["name"], propose(fill(spec, values, set())))
+
+
+def cmd_apply(which: str, dry: bool = False) -> None:
+    cfg = APPS[which]
+    env = read_env()
+    missing = [k for k in cfg["required"] if not env.get(k)]
+    if missing:
+        die(".env lacks " + ", ".join(missing) + " — nothing was changed on DO")
+    spec = load_spec(which)
+    values: dict[str, str] = {}
+    drop: set[str] = set()
+    for k in secret_keys(spec):
+        if env.get(k):
+            values[k] = env[k]
+        else:
+            drop.add(k)
+    for k in CONFIG_FROM_ENV:
+        if env.get(k) and any(e["key"] == k for e in envs(spec)):
+            values[k] = env[k]
+    pub = None
+    if which == "engine":
+        if not re.fullmatch(r"[0-9a-fA-F-]{36}", env["SHELL_TENANT_ID"]):
+            die("SHELL_TENANT_ID is not a uuid")
+        pub = tenant_pubkey(env["SHELL_TENANT_PRIVKEY"])
+        values |= {"SHELL_TENANT_ID": env["SHELL_TENANT_ID"], "SHELL_TENANT_PUBKEY": pub}
+    else:
+        values["ENGINE_BASE_URL"] = engine_ingress()
+    spec = fill(spec, values, drop)
+    report_proposal(cfg["name"], propose(spec))
+    existing = app_by_name(cfg["name"])
+    if dry:
+        a: dict = {"id": existing and existing["id"]}
+        verb = "would update" if existing else "would create"
+    elif existing:
+        a = do("PUT", f"/v2/apps/{existing['id']}", {"spec": spec}).get("app", {})
+        verb = "updated"
+    else:
+        a = do("POST", "/v2/apps", {"spec": spec}).get("app", {})
+        verb = "created"
+    print(f"{verb} {cfg['name']} id={a.get('id')} "
+          f"ingress={a.get('live_url') or a.get('default_ingress') or '(pending)'}")
+    print("set:     " + ", ".join(sorted(values)))
+    if drop:
+        print("not set: " + ", ".join(sorted(drop)) + " (absent from .env)")
+    if pub:
+        print(f"tenant public key: {pub}")
+    if which == "shell":
+        print(f"ENGINE_BASE_URL={values['ENGINE_BASE_URL']}")
+
+
+def deployments(app: dict) -> list[dict]:
+    return [d for d in (app.get(k) for k in ("in_progress_deployment",
+                                             "pending_deployment",
+                                             "active_deployment")) if d]
+
+
+def cmd_status() -> None:
+    apps = [a for a in do("GET", "/v2/apps?per_page=200").get("apps") or []
+            if a.get("spec", {}).get("name", "").startswith("ancu-")]
+    if not apps:
+        print("no ancu-* apps")
+    for a in apps:
+        ds = deployments(a)
+        phase = ds[0].get("phase") if ds else "-"
+        print(f"{a['spec']['name']} id={a['id']} region={a.get('region', {}).get('slug')} "
+              f"deployment={phase} ingress={a.get('live_url') or '(pending)'}")
+
+
+def cmd_logs(which: str, kind: str) -> None:
+    """The newest deployment's aggregate log of this kind (RUN, BUILD or DEPLOY)."""
+    a = app_by_name(APPS[which]["name"])
+    if not a:
+        die(f"no {APPS[which]['name']} app")
+    ds = deployments(a)
+    if not ds:
+        ds = do("GET", f"/v2/apps/{a['id']}/deployments?per_page=1").get("deployments") or []
+    if not ds:
+        die("no deployment yet")
+    res = do("GET", f"/v2/apps/{a['id']}/deployments/{ds[0]['id']}/logs"
+                    f"?type={kind.upper()}&follow=false")
+    urls = res.get("historic_urls") or []
+    if not urls:
+        die(f"no {kind} log for deployment {ds[0]['id']} ({ds[0].get('phase')})")
+    for u in urls:
+        with urllib.request.urlopen(u, timeout=60) as r:
+            sys.stdout.write(r.read().decode("utf-8", "replace"))
+
+
+def main(argv: list[str]) -> None:
+    if len(argv) == 2 and argv[0] == "propose" and argv[1] in APPS:
+        cmd_propose(argv[1])
+    elif len(argv) in (2, 3) and argv[0] == "apply" and argv[1] in APPS \
+            and argv[2:] in ([], ["--dry-run"]):
+        cmd_apply(argv[1], dry=argv[2:] == ["--dry-run"])
+    elif argv == ["status"]:
+        cmd_status()
+    elif len(argv) in (2, 3) and argv[0] == "logs" and argv[1] in APPS \
+            and (len(argv) == 2 or argv[2] in ("run", "build", "deploy")):
+        cmd_logs(argv[1], argv[2] if len(argv) == 3 else "run")
+    else:
+        die("usage: do_deploy.py propose engine|shell | apply engine|shell [--dry-run] "
+            "| status "
+            "| logs engine|shell [run|build|deploy]")
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])

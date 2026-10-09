@@ -28,6 +28,7 @@
 
 -export([start_link/0]).
 -export([period_tokens/1, invalidate/1, gate/1, usage_summary/1]).
+-export([claim_question/1, release_question/1, daily_question_limit/0]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
          terminate/2, code_change/3]).
 
@@ -94,6 +95,35 @@ gate(UserId) when is_binary(UserId) ->
                 true  -> {block, #{tier => Tier, used => Used, limit => Limit}};
                 false -> allow
             end
+    end.
+
+%% The daily assistant-question cap (behavior 36), beside the token gate it follows:
+%% an admin is exempt here as there (claim `none`, nothing counted); everyone else
+%% claims one of FH_QA_DAILY_LIMIT (default 1) questions for today in Sydney. The claim
+%% is handed back to release_question/1 when the engine does not start the turn.
+-spec claim_question(binary()) ->
+    {ok, none | {binary(), binary()}} | {block, #{limit := integer(), resets_at := binary()}}.
+claim_question(UserId) ->
+    case is_admin(UserId) of
+        true -> {ok, none};
+        false ->
+            Limit = daily_question_limit(),
+            case fh_shell_store:claim_question(UserId, Limit) of
+                {ok, Day}         -> {ok, {UserId, Day}};
+                {limit, ResetsAt} -> {block, #{limit => Limit, resets_at => ResetsAt}}
+            end
+    end.
+
+-spec release_question(none | {binary(), binary()}) -> ok.
+release_question(none) -> ok;
+release_question({UserId, Day}) -> fh_shell_store:release_question(UserId, Day).
+
+-spec daily_question_limit() -> non_neg_integer().
+daily_question_limit() ->
+    case os:getenv("FH_QA_DAILY_LIMIT") of
+        false -> 1;
+        ""    -> 1;
+        V     -> try list_to_integer(V) of N when N >= 0 -> N; _ -> 1 catch _:_ -> 1 end
     end.
 
 %% UserId -> admin?, via the same email lookup the usage consumer uses. A DB miss (no
