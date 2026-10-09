@@ -1,15 +1,20 @@
-# DigitalOcean App Platform spec — FirstHomey shell backend (deployment.md §3/§4).
+# DigitalOcean App Platform spec — Mai An Cư shell backend (deployment.md §3/§4).
 #
-# Deploy:  doctl apps spec validate --spec shell/web/app.yaml
-#          doctl apps create --spec shell/web/app.yaml
+# Deploy:  bash scripts/do_apply.sh shell   (after the engine: its ingress becomes
+#          ENGINE_BASE_URL — scripts/do_deploy.py)
+# Check:   python3 scripts/do_deploy.py propose shell   (read-only, no .env)
 #
-# Shares the ancu-pg cluster (provisioned out-of-band; see engine/app.yaml)
-# but a DIFFERENT database — ancu_shell — via SHELL_DATABASE_URL (set manually;
-# DO doesn't cross-inject DB refs across apps). HTTP-only to the engine; never a
-# cross-DB JOIN (constraint #11 / engine-contract §9.2).
+# Its own App Platform DEV database (PG 16, see engine/app.yaml for what that means),
+# separate from the engine's: HTTP-only to the engine; never a cross-DB JOIN
+# (constraint #11 / engine-contract §9.2).
 
 name: ancu-shell
-region: sgp
+region: syd
+databases:
+  - name: db
+    engine: PG
+    version: "16"
+    production: false
 services:
   - name: shell
     source_dir: shell/web
@@ -19,9 +24,9 @@ services:
       branch: main
       deploy_on_push: true
     http_port: 8081
-    # Cowboy + pgo only — the lighter app. ≈ 1 vcpu / 1 GB. Confirm slug with
-    # `doctl apps tier instance-size list`.
-    instance_size_slug: apps-s-1vcpu-1gb-fixed
+    # Cowboy + pgo only — the lighter app. 1 shared vcpu / 512 MB, US$5/mo
+    # (GET /v2/apps/tiers/instance_sizes, 2026-10-09). An OOM means one step up.
+    instance_size_slug: apps-s-1vcpu-0.5gb
     instance_count: 1
     health_check:
       http_path: /health
@@ -34,21 +39,20 @@ services:
       # ── Config (non-secret; committed) ──────────────────────────────────────────
       - key: FH_SHELL_HTTP_PORT
         value: "8081"
-      # The engine's public base URL the shell calls server-side. BEFORE DNS lands,
-      # override to the engine app's *.ondigitalocean.app ingress, then revert to the
-      # apex once DNS is up (deployment.md §4 step 6).
+      # The engine app's *.ondigitalocean.app ingress, which the shell calls
+      # server-side; do_deploy.py fills it from the live ancu-engine app.
       - key: ENGINE_BASE_URL
-        value: "https://engine.ancu.ai"
+        value: ""
       # Base for magic-link + Google redirect URIs and the SPA origin. The browser
       # only ever talks to this origin; /api/* is proxied here by a Pages Function.
       - key: APP_BASE_URL
-        value: "https://app.ancu.ai"
+        value: "https://maiancu.com"
       # fh_session gets Secure in prod (HTTPS-only). Host-only, SameSite=Lax cookie.
       - key: COOKIE_SECURE
         value: "1"
-      # Magic-link sender — must be on the Resend-verified domain (deployment.md §4 step 8).
+      # Magic-link sender — on the Resend-verified domain maiancu.com (Son 2026-10-09).
       - key: EMAIL_FROM
-        value: "no-reply@ancu.ai"
+        value: "no-reply@maiancu.com"
       # Stripe API base — live default; explicit for clarity. (Tests override it to a
       # stub; never set the stub value in prod.)
       - key: STRIPE_API_BASE
@@ -57,19 +61,20 @@ services:
       - key: ADDON_AMOUNT_DOC_REVIEW
         value: "4000"
       # Admin allowlist (config, comma-separated — emails aren't secret). Left empty
-      # in-repo; set the real list in the Dashboard to avoid committing addresses.
+      # in-repo; do_deploy.py fills it from .env so no address is committed.
       # Admins are charge-exempt (billed=false) but still metered (8-S5e).
       - key: ADMIN_EMAILS
         value: ""
-      # ── Secrets (set in DO Dashboard → Settings → Environment Variables) ─────────
-      # ancu_shell on the shared cluster, ?sslmode=require (deployment.md §4 step 6).
+      # The dev database's URL (?sslmode=require), bound by App Platform at run time.
       - key: SHELL_DATABASE_URL
-        type: SECRET
+        scope: RUN_TIME
+        value: ${db.DATABASE_URL}
+      # ── Secrets (filled from .env by scripts/do_deploy.py; absent ones dropped) ──
       # User-JWT HMAC (openssl rand -hex 32).
       - key: SHELL_JWT_SECRET
         type: SECRET
       # ed25519 tenant identity. PRIVKEY is base64 of the private key; its PUBLIC half
-      # is registered with the engine out-of-band (deployment.md §4 step 5).
+      # reaches the engine as SHELL_TENANT_PUBKEY and is registered at its boot.
       - key: SHELL_TENANT_ID
         type: SECRET
       - key: SHELL_TENANT_PRIVKEY
@@ -77,7 +82,7 @@ services:
       # re_… → magic-link emails via Resend; unset → link logged (DO log stream).
       - key: RESEND_API_KEY
         type: SECRET
-      # Google OAuth — redirect URI https://app.ancu.ai/api/auth/google/callback.
+      # Google OAuth — redirect URI https://maiancu.com/api/auth/google/callback.
       - key: GOOGLE_CLIENT_ID
         type: SECRET
       - key: GOOGLE_CLIENT_SECRET
@@ -94,11 +99,14 @@ services:
         type: SECRET
       # ── Intentionally UNSET in prod ─────────────────────────────────────────────
       # SHELL_DEV_AUTOPROVISION — else the shell mints an ephemeral tenant key instead
-      #   of using the static SHELL_TENANT_PRIVKEY (the out-of-band-registered one).
+      #   of using the static SHELL_TENANT_PRIVKEY (the one the engine registers).
       # AUTH_DEV_EXPOSE_LINK — dev-only magic-link echo.
       # GOOGLE_TOKEN_URL — test-stub override; unset → real Google token endpoint.
       # Do NOT add these here.
 
+# api.maiancu.com: a DNS-only CNAME in the Cloudflare zone to this app's ingress
+# (do_deploy.py dns); DO issues the certificate. The Pages project proxies
+# maiancu.com/api/* here (SHELL_ORIGIN).
 domains:
-  - domain: api.ancu.ai
+  - domain: api.maiancu.com
     type: PRIMARY

@@ -1,20 +1,24 @@
-# DigitalOcean App Platform spec — FirstHomey engine (deployment.md §3/§4).
+# DigitalOcean App Platform spec — Mai An Cư engine (deployment.md §3/§4).
 #
-# Deploy:  doctl apps spec validate --spec engine/app.yaml
-#          doctl apps create --spec engine/app.yaml
-# (The "Create App from repo" wizard reports "No components detected" because the
-#  Dockerfiles live in subdirs — use the App Spec editor / doctl, deployment.md §4.)
+# Deploy:  bash scripts/do_apply.sh engine   (fills the secrets from .env, validates
+#          with /v2/apps/propose, creates or updates the app — scripts/do_deploy.py)
+# Check:   python3 scripts/do_deploy.py propose engine   (read-only, no .env)
 #
-# The managed PG cluster (ancu-pg, PG 16, sgp1) is provisioned OUT-OF-BAND
-# via `doctl databases create` — NOT from a `databases:` block here. App Platform
-# won't create a cluster from-spec, and an attached block hands a restricted user
-# that can't CREATE DATABASE. The engine connects via ENGINE_DATABASE_URL (doadmin
-# creds, db ancu_engine, ?sslmode=require) — set as a SECRET below.
+# The engine owns an App Platform DEV database (`databases:` below, PG 16, ~US$7/mo):
+# one database, reachable only from this app, no backups, destroyed with the app;
+# "Convert to a Managed Database" upgrades it in place (behavior 33, Son 2026-10-09).
+# Because nothing outside the app can reach it, the shell's tenant public key is
+# registered by the engine itself at boot (SHELL_TENANT_ID / SHELL_TENANT_PUBKEY).
 #
-# Region slugs: the APP region is `sgp`; the PG CLUSTER region is `sgp1`.
+# Region `syd`: the users of maiancu.com are in Australia.
 
 name: ancu-engine
-region: sgp
+region: syd
+databases:
+  - name: db
+    engine: PG
+    version: "16"
+    production: false
 services:
   - name: engine
     # Build context = repo root so the Dockerfile can reach docs/ (KB sources),
@@ -27,9 +31,9 @@ services:
       deploy_on_push: true
     http_port: 8080
     # Heavier of the two apps — carries the per-turn Python Agent-SDK subprocess.
-    # `basic-s` ≈ 1 vcpu / 2 GB. Slugs drift — confirm with
-    # `doctl apps tier instance-size list`.
-    instance_size_slug: basic-s
+    # 1 vcpu / 1 GB fixed, US$10/mo (GET /v2/apps/tiers/instance_sizes, 2026-10-09).
+    # Unmeasured under a turn: an OOM in the run log means apps-s-1vcpu-2gb ($25).
+    instance_size_slug: apps-s-1vcpu-1gb-fixed
     instance_count: 1
     health_check:
       http_path: /health
@@ -53,11 +57,18 @@ services:
       # or leave the image default "unknown" for plain deploy_on_push (deployment.md §6).
       - key: FH_DEPLOY_COMMIT_SHA
         value: "unknown"
-      # ── Secrets (set in DO Dashboard → Settings → Environment Variables) ─────────
-      # Full doadmin string, db ancu_engine, ?sslmode=require. Derive from the
-      # out-of-band cluster (deployment.md §4 step 2/4). Not DO-injected.
+      # The dev database's URL (?sslmode=require), bound by App Platform at run time.
       - key: ENGINE_DATABASE_URL
-        type: SECRET
+        scope: RUN_TIME
+        value: ${db.DATABASE_URL}
+      # The shell's tenant: the engine registers this public key at boot (idempotent),
+      # so the shell's JWTs verify. Not secret — the private half stays in the shell.
+      # do_apply fills both from .env (the public key derived from SHELL_TENANT_PRIVKEY).
+      - key: SHELL_TENANT_ID
+        value: ""
+      - key: SHELL_TENANT_PUBKEY
+        value: ""
+      # ── Secrets (filled from .env by scripts/do_deploy.py) ───────────────────────
       # Anthropic Max-subscription credit for the Agent-SDK planner (the prod runner;
       # billing.md). The native `claude` binary authes off this; the planner blanks
       # ANTHROPIC_API_KEY in the SDK subprocess so this token wins.
@@ -68,13 +79,12 @@ services:
         type: SECRET
       # ── Intentionally UNSET in prod ─────────────────────────────────────────────
       # ENGINE_DEV_PROVISION — the dev-only POST /api/engine/dev/tenants endpoint must
-      # stay 404 in prod. Prod tenant pubkeys are provisioned out-of-band (deployment.md
-      # §4 step 5). Do NOT add it here.
+      # stay 404 in prod. The prod tenant key comes from SHELL_TENANT_PUBKEY above.
+      # Do NOT add it here.
       #
       # The engine needs NO CORS (no browser hits it directly — the suburb map is
       # proxied through the shell). Tenant PUBLIC keys live in the engine DB
       # (tenant_signing_keys), not env.
 
-domains:
-  - domain: engine.ancu.ai
-    type: PRIMARY
+# No custom domain: only the shell calls the engine, at its *.ondigitalocean.app
+# ingress (do_deploy.py hands it to the shell as ENGINE_BASE_URL).
