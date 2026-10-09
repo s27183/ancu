@@ -41,6 +41,7 @@
     import NewsTicker from '$lib/NewsTicker.svelte';
     import NewsListSheet from '$lib/NewsListSheet.svelte';
     import NewsDetailSheet from '$lib/NewsDetailSheet.svelte';
+    import Welcome from '$lib/Welcome.svelte';
     import { t, type MessageKey } from '$lib/i18n';
 
     // NB: never name a $state var `state` — svelte-check reads it as a store subscribe.
@@ -510,4 +511,7 @@
     {#if selectedHomeNews}
         <NewsDetailSheet note={selectedHomeNews} onClose={onHomeNewsClose} />
     {/if}
+
+    <!-- First visit: the case for Australian property, then a launcher to reopen it (behavior 42). -->
+    <Welcome />
 </div>

@@ -16,7 +16,7 @@
          refine/3, set_profile_financials/3, set_checklist_status/3,
          attach_property/3, set_transaction_dates/4, upload_document/4, stream_events/3,
          list_suburbs/1, get_usage_events/2, start_httpc_profiles/0,
-         get_news/2, dismiss_news/3, list_all_news/0]).
+         get_news/2, dismiss_news/3, list_all_news/0, list_facts/0]).
 
 %% Dedicated httpc profile for the LONG-LIVED SSE stream proxy (stream_events/3).
 %% SSE requests run with {timeout, infinity} and hold an httpc session for the entire
@@ -251,6 +251,18 @@ dismiss_news(UserId, PlanCardId, BodyMap) ->
 list_all_news() ->
     Token = fh_shell_engine_jwt:mint(#{user_id => ?ANON_USER_ID}),
     Url = base_url() ++ "/news",
+    Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
+    {ok, {{_, Status, _}, _, Resp}} =
+        httpc:request(get, {Url, Headers},
+                      [{timeout, ?RPC_TIMEOUT_MS}], [{body_format, binary}]),
+    {Status, Resp}.
+
+%% The first-visit sheet's facts — GET /api/engine/facts (behavior 42); same anonymous
+%% tenant-JWT posture as list_all_news/0: global KB content, no user.
+-spec list_facts() -> {non_neg_integer(), binary()}.
+list_facts() ->
+    Token = fh_shell_engine_jwt:mint(#{user_id => ?ANON_USER_ID}),
+    Url = base_url() ++ "/facts",
     Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
     {ok, {{_, Status, _}, _, Resp}} =
         httpc:request(get, {Url, Headers},
