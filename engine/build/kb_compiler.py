@@ -1187,6 +1187,14 @@ def run(emit=False):
         if not standalone and doc.get("diff") is None:
             suffix = f" ({doc['diff_error']})" if doc.get("diff_error") else ""
             fails.append(f"[news] {slug}: missing or unparsed '## Diff' jsonc block{suffix}")
+        # A summary is read by users verbatim; markdown_section stops only at the next
+        # H2, so an author's "Notes:" paragraph after the last summary (a standalone
+        # note has no ## Diff to stop it) would ship to the detail sheet (behavior 39,
+        # 2026-10-09: seen in prod). Author notes go under their own `## Notes`.
+        for loc in ("en", "vi"):
+            if re.search(r"^Notes:\s*$", doc.get(f"summary_{loc}") or "", re.M):
+                fails.append(f"[news] {slug}: Summary ({loc.upper()}) runs into an author "
+                            f"'Notes:' paragraph — head it `## Notes` so users never see it")
         err = check_copy_template({"en": doc.get("summary_en"), "vi": doc.get("summary_vi")})
         if err:
             fails.append(f"[news] {slug}: bilingual summary: {err}")
