@@ -14,6 +14,7 @@
     import {
         type FactDoc,
         SECTION_ORDER,
+        factSources,
         formatAsOf,
         getFacts,
         introSeen,
@@ -144,10 +145,11 @@
                         <h3 id="wl-{doc.slug}">{pick(doc.title, $lang)}</h3>
                         <div class="wl-grid">
                             {#each doc.facts as fact (fact.id)}
-                                {@const src = doc.sources[fact.source]}
+                                {@const srcs = factSources(doc, fact)}
                                 <article
                                     class="wl-fact"
                                     class:wide={fact.visual === 'bars' || fact.visual === 'growth'}
+                                    class:statement={fact.visual === 'statement'}
                                     data-fact={fact.id}
                                 >
                                     <h4>{pick(fact.headline, $lang)}</h4>
@@ -155,9 +157,9 @@
                                     <p class="wl-caption">{pick(fact.caption, $lang)}</p>
                                     <p class="wl-src">
                                         {$t('intro.source')}:
-                                        {#if src?.url}<a href={src.url} target="_blank" rel="noopener noreferrer"
-                                                >{publisher(src, $lang)}</a
-                                            >{/if}
+                                        {#each srcs as src, k (k)}{#if k}{', '}{/if}{#if src.url}<a href={src.url} target="_blank" rel="noopener noreferrer"
+                                                    >{publisher(src, $lang)}</a
+                                                >{/if}{/each}
                                         · {formatAsOf(fact.as_of, $lang)}
                                     </p>
                                 </article>
@@ -495,6 +497,11 @@
         margin: 0;
         font-size: var(--fs-xs);
         color: var(--ink-2);
+    }
+    /* A statement has no chart: its caption is the fact, so it reads at body size. */
+    .wl-fact.statement .wl-caption {
+        font-size: var(--fs-sm);
+        line-height: 1.55;
     }
     .wl-src {
         margin: auto 0 0;
