@@ -21,6 +21,11 @@ chosen — Son, 2026-10-09; it replaces "Rau" of 2026-10-06.)
 The plan is information provided as is, for budget planning across that
 lifecycle; the platform gives no legal, tax or financial advice service, and
 every disclaimer the user reads says so in those terms (Son, 2026-10-08).
+The platform is independent: it is tied to no real-estate, legal or migration
+service, so its plan is an independent check of the whole lifecycle budget,
+for a buyer who already bought through the channel they know and for one who
+does not know where to start; the user reads this position, and the
+information-not-advice one, before anything else (Son, 2026-10-10).
 
 **The launch scope is the system as built** (Son, 2026-10-06: "stop at the
 current scope which is good enough for production launch"): Modes A-E with
