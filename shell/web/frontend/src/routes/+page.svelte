@@ -4,7 +4,7 @@
     // state selector (the engine's query grain), a legend, the CC-BY attribution
     // strip (§6.1), and the click-sheet. Mobile-native: full-bleed canvas, the
     // sheet is a bottom-sheet on phone / side-panel on desktop (§7.1).
-    import { onMount } from 'svelte';
+    import { onMount, tick } from 'svelte';
     import {
         getSuburbs,
         listPlanCards,
@@ -26,7 +26,7 @@
         type SizeBy
     } from '$lib/map';
     import { signinFlag, type SigninFlag } from '$lib/auth';
-    import { refreshSession, session, sessionExpired, dismissSessionExpired } from '$lib/stores/session';
+    import { refreshSession, session, guest, sessionExpired, dismissSessionExpired } from '$lib/stores/session';
     import { loginOpen } from '$lib/stores/ui';
     import { clickOutside } from '$lib/actions/clickOutside';
     import SuburbMap from '$lib/SuburbMap.svelte';
@@ -249,8 +249,22 @@
         const s = suburbs.find((x) => x.sal_code === p.sal);
         if (!s) return;
         pickSuburb(s);
+        if (!p.answers) {
+            // A guest who signed in from their plan: back to that suburb's Plan tab, where
+            // the claimed plan now sits (SuburbSheet switches tab on a reloadPlan change
+            // after it has mounted, hence the tick).
+            void tick().then(() => planReload++);
+            return;
+        }
         restoreAnswers = p.answers;
         planning = true;
+    });
+    // Behavior 45: a guest opening sign-in with a suburb's sheet open (the plan notice,
+    // the Q&A reason, or the header) comes back to that suburb after the round-trip.
+    // The onboarding's own sign-in (the daily cap) saves its answers instead.
+    $effect(() => {
+        if ($loginOpen && $guest && selected && !planning)
+            savePending({ sal: selected.sal_code, scope: auState, ts: Date.now() });
     });
 </script>
 
@@ -292,7 +306,7 @@
     <!-- Session-expired cue (the 1-day JWT lapsed under a previously-signed-in user) —
          distinct from never-signed-in: prompt a calm re-login so the saved-plans surface
          doesn't just silently vanish. Signing in restores the checkbox + the saved set. -->
-    {#if $sessionExpired}
+    {#if $sessionExpired && !$guest}
         <div class="signin-banner signin-banner-cue" role="status">
             <span class="signin-banner-msg">{$t('auth.expired.cue')}</span>
             <span class="signin-banner-actions">
@@ -510,6 +524,9 @@
             oncreated={() => {
                 planning = false;
                 planReload++;
+                // A signed-out create made this browser a guest (behavior 45): re-read
+                // /api/me so the plan shows the 7-day notice.
+                void refreshSession();
             }}
             onclose={() => (planning = false)}
             onsignin={(answers) => {
