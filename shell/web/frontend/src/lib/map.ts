@@ -12,7 +12,7 @@ import type {
     ExpressionSpecification
 } from 'maplibre-gl';
 import type { FeatureCollection, Point } from 'geojson';
-import { layers, namedFlavor } from '@protomaps/basemaps';
+import { layers, namedFlavor, type Flavor } from '@protomaps/basemaps';
 import type { Suburb } from '$lib/api';
 
 /** The engine's CHECK-constrained state enum (003_suburbs.sql) — the map's query grain. */
@@ -426,6 +426,44 @@ const PROTOMAPS_ASSETS = 'https://protomaps.github.io/basemaps-assets';
 // failed basemap and fall back to `minimalStyle` (see its runtime-fallback comment).
 export const BASEMAP_SOURCE_ID = 'protomaps';
 
+// Mai An Cư's basemap: Protomaps 'light' with its land, water and green areas re-tinted
+// to the app palette (app.css :root, behavior 41). The stock flavour's cyan water and
+// saturated park greens competed with the jade suburb fills; here the ground is warm
+// paper (≈ --bg), water a quiet slate blue, and parks a faint sage, so the choropleth
+// is the only strong colour on the map. MapLibre needs literals, so they live here.
+const MAP_FLAVOR: Flavor = {
+    ...namedFlavor('light'),
+    background: '#e9ecea',
+    earth: '#efebe3',
+    water: '#c9d8e2',
+    ocean_label: '#6f8798',
+    park_a: '#e4e6dc',
+    park_b: '#d9dfcf',
+    wood_a: '#e4e6dc',
+    wood_b: '#d9dfcf',
+    scrub_a: '#e6e5dc',
+    scrub_b: '#dcdfd2',
+    sand: '#ece6d8',
+    beach: '#ece6d8',
+    glacier: '#f1efea',
+    buildings: '#e0dbd1',
+    pedestrian: '#ebe6dc',
+    boundaries: '#b8b1a3',
+    city_label: '#3b4658',
+    subplace_label: '#646a73',
+    // Low-zoom landcover (the whole continent at z3-6): stock greens and yellows read as
+    // data; a near-flat warm paper keeps them as texture only.
+    landcover: {
+        grassland: '#ebe9df',
+        barren: '#f1ebdf',
+        urban_area: '#e6e1d8',
+        farmland: '#ebe8dd',
+        glacier: '#f6f4ef',
+        scrub: '#ece9dd',
+        forest: '#e2e5d9'
+    }
+};
+
 /** A Protomaps-backed MapLibre style for a given `.pmtiles` archive URL. The caller must
  *  have registered the `pmtiles://` protocol first (ensurePmtilesProtocol, lib/pmtiles.ts).
  *  Returns a plain object — no DOM, no protocol side effect — so this stays unit-testable. */
@@ -435,7 +473,7 @@ export const BASEMAP_SOURCE_ID = 'protomaps';
  *  the data gets. Returns undefined if the flavor somehow has no symbol layer (then the
  *  data sits on top, the no-basemap behaviour). */
 export function firstLabelLayerId(): string | undefined {
-    return layers(BASEMAP_SOURCE_ID, namedFlavor('light'), { lang: 'en' }).find(
+    return layers(BASEMAP_SOURCE_ID, MAP_FLAVOR, { lang: 'en' }).find(
         (l) => l.type === 'symbol'
     )?.id;
 }
@@ -453,6 +491,6 @@ export function basemapStyle(pmtilesUrl: string): StyleSpecification {
                     '<a href="https://protomaps.com">Protomaps</a> © <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>'
             }
         },
-        layers: layers(BASEMAP_SOURCE_ID, namedFlavor('light'), { lang: 'en' })
+        layers: layers(BASEMAP_SOURCE_ID, MAP_FLAVOR, { lang: 'en' })
     };
 }
