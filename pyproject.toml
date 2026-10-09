@@ -10,3 +10,8 @@ dependencies = [
     "pypdf>=5.0", # due_diligence B: deterministic lease PDF -> text (no LLM); bytes transient
     "xlrd>=2.0", # build-time only: reads VIC VPSR legacy .xls (BIFF); openpyxl is .xlsx-only
 ]
+
+[dependency-groups]
+deploy = [
+    "pyyaml>=6.0.3",
+]
