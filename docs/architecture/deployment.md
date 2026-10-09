@@ -339,3 +339,5 @@ Status at any time: `python3 scripts/do_deploy.py status`; a deployment's log:
 - [`billing.md`](./billing.md) — the metering/commerce model the engine feeds (engine meters, shell gates).
 - aleap `docs/architecture/deployment.md` — the runbook template this reshapes.
 - aleap `engine/Dockerfile`, `shell/web/Dockerfile`, `engine/app.yaml`, `shell/web/app.yaml` — the **deployed, proven** packaging to lift from for the 8-S deploy-build slice (3-stage engine build + native `claude` binary install; trixie-slim shell runtime).
+
+See [the missing page](./no-such-page.md).
