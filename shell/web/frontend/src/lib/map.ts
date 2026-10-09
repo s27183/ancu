@@ -127,15 +127,18 @@ interface Criterion {
     heat?: { field: 'vc' | 'pop'; domain: [number, number] };
 }
 
+// The map palette's one declaration (behavior 41): MapLibre paint takes literal colours,
+// not CSS variables, so the ramps live here, beside the criteria they encode; the UI
+// tokens live in app.css :root. seifa's ramp is the brand jade family (2026-10-09).
 const CRITERIA: Record<SizeBy, Criterion> = {
     seifa: {
         field: 'se',
         domain: [1, 10],
         stops: [
-            [1, '#aec2de'],
-            [4, '#89a6cc'],
-            [7, '#5781b4'],
-            [10, '#234e86']
+            [1, '#cde6dd'],
+            [4, '#8cc6b2'],
+            [7, '#3d9a80'],
+            [10, '#0b5a49']
         ],
         min: '1',
         max: '10'
@@ -171,7 +174,7 @@ const CRITERIA: Record<SizeBy, Criterion> = {
         field: 'cr',
         domain: [0, 150],
         // Pure achromatic greys (R=G=B) — deliberately zero hue, so this never reads as
-        // "a duller blue" next to seifa's ramp. Distinct BY HUE FAMILY (chromatic blue
+        // "a duller jade" next to seifa's ramp. Distinct BY HUE FAMILY (chromatic jade
         // vs neutral grey), not just by saturation, so the two stay tellable apart at a
         // glance with only one on screen at a time. Still non-valenced (no shift toward
         // alarm-red) — see the comment on CRITERIA above.
@@ -186,7 +189,7 @@ const CRITERIA: Record<SizeBy, Criterion> = {
     }
 };
 
-const NO_DATA = '#cbd5e1'; // slate-300 — present on the map, visibly "no data", not zero
+const NO_DATA = '#d6d0c4'; // warm stone (app.css --border-strong family) — visibly "no data", not zero
 
 function interpolateStops(c: Criterion, valueExpr: unknown): unknown[] {
     const interp: unknown[] = ['interpolate', ['linear'], valueExpr];
@@ -407,7 +410,7 @@ export function legendFor(sizeBy: SizeBy): SizeLegend {
 export const minimalStyle: StyleSpecification = {
     version: 8,
     sources: {},
-    layers: [{ id: 'bg', type: 'background', paint: { 'background-color': '#e7e9ed' } }]
+    layers: [{ id: 'bg', type: 'background', paint: { 'background-color': '#e9ecea' } }] // = app.css --map-ground
 };
 
 // Protomaps basemap (8-S2d). Static assets (glyphs/sprite) load from protomaps.github.io

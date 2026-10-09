@@ -68,7 +68,7 @@
         display: flex;
         flex-direction: column;
         border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-        box-shadow: var(--shadow-2);
+        box-shadow: var(--shadow-3);
         animation: mo-rise var(--t-med, 0.22s) var(--ease, ease);
     }
     @keyframes mo-rise {
@@ -80,28 +80,40 @@
     .mo-head {
         display: flex;
         align-items: flex-start;
-        gap: 0.5rem;
-        padding: 0.9rem 1rem 0.5rem;
+        gap: var(--sp-3);
+        padding: var(--sp-5) var(--sp-5) var(--sp-4);
         border-bottom: 1px solid var(--border);
     }
     .mo-title {
         margin: 0;
-        font-size: 1.05rem;
+        font-size: var(--fs-xl);
         font-weight: 700;
+        line-height: 1.25;
+        letter-spacing: -0.02em;
         color: var(--ink);
     }
     .mo-close {
+        flex: none;
         margin-left: auto;
+        display: grid;
+        place-items: center;
+        width: 2rem;
+        height: 2rem;
         border: none;
-        background: transparent;
-        font-size: 1.1rem;
-        color: var(--muted);
+        border-radius: var(--radius-pill);
+        background: var(--bg-2);
+        font-size: var(--fs-sm);
+        color: var(--ink-2);
         cursor: pointer;
-        padding: 0.2rem 0.4rem;
         line-height: 1;
+        transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+    }
+    .mo-close:hover {
+        background: var(--border);
+        color: var(--ink);
     }
     .mo-body {
-        padding: 0.75rem 1rem 1rem;
+        padding: var(--sp-4) var(--sp-5) var(--sp-5);
         overflow-y: auto;
     }
 
@@ -111,7 +123,7 @@
             align-items: center;
         }
         .mo-card {
-            width: min(92%, 34rem);
+            width: min(92%, 38rem);
             max-height: 85%;
             border-radius: var(--radius-lg);
             border: 1px solid var(--glass-border);

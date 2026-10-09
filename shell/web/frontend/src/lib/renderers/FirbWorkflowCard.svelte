@@ -167,15 +167,15 @@
     .fw-blocking {
         margin: 0 0 0.6rem;
         padding: 0.6rem 0.75rem;
-        border-left: 3px solid #b91c1c;
-        background: #fef2f2;
+        border-left: 3px solid var(--danger);
+        background: var(--danger-soft);
         border-radius: 0 0.4rem 0.4rem 0;
     }
     .fw-blocking-body {
         margin: 0;
         font-size: 0.82rem;
         font-weight: 600;
-        color: #b91c1c;
+        color: var(--danger);
         line-height: 1.45;
     }
     .fw-item {

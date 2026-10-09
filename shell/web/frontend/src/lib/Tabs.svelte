@@ -77,9 +77,9 @@
         gap: 0.2rem;
         overflow-x: auto;
         padding: 0.2rem;
-        background: var(--bg);
+        background: var(--bg-2);
         border: 1px solid var(--border);
-        border-radius: 0.55rem;
+        border-radius: var(--radius);
         scrollbar-width: none;
     }
     .tabrail::-webkit-scrollbar {
@@ -90,9 +90,9 @@
         border: none;
         background: transparent;
         color: var(--muted);
-        border-radius: 0.4rem;
-        padding: 0.35rem 0.7rem;
-        font-size: 0.78rem;
+        border-radius: var(--radius-sm);
+        padding: 0.4rem 0.8rem;
+        font-size: var(--fs-xs);
         font-weight: 600;
         white-space: nowrap;
         cursor: pointer;
@@ -106,8 +106,8 @@
     }
     .tabrail button.active {
         background: var(--surface);
-        color: var(--ink);
-        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+        color: var(--accent);
+        box-shadow: var(--shadow-1);
     }
     /* Fades toward the rail's OWN background (var(--bg), the pill fill), not whatever sits
        behind the wrap — the overlay masks scrolled-under button edges inside the rail's own
@@ -126,12 +126,12 @@
     }
     .tabrail-fade-left {
         left: 1px;
-        border-radius: 0.55rem 0 0 0.55rem;
-        background: linear-gradient(to right, var(--bg), transparent);
+        border-radius: var(--radius) 0 0 var(--radius);
+        background: linear-gradient(to right, var(--bg-2), transparent);
     }
     .tabrail-fade-right {
         right: 1px;
-        border-radius: 0 0.55rem 0.55rem 0;
-        background: linear-gradient(to left, var(--bg), transparent);
+        border-radius: 0 var(--radius) var(--radius) 0;
+        background: linear-gradient(to left, var(--bg-2), transparent);
     }
 </style>

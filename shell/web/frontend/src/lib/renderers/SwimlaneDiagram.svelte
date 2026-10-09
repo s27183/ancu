@@ -284,8 +284,8 @@
         white-space: nowrap;
     }
     .sw-out {
-        background: color-mix(in srgb, #b91c1c 12%, transparent);
-        color: #b91c1c;
+        background: var(--danger-soft);
+        color: var(--danger);
     }
     .sw-in {
         background: color-mix(in srgb, var(--accent) 14%, transparent);
@@ -515,9 +515,9 @@
         color: var(--accent);
     }
     .sw-flow-amt.sw-out {
-        color: #b91c1c;
+        color: var(--danger);
     }
     .sw-flow-amt.sw-in {
-        color: #15803d;
+        color: var(--success);
     }
 </style>

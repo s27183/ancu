@@ -27,9 +27,9 @@
         ariaLabel?: string;
     } = $props();
 
-    // A small, fixed, calm categorical palette — segment colour is deterministic by
-    // index (matches the chip tones; cycles if >5 segments).
-    const PALETTE = ['#047857', '#1d4ed8', '#b45309', '#7c3aed', '#0e7490'];
+    // A small, fixed categorical palette — segment colour is deterministic by index
+    // (cycles if >5 segments). The colours are app.css's --chart-1..5 tokens (behavior 41).
+    const PALETTE = ['var(--chart-1)', 'var(--chart-2)', 'var(--chart-3)', 'var(--chart-4)', 'var(--chart-5)'];
     const color = (i: number) => PALETTE[i % PALETTE.length];
     const known = (v: number | null): v is number => typeof v === 'number';
 
