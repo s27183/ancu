@@ -302,7 +302,9 @@ def cmd_apply(which: str, dry: bool = False) -> None:
         pub = tenant_pubkey(env["SHELL_TENANT_PRIVKEY"])
         values |= {"SHELL_TENANT_ID": env["SHELL_TENANT_ID"], "SHELL_TENANT_PUBKEY": pub}
     else:
-        values["ENGINE_BASE_URL"] = engine_ingress()
+        # fh_shell_engine_client appends routes to this, so it carries the contract's
+        # /api/engine prefix (measured 2026-10-09: the bare ingress 404s every call).
+        values["ENGINE_BASE_URL"] = engine_ingress() + "/api/engine"
     spec = fill(spec, values, drop)
     report_proposal(cfg["name"], propose(spec))
     existing = app_by_name(cfg["name"])

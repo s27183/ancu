@@ -191,7 +191,7 @@ browser calls it directly).
 | Var | Kind | Value / note |
 |---|---|---|
 | `FH_SHELL_HTTP_PORT` | config | `8081` |
-| `ENGINE_BASE_URL` | config (filled) | the engine's `*.ondigitalocean.app` ingress — `do_deploy.py` reads it from the live `ancu-engine` |
+| `ENGINE_BASE_URL` | config (filled) | the engine's `*.ondigitalocean.app` ingress **plus `/api/engine`** (the shell appends routes to it) — `do_deploy.py` reads it from the live `ancu-engine` |
 | `APP_BASE_URL` | config | `https://maiancu.com` — base for the magic-link + Google redirect URIs |
 | `COOKIE_SECURE` | config | `1` (prod) — `fh_session` gets `Secure` |
 | `EMAIL_FROM` / `EMAIL_FROM_NAME` | config | magic-link sender `no-reply@maiancu.com`; the display name is the brand (`fh_shell_util:brand/0`) unless `EMAIL_FROM_NAME` overrides it — leave it unset |
