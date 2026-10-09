@@ -76,14 +76,26 @@ read(UserId, PlanCardId, Req0, Opts) ->
 %% metering-not-gating, the engine would happily run it; the shell decides. (The
 %% base-plan create turn is the free offering and is deliberately NOT gated; only
 %% this chat/refresh surface is — billing.md §5 "capped chat/refresh".)
+%%
+%% Then the DAILY QUESTION CAP (behavior 36): a well-formed question claims one of
+%% today's (Sydney) questions before the engine is called — 429 daily_question_limit
+%% with resets_at when none is left — and gives it back when the engine does not start
+%% the turn (any non-202, or the call crashing), so a busy or failed start costs nothing.
 ask(UserId, PlanCardId, Req0, Opts) ->
     case fh_shell_meter:gate(UserId) of
         allow ->
             case fh_shell_http:read_json_body(Req0) of
                 {ok, Body, Req1} ->
-                    {Status, Resp} =
-                        fh_shell_engine_client:post_message(UserId, PlanCardId, Body),
-                    {ok, relay(Status, Resp, Req1), Opts};
+                    case fh_shell_meter:claim_question(UserId) of
+                        {ok, Claim} ->
+                            {Status, Resp} = post_claimed(UserId, PlanCardId, Body, Claim),
+                            {ok, relay(Status, Resp, Req1), Opts};
+                        {block, #{limit := Limit, resets_at := ResetsAt}} ->
+                            {ok, fh_shell_http:reply_json(429,
+                                #{<<"error">> => <<"daily_question_limit">>,
+                                  <<"limit">> => Limit,
+                                  <<"resets_at">> => ResetsAt}, Req1), Opts}
+                    end;
                 {error, invalid_json} ->
                     {ok, fh_shell_http:reply_json(400,
                         #{<<"error">> => <<"invalid_json">>}, Req0), Opts}
@@ -94,6 +106,15 @@ ask(UserId, PlanCardId, Req0, Opts) ->
                   <<"tier">> => Tier,
                   <<"used_tokens">> => Used,
                   <<"limit_tokens">> => Limit}, Req0), Opts}
+    end.
+
+post_claimed(UserId, PlanCardId, Body, Claim) ->
+    try fh_shell_engine_client:post_message(UserId, PlanCardId, Body) of
+        {202, _} = Ok -> Ok;
+        Other -> fh_shell_meter:release_question(Claim), Other
+    catch Class:Reason:St ->
+        fh_shell_meter:release_question(Claim),
+        erlang:raise(Class, Reason, St)
     end.
 
 %% GET /api/plan-cards/:id/conversation — the Q&A thread's persisted history (bilingual
