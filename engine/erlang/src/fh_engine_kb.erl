@@ -24,7 +24,7 @@
 -export([kb/1, kb_content_md/1, kb_rules/1, kb_anchors/1, copy/2]).
 -export([rules/0]).
 -export([registry/1, registry/2]).
--export([news_for_slugs/1, all_news/0]).
+-export([news_for_slugs/1, all_news/0, all_facts/0]).
 
 -define(PT_KEY, {?MODULE, artifact}).
 
@@ -173,6 +173,17 @@ kb_anchors(Slugs) ->
                 {error, _} -> false
             end
         end, Slugs).
+
+%% --- facts accessor -----------------------------------------------------------
+%% The first-visit sheet's facts (behavior 42): the compiled `facts` map, one entry per
+%% docs/kb/facts/*.md ({title, last_verified, sources, facts}), each figure already
+%% checked against its archived primary by kb_compiler.py GATE 12. Returned as a list
+%% sorted by slug, each entry carrying its `slug`; global KB content, read-only. An
+%% artifact predating the key reads as no facts, never a crash.
+-spec all_facts() -> [map()].
+all_facts() ->
+    Facts = maps:get(<<"facts">>, artifact(), #{}),
+    [E#{<<"slug">> => Slug} || {Slug, E} <- lists:sort(maps:to_list(Facts))].
 
 %% --- news accessors ----------------------------------------------------------
 %% A news entry: {kb_slug, category, affected_kb_slugs, affected_components,

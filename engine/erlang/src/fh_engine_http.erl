@@ -36,6 +36,7 @@ routes() ->
         {"/api/engine/dev/tenants",             fh_engine_h_dev_provision, []},
         {"/api/engine/suburbs",                 fh_engine_h_suburbs,    []},
         {"/api/engine/news",                    fh_engine_h_news_feed,  []},
+        {"/api/engine/facts",                   fh_engine_h_facts,      []},
         {"/api/engine/usage_events",            fh_engine_h_usage_events, []},
         {"/api/engine/plan-cards",              fh_engine_h_plan_cards, []},
         {"/api/engine/plan-cards/:id/events",   fh_engine_h_events,     []},
