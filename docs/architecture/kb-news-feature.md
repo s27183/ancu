@@ -249,6 +249,13 @@ new detection mechanism, no scraping, no LLM diffing step. See
   `artifact["news"][slug]["sources"]`; `fh_engine_kb`/`fh_engine_h_news` pass
   it straight through, no runtime change. This was open design question #2
   (below the fold of #1's original numbering); now resolved.
+- **Sources** — government channels only (behavior 39, 2026-10-09): every
+  `sources:` entry of a news note is a URL whose host ends in `.gov.au`
+  (`NEWS_SOURCE_HOST_SUFFIX`, fail-closed in GATE 11). No commercial site and no
+  media, the ABC included, is ever behind a headline; a claim no government page
+  carries is cut. The detail sheet links `sources[0].url`, so the link a buyer
+  follows is always a government page. Authoring rule: kb-update-runbook.md
+  "Government sources only".
 - **Proof** — `engine/erlang/test/news_smoke.escript`: migration applies at
   boot, a fill's real `kb_versions` provenance correctly matches the compiled
   HECS note, GET/PATCH round-trip, `affected_components` names
