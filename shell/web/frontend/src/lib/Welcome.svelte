@@ -34,8 +34,22 @@
 
     const reduceMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
+    // The facts can be briefly unreachable (a cold engine, or the site deployed ahead of
+    // the API — measured 2026-10-09 on prod), and the sheet must not then lose two of its
+    // three sections for good: an empty answer is retried a few times, and again on reopen.
+    let loading = false;
+    async function loadFacts(tries = 3) {
+        if (loading || docs.length) return;
+        loading = true;
+        for (let i = 0; i < tries && !docs.length; i++) {
+            if (i) await new Promise((r) => setTimeout(r, 1500 * i));
+            docs = await getFacts();
+        }
+        loading = false;
+    }
+
     onMount(() => {
-        getFacts().then((d) => (docs = d));
+        loadFacts();
         if (!introSeen()) open = true;
     });
 
@@ -61,6 +75,7 @@
     }
 
     async function reopen() {
+        loadFacts();
         arrived = false;
         open = true;
         await tick();
