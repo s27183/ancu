@@ -106,6 +106,29 @@
                     <span class="wl-eyebrow">{$t('intro.eyebrow')}</span>
                     <h2 id="wl-title">{$t('intro.title')}</h2>
                     <p class="wl-lede">{$t('intro.lede')}</p>
+                    <!-- The platform's position, before anything else is read (behavior 44). -->
+                    <ul class="wl-position" aria-label={$t('intro.position.aria')}>
+                        <li>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"
+                                ><path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.4 7.5 9.5 4.3-1.1 7.5-4.9 7.5-9.5V6L12 3Z" /><path
+                                    d="m8.8 12 2.2 2.2 4.2-4.4"
+                                /></svg
+                            >
+                            <div>
+                                <strong>{$t('intro.position.independent.title')}</strong>
+                                <span>{$t('intro.position.independent.body')}</span>
+                            </div>
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"
+                                ><circle cx="12" cy="12" r="8.5" /><path d="M12 11v5.5M12 7.6v.1" /></svg
+                            >
+                            <div>
+                                <strong>{$t('intro.position.info.title')}</strong>
+                                <span>{$t('intro.position.info.body')}</span>
+                            </div>
+                        </li>
+                    </ul>
                     <button type="button" class="btn wl-cta" onclick={collapse}>{$t('intro.cta')} →</button>
                 </header>
 
@@ -171,6 +194,7 @@
                     <span>{$t('intro.cta.hint')}</span>
                     <button type="button" class="btn btn-primary" onclick={collapse}>{$t('intro.cta')}</button>
                 </footer>
+                <p class="wl-disclaimer">{$t('disclaimer.asic')}</p>
             </div>
         </div>
     </div>
@@ -337,6 +361,43 @@
         line-height: 1.6;
         color: var(--on-dark);
     }
+    .wl-position {
+        position: relative;
+        display: grid;
+        gap: var(--sp-3);
+        margin: 0 0 var(--sp-5);
+        padding: 0;
+        max-width: 38rem;
+        list-style: none;
+    }
+    .wl-position li {
+        display: flex;
+        gap: var(--sp-3);
+        align-items: flex-start;
+    }
+    .wl-position svg {
+        flex: none;
+        width: 1.25rem;
+        height: 1.25rem;
+        margin-top: 0.1rem;
+        fill: none;
+        stroke: var(--gold-mark);
+        stroke-width: 1.8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+    .wl-position strong {
+        display: block;
+        font-size: var(--fs-sm);
+        font-weight: 700;
+        color: var(--ink-inverse);
+    }
+    .wl-position span {
+        display: block;
+        font-size: var(--fs-sm);
+        line-height: 1.5;
+        color: var(--on-dark);
+    }
     .wl-cta {
         position: relative;
         background: var(--surface);
@@ -473,6 +534,15 @@
         color: var(--ink-2);
     }
 
+    /* The standing disclaimer closes the sheet (behavior 44). */
+    .wl-disclaimer {
+        margin: 0;
+        padding: 0 var(--sp-5) var(--sp-5);
+        font-size: var(--fs-xs);
+        line-height: 1.5;
+        color: var(--muted);
+    }
+
     /* --- launcher ----------------------------------------------------------- */
     .wl-launch {
         position: fixed;
@@ -592,6 +662,7 @@
         }
         .wl-note,
         .wl-section,
+        .wl-disclaimer,
         .wl-foot {
             padding-left: var(--sp-6);
             padding-right: var(--sp-6);

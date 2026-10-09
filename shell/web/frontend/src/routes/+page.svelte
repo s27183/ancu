@@ -461,6 +461,8 @@
                         >
                     {/if}
                     {#each attribution as src (src.source_id)}<span>{src.attribution}</span>{/each}
+                    <!-- The standing disclaimer, one tap away on every visit (behavior 44). -->
+                    <span class="attr-disclaimer">{$t('disclaimer.asic')}</span>
                 </div>
             {/if}
             <button

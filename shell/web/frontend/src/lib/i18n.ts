@@ -1108,6 +1108,19 @@ const messages = {
         vi: `${BRAND} lập kế hoạch ngân sách cho cả hành trình bất động sản của bạn tại Úc — mua, giữ, bán — theo quy định hiện hành và tối ưu cho hoàn cảnh của bạn. Mọi con số theo quy định đều dẫn về nguồn chính thức đã kiểm chứng.`,
         en: `${BRAND} builds a budget plan for your whole Australian property journey — buy, hold, sell — under current regulations and optimised for your situation. Every regulated figure traces to a verified official source.`
     },
+    // Behavior 44: the platform's position, on the sheet's first screen (invariants.md,
+    // the goal: independent; information as is, not an advice service — Son 2026-10-10).
+    'intro.position.aria': { vi: `${BRAND} là gì`, en: `What ${BRAND} is` },
+    'intro.position.independent.title': { vi: 'Một bản kiểm tra độc lập', en: 'An independent check' },
+    'intro.position.independent.body': {
+        vi: 'Không gắn với môi giới bất động sản, luật sư, đại lý di trú hay chủ đầu tư nào. Dù bạn đã mua qua kênh quen hay chưa biết bắt đầu từ đâu, bạn đều thấy được toàn bộ ngân sách mua, giữ và bán theo quy định hiện hành.',
+        en: 'Tied to no real-estate agent, lawyer, migration agent or developer. Whether you already bought through a channel you know or don’t know where to start, you see the whole budget to buy, hold and sell under current regulations.'
+    },
+    'intro.position.info.title': { vi: 'Thông tin, không phải tư vấn', en: 'Information, not advice' },
+    'intro.position.info.body': {
+        vi: 'Dựa trên quy định hiện hành hết mức có thể, cung cấp nguyên trạng — không phải dịch vụ tư vấn pháp lý, thuế hay tài chính.',
+        en: 'Grounded in current regulations as far as we can, provided as is — not a legal, tax or financial advice service.'
+    },
     'intro.sources.note': {
         vi: 'Mọi số liệu dưới đây lấy từ cơ quan chính phủ Úc, kèm nguồn và thời điểm.',
         en: 'Every figure below comes from an Australian government agency, with its source and date.'
