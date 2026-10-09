@@ -26,6 +26,6 @@ On **17 September 2026** the Minister for Home Affairs, Tony Burke, announced mi
 
 Ngày **17/9/2026**, Bộ trưởng Nội vụ Tony Burke công bố cải cách di trú tại National Press Club. Du học sinh và người có visa tốt nghiệp sẽ **không được thêm thành viên gia đình** nữa (trừ Thái Bình Dương, ASEAN và một số khóa như tiến sĩ; gia đình đã ở Úc không bị ảnh hưởng). Du học sinh chỉ được chuyển **lên** bậc học cao hơn. Năm thứ hai và thứ ba của visa Working Holiday chuyển sang **bốc thăm**, giới hạn **45.000** và **5.000**. Visa du lịch cấp mới sẽ có điều kiện **không được ở lại thêm** (trừ hồ sơ bảo hộ). Bài kiểm tra điểm được làm lại, nghề xây dựng nhà ở được tính điểm như bằng đại học, và xây dựng, nông nghiệp, thủy sản, tài nguyên, giảng dạy được thêm vào danh sách ưu tiên xét duyệt. Riêng từ **25/7/2026**, Chỉ thị 117 ưu tiên cao nhất cho hồ sơ visa gia đình nộp khi đang ở Úc. Bộ trưởng cho biết một số biện pháp, như hệ thống bày tỏ nguyện vọng, cần luật chưa được thông qua.
 
-Notes:
+## Notes
 
 - Authored 2026-10-09 (behavior 39) in place of an ABC story (4 Aug 2026) that the package was delayed: the government's own record is the speech that announced it. Dates of effect for each measure are not given in the speech, so none are claimed.
