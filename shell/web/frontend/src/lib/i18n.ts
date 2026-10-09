@@ -1103,12 +1103,12 @@ const messages = {
     // regulated figure traced to a verified source.
     'intro.eyebrow': { vi: `Chào mừng đến ${BRAND}`, en: `Welcome to ${BRAND}` },
     'intro.title': {
-        vi: 'Sở hữu nhà ở Úc — với một kế hoạch rõ ràng',
-        en: 'Owning property in Australia — with a clear plan'
+        vi: 'Sở hữu bất động sản ở Úc — với một kế hoạch rõ ràng',
+        en: 'Owning real estate in Australia — with a clear plan'
     },
     'intro.lede': {
-        vi: `${BRAND} lập kế hoạch ngân sách cho cả hành trình bất động sản của bạn tại Úc — mua, giữ, bán — từ chính hoàn cảnh của bạn, bằng tiếng Việt và tiếng Anh. Mọi con số theo quy định đều dẫn về nguồn chính thức đã kiểm chứng.`,
-        en: `${BRAND} builds a budget plan for your whole Australian property journey — buy, hold, sell — from your own situation, in Vietnamese and English. Every regulated figure traces to a verified official source.`
+        vi: `${BRAND} lập kế hoạch ngân sách cho cả hành trình bất động sản của bạn tại Úc — mua, giữ, bán — theo quy định hiện hành và tối ưu cho hoàn cảnh của bạn. Mọi con số theo quy định đều dẫn về nguồn chính thức đã kiểm chứng.`,
+        en: `${BRAND} builds a budget plan for your whole Australian property journey — buy, hold, sell — under current regulations and optimised for your situation. Every regulated figure traces to a verified official source.`
     },
     'intro.sources.note': {
         vi: 'Mọi số liệu dưới đây lấy từ cơ quan chính phủ Úc, kèm nguồn và thời điểm.',
