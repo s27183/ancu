@@ -12,8 +12,10 @@
     import type { Snippet } from 'svelte';
     import { t } from '$lib/i18n';
 
-    let { title = '', onClose, children }: {
+    let { title = '', compact = false, onClose, children }: {
         title?: string;
+        /** A smaller title for long headlines (the news detail sheet — behavior 43). */
+        compact?: boolean;
         onClose: () => void;
         children: Snippet;
     } = $props();
@@ -29,7 +31,7 @@
     <button type="button" class="mo-backdrop" aria-label={$t('sheet.close')} onclick={onClose}></button>
     <div class="mo-card" role="dialog" aria-modal="true" aria-label={title}>
         <header class="mo-head">
-            <h3 class="mo-title">{title}</h3>
+            <h3 class="mo-title" class:compact>{title}</h3>
             <button type="button" class="mo-close" aria-label={$t('sheet.close')} onclick={onClose}>✕</button>
         </header>
         <div class="mo-body">
@@ -92,6 +94,10 @@
         letter-spacing: -0.02em;
         color: var(--ink);
     }
+    .mo-title.compact {
+        font-size: var(--fs-lg);
+        letter-spacing: -0.01em;
+    }
     .mo-close {
         flex: none;
         margin-left: auto;
@@ -113,7 +119,8 @@
         color: var(--ink);
     }
     .mo-body {
-        padding: var(--sp-4) var(--sp-5) var(--sp-5);
+        /* phone bottom-sheet: the last line clears the home indicator (--safe-bottom) */
+        padding: var(--sp-4) var(--sp-5) calc(var(--sp-5) + var(--safe-bottom));
         overflow-y: auto;
     }
 

@@ -66,7 +66,7 @@
     const sourceUrl = $derived(note.sources?.[0]?.url ?? '');
 </script>
 
-<Modal title={headline} {onClose}>
+<Modal title={headline} compact {onClose}>
     {#if categoryLabel || dateLabel}
         <p class="pp-news-meta">
             {#if categoryLabel}<span class="pp-news-meta-cat">{categoryLabel}</span>{/if}

@@ -127,6 +127,9 @@
        notched phone; 0 on desktop. Bars and sheets pad by these, never by literals. */
     --safe-top: env(safe-area-inset-top, 0px);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
+    /* The header's full height: its bar plus the notch it extends up into. Everything
+       placed below the header offsets by this. */
+    --header-total: calc(var(--header-h) + var(--safe-top));
 }
 
 /* The shared glass surface — one rule every floating control opts into. */
@@ -392,7 +395,10 @@ body {
     left: 0;
     right: 0;
     z-index: 20; /* below the sheet (30) so the desktop drawer covers it top-to-bottom */
-    height: var(--header-h);
+    /* viewport-fit=cover (app.html): the glass bar extends up under the notch/status
+       bar, its content kept below it by the top inset (behavior 43). */
+    height: var(--header-total);
+    padding-top: var(--safe-top);
     /* 3 columns: brand (left) · language toggle (centred) · account (right). The two
        1fr edge columns keep the centre column visually centred regardless of side widths. */
     display: grid;
@@ -667,10 +673,28 @@ body {
     height: 100%;
 }
 
+/* Sized to the viewport the visitor can see: 100dvh shrinks while a phone browser's
+   address/tool bar is shown, where the vh unit is the bar-hidden height and puts the bottom
+   of a sheet under the bar (behavior 43). height:100% stays as the fallback. */
 body {
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    height: 100dvh;
+}
+
+/* Frosted glass over the home-indicator strip (behavior 43) — the header's twin at the
+   bottom edge; 0px tall wherever there is no bottom inset. */
+.safe-bottom-glass {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: var(--safe-bottom);
+    z-index: 20;
+    pointer-events: none;
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
 }
 
 main {
@@ -679,7 +703,7 @@ main {
 }
 
 .content {
-    padding: calc(var(--header-h) + 1.5rem) 1rem 1.5rem;
+    padding: calc(var(--header-total) + 1.5rem) 1rem calc(1.5rem + var(--safe-bottom));
     max-width: 48rem;
     margin: 0 auto;
 }
@@ -703,7 +727,7 @@ main {
    normal-flow child so it stacks under the toggle. */
 .controls-cluster {
     position: absolute;
-    top: calc(var(--header-h) + var(--home-news-h, 0px) + 0.75rem);
+    top: calc(var(--header-total) + var(--home-news-h, 0px) + 0.75rem);
     left: 0.75rem;
     z-index: 12;
     display: flex;
@@ -1065,6 +1089,7 @@ main {
     right: 0;
     bottom: 0;
     height: 75%;
+    padding-bottom: var(--safe-bottom); /* the body's last tile clears the home indicator */
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
 /* Grab handle — phone only; the desktop drawer hides it. */
@@ -1229,7 +1254,7 @@ main {
 
 /* Desktop: the sheet becomes a CENTERED popup modal — wide but not full-screen. Its
    height follows its CONTENT (so the Zone and Plan tabs are each their own height, not
-   forced to one fixed card height), capped at 85vh so a long plan tab scrolls inside.
+   forced to one fixed card height), capped at 85dvh so a long plan tab scrolls inside.
    No dimming backdrop on purpose: the map stays visible so the selected suburb's pulse
    reads. Transform-centring is paint-safe here because .sheet is SOLID (no backdrop-
    filter — the compositing trap noted above). */
@@ -1242,7 +1267,7 @@ main {
         transform: translate(-50%, -50%);
         width: min(92vw, 40rem);
         height: auto;
-        max-height: 85vh;
+        max-height: 85dvh;
         border-radius: var(--radius-lg);
         border: 1px solid var(--glass-border);
         animation: modal-in var(--t-med) var(--ease);
@@ -1507,7 +1532,7 @@ main {
 /* Calm sign-in banner — top-centre, status not alarm; emerald when ok. */
 .signin-banner {
     position: absolute;
-    top: calc(var(--header-h) + var(--home-news-h, 0px) + 0.75rem);
+    top: calc(var(--header-total) + var(--home-news-h, 0px) + 0.75rem);
     left: 50%;
     transform: translateX(-50%);
     z-index: 36;
@@ -1812,7 +1837,7 @@ main {
    once). */
 .home-news-band {
     position: absolute;
-    top: var(--header-h);
+    top: var(--header-total);
     left: 0;
     right: 0;
     z-index: 15;
@@ -2008,7 +2033,7 @@ main {
 }
 .pp-news-list-item-headline {
     color: var(--ink);
-    font-size: var(--fs-md);
+    font-size: var(--fs-sm);
     font-weight: 600;
     line-height: 1.4;
     letter-spacing: -0.01em;
@@ -2571,7 +2596,7 @@ main {
     gap: 0.5rem;
     /* Fixed viewport share so the composer stays put as the transcript grows — the
        log scrolls internally instead of pushing the input down the sheet. */
-    max-height: 45vh;
+    max-height: 45dvh;
     overflow-y: auto;
     overscroll-behavior: contain;
 }
