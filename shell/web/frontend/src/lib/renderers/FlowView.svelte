@@ -94,7 +94,7 @@
 <style>
     .fv-hint {
         margin: 0 0 0.5rem;
-        font-size: 0.78rem;
+        font-size: var(--fs-xs);
         color: var(--muted);
     }
 </style>

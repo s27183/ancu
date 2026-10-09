@@ -76,7 +76,7 @@
         display: flex;
         width: 100%;
         height: 1.6rem;
-        border-radius: 0.4rem;
+        border-radius: var(--radius-sm);
         overflow: hidden;
         border: 1px solid var(--border);
         background: var(--bg);
@@ -108,12 +108,12 @@
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        font-size: 0.85rem;
+        font-size: var(--fs-sm);
     }
     .sb-swatch {
         width: 0.7rem;
         height: 0.7rem;
-        border-radius: 2px;
+        border-radius: var(--radius-xs);
         flex: none;
     }
     .sb-swatch-unknown {

@@ -587,20 +587,20 @@
         border-radius: 0 0.4rem 0.4rem 0;
     }
     .tx-reform-title {
-        font-size: 0.8rem;
+        font-size: var(--fs-xs);
         font-weight: 700;
         color: var(--accent);
     }
     .tx-reform-body {
         margin: 0.25rem 0 0;
-        font-size: 0.82rem;
+        font-size: var(--fs-sm);
         color: var(--ink);
         line-height: 1.45;
     }
     /* One annual-tax-obligation line (portfolio_position headline) — calm prose. */
     .pp-obligation {
         margin: 0.2rem 0 0;
-        font-size: 0.82rem;
+        font-size: var(--fs-sm);
         color: var(--ink);
         line-height: 1.45;
     }
@@ -615,11 +615,11 @@
         margin-bottom: 0.5rem;
     }
     .og-label {
-        font-size: 0.85rem;
+        font-size: var(--fs-sm);
         color: var(--muted);
     }
     .og-total {
-        font-size: 1.15rem;
+        font-size: var(--fs-lg);
         font-weight: 700;
         color: var(--accent);
         font-variant-numeric: tabular-nums;
@@ -633,19 +633,19 @@
         border-radius: 0 0.4rem 0.4rem 0;
     }
     .og-grad-title {
-        font-size: 0.8rem;
+        font-size: var(--fs-xs);
         font-weight: 700;
         color: var(--accent);
     }
     .og-grad-body {
         margin: 0.25rem 0 0;
-        font-size: 0.82rem;
+        font-size: var(--fs-sm);
         color: var(--ink);
         line-height: 1.45;
     }
     .og-grad-year {
         margin: 0.3rem 0 0;
-        font-size: 0.8rem;
+        font-size: var(--fs-xs);
         font-weight: 600;
         color: var(--ink);
     }

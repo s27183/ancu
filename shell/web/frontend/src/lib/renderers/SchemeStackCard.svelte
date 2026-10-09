@@ -141,11 +141,11 @@
         line-height: 1.1;
     }
     .ss-total-label {
-        font-size: 0.7rem;
+        font-size: var(--fs-2xs);
         color: var(--muted);
     }
     .ss-total-value {
-        font-size: 1.15rem;
+        font-size: var(--fs-lg);
         font-weight: 700;
         color: var(--accent);
         font-variant-numeric: tabular-nums;

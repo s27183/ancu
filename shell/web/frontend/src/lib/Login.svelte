@@ -66,10 +66,6 @@
                 {#if showInvalid}
                     <p class="ob-error">{$t('auth.email.invalid')}</p>
                 {/if}
-
-                <div class="auth-divider"><span>{$t('auth.or')}</span></div>
-
-                <a class="google-btn" href={GOOGLE_SIGNIN_HREF}>{$t('auth.google')}</a>
             </div>
 
             <footer class="ob-foot">
@@ -81,6 +77,10 @@
                 >
                     {phase === 'sending' ? $t('auth.sending') : $t('auth.send')}
                 </button>
+                <!-- email → its send button → "or" → Google: each action sits under the
+                     thing it acts on, and the primary stays in the thumb zone. -->
+                <div class="auth-divider"><span>{$t('auth.or')}</span></div>
+                <a class="google-btn" href={GOOGLE_SIGNIN_HREF}>{$t('auth.google')}</a>
             </footer>
         {/if}
     </div>

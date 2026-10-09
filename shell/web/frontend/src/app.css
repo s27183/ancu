@@ -89,6 +89,7 @@
     --fs-3xl: 2.25rem;
 
     /* Shape */
+    --radius-xs: 0.25rem; /* bars, swatches, table cells */
     --radius-sm: 0.5rem;
     --radius: 0.75rem;
     --radius-lg: 1.25rem;
@@ -420,7 +421,7 @@ body {
     place-items: center;
     width: 2.25rem;
     height: 2.25rem;
-    border-radius: 0.65rem;
+    border-radius: var(--radius);
     background: var(--brand-gradient);
     color: var(--ink-inverse);
     box-shadow: var(--brand-glow);
@@ -456,7 +457,7 @@ body {
     border: 1px solid var(--border);
     background: var(--surface);
     color: var(--ink);
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     cursor: pointer;
     transition:
         background var(--t-fast) var(--ease),
@@ -522,10 +523,10 @@ body {
     height: 1.9rem;
     border: none;
     background: transparent;
-    font-size: 1.1rem;
+    font-size: var(--fs-lg);
     color: var(--muted);
     cursor: pointer;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     transition:
         background var(--t-fast) var(--ease),
         color var(--t-fast) var(--ease);
@@ -550,12 +551,12 @@ body {
     width: 2.5rem;
     height: 2.5rem;
     padding: 0.5rem;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     background: var(--accent-soft);
     color: var(--accent);
 }
 .account-user-email {
-    font-size: 0.9rem;
+    font-size: var(--fs-sm);
     color: var(--ink);
     word-break: break-all;
 }
@@ -572,13 +573,13 @@ body {
 }
 .account-usage-tier {
     font-weight: 600;
-    font-size: 0.92rem;
+    font-size: var(--fs-sm);
 }
 .account-usage-row {
     display: flex;
     justify-content: space-between;
     gap: 0.75rem;
-    font-size: 0.85rem;
+    font-size: var(--fs-sm);
 }
 .account-usage-label {
     color: var(--muted);
@@ -596,7 +597,7 @@ body {
     color: var(--ink);
     border-radius: var(--radius);
     padding: 0.65rem 0.85rem;
-    font-size: 0.9rem;
+    font-size: var(--fs-sm);
     font-weight: 600;
     cursor: pointer;
     transition:
@@ -619,7 +620,7 @@ body {
     position: relative;
     display: inline-flex;
     padding: 0.15rem;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     background: var(--bg-2);
     border: 1px solid var(--border);
 }
@@ -629,7 +630,7 @@ body {
     bottom: 0.15rem;
     width: calc(50% - 0.15rem);
     left: 0.15rem;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     background: var(--surface);
     box-shadow: var(--shadow-1);
     transition: transform var(--t-med) var(--ease);
@@ -643,10 +644,10 @@ body {
     border: none;
     background: transparent;
     color: var(--muted);
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     padding: 0.25rem 0.7rem;
     cursor: pointer;
-    font-size: 0.8rem;
+    font-size: var(--fs-xs);
     font-weight: 600;
     transition: color var(--t-fast) var(--ease);
 }
@@ -762,7 +763,7 @@ main {
     gap: 0.2rem;
 }
 .map-controls label {
-    font-size: 0.68rem;
+    font-size: var(--fs-2xs);
     font-weight: 600;
     letter-spacing: 0.02em;
     text-transform: uppercase;
@@ -794,7 +795,7 @@ main {
     border: 1px solid var(--border);
     border-radius: var(--radius);
     padding: 0.5rem 2rem 0.5rem 0.7rem;
-    font-size: 0.9rem;
+    font-size: var(--fs-sm);
     font-weight: 500;
     background: var(--surface);
     color: var(--ink);
@@ -820,7 +821,7 @@ main {
     align-items: center;
     gap: 0.5rem;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: var(--fs-sm);
     font-weight: 600;
     letter-spacing: 0;
     text-transform: none;
@@ -842,7 +843,7 @@ main {
     border: 1px solid var(--border);
     border-radius: var(--radius);
     padding: 0.5rem 0.7rem;
-    font-size: 0.9rem;
+    font-size: var(--fs-sm);
     background: var(--surface);
     color: var(--ink);
     transition:
@@ -884,7 +885,7 @@ main {
     border-radius: calc(var(--radius) - 0.2rem);
     background: transparent;
     color: var(--ink);
-    font-size: 0.9rem;
+    font-size: var(--fs-sm);
     text-align: left;
     cursor: pointer;
     transition: background var(--t-fast) var(--ease);
@@ -896,18 +897,18 @@ main {
     font-weight: 500;
 }
 .combo-state {
-    font-size: 0.72rem;
+    font-size: var(--fs-xs);
     font-weight: 600;
     color: var(--muted);
 }
 .combo-empty {
     padding: 0.5rem 0.55rem;
-    font-size: 0.85rem;
+    font-size: var(--fs-sm);
     color: var(--muted);
 }
 .filter-hint {
     margin: 0;
-    font-size: 0.8rem;
+    font-size: var(--fs-xs);
     line-height: 1.35;
     color: var(--muted);
 }
@@ -939,7 +940,7 @@ main {
 }
 .legend-bar {
     height: 0.5rem;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     /* gradient set inline per the selected criterion (legendFor in +page) */
 }
 .legend-scale {
@@ -956,7 +957,7 @@ main {
 .legend-nodata .swatch {
     width: 0.7rem;
     height: 0.7rem;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     background: var(--border-strong);
     border: 1px solid var(--surface);
 }
@@ -1013,13 +1014,13 @@ main {
     align-items: center;
     gap: 0.3rem;
     padding: 0.25rem 0.55rem;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     border: 1px solid var(--glass-border);
     background: var(--glass-bg);
     -webkit-backdrop-filter: var(--glass-blur);
     backdrop-filter: var(--glass-blur);
     box-shadow: var(--shadow-1);
-    font-size: 0.7rem;
+    font-size: var(--fs-2xs);
     font-weight: 600;
     color: var(--muted);
     cursor: pointer;
@@ -1041,7 +1042,7 @@ main {
     -webkit-backdrop-filter: var(--panel-blur);
     backdrop-filter: var(--panel-blur);
     box-shadow: var(--shadow-1);
-    font-size: 0.62rem;
+    font-size: var(--fs-2xs);
     line-height: 1.35;
     color: var(--muted);
     text-align: right;
@@ -1073,7 +1074,7 @@ main {
     flex: none;
     width: 2.25rem;
     height: 0.3rem;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     background: var(--border);
     margin: 0.5rem auto 0;
 }
@@ -1092,7 +1093,7 @@ main {
 }
 .sheet-head .title .sub {
     margin: 0.1rem 0 0;
-    font-size: 0.8rem;
+    font-size: var(--fs-xs);
     color: var(--muted);
 }
 .sheet-head .close {
@@ -1221,7 +1222,7 @@ main {
 }
 .metric .decile span {
     height: 0.4rem;
-    border-radius: 2px;
+    border-radius: var(--radius-xs);
     background: var(--bg-2);
 }
 .metric .decile span.on {
@@ -1323,7 +1324,7 @@ main {
 }
 .ob-head h2 {
     margin: 0;
-    font-size: 1.15rem;
+    font-size: var(--fs-lg);
 }
 .ob-head .close {
     flex: none;
@@ -1342,20 +1343,25 @@ main {
     transition: background var(--t-fast) var(--ease);
 }
 .ob-body {
-    padding: 0.5rem 1rem 1rem;
+    padding: var(--sp-2) var(--sp-4) var(--sp-4);
     overflow-y: auto;
+    /* each question its own group: the gap, not a fieldset's padding, separates them */
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-5);
 }
 .ob-body fieldset {
     border: none;
     margin: 0;
-    padding: 0.5rem 0;
+    padding: 0;
+    min-width: 0;
 }
 .ob-body legend {
     padding: 0;
-    font-size: 0.95rem;
+    font-size: var(--fs-md);
     font-weight: 600;
     color: var(--ink);
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--sp-3);
 }
 /* Yes/No gate + budget chips — large tap targets, calm selected state. */
 .choice {
@@ -1365,7 +1371,7 @@ main {
 .choice button {
     flex: 1;
     padding: 0.7rem;
-    font-size: 0.95rem;
+    font-size: var(--fs-md);
     border: 1px solid var(--border);
     background: var(--surface);
     color: var(--ink);
@@ -1383,7 +1389,7 @@ main {
 }
 .bands button {
     padding: 0.7rem;
-    font-size: 0.9rem;
+    font-size: var(--fs-sm);
     border: 1px solid var(--border);
     background: var(--surface);
     color: var(--ink);
@@ -1409,7 +1415,7 @@ main {
 }
 .ob-hint {
     margin: 0.5rem 0 0;
-    font-size: 0.72rem;
+    font-size: var(--fs-xs);
     color: var(--muted);
 }
 .ob-note {
@@ -1417,12 +1423,12 @@ main {
     padding: 0.75rem;
     background: var(--bg);
     border-radius: var(--radius);
-    font-size: 0.85rem;
+    font-size: var(--fs-sm);
     color: var(--muted);
 }
 .ob-error {
     margin: 0.75rem 0 0;
-    font-size: 0.85rem;
+    font-size: var(--fs-sm);
     color: var(--danger);
 }
 /* Generic accent-tinted callout — foreign-buyer, foreign-investor, and (mode-e-wedge.md
@@ -1446,7 +1452,7 @@ main {
 }
 .ob-terminal h3 {
     margin: 0;
-    font-size: 1.05rem;
+    font-size: var(--fs-md);
     color: var(--accent);
 }
 .ob-terminal p {
@@ -1474,7 +1480,7 @@ main {
    desktop side-panel takes precedence when open. */
 /* Account chip — now lives inline in the header nav. */
 .account-email {
-    font-size: 0.8rem;
+    font-size: var(--fs-xs);
     color: var(--muted);
     max-width: 32vw;
     overflow: hidden;
@@ -1518,7 +1524,7 @@ main {
     border: 1px solid var(--glass-border);
     border-radius: var(--radius);
     box-shadow: var(--shadow-2);
-    font-size: 0.85rem;
+    font-size: var(--fs-sm);
     color: var(--ink);
 }
 .signin-banner.ok {
@@ -1531,7 +1537,7 @@ main {
     border: none;
     background: transparent;
     color: inherit;
-    font-size: 1rem;
+    font-size: var(--fs-md);
     line-height: 1;
     cursor: pointer;
     padding: 0 0.2rem;
@@ -1559,7 +1565,7 @@ main {
     border-radius: var(--radius);
     background: var(--accent);
     color: var(--on-dark);
-    font-size: 0.8rem;
+    font-size: var(--fs-xs);
     font-weight: 600;
     white-space: nowrap;
 }
@@ -1575,14 +1581,14 @@ main {
     gap: 0.35rem;
 }
 .auth-field span {
-    font-size: 0.85rem;
+    font-size: var(--fs-sm);
     color: var(--muted);
 }
 .auth-field input {
     border: 1px solid var(--border);
     border-radius: var(--radius);
     padding: 0.65rem 0.6rem;
-    font-size: 1rem;
+    font-size: var(--fs-md);
     color: var(--ink);
     background: var(--surface);
 }
@@ -1592,7 +1598,7 @@ main {
     gap: 0.6rem;
     margin: 1rem 0 0.75rem;
     color: var(--muted);
-    font-size: 0.8rem;
+    font-size: var(--fs-xs);
 }
 .auth-divider::before,
 .auth-divider::after {
@@ -1612,14 +1618,14 @@ main {
     color: var(--ink);
     border-radius: var(--radius);
     padding: 0.7rem 1rem;
-    font-size: 0.95rem;
+    font-size: var(--fs-md);
     font-weight: 600;
     cursor: pointer;
 }
 .dev-link {
     display: block;
     word-break: break-all;
-    font-size: 0.72rem;
+    font-size: var(--fs-xs);
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     color: var(--accent);
     margin-bottom: 0.5rem;
@@ -1635,7 +1641,7 @@ main {
     gap: 0.75rem;
     padding: 1rem 0;
     color: var(--muted);
-    font-size: 0.9rem;
+    font-size: var(--fs-sm);
 }
 .pp-state button {
     border: 1px solid var(--border);
@@ -1643,7 +1649,7 @@ main {
     color: var(--ink);
     border-radius: var(--radius);
     padding: 0.5rem 1rem;
-    font-size: 0.9rem;
+    font-size: var(--fs-sm);
     cursor: pointer;
 }
 
@@ -1651,7 +1657,7 @@ main {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    font-size: 0.85rem;
+    font-size: var(--fs-sm);
     color: var(--muted);
     margin: 0 0 0.75rem;
 }
@@ -1700,7 +1706,7 @@ main {
     padding: 0.25rem;
     background: var(--bg);
     border: 1px solid var(--border);
-    border-radius: 0.6rem;
+    border-radius: var(--radius-sm);
     scrollbar-width: none; /* Firefox */
 }
 .pp-subtabs::-webkit-scrollbar {
@@ -1711,9 +1717,9 @@ main {
     border: none;
     background: transparent;
     color: var(--muted);
-    border-radius: 0.45rem;
+    border-radius: var(--radius-sm);
     padding: 0.4rem 0.8rem;
-    font-size: 0.8rem;
+    font-size: var(--fs-xs);
     font-weight: 600;
     white-space: nowrap;
     cursor: pointer;
@@ -1766,17 +1772,17 @@ main {
     padding: 0.45rem 0.6rem;
     background: var(--accent-soft);
     border: 1px solid var(--accent);
-    border-radius: 0.5rem;
+    border-radius: var(--radius-sm);
 }
 .pp-ticker-nav {
     flex: none;
     border: none;
     background: transparent;
     color: var(--accent);
-    font-size: 1.1rem;
+    font-size: var(--fs-lg);
     line-height: 1;
     padding: 0.1rem 0.4rem;
-    border-radius: 0.35rem;
+    border-radius: var(--radius-xs);
     cursor: pointer;
 }
 .pp-ticker-nav:hover {
@@ -1789,7 +1795,7 @@ main {
     border: none;
     background: transparent;
     color: var(--ink);
-    font-size: 0.82rem;
+    font-size: var(--fs-sm);
     font-weight: 600;
     text-align: left;
     white-space: normal;
@@ -1886,7 +1892,7 @@ main {
     background: transparent;
     color: var(--on-dark-muted);
     padding: 0.3rem;
-    border-radius: 0.35rem;
+    border-radius: var(--radius-xs);
     cursor: pointer;
 }
 .pp-ticker-pause:hover {
@@ -1997,7 +2003,7 @@ main {
     margin: 0 0 var(--sp-5);
     color: var(--ink);
     font-family: var(--font-serif);
-    font-size: 1.125rem;
+    font-size: var(--fs-lg);
     font-optical-sizing: auto;
     line-height: 1.65;
     letter-spacing: 0.002em;
@@ -2017,7 +2023,7 @@ main {
 .pp-news-summary code {
     background: var(--bg);
     border: 1px solid var(--border);
-    border-radius: 0.25rem;
+    border-radius: var(--radius-xs);
     padding: 0.05rem 0.3rem;
     font-size: 0.85em;
 }
@@ -2084,7 +2090,7 @@ main {
 }
 .pp-news-list-item-date {
     color: var(--muted);
-    font-size: 0.72rem;
+    font-size: var(--fs-xs);
     line-height: 1.3;
 }
 
@@ -2106,9 +2112,9 @@ main {
     border: 1px dashed var(--accent);
     background: transparent;
     color: var(--accent);
-    border-radius: 0.45rem;
+    border-radius: var(--radius-sm);
     padding: 0.4rem 0.75rem;
-    font-size: 0.8rem;
+    font-size: var(--fs-xs);
     font-weight: 600;
     white-space: nowrap;
     cursor: pointer;
@@ -2135,7 +2141,7 @@ main {
 }
 .pp-attach-intro {
     margin: 0;
-    font-size: 0.82rem;
+    font-size: var(--fs-sm);
     color: var(--muted);
 }
 .pp-af-field {
@@ -2145,7 +2151,7 @@ main {
     min-width: 0;
 }
 .pp-af-label {
-    font-size: 0.72rem;
+    font-size: var(--fs-xs);
     font-weight: 600;
     color: var(--muted);
     text-transform: uppercase;
@@ -2155,10 +2161,10 @@ main {
 .pp-af-field select {
     padding: 0.5rem 0.6rem;
     border: 1px solid var(--border);
-    border-radius: 0.4rem;
+    border-radius: var(--radius-sm);
     background: var(--bg);
     color: var(--ink);
-    font-size: 0.95rem;
+    font-size: var(--fs-md);
     width: 100%;
 }
 .pp-af-field input:focus,
@@ -2168,7 +2174,7 @@ main {
 }
 .pp-af-optional {
     margin: 0.3rem 0 0;
-    font-size: 0.72rem;
+    font-size: var(--fs-xs);
     font-weight: 600;
     color: var(--muted);
     text-transform: uppercase;
@@ -2178,7 +2184,7 @@ main {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    font-size: 0.9rem;
+    font-size: var(--fs-sm);
     color: var(--ink);
 }
 .pp-af-check input {
@@ -2186,7 +2192,7 @@ main {
 }
 .pp-af-error {
     margin: 0;
-    font-size: 0.85rem;
+    font-size: var(--fs-sm);
     color: var(--danger);
 }
 .pp-af-actions {
@@ -2199,9 +2205,9 @@ main {
     border: 1px solid var(--border);
     background: transparent;
     color: var(--muted);
-    border-radius: 0.45rem;
+    border-radius: var(--radius-sm);
     padding: 0.5rem 0.9rem;
-    font-size: 0.85rem;
+    font-size: var(--fs-sm);
     font-weight: 600;
     cursor: pointer;
 }
@@ -2236,17 +2242,17 @@ main {
     min-width: 0;
 }
 .pp-wi-label {
-    font-size: 0.72rem;
+    font-size: var(--fs-xs);
     color: var(--muted);
 }
 .pp-wi-field input,
 .pp-wi-field select {
     padding: 0.4rem 0.55rem;
     border: 1px solid var(--border);
-    border-radius: 0.4rem;
+    border-radius: var(--radius-sm);
     background: var(--bg);
     color: var(--ink);
-    font-size: 0.95rem;
+    font-size: var(--fs-md);
     font-variant-numeric: tabular-nums;
 }
 .pp-wi-field input:focus,
@@ -2257,16 +2263,16 @@ main {
 .pp-whatif .primary {
     flex: none;
     padding: 0.4rem 0.85rem;
-    font-size: 0.85rem;
+    font-size: var(--fs-sm);
 }
 .pp-wi-save {
     flex: none;
     border: 1px solid var(--success);
     background: var(--success);
     color: var(--on-dark);
-    border-radius: 0.4rem;
+    border-radius: var(--radius-sm);
     padding: 0.4rem 0.85rem;
-    font-size: 0.85rem;
+    font-size: var(--fs-sm);
     font-weight: 700;
     cursor: pointer;
 }
@@ -2282,9 +2288,9 @@ main {
     border: 1px solid var(--border);
     background: var(--surface);
     color: var(--muted);
-    border-radius: 0.4rem;
+    border-radius: var(--radius-sm);
     padding: 0.4rem 0.7rem;
-    font-size: 0.85rem;
+    font-size: var(--fs-sm);
     font-weight: 600;
     cursor: pointer;
 }
@@ -2293,13 +2299,13 @@ main {
 }
 .pp-wi-banner {
     margin: 0.5rem 0 0;
-    font-size: 0.78rem;
+    font-size: var(--fs-xs);
     font-weight: 600;
     color: var(--accent);
 }
 .pp-wi-error {
     margin: 0.5rem 0 0;
-    font-size: 0.78rem;
+    font-size: var(--fs-xs);
     color: var(--danger);
 }
 /* Cross-tab preview strip — only a banner + reset (the cockpit lives in the calc tab). */
@@ -2325,7 +2331,7 @@ main {
 /* Cash-calculator cockpit — the prototype's interactive input form (engine-driven). */
 .pp-calc-intro {
     margin: 0 0 0.75rem;
-    font-size: 0.82rem;
+    font-size: var(--fs-sm);
     color: var(--muted);
 }
 .pp-cockpit {
@@ -2346,7 +2352,7 @@ main {
     min-width: 0;
 }
 .pp-ck-label {
-    font-size: 0.72rem;
+    font-size: var(--fs-xs);
     font-weight: 600;
     color: var(--muted);
     text-transform: uppercase;
@@ -2356,10 +2362,10 @@ main {
 .pp-ck-field select {
     padding: 0.5rem 0.6rem;
     border: 1px solid var(--border);
-    border-radius: 0.4rem;
+    border-radius: var(--radius-sm);
     background: var(--bg);
     color: var(--ink);
-    font-size: 0.95rem;
+    font-size: var(--fs-md);
     font-variant-numeric: tabular-nums;
     width: 100%;
 }
@@ -2370,7 +2376,7 @@ main {
 }
 .pp-ck-locked select {
     color: var(--muted);
-    font-size: 0.8rem;
+    font-size: var(--fs-xs);
     cursor: not-allowed;
     background: var(--surface);
 }
@@ -2400,7 +2406,7 @@ main {
 .pp-cockpit-actions .primary {
     flex: none;
     padding: 0.45rem 0.9rem;
-    font-size: 0.85rem;
+    font-size: var(--fs-sm);
 }
 .pp-ck-field input:disabled {
     background: var(--surface);
@@ -2417,13 +2423,13 @@ main {
 }
 .pp-fin-title {
     margin: 0 0 0.2rem;
-    font-size: 0.92rem;
+    font-size: var(--fs-sm);
     font-weight: 700;
     color: var(--ink);
 }
 .pp-fin-intro {
     margin: 0 0 0.7rem;
-    font-size: 0.8rem;
+    font-size: var(--fs-xs);
     color: var(--muted);
 }
 .pp-fin-grid {
@@ -2441,7 +2447,7 @@ main {
     grid-column: 1 / -1;
 }
 .pp-fin-hint {
-    font-size: 0.72rem;
+    font-size: var(--fs-xs);
     color: var(--muted);
 }
 .pp-fin-debts-label {
@@ -2450,7 +2456,7 @@ main {
 }
 .pp-fin-disclaimer {
     margin: 0.6rem 0 0;
-    font-size: 0.72rem;
+    font-size: var(--fs-xs);
     color: var(--muted);
     font-style: italic;
 }
@@ -2467,7 +2473,7 @@ main {
     border: none;
 }
 .pp-card-title {
-    font-size: 0.95rem;
+    font-size: var(--fs-md);
     font-weight: 700;
     color: var(--ink);
     margin: 0 0 0.5rem;
@@ -2476,7 +2482,7 @@ main {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    font-size: 0.82rem;
+    font-size: var(--fs-sm);
     color: var(--muted);
     margin: 0;
 }
@@ -2492,11 +2498,11 @@ main {
     border-bottom: none;
 }
 .pp-label {
-    font-size: 0.75rem;
+    font-size: var(--fs-xs);
     color: var(--muted);
 }
 .pp-value {
-    font-size: 1.05rem;
+    font-size: var(--fs-md);
     font-weight: 600;
     color: var(--ink);
 }
@@ -2511,7 +2517,7 @@ main {
     margin: 0.4rem 0;
 }
 .pp-pending {
-    font-size: 0.9rem;
+    font-size: var(--fs-sm);
     font-style: italic;
     color: var(--muted);
 }
@@ -2520,10 +2526,10 @@ main {
 .pp-chip {
     display: inline-block;
     align-self: flex-start;
-    font-size: 0.8rem;
+    font-size: var(--fs-xs);
     font-weight: 600;
     padding: 0.15rem 0.5rem;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     border: 1px solid var(--border);
     margin-top: 0.1rem;
 }
@@ -2552,7 +2558,7 @@ main {
     padding: 0.4rem 0;
 }
 .pp-notes-head {
-    font-size: 0.75rem;
+    font-size: var(--fs-xs);
     color: var(--muted);
 }
 .pp-notes ul,
@@ -2563,7 +2569,7 @@ main {
 }
 .pp-notes li,
 .pp-sublist li {
-    font-size: 0.85rem;
+    font-size: var(--fs-sm);
     color: var(--ink);
     margin: 0.15rem 0;
 }
@@ -2592,18 +2598,18 @@ main {
 .pp-scheme-name,
 .pp-lender-name,
 .pp-alert-trigger {
-    font-size: 0.9rem;
+    font-size: var(--fs-sm);
     font-weight: 600;
     color: var(--ink);
 }
 .pp-scheme-benefit {
-    font-size: 0.9rem;
+    font-size: var(--fs-sm);
     font-weight: 600;
     color: var(--accent);
 }
 .pp-scheme-why,
 .pp-lender-why {
-    font-size: 0.82rem;
+    font-size: var(--fs-sm);
     color: var(--muted);
     margin: 0.15rem 0 0;
 }
@@ -2612,7 +2618,7 @@ main {
     flex-direction: column;
 }
 .pp-alert-action {
-    font-size: 0.82rem;
+    font-size: var(--fs-sm);
     color: var(--muted);
 }
 
@@ -2626,7 +2632,7 @@ main {
     border-top: 1px solid var(--border);
 }
 .chat-title {
-    font-size: 0.95rem;
+    font-size: var(--fs-md);
     font-weight: 700;
     color: var(--ink);
     margin: 0;
@@ -2645,7 +2651,7 @@ main {
     max-width: 85%;
     padding: 0.5rem 0.7rem;
     border-radius: var(--radius);
-    font-size: 0.9rem;
+    font-size: var(--fs-sm);
     line-height: 1.45;
 }
 .chat-msg p {
@@ -2680,7 +2686,7 @@ main {
     border: 1px solid var(--border);
     border-radius: var(--radius);
     padding: 0.55rem 0.7rem;
-    font-size: 0.9rem;
+    font-size: var(--fs-sm);
     background: var(--surface);
     color: var(--ink);
 }
@@ -2697,7 +2703,7 @@ main {
     cursor: not-allowed;
 }
 .chat-disclaimer {
-    font-size: 0.72rem;
+    font-size: var(--fs-xs);
     color: var(--muted);
     margin: 0;
 }
@@ -2713,7 +2719,7 @@ main {
     width: 1.9rem;
     height: 1.9rem;
     padding: 0;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     transition:
         background var(--t-fast) var(--ease),
         color var(--t-fast) var(--ease);
@@ -2776,7 +2782,7 @@ main {
     margin-top: 1rem;
     padding-top: 0.75rem;
     border-top: 1px solid var(--hairline);
-    font-size: 0.75rem;
+    font-size: var(--fs-xs);
     line-height: 1.4;
     opacity: 0.75;
 }

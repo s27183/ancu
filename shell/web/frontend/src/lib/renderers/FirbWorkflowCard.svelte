@@ -173,14 +173,14 @@
     }
     .fw-blocking-body {
         margin: 0;
-        font-size: 0.82rem;
+        font-size: var(--fs-sm);
         font-weight: 600;
         color: var(--danger);
         line-height: 1.45;
     }
     .fw-item {
         margin: 0.2rem 0 0;
-        font-size: 0.8rem;
+        font-size: var(--fs-xs);
         color: var(--ink);
         line-height: 1.4;
     }

@@ -405,7 +405,7 @@
         color: var(--accent);
         font-weight: 600;
         text-decoration: none;
-        border-radius: 2px;
+        border-radius: var(--radius-xs);
     }
     .wl-src a:hover {
         text-decoration: underline;

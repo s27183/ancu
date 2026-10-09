@@ -74,7 +74,7 @@
     .op-item {
         padding: 0.5rem 0.6rem;
         border: 1px solid var(--border);
-        border-radius: 0.4rem;
+        border-radius: var(--radius-sm);
         border-left: 3px solid var(--accent);
     }
     .op-head {
@@ -85,26 +85,26 @@
         flex-wrap: wrap;
     }
     .op-benefit {
-        font-size: 0.8rem;
+        font-size: var(--fs-xs);
         font-weight: 700;
         color: var(--accent);
         font-variant-numeric: tabular-nums;
         white-space: nowrap;
     }
     .op-benefit-label {
-        font-size: 0.7rem;
+        font-size: var(--fs-2xs);
         font-weight: 400;
         color: var(--muted);
         margin-right: 0.25rem;
     }
     .op-action {
         margin: 0.3rem 0 0;
-        font-size: 0.82rem;
+        font-size: var(--fs-sm);
         color: var(--ink);
         line-height: 1.45;
     }
     .op-none {
-        font-size: 0.82rem;
+        font-size: var(--fs-sm);
         font-style: italic;
         color: var(--muted);
         margin: 0;

@@ -270,7 +270,7 @@
 <style>
     .ck-heading {
         margin: 0.8rem 0 0.4rem;
-        font-size: 0.85rem;
+        font-size: var(--fs-sm);
         font-weight: 700;
         color: var(--ink);
     }
@@ -295,7 +295,7 @@
         gap: 0.5rem;
     }
     .ck-item-name {
-        font-size: 0.88rem;
+        font-size: var(--fs-sm);
         font-weight: 600;
         color: var(--ink);
     }
@@ -305,7 +305,7 @@
     }
     .ck-why {
         margin: 0.15rem 0 0;
-        font-size: 0.8rem;
+        font-size: var(--fs-xs);
         color: var(--muted);
         line-height: 1.4;
     }
@@ -315,24 +315,24 @@
     }
     .ck-awaiting {
         margin: 0 0 0.4rem;
-        font-size: 0.85rem;
+        font-size: var(--fs-sm);
         font-weight: 700;
         color: var(--accent);
     }
     .ck-meta {
         margin: 0.15rem 0 0;
-        font-size: 0.8rem;
+        font-size: var(--fs-xs);
         color: var(--ink);
     }
     .ck-meta-k { color: var(--muted); }
     .ck-status {
         flex: none;
-        font-size: 0.66rem;
+        font-size: var(--fs-2xs);
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.03em;
         padding: 0.05rem 0.4rem;
-        border-radius: 0.3rem;
+        border-radius: var(--radius-xs);
         border: 1px solid var(--border);
         color: var(--muted);
         white-space: nowrap;
@@ -344,7 +344,7 @@
     .ck-status-pending { color: var(--muted); }
     .ck-buffer-amt {
         margin: 0 0 0.3rem;
-        font-size: 1rem;
+        font-size: var(--fs-md);
         font-weight: 700;
         color: var(--accent);
         font-variant-numeric: tabular-nums;

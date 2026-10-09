@@ -715,28 +715,28 @@
         display: flex; align-items: baseline; justify-content: space-between;
         gap: 0.5rem; margin-bottom: 0.5rem;
     }
-    .cw-need-label { font-size: 0.85rem; color: var(--muted); }
+    .cw-need-label { font-size: var(--fs-sm); color: var(--muted); }
     .cw-need-total {
-        font-size: 1.15rem; font-weight: 700; color: var(--accent);
+        font-size: var(--fs-lg); font-weight: 700; color: var(--accent);
         font-variant-numeric: tabular-nums;
     }
 
     /* Verdict box — prototype's ok/warn/bad hero. */
     .cw-verdict { margin-top: 0.6rem; }
     .cw-vbox {
-        border: 1px solid var(--border); border-radius: 0.5rem;
+        border: 1px solid var(--border); border-radius: var(--radius-sm);
         padding: 0.6rem 0.75rem; display: flex; flex-direction: column; gap: 0.35rem;
     }
     .cw-good { background: var(--success-soft); border-color: var(--success-line); }
     .cw-warn { background: var(--warning-soft); border-color: var(--warning-line); }
     .cw-bad  { background: var(--danger-soft); border-color: var(--danger-line); }
-    .cw-vlabel { font-size: 0.8rem; font-weight: 600; color: var(--muted); }
+    .cw-vlabel { font-size: var(--fs-xs); font-weight: 600; color: var(--muted); }
     .cw-vbody { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
     .cw-vamount { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink); }
-    .cw-cta { margin: 0; font-size: 0.85rem; color: var(--muted); font-style: italic; }
+    .cw-cta { margin: 0; font-size: var(--fs-sm); color: var(--muted); font-style: italic; }
 
     /* Disposition: the sub-label under the full-horizon hero + the net subtotal row. */
-    .cw-disp-sub { margin: 0.25rem 0 0; font-size: 0.78rem; color: var(--muted); }
+    .cw-disp-sub { margin: 0.25rem 0 0; font-size: var(--fs-xs); color: var(--muted); }
     .cw-trnet td {
         border-top: 2px solid var(--border); font-weight: 700;
         padding-top: 0.55rem; background: var(--surface-2);
@@ -746,20 +746,20 @@
        language: uppercase head, hairline row borders, right-aligned tabular amounts). */
     .cw-spine {
         margin: 0.9rem 0; border: 1px solid var(--border);
-        border-radius: 0.5rem; overflow: hidden;
+        border-radius: var(--radius-sm); overflow: hidden;
     }
     .cw-spine-title {
-        margin: 0; padding: 0.5rem 0.75rem; font-size: 0.85rem; font-weight: 700;
+        margin: 0; padding: 0.5rem 0.75rem; font-size: var(--fs-sm); font-weight: 700;
         background: var(--bg-2); color: var(--ink);
         border-bottom: 1px solid var(--border);
     }
     .cw-table {
-        width: 100%; border-collapse: collapse; font-size: 0.82rem;
+        width: 100%; border-collapse: collapse; font-size: var(--fs-sm);
     }
     .cw-table th {
         text-align: left; padding: 0.5rem 0.75rem;
         background: var(--surface-2); color: var(--muted);
-        font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+        font-size: var(--fs-2xs); font-weight: 700; text-transform: uppercase;
         letter-spacing: 0.04em; border-bottom: 1px solid var(--border);
     }
     .cw-table th.num { text-align: right; }
@@ -769,7 +769,7 @@
     }
     .cw-table td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
     .cw-trphase td {
-        font-size: 0.68rem; font-weight: 700; color: var(--accent);
+        font-size: var(--fs-2xs); font-weight: 700; color: var(--accent);
         text-transform: uppercase; letter-spacing: 0.03em;
         background: var(--surface); padding-top: 0.55rem; padding-bottom: 0.3rem;
     }
@@ -779,13 +779,13 @@
         padding: 0; margin: 0; cursor: pointer; text-align: left;
     }
     .cw-ev-btn:hover .cw-ev-label { color: var(--accent); text-decoration: underline; }
-    .cw-caret { font-size: 0.7rem; color: var(--accent); flex: none; }
-    .cw-ev-label { font-size: 0.82rem; color: inherit; }
-    .cw-ev-rec { font-size: 0.7rem; color: var(--muted); white-space: nowrap; margin-left: 0.3rem; }
+    .cw-caret { font-size: var(--fs-2xs); color: var(--accent); flex: none; }
+    .cw-ev-label { font-size: var(--fs-sm); color: inherit; }
+    .cw-ev-rec { font-size: var(--fs-2xs); color: var(--muted); white-space: nowrap; margin-left: 0.3rem; }
     .cw-ev-amt { font-weight: 700; }
     .cw-out { color: var(--danger); }
     .cw-in { color: var(--success); }
-    .cw-trempty td { font-size: 0.78rem; color: var(--muted); font-style: italic; }
+    .cw-trempty td { font-size: var(--fs-xs); color: var(--muted); font-style: italic; }
 
     /* The Budget-breakdown opener — a calm full-width affordance under the table. */
     .cw-breakdown-btn {
@@ -793,12 +793,12 @@
         width: 100%;
         margin: 0.6rem 0 0;
         padding: 0.55rem 0.75rem;
-        font-size: 0.82rem;
+        font-size: var(--fs-sm);
         font-weight: 600;
         color: var(--accent);
         background: none;
         border: 1px solid var(--border);
-        border-radius: 0.5rem;
+        border-radius: var(--radius-sm);
         cursor: pointer;
         text-align: left;
     }

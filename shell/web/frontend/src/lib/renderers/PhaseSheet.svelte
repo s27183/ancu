@@ -206,7 +206,7 @@
         gap: 0.4rem;
     }
     .ps-act-label {
-        font-size: 0.88rem;
+        font-size: var(--fs-sm);
         font-weight: 600;
         color: var(--ink);
         line-height: 1.35;
@@ -216,24 +216,24 @@
         color: var(--muted);
     }
     .ps-act-amt {
-        font-size: 0.78rem;
+        font-size: var(--fs-xs);
         font-weight: 700;
         font-variant-numeric: tabular-nums;
         color: var(--accent);
         padding: 0.02rem 0.35rem;
-        border-radius: 0.3rem;
+        border-radius: var(--radius-xs);
         background: color-mix(in srgb, var(--accent) 12%, transparent);
         white-space: nowrap;
     }
     .ps-act-detail {
         margin: 0.25rem 0 0 1.5rem;
-        font-size: 0.8rem;
+        font-size: var(--fs-xs);
         color: var(--muted);
         line-height: 1.4;
     }
     .ps-detail-btn {
         margin: 0.3rem 0 0 1.5rem;
-        font-size: 0.74rem;
+        font-size: var(--fs-xs);
         font-weight: 600;
         color: var(--accent);
         background: none;
@@ -243,7 +243,7 @@
     }
     .ps-pending {
         margin: 0;
-        font-size: 0.82rem;
+        font-size: var(--fs-sm);
         color: var(--muted);
     }
 </style>

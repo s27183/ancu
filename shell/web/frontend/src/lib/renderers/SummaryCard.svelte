@@ -263,13 +263,13 @@
         margin-bottom: 0.35rem;
     }
     .rb-rowlabel {
-        font-size: 0.75rem;
+        font-size: var(--fs-xs);
         color: var(--muted);
     }
     .rb-track {
         position: relative;
         height: 0.9rem;
-        border-radius: 0.3rem;
+        border-radius: var(--radius-xs);
         background: var(--bg);
         border: 1px solid var(--border);
         overflow: hidden;
@@ -279,7 +279,7 @@
         top: 0;
         bottom: 0;
         background: var(--accent);
-        border-radius: 0.2rem;
+        border-radius: var(--radius-xs);
     }
     .rb-reach {
         position: absolute;
@@ -296,7 +296,7 @@
         );
     }
     .rb-val {
-        font-size: 0.8rem;
+        font-size: var(--fs-xs);
         font-weight: 600;
         color: var(--accent);
         font-variant-numeric: tabular-nums;
@@ -308,7 +308,7 @@
     }
     .rb-hint {
         margin: 0.2rem 0 0;
-        font-size: 0.8rem;
+        font-size: var(--fs-xs);
         font-style: italic;
         color: var(--muted);
     }
@@ -330,9 +330,9 @@
         align-items: center;
         gap: 0.5rem;
         padding: 0.4rem 0.6rem;
-        border-radius: 0.4rem;
+        border-radius: var(--radius-sm);
         border: 1px solid var(--border);
-        font-size: 0.9rem;
+        font-size: var(--fs-sm);
         color: var(--muted);
     }
     .pk-on {
@@ -348,7 +348,7 @@
         flex: 1;
     }
     .pk-rec {
-        font-size: 0.7rem;
+        font-size: var(--fs-2xs);
         text-transform: uppercase;
         letter-spacing: 0.03em;
         color: var(--accent);
@@ -363,7 +363,7 @@
     }
     .st-oneliner {
         margin: 0;
-        font-size: 0.95rem;
+        font-size: var(--fs-md);
         font-weight: 600;
         color: var(--ink);
     }

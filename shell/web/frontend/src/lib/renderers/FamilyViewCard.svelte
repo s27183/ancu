@@ -104,7 +104,7 @@
 
 <style>
     .fv-capacity {
-        font-size: 1.1rem;
+        font-size: var(--fs-lg);
         font-weight: 700;
         color: var(--accent);
         font-variant-numeric: tabular-nums;
@@ -120,24 +120,24 @@
         flex-wrap: wrap;
     }
     .fv-contrib-amt {
-        font-size: 0.85rem;
+        font-size: var(--fs-sm);
         font-weight: 600;
         color: var(--accent);
         font-variant-numeric: tabular-nums;
     }
     .fv-contrib-ccy {
-        font-size: 0.7rem;
+        font-size: var(--fs-2xs);
         color: var(--muted);
     }
     .fv-none {
-        font-size: 0.82rem;
+        font-size: var(--fs-sm);
         font-style: italic;
         color: var(--muted);
         margin: 0;
     }
     .fv-gap {
         margin: 0.2rem 0 0;
-        font-size: 0.8rem;
+        font-size: var(--fs-xs);
         color: var(--muted);
         line-height: 1.4;
     }

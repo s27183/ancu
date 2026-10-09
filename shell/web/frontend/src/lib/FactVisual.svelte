@@ -316,7 +316,7 @@
         max-width: 100%;
     }
     .cell {
-        border-radius: 2px;
+        border-radius: var(--radius-xs);
         transform: scale(0);
         transition: transform 0.35s var(--grow) calc(var(--k) * 7ms);
     }
@@ -368,7 +368,7 @@
     .sw {
         width: 0.75rem;
         height: 0.75rem;
-        border-radius: 3px;
+        border-radius: var(--radius-xs);
     }
     .fv-key-val {
         font-weight: 700;
