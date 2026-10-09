@@ -21,6 +21,7 @@
         SIZE_CRITERIA,
         DEFAULT_SIZE_BY,
         legendFor,
+        BASEMAP_CREDIT,
         type MapScope,
         type SizeBy
     } from '$lib/map';
@@ -98,6 +99,7 @@
     let newsBandHeight = $state(0);
     // CC-BY attribution is required (§6.1) but space-cheap when collapsed to a chip.
     let attrOpen = $state(false);
+    let basemapOn = $state(false);
 
     // --- Saved-plans + name filter (state × saved × name) --------------------
     // "Suburbs with a saved plan" = those whose name matches a plan-card title — the
@@ -267,6 +269,7 @@
     {#if !loading && !errored}
         <SuburbMap
             bind:this={mapRef}
+            bind:basemap={basemapOn}
             suburbs={visible}
             center={view.center}
             zoom={view.zoom}
@@ -438,23 +441,47 @@
         </div>
     {/if}
 
-    {#if attribution.length}
-        <!-- Collapsed to a small chip by default (CC-BY stays accessible, §6.1). -->
+    {#if attribution.length || basemapOn}
+        <!-- One "i" holds every credit: the basemap's (Protomaps © OpenStreetMap) and
+             each data source's (CC-BY §6.1). A tap anywhere outside closes it — the
+             scrim takes that tap, so it never also selects a suburb (behavior 43). -->
+        {#if attrOpen}
+            <div class="attr-scrim" aria-hidden="true" onpointerdown={() => (attrOpen = false)}></div>
+        {/if}
         <div class="attribution" class:open={attrOpen}>
+            {#if attrOpen}
+                <div class="attr-list" id="attr-list" role="dialog" aria-label={$t('map.sources')}>
+                    {#if basemapOn}
+                        <span class="attr-map"
+                            >{$t('map.basemap')}: {#each BASEMAP_CREDIT as c, i (c.name)}{#if i > 0}{' © '}{/if}<a
+                                    href={c.url}
+                                    target="_blank"
+                                    rel="noopener">{c.name}</a
+                                >{/each}</span
+                        >
+                    {/if}
+                    {#each attribution as src (src.source_id)}<span>{src.attribution}</span>{/each}
+                </div>
+            {/if}
             <button
                 type="button"
                 class="attr-toggle"
                 aria-expanded={attrOpen}
+                aria-controls="attr-list"
+                aria-label={$t('map.sources')}
                 onclick={() => (attrOpen = !attrOpen)}
             >
-                <span class="attr-mark" aria-hidden="true">©</span>
-                <span class="attr-label">{$t('map.sources')}</span>
+                <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"
+                    ><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5" /><rect
+                        x="7.25"
+                        y="7"
+                        width="1.5"
+                        height="5"
+                        rx=".75"
+                        fill="currentColor"
+                    /><circle cx="8" cy="4.6" r="1" fill="currentColor" /></svg
+                >
             </button>
-            {#if attrOpen}
-                <div class="attr-list">
-                    {#each attribution as src (src.source_id)}<span>{src.attribution}</span>{/each}
-                </div>
-            {/if}
         </div>
     {/if}
 

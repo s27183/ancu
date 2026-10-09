@@ -90,70 +90,142 @@
 
     // ---- marquee mode: homepage full-width continuous scroll ----
 
-    // Explicit pause/play (WCAG 2.2.2 — motion lasting >5s needs a stop control that
-    // isn't hover-only, since hover doesn't help touch/keyboard users). Left unset
-    // (not forced to 'running') when not paused so the CSS :hover/:focus-within rule
-    // can still pause it for mouse users without fighting an inline style.
-    let paused = $state(false);
-    function togglePaused() {
-        paused = !paused;
-    }
+    // Behavior 43: the strip moves under the finger. A requestAnimationFrame loop owns
+    // the track's translateX (a CSS animation cannot be dragged), so:
+    //   - a drag moves it 1:1 with the pointer, wrapping over the two duplicated runs;
+    //   - a press that travels < TAP_PX is a tap: it opens the note it started on;
+    //   - while a pointer is down, a mouse hovers, or focus is inside, the strip stands
+    //     still; on release it carries on.
+    // WCAG 2.2.2 (Pause, Stop, Hide) without a visible pause button (Son, behavior 43):
+    // press-and-hold stops it, hover/focus stop it, prefers-reduced-motion keeps it
+    // still (drag still scrolls it), and the sr-only list below is a non-moving
+    // equivalent for keyboard and screen-reader users.
+    const TAP_PX = 8;
 
-    // Reading-speed heuristic, not a measured layout value: ~6 chars/sec, clamped so
-    // a one-note list doesn't whip past and a long list doesn't crawl for a minute.
+    // Reading-speed heuristic, not a measured layout value: ~6 chars/sec over one run,
+    // clamped so a one-note list doesn't whip past and a long list doesn't crawl.
     const marqueeDurationS = $derived(
         Math.min(60, Math.max(15, news.reduce((acc, n) => acc + headlineFor(n).length, 0) / 6))
     );
+
+    let runEl: HTMLElement | undefined = $state();
+    let runWidth = $state(0);
+    let offset = $state(0); // px, <= 0; wrapped into (-runWidth, 0]
+    let held = false;
+    let hovering = false;
+    let focused = false;
+    let reduced = false;
+
+    function wrap(x: number): number {
+        if (runWidth <= 0) return 0;
+        const m = x % runWidth;
+        return m > 0 ? m - runWidth : m;
+    }
+
+    $effect(() => {
+        if (variant !== 'marquee' || !runEl) return;
+        const el = runEl;
+        const ro = new ResizeObserver(() => (runWidth = el.offsetWidth));
+        ro.observe(el);
+        runWidth = el.offsetWidth;
+        const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+        reduced = mq.matches;
+        const onMq = () => (reduced = mq.matches);
+        mq.addEventListener('change', onMq);
+        let last = performance.now();
+        let raf = requestAnimationFrame(function tick(now) {
+            const dt = Math.min(0.1, (now - last) / 1000);
+            last = now;
+            if (!held && !hovering && !focused && !reduced && runWidth > 0) {
+                offset = wrap(offset - (runWidth / marqueeDurationS) * dt);
+            }
+            raf = requestAnimationFrame(tick);
+        });
+        return () => {
+            cancelAnimationFrame(raf);
+            ro.disconnect();
+            mq.removeEventListener('change', onMq);
+        };
+    });
+
+    let downX = 0;
+    let downOffset = 0;
+    let travel = 0;
+    let downNote: NewsNote | undefined;
+
+    function onPointerDown(e: PointerEvent) {
+        if (e.button !== 0) return;
+        held = true;
+        downX = e.clientX;
+        downOffset = offset;
+        travel = 0;
+        const i = (e.target as HTMLElement | null)?.closest<HTMLElement>('[data-i]')?.dataset.i;
+        downNote = i !== undefined ? news[Number(i)] : undefined;
+        try {
+            (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+        } catch {
+            // a pointer the browser no longer tracks — drag still works inside the strip
+        }
+    }
+    function onPointerMove(e: PointerEvent) {
+        if (!held) return;
+        const dx = e.clientX - downX;
+        travel = Math.max(travel, Math.abs(dx));
+        offset = wrap(downOffset + dx);
+    }
+    function onPointerUp() {
+        if (!held) return;
+        held = false;
+        if (travel < TAP_PX && downNote) onSelect?.(downNote);
+        downNote = undefined;
+    }
+    function onPointerCancel() {
+        held = false;
+        downNote = undefined;
+    }
 </script>
 
 {#if news.length > 0 && variant === 'marquee'}
-    <div class="pp-ticker pp-ticker-marquee" role="region" aria-label={regionLabel}>
-        <span class="pp-ticker-label" aria-hidden="true">{$t('home.news.label')}</span>
-        <div class="pp-ticker-marquee-viewport">
-            <!-- Decorative: the moving copy is aria-hidden; the sr-only list below is
-                 the real, non-moving, keyboard/AT-reachable equivalent. -->
-            <div
-                class="pp-ticker-marquee-track"
-                aria-hidden="true"
-                style:animation-duration="{marqueeDurationS}s"
-                style:animation-play-state={paused ? 'paused' : undefined}
-            >
+    <div
+        class="pp-ticker pp-ticker-marquee"
+        role="region"
+        aria-label={regionLabel}
+        onfocusin={() => (focused = true)}
+        onfocusout={() => (focused = false)}
+    >
+        <!-- Decorative: the moving copy is aria-hidden; the sr-only list below is the
+             real, non-moving, keyboard/AT-reachable equivalent. Pointer handling (drag,
+             tap, hold) lives on the viewport — see the script's marquee block. -->
+        <div
+            class="pp-ticker-marquee-viewport"
+            aria-hidden="true"
+            onpointerdown={onPointerDown}
+            onpointermove={onPointerMove}
+            onpointerup={onPointerUp}
+            onpointercancel={onPointerCancel}
+            onpointerenter={(e) => (hovering = e.pointerType === 'mouse')}
+            onpointerleave={() => (hovering = false)}
+        >
+            <div class="pp-ticker-marquee-track" style:transform="translate3d({offset}px, 0, 0)">
                 {#each [0, 1] as run (run)}
-                    <span class="pp-ticker-marquee-run">
-                        {#each news as note (note.news_slug + '-' + run)}
-                            <button
-                                type="button"
-                                tabindex="-1"
-                                class="pp-ticker-marquee-item"
-                                onclick={() => onSelect?.(note)}>{headlineFor(note)}</button
-                            >
-                            <span class="pp-ticker-sep">•</span>
-                        {/each}
-                    </span>
+                    {#if run === 0}
+                        <span class="pp-ticker-marquee-run" bind:this={runEl}>
+                            {#each news as note, i (note.news_slug + '-0')}
+                                <span class="pp-ticker-marquee-item" data-i={i}>{headlineFor(note)}</span>
+                                <span class="pp-ticker-sep">•</span>
+                            {/each}
+                        </span>
+                    {:else}
+                        <span class="pp-ticker-marquee-run">
+                            {#each news as note, i (note.news_slug + '-1')}
+                                <span class="pp-ticker-marquee-item" data-i={i}>{headlineFor(note)}</span>
+                                <span class="pp-ticker-sep">•</span>
+                            {/each}
+                        </span>
+                    {/if}
                 {/each}
             </div>
         </div>
-        <!-- WCAG 2.2.2 (Pause, Stop, Hide): motion lasting >5s needs a stop control
-             reachable without hover — touch/keyboard users have no hover state, so
-             CSS-only :hover-pause below isn't enough on its own. Icon is an inline SVG,
-             not a Unicode glyph (❚❚/▶ render as a tofu box in some fonts — confirmed
-             via a headless-Chromium screenshot). -->
-        <button
-            type="button"
-            class="pp-ticker-pause"
-            onclick={togglePaused}
-            aria-label={paused ? $t('plan.news.play') : $t('plan.news.pause')}
-        >
-            {#if paused}
-                <svg viewBox="0 0 16 16" width="11" height="11" fill="currentColor" aria-hidden="true"
-                    ><path d="M3.5 2v12l10-6-10-6z" /></svg
-                >
-            {:else}
-                <svg viewBox="0 0 16 16" width="11" height="11" fill="currentColor" aria-hidden="true"
-                    ><rect x="3" y="2" width="3.2" height="12" /><rect x="9.8" y="2" width="3.2" height="12" /></svg
-                >
-            {/if}
-        </button>
         <ul class="sr-only">
             {#each news as note (note.news_slug)}
                 <li><button type="button" onclick={() => onSelect?.(note)}>{headlineFor(note)}</button></li>

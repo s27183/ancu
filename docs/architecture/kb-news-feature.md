@@ -707,6 +707,18 @@ ticker-opened detail sheet still lands on it (`onHomeNewsClose`,
 unchanged), so "browse everything" stays one tap away, just no longer the
 ticker's own first stop. `svelte-check` 0/0, `svelte-autofixer` clean.
 
+**The strip moves under the finger (2026-10-10, Son, behavior 43).** The
+"NEWS" label chip and the pause/play button are gone. The CSS keyframe loop
+became a `requestAnimationFrame` loop owning the track's `translateX`, so a
+sideways drag scrolls the strip 1:1 (wrapping over the two runs), a press
+that travels under 8px is a tap and opens that note, and the strip carries
+on once the finger lifts. WCAG 2.2.2 is still met without a visible button:
+the strip stands still while pressed, hovered by a mouse or holding focus;
+`prefers-reduced-motion` keeps it still (dragging still scrolls it); the
+`.sr-only` list remains the non-moving equivalent. The moving items are now
+`aria-hidden` spans, not `tabindex=-1` buttons — the viewport's pointer
+handlers own the tap.
+
 ## Open design questions (real gaps, not yet resolved)
 
 **1. Push vs pull.** The engine primitive is pull-only (the shell calls GET).

@@ -424,6 +424,13 @@ export const minimalStyle: StyleSpecification = {
 // that the data bubbles still read on top (§7.1). These basemap layers sit BELOW the
 // bubble layer — svelte-maplibre-gl adds the CircleLayer after the style loads, so the
 // data layer stays on top of the basemap.
+/** Who the basemap credits (ODbL / Protomaps terms). The page shows these in its one "i"
+ *  credit popup (behavior 43); MapLibre's own attribution control is off. */
+export const BASEMAP_CREDIT = [
+    { name: 'Protomaps', url: 'https://protomaps.com' },
+    { name: 'OpenStreetMap', url: 'https://openstreetmap.org/copyright' }
+] as const;
+
 const PROTOMAPS_ASSETS = 'https://protomaps.github.io/basemaps-assets';
 // The vector source id, shared between `sources` (below) and `layers()`'s first arg
 // (which bakes `"source": BASEMAP_SOURCE_ID` into every generated layer) — also the id
@@ -492,8 +499,7 @@ export function basemapStyle(pmtilesUrl: string): StyleSpecification {
             [BASEMAP_SOURCE_ID]: {
                 type: 'vector',
                 url: `pmtiles://${pmtilesUrl}`,
-                attribution:
-                    '<a href="https://protomaps.com">Protomaps</a> © <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>'
+                attribution: BASEMAP_CREDIT.map((c) => `<a href="${c.url}">${c.name}</a>`).join(' © ')
             }
         },
         layers: layers(BASEMAP_SOURCE_ID, MAP_FLAVOR, { lang: 'en' })

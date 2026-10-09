@@ -123,6 +123,13 @@
     --panel-bg: rgb(255 255 255 / 0.94);
     --panel-blur: saturate(1.2) blur(18px);
     --header-h: 3.5rem;
+    /* Phone safe areas (behavior 43): non-zero only with viewport-fit=cover on a
+       notched phone; 0 on desktop. Bars and sheets pad by these, never by literals. */
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    /* The header's full height: its bar plus the notch it extends up into. Everything
+       placed below the header offsets by this. */
+    --header-total: calc(var(--header-h) + var(--safe-top));
 }
 
 /* The shared glass surface — one rule every floating control opts into. */
@@ -388,7 +395,10 @@ body {
     left: 0;
     right: 0;
     z-index: 20; /* below the sheet (30) so the desktop drawer covers it top-to-bottom */
-    height: var(--header-h);
+    /* viewport-fit=cover (app.html): the glass bar extends up under the notch/status
+       bar, its content kept below it by the top inset (behavior 43). */
+    height: var(--header-total);
+    padding-top: var(--safe-top);
     /* 3 columns: brand (left) · language toggle (centred) · account (right). The two
        1fr edge columns keep the centre column visually centred regardless of side widths. */
     display: grid;
@@ -663,10 +673,28 @@ body {
     height: 100%;
 }
 
+/* Sized to the viewport the visitor can see: 100dvh shrinks while a phone browser's
+   address/tool bar is shown, where the vh unit is the bar-hidden height and puts the bottom
+   of a sheet under the bar (behavior 43). height:100% stays as the fallback. */
 body {
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    height: 100dvh;
+}
+
+/* Frosted glass over the home-indicator strip (behavior 43) — the header's twin at the
+   bottom edge; 0px tall wherever there is no bottom inset. */
+.safe-bottom-glass {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: var(--safe-bottom);
+    z-index: 20;
+    pointer-events: none;
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
 }
 
 main {
@@ -675,7 +703,7 @@ main {
 }
 
 .content {
-    padding: calc(var(--header-h) + 1.5rem) 1rem 1.5rem;
+    padding: calc(var(--header-total) + 1.5rem) 1rem calc(1.5rem + var(--safe-bottom));
     max-width: 48rem;
     margin: 0 auto;
 }
@@ -699,7 +727,7 @@ main {
    normal-flow child so it stacks under the toggle. */
 .controls-cluster {
     position: absolute;
-    top: calc(var(--header-h) + var(--home-news-h, 0px) + 0.75rem);
+    top: calc(var(--header-total) + var(--home-news-h, 0px) + 0.75rem);
     left: 0.75rem;
     z-index: 12;
     display: flex;
@@ -984,52 +1012,46 @@ main {
     cursor: pointer;
 }
 
-/* MapLibre's own basemap credit (compact "ⓘ") stacks ABOVE the sources chip in the
-   same corner instead of underneath it, so neither covers the other. Scoped under
-   .maplibregl-map: maplibre-gl.css loads after this file and would win a tie. */
-.maplibregl-map .maplibregl-ctrl-bottom-right {
-    bottom: 2.1rem;
-}
-.maplibregl-map .maplibregl-ctrl-bottom-right .maplibregl-ctrl-attrib {
-    margin: 0 0.75rem 0 0;
-    font-size: var(--fs-2xs);
-    border-radius: var(--radius-pill);
-}
-
-/* CC-BY attribution (§6.1) — required, but collapsed to a small chip bottom-right so
-   it stops eating a full-width strip. Click expands the source list. */
+/* Credits (behavior 43): one round "i" bottom-right; its popup holds the basemap
+   credit and every CC-BY source (§6.1). MapLibre's own attribution control is off.
+   The scrim under the open popup takes the outside tap that closes it. */
 .attribution {
     position: absolute;
-    bottom: 0.5rem;
+    bottom: calc(0.5rem + var(--safe-bottom));
     right: 0.75rem;
-    z-index: 10;
+    z-index: 26;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 0.3rem;
+    gap: var(--sp-2);
     max-width: min(80vw, 22rem);
+}
+.attr-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 25;
 }
 .attr-toggle {
     display: inline-flex;
     align-items: center;
-    gap: 0.3rem;
-    padding: 0.25rem 0.55rem;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
     border-radius: var(--radius-pill);
     border: 1px solid var(--glass-border);
     background: var(--glass-bg);
     -webkit-backdrop-filter: var(--glass-blur);
     backdrop-filter: var(--glass-blur);
     box-shadow: var(--shadow-1);
-    font-size: var(--fs-2xs);
-    font-weight: 600;
     color: var(--muted);
     cursor: pointer;
 }
-.attr-mark {
-    font-weight: 700;
+.attribution.open .attr-toggle {
+    color: var(--accent);
 }
-.attribution:not(.open) .attr-label {
-    /* collapsed: keep the label readable but tight */
+.attr-map a {
+    color: inherit;
 }
 .attr-list {
     display: flex;
@@ -1067,6 +1089,7 @@ main {
     right: 0;
     bottom: 0;
     height: 75%;
+    padding-bottom: var(--safe-bottom); /* the body's last tile clears the home indicator */
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
 /* Grab handle — phone only; the desktop drawer hides it. */
@@ -1231,7 +1254,7 @@ main {
 
 /* Desktop: the sheet becomes a CENTERED popup modal — wide but not full-screen. Its
    height follows its CONTENT (so the Zone and Plan tabs are each their own height, not
-   forced to one fixed card height), capped at 85vh so a long plan tab scrolls inside.
+   forced to one fixed card height), capped at 85dvh so a long plan tab scrolls inside.
    No dimming backdrop on purpose: the map stays visible so the selected suburb's pulse
    reads. Transform-centring is paint-safe here because .sheet is SOLID (no backdrop-
    filter — the compositing trap noted above). */
@@ -1244,7 +1267,7 @@ main {
         transform: translate(-50%, -50%);
         width: min(92vw, 40rem);
         height: auto;
-        max-height: 85vh;
+        max-height: 85dvh;
         border-radius: var(--radius-lg);
         border: 1px solid var(--glass-border);
         animation: modal-in var(--t-med) var(--ease);
@@ -1509,7 +1532,7 @@ main {
 /* Calm sign-in banner — top-centre, status not alarm; emerald when ok. */
 .signin-banner {
     position: absolute;
-    top: calc(var(--header-h) + var(--home-news-h, 0px) + 0.75rem);
+    top: calc(var(--header-total) + var(--home-news-h, 0px) + 0.75rem);
     left: 50%;
     transform: translateX(-50%);
     z-index: 36;
@@ -1814,7 +1837,7 @@ main {
    once). */
 .home-news-band {
     position: absolute;
-    top: var(--header-h);
+    top: var(--header-total);
     left: 0;
     right: 0;
     z-index: 15;
@@ -1852,68 +1875,22 @@ main {
     border: none;
     box-shadow: var(--shadow-1);
 }
-.pp-ticker-label {
-    flex: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.22rem 0.6rem 0.22rem 0.5rem;
-    background: var(--warm);
-    color: var(--on-dark);
-    font-size: var(--fs-2xs);
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    border-radius: var(--radius-pill);
-}
-/* A live dot before the label — the band is a feed, not a static banner. */
-.pp-ticker-label::before {
-    content: '';
-    width: 0.4rem;
-    height: 0.4rem;
-    border-radius: 50%;
-    background: var(--on-dark);
-    animation: pp-live 2s var(--ease) infinite;
-}
-@keyframes pp-live {
-    50% {
-        opacity: 0.35;
-    }
-}
-/* Pause/play (WCAG 2.2.2 — see NewsTicker.svelte): kept, but demoted to a small,
-   low-contrast icon at the strip's end so it reads as a utility control, not a
-   headline-level element — it's there for touch/keyboard users who can't hover to
-   pause, not a feature to draw the eye. */
-.pp-ticker-pause {
-    flex: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: none;
-    background: transparent;
-    color: var(--on-dark-muted);
-    padding: 0.3rem;
-    border-radius: var(--radius-xs);
-    cursor: pointer;
-}
-.pp-ticker-pause:hover {
-    background: var(--on-dark-wash);
-    color: var(--on-dark);
-}
 .pp-ticker-marquee-viewport {
     flex: 1 1 auto;
     min-width: 0;
     overflow: hidden;
+    touch-action: pan-y; /* horizontal drags are the strip's own (NewsTicker.svelte) */
+    user-select: none;
+    -webkit-user-select: none;
+    cursor: grab;
+}
+.pp-ticker-marquee-viewport:active {
+    cursor: grabbing;
 }
 .pp-ticker-marquee-track {
     display: flex;
     width: max-content;
-    animation-name: pp-ticker-scroll;
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-}
-.pp-ticker-marquee:hover .pp-ticker-marquee-track,
-.pp-ticker-marquee:focus-within .pp-ticker-marquee-track {
-    animation-play-state: paused;
+    will-change: transform;
 }
 .pp-ticker-marquee-run {
     display: flex;
@@ -1942,30 +1919,6 @@ main {
     color: var(--on-dark-faint);
     margin: 0 1rem;
 }
-@keyframes pp-ticker-scroll {
-    from {
-        transform: translateX(0);
-    }
-    to {
-        transform: translateX(-50%);
-    }
-}
-/* Reduced motion: stop the loop and let the (now single, un-duplicated-looking)
-   run be scrolled manually instead of forcing continuous motion. More specific
-   than the app-wide `* { animation-duration: 0.01ms }` catch-all, so this wins
-   cleanly rather than leaving a near-zero-duration animation flickering. */
-@media (prefers-reduced-motion: reduce) {
-    .pp-ticker-marquee-track {
-        animation: none !important;
-    }
-    .pp-ticker-marquee-viewport {
-        overflow-x: auto;
-    }
-    .pp-ticker-marquee-run:nth-child(2) {
-        display: none;
-    }
-}
-
 /* News detail sheet (kb-news-feature.md task 28) — content inside NewsDetailSheet.svelte's
    Modal. summary reuses .pp-card's ink/font sizing conventions rather than inventing new
    ones; it's rendered via renderInlineMarkdown (2026-07-09) since KB summaries carry
@@ -2080,7 +2033,7 @@ main {
 }
 .pp-news-list-item-headline {
     color: var(--ink);
-    font-size: var(--fs-md);
+    font-size: var(--fs-sm);
     font-weight: 600;
     line-height: 1.4;
     letter-spacing: -0.01em;
@@ -2643,7 +2596,7 @@ main {
     gap: 0.5rem;
     /* Fixed viewport share so the composer stays put as the transcript grows — the
        log scrolls internally instead of pushing the input down the sheet. */
-    max-height: 45vh;
+    max-height: 45dvh;
     overflow-y: auto;
     overscroll-behavior: contain;
 }

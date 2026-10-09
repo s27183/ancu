@@ -129,6 +129,7 @@
 <main>
     {@render children()}
 </main>
+<div class="safe-bottom-glass" aria-hidden="true"></div>
 
 <!-- Account side-sheet — slides in from the right (CSS transform on a solid panel).
      Always in the DOM for the slide; `inert` + off-screen when closed. -->
