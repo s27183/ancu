@@ -15,6 +15,7 @@
 -export([link_oauth/3]).
 -export([user_tier/1, user_email/1, link_subscription/3, update_subscription/5]).
 -export([record_charge/5]).
+-export([claim_question/2, release_question/2]).
 
 %% --- identity (login flow) --------------------------------------------------
 
@@ -240,6 +241,51 @@ record_charge(UserId, Kind, AmountCents, PaymentIntentId, PlanCardId) ->
 %% undefined → SQL NULL; a binary passes through (so a nullable text/uuid bind is uniform).
 null_bin(undefined) -> null;
 null_bin(B) when is_binary(B) -> B.
+
+%% Honest-partial -> P-5 · Metering, not gating -> The shell database -> the daily question cap, claimed in one statement
+%% The daily assistant-question cap (behavior 36). One statement claims a question for
+%% (user, today in Sydney): insert n=1, or increment while n < Limit. Postgres takes the
+%% row lock on conflict, so two concurrent claims serialise and the WHERE re-checks the
+%% fresh n: at most Limit claims succeed per day. The day is SQL's (Australia/Sydney),
+%% never the Erlang wall clock. On a refused claim it returns the next Sydney midnight
+%% as a UTC ISO-8601 string, for the client's "ask again tomorrow".
+-spec claim_question(binary(), non_neg_integer()) ->
+    {ok, binary()} | {limit, binary()}.
+claim_question(UserId, Limit) when Limit >= 1 ->
+    case query(
+        "INSERT INTO qa_daily_asks (user_id, day, n) "
+        "VALUES ($1::uuid, (now() AT TIME ZONE 'Australia/Sydney')::date, 1) "
+        "ON CONFLICT (user_id, day) DO UPDATE SET n = qa_daily_asks.n + 1 "
+        "WHERE qa_daily_asks.n < $2 "
+        "RETURNING day::text",
+        [UserId, Limit])
+    of
+        #{rows := [{Day}]} -> {ok, Day};
+        #{rows := []}      -> {limit, next_sydney_midnight()}
+    end;
+claim_question(_UserId, _Limit) ->
+    {limit, next_sydney_midnight()}.
+
+%% Give back a claimed question (the engine did not start the turn). Keyed on the day
+%% the claim returned, so a release just after midnight credits the right day. The day
+%% travels as `$2::text::date`: pgo types a bare `$2::date` parameter as date and
+%% refuses a binary for it (badarg_encoding, measured 2026-10-09 by
+%% qa_daily_cap_smoke) — the same encoder the timestamptz block above meets.
+-spec release_question(binary(), binary()) -> ok.
+release_question(UserId, Day) ->
+    _ = query(
+        "UPDATE qa_daily_asks SET n = n - 1 "
+        "WHERE user_id = $1::uuid AND day = $2::text::date AND n > 0",
+        [UserId, Day]),
+    ok.
+
+next_sydney_midnight() ->
+    #{rows := [{T}]} = query(
+        "SELECT to_char((((now() AT TIME ZONE 'Australia/Sydney')::date + 1)::timestamp "
+        "AT TIME ZONE 'Australia/Sydney') AT TIME ZONE 'UTC', "
+        "'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"')",
+        []),
+    T.
 
 -spec query(string(), list()) -> map().
 query(SQL, Params) ->
