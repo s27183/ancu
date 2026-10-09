@@ -49,8 +49,6 @@ services:
       # Magic-link sender — must be on the Resend-verified domain (deployment.md §4 step 8).
       - key: EMAIL_FROM
         value: "no-reply@ancu.ai"
-      - key: EMAIL_FROM_NAME
-        value: "FirstHomey"
       # Stripe API base — live default; explicit for clarity. (Tests override it to a
       # stub; never set the stub value in prod.)
       - key: STRIPE_API_BASE

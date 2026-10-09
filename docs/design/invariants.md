@@ -14,9 +14,9 @@ investor, or funded from Vietnam — a bilingual budget plan for the whole
 property lifecycle (buy, hold, sell), built from their own situation, whose every
 regulated figure traces to a verified, cited source.** (Son, 2026-10-06; "budget
 plan … (buy, hold, sell)" Son, 2026-10-08. The product name is left out
-on purpose: it is not settled, and renaming must not touch the ground. "Rau",
-the name users read today, is temporary until a final one is chosen — Son,
-2026-10-06.)
+on purpose: it is not settled, and renaming must not touch the ground. "Mai An Cư"
+(maiancu), the name users read today, is provisional until a final one is
+chosen — Son, 2026-10-09; it replaces "Rau" of 2026-10-06.)
 
 The plan is information provided as is, for budget planning across that
 lifecycle; the platform gives no legal, tax or financial advice service, and

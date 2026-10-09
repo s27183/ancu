@@ -168,7 +168,7 @@ CORS** (no browser calls it directly).
 | `ENGINE_BASE_URL` | config | `https://engine.ancu.ai` (pre-DNS: the engine's `*.ondigitalocean.app` ingress) |
 | `APP_BASE_URL` | config | `https://app.ancu.ai` — base for the magic-link + Google redirect URIs |
 | `COOKIE_SECURE` | config | `1` (prod) — `fh_session` gets `Secure` |
-| `EMAIL_FROM` / `EMAIL_FROM_NAME` | config | magic-link sender, e.g. `no-reply@ancu.ai` / `FirstHomey` |
+| `EMAIL_FROM` / `EMAIL_FROM_NAME` | config | magic-link sender, e.g. `no-reply@ancu.ai`; the display name is the brand (`fh_shell_util:brand/0`) unless `EMAIL_FROM_NAME` overrides it — leave it unset |
 | `STRIPE_API_BASE` | config | `https://api.stripe.com` (live default; explicit for clarity — never set the test stub in prod). |
 | `ADDON_AMOUNT_DOC_REVIEW` | config | doc_review add-on price in cents (`4000` = $40). Optional; code defaults to 4000 (8-S5f). |
 | `ADMIN_EMAILS` | config | comma-separated admin allowlist (charge-exempt, still metered — 8-S5e). Emails aren't secret but leave empty in-repo; set the real list in the Dashboard. |
