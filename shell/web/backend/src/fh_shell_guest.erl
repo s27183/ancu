@@ -11,6 +11,7 @@
 %% claims the guest (claim/2): its plans move into the account, with no rebuild.
 
 -export([is_guest/1, start/1, claim/2, refuse/1, ttl/0]).
+-export([client_addr/1, daily_limit/0]).
 
 -define(SESSION_COOKIE, <<"fh_session">>).
 -define(TTL, 7 * 86400).
@@ -56,3 +57,31 @@ claim(Req, UserId) ->
 -spec refuse(cowboy_req:req()) -> cowboy_req:req().
 refuse(Req) ->
     fh_shell_http:reply_json(403, #{<<"error">> => <<"sign_in_required">>}, Req).
+
+%% The client's address for the per-address cap: the first X-Forwarded-For entry (the
+%% app sits behind DigitalOcean's proxy), else the socket peer (local dev). Logged with
+%% the raw header on each guest create, so prod shows what the proxy sends before the
+%% cap is trusted (behavior 45's Assumes).
+-spec client_addr(cowboy_req:req()) -> binary().
+client_addr(Req) ->
+    case cowboy_req:header(<<"x-forwarded-for">>, Req, undefined) of
+        undefined -> peer(Req);
+        Xff ->
+            case string:trim(hd(binary:split(Xff, <<",">>))) of
+                <<>> -> peer(Req);
+                First -> First
+            end
+    end.
+
+peer(Req) ->
+    {Ip, _Port} = cowboy_req:peer(Req),
+    list_to_binary(inet:ntoa(Ip)).
+
+%% Plans a guest — and one address — may build a Sydney day (GUEST_DAILY_CREATES,
+%% default 3, Son 2026-10-10).
+-spec daily_limit() -> pos_integer().
+daily_limit() ->
+    case os:getenv("GUEST_DAILY_CREATES") of
+        false -> 3;
+        V -> try list_to_integer(V) of N when N >= 1 -> N; _ -> 3 catch _:_ -> 3 end
+    end.

@@ -17,6 +17,7 @@
 -export([record_charge/5]).
 -export([claim_question/2, release_question/2]).
 -export([create_guest/0, claim_guest/2]).
+-export([claim_guest_create/3, release_guest_create/3]).
 
 %% --- identity (login flow) --------------------------------------------------
 
@@ -317,6 +318,36 @@ release_question(UserId, Day) ->
         "UPDATE qa_daily_asks SET n = n - 1 "
         "WHERE user_id = $1::uuid AND day = $2::text::date AND n > 0",
         [UserId, Day]),
+    ok.
+
+%% Guest plans -> P-5 · Metering, not gating -> The shell database -> the guest daily create cap, claimed in one statement
+%% The signed-out create cap (behavior 45): 3 plans a Sydney day per guest and per
+%% client address. The same one-statement claim as claim_question/2, keyed by
+%% (kind, key, day) in guest_daily_creates: kind 'guest' with the guest's user_id,
+%% kind 'addr' with the client address. On a refused claim, the next Sydney midnight.
+-spec claim_guest_create(guest | addr, binary(), pos_integer()) ->
+    {ok, binary()} | {limit, binary()}.
+claim_guest_create(Kind, Key, Limit) ->
+    case query(
+        "INSERT INTO guest_daily_creates (kind, key, day, n) "
+        "VALUES ($1, $2, (now() AT TIME ZONE 'Australia/Sydney')::date, 1) "
+        "ON CONFLICT (kind, key, day) DO UPDATE SET n = guest_daily_creates.n + 1 "
+        "WHERE guest_daily_creates.n < $3 "
+        "RETURNING day::text",
+        [atom_to_binary(Kind), Key, Limit])
+    of
+        #{rows := [{Day}]} -> {ok, Day};
+        #{rows := []}      -> {limit, next_sydney_midnight()}
+    end.
+
+%% Give a claimed create back (the engine did not accept the plan, or the other
+%% counter refused it). Keyed on the claim's day, as release_question/2.
+-spec release_guest_create(guest | addr, binary(), binary()) -> ok.
+release_guest_create(Kind, Key, Day) ->
+    _ = query(
+        "UPDATE guest_daily_creates SET n = n - 1 "
+        "WHERE kind = $1 AND key = $2 AND day = $3::text::date AND n > 0",
+        [atom_to_binary(Kind), Key, Day]),
     ok.
 
 next_sydney_midnight() ->

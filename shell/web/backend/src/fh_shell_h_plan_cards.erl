@@ -41,24 +41,67 @@ handle_get(Req0, State) ->
     end.
 
 %% Signed out, the create still runs (behavior 45): the body is read first (so a
-%% malformed request makes no guest), then fh_shell_guest:start/1 makes this browser a
-%% guest and sets its session cookie, and the plan is created under that guest.
+%% malformed request makes no guest), then the guest path below makes this browser a
+%% guest (fh_shell_guest:start/1) and creates the plan under it. A signed-in user's
+%% create is not capped.
 handle_post(Req0, State) ->
     case fh_shell_http:read_json_body(Req0) of
         {ok, Body, Req1} ->
             case fh_shell_http:authenticate_user(Req1) of
-                {ok, #{<<"user_id">> := UserId}} ->
-                    create(UserId, Body, Req1, State);
+                {ok, #{<<"user_id">> := UserId} = Claims} ->
+                    case fh_shell_guest:is_guest(Claims) of
+                        false -> reply_create(create(UserId, Body), Req1, State);
+                        true -> guest_create(UserId, Body, Req1, State)
+                    end;
                 {error, 401, _} ->
-                    {GuestId, Req2} = fh_shell_guest:start(Req1),
-                    create(GuestId, Body, Req2, State)
+                    guest_create(new, Body, Req1, State)
             end;
         {error, invalid_json} ->
             {ok, fh_shell_http:reply_json(400,
                 #{<<"error">> => <<"invalid_json">>}, Req0), State}
     end.
 
-create(UserId, Body, Req, State) ->
+%% Guest plans -> P-5 · Metering, not gating -> The shell backend -> the cap runs before a guest is made
+%% A guest's create is capped per guest and per client address each Sydney day
+%% (fh_shell_store:claim_guest_create/3). The address is claimed first, so an address
+%% over its cap makes no new guest row; a claim the engine then refuses is given back.
+guest_create(Who, Body, Req0, State) ->
+    Limit = fh_shell_guest:daily_limit(),
+    Addr = fh_shell_guest:client_addr(Req0),
+    logger:info("[guest] create from addr=~s xff=~p",
+                [Addr, cowboy_req:header(<<"x-forwarded-for">>, Req0, undefined)]),
+    case fh_shell_store:claim_guest_create(addr, Addr, Limit) of
+        {limit, Resets} ->
+            {ok, limited(Limit, Resets, Req0), State};
+        {ok, AddrDay} ->
+            {GuestId, Req1} = case Who of
+                new -> fh_shell_guest:start(Req0);
+                Id -> {Id, Req0}
+            end,
+            case fh_shell_store:claim_guest_create(guest, GuestId, Limit) of
+                {limit, Resets} ->
+                    ok = fh_shell_store:release_guest_create(addr, Addr, AddrDay),
+                    {ok, limited(Limit, Resets, Req1), State};
+                {ok, GuestDay} ->
+                    case create(GuestId, Body) of
+                        {202, _} = Created ->
+                            reply_create(Created, Req1, State);
+                        Refused ->
+                            ok = fh_shell_store:release_guest_create(guest, GuestId, GuestDay),
+                            ok = fh_shell_store:release_guest_create(addr, Addr, AddrDay),
+                            reply_create(Refused, Req1, State)
+                    end
+            end
+    end.
+
+limited(Limit, Resets, Req) ->
+    fh_shell_http:reply_json(429, #{<<"error">> => <<"guest_daily_limit">>,
+                                    <<"limit">> => Limit,
+                                    <<"resets_at">> => Resets}, Req).
+
+%% Forward to the engine; on its 202 record the shell's view. Returns the engine's
+%% status and decoded body.
+create(UserId, Body) ->
     {EngineStatus, EngineResp} = fh_shell_engine_client:create_plan_card(UserId, Body),
     Decoded = fh_shell_util:json_decode(EngineResp),
     case EngineStatus of
@@ -68,11 +111,14 @@ create(UserId, Body, Req, State) ->
             %% view never dangles without its engine counterpart. Idempotent on
             %% (user_id, engine_plan_card_id).
             ok = fh_shell_store:insert_plan_card_view(UserId, PlanCardId, title_of(Body)),
-            {ok, fh_shell_http:reply_json(202, Decoded, Req), State};
+            {202, Decoded};
         _ ->
-            %% Relay the engine's rejection verbatim (it owns the onboarding contract).
-            {ok, fh_shell_http:reply_json(EngineStatus, Decoded, Req), State}
+            {EngineStatus, Decoded}
     end.
+
+%% A non-202 engine reply relays verbatim (it owns the onboarding contract).
+reply_create({Status, Decoded}, Req, State) ->
+    {ok, fh_shell_http:reply_json(Status, Decoded, Req), State}.
 
 %% A best-effort display title for the shell's plan-card view. The plan pins to a
 %% zone (map-first, §7), so the first target-zone label is the natural title; fall

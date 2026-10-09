@@ -41,22 +41,35 @@ init(Req0, Opts) ->
 %% The shared gate: authenticate → validate the :id shape → confirm ownership, then
 %% hand (UserId, PlanCardId, Req, Opts) to the action. is_uuid guards the $N::uuid
 %% bind so a garbage id is a calm 404, not a pgo crash.
+%%
+%% Behavior 45: a guest (a plan built signed out) reads, simulates and refines its plan
+%% like anyone, but the actions that spend an assistant turn on its behalf — a
+%% question, attaching a property, a document review — answer 403 sign_in_required
+%% before the engine is called.
 with_owned_card(Req0, Opts, Action) ->
     case fh_shell_http:authenticate_user(Req0) of
-        {ok, #{<<"user_id">> := UserId}} ->
-            PlanCardId = cowboy_req:binding(id, Req0),
-            case is_binary(PlanCardId)
-                andalso fh_shell_util:is_uuid(PlanCardId)
-                andalso fh_shell_store:owns_plan_card(UserId, PlanCardId)
-            of
-                true ->
-                    Action(UserId, PlanCardId, Req0, Opts);
-                false ->
-                    {ok, fh_shell_http:reply_json(404,
-                        #{<<"error">> => <<"not_found">>}, Req0), Opts}
+        {ok, Claims} when Opts =:= [messages]; Opts =:= [properties]; Opts =:= [documents] ->
+            case fh_shell_guest:is_guest(Claims) of
+                true -> {ok, fh_shell_guest:refuse(Req0), Opts};
+                false -> owned_card(Claims, Req0, Opts, Action)
             end;
+        {ok, Claims} ->
+            owned_card(Claims, Req0, Opts, Action);
         {error, Status, ErrBody} ->
             {ok, fh_shell_http:reply_json(Status, ErrBody, Req0), Opts}
+    end.
+
+owned_card(#{<<"user_id">> := UserId}, Req0, Opts, Action) ->
+    PlanCardId = cowboy_req:binding(id, Req0),
+    case is_binary(PlanCardId)
+        andalso fh_shell_util:is_uuid(PlanCardId)
+        andalso fh_shell_store:owns_plan_card(UserId, PlanCardId)
+    of
+        true ->
+            Action(UserId, PlanCardId, Req0, Opts);
+        false ->
+            {ok, fh_shell_http:reply_json(404,
+                #{<<"error">> => <<"not_found">>}, Req0), Opts}
     end.
 
 %% GET /api/plan-cards/:id — fetch the filled plan-card content (the projection's
