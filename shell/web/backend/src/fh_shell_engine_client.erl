@@ -11,7 +11,7 @@
 %% (fetch state, SSE event proxy, messages, suburbs) lands as the shell UX surfaces
 %% are built (8-S1..8-S4). HTTP via inets httpc (started by the shell app).
 
--export([create_plan_card/2, get_plan_card/2, post_message/3, get_conversation/2,
+-export([create_plan_card/2, get_plan_card/2, delete_plan_card/2, post_message/3, get_conversation/2,
          simulate/3,
          refine/3, set_profile_financials/3, set_checklist_status/3,
          attach_property/3, set_transaction_dates/4, upload_document/4, stream_events/3,
@@ -106,6 +106,19 @@ get_plan_card(UserId, PlanCardId) ->
         httpc:request(get, {Url, Headers},
                       [{timeout, ?RPC_TIMEOUT_MS}], [{body_format, binary}]),
     {Status, Resp}.
+
+%% Delete a plan card engine-side — DELETE /api/engine/plan-cards/:id, on behalf of
+%% the user that owns it (behavior 45: the guest purge, fh_shell_guest_purge). 204 on
+%% delete, 404 if the engine no longer has it (both mean the card is gone).
+-spec delete_plan_card(binary(), binary()) -> non_neg_integer().
+delete_plan_card(UserId, PlanCardId) ->
+    Token = fh_shell_engine_jwt:mint(#{user_id => UserId}),
+    Url = base_url() ++ "/plan-cards/" ++ binary_to_list(PlanCardId),
+    Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
+    {ok, {{_, Status, _}, _, _}} =
+        httpc:request(delete, {Url, Headers},
+                      [{timeout, ?RPC_TIMEOUT_MS}], [{body_format, binary}]),
+    Status.
 
 %% Ask a question about a plan card (the Q&A path, 8-S4) — POST
 %% /api/engine/plan-cards/:id/messages with the user's message. The shell has

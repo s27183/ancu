@@ -19,6 +19,7 @@
 -export([set_checklist_status/4, get_checklist_status/2]).
 -export([card_kb_slugs/1, get_news_status/2, dismiss_news/2]).
 -export([set_profile_financials/2, list_plan_card_ids_for_profile/1]).
+-export([delete_plan_card/2]).
 -export([deploy_commit_sha/0, projection_state/1, list_active_plan_card_ids/0]).
 -export([list_suburbs_by_state/1, list_all_suburbs/0, list_suburb_sources/0]).
 -export([read_glue/3, append_session_turn/6, read_conversation/3]).
@@ -335,6 +336,28 @@ set_profile_financials(PlanCardId, HouseholdFinancials) ->
 %% IC4 — every active (non-retired) plan card on a profile: the bounded sibling set a
 %% profile-fact write must refresh (a household has few journeys, so this is bounded by
 %% construction, unlike the global list_active_plan_card_ids/0 fleet sweep).
+%% Guest plans -> P-6 · Shells reach the engine only through the contract -> The engine -> a tenant-scoped plan-card delete
+%% Behavior 45 (Son, 2026-10-10): the shell purges an unclaimed guest's plans after 7
+%% days through DELETE /api/engine/plan-cards/:id, never the engine DB. The card goes
+%% (its events, sessions and audit rows cascade, 001), and so does its profile once no
+%% other card hangs on it — a profile without a card is a guest's facts kept for no plan.
+%% One transaction, so a concurrent create on the same profile cannot lose its profile.
+-spec delete_plan_card(binary(), binary()) -> ok | {error, not_found}.
+delete_plan_card(TenantId, PlanCardId) ->
+    pgo:transaction(fun() ->
+        case rows(query(
+                "DELETE FROM plan_cards WHERE tenant_id = $1::uuid AND plan_card_id = $2::uuid "
+                "RETURNING profile_id::text", [TenantId, PlanCardId])) of
+            [{ProfileId}] ->
+                _ = query(
+                    "DELETE FROM profiles p WHERE p.profile_id = $1::uuid "
+                    "AND NOT EXISTS (SELECT 1 FROM plan_cards c WHERE c.profile_id = p.profile_id)",
+                    [ProfileId]),
+                ok;
+            [] -> {error, not_found}
+        end
+    end).
+
 -spec list_plan_card_ids_for_profile(binary()) -> [binary()].
 list_plan_card_ids_for_profile(ProfileId) ->
     [Id || {Id} <- rows(query(

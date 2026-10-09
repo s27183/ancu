@@ -18,6 +18,7 @@
 -export([claim_question/2, release_question/2]).
 -export([create_guest/0, claim_guest/2]).
 -export([claim_guest_create/3, release_guest_create/3]).
+-export([expired_guests/1, delete_guest/1, prune_guest_creates/0]).
 
 %% --- identity (login flow) --------------------------------------------------
 
@@ -57,6 +58,35 @@ claim_guest(GuestId, UserId) ->
         end
     end),
     Moved.
+
+%% Unclaimed guests made more than AgeSeconds ago, each with the engine cards it still
+%% holds — the purge's work list (fh_shell_guest_purge, behavior 45). A claimed guest
+%% has no users row left, so a claimed card can never appear here.
+-spec expired_guests(pos_integer()) -> [{binary(), [binary()]}].
+expired_guests(AgeSeconds) ->
+    #{rows := Rows} = query(
+        "SELECT u.user_id::text, "
+        "       COALESCE(array_agg(v.engine_plan_card_id::text) "
+        "                FILTER (WHERE v.engine_plan_card_id IS NOT NULL), '{}') "
+        "FROM users u LEFT JOIN plan_card_views v ON v.user_id = u.user_id "
+        "WHERE u.guest AND u.created_at < now() - $1::int * interval '1 second' "
+        "GROUP BY u.user_id ORDER BY min(u.created_at)",
+        [AgeSeconds]),
+    [{Id, Cards} || {Id, Cards} <- Rows].
+
+%% Delete a guest's users row (its plan_card_views cascade; its usage_records keep
+%% their spend with user_id NULL, 005). Only ever a guest row.
+-spec delete_guest(binary()) -> ok.
+delete_guest(GuestId) ->
+    _ = query("DELETE FROM users WHERE user_id = $1::uuid AND guest", [GuestId]),
+    ok.
+
+%% The daily cap counters are only read for today; drop those older than a week.
+-spec prune_guest_creates() -> non_neg_integer().
+prune_guest_creates() ->
+    #{num_rows := N} = query(
+        "DELETE FROM guest_daily_creates WHERE day < CURRENT_DATE - 7", []),
+    N.
 
 %% Find-or-create a user by email. First login creates the row (role defaults to
 %% 'buyer', locale to 'vi' per 001_init_shell.sql); a returning user is found by the
