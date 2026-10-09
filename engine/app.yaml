@@ -10,7 +10,7 @@
 # Because nothing outside the app can reach it, the shell's tenant public key is
 # registered by the engine itself at boot (SHELL_TENANT_ID / SHELL_TENANT_PUBKEY).
 #
-# Region `syd`: uc.maiancu.com is the Australia (Úc) site of the maiancu.com umbrella.
+# Region `syd`: the users of maiancu.com are in Australia.
 
 name: ancu-engine
 region: syd

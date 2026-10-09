@@ -46,7 +46,7 @@ services:
       # Base for magic-link + Google redirect URIs and the SPA origin. The browser
       # only ever talks to this origin; /api/* is proxied here by a Pages Function.
       - key: APP_BASE_URL
-        value: "https://uc.maiancu.com"
+        value: "https://maiancu.com"
       # fh_session gets Secure in prod (HTTPS-only). Host-only, SameSite=Lax cookie.
       - key: COOKIE_SECURE
         value: "1"
@@ -82,7 +82,7 @@ services:
       # re_… → magic-link emails via Resend; unset → link logged (DO log stream).
       - key: RESEND_API_KEY
         type: SECRET
-      # Google OAuth — redirect URI https://uc.maiancu.com/api/auth/google/callback.
+      # Google OAuth — redirect URI https://maiancu.com/api/auth/google/callback.
       - key: GOOGLE_CLIENT_ID
         type: SECRET
       - key: GOOGLE_CLIENT_SECRET
@@ -104,9 +104,9 @@ services:
       # GOOGLE_TOKEN_URL — test-stub override; unset → real Google token endpoint.
       # Do NOT add these here.
 
-# uc-api.maiancu.com: a DNS-only CNAME in the Cloudflare zone to this app's ingress
+# api.maiancu.com: a DNS-only CNAME in the Cloudflare zone to this app's ingress
 # (do_deploy.py dns); DO issues the certificate. The Pages project proxies
-# uc.maiancu.com/api/* here (SHELL_ORIGIN).
+# maiancu.com/api/* here (SHELL_ORIGIN).
 domains:
-  - domain: uc-api.maiancu.com
+  - domain: api.maiancu.com
     type: PRIMARY

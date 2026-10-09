@@ -24,8 +24,9 @@ Son 2026-10-09), frontend on **Cloudflare Pages**, the cheapest setup that runs
 (~US$29/mo, below). GitHub source: **`s27183/ancu`**.
 
 **Naming.** The product is **Mai An Cư**; its umbrella domain is **`maiancu.com`**
-(Cloudflare zone; bought 2026-10-09) and each market is a subdomain — **`uc.maiancu.com`**
-is Australia (*Úc*), its API **`uc-api.maiancu.com`**. Mail is sent from
+(Cloudflare zone; bought 2026-10-09). The app is served on the apex **`maiancu.com`**
+(Son 2026-10-09: "i meant maiancu.com" — not a per-market subdomain), its API on
+**`api.maiancu.com`**; `www` is not served yet. Mail is sent from
 `no-reply@maiancu.com` (verified in Resend). The earlier `ancu.ai` apex (and before it
 `firsthomey.com.au`) was never bought and is superseded; the DO apps keep the internal
 names `ancu-engine` / `ancu-shell`.
@@ -58,9 +59,9 @@ Cloudflare Pages, secrets filled from `.env` by `scripts/do_deploy.py`, `deploy_
 
 | Service | Host | Domain | Spec |
 |---|---|---|---|
-| Frontend (SvelteKit `adapter-static` SPA) | Cloudflare Pages project `maiancu` | `uc.maiancu.com` | `shell/web/frontend/svelte.config.js` |
+| Frontend (SvelteKit `adapter-static` SPA) | Cloudflare Pages project `maiancu` | `maiancu.com` | `shell/web/frontend/svelte.config.js` |
 | Engine (Erlang gateway + **per-turn Python sidecar**) | DO App `ancu-engine`, `apps-s-1vcpu-1gb-fixed` (US$10), port 8080 | its `*.ondigitalocean.app` ingress only | `engine/app.yaml` |
-| Shell backend (Erlang; cowboy + pgo only) | DO App `ancu-shell`, `apps-s-1vcpu-0.5gb` (US$5), port 8081 | `uc-api.maiancu.com` | `shell/web/app.yaml` |
+| Shell backend (Erlang; cowboy + pgo only) | DO App `ancu-shell`, `apps-s-1vcpu-0.5gb` (US$5), port 8081 | `api.maiancu.com` | `shell/web/app.yaml` |
 | Databases | one App Platform **dev database** per app (PG 16, US$7 each), declared in the spec's `databases:` and bound as `${db.DATABASE_URL}` | — | the two app specs |
 
 **Compute is split and so are the databases.** Engine and shell run as two independent
@@ -191,7 +192,7 @@ browser calls it directly).
 |---|---|---|
 | `FH_SHELL_HTTP_PORT` | config | `8081` |
 | `ENGINE_BASE_URL` | config (filled) | the engine's `*.ondigitalocean.app` ingress — `do_deploy.py` reads it from the live `ancu-engine` |
-| `APP_BASE_URL` | config | `https://uc.maiancu.com` — base for the magic-link + Google redirect URIs |
+| `APP_BASE_URL` | config | `https://maiancu.com` — base for the magic-link + Google redirect URIs |
 | `COOKIE_SECURE` | config | `1` (prod) — `fh_session` gets `Secure` |
 | `EMAIL_FROM` / `EMAIL_FROM_NAME` | config | magic-link sender `no-reply@maiancu.com`; the display name is the brand (`fh_shell_util:brand/0`) unless `EMAIL_FROM_NAME` overrides it — leave it unset |
 | `STRIPE_API_BASE` | config | `https://api.stripe.com` (live default; explicit for clarity — never set the test stub in prod). |
@@ -201,7 +202,7 @@ browser calls it directly).
 | `SHELL_JWT_SECRET` | **secret** | user-JWT HMAC (`openssl rand -hex 32`) |
 | `SHELL_TENANT_ID` / `SHELL_TENANT_PRIVKEY` | **secret** | the ed25519 tenant identity — `SHELL_TENANT_PRIVKEY` is base64 of the private key; its **public** half reaches the engine as `SHELL_TENANT_PUBKEY` (§2). |
 | `RESEND_API_KEY` | **secret** | `re_…` — set → magic-link emails via Resend; unset → link logged. |
-| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | **secret** | OAuth; redirect URI `https://uc.maiancu.com/api/auth/google/callback`. |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | **secret** | OAuth; redirect URI `https://maiancu.com/api/auth/google/callback`. |
 | `STRIPE_SECRET_KEY` | **secret** | Stripe API key (8-S5e/8-S5f) — checkout create + webhook. |
 | `STRIPE_WEBHOOK_SECRET` | **secret** | `whsec_…` — raw-body HMAC verification of Stripe webhooks. |
 | `STRIPE_PRICE_PLUS` / `STRIPE_PRICE_PRO` | **secret** | recurring Price ids → tier reverse-map (8-S5e). |
@@ -219,10 +220,10 @@ browser calls it directly).
 |---|---|---|
 | `NODE_VERSION` | build | `20` |
 | `VITE_PMTILES_URL` | **build** | Protomaps pmtiles basemap URL (8-S2d). Vite inlines `import.meta.env.VITE_*` at **build** time, so this is a Pages **build** env var. Unset → the `minimalStyle` fallback (no basemap, no regression). Prod target: the R2 pmtiles extract. |
-| `SHELL_ORIGIN` | **runtime** | the shell backend origin the Pages **Function** proxies to (`https://uc-api.maiancu.com`). Read by `functions/api/[[path]].js` + `functions/health.js` at request time — a Pages **runtime** env var, NOT a `VITE_` build var. Unset → the proxy 503s. |
+| `SHELL_ORIGIN` | **runtime** | the shell backend origin the Pages **Function** proxies to (`https://api.maiancu.com`). Read by `functions/api/[[path]].js` + `functions/health.js` at request time — a Pages **runtime** env var, NOT a `VITE_` build var. Unset → the proxy 503s. |
 
 The frontend calls **relative `/api/*`** (no API-base env), so the browser sees **one
-origin** (`uc.maiancu.com`). Cloudflare Pages **cannot** proxy `/api/*` to an external origin
+origin** (`maiancu.com`). Cloudflare Pages **cannot** proxy `/api/*` to an external origin
 via `_redirects` (CF: *"Proxying will only support relative URLs on your site. You cannot
 proxy external domains"*; 200-rewrites are unsupported), so the proxy is a **Pages
 Function** — `shell/web/frontend/functions/api/[[path]].js` (catch-all) + `functions/health.js`
@@ -258,14 +259,14 @@ no record yet).
 4. **Shell app.** `bash scripts/do_apply.sh shell` — once the engine is live, its ingress
    becomes the shell's `ENGINE_BASE_URL`. Boots → migrations → `maybe_autoprovision`
    no-ops (static key present).
-5. **DNS.** In the `maiancu.com` zone: `uc-api` → a **DNS-only** CNAME to the shell's
+5. **DNS.** In the `maiancu.com` zone: `api` → a **DNS-only** CNAME to the shell's
    `*.ondigitalocean.app` ingress (DO issues the certificate for the `domains:` entry).
-6. **Frontend.** On the Pages project, by API: `SHELL_ORIGIN=https://uc-api.maiancu.com`
+6. **Frontend.** On the Pages project, by API: `SHELL_ORIGIN=https://api.maiancu.com`
    (runtime), `NODE_VERSION`, `VITE_PMTILES_URL` (build), and the custom domain
-   `uc.maiancu.com`; then redeploy so the build picks up the build vars.
+   `maiancu.com`; then redeploy so the build picks up the build vars.
 7. **Mail.** `maiancu.com` is verified in Resend (DKIM/SPF records in the zone:
    `resend._domainkey`, `send`); `EMAIL_FROM=no-reply@maiancu.com`. Register the Google
-   redirect URI `https://uc.maiancu.com/api/auth/google/callback` when Google sign-in is
+   redirect URI `https://maiancu.com/api/auth/google/callback` when Google sign-in is
    turned on.
 
 Status at any time: `python3 scripts/do_deploy.py status`; a deployment's log:
@@ -278,12 +279,12 @@ Status at any time: `python3 scripts/do_deploy.py status`; a deployment's log:
 
 ## 5. Post-deploy smoke
 
-- [ ] `GET https://<ancu-engine ingress>/health` → 200; `GET https://uc-api.maiancu.com/health` → 200.
-- [ ] `https://uc.maiancu.com/` loads the SPA; a deep link resolves via the SPA fallback
+- [ ] `GET https://<ancu-engine ingress>/health` → 200; `GET https://api.maiancu.com/health` → 200.
+- [ ] `https://maiancu.com/` loads the SPA; a deep link resolves via the SPA fallback
       (no 404 on refresh).
-- [ ] **Magic-link login:** request a link at `uc.maiancu.com`; the shell log says
+- [ ] **Magic-link login:** request a link at `maiancu.com`; the shell log says
       Resend accepted it; the email arrives from `Mai An Cư <no-reply@maiancu.com>`;
-      clicking it sets `fh_session` on `uc.maiancu.com` with `Secure`; a second click
+      clicking it sets `fh_session` on `maiancu.com` with `Secure`; a second click
       does not sign in.
 - [ ] **Google login** (if configured): consent → callback → session cookie; an
       already-magic-linked email lands the **same** account (keyed by email).
@@ -310,7 +311,7 @@ Status at any time: `python3 scripts/do_deploy.py status`; a deployment's log:
 | **SSE through the Pages Function** | **watch — verify in prod** | the 8-S4b plan-card SSE stream now rides `/api/*` through the Pages Function. Workers stream `fetch` bodies, but **verify long-lived SSE duration/streaming** against CF Pages Function limits in the post-deploy smoke (§5); if capped, consider a dedicated SSE route. |
 | **Prod tenant-pubkey provisioning** | **at engine boot** from `SHELL_TENANT_PUBKEY` | `engine/erlang/test/tenant_seed_smoke.escript`; rotating the key = a new `.env` value + re-apply both apps (the old key stays active until retired by hand). |
 | **`FH_DEPLOY_COMMIT_SHA` injection** | image defaults `"unknown"` | DO can't auto-inject the git SHA on `deploy_on_push`; build via CI with `--build-arg` for a real audit SHA (constraint #6). |
-| **DNS + custom domains + DKIM/SPF** | Resend verified (`maiancu.com`) | `uc-api` CNAME + the Pages custom domain `uc.maiancu.com` (behavior 33). |
+| **DNS + custom domains + DKIM/SPF** | Resend verified (`maiancu.com`) | `api` CNAME + the Pages custom domain `maiancu.com` (behavior 33). |
 | **Dev databases** | no backups, app-only, destroyed with the app | convert each to a managed database before real user data matters; check its connection limit against the pool size (10) if pools error. |
 | **VN data residency (Decree 13/2023)** | out of Wedge-1a scope | Wedge 1a is Mode A (AU users); plan VN-side residency from Wedge 2 before onboarding VN-located users (CLAUDE.md). |
 | **Stripe / commerce** | **landed (8-S5)** | shell-only secrets (`STRIPE_SECRET_KEY`/`STRIPE_WEBHOOK_SECRET`/`STRIPE_PRICE_*`) now in `shell/web/app.yaml` §3; engine carries none (it meters; the shell gates). |
