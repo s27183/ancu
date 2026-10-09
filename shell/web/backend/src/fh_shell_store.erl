@@ -16,8 +16,46 @@
 -export([user_tier/1, user_email/1, link_subscription/3, update_subscription/5]).
 -export([record_charge/5]).
 -export([claim_question/2, release_question/2]).
+-export([create_guest/0, claim_guest/2]).
 
 %% --- identity (login flow) --------------------------------------------------
+
+%% Guest plans -> P-5 · Metering, not gating -> The shell database -> a guest is a users row
+%% A visitor who builds a plan signed out becomes a users row with guest = true and no
+%% email (005_guest_plans.sql), so ownership (plan_card_views) and metering
+%% (usage_records) need no second path. Returns {UserId, Locale}.
+-spec create_guest() -> {binary(), binary()}.
+create_guest() ->
+    #{rows := [{UserId, Locale}]} = query(
+        "INSERT INTO users (guest) VALUES (true) RETURNING user_id::text, locale", []),
+    {UserId, Locale}.
+
+%% Sign-in claims a guest (behavior 45): in one transaction its plan views and its
+%% metered spend move to the real user, then the guest row is deleted (its remaining
+%% rows cascade). A view the real user already holds for the same card stays theirs.
+%% The engine needs nothing: it keys a card by the profile it was made under and makes
+%% a Q&A session with the asker's id on the first ask (fh_engine_h_messages), and a
+%% guest never asks. A GuestId that is not a guest row moves nothing. Returns the
+%% number of plan views moved.
+-spec claim_guest(binary(), binary()) -> non_neg_integer().
+claim_guest(GuestId, UserId) ->
+    {ok, Moved} = pgo:transaction(fun() ->
+        case query("SELECT 1 FROM users WHERE user_id = $1::uuid AND guest FOR UPDATE",
+                   [GuestId]) of
+            #{rows := []} -> {ok, 0};
+            #{rows := [_]} ->
+                #{num_rows := N} = query(
+                    "UPDATE plan_card_views v SET user_id = $2::uuid, updated_at = now() "
+                    "WHERE v.user_id = $1::uuid AND NOT EXISTS (SELECT 1 FROM plan_card_views w "
+                    "WHERE w.user_id = $2::uuid AND w.engine_plan_card_id = v.engine_plan_card_id)",
+                    [GuestId, UserId]),
+                _ = query("UPDATE usage_records SET user_id = $2::uuid WHERE user_id = $1::uuid",
+                          [GuestId, UserId]),
+                _ = query("DELETE FROM users WHERE user_id = $1::uuid AND guest", [GuestId]),
+                {ok, N}
+        end
+    end),
+    Moved.
 
 %% Find-or-create a user by email. First login creates the row (role defaults to
 %% 'buyer', locale to 'vi' per 001_init_shell.sql); a returning user is found by the
@@ -138,13 +176,15 @@ user_tier(UserId) ->
         #{rows := []}           -> <<"free">>
     end.
 
+%% A guest (behavior 45) has no email: {ok, null}, which is_admin/1 reads as not-admin,
+%% so a guest's turns are metered like anyone's.
 %% This user's email, for the ADMIN_EMAILS allowlist test (fh_shell_billing:is_admin/1,
 %% billing.md §9) — used by both the usage consumer (billed=false attribution) and the
 %% §7 pre-call gate (admin exemption). Calls pgo directly (NOT the raising query/2
 %% above) so a DB error is fail-soft (-> not_found, the caller's admin check then
 %% defaults to false) rather than crashing the caller — the same posture as
 %% fh_shell_meter:sum_period/1's direct pgo call.
--spec user_email(binary()) -> {ok, binary()} | not_found.
+-spec user_email(binary()) -> {ok, binary() | null} | not_found.
 user_email(UserId) ->
     case pgo:query("SELECT email FROM users WHERE user_id = $1::uuid", [UserId]) of
         #{rows := [{Email} | _]} -> {ok, Email};

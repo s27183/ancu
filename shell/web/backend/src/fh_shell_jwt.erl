@@ -9,15 +9,22 @@
 %% Issued by fh_shell_login after Resend magic-link / Google OAuth (login flow is a
 %% later slice); 8-S0 builds the issue/verify primitive + proves the round-trip.
 
--export([issue/1, verify/1]).
+-export([issue/1, issue/2, verify/1]).
 
 %% A day — the user session length. Refreshed by re-login; short enough that a
 %% role revocation takes effect within a day without a server-side session store.
 -define(TTL_SECONDS, 86400).
 
--spec issue(#{user_id := binary(), email := binary(),
+-spec issue(#{user_id := binary(), email := binary() | null,
               roles := [binary()], locale := binary()}) -> binary().
-issue(#{user_id := UserId, email := Email, roles := Roles, locale := Locale}) ->
+issue(Claims) ->
+    issue(Claims, ?TTL_SECONDS).
+
+%% A session of a given length: a guest's lasts as long as its plan is kept (7 days,
+%% fh_shell_guest, behavior 45); a guest has no email (null).
+-spec issue(#{user_id := binary(), email := binary() | null,
+              roles := [binary()], locale := binary()}, pos_integer()) -> binary().
+issue(#{user_id := UserId, email := Email, roles := Roles, locale := Locale}, Ttl) ->
     Now = erlang:system_time(second),
     Claims = #{
         <<"user_id">> => UserId,
@@ -25,7 +32,7 @@ issue(#{user_id := UserId, email := Email, roles := Roles, locale := Locale}) ->
         <<"roles">>   => Roles,
         <<"locale">>  => Locale,
         <<"iat">>     => Now,
-        <<"exp">>     => Now + ?TTL_SECONDS
+        <<"exp">>     => Now + Ttl
     },
     Header = fh_shell_util:b64url_encode(
         fh_shell_util:json_encode(#{<<"alg">> => <<"HS256">>, <<"typ">> => <<"JWT">>})),

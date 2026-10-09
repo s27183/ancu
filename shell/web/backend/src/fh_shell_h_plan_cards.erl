@@ -40,17 +40,22 @@ handle_get(Req0, State) ->
             {ok, fh_shell_http:reply_json(Status, ErrBody, Req0), State}
     end.
 
+%% Signed out, the create still runs (behavior 45): the body is read first (so a
+%% malformed request makes no guest), then fh_shell_guest:start/1 makes this browser a
+%% guest and sets its session cookie, and the plan is created under that guest.
 handle_post(Req0, State) ->
-    case fh_shell_http:authenticate_user(Req0) of
-        {ok, #{<<"user_id">> := UserId}} ->
-            case fh_shell_http:read_json_body(Req0) of
-                {ok, Body, Req1} -> create(UserId, Body, Req1, State);
-                {error, invalid_json} ->
-                    {ok, fh_shell_http:reply_json(400,
-                        #{<<"error">> => <<"invalid_json">>}, Req0), State}
+    case fh_shell_http:read_json_body(Req0) of
+        {ok, Body, Req1} ->
+            case fh_shell_http:authenticate_user(Req1) of
+                {ok, #{<<"user_id">> := UserId}} ->
+                    create(UserId, Body, Req1, State);
+                {error, 401, _} ->
+                    {GuestId, Req2} = fh_shell_guest:start(Req1),
+                    create(GuestId, Body, Req2, State)
             end;
-        {error, Status, ErrBody} ->
-            {ok, fh_shell_http:reply_json(Status, ErrBody, Req0), State}
+        {error, invalid_json} ->
+            {ok, fh_shell_http:reply_json(400,
+                #{<<"error">> => <<"invalid_json">>}, Req0), State}
     end.
 
 create(UserId, Body, Req, State) ->

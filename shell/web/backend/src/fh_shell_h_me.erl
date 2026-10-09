@@ -24,7 +24,10 @@ handle(Req) ->
                 <<"user_id">> => maps:get(<<"user_id">>, Claims),
                 <<"email">>   => maps:get(<<"email">>, Claims),
                 <<"roles">>   => maps:get(<<"roles">>, Claims, []),
-                <<"locale">>  => maps:get(<<"locale">>, Claims, <<"vi">>)
+                <<"locale">>  => maps:get(<<"locale">>, Claims, <<"vi">>),
+                %% Behavior 45: a guest session (a plan built signed out) is not a
+                %% sign-in — the SPA shows the signed-out header and the guest notice.
+                <<"guest">>   => fh_shell_guest:is_guest(Claims)
             }, Req);
         {error, Status, Body} ->
             fh_shell_http:reply_json(Status, Body, Req)
