@@ -477,7 +477,7 @@
     .wl-launch {
         position: fixed;
         right: 0.75rem;
-        bottom: calc(3rem + env(safe-area-inset-bottom, 0px));
+        bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
         z-index: 20;
         display: inline-flex;
         align-items: center;

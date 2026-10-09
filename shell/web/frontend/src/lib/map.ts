@@ -189,6 +189,11 @@ const CRITERIA: Record<SizeBy, Criterion> = {
     }
 };
 
+/** The saved/selected-suburb pulse: saturated magenta, distinct from every criterion
+ *  ramp, with a white rim so the centre dot reads on any dot colour. */
+export const PULSE = '#ff1f8f';
+export const PULSE_RIM = '#ffffff';
+
 const NO_DATA = '#d6d0c4'; // warm stone (app.css --border-strong family) — visibly "no data", not zero
 
 function interpolateStops(c: Criterion, valueExpr: unknown): unknown[] {
