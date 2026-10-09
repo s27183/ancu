@@ -1,0 +1,25 @@
+Source: https://www.abs.gov.au/statistics/people/housing/housing-census/2021
+Retrieved: 2026-10-09
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML 0c06152abecf73f1a68c02317ec782a14802d389b298ce266ff8823b97723ca2
+
+Key statistics There were 10,852,208 private dwellings counted in the 2021 Census. 70 per cent were separate houses, 13 per cent were townhouses and 16 per cent were apartments.
+There were 1,043,776 unoccupied dwellings on Census Night.
+Housing tenure, 2021 Census Image Description This image shows three different types of dwellings and information about tenure in Australia.
+Of all the occupied private dwellings, 31 per cent are owned outright, 35 per cent are owned with a mortgage and 30.6 per cent are rented.
+Refers to occupied private dwellings and excludes visitor only and other non-classifiable households.
+Owned with a mortgage includes dwellings being purchased under a shared equity scheme.
+Rented excludes dwellings being occupied rent-free.
+Other tenure type and tenure type not stated represent remaining 3.4 per cent.
+Source:
+Tenure type ( TEND ) Census data stories and concepts How Census data is used Learn how Census data helps community groups, businesses and governments make important decisions.
+Census data helps advocate for funding in Aboriginal community housing SEARMS Aboriginal Corporation in NSW provides housing and support for Aboriginal people, including helping older Aboriginal and Torres Strait Islander ‘age in place’ in an appropriately modified home.
+It manages over 230 rental properties in townships from Nowra and down the coast to Wallaga Lake, and across to Queanbeyan, Yass, Young and Goulburn.
+This is often a lifeline for Aboriginal and Torres Strait Islander people experiencing poverty and entrenched disadvantage, as it provides access to affordable, culturally appropriate housing and pathways to other community services and supports.
+CEO Kim Sinclair said SEARMS relies extensively on Census data to help determine where community housing is needed for those who can’t access the private rental market. “Factors like unemployment, vulnerable households and mental health impact housing security,” Ms Sinclair said. “We use Census data to understand the prevalence of these factors to help us provide appropriate housing for Aboriginal people.” According to the 2016 Census, 4.8% of Aboriginal and Torres Strait Islander people are aged over 65.
+This increases to 5.4% in NSW and 6.2% in the Shoalhaven local government area. “The lifespan for Indigenous Australians is 15 years shorter than non-Indigenous Australians.
+This means aged care packages and modifications need to happen a good 10 to 20 years earlier.” “We are getting more requests for disability modifications to support people to stay at home and we don’t have the money for these modifications.
+Census data helps us compile a business case so we can seek funding for ageing-in-place housing.” Knowing the areas of critical need means SEARMS can better anticipate who needs housing help, and where. “We encourage all Aboriginal and Torres Strait Islander people to complete the Census because it bolsters our understanding of housing needs and priorities,” Ms Sinclair said.
+See more Census stories .
+Key questions in 2021 Census How many bedrooms are there in this dwelling? Is this dwelling: (Owned outright; Owned with a mortgage; Purchased under a shared equity scheme; Rented; Occupied rent free; Occupied under life tenure scheme; Other)? Who is this dwelling being rented from? How much does your household pay for this dwelling? What is the person’s residential status in this dwelling? The questions from the 2021 Census are output into variables.
+To see descriptions of the variables, including data use considerations, relevant to this topic see the 2021 Census dictionary:
+Housing . 

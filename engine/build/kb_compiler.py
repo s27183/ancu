@@ -62,6 +62,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 KB = ROOT / "docs" / "kb"
 BP = ROOT / "docs" / "blueprints"
 NEWS_DIR = KB / "news"
+FACTS_DIR = KB / "facts"
 ARTIFACT_OUT = ROOT / "engine" / "erlang" / "priv" / "kb" / "artifact.json"
 
 # The in-scope SET — every blueprint whose registry is materialized + semantically
@@ -151,6 +152,175 @@ def news_source_host_error(src):
     if not host.endswith(NEWS_SOURCE_HOST_SUFFIX):
         return f"{host or url!r} is not a government host (*{NEWS_SOURCE_HOST_SUFFIX})"
     return None
+
+
+# Regulated figures are grounded -> P-7 · One declaration per outcome shape -> The KB compiler -> a fact doc quotes its archived primary
+# docs/kb/facts/*.md feed the first-visit sheet (behavior 42): figures drawn as charts for
+# a visitor, so each must trace to a primary the way a regulated figure does (the goal;
+# architecture.md "a secondary aggregator never supplies the figure"). A fact doc cites
+# sources on *.gov.au (as news does, NEWS_SOURCE_HOST_SUFFIX), each ARCHIVED under
+# docs/sources/ (`path:`), and every fact carries `quotes` — verbatim strings that must
+# appear in the archived file (or, with `owner:`, in the KB doc that owns the figure, so
+# one fact has one owner). GATE 12 checks them fail-closed: a figure that drifts from its
+# source, or a source that is not kept, fails the build.
+FACT_VISUALS = ("bars", "series", "figure", "split", "growth")
+FACT_UNITS = ("count", "people", "pct", "aud_k")
+
+
+def normalize_ws(s):
+    return re.sub(r"\s+", " ", s or "").strip()
+
+
+def archived_text(path):
+    """The searchable text of an archived source: a .docx's table cells joined by ' | '
+    (so a quote can name a table row, `Vietnam | 65 | 106`), paragraphs by spaces; any
+    other file read as text. Whitespace collapsed. None if the file is missing."""
+    import zipfile
+    if not path.is_file():
+        return None
+    if path.suffix == ".docx":
+        xml = zipfile.ZipFile(path).read("word/document.xml").decode("utf-8")
+        xml = re.sub(r"</w:tc>", " | ", xml)
+        xml = re.sub(r"</w:p>", " ", xml)
+        text = re.sub(r"<[^>]+>", "", xml)
+        import html as _html
+        return normalize_ws(re.sub(r"(\|\s*)+", "| ", _html.unescape(text)).replace("| ", " | "))
+    return normalize_ws(path.read_text(errors="ignore"))
+
+
+def parse_facts_doc(path):
+    text = path.read_text()
+    slug_m = re.search(r"^slug:\s*(\S+)", text, re.M)
+    eff_m = re.search(r"^effective_from:\s*(\S+)", text, re.M)
+    ver_m = re.search(r"^last_verified:\s*(\S+)", text, re.M)
+    block = fenced_jsonc_after(text, "## Facts")
+    body, error = None, None
+    if block is None:
+        error = "no '## Facts' jsonc block"
+    else:
+        try:
+            body = parse_jsonc(block)
+        except Exception as e:  # noqa: BLE001 - report, do not crash the build
+            error = str(e)
+    return {
+        "slug": slug_m.group(1) if slug_m else None,
+        "effective_from": eff_m.group(1) if eff_m else None,
+        "last_verified": ver_m.group(1) if ver_m else None,
+        "sources": parse_sources_block(text),
+        "body": body,
+        "error": error,
+        "path": path,
+    }
+
+
+def facts_doc_fails(slug, doc, kb_docs):
+    """GATE 12 problems for one fact doc (FACT_VISUALS block above)."""
+    out = []
+    if doc["error"]:
+        return [f"[facts] {slug}: {doc['error']}"]
+    for field in ("effective_from", "last_verified"):
+        if not doc.get(field):
+            out.append(f"[facts] {slug}: missing {field}")
+    sources = doc.get("sources") or []
+    if not sources:
+        out.append(f"[facts] {slug}: no `sources:`")
+    texts = []
+    for i, src in enumerate(sources):
+        err = news_source_host_error(src)
+        if err:
+            out.append(f"[facts] {slug}: source {i}: {err} — a fact cites a government primary")
+        rel = src.get("path")
+        txt = archived_text(ROOT / rel) if rel else None
+        if txt is None:
+            out.append(f"[facts] {slug}: source {i} is not archived (`path:` under docs/sources/ "
+                       f"missing or not found: {rel!r})")
+        texts.append(txt)
+    body = doc["body"] or {}
+    err = check_copy_template(body.get("title") or {})
+    if err:
+        out.append(f"[facts] {slug}: title: {err}")
+    facts = body.get("facts") or []
+    if not facts:
+        out.append(f"[facts] {slug}: no facts")
+    ids = set()
+    for f in facts:
+        fid = f.get("id") or "?"
+        where = f"[facts] {slug}#{fid}"
+        if fid in ids:
+            out.append(f"{where}: duplicate id")
+        ids.add(fid)
+        if f.get("visual") not in FACT_VISUALS:
+            out.append(f"{where}: visual {f.get('visual')!r} not one of {FACT_VISUALS}")
+        if f.get("unit") not in FACT_UNITS:
+            out.append(f"{where}: unit {f.get('unit')!r} not one of {FACT_UNITS}")
+        if not re.match(r"^\d{4}-\d{2}$", str(f.get("as_of") or "")):
+            out.append(f"{where}: as_of must be YYYY-MM")
+        for key in ("headline", "caption"):
+            e = check_copy_template(f.get(key) or {})
+            if e:
+                out.append(f"{where}: {key}: {e}")
+        if f.get("visual") == "figure":
+            if not isinstance(f.get("value"), (int, float)):
+                out.append(f"{where}: a figure needs a numeric value")
+        else:
+            items = f.get("items") or []
+            if len(items) < 2:
+                out.append(f"{where}: a {f.get('visual')} needs at least two items")
+            for it in items:
+                if not isinstance(it.get("value"), (int, float)):
+                    out.append(f"{where}: item without a numeric value")
+                # A label is {en, vi}, or a plain string for a proper name that reads the
+                # same in every locale (Sydney, NSW, 2023–24).
+                lab = it.get("label")
+                e = None if isinstance(lab, str) and lab.strip() else check_copy_template(lab or {})
+                if e:
+                    out.append(f"{where}: item label: {e}")
+        si = f.get("source")
+        if not isinstance(si, int) or not 0 <= si < len(sources):
+            out.append(f"{where}: source {si!r} is not an index into `sources:`")
+            continue
+        owner = f.get("owner")
+        if owner:
+            od = kb_docs.get(owner)
+            if od is None:
+                out.append(f"{where}: owner {owner!r} is not a KB doc")
+                continue
+            hay, against = normalize_ws(od["path"].read_text()), owner
+        else:
+            hay, against = texts[si], sources[si].get("path")
+        quotes = f.get("quotes") or []
+        if not quotes:
+            out.append(f"{where}: no `quotes` — every fact quotes its source")
+        for q in quotes:
+            if hay is not None and normalize_ws(q) not in hay:
+                out.append(f"{where}: quote not found in {against}: {q!r}")
+        # Every number drawn is in the fact's own quotes, so a value cannot disagree
+        # with the quote that proves it. An item computed from quoted numbers (a sum of
+        # small states) says how, in `derived`, and is exempt.
+        said = " ".join(normalize_ws(q) for q in quotes)
+        nums = []
+        if f.get("visual") == "figure":
+            nums.append(f.get("value"))
+            if isinstance(f.get("compare"), dict):
+                nums.append(f["compare"].get("value"))
+        for it in f.get("items") or []:
+            if it.get("derived"):
+                continue
+            nums += [it.get("value")] + ([it["from"]] if "from" in it else [])
+        for n in nums:
+            if isinstance(n, (int, float)) and not quoted_number(n, said):
+                out.append(f"{where}: value {n} does not appear in its quotes")
+    return out
+
+
+def quoted_number(n, text):
+    """True if `n` appears in `text` as written in a source (318,760 / 1,487.6 / 30.6)."""
+    forms = {f"{n:,}", str(n)}
+    if isinstance(n, float):
+        forms |= {f"{n:,.1f}", f"{n:.1f}"}
+        if n.is_integer():
+            forms |= {f"{int(n):,}", str(int(n))}
+    return any(re.search(rf"(?<![\d.,]){re.escape(x)}(?![\d]|[.,]\d)", text) for x in forms)
 
 
 def check_copy_template(pair, locales=LOCALES):
@@ -1080,12 +1250,20 @@ def run(emit=False):
     # mixed into kb_docs (so it never enters GATE 2/6/7/10 or the registries).
     kb_docs = {}
     news_docs = {}
+    facts_docs = {}
     for f in sorted(KB.rglob("*.md")):
         rel = f.relative_to(ROOT / "docs").with_suffix("")
         expect = str(rel).replace("/", ".")
         fm_fail = frontmatter_fail(f.read_text())
         if fm_fail:
             fails.append(f"[frontmatter] {f}: {fm_fail}")
+        if FACTS_DIR in f.parents:
+            doc = parse_facts_doc(f)
+            if doc["slug"] != expect:
+                fails.append(f"[slug] {f}: slug={doc['slug']} expect={expect}")
+            if doc["slug"]:
+                facts_docs[doc["slug"]] = doc
+            continue
         if NEWS_DIR in f.parents:
             doc = parse_news_doc(f)
             if doc["slug"] != expect:
@@ -1104,6 +1282,7 @@ def run(emit=False):
             applicant_rule_fails(doc["slug"], doc["content_json"], fails)
     stats["kb_docs"] = len(kb_docs)
     stats["news_docs"] = len(news_docs)
+    stats["facts_docs"] = len(facts_docs)
 
     # ---- GATE 10: sources citation (FAIL-CLOSED) --------------------------- #
     # kb-update-runbook.md Phase 1: a fact doc must cite the primary source it was
@@ -1213,6 +1392,10 @@ def run(emit=False):
             if not affected_components:
                 info.append(f"[news] {slug}: affected_kb_slugs match no blueprint component "
                             f"anchor — the shell will have nothing to badge")
+
+    # ---- GATE 12: fact docs quote their archived primaries (FACT_VISUALS block) ---- #
+    for slug, doc in sorted(facts_docs.items()):
+        fails.extend(facts_doc_fails(slug, doc, kb_docs))
 
     # ---- GATE 8: bilingual copy-template well-formedness (all docs) -------- #
     # Every `copy` template is localized in every LOCALES locale (outcome-conformance.md
@@ -1340,7 +1523,7 @@ def run(emit=False):
 
     artifact = None
     if not fails:
-        artifact = build_artifact(blueprints, registries, kb_docs, news_docs)
+        artifact = build_artifact(blueprints, registries, kb_docs, news_docs, facts_docs)
         if emit:
             ARTIFACT_OUT.parent.mkdir(parents=True, exist_ok=True)
             ARTIFACT_OUT.write_text(
@@ -1396,7 +1579,7 @@ def registry_payload(reg):
     }
 
 
-def build_artifact(blueprints, registries, kb_docs, news_docs):
+def build_artifact(blueprints, registries, kb_docs, news_docs, facts_docs=None):
     kb = {
         slug: {
             "effective_from": d["effective_from"],
@@ -1480,6 +1663,19 @@ def build_artifact(blueprints, registries, kb_docs, news_docs):
         "locales": list(LOCALES),
         "kb": kb,
         "news": news,
+        # The first-visit sheet's facts (behavior 42; GATE 12): per doc its title, the
+        # facts as authored (quotes dropped — they are the build's proof, not display)
+        # and the sources each fact's `source` index points into.
+        "facts": {
+            slug: {
+                "title": d["body"].get("title"),
+                "last_verified": d["last_verified"],
+                "sources": d.get("sources") or [],
+                "facts": [{k: v for k, v in f.items() if k != "quotes"}
+                          for f in d["body"].get("facts", [])],
+            }
+            for slug, d in (facts_docs or {}).items()
+        },
         "blueprints": bps,
     }
 
@@ -1498,7 +1694,8 @@ def main():
               f"ui_tabs={json.dumps(stats.get('ui_tabs', {}).get(stem, []))}")
     print(f"in-scope blueprints: {sorted(IN_SCOPE_BLUEPRINTS)} | deferred docs: "
           f"{stats.get('deferred_docs')}")
-    print(f"kb docs: {stats.get('kb_docs')} | news notes: {stats.get('news_docs')}")
+    print(f"kb docs: {stats.get('kb_docs')} | news notes: {stats.get('news_docs')} | "
+          f"fact docs: {stats.get('facts_docs')}")
     print(f"copy templates: {stats.get('copy_templates')} (bilingual gate, "
           f"locales={'+'.join(LOCALES)})")
     if info:
