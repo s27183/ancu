@@ -47,6 +47,8 @@
         firstLabelLayerId,
         BASEMAP_SOURCE_ID,
         DEFAULT_SIZE_BY,
+        PULSE,
+        PULSE_RIM,
         type SizeBy
     } from '$lib/map';
     import { ensurePmtilesProtocol } from '$lib/pmtiles';
@@ -134,7 +136,6 @@
     // (saved or not). The ring is JS-driven (MapLibre paint can't read time), so we
     // re-derive its paint each frame — fine for a handful of points. prefers-reduced-
     // motion → a static mid-expansion ring (no animation).
-    const PULSE = '#ff1f8f'; // saturated magenta — distinct from every criterion ramp
 
     // The selected suburb as a 0/1-feature source for its own (always-on) pulse.
     const selectedData = $derived({
@@ -182,7 +183,7 @@
         'circle-color': PULSE,
         'circle-opacity': 0.95,
         'circle-radius': 7,
-        'circle-stroke-color': '#ffffff',
+        'circle-stroke-color': PULSE_RIM,
         'circle-stroke-width': 2
     } satisfies CircleLayerSpecification['paint'];
     // The expanding ring — radius grows, stroke fades, as `pulse` runs 0→1.

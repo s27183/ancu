@@ -52,7 +52,7 @@
 <div class="sheet" role="dialog" aria-modal="false" aria-label={suburb.name}>
     <header class="sheet-head">
         <div class="title">
-            <h2>{suburb.name} - {suburb.state}</h2>
+            <h2>{suburb.name} <span class="state-chip">{suburb.state}</span></h2>
             {#if suburb.lga_name}
                 <p class="sub">{suburb.lga_name}</p>
             {/if}
@@ -81,48 +81,55 @@
 
     <div class="body">
         {#if tab === 'zone'}
-            <!-- Vietnamese community — the killer metric, surfaced first + emphasised. -->
-            <div class="metric hero">
-                <span class="label">{$t('sheet.viet')}</span>
-                {#if typeof f.vietnamese_ancestry_pct === 'number'}
-                    <span class="value">{pct(f.vietnamese_ancestry_pct)}</span>
-                {:else}
-                    <span class="value muted">{$t('sheet.nodata')}</span>
-                {/if}
-            </div>
+            <div class="metrics">
+                <!-- Vietnamese community — the killer metric, surfaced first + emphasised. -->
+                <div class="metric hero">
+                    <span class="label">{$t('sheet.viet')}</span>
+                    {#if typeof f.vietnamese_ancestry_pct === 'number'}
+                        <span class="value">{pct(f.vietnamese_ancestry_pct)}</span>
+                    {:else}
+                        <span class="value muted">{$t('sheet.nodata')}</span>
+                    {/if}
+                </div>
 
-            <div class="metric">
-                <span class="label">{$t('sheet.seifa')}</span>
-                {#if typeof f.seifa_irsad_decile === 'number'}
-                    <span class="value">{f.seifa_irsad_decile}<span class="unit">/10</span></span>
-                    <span class="note">{$t('sheet.seifa.note')}</span>
-                {:else}
-                    <span class="value muted">{$t('sheet.nodata')}</span>
-                {/if}
-            </div>
+                <div class="metric">
+                    <span class="label">{$t('sheet.seifa')}</span>
+                    {#if typeof f.seifa_irsad_decile === 'number'}
+                        <span class="value">{f.seifa_irsad_decile}<span class="unit">/10</span></span>
+                        <span class="decile" aria-hidden="true">
+                            {#each Array.from({ length: 10 }, (_, i) => i) as i (i)}
+                                <span class:on={i < (f.seifa_irsad_decile ?? 0)}></span>
+                            {/each}
+                        </span>
+                        <span class="note">{$t('sheet.seifa.note')}</span>
+                    {:else}
+                        <span class="value muted">{$t('sheet.nodata')}</span>
+                    {/if}
+                </div>
 
-            <div class="metric">
-                <span class="label">{$t('sheet.population')}</span>
-                {#if typeof f.census_total_persons === 'number'}
-                    <span class="value">{nf.format(f.census_total_persons)}</span>
-                {:else}
-                    <span class="value muted">{$t('sheet.nodata')}</span>
-                {/if}
-            </div>
+                <div class="metric">
+                    <span class="label">{$t('sheet.population')}</span>
+                    {#if typeof f.census_total_persons === 'number'}
+                        <span class="value">{nf.format(f.census_total_persons)}</span>
+                    {:else}
+                        <span class="value muted">{$t('sheet.nodata')}</span>
+                    {/if}
+                </div>
 
-            <div class="metric">
-                <span class="label">{$t('sheet.crime')}</span>
-                {#if typeof f.crime_incidents_per_1000 === 'number'}
-                    <span class="value"
-                        >{nf.format(f.crime_incidents_per_1000)}
-                        <span class="unit">{$t('sheet.crime.unit')}</span></span
-                    >
-                    <span class="note"
-                        >{$t('sheet.crime.note')}{#if f.crime_period} · {f.crime_period}{/if}</span
-                    >
-                {:else}
-                    <span class="value muted">{$t('sheet.nodata')}</span>
-                {/if}
+                <div class="metric">
+                    <span class="label">{$t('sheet.crime')}</span>
+                    {#if typeof f.crime_incidents_per_1000 === 'number'}
+                        <span class="value"
+                            >{nf.format(f.crime_incidents_per_1000)}
+                            <span class="unit">{$t('sheet.crime.unit')}</span></span
+                        >
+                        <span class="note"
+                            >{$t('sheet.crime.note')}{#if f.crime_period} · {f.crime_period}{/if}</span
+                        >
+                    {:else}
+                        <span class="value muted">{$t('sheet.nodata')}</span>
+                    {/if}
+                </div>
             </div>
         {:else}
             <!-- The plan projection mounts lazily when this tab is shown; it finds the

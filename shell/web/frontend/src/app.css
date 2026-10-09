@@ -412,6 +412,8 @@ body {
     color: var(--ink);
     text-decoration: none;
     letter-spacing: -0.02em;
+    white-space: nowrap; /* "Mai An Cư" is one name: never split over two lines at 390px */
+    min-width: 0;
 }
 .brand-mark {
     display: grid;
@@ -981,6 +983,18 @@ main {
     cursor: pointer;
 }
 
+/* MapLibre's own basemap credit (compact "ⓘ") stacks ABOVE the sources chip in the
+   same corner instead of underneath it, so neither covers the other. Scoped under
+   .maplibregl-map: maplibre-gl.css loads after this file and would win a tie. */
+.maplibregl-map .maplibregl-ctrl-bottom-right {
+    bottom: 2.1rem;
+}
+.maplibregl-map .maplibregl-ctrl-bottom-right .maplibregl-ctrl-attrib {
+    margin: 0 0.75rem 0 0;
+    font-size: var(--fs-2xs);
+    border-radius: var(--radius-pill);
+}
+
 /* CC-BY attribution (§6.1) — required, but collapsed to a small chip bottom-right so
    it stops eating a full-width strip. Click expands the source list. */
 .attribution {
@@ -1129,45 +1143,89 @@ main {
     padding: var(--sp-4) var(--sp-5) var(--sp-6);
     overflow-y: auto;
 }
+.sheet-head .state-chip {
+    display: inline-block;
+    vertical-align: 0.2em;
+    margin-left: 0.35rem;
+    padding: 0.1rem 0.5rem;
+    border-radius: var(--radius-pill);
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
+/* Zone facts as tiles: the Vietnamese-community share leads across the full width,
+   the rest sit two-up (one column on a phone). */
+.metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    gap: var(--sp-3);
+}
 .metric {
     display: flex;
     flex-direction: column;
-    padding: 0.55rem 0;
-    border-bottom: 1px solid var(--border);
-}
-.metric:last-child {
-    border-bottom: none;
+    gap: 0.15rem;
+    padding: var(--sp-3) var(--sp-4);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
 }
 .metric .label {
-    font-size: 0.8rem;
+    font-size: var(--fs-xs);
+    font-weight: 600;
     color: var(--muted);
 }
 .metric .value {
     font-size: var(--fs-lg);
-    font-weight: 650;
+    font-weight: 700;
     color: var(--ink);
     font-variant-numeric: tabular-nums;
     letter-spacing: -0.01em;
 }
 .metric .value .unit {
-    font-size: 0.8rem;
-    font-weight: 400;
+    font-size: var(--fs-xs);
+    font-weight: 500;
     color: var(--muted);
 }
 .metric .value.muted {
-    font-size: 0.95rem;
-    font-weight: 400;
+    font-size: var(--fs-sm);
+    font-weight: 500;
     color: var(--muted);
 }
 .metric .note {
-    font-size: 0.72rem;
+    font-size: var(--fs-2xs);
     color: var(--muted);
-    margin-top: 0.15rem;
+    margin-top: auto;
+    padding-top: 0.2rem;
+}
+.metric.hero {
+    grid-column: 1 / -1;
+    background: var(--accent-soft);
+    border-color: transparent;
+}
+.metric.hero .label {
+    color: var(--accent);
 }
 .metric.hero .value {
     font-size: var(--fs-2xl);
-    font-weight: 750;
+    font-weight: 800;
     color: var(--accent);
+}
+/* SEIFA decile as ten steps, filled up to the suburb's decile. */
+.metric .decile {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 2px;
+    margin-top: 0.25rem;
+}
+.metric .decile span {
+    height: 0.4rem;
+    border-radius: 2px;
+    background: var(--bg-2);
+}
+.metric .decile span.on {
+    background: var(--accent);
 }
 
 /* Desktop: the sheet becomes a CENTERED popup modal — wide but not full-screen. Its
