@@ -14,7 +14,7 @@
 %% (subject, bodies, sender) and the Stripe line items read it from here, so a rename is
 %% this one clause (behavior 17). The same in VI and EN: it is a name.
 -spec brand() -> binary().
-brand() -> <<"Rau">>.
+brand() -> <<"Mai An Cư"/utf8>>.
 
 -spec json_encode(term()) -> binary().
 json_encode(Term) ->

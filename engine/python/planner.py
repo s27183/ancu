@@ -61,7 +61,7 @@ _PROTO = None
 # The product's name is temporary (invariants.md, Son 2026-10-06). The agent prompts that name
 # the product (_PREAMBLE, _QA_PREAMBLE, _QA_TOOLS, the kb_lookup tool description) read it
 # from here, so a rename is this one line (behavior 17).
-BRAND = "Rau"
+BRAND = "Mai An Cư"
 
 
 def _isolate_protocol_stream():

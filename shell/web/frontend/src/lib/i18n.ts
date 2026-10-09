@@ -12,7 +12,7 @@ import { lang } from '$lib/stores/lang';
 // The product's name is temporary (invariants.md, Son 2026-10-06). It is declared here once; brand.name
 // and every chrome string that names the product interpolate it, as does the tab title
 // (+layout.svelte), so a rename is this one line (behavior 17). Same in VI and EN: a name.
-const BRAND = 'Rau';
+const BRAND = 'Mai An Cư';
 
 const messages = {
     'brand.name': { vi: BRAND, en: BRAND },
