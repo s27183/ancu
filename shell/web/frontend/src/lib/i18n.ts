@@ -1095,7 +1095,54 @@ const messages = {
     'home.news.category.scheme': { vi: 'Chương trình hỗ trợ', en: 'Government schemes' },
     'home.news.category.tax': { vi: 'Thuế', en: 'Tax' },
     'home.news.category.property': { vi: 'Bất động sản', en: 'Property' },
-    'home.news.category.market': { vi: 'Thị trường', en: 'Market' }
+    'home.news.category.market': { vi: 'Thị trường', en: 'Market' },
+
+    // The first-visit sheet (behavior 42): the product in two sentences, the facts
+    // (their headlines come from the KB, not here) and what the product adds. Its
+    // claims stay inside the goal: a budget plan for buy/hold/sell, bilingual, every
+    // regulated figure traced to a verified source.
+    'intro.eyebrow': { vi: `Chào mừng đến ${BRAND}`, en: `Welcome to ${BRAND}` },
+    'intro.title': {
+        vi: 'Sở hữu nhà ở Úc — với một kế hoạch rõ ràng',
+        en: 'Owning property in Australia — with a clear plan'
+    },
+    'intro.lede': {
+        vi: `${BRAND} lập kế hoạch ngân sách cho cả hành trình bất động sản của bạn tại Úc — mua, giữ, bán — từ chính hoàn cảnh của bạn, bằng tiếng Việt và tiếng Anh. Mọi con số theo quy định đều dẫn về nguồn chính thức đã kiểm chứng.`,
+        en: `${BRAND} builds a budget plan for your whole Australian property journey — buy, hold, sell — from your own situation, in Vietnamese and English. Every regulated figure traces to a verified official source.`
+    },
+    'intro.sources.note': {
+        vi: 'Mọi số liệu dưới đây lấy từ cơ quan chính phủ Úc, kèm nguồn và thời điểm.',
+        en: 'Every figure below comes from an Australian government agency, with its source and date.'
+    },
+    'intro.value.title': { vi: `${BRAND} giúp gì cho bạn`, en: `What ${BRAND} does for you` },
+    'intro.value.plan.title': { vi: 'Kế hoạch trọn hành trình', en: 'One plan, the whole journey' },
+    'intro.value.plan.body': {
+        vi: 'Chi phí khi mua, trong thời gian giữ và khi bán — thuế trước bạ, phí FIRB, khoản vay, thuế đất — trong một kế hoạch.',
+        en: 'What it costs to buy, to hold and to sell — stamp duty, FIRB fees, the loan, land tax — in one plan.'
+    },
+    'intro.value.you.title': { vi: 'Theo đúng trường hợp của bạn', en: 'Built around your case' },
+    'intro.value.you.body': {
+        vi: 'Mua nhà đầu tiên, đầu tư, hay dùng tiền từ Việt Nam — kế hoạch đi theo hoàn cảnh và visa của bạn.',
+        en: 'First home, investment, or funds from Vietnam — the plan follows your situation and visa.'
+    },
+    'intro.value.cited.title': { vi: 'Có nguồn, không phỏng đoán', en: 'Sourced, not guessed' },
+    'intro.value.cited.body': {
+        vi: 'Như các số liệu trên trang này, mỗi con số trong kế hoạch dẫn về nguồn chính phủ.',
+        en: 'Like every figure on this page, each figure in your plan traces to a government source.'
+    },
+    'intro.cta': { vi: 'Khám phá bản đồ', en: 'Explore the map' },
+    'intro.cta.hint': {
+        vi: 'Chọn một khu vực trên bản đồ để bắt đầu kế hoạch.',
+        en: 'Pick a suburb on the map to start your plan.'
+    },
+    'intro.source': { vi: 'Nguồn', en: 'Source' },
+    'intro.now': { vi: 'nay', en: 'now' },
+    'intro.button': { vi: 'Vì sao Úc?', en: 'Why Australia?' },
+    'intro.button.aria': {
+        vi: `Mở lại giới thiệu ${BRAND}`,
+        en: `Reopen the ${BRAND} introduction`
+    },
+    'intro.close': { vi: 'Thu gọn giới thiệu', en: 'Collapse the introduction' }
 } as const;
 
 export type MessageKey = keyof typeof messages;
