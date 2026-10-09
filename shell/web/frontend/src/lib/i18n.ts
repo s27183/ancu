@@ -968,6 +968,11 @@ const messages = {
         vi: 'Kế hoạch đang được cập nhật. Vui lòng đợi một chút rồi hỏi lại.',
         en: 'Your plan is updating. Please wait a moment, then ask again.'
     },
+    // Behavior 36: one assistant question per user per (Sydney) day; the shell's 429.
+    'chat.daily_limit': {
+        vi: 'Bạn đã dùng câu hỏi của hôm nay. Hãy hỏi lại vào ngày mai.',
+        en: 'You’ve used today’s question. You can ask again tomorrow.'
+    },
     'chat.error': {
         vi: 'Chưa trả lời được câu hỏi này. Vui lòng thử lại.',
         en: 'Couldn’t answer that just now. Please try again.'
