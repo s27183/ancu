@@ -152,7 +152,7 @@ never the screen). Frontend env is set on the Pages project through the Cloudfla
 | Key | Scope | Held in | Used by |
 |---|---|---|---|
 | `DO_API_KEY` | DigitalOcean API token (Son's DO account for Mai An Cư), read+write | Son's `.env`; served to the seat by `/bounds key DO_API_KEY@api.digitalocean.com` (the value never reaches it) | `scripts/do_deploy.py` — every DO call |
-| `CLOUDFLARE_API_TOKEN` | Cloudflare token: zone `maiancu.com` DNS edit + the account's Pages edit | Son's `.env`; `/bounds key CLOUDFLARE_API_TOKEN@api.cloudflare.com` | DNS records + the Pages project's env and custom domain |
+| `CLOUDFLARE_API_TOKEN` | Cloudflare token: zone `maiancu.com` DNS edit + the account's Pages edit, R2 edit and Workers Scripts edit (behavior 40) | Son's `.env`; `/bounds key CLOUDFLARE_API_TOKEN@api.cloudflare.com` | DNS records + the Pages project's env and custom domain |
 | `RESEND_API_KEY` | Resend, sending from the verified `maiancu.com` | `.env` → the shell's SECRET env | magic-link email (`fh_shell_mail`) |
 | `CLAUDE_CODE_OAUTH_TOKEN` | Anthropic Max subscription credit | `.env` → the engine's SECRET env | the planner sidecar |
 | `SHELL_JWT_SECRET` | user-session HMAC | `.env` → shell SECRET | `fh_shell_jwt` |
@@ -219,7 +219,7 @@ browser calls it directly).
 | Var | Kind | Value |
 |---|---|---|
 | `NODE_VERSION` | build | `20` |
-| `VITE_PMTILES_URL` | **build** | Protomaps pmtiles basemap URL (8-S2d). Vite inlines `import.meta.env.VITE_*` at **build** time, so this is a Pages **build** env var. Unset → the `minimalStyle` fallback (no basemap, no regression). Prod target: the R2 pmtiles extract. |
+| `VITE_PMTILES_URL` | **build** | Protomaps pmtiles basemap URL (8-S2d). Vite inlines `import.meta.env.VITE_*` at **build** time, so this is a Pages **build** env var. Unset → the `minimalStyle` fallback (no basemap, no regression). Prod: `https://tiles.maiancu.com/planet.pmtiles` — the whole-world planet in R2 bucket `maiancu-tiles` (map-stack.md, behavior 40). |
 | `SHELL_ORIGIN` | **runtime** | the shell backend origin the Pages **Function** proxies to (`https://api.maiancu.com`). Read by `functions/api/[[path]].js` + `functions/health.js` at request time — a Pages **runtime** env var, NOT a `VITE_` build var. Unset → the proxy 503s. |
 
 The frontend calls **relative `/api/*`** (no API-base env), so the browser sees **one
