@@ -1081,9 +1081,6 @@ const messages = {
     // with a CNBC/Bloomberg-style continuous scroll — distinct aria label from the
     // per-card ticker since this one is unfiltered, not "plan-relevant").
     'home.news.aria': { vi: 'Tin tức mới nhất', en: 'Latest updates' },
-    'home.news.label': { vi: 'TIN TỨC', en: 'NEWS' },
-    'plan.news.pause': { vi: 'Tạm dừng', en: 'Pause' },
-    'plan.news.play': { vi: 'Tiếp tục', en: 'Resume' },
 
     // News overview sheet (kb-news-feature.md "News overview sheet") — layer 1 of the
     // two-layer homepage news flow: tapping the ticker opens this categorized, scrollable

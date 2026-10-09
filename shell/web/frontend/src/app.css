@@ -1852,68 +1852,22 @@ main {
     border: none;
     box-shadow: var(--shadow-1);
 }
-.pp-ticker-label {
-    flex: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.22rem 0.6rem 0.22rem 0.5rem;
-    background: var(--warm);
-    color: var(--on-dark);
-    font-size: var(--fs-2xs);
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    border-radius: var(--radius-pill);
-}
-/* A live dot before the label — the band is a feed, not a static banner. */
-.pp-ticker-label::before {
-    content: '';
-    width: 0.4rem;
-    height: 0.4rem;
-    border-radius: 50%;
-    background: var(--on-dark);
-    animation: pp-live 2s var(--ease) infinite;
-}
-@keyframes pp-live {
-    50% {
-        opacity: 0.35;
-    }
-}
-/* Pause/play (WCAG 2.2.2 — see NewsTicker.svelte): kept, but demoted to a small,
-   low-contrast icon at the strip's end so it reads as a utility control, not a
-   headline-level element — it's there for touch/keyboard users who can't hover to
-   pause, not a feature to draw the eye. */
-.pp-ticker-pause {
-    flex: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: none;
-    background: transparent;
-    color: var(--on-dark-muted);
-    padding: 0.3rem;
-    border-radius: var(--radius-xs);
-    cursor: pointer;
-}
-.pp-ticker-pause:hover {
-    background: var(--on-dark-wash);
-    color: var(--on-dark);
-}
 .pp-ticker-marquee-viewport {
     flex: 1 1 auto;
     min-width: 0;
     overflow: hidden;
+    touch-action: pan-y; /* horizontal drags are the strip's own (NewsTicker.svelte) */
+    user-select: none;
+    -webkit-user-select: none;
+    cursor: grab;
+}
+.pp-ticker-marquee-viewport:active {
+    cursor: grabbing;
 }
 .pp-ticker-marquee-track {
     display: flex;
     width: max-content;
-    animation-name: pp-ticker-scroll;
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-}
-.pp-ticker-marquee:hover .pp-ticker-marquee-track,
-.pp-ticker-marquee:focus-within .pp-ticker-marquee-track {
-    animation-play-state: paused;
+    will-change: transform;
 }
 .pp-ticker-marquee-run {
     display: flex;
@@ -1942,30 +1896,6 @@ main {
     color: var(--on-dark-faint);
     margin: 0 1rem;
 }
-@keyframes pp-ticker-scroll {
-    from {
-        transform: translateX(0);
-    }
-    to {
-        transform: translateX(-50%);
-    }
-}
-/* Reduced motion: stop the loop and let the (now single, un-duplicated-looking)
-   run be scrolled manually instead of forcing continuous motion. More specific
-   than the app-wide `* { animation-duration: 0.01ms }` catch-all, so this wins
-   cleanly rather than leaving a near-zero-duration animation flickering. */
-@media (prefers-reduced-motion: reduce) {
-    .pp-ticker-marquee-track {
-        animation: none !important;
-    }
-    .pp-ticker-marquee-viewport {
-        overflow-x: auto;
-    }
-    .pp-ticker-marquee-run:nth-child(2) {
-        display: none;
-    }
-}
-
 /* News detail sheet (kb-news-feature.md task 28) — content inside NewsDetailSheet.svelte's
    Modal. summary reuses .pp-card's ink/font sizing conventions rather than inventing new
    ones; it's rendered via renderInlineMarkdown (2026-07-09) since KB summaries carry
