@@ -280,7 +280,9 @@ GATE 11 (`kb_compiler.py`) fail-closes on: `kb_slug` and every `affected_kb_slug
 entry resolving to a real KB doc, `category` being one of `NEWS_CATEGORIES`,
 `effective_from`/`authored_date` present,
 `sources:` non-empty (same fail-closed discipline as GATE 10 — a news note is a
-user-facing claim and gets the same citation bar as a fact doc, no exemption),
+user-facing claim and gets the same citation bar as a fact doc, no exemption)
+and **every entry a URL on a `*.gov.au` host** (`NEWS_SOURCE_HOST_SUFFIX`; see
+"Government sources only" below),
 the `## Diff` block present and parseable, the EN/VI summary
 bilingual-well-formed (the same check as a KB doc's `copy` templates), and the
 EN/VI **headline** bilingual-well-formed AND <=100 chars each (`NEWS_HEADLINE_MAX_CHARS`)
@@ -290,6 +292,21 @@ A news note is **never** anchored by a blueprint; it is parsed into its own arti
 array (`artifact["news"]`), never mixed into `kb`, so it never enters GATE 2/6/7
 or a blueprint's registry (GATE 10 itself doesn't apply — GATE 11's own
 `sources:` check is the news-note-scoped equivalent).
+
+**Government sources only (behavior 39, 2026-10-09).** Every source a news note
+cites is a public Australian government channel — a host under `.gov.au`
+(Commonwealth, state and territory agencies, regulators, the RBA, revenue offices,
+legislation registers, parliament, ministers' releases). Never a law firm, a
+tax-tool or payroll blog, or media — the ABC included (a statutory broadcaster,
+editorially independent, at abc.net.au). Son: "any news read by the users should
+have sources coming from public gov channels. This is to ensure we don't use
+commercial news." So: find the government page that carries each claim; a claim
+no government page carries is **cut**, not cited elsewhere; a story only media
+carry is not a note. Many `immi.homeaffairs.gov.au` pages are built in JavaScript
+and read as a JSON blob to `curl` or WebFetch — read them in a browser (Claude in
+Chrome `get_page_text`), and an ATO page that 403s to WebFetch reads with `curl`
+and a browser user agent (both measured 2026-10-09). GATE 11 fails the build on
+any other host, naming the note and the host.
 
 **Standalone notes — omit `kb_slug`, no diff required (2026-08).** The shape above
 assumes a diff against one of *our own* KB fact docs (a threshold changed, a rate
@@ -303,8 +320,8 @@ orthogonal to `category` (any of `NEWS_CATEGORIES` can carry a standalone note; 
 migration story is still `category: visa` even with no KB doc to diff). Everything
 else is unchanged: bilingual headline (<=100 chars)/summary, `sources:`,
 `effective_from`, `authored_date` are still required and fail-closed. A standalone
-note carries the source's own claims and their actual epistemic status (e.g. "ABC
-reports the government is *considering* X; nothing is yet enacted") rather than
+note carries the source's own claims and their actual epistemic status (e.g. "the
+Minister announced X; he said it needs legislation that has not passed") rather than
 asserting them as this platform's conclusion or as settled fact — report what was
 reported, at the certainty it was reported at. Since there's no `kb_slug`/
 `affected_kb_slugs`, a standalone note is **homepage-ticker-only** — it has nothing

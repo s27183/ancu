@@ -56,6 +56,7 @@ import json
 import re
 import sys
 import pathlib
+import urllib.parse
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 KB = ROOT / "docs" / "kb"
@@ -129,6 +130,27 @@ NEWS_HEADLINE_MAX_CHARS = 100
 # real note needs a 7th bucket (match enforcement grade to property kind — this is
 # display grouping, not a compliance gate, so the enum itself can grow on demand).
 NEWS_CATEGORIES = ("visa", "finance", "scheme", "tax", "property", "market")
+
+# Regulated figures are grounded -> P-7 · One declaration per outcome shape -> The KB compiler -> news sources restricted to government hosts
+# Every source a news note cites is a public Australian government channel: a URL whose
+# host ends in NEWS_SOURCE_HOST_SUFFIX (Commonwealth, state and territory agencies,
+# regulators, the RBA, revenue offices, ministers). No commercial site — law firms,
+# tax-tool blogs, media, the ABC included (a statutory broadcaster, editorially
+# independent, at abc.net.au) — is ever behind a headline; a claim no government page
+# carries is cut, not cited elsewhere. Son, 2026-10-09 (behavior 39): "any news read by
+# the users should have sources coming from public gov channels". Fail-closed in GATE 11.
+NEWS_SOURCE_HOST_SUFFIX = ".gov.au"
+
+
+def news_source_host_error(src):
+    """None if a news `sources:` entry is a URL on a government host, else why not."""
+    url = src.get("url")
+    if not url:
+        return "an entry with no url (a news note cites a government page, not a note)"
+    host = (urllib.parse.urlsplit(url).hostname or "").lower()
+    if not host.endswith(NEWS_SOURCE_HOST_SUFFIX):
+        return f"{host or url!r} is not a government host (*{NEWS_SOURCE_HOST_SUFFIX})"
+    return None
 
 
 def check_copy_template(pair, locales=LOCALES):
@@ -1108,7 +1130,8 @@ def run(emit=False):
     # entry must resolve to a real KB doc (the relevance-filter key has to point at
     # something real); category must be one of NEWS_CATEGORIES (the News overview
     # sheet has nowhere else to sort an unrecognized value); effective_from/
-    # authored_date required; sources required
+    # authored_date required; sources required, each a URL on a *.gov.au host
+# (NEWS_SOURCE_HOST_SUFFIX, its block)
     # (FAIL-CLOSED, same discipline as GATE 10 — a news note is a user-facing claim
     # and deserves the same citation bar as a fact doc; not exempt the way
     # kb.copy.*/kb.bilingual.*/kb.journey.* are, since every news note asserts a
@@ -1117,8 +1140,9 @@ def run(emit=False):
     # KB doc's `copy` templates — same {locale: text} shape).
     #
     # A note that OMITS `kb_slug` is exempt from kb_slug / affected_kb_slugs / Diff
-    # (2026-08, Adgemis private-credit + migration-cuts notes): those three exist for
-    # the DIFF case — "a regulated figure this KB cites just changed" — which needs
+    # (2026-08, first for two ABC-sourced notes, since replaced by government-sourced
+    # ones: ASIC private credit, the 2026-09 migration reforms, the RBA FSR): those
+    # three exist for the DIFF case — "a regulated figure this KB cites just changed" — which needs
     # an anchor doc to diff against and a component to badge. A standalone factual
     # citation (a macro/systemic event, a still-developing policy story) has no
     # regulated old_value→new_value pair and nothing of ours to diff against —
@@ -1155,6 +1179,11 @@ def run(emit=False):
         if not doc.get("sources"):
             fails.append(f"[news] {slug}: no `sources:` citation (kb-update-runbook.md "
                         f"\"authoring a news note\")")
+        for src in doc.get("sources") or []:
+            host_err = news_source_host_error(src)
+            if host_err:
+                fails.append(f"[news] {slug}: source {host_err} — news cites government "
+                            f"pages only (kb-news-feature.md \"Sources\")")
         if not standalone and doc.get("diff") is None:
             suffix = f" ({doc['diff_error']})" if doc.get("diff_error") else ""
             fails.append(f"[news] {slug}: missing or unparsed '## Diff' jsonc block{suffix}")

@@ -8,11 +8,8 @@ effective_from: 2026-07-01
 authored_date: 2026-07-06
 sources:
   - url: https://www.ato.gov.au/tax-rates-and-codes/study-and-training-support-loans-rates-and-repayment-thresholds
-    note: "PRIMARY (ATO) — same corroboration caveat as kb.hecs.thresholds's own citation: 403 Forbidden to WebFetch in-sandbox 2026-07-06; figures corroborated to the digit against the two secondary sources below."
-  - url: https://www.scalesuite.com.au/resources/understanding-stsl-tax-a-comprehensive-guide
-    retrieved: 2026-07-06
-  - url: https://www.wagecalculator.com.au/guides/hecs-help-repayment
-    retrieved: 2026-07-06
+    retrieved: 2026-10-09
+    note: "PRIMARY (ATO) — 403 to WebFetch in-sandbox 2026-07-06; read 2026-10-09 (curl, browser user agent): carries 69,528, 67,000, 129,717, 186,050, 9,028 and the 15% / 17% / 10% rates — every figure of the diff."
 ---
 
 ## Headline (EN)
@@ -58,13 +55,11 @@ năng lực vay — có thể hiện đã cao hơn một chút so với con số
 
 Notes:
 
-- **`sources:` pins this specific diff, not a live citation.** It's the same
-  primary + corroborating URLs as `kb_slug` (`kb.hecs.thresholds`)'s own
-  `sources:` at the moment this note was authored — copied at zero extra
-  gathering cost since the author already had them open for Phase 1. This does
-  NOT drift when the fact doc is next re-verified: the note is immutable, so
-  it stays a correct historical record of what was checked for *this* change,
-  never a live pointer that needs to track the doc's current state.
+- **`sources:` pins this specific diff, not a live citation.** A news note
+  cites government pages only (kb-news-feature.md): re-cited 2026-10-09 to the
+  ATO page alone (behavior 39), which carries every figure; the two commercial
+  pages that corroborated it while the ATO page was unreadable in-sandbox are
+  dropped. The facts are unchanged.
 - **`affected_kb_slugs` is the relevance-filter key.** The engine intersects
   this list against a plan card's per-fill `kb_versions` provenance
   (`plan-card-refresh.md`) — already-recorded data, no new lookup mechanism —
