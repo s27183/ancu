@@ -1,35 +1,126 @@
-/* FirstHomey shell — minimal design substrate (8-S0 scaffold). Semantic tokens so
-   pages reference roles, not hexes; the real token set + map theming lands with the
-   map home (8-S2). VI-first, mobile-native (shell-architecture.md §7). */
+/* Mai An Cư shell — the one stylesheet. Tokens (:root) first, then the shared
+   component classes, then each surface. VI-first, mobile-native (shell-architecture.md §7). */
 
 :root {
-    --bg: #f8fafc;
+    /* Shell -> P-7 · One declaration per outcome shape -> The shell -> the design tokens
+       This block is the ONE declaration of the theme (behavior 41, 2026-10-09): colour,
+       type, radius, elevation, spacing and motion. Components and renderers reference
+       these roles — never a hex — so a theme change is an edit here. Light theme only.
+       Palette: warm paper ground, deep navy ink, jade primary, warm coral-amber accent;
+       semantic tones carry meaning (status, positive/negative figures). Text pairs are
+       ≥ 4.5:1 (ink/muted on bg and surface, white on accent). */
+
+    /* Ground & surfaces */
+    --bg: #f6f4ef; /* warm paper — the app ground */
+    --bg-2: #efebe3; /* recessed wells: segmented tracks, inset fields */
     --surface: #ffffff;
-    --ink: #0f172a;
-    --muted: #64748b;
-    --border: #e2e8f0;
-    --accent: #047857; /* emerald-700 — placeholder brand accent */
+    --surface-2: #faf8f4; /* hover/alternate rows on a surface */
+    --map-ground: #e9ecea; /* the map canvas before tiles paint */
+
+    /* Text */
+    --ink: #172033; /* deep navy */
+    --ink-2: #3b4658; /* secondary text */
+    --muted: #646a73; /* captions, labels (5.2:1 on --bg) */
+    --ink-inverse: #ffffff;
+
+    /* Lines */
+    --border: #e4dfd4;
+    --border-strong: #cfc8b9;
+
+    /* Brand */
+    --accent: #0d7a63; /* jade — primary actions, selection */
+    --accent-hover: #0a6352;
+    --accent-press: #084f42;
     --accent-ink: #ffffff;
-    --accent-soft: #ecfdf5; /* emerald-50 — calm selected/affirmative wash */
-    --radius: 0.6rem;
-    --radius-lg: 1rem;
-    /* Layered, soft shadows — depth without the harsh 1px drop of the old chrome. */
-    --shadow-1: 0 1px 2px rgb(15 23 42 / 0.06), 0 2px 8px rgb(15 23 42 / 0.08);
-    --shadow-2: 0 6px 16px rgb(15 23 42 / 0.12), 0 24px 48px rgb(15 23 42 / 0.18);
-    --scrim: rgb(15 23 42 / 0.45);
-    --ring: 0 0 0 3px rgb(4 120 87 / 0.18); /* focus ring keyed to the accent */
+    --accent-soft: #e2f3ed; /* selected/affirmative wash */
+    --accent-soft-2: #cdeadf;
+    --inner-highlight: inset 0 1px 0 rgb(255 255 255 / 0.18);
+    --accent-line: rgb(13 122 99 / 0.3);
+    --warm: #d4582a; /* coral-amber — highlights, the brand mark, news label */
+    --warm-soft: #fbe9df;
+    --gold: #e0a43a;
+    --brand-gradient: linear-gradient(135deg, #0d7a63 0%, #12937a 55%, #e0a43a 140%);
+    --chrome-dark: #13243a; /* the news band */
+    --chrome-dark-2: #1d3350;
+    --pulse: #ff1f8f; /* saved-plans pulse on the map (map.ts) */
+
+    /* Semantic tones */
+    --success: #157a46;
+    --success-soft: #e3f4ea;
+    --warning: #a65a07;
+    --warning-soft: #fdf1dc;
+    --danger: #b42318;
+    --danger-soft: #fde8e6;
+    --info: #1e5fa6;
+    --info-soft: #e5eefa;
+    --success-line: #a9dcc0;
+    --warning-line: #f1d39a;
+    --info-line: #bcd2ef;
+    --danger-line: #f3c2bc;
+
+    /* Categorical chart series (StackedBar) */
+    --chart-1: #0d7a63;
+    --chart-2: #2f6fbf;
+    --chart-3: #d4582a;
+    --chart-4: #7a5bc7;
+    --chart-5: #d99a22;
+    --on-dark: #ffffff;
+    --on-dark-muted: rgb(255 255 255 / 0.68);
+    --on-dark-faint: rgb(255 255 255 / 0.4);
+    --on-dark-wash: rgb(255 255 255 / 0.14);
+    --hairline: rgb(23 32 51 / 0.08);
+    --pulse-ring: 0 0 0 3px rgb(255 31 143 / 0.18);
+    --brand-glow: 0 2px 6px rgb(13 122 99 / 0.35), inset 0 1px 0 rgb(255 255 255 / 0.25);
+    --header-shadow: 0 4px 18px rgb(23 32 51 / 0.05);
+    --overlay-bg: rgb(233 236 234 / 0.85);
+
+    /* Type */
+    --font-sans: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --font-serif: 'Newsreader Variable', Georgia, 'Times New Roman', serif;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+    --fs-2xs: 0.6875rem;
+    --fs-xs: 0.75rem;
+    --fs-sm: 0.875rem;
+    --fs-md: 1rem;
+    --fs-lg: 1.125rem;
+    --fs-xl: 1.375rem;
+    --fs-2xl: 1.75rem;
+    --fs-3xl: 2.25rem;
+
+    /* Shape */
+    --radius-sm: 0.5rem;
+    --radius: 0.75rem;
+    --radius-lg: 1.25rem;
+    --radius-pill: 999px;
+
+    /* Space (4-px steps) */
+    --sp-1: 0.25rem;
+    --sp-2: 0.5rem;
+    --sp-3: 0.75rem;
+    --sp-4: 1rem;
+    --sp-5: 1.25rem;
+    --sp-6: 1.5rem;
+    --sp-8: 2rem;
+
+    /* Elevation — warm-navy tinted, layered */
+    --shadow-1: 0 1px 2px rgb(23 32 51 / 0.06), 0 2px 6px rgb(23 32 51 / 0.06);
+    --shadow-2: 0 4px 12px rgb(23 32 51 / 0.08), 0 16px 32px rgb(23 32 51 / 0.1);
+    --shadow-3: 0 12px 28px rgb(23 32 51 / 0.14), 0 32px 64px rgb(23 32 51 / 0.18);
+    --scrim: rgb(19 36 58 / 0.42);
+    --ring: 0 0 0 3px rgb(13 122 99 / 0.28);
+
+    /* Motion */
     --ease: cubic-bezier(0.22, 1, 0.36, 1);
     --t-fast: 140ms;
     --t-med: 240ms;
-    /* Uniform glass language. `glass` = floating chrome over the map (lighter,
-       stronger blur). `panel` = content surfaces you READ over the map (sheet/modals)
-       — higher opacity so text stays legible against a moving basemap. */
-    --glass-bg: rgb(255 255 255 / 0.72);
-    --glass-blur: saturate(1.4) blur(14px);
-    --glass-border: rgb(255 255 255 / 0.5);
-    --panel-bg: rgb(255 255 255 / 0.92);
+
+    /* Glass: `glass` = floating chrome over the map; `panel` = content you read over it. */
+    --glass-bg: rgb(255 255 255 / 0.78);
+    --glass-blur: saturate(1.5) blur(16px);
+    --glass-border: rgb(255 255 255 / 0.6);
+    --panel-bg: rgb(255 255 255 / 0.94);
     --panel-blur: saturate(1.2) blur(18px);
-    --header-h: 3.25rem;
+    --header-h: 3.5rem;
 }
 
 /* The shared glass surface — one rule every floating control opts into. */
@@ -54,6 +145,218 @@ a:focus-visible {
 * {
     box-sizing: border-box;
 }
+button,
+input,
+select,
+textarea {
+    font-family: inherit;
+}
+
+/* --- Shared components (behavior 41) ---------------------------------------
+   One look per control tier. Markup opts in with .btn + a tier; older selectors
+   (.primary, .account-action, .google-btn, …) are grouped onto the same tiers below
+   so every button in the app reads as one family. */
+.btn,
+.primary,
+.account-action,
+.google-btn,
+.pp-state button,
+.pp-wi-reset,
+.pp-af-cancel,
+.overlay button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sp-2);
+    font-family: inherit;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    border-radius: var(--radius);
+    cursor: pointer;
+    text-decoration: none;
+    transition:
+        background var(--t-fast) var(--ease),
+        border-color var(--t-fast) var(--ease),
+        color var(--t-fast) var(--ease),
+        box-shadow var(--t-fast) var(--ease),
+        transform var(--t-fast) var(--ease);
+}
+.btn {
+    padding: 0.6rem 1.05rem;
+    font-size: var(--fs-sm);
+    border: 1px solid transparent;
+}
+.btn:active:not(:disabled),
+.account-action:active,
+.google-btn:active,
+.pp-state button:active {
+    transform: translateY(1px) scale(0.99);
+}
+.btn:disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+/* Primary — jade, a soft inner highlight, lifts on hover. */
+.btn-primary,
+.overlay button {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-ink);
+    box-shadow: var(--shadow-1), var(--inner-highlight);
+}
+.btn-primary:hover:not(:disabled),
+.overlay button:hover {
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+    box-shadow: var(--shadow-2);
+}
+/* Secondary — white, bordered, ink text. */
+.btn-secondary,
+.account-action,
+.google-btn,
+.pp-state button,
+.pp-wi-reset,
+.pp-af-cancel {
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    color: var(--ink);
+    box-shadow: var(--shadow-1);
+}
+.btn-secondary:hover:not(:disabled),
+.account-action:hover,
+.google-btn:hover,
+.pp-state button:hover,
+.pp-wi-reset:hover,
+.pp-af-cancel:hover {
+    background: var(--surface-2);
+    border-color: var(--ink-2);
+}
+/* Tonal — the accent wash, for a confident secondary action. */
+.btn-tonal {
+    background: var(--accent-soft);
+    color: var(--accent);
+}
+.btn-tonal:hover:not(:disabled) {
+    background: var(--accent-soft-2);
+}
+/* Ghost — text only until hovered. */
+.btn-ghost {
+    background: transparent;
+    color: var(--accent);
+}
+.btn-ghost:hover:not(:disabled) {
+    background: var(--accent-soft);
+}
+/* Icon — a round 2.25rem target. */
+.btn-icon {
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    border-radius: var(--radius-pill);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--ink-2);
+}
+.btn-icon:hover {
+    color: var(--ink);
+    border-color: var(--border-strong);
+    background: var(--surface-2);
+}
+.btn-sm {
+    padding: 0.35rem 0.75rem;
+    font-size: var(--fs-xs);
+    border-radius: var(--radius-sm);
+}
+
+/* Chip — a pill tag (categories, filters). */
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-1);
+    padding: 0.2rem 0.6rem;
+    border-radius: var(--radius-pill);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    background: var(--bg-2);
+    color: var(--ink-2);
+}
+.chip-accent {
+    background: var(--accent-soft);
+    color: var(--accent);
+}
+.chip-warm {
+    background: var(--warm-soft);
+    color: var(--warm);
+}
+
+/* Field — one look for every text input and select. */
+.input,
+.auth-field input,
+.combo-input,
+.select-wrap select,
+.pp-af-field input,
+.pp-af-field select,
+.pp-wi-field input,
+.pp-wi-field select,
+.pp-ck-field input:not([type='range']),
+.pp-ck-field select {
+    font-family: inherit;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    color: var(--ink);
+    transition:
+        border-color var(--t-fast) var(--ease),
+        box-shadow var(--t-fast) var(--ease);
+}
+.input:hover,
+.auth-field input:hover,
+.pp-af-field input:hover,
+.pp-wi-field input:hover,
+.pp-ck-field input:not([type='range']):hover {
+    border-color: var(--ink-2);
+}
+.input:focus,
+.auth-field input:focus,
+.pp-af-field input:focus,
+.pp-af-field select:focus,
+.pp-wi-field input:focus,
+.pp-wi-field select:focus,
+.pp-ck-field input:focus,
+.pp-ck-field select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: var(--ring);
+}
+.input {
+    padding: 0.6rem 0.75rem;
+    font-size: var(--fs-md);
+}
+input[type='range'] {
+    accent-color: var(--accent);
+}
+
+/* Card — a white, softly elevated container. */
+.card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-1);
+    padding: var(--sp-5);
+}
+
+h1,
+h2,
+h3,
+h4 {
+    letter-spacing: -0.02em;
+    color: var(--ink);
+}
+::selection {
+    background: var(--accent-soft);
+    color: var(--accent-press);
+}
+
 
 html,
 body {
@@ -64,15 +367,12 @@ body {
 body {
     background: var(--bg);
     color: var(--ink);
-    font-family:
-        system-ui,
-        -apple-system,
-        'Segoe UI',
-        Roboto,
-        'Helvetica Neue',
-        Arial,
-        sans-serif;
+    font-family: var(--font-sans);
+    font-size: var(--fs-md);
     line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
 }
 
 /* A floating glass bar over the full-bleed map (so the map runs edge-to-edge under
@@ -97,15 +397,38 @@ body {
     background: var(--glass-bg);
     -webkit-backdrop-filter: var(--glass-blur);
     backdrop-filter: var(--glass-blur);
-    border-bottom: 1px solid var(--glass-border);
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--header-shadow);
 }
 
 .app-header .brand {
     justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    font-size: var(--fs-lg);
     font-weight: 700;
-    color: var(--accent);
+    color: var(--ink);
     text-decoration: none;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
+}
+.brand-mark {
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.6rem;
+    background: var(--brand-gradient);
+    color: var(--ink-inverse);
+    box-shadow: var(--brand-glow);
+    transition: transform var(--t-fast) var(--ease);
+}
+.brand-mark svg {
+    width: 1.15rem;
+    height: 1.15rem;
+}
+.app-header .brand:hover .brand-mark {
+    transform: rotate(-6deg) scale(1.05);
 }
 .app-header .lang {
     justify-self: center;
@@ -139,7 +462,7 @@ body {
 }
 .account-trigger:hover {
     background: var(--bg);
-    border-color: #cbd5e1;
+    border-color: var(--border-strong);
 }
 
 /* Account side-sheet — slides in from the right edge (CSS transform; solid panel). */
@@ -281,7 +604,7 @@ body {
 }
 .account-action:hover {
     background: var(--bg);
-    border-color: #cbd5e1;
+    border-color: var(--border-strong);
 }
 
 /* Segmented language toggle: a pill track with a sliding white thumb under the
@@ -291,7 +614,7 @@ body {
     display: inline-flex;
     padding: 0.15rem;
     border-radius: 999px;
-    background: rgb(15 23 42 / 0.06);
+    background: var(--bg-2);
     border: 1px solid var(--border);
 }
 .lang-thumb {
@@ -361,7 +684,7 @@ main {
     height: 100%;
     width: 100%;
     overflow: hidden;
-    background: #e7e9ed;
+    background: var(--map-ground);
 }
 
 /* Controls cluster — top-left. Collapsed to a glass icon by default; the panel drops
@@ -475,7 +798,7 @@ main {
         box-shadow var(--t-fast) var(--ease);
 }
 .select-wrap select:hover {
-    border-color: #cbd5e1;
+    border-color: var(--border-strong);
 }
 
 /* Saved-plans filter — a checkbox + a name combobox, separated from the pickers above. */
@@ -500,7 +823,7 @@ main {
 .checkbox input {
     width: 1.05rem;
     height: 1.05rem;
-    accent-color: #ff1f8f; /* matches the saved-plans pulse */
+    accent-color: var(--pulse); /* matches the saved-plans pulse */
     cursor: pointer;
 }
 .combo {
@@ -522,8 +845,8 @@ main {
 }
 .combo-input:focus {
     outline: none;
-    border-color: #ff1f8f;
-    box-shadow: 0 0 0 3px rgb(255 31 143 / 0.16);
+    border-color: var(--pulse);
+    box-shadow: var(--pulse-ring);
 }
 .combo-list {
     position: absolute;
@@ -561,7 +884,7 @@ main {
     transition: background var(--t-fast) var(--ease);
 }
 .combo-list li button:hover {
-    background: var(--surface-2, #f1f5f9);
+    background: var(--surface-2);
 }
 .combo-name {
     font-weight: 500;
@@ -594,15 +917,17 @@ main {
     -webkit-backdrop-filter: var(--glass-blur);
     backdrop-filter: var(--glass-blur);
     border: 1px solid var(--glass-border);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-1);
-    font-size: 0.72rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-2);
+    font-size: var(--fs-2xs);
     color: var(--muted);
-    max-width: 11rem;
+    min-width: 9rem;
+    max-width: 12rem;
 }
 .legend-title {
     display: block;
-    font-weight: 600;
+    font-size: var(--fs-xs);
+    font-weight: 700;
     color: var(--ink);
     margin-bottom: 0.3rem;
 }
@@ -626,8 +951,8 @@ main {
     width: 0.7rem;
     height: 0.7rem;
     border-radius: 999px;
-    background: #cbd5e1;
-    border: 1px solid #fff;
+    background: var(--border-strong);
+    border: 1px solid var(--surface);
 }
 
 /* Loading / error — calm, centred, never alarming (§7.1). */
@@ -640,7 +965,7 @@ main {
     align-items: center;
     justify-content: center;
     gap: 0.75rem;
-    background: rgb(231 233 237 / 0.85);
+    background: var(--overlay-bg);
     color: var(--muted);
 }
 .overlay button {
@@ -738,12 +1063,14 @@ main {
     flex: none; /* fixed-size chrome — never shrinks into the tabs' space */
     display: flex;
     align-items: flex-start;
-    gap: 0.5rem;
-    padding: 0.7rem 1rem 0.5rem;
+    gap: var(--sp-3);
+    padding: var(--sp-4) var(--sp-5) var(--sp-3);
 }
 .sheet-head .title h2 {
     margin: 0;
-    font-size: 1.15rem;
+    font-size: var(--fs-xl);
+    font-weight: 700;
+    letter-spacing: -0.02em;
 }
 .sheet-head .title .sub {
     margin: 0.1rem 0 0;
@@ -751,40 +1078,51 @@ main {
     color: var(--muted);
 }
 .sheet-head .close {
+    flex: none;
     margin-left: auto;
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
     border: none;
-    background: transparent;
-    font-size: 1.1rem;
-    color: var(--muted);
+    border-radius: var(--radius-pill);
+    background: var(--bg-2);
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
     cursor: pointer;
-    padding: 0.2rem 0.4rem;
     line-height: 1;
+    transition: background var(--t-fast) var(--ease);
 }
 .sheet .tabs {
     flex: none; /* fixed-size chrome — never shrinks into the body */
     display: flex;
-    gap: 0.25rem;
-    padding: 0 1rem;
+    gap: var(--sp-4);
+    padding: 0 var(--sp-5);
     border-bottom: 1px solid var(--border);
 }
 .sheet .tabs button {
     border: none;
     background: transparent;
     color: var(--muted);
-    padding: 0.5rem 0.4rem;
-    font-size: 0.9rem;
+    padding: 0.65rem 0.1rem;
+    font-size: var(--fs-sm);
+    font-weight: 600;
     cursor: pointer;
-    border-bottom: 2px solid transparent;
+    border-bottom: 2.5px solid transparent;
+    margin-bottom: -1px;
+    transition: color var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease);
+}
+.sheet .tabs button:hover {
+    color: var(--ink);
 }
 .sheet .tabs button.active {
     color: var(--accent);
     border-bottom-color: var(--accent);
-    font-weight: 600;
 }
 .sheet .body {
     flex: 1 1 auto; /* the body absorbs the slack + is the scroll region */
     min-height: 0;
-    padding: 0.75rem 1rem 1.25rem;
+    padding: var(--sp-4) var(--sp-5) var(--sp-6);
     overflow-y: auto;
 }
 .metric {
@@ -801,9 +1139,11 @@ main {
     color: var(--muted);
 }
 .metric .value {
-    font-size: 1.15rem;
-    font-weight: 600;
+    font-size: var(--fs-lg);
+    font-weight: 650;
     color: var(--ink);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
 }
 .metric .value .unit {
     font-size: 0.8rem;
@@ -821,7 +1161,8 @@ main {
     margin-top: 0.15rem;
 }
 .metric.hero .value {
-    font-size: 1.6rem;
+    font-size: var(--fs-2xl);
+    font-weight: 750;
     color: var(--accent);
 }
 
@@ -862,24 +1203,20 @@ main {
     border: 1px solid var(--accent);
     background: var(--accent);
     color: var(--accent-ink);
-    border-radius: var(--radius);
-    padding: 0.8rem 1rem;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
+    padding: 0.85rem 1rem;
+    font-size: var(--fs-md);
     width: 100%;
-    box-shadow: var(--shadow-1);
-    transition:
-        transform var(--t-fast) var(--ease),
-        background var(--t-fast) var(--ease),
-        box-shadow var(--t-fast) var(--ease);
+    box-shadow: var(--shadow-1), var(--inner-highlight);
 }
 .primary:hover:not(:disabled) {
-    background: #036249; /* emerald-800 */
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
     box-shadow: var(--shadow-2);
+    transform: translateY(-1px);
 }
 .primary:active:not(:disabled) {
-    transform: translateY(1px);
+    background: var(--accent-press);
+    transform: translateY(0);
 }
 .primary:disabled {
     opacity: 0.45;
@@ -927,14 +1264,20 @@ main {
     font-size: 1.15rem;
 }
 .ob-head .close {
+    flex: none;
     margin-left: auto;
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
     border: none;
-    background: transparent;
-    font-size: 1.1rem;
-    color: var(--muted);
+    border-radius: var(--radius-pill);
+    background: var(--bg-2);
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
     cursor: pointer;
-    padding: 0.2rem 0.4rem;
     line-height: 1;
+    transition: background var(--t-fast) var(--ease);
 }
 .ob-body {
     padding: 0.5rem 1rem 1rem;
@@ -991,7 +1334,7 @@ main {
 }
 .choice button:hover,
 .bands button:hover {
-    border-color: #cbd5e1;
+    border-color: var(--border-strong);
     background: var(--bg);
 }
 .choice button.active,
@@ -1000,6 +1343,7 @@ main {
     background: var(--accent-soft); /* affirmative, not loud */
     color: var(--accent);
     font-weight: 600;
+    box-shadow: inset 0 0 0 1px var(--accent);
 }
 .ob-hint {
     margin: 0.5rem 0 0;
@@ -1017,7 +1361,7 @@ main {
 .ob-error {
     margin: 0.75rem 0 0;
     font-size: 0.85rem;
-    color: #b5341f;
+    color: var(--danger);
 }
 /* Generic accent-tinted callout — foreign-buyer, foreign-investor, and (mode-e-wedge.md
    P5) domestic next-home informational notes all share this look; nothing foreign-
@@ -1078,14 +1422,20 @@ main {
 /* Ghost button — transparent so it blends into the glass header (no opaque white pill);
    a faint accent edge + accent text read cleanly on the blur. */
 .account-btn {
-    border: 1px solid rgb(4 120 87 / 0.32);
-    background: transparent;
-    color: var(--accent);
-    border-radius: 999px;
-    padding: 0.35rem 0.85rem;
-    font-size: 0.82rem;
+    border: 1px solid var(--accent);
+    background: var(--accent);
+    color: var(--accent-ink);
+    border-radius: var(--radius-pill);
+    padding: 0.45rem 1rem;
+    font-size: var(--fs-sm);
     font-weight: 600;
     cursor: pointer;
+    box-shadow: var(--shadow-1), var(--inner-highlight);
+    transition: background var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
+}
+.account-btn:hover {
+    background: var(--accent-hover);
+    box-shadow: var(--shadow-2);
 }
 
 /* Calm sign-in banner — top-centre, status not alarm; emerald when ok. */
@@ -1111,7 +1461,7 @@ main {
 }
 .signin-banner.ok {
     border-color: var(--accent);
-    background: #ecfdf5;
+    background: var(--accent-soft);
     color: var(--accent);
 }
 .signin-banner button {
@@ -1146,7 +1496,7 @@ main {
     padding: 0.25rem 0.65rem;
     border-radius: var(--radius);
     background: var(--accent);
-    color: #fff;
+    color: var(--on-dark);
     font-size: 0.8rem;
     font-weight: 600;
     white-space: nowrap;
@@ -1316,7 +1666,7 @@ main {
 .pp-subtabs button.active {
     background: var(--surface);
     color: var(--ink);
-    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+    box-shadow: var(--shadow-1);
 }
 
 /* Grouped rail (2026-07-09, Son's request): a two-row layout past
@@ -1369,7 +1719,7 @@ main {
 }
 .pp-ticker-nav:hover {
     background: var(--accent);
-    color: #fff;
+    color: var(--on-dark);
 }
 .pp-ticker-headline {
     flex: 1 1 auto;
@@ -1428,20 +1778,38 @@ main {
    exactly one run's width (translateX(-50%) of the two-run track) for a seamless
    loop — see NewsTicker.svelte for why. */
 .pp-ticker-marquee {
-    gap: 0.6rem;
-    background: var(--ink);
+    gap: var(--sp-3);
+    padding: 0.5rem var(--sp-4);
+    background: linear-gradient(90deg, var(--chrome-dark) 0%, var(--chrome-dark-2) 100%);
     border: none;
-    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.18);
+    box-shadow: var(--shadow-1);
 }
 .pp-ticker-label {
     flex: none;
-    padding: 0.2rem 0.55rem;
-    background: var(--accent);
-    color: #fff;
-    font-size: 0.68rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.22rem 0.6rem 0.22rem 0.5rem;
+    background: var(--warm);
+    color: var(--on-dark);
+    font-size: var(--fs-2xs);
     font-weight: 800;
-    letter-spacing: 0.06em;
-    border-radius: 999px;
+    letter-spacing: 0.08em;
+    border-radius: var(--radius-pill);
+}
+/* A live dot before the label — the band is a feed, not a static banner. */
+.pp-ticker-label::before {
+    content: '';
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 50%;
+    background: var(--on-dark);
+    animation: pp-live 2s var(--ease) infinite;
+}
+@keyframes pp-live {
+    50% {
+        opacity: 0.35;
+    }
 }
 /* Pause/play (WCAG 2.2.2 — see NewsTicker.svelte): kept, but demoted to a small,
    low-contrast icon at the strip's end so it reads as a utility control, not a
@@ -1454,14 +1822,14 @@ main {
     justify-content: center;
     border: none;
     background: transparent;
-    color: rgba(255, 255, 255, 0.65);
+    color: var(--on-dark-muted);
     padding: 0.3rem;
     border-radius: 0.35rem;
     cursor: pointer;
 }
 .pp-ticker-pause:hover {
-    background: rgba(255, 255, 255, 0.15);
-    color: #fff;
+    background: var(--on-dark-wash);
+    color: var(--on-dark);
 }
 .pp-ticker-marquee-viewport {
     flex: 1 1 auto;
@@ -1489,15 +1857,21 @@ main {
     flex: none;
     border: none;
     background: transparent;
-    color: #fff;
-    font-size: 0.82rem;
+    color: var(--on-dark);
+    font-family: inherit;
+    font-size: var(--fs-sm);
     font-weight: 600;
+    letter-spacing: -0.005em;
     cursor: pointer;
     padding: 0;
+    transition: color var(--t-fast) var(--ease);
+}
+.pp-ticker-marquee-item:hover {
+    color: var(--gold);
 }
 .pp-ticker-sep {
     flex: none;
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--on-dark-faint);
     margin: 0 1rem;
 }
 @keyframes pp-ticker-scroll {
@@ -1533,24 +1907,47 @@ main {
    the summary body, so a note's "what kind of update, how recent" reads before its "what
    changed" without repeating the headline (Modal already shows that as the sheet title). */
 .pp-news-meta {
-    margin: 0 0 0.6rem;
-    font-size: 0.75rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2);
+    margin: 0 0 var(--sp-4);
+    font-size: var(--fs-xs);
     line-height: 1.3;
 }
 .pp-news-meta-cat {
-    font-weight: 800;
+    padding: 0.2rem 0.6rem;
+    border-radius: var(--radius-pill);
+    background: var(--accent-soft);
+    font-weight: 700;
     color: var(--accent);
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
 }
 .pp-news-meta-date {
     color: var(--muted);
 }
+/* The news BODY is the one serif surface in the app (behavior 41, Son 2026-10-09:
+   "serif typography for news content, news header stay sans serif") — every headline
+   (ticker, list, the Modal title) stays in --font-sans. Newsreader ships a Vietnamese
+   subset, so VI diacritics render in the same face. */
 .pp-news-summary {
-    margin: 0 0 0.75rem;
+    margin: 0 0 var(--sp-5);
     color: var(--ink);
-    font-size: 0.92rem;
-    line-height: 1.45;
+    font-family: var(--font-serif);
+    font-size: 1.125rem;
+    font-optical-sizing: auto;
+    line-height: 1.65;
+    letter-spacing: 0.002em;
+}
+.pp-news-summary p {
+    margin: 0 0 0.85em;
+}
+.pp-news-summary h2,
+.pp-news-summary h3 {
+    font-family: var(--font-sans);
+    font-size: var(--fs-md);
+    margin: 1.2em 0 0.4em;
 }
 .pp-news-summary strong {
     font-weight: 700;
@@ -1563,11 +1960,19 @@ main {
     font-size: 0.85em;
 }
 .pp-news-source {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
     color: var(--accent);
-    font-size: 0.85rem;
+    font-size: var(--fs-sm);
     font-weight: 600;
     text-decoration: underline;
+    text-decoration-color: var(--accent-line);
+    text-underline-offset: 0.2em;
+    transition: text-decoration-color var(--t-fast) var(--ease);
+}
+.pp-news-source:hover {
+    text-decoration-color: currentColor;
 }
 /* Dismiss (task 31) reuses .primary (the shared full-width affirmative-action style) —
    just needs breathing room above it when a source link precedes it. */
@@ -1591,18 +1996,26 @@ main {
     display: flex;
     flex-direction: column;
     gap: 0.15rem;
-    width: 100%;
     text-align: left;
     border: none;
     background: transparent;
-    padding: 0.6rem 0.1rem;
+    padding: var(--sp-3) var(--sp-3);
+    margin: 0 calc(-1 * var(--sp-3));
+    width: calc(100% + 2 * var(--sp-3));
+    border-radius: var(--radius);
+    font-family: inherit;
     cursor: pointer;
+    transition: background var(--t-fast) var(--ease);
+}
+.pp-news-list-item:hover {
+    background: var(--surface-2);
 }
 .pp-news-list-item-headline {
     color: var(--ink);
-    font-size: 0.88rem;
+    font-size: var(--fs-md);
     font-weight: 600;
     line-height: 1.4;
+    letter-spacing: -0.01em;
 }
 .pp-news-list-item:hover .pp-news-list-item-headline {
     color: var(--accent);
@@ -1643,7 +2056,7 @@ main {
 }
 .pp-attach-btn:hover {
     background: var(--accent);
-    color: #fff;
+    color: var(--on-dark);
 }
 
 /* settlement_prep B CTA — the dated-path affordance under the settlement card (reuses
@@ -1712,7 +2125,7 @@ main {
 .pp-af-error {
     margin: 0;
     font-size: 0.85rem;
-    color: var(--danger, #b91c1c);
+    color: var(--danger);
 }
 .pp-af-actions {
     display: flex;
@@ -1786,9 +2199,9 @@ main {
 }
 .pp-wi-save {
     flex: none;
-    border: 1px solid #15803d;
-    background: #16a34a;
-    color: #fff;
+    border: 1px solid var(--success);
+    background: var(--success);
+    color: var(--on-dark);
     border-radius: 0.4rem;
     padding: 0.4rem 0.85rem;
     font-size: 0.85rem;
@@ -1796,7 +2209,7 @@ main {
     cursor: pointer;
 }
 .pp-wi-save:hover:not(:disabled) {
-    background: #15803d;
+    background: var(--accent-press);
 }
 .pp-wi-save:disabled {
     opacity: 0.6;
@@ -1814,7 +2227,7 @@ main {
     cursor: pointer;
 }
 .pp-wi-reset:hover {
-    border-color: #cbd5e1;
+    border-color: var(--border-strong);
 }
 .pp-wi-banner {
     margin: 0.5rem 0 0;
@@ -1825,7 +2238,7 @@ main {
 .pp-wi-error {
     margin: 0.5rem 0 0;
     font-size: 0.78rem;
-    color: #b91c1c;
+    color: var(--danger);
 }
 /* Cross-tab preview strip — only a banner + reset (the cockpit lives in the calc tab). */
 .pp-whatif.active {
@@ -2026,7 +2439,7 @@ main {
     color: var(--ink);
 }
 .pp-value.pp-neg {
-    color: #b91c1c; /* red-700 — a cash gap reads as attention, calmly */
+    color: var(--danger); /* a cash gap reads as attention, calmly */
 }
 /* a wrapping row of Chip atoms (mirrors SummaryCard's .rb-chips) */
 .pp-chips-row {
@@ -2053,19 +2466,19 @@ main {
     margin-top: 0.1rem;
 }
 .pp-chip-good {
-    background: #ecfdf5;
-    color: #047857;
-    border-color: #a7f3d0;
+    background: var(--success-soft);
+    color: var(--success);
+    border-color: var(--success-line);
 }
 .pp-chip-warn {
-    background: #fffbeb;
-    color: #b45309;
-    border-color: #fde68a;
+    background: var(--warning-soft);
+    color: var(--warning);
+    border-color: var(--warning-line);
 }
 .pp-chip-info {
-    background: #eff6ff;
-    color: #1d4ed8;
-    border-color: #bfdbfe;
+    background: var(--info-soft);
+    color: var(--info);
+    border-color: var(--info-line);
 }
 .pp-chip-neutral {
     background: var(--bg);
@@ -2180,7 +2593,7 @@ main {
 .chat-msg.user {
     align-self: flex-end;
     background: var(--accent);
-    color: #fff;
+    color: var(--on-dark);
 }
 .chat-msg.assistant {
     align-self: flex-start;
@@ -2193,7 +2606,7 @@ main {
     color: var(--muted);
 }
 .chat-err {
-    color: #b45309; /* amber-700 — a calm "couldn't answer", not alarm */
+    color: var(--warning); /* a calm "couldn't answer", not alarm */
 }
 .chat-input {
     display: flex;
@@ -2272,7 +2685,7 @@ main {
 .google-btn:hover,
 .pp-state button:hover {
     background: var(--bg);
-    border-color: #cbd5e1;
+    border-color: var(--border-strong);
 }
 .account-btn:hover {
     background: var(--accent-soft);
@@ -2300,7 +2713,7 @@ main {
 .ob-disclaimer {
     margin-top: 1rem;
     padding-top: 0.75rem;
-    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    border-top: 1px solid var(--hairline);
     font-size: 0.75rem;
     line-height: 1.4;
     opacity: 0.75;
@@ -2308,4 +2721,10 @@ main {
 .pp-disclaimers p,
 .ob-disclaimer {
     margin-bottom: 0.25rem;
+}
+
+.sheet-head .close:hover,
+.ob-head .close:hover {
+    background: var(--border);
+    color: var(--ink);
 }

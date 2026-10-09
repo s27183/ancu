@@ -1,4 +1,9 @@
 <script lang="ts">
+    // Self-hosted faces (behavior 41): Inter for the UI and every headline, Newsreader
+    // for a news item's body only. Each ships a Vietnamese subset (unicode-range), so
+    // VI text never falls back; served from this origin, no third-party font host.
+    import '@fontsource-variable/inter';
+    import '@fontsource-variable/newsreader';
     import '../app.css';
     import { onMount } from 'svelte';
     import { lang } from '$lib/stores/lang';
@@ -59,7 +64,17 @@
 </svelte:head>
 
 <header class="app-header">
-    <a class="brand" href="/">{$t('brand.name')}</a>
+    <a class="brand" href="/">
+        <!-- The brand mark: a roof over a settled line ("an cư" — settling into a home). -->
+        <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 11.5 12 5l8 6.5" />
+                <path d="M7 10v8.5h10V10" />
+                <path d="M10.5 18.5v-4h3v4" />
+            </svg>
+        </span>
+        <span class="brand-name">{$t('brand.name')}</span>
+    </a>
 
     <!-- Segmented language toggle — centred in the header. -->
     <div class="lang" role="group" aria-label={$t('lang.label')} data-active={$lang}>

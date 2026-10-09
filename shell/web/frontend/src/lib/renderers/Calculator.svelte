@@ -727,9 +727,9 @@
         border: 1px solid var(--border); border-radius: 0.5rem;
         padding: 0.6rem 0.75rem; display: flex; flex-direction: column; gap: 0.35rem;
     }
-    .cw-good { background: #ecfdf5; border-color: #a7f3d0; }
-    .cw-warn { background: #fffbeb; border-color: #fde68a; }
-    .cw-bad  { background: #fef2f2; border-color: #fecaca; }
+    .cw-good { background: var(--success-soft); border-color: var(--success-line); }
+    .cw-warn { background: var(--warning-soft); border-color: var(--warning-line); }
+    .cw-bad  { background: var(--danger-soft); border-color: var(--danger-line); }
     .cw-vlabel { font-size: 0.8rem; font-weight: 600; color: var(--muted); }
     .cw-vbody { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
     .cw-vamount { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink); }
@@ -739,7 +739,7 @@
     .cw-disp-sub { margin: 0.25rem 0 0; font-size: 0.78rem; color: var(--muted); }
     .cw-trnet td {
         border-top: 2px solid var(--border); font-weight: 700;
-        padding-top: 0.55rem; background: var(--surface-2, #fafaf9);
+        padding-top: 0.55rem; background: var(--surface-2);
     }
 
     /* Financial spine — cash_events as a clean Item/Amount table (prototype design
@@ -750,7 +750,7 @@
     }
     .cw-spine-title {
         margin: 0; padding: 0.5rem 0.75rem; font-size: 0.85rem; font-weight: 700;
-        background: var(--surface-2, #f5f5f4); color: var(--ink);
+        background: var(--bg-2); color: var(--ink);
         border-bottom: 1px solid var(--border);
     }
     .cw-table {
@@ -758,7 +758,7 @@
     }
     .cw-table th {
         text-align: left; padding: 0.5rem 0.75rem;
-        background: var(--surface-2, #fafaf9); color: var(--muted);
+        background: var(--surface-2); color: var(--muted);
         font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
         letter-spacing: 0.04em; border-bottom: 1px solid var(--border);
     }
@@ -783,8 +783,8 @@
     .cw-ev-label { font-size: 0.82rem; color: inherit; }
     .cw-ev-rec { font-size: 0.7rem; color: var(--muted); white-space: nowrap; margin-left: 0.3rem; }
     .cw-ev-amt { font-weight: 700; }
-    .cw-out { color: #b91c1c; }
-    .cw-in { color: #15803d; }
+    .cw-out { color: var(--danger); }
+    .cw-in { color: var(--success); }
     .cw-trempty td { font-size: 0.78rem; color: var(--muted); font-style: italic; }
 
     /* The Budget-breakdown opener — a calm full-width affordance under the table. */

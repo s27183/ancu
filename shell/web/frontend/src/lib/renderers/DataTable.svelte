@@ -583,7 +583,7 @@
         margin: 0 0 0.6rem;
         padding: 0.6rem 0.75rem;
         border-left: 3px solid var(--accent);
-        background: var(--accent-soft, #fff7ed);
+        background: var(--accent-soft);
         border-radius: 0 0.4rem 0.4rem 0;
     }
     .tx-reform-title {
@@ -629,7 +629,7 @@
         margin: 0.7rem 0 0.4rem;
         padding: 0.6rem 0.75rem;
         border-left: 3px solid var(--accent);
-        background: var(--accent-soft, #fff7ed);
+        background: var(--accent-soft);
         border-radius: 0 0.4rem 0.4rem 0;
     }
     .og-grad-title {

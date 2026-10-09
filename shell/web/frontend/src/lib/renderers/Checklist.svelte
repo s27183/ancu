@@ -300,7 +300,7 @@
         color: var(--ink);
     }
     .ck-item-risk {
-        border-left: 3px solid #f59e0b;
+        border-left: 3px solid var(--gold);
         padding-left: 0.5rem;
     }
     .ck-why {
@@ -337,10 +337,10 @@
         color: var(--muted);
         white-space: nowrap;
     }
-    .ck-status-done { color: #15803d; border-color: #a7f3d0; background: #ecfdf5; }
-    .ck-status-in_progress { color: #92400e; border-color: #fde68a; background: #fffbeb; }
-    .ck-status-scheduled { color: #1d4ed8; border-color: #bfdbfe; background: #eff6ff; }
-    .ck-status-at_risk { color: #b91c1c; border-color: #fecaca; background: #fef2f2; }
+    .ck-status-done { color: var(--success); border-color: var(--success-line); background: var(--success-soft); }
+    .ck-status-in_progress { color: var(--warning); border-color: var(--warning-line); background: var(--warning-soft); }
+    .ck-status-scheduled { color: var(--info); border-color: var(--info-line); background: var(--info-soft); }
+    .ck-status-at_risk { color: var(--danger); border-color: var(--danger-line); background: var(--danger-soft); }
     .ck-status-pending { color: var(--muted); }
     .ck-buffer-amt {
         margin: 0 0 0.3rem;
