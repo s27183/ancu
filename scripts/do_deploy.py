@@ -33,6 +33,7 @@ reproducible -> P-6 -> deploy scripts -> fill a DO app spec from .env, validate,
 """
 from __future__ import annotations
 
+import gzip
 import http.client
 import json
 import os
@@ -360,7 +361,10 @@ def cmd_logs(which: str, kind: str) -> None:
         die(f"no {kind} log for deployment {ds[0]['id']} ({ds[0].get('phase')})")
     for u in urls:
         with urllib.request.urlopen(u, timeout=60) as r:
-            sys.stdout.write(r.read().decode("utf-8", "replace"))
+            body = r.read()
+        if body[:2] == b"\x1f\x8b":  # the Spaces object is gzip (measured 2026-10-09)
+            body = gzip.decompress(body)
+        sys.stdout.write(body.decode("utf-8", "replace"))
 
 
 def main(argv: list[str]) -> None:
