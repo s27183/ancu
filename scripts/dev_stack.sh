@@ -21,6 +21,7 @@ logs="$root/.git/enacs-dev-stack"
 mkdir -p "$logs"
 
 export FH_HTTP_IP=127.0.0.1
+export FH_VITE_POLL=1   # a seat's sandbox delivers no fs events to vite (behavior 41)
 export FH_ENGINE_HTTP_PORT=8080 FH_SHELL_HTTP_PORT=8081
 export ENGINE_DATABASE_URL="postgres://$user@$enc/ancu_engine"
 export SHELL_DATABASE_URL="postgres://$user@$enc/ancu_shell"

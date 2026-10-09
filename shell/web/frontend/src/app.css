@@ -39,7 +39,8 @@
     --warm: #d4582a; /* coral-amber — highlights, the brand mark, news label */
     --warm-soft: #fbe9df;
     --gold: #e0a43a;
-    --brand-gradient: linear-gradient(135deg, #0d7a63 0%, #12937a 55%, #e0a43a 140%);
+    --brand-gradient: linear-gradient(135deg, #0d7a63 0%, #12937a 60%, #0b5a49 100%);
+    --gold-mark: #f3c766; /* the household star in the brand mark */
     --chrome-dark: #13243a; /* the news band */
     --chrome-dark-2: #1d3350;
     --pulse: #ff1f8f; /* saved-plans pulse on the map (map.ts) */
@@ -415,17 +416,20 @@ body {
 .brand-mark {
     display: grid;
     place-items: center;
-    width: 2rem;
-    height: 2rem;
-    border-radius: 0.6rem;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 0.65rem;
     background: var(--brand-gradient);
     color: var(--ink-inverse);
     box-shadow: var(--brand-glow);
     transition: transform var(--t-fast) var(--ease);
 }
 .brand-mark svg {
-    width: 1.15rem;
-    height: 1.15rem;
+    width: 1.65rem;
+    height: 1.65rem;
+}
+.brand-mark-home {
+    fill: var(--gold-mark);
 }
 .app-header .brand:hover .brand-mark {
     transform: rotate(-6deg) scale(1.05);
