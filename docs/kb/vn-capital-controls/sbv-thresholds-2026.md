@@ -28,7 +28,7 @@ Before this doc's quantitative content can leave placeholder status, verify agai
 
 1. The current **SBV circular governing foreign-exchange management for outward remittance / overseas investment by residents** (the FX management law + its implementing circulars — cite the specific circular number and effective date once sourced).
 2. A **licensed VN bank's own compliance/FX desk** guidance for outward property-investment remittances (a provider-primary, per [[kb-doc-authoring]]'s "ask Son for the source doc before resigning to placeholder" move).
-3. **VN legal counsel** engaged for the Mode-B wedge (strategy §9's named blocker) — the authoritative source for a regulated determination this specific, in a jurisdiction Rau does not operate a licensed presence in.
+3. **VN legal counsel** engaged for the Mode-B wedge (strategy §9's named blocker) — the authoritative source for a regulated determination this specific, in a jurisdiction the platform does not operate a licensed presence in.
 
 ## Buyer / funder pointer (what the plan says today)
 
