@@ -39,8 +39,8 @@ services:
       # ── Config (non-secret; committed) ──────────────────────────────────────────
       - key: FH_SHELL_HTTP_PORT
         value: "8081"
-      # The engine app's *.ondigitalocean.app ingress, which the shell calls
-      # server-side; do_deploy.py fills it from the live ancu-engine app.
+      # The engine app's *.ondigitalocean.app ingress + /api/engine, which the shell
+      # calls server-side; do_deploy.py fills it from the live ancu-engine app.
       - key: ENGINE_BASE_URL
         value: ""
       # Base for magic-link + Google redirect URIs and the SPA origin. The browser
