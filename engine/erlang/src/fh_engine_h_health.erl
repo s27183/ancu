@@ -1,6 +1,6 @@
 -module(fh_engine_h_health).
 
-%% GET /api/engine/health — readiness probe (engine-contract §2.1). No auth: a load
+%% GET /api/engine/health (and /health) — readiness probe (engine-contract §2.1). No auth: a load
 %% balancer / orchestrator must reach it without a tenant token.
 
 -export([init/2]).

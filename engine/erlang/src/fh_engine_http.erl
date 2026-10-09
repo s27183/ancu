@@ -30,6 +30,9 @@ child_spec() ->
 routes() ->
     [{'_', [
         {"/api/engine/health",                  fh_engine_h_health,     []},
+        %% The same probe at the root, as the shell serves it: deployment.md §5 and
+        %% behavior 33's Expect check https://<engine ingress>/health.
+        {"/health",                             fh_engine_h_health,     []},
         {"/api/engine/dev/tenants",             fh_engine_h_dev_provision, []},
         {"/api/engine/suburbs",                 fh_engine_h_suburbs,    []},
         {"/api/engine/news",                    fh_engine_h_news_feed,  []},

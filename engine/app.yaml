@@ -36,7 +36,8 @@ services:
     instance_size_slug: apps-s-1vcpu-1gb-fixed
     instance_count: 1
     health_check:
-      http_path: /health
+      # The contract's probe (engine-contract §2.1); /health answers too (fh_engine_http).
+      http_path: /api/engine/health
       # Boot runs migrations + loads the KB artifact before serving — a short delay
       # avoids a boot-time health flap.
       initial_delay_seconds: 60
