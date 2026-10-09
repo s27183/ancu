@@ -170,6 +170,9 @@
         if (flag) {
             banner = flag;
             history.replaceState(null, '', window.location.pathname);
+            // "You're signed in" is a confirmation, not a task: it clears itself so it
+            // never sits over a sheet. A failure flag stays until dismissed.
+            if (flag === 'ok') setTimeout(() => banner === 'ok' && (banner = null), 4000);
         }
         getAllNews().then((news) => (homeNews = news));
     });

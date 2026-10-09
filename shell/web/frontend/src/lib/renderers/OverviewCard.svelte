@@ -177,19 +177,19 @@
     }
     .ov-what-title {
         margin: 0 0 0.35rem;
-        font-size: 0.95rem;
+        font-size: var(--fs-md);
         font-weight: 700;
         color: var(--ink);
     }
     .ov-what-body {
         margin: 0;
-        font-size: 0.85rem;
+        font-size: var(--fs-sm);
         color: var(--muted);
         line-height: 1.5;
     }
     .ov-lead {
         margin: 0 0 0.75rem;
-        font-size: 0.95rem;
+        font-size: var(--fs-md);
         font-weight: 600;
         color: var(--ink);
     }
@@ -204,15 +204,15 @@
         gap: 0.2rem;
         padding: 0.6rem 0.7rem;
         border: 1px solid var(--border);
-        border-radius: 0.4rem;
+        border-radius: var(--radius-sm);
         background: var(--bg);
     }
     .ov-stat-label {
-        font-size: 0.72rem;
+        font-size: var(--fs-2xs);
         color: var(--muted);
     }
     .ov-stat-value {
-        font-size: 1rem;
+        font-size: var(--fs-md);
         font-weight: 700;
         color: var(--accent);
         font-variant-numeric: tabular-nums;
@@ -231,13 +231,13 @@
     }
     .ov-hint {
         margin: 0.1rem 0 0;
-        font-size: 0.8rem;
+        font-size: var(--fs-xs);
         font-style: italic;
         color: var(--muted);
     }
     .ov-partial {
         margin: 0.75rem 0 0;
-        font-size: 0.78rem;
+        font-size: var(--fs-xs);
         font-style: italic;
         color: var(--muted);
     }

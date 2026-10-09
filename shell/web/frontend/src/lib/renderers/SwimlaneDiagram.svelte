@@ -268,17 +268,17 @@
     /* ── shared cell body ─────────────────────────────────────────────── */
     .sw-item {
         margin: 0;
-        font-size: 0.72rem;
+        font-size: var(--fs-2xs);
         line-height: 1.3;
         color: var(--ink);
     }
     .sw-amount {
         align-self: flex-start;
-        font-size: 0.72rem;
+        font-size: var(--fs-2xs);
         font-weight: 700;
         font-variant-numeric: tabular-nums;
         padding: 0.05rem 0.35rem;
-        border-radius: 0.3rem;
+        border-radius: var(--radius-xs);
         background: color-mix(in srgb, var(--accent) 12%, transparent);
         color: var(--accent);
         white-space: nowrap;
@@ -298,12 +298,12 @@
     }
     .sw-tag {
         align-self: flex-start;
-        font-size: 0.62rem;
+        font-size: var(--fs-2xs);
         text-transform: uppercase;
         letter-spacing: 0.03em;
         color: var(--muted);
         border: 1px solid var(--border);
-        border-radius: 0.3rem;
+        border-radius: var(--radius-xs);
         padding: 0.02rem 0.3rem;
     }
 
@@ -317,7 +317,7 @@
         gap: 1px;
         background: var(--border);
         border: 1px solid var(--border);
-        border-radius: 0.4rem;
+        border-radius: var(--radius-sm);
         overflow: hidden;
         min-width: max-content;
     }
@@ -327,7 +327,7 @@
     .sw-phase {
         background: var(--bg);
         padding: 0.35rem 0.5rem;
-        font-size: 0.72rem;
+        font-size: var(--fs-2xs);
         font-weight: 700;
         color: var(--ink);
         text-align: center;
@@ -336,7 +336,7 @@
     .sw-actor {
         background: var(--bg);
         padding: 0.4rem 0.5rem;
-        font-size: 0.7rem;
+        font-size: var(--fs-2xs);
         font-weight: 600;
         color: var(--muted);
         position: sticky;
@@ -402,13 +402,13 @@
         border: 2px solid var(--surface);
     }
     .sw-ph-name {
-        font-size: 0.8rem;
+        font-size: var(--fs-xs);
         font-weight: 700;
         color: var(--ink);
     }
     .sw-ph-step {
         margin-left: auto;
-        font-size: 0.66rem;
+        font-size: var(--fs-2xs);
         color: var(--muted);
         font-variant-numeric: tabular-nums;
     }
@@ -425,10 +425,10 @@
         padding: 0.35rem 0.5rem;
         background: var(--surface);
         border: 1px solid var(--border);
-        border-radius: 0.4rem;
+        border-radius: var(--radius-sm);
     }
     .sw-srow-actor {
-        font-size: 0.66rem;
+        font-size: var(--fs-2xs);
         font-weight: 600;
         color: var(--muted);
         padding-top: 0.1rem;
@@ -440,10 +440,10 @@
         min-width: 0;
     }
     .sw-srow-body .sw-item {
-        font-size: 0.78rem;
+        font-size: var(--fs-xs);
     }
     .sw-srow-body .sw-amount {
-        font-size: 0.78rem;
+        font-size: var(--fs-xs);
     }
 
     @container (max-width: 600px) {
@@ -463,7 +463,7 @@
     }
     .sw-flows-title {
         margin: 0 0 0.5rem;
-        font-size: 0.85rem;
+        font-size: var(--fs-sm);
         font-weight: 700;
         color: var(--ink);
     }
@@ -478,7 +478,7 @@
         border-bottom: none;
     }
     .sw-flow-phase-name {
-        font-size: 0.72rem;
+        font-size: var(--fs-2xs);
         font-weight: 600;
         color: var(--accent);
         text-transform: uppercase;
@@ -495,7 +495,7 @@
     }
     .sw-flow-parties {
         display: block;
-        font-size: 0.78rem;
+        font-size: var(--fs-xs);
         font-weight: 600;
         color: var(--ink);
     }
@@ -506,7 +506,7 @@
         margin-top: 0.1rem;
     }
     .sw-flow-item {
-        font-size: 0.76rem;
+        font-size: var(--fs-xs);
         color: var(--muted);
     }
     .sw-flow-amt {

@@ -166,12 +166,12 @@
     }
     .rf-sev {
         flex: none;
-        font-size: 0.62rem;
+        font-size: var(--fs-2xs);
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.03em;
         padding: 0.05rem 0.4rem;
-        border-radius: 0.3rem;
+        border-radius: var(--radius-xs);
         border: 1px solid var(--border);
         color: var(--muted);
         white-space: nowrap;
@@ -193,14 +193,14 @@
     }
     .rf-what {
         flex: 1;
-        font-size: 0.88rem;
+        font-size: var(--fs-sm);
         font-weight: 600;
         color: var(--ink);
         line-height: 1.35;
     }
     .rf-caret {
         flex: none;
-        font-size: 0.75rem;
+        font-size: var(--fs-xs);
         color: var(--accent);
         align-self: center;
     }
@@ -208,12 +208,12 @@
     .rf-verdict {
         margin: 0 0 0.5rem;
         display: inline-block;
-        font-size: 0.72rem;
+        font-size: var(--fs-2xs);
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.03em;
         padding: 0.15rem 0.5rem;
-        border-radius: 0.3rem;
+        border-radius: var(--radius-xs);
         border: 1px solid var(--border);
         color: var(--muted);
     }
@@ -237,7 +237,7 @@
     }
     .rf-flags-h {
         margin: 0.7rem 0 0.4rem;
-        font-size: 0.78rem;
+        font-size: var(--fs-xs);
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.03em;
@@ -251,13 +251,13 @@
     }
     .rf-detail-mit {
         margin: 0;
-        font-size: 0.9rem;
+        font-size: var(--fs-sm);
         color: var(--ink);
         line-height: 1.45;
     }
     .rf-mit-k {
         display: block;
-        font-size: 0.72rem;
+        font-size: var(--fs-2xs);
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.03em;

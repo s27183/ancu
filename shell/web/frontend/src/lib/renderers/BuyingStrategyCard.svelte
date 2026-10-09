@@ -127,13 +127,13 @@
         margin-bottom: 0.35rem;
     }
     .bs-rowlabel {
-        font-size: 0.75rem;
+        font-size: var(--fs-xs);
         color: var(--muted);
     }
     .bs-track {
         position: relative;
         height: 0.9rem;
-        border-radius: 0.3rem;
+        border-radius: var(--radius-xs);
         background: var(--bg);
         border: 1px solid var(--border);
         overflow: hidden;
@@ -143,7 +143,7 @@
         top: 0;
         bottom: 0;
         left: 0;
-        border-radius: 0.2rem;
+        border-radius: var(--radius-xs);
     }
     /* walk-away = the floor of discipline (muted); yield anchor = the thesis cap; max bid
        = the willing ceiling (accent). One axis, three calm weights. */
@@ -157,7 +157,7 @@
         background: var(--accent);
     }
     .bs-val {
-        font-size: 0.8rem;
+        font-size: var(--fs-xs);
         font-weight: 600;
         color: var(--accent);
         font-variant-numeric: tabular-nums;
@@ -169,14 +169,14 @@
     }
     .bs-reasoning {
         margin: 0 0 0.6rem;
-        font-size: 0.85rem;
+        font-size: var(--fs-sm);
         color: var(--ink);
         line-height: 1.45;
         font-style: italic;
     }
     .bs-comp-note {
         margin: 0.2rem 0 0;
-        font-size: 0.82rem;
+        font-size: var(--fs-sm);
         color: var(--ink);
         line-height: 1.45;
     }
