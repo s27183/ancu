@@ -60,6 +60,9 @@
     // would re-trigger the same failure class for a still-broken network/CDN state).
     let basemapFailed = $state(false);
     const usingBasemap = $derived(!!PMTILES_URL && !basemapFailed);
+    $effect(() => {
+        basemap = usingBasemap;
+    });
     const mapStyle = $derived(usingBasemap ? basemapStyle(PMTILES_URL) : minimalStyle);
     // Insert the data BELOW the basemap's labels so place names stay on top of the dots
     // (undefined with no basemap → data on top, which is fine: there are no labels).
@@ -83,7 +86,8 @@
         pulseSaved = false,
         selected = null,
         onselect,
-        onzoom
+        onzoom,
+        basemap = $bindable(false)
     }: {
         suburbs: Suburb[];
         center: [number, number];
@@ -98,6 +102,9 @@
         onselect: (s: Suburb | null) => void;
         /** Reports the live map zoom up to the parent (drives the overview hint). */
         onzoom?: (z: number) => void;
+        /** Out: whether the Protomaps basemap is drawn — its credit then belongs in the
+         *  page's one "i" credit popup (behavior 43), not a MapLibre control. */
+        basemap?: boolean;
     } = $props();
 
     /** Fly to a suburb (the name combobox picks one). Zooms in enough to resolve it. */
@@ -225,7 +232,7 @@
     style={mapStyle}
     {center}
     {zoom}
-    attributionControl={usingBasemap ? { compact: true } : false}
+    attributionControl={false}
     autoloadGlobalCss={false}
     inlineStyle="position:absolute;inset:0"
     onerror={onMapError}

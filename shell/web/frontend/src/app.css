@@ -123,6 +123,10 @@
     --panel-bg: rgb(255 255 255 / 0.94);
     --panel-blur: saturate(1.2) blur(18px);
     --header-h: 3.5rem;
+    /* Phone safe areas (behavior 43): non-zero only with viewport-fit=cover on a
+       notched phone; 0 on desktop. Bars and sheets pad by these, never by literals. */
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 /* The shared glass surface — one rule every floating control opts into. */
@@ -984,52 +988,46 @@ main {
     cursor: pointer;
 }
 
-/* MapLibre's own basemap credit (compact "ⓘ") stacks ABOVE the sources chip in the
-   same corner instead of underneath it, so neither covers the other. Scoped under
-   .maplibregl-map: maplibre-gl.css loads after this file and would win a tie. */
-.maplibregl-map .maplibregl-ctrl-bottom-right {
-    bottom: 2.1rem;
-}
-.maplibregl-map .maplibregl-ctrl-bottom-right .maplibregl-ctrl-attrib {
-    margin: 0 0.75rem 0 0;
-    font-size: var(--fs-2xs);
-    border-radius: var(--radius-pill);
-}
-
-/* CC-BY attribution (§6.1) — required, but collapsed to a small chip bottom-right so
-   it stops eating a full-width strip. Click expands the source list. */
+/* Credits (behavior 43): one round "i" bottom-right; its popup holds the basemap
+   credit and every CC-BY source (§6.1). MapLibre's own attribution control is off.
+   The scrim under the open popup takes the outside tap that closes it. */
 .attribution {
     position: absolute;
-    bottom: 0.5rem;
+    bottom: calc(0.5rem + var(--safe-bottom));
     right: 0.75rem;
-    z-index: 10;
+    z-index: 26;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 0.3rem;
+    gap: var(--sp-2);
     max-width: min(80vw, 22rem);
+}
+.attr-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 25;
 }
 .attr-toggle {
     display: inline-flex;
     align-items: center;
-    gap: 0.3rem;
-    padding: 0.25rem 0.55rem;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
     border-radius: var(--radius-pill);
     border: 1px solid var(--glass-border);
     background: var(--glass-bg);
     -webkit-backdrop-filter: var(--glass-blur);
     backdrop-filter: var(--glass-blur);
     box-shadow: var(--shadow-1);
-    font-size: var(--fs-2xs);
-    font-weight: 600;
     color: var(--muted);
     cursor: pointer;
 }
-.attr-mark {
-    font-weight: 700;
+.attribution.open .attr-toggle {
+    color: var(--accent);
 }
-.attribution:not(.open) .attr-label {
-    /* collapsed: keep the label readable but tight */
+.attr-map a {
+    color: inherit;
 }
 .attr-list {
     display: flex;

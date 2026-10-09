@@ -42,6 +42,7 @@ const messages = {
         en: 'No saved plans yet. Create a plan to pin a suburb here.'
     },
     'map.sources': { vi: 'Nguồn dữ liệu', en: 'Data sources' },
+    'map.basemap': { vi: 'Bản đồ nền', en: 'Basemap' },
     'map.loading': { vi: 'Đang tải bản đồ…', en: 'Loading the map…' },
     'map.error': {
         vi: 'Không tải được dữ liệu khu vực. Vui lòng thử lại.',
