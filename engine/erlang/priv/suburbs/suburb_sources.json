@@ -1,0 +1,35 @@
+[
+ {
+  "attribution": "Australian Bureau of Statistics, Australian Statistical Geography Standard (ASGS) Edition 3, 2021",
+  "cadence": "per-edition",
+  "license": "CC BY 4.0",
+  "name": "Australian Statistical Geography Standard (ASGS) Edition 3 2021 — SAL boundaries",
+  "notes": "SAL_PT centroids (lon/lat, WGS84) → centroid_lat/lon. boundary_jsonb + lga/is_capital deferred (§6).",
+  "publisher": "Australian Bureau of Statistics",
+  "redistribution": "permitted",
+  "source_id": "abs_asgs_2021",
+  "url": "https://geo.abs.gov.au/arcgis/rest/services/ASGS2021/SAL/MapServer/2"
+ },
+ {
+  "attribution": "Australian Bureau of Statistics, Census of Population and Housing 2021",
+  "cadence": "5y",
+  "license": "CC BY 4.0",
+  "name": "Census of Population and Housing 2021 — G08 Ancestry",
+  "notes": "ANCP=5107 Vietnamese / _T Total persons, BPPP=_T; SAL-direct, no correspondence.",
+  "publisher": "Australian Bureau of Statistics",
+  "redistribution": "permitted",
+  "source_id": "abs_census_2021",
+  "url": "https://data.api.abs.gov.au/rest/data/C21_G08_SAL"
+ },
+ {
+  "attribution": "© State of Victoria (Department of Transport and Planning), Victorian Property Sales Report",
+  "cadence": "quarterly",
+  "license": "CC BY 4.0",
+  "name": "Victorian Property Sales Report (VPSR) — median by suburb (house/unit), quarterly",
+  "notes": "Human-staged .xls (Cloudflare-gated). Median by suburb → name→SAL crosswalk; facts_jsonb median_{house,unit}_price + _sales_qtr. NSW/QLD price are separate (§7).",
+  "publisher": "Valuer-General Victoria (Department of Transport and Planning)",
+  "redistribution": "permitted",
+  "source_id": "vic_vpsr",
+  "url": "https://discover.data.vic.gov.au/dataset/victorian-property-sales-report-median-house-by-suburb"
+ }
+]
