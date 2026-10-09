@@ -23,7 +23,7 @@ start(_StartType, _StartArgs) ->
             logger:info("engine Postgres pool started"),
             ok = fh_engine_migrations:run(),  %% raises on failure -> boot aborts
             ok = seed_shell_tenant(),         %% raises on a malformed seed -> aborts
-            ok = fh_engine_suburb_snapshot:load(), %% empty `suburbs` only (its block)
+            ok = fh_engine_suburb_snapshot:load(), %% when the shipped snapshot changed (its block)
             ok = fh_engine_kb:load(),         %% raises on failure -> boot aborts
             case fh_engine_sup:start_link() of
                 {ok, SupPid} ->
