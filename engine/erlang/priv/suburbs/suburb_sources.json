@@ -22,6 +22,17 @@
   "url": "https://data.api.abs.gov.au/rest/data/C21_G08_SAL"
  },
  {
+  "attribution": "Australian Bureau of Statistics, Socio-Economic Indexes for Areas (SEIFA) 2021",
+  "cadence": "5y",
+  "license": "CC BY 4.0",
+  "name": "Socio-Economic Indexes for Areas (SEIFA) 2021 — IRSAD",
+  "notes": "IRSAD; SCORE→score, RWAD→national decile, URP→population; SAL-direct, no correspondence.",
+  "publisher": "Australian Bureau of Statistics",
+  "redistribution": "permitted",
+  "source_id": "abs_seifa_2021",
+  "url": "https://data.api.abs.gov.au/rest/data/ABS_SEIFA2021_SAL"
+ },
+ {
   "attribution": "© State of Victoria (Department of Transport and Planning), Victorian Property Sales Report",
   "cadence": "quarterly",
   "license": "CC BY 4.0",
