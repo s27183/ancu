@@ -24,12 +24,21 @@ most "update the KB" asks are Track A.
 
 ## When it runs — triggers and cadence
 
-**This runs on demand, not on a schedule.** A Track A pass happens when the
-maintainer (Son + Claude Code, in a session together) says *"let's update the
-KB"* — prompted by the freshness scanner's overdue report (Phase 0) or by
-either of us noticing an external event (a Budget, a regime change, a
-bulletin). There is no cron job, no RSS watcher, no automation that runs this
-without a person starting it.
+**Track A is proposed weekly by a routine and published by Son.** The Claude Code
+routine "ancu kb-watch" ([kb-watch-routine.md](kb-watch-routine.md), behavior 57)
+runs every Monday 06:00 AEDT: it takes the 10 most overdue docs from the freshness
+scanner (Phase 0), re-verifies them against their primaries, drafts news notes from
+the watched government sites, runs the gates (Phases 1, 2, 4, 5) and opens one PR.
+It never merges or deploys: Phases 6–7 are Son's merge and deploy. Kind-2 and
+kind-3 changes are named in the PR body, not drafted, and are taken up in a session
+(Son + Claude Code) as before — which is also how an external event (a Budget, a
+regime change) is handled between runs.
+
+**Track B is reported monthly, rerun by hand.** The routine "ancu suburb-watch"
+([suburb-watch-routine.md](suburb-watch-routine.md), behavior 58) opens one issue on
+the 1st when a suburb source has a newer release than the one in
+`engine/build/suburbs/data/README.md`'s "Built from" table. The rerun writes the
+engine's suburb tables, so it stays Son's.
 
 The Monthly/Quarterly/Per-event labels below (defined in
 [architecture.md §11.2](architecture.md)) are **re-verification budgets** — the
