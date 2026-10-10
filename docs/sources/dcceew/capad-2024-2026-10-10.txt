@@ -1,0 +1,85 @@
+Source: https://www.dcceew.gov.au/environment/land/nrs/science/capad/2024
+Retrieved: 2026-10-10
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML e17c03ed027a0f611a1cf60fef5fdf8b15e2bb1eb0879f0243590066f0bf59d8
+
+Collaborative Australian Protected Areas Database 2024 - DCCEEW
+Skip to main content
+Skip to main navigation
+Skip to page navigation
+Skip to search
+Main menu
+Skip to main content
+Skip to page navigation
+Collaborative Australian Protected Areas Database 2024
+Last updated: 13 April 2026
+During 2024, we compiled information on terrestrial and marine protected areas from:
+Australian Government agencies
+state and territory nature conservation agencies
+Indigenous Protected Area (IPA) managers
+private protected area managers.
+The Collaborative Australian Protected Areas Database (CAPAD) 2024 is the result.
+CAPAD 2024 shows that on 30 June 2024, Australia had:
+14,575 terrestrial protected areas, covering 22.57% of Australia’s landmass
+319 marine protected areas and 11 Sea Country Indigenous Protected Areas that cover 48.9% of Australian waters.
+Since then, 10 Indigenous Protected Areas have been dedicated. These add more than 17.7 million additional hectares to Australia’s terrestrial protected areas. As of September 2025, terrestrial protected areas cover 24.92% of our landmass.
+Australia’s marine protected area estate also grew in this time and now covers 52% of Australian waters.
+CAPAD 2024 includes:
+Information on interim protected areas. These are land parcels identified to become protected areas. The process for formal recognition is underway.
+Sea Country IPAs. These areas were included in CAPAD for the first time in 2024. This recognises and respects First Nations peoples’ management of Sea Country. Their inclusion contributes to Australia’s domestic and international reporting on marine protection. However, because they are not created through a parliamentary process, they are not part of the National Representative System of Marine Protected Areas (NRSMPA).
+The Australian Government is continuing to work with data suppliers to improve data submitted to CAPAD. Find out more about the geographic and descriptive information provided in the technical specifications.
+CAPAD 2024 Technical Specifications
+Technical Specifications for CAPAD 2024 (PDF 379 KB)
+Technical Specifications for CAPAD 2024 (DOCX 118 KB)
+CAPAD 2024 Spatial Data
+GIS data for CAPAD 2024 is available on the Find Environmental Data (FED) website .
+Access to this data is by the Creative Commons Attribution (CC-BY) licence model. The information is available in ArcGIS format.
+The CAPAD 2024 dataset integrates terrestrial and marine spatial data into a single spatial layer for the first time. Area statistic reporting for the National Reserve System (NRS) and the NRSMPA remain separate.
+The combined data means that users can display terrestrial or marine areas individually or together.
+CAPAD 2024 Textual Data
+To reduce the size of the statistical summary spreadsheets and improve viewing abbreviations are used. Full descriptions of the abbreviations are available at:
+Protected Area Types and Governance Descriptions
+IUCN Guidelines for applying protected area management categories
+Terrestrial protected area statistics
+This is the CAPAD 2024 summary for all protected terrestrial areas in Australia:
+Terrestrial CAPAD 2024 National summary (XLSX 118 KB)
+This is the CAPAD 2024 summary for terrestrial protected areas managed by the Australian Government:
+Terrestrial CAPAD 2024 Commonwealth summary (XLSX 45 KB)
+These are the CAPAD 2024 jurisdictional summaries of terrestrial protected areas:
+Terrestrial CAPAD 2024 ACT summary (XLSX 46 KB)
+Terrestrial CAPAD 2024 NSW summary (XLSX 178 KB)
+Terrestrial CAPAD 2024 NT summary (XLSX 71 KB)
+Terrestrial CAPAD 2024 Qld summary (XLSX 204 KB)
+Terrestrial CAPAD 2024 SA summary (XLSX 304 KB)
+Terrestrial CAPAD 2024 Tas summary (XLSX 238 KB)
+Terrestrial CAPAD 2024 Vic summary (XLSX 417 KB)
+Terrestrial CAPAD 2024 WA summary (XLSX 273 KB)
+Marine protected area statistics
+This is the CAPAD 2024 summary for all protected marine areas in Australia:
+Marine CAPAD 2024 National summary (XLSX 27 KB)
+This is the CAPAD 2024 summary for marine protected areas managed by the Australian Government:
+Marine CAPAD 2024 Commonwealth summary (XLSX 46 KB)
+These are the CAPAD 2024 jurisdictional summaries of marine protected areas:
+Marine CAPAD 2024 NSW summary (XLSX 31 KB)
+Marine CAPAD 2024 NT summary (XLSX 26 KB)
+Marine CAPAD 2024 Qld summary (XLSX 42 KB)
+Marine CAPAD 2024 SA summary (XLSX 35 KB)
+Marine CAPAD 2024 Tas summary (XLSX 31 KB)
+Marine CAPAD 2024 Vic summary (XLSX 29 KB)
+Marine CAPAD 2024 WA summary (XLSX 35 KB)
+Read more
+About CAPAD
+Australian Protected Areas Dashboard and Maps
+CAPAD Abbreviations
+National Reserve System
+Thanks for your feedback.
+Thanks! Your feedback has been submitted.
+Please tell us more in your own words (do not provide personal details)
+We aren't able to respond to your individual comments or questions.
+To contact us directly phone us or submit an online inquiry
+CAPTCHA
+This question is for testing whether or not you are a human visitor and to prevent automated spam submissions.
+Was this page helpful
+Please verify that you are not a robot.
+Submit
+Skip
+Skip

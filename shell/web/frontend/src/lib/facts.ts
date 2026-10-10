@@ -25,7 +25,7 @@ export interface Fact {
     /** `statement` (behavior 44): no number — headline and caption carry the fact. */
     visual: 'bars' | 'series' | 'figure' | 'split' | 'growth' | 'statement';
     /** Absent on a statement. */
-    unit?: 'count' | 'people' | 'pct' | 'aud_k';
+    unit?: 'count' | 'people' | 'pct' | 'aud_k' | 'aud' | 'years';
     headline: Localized;
     caption: Localized;
     /** YYYY-MM */
@@ -69,9 +69,14 @@ export async function getFacts(fetchFn: typeof fetch = fetch): Promise<FactDoc[]
     }
 }
 
-// The display order of the sheet's two fact sections: where Vietnamese buyers stand,
-// then why Australian property (Son's brief, behavior 42).
-export const SECTION_ORDER = ['kb.facts.vietnamese-in-australia', 'kb.facts.australian-property'];
+// The display order of the sheet's fact sections: where Vietnamese buyers stand, then
+// why Australian property (Son's brief, behavior 42), then what settling there gives a
+// family (behavior 47: people buy because they mean to settle).
+export const SECTION_ORDER = [
+    'kb.facts.vietnamese-in-australia',
+    'kb.facts.australian-property',
+    'kb.facts.living-in-australia'
+];
 
 export function pick(l: Label | undefined, lang: Lang): string {
     if (!l) return '';
@@ -81,16 +86,23 @@ export function pick(l: Label | undefined, lang: Lang): string {
 const LOCALE: Record<Lang, string> = { vi: 'vi-VN', en: 'en-AU' };
 
 /** A figure as a reader says it: grouped digits, a % for shares, $…k / $…m for prices
- *  given in $'000. */
+ *  given in $'000, dollars and cents for a wage or a fee. A figure keeps the decimals
+ *  its source gives (24.92%, 12.8, 81.1 years — behavior 47), up to two. */
 export function formatValue(n: number, unit: Fact['unit'], lang: Lang): string {
     const nf = (v: number, digits = 0) =>
         new Intl.NumberFormat(LOCALE[lang], {
             maximumFractionDigits: digits,
             minimumFractionDigits: 0
         }).format(v);
-    if (unit === 'pct') return `${nf(n, 1)}%`;
+    if (unit === 'pct') return `${nf(n, 2)}%`;
     if (unit === 'aud_k') return n >= 1000 ? `$${nf(n / 1000, 2)}m` : `$${nf(n)}k`;
-    return nf(n);
+    if (unit === 'aud')
+        return `$${new Intl.NumberFormat(LOCALE[lang], {
+            minimumFractionDigits: Number.isInteger(n) ? 0 : 2,
+            maximumFractionDigits: 2
+        }).format(n)}`;
+    if (unit === 'years') return lang === 'vi' ? `${nf(n, 2)} tuổi` : `${nf(n, 2)} yrs`;
+    return nf(n, 2);
 }
 
 /** "Mar 2026" / "tháng 3/2026" from YYYY-MM. */
@@ -112,6 +124,16 @@ const PUBLISHERS: Record<string, Localized> = {
     },
     'www.homeaffairs.gov.au': { en: 'Department of Home Affairs', vi: 'Bộ Nội vụ Úc' },
     'www.abs.gov.au': { en: 'Australian Bureau of Statistics', vi: 'Cục Thống kê Úc (ABS)' },
+    'www.dcceew.gov.au': {
+        en: 'Department of Climate Change, Energy, the Environment and Water',
+        vi: 'Bộ Biến đổi Khí hậu, Năng lượng, Môi trường và Nước Úc'
+    },
+    'www.health.gov.au': { en: 'Department of Health', vi: 'Bộ Y tế Úc' },
+    'www.pbs.gov.au': {
+        en: 'Pharmaceutical Benefits Scheme',
+        vi: 'Chương trình Trợ giá Thuốc (PBS)'
+    },
+    'www.fairwork.gov.au': { en: 'Fair Work Ombudsman', vi: 'Thanh tra Lao động Công bằng (Fair Work)' },
     'www.qld.gov.au': { en: 'Queensland Government', vi: 'Chính quyền bang Queensland' },
     'www.planning.act.gov.au': { en: 'ACT Planning', vi: 'Cơ quan Quy hoạch ACT' }
 };

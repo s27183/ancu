@@ -1,0 +1,78 @@
+Source: https://www.health.gov.au/topics/medicare/about
+Retrieved: 2026-10-10
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML 38595558ade4caa131f65d36647e2208151e1b4ff4db3ecf7714192031da9dcd
+
+About Medicare | Australian Government Department of Health, Disability and Ageing
+Medicare
+About Medicare
+Medicare pays for some or all of the costs of various medical services, including services delivered in public and private hospitals. It ensures all Australians have equitable access to health care when they need it, regardless of where they live or their ability to pay.
+Listen
+Print
+Share
+X (Twitter)
+Facebook
+Email
+Loading...
+What Medicare is
+Medicare is Australia’s universal health insurance scheme. It guarantees all Australians (and some overseas visitors) access to a wide range of health and hospital services at low or no cost.
+Benefits of Medicare
+Medicare helps Australians with the costs of the health care they need, regardless of where they live or their ability to pay.
+What Medicare covers
+Medicare subsidises the costs of:
+hospital services
+medical services
+tests, imaging, and scans.
+Read more about what Medicare does and does not cover .
+The Medicare Benefits Schedule (MBS) describes the medical services, hospital services, tests, imaging and scans subsidised by Medicare.
+If you have a Medicare card you can access the Pharmaceutical Benefits Scheme (PBS) for certain subsidised medicines and other medicinal products.
+Medicare also provides funding to state and territory governments for hospital services under the National Health Reform Agreement .
+Eligibility for Medicare
+To be eligible for Medicare, you must:
+be an Australian or New Zealand citizen
+be an Australian permanent resident
+have applied for permanent residency (some conditions apply)
+be a temporary resident covered by a ministerial order
+be a citizen or permanent resident of Norfolk Island, Cocos Islands, Christmas Island or Lord Howe Island.
+If you’re eligible, you must enrol in Medicare to access benefits . You may also be eligible if you're visiting from a Reciprocal Health Care Agreement country.
+How to access Medicare
+To access Medicare:
+check whether you are eligible
+enrol to get your Medicare card
+set up your Medicare online account and register your bank account details to get your rebate payments
+claim as required .
+Read more about how Medicare cards and accounts work .
+You must present your card when you:
+see a doctor
+go to a hospital as a public patient
+get a medical test done
+get prescription medicines listed on the PBS .
+Not all health practitioners bulk bill , so always check what you will have to pay when making your appointment.
+Find out about the cost of Medicare .
+If you don’t want to carry your card, you can download the Express Plus Medicare mobile app for a digital copy of your card.
+You can use My Health Record to access and keep track of all your health care, tests results and medicines.
+Medicare doesn’t cover all health services. Read more about what Medicare covers .
+Read more about accessing Medicare for health practitioners and industry .
+Who manages Medicare
+We develop and manage national Medicare policies, and advise the Australian Government on decisions about:
+what services and medicines to subsidise
+benefit amounts
+safety net thresholds .
+Services Australia can help you with:
+getting a Medicare card
+claiming benefits
+information about entitlements and rebates .
+State, territory and local governments deliver and manage public health services and regulate private hospitals.
+The Australian Health Practitioner Regulation Agency (Ahpra) regulates registered health professionals in Australia.
+Read more about what we’re doing about Medicare .
+Medicare reporting
+We publish statistics about the use of Medicare, including about the:
+use of fully paid and bulk-billed services
+benefits paid
+health services people have used.
+You can also create your own statistical reports for MBS and PBS items and categories.
+Date last updated:
+20 December 2022
+Tags:
+Medicare
+In this section
+Medicare

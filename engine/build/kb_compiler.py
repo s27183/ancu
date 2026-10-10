@@ -168,7 +168,7 @@ def news_source_host_error(src):
 # it. A fact may cite more than one source (`source: [3, 4]`, a rule and its exception
 # from two agencies); its quotes are then found in any of them.
 FACT_VISUALS = ("bars", "series", "figure", "split", "growth", "statement")
-FACT_UNITS = ("count", "people", "pct", "aud_k")
+FACT_UNITS = ("count", "people", "pct", "aud_k", "aud", "years")
 
 
 def normalize_ws(s):
@@ -197,6 +197,7 @@ def parse_facts_doc(path):
     slug_m = re.search(r"^slug:\s*(\S+)", text, re.M)
     eff_m = re.search(r"^effective_from:\s*(\S+)", text, re.M)
     ver_m = re.search(r"^last_verified:\s*(\S+)", text, re.M)
+    recent_m = re.search(r"^recent_since:\s*(\S+)", text, re.M)
     block = fenced_jsonc_after(text, "## Facts")
     body, error = None, None
     if block is None:
@@ -210,6 +211,7 @@ def parse_facts_doc(path):
         "slug": slug_m.group(1) if slug_m else None,
         "effective_from": eff_m.group(1) if eff_m else None,
         "last_verified": ver_m.group(1) if ver_m else None,
+        "recent_since": recent_m.group(1) if recent_m else None,
         "sources": parse_sources_block(text),
         "body": body,
         "error": error,
@@ -246,6 +248,16 @@ def facts_doc_fails(slug, doc, kb_docs):
     facts = body.get("facts") or []
     if not facts:
         out.append(f"[facts] {slug}: no facts")
+    # Regulated figures are grounded -> P-7 -> The KB compiler -> a fact doc can hold its figures to a recency floor
+    # Behavior 47 (Son, 2026-10-10: "select facts that have recent figures"): the
+    # "Settling in Australia" section shows only figures dated 2024 or later. A doc says so
+    # with frontmatter `recent_since: YYYY-MM`, and every fact's `as_of` must be on or after
+    # it — per doc, because the Vietnamese-buyers doc rightly keeps Census 2021, the latest
+    # census there is. YYYY-MM strings compare in date order.
+    recent = doc.get("recent_since")
+    if recent is not None and not re.match(r"^\d{4}-\d{2}$", recent):
+        out.append(f"[facts] {slug}: recent_since must be YYYY-MM")
+        recent = None
     ids = set()
     for f in facts:
         fid = f.get("id") or "?"
@@ -253,6 +265,8 @@ def facts_doc_fails(slug, doc, kb_docs):
         if fid in ids:
             out.append(f"{where}: duplicate id")
         ids.add(fid)
+        if recent and str(f.get("as_of") or "") < recent:
+            out.append(f"{where}: as_of {f.get('as_of')!r} is before the doc's recent_since {recent}")
         if f.get("visual") not in FACT_VISUALS:
             out.append(f"{where}: visual {f.get('visual')!r} not one of {FACT_VISUALS}")
         statement = f.get("visual") == "statement"
@@ -361,7 +375,7 @@ def quoted_number(n, text):
     """True if `n` appears in `text` as written in a source (318,760 / 1,487.6 / 30.6)."""
     forms = {f"{n:,}", str(n)}
     if isinstance(n, float):
-        forms |= {f"{n:,.1f}", f"{n:.1f}"}
+        forms |= {f"{n:,.1f}", f"{n:.1f}", f"{n:,.2f}"}  # $25.00 as the PBS writes it
         if n.is_integer():
             forms |= {f"{int(n):,}", str(int(n))}
     return any(re.search(rf"(?<![\d.,]){re.escape(x)}(?![\d]|[.,]\d)", text) for x in forms)
