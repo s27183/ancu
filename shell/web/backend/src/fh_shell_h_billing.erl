@@ -55,6 +55,10 @@ webhook(Req0) ->
 %% must wire Stripe), a Stripe/transport failure is 502, an unknown tier is 400.
 subscribe(Req0) ->
     case fh_shell_http:authenticate_user(Req0) of
+        {ok, #{<<"roles">> := [<<"guest">>]}} ->
+            %% A guest (its roles are exactly [guest], fh_shell_guest:start/1) has no
+            %% account to bill (behavior 45): sign in first.
+            fh_shell_guest:refuse(Req0);
         {ok, #{<<"user_id">> := UserId}} ->
             case fh_shell_http:read_json_body(Req0) of
                 {ok, Body, Req1} ->
@@ -86,6 +90,10 @@ subscribe_tier(_UserId, _Tier, Req) ->
 %% the secret key → 503; a Stripe/transport failure → 502; an unknown kind → 400.
 charge(Req0) ->
     case fh_shell_http:authenticate_user(Req0) of
+        {ok, #{<<"roles">> := [<<"guest">>]}} ->
+            %% A guest (its roles are exactly [guest], fh_shell_guest:start/1) has no
+            %% account to bill (behavior 45): sign in first.
+            fh_shell_guest:refuse(Req0);
         {ok, #{<<"user_id">> := UserId}} ->
             case fh_shell_http:read_json_body(Req0) of
                 {ok, Body, Req1} ->

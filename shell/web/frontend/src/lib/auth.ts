@@ -7,7 +7,10 @@
 
 export interface Session {
     user_id: string;
-    email: string;
+    /** null for a guest (behavior 45): a session with no account behind it. */
+    email: string | null;
+    /** True for a guest session — a plan built without signing in, kept 7 days. */
+    guest?: boolean;
     roles: string[];
     locale: 'vi' | 'en';
 }

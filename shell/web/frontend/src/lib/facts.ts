@@ -22,14 +22,16 @@ export interface FactItem {
 
 export interface Fact {
     id: string;
-    visual: 'bars' | 'series' | 'figure' | 'split' | 'growth';
-    unit: 'count' | 'people' | 'pct' | 'aud_k' | 'aud' | 'years';
+    /** `statement` (behavior 44): no number — headline and caption carry the fact. */
+    visual: 'bars' | 'series' | 'figure' | 'split' | 'growth' | 'statement';
+    /** Absent on a statement. */
+    unit?: 'count' | 'people' | 'pct' | 'aud_k' | 'aud' | 'years';
     headline: Localized;
     caption: Localized;
     /** YYYY-MM */
     as_of: string;
-    /** Index into the doc's `sources`. */
-    source: number;
+    /** Index into the doc's `sources`, or several (a rule and its exception). */
+    source: number | number[];
     value?: number;
     compare?: { label: Label; value: number };
     items?: FactItem[];
@@ -131,8 +133,16 @@ const PUBLISHERS: Record<string, Localized> = {
         en: 'Pharmaceutical Benefits Scheme',
         vi: 'Chương trình Trợ giá Thuốc (PBS)'
     },
-    'www.fairwork.gov.au': { en: 'Fair Work Ombudsman', vi: 'Thanh tra Lao động Công bằng (Fair Work)' }
+    'www.fairwork.gov.au': { en: 'Fair Work Ombudsman', vi: 'Thanh tra Lao động Công bằng (Fair Work)' },
+    'www.qld.gov.au': { en: 'Queensland Government', vi: 'Chính quyền bang Queensland' },
+    'www.planning.act.gov.au': { en: 'ACT Planning', vi: 'Cơ quan Quy hoạch ACT' }
 };
+
+/** The sources a fact cites, in its own order. */
+export function factSources(doc: FactDoc, fact: Fact): FactSource[] {
+    const idx = Array.isArray(fact.source) ? fact.source : [fact.source];
+    return idx.map((i) => doc.sources[i]).filter((s): s is FactSource => !!s);
+}
 
 export function publisher(src: FactSource | undefined, lang: Lang): string {
     if (!src?.url) return '';
