@@ -12,6 +12,7 @@
     import { lang } from '$lib/stores/lang';
     import { t } from '$lib/i18n';
     import FactVisual from '$lib/FactVisual.svelte';
+    import Sparkle from '$lib/Sparkle.svelte';
     import {
         type FactDoc,
         SECTION_ORDER,
@@ -228,6 +229,11 @@
                             </span>
                             <strong>{$t('intro.value.you.title')}</strong>
                             <span>{$t('intro.value.you.body')}</span>
+                        </li>
+                        <li>
+                            <span class="wl-ico wl-ico-ai" aria-hidden="true"><Sparkle size="1.1rem" /></span>
+                            <strong>{$t('intro.value.ai.title')}</strong>
+                            <span>{$t('intro.value.ai.body')}</span>
                         </li>
                         <li>
                             <span class="wl-ico" aria-hidden="true">
@@ -594,6 +600,7 @@
         grid-template-columns: 2.5rem 1fr;
         column-gap: var(--sp-3);
         row-gap: 0.15rem;
+        align-content: start;
         font-size: var(--fs-sm);
         color: var(--ink-2);
         line-height: 1.5;
@@ -614,6 +621,10 @@
         border-radius: var(--radius-sm);
         background: var(--surface);
         box-shadow: var(--shadow-1);
+    }
+    /* Behavior 59: the assistant's sparkle is filled (Sparkle.svelte), not stroked. */
+    .wl-ico-ai {
+        color: var(--accent);
     }
     .wl-ico svg {
         width: 1.35rem;
@@ -782,10 +793,11 @@
             margin-left: var(--sp-6);
             margin-right: var(--sp-6);
         }
-        /* The two position statements frame the card full-width; the three
-           capabilities sit between them three-up. */
+        /* The two position statements frame the card full-width; the four
+           capabilities (the AI assistant added by behavior 59) sit between them
+           two-up, so no row is left with one item. */
         .wl-value ul {
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr);
         }
         .wl-value li:first-child,
         .wl-value li:last-child {

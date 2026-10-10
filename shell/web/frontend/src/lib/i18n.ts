@@ -1140,8 +1140,8 @@ const messages = {
         en: 'Owning real estate in Australia — with a clear plan'
     },
     'intro.lede': {
-        vi: `${BRAND} lập kế hoạch ngân sách cho cả hành trình bất động sản của bạn tại Úc — mua, giữ, bán — cho từng khu vực cụ thể, với các chỉ số chính của khu vực đó, theo quy định hiện hành và tối ưu cho hoàn cảnh của bạn.`,
-        en: `${BRAND} builds a budget plan for your whole Australian property journey — buy, hold, sell — for a specific suburb, with that suburb's key indicators in view, under current regulations and optimised for your situation.`
+        vi: `${BRAND} lập kế hoạch ngân sách cho cả hành trình bất động sản của bạn tại Úc — mua, giữ, bán — cho từng khu vực cụ thể, với các chỉ số chính của khu vực đó, theo quy định hiện hành và tối ưu cho hoàn cảnh của bạn. Mỗi kế hoạch có một trợ lý AI trả lời câu hỏi của bạn về chính kế hoạch đó.`,
+        en: `${BRAND} builds a budget plan for your whole Australian property journey — buy, hold, sell — for a specific suburb, with that suburb's key indicators in view, under current regulations and optimised for your situation. Each plan comes with an AI assistant that answers your questions about it.`
     },
     // Behavior 44: the first screen leads to the platform's position in one tap
     // (invariants.md, the goal: independent; information as is, not an advice service).
@@ -1179,6 +1179,13 @@ const messages = {
     'intro.value.info.body': {
         vi: 'Các con số được tính từ quy định hiện hành — không có AI nào viết ra một con số theo quy định — và được tổng hợp thành thông tin, cung cấp nguyên trạng. Đây không phải dịch vụ tư vấn pháp lý, thuế hay tài chính, cũng không phải lời khuyên dành riêng cho bất kỳ ai.',
         en: 'The figures are calculated from current regulations — no AI writes a regulated figure — and aggregated as information, provided as is. This is not a legal, tax or financial advice service, and not a recommendation for any one person.'
+    },
+    // Behavior 59: the sheet names the plan's AI assistant (behavior 55); the facts are
+    // chat.intro's, and the last sentence agrees with intro.value.info.body.
+    'intro.value.ai.title': { vi: 'Hỏi trợ lý AI', en: 'Ask the AI assistant' },
+    'intro.value.ai.body': {
+        vi: 'Trợ lý AI đọc chính kế hoạch của bạn, gồm các con số và quy định có trích nguồn, rồi trả lời bằng tiếng Việt và tiếng Anh — mỗi ngày một câu hỏi, sau khi đăng nhập. Trợ lý không tự viết ra con số theo quy định nào, và câu trả lời là thông tin, không phải tư vấn.',
+        en: 'The AI assistant reads your plan, its own figures and cited rules, and answers in Vietnamese and English — one question a day, once you sign in. It never writes a regulated figure, and its answers are information, not advice.'
     },
     'intro.cta': { vi: 'Khám phá bản đồ', en: 'Explore the map' },
     'intro.cta.hint': {
