@@ -43,6 +43,8 @@
     import NewsListSheet from '$lib/NewsListSheet.svelte';
     import NewsDetailSheet from '$lib/NewsDetailSheet.svelte';
     import Welcome from '$lib/Welcome.svelte';
+    import Tour from '$lib/Tour.svelte';
+    import { tourStep, tourRun, tourEvent, endTour } from '$lib/tour';
     import { t, type MessageKey } from '$lib/i18n';
 
     // NB: never name a $state var `state` — svelte-check reads it as a store subscribe.
@@ -163,6 +165,40 @@
     }
 
     const view = $derived(STATE_VIEW[auState]);
+
+    // --- The first-visit tour (behavior 52; flow in tour.ts) ---------------------------
+    // It follows the suburb sheet opening and closing…
+    $effect(() => {
+        tourEvent(selected ? 'suburb' : 'unsuburb');
+    });
+    // …starts from the bare map (a replay may begin over an open sheet)…
+    let seenRun = 0;
+    $effect(() => {
+        if ($tourRun === seenRun) return;
+        seenRun = $tourRun;
+        planning = false;
+        selected = null;
+    });
+    // …and shows the suburb search on step 1, the control it points at.
+    $effect(() => {
+        if ($tourStep === 1) controlsOpen = true;
+    });
+    // "Try Cabramatta": fly there and open its sheet, as a pick from the search does.
+    // Outside the loaded scope it switches to NSW first and picks once that has loaded.
+    const TRY_SUBURB = { name: 'Cabramatta', scope: 'NSW' as MapScope };
+    let tryPending = $state(false);
+    function tryTourSuburb() {
+        const s = suburbs.find((x) => x.name === TRY_SUBURB.name);
+        if (s) return pickSuburb(s);
+        tryPending = true;
+        auState = TRY_SUBURB.scope;
+    }
+    $effect(() => {
+        if (!tryPending || loading || loadedScope !== TRY_SUBURB.scope) return;
+        tryPending = false;
+        const s = suburbs.find((x) => x.name === TRY_SUBURB.name);
+        if (s) pickSuburb(s);
+    });
 
     // On load: learn the session, and surface any ?signin=… feedback from a redeem /
     // OAuth redirect, then strip the query so a reload doesn't replay it (§7.1 calm).
@@ -339,6 +375,7 @@
         <button
             type="button"
             class="controls-toggle"
+            data-tour="controls"
             aria-expanded={controlsOpen}
             aria-label={$t('map.filters')}
             onclick={() => (controlsOpen = !controlsOpen)}
@@ -390,44 +427,46 @@
 
                 <!-- Saved-plans filter — signed-in only (no saved plans = a dead control
                      when logged out). The checkbox restricts the map to suburbs that have
-                     a saved plan (bright pulse); the combobox narrows further by name. -->
-                {#if $session}
-                    <div class="control control-saved">
+                     a saved plan (bright pulse); the combobox narrows further by name. The
+                     name search is for everyone (behavior 52: the tour's first bubble points
+                     at it, and a guest can build a plan since behavior 45). -->
+                <div class="control control-saved">
+                    {#if $session}
                         <label class="checkbox">
                             <input type="checkbox" bind:checked={savedOnly} />
                             <span>{$t('filter.saved')}</span>
                         </label>
-                        <div class="combo">
-                            <input
-                                type="text"
-                                class="combo-input"
-                                placeholder={$t('filter.name.placeholder')}
-                                bind:value={nameQuery}
-                                onfocus={() => (comboFocused = true)}
-                                autocomplete="off"
-                            />
-                            {#if comboFocused && suggestions.length}
-                                <ul class="combo-list">
-                                    {#each suggestions as s (s.sal_code)}
-                                        <li>
-                                            <button type="button" onclick={() => pickSuburb(s)}>
-                                                <span class="combo-name">{s.name}</span>
-                                                <span class="combo-state">{s.state}</span>
-                                            </button>
-                                        </li>
-                                    {/each}
-                                </ul>
-                            {:else if comboFocused && fold(nameQuery)}
-                                <ul class="combo-list">
-                                    <li class="combo-empty">{$t('filter.nomatch')}</li>
-                                </ul>
-                            {/if}
-                        </div>
-                        {#if savedOnly && savedTitles.size === 0}
-                            <p class="filter-hint">{$t('filter.saved.empty')}</p>
+                    {/if}
+                    <div class="combo" data-tour="search">
+                        <input
+                            type="text"
+                            class="combo-input"
+                            placeholder={$t('filter.name.placeholder')}
+                            bind:value={nameQuery}
+                            onfocus={() => (comboFocused = true)}
+                            autocomplete="off"
+                        />
+                        {#if comboFocused && suggestions.length}
+                            <ul class="combo-list" data-tour-part>
+                                {#each suggestions as s (s.sal_code)}
+                                    <li>
+                                        <button type="button" onclick={() => pickSuburb(s)}>
+                                            <span class="combo-name">{s.name}</span>
+                                            <span class="combo-state">{s.state}</span>
+                                        </button>
+                                    </li>
+                                {/each}
+                            </ul>
+                        {:else if comboFocused && fold(nameQuery)}
+                            <ul class="combo-list" data-tour-part>
+                                <li class="combo-empty">{$t('filter.nomatch')}</li>
+                            </ul>
                         {/if}
                     </div>
-                {/if}
+                    {#if savedOnly && savedTitles.size === 0}
+                        <p class="filter-hint">{$t('filter.saved.empty')}</p>
+                    {/if}
+                </div>
             </div>
         {/if}
     </div>
@@ -510,6 +549,7 @@
                 onplan={() => {
                     restoreAnswers = undefined;
                     planning = true;
+                    tourEvent('onboarding');
                 }}
             />
         {/key}
@@ -528,8 +568,12 @@
                 // /api/me so the plan shows the 7-day notice.
                 void refreshSession();
             }}
-            onclose={() => (planning = false)}
+            onclose={() => {
+                planning = false;
+                tourEvent('onboarding-closed');
+            }}
             onsignin={(answers) => {
+                endTour();
                 if (selected)
                     savePending({
                         sal: selected.sal_code,
@@ -563,4 +607,5 @@
 
     <!-- First visit: the case for Australian property, then a launcher to reopen it (behavior 42). -->
     <Welcome />
+    <Tour ontry={tryTourSuburb} />
 </div>
