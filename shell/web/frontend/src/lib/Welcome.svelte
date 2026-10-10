@@ -150,6 +150,15 @@
                                     <h4>{pick(fact.headline, $lang)}</h4>
                                     <FactVisual {fact} />
                                     <p class="wl-caption">{pick(fact.caption, $lang)}</p>
+                                    {#if fact.note}
+                                        {@const nsrc = doc.sources[fact.note_sources?.[0] ?? -1]}
+                                        <p class="wl-fact-note">
+                                            {pick(fact.note, $lang)}
+                                            {#if nsrc?.url}<a href={nsrc.url} target="_blank" rel="noopener noreferrer"
+                                                    >{publisher(nsrc, $lang)}</a
+                                                >{/if}
+                                        </p>
+                                    {/if}
                                     <p class="wl-src">
                                         {$t('intro.source')}:
                                         {#if src?.url}<a href={src.url} target="_blank" rel="noopener noreferrer"
@@ -454,6 +463,21 @@
         margin: 0;
         font-size: var(--fs-xs);
         color: var(--ink-2);
+    }
+    .wl-fact-note {
+        margin: 0;
+        padding: var(--sp-2) var(--sp-3);
+        background: var(--info-soft, var(--surface-2));
+        border-radius: var(--radius-xs);
+        font-size: var(--fs-2xs);
+        line-height: 1.5;
+        color: var(--ink-2);
+    }
+    .wl-fact-note a {
+        color: var(--accent);
+        font-weight: 600;
+        text-decoration: none;
+        white-space: nowrap;
     }
     .wl-src {
         margin: auto 0 0;
