@@ -49,6 +49,7 @@
         DEFAULT_SIZE_BY,
         PULSE,
         PULSE_RIM,
+        PULSE_RECENT,
         type SizeBy
     } from '$lib/map';
     import { ensurePmtilesProtocol } from '$lib/pmtiles';
@@ -85,6 +86,7 @@
         sizeBy = DEFAULT_SIZE_BY,
         pulseSaved = false,
         selected = null,
+        recent = null,
         onselect,
         onzoom,
         basemap = $bindable(false)
@@ -99,6 +101,9 @@
         /** The currently-selected suburb — gets a prominent pulse wherever it is (saved
          *  or not), so the click/combobox target is unmistakable on the map. */
         selected?: Suburb | null;
+        /** The suburb whose sheet was just closed (behavior 54) — a jade pulse, so the
+         *  visitor can find where they just were. Null while a sheet is open. */
+        recent?: Suburb | null;
         onselect: (s: Suburb | null) => void;
         /** Reports the live map zoom up to the parent (drives the overview hint). */
         onzoom?: (z: number) => void;
@@ -139,32 +144,38 @@
 
     // --- Pulse highlight -----------------------------------------------------
     // ONE bright pulse signal — a solid centre dot + an expanding ring animated by rAF
-    // — shared by (a) the saved suburbs in saved-only mode and (b) the SELECTED suburb
-    // (saved or not). The ring is JS-driven (MapLibre paint can't read time), so we
+    // — shared by (a) the saved suburbs in saved-only mode, (b) the SELECTED suburb
+    // (saved or not) and, in jade, (c) the suburb just closed (behavior 54). The ring is JS-driven (MapLibre paint can't read time), so we
     // re-derive its paint each frame — fine for a handful of points. prefers-reduced-
     // motion → a static mid-expansion ring (no animation).
 
-    // The selected suburb as a 0/1-feature source for its own (always-on) pulse.
-    const selectedData = $derived({
-        type: 'FeatureCollection',
-        features: selected?.centroid
-            ? [
-                  {
-                      type: 'Feature' as const,
-                      geometry: {
-                          type: 'Point' as const,
-                          coordinates: [selected.centroid.lon, selected.centroid.lat]
-                      },
-                      properties: {}
-                  }
-              ]
-            : []
-    } satisfies FeatureCollection<Point>);
+    // A suburb as a 0/1-feature source for its own (always-on) pulse.
+    function onePoint(s: Suburb | null): FeatureCollection<Point> {
+        return {
+            type: 'FeatureCollection',
+            features: s?.centroid
+                ? [
+                      {
+                          type: 'Feature' as const,
+                          geometry: {
+                              type: 'Point' as const,
+                              coordinates: [s.centroid.lon, s.centroid.lat]
+                          },
+                          properties: {}
+                      }
+                  ]
+                : []
+        };
+    }
+    const selectedData = $derived(onePoint(selected));
     const hasSelectedPoint = $derived(!!selected?.centroid);
+    // The just-closed suburb (behavior 54): same shape, jade instead of magenta.
+    const recentData = $derived(onePoint(recent));
+    const hasRecentPoint = $derived(!!recent?.centroid);
 
     let pulse = $state(0); // 0→1→0 eased ring progress
     $effect(() => {
-        if (!pulseSaved && !hasSelectedPoint) return;
+        if (!pulseSaved && !hasSelectedPoint && !hasRecentPoint) return;
         const reduce =
             typeof matchMedia === 'function' &&
             matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -201,6 +212,15 @@
         'circle-stroke-color': PULSE,
         'circle-stroke-width': 3,
         'circle-stroke-opacity': 0.85 * (1 - pulse)
+    } satisfies CircleLayerSpecification['paint']);
+
+    const recentDotPaint = {
+        ...dotPaint,
+        'circle-color': PULSE_RECENT
+    } satisfies CircleLayerSpecification['paint'];
+    const recentRingPaint = $derived({
+        ...ringPaint,
+        'circle-stroke-color': PULSE_RECENT
     } satisfies CircleLayerSpecification['paint']);
 
     function handleClick(ev: MapLayerMouseEvent) {
@@ -304,10 +324,22 @@
     <!-- The selected suburb's own pulse — always on (saved or not), sitting on its own
          single-feature source so it shows over any base layer. No click handler: the
          dot underneath still handles re-selection. -->
+    <!-- The just-closed suburb's jade pulse (behavior 54), under the selected one. Both
+         remount whenever the base block above does (saved filter, criterion): a layer
+         added later goes on top, so without the key a saved suburb's magenta dot hid the
+         green one (measured 2026-10-10, Cabramatta saved and just closed). -->
+    {#key `${pulseSaved}:${sizeBy}`}
+    {#if hasRecentPoint}
+        <GeoJSONSource id="suburb-recent" data={recentData}>
+            <CircleLayer id="recent-pulse" paint={recentRingPaint} beforeId={labelBeforeId} />
+            <CircleLayer id="recent-dot" paint={recentDotPaint} beforeId={labelBeforeId} />
+        </GeoJSONSource>
+    {/if}
     {#if hasSelectedPoint}
         <GeoJSONSource id="suburb-selected" data={selectedData}>
             <CircleLayer id="sel-pulse" paint={ringPaint} beforeId={labelBeforeId} />
             <CircleLayer id="sel-dot" paint={dotPaint} beforeId={labelBeforeId} />
         </GeoJSONSource>
     {/if}
+    {/key}
 </MapLibre>

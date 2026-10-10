@@ -63,6 +63,13 @@
     let loading = $state(true);
     let errored = $state(false);
     let selected = $state<Suburb | null>(null);
+    // The suburb whose sheet the visitor just closed — pulses jade on the map so they can
+    // find where they were (behavior 54). Set by the sheet's close, cleared when any
+    // suburb opens (that one pulses magenta) or the tour resets; never persisted.
+    let recent = $state<Suburb | null>(null);
+    $effect(() => {
+        if (selected) recent = null;
+    });
     // Onboarding opens over the map from the selected suburb's planning tab (8-S3).
     let planning = $state(false);
     // Bumped when a plan card is created → the sheet's Plan tab reloads in place to show
@@ -178,6 +185,7 @@
         seenRun = $tourRun;
         planning = false;
         selected = null;
+        recent = null;
     });
     // …and shows the suburb search on step 1, the control it points at.
     $effect(() => {
@@ -326,6 +334,7 @@
             {sizeBy}
             pulseSaved={savedOnly}
             {selected}
+            {recent}
             onselect={(s) => (selected = s)}
         />
     {/if}
@@ -545,7 +554,10 @@
             <SuburbSheet
                 suburb={selected}
                 reloadPlan={planReload}
-                onclose={() => (selected = null)}
+                onclose={() => {
+                    recent = selected;
+                    selected = null;
+                }}
                 onplan={() => {
                     restoreAnswers = undefined;
                     planning = true;

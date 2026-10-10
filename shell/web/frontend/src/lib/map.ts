@@ -193,6 +193,11 @@ const CRITERIA: Record<SizeBy, Criterion> = {
  *  ramp, with a white rim so the centre dot reads on any dot colour. */
 export const PULSE = '#ff1f8f';
 export const PULSE_RIM = '#ffffff';
+/** The just-closed suburb's pulse (behavior 54): the app's jade (app.css --accent), the
+ *  same dot + ring shape. Two colours, two meanings — magenta: the suburb whose sheet is
+ *  open, or a saved plan (saved-plans filter); jade: where the visitor just was, kept from
+ *  closing its sheet until another suburb opens (not across reloads). */
+export const PULSE_RECENT = '#0d7a63';
 
 const NO_DATA = '#d6d0c4'; // warm stone (app.css --border-strong family) — visibly "no data", not zero
 
