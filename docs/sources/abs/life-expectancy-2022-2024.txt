@@ -1,0 +1,357 @@
+Source: https://www.abs.gov.au/statistics/people/population/life-expectancy/latest-release
+Retrieved: 2026-10-10
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML 0d775f17b8f2be8af268b0664746b6bfc48b1f2a866e1cb8dcf18dfa984b25c0
+
+Life expectancy, 2022 - 2024 | Australian Bureau of Statistics
+Search ABS
+APA
+Copy
+Detail
+Cite
+Citation
+Close
+Print
+Life expectancy
+Latest release
+Statistics about life tables and life expectancy estimates for Australia, states and territories and life expectancy at birth for sub-state regions
+APA
+Copy
+Detail
+Cite
+Citation
+Close
+Print
+Reference period
+2022 - 2024
+Released
+11/11/2025
+Next release 10/12/2026
+Previous releases
+Life expectancy Reference Period 2021 - 2023
+Life expectancy Reference Period 2020 - 2022
+Life tables Reference Period 2019 - 2021
+View all releases
+Release date and time
+11/11/2025 11:30am AEDT
+Key statistics
+Life expectancy at birth was 81.1 years for males and 85.1 years for females in 2022 – 2024, reflecting no change for either males or females from the previous year (2021 – 2023).
+Life expectancy was highest in the Australian Capital Territory for both males (82.0 years) and females (85.8 years).
+Life expectancy was lowest in the Northern Territory for both males (77.0 years) and females (80.7 years).
+Life expectancy refers to the average number of additional years a person of a given age and sex could be expected to live, assuming current age-sex specific death rates are experienced throughout their lifetime.
+This release presents life expectancy estimates based on deaths that occurred in the 2022–2024 period; a time period that was impacted by the COVID-19 pandemic. In 2022, Australia recorded high levels of excess mortality, with the number of deaths increasing by almost 20,000 from 2021, and COVID-19 causing over 10,000 deaths. In 2023, around 5,000 deaths were registered that were due to COVID-19, and around 4,000 in 2024. For all causes combined, total registered deaths have decreased compared with 2022, but remain higher than pre-pandemic levels.
+National
+Life expectancy was unchanged from 2021 – 2023, following decreases in that period and the previous period (2020 – 2022), which were the first decreases since the mid-1990s.
+Life expectancy at birth for males was 81.1 years and for females was 85.1 years.
+Over the past decade, life expectancy increased by 0.8 years for males and 0.7 years for females.
+The difference in life expectancy between males and females is 4.0 years.
+30 years ago (1994), life expectancy at birth was 75.0 years for males and 80.9 years for females, a difference of 5.9 years.
+Graph Table
+Download
+Download table as CSV
+Download table as XLSX
+Download graph as PNG image
+Download graph as JPG image
+Download graph as SVG Vector image
+Life expectancy at birth, 1989 to 2022–24
+Year
+Males
+Females
+1989
+73.3
+79.6
+1990
+73.9
+80.1
+1991
+74.4
+80.3
+1992
+74.5
+80.4
+1993
+75.0
+80.9
+1994
+75.0
+80.9
+1993–95
+75.0
+80.8
+1994–96
+75.2
+81.1
+1995–97
+75.6
+81.3
+1996–98
+75.9
+81.5
+1997–99
+76.2
+81.8
+1998–00
+76.6
+82.0
+1999–01
+77.0
+82.4
+2000–02
+77.4
+82.6
+2001–03
+77.8
+82.8
+2002–04
+78.1
+83.0
+2003–05
+78.5
+83.3
+2004–06
+78.7
+83.5
+2005–07
+79.0
+83.7
+2006–08
+79.2
+83.7
+2007–09
+79.3
+83.9
+2008–10
+79.5
+84.0
+2009–11
+79.7
+84.2
+2010–12
+79.9
+84.3
+2011–13
+80.1
+84.3
+2012–14
+80.3
+84.4
+2013–15
+80.4
+84.5
+2014–16
+80.4
+84.6
+2015–17
+80.5
+84.6
+2016–18
+80.7
+84.9
+2017–19
+80.9
+85.0
+2018–20
+81.2
+85.3
+2019–21
+81.3
+85.4
+2020–22
+81.2
+85.3
+2021–23
+81.1
+85.1
+2022–24
+81.1
+85.1
+Life expectancy at birth, 1989 to 2022–24 ["Year","Males","Females"] [["1989","1990","1991","1992","1993","1994","1993\u201395","1994\u201396","1995\u201397","1996\u201398","1997\u201399","1998\u201300","1999\u201301","2000\u201302","2001\u201303","2002\u201304","2003\u201305","2004\u201306","2005\u201307","2006\u201308","2007\u201309","2008\u201310","2009\u201311","2010\u201312","2011\u201313","2012\u201314","2013\u201315","2014\u201316","2015\u201317","2016\u201318","2017\u201319","2018\u201320","2019\u201321","2020\u201322","2021\u201323","2022\u201324"],[[73.3],[73.9],[74.4],[74.5],[75],[75],[75],[75.2],[75.6],[75.9],[76.2],[76.6],[77],[77.4],[77.8],[78.1],[78.5],[78.7],[79],[79.2],[79.3],[79.5],[79.7],[79.9],[80.1],[80.3],[80.4],[80.4],[80.5],[80.7],[80.9],[81.2],[81.3],[81.2],[81.1],[81.1]],[[79.6],[80.1],[80.3],[80.4],[80.9],[80.9],[80.8],[81.1],[81.3],[81.5],[81.8],[82],[82.4],[82.6],[82.8],[83],[83.3],[83.5],[83.7],[83.7],[83.9],[84],[84.2],[84.3],[84.3],[84.4],[84.5],[84.6],[84.6],[84.9],[85],[85.3],[85.4],[85.3],[85.1],[85.1]]] [] [{"value":"0","axis_id":"0","axis_title":"","axis_units":"","tooltip_units":"","table_units":"","axis_min":null,"axis_max":null,"tick_interval":"5","precision":"-1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}] [{"value":"0","axis_id":"0","axis_title":"Age (years)","axis_units":"","tooltip_units":"(years)","table_units":"","axis_min":"72","axis_max":"86","tick_interval":null,"precision":"1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}]
+States and territories
+Life expectancy at birth:
+was highest for males (82.0 years) and females (85.8 years) in the Australian Capital Territory
+was lowest for both males (77.0 years) and females (80.7 years) in the Northern Territory
+had the largest increase for both males (0.6 years) and females (0.3 years) in the Northern Territory.
+Graph Table
+Download
+Download table as CSV
+Download table as XLSX
+Download graph as PNG image
+Download graph as JPG image
+Download graph as SVG Vector image
+Life expectancy at birth by state and territory, males
+State and territory
+2012–2014
+2021–2023
+2022–2024
+NSW
+80.2
+81.2
+81.2
+Vic.
+81.1
+81.5
+81.5
+Qld
+79.9
+80.5
+80.5
+SA
+80.1
+80.9
+80.9
+WA
+80.5
+81.6
+81.5
+Tas.
+78.8
+80.2
+80.3
+NT
+75.4
+76.4
+77.0
+ACT
+81.4
+81.7
+82.0
+Aust.(a)
+80.3
+81.1
+81.1
+Life expectancy at birth by state and territory, males ["State and territory","2012\u20132014","2021\u20132023","2022\u20132024"] [["NSW","Vic.","Qld","SA","WA","Tas.","NT","ACT","Aust.(a)"],[[80.2],[81.1],[79.9],[80.1],[80.5],[78.8],[75.4],[81.4],[80.3]],[[81.2],[81.5],[80.5],[80.9],[81.6],[80.2],[76.4],[81.7],[81.1]],[[81.2],[81.5],[80.5],[80.9],[81.5],[80.3],[77],[82],[81.1]]] [] [{"value":"0","axis_id":"0","axis_title":"","axis_units":"","tooltip_units":"","table_units":"","axis_min":null,"axis_max":null,"tick_interval":null,"precision":"-1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}] [{"value":"0","axis_id":"0","axis_title":"Age (years)","axis_units":"","tooltip_units":"(years)","table_units":"","axis_min":"50","axis_max":null,"tick_interval":null,"precision":"-1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}]
+Includes Other Territories
+Graph Table
+Download
+Download table as CSV
+Download table as XLSX
+Download graph as PNG image
+Download graph as JPG image
+Download graph as SVG Vector image
+Life expectancy at birth by state and territory, females
+State and territory
+2012–2014
+2021–2023
+2022–2024
+NSW
+84.4
+85.2
+85.3
+Vic.
+84.7
+85.4
+85.4
+Qld
+84.2
+84.7
+84.7
+SA
+84.3
+85.0
+84.9
+WA
+84.9
+85.7
+85.7
+Tas.
+82.5
+84.0
+83.7
+NT
+78.9
+80.4
+80.7
+ACT
+85.2
+85.7
+85.8
+Aust.(a)
+84.4
+85.1
+85.1
+Life expectancy at birth by state and territory, females ["State and territory","2012\u20132014","2021\u20132023","2022\u20132024"] [["NSW","Vic.","Qld","SA","WA","Tas.","NT","ACT","Aust.(a)"],[[84.4],[84.7],[84.2],[84.3],[84.9],[82.5],[78.9],[85.2],[84.4]],[[85.2],[85.4],[84.7],[85],[85.7],[84],[80.4],[85.7],[85.1]],[[85.3],[85.4],[84.7],[84.9],[85.7],[83.7],[80.7],[85.8],[85.1]]] [] [{"value":"0","axis_id":"0","axis_title":"","axis_units":"","tooltip_units":"","table_units":"","axis_min":null,"axis_max":null,"tick_interval":null,"precision":"-1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}] [{"value":"0","axis_id":"0","axis_title":"Age (years)","axis_units":"","tooltip_units":"(years)","table_units":"","axis_min":"50","axis_max":null,"tick_interval":null,"precision":"-1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}]
+Includes Other Territories
+Regions
+Life expectancy at birth:
+was generally higher in capital city SA4s than remote SA4s
+was highest for both males and females in Sydney - North Sydney and Hornsby (85.8 years and 88.1 years)
+increased the most for males in Tasmania's South East (1.4 years) and for females in Sydney - Parramatta, Melbourne - Inner South, and Western Australia - Outback (South) (0.7 years).
+International comparisons
+Based on Organisation for Economic Co-operation and Development (OECD) estimates:
+Australia had the tenth highest life expectancy
+Switzerland, Japan, Spain, Israel, Italy, Korea, Luxembourg, Sweden and Norway had higher life expectancies than Australia.
+Top 10 countries for life expectancy at birth(a), OECD, 2023
+Years
+Rank
+Switzerland
+84.3
+1
+Japan
+84.1
+2
+Spain
+84.0
+3
+Israel
+83.8
+4
+Italy
+83.5
+5
+Korea
+83.5
+5
+Luxembourg
+83.4
+7
+Sweden
+83.4
+7
+Norway
+83.1
+9
+Australia(b)
+83.0
+10
+Based on life expectancy for persons.
+ABS uses three years of deaths data to calculate life expectancy. This release includes deaths for 2022–2024. Deaths due to COVID-19 peaked in 2022, at over 10,000 deaths.
+Source: For all countries, see OECD, Life expectancy at birth
+Data downloads
+Data cubes
+Download all (222.78 KB)
+Data files
+Table 1: Life tables, age and sex by state and territory of usual residence, 2022–2024
+Download xlsx [203.19 KB]
+Table 2: Life expectancy at birth, sex by Statistical Areas Level 4, 2016–2018 to 2022–2024
+Download xlsx [56.63 KB]
+Previous catalogue number
+This release previously used catalogue number 3302.0.55.001
+Methodology
+Scope
+The ABS Death Registrations collection includes all deaths that occurred and were registered in Australia, including deaths of persons whose place of usual residence was overseas.
+Geography
+Data on life expectancy are available by the following geographies:
+Australia
+States and territories
+Statistical Areas Level 4 (SA4)
+Source
+Deaths data are sourced from death registrations systems administered by the various state and territory Registries of Births, Deaths and Marriages.
+Collection method
+Information about the deceased is supplied by a relative or other person acquainted with the deceased, or by an official of the institution where the death occurred.
+Concepts, sources and methods
+Descriptions of the underlying concepts and methods used are available in the Life Expectancy Methodology and Deaths, Australia Quality declaration .
+History of changes
+Not applicable to this release.
+View full methodology
+Articles
+Release date and time
+04 May 2026
+Life expectancy by Socio-Economic Indexes for Areas (SEIFA), 2011-2024
+View article
+Do you need more detailed statistics?
+Request data
+We can provide customised data to meet your requirements
+Request a quote
+Microdata and TableBuilder
+We can provide access to detailed, customisable data on selected topics
+View available Microdata and TableBuilder
+Back to top of the page

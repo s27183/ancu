@@ -1,0 +1,2511 @@
+Source: https://www.abs.gov.au/statistics/people/crime-and-justice/crime-victimisation-australia/latest-release
+Retrieved: 2026-10-10
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML bb5e06925140276471598d9b75318a6788223c980d92ed029c7599cf3827e58b
+
+Crime victimisation, 2024-25 financial year | Australian Bureau of Statistics
+Search ABS
+APA
+Copy
+Detail
+Cite
+Citation
+Close
+Print
+Crime victimisation
+Latest release
+National and state and territory crime rates for assault, threat, robbery, break-in, theft or stealing, property damage and police reporting rates
+APA
+Copy
+Detail
+Cite
+Citation
+Close
+Print
+Reference period
+2024-25 financial year
+Released
+25/03/2026
+Next release 17/03/2027
+Previous releases
+Crime Victimisation Reference Period 2023-24 financial year
+Crime Victimisation, Australia Reference Period 2022-23 financial year
+Crime Victimisation, Australia Reference Period 2021-22 financial year
+View all releases
+Release date and time
+25/03/2026 11:30am AEDT
+Key statistics
+In 2024-25:
+1.8% of persons (395,100) experienced physical assault
+2.1% of persons (463,400) experienced face-to-face threatened assault
+1.8% of households (196,600) experienced a break-in
+0.6% of households (64,400) experienced motor vehicle theft.
+The statistics discussed in the national commentary refer to experiences which occurred in the 12 months prior to interview (conducted between July 2024 and June 2025), referred to as the 2024-25 reference period.
+All statistics referred to throughout the commentary are available from the data downloads. Figures marked with an asterisk (*) have a relative standard error of between 25% and 50% and should be used with caution.
+Any differences between population groups or survey periods mentioned in the commentary are statistically significant at the 95% confidence level.
+Statistically significant changes in victimisation rates between 2014-15 (10-year time point) and 2024-25, and between 2023-24 (previous survey period) and 2024-25 are noted in the commentary. Time series data is available from 2008-09 onwards in the data tables.
+For more information about statistical significance and relative standard error, refer to the Crime Victimisation Methodology, 2024-25 financial year .
+Personal crime summary
+Victimisation rate
+In 2024-25, an estimated 3.9% of persons aged 15 years and over (861,400) experienced one or more selected personal crimes, including:
+1.8% (395,100) who experienced physical assault
+2.1% (463,400) who experienced face-to-face threatened assault
+0.6% (139,700) who experienced non-face-to-face threatened assault
+0.3% (67,500) who experienced robbery
+0.5% (89,400) who experienced sexual assault (persons aged 18 years and over).
+Change in victimisation rate over the last 10 years
+Between 2014-15 and 2024-25, there was a decrease in the victimisation rate for:
+physical assault (from 2.1% to 1.8%)
+face-to-face threatened assault (from 2.6% to 2.1%)
+non-face-to-face threatened assault (from 1.1% to 0.6%).
+Over the same period, the victimisation rate for sexual assault (persons aged 18 years and over) increased from 0.3% to 0.5%.
+Graph Table
+Download
+Download table as CSV
+Download table as XLSX
+Download graph as PNG image
+Download graph as JPG image
+Download graph as SVG Vector image
+Victimisation rates(a), Selected personal crimes, 2014-15 to 2024-25
+Physical assault (%)
+Face-to-face threatened assault (%)
+Non-face-to-face threatened assault (%)
+Robbery (%)
+Sexual assault (%)
+2014–15
+2.1
+2.6
+1.1
+0.3
+0.3
+2015–16
+2.4
+2.6
+1.0
+0.4
+0.4
+2016–17
+2.4
+2.6
+0.9
+0.4
+0.4
+2017–18
+2.4
+2.6
+0.8
+0.3
+0.3
+2018–19
+2.4
+2.8
+1.0
+0.4
+0.4
+2019–20
+2.3
+2.4
+0.9
+0.3
+0.3
+2020–21
+2.0
+2.2
+0.8
+0.3
+0.5
+2021–22
+1.9
+2.2
+0.7
+0.3
+0.5
+2022–23
+1.7
+2.2
+0.7
+0.2
+0.5
+2023–24
+1.7
+2.1
+0.8
+0.2
+0.6
+2024–25
+1.8
+2.1
+0.6
+0.3
+0.5
+Victimisation rates(a), Selected personal crimes, 2014-15 to 2024-25 ["","Physical assault","Face-to-face threatened assault","Non-face-to-face threatened assault","Robbery","Sexual assault"] [["2014\u201315","2015\u201316","2016\u201317","2017\u201318","2018\u201319","2019\u201320","2020\u201321","2021\u201322","2022\u201323","2023\u201324","2024\u201325"],[[2.1],[2.4],[2.4],[2.4],[2.4],[2.3],[2],[1.9],[1.7],[1.7],[1.8]],[[2.6],[2.6],[2.6],[2.6],[2.8],[2.4],[2.2],[2.2],[2.2],[2.1],[2.1]],[[1.1],[1],[0.9],[0.8],[1],[0.9],[0.8],[0.7],[0.7],[0.8],[0.6]],[[0.3],[0.4],[0.4],[0.3],[0.4],[0.3],[0.3],[0.3],[0.2],[0.2],[0.3]],[[0.3],[0.4],[0.4],[0.3],[0.4],[0.3],[0.5],[0.5],[0.5],[0.6],[0.5]]] [] [{"value":"0","axis_id":"0","axis_title":"","axis_units":"","tooltip_units":"","table_units":"","axis_min":null,"axis_max":null,"tick_interval":null,"precision":"-1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}] [{"value":"0","axis_id":"0","axis_title":"%","axis_units":"","tooltip_units":"(%)","table_units":"(%)","axis_min":"0","axis_max":"3","tick_interval":"0.5","precision":"1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}]
+Victimisation rate refers to the total number of persons aged 15 years and over who experienced a crime type in the last 12 months, expressed as a percentage of all persons aged 15 years and over (18 years and over for sexual assault).
+Household crime summary
+Victimisation rate
+Victimisation rate
+In 2024-25, an estimated 8.5% of households (913,700) experienced one or more selected household crimes, including:
+1.8% (196,600) that experienced break-in
+2.0% (217,500) that experienced attempted break-in
+0.6% (64,400) that experienced motor vehicle theft
+2.2% (236,500) that experienced theft from a motor vehicle
+3.4% (365,900) that experienced malicious property damage
+1.7% (183,100) that experienced other theft .
+Change in victimisation rate over the last 10 years
+Between 2014-15 and 2024-25, there was a decrease in the victimisation rate for:
+break-in (from 2.7% to 1.8%)
+theft from a motor vehicle (from 2.9% to 2.2%)
+malicious property damage (from 5.7% to 3.4%)
+other theft (from 2.9% to 1.7%).
+Graph Table
+Download
+Download table as CSV
+Download table as XLSX
+Download graph as PNG image
+Download graph as JPG image
+Download graph as SVG Vector image
+Victimisation rates(a), Selected household crimes, 2014-15 to 2024-25
+Break-in (%)
+Attempted break-in (%)
+Motor vehicle theft (%)
+Theft from a motor vehicle (%)
+Malicious property damage (%)
+Other theft(b) (%)
+2014–15
+2.7
+2.0
+0.6
+2.9
+5.7
+2.9
+2015–16
+2.5
+2.1
+0.5
+2.9
+4.8
+2.7
+2016–17
+2.5
+2.1
+0.6
+2.8
+5.0
+2.8
+2017–18
+2.5
+2.2
+0.6
+3.1
+5.1
+2.5
+2018–19
+2.4
+1.9
+0.5
+2.5
+4.6
+2.1
+2019–20
+2.4
+1.9
+0.6
+2.7
+4.6
+2.4
+2020–21
+1.7
+1.8
+0.5
+2.5
+4.0
+2.2
+2021–22
+2.0
+2.0
+0.6
+2.4
+3.8
+2.0
+2022–23
+1.8
+1.9
+0.5
+2.2
+3.7
+1.9
+2023–24
+2.1
+2.1
+0.7
+2.1
+3.6
+1.9
+2024–25
+1.8
+2.0
+0.6
+2.2
+3.4
+1.7
+Victimisation rates(a), Selected household crimes, 2014-15 to 2024-25 ["","Break-in","Attempted break-in","Motor vehicle theft","Theft from a motor vehicle","Malicious property damage","Other theft(b)"] [["2014\u201315","2015\u201316","2016\u201317","2017\u201318","2018\u201319","2019\u201320","2020\u201321","2021\u201322","2022\u201323","2023\u201324","2024\u201325"],[[2.7],[2.5],[2.5],[2.5],[2.4],[2.4],[1.7],[2],[1.8],[2.1],[1.8]],[[2],[2.1],[2.1],[2.2],[1.9],[1.9],[1.8],[2],[1.9],[2.1],[2]],[[0.6],[0.5],[0.6],[0.6],[0.5],[0.6],[0.5],[0.6],[0.5],[0.7],[0.6]],[[2.9],[2.9],[2.8],[3.1],[2.5],[2.7],[2.5],[2.4],[2.2],[2.1],[2.2]],[[5.7],[4.8],[5],[5.1],[4.6],[4.6],[4],[3.8],[3.7],[3.6],[3.4]],[[2.9],[2.7],[2.8],[2.5],[2.1],[2.4],[2.2],[2],[1.9],[1.9],[1.7]]] [] [{"value":"0","axis_id":"0","axis_title":"","axis_units":"","tooltip_units":"","table_units":"","axis_min":null,"axis_max":null,"tick_interval":null,"precision":"-1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}] [{"value":"0","axis_id":"0","axis_title":"%","axis_units":"","tooltip_units":"(%)","table_units":"(%)","axis_min":"0","axis_max":"6","tick_interval":"1","precision":"1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}]
+Victimisation rate refers to the total number of households that experienced a crime type, expressed as a percentage of all households.
+Includes property stolen from a yard, as well as property stolen in other situations/locations. Excludes any incidents involving theft covered in other sections of the survey such as break-ins or robberies.
+Physical assault
+Victimisation rate
+In 2024-25, an estimated 1.8% of persons (395,100) experienced physical assault, which was similar to the rate in 2023-24 (1.7%).
+The rate of physical assault victimisation was similar for males (2.0%) and females (1.6%).
+Change in victimisation rate over time
+Between 2014-15 and 2024-25, there was a decrease in the physical assault victimisation rate for females (from 2.0% to 1.6%).
+Graph Table
+Download
+Download table as CSV
+Download table as XLSX
+Download graph as PNG image
+Download graph as JPG image
+Download graph as SVG Vector image
+Physical assault victimisation rate(a), By sex, 2014-15 to 2024-25
+Males (%)
+Females (%)
+2014–15
+2.3
+2.0
+2015–16
+2.6
+2.3
+2016–17
+2.4
+2.3
+2017–18
+2.4
+2.5
+2018–19
+2.5
+2.3
+2019–20
+2.3
+2.3
+2020–21
+2.0
+2.1
+2021–22
+2.1
+1.7
+2022–23
+1.8
+1.7
+2023–24
+1.8
+1.6
+2024–25
+2.0
+1.6
+Physical assault victimisation rate(a), By sex, 2014-15 to 2024-25 ["","Males","Females"] [["2014\u201315","2015\u201316","2016\u201317","2017\u201318","2018\u201319","2019\u201320","2020\u201321","2021\u201322","2022\u201323","2023\u201324","2024\u201325"],[[2.3],[2.6],[2.4],[2.4],[2.5],[2.3],[2],[2.1],[1.8],[1.8],[2]],[[2],[2.3],[2.3],[2.5],[2.3],[2.3],[2.1],[1.7],[1.7],[1.6],[1.6]]] [] [{"value":"0","axis_id":"0","axis_title":"","axis_units":"","tooltip_units":"","table_units":"","axis_min":null,"axis_max":null,"tick_interval":null,"precision":"-1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}] [{"value":"0","axis_id":"0","axis_title":"%","axis_units":"","tooltip_units":"(%)","table_units":"(%)","axis_min":"0","axis_max":"3","tick_interval":"0.5","precision":"1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}]
+Victimisation rate refers to the total number of persons in the relevant population who experienced physical assault in the last 12 months, expressed as a percentage of the total relevant population.
+Socio-demographic characteristics
+The following groups were more likely to experience physical assault:
+persons aged 15 to 29 years (2.8%) compared with persons aged 45 years and over (1.1%)
+persons who have disability or restrictive condition (2.8%) compared with persons who do not have disability or restrictive condition (1.4%)
+persons living outside of a capital city (2.3%) compared with persons living in a capital city (1.5%)
+persons who have a non-school qualification (such as a certificate, diploma, or degree) (2.0%) compared with persons who do not (1.5%)
+persons born in Australia (2.1%) compared with persons who were born overseas (1.1%).
+Multiple victimisation
+Of those who experienced physical assault, 49% (194,200) experienced two or more incidents.
+Females were more likely than males to experience two or more incidents (56% compared with 44%).
+Police reporting
+Of the estimated 395,100 persons who experienced physical assault, 56% (219,200) reported the most recent incident to the police, which was similar to the police reporting rate in 2023-24 (49%).
+The police reporting rate was similar for males (55%) and females (58%).
+Common reasons given for not reporting the most recent incident to police include:
+told somebody else instead (10% or 39,600)
+believing that it was too trivial or unimportant (8.0% or 31,600).
+Sex of perpetrator(s)
+Both males and females were more likely to experience physical assault by a male perpetrator than by a female perpetrator in the most recent incident.
+Graph Table
+Download
+Download table as CSV
+Download table as XLSX
+Download graph as PNG image
+Download graph as JPG image
+Download graph as SVG Vector image
+Males and females who experienced physical assault, Sex of perpetrator(s) in the most recent incident(a), 2024-25
+By a male perpetrator (%)
+By a female perpetrator (%)
+Male(b)
+80.2
+21.3
+Female
+81.1
+29.2
+Males and females who experienced physical assault, Sex of perpetrator(s) in the most recent incident(a), 2024-25 ["","By a male perpetrator","By a female perpetrator"] [["Male(b)","Female"],[[80.2],[81.1]],[[21.3],[29.2]]] [] [{"value":"0","axis_id":"0","axis_title":"","axis_units":"","tooltip_units":"","table_units":"","axis_min":null,"axis_max":null,"tick_interval":null,"precision":"-1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}] [{"value":"0","axis_id":"0","axis_title":"%","axis_units":"","tooltip_units":"(%)","table_units":"(%)","axis_min":"0","axis_max":"90","tick_interval":"10","precision":"1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}]
+The assault may have involved both male and female perpetrators. As such, components may sum to over 100%.
+Estimate for males who have experienced physical assault by a female perpetrator has a relative standard error of 25% to 50% and should be used with caution.
+Relationship to perpetrator(s)
+In the most recent incident of physical assault:
+males were most likely to experience the assault by a stranger (56% or 118,200)
+females were most likely to experience the assault by a family member or intimate partner (44% or 78,400).
+Graph Table
+Download
+Download table as CSV
+Download table as XLSX
+Download graph as PNG image
+Download graph as JPG image
+Download graph as SVG Vector image
+Males and females who experienced physical assault, Relationship to perpetrator(s) in the most recent incident(a), 2024-25
+Male (%)
+Female (%)
+Stranger
+56.2
+25.3
+Family and intimate partner(b)
+19.2
+43.5
+Other known person(c)
+26.4
+32.5
+Males and females who experienced physical assault, Relationship to perpetrator(s) in the most recent incident(a), 2024-25 ["","Male","Female"] [["Stranger","Family and intimate partner(b)","Other known person(c)"],[[56.2],[19.2],[26.4]],[[25.3],[43.5],[32.5]]] [] [{"value":"0","axis_id":"0","axis_title":"","axis_units":"","tooltip_units":"","table_units":"","axis_min":null,"axis_max":null,"tick_interval":null,"precision":"-1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}] [{"value":"0","axis_id":"0","axis_title":"%","axis_units":"","tooltip_units":"(%)","table_units":"(%)","axis_min":"0","axis_max":"60","tick_interval":"10","precision":"1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}]
+The assault may have involved multiple perpetrators.
+Includes family member, current partner (married/de facto), previous partner (married/de facto), boyfriend, girlfriend or date and ex-boyfriend, ex-girlfriend or ex-date.
+Includes friend, professional or educational relationship, neighbour, known by sight only, other known persons and those who knew the perpetrator but did not give details of the relationship.
+Other characteristics of the most recent incident
+For males who experienced physical assault:
+the incident most often occurred in a non-residential location (72% or 151,100), including 27% (56,700) that occurred at work
+44% (92,400) were physically injured
+14% of incidents (28,800) involved the use of a weapon
+58% (105,000) believed that alcohol or another substance contributed (males aged 18 years and over only).
+For females who experienced physical assault:
+just under half (48% or 87,200) experienced the incident at a residential location and a further 28% (51,200) experienced the incident at work
+48% (86,900) were physically injured
+9.0% of incidents (16,300) involved the use of a weapon
+53% (89,300) believed that alcohol or another substance contributed (females aged 18 years and over only).
+Face-to-face threatened assault
+Victimisation rate
+In 2024-25, an estimated 2.1% of persons (463,400) experienced face-to-face threatened assault, which was the same as the rate in 2023-24 (2.1%).
+The rate of face-to-face threatened assault victimisation was similar for males (2.3%) and females (1.9%).
+Change in victimisation rate over time
+Between 2014-15 and 2024-25, there was a decrease in the face-to-face threatened assault victimisation rate for both males (from 2.9% to 2.3%) and females (from 2.4% to 1.9%).
+Graph Table
+Download
+Download table as CSV
+Download table as XLSX
+Download graph as PNG image
+Download graph as JPG image
+Download graph as SVG Vector image
+Face-to-face threatened assault victimisation rate(a), By sex, 2014-15 to 2024-25
+Males (%)
+Females (%)
+2014–15
+2.9
+2.4
+2015–16
+2.7
+2.5
+2016–17
+3.1
+2.1
+2017–18
+3.0
+2.1
+2018–19
+3.0
+2.5
+2019–20
+2.6
+2.3
+2020–21
+2.3
+2.1
+2021–22
+2.4
+2.0
+2022–23
+2.2
+2.1
+2023–24
+2.3
+1.8
+2024–25
+2.3
+1.9
+Face-to-face threatened assault victimisation rate(a), By sex, 2014-15 to 2024-25 ["","Males","Females"] [["2014\u201315","2015\u201316","2016\u201317","2017\u201318","2018\u201319","2019\u201320","2020\u201321","2021\u201322","2022\u201323","2023\u201324","2024\u201325"],[[2.9],[2.7],[3.1],[3],[3],[2.6],[2.3],[2.4],[2.2],[2.3],[2.3]],[[2.4],[2.5],[2.1],[2.1],[2.5],[2.3],[2.1],[2],[2.1],[1.8],[1.9]]] [] [{"value":"0","axis_id":"0","axis_title":"","axis_units":"","tooltip_units":"","table_units":"","axis_min":null,"axis_max":null,"tick_interval":null,"precision":"-1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}] [{"value":"0","axis_id":"0","axis_title":"%","axis_units":"","tooltip_units":"(%)","table_units":"(%)","axis_min":"0","axis_max":"3.5","tick_interval":"0.5","precision":"1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}]
+Victimisation rate refers to the total number of persons in the relevant population who experienced face-to-face threatened assault in the last 12 months, expressed as a percentage of the total relevant population.
+Socio-demographic characteristics
+The following groups were more likely to experience face-to-face threatened assault:
+persons who have disability or restrictive condition (3.3%) compared with persons who do not have disability or restrictive condition (1.7%)
+persons living outside of a capital city (2.8%) compared with persons living in a capital city (1.8%)
+persons born in Australia (2.4%) compared with persons who were born overseas (1.5%)
+persons living in an area ranked in the lowest (most disadvantaged) quintile (2.4%) of the Index of Relative Socio-Economic Advantage and Disadvantage, compared with persons living in the highest (most advantaged) quintile (1.4%).
+Multiple victimisation
+Of those who experienced face-to-face threatened assault, 57% (262,900) experienced two or more incidents.
+Males (52%) and females (62%) were about as likely to have experienced two or more incidents.
+Police reporting
+Of the estimated 463,400 persons who experienced face-to-face threatened assault, 40% (183,800) reported the most recent incident to the police, which was similar to the police reporting rate in 2023-24 (39%).
+Females were more likely than males to have reported the most recent incident of face-to-face threatened assault to the police (48% compared with 33%).
+Common reasons given for not reporting the most recent incident to police include:
+told somebody else instead (14% or 64,100)
+believing that it was too trivial or unimportant (14% or 62,600)
+thinking there was nothing police could do (9.7% or 44,900).
+Sex of perpetrator(s)
+Both males and females were more likely to experience face-to-face threatened assault by a male perpetrator than by a female perpetrator in the most recent incident.
+Graph Table
+Download
+Download table as CSV
+Download table as XLSX
+Download graph as PNG image
+Download graph as JPG image
+Download graph as SVG Vector image
+Males and females who experienced face-to-face threatened assault, Sex of perpetrator(s) in the most recent incident(a), 2024-25
+By a male perpetrator (%)
+By a female perpetrator (%)
+Male
+92.4
+22.4
+Female
+72.0
+40.0
+Males and females who experienced face-to-face threatened assault, Sex of perpetrator(s) in the most recent incident(a), 2024-25 ["","By a male perpetrator","By a female perpetrator"] [["Male","Female"],[[92.4],[72]],[[22.4],[40]]] [] [{"value":"0","axis_id":"0","axis_title":"","axis_units":"","tooltip_units":"","table_units":"","axis_min":null,"axis_max":null,"tick_interval":null,"precision":"-1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}] [{"value":"0","axis_id":"0","axis_title":"%","axis_units":"","tooltip_units":"(%)","table_units":"(%)","axis_min":"0","axis_max":"100","tick_interval":"10","precision":"1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}]
+The assault may have involved both male and female perpetrators. As such, components may sum to over 100%.
+Relationship to perpetrator(s)
+Males were more likely to experience the most recent incident of face-to-face threatened assault by a stranger (61% or 150,100) than by a known person (39% or 94,900).
+Females were more likely to experience the most recent incident of face-to-face threatened assault by a known person (60% or 128,800) than by a stranger (40% or 84,900).
+Other characteristics of the most recent incident
+For males who experienced face-to-face threatened assault:
+the incident most often occurred at a non-residential location (81% or 198,300), including 38% (93,700) that occurred at work
+most incidents did not involve the use of a weapon (93% or 228,900)
+55% (118,700) believed that alcohol or another substance contributed (males aged 18 years and over only).
+For females who experienced face-to-face threatened assault:
+64% of incidents (136,500) occurred at a non-residential location , including 38% (81,600) that occurred at work
+most incidents did not involve the use of a weapon (89% or 191,500)
+47% (88,500) believed that alcohol or another substance contributed (females aged 18 years and over only).
+Non-face-to-face threatened assault
+Victimisation rate
+In 2024-25, an estimated 0.6% of persons (139,700) experienced non-face-to-face threatened assault, which was similar to the rate in 2023-24 (0.8%).
+The non-face-to-face threatened assault victimisation rate was similar for males (0.6%) and females (0.7%).
+Change in victimisation rate over time
+Between 2014-15 and 2024-25, there was a decrease in the non-face-to-face threatened assault victimisation rate for both males (from 0.9% to 0.6%) and females (from 1.2% to 0.7%).
+Graph Table
+Download
+Download table as CSV
+Download table as XLSX
+Download graph as PNG image
+Download graph as JPG image
+Download graph as SVG Vector image
+Non-face-to-face threatened assault victimisation rate(a), By sex, 2014-15 to 2024-25
+Males (%)
+Females (%)
+2014–15
+0.9
+1.2
+2015–16
+0.9
+1.1
+2016–17
+0.9
+1.0
+2017–18
+0.7
+0.9
+2018–19
+0.9
+1.2
+2019–20
+0.8
+1.0
+2020–21
+0.6
+1.0
+2021–22
+0.6
+0.7
+2022–23
+0.6
+0.9
+2023–24
+0.8
+0.7
+2024–25
+0.6
+0.7
+Non-face-to-face threatened assault victimisation rate(a), By sex, 2014-15 to 2024-25 ["","Males","Females"] [["2014\u201315","2015\u201316","2016\u201317","2017\u201318","2018\u201319","2019\u201320","2020\u201321","2021\u201322","2022\u201323","2023\u201324","2024\u201325"],[[0.9],[0.9],[0.9],[0.7],[0.9],[0.8],[0.6],[0.6],[0.6],[0.8],[0.6]],[[1.2],[1.1],[1],[0.9],[1.2],[1],[1],[0.7],[0.9],[0.7],[0.7]]] [] [{"value":"0","axis_id":"0","axis_title":"","axis_units":"","tooltip_units":"","table_units":"","axis_min":null,"axis_max":null,"tick_interval":null,"precision":"-1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}] [{"value":"0","axis_id":"0","axis_title":"%","axis_units":"","tooltip_units":"(%)","table_units":"(%)","axis_min":"0","axis_max":"1.4","tick_interval":"0.2","precision":"1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}]
+Victimisation rate refers to the total number of persons in the relevant population who experienced non-face-to-face threatened assault in the last 12 months, expressed as a percentage of the total relevant population.
+Socio-demographic characteristics
+The following groups were more likely to experience non-face-to-face threatened assault:
+persons who have disability or restrictive condition (1.2%) compared with persons who do not have disability or restrictive condition (0.4%)
+persons living outside of a capital city (0.9%) compared with persons living in a capital city (0.5%)
+persons living in an area ranked in the lowest (most disadvantaged) quintile (1.1%) of the Index of Relative Socio-Economic Advantage and Disadvantage, compared with persons living in the highest (most advantaged) quintile (0.5%).
+Type of non-face-to-face threatened assault
+Of those who experienced non-face-to-face threatened assault, the threats were commonly experienced:
+over the phone (48% or 67,000)
+via SMS (39% or 54,600)
+through another person (or by word of mouth) (34% or 48,100)
+via instant messaging/social media (31% or 43,700).
+Police reporting
+Of the estimated 139,700 persons who experienced non-face-to-face threatened assault, 31% (42,600) reported the most recent incident to the police, which was similar to the police reporting rate in 2023-24 (33%).
+Robbery
+In 2024-25, an estimated 0.3% of persons (67,500) experienced robbery, which was similar to the rate in 2023-24 (0.2%).
+Change in victimisation rate over time
+The robbery victimisation rate in 2024-25 (0.3%) was the same as the rate in 2014-15.
+Graph Table
+Download
+Download table as CSV
+Download table as XLSX
+Download graph as PNG image
+Download graph as JPG image
+Download graph as SVG Vector image
+Robbery victimisation rate(a), 2014-15 to 2024-25
+Persons (%)
+2014–15
+0.3
+2015–16
+0.4
+2016–17
+0.4
+2017–18
+0.3
+2018–19
+0.4
+2019–20
+0.3
+2020–21
+0.3
+2021–22
+0.3
+2022–23
+0.2
+2023–24
+0.2
+2024–25
+0.3
+Robbery victimisation rate(a), 2014-15 to 2024-25 ["","Persons"] [["2014\u201315","2015\u201316","2016\u201317","2017\u201318","2018\u201319","2019\u201320","2020\u201321","2021\u201322","2022\u201323","2023\u201324","2024\u201325"],[[0.3],[0.4],[0.4],[0.3],[0.4],[0.3],[0.3],[0.3],[0.2],[0.2],[0.3]]] [] [{"value":"0","axis_id":"0","axis_title":"","axis_units":"","tooltip_units":"","table_units":"","axis_min":null,"axis_max":null,"tick_interval":null,"precision":"-1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}] [{"value":"0","axis_id":"0","axis_title":"%","axis_units":"","tooltip_units":"(%)","table_units":"(%)","axis_min":"0","axis_max":"1","tick_interval":"0.1","precision":"1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}]
+Victimisation rate refers to the total number of persons aged 15 years and over who experienced robbery in the last 12 months, expressed as a percentage of all persons aged 15 years and over.
+Socio-demographic characteristics
+The following groups were more likely to experience robbery:
+persons who have disability or restrictive condition (0.5%) compared with persons who do not have disability or restrictive condition (0.2%)
+persons living outside of a capital city (0.4%) compared with persons living in a capital city (0.2%).
+Police reporting
+Of the estimated 67,500 persons who experienced robbery, 62% (42,100) reported the most recent incident to the police, which was similar to the police reporting rate in 2023-24 (45%).
+Note: whilst it may appear that the reporting rate for robbery has changed between 2023-24 and 2024-25, the difference between the rates is not statistically significant when the sampling error is taken into consideration.
+Other characteristics of the most recent incident
+In the most recent incident of robbery:
+the incident most often occurred in a non-residential location (68% or 45,700)
+most incidents did not involve the use of a weapon (79% or 53,500)
+no property was stolen in the majority of incidents (61% or 41,000).
+Sexual assault
+In 2024-25, an estimated 0.5% of persons aged 18 years and over (89,400) experienced sexual assault, which was similar to the rate in 2023-24 (0.6%).
+Estimates for male experiences are subject to high sampling error (for further details on sampling error refer to the Methodology page). For this reason, only information on females’ experiences of sexual assault is included here.
+Female experiences of sexual assault
+In 2024-25, an estimated 0.7% of females aged 18 years and over (68,800) experienced sexual assault, which was similar to the rate in 2023-24 (0.9%). Of these, 16% (*10,700) reported the most recent incident to the police, which was similar to the police reporting rate in 2023-24 (19%).
+The following groups were more likely to experience sexual assault:
+females aged 18 to 29 years (2.6%) compared with females in all other age groups
+females with disability or restrictive condition (1.2%) compared with females who do not have disability or restrictive condition (*0.5%).
+Break-in
+In 2024-25, an estimated 1.8% of households (196,600) experienced a break-in, which was lower than the rate in 2023-24 (2.1%). Most of these households experienced a single incident (76% or 150,000).
+Household characteristics
+Households in an area ranked in the lowest (most disadvantaged) quintile of the Index of Relative Socio-Economic Advantage and Disadvantage were more likely to experience a break-in (2.6%) than households in an area ranked in the highest (most advantaged) quintile (1.6%).
+Police reporting
+Of the estimated 196,600 households that experienced a break-in, 69% (135,700) reported the most recent incident to the police, which was similar to the police reporting rate in 2023-24 (75%).
+Common reasons given for not reporting the incident include:
+thinking it was too trivial or unimportant (11% or 21,100)
+thinking there was nothing police could do (8.4% or 16,600).
+Types of property stolen in the most recent incident
+In the most recent incident of break-in, 69% of households (136,100) had something stolen.
+Common types of property stolen in the most recent incident of break-in include:
+personal items, such as jewellery and clothing (24% or 47,900)
+bicycles or sporting equipment (16% or 32,000)
+money, purse or wallet (16% or 31,300)
+tools (16% or 30,700).
+Other characteristics of the most recent incident
+In the most recent incident of break-in:
+44% of households (86,800) had property damaged
+12% of households (24,000) had the perpetrator confront someone.
+Attempted break-in
+In 2024-25, an estimated 2.0% of households (217,500) experienced an attempted break-in, which was similar to the rate in 2023-24 (2.1%). Most of these households experienced a single incident (71% or 153,500).
+Household characteristics
+The following households were more likely to experience an attempted break-in:
+households outside of capital cities (2.5%) compared with households in capital cities (1.8%)
+households in an area ranked in the lowest (most disadvantaged) quintile of the Index of Relative Socio-Economic Advantage and Disadvantage (2.7%), compared with households in an area ranked in the highest (most advantaged) quintile (1.3%).
+Police reporting
+Of the estimated 217,500 households that experienced an attempted break-in, 45% (97,700) reported the most recent incident to the police, which was similar to the police reporting rate in 2023-24 (48%).
+Common reasons provided for not reporting to the police include:
+thinking it was too trivial or unimportant (20% or 44,100)
+thinking there was nothing police could do (14% or 29,700).
+Evidence of the most recent incident
+The most common types of evidence of an attempted break-in were:
+a door or window was damaged or tampered with (40% or 87,000)
+someone was seen or heard trying to break in (30% or 66,000).
+Motor vehicle theft
+In 2024-25, an estimated 0.6% of households (64,400) had a motor vehicle stolen, which was similar to the rate in 2023-24 (0.7%). Most of these households experienced a single incident (92% or 59,500).
+Police reporting
+Of the estimated 64,400 households that had a motor vehicle stolen, 88% (56,900) reported the most recent incident to the police, which was similar to the police reporting rate in 2023-24 (84%).
+Location of the most recent incident
+Common locations where the motor vehicle was stolen include:
+residential location (47% or 30,000)
+in the street or other open land (38% or 24,500).
+Theft from a motor vehicle
+In 2024-25, an estimated 2.2% of households (236,500) experienced theft from a motor vehicle, which was similar to the rate in 2023-24 (2.1%). Most of these households experienced a single incident (83% or 197,000).
+Household characteristics
+The following households were more likely to experience theft from a motor vehicle:
+households in capital cities (2.4%) compared with households outside of capital cities (1.8%)
+households belonging to the highest quintile of equivalised weekly household income (2.6%) compared with households belonging to the lowest income quintile (1.4%).
+Police reporting
+Of the estimated 236,500 households that experienced theft from a motor vehicle, 52% (122,200) reported the most recent incident to the police, which was similar to the police reporting rate in 2023-24 (51%).
+Common reasons provided for not reporting to the police include:
+thinking it was too trivial or unimportant (28% or 66,800)
+thinking there was nothing police could do (14% or 32,800).
+Location of the most recent incident
+Most incidents of theft from a motor vehicle occurred when the motor vehicle was at the person’s home (68% or 159,900).
+Types of property stolen in the most recent incident
+The most common types of property stolen from a motor vehicle were:
+personal items, such as jewellery and clothing (40% or 93,600)
+money, purse or wallet (38% or 89,100).
+Malicious property damage
+In 2024-25, an estimated 3.4% of households (365,900) experienced malicious property damage, which was similar to the rate in 2023-24 (3.6%). Most of these households experienced a single incident (79% or 289,500).
+Household characteristics
+Households in an area ranked in the lowest (most disadvantaged) quintile of the Index of Relative Socio-Economic Advantage and Disadvantage were more likely to experience malicious property damage (4.8%) than households in an area ranked in the highest (most advantaged) quintile (2.7%).
+Police reporting
+Of the 365,900 households that experienced malicious property damage, 53% (195,300) reported the most recent incident to the police, which was similar to the police reporting rate in 2023-24 (55%).
+Common reasons provided for not reporting to police include:
+thinking it was too trivial or unimportant (23% or 83,900)
+thinking there was nothing the police could do (12% or 43,800).
+Types of property damaged in the most recent incident
+The most common types of property that were damaged, defaced or destroyed in the incident were:
+a car or other motor vehicle (29% or 105,200)
+external doors (25% or 91,800)
+other exterior items, such as walls, fences and letterboxes (24% or 88,100).
+Other theft
+In 2024-25, an estimated 1.7% of households (183,100) experienced other theft , which was similar to the rate in 2023-24 (1.9%). Most of these households experienced a single incident (78% or 143,300).
+Household characteristics
+Households in an area ranked in the lowest (most disadvantaged) quintile of the Index of Relative Socio-Economic Advantage and Disadvantage were more likely to experience other theft (2.3%) than households in an area ranked in the highest (most advantaged) quintile (1.6%).
+Police reporting
+Of the 183,100 households that experienced other theft, 42% (75,900) reported the most recent incident to the police, which was similar to the police reporting rate in 2023-24 (37%).
+Common reasons provided for not reporting to police include:
+thinking it was too trivial or unimportant (35% or 63,500)
+thinking there was nothing police could do (12% or 21,200).
+Location of the most recent incident
+Most incidents of other theft occurred at the person’s home (62% or 113,200).
+Types of property stolen in the most recent incident
+Common types of property stolen include:
+personal items, such as jewellery and clothing (26% or 47,400)
+bicycles or sporting equipment (22% or 39,800)
+outdoor or garden items (13% or 24,200)
+money, purse or wallet (13% or 24,100).
+State and territory statistics
+The state and territory statistics discussed in the following commentary have been obtained by pooling data across consecutive survey iterations to improve the reliability of estimates at the state/territory level.
+The pooled estimates can be understood as an annual average of the estimates from multiple survey years. For instance, the 2023-25 pooled period is an average of the 2023-24 and 2024-25 surveys, spanning from July 2023 to June 2025.
+While a pooled period spans multiple survey years, the data represents the average annual rate/estimate for those years, not the total number of victims over the pooled period.
+Data are pooled across two consecutive survey years for all crime types except sexual assault and robbery, for which data has been pooled across three consecutive survey years due to the lower incidence of these crime types leading to high survey error. Pooled sexual assault and robbery victimisation rates are not referred to in the commentary but are available in Table 29 from the data downloads .
+Statistically significant changes in victimisation rates between 2013-15 (10-year time point) and 2023-25, and between 2021-23 (most recent non-overlapping pooled period) and 2023-25 are noted in the commentary. Time series data is available from 2008-10/2008-11 onwards in the data tables.
+For more information refer to the Methodology .
+New South Wales
+Personal crime victimisation and reporting rates
+During the 2023-25 reference period, 2.9% of persons (198,500) experienced physical and/or threatened assault in the previous 12 months.
+The table below presents selected personal crime victimisation and police reporting rates for New South Wales in 2023-25.
+Personal crime victimisation rate(a)
+Police reporting rate(b)
+Physical assault
+1.4% (93,800)
+59.0%
+Face-to-face threatened assault
+1.5% (103,100)
+43.5%
+Non-face-to-face threatened assault
+0.6% (42,600)
+np
+Victimisation rate refers to the total number of persons aged 15 years and over who experienced a crime type, expressed as a percentage of all persons aged 15 years and over.
+Reporting rate refers to the total number of persons who had experienced the crime type and reported the most recent incident of the crime type to police, expressed as a percentage of the total number of persons who experienced the crime type.
+np not published
+Between 2021-23 and 2023-25, victimisation and police reporting rates were stable for all assault types.
+Changes in personal crime victimisation rates since 2013-15
+Between 2013-15 and 2023-25, the victimisation rate declined for:
+physical and/or threatened assault (from 3.9% to 2.9%)
+physical assault (from 1.8% to 1.4%)
+face-to-face threatened assault (from 2.2% to 1.5%)
+non-face-to-face threatened assault (from 0.9% to 0.6%).
+Graph Table
+Download
+Download table as CSV
+Download table as XLSX
+Download graph as PNG image
+Download graph as JPG image
+Download graph as SVG Vector image
+Victimisation rates(a), Selected personal crimes, New South Wales, Two-year pooled data: 2013-15 to 2023-25(b)
+Physical assault (%)
+Face-to-face threatened assault (%)
+Non-face-to-face threatened assault (%)
+Physical and/or threatened assault(c) (%)
+2013–15
+1.8
+2.2
+0.9
+3.9
+2014–16
+1.9
+2.1
+0.8
+3.9
+2015–17
+2.1
+2.2
+0.8
+4.1
+2016–18
+2.2
+2.2
+0.8
+4.2
+2017–19
+2.2
+2.4
+0.8
+4.4
+2018–20
+2.2
+2.3
+0.7
+4.2
+2019–21
+2.1
+1.9
+0.6
+3.7
+2020–22
+1.7
+1.8
+0.6
+3.4
+2021–23
+1.4
+1.8
+0.6
+3.1
+2022–24
+1.3
+1.8
+0.7
+3.0
+2023–25
+1.4
+1.5
+0.6
+2.9
+Victimisation rates(a), Selected personal crimes, New South Wales, Two-year pooled data: 2013-15 to 2023-25(b) ["","Physical assault","Face-to-face threatened assault","Non-face-to-face threatened assault","Physical and\/or threatened assault(c)"] [["2013\u201315","2014\u201316","2015\u201317","2016\u201318","2017\u201319","2018\u201320","2019\u201321","2020\u201322","2021\u201323","2022\u201324","2023\u201325"],[[1.8],[1.9],[2.1],[2.2],[2.2],[2.2],[2.1],[1.7],[1.4],[1.3],[1.4]],[[2.2],[2.1],[2.2],[2.2],[2.4],[2.3],[1.9],[1.8],[1.8],[1.8],[1.5]],[[0.9],[0.8],[0.8],[0.8],[0.8],[0.7],[0.6],[0.6],[0.6],[0.7],[0.6]],[[3.9],[3.9],[4.1],[4.2],[4.4],[4.2],[3.7],[3.4],[3.1],[3],[2.9]]] [] [{"value":"0","axis_id":"0","axis_title":"","axis_units":"","tooltip_units":"","table_units":"","axis_min":null,"axis_max":null,"tick_interval":null,"precision":"-1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}] [{"value":"0","axis_id":"0","axis_title":"%","axis_units":"","tooltip_units":"(%)","table_units":"(%)","axis_min":"0","axis_max":"5","tick_interval":"0.5","precision":"1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}]
+Victimisation rate refers to the total number of persons aged 15 years and over who experienced a crime type, expressed as a percentage of all persons aged 15 years and over.
+Estimates have been obtained by pooling data from two successive Crime Victimisation Survey reference periods.
+Includes physical assault, face-to-face threatened assault and non-face-to-face threatened assault. Where a person has experienced multiple types of assault, they are counted separately for each type of assault experienced but are counted only once in the aggregated assault total.
+Household crime victimisation and reporting rates
+The table below presents household crime victimisation and reporting rates for the 2023-25 reference period.
+Household crime victimisation rate(a)
+Police reporting rate(b)
+Break-in
+1.5% (51,400)
+65.5%
+Attempted break-in
+1.4% (46,000)
+46.7%
+Motor vehicle theft
+0.5% (16,700)
+83.3%
+Theft from a motor vehicle
+1.4% (45,100)
+42.8%
+Malicious property damage
+2.9% (97,100)
+51.3%
+Other theft(c)
+1.6% (53,200)
+35.9%
+Victimisation rate refers to the total number of households that experienced a crime type, expressed as a percentage of all households.
+Reporting rate refers to the total number of households that had experienced the crime type and reported the most recent incident of the crime type to police, expressed as a percentage of the total number of households that experienced the crime type.
+Includes property stolen from a yard, as well as property stolen in other situations/locations. Excludes any incidents involving theft covered in other sections of the survey such as break-ins or robberies.
+Between 2021-23 and 2023-25, victimisation and police reporting rates were stable for all household crime types.
+Changes in household crime victimisation rates since 2013-15
+Between 2013-15 and 2023-25, the victimisation rate declined for:
+break-in (from 2.2% to 1.5%)
+theft from a motor vehicle (from 2.3% to 1.4%)
+malicious property damage (from 5.0% to 2.9%)
+other theft (from 2.7% to 1.6%).
+Graph Table
+Download
+Download table as CSV
+Download table as XLSX
+Download graph as PNG image
+Download graph as JPG image
+Download graph as SVG Vector image
+Victimisation rates(a), Selected household crimes, New South Wales, Two-year pooled data: 2013-15 to 2023-25(b)
+Break-in (%)
+Attempted break-in (%)
+Motor vehicle theft (%)
+Theft from a motor vehicle (%)
+Malicious property damage (%)
+Other theft(c) (%)
+2013–15
+2.2
+1.6
+0.5
+2.3
+5.0
+2.7
+2014–16
+2.1
+1.8
+0.3
+2.0
+4.6
+2.4
+2015–17
+2.1
+1.7
+0.4
+2.0
+4.3
+2.3
+2016–18
+2.0
+1.6
+0.5
+2.3
+4.5
+2.3
+2017–19
+2.0
+1.6
+0.4
+2.2
+4.1
+1.9
+2018–20
+1.9
+1.6
+0.4
+1.9
+3.7
+2.0
+2019–21
+1.6
+1.5
+0.4
+1.8
+3.5
+2.0
+2020–22
+1.3
+1.3
+0.4
+1.6
+3.0
+1.7
+2021–23
+1.2
+1.4
+0.4
+1.6
+2.8
+1.4
+2022–24
+1.4
+1.4
+0.5
+1.4
+3.0
+1.6
+2023–25
+1.5
+1.4
+0.5
+1.4
+2.9
+1.6
+Victimisation rates(a), Selected household crimes, New South Wales, Two-year pooled data: 2013-15 to 2023-25(b) ["","Break-in","Attempted break-in","Motor vehicle theft","Theft from a motor vehicle","Malicious property damage","Other theft(c)"] [["2013\u201315","2014\u201316","2015\u201317","2016\u201318","2017\u201319","2018\u201320","2019\u201321","2020\u201322","2021\u201323","2022\u201324","2023\u201325"],[[2.2],[2.1],[2.1],[2],[2],[1.9],[1.6],[1.3],[1.2],[1.4],[1.5]],[[1.6],[1.8],[1.7],[1.6],[1.6],[1.6],[1.5],[1.3],[1.4],[1.4],[1.4]],[[0.5],[0.3],[0.4],[0.5],[0.4],[0.4],[0.4],[0.4],[0.4],[0.5],[0.5]],[[2.3],[2],[2],[2.3],[2.2],[1.9],[1.8],[1.6],[1.6],[1.4],[1.4]],[[5],[4.6],[4.3],[4.5],[4.1],[3.7],[3.5],[3],[2.8],[3],[2.9]],[[2.7],[2.4],[2.3],[2.3],[1.9],[2],[2],[1.7],[1.4],[1.6],[1.6]]] [] [{"value":"0","axis_id":"0","axis_title":"","axis_units":"","tooltip_units":"","table_units":"","axis_min":null,"axis_max":null,"tick_interval":null,"precision":"-1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}] [{"value":"0","axis_id":"0","axis_title":"%","axis_units":"","tooltip_units":"(%)","table_units":"(%)","axis_min":"0","axis_max":"6","tick_interval":"1","precision":"1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}]
+Victimisation rate refers to the total number of households that experienced a crime type, expressed as a percentage of all households.
+Estimates have been obtained by pooling data from two successive Crime Victimisation Survey reference periods.
+Includes property stolen from a yard, as well as property stolen in other situations/locations. Excludes any incidents involving theft covered in other sections of the survey such as break-ins or robberies.
+Victoria
+Personal crime victimisation and reporting rates
+During the 2023-25 reference period, 3.5% of persons (197,300) experienced physical and/or threatened assault in the previous 12 months.
+The table below presents selected personal crime victimisation and police reporting rates for Victoria in 2023-25.
+Personal crime victimisation rate(a)
+Police reporting rate(b)
+Physical assault
+1.6% (91,800)
+47.3%
+Face-to-face threatened assault
+2.0% (111,000)
+42.7%
+Non-face-to-face threatened assault
+0.7% (38,900)
+np
+Victimisation rate refers to the total number of persons aged 15 years and over who experienced a crime type, expressed as a percentage of all persons aged 15 years and over.
+Reporting rate refers to the total number of persons who had experienced the crime type and reported the most recent incident of the crime type to police, expressed as a percentage of the total number of persons who experienced the crime type.
+np not published
+Between 2021-23 and 2023-25, victimisation and police reporting rates were stable for all assault types.
+Changes in personal crime victimisation rates since 2013-15
+Between 2013-15 and 2023-25, the victimisation rate declined for:
+physical and/or threatened assault (from 4.3% to 3.5%)
+face-to-face threatened assault (from 2.6% to 2.0%).
+Graph Table
+Download
+Download table as CSV
+Download table as XLSX
+Download graph as PNG image
+Download graph as JPG image
+Download graph as SVG Vector image
+Victimisation rates(a), Selected personal crimes, Victoria, Two-year pooled data: 2013-15 to 2023-25(b)
+Physical assault (%)
+Face-to-face threatened assault (%)
+Non-face-to-face threatened assault (%)
+Physical and/or threatened assault(c) (%)
+2013–15
+2.0
+2.6
+0.9
+4.3
+2014–16
+2.3
+2.6
+1.0
+4.5
+2015–17
+2.5
+2.8
+1.0
+5.0
+2016–18
+2.2
+2.9
+1.0
+4.9
+2017–19
+2.2
+2.8
+1.0
+4.9
+2018–20
+2.1
+2.6
+0.9
+4.6
+2019–21
+1.7
+2.1
+0.7
+3.7
+2020–22
+1.7
+2.1
+0.6
+3.6
+2021–23
+1.8
+2.1
+0.5
+3.7
+2022–24
+1.7
+2.0
+0.7
+3.6
+2023–25
+1.6
+2.0
+0.7
+3.5
+Victimisation rates(a), Selected personal crimes, Victoria, Two-year pooled data: 2013-15 to 2023-25(b) ["","Physical assault","Face-to-face threatened assault","Non-face-to-face threatened assault","Physical and\/or threatened assault(c)"] [["2013\u201315","2014\u201316","2015\u201317","2016\u201318","2017\u201319","2018\u201320","2019\u201321","2020\u201322","2021\u201323","2022\u201324","2023\u201325"],[[2],[2.3],[2.5],[2.2],[2.2],[2.1],[1.7],[1.7],[1.8],[1.7],[1.6]],[[2.6],[2.6],[2.8],[2.9],[2.8],[2.6],[2.1],[2.1],[2.1],[2],[2]],[[0.9],[1],[1],[1],[1],[0.9],[0.7],[0.6],[0.5],[0.7],[0.7]],[[4.3],[4.5],[5],[4.9],[4.9],[4.6],[3.7],[3.6],[3.7],[3.6],[3.5]]] [] [{"value":"0","axis_id":"0","axis_title":"","axis_units":"","tooltip_units":"","table_units":"","axis_min":null,"axis_max":null,"tick_interval":null,"precision":"-1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}] [{"value":"0","axis_id":"0","axis_title":"%","axis_units":"","tooltip_units":"(%)","table_units":"(%)","axis_min":"0","axis_max":"6","tick_interval":"1","precision":"1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}]
+Victimisation rate refers to the total number of persons aged 15 years and over who experienced a crime type, expressed as a percentage of all persons aged 15 years and over.
+Estimates have been obtained by pooling data from two successive Crime Victimisation Survey reference periods.
+Includes physical assault, face-to-face threatened assault and non-face-to-face threatened assault. Where a person has experienced multiple types of assault, they are counted separately for each type of assault experienced but are counted only once in the aggregated assault total.
+Household crime victimisation and reporting rates
+The table below presents household crime victimisation and reporting rates for the 2023-25 reference period.
+Household crime victimisation rate(a)
+Police reporting rate(b)
+Break-in
+1.9% (51,700)
+74.4%
+Attempted break-in
+1.7% (46,000)
+46.3%
+Motor vehicle theft
+0.8% (21,800)
+89.9%
+Theft from a motor vehicle
+2.6% (72,300)
+55.4%
+Malicious property damage
+3.3% (89,900)
+51.0%
+Other theft(c)
+1.8% (48,300)
+45.8%
+Victimisation rate refers to the total number of households that experienced a crime type, expressed as a percentage of all households.
+Reporting rate refers to the total number of households that had experienced the crime type and reported the most recent incident of the crime type to police, expressed as a percentage of the total number of households that experienced the crime type.
+Includes property stolen from a yard, as well as property stolen in other situations/locations. Excludes any incidents involving theft covered in other sections of the survey such as break-ins or robberies.
+Between 2021-23 and 2023-25:
+the victimisation rate increased for motor vehicle theft (from 0.5% to 0.8%)
+the police reporting rate increased for other theft (from 37% to 46%).
+Changes in household crime victimisation rates since 2013-15
+Between 2013-15 and 2023-25, the victimisation rate declined for:
+break-in (from 2.4% to 1.9%)
+theft from a motor vehicle (from 3.2% to 2.6%)
+malicious property damage (from 6.4% to 3.3%)
+other theft (from 3.0% to 1.8%).
+Graph Table
+Download
+Download table as CSV
+Download table as XLSX
+Download graph as PNG image
+Download graph as JPG image
+Download graph as SVG Vector image
+Victimisation rates(a), Selected household crimes, Victoria, Two-year pooled data: 2013-15 to 2023-25(b)
+Break-in (%)
+Attempted break-in (%)
+Motor vehicle theft (%)
+Theft from a motor vehicle (%)
+Malicious property damage (%)
+Other theft(c) (%)
+2013–15
+2.4
+1.6
+0.6
+3.2
+6.4
+3.0
+2014–16
+2.6
+1.8
+0.7
+3.5
+5.9
+3.1
+2015–17
+2.7
+2.0
+0.8
+3.7
+5.5
+3.0
+2016–18
+2.7
+2.1
+0.7
+3.8
+5.6
+2.8
+2017–19
+2.3
+1.9
+0.6
+3.4
+5.2
+2.4
+2018–20
+2.3
+1.6
+0.6
+3.0
+4.7
+2.1
+2019–21
+2.0
+1.5
+0.6
+2.9
+4.3
+2.1
+2020–22
+1.8
+1.4
+0.5
+2.8
+3.9
+2.1
+2021–23
+2.0
+1.4
+0.5
+2.6
+3.8
+2.1
+2022–24
+1.9
+1.5
+0.6
+2.3
+3.5
+2.1
+2023–25
+1.9
+1.7
+0.8
+2.6
+3.3
+1.8
+Victimisation rates(a), Selected household crimes, Victoria, Two-year pooled data: 2013-15 to 2023-25(b) ["","Break-in","Attempted break-in","Motor vehicle theft","Theft from a motor vehicle","Malicious property damage","Other theft(c)"] [["2013\u201315","2014\u201316","2015\u201317","2016\u201318","2017\u201319","2018\u201320","2019\u201321","2020\u201322","2021\u201323","2022\u201324","2023\u201325"],[[2.4],[2.6],[2.7],[2.7],[2.3],[2.3],[2],[1.8],[2],[1.9],[1.9]],[[1.6],[1.8],[2],[2.1],[1.9],[1.6],[1.5],[1.4],[1.4],[1.5],[1.7]],[[0.6],[0.7],[0.8],[0.7],[0.6],[0.6],[0.6],[0.5],[0.5],[0.6],[0.8]],[[3.2],[3.5],[3.7],[3.8],[3.4],[3],[2.9],[2.8],[2.6],[2.3],[2.6]],[[6.4],[5.9],[5.5],[5.6],[5.2],[4.7],[4.3],[3.9],[3.8],[3.5],[3.3]],[[3],[3.1],[3],[2.8],[2.4],[2.1],[2.1],[2.1],[2.1],[2.1],[1.8]]] [] [{"value":"0","axis_id":"0","axis_title":"","axis_units":"","tooltip_units":"","table_units":"","axis_min":null,"axis_max":null,"tick_interval":null,"precision":"-1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}] [{"value":"0","axis_id":"0","axis_title":"%","axis_units":"","tooltip_units":"(%)","table_units":"(%)","axis_min":"0","axis_max":"7","tick_interval":"1","precision":"1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}]
+Victimisation rate refers to the total number of households that experienced a crime type, expressed as a percentage of all households.
+Estimates have been obtained by pooling data from two successive Crime Victimisation Survey reference periods.
+Includes property stolen from a yard, as well as property stolen in other situations/locations. Excludes any incidents involving theft covered in other sections of the survey such as break-ins or robberies.
+Queensland
+Personal crime victimisation and reporting rates
+During the 2023-25 reference period, 4.4% of persons (194,200) experienced physical and/or threatened assault in the previous 12 months.
+The table below presents selected personal crime victimisation and police reporting rates for Queensland in 2023-25.
+Personal crime victimisation rate(a)
+Police reporting rate(b)
+Physical assault
+2.1% (94,500)
+58.6%
+Face-to-face threatened assault
+2.7% (120,300)
+38.5%
+Non-face-to-face threatened assault
+0.8% (34,700)
+np
+Victimisation rate refers to the total number of persons aged 15 years and over who experienced a crime type, expressed as a percentage of all persons aged 15 years and over.
+Reporting rate refers to the total number of persons who had experienced the crime type and reported the most recent incident of the crime type to police, expressed as a percentage of the total number of persons who experienced the crime type.
+np not published
+Between 2021-23 and 2023-25, victimisation and police reporting rates were stable for all assault types.
+Changes in personal crime victimisation rates since 2013-15
+Victimisation rates in 2023-25 were similar to those in 2013-15.
+Graph Table
+Download
+Download table as CSV
+Download table as XLSX
+Download graph as PNG image
+Download graph as JPG image
+Download graph as SVG Vector image
+Victimisation rates(a), Selected personal crimes, Queensland, Two-year pooled data: 2013-15 to 2023-25(b)
+Physical assault (%)
+Face-to-face threatened assault (%)
+Non-face-to-face threatened assault (%)
+Physical and/or threatened assault(c) (%)
+2013–15
+2.4
+2.9
+1.1
+4.9
+2014–16
+2.5
+2.8
+1.2
+4.9
+2015–17
+2.5
+2.5
+1.1
+4.7
+2016–18
+2.8
+2.4
+0.9
+5.0
+2017–19
+2.8
+2.6
+1.0
+5.2
+2018–20
+2.6
+2.8
+1.2
+5.1
+2019–21
+2.5
+2.8
+1.2
+5.2
+2020–22
+2.4
+2.5
+1.0
+4.7
+2021–23
+2.4
+2.5
+0.8
+4.6
+2022–24
+2.2
+2.6
+0.9
+4.4
+2023–25
+2.1
+2.7
+0.8
+4.4
+Victimisation rates(a), Selected personal crimes, Queensland, Two-year pooled data: 2013-15 to 2023-25(b) ["","Physical assault","Face-to-face threatened assault","Non-face-to-face threatened assault","Physical and\/or threatened assault(c)"] [["2013\u201315","2014\u201316","2015\u201317","2016\u201318","2017\u201319","2018\u201320","2019\u201321","2020\u201322","2021\u201323","2022\u201324","2023\u201325"],[[2.4],[2.5],[2.5],[2.8],[2.8],[2.6],[2.5],[2.4],[2.4],[2.2],[2.1]],[[2.9],[2.8],[2.5],[2.4],[2.6],[2.8],[2.8],[2.5],[2.5],[2.6],[2.7]],[[1.1],[1.2],[1.1],[0.9],[1],[1.2],[1.2],[1],[0.8],[0.9],[0.8]],[[4.9],[4.9],[4.7],[5],[5.2],[5.1],[5.2],[4.7],[4.6],[4.4],[4.4]]] [] [{"value":"0","axis_id":"0","axis_title":"","axis_units":"","tooltip_units":"","table_units":"","axis_min":null,"axis_max":null,"tick_interval":null,"precision":"-1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}] [{"value":"0","axis_id":"0","axis_title":"%","axis_units":"","tooltip_units":"(%)","table_units":"(%)","axis_min":"0","axis_max":"6","tick_interval":"1","precision":"1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}]
+Victimisation rate refers to the total number of persons aged 15 years and over who experienced a crime type, expressed as a percentage of all persons aged 15 years and over.
+Estimates have been obtained by pooling data from two successive Crime Victimisation Survey reference periods.
+Includes physical assault, face-to-face threatened assault and non-face-to-face threatened assault. Where a person has experienced multiple types of assault, they are counted separately for each type of assault experienced but are counted only once in the aggregated assault total.
+Household crime victimisation and reporting rates
+The table below presents household crime victimisation and reporting rates for the 2023-25 reference period.
+Household crime victimisation rate(a)
+Police reporting rate(b)
+Break-in
+2.5% (54,200)
+73.5%
+Attempted break-in
+3.6% (78,700)
+47.7%
+Motor vehicle theft
+0.7% (16,200)
+91.8%
+Theft from a motor vehicle
+2.1% (45,400)
+51.8%
+Malicious property damage
+3.8% (83,700)
+58.3%
+Other theft(c)
+1.7% (36,700)
+35.4%
+Victimisation rate refers to the total number of households that experienced a crime type, expressed as a percentage of all households.
+Reporting rate refers to the total number of households that had experienced the crime type and reported the most recent incident of the crime type to police, expressed as a percentage of the total number of households that experienced the crime type.
+Includes property stolen from a yard, as well as property stolen in other situations/locations. Excludes any incidents involving theft covered in other sections of the survey such as break-ins or robberies.
+Between 2021-23 and 2023-25:
+victimisation rates were stable for all household crime types
+the police reporting rate increased for malicious property damage (from 48% to 58%).
+Changes in household crime victimisation rates since 2013-15
+Between 2013-15 and 2023-25, the victimisation rate:
+increased for attempted break-in (from 2.3% to 3.6%)
+decreased for other theft (from 2.3% to 1.7%).
+Graph Table
+Download
+Download table as CSV
+Download table as XLSX
+Download graph as PNG image
+Download graph as JPG image
+Download graph as SVG Vector image
+Victimisation rates(a), Selected household crimes, Queensland, Two-year pooled data: 2013-15 to 2023-25(b)
+Break-in (%)
+Attempted break-in (%)
+Motor vehicle theft (%)
+Theft from a motor vehicle (%)
+Malicious property damage (%)
+Other theft(c) (%)
+2013–15
+2.5
+2.3
+0.6
+2.0
+4.4
+2.3
+2014–16
+2.4
+1.9
+0.5
+1.9
+3.6
+2.5
+2015–17
+2.0
+2.0
+0.4
+1.7
+3.5
+2.3
+2016–18
+2.3
+2.4
+0.5
+1.8
+4.2
+2.4
+2017–19
+2.5
+2.5
+0.6
+1.9
+4.4
+2.1
+2018–20
+2.5
+2.3
+0.7
+2.0
+4.4
+2.0
+2019–21
+2.2
+2.3
+0.7
+2.3
+4.2
+2.2
+2020–22
+2.2
+2.8
+0.7
+2.2
+4.0
+2.1
+2021–23
+2.4
+3.2
+0.8
+2.1
+4.1
+2.0
+2022–24
+2.5
+3.8
+0.9
+2.2
+4.1
+1.9
+2023–25
+2.5
+3.6
+0.7
+2.1
+3.8
+1.7
+Victimisation rates(a), Selected household crimes, Queensland, Two-year pooled data: 2013-15 to 2023-25(b) ["","Break-in","Attempted break-in","Motor vehicle theft","Theft from a motor vehicle","Malicious property damage","Other theft(c)"] [["2013\u201315","2014\u201316","2015\u201317","2016\u201318","2017\u201319","2018\u201320","2019\u201321","2020\u201322","2021\u201323","2022\u201324","2023\u201325"],[[2.5],[2.4],[2],[2.3],[2.5],[2.5],[2.2],[2.2],[2.4],[2.5],[2.5]],[[2.3],[1.9],[2],[2.4],[2.5],[2.3],[2.3],[2.8],[3.2],[3.8],[3.6]],[[0.6],[0.5],[0.4],[0.5],[0.6],[0.7],[0.7],[0.7],[0.8],[0.9],[0.7]],[[2],[1.9],[1.7],[1.8],[1.9],[2],[2.3],[2.2],[2.1],[2.2],[2.1]],[[4.4],[3.6],[3.5],[4.2],[4.4],[4.4],[4.2],[4],[4.1],[4.1],[3.8]],[[2.3],[2.5],[2.3],[2.4],[2.1],[2],[2.2],[2.1],[2],[1.9],[1.7]]] [] [{"value":"0","axis_id":"0","axis_title":"","axis_units":"","tooltip_units":"","table_units":"","axis_min":null,"axis_max":null,"tick_interval":null,"precision":"-1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}] [{"value":"0","axis_id":"0","axis_title":"%","axis_units":"","tooltip_units":"(%)","table_units":"(%)","axis_min":"0","axis_max":"5","tick_interval":"0.5","precision":"1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}]
+Victimisation rate refers to the total number of households that experienced a crime type, expressed as a percentage of all households.
+Estimates have been obtained by pooling data from two successive Crime Victimisation Survey reference periods.
+Includes property stolen from a yard, as well as property stolen in other situations/locations. Excludes any incidents involving theft covered in other sections of the survey such as break-ins or robberies.
+South Australia
+Personal crime victimisation and reporting rates
+During the 2023-25 reference period, 3.6% of persons (55,000) experienced physical and/or threatened assault in the previous 12 months.
+The table below presents selected personal crime victimisation and police reporting rates for South Australia in 2023-25.
+Personal crime victimisation rate(a)
+Police reporting rate(b)
+Physical assault
+2.0% (30,400)
+52.3%
+Face-to-face threatened assault
+1.9% (29,300)
+39.4%
+Non-face-to-face threatened assault
+0.8% (12,300)
+np
+Victimisation rate refers to the total number of persons aged 15 years and over who experienced a crime type, expressed as a percentage of all persons aged 15 years and over.
+Reporting rate refers to the total number of persons who had experienced the crime type and reported the most recent incident of the crime type to police, expressed as a percentage of the total number of persons who experienced the crime type.
+np not published
+Between 2021-23 and 2023-25:
+the victimisation rate increased for physical assault (from 1.5% to 2.0%)
+police reporting rates were stable for all assault types.
+Changes in personal crime victimisation rates since 2013-15
+Between 2013-15 and 2023-25, the victimisation rate declined for:
+physical and/or threatened assault (from 5.1% to 3.6%)
+physical assault (from 2.8% to 2.0%)
+face-to-face threatened assault (from 2.7% to 1.9%)
+non-face-to-face threatened assault (from 1.3% to 0.8%).
+Graph Table
+Download
+Download table as CSV
+Download table as XLSX
+Download graph as PNG image
+Download graph as JPG image
+Download graph as SVG Vector image
+Victimisation rates(a), Selected personal crimes, South Australia, Two-year pooled data: 2013-15 to 2023-25(b)
+Physical assault (%)
+Face-to-face threatened assault (%)
+Non-face-to-face threatened assault (%)
+Physical and/or threatened assault(c) (%)
+2013–15
+2.8
+2.7
+1.3
+5.1
+2014–16
+2.4
+2.8
+1.4
+4.9
+2015–17
+2.1
+2.5
+1.1
+4.4
+2016–18
+2.3
+2.4
+0.9
+4.4
+2017–19
+2.4
+2.7
+1.1
+4.5
+2018–20
+2.3
+2.4
+1.2
+4.3
+2019–21
+2.5
+2.2
+0.9
+4.4
+2020–22
+2.2
+2.3
+0.7
+4.2
+2021–23
+1.5
+2.1
+0.7
+3.5
+2022–24
+1.7
+1.8
+0.7
+3.4
+2023–25
+2.0
+1.9
+0.8
+3.6
+Victimisation rates(a), Selected personal crimes, South Australia, Two-year pooled data: 2013-15 to 2023-25(b) ["","Physical assault","Face-to-face threatened assault","Non-face-to-face threatened assault","Physical and\/or threatened assault(c)"] [["2013\u201315","2014\u201316","2015\u201317","2016\u201318","2017\u201319","2018\u201320","2019\u201321","2020\u201322","2021\u201323","2022\u201324","2023\u201325"],[[2.8],[2.4],[2.1],[2.3],[2.4],[2.3],[2.5],[2.2],[1.5],[1.7],[2]],[[2.7],[2.8],[2.5],[2.4],[2.7],[2.4],[2.2],[2.3],[2.1],[1.8],[1.9]],[[1.3],[1.4],[1.1],[0.9],[1.1],[1.2],[0.9],[0.7],[0.7],[0.7],[0.8]],[[5.1],[4.9],[4.4],[4.4],[4.5],[4.3],[4.4],[4.2],[3.5],[3.4],[3.6]]] [] [{"value":"0","axis_id":"0","axis_title":"","axis_units":"","tooltip_units":"","table_units":"","axis_min":null,"axis_max":null,"tick_interval":null,"precision":"-1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}] [{"value":"0","axis_id":"0","axis_title":"%","axis_units":"","tooltip_units":"(%)","table_units":"(%)","axis_min":"0","axis_max":"6","tick_interval":"1","precision":"1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}]
+Victimisation rate refers to the total number of persons aged 15 years and over who experienced a crime type, expressed as a percentage of all persons aged 15 years and over.
+Estimates have been obtained by pooling data from two successive Crime Victimisation Survey reference periods.
+Includes physical assault, face-to-face threatened assault and non-face-to-face threatened assault. Where a person has experienced multiple types of assault, they are counted separately for each type of assault experienced but are counted only once in the aggregated assault total.
+Household crime victimisation and reporting rates
+The table below presents household crime victimisation and reporting rates for the 2023-25 reference period.
+Household crime victimisation rate(a)
+Police reporting rate(b)
+Break-in
+1.4% (11,100)
+62.9%
+Attempted break-in
+1.4% (10,600)
+40.0%
+Motor vehicle theft
+0.3% (2,400)
+75.0%
+Theft from a motor vehicle
+2.1% (16,200)
+57.6%
+Malicious property damage
+3.3% (25,400)
+55.1%
+Other theft(c)
+2.1% (16,200)
+32.0%
+Victimisation rate refers to the total number of households that experienced a crime type, expressed as a percentage of all households.
+Reporting rate refers to the total number of households that had experienced the crime type and reported the most recent incident of the crime type to police, expressed as a percentage of the total number of households that experienced the crime type.
+Includes property stolen from a yard, as well as property stolen in other situations/locations. Excludes any incidents involving theft covered in other sections of the survey such as break-ins or robberies.
+Between 2021-23 and 2023-25:
+the victimisation rate declined for theft from a motor vehicle (from 2.7% to 2.1%)
+police reporting rates were stable for all household crime types.
+Changes in household crime victimisation rates since 2013-15
+Between 2013-15 and 2023-25, the victimisation rate declined for:
+break-in (from 2.3% to 1.4%)
+motor vehicle theft (from 0.6% to 0.3%)
+theft from a motor vehicle (from 2.8% to 2.1%)
+malicious property damage (from 5.9% to 3.3%)
+other theft (from 2.9% to 2.1%).
+Graph Table
+Download
+Download table as CSV
+Download table as XLSX
+Download graph as PNG image
+Download graph as JPG image
+Download graph as SVG Vector image
+Victimisation rates(a), Selected household crimes, South Australia, Two-year pooled data: 2013-15 to 2023-25(b)
+Break-in (%)
+Attempted break-in (%)
+Motor vehicle theft (%)
+Theft from a motor vehicle (%)
+Malicious property damage (%)
+Other theft(c) (%)
+2013–15
+2.3
+1.8
+0.6
+2.8
+5.9
+2.9
+2014–16
+2.3
+1.8
+0.6
+3.0
+5.7
+3.0
+2015–17
+2.0
+1.9
+0.5
+2.9
+4.9
+2.8
+2016–18
+1.9
+2.1
+0.3
+2.8
+4.3
+2.5
+2017–19
+2.0
+1.9
+0.3
+2.7
+4.4
+2.4
+2018–20
+2.4
+1.8
+0.4
+2.7
+4.5
+2.5
+2019–21(d)
+2.0
+1.7
+0.3
+2.8
+4.3
+2.3
+2020–22
+1.8
+1.8
+0.4
+2.8
+3.8
+2.2
+2021–23
+1.8
+1.6
+0.4
+2.7
+3.6
+1.9
+2022–24
+1.5
+1.3
+0.4
+2.4
+3.3
+1.9
+2023–25
+1.4
+1.4
+0.3
+2.1
+3.3
+2.1
+Victimisation rates(a), Selected household crimes, South Australia, Two-year pooled data: 2013-15 to 2023-25(b) ["","Break-in","Attempted break-in","Motor vehicle theft","Theft from a motor vehicle","Malicious property damage","Other theft(c)"] [["2013\u201315","2014\u201316","2015\u201317","2016\u201318","2017\u201319","2018\u201320","2019\u201321(d)","2020\u201322","2021\u201323","2022\u201324","2023\u201325"],[[2.3],[2.3],[2],[1.9],[2],[2.4],[2],[1.8],[1.8],[1.5],[1.4]],[[1.8],[1.8],[1.9],[2.1],[1.9],[1.8],[1.7],[1.8],[1.6],[1.3],[1.4]],[[0.6],[0.6],[0.5],[0.3],[0.3],[0.4],[0.3],[0.4],[0.4],[0.4],[0.3]],[[2.8],[3],[2.9],[2.8],[2.7],[2.7],[2.8],[2.8],[2.7],[2.4],[2.1]],[[5.9],[5.7],[4.9],[4.3],[4.4],[4.5],[4.3],[3.8],[3.6],[3.3],[3.3]],[[2.9],[3],[2.8],[2.5],[2.4],[2.5],[2.3],[2.2],[1.9],[1.9],[2.1]]] [] [{"value":"0","axis_id":"0","axis_title":"","axis_units":"","tooltip_units":"","table_units":"","axis_min":null,"axis_max":null,"tick_interval":null,"precision":"-1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}] [{"value":"0","axis_id":"0","axis_title":"%","axis_units":"","tooltip_units":"(%)","table_units":"(%)","axis_min":"0","axis_max":"7","tick_interval":"1","precision":"1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}]
+Victimisation rate refers to the total number of households that experienced a crime type, expressed as a percentage of all households.
+Estimates have been obtained by pooling data from two successive Crime Victimisation Survey reference periods.
+Includes property stolen from a yard, as well as property stolen in other situations/locations. Excludes any incidents involving theft covered in other sections of the survey such as break-ins or robberies.
+The 2019-21 victimisation rate for motor vehicle theft has a relative standard error of between 25% and 50% and should be used with caution.
+Western Australia
+Personal crime victimisation and reporting rates
+During the 2023-25 reference period, 3.9% of persons (90,300) experienced physical and/or threatened assault in the previous 12 months.
+The table below presents selected personal crime victimisation and police reporting rates for Western Australia in 2023-25.
+Personal crime victimisation rate(a)
+Police reporting rate(b)
+Physical assault
+1.7% (40,100)
+41.8%
+Face-to-face threatened assault
+2.5% (57,900)
+31.0%
+Non-face-to-face threatened assault
+*0.6% (*14,600)
+np
+Victimisation rate refers to the total number of persons aged 15 years and over who experienced a crime type, expressed as a percentage of all persons aged 15 years and over.
+Reporting rate refers to the total number of persons who had experienced the crime type and reported the most recent incident of the crime type to police, expressed as a percentage of the total number of persons who experienced the crime type.
+* Estimate has a relative standard error of 25% to 50% and should be used with caution.
+np not published
+Between 2021-23 and 2023-25:
+the victimisation rate declined for physical and/or threatened assault (from 4.9% to 3.9%)
+police reporting rates were stable for all assault types.
+Changes in personal crime victimisation rates since 2013-15
+Between 2013-15 and 2023-25, the victimisation rate declined for:
+physical and/or threatened assault (from 5.7% to 3.9%)
+physical assault (from 2.7% to 1.7%)
+face-to-face threatened assault (from 3.5% to 2.5%)
+non-face-to-face threatened assault (from 1.2% to *0.6%).
+Graph Table
+Download
+Download table as CSV
+Download table as XLSX
+Download graph as PNG image
+Download graph as JPG image
+Download graph as SVG Vector image
+Victimisation rates(a), Selected personal crimes, Western Australia, Two-year pooled data: 2013-15 to 2023-25(b)
+Physical assault (%)
+Face-to-face threatened assault (%)
+Non-face-to-face threatened assault (%)
+Physical and/or threatened assault(c) (%)
+2013–15
+2.7
+3.5
+1.2
+5.7
+2014–16
+3.1
+3.5
+1.1
+6.0
+2015–17
+3.3
+3.6
+1.1
+6.5
+2016–18
+2.8
+3.1
+0.9
+5.8
+2017–19
+2.6
+2.9
+0.6
+5.1
+2018–20
+2.8
+3.1
+1.0
+5.4
+2019–21
+2.8
+2.9
+1.2
+5.3
+2020–22
+2.3
+3.0
+1.1
+5.2
+2021–23
+2.1
+3.0
+1.0
+4.9
+2022–24
+1.7
+2.5
+0.7
+3.9
+2023–25(d)
+1.7
+2.5
+0.6
+3.9
+Victimisation rates(a), Selected personal crimes, Western Australia, Two-year pooled data: 2013-15 to 2023-25(b) ["","Physical assault","Face-to-face threatened assault","Non-face-to-face threatened assault","Physical and\/or threatened assault(c)"] [["2013\u201315","2014\u201316","2015\u201317","2016\u201318","2017\u201319","2018\u201320","2019\u201321","2020\u201322","2021\u201323","2022\u201324","2023\u201325(d)"],[[2.7],[3.1],[3.3],[2.8],[2.6],[2.8],[2.8],[2.3],[2.1],[1.7],[1.7]],[[3.5],[3.5],[3.6],[3.1],[2.9],[3.1],[2.9],[3],[3],[2.5],[2.5]],[[1.2],[1.1],[1.1],[0.9],[0.6],[1],[1.2],[1.1],[1],[0.7],[0.6]],[[5.7],[6],[6.5],[5.8],[5.1],[5.4],[5.3],[5.2],[4.9],[3.9],[3.9]]] [] [{"value":"0","axis_id":"0","axis_title":"","axis_units":"","tooltip_units":"","table_units":"","axis_min":null,"axis_max":null,"tick_interval":null,"precision":"-1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}] [{"value":"0","axis_id":"0","axis_title":"%","axis_units":"","tooltip_units":"(%)","table_units":"(%)","axis_min":"0","axis_max":"7","tick_interval":"1","precision":"1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}]
+Victimisation rate refers to the total number of persons aged 15 years and over who experienced a crime type, expressed as a percentage of all persons aged 15 years and over.
+Estimates have been obtained by pooling data from two successive Crime Victimisation Survey reference periods.
+Includes physical assault, face-to-face threatened assault and non-face-to-face threatened assault. Where a person has experienced multiple types of assault, they are counted separately for each type of assault experienced but are counted only once in the aggregated assault total.
+The 2023-25 victimisation rate for non-face-to-face threatened assault has a relative standard error of between 25% and 50% and should be used with caution.
+Household crime victimisation and reporting rates
+The table below presents household crime victimisation and reporting rates for the 2023-25 reference period.
+Household crime victimisation rate(a)
+Police reporting rate(b)
+Break-in
+2.3% (25,600)
+75.6%
+Attempted break-in
+2.3% (26,600)
+43.4%
+Motor vehicle theft
+0.6% (6,300)
+80.3%
+Theft from a motor vehicle
+3.2% (36,600)
+46.7%
+Malicious property damage
+4.6% (52,700)
+55.6%
+Other theft(c)
+2.3% (26,600)
+44.9%
+Victimisation rate refers to the total number of households that experienced a crime type, expressed as a percentage of all households.
+Reporting rate refers to the total number of households that had experienced the crime type and reported the most recent incident of the crime type to police, expressed as a percentage of the total number of households that experienced the crime type.
+Includes property stolen from a yard, as well as property stolen in other situations/locations. Excludes any incidents involving theft covered in other sections of the survey such as break-ins or robberies.
+Between 2021-23 and 2023-25, victimisation and police reporting rates were stable for all household crime types.
+Changes in household crime victimisation rates since 2013-15
+Between 2013-15 and 2023-25, the victimisation rate declined for:
+break-in (from 4.8% to 2.3%)
+attempted break-in (from 3.4% to 2.3%)
+motor vehicle theft (from 1.0% to 0.6%)
+theft from a motor vehicle (from 5.4% to 3.2%)
+malicious property damage (from 9.2% to 4.6%)
+other theft (from 3.5% to 2.3%).
+Graph Table
+Download
+Download table as CSV
+Download table as XLSX
+Download graph as PNG image
+Download graph as JPG image
+Download graph as SVG Vector image
+Victimisation rates(a), Selected household crimes, Western Australia, Two-year pooled data: 2013-15 to 2023-25(b)
+Break-in (%)
+Attempted break-in (%)
+Motor vehicle theft (%)
+Theft from a motor vehicle (%)
+Malicious property damage (%)
+Other theft(c) (%)
+2013–15
+4.8
+3.4
+1.0
+5.4
+9.2
+3.5
+2014–16
+4.4
+3.7
+0.8
+5.6
+8.2
+3.5
+2015–17
+4.2
+3.7
+0.8
+5.5
+7.5
+3.9
+2016–18
+4.2
+3.6
+0.7
+5.2
+7.4
+3.9
+2017–19
+4.2
+3.0
+0.7
+4.8
+6.8
+3.6
+2018–20
+4.2
+2.6
+0.9
+4.7
+6.7
+3.4
+2019–21
+3.3
+3.0
+0.8
+4.5
+6.7
+3.4
+2020–22
+2.7
+2.7
+0.7
+3.9
+6.1
+3.1
+2021–23
+2.7
+2.1
+0.7
+3.4
+4.9
+2.6
+2022–24
+2.5
+2.2
+0.7
+3.2
+4.6
+2.2
+2023–25
+2.3
+2.3
+0.6
+3.2
+4.6
+2.3
+Victimisation rates(a), Selected household crimes, Western Australia, Two-year pooled data: 2013-15 to 2023-25(b) ["","Break-in","Attempted break-in","Motor vehicle theft","Theft from a motor vehicle","Malicious property damage","Other theft(c)"] [["2013\u201315","2014\u201316","2015\u201317","2016\u201318","2017\u201319","2018\u201320","2019\u201321","2020\u201322","2021\u201323","2022\u201324","2023\u201325"],[[4.8],[4.4],[4.2],[4.2],[4.2],[4.2],[3.3],[2.7],[2.7],[2.5],[2.3]],[[3.4],[3.7],[3.7],[3.6],[3],[2.6],[3],[2.7],[2.1],[2.2],[2.3]],[[1],[0.8],[0.8],[0.7],[0.7],[0.9],[0.8],[0.7],[0.7],[0.7],[0.6]],[[5.4],[5.6],[5.5],[5.2],[4.8],[4.7],[4.5],[3.9],[3.4],[3.2],[3.2]],[[9.2],[8.2],[7.5],[7.4],[6.8],[6.7],[6.7],[6.1],[4.9],[4.6],[4.6]],[[3.5],[3.5],[3.9],[3.9],[3.6],[3.4],[3.4],[3.1],[2.6],[2.2],[2.3]]] [] [{"value":"0","axis_id":"0","axis_title":"","axis_units":"","tooltip_units":"","table_units":"","axis_min":null,"axis_max":null,"tick_interval":null,"precision":"-1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}] [{"value":"0","axis_id":"0","axis_title":"%","axis_units":"","tooltip_units":"(%)","table_units":"(%)","axis_min":"0","axis_max":"10","tick_interval":"1","precision":"1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}]
+Victimisation rate refers to the total number of households that experienced a crime type, expressed as a percentage of all households.
+Estimates have been obtained by pooling data from two successive Crime Victimisation Survey reference periods.
+Includes property stolen from a yard, as well as property stolen in other situations/locations. Excludes any incidents involving theft covered in other sections of the survey such as break-ins or robberies.
+Tasmania
+Personal crime victimisation and reporting rates
+During the 2023-25 reference period, 5.1% of persons (23,900) experienced physical and/or threatened assault in the previous 12 months.
+The table below presents selected personal crime victimisation and police reporting rates for Tasmania in 2023-25.
+Personal crime victimisation rate(a)
+Police reporting rate(b)
+Physical assault
+2.6% (12,200)
+47.1%
+Face-to-face threatened assault
+2.9% (13,700)
+36.1%
+Non-face-to-face threatened assault
+1.1% (5,400)
+np
+Victimisation rate refers to the total number of persons aged 15 years and over who experienced a crime type, expressed as a percentage of all persons aged 15 years and over.
+Reporting rate refers to the total number of persons who had experienced the crime type and reported the most recent incident of the crime type to police, expressed as a percentage of the total number of persons who experienced the crime type.
+np not published
+Between 2021-23 and 2023-25:
+the victimisation rate increased for physical and/or threatened assault (from 3.9% to 5.1%)
+police reporting rates were stable for all assault types.
+Changes in personal crime victimisation rates since 2013-15
+Between 2013-15 and 2023-25, the victimisation rate declined for:
+physical and/or threatened assault (from 6.2% to 5.1%)
+non-face-to-face threatened assault (from 1.7% to 1.1%).
+Graph Table
+Download
+Download table as CSV
+Download table as XLSX
+Download graph as PNG image
+Download graph as JPG image
+Download graph as SVG Vector image
+Victimisation rates(a), Selected personal crimes, Tasmania, Two-year pooled data: 2013-15 to 2023-25(b)
+Physical assault (%)
+Face-to-face threatened assault (%)
+Non-face-to-face threatened assault (%)
+Physical and/or threatened assault(c) (%)
+2013–15
+3.0
+3.2
+1.7
+6.2
+2014–16
+2.4
+2.9
+1.2
+5.3
+2015–17
+2.0
+2.7
+1.2
+4.8
+2016–18
+2.2
+3.0
+1.2
+5.0
+2017–19
+2.6
+3.3
+1.4
+5.7
+2018–20
+2.5
+3.5
+1.6
+5.8
+2019–21
+2.5
+3.0
+1.3
+5.1
+2020–22
+2.2
+2.7
+1.1
+4.6
+2021–23
+1.9
+2.3
+1.0
+3.9
+2022–24
+2.2
+2.3
+1.1
+4.2
+2023–25
+2.6
+2.9
+1.1
+5.1
+Victimisation rates(a), Selected personal crimes, Tasmania, Two-year pooled data: 2013-15 to 2023-25(b) ["","Physical assault","Face-to-face threatened assault","Non-face-to-face threatened assault","Physical and\/or threatened assault(c)"] [["2013\u201315","2014\u201316","2015\u201317","2016\u201318","2017\u201319","2018\u201320","2019\u201321","2020\u201322","2021\u201323","2022\u201324","2023\u201325"],[[3],[2.4],[2],[2.2],[2.6],[2.5],[2.5],[2.2],[1.9],[2.2],[2.6]],[[3.2],[2.9],[2.7],[3],[3.3],[3.5],[3],[2.7],[2.3],[2.3],[2.9]],[[1.7],[1.2],[1.2],[1.2],[1.4],[1.6],[1.3],[1.1],[1],[1.1],[1.1]],[[6.2],[5.3],[4.8],[5],[5.7],[5.8],[5.1],[4.6],[3.9],[4.2],[5.1]]] [] [{"value":"0","axis_id":"0","axis_title":"","axis_units":"","tooltip_units":"","table_units":"","axis_min":null,"axis_max":null,"tick_interval":null,"precision":"-1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}] [{"value":"0","axis_id":"0","axis_title":"%","axis_units":"","tooltip_units":"(%)","table_units":"(%)","axis_min":"0","axis_max":"7","tick_interval":"1","precision":"1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}]
+Victimisation rate refers to the total number of persons aged 15 years and over who experienced a crime type, expressed as a percentage of all persons aged 15 years and over.
+Estimates have been obtained by pooling data from two successive Crime Victimisation Survey reference periods.
+Includes physical assault, face-to-face threatened assault and non-face-to-face threatened assault. Where a person has experienced multiple types of assault, they are counted separately for each type of assault experienced but are counted only once in the aggregated assault total.
+Household crime victimisation and reporting rates
+The table below presents household crime victimisation and reporting rates for the 2023-25 reference period.
+Household crime victimisation rate(a)
+Police reporting rate(b)
+Break-in
+2.1% (5,100)
+74.5%
+Attempted break-in
+1.6% (3,900)
+44.0%
+Motor vehicle theft
+0.7% (1,600)
+94.1%
+Theft from a motor vehicle
+1.5% (3,500)
+60.2%
+Malicious property damage
+4.0% (9,600)
+52.4%
+Other theft(c)
+2.0% (4,800)
+44.7%
+Victimisation rate refers to the total number of households that experienced a crime type, expressed as a percentage of all households.
+Reporting rate refers to the total number of households that had experienced the crime type and reported the most recent incident of the crime type to police, expressed as a percentage of the total number of households that experienced the crime type.
+Includes property stolen from a yard, as well as property stolen in other situations/locations. Excludes any incidents involving theft covered in other sections of the survey such as break-ins or robberies.
+Between 2021-23 and 2023-25:
+victimisation rates were stable for all household crime types
+the police reporting rate increased for attempted break-in (from 28% to 44%).
+Changes in household crime victimisation rates since 2013-15
+Between 2013-15 and 2023-25, the victimisation rate declined for:
+break-in (from 3.0% to 2.1%)
+theft from a motor vehicle (from 2.1% to 1.5%)
+malicious property damage (from 6.9% to 4.0%)
+other theft (from 3.1% to 2.0%).
+Graph Table
+Download
+Download table as CSV
+Download table as XLSX
+Download graph as PNG image
+Download graph as JPG image
+Download graph as SVG Vector image
+Victimisation rates(a), Selected household crimes, Tasmania, Two-year pooled data: 2013-15 to 2023-25(b)
+Break-in (%)
+Attempted break-in (%)
+Motor vehicle theft (%)
+Theft from a motor vehicle (%)
+Malicious property damage (%)
+Other theft(c) (%)
+2013–15
+3.0
+2.0
+1.0
+2.1
+6.9
+3.1
+2014–16
+2.8
+1.9
+1.1
+2.1
+5.9
+3.0
+2015–17
+2.3
+1.9
+0.9
+2.0
+5.1
+2.6
+2016–18
+2.0
+1.7
+0.6
+1.9
+4.6
+2.5
+2017–19
+2.2
+1.7
+0.5
+1.9
+4.7
+2.8
+2018–20
+2.1
+1.7
+0.7
+1.7
+4.7
+3.0
+2019–21
+1.8
+1.7
+0.6
+1.6
+4.0
+2.6
+2020–22
+1.7
+1.7
+0.7
+1.6
+3.4
+2.0
+2021–23
+1.9
+1.6
+0.6
+1.6
+3.7
+1.8
+2022–24
+2.1
+1.7
+0.7
+1.8
+4.3
+1.9
+2023–25
+2.1
+1.6
+0.7
+1.5
+4.0
+2.0
+Victimisation rates(a), Selected household crimes, Tasmania, Two-year pooled data: 2013-15 to 2023-25(b) ["","Break-in","Attempted break-in","Motor vehicle theft","Theft from a motor vehicle","Malicious property damage","Other theft(c)"] [["2013\u201315","2014\u201316","2015\u201317","2016\u201318","2017\u201319","2018\u201320","2019\u201321","2020\u201322","2021\u201323","2022\u201324","2023\u201325"],[[3],[2.8],[2.3],[2],[2.2],[2.1],[1.8],[1.7],[1.9],[2.1],[2.1]],[[2],[1.9],[1.9],[1.7],[1.7],[1.7],[1.7],[1.7],[1.6],[1.7],[1.6]],[[1],[1.1],[0.9],[0.6],[0.5],[0.7],[0.6],[0.7],[0.6],[0.7],[0.7]],[[2.1],[2.1],[2],[1.9],[1.9],[1.7],[1.6],[1.6],[1.6],[1.8],[1.5]],[[6.9],[5.9],[5.1],[4.6],[4.7],[4.7],[4],[3.4],[3.7],[4.3],[4]],[[3.1],[3],[2.6],[2.5],[2.8],[3],[2.6],[2],[1.8],[1.9],[2]]] [] [{"value":"0","axis_id":"0","axis_title":"","axis_units":"","tooltip_units":"","table_units":"","axis_min":null,"axis_max":null,"tick_interval":null,"precision":"-1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}] [{"value":"0","axis_id":"0","axis_title":"%","axis_units":"","tooltip_units":"(%)","table_units":"(%)","axis_min":"0","axis_max":"8","tick_interval":"1","precision":"1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}]
+Victimisation rate refers to the total number of households that experienced a crime type, expressed as a percentage of all households.
+Estimates have been obtained by pooling data from two successive Crime Victimisation Survey reference periods.
+Includes property stolen from a yard, as well as property stolen in other situations/locations. Excludes any incidents involving theft covered in other sections of the survey such as break-ins or robberies.
+Northern Territory
+Personal crime victimisation and reporting rates
+During the 2023-25 reference period, 8.9% of persons (15,500) experienced physical and/or threatened assault in the previous 12 months.
+The table below presents selected personal crime victimisation and police reporting rates for Northern Territory in 2023-25.
+Personal crime victimisation rate(a)
+Police reporting rate(b)
+Physical assault
+4.5% (7,800)
+63.7%
+Face-to-face threatened assault
+5.3% (9,300)
+44.4%
+Non-face-to-face threatened assault
+1.2% (2,100)
+np
+Victimisation rate refers to the total number of persons aged 15 years and over who experienced a crime type, expressed as a percentage of all persons aged 15 years and over.
+Reporting rate refers to the total number of persons who had experienced the crime type and reported the most recent incident of the crime type to police, expressed as a percentage of the total number of persons who experienced the crime type.
+np not published
+Between 2021-23 and 2023-25, victimisation and police reporting rates were stable for all assault types.
+Changes in personal crime victimisation rates since 2013-15
+Between 2013-15 and 2023-25, the victimisation rate increased for face-to-face threatened assault (from 3.0% to 5.3%).
+Graph Table
+Download
+Download table as CSV
+Download table as XLSX
+Download graph as PNG image
+Download graph as JPG image
+Download graph as SVG Vector image
+Victimisation rates(a), Selected personal crimes(b), Northern Territory, Two-year pooled data: 2013-15 to 2023-25(c)
+Physical assault (%)
+Face-to-face threatened assault (%)
+Physical and/or threatened assault(d) (%)
+2013–15
+4.6
+3.0
+6.8
+2014–16
+4.5
+3.8
+7.7
+2015–17
+4.9
+3.9
+8.0
+2016–18
+4.3
+3.6
+7.0
+2017–19
+4.5
+4.3
+7.5
+2018–20
+3.9
+4.5
+7.4
+2019–21
+2.6
+3.8
+6.2
+2020–22
+3.0
+3.8
+6.3
+2021–23
+4.0
+4.3
+7.4
+2022–24
+4.4
+4.9
+8.3
+2023–25
+4.5
+5.3
+8.9
+Victimisation rates(a), Selected personal crimes(b), Northern Territory, Two-year pooled data: 2013-15 to 2023-25(c) ["","Physical assault","Face-to-face threatened assault","Physical and\/or threatened assault(d)"] [["2013\u201315","2014\u201316","2015\u201317","2016\u201318","2017\u201319","2018\u201320","2019\u201321","2020\u201322","2021\u201323","2022\u201324","2023\u201325"],[[4.6],[4.5],[4.9],[4.3],[4.5],[3.9],[2.6],[3],[4],[4.4],[4.5]],[[3],[3.8],[3.9],[3.6],[4.3],[4.5],[3.8],[3.8],[4.3],[4.9],[5.3]],[[6.8],[7.7],[8],[7],[7.5],[7.4],[6.2],[6.3],[7.4],[8.3],[8.9]]] [] [{"value":"0","axis_id":"0","axis_title":"","axis_units":"","tooltip_units":"","table_units":"","axis_min":null,"axis_max":null,"tick_interval":null,"precision":"-1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}] [{"value":"0","axis_id":"0","axis_title":"%","axis_units":"","tooltip_units":"(%)","table_units":"(%)","axis_min":"0","axis_max":"10","tick_interval":"1","precision":"1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}]
+Victimisation rate refers to the total number of persons aged 15 years and over who experienced a crime type, expressed as a percentage of all persons aged 15 years and over.
+Data for non-face-to-face threatened assault are not shown, as multiple estimates in the time series have an associated RSE greater than 25%.
+Estimates have been obtained by pooling data from two successive Crime Victimisation Survey reference periods.
+Includes physical assault, face-to-face threatened assault and non-face-to-face threatened assault. Where a person has experienced multiple types of assault, they are counted separately for each type of assault experienced but are counted only once in the aggregated assault total.
+Household crime victimisation and reporting rates
+The table below presents household crime victimisation and reporting rates for the 2023-25 reference period.
+Household crime victimisation rate(a)
+Police reporting rate(b)
+Break-in
+7.7% (5,000)
+78.2%
+Attempted break-in
+8.8% (5,800)
+49.8%
+Motor vehicle theft
+2.2% (1,500)
+np
+Theft from a motor vehicle
+5.0% (3,300)
+41.7%
+Malicious property damage
+12.2% (8,000)
+62.6%
+Other theft(c)
+2.9% (1,900)
+37.8%
+Victimisation rate refers to the total number of households that experienced a crime type, expressed as a percentage of all households.
+Reporting rate refers to the total number of households that had experienced the crime type and reported the most recent incident of the crime type to police, expressed as a percentage of the total number of households that experienced the crime type.
+Includes property stolen from a yard, as well as property stolen in other situations/locations. Excludes any incidents involving theft covered in other sections of the survey such as break-ins or robberies.
+np not published. Police reporting data for motor vehicle theft are not included in the publication commentary due to data quality concerns.
+Between 2021-23 and 2023-25, victimisation and police reporting rates were stable for all household crime types included in the commentary.
+Changes in household crime victimisation rates since 2013-15
+Between 2013-15 and 2023-25, the victimisation rate increased for:
+attempted break-in (from 4.6% to 8.8%)
+malicious property damage (from 7.8% to 12%).
+Graph Table
+Download
+Download table as CSV
+Download table as XLSX
+Download graph as PNG image
+Download graph as JPG image
+Download graph as SVG Vector image
+Victimisation rates(a), Selected household crimes, Northern Territory, Two-year pooled data: 2013-15 to 2023-25(b)
+Break-in (%)
+Attempted break-in (%)
+Motor vehicle theft (%)
+Theft from a motor vehicle (%)
+Malicious property damage (%)
+Other theft(c) (%)
+2013–15
+6.1
+4.6
+2.0
+4.2
+7.8
+3.8
+2014–16
+7.0
+4.0
+1.7
+3.8
+7.7
+3.1
+2015–17
+6.5
+4.2
+1.4
+4.6
+7.6
+3.2
+2016–18
+5.4
+4.5
+1.0
+5.0
+7.1
+3.6
+2017–19
+6.1
+5.0
+0.8
+3.9
+7.3
+3.4
+2018–20
+6.6
+5.8
+0.8
+4.0
+8.1
+3.0
+2019–21
+5.6
+5.7
+1.1
+4.0
+8.3
+2.6
+2020–22
+5.2
+5.7
+1.5
+4.0
+8.5
+3.2
+2021–23
+6.5
+7.0
+1.7
+4.7
+10.1
+3.4
+2022–24
+7.0
+8.9
+1.7
+5.3
+11.8
+2.7
+2023–25
+7.7
+8.8
+2.2
+5.0
+12.2
+2.9
+Victimisation rates(a), Selected household crimes, Northern Territory, Two-year pooled data: 2013-15 to 2023-25(b) ["","Break-in","Attempted break-in","Motor vehicle theft","Theft from a motor vehicle","Malicious property damage","Other theft(c)"] [["2013\u201315","2014\u201316","2015\u201317","2016\u201318","2017\u201319","2018\u201320","2019\u201321","2020\u201322","2021\u201323","2022\u201324","2023\u201325"],[[6.1],[7],[6.5],[5.4],[6.1],[6.6],[5.6],[5.2],[6.5],[7],[7.7]],[[4.6],[4],[4.2],[4.5],[5],[5.8],[5.7],[5.7],[7],[8.9],[8.8]],[[2],[1.7],[1.4],[1],[0.8],[0.8],[1.1],[1.5],[1.7],[1.7],[2.2]],[[4.2],[3.8],[4.6],[5],[3.9],[4],[4],[4],[4.7],[5.3],[5]],[[7.8],[7.7],[7.6],[7.1],[7.3],[8.1],[8.3],[8.5],[10.1],[11.8],[12.2]],[[3.8],[3.1],[3.2],[3.6],[3.4],[3],[2.6],[3.2],[3.4],[2.7],[2.9]]] [] [{"value":"0","axis_id":"0","axis_title":"","axis_units":"","tooltip_units":"","table_units":"","axis_min":null,"axis_max":null,"tick_interval":null,"precision":"-1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}] [{"value":"0","axis_id":"0","axis_title":"%","axis_units":"","tooltip_units":"(%)","table_units":"(%)","axis_min":"0","axis_max":"14","tick_interval":"2","precision":"1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}]
+Victimisation rate refers to the total number of households that experienced a crime type, expressed as a percentage of all households.
+Estimates have been obtained by pooling data from two successive Crime Victimisation Survey reference periods.
+Includes property stolen from a yard, as well as property stolen in other situations/locations. Excludes any incidents involving theft covered in other sections of the survey such as break-ins or robberies.
+Australian Capital Territory
+Personal crime victimisation rates
+During the 2023-25 reference period, 4.0% of persons (14,900) experienced physical and/or threatened assault in the previous 12 months.
+The table below presents selected personal crime victimisation rates for Australian Capital Territory in 2023-25.
+Personal crime victimisation rate(a)(b)
+Physical assault
+1.9% (7,100)
+Face-to-face threatened assault
+2.3% (8,500)
+Non-face-to-face threatened assault
+0.7% (2,600)
+Victimisation rate refers to the total number of persons aged 15 years and over who experienced a crime type, expressed as a percentage of all persons aged 15 years and over.
+Police reporting data are not shown due to high relative standard error of estimates.
+Between 2021-23 and 2023-25, victimisation rates were stable for all assault types.
+Changes in personal crime victimisation rates since 2013-15
+Victimisation rates in 2023-25 were similar to the rates in 2013-15.
+Graph Table
+Download
+Download table as CSV
+Download table as XLSX
+Download graph as PNG image
+Download graph as JPG image
+Download graph as SVG Vector image
+Victimisation rates(a), Selected personal crimes(b), Australian Capital Territory, Two-year pooled data: 2013-15 to 2023-25(c)
+Physical assault (%)
+Face-to-face threatened assault (%)
+Physical and/or threatened assault(d) (%)
+2013–15
+2.3
+2.8
+5.1
+2014–16
+2.0
+2.8
+4.6
+2015–17
+2.1
+2.2
+4.1
+2016–18
+2.4
+2.3
+4.7
+2017–19
+2.3
+2.3
+4.4
+2018–20
+1.8
+2.2
+3.8
+2019–21
+1.7
+2.2
+3.8
+2020–22
+1.6
+2.3
+3.8
+2021–23(e)
+1.3
+2.1
+3.3
+2022–24
+1.2
+2.2
+3.3
+2023–25
+1.9
+2.3
+4.0
+Victimisation rates(a), Selected personal crimes(b), Australian Capital Territory, Two-year pooled data: 2013-15 to 2023-25(c) ["","Physical assault","Face-to-face threatened assault","Physical and\/or threatened assault(d)"] [["2013\u201315","2014\u201316","2015\u201317","2016\u201318","2017\u201319","2018\u201320","2019\u201321","2020\u201322","2021\u201323(e)","2022\u201324","2023\u201325"],[[2.3],[2],[2.1],[2.4],[2.3],[1.8],[1.7],[1.6],[1.3],[1.2],[1.9]],[[2.8],[2.8],[2.2],[2.3],[2.3],[2.2],[2.2],[2.3],[2.1],[2.2],[2.3]],[[5.1],[4.6],[4.1],[4.7],[4.4],[3.8],[3.8],[3.8],[3.3],[3.3],[4]]] [] [{"value":"0","axis_id":"0","axis_title":"","axis_units":"","tooltip_units":"","table_units":"","axis_min":null,"axis_max":null,"tick_interval":null,"precision":"-1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}] [{"value":"0","axis_id":"0","axis_title":"%","axis_units":"","tooltip_units":"(%)","table_units":"(%)","axis_min":"0","axis_max":"6","tick_interval":"1","precision":"1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}]
+Victimisation rate refers to the total number of persons aged 15 years and over who experienced a crime type, expressed as a percentage of all persons aged 15 years and over.
+Data for non-face-to-face threatened assault are not shown, as multiple estimates in the time series have an associated RSE greater than 25%.
+Estimates have been obtained by pooling data from two successive Crime Victimisation Survey reference periods.
+Includes physical assault, face-to-face threatened assault and non-face-to-face threatened assault. Where a person has experienced multiple types of assault, they are counted separately for each type of assault experienced but are counted only once in the aggregated assault total.
+The 2021-23 victimisation rate for physical assault has a relative standard error of between 25% and 50% and should be used with caution.
+Household crime victimisation and reporting rates
+The table below presents household crime victimisation and reporting rates for the 2023-25 reference period.
+Household crime victimisation rate(a)(b)
+Police reporting rate(b)(c)
+Break-in
+2.1% (4,000)
+75.0%
+Attempted break-in
+2.7% (5,000)
+42.7%
+Theft from a motor vehicle
+2.6% (4,900)
+60.1%
+Malicious property damage
+3.9% (7,300)
+58.8%
+Other theft(d)
+1.7% (3,100)
+37.6%
+Victimisation rate refers to the total number of households that experienced a crime type, expressed as a percentage of all households.
+Data for motor vehicle theft are not shown due to high relative standard error of victimisation and reporting estimates.
+Reporting rate refers to the total number of households that had experienced the crime type and reported the most recent incident of the crime type to police, expressed as a percentage of the total number of households that experienced the crime type.
+Includes property stolen from a yard, as well as property stolen in other situations/locations. Excludes any incidents involving theft covered in other sections of the survey such as break-ins or robberies.
+Between 2021-23 and 2023-25, victimisation and police reporting rates were stable for all household crime types.
+Changes in household crime victimisation rates since 2013-15
+Between 2013-15 and 2023-25, the victimisation rate declined for:
+break-in (from 3.1% to 2.1%)
+theft from a motor vehicle (from 4.0% to 2.6%)
+malicious property damage (from 7.8% to 3.9%)
+other theft (from 2.7% to 1.7%).
+Graph Table
+Download
+Download table as CSV
+Download table as XLSX
+Download graph as PNG image
+Download graph as JPG image
+Download graph as SVG Vector image
+Victimisation rates(a), Selected household crimes(b), Australian Capital Territory, Two-year pooled data: 2013-15 to 2023-25(c)
+Break-in (%)
+Attempted break-in (%)
+Theft from a motor vehicle (%)
+Malicious property damage (%)
+Other theft(d) (%)
+2013–15
+3.1
+2.1
+4.0
+7.8
+2.7
+2014–16
+2.3
+2.3
+4.2
+6.3
+2.6
+2015–17
+2.3
+1.7
+4.5
+6.2
+2.6
+2016–18
+2.3
+1.8
+4.9
+6.6
+2.9
+2017–19
+2.4
+2.0
+4.0
+6.4
+2.6
+2018–20
+2.6
+1.4
+3.5
+5.7
+3.0
+2019–21
+2.4
+1.4
+3.0
+5.6
+2.8
+2020–22
+2.4
+2.9
+3.0
+5.5
+2.3
+2021–23
+2.3
+3.3
+3.2
+5.0
+2.3
+2022–24
+2.5
+2.5
+3.0
+4.4
+1.9
+2023–25
+2.1
+2.7
+2.6
+3.9
+1.7
+Victimisation rates(a), Selected household crimes(b), Australian Capital Territory, Two-year pooled data: 2013-15 to 2023-25(c) ["","Break-in","Attempted break-in","Theft from a motor vehicle","Malicious property damage","Other theft(d)"] [["2013\u201315","2014\u201316","2015\u201317","2016\u201318","2017\u201319","2018\u201320","2019\u201321","2020\u201322","2021\u201323","2022\u201324","2023\u201325"],[[3.1],[2.3],[2.3],[2.3],[2.4],[2.6],[2.4],[2.4],[2.3],[2.5],[2.1]],[[2.1],[2.3],[1.7],[1.8],[2],[1.4],[1.4],[2.9],[3.3],[2.5],[2.7]],[[4],[4.2],[4.5],[4.9],[4],[3.5],[3],[3],[3.2],[3],[2.6]],[[7.8],[6.3],[6.2],[6.6],[6.4],[5.7],[5.6],[5.5],[5],[4.4],[3.9]],[[2.7],[2.6],[2.6],[2.9],[2.6],[3],[2.8],[2.3],[2.3],[1.9],[1.7]]] [] [{"value":"0","axis_id":"0","axis_title":"","axis_units":"","tooltip_units":"","table_units":"","axis_min":null,"axis_max":null,"tick_interval":null,"precision":"-1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}] [{"value":"0","axis_id":"0","axis_title":"%","axis_units":"","tooltip_units":"(%)","table_units":"(%)","axis_min":"0","axis_max":"9","tick_interval":"1","precision":"1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}]
+Victimisation rate refers to the total number of households that experienced a crime type, expressed as a percentage of all households.
+Data for motor vehicle theft are not shown, as multiple estimates in the time series have an associated RSE greater than 25%.
+Estimates have been obtained by pooling data from two successive Crime Victimisation Survey reference periods.
+Includes property stolen from a yard, as well as property stolen in other situations/locations. Excludes any incidents involving theft covered in other sections of the survey such as break-ins or robberies.
+Data downloads
+National summary and time series (Tables 1a-8d)
+2024-25 National summary statistics.
+Victimisation rates and police reporting rates, annual time series from 2008-09.
+Assault victimisation rates by relationship type, annual time series from 2021-22.
+Contribution of alcohol or other substances to most recent assault, annual time series from 2010-11.
+Data files
+Download xlsx [4.15 MB]
+Personal crime (Tables 9a-18b)
+Socio-demographic characteristics of victims of personal crime, multiple victimisation and characteristics of the most recent incident.
+Data files
+Download xlsx [940.28 KB]
+Household crimes (Tables 19a-26b)
+Household characteristics of victims of household crime, multiple victimisation and characteristics of the most recent incident.
+Data files
+Download xlsx [944.9 KB]
+State and territory time series, pooled data (Tables 27a-31d)
+State/territory victimisation rates and police reporting rates, pooled time series from 2008-10.
+Data files
+Download xlsx [253.03 KB]
+State and territory times series, single year data (Tables 32a-35d)
+State/territory victimisation rates and police reporting rates, annual time series from 2008-09.
+Data files
+Download xlsx [1008.5 KB]
+Populations (Tables 36a-37b)
+National and state/territory populations.
+Data files
+Download xlsx [1.04 MB]
+Data item list
+List of data items collected in the survey.
+Data files
+Download xlsx [154.92 KB]
+All data downloads
+All Crime victimisation 2024-25 data download files.
+Data files
+Download zip [3.32 MB]
+Methodology
+Scope
+People aged 15 years and over who were usual residents of private dwellings.
+Excludes:
+Australian permanent defence force members and their dependants
+non-Australian defence forces
+residents in very remote Australia and the Indigenous Community Strata.
+Geography
+Data available for:
+Australia
+States and territories.
+Source
+Multipurpose Household Survey
+Collection method
+Interviews were conducted by telephone with responses directly recorded in an electronic questionnaire.
+Proxy interviews were permissible under certain circumstances.
+Concepts, sources and methods
+Not applicable to this release
+History of changes
+From 2024–25, the scope also excludes persons resident in very remote areas of Australia.
+View full methodology
+Media releases
+Original publication date
+25 March 2026
+Nearly 400,000 Australians assaulted in the last 12 months
+View media release
+Do you need more detailed statistics?
+Request data
+We can provide customised data to meet your requirements
+Request a quote
+Microdata and TableBuilder
+We can provide access to detailed, customisable data on selected topics
+View available Microdata and TableBuilder
+Back to top of the page

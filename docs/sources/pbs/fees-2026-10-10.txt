@@ -1,0 +1,517 @@
+Source: https://www.pbs.gov.au/info/healthpro/explanatory-notes/front/fee
+Retrieved: 2026-10-10
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML 0af4fb0cecb09bf031a41cb550c7744d772f7d214035b177f1d3744f98a68324
+
+Fees, Patient Contributions and Safety Net Thresholds | Pharmaceutical Benefits Scheme (PBS)
+Medicine Status
+News
+Contact
+See also
+Patient Charges
+The Safety Net Scheme
+Pricing PBS Prescriptions
+Fees, Patient Contributions and Safety Net Thresholds
+The following fees, patient contributions and Safety Net thresholds apply as at 1
+July 2026 and are included, where applicable, in prices published in the Schedule
+of Pharmaceutical Benefits:
+Fees, Patient Contributions and Safety Net Thresholds
+Dispensing Fees:
+Ready-prepared
+$9.24
+Dangerous drug fee
+$5.73
+Extemporaneously-prepared
+$11.28
+Allowable additional patient charge*
+$2.79
+Wholesale Mark-Up (for Ready Prepared Pharmaceutical Benefits)***
+When the Ex-Manufacturer Price is up to and including $5.50
+$0.24 per dispense
+Where the Ex-Manufacturer Price is over $5.50 and up to and including $1,000
+4.3 per cent of the Ex-Manufacturer Price per dispense
+Where the Ex-Manufacturer Price is over $1,000 and up to and including $10,000
+$43 + 2 per cent of the amount of the Ex-Manufacturer Price over $1,000 per dispense
+When the Ex-Manufacturer Price is over $10,000
+$223 per dispense
+Administration, Handling and Infrastructure Fee (AHI Fee)
+Tier One AHI Fee
+For a Listed Brand with a Price to Pharmacists for Maximum Quantity less than $100
+$5.12 per dispense of Maximum Quantity
+Tier Two AHI Fee
+For a Listed Brand with a Price to Pharmacists for Maximum Quantity from $100 and
+up to and including $2,000
+Tier One AHI Fee plus 5% of the amount by which the Price to Pharmacists for Maximum
+Quantity exceeds $100, per dispense of Maximum Quantity
+Tier Three AHI Fee
+For a Listed Brand with a Price to Pharmacists for Maximum Quantity over $2,000
+Tier One AHI Fee and $95 per dispense of Maximum Quantity.
+Additional Fees (for Safety Net prices):
+Ready-prepared
+$1.54
+Extemporaneously-prepared
+$1.99
+Efficient Funding of Chemotherapy (EFC)**
+Preparation fee
+$92.56
+Distribution fee
+$31.51
+Diluent fee
+$6.24
+Patient Co-payment Amounts
+General
+$25.00
+Concessional
+$7.70
+Safety Net Thresholds
+General
+$1,748.20
+Concessional
+$277.20
+Safety Net Card Issue Fee
+$12.78
+Additional Community Supply Support (ACSS) Payment – Component 1
+For supply of a PBS or RPBS prescription of a section 85 medicine with increased dispensing
+quantities
+$5.12 per dispense
+Additional Community Supply Support (ACSS) Payment – Component 2
+for each supply of a PBS or RPBS prescription of a section 85 medicine
+$0.13 per dispense
+*The allowable additional patient charge is a discretionary charge to general patients
+if a pharmaceutical item has a dispensed price for maximum quantity less than the
+general patient co-payment amount. The pharmacist may charge general patients the
+allowable additional fee but the fee cannot take the cost of the prescription above
+the general patient co-payment amount for the medicine.
+**Public hospital pharmacies which are authorised to supply PBS-subsidised chemotherapy
+medicines are only eligible for the preparation fee (i.e. not the distribution or
+diluent fees).
+***The wholesale mark-up for a Pack Quantity of a Listed Brand is calculated using
+the Ex-Manufacturer Price for the Pack Quantity of the Listed Brand dispensed.
+PBS Changes Explainer Table – January 2026 (PDF 293KB) – (Word 62KB)
+The Real Cost of Medicines
+Information on how much medicines really cost and gives examples of the amount the
+Commonwealth subsidises for some medicines.
+The Real Cost of Medicines
+Condition/Medicine (chemical name)
+Actual Cost of Medicine* (dispensed price for maximum qty)
+General Patients*
+(Non-Concession)
+General Patients*
+(Non-Concession)
+General Patients after reaching PBS Safety Net/Concessional Patients* (Concession
+Card)
+General Patients after reaching PBS Safety Net/Concessional Patients* (Concession
+Card)
+Concessional Patients after reaching Safety Net
+Concessional Patients after reaching Safety Net
+Cost to patient
+Gov’t Subsidy
+Cost to patient
+Gov’t Subsidy
+Cost to patient
+Gov’t Subsidy
+Asthma & Chronic Obstructive Pulmonary Disease Fluticasone propionate with salmeterol
+250 mcg/25 mcg (pressurised inhalation)
+$56.54
+$25.00
+$31.54
+$7.70
+$48.84
+Nil
+$56.54
+Atrial fibrillation Dabigatran etexilate 150 mg
+$81.69
+$25.00
+$56.69
+$7.70
+$73.99
+Nil
+$81.69
+Prostate cancer Goserelin 3.6 mg and bicalutamide 50 mg
+$412.39
+$25.00
+$387.39
+$7.70
+$404.69
+Nil
+$412.39
+Multiple sclerosis Fingolimod 500 mcg
+$1,062.59
+$25.00
+$1037.59
+$7.70
+$1,054.89
+Nil
+$1,062.59
+Chronic Myeloid Leukaemia Imatinib 400 mg
+$662.67
+$25.00
+$637.67
+$7.70
+$654.97
+Nil
+$662.67
+*Please note that some medicines on the PBS are only subsidised for certain conditions.
+Amounts current as of 1 January 2025.
+Who Pays What?
+Information on Commonwealth subsidies, patient co-payment amounts, and how manufacturers,
+pharmacies and wholesalers are paid.
+Who Pays What
+Patient Co-payment Amount before Safety Net
+Patient Co-payment amount with Safety Net
+Safety Net Threshold
+General patient pays up to
+$25.00
+$7.70
+$1,748.20
+From 1 January 2026 for PBS prescriptions general patients (those without a concession
+card) can be charged up to $25.00. Pharmacists and other dispensers can charge the
+PBS dispensed price, plus an additional fee of up to $1.48 for recording Safety Net
+expenditure on the Patient Record Form, plus an optional pharmacy charge of $2.79
+or less, (such that the total of the afore-mentioned charges does not exceed the patient
+co-payment amount), plus any delivery or after hours fee, brand or therapeutic group
+premium, or special patient contribution that may be applicable.
+Concessional patient pays up to
+$7.70
+Nil
+$277.20
+plus any delivery or after hours fee, brand or therapeutic group premium, or special patient
+contribution that may be applicable.
+Government pays
+any additional cost of drugs exceeding patient co-payment amounts up to the dispensed
+price, excluding any delivery or after hours fee, brand or therapeutic group premium,
+or special patient contribution that may be applicable.
+History of PBS Co-payment Amounts and Safety Net Thresholds
+Table outlining past and current Co-payment Amounts and Safety Net Thresholds
+Date of Change
+Concessional Beneficiaries
+Concessional Beneficiaries
+Concessional Beneficiaries
+General Beneficiaries
+General Beneficiaries
+Co-payment Amount
+Co-payment Amount
+Safety Net Threshold $
+Co-payment Amount $
+Safety Net Threshold $
+Pensioners $
+Others $
+1/3/1960
+0.50
+1/11/1971
+1.00
+1/9/1975
+1.50
+1/3/1976
+2.00
+1/7/1978
+2.50
+1/9/1979
+2.75
+1/11/1981
+3.20
+1/1/1983
+1
+2.00
+4.00
+1/7/1985
+5.00
+1/11/1986
+2.50
+25 scripts
+10.00
+25 scripts
+1/7/1988
+11.00
+1/11/1990
+2
+2.50
+2.50
+130.00
+15.00
+1/1/1991
+Introduction of
+1st tier ..............
+2nd tier .............
+300.00
+50.00
+1/8/1991
+15.70
+1/10/1991
+2.60
+2.60
+1/1/1992
+RPBS Co-payment Introduced 2.60
+135.20
+1st tier ..............
+2nd tier .............
+309.90
+51.60
+1/8/1992
+15.90
+1/1/1993
+1st tier ..............
+2nd tier .............
+312.30
+52.00
+1/8/1993
+16.00
+1/1/1994
+Discontinuance of
+1st tier ..............
+2nd tier .............
+400.00
+nil
+1/8/1994
+16.20
+1/1/1995
+407.60
+1/8/1995
+16.80
+1/1/1996
+2.70
+2.70
+140.40
+600.000
+1/8/1996
+17.40
+1/1/1997
+3
+3.20
+3.20
+166.40
+20.00
+612.60
+1/1/1999
+20.30
+620.30
+1/1/2000
+3.30
+3.30
+171.60
+20.60
+631.20
+1/7/2000
+4
+3.30
+3.30
+171.60
+20.60
+631.20
+1/1/2001
+5
+3.50
+3.50
+182.00
+21.90
+669.70
+1/1/2002
+3.60
+3.60
+187.20
+22.40
+686.40
+1/1/2003
+3.70
+3.70
+192.40
+23.10
+708.40
+1/1/2004
+3.80
+3.80
+197.60
+23.70
+726.80
+1/1/2005
+4.60
+4.60
+239.20
+28.60
+874.90
+1/1/2006
+4.70
+4.70
+253.80
+29.50
+960.10
+1/1/2007
+4.90
+4.90
+274.40
+30.70
+1,059.00
+1/1/2008
+5.00
+5.00
+290.00
+31.30
+1,141.80
+1/1/2009
+5.30
+5.30
+318.00
+32.90
+1,264.90
+1/1/2010
+6
+5.40
+5.40
+324.00
+33.30
+1,281.30
+1/1/2011
+7
+5.60
+5.60
+336.00
+34.20
+1,317.20
+1/1/2012
+8
+5.80
+5.80
+348.00
+35.40
+1,363.30
+1/1/2013
+5.90
+5.90
+354.00
+36.10
+1,390.60
+1/1/2014
+6.00
+6.00
+360.00
+36.90
+1,421.20
+1/1/2015
+6.10
+6.10
+366.00
+37.70
+1,453.90
+1/1/2016
+6.20
+6.20
+372.00
+38.30
+1,475.70
+1/1/2017
+6.30
+6.30
+378.00
+38.80
+1,494.90
+1/1/2018
+6.40
+6.40
+384.00
+39.50
+1,521.80
+1/1/2019
+6.50
+6.50
+390.00
+40.30
+1,550.70
+1/1/2020
+6.60
+6.60
+9
+$316.80
+41.00
+10
+1,486.80
+1/1/2021
+6.60
+6.60
+316.80
+41.30
+1,497.20
+1/1/2022
+6.80
+6.80
+326.40
+42.50
+1,542.10
+1/7/2022
+6.80
+6.80
+11
+244.80
+42.50
+12
+1,457.10
+1/1/2023
+7.30
+7.30
+262.80
+13
+30.00
+1,563.50
+1/1/2024
+14
+7.70
+14
+7.70
+277.20
+14
+31.60
+1,647.90
+1/1/2025
+15
+7.70
+15
+7.70
+277.20
+16
+31.60
+17
+1,694.00
+1/1/2026
+15
+7.70
+15
+7.70
+277.20
+18
+25.00
+19
+1,748.20
+1. Previously paid general co-payment amount.
+2. A compensating Pharmaceutical Allowance was introduced equal to co-payment x 52.
+3. Pharmaceutical Allowance maintained at $2.70 per week paid fortnightly.
+4. Pharmaceutical Allowance increased to $2.80 per week paid fortnightly.
+5. Pharmaceutical Allowance increased to $2.90 per week paid fortnightly.
+6. Pharmaceutical Allowance increased to $3.00 per week paid fortnightly.
+7. Pharmaceutical Allowance is $3.00 per week paid fortnightly.
+8. Pharmaceutical Allowance increased to $3.10 per week paid fortnightly.
+9. The number of scripts for concessional beneficiaries to reach the Safety Net threshold
+was reduced from 60 to 48 scripts on 1 January 2020.
+10. Amendments to the National Health Act 1953 lowered the general patient Safety Net threshold to $1,486.80 on 1 January 2020.
+11. On 1 July 2022, the number of scripts to reach the Safety Net was lowered to 36
+scripts due to enactment of the Treasury Laws Amendment (Cost of Living Support and
+Other Measures) Bill 2022.
+12. Enactment of the Treasury Laws Amendment (Cost of Living Support and Other Measures)
+Bill 2022 changed the definition of the General Safety Net threshold to be $1,457.10
+on 1 July 2022.
+13. Enactment of National Health Amendment (General Co-payment) Bill 2022 defined
+the general patient co-payment amount to be $30.00 from 1 January 2023. This amount
+will be indexed annually from 1 January 2024.
+14. On 1 January 2024, the PBS Safety Net threshold increased in alignment with the
+Consumer Price Index.
+15. Effective 1 January 2025, concessional patient co-payment amount will not be indexed
+and remain at $7.70 for five calendar years from 2025 to 2029 due to amendments to
+subsection 99G(1B) of the National Health Act 1953 .
+16. Effective 1 January 2025, general patient co-payment amount will not be indexed
+and remain at $31.60 for the calendar year of 2025 due to amendments to subsection
+99G(1A) of the National Health Act 1953 .
+17. On 1 January 2025, the PBS general patient Safety Net threshold will increase
+in line with movements of the Consumer Price Index (CPI).
+18. The National Health Amendment (Cheaper Medicines) Act 2025 defined the general patient co-payment amount to be $25.00 from 1 January 2026. This
+amount will be indexed annually from 1 January 2027.
+19. On 1 January 2026, the PBS general patient Safety Net threshold will increase
+in line with movements of the Consumer Price Index (CPI).
+Last updated
+3 September 2026
