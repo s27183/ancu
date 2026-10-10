@@ -1,0 +1,66 @@
+Source: https://www.health.gov.au/topics/medicare/about/costs
+Retrieved: 2026-10-10
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML 6eac571cfbb7739dec01a15a82ccf005e5d92530770b90382b53d66b481b5db1
+
+Medicare costs | Australian Government Department of Health, Disability and Ageing
+About Medicare
+Medicare costs
+Medicare provides Australians with free or subsidised health care. Australians help to cover its costs through the Medicare levy. We thoroughly assess medical services and medicines to ensure we only subsidise those that are clinically effective, cost effective and as safe as possible.
+Listen
+Print
+Share
+X (Twitter)
+Facebook
+Email
+Loading...
+Keeping Medicare sustainable
+We pay subsidies when you use your Medicare card to access services listed on the Medicare Benefits Schedule (MBS) or Pharmaceutical Benefits Scheme (PBS). This reduces their costs to patients so that more people can afford them.
+But it would be too burdensome on taxpayers to subsidise every medical service, prescription drug or health technology. We start with a health technology assessment to ensure funding only goes to services, medicines or technologies that are clinically effective, cost effective and as safe as possible.
+For every medical service or treatment covered under the MBS, we set a schedule fee . Medicare sometimes reimburses 100% of that fee, and sometimes a lower percentage. Health practitioners can charge more than the schedule fee – in these cases, you pay the difference.
+For every medicine subsidised under the PBS, we apply a set co-payment amount. The government pays the difference between the full cost of the medicine and the applicable co-payment amount.
+From 1 January 2023, in most cases the most you will have to pay for any PBS medicine is $30 for general patients and $6.80 for people with an eligible concession card. These amounts typically change on 1 January each year. Pharmacists have the option to discount the patient co-payment by up to a maximum of $1.00, should they choose to do so.
+Private health insurance covers many services that Medicare doesn’t cover – like ambulance services, dental services, physiotherapy, glasses and lenses.
+This system helps Australians access the health care they need, while keeping the cost of Medicare sustainable for taxpayers.
+Read more about the cost of Medicare to taxpayers .
+Hospital costs
+If you are a public patient in hospital, Medicare covers all your medical expenses.
+If you are a private patient in a public hospital, Medicare subsidises the doctor fees paid by the patient. You pay for hospital accommodation, theatre fees and doctors’ fees. If you have private health insurance , you might get some of these costs back, depending on your policy.
+If you are a private hospital patient, Medicare covers 75% of the schedule fee for your associated medical costs, insurers pay at least 25% and you pay the rest. Costs above the schedule fee are your responsibility, although private health insurers may contribute, depending on your policy.
+Read more about out-of-pocket costs if you have private health insurance .
+Medical Costs Finder
+The Medical Costs Finder helps you find and understand costs for general practitioners (GPs) and medical specialist services across Australia.
+Medicine costs
+We help to keep the cost of medicines down for Australian patients by paying subsidies for many medicines under the PBS and Repatriation PBS (RPBS).
+This means you pay no more than a set co-payment amount for your prescription medicine. Where the price of the medicine is above the co-payment amount we pay the rest. The amount you pay depends on whether or not you have a concession card .
+You don’t need to claim your subsidy for medicines on the PBS. If the price you pay is above the co-payment amount, it is already subsidised.
+If you need a lot of PBS medicines, once you've paid a certain amount for the year, you may be able to get a larger subsidy, or your medicines at no cost, through the PBS safety net .
+Read more about how to get help with the cost of medicines .
+Medical services costs
+Under the MBS, Medicare pays 85% of the schedule fee for a specialist and 100% for general practitioners.
+If your health practitioner bulk bills for medical services, Medicare pays the cost straight to them (they accept the schedule fee as full payment), and you don’t pay anything.
+To find a health practitioner who bulk bills or a hospital near you, use the find a health service tool .
+If your health practitioner charges more than the schedule fee for their service, you pay the difference.
+If your doctor doesn’t bulk bill, you either:
+pay the full cost, then claim some of it back – some doctors can make that claim for you
+pay the difference between what your doctor charges and what Medicare covers.
+Read about the ways you can claim your Medicare rebate .
+When you make your appointment, check how much you will have to pay, if anything.
+If you pay a lot for medical services, once you reach a certain amount for the year, you may be able to get a further discount through the Medicare safety nets for medical services.
+Other factors affecting Medicare costs
+You might get extra support to meet the cost of your health care if:
+you hold a concession or healthcare card
+you have high healthcare costs , and become eligible for further discounts through the Medicare safety nets or PBS safety net
+you have private health insurance
+your health practitioner bulk bills .
+The cost of Medicare to taxpayers
+To help cover the cost of Medicare, most taxpayers pay a Medicare levy of 2% of their taxable income.
+People who earn less than a certain amount either don’t pay the levy or pay a lower percentage.
+High-income earners who don’t have an appropriate level of private hospital insurance also pay a Medicare levy surcharge of 1% to 1.5% depending on their income. This aims to encourage those who can afford it to take out private health cover to reduce the burden on the public health system.
+General taxation revenue covers the rest of the cost of Medicare.
+Read more about Medicare and tax .
+Date last updated:
+22 January 2024
+Tags:
+Medicare
+In this section
+Medicare
