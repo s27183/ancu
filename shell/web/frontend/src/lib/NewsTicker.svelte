@@ -95,18 +95,25 @@
     //   - a drag moves it 1:1 with the pointer, wrapping over the two duplicated runs;
     //   - a press that travels < TAP_PX is a tap: it opens the note it started on;
     //   - while a pointer is down, a mouse hovers, or focus is inside, the strip stands
-    //     still; on release it carries on.
+    //     still, and it waits RESUME_MS after the last touch, drag or hover before it
+    //     moves again (behavior 48, Son: a reader swiping back and forth to find a
+    //     headline must not have it run off; a new touch restarts the wait);
+    //   - it moves at a constant SPEED_PX_S, whatever the number of headlines (behavior
+    //     48: the old run-duration cap of 60 s made 18 headlines pass at 163 px/s,
+    //     ~3 s each — too fast to read);
+    //   - a tap opens its note on the CLICK that follows a short press, not on
+    //     pointerup: on a phone the detail sheet rises from the bottom and its scrim
+    //     covers the strip, so a sheet opened on pointerup would sit under the click the
+    //     browser sends next, and that click would land on the scrim and close it.
     // WCAG 2.2.2 (Pause, Stop, Hide) without a visible pause button (Son, behavior 43):
     // press-and-hold stops it, hover/focus stop it, prefers-reduced-motion keeps it
     // still (drag still scrolls it), and the sr-only list below is a non-moving
     // equivalent for keyboard and screen-reader users.
     const TAP_PX = 8;
-
-    // Reading-speed heuristic, not a measured layout value: ~6 chars/sec over one run,
-    // clamped so a one-note list doesn't whip past and a long list doesn't crawl.
-    const marqueeDurationS = $derived(
-        Math.min(60, Math.max(15, news.reduce((acc, n) => acc + headlineFor(n).length, 0) / 6))
-    );
+    // ~5 characters a second at the strip's type size (≈7.6 px a character measured
+    // 2026-10-10): an average headline (≈540 px) takes ≈13 s to pass. Son judges it.
+    const SPEED_PX_S = 40;
+    const RESUME_MS = 3000;
 
     let runEl: HTMLElement | undefined = $state();
     let runWidth = $state(0);
@@ -115,6 +122,7 @@
     let hovering = false;
     let focused = false;
     let reduced = false;
+    let lastActive = -Infinity; // performance.now() when the last touch/drag/hover ended
 
     function wrap(x: number): number {
         if (runWidth <= 0) return 0;
@@ -136,8 +144,9 @@
         let raf = requestAnimationFrame(function tick(now) {
             const dt = Math.min(0.1, (now - last) / 1000);
             last = now;
-            if (!held && !hovering && !focused && !reduced && runWidth > 0) {
-                offset = wrap(offset - (runWidth / marqueeDurationS) * dt);
+            const resting = now - lastActive < RESUME_MS;
+            if (!held && !hovering && !focused && !reduced && !resting && runWidth > 0) {
+                offset = wrap(offset - SPEED_PX_S * dt);
             }
             raf = requestAnimationFrame(tick);
         });
@@ -152,10 +161,12 @@
     let downOffset = 0;
     let travel = 0;
     let downNote: NewsNote | undefined;
+    let tapNote: NewsNote | undefined; // a short press's note, opened by the click after it
 
     function onPointerDown(e: PointerEvent) {
         if (e.button !== 0) return;
         held = true;
+        tapNote = undefined;
         downX = e.clientX;
         downOffset = offset;
         travel = 0;
@@ -176,12 +187,20 @@
     function onPointerUp() {
         if (!held) return;
         held = false;
-        if (travel < TAP_PX && downNote) onSelect?.(downNote);
+        lastActive = performance.now();
+        tapNote = travel < TAP_PX ? downNote : undefined;
         downNote = undefined;
     }
     function onPointerCancel() {
         held = false;
+        lastActive = performance.now();
         downNote = undefined;
+        tapNote = undefined;
+    }
+    function onClick() {
+        const note = tapNote;
+        tapNote = undefined;
+        if (note) onSelect?.(note);
     }
 </script>
 
@@ -203,8 +222,12 @@
             onpointermove={onPointerMove}
             onpointerup={onPointerUp}
             onpointercancel={onPointerCancel}
+            onclick={onClick}
             onpointerenter={(e) => (hovering = e.pointerType === 'mouse')}
-            onpointerleave={() => (hovering = false)}
+            onpointerleave={() => {
+                if (hovering) lastActive = performance.now();
+                hovering = false;
+            }}
         >
             <div class="pp-ticker-marquee-track" style:transform="translate3d({offset}px, 0, 0)">
                 {#each [0, 1] as run (run)}
