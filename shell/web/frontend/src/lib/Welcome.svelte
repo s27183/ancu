@@ -12,6 +12,7 @@
     import { lang } from '$lib/stores/lang';
     import { t } from '$lib/i18n';
     import FactVisual from '$lib/FactVisual.svelte';
+    import Sparkle from '$lib/Sparkle.svelte';
     import {
         type FactDoc,
         SECTION_ORDER,
@@ -228,6 +229,11 @@
                             </span>
                             <strong>{$t('intro.value.you.title')}</strong>
                             <span>{$t('intro.value.you.body')}</span>
+                        </li>
+                        <li>
+                            <span class="wl-ico wl-ico-ai" aria-hidden="true"><Sparkle size="1.1rem" /></span>
+                            <strong>{$t('intro.value.ai.title')}</strong>
+                            <span>{$t('intro.value.ai.body')}</span>
                         </li>
                         <li>
                             <span class="wl-ico" aria-hidden="true">
@@ -614,6 +620,10 @@
         border-radius: var(--radius-sm);
         background: var(--surface);
         box-shadow: var(--shadow-1);
+    }
+    /* Behavior 59: the assistant's sparkle is filled (Sparkle.svelte), not stroked. */
+    .wl-ico-ai {
+        color: var(--accent);
     }
     .wl-ico svg {
         width: 1.35rem;
