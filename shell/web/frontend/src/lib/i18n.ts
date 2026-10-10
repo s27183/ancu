@@ -1105,27 +1105,26 @@ const messages = {
         en: 'Owning real estate in Australia — with a clear plan'
     },
     'intro.lede': {
-        vi: `${BRAND} lập kế hoạch ngân sách cho cả hành trình bất động sản của bạn tại Úc — mua, giữ, bán — theo quy định hiện hành và tối ưu cho hoàn cảnh của bạn. Mọi con số theo quy định đều dẫn về nguồn chính thức đã kiểm chứng.`,
-        en: `${BRAND} builds a budget plan for your whole Australian property journey — buy, hold, sell — under current regulations and optimised for your situation. Every regulated figure traces to a verified official source.`
+        vi: `${BRAND} lập kế hoạch ngân sách cho cả hành trình bất động sản của bạn tại Úc — mua, giữ, bán — cho từng khu vực cụ thể, với các chỉ số chính của khu vực đó, theo quy định hiện hành và tối ưu cho hoàn cảnh của bạn.`,
+        en: `${BRAND} builds a budget plan for your whole Australian property journey — buy, hold, sell — for a specific suburb, with that suburb's key indicators in view, under current regulations and optimised for your situation.`
     },
-    // Behavior 44: the platform's position, on the sheet's first screen (invariants.md,
-    // the goal: independent; information as is, not an advice service — Son 2026-10-10).
-    'intro.position.aria': { vi: `${BRAND} là gì`, en: `What ${BRAND} is` },
-    'intro.position.independent.title': { vi: 'Một bản kiểm tra độc lập', en: 'An independent check' },
-    'intro.position.independent.body': {
-        vi: 'Không gắn với môi giới bất động sản, luật sư, đại lý di trú hay chủ đầu tư nào. Dù bạn đã mua qua kênh quen hay chưa biết bắt đầu từ đâu, bạn đều thấy được toàn bộ ngân sách mua, giữ và bán theo quy định hiện hành.',
-        en: 'Tied to no real-estate agent, lawyer, migration agent or developer. Whether you already bought through a channel you know or don’t know where to start, you see the whole budget to buy, hold and sell under current regulations.'
-    },
-    'intro.position.info.title': { vi: 'Thông tin, không phải tư vấn', en: 'Information, not advice' },
-    'intro.position.info.body': {
-        vi: 'Dựa trên quy định hiện hành hết mức có thể, cung cấp nguyên trạng — không phải dịch vụ tư vấn pháp lý, thuế hay tài chính.',
-        en: 'Grounded in current regulations as far as we can, provided as is — not a legal, tax or financial advice service.'
+    // Behavior 44: the first screen leads to the platform's position in one tap
+    // (invariants.md, the goal: independent; information as is, not an advice service).
+    'intro.what': { vi: `${BRAND} là gì?`, en: `What is ${BRAND}?` },
+    'intro.facts.arrow': {
+        vi: 'Xem số liệu về người Việt và thị trường Úc',
+        en: 'See the facts on Vietnamese buyers and the Australian market'
     },
     'intro.sources.note': {
         vi: 'Mọi số liệu dưới đây lấy từ cơ quan chính phủ Úc, kèm nguồn và thời điểm.',
         en: 'Every figure below comes from an Australian government agency, with its source and date.'
     },
     'intro.value.title': { vi: `${BRAND} giúp gì cho bạn`, en: `What ${BRAND} does for you` },
+    'intro.value.independent.title': { vi: 'Một bản kiểm tra độc lập', en: 'An independent check' },
+    'intro.value.independent.body': {
+        vi: 'Không gắn với môi giới bất động sản, luật sư, đại lý di trú hay chủ đầu tư nào. Dù bạn đã mua qua kênh quen hay chưa biết bắt đầu từ đâu, bạn đều thấy được toàn bộ ngân sách mua, giữ và bán theo quy định hiện hành.',
+        en: 'Tied to no real-estate agent, lawyer, migration agent or developer. Whether you already bought through a channel you know or don’t know where to start, you see the whole budget to buy, hold and sell under current regulations.'
+    },
     'intro.value.plan.title': { vi: 'Kế hoạch trọn hành trình', en: 'One plan, the whole journey' },
     'intro.value.plan.body': {
         vi: 'Chi phí khi mua, trong thời gian giữ và khi bán — thuế trước bạ, phí FIRB, khoản vay, thuế đất — trong một kế hoạch.',
@@ -1140,6 +1139,11 @@ const messages = {
     'intro.value.cited.body': {
         vi: 'Như các số liệu trên trang này, mỗi con số trong kế hoạch dẫn về nguồn chính phủ.',
         en: 'Like every figure on this page, each figure in your plan traces to a government source.'
+    },
+    'intro.value.info.title': { vi: 'Thông tin, không phải tư vấn', en: 'Information, not advice' },
+    'intro.value.info.body': {
+        vi: 'Các con số được tính từ quy định hiện hành — không có AI nào viết ra một con số theo quy định — và được tổng hợp thành thông tin, cung cấp nguyên trạng. Đây không phải dịch vụ tư vấn pháp lý, thuế hay tài chính, cũng không phải lời khuyên dành riêng cho bất kỳ ai.',
+        en: 'The figures are calculated from current regulations — no AI writes a regulated figure — and aggregated as information, provided as is. This is not a legal, tax or financial advice service, and not a recommendation for any one person.'
     },
     'intro.cta': { vi: 'Khám phá bản đồ', en: 'Explore the map' },
     'intro.cta.hint': {

@@ -1,6 +1,7 @@
 <script lang="ts">
     // One fact drawn as a picture (behavior 42): bars, a year series, a big counted-up
-    // figure, a 10×10 waffle for shares, or a dumbbell of price growth. Hand-drawn in
+    // figure, a 10×10 waffle for shares, a dumbbell of price growth, or a titled parcel
+    // for a statement that has no number (behavior 44). Hand-drawn in
     // HTML/CSS on the app's tokens (no chart library, the behavior's Approach), so it
     // follows the theme and the type scale. Each mark is sized from the fact's own
     // numbers; nothing here invents or rounds a figure the reader sees — labels print
@@ -138,6 +139,15 @@
                 </li>
             {/each}
         </ul>
+    {:else if fact.visual === 'statement'}
+        <!-- A titled parcel: the house and the ground under it inside one boundary. -->
+        <svg class="fv-parcel" viewBox="0 0 120 64" aria-hidden="true">
+            <path class="ground" d="M6 50 L60 36 L114 50 L60 62 Z" />
+            <path class="line" d="M6 50 L60 36 L114 50 L60 62 Z" />
+            <path class="house" d="M44 48 V34 L60 24 L76 34 V48 L60 52 Z" />
+            <path class="roof" d="M40 35 L60 22 L80 35" />
+            <circle class="pin" cx="96" cy="47" r="3.2" />
+        </svg>
     {/if}
 </div>
 
@@ -145,6 +155,37 @@
     .fv {
         --grow: cubic-bezier(0.2, 0.8, 0.2, 1);
         font-variant-numeric: tabular-nums;
+    }
+
+    /* --- statement --------------------------------------------------------- */
+    .fv-parcel {
+        width: 7.5rem;
+        height: 4rem;
+    }
+    .fv-parcel .ground {
+        fill: var(--accent-soft);
+    }
+    .fv-parcel .line {
+        fill: none;
+        stroke: var(--accent);
+        stroke-width: 1.6;
+        stroke-dasharray: 4 3;
+    }
+    .fv-parcel .house {
+        fill: var(--surface);
+        stroke: var(--ink-2);
+        stroke-width: 1.6;
+        stroke-linejoin: round;
+    }
+    .fv-parcel .roof {
+        fill: none;
+        stroke: var(--accent);
+        stroke-width: 2.4;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+    .fv-parcel .pin {
+        fill: var(--gold-mark);
     }
 
     /* --- figure ------------------------------------------------------------ */

@@ -15,6 +15,14 @@ sources:
     retrieved: 2026-10-09
     path: docs/sources/abs/housing-census-2021.txt
     note: "ABS Housing: Census, 2021 (released 28/06/2022) — tenure of occupied private dwellings."
+  - url: https://www.qld.gov.au/firstnations/environment-land-use-native-title/what-it-means-for-queensland
+    retrieved: 2026-10-10
+    path: docs/sources/qld/native-title-what-it-means-for-queensland.txt
+    note: "Queensland Government, What native title means for Queensland (last updated 1 September 2026) — 'Private property': freehold land under Australian common law."
+  - url: https://www.planning.act.gov.au/community/buy/leasing-and-titles/crown-leases
+    retrieved: 2026-10-10
+    path: docs/sources/act/crown-leases.txt
+    note: "ACT Government, Crown leases — the ACT's leasehold system and the 99-year residential lease."
 ---
 
 # Why property in Australia — facts for the first-visit sheet
@@ -81,6 +89,20 @@ The figures the first-visit sheet draws in its "Why Australian property" section
       ],
       "quotes": ["31 per cent are owned outright, 35 per cent are owned with a mortgage and 30.6 per cent are rented",
                  "remaining 3.4 per cent"]
+    },
+    {
+      "id": "freehold_land",
+      "visual": "statement",
+      "headline": {"en": "Buy a home in Australia and you own the land under it",
+                   "vi": "Mua nhà ở Úc, bạn sở hữu cả phần đất bên dưới"},
+      "caption": {"en": "Most private homes are freehold land: “free from hold” by any other entity — the owner can mortgage, lease or sell the land and build on it under local planning rules. In the ACT, homes sit on a Crown lease, usually for 99 years, which the holder effectively owns.",
+                  "vi": "Phần lớn nhà ở tư nhân nằm trên đất freehold: đất “không bị nắm giữ” bởi bất kỳ bên nào khác — chủ sở hữu có thể thế chấp, cho thuê, bán đất và xây nhà theo quy hoạch địa phương. Riêng ở ACT, nhà nằm trên đất thuê của Nhà nước (Crown lease), thường 99 năm, và người giữ hợp đồng thuê trên thực tế sở hữu đất."},
+      "as_of": "2026-09",
+      "source": [3, 4],
+      "quotes": ["In Australian common law, most private homes are under a type of tenure called freehold land.",
+                 "this means the land is ‘free from hold’ by any other entity and the owner can mortgage, lease, or sell their land and build a dwelling in accordance with local laws and planning regulations",
+                 "If you hold a Crown lease on a land or property, you effectively own it.",
+                 "A residential lease is usually for a term of 99 years in the ACT."]
     }
   ]
 }

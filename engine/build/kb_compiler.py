@@ -163,7 +163,11 @@ def news_source_host_error(src):
 # appear in the archived file (or, with `owner:`, in the KB doc that owns the figure, so
 # one fact has one owner). GATE 12 checks them fail-closed: a figure that drifts from its
 # source, or a source that is not kept, fails the build.
-FACT_VISUALS = ("bars", "series", "figure", "split", "growth")
+# A `statement` (behavior 44) is a fact with no number — a headline and caption read as
+# text (freehold title) — so it carries no unit, value or items; its quotes still prove
+# it. A fact may cite more than one source (`source: [3, 4]`, a rule and its exception
+# from two agencies); its quotes are then found in any of them.
+FACT_VISUALS = ("bars", "series", "figure", "split", "growth", "statement")
 FACT_UNITS = ("count", "people", "pct", "aud_k")
 
 
@@ -251,7 +255,11 @@ def facts_doc_fails(slug, doc, kb_docs):
         ids.add(fid)
         if f.get("visual") not in FACT_VISUALS:
             out.append(f"{where}: visual {f.get('visual')!r} not one of {FACT_VISUALS}")
-        if f.get("unit") not in FACT_UNITS:
+        statement = f.get("visual") == "statement"
+        if statement:
+            if any(k in f for k in ("unit", "value", "items", "compare")):
+                out.append(f"{where}: a statement carries no unit, value, items or compare")
+        elif f.get("unit") not in FACT_UNITS:
             out.append(f"{where}: unit {f.get('unit')!r} not one of {FACT_UNITS}")
         if not re.match(r"^\d{4}-\d{2}$", str(f.get("as_of") or "")):
             out.append(f"{where}: as_of must be YYYY-MM")
@@ -262,7 +270,7 @@ def facts_doc_fails(slug, doc, kb_docs):
         if f.get("visual") == "figure":
             if not isinstance(f.get("value"), (int, float)):
                 out.append(f"{where}: a figure needs a numeric value")
-        else:
+        elif not statement:
             items = f.get("items") or []
             if len(items) < 2:
                 out.append(f"{where}: a {f.get('visual')} needs at least two items")
@@ -276,8 +284,9 @@ def facts_doc_fails(slug, doc, kb_docs):
                 if e:
                     out.append(f"{where}: item label: {e}")
         si = f.get("source")
-        if not isinstance(si, int) or not 0 <= si < len(sources):
-            out.append(f"{where}: source {si!r} is not an index into `sources:`")
+        idx = si if isinstance(si, list) and si else [si]
+        if not all(isinstance(i, int) and not isinstance(i, bool) and 0 <= i < len(sources) for i in idx):
+            out.append(f"{where}: source {si!r} is not an index (or list of indices) into `sources:`")
             continue
         owner = f.get("owner")
         if owner:
@@ -287,7 +296,9 @@ def facts_doc_fails(slug, doc, kb_docs):
                 continue
             hay, against = normalize_ws(od["path"].read_text()), owner
         else:
-            hay, against = texts[si], sources[si].get("path")
+            got = [texts[i] for i in idx]
+            hay = None if any(t is None for t in got) else " \u241e ".join(got)
+            against = " or ".join(str(sources[i].get("path")) for i in idx)
         quotes = f.get("quotes") or []
         if not quotes:
             out.append(f"{where}: no `quotes` — every fact quotes its source")
