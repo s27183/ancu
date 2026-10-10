@@ -23,12 +23,16 @@ mkdir -p "$logs"
 export FH_HTTP_IP=127.0.0.1
 export FH_VITE_POLL=1   # a seat's sandbox delivers no fs events to vite (behavior 41)
 export FH_ENGINE_HTTP_PORT=8080 FH_SHELL_HTTP_PORT=8081
-export ENGINE_DATABASE_URL="postgres://$user@$enc/ancu_engine"
-export SHELL_DATABASE_URL="postgres://$user@$enc/ancu_shell"
+# FH_DEV_DB (default "ancu") names the pair <name>_engine / <name>_shell: a fresh pair
+# runs a check on empty databases (behavior 45: the real planner without the startup
+# refresh sweep re-filling every old dev card at real cost).
+db="${FH_DEV_DB:-ancu}"
+export ENGINE_DATABASE_URL="postgres://$user@$enc/${db}_engine"
+export SHELL_DATABASE_URL="postgres://$user@$enc/${db}_shell"
 export ENGINE_BASE_URL="http://127.0.0.1:8080/api/engine"   # the shell appends /dev/tenants, /plan-cards…
 
-for db in ancu_engine ancu_shell; do
-    createdb -h "$sock" "$db" 2>/dev/null || true   # exists → no-op
+for d in "${db}_engine" "${db}_shell"; do
+    createdb -h "$sock" "$d" 2>/dev/null || true   # exists → no-op
 done
 
 pids=()

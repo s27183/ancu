@@ -48,6 +48,8 @@
     import FlowView from '$lib/renderers/FlowView.svelte';
     import Tabs from '$lib/Tabs.svelte';
     import Chat from '$lib/Chat.svelte';
+    import { guest } from '$lib/stores/session';
+    import { loginOpen } from '$lib/stores/ui';
     import Modal from '$lib/Modal.svelte';
 
     let { suburbName, suburbState, onplan }: {
@@ -1037,6 +1039,17 @@
          clutter for little payoff. Backend untouched — GET/PATCH .../news, GATE 11, the
          compiled artifact's news entries are all still live; this was a shell-only
          removal, easy to re-wire if wanted later.) -->
+    <!-- Behavior 45: a guest's plan says what it is — kept 7 days, sign in to keep it
+         and to ask the assistant (fh_shell_guest). -->
+    {#if $guest && sub !== 'qa'}
+        <div class="pp-guest" role="note">
+            <p>{$t('guest.notice')}</p>
+            <button type="button" class="primary" onclick={() => loginOpen.set(true)}
+                >{$t('auth.signin')}</button
+            >
+        </div>
+    {/if}
+
     <div class="pp-sticky-top" bind:clientHeight={stickyTopHeight}>
         <!-- Sub-tabs: one per plan section + a Q&A tab — each section shows on its own,
              so the user never scrolls a long plan. Horizontally scrollable on narrow
@@ -1138,7 +1151,14 @@
         {#if sub === 'qa'}
             <!-- Chat runs over the FILLED card; the engine 409s a qa turn while the base
                  turn is still running, so gate it on the base turn having finished. -->
-            {#if cardId && turnDone && !turnFailed}
+            {#if $guest}
+                <div class="pp-guest" role="note">
+                    <p>{$t('guest.notice')}</p>
+                    <button type="button" class="primary" onclick={() => loginOpen.set(true)}
+                        >{$t('auth.signin')}</button
+                    >
+                </div>
+            {:else if cardId && turnDone && !turnFailed}
                 <Chat planCardId={cardId} />
             {:else}
                 <p class="pp-pending">{$t('plan.qa.pending')}</p>

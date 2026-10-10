@@ -53,7 +53,8 @@
             band: band === null ? null : BUDGET_BANDS.indexOf(band)
         };
     }
-    let phase = $state<'form' | 'submitting' | 'created' | 'auth' | 'error'>('form');
+    let phase = $state<'form' | 'submitting' | 'created' | 'auth' | 'limit' | 'error'>('form');
+    let guestLimit = $state(3);
 
     // The gate branches on intent (mode-c-wedge.md P5-activate) AND, orthogonally, on
     // citizen/PR (mode-b-wedge.md P5 / mode-d-wedge.md P5): owner_occupier still requires
@@ -126,8 +127,10 @@
         const outcome = await createPlanCard(
             buildOnboardingInput(stateCode, suburbName, suburbSal, band, intent, isForeign, buyerStage)
         );
+        if (outcome.kind === 'guest_limit') guestLimit = outcome.limit;
         phase =
             outcome.kind === 'created' ? 'created'
+            : outcome.kind === 'guest_limit' ? 'limit'
             : outcome.kind === 'auth_required' ? 'auth'
             : 'error';
     }
@@ -155,6 +158,13 @@
             <h3>{$t('onboarding.created.title')}</h3>
             <p>{$t('onboarding.created.body')}</p>
             <button type="button" class="primary" onclick={oncreated}>{$t('onboarding.created.cta')}</button>
+        </div>
+    {:else if phase === 'limit'}
+        <div class="ob-terminal">
+            <p>{$t('guest.limit').replace('{n}', String(guestLimit))}</p>
+            <button type="button" class="primary" onclick={() => onsignin(answers())}
+                >{$t('auth.signin')}</button
+            >
         </div>
     {:else if phase === 'auth'}
         <div class="ob-terminal">

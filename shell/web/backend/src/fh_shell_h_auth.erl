@@ -10,7 +10,8 @@
 %%   google_callback GET  /api/auth/google/callback?code&state -> set cookie, 302 app
 %%
 %% On success the shell issues the USER JWT (HS256, fh_shell_jwt) and sets it as an
-%% httpOnly, SameSite=Lax session cookie (`fh_session`). The token is never exposed to
+%% httpOnly, SameSite=Lax session cookie (`fh_session`); a guest session still on the
+%% browser is claimed first (fh_shell_guest:claim/2, behavior 45). The token is never exposed to
 %% JS — XSS cannot read it, and the redirect-based magic-link / OAuth flows land the
 %% browser back on the app already authenticated. (The engine never sees this token;
 %% the shell mints a separate ed25519 tenant JWT per engine call, fh_shell_engine_jwt.)
@@ -20,6 +21,7 @@
 %% paths upsert-by-email and converge on one user. First sign-in creates the row.
 
 -export([init/2]).
+-export([session_cookie_opts/1]).
 
 -define(SESSION_COOKIE, <<"fh_session">>).
 -define(OAUTH_STATE_COOKIE, <<"fh_oauth_state">>).
@@ -83,6 +85,7 @@ magic_verify(Req) ->
             case fh_shell_store:redeem_magic_token(token_hash(Raw)) of
                 {ok, Email} ->
                     {UserId, Role, Locale, Extra} = fh_shell_store:upsert_user_by_email(Email),
+                    ok = fh_shell_guest:claim(Req, UserId),
                     Jwt = issue_jwt(UserId, Email, Role, Extra, Locale),
                     Req1 = set_session_cookie(Jwt, Req),
                     redirect_app(<<"/?signin=ok">>, Req1);
@@ -134,6 +137,7 @@ google_exchange(Code, Req) ->
                 {ok, Email, Subject} ->
                     {UserId, Role, Locale, Extra} = fh_shell_store:upsert_user_by_email(Email),
                     ok = fh_shell_store:link_oauth(UserId, <<"google">>, Subject),
+                    ok = fh_shell_guest:claim(Req, UserId),
                     Jwt = issue_jwt(UserId, Email, Role, Extra, Locale),
                     Req1 = set_session_cookie(Jwt, Req),
                     redirect_app(<<"/?signin=ok">>, Req1);

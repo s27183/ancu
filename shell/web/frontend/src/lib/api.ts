@@ -122,6 +122,7 @@ export interface CreatePlanCardResult {
 export type CreateOutcome =
     | { kind: 'created'; result: CreatePlanCardResult }
     | { kind: 'auth_required' }
+    | { kind: 'guest_limit'; limit: number }
     | { kind: 'error'; status: number };
 
 /** POST /api/plan-cards. No auth header is attached here yet — the login slice will
@@ -140,6 +141,11 @@ export async function createPlanCard(
         return { kind: 'created', result: (await res.json()) as CreatePlanCardResult };
     }
     if (res.status === 401) return { kind: 'auth_required' };
+    // Behavior 45: a guest's (or one address's) daily create cap — sign in to build more.
+    if (res.status === 429) {
+        const b = (await res.json().catch(() => ({}))) as { error?: string; limit?: number };
+        if (b.error === 'guest_daily_limit') return { kind: 'guest_limit', limit: b.limit ?? 3 };
+    }
     return { kind: 'error', status: res.status };
 }
 

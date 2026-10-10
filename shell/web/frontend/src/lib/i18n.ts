@@ -136,6 +136,15 @@ const messages = {
         en: 'You’ll need to sign in to save and view your plan.'
     },
     'onboarding.auth.cta': { vi: 'Đăng nhập', en: 'Sign in' },
+    // Behavior 45 (Son, 2026-10-10): guest plans — the notice, the Q&A reason, the cap.
+    'guest.notice': {
+        vi: 'Kế hoạch tạm thời: được giữ 7 ngày trên máy chủ. Đăng nhập để lưu vào tài khoản và hỏi trợ lý.',
+        en: 'Temporary plan: kept for 7 days on our server. Sign in to save it to your account and ask the assistant.'
+    },
+    'guest.limit': {
+        vi: 'Bạn đã tạo {n} kế hoạch hôm nay. Đăng nhập để tạo thêm.',
+        en: 'You’ve built {n} plans today. Sign in to build more.'
+    },
     'onboarding.error': {
         vi: 'Có lỗi xảy ra. Vui lòng thử lại.',
         en: 'Something went wrong. Please try again.'
