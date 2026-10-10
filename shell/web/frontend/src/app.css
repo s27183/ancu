@@ -1788,6 +1788,63 @@ main {
     box-shadow: none;
 }
 
+/* Behavior 55: the AI assistant's tab stands apart from the grey section tabs — accent
+   text and a sparkle, a soft accent wash when open. The long label shows on wide sheets;
+   a phone's full row (356 px at a 400 px screen, measured) takes the short one. */
+.pp-subtabs button.pp-qa-tab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    color: var(--accent);
+}
+.pp-subtabs button.pp-qa-tab:hover {
+    color: var(--accent-hover);
+}
+.pp-subtabs button.pp-qa-tab.active {
+    background: var(--accent-soft);
+    color: var(--accent);
+    box-shadow: inset 0 0 0 1px var(--accent-line);
+}
+.pp-qa-short {
+    display: none;
+}
+@media (max-width: 520px) {
+    .pp-qa-long {
+        display: none;
+    }
+    .pp-qa-short {
+        display: inline;
+    }
+}
+/* The foot bar under every other plan tab: one line to the assistant. */
+.pp-askbar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    margin: 1rem 0 0.25rem;
+    padding: 0.7rem 0.9rem;
+    border: 1px solid var(--accent-line);
+    border-radius: 10px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font: inherit;
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    transition: background var(--t-fast) var(--ease);
+}
+.pp-askbar:hover {
+    background: var(--accent-soft-2);
+}
+.pp-askbar:focus-visible,
+.pp-subtabs button.pp-qa-tab:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
 /* KB-news ticker (kb-news-feature.md, task 29) — a slim strip cycling one relevant,
    non-dismissed news headline at a time, sitting above the sub-tab rail inside the
    shared .pp-sticky-top region. Arrow buttons flank the headline when there's more

@@ -14,6 +14,7 @@
     import { subscribeConversation, type PlanCardStream } from '$lib/planCardStream';
     import { pick, type LocalizedText } from '$lib/planCard';
     import { describeFailure } from '$lib/turnFailure';
+    import QaIntro from '$lib/QaIntro.svelte';
 
     let { planCardId }: { planCardId: string } = $props();
 
@@ -32,6 +33,9 @@
     // A turn is in flight → block another send (the engine 409s a concurrent turn anyway).
     let sending = $state(false);
     let logEl = $state<HTMLDivElement | null>(null);
+    let inputEl = $state<HTMLInputElement | null>(null);
+    // The intro waits for the history fetch, so a plan with past turns never flashes it.
+    let hydrated = $state(false);
 
     let stream: PlanCardStream | null = null;
     // Race guard: an answer can in principle arrive before postMessage's 202 registers
@@ -112,6 +116,7 @@
                     { role: 'assistant', turnId: turn.turnId, phase: 'done', answer: turn.answer }
                 ]);
             }
+            hydrated = true;
         })();
 
         stream = subscribeConversation(planCardId, {
@@ -141,7 +146,16 @@
 <section class="chat" aria-label={$t('chat.title')}>
     <h3 class="chat-title">{$t('chat.title')}</h3>
 
-    {#if messages.length > 0}
+    {#if messages.length === 0 && hydrated}
+        <!-- Behavior 55: before the first question, what the assistant does + examples
+             that only fill the input (never send). -->
+        <QaIntro
+            onpick={(text) => {
+                input = text;
+                inputEl?.focus();
+            }}
+        />
+    {:else if messages.length > 0}
         <div class="chat-log" bind:this={logEl}>
             {#each messages as m, i (i)}
                 {#if m.role === 'user'}
@@ -168,6 +182,7 @@
         <input
             type="text"
             bind:value={input}
+            bind:this={inputEl}
             placeholder={$t('chat.placeholder')}
             disabled={sending}
             aria-label={$t('chat.title')}

@@ -48,6 +48,8 @@
     import FlowView from '$lib/renderers/FlowView.svelte';
     import Tabs from '$lib/Tabs.svelte';
     import Chat from '$lib/Chat.svelte';
+    import QaIntro from '$lib/QaIntro.svelte';
+    import Sparkle from '$lib/Sparkle.svelte';
     import { guest } from '$lib/stores/session';
     import { loginOpen } from '$lib/stores/ui';
     import Modal from '$lib/Modal.svelte';
@@ -153,6 +155,15 @@
     // height (it grows a row when the rail is grouped) instead of a stale hardcoded
     // rem (see the .pp-sticky-top / .pp-subcontent markup below).
     let stickyTopHeight = $state(0);
+    let stickyTopEl = $state<HTMLElement | null>(null);
+
+    // Behavior 55: the foot bar on every other tab jumps to the AI assistant and brings
+    // the tab row (and the assistant under it) back into view.
+    async function openQa() {
+        sub = 'qa';
+        await tick();
+        stickyTopEl?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    }
 
     let stream: PlanCardStream | null = null;
     // A generation token so a retry's async can't be clobbered by a stale in-flight one.
@@ -942,6 +953,22 @@
         </Modal>
     {/if}
 
+    <!-- Behavior 55: the Q&A tab is the AI assistant's door — sparkle + accent, the
+         long label on wide screens, the short one on a phone's full tab row. -->
+    {#snippet qaTab()}
+        <button
+            type="button"
+            role="tab"
+            class="pp-qa-tab"
+            aria-selected={sub === 'qa'}
+            class:active={sub === 'qa'}
+            onclick={() => (sub = 'qa')}
+            ><Sparkle /><span class="pp-qa-long">{$t('plan.tab.qa')}</span><span
+                class="pp-qa-short">{$t('plan.tab.qa_short')}</span
+            ></button
+        >
+    {/snippet}
+
     {#snippet settleCta()}
         <div class="pp-settle-cta">
             <button type="button" class="pp-attach-btn" onclick={openSettle}>
@@ -1058,7 +1085,7 @@
         </div>
     {/if}
 
-    <div class="pp-sticky-top" bind:clientHeight={stickyTopHeight}>
+    <div class="pp-sticky-top" bind:clientHeight={stickyTopHeight} bind:this={stickyTopEl}>
         <!-- Sub-tabs: one per plan section + a Q&A tab — each section shows on its own,
              so the user never scrolls a long plan. Horizontally scrollable on narrow
              screens. Past RAIL_GROUP_THRESHOLD rail tabs (Modes B/C/D), a second row
@@ -1094,13 +1121,7 @@
                         class:active={railGroup === 'hold'}
                         onclick={() => selectGroup('hold')}>{$t('plan.railgroup.hold')}</button
                     >
-                    <button
-                        type="button"
-                        role="tab"
-                        aria-selected={sub === 'qa'}
-                        class:active={sub === 'qa'}
-                        onclick={() => (sub = 'qa')}>{$t('plan.tab.qa')}</button
-                    >
+                    {@render qaTab()}
                 </div>
                 <div
                     class="pp-subtabs pp-subtabs-group"
@@ -1130,13 +1151,7 @@
                             >{$t(`plan.ltab.${tab.tab_id}` as 'plan.ltab.overview')}</button
                         >
                     {/each}
-                    <button
-                        type="button"
-                        role="tab"
-                        aria-selected={sub === 'qa'}
-                        class:active={sub === 'qa'}
-                        onclick={() => (sub = 'qa')}>{$t('plan.tab.qa')}</button
-                    >
+                    {@render qaTab()}
                 </div>
             {/if}
         </div>
@@ -1160,6 +1175,7 @@
             <!-- Chat runs over the FILLED card; the engine 409s a qa turn while the base
                  turn is still running, so gate it on the base turn having finished. -->
             {#if $guest}
+                <QaIntro onpick={() => loginOpen.set(true)} />
                 <div class="pp-guest" role="note">
                     <p>{$t('guest.notice')}</p>
                     <button type="button" class="primary" onclick={() => loginOpen.set(true)}
@@ -1482,6 +1498,13 @@
             {/each}
         {/if}
     </div>
+
+    <!-- Behavior 55: every other tab ends with a way to the AI assistant. -->
+    {#if sub !== 'qa' && uiTabs.length > 0}
+        <button type="button" class="pp-askbar" onclick={openQa}
+            ><Sparkle />{$t('plan.askbar')}</button
+        >
+    {/if}
 
     {#if failure}
         <div class="pp-state">

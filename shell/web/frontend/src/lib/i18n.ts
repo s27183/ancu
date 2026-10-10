@@ -206,7 +206,14 @@ const messages = {
     'plan.tab.mortgage_finance': { vi: 'Vay', en: 'Finance' },
     'plan.tab.cash_position': { vi: 'Dòng tiền', en: 'Cash' },
     'plan.tab.ownership_planning': { vi: 'Sở hữu', en: 'Owning' },
-    'plan.tab.qa': { vi: 'Hỏi đáp', en: 'Q&A' },
+    // Behavior 55: the Q&A tab names the AI assistant; the short form is the phone row's
+    // (the long one overflows a 356 px row, measured 2026-10-10).
+    'plan.tab.qa': { vi: 'Hỏi trợ lý AI', en: 'Ask the AI assistant' },
+    'plan.tab.qa_short': { vi: 'Hỏi AI', en: 'Ask AI' },
+    'plan.askbar': {
+        vi: 'Có câu hỏi về kế hoạch này? Hỏi trợ lý AI →',
+        en: 'A question about this plan? Ask the AI assistant →'
+    },
     // Lifecycle tab labels — the blueprint-declared spine (plan-card-lifecycle-restoration.md
     // §11.3). Every in-scope blueprint now shares this five-view shape: overview/flow/budget/qa
     // (all five modes) plus one state-shaped view — portfolio (C/D) or family (B, always-on;
@@ -997,6 +1004,25 @@ const messages = {
     'disclaimer.firb': {
         vi: 'Các quy định FIRB ở đây là thông tin chung từ nguồn được trích dẫn, cung cấp nguyên trạng — không phải tư vấn pháp lý. Quy định áp dụng cho bạn tùy vào tình trạng cư trú và loại bất động sản; hãy xác nhận với FIRB hoặc luật sư trước khi ký hợp đồng.',
         en: 'The FIRB rules here are general information from cited sources, provided as is — not legal advice. What applies to you depends on your residency and the type of property; confirm with FIRB or a lawyer before you sign a contract.'
+    },
+    // Behavior 55: what the assistant is, before the first question, and three examples
+    // that only fill the input (the day's one question is never spent by a tap).
+    'chat.intro': {
+        vi: 'Trợ lý AI đọc chính kế hoạch này, gồm các con số và quy định có trích nguồn, rồi trả lời bằng tiếng Việt và tiếng Anh. Mỗi ngày một câu hỏi.',
+        en: 'The AI assistant reads this plan, its own figures and cited rules, and answers in Vietnamese and English. One question a day.'
+    },
+    'chat.examples': { vi: 'Thử hỏi', en: 'Try asking' },
+    'chat.ex1': {
+        vi: 'Tôi cần bao nhiêu tiền mặt để bắt đầu?',
+        en: 'How much cash do I need to start?'
+    },
+    'chat.ex2': {
+        vi: 'Nếu giá nhà là 800.000 AU$ thì kế hoạch thay đổi thế nào?',
+        en: 'What changes if the price is A$800,000?'
+    },
+    'chat.ex3': {
+        vi: 'Thuế trước bạ của tôi được tính thế nào?',
+        en: 'How is my stamp duty worked out?'
     },
     'chat.disclaimer': {
         vi: 'Câu trả lời là thông tin để lập ngân sách, cung cấp nguyên trạng — không phải dịch vụ tư vấn pháp lý, thuế hay tài chính.',
