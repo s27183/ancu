@@ -15,7 +15,9 @@
     // Marks grow in once the sheet is on screen. Under prefers-reduced-motion they are
     // drawn at full size at once (CSS below), and the figure shows its final value.
     let shown = $state(false);
-    let counted = $state(0);
+    // The figure rests at its value; the count-up starts from 0 only once a frame runs,
+    // so a tab drawn without animation frames (hidden, a thumbnail) still shows it.
+    let counted = $state(fact.value ?? 0);
     onMount(() => {
         const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
         const target = fact.value ?? 0;
@@ -28,9 +30,11 @@
         const t0 = performance.now();
         const dur = 1100;
         let frame = 0;
+        // Count in the figure's own decimals and land exactly on it (85.1, not 85).
+        const step = 10 ** Math.min(2, (String(target).split('.')[1] ?? '').length);
         const tick = (now: number) => {
             const p = Math.min(1, (now - t0) / dur);
-            counted = Math.round(target * (1 - Math.pow(1 - p, 3)));
+            counted = p >= 1 ? target : Math.round(target * (1 - Math.pow(1 - p, 3)) * step) / step;
             if (p < 1) frame = requestAnimationFrame(tick);
         };
         frame = requestAnimationFrame(tick);
@@ -41,7 +45,8 @@
     });
 
     const items = $derived(fact.items ?? []);
-    const max = $derived(Math.max(1, ...items.map((i) => i.value)));
+    // Shares are drawn against the whole (100%), so 24.92% of the land reads as a quarter.
+    const max = $derived(fact.unit === 'pct' ? 100 : Math.max(1, ...items.map((i) => i.value)));
     const fmt = (n: number) => formatValue(n, fact.unit, $lang);
 
     // Waffle: which segment each of the 100 cells belongs to.
