@@ -7,7 +7,7 @@
     // screen leads to the position card and the facts in one tap each); the browser then
     // remembers it was seen (facts.ts, introSeen). Under prefers-reduced-motion nothing
     // flies or pulses — it simply closes and the launcher sits still. The launcher pulses
-    // light green until the sheet has been seen (behavior 50).
+    // light green on every visit until it is tapped (behavior 50).
     import { onMount, tick } from 'svelte';
     import { lang } from '$lib/stores/lang';
     import { t } from '$lib/i18n';
@@ -30,12 +30,13 @@
     let docs = $state<FactDoc[]>([]);
     let cardEl = $state<HTMLElement | null>(null);
     let launchEl = $state<HTMLButtonElement | null>(null);
-    // Behavior 50: the launcher pulses light green until this browser has seen the
-    // sheet. introSeen() is read once at mount, not after the first close: the sheet
-    // opens by itself on a first visit and its close marks it seen, so re-reading
-    // would stop the pulse before anyone could see it. Opening it from the launcher
-    // stops it at once; a later page load finds it seen and the button stays still.
-    let pulse = $state(false);
+    // Behavior 50 (revised 2026-10-10): the launcher pulses light green on every page
+    // load, whether or not this browser has seen the sheet, and stops once the visitor
+    // taps it (reopen) — for that page view only; the next visit pulses again. The first
+    // version pulsed only while introSeen() was false, and since the sheet opens by
+    // itself on a first visit and its close marks it seen, nobody who had visited
+    // before ever saw it (Son on prod, 2026-10-10: "did not see … pulse at all").
+    let pulse = $state(true);
 
     const ordered = $derived(
         [...docs].sort((a, b) => SECTION_ORDER.indexOf(a.slug) - SECTION_ORDER.indexOf(b.slug))
@@ -59,10 +60,7 @@
 
     onMount(() => {
         loadFacts();
-        if (!introSeen()) {
-            open = true;
-            pulse = true;
-        }
+        if (!introSeen()) open = true;
     });
 
     async function collapse() {
