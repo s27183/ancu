@@ -90,14 +90,21 @@
 
     // ---- marquee mode: homepage full-width continuous scroll ----
 
-    // Behavior 43: the strip moves under the finger. A requestAnimationFrame loop owns
-    // the track's translateX (a CSS animation cannot be dragged), so:
-    //   - a drag moves it 1:1 with the pointer, wrapping over the two duplicated runs;
+    // Behavior 43: the strip moves under the finger. One Web Animations API animation
+    // owns the track's translateX (behavior 51), so:
+    //   - its free motion is that animation: translateX from 0 to -runWidth over
+    //     runWidth / SPEED_PX_S seconds, repeating, wrapping over the two duplicated
+    //     runs. The compositor runs it; no script runs per frame. (Before 51 a
+    //     requestAnimationFrame loop set the offset every frame: measured 2026-10-10,
+    //     120 rAF calls a second on an idle home screen, the phone ran warm);
+    //   - a drag pauses it and sets its currentTime from the finger, 1:1 with the
+    //     pointer (a CSS animation could not be dragged; a paused WAAPI one can);
     //   - a press that travels < TAP_PX is a tap: it opens the note it started on;
     //   - while a pointer is down, a mouse hovers, or focus is inside, the strip stands
     //     still, and it waits RESUME_MS after the last touch, drag or hover before it
     //     moves again (behavior 48, Son: a reader swiping back and forth to find a
-    //     headline must not have it run off; a new touch restarts the wait);
+    //     headline must not have it run off; a new touch restarts the wait) — one
+    //     timer resumes it, not a per-frame check;
     //   - it moves at a constant SPEED_PX_S, whatever the number of headlines (behavior
     //     48: the old run-duration cap of 60 s made 18 headlines pass at 163 px/s,
     //     ~3 s each — too fast to read);
@@ -116,18 +123,53 @@
     const RESUME_MS = 3000;
 
     let runEl: HTMLElement | undefined = $state();
+    let trackEl: HTMLElement | undefined = $state();
     let runWidth = $state(0);
-    let offset = $state(0); // px, <= 0; wrapped into (-runWidth, 0]
+    let anim: Animation | undefined;
+    let keptFrac = 0;
     let held = false;
     let hovering = false;
     let focused = false;
     let reduced = false;
-    let lastActive = -Infinity; // performance.now() when the last touch/drag/hover ended
+    let resting = false; // inside RESUME_MS after the last touch, drag or hover
+    let restTimer: ReturnType<typeof setTimeout> | undefined;
+
+    const durationMs = () => (runWidth / SPEED_PX_S) * 1000;
 
     function wrap(x: number): number {
         if (runWidth <= 0) return 0;
         const m = x % runWidth;
         return m > 0 ? m - runWidth : m;
+    }
+
+    // The track's offset in px, <= 0, read from and written to the animation's clock.
+    function getOffset(): number {
+        const d = durationMs();
+        if (!anim || d <= 0) return 0;
+        const tm = Number(anim.currentTime ?? 0);
+        return -((tm % d) / d) * runWidth;
+    }
+    function setOffset(x: number) {
+        if (!anim || runWidth <= 0) return;
+        anim.currentTime = (-wrap(x) / runWidth) * durationMs();
+    }
+
+    // Play or pause to match the reader's state; called on each change, never per frame.
+    function sync() {
+        if (!anim) return;
+        const still = held || hovering || focused || reduced || resting;
+        if (still && anim.playState !== 'paused') anim.pause();
+        else if (!still && anim.playState !== 'running') anim.play();
+    }
+
+    function rest() {
+        resting = true;
+        clearTimeout(restTimer);
+        restTimer = setTimeout(() => {
+            resting = false;
+            sync();
+        }, RESUME_MS);
+        sync();
     }
 
     $effect(() => {
@@ -138,22 +180,34 @@
         runWidth = el.offsetWidth;
         const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
         reduced = mq.matches;
-        const onMq = () => (reduced = mq.matches);
+        const onMq = () => {
+            reduced = mq.matches;
+            sync();
+        };
         mq.addEventListener('change', onMq);
-        let last = performance.now();
-        let raf = requestAnimationFrame(function tick(now) {
-            const dt = Math.min(0.1, (now - last) / 1000);
-            last = now;
-            const resting = now - lastActive < RESUME_MS;
-            if (!held && !hovering && !focused && !reduced && !resting && runWidth > 0) {
-                offset = wrap(offset - SPEED_PX_S * dt);
-            }
-            raf = requestAnimationFrame(tick);
-        });
         return () => {
-            cancelAnimationFrame(raf);
             ro.disconnect();
             mq.removeEventListener('change', onMq);
+            clearTimeout(restTimer);
+        };
+    });
+
+    // (Re)build the animation when the run's width changes (a language switch, a
+    // resize, new headlines), keeping the strip where it stood.
+    $effect(() => {
+        if (variant !== 'marquee' || !trackEl || runWidth <= 0) return;
+        anim = trackEl.animate(
+            [{ transform: 'translate3d(0, 0, 0)' }, { transform: `translate3d(${-runWidth}px, 0, 0)` }],
+            { duration: durationMs(), iterations: Infinity, easing: 'linear' }
+        );
+        anim.currentTime = keptFrac * durationMs();
+        sync();
+        return () => {
+            // the fraction of a run already travelled, for the next animation to resume at
+            const d = Number(anim?.effect?.getTiming().duration ?? 0);
+            keptFrac = anim && d > 0 ? (Number(anim.currentTime ?? 0) % d) / d : 0;
+            anim?.cancel();
+            anim = undefined;
         };
     });
 
@@ -166,9 +220,10 @@
     function onPointerDown(e: PointerEvent) {
         if (e.button !== 0) return;
         held = true;
+        sync();
         tapNote = undefined;
         downX = e.clientX;
-        downOffset = offset;
+        downOffset = getOffset();
         travel = 0;
         const i = (e.target as HTMLElement | null)?.closest<HTMLElement>('[data-i]')?.dataset.i;
         downNote = i !== undefined ? news[Number(i)] : undefined;
@@ -182,18 +237,18 @@
         if (!held) return;
         const dx = e.clientX - downX;
         travel = Math.max(travel, Math.abs(dx));
-        offset = wrap(downOffset + dx);
+        setOffset(downOffset + dx);
     }
     function onPointerUp() {
         if (!held) return;
         held = false;
-        lastActive = performance.now();
+        rest();
         tapNote = travel < TAP_PX ? downNote : undefined;
         downNote = undefined;
     }
     function onPointerCancel() {
         held = false;
-        lastActive = performance.now();
+        rest();
         downNote = undefined;
         tapNote = undefined;
     }
@@ -209,8 +264,14 @@
         class="pp-ticker pp-ticker-marquee"
         role="region"
         aria-label={regionLabel}
-        onfocusin={() => (focused = true)}
-        onfocusout={() => (focused = false)}
+        onfocusin={() => {
+            focused = true;
+            sync();
+        }}
+        onfocusout={() => {
+            focused = false;
+            sync();
+        }}
     >
         <!-- Decorative: the moving copy is aria-hidden; the sr-only list below is the
              real, non-moving, keyboard/AT-reachable equivalent. Pointer handling (drag,
@@ -223,13 +284,17 @@
             onpointerup={onPointerUp}
             onpointercancel={onPointerCancel}
             onclick={onClick}
-            onpointerenter={(e) => (hovering = e.pointerType === 'mouse')}
+            onpointerenter={(e) => {
+                hovering = e.pointerType === 'mouse';
+                sync();
+            }}
             onpointerleave={() => {
-                if (hovering) lastActive = performance.now();
+                const was = hovering;
                 hovering = false;
+                if (was) rest();
             }}
         >
-            <div class="pp-ticker-marquee-track" style:transform="translate3d({offset}px, 0, 0)">
+            <div class="pp-ticker-marquee-track" bind:this={trackEl}>
                 {#each [0, 1] as run (run)}
                     {#if run === 0}
                         <span class="pp-ticker-marquee-run" bind:this={runEl}>
