@@ -3,7 +3,8 @@
     // visits, says in two sentences what the product does, draws the KB's cited facts —
     // where Vietnamese buyers stand, then why Australian property — and what the product
     // adds on top of them. Closing it (✕, scrim, Escape or the CTA) flies the card into a
-    // small animated launcher at the bottom-right, which reopens it; the browser then
+    // small animated launcher at the bottom-right, which reopens it (behavior 44: its first
+    // screen leads to the position card and the facts in one tap each); the browser then
     // remembers it was seen (facts.ts, introSeen). Under prefers-reduced-motion nothing
     // flies or pulses — it simply closes and the launcher sits still.
     import { onMount, tick } from 'svelte';
@@ -13,6 +14,7 @@
     import {
         type FactDoc,
         SECTION_ORDER,
+        factSources,
         formatAsOf,
         getFacts,
         introSeen,
@@ -82,6 +84,16 @@
         cardEl?.querySelector<HTMLElement>('.wl-close')?.focus();
     }
 
+    // Smoothly bring a heading inside the sheet to its top (behavior 44); instant under
+    // prefers-reduced-motion. Scrolls .wl-scroll itself, never the page behind it.
+    function scrollToId(id: string) {
+        const box = cardEl?.querySelector<HTMLElement>('.wl-scroll');
+        const target = document.getElementById(id);
+        if (!box || !target) return;
+        const top = target.getBoundingClientRect().top - box.getBoundingClientRect().top + box.scrollTop;
+        box.scrollTo({ top, behavior: reduceMotion() ? 'auto' : 'smooth' });
+    }
+
     function onKey(e: KeyboardEvent) {
         if (open && e.key === 'Escape') collapse();
     }
@@ -106,30 +118,22 @@
                     <span class="wl-eyebrow">{$t('intro.eyebrow')}</span>
                     <h2 id="wl-title">{$t('intro.title')}</h2>
                     <p class="wl-lede">{$t('intro.lede')}</p>
-                    <!-- The platform's position, before anything else is read (behavior 44). -->
-                    <ul class="wl-position" aria-label={$t('intro.position.aria')}>
-                        <li>
-                            <svg viewBox="0 0 24 24" aria-hidden="true"
-                                ><path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.4 7.5 9.5 4.3-1.1 7.5-4.9 7.5-9.5V6L12 3Z" /><path
-                                    d="m8.8 12 2.2 2.2 4.2-4.4"
-                                /></svg
-                            >
-                            <div>
-                                <strong>{$t('intro.position.independent.title')}</strong>
-                                <span>{$t('intro.position.independent.body')}</span>
-                            </div>
-                        </li>
-                        <li>
-                            <svg viewBox="0 0 24 24" aria-hidden="true"
-                                ><circle cx="12" cy="12" r="8.5" /><path d="M12 11v5.5M12 7.6v.1" /></svg
-                            >
-                            <div>
-                                <strong>{$t('intro.position.info.title')}</strong>
-                                <span>{$t('intro.position.info.body')}</span>
-                            </div>
-                        </li>
-                    </ul>
-                    <button type="button" class="btn wl-cta" onclick={collapse}>{$t('intro.cta')} →</button>
+                    <!-- The first screen leads to the platform's position in one tap and
+                         invites the facts before the map (behavior 44). -->
+                    <div class="wl-actions">
+                        <button type="button" class="btn wl-what" onclick={() => scrollToId('wl-value-title')}
+                            >{$t('intro.what')}</button
+                        >
+                        <button type="button" class="btn wl-cta" onclick={collapse}>{$t('intro.cta')} →</button>
+                    </div>
+                    <button
+                        type="button"
+                        class="wl-arrow"
+                        onclick={() => scrollToId('wl-kb.facts.vietnamese-in-australia')}
+                    >
+                        <span>{$t('intro.facts.arrow')}</span>
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v15M5.5 12.5 12 19l6.5-6.5" /></svg>
+                    </button>
                 </header>
 
                 {#if ordered.length}
@@ -141,10 +145,11 @@
                         <h3 id="wl-{doc.slug}">{pick(doc.title, $lang)}</h3>
                         <div class="wl-grid">
                             {#each doc.facts as fact (fact.id)}
-                                {@const src = doc.sources[fact.source]}
+                                {@const srcs = factSources(doc, fact)}
                                 <article
                                     class="wl-fact"
                                     class:wide={fact.visual === 'bars' || fact.visual === 'growth'}
+                                    class:statement={fact.visual === 'statement'}
                                     data-fact={fact.id}
                                 >
                                     <h4>{pick(fact.headline, $lang)}</h4>
@@ -161,9 +166,9 @@
                                     {/if}
                                     <p class="wl-src">
                                         {$t('intro.source')}:
-                                        {#if src?.url}<a href={src.url} target="_blank" rel="noopener noreferrer"
-                                                >{publisher(src, $lang)}</a
-                                            >{/if}
+                                        {#each srcs as src, k (k)}{#if k}{', '}{/if}{#if src.url}<a href={src.url} target="_blank" rel="noopener noreferrer"
+                                                    >{publisher(src, $lang)}</a
+                                                >{/if}{/each}
                                         · {formatAsOf(fact.as_of, $lang)}
                                     </p>
                                 </article>
@@ -175,6 +180,17 @@
                 <section class="wl-value" aria-labelledby="wl-value-title">
                     <h3 id="wl-value-title">{$t('intro.value.title')}</h3>
                     <ul>
+                        <li>
+                            <span class="wl-ico" aria-hidden="true">
+                                <svg viewBox="0 0 24 24"
+                                    ><path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.4 7.5 9.5 4.3-1.1 7.5-4.9 7.5-9.5V6L12 3Z" /><path
+                                        d="m8.8 12 2.2 2.2 4.2-4.4"
+                                    /></svg
+                                >
+                            </span>
+                            <strong>{$t('intro.value.independent.title')}</strong>
+                            <span>{$t('intro.value.independent.body')}</span>
+                        </li>
                         <li>
                             <span class="wl-ico" aria-hidden="true">
                                 <svg viewBox="0 0 24 24"><path d="M4 18h16M6 18V9l6-4 6 4v9M10 18v-5h4v5" /></svg>
@@ -195,6 +211,13 @@
                             </span>
                             <strong>{$t('intro.value.cited.title')}</strong>
                             <span>{$t('intro.value.cited.body')}</span>
+                        </li>
+                        <li>
+                            <span class="wl-ico" aria-hidden="true">
+                                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" /><path d="M12 11v5.5M12 7.6v.1" /></svg>
+                            </span>
+                            <strong>{$t('intro.value.info.title')}</strong>
+                            <span>{$t('intro.value.info.body')}</span>
                         </li>
                     </ul>
                 </section>
@@ -316,6 +339,8 @@
     }
     .wl-close:focus-visible,
     .wl-cta:focus-visible,
+    .wl-what:focus-visible,
+    .wl-arrow:focus-visible,
     .wl-src a:focus-visible {
         outline: none;
         box-shadow: var(--ring);
@@ -370,42 +395,60 @@
         line-height: 1.6;
         color: var(--on-dark);
     }
-    .wl-position {
+    .wl-actions {
         position: relative;
-        display: grid;
-        gap: var(--sp-3);
-        margin: 0 0 var(--sp-5);
-        padding: 0;
-        max-width: 38rem;
-        list-style: none;
-    }
-    .wl-position li {
         display: flex;
+        flex-wrap: wrap;
         gap: var(--sp-3);
-        align-items: flex-start;
     }
-    .wl-position svg {
-        flex: none;
-        width: 1.25rem;
-        height: 1.25rem;
-        margin-top: 0.1rem;
-        fill: none;
-        stroke: var(--gold-mark);
-        stroke-width: 1.8;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-    }
-    .wl-position strong {
-        display: block;
-        font-size: var(--fs-sm);
+    .wl-what {
+        background: transparent;
+        color: var(--ink-inverse);
         font-weight: 700;
+        border: 1px solid var(--on-dark-faint);
+    }
+    .wl-what:hover {
+        background: var(--on-dark-faint);
+    }
+    .wl-arrow {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--sp-1);
+        margin: var(--sp-5) auto 0;
+        padding: var(--sp-2) var(--sp-3);
+        border: none;
+        border-radius: var(--radius-sm);
+        background: transparent;
+        color: var(--on-dark);
+        font: inherit;
+        font-size: var(--fs-xs);
+        font-weight: 600;
+        text-align: center;
+        cursor: pointer;
+    }
+    .wl-arrow:hover {
         color: var(--ink-inverse);
     }
-    .wl-position span {
-        display: block;
-        font-size: var(--fs-sm);
-        line-height: 1.5;
-        color: var(--on-dark);
+    .wl-arrow svg {
+        width: 1.5rem;
+        height: 1.5rem;
+        fill: none;
+        stroke: var(--gold-mark);
+        stroke-width: 2.2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        animation: wl-nudge 1.6s ease-in-out infinite;
+    }
+    @keyframes wl-nudge {
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(0.4rem);
+        }
     }
     .wl-cta {
         position: relative;
@@ -478,6 +521,11 @@
         font-weight: 600;
         text-decoration: none;
         white-space: nowrap;
+    }
+    /* A statement has no chart: its caption is the fact, so it reads at body size. */
+    .wl-fact.statement .wl-caption {
+        font-size: var(--fs-sm);
+        line-height: 1.55;
     }
     .wl-src {
         margin: auto 0 0;
@@ -699,8 +747,14 @@
             margin-left: var(--sp-6);
             margin-right: var(--sp-6);
         }
+        /* The two position statements frame the card full-width; the three
+           capabilities sit between them three-up. */
         .wl-value ul {
             grid-template-columns: repeat(3, 1fr);
+        }
+        .wl-value li:first-child,
+        .wl-value li:last-child {
+            grid-column: 1 / -1;
         }
         .wl-grid {
             grid-template-columns: repeat(2, 1fr);
@@ -716,7 +770,8 @@
         .wl-launch,
         .wl-launch.arrived,
         .wl-launch-ico::after,
-        .wl-launch-ico rect {
+        .wl-launch-ico rect,
+        .wl-arrow svg {
             animation: none;
             transition: none;
         }

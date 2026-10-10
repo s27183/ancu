@@ -37,6 +37,10 @@ init([]) ->
         %% engine logs + retries, never taking the shell down.
         #{id => fh_shell_usage_consumer,
           start => {fh_shell_usage_consumer, start_link, []},
+          restart => permanent, shutdown => 5000, type => worker},
+        %% Guest purge (behavior 45) — deletes unclaimed guests' plans after 7 days.
+        #{id => fh_shell_guest_purge,
+          start => {fh_shell_guest_purge, start_link, []},
           restart => permanent, shutdown => 5000, type => worker}
     ],
     {ok, {SupFlags, Children}}.

@@ -3,12 +3,17 @@
 %% GET /api/engine/plan-cards/:id — fetch the raw filled plan-card state (base +
 %% addenda) for the owning tenant (engine-contract §2.1 plan-card primitives). The
 %% engine returns typed outcomes; the shell projects to pixels (§1 invariant).
+%% DELETE /api/engine/plan-cards/:id — remove the tenant's card (and its profile once
+%% it has no other card): 204, or 404 for a card the tenant does not own. A running
+%% turn is cancelled first. The shell's guest purge is the caller (behavior 45,
+%% fh_engine_store:delete_plan_card/2).
 
 -export([init/2]).
 
 init(Req0, State) ->
     case cowboy_req:method(Req0) of
         <<"GET">> -> handle_get(Req0, State);
+        <<"DELETE">> -> handle_delete(Req0, State);
         _ ->
             {ok, fh_engine_http:reply_json(405,
                 #{<<"error">> => <<"method_not_allowed">>}, Req0), State}
@@ -49,3 +54,28 @@ handle_get(Req0, State) ->
         {error, Status, Body} ->
             {ok, fh_engine_http:reply_json(Status, Body, Req0), State}
     end.
+
+handle_delete(Req0, State) ->
+    case fh_engine_http:authenticate(Req0) of
+        {ok, #{tenant_id := T}} ->
+            PlanCardId = cowboy_req:binding(id, Req0),
+            case fh_engine_store:get_plan_card(T, PlanCardId) of
+                {ok, _} ->
+                    case fh_engine_turn_registry:lookup(PlanCardId) of
+                        {ok, #{pid := Pid}} when is_pid(Pid) -> gen_statem:cast(Pid, cancel);
+                        _ -> ok
+                    end,
+                    case fh_engine_store:delete_plan_card(T, PlanCardId) of
+                        ok ->
+                            logger:info("[plan-card] deleted ~s (tenant ~s)", [PlanCardId, T]),
+                            {ok, cowboy_req:reply(204, #{}, <<>>, Req0), State};
+                        {error, not_found} -> not_found(Req0, State)
+                    end;
+                {error, not_found} -> not_found(Req0, State)
+            end;
+        {error, Status, Body} ->
+            {ok, fh_engine_http:reply_json(Status, Body, Req0), State}
+    end.
+
+not_found(Req0, State) ->
+    {ok, fh_engine_http:reply_json(404, #{<<"error">> => <<"not_found">>}, Req0), State}.

@@ -21,7 +21,9 @@ export interface PendingOnboarding {
     sal: string;
     /** The map scope the user was on (a state code or 'ALL'). */
     scope: string;
-    answers: OnboardingAnswers;
+    /** Absent when a guest signs in from their plan (behavior 45): the sheet reopens on
+     *  that suburb's Plan tab — the claimed plan — instead of the onboarding. */
+    answers?: OnboardingAnswers;
     ts: number;
 }
 

@@ -16,8 +16,77 @@
 -export([user_tier/1, user_email/1, link_subscription/3, update_subscription/5]).
 -export([record_charge/5]).
 -export([claim_question/2, release_question/2]).
+-export([create_guest/0, claim_guest/2]).
+-export([claim_guest_create/3, release_guest_create/3]).
+-export([expired_guests/1, delete_guest/1, prune_guest_creates/0]).
 
 %% --- identity (login flow) --------------------------------------------------
+
+%% Guest plans -> P-5 · Metering, not gating -> The shell database -> a guest is a users row
+%% A visitor who builds a plan signed out becomes a users row with guest = true and no
+%% email (005_guest_plans.sql), so ownership (plan_card_views) and metering
+%% (usage_records) need no second path. Returns {UserId, Locale}.
+-spec create_guest() -> {binary(), binary()}.
+create_guest() ->
+    #{rows := [{UserId, Locale}]} = query(
+        "INSERT INTO users (guest) VALUES (true) RETURNING user_id::text, locale", []),
+    {UserId, Locale}.
+
+%% Sign-in claims a guest (behavior 45): in one transaction its plan views and its
+%% metered spend move to the real user, then the guest row is deleted (its remaining
+%% rows cascade). A view the real user already holds for the same card stays theirs.
+%% The engine needs nothing: it keys a card by the profile it was made under and makes
+%% a Q&A session with the asker's id on the first ask (fh_engine_h_messages), and a
+%% guest never asks. A GuestId that is not a guest row moves nothing. Returns the
+%% number of plan views moved.
+-spec claim_guest(binary(), binary()) -> non_neg_integer().
+claim_guest(GuestId, UserId) ->
+    {ok, Moved} = pgo:transaction(fun() ->
+        case query("SELECT 1 FROM users WHERE user_id = $1::uuid AND guest FOR UPDATE",
+                   [GuestId]) of
+            #{rows := []} -> {ok, 0};
+            #{rows := [_]} ->
+                #{num_rows := N} = query(
+                    "UPDATE plan_card_views v SET user_id = $2::uuid, updated_at = now() "
+                    "WHERE v.user_id = $1::uuid AND NOT EXISTS (SELECT 1 FROM plan_card_views w "
+                    "WHERE w.user_id = $2::uuid AND w.engine_plan_card_id = v.engine_plan_card_id)",
+                    [GuestId, UserId]),
+                _ = query("UPDATE usage_records SET user_id = $2::uuid WHERE user_id = $1::uuid",
+                          [GuestId, UserId]),
+                _ = query("DELETE FROM users WHERE user_id = $1::uuid AND guest", [GuestId]),
+                {ok, N}
+        end
+    end),
+    Moved.
+
+%% Unclaimed guests made more than AgeSeconds ago, each with the engine cards it still
+%% holds — the purge's work list (fh_shell_guest_purge, behavior 45). A claimed guest
+%% has no users row left, so a claimed card can never appear here.
+-spec expired_guests(pos_integer()) -> [{binary(), [binary()]}].
+expired_guests(AgeSeconds) ->
+    #{rows := Rows} = query(
+        "SELECT u.user_id::text, "
+        "       COALESCE(array_agg(v.engine_plan_card_id::text) "
+        "                FILTER (WHERE v.engine_plan_card_id IS NOT NULL), '{}') "
+        "FROM users u LEFT JOIN plan_card_views v ON v.user_id = u.user_id "
+        "WHERE u.guest AND u.created_at < now() - $1::int * interval '1 second' "
+        "GROUP BY u.user_id ORDER BY min(u.created_at)",
+        [AgeSeconds]),
+    [{Id, Cards} || {Id, Cards} <- Rows].
+
+%% Delete a guest's users row (its plan_card_views cascade; its usage_records keep
+%% their spend with user_id NULL, 005). Only ever a guest row.
+-spec delete_guest(binary()) -> ok.
+delete_guest(GuestId) ->
+    _ = query("DELETE FROM users WHERE user_id = $1::uuid AND guest", [GuestId]),
+    ok.
+
+%% The daily cap counters are only read for today; drop those older than a week.
+-spec prune_guest_creates() -> non_neg_integer().
+prune_guest_creates() ->
+    #{num_rows := N} = query(
+        "DELETE FROM guest_daily_creates WHERE day < CURRENT_DATE - 7", []),
+    N.
 
 %% Find-or-create a user by email. First login creates the row (role defaults to
 %% 'buyer', locale to 'vi' per 001_init_shell.sql); a returning user is found by the
@@ -138,13 +207,15 @@ user_tier(UserId) ->
         #{rows := []}           -> <<"free">>
     end.
 
+%% A guest (behavior 45) has no email: {ok, null}, which is_admin/1 reads as not-admin,
+%% so a guest's turns are metered like anyone's.
 %% This user's email, for the ADMIN_EMAILS allowlist test (fh_shell_billing:is_admin/1,
 %% billing.md §9) — used by both the usage consumer (billed=false attribution) and the
 %% §7 pre-call gate (admin exemption). Calls pgo directly (NOT the raising query/2
 %% above) so a DB error is fail-soft (-> not_found, the caller's admin check then
 %% defaults to false) rather than crashing the caller — the same posture as
 %% fh_shell_meter:sum_period/1's direct pgo call.
--spec user_email(binary()) -> {ok, binary()} | not_found.
+-spec user_email(binary()) -> {ok, binary() | null} | not_found.
 user_email(UserId) ->
     case pgo:query("SELECT email FROM users WHERE user_id = $1::uuid", [UserId]) of
         #{rows := [{Email} | _]} -> {ok, Email};
@@ -277,6 +348,36 @@ release_question(UserId, Day) ->
         "UPDATE qa_daily_asks SET n = n - 1 "
         "WHERE user_id = $1::uuid AND day = $2::text::date AND n > 0",
         [UserId, Day]),
+    ok.
+
+%% Guest plans -> P-5 · Metering, not gating -> The shell database -> the guest daily create cap, claimed in one statement
+%% The signed-out create cap (behavior 45): 3 plans a Sydney day per guest and per
+%% client address. The same one-statement claim as claim_question/2, keyed by
+%% (kind, key, day) in guest_daily_creates: kind 'guest' with the guest's user_id,
+%% kind 'addr' with the client address. On a refused claim, the next Sydney midnight.
+-spec claim_guest_create(guest | addr, binary(), pos_integer()) ->
+    {ok, binary()} | {limit, binary()}.
+claim_guest_create(Kind, Key, Limit) ->
+    case query(
+        "INSERT INTO guest_daily_creates (kind, key, day, n) "
+        "VALUES ($1, $2, (now() AT TIME ZONE 'Australia/Sydney')::date, 1) "
+        "ON CONFLICT (kind, key, day) DO UPDATE SET n = guest_daily_creates.n + 1 "
+        "WHERE guest_daily_creates.n < $3 "
+        "RETURNING day::text",
+        [atom_to_binary(Kind), Key, Limit])
+    of
+        #{rows := [{Day}]} -> {ok, Day};
+        #{rows := []}      -> {limit, next_sydney_midnight()}
+    end.
+
+%% Give a claimed create back (the engine did not accept the plan, or the other
+%% counter refused it). Keyed on the claim's day, as release_question/2.
+-spec release_guest_create(guest | addr, binary(), binary()) -> ok.
+release_guest_create(Kind, Key, Day) ->
+    _ = query(
+        "UPDATE guest_daily_creates SET n = n - 1 "
+        "WHERE kind = $1 AND key = $2 AND day = $3::text::date AND n > 0",
+        [atom_to_binary(Kind), Key, Day]),
     ok.
 
 next_sydney_midnight() ->

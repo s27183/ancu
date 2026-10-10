@@ -2475,6 +2475,27 @@ main {
     gap: 0.4rem;
     margin: 0.4rem 0;
 }
+.pp-guest {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.75rem;
+    margin: 0 0 0.75rem;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--info-soft);
+    color: var(--ink);
+}
+.pp-guest .primary {
+    flex: 0 0 auto;
+    width: auto;
+}
+.pp-guest p {
+    flex: 1 1 16rem;
+    margin: 0;
+    font-size: var(--fs-sm);
+}
 .pp-pending {
     font-size: var(--fs-sm);
     font-style: italic;
