@@ -1,10 +1,10 @@
 ---
 slug: kb.lender.hem-living-expenses
 effective_from: 2026-06-22
-last_verified: 2026-07-06
+last_verified: 2026-10-10
 sources:
   - url: https://download.asic.gov.au/media/hyeofbni/rg209-published-9-december-2019-20250306.pdf
-    retrieved: 2026-07-06
+    retrieved: 2026-10-10
     path: docs/sources/asics/rg209-published-9-december-2019.pdf
     note: "ASIC RG 209 §142-147 — HEM is the most-commonly-used expense benchmark, published by the Melbourne Institute, must be adjusted for income and not merely reflect 'low end' spending; a benchmark is 'a substitute for making reasonable inquiries', NOT a required floor. Confirms the band here has no single public figure → deliberate placeholder stands."
 ---
