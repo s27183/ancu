@@ -1,0 +1,117 @@
+Source: https://www.health.gov.au/topics/medicare/about/what-medicare-covers
+Retrieved: 2026-10-10
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML 2ead9483569aec9f13c8f94e8be85e5148123cb7ae9aa224b4df189f9d72315a
+
+What Medicare covers | Australian Government Department of Health, Disability and Ageing
+About Medicare
+What Medicare covers
+Medicare subsidises a large number of health services and products. You can use your Medicare card to access medical services, hospital services for public patients, surgical services, prescription medicines, eye tests, pathology tests, imaging and scans.
+Listen
+Print
+Share
+X (Twitter)
+Facebook
+Email
+Loading...
+What is covered
+Medicare subsidises the costs of:
+services delivered in public and private hospitals
+medical services
+tests, imaging and scans .
+The Pharmaceutical Benefits Scheme (PBS) subsidises medicines for people with a Medicare card.
+If you and your healthcare provider have opted in, you can use My Health Record to keep track of your health care, tests results and medicines.
+Read about accessing Medicare benefits .
+Hospital services
+If you’re a public patient in a hospital Medicare subsidises things like:
+emergency care
+most surgeries and procedures (there might be a wait time if it’s not an emergency)
+medicines provided to you in hospital
+follow-up care.
+Read more about hospital under Medicare and hospital costs .
+The Medicare Benefits Schedule (MBS) lists all the hospital services with MBS item numbers that Medicare covers.
+For private patients, while Medicare covers some of the doctor’s fees,, it doesn’t cover hospital charges like accommodation and theatre fees. Private health insurance can help cover these costs, if you have it.
+Medical services
+A wide range of medical services are subsidised under Medicare through the MBS.
+Medical services that Medicare subsidises include:
+consultations with health practitioners , like general practitioners, specialists and other health practitioners – in person or via telehealth
+mental health services , including mental health assessments, treatment plans and medicines
+health checks
+some dental procedures, under the Child Dental Benefits Schedule .
+Read more about health care under Medicare .
+Not all health practitioners bulk bill . When you make your appointment, check how much you will have to pay, if anything.
+Read more about medical services costs .
+Tests, imaging and scans
+Diagnostic imaging
+Medicare, through the MBS, covers many diagnostic imaging services, such as:
+magnetic resonance imaging (MRI)
+nuclear medicine scans like positron emission tomography (PET)
+ultrasounds
+computed tomography (CT) scans
+x‑rays.
+To be eligible for a Medicare rebate, MRI and PET scans must:
+have item numbers listed on the MBS
+have been referred by a health practitioner
+be provided by an accredited provider
+be done on eligible equipment – not all MRI machines are eligible.
+You can request to go to a provider of your choice, as long as they meet these criteria. Not all imaging and scan providers bulk bill . When you make your appointment, check with the provider how much you will have to pay, if anything.
+Read more about imaging and scans under Medicare .
+Pathology tests
+Medicare, through the MBS, covers pathology tests – such as blood, urine or tissue – to screen for, diagnose or monitor disease.
+If your GP requests more than 3 tests on the same day, Medicare will only pay for the 3 most expensive tests.
+There is no limit on the amount of tests a specialist can request.
+Not all pathology labs bulk bill , but many do. Before you go, check with them how much you will have to pay, if anything.
+Read more about pathology tests under Medicare and how pathology tests work .
+Eye tests
+Medicare covers eye tests done by an optometrist:
+once every 3 years if you’re under 65 years
+once a year if you’re 65 years or older.
+Medicare does not cover glasses or contact lenses, but you might be able to access state or territory schemes .
+Not all optometrists bulk bill . Check with them when you make your appointment.
+Read more about eye tests under Medicare .
+Medicines
+The PBS subsidises a wide range of prescription medicines.
+While many non-PBS medicines are available for purchase over the counter, there are other ways to access subsidised medicines if they are not on the PBS.
+The National Immunisation Program covers the cost of vaccines to eligible Australians.
+Read more about medicines and their cost .
+What isn’t covered
+Medicare does not cover the costs of:
+ambulance services
+most dental services
+glasses and contact lenses
+hearing devices
+elective and cosmetic surgery
+services not on the MBS
+services provided through the private health system.
+If you have private health insurance , it might cover some of the costs that Medicare doesn’t cover, depending on your policy.
+Medicare doesn’t cover your healthcare costs overseas – you will need travel insurance. But countries that have a Reciprocal Health Care Agreement with us may cover some of your costs.
+Support from other programs
+You might be eligible for free or subsidised medical services and products not covered by Medicare through the:
+BreastScreen Australia Program , which provides a free mammogram every 2 years to women aged 40 years and over
+Closing the Gap PBS Co-payment Program , which reduces the cost of PBS medicines for eligible patients, who can get their medicines free or at the concession price
+Continence Aids Payment Scheme , which helps with the cost of continence products
+Department of Veterans’ Affairs optical services , which provides free optical services to veterans who hold a gold card or white card
+Hearing Services Program , which provides subsidised hearing services and devices to eligible Australians with hearing loss
+Life Saving Drugs Program , which pays for specific essential medicines to treat patients with rare and life-threatening diseases.
+Medical Treatment Overseas Program , which provides financial assistance to approved applicants to travel overseas for life-saving treatment.
+National Bowel Cancer Screening Program , which mails a free screening test to Australians aged 45 to 74 that they do at home every 2 years – people aged 45 to 49 should request their first kit
+National Cervical Screening Program , which provides a free cervical screening test every 5 years to women aged 25 to 74 years
+National Diabetes Services Scheme , which helps people with diabetes to understand and manage their life with diabetes, and provides timely, reliable and affordable access to the NDSS support services and products
+Pharmaceutical Benefits Scheme , which provides timely, reliable and affordable access to necessary medicines for Australians
+Repatriation Pharmaceutical Benefits Scheme , which provides eligible people with access to a wide range of medicines and wound care items at a concession rate
+Stoma Appliance Scheme , which provides free stoma products to members of Australian stoma associations
+Visiting Optometrist Scheme , which supports optometrists to deliver services in remote and very remote locations
+state or territory-based schemes for glasses and contact lenses
+Australian Capital Territory – Spectacles Subsidy Scheme
+New South Wales – NSW Spectacles program
+Northern Territory – spectacles concessions
+Queensland – Spectacle Supply Scheme
+South Australia – GlassesSA
+Tasmania – spectacles assistance
+Victoria – Victorian Eye Care Service
+Western Australia – Spectacle Subsidy Scheme .
+Date last updated:
+23 October 2024
+Tags:
+Medicare
+In this section
+Medicare

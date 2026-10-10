@@ -1,0 +1,66 @@
+Source: https://www.prnewswire.com/news-releases/eiu-liveability-index-2026-copenhagen-vienna-and-melbourne-top-annual-city-ranking-with-new-york-recording-one-of-the-largest-score-gains-302818374.html
+Retrieved: 2026-10-10
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML 0cf14c6289e3a18686599a32046bf22f0f12fd8e564f7773e750dcf71e16b4e3
+
+EIU Liveability Index 2026: Copenhagen, Vienna and Melbourne top annual city ranking, with New York recording one of the largest score gains
+Accessibility Statement
+Skip Navigation
+Copenhagen (Denmark) remains the world's most liveable city, scoring a perfect 100 out of 100 in three categories, with Vienna (Austria) and Melbourne (Australia) close behind.
+New York's score improved noticeably, by 1.2 points, one of the largest gains recorded by any city in the index.
+Western Europe is still the strongest region for liveability, but its average score of 91.7 is fractionally lower than it was a year ago, while Asia's has risen by 0.3 to 73.9.
+The Iran war has undermined stability across the Gulf region, contributing to a 1-point decline in the average liveability score for cities in the Middle East and North Africa (MENA), now 61.2.
+Chinese cities have climbed up the rankings, owing to their improved scores for healthcare.
+After dropping places last year due to rioting, Manchester (52nd), London (54th) and Edinburgh (64th) all stabilised.
+EIU's Global Liveability Index assesses 173 cities across the world across 30 indicators grouped into five categories: stability, healthcare, culture and environment, education, and infrastructure.
+LONDON , July 7, 2026 /PRNewswire/ -- In the survey conducted in May 2026, the average liveability score across all cities is 76.1, the same as last year. However, scores in the stability category fell by an average of 0.5 points, which was offset by an average increase of 0.7 points for the healthcare category.
+Top ten positions
+Regional averages
+The Middle East has borne the brunt of the decline in stability due to the Iran War. On average, the 18 cities in the MENA region have fallen by more than three places in the rankings. Muscat at 123rd (Oman) and Kuwait City at 105th have fallen by 14 and 12 places respectively, making them the biggest downwards movers.
+All 19 Chinese cities in the index saw upgrades in their healthcare scores, reflecting efforts to extend social insurance and build out health infrastructure. Five Chinese cities now score above 80 in the healthcare category, dominating the list of biggest upwards movers this year. They are led by Fuzhou, an industrial city in the south-east, which climbed seven places to 93rd.
+New York (US) also moved up three places in the rankings to 66th; however, it still remains the third-lowest-ranked US city (behind Detroit and Lexington). New York's gains were in the stability category, following years of falling crime rates and lower risks of terrorist attacks. Vancouver (Canada), a previous winner that now sits in ninth place, is the only North American city represented in the top ten.
+Tokyo (Japan) increased its score for culture and environment, and rose three places into the top ten. Singapore (26th) and Hong Kong (44th) remain unchanged, with high scores across most categories but a bottleneck in culture and environment due to strictly curtailed political freedoms.
+These improvements drove a 0.3-point increase in average scores for Asian cities in the index, making Asia the most improved region this year. The average score for the 58 Asian cities in the index is now 73.9, just ahead of eastern Europe. Almost without exception, stability scores dictate a city's position in Latin America, with cities in Mexico, Colombia, and Ecuador suffering from drug-trade violence and weak rule of law.
+The bottom ten cities in our index have nearly all been affected by war or poverty, or both, with all scoring particularly poorly for stability. Damascus (Syria) remains the lowest ranked city as it continues to recover from its civil war. However, its scores for healthcare have improved markedly since December 2024, when the regime of Bashar al-Assad, the then president, was overthrown.
+Tehran (Iran) is a new entrant to the bottom ten, at 164th, as a result of the war there, joining Kyiv (Ukraine), at 166th, whose ranking has fallen further. By contrast, Caracas (Venezuela) has narrowly escaped the bottom ten this year, after the US instigated a change of government there.
+Ana Nicholls, industry director at EIU, said: "Copenhagen continues to lead our Liveability Index for 2026, with New York achieving one of the largest year-on-year gains of any city. The average liveability score globally is the same as last year, because the stability declines (in the Middle East) and healthcare improvements (in Asia) offset each other across the 173 cities. Score increases in Asia mean that there are now nine Asian cities in the top 20, alongside seven European cities."
+The Liveability Index 2026 summary report is available here.
+Note for editors
+Data for this survey was collected in May 2026. Liveability assesses which locations around the world provide the best or the worst living conditions. Every city is assigned a rating of relative comfort for more than 30 qualitative and quantitative factors across five broad categories: stability, healthcare, culture and environment, education, and infrastructure. The scores are then compiled and weighted within each category to provide a category score of 1-100, where 1 is considered intolerable and 100 is considered ideal. These category scores are then compiled and weighted into an overall liveability score out of 100.
+For further information
+To access the full Liveability rankings, survey and report please visit the EIU Store . The full Liveability rankings and history are also available via Snowflake Marketplace and please contact us for more details on our Tailored Feed.
+About EIU
+EIU, part of Economist Enterprise, operates at the intersection of macroeconomics and geopolitics, delivering data-led insights that empower financial market, corporate, and government leaders to make strategic decisions for the future. Trusted by the world's largest organisations for 80 years, EIU is known for its award-winning macroeconomic forecasts and independent, actionable insights and analytics—enriched by geopolitical analysis.
+Our breadth of coverage across 200+ markets, including 130+ emerging markets, and our global team of subject matter experts allow us to connect and contextualise global trends and events. This ensures our clients are fully informed to take action, with confidence and credibility, in a rapidly evolving world. For more information, please visit www.eiu.com .
+About The Economist Group
+The Economist Group is a global media and information-services company that exists to champion progress. Through its three brands: The Economist, Economist Enterprise and Economist Education, the Group provides individuals and organisations with the expertise, insights and perspective to press forward.
+SOURCE Economist Enterprise
+here.
+Note for editors
+Data for this survey was collected in May 2026. Liveability assesses which locations around the world provide the best or the worst living conditions. Every city is assigned a rating of relative comfort for more than 30 qualitative and quantitative factors across five broad categories: stability, healthcare, culture and environment, education, and infrastructure. The scores are then compiled and weighted within each category to provide a category score of 1-100, where 1 is considered intolerable and 100 is considered ideal. These category scores are then compiled and weighted into an overall liveability score out of 100.
+For further information
+To access the full Liveability rankings, survey and report please visit the EIU Store . The full Liveability rankings and history are also available via Snowflake Marketplace and please contact us for more details on our Tailored Feed.
+About EIU
+EIU, part of Economist Enterprise, operates at the intersection of macroeconomics and geopolitics, delivering data-led insights that empower financial market, corporate, and government leaders to make strategic decisions for the future. Trusted by the world's largest organisations for 80 years, EIU is known for its award-winning macroeconomic forecasts and independent, actionable insights and analytics—enriched by geopolitical analysis.
+Our breadth of coverage across 200+ markets, including 130+ emerging markets, and our global team of subject matter experts allow us to connect and contextualise global trends and events. This ensures our clients are fully informed to take action, with confidence and credibility, in a rapidly evolving world. For more information, please visit www.eiu.com .
+About The Economist Group
+The Economist Group is a global media and information-services company that exists to champion progress. Through its three brands: The Economist, Economist Enterprise and Economist Education, the Group provides individuals and organisations with the expertise, insights and perspective to press forward.
+SOURCE Economist Enterprise
+-->
+21 %
+more press release views with
+Request a Demo
+×
+Modal title
+Also from this source
+AI agents are breaking things and organisations know it. They are deploying more anyway.
+Inside most large organisations today, an AI agent is making decisions, accessing data and taking actions that nobody is fully tracking. Not because...
+More Releases From This Source
+Explore
+Banking & Financial Services
+Publishing & Information Services
+Surveys, Polls and Research
+Economic News, Trends, Analysis
+News Releases in Similar Topics
+-->
+-->
+-->

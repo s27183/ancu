@@ -1160,6 +1160,7 @@ const messages = {
         en: 'Pick a suburb on the map to start your plan.'
     },
     'intro.source': { vi: 'Nguồn', en: 'Source' },
+    'intro.source.ranking': { vi: 'xếp hạng độc lập', en: 'independent ranking' },
     'intro.now': { vi: 'nay', en: 'now' },
     'intro.button': { vi: 'Vì sao Úc?', en: 'Why Australia?' },
     'intro.button.aria': {

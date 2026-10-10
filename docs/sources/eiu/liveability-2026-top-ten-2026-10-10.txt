@@ -1,0 +1,18 @@
+Source: https://mmx.prnewswire.com/media/MS1877578/Liveability-Index-2026-top-ten.jpg?id=OA2747154&p=publish
+Retrieved: 2026-10-10
+Extracted: transcribed by hand from the image (JPEG, 1024x606, 143423 bytes); sha256 of the fetched image 50bf991922ec6daebc28839b96684d4ab846c41d1a79dddfe3c430e0bce8054a
+Context: the "Top ten positions" table of EIU's release "EIU Liveability Index 2026" (PR Newswire, London, July 7, 2026; archived beside this file as liveability-2026-release-2026-10-10.txt), which carries the table only as this image. The image itself is not kept in this public repository (Copyright © The Economist Intelligence Unit 2026); the sha256 above pins which image was read. Re-fetch it from the Source URL and compare the hash to re-check this transcription.
+
+Top ten positions
+Rank | City | Country | Overall rating (100=ideal) | Stability | Healthcare | Culture & environment | Education | Infrastructure
+1 | Copenhagen | Denmark | 98 | 100 | 96 | 95 | 100 | 100
+2 | Vienna | Austria | 97 | 95 | 100 | 94 | 100 | 100
+3 | Melbourne | Australia | 97 | 95 | 100 | 96 | 100 | 96
+4 | Sydney | Australia | 97 | 95 | 100 | 94 | 100 | 96
+5 | Zurich | Switzerland | 96 | 95 | 100 | 94 | 100 | 96
+6 | Geneva | Switzerland | 96 | 95 | 100 | 92 | 100 | 96
+7 | Osaka | Japan | 96 | 100 | 100 | 87 | 100 | 96
+8 | Adelaide | Australia | 96 | 95 | 100 | 91 | 100 | 96
+9 | Vancouver | Canada | 96 | 95 | 96 | 97 | 100 | 93
+10 | Tokyo | Japan | 96 | 100 | 100 | 89 | 100 | 93
+Source: EIU.

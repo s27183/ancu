@@ -171,6 +171,43 @@ FACT_VISUALS = ("bars", "series", "figure", "split", "growth", "statement")
 FACT_UNITS = ("count", "people", "pct", "aud_k", "aud", "years")
 
 
+# Regulated figures are grounded -> P-7 -> The KB compiler -> a fact may cite a named non-government ranking
+# Behavior 49 (Son, 2026-10-10: "they are not gov sources (the gov won't claim this). but
+# if the sources are reliable, then we can use it"): a city ranking is no regulated
+# figure, and no government publishes one, so a fact doc may cite a source off *.gov.au
+# only when it is named here — by exact URL, with the publisher the sheet credits — and
+# the doc marks it `kind: ranking` (the sheet labels it "independent ranking"). Its
+# archive starts `Source: <its url>` and carries the sha256 of what was fetched; where the
+# publisher's table is only an image (EIU's top ten, measured 2026-10-10), the archive is
+# a hand transcription pinned to the image by that hash, and the image is not kept in
+# this public repo (EIU copyright). Anything else off *.gov.au still fails GATE 12.
+FACT_RANKING_SOURCES = {
+    "https://www.prnewswire.com/news-releases/eiu-liveability-index-2026-copenhagen-vienna-and-melbourne-top-annual-city-ranking-with-new-york-recording-one-of-the-largest-score-gains-302818374.html": "EIU",
+    "https://mmx.prnewswire.com/media/MS1877578/Liveability-Index-2026-top-ten.jpg?id=OA2747154&p=publish": "EIU",
+}
+FACT_SOURCE_KINDS = ("ranking",)
+
+
+def fact_source_error(src, archived_raw):
+    """None if a fact doc's source may be cited (FACT_RANKING_SOURCES block), else why not."""
+    kind = src.get("kind")
+    if kind is not None and kind not in FACT_SOURCE_KINDS:
+        return f"kind {kind!r} not one of {FACT_SOURCE_KINDS}"
+    if kind is None:
+        err = news_source_host_error(src)
+        return f"{err} — a fact cites a government primary, or a named ranking" if err else None
+    url = src.get("url")
+    if url not in FACT_RANKING_SOURCES:
+        return f"{url!r} is not a named ranking source (FACT_RANKING_SOURCES)"
+    if archived_raw is not None:
+        head = archived_raw.splitlines()[:4]
+        if not head or head[0].strip() != f"Source: {url}":
+            return "its archive does not start 'Source: <its url>'"
+        if not re.search(r"sha256 of the fetched \w+ [0-9a-f]{64}", " ".join(head)):
+            return "its archive's header carries no sha256 of what was fetched"
+    return None
+
+
 def normalize_ws(s):
     return re.sub(r"\s+", " ", s or "").strip()
 
@@ -232,10 +269,11 @@ def facts_doc_fails(slug, doc, kb_docs):
         out.append(f"[facts] {slug}: no `sources:`")
     texts = []
     for i, src in enumerate(sources):
-        err = news_source_host_error(src)
-        if err:
-            out.append(f"[facts] {slug}: source {i}: {err} — a fact cites a government primary")
         rel = src.get("path")
+        raw = (ROOT / rel).read_text(errors="ignore") if rel and (ROOT / rel).is_file() else None
+        err = fact_source_error(src, raw)
+        if err:
+            out.append(f"[facts] {slug}: source {i}: {err}")
         txt = archived_text(ROOT / rel) if rel else None
         if txt is None:
             out.append(f"[facts] {slug}: source {i} is not archived (`path:` under docs/sources/ "
@@ -273,6 +311,8 @@ def facts_doc_fails(slug, doc, kb_docs):
         if statement:
             if any(k in f for k in ("unit", "value", "items", "compare")):
                 out.append(f"{where}: a statement carries no unit, value, items or compare")
+            if f.get("glyph", "health") != "health":
+                out.append(f"{where}: glyph {f.get('glyph')!r} is not 'health' (absent: the land parcel)")
         elif f.get("unit") not in FACT_UNITS:
             out.append(f"{where}: unit {f.get('unit')!r} not one of {FACT_UNITS}")
         if not re.match(r"^\d{4}-\d{2}$", str(f.get("as_of") or "")):
@@ -326,7 +366,10 @@ def facts_doc_fails(slug, doc, kb_docs):
         said = " ".join(normalize_ws(q) for q in quotes)
         nums = []
         if f.get("visual") == "figure":
-            nums.append(f.get("value"))
+            # a count read off quoted rows (three Australian cities in a top ten) says
+            # how in `derived`, as an item does, and is exempt
+            if not f.get("derived"):
+                nums.append(f.get("value"))
             if isinstance(f.get("compare"), dict):
                 nums.append(f["compare"].get("value"))
         for it in f.get("items") or []:
@@ -845,7 +888,7 @@ def parse_sources_block(text):
             cur = {"note": m.group(1).strip('"')}
             out.append(cur)
             continue
-        m = re.match(r"^\s+(retrieved|path):\s*(\S+)\s*$", line)
+        m = re.match(r"^\s+(retrieved|path|kind):\s*(\S+)\s*$", line)
         if m and cur is not None:
             cur[m.group(1)] = m.group(2)
     return out
