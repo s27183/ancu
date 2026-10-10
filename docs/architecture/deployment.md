@@ -157,7 +157,8 @@ never the screen). Frontend env is set on the Pages project through the Cloudfla
 | `CLAUDE_CODE_OAUTH_TOKEN` | Anthropic Max subscription credit | `.env` → the engine's SECRET env | the planner sidecar |
 | `SHELL_JWT_SECRET` | user-session HMAC | `.env` → shell SECRET | `fh_shell_jwt` |
 | `SHELL_TENANT_ID` / `SHELL_TENANT_PRIVKEY` | the shell's ed25519 tenant identity | `.env` → shell SECRET; the **public** half (derived by `do_deploy.py`) → engine plain env `SHELL_TENANT_PUBKEY` | tenant JWTs, shell → engine |
-| `GOOGLE_*`, `STRIPE_*`, `ANTHROPIC_API_KEY` | optional | `.env` when set → SECRET env; dropped from the spec when absent | Google sign-in, commerce, a cash-billed fallback |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | the Web OAuth client in Son's Google Cloud project (consent screen "Mai An Cư", scopes `openid email`, redirect URI `https://maiancu.com/api/auth/google/callback`, no JavaScript origin) | `.env` → shell SECRET; **required** — `do_deploy.py` refuses a shell deploy without them (behavior 60) | Google sign-in (`fh_shell_h_auth`) |
+| `STRIPE_*`, `ANTHROPIC_API_KEY` | optional | `.env` when set → SECRET env; dropped from the spec when absent | commerce, a cash-billed fallback |
 | the databases' credentials | each app's dev database | App Platform only (`${db.DATABASE_URL}`) | the app it belongs to — nobody else can connect |
 
 
@@ -202,7 +203,7 @@ browser calls it directly).
 | `SHELL_JWT_SECRET` | **secret** | user-JWT HMAC (`openssl rand -hex 32`) |
 | `SHELL_TENANT_ID` / `SHELL_TENANT_PRIVKEY` | **secret** | the ed25519 tenant identity — `SHELL_TENANT_PRIVKEY` is base64 of the private key; its **public** half reaches the engine as `SHELL_TENANT_PUBKEY` (§2). |
 | `RESEND_API_KEY` | **secret** | `re_…` — set → magic-link emails via Resend; unset → link logged. |
-| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | **secret** | OAuth; redirect URI `https://maiancu.com/api/auth/google/callback`. |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | **secret** | OAuth; redirect URI `https://maiancu.com/api/auth/google/callback`. Required (behavior 60). The consent screen's logo, when added, is `shell/web/frontend/static/brand/logo-120.png` (`rsvg-convert -w 120 -h 120 static/favicon.svg -o static/brand/logo-120.png`); adding one asks Google for brand verification. |
 | `STRIPE_SECRET_KEY` | **secret** | Stripe API key (8-S5e/8-S5f) — checkout create + webhook. |
 | `STRIPE_WEBHOOK_SECRET` | **secret** | `whsec_…` — raw-body HMAC verification of Stripe webhooks. |
 | `STRIPE_PRICE_PLUS` / `STRIPE_PRICE_PRO` | **secret** | recurring Price ids → tier reverse-map (8-S5e). |
