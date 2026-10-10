@@ -12,6 +12,25 @@ Drop the file(s) named below into this directory, then run the adapter.
 | `Data_Tables_LGA_Recorded_Offences_Year_Ending_*.xlsx` | `csa_vic` (VIC crime) | Crime Statistics Agency Victoria | **gitignored** — 18 MB + refetchable (see below) |
 | `division_Reported_Offences_Number.csv` | `qps` (QLD crime) | Queensland Police Service | **gitignored** — 21 MB + refetchable (see below) |
 
+## Built from — the release each adapter last ran on
+
+The monthly suburb-watch routine (behavior 58,
+[`docs/architecture/suburb-watch-routine.md`](../../../../docs/architecture/suburb-watch-routine.md))
+compares this table with each source's latest publication. Whoever reruns an adapter
+updates its row in the same commit. Read 2026-10-10 from the adapters' recorded `as_of`
+(`docs/architecture/suburb-data-foundation.md`) and the staged files.
+
+| Adapter | Built from (release / window end) | Where the latest release is announced |
+|---|---|---|
+| `abs_asgs` | ASGS Edition 3 (2021) | https://www.abs.gov.au/statistics/standards/australian-statistical-geography-standard-asgs-edition-3 |
+| `abs_census` | Census 2021 (G08 Ancestry) | https://www.abs.gov.au/census |
+| `abs_seifa` | SEIFA 2021 | https://www.abs.gov.au/statistics/people/people-and-communities/socio-economic-indexes-areas-seifa-australia |
+| `bocsar` | Jan–Dec 2025 (as_of 2025-12-31) | https://data.nsw.gov.au/data/dataset/crime-by-offence-by-nsw-suburb |
+| `csa_vic` | year ending December 2025 | https://www.crimestatistics.vic.gov.au/crime-statistics/latest-victorian-crime-data/download-data |
+| `qps` | 12 months to May 2026 | https://www.data.qld.gov.au/dataset/offence-numbers-police-divisions-monthly-from-july-2001 |
+| `sa_metro_price` | Q1 2026 (`lsg_stats_2026_q1.xlsx`) | https://data.gov.au/data/api/3/action/package_show?id=metro-median-house-sales |
+| `vic_vpsr` | Oct–Dec 2025 (`vpsr-median-*.xls`) | https://discover.data.vic.gov.au/dataset/victorian-property-sales-report-median-house-by-suburb |
+
 ## CSA Victoria crime — how to refetch
 
 The adapter reads sheet **`Table 03`** (Offences recorded by offence type, LGA, and
