@@ -69,8 +69,10 @@ APPS = {
     "shell": {
         "spec": ROOT / "shell" / "web" / "app.yaml",
         "name": "ancu-shell",
+        # GOOGLE_* required since behavior 60: a deploy without the client would bring
+        # back the "Google sign-in isn't available" button, so it fails here instead.
         "required": ["SHELL_JWT_SECRET", "SHELL_TENANT_ID", "SHELL_TENANT_PRIVKEY",
-                     "RESEND_API_KEY"],
+                     "RESEND_API_KEY", "GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET"],
     },
 }
 # Plain config the spec commits empty: taken from .env when it holds one.
