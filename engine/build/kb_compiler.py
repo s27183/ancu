@@ -305,6 +305,7 @@ def facts_doc_fails(slug, doc, kb_docs):
         for q in quotes:
             if hay is not None and normalize_ws(q) not in hay:
                 out.append(f"{where}: quote not found in {against}: {q!r}")
+        out.extend(fact_note_fails(where, f, sources, texts))
         # Every number drawn is in the fact's own quotes, so a value cannot disagree
         # with the quote that proves it. An item computed from quoted numbers (a sum of
         # small states) says how, in `derived`, and is exempt.
@@ -321,6 +322,38 @@ def facts_doc_fails(slug, doc, kb_docs):
         for n in nums:
             if isinstance(n, (int, float)) and not quoted_number(n, said):
                 out.append(f"{where}: value {n} does not appear in its quotes")
+    return out
+
+
+# Regulated figures are grounded -> P-7 -> The KB compiler -> a fact's note quotes its own primary
+# Behavior 46 (Son, 2026-10-10): a figure can be read as covering more than it does —
+# FIRB's approvals from Vietnam leave out every home bought in a citizen's or permanent
+# resident's name, however it was funded. A fact may carry a `note` ({en, vi}) saying
+# what it covers, shown under its caption. The note is a claim like the figure, so it
+# is grounded the same way: `note_sources` (indices into the doc's `sources:`, the first
+# one linked under the note) and `note_quotes` — verbatim strings, each found in one of
+# those archived files. A note without both fails the build.
+def fact_note_fails(where, f, sources, texts):
+    out = []
+    if "note" not in f:
+        for key in ("note_sources", "note_quotes"):
+            if key in f:
+                out.append(f"{where}: {key} without a note")
+        return out
+    e = check_copy_template(f.get("note") or {})
+    if e:
+        out.append(f"{where}: note: {e}")
+    idx = f.get("note_sources")
+    if not (isinstance(idx, list) and idx and all(isinstance(i, int) and 0 <= i < len(sources) for i in idx)):
+        out.append(f"{where}: note_sources must list indices into `sources:`")
+        return out
+    quotes = f.get("note_quotes") or []
+    if not quotes:
+        out.append(f"{where}: a note without `note_quotes` — a note quotes its source")
+    hays = [texts[i] for i in idx if texts[i] is not None]
+    for q in quotes:
+        if hays and not any(normalize_ws(q) in h for h in hays):
+            out.append(f"{where}: note quote not found in sources {idx}: {q!r}")
     return out
 
 
@@ -1682,7 +1715,7 @@ def build_artifact(blueprints, registries, kb_docs, news_docs, facts_docs=None):
                 "title": d["body"].get("title"),
                 "last_verified": d["last_verified"],
                 "sources": d.get("sources") or [],
-                "facts": [{k: v for k, v in f.items() if k != "quotes"}
+                "facts": [{k: v for k, v in f.items() if k not in ("quotes", "note_quotes")}
                           for f in d["body"].get("facts", [])],
             }
             for slug, d in (facts_docs or {}).items()

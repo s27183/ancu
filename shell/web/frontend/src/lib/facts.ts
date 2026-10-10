@@ -35,6 +35,10 @@ export interface Fact {
     value?: number;
     compare?: { label: Label; value: number };
     items?: FactItem[];
+    /** What the figure covers and leaves out (behavior 46), shown under the caption. */
+    note?: Localized;
+    /** Indices into the doc's `sources` the note quotes; the first is linked. */
+    note_sources?: number[];
 }
 
 export interface FactSource {
