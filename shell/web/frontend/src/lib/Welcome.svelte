@@ -23,6 +23,7 @@
         pick,
         publisher
     } from '$lib/facts';
+    import { startTour, tourDone } from '$lib/tour';
 
     let open = $state(false);
     let closing = $state(false);
@@ -37,6 +38,10 @@
     // itself on a first visit and its close marks it seen, nobody who had visited
     // before ever saw it (Son on prod, 2026-10-10: "did not see … pulse at all").
     let pulse = $state(true);
+    // Behavior 52: the first close of the sheet that opened by itself starts the tour
+    // (once per browser, tour.ts); "Show me around" at the sheet's foot replays it.
+    let autoOpened = false;
+    let tourAfter = false;
 
     const ordered = $derived(
         [...docs].sort((a, b) => SECTION_ORDER.indexOf(a.slug) - SECTION_ORDER.indexOf(b.slug))
@@ -60,17 +65,26 @@
 
     onMount(() => {
         loadFacts();
-        if (!introSeen()) open = true;
+        if (!introSeen()) open = autoOpened = true;
     });
+
+    function closed() {
+        open = false;
+        arrived = true;
+        const go = tourAfter || (autoOpened && !tourDone());
+        autoOpened = tourAfter = false;
+        if (go) startTour();
+    }
+
+    function replayTour() {
+        tourAfter = true;
+        collapse();
+    }
 
     async function collapse() {
         if (!open || closing) return;
         markIntroSeen();
-        if (reduceMotion() || !cardEl || !launchEl) {
-            open = false;
-            arrived = true;
-            return;
-        }
+        if (reduceMotion() || !cardEl || !launchEl) return closed();
         // Fly the card's centre onto the launcher's centre while it shrinks and fades.
         const c = cardEl.getBoundingClientRect();
         const l = launchEl.getBoundingClientRect();
@@ -78,9 +92,8 @@
         cardEl.style.setProperty('--fly-y', `${l.top + l.height / 2 - (c.top + c.height / 2)}px`);
         closing = true;
         setTimeout(() => {
-            open = false;
             closing = false;
-            arrived = true;
+            closed();
         }, 480);
     }
 
@@ -236,6 +249,7 @@
                 <footer class="wl-foot">
                     <span>{$t('intro.cta.hint')}</span>
                     <button type="button" class="btn btn-primary" onclick={collapse}>{$t('intro.cta')}</button>
+                    <button type="button" class="wl-replay" onclick={replayTour}>{$t('tour.replay')}</button>
                 </footer>
                 <p class="wl-disclaimer">{$t('disclaimer.asic')}</p>
             </div>
@@ -619,6 +633,22 @@
         padding: var(--sp-5);
         font-size: var(--fs-sm);
         color: var(--ink-2);
+    }
+    /* "Show me around" (behavior 52): a quiet link on its own line under the CTA. */
+    .wl-replay {
+        flex-basis: 100%;
+        padding: 0;
+        border: none;
+        background: none;
+        font: inherit;
+        color: var(--accent);
+        text-align: left;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+        cursor: pointer;
+    }
+    .wl-replay:hover {
+        color: var(--accent-hover);
     }
 
     /* The standing disclaimer closes the sheet (behavior 44). */

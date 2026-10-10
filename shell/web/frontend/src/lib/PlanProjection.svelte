@@ -51,6 +51,7 @@
     import { guest } from '$lib/stores/session';
     import { loginOpen } from '$lib/stores/ui';
     import Modal from '$lib/Modal.svelte';
+    import { tourEvent } from '$lib/tour';
 
     let { suburbName, suburbState, onplan }: {
         suburbName: string;
@@ -158,6 +159,11 @@
     let gen = 0;
 
     const running = $derived(phase === 'ready' && !turnDone && !turnFailed);
+    // The first-visit tour (behavior 52) points at the plan once it has finished
+    // rendering, never at the spinner.
+    $effect(() => {
+        if (phase === 'ready' && turnDone && !turnFailed) tourEvent('plan-ready');
+    });
 
     // ── Structural what-if (W9, engine-contract §10.1) ──────────────────────
     // Vary target_price / state → POST /simulate → the engine recomputes the base plan
@@ -832,7 +838,9 @@
 {:else if phase === 'no_card'}
     <div class="plan-cta">
         <p class="placeholder">{$t('sheet.plan.placeholder')}</p>
-        <button type="button" class="primary" onclick={onplan}>{$t('onboarding.cta')}</button>
+        <button type="button" class="primary" data-tour="plan-cta" onclick={onplan}
+            >{$t('onboarding.cta')}</button
+        >
     </div>
 {:else if phase === 'error'}
     <div class="pp-state">

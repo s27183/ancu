@@ -8,6 +8,7 @@
     import { t } from '$lib/i18n';
     import { lang } from '$lib/stores/lang';
     import PlanProjection from '$lib/PlanProjection.svelte';
+    import { tourEvent } from '$lib/tour';
 
     let { suburb, onclose, onplan, reloadPlan = 0 }: {
         suburb: Suburb;
@@ -39,6 +40,11 @@
             seenReload = reloadPlan;
             tab = 'plan';
         }
+    });
+
+    // The tour (behavior 52) follows which tab is shown.
+    $effect(() => {
+        tourEvent(tab === 'plan' ? 'plan-tab' : 'zone-tab');
     });
 
     const nf = $derived(new Intl.NumberFormat($lang === 'vi' ? 'vi-VN' : 'en-AU'));
@@ -74,12 +80,13 @@
             type="button"
             role="tab"
             aria-selected={tab === 'plan'}
+            data-tour="plan-tab"
             class:active={tab === 'plan'}
             onclick={() => (tab = 'plan')}>{$t('sheet.tab.plan')}</button
         >
     </div>
 
-    <div class="body">
+    <div class="body" data-tour={tab === 'plan' ? 'plan' : undefined}>
         {#if tab === 'zone'}
             <div class="metrics">
                 <!-- Vietnamese community — the killer metric, surfaced first + emphasised. -->
