@@ -600,6 +600,7 @@
         grid-template-columns: 2.5rem 1fr;
         column-gap: var(--sp-3);
         row-gap: 0.15rem;
+        align-content: start;
         font-size: var(--fs-sm);
         color: var(--ink-2);
         line-height: 1.5;
@@ -792,10 +793,11 @@
             margin-left: var(--sp-6);
             margin-right: var(--sp-6);
         }
-        /* The two position statements frame the card full-width; the three
-           capabilities sit between them three-up. */
+        /* The two position statements frame the card full-width; the four
+           capabilities (the AI assistant added by behavior 59) sit between them
+           two-up, so no row is left with one item. */
         .wl-value ul {
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr);
         }
         .wl-value li:first-child,
         .wl-value li:last-child {
