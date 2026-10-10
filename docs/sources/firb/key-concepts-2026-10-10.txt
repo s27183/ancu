@@ -1,0 +1,105 @@
+Source: https://foreigninvestment.gov.au/guidance/general/key-concepts
+Retrieved: 2026-10-10
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML ebfcea681a26f8b6a728be19ada94862ef366550fba7b7bea8b24dd0d44ae70e
+
+Key concepts | Foreign investment in Australia
+Skip to main content
+Key concepts
+Last updated
+12 December 2025
+Print or save to PDF
+Foreign investors
+Foreign investors can be:
+a person not ordinarily resident in Australia
+a corporation, where a person not ordinarily resident in Australia, a foreign corporation or a foreign government holds a substantial interest
+a corporation in which two or more people, each of whom is not ordinarily resident in Australia, a foreign corporation or a foreign government hold an aggregate substantial interest
+the trustee of a trust in which a person not ordinarily resident in Australia, a foreign corporation or a foreign government holds a substantial interest
+the trustee of a trust in which two or more people, each of whom is not ordinarily resident in Australia, a foreign corporation or a foreign government hold an aggregate substantial interest
+a foreign government
+a person not ordinarily resident in Australia, a foreign corporation or a foreign government that holds at least 20 per cent in a limited partnership
+two or more people each of whom is not ordinarily resident in Australia, a foreign corporation or a foreign government, that hold an interest of at least 40 per cent in a limited partnership
+any other person that meets the conditions, prescribed by the regulations.
+Foreign government investors
+A foreign government investor can be:
+a foreign government or separate government entity
+a corporation, the trustee of a trust, or a general partner of a limited partnership, in which:
+a foreign government or separate government entity holds a substantial interest of at least 20 per cent, including with associates
+foreign governments or separate government entities of more than one foreign country (or parts of more than one foreign country) hold a substantial interest of at least 40 per cent, including with associates.
+A foreign government investor may include state owned enterprises and sovereign wealth funds; the definition is broad.
+Investors who could have or could be seen to have a relationship with a foreign government investor as an associate should carefully consider how Australia’s foreign investment framework applies to them or their proposed investment.
+Ordinarily resident
+To be ordinarily resident in Australia you must be in Australia during 200 or more days of the preceding 12-month period.
+Your continued presence in Australia must not be subject to any limitation.
+You are also taken to be ordinarily resident if you are not in Australia, but before your departure your continued presence in Australia was not subject to any limitation.
+For example, you may hold a permanent residence visa.
+Temporary residents, foreign non-residents, and New Zealand citizens not ordinarily resident in Australia are taken to be foreign investors for the purposes of the Act.
+However, special rules apply to temporary residents wishing to acquire residential land.
+New Zealand citizens who hold or are eligible for a special category visa are exempt from requiring foreign investment approval for residential land.
+An Australian citizen who is living overseas may be a foreign person as defined in the Act. There is no specific rule in the Act for determining whether an Australian citizen is ordinarily resident in Australia. It will depend on your specific circumstances.
+Screening foreign investments
+Under the Foreign Acquisitions and Takeovers Act 1975 , we assess proposed foreign investments using the national interest test or the national security test.
+Most investments are screened under the national interest test if they meet the monetary thresholds.
+Investments that do not meet the monetary thresholds but may pose national security concerns are screened under the national security test.
+We can prohibit investments or apply conditions to the way they are implemented to ensure they are not contrary to the national interest or to national security.
+These conditions are attached to no objection notifications and exemption certificates.
+The Act characterises investments as:
+significant actions
+notifiable actions
+notifiable national security actions
+reviewable national security actions.
+Significant action
+A significant action is an action to acquires interests in securities, assets or Australian land, or other investment actions relating to Australian corporations, unit trusts and businesses.
+Generally, the action is only a significant action if it meets the monetary threshold test.
+A different monetary threshold test applies for certain significant actions taken to acquire interests in agribusinesses.
+The foreign investment framework may also prescribe actions that are significant actions. All significant actions prescribed in the framework and all significant actions relating to Australian land are also notifiable actions.
+Notifiable action
+A notifiable action is an action to:
+acquire a direct interest in an Australian entity or Australian business that is an agribusiness
+acquire a substantial interest in an Australian entity
+acquire an interest in Australian land.
+Generally, the action is only notifiable if it meets the monetary threshold test.
+A different monetary threshold test applies for certain notifiable actions taken in relation to agribusinesses.
+There does not need to be a change in control for actions relating to entities and businesses to be notifiable actions.
+The foreign investment framework may also prescribe actions that are notifiable actions.
+Notifiable national security action
+An action is a notifiable national security action if the action proposed is to start a national security business or acquire:
+a direct interest in a national security business
+a direct interest in an entity that carries on a national security business
+an interest in Australian land that, at the time of acquisition, is national security land
+a legal or equitable interest in an exploration tenement in respect of Australian land that, at the time of acquisition, is national security land.
+Guidance Note 2: Key concepts
+Overview
+Defines terms
+A: Who is a foreign person?
+B: Who is a foreign government investor?
+C: Who is an associate?
+D: Meaning of ‘direct interest’, ‘substantial interest’ and related concepts
+E: Meaning of ‘land’, ‘Australian land’ and ‘interest in Australian land’
+F: Meaning of ‘change in control’
+G: Meaning of ‘interests acquired by entering agreements or acquiring options’ – section 15 of the Act
+Key concepts – general
+H: Significant actions and notifiable actions
+I: Notifiable national security actions and reviewable national security actions
+J: Tracing of substantial interests
+K: Calculating consideration, asset values and issued securities values
+L: Time limits and extensions
+M: No objections notifications
+N: Variations
+O: Orders in relation to significant actions, notifiable national security actions or reviewable national security actions
+Key concepts – land
+P: Determining the type of land
+Q: Mixed-use land
+R: Agreements for lease and leases
+S: Subdivision or amalgamation of land
+Exemptions
+T: Overview of exemptions
+U: Moneylending exemption
+V: Will or devolution by operation of law
+W: Acquisitions from government
+Other
+X: Sector specific legislation
+Further information
+Download
+Guidance Note 2: Key Concepts [PDF 1.03 MB]
+Guidance Note 2: Key Concepts [DOCX 546 kB]
+Back to top

@@ -11,11 +11,19 @@ sources:
     retrieved: 2026-10-09
     path: docs/sources/homeaffairs/country-profile-vietnam-2026-10-09.txt
     note: "Department of Home Affairs, Country profile – Vietnam: population (ABS, Australia's Population by Country of Birth, June 2024), Table 2 temporary visa grants, Table 4 geographic distribution (Census 2021)."
+  - url: https://foreigninvestment.gov.au/guidance/general/key-concepts
+    retrieved: 2026-10-10
+    path: docs/sources/firb/key-concepts-2026-10-10.txt
+    note: "Foreign Investment Review Board, Key concepts: a foreign person is 'a person not ordinarily resident in Australia'; ordinarily resident = presence 'not subject to any limitation', e.g. a permanent residence visa — so a temporary-visa holder is a foreign person."
+  - url: https://foreigninvestment.gov.au/getting-started/investment-information/residential
+    retrieved: 2026-10-10
+    path: docs/sources/firb/residential-real-estate-2026-10-10.txt
+    note: "Foreign Investment Review Board, Residential real estate: 'When an application is not required' — Australian citizens living abroad, holders of Australian permanent residency visas: No."
 ---
 
 # Vietnamese buyers and residents in Australia — facts for the first-visit sheet
 
-The figures the first-visit sheet draws in its "Vietnamese in Australia" section (behavior 42). Each fact quotes the archived primary it comes from; the compiler checks every quote against that file (GATE 12). FIRB counts are **approved proposals**, not completed purchases: a proposal involving more than one source country is counted against each.
+The figures the first-visit sheet draws in its "Vietnamese in Australia" section (behavior 42). Each fact quotes the archived primary it comes from; the compiler checks every quote against that file (GATE 12). FIRB counts are **approved proposals**, not completed purchases: a proposal involving more than one source country is counted against each. They count only **foreign persons** — people who must apply to FIRB: anyone without Australian citizenship or permanent residency, temporary-visa holders in Australia included. A home bought in the name of a citizen or permanent resident (a child funded by family in Vietnam, say) needs no approval and is not in them; both FIRB facts carry that as their `note` (behavior 46, Son 2026-10-10), quoted from sources 2 and 3.
 
 Not shown, because no primary supports them (docs/01-market.md §5.6 cites VnExpress / Wikipedia only): "4th largest foreign buyer", the 60/30/10 purchase-purpose split, the 8–10% off-the-plan share.
 
@@ -42,6 +50,14 @@ Not shown, because no primary supports them (docs/01-market.md §5.6 cites VnExp
         {"label": {"en": "India", "vi": "Ấn Độ"}, "value": 58},
         {"label": {"en": "Hong Kong", "vi": "Hồng Kông"}, "value": 43}
       ],
+      "note": {"en": "Counts only buyers who must apply to FIRB: people without Australian citizenship or permanent residency, including Vietnamese on temporary visas in Australia. Homes bought in the name of an Australian citizen or permanent resident — including children funded by family in Vietnam — are not included.",
+               "vi": "Chỉ tính người mua phải xin phép FIRB: người không có quốc tịch hay thường trú Úc, kể cả người Việt đang ở Úc bằng visa tạm trú. Nhà đứng tên công dân hoặc thường trú nhân Úc — kể cả con em được gia đình ở Việt Nam gửi tiền mua — không nằm trong con số này."},
+      "note_sources": [2, 3],
+      "note_quotes": ["a person not ordinarily resident in Australia",
+                      "Your continued presence in Australia must not be subject to any limitation.",
+                      "For example, you may hold a permanent residence visa.",
+                      "Australian citizens living abroad No",
+                      "Holders of Australian permanent residency visas No"],
       "quotes": ["China | 156 | 248", "Taiwan | 76 | 111", "Vietnam | 65 | 106", "India | 58 | 61", "Hong Kong, SAR | 43 | 45"]
     },
     {
@@ -59,6 +75,14 @@ Not shown, because no primary supports them (docs/01-market.md §5.6 cites VnExp
         {"label": "2024–25", "value": 383},
         {"label": {"en": "2025–26 (9 mo.)", "vi": "2025–26 (9 th.)"}, "value": 237, "partial": true}
       ],
+      "note": {"en": "Counts only buyers who must apply to FIRB: people without Australian citizenship or permanent residency, including Vietnamese on temporary visas in Australia. Homes bought in the name of an Australian citizen or permanent resident — including children funded by family in Vietnam — are not included.",
+               "vi": "Chỉ tính người mua phải xin phép FIRB: người không có quốc tịch hay thường trú Úc, kể cả người Việt đang ở Úc bằng visa tạm trú. Nhà đứng tên công dân hoặc thường trú nhân Úc — kể cả con em được gia đình ở Việt Nam gửi tiền mua — không nằm trong con số này."},
+      "note_sources": [2, 3],
+      "note_quotes": ["a person not ordinarily resident in Australia",
+                      "Your continued presence in Australia must not be subject to any limitation.",
+                      "For example, you may hold a permanent residence visa.",
+                      "Australian citizens living abroad No",
+                      "Holders of Australian permanent residency visas No"],
       "quotes": ["Vietnam | 65 | 106 | 237 | 383 | 363"]
     },
     {
