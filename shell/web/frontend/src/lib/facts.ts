@@ -24,6 +24,8 @@ export interface Fact {
     id: string;
     /** `statement` (behavior 44): no number — headline and caption carry the fact. */
     visual: 'bars' | 'series' | 'figure' | 'split' | 'growth' | 'statement';
+    /** A statement's picture (behavior 49): the land parcel by default, or a health cross. */
+    glyph?: 'health';
     /** Absent on a statement. */
     unit?: 'count' | 'people' | 'pct' | 'aud_k' | 'aud' | 'years';
     headline: Localized;
@@ -46,6 +48,8 @@ export interface FactSource {
     retrieved?: string;
     path?: string;
     note?: string;
+    /** Behavior 49: a named non-government ranking (EIU), labelled as such in the sheet. */
+    kind?: 'ranking';
 }
 
 export interface FactDoc {
@@ -135,13 +139,27 @@ const PUBLISHERS: Record<string, Localized> = {
     },
     'www.fairwork.gov.au': { en: 'Fair Work Ombudsman', vi: 'Thanh tra Lao động Công bằng (Fair Work)' },
     'www.qld.gov.au': { en: 'Queensland Government', vi: 'Chính quyền bang Queensland' },
-    'www.planning.act.gov.au': { en: 'ACT Planning', vi: 'Cơ quan Quy hoạch ACT' }
+    'www.planning.act.gov.au': { en: 'ACT Planning', vi: 'Cơ quan Quy hoạch ACT' },
+    // Behavior 49: the one non-government source GATE 12 admits (FACT_RANKING_SOURCES),
+    // EIU's own release and its table, distributed through PR Newswire.
+    'www.prnewswire.com': { en: 'EIU', vi: 'EIU' },
+    'mmx.prnewswire.com': { en: 'EIU', vi: 'EIU' }
 };
 
-/** The sources a fact cites, in its own order. */
+/** The sources a fact cites, in its own order, one per publisher (EIU's release and its
+ *  table both read "EIU"; the first is linked). */
 export function factSources(doc: FactDoc, fact: Fact): FactSource[] {
     const idx = Array.isArray(fact.source) ? fact.source : [fact.source];
-    return idx.map((i) => doc.sources[i]).filter((s): s is FactSource => !!s);
+    const seen = new Set<string>();
+    return idx
+        .map((i) => doc.sources[i])
+        .filter((s): s is FactSource => !!s)
+        .filter((s) => {
+            const who = publisher(s, 'en') || String(s.url);
+            if (seen.has(who)) return false;
+            seen.add(who);
+            return true;
+        });
 }
 
 export function publisher(src: FactSource | undefined, lang: Lang): string {

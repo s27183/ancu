@@ -144,6 +144,14 @@
                 </li>
             {/each}
         </ul>
+    {:else if fact.visual === 'statement' && fact.glyph === 'health'}
+        <!-- Behavior 49: a hospital card — a cross on a soft ground, not the land parcel. -->
+        <svg class="fv-parcel fv-health" viewBox="0 0 120 64" aria-hidden="true">
+            <ellipse class="ground" cx="60" cy="54" rx="40" ry="7" />
+            <rect class="plate" x="40" y="10" width="40" height="40" rx="10" />
+            <path class="cross" d="M60 19 V41 M49 30 H71" />
+            <circle class="pin" cx="92" cy="50" r="3.2" />
+        </svg>
     {:else if fact.visual === 'statement'}
         <!-- A titled parcel: the house and the ground under it inside one boundary. -->
         <svg class="fv-parcel" viewBox="0 0 120 64" aria-hidden="true">
@@ -191,6 +199,17 @@
     }
     .fv-parcel .pin {
         fill: var(--gold-mark);
+    }
+    .fv-health .plate {
+        fill: var(--surface);
+        stroke: var(--ink-2);
+        stroke-width: 1.6;
+    }
+    .fv-health .cross {
+        fill: none;
+        stroke: var(--accent);
+        stroke-width: 6;
+        stroke-linecap: round;
     }
 
     /* --- figure ------------------------------------------------------------ */

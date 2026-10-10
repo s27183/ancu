@@ -168,6 +168,8 @@
                                         {$t('intro.source')}:
                                         {#each srcs as src, k (k)}{#if k}{', '}{/if}{#if src.url}<a href={src.url} target="_blank" rel="noopener noreferrer"
                                                     >{publisher(src, $lang)}</a
+                                                >{/if}{#if src.kind === 'ranking'}{' '}<span class="wl-src-kind"
+                                                    >({$t('intro.source.ranking')})</span
                                                 >{/if}{/each}
                                         · {formatAsOf(fact.as_of, $lang)}
                                     </p>
@@ -526,6 +528,9 @@
     .wl-fact.statement .wl-caption {
         font-size: var(--fs-sm);
         line-height: 1.55;
+    }
+    .wl-src-kind {
+        font-style: italic;
     }
     .wl-src {
         margin: auto 0 0;
