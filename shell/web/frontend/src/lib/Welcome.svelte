@@ -6,7 +6,8 @@
     // small animated launcher at the bottom-right, which reopens it (behavior 44: its first
     // screen leads to the position card and the facts in one tap each); the browser then
     // remembers it was seen (facts.ts, introSeen). Under prefers-reduced-motion nothing
-    // flies or pulses — it simply closes and the launcher sits still.
+    // flies or pulses — it simply closes and the launcher sits still. The launcher pulses
+    // light green until the sheet has been seen (behavior 50).
     import { onMount, tick } from 'svelte';
     import { lang } from '$lib/stores/lang';
     import { t } from '$lib/i18n';
@@ -29,6 +30,12 @@
     let docs = $state<FactDoc[]>([]);
     let cardEl = $state<HTMLElement | null>(null);
     let launchEl = $state<HTMLButtonElement | null>(null);
+    // Behavior 50: the launcher pulses light green until this browser has seen the
+    // sheet. introSeen() is read once at mount, not after the first close: the sheet
+    // opens by itself on a first visit and its close marks it seen, so re-reading
+    // would stop the pulse before anyone could see it. Opening it from the launcher
+    // stops it at once; a later page load finds it seen and the button stays still.
+    let pulse = $state(false);
 
     const ordered = $derived(
         [...docs].sort((a, b) => SECTION_ORDER.indexOf(a.slug) - SECTION_ORDER.indexOf(b.slug))
@@ -52,7 +59,10 @@
 
     onMount(() => {
         loadFacts();
-        if (!introSeen()) open = true;
+        if (!introSeen()) {
+            open = true;
+            pulse = true;
+        }
     });
 
     async function collapse() {
@@ -77,6 +87,7 @@
     }
 
     async function reopen() {
+        pulse = false;
         loadFacts();
         arrived = false;
         open = true;
@@ -237,6 +248,7 @@
     class="wl-launch"
     class:waiting={open}
     class:arrived
+    class:pulse
     aria-label={$t('intro.button.aria')}
     aria-hidden={open}
     tabindex={open ? -1 : 0}
@@ -666,49 +678,39 @@
         background: var(--brand-gradient);
         box-shadow: var(--brand-glow);
     }
-    .wl-launch-ico::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        border-radius: 50%;
-        box-shadow: 0 0 0 0 var(--accent);
-        animation: wl-ring 3.2s ease-out infinite;
-    }
-    @keyframes wl-ring {
-        0% {
-            box-shadow: 0 0 0 0 var(--accent-soft-2);
-            opacity: 0.9;
-        }
-        45%,
-        100% {
-            box-shadow: 0 0 0 0.75rem var(--accent-soft-2);
-            opacity: 0;
-        }
-    }
     .wl-launch-ico svg {
         width: 1.15rem;
         height: 1.15rem;
         fill: var(--ink-inverse);
     }
-    .wl-launch-ico rect {
-        transform-box: fill-box;
-        transform-origin: bottom;
-        animation: wl-bar 2.4s ease-in-out infinite;
-    }
-    .wl-launch-ico .b2 {
-        animation-delay: 0.25s;
-    }
     .wl-launch-ico .b3 {
-        animation-delay: 0.5s;
         fill: var(--gold-mark);
     }
-    @keyframes wl-bar {
+    /* The pulse (behavior 50) fades a light-green layer behind the label in and out.
+       Only its opacity animates, so the compositor runs it without repainting the
+       button each frame (behavior 51); the old box-shadow ring repainted every frame. */
+    .wl-launch::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: var(--accent-soft-2);
+        opacity: 0;
+        pointer-events: none;
+    }
+    .wl-launch > * {
+        position: relative;
+    }
+    .wl-launch.pulse::before {
+        animation: wl-pulse 2.4s ease-in-out infinite;
+    }
+    @keyframes wl-pulse {
         0%,
         100% {
-            transform: scaleY(1);
+            opacity: 0;
         }
         50% {
-            transform: scaleY(0.55);
+            opacity: 1;
         }
     }
 
@@ -769,8 +771,7 @@
         .wl-scrim,
         .wl-launch,
         .wl-launch.arrived,
-        .wl-launch-ico::after,
-        .wl-launch-ico rect,
+        .wl-launch.pulse::before,
         .wl-arrow svg {
             animation: none;
             transition: none;
