@@ -1,10 +1,10 @@
 ---
 slug: kb.lender.investor-friendly-shortlist
 effective_from: 2025-07-01
-last_verified: 2026-07-06
+last_verified: 2026-10-11
 sources:
   - url: https://asic.gov.au/for-finance-professionals/credit-licensees/
-    retrieved: 2026-07-06
+    retrieved: 2026-10-11
     note: "ASIC — engaging in credit activities (incl. \"suggesting or assisting with a particular credit contract\") generally requires an Australian Credit Licence. Grounds the doc's ACL boundary (criteria/reasoning only, no named-lender recommendation). The \"investor-friendly\" criteria framing is FirstHomey editorial judgment, not a single citable market fact"
 ---
 

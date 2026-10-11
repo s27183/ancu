@@ -1,10 +1,10 @@
 ---
 slug: kb.lender.credit-card-treatment
 effective_from: 2019-01-01
-last_verified: 2026-07-06
+last_verified: 2026-10-11
 sources:
   - url: https://www.asic.gov.au/about-asic/news-centre/find-a-media-release/2018-releases/18-257mr-asic-prescribes-three-year-period-for-credit-card-responsible-lending-assessments/
-    retrieved: 2026-07-06
+    retrieved: 2026-10-11
     note: "ASIC 18-257MR — prescribed a three-year period (ASIC Credit (Unsuitability—Credit Cards) Instrument 2018/753) for credit-card responsible-lending assessments; commences 1 January 2019"
 ---
 

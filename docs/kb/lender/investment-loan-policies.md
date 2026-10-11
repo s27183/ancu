@@ -1,10 +1,10 @@
 ---
 slug: kb.lender.investment-loan-policies
 effective_from: 2025-07-01
-last_verified: 2026-07-06
+last_verified: 2026-10-11
 sources:
   - url: https://handbook.apra.gov.au/ppg/apg-223
-    retrieved: 2026-07-06
+    retrieved: 2026-10-11
     path: docs/sources/apra/apg-223-residential-mortgage-lending_0.pdf
     note: APG 223 — LVR, interest-only availability/term, exception monitoring (the regulated capital-treatment framework the LVR/IO policy bands sit within)
 ---

@@ -1,13 +1,13 @@
 ---
 slug: kb.lender.non-resident-friendly-shortlist
 effective_from: 2025-07-01
-last_verified: 2026-07-06
+last_verified: 2026-10-11
 sources:
   - url: https://asic.gov.au/for-finance-professionals/credit-licensees/
-    retrieved: 2026-07-06
+    retrieved: 2026-10-11
     note: "ASIC — credit assistance / recommending a credit product requires an Australian Credit Licence. Grounds the ACL boundary (criteria + reasoning, user picks, no named recommendation)"
   - url: https://www.canstar.com.au/home-loans/non-resident-home-loans/
-    retrieved: 2026-07-06
+    retrieved: 2026-10-11
     note: "Restricted non-resident lender set (mostly non-banks), higher rates, foreign-income criteria. The \"non-resident-friendly\" criteria framing is FirstHomey editorial judgment"
 ---
 
