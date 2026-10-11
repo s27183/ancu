@@ -77,7 +77,7 @@ your verdict before you look the PR up on GitHub.
 
 4. Only now, with your GitHub tools: find the open pull request whose head branch is B. If
    there is none, skip B. Read nothing in it but its labels and its comments. If one of its
-   comments already ends with `<!-- kb-verify <the head sha> -->`, skip B. Otherwise:
+   comments already contains `<!-- kb-verify <the head sha> -->`, skip B. Otherwise:
    - add one comment: the first line is `**kb-verify: verified**` or `**kb-verify: held**`.
      Then one line per figure: `<doc slug> — <figure> — <source url> — confirmed`, or
      the reason it is not confirmed. End with a line `<!-- kb-verify <the head sha> -->`.
