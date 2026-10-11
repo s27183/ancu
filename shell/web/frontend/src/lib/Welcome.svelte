@@ -311,7 +311,7 @@
         --fly-y: 0px;
         position: relative;
         width: 100%;
-        max-height: 94%;
+        max-height: var(--sheet-h); /* the one sheet height (app.css, behavior 66) */
         display: flex;
         flex-direction: column;
         background: var(--bg);

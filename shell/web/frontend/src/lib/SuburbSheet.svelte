@@ -9,6 +9,7 @@
     import { lang } from '$lib/stores/lang';
     import PlanProjection from '$lib/PlanProjection.svelte';
     import { tourEvent } from '$lib/tour';
+    import { sheetMotion } from '$lib/sheetMotion';
 
     let { suburb, onclose, onplan, reloadPlan = 0 }: {
         suburb: Suburb;
@@ -55,7 +56,7 @@
     }
 </script>
 
-<div class="sheet" role="dialog" aria-modal="false" aria-label={suburb.name}>
+<div class="sheet" role="dialog" aria-modal="false" aria-label={suburb.name} transition:sheetMotion|global>
     <header class="sheet-head">
         <div class="title">
             <h2>{suburb.name} <span class="state-chip">{suburb.state}</span></h2>
