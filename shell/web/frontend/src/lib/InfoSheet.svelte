@@ -4,8 +4,12 @@
     // the privacy policy look and close alike — ✕, Esc, a tap outside — and closing one
     // leaves the menu as it was. Above the menu; centred on wide screens, a bottom sheet
     // on phones; the body scrolls inside the frame. The contents are the caller's.
+    // On phones the frame is the one sheet height and motion of the planning sheets
+    // (behavior 73 → behavior 66's --sheet-h and lib/sheetMotion.ts): the scrim is its own
+    // layer so it fades while the card slides, neither fading the other.
     import type { Snippet } from 'svelte';
     import { t } from '$lib/i18n';
+    import { sheetMotion, scrimMotion } from '$lib/sheetMotion';
 
     let {
         title,
@@ -21,9 +25,17 @@
 
 <svelte:window onkeydown={(e) => e.key === 'Escape' && onclose()} />
 
-<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-<div class="info-backdrop" onclick={(e) => e.target === e.currentTarget && onclose()}>
+<div class="info-backdrop">
+    <button
+        type="button"
+        class="info-scrim"
+        tabindex="-1"
+        aria-label={$t('sheet.close')}
+        onclick={onclose}
+        transition:scrimMotion|global
+    ></button>
     <div
+        transition:sheetMotion|global
         class="info-sheet"
         class:info-sheet-narrow={narrow}
         role="dialog"
