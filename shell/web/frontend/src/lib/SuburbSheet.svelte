@@ -208,5 +208,5 @@
             {/key}
         {/if}
     </div>
-    <SectionMenu groups={menuGroups} current={menuCurrent} onpick={toTop} />
+    <SectionMenu groups={menuGroups} current={menuCurrent} onpick={toTop} hint={tab === 'zone'} />
 </div>
