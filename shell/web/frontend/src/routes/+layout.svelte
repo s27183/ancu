@@ -28,6 +28,28 @@
     let menuOpen = $state(false);
     // Which of the menu's popups is open over it, if any (behavior 64).
     let popup: 'allowance' | 'privacy' | null = $state(null);
+
+    // While the menu is open on a phone, Safari's bars take the menu's white: html.menu-open
+    // retints --chrome and the page ground (app.css, beside .account-sheet), and the
+    // theme-color meta follows; closing restores both (behavior 69).
+    const PHONE = '(max-width: 520px)';
+    $effect(() => {
+        const meta = document.querySelector('meta[name="theme-color"]');
+        const ground = meta?.getAttribute('content') ?? '#f6f4ef';
+        const apply = () => {
+            const on = menuOpen && matchMedia(PHONE).matches;
+            document.documentElement.classList.toggle('menu-open', on);
+            meta?.setAttribute('content', on ? '#ffffff' : ground);
+        };
+        apply();
+        const mq = matchMedia(PHONE);
+        mq.addEventListener('change', apply);
+        return () => {
+            mq.removeEventListener('change', apply);
+            document.documentElement.classList.remove('menu-open');
+            meta?.setAttribute('content', ground);
+        };
+    });
 </script>
 
 <!-- The tab title is the product name from i18n's one BRAND constant (behavior 17). -->
