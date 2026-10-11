@@ -40,6 +40,9 @@ export class SectionRegistry {
     plan = $state<SectionGroup[]>([]);
     /** The plan's current section, for the pill ("Kế hoạch · <this>"). */
     current = $state('');
+    /** Opens the AI assistant, while a plan is shown and the assistant is not (the sheet
+     *  head's "Hỏi AI" button, behavior 75); null otherwise. */
+    ask = $state<(() => void) | null>(null);
 }
 
 const KEY = Symbol('section-menu');

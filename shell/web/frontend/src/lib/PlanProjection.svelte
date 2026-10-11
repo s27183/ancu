@@ -682,6 +682,8 @@
         if (!sectionReg) return;
         sectionReg.plan = sectionGroups;
         sectionReg.current = sectionCurrent;
+        // The sheet head's "Hỏi AI" (behavior 75): offered where the ask bar is.
+        sectionReg.ask = sub !== 'qa' && uiTabs.length > 0 ? openQa : null;
     });
     $effect(() => {
         const reg = sectionReg;
@@ -689,6 +691,7 @@
             if (reg) {
                 reg.plan = [];
                 reg.current = '';
+                reg.ask = null;
             }
         };
     });
