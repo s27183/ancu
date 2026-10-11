@@ -1,16 +1,22 @@
 -module(fh_shell_h_quota).
 
 %% Honest-partial -> P-5 · Metering, not gating -> The shell backend -> GET /api/me/quota
-%% What the visitor can still use for free, for the menu (behavior 62). It reads the
-%% counters the gates themselves claim, never a second count:
-%%   signed out (no session, or a guest session): new plans left today, from
-%%     guest_daily_creates for this guest and this address against GUEST_DAILY_CREATES
-%%     (the lower of the two governs, as guest_create/4 claims both); plans kept
-%%     fh_shell_guest:ttl() seconds; the assistant needs sign-in.
-%%   signed in: questions left today, from qa_daily_asks against FH_QA_DAILY_LIMIT; this
-%%     period's token allowance as a used fraction and its reset date
-%%     (fh_shell_meter:usage_summary/1). An admin reads `unlimited` for both, as the
-%%     gates exempt them.
+%% What the visitor can still use for free, for the menu (behavior 62). One shape for
+%% both kinds, so the menu shows the same three rows to everyone (Son 2026-10-11):
+%%   plans_saved   the plans the visitor holds now (plan_card_views, as the list shows);
+%%   plans_today   new plans today: {used, limit} signed out, from guest_daily_creates
+%%                 for this guest and this address against GUEST_DAILY_CREATES (the
+%%                 higher count governs, as guest_create/4 claims both); "unlimited"
+%%                 signed in (no cap on a user's saved plans);
+%%   keep_days     fh_shell_guest:ttl() in days signed out (the purge's age);
+%%                 "until_deleted" signed in;
+%%   questions_today  "sign_in" signed out (guests are refused the assistant); signed in
+%%                 {used, limit} from qa_daily_asks against FH_QA_DAILY_LIMIT;
+%%   allowance     signed in only: this period's token allowance as a used fraction and
+%%                 its reset date (fh_shell_meter:usage_summary/1) — the menu names it
+%%                 only from 80% (Son 2026-10-11: a hidden ceiling, warned near it).
+%% An admin reads "unlimited" for questions and allowance, as the gates exempt them.
+%% The counts are the rows the gates claim, never a second count.
 %% Tokens stay internal: the reply carries a fraction, never a token count or a cost.
 %% Read-only and never 401: a visitor with no session is a guest-to-be.
 
@@ -43,10 +49,16 @@ guest(GuestId, Req) ->
         _    -> fh_shell_store:guest_creates_today(guest, GuestId)
     end,
     Used = max(ByAddr, ByGuest),
+    Saved = case GuestId of
+        none -> 0;
+        _    -> fh_shell_store:plans_saved(GuestId)
+    end,
     fh_shell_http:reply_json(200, #{
         <<"kind">> => <<"guest">>,
+        <<"plans_saved">> => Saved,
         <<"plans_today">> => #{<<"used">> => min(Used, Limit), <<"limit">> => Limit},
-        <<"keep_days">> => fh_shell_guest:ttl() div 86400
+        <<"keep_days">> => fh_shell_guest:ttl() div 86400,
+        <<"questions_today">> => <<"sign_in">>
     }, Req).
 
 user(UserId, Req) ->
@@ -63,6 +75,9 @@ user(UserId, Req) ->
     end,
     fh_shell_http:reply_json(200, #{
         <<"kind">> => <<"user">>,
+        <<"plans_saved">> => fh_shell_store:plans_saved(UserId),
+        <<"plans_today">> => <<"unlimited">>,
+        <<"keep_days">> => <<"until_deleted">>,
         <<"questions_today">> => Questions,
         <<"allowance">> => Allowance
     }, Req).

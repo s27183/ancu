@@ -1092,16 +1092,27 @@ const messages = {
         en: 'Couldn’t load your allowance. Please try again later.'
     },
     'quota.left': { vi: 'Còn {n}/{of}', en: '{n} of {of} left' },
-    'quota.plans_today': { vi: 'Kế hoạch mới hôm nay', en: 'New plans today' },
-    'quota.kept': { vi: 'Kế hoạch được lưu', en: 'Your plans are kept' },
-    'quota.kept_days': { vi: '{n} ngày', en: 'for {n} days' },
-    'quota.kept_account': { vi: 'Cùng tài khoản của bạn', en: 'With your account' },
-    'quota.assistant': { vi: 'Trợ lý AI', en: 'AI assistant' },
-    'quota.assistant_signin': { vi: 'Cần đăng nhập', en: 'Sign in to use' },
-    'quota.questions_today': { vi: 'Câu hỏi cho trợ lý AI hôm nay', en: 'AI assistant questions today' },
-    'quota.allowance': { vi: 'Hạn mức AI tháng này', en: 'This month’s AI allowance' },
-    'quota.allowance_used': { vi: 'Đã dùng {p}%', en: '{p}% used' },
+    'quota.saved': { vi: 'Kế hoạch đã lưu', en: 'Saved plans' },
+    'quota.saved_cap': { vi: 'tối đa {n} mới/ngày', en: '{n} new a day' },
+    'quota.saved_nocap': { vi: 'không giới hạn', en: 'no cap' },
+    'quota.saved_none_left': {
+        vi: 'Hôm nay bạn đã tạo đủ kế hoạch mới. Đăng nhập để tạo thêm.',
+        en: 'You’ve made today’s new plans. Sign in to make more.'
+    },
+    'quota.kept': { vi: 'Thời gian lưu', en: 'Kept for' },
+    'quota.kept_days': { vi: '{n} ngày', en: '{n} days' },
+    'quota.kept_until_deleted': { vi: 'Đến khi bạn xoá', en: 'Until you delete them' },
+    'quota.questions_today': { vi: 'Câu hỏi AI hôm nay', en: 'AI questions today' },
+    'quota.questions_signin': { vi: 'Đăng nhập để hỏi', en: 'Sign in to ask' },
+    'quota.allowance_near': {
+        vi: 'Bạn đã dùng {p}% hạn mức AI miễn phí tháng này',
+        en: 'You’ve used {p}% of this month’s free AI'
+    },
     'quota.resets': { vi: 'làm mới ngày {d}', en: 'renews {d}' },
+    'quota.signin_adds': {
+        vi: 'Đăng nhập để lưu kế hoạch đến khi bạn xoá, tạo không giới hạn và hỏi trợ lý AI.',
+        en: 'Sign in to keep plans until you delete them, make as many as you like and ask the AI assistant.'
+    },
     'quota.unlimited': { vi: 'Không giới hạn', en: 'Unlimited' },
 
     // KB-news ticker (kb-news-feature.md, task 29): the sticky strip cycling relevant,

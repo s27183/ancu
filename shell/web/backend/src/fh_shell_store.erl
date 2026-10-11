@@ -18,7 +18,7 @@
 -export([claim_question/2, release_question/2]).
 -export([create_guest/0, claim_guest/2]).
 -export([claim_guest_create/3, release_guest_create/3]).
--export([questions_today/1, guest_creates_today/2]).
+-export([questions_today/1, guest_creates_today/2, plans_saved/1]).
 -export([expired_guests/1, delete_guest/1, prune_guest_creates/0]).
 
 %% --- identity (login flow) --------------------------------------------------
@@ -405,6 +405,16 @@ guest_creates_today(Kind, Key) ->
         #{rows := [{N}]} -> N;
         #{rows := []}    -> 0
     end.
+
+%% How many plans the visitor holds now, for the menu's "Saved plans" row (behavior 62):
+%% the same rows list_plan_card_views/1 returns, so the count is what the list shows.
+-spec plans_saved(binary()) -> non_neg_integer().
+plans_saved(UserId) ->
+    #{rows := [{N}]} = query(
+        "SELECT count(*)::int FROM plan_card_views "
+        "WHERE user_id = $1::uuid AND archived = false",
+        [UserId]),
+    N.
 
 next_sydney_midnight() ->
     #{rows := [{T}]} = query(

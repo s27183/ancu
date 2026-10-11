@@ -684,11 +684,6 @@ body {
     gap: 0.75rem;
     font-size: var(--fs-sm);
 }
-.menu-row-stack {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.35rem;
-}
 .menu-label {
     color: var(--muted);
 }
@@ -698,24 +693,18 @@ body {
     text-align: right;
     font-weight: 600;
 }
-.menu-value-wrap {
-    white-space: normal;
-}
-.menu-bar {
-    height: 0.4rem;
-    border-radius: var(--radius-pill);
-    background: var(--border);
-    overflow: hidden;
-}
-.menu-bar span {
-    display: block;
-    height: 100%;
-    background: var(--accent);
-}
 .menu-note {
     font-size: var(--fs-xs);
     color: var(--muted);
     font-variant-numeric: tabular-nums;
+}
+.menu-warn {
+    color: var(--ink);
+}
+.menu-signin {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
 }
 .menu-email {
     font-size: var(--fs-sm);
@@ -1645,24 +1634,6 @@ main {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-}
-/* Ghost button — transparent so it blends into the glass header (no opaque white pill);
-   a faint accent edge + accent text read cleanly on the blur. */
-.account-btn {
-    border: 1px solid var(--accent);
-    background: var(--accent);
-    color: var(--accent-ink);
-    border-radius: var(--radius-pill);
-    padding: 0.45rem 1rem;
-    font-size: var(--fs-sm);
-    font-weight: 600;
-    cursor: pointer;
-    box-shadow: var(--shadow-1), var(--inner-highlight);
-    transition: background var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
-}
-.account-btn:hover {
-    background: var(--accent-hover);
-    box-shadow: var(--shadow-2);
 }
 
 /* Calm sign-in banner — top-centre, status not alarm; emerald when ok. */
@@ -2908,7 +2879,6 @@ main {
 }
 
 /* Secondary / neutral buttons pick up the same calm motion. */
-.account-btn,
 .google-btn,
 .choice button,
 .pp-state button {
@@ -2921,10 +2891,6 @@ main {
 .pp-state button:hover {
     background: var(--bg);
     border-color: var(--border-strong);
-}
-.account-btn:hover {
-    background: var(--accent-soft);
-    border-color: var(--accent);
 }
 
 /* Text inputs: a soft, consistent surface (focus ring is global). */
