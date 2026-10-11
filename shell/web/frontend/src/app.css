@@ -551,7 +551,7 @@ body {
     color: var(--ink);
 }
 .account-sheet-head .close,
-.privacy-head .close {
+.info-head .close {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -568,7 +568,7 @@ body {
         color var(--t-fast) var(--ease);
 }
 .account-sheet-head .close:hover,
-.privacy-head .close:hover {
+.info-head .close:hover {
     background: var(--bg);
     color: var(--ink);
 }
@@ -578,9 +578,9 @@ body {
     gap: 1rem;
     padding: 1rem;
 }
-/* Privacy policy sheet (behavior 62) — above the menu, centred on wide screens, a
-   bottom sheet on phones; the text scrolls inside it. */
-.privacy-backdrop {
+/* The menu's popup frame (InfoSheet, behaviors 62/64) — above the menu, centred on
+   wide screens, a bottom sheet on phones; the body scrolls inside it. */
+.info-backdrop {
     position: fixed;
     inset: 0;
     z-index: 70;
@@ -590,7 +590,7 @@ body {
     padding: 1rem;
     background: var(--scrim);
 }
-.privacy-sheet {
+.info-sheet {
     width: min(40rem, 100%);
     max-height: min(85vh, 100%);
     display: flex;
@@ -599,7 +599,10 @@ body {
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-2);
 }
-.privacy-head {
+.info-sheet-narrow {
+    width: min(26rem, 100%);
+}
+.info-head {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -607,12 +610,12 @@ body {
     padding: 0.85rem 1rem;
     border-bottom: 1px solid var(--border);
 }
-.privacy-head h2 {
+.info-head h2 {
     margin: 0;
     font-size: var(--fs-md);
     text-wrap: balance;
 }
-.privacy-body {
+.info-body {
     overflow-y: auto;
     overscroll-behavior: contain;
     padding: 0.5rem 1.25rem 1.25rem;
@@ -620,52 +623,104 @@ body {
     line-height: 1.55;
     color: var(--ink);
 }
-.privacy-body h3 {
+.info-body h3 {
     margin: 1.1rem 0 0.35rem;
     font-size: var(--fs-sm);
     font-weight: 600;
 }
-.privacy-body p {
+.info-body p {
     margin: 0.4rem 0;
 }
-.privacy-body ul {
+.info-body ul {
     margin: 0.3rem 0;
     padding-left: 1.2rem;
 }
-.privacy-body li + li {
+.info-body li + li {
     margin-top: 0.3rem;
 }
 .privacy-effective {
     color: var(--muted);
     font-size: var(--fs-xs);
 }
-.menu-link {
-    align-self: flex-start;
-    padding: 0;
-    border: none;
-    background: none;
-    font: inherit;
-    font-size: var(--fs-sm);
-    color: var(--accent);
-    cursor: pointer;
-}
-.menu-link:hover {
-    text-decoration: underline;
-}
 @media (max-width: 520px) {
-    .privacy-backdrop {
+    .info-backdrop {
         align-items: flex-end;
         padding: 0;
     }
-    .privacy-sheet {
+    .info-sheet {
         max-height: 88vh;
         border-radius: var(--radius-lg) var(--radius-lg) 0 0;
     }
 }
 
-/* The menu (behavior 62) — the free allowance, contact, sign in/out. */
-.menu-quota,
-.menu-contact {
+/* The menu (behaviors 62/64) — a list of three items, then sign in/out. */
+.menu-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+.menu-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.7rem 0.6rem;
+    border: none;
+    border-radius: var(--radius);
+    background: none;
+    font: inherit;
+    color: var(--ink);
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background var(--t-fast) var(--ease);
+}
+.menu-item:hover {
+    background: var(--bg);
+}
+.menu-icon {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: var(--radius);
+    background: var(--accent-soft);
+    color: var(--accent);
+}
+.menu-icon svg {
+    width: 1.2rem;
+    height: 1.2rem;
+}
+.menu-item-text {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+.menu-item-name {
+    font-size: var(--fs-sm);
+    font-weight: 600;
+}
+.menu-item-hint {
+    font-size: var(--fs-xs);
+    color: var(--muted);
+}
+.menu-item-email {
+    color: var(--accent);
+    word-break: break-all;
+}
+.menu-chev {
+    flex: none;
+    width: 1.1rem;
+    height: 1.1rem;
+    color: var(--muted);
+}
+.menu-quota {
     display: flex;
     flex-direction: column;
     gap: 0.6rem;
@@ -675,14 +730,6 @@ body {
     border: 1px solid var(--border);
     border-radius: var(--radius);
     background: var(--bg);
-}
-.menu-h {
-    margin: 0;
-    font-size: var(--fs-xs);
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: var(--muted);
 }
 .menu-row {
     display: flex;
@@ -712,15 +759,6 @@ body {
     display: flex;
     flex-direction: column;
     gap: 0.4rem;
-}
-.menu-email {
-    font-size: var(--fs-sm);
-    color: var(--accent);
-    text-decoration: none;
-    word-break: break-all;
-}
-.menu-email:hover {
-    text-decoration: underline;
 }
 .account-action {
     display: inline-flex;

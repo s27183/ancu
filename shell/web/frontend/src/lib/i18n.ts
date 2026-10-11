@@ -1085,6 +1085,12 @@ const messages = {
     'menu.title': { vi: 'Menu', en: 'Menu' },
     'menu.contact': { vi: 'Liên hệ', en: 'Contact' },
     'menu.privacy': { vi: 'Chính sách quyền riêng tư', en: 'Privacy policy' },
+    'menu.privacy_hint': { vi: 'Cách chúng tôi giữ dữ liệu của bạn', en: 'How we look after your data' },
+    'menu.allowance': { vi: 'Hạn mức miễn phí', en: 'Free allowance' },
+    'menu.allowance_hint': {
+        vi: 'Kế hoạch đã lưu, thời gian lưu, câu hỏi AI',
+        en: 'Saved plans, how long they’re kept, AI questions'
+    },
     'quota.title': { vi: 'Bạn được dùng miễn phí', en: 'Your free allowance' },
     'quota.loading': { vi: 'Đang tải…', en: 'Loading…' },
     'quota.error': {

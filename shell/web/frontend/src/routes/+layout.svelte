@@ -10,9 +10,8 @@
     import { t } from '$lib/i18n';
     import { session, sessionLoaded, refreshSession, signOut } from '$lib/stores/session';
     import { loginOpen } from '$lib/stores/ui';
-    import { getQuota, type Quota } from '$lib/api';
     import PrivacySheet from '$lib/PrivacySheet.svelte';
-    import { date } from '$lib/format';
+    import AllowanceSheet from '$lib/AllowanceSheet.svelte';
 
     let { children }: { children: import('svelte').Snippet } = $props();
 
@@ -21,27 +20,14 @@
 
     // Honest-partial -> P-5 · Metering, not gating -> The web frontend -> the visitor's menu
     // The side-sheet (slides in from the right) every visitor opens from the header,
-    // signed in or not (behavior 62): the same three allowance rows for everyone, the
-    // privacy policy, the contact address, and sign in / out — nothing else. The tier, token
+    // signed in or not (behavior 62): three items, each an icon and a name (behavior 64)
+    // — the free allowance and the privacy policy open a popup over the menu
+    // (AllowanceSheet, PrivacySheet, one InfoSheet frame), contact opens the email
+    // program — then sign in / out. Nothing else. The tier, token
     // counts and infrastructure cost stay internal (GET /api/billing/usage).
     let menuOpen = $state(false);
-    let privacyOpen = $state(false);
-
-    // Fetched fresh each time the menu opens, from the gates' own counters.
-    type QuotaPhase = 'idle' | 'loading' | 'ok' | 'error';
-    let quotaPhase: QuotaPhase = $state('idle');
-    let quota: Quota | null = $state(null);
-
-    async function openMenu() {
-        menuOpen = true;
-        quotaPhase = 'loading';
-        quota = await getQuota();
-        quotaPhase = quota ? 'ok' : 'error';
-    }
-
-    const pct = (f: number) => Math.round(Math.min(1, Math.max(0, f)) * 100);
-    // The share of the month's AI allowance from which the menu names it.
-    const ALLOWANCE_WARN = 0.8;
+    // Which of the menu's popups is open over it, if any (behavior 64).
+    let popup: 'allowance' | 'privacy' | null = $state(null);
 </script>
 
 <!-- The tab title is the product name from i18n's one BRAND constant (behavior 17). -->
@@ -91,7 +77,7 @@
                 class="account-trigger"
                 aria-label={$t('menu.open')}
                 aria-expanded={menuOpen}
-                onclick={openMenu}
+                onclick={() => (menuOpen = true)}
             >
                 <svg
                     viewBox="0 0 24 24"
@@ -139,66 +125,48 @@
         >
     </header>
     <div class="account-sheet-body">
-        <section class="menu-quota" aria-labelledby="menu-quota-h">
-            <h2 id="menu-quota-h" class="menu-h">{$t('quota.title')}</h2>
-            {#if quotaPhase === 'loading'}
-                <p class="placeholder">{$t('quota.loading')}</p>
-            {:else if quotaPhase === 'error' || !quota}
-                <p class="placeholder">{$t('quota.error')}</p>
-            {:else}
-                <!-- The same three rows for every visitor (Son 2026-10-11); only the values
-                     differ between signed out and signed in. -->
-                <div class="menu-row">
-                    <span class="menu-label">{$t('quota.saved')}</span>
-                    <span class="menu-value"
-                        >{quota.plansSaved} · {quota.plansToday === 'unlimited'
-                            ? $t('quota.saved_nocap')
-                            : $t('quota.saved_cap').replace('{n}', String(quota.plansToday.limit))}</span
-                    >
-                </div>
-                {#if quota.plansToday !== 'unlimited' && quota.plansToday.used >= quota.plansToday.limit}
-                    <p class="menu-note">{$t('quota.saved_none_left')}</p>
-                {/if}
-                <div class="menu-row">
-                    <span class="menu-label">{$t('quota.kept')}</span>
-                    <span class="menu-value"
-                        >{quota.keepDays === 'until_deleted'
-                            ? $t('quota.kept_until_deleted')
-                            : $t('quota.kept_days').replace('{n}', String(quota.keepDays))}</span
-                    >
-                </div>
-                <div class="menu-row">
-                    <span class="menu-label">{$t('quota.questions_today')}</span>
-                    <span class="menu-value">
-                        {#if quota.questionsToday === 'sign_in'}
-                            {$t('quota.questions_signin')}
-                        {:else if quota.questionsToday === 'unlimited'}
-                            {$t('quota.unlimited')}
-                        {:else}
-                            {$t('quota.left')
-                                .replace('{n}', String(Math.max(0, quota.questionsToday.limit - quota.questionsToday.used)))
-                                .replace('{of}', String(quota.questionsToday.limit))}
-                        {/if}
+        <!-- Three items, each an icon, a name and what it does (behavior 64): two open a
+             popup over the menu, the third hands a new message to the email program. -->
+        <ul class="menu-list">
+            <li>
+                <button type="button" class="menu-item" onclick={() => (popup = 'allowance')}>
+                    <span class="menu-icon" aria-hidden="true">
+                        <!-- a gauge: what is left of the free allowance -->
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 18a9 9 0 1 1 15 0" /><path d="M12 13.5 15.5 9" /><circle cx="12" cy="14" r="1.2" fill="currentColor" stroke="none" /></svg>
                     </span>
-                </div>
-                <!-- The monthly AI allowance is a ceiling on what an account may cost, in a
-                     unit visitors do not use; named only once it is near (Son 2026-10-11). -->
-                {#if quota.allowance && quota.allowance !== 'unlimited' && quota.allowance.usedFraction >= ALLOWANCE_WARN}
-                    <p class="menu-note menu-warn">
-                        {$t('quota.allowance_near').replace('{p}', String(pct(quota.allowance.usedFraction)))}{#if quota.allowance.resetsAt}{' · '}{$t('quota.resets').replace('{d}', date(quota.allowance.resetsAt, $lang) ?? '')}{/if}
-                    </p>
-                {/if}
-            {/if}
-        </section>
-
-        <button type="button" class="menu-link" onclick={() => (privacyOpen = true)}
-            >{$t('menu.privacy')}</button
-        >
-
-        <section class="menu-contact" aria-labelledby="menu-contact-h">
-            <h2 id="menu-contact-h" class="menu-h">{$t('menu.contact')}</h2>
-            <a class="menu-email" href="mailto:info@maiancu.com">info@maiancu.com</a>
-        </section>
+                    <span class="menu-item-text">
+                        <span class="menu-item-name">{$t('menu.allowance')}</span>
+                        <span class="menu-item-hint">{$t('menu.allowance_hint')}</span>
+                    </span>
+                    <svg class="menu-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 6 15 12 9 18" /></svg>
+                </button>
+            </li>
+            <li>
+                <button type="button" class="menu-item" onclick={() => (popup = 'privacy')}>
+                    <span class="menu-icon" aria-hidden="true">
+                        <!-- a shield: how the visitor's data is kept -->
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 6v5.5c0 4.3 3 8 7 9.5 4-1.5 7-5.2 7-9.5V6l-7-3Z" /><polyline points="9 12 11.2 14.2 15 10.2" /></svg>
+                    </span>
+                    <span class="menu-item-text">
+                        <span class="menu-item-name">{$t('menu.privacy')}</span>
+                        <span class="menu-item-hint">{$t('menu.privacy_hint')}</span>
+                    </span>
+                    <svg class="menu-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 6 15 12 9 18" /></svg>
+                </button>
+            </li>
+            <li>
+                <a class="menu-item" href="mailto:info@maiancu.com">
+                    <span class="menu-icon" aria-hidden="true">
+                        <!-- an envelope: write to us -->
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2" /><polyline points="3.5 6.5 12 13 20.5 6.5" /></svg>
+                    </span>
+                    <span class="menu-item-text">
+                        <span class="menu-item-name">{$t('menu.contact')}</span>
+                        <span class="menu-item-hint menu-item-email">info@maiancu.com</span>
+                    </span>
+                </a>
+            </li>
+        </ul>
 
         {#if $session}
             <button
@@ -240,6 +208,8 @@
     </div>
 </aside>
 
-{#if privacyOpen}
-    <PrivacySheet onclose={() => (privacyOpen = false)} />
+{#if popup === 'allowance'}
+    <AllowanceSheet onclose={() => (popup = null)} />
+{:else if popup === 'privacy'}
+    <PrivacySheet onclose={() => (popup = null)} />
 {/if}
