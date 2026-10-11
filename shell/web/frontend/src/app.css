@@ -3063,7 +3063,8 @@ main {
    rails and never shows the pill. */
 .sec-pill,
 .sec-menu,
-.sec-scrim {
+.sec-scrim,
+.sec-hint {
     display: none;
 }
 @media (max-width: 47.99rem) {
@@ -3096,6 +3097,36 @@ main {
         font-size: var(--fs-sm);
         font-weight: 600;
         cursor: pointer;
+    }
+    /* Until the menu is first opened (behavior 72): a ring that swells and fades twice. */
+    .sec-pill-ring {
+        position: absolute;
+        inset: -1px;
+        border: 2px solid var(--accent);
+        border-radius: inherit;
+        pointer-events: none;
+        opacity: 0;
+        animation: sec-pulse 1.4s var(--ease) 2;
+    }
+    .sec-hint {
+        display: block;
+        position: absolute;
+        z-index: 6;
+        left: 50%;
+        bottom: calc(var(--sp-3) + var(--safe-bottom) + 3.6rem);
+        transform: translateX(-50%);
+        width: max-content;
+        max-width: calc(100% - 2rem);
+        margin: 0;
+        padding: 0.45rem 0.8rem;
+        border-radius: var(--radius-pill);
+        background: var(--accent);
+        color: var(--accent-ink);
+        font-size: var(--fs-sm);
+        font-weight: 600;
+        box-shadow: var(--shadow-2);
+        pointer-events: none;
+        animation: sec-hint-in var(--t-med) var(--ease);
     }
     .sec-pill-text {
         overflow: hidden;
@@ -3197,5 +3228,28 @@ main {
     .sec-pill:focus-visible {
         outline: 2px solid var(--accent);
         outline-offset: 2px;
+    }
+}
+@keyframes sec-pulse {
+    0% {
+        opacity: 0.9;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(1.18, 1.45);
+    }
+}
+@keyframes sec-hint-in {
+    from {
+        opacity: 0;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .sec-pill-ring {
+        display: none;
+    }
+    .sec-hint {
+        animation: none;
     }
 }

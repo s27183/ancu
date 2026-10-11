@@ -73,6 +73,7 @@
                               label: $t('sheet.tab.plan'),
                               icon: 'overview' as const,
                               active: tab === 'plan',
+                              tour: 'sections-plan',
                               select: () => (tab = 'plan')
                           }
                       ]
@@ -207,5 +208,5 @@
             {/key}
         {/if}
     </div>
-    <SectionMenu groups={menuGroups} current={menuCurrent} onpick={toTop} />
+    <SectionMenu groups={menuGroups} current={menuCurrent} onpick={toTop} hint={tab === 'zone'} />
 </div>
