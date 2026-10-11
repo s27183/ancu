@@ -819,49 +819,37 @@ export async function setTransactionDates(
     return { kind: 'error', status: res.status };
 }
 
-// --- Usage: current-period tokens/cost (8-S5g, the account page) ------------
-// GET /api/billing/usage — the authenticated user's tier + this-period token usage
-// (billing.md §6/§7), read fresh (no client cache) on each page load.
+// --- Quota: what the visitor can still use for free (behavior 62, the menu) ---
+// GET /api/me/quota — read from the counters the gates claim (fh_shell_h_quota). Never
+// 401: a visitor with no session reads as a guest. Tokens and cost stay internal (the
+// operator's GET /api/billing/usage still serves them); the menu gets counts and a
+// fraction.
 
-/** `limitTokens` is `'unlimited'` for an admin (fh_shell_meter exempts them from the
- *  gate entirely) rather than a numeric cap that would misreport what governs them. */
-export interface UsageSummary {
-    tier: 'free' | 'plus' | 'pro';
-    usedTokens: number;
-    limitTokens: number | 'unlimited';
-    shadowCost: number;
-    periodStart: string;
-    periodEnd: string;
-}
+export type Quota =
+    | { kind: 'guest'; plansToday: { used: number; limit: number }; keepDays: number }
+    | {
+          kind: 'user';
+          questionsToday: { used: number; limit: number } | 'unlimited';
+          allowance: { usedFraction: number; resetsAt: string | null } | 'unlimited';
+      };
 
-export type UsageOutcome =
-    | { kind: 'ok'; usage: UsageSummary }
-    | { kind: 'auth_required' }
-    | { kind: 'error'; status: number };
-
-export async function getUsage(fetchFn: typeof fetch = fetch): Promise<UsageOutcome> {
-    const res = await fetchFn('/api/billing/usage');
-    if (res.ok) {
-        const body = (await res.json()) as {
-            tier: 'free' | 'plus' | 'pro';
-            used_tokens: number;
-            limit_tokens: number | 'unlimited';
-            shadow_cost: number;
-            period_start: string;
-            period_end: string;
-        };
+export async function getQuota(fetchFn: typeof fetch = fetch): Promise<Quota | null> {
+    try {
+        const res = await fetchFn('/api/me/quota');
+        if (!res.ok) return null;
+        const b = await res.json();
+        if (b.kind === 'guest') {
+            return { kind: 'guest', plansToday: b.plans_today, keepDays: b.keep_days };
+        }
         return {
-            kind: 'ok',
-            usage: {
-                tier: body.tier,
-                usedTokens: body.used_tokens,
-                limitTokens: body.limit_tokens,
-                shadowCost: body.shadow_cost,
-                periodStart: body.period_start,
-                periodEnd: body.period_end
-            }
+            kind: 'user',
+            questionsToday: b.questions_today,
+            allowance:
+                b.allowance === 'unlimited'
+                    ? 'unlimited'
+                    : { usedFraction: b.allowance.used_fraction, resetsAt: b.allowance.resets_at }
         };
+    } catch {
+        return null;
     }
-    if (res.status === 401) return { kind: 'auth_required' };
-    return { kind: 'error', status: res.status };
 }

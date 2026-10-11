@@ -551,52 +551,71 @@ body {
     gap: 1rem;
     padding: 1rem;
 }
-.account-user {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-}
-.account-avatar {
-    flex: none;
-    width: 2.5rem;
-    height: 2.5rem;
-    padding: 0.5rem;
-    border-radius: var(--radius-pill);
-    background: var(--accent-soft);
-    color: var(--accent);
-}
-.account-user-email {
-    font-size: var(--fs-sm);
-    color: var(--ink);
-    word-break: break-all;
-}
-
-/* Usage summary (8-S5g) — tier + this-period tokens/cost, inside the account sheet. */
-.account-usage {
+/* The menu (behavior 62) — the free allowance, contact, sign in/out. */
+.menu-quota,
+.menu-contact {
     display: flex;
     flex-direction: column;
     gap: 0.6rem;
+}
+.menu-quota {
     padding: 0.85rem;
     border: 1px solid var(--border);
     border-radius: var(--radius);
     background: var(--bg);
 }
-.account-usage-tier {
+.menu-h {
+    margin: 0;
+    font-size: var(--fs-xs);
     font-weight: 600;
-    font-size: var(--fs-sm);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--muted);
 }
-.account-usage-row {
+.menu-row {
     display: flex;
     justify-content: space-between;
+    align-items: baseline;
     gap: 0.75rem;
     font-size: var(--fs-sm);
 }
-.account-usage-label {
+.menu-row-stack {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.35rem;
+}
+.menu-label {
     color: var(--muted);
 }
-.account-usage-value {
+.menu-value {
     font-variant-numeric: tabular-nums;
     text-align: right;
+    font-weight: 600;
+}
+.menu-bar {
+    height: 0.4rem;
+    border-radius: var(--radius-pill);
+    background: var(--border);
+    overflow: hidden;
+}
+.menu-bar span {
+    display: block;
+    height: 100%;
+    background: var(--accent);
+}
+.menu-note {
+    font-size: var(--fs-xs);
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+}
+.menu-email {
+    font-size: var(--fs-sm);
+    color: var(--accent);
+    text-decoration: none;
+    word-break: break-all;
+}
+.menu-email:hover {
+    text-decoration: underline;
 }
 .account-action {
     display: inline-flex;

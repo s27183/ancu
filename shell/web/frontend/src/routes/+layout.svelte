@@ -10,52 +10,34 @@
     import { t } from '$lib/i18n';
     import { session, sessionLoaded, refreshSession, signOut } from '$lib/stores/session';
     import { loginOpen } from '$lib/stores/ui';
-    import { getUsage, type UsageSummary } from '$lib/api';
-    import { num, date } from '$lib/format';
+    import { getQuota, type Quota } from '$lib/api';
+    import { date } from '$lib/format';
 
     let { children }: { children: import('svelte').Snippet } = $props();
 
     // The account chip lives in the global header now, so learn the session here.
     onMount(refreshSession);
 
-    // The account side-sheet (slides in from the right).
-    let accountOpen = $state(false);
+    // Honest-partial -> P-5 · Metering, not gating -> The web frontend -> the visitor's menu
+    // The side-sheet (slides in from the right) every visitor opens from the header,
+    // signed in or not (behavior 62): what they can still use for free, the privacy
+    // policy, the contact address, and sign in / out — nothing else. The tier, token
+    // counts and infrastructure cost stay internal (GET /api/billing/usage).
+    let menuOpen = $state(false);
 
-    // Usage summary (8-S5g, billing.md §6/§7) — fetched fresh each time the sheet
-    // opens (a low-frequency, cheap read; no point caching a per-visit glance).
-    type UsagePhase = 'idle' | 'loading' | 'ok' | 'error';
-    let usagePhase: UsagePhase = $state('idle');
-    let usage: UsageSummary | null = $state(null);
+    // Fetched fresh each time the menu opens, from the gates' own counters.
+    type QuotaPhase = 'idle' | 'loading' | 'ok' | 'error';
+    let quotaPhase: QuotaPhase = $state('idle');
+    let quota: Quota | null = $state(null);
 
-    const costFormat = $derived(
-        new Intl.NumberFormat($lang === 'vi' ? 'vi-VN' : 'en-AU', {
-            style: 'currency',
-            currency: 'USD',
-            maximumFractionDigits: 2
-        })
-    );
-
-    async function openAccount() {
-        accountOpen = true;
-        usagePhase = 'loading';
-        const out = await getUsage();
-        if (out.kind === 'ok') {
-            usage = out.usage;
-            usagePhase = 'ok';
-        } else {
-            usagePhase = 'error';
-        }
+    async function openMenu() {
+        menuOpen = true;
+        quotaPhase = 'loading';
+        quota = await getQuota();
+        quotaPhase = quota ? 'ok' : 'error';
     }
 
-    function tierKey(
-        tier: UsageSummary['tier']
-    ): 'account.usage.tier.free' | 'account.usage.tier.plus' | 'account.usage.tier.pro' {
-        return tier === 'plus'
-            ? 'account.usage.tier.plus'
-            : tier === 'pro'
-              ? 'account.usage.tier.pro'
-              : 'account.usage.tier.free';
-    }
+    const pct = (f: number) => Math.round(Math.min(1, Math.max(0, f)) * 100);
 </script>
 
 <!-- The tab title is the product name from i18n's one BRAND constant (behavior 17). -->
@@ -95,15 +77,21 @@
         >
     </div>
 
-    <!-- Far-right: signed-in → an account-menu trigger (opens the right sheet);
-         signed-out → a sign-in button. Held back until /api/me resolves. -->
+    <!-- Far-right: signed out → the sign-in button; once /api/me resolves, every visitor
+         gets the menu (behavior 62). Held back until then, so nothing flashes. -->
     <div class="header-right">
-        {#if $session}
+        {#if $sessionLoaded}
+            {#if !$session}
+                <button type="button" class="account-btn" onclick={() => loginOpen.set(true)}
+                    >{$t('auth.signin')}</button
+                >
+            {/if}
             <button
                 type="button"
                 class="account-trigger"
-                aria-label={$t('account.menu')}
-                onclick={openAccount}
+                aria-label={$t('menu.open')}
+                aria-expanded={menuOpen}
+                onclick={openMenu}
             >
                 <svg
                     viewBox="0 0 24 24"
@@ -111,17 +99,13 @@
                     stroke="currentColor"
                     stroke-width="2"
                     stroke-linecap="round"
-                    stroke-linejoin="round"
                     aria-hidden="true"
                 >
-                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-                    <circle cx="12" cy="7" r="4" />
+                    <line x1="4" y1="7" x2="20" y2="7" />
+                    <line x1="4" y1="12" x2="20" y2="12" />
+                    <line x1="4" y1="17" x2="20" y2="17" />
                 </svg>
             </button>
-        {:else if $sessionLoaded}
-            <button type="button" class="account-btn" onclick={() => loginOpen.set(true)}
-                >{$t('auth.signin')}</button
-            >
         {/if}
     </div>
 </header>
@@ -131,85 +115,107 @@
 </main>
 <div class="safe-bottom-glass" aria-hidden="true"></div>
 
-<!-- Account side-sheet — slides in from the right (CSS transform on a solid panel).
-     Always in the DOM for the slide; `inert` + off-screen when closed. -->
-<button
-    type="button"
+<!-- The menu — slides in from the right (CSS transform on a solid panel). -->
+<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
+<div
     class="account-backdrop"
-    class:open={accountOpen}
-    aria-label={$t('sheet.close')}
-    onclick={() => (accountOpen = false)}
-></button>
+    class:open={menuOpen}
+    aria-hidden="true"
+    onclick={() => (menuOpen = false)}
+></div>
 <aside
     class="account-sheet"
-    class:open={accountOpen}
-    inert={!accountOpen}
-    aria-label={$t('account.title')}
+    class:open={menuOpen}
+    inert={!menuOpen}
+    aria-label={$t('menu.title')}
 >
     <header class="account-sheet-head">
-        <span>{$t('account.title')}</span>
+        <span>{$t('menu.title')}</span>
         <button
             type="button"
             class="close"
-            aria-label={$t('sheet.close')}
-            onclick={() => (accountOpen = false)}>✕</button
+            aria-label={$t('menu.close')}
+            onclick={() => (menuOpen = false)}>✕</button
         >
     </header>
     <div class="account-sheet-body">
+        <section class="menu-quota" aria-labelledby="menu-quota-h">
+            <h2 id="menu-quota-h" class="menu-h">{$t('quota.title')}</h2>
+            {#if quotaPhase === 'loading'}
+                <p class="placeholder">{$t('quota.loading')}</p>
+            {:else if quotaPhase === 'error' || !quota}
+                <p class="placeholder">{$t('quota.error')}</p>
+            {:else if quota.kind === 'guest'}
+                <div class="menu-row">
+                    <span class="menu-label">{$t('quota.plans_today')}</span>
+                    <span class="menu-value"
+                        >{$t('quota.left')
+                            .replace('{n}', String(Math.max(0, quota.plansToday.limit - quota.plansToday.used)))
+                            .replace('{of}', String(quota.plansToday.limit))}</span
+                    >
+                </div>
+                <div class="menu-row">
+                    <span class="menu-label">{$t('quota.kept')}</span>
+                    <span class="menu-value"
+                        >{$t('quota.kept_days').replace('{n}', String(quota.keepDays))}</span
+                    >
+                </div>
+                <div class="menu-row">
+                    <span class="menu-label">{$t('quota.assistant')}</span>
+                    <span class="menu-value">{$t('quota.assistant_signin')}</span>
+                </div>
+            {:else}
+                <div class="menu-row">
+                    <span class="menu-label">{$t('quota.questions_today')}</span>
+                    <span class="menu-value">
+                        {#if quota.questionsToday === 'unlimited'}
+                            {$t('quota.unlimited')}
+                        {:else}
+                            {$t('quota.left')
+                                .replace('{n}', String(Math.max(0, quota.questionsToday.limit - quota.questionsToday.used)))
+                                .replace('{of}', String(quota.questionsToday.limit))}
+                        {/if}
+                    </span>
+                </div>
+                <div class="menu-row menu-row-stack">
+                    <span class="menu-label">{$t('quota.allowance')}</span>
+                    {#if quota.allowance === 'unlimited'}
+                        <span class="menu-value">{$t('quota.unlimited')}</span>
+                    {:else}
+                        <div
+                            class="menu-bar"
+                            role="meter"
+                            aria-valuemin="0"
+                            aria-valuemax="100"
+                            aria-valuenow={pct(quota.allowance.usedFraction)}
+                            aria-label={$t('quota.allowance')}
+                        >
+                            <span style="width: {pct(quota.allowance.usedFraction)}%"></span>
+                        </div>
+                        <span class="menu-note"
+                            >{$t('quota.allowance_used').replace('{p}', String(pct(quota.allowance.usedFraction)))}{#if quota.allowance.resetsAt}{' · '}{$t('quota.resets').replace('{d}', date(quota.allowance.resetsAt, $lang) ?? '')}{/if}</span
+                        >
+                    {/if}
+                </div>
+                <div class="menu-row">
+                    <span class="menu-label">{$t('quota.kept')}</span>
+                    <span class="menu-value">{$t('quota.kept_account')}</span>
+                </div>
+            {/if}
+        </section>
+
+        <section class="menu-contact" aria-labelledby="menu-contact-h">
+            <h2 id="menu-contact-h" class="menu-h">{$t('menu.contact')}</h2>
+            <a class="menu-email" href="mailto:info@maiancu.com">info@maiancu.com</a>
+        </section>
+
         {#if $session}
-            <div class="account-user">
-                <svg
-                    class="account-avatar"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    aria-hidden="true"
-                >
-                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-                    <circle cx="12" cy="7" r="4" />
-                </svg>
-                <span class="account-user-email">{$session.email}</span>
-            </div>
-
-            <div class="account-usage">
-                {#if usagePhase === 'loading'}
-                    <p class="placeholder">{$t('account.usage.loading')}</p>
-                {:else if usagePhase === 'error'}
-                    <p class="placeholder">{$t('account.usage.error')}</p>
-                {:else if usagePhase === 'ok' && usage}
-                    <div class="account-usage-tier">{$t(tierKey(usage.tier))}</div>
-                    <div class="account-usage-row">
-                        <span class="account-usage-label">{$t('account.usage.tokens_used')}</span>
-                        <span class="account-usage-value">
-                            {#if usage.limitTokens === 'unlimited'}
-                                {num(usage.usedTokens, $lang)} · {$t('account.usage.tokens_unlimited')}
-                            {:else}
-                                {num(usage.usedTokens, $lang)} / {num(usage.limitTokens, $lang)}
-                            {/if}
-                        </span>
-                    </div>
-                    <div class="account-usage-row">
-                        <span class="account-usage-label">{$t('account.usage.period')}</span>
-                        <span class="account-usage-value">
-                            {date(usage.periodStart, $lang)} – {date(usage.periodEnd, $lang)}
-                        </span>
-                    </div>
-                    <div class="account-usage-row">
-                        <span class="account-usage-label">{$t('account.usage.cost')}</span>
-                        <span class="account-usage-value">{costFormat.format(usage.shadowCost)}</span>
-                    </div>
-                {/if}
-            </div>
-
             <button
                 type="button"
                 class="account-action"
                 onclick={() => {
                     signOut();
-                    accountOpen = false;
+                    menuOpen = false;
                 }}
             >
                 <svg
@@ -227,6 +233,15 @@
                 </svg>
                 {$t('auth.signout')}
             </button>
+        {:else}
+            <button
+                type="button"
+                class="account-action"
+                onclick={() => {
+                    menuOpen = false;
+                    loginOpen.set(true);
+                }}>{$t('auth.signin')}</button
+            >
         {/if}
     </div>
 </aside>

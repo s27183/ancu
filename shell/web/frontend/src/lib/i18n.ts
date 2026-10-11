@@ -1031,8 +1031,6 @@ const messages = {
 
     'auth.signin': { vi: 'Đăng nhập', en: 'Sign in' },
     'auth.signout': { vi: 'Đăng xuất', en: 'Sign out' },
-    'account.title': { vi: 'Tài khoản', en: 'Account' },
-    'account.menu': { vi: 'Menu tài khoản', en: 'Account menu' },
     'auth.title': { vi: `Đăng nhập vào ${BRAND}`, en: `Sign in to ${BRAND}` },
     'auth.email.label': { vi: 'Email', en: 'Email' },
     'auth.email.placeholder': { vi: 'ban@example.com', en: 'you@example.com' },
@@ -1080,24 +1078,30 @@ const messages = {
     'status.ok': { vi: 'Backend đang hoạt động', en: 'Backend is up' },
     'status.fail': { vi: 'Không kết nối được backend', en: 'Backend unreachable' },
 
-    // Usage summary (8-S5g), inside the EXISTING account-sheet (+layout.svelte) —
-    // between the user-email row and the sign-out button. Not a new page: the sheet
-    // is already the account surface.
-    'account.usage.loading': { vi: 'Đang tải…', en: 'Loading…' },
-    'account.usage.error': {
-        vi: 'Không tải được dữ liệu sử dụng.',
-        en: 'Couldn’t load usage data.'
+    // The menu (behavior 62): what the visitor can still use for free, in a buyer's
+    // words — never tokens, tiers or cost. {n} left of {of}; {p} percent; {d} a date.
+    'menu.open': { vi: 'Mở menu', en: 'Open menu' },
+    'menu.close': { vi: 'Đóng menu', en: 'Close menu' },
+    'menu.title': { vi: 'Menu', en: 'Menu' },
+    'menu.contact': { vi: 'Liên hệ', en: 'Contact' },
+    'quota.title': { vi: 'Bạn được dùng miễn phí', en: 'Your free allowance' },
+    'quota.loading': { vi: 'Đang tải…', en: 'Loading…' },
+    'quota.error': {
+        vi: 'Chưa tải được hạn mức. Vui lòng thử lại sau.',
+        en: 'Couldn’t load your allowance. Please try again later.'
     },
-    'account.usage.tier.free': { vi: 'Miễn phí', en: 'Free' },
-    'account.usage.tier.plus': { vi: 'Plus', en: 'Plus' },
-    'account.usage.tier.pro': { vi: 'Pro', en: 'Pro' },
-    'account.usage.tokens_used': { vi: 'Token đã dùng kỳ này', en: 'Tokens used this period' },
-    'account.usage.tokens_unlimited': {
-        vi: 'không giới hạn (quản trị viên)',
-        en: 'unlimited (admin)'
-    },
-    'account.usage.period': { vi: 'Kỳ hiện tại', en: 'Current period' },
-    'account.usage.cost': { vi: 'Chi phí hạ tầng ước tính', en: 'Estimated infrastructure cost' },
+    'quota.left': { vi: 'Còn {n}/{of}', en: '{n} of {of} left' },
+    'quota.plans_today': { vi: 'Kế hoạch mới hôm nay', en: 'New plans today' },
+    'quota.kept': { vi: 'Kế hoạch được lưu', en: 'Your plans are kept' },
+    'quota.kept_days': { vi: '{n} ngày', en: 'for {n} days' },
+    'quota.kept_account': { vi: 'Cùng tài khoản của bạn', en: 'With your account' },
+    'quota.assistant': { vi: 'Trợ lý AI', en: 'AI assistant' },
+    'quota.assistant_signin': { vi: 'Cần đăng nhập', en: 'Sign in to use' },
+    'quota.questions_today': { vi: 'Câu hỏi cho trợ lý AI hôm nay', en: 'AI assistant questions today' },
+    'quota.allowance': { vi: 'Hạn mức AI tháng này', en: 'This month’s AI allowance' },
+    'quota.allowance_used': { vi: 'Đã dùng {p}%', en: '{p}% used' },
+    'quota.resets': { vi: 'làm mới ngày {d}', en: 'renews {d}' },
+    'quota.unlimited': { vi: 'Không giới hạn', en: 'Unlimited' },
 
     // KB-news ticker (kb-news-feature.md, task 29): the sticky strip cycling relevant,
     // non-dismissed news notes above the lifecycle sub-tab rail.
