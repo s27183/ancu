@@ -147,6 +147,12 @@
     /* The header's full height: its bar plus the notch it extends up into. Everything
        placed below the header offsets by this. */
     --header-total: calc(var(--header-h) + var(--safe-top));
+    /* One height for every sheet in planning on a phone — the suburb/plan sheet, each
+       popup at any depth and the "Vì sao Úc?" card it was taken from: 94% of the
+       visible screen (behavior 66, Son 2026-10-11). dvh follows Safari's toolbar the
+       way a fixed inset:0 box does; vh is the fallback. */
+    --sheet-h: 94vh;
+    --sheet-h: 94dvh;
 }
 
 /* The shared glass surface — one rule every floating control opts into. */
@@ -519,7 +525,12 @@ body {
     border-color: var(--border-strong);
 }
 
-/* Account side-sheet — slides in from the right edge (CSS transform; solid panel). */
+/* Account side-sheet — slides in from the right edge (CSS transform; solid panel).
+   Buyer-on-a-phone -> the visitor's menu -> app.css -> full height: a fixed layer from
+   top 0 to bottom 0 above the header, so with viewport-fit=cover its surface fills the
+   strip under the notch and the area behind Safari's address bar on its side; its head
+   is padded by the top inset and its body by the bottom inset so the title, ✕ and last
+   item stay clear of both (behavior 69, Son 2026-10-11). */
 .account-backdrop {
     position: fixed;
     inset: 0;
@@ -557,7 +568,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.9rem 1rem;
+    padding: calc(0.9rem + var(--safe-top)) 1rem 0.9rem;
     border-bottom: 1px solid var(--border);
     font-weight: 700;
     color: var(--ink);
@@ -588,7 +599,10 @@ body {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    padding: 1rem;
+    padding: 1rem 1rem calc(1rem + var(--safe-bottom));
+    overflow-y: auto;
+    flex: 1 1 auto;
+    min-height: 0;
 }
 /* The menu's popup frame (InfoSheet, behaviors 62/64) — above the menu, centred on
    wide screens, a bottom sheet on phones; the body scrolls inside it. */
@@ -1268,7 +1282,7 @@ main {
     left: 0;
     right: 0;
     bottom: 0;
-    height: 75%;
+    height: var(--sheet-h); /* the one sheet height (behavior 66); was 75% */
     padding-bottom: var(--safe-bottom); /* the body's last tile clears the home indicator */
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
@@ -1346,6 +1360,23 @@ main {
     min-height: 0;
     padding: var(--sp-4) var(--sp-5) var(--sp-6);
     overflow-y: auto;
+    /* Buyer-on-a-phone -> the plan sheet -> app.css -> up-down only: with overflow-y
+       auto and no overflow-x, overflow-x computed auto, so one child a few px too wide
+       let a swipe slide the whole body — rails and fields — off to the left (behavior
+       67, Son 2026-10-11). hidden, not clip: clip beside auto computes hidden anyway. */
+    overflow-x: hidden;
+    overscroll-behavior-x: none;
+}
+/* No field or control inside a sheet or popup is wider than its box: a select sizes to
+   its longest option by default, and a long Vietnamese option pushed past the body. */
+.sheet .body :is(input, select, textarea),
+.mo-body :is(input, select, textarea) {
+    max-width: 100%;
+    min-width: 0;
+}
+.sheet .body select,
+.mo-body select {
+    text-overflow: ellipsis;
 }
 .sheet-head .state-chip {
     display: inline-block;
@@ -1450,16 +1481,10 @@ main {
         max-height: 85dvh;
         border-radius: var(--radius-lg);
         border: 1px solid var(--glass-border);
-        animation: modal-in var(--t-med) var(--ease);
+        /* opened/closed by lib/sheetMotion.ts (behavior 66), not a keyframe */
     }
     .sheet-handle {
         display: none;
-    }
-}
-@keyframes modal-in {
-    from {
-        opacity: 0;
-        transform: translate(-50%, calc(-50% + 0.5rem));
     }
 }
 
@@ -1505,15 +1530,14 @@ main {
     display: flex;
     align-items: flex-end;
     justify-content: center;
-    background: var(--scrim);
-    backdrop-filter: blur(2px);
+    background: var(--scrim); /* no backdrop-filter (behavior 66, lib/sheetMotion.ts) */
 }
 .onboarding {
     /* SOLID, not glass — same backdrop-filter + transform (modalCard) compositing bug
        as the sheet; and forms read better on a solid surface. */
     background: var(--surface);
     width: 100%;
-    max-height: 88%;
+    height: var(--sheet-h); /* the one sheet height on a phone (behavior 66) */
     display: flex;
     flex-direction: column;
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
@@ -1546,6 +1570,8 @@ main {
     transition: background var(--t-fast) var(--ease);
 }
 .ob-body {
+    flex: 1 1 auto;
+    min-height: 0;
     padding: var(--sp-2) var(--sp-4) var(--sp-4);
     overflow-y: auto;
     /* each question its own group: the gap, not a fieldset's padding, separates them */
@@ -1672,6 +1698,7 @@ main {
     }
     .onboarding {
         max-width: 26rem;
+        height: auto;
         max-height: 80%;
         border-radius: var(--radius-lg);
     }

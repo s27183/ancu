@@ -11,6 +11,7 @@
     import { tourEvent } from '$lib/tour';
     import SectionMenu from '$lib/SectionMenu.svelte';
     import { provideSections, type SectionGroup } from '$lib/sections.svelte';
+    import { sheetMotion } from '$lib/sheetMotion';
 
     let { suburb, onclose, onplan, reloadPlan = 0 }: {
         suburb: Suburb;
@@ -104,7 +105,7 @@
     }
 </script>
 
-<div class="sheet" role="dialog" aria-modal="false" aria-label={suburb.name}>
+<div class="sheet" role="dialog" aria-modal="false" aria-label={suburb.name} transition:sheetMotion|global>
     <header class="sheet-head">
         <div class="title">
             <h2>{suburb.name} <span class="state-chip">{suburb.state}</span></h2>

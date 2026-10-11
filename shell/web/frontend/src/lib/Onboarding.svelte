@@ -19,6 +19,7 @@
     } from '$lib/onboarding';
     import { t } from '$lib/i18n';
     import { lang } from '$lib/stores/lang';
+    import { sheetMotion, scrimMotion } from '$lib/sheetMotion';
     import type { OnboardingAnswers } from '$lib/pendingOnboarding';
 
     let { stateCode, suburbName, suburbSal, initial, onclose, onsignin, oncreated }: {
@@ -144,8 +145,8 @@
     }
 </script>
 
-<div class="ob-backdrop">
-<div class="onboarding" role="dialog" aria-modal="true" aria-label={suburbName}>
+<div class="ob-backdrop" transition:scrimMotion|global>
+<div class="onboarding" role="dialog" aria-modal="true" aria-label={suburbName} transition:sheetMotion|global>
     <header class="ob-head">
         <h2>{$t('onboarding.title')} {suburbName}</h2>
         <button type="button" class="close" onclick={close} aria-label={$t('sheet.close')}
