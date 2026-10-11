@@ -9,7 +9,7 @@
     import { lang } from '$lib/stores/lang';
     import PlanProjection from '$lib/PlanProjection.svelte';
     import { tourEvent } from '$lib/tour';
-    import { sheetMotion } from '$lib/sheetMotion';
+    import { sheetMotion, scrimMotion } from '$lib/sheetMotion';
 
     let { suburb, onclose, onplan, reloadPlan = 0 }: {
         suburb: Suburb;
@@ -56,6 +56,16 @@
     }
 </script>
 
+<!-- The veil behind the sheet (behavior 71): dims the map as "Vì sao Úc?" dims the page;
+     a tap on it closes the sheet. Not in the tab order — the ✕ and Esc are the keyboard way. -->
+<button
+    type="button"
+    class="sheet-scrim"
+    tabindex="-1"
+    aria-label={$t('sheet.close')}
+    onclick={onclose}
+    transition:scrimMotion|global
+></button>
 <div class="sheet" role="dialog" aria-modal="false" aria-label={suburb.name} transition:sheetMotion|global>
     <header class="sheet-head">
         <div class="title">
