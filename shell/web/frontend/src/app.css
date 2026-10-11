@@ -3011,3 +3011,148 @@ main {
     background: var(--border);
     color: var(--ink);
 }
+
+/* --- The plan sheet's floating section menu (behavior 68) ------------------------
+   Buyer-on-a-phone -> the plan sheet -> sections from one menu: on a phone the three
+   stacked rails (.sheet .tabs, the plan's .pp-sticky-top, the budget's sub-rail) give
+   way to a pill at the sheet's foot that opens every section (SectionMenu.svelte,
+   sections.svelte.ts); the space they took goes to the content. Desktop keeps the
+   rails and never shows the pill. */
+.sec-pill,
+.sec-menu,
+.sec-scrim {
+    display: none;
+}
+@media (max-width: 47.99rem) {
+    .sheet .tabs,
+    .sheet .pp-sticky-top,
+    .sheet .pp-budget-rail {
+        display: none;
+    }
+    /* the last line scrolls clear of the pill */
+    .sheet .body {
+        padding-bottom: calc(var(--sp-6) + 3.75rem);
+    }
+    .sec-pill {
+        position: absolute;
+        z-index: 6;
+        left: 50%;
+        bottom: calc(var(--sp-3) + var(--safe-bottom));
+        transform: translateX(-50%);
+        max-width: calc(100% - 2rem);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.6rem 1rem 0.6rem 1.1rem;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-pill);
+        background: var(--surface);
+        box-shadow: var(--shadow-2);
+        color: var(--ink);
+        font: inherit;
+        font-size: var(--fs-sm);
+        font-weight: 600;
+        cursor: pointer;
+    }
+    .sec-pill-text {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+    .sec-pill-caret {
+        flex: none;
+        color: var(--muted);
+    }
+    .sec-pill[aria-expanded='true'] .sec-pill-caret {
+        transform: rotate(180deg);
+    }
+    .sec-scrim {
+        display: block;
+        position: absolute;
+        inset: 0;
+        z-index: 7;
+        border: none;
+        padding: 0;
+        background: rgb(19 36 58 / 0.18);
+        cursor: default;
+    }
+    .sec-menu {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        z-index: 8;
+        left: var(--sp-4);
+        right: var(--sp-4);
+        bottom: calc(var(--sp-3) + var(--safe-bottom) + 3.4rem);
+        max-height: 70%;
+        overflow-y: auto;
+        padding: var(--sp-2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        background: var(--surface);
+        box-shadow: var(--shadow-3);
+    }
+    .sec-group {
+        margin: var(--sp-2) var(--sp-3) var(--sp-1);
+        font-size: var(--fs-xs);
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--muted);
+    }
+    .sec-item {
+        display: flex;
+        align-items: center;
+        gap: var(--sp-3);
+        width: 100%;
+        min-height: 2.75rem;
+        padding: 0.5rem var(--sp-3);
+        border: none;
+        border-radius: var(--radius-sm);
+        background: transparent;
+        color: var(--ink);
+        font: inherit;
+        font-size: var(--fs-md);
+        text-align: left;
+        cursor: pointer;
+    }
+    .sec-item.nested {
+        min-height: 2.5rem;
+        padding-left: calc(var(--sp-3) + 1.6rem);
+        font-size: var(--fs-sm);
+        color: var(--ink-2);
+    }
+    .sec-item.active {
+        background: var(--accent-soft);
+        color: var(--accent);
+        font-weight: 600;
+    }
+    .sec-item.accent {
+        color: var(--accent);
+        font-weight: 600;
+    }
+    .sec-icon {
+        flex: none;
+        color: var(--muted);
+    }
+    .sec-item.active .sec-icon,
+    .sec-item.accent .sec-icon {
+        color: var(--accent);
+    }
+    .sec-icon-sub {
+        display: none;
+    }
+    .sec-label {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+    .sec-check {
+        flex: none;
+        font-size: var(--fs-sm);
+    }
+    .sec-item:focus-visible,
+    .sec-pill:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+    }
+}

@@ -50,6 +50,7 @@
     import Chat from '$lib/Chat.svelte';
     import QaIntro from '$lib/QaIntro.svelte';
     import Sparkle from '$lib/Sparkle.svelte';
+    import { useSections, type SectionGroup, type SectionIcon, type SectionItem } from '$lib/sections.svelte';
     import { guest } from '$lib/stores/session';
     import { loginOpen } from '$lib/stores/ui';
     import Modal from '$lib/Modal.svelte';
@@ -603,6 +604,95 @@
     // cross_border_funding, yield and non-resident tax the same way). The breakdown sub-tab
     // now draws them below the Calculator; cash_position and disposition keep their own
     // sub-tabs, and an uncomputed card is skipped, not shown pending (behavior 11).
+    // The phone's section menu (behavior 68, sections.svelte.ts): the same tabs the
+    // rails show, from the same `sub`/`budgetSub`, grouped as the rails group them; the
+    // budget's sub-tabs listed under it; the assistant last, in its accent.
+    const sectionReg = useSections();
+    const SECTION_ICON: Record<string, SectionIcon> = {
+        overview: 'overview',
+        flow: 'flow',
+        budget: 'budget',
+        portfolio: 'portfolio',
+        family: 'family'
+    };
+    function railItems(tabs: UiTab[]): SectionItem[] {
+        return tabs.flatMap((tb) => {
+            const item: SectionItem = {
+                id: tb.tab_id,
+                label: $t(`plan.ltab.${tb.tab_id}` as 'plan.ltab.overview'),
+                icon: SECTION_ICON[tb.tab_id] ?? 'overview',
+                active: sub === tb.tab_id || (!sub && tb === uiTabs[0]),
+                select: () => (sub = tb.tab_id)
+            };
+            if (!(tb.interactive && viewComponents.cash_position)) return [item];
+            return [
+                { ...item, parent: true },
+                ...budgetTabs.map((bt) => ({
+                    id: `${tb.tab_id}:${bt.id}`,
+                    label: bt.label,
+                    icon: 'sub' as const,
+                    nested: true,
+                    active: item.active && budgetSub === bt.id,
+                    select: () => {
+                        sub = tb.tab_id;
+                        budgetSub = bt.id;
+                    }
+                }))
+            ];
+        });
+    }
+    const sectionGroups = $derived.by<SectionGroup[]>(() => {
+        if (railTabs.length === 0) return [];
+        const planLabel = $t('sheet.tab.plan');
+        const groups: SectionGroup[] = railGrouped
+            ? [
+                  { id: 'plan', label: planLabel, items: overviewTab ? railItems([overviewTab]) : [] },
+                  ...(['buy', 'hold'] as const).map((g) => ({
+                      id: g,
+                      label: $t(`plan.railgroup.${g}` as 'plan.railgroup.buy'),
+                      items: railItems(
+                          nonOverviewRailTabs.filter((tb) => (TAB_GROUP[tb.tab_id] ?? 'buy') === g)
+                      )
+                  }))
+              ]
+            : [{ id: 'plan', label: planLabel, items: railItems(railTabs) }];
+        groups.push({
+            id: 'qa',
+            items: [
+                {
+                    id: 'qa',
+                    label: $t('plan.tab.qa'),
+                    icon: 'qa',
+                    accent: true,
+                    active: sub === 'qa',
+                    select: () => (sub = 'qa')
+                }
+            ]
+        });
+        return groups;
+    });
+    const sectionCurrent = $derived.by(() => {
+        if (sub === 'qa') return $t('plan.tab.qa_short');
+        if (!activeTab) return '';
+        if (activeTab.interactive && viewComponents.cash_position)
+            return budgetTabs.find((bt) => bt.id === budgetSub)?.label ?? '';
+        return $t(`plan.ltab.${activeTab.tab_id}` as 'plan.ltab.overview');
+    });
+    $effect(() => {
+        if (!sectionReg) return;
+        sectionReg.plan = sectionGroups;
+        sectionReg.current = sectionCurrent;
+    });
+    $effect(() => {
+        const reg = sectionReg;
+        return () => {
+            if (reg) {
+                reg.plan = [];
+                reg.current = '';
+            }
+        };
+    });
+
     const budgetCards = $derived(
         (activeTab?.interactive ? activeTab.components : []).filter(
             (cid) => cid !== 'cash_position' && cid !== 'disposition' && viewComponents[cid]
@@ -1227,7 +1317,9 @@
                  The interactive tab is [cash_position]; any other component falls through. -->
             <section class="pp-card pp-calc pp-flat">
                 {#if viewComponents.cash_position}
-                    <Tabs tabs={budgetTabs} active={budgetSub} onSelect={(id) => (budgetSub = id)} />
+                    <div class="pp-budget-rail">
+                        <Tabs tabs={budgetTabs} active={budgetSub} onSelect={(id) => (budgetSub = id)} />
+                    </div>
 
                     {#if budgetSub === 'ready'}
                         {#if viewingProperty}
