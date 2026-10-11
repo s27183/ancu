@@ -53,6 +53,7 @@ const messages = {
     'sheet.tab.zone': { vi: 'Dữ liệu khu vực', en: 'Zone data' },
     'sheet.tab.plan': { vi: 'Kế hoạch', en: 'Plan' },
     'sheet.close': { vi: 'Đóng', en: 'Close' },
+    'sheet.sections': { vi: 'Các mục', en: 'Sections' },
     'sheet.viet': { vi: 'Cộng đồng gốc Việt', en: 'Vietnamese community' },
     'sheet.seifa': { vi: 'Chỉ số kinh tế – xã hội (SEIFA)', en: 'Socio-economic (SEIFA)' },
     'sheet.seifa.note': {

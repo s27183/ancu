@@ -9,6 +9,8 @@
     import { lang } from '$lib/stores/lang';
     import PlanProjection from '$lib/PlanProjection.svelte';
     import { tourEvent } from '$lib/tour';
+    import SectionMenu from '$lib/SectionMenu.svelte';
+    import { provideSections, type SectionGroup } from '$lib/sections.svelte';
 
     let { suburb, onclose, onplan, reloadPlan = 0 }: {
         suburb: Suburb;
@@ -41,6 +43,53 @@
             tab = 'plan';
         }
     });
+
+    // The phone's floating section menu (behavior 68): Khu vực, then the plan's own
+    // groups once the plan is shown (PlanProjection publishes them), or one "Kế hoạch"
+    // entry while the zone tab is up.
+    const sections = provideSections();
+    const menuGroups = $derived<SectionGroup[]>([
+        {
+            id: 'zone',
+            items: [
+                {
+                    id: 'zone',
+                    label: $t('sheet.tab.zone'),
+                    icon: 'zone',
+                    active: tab === 'zone',
+                    select: () => (tab = 'zone')
+                }
+            ]
+        },
+        ...(tab === 'plan' && sections.plan.length > 0
+            ? sections.plan
+            : [
+                  {
+                      id: 'plan',
+                      items: [
+                          {
+                              id: 'plan',
+                              label: $t('sheet.tab.plan'),
+                              icon: 'overview' as const,
+                              active: tab === 'plan',
+                              select: () => (tab = 'plan')
+                          }
+                      ]
+                  }
+              ])
+    ]);
+    const menuCurrent = $derived(
+        tab === 'zone'
+            ? $t('sheet.tab.zone')
+            : sections.current
+              ? `${$t('sheet.tab.plan')} · ${sections.current}`
+              : $t('sheet.tab.plan')
+    );
+    let bodyEl: HTMLDivElement | undefined = $state();
+    // A section picked from the menu starts at its top, as a tab tap shows it.
+    function toTop() {
+        bodyEl?.scrollTo({ top: 0 });
+    }
 
     // The tour (behavior 52) follows which tab is shown.
     $effect(() => {
@@ -86,7 +135,7 @@
         >
     </div>
 
-    <div class="body" data-tour={tab === 'plan' ? 'plan' : undefined}>
+    <div class="body" data-tour={tab === 'plan' ? 'plan' : undefined} bind:this={bodyEl}>
         {#if tab === 'zone'}
             <div class="metrics">
                 <!-- Vietnamese community — the killer metric, surfaced first + emphasised. -->
@@ -147,4 +196,5 @@
             {/key}
         {/if}
     </div>
+    <SectionMenu groups={menuGroups} current={menuCurrent} onpick={toTop} />
 </div>
