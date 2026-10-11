@@ -18,6 +18,7 @@
 -export([claim_question/2, release_question/2]).
 -export([create_guest/0, claim_guest/2]).
 -export([claim_guest_create/3, release_guest_create/3]).
+-export([questions_today/1, guest_creates_today/2]).
 -export([expired_guests/1, delete_guest/1, prune_guest_creates/0]).
 
 %% --- identity (login flow) --------------------------------------------------
@@ -379,6 +380,31 @@ release_guest_create(Kind, Key, Day) ->
         "WHERE kind = $1 AND key = $2 AND day = $3::text::date AND n > 0",
         [atom_to_binary(Kind), Key, Day]),
     ok.
+
+%% The visitor's menu reads these (behavior 62): the same rows the two claims above
+%% write, for today in Sydney, so the menu shows what the gates will allow, never a
+%% second count. No row yet reads as 0.
+-spec questions_today(binary()) -> non_neg_integer().
+questions_today(UserId) ->
+    case query(
+        "SELECT n FROM qa_daily_asks "
+        "WHERE user_id = $1::uuid AND day = (now() AT TIME ZONE 'Australia/Sydney')::date",
+        [UserId])
+    of
+        #{rows := [{N}]} -> N;
+        #{rows := []}    -> 0
+    end.
+
+-spec guest_creates_today(guest | addr, binary()) -> non_neg_integer().
+guest_creates_today(Kind, Key) ->
+    case query(
+        "SELECT n FROM guest_daily_creates "
+        "WHERE kind = $1 AND key = $2 AND day = (now() AT TIME ZONE 'Australia/Sydney')::date",
+        [atom_to_binary(Kind), Key])
+    of
+        #{rows := [{N}]} -> N;
+        #{rows := []}    -> 0
+    end.
 
 next_sydney_midnight() ->
     #{rows := [{T}]} = query(

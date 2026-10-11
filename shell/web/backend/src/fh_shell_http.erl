@@ -65,6 +65,7 @@ routes() ->
         {"/api/auth/logout", fh_shell_h_auth, [logout]},
         {"/api/auth/google", fh_shell_h_auth, [google_start]},
         {"/api/auth/google/callback", fh_shell_h_auth, [google_callback]},
+        {"/api/me/quota", fh_shell_h_quota, []},
         {"/api/me", fh_shell_h_me, []},
         %% Commerce (8-S5e/8-S5f, billing.md §9). The webhook is Stripe-signed, not
         %% user-authenticated; subscribe (8-S5e-3) and charge (8-S5f) act on the
