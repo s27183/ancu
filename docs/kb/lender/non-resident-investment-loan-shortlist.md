@@ -1,10 +1,10 @@
 ---
 slug: kb.lender.non-resident-investment-loan-shortlist
 effective_from: 2025-07-01
-last_verified: 2026-07-06
+last_verified: 2026-10-11
 sources:
   - url: https://www.canstar.com.au/home-loans/non-resident-home-loans/
-    retrieved: 2026-07-06
+    retrieved: 2026-10-11
     note: "Non-resident lender pool is small (a select few, mostly non-banks) and priced higher — context for the narrowest combined non-resident+investor pool. The rate-premium band (100-200bp) and the criteria framing remain FirstHomey editorial / unverified-this-pass conventions, as the doc itself flags — a live broker quote is required"
 ---
 
