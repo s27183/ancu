@@ -1,0 +1,74 @@
+# Regulated figures are grounded -> P-7 -> The KB update -> a verified KB update publishes itself; the rest is held for Son
+# Behavior 74 (Son 2026-10-12). On every kb-watch PR (branch kb-watch-*): wait for the
+# required "done checks" on its head, ask scripts/kb_gate.py whether the PR may merge
+# itself (its block says when), and say so in one comment it keeps up to date. LIVE is
+# "no" while the gate is proven (a dry run only comments); turning it to "yes" is the
+# Irreversible step of behavior 74 — from then on a merge here deploys (deployment.md:
+# main deploys on push), and setting it back to "no" is the way back.
+name: kb gate
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, reopened, synchronize, labeled, unlabeled]
+
+env:
+  LIVE: "no"
+
+# contents: write joins these when LIVE turns "yes" (the merge needs it).
+permissions:
+  contents: read
+  pull-requests: write
+  checks: read
+
+concurrency:
+  group: kb-gate-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  gate:
+    if: startsWith(github.head_ref, 'kb-watch-')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PR: ${{ github.event.pull_request.number }}
+      HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      BASE_SHA: ${{ github.event.pull_request.base.sha }}
+      BRANCH: ${{ github.head_ref }}
+      LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      # The done checks run in their own workflow on the same head; wait for their result.
+      - name: Wait for the done checks
+        id: checks
+        run: |
+          ok=no
+          for i in $(seq 1 90); do
+            res=$(gh api "repos/${{ github.repository }}/commits/$HEAD_SHA/check-runs?check_name=done%20checks" \
+                    --jq '[.check_runs[] | select(.status=="completed") | .conclusion] | first // ""')
+            if [ -n "$res" ]; then [ "$res" = success ] && ok=yes; break; fi
+            sleep 30
+          done
+          echo "ok=$ok" >> "$GITHUB_OUTPUT"
+
+      - name: Decide
+        run: |
+          python3 scripts/kb_gate.py --base "$BASE_SHA" --head "$HEAD_SHA" --branch "$BRANCH" \
+            --labels "$LABELS" --checks-ok "${{ steps.checks.outputs.ok }}" --live "$LIVE" --out "$RUNNER_TEMP/gate"
+          echo "decision=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["decision"])' "$RUNNER_TEMP/gate/decision.json")" >> "$GITHUB_ENV"
+
+      - name: Comment
+        run: gh pr comment "$PR" --edit-last --body-file "$RUNNER_TEMP/gate/comment.md" || gh pr comment "$PR" --body-file "$RUNNER_TEMP/gate/comment.md"
+
+      - name: Merge
+        if: env.LIVE == 'yes' && env.decision == 'merge'
+        run: gh pr merge "$PR" --merge --match-head-commit "$HEAD_SHA"

@@ -77,9 +77,10 @@ def parse_sources(text: str) -> list[dict]:
     return out
 
 
-def doc_fails(path: Path, text: str | None = None) -> list[str]:
-    """Why a doc's quotes do not hold, one line each; [] if they hold. `text` stands
-    in for the file's content (the gate checks a doc as the PR's head has it)."""
+def doc_fails(path: Path, text: str | None = None, copy_text=None) -> list[str]:
+    """Why a doc's quotes do not hold, one line each; [] if they hold. `text` and
+    `copy_text(path) -> str | None` stand in for reading the doc and its saved copies
+    from the working tree (the gate reads both as the PR's head commit has them)."""
     rel = path.relative_to(ROOT) if path.is_absolute() and ROOT in path.parents else path
     out = []
     for i, src in enumerate(parse_sources(text if text is not None else path.read_text())):
@@ -96,7 +97,7 @@ def doc_fails(path: Path, text: str | None = None) -> list[str]:
         if f.suffix not in TEXT_SUFFIXES:
             out.append(f"{where}: {sp} is not text ({', '.join(sorted(TEXT_SUFFIXES))}); save a PDF as its extracted text")
             continue
-        text = archived_text(f)
+        text = copy_text(sp) if copy_text else archived_text(f)
         if text is None:
             out.append(f"{where}: saved copy {sp} not found")
             continue
