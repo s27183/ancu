@@ -4,7 +4,10 @@ effective_from: 2025-07-01
 last_verified: 2026-07-06
 sources:
   - url: https://www.sro.vic.gov.au/rates-taxes-duties-and-levies/foreign-purchaser-additional-duty-current-rates
-    retrieved: 2026-07-06
+    retrieved: 2026-10-12
+    path: docs/sources/sro-vic/fpad.txt
+    quotes:
+      - "The foreign purchaser additional duty rate is 9% of the dutiable value"
   - url: https://qro.qld.gov.au/duties/investors/afad/
     retrieved: 2026-07-06
   - url: https://www.wa.gov.au/government/publications/foreign-transfer-duty
@@ -33,7 +36,7 @@ A foreign person pays an **additional transfer-duty surcharge** on residential p
 | State | Foreign purchaser duty surcharge | Effective | Source tier |
 |---|---|---|---|
 | **NSW** | **9%** (surcharge purchaser duty) | increased from 8% on **1 Jan 2025** — the highest in Australia | PRIMARY (Revenue NSW) |
-| **VIC** | **8%** (foreign purchaser additional duty) | stable | PRIMARY (SRO VIC) |
+| **VIC** | **9%** (foreign purchaser additional duty) | stable | PRIMARY (SRO VIC) |
 | **QLD** | **8%** (AFAD residential) | increased from 7% on **1 Jul 2024** (aligning with NSW/VIC) | PRIMARY (QRO — 3% 2016–18, 7% 2018–24, 8% from 1 Jul 2024) |
 | **WA** | **7%** (foreign transfer duty) | stable | PRIMARY (RevenueWA) |
 | **SA** | **7%** (foreign ownership surcharge) | stable | PRIMARY (RevenueSA) |
