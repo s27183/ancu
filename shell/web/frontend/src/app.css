@@ -533,12 +533,13 @@ body {
 }
 
 /* Account side-sheet — slides in from the right edge (CSS transform; solid panel).
-   Buyer-on-a-phone -> the visitor's menu -> app.css -> one full-screen white surface on a
+   Buyer-on-a-phone -> the visitor's menu -> app.css -> one white panel, notch to address bar, on a
    phone: a fixed layer from top 0 to bottom 0 above the header, its head padded by the
    top inset and its body by the bottom inset so the title, ✕ and last item clear the
    notch and the address bar. Safari 26 does not draw a one-sided panel under its own
    bars: it tints the status and bottom-bar strips itself, one colour across the full
-   width (Son's screenshot 2026-10-12). So at phone width the sheet is full width and,
+   width (Son's screenshot 2026-10-12). So at phone width the sheet covers two thirds of
+   the width (Son 2026-10-12), the left third dimmed below the header, and,
    while it is open, html.menu-open retints everything Safari samples — --chrome (header
    and home strip), the page ground and theme-color (+layout.svelte) — to --surface;
    closing restores them. Wider screens keep the side panel (behavior 69, revised). */
@@ -577,7 +578,7 @@ body {
 }
 @media (max-width: 520px) {
     .account-sheet {
-        width: 100vw;
+        width: calc(100vw * 2 / 3);
     }
     html.menu-open {
         --chrome: var(--surface);
