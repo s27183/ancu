@@ -1,6 +1,6 @@
 -module(fh_shell_h_quota).
 
-%% Visitor quota -> P-5 · Metering, not gating -> The shell backend -> GET /api/me/quota
+%% Honest-partial -> P-5 · Metering, not gating -> The shell backend -> GET /api/me/quota
 %% What the visitor can still use for free, for the menu (behavior 62). It reads the
 %% counters the gates themselves claim, never a second count:
 %%   signed out (no session, or a guest session): new plans left today, from
