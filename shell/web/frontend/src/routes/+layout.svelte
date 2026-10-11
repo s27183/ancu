@@ -11,6 +11,7 @@
     import { session, sessionLoaded, refreshSession, signOut } from '$lib/stores/session';
     import { loginOpen } from '$lib/stores/ui';
     import { getQuota, type Quota } from '$lib/api';
+    import PrivacySheet from '$lib/PrivacySheet.svelte';
     import { date } from '$lib/format';
 
     let { children }: { children: import('svelte').Snippet } = $props();
@@ -24,6 +25,7 @@
     // policy, the contact address, and sign in / out — nothing else. The tier, token
     // counts and infrastructure cost stay internal (GET /api/billing/usage).
     let menuOpen = $state(false);
+    let privacyOpen = $state(false);
 
     // Fetched fresh each time the menu opens, from the gates' own counters.
     type QuotaPhase = 'idle' | 'loading' | 'ok' | 'error';
@@ -199,10 +201,14 @@
                 </div>
                 <div class="menu-row">
                     <span class="menu-label">{$t('quota.kept')}</span>
-                    <span class="menu-value">{$t('quota.kept_account')}</span>
+                    <span class="menu-value menu-value-wrap">{$t('quota.kept_account')}</span>
                 </div>
             {/if}
         </section>
+
+        <button type="button" class="menu-link" onclick={() => (privacyOpen = true)}
+            >{$t('menu.privacy')}</button
+        >
 
         <section class="menu-contact" aria-labelledby="menu-contact-h">
             <h2 id="menu-contact-h" class="menu-h">{$t('menu.contact')}</h2>
@@ -245,3 +251,7 @@
         {/if}
     </div>
 </aside>
+
+{#if privacyOpen}
+    <PrivacySheet onclose={() => (privacyOpen = false)} />
+{/if}

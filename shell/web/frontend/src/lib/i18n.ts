@@ -1084,6 +1084,7 @@ const messages = {
     'menu.close': { vi: 'Đóng menu', en: 'Close menu' },
     'menu.title': { vi: 'Menu', en: 'Menu' },
     'menu.contact': { vi: 'Liên hệ', en: 'Contact' },
+    'menu.privacy': { vi: 'Chính sách quyền riêng tư', en: 'Privacy policy' },
     'quota.title': { vi: 'Bạn được dùng miễn phí', en: 'Your free allowance' },
     'quota.loading': { vi: 'Đang tải…', en: 'Loading…' },
     'quota.error': {

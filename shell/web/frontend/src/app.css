@@ -525,7 +525,8 @@ body {
     font-weight: 700;
     color: var(--ink);
 }
-.account-sheet-head .close {
+.account-sheet-head .close,
+.privacy-head .close {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -541,7 +542,8 @@ body {
         background var(--t-fast) var(--ease),
         color var(--t-fast) var(--ease);
 }
-.account-sheet-head .close:hover {
+.account-sheet-head .close:hover,
+.privacy-head .close:hover {
     background: var(--bg);
     color: var(--ink);
 }
@@ -551,6 +553,91 @@ body {
     gap: 1rem;
     padding: 1rem;
 }
+/* Privacy policy sheet (behavior 62) — above the menu, centred on wide screens, a
+   bottom sheet on phones; the text scrolls inside it. */
+.privacy-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background: var(--scrim);
+}
+.privacy-sheet {
+    width: min(40rem, 100%);
+    max-height: min(85vh, 100%);
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-2);
+}
+.privacy-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid var(--border);
+}
+.privacy-head h2 {
+    margin: 0;
+    font-size: var(--fs-md);
+    text-wrap: balance;
+}
+.privacy-body {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 0.5rem 1.25rem 1.25rem;
+    font-size: var(--fs-sm);
+    line-height: 1.55;
+    color: var(--ink);
+}
+.privacy-body h3 {
+    margin: 1.1rem 0 0.35rem;
+    font-size: var(--fs-sm);
+    font-weight: 600;
+}
+.privacy-body p {
+    margin: 0.4rem 0;
+}
+.privacy-body ul {
+    margin: 0.3rem 0;
+    padding-left: 1.2rem;
+}
+.privacy-body li + li {
+    margin-top: 0.3rem;
+}
+.privacy-effective {
+    color: var(--muted);
+    font-size: var(--fs-xs);
+}
+.menu-link {
+    align-self: flex-start;
+    padding: 0;
+    border: none;
+    background: none;
+    font: inherit;
+    font-size: var(--fs-sm);
+    color: var(--accent);
+    cursor: pointer;
+}
+.menu-link:hover {
+    text-decoration: underline;
+}
+@media (max-width: 520px) {
+    .privacy-backdrop {
+        align-items: flex-end;
+        padding: 0;
+    }
+    .privacy-sheet {
+        max-height: 88vh;
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    }
+}
+
 /* The menu (behavior 62) — the free allowance, contact, sign in/out. */
 .menu-quota,
 .menu-contact {
@@ -589,8 +676,12 @@ body {
 }
 .menu-value {
     font-variant-numeric: tabular-nums;
+    white-space: nowrap;
     text-align: right;
     font-weight: 600;
+}
+.menu-value-wrap {
+    white-space: normal;
 }
 .menu-bar {
     height: 0.4rem;
