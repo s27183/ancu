@@ -109,6 +109,18 @@
     --shadow-2: 0 4px 12px rgb(23 32 51 / 0.08), 0 16px 32px rgb(23 32 51 / 0.1);
     --shadow-3: 0 12px 28px rgb(23 32 51 / 0.14), 0 32px 64px rgb(23 32 51 / 0.18);
     --scrim: rgb(19 36 58 / 0.42);
+    /* A scrim that dims the page but leaves the header band and the home-indicator strip
+       as they are: Safari tints the status bar from what is painted under the notch, so a
+       full-height scrim recoloured the notch whenever the menu or a popup opened
+       (behavior 64, Son 2026-10-11; behavior 63 keeps notch, header and bars one colour).
+       A background-image over a transparent background-color: the layer still covers
+       the header (a tap there closes it), it only paints nothing over that band. */
+    --scrim-below-header: linear-gradient(
+        to bottom,
+        transparent 0 var(--header-total),
+        var(--scrim) var(--header-total) calc(100% - var(--safe-bottom)),
+        transparent calc(100% - var(--safe-bottom))
+    );
     --ring: 0 0 0 3px rgb(13 122 99 / 0.28);
 
     /* Motion */
@@ -514,7 +526,7 @@ body {
     z-index: 55;
     border: none;
     padding: 0;
-    background: var(--scrim);
+    background: transparent var(--scrim-below-header);
     opacity: 0;
     pointer-events: none;
     cursor: default;
@@ -588,7 +600,7 @@ body {
     align-items: center;
     justify-content: center;
     padding: 1rem;
-    background: var(--scrim);
+    background: transparent var(--scrim-below-header);
 }
 .info-sheet {
     width: min(40rem, 100%);
