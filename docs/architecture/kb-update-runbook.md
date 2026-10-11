@@ -173,6 +173,24 @@ record; there is no scrape/archive requirement (this stays inside the
 no-property-scraping-pipeline posture — citing one regulator page for
 provenance is not the same market as scraping property listings at scale).
 
+**A changed figure is quoted from a saved copy (behavior 74).** When a figure
+changes, whoever drafts it (the kb-watch routine, or a session) saves the page it
+came from as text (`scripts/archive_source.py <url> docs/sources/<area>/<name>.txt`;
+a PDF as its extracted text) and adds, on that source, the copy's `path:` and the
+exact sentences that state the figure:
+
+```
+  - url: https://www.revenue.nsw.gov.au/...
+    retrieved: 2026-10-12
+    path: docs/sources/nsw-revenue/surcharge-purchaser-duty.txt
+    quotes:
+      - "Surcharge purchaser duty is 9% of the dutiable value"
+```
+
+`tests/kb_quote_check.py` (a done check) proves every quote is in its copy, and the
+kb-watch merge gate (`scripts/kb_gate.py`) requires such a quote for every number a
+kb-watch PR changes. Older docs without `quotes:` are untouched until their next change.
+
 **A synthesis doc that asserts no figure of its own cites a `note:`, not a `url:`.**
 A doc that ties together facts each single-owned elsewhere (its own figures are
 all cross-refs, nothing here is asserted independently) has no primary of its

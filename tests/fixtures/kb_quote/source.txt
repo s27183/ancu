@@ -1,0 +1,6 @@
+Source: https://www.revenue.nsw.gov.au/taxes-duties-levies-royalties/transfer-duty/surcharge-purchaser-duty
+Retrieved: 2026-10-12 (fixture for tests/kb_quote_check.py)
+
+Surcharge purchaser duty
+Surcharge purchaser duty is   9% of the
+dutiable value of residential-related property bought by a foreign person.
