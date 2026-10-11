@@ -122,6 +122,8 @@
         /* phone bottom-sheet: the last line clears the home indicator (--safe-bottom) */
         padding: var(--sp-4) var(--sp-5) calc(var(--sp-5) + var(--safe-bottom));
         overflow-y: auto;
+        overflow-x: hidden; /* up-down only (behavior 67): no sideways drag */
+        overscroll-behavior-x: none;
     }
 
     /* Desktop: a centred card (not a bottom sheet), matching .sheet's modal form. */

@@ -1354,6 +1354,23 @@ main {
     min-height: 0;
     padding: var(--sp-4) var(--sp-5) var(--sp-6);
     overflow-y: auto;
+    /* Buyer-on-a-phone -> the plan sheet -> app.css -> up-down only: with overflow-y
+       auto and no overflow-x, overflow-x computed auto, so one child a few px too wide
+       let a swipe slide the whole body — rails and fields — off to the left (behavior
+       67, Son 2026-10-11). hidden, not clip: clip beside auto computes hidden anyway. */
+    overflow-x: hidden;
+    overscroll-behavior-x: none;
+}
+/* No field or control inside a sheet or popup is wider than its box: a select sizes to
+   its longest option by default, and a long Vietnamese option pushed past the body. */
+.sheet .body :is(input, select, textarea),
+.mo-body :is(input, select, textarea) {
+    max-width: 100%;
+    min-width: 0;
+}
+.sheet .body select,
+.mo-body select {
+    text-overflow: ellipsis;
 }
 .sheet-head .state-chip {
     display: inline-block;
