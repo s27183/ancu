@@ -50,6 +50,7 @@
         PULSE,
         PULSE_RIM,
         PULSE_RECENT,
+        PULSE_SAVED,
         type SizeBy
     } from '$lib/map';
     import { ensurePmtilesProtocol } from '$lib/pmtiles';
@@ -87,6 +88,7 @@
         pulseSaved = false,
         selected = null,
         recent = null,
+        recentSaved = false,
         onselect,
         onzoom,
         basemap = $bindable(false)
@@ -104,6 +106,8 @@
         /** The suburb whose sheet was just closed (behavior 54) — a jade pulse, so the
          *  visitor can find where they just were. Null while a sheet is open. */
         recent?: Suburb | null;
+        /** Whether `recent` has a saved plan — its pulse is then red, not jade (behavior 70). */
+        recentSaved?: boolean;
         onselect: (s: Suburb | null) => void;
         /** Reports the live map zoom up to the parent (drives the overview hint). */
         onzoom?: (z: number) => void;
@@ -144,8 +148,9 @@
 
     // --- Pulse highlight -----------------------------------------------------
     // ONE bright pulse signal — a solid centre dot + an expanding ring animated by rAF
-    // — shared by (a) the saved suburbs in saved-only mode, (b) the SELECTED suburb
-    // (saved or not) and, in jade, (c) the suburb just closed (behavior 54). The ring is JS-driven (MapLibre paint can't read time), so we
+    // — shared by (a) the saved suburbs in saved-only mode, in red (behavior 70), (b) the
+    // SELECTED suburb (saved or not), in magenta, and (c) the suburb just closed
+    // (behavior 54), red if it is saved, else jade. The ring is JS-driven (MapLibre paint can't read time), so we
     // re-derive its paint each frame — fine for a handful of points. prefers-reduced-
     // motion → a static mid-expansion ring (no animation).
 
@@ -169,7 +174,7 @@
     }
     const selectedData = $derived(onePoint(selected));
     const hasSelectedPoint = $derived(!!selected?.centroid);
-    // The just-closed suburb (behavior 54): same shape, jade instead of magenta.
+    // The just-closed suburb (behavior 54): same shape, red if saved (behavior 70), else jade.
     const recentData = $derived(onePoint(recent));
     const hasRecentPoint = $derived(!!recent?.centroid);
 
@@ -214,13 +219,24 @@
         'circle-stroke-opacity': 0.85 * (1 - pulse)
     } satisfies CircleLayerSpecification['paint']);
 
-    const recentDotPaint = {
+    const savedDotPaint = {
         ...dotPaint,
-        'circle-color': PULSE_RECENT
+        'circle-color': PULSE_SAVED
     } satisfies CircleLayerSpecification['paint'];
+    const savedRingPaint = $derived({
+        ...ringPaint,
+        'circle-color': PULSE_SAVED,
+        'circle-stroke-color': PULSE_SAVED
+    } satisfies CircleLayerSpecification['paint']);
+    const recentColor = $derived(recentSaved ? PULSE_SAVED : PULSE_RECENT);
+    const recentDotPaint = $derived({
+        ...dotPaint,
+        'circle-color': recentColor
+    } satisfies CircleLayerSpecification['paint']);
     const recentRingPaint = $derived({
         ...ringPaint,
-        'circle-stroke-color': PULSE_RECENT
+        'circle-color': recentColor,
+        'circle-stroke-color': recentColor
     } satisfies CircleLayerSpecification['paint']);
 
     function handleClick(ev: MapLayerMouseEvent) {
@@ -262,10 +278,10 @@
         <!-- Saved-plans mode: an expanding ring (declared first → below the dot) and
              a solid bright centre dot. Uniform bright highlight, no criterion ramp. -->
         <GeoJSONSource id="suburbs" {data}>
-            <CircleLayer id="suburb-pulse" paint={ringPaint} beforeId={labelBeforeId} />
+            <CircleLayer id="suburb-pulse" paint={savedRingPaint} beforeId={labelBeforeId} />
             <CircleLayer
                 id="suburb-saved"
-                paint={dotPaint}
+                paint={savedDotPaint}
                 beforeId={labelBeforeId}
                 onclick={handleClick}
                 onmouseenter={(e: MapLayerMouseEvent) => setPointer(e, true)}
@@ -326,7 +342,7 @@
          dot underneath still handles re-selection. -->
     <!-- The just-closed suburb's jade pulse (behavior 54), under the selected one. Both
          remount whenever the base block above does (saved filter, criterion): a layer
-         added later goes on top, so without the key a saved suburb's magenta dot hid the
+         added later goes on top, so without the key a saved suburb's dot hid the
          green one (measured 2026-10-10, Cabramatta saved and just closed). -->
     {#key `${pulseSaved}:${sizeBy}`}
     {#if hasRecentPoint}
