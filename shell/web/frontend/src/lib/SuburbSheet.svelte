@@ -73,6 +73,7 @@
                               label: $t('sheet.tab.plan'),
                               icon: 'overview' as const,
                               active: tab === 'plan',
+                              tour: 'sections-plan',
                               select: () => (tab = 'plan')
                           }
                       ]

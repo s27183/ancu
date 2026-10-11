@@ -78,6 +78,7 @@
                     class:active={it.active}
                     class:accent={it.accent}
                     class:nested={it.nested}
+                    data-tour={it.tour}
                     onclick={() => pick(it.select)}
                 >
                     {@render icon(it.icon)}<span class="sec-label">{it.label}</span>{#if it.active && !it.parent}<span
@@ -93,6 +94,7 @@
 <button
     type="button"
     class="sec-pill"
+    data-tour="sections"
     aria-haspopup="menu"
     aria-expanded={open}
     onclick={() => (open = !open)}

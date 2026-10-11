@@ -28,6 +28,8 @@ export type SectionItem = {
     nested?: boolean;
     /** A tab whose sub-sections follow it: marked, but the ✓ goes on the sub-section. */
     parent?: boolean;
+    /** The tour's data-tour name for this item (behavior 72). */
+    tour?: string;
     select: () => void;
 };
 
