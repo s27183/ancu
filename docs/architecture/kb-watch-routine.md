@@ -1,6 +1,6 @@
 # kb-watch — the weekly KB and news routine
 
-Regulated figures are grounded -> P-7 -> The KB -> a weekly routine proposes the KB update as one PR; Son merges
+Regulated figures are grounded -> P-7 -> The KB -> a weekly routine proposes the KB update as one PR; the gate merges it when verified, else Son
 
 **What this is.** The prompt of the Claude Code routine "ancu kb-watch" on Son's
 claude.ai account (behavior 57, Son 2026-10-10). The routine runs weekly
@@ -12,9 +12,17 @@ sent as the routine's message verbatim; a change here is pushed to the routine w
 `RemoteTrigger update` in the same behavior that changes it.
 
 **Why a PR and not a commit.** The goal's figures must trace to a *verified*
-source, and the verifying reader is Son: the routine reads the primary and drafts,
-he reviews and publishes. A run that cannot verify a figure says so in the PR body
-and leaves the doc alone.
+source. The routine reads the primary and drafts. Behavior 57 made Son the verifying
+reader. Behavior 74 (Son 2026-10-12) replaces him for what can be proven:
+- every figure the routine changes carries a word-for-word quote from a saved copy
+  of a primary (`path:` + `quotes:` on the source; tests/kb_quote_check.py);
+- the independent kb-verify routine ([kb-verify-routine.md](kb-verify-routine.md))
+  re-reads the sources and labels the PR;
+- the kb-gate workflow (scripts/kb_gate.py) merges the PR when all of that holds,
+  and holds it otherwise.
+
+What only Son can decide — a could-not-verify, a kind-2/3 change — the routine files
+as one issue assigned to him, so he never has to read the PR to find it.
 
 ---8<---
 You are the weekly KB watch for the Mai An Cư project (repo s27183/ancu, cloned in your
@@ -36,9 +44,22 @@ in `docs/kb/news/` as the shape to copy.
    - unchanged: every figure still matches the primary. Bump `last_verified:` and each
      opened source's `retrieved:` to today. Nothing else.
    - changed: a figure moved. Change the figure in the body and in the `## Rules` block,
-     and its bilingual copy under `docs/kb/copy/` where it is interpolated. Re-archive the
-     page with `python3 scripts/archive_source.py <url> <docs/sources/...txt>` so every
-     `quotes` string the fact carries is found in the archive (GATE 12). Bump
+     and its bilingual copy under `docs/kb/copy/` where it is interpolated. Save the page
+     you read it on with `python3 scripts/archive_source.py <url> <docs/sources/<area>/<name>.txt>`
+     (a PDF too: save its extracted text as .txt). On that source in the doc's
+     `sources:`, add `path:` (the saved copy) and `quotes:`, a list of sentences copied
+     word for word from the saved copy that state each new figure, for example:
+         - url: https://www.revenue.nsw.gov.au/...
+           retrieved: <today>
+           path: docs/sources/nsw-revenue/surcharge-purchaser-duty.txt
+           quotes:
+             - "Surcharge purchaser duty is 9% of the dutiable value"
+     Every number you add to the doc's body must appear in one of its quotes, written
+     the same way. Quote only a primary: a government site (*.gov.au) for a regulated
+     figure, or the lender's own site for a lender policy. A figure whose only source is
+     a broker, comparison or news site is still drafted, but it will be held for Son.
+     For a first-visit fact (`docs/kb/facts/`), also make sure every `quotes` string the
+     fact carries is found in the archive (GATE 12). Bump
      `last_verified:`; bump `effective_from:` only if the rule's own start date changed.
      Only a kind-1 point-figure change is drafted. A new rule, scheme or lifecycle phase
      (kind-2 or kind-3 in the runbook) is not drafted: list it in the PR body for a
@@ -68,7 +89,7 @@ in `docs/kb/news/` as the shape to copy.
    `python3 tests/resolver_eval.py`, `python3 tests/eligibility_benefit_eval.py`,
    `python3 tests/cash_duty_eval.py`, `python3 tests/mortgage_eval.py`,
    `python3 tests/ownership_eval.py`, `python3 tests/bilingual_eval.py`,
-   `python3 tests/outcome_validate.py`. Do not commit `engine/erlang/priv/kb/artifact.json`
+   `python3 tests/outcome_validate.py`, `python3 tests/kb_quote_check.py`. Do not commit `engine/erlang/priv/kb/artifact.json`
    (it is untracked). If a check cannot run in your environment, say which and why in the
    PR body.
 
@@ -81,6 +102,16 @@ in `docs/kb/news/` as the shape to copy.
    - the news notes added, each with its EN headline and source
    - kind-2/3 changes found and not drafted
    - any check that could not run
-   The first line of the body says: "Opened by the weekly kb-watch routine (behavior 57).
-   Nothing reaches maiancu.com until Son merges and deploys."
+   The first line of the body says: "Opened by the weekly kb-watch routine (behaviors 57,
+   74). The kb-gate check merges it when every change is verified; otherwise it waits
+   for Son."
+   Change nothing in the PR after the kb-verify routine has commented on it, unless a
+   check failed.
+
+6. Son's issue. If step 2 found any doc you could not verify or any kind-2/3 change,
+   open one GitHub issue in s27183/ancu with your GitHub tools, assigned to `s27183`,
+   titled `kb-watch <yyyy-mm-dd>: needs Son`. It lists one line per item:
+   `<slug> — could not verify: <why> (<url>)` or `<slug> — kind-2/3: <what changed>
+   (<url>)`, and links the PR (or says no PR was opened). If an open issue with that
+   title already exists, add to it instead. If there is no such item, open no issue.
 ---8<---
