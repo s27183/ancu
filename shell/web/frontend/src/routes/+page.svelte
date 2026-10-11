@@ -63,7 +63,7 @@
     let loading = $state(true);
     let errored = $state(false);
     let selected = $state<Suburb | null>(null);
-    // The suburb whose sheet the visitor just closed — pulses jade on the map so they can
+    // The suburb whose sheet the visitor just closed — pulses on the map, red if saved (behavior 70), else jade, so they can
     // find where they were (behavior 54). Set by the sheet's close, cleared when any
     // suburb opens (that one pulses magenta) or the tour resets; never persisted.
     let recent = $state<Suburb | null>(null);
@@ -335,6 +335,7 @@
             pulseSaved={savedOnly}
             {selected}
             {recent}
+            recentSaved={!!recent && savedTitles.has(recent.name)}
             onselect={(s) => (selected = s)}
         />
     {/if}
