@@ -825,29 +825,33 @@ export async function setTransactionDates(
 // operator's GET /api/billing/usage still serves them); the menu gets counts and a
 // fraction.
 
-export type Quota =
-    | { kind: 'guest'; plansToday: { used: number; limit: number }; keepDays: number }
-    | {
-          kind: 'user';
-          questionsToday: { used: number; limit: number } | 'unlimited';
-          allowance: { usedFraction: number; resetsAt: string | null } | 'unlimited';
-      };
+export type Quota = {
+    kind: 'guest' | 'user';
+    plansSaved: number;
+    plansToday: { used: number; limit: number } | 'unlimited';
+    keepDays: number | 'until_deleted';
+    questionsToday: { used: number; limit: number } | 'unlimited' | 'sign_in';
+    // Signed in only; the menu names it from 80% used.
+    allowance: { usedFraction: number; resetsAt: string | null } | 'unlimited' | null;
+};
 
 export async function getQuota(fetchFn: typeof fetch = fetch): Promise<Quota | null> {
     try {
         const res = await fetchFn('/api/me/quota');
         if (!res.ok) return null;
         const b = await res.json();
-        if (b.kind === 'guest') {
-            return { kind: 'guest', plansToday: b.plans_today, keepDays: b.keep_days };
-        }
         return {
-            kind: 'user',
+            kind: b.kind,
+            plansSaved: b.plans_saved ?? 0,
+            plansToday: b.plans_today,
+            keepDays: b.keep_days,
             questionsToday: b.questions_today,
             allowance:
-                b.allowance === 'unlimited'
-                    ? 'unlimited'
-                    : { usedFraction: b.allowance.used_fraction, resetsAt: b.allowance.resets_at }
+                b.allowance === undefined
+                    ? null
+                    : b.allowance === 'unlimited'
+                      ? 'unlimited'
+                      : { usedFraction: b.allowance.used_fraction, resetsAt: b.allowance.resets_at }
         };
     } catch {
         return null;

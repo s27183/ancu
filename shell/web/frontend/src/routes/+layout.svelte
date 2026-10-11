@@ -21,8 +21,8 @@
 
     // Honest-partial -> P-5 · Metering, not gating -> The web frontend -> the visitor's menu
     // The side-sheet (slides in from the right) every visitor opens from the header,
-    // signed in or not (behavior 62): what they can still use for free, the privacy
-    // policy, the contact address, and sign in / out — nothing else. The tier, token
+    // signed in or not (behavior 62): the same three allowance rows for everyone, the
+    // privacy policy, the contact address, and sign in / out — nothing else. The tier, token
     // counts and infrastructure cost stay internal (GET /api/billing/usage).
     let menuOpen = $state(false);
     let privacyOpen = $state(false);
@@ -40,6 +40,8 @@
     }
 
     const pct = (f: number) => Math.round(Math.min(1, Math.max(0, f)) * 100);
+    // The share of the month's AI allowance from which the menu names it.
+    const ALLOWANCE_WARN = 0.8;
 </script>
 
 <!-- The tab title is the product name from i18n's one BRAND constant (behavior 17). -->
@@ -79,15 +81,11 @@
         >
     </div>
 
-    <!-- Far-right: signed out → the sign-in button; once /api/me resolves, every visitor
-         gets the menu (behavior 62). Held back until then, so nothing flashes. -->
+    <!-- Far-right: the menu icon only, for every visitor once /api/me resolves (held back
+         until then, so nothing flashes). Signing in lives in the menu, not the header
+         (Son 2026-10-11: a button beside the icon crowded the header at 390px). -->
     <div class="header-right">
         {#if $sessionLoaded}
-            {#if !$session}
-                <button type="button" class="account-btn" onclick={() => loginOpen.set(true)}
-                    >{$t('auth.signin')}</button
-                >
-            {/if}
             <button
                 type="button"
                 class="account-trigger"
@@ -147,30 +145,34 @@
                 <p class="placeholder">{$t('quota.loading')}</p>
             {:else if quotaPhase === 'error' || !quota}
                 <p class="placeholder">{$t('quota.error')}</p>
-            {:else if quota.kind === 'guest'}
+            {:else}
+                <!-- The same three rows for every visitor (Son 2026-10-11); only the values
+                     differ between signed out and signed in. -->
                 <div class="menu-row">
-                    <span class="menu-label">{$t('quota.plans_today')}</span>
+                    <span class="menu-label">{$t('quota.saved')}</span>
                     <span class="menu-value"
-                        >{$t('quota.left')
-                            .replace('{n}', String(Math.max(0, quota.plansToday.limit - quota.plansToday.used)))
-                            .replace('{of}', String(quota.plansToday.limit))}</span
+                        >{quota.plansSaved} · {quota.plansToday === 'unlimited'
+                            ? $t('quota.saved_nocap')
+                            : $t('quota.saved_cap').replace('{n}', String(quota.plansToday.limit))}</span
                     >
                 </div>
+                {#if quota.plansToday !== 'unlimited' && quota.plansToday.used >= quota.plansToday.limit}
+                    <p class="menu-note">{$t('quota.saved_none_left')}</p>
+                {/if}
                 <div class="menu-row">
                     <span class="menu-label">{$t('quota.kept')}</span>
                     <span class="menu-value"
-                        >{$t('quota.kept_days').replace('{n}', String(quota.keepDays))}</span
+                        >{quota.keepDays === 'until_deleted'
+                            ? $t('quota.kept_until_deleted')
+                            : $t('quota.kept_days').replace('{n}', String(quota.keepDays))}</span
                     >
                 </div>
                 <div class="menu-row">
-                    <span class="menu-label">{$t('quota.assistant')}</span>
-                    <span class="menu-value">{$t('quota.assistant_signin')}</span>
-                </div>
-            {:else}
-                <div class="menu-row">
                     <span class="menu-label">{$t('quota.questions_today')}</span>
                     <span class="menu-value">
-                        {#if quota.questionsToday === 'unlimited'}
+                        {#if quota.questionsToday === 'sign_in'}
+                            {$t('quota.questions_signin')}
+                        {:else if quota.questionsToday === 'unlimited'}
                             {$t('quota.unlimited')}
                         {:else}
                             {$t('quota.left')
@@ -179,30 +181,13 @@
                         {/if}
                     </span>
                 </div>
-                <div class="menu-row menu-row-stack">
-                    <span class="menu-label">{$t('quota.allowance')}</span>
-                    {#if quota.allowance === 'unlimited'}
-                        <span class="menu-value">{$t('quota.unlimited')}</span>
-                    {:else}
-                        <div
-                            class="menu-bar"
-                            role="meter"
-                            aria-valuemin="0"
-                            aria-valuemax="100"
-                            aria-valuenow={pct(quota.allowance.usedFraction)}
-                            aria-label={$t('quota.allowance')}
-                        >
-                            <span style="width: {pct(quota.allowance.usedFraction)}%"></span>
-                        </div>
-                        <span class="menu-note"
-                            >{$t('quota.allowance_used').replace('{p}', String(pct(quota.allowance.usedFraction)))}{#if quota.allowance.resetsAt}{' · '}{$t('quota.resets').replace('{d}', date(quota.allowance.resetsAt, $lang) ?? '')}{/if}</span
-                        >
-                    {/if}
-                </div>
-                <div class="menu-row">
-                    <span class="menu-label">{$t('quota.kept')}</span>
-                    <span class="menu-value menu-value-wrap">{$t('quota.kept_account')}</span>
-                </div>
+                <!-- The monthly AI allowance is a ceiling on what an account may cost, in a
+                     unit visitors do not use; named only once it is near (Son 2026-10-11). -->
+                {#if quota.allowance && quota.allowance !== 'unlimited' && quota.allowance.usedFraction >= ALLOWANCE_WARN}
+                    <p class="menu-note menu-warn">
+                        {$t('quota.allowance_near').replace('{p}', String(pct(quota.allowance.usedFraction)))}{#if quota.allowance.resetsAt}{' · '}{$t('quota.resets').replace('{d}', date(quota.allowance.resetsAt, $lang) ?? '')}{/if}
+                    </p>
+                {/if}
             {/if}
         </section>
 
@@ -240,14 +225,17 @@
                 {$t('auth.signout')}
             </button>
         {:else}
-            <button
-                type="button"
-                class="account-action"
-                onclick={() => {
-                    menuOpen = false;
-                    loginOpen.set(true);
-                }}>{$t('auth.signin')}</button
-            >
+            <div class="menu-signin">
+                <button
+                    type="button"
+                    class="account-action"
+                    onclick={() => {
+                        menuOpen = false;
+                        loginOpen.set(true);
+                    }}>{$t('auth.signin')}</button
+                >
+                <p class="menu-note">{$t('quota.signin_adds')}</p>
+            </div>
         {/if}
     </div>
 </aside>
