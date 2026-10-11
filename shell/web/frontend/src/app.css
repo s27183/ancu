@@ -118,6 +118,11 @@
 
     /* Glass: `glass` = floating chrome over the map; `panel` = content you read over it. */
     --glass-bg: rgb(255 255 255 / 0.78);
+    /* The phone's edges — the header under the notch and the strip over the home
+       indicator — are one opaque colour, the page ground, which the browser also paints
+       its own bars in (app.html theme-color, body). See-through glass there could never
+       match an opaque browser bar (behavior 63). */
+    --chrome: var(--bg);
     --glass-blur: saturate(1.5) blur(16px);
     --glass-border: rgb(255 255 255 / 0.6);
     --panel-bg: rgb(255 255 255 / 0.94);
@@ -413,8 +418,12 @@ body {
     left: 0;
     right: 0;
     z-index: 20; /* below the sheet (30) so the desktop drawer covers it top-to-bottom */
-    /* viewport-fit=cover (app.html): the glass bar extends up under the notch/status
-       bar, its content kept below it by the top inset (behavior 43). */
+    /* Bilingual and buyer-on-a-phone -> the header -> app.css -> one surface with the
+       browser's bars. viewport-fit=cover (app.html): the bar extends up under the
+       notch/status bar, its content kept below it by the top inset (behavior 43); it is
+       opaque in --chrome, the colour Safari paints its status and address bars from
+       (theme-color = body = --bg), so the notch, the header and the browser's bars read
+       as one surface whatever map is below (behavior 63, Son 2026-10-11). */
     height: var(--header-total);
     padding-top: var(--safe-top);
     /* 3 columns: brand (left) · language toggle (centred) · account (right). The two
@@ -424,9 +433,7 @@ body {
     align-items: center;
     gap: 0.75rem;
     padding: 0 1rem;
-    background: var(--glass-bg);
-    -webkit-backdrop-filter: var(--glass-blur);
-    backdrop-filter: var(--glass-blur);
+    background: var(--chrome);
     border-bottom: 1px solid var(--border);
     box-shadow: var(--header-shadow);
 }
@@ -799,8 +806,8 @@ body {
     height: 100dvh;
 }
 
-/* Frosted glass over the home-indicator strip (behavior 43) — the header's twin at the
-   bottom edge; 0px tall wherever there is no bottom inset. */
+/* The home-indicator strip (behavior 43) — the header's twin at the bottom edge, opaque
+   in --chrome like it (behavior 63); 0px tall wherever there is no bottom inset. */
 .safe-bottom-glass {
     position: fixed;
     left: 0;
@@ -809,9 +816,7 @@ body {
     height: var(--safe-bottom);
     z-index: 20;
     pointer-events: none;
-    background: var(--glass-bg);
-    -webkit-backdrop-filter: var(--glass-blur);
-    backdrop-filter: var(--glass-blur);
+    background: var(--chrome);
 }
 
 main {
