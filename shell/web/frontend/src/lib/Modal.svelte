@@ -11,6 +11,7 @@
     // overlays the plan card — the intended "popup over the plan" surface.
     import type { Snippet } from 'svelte';
     import { t } from '$lib/i18n';
+    import { sheetMotion, scrimMotion } from '$lib/sheetMotion';
 
     let { title = '', compact = false, onClose, children }: {
         title?: string;
@@ -28,8 +29,14 @@
 <svelte:window onkeydown={onKey} />
 
 <div class="mo-root">
-    <button type="button" class="mo-backdrop" aria-label={$t('sheet.close')} onclick={onClose}></button>
-    <div class="mo-card" role="dialog" aria-modal="true" aria-label={title}>
+    <button
+        type="button"
+        class="mo-backdrop"
+        aria-label={$t('sheet.close')}
+        onclick={onClose}
+        transition:scrimMotion|global
+    ></button>
+    <div class="mo-card" role="dialog" aria-modal="true" aria-label={title} transition:sheetMotion|global>
         <header class="mo-head">
             <h3 class="mo-title" class:compact>{title}</h3>
             <button type="button" class="mo-close" aria-label={$t('sheet.close')} onclick={onClose}>✕</button>
@@ -55,9 +62,7 @@
         border: none;
         padding: 0;
         margin: 0;
-        background: var(--scrim);
-        backdrop-filter: blur(2px);
-        -webkit-backdrop-filter: blur(2px);
+        background: var(--scrim); /* no backdrop-filter: see lib/sheetMotion.ts */
         cursor: default;
     }
     .mo-card {
@@ -66,20 +71,17 @@
         position: relative;
         background: var(--surface);
         width: 100%;
-        max-height: 88%;
+        /* phone: one height for every sheet in planning, the "Vì sao Úc?" card's
+           (--sheet-h, app.css; behavior 66) — content-sized cards made each step deeper
+           jump shorter or taller. Opens/closes with lib/sheetMotion.ts. */
+        height: var(--sheet-h);
         display: flex;
         flex-direction: column;
         border-radius: var(--radius-lg) var(--radius-lg) 0 0;
         box-shadow: var(--shadow-3);
-        animation: mo-rise var(--t-med, 0.22s) var(--ease, ease);
-    }
-    @keyframes mo-rise {
-        from {
-            opacity: 0;
-            transform: translateY(1rem);
-        }
     }
     .mo-head {
+        flex: none;
         display: flex;
         align-items: flex-start;
         gap: var(--sp-3);
@@ -119,6 +121,8 @@
         color: var(--ink);
     }
     .mo-body {
+        flex: 1 1 auto;
+        min-height: 0;
         /* phone bottom-sheet: the last line clears the home indicator (--safe-bottom) */
         padding: var(--sp-4) var(--sp-5) calc(var(--sp-5) + var(--safe-bottom));
         overflow-y: auto;
@@ -133,16 +137,10 @@
         }
         .mo-card {
             width: min(92%, 38rem);
+            height: auto;
             max-height: 85%;
             border-radius: var(--radius-lg);
             border: 1px solid var(--glass-border);
-            animation: mo-fade var(--t-med, 0.22s) var(--ease, ease);
-        }
-    }
-    @keyframes mo-fade {
-        from {
-            opacity: 0;
-            transform: translateY(0.5rem);
         }
     }
 </style>
