@@ -25,7 +25,10 @@ passed. Fail-closed: whatever this cannot classify is held. One PR, all or nothi
 here would mean rewriting the routine's branch; the routine can split later).
 
 Writes <out>/decision.json ({"decision": "merge"|"hold"|"skip", "reasons": [...],
-"items": [...]}) and <out>/comment.md, and prints the comment.
+"items": [...]}), <out>/comment.md and, on a hold, <out>/issue.md: the body of the one
+issue assigned to Son that the workflow opens or updates when live (a dry run only
+says it would). kb-watch files its own could-not-verify and kind-2/3 findings, which
+never reach the diff; this issue carries what the gate held.
 """
 from __future__ import annotations
 
@@ -223,7 +226,7 @@ def comment(d: dict, live: bool) -> str:
     mode = "" if live else " (dry run — nothing is merged)"
     head = {
         "merge": f"**kb-gate{mode}: {'merging' if live else 'would merge'}** — every change is date-only, a new news note, or a verified, quoted figure from a primary.",
-        "hold": f"**kb-gate{mode}: held for Son** — {len(d['reasons'])} reason(s):",
+        "hold": f"**kb-gate{mode}: held for Son** — {len(d['reasons'])} reason(s), {'filed' if live else 'would be filed'} as an issue assigned to him:",
         "skip": f"kb-gate{mode}: not a kb-watch PR.",
     }[d["decision"]]
     lines = [head, ""]
@@ -236,6 +239,14 @@ def comment(d: dict, live: bool) -> str:
     return "\n".join(lines) + "\n"
 
 
+def issue(d: dict, pr: str) -> str:
+    """The body of Son's issue for a held PR: each reason, and the PR to act on."""
+    lines = [f"kb-gate held #{pr}, so it did not publish itself. Each reason is something to decide or fix:", ""]
+    lines += [f"- [ ] {r}" for r in d["reasons"]]
+    lines += ["", f"Merge #{pr} yourself once these are settled, or close it. (behavior 74)", "", "<!-- kb-gate-issue -->"]
+    return "\n".join(lines) + "\n"
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--base", required=True)
@@ -245,6 +256,7 @@ def main() -> int:
     ap.add_argument("--checks-ok", default="no")
     ap.add_argument("--live", default="no")
     ap.add_argument("--out", default=".")
+    ap.add_argument("--pr", default="?")
     a = ap.parse_args()
     d = decide(a.base, a.head, a.branch, {x for x in a.labels.split(",") if x},
                a.checks_ok == "yes")
@@ -253,6 +265,8 @@ def main() -> int:
     (out / "decision.json").write_text(json.dumps(d, indent=2) + "\n")
     c = comment(d, a.live == "yes")
     (out / "comment.md").write_text(c)
+    if d["decision"] == "hold":
+        (out / "issue.md").write_text(issue(d, a.pr))
     print(c)
     return 0
 

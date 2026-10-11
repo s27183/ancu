@@ -21,6 +21,7 @@ permissions:
   contents: read
   pull-requests: write
   checks: read
+  issues: write
 
 concurrency:
   group: kb-gate-${{ github.event.pull_request.number }}
@@ -74,11 +75,24 @@ jobs:
           labels="$LABELS"
           [ "${{ github.event.action }}" = synchronize ] && labels=""
           python3 scripts/kb_gate.py --base "$BASE_SHA" --head "$HEAD_SHA" --branch "$BRANCH" \
-            --labels "$labels" --checks-ok "${{ steps.checks.outputs.ok }}" --live "$LIVE" --out "$RUNNER_TEMP/gate"
+            --labels "$labels" --checks-ok "${{ steps.checks.outputs.ok }}" --live "$LIVE" --out "$RUNNER_TEMP/gate" --pr "$PR"
           echo "decision=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["decision"])' "$RUNNER_TEMP/gate/decision.json")" >> "$GITHUB_ENV"
 
       - name: Comment
         run: gh pr comment "$PR" --edit-last --body-file "$RUNNER_TEMP/gate/comment.md" || gh pr comment "$PR" --body-file "$RUNNER_TEMP/gate/comment.md"
+
+      # One issue per held PR, assigned to Son, kept current on each re-run.
+      - name: File Son's issue
+        if: env.LIVE == 'yes' && env.decision == 'hold'
+        run: |
+          title="kb-gate: #$PR held"
+          n=$(gh issue list --state open --search "\"$title\" in:title" --json number,title \
+                --jq "[.[] | select(.title == \"$title\")][0].number // empty")
+          if [ -n "$n" ]; then
+            gh issue edit "$n" --body-file "$RUNNER_TEMP/gate/issue.md"
+          else
+            gh issue create --title "$title" --assignee s27183 --body-file "$RUNNER_TEMP/gate/issue.md"
+          fi
 
       - name: Merge
         if: env.LIVE == 'yes' && env.decision == 'merge'
