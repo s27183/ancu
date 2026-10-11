@@ -298,6 +298,24 @@ textarea {
     color: var(--warm);
 }
 
+/* Field size on phones — behavior 61.
+   Goal: bilingual, a plan from the buyer's own situation — usable on a phone, the usual case.
+   Invariant: no field a phone visitor can type in renders under 16px.
+   Component: this floor, beside the shared field look below.
+   Capability: Safari on iOS zooms the page when a field under 16px takes focus, and the
+   full-screen map then takes the pinch, so the visitor cannot zoom back (Son, 2026-10-11).
+   A 16px floor on touch or narrow screens stops the zoom where it starts; desktop keeps
+   its 14px fields. Chosen over maximum-scale=1, which would also stop pinch-zoom on
+   Android. !important because component-scoped rules (.x.svelte-hash) outrank any plain
+   selector here, and this is a floor every field must meet. */
+@media (pointer: coarse), (max-width: 520px) {
+    input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='button']):not([type='submit']),
+    select,
+    textarea {
+        font-size: max(1rem, 16px) !important;
+    }
+}
+
 /* Field — one look for every text input and select. */
 .input,
 .auth-field input,
@@ -769,6 +787,8 @@ main {
 .map-controls {
     display: flex;
     flex-direction: column;
+    /* the same 0.75rem gutter on the right as the cluster's left (behavior 61) */
+    max-width: calc(100vw - 1.5rem);
     gap: 0.55rem;
     padding: 0.7rem 0.75rem;
     background: var(--panel-bg);
