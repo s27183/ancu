@@ -4,19 +4,51 @@
     // tap opens the sections grouped as the rails group them, the current one marked;
     // picking one goes there and closes the menu (Esc or a tap outside closes it too).
     // Hidden at ≥48rem, where the rails are shown instead (app.css .sec-*).
+    //
+    // How it is found (behavior 72; Son 2026-10-12: visitors did not know it was there):
+    // until the visitor first opens the menu in this browser (SEEN_KEY, like the tour's
+    // flag), the pill pulses — a ring, 2 × 1.4 s, on transform/opacity only — each time a
+    // sheet opens or its section changes, and on the area data section (`hint`) a small
+    // bubble above it says the plan is in here. Neither shows while the tour runs (the tour
+    // rings the pill itself) nor after the first open; reduced motion drops the pulse only.
     import { fly, fade } from 'svelte/transition';
     import { cubicOut } from 'svelte/easing';
     import { t } from '$lib/i18n';
+    import { tourStep } from '$lib/tour';
     import type { SectionGroup, SectionIcon } from '$lib/sections.svelte';
 
-    let { groups, current, onpick }: {
+    let { groups, current, onpick, hint = false }: {
         groups: SectionGroup[];
         current: string;
         /** After a section is picked (the sheet scrolls its body to the top). */
         onpick?: () => void;
+        /** May show the "the plan is in here" bubble (the area data section). */
+        hint?: boolean;
     } = $props();
 
+    const SEEN_KEY = 'ancu-sections-seen';
+    function readSeen(): boolean {
+        try {
+            return localStorage.getItem(SEEN_KEY) === '1';
+        } catch {
+            return false;
+        }
+    }
+    let seen = $state(readSeen());
+    const noticing = $derived(!seen && $tourStep === 0);
+
     let open = $state(false);
+    function toggle() {
+        open = !open;
+        if (open && !seen) {
+            seen = true;
+            try {
+                localStorage.setItem(SEEN_KEY, '1');
+            } catch {
+                /* storage blocked: the pulse simply comes back next visit */
+            }
+        }
+    }
     let menuEl: HTMLDivElement | undefined = $state();
 
     function pick(select: () => void) {
@@ -78,6 +110,7 @@
                     class:active={it.active}
                     class:accent={it.accent}
                     class:nested={it.nested}
+                    data-tour={it.tour}
                     onclick={() => pick(it.select)}
                 >
                     {@render icon(it.icon)}<span class="sec-label">{it.label}</span>{#if it.active && !it.parent}<span
@@ -93,10 +126,14 @@
 <button
     type="button"
     class="sec-pill"
+    data-tour="sections"
     aria-haspopup="menu"
     aria-expanded={open}
-    onclick={() => (open = !open)}
+    onclick={toggle}
 >
+    {#if noticing && !reduce}
+        {#key current}<span class="sec-pill-ring" aria-hidden="true"></span>{/key}
+    {/if}
     <span class="sec-pill-text">{current}</span>
     <svg class="sec-pill-caret" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"
         ><path
@@ -109,6 +146,10 @@
         /></svg
     >
 </button>
+
+{#if noticing && hint && !open}
+    <p class="sec-hint" aria-hidden="true">{$t('sheet.sections.hint')}</p>
+{/if}
 
 {#snippet icon(name: SectionIcon)}
     {#if name === 'sub'}

@@ -17,12 +17,17 @@
     let { ontry }: { ontry: () => void } = $props();
 
     // Each step's target, first one present wins (step 1 falls back to the filters button
-    // when the search panel has been closed).
+    // when the search panel has been closed). On a phone the sheet's tabs are hidden and
+    // its sections live in the floating menu (behaviors 68, 72): step 2 points at the
+    // menu's pill, then at its "Kế hoạch" item once the visitor opens it (the layer's dim
+    // lies over the open menu, so the ring moves there); step 4 names the pill as where
+    // the plan's sections are. The pill is display none on desktop, so desktop falls
+    // through to the tabs and the plan as before.
     const TARGETS: Record<1 | 2 | 3 | 4, string[]> = {
         1: ['search', 'controls'],
-        2: ['plan-tab'],
+        2: ['plan-tab', 'sections-plan', 'sections'],
         3: ['plan-cta'],
-        4: ['plan']
+        4: ['sections', 'plan']
     };
     const TEXT: Record<1 | 2 | 3 | 4, MessageKey> = {
         1: 'tour.step1',
@@ -30,6 +35,13 @@
         3: 'tour.step3',
         4: 'tour.step4'
     };
+    // The words when the step points at the menu (a phone).
+    const MENU_TEXT: Partial<Record<1 | 2 | 3 | 4, MessageKey>> = {
+        2: 'tour.step2.menu',
+        4: 'tour.step4.menu'
+    };
+    const textFor = (s: 1 | 2 | 3 | 4, name: string): MessageKey =>
+        (name.startsWith('sections') && MENU_TEXT[s]) || TEXT[s];
     const MARGIN = 12;
     const GAP = 10;
     const PAD = 6;
@@ -37,10 +49,11 @@
     const shown = (s: TourStep): s is 1 | 2 | 3 | 4 => typeof s === 'number' && s > 0;
 
     let rect = $state<DOMRect | null>(null);
+    let target = $state('');
     let bubbleEl = $state<HTMLElement | null>(null);
     let pos = $state({ top: 0, left: 0 });
 
-    function find(s: 1 | 2 | 3 | 4): DOMRect | null {
+    function find(s: 1 | 2 | 3 | 4): { r: DOMRect; name: string } | null {
         for (const name of TARGETS[s]) {
             const el = document.querySelector<HTMLElement>(`[data-tour="${name}"]`);
             if (!el) continue;
@@ -54,7 +67,7 @@
                 const tp = Math.min(r.top, q.top);
                 r = new DOMRect(l, tp, Math.max(r.right, q.right) - l, Math.max(r.bottom, q.bottom) - tp);
             }
-            return r;
+            return { r, name };
         }
         return null;
     }
@@ -101,7 +114,9 @@
             rect = null;
             return;
         }
-        const r = find(s);
+        const hit = find(s);
+        const r = hit?.r ?? null;
+        target = hit?.name ?? '';
         // Only re-render when the target actually moved (no churn while it sits still).
         if (
             !r !== !rect ||
@@ -155,7 +170,7 @@
             style:top="{pos.top}px"
             style:left="{pos.left}px"
         >
-            <p class="tour-text" aria-live="polite">{$t(TEXT[s])}</p>
+            <p class="tour-text" aria-live="polite">{$t(textFor(s, target))}</p>
             {#if s === 1}
                 <button type="button" class="tour-chip" onclick={ontry}>{$t('tour.try')}</button>
             {/if}

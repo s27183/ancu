@@ -54,6 +54,10 @@ const messages = {
     'sheet.tab.plan': { vi: 'Kế hoạch', en: 'Plan' },
     'sheet.close': { vi: 'Đóng', en: 'Close' },
     'sheet.sections': { vi: 'Các mục', en: 'Sections' },
+    'sheet.sections.hint': {
+        vi: 'Kế hoạch và các mục khác ở đây ↓',
+        en: 'The plan and other sections are here ↓'
+    },
     'sheet.viet': { vi: 'Cộng đồng gốc Việt', en: 'Vietnamese community' },
     'sheet.seifa': { vi: 'Chỉ số kinh tế – xã hội (SEIFA)', en: 'Socio-economic (SEIFA)' },
     'sheet.seifa.note': {
@@ -1223,6 +1227,10 @@ const messages = {
     },
     'tour.try': { vi: 'Thử Cabramatta', en: 'Try Cabramatta' },
     'tour.step2': { vi: 'Kế hoạch cho khu vực này ở đây', en: 'The plan for this suburb is here' },
+    'tour.step2.menu': {
+        vi: 'Chạm vào menu này, rồi chọn Kế hoạch',
+        en: 'Tap this menu, then choose Plan'
+    },
     'tour.step3': {
         vi: 'Trả lời 4 câu hỏi ngắn — không cần đăng nhập',
         en: 'Answer 4 short questions — no sign-in needed'
@@ -1230,6 +1238,10 @@ const messages = {
     'tour.step4': {
         vi: 'Đây là kế hoạch của bạn: mua, giữ, bán, theo quy định hiện hành. Đăng nhập để lưu và hỏi trợ lý.',
         en: 'This is your plan: buy, hold, sell, under current rules. Sign in to save it and ask the assistant.'
+    },
+    'tour.step4.menu': {
+        vi: 'Đây là kế hoạch của bạn: mua, giữ, bán, theo quy định hiện hành. Các phần của kế hoạch nằm trong menu này. Đăng nhập để lưu và hỏi trợ lý.',
+        en: 'This is your plan: buy, hold, sell, under current rules. Its sections are in this menu. Sign in to save it and ask the assistant.'
     },
     'tour.skip': { vi: 'Bỏ qua', en: 'Skip' },
     'tour.done': { vi: 'Xong', en: 'Done' },
