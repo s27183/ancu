@@ -19,13 +19,19 @@ sources:
     retrieved: 2026-10-10
     path: docs/sources/firb/residential-real-estate-2026-10-10.txt
     note: "Foreign Investment Review Board, Residential real estate: 'When an application is not required' — Australian citizens living abroad, holders of Australian permanent residency visas: No."
+  - url: https://www.ato.gov.au/individuals-and-families/investments-and-assets/foreign-resident-investments/foreign-investment-in-australia/register-of-foreign-ownership-of-australian-assets/register-of-foreign-ownership-of-australian-assets-reports/register-of-foreign-ownership-of-australian-assets-2024-25-report/residential-land
+    retrieved: 2026-10-13
+    path: docs/sources/ato/register-foreign-ownership-residential-land-2024-25.txt
+    note: "Australian Taxation Office, Register of Foreign Ownership of Australian Assets 2024–25 report, Residential land (last updated 5 March 2026): Table 9 'Registered interests in residential land – Top 20 countries', held by foreign persons at 30 June 2025; who must register and who is exempt (Australian citizens living offshore, permanent residents)."
 ---
 
 # Vietnamese buyers and residents in Australia — facts for the first-visit sheet
 
 The figures the first-visit sheet draws in its "Vietnamese in Australia" section (behavior 42). Each fact quotes the archived primary it comes from; the compiler checks every quote against that file (GATE 12). FIRB counts are **approved proposals**, not completed purchases: a proposal involving more than one source country is counted against each. They count only **foreign persons** — people who must apply to FIRB: anyone without Australian citizenship or permanent residency, temporary-visa holders in Australia included. A home bought in the name of a citizen or permanent resident (a child funded by family in Vietnam, say) needs no approval and is not in them; both FIRB facts carry that as their `note` (behavior 46, Son 2026-10-10), quoted from sources 2 and 3.
 
-Not shown, because no primary supports them (docs/01-market.md §5.6 cites VnExpress / Wikipedia only): "4th largest foreign buyer", the 60/30/10 purchase-purpose split, the 8–10% off-the-plan share.
+The ATO register fact (behavior 77, Son 2026-10-13) counts homes **held** by foreign persons at 30 June 2025, as registered with the ATO since 1 July 2016 — the same foreign persons FIRB counts, so it carries the same note, quoted from the ATO page (source 4). The ATO says the register is self-registered and not a full stocktake; its country tables are national only (no state, suburb, CBD or dwelling type), and its data.gov.au spreadsheet is live and drifts from the dated report, so the fact cites the report.
+
+Not shown, because no primary supports them (docs/01-market.md §5.6 cites VnExpress / Wikipedia only): "4th largest foreign buyer", the 60/30/10 purchase-purpose split, the 8–10% off-the-plan share. The 8–10% is a developer's sales director speaking at a seminar (VnExpress, 28 April 2025); Son 2026-10-13 asked for a primary, and none states an apartment or CBD share by nationality (FIRB, the ATO register, Revenue NSW, the SRO and the Census searched), so the ATO register fact stands in its place.
 
 ## Facts
 
@@ -84,6 +90,33 @@ Not shown, because no primary supports them (docs/01-market.md §5.6 cites VnExp
                       "Australian citizens living abroad No",
                       "Holders of Australian permanent residency visas No"],
       "quotes": ["Vietnam | 65 | 106 | 237 | 383 | 363"]
+    },
+    {
+      "id": "ato_register_top_holders",
+      "visual": "bars",
+      "unit": "count",
+      "headline": {"en": "Vietnam is the 6th largest foreign owner of Australian homes",
+                   "vi": "Việt Nam đứng thứ 6 trong số người nước ngoài sở hữu nhà ở Úc"},
+      "caption": {"en": "Homes held by foreign persons on the ATO register, 30 June 2025",
+                  "vi": "Số nhà do người nước ngoài sở hữu theo sổ đăng ký của Sở Thuế Úc (ATO), 30/6/2025"},
+      "as_of": "2025-06",
+      "source": 4,
+      "items": [
+        {"label": {"en": "China", "vi": "Trung Quốc"}, "value": 22272},
+        {"label": {"en": "Hong Kong", "vi": "Hồng Kông"}, "value": 3396},
+        {"label": "Singapore", "value": 1978},
+        {"label": "Malaysia", "value": 1795},
+        {"label": {"en": "Japan", "vi": "Nhật Bản"}, "value": 1711},
+        {"label": {"en": "Vietnam", "vi": "Việt Nam"}, "value": 1658, "highlight": true}
+      ],
+      "note": {"en": "Counts only foreign persons, including temporary-visa holders. Homes held by Australian citizens or permanent residents — including children funded by family in Vietnam — are not included.",
+               "vi": "Chỉ tính người nước ngoài, kể cả người có visa tạm trú. Nhà do công dân hoặc thường trú nhân Úc sở hữu — kể cả con em được gia đình ở Việt Nam gửi tiền mua — không nằm trong con số này."},
+      "note_sources": [4],
+      "note_quotes": ["foreign persons (which include temporary residents and entities with foreign ownership of 20% or more)",
+                      "Australian citizens living offshore", "permanent residents"],
+      "quotes": ["Table 9: Registered interests in residential land – Top 20 countries",
+                 "People's Republic of China 22,272", "Hong Kong, SAR 3,396", "Singapore 1,978",
+                 "Malaysia 1,795", "Japan 1,711", "Vietnam 1,658"]
     },
     {
       "id": "vietnam_born_population",
