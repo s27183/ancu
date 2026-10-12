@@ -12,6 +12,7 @@
     import SectionMenu from '$lib/SectionMenu.svelte';
     import { provideSections, type SectionGroup } from '$lib/sections.svelte';
     import { sheetMotion, scrimMotion } from '$lib/sheetMotion';
+    import Sparkle from '$lib/Sparkle.svelte';
 
     let { suburb, onclose, onplan, reloadPlan = 0 }: {
         suburb: Suburb;
@@ -124,6 +125,33 @@
                 <p class="sub">{suburb.lga_name}</p>
             {/if}
         </div>
+        <!-- Buyer-on-a-phone -> the plan sheet -> the head leads on (behavior 75; Son
+             2026-10-12: some visitors never notice the floating menu): on the area data
+             the plan, inside a shown plan the AI assistant — the first thing read. Phone
+             only (app.css .head-link): desktop shows the tabs and rails instead. -->
+        {#if tab === 'zone'}
+            <button type="button" class="head-link" onclick={() => {
+                    tab = 'plan';
+                    toTop();
+                }}
+                ><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"
+                    ><path
+                        d="M4 4h7v7H4z M13 4h7v7h-7z M4 13h7v7H4z M13 13h7v7h-7z"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linejoin="round"
+                    /></svg
+                ><span class="head-link-text">{$t('sheet.head.plan')}</span></button
+            >
+        {:else if sections.ask}
+            <button type="button" class="head-link accent" onclick={() => {
+                    sections.ask?.();
+                    toTop();
+                }}
+                ><Sparkle /><span class="head-link-text">{$t('plan.tab.qa_short')}</span></button
+            >
+        {/if}
         <button type="button" class="close" onclick={onclose} aria-label={$t('sheet.close')}
             >✕</button
         >
@@ -208,5 +236,7 @@
             {/key}
         {/if}
     </div>
-    <SectionMenu groups={menuGroups} current={menuCurrent} onpick={toTop} hint={tab === 'zone'} />
+    <SectionMenu groups={menuGroups} current={menuCurrent} onpick={toTop} hint={tab === 'zone'}
+        inPlan={tab === 'plan' && sections.plan.length > 0}
+    />
 </div>

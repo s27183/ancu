@@ -52,11 +52,16 @@ const messages = {
 
     'sheet.tab.zone': { vi: 'Dữ liệu khu vực', en: 'Zone data' },
     'sheet.tab.plan': { vi: 'Kế hoạch', en: 'Plan' },
+    'sheet.head.plan': { vi: 'Kế hoạch →', en: 'Plan →' },
     'sheet.close': { vi: 'Đóng', en: 'Close' },
     'sheet.sections': { vi: 'Các mục', en: 'Sections' },
     'sheet.sections.hint': {
         vi: 'Kế hoạch và các mục khác ở đây ↓',
         en: 'The plan and other sections are here ↓'
+    },
+    'sheet.sections.hint_plan': {
+        vi: 'Tổng quan, Ngân sách và các mục khác ở đây ↓',
+        en: 'Overview, Budget and more sections are here ↓'
     },
     'sheet.viet': { vi: 'Cộng đồng gốc Việt', en: 'Vietnamese community' },
     'sheet.seifa': { vi: 'Chỉ số kinh tế – xã hội (SEIFA)', en: 'Socio-economic (SEIFA)' },

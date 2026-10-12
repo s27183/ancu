@@ -11,42 +11,57 @@
     // sheet opens or its section changes, and on the area data section (`hint`) a small
     // bubble above it says the plan is in here. Neither shows while the tour runs (the tour
     // rings the pill itself) nor after the first open; reduced motion drops the pulse only.
+    //
+    // Inside a shown plan (`inPlan`, behavior 75) the menu holds the plan's many sections,
+    // which a visitor who opened it once on the area data never saw: the pulse and a plan
+    // bubble come back there until the menu is opened while the plan is shown (PLAN_KEY).
     import { fly, fade } from 'svelte/transition';
     import { cubicOut } from 'svelte/easing';
     import { t } from '$lib/i18n';
     import { tourStep } from '$lib/tour';
     import type { SectionGroup, SectionIcon } from '$lib/sections.svelte';
 
-    let { groups, current, onpick, hint = false }: {
+    let { groups, current, onpick, hint = false, inPlan = false }: {
         groups: SectionGroup[];
         current: string;
         /** After a section is picked (the sheet scrolls its body to the top). */
         onpick?: () => void;
         /** May show the "the plan is in here" bubble (the area data section). */
         hint?: boolean;
+        /** The plan's sections are listed (behavior 75): its own flag and bubble. */
+        inPlan?: boolean;
     } = $props();
 
     const SEEN_KEY = 'ancu-sections-seen';
-    function readSeen(): boolean {
+    const PLAN_KEY = 'ancu-sections-plan-seen';
+    function readSeen(key: string): boolean {
         try {
-            return localStorage.getItem(SEEN_KEY) === '1';
+            return localStorage.getItem(key) === '1';
         } catch {
             return false;
         }
     }
-    let seen = $state(readSeen());
-    const noticing = $derived(!seen && $tourStep === 0);
+    function markSeen(key: string) {
+        try {
+            localStorage.setItem(key, '1');
+        } catch {
+            /* storage blocked: the pulse simply comes back next visit */
+        }
+    }
+    let seen = $state(readSeen(SEEN_KEY));
+    let seenPlan = $state(readSeen(PLAN_KEY));
+    const noticing = $derived((inPlan ? !seenPlan : !seen) && $tourStep === 0);
 
     let open = $state(false);
     function toggle() {
         open = !open;
         if (open && !seen) {
             seen = true;
-            try {
-                localStorage.setItem(SEEN_KEY, '1');
-            } catch {
-                /* storage blocked: the pulse simply comes back next visit */
-            }
+            markSeen(SEEN_KEY);
+        }
+        if (open && inPlan && !seenPlan) {
+            seenPlan = true;
+            markSeen(PLAN_KEY);
         }
     }
     let menuEl: HTMLDivElement | undefined = $state();
@@ -147,8 +162,10 @@
     >
 </button>
 
-{#if noticing && hint && !open}
-    <p class="sec-hint" aria-hidden="true">{$t('sheet.sections.hint')}</p>
+{#if noticing && (hint || inPlan) && !open}
+    <p class="sec-hint" aria-hidden="true">
+        {$t(inPlan ? 'sheet.sections.hint_plan' : 'sheet.sections.hint')}
+    </p>
 {/if}
 
 {#snippet icon(name: SectionIcon)}
