@@ -86,6 +86,7 @@
         zoom,
         sizeBy = DEFAULT_SIZE_BY,
         pulseSaved = false,
+        saved = [],
         selected = null,
         recent = null,
         recentSaved = false,
@@ -100,6 +101,9 @@
         /** Saved-plans mode: render the (few) suburbs as a uniform bright pulse instead
          *  of the criterion ramp — they're already filtered to the saved set upstream. */
         pulseSaved?: boolean;
+        /** The saved suburbs, drawn as a red pulse over the base layer while the saved
+         *  filter is off (behavior 76); empty in saved-only mode, which draws them itself. */
+        saved?: Suburb[];
         /** The currently-selected suburb — gets a prominent pulse wherever it is (saved
          *  or not), so the click/combobox target is unmistakable on the map. */
         selected?: Suburb | null;
@@ -134,7 +138,8 @@
     });
 
     const data = $derived(toFeatureCollection(suburbs));
-    const index = $derived(new Map(suburbs.map((s) => [s.sal_code, s])));
+    // The saved overlay can show a suburb a typed name hides, so it is indexed too (behavior 76).
+    const index = $derived(new Map([...saved, ...suburbs].map((s) => [s.sal_code, s])));
     // Colour + radius both follow the selected criterion; recomputed when it changes.
     const paint = $derived(circlePaintFor(sizeBy));
     // Below the measured handoff (~z7–9) the points overplot, so a KDE heatmap (weight
@@ -150,7 +155,9 @@
     // ONE bright pulse signal — a solid centre dot + an expanding ring animated by rAF
     // — shared by (a) the saved suburbs in saved-only mode, in red (behavior 70), (b) the
     // SELECTED suburb (saved or not), in magenta, and (c) the suburb just closed
-    // (behavior 54), red if it is saved, else jade. The ring is JS-driven (MapLibre paint can't read time), so we
+    // (behavior 54), red if it is saved, else jade; and (d) with the saved filter off,
+    // every saved suburb in red over the base layer, whatever the criterion draws there
+    // (behavior 76; Son 2026-10-12: unchecking the filter made the saved suburbs vanish). The ring is JS-driven (MapLibre paint can't read time), so we
     // re-derive its paint each frame — fine for a handful of points. prefers-reduced-
     // motion → a static mid-expansion ring (no animation).
 
@@ -177,10 +184,25 @@
     // The just-closed suburb (behavior 54): same shape, red if saved (behavior 70), else jade.
     const recentData = $derived(onePoint(recent));
     const hasRecentPoint = $derived(!!recent?.centroid);
+    // The saved overlay (behavior 76): every saved suburb with a point.
+    const savedData = $derived<FeatureCollection<Point>>({
+        type: 'FeatureCollection',
+        features: saved
+            .filter((s) => s.centroid)
+            .map((s) => ({
+                type: 'Feature' as const,
+                geometry: {
+                    type: 'Point' as const,
+                    coordinates: [s.centroid!.lon, s.centroid!.lat]
+                },
+                properties: { sal_code: s.sal_code }
+            }))
+    });
+    const hasSavedOverlay = $derived(savedData.features.length > 0);
 
     let pulse = $state(0); // 0→1→0 eased ring progress
     $effect(() => {
-        if (!pulseSaved && !hasSelectedPoint && !hasRecentPoint) return;
+        if (!pulseSaved && !hasSavedOverlay && !hasSelectedPoint && !hasRecentPoint) return;
         const reduce =
             typeof matchMedia === 'function' &&
             matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -345,6 +367,21 @@
          added later goes on top, so without the key a saved suburb's dot hid the
          green one (measured 2026-10-10, Cabramatta saved and just closed). -->
     {#key `${pulseSaved}:${sizeBy}`}
+    <!-- The saved overlay (behavior 76), under the just-closed and selected pulses; a tap
+         on a red dot opens that suburb, as its bubble beneath would. -->
+    {#if hasSavedOverlay}
+        <GeoJSONSource id="suburb-saved-overlay" data={savedData}>
+            <CircleLayer id="saved-overlay-pulse" paint={savedRingPaint} beforeId={labelBeforeId} />
+            <CircleLayer
+                id="saved-overlay-dot"
+                paint={savedDotPaint}
+                beforeId={labelBeforeId}
+                onclick={handleClick}
+                onmouseenter={(e: MapLayerMouseEvent) => setPointer(e, true)}
+                onmouseleave={(e: MapLayerMouseEvent) => setPointer(e, false)}
+            />
+        </GeoJSONSource>
+    {/if}
     {#if hasRecentPoint}
         <GeoJSONSource id="suburb-recent" data={recentData}>
             <CircleLayer id="recent-pulse" paint={recentRingPaint} beforeId={labelBeforeId} />
