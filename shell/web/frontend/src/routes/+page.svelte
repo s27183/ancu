@@ -157,6 +157,12 @@
         if (q) list = list.filter((s) => fold(s.name).includes(q));
         return list;
     });
+    // Every saved suburb in the fetched state(s), for the map's red overlay while the
+    // saved filter is off (behavior 76) — kept while a name is typed, so a visitor never
+    // loses sight of what they saved.
+    const savedSuburbs = $derived(
+        savedOnly || savedTitles.size === 0 ? [] : suburbs.filter((s) => savedTitles.has(s.name))
+    );
     // Name-combobox suggestions: the current visible set with a point, capped — only
     // while typing (an empty query shows none, so the dropdown is gone after a pick).
     const suggestions = $derived(
@@ -333,6 +339,7 @@
             zoom={view.zoom}
             {sizeBy}
             pulseSaved={savedOnly}
+            saved={savedSuburbs}
             {selected}
             {recent}
             recentSaved={!!recent && savedTitles.has(recent.name)}
