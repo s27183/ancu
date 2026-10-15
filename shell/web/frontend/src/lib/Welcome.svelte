@@ -25,8 +25,11 @@
         publisher
     } from '$lib/facts';
     import { startTour, tourDone } from '$lib/tour';
+    import { introOpen } from '$lib/mapHint';
 
     let open = $state(false);
+    // The map's finding pointer waits while this sheet is open (behavior 78, mapHint.ts).
+    $effect(() => introOpen.set(open));
     let closing = $state(false);
     let arrived = $state(false);
     let docs = $state<FactDoc[]>([]);

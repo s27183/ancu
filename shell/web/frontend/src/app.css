@@ -994,6 +994,41 @@ main {
     width: 1.25rem;
     height: 1.25rem;
 }
+/* The finding pointer (behavior 78, lib/mapHint.ts): a bubble under the button, its arrow
+   pointing up at it, bobbing on a transform only; it never takes a tap from the map. */
+.map-hint {
+    position: relative;
+    margin: 0.2rem 0 0;
+    max-width: min(20rem, calc(100vw - 1.5rem));
+    padding: 0.5rem 0.8rem;
+    border-radius: var(--radius);
+    background: var(--accent);
+    color: var(--accent-ink);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    line-height: 1.35;
+    box-shadow: var(--shadow-2);
+    pointer-events: none;
+    animation: map-hint-bob 1.6s ease-in-out infinite;
+}
+.map-hint::before {
+    content: '';
+    position: absolute;
+    top: -0.4rem;
+    left: 1.05rem;
+    border: 0.45rem solid transparent;
+    border-top: 0;
+    border-bottom-color: var(--accent);
+}
+@keyframes map-hint-bob {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-0.3rem);
+    }
+}
 
 /* Map controls — the expanded panel grouping the state + size-criterion + saved filter. */
 .map-controls {
@@ -3311,7 +3346,8 @@ main {
     .sec-pill-ring {
         display: none;
     }
-    .sec-hint {
+    .sec-hint,
+    .map-hint {
         animation: none;
     }
 }

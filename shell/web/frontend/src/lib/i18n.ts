@@ -34,6 +34,11 @@ const messages = {
     'map.legend.nodata': { vi: 'Chưa có dữ liệu', en: 'No data' },
     // Filters — the collapsible controls cluster + the saved-plans / name filter.
     'map.filters': { vi: 'Bộ lọc', en: 'Filters' },
+    // The finding pointer beside the filter button (behavior 78).
+    'map.hint': {
+        vi: 'Gõ tên khu vực ở đây — hoặc phóng to bản đồ để tìm khu vực bạn quan tâm',
+        en: "Type a suburb's name here — or zoom into the map to find the suburbs you care about"
+    },
     'filter.saved': { vi: 'Kế hoạch đã lưu', en: 'Saved plans' },
     'filter.name.placeholder': { vi: 'Tìm khu vực…', en: 'Search suburbs…' },
     'filter.nomatch': { vi: 'Không tìm thấy khu vực phù hợp.', en: 'No matching suburbs.' },
