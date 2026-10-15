@@ -271,6 +271,9 @@
         homeNewsListOpen = true;
     }
 
+    // After the first load the map stays mounted (behavior 79, SuburbMap flyToView):
+    // a later state's dots load behind the current ones, with no loading cover.
+    let loadedOnce = $state(false);
     async function load(st: MapScope) {
         loading = true;
         errored = false;
@@ -278,15 +281,18 @@
         loadedScope = null;
         try {
             const res = await getSuburbs(st);
+            if (st !== auState) return; // a later pick superseded this one
             suburbs = res.suburbs;
             attribution = res.attribution;
             loadedScope = st;
+            loadedOnce = true;
         } catch {
+            if (st !== auState) return;
             errored = true;
             suburbs = [];
             attribution = [];
         } finally {
-            loading = false;
+            if (st === auState) loading = false;
         }
     }
 
@@ -297,6 +303,17 @@
     // retry below is the calm, never-blank-wait surface §7.1 calls for.
     $effect(() => {
         load(auState);
+    });
+    // …and fly the map from where it is to the new state's view (behavior 79). Only a
+    // real change: the scope the map already shows does nothing. If the map is not
+    // mounted (first load, or after an error) it opens at `view` when it mounts.
+    let viewScope: MapScope = untrack(() => auState);
+    $effect(() => {
+        const st = auState;
+        if (st === viewScope) return;
+        viewScope = st;
+        const v = STATE_VIEW[st];
+        untrack(() => mapRef)?.flyToView(v.center, v.zoom);
     });
 
     // Once signed in, take any onboarding the user left for the sign-in (read once, so a
@@ -349,7 +366,7 @@
         </div>
     {/if}
 
-    {#if !loading && !errored}
+    {#if loadedOnce && !errored}
         <SuburbMap
             bind:this={mapRef}
             bind:basemap={basemapOn}
@@ -529,7 +546,7 @@
         </div>
     {/if}
 
-    {#if loading}
+    {#if loading && !loadedOnce}
         <div class="overlay"><p>{$t('map.loading')}</p></div>
     {:else if errored}
         <div class="overlay">
