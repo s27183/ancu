@@ -416,7 +416,6 @@
             class="controls-toggle"
             data-tour="controls"
             aria-expanded={controlsOpen}
-            aria-label={$t('map.filters')}
             onclick={() => (controlsOpen = !controlsOpen)}
         >
             <svg
@@ -435,6 +434,7 @@
                 <circle cx="15" cy="12" r="2.4" fill="var(--surface)" />
                 <circle cx="9" cy="17" r="2.4" fill="var(--surface)" />
             </svg>
+            <span class="controls-label">{$t('map.filters')}</span>
         </button>
 
         {#if showMapHint && !controlsOpen}
@@ -443,6 +443,7 @@
 
         {#if controlsOpen}
             <div class="map-controls">
+                <p class="controls-purpose">{$t('map.filters.purpose')}</p>
                 <div class="control">
                     <label for="state-select">{$t('map.state.label')}</label>
                     <div class="select-wrap">

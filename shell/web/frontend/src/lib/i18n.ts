@@ -33,7 +33,11 @@ const messages = {
     'map.size.crime': { vi: 'Chỉ số tội phạm', en: 'Recorded criminal incidents' },
     'map.legend.nodata': { vi: 'Chưa có dữ liệu', en: 'No data' },
     // Filters — the collapsible controls cluster + the saved-plans / name filter.
-    'map.filters': { vi: 'Bộ lọc', en: 'Filters' },
+    'map.filters': { vi: 'Tìm & lọc', en: 'Search & filter' },
+    'map.filters.purpose': {
+        vi: 'Tìm khu vực theo tên, hoặc chọn bang và chỉ số tô màu các chấm trên bản đồ.',
+        en: 'Find a suburb by name, or choose a state and what the dots show.'
+    },
     // The finding pointer beside the filter button (behavior 78).
     'map.hint': {
         vi: 'Gõ tên khu vực ở đây — hoặc phóng to bản đồ để tìm khu vực bạn quan tâm',
