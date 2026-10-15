@@ -4,7 +4,7 @@
     // state selector (the engine's query grain), a legend, the CC-BY attribution
     // strip (§6.1), and the click-sheet. Mobile-native: full-bleed canvas, the
     // sheet is a bottom-sheet on phone / side-panel on desktop (§7.1).
-    import { onMount, tick } from 'svelte';
+    import { onMount, tick, untrack } from 'svelte';
     import {
         getSuburbs,
         listPlanCards,
@@ -45,6 +45,7 @@
     import Welcome from '$lib/Welcome.svelte';
     import Tour from '$lib/Tour.svelte';
     import { tourStep, tourRun, tourEvent, endTour } from '$lib/tour';
+    import { introOpen, mapHintDone, markMapHintDone } from '$lib/mapHint';
     import { t, type MessageKey } from '$lib/i18n';
 
     // NB: never name a $state var `state` — svelte-check reads it as a store subscribe.
@@ -123,6 +124,24 @@
     let comboFocused = $state(false);
     // The controls cluster collapses to a glass icon by default (Feature 2).
     let controlsOpen = $state(false);
+    // The finding pointer beside the filter button (behavior 78, mapHint.ts): gone for
+    // this page view once the filter opens, the map zooms or a suburb opens; a suburb
+    // opened ends it for this browser. Only the visitor's own acts count: the tour opens
+    // the panel, a suburb and flies the map itself, and the pointer must still show once
+    // it ends (measured 2026-10-15: without the guard, skipping the tour left no pointer).
+    // `untrack` so a tour ending with the panel or a suburb open is not read as an act.
+    let hintGone = $state(mapHintDone());
+    const byVisitor = () => untrack(() => $tourStep) === 0;
+    $effect(() => {
+        if (controlsOpen && byVisitor()) hintGone = true;
+    });
+    $effect(() => {
+        if (selected && byVisitor()) {
+            hintGone = true;
+            markMapHintDone();
+        }
+    });
+    const showMapHint = $derived(!hintGone && !$introOpen && $tourStep === 0 && !loading && !errored);
     // The map component instance — for fly-to from the name combobox.
     let mapRef = $state<SuburbMap>();
 
@@ -344,6 +363,9 @@
             {recent}
             recentSaved={!!recent && savedTitles.has(recent.name)}
             onselect={(s) => (selected = s)}
+            onuserzoom={() => {
+                if (byVisitor()) hintGone = true;
+            }}
         />
     {/if}
 
@@ -394,7 +416,6 @@
             class="controls-toggle"
             data-tour="controls"
             aria-expanded={controlsOpen}
-            aria-label={$t('map.filters')}
             onclick={() => (controlsOpen = !controlsOpen)}
         >
             <svg
@@ -413,10 +434,16 @@
                 <circle cx="15" cy="12" r="2.4" fill="var(--surface)" />
                 <circle cx="9" cy="17" r="2.4" fill="var(--surface)" />
             </svg>
+            <span class="controls-label">{$t('map.filters')}</span>
         </button>
+
+        {#if showMapHint && !controlsOpen}
+            <p class="map-hint" role="note">{$t('map.hint')}</p>
+        {/if}
 
         {#if controlsOpen}
             <div class="map-controls">
+                <p class="controls-purpose">{$t('map.filters.purpose')}</p>
                 <div class="control">
                     <label for="state-select">{$t('map.state.label')}</label>
                     <div class="select-wrap">

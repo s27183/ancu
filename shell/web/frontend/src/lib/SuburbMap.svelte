@@ -92,6 +92,7 @@
         recentSaved = false,
         onselect,
         onzoom,
+        onuserzoom,
         basemap = $bindable(false)
     }: {
         suburbs: Suburb[];
@@ -115,6 +116,9 @@
         onselect: (s: Suburb | null) => void;
         /** Reports the live map zoom up to the parent (drives the overview hint). */
         onzoom?: (z: number) => void;
+        /** A zoom once the map has settled after load — the visitor's own, or a fly the
+         *  page asked for — so the finding pointer goes (behavior 78). */
+        onuserzoom?: () => void;
         /** Out: whether the Protomaps basemap is drawn — its credit then belongs in the
          *  page's one "i" credit popup (behavior 43), not a MapLibre control. */
         basemap?: boolean;
@@ -135,6 +139,18 @@
         m.on('zoom', report);
         report();
         return () => m.off('zoom', report);
+    });
+    // The load's own fit is not the visitor zooming: listen only after the first idle.
+    $effect(() => {
+        if (!map || !onuserzoom) return;
+        const m = map;
+        const cb = onuserzoom;
+        const arm = () => m.on('zoomstart', cb);
+        m.once('idle', arm);
+        return () => {
+            m.off('idle', arm);
+            m.off('zoomstart', cb);
+        };
     });
 
     const data = $derived(toFeatureCollection(suburbs));
