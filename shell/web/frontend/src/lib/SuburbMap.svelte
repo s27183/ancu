@@ -54,6 +54,7 @@
         type SizeBy
     } from '$lib/map';
     import { ensurePmtilesProtocol } from '$lib/pmtiles';
+    import { untrack } from 'svelte';
 
     // Build-time: Vite statically replaces this; unset → undefined → no-basemap fallback.
     const PMTILES_URL = import.meta.env.VITE_PMTILES_URL;
@@ -96,6 +97,8 @@
         basemap = $bindable(false)
     }: {
         suburbs: Suburb[];
+        /** Where the map opens — read once at mount. A later change of state moves the
+         *  map through flyToView, not these props (behavior 79). */
         center: [number, number];
         zoom: number;
         sizeBy?: SizeBy;
@@ -129,8 +132,25 @@
         map?.flyTo({ center: [lon, lat], zoom: Math.max(map.getZoom(), 11) });
     }
 
-    // Track the live zoom via the map instance (separate from the initial `zoom` prop,
-    // which still drives recentre-on-state-change). Reported up for the overview hint.
+    // Choosing a state flies the map there (behavior 79).
+    //   goal property: bilingual — a guest explores unaided; the map is a full-bleed
+    //     canvas that never goes blank to wait (+page.svelte, §7.1)
+    //   invariant: the map is built once per page view; a state change moves the camera
+    //     and swaps the dots, never remounts the map
+    //   component: this flyToView + the page's scope effect (routes/+page.svelte)
+    //   capability: flies from wherever the camera is to the state's STATE_VIEW;
+    //     MapLibre itself (5.24 camera.ts flyTo) makes it a jump under reduced motion.
+    // svelte-maplibre-gl 2.0.1 applies a changed `center`/`zoom` prop with jumpTo (an
+    // instant cut, measured 2026-10-15 in dist/map/MapLibre.svelte), so those props are
+    // read once here and the flight is asked for explicitly.
+    const initialCenter = untrack(() => center);
+    const initialZoom = untrack(() => zoom);
+    export function flyToView(to: [number, number], z: number) {
+        map?.flyTo({ center: to, zoom: z });
+    }
+
+    // Track the live zoom via the map instance (separate from the initial `zoom` prop;
+    // a state change flies through flyToView). Reported up for the overview hint.
     let map = $state<MlMap>();
     $effect(() => {
         if (!map) return;
@@ -139,6 +159,12 @@
         m.on('zoom', report);
         report();
         return () => m.off('zoom', report);
+    });
+    // Dev server only (never in a build): the live map, so a browser check can read the
+    // camera — a hidden test tab draws no frames to see it by (behavior 79).
+    $effect(() => {
+        if (!import.meta.env.DEV || !map) return;
+        (window as unknown as { __ancuMap?: MlMap }).__ancuMap = map;
     });
     // The load's own fit is not the visitor zooming: listen only after the first idle.
     $effect(() => {
@@ -304,8 +330,8 @@
 <MapLibre
     bind:map
     style={mapStyle}
-    {center}
-    {zoom}
+    center={initialCenter}
+    zoom={initialZoom}
     attributionControl={false}
     autoloadGlobalCss={false}
     inlineStyle="position:absolute;inset:0"
