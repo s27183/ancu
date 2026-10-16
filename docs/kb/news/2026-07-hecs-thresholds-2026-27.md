@@ -28,12 +28,14 @@ borrowing-capacity figures were calculated against last year's threshold, your
 HECS repayment commitment — and therefore your capacity — may now be slightly
 higher than shown.
 
+
 ## Summary (VI)
 
 Ngưỡng hoàn trả HECS-HELP bắt buộc đã tăng từ **67.000 đô la** (năm 2025-26)
 lên **69.528 đô la** (năm 2026-27), cùng với bảng bậc thuế biên mới. Nếu năng
 lực vay của bạn được tính theo ngưỡng năm ngoái, khoản hoàn trả HECS — và do đó
 năng lực vay — có thể hiện đã cao hơn một chút so với con số đang hiển thị.
+
 
 ## Diff
 

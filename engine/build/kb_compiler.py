@@ -127,6 +127,26 @@ LOCALE_VALIDATORS = {
 # after it, so this is structural, not a style nit).
 NEWS_HEADLINE_MAX_CHARS = 100
 
+# Bilingual -> P-7 · The KB -> The KB compiler -> a news summary reads in short paragraphs
+# Behavior 103 (Son 2026-10-17, his friend on the Visa news): every summary was one block,
+# up to 1,178 characters — hard to read on a phone. A summary paragraph (text between
+# blank lines) is at most NEWS_PARAGRAPH_MAX_CHARS in either language, fail-closed in
+# GATE 11 so a note the weekly kb-watch routine writes later holds it too. A markdown
+# table (every line starting with `|`) is not a paragraph and has no limit.
+NEWS_PARAGRAPH_MAX_CHARS = 400
+
+
+def long_paragraphs(text):
+    """The (index, length) of each summary paragraph over NEWS_PARAGRAPH_MAX_CHARS."""
+    out = []
+    paras = [p.strip() for p in re.split(r"\n\s*\n", text or "") if p.strip()]
+    for i, para in enumerate(paras, 1):
+        if all(line.lstrip().startswith("|") for line in para.splitlines()):
+            continue
+        if len(para) > NEWS_PARAGRAPH_MAX_CHARS:
+            out.append((i, len(para)))
+    return out
+
 # A news note's display category (kb-news-feature.md "News overview sheet") — a small,
 # closed enum grounded in the five modes' concerns, NOT derived from docs/kb/*'s ~40
 # fine-grained slug namespaces (too granular, not user-facing groupings). Explicit
@@ -1533,6 +1553,11 @@ def run(emit=False):
     # affected_kb_slugs there's nothing to intersect against a plan card's
     # consulted-slugs list, so it never enters the (currently dormant) per-card
     # relevance filter.
+    # the paragraph check proves itself each build: a planted 401-char paragraph is caught,
+    # a 400-char one and a table are not (behavior 103)
+    if (long_paragraphs("ok.\n\n" + "x" * 401) != [(2, 401)] or long_paragraphs("x" * 400)
+            or long_paragraphs("| a | b |\n|---|---|\n| " + "x" * 500 + " | 1 |")):
+        fails.append("[news] the summary paragraph check missed a planted case")
     for slug, doc in sorted(news_docs.items()):
         standalone = doc.get("kb_slug") is None
         if not standalone:
@@ -1574,6 +1599,11 @@ def run(emit=False):
         err = check_copy_template({"en": doc.get("summary_en"), "vi": doc.get("summary_vi")})
         if err:
             fails.append(f"[news] {slug}: bilingual summary: {err}")
+        for loc in ("en", "vi"):
+            for i, n in long_paragraphs(doc.get(f"summary_{loc}")):
+                fails.append(f"[news] {slug}: Summary ({loc.upper()}) paragraph {i} is {n} chars "
+                            f"(max {NEWS_PARAGRAPH_MAX_CHARS}) — split it at a blank line "
+                            f"(kb-update-runbook.md \"Authoring a news note\")")
         hl_err = check_copy_template({"en": doc.get("headline_en"), "vi": doc.get("headline_vi")})
         if hl_err:
             fails.append(f"[news] {slug}: bilingual headline: {hl_err}")

@@ -23,11 +23,19 @@ Phụ phí thuế trước bạ người mua nước ngoài tăng: NSW lên 9%, 
 
 ## Summary (EN)
 
-The one-off foreign-purchaser duty surcharge — paid at settlement on top of standard stamp duty — increased in two states. **NSW's surcharge purchaser duty rose from 8% to 9%** on **1 January 2025**, now the highest rate in the country. **QLD's additional foreign acquirer duty (AFAD) rose from 7% to 8%** on **1 July 2024**, aligning it with NSW and VIC. On a $1M purchase this is an extra $10,000 (NSW) or $10,000 (QLD, from the 1% step) in surcharge alone, on top of standard duty. If your plan modelled a NSW or QLD foreign-buyer purchase using the earlier rate, re-check the figure — the current rates (NSW 9%, QLD 8%, VIC 8%, WA/SA 7%, TAS 8%, ACT/NT nil) are what the resolver now applies.
+The one-off foreign-purchaser duty surcharge — paid at settlement on top of standard stamp duty — increased in two states. **NSW's surcharge purchaser duty rose from 8% to 9%** on **1 January 2025**, now the highest rate in the country. **QLD's additional foreign acquirer duty (AFAD) rose from 7% to 8%** on **1 July 2024**, aligning it with NSW and VIC.
+
+On a $1M purchase this is an extra $10,000 (NSW) or $10,000 (QLD, from the 1% step) in surcharge alone, on top of standard duty. If your plan modelled a NSW or QLD foreign-buyer purchase using the earlier rate, re-check the figure — the current rates (NSW 9%, QLD 8%, VIC 8%, WA/SA 7%, TAS 8%, ACT/NT nil) are what the resolver now applies.
+
 
 ## Summary (VI)
 
-Phụ phí thuế trước bạ một lần dành cho người mua nước ngoài — nộp khi hoàn tất giao dịch, cộng thêm vào thuế trước bạ tiêu chuẩn — đã tăng tại hai bang. **Phụ phí thuế trước bạ của NSW tăng từ 8% lên 9%** từ ngày **1/1/2025**, hiện là mức cao nhất cả nước. **Phụ phí AFAD (additional foreign acquirer duty) của QLD tăng từ 7% lên 8%** từ ngày **1/7/2024**, ngang bằng với NSW và VIC. Với một giao dịch mua trị giá 1 triệu đô, đây là khoản phụ phí tăng thêm đáng kể so với trước, chưa kể thuế trước bạ tiêu chuẩn. Nếu kế hoạch của bạn từng tính theo mức phụ phí cũ tại NSW hoặc QLD, hãy kiểm tra lại con số — mức hiện tại (NSW 9%, QLD 8%, VIC 8%, WA/SA 7%, TAS 8%, ACT/NT không thu) là mức bộ giải quyết hiện đang áp dụng.
+Phụ phí thuế trước bạ một lần dành cho người mua nước ngoài — nộp khi hoàn tất giao dịch, cộng thêm vào thuế trước bạ tiêu chuẩn — đã tăng tại hai bang. **Phụ phí thuế trước bạ của NSW tăng từ 8% lên 9%** từ ngày **1/1/2025**, hiện là mức cao nhất cả nước.
+
+**Phụ phí AFAD (additional foreign acquirer duty) của QLD tăng từ 7% lên 8%** từ ngày **1/7/2024**, ngang bằng với NSW và VIC. Với một giao dịch mua trị giá 1 triệu đô, đây là khoản phụ phí tăng thêm đáng kể so với trước, chưa kể thuế trước bạ tiêu chuẩn.
+
+Nếu kế hoạch của bạn từng tính theo mức phụ phí cũ tại NSW hoặc QLD, hãy kiểm tra lại con số — mức hiện tại (NSW 9%, QLD 8%, VIC 8%, WA/SA 7%, TAS 8%, ACT/NT không thu) là mức bộ giải quyết hiện đang áp dụng.
+
 
 ## Diff
 

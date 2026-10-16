@@ -22,11 +22,21 @@ Thuế khấu lưu CGT với người không cư trú tăng lên 15%, bỏ ngư�
 
 ## Summary (EN)
 
-For contracts entered on or after **1 January 2025**, the Foreign Resident Capital Gains Withholding (FRCGW) rate rose from **12.5% to 15%** of the sale price, and the earlier **A$750,000 property-value threshold was removed** — FRCGW now applies to **every** disposal of Australian taxable real property by a foreign resident, not just those above a value floor. The purchaser still withholds the amount at settlement and remits it to the ATO; it remains a **prepayment credited against the vendor's actual CGT liability** on assessment, not a separate tax, and a variation notice can still reduce the amount withheld where the real gain is smaller. This matters for the sale-day cash flow of any Mode B foreign-resident vendor — and, symmetrically, for a Mode B buyer purchasing from a foreign-resident vendor, who is themselves the withholder. If your plan's disposition or purchase modelling used the pre-2025 12.5%/$750k figures, it understated the withholding by 2.5 percentage points and missed properties below the old threshold entirely.
+For contracts entered on or after **1 January 2025**, the Foreign Resident Capital Gains Withholding (FRCGW) rate rose from **12.5% to 15%** of the sale price, and the earlier **A$750,000 property-value threshold was removed** — FRCGW now applies to **every** disposal of Australian taxable real property by a foreign resident, not just those above a value floor.
+
+The purchaser still withholds the amount at settlement and remits it to the ATO; it remains a **prepayment credited against the vendor's actual CGT liability** on assessment, not a separate tax, and a variation notice can still reduce the amount withheld where the real gain is smaller.
+
+This matters for the sale-day cash flow of any Mode B foreign-resident vendor — and, symmetrically, for a Mode B buyer purchasing from a foreign-resident vendor, who is themselves the withholder. If your plan's disposition or purchase modelling used the pre-2025 12.5%/$750k figures, it understated the withholding by 2.5 percentage points and missed properties below the old threshold entirely.
+
 
 ## Summary (VI)
 
-Đối với hợp đồng ký kết từ **1/1/2025** trở đi, mức thuế khấu lưu thuế lãi vốn đối với người không cư trú (FRCGW) tăng từ **12,5% lên 15%** giá bán, và **ngưỡng giá trị bất động sản 750.000 AUD** trước đây đã bị **bãi bỏ** — FRCGW nay áp dụng cho **mọi** giao dịch chuyển nhượng bất động sản chịu thuế tại Úc của người không cư trú, không chỉ những giao dịch trên một mức giá trị nhất định. Người mua vẫn khấu lưu khoản này tại thời điểm hoàn tất giao dịch và nộp cho Sở Thuế (ATO); đây vẫn là **khoản tạm nộp được khấu trừ vào nghĩa vụ thuế lãi vốn thực tế** của người bán khi quyết toán, không phải một loại thuế riêng, và người bán vẫn có thể xin thông báo điều chỉnh để giảm mức khấu lưu nếu lãi thực tế thấp hơn. Điều này ảnh hưởng đến dòng tiền ngày bán của người bán không cư trú thuộc Mode B — và tương tự, đối với người mua thuộc Mode B mua từ người bán không cư trú, chính họ là người phải khấu lưu. Nếu kế hoạch của bạn từng tính toán dựa trên mức 12,5%/ngưỡng 750.000 AUD trước 2025, số liệu đó đã thấp hơn thực tế 2,5 điểm phần trăm và bỏ sót các bất động sản dưới ngưỡng cũ.
+Đối với hợp đồng ký kết từ **1/1/2025** trở đi, mức thuế khấu lưu thuế lãi vốn đối với người không cư trú (FRCGW) tăng từ **12,5% lên 15%** giá bán, và **ngưỡng giá trị bất động sản 750.000 AUD** trước đây đã bị **bãi bỏ** — FRCGW nay áp dụng cho **mọi** giao dịch chuyển nhượng bất động sản chịu thuế tại Úc của người không cư trú, không chỉ những giao dịch trên một mức giá trị nhất định.
+
+Người mua vẫn khấu lưu khoản này tại thời điểm hoàn tất giao dịch và nộp cho Sở Thuế (ATO); đây vẫn là **khoản tạm nộp được khấu trừ vào nghĩa vụ thuế lãi vốn thực tế** của người bán khi quyết toán, không phải một loại thuế riêng, và người bán vẫn có thể xin thông báo điều chỉnh để giảm mức khấu lưu nếu lãi thực tế thấp hơn.
+
+Điều này ảnh hưởng đến dòng tiền ngày bán của người bán không cư trú thuộc Mode B — và tương tự, đối với người mua thuộc Mode B mua từ người bán không cư trú, chính họ là người phải khấu lưu. Nếu kế hoạch của bạn từng tính toán dựa trên mức 12,5%/ngưỡng 750.000 AUD trước 2025, số liệu đó đã thấp hơn thực tế 2,5 điểm phần trăm và bỏ sót các bất động sản dưới ngưỡng cũ.
+
 
 ## Diff
 

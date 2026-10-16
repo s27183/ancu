@@ -16,7 +16,7 @@
     import { t, type MessageKey } from '$lib/i18n';
     import Modal from '$lib/Modal.svelte';
     import type { NewsNote, NewsCategory } from '$lib/api';
-    import { renderInlineMarkdown } from '$lib/markdown';
+    import { renderMarkdown } from '$lib/markdown';
     import { terms, markTermsHtml, termClicks } from '$lib/terms';
     import { date as formatDate } from '$lib/format';
 
@@ -56,9 +56,12 @@
     const summary = $derived(
         ($lang === 'vi' ? note.summary_vi : note.summary_en) ?? note.summary_en ?? note.summary_vi ?? ''
     );
-    // KB authors write summaries with **bold**/*italic* (docs/kb convention) — render it,
-    // don't show the buyer literal asterisks.
-    const summaryHtml = $derived(markTermsHtml(renderInlineMarkdown(summary), $terms));
+    // KB authors write summaries as markdown (docs/kb convention): short paragraphs split by
+    // blank lines, **bold**/*italic*, and a table where a note reports numbers by category
+    // (behavior 103, Son 2026-10-17: a 1,000-character block was hard to read, and the
+    // planning levels are a table). The block renderer draws all of it; one `seen` set for
+    // the whole summary, so a term is marked once per note.
+    const summaryHtml = $derived(markTermsHtml(renderMarkdown(summary), $terms));
 
     // `note.diff` is a generic, schema-less JSON blob (kb_compiler.py's build-time audit
     // trail for what a news note changed) — authored for the KB-authoring/QA workflow, not
@@ -75,7 +78,7 @@
             {#if dateLabel}<span class="pp-news-meta-date">{dateLabel}</span>{/if}
         </p>
     {/if}
-    <p class="pp-news-summary" use:termClicks>{@html summaryHtml}</p>
+    <div class="pp-news-summary" use:termClicks>{@html summaryHtml}</div>
     {#if sourceUrl}
         <a class="pp-news-source" href={sourceUrl} target="_blank" rel="noopener noreferrer"
             >{$t('plan.news.source')}</a

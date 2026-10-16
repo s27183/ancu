@@ -37,11 +37,21 @@ Visa Kỹ năng Cần thiết (482) thay thế visa TSS từ 7/12/2024
 
 ## Summary (EN)
 
-The employer-sponsored **Skills in Demand (subclass 482)** visa **replaced the Temporary Skill Shortage (TSS) visa** on **7 December 2024**. It has three streams (Core Skills, Specialist Skills, Labour agreement), lets the holder work in Australia for up to **4 years** — for the sponsor, in the nominated occupation — and opens a permanent-residence pathway via subclass 186 after **2 years** of sponsored work. For FIRB purposes nothing changes: a 482 holder is a **temporary resident, so a foreign person**, for as long as they hold it — the established-dwelling ban (1 April 2025 – 30 June 2029) and the FIRB approval requirement still apply. If your plan referenced the old TSS visa, it should now reference the 482.
+The employer-sponsored **Skills in Demand (subclass 482)** visa **replaced the Temporary Skill Shortage (TSS) visa** on **7 December 2024**.
+
+It has three streams (Core Skills, Specialist Skills, Labour agreement), lets the holder work in Australia for up to **4 years** — for the sponsor, in the nominated occupation — and opens a permanent-residence pathway via subclass 186 after **2 years** of sponsored work.
+
+For FIRB purposes nothing changes: a 482 holder is a **temporary resident, so a foreign person**, for as long as they hold it — the established-dwelling ban (1 April 2025 – 30 June 2029) and the FIRB approval requirement still apply.
+
+If your plan referenced the old TSS visa, it should now reference the 482.
+
 
 ## Summary (VI)
 
-Visa **Kỹ năng Cần thiết (diện phụ 482)** do chủ lao động bảo lãnh đã **thay thế visa Thiếu hụt Kỹ năng Tạm thời (TSS)** từ ngày **7/12/2024**. Visa này có ba luồng (Kỹ năng Cốt lõi, Kỹ năng Chuyên gia, Thỏa thuận Lao động), cho phép làm việc tại Úc tối đa **4 năm** — cho chủ bảo lãnh, trong ngành nghề được đề cử — và mở lộ trình thường trú qua diện 186 sau **2 năm** làm việc có bảo lãnh. Về mặt FIRB, không có gì thay đổi: người giữ visa 482 là **thường trú tạm thời, tức người nước ngoài**, trong suốt thời gian giữ visa — lệnh cấm mua nhà đã xây (1/4/2025 – 30/6/2029) và yêu cầu phê duyệt FIRB vẫn áp dụng. Nếu kế hoạch của bạn từng tham chiếu visa TSS cũ, nay nên tham chiếu visa 482.
+Visa **Kỹ năng Cần thiết (diện phụ 482)** do chủ lao động bảo lãnh đã **thay thế visa Thiếu hụt Kỹ năng Tạm thời (TSS)** từ ngày **7/12/2024**. Visa này có ba luồng (Kỹ năng Cốt lõi, Kỹ năng Chuyên gia, Thỏa thuận Lao động), cho phép làm việc tại Úc tối đa **4 năm** — cho chủ bảo lãnh, trong ngành nghề được đề cử — và mở lộ trình thường trú qua diện 186 sau **2 năm** làm việc có bảo lãnh.
+
+Về mặt FIRB, không có gì thay đổi: người giữ visa 482 là **thường trú tạm thời, tức người nước ngoài**, trong suốt thời gian giữ visa — lệnh cấm mua nhà đã xây (1/4/2025 – 30/6/2029) và yêu cầu phê duyệt FIRB vẫn áp dụng. Nếu kế hoạch của bạn từng tham chiếu visa TSS cũ, nay nên tham chiếu visa 482.
+
 
 ## Diff
 
