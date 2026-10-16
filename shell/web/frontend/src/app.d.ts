@@ -9,6 +9,12 @@ declare global {
             lifecycle?: 'buy' | 'own' | 'sell' | 'finances';
             // A plan opened over the planner's plans list (behavior 96): back returns to it.
             overList?: boolean;
+            // Behavior 106: a plan's levels are history entries — the hub is the plan's own
+            // entry; Ngân sách / Hành trình / the assistant push `planView`; a step of
+            // Hành trình pushes `flowPhase` (and the step it was opened at, `flowAction`).
+            planView?: boolean;
+            flowPhase?: string;
+            flowAction?: string;
         }
         // interface Platform {}
     }

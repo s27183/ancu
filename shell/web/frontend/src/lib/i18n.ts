@@ -243,7 +243,7 @@ const messages = {
     // yield_tax, cash_calculator, journey, property, buying, after_you_buy) are now dead — see
     // git history if reviving a pre-restructure card shape is ever needed.
     'plan.ltab.overview': { vi: 'Tổng quan', en: 'Overview' },
-    'plan.ltab.flow': { vi: 'Hành trình', en: 'Flow' },
+    'plan.ltab.flow': { vi: 'Hành trình', en: 'Journey' },
     'plan.ltab.budget': { vi: 'Ngân sách', en: 'Budget' },
     'plan.ltab.portfolio': { vi: 'Danh mục', en: 'Portfolio' },
     'plan.ltab.family': { vi: 'Gia đình', en: 'Family' },
@@ -697,6 +697,14 @@ const messages = {
     'plan.sheet.costs_sell': { vi: 'Phí bán', en: 'Selling costs' },
     'plan.sheet.total_hold': { vi: 'Tổng phí trong {n} năm', en: 'Total costs over {n} years' },
     'plan.sheet.total_hold_none': { vi: 'Tổng phí', en: 'Total costs' },
+    // Behavior 106: the plan hub's cards (PlanHub.svelte).
+    'plan.hub.steps': { vi: 'Bước đã xong', en: 'Steps done' },
+    'plan.hub.next': { vi: 'Tiếp theo:', en: 'Next:' },
+    'plan.hub.all_done': { vi: 'Đã xong mọi bước', en: 'Every step done' },
+    'plan.hub.flow_what': {
+        vi: 'Từng bước: ai làm gì, khi nào',
+        en: 'Step by step: who does what, and when'
+    },
     'plan.sheet.own_why': { vi: '{x}/năm × {n} năm', en: '{x}/yr × {n} years' },
     'plan.sheet.sell_why': {
         vi: 'Theo giá bán dự kiến sau {n} năm: {p} (tăng {g}%/năm)',
@@ -710,7 +718,6 @@ const messages = {
     'plan.sheet.into_principal_none': { vi: 'Tiền gốc vay đã trả', en: 'Loan principal repaid' },
     'plan.sheet.cash_to_buy': { vi: 'Cần có khi mua (đặt cọc + phí mua)', en: 'Cash needed to buy (deposit + buying costs)' },
     'plan.sheet.not_a_cost': { vi: 'Không phải phí · không tính vào tổng', en: 'Not a cost · not in the total' },
-    'plan.sheet.back': { vi: 'Ngân sách', en: 'Budget' },
     'plan.sheet.not_in_total': { vi: 'Không tính vào tổng', en: 'Not in the total' },
     'plan.sheet.key': { vi: '≈ ước tính · không dấu: chính xác', en: '≈ estimate · unmarked: exact' },
     'plan.sheet.estimate': { vi: 'ước tính', en: 'estimate' },
