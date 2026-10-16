@@ -1,0 +1,8 @@
+Source: https://immi.homeaffairs.gov.au/what-we-do/migration-program-planning-levels
+Retrieved: 2026-10-17
+Extracted: the link targets of the category names in the page's main element, read in Claude in Chrome (javascript: text -> href); the page text itself is archived as migration-program-planning-levels-2026-10-16.txt
+
+Skilled Independent -> https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/skilled-independent-189
+Talent and Innovation -> https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/national-innovation-visa-858
+Employer Sponsored -> https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/employer-nomination-scheme-186
+Visa options -> https://immi.homeaffairs.gov.au/what-we-do/family-migration-program/visa-options
