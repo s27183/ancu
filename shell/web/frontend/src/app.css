@@ -2405,6 +2405,7 @@ main {
     margin: 0 0 0.85em;
 }
 .pp-news-summary table {
+    width: 100%; /* two tables in one note line up their columns */
     border-collapse: collapse;
     font-family: var(--font-sans);
     font-size: var(--fs-sm);
