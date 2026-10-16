@@ -735,6 +735,18 @@ const messages = {
     'plan.sheet.hold_q': { vi: 'Bạn định giữ nhà bao lâu?', en: 'How long will you keep it?' },
     'plan.sheet.years': { vi: 'năm', en: 'yrs' },
     'plan.sheet.filling': { vi: 'Đang tính…', en: 'Working it out…' },
+    // behavior 95: the price change on the statement; "Tiền bạn có" on the Mua sheet
+    'plan.sheet.price': { vi: 'Giá nhà', en: 'Price' },
+    'plan.sheet.price_preview': { vi: 'Xem thử', en: 'Preview' },
+    'plan.sheet.price_save': { vi: 'Lưu', en: 'Save' },
+    'plan.sheet.price_saved': { vi: 'Đã lưu vào kế hoạch.', en: 'Saved to the plan.' },
+    'plan.sheet.cash': { vi: 'Tiền bạn có', en: 'Cash you have' },
+    'plan.sheet.cash_low': { vi: 'Mức thấp', en: 'Low end' },
+    'plan.sheet.cash_high': { vi: 'Mức cao', en: 'High end' },
+    'plan.sheet.cash_ok': { vi: 'Đủ', en: 'Enough' },
+    'plan.sheet.cash_short': { vi: 'Còn thiếu {x}', en: '{x} short' },
+    'plan.sheet.finances': { vi: 'Thu nhập và khoản nợ', en: 'Income and debts' },
+    'plan.sheet.steps': { vi: 'Trong hành trình', en: 'In the journey' },
     // Budget cockpit (the prototype's input form, engine-driven).
     'plan.cockpit.title': { vi: 'Ngân sách — bạn đã sẵn sàng?', en: 'Budget — am I ready?' },
     'plan.cockpit.intro': {

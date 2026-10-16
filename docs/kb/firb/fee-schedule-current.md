@@ -68,7 +68,8 @@ Pure-reference (`fills: []`). The fee is selected and placed by the `firb_workfl
             "vi": "Giá căn nhà; mức phí được điều chỉnh mỗi ngày 1/7.",
             "en": "The price of the home; the fees are indexed every 1 July."
           },
-          "source": 1
+          "source": 1,
+          "explains": ["firb_workflow"]
         }
       ]
     },

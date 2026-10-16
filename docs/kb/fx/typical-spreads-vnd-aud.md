@@ -120,7 +120,8 @@ Pure-reference (`fills: []`). The `cash_position` resolver seeds `estimated_fx_s
             "vi": "Thấp (~0,5–1,5%) khi dùng dịch vụ chuyển tiền chuyên biệt; cao (~2,5–4%) khi chuyển khoản ngân hàng (bank wire). VND ít thanh khoản nên thường ở mức cao của mỗi khoảng.",
             "en": "Low (~0.5–1.5%) through a specialist transfer service; high (~2.5–4%) through a bank wire. VND is less liquid, so it sits toward the top of each band."
           },
-          "source": "https://wise.com/au/send-money/send-money-to-vietnam"
+          "source": "https://wise.com/au/send-money/send-money-to-vietnam",
+          "explains": ["cross_border_funding"]
         },
         {
           "id": "vn_outbound_bank_fee",
@@ -152,7 +153,8 @@ Pure-reference (`fills: []`). The `cash_position` resolver seeds `estimated_fx_s
             "vi": "Biểu phí ngân hàng: khoảng 0,1–0,2% số tiền (tối thiểu ~5–10 USD) cộng điện phí ~5 USD, thêm ~20–25 USD nếu người gửi chịu luôn phí ngân hàng nhận (OUR). Mức trần ~200 USD với mục đích du học/trợ cấp thân nhân; mục đích khác có thể tới 990 USD. Tính cho mỗi lần chuyển — chia nhiều lần thì tốn nhiều lần.",
             "en": "Bank tariffs: about 0.1–0.2% of the amount (minimum ~US$5–10) plus a ~US$5 wire charge, and ~US$20–25 more if the sender also pays the receiving bank's fee (OUR). Capped ~US$200 for study/family-support purposes; other purposes up to US$990. Charged per transfer — splitting the money multiplies it."
           },
-          "source": "https://www.vietcombank.com.vn/-/media/Project/VCB-Sites/VCB/KHCN/Bieu-mau-Bieu-phi-KHCN/Update-30062026/BP-dich-vu-chuyen-tien-nuoc-ngoai.pdf"
+          "source": "https://www.vietcombank.com.vn/-/media/Project/VCB-Sites/VCB/KHCN/Bieu-mau-Bieu-phi-KHCN/Update-30062026/BP-dich-vu-chuyen-tien-nuoc-ngoai.pdf",
+          "explains": ["cross_border_funding"]
         },
         {
           "id": "au_inbound_bank_fee",
@@ -183,7 +185,8 @@ Pure-reference (`fills: []`). The `cash_position` resolver seeds `estimated_fx_s
             "vi": "Ngân hàng lớn ở Úc thu tới khoảng $11–$15 mỗi lần nhận; một số miễn phí với khoản nhỏ hoặc khi người gửi đã trả phí.",
             "en": "Major Australian banks charge up to about $11–$15 per incoming transfer; some waive it for small amounts or when the sender has paid."
           },
-          "source": "https://www.nab.com.au/important-information/personal/fees-charges"
+          "source": "https://www.nab.com.au/important-information/personal/fees-charges",
+          "explains": ["cross_border_funding"]
         },
         {
           "id": "fx_back",
@@ -215,7 +218,8 @@ Pure-reference (`fills: []`). The `cash_position` resolver seeds `estimated_fx_s
             "vi": "Chỉ phát sinh nếu đưa tiền bán nhà về Việt Nam. Cùng khoảng như chiều vào: dịch vụ chuyên biệt rẻ hơn chuyển khoản ngân hàng.",
             "en": "Only if the proceeds are sent back to Vietnam. Same bands as the inbound direction: a specialist service costs less than a bank wire."
           },
-          "source": "https://wise.com/au/send-money/send-money-to-vietnam"
+          "source": "https://wise.com/au/send-money/send-money-to-vietnam",
+          "explains": ["cross_border_funding"]
         }
       ]
     }

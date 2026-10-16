@@ -12,6 +12,13 @@
     // The toggle is owned by the parent (it holds card state + the SOT reconcile); this
     // emits intent via onToggle. honest-partial throughout: a null budget_ref → no chip,
     // an absent component → a calm "attach property", an empty phase → no checklist tab.
+    // Behavior 95 (the checklist links both ways): a step's amount is a button that opens
+    // the line it links (LineDetail, the same body the statement's phase sheet opens in
+    // place) in a modal over this one — closing it returns to the checklist; a ref naming a
+    // figure split into lines (its group) lists those lines, each opening its detail. Opened
+    // from a line's detail (`focusAction`), the sheet starts on the checklist at that step.
+    import { tick } from 'svelte';
+    import LineDetail from '$lib/LineDetail.svelte';
     import { t } from '$lib/i18n';
     import { lang } from '$lib/stores/lang';
     import {
@@ -40,7 +47,8 @@
         cashEvents,
         components,
         checklistStatus,
-        onToggle
+        onToggle,
+        focusAction = null
     }: {
         phaseId: string;
         journey: JourneySwimlaneOutcome;
@@ -49,6 +57,8 @@
         components: Record<string, ComponentEntry>;
         checklistStatus: ChecklistStatusMap;
         onToggle: (phase: string, actionId: string, next: 'done' | 'not_started') => void;
+        /** Open on the checklist at this step (a line's detail chose it). */
+        focusAction?: string | null;
     } = $props();
 
     // The focused viz: the same journey outcome FILTERED to this phase (pure subset —
@@ -110,7 +120,33 @@
     // checklist → the KB risks. The checklist and risks tabs are present only when the phase
     // has actions / risks (no empty tab); 'overview' is the #if fallback so a vanished tab can
     // never blank the sheet (e.g. risks removed by a preview while that tab was open).
-    let psTab = $state<string>('overview');
+    // svelte-ignore state_referenced_locally
+    let psTab = $state<string>(focusAction ? 'checklist' : 'overview');
+    let listEl: HTMLElement | undefined = $state();
+    $effect(() => {
+        const id = focusAction;
+        if (!id) return;
+        psTab = 'checklist';
+        void tick().then(() => {
+            const el = listEl?.querySelector<HTMLElement>(`[data-action="${CSS.escape(id)}"]`);
+            el?.scrollIntoView({ block: 'center' });
+            el?.querySelector<HTMLElement>('input')?.focus({ preventScroll: true });
+        });
+    });
+
+    // The line a step links, opened over the checklist: its own event, or the lines of the
+    // figure it names (group) — the same events amountFor sums.
+    let lineRef = $state<string | null>(null);
+    let lineTitle = $state('');
+    const lineEvents = $derived.by((): CashEvent[] => {
+        if (!lineRef) return [];
+        const own = cashEvents.filter((e) => e.id === lineRef);
+        return own.length ? own : cashEvents.filter((e) => e.group === lineRef);
+    });
+    function openLine(a: PhaseAction) {
+        lineRef = a.budget_ref ?? null;
+        lineTitle = pick(a.label, $lang);
+    }
     const psTabs = $derived([
         { id: 'overview', label: $t('plan.journey.interactions') },
         ...(actions.length ? [{ id: 'checklist', label: $t('plan.flow.actions') }] : []),
@@ -123,10 +159,10 @@
 
     {#if psTab === 'checklist' && actions.length}
         <!-- the temporally-ordered action checklist -->
-        <ul class="ps-actions">
+        <ul class="ps-actions" bind:this={listEl}>
             {#each actions as a (a.id)}
                 {@const amt = amountLabel(amountFor(a.budget_ref))}
-                <li class="ps-action" class:ps-done={isDone(a)}>
+                <li class="ps-action" class:ps-done={isDone(a)} class:ps-focus={a.id === focusAction} data-action={a.id}>
                     <label class="ps-act-row">
                         <input
                             type="checkbox"
@@ -136,9 +172,13 @@
                         />
                         <span class="ps-act-text">
                             <span class="ps-act-label">{pick(a.label, $lang)}</span>
-                            {#if amt}<span class="ps-act-amt">{amt}</span>{/if}
                         </span>
                     </label>
+                    {#if amt}
+                        <button type="button" class="ps-act-amt" onclick={() => openLine(a)}
+                            >{amt} <span aria-hidden="true">›</span></button
+                        >
+                    {/if}
                     {#if a.detail}<p class="ps-act-detail">{pick(a.detail, $lang)}</p>{/if}
                     {#if a.component_ref}
                         <button type="button" class="ps-detail-btn" onclick={() => (selectedActionId = a.id)}>
@@ -169,6 +209,32 @@
         {:else}
             <p class="ps-pending">{$t('plan.attach_property')}</p>
         {/if}
+    </Modal>
+{/if}
+
+<!-- Behavior 95: the line a step links, over the checklist; closing returns to it. -->
+{#if lineRef && lineEvents.length}
+    <Modal title={lineTitle} onClose={() => (lineRef = null)}>
+        <ul class="ps-lines">
+            {#each lineEvents as e (e.id)}
+                {@const amt = amountLabel(e.amount ?? null)}
+                <li class="ps-line">
+                    {#if lineEvents.length > 1 && e.detail}
+                        <details>
+                            <summary class="ps-line-head">
+                                <span>{pick(e.label, $lang)}</span>{#if amt}<span class="ps-line-amt">{amt}</span>{/if}
+                            </summary>
+                            <LineDetail detail={e.detail} {components} />
+                        </details>
+                    {:else}
+                        <p class="ps-line-head">
+                            <span>{pick(e.label, $lang)}</span>{#if amt}<span class="ps-line-amt">{amt}</span>{/if}
+                        </p>
+                        {#if e.detail}<LineDetail detail={e.detail} {components} />{/if}
+                    {/if}
+                </li>
+            {/each}
+        </ul>
     </Modal>
 {/if}
 
@@ -223,6 +289,10 @@
         color: var(--muted);
     }
     .ps-act-amt {
+        margin: 0.3rem 0 0 1.5rem;
+        border: 0;
+        font-family: inherit;
+        cursor: pointer;
         font-size: var(--fs-xs);
         font-weight: 700;
         font-variant-numeric: tabular-nums;
@@ -248,6 +318,18 @@
         padding: 0;
         cursor: pointer;
     }
+    .ps-act-amt:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .ps-focus { background: var(--accent-soft); border-radius: var(--radius-xs); }
+    .ps-lines { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.75rem; }
+    .ps-line + .ps-line { border-top: 1px solid var(--border); padding-top: 0.75rem; }
+    .ps-line details > summary { cursor: pointer; list-style: none; }
+    .ps-line details > summary::-webkit-details-marker { display: none; }
+    .ps-line details[open] > summary { margin-bottom: 0.5rem; }
+    .ps-line-head {
+        margin: 0; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.25rem 0.75rem;
+        font-weight: 600; color: var(--ink);
+    }
+    .ps-line-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
     .ps-pending {
         margin: 0;
         font-size: var(--fs-sm);

@@ -230,6 +230,8 @@ export interface FeeDetail {
     owner?: string;
     how?: LocalizedText | null;
     note?: LocalizedText | null;
+    /** the components whose detail this line opens (behavior 95: the FIRB fee → FIRB). */
+    explains?: string[] | null;
 }
 
 /** cash_position → calculator (outcome type `budget_envelope`). */
@@ -777,6 +779,18 @@ export interface LifecycleBudget {
     own_per_year?: MoneyRange | null;
     sell?: MoneyRange | null;
     pending?: PendingLine[] | null;
+    /** behavior 95: lines after a sheet's divider that no total sums — where the money
+     *  comes from (Mua) and the rent coming in (Giữ nhà). */
+    beside?: BesideLine[] | null;
+}
+export interface BesideLine {
+    id: 'funding_sources' | 'rental_income' | string;
+    phase: string;
+    label: LocalizedText;
+    amount: MoneyRange | null;
+    needs: string | null;
+    timing: 'one_off' | 'recurring' | string;
+    detail: FeeDetail;
 }
 
 // --- phase_playbook → checklist + risk-flag-list (outcome `phase_playbook`) --
@@ -875,13 +889,17 @@ export function firstComponentEntry(
  *  amount here too, not just the ones on `cash_position`. Mode A has one source
  *  (`cash_position`); Mode C adds `yield_modelling`/`tax_structure` — reading only
  *  `cash_position` would silently drop the amount chip on their hold-phase actions even
- *  though the engine already validated the link. `dispose_cash_events` (disposition) is
- *  deliberately excluded — the engine harvest excludes it too (no authored action links a
- *  dispose-phase budget_ref), so including it here would diverge from what was validated. */
+ *  though the engine already validated the link. Behavior 95: `dispose_cash_events`
+ *  (disposition) are harvested too, as the engine's playbook harvest now is — selling steps
+ *  link the selling lines. */
 export function harvestCashEvents(components: Record<string, ComponentEntry>): CashEvent[] {
-    return Object.values(components).flatMap(
-        (c) => (c.outcome as { cash_events?: CashEvent[] | null }).cash_events ?? []
-    );
+    return Object.values(components).flatMap((c) => {
+        const o = c.outcome as {
+            cash_events?: CashEvent[] | null;
+            dispose_cash_events?: CashEvent[] | null;
+        };
+        return [...(o.cash_events ?? []), ...(o.dispose_cash_events ?? [])];
+    });
 }
 
 /** A normalized property as the engine stores it under content.addenda.<pid>.property_card

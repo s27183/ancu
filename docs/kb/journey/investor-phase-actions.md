@@ -25,7 +25,7 @@ reused unchanged from `disposition`). Not every id is live yet — `budget_envel
 honest-partial by construction: **if a `budget_ref` does not match any `cash_event.id` present in
 the investor's outcomes, drop the ref (set `null`) — never fabricate a figure**, exactly Mode A's
 rule. An action may also carry a `component_ref` — the id of a component whose renderer opens as
-the item's backing detail. Both are optional; `null` means no link.
+the item's backing detail. Both are optional; `null` means no link. Since behavior 95 (2026-10-16) owning and selling steps link their lines too: an insurance, rates, loan, agent, discharge or transfer step names the statement line it pays for (a fee line of `fh_engine_fees`, an own-phase line of the ownership component, or a `dispose_cash_events` id). The resolver keeps a ref that names a line the plan's statement shows — an event of any phase, a line still waiting on an input (`fee_pending`), or, before a hold is chosen, a selling fee line that applies to the plan's blueprint and state — and drops any other to `null`.
 
 This is a **copy doc** (it fills no slot). It is a blueprint anchor (component 12 — not yet added
 to the Mode-C pipeline; tracked as the restructure's blueprint-wiring pass), so it must resolve;
@@ -58,14 +58,14 @@ action_<phase>_<id>_label, detail ← action_<phase>_<id>_detail, status: not_st
           { "id": "clarify_thesis",       "order": 1, "budget_ref": null, "component_ref": "investment_strategy" },
           { "id": "compare_lenders",      "order": 2, "budget_ref": null, "component_ref": "mortgage_finance" },
           { "id": "consider_entity",      "order": 3, "budget_ref": null, "component_ref": "tax_structure" },
-          { "id": "build_deposit",        "order": 4, "budget_ref": null, "component_ref": "cash_position" }
+          { "id": "build_deposit",        "order": 4, "budget_ref": "deposit", "component_ref": "cash_position" }
         ]
       },
       {
         "phase": "pre_approve",
         "actions": [
           { "id": "gather_documents",     "order": 1, "budget_ref": null, "component_ref": "mortgage_finance" },
-          { "id": "consider_broker",      "order": 2, "budget_ref": null, "component_ref": "mortgage_finance" },
+          { "id": "consider_broker",      "order": 2, "budget_ref": "mortgage_broker", "component_ref": "mortgage_finance" },
           { "id": "submit_preapproval",   "order": 3, "budget_ref": null, "component_ref": "mortgage_finance" }
         ]
       },
@@ -73,7 +73,7 @@ action_<phase>_<id>_label, detail ← action_<phase>_<id>_detail, status: not_st
         "phase": "contract",
         "actions": [
           { "id": "get_rental_appraisal",   "order": 1, "budget_ref": null,      "component_ref": "due_diligence" },
-          { "id": "get_depreciation_quote", "order": 2, "budget_ref": null,      "component_ref": "due_diligence" },
+          { "id": "get_depreciation_quote", "order": 2, "budget_ref": "depreciation_schedule",      "component_ref": "due_diligence" },
           { "id": "inspect_building_pest",  "order": 3, "budget_ref": null,      "component_ref": "due_diligence" },
           { "id": "review_contract",        "order": 4, "budget_ref": null,      "component_ref": "due_diligence" },
           { "id": "decide_offer_strategy",  "order": 5, "budget_ref": null,      "component_ref": "buying_strategy" },
@@ -87,29 +87,29 @@ action_<phase>_<id>_label, detail ← action_<phase>_<id>_detail, status: not_st
           { "id": "pay_stamp_duty",        "order": 1, "budget_ref": "stamp_duty",         "component_ref": "cash_position" },
           { "id": "settle_other_costs",    "order": 2, "budget_ref": "other_buying_costs", "component_ref": "cash_position" },
           { "id": "complete_entity_setup", "order": 3, "budget_ref": "entity_setup_costs",  "component_ref": "settlement_prep" },
-          { "id": "engage_qs",             "order": 4, "budget_ref": null,                  "component_ref": "settlement_prep" },
-          { "id": "appoint_pm",            "order": 5, "budget_ref": null,                  "component_ref": "settlement_prep" },
-          { "id": "bind_landlord_insurance","order": 6,"budget_ref": null,                  "component_ref": "settlement_prep" },
+          { "id": "engage_qs",             "order": 4, "budget_ref": "depreciation_schedule",                  "component_ref": "settlement_prep" },
+          { "id": "appoint_pm",            "order": 5, "budget_ref": "letting_fee",                  "component_ref": "settlement_prep" },
+          { "id": "bind_landlord_insurance","order": 6,"budget_ref": "landlord_insurance",                  "component_ref": "settlement_prep" },
           { "id": "settlement_completes",  "order": 7, "budget_ref": null,                  "component_ref": "settlement_prep" }
         ]
       },
       {
         "phase": "own",
         "actions": [
-          { "id": "track_cash_flow",       "order": 1, "budget_ref": null,           "component_ref": "ownership_planning_investor" },
-          { "id": "lodge_annual_return",   "order": 2, "budget_ref": "tax_refund",   "component_ref": "tax_structure" },
+          { "id": "track_cash_flow",       "order": 1, "budget_ref": "loan_repayments",           "component_ref": "ownership_planning_investor" },
+          { "id": "lodge_annual_return",   "order": 2, "budget_ref": "tax_return_rental",   "component_ref": "tax_structure" },
           { "id": "monitor_land_tax",      "order": 3, "budget_ref": null,           "component_ref": "ownership_planning_investor" },
           { "id": "watch_equity_release",  "order": 4, "budget_ref": null,           "component_ref": "ownership_planning_investor" },
-          { "id": "review_pm_performance", "order": 5, "budget_ref": null,           "component_ref": "ownership_planning_investor" }
+          { "id": "review_pm_performance", "order": 5, "budget_ref": "property_management",           "component_ref": "ownership_planning_investor" }
         ]
       },
       {
         "phase": "dispose",
         "actions": [
           { "id": "decide_to_sell",         "order": 1, "budget_ref": null, "component_ref": "disposition" },
-          { "id": "engage_selling_agent",   "order": 2, "budget_ref": null, "component_ref": "disposition" },
-          { "id": "confirm_cgt_position",   "order": 3, "budget_ref": null, "component_ref": "disposition" },
-          { "id": "discharge_mortgage",     "order": 4, "budget_ref": null, "component_ref": "disposition" },
+          { "id": "engage_selling_agent",   "order": 2, "budget_ref": "commission", "component_ref": "disposition" },
+          { "id": "confirm_cgt_position",   "order": 3, "budget_ref": "dispose_cgt", "component_ref": "disposition" },
+          { "id": "discharge_mortgage",     "order": 4, "budget_ref": "mortgage_discharge", "component_ref": "disposition" },
           { "id": "plan_next_purchase",     "order": 5, "budget_ref": null, "component_ref": "disposition" }
         ]
       }

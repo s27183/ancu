@@ -16,7 +16,8 @@
 %% Known gaps: the % of the loan uses the band the caller passes (repayments' principal),
 %%            not the buyer's own borrowing capacity.
 
--export([events/2, owners/0, buy_lines/1, committed/1, property_kind/1, line_band/1, fee_line/1]).
+-export([events/2, owners/0, buy_lines/1, committed/1, property_kind/1, line_band/1, fee_line/1,
+         line_ids/2]).
 
 %% Ctx: blueprint (binary), state (binary | undefined), property (house | strata |
 %% undefined), source (the emitting component id), counterparty (the swimlane actor the
@@ -99,6 +100,15 @@ line_band(Id) ->
             end;
         [] -> null
     end.
+
+%% the ids of every fee line that applies to the plan in these phases, whatever its amount —
+%% the lines its statement carries once their input is there (behavior 95: a sell step links
+%% the selling lines before a hold is chosen).
+-spec line_ids([binary()], ctx()) -> [binary()].
+line_ids(Phases, Ctx) ->
+    [maps:get(<<"id">>, E) || E <- all_entries(),
+                              lists:member(maps:get(<<"phase">>, E), Phases),
+                              applies(E, Ctx)].
 
 all_entries() ->
     lists:append([entries(Slug) || Slug <- owners()]).
@@ -185,6 +195,9 @@ detail(E, Tier, Property) ->
                              {P, undefined}  -> P;    %% still open: shown as "if <P>"
                              {_, _}          -> null  %% known and it applies
                          end,
+      %% behavior 95: the components whose detail this line opens (an FX line: money from
+      %% overseas), as the KB entry names them
+      <<"explains">>  => maps:get(<<"explains">>, E, []),
       <<"owner">>     => maps:get(<<"_owner">>, E)}.
 
 pending(E, Needs) ->

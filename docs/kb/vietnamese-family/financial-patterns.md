@@ -66,6 +66,31 @@ Pure-reference (`fills: []`). `family_context` reasons over these behavioural pa
     "vn_leg_origin_is_the_under_evidenced_pinch_point": { "type": "bool", "value": true, "provenance": "CONVENTION", "note": "the parent's ORIGIN of funds (not just the transfer record) is the hardest leg to evidence; documentation_readiness=not_started on the VN side is the top complexity driver. Evidence standards owned by kb.au-aml-ctf.source-of-funds-documentation." },
     "many_contributor_pool_raises_complexity": { "type": "bool", "value": true, "provenance": "CONVENTION", "note": "more contributors / accounts / countries raises funding_complexity_score and the evidentiary burden — a many-relative pool is harder to document than a single parental gift." },
     "deposit_achievable_paperwork_is_the_risk": { "type": "bool", "value": true, "provenance": "CONVENTION", "note": "the Vietnamese family funding pattern usually makes the deposit achievable; the failure mode is evidentiary (source-of-funds / gift-vs-loan / VN outbound), not capacity — surface the inversion early." }
+  },
+  "lookup": {
+    "line_details": {
+      "note": "behavior 95: the statement's \"Nguồn tiền\" line, after the Mua sheet's divider for a foreign buyer — where the money to buy comes from, never summed into what you pay; it opens the family funding and money-from-overseas details (explains: the components it draws)",
+      "entries": [
+        {
+          "id": "funding_sources",
+          "tier": "CONVENTION",
+          "label": { "vi": "Nguồn tiền", "en": "Where the money comes from" },
+          "how": {
+            "vi": "Số tiền để mua thường góp từ nhiều nơi: tiền tiết kiệm của bạn ở Úc, tiền gia đình cho hoặc cho mượn, và tiền chuyển từ Việt Nam. Bạn nhập số tiền và người góp; kế hoạch không đoán thay bạn.",
+            "en": "The money to buy usually comes from several places: your own savings in Australia, money your family gives or lends, and money sent from Vietnam. You enter the amounts and who gives them; the plan never guesses them."
+          },
+          "drivers": {
+            "vi": "Ai góp tiền, tiền là cho hay cho mượn, và giấy tờ chứng minh nguồn gốc tiền ở mỗi bên.",
+            "en": "Who contributes, whether the money is a gift or a loan, and the papers that show where it came from on each side."
+          },
+          "note": {
+            "vi": "Không tính vào tổng: đây là nguồn tiền để trả, không phải khoản phải trả. Ngân hàng xem tiền gia đình phải trả lại là một khoản vay.",
+            "en": "Not in the total: this is where the money comes from, not a cost. A lender reads family money that must be repaid as a loan."
+          },
+          "explains": ["family_context", "cross_border_funding"]
+        }
+      ]
+    }
   }
 }
 ```

@@ -9,6 +9,8 @@
     // the swimlane alone, no drill (settlement_prep is Phase-B and simply absent at base).
     // The toggle is owned by the parent (card state + SOT reconcile); this passes intent
     // straight through.
+    // Behavior 95: a statement line's detail opens Hành trình at a step that links it —
+    // `openAt` opens that step's phase sheet on its checklist, at the step.
     import { t } from '$lib/i18n';
     import { lang } from '$lib/stores/lang';
     import {
@@ -31,7 +33,8 @@
         components,
         checklistStatus,
         onToggle,
-        filling
+        filling,
+        openAt = null
     }: {
         journey: JourneySwimlaneOutcome | undefined;
         playbook: PhasePlaybookOutcome | undefined;
@@ -40,6 +43,8 @@
         checklistStatus: ChecklistStatusMap;
         onToggle: (phase: string, actionId: string, next: 'done' | 'not_started') => void;
         filling: boolean;
+        /** Open this phase's sheet at this step (from a line's detail). */
+        openAt?: { phase: string; action: string } | null;
     } = $props();
 
     const phases = $derived(journey?.phases ?? []);
@@ -54,7 +59,16 @@
     const selectedPhase = $derived(phases.find((p) => p.id === selected) ?? null);
     // The swimlane IS the navigation (§7.1): clicking a phase header or any item cell in it
     // toggles that phase's sheet. Re-clicking the open phase closes it.
-    const selectPhase = (id: string) => (selected = selected === id ? null : id);
+    const selectPhase = (id: string) => {
+        focusAction = null;
+        selected = selected === id ? null : id;
+    };
+    let focusAction = $state<string | null>(null);
+    $effect(() => {
+        if (!openAt) return;
+        selected = openAt.phase;
+        focusAction = openAt.action;
+    });
 </script>
 
 <section class="pp-card pp-flat">
@@ -70,7 +84,13 @@
         />
 
         {#if drillable && selectedPhase}
-            <Modal title={pick(selectedPhase.label, $lang)} onClose={() => (selected = null)}>
+            <Modal
+                title={pick(selectedPhase.label, $lang)}
+                onClose={() => {
+                    selected = null;
+                    focusAction = null;
+                }}
+            >
                 <PhaseSheet
                     phaseId={selectedPhase.id}
                     journey={journey as JourneySwimlaneOutcome}
@@ -79,6 +99,7 @@
                     {components}
                     {checklistStatus}
                     {onToggle}
+                    {focusAction}
                 />
             </Modal>
         {/if}

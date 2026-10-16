@@ -116,7 +116,37 @@ budget_ref_cases() ->
      check("partial(only stamp_duty): deposit/other refs drop, stamp_duty kept",
            lists:sort(nonnull_refs(Partial)), [<<"stamp_duty">>]),
      check("component_ref passes through even when budget_ref drops (empty)",
-           component_ref(Empty, <<"prepare">>, <<"build_deposit">>), <<"cash_position">>)].
+           component_ref(Empty, <<"prepare">>, <<"build_deposit">>), <<"cash_position">>)]
+    ++ own_sell_cases().
+
+%% behavior 95: owning and selling steps link their lines too. With a hold, the dispose
+%% events link; before one, the selling fee lines this plan's blueprint carries link; an
+%% own line links from its ownership event; a line waiting on an input (fee_pending) links.
+own_sell_cases() ->
+    Own = #{<<"ongoing_obligations">> =>
+                #{<<"cash_events">> => [ev(<<"council_rates_water">>), ev(<<"loan_repayments">>)]}},
+    {NoHold, _} = fill(Own#{<<"disposition">> => #{<<"horizon_years">> => null,
+                                                   <<"dispose_cash_events">> => []}}),
+    {Held, _}   = fill(Own#{<<"disposition">> => #{<<"horizon_years">> => 10,
+                                                   <<"dispose_cash_events">> => [ev(<<"commission">>)]}}),
+    {NoDisp, _} = fill(Own),
+    {Pending, _} = fill(#{<<"x">> => #{<<"fee_pending">> => [#{<<"id">> => <<"building_insurance">>}]}}),
+    [check("own: budget_ongoing links council_rates_water",
+           budget_ref(NoHold, <<"own">>, <<"budget_ongoing">>), <<"council_rates_water">>),
+     check("own: watch_refinance links loan_repayments",
+           budget_ref(NoHold, <<"own">>, <<"watch_refinance">>), <<"loan_repayments">>),
+     check("sell, no hold yet: engage_selling_agent links commission (a line the Bán sheet carries)",
+           budget_ref(NoHold, <<"dispose">>, <<"engage_selling_agent">>), <<"commission">>),
+     check("sell, no hold yet: discharge_mortgage links mortgage_discharge",
+           budget_ref(NoHold, <<"dispose">>, <<"discharge_mortgage">>), <<"mortgage_discharge">>),
+     check("sell, held: a dispose_cash_events id links (commission kept)",
+           budget_ref(Held, <<"dispose">>, <<"engage_selling_agent">>), <<"commission">>),
+     check("sell, held: a line the hold did not make drops (mortgage_discharge)",
+           budget_ref(Held, <<"dispose">>, <<"discharge_mortgage">>), null),
+     check("no disposition upstream: sell refs drop",
+           budget_ref(NoDisp, <<"dispose">>, <<"engage_selling_agent">>), null),
+     check("a line waiting on an input (fee_pending) links",
+           budget_ref(Pending, <<"settle">>, <<"bind_insurance">>), <<"building_insurance">>)].
 
 %% --- 4. bilingual spot check ------------------------------------------------
 

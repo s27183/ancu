@@ -18,9 +18,7 @@ buyer's calculator already computed. `fh_engine_cash:fill_fhb_foreign/2` (task 1
 `deposit`, `firb_fee` (both at `contract`), `stamp_duty`, `foreign_buyer_surcharge`,
 `other_buying_costs` (all three at `settle`) — the honest-partial rule
 (`fh_engine_phase_playbook:keep_valid/2`) drops any `budget_ref` with no matching live
-`cash_event.id` to `null` rather than fabricate a figure, exactly Mode A's rule. Dispose-phase
-actions carry no `budget_ref` (Mode A's own precedent — `disposition`'s dispose ids surface via
-the swimlane's dispose cells, not linked from an action). An action may also carry a
+`cash_event.id` to `null` rather than fabricate a figure, exactly Mode A's rule. Since behavior 95 (2026-10-16) owning and selling steps link their lines too: an insurance, rates, loan, agent, discharge or transfer step names the statement line it pays for (a fee line of `fh_engine_fees`, an own-phase line of the ownership component, or a `dispose_cash_events` id). The resolver keeps a ref that names a line the plan's statement shows — an event of any phase, a line still waiting on an input (`fee_pending`), or, before a hold is chosen, a selling fee line that applies to the plan's blueprint and state — and drops any other to `null`. An action may also carry a
 `component_ref` — the id of a component whose renderer opens as the item's backing detail. Mode
 B has no `eligibility`/`preparation` components (replaced by `firb_workflow`; there is no
 Mode-B-specific document-checklist component), so actions that would reference them in Mode A
@@ -58,7 +56,7 @@ with no matching live `cash_event.id`.
           { "id": "check_firb_eligible_property","order": 2, "budget_ref": null,      "component_ref": "firb_workflow" },
           { "id": "compare_non_resident_lenders","order": 3, "budget_ref": null,      "component_ref": "mortgage_finance" },
           { "id": "map_family_funding",          "order": 4, "budget_ref": null,      "component_ref": "family_context" },
-          { "id": "research_transfer_providers", "order": 5, "budget_ref": null,      "component_ref": "cross_border_funding" }
+          { "id": "research_transfer_providers", "order": 5, "budget_ref": "fx_spread_in",      "component_ref": "cross_border_funding" }
         ]
       },
       {
@@ -66,7 +64,7 @@ with no matching live `cash_event.id`.
         "actions": [
           { "id": "gather_documents",       "order": 1, "budget_ref": null, "component_ref": "mortgage_finance" },
           { "id": "submit_preapproval",      "order": 2, "budget_ref": null, "component_ref": "mortgage_finance" },
-          { "id": "prepare_firb_application","order": 3, "budget_ref": null, "component_ref": "firb_workflow" },
+          { "id": "prepare_firb_application","order": 3, "budget_ref": "firb_application_help", "component_ref": "firb_workflow" },
           { "id": "plan_transfer_timing",    "order": 4, "budget_ref": null, "component_ref": "cross_border_funding" }
         ]
       },
@@ -79,7 +77,7 @@ with no matching live `cash_event.id`.
           { "id": "pay_deposit",                  "order": 4, "budget_ref": "deposit",                 "component_ref": "cash_position" },
           { "id": "submit_firb_application",      "order": 5, "budget_ref": "firb_fee",                "component_ref": "firb_workflow" },
           { "id": "seek_unconditional_finance",   "order": 6, "budget_ref": null,                      "component_ref": "mortgage_finance" },
-          { "id": "initiate_deposit_transfer",    "order": 7, "budget_ref": null,                      "component_ref": "cross_border_funding" }
+          { "id": "initiate_deposit_transfer",    "order": 7, "budget_ref": "vn_outbound_bank_fee",                      "component_ref": "cross_border_funding" }
         ]
       },
       {
@@ -88,9 +86,9 @@ with no matching live `cash_event.id`.
           { "id": "confirm_firb_approval",     "order": 1, "budget_ref": null,                     "component_ref": "firb_workflow" },
           { "id": "pay_stamp_duty",            "order": 2, "budget_ref": "stamp_duty",             "component_ref": "cash_position" },
           { "id": "pay_foreign_buyer_surcharge","order": 3, "budget_ref": "foreign_buyer_surcharge","component_ref": "cash_position" },
-          { "id": "complete_transfer",         "order": 4, "budget_ref": null,                     "component_ref": "cross_border_funding" },
+          { "id": "complete_transfer",         "order": 4, "budget_ref": "au_inbound_bank_fee",                     "component_ref": "cross_border_funding" },
           { "id": "settle_other_costs",        "order": 5, "budget_ref": "other_buying_costs",     "component_ref": "cash_position" },
-          { "id": "bind_insurance",            "order": 6, "budget_ref": null,                     "component_ref": "settlement_prep" },
+          { "id": "bind_insurance",            "order": 6, "budget_ref": "building_insurance",                     "component_ref": "settlement_prep" },
           { "id": "final_inspection",          "order": 7, "budget_ref": null,                     "component_ref": "settlement_prep" },
           { "id": "settlement_completes",      "order": 8, "budget_ref": null,                     "component_ref": "settlement_prep" }
         ]
@@ -98,20 +96,20 @@ with no matching live `cash_event.id`.
       {
         "phase": "own",
         "actions": [
-          { "id": "move_in",                  "order": 1, "budget_ref": null, "component_ref": "ownership_planning" },
-          { "id": "budget_ongoing",           "order": 2, "budget_ref": null, "component_ref": "ownership_planning" },
+          { "id": "move_in",                  "order": 1, "budget_ref": "moving_costs", "component_ref": "ownership_planning" },
+          { "id": "budget_ongoing",           "order": 2, "budget_ref": "council_rates_water", "component_ref": "ownership_planning" },
           { "id": "declare_vacancy_occupancy","order": 3, "budget_ref": null, "component_ref": "ownership_planning" },
           { "id": "monitor_visa_status",      "order": 4, "budget_ref": null, "component_ref": "buyer_profile" },
-          { "id": "watch_refinance",          "order": 5, "budget_ref": null, "component_ref": "ownership_planning" }
+          { "id": "watch_refinance",          "order": 5, "budget_ref": "loan_repayments", "component_ref": "ownership_planning" }
         ]
       },
       {
         "phase": "dispose",
         "actions": [
           { "id": "decide_to_sell",                  "order": 1, "budget_ref": null, "component_ref": "disposition" },
-          { "id": "engage_selling_agent",             "order": 2, "budget_ref": null, "component_ref": "disposition" },
+          { "id": "engage_selling_agent",             "order": 2, "budget_ref": "commission", "component_ref": "disposition" },
           { "id": "confirm_cgt_tax_residency_position","order": 3, "budget_ref": null, "component_ref": "disposition" },
-          { "id": "discharge_mortgage",               "order": 4, "budget_ref": null, "component_ref": "disposition" },
+          { "id": "discharge_mortgage",               "order": 4, "budget_ref": "mortgage_discharge", "component_ref": "disposition" },
           { "id": "plan_next_step",                   "order": 5, "budget_ref": null, "component_ref": "disposition" }
         ]
       }
