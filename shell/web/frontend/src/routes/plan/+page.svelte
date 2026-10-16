@@ -5,7 +5,10 @@
     // engine resolved for it (GET card `state`). With no plan yet: pick a state, answer the
     // onboarding, and the plan is for that state alone (no suburb). Behavior 84: the head
     // lists every saved plan (title, state, last update — older plans titled by a suburb
-    // among them); the one opened is in the address (?plan=<id>), else the newest. A sign-in from the onboarding (the guest's daily
+    // among them); the one opened is in the address (?plan=<id>), else the newest.
+    // Behavior 86: with a plan open, "Kế hoạch mới" in the head brings back the empty
+    // page's state picker (`choosing`); cancelling it, or the questions, returns to the
+    // plan, and a create opens the new plan by its id. A sign-in from the onboarding (the guest's daily
     // cap) or from a guest's plan comes back here (pendingOnboarding.ts, page 'plan').
     // The plan is drawn in the same frame as the map's sheet (.sheet) so its sticky rails,
     // section menu and popups behave as they did there; .page-sheet makes it a page.
@@ -89,6 +92,13 @@
         restoreAnswers = undefined;
         planning = true;
     }
+    // The state picker over an open plan (behavior 86).
+    let choosing = $state(false);
+    function newPlan() {
+        listOpen = false;
+        choosing = true;
+        toTop();
+    }
 </script>
 
 <div class="page-shell">
@@ -97,7 +107,8 @@
             <HomeBack />
             <div class="title" use:clickOutside={() => (listOpen = false)}>
                 <h2>{$t('planpage.title')}</h2>
-                {#if cards && cards.length > 1 && newest}
+                <div class="plan-line">
+                {#if cards && cards.length > 1 && newest && !choosing}
                     <button
                         type="button"
                         class="plan-switch"
@@ -130,7 +141,13 @@
                             {/each}
                         </ul>
                     {/if}
-                {:else if place}<p class="sub">{place}</p>{/if}
+                {:else if place && !choosing}<p class="sub">{place}</p>{/if}
+                {#if newest && !choosing}
+                    <button type="button" class="plan-new" onclick={newPlan}
+                        ><span aria-hidden="true">+</span> {$t('planpage.new')}</button
+                    >
+                {/if}
+                </div>
             </div>
             {#if sections.ask}
                 <button
@@ -147,7 +164,7 @@
         <div class="body" data-tour="plan" bind:this={bodyEl}>
             {#if cards === null}
                 <div class="pp-state"><p>{$t('plan.loading')}</p></div>
-            {:else if newest}
+            {:else if newest && !choosing}
                 {#key `${newest.plan_card_id}:${reload}`}
                     <PlanProjection
                         cardId={newest.plan_card_id}
@@ -172,10 +189,15 @@
                     <button type="button" class="primary" data-tour="plan-cta" onclick={startPlan}
                         >{$t('planpage.cta')}</button
                     >
+                    {#if newest}
+                        <button type="button" class="plan-cancel" onclick={() => (choosing = false)}
+                            >{$t('planpage.back')}</button
+                        >
+                    {/if}
                 </div>
             {/if}
         </div>
-        {#if newest}
+        {#if newest && !choosing}
             <SectionMenu groups={sections.plan} current={menuCurrent} onpick={toTop} inPlan={sections.plan.length > 0} />
         {/if}
     </div>
@@ -184,14 +206,19 @@
         <Onboarding
             stateCode={pick}
             initial={restoreAnswers}
-            oncreated={() => {
+            oncreated={(id) => {
                 planning = false;
+                choosing = false;
                 reload++;
+                if (id) goto(`/plan?plan=${encodeURIComponent(id)}`, { noScroll: true });
                 // A signed-out create made this browser a guest (behavior 45): re-read
                 // /api/me so the plan shows the 7-day notice.
                 void refreshSession();
             }}
-            onclose={() => (planning = false)}
+            onclose={() => {
+                planning = false;
+                choosing = false;
+            }}
             onsignin={(answers) => {
                 savePending({ page: 'plan', scope: pick, answers, ts: Date.now() });
                 planning = false;

@@ -33,8 +33,9 @@
         onclose: () => void;
         /** Sign-in is needed; the answers so far ride along so they survive the redirect. */
         onsignin: (answers: OnboardingAnswers) => void;
-        /** The plan card was created — close the modal and reveal it in the Plan tab. */
-        oncreated: () => void;
+        /** The plan card was created — close the modal and reveal it; `id` is the new
+         *  card's, so the planner opens that plan (behavior 86). */
+        oncreated: (id: string) => void;
     } = $props();
 
     // Seeded once from `initial` (a restore), never re-synced — the user's taps own them after.
@@ -56,6 +57,7 @@
             band: band === null ? null : BUDGET_BANDS.indexOf(band)
         };
     }
+    let createdId = '';
     let phase = $state<'form' | 'submitting' | 'created' | 'auth' | 'limit' | 'error'>('form');
     let guestLimit = $state(3);
 
@@ -131,6 +133,7 @@
             buildOnboardingInput(stateCode, suburbName, suburbSal, band, intent, isForeign, buyerStage)
         );
         if (outcome.kind === 'guest_limit') guestLimit = outcome.limit;
+        if (outcome.kind === 'created') createdId = outcome.result.plan_card_id;
         phase =
             outcome.kind === 'created' ? 'created'
             : outcome.kind === 'guest_limit' ? 'limit'
@@ -145,7 +148,7 @@
     const place = $derived(suburbName || STATE_NAMES[stateCode as AuState] || stateCode);
 
     function close() {
-        if (phase === 'created') oncreated();
+        if (phase === 'created') oncreated(createdId);
         else onclose();
     }
 </script>
@@ -163,7 +166,7 @@
         <div class="ob-terminal">
             <h3>{$t('onboarding.created.title')}</h3>
             <p>{$t('onboarding.created.body')}</p>
-            <button type="button" class="primary" onclick={oncreated}>{$t('onboarding.created.cta')}</button>
+            <button type="button" class="primary" onclick={() => oncreated(createdId)}>{$t('onboarding.created.cta')}</button>
         </div>
     {:else if phase === 'limit'}
         <div class="ob-terminal">
