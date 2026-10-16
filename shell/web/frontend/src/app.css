@@ -2706,6 +2706,12 @@ main {
     font-size: var(--fs-sm);
     color: var(--muted);
 }
+.pp-fin-capacity {
+    margin: 0;
+    font-size: var(--fs-sm);
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+}
 .pp-fin-outright {
     flex: none;
     border: 1px solid var(--border);

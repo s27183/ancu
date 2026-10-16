@@ -41,6 +41,7 @@
         type PropertyAddendum,
         harvestCashEvents,
         firstComponentEntry,
+        loanFit,
         PROFILE_COMPONENT_IDS
     } from '$lib/planCard';
     import { AU_STATES } from '$lib/map';
@@ -689,6 +690,7 @@
         ((viewComponents.cash_position?.outcome as BudgetEnvelopeOutcome | undefined)
             ?.deposit_bounds ?? null) as DepositBounds | null
     );
+    const fit = $derived(loanFit(viewComponents));
     const pricePreview = $derived(aud(priceInput));
     function outright() {
         const p = aud(priceInput) ?? depositBounds?.price ?? null;
@@ -1098,6 +1100,10 @@
     <div class="pp-fin-wrap">
         <h4 class="pp-fin-title">{$t('plan.sheet.finances')}</h4>
         <p class="pp-fin-effect">{$t('plan.fin.household_effect')}</p>
+        <p class="pp-fin-capacity" data-capacity>
+            {#if fit.capacity}{$t('plan.fin.capacity').replace('{x}', (moneyRange(fit.capacity, $lang) ?? ''))}{:else}{$t('plan.fin.capacity_none')}{/if}
+            {#if fit.loan}{$t('plan.fin.loan_needed').replace('{x}', money(fit.loan, $lang) ?? '')}{/if}
+        </p>
         <!-- Household financials (IC5): a persisted FACT — income + debts —
              distinct from the what-if scenario above and the client-side
              cash-on-hand. Commits via POST /profile → the engine recomputes

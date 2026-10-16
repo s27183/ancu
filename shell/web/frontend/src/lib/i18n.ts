@@ -800,6 +800,20 @@ const messages = {
         vi: 'Cho biết ngân hàng có thể cho vay bao nhiêu. Thu nhập không đổi khoản phí nào.',
         en: 'Sets how much a lender may lend. Income changes no fee.'
     },
+    'plan.fin.capacity': { vi: 'Bạn vay được khoảng {x}.', en: 'A lender may lend you about {x}.' },
+    'plan.fin.capacity_none': {
+        vi: 'Nhập thu nhập để biết bạn vay được khoảng bao nhiêu.',
+        en: 'Enter your income to see about how much a lender may lend.'
+    },
+    'plan.fin.loan_needed': { vi: 'Khoản vay cần: {x}.', en: 'Loan needed: {x}.' },
+    'plan.sheet.loan_above': {
+        vi: 'Khoản vay cần ({loan}) cao hơn mức ngân hàng có thể cho vay ({cap}).',
+        en: 'The loan needed ({loan}) is above what a lender may lend ({cap}).'
+    },
+    'plan.sheet.loan_maybe': {
+        vi: 'Khoản vay cần ({loan}) nằm trong mức ngân hàng có thể cho vay ({cap}): có thể không đủ.',
+        en: 'The loan needed ({loan}) is inside what a lender may lend ({cap}): it may not be enough.'
+    },
     'plan.sheet.steps': { vi: 'Trong hành trình', en: 'In the journey' },
     // Budget cockpit (the prototype's input form, engine-driven).
     'plan.cockpit.title': { vi: 'Ngân sách — bạn đã sẵn sàng?', en: 'Budget — am I ready?' },

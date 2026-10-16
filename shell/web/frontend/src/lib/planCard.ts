@@ -916,6 +916,31 @@ export const PROFILE_COMPONENT_IDS = [
     'investor_profile_foreign'
 ] as const;
 
+/** Behavior 101: the loan this plan needs set against what a lender may lend.
+ *  loan = the ceiling price less the deposit (chosen, else the plan's assumed one), as
+ *  fh_engine_cash places it; capacity = mortgage_finance's expected_borrowing_capacity
+ *  (null until income is known). `over` is 'above' past the band's top, 'maybe' inside
+ *  the band, null under it or when either side is unknown. */
+export interface LoanFit {
+    loan: number | null;
+    capacity: MoneyRange | null;
+    over: 'above' | 'maybe' | null;
+}
+export function loanFit(components: Record<string, ComponentEntry>): LoanFit {
+    const b = (components.cash_position?.outcome as BudgetEnvelopeOutcome | undefined)?.deposit_bounds;
+    const dep = b ? (b.chosen ?? b.assumed) : null;
+    const loan = b && typeof b.price === 'number' && typeof dep === 'number' ? Math.max(0, b.price - dep) : null;
+    const c = (components.mortgage_finance?.outcome as MortgagePlanOutcome | undefined)
+        ?.expected_borrowing_capacity;
+    const capacity = Array.isArray(c) && c.length === 2 ? (c as MoneyRange) : null;
+    let over: LoanFit['over'] = null;
+    if (loan !== null && loan > 0 && capacity) {
+        if (loan > capacity[1]) over = 'above';
+        else if (loan > capacity[0]) over = 'maybe';
+    }
+    return { loan, capacity, over };
+}
+
 /** The first present entry among a set of alias componentIds (e.g. `PROFILE_COMPONENT_IDS`). */
 export function firstComponentEntry(
     components: Record<string, ComponentEntry>,

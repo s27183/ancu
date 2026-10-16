@@ -58,6 +58,7 @@
     import {
         pick,
         harvestCashEvents,
+        loanFit,
         type CashEvent,
         type ComponentEntry,
         type DispositionOutcome,
@@ -186,6 +187,7 @@
     const holdYears = $derived(budget?.hold_years ?? disposition?.horizon_years ?? 0);
     const loan = $derived(disposition?.loan_over_hold ?? null);
     const intoHome = $derived(budget?.into_home ?? null);
+    const fit = $derived(loanFit(components));
     const deposits = $derived(events.filter((e) => BUY_PHASES.includes(e.phase) && e.id === 'deposit'));
     const groups = $derived([
         {
@@ -503,6 +505,14 @@
                 {/if}
             </div>
         {/if}
+        {#if fit.over && fit.loan && fit.capacity}
+            <!-- behavior 101: the loan needed against what a lender may lend -->
+            <button type="button" class="ls-over" data-loan-over={fit.over} onclick={() => openPhase('finances')}
+                >{$t(fit.over === 'above' ? 'plan.sheet.loan_above' : 'plan.sheet.loan_maybe')
+                    .replace('{loan}', range([fit.loan, fit.loan]))
+                    .replace('{cap}', range(fit.capacity))}</button
+            >
+        {/if}
     </section>
 {/if}
 
@@ -712,4 +722,19 @@
     .ls-cash-verdict dt { color: var(--muted); font-size: var(--fs-sm, 0.875rem); }
     .ls-cash-verdict dd { margin: 0; font-weight: 700; color: var(--success); font-variant-numeric: tabular-nums; }
     .ls-cash-verdict .ls-short dd { color: var(--danger, var(--warning)); }
+    .ls-over {
+        display: block;
+        width: 100%;
+        margin-top: 0.75rem;
+        padding: 0.6rem 0.75rem;
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--warning);
+        border-radius: 6px;
+        background: var(--surface);
+        color: var(--ink);
+        font: inherit;
+        font-size: 0.9rem;
+        text-align: left;
+        cursor: pointer;
+    }
 </style>
