@@ -7,6 +7,7 @@
     // the property-agnostic BASE components, identical across suburbs.
     import { onMount } from 'svelte';
     import { page } from '$app/state';
+    import { pushState } from '$app/navigation';
     import { t } from '$lib/i18n';
     import { lang } from '$lib/stores/lang';
     import {
@@ -177,7 +178,15 @@
     // Behavior 82: the sheet's line → its source component in a modal (the zoom-in layer);
     // closing leaves the sheet where it was. The hold-years chips drive the same horizon
     // what-if as the cockpit's slider.
-    let sheetDetail = $state<string | null>(null);
+    // Behavior 93: the detail is a history entry over its phase sheet, so back (the
+    // browser's, the iPhone's swipe, or the detail's ✕) returns to that sheet.
+    const sheetDetail = $derived(page.state.detail ?? null);
+    function openDetail(cid: string) {
+        pushState('', { ...page.state, detail: cid });
+    }
+    function closeDetail() {
+        if (page.state.detail) history.back();
+    }
     function chooseHold(years: number) {
         horizonValue = years;
         void runPreview();
@@ -627,7 +636,9 @@
     // A pick from the menu leaves an open phase sheet of the statement (its history entry,
     // LifecycleSheet), so the budget's first sheet is the statement again.
     function leaveLayer() {
-        if (page.state.lifecycle) history.back();
+        // An open line detail is one more entry above its phase sheet.
+        const layers = (page.state.lifecycle ? 1 : 0) + (page.state.detail ? 1 : 0);
+        if (layers) history.go(-layers);
     }
     function railItems(tabs: UiTab[]): SectionItem[] {
         return tabs.flatMap((tb) => {
@@ -1269,12 +1280,12 @@
                             busy={previewing}
                             onhorizon={chooseHold}
                             onstate={chooseState}
-                            onopen={(cid) => (sheetDetail = cid)}
+                            onopen={openDetail}
                         />
                         {#if sheetDetail && viewComponents[sheetDetail]}
                             <Modal
                                 title={$t(`plan.c.${sheetDetail}` as 'plan.c.buyer_profile')}
-                                onClose={() => (sheetDetail = null)}
+                                onClose={closeDetail}
                             >
                                 <ComponentCard componentId={sheetDetail} entry={viewComponents[sheetDetail]} filling={running} />
                             </Modal>
