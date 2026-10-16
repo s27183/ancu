@@ -28,7 +28,7 @@
 
 {#if $openTerm}
     {@const term = $openTerm.term}
-    <InfoSheet title={pickL(term.name, $lang)} onclose={close} narrow>
+    <InfoSheet title={pickL(term.name, $lang)} onclose={close} narrow fit>
         <div class="tc" data-term-card={term.id}>
             <p class="tc-names">
                 {#if term.abbr}<span class="tc-abbr">{term.abbr}</span> · {/if}<span lang={other}
