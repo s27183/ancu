@@ -15,8 +15,8 @@
     // figures below recompute; cash-on-hand arrives as a prop and drives the verdict only.
     //
     // R1 every bar/figure is a pure outcome→geometry function (nothing agent-drawn). R2
-    // honest-partial — a null line is omitted/ghosted, never a zero or fake point; an empty
-    // phase says so. R4 bilingual — enum labels via $t, engine prose via pick(), figures via
+    // honest-partial — a null line or figure is left out, never a zero, a fake point or a
+    // placeholder; an empty phase is not drawn. R4 bilingual — enum labels via $t, engine prose via pick(), figures via
     // money()/moneyRange(). All money is resolver-computed + single-valued/ranged.
     import { t } from '$lib/i18n';
     import { lang } from '$lib/stores/lang';
@@ -35,7 +35,6 @@
     import Field from './Field.svelte';
     import Chip from './Chip.svelte';
     import NoteList from './NoteList.svelte';
-    import Pending from './Pending.svelte';
     import StackedBar from './StackedBar.svelte';
     import ComponentCard from './ComponentCard.svelte';
     import Modal from '$lib/Modal.svelte';
@@ -80,6 +79,9 @@
         if (v[0] === v[1]) return money(v[0], $lang) ?? '—';
         return moneyRange(v, $lang) ?? '—';
     }
+    // A Field value: the range label when the figure exists, else null (the row is left out).
+    const rangeValue = (v: MoneyRange | null | undefined): string | null =>
+        hasRange(v) ? rangeLabel(v) : null;
 
     // NEED-bar segments: deposit (range), duty (scalar, exact), other costs (range,
     // convention estimate). Each present only when its figure is known.
@@ -151,8 +153,8 @@
     // ── Financial spine: cash_events placed on the lifecycle phases ───────────
     // Phase-aligned with the swimlane (same ids/order). The spine PLACES the engine's
     // events; it never sums them into a total (the headline total is total_cash_required,
-    // engine-computed — one-computer-per-figure). Empty phases say so (honest-partial:
-    // recurring Own-phase costs are PENDING until profile facts arrive).
+    // engine-computed — one-computer-per-figure). A phase with no events is not drawn
+    // (recurring Own-phase costs arrive with profile facts; until then there is no row).
     const PHASE_ORDER = ['prepare', 'pre_approve', 'contract', 'settle', 'own'] as const;
     // Harvested across every passed component (mirrors the engine's own multi-source
     // harvest, [[unify-views-as-projections-of-one-primitive]]) so Mode C's hold-phase
@@ -172,7 +174,9 @@
         const known: readonly string[] = PHASE_ORDER;
         const extra = events.map((e) => e.phase).filter((p) => !known.includes(p));
         const phases = [...PHASE_ORDER, ...extra.filter((p, i) => extra.indexOf(p) === i)];
-        return phases.map((phase) => ({ phase, events: events.filter((e) => e.phase === phase) }));
+        return phases
+            .map((phase) => ({ phase, events: events.filter((e) => e.phase === phase) }))
+            .filter((g) => g.events.length > 0);
     });
     function phaseLabel(p: string): string {
         return $t(`plan.phase.${p}` as 'plan.phase.prepare');
@@ -217,7 +221,7 @@
     // budget_envelope_investor) has none of stamp_duty/deposit/other_buying_costs/
     // reserve_buffer — found 2026-07-11 via the renderer conformance check: hasBreakdown
     // was false for these modes even with real figures present (channel_costs_total etc.),
-    // so the whole Detail tab silently rendered Pending. hasSummaryTotals is its own gate
+    // so the whole Detail tab silently rendered nothing. hasSummaryTotals is its own gate
     // (regulatory_imposts_total/channel_costs_total/family_capacity_available/loan_amount/
     // lvr/lmi_payable — each field means the same thing regardless of which mode's
     // resolver produced it, so ONE generic block below covers all three modes at once).
@@ -250,7 +254,7 @@
     // (the blueprint maps both → calculator). This view reads `disposition`: the sell-side
     // projection (sale − selling − loan − cgt = net) + the full-horizon net position.
     // Honest-partial: H null → invitation; H set + loan unknown (no income captured, the
-    // common simulate-only state) → sale/selling banded, loan/net/full PENDING with a CTA.
+    // common simulate-only state) → sale/selling banded, loan/net/full left out with a CTA.
     const d = $derived(outcome as DispositionOutcome);
     // The `calculator` renderer is mapped to THREE outcome types (cash_position's
     // budget_envelope, disposition, and Mode-E-only existing_home_disposal); a standalone
@@ -268,11 +272,17 @@
     const loanPending = $derived(hasHorizon && !hasRange(d.loan_payout));
     const fullHorizon = $derived(hasRange(d.full_horizon_net_position) ? d.full_horizon_net_position : null);
     // Investor exits (Mode C/D) carry taxable_gain; a foreign-resident exit (Mode D) carries
-    // the VN-side note from the base turn on, horizon or not — so both rows below show as
-    // pending before a horizon is set rather than vanishing (behavior 30).
+    // the VN-side note from the base turn on, horizon or not — the note shows either way; a
+    // figure row shows only once its figure exists.
     const isInvestorExit = $derived('taxable_gain' in outcome);
     const isForeignExit = $derived(d.vn_side_cgt_note != null);
     const vnNote = $derived(d.vn_side_cgt_note ? [d.vn_side_cgt_note] : []);
+    // The sell-side table draws only when at least one of its rows has a figure.
+    const hasDispRows = $derived(
+        hasRange(d.sale_proceeds) || hasRange(d.selling_costs) || hasRange(d.loan_payout) ||
+        (isInvestorExit && hasRange(d.taxable_gain)) || hasRange(d.cgt) || !!d.cgt_status ||
+        hasRange(d.net_proceeds)
+    );
     const CGT_TONE: Record<string, 'good' | 'warn' | 'neutral'> = { exempt: 'good', to_verify: 'warn' };
     // Map the closed cgt_status enum to literal i18n keys (no dynamic-key cast that would
     // hide a producer rename — firsthomey-svelte-conventions).
@@ -323,11 +333,11 @@
     {/if}
 
     {#if o.deposit}
-        <Field label={$t('plan.cash.deposit')} value={rangeLabel(o.deposit.minimum_required_amount)} />
+        <Field label={$t('plan.cash.deposit')} value={rangeValue(o.deposit.minimum_required_amount)} />
         <NoteList notes={o.deposit.notes} />
     {/if}
     {#if o.other_buying_costs}
-        <Field label={$t('plan.cash.other')} value={rangeLabel(o.other_buying_costs.total)} />
+        <Field label={$t('plan.cash.other')} value={rangeValue(o.other_buying_costs.total)} />
         <NoteList notes={o.other_buying_costs.notes} />
     {/if}
     {#if o.reserve_buffer}
@@ -375,14 +385,12 @@
 <!-- ── (1) "Am I ready?" verdict hero ───────────────────────────────────── -->
 {#if view === 'verdict' || (view === 'full' && !isDisposition && !isExistingHomeDisposal && !isYield && !isTax)}
 <div class="cw-hero" class:cw-full={density === 'full'}>
-    <div class="cw-head">
-        <span class="cw-need-label">{$t('plan.cash.need')}</span>
-        {#if needTotal}
+    {#if needTotal}
+        <div class="cw-head">
+            <span class="cw-need-label">{$t('plan.cash.need')}</span>
             <span class="cw-need-total">{needTotal}</span>
-        {:else}
-            <Pending />
-        {/if}
-    </div>
+        </div>
+    {/if}
 
     {#if needSegments.length}
         <StackedBar segments={needSegments} {density} />
@@ -420,8 +428,7 @@
             <tbody>
                 {#each byPhase as { phase, events: evs } (phase)}
                     <tr class="cw-trphase"><td colspan="2">{phaseLabel(phase)}</td></tr>
-                    {#if evs.length}
-                        {#each evs as e (e.id)}
+                    {#each evs as e (e.id)}
                             {@const clickable = rowClickable(e)}
                             <tr class="cw-trevent">
                                 <td class="cw-td-item">
@@ -447,10 +454,7 @@
                                     class:cw-in={e.direction === 'in'}>{signed(e)}</td
                                 >
                             </tr>
-                        {/each}
-                    {:else}
-                        <tr class="cw-trempty"><td colspan="2">{$t('plan.cash.spine.empty')}</td></tr>
-                    {/if}
+                    {/each}
                 {/each}
             </tbody>
         </table>
@@ -465,12 +469,8 @@
 {/if}
 
 <!-- ── (3) The breakdown — inline in the Detail tab (tabbed budget, §7.3). ── -->
-{#if view === 'detail'}
-    {#if hasBreakdown}
-        {@render breakdownBody()}
-    {:else}
-        <Pending />
-    {/if}
+{#if view === 'detail' && hasBreakdown}
+    {@render breakdownBody()}
 {/if}
 
 <!-- ── (4) Disposition — the sell-side projection + full-horizon net position. ── -->
@@ -481,63 +481,69 @@
 {#if view === 'disposition' || (view === 'full' && isDisposition)}
     {#if hasHorizon}
         <!-- The full-horizon net position hero (the headline). -->
-        <div class="cw-hero cw-full">
-            <div class="cw-head">
-                <span class="cw-need-label">{$t('plan.disp.full_horizon')}</span>
-                {#if fullHorizon}
+        {#if fullHorizon}
+            <div class="cw-hero cw-full">
+                <div class="cw-head">
+                    <span class="cw-need-label">{$t('plan.disp.full_horizon')}</span>
                     <span class="cw-need-total">{rangeLabel(fullHorizon)}</span>
-                {:else}
-                    <Pending />
-                {/if}
+                </div>
+                <p class="cw-disp-sub">{$t('plan.disp.full_horizon_sub')}</p>
             </div>
-            <p class="cw-disp-sub">{$t('plan.disp.full_horizon_sub')}</p>
-        </div>
+        {/if}
 
         <!-- The sell-side breakdown: sale − selling − loan − cgt = net. Every figure is
-             resolver-computed + banded; a pending figure shows "—", never a fake zero. -->
+             resolver-computed + banded; a row whose figure is unknown is left out. -->
+        {#if hasDispRows}
         <div class="cw-spine">
             <h4 class="cw-spine-title">{phaseLabel('dispose')}</h4>
             <table class="cw-table">
                 <tbody>
-                    <tr class="cw-trevent">
-                        <td class="cw-td-item"><span class="cw-ev-label">{$t('plan.disp.sale')}</span></td>
-                        <td class="num cw-ev-amt cw-in">+{rangeLabel(d.sale_proceeds)}</td>
-                    </tr>
-                    <tr class="cw-trevent">
-                        <td class="cw-td-item"><span class="cw-ev-label">{$t('plan.disp.selling')}</span></td>
-                        <td class="num cw-ev-amt cw-out">−{rangeLabel(d.selling_costs)}</td>
-                    </tr>
-                    <tr class="cw-trevent">
-                        <td class="cw-td-item"><span class="cw-ev-label">{$t('plan.disp.loan')}</span></td>
-                        <td class="num cw-ev-amt" class:cw-out={hasRange(d.loan_payout)}
-                            >{hasRange(d.loan_payout) ? '−' + rangeLabel(d.loan_payout) : '—'}</td
-                        >
-                    </tr>
-                    {#if isInvestorExit}
+                    {#if hasRange(d.sale_proceeds)}
                         <tr class="cw-trevent">
-                            <td class="cw-td-item"><span class="cw-ev-label">{$t('plan.disp.taxable_gain')}</span></td>
-                            <td class="num cw-ev-amt">{#if hasRange(d.taxable_gain)}{rangeLabel(d.taxable_gain)}{:else}<Pending />{/if}</td>
+                            <td class="cw-td-item"><span class="cw-ev-label">{$t('plan.disp.sale')}</span></td>
+                            <td class="num cw-ev-amt cw-in">+{rangeLabel(d.sale_proceeds)}</td>
                         </tr>
                     {/if}
-                    <tr class="cw-trevent">
-                        <td class="cw-td-item"><span class="cw-ev-label">{$t('plan.disp.cgt')}</span></td>
-                        <td class="num">
-                            {#if hasRange(d.cgt)}
-                                <span class="cw-ev-amt cw-out">−{rangeLabel(d.cgt)}</span>
-                            {:else if d.cgt_status}
-                                <Chip label={cgtLabel(d.cgt_status)} tone={CGT_TONE[d.cgt_status] ?? 'neutral'} />
-                            {:else}
-                                —
-                            {/if}
-                        </td>
-                    </tr>
-                    <tr class="cw-trevent cw-trnet">
-                        <td class="cw-td-item"><span class="cw-ev-label">{$t('plan.disp.net')}</span></td>
-                        <td class="num cw-ev-amt">{rangeLabel(d.net_proceeds)}</td>
-                    </tr>
+                    {#if hasRange(d.selling_costs)}
+                        <tr class="cw-trevent">
+                            <td class="cw-td-item"><span class="cw-ev-label">{$t('plan.disp.selling')}</span></td>
+                            <td class="num cw-ev-amt cw-out">−{rangeLabel(d.selling_costs)}</td>
+                        </tr>
+                    {/if}
+                    {#if hasRange(d.loan_payout)}
+                        <tr class="cw-trevent">
+                            <td class="cw-td-item"><span class="cw-ev-label">{$t('plan.disp.loan')}</span></td>
+                            <td class="num cw-ev-amt cw-out">−{rangeLabel(d.loan_payout)}</td>
+                        </tr>
+                    {/if}
+                    {#if isInvestorExit && hasRange(d.taxable_gain)}
+                        <tr class="cw-trevent">
+                            <td class="cw-td-item"><span class="cw-ev-label">{$t('plan.disp.taxable_gain')}</span></td>
+                            <td class="num cw-ev-amt">{rangeLabel(d.taxable_gain)}</td>
+                        </tr>
+                    {/if}
+                    {#if hasRange(d.cgt) || d.cgt_status}
+                        <tr class="cw-trevent">
+                            <td class="cw-td-item"><span class="cw-ev-label">{$t('plan.disp.cgt')}</span></td>
+                            <td class="num">
+                                {#if hasRange(d.cgt)}
+                                    <span class="cw-ev-amt cw-out">−{rangeLabel(d.cgt)}</span>
+                                {:else if d.cgt_status}
+                                    <Chip label={cgtLabel(d.cgt_status)} tone={CGT_TONE[d.cgt_status] ?? 'neutral'} />
+                                {/if}
+                            </td>
+                        </tr>
+                    {/if}
+                    {#if hasRange(d.net_proceeds)}
+                        <tr class="cw-trevent cw-trnet">
+                            <td class="cw-td-item"><span class="cw-ev-label">{$t('plan.disp.net')}</span></td>
+                            <td class="num cw-ev-amt">{rangeLabel(d.net_proceeds)}</td>
+                        </tr>
+                    {/if}
                 </tbody>
             </table>
         </div>
+        {/if}
 
         {#if loanPending}
             <p class="cw-cta">{$t('plan.disp.loan_pending')}</p>
@@ -546,9 +552,10 @@
         {#if isForeignExit}
             <!-- FRCGW: withheld from the price at settlement and credited on the return —
                  a sale-day cash fact, NOT a deduction in net (net subtracts the assessed CGT). -->
-            <Field label={$t('plan.disp.frcgw')}
-                value={hasRange(d.frcgw_withheld_at_settlement) ? rangeLabel(d.frcgw_withheld_at_settlement) : null} />
-            <p class="cw-disp-sub">{$t('plan.disp.frcgw_sub')}</p>
+            {#if hasRange(d.frcgw_withheld_at_settlement)}
+                <Field label={$t('plan.disp.frcgw')} value={rangeLabel(d.frcgw_withheld_at_settlement)} />
+                <p class="cw-disp-sub">{$t('plan.disp.frcgw_sub')}</p>
+            {/if}
             <NoteList heading={$t('plan.disp.vn_note')} notes={vnNote} />
         {/if}
 
@@ -560,12 +567,7 @@
             <span class="cw-need-label">{$t('plan.disp.set_horizon')}</span>
         </div>
         <NoteList notes={d.key_assumptions} />
-        {#if isInvestorExit}
-            <Field label={$t('plan.disp.taxable_gain')} value={null} />
-        {/if}
         {#if isForeignExit}
-            <Field label={$t('plan.disp.frcgw')} value={null} />
-            <p class="cw-disp-sub">{$t('plan.disp.frcgw_sub')}</p>
             <NoteList heading={$t('plan.disp.vn_note')} notes={vnNote} />
         {/if}
     {/if}
@@ -578,17 +580,15 @@
      so the breakdown only shows once a refine turn supplies at least the sale price. -->
 {#if view === 'full' && isExistingHomeDisposal}
     {#if typeof xhd.estimated_sale_price === 'number'}
-        <div class="cw-hero cw-full">
-            <div class="cw-head">
-                <span class="cw-need-label">{$t('plan.xhd.net_proceeds')}</span>
-                {#if hasRange(xhd.net_sale_proceeds)}
+        {#if hasRange(xhd.net_sale_proceeds)}
+            <div class="cw-hero cw-full">
+                <div class="cw-head">
+                    <span class="cw-need-label">{$t('plan.xhd.net_proceeds')}</span>
                     <span class="cw-need-total">{rangeLabel(xhd.net_sale_proceeds)}</span>
-                {:else}
-                    <Pending />
-                {/if}
+                </div>
+                <p class="cw-disp-sub">{$t('plan.xhd.net_proceeds_sub')}</p>
             </div>
-            <p class="cw-disp-sub">{$t('plan.xhd.net_proceeds_sub')}</p>
-        </div>
+        {/if}
 
         <div class="cw-spine">
             <h4 class="cw-spine-title">{$t('plan.c.existing_home_disposal')}</h4>
@@ -596,41 +596,42 @@
                 <tbody>
                     <tr class="cw-trevent">
                         <td class="cw-td-item"><span class="cw-ev-label">{$t('plan.xhd.sale_price')}</span></td>
-                        <td class="num cw-ev-amt cw-in">+{money(xhd.estimated_sale_price, $lang) ?? '—'}</td>
+                        <td class="num cw-ev-amt cw-in">+{money(xhd.estimated_sale_price, $lang)}</td>
                     </tr>
-                    <tr class="cw-trevent">
-                        <td class="cw-td-item">
-                            <span class="cw-ev-label">{$t('plan.xhd.loan_payout')}</span>
-                            {#if xhd.loan_payout?.break_cost_status}
-                                <Chip label={breakCostLabel(xhd.loan_payout.break_cost_status)} tone="neutral" />
-                            {/if}
-                        </td>
-                        <td class="num cw-ev-amt" class:cw-out={hasRange(xhd.loan_payout?.total_payout)}
-                            >{hasRange(xhd.loan_payout?.total_payout)
-                                ? '−' + rangeLabel(xhd.loan_payout?.total_payout)
-                                : '—'}</td
-                        >
-                    </tr>
-                    <tr class="cw-trevent">
-                        <td class="cw-td-item"><span class="cw-ev-label">{$t('plan.disp.selling')}</span></td>
-                        <td class="num cw-ev-amt" class:cw-out={hasRange(xhd.selling_costs)}
-                            >{hasRange(xhd.selling_costs) ? '−' + rangeLabel(xhd.selling_costs) : '—'}</td
-                        >
-                    </tr>
-                    <tr class="cw-trevent">
-                        <td class="cw-td-item"><span class="cw-ev-label">{$t('plan.disp.cgt')}</span></td>
-                        <td class="num">
-                            {#if xhd.cgt_status}
+                    {#if hasRange(xhd.loan_payout?.total_payout) || xhd.loan_payout?.break_cost_status}
+                        <!-- the break-cost status is a real answer even before the payout figure -->
+                        <tr class="cw-trevent">
+                            <td class="cw-td-item">
+                                <span class="cw-ev-label">{$t('plan.xhd.loan_payout')}</span>
+                                {#if xhd.loan_payout?.break_cost_status}
+                                    <Chip label={breakCostLabel(xhd.loan_payout.break_cost_status)} tone="neutral" />
+                                {/if}
+                            </td>
+                            <td class="num cw-ev-amt cw-out"
+                                >{#if hasRange(xhd.loan_payout?.total_payout)}−{rangeLabel(xhd.loan_payout?.total_payout)}{/if}</td
+                            >
+                        </tr>
+                    {/if}
+                    {#if hasRange(xhd.selling_costs)}
+                        <tr class="cw-trevent">
+                            <td class="cw-td-item"><span class="cw-ev-label">{$t('plan.disp.selling')}</span></td>
+                            <td class="num cw-ev-amt cw-out">−{rangeLabel(xhd.selling_costs)}</td>
+                        </tr>
+                    {/if}
+                    {#if xhd.cgt_status}
+                        <tr class="cw-trevent">
+                            <td class="cw-td-item"><span class="cw-ev-label">{$t('plan.disp.cgt')}</span></td>
+                            <td class="num">
                                 <Chip label={cgtLabel(xhd.cgt_status)} tone={CGT_TONE[xhd.cgt_status] ?? 'neutral'} />
-                            {:else}
-                                —
-                            {/if}
-                        </td>
-                    </tr>
-                    <tr class="cw-trevent cw-trnet">
-                        <td class="cw-td-item"><span class="cw-ev-label">{$t('plan.disp.net')}</span></td>
-                        <td class="num cw-ev-amt">{rangeLabel(xhd.net_sale_proceeds)}</td>
-                    </tr>
+                            </td>
+                        </tr>
+                    {/if}
+                    {#if hasRange(xhd.net_sale_proceeds)}
+                        <tr class="cw-trevent cw-trnet">
+                            <td class="cw-td-item"><span class="cw-ev-label">{$t('plan.disp.net')}</span></td>
+                            <td class="num cw-ev-amt">{rangeLabel(xhd.net_sale_proceeds)}</td>
+                        </tr>
+                    {/if}
                 </tbody>
             </table>
         </div>
@@ -660,18 +661,14 @@
      cluster (interest, cash flow, net-post-loan yield, year 5/10, geared position) needs
      the representative-leverage financing too — both arrive together in practice. -->
 {#if view === 'full' && isYield}
-    <div class="cw-hero cw-full">
-        <div class="cw-head">
-            <span class="cw-need-label">{$t('plan.yield.gross')}</span>
-            {#if hasRange(cf.gross_yield)}
+    {#if hasRange(cf.gross_yield)}
+        <div class="cw-hero cw-full">
+            <div class="cw-head">
+                <span class="cw-need-label">{$t('plan.yield.gross')}</span>
                 <span class="cw-need-total">{rangeLabel(cf.gross_yield)}</span>
-            {:else}
-                <Pending />
-            {/if}
+            </div>
         </div>
-    </div>
-
-    {#if !hasRange(cf.gross_yield)}
+    {:else}
         <p class="cw-cta">{$t('plan.yield.pending')}</p>
     {/if}
 
@@ -785,7 +782,6 @@
     .cw-ev-amt { font-weight: 700; }
     .cw-out { color: var(--danger); }
     .cw-in { color: var(--success); }
-    .cw-trempty td { font-size: var(--fs-xs); color: var(--muted); font-style: italic; }
 
     /* The Budget-breakdown opener — a calm full-width affordance under the table. */
     .cw-breakdown-btn {

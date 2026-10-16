@@ -11,7 +11,7 @@
     //   - status is the resolver's seed overlaid by the user-set `done` (checklistStatus).
     // The toggle is owned by the parent (it holds card state + the SOT reconcile); this
     // emits intent via onToggle. honest-partial throughout: a null budget_ref → no chip,
-    // an absent component → a calm "attach property", an empty phase → a calm line.
+    // an absent component → a calm "attach property", an empty phase → no checklist tab.
     import { t } from '$lib/i18n';
     import { lang } from '$lib/stores/lang';
     import {
@@ -107,13 +107,13 @@
     const selectedAction = $derived(actions.find((a) => a.id === selectedActionId) ?? null);
 
     // The sheet's three tabs (§7.2): the focused viz incl. who-deals-with-whom → the action
-    // checklist → the KB risks. The risks tab is present only when the phase has risks
-    // (honest-partial: no empty tab); 'overview' is the #if fallback so a vanished tab can
+    // checklist → the KB risks. The checklist and risks tabs are present only when the phase
+    // has actions / risks (no empty tab); 'overview' is the #if fallback so a vanished tab can
     // never blank the sheet (e.g. risks removed by a preview while that tab was open).
     let psTab = $state<string>('overview');
     const psTabs = $derived([
         { id: 'overview', label: $t('plan.journey.interactions') },
-        { id: 'checklist', label: $t('plan.flow.actions') },
+        ...(actions.length ? [{ id: 'checklist', label: $t('plan.flow.actions') }] : []),
         ...(risks.length ? [{ id: 'risks', label: $t('plan.flow.risks') }] : [])
     ]);
 </script>
@@ -121,37 +121,33 @@
 <div class="ps-sheet">
     <Tabs tabs={psTabs} active={psTab} onSelect={(id) => (psTab = id)} />
 
-    {#if psTab === 'checklist'}
+    {#if psTab === 'checklist' && actions.length}
         <!-- the temporally-ordered action checklist -->
-        {#if actions.length}
-            <ul class="ps-actions">
-                {#each actions as a (a.id)}
-                    {@const amt = amountLabel(amountFor(a.budget_ref))}
-                    <li class="ps-action" class:ps-done={isDone(a)}>
-                        <label class="ps-act-row">
-                            <input
-                                type="checkbox"
-                                checked={isDone(a)}
-                                onchange={() =>
-                                    onToggle(phaseId, a.id, isDone(a) ? 'not_started' : 'done')}
-                            />
-                            <span class="ps-act-text">
-                                <span class="ps-act-label">{pick(a.label, $lang)}</span>
-                                {#if amt}<span class="ps-act-amt">{amt}</span>{/if}
-                            </span>
-                        </label>
-                        {#if a.detail}<p class="ps-act-detail">{pick(a.detail, $lang)}</p>{/if}
-                        {#if a.component_ref}
-                            <button type="button" class="ps-detail-btn" onclick={() => (selectedActionId = a.id)}>
-                                {$t('plan.flow.detail')}
-                            </button>
-                        {/if}
-                    </li>
-                {/each}
-            </ul>
-        {:else}
-            <p class="ps-pending">{$t('plan.flow.empty')}</p>
-        {/if}
+        <ul class="ps-actions">
+            {#each actions as a (a.id)}
+                {@const amt = amountLabel(amountFor(a.budget_ref))}
+                <li class="ps-action" class:ps-done={isDone(a)}>
+                    <label class="ps-act-row">
+                        <input
+                            type="checkbox"
+                            checked={isDone(a)}
+                            onchange={() =>
+                                onToggle(phaseId, a.id, isDone(a) ? 'not_started' : 'done')}
+                        />
+                        <span class="ps-act-text">
+                            <span class="ps-act-label">{pick(a.label, $lang)}</span>
+                            {#if amt}<span class="ps-act-amt">{amt}</span>{/if}
+                        </span>
+                    </label>
+                    {#if a.detail}<p class="ps-act-detail">{pick(a.detail, $lang)}</p>{/if}
+                    {#if a.component_ref}
+                        <button type="button" class="ps-detail-btn" onclick={() => (selectedActionId = a.id)}>
+                            {$t('plan.flow.detail')}
+                        </button>
+                    {/if}
+                </li>
+            {/each}
+        </ul>
     {:else if psTab === 'risks' && risks.length}
         <!-- the KB-grounded risks + mitigations (layered: row → mitigation modal) -->
         <RiskFlagList {risks} />

@@ -16,7 +16,6 @@
     import { money } from '$lib/format';
     import Field from './Field.svelte';
     import Chip from './Chip.svelte';
-    import Pending from './Pending.svelte';
 
     let { outcome }: { outcome: Record<string, unknown> } = $props();
     const o = $derived(outcome as FamilyFundingPlanOutcome);
@@ -49,14 +48,12 @@
 </script>
 
 <!-- ── Family capacity hero ───────────────────────────────────────────── -->
-<div class="pp-field">
-    <span class="pp-label">{$t('plan.f.family_capacity')}</span>
-    {#if typeof o.total_capacity_aud === 'number'}
+{#if typeof o.total_capacity_aud === 'number'}
+    <div class="pp-field">
+        <span class="pp-label">{$t('plan.f.family_capacity')}</span>
         <span class="fv-capacity">{money(o.total_capacity_aud, $lang)}</span>
-    {:else}
-        <Pending />
-    {/if}
-</div>
+    </div>
+{/if}
 
 <!-- contributions -->
 {#if breakdown.length}
@@ -74,8 +71,6 @@
             </div>
         {/each}
     </div>
-{:else}
-    <p class="fv-none">{$t('plan.family.none')}</p>
 {/if}
 
 <Field label={$t('plan.f.decision_authority')} value={authorityLabel} />
@@ -128,12 +123,6 @@
     .fv-contrib-ccy {
         font-size: var(--fs-2xs);
         color: var(--muted);
-    }
-    .fv-none {
-        font-size: var(--fs-sm);
-        font-style: italic;
-        color: var(--muted);
-        margin: 0;
     }
     .fv-gap {
         margin: 0.2rem 0 0;

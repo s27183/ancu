@@ -19,7 +19,6 @@
     import { money, moneyRange } from '$lib/format';
     import Chip from './Chip.svelte';
     import NoteList from './NoteList.svelte';
-    import Pending from './Pending.svelte';
     import Field from './Field.svelte';
 
     let { outcome }: { outcome: Record<string, unknown> } = $props();
@@ -49,16 +48,18 @@
         return v[0] === v[1] ? (money(v[0], $lang) ?? '—') : (moneyRange(v, $lang) ?? '—');
     }
     // The price ladder: walk-away ≤ yield ceiling ≤ max bid, plotted on a shared axis so
-    // the discipline gap reads at a glance. Render only when at least one is a real figure.
-    // Each is a BAND — the ladder plots the band's midpoint (matches SummaryCard's own
+    // the discipline gap reads at a glance. Only rungs with a real figure are drawn; with
+    // none, the ladder is left out. Each is a BAND — the ladder plots the band's midpoint (matches SummaryCard's own
     // range-to-scale convention elsewhere).
-    const prices = $derived([
-        { key: 'walk_away', label: $t('plan.f.walk_away'), v: o.walk_away_price ?? null, tone: 'floor' },
-        { key: 'yield', label: $t('plan.f.yield_ceiling'), v: o.yield_anchored_max_price ?? null, tone: 'anchor' },
-        { key: 'max', label: $t('plan.f.max_bid'), v: o.max_bid_value ?? null, tone: 'cap' }
-    ]);
-    const scale = $derived(Math.max(0, ...prices.map((p) => (hasRange(p.v) ? mid(p.v) : 0))));
-    const anyPrice = $derived(prices.some((p) => hasRange(p.v)));
+    const prices = $derived(
+        [
+            { key: 'walk_away', label: $t('plan.f.walk_away'), v: o.walk_away_price ?? null, tone: 'floor' },
+            { key: 'yield', label: $t('plan.f.yield_ceiling'), v: o.yield_anchored_max_price ?? null, tone: 'anchor' },
+            { key: 'max', label: $t('plan.f.max_bid'), v: o.max_bid_value ?? null, tone: 'cap' }
+        ].flatMap((p) => (hasRange(p.v) ? [{ ...p, v: p.v }] : []))
+    );
+    const scale = $derived(Math.max(0, ...prices.map((p) => mid(p.v))));
+    const anyPrice = $derived(prices.length > 0);
     const pctOf = (v: number) => (scale > 0 ? Math.max(0, Math.min(100, (v / scale) * 100)) : 0);
 </script>
 
@@ -69,18 +70,12 @@
             <div class="bs-row">
                 <span class="bs-rowlabel">{p.label}</span>
                 <div class="bs-track" aria-hidden="true">
-                    {#if hasRange(p.v)}
-                        <span class="bs-fill bs-{p.tone}" style="width:{pctOf(mid(p.v))}%"></span>
-                    {/if}
+                    <span class="bs-fill bs-{p.tone}" style="width:{pctOf(mid(p.v))}%"></span>
                 </div>
-                <span class="bs-val" class:bs-muted={!hasRange(p.v)}>
-                    {rangeLabel(p.v)}
-                </span>
+                <span class="bs-val">{rangeLabel(p.v)}</span>
             </div>
         {/each}
     </div>
-{:else}
-    <Pending />
 {/if}
 
 {#if pick(o.max_bid_reasoning, $lang)}
@@ -162,10 +157,6 @@
         color: var(--accent);
         font-variant-numeric: tabular-nums;
         white-space: nowrap;
-    }
-    .bs-muted {
-        color: var(--muted);
-        font-weight: 400;
     }
     .bs-reasoning {
         margin: 0 0 0.6rem;

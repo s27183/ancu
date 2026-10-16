@@ -207,8 +207,8 @@
             <ul class="ls-lines">
                 {#each inTotal as e (e.id)}{@render line(e)}{/each}
             </ul>
-        {:else if rest.length === 0 && waiting.length === 0}
-            <p class="ls-empty">{filling ? $t('plan.sheet.filling') : $t('plan.sheet.none')}</p>
+        {:else if filling && rest.length === 0 && waiting.length === 0}
+            <p class="ls-empty">{$t('plan.sheet.filling')}</p>
         {/if}
 
         {#if rest.length > 0 || waiting.length > 0}

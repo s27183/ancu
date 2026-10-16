@@ -26,7 +26,6 @@
         PROFILE_COMPONENT_IDS
     } from '$lib/planCard';
     import { moneyRange, asRange } from '$lib/format';
-    import Pending from './Pending.svelte';
     import { archetypeLabel } from './archetype';
 
     let { components, filling }: {
@@ -63,7 +62,7 @@
     );
     // Mode-E ONLY: no other mode has this component, so the tile below is present/absent by
     // component presence (not honest-partial-null) — Modes A/B/C/D never grow a dead
-    // "Pending" tile for a figure that doesn't apply to them.
+    // tile for a figure that doesn't apply to them.
     const existingHome = $derived(
         components.existing_home_disposal?.outcome as ExistingHomeDisposalOutcome | undefined
     );
@@ -95,7 +94,7 @@
     const target = $derived(range(profile?.target_price_range));
     // eligibility (and its total_benefit_value) doesn't exist for Modes C/D — see `stats`
     // below, where this tile is presence-gated on `scheme` rather than shown as a
-    // perpetual "Not yet" for a figure that structurally can't apply.
+    // perpetual empty tile for a figure that structurally can't apply.
     const benefit = $derived(range(scheme?.total_benefit_value));
     // total_cash_required is a range for Modes A/B/E, a scalar point for Modes C/D
     // (fh_engine_cash.erl SEAMS note) — asRange() upgrades a scalar to [v,v] instead of the
@@ -110,8 +109,8 @@
     // Headline tiles. Cash-to-get-in leads (2026-08, Son's call): it's the number a buyer
     // asks first ("can I actually afford this?"), ahead of the journey-order framing
     // (where you're aiming → how you finance → what help stacks) the rest of the grid
-    // still follows. Each ghosts honest-partial when null (its component ran but hasn't
-    // filled the figure yet). `benefit` is different: it's presence-gated on `scheme`
+    // still follows. A null figure shows the "…" marker while the plan is filling and is
+    // left out once it has settled (its component ran but hasn't filled the figure). `benefit` is different: it's presence-gated on `scheme`
     // (component-presence, not honest-partial) since Modes C/D have no eligibility
     // component at all — same treatment the existing-home tile already gets for Mode E, so
     // C/D never carry a tile for a figure that can't structurally exist for them.
@@ -144,16 +143,16 @@
 
     <div class="ov-grid">
         {#each stats as s (s.key)}
-            <div class="ov-stat">
-                <span class="ov-stat-label">{s.label}</span>
-                {#if s.value}
-                    <span class="ov-stat-value">{s.value}</span>
-                {:else if filling}
-                    <span class="ov-stat-value ov-muted">…</span>
-                {:else}
-                    <Pending />
-                {/if}
-            </div>
+            {#if s.value || filling}
+                <div class="ov-stat">
+                    <span class="ov-stat-label">{s.label}</span>
+                    {#if s.value}
+                        <span class="ov-stat-value">{s.value}</span>
+                    {:else}
+                        <span class="ov-stat-value ov-muted">…</span>
+                    {/if}
+                </div>
+            {/if}
         {/each}
     </div>
 

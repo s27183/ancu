@@ -202,7 +202,6 @@ const messages = {
         en: 'Preparing your base plan…'
     },
     'plan.computing': { vi: 'Đang tính…', en: 'Computing…' },
-    'plan.pending': { vi: 'Chưa có', en: 'Not yet' },
 
     'plan.c.buyer_profile': { vi: 'Hồ sơ của bạn', en: 'Your profile' },
     'plan.c.preparation': { vi: 'Chuẩn bị', en: 'Getting ready' },
@@ -612,7 +611,6 @@ const messages = {
     // Financial spine — cash_events grouped by lifecycle phase (the calculator's
     // projection, phase-aligned with the swimlane). Phase labels match the swimlane.
     'plan.cash.spine': { vi: 'Dòng tiền theo giai đoạn', en: 'When the money moves' },
-    'plan.cash.spine.empty': { vi: 'Chưa có dòng tiền ở giai đoạn này.', en: 'No cash flow at this stage yet.' },
     'plan.cash.col_item': { vi: 'Khoản mục', en: 'Item' },
     'plan.cash.col_amount': { vi: 'Số tiền', en: 'Amount' },
     'plan.cash.breakdown': { vi: 'Chi tiết ngân sách', en: 'Budget breakdown' },
@@ -737,7 +735,6 @@ const messages = {
     'plan.sheet.hold_q': { vi: 'Bạn định giữ nhà bao lâu?', en: 'How long will you keep it?' },
     'plan.sheet.years': { vi: 'năm', en: 'yrs' },
     'plan.sheet.filling': { vi: 'Đang tính…', en: 'Working it out…' },
-    'plan.sheet.none': { vi: 'Chưa có khoản nào', en: 'No lines yet' },
     // Budget cockpit (the prototype's input form, engine-driven).
     'plan.cockpit.title': { vi: 'Ngân sách — bạn đã sẵn sàng?', en: 'Budget — am I ready?' },
     'plan.cockpit.intro': {
@@ -767,10 +764,6 @@ const messages = {
     'plan.flow.detail': { vi: 'Xem chi tiết', en: 'See detail' },
     'plan.flow.detail_hide': { vi: 'Ẩn chi tiết', en: 'Hide detail' },
     'plan.flow.done': { vi: 'Đã xong', en: 'Done' },
-    'plan.flow.empty': {
-        vi: 'Chưa có việc nào ở giai đoạn này.',
-        en: 'No actions at this stage yet.'
-    },
     // Risk-flag-list → severity chrome + mitigation label.
     'plan.risk.sev.low': { vi: 'Thấp', en: 'Low' },
     'plan.risk.sev.medium': { vi: 'Trung bình', en: 'Medium' },
@@ -939,10 +932,6 @@ const messages = {
     'plan.pp.diversification': { vi: 'Điểm đa dạng hóa danh mục', en: 'Portfolio diversification' },
     // opportunity-card (ownership_planning_investor): modelled opportunities to act on.
     'plan.f.modeled_benefit': { vi: 'Lợi ích ước tính', en: 'Modelled benefit' },
-    'plan.opp.none': {
-        vi: 'Chưa có cơ hội nào được mô hình hoá.',
-        en: 'No opportunities modelled yet.'
-    },
 
     // --- Mode-B (foreign buyer) renderers -------------------------------------
     // family_context (family_funding_plan) → family-view-card. None of these array
@@ -970,10 +959,6 @@ const messages = {
     'plan.family.gap.funding_source_and_documentation_pending': {
         vi: 'Nguồn tiền & giấy tờ liên quan chưa được xác định',
         en: 'Funding source & documentation pending'
-    },
-    'plan.family.none': {
-        vi: 'Chưa có thông tin đóng góp gia đình.',
-        en: 'No family contribution captured yet.'
     },
 
     // firb_workflow (firb_status) → firb-workflow-card. The approval state machine.

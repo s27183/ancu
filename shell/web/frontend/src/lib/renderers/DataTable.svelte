@@ -18,7 +18,6 @@
     import Field from './Field.svelte';
     import Chip from './Chip.svelte';
     import NoteList from './NoteList.svelte';
-    import Pending from './Pending.svelte';
 
     let { outcome, density = 'compact' }: {
         outcome: Record<string, unknown>;
@@ -51,7 +50,7 @@
     const afterTaxCf = $derived(moneyRange(tx.after_tax_cash_flow_year_1, $lang));
     // Entity setup is an INDICATIVE band the engine places from the KB (never the agent's):
     // [0, 0] → "$0", [lo, hi] → "lo – hi", [lo, null] → "from lo" (an open-ended floor), each
-    // labelled indicative; null (no entity yet) → Pending. Not part of the cash total.
+    // labelled indicative; null (no entity yet) → the row is left out. Not part of the cash total.
     const setupCosts = $derived.by(() => {
         const r = tx.setup_costs;
         if (!Array.isArray(r) || typeof r[0] !== 'number') return null;
@@ -69,7 +68,7 @@
     // fires true for this shape too — but the rest of Mode C's field names don't exist here
     // (negative_gearing_active → negative_gearing_available_against_au_income; no
     // after_tax_cash_flow_year_1 at all, per the blueprint's own outcome schema). Without
-    // this, the branch above silently rendered Pending for gearing/cash-flow instead of this
+    // this, the branch above silently rendered empty gearing/cash-flow rows instead of this
     // shape's real fields. Checked BEFORE isTax in the template (more specific first);
     // rental_withholding_rate is unique to Mode D (absent from Mode C's schema).
     const isTaxForeign = $derived('rental_withholding_rate' in outcome);
@@ -179,8 +178,8 @@
 
     // ownership_planning (Mode B, fhb-foreign-au component 11) shares ongoing_obligations
     // with Mode A but adds the foreign-person rows; vacancy_fee_at_risk_amount is unique to
-    // it. Each row shows Pending while null (occupancy intent not captured yet) — never
-    // dropped (behavior 30).
+    // it. Each row is left out while null (occupancy intent not captured yet) and shows
+    // once the engine fills it.
     const isOwnershipForeign = $derived('vacancy_fee_at_risk_amount' in outcome);
     const OCCUPANCY: Record<string, 'good' | 'warn' | 'neutral'> = {
         compliant_owner_occupier: 'good',
@@ -224,16 +223,16 @@
 {#if isTaxForeign}
 <!-- ── tax_structure_non_resident (tax_optimised_structure, Mode D) ─────── -->
 <Field label={$t('plan.tx.entity')} value={txfEntityLabel} />
-<div class="pp-field">
-    <span class="pp-label">{$t('plan.tx.gearing')}</span>
-    {#if txf.negative_gearing_available_against_au_income === true}
-        <Chip label={$t('plan.tx.geared_negative')} tone="info" />
-    {:else if txf.negative_gearing_available_against_au_income === false}
-        <Chip label={$t('plan.tx.geared_not_available')} tone="neutral" />
-    {:else}
-        <Pending />
-    {/if}
-</div>
+{#if typeof txf.negative_gearing_available_against_au_income === 'boolean'}
+    <div class="pp-field">
+        <span class="pp-label">{$t('plan.tx.gearing')}</span>
+        {#if txf.negative_gearing_available_against_au_income === true}
+            <Chip label={$t('plan.tx.geared_negative')} tone="info" />
+        {:else}
+            <Chip label={$t('plan.tx.geared_not_available')} tone="neutral" />
+        {/if}
+    </div>
+{/if}
 <Field label={$t('plan.tx.marginal_rate')} value={txfMarginalRate} />
 <Field label={$t('plan.tx.withholding_rate')} value={txfWithholdingRate} />
 <Field label={$t('plan.tx.annual_tax_payable')} value={money(txf.annual_au_tax_payable_on_rental, $lang)} />
@@ -269,14 +268,12 @@
     </div>
 {/if}
 <Field label={$t('plan.tx.entity')} value={entityLabel} />
-<div class="pp-field">
-    <span class="pp-label">{$t('plan.tx.gearing')}</span>
-    {#if tx.negative_gearing_active === true}
+{#if tx.negative_gearing_active === true}
+    <div class="pp-field">
+        <span class="pp-label">{$t('plan.tx.gearing')}</span>
         <Chip label={$t('plan.tx.geared_negative')} tone="info" />
-    {:else}
-        <Pending />
-    {/if}
-</div>
+    </div>
+{/if}
 <Field label={$t('plan.tx.marginal_rate')} value={marginalRate} />
 <Field label={$t('plan.tx.after_tax_cf')} value={afterTaxCf} />
 <Field label={$t('plan.tx.setup_costs')} value={setupCosts} />
@@ -294,14 +291,12 @@
 <Field label={$t('plan.pp.lvr')} value={ppLvr} />
 <Field label={$t('plan.pp.equity')} value={ppEquity} />
 <Field label={$t('plan.pp.cash_flow')} value={ppCashFlow} />
-<div class="pp-field">
-    <span class="pp-label">{$t('plan.pp.ready')}</span>
-    {#if pp.ready_for_next_property === true}
+{#if pp.ready_for_next_property === true}
+    <div class="pp-field">
+        <span class="pp-label">{$t('plan.pp.ready')}</span>
         <Chip label={$t('plan.pp.ready_yes')} tone="good" />
-    {:else}
-        <Pending />
-    {/if}
-</div>
+    </div>
+{/if}
 <Field label={$t('plan.pp.diversification')} value={ppDiversification} />
 {#if pp.alert_triggers_armed?.length}
     <div class="pp-sublist">
@@ -330,9 +325,9 @@
      (investor-foreign-au) has NO loan-structure-scaffold or offset concept at all (its
      blueprint: "no offset-strategy or PPOR-equity leaves... Mode D has no AU PPOR to point
      an offset at"), so loanStructure is null there. Found 2026-07-11: these two Fields
-     rendered unconditionally, showing "Chưa có" for a mode where the field will NEVER
-     exist — honest-partial (Pending) is for a value not yet known, not for a concept that
-     doesn't apply; the fix is to not render the row at all, gated on the scaffold's presence. -->
+     rendered unconditionally, showing a placeholder for a mode where the field will NEVER
+     exist; the rows are gated on the scaffold's presence, and (like every Field) a null
+     value is left out. -->
 <Field label={$t('plan.f.loan_rate_type')} value={rateLabel(loanStructure.rate)} />
 <Field label={$t('plan.f.loan_offset')} value={offsetLabel(loanStructure.offset)} />
 {/if}
@@ -340,16 +335,16 @@
     <Field label={$t('plan.f.loan_currency')} value={loanStructure.currency ?? null} />
 {/if}
 {#if loanStructure && 'uses_existing_ppor_equity' in loanStructure}
-    <div class="pp-field">
-        <span class="pp-label">{$t('plan.f.ppor_equity')}</span>
-        {#if loanStructure.uses_existing_ppor_equity === true}
-            <Chip label={$t('onboarding.yes')} tone="info" />
-        {:else if loanStructure.uses_existing_ppor_equity === false}
-            <Chip label={$t('onboarding.no')} tone="neutral" />
-        {:else}
-            <Pending />
-        {/if}
-    </div>
+    {#if typeof loanStructure.uses_existing_ppor_equity === 'boolean'}
+        <div class="pp-field">
+            <span class="pp-label">{$t('plan.f.ppor_equity')}</span>
+            {#if loanStructure.uses_existing_ppor_equity === true}
+                <Chip label={$t('onboarding.yes')} tone="info" />
+            {:else}
+                <Chip label={$t('onboarding.no')} tone="neutral" />
+            {/if}
+        </div>
+    {/if}
 {/if}
 {#if loanStructure && 'interest_only_period_years' in loanStructure}
     <Field
@@ -407,16 +402,16 @@
     <Field label={$t('plan.f.preapproval_expiry')} value={mp.pre_approval_expiry ?? null} />
 {/if}
 {#if 'reapplication_required' in outcome}
-    <div class="pp-field">
-        <span class="pp-label">{$t('plan.f.reapplication')}</span>
-        {#if mp.reapplication_required === true}
-            <Chip label={$t('onboarding.yes')} tone="warn" />
-        {:else if mp.reapplication_required === false}
-            <Chip label={$t('onboarding.no')} tone="good" />
-        {:else}
-            <Pending />
-        {/if}
-    </div>
+    {#if typeof mp.reapplication_required === 'boolean'}
+        <div class="pp-field">
+            <span class="pp-label">{$t('plan.f.reapplication')}</span>
+            {#if mp.reapplication_required === true}
+                <Chip label={$t('onboarding.yes')} tone="warn" />
+            {:else}
+                <Chip label={$t('onboarding.no')} tone="good" />
+            {/if}
+        </div>
+    {/if}
 {/if}
 
 <NoteList heading={$t('plan.f.debt_optimisations')} notes={mp.debt_optimisations_to_action} />
@@ -452,14 +447,12 @@
 {/if}
 <Field label={$t('plan.pp.cash_flow')} value={ppfCashFlow} />
 <Field label={$t('plan.f.frcgw_reserve')} value={ppfFrcgw} />
-<div class="pp-field">
-    <span class="pp-label">{$t('plan.pp.ready')}</span>
-    {#if ppf.ready_for_next_property === true}
+{#if ppf.ready_for_next_property === true}
+    <div class="pp-field">
+        <span class="pp-label">{$t('plan.pp.ready')}</span>
         <Chip label={$t('plan.pp.ready_yes')} tone="good" />
-    {:else}
-        <Pending />
-    {/if}
-</div>
+    </div>
+{/if}
 <div class="pp-field">
     <span class="pp-label">{$t('plan.mode_switch.title')}</span>
     {#if ppf.mode_switch_eligible_on_pr === true}
@@ -495,8 +488,6 @@
         <span class="pp-label">{$t('plan.f.land_tax')}</span>
         <Chip label={landTaxLabel(o.land_tax_check)} tone={LAND_TAX[o.land_tax_check] ?? 'neutral'} />
     </div>
-{:else}
-    <Field label={$t('plan.f.land_tax')} value={null} />
 {/if}
 
 <Field label={$t('plan.f.maintenance')} value={money(o.maintenance_reserve_target, $lang)} />
@@ -509,8 +500,6 @@
             <Chip label={occupancyLabel(o.current_year_occupancy_status)}
                 tone={OCCUPANCY[o.current_year_occupancy_status] ?? 'neutral'} />
         </div>
-    {:else}
-        <Field label={$t('plan.f.occupancy_status')} value={null} />
     {/if}
     <Field label={$t('plan.f.nr_filing')}
         value={typeof o.non_resident_tax_filing_required === 'boolean'
