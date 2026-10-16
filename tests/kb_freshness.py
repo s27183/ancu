@@ -14,7 +14,9 @@ living fact docs with a re-verification cadence.
 The cadence tiers are NOT invented here — they come straight from the update
 cadence table in `docs/architecture/architecture.md §11.2`:
 
-  - Monthly   — lender policy, RBA cash rate, FHG panel / participating lenders.
+  - Weekly    — the RBA's AUD/VND reference reading (behavior 85).
+  - Monthly   — lender policy, RBA cash rate, FHG panel / participating lenders;
+                lender and FX-provider fees (behavior 85).
   - Per-event — FIRB regime changes, budgets, ASIC bulletins (no fixed period —
                 triggered on demand when the maintainer notices the event, not
                 by any scheduler/RSS watcher); we still apply a long
@@ -52,6 +54,7 @@ NEWS_DIR = KB_DIR / "news"
 # Re-verification budget per cadence tier, in days. Grounded in architecture
 # §11.2; the day counts give a small grace over the nominal period.
 BUDGET_DAYS = {
+    "weekly": 8,
     "monthly": 31,
     "quarterly": 92,
     "per-event": 183,  # no fixed cadence — safety-net so it can't drift forever
@@ -61,6 +64,14 @@ BUDGET_DAYS = {
 # need listing (§11.2): lender/LMI move monthly, FIRB is event-driven. Everything
 # else falls through to DEFAULT_CADENCE.
 CADENCE_RULES = [
+    # Behavior 85 (Son 2026-10-16): the RBA's AUD/VND reading moves daily and is
+    # re-read every weekly run; what a buyer pays a lender or a transfer provider
+    # (its own published price) is re-checked monthly. Market bands drawn from
+    # comparison sites (conveyancing, inspections, agents, insurance) stay quarterly.
+    ("kb.fx.rba-aud-vnd", "weekly"),
+    ("kb.fx.typical-spreads-vnd-aud", "monthly"),
+    ("kb.fx-providers", "monthly"),
+    ("kb.existing-home-sale.net-proceeds", "monthly"),
     ("kb.lender", "monthly"),
     ("kb.lmi", "monthly"),
     ("kb.firb", "per-event"),
@@ -157,7 +168,7 @@ def main():
 
     # Per-cadence summary so the operator sees the shape at a glance.
     print("By cadence:")
-    for cadence in ("monthly", "quarterly", "per-event"):
+    for cadence in ("weekly", "monthly", "quarterly", "per-event"):
         grp = [r for r in rows if r[1] == cadence]
         grp_stale = [r for r in grp if r[5] == "STALE"]
         print(f"  {cadence:<10} {len(grp):>2} docs, {len(grp_stale)} overdue  (budget {BUDGET_DAYS[cadence]}d)")
