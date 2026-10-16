@@ -577,8 +577,11 @@
     //            neither (an engine before ui_tabs) lists its tabs as before, so a version
     //            skew never blanks the menu.
     // Capability: picking Ngân sách from any sheet returns to the statement (leaveLayer pops
-    //            an open phase sheet); picking Hành trình opens the swimlane.
-    //
+    //            an open phase sheet or step); picking Hành trình opens the swimlane.
+    const sectionReg = useSections();
+    const budgetTab = $derived(uiTabs.find((tb) => tb.interactive));
+    const flowTab = $derived(uiTabs.find((tb) => tb.kind === 'flow'));
+
     // Whole lifecycle -> bilingual; information as is -> the web frontend -> the plan's levels
     // Goal:      behavior 106 (Son 2026-10-17, his friend could not find her way back to the
     //            overview): a plan opens on its hub (PlanHub: a Ngân sách card with the total
@@ -597,11 +600,7 @@
     // Capability: the floating menu switches Ngân sách ↔ Hành trình in place (sub), so back
     //            from either goes to the hub; it is not drawn on the hub, whose cards are the
     //            way in.
-    const sectionReg = useSections();
-    const budgetTab = $derived(uiTabs.find((tb) => tb.interactive));
-    const flowTab = $derived(uiTabs.find((tb) => tb.kind === 'flow'));
-    // A pick from the menu leaves an open phase sheet of the statement (its history entry,
-    // LifecycleSheet), so the budget's first sheet is the statement again.
+
     // A pick from the menu, or "Hỏi AI", leaves an open phase sheet or step first, and
     // waits for that back to land so a push that follows lands over the sheet, not under it.
     function leaveLayer(): Promise<void> {
