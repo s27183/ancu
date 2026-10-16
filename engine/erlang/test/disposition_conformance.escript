@@ -22,6 +22,9 @@
 %%      PLACES these on the swimlane's Dispose column, TW3).
 %%   6. GROWTH BASIS surfaced (ABS-sourced band, or PLACEHOLDER when the doc says so) +
 %%      bilingual key_assumptions (the §8.4 ASIC discipline).
+%%   8. THE LOAN (behavior 98, Expect 3) — the loan is the price less the deposit; the
+%%      repayments over a hold split into interest and principal repaid at both ends; a
+%%      foreign buyer's rate carries the non-resident premium band.
 %%   7. LAYER-1 CONFORMANCE — every state passes fh_engine_outcome:validate/2 against the
 %%      compiled `disposition` schema (the fail-closed commit-seam check is strict now).
 %%
@@ -36,7 +39,7 @@ main(_) ->
     R = lists:flatten([figure_cases(), arithmetic_cases(), cgt_cases(),
                        investor_cases(), per_property_cases(),
                        honest_partial_cases(), event_cases(), assumption_cases(),
-                       rate_source_cases(), layer1_cases()]),
+                       rate_source_cases(), loan_cases(), layer1_cases()]),
     Fails = [X || X <- R, X =:= fail],
     io:format("~n================================================================~n"),
     case Fails of
@@ -58,7 +61,10 @@ profile(Occupancy) ->
       <<"intended_occupancy_use">> => Occupancy,
       <<"tax_residency">>          => <<"resident">>}.
 
-budget()   -> #{<<"total_cash_required">> => [200000, 205000]}.
+%% the plan's own deposit event: a point at the 800000 ceiling, so the loan is
+%% 800000 − 240000 = 560000 (behavior 98: the loan is the price less the deposit).
+budget()   -> #{<<"total_cash_required">> => [200000, 205000],
+                <<"cash_events">> => [#{<<"id">> => <<"deposit">>, <<"amount">> => [240000, 240000]}]}.
 %% the REAL mortgage_plan shape: loan_structure_recommendation.rate holds the agent's
 %% rate-STRUCTURE enum ("variable"/"fixed_1yr"/…), NOT a numeric rate. loan_payout amortises
 %% at the KB representative product rate (6.0%), so it must NOT read this field as a number
@@ -98,7 +104,8 @@ inv_tax(Entity, Rate, Clawback, Eligible) ->
       <<"cgt_marginal_rate">>              => Rate,
       <<"cost_base_depreciation_clawback">> => Clawback}.
 
-inv_budget()   -> #{<<"total_cash_required">> => [200000, 205000], <<"loan_amount">> => 560000}.
+inv_budget()   -> #{<<"total_cash_required">> => [200000, 205000], <<"loan_amount">> => 560000,
+                    <<"cash_events">> => [#{<<"id">> => <<"deposit">>, <<"amount">> => [240000, 240000]}]}.
 inv_cashflow() -> #{<<"cash_flow_before_tax_year_1">> => -8000}.
 
 inv_upstream(Profile, Tax) ->
@@ -213,7 +220,7 @@ investor_cases() ->
     Sell     = g(C, <<"selling_costs">>),
     Loan     = g(C, <<"loan_payout">>),
     Cgt      = g(C, <<"cgt">>),
-    LoanExp  = fh_engine_disposition:loan_payout_investor(inv_budget(), 10),
+    LoanExp  = fh_engine_disposition:loan_payout([560000, 560000], investor, 10),
     NetExp   = fh_engine_disposition:net_proceeds(Sale, Sell, Loan, Cgt),
     FullExp  = fh_engine_disposition:full_horizon_investor(NetExp, inv_budget(), inv_cashflow(), 10),
     Assumps  = g(C, <<"key_assumptions">>),
@@ -288,8 +295,8 @@ honest_partial_cases() ->
     NoH = (full_upstream())#{<<"profile">> =>
                (profile(<<"sole_occupier">>))#{<<"hold_horizon_years">> => null}},
     {A, _} = fill(NoH),
-    %% (b) horizon set, loan unknown (empty mortgage_plan — the reserve_buffer precedent).
-    NoLoan = (full_upstream())#{<<"mortgage_plan">> => #{}},
+    %% (b) horizon set, loan unknown (no deposit event upstream, so no price less deposit).
+    NoLoan = (full_upstream())#{<<"budget_envelope">> => #{}},
     {B, _} = fill(NoLoan),
     [check("H=null: sale PENDING", g(A, <<"sale_proceeds">>), null),
      check("H=null: selling PENDING", g(A, <<"selling_costs">>), null),
@@ -315,7 +322,7 @@ event_cases() ->
     Sale        = ev_by_id(Events, <<"dispose_sale_proceeds">>),
     Loan        = ev_by_id(Events, <<"dispose_loan_payout">>),
     %% loan-pending ⟹ the loan event is dropped (honest-partial), sale+selling remain.
-    {NoLoanF, _} = fill((full_upstream())#{<<"mortgage_plan">> => #{}}),
+    {NoLoanF, _} = fill((full_upstream())#{<<"budget_envelope">> => #{}}),
     NoLoanIds    = [maps:get(<<"id">>, E) || E <- g(NoLoanF, <<"dispose_cash_events">>)],
     [check("full: 6 dispose events (sale, loan, 4 sell fee lines; cgt exempt ⟹ dropped)", length(Events), 6),
      check("full: event ids", Ids,
@@ -409,6 +416,62 @@ rate_source_cases() ->
            g(Absurd, <<"loan_payout">>), Want),
      check("loan_payout with NO loan_structure_recommendation = same (capacity + KB rate only)",
            g(NoLS, <<"loan_payout">>), Want)].
+
+%% --- 9. the loan (behavior 98, Expect 3) -------------------------------------
+%% For a loan L at rate r over 30 years and hold N: interest over N = repayments × N −
+%% (L − balance at N), at both ends, on the rounded figures the statement shows. The loan is
+%% the price less the deposit (an $800k home with a 5% deposit is a $760,000 loan, not the
+%% $820,571–$900,000 borrowing capacity b93-lines measured). B's rate = the owner rate + the
+%% non-resident premium (50–150bp, low end with low), D's = the investment rate + the same;
+%% so on one loan B's and D's interest per year exceed A's and C's.
+loan_cases() ->
+    D = fun(Dep) -> #{<<"cash_events">> => [#{<<"id">> => <<"deposit">>, <<"amount">> => Dep}]} end,
+    Kinds = [owner, investor, owner_foreign, investor_foreign],
+    Owner = fh_engine_disposition:rate_band(owner),
+    Inv = fh_engine_disposition:rate_band(investor),
+    Identity = fun(Kind, N) ->
+        L = [617500, 760000],
+        M = fh_engine_disposition:loan_over_hold(L, Kind, N),
+        [RepLo, RepHi] = fh_engine_disposition:annual_repayments(L, Kind),
+        [PayLo, PayHi] = fh_engine_disposition:loan_payout(L, Kind, N),
+        Want = lists:sort([RepLo * N - (617500 - PayLo), RepHi * N - (760000 - PayHi)]),
+        maps:get(<<"interest">>, M) =:= Want
+            andalso maps:get(<<"principal_repaid">>, M) =:= lists:sort([617500 - PayLo, 760000 - PayHi])
+            andalso lists:sum(maps:get(<<"interest">>, M)) + lists:sum(maps:get(<<"principal_repaid">>, M))
+                    =:= (RepLo + RepHi) * N
+    end,
+    PerYear = fun(Kind) ->
+        M = fh_engine_disposition:loan_over_hold([560000, 560000], Kind, 10),
+        [I || I <- maps:get(<<"interest">>, M)]
+    end,
+    [check("an $800k home with a 5% deposit is a $760,000 loan",
+           fh_engine_disposition:principal([800000, 800000], D([40000, 40000])), [760000, 760000]),
+     check("a deposit band pairs end to end with the price band",
+           fh_engine_disposition:principal([650000, 800000], D([32500, 40000])), [617500, 760000]),
+     check("no deposit event: the loan is unknown (honest-partial)",
+           fh_engine_disposition:principal([650000, 800000], #{}), null),
+     check("interest over N = repayments × N − (L − balance at N), both ends, every kind, N in 5..30",
+           lists:all(fun({K, N}) -> Identity(K, N) end, [{K, N} || K <- Kinds, N <- [5, 10, 15, 20, 30]]),
+           true),
+     check("N = 30: the loan is repaid in full, principal repaid = L",
+           maps:get(<<"principal_repaid">>, fh_engine_disposition:loan_over_hold([617500, 760000], owner, 30)),
+           [617500, 760000]),
+     check("B's rate = owner rate + 0.5 / + 1.5 (non_resident_rate_premium_bp_low/high)",
+           fh_engine_disposition:rate_band(owner_foreign),
+           [lists:nth(1, Owner) + 0.5, lists:nth(2, Owner) + 1.5]),
+     check("D's rate = investment rate + 0.5 / + 1.5",
+           fh_engine_disposition:rate_band(investor_foreign),
+           [round((lists:nth(1, Inv) + 0.5) * 100) / 100, round((lists:nth(2, Inv) + 1.5) * 100) / 100]),
+     check("on one loan, B's interest exceeds A's at both ends",
+           lists:all(fun({X, Y}) -> X > Y end, lists:zip(PerYear(owner_foreign), PerYear(owner))), true),
+     check("on one loan, D's interest exceeds C's at both ends",
+           lists:all(fun({X, Y}) -> X > Y end, lists:zip(PerYear(investor_foreign), PerYear(investor))), true),
+     check("Mode B (fhb-foreign-au) borrows at the non-resident rate",
+           fh_engine_disposition:loan_kind(#{blueprint_slug => <<"fhb-foreign-au">>}, owner), owner_foreign),
+     check("Mode D (investor-foreign-au) borrows at the non-resident investment rate",
+           fh_engine_disposition:loan_kind(#{blueprint_slug => <<"investor-foreign-au">>}, investor),
+           investor_foreign),
+     check("no horizon: no split", fh_engine_disposition:loan_over_hold([560000, 560000], owner, null), null)].
 
 %% --- 7. Layer-1 conformance across every state (the fail-closed seam) --------
 

@@ -17,7 +17,7 @@
 %% Rests on:  the compiler's line_details gate (kb_compiler.py) — bilingual text, a known
 %%            tier, every source index inside the doc's `sources:`.
 
--export([attach/4, attach_all/2, detail/3, beside/3, pct/1, price/2, money_range/1]).
+-export([attach/4, attach_all/2, detail/3, beside/3, pct/1, pct_range/1, price/2, money_range/1]).
 
 %% Ctx: state (binary | undefined) and params (#{binary() => fh_engine_i18n:param()}).
 -type ctx() :: #{state => binary() | undefined, params => map()}.
@@ -95,6 +95,15 @@ pct(N) when is_float(N), N == trunc(N) -> pct(trunc(N));
 pct(N) when is_float(N) ->
     En = float_to_binary(N, [{decimals, 2}, compact]),
     #{<<"vi">> => binary:replace(En, <<".">>, <<",">>), <<"en">> => En}.
+
+%% a [low, high] rate band (behavior 98: a foreign buyer's rate carries the non-resident
+%% premium band): one figure when the ends meet, else "6.5–7.5" / "6,5–7,5".
+-spec pct_range([number()]) -> fh_engine_i18n:localized().
+pct_range([Lo, Hi]) when Lo == Hi -> pct(Lo);
+pct_range([Lo, Hi]) ->
+    #{<<"vi">> := VLo, <<"en">> := ELo} = pct(Lo),
+    #{<<"vi">> := VHi, <<"en">> := EHi} = pct(Hi),
+    #{<<"vi">> => <<VLo/binary, "–"/utf8, VHi/binary>>, <<"en">> => <<ELo/binary, "–"/utf8, EHi/binary>>}.
 
 entry(Slug, Id) ->
     {ok, Kb} = fh_engine_kb:kb(Slug),
