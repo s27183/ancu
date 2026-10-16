@@ -3460,6 +3460,8 @@ main {
    budget, explore the map. Stacked on a phone, side by side from 48rem; the page scrolls
    on its own (main does not), clearing the header, the band and the home indicator. */
 .home {
+    position: relative;
+    z-index: 1; /* over the home's backdrop (behavior 89) */
     height: 100%;
     overflow-y: auto;
     padding: calc(var(--header-total) + var(--home-news-h, 0px) + var(--sp-6)) var(--sp-4)
