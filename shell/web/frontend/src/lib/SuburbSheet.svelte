@@ -1,102 +1,26 @@
 <script lang="ts">
-    // The suburb-click detail (8-S2): a bottom-sheet on phone, a side-panel on desktop
-    // (one layout, adjusted — shell-architecture.md §7.1). Two tabs: zone-data (the raw
-    // facts, rendered from the already-loaded list payload — no detail endpoint needed)
-    // and a planning placeholder (the plan projection lands in 8-S4). Raw figures read
-    // as calm reference, never a verdict (crime is map-display only, not a rating).
+    // Bilingual -> The web frontend -> the suburb sheet on the map page
+    // The suburb-click detail (8-S2): a bottom-sheet on phone, a centred panel on desktop
+    // (one layout, adjusted — shell-architecture.md §7.1): the suburb's raw facts,
+    // rendered from the already-loaded list payload (no detail endpoint). Raw figures read
+    // as calm reference, never a verdict (crime is map-display only, not a rating). Its
+    // Plan tab, the section menu and the head's way to the plan left with behavior 81:
+    // the plan is the planner page's (/plan), so the sheet is the facts alone and as tall
+    // as they are on a phone (.sheet-facts).
     import type { Suburb } from '$lib/api';
     import { t } from '$lib/i18n';
     import { lang } from '$lib/stores/lang';
-    import PlanProjection from '$lib/PlanProjection.svelte';
     import { tourEvent } from '$lib/tour';
-    import SectionMenu from '$lib/SectionMenu.svelte';
-    import { provideSections, type SectionGroup } from '$lib/sections.svelte';
     import { sheetMotion, scrimMotion } from '$lib/sheetMotion';
-    import Sparkle from '$lib/Sparkle.svelte';
 
-    let { suburb, onclose, onplan, reloadPlan = 0 }: {
+    let { suburb, onclose }: {
         suburb: Suburb;
         onclose: () => void;
-        onplan: () => void;
-        /** Bumped by the parent when a plan is created → remounts PlanProjection (via
-         *  `{#key reloadPlan}`) so the Plan tab shows the new plan without a close/reopen.
-         *  A bump also switches to the Plan tab: after a sign-in restore (behavior 18) the
-         *  sheet reopens on Zone, not on the Plan tab where the create CTA was. */
-        reloadPlan?: number;
     } = $props();
 
-    // Opens on the zone tab. The parent remounts this component per suburb
-    // ({#key suburb.sal_code}), so `tab` resets naturally on a new selection —
-    // no reset-in-$effect needed.
-    type Tab = 'zone' | 'plan';
-    let tab = $state<Tab>('zone');
-
-    // Why not open the restored sheet on Plan: measured 2026-10-07 (Chrome, dev stack,
-    // twice): opened on Plan over an existing plan, the new plan stayed "Computing…" — its
-    // /events got no headers while the engine had the turn completed, and the shell hung
-    // up ~60 s later; opened on Zone it filled. Concluded cause: the old projection's
-    // stream (nothing to replay) is cancelled by the remount before its first byte, and
-    // that wedges the shell's stream relay. Switching only once the plan exists avoids it.
-    // svelte-ignore state_referenced_locally
-    let seenReload = reloadPlan;
+    // The tour (behavior 52) follows the sheet: its facts are what step 2 points at.
     $effect(() => {
-        if (reloadPlan !== seenReload) {
-            seenReload = reloadPlan;
-            tab = 'plan';
-        }
-    });
-
-    // The phone's floating section menu (behavior 68): Khu vực, then the plan's own
-    // groups once the plan is shown (PlanProjection publishes them), or one "Kế hoạch"
-    // entry while the zone tab is up.
-    const sections = provideSections();
-    const menuGroups = $derived<SectionGroup[]>([
-        {
-            id: 'zone',
-            items: [
-                {
-                    id: 'zone',
-                    label: $t('sheet.tab.zone'),
-                    icon: 'zone',
-                    active: tab === 'zone',
-                    select: () => (tab = 'zone')
-                }
-            ]
-        },
-        ...(tab === 'plan' && sections.plan.length > 0
-            ? sections.plan
-            : [
-                  {
-                      id: 'plan',
-                      items: [
-                          {
-                              id: 'plan',
-                              label: $t('sheet.tab.plan'),
-                              icon: 'overview' as const,
-                              active: tab === 'plan',
-                              tour: 'sections-plan',
-                              select: () => (tab = 'plan')
-                          }
-                      ]
-                  }
-              ])
-    ]);
-    const menuCurrent = $derived(
-        tab === 'zone'
-            ? $t('sheet.tab.zone')
-            : sections.current
-              ? `${$t('sheet.tab.plan')} · ${sections.current}`
-              : $t('sheet.tab.plan')
-    );
-    let bodyEl: HTMLDivElement | undefined = $state();
-    // A section picked from the menu starts at its top, as a tab tap shows it.
-    function toTop() {
-        bodyEl?.scrollTo({ top: 0 });
-    }
-
-    // The tour (behavior 52) follows which tab is shown.
-    $effect(() => {
-        tourEvent(tab === 'plan' ? 'plan-tab' : 'zone-tab');
+        tourEvent('zone-tab');
     });
 
     const nf = $derived(new Intl.NumberFormat($lang === 'vi' ? 'vi-VN' : 'en-AU'));
@@ -117,7 +41,7 @@
     onclick={onclose}
     transition:scrimMotion|global
 ></button>
-<div class="sheet" role="dialog" aria-modal="false" aria-label={suburb.name} transition:sheetMotion|global>
+<div class="sheet sheet-facts" role="dialog" aria-modal="false" aria-label={suburb.name} transition:sheetMotion|global>
     <header class="sheet-head">
         <div class="title">
             <h2>{suburb.name} <span class="state-chip">{suburb.state}</span></h2>
@@ -125,118 +49,61 @@
                 <p class="sub">{suburb.lga_name}</p>
             {/if}
         </div>
-        <!-- Buyer-on-a-phone -> the plan sheet -> the head leads on (behavior 75; Son
-             2026-10-12: some visitors never notice the floating menu): on the area data
-             the plan, inside a shown plan the AI assistant — the first thing read. Phone
-             only (app.css .head-link): desktop shows the tabs and rails instead. -->
-        {#if tab === 'zone'}
-            <button type="button" class="head-link" onclick={() => {
-                    tab = 'plan';
-                    toTop();
-                }}
-                ><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"
-                    ><path
-                        d="M4 4h7v7H4z M13 4h7v7h-7z M4 13h7v7H4z M13 13h7v7h-7z"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.8"
-                        stroke-linejoin="round"
-                    /></svg
-                ><span class="head-link-text">{$t('sheet.head.plan')}</span></button
-            >
-        {:else if sections.ask}
-            <button type="button" class="head-link accent" onclick={() => {
-                    sections.ask?.();
-                    toTop();
-                }}
-                ><Sparkle /><span class="head-link-text">{$t('plan.tab.qa_short')}</span></button
-            >
-        {/if}
         <button type="button" class="close" onclick={onclose} aria-label={$t('sheet.close')}
             >✕</button
         >
     </header>
 
-    <div class="tabs" role="tablist">
-        <button
-            type="button"
-            role="tab"
-            aria-selected={tab === 'zone'}
-            class:active={tab === 'zone'}
-            onclick={() => (tab = 'zone')}>{$t('sheet.tab.zone')}</button
-        >
-        <button
-            type="button"
-            role="tab"
-            aria-selected={tab === 'plan'}
-            data-tour="plan-tab"
-            class:active={tab === 'plan'}
-            onclick={() => (tab = 'plan')}>{$t('sheet.tab.plan')}</button
-        >
-    </div>
-
-    <div class="body" data-tour={tab === 'plan' ? 'plan' : undefined} bind:this={bodyEl}>
-        {#if tab === 'zone'}
-            <div class="metrics">
-                <!-- Vietnamese community — the killer metric, surfaced first + emphasised. -->
-                <div class="metric hero">
-                    <span class="label">{$t('sheet.viet')}</span>
-                    {#if typeof f.vietnamese_ancestry_pct === 'number'}
-                        <span class="value">{pct(f.vietnamese_ancestry_pct)}</span>
-                    {:else}
-                        <span class="value muted">{$t('sheet.nodata')}</span>
-                    {/if}
-                </div>
-
-                <div class="metric">
-                    <span class="label">{$t('sheet.seifa')}</span>
-                    {#if typeof f.seifa_irsad_decile === 'number'}
-                        <span class="value">{f.seifa_irsad_decile}<span class="unit">/10</span></span>
-                        <span class="decile" aria-hidden="true">
-                            {#each Array.from({ length: 10 }, (_, i) => i) as i (i)}
-                                <span class:on={i < (f.seifa_irsad_decile ?? 0)}></span>
-                            {/each}
-                        </span>
-                        <span class="note">{$t('sheet.seifa.note')}</span>
-                    {:else}
-                        <span class="value muted">{$t('sheet.nodata')}</span>
-                    {/if}
-                </div>
-
-                <div class="metric">
-                    <span class="label">{$t('sheet.population')}</span>
-                    {#if typeof f.census_total_persons === 'number'}
-                        <span class="value">{nf.format(f.census_total_persons)}</span>
-                    {:else}
-                        <span class="value muted">{$t('sheet.nodata')}</span>
-                    {/if}
-                </div>
-
-                <div class="metric">
-                    <span class="label">{$t('sheet.crime')}</span>
-                    {#if typeof f.crime_incidents_per_1000 === 'number'}
-                        <span class="value"
-                            >{nf.format(f.crime_incidents_per_1000)}
-                            <span class="unit">{$t('sheet.crime.unit')}</span></span
-                        >
-                        <span class="note"
-                            >{$t('sheet.crime.note')}{#if f.crime_period} · {f.crime_period}{/if}</span
-                        >
-                    {:else}
-                        <span class="value muted">{$t('sheet.nodata')}</span>
-                    {/if}
-                </div>
+    <div class="body" data-tour="facts">
+        <div class="metrics">
+            <!-- Vietnamese community — the killer metric, surfaced first + emphasised. -->
+            <div class="metric hero">
+                <span class="label">{$t('sheet.viet')}</span>
+                {#if typeof f.vietnamese_ancestry_pct === 'number'}
+                    <span class="value">{pct(f.vietnamese_ancestry_pct)}</span>
+                {:else}
+                    <span class="value muted">{$t('sheet.nodata')}</span>
+                {/if}
             </div>
-        {:else}
-            <!-- The plan projection mounts lazily when this tab is shown; it finds the
-                 user's card for THIS zone, or renders the create CTA itself (8-S4c).
-                 Keyed by reloadPlan so a freshly-created plan reloads it in place. -->
-            {#key reloadPlan}
-                <PlanProjection suburbName={suburb.name} suburbState={suburb.state} {onplan} />
-            {/key}
-        {/if}
+
+            <div class="metric">
+                <span class="label">{$t('sheet.seifa')}</span>
+                {#if typeof f.seifa_irsad_decile === 'number'}
+                    <span class="value">{f.seifa_irsad_decile}<span class="unit">/10</span></span>
+                    <span class="decile" aria-hidden="true">
+                        {#each Array.from({ length: 10 }, (_, i) => i) as i (i)}
+                            <span class:on={i < (f.seifa_irsad_decile ?? 0)}></span>
+                        {/each}
+                    </span>
+                    <span class="note">{$t('sheet.seifa.note')}</span>
+                {:else}
+                    <span class="value muted">{$t('sheet.nodata')}</span>
+                {/if}
+            </div>
+
+            <div class="metric">
+                <span class="label">{$t('sheet.population')}</span>
+                {#if typeof f.census_total_persons === 'number'}
+                    <span class="value">{nf.format(f.census_total_persons)}</span>
+                {:else}
+                    <span class="value muted">{$t('sheet.nodata')}</span>
+                {/if}
+            </div>
+
+            <div class="metric">
+                <span class="label">{$t('sheet.crime')}</span>
+                {#if typeof f.crime_incidents_per_1000 === 'number'}
+                    <span class="value"
+                        >{nf.format(f.crime_incidents_per_1000)}
+                        <span class="unit">{$t('sheet.crime.unit')}</span></span
+                    >
+                    <span class="note"
+                        >{$t('sheet.crime.note')}{#if f.crime_period} · {f.crime_period}{/if}</span
+                    >
+                {:else}
+                    <span class="value muted">{$t('sheet.nodata')}</span>
+                {/if}
+            </div>
+        </div>
     </div>
-    <SectionMenu groups={menuGroups} current={menuCurrent} onpick={toTop} hint={tab === 'zone'}
-        inPlan={tab === 'plan' && sections.plan.length > 0}
-    />
 </div>

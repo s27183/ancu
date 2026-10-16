@@ -18,14 +18,16 @@
         type Intent
     } from '$lib/onboarding';
     import { t } from '$lib/i18n';
+    import { STATE_NAMES, type AuState } from '$lib/map';
     import { lang } from '$lib/stores/lang';
     import { sheetMotion, scrimMotion } from '$lib/sheetMotion';
     import type { OnboardingAnswers } from '$lib/pendingOnboarding';
 
     let { stateCode, suburbName, suburbSal, initial, onclose, onsignin, oncreated }: {
         stateCode: string;
-        suburbName: string;
-        suburbSal: string;
+        /** Absent on the planner page (behavior 81): a plan for the state alone. */
+        suburbName?: string;
+        suburbSal?: string;
         /** Answers restored after the sign-in round-trip (pendingOnboarding.ts). */
         initial?: OnboardingAnswers;
         onclose: () => void;
@@ -139,6 +141,9 @@
     // ✕ once the plan exists is the same exit as the "created" button (behavior 28): the
     // parent reloads the sheet's plan on oncreated only, so closing with ✕ after a create
     // left the new plan missing until a page refresh (read 2026-10-08, +page.svelte).
+    // What the plan is for: the suburb on the map, the state on the planner page.
+    const place = $derived(suburbName || STATE_NAMES[stateCode as AuState] || stateCode);
+
     function close() {
         if (phase === 'created') oncreated();
         else onclose();
@@ -146,9 +151,9 @@
 </script>
 
 <div class="ob-backdrop" transition:scrimMotion|global>
-<div class="onboarding" role="dialog" aria-modal="true" aria-label={suburbName} transition:sheetMotion|global>
+<div class="onboarding" role="dialog" aria-modal="true" aria-label={place} transition:sheetMotion|global>
     <header class="ob-head">
-        <h2>{$t('onboarding.title')} {suburbName}</h2>
+        <h2>{$t('onboarding.title')} {place}</h2>
         <button type="button" class="close" onclick={close} aria-label={$t('sheet.close')}
             >✕</button
         >

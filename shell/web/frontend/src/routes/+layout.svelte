@@ -7,16 +7,53 @@
     import '../app.css';
     import { onMount } from 'svelte';
     import { lang } from '$lib/stores/lang';
-    import { t } from '$lib/i18n';
-    import { session, sessionLoaded, refreshSession, signOut } from '$lib/stores/session';
+    import { t, type MessageKey } from '$lib/i18n';
+    import {
+        session,
+        sessionLoaded,
+        refreshSession,
+        signOut,
+        guest,
+        sessionExpired,
+        dismissSessionExpired
+    } from '$lib/stores/session';
     import { loginOpen } from '$lib/stores/ui';
+    import { goto } from '$app/navigation';
+    import { signinFlag, type SigninFlag } from '$lib/auth';
+    import { pendingPage } from '$lib/pendingOnboarding';
+    import NewsBand from '$lib/NewsBand.svelte';
+    import Login from '$lib/Login.svelte';
     import PrivacySheet from '$lib/PrivacySheet.svelte';
     import AllowanceSheet from '$lib/AllowanceSheet.svelte';
 
     let { children }: { children: import('svelte').Snippet } = $props();
 
-    // The account chip lives in the global header now, so learn the session here.
-    onMount(refreshSession);
+    // Bilingual -> The web frontend -> what every page shares
+    // Behavior 81: the home, the planner (/plan) and the map (/explore) are three pages,
+    // and what was the map-first home's alone is now every page's: the news band (its
+    // measured height, --home-news-h on the root, is what each page offsets by), the
+    // sign-in sheet the header and the plans open, and the calm sign-in banners. A sign-in
+    // (magic link or Google) lands on /?signin=…: the flag is read and stripped here, and a
+    // sign-in begun from a plan or a suburb (pendingOnboarding.ts) goes on to that page,
+    // which takes the pending answers itself.
+    let newsH = $state(0);
+    $effect(() => {
+        document.documentElement.style.setProperty('--home-news-h', `${newsH}px`);
+    });
+    let banner = $state<SigninFlag | null>(null);
+    onMount(() => {
+        refreshSession();
+        const flag = signinFlag(window.location.search);
+        if (flag) {
+            banner = flag;
+            history.replaceState(null, '', window.location.pathname);
+            // "You're signed in" is a confirmation, not a task: it clears itself so it
+            // never sits over a sheet. A failure flag stays until dismissed.
+            if (flag === 'ok') setTimeout(() => banner === 'ok' && (banner = null), 4000);
+        }
+        const to = window.location.pathname === '/' ? pendingPage() : null;
+        if (to) void goto(`/${to}`, { replaceState: true });
+    });
 
     // Honest-partial -> P-5 · Metering, not gating -> The web frontend -> the visitor's menu
     // The side-sheet (slides in from the right) every visitor opens from the header,
@@ -121,6 +158,42 @@
 <main>
     {@render children()}
 </main>
+<NewsBand bind:height={newsH} />
+
+{#if banner}
+    <div class="signin-banner" class:ok={banner === 'ok'} role="status">
+        <span>{$t(`auth.flag.${banner}` as MessageKey)}</span>
+        <button type="button" onclick={() => (banner = null)} aria-label={$t('sheet.close')}
+            >✕</button
+        >
+    </div>
+{/if}
+
+<!-- Session-expired cue (the 1-day JWT lapsed under a previously-signed-in user) —
+     distinct from never-signed-in: prompt a calm re-login so the saved-plans surface
+     doesn't just silently vanish. Signing in restores the checkbox + the saved set. -->
+{#if $sessionExpired && !$guest}
+    <div class="signin-banner signin-banner-cue" role="status">
+        <span class="signin-banner-msg">{$t('auth.expired.cue')}</span>
+        <span class="signin-banner-actions">
+            <button
+                type="button"
+                class="signin-banner-action"
+                onclick={() => {
+                    dismissSessionExpired();
+                    loginOpen.set(true);
+                }}>{$t('auth.signin')}</button
+            >
+            <button type="button" onclick={dismissSessionExpired} aria-label={$t('sheet.close')}
+                >✕</button
+            >
+        </span>
+    </div>
+{/if}
+
+{#if $loginOpen}
+    <Login onclose={() => loginOpen.set(false)} />
+{/if}
 <div class="safe-bottom-glass" aria-hidden="true"></div>
 
 <!-- The menu — slides in from the right (CSS transform on a solid panel). -->

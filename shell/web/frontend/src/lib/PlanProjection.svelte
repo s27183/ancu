@@ -57,11 +57,18 @@
     import Modal from '$lib/Modal.svelte';
     import { tourEvent } from '$lib/tour';
 
-    let { suburbName, suburbState, onplan }: {
+    let { suburbName, suburbState, onplan, cardId: openId }: {
         suburbName: string;
+        /** '' on the planner page (behavior 81): the card's own state is used then. */
         suburbState: string;
         onplan: () => void;
+        /** The planner page opens this card by id; the suburb sheet matches by title. */
+        cardId?: string;
     } = $props();
+    // The state the plan is read under: the suburb's on the map, else the one the engine
+    // resolved for the card (GET card `state`, behavior 81).
+    let cardState = $state('');
+    const planBase = $derived(suburbState || cardState);
 
     // The plan is shown one lifecycle TAB at a time (the blueprint's ui_tabs spine —
     // plan-card-lifecycle-restoration.md §3 — plus a Q&A tab) so the user never scrolls a
@@ -417,7 +424,7 @@
     function openAttach() {
         apPrice = '';
         apSuburb = suburbName; // seed from the projected suburb — the common case
-        apState = suburbState;
+        apState = planBase;
         apType = '';
         apYear = '';
         apLand = '';
@@ -776,7 +783,7 @@
         const overrides: SimulateOverrides = {};
         const p = Number(priceInput.replace(/[^0-9.]/g, ''));
         if (priceInput.trim() !== '' && Number.isFinite(p) && p > 0) overrides.target_price = p;
-        if (stateSelect && stateSelect !== suburbState) overrides.state = stateSelect;
+        if (stateSelect && stateSelect !== planBase) overrides.state = stateSelect;
         // horizon: only a positive H that differs from the card's baseline (omit 0 — the
         // engine has no "clear horizon" override; absence IS the indefinite default).
         if (horizonValue >= 1 && horizonValue !== baselineHorizon) overrides.horizon = horizonValue;
@@ -830,7 +837,7 @@
         previewError = false;
         saveError = false;
         priceInput = '';
-        stateSelect = suburbState;
+        stateSelect = planBase;
         horizonValue = baselineHorizon;
     }
 
@@ -846,6 +853,7 @@
         checklistStatus = {};
         uiTabs = [];
         cardId = null;
+        cardState = '';
         blueprintSlug = '';
         turnDone = false;
         failure = null;
@@ -853,7 +861,10 @@
         // Signed-out or no cards → listPlanCards() returns []; no zone match → the CTA.
         const cards = await listPlanCards();
         if (myGen !== gen) return;
-        const match = cards.find((c) => c.title === suburbName) ?? null;
+        const match =
+            (openId
+                ? cards.find((c) => c.plan_card_id === openId)
+                : cards.find((c) => c.title === suburbName)) ?? null;
         if (!match) {
             phase = 'no_card';
             return;
@@ -930,6 +941,8 @@
             uiTabs = res.card.ui_tabs?.length ? res.card.ui_tabs : FALLBACK_TABS;
             if (!uiTabs.some((t) => t.tab_id === sub)) sub = uiTabs[0]?.tab_id ?? '';
             cardId = match.plan_card_id;
+            cardState = res.card.state ?? '';
+            stateSelect = planBase;
             phase = 'ready';
             // The GET snapshot is the authoritative latest projection. Take the done-state
             // from turn_running (a settled card has no terminal to replay once we subscribe
@@ -1355,7 +1368,7 @@
                             components={viewComponents}
                             filling={running}
                             horizon={previewActive || baselineHorizon ? horizonValue : 0}
-                            planState={stateSelect || suburbState}
+                            planState={stateSelect || planBase}
                             busy={previewing}
                             onhorizon={chooseHold}
                             onstate={chooseState}

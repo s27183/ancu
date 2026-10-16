@@ -952,6 +952,8 @@ export interface PlanCard {
     // done-state from `turn_running`. (Optional for backward-compat with an older engine.)
     event_cursor?: number;
     turn_running?: boolean;
+    /** The state the engine resolved for this card (behavior 81); null when none. */
+    state?: string | null;
 }
 
 /** A display handle from GET /api/plan-cards (shell-DB read, no engine call). */

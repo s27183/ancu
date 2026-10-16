@@ -47,8 +47,8 @@ export const BUDGET_BANDS: readonly BudgetBand[] = [
  *  default, mode-e-wedge.md P5). */
 export function buildOnboardingInput(
     stateCode: string,
-    suburbName: string,
-    suburbSal: string,
+    suburbName: string | undefined,
+    suburbSal: string | undefined,
     band: BudgetBand,
     intent: Intent,
     foreignPerson = false,
@@ -57,8 +57,11 @@ export function buildOnboardingInput(
     return {
         state: stateCode,
         target_price_range: [band.lo, band.hi],
-        target_zone: [suburbName],
-        target_sal: suburbSal,
+        // A plan for a state alone (the planner page, behavior 81) names no suburb: the
+        // engine resolves the state from `state` (projection_state/1) and the shell
+        // titles the card by it (title_of/1).
+        target_zone: suburbName ? [suburbName] : [],
+        ...(suburbSal ? { target_sal: suburbSal } : {}),
         intent,
         foreign_person: foreignPerson,
         ...(buyerStage ? { buyer_stage: buyerStage } : {})

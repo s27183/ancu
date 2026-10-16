@@ -4,7 +4,8 @@
 // OAuth callback) lands on /?signin=ok as a fresh page load, which used to drop the
 // answers (they were Onboarding's local $state). Only the user's own taps are kept —
 // nothing is inferred — in this browser's localStorage, for an hour, and read once:
-// takePending() removes the key whether or not it is still fresh. It is not a plan
+// takePending(page) removes the key unless a fresh entry belongs to the other page (the
+// home routes a returning sign-in there first, pendingPage()). It is not a plan
 // fact: the plan card is created only by the user's tap after the restore.
 
 import type { Intent } from '$lib/onboarding';
@@ -17,12 +18,19 @@ export interface OnboardingAnswers {
     band: number | null;
 }
 
+export type PendingPage = 'explore' | 'plan';
+
 export interface PendingOnboarding {
-    sal: string;
-    /** The map scope the user was on (a state code or 'ALL'). */
+    /** The page that restores it (behavior 81): the map reopens a suburb, the planner its
+     *  plan. The sign-in lands on the home, which routes to this page. Absent in an entry
+     *  saved before behavior 81 — read as 'explore'. */
+    page?: PendingPage;
+    /** The suburb whose sheet was open (the map only). */
+    sal?: string;
+    /** The map scope the user was on (a state code or 'ALL'); on the planner, the state. */
     scope: string;
-    /** Absent when a guest signs in from their plan (behavior 45): the sheet reopens on
-     *  that suburb's Plan tab — the claimed plan — instead of the onboarding. */
+    /** Absent when a guest signs in from their plan (behavior 45): the page reopens the
+     *  claimed plan instead of the onboarding. */
     answers?: OnboardingAnswers;
     ts: number;
 }
@@ -34,24 +42,39 @@ export function savePending(p: PendingOnboarding): void {
     try {
         localStorage.setItem(KEY, JSON.stringify(p));
     } catch {
-        // storage blocked (private window etc.) → the user lands on the plain map, as before
+        // storage blocked (private window etc.) → the user lands on the plain page, as before
     }
 }
 
-/** Read and clear the pending onboarding; null if none, malformed or older than the TTL. */
-export function takePending(now: number = Date.now()): PendingOnboarding | null {
-    let raw: string | null = null;
-    try {
-        raw = localStorage.getItem(KEY);
-        localStorage.removeItem(KEY);
-    } catch {
-        return null;
-    }
+function parse(raw: string | null, now: number): PendingOnboarding | null {
     if (!raw) return null;
     try {
         const p = JSON.parse(raw) as PendingOnboarding;
-        if (typeof p?.sal !== 'string' || typeof p?.scope !== 'string') return null;
+        if (typeof p?.scope !== 'string') return null;
+        if (p.page !== 'plan' && typeof p.sal !== 'string') return null;
         if (typeof p.ts !== 'number' || now - p.ts > PENDING_TTL_MS || now < p.ts) return null;
+        return { ...p, page: p.page ?? 'explore' };
+    } catch {
+        return null;
+    }
+}
+
+/** The page a fresh pending onboarding belongs to, without taking it; null if none. */
+export function pendingPage(now: number = Date.now()): PendingPage | null {
+    try {
+        return parse(localStorage.getItem(KEY), now)?.page ?? null;
+    } catch {
+        return null;
+    }
+}
+
+/** Read and clear the pending onboarding for this page; null if none, malformed, older
+ *  than the TTL, or another page's (left for that page to take). */
+export function takePending(page: PendingPage, now: number = Date.now()): PendingOnboarding | null {
+    try {
+        const p = parse(localStorage.getItem(KEY), now);
+        if (p && p.page !== page) return null;
+        localStorage.removeItem(KEY);
         return p;
     } catch {
         return null;

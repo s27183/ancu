@@ -145,8 +145,8 @@ const messages = {
         en: 'Preparing your plan'
     },
     'onboarding.created.body': {
-        vi: 'Kế hoạch cơ bản đang được tính toán và sẽ xuất hiện trong mục Kế hoạch.',
-        en: 'Your base plan is being computed and will appear in the Plan tab.'
+        vi: 'Kế hoạch cơ bản đang được tính toán và sẽ hiện ra trên trang Kế hoạch ngân sách.',
+        en: 'Your base plan is being computed and will appear on the budget plan page.'
     },
     'onboarding.created.cta': { vi: 'Xem kế hoạch', en: 'View your plan' },
     'onboarding.auth.title': { vi: 'Đăng nhập để lưu kế hoạch', en: 'Sign in to save your plan' },
@@ -1218,6 +1218,25 @@ const messages = {
     // with a CNBC/Bloomberg-style continuous scroll — distinct aria label from the
     // per-card ticker since this one is unfiltered, not "plan-relevant").
     'home.news.aria': { vi: 'Tin tức mới nhất', en: 'Latest updates' },
+    // The home's two ways in (behavior 81): plan a budget, or explore the map.
+    'home.plan.title': { vi: 'Lập kế hoạch ngân sách', en: 'Plan your budget' },
+    'home.plan.body': {
+        vi: 'Theo bang: chi phí khi mua, khi sở hữu và khi bán nhà.',
+        en: 'By state: what buying, owning and selling a home cost.'
+    },
+    'home.explore.title': { vi: 'Khám phá khu vực', en: 'Explore suburbs' },
+    'home.explore.body': {
+        vi: 'Xem các khu vực trên bản đồ: cộng đồng người Việt, dân số, kinh tế, an ninh.',
+        en: 'See suburbs on the map: Vietnamese community, population, income, crime.'
+    },
+    'nav.home': { vi: 'Trang chủ', en: 'Home' },
+    'planpage.title': { vi: 'Kế hoạch ngân sách', en: 'Budget plan' },
+    'planpage.intro': {
+        vi: 'Chọn bang bạn định mua nhà, rồi trả lời vài câu hỏi để có kế hoạch.',
+        en: 'Choose the state you plan to buy in, then answer a few questions to get your plan.'
+    },
+    'planpage.state': { vi: 'Bang', en: 'State' },
+    'planpage.cta': { vi: 'Lập kế hoạch', en: 'Make a plan' },
 
     // News overview sheet (kb-news-feature.md "News overview sheet") — layer 1 of the
     // two-layer homepage news flow: tapping the ticker opens this categorized, scrollable
