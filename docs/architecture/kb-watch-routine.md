@@ -97,6 +97,13 @@ in `docs/kb/news/` as the shape to copy.
    as the English. Information, not advice: no "you should". A `## Notes` section is for
    the reviewer; nothing a user reads goes there. Where the note concerns a KB doc, add
    `affected_kb_slugs:` as the existing notes do.
+   Every acronym in a headline or summary (ASIC, FHOG…) must be a term in
+   `docs/kb/terms/*.md`, and so should a named rule a Vietnamese buyer may not know
+   (Ministerial Direction): the reader taps it for an explanation. Add a missing one in the
+   same PR, to the existing terms file of its area, shaped like its neighbours: `name`,
+   `meaning` and `why` in Vietnamese and English, `forms` (the spellings the notes use),
+   and the government page it rests on (`url`, or `kb` for a KB doc). A term explains; it
+   states no figure — figures belong in the note, where their quotes are checked.
 
 4. Gate. Set up with `uv sync --frozen` (install uv with pip if it is missing) and run
    each command below with `.venv/bin/python` in place of `python3`; fix what you wrote
@@ -105,7 +112,8 @@ in `docs/kb/news/` as the shape to copy.
    `python3 tests/resolver_eval.py`, `python3 tests/eligibility_benefit_eval.py`,
    `python3 tests/cash_duty_eval.py`, `python3 tests/mortgage_eval.py`,
    `python3 tests/ownership_eval.py`, `python3 tests/bilingual_eval.py`,
-   `python3 tests/outcome_validate.py`, `python3 tests/kb_quote_check.py`. Do not commit `engine/erlang/priv/kb/artifact.json`
+   `python3 tests/outcome_validate.py`, `python3 tests/kb_quote_check.py`,
+   `python3 tests/terms_coverage.py` (it names any acronym with no term). Do not commit `engine/erlang/priv/kb/artifact.json`
    (it is untracked). If a check cannot run in your environment, say which and why in the
    PR body.
 

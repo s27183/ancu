@@ -66,6 +66,10 @@ your verdict before you look the PR up on GitHub.
        d. any `quotes:` on that source is the sentence that states it, and its saved copy
           (the `path:` file in the diff) is that page.
      A source you cannot open (blocked, moved, rendered by JavaScript) is a fail: say so.
+   - A changed `docs/kb/terms/` doc: for each term added or changed, open its `url` (or the
+     first source of the KB doc its `kb` names) yourself and confirm its `meaning` and `why`
+     say nothing that page does not, in English and Vietnamese alike, and that it states no
+     figure. Write it down as `<term id> — <url> — confirmed` or the reason it is not.
    - A changed `docs/kb/copy/`, `bilingual/` or `journey/` doc: each figure in it equals the
      figure in the KB doc it restates, in both English and Vietnamese.
    Never check a figure against another KB doc, a search snippet, or what you remember.
