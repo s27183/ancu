@@ -10,18 +10,12 @@
     import type { Suburb } from '$lib/api';
     import { t } from '$lib/i18n';
     import { lang } from '$lib/stores/lang';
-    import { tourEvent } from '$lib/tour';
     import { sheetMotion, scrimMotion } from '$lib/sheetMotion';
 
     let { suburb, onclose }: {
         suburb: Suburb;
         onclose: () => void;
     } = $props();
-
-    // The tour (behavior 52) follows the sheet: its facts are what step 2 points at.
-    $effect(() => {
-        tourEvent('zone-tab');
-    });
 
     const nf = $derived(new Intl.NumberFormat($lang === 'vi' ? 'vi-VN' : 'en-AU'));
     const f = $derived(suburb.facts);

@@ -55,7 +55,6 @@
     import { guest } from '$lib/stores/session';
     import { loginOpen } from '$lib/stores/ui';
     import Modal from '$lib/Modal.svelte';
-    import { tourEvent } from '$lib/tour';
 
     let { suburbName, suburbState, onplan, cardId: openId }: {
         suburbName: string;
@@ -179,12 +178,6 @@
     let gen = 0;
 
     const running = $derived(phase === 'ready' && !turnDone && !turnFailed);
-    // The first-visit tour (behavior 52) points at the plan once it has finished
-    // rendering, never at the spinner.
-    $effect(() => {
-        if (phase === 'ready' && turnDone && !turnFailed) tourEvent('plan-ready');
-    });
-
     // ── Structural what-if (W9, engine-contract §10.1) ──────────────────────
     // Vary target_price / state → POST /simulate → the engine recomputes the base plan
     // resolver-only and returns outcomes keyed by component_id (same keying as the GET

@@ -2,7 +2,7 @@
     // Draws the first-visit tour's current step (behavior 52; the flow lives in tour.ts):
     // a spotlight ring around the control to tap next, the rest of the screen dimmed, and
     // one bubble beside it with the step count, "Skip", and on step 1 a "Try Cabramatta"
-    // chip, on step 4 "Done". The layer takes no pointer events — only the bubble does —
+    // chip, on the last "Done". The layer takes no pointer events — only the bubble does —
     // so the visitor taps the real control under the ring (or anything else) as normal.
     // The target is found by its data-tour attribute and re-measured every 150 ms while a
     // step shows, because the controls move with the app (the map flies, the sheet slides
@@ -17,43 +17,27 @@
     let { ontry }: { ontry: () => void } = $props();
 
     // Each step's target, first one present wins (step 1 falls back to the filters button
-    // when the search panel has been closed). On a phone the sheet's tabs are hidden and
-    // its sections live in the floating menu (behaviors 68, 72): step 2 points at the
-    // menu's pill, then at its "Kế hoạch" item once the visitor opens it (the layer's dim
-    // lies over the open menu, so the ring moves there); step 4 names the pill as where
-    // the plan's sections are. The pill is display none on desktop, so desktop falls
-    // through to the tabs and the plan as before.
-    const TARGETS: Record<1 | 2 | 3 | 4, string[]> = {
+    // when the search panel has been closed); step 2 is the open suburb's facts (b81).
+    const TARGETS: Record<1 | 2, string[]> = {
         1: ['search', 'controls'],
-        2: ['plan-tab', 'sections-plan', 'sections'],
-        3: ['plan-cta'],
-        4: ['sections', 'plan']
+        2: ['facts']
     };
-    const TEXT: Record<1 | 2 | 3 | 4, MessageKey> = {
+    const TEXT: Record<1 | 2, MessageKey> = {
         1: 'tour.step1',
-        2: 'tour.step2',
-        3: 'tour.step3',
-        4: 'tour.step4'
+        2: 'tour.step2'
     };
-    // The words when the step points at the menu (a phone).
-    const MENU_TEXT: Partial<Record<1 | 2 | 3 | 4, MessageKey>> = {
-        2: 'tour.step2.menu',
-        4: 'tour.step4.menu'
-    };
-    const textFor = (s: 1 | 2 | 3 | 4, name: string): MessageKey =>
-        (name.startsWith('sections') && MENU_TEXT[s]) || TEXT[s];
     const MARGIN = 12;
     const GAP = 10;
     const PAD = 6;
 
-    const shown = (s: TourStep): s is 1 | 2 | 3 | 4 => typeof s === 'number' && s > 0;
+    const shown = (s: TourStep): s is 1 | 2 => typeof s === 'number' && s > 0;
 
     let rect = $state<DOMRect | null>(null);
     let target = $state('');
     let bubbleEl = $state<HTMLElement | null>(null);
     let pos = $state({ top: 0, left: 0 });
 
-    function find(s: 1 | 2 | 3 | 4): { r: DOMRect; name: string } | null {
+    function find(s: 1 | 2): { r: DOMRect; name: string } | null {
         for (const name of TARGETS[s]) {
             const el = document.querySelector<HTMLElement>(`[data-tour="${name}"]`);
             if (!el) continue;
@@ -152,7 +136,7 @@
 </script>
 
 {#if shown($tourStep) && rect}
-    {@const s = $tourStep as 1 | 2 | 3 | 4}
+    {@const s = $tourStep as 1 | 2}
     <div class="tour-layer" data-tour-layer>
         <div
             class="tour-ring"
@@ -170,13 +154,13 @@
             style:top="{pos.top}px"
             style:left="{pos.left}px"
         >
-            <p class="tour-text" aria-live="polite">{$t(textFor(s, target))}</p>
+            <p class="tour-text" aria-live="polite">{$t(TEXT[s])}</p>
             {#if s === 1}
                 <button type="button" class="tour-chip" onclick={ontry}>{$t('tour.try')}</button>
             {/if}
             <div class="tour-foot">
                 <span class="tour-count">{s}/{TOUR_STEPS}</span>
-                {#if s === 4}
+                {#if s === TOUR_STEPS}
                     <button type="button" class="tour-done" onclick={endTour}>{$t('tour.done')}</button>
                 {:else}
                     <button type="button" class="tour-skip" onclick={endTour}>{$t('tour.skip')}</button>

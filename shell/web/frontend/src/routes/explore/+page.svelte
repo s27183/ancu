@@ -29,7 +29,7 @@
     import { savePending, takePending, type PendingOnboarding } from '$lib/pendingOnboarding';
     import Tour from '$lib/Tour.svelte';
     import HomeBack from '$lib/HomeBack.svelte';
-    import { tourStep, tourRun, tourEvent } from '$lib/tour';
+    import { tourStep, tourRun, tourEvent, tourDone, startTour } from '$lib/tour';
     import { introOpen, mapHintDone, markMapHintDone } from '$lib/mapHint';
     import { t } from '$lib/i18n';
 
@@ -156,6 +156,11 @@
     // It follows the suburb sheet opening and closing…
     $effect(() => {
         tourEvent(selected ? 'suburb' : 'unsuburb');
+    });
+    // …starts by itself on this browser's first visit to the map (behavior 81: the map is
+    // its own page now, so the tour no longer waits on the home's "Vì sao Úc?")…
+    $effect(() => {
+        if (untrack(() => $tourStep) === 0 && !tourDone()) startTour();
     });
     // …starts from the bare map (a replay may begin over an open sheet)…
     let seenRun = 0;

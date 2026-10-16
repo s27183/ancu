@@ -24,7 +24,8 @@
         pick,
         publisher
     } from '$lib/facts';
-    import { startTour, tourDone } from '$lib/tour';
+    import { goto } from '$app/navigation';
+    import { startTour } from '$lib/tour';
     import { introOpen } from '$lib/mapHint';
 
     let open = $state(false);
@@ -42,9 +43,9 @@
     // itself on a first visit and its close marks it seen, nobody who had visited
     // before ever saw it (Son on prod, 2026-10-10: "did not see … pulse at all").
     let pulse = $state(true);
-    // Behavior 52: the first close of the sheet that opened by itself starts the tour
-    // (once per browser, tour.ts); "Show me around" at the sheet's foot replays it.
-    let autoOpened = false;
+    // Behavior 52, moved by 81: the tour is the map page's, so closing this sheet on the
+    // home starts nothing (the map page starts it on its own first visit, tour.ts);
+    // "Show me around" at the sheet's foot goes to the map and replays it there.
     let tourAfter = false;
 
     const ordered = $derived(
@@ -69,15 +70,15 @@
 
     onMount(() => {
         loadFacts();
-        if (!introSeen()) open = autoOpened = true;
+        if (!introSeen()) open = true;
     });
 
     function closed() {
         open = false;
         arrived = true;
-        const go = tourAfter || (autoOpened && !tourDone());
-        autoOpened = tourAfter = false;
-        if (go) startTour();
+        const go = tourAfter;
+        tourAfter = false;
+        if (go) goto('/explore').then(startTour);
     }
 
     function replayTour() {
