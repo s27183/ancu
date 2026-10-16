@@ -9,7 +9,7 @@
     // opportunities[] ([] at base — populates per-property in Phase B). Consumer half remains:
     // ComponentCard renders only renderers[0] (data-table), so this card is unreached until
     // dual-renderer support lands (a shell unit). Built against the §11.9 renderer contract;
-    // list-tolerant + honest-partial.
+    // list-tolerant + honest-partial: an empty list draws nothing.
     import { t } from '$lib/i18n';
     import { lang } from '$lib/stores/lang';
     import { pick, type OpportunityCardOutcome, type Opportunity } from '$lib/planCard';
@@ -58,8 +58,6 @@
             </li>
         {/each}
     </ul>
-{:else}
-    <p class="op-none">{$t('plan.opp.none')}</p>
 {/if}
 
 <style>
@@ -102,11 +100,5 @@
         font-size: var(--fs-sm);
         color: var(--ink);
         line-height: 1.45;
-    }
-    .op-none {
-        font-size: var(--fs-sm);
-        font-style: italic;
-        color: var(--muted);
-        margin: 0;
     }
 </style>

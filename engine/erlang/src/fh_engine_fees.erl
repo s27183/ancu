@@ -16,7 +16,7 @@
 %% Known gaps: the % of the loan uses the band the caller passes (repayments' principal),
 %%            not the buyer's own borrowing capacity.
 
--export([events/2, owners/0, buy_lines/1, committed/1, property_kind/1, line_band/1]).
+-export([events/2, owners/0, buy_lines/1, committed/1, property_kind/1, line_band/1, fee_line/1]).
 
 %% Ctx: blueprint (binary), state (binary | undefined), property (house | strata |
 %% undefined), source (the emitting component id), counterparty (the swimlane actor the
@@ -57,6 +57,12 @@ events(Phases, Ctx) ->
 -spec buy_lines(ctx()) -> {[map()], [map()]}.
 buy_lines(Ctx) ->
     events([<<"prepare">>, <<"pre_approve">>, <<"contract">>, <<"settle">>], Ctx).
+
+%% whether an event is one of these fee lines: its detail is this module's. Every statement
+%% line carries a detail since behavior 93; the others' (fh_engine_line_detail) say `how`.
+-spec fee_line(map()) -> boolean().
+fee_line(#{<<"detail">> := D}) when is_map(D) -> not maps:is_key(<<"how">>, D);
+fee_line(_) -> false.
 
 %% what a total counts: every line the plan will pay for sure — not an optional one (a
 %% buyer's agent) and not one whose property condition is still open. [0, 0] when none.

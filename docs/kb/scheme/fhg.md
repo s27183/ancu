@@ -125,6 +125,54 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
     "combines_with": ["kb.scheme.fhss"],   // concrete slugs only; the fhg↔state-concession edge is declared on each state-concession doc (combines_with is symmetric — see §11.9), never enumerated here
     "alternative_to": ["kb.scheme.help-to-buy"],
     "order_hint": 20
+  },
+  "lookup": {
+    "line_details": {
+      "note": "one entry per statement line this doc's figure is placed on (not a fee line); the engine attaches it as the line's detail, filling {params} with the figures it computed (fh_engine_line_detail, behavior 93)",
+      "entries": [
+        {
+          "id": "deposit_fhg",
+          "tier": "LENDER-POLICY",
+          "how": {
+            "vi": "{pct}% giá nhà, trả khi ký hợp đồng — mức đặt cọc thấp nhất mà chương trình Đặt cọc 5% (First Home Guarantee) chấp nhận, không phải mua bảo hiểm khoản vay (LMI). Khoảng tiền đi theo khoảng giá bạn chọn.",
+            "en": "{pct}% of the price, paid when you sign the contract — the smallest deposit the 5% Deposit Scheme (First Home Guarantee) accepts, with no lenders mortgage insurance (LMI). The range follows your price range."
+          },
+          "payer": {
+            "vi": "Bạn trả từ tiền tiết kiệm; khoản này được giữ trong tài khoản ủy thác (trust) đến ngày settlement.",
+            "en": "You, from your savings; it is held in trust until settlement."
+          },
+          "drivers": {
+            "vi": "Giá mua và mức đặt cọc bạn chọn: đặt cọc nhiều hơn thì khoản vay nhỏ hơn, tiền trả góp thấp hơn. Chương trình có giá trần cho từng bang và khu vực.",
+            "en": "The price and the deposit you choose: a larger deposit means a smaller loan and lower repayments. The scheme has a price cap for each state and area."
+          },
+          "note": {
+            "vi": "Đây là mức tối thiểu — bạn có thể đặt cọc nhiều hơn.",
+            "en": "The minimum — you can put down more."
+          },
+          "source": 1
+        },
+        {
+          "id": "deposit_floor",
+          "tier": "LENDER-POLICY",
+          "how": {
+            "vi": "{pct}% giá nhà, trả khi ký hợp đồng — mức đặt cọc thấp nhất kế hoạch này giả định; phương án vay của bạn sẽ xác nhận con số. Khoảng tiền đi theo khoảng giá bạn chọn.",
+            "en": "{pct}% of the price, paid when you sign the contract — the smallest deposit this plan assumes; your loan confirms the figure. The range follows your price range."
+          },
+          "payer": {
+            "vi": "Bạn trả từ tiền tiết kiệm (hoặc từ tiền bán nhà cũ); khoản này được giữ trong tài khoản ủy thác (trust) đến ngày settlement.",
+            "en": "You, from your savings (or the sale of your current home); it is held in trust until settlement."
+          },
+          "drivers": {
+            "vi": "Giá mua và mức đặt cọc bạn chọn: đặt cọc nhiều hơn thì khoản vay nhỏ hơn; dưới 20% giá nhà, đa số ngân hàng sẽ tính thêm bảo hiểm khoản vay (LMI).",
+            "en": "The price and how much you put down: a larger deposit means a smaller loan; below 20% of the price most lenders add mortgage insurance (LMI)."
+          },
+          "note": {
+            "vi": "Đây là mức tối thiểu — bạn có thể đặt cọc nhiều hơn.",
+            "en": "The minimum — you can put down more."
+          }
+        }
+      ]
+    }
   }
 }
 ```

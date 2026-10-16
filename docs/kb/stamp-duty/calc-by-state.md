@@ -107,6 +107,51 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
     "foreign_purchaser_surcharge_applies":  { "type": "bool", "value": true, "note": "each state adds a surcharge for FOREIGN persons (Mode B/D) on top of these rates; NOT a Mode A cost and deliberately not tabled here — belongs to the foreign-person blueprint" }
   },
   "lookup": {
+    "line_details": {
+      "note": "one entry per statement line this doc's figure is placed on (not a fee line); the engine attaches it as the line's detail, filling {params} with the figures it computed (fh_engine_line_detail, behavior 93)",
+      "entries": [
+        {
+          "id": "stamp_duty",
+          "tier": "REGULATED",
+          "how": {
+            "vi": "Biểu thuế trước bạ (transfer duty) của bang {state} tính trên {price}.",
+            "en": "{state}'s transfer-duty scale applied to {price}."
+          },
+          "payer": {
+            "vi": "Bạn (người mua); thường được nộp khi settlement qua luật sư/chuyên viên chuyển nhượng (conveyancer) của bạn.",
+            "en": "You, the buyer; it is usually paid at settlement through your conveyancer."
+          },
+          "drivers": {
+            "vi": "Giá nhà và bang: mỗi bang có biểu thuế riêng, và thuế suất tăng theo giá nhà.",
+            "en": "The price and the state: each state has its own scale, and the rate rises with the price."
+          },
+          "source": {
+            "QLD": 0,
+            "VIC": 2
+          }
+        },
+        {
+          "id": "stamp_duty_concession",
+          "tier": "REGULATED",
+          "how": {
+            "vi": "Biểu thuế trước bạ của bang {state} tính trên {price} ({before}), trừ ưu đãi cho người mua nhà lần đầu ({saving}).",
+            "en": "{state}'s transfer-duty scale on {price} ({before}), less the first-home buyer concession ({saving})."
+          },
+          "payer": {
+            "vi": "Bạn (người mua); thường được nộp khi settlement qua luật sư/chuyên viên chuyển nhượng (conveyancer) của bạn.",
+            "en": "You, the buyer; it is usually paid at settlement through your conveyancer."
+          },
+          "drivers": {
+            "vi": "Giá nhà, bang, và việc bạn có đủ điều kiện người mua nhà lần đầu không: ưu đãi giảm dần khi giá tăng và hết khi vượt mức trần của bang.",
+            "en": "The price, the state and whether you qualify as a first-home buyer: the concession shrinks as the price rises and ends at the state's cap."
+          },
+          "source": {
+            "QLD": 1,
+            "VIC": 3
+          }
+        }
+      ]
+    },
     "nsw_standard_scale": {
       "note": "Revenue NSW standard transfer-duty scale, 2025–26. marginal_rate_pct charged 'for each $100 or part of $100' over lower_bound (round excess up to next $100). First bracket has a $20 minimum.",
       "rounds_marginal_to_part_of_100": true,

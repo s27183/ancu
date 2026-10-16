@@ -33,6 +33,14 @@ code supplies the arithmetic + assembly.
 
 ## 2. The base-turn honest-partial boundary (the load-bearing decision)
 
+> **Superseded in part, 2026-10-16 (behavior 93).** The yearly cost to own is now the Own
+> phase's `cash_events` (council rates + water, the maintenance reserve, the yearly P&I at the
+> KB representative rate, the fee lines — behaviors 82/83), each with its own detail. The
+> fields that waited on it — `total_monthly/annual_outgoings_estimate`, the null
+> `strata_levies`/`utilities`/`building_insurance` slots and the "repayments pending" note —
+> are removed from the outcome; `recurring_costs_estimate.statutory_band` stays (disposition
+> and purchase_journey read it). The table below is the boundary as first drawn.
+
 At the onboarding turn the fill has: `target_price_range` (→ ceiling `V`), `state`, `intent =
 owner_occupier`, `intended_occupancy_use = sole_occupier`, `scheme_stack` (whether FHG is
 applicable), and **coarse** upstream — `budget_envelope` with deposit/loan `null`, `mortgage_plan`

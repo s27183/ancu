@@ -78,10 +78,10 @@
         goto(`/plan?plan=${encodeURIComponent(c.plan_card_id)}`, { state: { overList: true } });
     }
     // ‹ in a plan's head: back to the list — through any layers the plan opened over itself
-    // (a phase sheet, a line's detail), else (no list underneath) to the list's address.
+    // (a phase sheet; a line's detail opens in place, behavior 93), else (no list underneath) to the list's address.
     function toList() {
         const s = page.state;
-        if (s.overList) history.go(-(1 + (s.lifecycle ? 1 : 0) + (s.detail ? 1 : 0)));
+        if (s.overList) history.go(-(1 + (s.lifecycle ? 1 : 0)));
         else goto('/plan');
     }
     // An old link straight to a plan: the list goes underneath it, once, on arrival.

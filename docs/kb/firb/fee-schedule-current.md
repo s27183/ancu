@@ -50,6 +50,28 @@ Pure-reference (`fills: []`). The fee is selected and placed by the `firb_workfl
     "established_dwelling_fee_multiplier": { "type": "number", "value": 3, "provenance": "REGULATED", "note": "established-dwelling fees are exactly 3x the non-established amount; off-path for the individual foreign buyer (banned)." }
   },
   "lookup": {
+    "line_details": {
+      "note": "one entry per statement line this doc's figure is placed on (not a fee line); the engine attaches it as the line's detail, filling {params} with the figures it computed (fh_engine_line_detail, behavior 93)",
+      "entries": [
+        {
+          "id": "firb_fee",
+          "tier": "REGULATED",
+          "how": {
+            "vi": "Phí nhà nước thu cho hồ sơ xin phép mua nhà của người nước ngoài (FIRB), với nhà giá {price}; phí tăng theo từng bậc giá.",
+            "en": "The government's fee for a foreign person's application (FIRB) to buy a home at {price}; the fee rises in steps with the price."
+          },
+          "payer": {
+            "vi": "Bạn trả khi nộp hồ sơ FIRB — thời hạn xét duyệt 30 ngày chỉ bắt đầu khi đã nộp đủ phí.",
+            "en": "You, when you lodge the FIRB application — the 30-day decision clock starts only once it is paid in full."
+          },
+          "drivers": {
+            "vi": "Giá căn nhà; mức phí được điều chỉnh mỗi ngày 1/7.",
+            "en": "The price of the home; the fees are indexed every 1 July."
+          },
+          "source": 1
+        }
+      ]
+    },
     "fee_schedule_residential_non_established_2026_27": {
       "keydim": ["consideration_band"],
       "provenance": "REGULATED (FIRB Schedule of Fees, Version 8, 1 Jul 2026, Table 2 — notifiable action)",

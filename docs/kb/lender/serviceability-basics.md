@@ -74,6 +74,53 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
     "representative_product_rate_pct": { "type": "percentage", "value": 6.0, "note": "CONVENTION — representative owner-occupier variable rate used as the capacity assessment BASE when no specific product is chosen; assessment rate = this + apra_serviceability_buffer_pp (= 9.0%). Labelled, re-groundable; the agent's lender_fit rate NEVER overrides this resolver figure (§98 — capacity removed from the LLM's reach)" },
     "loan_term_years":                 { "type": "integer",    "value": 30,  "note": "CONVENTION — standard P&I term for the capacity present-value inversion (matches fh_engine_disposition's amortisation constant)" },
     "consumer_loan_monthly_repayment_pct_of_balance": { "type": "percentage", "value": 2.5, "note": "CONVENTION — personal/car/BNPL balances are counted as a monthly commitment ≈ this % of balance (conservative; over-stating a commitment under-states capacity, the safe direction). Credit cards use the card-specific limit band in kb.lender.credit-card-treatment; HECS uses the income-contingent schedule in kb.hecs.thresholds" }
+  },
+  "lookup": {
+    "line_details": {
+      "note": "one entry per statement line this doc's figure is placed on (not a fee line); the engine attaches it as the line's detail, filling {params} with the figures it computed (fh_engine_line_detail, behavior 93)",
+      "entries": [
+        {
+          "id": "loan_repayments",
+          "tier": "CONVENTION",
+          "how": {
+            "vi": "Trả cả gốc và lãi cho khoản vay {principal} (giá nhà trừ tiền đặt cọc) trong {term} năm, lãi suất {rate}%/năm — lãi suất tham khảo, không phải lãi suất khoản vay của bạn.",
+            "en": "Principal and interest on a loan of {principal} (the price less your deposit) over {term} years at {rate}% a year — a typical rate, not your loan's."
+          },
+          "payer": {
+            "vi": "Bạn trả cho ngân hàng, thường hằng tháng.",
+            "en": "You, to your lender, usually monthly."
+          },
+          "drivers": {
+            "vi": "Lãi suất ngân hàng cho bạn và biến động của nó, số tiền vay và thời hạn vay.",
+            "en": "The rate your lender gives you and how it moves, the loan size and the term."
+          },
+          "note": {
+            "vi": "Ước tính theo lãi suất tham khảo — đề nghị cho vay của ngân hàng mới quyết định.",
+            "en": "An estimate at a typical rate — your loan offer decides."
+          }
+        },
+        {
+          "id": "loan_payout",
+          "tier": "CONVENTION",
+          "how": {
+            "vi": "Phần còn lại của khoản vay {principal} sau {years} năm trả góp (thời hạn {term} năm, lãi suất {rate}%/năm) — được trả từ tiền bán nhà.",
+            "en": "What is left of a {principal} loan after {years} years of repayments ({term}-year term at {rate}% a year) — repaid from the sale."
+          },
+          "payer": {
+            "vi": "Trả cho ngân hàng từ tiền bán nhà khi hoàn tất việc bán.",
+            "en": "Paid to your lender from the sale money at settlement."
+          },
+          "drivers": {
+            "vi": "Số tiền vay, lãi suất qua các năm, và việc trả thêm: trả thêm sớm thì còn nợ ít hơn.",
+            "en": "The loan size, the rate over the years, and extra repayments: paying more early leaves less to repay."
+          },
+          "note": {
+            "vi": "Ước tính theo lãi suất tham khảo — đề nghị cho vay của ngân hàng mới quyết định.",
+            "en": "An estimate at a typical rate — your loan offer decides."
+          }
+        }
+      ]
+    }
   }
 }
 ```

@@ -48,6 +48,34 @@ Pure-reference (`fills: []`). The `mortgage_finance` resolver selects the deposi
     "with_au_partner_min_deposit_pct": { "type": "int", "value": 5, "provenance": "CONVENTION", "note": "joint purchase with an AU citizen/PR/NZ-citizen partner as joint tenants can reach 95% LVR (5% deposit); FIRB overlay also falls away." },
     "deposit_is_not_total_cash_to_settle": { "type": "bool", "value": true, "provenance": "CONVENTION", "note": "FIRB fee, foreign-buyer surcharge, ordinary duty and FX spread are additional and owned by cash_position anchors; do not present the deposit as total outlay." },
     "genuine_savings_still_applies": { "type": "bool", "value": true, "provenance": "CONVENTION", "note": "the ~5%-held-3-months genuine-savings rule (kb.lender.serviceability-basics) applies; a lump-sum overseas parental gift may fail it." }
+  },
+  "lookup": {
+    "line_details": {
+      "note": "one entry per statement line this doc's figure is placed on (not a fee line); the engine attaches it as the line's detail, filling {params} with the figures it computed (fh_engine_line_detail, behavior 93)",
+      "entries": [
+        {
+          "id": "deposit",
+          "tier": "CONVENTION",
+          "how": {
+            "vi": "{pct}% của {price} — mức đặt cọc các ngân hàng thường yêu cầu với người mua nước ngoài có thu nhập ở nước ngoài (họ cho vay tối đa khoảng 70% giá nhà).",
+            "en": "{pct}% of {price} — the deposit lenders commonly ask of a foreign buyer earning income overseas (they lend up to about 70% of the price)."
+          },
+          "payer": {
+            "vi": "Bạn và người thân góp tiền mua nhà, trả khi ký hợp đồng; khoản này được giữ trong tài khoản ủy thác (trust) đến ngày settlement.",
+            "en": "You and any family funding the purchase, paid when you sign the contract and held in trust until settlement."
+          },
+          "drivers": {
+            "vi": "Tình trạng cư trú và nơi bạn có thu nhập: có thu nhập tại Úc, hoặc mua chung với vợ/chồng là công dân hay thường trú nhân Úc, có thể giảm mức này; hồ sơ ít phổ biến có thể cần tới 40%.",
+            "en": "Your residency and where you earn: income in Australia, or buying with a partner who is an Australian citizen or permanent resident, can lower it; less usual profiles can need up to 40%."
+          },
+          "note": {
+            "vi": "Con số thường gặp — ngân hàng bạn chọn sẽ quyết định.",
+            "en": "A typical figure — the lender you choose sets it."
+          },
+          "source": 0
+        }
+      ]
+    }
   }
 }
 ```

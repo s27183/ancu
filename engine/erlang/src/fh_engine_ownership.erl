@@ -100,8 +100,6 @@ fill_foreign(Args, Upstream) ->
         <<"cash_events">> => own_cash_events(Args, Upstream, <<"budget_envelope">>,
                                              <<"other">>, owner, <<"ownership_planning">>),
         <<"fee_pending">> => own_fee_pending(Args, <<"other">>, <<"ownership_planning">>),
-        <<"total_monthly_outgoings_estimate">> => null,   %% pending: mortgage P&I unknown at base
-        <<"total_annual_outgoings_estimate">>  => null,   %% pending: as above
         <<"vacancy_fee_at_risk_amount">>       => vacancy_fee_at_risk(Fee),
         <<"current_year_occupancy_status">>    => null,   %% pending: occupancy intent not yet captured
         <<"non_resident_tax_filing_required">> => null,   %% pending: as above
@@ -398,16 +396,52 @@ own_cash_events(Args, Upstream, BudgetKey, Other, Kind, Source) ->
     Range = price_range(Args),
     Budget = maps:get(BudgetKey, Upstream, #{}),
     Band = statutory_band(),
+    Principal = principal(Range, Budget),
     Events = [
         own_event(<<"council_rates_water">>, <<"event_rates_water">>,
                   [maps:get(<<"low">>, Band), maps:get(<<"high">>, Band)], <<"government">>, Source),
         own_event(<<"maintenance_reserve">>, <<"event_maintenance_reserve">>,
                   maintenance_band(Range), Other, Source),
         own_event(<<"loan_repayments">>, <<"event_loan_repayments">>,
-                  fh_engine_disposition:annual_repayments(principal(Range, Budget), Kind),
+                  fh_engine_disposition:annual_repayments(Principal, Kind),
                   <<"lender">>, Source)],
     {FeeEvents, _} = own_fees(Args, Other, Source),
-    [E || E <- Events, maps:get(<<"amount">>, E) =/= null] ++ FeeEvents.
+    own_details([E || E <- Events, maps:get(<<"amount">>, E) =/= null], Principal, Kind)
+        ++ FeeEvents.
+
+%% Whole lifecycle -> every statement line opens its own detail -> ownership_planning -> the
+%% own lines' details (behavior 93): each names the figures its line was computed with — the
+%% council and water bands, the reserve %, the principal with the rate and term
+%% fh_engine_disposition amortises at — from the doc that owns them (fh_engine_line_detail).
+own_details(Events, Principal, Kind) ->
+    Rates = <<"kb.ongoing-costs.rates-water-strata">>,
+    M = fun(K) -> fh_engine_money:money(kb_param(Rates, K)) end,
+    Pct = fun fh_engine_line_detail:pct/1,
+    {Rate, Term} = fh_engine_disposition:repayment_basis(Kind),
+    Loan = case Kind of
+               owner    -> <<"kb.lender.serviceability-basics">>;
+               investor -> <<"kb.lender.serviceability-investment-loans">>
+           end,
+    Spec0 = #{
+        <<"council_rates_water">> =>
+            {Rates, <<"council_rates_water">>,
+             #{params => #{<<"council_lo">> => M(<<"council_rates_indicative_aud_year_low">>),
+                           <<"council_hi">> => M(<<"council_rates_indicative_aud_year_high">>),
+                           <<"water_lo">> => M(<<"water_indicative_aud_year_low">>),
+                           <<"water_hi">> => M(<<"water_indicative_aud_year_high">>)}}},
+        <<"maintenance_reserve">> =>
+            {<<"kb.maintenance.budget-by-property-type">>, <<"maintenance_reserve">>,
+             #{params => #{<<"pct">> => Pct(kb_param(<<"kb.maintenance.budget-by-property-type">>,
+                                                     <<"reserve_pct_of_value_default">>))}}}},
+    Spec = case Principal of
+               [_, _] -> Spec0#{<<"loan_repayments">> =>
+                                    {Loan, <<"loan_repayments">>,
+                                     #{params => #{<<"principal">> =>
+                                                       fh_engine_line_detail:money_range(Principal),
+                                                   <<"term">> => Term, <<"rate">> => Pct(Rate)}}}};
+               _      -> Spec0
+           end,
+    fh_engine_line_detail:attach_all(Events, Spec).
 
 %% Whole lifecycle -> honesty tiers; one owner per fact -> ownership_planning -> own fee lines
 %% The yearly fees a buyer only learns from a quote (building and landlord insurance,
@@ -481,14 +515,17 @@ nonneg(_) -> null.
 
 %% --- the ongoing_obligations outcome (honest partial) ------------------------
 %% Filled: maintenance_reserve_target, recurring_costs_estimate.statutory_band,
-%% graduation_milestone.target_lvr, alert_triggers_armed. Null/pending: the two
-%% outgoings totals (P&I-dominated), estimated graduation year, and the strata/
-%% utilities/insurance cost lines.
+%% graduation_milestone.target_lvr, alert_triggers_armed. Null/pending: the estimated
+%% graduation year.
+%% Whole lifecycle -> each phase has its money lines -> ownership_planning -> no slot the
+%% cash events superseded (behavior 93): the yearly cost to own is the Own phase's
+%% cash_events (rates and water, maintenance, repayments, the fee lines), so the outgoings
+%% totals, the strata/utilities/insurance slots — null at base, never filled — and the note
+%% that repayments were pending are gone (2026-10-16). statutory_band stays: disposition's
+%% hold cost and purchase_journey read it.
 
 ongoing_obligations(Ceiling, Intent, State, HasFhg, LandTax) ->
-    #{<<"total_monthly_outgoings_estimate">> => null,   %% pending: mortgage P&I unknown at base
-      <<"total_annual_outgoings_estimate">>  => null,   %% pending: as above
-      <<"maintenance_reserve_target">>       => maintenance_target(Ceiling),
+    #{<<"maintenance_reserve_target">>       => maintenance_target(Ceiling),
       <<"recurring_costs_estimate">>         => recurring_costs(),
       <<"graduation_milestone">> =>
           #{<<"target_lvr">>     => graduation_target_lvr(),
@@ -506,17 +543,10 @@ maintenance_target(V) when is_integer(V) ->
                    <<"reserve_pct_of_value_default">>),
     dollars(Pct * V / 100).
 
-%% the recurring NON-mortgage costs. statutory_band (council + water) is computable
-%% from KB now; strata needs the property type (no property at base), utilities +
-%% building insurance have no KB band / are property-specific (refine/per-property).
+%% the recurring non-mortgage costs: statutory_band (council + water), from the KB.
 recurring_costs() ->
-    #{<<"statutory_band">>     => statutory_band(),
-      <<"strata_levies">>      => null,   %% pending: needs property type (apartment/townhouse)
-      <<"utilities">>          => null,   %% pending: no KB band (electricity/gas) - refine
-      <<"building_insurance">> => null,   %% pending: sum-insured is property-specific - per-property
-      <<"notes">> =>
-          [copy(<<"note_indicative">>, #{}),
-           copy(<<"note_mortgage_pending">>, #{})]}.
+    #{<<"statutory_band">> => statutory_band(),
+      <<"notes">>          => [copy(<<"note_indicative">>, #{})]}.
 
 %% council + water annual band (strata excluded - applies only to strata title).
 -spec statutory_band() -> map().

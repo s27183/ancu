@@ -75,7 +75,7 @@ scaffold_cases() ->
     Surcharge = fh_engine_cash:surcharge_amount(<<"NSW">>, 900000),
     ExpectedImposts = fh_engine_cash:sum_or_null([DutyAfter, Surcharge, 15100, 0]),
     %% behavior 83: registration + the midpoint of the buy fee lines the buyer pays for sure
-    Fees = [E || E <- g(O, <<"cash_events">>), maps:is_key(<<"detail">>, E)],
+    Fees = [E || E <- g(O, <<"cash_events">>), fh_engine_fees:fee_line(E)],
     [CLo, CHi] = fh_engine_fees:committed(Fees),
     ExpectedChannel = fh_engine_cash:registration_total(<<"NSW">>, 900000) + round((CLo + CHi) / 2),
     ExpectedTotal = fh_engine_cash:sum_or_null([270000, ExpectedImposts, ExpectedChannel]),

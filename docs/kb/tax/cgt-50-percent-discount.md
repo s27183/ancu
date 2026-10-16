@@ -93,6 +93,32 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
     "announced_reform_not_yet_law":   { "type": "string", "value": "2026-27 Budget (12 May 2026): replacement of the 50% discount with cost-base indexation + a 30% minimum tax from 1 July 2027 — now ENACTED as Treasury Laws Amendment (Tax Reform No. 1) Act 2026 (Act No. 49 of 2026), passed both Houses 25 Jun 2026 (amended in the Senate that day), assented 26 Jun 2026, effective 1 July 2027; existing holdings split at 1 July 2027 (pre = 50% discount, post = indexation + 30% min); new builds may choose either regime; income-support recipients exempt from the 30% minimum", "note": "ENACTED (Act No. 49 of 2026) but not yet in effect — the 50% discount remains the applicable law for disposals up to 1 July 2027. Resolver computes current law and flags the enacted reform; any post-1-July-2027 portion → to_verify. Specific mechanics reflect the announcement + enacted-Act summary; the Bill was amended in the Senate 25 Jun 2026 — reconfirm the fine detail against the enacted Act text (key name retained for reference stability; the reform is no longer merely 'announced')." }
   },
   "lookup": {
+    "line_details": {
+      "note": "one entry per statement line this doc's figure is placed on (not a fee line); the engine attaches it as the line's detail, filling {params} with the figures it computed (fh_engine_line_detail, behavior 93)",
+      "entries": [
+        {
+          "id": "cgt",
+          "tier": "REGULATED",
+          "how": {
+            "vi": "Phần lãi (giá bán trừ giá mua), giảm {discount}%, rồi nhân với thuế suất biên của bạn {rate}%. Mức giảm 50% áp dụng cho cá nhân giữ nhà ít nhất 12 tháng.",
+            "en": "The gain (sale price less the price you paid), reduced by a {discount}% discount, taxed at your marginal rate of {rate}%. The 50% discount applies to an individual who held the property at least 12 months."
+          },
+          "payer": {
+            "vi": "Bạn, qua tờ khai thuế của năm bán nhà.",
+            "en": "You, through your tax return for the year of the sale."
+          },
+          "drivers": {
+            "vi": "Giá bán, các chi phí được cộng vào giá mua, thời gian giữ nhà, thu nhập của bạn năm đó và tình trạng cư trú thuế.",
+            "en": "The sale price, the costs you can add to what you paid, how long you held it, your income that year and your residency for tax."
+          },
+          "note": {
+            "vi": "Ước tính — đại lý thuế có đăng ký sẽ xác nhận.",
+            "en": "An estimate — a registered tax agent confirms it."
+          },
+          "source": 0
+        }
+      ]
+    },
     "cgt_discount_by_entity": {
       "note": "discount percentage keyed by owning entity; resolver selects by tax_structure.entity and applies (1 − discount_pct/100) to the net gain after losses for assets held ≥ min_holding_months",
       "entries": [

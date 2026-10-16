@@ -56,6 +56,8 @@
 -export([growth_assumption/3]).
 %% the Own-phase loan-repayment band fh_engine_ownership places (behavior 82):
 -export([annual_repayments/2]).
+%% the rate and term that band is amortised at, for its line's detail (behavior 93):
+-export([repayment_basis/1]).
 
 -define(COPY,    <<"kb.copy.disposition">>).
 -define(GROWTH,  <<"kb.property.capital-growth-bands">>).
@@ -107,7 +109,11 @@ fill_owner_occupier(Args, Profile, Upstream) ->
     Full          = full_horizon(Net, Budget, Ownership, H),
     %% Mode-A/B/E four-actor swimlane (fh_engine_journey:actors/0) — the money-flow party for
     %% sale/selling is "other" there.
-    Events        = dispose_cash_events(Sale, Fees, Loan, Cgt, <<"other">>),
+    Events        = dispose_details(dispose_cash_events(Sale, Fees, Loan, Cgt, <<"other">>),
+                                    {ceiling, Price}, H, GLow, GHigh,
+                                    principal_band(maps:get(<<"expected_borrowing_capacity">>,
+                                                            Mortgage, null)),
+                                    owner, null),
 
     Outcome = #{
         <<"horizon_years">>             => H,
@@ -156,7 +162,15 @@ fill_investor(Args, Profile, Tax, Upstream) ->
     %% sale_proceeds/selling_costs cells the moment a hold horizon is set (found via review,
     %% 2026-07-10 — [[firsthomey-bcd-lifecycle-restructure]] task 10). Fixed at the source: the
     %% investor path (the ONLY caller of the six-actor set) passes "services" here.
-    Events              = dispose_cash_events(Sale, Fees, Loan, Cgt, <<"services">>),
+    Basis               = case maps:get(<<"price">>, maps:get(<<"property_fit_investor">>, Upstream, #{}), null) of
+                              P when is_number(P) -> property;
+                              _                   -> ceiling
+                          end,
+    Events              = dispose_details(dispose_cash_events(Sale, Fees, Loan, Cgt, <<"services">>),
+                                          {Basis, Price}, H, GLow, GHigh,
+                                          principal_band(maps:get(<<"loan_amount">>, Budget, null)),
+                                          investor, {maps:get(<<"cgt_marginal_rate">>, Tax, null),
+                                                     maps:get(<<"cgt_discount_eligible">>, Tax, null)}),
     %% Mode-D-only fields (frcgw_applicable is absent/false on Mode C's tax_optimised_structure
     %% ⟹ both null there — one function serves both modes, see frcgw_withheld/2's header note).
     FrcgwApplicable     = maps:get(<<"frcgw_applicable">>, Tax, false),
@@ -340,9 +354,15 @@ remaining_balance(P, AnnualRatePct, TermYears, ElapsedYears) ->
 %%   buyer's product rate; null when the principal is unknown (honest-partial).
 -spec annual_repayments([number()] | null, owner | investor) -> [integer()] | null.
 annual_repayments([PLo, PHi], Kind) when is_number(PLo), is_number(PHi) ->
-    R = case Kind of owner -> representative_rate(); investor -> investor_rate() end,
+    {R, _Term} = repayment_basis(Kind),
     [round(annual_pi(PLo, R, ?LOAN_TERM_YEARS)), round(annual_pi(PHi, R, ?LOAN_TERM_YEARS))];
 annual_repayments(_, _) -> null.
+
+%% {annual rate %, term years} a loan of this kind is amortised at — one basis for the yearly
+%% repayment, the payout at sale and both lines' details.
+-spec repayment_basis(owner | investor) -> {number(), pos_integer()}.
+repayment_basis(owner)    -> {representative_rate(), ?LOAN_TERM_YEARS};
+repayment_basis(investor) -> {investor_rate(), ?LOAN_TERM_YEARS}.
 
 annual_pi(P, 0, TermYears) -> P / TermYears;
 annual_pi(P, AnnualRatePct, TermYears) ->
@@ -399,6 +419,12 @@ cgt_contribution(_,    <<"to_verify">>) -> null.
 %% dollar). The indicative discounted gain is surfaced as taxable_gain on BOTH paths (what's
 %% computable is shown). cgt = taxable_gain × marginal rate.
 
+%% the CGT discount %: the individual discount once the holding clears 12 months
+%% (kb.tax.cgt-50-percent-discount); else 0% — the full nominal gain is taxable (held < 12
+%% months OR eligibility undetermined: the conservative, higher-gain direction).
+cgt_discount(true) -> param(?CGT_INV, <<"discount_pct_individual">>);
+cgt_discount(_)    -> 0.
+
 -spec cgt_investor(map(), map(), [integer()] | null, number() | null) ->
           {[integer()] | null, [integer()] | null, binary()}.
 cgt_investor(Profile, Tax, Sale, Price) ->
@@ -406,13 +432,7 @@ cgt_investor(Profile, Tax, Sale, Price) ->
     Rate     = maps:get(<<"cgt_marginal_rate">>, Tax, null),
     Eligible = maps:get(<<"cgt_discount_eligible">>, Tax, null),
     Clawback = maps:get(<<"cost_base_depreciation_clawback">>, Tax, null),
-    %% the discount only when the holding clears 12 months (kb.tax.cgt-50-percent-discount); else
-    %% 0% — the full nominal gain is taxable (held < 12 months OR eligibility undetermined: the
-    %% conservative, higher-gain direction).
-    Discount = case Eligible of
-                   true -> param(?CGT_INV, <<"discount_pct_individual">>);
-                   _    -> 0
-               end,
+    Discount = cgt_discount(Eligible),
     Gain = taxable_gain(Sale, Price, Discount),
     %% the clean computed case — an individual resident with a known rate and no clawback in play.
     %% Holding period sets the discount %, not clean-ness (a sub-12-month individual sale is still
@@ -541,6 +561,43 @@ dispose_cash_events(Sale, {FeeEvents, _}, Loan, Cgt, MoneyPartyId) ->
         event(<<"cgt">>,           <<"event_cgt">>,           <<"out">>, Cgt,     <<"government">>)
     ],
     [E || E <- Candidates, maps:get(<<"amount">>, E) =/= null] ++ FeeEvents.
+
+%% Whole lifecycle -> every statement line opens its own detail -> disposition -> the sell
+%% lines' details (behavior 93).
+%% Goal: the sale price, the loan paid out and CGT open in place like the sell fee lines.
+%% Invariant: each detail names the figures this module computed the line with — the price
+%% basis, the growth band and horizon, the principal, rate and term, the discount and the
+%% marginal rate — from the doc that owns them (fh_engine_line_detail). The exported
+%% dispose_cash_events/5 is left as it was; this wraps it.
+dispose_details(Events, {Basis, Price}, H, GLow, GHigh, Principal, Kind, CgtRate)
+  when is_number(Price), is_integer(H) ->
+    Pct = fun fh_engine_line_detail:pct/1,
+    {Rate, Term} = repayment_basis(Kind),
+    ServSlug = case Kind of owner -> ?SERVICEABILITY; investor -> ?SERV_INV end,
+    Sale = {?GROWTH, <<"sale_proceeds">>,
+            #{params => #{<<"price">> => fh_engine_line_detail:price(Basis, Price),
+                          <<"low">> => Pct(GLow), <<"high">> => Pct(GHigh), <<"years">> => H}}},
+    Payout = case Principal of
+                 [_, _] -> #{<<"dispose_loan_payout">> =>
+                                 {ServSlug, <<"loan_payout">>,
+                                  #{params => #{<<"principal">> =>
+                                                    fh_engine_line_detail:money_range(Principal),
+                                                <<"years">> => H, <<"term">> => Term,
+                                                <<"rate">> => Pct(Rate)}}}};
+                 _      -> #{}
+             end,
+    Cgt = case CgtRate of
+              {R, Eligible} when is_number(R) ->
+                  #{<<"dispose_cgt">> =>
+                        {?CGT_INV, <<"cgt">>,
+                         #{params => #{<<"discount">> => Pct(cgt_discount(Eligible)),
+                                       <<"rate">> => Pct(R)}}}};
+              _ -> #{}
+          end,
+    fh_engine_line_detail:attach_all(
+        Events, maps:merge(#{<<"dispose_sale_proceeds">> => Sale}, maps:merge(Payout, Cgt)));
+dispose_details(Events, _Price, _H, _GLow, _GHigh, _Principal, _Kind, _CgtRate) ->
+    Events.
 
 event(Id, LabelCopyId, Dir, Amount, Counterparty) ->
     #{<<"id">>               => <<"dispose_", Id/binary>>,

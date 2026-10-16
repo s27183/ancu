@@ -12,7 +12,7 @@
     // wasn't built for — an unmapped componentId used to silently fall into the path-picker
     // branch and read undefined mortgage fields (Mode-D P4 finding, 2026-07-04).
     // All heroes are deterministic outcome→geometry (R1), honest-partial (R2: fields the
-    // base turn can't yet know ghost via `Field`'s Pending, or the reach bar's own hint —
+    // base turn can't yet know are left out by `Field`, or carry the reach bar's own hint —
     // financials/thesis reasoning arrive on a refine turn), bilingual at the source (R4).
     import { t } from '$lib/i18n';
     import { lang } from '$lib/stores/lang';
@@ -29,7 +29,6 @@
     import Chip from './Chip.svelte';
     import { archetypeLabel } from './archetype';
     import NoteList from './NoteList.svelte';
-    import Pending from './Pending.svelte';
 
     let { componentId, outcome }: {
         componentId: string;
@@ -61,7 +60,7 @@
     const capacity = $derived(profile.approx_borrowing_capacity);
     // a shared price axis 0..scale; the target band + the reach band plot against it. At
     // base capacity is null (no income at onboarding) → scale is the target ceiling and
-    // the reach band ghosts.
+    // the reach row is left out (the hint invites the income that fills it).
     const scale = $derived(
         Math.max(hasRange(capacity) ? capacity[1] : 0, hasRange(target) ? target[1] : 0)
     );
@@ -91,8 +90,8 @@
 
     // --- strategy hero (investment_strategy, Mode C/D, strategy_thesis) -----
     // Mostly agent-filled — null at base except hold_period_years (resolver-carried off
-    // profile.hold_horizon_years); every field ghosts via Field's own Pending until a
-    // refine turn. No bilingual label table for these enums (would be ~30 option pairs
+    // profile.hold_horizon_years); every null field is left out by Field until a
+    // refine turn fills it. No bilingual label table for these enums (would be ~30 option pairs
     // for a mostly-null base card) — same raw-value fallback as pathLabel above.
     const pct = (v: number | null | undefined) => (v != null ? `${num(v, $lang)}%` : null);
     const years = (v: number | null | undefined) =>
@@ -130,19 +129,15 @@
             </div>
         {/if}
 
-        <div class="rb-row">
-            <span class="rb-rowlabel">{$t('plan.reach.label')}</span>
-            {#if hasRange(capacity)}
+        {#if hasRange(capacity)}
+            <div class="rb-row">
+                <span class="rb-rowlabel">{$t('plan.reach.label')}</span>
                 <div class="rb-track" aria-hidden="true">
                     <span class="rb-reach" style="width:{pctOf(capacity[1])}%"></span>
                 </div>
                 <span class="rb-val">{moneyRange(capacity, $lang)}</span>
-            {:else}
-                <div class="rb-track rb-pending" aria-hidden="true"></div>
-                <span class="rb-val rb-muted">—</span>
-            {/if}
-        </div>
-        {#if !hasRange(capacity)}
+            </div>
+        {:else}
             <p class="rb-hint">{$t('plan.reach.capacity_pending')}</p>
         {/if}
     </div>
@@ -161,19 +156,18 @@
 {:else if componentId === 'mortgage_finance'}
     {#if isInvestorMortgage}
         <!-- ── Financing snapshot hero (Mode C/D — no FHB path lanes to light up) ──── -->
-        <div class="pk-hero">
-            <div class="pp-chips-row">
-                {#if mortgage.io_vs_pi_recommendation}
-                    <Chip label={iovspiLabel(mortgage.io_vs_pi_recommendation) ?? mortgage.io_vs_pi_recommendation} tone="info" />
-                {/if}
-                {#if mortgage.deposit_required_percentage != null}
-                    <Chip label={`${$t('plan.f.deposit_pct')}: ${num(mortgage.deposit_required_percentage, $lang)}%`} tone="neutral" />
-                {/if}
+        {#if mortgage.io_vs_pi_recommendation || mortgage.deposit_required_percentage != null}
+            <div class="pk-hero">
+                <div class="pp-chips-row">
+                    {#if mortgage.io_vs_pi_recommendation}
+                        <Chip label={iovspiLabel(mortgage.io_vs_pi_recommendation) ?? mortgage.io_vs_pi_recommendation} tone="info" />
+                    {/if}
+                    {#if mortgage.deposit_required_percentage != null}
+                        <Chip label={`${$t('plan.f.deposit_pct')}: ${num(mortgage.deposit_required_percentage, $lang)}%`} tone="neutral" />
+                    {/if}
+                </div>
             </div>
-            {#if !mortgage.io_vs_pi_recommendation && mortgage.deposit_required_percentage == null}
-                <Pending />
-            {/if}
-        </div>
+        {/if}
     {:else}
         <!-- ── Path picker hero (Mode A/B) ─────────────────────────────────── -->
         <div class="pk-hero">
@@ -288,23 +282,12 @@
         left: 0;
         background: color-mix(in srgb, var(--accent) 35%, transparent);
     }
-    .rb-pending {
-        background-image: repeating-linear-gradient(
-            45deg,
-            var(--border) 0 6px,
-            transparent 6px 12px
-        );
-    }
     .rb-val {
         font-size: var(--fs-xs);
         font-weight: 600;
         color: var(--accent);
         font-variant-numeric: tabular-nums;
         white-space: nowrap;
-    }
-    .rb-muted {
-        color: var(--muted);
-        font-weight: 400;
     }
     .rb-hint {
         margin: 0.2rem 0 0;

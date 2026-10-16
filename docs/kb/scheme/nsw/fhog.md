@@ -78,6 +78,30 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
   "stacking": {
     "combines_with": ["kb.scheme.fhg", "kb.scheme.fhss", "kb.scheme.help-to-buy", "kb.scheme.nsw.fhbas"],   // state doc declares federal↔state edges (symmetric, §11.9); the NSW FHOG↔FHBAS edge is declared here (once). Help to Buy explicitly allows stacking FHOG.
     "order_hint": 25   // a grant arranged with finance / paid at settlement — between FHG (20) and the duty concession (30)
+  },
+  "lookup": {
+    "line_details": {
+      "note": "one entry per statement line this doc's figure is placed on (not a fee line); the engine attaches it as the line's detail, filling {params} with the figures it computed (fh_engine_line_detail, behavior 93)",
+      "entries": [
+        {
+          "id": "grant",
+          "tier": "REGULATED",
+          "how": {
+            "vi": "Trợ cấp Người mua nhà lần đầu (nhà mới) của NSW: $10,000 cho nhà mới — mới xây, mua trên giấy (off the plan) hoặc sửa chữa lớn — giá tới $600,000 ($750,000 nếu bạn tự xây). Nhà đã qua sử dụng không được, nên khoảng tiền bắt đầu từ $0.",
+            "en": "The NSW First Home Owner (New Homes) Grant: $10,000 for a new home — newly built, off the plan or substantially renovated — up to $600,000 ($750,000 if you build). An established home gets nothing, so the range starts at $0."
+          },
+          "payer": {
+            "vi": "Revenue NSW trả cho bạn, nhận khi settlement.",
+            "en": "Revenue NSW pays it to you, received at settlement."
+          },
+          "drivers": {
+            "vi": "Nhà có phải nhà mới không, giá nhà so với mức trần, và việc bạn (và vợ/chồng) chưa từng sở hữu nhà ở Úc — nhà sở hữu ở nước ngoài không tính.",
+            "en": "Whether the home is new, its price against the cap, and whether you (and your partner) have never owned a home in Australia — a home owned overseas does not count."
+          },
+          "source": 0
+        }
+      ]
+    }
   }
 }
 ```

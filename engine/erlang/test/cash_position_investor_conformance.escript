@@ -196,7 +196,7 @@ per_property_cases() ->
      %% land here (lmi_payable = 0 at the 80% baseline LVR is still a non-null point figure).
      check("per-property: cash_events carries deposit/stamp_duty/registration/lmi ids, then the fee lines (behavior 83)",
            lists:sort([maps:get(<<"id">>, E) || E <- g(O, <<"cash_events">>),
-                                                not maps:is_key(<<"detail">>, E)]),
+                                                not fh_engine_fees:fee_line(E)]),
            lists:sort([<<"deposit">>, <<"stamp_duty">>, <<"registration">>, <<"lmi">>])),
      check("per-property: every cash_event source_component = cash_position",
            lists:usort([maps:get(<<"source_component">>, E) || E <- g(O, <<"cash_events">>)]),

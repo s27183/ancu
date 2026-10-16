@@ -50,6 +50,34 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
     "strata_two_funds":                  { "type": "array<string>", "value": ["administrative_fund", "capital_works_sinking_fund"], "note": "strata levies split into an admin fund (day-to-day common-property running) and a capital-works/sinking fund (reserve for major future works)" },
     "strata_levy_indicative_aud_year_low":  { "type": "money", "value": 3000, "note": "INDICATIVE — typical lower end of annual strata levies for a standard apartment; binding figure is the strata disclosure" },
     "strata_levy_indicative_aud_year_high": { "type": "money", "value": 6000, "note": "INDICATIVE — typical upper end; materially higher with lifts/pool/gym/concierge — wide variance, treat as orientation only" }
+  },
+  "lookup": {
+    "line_details": {
+      "note": "one entry per statement line this doc's figure is placed on (not a fee line); the engine attaches it as the line's detail, filling {params} with the figures it computed (fh_engine_line_detail, behavior 93)",
+      "entries": [
+        {
+          "id": "council_rates_water",
+          "tier": "CONVENTION",
+          "how": {
+            "vi": "Phí hội đồng địa phương (council rates) khoảng {council_lo}–{council_hi} mỗi năm, cộng tiền nước khoảng {water_lo}–{water_hi} — mức thường gặp cho một căn nhà ở thành phố.",
+            "en": "Council rates of about {council_lo}–{council_hi} a year, plus water of about {water_lo}–{water_hi} — typical for a home in a capital city."
+          },
+          "payer": {
+            "vi": "Chủ nhà trả, thường theo quý; con số chính xác nằm trên thông báo thu phí (rates notice) của căn nhà.",
+            "en": "The owner, usually each quarter; the exact figures are on the property's rates notices."
+          },
+          "drivers": {
+            "vi": "Hội đồng địa phương và giá trị căn nhà, công ty cấp nước và lượng nước bạn dùng.",
+            "en": "The council and the property's value, the water utility and how much water you use."
+          },
+          "note": {
+            "vi": "Ước tính — thông báo thu phí của căn nhà mới là con số cuối cùng.",
+            "en": "An estimate — the property's rates notices decide."
+          },
+          "source": 0
+        }
+      ]
+    }
   }
 }
 ```

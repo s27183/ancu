@@ -8,8 +8,8 @@
     //   R1 deterministic — the bar is a pure function outcome→geometry, drawn here in
     //      CSS flex. Nothing is agent-drawn.
     //   R2 honest-partial — a scheme whose benefit_value the base turn can't yet know
-    //      renders as a fixed-width HATCHED slice (counted, not sized); a null total
-    //      shows Pending. Never a zero, never a faked width.
+    //      is left out of the bar and its legend; a null total or basis is left out.
+    //      Never a zero, never a faked width, never a placeholder.
     //   R4 bilingual-at-source — labels are enum→$t or LocalizedText→pick($lang);
     //      figures via the shared money() formatter. No prose minted here.
     //
@@ -21,7 +21,6 @@
     import { money, moneyRange } from '$lib/format';
     import Chip from './Chip.svelte';
     import NoteList from './NoteList.svelte';
-    import Pending from './Pending.svelte';
     import StackedBar from './StackedBar.svelte';
 
     let { outcome, density = 'compact' }: {
@@ -54,11 +53,11 @@
     }
 
     // The hero bar segments (one per scheme), handed to the shared StackedBar primitive:
-    // sized by the benefit range MIDPOINT, null when honestly unknown (→ hatched slice).
+    // sized by the benefit range MIDPOINT, null when honestly unknown (→ not drawn).
     const segments = $derived(
         schemes.map((s) => ({
             value: hasRange(s.benefit_value) ? mid(s.benefit_value) : null,
-            label: s.name ?? '—',
+            label: s.name ?? '',
             amount: benefitLabel(s.benefit_value),
             estimate: s.benefit_is_estimate ?? false
         }))
@@ -66,21 +65,19 @@
 </script>
 
 <div class="ss-hero">
-    <div class="ss-head">
-        {#if o.eligibility_basis}
-            <Chip label={basisLabel(o.eligibility_basis)} tone={BASES[o.eligibility_basis] ?? 'neutral'} />
-        {:else}
-            <Pending />
-        {/if}
-        <div class="ss-total">
-            <span class="ss-total-label">{$t('plan.f.total_benefit')}</span>
+    {#if o.eligibility_basis || hasRange(o.total_benefit_value)}
+        <div class="ss-head">
+            {#if o.eligibility_basis}
+                <Chip label={basisLabel(o.eligibility_basis)} tone={BASES[o.eligibility_basis] ?? 'neutral'} />
+            {/if}
             {#if hasRange(o.total_benefit_value)}
-                <span class="ss-total-value">{benefitLabel(o.total_benefit_value)}</span>
-            {:else}
-                <Pending />
+                <div class="ss-total">
+                    <span class="ss-total-label">{$t('plan.f.total_benefit')}</span>
+                    <span class="ss-total-value">{benefitLabel(o.total_benefit_value)}</span>
+                </div>
             {/if}
         </div>
-    </div>
+    {/if}
 
     {#if segments.length}
         <StackedBar {segments} {density} />
@@ -135,6 +132,7 @@
         margin-bottom: 0.5rem;
     }
     .ss-total {
+        margin-left: auto;
         display: flex;
         flex-direction: column;
         align-items: flex-end;

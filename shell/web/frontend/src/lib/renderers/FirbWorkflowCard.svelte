@@ -24,7 +24,6 @@
     import { money, date } from '$lib/format';
     import Field from './Field.svelte';
     import Chip from './Chip.svelte';
-    import Pending from './Pending.svelte';
 
     let { outcome }: { outcome: Record<string, unknown> } = $props();
     const isTransfer = $derived('total_transfer_amount_aud' in (outcome ?? {}));
@@ -86,14 +85,12 @@
 
 {#if isTransfer}
     <!-- ── transfer_plan (cross_border_funding) ─────────────────────────── -->
-    <div class="pp-field">
-        <span class="pp-label">{$t('plan.f.provider')}</span>
-        {#if providerLabel(tp.provider)}
+    {#if providerLabel(tp.provider)}
+        <div class="pp-field">
+            <span class="pp-label">{$t('plan.f.provider')}</span>
             <Chip label={providerLabel(tp.provider) ?? ''} tone="info" />
-        {:else}
-            <Pending />
-        {/if}
-    </div>
+        </div>
+    {/if}
     <Field label={$t('plan.f.transfer_amount')} value={money(tp.total_transfer_amount_aud, $lang)} />
     <Field label={$t('plan.f.fx_cost')} value={money(tp.estimated_fx_cost, $lang)} />
     <Field label={$t('plan.f.transfer_initiated')} value={date(tp.transfer_initiated_by_date, $lang) ?? tp.transfer_initiated_by_date ?? null} />
@@ -106,38 +103,32 @@
         </div>
     {/if}
 
-    <div class="pp-field">
-        <span class="pp-label">{$t('plan.f.stage')}</span>
-        {#if f.current_stage}
+    {#if f.current_stage}
+        <div class="pp-field">
+            <span class="pp-label">{$t('plan.f.stage')}</span>
             <Chip label={stageLabel(f.current_stage)} tone={STAGE_TONE[f.current_stage] ?? 'neutral'} />
-        {:else}
-            <Pending />
-        {/if}
-    </div>
+        </div>
+    {/if}
 
-    <div class="pp-field">
-        <span class="pp-label">{$t('plan.f.eligible')}</span>
-        {#if typeof f.foreign_person_eligible === 'boolean'}
+    {#if typeof f.foreign_person_eligible === 'boolean'}
+        <div class="pp-field">
+            <span class="pp-label">{$t('plan.f.eligible')}</span>
             <Chip
                 label={f.foreign_person_eligible ? $t('plan.firb.yes') : $t('plan.firb.no')}
                 tone={f.foreign_person_eligible ? 'good' : 'warn'}
             />
-        {:else}
-            <Pending />
-        {/if}
-    </div>
+        </div>
+    {/if}
 
     <Field label={$t('plan.f.firb_fee')} value={money(f.total_firb_fee_payable, $lang)} />
     <Field label={$t('plan.f.fee_tier')} value={f.firb_fee_tier ? tierLabel(f.firb_fee_tier) : null} />
 
-    <div class="pp-field">
-        <span class="pp-label">{$t('plan.f.approval_received')}</span>
-        {#if typeof f.approval_received === 'boolean' && f.approval_received}
+    {#if typeof f.approval_received === 'boolean' && f.approval_received}
+        <div class="pp-field">
+            <span class="pp-label">{$t('plan.f.approval_received')}</span>
             <Chip label={$t('plan.firb.yes')} tone="good" />
-        {:else}
-            <Pending />
-        {/if}
-    </div>
+        </div>
+    {/if}
 
     <Field
         label={$t('plan.f.days_to_decision')}

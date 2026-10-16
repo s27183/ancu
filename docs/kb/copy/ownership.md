@@ -47,10 +47,6 @@ template ids the resolver references, each a `{vi, en}` pair.
       "vi": "Đây là khoảng ước tính hằng năm cho một căn nhà ở khu vực đô thị; con số chính thức nằm trên thông báo thuế/phí (rates notice) của bạn và (nếu là chung cư) bản công bố thông tin (disclosure statement).",
       "en": "Indicative annual ranges for a metro home; the binding figures are your rates notice and (if strata) the disclosure statement."
     },
-    "note_mortgage_pending": {
-      "vi": "Khoản trả nợ vay và tổng chi phí hằng tháng sẽ được tính khi bạn xác định số tiền vay và lãi suất.",
-      "en": "Mortgage repayments and the all-in monthly total fill in once your loan amount and rate are set."
-    },
     "alert_fhg_trigger": {
       "vi": "Tỷ lệ vay trên giá trị (LVR) của bạn giảm xuống dưới 80%",
       "en": "Your loan-to-value ratio drops below 80%"

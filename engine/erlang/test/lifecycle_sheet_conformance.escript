@@ -39,7 +39,9 @@ events(Out) ->
 
 main(_) ->
     ok = fh_engine_kb:load(),
-    R = lists:flatten([mode_cases(M) || M <- modes()]),
+    R = lists:flatten([mode_cases(M) || M <- modes()]
+                      ++ [detail_cases(M, S) || M <- modes(),
+                                                S <- [<<"NSW">>, <<"VIC">>, <<"QLD">>, <<"WA">>]]),
     case [X || X <- R, X =:= fail] of
         [] -> io:format("PASS — all ~p lifecycle-sheet anchors hold~n", [length(R)]), halt(0);
         F  -> io:format("FAIL — ~p anchor(s) mismatched~n", [length(F)]), halt(1)
@@ -86,6 +88,32 @@ mode_cases({BP, Intent, Firb}) ->
          maps:get(<<"sell">>, B0) =:= null andalso
          lists:usort([maps:get(<<"needs">>, P) || P <- maps:get(<<"pending">>, B0),
                                                   maps:get(<<"phase">>, P) =:= <<"dispose">>]) =:= [<<"hold_years">>])].
+
+%% Whole lifecycle -> every statement line opens its own detail -> the base fill -> every
+%% line carries a detail (behavior 93, Expect 10). Measured 2026-10-16 before the change:
+%% deposit, duty, registration, surcharge, the FIRB fee, a grant, LMI, the three own lines,
+%% the sale price, the payout and CGT carried none, so the sheet opened a component card.
+%% A line that is not a fee says how its figure is set, who pays and what moves it, in both
+%% languages; fee lines keep their own (behavior 83).
+detail_cases({BP, Intent, Firb}, State) ->
+    Fin = #{<<"income">> => #{<<"assessable_income">> => 150000}},
+    {ok, Out} = fh_engine_simulate:run(BP, (onboarding())#{<<"state">> => State}, Intent, Fin, Firb),
+    Ev = events(Out),
+    Label = <<BP/binary, " ", State/binary>>,
+    Lines = [maps:get(<<"detail">>, E) || E <- Ev, maps:is_key(<<"how">>, maps:get(<<"detail">>, E, #{}))],
+    [chk(Label, "every line carries a detail", lists:all(fun(E) -> maps:is_key(<<"detail">>, E) end, Ev)),
+     chk(Label, "the deposit, duty-or-surcharge and own lines are explained in place",
+         length(Lines) >= 5),
+     chk(Label, "each line's how, payer and drivers are bilingual", lists:all(fun(D) ->
+            lists:all(fun(K) -> bilingual(maps:get(K, D, null)) end,
+                      [<<"how">>, <<"payer">>, <<"drivers">>])
+        end, Lines)),
+     chk(Label, "no detail text keeps an unfilled {param}", lists:all(fun(D) ->
+            nomatch =:= re:run(term_to_binary(maps:get(<<"how">>, D)), <<"\\{[a-z_]+\\}">>)
+        end, Lines))].
+
+bilingual(#{<<"vi">> := Vi, <<"en">> := En}) -> Vi =/= <<>> andalso En =/= <<>>;
+bilingual(_) -> false.
 
 %% measured 2026-10-16 (behavior 83): disposition ids its payout dispose_loan_payout, and
 %% the budget matched the bare id, so with income the payout was summed as a selling cost.
