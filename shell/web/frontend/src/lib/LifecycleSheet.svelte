@@ -22,8 +22,11 @@
     //            an estimate is one small mark keyed once at the foot.
     // Rests on:  fh_engine_journey's lifecycle_budget block (what each total sums: the
     //            `counted` test below mirrors its out/1, own's recurring and payout/1).
-    // Known gaps: the hold-years and state choices are what-if previews (the cockpit's
-    //            horizon and state), not saved until the plan is saved from the budget tab.
+    //            Behavior 96: the plan's state is text in the statement's head, never a
+    //            choice — a plan is for one state (81); another state is another plan,
+    //            made from the planner's list.
+    // Known gaps: the hold-years choice is a what-if preview (the cockpit's horizon), not
+    //            saved until the plan is saved from the budget tab.
     import { tick } from 'svelte';
     import { pushState } from '$app/navigation';
     import { page } from '$app/state';
@@ -41,7 +44,6 @@
         type PendingLine
     } from '$lib/planCard';
     import { money, moneyRange } from '$lib/format';
-    import { AU_STATES } from '$lib/map';
 
     let {
         components,
@@ -50,7 +52,6 @@
         planState,
         busy = false,
         onhorizon,
-        onstate
     }: {
         components: Record<string, ComponentEntry>;
         filling: boolean;
@@ -60,7 +61,6 @@
         planState: string;
         busy?: boolean;
         onhorizon: (years: number) => void;
-        onstate: (state: string) => void;
     } = $props();
 
     type PhaseKey = 'buy' | 'own' | 'sell';
@@ -122,7 +122,8 @@
         rootEl?.closest('.body')?.scrollTo({ top: 0 });
     }
     function openPhase(key: PhaseKey) {
-        pushState('', { lifecycle: key });
+        // over whatever layer the page is on (the planner's list, behavior 96)
+        pushState('', { ...page.state, lifecycle: key });
         void toTop();
     }
     function back() {
@@ -234,17 +235,7 @@
     <section class="ls" bind:this={rootEl} aria-labelledby="ls-title">
         <div class="ls-head">
             <h3 id="ls-title" class="ls-title">{$t('plan.sheet.title')}</h3>
-            <select
-                class="ls-state"
-                aria-label={$t('plan.sheet.state_q')}
-                value={planState}
-                disabled={busy}
-                onchange={(e) => onstate((e.currentTarget as HTMLSelectElement).value)}
-            >
-                {#each AU_STATES as s (s)}
-                    <option value={s}>{s}</option>
-                {/each}
-            </select>
+            {#if planState}<span class="ls-state" aria-label={$t('plan.sheet.state_q')}>{planState}</span>{/if}
         </div>
 
         <ul class="ls-statement">
@@ -376,11 +367,7 @@
     .ls { display: grid; gap: 0.75rem; }
     .ls-head { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
     .ls-title { margin: 0; font-size: var(--fs-lg, 1.125rem); color: var(--ink); }
-    .ls-state {
-        font: inherit; font-size: var(--fs-sm, 0.875rem); color: var(--ink); background: var(--surface);
-        border: 1px solid var(--border-strong); border-radius: 0.5rem; padding: 0.2rem 0.4rem;
-    }
-    .ls-state:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .ls-state { font-size: var(--fs-sm, 0.875rem); font-weight: 700; letter-spacing: 0.04em; color: var(--muted); }
 
     /* The statement: one row per phase, its figure right-aligned, then the bottom line. */
     .ls-statement {
