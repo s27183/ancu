@@ -2879,6 +2879,18 @@ main {
 .pp-flat {
     border: none;
 }
+/* Behavior 93, clean-sheet rule (Son 2026-10-16: "get rid of those container borders
+   around the popup sheets"): a card opened in a popup is the sheet itself — no box inside
+   the sheet, and no second title under the popup's own. */
+.mo-body > .pp-card {
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    background: none;
+}
+.mo-body > .pp-card > .pp-card-title {
+    display: none;
+}
 .pp-card-title {
     font-size: var(--fs-md);
     font-weight: 700;
