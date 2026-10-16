@@ -10,7 +10,9 @@
 %% text OID to a `uuid` column, so every uuid bind carries an explicit `$N::uuid`
 %% cast and the value is passed as its canonical string binary.
 
--export([insert_plan_card_view/3, owns_plan_card/2, list_plan_card_views/1]).
+-export([insert_plan_card_view/3, insert_plan_card_view/4, owns_plan_card/2,
+         list_plan_card_views/1]).
+-export([with_create_key/3, plan_card_by_create_key/2]).
 -export([upsert_user_by_email/1, insert_magic_token/2, redeem_magic_token/1]).
 -export([link_oauth/3]).
 -export([user_tier/1, user_email/1, link_subscription/3, update_subscription/5]).
@@ -18,7 +20,7 @@
 -export([claim_question/2, release_question/2]).
 -export([create_guest/0, claim_guest/2]).
 -export([claim_guest_create/3, release_guest_create/3]).
--export([questions_today/1, guest_creates_today/2, plans_saved/1]).
+-export([questions_today/1, guest_creates_today/2, plans_saved/1, next_reset/0]).
 -export([expired_guests/1, delete_guest/1, prune_guest_creates/0]).
 -export([list_saved_suburbs/1, save_suburb/4, unsave_suburb/2,
          saved_seeded/1, seed_saved_suburbs/2]).
@@ -155,12 +157,50 @@ link_oauth(UserId, Provider, Subject) ->
 %% plan content lives in the engine (shell-architecture.md §2/§6).
 -spec insert_plan_card_view(binary(), binary(), binary()) -> ok.
 insert_plan_card_view(UserId, EnginePlanCardId, Title) ->
+    insert_plan_card_view(UserId, EnginePlanCardId, Title, undefined).
+
+%% The same, carrying the create key the tap sent (007_create_key.sql; undefined when
+%% the client sent none), so a repeat of that create finds this view
+%% (plan_card_by_create_key/2).
+-spec insert_plan_card_view(binary(), binary(), binary(), binary() | undefined) -> ok.
+insert_plan_card_view(UserId, EnginePlanCardId, Title, CreateKey) ->
     _ = query(
-        "INSERT INTO plan_card_views (user_id, engine_plan_card_id, title) "
-        "VALUES ($1::uuid, $2::uuid, $3) "
+        "INSERT INTO plan_card_views (user_id, engine_plan_card_id, title, create_key) "
+        "VALUES ($1::uuid, $2::uuid, $3, $4) "
         "ON CONFLICT (user_id, engine_plan_card_id) DO NOTHING",
-        [UserId, EnginePlanCardId, Title]),
+        [UserId, EnginePlanCardId, Title, null_bin(CreateKey)]),
     ok.
+
+%% Guest plans -> P-2 · The database is the single source of truth -> The shell database -> one plan per create key, serialised per (owner, key)
+%% Behavior 97: a tap's create may arrive twice — a double tap, or the dialog resending
+%% it after the reply was lost (the phone locked, the tab reloaded). Fun runs inside one
+%% transaction holding a transaction-level advisory lock on (owner, key), so a second
+%% request with the same key waits for the first to commit its view and then finds it
+%% (plan_card_by_create_key/2) rather than racing it to a second plan. Fun's own queries
+%% (the guest cap claims, the view insert) run in that transaction — pgo reuses the
+%% transaction's connection for any pgo:query in the same process (pgo.erl
+%% transaction/3, the pgo_transaction_connection process key, read at the locked
+%% version) — so a crash mid-create gives the claims back. The lock is held across the
+%% engine call (the create replies 202 at once; the base turn runs after it).
+-spec with_create_key(binary(), binary(), fun(() -> T)) -> T.
+with_create_key(UserId, Key, Fun) ->
+    pgo:transaction(fun() ->
+        _ = query("SELECT 1 FROM pg_advisory_xact_lock(hashtextextended($1::text, 0))",
+                  [<<"create:", UserId/binary, ":", Key/binary>>]),
+        Fun()
+    end).
+
+%% The plan this owner already made with this create key, if any.
+-spec plan_card_by_create_key(binary(), binary()) -> {ok, binary()} | none.
+plan_card_by_create_key(UserId, Key) ->
+    case query(
+        "SELECT engine_plan_card_id::text FROM plan_card_views "
+        "WHERE user_id = $1::uuid AND create_key = $2",
+        [UserId, Key])
+    of
+        #{rows := [{Id}]} -> {ok, Id};
+        #{rows := []}     -> none
+    end.
 
 %% Does UserId own a view of EnginePlanCardId? The shell's AUTHORIZATION gate for the
 %% per-card proxies (read / messages): a user may only read or ask about a plan card
@@ -477,6 +517,10 @@ plans_saved(UserId) ->
         "WHERE user_id = $1::uuid AND archived = false",
         [UserId]),
     N.
+
+%% When the daily caps reset: the next Sydney midnight, UTC ISO-8601.
+-spec next_reset() -> binary().
+next_reset() -> next_sydney_midnight().
 
 next_sydney_midnight() ->
     #{rows := [{T}]} = query(
