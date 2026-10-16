@@ -132,6 +132,28 @@ The Australian taxes and tax rules that touch a home or an investment property o
         "en": "Several of your steps go through the ATO, so its processing time belongs in the plan — an FHSS release, for one, typically takes weeks."
       },
       "kb": "kb.scheme.fhss"
+    },
+    {
+      "id": "ppr",
+      "abbr": "PPR",
+      "name": {
+        "vi": "Nơi ở chính (PPR)",
+        "en": "Principal place of residence"
+      },
+      "forms": [
+        "PPR",
+        "principal place of residence",
+        "nơi ở chính"
+      ],
+      "meaning": {
+        "vi": "Căn nhà bạn thực sự sống làm nhà chính. Với thuế đất (land tax), tiểu bang miễn thuế cho đất có nơi ở chính của bạn nếu đáp ứng điều kiện về thời gian ở và quyền sở hữu.",
+        "en": "The home you actually live in as your main home. For land tax, the state exempts the land your principal place of residence stands on, if you meet its conditions on occupation and ownership."
+      },
+      "why": {
+        "vi": "Nhà đầu tư chịu thuế đất hằng năm, còn nhà bạn ở thì thường được miễn — nhưng điều kiện (như chỉ được một nơi ở chính) khác nhau giữa các tiểu bang.",
+        "en": "An investment property pays land tax every year while the home you live in is usually exempt — but the conditions (such as having only one principal place of residence) differ between states."
+      },
+      "url": "https://www.revenue.nsw.gov.au/taxes-duties-levies-royalties/land-tax/exemptions-and-concessions/principal-place-of-residence"
     }
   ]
 }
