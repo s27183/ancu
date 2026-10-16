@@ -77,7 +77,9 @@ fill(Args, Upstream) ->
     %% An event's `group` counts too: behavior 83 split other_buying_costs into one line per
     %% fee, each grouped under that id, so a ref to the group links all of its lines.
     ValidRefs = sets:from_list(lists:append([[maps:get(<<"id">>, E) | group(E)]
-                                             || E <- harvest_cash_events(Upstream)])),
+                                             || E <- harvest_cash_events(Upstream)])
+                               ++ pending_ids(Upstream)
+                               ++ held_lines(Args, Upstream)),
     %% The authored structure (layout) + bilingual prose (copy) from the two KB docs.
     {ok, ActionsCj} = fh_engine_kb:kb_rules(ActionsDoc),
     {ok, RisksCj}   = fh_engine_kb:kb_rules(RisksDoc),
@@ -98,9 +100,40 @@ fill(Args, Upstream) ->
     KbVersions = fh_engine_kb:kb_anchors([ActionsDoc, RisksDoc]),
     {Outcome, <<"checklist">>, KbVersions}.
 
-%% every upstream outcome that carries a `cash_events` field, concatenated.
+%% Whole lifecycle -> the checklist links both ways -> phase_playbook -> what a step may link
+%% Goal (behavior 95): owning and selling steps link their lines too, not only buying's.
+%% Invariant: a budget_ref is kept only when it names a line this plan's statement shows —
+%%   an event of any phase (cash_events, and disposition's dispose_cash_events), a line
+%%   waiting on an input (an upstream `fee_pending`: rent before a property), or, while no
+%%   hold is chosen, a selling fee line that applies to this plan's blueprint and state —
+%%   the Bán sheet carries it as soon as a hold is (the statement previews one at once,
+%%   behavior 93). Anything else is dropped to null, as before.
+%% every upstream outcome that carries a `cash_events` or `dispose_cash_events` field.
 harvest_cash_events(Upstream) ->
-    lists:flatten([maps:get(<<"cash_events">>, V, []) || V <- maps:values(Upstream), is_map(V)]).
+    [E || V <- maps:values(Upstream), is_map(V),
+          K <- [<<"cash_events">>, <<"dispose_cash_events">>], E <- list(V, K), is_map(E)].
+
+pending_ids(Upstream) ->
+    [maps:get(<<"id">>, P) || V <- maps:values(Upstream), is_map(V),
+                              P <- list(V, <<"fee_pending">>), is_map(P)].
+
+list(V, K) ->
+    case maps:get(K, V, []) of
+        L when is_list(L) -> L;
+        _ -> []
+    end.
+
+held_lines(Args, Upstream) ->
+    case maps:get(<<"disposition">>, Upstream, undefined) of
+        #{<<"horizon_years">> := null} ->
+            Ctx = #{blueprint => maps:get(blueprint_slug, Args, <<"fhb-domestic-au">>),
+                    state => case fh_engine_store:projection_state(maps:get(onboarding, Args, #{})) of
+                                 S when is_binary(S) -> S;
+                                 _ -> undefined
+                             end},
+            [<<"selling_costs">> | fh_engine_fees:line_ids([<<"dispose">>], Ctx)];
+        _ -> []
+    end.
 
 -spec phase_order() -> [binary()].
 phase_order() -> ?PHASE_ORDER.

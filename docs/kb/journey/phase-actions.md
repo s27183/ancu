@@ -10,8 +10,8 @@ The **actionable layer** of the legal/temporal spine — for each lifecycle phas
 Pre-approve → Contract → Settle → Own → Sell), the ordered "do these, in this sequence" steps
 a Mode-A first-home buyer works through. The terminal **Sell** (`dispose`) phase is the full
 temporal arc (lifecycle-simulation-model §8); its actions link to the `disposition` component
-for the sale / cost / net figures (`component_ref`, no `budget_ref` — the dispose figures live
-on `disposition.dispose_cash_events`, not the acquisition `budget_envelope.cash_events`). It is the content the `phase_playbook` resolver
+for the sale / cost / net figures (`component_ref`) and to the selling lines they pay for
+(`budget_ref`: the agent's commission, the mortgage discharge fee). It is the content the `phase_playbook` resolver
 (component 12) renders as a `checklist` behind each Flow-view phase sheet. The swimlane
 (`kb.journey.fhg-path`) shows *what happens*; this doc turns that into *what you do, in what
 order*.
@@ -23,7 +23,7 @@ referenced; the **amount** is joined at render from `budget_envelope.cash_events
 recomputed or stored here (one-computer-per-figure, extended to this consumer). An action may
 also carry a `component_ref` — the id of a component whose renderer opens as the item's
 backing detail (e.g. `eligibility` behind "Reserve a First Home Guarantee place"). Both are
-optional; `null` means no link.
+optional; `null` means no link. Since behavior 95 (2026-10-16) owning and selling steps link their lines too: an insurance, rates, loan, agent, discharge or transfer step names the statement line it pays for (a fee line of `fh_engine_fees`, an own-phase line of the ownership component, or a `dispose_cash_events` id). The resolver keeps a ref that names a line the plan's statement shows — an event of any phase, a line still waiting on an input (`fee_pending`), or, before a hold is chosen, a selling fee line that applies to the plan's blueprint and state — and drops any other to `null`.
 
 This is a **copy doc** (it fills no slot). It is a blueprint anchor (component 12 references
 it), so it must resolve; structurally only slug==path + content_json-parse + the bilingual
@@ -94,7 +94,7 @@ figure. `key_assumptions[]` ← the `assumption_*` lines.
       {
         "phase": "settle",
         "actions": [
-          { "id": "bind_insurance",       "order": 1, "budget_ref": null,                "component_ref": "settlement_prep" },
+          { "id": "bind_insurance",       "order": 1, "budget_ref": "building_insurance",                "component_ref": "settlement_prep" },
           { "id": "pay_stamp_duty",       "order": 2, "budget_ref": "stamp_duty",        "component_ref": "cash_position" },
           { "id": "settle_other_costs",   "order": 3, "budget_ref": "other_buying_costs","component_ref": "cash_position" },
           { "id": "final_inspection",     "order": 4, "budget_ref": null,                "component_ref": "settlement_prep" },
@@ -104,19 +104,19 @@ figure. `key_assumptions[]` ← the `assumption_*` lines.
       {
         "phase": "own",
         "actions": [
-          { "id": "move_in",         "order": 1, "budget_ref": null, "component_ref": "ownership_planning" },
-          { "id": "budget_ongoing",  "order": 2, "budget_ref": null, "component_ref": "ownership_planning" },
+          { "id": "move_in",         "order": 1, "budget_ref": "moving_costs", "component_ref": "ownership_planning" },
+          { "id": "budget_ongoing",  "order": 2, "budget_ref": "council_rates_water", "component_ref": "ownership_planning" },
           { "id": "keep_ppor",       "order": 3, "budget_ref": null, "component_ref": "ownership_planning" },
-          { "id": "watch_refinance", "order": 4, "budget_ref": null, "component_ref": "ownership_planning" }
+          { "id": "watch_refinance", "order": 4, "budget_ref": "loan_repayments", "component_ref": "ownership_planning" }
         ]
       },
       {
         "phase": "dispose",
         "actions": [
           { "id": "decide_to_sell",        "order": 1, "budget_ref": null, "component_ref": "disposition" },
-          { "id": "engage_selling_agent",  "order": 2, "budget_ref": null, "component_ref": "disposition" },
+          { "id": "engage_selling_agent",  "order": 2, "budget_ref": "commission", "component_ref": "disposition" },
           { "id": "confirm_cgt_exemption", "order": 3, "budget_ref": null, "component_ref": "disposition" },
-          { "id": "discharge_mortgage",    "order": 4, "budget_ref": null, "component_ref": "disposition" },
+          { "id": "discharge_mortgage",    "order": 4, "budget_ref": "mortgage_discharge", "component_ref": "disposition" },
           { "id": "plan_next_purchase",    "order": 5, "budget_ref": null, "component_ref": "disposition" }
         ]
       }
