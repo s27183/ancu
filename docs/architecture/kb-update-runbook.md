@@ -347,6 +347,13 @@ characters. So:
   which reads as marriage only. A visa word a reader may not know (Partner visa,
   Ministerial Direction) is a term in `docs/kb/terms/` so a tap explains it
   (behavior 102).
+- **Every acronym is a term (behavior 105, Son 2026-10-17).** Any note, from the routine
+  or a seat: each acronym in its headlines and summaries is a term in `docs/kb/terms/`, or
+  tests/terms_coverage.py fails the done checks and the PR stops. Add the term in the
+  same PR, to the existing file of its area (a new terms file is a new doc, and holds the
+  PR for Son), resting on a government page, stating no figure (the KB gate cannot check
+  a figure in a term, so one holds the PR). A named rule that is not an acronym is a term
+  too, by the writer's judgment; no check can find it.
 
 A note is immutable in what it claims. Laying out its summary again — paragraphs,
 a table of figures its archived source already carries, a visa's plainer name —

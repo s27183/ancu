@@ -42,6 +42,28 @@ The visa words the news uses. Neither has a KB doc of its own; each explanation 
         "en": "While you hold the temporary stage (820 or 309) you are a foreign person for FIRB; once 801 or 100 is granted you are a permanent resident."
       },
       "url": "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/partner-onshore"
+    },
+    {
+      "id": "tss_visa",
+      "abbr": "TSS",
+      "name": {
+        "vi": "Visa Temporary Skill Shortage (TSS, diện 482 cũ)",
+        "en": "Temporary Skill Shortage visa"
+      },
+      "forms": [
+        "TSS",
+        "Temporary Skill Shortage",
+        "Temporary Skills Shortage"
+      ],
+      "meaning": {
+        "vi": "Visa tay nghề tạm thời diện 482 do chủ lao động bảo lãnh, đã được thay bằng visa Skills in Demand (cũng là diện 482) từ ngày 7/12/2024.",
+        "en": "The employer-sponsored temporary skilled visa, subclass 482, replaced by the Skills in Demand visa (also subclass 482) on 7 December 2024."
+      },
+      "why": {
+        "vi": "Người giữ visa TSS hay Skills in Demand là người cư trú tạm thời, nên là người nước ngoài theo FIRB khi mua nhà.",
+        "en": "A TSS or Skills in Demand holder is a temporary resident, and so a foreign person for FIRB when buying a home."
+      },
+      "url": "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/repealed-visas/temporary-skill-shortage-short-term-visa-subclass-482"
     }
   ]
 }

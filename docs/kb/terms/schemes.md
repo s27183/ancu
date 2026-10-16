@@ -42,6 +42,28 @@ The federal first-home schemes the plan checks a buyer against: the guarantee th
         "en": "The benefit is tax, but releases take weeks and the yearly cap means building the full amount takes several years — and owning a home in Vietnam does not rule you out."
       },
       "kb": "kb.scheme.fhss"
+    },
+    {
+      "id": "fhog",
+      "abbr": "FHOG",
+      "name": {
+        "vi": "Trợ cấp người mua nhà lần đầu (FHOG)",
+        "en": "First Home Owner Grant"
+      },
+      "forms": [
+        "FHOG",
+        "First Home Owner Grant",
+        "First Home Owners Grant"
+      ],
+      "meaning": {
+        "vi": "Khoản tiền tiểu bang tặng một lần cho người mua hoặc xây căn nhà đầu tiên, thường chỉ cho nhà mới và dưới một mức giá trần. Mỗi tiểu bang tự đặt số tiền và điều kiện.",
+        "en": "A one-off payment a state gives to a buyer who buys or builds their first home, usually only for a new home under a price cap. Each state sets its own amount and conditions."
+      },
+      "why": {
+        "vi": "Đây là tiền mặt cộng vào khoản đặt cọc, nhưng thường đòi bạn là công dân hoặc thường trú nhân và phải ở trong căn nhà đó — kiểm tra điều kiện của tiểu bang trước khi tính vào kế hoạch.",
+        "en": "It is cash towards the deposit, but it usually requires citizenship or permanent residency and that you live in the home — check your state's conditions before counting on it."
+      },
+      "kb": "kb.scheme.nsw.fhog"
     }
   ]
 }

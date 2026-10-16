@@ -32,7 +32,7 @@ The words of the purchase itself: the duties paid on it, the legal transfer and 
       "id": "foreign_purchaser_surcharge",
       "abbr": null,
       "name": { "vi": "Phụ phí người mua nước ngoài", "en": "Foreign purchaser surcharge" },
-      "forms": ["foreign-buyer surcharge", "foreign buyer surcharge", "foreign purchaser surcharge", "foreign purchaser additional duty", "surcharge purchaser duty", "phụ phí người mua nước ngoài", "phụ phí dành cho người mua nước ngoài"],
+      "forms": ["foreign-buyer surcharge", "foreign buyer surcharge", "foreign purchaser surcharge", "foreign purchaser additional duty", "surcharge purchaser duty", "AFAD", "additional foreign acquirer duty", "phụ phí người mua nước ngoài", "phụ phí dành cho người mua nước ngoài"],
       "meaning": {
         "vi": "Khoản thuế trước bạ cộng thêm mà người nước ngoài trả một lần khi mua nhà ở, tính theo phần trăm giá trị căn nhà, nộp khi hoàn tất giao dịch cùng với thuế trước bạ thông thường.",
         "en": "An extra stamp duty a foreign person pays once when buying a home, a percentage of the property's value, due at settlement on top of the standard duty."
