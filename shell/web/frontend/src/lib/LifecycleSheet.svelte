@@ -39,7 +39,7 @@
     //            choice — a plan is for one state (81); another state is another plan,
     //            made from the planner's list.
     //            Behavior 101 (over 95): every number the statement rests on has one home,
-    //            "Tài chính của bạn" — a button under the statement opens it as a layer
+    //            "Tài chính của bạn" — a line at the top of the statement opens it as a layer
     //            (page.state.lifecycle 'finances'): the price and the deposit (the
     //            planner's `scenario`: "Xem thử" previews, "Lưu" saves to the plan), "Tiền
     //            bạn có" (a sum the visitor types, set against the cash needed to buy,
@@ -48,6 +48,15 @@
     //            browser per plan, localStorage, never sent), then income and debts (the
     //            planner's `household`). Each field says in one line what it moves. The
     //            Mua sheet shows the cash verdict, never an input.
+    //            Behavior 108 (over 101): that line is the one thing above the statement's
+    //            figure (the clean-sheet rule's exception, architecture.md): "Tài chính của
+    //            bạn: giá <price> · cọc <deposit>", then — only once "Tiền bạn có" is typed —
+    //            the cash verdict summed up: "Đủ" when the sum covers the high end of the
+    //            cash to buy, "Đủ ở mức thấp" when only the low end, else "Còn thiếu <low
+    //            − sum> – <high − sum>" (the Mua sheet's two rows, in one phrase). The price is the one the
+    //            finances sheet shows (target_price_range), the deposit its field's own
+    //            (deposit_bounds chosen, else assumed). No button sits under the statement;
+    //            the over-loan prompt still opens the sheet.
     //            A line's detail (LineDetail, the same body PhaseSheet opens over the
     //            checklist) names the checklist steps that link it; choosing one is
     //            `onstep` — the planner opens Hành trình at that step.
@@ -61,6 +70,11 @@
         pick,
         harvestCashEvents,
         loanFit,
+        firstComponentEntry,
+        PROFILE_COMPONENT_IDS,
+        type BudgetEnvelopeOutcome,
+        type DepositBounds,
+        type ProfileOutcome,
         type CashEvent,
         type ComponentEntry,
         type DispositionOutcome,
@@ -143,6 +157,27 @@
         const n = Number(cashInput.replace(/[^0-9]/g, ''));
         return cashInput.trim() !== '' && Number.isFinite(n) ? n : null;
     });
+    // behavior 108: the finances line's figures — read, never computed.
+    const finPrice = $derived.by((): string | null => {
+        const o = firstComponentEntry(components, PROFILE_COMPONENT_IDS)?.outcome as ProfileOutcome | undefined;
+        const r = o?.target_price_range as MoneyRange | null | undefined;
+        if (!Array.isArray(r) || r.length !== 2) return null;
+        return r[0] === r[1] ? money(r[0], $lang) : moneyRange(r, $lang);
+    });
+    const finDeposit = $derived.by((): string | null => {
+        const b = (components.cash_position?.outcome as BudgetEnvelopeOutcome | undefined)?.deposit_bounds as
+            | DepositBounds
+            | null
+            | undefined;
+        const d = b ? (b.chosen ?? b.assumed) : null;
+        return d === null || d === undefined ? null : money(d, $lang);
+    });
+    function finVerdict(need: MoneyRange, have: number): { ok: boolean; text: string } {
+        if (have >= need[1]) return { ok: true, text: $t('plan.sheet.cash_ok') };
+        if (have >= need[0]) return { ok: true, text: $t('plan.fin.line_low_ok') };
+        const short: MoneyRange = [need[0] - have, need[1] - have];
+        return { ok: false, text: $t('plan.sheet.cash_short').replace('{x}', range(short)) };
+    }
     function cashVerdict(need: number, have: number): string {
         return have >= need
             ? $t('plan.sheet.cash_ok')
@@ -435,6 +470,26 @@
             {#if planState}<span class="ls-state" aria-label={$t('plan.sheet.state_q')}>{planState}</span>{/if}
         </div>
 
+        {#if scenario}
+            <!-- behavior 108: the numbers the statement rests on, one line above it -->
+            <button type="button" class="ls-fin-line" data-finances-open onclick={() => openPhase('finances')}>
+                <span class="ls-fin-line-text"
+                    ><strong>{$t('plan.fin.title')}:</strong>
+                    {[
+                        finPrice && `${$t('plan.fin.line_price')} ${finPrice}`,
+                        finDeposit && `${$t('plan.fin.line_deposit')} ${finDeposit}`
+                    ]
+                        .filter(Boolean)
+                        .join(' · ')}{#if cash !== null && budget?.buy}{@const v = finVerdict(budget.buy, cash)}{' · '}<span
+                            class="ls-fin-verdict"
+                            class:ls-short={!v.ok}
+                            data-fin-verdict>{v.text}</span
+                        >{/if}</span
+                >
+                <span class="ls-caret" aria-hidden="true">›</span>
+            </button>
+        {/if}
+
         <ul class="ls-statement">
             {#each groups as g (g.key)}
                 <li>
@@ -469,11 +524,6 @@
                 >
             {/each}
         </div>
-        {#if scenario}
-            <button type="button" class="ls-fin-open" data-finances-open onclick={() => openPhase('finances')}
-                >{$t('plan.fin.title')} <span class="ls-caret" aria-hidden="true">›</span></button
-            >
-        {/if}
 
         {#if intoHome?.deposit || budget?.buy}
             <!-- behavior 98: not costs — what goes into the home, and the cash to buy -->
@@ -695,14 +745,17 @@
         background: var(--surface); color: var(--ink);
     }
     .ls-cash-verdict { margin: 0; display: grid; gap: 0.25rem; }
-    /* behavior 101: the finances sheet's opener under the statement, and its fields */
-    .ls-fin-open {
-        display: flex; justify-content: space-between; align-items: center; width: 100%;
-        margin-top: 0.75rem; padding: 0.7rem 0.9rem; font: inherit; font-weight: 600;
+    /* behavior 108: the finances line above the statement (opens the sheet); 101's fields */
+    .ls-fin-line {
+        display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; width: 100%;
+        margin-bottom: 0.75rem; padding: 0.55rem 0.8rem; font: inherit; font-size: var(--fs-sm, 0.875rem);
         color: var(--ink); background: var(--surface);
         border: 1px solid var(--border); border-radius: 0.75rem; cursor: pointer; text-align: left;
     }
-    .ls-fin-open:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .ls-fin-line:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .ls-fin-line-text { font-variant-numeric: tabular-nums; }
+    .ls-fin-verdict { font-weight: 700; color: var(--success); }
+    .ls-fin-verdict.ls-short { color: var(--danger, var(--warning)); }
     .ls-fin { display: grid; gap: 1rem; }
     .ls-fin-effect { margin: 0.25rem 0 0; font-size: 0.85rem; color: var(--muted); }
     .ls-cash-verdict > div { display: flex; justify-content: space-between; gap: 0.75rem; }

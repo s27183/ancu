@@ -915,6 +915,9 @@ const messages = {
     // unblocks borrowing capacity → the full-horizon net position; distinct from the
     // ephemeral price/state what-if and the client-side cash-on-hand figure.
     'plan.fin.title': { vi: 'Tài chính của bạn', en: 'Your finances' },
+    'plan.fin.line_price': { vi: 'giá', en: 'price' },
+    'plan.fin.line_deposit': { vi: 'cọc', en: 'deposit' },
+    'plan.fin.line_low_ok': { vi: 'Đủ ở mức thấp', en: 'Enough at the low end' },
     'plan.fin.intro': {
         vi: 'Nhập thu nhập và các khoản nợ để hệ thống ước tính khả năng vay và vị thế ròng cả hành trình. Thông tin này được lưu vào kế hoạch của bạn.',
         en: 'Enter your income and debts so we can estimate your borrowing capacity and full-horizon net position. This is saved to your plan.'

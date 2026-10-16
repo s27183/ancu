@@ -257,7 +257,10 @@ Added 2026-10-16 (behavior 93; Son: too much text at first look on a plan):
   figure first, and the rest one tap down: no explanatory subtitle, an estimate
   as one small mark keyed once at the foot, the lines a total leaves out after
   one quiet divider, and every notice (the guest's, the disclaimer) one line —
-  shortened, never removed.
+  shortened, never removed. One thing may sit above the budget's figure: the
+  line naming the numbers it rests on ("Tài chính của bạn: giá · cọc", and the
+  cash verdict once typed), which opens where they are changed (behavior 108,
+  2026-10-17: you read your numbers before the result).
 
 Added 2026-10-17 (behavior 106; Son's friend could not find her way back to a plan's
 overview):
