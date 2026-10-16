@@ -11,7 +11,7 @@
 //     takes no pointer events but the bubble's own)
 //   component: this store + Tour.svelte + data-tour='<target>' on the controls
 //   capability: start (the map page's first visit in this browser, or 'Show me around'
-//     in "Vì sao Úc?"), advance on events, skip/finish → remembered per browser (TOUR_KEY)
+//     in "Giới thiệu"), advance on events, skip/finish → remembered per browser (TOUR_KEY)
 import { writable, get } from 'svelte/store';
 
 /** 0 = off; 1 = find a suburb; 2 = its facts. */

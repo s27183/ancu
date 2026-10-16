@@ -1,7 +1,16 @@
 <script lang="ts">
+    // Bilingual -> P-6 · Shells reach the engine only through the contract -> The web frontend -> the first-visit introduction
+    // Purpose:   says on its first screen what the product does and what it is not, so a
+    //            visitor knows before opening a plan that it budgets the whole lifecycle and
+    //            walks the journey step by step (Hành trình, behavior 107).
+    // Holds:     every item names a place the visitor can reach — the plan, Hành trình, the
+    //            suburb data, the news, the assistant; the launcher reads "Giới thiệu" /
+    //            "Introduction" (behavior 107, Son 2026-10-17: once "Vì sao Úc?").
+    // Rests on:  i18n.ts intro.* keys, VI and EN side by side.
+    //
     // The first-visit sheet (behavior 42): opens by itself the first time this browser
-    // visits, says on its first screen what the product does (plan a budget, suburb data,
-    // news) and what it is not (a listing site, an advice service — behavior 90, Son
+    // visits, says on its first screen what the product does (plan a budget, the journey's
+    // checklist — behavior 107 — suburb data, news) and what it is not (a listing site, an advice service — behavior 90, Son
     // 2026-10-16: many took it for a listing site), draws the KB's cited facts —
     // where Vietnamese buyers stand, then why Australian property — and what the product
     // adds on top of them. Closing it (✕, scrim, Escape or the CTA) flies the card into a
@@ -236,6 +245,11 @@
                             <span class="wl-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 18h16M6 18V9l6-4 6 4v9M10 18v-5h4v5" /></svg></span>
                             <strong>{$t('intro.value.plan.title')}</strong>
                             <span>{$t('intro.value.plan.body')}</span>
+                        </li>
+                        <li>
+                            <span class="wl-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m4 6 1.5 1.5L8 5M4 12l1.5 1.5L8 11M4 18l1.5 1.5L8 17M11 6h9M11 12h9M11 18h9" /></svg></span>
+                            <strong>{$t('intro.value.journey.title')}</strong>
+                            <span>{$t('intro.value.journey.body')}</span>
                         </li>
                         <li>
                             <span class="wl-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Z" /><path d="M9 4v14M15 6v14" /></svg></span>
