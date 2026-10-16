@@ -11,7 +11,7 @@
 %% claims the guest (claim/2): its plans move into the account, with no rebuild.
 
 -export([is_guest/1, start/1, claim/2, refuse/1, ttl/0]).
--export([client_addr/1, daily_limit/0]).
+-export([client_addr/1, daily_limit/0, limited/2, start_limit/0]).
 
 -define(SESSION_COOKIE, <<"fh_session">>).
 -define(TTL, 7 * 86400).
@@ -85,3 +85,19 @@ daily_limit() ->
         false -> 3;
         V -> try list_to_integer(V) of N when N >= 1 -> N; _ -> 3 catch _:_ -> 3 end
     end.
+
+%% Guests one address may start a Sydney day before any create (fh_shell_h_guest,
+%% behavior 97): three times the create cap — a browser keeps its guest for 7 days, so
+%% only a cleared cookie or another device on the same network starts another; the
+%% bound stops a script filling the users table with plan-less guests (the purge takes
+%% them after 7 days).
+-spec start_limit() -> pos_integer().
+start_limit() -> 3 * daily_limit().
+
+%% The reply to a capped guest: 429 with the cap and when it resets (the dialog asks
+%% the visitor to sign in, behavior 45).
+-spec limited(pos_integer(), binary()) -> {429, map()}.
+limited(Limit, Resets) ->
+    {429, #{<<"error">> => <<"guest_daily_limit">>,
+            <<"limit">> => Limit,
+            <<"resets_at">> => Resets}}.

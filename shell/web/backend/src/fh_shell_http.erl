@@ -63,6 +63,7 @@ routes() ->
         {"/api/auth/magic", fh_shell_h_auth, [magic_request]},
         {"/api/auth/magic/verify", fh_shell_h_auth, [magic_verify]},
         {"/api/auth/logout", fh_shell_h_auth, [logout]},
+        {"/api/auth/guest", fh_shell_h_guest, []},
         {"/api/auth/google", fh_shell_h_auth, [google_start]},
         {"/api/auth/google/callback", fh_shell_h_auth, [google_callback]},
         {"/api/saved-suburbs", fh_shell_h_saved_suburbs, []},

@@ -59,67 +59,124 @@ with_summaries(UserId, Views) ->
      || #{<<"plan_card_id">> := Id} = V <- Views].
 
 %% Signed out, the create still runs (behavior 45): the body is read first (so a
-%% malformed request makes no guest), then the guest path below makes this browser a
-%% guest (fh_shell_guest:start/1) and creates the plan under it. A signed-in user's
-%% create is not capped.
+%% malformed request makes no guest), then the guest path below creates the plan under
+%% this browser's guest. Since behavior 97 the onboarding dialog makes the guest first
+%% (POST /api/auth/guest, fh_shell_h_guest), so a create normally arrives with a
+%% session; a create with none (a client that did not start a guest) still makes one
+%% here. A signed-in user's create is not capped.
 handle_post(Req0, State) ->
     case fh_shell_http:read_json_body(Req0) of
         {ok, Body, Req1} ->
-            case fh_shell_http:authenticate_user(Req1) of
-                {ok, #{<<"user_id">> := UserId} = Claims} ->
-                    case fh_shell_guest:is_guest(Claims) of
-                        false -> reply_create(create(UserId, Body), Req1, State);
-                        true -> guest_create(UserId, Body, Req1, State)
-                    end;
-                {error, 401, _} ->
-                    guest_create(new, Body, Req1, State)
+            case create_key(Req1) of
+                invalid ->
+                    {ok, fh_shell_http:reply_json(400,
+                        #{<<"error">> => <<"invalid_create_key">>}, Req1), State};
+                Key ->
+                    case fh_shell_http:authenticate_user(Req1) of
+                        {ok, #{<<"user_id">> := UserId} = Claims} ->
+                            case fh_shell_guest:is_guest(Claims) of
+                                false ->
+                                    reply_create(once(UserId, Key,
+                                        fun() -> create(UserId, Body, Key) end), Req1, State);
+                                true -> guest_create(UserId, Body, Key, Req1, State)
+                            end;
+                        {error, 401, _} ->
+                            guest_create(new, Body, Key, Req1, State)
+                    end
             end;
         {error, invalid_json} ->
             {ok, fh_shell_http:reply_json(400,
                 #{<<"error">> => <<"invalid_json">>}, Req0), State}
     end.
 
+%% Guest plans -> P-5 · Metering, not gating -> The shell backend -> a tap makes one plan, whatever the phone does
+%% Behavior 97 (Son 2026-10-16: a plan lost when the phone locked mid-create). The
+%% dialog sends a create key (header create-key) with each tap and sends the same key
+%% again when the reply was lost: the phone locked after the POST left, the tab was
+%% reloaded, the user tapped twice. once/3 runs the create under that key for that owner
+%% (fh_shell_store:with_create_key/3): a key the owner already used returns the plan
+%% it made — 202 with that plan_card_id and `repeat: true`, no engine call, no second
+%% guest claim. No key (an older client): no check, as before behavior 97. A key with
+%% no owner (a create that makes its guest) cannot repeat: the next try carries that
+%% guest's cookie only if the reply reached the browser — which is why the dialog
+%% makes its guest before the create.
+once(_Owner, undefined, Fun) -> Fun();
+once(Owner, Key, Fun) ->
+    fh_shell_store:with_create_key(Owner, Key, fun() ->
+        case fh_shell_store:plan_card_by_create_key(Owner, Key) of
+            {ok, PlanCardId} ->
+                logger:info("[plan-cards] repeat of create ~s by ~s -> ~s",
+                            [Key, Owner, PlanCardId]),
+                {202, #{<<"plan_card_id">> => PlanCardId, <<"repeat">> => true}};
+            none -> Fun()
+        end
+    end).
+
+%% The create key: absent -> undefined; 8-64 of [A-Za-z0-9_-] (the dialog sends a
+%% UUID) -> the key; anything else -> invalid (400, nothing made).
+create_key(Req) ->
+    case cowboy_req:header(<<"create-key">>, Req, undefined) of
+        undefined -> undefined;
+        K when byte_size(K) >= 8, byte_size(K) =< 64 ->
+            case re:run(K, <<"^[A-Za-z0-9_-]+$">>, [{capture, none}]) of
+                match -> K;
+                nomatch -> invalid
+            end;
+        _ -> invalid
+    end.
+
 %% Guest plans -> P-5 · Metering, not gating -> The shell backend -> the cap runs before a guest is made
 %% A guest's create is capped per guest and per client address each Sydney day
 %% (fh_shell_store:claim_guest_create/3). The address is claimed first, so an address
 %% over its cap makes no new guest row; a claim the engine then refuses is given back.
-guest_create(Who, Body, Req0, State) ->
-    Limit = fh_shell_guest:daily_limit(),
-    Addr = fh_shell_guest:client_addr(Req0),
-    logger:info("[guest] create from addr=~s xff=~p",
-                [Addr, cowboy_req:header(<<"x-forwarded-for">>, Req0, undefined)]),
+%% A guest made before the create (fh_shell_h_guest, behavior 97) is held to the same
+%% rule there: it is refused while the address is at its create cap, and an address may
+%% start only so many guests a day, so a guest made early opens no way past the
+%% per-address cap — the create still claims the address here.
+guest_create(new, Body, Key, Req0, State) ->
+    {Limit, Addr} = guest_cap(Req0),
     case fh_shell_store:claim_guest_create(addr, Addr, Limit) of
         {limit, Resets} ->
-            {ok, limited(Limit, Resets, Req0), State};
+            reply_create(fh_shell_guest:limited(Limit, Resets), Req0, State);
         {ok, AddrDay} ->
-            {GuestId, Req1} = case Who of
-                new -> fh_shell_guest:start(Req0);
-                Id -> {Id, Req0}
-            end,
-            case fh_shell_store:claim_guest_create(guest, GuestId, Limit) of
-                {limit, Resets} ->
+            {GuestId, Req1} = fh_shell_guest:start(Req0),
+            reply_create(claimed_create(GuestId, Addr, AddrDay, Limit, Body, Key), Req1, State)
+    end;
+guest_create(GuestId, Body, Key, Req0, State) ->
+    {Limit, Addr} = guest_cap(Req0),
+    reply_create(once(GuestId, Key, fun() ->
+        case fh_shell_store:claim_guest_create(addr, Addr, Limit) of
+            {limit, Resets} -> fh_shell_guest:limited(Limit, Resets);
+            {ok, AddrDay} -> claimed_create(GuestId, Addr, AddrDay, Limit, Body, Key)
+        end
+    end), Req0, State).
+
+guest_cap(Req) ->
+    Addr = fh_shell_guest:client_addr(Req),
+    logger:info("[guest] create from addr=~s xff=~p",
+                [Addr, cowboy_req:header(<<"x-forwarded-for">>, Req, undefined)]),
+    {fh_shell_guest:daily_limit(), Addr}.
+
+%% The address is claimed; claim the guest, then create. Either refusal gives back
+%% what was claimed.
+claimed_create(GuestId, Addr, AddrDay, Limit, Body, Key) ->
+    case fh_shell_store:claim_guest_create(guest, GuestId, Limit) of
+        {limit, Resets} ->
+            ok = fh_shell_store:release_guest_create(addr, Addr, AddrDay),
+            fh_shell_guest:limited(Limit, Resets);
+        {ok, GuestDay} ->
+            case create(GuestId, Body, Key) of
+                {202, _} = Created -> Created;
+                Refused ->
+                    ok = fh_shell_store:release_guest_create(guest, GuestId, GuestDay),
                     ok = fh_shell_store:release_guest_create(addr, Addr, AddrDay),
-                    {ok, limited(Limit, Resets, Req1), State};
-                {ok, GuestDay} ->
-                    case create(GuestId, Body) of
-                        {202, _} = Created ->
-                            reply_create(Created, Req1, State);
-                        Refused ->
-                            ok = fh_shell_store:release_guest_create(guest, GuestId, GuestDay),
-                            ok = fh_shell_store:release_guest_create(addr, Addr, AddrDay),
-                            reply_create(Refused, Req1, State)
-                    end
+                    Refused
             end
     end.
 
-limited(Limit, Resets, Req) ->
-    fh_shell_http:reply_json(429, #{<<"error">> => <<"guest_daily_limit">>,
-                                    <<"limit">> => Limit,
-                                    <<"resets_at">> => Resets}, Req).
-
-%% Forward to the engine; on its 202 record the shell's view. Returns the engine's
-%% status and decoded body.
-create(UserId, Body) ->
+%% Forward to the engine; on its 202 record the shell's view, with the tap's create
+%% key. Returns the engine's status and decoded body.
+create(UserId, Body, Key) ->
     {EngineStatus, EngineResp} = fh_shell_engine_client:create_plan_card(UserId, Body),
     Decoded = fh_shell_util:json_decode(EngineResp),
     case EngineStatus of
@@ -128,7 +185,7 @@ create(UserId, Body) ->
             %% Record the shell's view AFTER the engine has committed the card, so a
             %% view never dangles without its engine counterpart. Idempotent on
             %% (user_id, engine_plan_card_id).
-            ok = fh_shell_store:insert_plan_card_view(UserId, PlanCardId, title_of(Body)),
+            ok = fh_shell_store:insert_plan_card_view(UserId, PlanCardId, title_of(Body), Key),
             {202, Decoded};
         _ ->
             {EngineStatus, Decoded}

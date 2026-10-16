@@ -110,10 +110,13 @@ export interface OnboardingInput {
     buyer_stage?: 'first_home' | 'next_home';
 }
 
-/** The engine's 202 reply: the new plan card + the base turn now running async. */
+/** The engine's 202 reply: the new plan card + the base turn now running async. A
+ *  repeat of a create key the owner already used (behavior 97) carries the first
+ *  create's plan_card_id, `repeat: true` and no turn_id. */
 export interface CreatePlanCardResult {
     plan_card_id: string;
-    turn_id: string;
+    turn_id?: string;
+    repeat?: boolean;
 }
 
 /** A discriminated outcome so the UI can branch calmly (§7.1) without try/catch.
@@ -130,12 +133,20 @@ export type CreateOutcome =
  *  create returns 401 → `auth_required`. */
 export async function createPlanCard(
     body: OnboardingInput,
-    fetchFn: typeof fetch = fetch
+    fetchFn: typeof fetch = fetch,
+    /** The tap's create key (behavior 97): sent again with a retry, so the shell
+     *  returns the plan this tap already made instead of making a second. */
+    createKey?: string,
+    signal?: AbortSignal
 ): Promise<CreateOutcome> {
     const res = await fetchFn('/api/plan-cards', {
         method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify(body)
+        headers: {
+            'content-type': 'application/json',
+            ...(createKey ? { 'create-key': createKey } : {})
+        },
+        body: JSON.stringify(body),
+        signal
     });
     if (res.status === 202) {
         return { kind: 'created', result: (await res.json()) as CreatePlanCardResult };
@@ -147,6 +158,20 @@ export async function createPlanCard(
         if (b.error === 'guest_daily_limit') return { kind: 'guest_limit', limit: b.limit ?? 3 };
     }
     return { kind: 'error', status: res.status };
+}
+
+/** POST /api/auth/guest (behavior 97): make this browser a guest before its first
+ *  create, so the guest's cookie never rides on the create's reply alone. A browser
+ *  with a session is left as it is. True once the shell has answered — whatever it
+ *  said: a refusal (the address at its daily cap) leaves the create to answer with the
+ *  same cap, as it always has. False when no answer came (offline): try again. */
+export async function startGuest(fetchFn: typeof fetch = fetch): Promise<boolean> {
+    try {
+        await fetchFn('/api/auth/guest', { method: 'POST' });
+        return true;
+    } catch {
+        return false;
+    }
 }
 
 // --- Plan projection: read a card + list a user's cards (8-S4c) --------------

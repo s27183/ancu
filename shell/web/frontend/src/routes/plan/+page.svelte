@@ -26,6 +26,7 @@
     import { session, guest, refreshSession } from '$lib/stores/session';
     import { loginOpen } from '$lib/stores/ui';
     import { savePending, takePending, type OnboardingAnswers } from '$lib/pendingOnboarding';
+    import { readDraft, type OnboardingDraft } from '$lib/onboardingDraft';
     import PlanProjection from '$lib/PlanProjection.svelte';
     import Onboarding from '$lib/Onboarding.svelte';
     import SectionMenu from '$lib/SectionMenu.svelte';
@@ -99,6 +100,20 @@
     let pick = $state<AuState>('NSW');
     let planning = $state(false);
     let restoreAnswers = $state<OnboardingAnswers | undefined>(undefined);
+    let resumeTap = $state<Pick<OnboardingDraft, 'createKey' | 'planId'> | undefined>(undefined);
+
+    // Behavior 97: this tab was reloaded (Safari, after a lock) while the questions were
+    // open — reopen them with their answers, or pick the tap up where it was (send its
+    // create again, or go back to its wait). onboardingDraft.ts keeps them.
+    {
+        const d = readDraft();
+        if (d) {
+            if (isState(d.scope)) pick = d.scope;
+            restoreAnswers = d.answers;
+            resumeTap = { createKey: d.createKey, planId: d.planId };
+            planning = true;
+        }
+    }
 
     // Back from a sign-in begun here: reopen the onboarding with its answers, or (a guest
     // who signed in from their plan) show the plan they now own.
@@ -111,6 +126,7 @@
         if (isState(p.scope)) pick = p.scope;
         if (p.answers) {
             restoreAnswers = p.answers;
+            resumeTap = undefined;
             planning = true;
         } else reload++;
     });
@@ -129,6 +145,7 @@
         // From an open plan ("Thử lại" on one that did not finish, behavior 94): its state.
         if (open && open.state && isState(open.state)) pick = open.state;
         restoreAnswers = undefined;
+        resumeTap = undefined;
         planning = true;
     }
     // The state picker over the list (behavior 86, moved to the list by 96).
@@ -255,6 +272,7 @@
         <Onboarding
             stateCode={pick}
             initial={restoreAnswers}
+            resume={resumeTap}
             oncreated={(id) => {
                 planning = false;
                 choosing = false;

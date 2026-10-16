@@ -9,7 +9,7 @@
     // plan-first payload (constraint #1). Mobile-native: one decision per step, big tap
     // targets, the primary action in the thumb zone, calm terminal states (§7.1). The
     // base plan itself renders later, in the Plan tab (8-S4).
-    import { createPlanCard } from '$lib/api';
+    import { createPlanCard, getPlanCard, startGuest, type CreateOutcome, type OnboardingInput } from '$lib/api';
     import {
         BUDGET_BANDS,
         buildOnboardingInput,
@@ -24,15 +24,20 @@
     import type { OnboardingAnswers } from '$lib/pendingOnboarding';
     import { subscribePlanCard, type PlanCardStream } from '$lib/planCardStream';
     import { describeFailure, type FailureView } from '$lib/turnFailure';
-    import { onDestroy } from 'svelte';
+    import { saveDraft, clearDraft, newCreateKey, type OnboardingDraft } from '$lib/onboardingDraft';
+    import { onDestroy, onMount } from 'svelte';
 
-    let { stateCode, suburbName, suburbSal, initial, onclose, onsignin, oncreated }: {
+    let { stateCode, suburbName, suburbSal, initial, resume, onclose, onsignin, oncreated }: {
         stateCode: string;
         /** Absent on the planner page (behavior 81): a plan for the state alone. */
         suburbName?: string;
         suburbSal?: string;
         /** Answers restored after the sign-in round-trip (pendingOnboarding.ts). */
         initial?: OnboardingAnswers;
+        /** A tap this tab already made before it was reloaded (onboardingDraft.ts): its
+         *  create key (the create is sent again) or, once the reply came, its plan (the
+         *  wait resumes). */
+        resume?: Pick<OnboardingDraft, 'createKey' | 'planId'>;
         onclose: () => void;
         /** Sign-in is needed; the answers so far ride along so they survive the redirect. */
         onsignin: (answers: OnboardingAnswers) => void;
@@ -60,7 +65,10 @@
             band: band === null ? null : BUDGET_BANDS.indexOf(band)
         };
     }
-    let createdId = '';
+    // svelte-ignore state_referenced_locally
+    let createdId = resume?.planId ?? '';
+    // svelte-ignore state_referenced_locally
+    let createKey = resume?.createKey ?? '';
     let phase = $state<'form' | 'submitting' | 'waiting' | 'failed' | 'auth' | 'limit' | 'error'>('form');
     let guestLimit = $state(3);
 
@@ -129,24 +137,119 @@
             : `${nf.format(b.lo)} – ${nf.format(b.hi)}`;
     }
 
+    // A tap survives the phone (behavior 97; the block above onboardingDraft.ts).
+    // The answers, the tap's create key and then its plan are kept in this tab's
+    // sessionStorage as they change, so a reloaded /plan reopens the dialog where it was.
+    // The guest is made when the dialog opens (startGuest), before any create, so the
+    // create's reply is not the only carrier of the guest's cookie. A create whose reply
+    // does not come (offline, a 5xx, the phone locked mid-request) is sent again with the
+    // same key, after a pause or at once when the page is shown again — the shell answers
+    // a repeat with the plan it already made, so one tap is one plan however many times
+    // it is sent.
+    const RETRY_MS = [1000, 2000, 4000, 4000, 8000, 8000];
+    let finished = false;
+    let destroyed = false;
+    let guestOk: Promise<boolean> = startGuest();
+    let inflight: AbortController | null = null;
+    let wake: (() => void) | null = null;
+
+    function keep() {
+        if (finished) return;
+        saveDraft({
+            scope: stateCode,
+            answers: answers(),
+            createKey: createKey || undefined,
+            planId: createdId || undefined,
+            ts: Date.now()
+        });
+    }
+    // Every answer, every phase: on record as it changes.
+    $effect(() => {
+        void phase;
+        void [intent, citizenPr, firstHome, band];
+        keep();
+    });
+    function forget() {
+        finished = true;
+        clearDraft();
+    }
+
+    function pause(ms: number): Promise<void> {
+        return new Promise((resolve) => {
+            const t = setTimeout(done, ms);
+            function done() {
+                clearTimeout(t);
+                wake = null;
+                resolve();
+            }
+            wake = done;
+        });
+    }
+
+    async function send(input: OnboardingInput): Promise<CreateOutcome> {
+        for (let i = 0; ; i++) {
+            if (!(await guestOk)) guestOk = startGuest();
+            await guestOk;
+            inflight = new AbortController();
+            let outcome: CreateOutcome | null = null;
+            try {
+                outcome = await createPlanCard(input, fetch, createKey, inflight.signal);
+            } catch {
+                outcome = null; // no reply: offline, aborted, or the phone dropped it
+            }
+            inflight = null;
+            const lost = outcome === null || (outcome.kind === 'error' && outcome.status >= 500);
+            if (!lost || destroyed || i >= RETRY_MS.length) return outcome ?? { kind: 'error', status: 0 };
+            await pause(RETRY_MS[i]);
+        }
+    }
+
     async function submit() {
         if (band === null || intent === null) return;
+        if (!createKey) createKey = newCreateKey();
+        createdId = '';
         phase = 'submitting';
-        const outcome = await createPlanCard(
+        keep(); // the key is on record before the create leaves
+        const outcome = await send(
             buildOnboardingInput(stateCode, suburbName, suburbSal, band, intent, isForeign, buyerStage)
         );
+        if (destroyed) return;
         if (outcome.kind === 'guest_limit') guestLimit = outcome.limit;
         if (outcome.kind === 'created') {
             createdId = outcome.result.plan_card_id;
             phase = 'waiting';
+            keep();
             wait(createdId);
             return;
         }
+        // Refused before any plan was made: the next tap is a new create. A plain error
+        // keeps the key, so tapping again repeats this tap.
+        if (outcome.kind !== 'error') createKey = '';
         phase =
             outcome.kind === 'guest_limit' ? 'limit'
             : outcome.kind === 'auth_required' ? 'auth'
             : 'error';
     }
+
+    // Shown again after a lock or an app switch: a create still waiting for its reply
+    // is sent again now rather than after its pause.
+    function onVisible() {
+        if (document.visibilityState !== 'visible') return;
+        if (phase === 'submitting') {
+            inflight?.abort();
+            wake?.();
+        } else if (phase === 'waiting' && createdId) void recheck(createdId);
+    }
+    onMount(() => {
+        document.addEventListener('visibilitychange', onVisible);
+        // A reloaded tab picks the tap up where it was.
+        if (createdId) {
+            phase = 'waiting';
+            wait(createdId);
+        } else if (createKey) void submit();
+        return () => document.removeEventListener('visibilitychange', onVisible);
+    });
+    onDestroy(() => (destroyed = true));
 
     // The wait after a create (behavior 92).
     // Goal property: a visitor sees the plan being made, then lands on it with no tap.
@@ -176,19 +279,44 @@
     function stopWait() {
         stream?.close();
         stream = null;
+        clearTimeout(errTimer);
         clearInterval(ticker);
         clearTimeout(slowTimer);
     }
     onDestroy(stopWait);
+
+    // Behavior 97: a phone that locks during the wait freezes the ticker and may close
+    // the stream for good (iOS does; EventSource then stops reconnecting). So the wait
+    // also asks the card itself — GET /api/plan-cards/:id — when the page is shown again,
+    // when the stream errs, and when a reloaded tab resumes it: once the budget
+    // (cash_position) is on the card it lands at once, the remaining lines filled, and
+    // otherwise it listens to the stream afresh (the replay carries what was missed).
+    let filled = new Set<string>();
+    let ready = false;
+    let errTimer: ReturnType<typeof setTimeout> | undefined;
 
     function wait(id: string) {
         stopWait();
         shown = 0;
         slow = false;
         failure = null;
-        const filled = new Set<string>();
-        let ready = false;
+        filled = new Set<string>();
+        ready = false;
         const started = Date.now();
+        listen(id);
+        ticker = setInterval(() => {
+            const byEvents = filled.has('mortgage_finance') ? 2 : filled.size > 0 ? 1 : 0;
+            const byTime = Math.min(WAIT_LINES.length - 1, Math.floor((Date.now() - started) / TIME_STEP_MS));
+            const target = ready ? WAIT_LINES.length : Math.max(byEvents, byTime);
+            if (shown < target) shown += 1;
+            if (shown >= WAIT_LINES.length) land();
+        }, STEP_MS);
+        slowTimer = setTimeout(() => (slow = true), SLOW_MS);
+        void recheck(id, false);
+    }
+
+    function listen(id: string) {
+        stream?.close();
         stream = subscribePlanCard(id, {
             onComponentFilled: (e) => {
                 if (e.property_id) return;
@@ -202,21 +330,31 @@
                 }
                 stopWait();
                 failure = describeFailure(failed);
+                // "Thử lại" is a new tap, for a new plan: it gets its own key.
+                createKey = '';
                 phase = 'failed';
+            },
+            onError: () => {
+                clearTimeout(errTimer);
+                errTimer = setTimeout(() => void recheck(id), 2000);
             }
         });
-        ticker = setInterval(() => {
-            const byEvents = filled.has('mortgage_finance') ? 2 : filled.size > 0 ? 1 : 0;
-            const byTime = Math.min(WAIT_LINES.length - 1, Math.floor((Date.now() - started) / TIME_STEP_MS));
-            const target = ready ? WAIT_LINES.length : Math.max(byEvents, byTime);
-            if (shown < target) shown += 1;
-            if (shown >= WAIT_LINES.length) land();
-        }, STEP_MS);
-        slowTimer = setTimeout(() => (slow = true), SLOW_MS);
+    }
+
+    // Read the card: land if its budget is there; else listen again if the stream died.
+    async function recheck(id: string, relisten = true) {
+        const got = await getPlanCard(id).catch(() => null);
+        if (phase !== 'waiting' || createdId !== id) return;
+        if (got?.kind === 'ok' && got.card.content?.components?.cash_position) {
+            ready = true;
+            shown = WAIT_LINES.length;
+            land();
+        } else if (relisten && document.visibilityState === 'visible') listen(id);
     }
 
     function land() {
         stopWait();
+        forget();
         oncreated(createdId);
     }
 
@@ -228,7 +366,15 @@
 
     function close() {
         if (phase === 'waiting' || phase === 'failed') land();
-        else onclose();
+        else {
+            forget();
+            onclose();
+        }
+    }
+    // Sign-in takes the answers over (pendingOnboarding.ts); this tab's draft goes.
+    function signin() {
+        forget();
+        onsignin(answers());
     }
 </script>
 
@@ -279,7 +425,7 @@
     {:else if phase === 'limit'}
         <div class="ob-terminal">
             <p>{$t('guest.limit').replace('{n}', String(guestLimit))}</p>
-            <button type="button" class="primary" onclick={() => onsignin(answers())}
+            <button type="button" class="primary" onclick={signin}
                 >{$t('auth.signin')}</button
             >
         </div>
@@ -287,7 +433,7 @@
         <div class="ob-terminal">
             <h3>{$t('onboarding.auth.title')}</h3>
             <p>{$t('onboarding.auth.body')}</p>
-            <button type="button" class="primary" onclick={() => onsignin(answers())}
+            <button type="button" class="primary" onclick={signin}
                 >{$t('onboarding.auth.cta')}</button
             >
         </div>
