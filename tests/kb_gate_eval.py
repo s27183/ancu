@@ -48,7 +48,10 @@ def commit(parent: str, files: dict[str, str], msg: str) -> str:
             blob = git("hash-object", "-w", "--stdin", data=text.encode())
             git("update-index", "--add", "--cacheinfo", f"100644,{blob},{path}", env=env)
         tree = git("write-tree", env=env)
-    return git("commit-tree", tree, "-p", parent, "-m", msg)
+    # A fixed identity: CI's checkout has no user.name/email, and commit-tree needs one.
+    ident = {"GIT_AUTHOR_NAME": "kb_gate_eval", "GIT_AUTHOR_EMAIL": "kb_gate_eval@invalid",
+             "GIT_COMMITTER_NAME": "kb_gate_eval", "GIT_COMMITTER_EMAIL": "kb_gate_eval@invalid"}
+    return git("commit-tree", tree, "-p", parent, "-m", msg, env={**os.environ, **ident})
 
 
 def case(path: str, url: str) -> dict:
