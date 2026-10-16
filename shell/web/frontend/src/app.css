@@ -713,6 +713,12 @@ body {
         max-height: none;
         border-radius: var(--radius-lg) var(--radius-lg) 0 0;
     }
+    /* a term card (behavior 102) is two short paragraphs read mid-sentence: it hugs its
+       content up to that height, so the plan stays in view above it */
+    .info-sheet.info-sheet-fit {
+        height: auto;
+        max-height: var(--sheet-h);
+    }
     .info-head {
         flex: none;
     }
@@ -3930,4 +3936,21 @@ main {
     .page-sheet .sheet-head .title h2 {
         font-size: var(--fs-lg);
     }
+}
+
+/* behavior 102: an Australian term that opens its card (lib/terms.ts, Termed.svelte) */
+.term {
+    text-decoration: underline dotted;
+    text-decoration-color: var(--accent);
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 0.2em;
+    cursor: pointer;
+    border-radius: 2px;
+}
+.term:hover {
+    text-decoration-style: solid;
+}
+.term:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
 }

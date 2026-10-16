@@ -800,6 +800,9 @@ const messages = {
         vi: 'Cho biết ngân hàng có thể cho vay bao nhiêu. Thu nhập không đổi khoản phí nào.',
         en: 'Sets how much a lender may lend. Income changes no fee.'
     },
+    // behavior 102: the card a tapped Australian term opens
+    'term.why': { vi: 'Với bạn:', en: 'For you:' },
+    'term.source': { vi: 'Nguồn:', en: 'Source:' },
     'plan.fin.capacity': { vi: 'Bạn vay được khoảng {x}.', en: 'A lender may lend you about {x}.' },
     'plan.fin.capacity_none': {
         vi: 'Nhập thu nhập để biết bạn vay được khoảng bao nhiêu.',

@@ -17,6 +17,7 @@
     import Modal from '$lib/Modal.svelte';
     import type { NewsNote, NewsCategory } from '$lib/api';
     import { renderInlineMarkdown } from '$lib/markdown';
+    import { terms, markTermsHtml, termClicks } from '$lib/terms';
     import { date as formatDate } from '$lib/format';
 
     let { note, onClose, onDismiss }: { note: NewsNote; onClose: () => void; onDismiss?: () => void } =
@@ -57,7 +58,7 @@
     );
     // KB authors write summaries with **bold**/*italic* (docs/kb convention) — render it,
     // don't show the buyer literal asterisks.
-    const summaryHtml = $derived(renderInlineMarkdown(summary));
+    const summaryHtml = $derived(markTermsHtml(renderInlineMarkdown(summary), $terms));
 
     // `note.diff` is a generic, schema-less JSON blob (kb_compiler.py's build-time audit
     // trail for what a news note changed) — authored for the KB-authoring/QA workflow, not
@@ -74,7 +75,7 @@
             {#if dateLabel}<span class="pp-news-meta-date">{dateLabel}</span>{/if}
         </p>
     {/if}
-    <p class="pp-news-summary">{@html summaryHtml}</p>
+    <p class="pp-news-summary" use:termClicks>{@html summaryHtml}</p>
     {#if sourceUrl}
         <a class="pp-news-source" href={sourceUrl} target="_blank" rel="noopener noreferrer"
             >{$t('plan.news.source')}</a

@@ -14,6 +14,7 @@
     //            are the playbook actions whose budget_ref is this line's id or its group.
     // Capability: the detail body; `steps` empty or no `onstep` → no steps list.
     import { t } from '$lib/i18n';
+    import Termed from '$lib/Termed.svelte';
     import { lang } from '$lib/stores/lang';
     import { pick, type ComponentEntry, type FeeDetail } from '$lib/planCard';
     import ComponentCard from '$lib/renderers/ComponentCard.svelte';
@@ -62,15 +63,15 @@
     {#if why}<p class="ld-why">{why}</p>{/if}
     <dl class="ld-facts">
         {#if d.how}
-            <div><dt>{$t('plan.sheet.fee.how')}</dt><dd>{pick(d.how, $lang)}</dd></div>
+            <div><dt>{$t('plan.sheet.fee.how')}</dt><dd><Termed text={pick(d.how, $lang)} /></dd></div>
         {:else if basis}
             <div><dt>{$t('plan.sheet.fee.range')}</dt><dd>{basis}</dd></div>
         {/if}
         {#if d.payer}
-            <div><dt>{$t('plan.sheet.fee.payer')}</dt><dd>{pick(d.payer, $lang)}</dd></div>
+            <div><dt>{$t('plan.sheet.fee.payer')}</dt><dd><Termed text={pick(d.payer, $lang)} /></dd></div>
         {/if}
         {#if d.drivers}
-            <div><dt>{$t('plan.sheet.fee.drivers')}</dt><dd>{pick(d.drivers, $lang)}</dd></div>
+            <div><dt>{$t('plan.sheet.fee.drivers')}</dt><dd><Termed text={pick(d.drivers, $lang)} /></dd></div>
         {/if}
         {#if d.source}
             <div>
@@ -82,11 +83,13 @@
         {/if}
     </dl>
     <p class="ld-note">
-        {d.note
-            ? pick(d.note, $lang)
-            : d.tier === 'REGULATED'
-              ? $t('plan.sheet.fee.regulated_note')
-              : $t('plan.sheet.fee.quote_note')}
+        <Termed
+            text={d.note
+                ? pick(d.note, $lang)
+                : d.tier === 'REGULATED'
+                  ? $t('plan.sheet.fee.regulated_note')
+                  : $t('plan.sheet.fee.quote_note')}
+        />
     </p>
     {#if onstep && steps.length > 0}
         <div class="ld-steps">

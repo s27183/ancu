@@ -25,6 +25,8 @@
     import Login from '$lib/Login.svelte';
     import PrivacySheet from '$lib/PrivacySheet.svelte';
     import AllowanceSheet from '$lib/AllowanceSheet.svelte';
+    import TermCard from '$lib/TermCard.svelte';
+    import { loadTerms } from '$lib/terms';
 
     let { children }: { children: import('svelte').Snippet } = $props();
 
@@ -43,6 +45,7 @@
     let banner = $state<SigninFlag | null>(null);
     onMount(() => {
         refreshSession();
+        void loadTerms(); // behavior 102: the term list every page marks with
         const flag = signinFlag(window.location.search);
         if (flag) {
             banner = flag;
@@ -159,6 +162,7 @@
     {@render children()}
 </main>
 <NewsBand bind:height={newsH} />
+<TermCard />
 
 {#if banner}
     <div class="signin-banner" class:ok={banner === 'ok'} role="status">

@@ -24,7 +24,7 @@
 -export([kb/1, kb_content_md/1, kb_rules/1, kb_anchors/1, copy/2]).
 -export([rules/0]).
 -export([registry/1, registry/2]).
--export([news_for_slugs/1, all_news/0, all_facts/0]).
+-export([news_for_slugs/1, all_news/0, all_facts/0, all_terms/0]).
 
 -define(PT_KEY, {?MODULE, artifact}).
 
@@ -184,6 +184,16 @@ kb_anchors(Slugs) ->
 all_facts() ->
     Facts = maps:get(<<"facts">>, artifact(), #{}),
     [E#{<<"slug">> => Slug} || {Slug, E} <- lists:sort(maps:to_list(Facts))].
+
+%% --- terms accessor -----------------------------------------------------------
+%% Bilingual -> P-7 · The KB -> The engine -> the term list a tap explains (behavior 102)
+%% The compiled `terms` list, one entry per term of docs/kb/terms/*.md ({id, abbr, name,
+%% forms, meaning, why, source}), each checked by kb_compiler.py GATE 15 (both languages,
+%% forms unique, a KB source). Global KB content, read-only, in the compiled order. An
+%% artifact predating the key reads as no terms (nothing is marked), never a crash.
+-spec all_terms() -> [map()].
+all_terms() ->
+    maps:get(<<"terms">>, artifact(), []).
 
 %% --- news accessors ----------------------------------------------------------
 %% A news entry: {kb_slug, category, affected_kb_slugs, affected_components,
