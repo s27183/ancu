@@ -1269,9 +1269,30 @@ const messages = {
         vi: 'Sở hữu bất động sản ở Úc — với một kế hoạch rõ ràng',
         en: 'Owning real estate in Australia — with a clear plan'
     },
-    'intro.lede': {
-        vi: `${BRAND} lập kế hoạch ngân sách cho cả hành trình bất động sản của bạn tại Úc — mua, giữ, bán — theo từng bang, theo quy định hiện hành và tối ưu cho hoàn cảnh của bạn. Mỗi kế hoạch có một trợ lý AI trả lời câu hỏi của bạn về chính kế hoạch đó. Bản đồ cho xem các chỉ số chính của từng khu vực.`,
-        en: `${BRAND} builds a budget plan for your whole Australian property journey — buy, hold, sell — for your state, under current regulations and optimised for your situation. Each plan comes with an AI assistant that answers your questions about it. The map shows each suburb's key indicators.`
+    // Behavior 90 (Son 2026-10-16: many users take the product for a property listing
+    // site): the first screen says what it does — three things — and what it is not —
+    // two — in short lines; "What is Mai An Cư?" leads to the long form (intro.value.*).
+    'intro.does': { vi: `${BRAND} giúp bạn`, en: `${BRAND} helps you` },
+    'intro.does.plan': {
+        vi: 'Lập ngân sách mua, giữ và bán nhà, theo từng bang',
+        en: 'Plan the budget to buy, hold and sell, by state'
+    },
+    'intro.does.data': {
+        vi: 'Xem số liệu từng khu vực trên bản đồ',
+        en: "See each suburb's data on the map"
+    },
+    'intro.does.news': {
+        vi: 'Đọc tin về quy định và thị trường',
+        en: 'Read the news on the rules and the market'
+    },
+    'intro.isnt': { vi: `${BRAND} không phải`, en: `${BRAND} is not` },
+    'intro.isnt.listing': {
+        vi: 'Trang rao bán nhà đất: không đăng bán nhà, không môi giới',
+        en: 'A property listing site: no homes for sale, no agents'
+    },
+    'intro.isnt.advice': {
+        vi: 'Dịch vụ tư vấn pháp lý, thuế hay tài chính',
+        en: 'A legal, tax or financial advice service'
     },
     // Behavior 44: the first screen leads to the platform's position in one tap
     // (invariants.md, the goal: independent; information as is, not an advice service).
@@ -1284,11 +1305,23 @@ const messages = {
         vi: 'Mọi số liệu dưới đây lấy từ cơ quan chính phủ Úc, kèm nguồn và thời điểm.',
         en: 'Every figure below comes from an Australian government agency, with its source and date.'
     },
-    'intro.value.title': { vi: `${BRAND} giúp gì cho bạn`, en: `What ${BRAND} does for you` },
-    'intro.value.independent.title': { vi: 'Một bản kiểm tra độc lập', en: 'An independent check' },
-    'intro.value.independent.body': {
-        vi: 'Không gắn với môi giới bất động sản, luật sư, đại lý di trú hay chủ đầu tư nào. Dù bạn đã mua qua kênh quen hay chưa biết bắt đầu từ đâu, bạn đều thấy được toàn bộ ngân sách mua, giữ và bán theo quy định hiện hành.',
-        en: 'Tied to no real-estate agent, lawyer, migration agent or developer. Whether you already bought through a channel you know or don’t know where to start, you see the whole budget to buy, hold and sell under current regulations.'
+    'intro.value.title': { vi: `${BRAND} là gì?`, en: `What is ${BRAND}?` },
+    'intro.value.does': { vi: 'Những gì bạn làm được ở đây', en: 'What you can do here' },
+    'intro.value.isnt': { vi: `${BRAND} không phải là`, en: `What ${BRAND} is not` },
+    'intro.value.data.title': { vi: 'Số liệu từng khu vực', en: "Each suburb's data" },
+    'intro.value.data.body': {
+        vi: 'Bản đồ cho xem các chỉ số chính của từng khu vực — cộng đồng người Việt, dân số, thu nhập, an ninh — để bạn so sánh nơi muốn sống hay đầu tư. Bạn lưu được những khu vực mình quan tâm.',
+        en: 'The map shows each suburb\'s key indicators — Vietnamese community, population, income, crime — so you can compare where to live or invest. You can save the suburbs you care about.'
+    },
+    'intro.value.news.title': { vi: 'Tin tức về quy định và thị trường', en: 'News on the rules and the market' },
+    'intro.value.news.body': {
+        vi: 'Tin ngắn khi quy định hay thị trường thay đổi — visa, tài chính, thuế, chương trình hỗ trợ — bằng tiếng Việt và tiếng Anh, kèm nguồn.',
+        en: 'Short notes when the rules or the market change — visa, finance, tax, government schemes — in Vietnamese and English, with their sources.'
+    },
+    'intro.value.listing.title': { vi: 'Không phải trang rao bán nhà đất', en: 'Not a property listing site' },
+    'intro.value.listing.body': {
+        vi: `${BRAND} không đăng bán bất động sản nào và không làm môi giới; không gắn với môi giới, luật sư, đại lý di trú hay chủ đầu tư nào. Bạn tìm nhà qua kênh mình chọn — ${BRAND} là bản kiểm tra độc lập cho toàn bộ ngân sách mua, giữ và bán theo quy định hiện hành, dù bạn đã mua hay chưa biết bắt đầu từ đâu.`,
+        en: `${BRAND} lists no property for sale and acts as no agent; it is tied to no real-estate agent, lawyer, migration agent or developer. You find a home through the channel you choose — ${BRAND} is an independent check of the whole budget to buy, hold and sell under current regulations, whether you already bought or don’t know where to start.`
     },
     'intro.value.plan.title': { vi: 'Kế hoạch trọn hành trình', en: 'One plan, the whole journey' },
     'intro.value.plan.body': {

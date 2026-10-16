@@ -1,6 +1,8 @@
 <script lang="ts">
     // The first-visit sheet (behavior 42): opens by itself the first time this browser
-    // visits, says in two sentences what the product does, draws the KB's cited facts —
+    // visits, says on its first screen what the product does (plan a budget, suburb data,
+    // news) and what it is not (a listing site, an advice service — behavior 90, Son
+    // 2026-10-16: many took it for a listing site), draws the KB's cited facts —
     // where Vietnamese buyers stand, then why Australian property — and what the product
     // adds on top of them. Closing it (✕, scrim, Escape or the CTA) flies the card into a
     // small animated launcher at the bottom-right, which reopens it (behavior 44: its first
@@ -144,7 +146,25 @@
                     </svg>
                     <span class="wl-eyebrow">{$t('intro.eyebrow')}</span>
                     <h2 id="wl-title">{$t('intro.title')}</h2>
-                    <p class="wl-lede">{$t('intro.lede')}</p>
+                    <!-- Behavior 90: what it does (three) and what it is not (two), on the
+                         first screen, before any scroll. -->
+                    <div class="wl-is">
+                        <div class="wl-is-col">
+                            <p class="wl-is-head">{$t('intro.does')}</p>
+                            <ul>
+                                <li class="yes">{$t('intro.does.plan')}</li>
+                                <li class="yes">{$t('intro.does.data')}</li>
+                                <li class="yes">{$t('intro.does.news')}</li>
+                            </ul>
+                        </div>
+                        <div class="wl-is-col">
+                            <p class="wl-is-head">{$t('intro.isnt')}</p>
+                            <ul>
+                                <li class="no">{$t('intro.isnt.listing')}</li>
+                                <li class="no">{$t('intro.isnt.advice')}</li>
+                            </ul>
+                        </div>
+                    </div>
                     <!-- The first screen leads to the platform's position in one tap and
                          invites the facts before the map (behavior 44). -->
                     <div class="wl-actions">
@@ -206,33 +226,26 @@
                     </section>
                 {/each}
 
+                <!-- Behavior 90: the long form of the first screen — what you can do here
+                     (two-up on a wide screen), then what it is not. -->
                 <section class="wl-value" aria-labelledby="wl-value-title">
                     <h3 id="wl-value-title">{$t('intro.value.title')}</h3>
+                    <h4 class="wl-value-sub">{$t('intro.value.does')}</h4>
                     <ul>
                         <li>
-                            <span class="wl-ico" aria-hidden="true">
-                                <svg viewBox="0 0 24 24"
-                                    ><path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.4 7.5 9.5 4.3-1.1 7.5-4.9 7.5-9.5V6L12 3Z" /><path
-                                        d="m8.8 12 2.2 2.2 4.2-4.4"
-                                    /></svg
-                                >
-                            </span>
-                            <strong>{$t('intro.value.independent.title')}</strong>
-                            <span>{$t('intro.value.independent.body')}</span>
-                        </li>
-                        <li>
-                            <span class="wl-ico" aria-hidden="true">
-                                <svg viewBox="0 0 24 24"><path d="M4 18h16M6 18V9l6-4 6 4v9M10 18v-5h4v5" /></svg>
-                            </span>
+                            <span class="wl-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 18h16M6 18V9l6-4 6 4v9M10 18v-5h4v5" /></svg></span>
                             <strong>{$t('intro.value.plan.title')}</strong>
                             <span>{$t('intro.value.plan.body')}</span>
                         </li>
                         <li>
-                            <span class="wl-ico" aria-hidden="true">
-                                <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5" /><path d="M5 20c.8-3.8 3.6-6 7-6s6.2 2.2 7 6" /></svg>
-                            </span>
-                            <strong>{$t('intro.value.you.title')}</strong>
-                            <span>{$t('intro.value.you.body')}</span>
+                            <span class="wl-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Z" /><path d="M9 4v14M15 6v14" /></svg></span>
+                            <strong>{$t('intro.value.data.title')}</strong>
+                            <span>{$t('intro.value.data.body')}</span>
+                        </li>
+                        <li>
+                            <span class="wl-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2" /><path d="M8 9h8M8 13h8M8 16.5h5" /></svg></span>
+                            <strong>{$t('intro.value.news.title')}</strong>
+                            <span>{$t('intro.value.news.body')}</span>
                         </li>
                         <li>
                             <span class="wl-ico wl-ico-ai" aria-hidden="true"><Sparkle size="1.1rem" /></span>
@@ -240,16 +253,25 @@
                             <span>{$t('intro.value.ai.body')}</span>
                         </li>
                         <li>
-                            <span class="wl-ico" aria-hidden="true">
-                                <svg viewBox="0 0 24 24"><path d="M5 12.5 10 17l9-10" /></svg>
-                            </span>
+                            <span class="wl-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5" /><path d="M5 20c.8-3.8 3.6-6 7-6s6.2 2.2 7 6" /></svg></span>
+                            <strong>{$t('intro.value.you.title')}</strong>
+                            <span>{$t('intro.value.you.body')}</span>
+                        </li>
+                        <li>
+                            <span class="wl-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5 10 17l9-10" /></svg></span>
                             <strong>{$t('intro.value.cited.title')}</strong>
                             <span>{$t('intro.value.cited.body')}</span>
                         </li>
+                    </ul>
+                    <h4 class="wl-value-sub">{$t('intro.value.isnt')}</h4>
+                    <ul class="wl-value-not">
                         <li>
-                            <span class="wl-ico" aria-hidden="true">
-                                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" /><path d="M12 11v5.5M12 7.6v.1" /></svg>
-                            </span>
+                            <span class="wl-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 11 12 4l8 7M6 9.5V20h12V9.5" /><path d="m4 20 16-16" /></svg></span>
+                            <strong>{$t('intro.value.listing.title')}</strong>
+                            <span>{$t('intro.value.listing.body')}</span>
+                        </li>
+                        <li>
+                            <span class="wl-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" /><path d="M12 11v5.5M12 7.6v.1" /></svg></span>
                             <strong>{$t('intro.value.info.title')}</strong>
                             <span>{$t('intro.value.info.body')}</span>
                         </li>
@@ -423,12 +445,47 @@
         text-wrap: balance;
         color: var(--ink-inverse);
     }
-    .wl-lede {
+    .wl-is {
         position: relative;
+        display: grid;
+        gap: var(--sp-3);
         margin: 0 0 var(--sp-5);
-        max-width: 38rem;
+        max-width: 44rem;
+    }
+    .wl-is-head {
+        margin: 0 0 var(--sp-1);
+        font-size: var(--fs-xs);
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--gold-mark);
+    }
+    .wl-is ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 0.2rem;
+    }
+    .wl-is li {
+        position: relative;
+        padding-left: 1.5rem;
         font-size: var(--fs-md);
-        line-height: 1.6;
+        line-height: 1.4;
+        color: var(--ink-inverse);
+    }
+    .wl-is li::before {
+        position: absolute;
+        left: 0;
+        top: 0;
+        font-weight: 800;
+    }
+    .wl-is li.yes::before {
+        content: '✓';
+        color: var(--gold-mark);
+    }
+    .wl-is li.no::before {
+        content: '✕';
         color: var(--on-dark);
     }
     .wl-actions {
@@ -591,6 +648,14 @@
         border-radius: var(--radius);
         background: var(--accent-soft);
         border: 1px solid var(--accent-soft-2);
+    }
+    .wl-value-sub {
+        margin: var(--sp-4) 0 var(--sp-3);
+        font-size: var(--fs-xs);
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--accent-press);
     }
     .wl-value ul {
         list-style: none;
@@ -797,15 +862,13 @@
             margin-left: var(--sp-6);
             margin-right: var(--sp-6);
         }
-        /* The two position statements frame the card full-width; the four
-           capabilities (the AI assistant added by behavior 59) sit between them
-           two-up, so no row is left with one item. */
+        /* Behavior 90: six things you can do, two-up; the two it is not, two-up. */
         .wl-value ul {
             grid-template-columns: repeat(2, 1fr);
         }
-        .wl-value li:first-child,
-        .wl-value li:last-child {
-            grid-column: 1 / -1;
+        .wl-is {
+            grid-template-columns: 1.2fr 1fr;
+            gap: var(--sp-6);
         }
         .wl-grid {
             grid-template-columns: repeat(2, 1fr);
