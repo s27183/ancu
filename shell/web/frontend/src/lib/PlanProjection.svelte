@@ -45,7 +45,6 @@
     import { money, moneyRange } from '$lib/format';
     import ComponentCard from '$lib/renderers/ComponentCard.svelte';
     import OverviewCard from '$lib/renderers/OverviewCard.svelte';
-    import Calculator from '$lib/renderers/Calculator.svelte';
     import FlowView from '$lib/renderers/FlowView.svelte';
     import LifecycleSheet from '$lib/LifecycleSheet.svelte';
     import Tabs from '$lib/Tabs.svelte';
@@ -90,34 +89,10 @@
     // (there is deliberately no plan.ltab.qa label — qa uses plan.tab.qa).
     const railTabs = $derived(uiTabs.filter((t) => t.kind !== 'qa'));
 
-    // Section grouping (2026-07-09, Son's request; the rails it grouped are gone since
-    // behavior 93 — the section menu groups the same way), updated 2026-07-11 once Mode B's
-    // task-13 rewrite retired the last blueprint on the pre-restructure flat tab vocabulary
-    // (plan-card-lifecycle-restoration.md §11.3) — every in-scope blueprint now declares at
-    // most 5 rail tabs (overview/flow/budget/[portfolio|family]/qa), under RAIL_GROUP_THRESHOLD,
-    // so grouping is currently dormant everywhere; kept as a static map (not deleted) since a
-    // future blueprint growing past the threshold again just needs an entry added here.
-    // `overview` and `qa` are never grouped (always-visible anchors); everything else buckets
-    // into the coarse halves of this project's buy→hold→sell mental model (see the swimlane's
-    // own finer-grained `plan.phase.*` labels below for the 6-step version this coarsens).
-    // An unmapped future tab_id defaults into 'buy' rather than silently vanishing.
-    const TAB_GROUP: Record<string, 'buy' | 'hold'> = {
-        flow: 'buy',
-        family: 'buy',
-        budget: 'hold',
-        portfolio: 'hold'
-    };
-    const RAIL_GROUP_THRESHOLD = 5;
-    const overviewTab = $derived(railTabs.find((t) => t.tab_id === 'overview'));
-    const nonOverviewRailTabs = $derived(railTabs.filter((t) => t.tab_id !== 'overview'));
-    const railGrouped = $derived(nonOverviewRailTabs.length > RAIL_GROUP_THRESHOLD);
-
-    // The budget (Cash-calculator) tab's three sub-tabs (§7.3): the cockpit inputs + the
-    // "Bạn đã đủ chưa?" verdict → the cash-events table → the breakdown detail. Labels reuse
-    // the existing calculator keys. A self-owned table row routes here to 'detail'.
-    let budgetSub = $state<string>('sheet');
-    // The budget sub-tabs are derived below, after `viewComponents` (the 4th "Full horizon"
-    // tab is gated on the disposition component existing).
+    // Behavior 95: the budget is one sheet chain (the statement → phase sheets → line
+    // details, LifecycleSheet); the cockpit, table, breakdown and full-horizon sub-tabs are gone.
+    // A statement line's detail opens Hành trình at a step that links it (`flowAt`).
+    let flowAt = $state<{ phase: string; action: string } | null>(null);
 
     let phase = $state<'loading' | 'ready' | 'no_card' | 'error'>('loading');
     let components = $state<Record<string, ComponentEntry>>({});
@@ -575,110 +550,51 @@
         }
     }
 
-    // The budget (Cash-calculator) sub-tabs (§7.3): cockpit + verdict → cash-events table →
-    // breakdown detail → the disposition projection. The 4th "Full horizon" tab is present
-    // only when the engine emits a disposition component (honest-partial tab presence; its
-    // own content is honest-partial too — an invitation until a hold horizon H is set). TW5.
-    const budgetTabs = $derived([
-        // Behavior 82: the one-page lifecycle budget lands first (the bird's-eye layer);
-        // the cockpit, table and breakdown are the zoom-in.
-        { id: 'sheet', label: $t('plan.sheet.tab') },
-        { id: 'table', label: $t('plan.cash.spine') },
-        { id: 'detail', label: $t('plan.cash.breakdown') },
-        ...(viewComponents.disposition ? [{ id: 'horizon', label: $t('plan.cash.horizon') }] : [])
-    ]);
-
-    // Whole lifecycle -> P-7 · One declaration per outcome shape -> The web frontend -> the Budget breakdown draws the declared cards
-    // The interactive Budget tab drew only the Calculator, so every other component its ui_tabs
-    // entry declares was computed and never shown (measured 2026-10-07 in Chrome: a Mode C
-    // card's tax_structure, with its setup band, on no tab; B and D drop firb_workflow,
-    // cross_border_funding, yield and non-resident tax the same way). The breakdown sub-tab
-    // now draws them below the Calculator; cash_position and disposition keep their own
-    // sub-tabs, and an uncomputed card is skipped, not shown pending (behavior 11).
-    // The phone's section menu (behavior 68, sections.svelte.ts): the same tabs the
-    // rails show, from the same `sub`/`budgetSub`, grouped as the rails group them; the
-    // budget's sub-tabs listed under it; the assistant last, in its accent.
+    // Whole lifecycle -> bilingual; information as is -> the web frontend -> the planner's two places
+    // Goal:      behavior 95 — the plan's section menu (behavior 68, sections.svelte.ts) holds
+    //            two fixed entries, "Ngân sách" (the statement chain) and "Hành trình" (the
+    //            lifecycle checklist), no sub-items; the assistant is the head's "Hỏi AI"
+    //            (sectionReg.ask), never a menu entry.
+    // Invariant: the engine's ui_tabs stay its declaration (invariants.md: a shell may ignore
+    //            them); the two entries are its interactive tab (cash_position) and its flow
+    //            tab — "Tổng quan", "Danh mục" and "Gia đình" are not offered. A card with
+    //            neither (an engine before ui_tabs) lists its tabs as before, so a version
+    //            skew never blanks the menu.
+    // Capability: picking Ngân sách from any sheet returns to the statement (leaveLayer pops
+    //            an open phase sheet); picking Hành trình opens the swimlane.
     const sectionReg = useSections();
-    const SECTION_ICON: Record<string, SectionIcon> = {
-        overview: 'overview',
-        flow: 'flow',
-        budget: 'budget',
-        portfolio: 'portfolio',
-        family: 'family'
-    };
+    const budgetTab = $derived(uiTabs.find((tb) => tb.interactive));
+    const flowTab = $derived(uiTabs.find((tb) => tb.kind === 'flow'));
     // A pick from the menu leaves an open phase sheet of the statement (its history entry,
     // LifecycleSheet), so the budget's first sheet is the statement again.
     function leaveLayer() {
         if (page.state.lifecycle) history.back();
     }
-    function railItems(tabs: UiTab[]): SectionItem[] {
-        return tabs.flatMap((tb) => {
-            const item: SectionItem = {
-                id: tb.tab_id,
-                label: $t(`plan.ltab.${tb.tab_id}` as 'plan.ltab.overview'),
-                icon: SECTION_ICON[tb.tab_id] ?? 'overview',
-                active: sub === tb.tab_id || (!sub && tb === uiTabs[0]),
-                select: () => {
-                    leaveLayer();
-                    sub = tb.tab_id;
-                }
-            };
-            if (!(tb.interactive && viewComponents.cash_position)) return [item];
-            return [
-                { ...item, parent: true },
-                ...budgetTabs.map((bt) => ({
-                    id: `${tb.tab_id}:${bt.id}`,
-                    label: bt.label,
-                    icon: 'sub' as const,
-                    nested: true,
-                    active: item.active && budgetSub === bt.id,
-                    select: () => {
-                        leaveLayer();
-                        sub = tb.tab_id;
-                        budgetSub = bt.id;
-                    }
-                }))
-            ];
-        });
-    }
     const sectionGroups = $derived.by<SectionGroup[]>(() => {
         if (railTabs.length === 0) return [];
-        const planLabel = $t('sheet.tab.plan');
-        const groups: SectionGroup[] = railGrouped
-            ? [
-                  { id: 'plan', label: planLabel, items: overviewTab ? railItems([overviewTab]) : [] },
-                  ...(['buy', 'hold'] as const).map((g) => ({
-                      id: g,
-                      label: $t(`plan.railgroup.${g}` as 'plan.railgroup.buy'),
-                      items: railItems(
-                          nonOverviewRailTabs.filter((tb) => (TAB_GROUP[tb.tab_id] ?? 'buy') === g)
-                      )
-                  }))
-              ]
-            : [{ id: 'plan', label: planLabel, items: railItems(railTabs) }];
-        groups.push({
-            id: 'qa',
-            items: [
-                {
-                    id: 'qa',
-                    label: $t('plan.tab.qa'),
-                    icon: 'qa',
-                    accent: true,
-                    active: sub === 'qa',
-                    select: () => {
-                        leaveLayer();
-                        sub = 'qa';
-                    }
-                }
-            ]
+        const entry = (tb: UiTab, icon: SectionIcon): SectionItem => ({
+            id: tb.tab_id,
+            label: $t(`plan.ltab.${tb.tab_id}` as 'plan.ltab.overview'),
+            icon,
+            active: sub === tb.tab_id,
+            select: () => {
+                leaveLayer();
+                flowAt = null;
+                sub = tb.tab_id;
+            }
         });
-        return groups;
+        const items: SectionItem[] =
+            budgetTab || flowTab
+                ? [
+                      ...(budgetTab ? [entry(budgetTab, 'budget')] : []),
+                      ...(flowTab ? [entry(flowTab, 'flow')] : [])
+                  ]
+                : railTabs.map((tb) => entry(tb, 'overview'));
+        return [{ id: 'plan', label: $t('sheet.tab.plan'), items }];
     });
     const sectionCurrent = $derived.by(() => {
         if (sub === 'qa') return $t('plan.tab.qa_short');
         if (!activeTab) return '';
-        if (activeTab.interactive && viewComponents.cash_position)
-            return budgetTabs.find((bt) => bt.id === budgetSub)?.label ?? '';
         return $t(`plan.ltab.${activeTab.tab_id}` as 'plan.ltab.overview');
     });
     $effect(() => {
@@ -698,12 +614,6 @@
             }
         };
     });
-
-    const budgetCards = $derived(
-        (activeTab?.interactive ? activeTab.components : []).filter(
-            (cid) => cid !== 'cash_position' && cid !== 'disposition' && viewComponents[cid]
-        )
-    );
 
     // ── Flow view (task 10) ────────────────────────────────────────────────
     // The legal/temporal spine's three live inputs, read from viewComponents so a what-if
@@ -921,7 +831,8 @@
             seedFinancials(); // seed income/debts from the card's stored profile facts (IC5)
             checklistStatus = res.card.checklist_status ?? {};
             uiTabs = res.card.ui_tabs?.length ? res.card.ui_tabs : FALLBACK_TABS;
-            if (!uiTabs.some((t) => t.tab_id === sub)) sub = uiTabs[0]?.tab_id ?? '';
+            if (!uiTabs.some((t) => t.tab_id === sub))
+                sub = (uiTabs.find((t) => t.interactive) ?? uiTabs[0])?.tab_id ?? '';
             cardId = match.plan_card_id;
             cardState = res.card.state ?? '';
             phase = 'ready';
@@ -1275,19 +1186,6 @@
         </Modal>
     {/if}
 
-    <!-- Behavior 45: a guest's plan says what it is — kept 7 days, sign in to keep it;
-         one line since behavior 93 (the full notice stays on the assistant's tab). The
-         plan's sections (the tab rows above it until behavior 93) are in the section menu,
-         so the plan's first sheet is the first thing under the head. -->
-    {#if $guest && sub !== 'qa'}
-        <p class="pp-guest pp-guest-line" role="note">
-            {$t('guest.notice_short')} ·
-            <button type="button" class="pp-guest-signin" onclick={() => loginOpen.set(true)}
-                >{$t('auth.signin')}</button
-            >
-        </p>
-    {/if}
-
     <!-- Cross-tab what-if indicator: the price/state cockpit lives in the Cash-calculator
          tab (the financial spine is where you reason about money), but a scenario re-renders
          EVERY tab — so on the other tabs, signpost that the figures are a preview, with a
@@ -1334,6 +1232,7 @@
                 {checklistStatus}
                 onToggle={toggleChecklist}
                 filling={running}
+                openAt={flowAt}
             />
             <!-- Whole lifecycle -> P-4 · The engine is coupled to no shell -> The web
                  frontend -> settlement_prep under the swimlane (behavior 25, #35)
@@ -1358,72 +1257,30 @@
                  The interactive tab is [cash_position]; any other component falls through. -->
             <section class="pp-card pp-calc pp-flat">
                 {#if viewComponents.cash_position}
-                    {#if budgetSub === 'sheet'}
-                        {#if scenarioActive}
-                            <div class="pp-whatif active">
-                                <p class="pp-wi-banner">{$t('plan.whatif.banner')}</p>
-                                <button type="button" class="pp-wi-reset" onclick={resetPreview}
-                                    >{$t('plan.whatif.reset')}</button
-                                >
-                            </div>
-                        {/if}
-                        <LifecycleSheet
-                            components={viewComponents}
-                            filling={running}
-                            horizon={horizonValue}
-                            planState={planBase}
-                            busy={previewing}
-                            onhorizon={chooseHold}
-                            planId={cardId}
-                            priceControl={viewingProperty ? undefined : priceControl}
-                            buyExtra={viewingProperty ? undefined : finances}
-                        />
-                    {:else}
-                        <!-- Tabs 2/3: the cockpit is on tab 1, so signpost an active preview here. -->
-                        {#if previewActive}
-                            <div class="pp-whatif active">
-                                <p class="pp-wi-banner">{$t('plan.whatif.banner')}</p>
-                                <button type="button" class="pp-wi-reset" onclick={resetPreview}
-                                    >{$t('plan.whatif.reset')}</button
-                                >
-                            </div>
-                        {/if}
-                        {#if budgetSub === 'table'}
-                            <!-- Tab 2: the cash-events table. A self-owned row → the Detail tab. -->
-                            <Calculator
-                                outcome={viewComponents.cash_position.outcome}
-                                view="table"
-                                components={viewComponents}
-                                onShowDetail={() => (budgetSub = 'detail')}
-                                density="full"
-                            />
-                        {:else if budgetSub === 'horizon'}
-                            <!-- Tab 4 (TW5): the disposition projection — the sell-side +
-                                 full-horizon net position, a SEPARATE outcome via the same
-                                 calculator renderer. Honest-partial: invitation until H set. -->
-                            {#if viewComponents.disposition}
-                                <Calculator
-                                    outcome={viewComponents.disposition.outcome}
-                                    view="disposition"
-                                    components={viewComponents}
-                                    density="full"
-                                />
-                            {:else}
-                                <p class="pp-pending">{$t('plan.computing')}</p>
-                            {/if}
-                        {:else}
-                            <!-- Tab 3: the breakdown detail, inline. -->
-                            <Calculator
-                                outcome={viewComponents.cash_position.outcome}
-                                view="detail"
-                                components={viewComponents}
-                                density="full"
-                            />
-                            {#each budgetCards as cid (cid)}
-                                <ComponentCard componentId={cid} entry={viewComponents[cid]} filling={running} />
-                            {/each}
-                        {/if}
+                    {#if scenarioActive}
+                        <div class="pp-whatif active">
+                            <p class="pp-wi-banner">{$t('plan.whatif.banner')}</p>
+                            <button type="button" class="pp-wi-reset" onclick={resetPreview}
+                                >{$t('plan.whatif.reset')}</button
+                            >
+                        </div>
                     {/if}
+                    <LifecycleSheet
+                        components={viewComponents}
+                        filling={running}
+                        horizon={horizonValue}
+                        planState={planBase}
+                        busy={previewing}
+                        onhorizon={chooseHold}
+                        planId={cardId}
+                        priceControl={viewingProperty ? undefined : priceControl}
+                        buyExtra={viewingProperty ? undefined : finances}
+                        onstep={(st) => {
+                            leaveLayer();
+                            if (flowTab) sub = flowTab.tab_id;
+                            flowAt = { phase: st.phase, action: st.id };
+                        }}
+                    />
                 {:else if running}
                     <p class="pp-computing"><span class="pp-spinner" aria-hidden="true"></span>{$t('plan.computing')}</p>
                 {:else}
@@ -1481,6 +1338,19 @@
             {#if failure.retry}<button type="button" onclick={load}>{$t('plan.retry')}</button>{/if}
         </div>
     {/if}
+    <!-- Behavior 45: a guest's plan says what it is — kept 7 days, sign in to keep it;
+         one line since behavior 93 (the full notice stays on the assistant's tab). Since
+         behavior 95 it sits at the foot, over the disclaimer, so nothing but the head is
+         above the plan's first sheet. -->
+    {#if $guest && sub !== 'qa'}
+        <p class="pp-guest pp-guest-line" role="note">
+            {$t('guest.notice_short')} ·
+            <button type="button" class="pp-guest-signin" onclick={() => loginOpen.set(true)}
+                >{$t('auth.signin')}</button
+            >
+        </p>
+    {/if}
+
     <!-- Behavior 20: every plan carries the ASIC decision-support line; a foreign-buyer
          plan (Mode B fhb-foreign-au, Mode D investor-foreign-au) also the FIRB line.
          Behavior 93: shown as one line, "Xem thêm" opening the full text — shortened,

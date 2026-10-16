@@ -37,6 +37,9 @@
     //            its low and high ends — "Đủ" or "Còn thiếu <total − sum>" — a subtraction,
     //            never a figure of its own; kept in this browser per plan (localStorage),
     //            never sent. The household figures behind the loan sit under it, closed.
+    //            A line's detail (LineDetail, the same body PhaseSheet opens over the
+    //            checklist) names the checklist steps that link it; choosing one is
+    //            `onstep` — the planner opens Hành trình at that step.
     // Known gaps: the hold-years choice is a what-if preview, not saved with the plan.
     import { tick, type Snippet } from 'svelte';
     import { pushState } from '$app/navigation';
@@ -53,9 +56,10 @@
         type FeeDetail,
         type MoneyRange,
         type PendingLine,
-        type BesideLine
+        type BesideLine,
+        type PhasePlaybookOutcome
     } from '$lib/planCard';
-    import ComponentCard from '$lib/renderers/ComponentCard.svelte';
+    import LineDetail, { type LineStep } from '$lib/LineDetail.svelte';
     import { money, moneyRange } from '$lib/format';
 
     let {
@@ -67,7 +71,8 @@
         onhorizon,
         planId = null,
         priceControl,
-        buyExtra
+        buyExtra,
+        onstep
     }: {
         components: Record<string, ComponentEntry>;
         filling: boolean;
@@ -83,7 +88,21 @@
         priceControl?: Snippet;
         /** Drawn on the Mua sheet under "Tiền bạn có". */
         buyExtra?: Snippet;
+        /** A step that links a line, chosen from the line's detail: open Hành trình there. */
+        onstep?: (s: LineStep) => void;
     } = $props();
+
+    // behavior 95: the checklist steps that link a line — the playbook actions whose
+    // budget_ref is the line's id or the figure it belongs to (its group).
+    const playbook = $derived(components.phase_playbook?.outcome as PhasePlaybookOutcome | undefined);
+    function stepsFor(e: CashEvent): LineStep[] {
+        const refs = [e.id, e.group].filter((r): r is string => !!r);
+        return (playbook?.phases ?? []).flatMap((p) =>
+            (p.actions ?? [])
+                .filter((a) => a.budget_ref && refs.includes(a.budget_ref))
+                .map((a) => ({ phase: p.phase, id: a.id, label: a.label }))
+        );
+    }
 
     // "Tiền bạn có": the visitor's own sum, kept in this browser for this plan only.
     const CASH_KEY = 'fh.cash_on_hand.';
@@ -241,29 +260,6 @@
     function needsLabel(p: PendingLine): string {
         return $t(`plan.sheet.needs.${p.needs}` as 'plan.sheet.needs.income');
     }
-    // why a shown line is left out of the total (opened with its detail), or null.
-    function notCounted(d: FeeDetail): string | null {
-        if (d.optional) return $t('plan.sheet.fee.optional');
-        if (d.condition === 'strata') return $t('plan.sheet.fee.if_strata');
-        if (d.condition === 'house') return $t('plan.sheet.fee.if_house');
-        return null;
-    }
-    // a percentage line states its rate and base; a fixed line's range is its amount.
-    function basisText(d: FeeDetail): string | null {
-        const [lo, hi] = d.band;
-        if (d.basis === 'fixed' || lo == null || hi == null) return null;
-        const fmt = (n: number) => n.toLocaleString($lang === 'vi' ? 'vi-VN' : 'en-AU');
-        return $t(`plan.sheet.basis.${d.basis}` as 'plan.sheet.basis.pct_of_sale')
-            .replace('{lo}', fmt(lo))
-            .replace('{hi}', fmt(hi));
-    }
-    function sourceHost(url: string): string {
-        try {
-            return new URL(url).hostname.replace(/^www\./, '');
-        } catch {
-            return url;
-        }
-    }
 </script>
 
 {#if openGroup}
@@ -415,50 +411,13 @@
 {/snippet}
 
 {#snippet fee(e: CashEvent, d: FeeDetail)}
-    {@const why = notCounted(d)}
-    {@const basis = basisText(d)}
     <details class="ls-fee">
         <summary class="ls-line-btn">
             {@render body(e)}
             <span class="ls-caret ls-fee-caret" aria-hidden="true">›</span>
         </summary>
         <div class="ls-fee-detail">
-            {#if why}<p class="ls-fee-why">{why}</p>{/if}
-            <dl class="ls-fee-facts">
-                {#if d.how}
-                    <div><dt>{$t('plan.sheet.fee.how')}</dt><dd>{pick(d.how, $lang)}</dd></div>
-                {:else if basis}
-                    <div><dt>{$t('plan.sheet.fee.range')}</dt><dd>{basis}</dd></div>
-                {/if}
-                {#if d.payer}
-                    <div><dt>{$t('plan.sheet.fee.payer')}</dt><dd>{pick(d.payer, $lang)}</dd></div>
-                {/if}
-                {#if d.drivers}
-                    <div><dt>{$t('plan.sheet.fee.drivers')}</dt><dd>{pick(d.drivers, $lang)}</dd></div>
-                {/if}
-                {#if d.source}
-                    <div>
-                        <dt>{$t('plan.sheet.fee.source')}</dt>
-                        <dd>
-                            <a href={d.source} target="_blank" rel="noopener noreferrer"
-                                >{sourceHost(d.source)}</a
-                            >
-                        </dd>
-                    </div>
-                {/if}
-            </dl>
-            <p class="ls-fee-note">
-                {d.note
-                    ? pick(d.note, $lang)
-                    : d.tier === 'REGULATED'
-                      ? $t('plan.sheet.fee.regulated_note')
-                      : $t('plan.sheet.fee.quote_note')}
-            </p>
-            {#each (d.explains ?? []).filter((c) => components[c]) as cid (cid)}
-                <div class="ls-explains">
-                    <ComponentCard componentId={cid} entry={components[cid]} {filling} />
-                </div>
-            {/each}
+            <LineDetail detail={d} {components} {filling} steps={stepsFor(e)} {onstep} />
         </div>
     </details>
 {/snippet}
@@ -569,19 +528,7 @@
     .ls-fee-caret { transition: transform 0.15s ease; }
     .ls-fee[open] .ls-fee-caret { transform: rotate(90deg); }
     @media (prefers-reduced-motion: reduce) { .ls-fee-caret { transition: none; } }
-    .ls-fee-detail {
-        display: grid; gap: 0.5rem; padding: 0 0.75rem 0.75rem;
-        font-size: var(--fs-sm, 0.875rem); color: var(--ink);
-    }
-    .ls-fee-why { margin: 0; font-size: var(--fs-xs, 0.75rem); color: var(--muted); font-style: italic; }
-    .ls-fee-facts { margin: 0; display: grid; gap: 0.4rem; }
-    .ls-fee-facts > div { display: grid; gap: 0.1rem; }
-    .ls-fee-facts dt {
-        font-size: var(--fs-2xs, 0.6875rem); font-weight: 700; color: var(--muted);
-        text-transform: uppercase; letter-spacing: 0.04em;
-    }
-    .ls-fee-facts dd { margin: 0; max-width: 65ch; }
-    .ls-fee-facts a { color: var(--accent); overflow-wrap: anywhere; }
+    .ls-fee-detail { padding: 0 0.75rem 0.75rem; }
     /* "Tiền bạn có": the visitor's sum, then each end of the Mua total enough or short. */
     .ls-cash {
         display: grid; gap: 0.5rem; padding: 0.6rem 0.75rem; background: var(--surface);
@@ -598,8 +545,4 @@
     .ls-cash-verdict dt { color: var(--muted); font-size: var(--fs-sm, 0.875rem); }
     .ls-cash-verdict dd { margin: 0; font-weight: 700; color: var(--success); font-variant-numeric: tabular-nums; }
     .ls-cash-verdict .ls-short dd { color: var(--danger, var(--warning)); }
-    /* behavior 95: the component a line explains, drawn inside its detail. */
-    .ls-explains { border-top: 1px solid var(--border); padding-top: 0.5rem; }
-    .ls-explains :global(.pp-card) { margin: 0; padding: 0; border: 0; box-shadow: none; background: none; }
-    .ls-fee-note { margin: 0; font-size: var(--fs-xs, 0.75rem); color: var(--muted); }
 </style>

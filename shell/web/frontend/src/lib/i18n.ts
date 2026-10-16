@@ -746,6 +746,7 @@ const messages = {
     'plan.sheet.cash_ok': { vi: 'Đủ', en: 'Enough' },
     'plan.sheet.cash_short': { vi: 'Còn thiếu {x}', en: '{x} short' },
     'plan.sheet.finances': { vi: 'Thu nhập và khoản nợ', en: 'Income and debts' },
+    'plan.sheet.steps': { vi: 'Trong hành trình', en: 'In the journey' },
     // Budget cockpit (the prototype's input form, engine-driven).
     'plan.cockpit.title': { vi: 'Ngân sách — bạn đã sẵn sàng?', en: 'Budget — am I ready?' },
     'plan.cockpit.intro': {
