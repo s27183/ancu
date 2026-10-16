@@ -24,9 +24,11 @@ Bậc thuế thu nhập thứ hai giảm từ 16% xuống 15% cho năm 2026-27
 
 From 1 July 2026, the resident income-tax rate on income between **$18,201 and $45,000** dropped from **16% to 15%**. Every other bracket boundary and rate is unchanged. If your borrowing-capacity figures were calculated against last year's 2025-26 schedule, your net income — and therefore your capacity — is now **up to $268/year higher** than shown.
 
+
 ## Summary (VI)
 
 Từ ngày 1/7/2026, mức thuế thu nhập cư trú áp dụng cho thu nhập từ **18.201 đến 45.000 đô la** đã giảm từ **16% xuống 15%**. Mọi bậc thuế khác không đổi. Nếu năng lực vay của bạn được tính theo bảng thuế năm 2025-26 trước đó, thu nhập ròng — và do đó năng lực vay — hiện có thể cao hơn tới **268 đô la/năm** so với con số đang hiển thị.
+
 
 ## Diff
 

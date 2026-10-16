@@ -26,11 +26,25 @@ Cải cách CGT đã thành luật: khấu trừ 50% bị thay bằng lập ch�
 
 ## Summary (EN)
 
-The *Treasury Laws Amendment (Tax Reform No. 1) Act 2026* (Act No. 49 of 2026) received **Royal Assent on 26 June 2026**, after passing both Houses on 25 June 2026. It **replaces the 50% CGT discount** for individuals, trusts and partnerships with **cost-base indexation** (tax on the real, inflation-adjusted gain) plus a **30% minimum tax rate** on real capital gains (pensioners exempt) — but it doesn't take effect until **1 July 2027**. The 50% discount remains the applicable law for every disposal up to that date. For an existing holding, the gain accrued up to 1 July 2027 stays taxed under the old 50% rule; the gain accruing after is taxed under the new regime. New-build investors get a choice between the two regimes. This also changes negative-gearing settings (limited to new builds from 1 Jul 2027) and the CGT trade-off between entity types (company/trust/SMSF/individual). If your plan modelled a disposal or entity comparison before 26 June 2026, it was working from a *proposed* reform — it's now enacted law, still with the same 1 July 2027 start date.
+The *Treasury Laws Amendment (Tax Reform No. 1) Act 2026* (Act No. 49 of 2026) received **Royal Assent on 26 June 2026**, after passing both Houses on 25 June 2026.
+
+It **replaces the 50% CGT discount** for individuals, trusts and partnerships with **cost-base indexation** (tax on the real, inflation-adjusted gain) plus a **30% minimum tax rate** on real capital gains (pensioners exempt) — but it doesn't take effect until **1 July 2027**. The 50% discount remains the applicable law for every disposal up to that date.
+
+For an existing holding, the gain accrued up to 1 July 2027 stays taxed under the old 50% rule; the gain accruing after is taxed under the new regime. New-build investors get a choice between the two regimes. This also changes negative-gearing settings (limited to new builds from 1 Jul 2027) and the CGT trade-off between entity types (company/trust/SMSF/individual).
+
+If your plan modelled a disposal or entity comparison before 26 June 2026, it was working from a *proposed* reform — it's now enacted law, still with the same 1 July 2027 start date.
+
 
 ## Summary (VI)
 
-*Luật sửa đổi thuế (Cải cách thuế số 1) 2026* (Đạo luật số 49/2026) đã được **Toàn quyền phê chuẩn ngày 26/6/2026**, sau khi được cả hai viện Quốc hội thông qua ngày 25/6/2026. Luật này **thay thế mức khấu trừ 50% thuế lãi vốn (CGT)** đối với cá nhân, quỹ tín thác và hợp danh bằng **lập chỉ số theo giá vốn** (đánh thuế trên phần lãi thực, đã điều chỉnh lạm phát) cùng **mức thuế tối thiểu 30%** trên lãi vốn thực (người hưởng lương hưu được miễn) — nhưng luật này **chưa có hiệu lực cho đến ngày 1/7/2027**. Mức khấu trừ 50% vẫn được áp dụng cho mọi giao dịch bán trước ngày đó. Với tài sản đang nắm giữ, phần lãi phát sinh đến 1/7/2027 vẫn tính theo quy tắc khấu trừ 50% cũ; phần lãi phát sinh sau đó tính theo chế độ mới. Nhà đầu tư mua nhà mới xây được chọn giữa hai chế độ. Thay đổi này cũng ảnh hưởng đến quy định negative gearing (chỉ áp dụng cho nhà mới xây từ 1/7/2027) và bài toán so sánh giữa các loại hình sở hữu (công ty/quỹ tín thác/SMSF/cá nhân). Nếu kế hoạch của bạn từng mô phỏng việc bán tài sản hoặc so sánh loại hình sở hữu trước ngày 26/6/2026, khi đó luật này còn là *đề xuất* — nay đã chính thức thành luật, vẫn giữ nguyên ngày bắt đầu hiệu lực 1/7/2027.
+*Luật sửa đổi thuế (Cải cách thuế số 1) 2026* (Đạo luật số 49/2026) đã được **Toàn quyền phê chuẩn ngày 26/6/2026**, sau khi được cả hai viện Quốc hội thông qua ngày 25/6/2026.
+
+Luật này **thay thế mức khấu trừ 50% thuế lãi vốn (CGT)** đối với cá nhân, quỹ tín thác và hợp danh bằng **lập chỉ số theo giá vốn** (đánh thuế trên phần lãi thực, đã điều chỉnh lạm phát) cùng **mức thuế tối thiểu 30%** trên lãi vốn thực (người hưởng lương hưu được miễn) — nhưng luật này **chưa có hiệu lực cho đến ngày 1/7/2027**.
+
+Mức khấu trừ 50% vẫn được áp dụng cho mọi giao dịch bán trước ngày đó. Với tài sản đang nắm giữ, phần lãi phát sinh đến 1/7/2027 vẫn tính theo quy tắc khấu trừ 50% cũ; phần lãi phát sinh sau đó tính theo chế độ mới. Nhà đầu tư mua nhà mới xây được chọn giữa hai chế độ.
+
+Thay đổi này cũng ảnh hưởng đến quy định negative gearing (chỉ áp dụng cho nhà mới xây từ 1/7/2027) và bài toán so sánh giữa các loại hình sở hữu (công ty/quỹ tín thác/SMSF/cá nhân). Nếu kế hoạch của bạn từng mô phỏng việc bán tài sản hoặc so sánh loại hình sở hữu trước ngày 26/6/2026, khi đó luật này còn là *đề xuất* — nay đã chính thức thành luật, vẫn giữ nguyên ngày bắt đầu hiệu lực 1/7/2027.
+
 
 ## Diff
 

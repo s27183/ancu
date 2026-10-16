@@ -21,11 +21,17 @@ Chương trình đặt cọc 5%: danh sách của Housing Australia nay có 54 b
 
 ## Summary (EN)
 
-Housing Australia's participating-lender page for the Australian Government 5% Deposit Scheme now lists **54 lenders** (counting brands such as St George, Bank of Melbourne and BankSA separately), above the approximate figure of **32** this platform had used since July 2026. All four major banks (ANZ, Commonwealth Bank, NAB and Westpac) remain on it, alongside customer-owned, mutual and regional banks. A loan backed by the scheme can only be written by a lender on this list; each lender still applies its own rates, fees and credit assessment.
+Housing Australia's participating-lender page for the Australian Government 5% Deposit Scheme now lists **54 lenders** (counting brands such as St George, Bank of Melbourne and BankSA separately), above the approximate figure of **32** this platform had used since July 2026.
+
+All four major banks (ANZ, Commonwealth Bank, NAB and Westpac) remain on it, alongside customer-owned, mutual and regional banks. A loan backed by the scheme can only be written by a lender on this list; each lender still applies its own rates, fees and credit assessment.
+
 
 ## Summary (VI)
 
-Trang danh sách bên cho vay tham gia Chương trình đặt cọc 5% của Chính phủ Úc do Housing Australia quản lý nay liệt kê **54 bên cho vay** (tính riêng các thương hiệu như St George, Bank of Melbourne và BankSA), cao hơn con số ước tính **32** mà nền tảng này sử dụng từ tháng 7/2026. Cả bốn ngân hàng lớn (ANZ, Commonwealth Bank, NAB và Westpac) vẫn có mặt, cùng với các ngân hàng thuộc sở hữu khách hàng, ngân hàng tương hỗ và ngân hàng khu vực. Khoản vay được chương trình bảo lãnh chỉ có thể do một bên cho vay trong danh sách này cấp; mỗi bên vẫn áp dụng lãi suất, phí và cách thẩm định tín dụng riêng.
+Trang danh sách bên cho vay tham gia Chương trình đặt cọc 5% của Chính phủ Úc do Housing Australia quản lý nay liệt kê **54 bên cho vay** (tính riêng các thương hiệu như St George, Bank of Melbourne và BankSA), cao hơn con số ước tính **32** mà nền tảng này sử dụng từ tháng 7/2026.
+
+Cả bốn ngân hàng lớn (ANZ, Commonwealth Bank, NAB và Westpac) vẫn có mặt, cùng với các ngân hàng thuộc sở hữu khách hàng, ngân hàng tương hỗ và ngân hàng khu vực. Khoản vay được chương trình bảo lãnh chỉ có thể do một bên cho vay trong danh sách này cấp; mỗi bên vẫn áp dụng lãi suất, phí và cách thẩm định tín dụng riêng.
+
 
 ## Diff
 

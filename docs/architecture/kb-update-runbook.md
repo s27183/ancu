@@ -290,7 +290,8 @@ not a sentence explaining why it matters — that's what Summary is for.
 Same fact, in Vietnamese, same length bar.
 
 ## Summary (EN)
-Plain-language, one or two sentences — what changed and why a buyer might care.
+Plain language, in short paragraphs split by a blank line, each at most 400
+characters: what changed first, then the detail, then what it means for buying.
 Read in the detail sheet after tapping the ticker headline, never in the ticker
 strip itself.
 
@@ -311,7 +312,8 @@ user-facing claim and gets the same citation bar as a fact doc, no exemption)
 and **every entry a URL on a `*.gov.au` host** (`NEWS_SOURCE_HOST_SUFFIX`; see
 "Government sources only" below),
 the `## Diff` block present and parseable, the EN/VI summary
-bilingual-well-formed (the same check as a KB doc's `copy` templates), and the
+bilingual-well-formed (the same check as a KB doc's `copy` templates) with every
+summary paragraph <=400 chars (`NEWS_PARAGRAPH_MAX_CHARS`, behavior 103), and the
 EN/VI **headline** bilingual-well-formed AND <=100 chars each (`NEWS_HEADLINE_MAX_CHARS`)
 — a headline is ticker copy, a hard contract, so an over-length headline fails
 the build rather than silently degrading the ticker UI for every note after it.
@@ -319,6 +321,37 @@ A news note is **never** anchored by a blueprint; it is parsed into its own arti
 array (`artifact["news"]`), never mixed into `kb`, so it never enters GATE 2/6/7
 or a blueprint's registry (GATE 10 itself doesn't apply — GATE 11's own
 `sources:` check is the news-note-scoped equivalent).
+
+**Short paragraphs, tables, plain visa names (behavior 103, Son 2026-10-17).**
+A Vietnamese reader on a phone read the visa notes as one block of up to 1,178
+characters. So:
+
+- **Paragraphs.** A summary is written as short paragraphs, each at most 400
+  characters (`NEWS_PARAGRAPH_MAX_CHARS`) in both languages; GATE 11 fails the
+  build on a longer one, naming the note, the language and the paragraph. Order:
+  the change, then its detail, then what it means for buying.
+- **Tables for numbers by category.** A note that reports planning levels (places
+  per visa category), a state's nomination allocations (190/491 places by state)
+  or any set of figures by category puts them in a markdown table, one row per
+  category, last year's and this year's figures side by side, with the visa
+  subclasses the category covers in the row's name. The detail sheet draws the
+  table (lib/markdown.ts `renderMarkdown`); a table has no paragraph limit. Every
+  figure is a quote in the note's archived source, like any other figure; a
+  subclass is named in a row only when a Home Affairs page ties it to that
+  category. Planning levels come from Home Affairs' "Migration Program planning
+  levels" page; state allocations, whenever they are published, from Home Affairs
+  or the state's own nomination page (both `.gov.au`).
+- **Visa names a reader searches for.** Name a visa as Home Affairs does, with its
+  subclasses, and in Vietnamese keep the English name: "visa Partner (vợ/chồng hoặc
+  bạn đời: 820/801 nộp tại Úc, 309/100 nộp từ nước ngoài)", never "visa Hôn phối",
+  which reads as marriage only. A visa word a reader may not know (Partner visa,
+  Ministerial Direction) is a term in `docs/kb/terms/` so a tap explains it
+  (behavior 102).
+
+A note is immutable in what it claims. Laying out its summary again — paragraphs,
+a table of figures its archived source already carries, a visa's plainer name —
+makes no new claim, so behavior 103 did that to the existing notes in place; a new
+figure or a changed fact still gets a new note.
 
 **Government sources only (behavior 39, 2026-10-09).** Every source a news note
 cites is a public Australian government channel — a host under `.gov.au`

@@ -32,11 +32,25 @@ Thường trú 2026–27: 185.000 suất, tăng diện chủ bảo lãnh, giảm
 
 ## Summary (EN)
 
-The **2026–27 Permanent Migration Program**, which runs from **1 July 2026**, stays at **185,000** places, and **129,590** of them go to migrants already living in Australia. Within it, places change by category: Employer-Sponsored (such as subclass 186) rises from **44,000** to **58,040**, Skilled Independent (189) from **16,900** to **21,090**, and State/Territory Nominated (190) from **33,000** to **35,500**, while Regional (such as 491) falls from **33,000** to **14,110**. Partner places rise from **40,500** to **41,500**; Parent places fall from **8,500** to **7,060**. The Government announced these levels on **12 May 2026**. What the status means for buying: a permanent resident who is ordinarily resident in Australia (here 200 or more days of the past year) is not a foreign person for FIRB and can use the First Home Guarantee, while a temporary visa holder is a foreign person; whether a permanent resident pays a state's foreign buyer surcharge depends on the state.
+The **2026–27 Permanent Migration Program**, which runs from **1 July 2026**, stays at **185,000** places, and **129,590** of them go to migrants already living in Australia.
+
+Within it, places change by category: Employer-Sponsored (such as subclass 186) rises from **44,000** to **58,040**, Skilled Independent (189) from **16,900** to **21,090**, and State/Territory Nominated (190) from **33,000** to **35,500**, while Regional (such as 491) falls from **33,000** to **14,110**.
+
+Partner places rise from **40,500** to **41,500**; Parent places fall from **8,500** to **7,060**. The Government announced these levels on **12 May 2026**.
+
+What the status means for buying: a permanent resident who is ordinarily resident in Australia (here 200 or more days of the past year) is not a foreign person for FIRB and can use the First Home Guarantee, while a temporary visa holder is a foreign person; whether a permanent resident pays a state's foreign buyer surcharge depends on the state.
+
 
 ## Summary (VI)
 
-**Chương trình Di trú Thường trú 2026–27**, áp dụng từ **1/7/2026**, giữ nguyên **185.000** suất, trong đó **129.590** suất dành cho người di cư đang sống tại Úc. Số suất thay đổi theo từng diện: diện Chủ lao động bảo lãnh (như diện 186) tăng từ **44.000** lên **58.040**, diện Tay nghề độc lập (189) từ **16.900** lên **21.090**, diện Bang/Vùng lãnh thổ đề cử (190) từ **33.000** lên **35.500**, còn diện Regional (như 491) giảm từ **33.000** xuống **14.110**. Suất visa Hôn phối tăng từ **40.500** lên **41.500**; suất visa Cha mẹ giảm từ **8.500** xuống **7.060**. Chính phủ công bố các mức này ngày **12/5/2026**. Ý nghĩa với việc mua nhà: thường trú nhân cư trú thường xuyên tại Úc (ở Úc từ 200 ngày trở lên trong 12 tháng qua) không phải người nước ngoài theo FIRB và được dùng chương trình Bảo lãnh Mua nhà Lần đầu (First Home Guarantee), còn người giữ visa tạm trú là người nước ngoài; thường trú nhân có phải đóng phụ phí người mua nước ngoài hay không thì tùy từng bang.
+**Chương trình Di trú Thường trú 2026–27**, áp dụng từ **1/7/2026**, giữ nguyên **185.000** suất, trong đó **129.590** suất dành cho người di cư đang sống tại Úc.
+
+Số suất thay đổi theo từng diện: diện Chủ lao động bảo lãnh (như diện 186) tăng từ **44.000** lên **58.040**, diện Tay nghề độc lập (189) từ **16.900** lên **21.090**, diện Bang/Vùng lãnh thổ đề cử (190) từ **33.000** lên **35.500**, còn diện Regional (như 491) giảm từ **33.000** xuống **14.110**.
+
+Suất visa Hôn phối tăng từ **40.500** lên **41.500**; suất visa Cha mẹ giảm từ **8.500** xuống **7.060**. Chính phủ công bố các mức này ngày **12/5/2026**.
+
+Ý nghĩa với việc mua nhà: thường trú nhân cư trú thường xuyên tại Úc (ở Úc từ 200 ngày trở lên trong 12 tháng qua) không phải người nước ngoài theo FIRB và được dùng chương trình Bảo lãnh Mua nhà Lần đầu (First Home Guarantee), còn người giữ visa tạm trú là người nước ngoài; thường trú nhân có phải đóng phụ phí người mua nước ngoài hay không thì tùy từng bang.
+
 
 ## Notes
 

@@ -23,11 +23,17 @@ Bảo lãnh Ngôi nhà Đầu tiên: bỏ giới hạn suất và thu nhập t�
 
 ## Summary (EN)
 
-From 1 October 2025 the First Home Guarantee was materially expanded: **unlimited places** (the old annual cap is gone), **no income caps**, and **higher property price caps** by location. The former Regional First Home Buyer Guarantee was folded into this single scheme. If you were assessed against the pre-October-2025 scheme — a place-limited, income-tested version with lower price caps — re-check eligibility and the cap for your target suburb; you may now qualify or have more room than previously shown.
+From 1 October 2025 the First Home Guarantee was materially expanded: **unlimited places** (the old annual cap is gone), **no income caps**, and **higher property price caps** by location. The former Regional First Home Buyer Guarantee was folded into this single scheme.
+
+If you were assessed against the pre-October-2025 scheme — a place-limited, income-tested version with lower price caps — re-check eligibility and the cap for your target suburb; you may now qualify or have more room than previously shown.
+
 
 ## Summary (VI)
 
-Từ ngày 1/10/2025, chương trình Bảo lãnh Ngôi nhà Đầu tiên đã được mở rộng đáng kể: **không giới hạn số suất** (bỏ mức trần hàng năm trước đây), **không giới hạn thu nhập**, và **nâng mức trần giá bất động sản** theo từng khu vực. Chương trình Bảo lãnh Người mua nhà lần đầu vùng nông thôn trước đây đã được gộp vào chương trình này. Nếu bạn từng được đánh giá theo phiên bản trước tháng 10/2025 — có giới hạn suất, xét thu nhập và mức trần giá thấp hơn — hãy kiểm tra lại điều kiện và mức trần cho khu vực bạn nhắm đến; bạn có thể hiện đủ điều kiện hoặc có dư địa nhiều hơn so với trước.
+Từ ngày 1/10/2025, chương trình Bảo lãnh Ngôi nhà Đầu tiên đã được mở rộng đáng kể: **không giới hạn số suất** (bỏ mức trần hàng năm trước đây), **không giới hạn thu nhập**, và **nâng mức trần giá bất động sản** theo từng khu vực. Chương trình Bảo lãnh Người mua nhà lần đầu vùng nông thôn trước đây đã được gộp vào chương trình này.
+
+Nếu bạn từng được đánh giá theo phiên bản trước tháng 10/2025 — có giới hạn suất, xét thu nhập và mức trần giá thấp hơn — hãy kiểm tra lại điều kiện và mức trần cho khu vực bạn nhắm đến; bạn có thể hiện đủ điều kiện hoặc có dư địa nhiều hơn so với trước.
+
 
 ## Diff
 

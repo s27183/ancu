@@ -21,11 +21,21 @@ QLD: Ưu đãi Đất Trống Ngôi nhà Đầu tiên miễn thuế hoàn toàn,
 
 ## Summary (EN)
 
-From **1 May 2025** Queensland's **First Home Vacant Land Concession** — for a first home buyer who buys land to build on — was overhauled in step with the new-home concession: eligible vacant land now pays **nil transfer duty with no value cap**. This replaced the previous regime (9 June 2024 – 30 April 2025), which gave nil duty only at **$350,000 or under**, tapering to no concession at **$500,000**, for a maximum saving of **$10,675**. If your plan modelled a Queensland land purchase against that capped band, the concession is now materially larger and the $500,000 cut-off no longer applies. The 2-year build-and-move-in window and worldwide prior-ownership test are unchanged, and the new figures apply only to contracts dated 1 May 2025 or later.
+From **1 May 2025** Queensland's **First Home Vacant Land Concession** — for a first home buyer who buys land to build on — was overhauled in step with the new-home concession: eligible vacant land now pays **nil transfer duty with no value cap**.
+
+This replaced the previous regime (9 June 2024 – 30 April 2025), which gave nil duty only at **$350,000 or under**, tapering to no concession at **$500,000**, for a maximum saving of **$10,675**. If your plan modelled a Queensland land purchase against that capped band, the concession is now materially larger and the $500,000 cut-off no longer applies.
+
+The 2-year build-and-move-in window and worldwide prior-ownership test are unchanged, and the new figures apply only to contracts dated 1 May 2025 or later.
+
 
 ## Summary (VI)
 
-Từ ngày **1/5/2025**, **Ưu đãi Đất Trống Ngôi nhà Đầu tiên (First Home Vacant Land Concession)** của Queensland — dành cho người mua nhà lần đầu mua đất để xây nhà — đã được cải tổ cùng lúc với ưu đãi nhà mới: đất trống đủ điều kiện nay **hoàn toàn không phải trả thuế chuyển nhượng, không giới hạn giá trị**. Điều này thay thế chế độ trước đó (9/6/2024 – 30/4/2025), vốn chỉ miễn thuế ở mức **$350.000 trở xuống**, giảm dần đến mức không còn ưu đãi ở **$500.000**, với mức tiết kiệm tối đa **$10.675**. Nếu kế hoạch của bạn từng tính ưu đãi này cho việc mua đất ở Queensland theo mức giới hạn cũ, khoản ưu đãi nay lớn hơn đáng kể và ngưỡng $500.000 không còn áp dụng. Thời hạn 2 năm để xây và chuyển vào ở cùng điều kiện xét lịch sử sở hữu nhà trên toàn thế giới không thay đổi, và các con số mới chỉ áp dụng cho hợp đồng ký từ ngày 1/5/2025 trở đi.
+Từ ngày **1/5/2025**, **Ưu đãi Đất Trống Ngôi nhà Đầu tiên (First Home Vacant Land Concession)** của Queensland — dành cho người mua nhà lần đầu mua đất để xây nhà — đã được cải tổ cùng lúc với ưu đãi nhà mới: đất trống đủ điều kiện nay **hoàn toàn không phải trả thuế chuyển nhượng, không giới hạn giá trị**.
+
+Điều này thay thế chế độ trước đó (9/6/2024 – 30/4/2025), vốn chỉ miễn thuế ở mức **$350.000 trở xuống**, giảm dần đến mức không còn ưu đãi ở **$500.000**, với mức tiết kiệm tối đa **$10.675**. Nếu kế hoạch của bạn từng tính ưu đãi này cho việc mua đất ở Queensland theo mức giới hạn cũ, khoản ưu đãi nay lớn hơn đáng kể và ngưỡng $500.000 không còn áp dụng.
+
+Thời hạn 2 năm để xây và chuyển vào ở cùng điều kiện xét lịch sử sở hữu nhà trên toàn thế giới không thay đổi, và các con số mới chỉ áp dụng cho hợp đồng ký từ ngày 1/5/2025 trở đi.
+
 
 ## Diff
 
