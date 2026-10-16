@@ -56,7 +56,10 @@ in `docs/kb/news/` as the shape to copy.
              - "Surcharge purchaser duty is 9% of the dutiable value"
      Every number you add to the doc's body must appear in one of its quotes, written
      the same way. Quote only a primary: a government site (*.gov.au) for a regulated
-     figure, or the lender's own site for a lender policy. A figure whose only source is
+     figure, or the provider's own published price for its own fee: the lender's site
+     for a lender policy or discharge fee, a bank's or transfer service's fee page for
+     the FX docs, the land registry (nswlrs.com.au, titlesqld.com.au) for its
+     registration fee (scripts/kb_gate.py PROVIDER_HOSTS). A figure whose only source is
      a broker, comparison or news site is still drafted, but it will be held for Son.
      For a first-visit fact (`docs/kb/facts/`), also make sure every `quotes` string the
      fact carries is found in the archive (GATE 12). Bump
