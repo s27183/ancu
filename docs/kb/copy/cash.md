@@ -71,6 +71,10 @@ template ids the resolver references, each a `{vi, en}` pair.
       "vi": "Giả định mức đặt cọc tối thiểu {pct}% theo phương án Bảo lãnh Nhà đầu tiên (không cần bảo hiểm khoản vay LMI).",
       "en": "Assumes the minimum {pct}% deposit on the First Home Guarantee path (no LMI)."
     },
+    "deposit_chosen": {
+      "vi": "Mức đặt cọc bạn chọn: {amount}.",
+      "en": "The deposit you chose: {amount}."
+    },
     "deposit_min_floor": {
       "vi": "Giả định mức đặt cọc tối thiểu {pct}%; phương án vay của bạn sẽ xác nhận con số này.",
       "en": "Assumes the minimum {pct}% deposit; your loan path will confirm the figure."

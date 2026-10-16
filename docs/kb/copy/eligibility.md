@@ -46,6 +46,7 @@ Everything above is `content_md`. The `copy` block is this doc's `content_json`.
     "fhog_if_new_build":    { "vi": "Chỉ áp dụng nếu bạn mua nhà xây mới; $0 đối với nhà đã qua sử dụng.", "en": "Applies only to a new build; $0 for an established home." },
     "total_excludes":       { "vi": "Tổng chưa bao gồm {names} (giá trị tùy theo chi tiết chưa xác định).", "en": "Total excludes {names} (value depends on details not yet known)." },
 
+    "fhg_not_needed":  { "vi": "Không cần: với mức đặt cọc từ 20% giá nhà trở lên (hoặc mua đứt, không vay) thì không có bảo hiểm khoản vay (LMI), nên không có gì để bảo lãnh.", "en": "Not needed: with a deposit of 20% of the price or more (or buying outright, with no loan) there is no lenders mortgage insurance (LMI), so there is nothing to guarantee." },
     "band_cap_above":  { "vi": "Giới hạn giá bất động sản là {cap}; mức mục tiêu của bạn bắt đầu cao hơn mức đó.", "en": "Property price cap is {cap}; your target starts above it." },
     "band_straddle":   { "vi": "Đủ điều kiện cho bất động sản đến {max}; mức giới hạn chính xác tùy theo khu vực.", "en": "Eligible for properties up to {max}; the exact cap depends on the suburb." },
     "type_new_build":  { "vi": "Áp dụng cho nhà xây mới hoặc mua theo dự án (off-the-plan) đủ điều kiện.", "en": "Available for an eligible new build or off-the-plan purchase." },

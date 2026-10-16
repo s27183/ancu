@@ -600,7 +600,8 @@ The `mortgage_plan` outcome feeds `cash_position` (loan amount + buffer requirem
     "cash_events": "array<{ id: string, phase: string, label: localized_text, direction: enum [out, in], amount: money_range|null, is_estimate: bool, timing: enum [one_off, recurring], period: enum [once, monthly, quarterly, annual]|null, counterparty: string, source_component: string }>",
     "fee_pending": "array<{ id: string, phase: string, needs: enum [price, income, rent, quote, hold_years], label: localized_text|null }>",  // behavior 83 (2026-10-16): each fee line this component owns whose base is still missing (a % of the rent before a property, of the price before a range) or that waits on a quote — named, never a guessed figure (fh_engine_fees); purchase_journey folds them into lifecycle_budget.pending
     "mitigation_options_if_short": "array<string>",
-    "key_assumptions": "array<localized_text>"
+    "key_assumptions": "array<localized_text>",
+    "deposit_bounds": "{ min: money, max: money, min_pct: percentage, assumed: money|null, chosen: money|null, price: money }",  // behavior 101 (2026-10-16): the deposit the buyer may choose in "Tài chính của bạn" — min = the mode's KB minimum % (min_pct) of the price basis (range ceiling or attached price), max = that price (buying outright); assumed = the plan's own deposit, chosen = the buyer's (deposit_amount), null when unset. null with no price
   }
 }
 ```

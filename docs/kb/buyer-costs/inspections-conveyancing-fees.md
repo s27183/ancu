@@ -275,7 +275,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
           "applies": {
             "modes": ["fhb-domestic-au", "fhb-foreign-au", "investor-domestic-au", "investor-foreign-au", "nexthome-domestic-au"],
             "states": "all",
-            "property": "any"
+            "property": "any", "loan": true
           },
           "optional": false,
           "label":   { "vi": "Phí hồ sơ / thiết lập khoản vay (application / establishment fee)", "en": "Loan application / establishment fee" },
@@ -290,7 +290,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
           "applies": {
             "modes": ["fhb-domestic-au", "fhb-foreign-au", "investor-domestic-au", "investor-foreign-au", "nexthome-domestic-au"],
             "states": "all",
-            "property": "any"
+            "property": "any", "loan": true
           },
           "optional": false,
           "label":   { "vi": "Phí định giá của ngân hàng (valuation)", "en": "Lender valuation" },
