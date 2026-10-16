@@ -1,5 +1,8 @@
 -module(fh_engine_h_plan_cards).
 
+%% GET /api/engine/plan-cards?ids=<uuid>,<uuid>… — each named card's list line
+%% {plan_card_id, state, updated_at} for the planner's saved-plans list (behavior 84);
+%% at most ?MAX_IDS ids, unknown ids left out. The shell names the ids it owns.
 %% POST /api/engine/plan-cards — create a plan card from onboarding inputs
 %% (mode/state/target price range/target zone/intent) and start the base planning
 %% turn (engine-contract §2.1, constraint #1 plan-first). Returns {plan_card_id,
@@ -26,11 +29,39 @@
 init(Req0, State) ->
     case cowboy_req:method(Req0) of
         <<"POST">> -> handle_post(Req0, State);
+        <<"GET">> -> handle_list(Req0, State);
         _ ->
             Req = fh_engine_http:reply_json(405,
                 #{<<"error">> => <<"method_not_allowed">>}, Req0),
             {ok, Req, State}
     end.
+
+-define(MAX_IDS, 200).
+
+handle_list(Req0, State) ->
+    case fh_engine_http:authenticate(Req0) of
+        {ok, #{tenant_id := T}} ->
+            Ids = case lists:keyfind(<<"ids">>, 1, cowboy_req:parse_qs(Req0)) of
+                      {_, Csv} when is_binary(Csv) ->
+                          [I || I <- binary:split(Csv, <<",">>, [global, trim_all]), is_uuid(I)];
+                      _ -> []
+                  end,
+            case length(Ids) =< ?MAX_IDS of
+                true ->
+                    Rows = [R#{<<"state">> => fh_engine_h_plan_card:card_state(Id)}
+                            || #{<<"plan_card_id">> := Id} = R
+                                   <- fh_engine_store:plan_card_summaries(T, Ids)],
+                    {ok, fh_engine_http:reply_json(200, #{<<"plan_cards">> => Rows}, Req0), State};
+                false ->
+                    {ok, fh_engine_http:reply_json(400, #{<<"error">> => <<"too_many_ids">>}, Req0), State}
+            end;
+        {error, Status, Body} ->
+            {ok, fh_engine_http:reply_json(Status, Body, Req0), State}
+    end.
+
+is_uuid(B) ->
+    re:run(B, <<"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$">>,
+           [{capture, none}]) =:= match.
 
 handle_post(Req0, State) ->
     case fh_engine_http:authenticate(Req0) of

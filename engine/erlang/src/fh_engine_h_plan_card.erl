@@ -9,6 +9,7 @@
 %% fh_engine_store:delete_plan_card/2).
 
 -export([init/2]).
+-export([card_state/1]).  % the list line's state (fh_engine_h_plan_cards)
 
 init(Req0, State) ->
     case cowboy_req:method(Req0) of

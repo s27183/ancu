@@ -28,17 +28,31 @@ init(Req0, State) ->
                 #{<<"error">> => <<"method_not_allowed">>}, Req0), State}
     end.
 
-%% GET /api/plan-cards — the signed-in user's own cards (the shell's views). Pure
-%% shell-DB read, no engine call: the list is display handles (id + title + created);
-%% the projection for any one card is fetched per card by fh_shell_h_plan_card.
+%% GET /api/plan-cards — the signed-in user's own cards (the shell's views): display
+%% handles (id + title + created), and since behavior 84 each card's state and last
+%% update from the engine, for the planner's saved-plans list (one engine read for the
+%% whole list; if it fails the handles go out alone, state/updated_at null). The
+%% projection for any one card is fetched per card by fh_shell_h_plan_card.
 handle_get(Req0, State) ->
     case fh_shell_http:authenticate_user(Req0) of
         {ok, #{<<"user_id">> := UserId}} ->
-            Views = fh_shell_store:list_plan_card_views(UserId),
+            Views = with_summaries(UserId, fh_shell_store:list_plan_card_views(UserId)),
             {ok, fh_shell_http:reply_json(200, #{<<"plan_cards">> => Views}, Req0), State};
         {error, Status, ErrBody} ->
             {ok, fh_shell_http:reply_json(Status, ErrBody, Req0), State}
     end.
+
+with_summaries(UserId, Views) ->
+    Ids = [Id || #{<<"plan_card_id">> := Id} <- Views],
+    Sums = case fh_shell_engine_client:plan_card_summaries(UserId, Ids) of
+               {ok, M} -> M;
+               {error, Why} ->
+                   logger:warning("[plan-cards] list without engine summaries: ~p", [Why]),
+                   #{}
+           end,
+    [V#{<<"state">> => maps:get(<<"state">>, maps:get(Id, Sums, #{}), null),
+        <<"updated_at">> => maps:get(<<"updated_at">>, maps:get(Id, Sums, #{}), null)}
+     || #{<<"plan_card_id">> := Id} = V <- Views].
 
 %% Signed out, the create still runs (behavior 45): the body is read first (so a
 %% malformed request makes no guest), then the guest path below makes this browser a

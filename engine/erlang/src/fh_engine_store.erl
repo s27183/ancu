@@ -19,7 +19,7 @@
 -export([set_checklist_status/4, get_checklist_status/2]).
 -export([card_kb_slugs/1, get_news_status/2, dismiss_news/2]).
 -export([set_profile_financials/2, list_plan_card_ids_for_profile/1]).
--export([delete_plan_card/2]).
+-export([delete_plan_card/2, plan_card_summaries/2]).
 -export([deploy_commit_sha/0, projection_state/1, list_active_plan_card_ids/0]).
 -export([list_suburbs_by_state/1, list_all_suburbs/0, list_suburb_sources/0]).
 -export([read_glue/3, append_session_turn/6, read_conversation/3]).
@@ -257,6 +257,20 @@ get_plan_card(TenantId, PlanCardId) ->
         [] ->
             {error, not_found}
     end.
+
+%% Whole lifecycle -> The engine -> a plan's list line (behavior 84)
+%% The planner lists a user's plans by title, state and last update; the shell owns which
+%% ids are the user's (plan_card_views) and asks for these. Ids the tenant does not hold
+%% are left out. updated_at moves with every fill, refine, target and checklist write.
+-spec plan_card_summaries(binary(), [binary()]) -> [map()].
+plan_card_summaries(_TenantId, []) -> [];
+plan_card_summaries(TenantId, Ids) ->
+    Res = query(
+        "SELECT plan_card_id::text, "
+        "       to_char(updated_at AT TIME ZONE 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') "
+        "FROM plan_cards WHERE tenant_id = $1::uuid AND plan_card_id = ANY($2::uuid[])",
+        [TenantId, Ids]),
+    [#{<<"plan_card_id">> => Id, <<"updated_at">> => At} || {Id, At} <- rows(Res)].
 
 %% Reconstruct the base-turn inputs for an existing card (plan-card-refresh.md): join
 %% the card to its profile so a re-run recomputes against the CURRENT profile facts +
