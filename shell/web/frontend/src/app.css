@@ -1440,12 +1440,9 @@ main {
     flex: 1 1 auto;
     min-width: 0;
 }
-/* The head's way on (behavior 75): the plan from the area data, the AI assistant inside a
-   shown plan — phone only, where the tabs and rails are hidden (see .sec-pill). */
-.sheet-head .head-link {
-    display: none;
-}
-@media (max-width: 47.99rem) {
+/* The head's way on (behavior 75): the AI assistant inside a shown plan — at every width
+   since behavior 93 moved the plan's tab rows into the section menu (see .sec-pill). */
+@media screen {
     .sheet-head .head-link {
         flex: none;
         align-self: center;
@@ -2126,140 +2123,6 @@ main {
     gap: 1rem;
 }
 
-/* Sticky region atop the scrolling sheet body (.sheet .body is the scroll region): the
-   lifecycle sub-tab rail. (Used to also carry the KB-news ticker, first above this
-   region then as a .pp-sticky-bottom footer below the tab content — removed
-   2026-07-09, Son's call: the homepage's unfiltered ticker is enough. See
-   PlanProjection.svelte for the removal note; backend untouched.) */
-.pp-sticky-top {
-    position: sticky;
-    top: 0;
-    z-index: 5;
-    background: var(--bg);
-}
-
-/* Plan sub-tabs — a horizontally-scrollable pill row; one section shows at a time. */
-/* Segmented control — one container guiding the lifecycle flow (the prototype's nav),
-   not separate pills. Scrolls horizontally on narrow surfaces; the buttons grow to fill
-   on wide ones. Active = a raised white chip. */
-.pp-subtabs {
-    display: flex;
-    gap: 0.2rem;
-    overflow-x: auto;
-    margin: 0 0 0.85rem;
-    padding: 0.25rem;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    scrollbar-width: none; /* Firefox */
-}
-.pp-subtabs::-webkit-scrollbar {
-    display: none;
-}
-.pp-subtabs button {
-    flex: 1 0 auto;
-    border: none;
-    background: transparent;
-    color: var(--muted);
-    border-radius: var(--radius-sm);
-    padding: 0.4rem 0.8rem;
-    font-size: var(--fs-xs);
-    font-weight: 600;
-    white-space: nowrap;
-    cursor: pointer;
-    transition:
-        background var(--t-fast) var(--ease),
-        color var(--t-fast) var(--ease),
-        box-shadow var(--t-fast) var(--ease);
-}
-.pp-subtabs button:hover {
-    color: var(--ink);
-}
-.pp-subtabs button.active {
-    background: var(--surface);
-    color: var(--ink);
-    box-shadow: var(--shadow-1);
-}
-
-/* Grouped rail (2026-07-09, Son's request): a two-row layout past
-   RAIL_GROUP_THRESHOLD rail tabs (PlanProjection.svelte) — row 1 is always-visible
-   navigation (Overview / Buy-Hold group toggle / Q&A), row 2 is the active group's
-   tabs. Under the threshold, .pp-subtabs-outer wraps a single unchanged row. */
-.pp-subtabs-outer {
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-    margin: 0 0 0.85rem;
-}
-.pp-subtabs-outer .pp-subtabs {
-    margin: 0;
-}
-/* The group toggle gets its own active look (soft accent wash, not the white
-   raised-chip look of a destination tab) so it visually reads as "currently filtered
-   to," not "currently open" — that distinction is the row split's whole point. */
-.pp-railgroup-btn.active {
-    background: var(--accent-soft);
-    color: var(--accent);
-    box-shadow: none;
-}
-
-/* Behavior 55: the AI assistant's tab stands apart from the grey section tabs — accent
-   text and a sparkle, a soft accent wash when open. The long label shows on wide sheets;
-   a phone's full row (356 px at a 400 px screen, measured) takes the short one. */
-.pp-subtabs button.pp-qa-tab {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.35rem;
-    color: var(--accent);
-}
-.pp-subtabs button.pp-qa-tab:hover {
-    color: var(--accent-hover);
-}
-.pp-subtabs button.pp-qa-tab.active {
-    background: var(--accent-soft);
-    color: var(--accent);
-    box-shadow: inset 0 0 0 1px var(--accent-line);
-}
-.pp-qa-short {
-    display: none;
-}
-@media (max-width: 520px) {
-    .pp-qa-long {
-        display: none;
-    }
-    .pp-qa-short {
-        display: inline;
-    }
-}
-/* The foot bar under every other plan tab: one line to the assistant. */
-.pp-askbar {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    width: 100%;
-    margin: 1rem 0 0.25rem;
-    padding: 0.7rem 0.9rem;
-    border: 1px solid var(--accent-line);
-    border-radius: 10px;
-    background: var(--accent-soft);
-    color: var(--accent);
-    font: inherit;
-    font-size: var(--fs-sm);
-    font-weight: 600;
-    text-align: left;
-    cursor: pointer;
-    transition: background var(--t-fast) var(--ease);
-}
-.pp-askbar:hover {
-    background: var(--accent-soft-2);
-}
-.pp-askbar:focus-visible,
-.pp-subtabs button.pp-qa-tab:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-}
-
 /* KB-news ticker (kb-news-feature.md, task 29) — a slim strip cycling one relevant,
    non-dismissed news headline at a time, sitting above the sub-tab rail inside the
    shared .pp-sticky-top region. Arrow buttons flank the headline when there's more
@@ -2750,15 +2613,6 @@ main {
     margin: 0;
 }
 
-/* The Budget tab's sub-rail (Tabs.svelte) shares the .sheet .body scroll with the sticky
-   .pp-sticky-top region (ticker + top-level .pp-subtabs), so it must stick just BELOW
-   that region. --tabrail-top is set inline on .pp-subcontent (PlanProjection.svelte)
-   from that region's REAL measured height (bind:clientHeight) — not a hardcoded rem —
-   because the ticker's presence/height varies (no news → 0; a wrapped headline → taller
-   than the bare subtabs rail a fixed value was once calibrated to). .pp-sticky-top's
-   higher z-index + opaque bg keep the small intentional overlap invisible.
-*/
-
 /* Cash-calculator cockpit — the prototype's interactive input form (engine-driven). */
 .pp-calc-intro {
     margin: 0 0 0.75rem;
@@ -2962,6 +2816,22 @@ main {
 .pp-guest .primary {
     flex: 0 0 auto;
     width: auto;
+}
+/* Behavior 93: over the plan the guest notice is one line, its sign-in a link. */
+.pp-guest-line {
+    display: block;
+    padding: 0.4rem 0.75rem;
+    font-size: var(--fs-sm);
+}
+.pp-guest-signin {
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--accent);
+    font: inherit;
+    font-weight: 600;
+    text-decoration: underline;
+    cursor: pointer;
 }
 .pp-guest p {
     flex: 1 1 16rem;
@@ -3237,6 +3107,24 @@ main {
 .ob-disclaimer {
     margin-bottom: 0.25rem;
 }
+/* Behavior 93: the plan's disclaimer is one line; "Xem thêm" opens the full text. */
+.pp-disclaimer-more > summary {
+    list-style: none;
+    cursor: pointer;
+}
+.pp-disclaimer-more > summary::-webkit-details-marker {
+    display: none;
+}
+.pp-disclaimer-more[open] > summary {
+    margin-bottom: 0.4rem;
+}
+.pp-disclaimer-more[open] .pp-more {
+    display: none;
+}
+.pp-more {
+    color: var(--accent);
+    text-decoration: underline;
+}
 
 .sheet-head .close:hover,
 .ob-head .close:hover {
@@ -3245,23 +3133,12 @@ main {
 }
 
 /* --- The plan sheet's floating section menu (behavior 68) ------------------------
-   Buyer-on-a-phone -> the plan sheet -> sections from one menu: on a phone the three
-   stacked rails (.sheet .tabs, the plan's .pp-sticky-top, the budget's sub-rail) give
+   Buyer-on-a-phone -> the plan sheet -> sections from one menu: the stacked rails gave
    way to a pill at the sheet's foot that opens every section (SectionMenu.svelte,
-   sections.svelte.ts); the space they took goes to the content. Desktop keeps the
-   rails and never shows the pill. */
-.sec-pill,
-.sec-menu,
-.sec-scrim,
-.sec-hint {
-    display: none;
-}
-@media (max-width: 47.99rem) {
-    .sheet .tabs,
-    .sheet .pp-sticky-top,
-    .sheet .pp-budget-rail {
-        display: none;
-    }
+   sections.svelte.ts); the space they took goes to the content. Since behavior 93 the
+   rails are gone at every width too: the plan's first sheet is the first thing under
+   the head, and the pill is the one way to the other sections. */
+@media screen {
     /* the last line scrolls clear of the pill */
     .sheet .body {
         padding-bottom: calc(var(--sp-6) + 3.75rem);
@@ -3341,6 +3218,8 @@ main {
     }
     .sec-menu {
         display: flex;
+        width: min(26rem, calc(100% - 2 * var(--sp-4)));
+        margin-inline: auto;
         flex-direction: column;
         position: absolute;
         z-index: 8;

@@ -4,7 +4,10 @@ declare global {
         // interface Error {}
         // interface Locals {}
         // interface PageData {}
-        // interface PageState {}
+        // The plan's lifecycle statement opens a phase as a history entry (behavior 93).
+        interface PageState {
+            lifecycle?: 'buy' | 'own' | 'sell';
+        }
         // interface Platform {}
     }
 }

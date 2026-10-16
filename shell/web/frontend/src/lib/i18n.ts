@@ -163,6 +163,8 @@ const messages = {
         vi: 'Kế hoạch tạm thời: được giữ 7 ngày trên máy chủ. Đăng nhập để lưu vào tài khoản và hỏi trợ lý.',
         en: 'Temporary plan: kept for 7 days on our server. Sign in to save it to your account and ask the assistant.'
     },
+    // Behavior 93: the same notice as one line over the plan; the full one stays on the Q&A.
+    'guest.notice_short': { vi: 'Kế hoạch tạm, giữ 7 ngày', en: 'Temporary plan, kept 7 days' },
     'guest.limit': {
         vi: 'Bạn đã tạo {n} kế hoạch hôm nay. Đăng nhập để tạo thêm.',
         en: 'You’ve built {n} plans today. Sign in to build more.'
@@ -232,10 +234,6 @@ const messages = {
     // (the long one overflows a 356 px row, measured 2026-10-10).
     'plan.tab.qa': { vi: 'Hỏi trợ lý AI', en: 'Ask the AI assistant' },
     'plan.tab.qa_short': { vi: 'Hỏi AI', en: 'Ask AI' },
-    'plan.askbar': {
-        vi: 'Có câu hỏi về kế hoạch này? Hỏi trợ lý AI →',
-        en: 'A question about this plan? Ask the AI assistant →'
-    },
     // Lifecycle tab labels — the blueprint-declared spine (plan-card-lifecycle-restoration.md
     // §11.3). Every in-scope blueprint now shares this five-view shape: overview/flow/budget/qa
     // (all five modes) plus one state-shaped view — portfolio (C/D) or family (B, always-on;
@@ -689,20 +687,15 @@ const messages = {
     // Behavior 82: the one-page lifecycle budget sheet (LifecycleSheet.svelte).
     'plan.sheet.tab': { vi: 'Trọn vòng đời', en: 'Whole lifecycle' },
     'plan.sheet.title': { vi: 'Ngân sách trọn vòng đời', en: 'Lifecycle budget' },
-    'plan.sheet.sub': {
-        vi: 'Mọi khoản tiền từ lúc mua, trong lúc ở, đến khi bán. Chạm vào một dòng để xem chi tiết.',
-        en: 'Every money line from buying, to owning, to selling. Tap a line to see its detail.'
-    },
+    // Behavior 93: the statement's rows, its bottom line, and each phase sheet's foot.
     'plan.sheet.buy': { vi: 'Mua', en: 'Buy' },
-    'plan.sheet.buy_sub': { vi: 'hợp đồng → bàn giao', en: 'contract → settlement' },
-    'plan.sheet.own': { vi: 'Sở hữu', en: 'Own' },
-    'plan.sheet.own_sub': { vi: 'mỗi năm', en: 'per year' },
+    'plan.sheet.own': { vi: 'Giữ nhà', en: 'Own' },
     'plan.sheet.sell': { vi: 'Bán', en: 'Sell' },
-    'plan.sheet.sell_sub': { vi: 'khi bạn bán lại', en: 'when you sell' },
-    'plan.sheet.total_buy': { vi: 'Tiền mặt cần để mua', en: 'Cash needed to buy' },
-    'plan.sheet.total_own': { vi: 'Chi phí sở hữu mỗi năm', en: 'Cost per year to own' },
-    'plan.sheet.total_sell': { vi: 'Chi phí khi bán', en: 'Cost to sell' },
-    'plan.sheet.exact': { vi: 'chính xác', en: 'exact' },
+    'plan.sheet.total_hold': { vi: 'Tổng chi trong {n} năm', en: 'Total paid over {n} years' },
+    'plan.sheet.total_hold_none': { vi: 'Tổng chi', en: 'Total paid' },
+    'plan.sheet.back': { vi: 'Ngân sách', en: 'Budget' },
+    'plan.sheet.not_in_total': { vi: 'Chưa tính vào tổng', en: 'Not in the total yet' },
+    'plan.sheet.key': { vi: '≈ ước tính · không dấu: chính xác', en: '≈ estimate · unmarked: exact' },
     'plan.sheet.estimate': { vi: 'ước tính', en: 'estimate' },
     'plan.sheet.per_year': { vi: '/năm', en: '/yr' },
     'plan.sheet.needs.hold_years': {
@@ -742,10 +735,6 @@ const messages = {
     'plan.sheet.years': { vi: 'năm', en: 'yrs' },
     'plan.sheet.filling': { vi: 'Đang tính…', en: 'Working it out…' },
     'plan.sheet.none': { vi: 'Chưa có khoản nào', en: 'No lines yet' },
-    'plan.sheet.grant_note': {
-        vi: 'Khoản trợ cấp được liệt kê nhưng không trừ vào tổng.',
-        en: 'Grants are listed but not taken off the total.'
-    },
     // Budget cockpit (the prototype's input form, engine-driven).
     'plan.cockpit.title': { vi: 'Ngân sách — bạn đã sẵn sàng?', en: 'Budget — am I ready?' },
     'plan.cockpit.intro': {
@@ -1083,6 +1072,12 @@ const messages = {
         vi: 'Thông tin để lập ngân sách mua, giữ và bán bất động sản, cung cấp nguyên trạng — không phải dịch vụ tư vấn pháp lý, thuế hay tài chính. Mỗi số liệu quy định đều ghi nguồn; hãy kiểm tra với chuyên gia có giấy phép trước khi hành động.',
         en: 'Information for budgeting your property purchase, hold and sale, provided as is — not a legal, tax or financial advice service. Each regulated figure cites its source; check with a licensed professional before you act.'
     },
+    // Behavior 93: the plan's disclaimer as one line; "Xem thêm" opens the full text.
+    'disclaimer.short': {
+        vi: 'Thông tin nguyên trạng, không phải tư vấn.',
+        en: 'Information as is, not advice.'
+    },
+    'disclaimer.more': { vi: 'Xem thêm', en: 'More' },
     'disclaimer.firb': {
         vi: 'Các quy định FIRB ở đây là thông tin chung từ nguồn được trích dẫn, cung cấp nguyên trạng — không phải tư vấn pháp lý. Quy định áp dụng cho bạn tùy vào tình trạng cư trú và loại bất động sản; hãy xác nhận với FIRB hoặc luật sư trước khi ký hợp đồng.',
         en: 'The FIRB rules here are general information from cited sources, provided as is — not legal advice. What applies to you depends on your residency and the type of property; confirm with FIRB or a lawyer before you sign a contract.'

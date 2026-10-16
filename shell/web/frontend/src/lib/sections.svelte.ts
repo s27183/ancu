@@ -4,7 +4,9 @@
 // ~200px of a sheet to navigation before any content (Son's screenshot, 2026-10-11).
 // SuburbSheet owns the zone/plan switch and draws the menu; PlanProjection owns which
 // lifecycle tab and budget sub-tab are shown and publishes them here, so the menu offers
-// exactly the set the rails offer, from the same state — the rails stay on desktop.
+// exactly the set the rails offered, from the same state. Behavior 93 (the plan reads as
+// one statement, one layer at a time): the rails are gone at every width, so the menu is
+// the one way to the plan's other sections and the statement sits right under the head.
 import { getContext, setContext } from 'svelte';
 
 export type SectionIcon =
