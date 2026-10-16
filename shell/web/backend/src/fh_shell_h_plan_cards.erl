@@ -32,8 +32,9 @@ init(Req0, State) ->
 %% handles (id + title + created), and since behavior 84 each card's state and last
 %% update from the engine, for the planner's saved-plans list (one engine read for the
 %% whole list; if it fails the handles go out alone, every engine field null). Behavior
-%% 96: the list's cards also show what each plan is for and its Buy and Own-per-year
-%% figures — intent, mode, buy, own_per_year, passed through from the engine as they come.
+%% 96: the list's cards also show what each plan is for and its cost figures (behavior
+%% 98) — intent, mode, costs_buy, costs_own_per_year, passed through from the engine as
+%% they come.
 %% The projection for any one card is fetched per card by fh_shell_h_plan_card.
 handle_get(Req0, State) ->
     case fh_shell_http:authenticate_user(Req0) of
@@ -52,8 +53,8 @@ with_summaries(UserId, Views) ->
                    logger:warning("[plan-cards] list without engine summaries: ~p", [Why]),
                    #{}
            end,
-    Fields = [<<"state">>, <<"updated_at">>, <<"intent">>, <<"mode">>, <<"buy">>,
-              <<"own_per_year">>],
+    Fields = [<<"state">>, <<"updated_at">>, <<"intent">>, <<"mode">>, <<"costs_buy">>,
+              <<"costs_own_per_year">>],
     [maps:merge(V, maps:from_list([{F, maps:get(F, maps:get(Id, Sums, #{}), null)}
                                    || F <- Fields]))
      || #{<<"plan_card_id">> := Id} = V <- Views].

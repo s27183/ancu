@@ -109,7 +109,8 @@ get_plan_card(UserId, PlanCardId) ->
 
 %% Whole lifecycle -> The shell backend -> each listed plan's state, last update, purpose
 %% and figures (behaviors 84, 96): GET /api/engine/plan-cards?ids=… for the ids the user
-%% owns. Returns {ok, #{Id => #{state, updated_at, intent, mode, buy, own_per_year}}}, or
+%% owns. Returns {ok, #{Id => #{state, updated_at, intent, mode, costs_buy,
+%% costs_own_per_year}}}, or
 %% {error, _} when the engine cannot answer (the
 %% list then goes out without them, never blocked on the engine).
 -spec plan_card_summaries(binary(), [binary()]) -> {ok, map()} | {error, term()}.

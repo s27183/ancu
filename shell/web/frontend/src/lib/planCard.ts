@@ -1019,10 +1019,11 @@ export interface PlanCardSummary {
      *  E next home); null as above. */
     intent?: string | null;
     mode?: string | null;
-    /** The statement's Buy and Own-per-year totals (purchase_journey.lifecycle_budget),
+    /** The statement's Phí mua and Phí giữ nhà a year (purchase_journey.lifecycle_budget
+     *  costs_buy, costs_own_per_year; behavior 98: costs only, no deposit or principal),
      *  so a list card's figures equal its statement's; null until the journey fills. */
-    buy?: MoneyRange | null;
-    own_per_year?: MoneyRange | null;
+    costs_buy?: MoneyRange | null;
+    costs_own_per_year?: MoneyRange | null;
 }
 
 /** The base components in DAG order — the projection renders in this order. The

@@ -208,8 +208,8 @@
                     <ul class="plan-cards" aria-label={$t('planpage.saved')}>
                         {#each sorted as c (c.plan_card_id)}
                             {@const purpose = purposeOf(c)}
-                            {@const buy = fig(c.buy)}
-                            {@const own = fig(c.own_per_year)}
+                            {@const buy = fig(c.costs_buy)}
+                            {@const own = fig(c.costs_own_per_year)}
                             <li>
                                 <button type="button" class="plan-card" onclick={() => openPlan(c)}>
                                     <span class="plan-card-place"
@@ -219,13 +219,13 @@
                                     {#if buy || own}
                                         <span class="plan-card-figs">
                                             {#if buy}<span class="plan-card-fig"
-                                                    ><span class="plan-card-k">{$t('plan.sheet.buy')}</span>
+                                                    ><span class="plan-card-k">{$t('plan.sheet.costs_buy')}</span>
                                                     <span class="plan-card-v">{buy}</span></span
                                                 >{/if}
                                             {#if own}<span class="plan-card-fig"
-                                                    ><span class="plan-card-k">{$t('plan.sheet.own')}</span>
+                                                    ><span class="plan-card-k">{$t('plan.sheet.costs_own_none')}</span>
                                                     <span class="plan-card-v"
-                                                        >{own}<span class="plan-card-unit">{$t('plan.sheet.per_year')}</span></span
+                                                        >≈ {own}<span class="plan-card-unit">{$t('plan.sheet.per_year')}</span></span
                                                     ></span
                                                 >{/if}
                                         </span>

@@ -263,10 +263,12 @@ get_plan_card(TenantId, PlanCardId) ->
 %% ids are the user's (plan_card_views) and asks for these. Ids the tenant does not hold
 %% are left out. updated_at moves with every fill, refine, target and checklist write.
 %% Behavior 96: each line also says what the plan is for (intent, mode) and carries the
-%% statement's Buy and Own-per-year totals, read from the one place the statement reads
+%% statement's figures, read from the one place the statement reads
 %% them (purchase_journey.lifecycle_budget, fh_engine_journey; the journey owns it in every
 %% mode) — never recomputed here, so a list card's figures equal its statement's. null
-%% until the journey has filled.
+%% until the journey has filled. Behavior 98: the figures are the statement's cost framing,
+%% Phí mua (costs_buy) and Phí giữ nhà a year (costs_own_per_year) — costs only, never the
+%% deposit or loan principal, which are money into the home, not costs.
 -spec plan_card_summaries(binary(), [binary()]) -> [map()].
 plan_card_summaries(_TenantId, []) -> [];
 plan_card_summaries(TenantId, Ids) ->
@@ -274,15 +276,16 @@ plan_card_summaries(TenantId, Ids) ->
         "SELECT plan_card_id::text, "
         "       to_char(updated_at AT TIME ZONE 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"'), "
         "       intent, mode, "
-        "       coalesce(content_jsonb #> '{components,purchase_journey,outcome,lifecycle_budget,buy}', "
+        "       coalesce(content_jsonb #> '{components,purchase_journey,outcome,lifecycle_budget,costs_buy}', "
         "                'null'::jsonb), "
-        "       coalesce(content_jsonb #> '{components,purchase_journey,outcome,lifecycle_budget,own_per_year}', "
+        "       coalesce(content_jsonb #> '{components,purchase_journey,outcome,lifecycle_budget,costs_own_per_year}', "
         "                'null'::jsonb) "
         "FROM plan_cards WHERE tenant_id = $1::uuid AND plan_card_id = ANY($2::uuid[])",
         [TenantId, Ids]),
     [#{<<"plan_card_id">> => Id, <<"updated_at">> => At,
        <<"intent">> => Intent, <<"mode">> => Mode,
-       <<"buy">> => decode_jsonb(Buy), <<"own_per_year">> => decode_jsonb(Own)}
+       <<"costs_buy">> => decode_jsonb(Buy),
+       <<"costs_own_per_year">> => decode_jsonb(Own)}
      || {Id, At, Intent, Mode, Buy, Own} <- rows(Res)].
 
 %% Reconstruct the base-turn inputs for an existing card (plan-card-refresh.md): join
