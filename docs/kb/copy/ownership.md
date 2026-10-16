@@ -8,7 +8,9 @@ last_verified: 2026-06-01
 
 User-facing copy-templates for the `ownership_planning` resolver half
 (`fh_engine_ownership`): the recurring-cost `notes` and the lifecycle `alert_triggers_armed`
-(FHG graduation window, the periodic rate review, the land-tax mode-switch). Each alert is a
+(FHG graduation window, the periodic rate review, the land-tax mode-switch), and the
+Own-phase spine labels (`event_*`, param-free — the figure rides in the event's `amount`;
+added 2026-10-16 for the lifecycle sheet, behavior 82). Each alert is a
 `{trigger, action}` pair of free-text prose, so both halves are `{vi, en}`. Each template is
 filled via `fh_engine_i18n:subst/2`.
 
@@ -29,6 +31,18 @@ template ids the resolver references, each a `{vi, en}` pair.
 {
   "fills": [],
   "copy": {
+    "event_rates_water": {
+      "vi": "Phí hội đồng địa phương (council rates) và tiền nước",
+      "en": "Council rates and water"
+    },
+    "event_maintenance_reserve": {
+      "vi": "Quỹ bảo trì, sửa chữa nhà",
+      "en": "Maintenance reserve"
+    },
+    "event_loan_repayments": {
+      "vi": "Trả nợ vay (gốc và lãi, theo lãi suất tham chiếu)",
+      "en": "Loan repayments (principal and interest, at a typical rate)"
+    },
     "note_indicative": {
       "vi": "Đây là khoảng ước tính hằng năm cho một căn nhà ở khu vực đô thị; con số chính thức nằm trên thông báo thuế/phí (rates notice) của bạn và (nếu là chung cư) bản công bố thông tin (disclosure statement).",
       "en": "Indicative annual ranges for a metro home; the binding figures are your rates notice and (if strata) the disclosure statement."

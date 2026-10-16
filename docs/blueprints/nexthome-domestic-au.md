@@ -890,7 +890,8 @@ The `mortgage_plan` outcome feeds `cash_position` (loan amount + buffer requirem
     "recurring_costs_estimate": "{ statutory_band: { low: money|null, high: money|null, period, components: array<string> }, strata_levies: money|null, utilities: money|null, building_insurance: money|null, notes: array<localized_text> }",
     "land_tax_check": "enum [exempt_ppor, applicable, to_verify]",
     "graduation_milestone": "{ target_lvr, estimated_year: number|null }",
-    "alert_triggers_armed": "array<{ trigger: localized_text, action: localized_text }>"
+    "alert_triggers_armed": "array<{ trigger: localized_text, action: localized_text }>",
+    "cash_events": "array<{ id: enum [council_rates_water, maintenance_reserve, loan_repayments], phase: 'own', label: localized_text, direction: 'out', amount: money_range, is_estimate: bool, timing: 'recurring', period: 'year', counterparty: string, source_component: string }>"  // the Own-phase per-year spine (behavior 82, 2026-10-16): council rates + water (the statutory band), the maintenance reserve over the target range, and the yearly P&I on the target range less the plan's own deposit event (fh_engine_disposition:annual_repayments/2, KB representative rate). Each PLACES a figure its owner computes; an unknown one is dropped (honest partial)
   }
 }
 ```

@@ -968,7 +968,8 @@ Same as [Mode A ownership_planning](fhb-domestic-au.md#9-ownership_planning) wit
     "current_year_occupancy_status": "enum",
     "non_resident_tax_filing_required": "bool",
     "alert_triggers_armed": "array<{ trigger, action }>",
-    "mode_switch_eligible": "bool"
+    "mode_switch_eligible": "bool",
+    "cash_events": "array<{ id: enum [council_rates_water, maintenance_reserve, loan_repayments], phase: 'own', label: localized_text, direction: 'out', amount: money_range, is_estimate: bool, timing: 'recurring', period: 'year', counterparty: string, source_component: string }>"  // the Own-phase per-year spine (behavior 82, 2026-10-16): council rates + water (the statutory band), the maintenance reserve over the target range, and the yearly P&I on the target range less the plan's own deposit event (fh_engine_disposition:annual_repayments/2, KB representative rate). Each PLACES a figure its owner computes; an unknown one is dropped (honest partial)
   }
 }
 ```

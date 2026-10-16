@@ -54,6 +54,8 @@
 -export([cgt_investor/4, taxable_gain/3, loan_payout_investor/2, full_horizon_investor/4]).
 %% the growth assumption line (copy key chosen by the band's is_placeholder flag):
 -export([growth_assumption/3]).
+%% the Own-phase loan-repayment band fh_engine_ownership places (behavior 82):
+-export([annual_repayments/2]).
 
 -define(COPY,    <<"kb.copy.disposition">>).
 -define(GROWTH,  <<"kb.property.capital-growth-bands">>).
@@ -296,6 +298,28 @@ remaining_balance(P, AnnualRatePct, TermYears, ElapsedYears) ->
     N = TermYears * 12,
     K = ElapsedYears * 12,
     P * (math:pow(1 + R, N) - math:pow(1 + R, K)) / (math:pow(1 + R, N) - 1).
+
+%% --- annual loan repayments (the Own-phase per-year line, behavior 82) ---------
+%% Whole lifecycle -> each phase has its money lines -> disposition owns amortisation ->
+%%   the yearly P&I on a principal band.
+%% Goal: the lifecycle sheet (behavior 82) shows a per-year cost to own; the biggest is
+%%   the loan. Invariant: one computer per figure — the rate and the amortisation live
+%%   here beside remaining_balance/4, so the yearly repayment and the balance paid out at
+%%   sale stay on one basis. Component: fh_engine_ownership places the band as an own
+%%   cash event. Capability: standard P&I over ?LOAN_TERM_YEARS at the KB representative
+%%   rate (owner) or the investment rate (investor) — a labelled CONVENTION, never this
+%%   buyer's product rate; null when the principal is unknown (honest-partial).
+-spec annual_repayments([number()] | null, owner | investor) -> [integer()] | null.
+annual_repayments([PLo, PHi], Kind) when is_number(PLo), is_number(PHi) ->
+    R = case Kind of owner -> representative_rate(); investor -> investor_rate() end,
+    [round(annual_pi(PLo, R, ?LOAN_TERM_YEARS)), round(annual_pi(PHi, R, ?LOAN_TERM_YEARS))];
+annual_repayments(_, _) -> null.
+
+annual_pi(P, 0, TermYears) -> P / TermYears;
+annual_pi(P, AnnualRatePct, TermYears) ->
+    R = AnnualRatePct / 100 / 12,
+    N = TermYears * 12,
+    12 * P * R / (1 - math:pow(1 + R, -N)).
 
 %% --- investor loan payout: investment-loan amount amortised at the investment rate -----
 %% reads budget_envelope_investor.loan_amount (the actual loan for THIS purchase, not a capacity)

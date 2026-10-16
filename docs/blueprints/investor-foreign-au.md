@@ -1151,7 +1151,8 @@ Combines Mode C `ownership_planning_investor` (property management, tax reportin
     "frcgw_reserve_at_exit": "money",
     "ready_for_next_property": "bool",
     "mode_switch_eligible_on_pr": "bool",
-    "alert_triggers_armed": "array<{ trigger, action }>"
+    "alert_triggers_armed": "array<{ trigger, action }>",
+    "cash_events": "array<{ id: enum [council_rates_water, maintenance_reserve, loan_repayments], phase: 'own', label: localized_text, direction: 'out', amount: money_range, is_estimate: bool, timing: 'recurring', period: 'year', counterparty: string, source_component: string }>"  // the Own-phase per-year spine (behavior 82, 2026-10-16): council rates + water (the statutory band), the maintenance reserve over the target range, and the yearly P&I on the target range less the plan's own deposit event (fh_engine_disposition:annual_repayments/2, KB representative rate). Each PLACES a figure its owner computes; an unknown one is dropped (honest partial); base only — once a property is attached yield_modelling places the hold events instead
   }
 }
 ```

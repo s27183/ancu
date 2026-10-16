@@ -49,7 +49,7 @@ fields() ->
     [<<"monthly_net_cash_flow_actual">>, <<"ytd_cash_flow_vs_projection">>,
      <<"current_lvr">>, <<"equity_built">>, <<"ready_for_next_property">>,
      <<"portfolio_diversification_score">>, <<"annual_tax_obligations">>,
-     <<"alert_triggers_armed">>, <<"opportunities">>].
+     <<"alert_triggers_armed">>, <<"opportunities">>, <<"cash_events">>].
 
 %% the six post-acquisition figure fields that are null at base.
 null_at_base() ->
@@ -75,7 +75,7 @@ scaffold_cases() ->
     BareChecks =
         [check(<<"input-independent null: ", F/binary>>, g(OBare, F), null) || F <- null_at_base()],
     [check("renderer = data-table", Rend, <<"data-table">>),
-     check("outcome has exactly the nine portfolio_position fields",
+     check("outcome has exactly the nine portfolio_position fields + the own-phase cash_events (behavior 82)",
            lists:sort(maps:keys(O)), lists:sort(fields())),
      check("annual_tax_obligations: 5 obligations filled",
            length(g(O, <<"annual_tax_obligations">>)), 5),
