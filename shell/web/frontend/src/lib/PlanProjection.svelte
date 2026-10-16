@@ -8,6 +8,7 @@
     import { onMount } from 'svelte';
     import { page } from '$app/state';
     import { t } from '$lib/i18n';
+    import Termed from '$lib/Termed.svelte';
     import { lang } from '$lib/stores/lang';
     import {
         getPlanCard,
@@ -1039,7 +1040,7 @@
         </label>
         {#if pricePreview}<p class="pp-fin-shown">{$t('plan.fin.shown').replace('{x}', money(pricePreview, $lang) ?? '')}</p>{/if}
         {#if currentPriceLabel}<p class="pp-fin-hint">{$t(currentPriceIsPoint ? 'plan.fin.price_hint_point' : 'plan.fin.price_hint').replace('{r}', currentPriceLabel)}</p>{/if}
-        <p class="pp-fin-effect">{$t('plan.fin.price_effect')}</p>
+        <p class="pp-fin-effect"><Termed text={$t('plan.fin.price_effect')} /></p>
     </div>
     {#if depositBounds}
         {@const b = depositBounds}
@@ -1070,7 +1071,7 @@
                         .replace('{max}', money(depositRefused.max, $lang) ?? '—')}
                 </p>
             {/if}
-            <p class="pp-fin-effect">{$t('plan.fin.deposit_effect')}</p>
+            <p class="pp-fin-effect"><Termed text={$t('plan.fin.deposit_effect')} /></p>
         </div>
     {/if}
     <div class="pp-price-actions">
@@ -1099,7 +1100,7 @@
 {#snippet household()}
     <div class="pp-fin-wrap">
         <h4 class="pp-fin-title">{$t('plan.sheet.finances')}</h4>
-        <p class="pp-fin-effect">{$t('plan.fin.household_effect')}</p>
+        <p class="pp-fin-effect"><Termed text={$t('plan.fin.household_effect')} /></p>
         <p class="pp-fin-capacity" data-capacity>
             {#if fit.capacity}{$t('plan.fin.capacity').replace('{x}', (moneyRange(fit.capacity, $lang) ?? ''))}{:else}{$t('plan.fin.capacity_none')}{/if}
             {#if fit.loan}{$t('plan.fin.loan_needed').replace('{x}', money(fit.loan, $lang) ?? '')}{/if}

@@ -3931,3 +3931,20 @@ main {
         font-size: var(--fs-lg);
     }
 }
+
+/* behavior 102: an Australian term that opens its card (lib/terms.ts, Termed.svelte) */
+.term {
+    text-decoration: underline dotted;
+    text-decoration-color: var(--accent);
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 0.2em;
+    cursor: pointer;
+    border-radius: 2px;
+}
+.term:hover {
+    text-decoration-style: solid;
+}
+.term:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+}

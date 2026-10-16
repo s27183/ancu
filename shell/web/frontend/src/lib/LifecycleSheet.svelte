@@ -70,6 +70,7 @@
         type PhasePlaybookOutcome
     } from '$lib/planCard';
     import LineDetail, { type LineStep } from '$lib/LineDetail.svelte';
+    import Termed from '$lib/Termed.svelte';
     import { money, moneyRange, num } from '$lib/format';
 
     let {
@@ -423,7 +424,7 @@
                 {#each waiting as p (p.id)}
                     <li class="ls-line">
                         <div class="ls-line-btn ls-static">
-                            <span class="ls-label">{pendingLabel(p)}</span>
+                            <span class="ls-label"><Termed text={pendingLabel(p)} /></span>
                             <span class="ls-needs">{needsLabel(p)}</span>
                         </div>
                     </li>
@@ -574,7 +575,7 @@
 {/snippet}
 
 {#snippet body(e: CashEvent)}
-    <span class="ls-label">{pick(e.label, $lang)}</span>
+    <span class="ls-label"><Termed text={pick(e.label, $lang)} /></span>
     {#if !e.amount}
         <!-- a line beside the totals with no figure yet (behavior 95) names its input, if any -->
         {#if lineNeeds(e)}<span class="ls-needs"

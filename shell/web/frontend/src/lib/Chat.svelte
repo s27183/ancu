@@ -16,6 +16,7 @@
     import { describeFailure } from '$lib/turnFailure';
     import QaIntro from '$lib/QaIntro.svelte';
     import { renderMarkdown } from '$lib/markdown';
+    import { terms, markTermsHtml, termClicks } from '$lib/terms';
 
     let { planCardId }: { planCardId: string } = $props();
 
@@ -164,7 +165,7 @@
                 {:else if m.phase === 'done'}
                     <!-- The model writes markdown; markdown.ts escapes it first, so {@html}
                          carries only the tags it writes (behavior 99). -->
-                    <div class="chat-msg assistant chat-md">{@html renderMarkdown(pick(m.answer, $lang))}</div>
+                    <div class="chat-msg assistant chat-md" use:termClicks>{@html markTermsHtml(renderMarkdown(pick(m.answer, $lang)), $terms)}</div>
                 {:else if m.phase === 'thinking' || m.phase === 'looking'}
                     <div class="chat-msg assistant">
                         <p class="chat-status">
