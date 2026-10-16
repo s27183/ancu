@@ -5,6 +5,9 @@ import { defineConfig } from 'vite';
 // — it proxies /api/* and /health to the shell BACKEND (Erlang, :8081), which holds
 // the engine signing key and mints the tenant JWT. In prod the static bundle is
 // served by that same backend (or Cloudflare Pages with the backend at /api).
+// A seat beside another seat's stack moves its ports (scripts/dev_stack.sh: FH_SHELL_HTTP_PORT).
+const shell = `http://127.0.0.1:${process.env.FH_SHELL_HTTP_PORT || 8081}`;
+
 export default defineConfig({
     plugins: [sveltekit()],
     server: {
@@ -13,8 +16,8 @@ export default defineConfig({
         // server; FH_VITE_POLL=1 (scripts/dev_stack.sh sets it) polls instead.
         watch: process.env.FH_VITE_POLL ? { usePolling: true, interval: 300 } : undefined,
         proxy: {
-            '/api': { target: 'http://127.0.0.1:8081', changeOrigin: false },
-            '/health': { target: 'http://127.0.0.1:8081', changeOrigin: false }
+            '/api': { target: shell, changeOrigin: false },
+            '/health': { target: shell, changeOrigin: false }
         }
     }
 });

@@ -15,10 +15,12 @@
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
-sock="$root/.git/enacs-pg"
+# The clone's git dir: in a worktree .git is a file, so ask git for the common one.
+gitdir="$(cd "$root" && cd "$(git rev-parse --git-common-dir)" && pwd)"
+sock="$gitdir/enacs-pg"
 enc="${sock//\//%2F}"
 user="$(id -un)"
-logs="$root/.git/enacs-dev-stack"
+logs="${FH_DEV_LOGS:-$gitdir/enacs-dev-stack}"
 mkdir -p "$logs"
 
 export FH_HTTP_IP=127.0.0.1
@@ -34,14 +36,17 @@ if [ ! -r "$root/.env" ] && [ -z "${SHELL_JWT_SECRET:-}" ]; then
     SHELL_JWT_SECRET="$(openssl rand -hex 32)"; export SHELL_JWT_SECRET
 fi
 export FH_VITE_POLL=1   # a seat's sandbox delivers no fs events to vite (behavior 41)
-export FH_ENGINE_HTTP_PORT=8080 FH_SHELL_HTTP_PORT=8081
+# Ports default to 8080/8081/5173; a seat running beside another seat's stack sets its own
+# (FH_ENGINE_HTTP_PORT, FH_SHELL_HTTP_PORT, FH_VITE_PORT) — vite proxies to the shell's.
+export FH_ENGINE_HTTP_PORT="${FH_ENGINE_HTTP_PORT:-8080}" FH_SHELL_HTTP_PORT="${FH_SHELL_HTTP_PORT:-8081}"
+vite_port="${FH_VITE_PORT:-5173}"
 # FH_DEV_DB (default "ancu") names the pair <name>_engine / <name>_shell: a fresh pair
 # runs a check on empty databases (behavior 45: the real planner without the startup
 # refresh sweep re-filling every old dev card at real cost).
 db="${FH_DEV_DB:-ancu}"
 export ENGINE_DATABASE_URL="postgres://$user@$enc/${db}_engine"
 export SHELL_DATABASE_URL="postgres://$user@$enc/${db}_shell"
-export ENGINE_BASE_URL="http://127.0.0.1:8080/api/engine"   # the shell appends /dev/tenants, /plan-cards…
+export ENGINE_BASE_URL="http://127.0.0.1:$FH_ENGINE_HTTP_PORT/api/engine"   # the shell appends /dev/tenants, /plan-cards…
 
 for d in "${db}_engine" "${db}_shell"; do
     createdb -h "$sock" "$d" 2>/dev/null || true   # exists → no-op
@@ -68,13 +73,13 @@ boot_erl() {    # $1 dir, $2 app, $3 name
 }
 
 boot_erl engine/erlang fh_engine engine
-wait_port 8080 engine        # the shell registers its tenant key with the engine at boot
+wait_port "$FH_ENGINE_HTTP_PORT" engine        # the shell registers its tenant key with the engine at boot
 boot_erl shell/web/backend fh_shell shell
-wait_port 8081 shell
+wait_port "$FH_SHELL_HTTP_PORT" shell
 (cd "$root/shell/web/frontend" && { [ -d node_modules ] || npm install; } \
-    && exec npx vite dev --host 127.0.0.1 --port 5173 --strictPort >"$logs/frontend.log" 2>&1) &
+    && exec npx vite dev --host 127.0.0.1 --port "$vite_port" --strictPort >"$logs/frontend.log" 2>&1) &
 pids+=($!)
-wait_port 5173 frontend
+wait_port "$vite_port" frontend
 
 echo "stack up — logs in $logs"
 wait
