@@ -71,7 +71,7 @@
         position: relative;
         background: var(--surface);
         width: 100%;
-        /* phone: one height for every sheet in planning, the "Vì sao Úc?" card's
+        /* phone: one height for every sheet in planning, the "Giới thiệu" card's
            (--sheet-h, app.css; behavior 66) — content-sized cards made each step deeper
            jump shorter or taller. Opens/closes with lib/sheetMotion.ts. */
         height: var(--sheet-h);

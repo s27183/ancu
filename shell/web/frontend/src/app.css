@@ -121,7 +121,7 @@
         var(--scrim) var(--header-total) calc(100% - var(--safe-bottom)),
         transparent calc(100% - var(--safe-bottom))
     );
-    /* The suburb sheet's veil (behavior 71) dims the header too, as "Vì sao Úc?" does,
+    /* The suburb sheet's veil (behavior 71) dims the header too, as "Giới thiệu" does,
        but not the notch strip, so Safari's status-bar tint keeps behavior 63's colour. */
     --scrim-below-notch: linear-gradient(
         to bottom,
@@ -155,7 +155,7 @@
        placed below the header offsets by this. */
     --header-total: calc(var(--header-h) + var(--safe-top));
     /* One height for every sheet in planning on a phone — the suburb/plan sheet, each
-       popup at any depth and the "Vì sao Úc?" card it was taken from: 94% of the
+       popup at any depth and the "Giới thiệu" card it was taken from: 94% of the
        visible screen (behavior 66, Son 2026-10-11). dvh follows Safari's toolbar the
        way a fixed inset:0 box does; vh is the fallback. */
     --sheet-h: 94vh;
@@ -1412,7 +1412,7 @@ main {
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
 /* The veil behind the suburb sheet (behavior 71, Son 2026-10-11: the plan sheets dim
-   what is behind them like "Vì sao Úc?"). Above the header (20) and the map controls,
+   what is behind them like "Giới thiệu"). Above the header (20) and the map controls,
    just under the sheet (30); the sheet's popups (Modal) sit inside the sheet's stacking
    context, so their own --scrim lies over the sheet and this veil alike. No
    backdrop-filter (behavior 66: the costly part on iPhones). */
@@ -2037,7 +2037,7 @@ main {
 /* Phones (behavior 78): the top-left cluster now carries its label and the finding
    pointer, which a top-centre banner would cover (measured 2026-10-15 at 390: banner
    x 98–293 over the label 12–131 and the pointer). The banner sits above the bottom
-   controls instead — the legend and "Vì sao Úc?" end 115px above the map's foot. */
+   controls instead — the legend and "Giới thiệu" end 115px above the map's foot. */
 @media (max-width: 47.99rem) {
     .signin-banner {
         top: auto;

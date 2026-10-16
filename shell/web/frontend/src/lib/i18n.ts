@@ -1404,6 +1404,12 @@ const messages = {
         vi: 'Chi phí khi mua, trong thời gian giữ và khi bán — thuế trước bạ, phí FIRB, khoản vay, thuế đất — trong một kế hoạch.',
         en: 'What it costs to buy, to hold and to sell — stamp duty, FIRB fees, the loan, land tax — in one plan.'
     },
+    // behavior 107: Hành trình, named before a plan is opened.
+    'intro.value.journey.title': { vi: 'Hành trình từng bước', en: 'The journey, step by step' },
+    'intro.value.journey.body': {
+        vi: 'Danh sách việc theo thứ tự — ai làm gì, khi nào — từ lúc quyết định mua đến khi bán; đánh dấu từng bước khi xong.',
+        en: 'A checklist in order — who does what, and when — from deciding to buy to selling; tick each step off as you go.'
+    },
     'intro.value.you.title': { vi: 'Theo đúng trường hợp của bạn', en: 'Built around your case' },
     'intro.value.you.body': {
         vi: 'Mua nhà đầu tiên, đầu tư, hay dùng tiền từ Việt Nam — kế hoạch đi theo hoàn cảnh và visa của bạn.',
@@ -1448,7 +1454,8 @@ const messages = {
     'intro.source': { vi: 'Nguồn', en: 'Source' },
     'intro.source.ranking': { vi: 'xếp hạng độc lập', en: 'independent ranking' },
     'intro.now': { vi: 'nay', en: 'now' },
-    'intro.button': { vi: 'Vì sao Úc?', en: 'Why Australia?' },
+    // behavior 107 (Son 2026-10-17, from his friend): the launcher names what it opens.
+    'intro.button': { vi: 'Giới thiệu', en: 'Introduction' },
     'intro.button.aria': {
         vi: `Mở lại giới thiệu ${BRAND}`,
         en: `Reopen the ${BRAND} introduction`

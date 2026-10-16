@@ -1,7 +1,7 @@
 <script lang="ts">
     // The first-visit sheet (behavior 42): opens by itself the first time this browser
-    // visits, says on its first screen what the product does (plan a budget, suburb data,
-    // news) and what it is not (a listing site, an advice service — behavior 90, Son
+    // visits, says on its first screen what the product does (plan a budget, the journey's
+    // checklist — behavior 107 — suburb data, news) and what it is not (a listing site, an advice service — behavior 90, Son
     // 2026-10-16: many took it for a listing site), draws the KB's cited facts —
     // where Vietnamese buyers stand, then why Australian property — and what the product
     // adds on top of them. Closing it (✕, scrim, Escape or the CTA) flies the card into a
@@ -9,7 +9,8 @@
     // screen leads to the position card and the facts in one tap each); the browser then
     // remembers it was seen (facts.ts, introSeen). Under prefers-reduced-motion nothing
     // flies or pulses — it simply closes and the launcher sits still. The launcher pulses
-    // light green on every visit until it is tapped (behavior 50).
+    // light green on every visit until it is tapped (behavior 50). It reads "Giới thiệu"
+    // (behavior 107, once "Vì sao Úc?").
     import { onMount, tick } from 'svelte';
     import { lang } from '$lib/stores/lang';
     import { t } from '$lib/i18n';
@@ -236,6 +237,11 @@
                             <span class="wl-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 18h16M6 18V9l6-4 6 4v9M10 18v-5h4v5" /></svg></span>
                             <strong>{$t('intro.value.plan.title')}</strong>
                             <span>{$t('intro.value.plan.body')}</span>
+                        </li>
+                        <li>
+                            <span class="wl-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m4 6 1.5 1.5L8 5M4 12l1.5 1.5L8 11M4 18l1.5 1.5L8 17M11 6h9M11 12h9M11 18h9" /></svg></span>
+                            <strong>{$t('intro.value.journey.title')}</strong>
+                            <span>{$t('intro.value.journey.body')}</span>
                         </li>
                         <li>
                             <span class="wl-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Z" /><path d="M9 4v14M15 6v14" /></svg></span>

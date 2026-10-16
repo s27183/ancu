@@ -192,7 +192,7 @@
         tourEvent(selected ? 'suburb' : 'unsuburb');
     });
     // …starts by itself on this browser's first visit to the map (behavior 81: the map is
-    // its own page now, so the tour no longer waits on the home's "Vì sao Úc?")…
+    // its own page now, so the tour no longer waits on the home's "Giới thiệu")…
     $effect(() => {
         if (untrack(() => $tourStep) === 0 && !tourDone()) startTour();
     });

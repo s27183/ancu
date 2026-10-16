@@ -38,7 +38,7 @@
     }
 </script>
 
-<!-- The veil behind the sheet (behavior 71): dims the map as "Vì sao Úc?" dims the page;
+<!-- The veil behind the sheet (behavior 71): dims the map as "Giới thiệu" dims the page;
      a tap on it closes the sheet. Not in the tab order — the ✕ and Esc are the keyboard way. -->
 <button
     type="button"
