@@ -89,6 +89,8 @@
     const menuCurrent = $derived(sections.current || $t('sheet.tab.plan'));
 
     function startPlan() {
+        // From an open plan ("Thử lại" on one that did not finish, behavior 94): its state.
+        if (newest && !choosing && newest.state && isState(newest.state)) pick = newest.state;
         restoreAnswers = undefined;
         planning = true;
     }

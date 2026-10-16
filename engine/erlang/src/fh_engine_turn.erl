@@ -231,7 +231,15 @@ init(#{tenant_id := T, plan_card_id := PC, turn_id := Tn} = Args) ->
             %% resolver-only refresh (plan-card-refresh.md): two-path components run
             %% their resolver half and re-attach the EXISTING agent leaves, no sidecar.
             Components = base_components(maps:get(blueprint_slug, Args)),
-            Data = Args#{components => Components, outcomes => #{}},
+            %% A full base turn walks the DAG twice (behavior 94): a quick pass with the
+            %% two-path components' agent leaves left empty, so every figure — the budget —
+            %% is filled within a second, then the full pass that runs the sidecar and
+            %% recommits each component with its leaves (the page merges by component id).
+            %% Measured 2026-10-16 on the local stack with the real planner: the sidecar
+            %% (opus) held the budget back 18 s (Mode A) to 27 s (investor).
+            Quick = K =:= base,
+            Data = Args#{components => Components, outcomes => #{},
+                         quick => Quick, base_list => Components, deferred => false},
             {ok, running, Data, [{next_event, internal, step}]};
         property ->
             %% Phase-B per-property turn (mode-c-wedge.md "Phase B"): walk the per-property
@@ -287,6 +295,11 @@ init(#{tenant_id := T, plan_card_id := PC, turn_id := Tn} = Args) ->
 %% --- running state ----------------------------------------------------------
 
 %% Drive the DAG walk one component at a time.
+running(internal, step, #{components := [], quick := true, deferred := true,
+                           base_list := All} = Data) ->
+    %% The quick pass is done and deferred agent leaves: walk again, sidecar included.
+    {keep_state, Data#{components := All, quick := false},
+     [{next_event, internal, step}]};
 running(internal, step, #{components := []} = Data) ->
     #{tenant_id := T, plan_card_id := PC, turn_id := Tn} = Data,
     emit(T, PC, <<"turn_completed">>,
@@ -332,6 +345,20 @@ running(internal, step, #{components := [Comp | Rest]} = Data) ->
             %% component with no base outcome in the seed (e.g. property_assessment — rent/valuation
             %% for THIS property genuinely needs the agent).
             case two_path_stored_leaf(Data, Comp) of
+                deferred ->
+                    %% The quick pass: the resolver half with the agent leaves empty (the
+                    %% merge's own absent-leaf defaults), committed as a resolver fill.
+                    {RO, Renderer, KbVersions} =
+                        fh_engine_fill:resolver(Name, Data, maps:get(outcomes, Data)),
+                    Partial = fh_engine_fill:merge_agent(Name, RO, #{}),
+                    case commit(Comp, <<"resolver">>, Renderer, KbVersions, Partial, Data) of
+                        {ok, Data1} ->
+                            {keep_state, Data1#{components := Rest, deferred := true},
+                             [{next_event, internal, step}]};
+                        {blocked, G, _} ->
+                            fail(Data, <<"compliance_block">>, gate_detail(G)),
+                            {stop, normal, Data}
+                    end;
                 {reuse, Existing} ->
                     {RO, Renderer, KbVersions} =
                         fh_engine_fill:resolver(Name, Data, maps:get(outcomes, Data)),
@@ -554,7 +581,19 @@ handle_sidecar(_Other, Data) ->
 
 %% --- terminate --------------------------------------------------------------
 
-terminate(_Reason, _State, #{plan_card_id := PC}) ->
+%% A turn that crashes (an exception, not a planned stop) still ends with a terminal
+%% event, so a page following the card sees the failure instead of waiting on a turn
+%% that is gone (behavior 94: a crash left plans on "Đang tính…" forever).
+terminate(Reason, _State, #{plan_card_id := PC} = Data) ->
+    case Reason of
+        normal -> ok;
+        shutdown -> ok;
+        {shutdown, _} -> ok;
+        _ ->
+            try fail(Data, <<"internal">>, <<"the plan could not be computed">>)
+            catch _:_ -> ok
+            end
+    end,
     fh_engine_turn_registry:release(PC),
     ok.
 
@@ -685,7 +724,8 @@ order(BlueprintSlug, Names) ->
 %%   - property turn: reuse iff the component's outcome_type is already in the seed (a scope:both
 %%     two-path component whose agent judgment was decided at base — e.g. tax_structure's entity);
 %%     a per-property component with no base outcome (property_assessment) is a fresh agent fill;
-%%   - base (full) turn: always fresh (the sidecar authors the agent leaves).
+%%   - base (full) turn: deferred on its quick pass (leaves empty, behavior 94), then fresh
+%%     (the sidecar authors the agent leaves).
 two_path_stored_leaf(Data, Comp) ->
     Name = maps:get(<<"name">>, Comp),
     case maps:get(kind, Data, base) of
@@ -696,6 +736,11 @@ two_path_stored_leaf(Data, Comp) ->
             case maps:get(OutcomeType, maps:get(outcomes, Data), undefined) of
                 undefined -> fresh;
                 Existing  -> {reuse, Existing}
+            end;
+        base ->
+            case maps:get(quick, Data, false) of
+                true -> deferred;
+                false -> fresh
             end;
         _ ->
             fresh
@@ -948,13 +993,23 @@ close_port(_Data) ->
 %% value resolves against the engine's cwd (engine/erlang), not the repo root: a
 %% repo-root-relative value crashes open_port with enoent on the first fill. Measured
 %% 2026-07-04: investor_seam_smoke with real sonnet.
+%% A bare name (no "/") is looked up on PATH: open_port's spawn_executable does not
+%% search PATH, so the image's FH_SIDECAR_PYTHON=python3 crashed every agent fill on
+%% prod with enoent (behavior 94, measured 2026-10-16 in the prod engine log: every
+%% plan stopped after eligibility, at mortgage_finance).
 python_exe() ->
     case os:getenv("FH_SIDECAR_PYTHON") of
-        false ->
-            case os:find_executable("python3") of
-                false -> error(python3_not_found);
-                P -> P
-            end;
+        false -> on_path("python3");
+        P ->
+            case lists:member($/, P) of
+                true -> P;
+                false -> on_path(P)
+            end
+    end.
+
+on_path(Name) ->
+    case os:find_executable(Name) of
+        false -> error({sidecar_python_not_found, Name});
         P -> P
     end.
 

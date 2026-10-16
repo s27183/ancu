@@ -1605,7 +1605,15 @@
                 {:else if running}
                     <p class="pp-computing"><span class="pp-spinner" aria-hidden="true"></span>{$t('plan.computing')}</p>
                 {:else}
-                    <p class="pp-pending">{$t('plan.computing')}</p>
+                    <!-- Behavior 94: the turn has ended (or crashed) without a budget — say
+                         so, never "Đang tính…"; "Thử lại" makes the plan again for its state
+                         (a failed card does not recompute by itself). -->
+                    <div class="pp-state" data-testid="plan-unfinished">
+                        <p>{$t(failure?.key ?? 'plan.failed')}</p>
+                        {#if !failure || failure.retry}<button type="button" onclick={onplan}
+                                >{$t('plan.retry')}</button
+                            >{/if}
+                    </div>
                 {/if}
             </section>
         {:else if activeTab}
@@ -1652,7 +1660,7 @@
         >
     {/if}
 
-    {#if failure}
+    {#if failure && !(activeTab?.interactive && !viewComponents.cash_position)}
         <div class="pp-state">
             <p>{$t(failure.key)}</p>
             {#if failure.retry}<button type="button" onclick={load}>{$t('plan.retry')}</button>{/if}
