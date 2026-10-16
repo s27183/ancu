@@ -57,6 +57,49 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
     "no_foreign_surcharge_domestic_investor": { "type": "bool", "value": true, "note": "a domestic (citizen/PR) investor pays full ordinary stamp duty but NOT the foreign-buyer surcharge (cross-ref kb.stamp-duty.calc-by-state)" }
   },
   "lookup": {
+    "line_details": {
+      "note": "one entry per statement line this doc's figure is placed on (not a fee line); the engine attaches it as the line's detail, filling {params} with the figures it computed (fh_engine_line_detail, behavior 93)",
+      "entries": [
+        {
+          "id": "deposit",
+          "tier": "CONVENTION",
+          "how": {
+            "vi": "{pct}% của {price} — mức đặt cọc giữ khoản vay ở 80% giá nhà; vay cao hơn mức này, ngân hàng tính thêm bảo hiểm khoản vay (LMI).",
+            "en": "{pct}% of {price} — the deposit that keeps the loan at 80% of the price; above that, lenders add mortgage insurance (LMI)."
+          },
+          "payer": {
+            "vi": "Bạn trả khi ký hợp đồng, từ tiền tiết kiệm hoặc từ phần vốn (equity) trong một bất động sản khác.",
+            "en": "You, when you sign the contract — from savings or equity in another property."
+          },
+          "drivers": {
+            "vi": "Số tiền bạn vay: có thể đặt cọc 10% nhưng sẽ phải trả LMI, và LMI cho khoản vay đầu tư đắt hơn.",
+            "en": "How much you borrow: a 10% deposit is possible but adds LMI, which costs more on an investment loan."
+          },
+          "note": {
+            "vi": "Mức dùng để lập kế hoạch — bạn có thể đặt cọc nhiều hoặc ít hơn.",
+            "en": "A planning baseline — you can put down more or less."
+          },
+          "source": 2
+        },
+        {
+          "id": "lmi_none",
+          "tier": "CONVENTION",
+          "how": {
+            "vi": "Không có: với mức đặt cọc {pct}%, khoản vay ở mức 80% giá nhà, và ngân hàng chỉ tính bảo hiểm khoản vay (LMI) khi vay trên 80%.",
+            "en": "None: with a {pct}% deposit the loan is 80% of the price, and lenders add mortgage insurance (LMI) only above 80%."
+          },
+          "payer": {
+            "vi": "Nếu có, bạn trả một lần khi settlement (có thể cộng vào khoản vay).",
+            "en": "If it applied, you would pay it once, at settlement (it can be added to the loan)."
+          },
+          "drivers": {
+            "vi": "Đặt cọc ít hơn: khi vay trên 80% giá nhà, phí bảo hiểm tăng theo tỷ lệ vay và số tiền vay.",
+            "en": "A smaller deposit: above 80% of the price, the premium rises with the share borrowed and the loan size."
+          },
+          "source": 1
+        }
+      ]
+    },
     "investment_deposit_bands": {
       "note": "CONVENTION — investor deposit bands as % of purchase price; resolver places the cash requirement against the price, adds the sibling-owned acquisition costs",
       "entries": [

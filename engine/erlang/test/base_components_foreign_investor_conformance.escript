@@ -201,12 +201,12 @@ money_spine_cases() ->
     {Acc, _} = walk(args(true), Comps),
     Cash = maps:get(<<"budget_envelope_investor">>, Acc),
     Events = maps:get(<<"cash_events">>, Cash),
-    %% behavior 83: the fee lines (each with a detail) follow the fixed events, in place of one
+    %% behavior 83: the fee lines (fh_engine_fees:fee_line/1) follow the fixed events, in place of one
     %% other_buying_costs event; the total counts the midpoint of the lines paid for sure.
-    Fees = [E || E <- Events, maps:is_key(<<"detail">>, E)],
-    Ids = [maps:get(<<"id">>, E) || E <- Events, not maps:is_key(<<"detail">>, E)],
+    Fees = [E || E <- Events, fh_engine_fees:fee_line(E)],
+    Ids = [maps:get(<<"id">>, E) || E <- Events, not fh_engine_fees:fee_line(E)],
     [CLo, CHi] = fh_engine_fees:committed(Fees),
-    Sum = lists:sum([hd(maps:get(<<"amount">>, E)) || E <- Events, not maps:is_key(<<"detail">>, E)])
+    Sum = lists:sum([hd(maps:get(<<"amount">>, E)) || E <- Events, not fh_engine_fees:fee_line(E)])
           + round((CLo + CHi) / 2),
     Cells = maps:get(<<"cells">>, maps:get(<<"journey_swimlane">>, Acc)),
     Actors = [maps:get(<<"id">>, A)
@@ -225,7 +225,7 @@ money_spine_cases() ->
                           mode => <<"D">>, firb_required_any => true}, Comps),
     NoStateIds = [maps:get(<<"id">>, E) || E <- maps:get(<<"cash_events">>,
                                        maps:get(<<"budget_envelope_investor">>, NoState)),
-                                      not maps:is_key(<<"detail">>, E)],
+                                      not fh_engine_fees:fee_line(E)],
     [check("cash_position emits the five fixed acquisition events at base",
            Ids, [<<"deposit">>, <<"firb_fee">>, <<"stamp_duty">>,
                  <<"foreign_buyer_surcharge">>, <<"registration">>]),

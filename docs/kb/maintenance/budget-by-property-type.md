@@ -41,6 +41,34 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
     "house_owner_bears_all_maintenance": { "type": "bool", "value": true, "note": "freestanding house: owner bears all maintenance (roof, exterior, garden, fences) → full ~1%+ reserve, higher when older" },
     "new_build_lower_early_years":    { "type": "bool", "value": true, "note": "CONVENTION — new house/off-the-plan: lower maintenance in early years (builder's warranty, new fixtures), but reserve still prudent as it ages" },
     "strata_structural_maintenance_in_levy": { "type": "bool", "value": true, "note": "apartment/townhouse: common-property/structural maintenance is funded by the strata capital-works fund (see kb.ongoing-costs.rates-water-strata), NOT the owner's reserve — the owner's reserve covers the interior only; do not double-count" }
+  },
+  "lookup": {
+    "line_details": {
+      "note": "one entry per statement line this doc's figure is placed on (not a fee line); the engine attaches it as the line's detail, filling {params} with the figures it computed (fh_engine_line_detail, behavior 93)",
+      "entries": [
+        {
+          "id": "maintenance_reserve",
+          "tier": "CONVENTION",
+          "how": {
+            "vi": "{pct}% giá nhà mỗi năm, để dành cho sửa chữa và bảo trì — quy tắc ước lượng thường dùng.",
+            "en": "{pct}% of the price a year, set aside for repairs and upkeep — a common rule of thumb."
+          },
+          "payer": {
+            "vi": "Chủ nhà, khi cần sửa chữa; đây là khoản dự phòng, không phải hoá đơn.",
+            "en": "The owner, as work comes up; it is a reserve, not a bill."
+          },
+          "drivers": {
+            "vi": "Tuổi, loại và tình trạng căn nhà: nhà cũ cần nhiều hơn; với căn hộ, việc bảo trì phần chung nằm trong phí strata.",
+            "en": "The home's age, type and condition: an older house needs more; for an apartment, upkeep of the common property is inside the strata levy."
+          },
+          "note": {
+            "vi": "Quy tắc ước lượng — tình trạng căn nhà mới quyết định.",
+            "en": "A rule of thumb — the home's condition decides."
+          },
+          "source": 0
+        }
+      ]
+    }
   }
 }
 ```

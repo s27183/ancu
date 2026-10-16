@@ -108,6 +108,8 @@ ALL_OPS = NUMERIC_OPS | SET_OPS | {"eq", "neq"}
 # the artifact (so the seam check, the generated LocalizedText, and the shell all read
 # one declaration). Keeping the gate driven off this constant makes that move a one-liner.
 LOCALES = ("vi", "en")
+# the honesty tiers a statement line's detail may carry (GATE 14; fh_engine_fees uses the same)
+LINE_TIERS = ("REGULATED", "LENDER-POLICY", "CONVENTION", "PLACEHOLDER")
 
 # Per-locale anti-fallback heuristics — ISOLATED on purpose (outcome-conformance.md §3):
 # the load-bearing, locale-agnostic check is "all locales present, non-empty, pairwise
@@ -1516,6 +1518,36 @@ def run(emit=False):
             if err:
                 fails.append(f"[copy] {slug}/{tid}: {err}")
     stats["copy_templates"] = copy_templates
+
+    # ---- GATE 14: a statement line's detail cites only its own doc (behavior 93) ---- #
+    # Whole lifecycle -> honesty tiers; one owner per fact -> the KB compiler -> line details
+    # A `lookup.line_details` entry is what a lifecycle-statement line opens to (the engine's
+    # fh_engine_line_detail): bilingual words and a source that is an index — or a state ->
+    # index map — into the SAME doc's `sources:`, so a line can never cite a page its doc
+    # does not. DISCOVERED over every doc, like GATE 8.
+    line_details = 0
+    for slug, doc in sorted(kb_docs.items()):
+        cj = doc.get("content_json")
+        table = ((cj or {}).get("lookup") or {}).get("line_details") if isinstance(cj, dict) else None
+        if table is None:
+            continue
+        n_src = len(doc.get("sources") or [])
+        for e in table.get("entries") or []:
+            line_details += 1
+            where = f"[line_details] {slug}/{e.get('id')}"
+            if e.get("tier") not in LINE_TIERS:
+                fails.append(f"{where}: tier {e.get('tier')!r} not one of {LINE_TIERS}")
+            for key in ("how", "payer", "drivers", "note"):
+                if key == "how" or key in e:
+                    err = check_copy_template(e.get(key))
+                    if err:
+                        fails.append(f"{where}.{key}: {err}")
+            src = e.get("source")
+            idx = list(src.values()) if isinstance(src, dict) else [] if src is None else [src]
+            for i in idx:
+                if not (isinstance(i, int) and not isinstance(i, bool) and 0 <= i < n_src):
+                    fails.append(f"{where}: source {i!r} is not an index into the doc's {n_src} `sources:`")
+    stats["line_details"] = line_details
 
     # ---- per-blueprint registry materialization + SEMANTIC gates ---------- #
     # The registry is per-blueprint (architecture §11.9): each in-scope blueprint is

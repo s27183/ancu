@@ -244,8 +244,14 @@ fill_fhb_foreign(Args, Upstream) ->
         <<"gap_or_surplus">>               => GapOrSurplus,
         <<"verdict">>                      => Verdict,
         <<"mitigation_options_if_short">>  => [],
-        <<"cash_events">>                  => cash_events_foreign(Deposit, DutyAfter, Surcharge, FirbFee,
-                                                                  registration_total(State, Ceiling), Fees),
+        <<"cash_events">>                  =>
+            line_details(cash_events_foreign(Deposit, DutyAfter, Surcharge, FirbFee,
+                                             registration_total(State, Ceiling), Fees),
+                         State, {ceiling, Ceiling}, Duty,
+                         {<<"kb.lender.foreign-buyer-deposit-requirements">>, <<"deposit">>,
+                          #{<<"pct">> => fh_engine_line_detail:pct(param_value(
+                                <<"kb.lender.foreign-buyer-deposit-requirements">>,
+                                <<"non_resident_deposit_pct_typical">>))}}),
         <<"fee_pending">>                  => fee_pending(Fees),
         <<"key_assumptions">>              => key_assumptions_foreign(Ceiling, State)
     },
@@ -469,7 +475,9 @@ budget_envelope_investor(Args, Pf) ->
                 <<"key_assumptions">>       =>
                     security_lvr_caveat(maps:get(<<"property_type">>, Pf, null)),
                 <<"cash_events">>           =>
-                    cash_events_investor(Deposit, Duty, registration_total(State, Price), Lmi, Fees),
+                    line_details(
+                        cash_events_investor(Deposit, Duty, registration_total(State, Price), Lmi, Fees),
+                        State, {property, Price}, #{}, investor_deposit_detail()),
                 <<"fee_pending">>           => fee_pending(Fees)
             }
     end.
@@ -503,7 +511,9 @@ base_cash_events_investor(Args, Upstream) ->
         true  ->
             {_Lvr, _Loan, Deposit, Duty, _Acq, Fees} =
                 investor_need(Args, State, Ceiling, undefined),
-            cash_events_investor(Deposit, Duty, registration_total(State, Ceiling), 0, Fees)
+            line_details(
+                cash_events_investor(Deposit, Duty, registration_total(State, Ceiling), 0, Fees),
+                State, {ceiling, Ceiling}, #{}, investor_deposit_detail())
     end.
 
 %% Goal: regulated figures are grounded, honest about their tier -> a CONVENTION is stated as a
@@ -624,8 +634,10 @@ fill_investor_foreign(Args, Upstream) ->
         %% only when its figure is known, so an unknown state drops duty, surcharge and
         %% other costs. Mode D has no per-property cash_position turn in launch scope.
         <<"cash_events">>                  =>
-            cash_events_foreign(Deposit, DutyAfter, Surcharge, FirbFee,
-                                registration_total(State, Ceiling), Fees, <<"services">>),
+            line_details(cash_events_foreign(Deposit, DutyAfter, Surcharge, FirbFee,
+                                             registration_total(State, Ceiling), Fees,
+                                             <<"services">>),
+                         State, {ceiling, Ceiling}, Duty, non_resident_deposit_detail()),
         <<"fee_pending">>                  => fee_pending(Fees)
     },
     KbVersions = fh_engine_kb:kb_anchors(
@@ -794,7 +806,9 @@ budget_envelope(Sd, State, RecPath, Range, Ceiling, Stack, Fees) ->
       <<"gap_or_surplus">>               => null,   %% needs cash_available
       <<"verdict">>                      => null,   %% PENDING by design (no savings at base)
       <<"genuine_savings_verdict">>      => <<"unknown">>,
-      <<"cash_events">>                  => cash_events(Deposit, Sd, OtherCosts, Stack, Fees),
+      <<"cash_events">>                  =>
+          line_details(cash_events(Deposit, Sd, OtherCosts, Stack, Fees),
+                       State, {ceiling, Ceiling}, Sd, home_deposit_detail(RecPath)),
       <<"fee_pending">>                  => fee_pending(Fees),
       <<"mitigation_options_if_short">>  => [],
       <<"key_assumptions">> => key_assumptions(Total, Ceiling)}.
@@ -999,6 +1013,87 @@ registration_event(Reg, Counterparty) ->
     (event(<<"registration">>, <<"settle">>, <<"event_registration">>, <<"out">>,
            point(Reg), false, Counterparty, <<"cash_position">>))#{
         <<"group">> => <<"other_buying_costs">>}.
+
+%% Whole lifecycle -> every statement line opens its own detail -> cash_position -> the buy
+%% lines' details (behavior 93).
+%% Goal: a buy line that is not a fee (deposit, duty, registration, surcharge, FIRB fee, a
+%% grant, LMI) opens in place like a fee line does, instead of a whole component card.
+%% Invariant: the detail names the figures this module computed the line with — the price
+%% basis (range ceiling or the attached property), the state, the deposit % — and the doc
+%% that owns the figure (fh_engine_line_detail); never another computation.
+%% Capability: the details every mode shares; Deposit is the mode's own deposit
+%% {Slug, EntryId, Params} (its price phrase is added here). No price → no events to detail.
+line_details(Events, State, {Basis, Price}, Sd, {DepSlug, DepId, DepParams})
+  when is_number(Price) ->
+    PriceP = fh_engine_line_detail:price(Basis, Price),
+    Ctx = fun(P) -> #{state => State, params => P} end,
+    Spec0 = #{
+        <<"deposit">> => {DepSlug, DepId, Ctx(DepParams#{<<"price">> => PriceP})},
+        <<"stamp_duty">> => duty_detail(State, PriceP, Sd),
+        <<"registration">> => {<<"kb.buyer-costs.inspections-conveyancing-fees">>,
+                               <<"registration">>,
+                               Ctx(#{<<"state">> => State, <<"price">> => PriceP})},
+        <<"firb_fee">> => {<<"kb.firb.fee-schedule-current">>, <<"firb_fee">>,
+                           Ctx(#{<<"price">> => PriceP})},
+        <<"lmi">> => {<<"kb.investor.deposit-requirements-investment-loans">>, <<"lmi_none">>,
+                      Ctx(#{<<"pct">> => param_value(
+                                <<"kb.investor.deposit-requirements-investment-loans">>,
+                                <<"deposit_no_lmi_pct">>)})}},
+    Spec1 = case surcharge_pct(State) of
+                null -> Spec0;
+                Pct  -> Spec0#{<<"foreign_buyer_surcharge">> =>
+                                   {?SURCHARGE, <<"surcharge">>,
+                                    Ctx(#{<<"pct">> => fh_engine_line_detail:pct(Pct),
+                                          <<"price">> => PriceP, <<"state">> => State})}}
+            end,
+    Spec = maps:merge(Spec1, grant_details(Events, State)),
+    fh_engine_line_detail:attach_all(Events, Spec);
+line_details(Events, _State, _Price, _Sd, _Deposit) ->
+    Events.
+
+%% each mode's deposit line: the doc whose % the deposit was computed at.
+home_deposit_detail(RecPath) ->
+    Id = case RecPath of <<"fhg_backed">> -> <<"deposit_fhg">>; _ -> <<"deposit_floor">> end,
+    {<<"kb.scheme.fhg">>, Id, #{<<"pct">> => fh_engine_line_detail:pct(deposit_pct())}}.
+
+investor_deposit_detail() ->
+    Slug = <<"kb.investor.deposit-requirements-investment-loans">>,
+    {Slug, <<"deposit">>,
+     #{<<"pct">> => fh_engine_line_detail:pct(param_value(Slug, <<"deposit_no_lmi_pct">>))}}.
+
+non_resident_deposit_detail() ->
+    Slug = <<"kb.non-resident.investment-loan-deposit-requirements">>,
+    {Slug, <<"deposit">>,
+     #{<<"pct">> => fh_engine_line_detail:pct(fh_engine_mortgage:deposit_pct_foreign()),
+       <<"lo">> => fh_engine_line_detail:pct(
+                       param_value(Slug, <<"non_resident_investment_deposit_pct_low">>)),
+       <<"hi">> => fh_engine_line_detail:pct(
+                       param_value(Slug, <<"non_resident_investment_deposit_pct_high">>))}}.
+
+%% the duty line: the state's scale at the price, less the first-home concession where one
+%% applied (the before/saving figures stamp_duty/3 computed).
+duty_detail(State, PriceP, #{<<"concession_applied">> := Saving,
+                             <<"before_concession">> := Before})
+  when is_number(Saving), Saving > 0 ->
+    {<<"kb.stamp-duty.calc-by-state">>, <<"stamp_duty_concession">>,
+     #{state => State, params => #{<<"state">> => State, <<"price">> => PriceP,
+                                   <<"before">> => money(Before),
+                                   <<"saving">> => money(Saving)}}};
+duty_detail(State, PriceP, _Sd) ->
+    {<<"kb.stamp-duty.calc-by-state">>, <<"stamp_duty">>,
+     #{state => State, params => #{<<"state">> => State, <<"price">> => PriceP}}}.
+
+%% a grant line's detail is its state's FHOG doc; a state the KB holds no grant doc for
+%% gives none (the line shows without one).
+grant_details(Events, State) ->
+    Slug = case State of
+               <<"NSW">> -> <<"kb.scheme.nsw.fhog">>;
+               <<"VIC">> -> <<"kb.scheme.vic.fhog">>;
+               _         -> none
+           end,
+    maps:from_list([{Id, {Slug, <<"grant">>, #{state => State, params => #{}}}}
+                    || Slug =/= none,
+                       #{<<"id">> := <<"grant_", _/binary>> = Id} <- Events]).
 
 %% Mode A/E's loan at the ceiling: the ceiling less the minimum deposit.
 home_loan(V) when is_integer(V) -> V - pct_of(deposit_pct(), V);

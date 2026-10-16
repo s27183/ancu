@@ -72,6 +72,30 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
   "stacking": {
     "combines_with": ["kb.scheme.fhg", "kb.scheme.fhss", "kb.scheme.help-to-buy", "kb.scheme.vic.fhb-duty"],   // state doc declares federal↔state edges (symmetric, §11.9); the VIC FHOG↔duty edge is declared here (once). Help to Buy explicitly allows stacking FHOG.
     "order_hint": 25   // a grant arranged with finance / paid at settlement — between FHG (20) and the duty concession (30)
+  },
+  "lookup": {
+    "line_details": {
+      "note": "one entry per statement line this doc's figure is placed on (not a fee line); the engine attaches it as the line's detail, filling {params} with the figures it computed (fh_engine_line_detail, behavior 93)",
+      "entries": [
+        {
+          "id": "grant",
+          "tier": "REGULATED",
+          "how": {
+            "vi": "Trợ cấp Người mua nhà lần đầu của Victoria: $10,000 cho nhà mới (mới xây, mua trên giấy hoặc sửa chữa lớn) giá tới $750,000. Nhà đã qua sử dụng không được, nên khoảng tiền bắt đầu từ $0.",
+            "en": "Victoria's First Home Owner Grant: $10,000 for a new home (newly built, off the plan or substantially renovated) valued up to $750,000. An established home gets nothing, so the range starts at $0."
+          },
+          "payer": {
+            "vi": "Sở Thuế Victoria (SRO) trả cho bạn, nhận khi settlement.",
+            "en": "The State Revenue Office pays it to you, received at settlement."
+          },
+          "drivers": {
+            "vi": "Nhà có phải nhà mới không, giá nhà so với mức trần, và việc bạn (và vợ/chồng) chưa từng sở hữu nhà ở Úc — nhà sở hữu ở nước ngoài không tính.",
+            "en": "Whether the home is new, its price against the cap, and whether you (and your partner) have never owned a home in Australia — a home owned overseas does not count."
+          },
+          "source": 0
+        }
+      ]
+    }
   }
 }
 ```

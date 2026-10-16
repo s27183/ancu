@@ -398,16 +398,52 @@ own_cash_events(Args, Upstream, BudgetKey, Other, Kind, Source) ->
     Range = price_range(Args),
     Budget = maps:get(BudgetKey, Upstream, #{}),
     Band = statutory_band(),
+    Principal = principal(Range, Budget),
     Events = [
         own_event(<<"council_rates_water">>, <<"event_rates_water">>,
                   [maps:get(<<"low">>, Band), maps:get(<<"high">>, Band)], <<"government">>, Source),
         own_event(<<"maintenance_reserve">>, <<"event_maintenance_reserve">>,
                   maintenance_band(Range), Other, Source),
         own_event(<<"loan_repayments">>, <<"event_loan_repayments">>,
-                  fh_engine_disposition:annual_repayments(principal(Range, Budget), Kind),
+                  fh_engine_disposition:annual_repayments(Principal, Kind),
                   <<"lender">>, Source)],
     {FeeEvents, _} = own_fees(Args, Other, Source),
-    [E || E <- Events, maps:get(<<"amount">>, E) =/= null] ++ FeeEvents.
+    own_details([E || E <- Events, maps:get(<<"amount">>, E) =/= null], Principal, Kind)
+        ++ FeeEvents.
+
+%% Whole lifecycle -> every statement line opens its own detail -> ownership_planning -> the
+%% own lines' details (behavior 93): each names the figures its line was computed with — the
+%% council and water bands, the reserve %, the principal with the rate and term
+%% fh_engine_disposition amortises at — from the doc that owns them (fh_engine_line_detail).
+own_details(Events, Principal, Kind) ->
+    Rates = <<"kb.ongoing-costs.rates-water-strata">>,
+    M = fun(K) -> fh_engine_money:money(kb_param(Rates, K)) end,
+    Pct = fun fh_engine_line_detail:pct/1,
+    {Rate, Term} = fh_engine_disposition:repayment_basis(Kind),
+    Loan = case Kind of
+               owner    -> <<"kb.lender.serviceability-basics">>;
+               investor -> <<"kb.lender.serviceability-investment-loans">>
+           end,
+    Spec0 = #{
+        <<"council_rates_water">> =>
+            {Rates, <<"council_rates_water">>,
+             #{params => #{<<"council_lo">> => M(<<"council_rates_indicative_aud_year_low">>),
+                           <<"council_hi">> => M(<<"council_rates_indicative_aud_year_high">>),
+                           <<"water_lo">> => M(<<"water_indicative_aud_year_low">>),
+                           <<"water_hi">> => M(<<"water_indicative_aud_year_high">>)}}},
+        <<"maintenance_reserve">> =>
+            {<<"kb.maintenance.budget-by-property-type">>, <<"maintenance_reserve">>,
+             #{params => #{<<"pct">> => Pct(kb_param(<<"kb.maintenance.budget-by-property-type">>,
+                                                     <<"reserve_pct_of_value_default">>))}}}},
+    Spec = case Principal of
+               [_, _] -> Spec0#{<<"loan_repayments">> =>
+                                    {Loan, <<"loan_repayments">>,
+                                     #{params => #{<<"principal">> =>
+                                                       fh_engine_line_detail:money_range(Principal),
+                                                   <<"term">> => Term, <<"rate">> => Pct(Rate)}}}};
+               _      -> Spec0
+           end,
+    fh_engine_line_detail:attach_all(Events, Spec).
 
 %% Whole lifecycle -> honesty tiers; one owner per fact -> ownership_planning -> own fee lines
 %% The yearly fees a buyer only learns from a quote (building and landlord insurance,

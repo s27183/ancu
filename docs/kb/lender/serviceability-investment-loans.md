@@ -59,6 +59,53 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
     "existing_property_repayments_assessed": { "type": "bool", "value": true, "note": "every existing mortgage is counted as a committed expense at the buffered rate (some lenders use actual/floor for external debt); stacks across a portfolio" },
     "negative_gearing_addback_varies":   { "type": "bool", "value": true, "note": "CONVENTION — some lenders add back the cash benefit of negative-gearing deductions in serviceability; varies materially by lender, NOT assumed by the plan — surfaced as a broker-confirmed variable" },
     "dti_high_lending_cap_share_pct":    { "type": "percentage", "value": 20, "note": "REGULATED (APRA, from Feb 2026) — ADIs must limit new lending at DTI ≥6 to 20% of new mortgage lending, applied to owner-occupier and INVESTOR portfolios SEPARATELY; the binding ceiling on portfolio scale-up. DTI threshold (6) and the buffer (3.0pp) are owned by kb.lender.serviceability-basics" }
+  },
+  "lookup": {
+    "line_details": {
+      "note": "one entry per statement line this doc's figure is placed on (not a fee line); the engine attaches it as the line's detail, filling {params} with the figures it computed (fh_engine_line_detail, behavior 93)",
+      "entries": [
+        {
+          "id": "loan_repayments",
+          "tier": "CONVENTION",
+          "how": {
+            "vi": "Trả cả gốc và lãi cho khoản vay {principal} (giá nhà trừ tiền đặt cọc) trong {term} năm, lãi suất {rate}%/năm — lãi suất tham khảo cho nhà ở cộng phần chênh thường gặp của khoản vay đầu tư, không phải lãi suất khoản vay của bạn.",
+            "en": "Principal and interest on a loan of {principal} (the price less your deposit) over {term} years at {rate}% a year — a typical home-loan rate plus the usual investment-loan premium, not your loan's rate."
+          },
+          "payer": {
+            "vi": "Bạn trả cho ngân hàng, thường hằng tháng; với nhà cho thuê, phần lãi được khấu trừ thuế.",
+            "en": "You, to your lender, usually monthly; on a rental the interest is tax-deductible."
+          },
+          "drivers": {
+            "vi": "Lãi suất ngân hàng cho bạn và biến động của nó, số tiền vay và thời hạn vay, và việc bạn chỉ trả lãi hay trả cả gốc.",
+            "en": "The rate your lender gives you and how it moves, the loan size and term, and whether you pay interest only."
+          },
+          "note": {
+            "vi": "Ước tính theo lãi suất tham khảo — đề nghị cho vay của ngân hàng mới quyết định.",
+            "en": "An estimate at a typical rate — your loan offer decides."
+          }
+        },
+        {
+          "id": "loan_payout",
+          "tier": "CONVENTION",
+          "how": {
+            "vi": "Phần còn lại của khoản vay {principal} sau {years} năm trả góp (thời hạn {term} năm, lãi suất {rate}%/năm) — được trả từ tiền bán nhà.",
+            "en": "What is left of a {principal} loan after {years} years of repayments ({term}-year term at {rate}% a year) — repaid from the sale."
+          },
+          "payer": {
+            "vi": "Trả cho ngân hàng từ tiền bán nhà khi hoàn tất việc bán.",
+            "en": "Paid to your lender from the sale money at settlement."
+          },
+          "drivers": {
+            "vi": "Số tiền vay, lãi suất qua các năm, và việc trả thêm: trả thêm sớm thì còn nợ ít hơn.",
+            "en": "The loan size, the rate over the years, and extra repayments: paying more early leaves less to repay."
+          },
+          "note": {
+            "vi": "Ước tính theo lãi suất tham khảo — đề nghị cho vay của ngân hàng mới quyết định.",
+            "en": "An estimate at a typical rate — your loan offer decides."
+          }
+        }
+      ]
+    }
   }
 }
 ```

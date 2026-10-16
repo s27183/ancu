@@ -46,6 +46,34 @@ Pure-reference (`fills: []`). The `cash_position` resolver selects `minimum_requ
     "non_resident_investment_deposit_pct_high": { "type": "int", "value": 40, "provenance": "CONVENTION", "note": "same upper band; investment loans generally assessed more conservatively than owner-occupier on rate/serviceability, not on a distinct deposit floor." },
     "au_partner_reduced_deposit_path_not_applicable": { "type": "bool", "value": true, "provenance": "CONVENTION", "note": "the 95% LVR joint-purchase-with-AU-partner path assumes occupancy on the AU co-borrower's footing; not surfaced for a Vietnam-located investor's co-ownership structure without that occupancy fact." },
     "no_fhb_schemes_for_non_resident_investor": { "type": "bool", "value": true, "provenance": "CONVENTION", "note": "no FHB scheme/concession applies — same fact as kb.investor.deposit-requirements-investment-loans, restated for the non-resident case." }
+  },
+  "lookup": {
+    "line_details": {
+      "note": "one entry per statement line this doc's figure is placed on (not a fee line); the engine attaches it as the line's detail, filling {params} with the figures it computed (fh_engine_line_detail, behavior 93)",
+      "entries": [
+        {
+          "id": "deposit",
+          "tier": "CONVENTION",
+          "how": {
+            "vi": "{pct}% của {price} — mức giữa của khoảng {lo}–{hi}% mà ngân hàng thường yêu cầu khi người không cư trú vay để đầu tư.",
+            "en": "{pct}% of {price} — the middle of the {lo}–{hi}% deposit lenders commonly ask of a non-resident borrowing to invest."
+          },
+          "payer": {
+            "vi": "Bạn và người thân góp tiền mua nhà, trả khi ký hợp đồng; khoản này được giữ trong tài khoản ủy thác (trust) đến ngày settlement.",
+            "en": "You and any family funding the purchase, paid when you sign the contract and held in trust until settlement."
+          },
+          "drivers": {
+            "vi": "Tình trạng cư trú, đồng tiền bạn nhận thu nhập và ngân hàng: hồ sơ ít phổ biến thường ở mức cao của khoảng.",
+            "en": "Your residency, the currency you earn in and the lender: less usual profiles sit at the top of the band."
+          },
+          "note": {
+            "vi": "Con số thường gặp — ngân hàng bạn chọn sẽ quyết định.",
+            "en": "A typical figure — the lender you choose sets it."
+          },
+          "source": 0
+        }
+      ]
+    }
   }
 }
 ```

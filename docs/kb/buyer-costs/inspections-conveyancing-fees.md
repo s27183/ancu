@@ -157,6 +157,30 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
     "registration_fees_indexed_annually":   { "type": "bool",  "value": true, "note": "REGULATED — state land-titles registration fees are reset each 1 July; figures in the lookup are FY-stamped, re-verify annually (drives last_verified)" }
   },
   "lookup": {
+    "line_details": {
+      "note": "one entry per statement line this doc's figure is placed on (not a fee line); the engine attaches it as the line's detail, filling {params} with the figures it computed (fh_engine_line_detail, behavior 93)",
+      "entries": [
+        {
+          "id": "registration",
+          "tier": "REGULATED",
+          "how": {
+            "vi": "Lệ phí của cơ quan đăng ký đất đai bang {state} để đăng bộ sang tên và đăng ký thế chấp, tính trên {price}.",
+            "en": "{state}'s land-titles fees to register the transfer and your mortgage, on {price}."
+          },
+          "payer": {
+            "vi": "Bạn (người mua) trả khi settlement; conveyancer của bạn nộp hồ sơ.",
+            "en": "You, the buyer, at settlement; your conveyancer lodges the papers."
+          },
+          "drivers": {
+            "vi": "Bang, và ở VIC, QLD thì cả giá nhà; lệ phí được điều chỉnh mỗi ngày 1/7.",
+            "en": "The state, and in VIC and QLD the price; the fees are reset every 1 July."
+          },
+          "source": {
+            "NSW": 0
+          }
+        }
+      ]
+    },
     "state_registration_fees": {
       "note": "REGULATED — statutory land-titles registration fees, per state. NSW is flat; VIC and QLD add a value-based component to a base. FY stamped per state (NSW and QLD FY2026-27 effective 1 Jul 2026; VIC FY2025-26, not yet re-grounded for 2026-27). Resolver computes the transfer fee per state's formula.",
       "entries": [

@@ -80,6 +80,34 @@ The resolver rules the artifact compiler extracts as this doc's `content_json`. 
     "compounding":                    { "type": "string", "value": "value_at_H = purchase_price × (1 + rate)^H, applied at both band ends to yield a sale_proceeds money_range", "note": "the resolver's projection method over the hold horizon H" },
     "surface_as":                     { "type": "string", "value": "banded money_range with the growth basis stated in key_assumptions; PENDING when H or price unparameterised; never a point forecast", "note": "ASIC discipline — decision-support, not a forecast or advice" },
     "source_series":                  { "type": "string", "value": "ABS 6432.0 Total Value of Dwellings, Table 2 — median price of established house and attached dwelling transfers, 8 capital cities, Jun Qtr 2006 → Jun Qtr 2026", "note": "the series and window the band is derived from; re-run the derivation on each quarterly release and update last_verified" }
+  },
+  "lookup": {
+    "line_details": {
+      "note": "one entry per statement line this doc's figure is placed on (not a fee line); the engine attaches it as the line's detail, filling {params} with the figures it computed (fh_engine_line_detail, behavior 93)",
+      "entries": [
+        {
+          "id": "sale_proceeds",
+          "tier": "CONVENTION",
+          "how": {
+            "vi": "Giá mua {price}, tăng {low}–{high}% mỗi năm trong {years} năm — khoảng lấy từ mức tăng giá nhà trong 20 năm qua ở các thành phố thủ phủ (ABS), không phải dự báo.",
+            "en": "Your price of {price}, grown {low}–{high}% a year for {years} years — a band from the last 20 years of capital-city home prices (ABS), not a forecast."
+          },
+          "payer": {
+            "vi": "Người mua nhà của bạn trả khi hoàn tất việc bán; khoản vay được trả từ tiền này trước.",
+            "en": "Your buyer pays it at settlement of the sale; your loan is repaid from it first."
+          },
+          "drivers": {
+            "vi": "Thị trường lúc bạn bán, khu vực (suburb) và tình trạng căn nhà.",
+            "en": "The market when you sell, the suburb and the home's condition."
+          },
+          "note": {
+            "vi": "Dự phóng, không phải dự báo — thị trường mới quyết định.",
+            "en": "A projection, not a forecast — the market decides."
+          },
+          "source": 0
+        }
+      ]
+    }
   }
 }
 ```

@@ -75,6 +75,35 @@ Pure-reference (`fills: []`). The `cash_position` resolver reads the surcharge *
     "nt_has_no_duty_surcharge": { "type": "bool", "value": true, "provenance": "REGULATED", "note": "NT levies no foreign purchaser stamp-duty surcharge." }
   },
   "lookup": {
+    "line_details": {
+      "note": "one entry per statement line this doc's figure is placed on (not a fee line); the engine attaches it as the line's detail, filling {params} with the figures it computed (fh_engine_line_detail, behavior 93)",
+      "entries": [
+        {
+          "id": "surcharge",
+          "tier": "REGULATED",
+          "how": {
+            "vi": "{pct}% của {price} — khoản thuế trước bạ bổ sung của bang {state} cho người mua nước ngoài, cộng thêm vào thuế thông thường.",
+            "en": "{pct}% of {price} — {state}'s extra duty for a foreign buyer, on top of the ordinary duty."
+          },
+          "payer": {
+            "vi": "Bạn (người mua nước ngoài) trả khi settlement, cùng với thuế trước bạ thông thường.",
+            "en": "You, the foreign buyer, at settlement, with the ordinary duty."
+          },
+          "drivers": {
+            "vi": "Giá nhà và bang: mỗi bang tự đặt thuế suất (ACT và NT không thu).",
+            "en": "The price and the state: each state sets its own rate (the ACT and NT charge none)."
+          },
+          "source": {
+            "VIC": 0,
+            "QLD": 1,
+            "WA": 2,
+            "TAS": 3,
+            "NSW": 4,
+            "SA": 4
+          }
+        }
+      ]
+    },
     "foreign_buyer_surcharge_by_state": {
       "note": "per-state foreign purchaser DUTY surcharge rate; the resolver reads surcharge_pct for the property's state and computes amount = dutiable value × rate (postcondition vs the state revenue calculator). Standard duty is owned by kb.stamp-duty.calc-by-state; annual land-tax surcharge by kb.tax.land-tax-by-state.",
       "entries": [
