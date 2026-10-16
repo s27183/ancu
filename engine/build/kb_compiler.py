@@ -63,6 +63,7 @@ KB = ROOT / "docs" / "kb"
 BP = ROOT / "docs" / "blueprints"
 NEWS_DIR = KB / "news"
 FACTS_DIR = KB / "facts"
+TERMS_DIR = KB / "terms"
 ARTIFACT_OUT = ROOT / "engine" / "erlang" / "priv" / "kb" / "artifact.json"
 
 # The in-scope SET — every blueprint whose registry is materialized + semantically
@@ -256,6 +257,90 @@ def parse_facts_doc(path):
         "error": error,
         "path": path,
     }
+
+
+# Bilingual -> P-7 · The KB -> The KB compiler -> an Australian term's explanation is bilingual and rests on a KB doc
+# Behavior 102 (Son 2026-10-17): the app marks the terms it writes (LMI, FIRB, …) and a tap
+# opens a card. docs/kb/terms/*.md hold them: a `## Terms` jsonc block of
+# {id, abbr, name, forms, meaning, why, kb | url}. GATE 15 fails closed on: a duplicate id
+# or form (a form is matched case-insensitively unless it is all capitals), an empty
+# forms list, a name/meaning/why missing a locale, and a `kb` slug that is not a KB doc
+# with a source url (or, with no KB doc, a `url` that is not https). The term's source
+# link in the artifact is that doc's first source url: its sources are the record.
+TERM_ID = re.compile(r"^[a-z0-9_]+$")
+TERM_ACRONYM = re.compile(r"^[A-Z0-9/]+$")
+
+
+def parse_terms_doc(path):
+    text = path.read_text()
+    slug_m = re.search(r"^slug:\s*(\S+)", text, re.M)
+    block = fenced_jsonc_after(text, "## Terms")
+    body, error = None, None
+    if block is None:
+        error = "no '## Terms' jsonc block"
+    else:
+        try:
+            body = parse_jsonc(block)
+        except Exception as e:  # noqa: BLE001 - report, do not crash the build
+            error = str(e)
+    return {"slug": slug_m.group(1) if slug_m else None, "body": body, "error": error,
+            "path": path,
+            "last_verified": (re.search(r"^last_verified:\s*(\S+)", text, re.M) or [None, None])[1]}
+
+
+def term_source(term, kb_docs):
+    """{slug, url} for a term: its KB doc's first source url, or its own url."""
+    slug = term.get("kb")
+    if slug:
+        urls = [s.get("url") for s in (kb_docs.get(slug, {}).get("sources") or []) if s.get("url")]
+        return {"slug": slug, "url": urls[0] if urls else None}
+    return {"slug": None, "url": term.get("url")}
+
+
+def terms_fails(terms_docs, kb_docs):
+    """GATE 15 problems over every terms doc (block above)."""
+    out, ids, forms = [], {}, {}
+    for slug, doc in sorted(terms_docs.items()):
+        if doc["error"]:
+            out.append(f"[terms] {slug}: {doc['error']}")
+            continue
+        if not doc.get("last_verified"):
+            out.append(f"[terms] {slug}: missing last_verified")
+        terms = (doc["body"] or {}).get("terms") or []
+        if not terms:
+            out.append(f"[terms] {slug}: no terms")
+        for t in terms:
+            tid = t.get("id") or "?"
+            where = f"[terms] {slug}#{tid}"
+            if not TERM_ID.match(tid):
+                out.append(f"{where}: id must be lowercase a-z0-9_")
+            if tid in ids:
+                out.append(f"{where}: id also in {ids[tid]}")
+            ids[tid] = slug
+            for key in ("name", "meaning", "why"):
+                err = check_copy_template(t.get(key) or {})
+                if err:
+                    out.append(f"{where}: {key}: {err}")
+            fs = t.get("forms") or []
+            if not fs:
+                out.append(f"{where}: no forms")
+            for f in fs:
+                if not isinstance(f, str) or not f.strip() or "&" in f:
+                    out.append(f"{where}: form {f!r} is empty or holds '&'")
+                    continue
+                key = f if TERM_ACRONYM.match(f) else f.lower()
+                if key in forms and forms[key] != tid:
+                    out.append(f"{where}: form {f!r} also belongs to {forms[key]}")
+                forms[key] = tid
+            src = term_source(t, kb_docs)
+            if t.get("kb"):
+                if t["kb"] not in kb_docs:
+                    out.append(f"{where}: kb {t['kb']!r} is not a KB doc")
+                elif not src["url"]:
+                    out.append(f"{where}: kb {t['kb']!r} has no source url")
+            elif not str(t.get("url") or "").startswith("https://"):
+                out.append(f"{where}: neither a `kb` slug nor an https `url`")
+    return out
 
 
 def facts_doc_fails(slug, doc, kb_docs):
@@ -1354,6 +1439,7 @@ def run(emit=False):
     kb_docs = {}
     news_docs = {}
     facts_docs = {}
+    terms_docs = {}
     for f in sorted(KB.rglob("*.md")):
         rel = f.relative_to(ROOT / "docs").with_suffix("")
         expect = str(rel).replace("/", ".")
@@ -1366,6 +1452,13 @@ def run(emit=False):
                 fails.append(f"[slug] {f}: slug={doc['slug']} expect={expect}")
             if doc["slug"]:
                 facts_docs[doc["slug"]] = doc
+            continue
+        if TERMS_DIR in f.parents:
+            doc = parse_terms_doc(f)
+            if doc["slug"] != expect:
+                fails.append(f"[slug] {f}: slug={doc['slug']} expect={expect}")
+            if doc["slug"]:
+                terms_docs[doc["slug"]] = doc
             continue
         if NEWS_DIR in f.parents:
             doc = parse_news_doc(f)
@@ -1386,6 +1479,7 @@ def run(emit=False):
     stats["kb_docs"] = len(kb_docs)
     stats["news_docs"] = len(news_docs)
     stats["facts_docs"] = len(facts_docs)
+    stats["terms"] = sum(len((d["body"] or {}).get("terms") or []) for d in terms_docs.values())
 
     # ---- GATE 10: sources citation (FAIL-CLOSED) --------------------------- #
     # kb-update-runbook.md Phase 1: a fact doc must cite the primary source it was
@@ -1518,6 +1612,9 @@ def run(emit=False):
             if err:
                 fails.append(f"[copy] {slug}/{tid}: {err}")
     stats["copy_templates"] = copy_templates
+
+    # ---- GATE 15: Australian terms (TERM_ID block above; behavior 102) ---- #
+    fails.extend(terms_fails(terms_docs, kb_docs))
 
     # ---- GATE 14: a statement line's detail cites only its own doc (behavior 93) ---- #
     # Whole lifecycle -> honesty tiers; one owner per fact -> the KB compiler -> line details
@@ -1660,7 +1757,7 @@ def run(emit=False):
 
     artifact = None
     if not fails:
-        artifact = build_artifact(blueprints, registries, kb_docs, news_docs, facts_docs)
+        artifact = build_artifact(blueprints, registries, kb_docs, news_docs, facts_docs, terms_docs)
         if emit:
             ARTIFACT_OUT.parent.mkdir(parents=True, exist_ok=True)
             ARTIFACT_OUT.write_text(
@@ -1716,7 +1813,7 @@ def registry_payload(reg):
     }
 
 
-def build_artifact(blueprints, registries, kb_docs, news_docs, facts_docs=None):
+def build_artifact(blueprints, registries, kb_docs, news_docs, facts_docs=None, terms_docs=None):
     kb = {
         slug: {
             "effective_from": d["effective_from"],
@@ -1813,6 +1910,14 @@ def build_artifact(blueprints, registries, kb_docs, news_docs, facts_docs=None):
             }
             for slug, d in (facts_docs or {}).items()
         },
+        # Behavior 102: every Australian term the app marks, with its source link
+        # (GATE 15), served at GET /api/terms.
+        "terms": [
+            {"id": t["id"], "abbr": t.get("abbr"), "name": t["name"], "forms": t["forms"],
+             "meaning": t["meaning"], "why": t["why"], "source": term_source(t, kb_docs)}
+            for _slug, d in sorted((terms_docs or {}).items())
+            for t in ((d["body"] or {}).get("terms") or [])
+        ],
         "blueprints": bps,
     }
 
@@ -1832,7 +1937,7 @@ def main():
     print(f"in-scope blueprints: {sorted(IN_SCOPE_BLUEPRINTS)} | deferred docs: "
           f"{stats.get('deferred_docs')}")
     print(f"kb docs: {stats.get('kb_docs')} | news notes: {stats.get('news_docs')} | "
-          f"fact docs: {stats.get('facts_docs')}")
+          f"fact docs: {stats.get('facts_docs')}, terms: {stats.get('terms')}")
     print(f"copy templates: {stats.get('copy_templates')} (bilingual gate, "
           f"locales={'+'.join(LOCALES)})")
     if info:
