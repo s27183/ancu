@@ -684,6 +684,7 @@ const messages = {
     'plan.phase.own': { vi: 'Sở hữu', en: 'Own' },
     'plan.phase.dispose': { vi: 'Bán nhà', en: 'Sell' },
     // Behavior 82: the one-page lifecycle budget sheet (LifecycleSheet.svelte).
+    'plan.sheet.tab': { vi: 'Trọn vòng đời', en: 'Whole lifecycle' },
     'plan.sheet.title': { vi: 'Ngân sách trọn vòng đời', en: 'Lifecycle budget' },
     'plan.sheet.sub': {
         vi: 'Mọi khoản tiền từ lúc mua, trong lúc ở, đến khi bán. Chạm vào một dòng để xem chi tiết.',

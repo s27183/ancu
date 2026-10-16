@@ -126,7 +126,7 @@
     // The budget (Cash-calculator) tab's three sub-tabs (§7.3): the cockpit inputs + the
     // "Bạn đã đủ chưa?" verdict → the cash-events table → the breakdown detail. Labels reuse
     // the existing calculator keys. A self-owned table row routes here to 'detail'.
-    let budgetSub = $state<string>('ready');
+    let budgetSub = $state<string>('sheet');
     // The budget sub-tabs are derived below, after `viewComponents` (the 4th "Full horizon"
     // tab is gated on the disposition component existing).
 
@@ -600,6 +600,9 @@
     // only when the engine emits a disposition component (honest-partial tab presence; its
     // own content is honest-partial too — an invitation until a hold horizon H is set). TW5.
     const budgetTabs = $derived([
+        // Behavior 82: the one-page lifecycle budget lands first (the bird's-eye layer);
+        // the cockpit, table and breakdown are the zoom-in.
+        { id: 'sheet', label: $t('plan.sheet.tab') },
         { id: 'ready', label: $t('plan.cash.ready') },
         { id: 'table', label: $t('plan.cash.spine') },
         { id: 'detail', label: $t('plan.cash.breakdown') },
@@ -1292,22 +1295,6 @@
         {:else if activeTab?.kind === 'synthesis'}
             <!-- The Overview tab: a shell-composed synthesis over the filled base
                  outcomes (the "plan in 90 seconds"), not the raw component cards. -->
-            <LifecycleSheet
-                components={viewComponents}
-                filling={running}
-                horizon={previewActive || baselineHorizon ? horizonValue : 0}
-                busy={previewing}
-                onhorizon={chooseHold}
-                onopen={(cid) => (sheetDetail = cid)}
-            />
-            {#if sheetDetail && viewComponents[sheetDetail]}
-                <Modal
-                    title={$t(`plan.c.${sheetDetail}` as 'plan.c.buyer_profile')}
-                    onClose={() => (sheetDetail = null)}
-                >
-                    <ComponentCard componentId={sheetDetail} entry={viewComponents[sheetDetail]} filling={running} />
-                </Modal>
-            {/if}
             <OverviewCard components={viewComponents} filling={running} />
         {:else if activeTab?.kind === 'flow'}
             <!-- The Flow view: the legal/temporal spine — the journey swimlane as the
@@ -1349,7 +1336,32 @@
                         <Tabs tabs={budgetTabs} active={budgetSub} onSelect={(id) => (budgetSub = id)} />
                     </div>
 
-                    {#if budgetSub === 'ready'}
+                    {#if budgetSub === 'sheet'}
+                        {#if previewActive}
+                            <div class="pp-whatif active">
+                                <p class="pp-wi-banner">{$t('plan.whatif.banner')}</p>
+                                <button type="button" class="pp-wi-reset" onclick={resetPreview}
+                                    >{$t('plan.whatif.reset')}</button
+                                >
+                            </div>
+                        {/if}
+                        <LifecycleSheet
+                            components={viewComponents}
+                            filling={running}
+                            horizon={previewActive || baselineHorizon ? horizonValue : 0}
+                            busy={previewing}
+                            onhorizon={chooseHold}
+                            onopen={(cid) => (sheetDetail = cid)}
+                        />
+                        {#if sheetDetail && viewComponents[sheetDetail]}
+                            <Modal
+                                title={$t(`plan.c.${sheetDetail}` as 'plan.c.buyer_profile')}
+                                onClose={() => (sheetDetail = null)}
+                            >
+                                <ComponentCard componentId={sheetDetail} entry={viewComponents[sheetDetail]} filling={running} />
+                            </Modal>
+                        {/if}
+                    {:else if budgetSub === 'ready'}
                         {#if viewingProperty}
                             <!-- A selected property shows its OWN cash figures (the per-property
                                  budget_envelope_investor). The base what-if cockpit + financials
