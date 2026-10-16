@@ -315,6 +315,12 @@ export interface DispositionOutcome {
     full_horizon_net_position?: MoneyRange | null;
     /** The Dispose-phase entries of the shared spine (same shape as cash_events). */
     dispose_cash_events?: CashEvent[] | null;
+    /** behavior 98: the one loan (price less deposit, the kind's rate band) and its
+     *  repayments over the hold split into interest (a cost) and principal repaid (into the
+     *  home); null with no hold or no loan (fh_engine_disposition loan_over_hold/3). */
+    loan_over_hold?: LoanOverHold | null;
+    /** behavior 98: the [low, high] nominal growth %/yr the sale price is projected at. */
+    growth_pct_pa?: [number, number] | null;
     key_assumptions?: LocalizedText[] | null;
     /** Mode C/D only (fh_engine_disposition.erl fill_investor/3): the gain after any CGT
      *  discount, before tax; absent on the Mode-A/B main-residence path. */
@@ -782,6 +788,31 @@ export interface LifecycleBudget {
     /** behavior 95: lines after a sheet's divider that no total sums — where the money
      *  comes from (Mua) and the rent coming in (Giữ nhà). */
     beside?: BesideLine[] | null;
+    /** behavior 98: the statement's costs over the hold (fh_engine_journey costs/4) — the
+     *  hold they were made for, Phí mua (buy less the deposit), Phí giữ nhà over the hold
+     *  and per year, Phí bán, their total (exactly the sum at each end), and the money that
+     *  goes into the home instead (never in a total). Over-the-hold figures null with no hold. */
+    hold_years?: number | null;
+    costs_buy?: MoneyRange | null;
+    costs_own?: MoneyRange | null;
+    costs_own_per_year?: MoneyRange | null;
+    costs_sell?: MoneyRange | null;
+    costs_total?: MoneyRange | null;
+    into_home?: IntoHome | null;
+}
+export interface IntoHome {
+    deposit: MoneyRange | null;
+    principal_repaid: MoneyRange | null;
+    total: MoneyRange | null;
+}
+export interface LoanOverHold {
+    principal: MoneyRange;
+    /** [low, high] annual rate %: a point for A/C/E, the non-resident band for B/D. */
+    rate: [number, number];
+    years: number;
+    repayments: MoneyRange;
+    interest: MoneyRange;
+    principal_repaid: MoneyRange;
 }
 export interface BesideLine {
     id: 'funding_sources' | 'rental_income' | string;
@@ -988,10 +1019,11 @@ export interface PlanCardSummary {
      *  E next home); null as above. */
     intent?: string | null;
     mode?: string | null;
-    /** The statement's Buy and Own-per-year totals (purchase_journey.lifecycle_budget),
+    /** The statement's Phí mua and Phí giữ nhà a year (purchase_journey.lifecycle_budget
+     *  costs_buy, costs_own_per_year; behavior 98: costs only, no deposit or principal),
      *  so a list card's figures equal its statement's; null until the journey fills. */
-    buy?: MoneyRange | null;
-    own_per_year?: MoneyRange | null;
+    costs_buy?: MoneyRange | null;
+    costs_own_per_year?: MoneyRange | null;
 }
 
 /** The base components in DAG order — the projection renders in this order. The

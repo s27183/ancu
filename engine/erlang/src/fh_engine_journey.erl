@@ -211,18 +211,17 @@ fill_investor_foreign(Upstream) ->
 %%            loan is repaid from the proceeds, not a cost of selling), null with no dispose
 %%            events. A null-amount event adds nothing. pending names each dispose line
 %%            whose input is missing: every one needs hold_years until a horizon is set;
-%%            loan_payout then needs income (A, B, E: the borrowing capacity) or, for an
-%%            investor (C, D), the property's price (its loan amount); and each fee line whose base is
-%%            missing (fee_pending, behavior 83) names its input — price, income, rent or
-%%            a quote. Totals are null when nothing sums. beside holds the lines that
-%%            say where money comes from or what the home earns (behavior 95), which no
-%%            total sums.
+%%            loan_payout then needs a price (no range, so no loan: PayoutNeeds names what
+%%            the mode's loan waits on); and each fee line whose base is missing
+%%            (fee_pending, behavior 83) names its input — price, income, rent or a quote.
+%%            Totals are null when nothing sums. beside holds the lines that say where
+%%            money comes from or what the home earns (behavior 95), which no total sums.
+%%            The costs over the hold (behavior 98) are costs/4 below.
 %% Rests on:  disposition emits dispose_cash_events only with a horizon, and loan_payout
-%%            only with income (A, B, E) or an attached property (C, D: budget_envelope_
-%%            investor.loan_amount is null at base) — measured 2026-10-16, escript over
-%%            fh_engine_simulate:run: an investor with income 150000 still had no payout.
-%% Known gaps: repayments (own) use the price band less the deposit; disposition's
-%%            loan_payout uses borrowing capacity, so the two loans can differ.
+%%            whenever the price range and the plan's deposit are known — the loan is the
+%%            price less the deposit in every mode, the same loan as the repayments
+%%            (behavior 98; before it the payout read the borrowing capacity or the
+%%            investor's loan_amount, null at base, measured 2026-10-16).
 -spec lifecycle_budget([map()], [map()], map(), binary()) -> map().
 lifecycle_budget(Events, DisposeEvents, Upstream, PayoutNeeds) ->
     FeePending = harvest_fee_pending(Upstream),
@@ -242,11 +241,86 @@ lifecycle_budget(Events, DisposeEvents, Upstream, PayoutNeeds) ->
                   {_, false} -> [pend(<<"loan_payout">>, PayoutNeeds)];
                   {_, true}  -> []
               end,
-    #{<<"buy">>          => sum_ranges(Buy),
-      <<"own_per_year">> => sum_ranges(Own),
-      <<"sell">>         => case DisposeEvents of [] -> null; _ -> sum_ranges(Sell) end,
-      <<"pending">>      => Pending ++ FeePending,
-      <<"beside">>       => beside(Upstream)}.
+    SellTotal = case DisposeEvents of [] -> null; _ -> sum_ranges(Sell) end,
+    Costs = costs(Buy, Own, SellTotal, maps:get(<<"disposition">>, Upstream, #{})),
+    Costs#{<<"buy">>          => sum_ranges(Buy),
+           <<"own_per_year">> => sum_ranges(Own),
+           <<"sell">>         => SellTotal,
+           <<"pending">>      => Pending ++ FeePending,
+           <<"beside">>       => beside(Upstream)}.
+
+%% Whole lifecycle -> honest-partial; information as is -> purchase_journey -> the costs over
+%% the hold (behavior 98).
+%% Purpose:   the statement reads as what the home costs over the hold the visitor picks —
+%%            Phí mua, Phí giữ nhà trong N năm, Phí bán — and a total that is exactly their
+%%            sum; money that goes into the home (the deposit, the principal repaid by year
+%%            N) is not a cost and sits apart, never in the total.
+%% Holds:     costs_buy = buy less the deposit; costs_own = (every counted recurring own line
+%%            but the loan repayments) × N + the loan's interest over N (disposition's
+%%            loan_over_hold, the same loan and rate as the repayments and the payout);
+%%            costs_own_per_year = costs_own / N, rounded at each end ("≈ X/năm");
+%%            costs_sell = sell; costs_total = costs_buy + costs_own + costs_sell at each end,
+%%            null unless all three are known; into_home = the deposit and the principal
+%%            repaid by N, and their sum. N = disposition.horizon_years (hold_years); with no
+%%            hold every over-the-hold figure is null. buy stays the cash needed on the day
+%%            (deposit + Phí mua).
+%% Rests on:  the repayments line is P&I on loan_over_hold's principal at its rate, so
+%%            repayments × N = interest + principal repaid at each end (fh_engine_disposition
+%%            loan_over_hold/3); costs_own is null when a repayments line has no split.
+costs(Buy, Own, SellTotal, Disp) ->
+    H = case maps:get(<<"horizon_years">>, Disp, null) of
+            I when is_integer(I), I > 0 -> I;
+            _ -> null
+        end,
+    Loan = case maps:get(<<"loan_over_hold">>, Disp, null) of
+               M when is_map(M) -> M;
+               _ -> null
+           end,
+    Deposit = sum_ranges([E || E <- Buy, into_home(E)]),
+    CostsBuy = sum_ranges([E || E <- Buy, not into_home(E)]),
+    CostsOwn = costs_own(Own, Loan, H),
+    Repaid = case {H, Loan} of
+                 {null, _} -> null;
+                 {_, null} -> null;
+                 _ -> as_range(maps:get(<<"principal_repaid">>, Loan, null))
+             end,
+    #{<<"hold_years">>         => H,
+      <<"costs_buy">>          => CostsBuy,
+      <<"costs_own">>          => CostsOwn,
+      <<"costs_own_per_year">> => per_year(CostsOwn, H),
+      <<"costs_sell">>         => SellTotal,
+      <<"costs_total">>        => add_all([CostsBuy, CostsOwn, SellTotal]),
+      <<"into_home">>          => #{<<"deposit">>          => Deposit,
+                                    <<"principal_repaid">> => Repaid,
+                                    <<"total">>            => case H of
+                                                                  null -> null;
+                                                                  _ -> add_all([Deposit, Repaid])
+                                                              end}}.
+
+into_home(E) -> maps:get(<<"id">>, E, null) =:= <<"deposit">>.
+
+repayments(E) -> maps:get(<<"id">>, E, null) =:= <<"loan_repayments">>.
+
+costs_own(_Own, _Loan, null) -> null;
+costs_own(Own, Loan, H) ->
+    Yearly = case sum_ranges([E || E <- Own, not repayments(E)]) of
+                 null -> [0, 0];
+                 [L, Hi] -> [L * H, Hi * H]
+             end,
+    case {lists:any(fun repayments/1, Own), Loan} of
+        {false, _}   -> case Own of [] -> null; _ -> Yearly end;
+        {true, null} -> null;
+        {true, _}    -> add_all([Yearly, as_range(maps:get(<<"interest">>, Loan, null))])
+    end.
+
+per_year(null, _H) -> null;
+per_year([L, Hi], H) -> [round(L / H), round(Hi / H)].
+
+add_all(Rs) ->
+    case lists:member(null, Rs) of
+        true  -> null;
+        false -> [lists:sum([L || [L, _] <- Rs]), lists:sum([Hi || [_, Hi] <- Rs])]
+    end.
 
 %% behavior 95: the lines beside the totals (fh_engine_line_detail:beside/3) — a foreign
 %% buyer's "Nguồn tiền" on Mua when the plan moves money from overseas (transfer_plan),

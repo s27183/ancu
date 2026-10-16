@@ -98,7 +98,7 @@ fill_foreign(Args, Upstream) ->
     Fee = maps:get(<<"total_firb_fee_payable">>, FirbStatus, null),
     Outcome = #{
         <<"cash_events">> => own_cash_events(Args, Upstream, <<"budget_envelope">>,
-                                             <<"other">>, owner, <<"ownership_planning">>),
+                                             <<"other">>, owner_foreign, <<"ownership_planning">>),
         <<"fee_pending">> => own_fee_pending(Args, <<"other">>, <<"ownership_planning">>),
         <<"vacancy_fee_at_risk_amount">>       => vacancy_fee_at_risk(Fee),
         <<"current_year_occupancy_status">>    => null,   %% pending: occupancy intent not yet captured
@@ -185,7 +185,8 @@ vacancy_alert(Fee) when is_integer(Fee) ->
 -spec fill_investor(map(), map()) -> {map(), binary(), [map()]}.
 fill_investor(Args, Upstream) ->
     Outcome = #{
-        <<"cash_events">> => investor_own_cash_events(Args, Upstream, <<"ownership_planning_investor">>),
+        <<"cash_events">> => investor_own_cash_events(Args, Upstream, investor,
+                                                      <<"ownership_planning_investor">>),
         <<"fee_pending">> => investor_own_fee_pending(Args, Upstream, <<"ownership_planning_investor">>),
         %% post-acquisition actuals — no property/actuals at base
         <<"monthly_net_cash_flow_actual">>     => null,
@@ -316,7 +317,8 @@ fill_foreign_investor(Args, Upstream) ->
     FirbStatus = maps:get(<<"firb_status">>, Upstream, #{}),
     Fee = maps:get(<<"total_firb_fee_payable">>, FirbStatus, null),
     Outcome = #{
-        <<"cash_events">> => investor_own_cash_events(Args, Upstream, <<"ownership_planning_foreign_investor">>),
+        <<"cash_events">> => investor_own_cash_events(Args, Upstream, investor_foreign,
+                                                      <<"ownership_planning_foreign_investor">>),
         <<"fee_pending">> => investor_own_fee_pending(Args, Upstream, <<"ownership_planning_foreign_investor">>),
         %% post-acquisition actuals — no property/actuals at base.
         <<"monthly_net_cash_flow_after_withholding">> => null,
@@ -388,15 +390,16 @@ cfi(Id) -> fh_engine_kb:copy(?COPY_FOREIGN_INV, Id).
 %%   multi-source harvest), so these land on the swimlane's Own column too, as the
 %%   blueprints planned ("placed on the swimlane's Own column by purchase_journey").
 %% Capability: timing recurring, period year, is_estimate true. The repayment principal is
-%%   the price band less the plan's own deposit event: a deposit band spanning the price
-%%   band pairs end to end; a point deposit (Mode B/D compute at the ceiling) pairs with
-%%   the ceiling only. Measured 2026-10-16 (escript over fh_engine_simulate:run): before
-%%   this no mode emitted any own-phase event at base.
+%%   the price band less the plan's own deposit event (fh_engine_disposition:principal/2, the
+%%   same loan its payout and the hold's interest split use — behavior 98), at the kind's
+%%   rate: a foreign buyer's (B owner_foreign, D investor_foreign) carries the non-resident
+%%   premium. Measured 2026-10-16 (escript over fh_engine_simulate:run): before behavior 82
+%%   no mode emitted any own-phase event at base.
 own_cash_events(Args, Upstream, BudgetKey, Other, Kind, Source) ->
     Range = price_range(Args),
     Budget = maps:get(BudgetKey, Upstream, #{}),
     Band = statutory_band(),
-    Principal = principal(Range, Budget),
+    Principal = fh_engine_disposition:principal(Range, Budget),
     Events = [
         own_event(<<"council_rates_water">>, <<"event_rates_water">>,
                   [maps:get(<<"low">>, Band), maps:get(<<"high">>, Band)], <<"government">>, Source),
@@ -418,10 +421,7 @@ own_details(Events, Principal, Kind) ->
     M = fun(K) -> fh_engine_money:money(kb_param(Rates, K)) end,
     Pct = fun fh_engine_line_detail:pct/1,
     {Rate, Term} = fh_engine_disposition:repayment_basis(Kind),
-    Loan = case Kind of
-               owner    -> <<"kb.lender.serviceability-basics">>;
-               investor -> <<"kb.lender.serviceability-investment-loans">>
-           end,
+    Loan = fh_engine_disposition:loan_detail_slug(Kind),
     Spec0 = #{
         <<"council_rates_water">> =>
             {Rates, <<"council_rates_water">>,
@@ -438,7 +438,8 @@ own_details(Events, Principal, Kind) ->
                                     {Loan, <<"loan_repayments">>,
                                      #{params => #{<<"principal">> =>
                                                        fh_engine_line_detail:money_range(Principal),
-                                                   <<"term">> => Term, <<"rate">> => Pct(Rate)}}}};
+                                                   <<"term">> => Term,
+                                                   <<"rate">> => fh_engine_line_detail:pct_range(Rate)}}}};
                _      -> Spec0
            end,
     fh_engine_line_detail:attach_all(Events, Spec).
@@ -470,11 +471,11 @@ investor_own_fee_pending(Args, Upstream, Source) ->
 %% Mode C/D: yield_modelling already places the per-property hold events (rent, operating
 %% expenses, interest) once a property is attached; this base set fills the Own phase only
 %% until then, so nothing is counted twice.
-investor_own_cash_events(Args, Upstream, Source) ->
+investor_own_cash_events(Args, Upstream, Kind, Source) ->
     Cf = maps:get(<<"cash_flow_projection">>, Upstream, #{}),
     case maps:get(<<"annual_operating_expenses_year_1">>, Cf, null) of
         null -> own_cash_events(Args, Upstream, <<"budget_envelope_investor">>, <<"services">>,
-                                investor, Source);
+                                Kind, Source);
         _    -> []
     end.
 
@@ -498,20 +499,6 @@ price_range(Args) ->
 
 maintenance_band(null) -> null;
 maintenance_band([Lo, Hi]) -> [maintenance_target(Lo), maintenance_target(Hi)].
-
-%% the plan's own deposit event (cash_position's figure, placed — never re-derived).
-principal(null, _Budget) -> null;
-principal([PLo, PHi], Budget) ->
-    Deposits = [maps:get(<<"amount">>, E) || E <- maps:get(<<"cash_events">>, Budget, []),
-                                             maps:get(<<"id">>, E, <<>>) =:= <<"deposit">>],
-    case Deposits of
-        [[D, D]] when is_number(D) -> nonneg([PHi - D, PHi - D]);
-        [[DLo, DHi]] when is_number(DLo), is_number(DHi) -> nonneg([PLo - DLo, PHi - DHi]);
-        _ -> null
-    end.
-
-nonneg([A, B]) when A >= 0, B >= 0 -> [A, B];
-nonneg(_) -> null.
 
 %% --- the ongoing_obligations outcome (honest partial) ------------------------
 %% Filled: maintenance_reserve_target, recurring_costs_estimate.statutory_band,

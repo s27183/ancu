@@ -22,9 +22,10 @@
 %% → H is null → no disposal projection until the user asks "what if I sell in N years?" (the
 %% horizon structural what-if, engine-contract §10.5). With H unset, every projected figure is
 %% null and the only key_assumption is the invitation to set a horizon. With H set but the loan
-%% not yet known (expected_borrowing_capacity null at base, populated on a refine turn — the
-%% reserve_buffer precedent), loan_payout / net_proceeds / full_horizon_net_position stay null;
-%% sale_proceeds + selling_costs surface as banded estimates. No figure is ever fabricated.
+%% not known (no price range or no deposit event upstream), loan_payout / net_proceeds /
+%% full_horizon_net_position stay null; sale_proceeds + selling_costs surface as banded
+%% estimates. No figure is ever fabricated. The loan is the price less the plan's deposit in
+%% every mode (behavior 98, see loan_payout/3), so at base it is known whenever a range is.
 %%
 %% TWO CGT PATHS, ONE OUTCOME. fill/2 dispatches on the presence of a `tax_optimised_structure`
 %% upstream (only the investor blueprint runs a tax_structure component) — same outcome type +
@@ -48,16 +49,19 @@
 
 -export([fill/2]).
 %% exported for the conformance harness:
--export([sale_proceeds/4, selling_costs/1, loan_payout/2, cgt/1,
+-export([sale_proceeds/4, selling_costs/1, loan_payout/3, cgt/1,
          net_proceeds/4, full_horizon/4, dispose_cash_events/5]).
 %% the Mode-C/D investor path (full CGT):
--export([cgt_investor/4, taxable_gain/3, loan_payout_investor/2, full_horizon_investor/4]).
+-export([cgt_investor/4, taxable_gain/3, full_horizon_investor/4]).
+%% the one loan every phase uses (behavior 98): price less deposit, its kind's rate, and
+%% its repayments split into interest and principal over the hold:
+-export([principal/2, loan_kind/2, rate_band/1, loan_over_hold/3]).
 %% the growth assumption line (copy key chosen by the band's is_placeholder flag):
 -export([growth_assumption/3]).
 %% the Own-phase loan-repayment band fh_engine_ownership places (behavior 82):
 -export([annual_repayments/2]).
 %% the rate and term that band is amortised at, for its line's detail (behavior 93):
--export([repayment_basis/1]).
+-export([repayment_basis/1, loan_detail_slug/1]).
 
 -define(COPY,    <<"kb.copy.disposition">>).
 -define(GROWTH,  <<"kb.property.capital-growth-bands">>).
@@ -92,15 +96,16 @@ fill(Args, Upstream) ->
 
 fill_owner_occupier(Args, Profile, Upstream) ->
     Budget    = maps:get(<<"budget_envelope">>, Upstream, #{}),
-    Mortgage  = maps:get(<<"mortgage_plan">>, Upstream, #{}),
     Ownership = maps:get(<<"ongoing_obligations">>, Upstream, #{}),
 
     H        = horizon(Profile),
     Price    = price_basis(Profile),
     {GLow, GHigh, IsPlaceholder} = growth_band(),
 
+    Kind          = loan_kind(Args, owner),
+    Principal     = principal(price_range(Profile, Args), Budget),
     Sale          = sale_proceeds(Price, H, GLow, GHigh),
-    Loan          = loan_payout(Mortgage, H),
+    Loan          = loan_payout(Principal, Kind, H),
     Fees          = dispose_fees(Args, Sale, Loan, <<"other">>),
     Selling       = selling_from(Sale, Fees),
     {Cgt, Status} = cgt(Profile),
@@ -110,10 +115,7 @@ fill_owner_occupier(Args, Profile, Upstream) ->
     %% Mode-A/B/E four-actor swimlane (fh_engine_journey:actors/0) — the money-flow party for
     %% sale/selling is "other" there.
     Events        = dispose_details(dispose_cash_events(Sale, Fees, Loan, Cgt, <<"other">>),
-                                    {ceiling, Price}, H, GLow, GHigh,
-                                    principal_band(maps:get(<<"expected_borrowing_capacity">>,
-                                                            Mortgage, null)),
-                                    owner, null),
+                                    {ceiling, Price}, H, GLow, GHigh, Principal, Kind, null),
 
     Outcome = #{
         <<"horizon_years">>             => H,
@@ -125,10 +127,13 @@ fill_owner_occupier(Args, Profile, Upstream) ->
         <<"net_proceeds">>              => Net,
         <<"full_horizon_net_position">> => Full,
         <<"dispose_cash_events">>       => Events,
+        <<"loan_over_hold">>            => loan_over_hold(Principal, Kind, H),
+        <<"growth_pct_pa">>             => [GLow, GHigh],
         <<"fee_pending">>               => element(2, Fees),
-        <<"key_assumptions">>           => assumptions(H, GLow, GHigh, IsPlaceholder, Status, Loan)
+        <<"key_assumptions">>           => assumptions(H, GLow, GHigh, IsPlaceholder, Status, Loan, Kind)
     },
-    KbVersions = fh_engine_kb:kb_anchors([?GROWTH, ?SELLING, ?CGT, ?SERVICEABILITY, ?COPY]),
+    KbVersions = fh_engine_kb:kb_anchors(lists:usort([?GROWTH, ?SELLING, ?CGT, ?SERVICEABILITY, ?COPY,
+                                                      loan_detail_slug(Kind)])),
     {Outcome, <<"calculator">>, KbVersions}.
 
 %% --- Mode-C/D investor (full CGT) --------------------------------------------
@@ -145,11 +150,19 @@ fill_investor(Args, Profile, Tax, Upstream) ->
     %% per-property (Phase B, Slice B3c): the ATTACHED property's exact price drives every dispose
     %% figure (sale_proceeds, taxable_gain, the net); at base: the target-range ceiling. So the
     %% dispose projection reflects THIS property, not the plan-wide range. [[place-upstream-figures-dont-recompute]]
-    Price    = property_price(maps:get(<<"property_fit_investor">>, Upstream, #{}), Profile),
+    Pf       = maps:get(<<"property_fit_investor">>, Upstream, #{}),
+    Price    = property_price(Pf, Profile),
     {GLow, GHigh, IsPlaceholder} = growth_band(),
+    %% the loan: the attached property's price (or the target range at base) less the plan's
+    %% own deposit event — the same basis as the Own phase's repayments (behavior 98).
+    Kind     = loan_kind(Args, investor),
+    Principal = principal(case maps:get(<<"price">>, Pf, null) of
+                              PP when is_number(PP) -> [PP, PP];
+                              _                   -> price_range(Profile, Args)
+                          end, Budget),
 
     Sale                = sale_proceeds(Price, H, GLow, GHigh),
-    Loan                = loan_payout_investor(Budget, H),
+    Loan                = loan_payout(Principal, Kind, H),
     Fees                = dispose_fees(Args, Sale, Loan, <<"services">>),
     Selling             = selling_from(Sale, Fees),
     {Gain, Cgt, Status} = cgt_investor(Profile, Tax, Sale, Price),
@@ -167,9 +180,8 @@ fill_investor(Args, Profile, Tax, Upstream) ->
                               _                   -> ceiling
                           end,
     Events              = dispose_details(dispose_cash_events(Sale, Fees, Loan, Cgt, <<"services">>),
-                                          {Basis, Price}, H, GLow, GHigh,
-                                          principal_band(maps:get(<<"loan_amount">>, Budget, null)),
-                                          investor, {maps:get(<<"cgt_marginal_rate">>, Tax, null),
+                                          {Basis, Price}, H, GLow, GHigh, Principal,
+                                          Kind, {maps:get(<<"cgt_marginal_rate">>, Tax, null),
                                                      maps:get(<<"cgt_discount_eligible">>, Tax, null)}),
     %% Mode-D-only fields (frcgw_applicable is absent/false on Mode C's tax_optimised_structure
     %% ⟹ both null there — one function serves both modes, see frcgw_withheld/2's header note).
@@ -193,15 +205,18 @@ fill_investor(Args, Profile, Tax, Upstream) ->
         <<"net_proceeds">>              => Net,
         <<"full_horizon_net_position">> => Full,
         <<"dispose_cash_events">>       => Events,
+        <<"loan_over_hold">>            => loan_over_hold(Principal, Kind, H),
+        <<"growth_pct_pa">>             => [GLow, GHigh],
         <<"fee_pending">>               => element(2, Fees),
-        <<"key_assumptions">>           => assumptions_investor(H, GLow, GHigh, IsPlaceholder, Status, Loan, Frcgw)
+        <<"key_assumptions">>           => assumptions_investor(H, GLow, GHigh, IsPlaceholder, Status, Loan, Frcgw, Kind)
     },
     FrcgwAnchors = case FrcgwApplicable of
                        true -> [?FRCGW];
                        _    -> []
                    end,
     KbVersions = fh_engine_kb:kb_anchors(
-        [?GROWTH, ?SELLING, ?CGT_INV, ?DEPR, ?SERV_INV, ?COPY] ++ FrcgwAnchors),
+        lists:usort([?GROWTH, ?SELLING, ?CGT_INV, ?DEPR, ?SERV_INV, ?COPY, loan_detail_slug(Kind)]
+                    ++ FrcgwAnchors)),
     {Outcome, <<"calculator">>, KbVersions}.
 
 %% --- inputs ------------------------------------------------------------------
@@ -229,6 +244,15 @@ price_basis(Profile) ->
     case maps:get(<<"target_price_range">>, Profile, null) of
         [_Lo, Hi] when is_number(Hi) -> Hi;
         _                            -> null
+    end.
+
+%% the target price range the loan is taken against: the profile's, else onboarding's (the
+%% range fh_engine_ownership prices the repayments on). null when neither is a [lo, hi].
+price_range(Profile, Args) ->
+    Onb = maps:get(<<"target_price_range">>, maps:get(onboarding, Args, #{}), null),
+    case maps:get(<<"target_price_range">>, Profile, Onb) of
+        [Lo, Hi] when is_number(Lo), is_number(Hi), Lo =< Hi -> [Lo, Hi];
+        _ -> null
     end.
 
 %% --- growth band (kb.property.capital-growth-bands) ---------------------------
@@ -290,43 +314,106 @@ dispose_fees(Args, Sale, Loan, Other) ->
 after_loan([SL, SH], [LL, LH]) -> [max(0, SL - LH), max(0, SH - LL)];
 after_loan(Sale, _) -> Sale.
 
-%% --- loan payout: remaining principal at year H (amortisation) ---------------
-%% null until the loan AMOUNT is known (expected_borrowing_capacity is null at base,
-%% populated when income arrives via /profile — IC4; the reserve_buffer honest-partial
-%% precedent). The amortisation RATE is NOT the agent's `loan_structure_recommendation.rate`
-%% — that field holds the agent's rate-STRUCTURE enum (variable/fixed_1yr/…), a qualitative
-%% leaf, never a numeric rate. §98 ([[verify-regulated-figures-by-postcondition]]): the
-%% amortisation rate is a regulated figure → it is the KB representative product rate
-%% (kb.lender.serviceability-basics), the SAME base the capacity assessment uses, so the
-%% loan you can service and the balance you carry stay coherent. So loan_payout depends only
-%% on the (resolver-computed) capacity + H + the KB rate — no LLM in its lineage; the whole
-%% full-horizon position is a fully resolver-computed, KB-grounded figure.
+%% --- the loan: one principal, one rate, one amortisation (behavior 98) ----------
+%% Whole lifecycle -> each phase has its money lines -> disposition owns amortisation ->
+%%   the loan behind repayments, interest and the payout.
+%% Purpose:   one loan for every phase of a plan: the Own phase's repayments
+%%            (fh_engine_ownership), the interest and principal over the hold the statement
+%%            sums (fh_engine_journey lifecycle_budget) and the balance paid out at sale.
+%% Holds:     the principal is the price less the plan's own deposit event in every mode
+%%            (principal/2), so an $800k home with a 5% deposit is a $760,000 loan; the
+%%            payout no longer reads the borrowing capacity (A, B, E) or
+%%            budget_envelope_investor.loan_amount (C, D; null at base, so D's payout was
+%%            pending). The rate is the kind's band (rate_band/1): the KB representative
+%%            owner-occupier rate, + the investment premium for an investor, + the
+%%            non-resident premium band (kb.lender.non-resident-friendly-shortlist, 50-150bp)
+%%            for a foreign buyer (B, D) — the low end of a band at the low premium, the
+%%            high end at the high. Never the agent's loan_structure_recommendation.rate,
+%%            which holds a rate-STRUCTURE enum (§98, measured 2026-10-08).
+%% Rests on:  standard P&I over ?LOAN_TERM_YEARS; at both ends, interest over H =
+%%            repayments × H − (principal − balance at H), on the rounded figures shown, so
+%%            the identity holds to the dollar (loan_over_hold/3).
+%% Known gaps: the non-resident investment-loan premium the KB states in prose
+%%            (non-resident-investment-loan-shortlist, a further ~100-200bp over the domestic
+%%            investor rate) has no param, so D takes the owner-occupier non-resident band on
+%%            top of the investment rate. A per-property investor's Own phase uses
+%%            yield_modelling's interest line, not this split.
 
--spec loan_payout(map(), integer() | null) -> [integer()] | null.
-loan_payout(_Mortgage, null) -> null;
-loan_payout(Mortgage, H) when is_integer(H) ->
-    Capacity = maps:get(<<"expected_borrowing_capacity">>, Mortgage, null),
-    case principal_band(Capacity) of
-        null       -> null;
-        [PLo, PHi] ->
-            R = representative_rate(),
-            [round(remaining_balance(PLo, R, ?LOAN_TERM_YEARS, H)),
-             round(remaining_balance(PHi, R, ?LOAN_TERM_YEARS, H))]
+%% the plan's own deposit event (cash_position's figure, placed — never re-derived), off the
+%% price band: a deposit band spanning the price band pairs end to end; a point deposit (B, C,
+%% D compute at the ceiling) pairs with the ceiling only. null without a range or a deposit.
+-spec principal([number()] | null, map()) -> [integer()] | null.
+principal(null, _Budget) -> null;
+principal([PLo, PHi], Budget) ->
+    Deposits = [maps:get(<<"amount">>, E) || E <- maps:get(<<"cash_events">>, Budget, []),
+                                             maps:get(<<"id">>, E, <<>>) =:= <<"deposit">>],
+    case Deposits of
+        [[D, D]] when is_number(D) -> nonneg([round(PHi - D), round(PHi - D)]);
+        [[DLo, DHi]] when is_number(DLo), is_number(DHi) -> nonneg([round(PLo - DLo), round(PHi - DHi)]);
+        _ -> null
     end.
 
-%% the borrowing capacity → a [lo, hi] principal band; a scalar collapses to a point.
-principal_band([Lo, Hi]) when is_number(Lo), is_number(Hi) -> [Lo, Hi];
-principal_band(P) when is_number(P) -> [P, P];
-principal_band(_) -> null.
+nonneg([A, B]) when A >= 0, B >= 0 -> [A, B];
+nonneg(_) -> null.
+
+%% the loan's kind from the plan's mode: a foreign buyer (fhb-foreign-au, investor-foreign-au)
+%% borrows at the non-resident rate.
+-spec loan_kind(map(), owner | investor) -> owner | investor | owner_foreign | investor_foreign.
+loan_kind(Args, Base) ->
+    case {maps:get(blueprint_slug, Args, undefined), Base} of
+        {<<"fhb-foreign-au">>, owner}         -> owner_foreign;
+        {<<"investor-foreign-au">>, investor} -> investor_foreign;
+        _                                     -> Base
+    end.
+
+%% the [low, high] annual rate % a loan of this kind amortises at (a point for A, C, E).
+-spec rate_band(owner | investor | owner_foreign | investor_foreign) -> [number()].
+rate_band(owner)            -> [representative_rate(), representative_rate()];
+rate_band(investor)         -> [investor_rate(), investor_rate()];
+rate_band(owner_foreign)    -> plus_premium(representative_rate());
+rate_band(investor_foreign) -> plus_premium(investor_rate()).
+
+plus_premium(R) ->
+    Slug = <<"kb.lender.non-resident-friendly-shortlist">>,
+    [two_dp(R + param(Slug, <<"non_resident_rate_premium_bp_low">>) / 100),
+     two_dp(R + param(Slug, <<"non_resident_rate_premium_bp_high">>) / 100)].
+
+two_dp(X) -> round(X * 100) / 100.
+
+%% the balance left at year H, at both ends of the principal and rate bands; null until H and
+%% the principal are known (honest-partial).
+-spec loan_payout([number()] | null, atom(), integer() | null) -> [integer()] | null.
+loan_payout(_Principal, _Kind, null) -> null;
+loan_payout([PLo, PHi], Kind, H) when is_integer(H) ->
+    [RLo, RHi] = rate_band(Kind),
+    [round(remaining_balance(PLo, RLo, ?LOAN_TERM_YEARS, H)),
+     round(remaining_balance(PHi, RHi, ?LOAN_TERM_YEARS, H))];
+loan_payout(_, _, _) -> null.
+
+%% the loan's repayments over H split into interest (a cost) and principal repaid (money into
+%% the home), at both ends. Each band is ordered on its own: a higher rate on the same loan
+%% repays less principal by H, so the principal band's ends can swap. null until H and the
+%% principal are known.
+-spec loan_over_hold([number()] | null, atom(), integer() | null) -> map() | null.
+loan_over_hold([PLo, PHi], Kind, H) when is_integer(H), H > 0 ->
+    [RepLo, RepHi] = annual_repayments([PLo, PHi], Kind),
+    [PayLo, PayHi] = loan_payout([PLo, PHi], Kind, H),
+    {PaidLo, PaidHi} = {round(PLo) - PayLo, round(PHi) - PayHi},
+    #{<<"principal">>        => [round(PLo), round(PHi)],
+      <<"rate">>             => rate_band(Kind),
+      <<"years">>            => H,
+      <<"repayments">>       => [RepLo * H, RepHi * H],
+      <<"interest">>         => ordered(RepLo * H - PaidLo, RepHi * H - PaidHi),
+      <<"principal_repaid">> => ordered(PaidLo, PaidHi)};
+loan_over_hold(_, _, _) -> null.
+
+ordered(A, B) when A =< B -> [A, B];
+ordered(A, B)             -> [B, A].
 
 %% the representative owner-occupier product rate (kb.lender.serviceability-basics) — the
 %% capacity-assessment BASE WITHOUT the APRA stress buffer (the buffer is a serviceability
 %% stress overlay, not the rate at which the loan actually amortises). A labelled CONVENTION
 %% (surfaced in key_assumptions), never this buyer's actual product rate.
-%% Regulated figures are grounded -> no LLM in a regulated figure's inputs -> disposition
-%% -> loan payout rate. The rate is a KB param, never an agent field: loan_payout once read
-%% the agent's rate-structure enum as its interest rate (memory, mid-2026; concluded, the
-%% code now reads only ?SERVICEABILITY, measured 2026-10-08).
 representative_rate() ->
     param(?SERVICEABILITY, <<"representative_product_rate_pct">>).
 
@@ -334,7 +421,7 @@ representative_rate() ->
 %% B_K = P · ((1+r)^N − (1+r)^K) / ((1+r)^N − 1); r = 0 → straight-line; K ≥ N → 0.
 remaining_balance(P, AnnualRatePct, TermYears, ElapsedYears) when ElapsedYears >= TermYears ->
     _ = {P, AnnualRatePct}, 0.0;
-remaining_balance(P, 0, TermYears, ElapsedYears) ->
+remaining_balance(P, R0, TermYears, ElapsedYears) when R0 == 0 ->
     P * (TermYears - ElapsedYears) / TermYears;
 remaining_balance(P, AnnualRatePct, TermYears, ElapsedYears) ->
     R = AnnualRatePct / 100 / 12,
@@ -349,47 +436,31 @@ remaining_balance(P, AnnualRatePct, TermYears, ElapsedYears) ->
 %%   the loan. Invariant: one computer per figure — the rate and the amortisation live
 %%   here beside remaining_balance/4, so the yearly repayment and the balance paid out at
 %%   sale stay on one basis. Component: fh_engine_ownership places the band as an own
-%%   cash event. Capability: standard P&I over ?LOAN_TERM_YEARS at the KB representative
-%%   rate (owner) or the investment rate (investor) — a labelled CONVENTION, never this
-%%   buyer's product rate; null when the principal is unknown (honest-partial).
--spec annual_repayments([number()] | null, owner | investor) -> [integer()] | null.
+%%   cash event. Capability: standard P&I over ?LOAN_TERM_YEARS at the kind's rate band
+%%   (rate_band/1) — a labelled CONVENTION, never this buyer's product rate; null when the
+%%   principal is unknown (honest-partial).
+-spec annual_repayments([number()] | null, atom()) -> [integer()] | null.
 annual_repayments([PLo, PHi], Kind) when is_number(PLo), is_number(PHi) ->
-    {R, _Term} = repayment_basis(Kind),
-    [round(annual_pi(PLo, R, ?LOAN_TERM_YEARS)), round(annual_pi(PHi, R, ?LOAN_TERM_YEARS))];
+    {[RLo, RHi], _Term} = repayment_basis(Kind),
+    [round(annual_pi(PLo, RLo, ?LOAN_TERM_YEARS)), round(annual_pi(PHi, RHi, ?LOAN_TERM_YEARS))];
 annual_repayments(_, _) -> null.
 
-%% {annual rate %, term years} a loan of this kind is amortised at — one basis for the yearly
-%% repayment, the payout at sale and both lines' details.
--spec repayment_basis(owner | investor) -> {number(), pos_integer()}.
-repayment_basis(owner)    -> {representative_rate(), ?LOAN_TERM_YEARS};
-repayment_basis(investor) -> {investor_rate(), ?LOAN_TERM_YEARS}.
+%% {[low, high] annual rate %, term years} a loan of this kind is amortised at — one basis for
+%% the yearly repayment, the payout at sale and both lines' details.
+-spec repayment_basis(atom()) -> {[number()], pos_integer()}.
+repayment_basis(Kind) -> {rate_band(Kind), ?LOAN_TERM_YEARS}.
 
-annual_pi(P, 0, TermYears) -> P / TermYears;
+annual_pi(P, R0, TermYears) when R0 == 0 -> P / TermYears;
 annual_pi(P, AnnualRatePct, TermYears) ->
     R = AnnualRatePct / 100 / 12,
     N = TermYears * 12,
     12 * P * R / (1 - math:pow(1 + R, -N)).
 
-%% --- investor loan payout: investment-loan amount amortised at the investment rate -----
-%% reads budget_envelope_investor.loan_amount (the actual loan for THIS purchase, not a capacity)
-%% and amortises at the KB representative owner-occupier rate PLUS the investment premium — both
-%% KB-grounded, removed from the LLM's reach (§98). null until the loan amount is known.
--spec loan_payout_investor(map(), integer() | null) -> [integer()] | null.
-loan_payout_investor(_Budget, null) -> null;
-loan_payout_investor(Budget, H) when is_integer(H) ->
-    case principal_band(maps:get(<<"loan_amount">>, Budget, null)) of
-        null       -> null;
-        [PLo, PHi] ->
-            R = investor_rate(),
-            [round(remaining_balance(PLo, R, ?LOAN_TERM_YEARS, H)),
-             round(remaining_balance(PHi, R, ?LOAN_TERM_YEARS, H))]
-    end.
-
 %% the investment-loan amortisation rate: the owner-occupier representative rate
 %% (kb.lender.serviceability-basics) + the investment premium (kb.lender.serviceability-
 %% investment-loans). A labelled KB convention surfaced in key_assumptions, never a product rate.
 investor_rate() ->
-    representative_rate() + param(?SERV_INV, <<"investment_rate_premium_pp">>).
+    two_dp(representative_rate() + param(?SERV_INV, <<"investment_rate_premium_pp">>)).
 
 %% --- CGT: Mode-A main-residence exemption ------------------------------------
 %% exempt (cgt = null) for the clean owner-occupier resident-for-tax case; to_verify once
@@ -573,7 +644,7 @@ dispose_details(Events, {Basis, Price}, H, GLow, GHigh, Principal, Kind, CgtRate
   when is_number(Price), is_integer(H) ->
     Pct = fun fh_engine_line_detail:pct/1,
     {Rate, Term} = repayment_basis(Kind),
-    ServSlug = case Kind of owner -> ?SERVICEABILITY; investor -> ?SERV_INV end,
+    ServSlug = loan_detail_slug(Kind),
     Sale = {?GROWTH, <<"sale_proceeds">>,
             #{params => #{<<"price">> => fh_engine_line_detail:price(Basis, Price),
                           <<"low">> => Pct(GLow), <<"high">> => Pct(GHigh), <<"years">> => H}}},
@@ -583,7 +654,7 @@ dispose_details(Events, {Basis, Price}, H, GLow, GHigh, Principal, Kind, CgtRate
                                   #{params => #{<<"principal">> =>
                                                     fh_engine_line_detail:money_range(Principal),
                                                 <<"years">> => H, <<"term">> => Term,
-                                                <<"rate">> => Pct(Rate)}}}};
+                                                <<"rate">> => fh_engine_line_detail:pct_range(Rate)}}}};
                  _      -> #{}
              end,
     Cgt = case CgtRate of
@@ -599,6 +670,13 @@ dispose_details(Events, {Basis, Price}, H, GLow, GHigh, Principal, Kind, CgtRate
 dispose_details(Events, _Price, _H, _GLow, _GHigh, _Principal, _Kind, _CgtRate) ->
     Events.
 
+%% the KB doc whose line detail explains a loan line of this kind: a foreign buyer's names the
+%% non-resident premium (behavior 98).
+loan_detail_slug(owner)            -> ?SERVICEABILITY;
+loan_detail_slug(investor)         -> ?SERV_INV;
+loan_detail_slug(owner_foreign)    -> <<"kb.lender.non-resident-friendly-shortlist">>;
+loan_detail_slug(investor_foreign) -> <<"kb.lender.non-resident-friendly-shortlist">>.
+
 event(Id, LabelCopyId, Dir, Amount, Counterparty) ->
     #{<<"id">>               => <<"dispose_", Id/binary>>,
       <<"phase">>            => <<"dispose">>,
@@ -613,10 +691,10 @@ event(Id, LabelCopyId, Dir, Amount, Counterparty) ->
 
 %% --- key_assumptions (bilingual, every line states a basis) ------------------
 
-assumptions(null, _GLow, _GHigh, _IsPlaceholder, _Status, _Loan) ->
+assumptions(null, _GLow, _GHigh, _IsPlaceholder, _Status, _Loan, _Kind) ->
     %% no horizon set → the only assumption is the invitation to set one.
     [copy(<<"assumption_set_horizon">>, #{})];
-assumptions(H, GLow, GHigh, IsPlaceholder, Status, Loan) ->
+assumptions(H, GLow, GHigh, IsPlaceholder, Status, Loan, Kind) ->
     Base = [copy(<<"assumption_horizon">>, #{<<"years">> => H}),
             growth_assumption(GLow, GHigh, IsPlaceholder),
             cgt_assumption(Status),
@@ -626,7 +704,7 @@ assumptions(H, GLow, GHigh, IsPlaceholder, Status, Loan) ->
     case Loan of
         null -> Base;
         _    -> Base ++ [copy(<<"assumption_loan_rate">>,
-                              #{<<"rate">> => representative_rate(),
+                              #{<<"rate">> => fh_engine_line_detail:pct_range(rate_band(Kind)),
                                 <<"term">> => ?LOAN_TERM_YEARS})]
     end.
 
@@ -650,9 +728,9 @@ cgt_assumption(<<"to_verify">>) -> copy(<<"assumption_cgt_to_verify">>, #{}).
 %% the 2026-27 Budget reform flag (current law computed; the reform may change it from 1 Jul 2027).
 %% The FRCGW line (Mode D only) is appended LAST, only when the withheld figure is actually
 %% shown — never asserting a basis for a null figure (mirrors the loan-rate line's own gate).
-assumptions_investor(null, _GLow, _GHigh, _IsPlaceholder, _Status, _Loan, _Frcgw) ->
+assumptions_investor(null, _GLow, _GHigh, _IsPlaceholder, _Status, _Loan, _Frcgw, _Kind) ->
     [copy(<<"assumption_set_horizon">>, #{})];
-assumptions_investor(H, GLow, GHigh, IsPlaceholder, Status, Loan, Frcgw) ->
+assumptions_investor(H, GLow, GHigh, IsPlaceholder, Status, Loan, Frcgw, Kind) ->
     Base = [copy(<<"assumption_horizon">>, #{<<"years">> => H}),
             growth_assumption(GLow, GHigh, IsPlaceholder),
             cgt_assumption_investor(Status),
@@ -661,7 +739,7 @@ assumptions_investor(H, GLow, GHigh, IsPlaceholder, Status, Loan, Frcgw) ->
     WithLoan = case Loan of
         null -> Base;
         _    -> Base ++ [copy(<<"assumption_loan_rate">>,
-                              #{<<"rate">> => investor_rate(),
+                              #{<<"rate">> => fh_engine_line_detail:pct_range(rate_band(Kind)),
                                 <<"term">> => ?LOAN_TERM_YEARS})]
     end,
     case Frcgw of

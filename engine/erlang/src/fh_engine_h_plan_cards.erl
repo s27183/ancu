@@ -1,8 +1,8 @@
 -module(fh_engine_h_plan_cards).
 
 %% GET /api/engine/plan-cards?ids=<uuid>,<uuid>… — each named card's list line
-%% {plan_card_id, state, updated_at, intent, mode, buy, own_per_year} for the planner's
-%% plans list (behaviors 84, 96; fh_engine_store:plan_card_summaries/2);
+%% {plan_card_id, state, updated_at, intent, mode, costs_buy, costs_own_per_year} for the
+%% planner's plans list (behaviors 84, 96, 98; fh_engine_store:plan_card_summaries/2);
 %% at most ?MAX_IDS ids, unknown ids left out. The shell names the ids it owns.
 %% POST /api/engine/plan-cards — create a plan card from onboarding inputs
 %% (mode/state/target price range/target zone/intent) and start the base planning

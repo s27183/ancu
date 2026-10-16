@@ -69,6 +69,51 @@ Pure-reference (`fills: []`). This is a decision-support doc — it fills no slo
         { "criterion": "documentation_capability_non_resident", "owner": "kb.lender.documentation-non-resident" },
         { "criterion": "rate_and_fees", "owner": "kb.lender.temp-resident-lending-policies" }
       ]
+    },
+    "line_details": {
+      "note": "behavior 98: a foreign buyer's (Mode B, D) loan lines — the repayments and the payout at sale — are priced at the representative rate plus the non-resident premium band above, so their details name that premium; the engine fills {params} with the figures it computed (fh_engine_line_detail).",
+      "entries": [
+        {
+          "id": "loan_repayments",
+          "tier": "CONVENTION",
+          "how": {
+            "vi": "Trả cả gốc và lãi cho khoản vay {principal} (giá nhà trừ tiền đặt cọc) trong {term} năm, lãi suất {rate}%/năm — lãi suất tham khảo cộng phần chênh thường gặp khi người không cư trú vay (0,5–1,5%), không phải lãi suất khoản vay của bạn.",
+            "en": "Principal and interest on a loan of {principal} (the price less your deposit) over {term} years at {rate}% a year — a typical rate plus the usual non-resident premium (0.5–1.5%), not your loan's rate."
+          },
+          "payer": {
+            "vi": "Bạn trả cho ngân hàng, thường hằng tháng.",
+            "en": "You, to your lender, usually monthly."
+          },
+          "drivers": {
+            "vi": "Lãi suất ngân hàng cho bạn (ít ngân hàng cho người không cư trú vay, nên chênh lệch lớn), số tiền vay và thời hạn vay.",
+            "en": "The rate your lender gives you (few lenders take non-residents, so rates vary widely), the loan size and the term."
+          },
+          "note": {
+            "vi": "Ước tính theo lãi suất tham khảo — đề nghị cho vay của ngân hàng mới quyết định.",
+            "en": "An estimate at a typical rate — your loan offer decides."
+          }
+        },
+        {
+          "id": "loan_payout",
+          "tier": "CONVENTION",
+          "how": {
+            "vi": "Phần còn lại của khoản vay {principal} sau {years} năm trả góp (thời hạn {term} năm, lãi suất {rate}%/năm, gồm phần chênh cho người không cư trú) — được trả từ tiền bán nhà.",
+            "en": "What is left of a {principal} loan after {years} years of repayments ({term}-year term at {rate}% a year, the non-resident premium included) — repaid from the sale."
+          },
+          "payer": {
+            "vi": "Trả cho ngân hàng từ tiền bán nhà khi hoàn tất việc bán.",
+            "en": "Paid to your lender from the sale money at settlement."
+          },
+          "drivers": {
+            "vi": "Số tiền vay, lãi suất qua các năm, và việc trả thêm: trả thêm sớm thì còn nợ ít hơn.",
+            "en": "The loan size, the rate over the years, and extra repayments: paying more early leaves less to repay."
+          },
+          "note": {
+            "vi": "Ước tính theo lãi suất tham khảo — đề nghị cho vay của ngân hàng mới quyết định.",
+            "en": "An estimate at a typical rate — your loan offer decides."
+          }
+        }
+      ]
     }
   }
 }

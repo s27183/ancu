@@ -14,10 +14,8 @@
 %%   3. REGRESSION: with no financials (the onboarding/plan-first base) the framed
 %%      financials stay PENDING (assessable_income null, debts empty, capacity null) —
 %%      the pre-IC3 honest-partial behaviour is preserved.
-%%   4. LINK proof: capacity is the unblock for the dispose chain — loan_payout is null
-%%      when capacity is null and non-null once capacity + a rate + H are present (the
-%%      rate is the agent slot, supplied end-to-end in IC6; here injected to isolate the
-%%      capacity link the "Chưa có" symptom turned on).
+%%   4. LINK: the dispose chain no longer waits on capacity — loan_payout is the price
+%%      less the plan's deposit with or without income (behavior 98).
 %%
 %% Pure given onboarding + financials Args + the persistent_term artifact. Run from
 %% engine/erlang:  ERL_LIBS=_build/default/lib escript test/profile_enrichment_conformance.escript
@@ -79,22 +77,21 @@ regression_checks() ->
      check("mortgage.expected_borrowing_capacity stays null (pre-IC3 honest-partial)",
            maps:get(<<"expected_borrowing_capacity">>, Mort), null)].
 
-%% --- 3. link: capacity is the dispose-chain unblock -------------------------
+%% --- 3. link: the payout no longer waits on capacity (behavior 98) --------
+%% The loan paid out at sale is the price less the plan's deposit, the same loan as the Own
+%% phase's repayments — so it is known at base, with or without income, and income does not
+%% change it. Before behavior 98 it was amortised from expected_borrowing_capacity and was
+%% null until income arrived (the "Chưa có" chain this test once proved).
 
 link_checks() ->
-    io:format("~nlink — capacity unblocks loan_payout (the 'Chưa có' chain)~n"),
+    io:format("~nlink — the payout is the price less the deposit, income or not~n"),
     {ok, Rich} = run(ic0_financials()),
     {ok, Bare} = run(#{}),
-    H = 10,
-    %% the resolver-only mortgage has no rate (the agent slot — IC6); inject a
-    %% representative rate to isolate the CAPACITY link this test owns.
-    Rate = 0.06,
-    RichMort = inject_rate(maps:get(<<"mortgage_plan">>, Rich), Rate),
-    BareMort = inject_rate(maps:get(<<"mortgage_plan">>, Bare), Rate),
-    [check("loan_payout is null when capacity is null (the symptom: no income)",
-           fh_engine_disposition:loan_payout(BareMort, H), null),
-     check("loan_payout is NON-null once capacity + rate + H are present (unblocked)",
-           fh_engine_disposition:loan_payout(RichMort, H) =/= null, true)].
+    Payout = fun(Out) -> maps:get(<<"loan_payout">>, maps:get(<<"disposition">>, Out)) end,
+    [check("loan_payout is known with no income (price less deposit)",
+           Payout(Bare) =/= null, true),
+     check("loan_payout is the same once income arrives (capacity no longer its principal)",
+           Payout(Rich), Payout(Bare))].
 
 %% --- fixtures ---------------------------------------------------------------
 
@@ -116,10 +113,6 @@ run(Financials) ->
                    <<"target_zone">> => [],
                    <<"hold_horizon_years">> => 10},
     fh_engine_simulate:run(<<"fhb-domestic-au">>, Onboarding, <<"owner_occupier">>, Financials).
-
-inject_rate(Mort, Rate) ->
-    LS = maps:get(<<"loan_structure_recommendation">>, Mort, #{}),
-    Mort#{<<"loan_structure_recommendation">> => LS#{<<"rate">> => Rate}}.
 
 check(Label, Got, Want) ->
     case Got =:= Want of

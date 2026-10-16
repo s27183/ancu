@@ -1,9 +1,12 @@
 <script lang="ts">
     // Whole lifecycle -> honest-partial; one computer per figure -> the web frontend -> the lifecycle statement
     // Purpose:   the plan's first sheet (behavior 93, over behavior 82's lines): the whole
-    //            lifecycle budget read top to bottom like a P&L — one row per phase (Buy,
-    //            Own per year, Sell), its figure right-aligned, and a bottom line: the total
-    //            paid over the hold chosen on the statement (buy + own × years + sell).
+    //            lifecycle budget read top to bottom like a P&L of costs over the hold
+    //            chosen on the statement (behavior 98) — Phí mua, Phí giữ nhà trong N năm
+    //            (≈ X/năm beside it), Phí bán, each right-aligned, and the bottom line
+    //            "Tổng phí trong N năm", exactly their sum. Money into the home (the deposit,
+    //            the loan principal repaid by N) is not a cost: it sits after a divider, with
+    //            the cash needed to buy (deposit + Phí mua), on the statement and the Mua sheet.
     //            Tapping a phase opens its sheet (that phase's lines); tapping a line opens
     //            its detail in place — what it is, how its figure is set, who pays, what
     //            moves it, its source (the engine's `detail`: a fee line's, behavior 83, or
@@ -14,10 +17,14 @@
     //            "Tiền thuê thu về" → yield and tax — those two from lifecycle_budget.beside,
     //            after the divider, in no total). A phase sheet is a history entry (shallow routing,
     //            page.state.lifecycle), so back returns to the statement.
-    // Holds:     it computes no figure but the bottom line, and that only as a sum of the
-    //            engine's own totals (purchase_journey.lifecycle_budget) with the hold the
-    //            sell figures were computed for (disposition.horizon_years) — never a
-    //            forecast. Lines are the engine's cash events. A line the engine's totals do
+    // Holds:     it computes no figure: every row, the bottom line and the money into the
+    //            home are the engine's (purchase_journey.lifecycle_budget costs_*, into_home,
+    //            buy; fh_engine_journey costs/4), for the hold they were made for
+    //            (hold_years). Phí giữ nhà's sheet lists the yearly lines and the loan's
+    //            interest over the hold (disposition.loan_over_hold) — the repayments line
+    //            itself, principal and interest together, after the divider — and says
+    //            "X/năm × N năm"; Phí bán's names the projected sale price and its growth
+    //            band (disposition.growth_pct_pa). Lines are the engine's cash events. A line the engine's totals do
     //            not sum (a grant or sale price coming in, an optional or still-conditional
     //            fee, the loan payout, a line waiting on an input) sits after one quiet
     //            divider, never tagged one by one; a line waiting on an input says which.
@@ -33,7 +40,7 @@
     //            cockpit held comes here — the price change beside the hold picker (the
     //            planner's control, passed in as `priceControl`: preview, then "Lưu" saves
     //            it to the plan), and "Tiền bạn có" as one row of the Mua sheet: a sum the
-    //            visitor types, set against the sheet's own total (lifecycle_budget.buy) at
+    //            visitor types, set against the cash needed to buy (lifecycle_budget.buy) at
     //            its low and high ends — "Đủ" or "Còn thiếu <total − sum>" — a subtraction,
     //            never a figure of its own; kept in this browser per plan (localStorage),
     //            never sent. The household figures behind the loan sit under it, closed.
@@ -60,7 +67,7 @@
         type PhasePlaybookOutcome
     } from '$lib/planCard';
     import LineDetail, { type LineStep } from '$lib/LineDetail.svelte';
-    import { money, moneyRange } from '$lib/format';
+    import { money, moneyRange, num } from '$lib/format';
 
     let {
         components,
@@ -172,40 +179,72 @@
             }));
     }
 
+    // behavior 98: every figure on the statement is the engine's (lifecycle_budget costs/4) —
+    // the hold they were made for, the costs and their total, the money into the home.
+    const holdYears = $derived(budget?.hold_years ?? disposition?.horizon_years ?? 0);
+    const loan = $derived(disposition?.loan_over_hold ?? null);
+    const intoHome = $derived(budget?.into_home ?? null);
+    const deposits = $derived(events.filter((e) => BUY_PHASES.includes(e.phase) && e.id === 'deposit'));
     const groups = $derived([
         {
             key: 'buy' as PhaseKey,
-            title: $t('plan.sheet.buy'),
-            lines: events.filter((e) => BUY_PHASES.includes(e.phase)),
-            total: budget?.buy ?? null,
-            perYear: false
+            title: $t('plan.sheet.costs_buy'),
+            lines: events.filter((e) => BUY_PHASES.includes(e.phase) && e.id !== 'deposit'),
+            total: budget?.costs_buy ?? null,
+            perYear: null as MoneyRange | null
         },
         {
             key: 'own' as PhaseKey,
-            title: $t('plan.sheet.own'),
+            title: holdYears
+                ? $t('plan.sheet.costs_own').replace('{n}', String(holdYears))
+                : $t('plan.sheet.costs_own_none'),
             lines: events.filter((e) => e.phase === 'own'),
-            total: budget?.own_per_year ?? null,
-            perYear: true
+            total: budget?.costs_own ?? null,
+            perYear: budget?.costs_own_per_year ?? null
         },
         {
             key: 'sell' as PhaseKey,
-            title: $t('plan.sheet.sell'),
+            title: $t('plan.sheet.costs_sell'),
             lines: disposeEvents,
-            total: budget?.sell ?? null,
-            perYear: false
+            total: budget?.costs_sell ?? null,
+            perYear: null as MoneyRange | null
         }
     ]);
+    // The bottom line: the engine's costs_total, exactly the three rows' sum at each end.
+    const bottom = $derived(budget?.costs_total ?? null);
 
-    // The bottom line: the total paid over the hold, low and high ends — the engine's three
-    // totals summed, own taken once per year of the hold the sell figures were made for.
-    const holdYears = $derived(disposition?.horizon_years ?? 0);
-    const bottom = $derived.by((): MoneyRange | null => {
-        const b = budget;
-        if (!b?.buy || !b.own_per_year || !b.sell || !holdYears) return null;
-        return [
-            b.buy[0] + b.own_per_year[0] * holdYears + b.sell[0],
-            b.buy[1] + b.own_per_year[1] * holdYears + b.sell[1]
-        ];
+    // The loan's interest over the hold, a line of Phí giữ nhà: the engine's split of the
+    // repayments line (disposition.loan_over_hold), with that line's detail — only where the
+    // plan has a repayments line, as costs/4 sums it.
+    const interestLine = $derived.by((): CashEvent | null => {
+        const rep = events.find((e) => e.phase === 'own' && e.id === 'loan_repayments');
+        if (!rep || !loan?.interest || !holdYears) return null;
+        const label = $t('plan.sheet.interest_hold').replace('{n}', String(holdYears));
+        return {
+            ...rep,
+            id: 'loan_interest_over_hold',
+            label: { vi: label, en: label },
+            amount: loan.interest,
+            timing: 'one_off',
+            is_estimate: true
+        };
+    });
+
+    // One line each on why Phí giữ nhà and Phí bán move with the hold.
+    const ownWhy = $derived.by((): string | null => {
+        const p = budget?.costs_own_per_year;
+        if (!p || !holdYears) return null;
+        return $t('plan.sheet.own_why').replace('{x}', range(p)).replace('{n}', String(holdYears));
+    });
+    const sellWhy = $derived.by((): string | null => {
+        const sale = disposition?.sale_proceeds;
+        const g = disposition?.growth_pct_pa;
+        if (!sale || !g || !holdYears) return null;
+        const pct = (x: number) => num(x, $lang) ?? String(x);
+        return $t('plan.sheet.sell_why')
+            .replace('{n}', String(holdYears))
+            .replace('{p}', range(sale))
+            .replace('{g}', g[0] === g[1] ? pct(g[0]) : `${pct(g[0])}–${pct(g[1])}`);
     });
 
     // The open layer: the statement (null) or one phase's sheet, kept in the history entry.
@@ -238,10 +277,14 @@
     // Whether the engine's total for this phase sums the line (fh_engine_journey:
     // out/1 — an out-event, not optional, no open condition; own: recurring; sell: not the
     // loan payout, which the sale proceeds repay).
+    // behavior 98 (costs/4): the deposit is money into the home, never a cost; the loan
+    // repayments are not summed as they are — their interest over the hold is (a line of
+    // its own), their principal goes into the home.
     function counted(e: CashEvent, key: PhaseKey): boolean {
         if (e.direction !== 'out') return false;
         if (e.detail && (e.detail.optional || e.detail.condition)) return false;
-        if (key === 'own') return e.timing === 'recurring';
+        if (key === 'buy') return e.id !== 'deposit';
+        if (key === 'own') return e.timing === 'recurring' && e.id !== 'loan_repayments';
         if (key === 'sell') return e.id !== 'dispose_loan_payout';
         return true;
     }
@@ -268,25 +311,73 @@
     {@const rest = g.lines.filter((e) => !counted(e, g.key))}
     {@const waiting = pendingFor(g.key)}
     {@const extra = besideFor(g.key)}
+    {@const interest = g.key === 'own' ? interestLine : null}
     <section class="ls" data-group={g.key} bind:this={rootEl} aria-labelledby="ls-phase-title">
         <button type="button" class="ls-back" onclick={back}
             ><span aria-hidden="true">‹</span> {$t('plan.sheet.back')}</button
         >
         <h3 id="ls-phase-title" class="ls-row ls-phase-head">
             <span class="ls-row-label">{g.title}</span>
-            <span class="ls-row-fig">{@render total(g.key, g.total, g.perYear)}</span>
+            <span class="ls-row-fig">{@render total(g.key, g.total, null)}</span>
         </h3>
+        {#if g.key === 'own' && ownWhy}<p class="ls-why">≈ {ownWhy}</p>{/if}
+        {#if g.key === 'sell' && sellWhy}<p class="ls-why">{sellWhy}</p>{/if}
 
-        {#if inTotal.length > 0}
+        {#if inTotal.length > 0 || interest}
             <ul class="ls-lines">
                 {#each inTotal as e (e.id)}{@render line(e)}{/each}
+                {#if interest}{@render line(interest)}{/if}
             </ul>
         {:else if filling && rest.length === 0 && waiting.length === 0}
             <p class="ls-empty">{$t('plan.sheet.filling')}</p>
         {/if}
 
-        {#if g.key === 'buy' && g.total}
-            {@const need = g.total}
+        {#if g.key === 'buy' && (deposits.length > 0 || intoHome?.deposit)}
+            <!-- behavior 98: money that goes into the home, not a cost — apart, in no total -->
+            <p class="ls-divider">{$t('plan.sheet.not_a_cost')}</p>
+            <div class="ls-into" data-into-home>
+                <div class="ls-row ls-into-head">
+                    <span class="ls-row-label"
+                        >{holdYears
+                            ? $t('plan.sheet.into_home_hold').replace('{n}', String(holdYears))
+                            : $t('plan.sheet.into_home')}</span
+                    >
+                    <span class="ls-row-fig"
+                        >{#if intoHome?.total}{@render ends(intoHome.total)}{:else if intoHome?.deposit}{@render ends(intoHome.deposit)}{:else}—{/if}</span
+                    >
+                </div>
+                <ul class="ls-lines ls-rest">
+                    {#each deposits as e (e.id)}{@render line(e)}{/each}
+                    <li class="ls-line">
+                        <div class="ls-line-btn ls-static">
+                            <span class="ls-label"
+                                >{holdYears
+                                    ? $t('plan.sheet.into_principal').replace('{n}', String(holdYears))
+                                    : $t('plan.sheet.into_principal_none')}</span
+                            >
+                            {#if intoHome?.principal_repaid}
+                                <span class="ls-amt"
+                                    ><span class="ls-mark" title={$t('plan.sheet.estimate')}>≈</span>{range(
+                                        intoHome.principal_repaid
+                                    )}</span
+                                >
+                            {:else if !holdYears}
+                                <span class="ls-needs">{$t('plan.sheet.needs.hold_years')}</span>
+                            {:else}
+                                <span class="ls-amt">—</span>
+                            {/if}
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        {/if}
+
+        {#if g.key === 'buy' && budget?.buy}
+            {@const need = budget.buy}
+            <div class="ls-row ls-need" data-cash-to-buy>
+                <span class="ls-row-label">{$t('plan.sheet.cash_to_buy')}</span>
+                <span class="ls-row-fig">{@render ends(need)}</span>
+            </div>
             <div class="ls-cash">
                 <label class="ls-cash-row">
                     <span class="ls-label">{$t('plan.sheet.cash')}</span>
@@ -375,15 +466,41 @@
             {/each}
         </div>
         {#if priceControl}{@render priceControl()}{/if}
+
+        {#if intoHome?.deposit || budget?.buy}
+            <!-- behavior 98: not costs — what goes into the home, and the cash to buy -->
+            <p class="ls-divider">{$t('plan.sheet.not_a_cost')}</p>
+            <div class="ls-aside">
+                {#if intoHome?.deposit}
+                    <button type="button" class="ls-row" data-into-home onclick={() => openPhase('buy')}>
+                        <span class="ls-row-label"
+                            >{holdYears
+                                ? $t('plan.sheet.into_home_hold').replace('{n}', String(holdYears))
+                                : $t('plan.sheet.into_home')}</span
+                        >
+                        <span class="ls-row-fig">{@render ends(intoHome.total ?? intoHome.deposit)}</span>
+                        <span class="ls-caret" aria-hidden="true">›</span>
+                    </button>
+                {/if}
+                {#if budget?.buy}
+                    <div class="ls-row ls-need" data-cash-to-buy>
+                        <span class="ls-row-label">{$t('plan.sheet.cash_to_buy')}</span>
+                        <span class="ls-row-fig">{@render ends(budget.buy)}</span>
+                    </div>
+                {/if}
+            </div>
+        {/if}
     </section>
 {/if}
 
-{#snippet total(key: PhaseKey, r: MoneyRange | null, perYear: boolean)}
+{#snippet total(key: PhaseKey, r: MoneyRange | null, perYear: MoneyRange | null)}
     {#if r}
-        {@render ends(r)}{#if perYear}<span class="ls-unit">{$t('plan.sheet.per_year')}</span>{/if}
+        {@render ends(r)}{#if perYear}<span class="ls-per"
+                >≈ {range(perYear)}<span class="ls-unit">{$t('plan.sheet.per_year')}</span></span
+            >{/if}
     {:else if busy || filling}
         {@render skel()}
-    {:else if key === 'sell' && holdPending}
+    {:else if (key === 'sell' && holdPending) || (key === 'own' && !holdYears)}
         <span class="ls-needs">{$t('plan.sheet.needs.hold_years')}</span>
     {:else}
         —
@@ -461,10 +578,12 @@
     button.ls-row { cursor: pointer; }
     button.ls-row:hover { background: var(--accent-soft); }
     button.ls-row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
-    /* The label keeps its line; on a phone a long range wraps inside the figure's column. */
-    .ls-row-label { flex: 0 0 auto; white-space: nowrap; font-weight: 600; }
+    /* On a phone a long range wraps inside the figure's column, after its dash. */
+    /* behavior 98: "Phí giữ nhà trong N năm" is long, so on a phone the label wraps rather
+       than squeeze the figure under one whole end of its range. */
+    .ls-row-label { flex: 0 1 auto; min-width: 0; font-weight: 600; }
     .ls-row-fig {
-        flex: 1 1 auto; min-width: 0; text-align: right; font-weight: 700;
+        flex: 1 0 9rem; min-width: 9rem; text-align: right; font-weight: 700;
         font-variant-numeric: tabular-nums; text-wrap: balance;
     }
     .ls-end { white-space: nowrap; }
@@ -472,6 +591,20 @@
     .ls-bottom .ls-row-fig { font-size: var(--fs-lg, 1.125rem); }
     .ls-bottom .ls-row-label { font-weight: 700; }
 
+    /* Phí giữ nhà's per-year figure, quiet beside its total. */
+    .ls-per { display: block; font-size: var(--fs-xs, 0.75rem); font-weight: 500; color: var(--muted); }
+    .ls-why { margin: -0.4rem 0 0; font-size: var(--fs-sm, 0.875rem); color: var(--muted); }
+    /* Not costs (behavior 98): the money into the home and the cash to buy, quieter than
+       the statement, their labels free to wrap on a phone. */
+    .ls-aside, .ls-into {
+        display: grid; background: var(--surface); border: 1px solid var(--border); border-radius: 0.75rem; overflow: hidden;
+    }
+    .ls-aside > * + * { border-top: 1px solid var(--border); }
+    .ls-aside .ls-row-fig, .ls-into-head .ls-row-fig, .ls-need .ls-row-fig { font-weight: 600; }
+    .ls-need .ls-row-label, .ls-into-head .ls-row-label, .ls-aside .ls-row-label { white-space: normal; flex: 1 1 9rem; font-weight: 500; }
+    .ls-into .ls-rest { border: 0; border-top: 1px solid var(--border); border-radius: 0; }
+    .ls-need { background: var(--surface); border: 1px solid var(--border); border-radius: 0.75rem; }
+    .ls-aside .ls-need { border: 0; border-radius: 0; }
     .ls-hold { display: flex; flex-wrap: wrap; gap: 0.35rem; }
     .ls-chip {
         font: inherit; font-size: var(--fs-xs, 0.75rem); padding: 0.3rem 0.7rem;
