@@ -107,9 +107,10 @@ get_plan_card(UserId, PlanCardId) ->
                       [{timeout, ?RPC_TIMEOUT_MS}], [{body_format, binary}]),
     {Status, Resp}.
 
-%% Whole lifecycle -> The shell backend -> each listed plan's state and last update
-%% (behavior 84): GET /api/engine/plan-cards?ids=… for the ids the user owns. Returns
-%% {ok, #{Id => #{state, updated_at}}}, or {error, _} when the engine cannot answer (the
+%% Whole lifecycle -> The shell backend -> each listed plan's state, last update, purpose
+%% and figures (behaviors 84, 96): GET /api/engine/plan-cards?ids=… for the ids the user
+%% owns. Returns {ok, #{Id => #{state, updated_at, intent, mode, buy, own_per_year}}}, or
+%% {error, _} when the engine cannot answer (the
 %% list then goes out without them, never blocked on the engine).
 -spec plan_card_summaries(binary(), [binary()]) -> {ok, map()} | {error, term()}.
 plan_card_summaries(_UserId, []) -> {ok, #{}};
