@@ -79,9 +79,11 @@ in `docs/kb/news/` as the shape to copy.
    care about: every "changed" doc from step 2, and any change published since the newest
    note's `authored_date` on these government sites: ato.gov.au, revenue.nsw.gov.au,
    sro.vic.gov.au, qro.qld.gov.au, revenuesa.sa.gov.au, finance.wa.gov.au (RevenueWA),
-   treasury.gov.au and budget.gov.au, homeaffairs.gov.au, firb.gov.au,
+   treasury.gov.au and budget.gov.au, firb.gov.au,
    housingaustralia.gov.au, rba.gov.au, asic.gov.au. Government sources only: no news
-   outlet, blog or aggregator. Skip anything already covered by an existing note. Each
+   outlet, blog or aggregator. Home Affairs visa news is not yours: homeaffairs.gov.au
+   refuses automated fetches, so the runbook's "Home Affairs visa check" step is run
+   from Son's machine when your PR arrives, and adds its visa notes to your PR. Skip anything already covered by an existing note. Each
    note is `docs/kb/news/<yyyy-mm>-<slug>.md`, frontmatter `slug: kb.news.<same>`,
    `category` (one of finance, market, property, scheme, tax, visa), `effective_from`, `authored_date: <today>`, `sources:` (url + retrieved
    today, a page you opened), and four sections: Headline (EN), Headline (VI), Summary
