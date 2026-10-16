@@ -5,9 +5,11 @@
     //            Own per year, Sell), its figure right-aligned, and a bottom line: the total
     //            paid over the hold chosen on the statement (buy + own × years + sell).
     //            Tapping a phase opens its sheet (that phase's lines); tapping a line opens
-    //            its detail — a fee line in place (behavior 83), any other its source
-    //            component through `onopen`. Each layer is a history entry (shallow
-    //            routing, page.state.lifecycle), so back returns one layer at a time.
+    //            its detail in place — what it is, how its figure is set, who pays, what
+    //            moves it, its source (the engine's `detail`: a fee line's, behavior 83, or
+    //            any other line's, fh_engine_line_detail, behavior 93); no line opens a
+    //            component card. A phase sheet is a history entry (shallow routing,
+    //            page.state.lifecycle), so back returns to the statement.
     // Holds:     it computes no figure but the bottom line, and that only as a sum of the
     //            engine's own totals (purchase_journey.lifecycle_budget) with the hold the
     //            sell figures were computed for (disposition.horizon_years) — never a
@@ -48,8 +50,7 @@
         planState,
         busy = false,
         onhorizon,
-        onstate,
-        onopen
+        onstate
     }: {
         components: Record<string, ComponentEntry>;
         filling: boolean;
@@ -60,7 +61,6 @@
         busy?: boolean;
         onhorizon: (years: number) => void;
         onstate: (state: string) => void;
-        onopen: (componentId: string) => void;
     } = $props();
 
     type PhaseKey = 'buy' | 'own' | 'sell';
@@ -138,11 +138,6 @@
     function rangeEnds(r: MoneyRange): string[] {
         if (r[0] === r[1]) return [money(r[0], $lang) ?? '—'];
         return [`${money(r[0], $lang) ?? '—'} –`, money(r[1], $lang) ?? '—'];
-    }
-    // The dispose events' owner is disposition; every other event names its own.
-    function owner(e: CashEvent): string | null {
-        const id = e.phase === 'dispose' ? 'disposition' : (e.source_component ?? null);
-        return id && components[id] ? id : null;
     }
     // Whether the engine's total for this phase sums the line (fh_engine_journey:
     // out/1 — an out-event, not optional, no open condition; own: recurring; sell: not the
@@ -312,15 +307,9 @@
 {/snippet}
 
 {#snippet line(e: CashEvent)}
-    {@const own = owner(e)}
     <li class="ls-line" class:ls-in={e.direction === 'in'}>
         {#if e.detail}
             {@render fee(e, e.detail)}
-        {:else if own}
-            <button type="button" class="ls-line-btn" onclick={() => onopen(own)}>
-                {@render body(e)}
-                <span class="ls-caret" aria-hidden="true">›</span>
-            </button>
         {:else}
             <div class="ls-line-btn ls-static">{@render body(e)}</div>
         {/if}
@@ -338,7 +327,9 @@
         <div class="ls-fee-detail">
             {#if why}<p class="ls-fee-why">{why}</p>{/if}
             <dl class="ls-fee-facts">
-                {#if basis}
+                {#if d.how}
+                    <div><dt>{$t('plan.sheet.fee.how')}</dt><dd>{pick(d.how, $lang)}</dd></div>
+                {:else if basis}
                     <div><dt>{$t('plan.sheet.fee.range')}</dt><dd>{basis}</dd></div>
                 {/if}
                 {#if d.payer}
@@ -359,7 +350,11 @@
                 {/if}
             </dl>
             <p class="ls-fee-note">
-                {d.tier === 'REGULATED' ? $t('plan.sheet.fee.regulated_note') : $t('plan.sheet.fee.quote_note')}
+                {d.note
+                    ? pick(d.note, $lang)
+                    : d.tier === 'REGULATED'
+                      ? $t('plan.sheet.fee.regulated_note')
+                      : $t('plan.sheet.fee.quote_note')}
             </p>
         </div>
     </details>
@@ -449,9 +444,6 @@
         padding: 0.6rem 0.75rem; background: none; border: 0; text-align: left;
         font: inherit; color: var(--ink);
     }
-    button.ls-line-btn { cursor: pointer; }
-    button.ls-line-btn:hover { background: var(--accent-soft); }
-    button.ls-line-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
     .ls-label { flex: 1 1 10rem; min-width: 0; }
     .ls-amt { flex: 0 0 auto; margin-left: auto; font-variant-numeric: tabular-nums; white-space: nowrap; font-weight: 600; }
     .ls-in .ls-amt { color: var(--success); }
@@ -463,7 +455,7 @@
     .ls-empty, .ls-key { margin: 0; font-size: var(--fs-xs, 0.75rem); color: var(--muted); }
     .ls-empty { font-style: italic; }
 
-    /* A fee line opens in place: its summary is the line, its body the facts behind it. */
+    /* A line opens in place: its summary is the line, its body the facts behind it. */
     .ls-fee > summary { list-style: none; cursor: pointer; }
     .ls-fee > summary::-webkit-details-marker { display: none; }
     .ls-fee > summary:hover { background: var(--accent-soft); }

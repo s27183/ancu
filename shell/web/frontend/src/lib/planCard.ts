@@ -209,13 +209,15 @@ export interface CashEvent {
     /** behavior 83: the figure a fee line belongs to (other_buying_costs on the buy side,
      *  selling_costs on the sell side), so a link to that figure sums its lines. */
     group?: string | null;
-    /** behavior 83: a fee line's detail — what the sheet opens in place. */
+    /** behavior 83/93: a line's detail — what the sheet opens in place. */
     detail?: FeeDetail | null;
 }
 
-/** One fee line's detail (fh_engine_fees): its honesty tier, how it is figured, the band,
- *  who usually pays, what moves it within the band, the source, and whether it is optional
- *  or applies only to one kind of property (`condition`, while the type is unknown). */
+/** One line's detail: its honesty tier, how it is figured, the band, who usually pays, what
+ *  moves it within the band, the source, and whether it is optional or applies only to one
+ *  kind of property (`condition`, while the type is unknown). A fee line's comes from
+ *  fh_engine_fees (behavior 83); any other line's from fh_engine_line_detail (behavior 93),
+ *  which adds `how` (the figure's working, with its own figures) and its own `note`. */
 export interface FeeDetail {
     tier: 'CONVENTION' | 'LENDER-POLICY' | 'REGULATED' | 'PLACEHOLDER';
     basis: string;
@@ -226,6 +228,8 @@ export interface FeeDetail {
     optional?: boolean;
     condition?: string | null;
     owner?: string;
+    how?: LocalizedText | null;
+    note?: LocalizedText | null;
 }
 
 /** cash_position → calculator (outcome type `budget_envelope`). */

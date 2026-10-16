@@ -714,6 +714,8 @@ const messages = {
     'plan.sheet.fee.payer': { vi: 'Ai trả', en: 'Who pays' },
     'plan.sheet.fee.drivers': { vi: 'Điều gì làm thay đổi', en: 'What moves it' },
     'plan.sheet.fee.range': { vi: 'Khoảng', en: 'Range' },
+    // behavior 93: any other line's working, in its own figures
+    'plan.sheet.fee.how': { vi: 'Cách tính', en: 'How it’s set' },
     'plan.sheet.fee.source': { vi: 'Nguồn', en: 'Source' },
     'plan.sheet.fee.quote_note': {
         vi: 'Ước tính — báo giá của chính bạn mới là con số cuối cùng.',
