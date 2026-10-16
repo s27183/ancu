@@ -251,6 +251,14 @@ Added 2026-10-08 from the rest of that memory (Son left the choice to the goal):
   the issuing body with its currency marker (an Authorised Version No., a dated
   schedule); a secondary aggregator never supplies the figure.
 
+Added 2026-10-16 (behavior 93; Son: too much text at first look on a plan):
+
+- **A planning sheet does one job.** Every sheet of the plan shows one job, its
+  figure first, and the rest one tap down: no explanatory subtitle, an estimate
+  as one small mark keyed once at the foot, the lines a total leaves out after
+  one quiet divider, and every notice (the guest's, the disclaimer) one line —
+  shortened, never removed.
+
 ## What is deliberately not coupled
 
 *Empty at plant.* A thing that looks like it should be coupled and is not is

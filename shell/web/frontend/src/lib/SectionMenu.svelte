@@ -3,7 +3,7 @@
     // why in sections.svelte.ts). A pill at the sheet's foot names where you are; a
     // tap opens the sections grouped as the rails group them, the current one marked;
     // picking one goes there and closes the menu (Esc or a tap outside closes it too).
-    // Hidden at ≥48rem, where the rails are shown instead (app.css .sec-*).
+    // Shown at every width since behavior 93 took the plan's tab rows away (app.css .sec-*).
     //
     // How it is found (behavior 72; Son 2026-10-12: visitors did not know it was there):
     // until the visitor first opens the menu in this browser (SEEN_KEY, like the tour's
@@ -15,6 +15,9 @@
     // Inside a shown plan (`inPlan`, behavior 75) the menu holds the plan's many sections,
     // which a visitor who opened it once on the area data never saw: the pulse and a plan
     // bubble come back there until the menu is opened while the plan is shown (PLAN_KEY).
+    // Behavior 93 (clean sheets): only on the first plan a visitor opens in this browser —
+    // FIRST_KEY is read once as the menu mounts and set once the plan's sections show, so
+    // a reload, or the next plan, shows neither.
     import { fly, fade } from 'svelte/transition';
     import { cubicOut } from 'svelte/easing';
     import { t } from '$lib/i18n';
@@ -34,6 +37,7 @@
 
     const SEEN_KEY = 'ancu-sections-seen';
     const PLAN_KEY = 'ancu-sections-plan-seen';
+    const FIRST_KEY = 'ancu-plan-first-shown';
     function readSeen(key: string): boolean {
         try {
             return localStorage.getItem(key) === '1';
@@ -50,7 +54,11 @@
     }
     let seen = $state(readSeen(SEEN_KEY));
     let seenPlan = $state(readSeen(PLAN_KEY));
-    const noticing = $derived((inPlan ? !seenPlan : !seen) && $tourStep === 0);
+    const firstPlan = !readSeen(FIRST_KEY);
+    $effect(() => {
+        if (inPlan) markSeen(FIRST_KEY);
+    });
+    const noticing = $derived((inPlan ? firstPlan && !seenPlan : !seen) && $tourStep === 0);
 
     let open = $state(false);
     function toggle() {

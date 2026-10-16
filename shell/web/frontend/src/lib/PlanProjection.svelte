@@ -5,7 +5,8 @@
     // seeds from the GET snapshot, then merges live component_filled frames over the
     // SSE proxy. The zone→suburb gradient (per-suburb overlay) is deferred — this shows
     // the property-agnostic BASE components, identical across suburbs.
-    import { onMount, tick } from 'svelte';
+    import { onMount } from 'svelte';
+    import { page } from '$app/state';
     import { t } from '$lib/i18n';
     import { lang } from '$lib/stores/lang';
     import {
@@ -50,7 +51,6 @@
     import Tabs from '$lib/Tabs.svelte';
     import Chat from '$lib/Chat.svelte';
     import QaIntro from '$lib/QaIntro.svelte';
-    import Sparkle from '$lib/Sparkle.svelte';
     import { useSections, type SectionGroup, type SectionIcon, type SectionItem } from '$lib/sections.svelte';
     import { guest } from '$lib/stores/session';
     import { loginOpen } from '$lib/stores/ui';
@@ -90,7 +90,8 @@
     // (there is deliberately no plan.ltab.qa label — qa uses plan.tab.qa).
     const railTabs = $derived(uiTabs.filter((t) => t.kind !== 'qa'));
 
-    // Sub-tab rail grouping (2026-07-09, Son's request), updated 2026-07-11 once Mode B's
+    // Section grouping (2026-07-09, Son's request; the rails it grouped are gone since
+    // behavior 93 — the section menu groups the same way), updated 2026-07-11 once Mode B's
     // task-13 rewrite retired the last blueprint on the pre-restructure flat tab vocabulary
     // (plan-card-lifecycle-restoration.md §11.3) — every in-scope blueprint now declares at
     // most 5 rail tabs (overview/flow/budget/[portfolio|family]/qa), under RAIL_GROUP_THRESHOLD,
@@ -110,24 +111,6 @@
     const overviewTab = $derived(railTabs.find((t) => t.tab_id === 'overview'));
     const nonOverviewRailTabs = $derived(railTabs.filter((t) => t.tab_id !== 'overview'));
     const railGrouped = $derived(nonOverviewRailTabs.length > RAIL_GROUP_THRESHOLD);
-    // Pure derivation from `sub`, not a $state mutated in an $effect (the autofixer
-    // flags that pattern) — this also means the group toggle always follows `sub`
-    // automatically, including any programmatic jump elsewhere in this file, same
-    // "derive, don't clamp" idiom as NewsTicker's safeIdx. Defaults to 'buy' while
-    // `sub` is 'overview'/'qa' (group-less) or on first render.
-    const railGroup = $derived(TAB_GROUP[sub] ?? 'buy');
-    const groupedRailTabs = $derived(
-        nonOverviewRailTabs.filter((t) => (TAB_GROUP[t.tab_id] ?? 'buy') === railGroup)
-    );
-    // Selecting a group the current tab isn't in jumps to that group's first tab —
-    // railGroup then follows for free (it's derived from `sub`, not set here).
-    // Re-clicking the group `sub` is already in is a no-op, matching the toggle's
-    // "already active" visual state.
-    function selectGroup(g: 'buy' | 'hold') {
-        if ((TAB_GROUP[sub] ?? 'buy') === g) return;
-        const first = nonOverviewRailTabs.find((t) => (TAB_GROUP[t.tab_id] ?? 'buy') === g);
-        if (first) sub = first.tab_id;
-    }
 
     // The budget (Cash-calculator) tab's three sub-tabs (§7.3): the cockpit inputs + the
     // "Bạn đã đủ chưa?" verdict → the cash-events table → the breakdown detail. Labels reuse
@@ -158,19 +141,11 @@
     // optimistic for immediacy, then reconciled from the PATCH response (revert on failure).
     let checklistStatus = $state<ChecklistStatusMap>({});
 
-    // The rendered height of the sticky sub-tab rail region, fed to --tabrail-top so
-    // the nested Budget sub-rail's own sticky offset tracks the rail's real, variable
-    // height (it grows a row when the rail is grouped) instead of a stale hardcoded
-    // rem (see the .pp-sticky-top / .pp-subcontent markup below).
-    let stickyTopHeight = $state(0);
-    let stickyTopEl = $state<HTMLElement | null>(null);
-
-    // Behavior 55: the foot bar on every other tab jumps to the AI assistant and brings
-    // the tab row (and the assistant under it) back into view.
-    async function openQa() {
+    // Behavior 55: the head's "Hỏi AI" (the plan's one way to the assistant since behavior
+    // 93 took the foot bar off) opens it; the page scrolls its body to the top.
+    function openQa() {
+        leaveLayer();
         sub = 'qa';
-        await tick();
-        stickyTopEl?.scrollIntoView({ block: 'start', behavior: 'smooth' });
     }
 
     let stream: PlanCardStream | null = null;
@@ -213,10 +188,26 @@
         stateSelect = s;
         void runPreview();
     }
+    // Behavior 93: the statement opens with a hold picked, so its bottom line shows at
+    // once — a plan saved with no hold previews DEFAULT_HOLD years, as a tap on that chip
+    // would. Once per load (`holdDefaulted`; a reset re-arms it); the cockpit's slider can
+    // still clear it. The hold is shown on the statement's chips, so only a state or price
+    // what-if (`scenarioActive`) raises the preview banner.
+    const DEFAULT_HOLD = 10;
+    let holdDefaulted = false;
+    $effect(() => {
+        if (holdDefaulted || !turnDone || !cardId || viewingProperty) return;
+        if (!components.cash_position || baselineHorizon !== 0 || horizonValue !== 0) return;
+        holdDefaulted = true;
+        chooseHold(DEFAULT_HOLD);
+    });
     let previewOutcomes = $state<Record<string, Record<string, unknown>> | null>(null);
     let previewing = $state(false);
     let previewError = $state(false);
     const previewActive = $derived(previewOutcomes !== null);
+    const scenarioActive = $derived(
+        previewActive && ((!!stateSelect && stateSelect !== planBase) || priceInput.trim() !== '')
+    );
     // Save (W8) — the COMMIT half: refine persists the previewed overrides + runs a
     // base_resolver turn whose recomputed components arrive over the SAME SSE. `committing`
     // is set on a 202 so onDone clears the preview once the saved (== previewed) snapshot
@@ -633,6 +624,11 @@
         portfolio: 'portfolio',
         family: 'family'
     };
+    // A pick from the menu leaves an open phase sheet of the statement (its history entry,
+    // LifecycleSheet), so the budget's first sheet is the statement again.
+    function leaveLayer() {
+        if (page.state.lifecycle) history.back();
+    }
     function railItems(tabs: UiTab[]): SectionItem[] {
         return tabs.flatMap((tb) => {
             const item: SectionItem = {
@@ -640,7 +636,10 @@
                 label: $t(`plan.ltab.${tb.tab_id}` as 'plan.ltab.overview'),
                 icon: SECTION_ICON[tb.tab_id] ?? 'overview',
                 active: sub === tb.tab_id || (!sub && tb === uiTabs[0]),
-                select: () => (sub = tb.tab_id)
+                select: () => {
+                    leaveLayer();
+                    sub = tb.tab_id;
+                }
             };
             if (!(tb.interactive && viewComponents.cash_position)) return [item];
             return [
@@ -652,6 +651,7 @@
                     nested: true,
                     active: item.active && budgetSub === bt.id,
                     select: () => {
+                        leaveLayer();
                         sub = tb.tab_id;
                         budgetSub = bt.id;
                     }
@@ -683,7 +683,10 @@
                     icon: 'qa',
                     accent: true,
                     active: sub === 'qa',
-                    select: () => (sub = 'qa')
+                    select: () => {
+                        leaveLayer();
+                        sub = 'qa';
+                    }
                 }
             ]
         });
@@ -832,6 +835,7 @@
         priceInput = '';
         stateSelect = planBase;
         horizonValue = baselineHorizon;
+        holdDefaulted = false;
     }
 
     async function load() {
@@ -1070,22 +1074,6 @@
         </Modal>
     {/if}
 
-    <!-- Behavior 55: the Q&A tab is the AI assistant's door — sparkle + accent, the
-         long label on wide screens, the short one on a phone's full tab row. -->
-    {#snippet qaTab()}
-        <button
-            type="button"
-            role="tab"
-            class="pp-qa-tab"
-            aria-selected={sub === 'qa'}
-            class:active={sub === 'qa'}
-            onclick={() => (sub = 'qa')}
-            ><Sparkle /><span class="pp-qa-long">{$t('plan.tab.qa')}</span><span
-                class="pp-qa-short">{$t('plan.tab.qa_short')}</span
-            ></button
-        >
-    {/snippet}
-
     {#snippet settleCta()}
         <div class="pp-settle-cta">
             <button type="button" class="pp-attach-btn" onclick={openSettle}>
@@ -1181,104 +1169,24 @@
         </Modal>
     {/if}
 
-    <!-- Sticky region atop the scrolling plan body: the lifecycle sub-tab rail. Its real
-         rendered height is measured via bind:clientHeight and fed to --tabrail-top below,
-         so the nested Budget sub-rail (Tabs.svelte) — which stacks its own sticky rail
-         just below this region — tracks the rail's presence instead of a stale
-         hand-picked rem. (A per-card KB-news ticker used to live here, then as a sticky
-         footer below the tab content — removed 2026-07-09, Son's call: the homepage's
-         unfiltered ticker is enough, and the per-card fetch/render/dismiss UI added
-         clutter for little payoff. Backend untouched — GET/PATCH .../news, GATE 11, the
-         compiled artifact's news entries are all still live; this was a shell-only
-         removal, easy to re-wire if wanted later.) -->
-    <!-- Behavior 45: a guest's plan says what it is — kept 7 days, sign in to keep it
-         and to ask the assistant (fh_shell_guest). -->
+    <!-- Behavior 45: a guest's plan says what it is — kept 7 days, sign in to keep it;
+         one line since behavior 93 (the full notice stays on the assistant's tab). The
+         plan's sections (the tab rows above it until behavior 93) are in the section menu,
+         so the plan's first sheet is the first thing under the head. -->
     {#if $guest && sub !== 'qa'}
-        <div class="pp-guest" role="note">
-            <p>{$t('guest.notice')}</p>
-            <button type="button" class="primary" onclick={() => loginOpen.set(true)}
+        <p class="pp-guest pp-guest-line" role="note">
+            {$t('guest.notice_short')} ·
+            <button type="button" class="pp-guest-signin" onclick={() => loginOpen.set(true)}
                 >{$t('auth.signin')}</button
             >
-        </div>
+        </p>
     {/if}
-
-    <div class="pp-sticky-top" bind:clientHeight={stickyTopHeight} bind:this={stickyTopEl}>
-        <!-- Sub-tabs: one per plan section + a Q&A tab — each section shows on its own,
-             so the user never scrolls a long plan. Horizontally scrollable on narrow
-             screens. Past RAIL_GROUP_THRESHOLD rail tabs (Modes B/C/D), a second row
-             appears: Overview/group-toggle/Q&A always visible on top, the active
-             group's tabs below — under the threshold (Modes A/E) this renders the
-             original single flat row, unchanged. -->
-        <div class="pp-subtabs-outer">
-            {#if railGrouped}
-                <div class="pp-subtabs" role="tablist">
-                    {#if overviewTab}
-                        <button
-                            type="button"
-                            role="tab"
-                            aria-selected={sub === overviewTab.tab_id}
-                            class:active={sub === overviewTab.tab_id}
-                            onclick={() => overviewTab && (sub = overviewTab.tab_id)}
-                            >{$t('plan.ltab.overview')}</button
-                        >
-                    {/if}
-                    <button
-                        type="button"
-                        role="tab"
-                        class="pp-railgroup-btn"
-                        aria-selected={railGroup === 'buy'}
-                        class:active={railGroup === 'buy'}
-                        onclick={() => selectGroup('buy')}>{$t('plan.railgroup.buy')}</button
-                    >
-                    <button
-                        type="button"
-                        role="tab"
-                        class="pp-railgroup-btn"
-                        aria-selected={railGroup === 'hold'}
-                        class:active={railGroup === 'hold'}
-                        onclick={() => selectGroup('hold')}>{$t('plan.railgroup.hold')}</button
-                    >
-                    {@render qaTab()}
-                </div>
-                <div
-                    class="pp-subtabs pp-subtabs-group"
-                    role="tablist"
-                    aria-label={$t(`plan.railgroup.${railGroup}` as 'plan.railgroup.buy')}
-                >
-                    {#each groupedRailTabs as tab (tab.tab_id)}
-                        <button
-                            type="button"
-                            role="tab"
-                            aria-selected={sub === tab.tab_id}
-                            class:active={sub === tab.tab_id}
-                            onclick={() => (sub = tab.tab_id)}
-                            >{$t(`plan.ltab.${tab.tab_id}` as 'plan.ltab.overview')}</button
-                        >
-                    {/each}
-                </div>
-            {:else}
-                <div class="pp-subtabs" role="tablist">
-                    {#each railTabs as tab (tab.tab_id)}
-                        <button
-                            type="button"
-                            role="tab"
-                            aria-selected={sub === tab.tab_id}
-                            class:active={sub === tab.tab_id}
-                            onclick={() => (sub = tab.tab_id)}
-                            >{$t(`plan.ltab.${tab.tab_id}` as 'plan.ltab.overview')}</button
-                        >
-                    {/each}
-                    {@render qaTab()}
-                </div>
-            {/if}
-        </div>
-    </div>
 
     <!-- Cross-tab what-if indicator: the price/state cockpit lives in the Cash-calculator
          tab (the financial spine is where you reason about money), but a scenario re-renders
          EVERY tab — so on the other tabs, signpost that the figures are a preview, with a
          reset. The calculator tab shows the full cockpit instead (below). -->
-    {#if previewActive && sub !== 'qa' && !activeTab?.interactive}
+    {#if scenarioActive && sub !== 'qa' && !activeTab?.interactive}
         <div class="pp-whatif active">
             <p class="pp-wi-banner">{$t('plan.whatif.banner')}</p>
             <button type="button" class="pp-wi-reset" onclick={resetPreview}
@@ -1287,7 +1195,7 @@
         </div>
     {/if}
 
-    <div class="pp-subcontent" style="--tabrail-top: {stickyTopHeight}px">
+    <div class="pp-subcontent">
         {#if sub === 'qa'}
             <!-- Chat runs over the FILLED card; the engine 409s a qa turn while the base
                  turn is still running, so gate it on the base turn having finished. -->
@@ -1344,12 +1252,8 @@
                  The interactive tab is [cash_position]; any other component falls through. -->
             <section class="pp-card pp-calc pp-flat">
                 {#if viewComponents.cash_position}
-                    <div class="pp-budget-rail">
-                        <Tabs tabs={budgetTabs} active={budgetSub} onSelect={(id) => (budgetSub = id)} />
-                    </div>
-
                     {#if budgetSub === 'sheet'}
-                        {#if previewActive}
+                        {#if scenarioActive}
                             <div class="pp-whatif active">
                                 <p class="pp-wi-banner">{$t('plan.whatif.banner')}</p>
                                 <button type="button" class="pp-wi-reset" onclick={resetPreview}
@@ -1360,7 +1264,7 @@
                         <LifecycleSheet
                             components={viewComponents}
                             filling={running}
-                            horizon={previewActive || baselineHorizon ? horizonValue : 0}
+                            horizon={horizonValue}
                             planState={stateSelect || planBase}
                             busy={previewing}
                             onhorizon={chooseHold}
@@ -1653,13 +1557,6 @@
         {/if}
     </div>
 
-    <!-- Behavior 55: every other tab ends with a way to the AI assistant. -->
-    {#if sub !== 'qa' && uiTabs.length > 0}
-        <button type="button" class="pp-askbar" onclick={openQa}
-            ><Sparkle />{$t('plan.askbar')}</button
-        >
-    {/if}
-
     {#if failure && !(activeTab?.interactive && !viewComponents.cash_position)}
         <div class="pp-state">
             <p>{$t(failure.key)}</p>
@@ -1667,9 +1564,14 @@
         </div>
     {/if}
     <!-- Behavior 20: every plan carries the ASIC decision-support line; a foreign-buyer
-         plan (Mode B fhb-foreign-au, Mode D investor-foreign-au) also the FIRB line. -->
+         plan (Mode B fhb-foreign-au, Mode D investor-foreign-au) also the FIRB line.
+         Behavior 93: shown as one line, "Xem thêm" opening the full text — shortened,
+         never removed (the goal: information as is, not advice). -->
     <footer class="pp-disclaimers">
-        <p>{$t('disclaimer.asic')}</p>
-        {#if blueprintSlug.includes('-foreign-')}<p>{$t('disclaimer.firb')}</p>{/if}
+        <details class="pp-disclaimer-more">
+            <summary>{$t('disclaimer.short')} <span class="pp-more">{$t('disclaimer.more')}</span></summary>
+            <p>{$t('disclaimer.asic')}</p>
+            {#if blueprintSlug.includes('-foreign-')}<p>{$t('disclaimer.firb')}</p>{/if}
+        </details>
     </footer>
 {/if}
