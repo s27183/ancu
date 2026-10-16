@@ -16,7 +16,9 @@
     //            an FX line → money from overseas, "Nguồn tiền" → family funding,
     //            "Tiền thuê thu về" → yield and tax — those two from lifecycle_budget.beside,
     //            after the divider, in no total). A phase sheet is a history entry (shallow routing,
-    //            page.state.lifecycle), so back returns to the statement.
+    //            page.state.lifecycle), so back returns to the statement — by the plan
+    //            head's one back button ("‹ Ngân sách", behavior 106), never a link in the
+    //            sheet's body.
     // Holds:     it computes no figure: every row, the bottom line and the money into the
     //            home are the engine's (purchase_journey.lifecycle_budget costs_*, into_home,
     //            buy; fh_engine_journey costs/4), for the hold they were made for
@@ -265,10 +267,6 @@
         pushState('', { ...page.state, lifecycle: key });
         void toTop();
     }
-    function back() {
-        history.back();
-        void toTop();
-    }
 
     function range(r: MoneyRange | null | undefined): string {
         if (!r) return '—';
@@ -313,9 +311,6 @@
 {#if openKey === 'finances' && scenario}
     <!-- behavior 101: "Tài chính của bạn" — price, deposit, cash, income and debts -->
     <section class="ls ls-fin" data-finances bind:this={rootEl} aria-labelledby="ls-fin-title">
-        <button type="button" class="ls-back" onclick={back}
-            ><span aria-hidden="true">‹</span> {$t('plan.sheet.back')}</button
-        >
         <h3 id="ls-fin-title" class="ls-title">{$t('plan.fin.title')}</h3>
         {@render scenario()}
         <div class="ls-cash ls-fin-field">
@@ -343,9 +338,6 @@
     {@const extra = besideFor(g.key)}
     {@const interest = g.key === 'own' ? interestLine : null}
     <section class="ls" data-group={g.key} bind:this={rootEl} aria-labelledby="ls-phase-title">
-        <button type="button" class="ls-back" onclick={back}
-            ><span aria-hidden="true">‹</span> {$t('plan.sheet.back')}</button
-        >
         <h3 id="ls-phase-title" class="ls-row ls-phase-head">
             <span class="ls-row-label">{g.title}</span>
             <span class="ls-row-fig">{@render total(g.key, g.total, null)}</span>
@@ -651,12 +643,6 @@
     .ls-chip:disabled { opacity: 0.6; cursor: progress; }
 
     /* A phase's sheet: back, its title and figure first, its lines, the rest. */
-    .ls-back {
-        justify-self: start; display: inline-flex; align-items: center; gap: 0.3rem;
-        padding: 0.25rem 0; background: none; border: 0; font: inherit;
-        font-size: var(--fs-sm, 0.875rem); color: var(--accent); cursor: pointer;
-    }
-    .ls-back:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
     .ls-phase-head { padding: 0 0 0.25rem; font-size: var(--fs-lg, 1.125rem); }
 
     .ls-lines {

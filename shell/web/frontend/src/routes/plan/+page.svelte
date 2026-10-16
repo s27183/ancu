@@ -10,8 +10,9 @@
     // With no plans the list is the state picker itself. A plan opens at /plan?plan=<id>
     // as a history entry over the list (page.state.overList), so ‹ and the browser's back
     // return to it; an old link straight to a plan is given the list underneath once, on
-    // arrival. A plan's head is ‹, its place and "Hỏi AI" — nothing else. A create opens
-    // the new plan the same way (behavior 92: on its statement), so back shows the list
+    // arrival. A plan's head is its back button (naming the level above, behavior 106),
+    // its place and "Hỏi AI" — nothing else. A create opens the new plan the same way, on
+    // its hub (behavior 106, over 92's statement), so back shows the list
     // with it first. A sign-in from the onboarding (the guest's daily cap) or from a
     // guest's plan comes back here (pendingOnboarding.ts, page 'plan').
     // The plan is drawn in the same frame as the map's sheet (.sheet) so its sticky rails,
@@ -78,12 +79,25 @@
     function openPlan(c: PlanCardSummary) {
         goto(`/plan?plan=${encodeURIComponent(c.plan_card_id)}`, { state: { overList: true } });
     }
-    // ‹ in a plan's head: back to the list — through any layers the plan opened over itself
-    // (a phase sheet; a line's detail opens in place, behavior 93), else (no list underneath) to the list's address.
-    function toList() {
+    // Behavior 106: the plan head's one back button goes up one level and names it — a
+    // step → Hành trình, a phase sheet or "Tài chính của bạn" → Ngân sách, a sheet → the
+    // plan's hub, the hub → the list. Every level is a history entry (PlanProjection's
+    // "the plan's levels" block), so it is history.back(), as the browser's back is; the
+    // hub opened with no list underneath (no overList) goes to the list's address.
+    const backTo = $derived(
+        page.state.flowPhase
+            ? $t('plan.ltab.flow')
+            : page.state.lifecycle
+              ? $t('plan.ltab.budget')
+              : page.state.planView
+                ? $t('sheet.tab.plan')
+                : $t('planpage.list')
+    );
+    function up() {
         const s = page.state;
-        if (s.overList) history.go(-(1 + (s.lifecycle ? 1 : 0)));
+        if (s.flowPhase || s.lifecycle || s.planView || s.overList) history.back();
         else goto('/plan');
+        toTop();
     }
     // An old link straight to a plan: the list goes underneath it, once, on arrival.
     let seeded = false;
@@ -160,9 +174,11 @@
     <div class="sheet page-sheet" role="region" aria-label={$t('planpage.title')}>
         {#if open}
             <header class="sheet-head">
-                <button type="button" class="plan-back" aria-label={$t('planpage.list')} onclick={toList}
-                    ><span aria-hidden="true">‹</span></button
-                >
+                <div class="plan-back-row">
+                    <button type="button" class="plan-back" data-back onclick={up}
+                        ><span class="plan-back-mark" aria-hidden="true">‹</span> {backTo}</button
+                    >
+                </div>
                 <div class="title">
                     <h2>
                         {placeOf(open)}{#if open.state && open.state !== open.title}<span class="state-chip"
@@ -263,7 +279,8 @@
                 </div>
             {/if}
         </div>
-        {#if open}
+        {#if open && sections.plan.length > 0}
+            <!-- behavior 106: not on the plan's hub, whose cards are the way in -->
             <SectionMenu groups={sections.plan} current={menuCurrent} onpick={toTop} inPlan={sections.plan.length > 0} />
         {/if}
     </div>

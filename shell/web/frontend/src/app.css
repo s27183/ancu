@@ -3926,22 +3926,34 @@ main {
     color: var(--muted);
     font-size: 1.25rem;
 }
-/* A plan's ‹: back to the list, where the way home sits on the list's own head. */
+/* Behavior 106: a plan's back button — the one way up, on every level, naming where it
+   goes ("‹ Ngân sách"); its own row above the title so a long name never squeezes it. */
+.page-sheet .sheet-head:has(.plan-back) {
+    flex-wrap: wrap;
+    row-gap: var(--sp-2);
+}
+.plan-back-row {
+    flex: 0 0 100%;
+}
 .plan-back {
-    flex: none;
-    align-self: center;
-    display: grid;
-    place-items: center;
-    width: 2.25rem;
-    height: 2.25rem;
-    border: 1px solid var(--border);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    max-width: 100%;
+    padding: 0.35rem 0.85rem 0.35rem 0.6rem;
+    border: 1px solid var(--accent-line);
     border-radius: var(--radius-pill);
-    background: var(--surface);
-    color: var(--ink-2);
+    background: var(--accent-soft);
+    color: var(--accent);
     font: inherit;
-    font-size: 1.35rem;
-    line-height: 1;
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    line-height: 1.2;
     cursor: pointer;
+}
+.plan-back-mark {
+    font-size: 1.2rem;
+    line-height: 1;
 }
 .plan-back:hover {
     color: var(--accent);
