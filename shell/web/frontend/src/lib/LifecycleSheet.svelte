@@ -271,7 +271,7 @@
                     : $t('plan.sheet.total_hold_none')}</span
             >
             <span class="ls-row-fig"
-                >{#if bottom}{@render ends(bottom)}{:else}{busy || filling ? $t('plan.sheet.filling') : '—'}{/if}</span
+                >{#if bottom}{@render ends(bottom)}{:else if busy || filling}{@render skel()}{:else}—{/if}</span
             >
         </div>
 
@@ -293,12 +293,18 @@
     {#if r}
         {@render ends(r)}{#if perYear}<span class="ls-unit">{$t('plan.sheet.per_year')}</span>{/if}
     {:else if busy || filling}
-        <span class="ls-needs">{$t('plan.sheet.filling')}</span>
+        {@render skel()}
     {:else if key === 'sell' && holdPending}
         <span class="ls-needs">{$t('plan.sheet.needs.hold_years')}</span>
     {:else}
         —
     {/if}
+{/snippet}
+
+<!-- Behavior 92: the moment a figure is still on its way (the hold preview, well under a
+     second) holds a still bar, never words — the plan never says it is still working. -->
+{#snippet skel()}
+    <span class="ls-skel" role="img" aria-label={$t('plan.sheet.filling')}></span>
 {/snippet}
 
 {#snippet ends(r: MoneyRange)}
@@ -452,6 +458,7 @@
     .ls-mark { margin-right: 0.2rem; color: var(--warning); font-weight: 700; }
     .ls-unit { font-weight: 400; color: var(--muted); font-size: 0.85em; }
     .ls-caret { color: var(--muted); }
+    .ls-skel { display: inline-block; margin-left: auto; width: 7.5rem; height: 0.9em; vertical-align: middle; border-radius: var(--radius-pill); background: var(--bg-2); }
     .ls-needs { margin-left: auto; font-size: var(--fs-xs, 0.75rem); font-weight: 400; color: var(--muted); font-style: italic; }
     .ls-empty, .ls-key { margin: 0; font-size: var(--fs-xs, 0.75rem); color: var(--muted); }
     .ls-empty { font-style: italic; }

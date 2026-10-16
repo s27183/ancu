@@ -196,7 +196,10 @@
     const DEFAULT_HOLD = 10;
     let holdDefaulted = false;
     $effect(() => {
-        if (holdDefaulted || !turnDone || !cardId || viewingProperty) return;
+        // Behavior 92: as soon as the budget is there, not after the turn — the slow AI
+        // pass does not move the statement's figures (measured 2026-10-16), and the engine
+        // simulates a hold while the turn still runs, so the plan lands complete.
+        if (holdDefaulted || !cardId || viewingProperty) return;
         if (!components.cash_position || baselineHorizon !== 0 || horizonValue !== 0) return;
         holdDefaulted = true;
         chooseHold(DEFAULT_HOLD);
@@ -908,6 +911,11 @@
                     if (committing) {
                         committing = false;
                         resetPreview();
+                    } else if (previewOutcomes && !failed) {
+                        // A preview made while the turn ran (the default hold, behavior 92)
+                        // overlays every component: re-run it so the detail sheets carry
+                        // the turn's finished notes. Same figures; nothing flickers.
+                        void runPreview();
                     }
                     // A just-committed financials write (IC5): the recomputed capacity is
                     // now live, so re-seed the fields from the engine SOT (reflects what was
@@ -980,7 +988,9 @@
         <button type="button" onclick={load}>{$t('plan.retry')}</button>
     </div>
 {:else}
-    {#if running}
+    <!-- Behavior 92: once the budget is there the plan reads as finished — the AI's notes
+         fill the detail sheets quietly, each card showing its own filling state. -->
+    {#if running && !components.cash_position}
         <p class="pp-running"><span class="pp-spinner" aria-hidden="true"></span>{$t('plan.running')}</p>
     {/if}
 
