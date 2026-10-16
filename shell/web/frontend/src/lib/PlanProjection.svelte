@@ -161,9 +161,6 @@
     // is Phase-B (per-property), so it's not offered here. State seeds from the suburb the
     // card is projected under; only a CHANGED state is sent as an override.
     let priceInput = $state('');
-    // Seeded to suburbState by resetPreview() (called at the top of load()), not at init —
-    // $state captures only the initial prop value, and the bar only renders post-load.
-    let stateSelect = $state('');
     // The horizon slider (TW6): the dispose-phase hold years H — a structural what-if at
     // PLAN scope (it re-renders the Full-horizon tab + the Flow dispose column, not just one
     // renderer — preview-is-commit-minus-persistence, place-at-scope-of-effect), so it lives
@@ -200,9 +197,7 @@
     let previewing = $state(false);
     let previewError = $state(false);
     const previewActive = $derived(previewOutcomes !== null);
-    const scenarioActive = $derived(
-        previewActive && ((!!stateSelect && stateSelect !== planBase) || priceInput.trim() !== '')
-    );
+    const scenarioActive = $derived(previewActive && priceInput.trim() !== '');
     // Save (W8) — the COMMIT half: refine persists the previewed overrides + runs a
     // base_resolver turn whose recomputed components arrive over the SAME SSE. `committing`
     // is set on a 202 so onDone clears the preview once the saved (== previewed) snapshot
@@ -211,14 +206,7 @@
     let saveError = $state(false);
     let committing = $state(false);
 
-    // Cash-on-hand (the cockpit's 4th input) — CLIENT-SIDE only: a subtraction against the
-    // engine's verified need range, never a regulated recompute. Independent of the price/
-    // state scenario (it's the user's own figure), so it survives a scenario reset.
-    let cashOnHandInput = $state('');
-    const cashOnHand = $derived.by((): number | null => {
-        const n = Number(cashOnHandInput.replace(/[^0-9.]/g, ''));
-        return cashOnHandInput.trim() !== '' && Number.isFinite(n) && n >= 0 ? n : null;
-    });
+    // Cash-on-hand is the Mua sheet's "Tiền bạn có" row (LifecycleSheet, behavior 95).
 
     // ── Household financials (IC5) ──────────────────────────────────────────
     // A persisted FACT — income + debts — distinct from the what-if above (price/state/
@@ -595,7 +583,6 @@
         // Behavior 82: the one-page lifecycle budget lands first (the bird's-eye layer);
         // the cockpit, table and breakdown are the zoom-in.
         { id: 'sheet', label: $t('plan.sheet.tab') },
-        { id: 'ready', label: $t('plan.cash.ready') },
         { id: 'table', label: $t('plan.cash.spine') },
         { id: 'detail', label: $t('plan.cash.breakdown') },
         ...(viewComponents.disposition ? [{ id: 'horizon', label: $t('plan.cash.horizon') }] : [])
@@ -774,7 +761,6 @@
         const overrides: SimulateOverrides = {};
         const p = Number(priceInput.replace(/[^0-9.]/g, ''));
         if (priceInput.trim() !== '' && Number.isFinite(p) && p > 0) overrides.target_price = p;
-        if (stateSelect && stateSelect !== planBase) overrides.state = stateSelect;
         // horizon: only a positive H that differs from the card's baseline (omit 0 — the
         // engine has no "clear horizon" override; absence IS the indefinite default).
         if (horizonValue >= 1 && horizonValue !== baselineHorizon) overrides.horizon = horizonValue;
@@ -828,7 +814,6 @@
         previewError = false;
         saveError = false;
         priceInput = '';
-        stateSelect = planBase;
         horizonValue = baselineHorizon;
         holdDefaulted = false;
     }
@@ -939,7 +924,6 @@
             if (!uiTabs.some((t) => t.tab_id === sub)) sub = uiTabs[0]?.tab_id ?? '';
             cardId = match.plan_card_id;
             cardState = res.card.state ?? '';
-            stateSelect = planBase;
             phase = 'ready';
             // The GET snapshot is the authoritative latest projection. Take the done-state
             // from turn_running (a settled card has no terminal to replay once we subscribe
@@ -1075,6 +1059,126 @@
             </form>
         </Modal>
     {/if}
+
+
+<!-- Behavior 95: the price change, beside the statement's hold picker — a new price previews
+     the statement (simulate), "Lưu" saves it to the plan (refine), as the cockpit did. -->
+{#snippet priceControl()}
+    <div class="pp-price">
+        <label class="pp-price-row">
+            <span class="pp-price-label">{$t('plan.sheet.price')}</span>
+            <input
+                type="text"
+                inputmode="numeric"
+                bind:value={priceInput}
+                placeholder={currentPriceLabel ?? $t('plan.cash.whatif.placeholder')}
+                onkeydown={(e) => e.key === 'Enter' && runPreview()}
+            />
+        </label>
+        <div class="pp-price-actions">
+            <button type="button" onclick={runPreview} disabled={previewing || priceInput.trim() === ''}
+                >{previewing ? $t('plan.whatif.running') : $t('plan.sheet.price_preview')}</button
+            >
+            {#if scenarioActive}
+                <button type="button" class="primary" onclick={saveScenario} disabled={saving}
+                    >{saving ? $t('plan.whatif.saving') : $t('plan.sheet.price_save')}</button
+                >
+                <button type="button" class="pp-wi-reset" onclick={resetPreview}
+                    >{$t('plan.whatif.reset')}</button
+                >
+            {/if}
+        </div>
+        {#if previewError}
+            <p class="pp-wi-error">{$t('plan.whatif.error')}</p>
+        {/if}
+        {#if saveError}
+            <p class="pp-wi-error">{$t('plan.whatif.saveerror')}</p>
+        {/if}
+    </div>
+{/snippet}
+
+<!-- The household figures behind the loan (IC5), closed under the Mua sheet's
+     "Tiền bạn có" (behavior 95: the cockpit's other half). -->
+{#snippet finances()}
+    <details class="pp-fin-wrap">
+        <summary>{$t('plan.sheet.finances')}</summary>
+        <!-- Household financials (IC5): a persisted FACT — income + debts —
+             distinct from the what-if scenario above and the client-side
+             cash-on-hand. Commits via POST /profile → the engine recomputes
+             borrowing capacity → the full-horizon net position arrives over
+             the live SSE. Seeded from the engine SOT; full-replace on submit. -->
+        <section class="pp-fin">
+            <h4 class="pp-fin-title">{$t('plan.fin.title')}</h4>
+            <p class="pp-fin-intro">{$t('plan.fin.intro')}</p>
+            <div class="pp-fin-grid">
+                <label class="pp-ck-field pp-fin-wide">
+                    <span class="pp-ck-label">{$t('plan.fin.income')}</span>
+                    <input
+                        type="text"
+                        inputmode="numeric"
+                        bind:value={finIncome}
+                        placeholder={$t('plan.fin.placeholder')}
+                        disabled={finBusy}
+                    />
+                    <span class="pp-fin-hint">{$t('plan.fin.income_hint')}</span>
+                </label>
+                <label class="pp-ck-field">
+                    <span class="pp-ck-label">{$t('plan.fin.foreign')}</span>
+                    <input
+                        type="text"
+                        inputmode="numeric"
+                        bind:value={finForeign}
+                        placeholder={$t('plan.fin.placeholder0')}
+                        disabled={finBusy}
+                    />
+                </label>
+            </div>
+            <span class="pp-ck-label pp-fin-debts-label">{$t('plan.fin.debts_label')}</span>
+            <div class="pp-fin-grid">
+                <label class="pp-ck-field">
+                    <span class="pp-ck-label">{$t('plan.fin.hecs')}</span>
+                    <input type="text" inputmode="numeric" bind:value={finHecs}
+                        placeholder={$t('plan.fin.placeholder0')} disabled={finBusy} />
+                </label>
+                <label class="pp-ck-field">
+                    <span class="pp-ck-label">{$t('plan.fin.cards')}</span>
+                    <input type="text" inputmode="numeric" bind:value={finCards}
+                        placeholder={$t('plan.fin.placeholder0')} disabled={finBusy} />
+                </label>
+                <label class="pp-ck-field">
+                    <span class="pp-ck-label">{$t('plan.fin.personal')}</span>
+                    <input type="text" inputmode="numeric" bind:value={finPersonal}
+                        placeholder={$t('plan.fin.placeholder0')} disabled={finBusy} />
+                </label>
+                <label class="pp-ck-field">
+                    <span class="pp-ck-label">{$t('plan.fin.car')}</span>
+                    <input type="text" inputmode="numeric" bind:value={finCar}
+                        placeholder={$t('plan.fin.placeholder0')} disabled={finBusy} />
+                </label>
+                <label class="pp-ck-field">
+                    <span class="pp-ck-label">{$t('plan.fin.bnpl')}</span>
+                    <input type="text" inputmode="numeric" bind:value={finBnpl}
+                        placeholder={$t('plan.fin.placeholder0')} disabled={finBusy} />
+                </label>
+            </div>
+            <div class="pp-cockpit-actions">
+                <button type="button" class="primary" onclick={saveFinancials} disabled={finBusy}>
+                    {finSaving ? $t('plan.fin.saving') : $t('plan.fin.save')}
+                </button>
+            </div>
+            {#if finRecomputing}
+                <p class="pp-wi-banner">{$t('plan.fin.recomputing')}</p>
+            {:else if finError === 'busy'}
+                <p class="pp-wi-error">{$t('plan.fin.busy')}</p>
+            {:else if finError === 'invalid'}
+                <p class="pp-wi-error">{$t('plan.fin.error')} {finErrorDetail}</p>
+            {:else if finError === 'error'}
+                <p class="pp-wi-error">{$t('plan.fin.error')}</p>
+            {/if}
+            <p class="pp-fin-disclaimer">{$t('plan.fin.disclaimer')}</p>
+        </section>
+    </details>
+{/snippet}
 
     {#snippet settleCta()}
         <div class="pp-settle-cta">
@@ -1267,191 +1371,13 @@
                             components={viewComponents}
                             filling={running}
                             horizon={horizonValue}
-                            planState={stateSelect || planBase}
+                            planState={planBase}
                             busy={previewing}
                             onhorizon={chooseHold}
+                            planId={cardId}
+                            priceControl={viewingProperty ? undefined : priceControl}
+                            buyExtra={viewingProperty ? undefined : finances}
                         />
-                    {:else if budgetSub === 'ready'}
-                        {#if viewingProperty}
-                            <!-- A selected property shows its OWN cash figures (the per-property
-                                 budget_envelope_investor). The base what-if cockpit + financials
-                                 editor are base-plan controls, so they're hidden here; the table/
-                                 detail/horizon sub-tabs already read the per-property outcome. -->
-                            <p class="pp-calc-intro">{$t('plan.prop.viewing')}</p>
-                            <Calculator
-                                outcome={viewComponents.cash_position.outcome}
-                                view="verdict"
-                                {cashOnHand}
-                                components={viewComponents}
-                                density="full"
-                            />
-                        {:else}
-                        <!-- Tab 1: the cockpit inputs + the "Bạn đã đủ chưa?" verdict. -->
-                        <p class="pp-calc-intro">{$t('plan.cockpit.intro')}</p>
-                        <div class="pp-cockpit">
-                            <label class="pp-ck-field">
-                                <span class="pp-ck-label">{$t('plan.whatif.price')}</span>
-                                <input
-                                    type="text"
-                                    inputmode="numeric"
-                                    bind:value={priceInput}
-                                    placeholder={currentPriceLabel
-                                        ? `${$t('plan.whatif.current')} ${currentPriceLabel}`
-                                        : $t('plan.cash.whatif.placeholder')}
-                                    onkeydown={(e) => e.key === 'Enter' && runPreview()}
-                                />
-                            </label>
-                            <label class="pp-ck-field">
-                                <span class="pp-ck-label">{$t('plan.whatif.state')}</span>
-                                <select bind:value={stateSelect} onchange={runPreview}>
-                                    {#each AU_STATES as s (s)}
-                                        <option value={s}>{s}</option>
-                                    {/each}
-                                </select>
-                            </label>
-                            <!-- Horizon slider (TW6): drag to project the sell-side over H
-                                 years; oninput shows the live value, onchange (on release)
-                                 runs ONE simulate (not per-tick during the drag). 0 = no sale
-                                 projection (the Mode-A default) → omitted from the override. -->
-                            <label class="pp-ck-field pp-ck-horizon">
-                                <span class="pp-ck-label">
-                                    {$t('plan.whatif.horizon')}
-                                    <span class="pp-ck-hval">
-                                        {horizonValue >= 1
-                                            ? `${horizonValue} ${$t('plan.whatif.years_unit')}`
-                                            : $t('plan.whatif.horizon_off')}
-                                    </span>
-                                </span>
-                                <input
-                                    type="range"
-                                    min="0"
-                                    max="30"
-                                    step="1"
-                                    bind:value={horizonValue}
-                                    onchange={runPreview}
-                                />
-                            </label>
-                            <label class="pp-ck-field pp-ck-locked">
-                                <span class="pp-ck-label">{$t('plan.cockpit.ptype')}</span>
-                                <select disabled>
-                                    <option>{$t('plan.attach_property')}</option>
-                                </select>
-                            </label>
-                            <label class="pp-ck-field">
-                                <span class="pp-ck-label">{$t('plan.cash.whatif.label')}</span>
-                                <input
-                                    type="text"
-                                    inputmode="numeric"
-                                    bind:value={cashOnHandInput}
-                                    placeholder={$t('plan.cash.whatif.placeholder')}
-                                />
-                            </label>
-                        </div>
-                        <div class="pp-cockpit-actions">
-                            <button type="button" class="primary" onclick={runPreview} disabled={previewing}>
-                                {previewing ? $t('plan.whatif.running') : $t('plan.whatif.run')}
-                            </button>
-                            {#if previewActive}
-                                <button type="button" class="pp-wi-save" onclick={saveScenario} disabled={saving}>
-                                    {saving ? $t('plan.whatif.saving') : $t('plan.whatif.save')}
-                                </button>
-                                <button type="button" class="pp-wi-reset" onclick={resetPreview}
-                                    >{$t('plan.whatif.reset')}</button
-                                >
-                            {/if}
-                        </div>
-                        {#if previewActive}
-                            <p class="pp-wi-banner">{$t('plan.whatif.banner')}</p>
-                        {:else if previewError}
-                            <p class="pp-wi-error">{$t('plan.whatif.error')}</p>
-                        {/if}
-                        {#if saveError}
-                            <p class="pp-wi-error">{$t('plan.whatif.saveerror')}</p>
-                        {/if}
-                        <Calculator
-                            outcome={viewComponents.cash_position.outcome}
-                            view="verdict"
-                            {cashOnHand}
-                            components={viewComponents}
-                            density="full"
-                        />
-
-                        <!-- Household financials (IC5): a persisted FACT — income + debts —
-                             distinct from the what-if scenario above and the client-side
-                             cash-on-hand. Commits via POST /profile → the engine recomputes
-                             borrowing capacity → the full-horizon net position arrives over
-                             the live SSE. Seeded from the engine SOT; full-replace on submit. -->
-                        <section class="pp-fin">
-                            <h4 class="pp-fin-title">{$t('plan.fin.title')}</h4>
-                            <p class="pp-fin-intro">{$t('plan.fin.intro')}</p>
-                            <div class="pp-fin-grid">
-                                <label class="pp-ck-field pp-fin-wide">
-                                    <span class="pp-ck-label">{$t('plan.fin.income')}</span>
-                                    <input
-                                        type="text"
-                                        inputmode="numeric"
-                                        bind:value={finIncome}
-                                        placeholder={$t('plan.fin.placeholder')}
-                                        disabled={finBusy}
-                                    />
-                                    <span class="pp-fin-hint">{$t('plan.fin.income_hint')}</span>
-                                </label>
-                                <label class="pp-ck-field">
-                                    <span class="pp-ck-label">{$t('plan.fin.foreign')}</span>
-                                    <input
-                                        type="text"
-                                        inputmode="numeric"
-                                        bind:value={finForeign}
-                                        placeholder={$t('plan.fin.placeholder0')}
-                                        disabled={finBusy}
-                                    />
-                                </label>
-                            </div>
-                            <span class="pp-ck-label pp-fin-debts-label">{$t('plan.fin.debts_label')}</span>
-                            <div class="pp-fin-grid">
-                                <label class="pp-ck-field">
-                                    <span class="pp-ck-label">{$t('plan.fin.hecs')}</span>
-                                    <input type="text" inputmode="numeric" bind:value={finHecs}
-                                        placeholder={$t('plan.fin.placeholder0')} disabled={finBusy} />
-                                </label>
-                                <label class="pp-ck-field">
-                                    <span class="pp-ck-label">{$t('plan.fin.cards')}</span>
-                                    <input type="text" inputmode="numeric" bind:value={finCards}
-                                        placeholder={$t('plan.fin.placeholder0')} disabled={finBusy} />
-                                </label>
-                                <label class="pp-ck-field">
-                                    <span class="pp-ck-label">{$t('plan.fin.personal')}</span>
-                                    <input type="text" inputmode="numeric" bind:value={finPersonal}
-                                        placeholder={$t('plan.fin.placeholder0')} disabled={finBusy} />
-                                </label>
-                                <label class="pp-ck-field">
-                                    <span class="pp-ck-label">{$t('plan.fin.car')}</span>
-                                    <input type="text" inputmode="numeric" bind:value={finCar}
-                                        placeholder={$t('plan.fin.placeholder0')} disabled={finBusy} />
-                                </label>
-                                <label class="pp-ck-field">
-                                    <span class="pp-ck-label">{$t('plan.fin.bnpl')}</span>
-                                    <input type="text" inputmode="numeric" bind:value={finBnpl}
-                                        placeholder={$t('plan.fin.placeholder0')} disabled={finBusy} />
-                                </label>
-                            </div>
-                            <div class="pp-cockpit-actions">
-                                <button type="button" class="primary" onclick={saveFinancials} disabled={finBusy}>
-                                    {finSaving ? $t('plan.fin.saving') : $t('plan.fin.save')}
-                                </button>
-                            </div>
-                            {#if finRecomputing}
-                                <p class="pp-wi-banner">{$t('plan.fin.recomputing')}</p>
-                            {:else if finError === 'busy'}
-                                <p class="pp-wi-error">{$t('plan.fin.busy')}</p>
-                            {:else if finError === 'invalid'}
-                                <p class="pp-wi-error">{$t('plan.fin.error')} {finErrorDetail}</p>
-                            {:else if finError === 'error'}
-                                <p class="pp-wi-error">{$t('plan.fin.error')}</p>
-                            {/if}
-                            <p class="pp-fin-disclaimer">{$t('plan.fin.disclaimer')}</p>
-                        </section>
-                        {/if}
                     {:else}
                         <!-- Tabs 2/3: the cockpit is on tab 1, so signpost an active preview here. -->
                         {#if previewActive}

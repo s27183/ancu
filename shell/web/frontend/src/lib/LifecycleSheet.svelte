@@ -25,9 +25,16 @@
     //            Behavior 96: the plan's state is text in the statement's head, never a
     //            choice — a plan is for one state (81); another state is another plan,
     //            made from the planner's list.
-    // Known gaps: the hold-years choice is a what-if preview (the cockpit's horizon), not
-    //            saved until the plan is saved from the budget tab.
-    import { tick } from 'svelte';
+    //            Behavior 95: the budget is one of the planner's two places, so what the
+    //            cockpit held comes here — the price change beside the hold picker (the
+    //            planner's control, passed in as `priceControl`: preview, then "Lưu" saves
+    //            it to the plan), and "Tiền bạn có" as one row of the Mua sheet: a sum the
+    //            visitor types, set against the sheet's own total (lifecycle_budget.buy) at
+    //            its low and high ends — "Đủ" or "Còn thiếu <total − sum>" — a subtraction,
+    //            never a figure of its own; kept in this browser per plan (localStorage),
+    //            never sent. The household figures behind the loan sit under it, closed.
+    // Known gaps: the hold-years choice is a what-if preview, not saved with the plan.
+    import { tick, type Snippet } from 'svelte';
     import { pushState } from '$app/navigation';
     import { page } from '$app/state';
     import { t } from '$lib/i18n';
@@ -52,6 +59,9 @@
         planState,
         busy = false,
         onhorizon,
+        planId = null,
+        priceControl,
+        buyExtra
     }: {
         components: Record<string, ComponentEntry>;
         filling: boolean;
@@ -61,7 +71,45 @@
         planState: string;
         busy?: boolean;
         onhorizon: (years: number) => void;
+        /** The plan whose "Tiền bạn có" this browser keeps. */
+        planId?: string | null;
+        /** The price change, drawn beside the hold picker. */
+        priceControl?: Snippet;
+        /** Drawn on the Mua sheet under "Tiền bạn có". */
+        buyExtra?: Snippet;
     } = $props();
+
+    // "Tiền bạn có": the visitor's own sum, kept in this browser for this plan only.
+    const CASH_KEY = 'fh.cash_on_hand.';
+    let cashInput = $state('');
+    $effect(() => {
+        const id = planId;
+        let v = '';
+        try {
+            if (id) v = localStorage.getItem(CASH_KEY + id) ?? '';
+        } catch {
+            v = '';
+        }
+        cashInput = v;
+    });
+    function keepCash() {
+        try {
+            if (!planId) return;
+            if (cashInput.trim() === '') localStorage.removeItem(CASH_KEY + planId);
+            else localStorage.setItem(CASH_KEY + planId, cashInput);
+        } catch {
+            /* a private window keeps it for this page only */
+        }
+    }
+    const cash = $derived.by((): number | null => {
+        const n = Number(cashInput.replace(/[^0-9]/g, ''));
+        return cashInput.trim() !== '' && Number.isFinite(n) ? n : null;
+    });
+    function cashVerdict(need: number, have: number): string {
+        return have >= need
+            ? $t('plan.sheet.cash_ok')
+            : $t('plan.sheet.cash_short').replace('{x}', money(need - have, $lang) ?? '—');
+    }
 
     type PhaseKey = 'buy' | 'own' | 'sell';
     const BUY_PHASES = ['prepare', 'pre_approve', 'contract', 'settle'];
@@ -212,6 +260,34 @@
             <p class="ls-empty">{$t('plan.sheet.filling')}</p>
         {/if}
 
+        {#if g.key === 'buy' && g.total}
+            {@const need = g.total}
+            <div class="ls-cash">
+                <label class="ls-cash-row">
+                    <span class="ls-label">{$t('plan.sheet.cash')}</span>
+                    <input
+                        class="ls-cash-in"
+                        type="text"
+                        inputmode="numeric"
+                        bind:value={cashInput}
+                        oninput={keepCash}
+                        placeholder={$t('plan.cash.whatif.placeholder')}
+                    />
+                </label>
+                {#if cash !== null}
+                    <dl class="ls-cash-verdict" aria-live="polite">
+                        {#each [[$t('plan.sheet.cash_low'), need[0]], [$t('plan.sheet.cash_high'), need[1]]] as [lbl, n] (lbl)}
+                            <div class:ls-short={cash < Number(n)}>
+                                <dt>{lbl}</dt>
+                                <dd>{cashVerdict(Number(n), cash)}</dd>
+                            </div>
+                        {/each}
+                    </dl>
+                {/if}
+            </div>
+            {#if buyExtra}{@render buyExtra()}{/if}
+        {/if}
+
         {#if rest.length > 0 || waiting.length > 0}
             <p class="ls-divider">{$t('plan.sheet.not_in_total')}</p>
             <ul class="ls-lines ls-rest">
@@ -272,6 +348,7 @@
                 >
             {/each}
         </div>
+        {#if priceControl}{@render priceControl()}{/if}
     </section>
 {/if}
 
@@ -463,5 +540,21 @@
     }
     .ls-fee-facts dd { margin: 0; max-width: 65ch; }
     .ls-fee-facts a { color: var(--accent); overflow-wrap: anywhere; }
+    /* "Tiền bạn có": the visitor's sum, then each end of the Mua total enough or short. */
+    .ls-cash {
+        display: grid; gap: 0.5rem; padding: 0.6rem 0.75rem; background: var(--surface);
+        border: 1px solid var(--border); border-radius: 0.75rem;
+    }
+    .ls-cash-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem; }
+    .ls-cash-in {
+        flex: 1 1 8rem; min-width: 0; font: inherit; text-align: right; font-variant-numeric: tabular-nums;
+        padding: 0.4rem 0.6rem; border: 1px solid var(--border-strong); border-radius: 0.5rem;
+        background: var(--surface); color: var(--ink);
+    }
+    .ls-cash-verdict { margin: 0; display: grid; gap: 0.25rem; }
+    .ls-cash-verdict > div { display: flex; justify-content: space-between; gap: 0.75rem; }
+    .ls-cash-verdict dt { color: var(--muted); font-size: var(--fs-sm, 0.875rem); }
+    .ls-cash-verdict dd { margin: 0; font-weight: 700; color: var(--success); font-variant-numeric: tabular-nums; }
+    .ls-cash-verdict .ls-short dd { color: var(--danger, var(--warning)); }
     .ls-fee-note { margin: 0; font-size: var(--fs-xs, 0.75rem); color: var(--muted); }
 </style>
