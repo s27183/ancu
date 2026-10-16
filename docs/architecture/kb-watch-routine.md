@@ -37,6 +37,11 @@ in `docs/kb/news/` as the shape to copy.
 
 1. Scope. Run `python3 tests/kb_freshness.py`. Take the 10 most overdue docs (largest
    overdue first; ties by slug). Skip `kb.copy.*`, `kb.bilingual.*`, `kb.journey.*`.
+   Also take `kb.fx.rba-aud-vnd`, where it exists, on every run (cadence weekly): its
+   reading becomes the RBA's latest published AUD/VND rate on the page it cites, quoted
+   from that page's saved copy. That reading changing is not news (step 3). A fee
+   line's band (a `low`/`high` from several providers) is re-checked as the runbook's
+   "Fee lines" section says.
 
 2. Re-verify each of the 10 against the primaries its own `sources:` list cites — open
    each URL now (curl or your web fetch). Never verify against another KB doc, a search
@@ -56,7 +61,10 @@ in `docs/kb/news/` as the shape to copy.
              - "Surcharge purchaser duty is 9% of the dutiable value"
      Every number you add to the doc's body must appear in one of its quotes, written
      the same way. Quote only a primary: a government site (*.gov.au) for a regulated
-     figure, or the lender's own site for a lender policy. A figure whose only source is
+     figure, or the provider's own published price for its own fee: the lender's site
+     for a lender policy or discharge fee, a bank's or transfer service's fee page for
+     the FX docs, the land registry (nswlrs.com.au, titlesqld.com.au) for its
+     registration fee (scripts/kb_gate.py PROVIDER_HOSTS). A figure whose only source is
      a broker, comparison or news site is still drafted, but it will be held for Son.
      For a first-visit fact (`docs/kb/facts/`), also make sure every `quotes` string the
      fact carries is found in the archive (GATE 12). Bump

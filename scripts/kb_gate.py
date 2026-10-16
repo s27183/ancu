@@ -12,8 +12,9 @@ merges itself only when each thing it changes is one of these:
   - a figure change that passed two independent checks: every number the PR adds
     to a doc's text appears in a word-for-word quote on that doc's sources, each
     quote is found in its saved copy (tests/kb_quote_check.py), and each quoting
-    source is a primary — a government host (*.gov.au) or, for a lender doc, the
-    lender's own site (PRIMARY_LENDER_HOSTS) — and the independent kb-verify routine
+    source is a primary — a government host (*.gov.au) or, for a provider's fee, the
+    provider's own site (PROVIDER_HOSTS, per doc: lenders, FX providers, land
+    registries; behavior 85) — and the independent kb-verify routine
     has labelled the PR `kb-verified` after re-reading the sources itself.
 Anything else holds the whole PR, with one reason per held item: a path outside
 docs/kb and docs/sources, a new or deleted doc (a new rule or scheme is kind-2/3,
@@ -60,6 +61,24 @@ PRIMARY_LENDER_HOSTS = (
     "ing.com.au", "suncorp.com.au", "bankwest.com.au", "boq.com.au",
     "bendigobank.com.au", "amp.com.au", "hsbc.com.au", "citi.com.au",
 )
+# A provider's own published price is the primary for its own fee (behavior 85, Son
+# 2026-10-16): a bank's or transfer service's fee schedule for the FX doc, a lender's
+# for its discharge fee, a land registry's for its registration fee. Per doc (or doc
+# folder): a provider's site proves nothing about another doc's figures, and a
+# comparison or broker site is never a provider.
+FX_PROVIDER_HOSTS = PRIMARY_LENDER_HOSTS + (
+    "wise.com", "ofx.com", "westernunion.com", "remitly.com",
+    "vietcombank.com.vn", "techcombank.com", "techcombank.com.vn", "bidv.com.vn",
+    "vietinbank.vn", "acb.com.vn",
+)
+REGISTRY_HOSTS = ("nswlrs.com.au", "titlesqld.com.au")
+PROVIDER_HOSTS = {
+    "docs/kb/lender/": PRIMARY_LENDER_HOSTS,
+    "docs/kb/fx/typical-spreads-vnd-aud.md": FX_PROVIDER_HOSTS,
+    "docs/kb/fx-providers/": FX_PROVIDER_HOSTS,
+    "docs/kb/existing-home-sale/net-proceeds.md": PRIMARY_LENDER_HOSTS + REGISTRY_HOSTS,
+    "docs/kb/buyer-costs/inspections-conveyancing-fees.md": REGISTRY_HOSTS,
+}
 DERIVED = ("docs/kb/copy/", "docs/kb/bilingual/", "docs/kb/journey/")
 LABEL_OK = "kb-verified"
 LABEL_HOLD = "kb-hold"
@@ -94,9 +113,8 @@ def host_ok(url: str, path: str) -> bool:
     host = (urllib.parse.urlsplit(url or "").hostname or "").lower()
     if host.endswith(GOV_SUFFIX):
         return True
-    if path.startswith("docs/kb/lender/"):
-        return any(host == h or host.endswith("." + h) for h in PRIMARY_LENDER_HOSTS)
-    return False
+    hosts = next((hs for where, hs in PROVIDER_HOSTS.items() if path.startswith(where)), ())
+    return any(host == h or host.endswith("." + h) for h in hosts)
 
 
 def changed_lines(base: str, head: str, path: str) -> tuple[list[str], list[str], list[str], list[str]]:
@@ -199,7 +217,7 @@ def decide(base: str, head: str, branch: str, labels: set[str], checks_ok: bool)
         for s in quoted:
             if not host_ok(s.get("url", ""), path):
                 host = urllib.parse.urlsplit(s.get("url", "")).hostname or s.get("url")
-                reasons.append(f"`{path}`: quoted source {host} is not a primary (government site, or the lender's own) — secondary source")
+                reasons.append(f"`{path}`: quoted source {host} is not a primary (a government site, or the provider's own for this doc's fee) — secondary source")
         for f in doc_fails(Path(path), text, lambda sp: copy_at(head, sp)):
             reasons.append(f"`{path}`: " + f.split(": ", 1)[1])
         if not add_body and not del_body and support_only:

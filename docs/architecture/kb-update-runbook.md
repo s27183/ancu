@@ -389,6 +389,45 @@ outcome" or "None of these measures are enacted or confirmed." Never present a
 forecast as the platform's own conclusion (the ASIC line), and exclude only
 content with no real connection to a buyer's decision.
 
+#### Fee lines — re-checking a hard-to-know fee's band (behaviors 83, 85)
+
+A fee the buyer cannot know until they hire someone or get a quote (conveyancing,
+inspections, a broker, translation, FX spread and transfer fees, insurance, property
+management, selling costs, the discharge fee) is one entry in its owning doc's
+`lookup.fee_lines.entries` (the owners are listed in `fh_engine_fees:owners/0`). The
+engine emits one estimate line per entry that applies, so the band, the payer, the
+drivers and the source a user opens on the sheet are exactly what the entry holds.
+Re-check an entry the way it was built:
+
+- **One owner per figure.** A band lives in one entry. Before adding or moving one,
+  grep the KB and `engine/` for the same fee under another name (an old `parameters`
+  pair, a figure typed into a resolver) and point that reader at the entry
+  (`fh_engine_fees:line_band/1`) rather than keep two.
+- **Re-open the entry's `source`** and every `sources:` URL behind it, save each page you
+  read with `scripts/archive_source.py`, and quote word for word the sentences that state
+  the band's low and high (Phase 1 above). A source you did not open is not cited.
+- **Which source settles it.** A provider's own published price for its own fee (a
+  lender's fee schedule, a bank's or transfer service's fee page, a land registry's fee
+  table) is a primary: a change quoted from it merges by itself through the kb-gate
+  (`PROVIDER_HOSTS` in `scripts/kb_gate.py`; add the host for the doc it prices). A
+  market band drawn from comparison sites, cost guides or several firms' prices is
+  secondary: draft the change, and it waits for Son.
+- **The band.** `low` is the cheapest price the sources show for the common job; `high`
+  the typical top for a bigger or harder one (not one outlier quote). `basis` says what
+  it is a share of (`fixed`, or `pct_of_price` / `_loan` / `_rent` / `_transfer` /
+  `_sale`). A band derived from a published rate (a per-page rate times an assumed page
+  count) says so in `drivers`, so the user sees the assumption. With no grounded figure,
+  leave `low`/`high` out: the entry is a PLACEHOLDER and the sheet shows it as needing a
+  quote.
+- **The tier.** `REGULATED` only for a fee a law or a registry sets (it renders as
+  exact); every market fee is `CONVENTION` and renders as an estimate.
+- **Scope.** `applies.modes`, `states` and `property` (`house` / `strata` / `any`) say
+  where it shows; `optional: true` for a service the buyer may skip (a buyer's agent):
+  shown, not counted.
+- **Cadence.** Provider fees (lender, FX) are re-checked monthly, market bands
+  quarterly (`tests/kb_freshness.py`). A changed band also moves the doc's body text and
+  `label`/`payer`/`drivers` in both languages.
+
 ### Phase 2 — Co-update the bilingual copy (when a figure or note changed)
 
 *Applies when a ruled component's facts changed.* The VI/EN copy templates live in
