@@ -3,6 +3,13 @@ slug: kb.buyer-costs.inspections-conveyancing-fees
 effective_from: 2025-07-01
 last_verified: 2026-07-06
 sources:
+  - url: https://nswlrs.com.au/assets/f/1129775276948026/x/5fed3e7cd6/2026-2027_nsw-lrs-fees_final.pdf
+    retrieved: 2026-10-16
+    path: docs/sources/nsw/nsw-lrs-fees-2026-27.txt
+    quotes:
+      - "NSW LRS customer fees from 1 July 2026"
+      - "Mortgage *166.60 182.73"
+      - "Transfer (pursuant to section 46 Real Property Act) *166.60 182.73"
   - url: https://moneysmart.gov.au/home-loans/buying-a-house
     retrieved: 2026-07-06
   - url: https://www.canstar.com.au/home-loans/building-inspection-cost/
@@ -21,11 +28,11 @@ When the buyer takes title and the lender registers its mortgage, the state land
 
 | State | Transfer registration | Mortgage registration | Notes |
 |---|---|---|---|
-| **NSW** (FY2025–26) | **$175.70** (flat, incl GST) | **$175.70** (flat, incl GST) | NSW LRS dealing fee — flat per dealing, does **not** scale with price |
+| **NSW** (FY2026–27, eff 1 Jul 2026) | **$182.73** (flat, incl GST) | **$182.73** (flat, incl GST) | NSW LRS dealing fee — flat per dealing, does **not** scale with price |
 | **VIC** (FY2025–26, electronic) | **$101.50 + $2.34 per whole $1,000** of consideration, **max $3,611** | **$125.70** | Land Use Victoria, electronic (PEXA) lodgement; paper lodgement is a few dollars higher |
 | **QLD** (FY2026–27, eff 1 Jul 2026) | **$248.04 + $46.56 per $10,000** (or part) **over $180,000** | **$248.04** | Titles Queensland; transfer = base lodgement + value-based component |
 
-**Worked anchors:** NSW is **$175.70 + $175.70 = $351.40** at any price. A **VIC $700,000** purchase: transfer $101.50 + $2.34 × 700 = **$1,739.50**, plus mortgage $125.70. A **QLD $600,000** purchase: transfer $248.04 + $46.56 × 42 = **$2,203.56** (42 = ($600,000 − $180,000) ÷ $10,000), plus mortgage $248.04.
+**Worked anchors:** NSW is **$182.73 + $182.73 = $365.46** at any price. A **VIC $700,000** purchase: transfer $101.50 + $2.34 × 700 = **$1,739.50**, plus mortgage $125.70. A **QLD $600,000** purchase: transfer $248.04 + $46.56 × 42 = **$2,203.56** (42 = ($600,000 − $180,000) ÷ $10,000), plus mortgage $248.04.
 
 ## The lender-policy cost — loan application / establishment fee
 
@@ -73,11 +80,11 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
     "state_registration_fees": {
       "note": "REGULATED — statutory land-titles registration fees, per state. NSW is flat; VIC and QLD add a value-based component to a base. FY stamped per state (NSW/VIC FY2025-26; QLD FY2026-27 effective 1 Jul 2026). Resolver computes the transfer fee per state's formula.",
       "entries": [
-        { "state": "NSW", "fy": "2025-26", "gst_inclusive": true,
-          "transfer_registration_flat": 175.70,
-          "mortgage_registration_flat": 175.70,
+        { "state": "NSW", "fy": "2026-27", "effective_from": "2026-07-01", "gst_inclusive": true,
+          "transfer_registration_flat": 182.73,
+          "mortgage_registration_flat": 182.73,
           "transfer_scales_with_value": false,
-          "note": "NSW LRS dealing fee — flat $175.70 incl GST per dealing, independent of price" },
+          "note": "NSW LRS dealing fee — flat $182.73 incl GST ($166.60 excl) per dealing from 1 July 2026, independent of price" },
         { "state": "VIC", "fy": "2025-26", "basis": "electronic_pexa_lodgement",
           "transfer_registration_base": 101.50,
           "transfer_registration_per_1000_consideration": 2.34,
@@ -102,15 +109,15 @@ Notes:
 
 - **No `fills`.** No outcome leaf is set. Each `cash_position.other_buying_costs.*` line is a resolver estimate from these figures; the doc supplies the ranges and the regulated per-state fees, asserting no buyer-specific total.
 - **Three provenance tiers, deliberately separated.** The per-state registration fees are **REGULATED** (statutory, exact, indexed annually — the one part the agent can state as fact); `lender_application_fee_*` is **LENDER POLICY** (varies, often waived — present as a range, never a steer); the inspection/conveyancing/insurance/utility/moving ranges are **CONVENTION** (market typical, not fixed — the buyer's quotes bind). Same tagging discipline as the [lender-treatment docs](../lender/credit-card-treatment.md).
-- **Registration-fee FY mismatch is intentional and stamped.** NSW and VIC figures are FY2025–26 (in force now); QLD is FY2026–27 (effective 1 Jul 2026, the schedule supplied). Each entry carries its `fy`/`effective_from`, and `registration_fees_indexed_annually` flags that all three reset each July — re-verify at the next indexation.
+- **Registration-fee FY mismatch is stamped.** NSW (re-grounded 2026-10-16 against the NSW LRS 2026-27 schedule, `docs/sources/nsw/nsw-lrs-fees-2026-27.txt`) and QLD are FY2026–27, effective 1 Jul 2026; VIC is still FY2025–26 (its 2026–27 schedule could not be fetched on 2026-10-16: land.vic.gov.au answered 403). Each entry carries its `fy`/`effective_from`, and `registration_fees_indexed_annually` flags that all three reset each July.
 - **Strata vs house insurance — don't double-count.** First-year building insurance is a house cost; for strata, building cover is inside the body-corporate levy owned by `kb.ongoing-costs.rates-water-strata`. The low end is the house figure; the resolver zeroes this line for strata. Single-owner discipline keeps the strata levy in the ongoing-costs doc.
-- **NSW registration is GST-inclusive; VIC/QLD figures are the fee payable.** NSW LRS (a privatised registry) charges GST, so $175.70 is the incl-GST amount the buyer pays. The figure the calculator shows is in each case the amount payable.
+- **NSW registration is GST-inclusive; VIC/QLD figures are the fee payable.** NSW LRS (a privatised registry) charges GST, so $182.73 is the incl-GST amount the buyer pays. The figure the calculator shows is in each case the amount payable.
 
 ## Sources
 
 **Registry fees (REGULATED — confirmed against primary documents in `docs/sources/`):**
 
-- NSW Land Registry Services — *2025/26 Fees Update* (Transfer pursuant to s46 RPA and Mortgage each $160.19 excl / $175.70 incl GST, from 1 July 2025) — announcement https://www.nswlrs.com.au/about-us/announcements/new-regulated-customer-fees-1-july-2025/ ; official schedule https://nswlrs.com.au/assets/f/1129775276948026/d3060f1be0/2025-2026-nsw-lrs-fees-update.pdf (primary: `docs/sources/nsw/2025-2026-nsw-lrs-fees-update-final-1.pdf`)
+- NSW Land Registry Services — *NSW LRS customer fees from 1 July 2026* (Transfer pursuant to s46 RPA and Mortgage each $166.60 excl / $182.73 incl GST) — https://nswlrs.com.au/assets/f/1129775276948026/x/5fed3e7cd6/2026-2027_nsw-lrs-fees_final.pdf (archived text: `docs/sources/nsw/nsw-lrs-fees-2026-27.txt`). Previously FY2025–26: $160.19 excl / $175.70 incl GST.
 - Land Use Victoria — *Guide to Transfer of Land Act fees 2025–26* (Transfer on sale s45 electronic: 101.50 + 2.34 per whole $1,000, max 3,611; Mortgage or charge s74 electronic: 125.70) — https://www.land.vic.gov.au/land-registration/fees-guides-and-forms/2025-26-fees (primary: `docs/sources/vic/Guide-to-TLA-fees-2025-2026.docx`)
 - Titles Queensland — *FY2026/27 Fees* (Land Title Act 1994: lodging a transfer of ownership for 1 lot $248.04; additional $46.56 per $10,000 or part over $180,000 consideration; any other instrument (e.g. mortgage) $248.04) — https://www.titlesqld.com.au/fees-payments/ (primary: `docs/sources/qld/Titles-Registry-Fees_FY-2026-to-2027.pdf`)
 
