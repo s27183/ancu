@@ -143,15 +143,16 @@ const messages = {
     'onboarding.budget.under': { vi: 'Dưới', en: 'Under' },
     'onboarding.submit': { vi: 'Tạo kế hoạch', en: 'Create my plan' },
     'onboarding.submitting': { vi: 'Đang tạo…', en: 'Creating…' },
-    'onboarding.created.title': {
-        vi: 'Đang chuẩn bị kế hoạch của bạn',
-        en: 'Preparing your plan'
+    // The wait after a create (behavior 92): one line per part of the budget as it fills.
+    'onboarding.wait.title': { vi: 'Đang lập kế hoạch của bạn', en: 'Building your plan' },
+    'onboarding.wait.buy': { vi: 'Tính chi phí mua…', en: 'Working out the buying costs…' },
+    'onboarding.wait.hold': { vi: 'Tính chi phí giữ nhà…', en: 'Working out the costs of keeping the home…' },
+    'onboarding.wait.sell': { vi: 'Tính chi phí bán…', en: 'Working out the selling costs…' },
+    'onboarding.wait.slow': {
+        vi: 'Lâu hơn thường lệ một chút. Bạn có thể mở kế hoạch ngay, phần còn lại sẽ hiện dần.',
+        en: 'This is taking a little longer than usual. You can open the plan now; the rest fills in as it arrives.'
     },
-    'onboarding.created.body': {
-        vi: 'Kế hoạch cơ bản đang được tính toán và sẽ hiện ra trên trang Kế hoạch ngân sách.',
-        en: 'Your base plan is being computed and will appear on the budget plan page.'
-    },
-    'onboarding.created.cta': { vi: 'Xem kế hoạch', en: 'View your plan' },
+    'onboarding.wait.open': { vi: 'Mở kế hoạch', en: 'Open the plan' },
     'onboarding.auth.title': { vi: 'Đăng nhập để lưu kế hoạch', en: 'Sign in to save your plan' },
     'onboarding.auth.body': {
         vi: 'Bạn cần đăng nhập để lưu và xem kế hoạch của mình.',

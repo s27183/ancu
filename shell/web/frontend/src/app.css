@@ -1908,6 +1908,80 @@ main {
 .ob-terminal .primary {
     margin-top: 0.5rem;
 }
+/* The wait after a create (behavior 92): a small house whose three budget lines fill
+   as the plan's parts arrive; the roof breathes and the current line shimmers. Under
+   prefers-reduced-motion nothing animates — the lines still fill, without motion. */
+.ob-wait {
+    flex: 1 1 auto;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding-block: 1.5rem 2rem;
+}
+.ob-house {
+    width: 7.5rem;
+    height: auto;
+    overflow: visible;
+    animation: ob-house-bob 2.4s var(--ease) infinite;
+}
+.ob-house .roof {
+    fill: none;
+    stroke: var(--warm);
+    stroke-width: 6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+.ob-house .wall {
+    fill: var(--surface);
+    stroke: var(--accent);
+    stroke-width: 3;
+}
+.ob-house .line-track {
+    fill: var(--bg-2);
+}
+.ob-house .line-fill {
+    fill: var(--accent);
+    transform-box: fill-box;
+    transform-origin: left center;
+    transform: scaleX(0);
+    transition: transform 0.6s var(--ease);
+}
+.ob-house .line-fill.now {
+    transform: scaleX(0.55);
+    animation: ob-line-shimmer 1.2s var(--ease) infinite alternate;
+}
+.ob-house .line-fill.done {
+    transform: scaleX(1);
+}
+.ob-terminal .ob-wait-line {
+    font-weight: 600;
+    color: var(--ink);
+}
+@keyframes ob-house-bob {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-4px);
+    }
+}
+@keyframes ob-line-shimmer {
+    from {
+        opacity: 0.45;
+    }
+    to {
+        opacity: 1;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .ob-house,
+    .ob-house .line-fill,
+    .ob-house .line-fill.now {
+        animation: none;
+        transition: none;
+    }
+}
 
 @media (min-width: 48rem) {
     .ob-backdrop {
