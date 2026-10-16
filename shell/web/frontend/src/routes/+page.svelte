@@ -5,10 +5,13 @@
     // layout's). The map no longer opens first. A first visit still opens "Vì sao Úc?"
     // (Welcome) over the cards, whose first screen leads to the independent /
     // information-not-advice position in one tap; minimised, it leaves the cards in view.
+    // Behavior 89: a dotted map of Australia lights up behind the cards (HomeBackdrop).
     import Welcome from '$lib/Welcome.svelte';
+    import HomeBackdrop from '$lib/HomeBackdrop.svelte';
     import { t } from '$lib/i18n';
 </script>
 
+<HomeBackdrop />
 <div class="home">
     <nav class="home-ways" aria-label={$t('brand.name')}>
         <a class="home-way" href="/plan">
