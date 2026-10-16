@@ -89,8 +89,8 @@ run_stamp({State, HasConc, V, Before, Saving, After}) ->
 %% dollars, against each registry's published schedule (REGULATED — Decision 9).
 
 reg_cases() ->
-    [{<<"NSW">>, 600000,  351},    %% flat $351.40 → $351 (price-independent)
-     {<<"NSW">>, 850000,  351},    %% same flat fee at any price
+    [{<<"NSW">>, 600000,  365},    %% flat $365.46 → $365 (price-independent; FY2026-27)
+     {<<"NSW">>, 850000,  365},    %% same flat fee at any price
      {<<"VIC">>, 700000,  1865},   %% 1739.50 + 125.70 = 1865.20
      {<<"VIC">>, 2000000, 3737},   %% transfer capped 3611 + 125.70 (proves the cap)
      {<<"QLD">>, 600000,  2452},   %% 2203.56 + 248.04 = 2451.60

@@ -1,0 +1,141 @@
+Source: https://moneysmart.gov.au/home-loans/using-a-mortgage-broker
+Retrieved: 2026-10-16
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML 2e2fe75212ea60b6379ee4b0ccfd6e621c0acc9a9e96880501d06617f7811823
+
+Using a mortgage broker - Moneysmart.gov.au
+Skip to main content
+Using a mortgage broker
+Last updated: 12 October 2026
+With many lenders to choose from, you may decide to get help from a mortgage broker. They may be able to assist in asking the right questions to get a home loan that meets your needs and is value for money.
+What mortgage brokers do
+A mortgage broker is a go-between who deals with banks and other lenders to arrange a home loan. Mortgage brokers must act in your best interests when suggesting a loan for you.
+A broker works with you to:
+Understand your needs and goals.
+Work out what you can afford to borrow.
+Find options to suit your situation.
+Explain how each loan works and what it costs (for example, interest rate , features and fees).
+Help you apply for the loan and manage the process through to settlement.
+How to find a mortgage broker
+You can find a licensed mortgage broker through:
+recommendations from people you know
+a mortgage broker professional association
+Before meeting with a broker, make sure they have a licence to give you credit (loan) advice, or are a representative of a licensee.
+Search the following lists on ASIC's Professional Registers Search :
+Credit Representative
+Credit Licensee
+To search, choose the list name in the 'Select Register' drop-down menu.
+‘Mortgage brokers can play a critical role in helping Australians make one of the most significant financial decisions of their lives.
+‘More than 80% of home loans are now arranged through mortgage brokers. With that level of influence comes an obligation to act in consumers’ best interests when recommending a loan.’
+ASIC Commissioner Alan Kirkland
+Meeting with a mortgage broker
+Before you see a broker, think about what matters most to you in a home loan. Do you simply want the lowest cost loan? Do you want specific features, such as being able to make extra repayments, or a mortgage offset account ?
+Thinking about this beforehand will make the conversation with your broker easier. Make a list of your:
+'must-haves' (can't do without)
+'nice-to-haves' (could do without)
+See choosing a home loan for advice on what to consider.
+When you meet with the broker, bring your list of must-haves and nice-to-haves.
+The broker should present you with more than one option. Get them to explain how each loan option works, what it costs and why it's in your best interests.
+You don't have to take the first loan you're offered. If you are not happy with any option, ask the broker to find alternatives. You may have a preference for a particular lender, such as your current bank. The broker should show you loans from other lenders as well, so you can compare.
+A home loan is a long-term debt, so even a small difference in the overall cost of the loan adds up over time. If you can get a lower-cost loan from another lender, you could save thousands of dollars. Learn how to step through the costs and considerations when you compare home loans .
+Questions to ask your mortgage broker
+Ask plenty of questions, including:
+Do you offer loans from a range of different lenders? What sort of lenders do you work with? What kind of lenders can't you access?
+How do you get paid for the advice you're giving me? Does this differ between lenders?
+Why did you recommend this loan to me? Why is this loan in my best interests?
+What fees will I have to pay when taking out this loan?
+What features (options) come with this loan? Can you show me how they work?
+How do the fees and features of this loan affect how much the loan will cost me?
+Can you show me a couple more options, including one with the lowest cost?
+What is the threshold for lender's mortgage insurance (LMI) and how can I avoid it?
+How mortgage brokers get paid
+Lenders generally pay mortgage brokers a commission for distributing their products, so you don't pay them directly. The commission paid is a percentage of the loan amount and typically has both an upfront and ongoing payment. Brokers must provide you information about the commissions they may receive.
+Sometimes brokers might charge you a fee directly. Where they do, they should clearly communicate this to you and set out the proposed fee in a written quote. You must sign a quote before a broker can provide services and request payment of a fee. A broker is not entitled to request payment of a fee prior to providing their services.
+If a broker proposes to charge you a fee directly and you're not sure whether you're getting a good deal, ask around or look online to see whether other brokers charge fees for similar services, and if so the amount of those fees.
+If you have problems with a mortgage broker
+If you're unhappy with the loan advice you've received or fees you've paid, there are steps you can take.
+The first step is to talk to your broker. Explain the problem and how you'd like it fixed.
+If the problem isn't fixed, make a complaint to your broker's business in writing. See how to complain for help with this.
+If the problem is still not resolved, contact the Australian Financial Complaints Authority to make a complaint and get free, independent dispute resolution.
+What a mortgage broker does
+Join thousands of Australians and get tools, tips and calculators to help with your money - straight to your inbox each month.
+Sign up
+Do you find this page useful?
+Yes
+No
+Why?
+It had the information I was looking for
+The page makes sense
+The information is balanced and unbiased
+The information gave me a sense of what to do next
+Submit
+Any other feedback
+Why not?
+It didn't have the information I was looking for
+The page was confusing
+The information overwhelmed me
+There wasn't enough information for me to take action
+Submit
+Any other feedback
+Your feedback
+Your feedback relates to:
+Please select...
+Webpage Content
+Calculator or tool
+Complaint or scam
+Copyright requests
+Loans, money and personal finance advice
+Other feedback/suggestion
+You would like to:
+Please select...
+Report an Error
+Comment on a Webpage
+Ask a question
+Your issue is:
+Please select...
+You don't understand the calculator result
+You believe the calculator is incorrect
+The calculator/tool does not work (eg technical issue)
+You want to provide general feedback/suggestions
+Error loading Partial View script (file: ~/Views/MacroPartials/MoneySmart/Standard text.cshtml)
+Error loading Partial View script (file: ~/Views/MacroPartials/MoneySmart/Standard text.cshtml)
+Error loading Partial View script (file: ~/Views/MacroPartials/MoneySmart/Standard text.cshtml)
+Summary of your feedback:
+Your comments:
+The page/calculator/app you are referring to (eg. cut/paste URL):
+Cancel
+Send feedback
+Up next in Home loans
+Buying a house
+Step through the house buying process, so you know what to expect
+7 min read
+Choosing a home loan
+How to compare home loans to choose one that's right for you
+5 min read
+Fixed vs variable home loan interest rates
+What's the difference between fixed and variable home loan rates? Learn the pros, cons and key questions to ask before choosing a loan.
+92 min read
+Mortgage calculator
+Small differences in your mortgage interest rate can make a big difference to the long-term cost of your home loan
+3 min read
+Interest-only home loans
+Decide whether an interest-only home loan is right for you
+3 min read
+Interest-only mortgage calculator
+This calculator helps you to work out your mortgage repayments before and after the interest-only period
+2 min read
+Switching home loans
+Work out if you could save money by switching to another mortgage
+3 min read
+Mortgage switching calculator
+Calculate the cost of switching your mortgage, to decide whether you could save money
+5 min read
+Pay off your mortgage faster
+Some Moneysmart tips to get rid of your mortgage debt faster
+3 min read
+Problems paying your mortgage
+If you're struggling with your home loan repayments, there is help available. The earlier you get help, the more options you'll have
+4 min read
+Mortgage offset accounts
+Learn how a mortgage offset account works, how it can reduce your home loan interest, and whether it’s worth having.
+5 min read
+search

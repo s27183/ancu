@@ -59,7 +59,8 @@ fill_domestic(Args, Upstream) ->
     Outcome = (ongoing_obligations(Ceiling, Intent, State, HasFhg, LandTax))#{
                   <<"cash_events">> => own_cash_events(Args, Upstream, <<"budget_envelope">>,
                                                        <<"other">>, owner,
-                                                       <<"ownership_planning">>)},
+                                                       <<"ownership_planning">>),
+                  <<"fee_pending">> => own_fee_pending(Args, <<"other">>, <<"ownership_planning">>)},
     KbVersions = fh_engine_kb:kb_anchors(
         [<<"kb.ongoing-costs.rates-water-strata">>,
          <<"kb.maintenance.budget-by-property-type">>,
@@ -98,6 +99,7 @@ fill_foreign(Args, Upstream) ->
     Outcome = #{
         <<"cash_events">> => own_cash_events(Args, Upstream, <<"budget_envelope">>,
                                              <<"other">>, owner, <<"ownership_planning">>),
+        <<"fee_pending">> => own_fee_pending(Args, <<"other">>, <<"ownership_planning">>),
         <<"total_monthly_outgoings_estimate">> => null,   %% pending: mortgage P&I unknown at base
         <<"total_annual_outgoings_estimate">>  => null,   %% pending: as above
         <<"vacancy_fee_at_risk_amount">>       => vacancy_fee_at_risk(Fee),
@@ -186,6 +188,7 @@ vacancy_alert(Fee) when is_integer(Fee) ->
 fill_investor(Args, Upstream) ->
     Outcome = #{
         <<"cash_events">> => investor_own_cash_events(Args, Upstream, <<"ownership_planning_investor">>),
+        <<"fee_pending">> => investor_own_fee_pending(Args, Upstream, <<"ownership_planning_investor">>),
         %% post-acquisition actuals — no property/actuals at base
         <<"monthly_net_cash_flow_actual">>     => null,
         <<"ytd_cash_flow_vs_projection">>      => null,
@@ -316,6 +319,7 @@ fill_foreign_investor(Args, Upstream) ->
     Fee = maps:get(<<"total_firb_fee_payable">>, FirbStatus, null),
     Outcome = #{
         <<"cash_events">> => investor_own_cash_events(Args, Upstream, <<"ownership_planning_foreign_investor">>),
+        <<"fee_pending">> => investor_own_fee_pending(Args, Upstream, <<"ownership_planning_foreign_investor">>),
         %% post-acquisition actuals — no property/actuals at base.
         <<"monthly_net_cash_flow_after_withholding">> => null,
         <<"vacancy_fee_at_risk_status">>               => null,
@@ -402,7 +406,32 @@ own_cash_events(Args, Upstream, BudgetKey, Other, Kind, Source) ->
         own_event(<<"loan_repayments">>, <<"event_loan_repayments">>,
                   fh_engine_disposition:annual_repayments(principal(Range, Budget), Kind),
                   <<"lender">>, Source)],
-    [E || E <- Events, maps:get(<<"amount">>, E) =/= null].
+    {FeeEvents, _} = own_fees(Args, Other, Source),
+    [E || E <- Events, maps:get(<<"amount">>, E) =/= null] ++ FeeEvents.
+
+%% Whole lifecycle -> honesty tiers; one owner per fact -> ownership_planning -> own fee lines
+%% The yearly fees a buyer only learns from a quote (building and landlord insurance,
+%% property management, the accountant, the depreciation schedule), one event each from
+%% their owning KB docs (fh_engine_fees, behavior 83), placed beside the base own events
+%% and dropped with them once yield_modelling owns a property's operating costs. A line
+%% whose base is unknown (management fees before a rent) is in `fee_pending`.
+own_fees(Args, Other, Source) ->
+    fh_engine_fees:events([<<"own">>],
+        #{blueprint => maps:get(blueprint_slug, Args, <<"fhb-domestic-au">>),
+          state => case fh_engine_store:projection_state(maps:get(onboarding, Args, #{})) of
+                       S when is_binary(S) -> S; _ -> undefined end,
+          property => undefined, source => Source, counterparty => Other,
+          price => price_range(Args), loan => null, rent => null, transfer => null, sale => null}).
+
+own_fee_pending(Args, Other, Source) ->
+    element(2, own_fees(Args, Other, Source)).
+
+investor_own_fee_pending(Args, Upstream, Source) ->
+    Cf = maps:get(<<"cash_flow_projection">>, Upstream, #{}),
+    case maps:get(<<"annual_operating_expenses_year_1">>, Cf, null) of
+        null -> own_fee_pending(Args, <<"services">>, Source);
+        _    -> []
+    end.
 
 %% Mode C/D: yield_modelling already places the per-property hold events (rent, operating
 %% expenses, interest) once a property is attached; this base set fills the Own phase only

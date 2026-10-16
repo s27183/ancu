@@ -80,7 +80,18 @@
     // honest-partial: a null/dangling ref → null → no chip.
     function amountFor(ref: string | null | undefined): MoneyRange | null {
         if (!ref) return null;
-        return cashEvents.find((e) => e.id === ref)?.amount ?? null;
+        const own = cashEvents.find((e) => e.id === ref);
+        if (own) return own.amount ?? null;
+        // behavior 83: the ref names a figure split into fee lines (its `group`) → the sum of
+        // the lines paid for sure, as the engine's total (fh_engine_fees:committed/1).
+        const lines = cashEvents.filter(
+            (e) => e.group === ref && hasRange(e.amount ?? null) && !e.detail?.optional && !e.detail?.condition
+        );
+        if (lines.length === 0) return null;
+        return [
+            lines.reduce((t, e) => t + (e.amount as [number, number])[0], 0),
+            lines.reduce((t, e) => t + (e.amount as [number, number])[1], 0)
+        ];
     }
     const hasRange = (v: MoneyRange | null): v is MoneyRange =>
         Array.isArray(v) && v.length === 2 && typeof v[0] === 'number' && typeof v[1] === 'number';

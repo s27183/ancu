@@ -206,6 +206,26 @@ export interface CashEvent {
     period?: string | null;
     is_estimate?: boolean | null;
     source_component?: string | null;
+    /** behavior 83: the figure a fee line belongs to (other_buying_costs on the buy side,
+     *  selling_costs on the sell side), so a link to that figure sums its lines. */
+    group?: string | null;
+    /** behavior 83: a fee line's detail — what the sheet opens in place. */
+    detail?: FeeDetail | null;
+}
+
+/** One fee line's detail (fh_engine_fees): its honesty tier, how it is figured, the band,
+ *  who usually pays, what moves it within the band, the source, and whether it is optional
+ *  or applies only to one kind of property (`condition`, while the type is unknown). */
+export interface FeeDetail {
+    tier: 'CONVENTION' | 'LENDER-POLICY' | 'REGULATED' | 'PLACEHOLDER';
+    basis: string;
+    band: [number | null, number | null];
+    payer?: LocalizedText | null;
+    drivers?: LocalizedText | null;
+    source?: string | null;
+    optional?: boolean;
+    condition?: string | null;
+    owner?: string;
 }
 
 /** cash_position → calculator (outcome type `budget_envelope`). */
@@ -746,7 +766,9 @@ export interface JourneySwimlaneOutcome {
 export interface PendingLine {
     id: 'sale_proceeds' | 'selling_costs' | 'loan_payout' | string;
     phase: string;
-    needs: 'hold_years' | 'income' | string;
+    needs: 'hold_years' | 'income' | 'price' | 'rent' | 'quote' | string;
+    /** a fee line's own label (behavior 83); the base lines have none. */
+    label?: LocalizedText | null;
 }
 /** purchase_journey.lifecycle_budget (fh_engine_journey lifecycle_budget block): buy =
  *  prepare..settle out-events (a grant shown, not netted), own_per_year = recurring own

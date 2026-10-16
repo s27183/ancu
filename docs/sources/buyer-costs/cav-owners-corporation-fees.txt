@@ -1,0 +1,157 @@
+Source: https://www.consumer.vic.gov.au/housing/owners-corporations/finance-insurance-and-record-keeping/fees
+Retrieved: 2026-10-16
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML 5e9e06214a7d6735565fad2adb3a6d5fea8a55392677b1180188e745f2bdc74b
+
+Fees - owners corporations - Consumer Affairs Victoria
+Skip to content
+Skip to main navigation
+Skip to footer
+Back
+Fees - owners corporations
+Skip listen and sharing tools
+Listen
+Share this page
+Print
+Email
+Facebook
+On this page:
+Annual fees
+Special fees
+Issuing notices for fees and levies
+Late payment of fees and charges
+Other fees and charges
+Payment plans and financial hardship
+Penalty interest rate
+Owners corporation certificate fees
+Fees for copies of register and records
+Disputes
+Your owners corporation can set both annual and special fees.
+Annual fees
+Annual fees cover general administration, maintenance, insurance and other ongoing costs. Lot owners are charged annual fees according to their lot liability. For more information on lot liability, go to Definitions .
+To determine its fees for the financial year, your owners corporation will need to prepare an annual budget. This means the committee or a delegate of the committee must estimate the cost of administration, maintenance, insurance and contributions to the maintenance plan (if any) before the annual general meeting each year.
+The owners corporation must send its proposed annual budget to lot owners with the notice of the annual general meeting, where they will determine annual fees.
+A maintenance plan helps the owners corporation to budget for necessary works. A detailed plan can help the committee win approval for funds at the annual general meeting. For more information about preparing a maintenance plan, go to Preparing for a maintenance plan .
+If your owners corporation has a maintenance plan, it must also have a maintenance fund. The owners corporation can decide what, if any, portion of the annual fees should be contributed to the fund, how it is paid and when payment is due (usually quarterly).
+Special fees
+Special fees or charges cover extraordinary or unexpected expenditure; for example, to urgently repair the building or to cover other costs such as to defend legal action against the owners corporation.
+If the amount of the proposed special fees is more than double the amount of the owners corporation’s current annual fees, it must be approved by a special resolution. A special resolution requires support from at least 75% of all lot owners or lot entitlements, depending on whether the decision is to be made by a poll or ballot or by a vote in person. For more information about voting and ballots, go to Voting and ballot guidelines .
+Lot owners are charged special fees according to their lot liability, unless works are being undertaken that will only or substantially benefit one, or some (but not all) lots.
+In such a case, special fees are charged using the 'benefit principle'.
+Applying the benefit principle
+The benefit principle simply means that those who benefit more, pay more. It does not always need to be applied in an exact way if it is not practical to do so. The apportionment only needs to be considered reasonable.
+Applying the benefit principle may not always result in lot owners paying other than in accordance with their lot liability.
+For example:
+when the greater benefit of works to a lot owner are offset by their having paid higher annual fees (because of their higher lot liabilities) or
+when works on one lot are offset by indirect benefits to the other lots; for example, by raising the value of the entire building or by reducing the possibility of legal actions against the owners corporation.
+Issuing notices for fees and levies
+Notices for fees issued by the owners corporation must be in the approved forms. If not, the owners corporation may have difficulty recovering the money owing.
+Download the approved form Owners corporation fee notice (Word, 71KB) .
+Download the approved form Owners corporation final fee notice (Word, 67KB) .
+The first fee notice must state that:
+the lot owner must pay the fees and charges within 28 days of the date of the notice
+if the owners corporation has voted to charge interest on overdue fees, penalty interest at the rate specified in the notice will be payable on overdue fees and charges. For more information, go to Penalty interest rate .
+the dispute resolution process applies to disagreements about fees and charges.
+Lot owners must pay the fees and charges within 28 days of the date on the fee notice.
+The final fee notice can be sent any time after the 28 days has expired and must state that:
+the lot owner must pay the overdue fees and any charges and interest immediately
+penalty interest (if charged) is payable on the overdue fees and charges at the date of the final fee notice. For more information, go to Penalty interest rate .
+the amount of penalty interest (if charged) that will accrue daily until overdue fees and charges are paid
+the owners corporation intends to take legal action to recover the amount due if the full amount is not paid within 28 days of the final fee notice.
+Note: Some owners corporations choose not to send a final fee notice as soon as the first 28 days has expired, but instead allow a 'grace period' (perhaps with a reminder call or email, during which no penalty interest is charged) before sending the final fee notice.
+The table below is a sample only and includes suggested timeframes for sending fee notices:
+Quarter
+Due date
+Fee notice
+Reminder letter or telephone call (optional)
+Final fee notice (with optional 2-week grace period)
+First notice of annual fees/first quarter
+1 January
+1 December
+14 December
+15 January
+Second quarter
+28 March
+28 February
+14 March
+11 April
+Third quarter/half yearly
+28 June
+28 May
+14 June
+12 July
+Fourth quarter
+28 September
+28 August
+14 September
+12 October
+Your owners corporation can arrange for fees to be paid by direct debit to help lot owners with budgeting and reduce the risk of the owners corporation not being able to meet its financial and legal obligations due to unpaid fees.
+Late payment of fees and charges
+Lot owners who are in arrears for any amount of their fees, lose the right to vote on ordinary resolutions. They can attend owners corporation meetings but can only vote on special or unanimous resolutions. For more information on these resolutions, go to Voting and ballot guidelines .
+Other fees and charges
+An owners corporation can only charge fees and charges in accordance with the Owners Corporation Act 2006 . These fees must be based on lot liability.
+If a lot owner has overdue fees and the owners corporation decides to issue a fee notice, the owners corporation can only charge them their proportional share of the actual cost incurred for issuing the overdue notice (if any). The owners corporation cannot add extra fees or charges, such as “administration fees” for late payments.
+Example:
+A lot owner has 10% of the lot liability and has not paid their fees. The owners corporation manager charges the owners corporation $33 for processing the late payment, as allowed by the manager's contract of appointment. Whilst the OC is not permitted to pass on the full $33 late fee to the lot owner that has failed to pay their fees, the OC can require the lot owner to pay a portion of the late fee, based on the lot owner’s lot liability. In this case, the owners corporation could pass on $3.30 to the lot owner, that is, 10% of the late fee charged by the owners corporation manager to the owners corporation.
+Further, an owners corporation manager cannot require a lot owner to pay any fees due to the manager under their contract of appointment.
+A manager's contract of appointment is a contract between the owners corporation and the manager. This means that the owners corporation is bound by the contract, not the individual lot owners.
+The contents of any contract of appointment must comply with the Owners Corporation Act 2006 and the Owners Corporations Regulations 2018.
+Payment plans and financial hardship
+If you are experiencing financial hardship and struggling to pay your owners corporation levies and fees on time, contact your owners corporation and owners corporation manager as soon as possible. Ask them to have a payment plan put in place.
+National Debt Helpline – Debt Problems - Strata Levies has a step-by-step guide on how to do this. Note: Owners corporations are called strata in some other states.
+It also has information about other payment options, what to do if you can’t come to an agreement, and what to do if legal action is being threatened or has commenced against you.
+If you’re feeling overwhelmed and need help to deal with financial issues, you can get free, independent, and confidential advice from a community based financial counsellor.
+To speak to a financial counsellor, call the National Debt Helpline on 1800 007 007 or find a financial counsellor near you .
+Penalty interest rate
+The maximum rate of interest that your owners corporation can charge on overdue fees is determined by the Penalty Interest Rates Act 1983.
+Find the current penalty interest rates at Penalties and values - Department of Justice and Community Safety .
+Owners corporation certificate fees
+The owners corporation fee structure sets out the maximum amount an owners corporation can charge for issuing a certificate.
+If a lot is affected by more than one owners corporation, a separate certificate may be issued for each and the owners corporation may charge a separate fee.
+There are discounts for additional certificates, when required as part of a sale of land from the same owners corporation manager.
+The value of a fee unit is $17.27 for 2026-27. Find more information at Indexation of fees and penalties - Department of Treasury and Finance .
+Item
+Maximum fee (not including GST)
+Certificate within 6-10 business days
+9.64 fee units
+Certificate within 3-5 business days
+14.46 fee units
+Certificate within 2 business days
+17.35 fee units
+Additional certificate within 6-10 business days
+5.3 fee units
+Additional certificate within 3-5 business days
+7.95 fee units
+Additional certificate within 2 business days
+9.54 fee units
+Download our Sample owners corporation certificate (Word, 154KB) .
+Fees for copies of register and records
+The fee structure sets out the maximum amount an owners corporation can charge for providing copies of the register and records.
+The value of a fee unit is $17.27 for 2026-27. Find more information at Indexation of fees and penalties - Department of Treasury and Finance .
+Item
+Maximum fee (not including GST)
+Copy of the Register
+3.03 fee units
+Copy of Record
+1.15 fee units for the first record requested
+(with an additional $7.60 for each additional record requested at the same time)
+Printed copies
+20 cents per page
+Disputes
+We recommend first trying to resolve any disputes about fees and charges through the owners corporation's internal dispute resolution process. Find information about complaint handling and resolving disputes in an owners corporation .
+If the matter remains unresolved, a lot owner can apply to the Victorian Civil and Administrative Tribunal (VCAT ) for a ruling.
+If an owners corporation is in dispute over a fee, it must first provide the lot owner with a fee notice and a final fee notice before applying to VCAT for a ruling.
+Related links
+Owners corporation fee notice (Word, 71KB)
+Owners corporation final fee notice (Word, 67KB)
+Owners Corporations Act 2006
+Owners Corporations Regulations 2018
+Victorian Civil and Administrative Tribunal (VCAT) website
+Last updated: 9 April 2026
+Feedback
+Was this page helpful?
+Yes
+No
+Why? (optional). If you require a response, use our General enquiry online form .
+Why not? (optional). If you require a response, use our General enquiry online form .
+Please ensure that this field is always blank.
+Back To Top

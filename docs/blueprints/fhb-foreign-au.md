@@ -659,6 +659,7 @@ The `mortgage_plan` outcome feeds `cash_position` (loan amount + deposit), `cros
     "verdict": "enum [surplus, tight, short]",
     "mitigation_options_if_short": "array<string>",
     "cash_events": "array<{ id: string, phase: string, label: localized_text, direction: enum [out, in], amount: money_range|null, is_estimate: bool, timing: enum [one_off, recurring], period: enum [once, monthly, quarterly, annual]|null, counterparty: string, source_component: string }>",  // Mode B's ACQUISITION financial spine (task 12, 2026-07-11) — deposit + firb_fee (contract), stamp_duty + foreign_buyer_surcharge + other_buying_costs (settle); a scalar figure collapses to [v,v]. Live at base (Mode B's ceiling-estimate convention computes these figures from target_price_range alone, unlike Mode D's cash_position which is permanently null pre-property). Implemented by `fh_engine_cash:cash_events_foreign/5`; `purchase_journey`'s generic multi-source harvest places these on the swimlane
+    "fee_pending": "array<{ id: string, phase: string, needs: enum [price, income, rent, quote, hold_years], label: localized_text|null }>",  // behavior 83 (2026-10-16): each fee line this component owns whose base is still missing (a % of the rent before a property, of the price before a range) or that waits on a quote — named, never a guessed figure (fh_engine_fees); purchase_journey folds them into lifecycle_budget.pending
     "key_assumptions": "array<string>"
   }
 }
@@ -969,7 +970,8 @@ Same as [Mode A ownership_planning](fhb-domestic-au.md#9-ownership_planning) wit
     "non_resident_tax_filing_required": "bool",
     "alert_triggers_armed": "array<{ trigger, action }>",
     "mode_switch_eligible": "bool",
-    "cash_events": "array<{ id: enum [council_rates_water, maintenance_reserve, loan_repayments], phase: 'own', label: localized_text, direction: 'out', amount: money_range, is_estimate: bool, timing: 'recurring', period: 'year', counterparty: string, source_component: string }>"  // the Own-phase per-year spine (behavior 82, 2026-10-16): council rates + water (the statutory band), the maintenance reserve over the target range, and the yearly P&I on the target range less the plan's own deposit event (fh_engine_disposition:annual_repayments/2, KB representative rate). Each PLACES a figure its owner computes; an unknown one is dropped (honest partial)
+    "cash_events": "array<{ id: string, phase: 'own', label: localized_text, direction: 'out', amount: money_range, is_estimate: bool, timing: 'recurring', period: 'year', counterparty: string, source_component: string }>",  // the Own-phase per-year spine (behavior 82, 2026-10-16): council rates + water (the statutory band), the maintenance reserve over the target range, and the yearly P&I on the target range less the plan's own deposit event (fh_engine_disposition:annual_repayments/2, KB representative rate). Each PLACES a figure its owner computes; an unknown one is dropped (honest partial). Behavior 83: the yearly fee lines (insurance, property management, accountant, depreciation schedule) join them, one event per fee with a `detail` {tier, basis, band, payer, drivers, source, optional, condition, owner} from fh_engine_fees
+    "fee_pending": "array<{ id: string, phase: string, needs: enum [price, income, rent, quote, hold_years], label: localized_text|null }>"  // behavior 83 (2026-10-16): each fee line this component owns whose base is still missing (a % of the rent before a property, of the price before a range) or that waits on a quote — named, never a guessed figure (fh_engine_fees); purchase_journey folds them into lifecycle_budget.pending
   }
 }
 ```
@@ -1016,6 +1018,7 @@ The `mode_switch_eligible` field signals when the user's status has changed (e.g
     "net_proceeds": "money_range|null",
     "full_horizon_net_position": "money_range|null",  // always null for Mode B (permanent gap — see above, not honest-partial-pending)
     "dispose_cash_events": "array<{ id: string, phase: string, label: localized_text, direction: enum [out, in], amount: money_range|null, is_estimate: bool, timing: enum [one_off, recurring], period: enum [once, monthly, quarterly, annual]|null, counterparty: string, source_component: string }>",
+    "fee_pending": "array<{ id: string, phase: string, needs: enum [price, income, rent, quote, hold_years], label: localized_text|null }>",  // behavior 83 (2026-10-16): each fee line this component owns whose base is still missing (a % of the rent before a property, of the price before a range) or that waits on a quote — named, never a guessed figure (fh_engine_fees); purchase_journey folds them into lifecycle_budget.pending
     "key_assumptions": "array<localized_text>"
   }
 }
@@ -1053,7 +1056,7 @@ The `mode_switch_eligible` field signals when the user's status has changed (e.g
     "actors": "array<{ id: string, label: localized_text }>",
     "cells": "array<{ phase: string, actor: string, item: localized_text, flow_marker: enum [none, document, milestone, money_out, money_in], amount: money_range|null, counterparty: string|null, source_component: string }>",
     "interactions": "array<{ from_actor: string, to_actor: string, phase: string, flows: array<{ label: localized_text, direction: enum [out, in], amount: money_range }> }>",
-    "lifecycle_budget": "{ buy: money_range|null, own_per_year: money_range|null, sell: money_range|null, pending: array<{ id: enum [sale_proceeds, selling_costs, loan_payout], phase: 'dispose', needs: enum [hold_years, income] }> }",  // behavior 82 (2026-10-16): the one-page sheet's three totals, summed HERE from the harvested events so the shell computes nothing — buy = prepare..settle out-events (a grant shown, never netted), own_per_year = recurring own out-events, sell = dispose out-events except loan_payout (repaid from the proceeds, not a cost); pending names each dispose line still waiting on an input (fh_engine_journey lifecycle_budget block)
+    "lifecycle_budget": "{ buy: money_range|null, own_per_year: money_range|null, sell: money_range|null, pending: array<{ id: string, phase: string, needs: enum [hold_years, income, price, rent, quote], label: localized_text|null }> }",  // behavior 82 (2026-10-16): the one-page sheet's three totals, summed HERE from the harvested events so the shell computes nothing — buy = prepare..settle out-events (a grant shown, never netted), own_per_year = recurring own out-events, sell = dispose out-events except loan_payout (repaid from the proceeds, not a cost); pending names each dispose line still waiting on an input (fh_engine_journey lifecycle_budget block); behavior 83: pending also names each fee line whose base is missing (price, income, rent) or that waits on a quote, with its label
     "key_assumptions": "array<localized_text>"
   }
 }

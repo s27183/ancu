@@ -1,0 +1,285 @@
+Source: https://techcombank.com/content/dam/techcombank/public-site/documents/bieu-phi-dich-vu-ngan-hang-dien-tu-va-chuyen-tien-ca-nhan-24122025.pdf
+Retrieved: 2026-10-16
+Extracted: pdftotext -layout of the fetched PDF; sha256 of the fetched PDF f54a1de74753d0dc5446bd286a73d943df7ba006ef52141d62316effcacbdc41
+
+PHỤ LỤC 1.4: BIỂU PHÍ DỊCH VỤ NGÂN HÀNG ĐIỆN TỬ VÀ CHUYỂN TIỀN
+CHO KHÁCH HÀNG THƯỜNG
+Cách thức quy đổi ngoại tệ trên biểu phí: 1 USD = 1 EUR = 120 JPY = 2 AUD = 1
+GPB=1CAD=1CHF= 2SGD = 30 THB
+4.1.Phí Dịch vụ Ngân hàng điện tử
+        Code phí                    Loại phí                      F@st iBank          F@st      Loại
+ STT
+          (tại                                                                       Mobile     phí
+         quầy)
+   I             Phí Dịch vụ Ngân hàng điện tử (Bao
+                 gồm Phí đăng ký dịch vụ; Phí thay đổi
+                 nội dung dịch vụ; Phí hủy dịch vụ)
+  1.1            Phí đăng ký dịch vụ, Phí thay đổi nội              Miễn phí         Miễn phí
+                 dung dịch vụ, Phí hủy dịch vụ
+  1.2            Dịch vụ nhận thông báo biến động số dư             Miễn phí         Miễn phí
+                 tài khoản qua Push Notification của
+                 F@st Mobile
+  II    Code phí           Phí Dịch vụ tin nhắn                  Homebanking          F@st
+          (tại                                                                       Mobipay
+         quầy)
+  1.1            Phí Đăng ký dịch vụ                                Miễn phí         Miễn phí
+  1.2            Phí sử dụng Dịch vụ gửi tin nhắn chủ                                 Không
+                 động từ Techcombank (thông báo biến                                 áp dụng
+                 động số dư tài khoản qua SMS gửi đến
+                 số ĐTDĐ)
+        CN15302 KH sử dụng từ 1 đến 20 SMS/tháng               15.000VNĐ/tháng
+                 KH sử dụng trên 20 SMS/tháng                  700VNĐ/SMS tính
+                                                                  theo số lượng
+                                                                  SMS thực tế.
+                                                                Tối đa 1.000.000
+                                                                VNĐ/tháng/01 số
+                                                                điện thoại/ 01 tài
+                                                                      khoản
+  1.3              Dịch vụ gửi tin nhắn chủ động từ Khách        Không áp dụng       Miễn phí
+                   hàng
+                   (Soạn tin nhắn theo cú pháp để Topup
+                   hoặc thanh toán hóa đơn-Tham chiếu
+                   dịch vụ F@st Mobipay)
+  1.4              Phí soạn tin nhắn (do mạng viễn thông        Không áp dụng          500
+                   quy định)                                                         VNĐ/tin
+  1.5              Phí Thay đổi nội dung dịch vụ                    Miễn phí         Miễn phí
+
+
+  1.6              Phí sử dụng Dịch vụ gửi thông báo chủ
+                   động từ Techcombank (thông báo biến
+                   động số dư tài khoản qua Zalo)
+                   KH sử dụng từ 1 đến 50 tin nhắn BĐSD        15.000 VNĐ/Tháng
+
+
+
+                                                                                        Trang số: 1/6
+                                         TCB Public Document
+                    KH sử dụng trên 50 tin nhắn BĐSD             300 VNĐ/tin nhắn
+                                                                         tính
+                                                               theo số lượng tin nhắn
+                                                                      thực tế.
+                                                                       Tối đa
+                                                                300.000VNĐ/tháng
+   Phí sử dụng Dịch vụ gửi thông báo chủ động từ Techcombank (thông báo biến động số dư tài
+   khoản qua Zalo) áp dụng cho Khách hàng đăng ký sử dụng dịch vụ từ ngày 08/06/2025.
+4.2.Phí Rút tiền và Phí chuyển tiền
+          Code phí                   Loại phí                      Tại Quầy          Dịch vụ       Loại
+  STT
+          (tại quầy)                                                                Ngân hàng      phí
+                                                                                     điện tử
+    I                  Phí Rút tiền (chỉ áp dụng với                                                 B
+                       FastMobile)
+   1.1                 Thực hiện lệnh Rút tiền tại ATM mà       Không áp dụng           Miễn phí
+                       không cần thẻ trên F@st i-bank và
+                       F@st Mobile
+   1.2    CN19104      Rút tiền bằng Giấy tờ tùy thân của KH    5,000 VNĐ/giao          Miễn phí
+                       tại CN/PGD của Techcombank từ giao             dịch
+                       dịch thực hiện trên F@st Mobile (Phí
+                       thu áp dụng đối với người nhận tại
+                       quầy)
+   II                  Phí chuyển tiền
+    1                  Chuyển tiền đến                                                               B
+   1.1                 Nhận chuyển đến từ trong nước (áp
+                       dụng đối với cả tiền VND và ngoại tệ)
+  1.1.1   CN13101      Ghi có trên tài khoản tại Techcombank        Miễn phí            Không áp
+                                                                                         dụng
+  1.1.2                Người hưởng không có tài khoản tại           0.03%               Không áp
+                       Techcombank, nhận bằng CMT/Hộ               Tối thiểu:            dụng
+                       chiếu; thu của người thụ hưởng           20,000VNĐ/ 1
+                                                                     USD
+                                                               Tối đa: 1,000,000
+                                                                VND/ 500 USD
+   1.2                 Nhận chuyển đến từ nước ngoài
+  1.2.1   CN13106      Phí ghi có tại Techcombank                   Miễn phí            Không áp
+                                                                                         dụng
+  1.2.2   CN13107      Phí sửa đổi (đối với giao dịch không
+                                                                            5 USD
+                       đi tra soát với NHNN)
+   1.3    CN13115      Nhận tiền từ nước ngoài gửi về qua           Miễn phí            Miễn phí
+                       Western Union
+    2                  Chuyển tiền đi
+   2.1                 Chuyển khoản đi trong nước từ tài                                             B
+                       khoản VND (khách hàng có tài khoản
+                       mở tại Techcombank)
+  2.1.1                Chuyển khoản cùng hệ thống
+    a.    CN13201      Từ 20 triệu đồng trở xuống               3,000 VNĐ/ giao         Miễn phí
+                                                                      dịch
+
+                                                                                             Trang số: 2/6
+                                         TCB Public Document
+ b      CN13202   Trên 20 triệu đồng                              0.02%          Miễn phí
+                                                             Tối đa: 1,000,000
+                                                                   VNĐ
+ c.     CN13206   Áp dụng riêng với chuyển khoản từ tài      9,000 VNĐ/ giao     Không áp
+                  khoản giải ngân sang tài khoản của bên           dịch           dụng
+                  thụ hưởng mở tại TCB
+ d.     CN13203   Giữa các TK của một khách hàng, bao            Miễn phí        Miễn phí
+                  gồm tài khoản thẻ tín dụng TCB
+ e.     CN13204   Người nhận bằng CMT/Thẻ CCCD/Hộ            0.03%Tối thiểu:     Không áp
+                  chiếu tại điểm giao dịch của TCB từ          20,000VNĐ          dụng
+                  giao dịch tại quầy                         Tối đa: 1,000,000
+                                                                   VNĐ
+2.1.2             Chuyển khoản khác hệ thống
+  a     CN13205   Chuyển qua hệ thống liên ngân hàng             0.0175%         Miễn phí
+                                                                 Tối thiểu:
+                                                               20,000VNĐ
+                                                             Tối đa: 1,000,000
+                                                                   VNĐ
+ b                Chuyển tiền qua số thẻ, số tài khoản        Không áp dụng      Miễn phí
+                  thông qua dịch vụ 24/7
+2.1.3   CN13207   Trường hợp KH chuyển khoản đi trong             0.01%          Miễn phí
+                  vòng 2 ngày làm việc kể từ ngày nộp        Tối thiểu: 10,000
+                  tiền mặt vào tài khoản (Thu thêm)                VNĐ
+                                                             Tối đa: 1,000,000
+                                                                   VNĐ
+2.2               Chuyển tiền đi trong nước bằng tiền                                         B
+                  mặt VND (KH nộp tiền mặt để chuyển
+                  đi) - thu người chuyển tiền
+2.2.1   CN13225   Người hưởng nhận tiền mặt bằng                  0,04%          Không áp
+                  CMT/Thẻ CCCD/Hộ chiếu tại điểm             Tối thiểu: 30,000    dụng
+                  giao dịch của Techcombank                        VNĐ
+                                                             Tối đa: 1,000,000
+                                                                   VNĐ
+2.2.2             Tài khoản người hưởng tại Ngân hàng             0,06%
+                  khác hoặc người hưởng nhận tiền mặt        Tối thiểu 50,000
+                  bằng CMT/Hộ chiếu tại điểm giao dịch             VNĐ
+                  của Ngân hàng khác                         Tối đa: 1,000,000
+                                                                   VNĐ
+2.3               Chuyển khoản đi trong nước từ tài                                           B
+                  khoản ngoại tệ
+2.3.1             Chuyển khoản cùng hệ thống
+  a     CN13235   Cho người hưởng cùng hệ thống               1.5USD/giao        Không áp
+                                                                    dịch          dụng
+ b      CN13237   Giữa các TK của một khách hàng                 Miễn phí        Miễn phí
+ c      CN13238   Người nhận bằng CMT/Thẻ CCCD/Hộ                 0.03%          Không áp
+                  chiếu tại điểm giao dịch của TCB (Áp       Tối thiểu: 1 USD     dụng
+                  dụng với KH được phép nhận ngoại tệ        Tối đa: 500 USD
+                  mặt) - thu người chuyển tiền
+
+
+
+                                                                                      Trang số: 3/6
+                                       TCB Public Document
+2.3.2     CN13241   Chuyển khoản khác hệ thống                    0.05%
+                                                             Tối thiểu: 4 USD
+                                                             Tối đa: 100 USD
+ 2.4      CN13246   Chuyển tiền đi trong nước bằng                0.05%            Không áp       B
+                    ngoại tệ mặt (Áp dụng đối với khách       Tối thiểu: 10         dụng
+                    hàng được phép chuyển tiền bằng                USD
+                    ngoại tệ)                                Tối đa: 500 USD
+ 2.5                Chuyển tiền đi nước ngoài bằng                                                B
+                    ngoại tệ (Áp dụng đối với khách hàng
+                    được phép chuyển tiền bằng ngoại tệ)
+2.5.1.              Chuyển tiền đi nước ngoài bằng
+                    ngoại tệ tại quầy
+2.5.1.1   CN13251   Chuyển tiền đi bằng ngoại tệ - Inspire
+                                                             - USD:                Không áp
+                    & Other
+                                                               0.6%/lệnh (tối       dụng
+                                                               thiểu 10 USD
+                                                               và tối đa 1000
+                                                               USD) + Điện
+                                                               phí + Phí Ngân
+                                                               hàng đại lý.
+                                                             - CNY:
+                                                               0.3%/lệnh (tối
+                                                               thiểu 15 USD)
+                                                               + Điện phí +
+                                                               Phí Ngân hàng
+                                                               đại lý.
+                                                             - Ngoại tệ khác:
+                                                               0.2%/lệnh (tối
+                                                               thiểu 5 EUR đối
+                                                               với đồng EUR,
+                                                               tối thiểu 5 USD
+                                                               với các đồng
+                                                               ngoại tệ khác) +
+                                                               Điện phí + Phí
+                                                               Ngân hàng đại
+                                                               lý.
+2.5.2               Chuyển tiền đi nước ngoài bằng
+                    ngoại tệ online
+2.5.2.1             Chuyển tiền đi nước ngoài bằng ngoại                           0.1%/lệnh
+                    tệ online cho KH thường                                       (tối thiểu 10
+                                                                                  USD, không
+          CN11223                                             Không áp dụng         bao gồm
+                                                                                   Điện phí &
+                                                                                    Phí ngân
+                                                                                  hàng đại lý)
+2.5.3     CN13254   Sửa đổi/Huỷ lệnh chuyển tiền             - Lệnh chuyển          Không áp
+                                                             tiền < 20 USD:           dụng
+                                                             5USD/ giao dịch-
+                                                             Lệnh chuyển tiền
+                                                             >20 USD: 5USD/
+
+                                                                                          Trang số: 4/6
+                                       TCB Public Document
+                                                              giao dịch + điện
+                                                              phí + phí trả cho
+                                                              ngân hàng nước
+                                                              ngoài theo thực tế
+2.5.4     CN13261   Phí nước ngoài do người chuyển tiền
+                    chịu (OUR)
+2.5.4.1             Thu hộ NHĐL mức cố định sau:                  25USD/30EUR/20 GBP
+2.5.4.2             Tạm thu hộ NHĐL mức phí sau:
+   a                AUD/CHF/CAD/SGD/THB                                    25 USD
+   b                JPY                                                 0.05%/Lệnh
+                                                                      Min: 5.000 JPY
+  c                 HKD                                                   300 HKD
+  d                 Ngoại tệ khác                                     Thu theo thực tế
+2.5.5     CN51101   Phí thoái hối chuyển tiền đến              5 USD + điện phí + phí trả cho
+                                                              ngân hàng nước ngoài theo thực
+                                                                              tế
+ 2.6      CN16301   Điện phí                                       5USD thu từ KH TCB.
+                                                               Trường hợp phí BEN: 15 USD
+                                                              (các ngoại tệ khác tương đương)
+                                                                    thu từ người hưởng
+  3                 Phí tra soát
+ 3.1                Phí tra soát đối với tiền ngoại tệ
+  a       CN13501   Chuyển tiền đến từ nước ngoài               5USD/giao dịch + 5USD điện
+                                                                              phí
+  b                 Chuyển tiền đi nước ngoài                 5USD/giao dịch + điện phí + phí
+                                                                trả cho ngân hàng nước ngoài
+                                                                          theo thực tế
+  c                 Chuyển tiền trong nước                     3USD/giao dịch
+2.4.2               Chuyển tiền sang tài khoản ngoài            0.03%/ số tiền
+                    Techcombank                                    giao dịch
+                                                                  (Tối thiểu:
+                                                                 12,000 VNĐ,
+                                                                      Tối
+                                                              đa:1,000,000VN
+                                                                      Đ)
+ 3.2      CN13511   Phí tra soát với tiền VNĐ                    15,000 VNĐ/          Miễn phí   B
+                                                                   giao dịch
+  4                 Dịch vụ thu hộ học phí                                                       A
+ 4.1      CN13401   Dịch vụ thu hộ học phí qua ủy nhiệm       - Miễn phí 1 năm     Không áp
+                    thu - Trích tiền từ tài khoản phụ huynh   đầu tiên kể từ        dụng
+                    học sinh theo danh sách đổ vào tài        ngày ký hợp
+                    khoản pháp nhân của nhà trường mở         đồng
+                    tại Techcombank                           - 1,000VND/món
+                                                              kể từ năm thứ 2
+                                                              trở đi
+ 4.2                Dịch vụ thu hộ học phí tại quầy giao      Áp dụng phí nộp
+                    dịch Techcombank - Phụ huynh học          tiền mặt vào tài
+                    sinh đến quầy giao dịch chuyển tiền       khoản VND và
+                                                              phí chuyển khoản
+
+                                                                                         Trang số: 5/6
+                                       TCB Public Document
+                      hoặc chuyển khoản vào tài khoản nhà     đi trong nước từ
+                      trường để đóng học phí                  tài khoản VND
+
+  4.3      CN13403    Dịch vụ thu hộ học phí qua F@st i-       Không áp dụng     Miễn phí
+                      bank/ F@st Mobile - Phụ huynh học
+                      sinh sử dụng dịch vụ F@st i-
+                      Bank/F@st Mobile để đóng học phí
+Các trường hợp miễn giảm phí
+   •    Chuyển tiền bằng ngoại tệ tại TCB: Miễn phí tín dụng trên tài khoản có giá trị < 20 USD
+        (Mã số CN51101)
+
+
+
+
+                                                                                      Trang số: 6/6
+                                        TCB Public Document
+

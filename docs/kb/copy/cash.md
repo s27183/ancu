@@ -101,6 +101,10 @@ template ids the resolver references, each a `{vi, en}` pair.
       "vi": "Thuế trước bạ khi hoàn tất giao dịch",
       "en": "Transfer duty at settlement"
     },
+    "event_registration": {
+      "vi": "Phí đăng bộ sang tên và thế chấp (do bang quy định)",
+      "en": "Title registration — transfer and mortgage (set by the state)"
+    },
     "event_other_costs": {
       "vi": "Chi phí giao dịch (đăng bộ, kiểm định, sang tên)",
       "en": "Transaction costs (registration, inspection, conveyancing)"
@@ -129,9 +133,9 @@ template ids the resolver references, each a `{vi, en}` pair.
       "vi": "Khoản vay và tiền đặt cọc tính theo mức chuẩn LVR 80%. Với căn hộ, một số ngân hàng có thể giới hạn LVR thấp hơn (thường khoảng 70–80%) — khi đó cần đặt cọc nhiều hơn. Hãy hỏi môi giới tín dụng về loại tài sản này.",
       "en": "Loan and deposit use the 80% LVR baseline. For an apartment, some lenders may cap the LVR lower (commonly about 70–80%), which would need a larger deposit. Ask a mortgage broker about this security type."
     },
-    "assume_fx_not_included": {
-      "vi": "Chi phí chuyển đổi ngoại tệ (VND sang AUD) chưa được tính vào tổng số tiền cần — khoản này sẽ được thêm vào khi biết số tiền chuyển từ Việt Nam.",
-      "en": "The VND-to-AUD currency-transfer cost is not yet included in the total — it's added once the transfer amount from Vietnam is known."
+    "assume_fx_estimated": {
+      "vi": "Chi phí chuyển tiền từ Việt Nam (VND sang AUD) được ước tính theo tỷ lệ 0,5–4% số tiền chuyển (tiền đặt cọc cộng thuế và phí). Báo giá thực tế từ ngân hàng hoặc dịch vụ chuyển tiền sẽ cho con số chính xác.",
+      "en": "The cost of sending money from Vietnam (VND to AUD) is estimated at 0.5–4% of the amount sent (the deposit plus duty and fees). A live quote from a bank or transfer service gives the actual figure."
     },
     "assume_no_lmi_at_conservative_deposit": {
       "vi": "Giả định không cần bảo hiểm khoản vay (LMI) vì mức đặt cọc ước tính ({pct}%) cao hơn ngưỡng 20%; đây là giả định ban đầu, không phải chính sách của một ngân hàng cụ thể.",

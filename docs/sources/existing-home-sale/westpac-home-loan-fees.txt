@@ -1,0 +1,248 @@
+Source: https://www.westpac.com.au/personal-banking/home-loans/fees/
+Retrieved: 2026-10-16
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML 8fcb0f8a93c4a51b62a5409c4851e313f5df44f660f6d7fefe026efc93a8f5d2
+
+Our Home Loan Fees | Westpac
+Home loan fees & costs
+We’re here to help you understand your home loan fees and costs, including upfront, ongoing and other fees.
+style
+layout-12
+There are no Westpac fees for:
+Loan increases (property valuer fee may apply)
+Extra repayments on variable loans
+Up to $30k in extra repayments on fixed loans (break costs [#] may apply if you repay more)
+Redrawing from your loan [#]
+Construction option (property valuer fees may apply)
+Portability option (moving house)
+Repayment Holidays
+Loan switching (changing loan/ repayment type – break costs [#] may apply for changes to a fixed rate loan)
+style
+layout-4-8
+leftColumnCount
+1
+What fees are on my Westpac home loan?
+true
+false
+style
+layout-12
+leftColumnCount
+0
+For owner occupied and investor loans.
+Fees and costs
+Amount
+Upfront
+Lending establishment fee
+$0
+Document processing fee​
+$100
+Ongoing
+Monthly loan account fee
+$0
+If applicable
+Lenders Mortgage Insurance premium (may be payable if your loan-to-value ratio is more than 80% of your property’s value)
+Individual calculation
+Additional bank cheque at settlement
+$10
+Missed payment fee
+$15
+Overdrawn fee
+$15
+Property valuer fee (may be payable if a valuation is needed)
+Determined by external valuer's fee
+Loan discharge fee
+$350 per settlement activity
+See more about our basic variable home loan
+label
+Flexi First Option – basic variable home loan
+For owner occupied and investor loans.
+Fees and costs
+Packaged [#] amount
+Without package amount
+Upfront
+Lending establishment fee
+$0
+$600
+Document processing fee​
+$100
+$100
+Ongoing
+Annual Premier Advantage Package fee
+$395
+-
+Monthly loan account fee
+$0
+$8
+Monthly account-keeping fee on any linked offset account
+Waived [#]
+Waived [#]
+If applicable
+Lenders Mortgage Insurance premium (may be payable if your loan-to-value ratio is more than 80% of your property’s value)
+Individual calculation
+Individual calculation
+Additional bank cheque at settlement
+$10
+$10
+Stop cheque payment fee
+$12
+$12
+Missed payment fee
+$15
+$15
+Overdrawn fee
+$15
+$15
+Property valuer fee (may be payable if a valuation is needed)
+Determined by external valuer's fee
+Determined by external valuer's fee
+Loan discharge fee
+$350 per settlement activity
+$350 per settlement activity
+See more about our variable home loan with offset account
+label
+Rocket – variable home loan with offset
+1-5 year loan term for owner occupiers and investors.
+Fees and costs
+Packaged [#] amount
+Without package amount
+Upfront
+Lending establishment fee
+$0
+$600
+Document processing fee​
+$100
+$100
+Ongoing
+Annual Premier Advantage Package fee
+$395
+-
+Monthly loan account fee
+$0
+$8
+If applicable
+Lock-in fee (to lock-in a fixed rate)
+0.10% of loan amount
+0.10% of loan amount
+Lenders Mortgage Insurance premium (may be payable if your loan-to-value ratio is more than 80% of your property’s value)
+Individual calculation
+Individual calculation
+Break cost [#]
+Individual calculation
+Individual calculation
+Additional bank cheque at settlement
+$10
+$10
+Missed payment fee
+$15
+$15
+Overdrawn fee
+$15
+$15
+Property valuer fee (may be payable if a valuation is needed)
+Determined by external valuer's fee
+Determined by external valuer's fee
+Loan discharge fee
+$350 per settlement activity
+$350 per settlement activity
+See more about our fixed options home loan
+label
+Fixed Options – fixed interest home loan
+A short-term variable interest loan for owner occupiers.
+Fees and costs
+Amount
+Upfront
+Lending establishment fee
+$600
+Document processing fee​
+$100
+Ongoing
+Loan account fee
+$8/month
+If applicable
+Overdrawn fee
+$15
+Property valuer fee (may be payable if a valuation is needed)
+Determined by external valuer's fee
+Loan discharge fee
+$350 per settlement activity
+See more about our bridging loan .
+label
+Bridging Loan – to help you buy your next home
+For Sustainable Upgrades Home Loan:
+Fees and costs
+Amount
+Upfront
+Lending establishment fee
+$0
+Ongoing
+Monthly loan account fee
+$0
+If applicable
+Overdrawn fee
+$15
+Missed payment fee
+$15
+Loan Discharge Fee
+$0
+See more about our Sustainable Upgrades Home Loan
+label
+Sustainable Upgrades Home Loan
+What are some of the other costs of buying a home?
+Upfront Government costs can include:
+Government transfer/stamp duty, based on your home’s value (first home buyers could be eligible for grants and concessions)
+Government mortgage registration fee
+Government land tax and registration of title.
+Estimate yours now
+Upfront non-bank costs can include:
+Legal or conveyancing fees
+Pest, building or strata reports
+Optional independent valuer’s fee.
+Estimate yours now
+Ongoing non-bank costs can include:
+Local Government council rates
+Utilities, like electricity
+Insurance
+Strata levies, for most units
+Home maintenance.
+grey
+Keep exploring
+Cost calculators
+Stamp duty and LMI calculator
+View all calculators
+none
+Interest rates
+What is a comparison rate?
+Compare home loans
+none
+Read more
+Investment property costs
+Fixed loan break costs
+grey
+We're here to help
+true
+Save time, apply online
+Apply in around 10-20 mins to buy a home or refinance to Westpac.
+icon
+phone-outlined
+Start applying
+[BVAR#wdp-domain]/cassini/applicationprerequisites/landing?fid=hl apply-online
+Talk with us
+8am-8pm, Mon-Fri
+9am-6pm, Sat-Sun (Sydney time)
+Or find your nearest branch
+icon
+person-outlined
+Call 132 558
+tel:132558
+true
+Book an appointment
+Pick a time and place that suits you to talk to a home loan specialist.
+icon
+calendar-outlined
+Book appointment
+[BVAR#wdp-domain]/cassini/ntb0/bookabanker?action=create&fid=hl book-app
+style
+layout-12
+Things you should know
+/content/dam/westpac/au/cf/disclaimers/home-loans/hl-home-loans-general-terms
+style
+layout-12

@@ -1,7 +1,7 @@
 ---
 slug: kb.investor.property-management-fees
 effective_from: 2025-07-01
-last_verified: 2026-07-06
+last_verified: 2026-10-16
 sources:
   - url: https://moneysmart.gov.au/property-investment/buying-an-investment-property
     retrieved: 2026-07-06
@@ -9,6 +9,18 @@ sources:
     retrieved: 2026-07-06
   - url: https://www.canstar.com.au/home-loans/real-estate-commission-fees/
     retrieved: 2026-07-06
+  - url: https://www.localagentfinder.com.au/blog/property-management-commission-fees
+    retrieved: 2026-10-16
+    path: docs/sources/investor/laf-property-management-fees.txt
+    quotes:
+      - "The national average management fee across Australia is approximately 7.5% of weekly rent. The average letting fee is approximately 1.4 weeks' rent ."
+  - url: https://www.propspotter.com.au/property-management-fees
+    retrieved: 2026-10-16
+    path: docs/sources/investor/propspotter-property-management-fees.txt
+    quotes:
+      - "A fee closer to 5% could mean you are paying for management only."
+      - "Regional NSW landlords pay 7–12%, compared to Sydney's 5.4%."
+      - "In Sydney, expect 1–2 weeks' rent, averaging 1.2 weeks."
 ---
 
 # Property management fees — structures and benchmarks
@@ -42,13 +54,80 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
   "fills": [],
   "parameters": {
     "management_fee_pct_default": { "type": "percentage", "value": 7.5, "note": "CONVENTION — default management fee as % of rent collected (the yield_modelling default); plus GST; charged on rent collected so vacancy reduces it" },
-    "management_fee_pct_low": { "type": "percentage", "value": 5, "note": "CONVENTION — lower end of the management-fee band; varies by state/agency, negotiable" },
-    "management_fee_pct_high": { "type": "percentage", "value": 10, "note": "CONVENTION — upper end of the management-fee band" },
-    "letting_fee_weeks_of_rent_low": { "type": "number", "value": 1, "note": "CONVENTION — one-off letting/leasing fee on a NEW tenancy, lower end (weeks of rent, plus GST); recurs on turnover" },
-    "letting_fee_weeks_of_rent_high": { "type": "number", "value": 2, "note": "CONVENTION — letting fee, upper end (weeks of rent)" },
     "lease_renewal_fee_applies": { "type": "bool", "value": true, "note": "CONVENTION — a smaller lease-renewal fee may apply where the agency charges one (a few hundred dollars or a fraction of a week's rent)" },
     "sundries_loading": { "type": "string", "value": "modest loading for statement/admin, new-tenancy advertising, routine-inspection fees where applicable", "note": "CONVENTION — small per-agency charges, bundled into the PM line as a modest loading" },
     "fee_charged_on_rent_collected": { "type": "bool", "value": true, "note": "the management % is on rent COLLECTED — vacancy reduces it; letting fee recurs per new tenancy, so turnover raises cost" }
+  },
+  "lookup": {
+    "fee_lines": {
+      "note": "one entry per fee the buyer cannot know until they hire someone or get a quote; the engine emits one cash event per applicable entry (behavior 83)",
+      "entries": [
+        {
+          "id": "property_management",
+          "phase": "own",
+          "timing": "per_year",
+          "tier": "CONVENTION",
+          "basis": "pct_of_rent",
+          "low": 5,
+          "high": 12,
+          "applies": {
+            "modes": [
+              "investor-domestic-au",
+              "investor-foreign-au"
+            ],
+            "states": "all",
+            "property": "any"
+          },
+          "optional": false,
+          "note": "national average about 7.5%; regional NSW up to 12% (the prior band was 5–10%)",
+          "label": {
+            "vi": "Phí quản lý cho thuê (property management)",
+            "en": "Property management fee"
+          },
+          "payer": {
+            "vi": "Chủ nhà trả, trừ thẳng vào tiền thuê; được khấu trừ thuế",
+            "en": "The owner pays, taken from the rent; tax-deductible"
+          },
+          "drivers": {
+            "vi": "Thành phố lớn cạnh tranh (~5–7,5%) rẻ hơn vùng xa (tới ~12%); có thể thương lượng. Tính trên tiền thuê thực thu, cộng GST.",
+            "en": "Competitive capital cities (~5–7.5%) cost less than regional areas (up to ~12%); negotiable. Charged on rent collected, plus GST."
+          },
+          "source": "https://www.propspotter.com.au/property-management-fees"
+        },
+        {
+          "id": "letting_fee",
+          "phase": "own",
+          "timing": "per_year",
+          "tier": "CONVENTION",
+          "basis": "pct_of_rent",
+          "low": 1.9,
+          "high": 3.8,
+          "applies": {
+            "modes": [
+              "investor-domestic-au",
+              "investor-foreign-au"
+            ],
+            "states": "all",
+            "property": "any"
+          },
+          "optional": false,
+          "note": "1–2 weeks' rent ÷ 52 weeks, assuming one re-let a year; national average about 1.4 weeks",
+          "label": {
+            "vi": "Phí tìm người thuê (letting fee)",
+            "en": "Letting fee (finding a tenant)"
+          },
+          "payer": {
+            "vi": "Chủ nhà trả mỗi khi có người thuê mới",
+            "en": "The owner pays each time a new tenant signs"
+          },
+          "drivers": {
+            "vi": "Khoảng 1–2 tuần tiền thuê mỗi lần tìm người thuê mới; dòng này giả định mỗi năm đổi người thuê một lần. Người thuê ở lâu thì ít tốn hơn.",
+            "en": "About 1–2 weeks' rent per new tenancy; this line assumes one new tenancy a year. A tenant who stays longer makes it cheaper."
+          },
+          "source": "https://www.propspotter.com.au/property-management-fees"
+        }
+      ]
+    }
   }
 }
 ```

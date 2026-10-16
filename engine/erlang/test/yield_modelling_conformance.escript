@@ -184,28 +184,30 @@ per_property_cases() ->
     [Y5Lo, Y5Hi] = g(HO, <<"year_5_projected_cash_flow">>),
     [Y10Lo, Y10Hi] = g(HO, <<"year_10_projected_cash_flow">>),
     %% HOUSE — pre-loan (B1) EXACT bands:
-    %%   income [31273,36317]; opex [10445,18624]; gross [3.5,4.1]; net-pre [1.4,2.8]
+    %%   income [31273,36317]; opex [10975,20174]; gross [3.5,4.1]; net-pre [1.2,2.8]
+    %%   (opex's two insurances are the fee lines since behavior 83: building 1400–3050 +
+    %%   landlord 430–1200, up from 1000–2000 + 300–700 ⟹ +530 low, +1550 high)
     %% post-loan (B3a) — loan = 920k×80% = 736k; rate = 6.0+0.35 = 6.35%; interest-only:
     %%   interest = round(736000×6.35%) = 46736
-    %%   CF       = [31273−18624−46736, 36317−10445−46736]   = [−34087, −20864] (negatively geared)
-    %%   /week    = [round(−34087/52), round(−20864/52)]      = [−656, −401]
-    %%   net-post = CF ÷ 920k × 100                            = [−3.7, −2.3]
+    %%   CF       = [31273−20174−46736, 36317−10975−46736]   = [−35637, −21394] (negatively geared)
+    %%   /week    = [round(−35637/52), round(−21394/52)]      = [−685, −411]
+    %%   net-post = CF ÷ 920k × 100                            = [−3.9, −2.3]
     [check("house: renderer still calculator", HRend, <<"calculator">>),
      check("house: annual_rental_income_year_1 = effective band [31273,36317]",
            g(HO, <<"annual_rental_income_year_1">>), [31273, 36317]),
-     check("house: annual_operating_expenses_year_1 = band [10445,18624]",
-           g(HO, <<"annual_operating_expenses_year_1">>), [10445, 18624]),
+     check("house: annual_operating_expenses_year_1 = band [10975,20174]",
+           g(HO, <<"annual_operating_expenses_year_1">>), [10975, 20174]),
      check("house: gross_yield = band [3.5,4.1]", g(HO, <<"gross_yield">>), [3.5, 4.1]),
-     check("house: net_yield_pre_loan = band [1.4,2.8]", g(HO, <<"net_yield_pre_loan">>), [1.4, 2.8]),
+     check("house: net_yield_pre_loan = band [1.2,2.8]", g(HO, <<"net_yield_pre_loan">>), [1.2, 2.8]),
      %% post-loan cluster (B3a):
      check("house: annual_interest_year_1 = 46736 (736k loan × 6.35%, scalar point)",
            g(HO, <<"annual_interest_year_1">>), 46736),
-     check("house: cash_flow_before_tax_year_1 = band [-34087,-20864]",
-           g(HO, <<"cash_flow_before_tax_year_1">>), [-34087, -20864]),
-     check("house: cash_flow_before_tax_per_week = band [-656,-401]",
-           g(HO, <<"cash_flow_before_tax_per_week">>), [-656, -401]),
-     check("house: net_yield_post_loan_pre_tax = band [-3.7,-2.3]",
-           g(HO, <<"net_yield_post_loan_pre_tax">>), [-3.7, -2.3]),
+     check("house: cash_flow_before_tax_year_1 = band [-35637,-21394]",
+           g(HO, <<"cash_flow_before_tax_year_1">>), [-35637, -21394]),
+     check("house: cash_flow_before_tax_per_week = band [-685,-411]",
+           g(HO, <<"cash_flow_before_tax_per_week">>), [-685, -411]),
+     check("house: net_yield_post_loan_pre_tax = band [-3.9,-2.3]",
+           g(HO, <<"net_yield_post_loan_pre_tax">>), [-3.9, -2.3]),
      check("house: geared position = negative (whole CF band < 0)",
            g(HO, <<"is_positive_neutral_or_negative_geared_pre_tax">>), <<"negative">>),
      %% year-5/10 projections — structural (income grows 3%, interest flat → CF improves over time).

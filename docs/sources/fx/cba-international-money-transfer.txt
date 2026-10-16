@@ -1,0 +1,176 @@
+Source: https://www.commbank.com.au/personal/international/international-money-transfer.html
+Retrieved: 2026-10-16
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML 3f1a6a1950683ab845f2487b760d946aa6e646ba126c766af4915a9b10791cd4
+
+International Money Transfer - CommBank
+var trackerID = s.c_r("CBATracker") ? "&d_dpuuid="+ s.c_r("CBATracker") : "";
+var oScript = document.createElement('script');
+oScript.type = 'text/javascript';
+oScript.async = false;
+if (typeof trackerID !== "undefined" && trackerID.length > 20) {
+oScript.src = "https://cba.demdex.net/event?d_stuff=1&d_dst=1&d_rtbd=json&d_cts=1&d_cb=aam_tnt_cb&d_dpid=604&d_dpuuid=" + trackerID;
+}
+else{
+oScript.src = "https://cba.demdex.net/event?d_stuff=1&d_dst=1&d_rtbd=json&d_cts=1&d_cb=aam_tnt_cb&d_dpid=604";
+}
+document.getElementsByTagName('head')[0].appendChild(oScript);
+Skip to main content
+Skip to log on
+Skip to search
+Accessibility at CommBank
+Banking
+Home loans
+Insurance
+Investing & Super
+Business
+Institutional
+CommBank Yello
+Log on
+NetBank log on
+CommBiz log on
+CommSec log on
+Banking
+Home loans
+Insurance
+Investing & Super
+Business
+Institutional
+CommBank Yello
+Locate us
+Help & support
+CommBank Search. Dialog start.
+Search CommBank. Start typing…
+Popular searches
+Travel insurance
+Foreign exchange calculator
+Discharge/ Refinance authority form
+Activate a CommBank card
+Cardless cash
+Interest rates & fees
+Help & support
+Locate us
+Contact us
+Personal
+/
+International
+/
+Money Transfer
+International Money Transfers (IMT)
+Send money overseas using NetBank or the CommBank app.
+Send now
+IMT fees waived
+When you send money overseas using NetBank or the CommBank app, we’ll waive the transfer fee (excludes AUD to AUD).
+We’ll also absorb any correspondent bank fees for these transfers.
+IMT pre-validation feature
+Send money overseas with more confidence
+Enjoy peace of mind when sending international money transfers (IMT). Our IMT pre-validation feature automatically checks your payment details - so your money gets where it needs to go faster and more securely.
+Track your payments
+Whether you’re sending or receiving IMTs, our payment tracker will keep you up to date on the status of your IMT. Simply log on to NetBank using your Unique End-to-Tracking Code (UETR) – a 36-character code found in your payment details.
+More than 200 countries, over 30 currencies
+Want to send money to friends and family overseas for a special occasion, or to cover their day-to-day expenses? Need to pay an overseas bill or invoice? You can send an (IMT) to more than 200 countries, in over 30 currencies from the CommBank app, NetBank or at your nearest branch.
+Download the CommBank app:
+Making business related payments?
+If you're planning to make payments to an overseas supplier or would like to pay a business related invoice or bill, go to International Money Transfer for business.
+Take me there
+How to send money overseas
+To transfer money to someone overseas, you’ll need their full name, home address, account number or International Bank Account Number (IBAN) and the SWIFT or Bank Identification Code (BIC) of their bank
+Tip: if you convert your payment into foreign currency and send from NetBank or the CommBank app, you’ll lock in the exchange rate and we’ll waive the transfer fee.
+Your checklist
+Before you send money
+Ask the payee for their bank details
+Choose which CommBank account to transfer the money from
+Check your transfer limit. You can increase it in NetBank or the CommBank app and make sure you’re registered for Netcode SMS
+Check the exchange rate to calculate your transfer amount
+Always double-check you’ve entered the correct information before you confirm the transfer
+Once your money is sent
+IMT’s usually take 1 business day to be delivered, but can take longer depending on the overseas country, correspondent and recipient bank requirements, and local regulatory practices
+Transfers made on a weekend or a public/bank holiday will be processed the following business day
+You can trace, amend or cancel an IMT or track your payment using the payment tracker in NetBank
+How to send an IMT
+Send to an account number using NetBank or the CommBank app
+Log on to NetBank , go to Transfers and BPAY then select International money transfers .
+Or log on to the CommBank app, tap Pay someone then Overseas transfer
+Choose your account, destination country and currency
+Add the payee’s details
+Double-check the details you’ve entered are correct
+In branch
+You can also send money overseas at your nearest branch (minimum AUD5,000 per transfer).
+It’s quicker to make a transfer online or using NetBank or the CommBank app.
+International Money Transfer (IMT)
+Sending an IMT using NetBank or the CommBank app
+When you send money overseas using NetBank or the CommBank app, we’ll waive the transfer fee. (excludes AUD to AUD).
+We’ll pay any correspondent bank fees when you send an IMT in any currency, as long as the originating account currency is different to the payment currency (i.e. a cross-currency IMT) – e.g. using an AUD account to send a payment in USD. We won’t cover any fees that may be charged by the payee’s bank.
+Sending an IMT using CommBiz
+We'll pay any correspondent bank fees when you send a cross-currency IMT (Japanese Yen excluded).
+If you use a Foreign Currency Account to send a same-currency IMT, for select currencies, you have the option to pay a separate upfront fee to cover the correspondent bank fees. We won’t cover any fees that may be charged by the payee’s bank.
+Sending an IMT in-branch
+We’ll pay any correspondent bank fees when you send a cross-currency IMT – e.g. using an AUD account to send a payment in USD.
+If you use a Foreign Currency Account to send a same-currency IMT, for select currencies, you have the option to pay a separate upfront fee to cover the correspondent bank fees. We won’t cover any fees that may be charged by the payee’s bank.
+Find out more about fees and charges for IMTs .
+Fees and charges
+Description
+Fee
+Issued via a branch or manual payment instruction. 1 , 3
+$30.00 per transfer
+Issued via Digital channels. Funds debited from an AUD account and converted to foreign currency, or funds debited from a Foreign Currency Account. 3,5
+Transfer fee waived
+Issued via NetBank and CommBank app. Funds debited and credited in AUD currency (no FX conversion). 3
+$30.00 per transfer
+Issued via CommBiz. Funds debited and credited in AUD currency (no FX conversion). 3
+Transfer fee waived
+Cancellation and request for funds to be returned 2,3,4
+$25.00 per request plus overseas bank’s costs
+Amendment to payment instruction, i.e. payee, bank, address when requested by customer, or where the overseas bank is unable to process payment on original instruction. 3,4
+$25.00 per request plus overseas bank’s costs
+Investigation of sent International Money Transfer (trace) 2,3,4
+$25.00 per investigation includes any subsequent follow up request. To save on fees, check your payment status using our payment tracker before lodging a trace.
+Receiving money from overseas
+The person sending you money will need your full name and home address (PO Boxes cannot be used). They’ll also need:
+Bank name: Commonwealth Bank of Australia
+CommBank BIC/SWIFT code: CTBAAU2S
+Your 6 digit BSB and 8 digit account number (card numbers are not accepted).
+Account name and address (PO Boxes cannot be used).
+Fees and charges
+Description
+Fee
+For credit of a Commonwealth Bank Australian dollar (AUD) account (regardless of currency) 6
+Up to $11.00 per transfer
+For credit of a CommBank Foreign Currency Account 6
+Up to $11.00 per transfer
+Support
+FAQs
+What details do I provide if someone’s transferring money to me from overseas?
+How do I transfer money overseas?
+What do I do if my IMT hasn’t arrived?
+What currencies are available?
+Tools
+Currency converter
+Foreign exchange rates
+International payment tracker
+Guidance
+Mistakes to avoid when transferring money overseas
+Message us 24/7
+Get instant help from Ceba in the CommBank app or connect with a specialist who can message you back. You’ll need CommBank app notifications turned on so you know when you’ve received a reply.
+Message us
+New to CommBank?
+Open a Foreign Currency account
+Show me how
+Open a Smart Access bank account with a Debit Mastercard
+Discover how
+Choose one of our savings accounts
+Discover more
+We can help
+Your questions answered
+Contact us
+Visit your nearest branch
+Things you should know
+1 Fees must be paid in Australian Dollars or debited from an Australian Dollar account. For more information about fees and charges for international payments, read our Standard fees and charges for international payments and travel funds .
+Read about our IMT terms and conditions for NetBank and the CommBank app .
+2 This is a request only and is dependent on the overseas bank obtaining the relevant debit authority to be able to return funds. Returned funds will be converted back to the currency of the funding account at the published Bank buys IMT rate on the day it is credited to the funding account.
+3 Overseas bank charges (which may vary from country to country) could apply in addition to the charges listed above.
+4 Please note that amendment requests are not available for IMITs processed through payment agents via the CommBank app; only trace and cancellation requests are permitted for such transactions.
+5 Digital channels include CommBank app, NetBank and CommBiz.
+6 Fee charged depends on arrangements with overseas banks
+The CommBank app is free to download however your mobile network provider charges you for accessing data on your phone. Find out about the minimum operating system requirements on the CommBank app page . Terms and conditions are available on the app. NetBank access with NetCode SMS required.
+Commonwealth Bank of Australia ABN 48 123 123 124.
+Commonwealth Bank

@@ -74,7 +74,10 @@ fill(Args, Upstream) ->
         end,
     %% The only upstream read: the set of cash_event ids, for budget_ref validation —
     %% harvested from every upstream outcome that exposes the field.
-    ValidRefs = sets:from_list([maps:get(<<"id">>, E) || E <- harvest_cash_events(Upstream)]),
+    %% An event's `group` counts too: behavior 83 split other_buying_costs into one line per
+    %% fee, each grouped under that id, so a ref to the group links all of its lines.
+    ValidRefs = sets:from_list(lists:append([[maps:get(<<"id">>, E) | group(E)]
+                                             || E <- harvest_cash_events(Upstream)])),
     %% The authored structure (layout) + bilingual prose (copy) from the two KB docs.
     {ok, ActionsCj} = fh_engine_kb:kb_rules(ActionsDoc),
     {ok, RisksCj}   = fh_engine_kb:kb_rules(RisksDoc),
@@ -152,6 +155,12 @@ risk(Phase, Def, RisksDoc) ->
 index(Cj, Key) ->
     Phases = maps:get(<<"phases">>, maps:get(<<"layout">>, Cj, #{}), []),
     maps:from_list([{maps:get(<<"phase">>, P), maps:get(Key, P, [])} || P <- Phases]).
+
+group(E) ->
+    case maps:get(<<"group">>, E, null) of
+        G when is_binary(G) -> [G];
+        _ -> []
+    end.
 
 %% honest-partial: keep a budget_ref only when it names a cash_event present in THIS
 %% buyer's budget_envelope; otherwise drop it to null (never a fabricated link).

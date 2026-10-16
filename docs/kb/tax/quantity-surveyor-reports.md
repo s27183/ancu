@@ -1,12 +1,23 @@
 ---
 slug: kb.tax.quantity-surveyor-reports
 effective_from: 2025-07-01
-last_verified: 2026-06-23
+last_verified: 2026-10-16
 sources:
   - url: https://www.ato.gov.au/individuals-and-families/investments-and-assets/property-and-land/residential-rental-properties/rental-expenses/depreciating-assets-in-rental-properties
     retrieved: 2026-06-23
   - url: https://www.ato.gov.au/law/view/document?docid=TXR/TR9725/NAT/ATO/00001
     retrieved: 2026-06-23
+  - url: https://www.washingtonbrown.com.au/blog/depreciation-schedule-cost/
+    retrieved: 2026-10-16
+    path: docs/sources/tax/washington-brown-depreciation-schedule-cost.txt
+    quotes:
+      - "Typically, you could expect to pay between $385*-$770 for a depreciation schedule."
+      - "$590-$770 is a fairly standard price for an established, residential home."
+  - url: https://tenfoldwealthaccountants.com.au/professional-fee-schedule/
+    retrieved: 2026-10-16
+    path: docs/sources/investor/tenfold-professional-fee-schedule.txt
+    quotes:
+      - "Tax Depreciation Report for Investment Property $495 Via our partners at Duo Tax (special price — normally $700)."
 ---
 
 # Quantity surveyor tax depreciation schedules
@@ -46,11 +57,41 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
     "qs_schedule_fee_deductible":           { "type": "bool", "value": true, "note": "the QS schedule fee is itself tax-deductible" }
   },
   "lookup": {
-    "qs_schedule_cost_band": {
-      "note": "INDICATIVE residential QS depreciation schedule cost (market, no regulator publishes QS fees); resolver places a band, never a point quote",
+    "fee_lines": {
+      "note": "one entry per fee the buyer cannot know until they hire someone or get a quote; the engine emits one cash event per applicable entry (behavior 83)",
       "entries": [
-        { "scope": "residential_typical",      "cost": "385-770", "tier": "INDICATIVE" },
-        { "scope": "established_home_standard", "cost": "590-770", "tier": "INDICATIVE" }
+        {
+          "id": "depreciation_schedule",
+          "phase": "settle",
+          "timing": "one_off",
+          "tier": "CONVENTION",
+          "basis": "fixed",
+          "low": 385,
+          "high": 770,
+          "applies": {
+            "modes": [
+              "investor-domestic-au",
+              "investor-foreign-au"
+            ],
+            "states": "all",
+            "property": "any"
+          },
+          "optional": false,
+          "note": "residential typical $385–$770, established home commonly $590–$770; a second published price ($700 list, accountant-referred) sits inside it",
+          "label": {
+            "vi": "Lập lịch khấu hao thuế (depreciation schedule) bởi chuyên viên định giá xây dựng (quantity surveyor)",
+            "en": "Tax depreciation schedule by a quantity surveyor"
+          },
+          "payer": {
+            "vi": "Chủ nhà trả một lần; phí này được khấu trừ thuế",
+            "en": "The owner pays once; the fee is tax-deductible"
+          },
+          "drivers": {
+            "vi": "Nhà mới hoặc mới sửa nhiều thì đáng làm hơn nhà cũ. Nhà có sẵn thường ~$590–$770; căn hộ hoặc nhà nhỏ có thể rẻ hơn. Làm một lần, dùng suốt đời tài sản.",
+            "en": "Worth more on a new or recently renovated property than an old one. An established home is typically ~$590–$770; a unit or small home can cost less. Done once, used for the asset's life."
+          },
+          "source": "https://www.washingtonbrown.com.au/blog/depreciation-schedule-cost/"
+        }
       ]
     }
   }

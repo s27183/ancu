@@ -45,7 +45,7 @@ fields() ->
     [<<"total_monthly_outgoings_estimate">>, <<"total_annual_outgoings_estimate">>,
      <<"vacancy_fee_at_risk_amount">>, <<"current_year_occupancy_status">>,
      <<"non_resident_tax_filing_required">>, <<"alert_triggers_armed">>,
-     <<"mode_switch_eligible">>, <<"cash_events">>].
+     <<"mode_switch_eligible">>, <<"cash_events">>, <<"fee_pending">>].
 
 foreign_args() -> #{firb_required_any => true}.
 
