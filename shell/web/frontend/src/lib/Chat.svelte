@@ -15,6 +15,7 @@
     import { pick, type LocalizedText } from '$lib/planCard';
     import { describeFailure } from '$lib/turnFailure';
     import QaIntro from '$lib/QaIntro.svelte';
+    import { renderMarkdown } from '$lib/markdown';
 
     let { planCardId }: { planCardId: string } = $props();
 
@@ -161,7 +162,9 @@
                 {#if m.role === 'user'}
                     <div class="chat-msg user"><p>{m.text}</p></div>
                 {:else if m.phase === 'done'}
-                    <div class="chat-msg assistant"><p>{pick(m.answer, $lang)}</p></div>
+                    <!-- The model writes markdown; markdown.ts escapes it first, so {@html}
+                         carries only the tags it writes (behavior 99). -->
+                    <div class="chat-msg assistant chat-md">{@html renderMarkdown(pick(m.answer, $lang))}</div>
                 {:else if m.phase === 'thinking' || m.phase === 'looking'}
                     <div class="chat-msg assistant">
                         <p class="chat-status">
