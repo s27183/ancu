@@ -9,6 +9,7 @@
     // height, which a page feeds into --home-news-h (never a guessed offset).
     import { onMount } from 'svelte';
     import { afterNavigate } from '$app/navigation';
+    import { page } from '$app/state';
     import { getAllNews, type NewsNote } from '$lib/api';
     import NewsTicker from '$lib/NewsTicker.svelte';
     import NewsListSheet from '$lib/NewsListSheet.svelte';
@@ -61,7 +62,8 @@
         note={selected}
         onClose={() => {
             selected = null;
-            listOpen = true;
+            // On the News page the list is the page itself (behavior 88).
+            listOpen = page.url.pathname !== '/news';
         }}
     />
 {/if}

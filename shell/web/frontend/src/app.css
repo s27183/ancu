@@ -3469,12 +3469,13 @@ main {
 .home-ways {
     display: grid;
     gap: var(--sp-4);
-    max-width: 48rem;
+    max-width: 64rem;
     margin: 0 auto;
 }
+/* Three ways in (behavior 88): one row from 48rem, stacked below it. */
 @media (min-width: 48rem) {
     .home-ways {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: repeat(3, 1fr);
         padding-top: var(--sp-8);
     }
 }
@@ -3537,8 +3538,8 @@ main {
     color: var(--muted);
 }
 
-/* The way back home, on the planner's head and floating over the map (top-right, under
-   the band — the map's filters hold the top-left). */
+/* The way back home: first in the head of the planner and the News page, and first in the
+   map's top-left controls row (behavior 88), so it is in the same place on every page. */
 .home-back {
     flex: none;
     align-self: center;
@@ -3563,11 +3564,12 @@ main {
     outline: 2px solid var(--accent);
     outline-offset: 2px;
 }
-.home-back.floating {
-    position: absolute;
-    z-index: 12;
-    top: calc(var(--header-total) + var(--home-news-h, 0px) + 0.75rem);
-    right: 0.75rem;
+.controls-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.controls-row .home-back {
     height: 2.6rem;
     box-sizing: border-box;
     box-shadow: var(--shadow-1);
