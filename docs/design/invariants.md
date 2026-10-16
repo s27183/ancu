@@ -25,7 +25,10 @@ The platform is independent: it is tied to no real-estate, legal or migration
 service, so its plan is an independent check of the whole lifecycle budget,
 for a buyer who already bought through the channel they know and for one who
 does not know where to start; the first screen the user sees leads to this
-position, and the information-not-advice one, in one tap (Son, 2026-10-10).
+position, and the information-not-advice one, in one tap (Son, 2026-10-10), and
+states what the platform does — budget planning, suburb data, news — and what
+it is not — a property listing platform, an advisory service (Son, 2026-10-16:
+many users took it for a listing platform).
 
 **The launch scope is the system as built** (Son, 2026-10-06: "stop at the
 current scope which is good enough for production launch"): Modes A-E with
