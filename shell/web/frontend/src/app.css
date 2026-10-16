@@ -2342,8 +2342,8 @@ main {
 }
 /* News detail sheet (kb-news-feature.md task 28) — content inside NewsDetailSheet.svelte's
    Modal. summary reuses .pp-card's ink/font sizing conventions rather than inventing new
-   ones; it's rendered via renderInlineMarkdown (2026-07-09) since KB summaries carry
-   **bold**/*italic* — the raw diff JSON is intentionally NOT shown here (it's a build-time
+   ones; it's rendered via renderMarkdown (behavior 103) since KB summaries carry
+   paragraphs, **bold**/*italic* and tables — the raw diff JSON is intentionally NOT shown here (it's a build-time
    audit artifact, not buyer-facing content; see NewsDetailSheet.svelte). */
 /* Category + date meta line (2026-08) — sits between the Modal's own headline title and
    the summary body, so a note's "what kind of update, how recent" reads before its "what
@@ -2393,6 +2393,39 @@ main {
 }
 .pp-news-summary strong {
     font-weight: 700;
+}
+.pp-news-summary p:last-child {
+    margin-bottom: 0;
+}
+/* A table in a news note (behavior 103: planning levels by visa category) — sans and
+   tabular figures so the columns line up; it scrolls inside its own box on a phone, the
+   page never sideways. */
+.pp-news-summary .md-table {
+    overflow-x: auto;
+    margin: 0 0 0.85em;
+}
+.pp-news-summary table {
+    border-collapse: collapse;
+    font-family: var(--font-sans);
+    font-size: var(--fs-sm);
+    line-height: 1.4;
+    font-variant-numeric: tabular-nums;
+}
+.pp-news-summary th,
+.pp-news-summary td {
+    border-bottom: 1px solid var(--border);
+    padding: 0.35rem 0.6rem 0.35rem 0;
+    text-align: left;
+    vertical-align: top;
+}
+.pp-news-summary th {
+    color: var(--muted);
+    font-weight: 600;
+}
+.pp-news-summary td + td,
+.pp-news-summary th + th {
+    text-align: right;
+    white-space: nowrap;
 }
 .pp-news-summary code {
     background: var(--bg);

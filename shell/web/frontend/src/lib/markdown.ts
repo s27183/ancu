@@ -1,9 +1,10 @@
 // Bilingual -> P-4 · The engine is coupled to no shell -> The web frontend -> markdown text renders as formatted HTML, escape-first
 // Two readers, one escape-first renderer, no markdown library (package.json has none;
 // behavior 99 kept it so):
-//   - renderInlineMarkdown: KB-authored single-paragraph prose (news summaries) —
-//     **bold**/*italic*/`code`/[text](url), the docs/kb convention.
-//   - renderMarkdown: the assistant's answer (Chat.svelte). The model writes markdown —
+//   - renderInlineMarkdown: one line of prose — **bold**/*italic*/`code`/[text](url).
+//   - renderMarkdown: the assistant's answer (Chat.svelte) and a news summary
+//     (NewsDetailSheet.svelte, behavior 103: paragraphs and a planning-levels table,
+//     written in the KB note). The model writes markdown —
 //     paragraphs, - and 1. lists, # headings, tables — and the buyer saw the marks raw
 //     (behavior 99, Son 2026-10-16). The engine stays shell-agnostic: it sends the text
 //     as written and this shell decides how it looks. Headings render as bold lines, not
