@@ -1,0 +1,584 @@
+Source: https://www.titlesqld.com.au/fees-payments/
+Retrieved: 2026-10-16
+Extracted: pdftotext -layout of the FY2026/27 Fees PDF (archived as docs/sources/qld/Titles-Registry-Fees_FY-2026-to-2027.pdf); sha256 of the fetched PDF 0f7dd2180fc0aa3d4e99c13e2c28e58da249e1c1accdf8c242546760f672056f
+
+FY2026/27 Fees
+
+
+
+
+   Queensland Titles Registry Pty Ltd. | ABN 23 648 568 101
+Contents
+
+
+
+Land Title Act 1994                              3
+
+Land Act 1994                                    6
+
+Water Act 2000                                   8
+
+Building Units and Group Titles Act 1980         10
+
+Foreign Ownership of Land Register Act 1988      11
+
+Property Law Act 2023                            12
+
+South Bank Corporation Act 1989                  13
+
+South Bank Corporation Act 1989                  14
+– modified Building Units and Group Titles Act
+1980
+
+                                                      2
+Land Title Act 1994
+
+
+
+
+Matter for which fee payable                                                                             26/27 fee ($)
+1 Creation of an indefeasible title or, on request, a separate indefeasible title (other than a deed
+  of grant)—for each indefeasible title created under section 37 or 57 of the Act                           94.42
+
+
+2 Lodging—
+  (a) an instrument that changes the ownership of a lot or an interest in a lot—
+      (i) to record the death of an individual who is a joint tenant—
+          (A) for 1 lot                                                                                     46.56
+          (B) for each additional lot                                                                         Nil
+      (ii) other than in the circumstances mentioned in subparagraph (i)—
+           (A) for 1 lot                                                                                    248.04
+          (B) for each additional lot                                                                       46.56
+  (b) a request to record a change of name of an individual, or to correct the name of an
+      individual, who is the owner of a lot or an interest in a lot—
+      (i) for 1 lot                                                                                         46.56
+      (ii) for each additional lot                                                                            Nil
+  (c) a plan of survey or an explanatory format plan—
+      (i) for the plan                                                                                      496.12
+      (ii) for each lot or interest surveyed or defined                                                     36.49
+  (d) for establishing a community titles scheme—a request to record the first
+      community management statement for the scheme                                                         248.04
+  (e) for an established community titles scheme—a request to record a new
+      community management statement for the scheme                                                         120.86
+  (f) an application—
+      (i) to reserve a name as the identifying name to be shown in the community management
+          statement for a proposed community titles scheme (a name reservation) under section
+          115F of the Act                                                                                   120.86
+      (ii) to extend a name reservation under section 115G of the Act                                       120.86
+      (iii) to withdraw a name reservation under section 115G(3)(a) of the Act                                Nil
+  (g) a request to record a change of the address for service of a body corporate recorded
+      on an indefeasible title for common property                                                          46.56
+  (h) a request—
+      (i) to cancel registration of a writ of execution under section 118 of the Act                          Nil
+      (ii) to register a discharge or satisfaction of a writ of execution under section 119 of the Act      248.04
+      (i) a request to note the lapsing of a caveat under section 126(5) of the Act                           Nil
+  (j) a standard terms document under section 169(1) of the Act                                               Nil
+  (k) a request to remove from an indefeasible title a lease or easement that has expired or a
+      profit a prendre that has expired or otherwise ended                                                    Nil
+  (l) any other instrument                                                                                  248.04
+
+
+
+
+                                                                                                                         3
+Land Title Act 1994
+
+
+
+ 3 Additional fee for lodging a transfer if the consideration is more than $180,000—
+   (a) for a transfer of a fee simple—for each $10,000 or part of $10,000 more than $180,000          46.56
+
+    (b) for a transfer of a lease under the South Bank Corporation Act 1989—for each $10,000 or
+        part of $10,000 more than $180,000                                                            46.56
+
+
+ 4 Examination of a sketch plan that is part of a lodged document                                     46.56
+
+
+ 5 Obtaining a certified copy of a document mentioned in section 35(1)(b) of the Act                  46.76
+
+
+ 6 Obtaining an image of—
+   (a) a certificate of title—
+       (i) if the image is generated for an entity mentioned in section 35(4) of the Act              21.07
+
+       (ii) otherwise                                                                                 25.71
+
+   (b) a plan of survey—
+       (i) if the image is generated for an entity mentioned in section 35(4) of the Act              22.89
+
+       (ii) otherwise                                                                                 27.56
+
+   (c) any other instrument or document, including a community management statement                   50.16
+
+
+ 7 Search for—
+    (a) an indefeasible title—
+        (i) if the information is generated for an entity mentioned in section 35(4) of the Act       21.07
+
+       (ii) otherwise                                                                                 25.71
+
+   (b) the historical details of a title—
+       (i) if the information is generated for an entity mentioned in section 35(4) of the Act        33.03
+
+       (ii) otherwise                                                                                 37.88
+
+
+ 8 Preparation and giving of written notice of lodgement of a caveat under the Act                    46.56
+
+
+ 9 Depositing—
+    (a) a priority notice under section 139(1) of the Act                                             46.56
+
+    (b) a request to extend or withdraw a priority notice under section 141(1) or 143(1) of the Act   46.56
+
+
+ 10 Depositing an administrative advice, or a request to remove an administrative advice,
+    other than by the State                                                                           36.49
+
+
+ 11 Requisition of an instrument or other document lodged or deposited under section
+    156(1) of the Act                                                                                 46.56
+
+
+ 12 Search of a statement of registered dealing, community titles scheme or administrative
+    advice against an indefeasible title                                                              4.20
+
+                                                                                                              4
+Land Title Act 1994
+
+
+
+
+ 13 Investigative search of a register (not including providing a copy of a document)—
+    (a) if no computer programming is required—for each hour or part of an hour                   161.28
+
+   (b) if computer programming is required—
+       (i) for each hour or part of an hour not involving computer programming time               161.28
+
+       (ii) for each hour or part of an hour involving computer programming time (excluding any
+            part of an hour for which a fee under subparagraph (i) applies)                       450.60
+
+
+ 14 Provision of lodgement support service bundle 1 to an ELN in relation to a
+    conveyancing transaction                                                                      21.07
+
+
+ 15 Provision of lodgement support service bundle 2 to an ELN in relation to a
+    conveyancing transaction                                                                      16.66
+
+
+
+
+                                                                                                           5
+Land Act 1994
+
+
+
+
+Matter for which fee payable                                                                         26/27 fee ($)
+1 Lodging—
+  (a) a document that changes the lessee of a lease, the licensee of a licence or the holder
+      of an interest in a lease or licence—
+      (i) to record the death of an individual who is a joint tenant—
+          (A) for 1 lease or licence                                                                    46.56
+
+          (B) for each additional lease or licence                                                        Nil
+
+      (ii) other than in the circumstances mentioned in subparagraph (i)—
+           (A) for 1 lease or licence                                                                   248.04
+
+          (B) for each additional lease or licence                                                      46.56
+
+  (b) a request to record a change of name of an individual, or to correct the name of an
+      individual, who is a lessee of a lease, a licensee of a licence or a holder of an
+      interest in a lease or licence—
+      (i) for 1 lease or licence                                                                        46.56
+
+      (ii) for each additional lease or licence                                                           Nil
+
+  (c) a surrender of a lease, trustee lease, road licence, occupation licence or permit to occupy         Nil
+
+  (d) a standard terms document under section 318 of the Act                                              Nil
+
+  (e) a plan of survey—
+      (i) for the plan                                                                                  496.12
+
+      (ii) for each lot or interest surveyed or defined                                                 36.49
+
+  (f) a request—
+      (i) to cancel registration of a writ of execution under section 388 of the Act                      Nil
+
+      (ii) to register a discharge or satisfaction of a writ of execution under section 389 of the
+           Act                                                                                          248.04
+
+  (g) a request—
+      (i) to cancel registration of an enforcement warrant under section 61SX of the
+          Forestry Act 1959                                                                               Nil
+
+      (ii) to register a discharge or satisfaction of an enforcement warrant under section
+           61SY of the Forestry Act 1959                                                                248.04
+
+  (h) another document                                                                                  248.04
+
+
+2 Examination of a sketch plan that is part of a lodged document                                        46.56
+
+
+3 Search for—
+  (a) the current details of a lease, licence, permit or reserve—
+      (i) if the information is generated for an entity mentioned in section 284(4) of the
+          Act or section 61TS(4) of the Forestry Act 1959                                               21.07
+
+      (ii) otherwise                                                                                    25.71
+
+  (b) the historical details of a lease or licence—
+      (i) if the information is generated for an entity mentioned in section 284(4) of the
+          Act or section 61TS(4) of the Forestry Act 1959                                               33.03
+
+      (ii) otherwise                                                                                    37.88
+                                                                                                                     6
+Land Act 1994
+
+
+
+
+4 Obtaining an image of—
+  (a) a lease, licence or permit to occupy—
+      (i) if the image is generated for an entity mentioned in section 284(4) of the Act or
+          section 61TS(4) of the Forestry Act 1959                                            21.07
+
+      (ii) otherwise                                                                          25.71
+
+  (b) another document                                                                        50.16
+
+
+5 Obtaining a copy of particulars mentioned in section 284(1)(b) of the Act or
+  section 61TS(1)(b) of the Forestry Act 1959                                                 46.76
+
+
+6 Requisition of a document lodged or deposited under section 305(1) of the Act or
+  section 61TQ(1) of the Forestry Act 1959                                                    46.56
+
+
+7 Search of a statement of registered dealing or administrative advice against a lease
+  or licence                                                                                   4.20
+
+
+8 Investigative search of a register (not including providing a copy of a document)—
+  (a) if no computer programming is required—for each hour or part of an hour                 161.28
+
+  (b) if computer programming is required—
+      (i) for each hour or part of an hour not involving computer programming time            161.28
+
+      (ii) for each hour or part of an hour involving computer programming time (excluding
+           any part of an hour for which a fee under subparagraph (i) applies)                450.60
+
+
+9 Depositing an administrative advice or a request to remove an administrative advice,
+  other than by the State                                                                     36.49
+
+
+10 Preparation and giving of a notice of the lodgement of a caveat under the Act or
+   the Forestry Act 1959                                                                      46.56
+
+
+11 Provision of lodgement support service bundle 1 to an ELN in relation to a
+   conveyancing transaction                                                                   21.07
+
+
+12 Provision of lodgement support service bundle 2 to an ELN in relation to a
+   conveyancing transaction                                                                   16.66
+
+
+
+
+                                                                                                       7
+Water Act 2000
+
+
+
+
+Matter for which fee payable                                                                       26/27 fee ($)
+1 Creation of, on request, a title or separate title for a water allocation, other than under
+  section 146 or 147 of the Act—for each title created                                                94.42
+
+
+2 Lodging—
+  (a) an instrument that changes ownership of a water allocation or an interest in a
+      water allocation—
+      (i) to record the death of an individual—
+          (A) for 1 water allocation                                                                  46.56
+
+          (B) for each additional water allocation                                                      Nil
+
+      (ii) with an instrument changing ownership of a lot or an interest in a lot, other than
+           in the circumstances mentioned in subparagraph (i)—for each water allocation               46.56
+
+      (iii) otherwise—
+            (A) for 1 water allocation                                                                248.04
+
+          (B) for each additional water allocation                                                    46.56
+
+   (b) a certificate of a dealing with a water allocation                                             248.04
+
+   (c) a request to record a change of name of an individual, or to correct the name
+       of an individual, who holds a water allocation or an interest in a water
+       allocation—
+       (i) for 1 water allocation                                                                     46.56
+
+      (ii) for each additional water allocation                                                         Nil
+
+   (d) a request—
+       (i) to cancel the registration of a writ of execution for a water allocation                     Nil
+
+      (ii) to register a discharge or satisfaction of a writ of execution for a water allocation      248.04
+
+   (e) a request to note the lapsing of a caveat claiming an interest in a water allocation             Nil
+
+   (f) a standard terms document for a water allocation                                                 Nil
+
+   (g) a request to remove from the title for a water allocation a lease that has
+       expired or otherwise ended                                                                       Nil
+
+   (h) any other instrument relating to a water allocation                                            248.04
+
+
+3 Depositing—
+  (a) a priority notice for a water allocation                                                        46.56
+
+   (b) a request to extend or withdraw a priority notice for a water allocation                       46.56
+
+
+4 Depositing an administrative advice, or a request to remove an administrative advice,
+  other than by the State                                                                             36.49
+
+
+5 Preparation and giving of a notice of the lodgement of a caveat under the Act                       46.56
+
+
+
+
+                                                                                                                   8
+Water Act 2000
+
+
+
+
+6 Search for—
+  (a) a current title for a water allocation
+      (i) if the information is generated for an entity who provides a service of conducting
+          searches on behalf of other persons                                                     21.07
+
+      (ii) otherwise                                                                              25.71
+
+  (b) the historical details of a title for a water allocation—
+      (i) if the information is generated for an entity who provides a service of conducting
+          searches on behalf of other persons                                                     33.03
+
+      (ii) otherwise                                                                              37.88
+
+7 Obtaining an image of an instrument relating to a water allocation lodged with the registrar    50.16
+
+
+8 Search of a statement of a registered dealing or an administrative advice against a title for
+  a water allocation                                                                               4.20
+
+
+9 Investigative search of the water allocations register (not including providing a copy of
+  a document)—
+  (a) if no computer programming is required—for each hour or part of an hour                     161.28
+
+  (b) if computer programming is required—
+      (i) for each hour or part of an hour not involving computer programming time                161.28
+
+      (ii) for each hour or part of an hour involving computer programming time (excluding
+           any part of an hour for which a fee under subparagraph (i) applies)                    450.60
+
+
+10 Obtaining a certified copy of a water allocation or a registered instrument relating to a
+   water allocation                                                                               46.76
+
+
+11 Requisition of an instrument or document relating to a water allocation lodged with
+   the registrar                                                                                  46.56
+
+
+
+
+                                                                                                           9
+Building Units and
+Group Titles Act 1980
+
+
+
+ Matter for which fee payable                                                                    26/27 fee ($)
+
+ 1 Lodging in the land registry—
+   (a) a plan or a plan of amalgamation mentioned in section 11 of the Act—
+       (i) lodgement fee                                                                            496.12
+
+       (ii) additional fee for each lot in the plan                                                 36.49
+
+   (b) a notice of conversion under section 12 of the Act                                           167.45
+
+   (c) a request to register an order, made under section 25(7A)(c) of the Act,                     167.45
+       directing an amendment of a building units plan
+
+                                                                                                    167.45
+   (d) a notification of a proposed extinguishment of a plan under section 26(1)(a) of the Act
+
+   (e) a notification of an amendment of, addition to or repeal of by-laws under section            167.45
+       30(3) of the Act
+
+                                                                                                    167.45
+   (f) a copy of a referee’s order or the tribunal’s order under section 112(1)(a) of the Act
+
+   (g) another document under the Act                                                               46.56
+
+
+ 2 Furnish of copies of a registered plan or amendment of a registered plan under section 14
+   of the Act                                                                                       36.49
+
+
+ 3 Application to—
+   (a) reserve a name under section 120(1) of the Act                                               120.86
+
+   (b) extend the period for which a name is reserved under section 120(3) of the Act               120.86
+
+
+
+
+                                                                                                                 10
+Foreign Ownership of
+Land Register Act 1988
+
+
+
+Matter for which fee payable                                                                 26/27 fee ($)
+1 Obtaining a title search statement of the details of interests in land held by a person
+  recorded in the register                                                                      25.71
+
+
+2 Preparation and extraction of statistical data from computerised information recorded in
+  the register—
+  (a) if no computer programming is required—for each hour or part of an hour                   161.28
+
+  (b) if computer programming is required—
+      (i) for each hour or part of an hour not involving computer programming time              161.28
+
+      (ii) for each hour or part of an hour involving computer programming time (excluding
+           any part of an hour for which a fee under subparagraph (i) applies)                  450.60
+
+
+
+
+                                                                                                             11
+Property Law Act 2023
+
+
+
+
+Matter for which fee payable                                                                    26/27 fee ($)
+1 Lodging in the land registry any of the following under part 18, division 3 of the Act—
+  (a) an agreement in writing, deed, conveyance or other instrument, other than a lease for
+      less than 3 years, affecting an estate in land
+  (b) a will or devise affecting an estate in land
+  (c) another instrument, record or document                                                       95.67
+
+
+2 Obtaining a copy of a document registered in the land registry under part 18, division 3 of
+  the Act that is—
+  (a) an uncertified copy                                                                          46.56
+
+  (b) a certified copy                                                                             94.42
+
+
+
+
+                                                                                                                12
+South Bank
+Corporation Act 1989
+
+
+
+Matter for which fee payable                                                                      26/27 fee ($)
+1 Lodging in the land registry—
+  (a) a plan for the subdivision or amalgamation of land under section 41(4) of the Act              64.20
+
+   (b) a stratum plan                                                                                152.33
+
+   (c) a boundary adjustment plan                                                                    152.33
+
+   (d) a stratum plan of subdivision                                                                 152.33
+
+   (e) the schedule mentioned in section 42(7) of the Act                                            99.46
+
+   (f) a stratum plan of amalgamation                                                                152.33
+
+   (g) a plan mentioned in section 48(2) of the Act                                                  64.20
+   (h) an instrument mentioned in section 48(2)(b) of the Act                                        99.46
+
+   (i) a management statement                                                                        99.46
+
+   (j) an amendment of a management statement                                                        99.46
+
+   (k) a request to terminate a management statement                                                 99.46
+
+
+2 Additional fee for lodging, in the land registry, a plan mentioned in item 1(a), (b) or (c)
+  that contains more than 9 lots—for each additional lot                                             19.93
+
+
+3 Additional fee for lodging, in the land registry, an instrument mentioned in section 48(2)(b)
+  of the Act that contains more than 9 easements—for each additional easement                        19.93
+
+
+
+
+                                                                                                                  13
+South Bank Corporation Act 1989
+– modified Building Units and
+Group Titles Act 1980
+
+
+
+ Matter for which fee payable                                                                    26/27 fee ($)
+ 1 Lodging in the land registry—
+   (a) a leasehold building units plan, a leasehold plan of amalgamation or a leasehold
+       plan of resubdivision under the modified Building Units and Group Titles Act—
+       (i) lodgement fee                                                                            158.64
+
+       (ii) additional fee if the plan contains more than 9 lots—for each additional lot            19.93
+
+   (b) a notice of conversion under section 12 of the modified Building Units and Group Titles
+       Act                                                                                          99.46
+   (c) a request under section 26B of the modified Building Units and Group Titles Act              99.46
+
+   (d) a notification of an amendment of, addition to or repeal of by-laws under section            99.46
+       30(3) of the modified Building Units and Group Titles Act
+
+   (e) a copy of a referee’s order or the tribunal’s order under section 112(1)(a) of the
+       modified Building Units and Group Titles Act                                                 167.45
+
+   (f) a document required to be lodged in the registry under the modified Building Units
+       and Group Titles Act, other than a document mentioned in paragraphs (a) to (e)               19.93
+
+
+ 2 Furnish of copies of a registered leasehold building units plan or amendment of a
+   registered leasehold building units plan under section 14 of the modified Building Units
+   and Group Titles Act                                                                             36.49
+
+
+ 3 Application to—
+   (a) reserve a name under section 120(1) of the modified Building Units and Group Titles Act      120.86
+
+   (b) extend the period for which a name is reserved under section 120(3) of the
+       modified Building Units and Group Titles Act                                                 120.86
+
+
+
+
+                                                                                                                 14
+titlesqld.com.au
+

@@ -108,9 +108,10 @@ payout_total(Balance, <<"not_applicable">>, [Lo, Hi]) when is_number(Balance) ->
 payout_total(_Balance, _Status, _Fee) ->
     null.
 
+%% the lender's discharge fee is the net-proceeds doc's `mortgage_discharge` fee line
+%% (behavior 83: one owner per figure; the old discharge_fee_*_aud parameters are gone).
 discharge_fee_band() ->
-    [param(?NET_PROCEEDS_KB, <<"discharge_fee_low_aud">>),
-     param(?NET_PROCEEDS_KB, <<"discharge_fee_high_aud">>)].
+    fh_engine_fees:line_band(<<"mortgage_discharge">>).
 
 %% --- CGT: REUSE fh_engine_disposition's own main-residence-exemption computer ---------
 %% disposition:cgt/1 reads Profile's `intended_occupancy_use` (which describes the NEW home
@@ -170,11 +171,6 @@ cgt_assumption(<<"to_verify">>) -> [copy_disposition(<<"assumption_cgt_to_verify
 
 point(V) when is_number(V) -> [V, V];
 point(_)                   -> null.
-
-param(Slug, Key) ->
-    {ok, Cj} = fh_engine_kb:kb_rules(Slug),
-    Params = maps:get(<<"parameters">>, Cj),
-    maps:get(<<"value">>, maps:get(Key, Params)).
 
 -spec copy(binary(), #{binary() => fh_engine_i18n:param()}) -> fh_engine_i18n:localized().
 copy(Id, Params) ->

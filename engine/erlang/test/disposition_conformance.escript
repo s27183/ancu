@@ -117,14 +117,17 @@ figure_cases() ->
      check("horizon_years = 10", g(Outcome, <<"horizon_years">>), 10),
      check("sale_proceeds = ceiling 800000 × growth band over H=10", g(Outcome, <<"sale_proceeds">>),
            [1075133, 1432678]),
-     check("selling_costs = commission band × sale + legal + marketing", g(Outcome, <<"selling_costs">>),
-           [17927, 60644]),
+     %% behavior 83: the sum of the dispose fee lines the seller pays for sure — commission
+     %% 1.5–3.5% × sale [16127, 50144] + marketing [600, 8000] + sale conveyancing [500, 2500]
+     %% + the lender's discharge [150, 500] (no state ⟹ no state discharge registration).
+     check("selling_costs = the committed dispose fee lines", g(Outcome, <<"selling_costs">>),
+           [17377, 61144]),
      check("loan_payout = P&I remaining balance at year 10 (560000 @ 6.0%)", g(Outcome, <<"loan_payout">>),
            [468640, 468640]),
      check("net_proceeds = sale − selling − loan − cgt (interval arithmetic)", g(Outcome, <<"net_proceeds">>),
-           [545849, 946111]),
+           [545349, 946661]),
      check("full_horizon_net_position = net − acquire − hold×H (placed)",
-           g(Outcome, <<"full_horizon_net_position">>), [304849, 724111])].
+           g(Outcome, <<"full_horizon_net_position">>), [304349, 724661])].
 
 %% --- 2. place-never-recompute: net/full are the exported interval arithmetic ---
 
@@ -142,9 +145,9 @@ arithmetic_cases() ->
            g(Outcome, <<"full_horizon_net_position">>), FullFromExport),
      %% interval discipline: net_lo subtracts the HIGH cost ends, net_hi the LOW ends
      check("net_lo = sale_lo − selling_hi − loan_hi − cgt_hi",
-           hd(g(Outcome, <<"net_proceeds">>)), 1075133 - 60644 - 468640 - 0),
+           hd(g(Outcome, <<"net_proceeds">>)), 1075133 - 61144 - 468640 - 0),
      check("net_hi = sale_hi − selling_lo − loan_lo − cgt_lo",
-           lists:last(g(Outcome, <<"net_proceeds">>)), 1432678 - 17927 - 468640 - 0)].
+           lists:last(g(Outcome, <<"net_proceeds">>)), 1432678 - 17377 - 468640 - 0)].
 
 %% --- 3. CGT (Mode-A main residence) -----------------------------------------
 
@@ -250,9 +253,10 @@ investor_cases() ->
      check("clean: sale event counterparty = services (resolves in the investor 6-actor set)",
            maps:get(<<"counterparty">>, ev_by_id(g(C, <<"dispose_cash_events">>), <<"dispose_sale_proceeds">>)),
            <<"services">>),
-     check("clean: selling_costs event counterparty = services",
-           maps:get(<<"counterparty">>, ev_by_id(g(C, <<"dispose_cash_events">>), <<"dispose_selling_costs">>)),
-           <<"services">>),
+     check("clean: every sell fee line's counterparty = services",
+           lists:usort([maps:get(<<"counterparty">>, ev_by_id(g(C, <<"dispose_cash_events">>), Id))
+                        || Id <- [<<"commission">>, <<"marketing">>, <<"sale_conveyancing">>, <<"mortgage_discharge">>]]),
+           [<<"services">>]),
      %% exported cgt_investor/4 verdict surface
      check("cgt_investor/4 clean → {gain, cgt, computed}",
            fh_engine_disposition:cgt_investor(inv_profile(<<"resident">>),
@@ -297,7 +301,7 @@ honest_partial_cases() ->
            length(g(A, <<"key_assumptions">>)), 1),
      %% loan-pending: sale/selling banded, loan/net/full PENDING — no fabricated point.
      check("H set, loan unknown: sale banded", g(B, <<"sale_proceeds">>), [1075133, 1432678]),
-     check("H set, loan unknown: selling banded", g(B, <<"selling_costs">>), [17927, 60644]),
+     check("H set, loan unknown: selling banded", g(B, <<"selling_costs">>), [17377, 61144]),
      check("H set, loan unknown: loan PENDING", g(B, <<"loan_payout">>), null),
      check("H set, loan unknown: net PENDING", g(B, <<"net_proceeds">>), null),
      check("H set, loan unknown: full PENDING", g(B, <<"full_horizon_net_position">>), null)].
@@ -313,9 +317,9 @@ event_cases() ->
     %% loan-pending ⟹ the loan event is dropped (honest-partial), sale+selling remain.
     {NoLoanF, _} = fill((full_upstream())#{<<"mortgage_plan">> => #{}}),
     NoLoanIds    = [maps:get(<<"id">>, E) || E <- g(NoLoanF, <<"dispose_cash_events">>)],
-    [check("full: 3 dispose events (sale, selling, loan; cgt exempt ⟹ dropped)", length(Events), 3),
+    [check("full: 6 dispose events (sale, loan, 4 sell fee lines; cgt exempt ⟹ dropped)", length(Events), 6),
      check("full: event ids", Ids,
-           [<<"dispose_sale_proceeds">>, <<"dispose_selling_costs">>, <<"dispose_loan_payout">>]),
+           [<<"dispose_sale_proceeds">>, <<"dispose_loan_payout">> | [<<"commission">>, <<"marketing">>, <<"sale_conveyancing">>, <<"mortgage_discharge">>]]),
      check("sale event: phase=dispose, direction=in, counterparty=other, src=disposition",
            {maps:get(<<"phase">>, Sale), maps:get(<<"direction">>, Sale),
             maps:get(<<"counterparty">>, Sale), maps:get(<<"source_component">>, Sale)},
@@ -327,7 +331,7 @@ event_cases() ->
      check("loan event: out / lender", {maps:get(<<"direction">>, Loan),
             maps:get(<<"counterparty">>, Loan)}, {<<"out">>, <<"lender">>}),
      check("loan-pending: loan event dropped (honest-partial), sale+selling remain", NoLoanIds,
-           [<<"dispose_sale_proceeds">>, <<"dispose_selling_costs">>])].
+           [<<"dispose_sale_proceeds">> | [<<"commission">>, <<"marketing">>, <<"sale_conveyancing">>, <<"mortgage_discharge">>]])].
 
 %% --- 6. growth basis surfaced + bilingual assumptions -------------------------
 

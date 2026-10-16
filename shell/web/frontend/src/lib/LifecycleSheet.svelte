@@ -5,8 +5,12 @@
     // Holds:     it computes no figure. Lines are the engine's cash events (harvested like
     //            the calculator's spine, plus disposition's dispose events); the totals and
     //            the waiting lines are purchase_journey.lifecycle_budget. A line whose input
-    //            is missing says which input, never a figure. Tapping a line opens its
-    //            source component (the zoom-in layer) through `onopen`.
+    //            is missing says which input, never a figure, in its own phase's group.
+    //            Tapping a line opens its source component (the zoom-in layer) through
+    //            `onopen`; a fee line (behavior 83: it carries `detail`) opens in place
+    //            instead, showing who pays, what moves it, its range basis and its source.
+    //            An optional line, or one whose property condition is open, says it is
+    //            not in the total (the engine's lifecycle_budget does not sum it).
     // Rests on:  fh_engine_journey's lifecycle_budget block (what each total sums).
     //            The state it is planned for is in its title; picking another re-plans
     //            for that state through `onstate` (the engine's state what-if).
@@ -21,6 +25,7 @@
         type ComponentEntry,
         type DispositionOutcome,
         type JourneySwimlaneOutcome,
+        type FeeDetail,
         type MoneyRange,
         type PendingLine
     } from '$lib/planCard';
@@ -107,6 +112,41 @@
     function needsLabel(p: PendingLine): string {
         return $t(`plan.sheet.needs.${p.needs}` as 'plan.sheet.needs.income');
     }
+    // a pending line sits in its own phase's group: buy, own or sell.
+    function groupOf(phase: string): string {
+        return phase === 'own' ? 'own' : phase === 'dispose' ? 'sell' : 'buy';
+    }
+    function pendingFor(key: string): PendingLine[] {
+        return pending.filter((p) => groupOf(p.phase) === key);
+    }
+    function pendingLabel(p: PendingLine): string {
+        return p.label
+            ? pick(p.label, $lang)
+            : $t(`plan.sheet.line.${p.id}` as 'plan.sheet.line.loan_payout');
+    }
+    // why a shown line is left out of the total, or null when it is counted.
+    function notCounted(d: FeeDetail): string | null {
+        if (d.optional) return $t('plan.sheet.fee.optional');
+        if (d.condition === 'strata') return $t('plan.sheet.fee.if_strata');
+        if (d.condition === 'house') return $t('plan.sheet.fee.if_house');
+        return null;
+    }
+    // a percentage line states its rate and base; a fixed line's range is its amount.
+    function basisText(d: FeeDetail): string | null {
+        const [lo, hi] = d.band;
+        if (d.basis === 'fixed' || lo == null || hi == null) return null;
+        const fmt = (n: number) => n.toLocaleString($lang === 'vi' ? 'vi-VN' : 'en-AU');
+        return $t(`plan.sheet.basis.${d.basis}` as 'plan.sheet.basis.pct_of_sale')
+            .replace('{lo}', fmt(lo))
+            .replace('{hi}', fmt(hi));
+    }
+    function sourceHost(url: string): string {
+        try {
+            return new URL(url).hostname.replace(/^www\./, '');
+        } catch {
+            return url;
+        }
+    }
 </script>
 
 <section class="ls" aria-labelledby="ls-title">
@@ -173,7 +213,9 @@
                 {#each g.lines as e (e.id)}
                     {@const own = owner(e)}
                     <li class="ls-line" class:ls-in={e.direction === 'in'}>
-                        {#if own}
+                        {#if e.detail}
+                            {@render fee(e, e.detail)}
+                        {:else if own}
                             <button type="button" class="ls-line-btn" onclick={() => onopen(own)}>
                                 {@render body(e)}
                                 <span class="ls-caret" aria-hidden="true">›</span>
@@ -183,20 +225,18 @@
                         {/if}
                     </li>
                 {/each}
-                {#if g.key === 'sell'}
-                    {#each pending as p (p.id)}
-                        <li class="ls-line ls-pending">
-                            <div class="ls-line-btn ls-static">
-                                <span class="ls-label">
-                                    {$t(`plan.sheet.line.${p.id}` as 'plan.sheet.line.loan_payout')}
-                                    <span class="ls-needs">{needsLabel(p)}</span>
-                                </span>
-                                <span class="ls-amt">—</span>
-                            </div>
-                        </li>
-                    {/each}
-                {/if}
-                {#if g.lines.length === 0 && !(g.key === 'sell' && pending.length)}
+                {#each pendingFor(g.key) as p (p.id)}
+                    <li class="ls-line ls-pending">
+                        <div class="ls-line-btn ls-static">
+                            <span class="ls-label">
+                                {pendingLabel(p)}
+                                <span class="ls-needs">{needsLabel(p)}</span>
+                            </span>
+                            <span class="ls-amt">—</span>
+                        </div>
+                    </li>
+                {/each}
+                {#if g.lines.length === 0 && pendingFor(g.key).length === 0}
                     <li class="ls-empty">{filling ? $t('plan.sheet.filling') : $t('plan.sheet.none')}</li>
                 {/if}
             </ul>
@@ -207,12 +247,52 @@
     {/each}
 </section>
 
+{#snippet fee(e: CashEvent, d: FeeDetail)}
+    {@const why = notCounted(d)}
+    {@const basis = basisText(d)}
+    <details class="ls-fee">
+        <summary class="ls-line-btn">
+            {@render body(e)}
+            <span class="ls-caret ls-fee-caret" aria-hidden="true">›</span>
+        </summary>
+        <div class="ls-fee-detail">
+            {#if why}<p class="ls-fee-why">{why}</p>{/if}
+            <dl class="ls-fee-facts">
+                {#if basis}
+                    <div><dt>{$t('plan.sheet.fee.range')}</dt><dd>{basis}</dd></div>
+                {/if}
+                {#if d.payer}
+                    <div><dt>{$t('plan.sheet.fee.payer')}</dt><dd>{pick(d.payer, $lang)}</dd></div>
+                {/if}
+                {#if d.drivers}
+                    <div><dt>{$t('plan.sheet.fee.drivers')}</dt><dd>{pick(d.drivers, $lang)}</dd></div>
+                {/if}
+                {#if d.source}
+                    <div>
+                        <dt>{$t('plan.sheet.fee.source')}</dt>
+                        <dd>
+                            <a href={d.source} target="_blank" rel="noopener noreferrer"
+                                >{sourceHost(d.source)}</a
+                            >
+                        </dd>
+                    </div>
+                {/if}
+            </dl>
+            <p class="ls-fee-note">
+                {d.tier === 'REGULATED' ? $t('plan.sheet.fee.regulated_note') : $t('plan.sheet.fee.quote_note')}
+            </p>
+        </div>
+    </details>
+{/snippet}
+
 {#snippet body(e: CashEvent)}
+    {@const why = e.detail ? notCounted(e.detail) : null}
     <span class="ls-label">
         {pick(e.label, $lang)}
         <span class="ls-tier" class:ls-exact={!e.is_estimate}
             >{e.is_estimate ? $t('plan.sheet.estimate') : $t('plan.sheet.exact')}</span
         >
+        {#if why}<span class="ls-out">{why}</span>{/if}
     </span>
     <span class="ls-amt"
         >{e.direction === 'in' ? '+' : ''}{range(e.amount)}{#if e.timing === 'recurring'}<span class="ls-unit"
@@ -283,6 +363,30 @@
     .ls-tier.ls-exact { color: var(--info); background: var(--info-soft); }
     .ls-needs { font-size: var(--fs-xs, 0.75rem); color: var(--muted); font-style: italic; }
     .ls-pending .ls-amt { color: var(--muted); }
+    .ls-out { font-size: var(--fs-2xs, 0.6875rem); color: var(--muted); white-space: nowrap; }
+
+    /* A fee line opens in place: its summary is the line, its body the facts behind it. */
+    .ls-fee > summary { list-style: none; cursor: pointer; }
+    .ls-fee > summary::-webkit-details-marker { display: none; }
+    .ls-fee > summary:hover { background: var(--accent-soft); }
+    .ls-fee > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+    .ls-fee-caret { transition: transform 0.15s ease; }
+    .ls-fee[open] .ls-fee-caret { transform: rotate(90deg); }
+    @media (prefers-reduced-motion: reduce) { .ls-fee-caret { transition: none; } }
+    .ls-fee-detail {
+        display: grid; gap: 0.5rem; padding: 0 0.75rem 0.75rem;
+        font-size: var(--fs-sm, 0.875rem); color: var(--ink);
+    }
+    .ls-fee-why { margin: 0; font-size: var(--fs-xs, 0.75rem); color: var(--muted); font-style: italic; }
+    .ls-fee-facts { margin: 0; display: grid; gap: 0.4rem; }
+    .ls-fee-facts > div { display: grid; gap: 0.1rem; }
+    .ls-fee-facts dt {
+        font-size: var(--fs-2xs, 0.6875rem); font-weight: 700; color: var(--muted);
+        text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .ls-fee-facts dd { margin: 0; max-width: 65ch; }
+    .ls-fee-facts a { color: var(--accent); overflow-wrap: anywhere; }
+    .ls-fee-note { margin: 0; font-size: var(--fs-xs, 0.75rem); color: var(--muted); }
     .ls-empty { padding: 0.6rem 0.75rem; font-size: var(--fs-xs, 0.75rem); color: var(--muted); font-style: italic; }
     .ls-note { margin: 0; font-size: var(--fs-xs, 0.75rem); color: var(--muted); }
 

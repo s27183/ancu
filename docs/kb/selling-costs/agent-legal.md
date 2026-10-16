@@ -1,10 +1,28 @@
 ---
 slug: kb.selling-costs.agent-legal
 effective_from: 2026-06-21
-last_verified: 2026-07-06
+last_verified: 2026-10-16
 sources:
   - url: https://whichrealestateagent.com.au/agent-fees/how-much-do-real-estate-agents-charge/
     retrieved: 2026-07-06
+    path: docs/sources/selling-costs/wrea-how-much-agents-charge.txt
+    quotes:
+      - "On average, real estate agents in Australia charge between 2% and 3% of your home’s final selling price ."
+      - "In Hobart and regional areas, commission rates are higher (around 3% or more)"
+  - url: https://www.yourpropertyguide.com.au/guides/real-estate-agent-fees-australia
+    retrieved: 2026-10-16
+    path: docs/sources/selling-costs/ypg-real-estate-agent-fees.txt
+    quotes:
+      - "Australian real estate commission is negotiable and typically ranges from 1.5% to 3.5% of the sale price, depending on state, suburb and property value."
+      - "Marketing costs (photography, online listings, signboard, styling) are usually charged separately on top of commission and typically run $3,000 to $6,000 for an average home."
+  - url: https://www.openagent.com.au/blog/cost-selling-house
+    retrieved: 2026-10-16
+    path: docs/sources/selling-costs/openagent-cost-selling-house.txt
+    quotes:
+      - "For advertising and marketing, you can expect to pay anywhere between $600 - $10,000, depending on what package you opt for."
+      - "Depending on what package you opt for, expect to pay anywhere from $500 - $8000 for advertising and marketing in Victoria"
+      - "As for legal fees, NSW solicitors and conveyancers typically charge around $700 - $2500."
+      - "In terms of other selling costs in the Sunshine State, conveyancing ranges anywhere from $500 to $2200."
 ---
 
 # Selling costs — agent commission, legal, and marketing
@@ -17,11 +35,11 @@ The selling agent's commission is the largest selling cost and is **negotiable**
 
 ## Legal / conveyancing on sale
 
-Sale-side **conveyancing or solicitor** costs to prepare the contract of sale / vendor statement and handle settlement run conventionally around **$800–$2,500**, broadly similar to the buyer-side figure (`kb.buyer-costs`). State-specific document requirements (e.g. a VIC Section 32 vendor statement) sit at the higher end.
+Sale-side **conveyancing or solicitor** costs to prepare the contract of sale / vendor statement and handle settlement run conventionally around **$500–$2,500**, broadly similar to the buyer-side figure (`kb.buyer-costs`). State-specific document requirements (e.g. a VIC Section 32 vendor statement) sit at the higher end.
 
 ## Marketing / advertising
 
-**Marketing** (photography, listing portals, signboard, copywriting, and — for an auction — the auctioneer fee) is typically paid by the vendor and runs conventionally around **$1,000–$8,000** depending on the campaign and price point. Premium campaigns (video, staging/styling) push higher; a low-key private-treaty sale lower.
+**Marketing** (photography, listing portals, signboard, copywriting, and — for an auction — the auctioneer fee) is typically paid by the vendor and runs conventionally around **$600–$8,000** (about $3,000–$6,000 for an average home) depending on the campaign and price point. Premium campaigns (video, staging/styling) push higher; a low-key private-treaty sale lower.
 
 ## Relevance for Vietnamese-Australian buyers (Mode A)
 
@@ -37,14 +55,119 @@ The resolver rules the artifact compiler extracts as this doc's `content_json`. 
 {
   "fills": [],
   "parameters": {
-    "agent_commission_low_pct":   { "type": "percentage", "value": 1.5, "note": "ESTIMATE — conventional low end of selling-agent commission as % of sale price; negotiable, varies by state/price/agency" },
-    "agent_commission_high_pct":  { "type": "percentage", "value": 3.5, "note": "ESTIMATE — conventional high end of selling-agent commission as % of sale price (higher in QLD/regional, lower in competitive metro)" },
-    "legal_conveyancing_low_aud": { "type": "money", "value": 800,  "note": "ESTIMATE — sale-side conveyancing / solicitor, low end" },
-    "legal_conveyancing_high_aud":{ "type": "money", "value": 2500, "note": "ESTIMATE — sale-side conveyancing / solicitor, high end (VIC S32 vendor statement etc. at the top)" },
-    "marketing_low_aud":          { "type": "money", "value": 1000, "note": "ESTIMATE — vendor marketing / advertising (photography, portals, signboard), low end" },
-    "marketing_high_aud":         { "type": "money", "value": 8000, "note": "ESTIMATE — vendor marketing / advertising, high end (premium campaign, auctioneer, staging)" },
-    "commission_applied_to":      { "type": "string", "value": "projected sale_proceeds over horizon H — so selling_costs is itself a money_range when proceeds are banded", "note": "the resolver applies the commission band to the disposition.sale_proceeds range" },
-    "surface_as":                 { "type": "string", "value": "banded money_range (selling_costs = commission% × sale_proceeds + legal + marketing) with the negotiable/estimate basis stated in key_assumptions", "note": "estimates, not regulated — surfaced as ranges, never single asserted figures" }
+    "commission_applied_to":      { "type": "string", "value": "projected sale_proceeds over horizon H — so selling_costs is itself a money_range when proceeds are banded", "note": "the resolver applies the commission fee line's band to the disposition.sale_proceeds range" },
+    "surface_as":                 { "type": "string", "value": "banded money_range (selling_costs = the sum of the non-optional dispose fee_lines: commission% × sale_proceeds + marketing + sale_conveyancing + mortgage_discharge) with the negotiable/estimate basis stated in key_assumptions", "note": "estimates, not regulated — surfaced as ranges, never single asserted figures" }
+  },
+  "lookup": {
+    "fee_lines": {
+      "note": "one entry per fee the buyer cannot know until they hire someone or get a quote; the engine emits one cash event per applicable entry (behavior 83)",
+      "entries": [
+        {
+          "id": "commission",
+          "phase": "dispose",
+          "timing": "one_off",
+          "tier": "CONVENTION",
+          "basis": "pct_of_sale",
+          "low": 1.5,
+          "high": 3.5,
+          "applies": {
+            "modes": [
+              "fhb-domestic-au",
+              "fhb-foreign-au",
+              "investor-domestic-au",
+              "investor-foreign-au",
+              "nexthome-domestic-au"
+            ],
+            "states": "all",
+            "property": "any"
+          },
+          "optional": false,
+          "label": {
+            "vi": "Hoa hồng môi giới bán nhà (agent commission)",
+            "en": "Selling agent's commission"
+          },
+          "payer": {
+            "vi": "Người bán trả, trừ vào tiền bán nhà",
+            "en": "The seller pays, from the sale proceeds"
+          },
+          "drivers": {
+            "vi": "Bang, khu vực và giá nhà: thành phố lớn cạnh tranh thường ~2–2,5%; Hobart và vùng xa ~3% trở lên. Có thể thương lượng.",
+            "en": "State, suburb and price: competitive capital cities are often ~2–2.5%; Hobart and regional areas ~3% or more. Negotiable."
+          },
+          "source": "https://www.yourpropertyguide.com.au/guides/real-estate-agent-fees-australia"
+        },
+        {
+          "id": "marketing",
+          "phase": "dispose",
+          "timing": "one_off",
+          "tier": "CONVENTION",
+          "basis": "fixed",
+          "low": 600,
+          "high": 8000,
+          "applies": {
+            "modes": [
+              "fhb-domestic-au",
+              "fhb-foreign-au",
+              "investor-domestic-au",
+              "investor-foreign-au",
+              "nexthome-domestic-au"
+            ],
+            "states": "all",
+            "property": "any"
+          },
+          "optional": false,
+          "note": "$600 is the low end of the national $600–$10,000; $8,000 the top of the Victorian $500–$8,000 (the prior marketing band was $1,000–$8,000)",
+          "label": {
+            "vi": "Chi phí quảng cáo bán nhà (marketing)",
+            "en": "Sale marketing and advertising"
+          },
+          "payer": {
+            "vi": "Người bán trả, thường trước khi bán xong",
+            "en": "The seller pays, often before the sale completes"
+          },
+          "drivers": {
+            "vi": "Gói quảng cáo: ảnh chụp, đăng tin trên các trang bất động sản, bảng hiệu, dàn dựng nội thất (styling). Nhà trung bình khoảng $3.000–$6.000; gói cao cấp hoặc đấu giá cao hơn.",
+            "en": "The package: photography, listings on property portals, signboard, styling. An average home is about $3,000–$6,000; a premium campaign or auction costs more."
+          },
+          "source": "https://www.openagent.com.au/blog/cost-selling-house"
+        },
+        {
+          "id": "sale_conveyancing",
+          "phase": "dispose",
+          "timing": "one_off",
+          "tier": "CONVENTION",
+          "basis": "fixed",
+          "low": 500,
+          "high": 2500,
+          "applies": {
+            "modes": [
+              "fhb-domestic-au",
+              "fhb-foreign-au",
+              "investor-domestic-au",
+              "investor-foreign-au",
+              "nexthome-domestic-au"
+            ],
+            "states": "all",
+            "property": "any"
+          },
+          "optional": false,
+          "note": "QLD $500–$2,200, NSW $700–$2,500",
+          "label": {
+            "vi": "Phí luật sư/chuyển nhượng khi bán (conveyancing)",
+            "en": "Conveyancing / legal on the sale"
+          },
+          "payer": {
+            "vi": "Người bán trả",
+            "en": "The seller pays"
+          },
+          "drivers": {
+            "vi": "Bang (VIC cần bản kê của người bán — Section 32 — nên cao hơn), độ phức tạp của hợp đồng và chọn chuyên viên chuyển nhượng (conveyancer) hay luật sư.",
+            "en": "State (VIC needs a vendor's statement — Section 32 — so costs more), the contract's complexity, and a conveyancer versus a solicitor."
+          },
+          "source": "https://www.openagent.com.au/blog/cost-selling-house"
+        }
+      ]
+    }
   }
 }
 ```

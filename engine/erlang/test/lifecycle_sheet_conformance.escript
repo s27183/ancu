@@ -60,24 +60,60 @@ mode_cases({BP, Intent, Firb}) ->
             maps:get(<<"timing">>, E) =:= <<"recurring">> andalso maps:get(<<"period">>, E) =:= <<"year">>
         end, Own)),
      chk(BP, "own: rates+water, maintenance and repayments all present",
-         lists:sort([maps:get(<<"id">>, E) || E <- Own]) =:=
-             [<<"council_rates_water">>, <<"loan_repayments">>, <<"maintenance_reserve">>]),
+         [<<"council_rates_water">>, <<"loan_repayments">>, <<"maintenance_reserve">>] --
+             [maps:get(<<"id">>, E) || E <- Own] =:= []),
+     chk(BP, "own: every other own line is a fee line with its source (behavior 83)",
+         lists:all(fun(E) -> maps:get(<<"source">>, maps:get(<<"detail">>, E, #{}), null) =/= null end,
+                   [E || E <- Own, not lists:member(maps:get(<<"id">>, E),
+                        [<<"council_rates_water">>, <<"loan_repayments">>, <<"maintenance_reserve">>])])),
      chk(BP, "every amount is an ordered [lo, hi]", lists:all(fun(E) ->
             case maps:get(<<"amount">>, E) of [L, H] when is_number(L), is_number(H) -> L =< H; _ -> false end
         end, Ev)),
      chk(BP, "budget.buy = sum of prepare..settle out-events",
-         maps:get(<<"buy">>, B) =:= sum([E || E <- Ev, maps:get(<<"direction">>, E) =:= <<"out">>,
+         maps:get(<<"buy">>, B) =:= sum([E || E <- Ev, counted(E),
              lists:member(maps:get(<<"phase">>, E), [<<"prepare">>, <<"pre_approve">>, <<"contract">>, <<"settle">>])])),
      chk(BP, "budget.own_per_year = sum of own out-events",
-         maps:get(<<"own_per_year">>, B) =:= sum([E || E <- Own, maps:get(<<"direction">>, E) =:= <<"out">>])),
+         maps:get(<<"own_per_year">>, B) =:= sum([E || E <- Own, counted(E)])),
      chk(BP, "budget.sell = dispose out-events except loan_payout",
-         maps:get(<<"sell">>, B) =:= sum([E || E <- Ph(<<"dispose">>), maps:get(<<"direction">>, E) =:= <<"out">>,
-                                           maps:get(<<"id">>, E) =/= <<"loan_payout">>])),
-     chk(BP, "no income: pending names loan_payout needing income",
-         maps:get(<<"pending">>, B) =:= [#{<<"id">> => <<"loan_payout">>, <<"phase">> => <<"dispose">>, <<"needs">> => <<"income">>}]),
+         maps:get(<<"sell">>, B) =:= sum([E || E <- Ph(<<"dispose">>), counted(E),
+                                           maps:get(<<"id">>, E) =/= <<"dispose_loan_payout">>])),
+     chk(BP, "no income: pending names loan_payout needing income (an investor: the price)",
+         lists:member(#{<<"id">> => <<"loan_payout">>, <<"phase">> => <<"dispose">>, <<"needs">> => payout_needs(Intent)},
+                      [maps:with([<<"id">>, <<"phase">>, <<"needs">>], P) || P <- maps:get(<<"pending">>, B)])),
+     chk(BP, "with income: the payout is placed, never summed into sell, never pending",
+         Intent =:= <<"investor">> orelse with_income(BP, Intent, Firb)),
      chk(BP, "no horizon: sell null, every dispose line needs hold_years",
          maps:get(<<"sell">>, B0) =:= null andalso
-         [maps:get(<<"needs">>, P) || P <- maps:get(<<"pending">>, B0)] =:= [<<"hold_years">>, <<"hold_years">>, <<"hold_years">>])].
+         lists:usort([maps:get(<<"needs">>, P) || P <- maps:get(<<"pending">>, B0),
+                                                  maps:get(<<"phase">>, P) =:= <<"dispose">>]) =:= [<<"hold_years">>])].
+
+%% measured 2026-10-16 (behavior 83): disposition ids its payout dispose_loan_payout, and
+%% the budget matched the bare id, so with income the payout was summed as a selling cost.
+%% an investor's payout waits on a property (budget_envelope_investor.loan_amount), not income.
+payout_needs(<<"investor">>) -> <<"price">>;
+payout_needs(_)              -> <<"income">>.
+
+with_income(BP, Intent, Firb) ->
+    Fin = #{<<"income">> => #{<<"assessable_income">> => 150000}},
+    {ok, Out} = fh_engine_simulate:run(BP, onboarding(), Intent, Fin, Firb),
+    B = budget(Out),
+    Dispose = [E || E <- events(Out), maps:get(<<"phase">>, E) =:= <<"dispose">>],
+    Payout = [E || E <- Dispose, maps:get(<<"id">>, E) =:= <<"dispose_loan_payout">>],
+    Sell = sum([E || E <- Dispose, counted(E),
+                     maps:get(<<"id">>, E) =/= <<"dispose_loan_payout">>]),
+    Payout =/= [] andalso maps:get(<<"sell">>, B) =:= Sell
+        andalso not lists:any(fun(P) -> maps:get(<<"id">>, P) =:= <<"loan_payout">> end,
+                              maps:get(<<"pending">>, B)).
+
+%% an out-event the totals count: not an optional fee line, not one whose property
+%% condition is still open (behavior 83).
+counted(E) ->
+    maps:get(<<"direction">>, E) =:= <<"out">> andalso
+        case maps:get(<<"detail">>, E, null) of
+            D when is_map(D) -> maps:get(<<"optional">>, D) =/= true andalso
+                                maps:get(<<"condition">>, D) =:= null;
+            _ -> true
+        end.
 
 chk(BP, Label, true)  -> io:format("  PASS   ~s: ~s~n", [BP, Label]), pass;
 chk(BP, Label, false) -> io:format("  FAIL   ~s: ~s~n", [BP, Label]), fail.

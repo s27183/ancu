@@ -208,8 +208,8 @@ DUTY_CASES = [
 # registration_total() checks — (state, value, expected_total_dollars). The whole-dollar
 # total of transfer + mortgage against each registry's published schedule (kb.buyer-costs).
 REG_CASES = [
-    ("NSW", 600000, 351),   # flat $175.70 + $175.70 = $351.40 → $351 (price-independent)
-    ("NSW", 850000, 351),   # same flat fee at any price (proves NSW does not scale)
+    ("NSW", 600000, 365),   # flat $182.73 + $182.73 = $365.46 → $365 (price-independent; FY2026-27)
+    ("NSW", 850000, 365),   # same flat fee at any price (proves NSW does not scale)
     ("VIC", 700000, 1865),  # transfer 101.50 + 2.34×700 = 1739.50, + mortgage 125.70 = 1865.20
     ("VIC", 2000000, 3737), # transfer capped at 3611, + mortgage 125.70 = 3736.70 (proves the cap)
     ("QLD", 600000, 2452),  # transfer 248.04 + 46.56×42 = 2203.56, + mortgage 248.04 = 2451.60

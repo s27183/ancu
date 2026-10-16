@@ -707,6 +707,30 @@ const messages = {
         en: 'Needs: how many years you’ll keep it'
     },
     'plan.sheet.needs.income': { vi: 'Cần biết: thu nhập của bạn', en: 'Needs: your income' },
+    'plan.sheet.needs.price': { vi: 'Cần biết: giá căn nhà', en: 'Needs: the property’s price' },
+    'plan.sheet.needs.rent': { vi: 'Cần biết: tiền thuê dự kiến', en: 'Needs: the expected rent' },
+    'plan.sheet.needs.quote': { vi: 'Cần báo giá', en: 'Needs: a quote' },
+    // behavior 83: a fee line's detail, opened in place
+    'plan.sheet.fee.optional': { vi: 'tùy chọn · không tính vào tổng', en: 'optional · not in the total' },
+    'plan.sheet.fee.if_strata': { vi: 'nếu là căn hộ strata · chưa tính vào tổng', en: 'if strata · not in the total yet' },
+    'plan.sheet.fee.if_house': { vi: 'nếu là nhà riêng · chưa tính vào tổng', en: 'if a house · not in the total yet' },
+    'plan.sheet.fee.payer': { vi: 'Ai trả', en: 'Who pays' },
+    'plan.sheet.fee.drivers': { vi: 'Điều gì làm thay đổi', en: 'What moves it' },
+    'plan.sheet.fee.range': { vi: 'Khoảng', en: 'Range' },
+    'plan.sheet.fee.source': { vi: 'Nguồn', en: 'Source' },
+    'plan.sheet.fee.quote_note': {
+        vi: 'Ước tính — báo giá của chính bạn mới là con số cuối cùng.',
+        en: 'An estimate — your own quote decides.'
+    },
+    'plan.sheet.fee.regulated_note': { vi: 'Do nhà nước quy định.', en: 'Set by the government.' },
+    'plan.sheet.basis.pct_of_price': { vi: '{lo}–{hi}% giá nhà', en: '{lo}–{hi}% of the price' },
+    'plan.sheet.basis.pct_of_loan': { vi: '{lo}–{hi}% khoản vay', en: '{lo}–{hi}% of the loan' },
+    'plan.sheet.basis.pct_of_rent': { vi: '{lo}–{hi}% tiền thuê', en: '{lo}–{hi}% of the rent' },
+    'plan.sheet.basis.pct_of_transfer': {
+        vi: '{lo}–{hi}% số tiền chuyển',
+        en: '{lo}–{hi}% of the money sent'
+    },
+    'plan.sheet.basis.pct_of_sale': { vi: '{lo}–{hi}% giá bán', en: '{lo}–{hi}% of the sale price' },
     'plan.sheet.line.sale_proceeds': { vi: 'Giá bán', en: 'Sale price' },
     'plan.sheet.line.selling_costs': { vi: 'Chi phí bán', en: 'Selling costs' },
     'plan.sheet.line.loan_payout': { vi: 'Tất toán khoản vay', en: 'Loan payout' },

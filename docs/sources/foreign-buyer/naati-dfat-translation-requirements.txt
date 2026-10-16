@@ -1,0 +1,35 @@
+Source: https://www.naati.com.au/resources/dfat-translation-requirements/
+Retrieved: 2026-10-16
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML 13bdf6feb7b2620138261900d14add76bf374d6d1856bef047bd978994b704a2
+
+DFAT Requirements for Translators - NAATI
+Skip to content
+DFAT Requirements for Translators
+Home / Resources / DFAT Requirements for Translators
+What does your translation need to have?
+The Department of Foreign Affairs and Trade (DFAT) requires NAATI credentialed translators in Australia to include correct information in order for translations to be accepted.
+DFAT receives copies of translations because often Australian documents require a form of ‘legalisation’ before they will be accepted for use by foreign governments or organisations. Legalisation by DFAT occurs in two ways: either through the affixing of an apostille, attesting to the validity of a signature/seal or through a chain of authentications of signatures and/or seals.
+For translations, the legalisation relates to the signature or seal of the NAATI translator. In light of NAATI’s function as the national standards and certification body for translators and interpreters in Australia, a stamp/signature of a NAATI credentialed translator can be treated as an ‘official certificate’ for the purposes of issuing an apostille only where it is accompanied by additional information, designed to protect the integrity of both NAATI, the translator and DFAT.
+This means, that a translation submitted to DFAT must include the Translator’s NAATI stamp (either physical or digital) clearly showing:
+their practitioner ID; AND
+their language and type of certification; AND
+their name as the translator; AND
+the date of the translation (physical stamp) OR the date the stamp was generated on (digital stamp); AND
+their signature (physical stamp) OR “Digitally Authenticated by NAATI” (digital stamp); AND
+the web address below the QR code is clearly legible (digital stamp only). This can be an issue if the digital stamp is resized too small.
+The information above must be contained on EVERY translated page.
+An original or a copy of the original document, signed or stamped by the translator, needs to accompany the translated document.
+NAATI recommends that you adopt this practice as the standard for any translation work you undertake.
+Translations by accredited translators
+From 1 July 2018, DFAT is only able to accept translations completed by translators with NAATI certification (this includes Recognised Practising credentials) issued under the current Certification System.
+The department will no longer be able to accept translations done by an accredited translator (that is, someone holding a NAATI accreditation issued under the former NAATI accreditation system) after 1 July 2018.
+Translations dated before 1 July 2018 are not affected and will still be accepted.
+Translating official Australian Government stamps
+Translators should not alter the look of official Australian government seals and stamps. Stamps and seals should remain in the original format. If clarification is needed, the word ‘Seal’ can be included in brackets alongside the seal or stamp.
+Further questions
+If you have any further questions regarding this policy or the legalisation of documents can be directed to DFAT via email at legalisations.australia@dfat.gov.au .
+Both NAATI and DFAT thank all certified translators in advance for your cooperation.
+This information is current as of January 2024.
+On this page
+Practitioner details
+credential result

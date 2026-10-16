@@ -1,10 +1,31 @@
 ---
 slug: kb.existing-home-sale.net-proceeds
 effective_from: 2026-07-05
-last_verified: 2026-07-06
+last_verified: 2026-10-16
 sources:
   - url: https://www.mozo.com.au/home-loans/resources/guides/how-to-discharge-your-mortgage-and-what-it-means.html
     retrieved: 2026-07-06
+  - url: https://www.finder.com.au/home-loans/home-loan-exit-fees
+    retrieved: 2026-10-16
+    path: docs/sources/existing-home-sale/finder-home-loan-discharge-fees.txt
+    quotes:
+      - "The average mortgage discharge fee is just over $300. Some lenders charge as much as $500 or as little as $150."
+      - "CBA discharge fee: $350"
+  - url: https://www.westpac.com.au/personal-banking/home-loans/fees/
+    retrieved: 2026-10-16
+    path: docs/sources/existing-home-sale/westpac-home-loan-fees.txt
+    quotes:
+      - "Loan discharge fee $350 per settlement activity"
+  - url: https://nswlrs.com.au/assets/f/1129775276948026/x/5fed3e7cd6/2026-2027_nsw-lrs-fees_final.pdf
+    retrieved: 2026-10-16
+    path: docs/sources/nsw/nsw-lrs-fees-2026-27.txt
+    quotes:
+      - "Discharge of Mortgage *166.60 182.73"
+  - url: https://www.titlesqld.com.au/fees-payments/
+    retrieved: 2026-10-16
+    path: docs/sources/qld/titles-registry-fees-fy-2026-27.txt
+    quotes:
+      - "(l) any other instrument 248.04"
 ---
 
 # Existing-home sale — net proceeds funding the next purchase
@@ -56,8 +77,6 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
 {
   "fills": [],
   "parameters": {
-    "discharge_fee_low_aud":  { "type": "money", "value": 150, "provenance": "ESTIMATE", "note": "conventional low end of a lender discharge/settlement admin fee; market-set, no regulated fee schedule (aggregator-corroborated: Yard Home Loans, Canstar; not a primary regulator figure)" },
-    "discharge_fee_high_aud": { "type": "money", "value": 500, "provenance": "ESTIMATE", "note": "conventional high end (some lenders up to ~$795); market-set, same caveat" },
     "exit_fee_ban_from":      { "type": "string", "value": "1 July 2011", "provenance": "REGULATED", "note": "National Consumer Credit Protection Amendment Regulations 2011 — bans loan-termination fees on home loans written on/after this date EXCEPT a fixed-rate break cost (genuine cost-of-funds change) or a discharge fee recovering only reasonable admin costs. Exact amending-instrument gazettal number not independently re-verified this pass; ASIC RG220 is a named, not-yet-directly-read secondary confirming the same rule." },
     "break_cost_is_lender_calculated_not_fixed": { "type": "bool", "value": true, "provenance": "REGULATED", "note": "a fixed-rate break cost reflects the lender's own economic loss (interest-rate differential since the fixed rate was set) — NOT a fixed percentage or published figure; the resolver must never estimate a break-cost dollar amount, only flag to_verify when the loan is fixed-rate (MoneySmart glossary, 'break fee' — retrieved via search snippet, direct fetch blocked by the site)" },
     "discharge_processing_business_days_low":  { "type": "integer", "value": 10, "provenance": "CONVENTION", "note": "typical minimum lender notice period to process a discharge (NAB, ANZ) — lender convention, not regulated" },
@@ -66,6 +85,157 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
     "reuses_cgt_doc":           { "type": "string", "value": "kb.tax.cgt-main-residence-exemption", "note": "no duplication — the resolver reuses that doc's content_json parameters directly, applied to this (current) sale rather than a future disposition" },
     "settlement_mismatch_hands_off_to": { "type": "string", "value": "kb.bridging-finance.mechanics", "note": "the resolver detects the timing fact (plain date comparison) and hands off; it does not compute bridging economics itself (placeholder, mode-e-wedge.md decision #3)" },
     "net_proceeds_formula": { "type": "string", "value": "sale_price − loan_payout(outstanding_balance + discharge_fee [+ break_cost if fixed-rate, to_verify]) − selling_costs − cgt", "note": "surfaced as a banded money_range (inherits the banding of selling_costs and, where applicable, sale_price projections) — never a single asserted figure" }
+  },
+  "lookup": {
+    "fee_lines": {
+      "note": "one entry per fee the buyer cannot know until they hire someone or get a quote; the engine emits one cash event per applicable entry (behavior 83)",
+      "entries": [
+        {
+          "id": "mortgage_discharge",
+          "phase": "dispose",
+          "timing": "one_off",
+          "tier": "LENDER-POLICY",
+          "basis": "fixed",
+          "low": 150,
+          "high": 500,
+          "applies": {
+            "modes": [
+              "fhb-domestic-au",
+              "fhb-foreign-au",
+              "investor-domestic-au",
+              "investor-foreign-au",
+              "nexthome-domestic-au"
+            ],
+            "states": "all",
+            "property": "any"
+          },
+          "optional": false,
+          "label": {
+            "vi": "Phí tất toán khoản vay (discharge fee) của ngân hàng",
+            "en": "Lender's mortgage discharge fee"
+          },
+          "payer": {
+            "vi": "Người bán trả cho ngân hàng khi trả hết khoản vay",
+            "en": "The seller pays the lender when the loan is paid out"
+          },
+          "drivers": {
+            "vi": "Do từng ngân hàng quy định; bốn ngân hàng lớn thường ~$350. Vay lãi suất cố định còn có thể chịu phí phá vỡ hợp đồng (break cost) — tính riêng.",
+            "en": "Set by each lender; the major banks are typically ~$350. A fixed-rate loan can also carry a break cost — separate."
+          },
+          "source": "https://www.finder.com.au/home-loans/home-loan-exit-fees"
+        },
+        {
+          "id": "mortgage_discharge_registration_nsw",
+          "phase": "dispose",
+          "timing": "one_off",
+          "tier": "REGULATED",
+          "basis": "fixed",
+          "low": 182.73,
+          "high": 182.73,
+          "applies": {
+            "modes": [
+              "fhb-domestic-au",
+              "fhb-foreign-au",
+              "investor-domestic-au",
+              "investor-foreign-au",
+              "nexthome-domestic-au"
+            ],
+            "states": [
+              "NSW"
+            ],
+            "property": "any"
+          },
+          "optional": false,
+          "label": {
+            "vi": "Lệ phí đăng ký giải chấp (discharge of mortgage) — NSW",
+            "en": "Discharge of mortgage registration fee — NSW"
+          },
+          "payer": {
+            "vi": "Người bán trả, thường qua luật sư khi settlement",
+            "en": "The seller pays, usually through the conveyancer at settlement"
+          },
+          "drivers": {
+            "vi": "Lệ phí cố định của cơ quan đăng ký đất đai NSW, áp dụng từ 1/7/2026.",
+            "en": "A fixed NSW land registry fee, from 1 July 2026."
+          },
+          "source": "https://nswlrs.com.au/assets/f/1129775276948026/x/5fed3e7cd6/2026-2027_nsw-lrs-fees_final.pdf"
+        },
+        {
+          "id": "mortgage_discharge_registration_qld",
+          "phase": "dispose",
+          "timing": "one_off",
+          "tier": "REGULATED",
+          "basis": "fixed",
+          "low": 248.04,
+          "high": 248.04,
+          "applies": {
+            "modes": [
+              "fhb-domestic-au",
+              "fhb-foreign-au",
+              "investor-domestic-au",
+              "investor-foreign-au",
+              "nexthome-domestic-au"
+            ],
+            "states": [
+              "QLD"
+            ],
+            "property": "any"
+          },
+          "optional": false,
+          "note": "lodged as 'any other instrument' in the Titles Registry fee schedule FY2026-27",
+          "label": {
+            "vi": "Lệ phí đăng ký giải chấp (release of mortgage) — QLD",
+            "en": "Release of mortgage registration fee — QLD"
+          },
+          "payer": {
+            "vi": "Người bán trả, thường qua luật sư khi settlement",
+            "en": "The seller pays, usually through the conveyancer at settlement"
+          },
+          "drivers": {
+            "vi": "Lệ phí cố định của Titles Queensland cho năm tài chính 2026-27 (mục 'any other instrument').",
+            "en": "A fixed Titles Queensland fee for FY2026-27 (the 'any other instrument' item)."
+          },
+          "source": "https://www.titlesqld.com.au/fees-payments/"
+        },
+        {
+          "id": "mortgage_discharge_registration_vic",
+          "phase": "dispose",
+          "timing": "one_off",
+          "tier": "PLACEHOLDER",
+          "basis": "fixed",
+          "low": null,
+          "high": null,
+          "applies": {
+            "modes": [
+              "fhb-domestic-au",
+              "fhb-foreign-au",
+              "investor-domestic-au",
+              "investor-foreign-au",
+              "nexthome-domestic-au"
+            ],
+            "states": [
+              "VIC"
+            ],
+            "property": "any"
+          },
+          "optional": false,
+          "note": "PLACEHOLDER — re-ground from Land Use Victoria's 'Guide to Transfer of Land Act fees' 2026-27 (land.vic.gov.au, fetch blocked 403 this session); the 2025-26 figure is stale",
+          "label": {
+            "vi": "Lệ phí đăng ký giải chấp (discharge of mortgage) — VIC",
+            "en": "Discharge of mortgage registration fee — VIC"
+          },
+          "payer": {
+            "vi": "Người bán trả, thường qua luật sư khi settlement",
+            "en": "The seller pays, usually through the conveyancer at settlement"
+          },
+          "drivers": {
+            "vi": "Lệ phí cố định của Land Use Victoria; mức 2026-27 chưa được xác minh.",
+            "en": "A fixed Land Use Victoria fee; the 2026-27 figure is not yet verified."
+          },
+          "source": null
+        }
+      ]
+    }
   }
 }
 ```
