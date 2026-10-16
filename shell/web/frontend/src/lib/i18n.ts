@@ -764,6 +764,56 @@ const messages = {
     'plan.sheet.cash_ok': { vi: 'Đủ', en: 'Enough' },
     'plan.sheet.cash_short': { vi: 'Còn thiếu {x}', en: '{x} short' },
     'plan.sheet.finances': { vi: 'Thu nhập và khoản nợ', en: 'Income and debts' },
+    // behavior 101: "Tài chính của bạn", the one sheet for the numbers the statement rests on
+    'plan.fin.price_hint': {
+        vi: 'Một giá, bằng AUD. Thay khoảng {r} của kế hoạch bằng giá này.',
+        en: 'One price, in AUD. It replaces the plan’s range {r} with that price.'
+    },
+    'plan.fin.price_hint_point': {
+        vi: 'Một giá, bằng AUD. Kế hoạch đang tính với giá {r}.',
+        en: 'One price, in AUD. The plan is counting {r}.'
+    },
+    'plan.fin.price_effect': {
+        vi: 'Đổi cả ba dòng: thuế trước bạ, khoản vay và tiền lãi, phí bán.',
+        en: 'Moves all three rows: duty, the loan and its interest, selling fees.'
+    },
+    'plan.fin.shown': { vi: '= {x}', en: '= {x}' },
+    'plan.fin.deposit': { vi: 'Tiền đặt cọc', en: 'Deposit' },
+    'plan.fin.deposit_hint': {
+        vi: 'Kế hoạch đang tính {x}. Tối thiểu {min} ({p}% giá nhà), tối đa bằng giá nhà.',
+        en: 'The plan uses {x}. At least {min} ({p}% of the price), at most the whole price.'
+    },
+    'plan.fin.deposit_effect': {
+        vi: 'Đổi khoản vay, nên đổi tiền lãi trong Phí giữ nhà. Dưới 20% giá nhà mà không có chương trình nào miễn thì có bảo hiểm khoản vay (LMI) trong Phí mua. Mua đứt: không vay, không lãi, không LMI, không phí vay; ưu đãi thuế trước bạ vẫn giữ, và Bảo lãnh mua nhà lần đầu không còn cần.',
+        en: 'Moves the loan, so the interest in Owning costs. Under 20% of the price with no scheme waiving it, lenders mortgage insurance (LMI) is added to Buying costs. Buying outright: no loan, interest, LMI or loan fees; the duty concession still applies, and the First Home Guarantee is not needed.'
+    },
+    'plan.fin.outright': { vi: 'Mua đứt', en: 'Buy outright' },
+    'plan.fin.deposit_out': {
+        vi: 'Tiền đặt cọc phải từ {min} đến {max}.',
+        en: 'The deposit must be between {min} and {max}.'
+    },
+    'plan.fin.cash_effect': {
+        vi: 'So với tiền cần có khi mua: Đủ hay Còn thiếu. Chỉ lưu trên trình duyệt này.',
+        en: 'Set against the cash needed to buy: enough or short. Kept in this browser only.'
+    },
+    'plan.fin.household_effect': {
+        vi: 'Cho biết ngân hàng có thể cho vay bao nhiêu. Thu nhập không đổi khoản phí nào.',
+        en: 'Sets how much a lender may lend. Income changes no fee.'
+    },
+    'plan.fin.capacity': { vi: 'Bạn vay được khoảng {x}.', en: 'A lender may lend you about {x}.' },
+    'plan.fin.capacity_none': {
+        vi: 'Nhập thu nhập để biết bạn vay được khoảng bao nhiêu.',
+        en: 'Enter your income to see about how much a lender may lend.'
+    },
+    'plan.fin.loan_needed': { vi: 'Khoản vay cần: {x}.', en: 'Loan needed: {x}.' },
+    'plan.sheet.loan_above': {
+        vi: 'Khoản vay cần ({loan}) cao hơn mức ngân hàng có thể cho vay ({cap}).',
+        en: 'The loan needed ({loan}) is above what a lender may lend ({cap}).'
+    },
+    'plan.sheet.loan_maybe': {
+        vi: 'Khoản vay cần ({loan}) nằm trong mức ngân hàng có thể cho vay ({cap}): có thể không đủ.',
+        en: 'The loan needed ({loan}) is inside what a lender may lend ({cap}): it may not be enough.'
+    },
     'plan.sheet.steps': { vi: 'Trong hành trình', en: 'In the journey' },
     // Budget cockpit (the prototype's input form, engine-driven).
     'plan.cockpit.title': { vi: 'Ngân sách — bạn đã sẵn sàng?', en: 'Budget — am I ready?' },

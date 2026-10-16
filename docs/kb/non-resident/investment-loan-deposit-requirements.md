@@ -52,6 +52,27 @@ Pure-reference (`fills: []`). The `cash_position` resolver selects `minimum_requ
       "note": "one entry per statement line this doc's figure is placed on (not a fee line); the engine attaches it as the line's detail, filling {params} with the figures it computed (fh_engine_line_detail, behavior 93)",
       "entries": [
         {
+          "id": "deposit_chosen",
+          "tier": "LENDER-POLICY",
+          "how": {
+            "vi": "{amount} — mức đặt cọc bạn chọn ({pct}% giá nhà), trả khi ký hợp đồng. Mức thấp nhất kế hoạch chấp nhận là {min_pct}%; bạn có thể đặt đến toàn bộ giá nhà (mua đứt, không vay).",
+            "en": "{amount} — the deposit you chose ({pct}% of the price), paid when you sign the contract. The smallest this plan accepts is {min_pct}%; you can put down up to the whole price (buying outright, with no loan)."
+          },
+          "payer": {
+            "vi": "Bạn trả từ tiền của mình; khoản này được giữ trong tài khoản ủy thác (trust) đến ngày settlement.",
+            "en": "You, from your own money; it is held in trust until settlement."
+          },
+          "drivers": {
+            "vi": "Đặt cọc nhiều hơn thì khoản vay nhỏ hơn và tiền lãi ít hơn; từ 20% giá nhà trở lên thì không phải trả bảo hiểm khoản vay (LMI).",
+            "en": "A larger deposit means a smaller loan and less interest; from 20% of the price there is no lenders mortgage insurance (LMI)."
+          },
+          "note": {
+            "vi": "Bạn đổi được con số này trong “Tài chính của bạn”.",
+            "en": "You can change this in “Your finances”."
+          },
+          "source": 0
+        },
+        {
           "id": "deposit",
           "tier": "CONVENTION",
           "how": {

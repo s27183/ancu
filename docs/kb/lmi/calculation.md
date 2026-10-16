@@ -60,6 +60,28 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
     "partial_refund_window_months": { "type": "integer",    "value": 12,   "note": "QBE LMI Guide (primary): partial refund only if loan discharged ≤12 months after settlement, repaid in full, QBE notified within 30 days, refund ≥$500. Window/scale is insurer-specific — some historically to ~24mo; confirm per insurer" }
   },
   "lookup": {
+    "line_details": {
+      "note": "one entry per statement line this doc's figure is placed on (not a fee line); the engine attaches it as the line's detail, filling {params} with the figures it computed (fh_engine_line_detail, behavior 93; the lmi line, behavior 101)",
+      "entries": [
+        {
+          "id": "lmi",
+          "tier": "CONVENTION",
+          "how": {
+            "vi": "Khoảng {lo}–{hi}% của khoản vay {loan}, vì bạn vay {lvr}% giá nhà (trên 80%) — biểu phí tham khảo của bảo hiểm khoản vay (LMI); công ty bảo hiểm của ngân hàng sẽ báo phí chính xác.",
+            "en": "About {lo}–{hi}% of your {loan} loan, because you borrow {lvr}% of the price (above 80%) — the indicative lenders mortgage insurance (LMI) band; your lender's insurer quotes the exact premium."
+          },
+          "payer": {
+            "vi": "Bạn trả một lần khi settlement; thường có thể cộng vào khoản vay.",
+            "en": "You pay it once, at settlement; it can usually be added to the loan."
+          },
+          "drivers": {
+            "vi": "Đặt cọc nhiều hơn: từ 20% giá nhà trở lên thì không còn LMI; chương trình Đặt cọc 5% (First Home Guarantee) cũng miễn LMI.",
+            "en": "A larger deposit: from 20% of the price there is no LMI; the 5% Deposit Scheme (First Home Guarantee) also waives it."
+          },
+          "source": 0
+        }
+      ]
+    },
     "indicative_premium_by_lvr_band": {
       "note": "INDICATIVE rates at ~$500k loan for a base-scope estimate ONLY; the binding premium is the insurer's proprietary (LVR × loan-size) rate table at application — resolver produces an estimate, not an assertion",
       "entries": [

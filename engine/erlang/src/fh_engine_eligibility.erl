@@ -57,7 +57,9 @@ fill(Args, Upstream) ->
               <<"non_buying_partner">> =>
                   maps:get(<<"non_buying_partner">>, Profile, #{<<"exists">> => false})},
     Schemes = catalog(State),
-    Evaluated = [evaluate(S, GlobalRules, Facts, Target, State) || S <- Schemes],
+    Chosen = maps:get(<<"deposit_amount">>, maps:get(onboarding, Args, #{}), undefined),
+    Evaluated = [deposit_need(evaluate(S, GlobalRules, Facts, Target, State), Chosen, Target)
+                 || S <- Schemes],
     Outcome = assemble(Evaluated, State),
     KbVersions = fh_engine_kb:kb_anchors([maps:get(slug, S) || S <- Schemes]),
     {Outcome, <<"scheme-stack-card">>, KbVersions}.
@@ -128,6 +130,27 @@ evaluate(S, GlobalRules, Facts, Target, State) ->
     {BV, Est} = benefit_value(S, State, Target),
     S#{disposition => Disp, stacking => Stacking,
        benefit_value => BV, benefit_is_estimate => Est}.
+
+%% Goal: built from their own situation -> the deposit is the buyer's choice -> eligibility
+%%   -> the FHG follows the deposit (behavior 101)
+%% Purpose:   the First Home Guarantee guarantees the part of a loan above 80% LVR so the
+%%            buyer pays no LMI (kb.scheme.fhg). With the buyer's own deposit
+%%            (`deposit_amount`, the "Tài chính của bạn" sheet) at 20% of the price or more
+%%            — up to buying outright, with no loan — there is nothing to guarantee: the
+%%            scheme drops out, "not needed", and the plan's path is no longer fhg_backed.
+%%            Under 20% it stays, and the LMI it avoids is figured at the chosen LVR.
+%% Holds:     the price is the range ceiling (the cash_position convention); a scheme
+%%            already rejected keeps its own reason; no chosen deposit changes nothing.
+deposit_need(#{key := fhg, disposition := #{status := St}} = E, D, [_Lo, Hi])
+  when is_number(D), is_integer(Hi), Hi > 0, St =/= rejected ->
+    Loan = erlang:max(0, Hi - round(D)),
+    case fh_engine_lmi:premium(Loan, Hi) of
+        none -> E#{disposition => #{status => rejected,
+                                    reason => copy(<<"fhg_not_needed">>, #{})},
+                   benefit_value => null};
+        Avoided -> E#{benefit_value => Avoided}
+    end;
+deposit_need(E, _D, _Target) -> E.
 
 %% --- benefit quantification (Decision 8) -------------------------------------
 %% Each applicable scheme's dollar benefit as a `money_range` from target_price_range

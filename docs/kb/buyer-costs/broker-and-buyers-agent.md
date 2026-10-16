@@ -87,7 +87,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json`. 
           "applies": {
             "modes": ["fhb-domestic-au", "fhb-foreign-au", "investor-domestic-au", "investor-foreign-au", "nexthome-domestic-au"],
             "states": "all",
-            "property": "any"
+            "property": "any", "loan": true
           },
           "optional": false,
           "label":   { "vi": "Môi giới vay (mortgage broker)", "en": "Mortgage broker" },

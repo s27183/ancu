@@ -127,11 +127,18 @@ applies(E, Ctx) ->
     lists:member(maps:get(blueprint, Ctx), maps:get(<<"modes">>, A, []))
         andalso state_applies(maps:get(<<"states">>, A, <<"all">>), maps:get(state, Ctx, undefined))
         andalso property_applies(maps:get(<<"property">>, A, <<"any">>),
-                                 maps:get(property, Ctx, undefined)).
+                                 maps:get(property, Ctx, undefined))
+        andalso loan_applies(maps:get(<<"loan">>, A, false), maps:get(loan, Ctx, null)).
 
 state_applies(<<"all">>, _) -> true;
 state_applies(States, S) when is_list(States), is_binary(S) -> lists:member(S, States);
 state_applies(_, _) -> false.     %% a state-limited fee needs the state to be known
+
+%% behavior 101: a line the KB marks `loan: true` (a lender's or broker's fee, a discharge)
+%% is dropped when the plan has no loan — bought outright, the loan is [0, 0]. An unknown
+%% loan keeps it.
+loan_applies(true, [0, 0]) -> false;
+loan_applies(_, _)         -> true.
 
 property_applies(<<"any">>, _) -> true;
 property_applies(_, undefined) -> true;     %% unknown: shown with its condition

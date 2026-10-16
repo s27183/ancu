@@ -813,7 +813,8 @@ key. *Reconciled 2026-07-03, see the outcome-type conformance note.*)
     "loan_amount": "money",
     "lvr": "percentage",
     "gap_or_surplus": "money",
-    "verdict": "enum"
+    "verdict": "enum",
+    "deposit_bounds": "{ min: money, max: money, min_pct: percentage, assumed: money|null, chosen: money|null, price: money }",  // behavior 101 (2026-10-16): the deposit the buyer may choose in "Tài chính của bạn" — min = the mode's KB minimum % (min_pct) of the price basis (range ceiling or attached price), max = that price (buying outright); assumed = the plan's own deposit, chosen = the buyer's (deposit_amount), null when unset. null with no price
   }
 }
 ```

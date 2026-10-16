@@ -107,7 +107,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
               "nexthome-domestic-au"
             ],
             "states": "all",
-            "property": "any"
+            "property": "any", "loan": true
           },
           "optional": false,
           "label": {
@@ -143,7 +143,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
             "states": [
               "NSW"
             ],
-            "property": "any"
+            "property": "any", "loan": true
           },
           "optional": false,
           "label": {
@@ -179,7 +179,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
             "states": [
               "QLD"
             ],
-            "property": "any"
+            "property": "any", "loan": true
           },
           "optional": false,
           "note": "lodged as 'any other instrument' in the Titles Registry fee schedule FY2026-27",
@@ -216,7 +216,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
             "states": [
               "VIC"
             ],
-            "property": "any"
+            "property": "any", "loan": true
           },
           "optional": false,
           "note": "PLACEHOLDER — re-ground from Land Use Victoria's 'Guide to Transfer of Land Act fees' 2026-27 (land.vic.gov.au, fetch blocked 403 this session); the 2025-26 figure is stale",

@@ -308,7 +308,7 @@ dispose_fees(Args, Sale, Loan, Other) ->
           state => case fh_engine_store:projection_state(maps:get(onboarding, Args, #{})) of
                        S when is_binary(S) -> S; _ -> undefined end,
           property => undefined, source => <<"disposition">>, counterparty => Other,
-          price => null, loan => null, rent => null, sale => Sale,
+          price => null, loan => Loan, rent => null, sale => Sale,
           transfer => after_loan(Sale, Loan)}).
 
 after_loan([SL, SH], [LL, LH]) -> [max(0, SL - LH), max(0, SH - LL)];
@@ -631,7 +631,10 @@ dispose_cash_events(Sale, {FeeEvents, _}, Loan, Cgt, MoneyPartyId) ->
         event(<<"loan_payout">>,   <<"event_loan_payout">>,   <<"out">>, Loan,    <<"lender">>),
         event(<<"cgt">>,           <<"event_cgt">>,           <<"out">>, Cgt,     <<"government">>)
     ],
-    [E || E <- Candidates, maps:get(<<"amount">>, E) =/= null] ++ FeeEvents.
+    %% behavior 101: no loan left to pay out (bought outright) → no payout line
+    [E || E <- Candidates, maps:get(<<"amount">>, E) =/= null,
+          not (maps:get(<<"id">>, E) =:= <<"dispose_loan_payout">>
+               andalso maps:get(<<"amount">>, E) =:= [0, 0])] ++ FeeEvents.
 
 %% Whole lifecycle -> every statement line opens its own detail -> disposition -> the sell
 %% lines' details (behavior 93).

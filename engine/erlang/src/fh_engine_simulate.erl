@@ -27,7 +27,7 @@
 %% (target_price / state / horizon) is deterministic and cannot move a FIRB/ASIC/AML
 %% branch — the full pipeline runs at COMMIT (the refine turn, W7b), never here.
 
--export([apply_overrides/2, run/3, run/4, run/5]).
+-export([apply_overrides/2, run/3, run/4, run/5, check_deposit/2]).
 
 %% --- override mapping (engine-contract §10.1/§10.2) -------------------------
 %%
@@ -78,6 +78,16 @@ apply_one({<<"horizon">>, H}, Ob) when is_integer(H), H > 0 ->
     Ob#{<<"hold_horizon_years">> => H};
 apply_one({<<"horizon">>, _}, _Ob) ->
     throw({invalid_override, <<"horizon">>});
+%% deposit → the buyer's own deposit in AUD (behavior 101, "Tài chính của bạn"): sets
+%% deposit_amount on the fact base, which cash_position places in place of the mode's assumed
+%% deposit, so the loan (price − deposit), its interest, LMI and loan fees follow. A
+%% non-negative number here; its floor and ceiling depend on the mode and the price, so
+%% check_deposit/1 checks them on the recomputed outcome. Like target_price it is
+%% deterministic and cannot move a FIRB/ASIC/AML branch (§10.3).
+apply_one({<<"deposit">>, D}, Ob) when is_number(D), D >= 0 ->
+    Ob#{<<"deposit_amount">> => round(D)};
+apply_one({<<"deposit">>, _}, _Ob) ->
+    throw({invalid_override, <<"deposit">>});
 %% property_type: a Phase-B per-property dimension — out of base scope (Fork A).
 apply_one({<<"property_type">>, _}, _Ob) ->
     throw(property_type_phase_b);
@@ -126,3 +136,21 @@ run(BlueprintSlug, Onboarding, Intent, Financials, FirbRequiredAny) ->
               Up#{Type => Outcome}
           end, #{}, Components),
     {ok, Outcomes}.
+
+%% --- the deposit's bounds (behavior 101) -------------------------------------
+%%
+%% check_deposit(Overrides, Outcomes) -> ok | {error, {deposit_out_of_bounds, Min, Max}}
+%% A `deposit` override outside the mode's floor (the KB minimum % of the price) and the
+%% price itself is refused, naming both — cash_position computes the bounds once (its
+%% `deposit_bounds`), so the handler never re-derives a floor. Without the override, or
+%% with no price to bound it by, there is nothing to check.
+-spec check_deposit(map(), map()) -> ok | {error, {deposit_out_of_bounds, integer(), integer()}}.
+check_deposit(#{<<"deposit">> := D}, Outcomes) when is_number(D) ->
+    Cash = maps:get(<<"budget_envelope">>, Outcomes,
+                    maps:get(<<"budget_envelope_investor">>, Outcomes, #{})),
+    case maps:get(<<"deposit_bounds">>, Cash, null) of
+        #{<<"min">> := Min, <<"max">> := Max} when D < Min; D > Max ->
+            {error, {deposit_out_of_bounds, Min, Max}};
+        _ -> ok
+    end;
+check_deposit(_Overrides, _Outcomes) -> ok.
