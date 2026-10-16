@@ -10,6 +10,8 @@ declare global {
             // A line's detail opened from a phase sheet: one more layer, so browser back
             // (and the iPhone's back swipe) closes it first.
             detail?: string;
+            // A plan opened over the planner's plans list (behavior 96): back returns to it.
+            overList?: boolean;
         }
         // interface Platform {}
     }

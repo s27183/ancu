@@ -191,12 +191,6 @@
         horizonValue = years;
         void runPreview();
     }
-    // The sheet's state picker drives the cockpit's state what-if (the engine drops the
-    // pinned suburb and plans for the state).
-    function chooseState(s: string) {
-        stateSelect = s;
-        void runPreview();
-    }
     // Behavior 93: the statement opens with a hold picked, so its bottom line shows at
     // once — a plan saved with no hold previews DEFAULT_HOLD years, as a tap on that chip
     // would. Once per load (`holdDefaulted`; a reset re-arms it); the cockpit's slider can
@@ -1289,7 +1283,6 @@
                             planState={stateSelect || planBase}
                             busy={previewing}
                             onhorizon={chooseHold}
-                            onstate={chooseState}
                             onopen={openDetail}
                         />
                         {#if sheetDetail && viewComponents[sheetDetail]}
