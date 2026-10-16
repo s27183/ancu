@@ -45,15 +45,16 @@ main(_) ->
 
 %% --- fixtures ----------------------------------------------------------------
 
-%% the eleven budget_envelope_investor fields the registry declares — the original nine
+%% the twelve budget_envelope_investor fields the registry declares — the original nine
 %% figures plus cash_events (added 2026-07-10, task 4: cash_position emits the acquire-phase
 %% cash_events purchase_journey/phase_playbook harvest) and key_assumptions (2026-10-07,
-%% behavior 13: the apartment security LVR-cap caveat; [] at base).
+%% behavior 13: the apartment security LVR-cap caveat; [] at base) and deposit_bounds
+%% (2026-10-16, behavior 101: the deposit range "Tài chính của bạn" offers; null at base).
 fields() ->
     [<<"actual_property_price">>, <<"max_property_price_supported">>,
      <<"total_cash_required">>, <<"loan_amount">>, <<"lvr">>, <<"lmi_payable">>,
      <<"gap_or_surplus">>, <<"verdict">>, <<"mitigation_options_if_short">>,
-     <<"key_assumptions">>, <<"cash_events">>].
+     <<"key_assumptions">>, <<"cash_events">>, <<"deposit_bounds">>].
 
 %% the eight fields that are null at base (everything except the empty mitigation list).
 null_at_base() ->
@@ -96,7 +97,7 @@ scaffold_cases() ->
         [check(<<"input-independent (bare upstream) null: ", F/binary>>, g(OBare, F), null)
          || F <- null_at_base()],
     [check("renderer = calculator", Rend, <<"calculator">>),
-     check("outcome has exactly the eleven budget_envelope_investor fields",
+     check("outcome has exactly the twelve budget_envelope_investor fields",
            lists:sort(maps:keys(O)), lists:sort(fields())),
      check("mitigation_options_if_short = [] (honest empty, no shortfall known)",
            g(O, <<"mitigation_options_if_short">>), []),
@@ -131,7 +132,7 @@ validate(Bp, Type, O) ->
 discriminator_cases() ->
     {Inv, _, _} = fh_engine_fill:resolver(<<"cash_position">>, #{}, inv_upstream()),
     {Fhb, FhbRend, _} = fh_engine_fill:resolver(<<"cash_position">>, #{}, fhb_upstream()),
-    [check("present → investor branch (eleven-field set)",
+    [check("present → investor branch (twelve-field set)",
            lists:sort(maps:keys(Inv)), lists:sort(fields())),
      check("present → investor branch has NO FHB stamp_duty key",
            maps:is_key(<<"stamp_duty">>, Inv), false),

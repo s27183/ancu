@@ -96,8 +96,9 @@ fill_fhb(Args, Upstream) ->
     HasConc = has_state_concession(Stack),
     RecPath = maps:get(<<"recommended_path">>, Mortgage, null),
     Sd = stamp_duty(State, HasConc, Ceiling),
-    Fees = buy_fees(Args, State, Ceiling, home_loan(Ceiling), null, undefined, <<"other">>),
-    Outcome = budget_envelope(Sd, State, RecPath, Range, Ceiling, Stack, Fees),
+    Dep  = home_deposit(Args, RecPath, Range, Ceiling),
+    Fees = buy_fees(Args, State, Ceiling, maps:get(loan, Dep), null, undefined, <<"other">>),
+    Outcome = budget_envelope(Sd, State, Ceiling, Stack, Fees, Dep),
     KbVersions = fh_engine_kb:kb_anchors(
         [<<"kb.stamp-duty.calc-by-state">>,
          <<"kb.buyer-costs.inspections-conveyancing-fees">>,
@@ -132,8 +133,9 @@ fill_fhb_nexthome(Args, Upstream) ->
     RecPath = maps:get(<<"recommended_path">>, Mortgage, null),
     Sd = stamp_duty(State, HasConc, Ceiling),
     ExistingNet = maps:get(<<"net_sale_proceeds">>, ExistingHome, null),
-    Fees = buy_fees(Args, State, Ceiling, home_loan(Ceiling), null, undefined, <<"other">>),
-    Outcome = budget_envelope_nexthome(Sd, State, RecPath, Range, Ceiling, Stack, ExistingNet, Fees),
+    Dep  = home_deposit(Args, RecPath, Range, Ceiling),
+    Fees = buy_fees(Args, State, Ceiling, maps:get(loan, Dep), null, undefined, <<"other">>),
+    Outcome = budget_envelope_nexthome(Sd, State, Ceiling, Stack, ExistingNet, Fees, Dep),
     %% no kb.scheme.fhg / concession_anchor — a repeat buyer is never FHG-eligible or
     %% state-concession-eligible (both first-home-only), so no misleading anchor is listed.
     KbVersions = fh_engine_kb:kb_anchors(
@@ -145,8 +147,8 @@ fill_fhb_nexthome(Args, Upstream) ->
 %% budget_envelope/6 computes the NEED side (unchanged, one computer); this overrides only
 %% the three HAVE-side fields it hardcodes to null, using existing_home_disposal's net
 %% proceeds as the HAVE-side source.
-budget_envelope_nexthome(Sd, State, RecPath, Range, Ceiling, Stack, ExistingNet, Fees) ->
-    Base  = budget_envelope(Sd, State, RecPath, Range, Ceiling, Stack, Fees),
+budget_envelope_nexthome(Sd, State, Ceiling, Stack, ExistingNet, Fees, Dep) ->
+    Base  = budget_envelope(Sd, State, Ceiling, Stack, Fees, Dep),
     Total = maps:get(<<"total_cash_required">>, Base),
     Gap   = gap_range(ExistingNet, Total),
     Base#{
@@ -227,10 +229,15 @@ fill_fhb_foreign(Args, Upstream) ->
     %% convention, not a code-invented zero.
     Lmi = 0,
     RegulatoryImposts = sum_or_null([DutyAfter, Surcharge, FirbFee, Lmi]),
-    Deposit = maps:get(<<"deposit_required">>, Mortgage, null),
-    Fees = buy_fees(Args, State, Ceiling, minus(Ceiling, Deposit),
+    BSlug = <<"kb.lender.foreign-buyer-deposit-requirements">>,
+    BPct  = param_value(BSlug, <<"non_resident_deposit_pct_typical">>),
+    {Deposit, Bounds, DepDetail} =
+        own_deposit(Args, maps:get(<<"deposit_required">>, Mortgage, null), BPct, Ceiling,
+                    {BSlug, <<"deposit">>, #{<<"pct">> => fh_engine_line_detail:pct(BPct)}}),
+    Loan = minus(Ceiling, Deposit),
+    Fees = buy_fees(Args, State, Ceiling, Loan,
                     sum_or_null([Deposit, RegulatoryImposts]), undefined, <<"other">>),
-    ChannelCosts = channel_costs(State, Ceiling, Fees),
+    ChannelCosts = channel_costs(State, Ceiling, Fees, Loan),
     TotalCashRequired = sum_or_null([Deposit, RegulatoryImposts, ChannelCosts]),
     FamilyCapacity = maps:get(<<"deposit_ready_for_purchase_amount">>, Profile, null),
     {GapOrSurplus, Verdict} = gap_and_verdict(FamilyCapacity, TotalCashRequired),
@@ -246,13 +253,10 @@ fill_fhb_foreign(Args, Upstream) ->
         <<"mitigation_options_if_short">>  => [],
         <<"cash_events">>                  =>
             line_details(cash_events_foreign(Deposit, DutyAfter, Surcharge, FirbFee,
-                                             registration_total(State, Ceiling), Fees),
-                         State, {ceiling, Ceiling}, Duty,
-                         {<<"kb.lender.foreign-buyer-deposit-requirements">>, <<"deposit">>,
-                          #{<<"pct">> => fh_engine_line_detail:pct(param_value(
-                                <<"kb.lender.foreign-buyer-deposit-requirements">>,
-                                <<"non_resident_deposit_pct_typical">>))}}),
+                                             registration(State, Ceiling, Loan), Fees),
+                         State, {ceiling, Ceiling}, Duty, DepDetail),
         <<"fee_pending">>                  => fee_pending(Fees),
+        <<"deposit_bounds">>               => Bounds,
         <<"key_assumptions">>              => key_assumptions_foreign(Ceiling, State)
     },
     KbVersions = fh_engine_kb:kb_anchors(
@@ -338,12 +342,15 @@ surcharge_pct(_)         -> null.
 %% band). Foreign-only lines (translation, FIRB help, the transfer from Vietnam) are among
 %% them when their owning docs say they apply to the mode.
 -spec channel_costs(binary() | undefined, integer() | null, fees()) -> integer() | null.
-channel_costs(State, V, {FeeEvents, _}) when is_integer(V) ->
-    case registration_total(State, V) of
+channel_costs(State, V, Fees) -> channel_costs(State, V, Fees, undefined).
+
+%% with the loan: a plan bought outright registers no mortgage (registration/3).
+channel_costs(State, V, {FeeEvents, _}, Loan) when is_integer(V) ->
+    case registration(State, V, Loan) of
         null -> null;
         Reg  -> Reg + mid(fh_engine_fees:committed(FeeEvents))
     end;
-channel_costs(_State, _V, _Fees) -> null.
+channel_costs(_State, _V, _Fees, _Loan) -> null.
 
 %% sum a list of contributing lines; null (never a partial sum) if ANY is unknown —
 %% the honest-partial discipline for an aggregate total (mirrors total_cash_investor/3's
@@ -423,8 +430,9 @@ fill_investor(Args, Upstream) ->
     %% (Phase-B) it carries the exact price → the cash-to-complete.
     Outcome = case maps:get(<<"property_fit_investor">>, Upstream, undefined) of
                   Pf when is_map(Pf), map_size(Pf) > 0 -> budget_envelope_investor(Args, Pf);
-                  _ -> (budget_envelope_investor_base())#{
-                           <<"cash_events">> => base_cash_events_investor(Args, Upstream)}
+                  _ -> {Events, Bounds} = base_cash_events_investor(Args, Upstream),
+                       (budget_envelope_investor_base())#{
+                           <<"cash_events">> => Events, <<"deposit_bounds">> => Bounds}
               end,
     KbVersions = fh_engine_kb:kb_anchors(
         [<<"kb.stamp-duty.calc-by-state">>,
@@ -448,7 +456,8 @@ budget_envelope_investor_base() ->
       <<"verdict">>                      => null,
       <<"mitigation_options_if_short">>  => [],
       <<"key_assumptions">>              => [],
-      <<"cash_events">>                  => []}.
+      <<"cash_events">>                  => [],
+      <<"deposit_bounds">>               => null}.
 
 %% Slice B3b — the per-property cash-to-complete (NEED side), POINT figures off the attached
 %% property's EXACT price (so scalar `money`, not banded): loan at the LVR baseline (80% — the
@@ -464,34 +473,45 @@ budget_envelope_investor(Args, Pf) ->
         false -> budget_envelope_investor_base();
         true ->
             Kind = fh_engine_fees:property_kind(maps:get(<<"property_type">>, Pf, null)),
-            {Lvr, Loan, Deposit, Duty, Acq, Fees} = investor_need(Args, State, Price, Kind),
-            Lmi     = 0,   %% 80% LVR baseline → no LMI (lmi.calculation 80% threshold)
+            #{lvr := Lvr, loan := Loan, deposit := Deposit, duty := Duty, acq := Acq,
+              fees := Fees, lmi := Lmi, bounds := Bounds, detail := DepDetail} =
+                investor_need(Args, State, Price, Kind),
             (budget_envelope_investor_base())#{
                 <<"actual_property_price">> => Price,
                 <<"loan_amount">>           => Loan,
                 <<"lvr">>                   => Lvr,
-                <<"lmi_payable">>           => Lmi,
-                <<"total_cash_required">>   => total_cash_investor(Deposit, Duty, Acq),
+                <<"lmi_payable">>           => lmi_point(Lmi),
+                <<"total_cash_required">>   =>
+                    plus_point(total_cash_investor(Deposit, Duty, Acq), lmi_point(Lmi)),
                 <<"key_assumptions">>       =>
                     security_lvr_caveat(maps:get(<<"property_type">>, Pf, null)),
                 <<"cash_events">>           =>
                     line_details(
-                        cash_events_investor(Deposit, Duty, registration_total(State, Price), Lmi, Fees),
-                        State, {property, Price}, #{}, investor_deposit_detail()),
-                <<"fee_pending">>           => fee_pending(Fees)
+                        cash_events_investor(Deposit, Duty, registration(State, Price, Loan),
+                                             lmi_amount(Lmi), Fees),
+                        State, {property, Price}, #{}, DepDetail, lmi_detail(Lmi, Loan, Price)),
+                <<"fee_pending">>           => fee_pending(Fees),
+                <<"deposit_bounds">>        => Bounds
             }
     end.
 
 %% the NEED side at one price: the 80% LVR baseline loan, the deposit, full duty (no FHB
 %% concession), the acquisition adders. Shared by the per-property figures and the base events.
+%% behavior 101: the visitor's own deposit replaces the 20% baseline, floored at the doc's
+%% minimum with LMI (deposit_min_with_lmi_pct); LMI follows kb.lmi.calculation above 80%.
 investor_need(Args, State, Price, Kind) ->
-    Lvr     = 100 - param_value(<<"kb.investor.deposit-requirements-investment-loans">>,
-                                <<"deposit_no_lmi_pct">>),
-    Loan    = round(Price * Lvr / 100),
+    Slug    = <<"kb.investor.deposit-requirements-investment-loans">>,
+    Base    = Price - round(Price * (100 - param_value(Slug, <<"deposit_no_lmi_pct">>)) / 100),
+    {Deposit, Bounds, Detail} =
+        own_deposit(Args, Base, param_value(Slug, <<"deposit_min_with_lmi_pct">>), Price,
+                    investor_deposit_detail()),
+    Loan    = Price - Deposit,
     Duty    = maps:get(<<"after_concession">>, stamp_duty(State, false, Price), null),
     Fees    = buy_fees(Args, State, Price, Loan, null, Kind, <<"services">>),
-    Acq     = acquisition_costs_investor(State, Price, Fees),
-    {Lvr, Loan, Price - Loan, Duty, Acq, Fees}.
+    Acq     = acquisition_costs_investor(State, Price, Fees, Loan),
+    #{lvr => round(Loan * 100 / Price), loan => Loan, deposit => Deposit, duty => Duty,
+      acq => Acq, fees => Fees, lmi => fh_engine_lmi:premium(Loan, Price),
+      bounds => Bounds, detail => Detail}.
 
 %% Whole lifecycle -> each phase has its money lines -> Mode C cash_position -> base events.
 %% Goal: the lifecycle sheet (behavior 82) shows Mode C's cash to buy before a property is
@@ -507,13 +527,16 @@ base_cash_events_investor(Args, Upstream) ->
     Ceiling = ceiling(maps:get(<<"target_price_range">>, Profile,
                                maps:get(<<"target_price_range">>, maps:get(onboarding, Args, #{}), null))),
     case is_integer(Ceiling) andalso Ceiling > 0 andalso is_binary(State) of
-        false -> [];
+        false -> {[], null};
         true  ->
-            {_Lvr, _Loan, Deposit, Duty, _Acq, Fees} =
+            #{loan := Loan, deposit := Deposit, duty := Duty, fees := Fees, lmi := Lmi,
+              bounds := Bounds, detail := Detail} =
                 investor_need(Args, State, Ceiling, undefined),
-            line_details(
-                cash_events_investor(Deposit, Duty, registration_total(State, Ceiling), 0, Fees),
-                State, {ceiling, Ceiling}, #{}, investor_deposit_detail())
+            {line_details(
+                cash_events_investor(Deposit, Duty, registration(State, Ceiling, Loan),
+                                     lmi_amount(Lmi), Fees),
+                State, {ceiling, Ceiling}, #{}, Detail, lmi_detail(Lmi, Loan, Ceiling)),
+             Bounds}
     end.
 
 %% Goal: regulated figures are grounded, honest about their tier -> a CONVENTION is stated as a
@@ -544,7 +567,7 @@ cash_events_investor(Deposit, Duty, Reg, Lmi, {FeeEvents, _}) ->
               point(Duty), false, <<"government">>, <<"cash_position">>),
         registration_event(Reg, <<"government">>),
         event(<<"lmi">>, <<"settle">>, <<"event_lmi">>, <<"out">>,
-              point(Lmi), false, <<"lender">>, <<"cash_position">>)
+              amount(Lmi), Lmi =/= [0, 0], <<"lender">>, <<"cash_position">>)
     ],
     [E || E <- Out, maps:get(<<"amount">>, E) =/= null] ++ FeeEvents.
 
@@ -555,8 +578,8 @@ cash_events_investor(Deposit, Duty, Reg, Lmi, {FeeEvents, _}) ->
 %% is a recurring OPERATING expense in yield_modelling, never an acquisition cost; no double-count).
 %% The conditional adders (lease review if tenant-in-situ, QS report, entity setup) are surfaced as
 %% considerations, not summed into the baseline cash. null when the state's registration isn't modelled.
-acquisition_costs_investor(State, Price, {FeeEvents, _}) ->
-    case registration_total(State, Price) of
+acquisition_costs_investor(State, Price, {FeeEvents, _}, Loan) ->
+    case registration(State, Price, Loan) of
         null -> null;
         Reg  -> Reg + mid(fh_engine_fees:committed(FeeEvents))
     end.
@@ -609,10 +632,15 @@ fill_investor_foreign(Args, Upstream) ->
     %% reuses the SAME due-diligence/legal + registration convention band Mode B's
     %% channel_costs/2 already sums (building/pest inspection, conveyancing, lender
     %% application fee + per-state registration) — investor-agnostic, no double build.
-    Deposit = maps:get(<<"deposit_required_amount">>, Mortgage, null),
-    Fees = buy_fees(Args, State, Ceiling, minus(Ceiling, Deposit),
+    DSlug = <<"kb.non-resident.investment-loan-deposit-requirements">>,
+    DPct  = param_value(DSlug, <<"non_resident_investment_deposit_pct_low">>),
+    {Deposit, Bounds, DepDetail} =
+        own_deposit(Args, maps:get(<<"deposit_required_amount">>, Mortgage, null), DPct,
+                    Ceiling, non_resident_deposit_detail()),
+    Loan = minus(Ceiling, Deposit),
+    Fees = buy_fees(Args, State, Ceiling, Loan,
                     sum_or_null([Deposit, RegulatoryImposts]), undefined, <<"services">>),
-    ChannelCosts = channel_costs(State, Ceiling, Fees),
+    ChannelCosts = channel_costs(State, Ceiling, Fees, Loan),
     TotalCashRequired = sum_or_null([Deposit, RegulatoryImposts, ChannelCosts]),
     %% the VN-side available capital (investor_profile_foreign's own field) is the HAVE side —
     %% null at base (genuinely uncaptured), same honest-partial call as Mode B's family
@@ -635,10 +663,11 @@ fill_investor_foreign(Args, Upstream) ->
         %% other costs. Mode D has no per-property cash_position turn in launch scope.
         <<"cash_events">>                  =>
             line_details(cash_events_foreign(Deposit, DutyAfter, Surcharge, FirbFee,
-                                             registration_total(State, Ceiling), Fees,
+                                             registration(State, Ceiling, Loan), Fees,
                                              <<"services">>),
-                         State, {ceiling, Ceiling}, Duty, non_resident_deposit_detail()),
-        <<"fee_pending">>                  => fee_pending(Fees)
+                         State, {ceiling, Ceiling}, Duty, DepDetail),
+        <<"fee_pending">>                  => fee_pending(Fees),
+        <<"deposit_bounds">>               => Bounds
     },
     KbVersions = fh_engine_kb:kb_anchors(
         [<<"kb.stamp-duty.calc-by-state">>, <<"kb.foreign-buyer-surcharge.by-state">>,
@@ -790,10 +819,11 @@ fhc_pick(V, [E | Rest]) ->
 %% stay null BY DESIGN: onboarding captures no savings (plan-first), so they compute on
 %% a refine turn (eligibility-resolution.md §9). Honest-partial throughout.
 
-budget_envelope(Sd, State, RecPath, Range, Ceiling, Stack, Fees) ->
-    Deposit    = deposit(RecPath, Range),
-    OtherCosts = other_buying_costs(State, Ceiling, Fees),
-    Total      = total_cash_required(Deposit, Sd, OtherCosts),
+budget_envelope(Sd, State, Ceiling, Stack, Fees, Dep) ->
+    Deposit    = maps:get(map, Dep),
+    Lmi        = maps:get(lmi, Dep),
+    OtherCosts = other_buying_costs(State, Ceiling, Fees, maps:get(loan, Dep)),
+    Total      = plus_range(total_cash_required(Deposit, Sd, OtherCosts), Lmi),
     #{<<"stamp_duty">>         => Sd,
       <<"deposit">>            => Deposit,        %% NEED — money_range (Decision 9)
       <<"other_buying_costs">> => OtherCosts,     %% NEED — regulated reg + convention bands
@@ -807,9 +837,12 @@ budget_envelope(Sd, State, RecPath, Range, Ceiling, Stack, Fees) ->
       <<"verdict">>                      => null,   %% PENDING by design (no savings at base)
       <<"genuine_savings_verdict">>      => <<"unknown">>,
       <<"cash_events">>                  =>
-          line_details(cash_events(Deposit, Sd, OtherCosts, Stack, Fees),
-                       State, {ceiling, Ceiling}, Sd, home_deposit_detail(RecPath)),
+          line_details(cash_events(Deposit, Sd, OtherCosts, Stack, Fees)
+                       ++ lmi_events(Lmi, <<"other">>),
+                       State, {ceiling, Ceiling}, Sd, maps:get(detail, Dep),
+                       lmi_detail(Lmi, maps:get(loan, Dep), Ceiling)),
       <<"fee_pending">>                  => fee_pending(Fees),
+      <<"deposit_bounds">>               => maps:get(bounds, Dep),
       <<"mitigation_options_if_short">>  => [],
       <<"key_assumptions">> => key_assumptions(Total, Ceiling)}.
 
@@ -925,12 +958,12 @@ deposit_pct() ->
 %% band its owning doc sources (behavior 83: the lines replaced one summed convention band,
 %% so the buyer sees them one by one). Evaluated at the range ceiling (the duty-at-ceiling
 %% convention); only the fee bands widen it.
-other_buying_costs(undefined, _Ceiling, _Fees) ->
+other_buying_costs(undefined, _Ceiling, _Fees, _Loan) ->
     pending_costs(copy(<<"note_state_unknown">>, #{}));
-other_buying_costs(_State, null, _Fees) ->
+other_buying_costs(_State, null, _Fees, _Loan) ->
     pending_costs(copy(<<"note_set_range">>, #{}));
-other_buying_costs(State, V, {FeeEvents, _}) when is_integer(V) ->
-    case registration_total(State, V) of
+other_buying_costs(State, V, {FeeEvents, _}, Loan) when is_integer(V) ->
+    case registration(State, V, Loan) of
         null -> pending_costs(copy(<<"note_state_unmodelled">>, #{<<"state">> => State}));
         Reg  ->
             [Lo, Hi] = fh_engine_fees:committed(FeeEvents),
@@ -1023,7 +1056,10 @@ registration_event(Reg, Counterparty) ->
 %% that owns the figure (fh_engine_line_detail); never another computation.
 %% Capability: the details every mode shares; Deposit is the mode's own deposit
 %% {Slug, EntryId, Params} (its price phrase is added here). No price → no events to detail.
-line_details(Events, State, {Basis, Price}, Sd, {DepSlug, DepId, DepParams})
+line_details(Events, State, Price, Sd, Deposit) ->
+    line_details(Events, State, Price, Sd, Deposit, lmi_none_detail()).
+
+line_details(Events, State, {Basis, Price}, Sd, {DepSlug, DepId, DepParams}, {LSlug, LId, LParams})
   when is_number(Price) ->
     PriceP = fh_engine_line_detail:price(Basis, Price),
     Ctx = fun(P) -> #{state => State, params => P} end,
@@ -1035,10 +1071,7 @@ line_details(Events, State, {Basis, Price}, Sd, {DepSlug, DepId, DepParams})
                                Ctx(#{<<"state">> => State, <<"price">> => PriceP})},
         <<"firb_fee">> => {<<"kb.firb.fee-schedule-current">>, <<"firb_fee">>,
                            Ctx(#{<<"price">> => PriceP})},
-        <<"lmi">> => {<<"kb.investor.deposit-requirements-investment-loans">>, <<"lmi_none">>,
-                      Ctx(#{<<"pct">> => param_value(
-                                <<"kb.investor.deposit-requirements-investment-loans">>,
-                                <<"deposit_no_lmi_pct">>)})}},
+        <<"lmi">> => {LSlug, LId, Ctx(LParams)}},
     Spec1 = case surcharge_pct(State) of
                 null -> Spec0;
                 Pct  -> Spec0#{<<"foreign_buyer_surcharge">> =>
@@ -1048,7 +1081,7 @@ line_details(Events, State, {Basis, Price}, Sd, {DepSlug, DepId, DepParams})
             end,
     Spec = maps:merge(Spec1, grant_details(Events, State)),
     fh_engine_line_detail:attach_all(Events, Spec);
-line_details(Events, _State, _Price, _Sd, _Deposit) ->
+line_details(Events, _State, _Price, _Sd, _Deposit, _Lmi) ->
     Events.
 
 %% each mode's deposit line: the doc whose % the deposit was computed at.
@@ -1095,9 +1128,123 @@ grant_details(Events, State) ->
                     || Slug =/= none,
                        #{<<"id">> := <<"grant_", _/binary>> = Id} <- Events]).
 
-%% Mode A/E's loan at the ceiling: the ceiling less the minimum deposit.
-home_loan(V) when is_integer(V) -> V - pct_of(deposit_pct(), V);
-home_loan(_) -> null.
+%% --- the visitor's own deposit (behavior 101) ----------------------------------
+%% Goal: built from their own situation -> the deposit is the buyer's choice -> cash_position
+%%   -> the deposit event every loan figure follows
+%% Purpose:   "Tài chính của bạn" lets a buyer put down more than the plan assumes, up to the
+%%            whole price ("Mua đứt"). The onboarding fact `deposit_amount` (set by the
+%%            `deposit` override, fh_engine_simulate) replaces the mode's assumed deposit at
+%%            the price basis (the range ceiling, or the attached property's price).
+%% Holds:     floor = the mode's KB minimum % of that price (A/E kb.scheme.fhg 5; B
+%%            kb.lender.foreign-buyer-deposit-requirements typical 30; C kb.investor
+%%            deposit_min_with_lmi_pct 10; D kb.non-resident low 30); max = the price. The
+%%            handlers refuse a deposit outside them (deposit_out_of_bounds); a stored one
+%%            the price later moved past is clamped here, never an error. The loan is the
+%%            price less the deposit, so disposition's principal (read from this deposit
+%%            event) and every loan-tied line follow it; a loan of 0 drops the mortgage
+%%            registration and the loan fee lines (fh_engine_fees `applies.loan`).
+%%            `deposit_bounds` carries {min, max, min_pct, assumed, chosen, price} to the sheet.
+%% Measured:  2026-10-16, reading fh_engine_disposition principal/2 and the P&I formulas: a
+%%            loan of 0 yields 0 repayments and interest, no division by the principal.
+
+%% Mode A/E: the deposit map budget_envelope places, the loan at the ceiling, LMI (outside
+%% the FHG's path, kb.lmi.calculation), the bounds, the line's detail.
+home_deposit(Args, RecPath, [Lo, Hi] = Range, Ceiling) when is_integer(Lo), is_integer(Hi) ->
+    Pct = deposit_pct(),
+    Assumed = pct_of(Pct, Ceiling),
+    case chosen_deposit(Args, Pct, Ceiling) of
+        undefined ->
+            Loan = Ceiling - Assumed,
+            #{map => deposit(RecPath, Range), loan => Loan, lmi => home_lmi(RecPath, Loan, Ceiling),
+              bounds => bounds(Pct, Ceiling, Assumed, null),
+              detail => home_deposit_detail(RecPath)};
+        D ->
+            Loan = Ceiling - D,
+            #{map => #{<<"minimum_required_percentage">> => Pct,
+                       <<"minimum_required_amount">>     => [D, D],
+                       <<"notes">> => [copy(<<"deposit_chosen">>,
+                                            #{<<"amount">> => money(D)})]},
+              loan => Loan, lmi => home_lmi(RecPath, Loan, Ceiling),
+              bounds => bounds(Pct, Ceiling, Assumed, D),
+              detail => chosen_detail(<<"kb.scheme.fhg">>, D, Ceiling, Pct)}
+    end;
+home_deposit(_Args, RecPath, Range, _Ceiling) ->
+    #{map => deposit(RecPath, Range), loan => null, lmi => none, bounds => null,
+      detail => home_deposit_detail(RecPath)}.
+
+%% the FHG backs a deposit from 5% with no LMI; any other path pays it above 80% LVR.
+home_lmi(<<"fhg_backed">>, _Loan, _Price) -> none;
+home_lmi(_RecPath, Loan, Price) -> fh_engine_lmi:premium(Loan, Price).
+
+%% Modes B/C/D: {Deposit, Bounds, Detail} — the chosen deposit or the mode's own (Assumed).
+own_deposit(_Args, Assumed, _Pct, Price, Detail) when not is_integer(Price) ->
+    {Assumed, null, Detail};
+own_deposit(Args, Assumed, Pct, Price, {Slug, _Id, _P} = Detail) ->
+    case chosen_deposit(Args, Pct, Price) of
+        undefined -> {Assumed, bounds(Pct, Price, Assumed, null), Detail};
+        D         -> {D, bounds(Pct, Price, Assumed, D), chosen_detail(Slug, D, Price, Pct)}
+    end.
+
+%% the visitor's deposit at this price, clamped into [floor, price]; undefined when unset.
+chosen_deposit(Args, Pct, Price) ->
+    case maps:get(<<"deposit_amount">>, maps:get(onboarding, Args, #{}), undefined) of
+        D when is_number(D), is_integer(Price), Price > 0 ->
+            erlang:min(Price, erlang:max(pct_of(Pct, Price), round(D)));
+        _ -> undefined
+    end.
+
+bounds(Pct, Price, Assumed, Chosen) ->
+    #{<<"min">> => pct_of(Pct, Price), <<"max">> => Price, <<"min_pct">> => Pct,
+      <<"assumed">> => Assumed, <<"chosen">> => Chosen, <<"price">> => Price}.
+
+%% the deposit line's detail when the buyer chose it: the doc whose minimum floors it.
+chosen_detail(Slug, D, Price, MinPct) ->
+    {Slug, <<"deposit_chosen">>,
+     #{<<"amount">> => money(D),
+       <<"pct">> => fh_engine_line_detail:pct(round(D * 1000 / Price) / 10),
+       <<"min_pct">> => fh_engine_line_detail:pct(MinPct)}}.
+
+%% the LMI line: an event where a premium applies (none → no line).
+lmi_events(none, _Counterparty) -> [];
+lmi_events([_, _] = R, Counterparty) ->
+    [event(<<"lmi">>, <<"settle">>, <<"event_lmi">>, <<"out">>, R, true, Counterparty,
+           <<"cash_position">>)].
+
+lmi_amount(none) -> [0, 0];
+lmi_amount(R)    -> R.
+
+lmi_point(none)     -> 0;
+lmi_point([Lo, Hi]) -> round((Lo + Hi) / 2).
+
+%% the LMI line's detail: the band at this LVR (kb.lmi.calculation), or the investor
+%% doc's "no LMI at 20%" when there is none.
+lmi_detail(none, _Loan, _Price) -> lmi_none_detail();
+lmi_detail([_, _], Loan, Price) ->
+    Lvr = fh_engine_lmi:lvr(Loan, Price),
+    {RLo, RHi} = fh_engine_lmi:rates(Lvr),
+    {<<"kb.lmi.calculation">>, <<"lmi">>,
+     #{<<"lvr">> => Lvr, <<"loan">> => money(Loan),
+       <<"lo">> => fh_engine_line_detail:pct(RLo), <<"hi">> => fh_engine_line_detail:pct(RHi)}}.
+
+lmi_none_detail() ->
+    {<<"kb.investor.deposit-requirements-investment-loans">>, <<"lmi_none">>,
+     #{<<"pct">> => param_value(<<"kb.investor.deposit-requirements-investment-loans">>,
+                                <<"deposit_no_lmi_pct">>)}}.
+
+plus_range(null, _) -> null;
+plus_range(R, none) -> R;
+plus_range([A, B], [C, D]) -> [A + C, B + D].
+
+plus_point(null, _) -> null;
+plus_point(V, L) -> V + L.
+
+%% registration with the loan: no loan (bought outright) registers no mortgage.
+registration(State, V, 0) ->
+    case {registration_total(State, V), reg_entry(State)} of
+        {null, _} -> null;
+        {Reg, E}  -> dollars(Reg - maps:get(<<"mortgage_registration_flat">>, E))
+    end;
+registration(State, V, _Loan) -> registration_total(State, V).
 
 minus(A, B) when is_number(A), is_number(B) -> A - B;
 minus(_, _) -> null.

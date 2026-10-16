@@ -76,10 +76,14 @@ run(Id, Body, Req, State) ->
 preview(Id, Slug, Overrides, Onboarding, Intent, Financials, Firb, Req, State) ->
     try fh_engine_simulate:run(Slug, Onboarding, Intent, Financials, Firb) of
         {ok, Outcomes} ->
-            Resp = #{<<"plan_card_id">> => Id,
-                     <<"overrides">> => Overrides,
-                     <<"outcomes">> => by_component(Slug, Outcomes)},
-            {ok, fh_engine_http:reply_json(200, Resp, Req), State}
+            case fh_engine_simulate:check_deposit(Overrides, Outcomes) of
+                ok ->
+                    Resp = #{<<"plan_card_id">> => Id,
+                             <<"overrides">> => Overrides,
+                             <<"outcomes">> => by_component(Slug, Outcomes)},
+                    {ok, fh_engine_http:reply_json(200, Resp, Req), State};
+                {error, Why} -> reject(Why, Req, State)
+            end
     catch
         Class:Why:St ->
             %% A non-conforming resolver outcome is an engine bug, not user error — and
@@ -111,7 +115,11 @@ reject(property_type_phase_b, Req, State) ->
           <<"field">> => <<"property_type">>,
           <<"detail">> => <<"property_type is a Phase-B (per-property) simulate "
                             "dimension; attach a property to vary it. Base simulate "
-                            "accepts target_price, state, and horizon.">>}, Req), State};
+                            "accepts target_price, state, horizon, and deposit.">>}, Req), State};
+reject({deposit_out_of_bounds, Min, Max}, Req, State) ->
+    {ok, fh_engine_http:reply_json(400,
+        #{<<"error">> => <<"deposit_out_of_bounds">>, <<"field">> => <<"deposit">>,
+          <<"min">> => Min, <<"max">> => Max}, Req), State};
 reject({unknown_override, K}, Req, State) ->
     {ok, fh_engine_http:reply_json(400,
         #{<<"error">> => <<"unknown_override">>, <<"field">> => K}, Req), State};

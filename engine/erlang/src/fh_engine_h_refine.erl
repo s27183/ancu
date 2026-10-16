@@ -66,7 +66,11 @@ run(Id, Card, Body, Req, State) ->
             %% applied by get_card_rerun_context), so overrides accumulate on a refined card.
             Onboarding0 = maps:get(<<"onboarding">>, maps:get(facts, Ctx), #{}),
             case fh_engine_simulate:apply_overrides(Overrides, Onboarding0) of
-                {ok, Onboarding} -> commit(Id, Card, Ctx, Onboarding, Req, State);
+                {ok, Onboarding} ->
+                    case deposit_ok(Overrides, Ctx, Onboarding) of
+                        ok -> commit(Id, Card, Ctx, Onboarding, Req, State);
+                        {error, Why} -> reject(Why, Req, State)
+                    end;
                 {error, Reason}  -> reject(Reason, Req, State)
             end
     end.
@@ -89,14 +93,31 @@ commit(Id, Card, Ctx, Onboarding, Req, State) ->
                 Req), State}
     end.
 
+%% behavior 101: a `deposit` save is checked against the bounds cash_position computes for
+%% the saved scenario — the same pure preview walk /simulate runs (no persist), so a refused
+%% deposit never reaches the target column. Without a deposit override there is no walk.
+deposit_ok(#{<<"deposit">> := _} = Overrides, Ctx, Onboarding) ->
+    Facts = maps:get(facts, Ctx),
+    Firb = maps:get(<<"firb_required_any">>, maps:get(<<"derived">>, Facts, #{}), false),
+    {ok, Outcomes} = fh_engine_simulate:run(maps:get(blueprint_slug, Ctx), Onboarding,
+                                            maps:get(intent, Ctx, <<"owner_occupier">>),
+                                            maps:get(<<"household_financials">>, Facts, #{}),
+                                            Firb),
+    fh_engine_simulate:check_deposit(Overrides, Outcomes);
+deposit_ok(_Overrides, _Ctx, _Onboarding) -> ok.
+
 %% Override rejects — same atoms as /simulate (the shared apply_overrides/2).
 reject(property_type_phase_b, Req, State) ->
     {ok, fh_engine_http:reply_json(400,
         #{<<"error">> => <<"override_not_supported">>,
           <<"field">> => <<"property_type">>,
           <<"detail">> => <<"property_type is a Phase-B (per-property) dimension; attach a "
-                            "property to vary it. Base refine accepts target_price, state, and horizon.">>},
+                            "property to vary it. Base refine accepts target_price, state, horizon, and deposit.">>},
         Req), State};
+reject({deposit_out_of_bounds, Min, Max}, Req, State) ->
+    {ok, fh_engine_http:reply_json(400,
+        #{<<"error">> => <<"deposit_out_of_bounds">>, <<"field">> => <<"deposit">>,
+          <<"min">> => Min, <<"max">> => Max}, Req), State};
 reject({unknown_override, K}, Req, State) ->
     {ok, fh_engine_http:reply_json(400,
         #{<<"error">> => <<"unknown_override">>, <<"field">> => K}, Req), State};

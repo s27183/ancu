@@ -409,7 +409,11 @@ own_cash_events(Args, Upstream, BudgetKey, Other, Kind, Source) ->
                   fh_engine_disposition:annual_repayments(Principal, Kind),
                   <<"lender">>, Source)],
     {FeeEvents, _} = own_fees(Args, Other, Source),
-    own_details([E || E <- Events, maps:get(<<"amount">>, E) =/= null], Principal, Kind)
+    %% behavior 101: bought outright (principal [0, 0]) there are no repayments to show
+    own_details([E || E <- Events, maps:get(<<"amount">>, E) =/= null,
+                      not (Principal =:= [0, 0]
+                           andalso maps:get(<<"id">>, E) =:= <<"loan_repayments">>)],
+                Principal, Kind)
         ++ FeeEvents.
 
 %% Whole lifecycle -> every statement line opens its own detail -> ownership_planning -> the
