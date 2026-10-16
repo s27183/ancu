@@ -111,6 +111,10 @@ template ids the resolver references, each a `{vi, en}` pair.
       "vi": "Phí đăng bộ sang tên và thế chấp (do bang quy định)",
       "en": "Title registration — transfer and mortgage (set by the state)"
     },
+    "event_registration_transfer": {
+      "vi": "Phí đăng bộ sang tên (do bang quy định)",
+      "en": "Title registration — transfer (set by the state)"
+    },
     "event_other_costs": {
       "vi": "Chi phí giao dịch (đăng bộ, kiểm định, sang tên)",
       "en": "Transaction costs (registration, inspection, conveyancing)"

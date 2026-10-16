@@ -123,7 +123,11 @@ outright_cases() ->
             <<"loan_repayments">>, <<"dispose_loan_payout">>],
     [check("outright → no " ++ binary_to_list(Id), event(A, Id), absent) || Id <- Gone] ++
     [check("outright → deposit is the whole price", event(A, <<"deposit">>), [?PRICE, ?PRICE]),
-     check("outright → FHG rejected as not needed", rejected_fhg(A), true)].
+     check("outright → FHG rejected as not needed", rejected_fhg(A), true),
+     check("outright → registration names the transfer only",
+           maps:get(<<"en">>, maps:get(<<"label">>, hd([E || E <- events(A),
+                                                       maps:get(<<"id">>, E) =:= <<"registration">>]))),
+           <<"Title registration — transfer (set by the state)"/utf8>>)].
 
 %% --- harness -----------------------------------------------------------------
 

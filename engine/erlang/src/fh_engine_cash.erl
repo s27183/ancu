@@ -252,9 +252,9 @@ fill_fhb_foreign(Args, Upstream) ->
         <<"verdict">>                      => Verdict,
         <<"mitigation_options_if_short">>  => [],
         <<"cash_events">>                  =>
-            line_details(cash_events_foreign(Deposit, DutyAfter, Surcharge, FirbFee,
+            no_loan(line_details(cash_events_foreign(Deposit, DutyAfter, Surcharge, FirbFee,
                                              registration(State, Ceiling, Loan), Fees),
-                         State, {ceiling, Ceiling}, Duty, DepDetail),
+                         State, {ceiling, Ceiling}, Duty, DepDetail), Loan),
         <<"fee_pending">>                  => fee_pending(Fees),
         <<"deposit_bounds">>               => Bounds,
         <<"key_assumptions">>              => key_assumptions_foreign(Ceiling, State)
@@ -486,10 +486,11 @@ budget_envelope_investor(Args, Pf) ->
                 <<"key_assumptions">>       =>
                     security_lvr_caveat(maps:get(<<"property_type">>, Pf, null)),
                 <<"cash_events">>           =>
-                    line_details(
+                    no_loan(line_details(
                         cash_events_investor(Deposit, Duty, registration(State, Price, Loan),
                                              lmi_amount(Lmi), Fees),
                         State, {property, Price}, #{}, DepDetail, lmi_detail(Lmi, Loan, Price)),
+                            Loan),
                 <<"fee_pending">>           => fee_pending(Fees),
                 <<"deposit_bounds">>        => Bounds
             }
@@ -532,10 +533,10 @@ base_cash_events_investor(Args, Upstream) ->
             #{loan := Loan, deposit := Deposit, duty := Duty, fees := Fees, lmi := Lmi,
               bounds := Bounds, detail := Detail} =
                 investor_need(Args, State, Ceiling, undefined),
-            {line_details(
+            {no_loan(line_details(
                 cash_events_investor(Deposit, Duty, registration(State, Ceiling, Loan),
                                      lmi_amount(Lmi), Fees),
-                State, {ceiling, Ceiling}, #{}, Detail, lmi_detail(Lmi, Loan, Ceiling)),
+                State, {ceiling, Ceiling}, #{}, Detail, lmi_detail(Lmi, Loan, Ceiling)), Loan),
              Bounds}
     end.
 
@@ -662,10 +663,10 @@ fill_investor_foreign(Args, Upstream) ->
         %% only when its figure is known, so an unknown state drops duty, surcharge and
         %% other costs. Mode D has no per-property cash_position turn in launch scope.
         <<"cash_events">>                  =>
-            line_details(cash_events_foreign(Deposit, DutyAfter, Surcharge, FirbFee,
+            no_loan(line_details(cash_events_foreign(Deposit, DutyAfter, Surcharge, FirbFee,
                                              registration(State, Ceiling, Loan), Fees,
                                              <<"services">>),
-                         State, {ceiling, Ceiling}, Duty, DepDetail),
+                         State, {ceiling, Ceiling}, Duty, DepDetail), Loan),
         <<"fee_pending">>                  => fee_pending(Fees),
         <<"deposit_bounds">>               => Bounds
     },
@@ -837,10 +838,10 @@ budget_envelope(Sd, State, Ceiling, Stack, Fees, Dep) ->
       <<"verdict">>                      => null,   %% PENDING by design (no savings at base)
       <<"genuine_savings_verdict">>      => <<"unknown">>,
       <<"cash_events">>                  =>
-          line_details(cash_events(Deposit, Sd, OtherCosts, Stack, Fees)
+          no_loan(line_details(cash_events(Deposit, Sd, OtherCosts, Stack, Fees)
                        ++ lmi_events(Lmi, <<"other">>),
                        State, {ceiling, Ceiling}, Sd, maps:get(detail, Dep),
-                       lmi_detail(Lmi, maps:get(loan, Dep), Ceiling)),
+                       lmi_detail(Lmi, maps:get(loan, Dep), Ceiling)), maps:get(loan, Dep)),
       <<"fee_pending">>                  => fee_pending(Fees),
       <<"deposit_bounds">>               => maps:get(bounds, Dep),
       <<"mitigation_options_if_short">>  => [],
@@ -1056,6 +1057,15 @@ registration_event(Reg, Counterparty) ->
 %% that owns the figure (fh_engine_line_detail); never another computation.
 %% Capability: the details every mode shares; Deposit is the mode's own deposit
 %% {Slug, EntryId, Params} (its price phrase is added here). No price → no events to detail.
+%% behavior 101: bought outright, the registration line is the transfer alone (registration/3
+%% left the mortgage fee out), so its label stops naming a mortgage.
+no_loan(Events, Loan) when Loan == 0; Loan =:= [0, 0] ->
+    [case maps:get(<<"id">>, E) of
+         <<"registration">> -> E#{<<"label">> => copy(<<"event_registration_transfer">>, #{})};
+         _ -> E
+     end || E <- Events];
+no_loan(Events, _Loan) -> Events.
+
 line_details(Events, State, Price, Sd, Deposit) ->
     line_details(Events, State, Price, Sd, Deposit, lmi_none_detail()).
 
