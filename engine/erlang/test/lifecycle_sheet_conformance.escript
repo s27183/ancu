@@ -136,7 +136,14 @@ cost_cases(BP, Intent, Firb, Out10, B10) ->
          lists:all(Holds, [5, 10, 15, 20, 30])),
      chk(BP, "the loan paid out is the price less the deposit at the mode's rate",
          maps:get(<<"loan_payout">>, Disp10) =:= fh_engine_disposition:loan_payout(Loan, Kind, 10)
-             andalso maps:get(<<"principal">>, maps:get(<<"loan_over_hold">>, Disp10)) =:= Loan)].
+             andalso maps:get(<<"principal">>, maps:get(<<"loan_over_hold">>, Disp10)) =:= Loan),
+     chk(BP, "the Bán sheet's growth band is the KB's, the one the sale price is projected at",
+         begin
+             {ok, G} = fh_engine_kb:kb_rules(<<"kb.property.capital-growth-bands">>),
+             V = fun(K) -> maps:get(<<"value">>, maps:get(K, maps:get(<<"parameters">>, G))) end,
+             maps:get(<<"growth_pct_pa">>, Disp10) =:=
+                 [V(<<"growth_band_low_pct_pa_nominal">>), V(<<"growth_band_high_pct_pa_nominal">>)]
+         end)].
 
 %% Whole lifecycle -> every statement line opens its own detail -> the base fill -> every
 %% line carries a detail (behavior 93, Expect 10). Measured 2026-10-16 before the change:

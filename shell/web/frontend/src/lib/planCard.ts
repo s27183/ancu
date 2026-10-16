@@ -319,6 +319,8 @@ export interface DispositionOutcome {
      *  repayments over the hold split into interest (a cost) and principal repaid (into the
      *  home); null with no hold or no loan (fh_engine_disposition loan_over_hold/3). */
     loan_over_hold?: LoanOverHold | null;
+    /** behavior 98: the [low, high] nominal growth %/yr the sale price is projected at. */
+    growth_pct_pa?: [number, number] | null;
     key_assumptions?: LocalizedText[] | null;
     /** Mode C/D only (fh_engine_disposition.erl fill_investor/3): the gain after any CGT
      *  discount, before tax; absent on the Mode-A/B main-residence path. */

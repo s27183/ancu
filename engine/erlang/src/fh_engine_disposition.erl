@@ -128,6 +128,7 @@ fill_owner_occupier(Args, Profile, Upstream) ->
         <<"full_horizon_net_position">> => Full,
         <<"dispose_cash_events">>       => Events,
         <<"loan_over_hold">>            => loan_over_hold(Principal, Kind, H),
+        <<"growth_pct_pa">>             => [GLow, GHigh],
         <<"fee_pending">>               => element(2, Fees),
         <<"key_assumptions">>           => assumptions(H, GLow, GHigh, IsPlaceholder, Status, Loan, Kind)
     },
@@ -205,6 +206,7 @@ fill_investor(Args, Profile, Tax, Upstream) ->
         <<"full_horizon_net_position">> => Full,
         <<"dispose_cash_events">>       => Events,
         <<"loan_over_hold">>            => loan_over_hold(Principal, Kind, H),
+        <<"growth_pct_pa">>             => [GLow, GHigh],
         <<"fee_pending">>               => element(2, Fees),
         <<"key_assumptions">>           => assumptions_investor(H, GLow, GHigh, IsPlaceholder, Status, Loan, Frcgw, Kind)
     },
