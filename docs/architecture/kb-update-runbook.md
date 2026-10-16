@@ -363,43 +363,43 @@ have sources coming from public gov channels. This is to ensure we don't use
 commercial news." So: find the government page that carries each claim; a claim
 no government page carries is **cut**, not cited elsewhere; a story only media
 carry is not a note. Many `immi.homeaffairs.gov.au` pages are built in JavaScript
-and read as a JSON blob to `curl` or WebFetch — read them in a browser (Claude in
-Chrome `get_page_text`), and an ATO page that 403s to WebFetch reads with `curl`
+from a JSON blob — `scripts/archive_source.py` unpacks it (2026-10-17), and an ATO page that 403s to WebFetch reads with `curl`
 and a browser user agent (both measured 2026-10-09). GATE 11 fails the build on
 any other host, naming the note and the host.
 
-#### Home Affairs visa check — from Son's machine, at each kb-watch PR (behavior 100)
+#### Home Affairs visa check — in the weekly kb-watch routine (behaviors 100, 104)
 
-Home Affairs refuses automated fetches (curl and WebFetch get HTTP 403, measured
-2026-10-16), so the cloud kb-watch routine cannot read it. Visa news is checked
-instead by the seat on Son's machine, in Claude in Chrome, **whenever a weekly
-kb-watch PR arrives for Son's review**, and any note it writes is added to that PR
-(or, if the PR has merged, to a follow-up KB PR). It covers the permanent visas a
-buyer's status rests on and the pathways to them: skilled (189, 190, 491/191),
-employer-sponsored (186, 494), graduate 485 to PR, partner (820/801, 309/100),
+The cloud kb-watch routine runs this check each week (behavior 104, Son 2026-10-17);
+it used to wait for the seat on Son's machine, because Home Affairs was thought to
+refuse automated fetches. Measured 2026-10-17: curl reads every Home Affairs page and
+feed with HTTP 200, from Son's machine and from a cloud routine alike, with a browser
+user agent or none; WebFetch alone gets 403. It covers the permanent visas a buyer's
+status rests on and the pathways to them: skilled (189, 190, 491/191),
+employer-sponsored (186, 494), graduate 485 to PR, partner (820/801, 309/100, 300),
 parent (103, 143, 804, 864 and their temporary 173/884/870), and the permanent
 Migration Program's planning levels.
 
-1. **Read, one page at a time.** Open your own new tab and close it after. A
-   background tab renders only when a screenshot forces frames: take a small
-   screenshot, then `get_page_text`. Never script bulk `fetch()` calls from the
-   page: a burst of about 25 parallel requests on 2026-10-16 got the browser's
-   address blocked ("Access Denied") for the rest of the session.
-2. **The pages.** `minister.homeaffairs.gov.au` — the media-release list pages
-   return a server error, but the Minister's page (`/TonyBurke/Pages/Welcome.aspx`)
-   links an RSS feed (`/_layouts/15/AppPages/Rss.aspx?type=media&mini=TonyBurke`,
-   and `type=speech`; the same for `MattThistlethwaite` and `JulianHill`) that
-   lists every release with its date. `immi.homeaffairs.gov.au/what-we-do/migration-program-planning-levels`
-   and `/what-we-do/state-and-territory-nomination-allocations` (the 190/491
-   allocations). Each visa's page under `/visas/getting-a-visa/visa-listing/`
-   shows a "Last updated" date (`id="pageModified"` in the HTML): a page changed
-   since the newest visa note is the one to read. `immi.homeaffairs.gov.au/news-media/archive`
-   stays "Loading…": its `GetNews` call returns HTTP 500 (2026-10-16).
-3. **Write.** A change published since the newest `category: visa` note's
-   `authored_date`, and not already covered by a note, becomes a note as Phase 1
+1. **What moved.** `python3 scripts/visa_watch.py --update` reads the watch list in
+   `docs/sources/homeaffairs/visa-watch.json` one source at a time with a pause
+   (a burst of about 25 parallel requests on 2026-10-16 got a browser's address
+   blocked) and prints a `RELEASE` line for each ministerial release, and a `PAGE`
+   line for each page whose "Last updated" date is on or after `since`, then moves
+   `since` to today. A page added to the watch goes in that file.
+2. **The sources.** The ministers' releases come from RSS
+   (`minister.homeaffairs.gov.au/_layouts/15/AppPages/Rss.aspx?type=media&mini=TonyBurke`,
+   the same for `MattThistlethwaite` and `JulianHill`); the release list pages return
+   a server error. Home Affairs' own news archive (`immi.homeaffairs.gov.au/news-media/archive`)
+   has no working feed: its `GetNews` call returns HTTP 500 (2026-10-16). Each visa
+   page under `/visas/getting-a-visa/visa-listing/` carries its "Last updated" date
+   in the HTML (`id="pageModified"`), and draws its text from a JSON field that
+   `scripts/archive_source.py` unpacks; WebFetch is refused, so read with curl or the
+   archive. If the cloud is ever refused, the seat on Son's machine runs the same
+   script and reads in Claude in Chrome, one tab at a time.
+3. **Write.** A `RELEASE` or `PAGE` line whose change a buyer would care about,
+   and not already covered by a note, becomes a note as Phase 1
    "Authoring a news note" says: archive each cited page as text under
-   `docs/sources/homeaffairs/<name>-<date read>.txt` (the Source / Retrieved /
-   Extracted header, `Extracted:` naming Chrome `get_page_text`) and cite it with
+   `docs/sources/homeaffairs/<name>-<date read>.txt` with `scripts/archive_source.py`
+   and cite it with
    `path:`. Its last summary sentence says what the status means for buying, taken
    from the KB doc it names in `affected_kb_slugs` and never saying more than that
    doc does: `kb.firb.status-determination` (an ordinarily resident permanent
@@ -407,8 +407,8 @@ Migration Program's planning levels.
    `kb.scheme.fhg` (citizen or permanent resident when entering the loan),
    `kb.foreign-buyer-surcharge.by-state` (a permanent resident is exempt from the
    surcharge in some states and not others; the state revenue office decides).
-4. **Report on the PR.** Name the pages read with the date, and each note added,
-   or `Home Affairs visa check: no change since <date>`.
+4. **Report on the PR.** Each `PAGE`/`RELEASE` line with the note it became or why
+   none, each `COULD NOT READ` line, or `Home Affairs visa check: no change since <date>`.
 
 **Standalone notes — omit `kb_slug`, no diff required (2026-08).** The shape above
 assumes a diff against one of *our own* KB fact docs (a threshold changed, a rate

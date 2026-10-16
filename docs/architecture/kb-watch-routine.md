@@ -81,9 +81,15 @@ in `docs/kb/news/` as the shape to copy.
    sro.vic.gov.au, qro.qld.gov.au, revenuesa.sa.gov.au, finance.wa.gov.au (RevenueWA),
    treasury.gov.au and budget.gov.au, firb.gov.au,
    housingaustralia.gov.au, rba.gov.au, asic.gov.au. Government sources only: no news
-   outlet, blog or aggregator. Home Affairs visa news is not yours: homeaffairs.gov.au
-   refuses automated fetches, so the runbook's "Home Affairs visa check" step is run
-   from Son's machine when your PR arrives, and adds its visa notes to your PR. Skip anything already covered by an existing note. Each
+   outlet, blog or aggregator. Skip anything already covered by an existing note.
+   Visa news (Home Affairs and its ministers): run `python3 scripts/visa_watch.py
+   --update`. Each `RELEASE` or `PAGE` line it prints is a candidate: open it with
+   curl (never WebFetch, which Home Affairs refuses), read only what changed, and write
+   a note if a buyer would care, as the runbook's "Home Affairs visa check" says —
+   archive each page you cite with `scripts/archive_source.py`, short paragraphs,
+   tables for quotas, plain visa names. A release about security, disasters or the arts
+   is not visa news. Commit `docs/sources/homeaffairs/visa-watch.json` (its new
+   `since`) whenever you open a PR. Each
    note is `docs/kb/news/<yyyy-mm>-<slug>.md`, frontmatter `slug: kb.news.<same>`,
    `category` (one of finance, market, property, scheme, tax, visa), `effective_from`, `authored_date: <today>`, `sources:` (url + retrieved
    today, a page you opened), and four sections: Headline (EN), Headline (VI), Summary
@@ -110,6 +116,9 @@ in `docs/kb/news/` as the shape to copy.
    - one line per doc taken in step 1: `<slug> — unchanged` / `<slug> — changed <old> →
      <new> (<source url>)` / `<slug> — could not verify: <why>`
    - the news notes added, each with its EN headline and source
+   - the visa check: each `PAGE`/`RELEASE` line with what you did with it (a note, or
+     why none), each `COULD NOT READ` line as printed, or the one line
+     `Home Affairs visa check: no change since <date>`
    - kind-2/3 changes found and not drafted
    - any check that could not run
    The first line of the body says: "Opened by the weekly kb-watch routine (behaviors 57,
