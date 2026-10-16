@@ -710,6 +710,7 @@ const messages = {
     'plan.sheet.line.sale_proceeds': { vi: 'Giá bán', en: 'Sale price' },
     'plan.sheet.line.selling_costs': { vi: 'Chi phí bán', en: 'Selling costs' },
     'plan.sheet.line.loan_payout': { vi: 'Tất toán khoản vay', en: 'Loan payout' },
+    'plan.sheet.state_q': { vi: 'Bang', en: 'State' },
     'plan.sheet.hold_q': { vi: 'Bạn định giữ nhà bao lâu?', en: 'How long will you keep it?' },
     'plan.sheet.years': { vi: 'năm', en: 'yrs' },
     'plan.sheet.filling': { vi: 'Đang tính…', en: 'Working it out…' },

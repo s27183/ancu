@@ -207,6 +207,12 @@
         horizonValue = years;
         void runPreview();
     }
+    // The sheet's state picker drives the cockpit's state what-if (the engine drops the
+    // pinned suburb and plans for the state).
+    function chooseState(s: string) {
+        stateSelect = s;
+        void runPreview();
+    }
     let previewOutcomes = $state<Record<string, Record<string, unknown>> | null>(null);
     let previewing = $state(false);
     let previewError = $state(false);
@@ -1349,8 +1355,10 @@
                             components={viewComponents}
                             filling={running}
                             horizon={previewActive || baselineHorizon ? horizonValue : 0}
+                            planState={stateSelect || suburbState}
                             busy={previewing}
                             onhorizon={chooseHold}
+                            onstate={chooseState}
                             onopen={(cid) => (sheetDetail = cid)}
                         />
                         {#if sheetDetail && viewComponents[sheetDetail]}

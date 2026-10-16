@@ -8,8 +8,10 @@
     //            is missing says which input, never a figure. Tapping a line opens its
     //            source component (the zoom-in layer) through `onopen`.
     // Rests on:  fh_engine_journey's lifecycle_budget block (what each total sums).
-    // Known gaps: the hold-years choice is a what-if preview (the cockpit's horizon), not
-    //            saved until the plan is saved from the budget tab.
+    //            The state it is planned for is in its title; picking another re-plans
+    //            for that state through `onstate` (the engine's state what-if).
+    // Known gaps: the hold-years and state choices are what-if previews (the cockpit's
+    //            horizon and state), not saved until the plan is saved from the budget tab.
     import { t } from '$lib/i18n';
     import { lang } from '$lib/stores/lang';
     import {
@@ -23,21 +25,27 @@
         type PendingLine
     } from '$lib/planCard';
     import { money, moneyRange } from '$lib/format';
+    import { AU_STATES } from '$lib/map';
 
     let {
         components,
         filling,
         horizon,
+        planState,
         busy = false,
         onhorizon,
+        onstate,
         onopen
     }: {
         components: Record<string, ComponentEntry>;
         filling: boolean;
         /** The hold years currently shown (0 = none chosen). */
         horizon: number;
+        /** The state the figures are planned for. */
+        planState: string;
         busy?: boolean;
         onhorizon: (years: number) => void;
+        onstate: (state: string) => void;
         onopen: (componentId: string) => void;
     } = $props();
 
@@ -103,7 +111,22 @@
 
 <section class="ls" aria-labelledby="ls-title">
     <header class="ls-head">
-        <h3 id="ls-title" class="ls-title">{$t('plan.sheet.title')}</h3>
+        <div class="ls-head-row">
+            <h3 id="ls-title" class="ls-title">{$t('plan.sheet.title')} · {planState}</h3>
+            <label class="ls-state">
+                <span class="ls-state-label">{$t('plan.sheet.state_q')}</span>
+                <select
+                    id="ls-state"
+                    value={planState}
+                    disabled={busy}
+                    onchange={(e) => onstate((e.currentTarget as HTMLSelectElement).value)}
+                >
+                    {#each AU_STATES as s (s)}
+                        <option value={s}>{s}</option>
+                    {/each}
+                </select>
+            </label>
+        </div>
         <p class="ls-sub">{$t('plan.sheet.sub')}</p>
     </header>
 
@@ -201,6 +224,13 @@
 <style>
     .ls { display: grid; gap: 1rem; }
     .ls-head { display: grid; gap: 0.25rem; }
+    .ls-head-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.4rem 0.75rem; }
+    .ls-state { display: inline-flex; align-items: center; gap: 0.4rem; font-size: var(--fs-sm, 0.875rem); color: var(--muted); }
+    .ls-state select {
+        font: inherit; color: var(--ink); background: var(--surface);
+        border: 1px solid var(--border-strong); border-radius: 0.5rem; padding: 0.2rem 0.4rem;
+    }
+    .ls-state select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
     .ls-title { margin: 0; font-size: var(--fs-lg, 1.125rem); color: var(--ink); text-wrap: balance; }
     .ls-sub { margin: 0; font-size: var(--fs-sm, 0.875rem); color: var(--muted); }
 
