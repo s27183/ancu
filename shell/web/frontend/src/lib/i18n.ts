@@ -683,6 +683,42 @@ const messages = {
     'plan.phase.settle': { vi: 'Bàn giao', en: 'Settle' },
     'plan.phase.own': { vi: 'Sở hữu', en: 'Own' },
     'plan.phase.dispose': { vi: 'Bán nhà', en: 'Sell' },
+    // Behavior 82: the one-page lifecycle budget sheet (LifecycleSheet.svelte).
+    'plan.sheet.tab': { vi: 'Trọn vòng đời', en: 'Whole lifecycle' },
+    'plan.sheet.title': { vi: 'Ngân sách trọn vòng đời', en: 'Lifecycle budget' },
+    'plan.sheet.sub': {
+        vi: 'Mọi khoản tiền từ lúc mua, trong lúc ở, đến khi bán. Chạm vào một dòng để xem chi tiết.',
+        en: 'Every money line from buying, to owning, to selling. Tap a line to see its detail.'
+    },
+    'plan.sheet.buy': { vi: 'Mua', en: 'Buy' },
+    'plan.sheet.buy_sub': { vi: 'hợp đồng → bàn giao', en: 'contract → settlement' },
+    'plan.sheet.own': { vi: 'Sở hữu', en: 'Own' },
+    'plan.sheet.own_sub': { vi: 'mỗi năm', en: 'per year' },
+    'plan.sheet.sell': { vi: 'Bán', en: 'Sell' },
+    'plan.sheet.sell_sub': { vi: 'khi bạn bán lại', en: 'when you sell' },
+    'plan.sheet.total_buy': { vi: 'Tiền mặt cần để mua', en: 'Cash needed to buy' },
+    'plan.sheet.total_own': { vi: 'Chi phí sở hữu mỗi năm', en: 'Cost per year to own' },
+    'plan.sheet.total_sell': { vi: 'Chi phí khi bán', en: 'Cost to sell' },
+    'plan.sheet.exact': { vi: 'chính xác', en: 'exact' },
+    'plan.sheet.estimate': { vi: 'ước tính', en: 'estimate' },
+    'plan.sheet.per_year': { vi: '/năm', en: '/yr' },
+    'plan.sheet.needs.hold_years': {
+        vi: 'Cần biết: bạn giữ nhà bao nhiêu năm',
+        en: 'Needs: how many years you’ll keep it'
+    },
+    'plan.sheet.needs.income': { vi: 'Cần biết: thu nhập của bạn', en: 'Needs: your income' },
+    'plan.sheet.line.sale_proceeds': { vi: 'Giá bán', en: 'Sale price' },
+    'plan.sheet.line.selling_costs': { vi: 'Chi phí bán', en: 'Selling costs' },
+    'plan.sheet.line.loan_payout': { vi: 'Tất toán khoản vay', en: 'Loan payout' },
+    'plan.sheet.state_q': { vi: 'Bang', en: 'State' },
+    'plan.sheet.hold_q': { vi: 'Bạn định giữ nhà bao lâu?', en: 'How long will you keep it?' },
+    'plan.sheet.years': { vi: 'năm', en: 'yrs' },
+    'plan.sheet.filling': { vi: 'Đang tính…', en: 'Working it out…' },
+    'plan.sheet.none': { vi: 'Chưa có khoản nào', en: 'No lines yet' },
+    'plan.sheet.grant_note': {
+        vi: 'Khoản trợ cấp được liệt kê nhưng không trừ vào tổng.',
+        en: 'Grants are listed but not taken off the total.'
+    },
     // Budget cockpit (the prototype's input form, engine-driven).
     'plan.cockpit.title': { vi: 'Ngân sách — bạn đã sẵn sàng?', en: 'Budget — am I ready?' },
     'plan.cockpit.intro': {

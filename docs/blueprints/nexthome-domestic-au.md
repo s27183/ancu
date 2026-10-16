@@ -890,7 +890,8 @@ The `mortgage_plan` outcome feeds `cash_position` (loan amount + buffer requirem
     "recurring_costs_estimate": "{ statutory_band: { low: money|null, high: money|null, period, components: array<string> }, strata_levies: money|null, utilities: money|null, building_insurance: money|null, notes: array<localized_text> }",
     "land_tax_check": "enum [exempt_ppor, applicable, to_verify]",
     "graduation_milestone": "{ target_lvr, estimated_year: number|null }",
-    "alert_triggers_armed": "array<{ trigger: localized_text, action: localized_text }>"
+    "alert_triggers_armed": "array<{ trigger: localized_text, action: localized_text }>",
+    "cash_events": "array<{ id: enum [council_rates_water, maintenance_reserve, loan_repayments], phase: 'own', label: localized_text, direction: 'out', amount: money_range, is_estimate: bool, timing: 'recurring', period: 'year', counterparty: string, source_component: string }>"  // the Own-phase per-year spine (behavior 82, 2026-10-16): council rates + water (the statutory band), the maintenance reserve over the target range, and the yearly P&I on the target range less the plan's own deposit event (fh_engine_disposition:annual_repayments/2, KB representative rate). Each PLACES a figure its owner computes; an unknown one is dropped (honest partial)
   }
 }
 ```
@@ -925,6 +926,7 @@ The `mortgage_plan` outcome feeds `cash_position` (loan amount + buffer requirem
     "actors": "array<{ id: string, label: localized_text }>",
     "cells": "array<{ phase: string, actor: string, item: localized_text, flow_marker: enum [none, money_out, money_in, document, milestone], amount: money_range, counterparty: string|null, source_component: string }>",
     "interactions": "array<{ from_actor: string, to_actor: string, phase: string, flows: array<{ label: localized_text, direction: enum [out, in], amount: money_range }> }>",
+    "lifecycle_budget": "{ buy: money_range|null, own_per_year: money_range|null, sell: money_range|null, pending: array<{ id: enum [sale_proceeds, selling_costs, loan_payout], phase: 'dispose', needs: enum [hold_years, income] }> }",  // behavior 82 (2026-10-16): the one-page sheet's three totals, summed HERE from the harvested events so the shell computes nothing — buy = prepare..settle out-events (a grant shown, never netted), own_per_year = recurring own out-events, sell = dispose out-events except loan_payout (repaid from the proceeds, not a cost); pending names each dispose line still waiting on an input (fh_engine_journey lifecycle_budget block)
     "key_assumptions": "array<localized_text>"
   }
 }

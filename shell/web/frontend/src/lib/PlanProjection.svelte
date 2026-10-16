@@ -46,6 +46,7 @@
     import OverviewCard from '$lib/renderers/OverviewCard.svelte';
     import Calculator from '$lib/renderers/Calculator.svelte';
     import FlowView from '$lib/renderers/FlowView.svelte';
+    import LifecycleSheet from '$lib/LifecycleSheet.svelte';
     import Tabs from '$lib/Tabs.svelte';
     import Chat from '$lib/Chat.svelte';
     import QaIntro from '$lib/QaIntro.svelte';
@@ -125,7 +126,7 @@
     // The budget (Cash-calculator) tab's three sub-tabs (§7.3): the cockpit inputs + the
     // "Bạn đã đủ chưa?" verdict → the cash-events table → the breakdown detail. Labels reuse
     // the existing calculator keys. A self-owned table row routes here to 'detail'.
-    let budgetSub = $state<string>('ready');
+    let budgetSub = $state<string>('sheet');
     // The budget sub-tabs are derived below, after `viewComponents` (the 4th "Full horizon"
     // tab is gated on the disposition component existing).
 
@@ -198,6 +199,20 @@
     const baselineHorizon = $derived(
         (components.disposition?.outcome as DispositionOutcome | undefined)?.horizon_years ?? 0
     );
+    // Behavior 82: the sheet's line → its source component in a modal (the zoom-in layer);
+    // closing leaves the sheet where it was. The hold-years chips drive the same horizon
+    // what-if as the cockpit's slider.
+    let sheetDetail = $state<string | null>(null);
+    function chooseHold(years: number) {
+        horizonValue = years;
+        void runPreview();
+    }
+    // The sheet's state picker drives the cockpit's state what-if (the engine drops the
+    // pinned suburb and plans for the state).
+    function chooseState(s: string) {
+        stateSelect = s;
+        void runPreview();
+    }
     let previewOutcomes = $state<Record<string, Record<string, unknown>> | null>(null);
     let previewing = $state(false);
     let previewError = $state(false);
@@ -591,6 +606,9 @@
     // only when the engine emits a disposition component (honest-partial tab presence; its
     // own content is honest-partial too — an invitation until a hold horizon H is set). TW5.
     const budgetTabs = $derived([
+        // Behavior 82: the one-page lifecycle budget lands first (the bird's-eye layer);
+        // the cockpit, table and breakdown are the zoom-in.
+        { id: 'sheet', label: $t('plan.sheet.tab') },
         { id: 'ready', label: $t('plan.cash.ready') },
         { id: 'table', label: $t('plan.cash.spine') },
         { id: 'detail', label: $t('plan.cash.breakdown') },
@@ -1324,7 +1342,34 @@
                         <Tabs tabs={budgetTabs} active={budgetSub} onSelect={(id) => (budgetSub = id)} />
                     </div>
 
-                    {#if budgetSub === 'ready'}
+                    {#if budgetSub === 'sheet'}
+                        {#if previewActive}
+                            <div class="pp-whatif active">
+                                <p class="pp-wi-banner">{$t('plan.whatif.banner')}</p>
+                                <button type="button" class="pp-wi-reset" onclick={resetPreview}
+                                    >{$t('plan.whatif.reset')}</button
+                                >
+                            </div>
+                        {/if}
+                        <LifecycleSheet
+                            components={viewComponents}
+                            filling={running}
+                            horizon={previewActive || baselineHorizon ? horizonValue : 0}
+                            planState={stateSelect || suburbState}
+                            busy={previewing}
+                            onhorizon={chooseHold}
+                            onstate={chooseState}
+                            onopen={(cid) => (sheetDetail = cid)}
+                        />
+                        {#if sheetDetail && viewComponents[sheetDetail]}
+                            <Modal
+                                title={$t(`plan.c.${sheetDetail}` as 'plan.c.buyer_profile')}
+                                onClose={() => (sheetDetail = null)}
+                            >
+                                <ComponentCard componentId={sheetDetail} entry={viewComponents[sheetDetail]} filling={running} />
+                            </Modal>
+                        {/if}
+                    {:else if budgetSub === 'ready'}
                         {#if viewingProperty}
                             <!-- A selected property shows its OWN cash figures (the per-property
                                  budget_envelope_investor). The base what-if cockpit + financials

@@ -6,9 +6,10 @@
 #
 # Reproducible -> P-2 · The database is the single source of truth -> Mechanisms -> one script, loopback, private socket
 # The per-component bin/dev launchers need docker (engine) and Son's shared :5432 (shell);
-# a seat has neither, and runs this instead (behavior 24, 2026-10-07). It runs outside the
-# sandbox as a granted Need because the root .env (the planner's token, sign-in settings)
-# is unreadable inside it; the variables set here win over .env (OS env wins in both apps'
+# a seat has neither, and runs this instead (behavior 24, 2026-10-07). A seat runs it inside
+# its sandbox, where the root .env (the planner's token, sign-in settings) is unreadable, so
+# what boot needs is set here (dev provisioning below; an agent turn needs the planner token
+# passed in, e.g. through the key socket); the variables set here win over .env (OS env wins in both apps'
 # loaders), so the databases and bind address are always these. FH_HTTP_IP keeps the two
 # Erlang listeners off the LAN; vite gets --host 127.0.0.1.
 set -euo pipefail
@@ -21,6 +22,17 @@ logs="$root/.git/enacs-dev-stack"
 mkdir -p "$logs"
 
 export FH_HTTP_IP=127.0.0.1
+# Dev provisioning on by default: the shell mints its tenant keypair at boot and registers
+# it with the engine (docs/local-dev.md). Without both, the shell reads SHELL_TENANT_PRIVKEY
+# from .env and crashes in a seat, which cannot read it (measured 2026-10-16: missing_env).
+# Loopback-only, so the open /dev/tenants endpoint is not reachable from the LAN.
+export ENGINE_DEV_PROVISION="${ENGINE_DEV_PROVISION:-1}" SHELL_DEV_AUTOPROVISION="${SHELL_DEV_AUTOPROVISION:-1}"
+# Sessions (guest and signed-in) are signed with SHELL_JWT_SECRET, also from .env. Where
+# .env cannot be read (a seat), a throwaway per-run secret: sessions end with the stack.
+# Where it can, it is left alone so .env's own secret applies.
+if [ ! -r "$root/.env" ] && [ -z "${SHELL_JWT_SECRET:-}" ]; then
+    SHELL_JWT_SECRET="$(openssl rand -hex 32)"; export SHELL_JWT_SECRET
+fi
 export FH_VITE_POLL=1   # a seat's sandbox delivers no fs events to vite (behavior 41)
 export FH_ENGINE_HTTP_PORT=8080 FH_SHELL_HTTP_PORT=8081
 # FH_DEV_DB (default "ancu") names the pair <name>_engine / <name>_shell: a fresh pair

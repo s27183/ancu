@@ -1151,7 +1151,8 @@ Combines Mode C `ownership_planning_investor` (property management, tax reportin
     "frcgw_reserve_at_exit": "money",
     "ready_for_next_property": "bool",
     "mode_switch_eligible_on_pr": "bool",
-    "alert_triggers_armed": "array<{ trigger, action }>"
+    "alert_triggers_armed": "array<{ trigger, action }>",
+    "cash_events": "array<{ id: enum [council_rates_water, maintenance_reserve, loan_repayments], phase: 'own', label: localized_text, direction: 'out', amount: money_range, is_estimate: bool, timing: 'recurring', period: 'year', counterparty: string, source_component: string }>"  // the Own-phase per-year spine (behavior 82, 2026-10-16): council rates + water (the statutory band), the maintenance reserve over the target range, and the yearly P&I on the target range less the plan's own deposit event (fh_engine_disposition:annual_repayments/2, KB representative rate). Each PLACES a figure its owner computes; an unknown one is dropped (honest partial); base only — once a property is attached yield_modelling places the hold events instead
   }
 }
 ```
@@ -1233,6 +1234,7 @@ Combines Mode C `ownership_planning_investor` (property management, tax reportin
     "actors": "array<{ id: string, label: localized_text }>",   // the swimlane rows: you / government / lender / property_manager / tenant / services — reused unchanged from Mode C; the FX/transfer provider renders as a services cell, not a new row
     "cells": "array<{ phase: string, actor: string, item: localized_text, flow_marker: enum [none, money_out, money_in, document, milestone], amount: money_range, counterparty: string|null, source_component: string }>",  // one action per (phase, actor) that has one; amount is an upstream figure PLACED on the timeline — NEVER computed here. source_component traces the cell to the figure's owner (cash_position / yield_modelling / tax_structure_non_resident / disposition) for the outcome-conformance gate.
     "interactions": "array<{ from_actor: string, to_actor: string, phase: string, flows: array<{ label: localized_text, direction: enum [out, in], amount: money_range }> }>",  // the who-pays/talks-to-whom view, derived by PLACEMENT from the same cash_events, not recomputed
+    "lifecycle_budget": "{ buy: money_range|null, own_per_year: money_range|null, sell: money_range|null, pending: array<{ id: enum [sale_proceeds, selling_costs, loan_payout], phase: 'dispose', needs: enum [hold_years, income] }> }",  // behavior 82 (2026-10-16): the one-page sheet's three totals, summed HERE from the harvested events so the shell computes nothing — buy = prepare..settle out-events (a grant shown, never netted), own_per_year = recurring own out-events, sell = dispose out-events except loan_payout (repaid from the proceeds, not a cost); pending names each dispose line still waiting on an input (fh_engine_journey lifecycle_budget block)
     "key_assumptions": "array<localized_text>"
   }
 }

@@ -411,12 +411,14 @@ key_assumptions_foreign(Ceiling, _State) ->
 %%      entity agent runs (behavior 11, #12), shown on the tax card and kept out of the point
 %%      cash total and its events.
 -spec fill_investor(map(), map()) -> {map(), binary(), [map()]}.
-fill_investor(_Args, Upstream) ->
+fill_investor(Args, Upstream) ->
     %% Branch on the per-property keystone (Slice B3b): at base property_fit_investor is absent →
-    %% the all-null scaffold; per-property (Phase-B) it carries the exact price → the cash-to-complete.
+    %% the all-null scaffold plus the ceiling-basis acquisition events (behavior 82); per-property
+    %% (Phase-B) it carries the exact price → the cash-to-complete.
     Outcome = case maps:get(<<"property_fit_investor">>, Upstream, undefined) of
                   Pf when is_map(Pf), map_size(Pf) > 0 -> budget_envelope_investor(Pf);
-                  _                                    -> budget_envelope_investor_base()
+                  _ -> (budget_envelope_investor_base())#{
+                           <<"cash_events">> => base_cash_events_investor(Args, Upstream)}
               end,
     KbVersions = fh_engine_kb:kb_anchors(
         [<<"kb.stamp-duty.calc-by-state">>,
@@ -455,12 +457,7 @@ budget_envelope_investor(Pf) ->
     case is_integer(Price) andalso Price > 0 andalso is_binary(State) of
         false -> budget_envelope_investor_base();
         true ->
-            Lvr     = 100 - param_value(<<"kb.investor.deposit-requirements-investment-loans">>,
-                                        <<"deposit_no_lmi_pct">>),
-            Loan    = round(Price * Lvr / 100),
-            Duty    = maps:get(<<"after_concession">>, stamp_duty(State, false, Price), null),
-            Acq     = acquisition_costs_investor(State, Price),
-            Deposit = Price - Loan,
+            {Lvr, Loan, Deposit, Duty, Acq} = investor_need(State, Price),
             Lmi     = 0,   %% 80% LVR baseline → no LMI (lmi.calculation 80% threshold)
             (budget_envelope_investor_base())#{
                 <<"actual_property_price">> => Price,
@@ -472,6 +469,36 @@ budget_envelope_investor(Pf) ->
                     security_lvr_caveat(maps:get(<<"property_type">>, Pf, null)),
                 <<"cash_events">>           => cash_events_investor(Deposit, Duty, Acq, Lmi)
             }
+    end.
+
+%% the NEED side at one price: the 80% LVR baseline loan, the deposit, full duty (no FHB
+%% concession), the acquisition adders. Shared by the per-property figures and the base events.
+investor_need(State, Price) ->
+    Lvr     = 100 - param_value(<<"kb.investor.deposit-requirements-investment-loans">>,
+                                <<"deposit_no_lmi_pct">>),
+    Loan    = round(Price * Lvr / 100),
+    Duty    = maps:get(<<"after_concession">>, stamp_duty(State, false, Price), null),
+    Acq     = acquisition_costs_investor(State, Price),
+    {Lvr, Loan, Price - Loan, Duty, Acq}.
+
+%% Whole lifecycle -> each phase has its money lines -> Mode C cash_position -> base events.
+%% Goal: the lifecycle sheet (behavior 82) shows Mode C's cash to buy before a property is
+%% attached. Invariant: honest-partial — the scalar fields stay null (no property, no price);
+%% only the events carry figures, each labelled at the CONSERVATIVE ceiling of the target
+%% range, the same basis Mode D's base cash_position uses (fill_investor_foreign/2).
+%% Capability: deposit, duty, acquisition adders and LMI 0 at the ceiling; [] when the
+%% state or range is missing. Measured 2026-10-16: before this Mode C emitted no buy event
+%% at base (escript over fh_engine_simulate:run).
+base_cash_events_investor(Args, Upstream) ->
+    Profile = maps:get(<<"profile">>, Upstream, #{}),
+    State   = fh_engine_store:projection_state(maps:get(onboarding, Args, #{})),
+    Ceiling = ceiling(maps:get(<<"target_price_range">>, Profile,
+                               maps:get(<<"target_price_range">>, maps:get(onboarding, Args, #{}), null))),
+    case is_integer(Ceiling) andalso Ceiling > 0 andalso is_binary(State) of
+        false -> [];
+        true  ->
+            {_Lvr, _Loan, Deposit, Duty, Acq} = investor_need(State, Ceiling),
+            cash_events_investor(Deposit, Duty, Acq, 0)
     end.
 
 %% Goal: regulated figures are grounded, honest about their tier -> a CONVENTION is stated as a

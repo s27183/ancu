@@ -89,6 +89,7 @@ fill_fhb(Upstream) ->
         <<"actors">>       => actors(),
         <<"cells">>        => Cells,
         <<"interactions">> => interactions(Cells),
+        <<"lifecycle_budget">> => lifecycle_budget(Events, DisposeEvents),
         <<"key_assumptions">> =>
             [copy(<<"assumption_indicative">>), copy(<<"assumption_figures">>)]
     },
@@ -127,6 +128,7 @@ fill_fhb_foreign(Upstream) ->
         <<"actors">>       => actors(),
         <<"cells">>        => Cells,
         <<"interactions">> => interactions(Cells),
+        <<"lifecycle_budget">> => lifecycle_budget(Events, DisposeEvents),
         <<"key_assumptions">> =>
             [fhb_foreign_copy(<<"assumption_indicative">>), fhb_foreign_copy(<<"assumption_figures">>),
              fhb_foreign_copy(<<"assumption_no_fhb_schemes">>)]
@@ -155,6 +157,7 @@ fill_investor(Upstream) ->
         <<"actors">>       => investor_actors(),
         <<"cells">>        => Cells,
         <<"interactions">> => interactions(Cells),
+        <<"lifecycle_budget">> => lifecycle_budget(Events, DisposeEvents),
         <<"key_assumptions">> =>
             [investor_copy(<<"assumption_indicative">>), investor_copy(<<"assumption_figures">>),
              investor_copy(<<"assumption_no_fhb_schemes">>)]
@@ -186,6 +189,7 @@ fill_investor_foreign(Upstream) ->
         <<"actors">>       => investor_actors(),
         <<"cells">>        => Cells,
         <<"interactions">> => interactions(Cells),
+        <<"lifecycle_budget">> => lifecycle_budget(Events, DisposeEvents),
         <<"key_assumptions">> =>
             [investor_foreign_copy(<<"assumption_indicative">>),
              investor_foreign_copy(<<"assumption_figures">>),
@@ -193,6 +197,59 @@ fill_investor_foreign(Upstream) ->
     },
     KbVersions = fh_engine_kb:kb_anchors([?INVESTOR_FOREIGN_COPY]),
     {Outcome, <<"swimlane-diagram">>, KbVersions}.
+
+%% --- lifecycle budget: the sheet's three totals -------------------------------
+%%
+%% Whole lifecycle -> honest-partial; regulated figures grounded -> purchase_journey -> lifecycle_budget
+%% Purpose:   the one-page sheet's three totals (cash needed to buy, cost per year to own,
+%%            cost to sell) and the lines still waiting on an input, computed here so the
+%%            shell places them and computes nothing (behavior 82, Expect 3).
+%% Holds:     buy = sum of out-events in prepare..settle (a grant is an in-event: shown,
+%%            never netted — as total_cash_required); own_per_year = sum of recurring
+%%            out-events in own; sell = sum of dispose out-events except loan_payout (the
+%%            loan is repaid from the proceeds, not a cost of selling), null with no dispose
+%%            events. A null-amount event adds nothing. pending names each dispose line
+%%            whose input is missing: every one needs hold_years until a horizon is set;
+%%            loan_payout needs income once it is. Totals are null when nothing sums.
+%% Rests on:  disposition emits dispose_cash_events only with a horizon, and loan_payout
+%%            only with income (measured 2026-10-16, escript over fh_engine_simulate:run).
+%% Known gaps: repayments (own) use the price band less the deposit; disposition's
+%%            loan_payout uses borrowing capacity, so the two loans can differ.
+-spec lifecycle_budget([map()], [map()]) -> map().
+lifecycle_budget(Events, DisposeEvents) ->
+    Buy  = [E || E <- Events, out(E),
+                 lists:member(maps:get(<<"phase">>, E), [<<"prepare">>, <<"pre_approve">>,
+                                                          <<"contract">>, <<"settle">>])],
+    Own  = [E || E <- Events, out(E), maps:get(<<"phase">>, E) =:= <<"own">>,
+                 maps:get(<<"timing">>, E, null) =:= <<"recurring">>],
+    Sell = [E || E <- DisposeEvents, out(E), maps:get(<<"id">>, E) =/= <<"loan_payout">>],
+    HasLoan = lists:any(fun(E) -> maps:get(<<"id">>, E) =:= <<"loan_payout">> end, DisposeEvents),
+    Pending = case {DisposeEvents, HasLoan} of
+                  {[], _}    -> [pend(I, <<"hold_years">>) || I <- [<<"sale_proceeds">>,
+                                                                     <<"selling_costs">>,
+                                                                     <<"loan_payout">>]];
+                  {_, false} -> [pend(<<"loan_payout">>, <<"income">>)];
+                  {_, true}  -> []
+              end,
+    #{<<"buy">>          => sum_ranges(Buy),
+      <<"own_per_year">> => sum_ranges(Own),
+      <<"sell">>         => case DisposeEvents of [] -> null; _ -> sum_ranges(Sell) end,
+      <<"pending">>      => Pending}.
+
+out(E) -> maps:get(<<"direction">>, E, null) =:= <<"out">>.
+
+pend(Id, Needs) -> #{<<"id">> => Id, <<"phase">> => <<"dispose">>, <<"needs">> => Needs}.
+
+sum_ranges(Es) ->
+    Rs = [R || E <- Es, R <- [as_range(maps:get(<<"amount">>, E, null))], R =/= null],
+    case Rs of
+        [] -> null;
+        _  -> [round(lists:sum([L || [L, _] <- Rs])), round(lists:sum([H || [_, H] <- Rs]))]
+    end.
+
+as_range([L, H]) when is_number(L), is_number(H) -> [L, H];
+as_range(V) when is_number(V) -> [V, V];
+as_range(_) -> null.
 
 %% every upstream outcome that carries a `cash_events` field, concatenated (order does not
 %% matter for correctness — interactions/1 re-sorts by lifecycle phase regardless).
@@ -276,7 +333,11 @@ dispose_prose_cells() ->
 %% the recurring statutory band from ownership_planning (cash_events is Prepare→Settle).
 -spec money_cells([map()], map()) -> [map()].
 money_cells(Events, Ownership) ->
-    [money_cell_from_event(E) || E <- Events] ++ own_recurring_cells(Ownership).
+    %% ownership_planning's own cash_events carry the rates+water band since behavior 82;
+    %% placing the field-read cell too would put it on the Own column twice.
+    HasRates = lists:any(fun(E) -> maps:get(<<"id">>, E, null) =:= <<"council_rates_water">> end, Events),
+    [money_cell_from_event(E) || E <- Events]
+        ++ case HasRates of true -> []; false -> own_recurring_cells(Ownership) end.
 
 money_cell_from_event(E) ->
     money_cell(maps:get(<<"phase">>, E),
