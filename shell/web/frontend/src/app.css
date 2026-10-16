@@ -3549,6 +3549,20 @@ main {
     box-shadow: none;
     z-index: 5;
 }
+/* Behavior 93 (Son 2026-10-16, his phone: a line's detail had no way back): on a phone the
+   page sheet is not transformed, so a popup inside it (Modal, position: fixed) sits in the
+   viewport but inside the sheet's z-index 5, under the site header and the news band (15),
+   which hid its title and ✕. Here it starts below them and fits what is left. On desktop the
+   transformed sheet already holds it below the header. Two classes on the sheet so this
+   outranks the Modal's own scoped inset. */
+@media (max-width: 47.99rem) {
+    .sheet.page-sheet .mo-root {
+        top: calc(var(--header-total) + var(--home-news-h, 0px));
+    }
+    .sheet.page-sheet .mo-root .mo-card {
+        height: min(var(--sheet-h), 100%);
+    }
+}
 @media (min-width: 48rem) {
     .sheet.page-sheet {
         top: calc(var(--header-total) + var(--home-news-h, 0px) + var(--sp-4));
