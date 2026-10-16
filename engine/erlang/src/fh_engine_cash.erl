@@ -26,7 +26,7 @@
 %% exported for the conformance harness (same anchors as the Python spec):
 -export([duty/2, stamp_duty/3, registration_total/2]).
 %% exported for the Mode-B foreign-person conformance suite:
--export([surcharge_pct/1, surcharge_amount/2, sum_or_null/1, channel_costs/2]).
+-export([surcharge_pct/1, surcharge_amount/2, sum_or_null/1, channel_costs/3]).
 %% exported for the Mode-D foreign-investor conformance suite:
 -export([fill_investor_foreign/2]).
 %% exported for the Mode-E next-home conformance suite:
@@ -96,12 +96,13 @@ fill_fhb(Args, Upstream) ->
     HasConc = has_state_concession(Stack),
     RecPath = maps:get(<<"recommended_path">>, Mortgage, null),
     Sd = stamp_duty(State, HasConc, Ceiling),
-    Outcome = budget_envelope(Sd, State, RecPath, Range, Ceiling, Stack),
+    Fees = buy_fees(Args, State, Ceiling, home_loan(Ceiling), null, undefined, <<"other">>),
+    Outcome = budget_envelope(Sd, State, RecPath, Range, Ceiling, Stack, Fees),
     KbVersions = fh_engine_kb:kb_anchors(
         [<<"kb.stamp-duty.calc-by-state">>,
          <<"kb.buyer-costs.inspections-conveyancing-fees">>,
          <<"kb.cash-reserve.lender-expectations">>, <<"kb.scheme.fhg">>]
-        ++ concession_anchor(State, HasConc)),
+        ++ concession_anchor(State, HasConc) ++ fee_anchors(Fees)),
     {Outcome, <<"calculator">>, KbVersions}.
 
 %% --- Mode-E next-home cash_position (budget_envelope, SAME shape as Mode A) --
@@ -131,20 +132,21 @@ fill_fhb_nexthome(Args, Upstream) ->
     RecPath = maps:get(<<"recommended_path">>, Mortgage, null),
     Sd = stamp_duty(State, HasConc, Ceiling),
     ExistingNet = maps:get(<<"net_sale_proceeds">>, ExistingHome, null),
-    Outcome = budget_envelope_nexthome(Sd, State, RecPath, Range, Ceiling, Stack, ExistingNet),
+    Fees = buy_fees(Args, State, Ceiling, home_loan(Ceiling), null, undefined, <<"other">>),
+    Outcome = budget_envelope_nexthome(Sd, State, RecPath, Range, Ceiling, Stack, ExistingNet, Fees),
     %% no kb.scheme.fhg / concession_anchor — a repeat buyer is never FHG-eligible or
     %% state-concession-eligible (both first-home-only), so no misleading anchor is listed.
     KbVersions = fh_engine_kb:kb_anchors(
         [<<"kb.stamp-duty.calc-by-state">>,
          <<"kb.buyer-costs.inspections-conveyancing-fees">>,
-         <<"kb.cash-reserve.lender-expectations">>]),
+         <<"kb.cash-reserve.lender-expectations">>] ++ fee_anchors(Fees)),
     {Outcome, <<"calculator">>, KbVersions}.
 
 %% budget_envelope/6 computes the NEED side (unchanged, one computer); this overrides only
 %% the three HAVE-side fields it hardcodes to null, using existing_home_disposal's net
 %% proceeds as the HAVE-side source.
-budget_envelope_nexthome(Sd, State, RecPath, Range, Ceiling, Stack, ExistingNet) ->
-    Base  = budget_envelope(Sd, State, RecPath, Range, Ceiling, Stack),
+budget_envelope_nexthome(Sd, State, RecPath, Range, Ceiling, Stack, ExistingNet, Fees) ->
+    Base  = budget_envelope(Sd, State, RecPath, Range, Ceiling, Stack, Fees),
     Total = maps:get(<<"total_cash_required">>, Base),
     Gap   = gap_range(ExistingNet, Total),
     Base#{
@@ -225,8 +227,10 @@ fill_fhb_foreign(Args, Upstream) ->
     %% convention, not a code-invented zero.
     Lmi = 0,
     RegulatoryImposts = sum_or_null([DutyAfter, Surcharge, FirbFee, Lmi]),
-    ChannelCosts = channel_costs(State, Ceiling),
     Deposit = maps:get(<<"deposit_required">>, Mortgage, null),
+    Fees = buy_fees(Args, State, Ceiling, minus(Ceiling, Deposit),
+                    sum_or_null([Deposit, RegulatoryImposts]), undefined, <<"other">>),
+    ChannelCosts = channel_costs(State, Ceiling, Fees),
     TotalCashRequired = sum_or_null([Deposit, RegulatoryImposts, ChannelCosts]),
     FamilyCapacity = maps:get(<<"deposit_ready_for_purchase_amount">>, Profile, null),
     {GapOrSurplus, Verdict} = gap_and_verdict(FamilyCapacity, TotalCashRequired),
@@ -240,7 +244,9 @@ fill_fhb_foreign(Args, Upstream) ->
         <<"gap_or_surplus">>               => GapOrSurplus,
         <<"verdict">>                      => Verdict,
         <<"mitigation_options_if_short">>  => [],
-        <<"cash_events">>                  => cash_events_foreign(Deposit, DutyAfter, Surcharge, FirbFee, ChannelCosts),
+        <<"cash_events">>                  => cash_events_foreign(Deposit, DutyAfter, Surcharge, FirbFee,
+                                                                  registration_total(State, Ceiling), Fees),
+        <<"fee_pending">>                  => fee_pending(Fees),
         <<"key_assumptions">>              => key_assumptions_foreign(Ceiling, State)
     },
     KbVersions = fh_engine_kb:kb_anchors(
@@ -279,13 +285,13 @@ fill_fhb_foreign(Args, Upstream) ->
 %% Mode D reuses it (#13, 2026-10-06) with Other = <<"services">>: its swimlane is Mode C's
 %% six actors, which hold the conveyancer/trust chain as `services`, not Mode A/B's `other`.
 -spec cash_events_foreign(number() | null, number() | null, number() | null,
-                          number() | null, number() | null) -> [map()].
-cash_events_foreign(Deposit, DutyAfter, Surcharge, FirbFee, ChannelCosts) ->
-    cash_events_foreign(Deposit, DutyAfter, Surcharge, FirbFee, ChannelCosts, <<"other">>).
+                          number() | null, number() | null, fees()) -> [map()].
+cash_events_foreign(Deposit, DutyAfter, Surcharge, FirbFee, Reg, Fees) ->
+    cash_events_foreign(Deposit, DutyAfter, Surcharge, FirbFee, Reg, Fees, <<"other">>).
 
 -spec cash_events_foreign(number() | null, number() | null, number() | null,
-                          number() | null, number() | null, binary()) -> [map()].
-cash_events_foreign(Deposit, DutyAfter, Surcharge, FirbFee, ChannelCosts, Other) ->
+                          number() | null, number() | null, fees(), binary()) -> [map()].
+cash_events_foreign(Deposit, DutyAfter, Surcharge, FirbFee, Reg, {FeeEvents, _}, Other) ->
     Out = [
         event(<<"deposit">>, <<"contract">>, <<"event_deposit">>, <<"out">>,
               point(Deposit), false, Other, <<"cash_position">>),
@@ -295,10 +301,9 @@ cash_events_foreign(Deposit, DutyAfter, Surcharge, FirbFee, ChannelCosts, Other)
               point(DutyAfter), false, <<"government">>, <<"cash_position">>),
         event(<<"foreign_buyer_surcharge">>, <<"settle">>, <<"event_foreign_buyer_surcharge">>, <<"out">>,
               point(Surcharge), false, <<"government">>, <<"cash_position">>),
-        event(<<"other_buying_costs">>, <<"settle">>, <<"event_other_costs">>, <<"out">>,
-              point(ChannelCosts), true, Other, <<"cash_position">>)
+        registration_event(Reg, <<"government">>)
     ],
-    [E || E <- Out, maps:get(<<"amount">>, E) =/= null].
+    [E || E <- Out, maps:get(<<"amount">>, E) =/= null] ++ FeeEvents.
 
 %% kb.foreign-buyer-surcharge.by-state: amount = dutiable value × rate (postcondition
 %% vs the state revenue calculator, same discipline as stamp_duty/3). null for an
@@ -322,22 +327,17 @@ surcharge_pct(<<"ACT">>) -> 0;
 surcharge_pct(<<"NT">>)  -> 0;
 surcharge_pct(_)         -> null.
 
-%% registration (exact, per state) + the shared due-diligence/legal convention band
-%% (building/pest inspection, conveyancing, lender application fee — the SAME three
-%% lines the investor variant sums, convention_band_investor/0). The FX transfer cost
-%% is a real add-on but its amount is unknowable until the transfer sum is known (a
-%% cross_border_funding fact) — deliberately EXCLUDED here and disclosed via
-%% key_assumptions (assume_fx_not_included) rather than silently understated-without-
-%% comment or blocking the whole total on one unknown line.
--spec channel_costs(binary() | undefined, integer() | null) -> integer() | null.
-channel_costs(State, V) when is_integer(V) ->
+%% registration (exact, per state) + the midpoint of the buy fee lines the plan pays for
+%% sure (fh_engine_fees:committed/1; behavior 83 — they replaced a three-line convention
+%% band). Foreign-only lines (translation, FIRB help, the transfer from Vietnam) are among
+%% them when their owning docs say they apply to the mode.
+-spec channel_costs(binary() | undefined, integer() | null, fees()) -> integer() | null.
+channel_costs(State, V, {FeeEvents, _}) when is_integer(V) ->
     case registration_total(State, V) of
         null -> null;
-        Reg  ->
-            {Lo, Hi} = convention_band_investor(),
-            Reg + round((Lo + Hi) / 2)
+        Reg  -> Reg + mid(fh_engine_fees:committed(FeeEvents))
     end;
-channel_costs(_State, _V) -> null.
+channel_costs(_State, _V, _Fees) -> null.
 
 %% sum a list of contributing lines; null (never a partial sum) if ANY is unknown —
 %% the honest-partial discipline for an aggregate total (mirrors total_cash_investor/3's
@@ -365,7 +365,7 @@ gap_and_verdict(Capacity, Required) ->
 
 %% Mode-B key_assumptions: the shared ceiling-estimate framing (assume_ceiling, reused
 %% from Mode A — no mode-specific claim) plus the three foreign-person-specific
-%% disclosures (no first-home concession, FX not yet included, the no-LMI base
+%% disclosures (no first-home concession, the FX transfer estimated, the no-LMI base
 %% convention). Bilingual via kb.copy.cash; interpolated params only.
 -spec key_assumptions_foreign(integer() | null, binary() | undefined) ->
           [fh_engine_i18n:localized()].
@@ -376,7 +376,7 @@ key_assumptions_foreign(Ceiling, _State) ->
                              <<"non_resident_deposit_pct_typical">>),
     [copy(<<"assume_ceiling">>, #{<<"ceiling">> => money(Ceiling)}),
      copy(<<"assume_no_concession_foreign_person">>, #{}),
-     copy(<<"assume_fx_not_included">>, #{}),
+     copy(<<"assume_fx_estimated">>, #{}),   %% the fx_spread_in fee line (behavior 83)
      copy(<<"assume_no_lmi_at_conservative_deposit">>, #{<<"pct">> => DepositPct})].
 
 %% --- Mode-C investor cash_position (budget_envelope_investor) ----------------
@@ -416,7 +416,7 @@ fill_investor(Args, Upstream) ->
     %% the all-null scaffold plus the ceiling-basis acquisition events (behavior 82); per-property
     %% (Phase-B) it carries the exact price → the cash-to-complete.
     Outcome = case maps:get(<<"property_fit_investor">>, Upstream, undefined) of
-                  Pf when is_map(Pf), map_size(Pf) > 0 -> budget_envelope_investor(Pf);
+                  Pf when is_map(Pf), map_size(Pf) > 0 -> budget_envelope_investor(Args, Pf);
                   _ -> (budget_envelope_investor_base())#{
                            <<"cash_events">> => base_cash_events_investor(Args, Upstream)}
               end,
@@ -451,13 +451,14 @@ budget_envelope_investor_base() ->
 %% adders. lmi_payable = 0 at the 80% baseline. The HAVE side (gap_or_surplus, verdict) and
 %% max_property_price_supported (borrowing capacity → income, a refine fact) stay null — honest-
 %% partial. Honest-partial too if the price/state are missing or the state's duty isn't modelled.
-budget_envelope_investor(Pf) ->
+budget_envelope_investor(Args, Pf) ->
     Price = maps:get(<<"price">>, Pf, null),
     State = maps:get(<<"state">>, Pf, null),
     case is_integer(Price) andalso Price > 0 andalso is_binary(State) of
         false -> budget_envelope_investor_base();
         true ->
-            {Lvr, Loan, Deposit, Duty, Acq} = investor_need(State, Price),
+            Kind = fh_engine_fees:property_kind(maps:get(<<"property_type">>, Pf, null)),
+            {Lvr, Loan, Deposit, Duty, Acq, Fees} = investor_need(Args, State, Price, Kind),
             Lmi     = 0,   %% 80% LVR baseline → no LMI (lmi.calculation 80% threshold)
             (budget_envelope_investor_base())#{
                 <<"actual_property_price">> => Price,
@@ -467,19 +468,22 @@ budget_envelope_investor(Pf) ->
                 <<"total_cash_required">>   => total_cash_investor(Deposit, Duty, Acq),
                 <<"key_assumptions">>       =>
                     security_lvr_caveat(maps:get(<<"property_type">>, Pf, null)),
-                <<"cash_events">>           => cash_events_investor(Deposit, Duty, Acq, Lmi)
+                <<"cash_events">>           =>
+                    cash_events_investor(Deposit, Duty, registration_total(State, Price), Lmi, Fees),
+                <<"fee_pending">>           => fee_pending(Fees)
             }
     end.
 
 %% the NEED side at one price: the 80% LVR baseline loan, the deposit, full duty (no FHB
 %% concession), the acquisition adders. Shared by the per-property figures and the base events.
-investor_need(State, Price) ->
+investor_need(Args, State, Price, Kind) ->
     Lvr     = 100 - param_value(<<"kb.investor.deposit-requirements-investment-loans">>,
                                 <<"deposit_no_lmi_pct">>),
     Loan    = round(Price * Lvr / 100),
     Duty    = maps:get(<<"after_concession">>, stamp_duty(State, false, Price), null),
-    Acq     = acquisition_costs_investor(State, Price),
-    {Lvr, Loan, Price - Loan, Duty, Acq}.
+    Fees    = buy_fees(Args, State, Price, Loan, null, Kind, <<"services">>),
+    Acq     = acquisition_costs_investor(State, Price, Fees),
+    {Lvr, Loan, Price - Loan, Duty, Acq, Fees}.
 
 %% Whole lifecycle -> each phase has its money lines -> Mode C cash_position -> base events.
 %% Goal: the lifecycle sheet (behavior 82) shows Mode C's cash to buy before a property is
@@ -497,8 +501,9 @@ base_cash_events_investor(Args, Upstream) ->
     case is_integer(Ceiling) andalso Ceiling > 0 andalso is_binary(State) of
         false -> [];
         true  ->
-            {_Lvr, _Loan, Deposit, Duty, Acq} = investor_need(State, Ceiling),
-            cash_events_investor(Deposit, Duty, Acq, 0)
+            {_Lvr, _Loan, Deposit, Duty, _Acq, Fees} =
+                investor_need(Args, State, Ceiling, undefined),
+            cash_events_investor(Deposit, Duty, registration_total(State, Ceiling), 0, Fees)
     end.
 
 %% Goal: regulated figures are grounded, honest about their tier -> a CONVENTION is stated as a
@@ -521,18 +526,17 @@ security_lvr_caveat(_) -> [].
 %% (kb.journey.investor-path's six-actor set — the deposit/other-buying-costs settlement
 %% chain runs through the conveyancer/trust, not a party Mode A already has a row for).
 %% Honest-partial: an event is emitted only when its figure is non-null.
-cash_events_investor(Deposit, Duty, Acq, Lmi) ->
+cash_events_investor(Deposit, Duty, Reg, Lmi, {FeeEvents, _}) ->
     Out = [
         event(<<"deposit">>, <<"contract">>, <<"event_deposit">>, <<"out">>,
               point(Deposit), false, <<"services">>, <<"cash_position">>),
         event(<<"stamp_duty">>, <<"settle">>, <<"event_stamp_duty">>, <<"out">>,
               point(Duty), false, <<"government">>, <<"cash_position">>),
-        event(<<"other_buying_costs">>, <<"settle">>, <<"event_other_costs">>, <<"out">>,
-              point(Acq), true, <<"services">>, <<"cash_position">>),
+        registration_event(Reg, <<"government">>),
         event(<<"lmi">>, <<"settle">>, <<"event_lmi">>, <<"out">>,
               point(Lmi), false, <<"lender">>, <<"cash_position">>)
     ],
-    [E || E <- Out, maps:get(<<"amount">>, E) =/= null].
+    [E || E <- Out, maps:get(<<"amount">>, E) =/= null] ++ FeeEvents.
 
 %% acquisition adders for an investor (kb.buyer-costs.investor-additional-costs): registration
 %% (exact, per state) + the shared due-diligence/legal lines (building+pest inspection,
@@ -541,18 +545,11 @@ cash_events_investor(Deposit, Duty, Acq, Lmi) ->
 %% is a recurring OPERATING expense in yield_modelling, never an acquisition cost; no double-count).
 %% The conditional adders (lease review if tenant-in-situ, QS report, entity setup) are surfaced as
 %% considerations, not summed into the baseline cash. null when the state's registration isn't modelled.
-acquisition_costs_investor(State, Price) ->
+acquisition_costs_investor(State, Price, {FeeEvents, _}) ->
     case registration_total(State, Price) of
         null -> null;
-        Reg  ->
-            {Lo, Hi} = convention_band_investor(),
-            Reg + round((Lo + Hi) / 2)
+        Reg  -> Reg + mid(fh_engine_fees:committed(FeeEvents))
     end.
-
-convention_band_investor() ->
-    Keys = [<<"building_pest_inspection">>, <<"conveyancing">>, <<"lender_application_fee">>],
-    {lists:sum([cost_param(K, <<"_low">>)  || K <- Keys]),
-     lists:sum([cost_param(K, <<"_high">>) || K <- Keys])}.
 
 %% = deposit + duty + acquisition adders; null if any contributing line is pending (honest-partial,
 %% never a partial sum) — e.g. an unmodelled state's duty/registration.
@@ -602,8 +599,10 @@ fill_investor_foreign(Args, Upstream) ->
     %% reuses the SAME due-diligence/legal + registration convention band Mode B's
     %% channel_costs/2 already sums (building/pest inspection, conveyancing, lender
     %% application fee + per-state registration) — investor-agnostic, no double build.
-    ChannelCosts = channel_costs(State, Ceiling),
     Deposit = maps:get(<<"deposit_required_amount">>, Mortgage, null),
+    Fees = buy_fees(Args, State, Ceiling, minus(Ceiling, Deposit),
+                    sum_or_null([Deposit, RegulatoryImposts]), undefined, <<"services">>),
+    ChannelCosts = channel_costs(State, Ceiling, Fees),
     TotalCashRequired = sum_or_null([Deposit, RegulatoryImposts, ChannelCosts]),
     %% the VN-side available capital (investor_profile_foreign's own field) is the HAVE side —
     %% null at base (genuinely uncaptured), same honest-partial call as Mode B's family
@@ -625,8 +624,9 @@ fill_investor_foreign(Args, Upstream) ->
         %% only when its figure is known, so an unknown state drops duty, surcharge and
         %% other costs. Mode D has no per-property cash_position turn in launch scope.
         <<"cash_events">>                  =>
-            cash_events_foreign(Deposit, DutyAfter, Surcharge, FirbFee, ChannelCosts,
-                                <<"services">>)
+            cash_events_foreign(Deposit, DutyAfter, Surcharge, FirbFee,
+                                registration_total(State, Ceiling), Fees, <<"services">>),
+        <<"fee_pending">>                  => fee_pending(Fees)
     },
     KbVersions = fh_engine_kb:kb_anchors(
         [<<"kb.stamp-duty.calc-by-state">>, <<"kb.foreign-buyer-surcharge.by-state">>,
@@ -778,9 +778,9 @@ fhc_pick(V, [E | Rest]) ->
 %% stay null BY DESIGN: onboarding captures no savings (plan-first), so they compute on
 %% a refine turn (eligibility-resolution.md §9). Honest-partial throughout.
 
-budget_envelope(Sd, State, RecPath, Range, Ceiling, Stack) ->
+budget_envelope(Sd, State, RecPath, Range, Ceiling, Stack, Fees) ->
     Deposit    = deposit(RecPath, Range),
-    OtherCosts = other_buying_costs(State, Ceiling),
+    OtherCosts = other_buying_costs(State, Ceiling, Fees),
     Total      = total_cash_required(Deposit, Sd, OtherCosts),
     #{<<"stamp_duty">>         => Sd,
       <<"deposit">>            => Deposit,        %% NEED — money_range (Decision 9)
@@ -794,7 +794,8 @@ budget_envelope(Sd, State, RecPath, Range, Ceiling, Stack) ->
       <<"gap_or_surplus">>               => null,   %% needs cash_available
       <<"verdict">>                      => null,   %% PENDING by design (no savings at base)
       <<"genuine_savings_verdict">>      => <<"unknown">>,
-      <<"cash_events">>                  => cash_events(Deposit, Sd, OtherCosts, Stack),
+      <<"cash_events">>                  => cash_events(Deposit, Sd, OtherCosts, Stack, Fees),
+      <<"fee_pending">>                  => fee_pending(Fees),
       <<"mitigation_options_if_short">>  => [],
       <<"key_assumptions">> => key_assumptions(Total, Ceiling)}.
 
@@ -817,7 +818,7 @@ budget_envelope(Sd, State, RecPath, Range, Ceiling, Stack) ->
 %% ownership_planning and are placed on the swimlane's Own column by purchase_journey
 %% (cash_position cannot see downstream). Honest-partial: an event is emitted only when
 %% its placed figure is non-null (the figure is the event; no figure → no event).
-cash_events(Deposit, Sd, OtherCosts, Stack) ->
+cash_events(Deposit, Sd, OtherCosts, Stack, {FeeEvents, _}) ->
     Out = [
         event(<<"deposit">>, <<"contract">>, <<"event_deposit">>, <<"out">>,
               amount(maps:get(<<"minimum_required_amount">>, Deposit, null)),
@@ -825,12 +826,10 @@ cash_events(Deposit, Sd, OtherCosts, Stack) ->
         event(<<"stamp_duty">>, <<"settle">>, <<"event_stamp_duty">>, <<"out">>,
               point(maps:get(<<"after_concession">>, Sd, null)),
               false, <<"government">>, <<"cash_position">>),
-        event(<<"other_buying_costs">>, <<"settle">>, <<"event_other_costs">>, <<"out">>,
-              amount(maps:get(<<"total">>, OtherCosts, null)),
-              true, <<"other">>, <<"cash_position">>)
+        registration_event(maps:get(<<"registration_exact">>, OtherCosts, null), <<"government">>)
     ],
     In = grant_events(Stack),
-    [E || E <- Out ++ In, maps:get(<<"amount">>, E) =/= null].
+    [E || E <- Out ++ In, maps:get(<<"amount">>, E) =/= null] ++ FeeEvents.
 
 %% one in-event per applicable role=grant scheme (FHOG); benefit_value placed verbatim
 %% (money_range, [0, amount] at base — honest), is_estimate mirrors the source flag.
@@ -905,20 +904,22 @@ deposit_pct() ->
         _                   -> 5
     end.
 
-%% --- other_buying_costs (NEED): regulated registration + convention bands ----
-%% total = [reg + Σconv_low, reg + Σconv_high] (money_range). Registration is exact per
-%% state (REGULATED, kb.buyer-costs); the inspection/conveyancing/insurance/utility/
-%% moving lines are CONVENTION ranges (the buyer's own quotes bind). Evaluated at the
-%% range ceiling (the duty-at-ceiling convention); only the convention band widens it.
-other_buying_costs(undefined, _Ceiling) ->
+%% --- other_buying_costs (NEED): regulated registration + the fee lines ----------
+%% total = [reg + Σlow, reg + Σhigh] over the buy fee lines the plan pays for sure
+%% (fh_engine_fees:committed/1 — not an optional line, not one whose property condition is
+%% open). Registration is exact per state (REGULATED, kb.buyer-costs); each fee line is a
+%% band its owning doc sources (behavior 83: the lines replaced one summed convention band,
+%% so the buyer sees them one by one). Evaluated at the range ceiling (the duty-at-ceiling
+%% convention); only the fee bands widen it.
+other_buying_costs(undefined, _Ceiling, _Fees) ->
     pending_costs(copy(<<"note_state_unknown">>, #{}));
-other_buying_costs(_State, null) ->
+other_buying_costs(_State, null, _Fees) ->
     pending_costs(copy(<<"note_set_range">>, #{}));
-other_buying_costs(State, V) when is_integer(V) ->
+other_buying_costs(State, V, {FeeEvents, _}) when is_integer(V) ->
     case registration_total(State, V) of
         null -> pending_costs(copy(<<"note_state_unmodelled">>, #{<<"state">> => State}));
         Reg  ->
-            {Lo, Hi} = convention_band(),
+            [Lo, Hi] = fh_engine_fees:committed(FeeEvents),
             #{<<"total">>             => [Reg + Lo, Reg + Hi],
               <<"registration_exact">> => Reg,
               <<"notes">> => [copy(<<"costs_banded">>, #{})]}
@@ -969,19 +970,45 @@ reg_entry(State) ->
         false      -> undefined
     end.
 
-%% Σ of the convention / lender-policy cost ranges (kb.buyer-costs params). The buyer's
-%% own quotes bind; these are typical ranges only (CONVENTION). first_year_building_
-%% insurance is the house figure (near-zero for strata — noted in costs_banded copy).
-convention_band() ->
-    Keys = [<<"building_pest_inspection">>, <<"conveyancing">>, <<"lender_application_fee">>,
-            <<"first_year_building_insurance">>, <<"utility_connections">>, <<"moving_costs">>],
-    Lo = lists:sum([cost_param(K, <<"_low">>)  || K <- Keys]),
-    Hi = lists:sum([cost_param(K, <<"_high">>) || K <- Keys]),
-    {Lo, Hi}.
+%% --- the fee lines (behavior 83) -------------------------------------------------
+%% Whole lifecycle -> honesty tiers; one owner per fact -> cash_position -> buy fee lines
+%% Purpose:   the acquisition fees a buyer cannot know until they get a quote, one event
+%%            each (fh_engine_fees reads them from their owning KB docs), in place of the
+%%            one other_buying_costs event that summed them; registration stays its own
+%%            exact line (REGULATED, the state's fee).
+%% Holds:     bases at the range ceiling (the duty convention): price = the ceiling, loan =
+%%            the ceiling less the deposit, transfer (the money sent from Vietnam, modes B/D)
+%%            = deposit + duty + surcharge + FIRB fee. A line whose base is unknown is in
+%%            `fee_pending` naming the input, never a guessed figure.
+-type fees() :: {[map()], [map()]}.
 
-cost_param(Key, Suffix) ->
-    param_value(<<"kb.buyer-costs.inspections-conveyancing-fees">>,
-                <<Key/binary, Suffix/binary>>).
+buy_fees(Args, State, Price, Loan, Transfer, Kind, Counterparty) ->
+    fh_engine_fees:buy_lines(
+      #{blueprint => maps:get(blueprint_slug, Args, <<"fhb-domestic-au">>),
+        state => case State of S when is_binary(S) -> S; _ -> undefined end,
+        property => Kind, source => <<"cash_position">>, counterparty => Counterparty,
+        price => point(Price), loan => point(Loan), transfer => point(Transfer),
+        rent => null, sale => null}).
+
+fee_pending({_, Pending}) -> Pending.
+
+fee_anchors({Events, _}) ->
+    lists:usort([maps:get(<<"owner">>, maps:get(<<"detail">>, E)) || E <- Events]).
+
+registration_event(Reg, Counterparty) ->
+    (event(<<"registration">>, <<"settle">>, <<"event_registration">>, <<"out">>,
+           point(Reg), false, Counterparty, <<"cash_position">>))#{
+        <<"group">> => <<"other_buying_costs">>}.
+
+%% Mode A/E's loan at the ceiling: the ceiling less the minimum deposit.
+home_loan(V) when is_integer(V) -> V - pct_of(deposit_pct(), V);
+home_loan(_) -> null.
+
+minus(A, B) when is_number(A), is_number(B) -> A - B;
+minus(_, _) -> null.
+
+mid([Lo, Hi]) -> round((Lo + Hi) / 2).
+
 
 %% --- reserve_buffer (post-settlement): amount pending at base ----------------
 %% = months × monthly repayment; the repayment needs the loan rate (an agent/refine

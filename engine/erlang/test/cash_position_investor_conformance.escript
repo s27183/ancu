@@ -194,9 +194,10 @@ per_property_cases() ->
      %% the acquire-phase cash_events purchase_journey's generic harvest places on the swimlane
      %% (task 4) — cash_events_investor/4 filters amount =/= null, not =/= 0, so all four events
      %% land here (lmi_payable = 0 at the 80% baseline LVR is still a non-null point figure).
-     check("per-property: cash_events carries deposit/stamp_duty/other_buying_costs/lmi ids",
-           lists:sort([maps:get(<<"id">>, E) || E <- g(O, <<"cash_events">>)]),
-           lists:sort([<<"deposit">>, <<"stamp_duty">>, <<"other_buying_costs">>, <<"lmi">>])),
+     check("per-property: cash_events carries deposit/stamp_duty/registration/lmi ids, then the fee lines (behavior 83)",
+           lists:sort([maps:get(<<"id">>, E) || E <- g(O, <<"cash_events">>),
+                                                not maps:is_key(<<"detail">>, E)]),
+           lists:sort([<<"deposit">>, <<"stamp_duty">>, <<"registration">>, <<"lmi">>])),
      check("per-property: every cash_event source_component = cash_position",
            lists:usort([maps:get(<<"source_component">>, E) || E <- g(O, <<"cash_events">>)]),
            [<<"cash_position">>])].

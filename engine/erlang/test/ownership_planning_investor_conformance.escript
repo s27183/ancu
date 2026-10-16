@@ -49,7 +49,7 @@ fields() ->
     [<<"monthly_net_cash_flow_actual">>, <<"ytd_cash_flow_vs_projection">>,
      <<"current_lvr">>, <<"equity_built">>, <<"ready_for_next_property">>,
      <<"portfolio_diversification_score">>, <<"annual_tax_obligations">>,
-     <<"alert_triggers_armed">>, <<"opportunities">>, <<"cash_events">>].
+     <<"alert_triggers_armed">>, <<"opportunities">>, <<"cash_events">>, <<"fee_pending">>].
 
 %% the six post-acquisition figure fields that are null at base.
 null_at_base() ->

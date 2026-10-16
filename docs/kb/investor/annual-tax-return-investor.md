@@ -1,7 +1,7 @@
 ---
 slug: kb.investor.annual-tax-return-investor
 effective_from: 2025-07-01
-last_verified: 2026-07-06
+last_verified: 2026-10-16
 sources:
   - url: https://www.ato.gov.au/individuals-and-families/investments-and-assets/property-and-land/residential-rental-properties
     retrieved: 2026-07-06
@@ -9,6 +9,22 @@ sources:
     retrieved: 2026-07-06
   - url: https://moneysmart.gov.au/property-investment
     retrieved: 2026-07-06
+  - url: https://taxaccountantbrisbane.com.au/fees/
+    retrieved: 2026-10-16
+    path: docs/sources/investor/tax-accountant-brisbane-fees.txt
+    quotes:
+      - "Individual returns start at $150 for salary income with standard deductions, $250–$450 with investments or a rental property"
+      - "Foreign income or part-year residency $390"
+  - url: https://tenfoldwealthaccountants.com.au/professional-fee-schedule/
+    retrieved: 2026-10-16
+    path: docs/sources/investor/tenfold-professional-fee-schedule.txt
+    quotes:
+      - "Individual Tax Return with Investment / Airbnb Rental $480 from"
+  - url: https://beyondaccountancy.com.au/tax-returns/pricing/
+    retrieved: 2026-10-16
+    path: docs/sources/investor/beyond-accountancy-tax-return-pricing.txt
+    quotes:
+      - "One property, one owner $308^"
 ---
 
 # Annual tax return — the investor's obligations
@@ -55,6 +71,45 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
     "keep_records_incl_cost_base": { "type": "bool", "value": true, "note": "keep rental statements, invoices, interest summary, depreciation schedule, AND cost-base records for the eventual CGT calc, for the ATO retention period" },
     "lodge_by_deadline": { "type": "bool", "value": true, "note": "individuals by 31 October, or later via a registered tax agent; tax_return_due_date carries the applicable date; the agent's fee is deductible next year" },
     "preparation_needs_a_tax_agent": { "type": "bool", "value": true, "note": "ASIC/TPB line — a registered tax agent prepares the return; the plan does not give tax advice" }
+  },
+  "lookup": {
+    "fee_lines": {
+      "note": "one entry per fee the buyer cannot know until they hire someone or get a quote; the engine emits one cash event per applicable entry (behavior 83)",
+      "entries": [
+        {
+          "id": "tax_return_rental",
+          "phase": "own",
+          "timing": "per_year",
+          "tier": "CONVENTION",
+          "basis": "fixed",
+          "low": 250,
+          "high": 480,
+          "applies": {
+            "modes": [
+              "investor-domestic-au",
+              "investor-foreign-au"
+            ],
+            "states": "all",
+            "property": "any"
+          },
+          "optional": false,
+          "note": "published fixed fees for an individual return with one rental: $250–$450, $308, from $480. A foreign-resident return is in the same band on the one published price found ($390) — no separate line",
+          "label": {
+            "vi": "Phí kế toán khai thuế hằng năm có nhà cho thuê (tax agent)",
+            "en": "Accountant's fee for the yearly tax return with a rental"
+          },
+          "payer": {
+            "vi": "Chủ nhà trả mỗi năm; được khấu trừ thuế năm sau",
+            "en": "The owner pays yearly; deductible the following year"
+          },
+          "drivers": {
+            "vi": "Số bất động sản và số người đứng tên, có lịch khấu hao (depreciation schedule) hay không, và thu nhập nước ngoài hoặc cư trú một phần năm (cao hơn — khoảng $390 trở lên).",
+            "en": "How many properties and owners, whether there is a depreciation schedule, and foreign income or part-year residency (higher — about $390 and up)."
+          },
+          "source": "https://taxaccountantbrisbane.com.au/fees/"
+        }
+      ]
+    }
   }
 }
 ```

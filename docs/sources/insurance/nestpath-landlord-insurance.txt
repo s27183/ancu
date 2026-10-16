@@ -1,0 +1,156 @@
+Source: https://nestpath.com.au/blog/landlord-insurance-australia
+Retrieved: 2026-10-16
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML b90e0f5d785456ae7b6af8c2401ef06e432d16013cc55d0c953902db51342ff0
+
+Landlord Insurance Australia 2026: Cover, Cost & Do You Need It
+Tools & calculators
+All free
+View all tools
+Find support.
+In your state.
+Choose your state Choose your state NSW VIC QLD WA SA TAS ACT NT View grants
+Landlord Insurance Australia 2026: What It Covers, Costs & Do You Need It
+By Anish Puri , Founder and Editor · 16 June 2026 · Last updated 11 September 2026
+An independent 2026 guide to landlord insurance in Australia, what it covers (loss of rent, tenant damage, $20m liability), what it really costs by state (house vs unit), the strata trap for unit investors, the tax deduction, and whether you actually need it.
+In this article
+What landlord insurance is, and how it's different
+What it covers
+What landlord insurance costs in 2026
+Do you actually need it?
+Strata vs landlord: don't pay twice for a unit
+Choosing cover and making a claim
+Frequently asked questions
+In this article
+Here's the trap a lot of new investors fall into: they buy a rental, roll their existing home insurance onto it, and assume they're covered. They're not. A standard home and contents policy is written for owner-occupiers. It doesn't pay out when a tenant stops paying rent, trashes the place on the way out, or sues you over an injury. That's what landlord insurance is for. And because almost every page ranking for this topic is an insurer selling its own policy, here's the independent version: what it actually covers, what it really costs in 2026, and whether you genuinely need it.
+What landlord insurance is, and how it's different
+Landlord insurance is a specialised policy for owners of rental properties. Its whole reason for existing is to cover the tenant-related risks a normal home policy ignores , chiefly loss of rent, rent default and tenant damage, usually bundled with building and/or contents cover and a big public liability component.
+Two distinctions matter:
+Versus standard home & contents insurance: a regular policy covers the building and your own belongings against events like fire and storm, but pays nothing if a tenant defaults or maliciously damages the property. Putting a rental on a home policy is the single most common, and most expensive, insurance mistake landlords make.
+Versus strata insurance (for units): if you own an apartment, the body corporate already insures the building and common areas. You don't need to insure the building again, only your contents, loss of rent and in-unit liability. More on that below, because it changes the cost dramatically.
+What it covers
+A full landlord policy typically combines standard property cover with the landlord-specific extras that justify it:
+Building cover , the structure and fixed fittings against fire, storm, impact and the like. Often bundled, but you can skip it on a strata unit.
+Contents cover (yours, not the tenant's) , carpets, blinds, curtains, light fittings and any free-standing appliances or furniture you provide. Your tenant's belongings are their responsibility, not yours.
+Loss of rent and rent default , the headline benefit. If a tenant stops paying, absconds, or won't give vacant possession, the policy pays your rent for a set period, commonly up to around 15 to 20 weeks depending on the cause and insurer.
+Loss of rent from an insured event , if a fire or storm makes the property untenantable, cover for lost rent while it's repaired, sometimes up to 52 weeks.
+Tenant and malicious damage, and theft by the tenant , deliberate or malicious damage by tenants or their guests, beyond what the bond covers.
+Public liability , typically up to $20 million , covering you if someone is injured at the property and holds you responsible.
+Legal and eviction expenses , the cost of pursuing a defaulting tenant, often capped per claim.
+What it doesn't cover
+Just as important is what's excluded, because this is where claims get knocked back:
+General wear and tear and gradual deterioration , insurance is for sudden events, not ageing carpet or a slowly failing roof.
+Loss of rent from a soft market , if you simply can't find a tenant, that's not covered. Only tenant default or an insured event triggers loss-of-rent cover.
+Unpaid rent without proper records , no signed tenancy agreement, condition report or rent ledger usually means no payout. Your paperwork is your claim.
+Short-stay and Airbnb letting , standard landlord policies generally exclude it; you need a specialist short-stay policy.
+Natural events in the first 72 hours of a new policy, and flood is sometimes an optional add-on rather than standard.
+What landlord insurance costs in 2026
+This is the figure insurer pages bury. Based on Canstar's early-2026 quote data (at a $1,000 excess):
+State
+House (avg/year)
+Unit (avg/year)
+National average
+$2,640
+$432
+NSW
+$2,532
+$445
+VIC
+$2,248
+$363
+QLD (excl. north)
+$2,529
+$396
+North QLD
+$4,482
+$679
+WA
+$2,181
+$395
+SA
+$2,108
+$358
+TAS
+$1,998
+$395
+NT
+$4,157
+$520
+The standout is the gap between houses (about $2,640 a year) and units (about $432). It's not a discount; it's because a unit landlord doesn't insure the building at all (the strata policy does), so you're only paying for contents, loss of rent and liability. The other pattern is geography: cyclone- and flood-exposed regions like North Queensland and the NT cost roughly double the southern-state average. Premiums have also been climbing: landlord house premiums rose around 3.7% in the past year, part of a broader surge in home insurance costs across the country. When you're adding up the property's holding costs, our mortgage repayment calculator gives you the loan repayments to sit alongside figures like these.
+Do you actually need it?
+It's not legally required, but if your property is mortgaged, your lender almost certainly requires building insurance as a condition of the loan, and landlord cover is the sensible way to meet that while also protecting your income. If you're still sorting the loan itself, our free find a broker service can match you with a broker, and brokers are free for most borrowers. The real question is whether the risk justifies the premium, and the data says it usually does:
+35% of landlords have had a tenant fall behind on rent, and 30% have experienced tenant damage, according to a 2025 QBE survey.
+The average paid claim runs around $8,800 (EBM RentCover, 2023), and loss of rent is the single biggest claim category by payout. One default-plus-damage event can wipe out a year of your rental returns .
+Only about 56% of landlords actually hold landlord insurance (QBE, 2025), and many are on the wrong (home) policy and don't know it until they try to claim.
+There's also a tax sweetener: landlord insurance premiums are tax-deductible against your rental income, claimed in the year you pay them, like other holding costs you'd track alongside negative gearing . On a $2,640 premium, the deduction meaningfully lowers the real cost, so the out-of-pocket figure is smaller than the sticker price.
+Strata vs landlord: don't pay twice for a unit
+If you're buying a unit or apartment, this is the most valuable thing to understand. There are effectively three policies in play, and they don't overlap:
+The body corporate's strata insurance covers the building structure, the exterior, and common property like lobbies, lifts, pools and car parks, plus liability on common areas. You can't buy this yourself; it's arranged collectively and you pay for it through your levies.
+Your landlord policy covers only what's inside your unit: your contents (carpets, blinds, appliances), loss of rent, tenant damage, and liability inside the unit.
+The tenant's own contents insurance covers their belongings.
+The rule of thumb: strata insurance stops at the apartment door. A leak in the roof is the body corporate's problem; the damaged carpet inside your unit is yours. This is exactly why unit landlord premiums are a fraction of house premiums, because you're not double-insuring the building. If you're checking out a unit, the strata report tells you whether the building's insurance and finances are in order. And if you're weighing landlord against ordinary cover, our home insurance guide and contents insurance guide cover the owner-occupier side.
+Choosing cover and making a claim
+When you set up a policy, get the building sum insured right (the cost to rebuild, not the market value, and only for houses, not strata units), set a sensible contents sum insured for what you actually provide, and check the loss-of-rent limit (how many weeks it pays) and the excess (a higher excess lowers the premium). Limits vary a lot between insurers, so read the product disclosure statement rather than assuming.
+To make a claim stick, keep the paperwork insurers (and the ATO) expect: a signed tenancy agreement , an entry and exit condition report with photos, a rent ledger showing arrears, and bond and breach-notice records. Loss-of-rent and damage claims are routinely declined when this documentation is missing, so treat good record-keeping as part of the cover, not an afterthought.
+Frequently asked questions
+How much does landlord insurance cost in Australia in 2026?
+On Canstar's early-2026 data, the national average is about $2,640 a year for a house and just $432 a year for a unit (at a $1,000 excess). Units are far cheaper because the body corporate's strata insurance covers the building, so you only insure contents, loss of rent and liability. Cyclone- and flood-exposed regions cost much more. North Queensland houses average around $4,482.
+What does landlord insurance cover?
+A typical policy covers loss of rent and rent default (if a tenant stops paying or absconds), tenant and malicious damage, theft by the tenant, public liability up to around $20 million, and legal or eviction expenses, usually alongside building and/or contents cover. It's the tenant-related risks that distinguish it from a standard home policy, which covers none of them.
+What's the difference between landlord insurance and home insurance?
+Home and contents insurance is designed for owner-occupiers and covers the building and your belongings against events like fire and storm. It does not cover tenant-related risks: loss of rent, rent default, tenant damage or eviction costs. Landlord insurance adds those, which is why you can't simply use a home policy on a rental. Doing so is the most common reason a landlord's claim gets declined.
+Is landlord insurance mandatory in Australia?
+There's no law requiring it, but if your investment property is mortgaged, your lender almost always requires building insurance as a loan condition, and a landlord policy is the practical way to meet that while also protecting your rental income. Given 35% of landlords have had rent fall behind and the average claim is around $8,800, most investors treat it as essential rather than optional.
+Is landlord insurance tax-deductible?
+Yes. The ATO treats landlord insurance (building, contents, public liability and loss of rent) as a deductible rental expense, claimed in the income year you pay it, provided the property is rented or genuinely available for rent. That deduction lowers the real cost of the premium, so the net out-of-pocket figure is smaller than the headline price.
+Do I need landlord insurance for a unit or apartment?
+Yes, but a cheaper version. The body corporate's strata insurance already covers the building and common property, so you don't insure the building again; your landlord policy only needs to cover your contents, loss of rent, tenant damage and liability inside the unit. That's why unit landlord premiums (around $432 a year) are a fraction of house premiums. Just don't double-insure the building.
+Does landlord insurance cover loss of rent?
+Yes, it's the main reason to have it. If a tenant defaults, absconds or won't vacate, the policy pays your rent for a set period, commonly up to 15 to 20 weeks depending on the cause and insurer. It also covers lost rent if an insured event like a fire or storm makes the property untenantable, sometimes for up to a year. What it won't cover is rent lost simply because you can't find a tenant in a soft market.
+Why was my landlord insurance claim rejected?
+The most common reasons are missing documentation and excluded events. Loss-of-rent and tenant-damage claims are routinely declined without a signed tenancy agreement, an entry and exit condition report, and a rent ledger showing the arrears. Claims also fail when the cause is an exclusion: general wear and tear, gradual deterioration, market vacancy, or short-stay letting on a standard policy. Good record-keeping is effectively part of your cover.
+Do landlords need contents insurance?
+Landlords should consider contents cover for the items they provide, such as carpets, blinds, appliances and furniture, even in an unfurnished rental. Check whether the landlord policy already includes this cover; tenants are responsible for their own belongings.
+AP
+Written by Anish Puri
+Founder, NestPath · hello@nestpath.com.au
+First home buyer turned guide. Anish built NestPath after going through the home buying process himself, wishing someone had been in his corner. Every guide on NestPath is written from real experience, not a marketing department.
+Connect on LinkedIn → Read our story →
+Ready to take your next step? We are here to help.
+Find me a free broker → Calculate my borrowing power Continue my journey
+You might also find this helpful
+Rental Yield Explained: How to Calculate It + Average Yields by City (Australia 2026)
+Read More →
+Land Tax in Australia 2026: Thresholds & Rates by State
+Read More →
+When Does Property Risk Pass When You Buy a House in Australia?
+Read More →
+Your home buying team
+Broker Compare cover Inspections
+MEET YOUR BROKER
+Laszlo Szollosi
+Orange Mortgage
+and Finance
+Buying your first home? Laszlo can help you compare lenders and handle the paperwork.
+RATEMYAGENT AWARDS WA Mortgage Broker
+of the Year Orange Mortgage and Finance
+Winner in 2024 and 2025
+Get connected with Laszlo Meet all our brokers
+THE FIRST HOME GUIDE
+A plan for
+your biggest move.
+Eight steps. A clear way forward.
+Explore the 8 steps
+01 Know your numbers
+02 Find your broker
+03 Get preapproved
+04 Find your property
+05 Make your offer
+06 Find your solicitor
+07 Get home insurance
+08 Get your keys
+Start my journey
+Some partners pay NestPath a referral fee.
+How we make money
+Also explore
+Free tools and guides for Australian first home buyers
+FHB Eligibility Checker Which schemes do you actually qualify for? → Borrowing Power Calculator How much can you actually borrow? → Mortgage Repayment Calculator Weekly, fortnightly & monthly repayments → Stamp Duty Calculator Know your full upfront costs by state → Move-In Cost Calculator The full first-30-days figure, not just stamp duty → Open Amazon AU Dataset Free CSV and JSON of our Amazon AU picks, CC BY 4.0. →

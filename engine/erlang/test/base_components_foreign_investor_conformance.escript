@@ -201,8 +201,13 @@ money_spine_cases() ->
     {Acc, _} = walk(args(true), Comps),
     Cash = maps:get(<<"budget_envelope_investor">>, Acc),
     Events = maps:get(<<"cash_events">>, Cash),
-    Ids = [maps:get(<<"id">>, E) || E <- Events],
-    Sum = lists:sum([hd(maps:get(<<"amount">>, E)) || E <- Events]),
+    %% behavior 83: the fee lines (each with a detail) follow the fixed events, in place of one
+    %% other_buying_costs event; the total counts the midpoint of the lines paid for sure.
+    Fees = [E || E <- Events, maps:is_key(<<"detail">>, E)],
+    Ids = [maps:get(<<"id">>, E) || E <- Events, not maps:is_key(<<"detail">>, E)],
+    [CLo, CHi] = fh_engine_fees:committed(Fees),
+    Sum = lists:sum([hd(maps:get(<<"amount">>, E)) || E <- Events, not maps:is_key(<<"detail">>, E)])
+          + round((CLo + CHi) / 2),
     Cells = maps:get(<<"cells">>, maps:get(<<"journey_swimlane">>, Acc)),
     Actors = [maps:get(<<"id">>, A)
               || A <- maps:get(<<"actors">>, maps:get(<<"journey_swimlane">>, Acc))],
@@ -219,10 +224,15 @@ money_spine_cases() ->
                           intent => <<"investment">>, blueprint_slug => ?FHB_FOREIGN_INV,
                           mode => <<"D">>, firb_required_any => true}, Comps),
     NoStateIds = [maps:get(<<"id">>, E) || E <- maps:get(<<"cash_events">>,
-                                       maps:get(<<"budget_envelope_investor">>, NoState))],
-    [check("cash_position emits the five acquisition events at base",
+                                       maps:get(<<"budget_envelope_investor">>, NoState)),
+                                      not maps:is_key(<<"detail">>, E)],
+    [check("cash_position emits the five fixed acquisition events at base",
            Ids, [<<"deposit">>, <<"firb_fee">>, <<"stamp_duty">>,
-                 <<"foreign_buyer_surcharge">>, <<"other_buying_costs">>]),
+                 <<"foreign_buyer_surcharge">>, <<"registration">>]),
+     check("and one event per buy fee line, each an estimate in group other_buying_costs",
+           Fees =/= [] andalso lists:all(fun(E) -> maps:get(<<"is_estimate">>, E) andalso
+                                         maps:get(<<"group">>, E) =:= <<"other_buying_costs">>
+                                         end, Fees), true),
      check("each is cash_position's own figure",
            lists:usort([maps:get(<<"source_component">>, E) || E <- Events]),
            [<<"cash_position">>]),

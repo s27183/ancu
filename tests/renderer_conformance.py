@@ -62,6 +62,13 @@ import kb_compiler  # noqa: E402 — path injected above
 # does reach the user some other way, or is genuinely internal/cross-component
 # wiring that carries no independent display value — never to silence a real gap.
 ALLOWLIST = {
+    # behavior 83 (2026-10-16): each owner's fee lines still waiting on an input reach the
+    # screen through purchase_journey's lifecycle_budget.pending, which folds them in
+    # (fh_engine_journey:harvest_fee_pending/1) and the lifecycle sheet lists.
+    **{(c, "fee_pending"): "folded into lifecycle_budget.pending (fh_engine_journey), "
+          "which LifecycleSheet.svelte lists"
+       for c in ("cash_position", "ownership_planning", "ownership_planning_investor",
+                 "ownership_planning_foreign_investor", "disposition")},
     ("preparation", "document_checklist"): "Checklist.svelte's own preparation branch "
         "renders every preparation_plan field; data-table's second-renderer branch is "
         "intentionally empty (2026-07-11 audit) so it doesn't duplicate content. This "

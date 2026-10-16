@@ -353,7 +353,7 @@ The blueprint is a directed pipeline of thirteen components — the same count a
   },
   "loan_payout": {
     "outstanding_balance": { "type": "money", "value": "<from_buyer_profile>", "note": "profile.existing_home_ownership.ppor_outstanding_loan_balance — user-attested, never inferred" },
-    "discharge_fee": { "type": "money_range", "value": "<initial>", "note": "kb.existing-home-sale.net-proceeds discharge_fee_low_aud/high_aud — market convention, not regulated" },
+    "discharge_fee": { "type": "money_range", "value": "<initial>", "note": "kb.existing-home-sale.net-proceeds fee line mortgage_discharge — market convention, not regulated" },
     "break_cost_status": { "type": "enum", "options": ["not_applicable", "to_verify"], "value": "<initial>", "derived_from": "profile.existing_home_ownership.ppor_loan_rate_type", "note": "variable → not_applicable (exit-fee ban, kb.existing-home-sale.net-proceeds); fixed → to_verify (lender-quoted break cost, never estimated); unknown → to_verify" },
     "total_payout": { "type": "money_range", "value": "<initial>", "note": "outstanding_balance + discharge_fee (a [Lo, Hi] band, since discharge_fee is a band — fh_engine_existing_home_disposal:total_payout/2); null while break_cost_status = to_verify AND the rate is fixed (honest-partial — the break cost is an unknown addend, not zero)" }
   },
@@ -598,6 +598,7 @@ The `mortgage_plan` outcome feeds `cash_position` (loan amount + buffer requirem
     "verdict": "enum [surplus, tight, short]",
     "genuine_savings_verdict": "enum [meets, fails_recent_gift, insufficient_track_record, unknown]",
     "cash_events": "array<{ id: string, phase: string, label: localized_text, direction: enum [out, in], amount: money_range|null, is_estimate: bool, timing: enum [one_off, recurring], period: enum [once, monthly, quarterly, annual]|null, counterparty: string, source_component: string }>",
+    "fee_pending": "array<{ id: string, phase: string, needs: enum [price, income, rent, quote, hold_years], label: localized_text|null }>",  // behavior 83 (2026-10-16): each fee line this component owns whose base is still missing (a % of the rent before a property, of the price before a range) or that waits on a quote — named, never a guessed figure (fh_engine_fees); purchase_journey folds them into lifecycle_budget.pending
     "mitigation_options_if_short": "array<string>",
     "key_assumptions": "array<localized_text>"
   }
@@ -891,7 +892,8 @@ The `mortgage_plan` outcome feeds `cash_position` (loan amount + buffer requirem
     "land_tax_check": "enum [exempt_ppor, applicable, to_verify]",
     "graduation_milestone": "{ target_lvr, estimated_year: number|null }",
     "alert_triggers_armed": "array<{ trigger: localized_text, action: localized_text }>",
-    "cash_events": "array<{ id: enum [council_rates_water, maintenance_reserve, loan_repayments], phase: 'own', label: localized_text, direction: 'out', amount: money_range, is_estimate: bool, timing: 'recurring', period: 'year', counterparty: string, source_component: string }>"  // the Own-phase per-year spine (behavior 82, 2026-10-16): council rates + water (the statutory band), the maintenance reserve over the target range, and the yearly P&I on the target range less the plan's own deposit event (fh_engine_disposition:annual_repayments/2, KB representative rate). Each PLACES a figure its owner computes; an unknown one is dropped (honest partial)
+    "cash_events": "array<{ id: string, phase: 'own', label: localized_text, direction: 'out', amount: money_range, is_estimate: bool, timing: 'recurring', period: 'year', counterparty: string, source_component: string }>",  // the Own-phase per-year spine (behavior 82, 2026-10-16): council rates + water (the statutory band), the maintenance reserve over the target range, and the yearly P&I on the target range less the plan's own deposit event (fh_engine_disposition:annual_repayments/2, KB representative rate). Each PLACES a figure its owner computes; an unknown one is dropped (honest partial). Behavior 83: the yearly fee lines (insurance, property management, accountant, depreciation schedule) join them, one event per fee with a `detail` {tier, basis, band, payer, drivers, source, optional, condition, owner} from fh_engine_fees
+    "fee_pending": "array<{ id: string, phase: string, needs: enum [price, income, rent, quote, hold_years], label: localized_text|null }>"  // behavior 83 (2026-10-16): each fee line this component owns whose base is still missing (a % of the rent before a property, of the price before a range) or that waits on a quote — named, never a guessed figure (fh_engine_fees); purchase_journey folds them into lifecycle_budget.pending
   }
 }
 ```
@@ -926,7 +928,7 @@ The `mortgage_plan` outcome feeds `cash_position` (loan amount + buffer requirem
     "actors": "array<{ id: string, label: localized_text }>",
     "cells": "array<{ phase: string, actor: string, item: localized_text, flow_marker: enum [none, money_out, money_in, document, milestone], amount: money_range, counterparty: string|null, source_component: string }>",
     "interactions": "array<{ from_actor: string, to_actor: string, phase: string, flows: array<{ label: localized_text, direction: enum [out, in], amount: money_range }> }>",
-    "lifecycle_budget": "{ buy: money_range|null, own_per_year: money_range|null, sell: money_range|null, pending: array<{ id: enum [sale_proceeds, selling_costs, loan_payout], phase: 'dispose', needs: enum [hold_years, income] }> }",  // behavior 82 (2026-10-16): the one-page sheet's three totals, summed HERE from the harvested events so the shell computes nothing — buy = prepare..settle out-events (a grant shown, never netted), own_per_year = recurring own out-events, sell = dispose out-events except loan_payout (repaid from the proceeds, not a cost); pending names each dispose line still waiting on an input (fh_engine_journey lifecycle_budget block)
+    "lifecycle_budget": "{ buy: money_range|null, own_per_year: money_range|null, sell: money_range|null, pending: array<{ id: string, phase: string, needs: enum [hold_years, income, price, rent, quote], label: localized_text|null }> }",  // behavior 82 (2026-10-16): the one-page sheet's three totals, summed HERE from the harvested events so the shell computes nothing — buy = prepare..settle out-events (a grant shown, never netted), own_per_year = recurring own out-events, sell = dispose out-events except loan_payout (repaid from the proceeds, not a cost); pending names each dispose line still waiting on an input (fh_engine_journey lifecycle_budget block); behavior 83: pending also names each fee line whose base is missing (price, income, rent) or that waits on a quote, with its label
     "key_assumptions": "array<localized_text>"
   }
 }
@@ -1068,6 +1070,7 @@ The `mortgage_plan` outcome feeds `cash_position` (loan amount + buffer requirem
     "net_proceeds": "money_range|null",
     "full_horizon_net_position": "money_range|null",
     "dispose_cash_events": "array<{ id: string, phase: string, label: localized_text, direction: enum [out, in], amount: money_range|null, is_estimate: bool, timing: enum [one_off, recurring], period: enum [once, monthly, quarterly, annual]|null, counterparty: string, source_component: string }>",
+    "fee_pending": "array<{ id: string, phase: string, needs: enum [price, income, rent, quote, hold_years], label: localized_text|null }>",  // behavior 83 (2026-10-16): each fee line this component owns whose base is still missing (a % of the rent before a property, of the price before a range) or that waits on a quote — named, never a guessed figure (fh_engine_fees); purchase_journey folds them into lifecycle_budget.pending
     "key_assumptions": "array<localized_text>"
   }
 }

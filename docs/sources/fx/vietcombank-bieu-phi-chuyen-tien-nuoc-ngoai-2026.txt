@@ -1,0 +1,146 @@
+Source: https://www.vietcombank.com.vn/-/media/Project/VCB-Sites/VCB/KHCN/Bieu-mau-Bieu-phi-KHCN/Update-30062026/BP-dich-vu-chuyen-tien-nuoc-ngoai.pdf
+Retrieved: 2026-10-16
+Extracted: pdftotext -layout of the fetched PDF; sha256 of the fetched PDF 2d528856ab12c00ce00c27e20e1220a87a34702e8c2f3083f00a516f6f358a85
+
+                         BIỂU PHÍ DỊCH VỤ CHUYỂN TIỀN NƯỚC NGOÀI
+                              ÁP DỤNG CHO KHÁCH HÀNG CÁ NHÂN
+                                (có hiệu lực thi hành từ ngày 06/07/2026)
+
+                                                                          Mức phí
+STT                          Dịch vụ
+                                                             Kênh quầy              Kênh NHĐT
+1.       Chuyển tiền đi bằng điện SWIFT
+1.1.     Phí chuyển tiền đi của VCB
+         Chuyển tiền cho mục đích du học/khám chữa              0,2%                  0,2%
+         bệnh/trợ cấp nhân thân/du lịch nước ngoài/       Tối thiểu: 5 USD     Tối thiểu: 200.000
+1.1.1. công tác nước ngoài                                Tối đa: 200 USD             VND
+                                                                                Tối đa: 3.900.000
+                                                                                      VND
+         Chuyển tiền cho mục đích định cư/thừa kế               0,2%
+1.1.2.                                                    Tối thiểu: 5 USD             N/A
+                                                          Tối đa: 5.000 USD
+         Chuyển tiền cho mục đích khác (các mục đích            0,2%
+         chuyển tiền cho nhu cầu phù hợp khác, tuân       Tối thiểu: 5 USD
+1.1.3.                                                                                 N/A
+         thủ quy định quản lý ngoại hối của NHNN và       Tối đa: 990 USD
+         VCB)
+         Phí dịch vụ trả ngân hàng nước ngoài để đảm
+         bảo qua NH trung gian đầu tiên không thu phí
+1.2.
+         từ số tiền chuyển (thu theo yêu cầu của người
+         chuyển)
+                                                                               200.000 VND /giao
+1.2.1.                             Chuyển đi bằng USD     10 USD /giao dịch
+                                                                                       dịch
+                                                                               800.000 VND /giao
+1.2.2.                        Chuyển đi bằng JPY, EUR     40 USD/giao dịch
+                                                                                       dịch
+                                                                               400.000 VND /giao
+1.2.3.                     Chuyển đi bằng ngoại tệ khác   20 USD/giao dịch
+                                                                                       dịch
+
+                Phí chuyển nguyên số tiền cho người thụ                        600.000 VND /giao
+1.2.4.                                                    30 USD/giao dịch
+                    hưởng (áp dụng chuyển đi bằng USD)                                 dịch
+
+1.3.     Điện phí                                            5 USD/điện
+
+2.       Chuyển tiền đi bằng séc                                                       N/A
+
+
+                                                                                                    1
+                                                                            Mức phí
+STT                         Dịch vụ
+                                                            Kênh quầy                 Kênh NHĐT
+2.1.     Phát hành séc
+2.1.1. Cung ứng séc                                          1 USD/tờ
+         Chuyển tiền bằng séc (chưa bao gồm điện phí)          0,1%
+2.1.2.                                                    Tối thiểu: 5 USD
+                                                          Tối đa: 150 USD
+2.2.     Hủy séc
+2.2.1. Khách hàng có xuất trình séc (chưa bao gồm
+                                                             5 USD/tờ
+         điện phí, phí ngân hàng nước ngoài)
+         Khách hàng không xuất trình séc (chưa bao
+2.2.2.                                                       10 USD/tờ
+         gồm điện phí, phí ngân hàng nước ngoài)
+                                                         Theo biểu phí của
+3.       Chuyển tiền đi MoneyGram                                                        N/A
+                                                           MoneyGram
+4.       Chuyển tiền đến SWIFT                                                           N/A
+         Phí chuyển tiền đến bằng điện Swift                   0,05%
+4.1.     (Không thu phí với chỉ thị phí OUR)              Tối thiểu: 2 USD
+                                                          Tối đa: 70 USD
+4.2.     Phí nhận tiền mặt tại VCB
+4.2.1. Nhận bằng VND                                          Miễn phí
+         Nhận ngoại tệ mặt của khách hàng tại VCB       Áp dụng phí rút tiền
+         (nguồn từ tài khoản hoặc từ các nguồn khác)    mặt ngoại tệ của chủ
+4.2.2.
+                                                        tài khoản tại mục phí
+                                                               A.4.2
+5.       Nhờ thu séc                                                                     N/A
+5.1.     Nhận séc để gửi đi nhờ thu                          2 USD/tờ
+5.2.     Hủy nhờ thu theo yêu cầu                            5 USD/tờ
+                                                         Áp dụng phí tương
+5.3.     Thanh toán kết quả nhờ thu                     ứng tại mục Chuyển
+                                                           tiền đến Swift
+                                                        Thu theo thực tế phát
+5.4.     Séc nhờ thu bị từ chối
+                                                                sinh
+                                                         Theo quy định của
+5.5.     Bưu phí
+                                                        Bưu điện/chuyển phát
+
+
+                                                                                                  2
+                                                                              Mức phí
+ STT                             Dịch vụ
+                                                              Kênh quầy                 Kênh NHĐT
+                                                                 nhanh
+             Thanh toán séc                                Áp dụng phí tương
+ 6.          (séc được chỉ định thanh toán tại VCB)       ứng tại mục Chuyển                N/A
+                                                             tiền đến Swift
+             Giao dịch nhận tiền kiều hối qua DV
+             MoneyGram/RIA/Host to Host
+ 7.          (TNMonex/Uniteller/Xoom/VCBR/TNMonex               Miễn phí                    N/A
+             …) bằng VND hoặc USD hoặc ngoại tệ khác
+             theo từng dịch vụ
+             Tra soát/Điều chỉnh/Hủy lệnh chuyển tiền        10 USD/ lần tra        200.000 VND/ lần
+             bằng điện/Séc                                 soát/điều chỉnh/hủy          tra soát/điều
+ 8.                                                        lệnh + phí trả ngân     chỉnh/hủy lệnh + phí
+                                                          hàng nước ngoài (nếu     trả ngân hàng nước
+                                                               phát sinh)          ngoài (nếu phát sinh)
+ 9.          Thoái hối                                     10 USD/giao dịch                 N/A
+                                                               Thỏa thuận
+ 10.         Dịch vụ khác                                   Tối thiều: 20.000               N/A
+                                                                 VND
+
+
+ GHI CHÚ
+1. Các mức phí quy định tại biểu phí chưa bao gồm thuế giá trị gia tăng (VAT). Khi thu phí dịch vụ,
+      Vietcombank sẽ tính và thu thuế VAT theo quy định của pháp luật hiện hành.
+2. Đối với mức phí quy định theo tỷ lệ % thì phí thu được tính theo tỷ lệ % x giá trị giao dịch tương
+      ứng.
+3. Mức phí quy định trong biểu phí chưa bao gồm các khoản phí (điện phí, bưu phí, thuế, phí dịch
+      vụ...) phải trả cho các đơn vị và/hoặc các ngân hàng khác cùng tham gia cung ứng dịch vụ.
+      Vietcombank sẽ thu các khoản phí này (nếu phát sinh) cùng với Phí dịch vụ tương ứng theo Biểu
+      phí của Vietcombank.
+4. Các giao dịch liên quan đến việc sử dụng ngoại tệ tuân thủ theo quy định Quản lý Ngoại hối hiện
+      hành của nhà nước.
+5. Khách hàng có thể trả phí dịch vụ bằng VND đối với các khoản phí được thu bằng ngoại tệ theo tỷ
+      giá do Vietcombank công bố tại thời điểm thu phí.
+6. Trường hợp khách hàng yêu cầu hủy bỏ giao dịch hoặc khách hàng ngưng sử dụng dịch vụ trước
+      hạn hoặc giao dịch không được thực hiện vì sai sót không phải do lỗi của VCB gây ra,
+      Vietcombank không hoàn lại phí dịch vụ và các khoản phí khác (điện phí, bưu phí, thuế, phí dịch
+
+                                                                                                        3
+   vụ ... phải trả các đơn vị/ngân hàng khác) đã thu.
+7. N/A: Không áp dụng.
+8. Vietcombank có thể thay đổi Biểu phí dịch vụ dành cho khách hàng cá nhân mà không cần báo
+   trước với khách hàng, trừ khi có thoả thuận khác.
+
+
+
+
+                                                                                           4
+

@@ -1236,14 +1236,24 @@ param(Slug, Key) ->
 %% banded. A freestanding HOUSE carries its own building insurance + full maintenance; a STRATA
 %% property carries building cover + structural maintenance inside the body-corporate levy (not
 %% carried in property_fit_investor) → return `none` so opex stays null rather than understate cost.
+fee_band(Id) ->
+    case fh_engine_fees:line_band(Id) of
+        [_, _] = B -> B;
+        null       -> [0, 0]
+    end.
+
 opex_band(EffLo, EffHi, Price, PType) ->
     case is_house(PType) of
         false -> none;
         true ->
             %% fixed dollar bands (low/high), from operating-expenses-typical-ratios:
-            %% council 1500–2500, water 700–1500, landlord-ins 300–700, building-ins(house) 1000–2000.
-            FixedLo = 1500 + 700 + 300 + 1000,
-            FixedHi = 2500 + 1500 + 700 + 2000,
+            %% council 1500–2500, water 700–1500; the two insurances are that doc's fee lines
+            %% (behavior 83: one owner per figure — building_insurance for a house, plus
+            %% landlord_insurance), read through fh_engine_fees, not repeated here.
+            [BiLo, BiHi] = fee_band(<<"building_insurance">>),
+            [LiLo, LiHi] = fee_band(<<"landlord_insurance">>),
+            FixedLo = 1500 + 700 + LiLo + BiLo,
+            FixedHi = 2500 + 1500 + LiHi + BiHi,
             %% maintenance reserve — 0.5–1.0% of property value (maintenance_reserve_pct_of_value_*).
             MaintLo = 0.005 * Price,
             MaintHi = 0.010 * Price,

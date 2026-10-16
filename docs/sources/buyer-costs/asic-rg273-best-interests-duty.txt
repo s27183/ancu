@@ -1,0 +1,3302 @@
+Source: https://download.asic.gov.au/media/5641325/rg273-published-24-june-2020.pdf
+Retrieved: 2026-10-16
+Extracted: pdftotext of the fetched PDF; sha256 of the PDF 0ac84be38c70d8a83c84a1cbbfc3e90e2a079c21362bba8dc56ceda381178542
+
+REGULATORY GUIDE 273
+
+Mortgage brokers: Best
+interests duty
+June 2020
+
+About this guide
+This is a guide for mortgage brokers and other relevant Australian credit
+licensees.
+It explains what ASIC looks for when we assess compliance with the best
+interests obligations in Pt 3-5A of the National Consumer Credit Protection
+Act 2009 (National Credit Act). It also outlines steps you can take to
+minimise the risk of non-compliance with these provisions.
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+About ASIC regulatory documents
+In administering legislation ASIC issues the following types of regulatory
+documents.
+Consultation papers: seek feedback from stakeholders on matters ASIC
+is considering, such as proposed relief or proposed regulatory guidance.
+Regulatory guides: give guidance to regulated entities by:
+
+
+explaining when and how ASIC will exercise specific powers under
+legislation
+
+
+
+explaining how ASIC interprets the law
+
+
+
+describing the principles underlying ASIC’s approach
+
+
+
+giving practical guidance (e.g. describing the steps of a process such
+as applying for a licence or giving practical examples of how
+regulated entities may decide to meet their obligations).
+
+Information sheets: provide concise guidance on a specific process or
+compliance issue or an overview of detailed guidance.
+Reports: describe ASIC compliance or relief activity or the results of a
+research project.
+
+Document history
+This guide was issued in June 2020 and is based on the legislation and
+regulations as at the date of issue.
+
+Disclaimer
+This guide does not constitute legal advice. We encourage you to seek your
+own professional advice to find out how the credit legislation and other
+applicable laws apply to you, as it is your responsibility to determine your
+obligations.
+Examples in this guide are purely for illustration; they are not exhaustive
+and are not intended to impose or imply particular rules or requirements.
+
+© Australian Securities and Investments Commission June 2020
+
+Page 2
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+Contents
+A
+
+Overview........................................................................................... 4
+What are your obligations?................................................................ 4
+Our approach to the best interests obligations.................................. 6
+Other obligations ............................................................................... 8
+
+B
+
+Acting in the consumer’s best interests ....................................... 9
+What is the best interests duty? ........................................................ 9
+Gathering information about the consumer ..................................... 10
+Making an individual assessment ................................................... 12
+Presenting information and recommendations................................ 20
+
+C
+
+Guidance on specific issues and the best interests duty ......... 24
+Interaction with the responsible lending obligations ........................ 24
+Range of credit providers and products .......................................... 25
+When the duty applies ..................................................................... 27
+Mortgage managers ........................................................................ 30
+Risk-based pricing ........................................................................... 31
+Other circumstances where the duty applies .................................. 31
+
+D
+
+Related obligations ....................................................................... 36
+The conflict priority rule ................................................................... 36
+Record keeping ............................................................................... 39
+Obligations for credit licensees ....................................................... 42
+The anti-avoidance provision .......................................................... 44
+
+Appendix: Comparison of the responsible lending obligations and
+the best interests duty .................................................................. 46
+Key terms ............................................................................................... 49
+Related information .............................................................................. 51
+
+© Australian Securities and Investments Commission June 2020
+
+Page 3
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+A
+
+Overview
+Key points
+The National Consumer Credit Protection Act 2009 (National Credit Act)
+requires mortgage brokers to act in the best interests of consumers when
+providing credit assistance. Where there is a conflict of interest, mortgage
+brokers must prioritise the interests of consumers.
+This guide sets out ASIC’s views on what these obligations require and
+steps you can take to minimise the risk of non-compliance.
+This section of the guide gives an overview of our guidance. It also
+explains when the provisions apply and how we administer the provisions.
+
+What are your obligations?
+RG 273.1
+
+The Royal Commission into Misconduct in the Banking, Superannuation
+and Financial Services Industry (Royal Commission) considered mortgage
+broking in Australia and, in its final report, made recommendations relating
+to mortgage brokers, including Recommendation 1.2 (best interests duty)
+and Recommendation 1.3 (mortgage broker remuneration).
+Note: See Royal Commission, Final report, 4 February 2019.
+
+RG 273.2
+
+In response to Recommendation 1.2, the Government passed legislation to:
+(a)
+
+create a duty for mortgage brokers to act in the best interests of their
+consumers (best interests duty); and
+
+(b)
+
+require mortgage brokers to prioritise their consumers’ interests when
+providing credit assistance (conflict priority rule).
+Note: The Financial Sector Reform (Hayne Royal Commission Response—Protecting
+Consumers (2019 Measures)) Act 2020 (Mortgage Broker Reforms Act) inserted these
+obligations into the National Credit Act. The Mortgage Broker Reforms Act also
+inserted other reforms relating to mortgage broker remuneration.
+
+RG 273.3
+
+These obligations—collectively referred to in this guide as the ‘best interests
+obligations’—give statutory recognition to consumers’ expectations. The
+Replacement Explanatory Memorandum to the Financial Sector Reform
+(Hayne Royal Commission Response—Protecting Consumers (2019
+Measures) Bill 2019 (Replacement Explanatory Memorandum) outlines the
+objective of the obligations at paragraph 3.11:
+The objective of the new law is to improve consumer outcomes. Firstly, by
+requiring mortgage brokers to act in the best interests of their clients and
+secondly, by reducing the potential for conflicts of interests to impact the
+advice consumers receive from mortgage brokers.
+
+© Australian Securities and Investments Commission June 2020
+
+Page 4
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+RG 273.4
+
+Mortgage brokers, and, where relevant, other credit licensees, must comply
+with these obligations from 1 January 2021.
+Note: ASIC has provided a temporary exemption from the best interests obligations for
+six months from 1 July 2020 due to the effect of COVID-19: see ASIC Credit (Deferral
+of Mortgage Broker Obligations) Instrument 2020/487 and Media Release (20-109MR)
+ASIC defers commencement of mortgage broker reforms and design and distribution
+obligations (8 May 2020).
+
+RG 273.5
+
+The best interests obligations apply only in relation to credit products that
+are regulated under the National Credit Act—that is, products provided to
+consumers for personal, domestic or household purposes or for the purchase
+or improvement of residential investment property.
+
+Best interests duty
+RG 273.6
+
+If you are a mortgage broker, you are required to act in the best interests of
+the consumer when providing credit assistance: s158LA and 158LE of the
+National Credit Act.
+Note: For guidance on the meaning of credit assistance, see Regulatory Guide 203 Do I
+need a credit licence? (RG 203).
+
+RG 273.7
+
+Mortgage brokers are defined as persons who:
+(a)
+
+carry on a business of providing credit assistance in relation to credit
+contracts secured by mortgages over residential property;
+
+(b)
+
+do not act as the credit provider in relation to most of those contracts; and
+
+(c)
+
+provide credit assistance in relation to credit contracts offered by more
+than one credit provider: s15B.
+Note: For general guidance on the meaning of ‘carrying on a business’, see RG 203 and
+Section C of Regulatory Guide 121 Doing financial services business in Australia (RG 121).
+
+RG 273.8
+
+This definition applies regardless of the title of the person providing credit
+assistance. For instance, a mortgage manager who meets these criteria will
+still satisfy this definition and be subject to the best interests duty.
+Note: For information on the application of the best interests duty to mortgage
+managers, see RG 273.123–RG 273.128.
+
+Conflict priority rule
+RG 273.9
+
+Sections 158LB and 158LF contain a conflict priority rule for mortgage
+brokers. If there is a conflict of interest when providing credit assistance, you
+are required to give priority to the consumer’s interests. You must not
+prioritise your own interests or the interests of credit providers or third parties.
+Note: For our guidance on the conflict priority rule, see RG 273.144–RG 273.161.
+
+© Australian Securities and Investments Commission June 2020
+
+Page 5
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+Anti-avoidance provision
+RG 273.10
+
+There is also a ban on entering into or carrying out a scheme that is designed
+to avoid the application of the best interests obligations, as well as the ban
+on conflicted remuneration. The purpose of the anti-avoidance provision is
+to ensure that the policy intent of the Mortgage Broker Reforms Act is not
+avoided through industry or transaction structuring.
+Note: For our guidance on the anti-avoidance provision, see RG 273.180–RG 273.186.
+
+Our approach to the best interests obligations
+RG 273.11
+
+The best interests obligations are designed to more closely align the interests
+of mortgage brokers with the interests of their consumers: see Replacement
+Explanatory Memorandum, paragraphs 3.4 and 3.22. This is the guiding
+principle in our approach to administering these obligations.
+
+RG 273.12
+
+The obligations are high-level principles, and do not contain prescriptive
+steps for mortgage brokers and others to follow to ensure they comply.
+Paragraph 3.24 of the Replacement Explanatory Memorandum states:
+[W]hat conduct satisfies the duty will depend on the individual
+circumstances in which credit assistance is provided to a consumer in
+relation to a credit contract… the duty does not prescribe conduct that will
+be taken to satisfy the duty in specific circumstances. It is the responsibility
+of mortgage brokers to ensure that their conduct meets the standard of
+‘acting in the best interests of consumers’ in the relevant circumstances.
+
+RG 273.13
+
+This guidance sets out our views on the best interests obligations and our
+expectations of industry; nothing in this guidance is intended to provide a
+‘safe harbour’.
+
+RG 273.14
+
+The best interests obligations cannot be avoided by any notice or disclaimer
+provided to or signed by the consumer. A mortgage broker cannot comply
+with these obligations merely by getting the consumer to consent to certain
+credit assistance or a conflict of interest.
+
+General principles
+RG 273.15
+
+The following matters will guide our administration of these obligations:
+(a)
+
+The best interests obligations are intended to more closely align
+mortgage broker practices with consumers’ expectations.
+
+(b)
+
+The obligations should improve the support, guidance and communication
+provided to consumers throughout the credit assistance process.
+
+(c)
+
+The obligations should lead to a higher quality of credit assistance
+being provided.
+
+© Australian Securities and Investments Commission June 2020
+
+Page 6
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+(d)
+
+Any products recommended by a broker must be in the consumer’s best
+interests, and the reasons for this conclusion should be recorded and
+explained to the consumer.
+Note: For our guidance on the things you may need to consider when determining what
+is in a consumer’s best interests, see RG 273.44–RG 273.86.
+
+(e)
+
+To the extent that it is in the interests of the broker or a related third
+party to provide certain credit assistance, that credit assistance may
+only be provided if it is also in the consumer’s best interests.
+
+(f)
+
+The best interests duty and the conflict priority rule are separate
+obligations that operate alongside each other and apply each time a
+mortgage broker provides credit assistance. This includes credit
+assistance about credit cards and personal loans that are packaged with a
+home loan, as well as standalone products on which mortgage brokers
+provide credit assistance.
+
+What we expect of brokers
+RG 273.16
+
+Mortgage brokers must act in the best interests of each individual consumer
+to whom credit assistance is provided. We consider that the obligations
+require mortgage brokers to assess what product(s), and what credit
+assistance, would be in each consumer’s best interests.
+
+RG 273.17
+
+The broker’s consideration of the individual circumstances of the consumer
+and their needs, goals and financial situation is particularly relevant to
+complying with the obligations. The risk of non-compliance is substantially
+increased if a broker’s processes typically lead to a ‘one-size-fits-all’
+outcome for consumers.
+Note: For a non-exhaustive list of factors which may need to be considered when
+making an assessment of the individual circumstances of a consumer, see RG 273.48.
+
+RG 273.18
+
+Brokers will need to exercise their judgment when determining what is in the
+consumer’s best interests. In some situations, this will include challenging the
+consumer’s perception of their best interests. Although it is the consumer’s
+decision whether to accept or decline the recommendation and proceed with
+an application, it is the sole responsibility of the broker to ensure the
+recommendation is in the consumer’s best interests.
+
+RG 273.19
+
+A variety of factors can be relevant in determining whether recommending
+a credit product is in the consumer’s best interests. In our view, this
+determination involves considering the product holistically and weighing up
+the relevant factors based on the value and benefits they offer that consumer.
+
+RG 273.20
+
+In most instances, you should present consumers with more than one option.
+Where there are multiple options for a consumer to consider, these are to be
+presented in a manner consistent with the consumer’s best interests: see
+RG 273.87–RG 273.104.
+
+© Australian Securities and Investments Commission June 2020
+
+Page 7
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+RG 273.21
+
+We expect that evidence of compliance with the best interests obligations will
+come predominantly from the broker’s records: see RG 273.162–RG 273.172.
+These records may help brokers demonstrate that they have met their
+obligations, and help credit licensees take reasonable steps to ensure that
+brokers who are their credit representatives comply with these obligations.
+Note: For our guidance on obligations for credit licensees, see RG 273.173–RG 273.179.
+
+Other obligations
+RG 273.22
+
+The best interests obligations operate alongside other laws that affect how
+credit assistance is provided to consumers. They do not alter existing laws,
+including the responsible lending obligations.
+Note: Regulatory Guide 209 Credit licensing: Responsible lending conduct (RG 209)
+provides information on the responsible lending obligations. We have also provided
+guidance on other obligations, including in Regulatory Guide 205 Credit licensing:
+General conduct obligations (RG 205) and Regulatory Guide 206 Credit licensing:
+Competence and training (RG 206).
+
+RG 273.23
+
+The best interests duty and the responsible lending obligations are distinct
+obligations that apply whenever credit assistance regulated under the
+National Credit Act is provided by a mortgage broker.
+
+RG 273.24
+
+The best interests duty introduces requirements and steps that are additional
+to the responsible lending obligations. The obligations are complementary
+and you will need to comply with both, even if some steps are not required
+by the responsible lending obligations: see Replacement Explanatory
+Memorandum, paragraph 3.5.
+Note: For guidance on the interaction of the best interests duty and the responsible
+lending obligations, see RG 273.105–RG 273.111.
+
+RG 273.25
+
+Information gathered for the purpose of complying with the responsible
+lending obligations may help brokers to comply with the best interests duty.
+The information gathered may also help brokers to comply with the design
+and distribution obligations from October 2021.
+Note: For our draft guidance on the design and distribution obligations, see
+Consultation Paper 325 Product design and distribution obligations (CP 325).
+
+© Australian Securities and Investments Commission June 2020
+
+Page 8
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+B
+
+Acting in the consumer’s best interests
+Key points
+The best interests duty requires mortgage brokers to act in the best
+interests of their consumers.
+What is required to act in a consumer’s best interests will depend on the
+individual consumer’s circumstances. Mortgage brokers are likely to need to:
+• gather information about the consumer and their situation;
+• use that information to assess what credit assistance would be in the
+consumer’s best interests; and
+• depending on that assessment, potentially suggest one or more options
+to the consumer, and provide information about why the recommended
+option(s) are in the consumer’s best interests.
+This section sets out what we consider mortgage brokers may need to do
+to comply with the best interests duty. Additional guidance on specific
+issues that are relevant to this obligation is set out in Section C.
+
+What is the best interests duty?
+RG 273.26
+
+Mortgage brokers assist consumers to obtain home loans by approaching
+and negotiating with credit providers on the consumer’s behalf. An important
+part of this process is brokers reviewing various credit contracts from their
+available panel of credit providers and making a recommendation to the
+consumer, based on information about the consumer and the nature of
+the product.
+
+RG 273.27
+
+The best interests duty extends this process by requiring that brokers determine
+and assess the best interests of the consumer and present recommendations in
+line with those interests.
+
+RG 273.28
+
+The National Credit Act does not set out circumstances in which a mortgage
+broker is taken to have complied with these obligations. This means that there
+is no ‘safe harbour’; mortgage brokers will need to take all steps necessary to
+ensure that they act in the best interests of the relevant consumer.
+
+RG 273.29
+
+We consider that the processes and actions of the mortgage broker are a key
+consideration when determining whether the best interests duty has been
+complied with. Table 1 summarises our general approach to what we consider
+mortgage brokers may need to do to comply with the best interests duty.
+Note: For our guidance on a range of specific issues relating to the best interests duty,
+see Section C.
+
+© Australian Securities and Investments Commission June 2020
+
+Page 9
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+Table 1:
+
+Complying with the best interests duty
+
+Step
+
+Process
+
+Guidance
+
+Gathering information
+about the consumer
+
+This step may involve investigating the consumer’s circumstances,
+objectives and financial situation by obtaining information about the
+consumer, what they are attempting to achieve and what features
+they value.
+
+RG 273.30–
+RG 273.43
+
+Making an individual
+assessment
+
+This step may involve:
+
+RG 273.44–
+RG 273.86
+
+ considering a range of relevant products to identify options that
+are available to the consumer to meet their goals and objectives;
+and
+ assessing what is in that particular consumer's best interests.
+
+Presenting information
+and recommendations
+
+This step may involve:
+ making recommendations that reflect the broker’s consideration of
+the range of options that align with the consumer’s circumstances;
+
+RG 273.87–
+RG 273.104
+
+Note: Making recommendations typically involves suggesting that a
+consumer apply for a particular credit contract, and therefore involves
+credit assistance.
+
+ presenting recommendations and information to the consumer in
+a manner that is consistent with acting in their best interests;
+ educating and equipping the consumer to make informed
+decisions, including whether to apply the product(s)
+recommended with the broker’s assistance; and
+ following appropriate processes for engaging and communicating
+with the consumer, and assisting them to apply for the credit
+product they have selected.
+Note: Assisting a consumer to apply for a particular credit contract is
+also credit assistance. This includes making recommendations or
+assisting a consumer to refinance an existing loan: see s8 of the
+National Credit Act and RG 203.
+
+Gathering information about the consumer
+RG 273.30
+
+As a mortgage broker, to determine what is in the consumer’s best interests,
+you will need to gather information about the consumer, including their
+reasons for approaching you and what they are seeking to achieve.
+
+RG 273.31
+
+Separately, you are required to obtain information about the consumer for
+the purposes of complying with the responsible lending obligations. Those
+obligations require brokers, or the credit licensees that authorise them, to
+make reasonable inquiries about the consumer’s requirements and objectives,
+and make reasonable inquiries about the consumer’s financial situation.
+Note: See RG 209 and s117, 130, 140 and 153 of the National Credit Act.
+
+RG 273.32
+
+Although the responsible lending obligations and the best interests duty are
+separate obligations, the information gathered for the purposes of
+responsible lending may help you to determine what is in the consumer’s
+
+© Australian Securities and Investments Commission June 2020
+
+Page 10
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+best interests. If additional information is needed to make that assessment,
+you will need to obtain that information from the consumer.
+Note: For a discussion of the interaction of the best interests duty and the responsible
+lending obligations, see RG 273.105–RG 273.111.
+
+Receiving instructions and making inquiries
+RG 273.33
+
+The best interests duty does not prescribe how you should gather information
+about the consumer or their circumstances. However, good communication
+and consultation—which ensures that your role and the broader application
+process are understood—are generally indicative of acting in the consumer’s
+best interests. This may in turn assist the consumer to understand, and choose
+from, any recommendation that you put forward in due course.
+
+RG 273.34
+
+Consumers may communicate their instructions in different ways and with
+varying degrees of formality. For example, instructions may be provided
+through a face-to-face meeting, telephone or email, or by entering
+information on an online platform. Some consumers may have a specific
+request—such as whether you can help them obtain a better and/or cheaper
+loan than one that they currently have or have found themselves.
+
+RG 273.35
+
+The information initially disclosed by consumers will often be insufficient for
+you to identify the consumer’s individual circumstances and do the analysis
+necessary to recommend products based on what would be in their best interests.
+
+RG 273.36
+
+In many cases, consumers approach a mortgage broker because they do not
+know or fully understand what circumstances are relevant to a home loan
+application. Our findings in Report 628 Looking for a mortgage: Consumer
+experiences and expectations in getting a home loan (REP 628) indicated that
+consumers who took out their loan through a broker tended to be more
+uncertain of the process and were less sure which loan would be right for them.
+
+RG 273.37
+
+Consumers may also provide instructions that are unclear or make requests
+that seem inconsistent with their circumstances. In these situations, you
+should make further inquiries to identify the consumer’s circumstances to
+inform your product recommendation. This may also be important for you to
+determine the significance of various product features or options that may
+be relevant to the consumer.
+
+RG 273.38
+
+There is no prescribed manner for making these inquiries. It may be an
+iterative process, as engaging with the consumer could lead you to identify
+other matters that are relevant to the credit assistance you intend to provide.
+
+RG 273.39
+
+Further inquiries are particularly important and may be more detailed if the
+consumer has a low level of financial capability or the proposed transaction
+or structure of the home loan product sought is complex. For example, a
+first home buyer may require more detailed inquiries than an experienced
+borrower thinking about refinancing a loan on an owner-occupied property.
+
+© Australian Securities and Investments Commission June 2020
+
+Page 11
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+Incomplete or inaccurate information about a consumer’s
+circumstances
+RG 273.40
+
+If it is reasonably apparent that the information about a consumer’s
+individual circumstances is incomplete or inaccurate, you should make
+further inquiries to obtain complete and accurate information.
+
+RG 273.41
+
+If critical information is not obtained when inquiring about a consumer’s
+circumstances, you should refrain from making a recommendation.
+Paragraph 3.25 of the Replacement Explanatory Memorandum states:
+[I]n cases where critical information is not obtained when inquiring about
+a consumer’s circumstances, the broker could be expected to refrain from
+making a recommendation about a loan where there is a consequent risk
+that the loan will not be in the consumer’s best interests.
+
+RG 273.42
+
+A mortgage broker who provides incomplete or inaccurate information as
+part of a home loan application will not be acting in the consumer’s best
+interests, even if the inaccurate information would increase the likelihood of
+approval or give the consumer access to better terms.
+Note: For our detailed guidance on incomplete and inaccurate information, see RG 209.
+
+RG 273.43
+
+It is possible that, in the course of providing credit assistance, the consumer
+may disclose additional information or a change in circumstances. If this
+occurs, you should clarify these circumstances with the consumer, and
+consider whether there is a need to change the content of the credit
+assistance you provide.
+
+Making an individual assessment
+RG 273.44
+
+As a mortgage broker, after going through a process of gathering
+information, you are likely to need to consider the available products and
+assess which of those (if any) are in the consumer’s best interests: see
+Replacement Explanatory Memorandum, paragraph 3.25.
+
+RG 273.45
+
+What is needed to comply with the best interests duty varies depending on
+the individual circumstances of the consumer and their needs, goals and
+financial situation.
+
+RG 273.46
+
+We consider that the judgment you exercise in considering the information
+provided by the consumer and making this assessment is an important part of
+acting in the best interests of the consumer.
+
+RG 273.47
+
+There is no prescribed process or set of factors for mortgage brokers to
+consider when conducting this assessment. You should consider each
+consumer’s individual circumstances, including any matters that may affect
+what is in that consumer’s best interests.
+
+© Australian Securities and Investments Commission June 2020
+
+Page 12
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+RG 273.48
+
+Without limiting the assessment, some matters you are likely to need to
+consider are:
+(a)
+
+the consumer’s priorities and preferences for different products or
+credit providers (including the price of the loan, product features such
+as bundled products or offset accounts, and the level of service of the
+credit provider);
+
+(b)
+
+the consumer’s needs and objectives (including the term of the loan, the
+amount to be borrowed and the outcome the consumer would like to
+achieve);
+
+(c)
+
+the consumer’s personal circumstances and financial situation, to the
+extent that they could affect the suitability of different products;
+
+(d)
+
+reasonably foreseeable changes to the consumer’s personal
+circumstances and financial situation;
+
+(e)
+
+whether you have access to products that meet the consumer’s needs,
+objectives, preferences and priorities; and
+
+(f)
+
+whether you have the ability or expertise to make a recommendation
+that meets the consumer’s needs, objectives, preferences and priorities.
+
+RG 273.49
+
+The assessment of what product(s) would be in the consumer’s best interests
+is a point-in-time assessment: see RG 273.116–RG 273.122.
+
+RG 273.50
+
+If you cannot act in the consumer’s best interests in providing them with
+credit assistance, you must not provide the assistance.
+
+Considering cost
+RG 273.51
+
+The cost of a credit product can significantly affect the outcome the
+consumer achieves, as well as their other objectives that are unrelated to the
+credit product. For that reason, we generally expect the cost of a credit
+product—such as interest rate, fees and charges and the size of
+repayments—to be a factor that mortgage brokers should prioritise.
+
+RG 273.52
+
+We believe that this is consistent with consumers’ expectations of brokers.
+In our research for REP 628, we found that the key focus for consumers is
+finding the ‘best loan’, usually in reference to a low or competitive interest
+rate. The cost of the home loan was generally considered the most important
+feature, with flexibility also being important for some consumers.
+
+RG 273.53
+
+Further, in Report 516 Review of mortgage broker remuneration (REP 516),
+we found that consumers who use a mortgage broker also tend to have a
+higher loan-to-income ratio and greater leverage. This suggests that lower
+costs and affordable repayments may be a priority and are likely to be
+consistent with those consumers’ best interests.
+
+© Australian Securities and Investments Commission June 2020
+
+Page 13
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+RG 273.54
+
+A failure to consider cost and investigate the lowest cost options available to
+the consumer may suggest non-compliance with the best interests duty. Any
+situation where a higher cost loan is recommended will need to be supported
+by evidence demonstrating why that recommendation is in the consumer’s
+best interests.
+
+RG 273.55
+
+Additionally, suggesting that the consumer apply for a loan—when there is
+another, cheaper loan you could recommend that would meet their non-cost
+needs and objectives—is unlikely to be in the consumer’s best interests.
+
+RG 273.56
+
+However, the product with the lowest interest rate is not necessarily the lowest
+cost option for all consumers. For example, a product with access to an offset
+account or redraw facility may offer certain consumers greater flexibility and
+save them a considerable amount in interest. Additionally, annual or
+establishment fees associated with some loans or packages may mean the loan
+will be more expensive for the consumer despite a lower interest rate.
+
+RG 273.57
+
+Cost is not the only matter relevant to whether recommending a product is in
+the consumer’s best interests. Some consumers’ circumstances will mean that
+the benefits provided by particular features might outweigh the importance of
+cost: see RG 273.71–RG 273.79.
+
+RG 273.58
+
+For consumers who are thinking about refinancing an existing loan, the
+expenses incurred when refinancing may exceed the cost savings of a new
+loan. In this situation, recommending a new loan may not be in the
+consumer’s best interests. The consumer may benefit from being made aware
+of any potentially minor cost savings associated with refinancing, with an
+explanation of when the cost savings would exceed the refinancing expenses.
+Consumers with limited access to certain products
+
+RG 273.59
+
+We understand that access to certain products may be limited based on
+consumers’ specific circumstances, including their credit risk and desired
+loan amount.
+
+RG 273.60
+
+The credit policy, pricing practices and risk appetite of the credit provider
+may preclude some consumers from accessing the lowest cost products.
+Different policies and approaches by credit providers to matters such as
+lenders’ mortgage insurance, the need to see repeated savings history, and
+acceptance of a guarantee might influence whether or not certain products
+may be available to the consumer.
+
+RG 273.61
+
+In these situations, you should:
+(a)
+
+explain why the products are not available and the limitations involved
+with the available option(s); and
+
+(b)
+
+still consider the cost of the available options (i.e. if you think the
+application is reasonably likely to be approved by the credit provider).
+
+© Australian Securities and Investments Commission June 2020
+
+Page 14
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+Example 1: Considering cost and comparing products
+Scenario
+Ben receives an inheritance of $200,000. He approaches a mortgage
+broker for help buying an apartment with his inheritance. Ben would like to
+use $50,000 for the deposit and keep the remaining $150,000 liquid.
+Aware of Ben’s financial situation, the broker presents him with several
+options but recommends only the lowest cost, ‘no frills’ option. Although
+this product offers the lowest interest rate on the market, it does not allow
+for features such as an offset account or redraw facility. Ben applies for the
+recommended loan and buys an apartment.
+Several months later, Ben discovers that, with an offset account holding
+the $150,000 he has kept liquid, he would have paid less interest and
+would owe less money. Ben finds that an offset balance as low as $10,000
+would have reduced the amount of interest charged on the home loan.
+Commentary
+Offset accounts may not benefit all consumers because higher fees may
+be charged for having the offset facility included in the home loan package.
+However, Ben’s inheritance and other circumstances created a situation
+where an offset account feature may have been in his best interests and
+outweighed the benefit of having the lowest interest rate.
+In this situation, we would expect the broker to have presented an option
+with an offset account and explained to Ben that he could have a net
+benefit if he keeps a sufficient level of savings in the offset account.
+This option may not be in the best interests of other consumers, such as
+those who do not have or are unlikely to build substantial savings.
+Promotional offers
+RG 273.62
+
+Some credit providers make promotional offers to entice consumers to take
+out their credit products. These can include, for example:
+(a)
+
+cashback or reward points offers;
+
+(b)
+
+waived or reduced fees; or
+
+(c)
+
+a discounted interest rate.
+
+RG 273.63
+
+We expect that any promotional offer that is quantifiable will be considered as
+part of the cost of the credit product. For example, a cashback offer, waived fees
+and a reduced interest rate are all quantifiable. When considering these offers, it
+is important to be aware of eligibility criteria, exclusions and time limitations.
+
+RG 273.64
+
+The value of some promotional offers is not easily quantified. For example,
+offers which include the provision of rewards points may be more valuable
+to certain consumers.
+
+RG 273.65
+
+You should also consider whether a lower interest rate, or other features such
+as an offset account, would provide more benefit to the consumer than the
+short-term benefit offered by the promotion. For example, where a consumer
+has short-term expenses or debts, a cashback offer may provide them greater
+value than comparatively marginal cost savings over the life of the loan.
+
+© Australian Securities and Investments Commission June 2020
+
+Page 15
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+Government schemes
+RG 273.66
+
+When considering a consumer’s individual circumstances, it may become
+apparent that they could be eligible for a Government grant or scheme.
+These schemes are typically available to first home buyers, pensioners and
+social housing tenants.
+Note: ASIC research suggests that first home buyers and consumers with lower
+incomes are both more likely to take out a loan through a broker, rather than directly
+from a credit provider: see REP 628 at paragraphs 27 and 28.
+
+RG 273.67
+
+In this situation, we generally expect you to educate consumers about the
+availability and eligibility requirements of these schemes. You may also help
+consumers to assess their eligibility and the potential benefits of the schemes.
+
+RG 273.68
+
+We understand that obtaining a scheme’s full benefit may require steps to be
+taken before the broker starts providing credit assistance. For example,
+taking advantage of the First Home Super Saver Scheme (FHSSS) would
+generally involve the consumer making voluntary superannuation
+contributions in advance of seeking credit assistance from a broker.
+Example 2: Considering Government schemes—First home buyer
+Scenario
+Isabella approaches a mortgage broker for help buying her first home. She
+has contributed $15,000 to her superannuation under the Government’s
+FHSSS to help save for a deposit.
+Isabella mentions this contribution to the broker because she is unsure
+about how to release her contributions. She also asks the broker whether
+she can access the First Home Loan Deposit Scheme (FHLDS) to buy a
+more expensive home.
+Commentary
+We would expect the mortgage broker to take into account Isabella’s
+FHSSS contributions as part of her individual circumstances when
+providing credit assistance. The broker should also consider the
+restrictions of the scheme, such as the lead times between requesting a
+release and receiving the FHSSS funds.
+It would be appropriate for the broker to educate Isabella about these
+restrictions and the process for requesting a release.
+As Isabella may also be eligible for the FHLDS, we would expect the
+broker to give her information about the scheme including its eligibility
+requirements and potential benefits. This information should be given
+regardless of whether Isabella asked about the FHLDS, because it is
+apparent from her circumstances that she could be eligible.
+We note that the FHLDS can only be accessed through certain credit
+providers. If the broker does not have these providers on their panel, they
+should inform the consumer. It would also be useful for the mortgage
+broker to inform Isabella of the availability of first home owner grants.
+
+© Australian Securities and Investments Commission June 2020
+
+Page 16
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+RG 273.69
+
+Other schemes can be alternatives to the credit products available to
+mortgage brokers and specialist reverse mortgage brokers. For example, the
+Pension Loans Scheme and shared equity loan schemes provide alternative
+finance from the Government at a concessional rate to eligible consumers.
+
+RG 273.70
+
+If such a scheme meets an eligible consumer’s requirements, accessing it
+may provide a concession that is of such benefit that it would not be in the
+best interests of the consumer to recommend any other credit product.
+
+Weighing up other factors and product features
+RG 273.71
+
+Although cost is a key consideration, some consumers may also derive value
+from other loan features, depending on their individual circumstances.
+These features can include:
+(a)
+
+substantive features, such as access to an offset account, redraw facility
+or a package which includes other credit product(s); and
+
+(b)
+
+matters that are more difficult to quantify, such as the service levels
+and policies of the credit provider.
+
+RG 273.72
+
+You should exercise judgment in considering the relevance of these factors
+with reference to the consumer’s individual circumstances.
+
+RG 273.73
+
+Generally, some examples of factors that you could take into account in
+assessing whether a credit product will be in a consumer’s best interests are:
+(a)
+
+the features that meet the consumer’s needs and objectives, and any
+features that are inconsistent with those needs and objectives;
+
+(b)
+
+if the consumer has more than one need or objective—
+(i)
+
+the relative importance of each to the consumer; and
+
+(ii)
+
+the way in which any inconsistencies between competing needs or
+objectives are resolved;
+
+(c)
+
+the term and structure of the credit product relative to the consumer’s
+objectives;
+
+(d)
+
+the credit policy and risk appetite of the credit provider;
+
+(e)
+
+the interest rate, fees and charges applicable to the credit product;
+
+(f)
+
+the consumer’s understanding of the credit product; and
+
+(g)
+
+in relation to switching—the extent to which switching to the new
+credit contract will be in the consumer’s best interests.
+Note: This is not intended to be an exhaustive list of potentially relevant factors.
+
+RG 273.74
+
+Some consumers’ circumstances will mean they may derive greater benefit
+from particular features than they might from a lower cost product. We do
+not expect you to comprehensively assess the separate value of each feature.
+
+RG 273.75
+
+However, if a product is recommended based on one of these features, you
+should be able to make an overall assessment that the non-cost consideration
+
+© Australian Securities and Investments Commission June 2020
+
+Page 17
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+has a realistic possibility of offering that individual consumer greater value.
+Paragraph 3.25 of the Replacement Explanatory Memorandum states:
+[A] broker should not recommend a loan by prioritising factors that cannot
+be substantiated as delivering benefits to that particular consumer (such as
+the broker’s relationship with the [credit provider]), over factors and features
+which affect the cost of the product or are more relevant to the consumer.
+RG 273.76
+
+The circumstances may also demonstrate that a feature is irrelevant or
+detrimental to a particular consumer. For example:
+(a)
+
+a fixed rate loan with a substantial break fee could be detrimental to a
+consumer who wants flexibility to refinance; or
+
+(b)
+
+an offset account may not be relevant to a consumer whose plans do
+not include repaying additional amounts (and may be detrimental if
+there is an additional cost for the feature).
+
+RG 273.77
+
+In some situations, features which do not relate to the cost of the product will
+be highly relevant. For example, some consumers will prioritise approval time
+and compromise on cost because of a time-sensitive transaction, such as an
+impending settlement date. However, we expect that any claims of this nature
+you make will be evidence-based and able to be substantiated.
+
+RG 273.78
+
+In our view, there is an increased risk that you are not complying with the
+best interests duty if your processes typically lead to a ‘one-size-fits-all’
+outcome for consumers.
+Example 3: Considering other factors—Application processing times
+Scenario
+Tim, a mortgage broker, regularly recommends home loan products from
+one particular credit provider to consumers who contact him for a home
+loan. Tim tells consumers that he has a strong relationship with the
+business development manager at this credit provider and can get loan
+applications processed ‘much faster’.
+Tim thinks that consumers are happy to make concessions on cost in order
+to be pre-approved by a credit provider at short notice.
+Commentary
+We expect that Tim would:
+• consider the individual circumstances of each consumer to determine
+whether timely processing is relevant and valuable for that consumer;
+• only weigh timeliness above other factors (including cost) if the
+individual consumer’s information and circumstances indicate that this
+is of significant importance and could offer them good value; and
+• be able to substantiate his claims about processing times.
+Tim should be able to demonstrate that he has considered and presented
+a range of options, but ultimately recommended this option because it is in
+the consumers’ best interests.
+Tim should also keep a record of this process.
+
+© Australian Securities and Investments Commission June 2020
+
+Page 18
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+RG 273.79
+
+We do not expect you to give advice on matters that are outside your
+competence (e.g. detailed tax or investment advice). However, we do expect
+you to be able to give guidance on the suitability and benefits of product
+features for each consumer.
+Note: See RG 273.141–RG 273.143 for further guidance on matters outside the
+mortgage broker’s expertise.
+
+Requests made by consumers
+RG 273.80
+
+When providing credit assistance, you may discover that a type of product
+other than the one initially sought by the consumer could be more
+appropriate to the consumer’s circumstances. In this situation, you should
+discuss this with the consumer and recommend alternative options. Based
+on this discussion, the consumer may decide to change their mind.
+
+RG 273.81
+
+In our view, if you consider that a different product or feature to the one
+initially sought by the consumer may be more appropriate, and fail to advise
+the consumer of this, you are unlikely to have acted in their best interests.
+
+RG 273.82
+
+Exercising judgment is particularly important if the consumer has strong
+preferences or self-selects a specific credit provider or product type. For
+example, consumers may have strongly held beliefs or preferences about
+certain credit providers and will not consider those providers, regardless of
+the competitiveness of their product offering.
+
+RG 273.83
+
+In these situations, you may still reasonably consider and recommend
+products from these credit providers, rather than exclude them from the
+outset. Similarly, where the consumer prefers a specific credit provider, you
+should investigate a broader range of products than just those offered by the
+preferred credit provider in order to act in the consumer’s best interests.
+
+RG 273.84
+
+Consumers may also have a strong preference for a loan feature that may not
+be in their best interests. For example, consumers may insist on an interestonly loan or offset account when it is not, in your view, in their best interests.
+
+RG 273.85
+
+In these situations, you should make reasonable efforts to explain to the
+consumer why these features may not be appropriate or may not offer good
+value to them: see Replacement Explanatory Memorandum, paragraph 3.27.
+This will help the consumer make an informed decision. If the consumer
+decides to still proceed with an application for that product, you may assist
+the consumer with that application.
+
+RG 273.86
+
+Your recommendations may deviate from the consumer’s request and present
+an alternative if an alternative without that feature is in the consumer’s best
+interests. Providing the consumer with a cost–benefit analysis may be helpful
+in explaining why the alternative has been presented.
+
+© Australian Securities and Investments Commission June 2020
+
+Page 19
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+Example 4: Responding to specific consumer requests
+Scenario
+Jordan approaches a mortgage broker to assist with financing the
+purchase of a property. Jordan indicates to the broker that frequent flyer
+points are important, and that she would like a home loan and credit card
+package that would allow her to earn points in her preferred scheme.
+When considering Jordan’s circumstances, the broker can see that she has
+not typically paid off her credit card balance in full, incurring interest charges.
+Additionally, there are some products available without a frequent flyer credit
+card which would appear to better suit Jordan’s financial situation (as under
+that credit provider’s policy she would not need to buy lenders’ mortgage
+insurance).
+The broker doesn’t explain the cost-related benefits of what Jordan
+requested and the other product, and eventually recommends a home loan
+and credit card package.
+Commentary
+Jordan’s individual circumstances mean that the package the broker
+recommends may not be in her best interests. We would expect the broker
+to explain why what Jordan has requested may not be appropriate for her
+circumstances.
+If Jordan insists on a home loan package, we consider that the broker can
+help her to obtain this, but should still recommend a superior alternative
+option if one exists, and make reasonable efforts to ensure that Jordan
+makes an informed decision.
+
+Presenting information and recommendations
+RG 273.87
+
+As a mortgage broker, when you have assessed which options are consistent
+with the consumer’s best interests, you will need to explain these options to
+the consumer.
+
+RG 273.88
+
+We consider that presenting information about options, including one or more
+recommendations, forms part of the credit assistance you provide. As a result,
+you must act in the consumer’s best interests when presenting information.
+
+RG 273.89
+
+You should assess the needs of each consumer on a case-by-case basis, and
+then determine the number of options you should provide to that specific
+consumer. As a matter of good practice, you should present a consumer with
+more than one option, unless there is a good reason not to. For example, a
+consumer’s financial situation may mean that very few credit products are
+available or appropriate for them.
+
+RG 273.90
+
+When you recommend a product, we consider that you should present the
+information to the consumer in a way that clearly articulates how taking the
+recommended action would achieve their objectives and be in their best
+interests (relative to the other options available).
+
+© Australian Securities and Investments Commission June 2020
+
+Page 20
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+RG 273.91
+
+You must base all recommendations you make on the consumer’s individual
+circumstances. This includes the judgements you make about:
+(a)
+
+the extent of the inquiries you make into the consumer’s relevant
+circumstances;
+
+(b)
+
+the strategies, types of credit product, specific credit products and
+credit providers you investigate; and
+
+(c)
+
+the strategies, types of credit product, specific credit products and
+credit providers you make recommendations about.
+
+RG 273.92
+
+It would generally be helpful to present the consumer with a shortlist of
+options with one option being the recommended option. For example, the
+recommended option may be a suggestion that the consumer take out a
+particular product.
+
+RG 273.93
+
+We consider that it is important that consumers are presented with options
+and understand why:
+(a)
+
+the options presented to them have been selected;
+
+(b)
+
+other options have not been presented to them (e.g. why they have
+received relatively few or many options); and
+
+(c)
+
+a particular option has been recommended to them.
+
+RG 273.94
+
+The size of the shortlist may vary according to the consumer’s circumstances.
+Additionally, in some specific cases, it may be necessary for you to make
+more than one recommendation to the consumer. This could occur if you
+determine that two products are largely similar and would equally meet the
+consumer’s best interests, and you decide that it is in the consumer’s best
+interests to, after providing the shortlist of other options to the consumer,
+recommend both of those products.
+
+RG 273.95
+
+If all the options presented to a consumer are for products from the same
+credit provider, you should explain this and provide reasons for this to the
+consumer.
+
+RG 273.96
+
+In some situations, the consumer may not understand the implications of the
+options available to them. You should help the consumer understand why a
+particular loan may or may not be in their best interests. Paragraph 3.27 of
+the Replacement Explanatory Memorandum states:
+In some situations the consumer will not properly understand the
+implications of different choices and so the broker may have to assist them
+to understand why a particular loan is or is not in their best interests.
+
+RG 273.97
+
+You may find that some matters need to be explained frequently, to multiple
+consumers. If this is the case, there is scope for you to consider the best
+way to provide this explanation in a consistent manner. However, any
+information or description provided should be fit for purpose for the
+individual consumer it is being presented to.
+
+© Australian Securities and Investments Commission June 2020
+
+Page 21
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+RG 273.98
+
+For example, you may choose to provide consumers with a standardised
+factsheet explaining offset accounts. In this situation, you should consider
+whether this information is sufficient and provide further explanation where
+appropriate, based on the products recommended and the circumstances of
+each individual consumer.
+Note: Records of the information provided to the consumer should be kept including any
+offset calculations used. For our guidance on record keeping, see RG 273.162–RG 273.172.
+
+RG 273.99
+
+You should ensure that any recommendations presented to the consumer are
+based on benefits to that consumer, rather than benefits that may be realised
+by you. You should not present recommendations by prioritising factors that
+cannot be substantiated as delivering benefits to that consumer.
+Example 5: Presenting recommendations when options are limited
+Scenario
+Looking to buy his first home, Edwin approaches a mortgage broker after
+having experienced difficulty approaching credit providers directly for a
+home loan. Edwin has saved a 5% deposit, but recently started working
+casually in a temporary position.
+The mortgage broker presents one home loan option. The option has a
+much higher interest rate than expected and lacks many of the features
+Edwin sought.
+The broker tells Edwin that this is the only credit provider that is willing to
+offer a home loan, given his employment situation and the size of his
+deposit. The broker explains that Edwin’s credit risk means that the lower
+cost options that Edwin has seen advertised are not available to him.
+The broker also explains what Edwin could do to become eligible for the
+lower cost options. Based on Edwin’s circumstances, this would mean a
+longer history in his current job and continued saving for a larger deposit to
+reduce the loan-to-value ratio.
+Commentary
+We generally expect mortgage brokers to present a range of options and
+provide a recommendation.
+In some circumstances, limited options are available to a consumer for
+reasons outside the broker’s control.
+Consistent with our expectations, the mortgage broker explains to Edwin
+the reason for presenting only one product and why lower cost options are
+not available.
+If the broker determines that applying for this product will not be in Edwin’s
+best interests, the broker should help Edwin understand the reasons why.
+
+© Australian Securities and Investments Commission June 2020
+
+Page 22
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+After the recommendation has been made
+RG 273.100
+
+Consumers may have questions about the recommendation(s), options and
+information that brokers provide. This may lead to further information being
+presented.
+
+RG 273.101
+
+In some instances, providing a recommendation may prompt the consumer to
+reflect on the importance of certain product features. As a result, there may be
+further engagement, or you may need to consider additional options.
+
+RG 273.102
+
+At some point, the consumer may indicate to you that they would like to
+proceed with one of the options you have put forward. At that stage, you might
+proceed to assist the consumer to apply for a particular credit contract.
+
+RG 273.103
+
+There may be situations where you have acted in the consumer’s best
+interests but the consumer decides not to follow your recommendation and
+chooses a product which, in your view, is not in their best interests.
+
+RG 273.104
+
+You should ensure that:
+(a)
+
+consistent with our guidance in RG 273.80–RG 273.86, these consumers
+are informed and understand the nature of the products you recommended
+or those self-selected by the consumer, including their structure and
+features; and
+
+(b)
+
+you clearly record the recommendations you presented, including any
+alternatives that are not selected by the consumer—this should include
+the steps you took to educate the consumer about the options.
+Note: For our guidance on record keeping, see RG 273.162–RG 273.172.
+
+© Australian Securities and Investments Commission June 2020
+
+Page 23
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+C
+
+Guidance on specific issues and the best
+interests duty
+Key points
+This section provides guidance on a range of specific issues relating to the
+best interests duty, including:
+• the interaction of the best interests duty and the responsible lending
+obligations (see RG 273.105–RG 273.111);
+• implications of the best interests duty for the range of credit providers
+and products you deal with (see RG 273.112–RG 273.115);
+• when the best interests duty applies (see RG 273.116–RG 273.122);
+• when mortgage managers may be subject to the best interests duty
+(see RG 273.123–RG 273.128);
+• the interaction of risk-based pricing of credit products other than home
+loans and the best interests duty (see RG 273.129–RG 273.132); and
+• how the best interests duty applies in other circumstances, including to
+packaged products or matters outside your expertise (see RG 273.133–
+RG 273.143).
+
+Interaction with the responsible lending obligations
+RG 273.105
+
+The best interests obligations apply in addition to other laws—such as the
+responsible lending obligations—which affect the credit assistance that may
+be provided to consumers.
+
+RG 273.106
+
+Mortgage brokers who are credit licensees will need to comply with both
+responsible lending and the best interests obligations. Mortgage brokers who
+are credit representatives will need to comply with the best interests
+obligations, and may need to help their authorising licensee to comply with
+the responsible lending obligations.
+
+RG 273.107
+
+In both situations, the obligations are separate, and compliance with one of
+these obligations does not necessarily mean the other has been satisfied.
+
+RG 273.108
+
+There may be some overlap in the process of making inquiries for each of
+these obligations. Information gathered for the purpose of complying with the
+responsible lending obligations may assist you in complying with the best
+interests obligations. However, if additional information is needed to comply
+with the best interests obligations, you will need to seek this information.
+
+RG 273.109
+
+The responsible lending obligations involve an assessment, which is ultimately
+the credit licensee’s responsibility, of whether a credit product is ‘not
+unsuitable’ for a consumer. The best interests obligations apply more broadly
+to the credit assistance you provide, which extends to your conduct and
+processes as well as the appropriateness of the credit product.
+
+© Australian Securities and Investments Commission June 2020
+
+Page 24
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+RG 273.110
+
+There are situations where you might satisfy the responsible lending obligations
+but fall short of complying with the best interests duty. Where a credit product is
+deemed ‘not unsuitable’ for the consumer, it is possible that suggesting that the
+consumer take out that product may not be in the consumer’s best interests.
+Note: For a comparison of the responsible lending obligations and the best interests duty
+and the interaction between these obligations, see Table 2 in the appendix to this guide.
+
+RG 273.111
+
+Paragraph 3.5 of the Replacement Explanatory Memorandum states:
+There are circumstances where the mortgage broker may not have acted in a
+consumer’s best interests even if the responsible lending obligations were
+complied with. For example, even if a home loan product is ‘not unsuitable’,
+recommending it to the consumer might not be in the consumer’s best interests.
+
+Range of credit providers and products
+RG 273.112
+
+As a mortgage broker, you must be satisfied that the credit products you can
+access and recommend are sufficient to allow you to act in your consumers’
+best interests. Having an awareness of the products and features that are
+available in the market, and periodically comparing them to those you can
+access and recommend, may help you to determine whether your panel and
+accreditations are sufficient for you to act in your consumers’ best interests.
+
+RG 273.113
+
+You should be accredited with a reasonably representative panel of credit
+providers. The number of credit providers on your panel may vary, including
+based on the market you operate in. For example, if you operate in a market
+with fewer credit providers and products, your panel may be smaller. We
+expect that you will use your judgement to determine whether the composition
+of your panel is sufficient to meet your consumers’ best interests.
+
+RG 273.114
+
+You are not necessarily required to recommend a specific product outside
+your panel. If a consumer is interested in a product from a credit provider
+that is on your aggregator’s marketing material, but you do not have access
+to that provider, you should tell the consumer this.
+
+RG 273.115
+
+If you are not satisfied that the products and credit providers you can access
+and recommend will allow you to act in a consumer’s best interests, you
+must not provide credit assistance to that consumer. In declining to provide
+credit assistance, it may be helpful to refer the consumer to another
+mortgage broker who would be better placed to assist them.
+Example 6: Maintaining general awareness
+Scenario
+Phillip is a mortgage broker who has a number of credit providers and
+products on his panel. Phillip is confident that his current panel has enough
+variety to enable him to act in the best interests of most consumers.
+Francesca contacts Phillip and indicates she is looking for a home loan from a
+credit provider whose ethical values align with her own. Francesca has signed
+a conditional contract, so gaining approval for a home loan is time sensitive.
+
+© Australian Securities and Investments Commission June 2020
+
+Page 25
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+Phillip is familiar with the credit providers currently on his panel and is generally
+aware that there are lenders outside his panel that operate based on ethical
+concerns such as not investing in environmentally harmful industries, which
+aligns with the ethics Francesca has indicated are important to her.
+Phillip tells Francesca this and says he can still provide her with options
+and a recommendation that would be likely to meet the timeframe for
+settlement. Francesca reiterates that she wants to deal only with credit
+providers that reflect her ethics and asks Phillip if he can help her do that.
+Phillip is aware that gaining accreditation might not be possible within the
+timeframe required. He tells Francesca this and suggests that it might be in
+her best interests to seek the assistance of a mortgage broker already
+accredited with credit providers that align with Francesca’s ethical values.
+Commentary
+In this situation, Phillip acted in Francesca’s best interests by:
+• maintaining a general awareness of the products and credit providers
+available on the market;
+• offering to assist Francesca after having informed her of potential
+limitations relating to his panel’s composition; and
+• given the limited timeframe—suggesting that it might be in Francesca’s
+best interests to seek the assistance of a mortgage broker already
+accredited with the type of credit provider she is seeking.
+Phillip may maintain a panel with sufficient variety to enable him to act in
+the best interests of most consumers.
+Example 7: Narrow panels of credit providers
+Scenario
+Ali is a new mortgage broker and has received accreditation from only a
+limited number of credit providers. Two consumers approach Ali for help:
+• Pip, who is seeking a loan with low or no ongoing fees; and
+• Wei, who is seeking to purchase a small studio apartment.
+Ali proceeds to conduct inquiries into Pip and Wei’s circumstances, and
+assesses a variety of products available for each.
+For Pip, Ali concludes that there are several products for which he has an
+accreditation that could be appropriate. From this group, Ali recommends
+that Pip take out the loan with the lowest (variable) interest rate, which he
+concludes is in her bests interests, but also explains her other options.
+In Wei’s case, given that not all credit providers may be willing to finance a
+small apartment, Ali also conducts some broader research on the options
+that may be available.
+He concludes that the product which is likely to be the most appropriate for
+Wei is offered by a credit provider that is on his aggregator’s panel, but for
+which he does not have accreditation. Ali decides to seek the
+accreditation. Once he obtains it, he recommends the product to Wei.
+
+© Australian Securities and Investments Commission June 2020
+
+Page 26
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+Commentary
+Ali acted in Pip’s best interests by making relevant inquiries into her
+personal circumstances, considering the options available, providing a
+recommendation based on Pip’s best interests and explaining the options.
+Ali also acted in Wei’s best interests. The circumstances indicate that Ali
+may not have been able to satisfy himself that recommending one of the
+existing suite of products would have been consistent with acting in Wei’s
+best interests.
+If Wei’s application was time sensitive, such that there was not time for Ali to
+seek the accreditation, he could have chosen to refer Wei to another broker.
+
+When the duty applies
+RG 273.116
+
+The best interests duty applies any time you provide credit assistance to the
+consumer, based on the information available at the time. This information
+includes reasonably foreseeable changes to the consumer’s personal
+circumstances and financial situation.
+
+RG 273.117
+
+It does not matter whether you have provided credit assistance to the
+consumer before. For example, if you provide credit assistance suggesting that
+a consumer remain in a home loan you previously helped them obtain, you
+will need to act in the consumer’s best interests when making that suggestion.
+Note: The conflict priority rule also applies in these situations: see Section D.
+
+Example 8: Point-in-time assessment
+Scenario
+Basil meets with a mortgage broker to obtain a home loan. Basil is a lowincome earner who is worried he will not be able to afford his loan
+repayments if interest rates increase.
+The mortgage broker assesses Basil’s current situation and recommends a
+fixed rate loan at a similar rate to the lowest cost variable rate loans available
+to Basil. Basil selects the fixed rate option recommended by the broker.
+Interest rates fall. If Basil had taken out a variable rate loan, he would have
+saved a significant amount in interest.
+Commentary
+At the time credit assistance was provided, the fixed rate loan was the best option
+available to Basil because it allowed him to take out a loan, and to do so with
+certainty about his future repayments and at a low cost, relative to other options.
+The broker therefore complied with the best interests duty.
+Generally, changes that occur after the recommendation is made are not
+relevant to whether the best interests duty has been complied with.
+The broker’s assessment of what would be in the consumer’s best
+interests is a point-in-time assessment. However, we also expect brokers
+to consider reasonably foreseeable changes to the consumer’s personal
+circumstances and financial situation.
+
+© Australian Securities and Investments Commission June 2020
+
+Page 27
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+RG 273.118
+
+The best interests duty does not require you to conduct a ‘periodic review’,
+or to provide credit assistance to the consumer in the future. However, it is
+good practice to review the consumer’s circumstances from time to time. If
+you choose to review the consumer’s circumstances, or you are contacted by
+a consumer you previously assisted, then the best interests duty will apply to
+any credit assistance you provide at that time.
+
+RG 273.119
+
+You must not suggest that a consumer remain in a credit contract without
+considering whether this would be in the consumer’s best interests.
+Paragraph 3.25 of the Replacement Explanatory Memorandum states:
+[I]t may be a breach of the duty if the broker suggested the consumer
+remain in their current home loan when they could refinance to a cheaper
+product as the broker did not want to incur the consequent liability to the
+[credit provider] when their commission payments were clawed back.
+
+RG 273.120
+
+For consumers who may be thinking about refinancing, you should consider
+the costs associated with refinancing.
+
+RG 273.121
+
+When the credit assistance process is subject to delay, you should consider
+whether you need to start a new assessment or make further inquiries into
+the consumer’s circumstances before making a recommendation or assisting
+the consumer to take out a product.
+
+RG 273.122
+
+In deciding whether to take these steps you should consider:
+(a)
+
+the length of the delay;
+
+(b)
+
+whether the information considered is reasonably current and likely to
+still reflect the consumer’s circumstances; and
+
+(c)
+
+your responsible lending obligations.
+Note: Your responsible lending obligations require you to undertake inquiries within 90 days
+of credit assistance being provided. See RG 209 for more information on this requirement.
+
+Example 9: Another assessment required
+Scenario
+Shiva is a first home buyer who contacts a broker to organise a home loan.
+The broker works with Shiva and ultimately recommends a particular home
+loan package.
+Shiva decides to take some time to think about whether she will accept the
+recommendation provided by the broker, or whether she will go direct to a
+credit provider.
+Shiva meets with the same broker again five months later. Shiva says she
+has weighed up the options and wants to proceed with the broker’s
+recommendation.
+
+© Australian Securities and Investments Commission June 2020
+
+Page 28
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+Commentary
+The broker cannot solely rely on their initial inquiries for the previous
+recommendation and will need to reconsider what is in Shiva’s best interests.
+This avoids any issues that may arise if a previous product recommended is
+no longer available, or if the consumer’s circumstances have changed.
+Separately, the broker (or the credit licensee that authorises them) would
+also need to comply with the responsible lending obligations before
+providing further credit assistance to Shiva.
+Example 10: Home loan ‘health check’
+Scenario
+Annie contacts the broker who assisted her in getting her home loan. She
+asks the broker if refinancing would be appropriate in light of her objective
+to repay her home loan quickly.
+The broker discusses Annie’s objectives and financial situation, surveys
+the market and concludes that Annie’s objectives would be best met by her
+current loan. The broker determines that there is no benefit in terms of
+costs (or other features) in changing. The broker makes this
+recommendation and documents what they have done.
+Commentary
+The best interests duty applies in this scenario. Based on the credit
+assistance provided, the broker would need to be satisfied that suggesting
+that Annie remain in her current loan would be in her best interests,
+informed by her objectives and circumstances, and the potential for other
+products available in the market to be better suited to those objectives.
+Example 11: Home loan ‘health check’—No credit assistance
+Scenario
+Esther contacts the broker who assisted her to get her home loan, as she
+has noticed that her credit provider has since started offering larger
+discounts to new consumers.
+Esther asks the broker whether they can contact the credit provider and
+offer her a more competitive interest rate. The broker contacts the credit
+provider and arranges a discount for Esther.
+The broker then advises Esther that the credit provider has agreed to change
+her interest rate, without making any other representations or suggestions.
+Commentary
+In this scenario, the broker has not suggested that Esther remain in her
+current credit contract, and has not assisted her to increase the limit on her
+loan. On that basis no credit assistance has been provided, and the best
+interests duty does not apply.
+The broker would need to comply with the best interests duty in relation to
+any suggestion that a consumer remain in a home loan, enter a new credit
+contract, or an increase in the limit of the current loan.
+
+© Australian Securities and Investments Commission June 2020
+
+Page 29
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+Mortgage managers
+RG 273.123
+
+Mortgage managers are intermediaries that help consumers to obtain credit,
+sometimes from a range of credit providers. Some mortgage managers also
+have arrangements with a particular credit provider where they help that
+provider with the day-to-day management of their loans.
+
+RG 273.124
+
+However, mortgage managers operate under different models, and whether
+they are mortgage brokers for the purposes of the best interests duty depends
+upon their individual circumstances and business structure.
+
+RG 273.125
+
+While managing credit contracts and the day-to-day relationship with the
+consumer, mortgage managers may exercise the rights or perform the
+obligations of a credit provider. For example, mortgage managers typically
+help consumers complete loan applications and, after approval of the loan,
+administer the loan on behalf of the credit provider by accepting payments,
+issuing statements, monitoring defaults and responding to consumer inquiries.
+
+RG 273.126
+
+For the purposes of the best interests duty, a person is not a mortgage broker if
+they perform the obligations, or exercise the rights, of a credit provider in relation
+to the majority of credit contracts on which they provide credit assistance.
+
+RG 273.127
+
+We consider that exercising some of the rights or performing some of the
+obligations of credit providers is sufficient for a person, including a mortgage
+manager, to not be considered a mortgage broker.
+
+RG 273.128
+
+For example, a mortgage manager that does not securitise the loan or exercise the
+right to collect repayments may not be considered a mortgage broker if they
+exercise some other rights or perform some other obligations of a credit provider
+in relation to the majority of credit contracts on which they provide credit
+assistance.
+Example 12: Misleading or deceptive conduct
+Scenario
+Ron is a mortgage manager who exercises the right to repayment, on
+behalf of the credit provider, in the majority of contracts that he provides
+credit assistance on. For this reason, Ron knows that he will not be a
+‘mortgage broker’ for the purposes of the best interests duty. Because of
+this, Ron is not required to comply with the best interests duty.
+In the course of providing credit assistance, Ron suggests to consumers
+that he has a duty to act in their best interests.
+Commentary
+Any intermediariesincluding mortgage managersmust not imply that
+the best interests duty applies when that is not the case. This applies both
+when the person providing the credit assistance is not a mortgage broker
+and when no credit assistance is being provided (e.g. when an insurance
+product is being offered).
+
+© Australian Securities and Investments Commission June 2020
+
+Page 30
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+While Ron may, in fact, act in the best interests of his clients while
+providing credit assistance, there is no legal obligation for him to do so.
+By stating that the best interests duty will apply to him, Ron is likely to have
+engaged in misleading or deceptive conduct, which is prohibited by the
+Australian Securities and Investments Commission Act 2001 (ASIC Act)
+and the National Credit Act.
+
+Risk-based pricing
+RG 273.129
+
+There are some credit products where the applicable interest rate is determined
+during the application process. An example is a personal loan product where
+only an interest rate band is publicly available, with the specific interest rate
+being determined by the credit risk presented by the consumer.
+
+RG 273.130
+
+When discussing these products, you should explain to the consumer how riskbased pricing works and give a general description of how the consumer’s
+circumstances may affect the credit provider’s decision. You may need to
+discuss matters which credit providers typically take into account, including:
+(a)
+
+the consumer’s past use of credit;
+
+(b)
+
+the consumer’s employment status and income; and
+
+(c)
+
+whether the loan would be secured and what the security is.
+
+RG 273.131
+
+When considering whether a product with risk-based pricing is in the consumer’s
+best interests, you should be informed by public material on the range of interest
+rates offered by particular credit providers, as well as your previous experience.
+This should allow you to provide the consumer with an estimated range for the
+interest rate they might expect to receive from a credit provider.
+
+RG 273.132
+
+We consider that applying for loans to determine loan price offerings may
+not be in the consumer’s best interests. For example, multiple applications
+may affect the consumer’s credit history and reduce the availability, or
+increase the cost, of future credit products.
+
+Other circumstances where the duty applies
+RG 273.133
+
+As a mortgage broker, the best interests duty applies to any credit assistance
+you provide. This includes credit assistance on products that are packaged with
+a mortgage, as well as any standalone credit products on which you provide
+credit assistance.
+
+RG 273.134
+
+The duty does not apply in relation to non-credit products, such as insurance
+products. If you offer these products or other services to a consumer, you
+must not imply that the best interests duty applies in this situation. Doing so
+may be misleading or deceptive conduct.
+Note: See s12DA(1) of the ASIC Act.
+
+© Australian Securities and Investments Commission June 2020
+
+Page 31
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+Packaged products
+RG 273.135
+
+Credit cards, personal loans and other credit products that are packaged or
+bundled with the mortgage are subject to the best interests duty.
+
+RG 273.136
+
+A consumer’s financial situation and personal circumstances may affect the
+suitability of different products within packages.
+
+RG 273.137
+
+Recommendations to consumers should identify and consider, for each
+product within the package:
+(a)
+
+how those products will meet the consumer’s needs, objectives,
+priorities and preferences; and
+
+(b)
+
+whether (and why) suggesting the consumer take out that product, as
+part of a package, would be in the consumer’s best interests.
+
+RG 273.138
+
+Forming a view on these matters will require you to compare the package to
+other packages available to the consumer, and to standalone home loans without
+other packaged credit products. In some instances, it may be helpful for you to
+base your recommendations on an assessment of the package as a whole.
+
+RG 273.139
+
+Paragraph 3.26 of the Replacement Explanatory Memorandum states:
+In recommending a package the broker would be expected to ensure that it,
+rather than the standalone mortgage (if available) or an alternative
+standalone mortgage or packaged product in the range of options
+considered by the broker, is in the consumer’s best interests. In making
+this assessment, the broker would be expected to weigh up the relative
+benefits and risks for the consumer, which may depend on a range of
+factors including what the consumer is attempting to achieve and the
+relative value and importance of the different components of the package.
+
+RG 273.140
+
+You should not recommend a package to a consumer on the basis that it is
+merely satisfactory. There must be reasons why selecting that package
+would be in that consumer’s best interests and preferable to both the other
+packages that are available and non-packaged products.
+Example 13: Recommending home loan packages—Existing credit card
+Scenario
+Sofia approaches a mortgage broker seeking a home loan. The broker
+determines that Sofia may be eligible for a range of products, including
+some home loan packages with a credit card. Sofia currently has a
+standalone credit card.
+The broker concludes that the product that is most appropriate for Sofia
+given her circumstances and objectives is a packaged product.
+The broker recommends that Sofia take out a package which includes a
+credit card and close her existing credit card to simplify her arrangements.
+Sofia is presented with credit card options that can be packaged with the
+home loanincluding one option that is recommended because of its lower
+interest rateas well as some other, standalone home loan products.
+The broker explains to Sofia why the packaged product is recommended.
+
+© Australian Securities and Investments Commission June 2020
+
+Page 32
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+Commentary
+In this scenario, the broker is likely to have complied with the best interests
+duty. The broker has considered which home loan products address
+Sofia’s objectives for a property purchase, including in some instances
+products that are part of a package.
+Because the best interests duty applies to all aspects of the credit assistance
+provided, the broker would need to be satisfied that recommending Sofia
+take out the new credit card with the package is in her best interests.
+Because Sofia already has a credit card, at a minimum this may involve:
+• a comparison with her existing credit card; and
+• a holistic assessment of the outcomes that may be achieved if Sofia
+takes out the home loan packaged with a credit card (i.e. relative to the
+standalone home loan products that are available).
+Example 14: Recommending home loan packages—No existing credit card
+Scenario
+Grant approaches a mortgage broker, seeking a home loan. The broker
+determines that Grant may be eligible for a range of products due to his
+strong financial position. The range of potential products that would meet
+Grant’s needs includes loans that are packaged with credit cards.
+The broker learns that Grant does not currently have a credit card and has no
+history of credit card debt. Further inquiries reveal that, although Grant does
+not think that taking out a credit card is essential, he is open to considering
+such a product if a home loan–credit card package increases the overall
+benefit of his mortgage. The broker concludes that the most appropriate
+recommendation for Grant, given his circumstances and objectives, is a
+packaged product.
+The broker is generally aware that some standalone credit cards may offer
+better value, but cannot be packaged. Also, the home loan the broker
+considers most appropriate offers better value than other standalone or
+packaged loans.
+Looking at Grant’s circumstances, the broker concludes that the risk of harm
+(e.g. from non-repayment of the credit card) is minimal and is outweighed by
+the benefits Grant would receive from the packaged product.
+Commentary
+The broker is likely to have complied with the best interests duty in this
+scenario. The broker’s research into Grant’s past experience with credit
+cards, including past credit card debt, is consistent with complying with the
+duty. Previous experience with credit cards and the risk of non-repayment
+are factors that should be assessed.
+As stated in the Replacement Explanatory Memorandum, what Grant is
+seeking to achieve, and the relative importance of the different components
+of the package (including to Grant) are both relevant to the broker’s
+assessment of what is in Grant’s best interests. This may inform the amount
+of research into standalone credit cards the broker needs to undertake.
+
+© Australian Securities and Investments Commission June 2020
+
+Page 33
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+The credit assistance for each component product is subject to the best
+interests duty. This means the broker would need to be able to outline why
+the suggestions that Grant take out the particular home loan and the
+particular credit card are in his best interests.
+However, the recommendation that Grant enter into the credit card contract is
+made in the context of Grant seeking to take out a home loan. Thus, the home
+loan (and the benefits provided by the products when packaged, including the
+lower overall cost) is likely to be relevant to the broker’s assessment.
+Example 15: Recommending a packaged credit card
+Scenario
+A mortgage broker tells Pablo about potential savings he can make if he takes
+out a loan packaged with an offset account and a credit card. The broker says
+Pablo can meet his living expenses with the credit card, and his salary will be
+offset against the home loan balance during the interest-free period on the card.
+The broker says this package could help Pablo ‘save years’ on his home loan.
+However, the broker does not mention that if Pablo fails to repay the
+amount outstanding on the credit card in full each month (e.g. because he
+cannot afford the repayments), he will be liable for interest on that amount
+at a high interest rate (i.e. higher than the interest rate on his home loan).
+Pablo is not aware of this and does not pay the amount outstanding on the
+credit card in full each month. As a result, Pablo does not receive the
+benefits the broker told him he would receive.
+Commentary
+The appropriateness of a mortgage broker’s recommendation in part
+depends on the consumer’s understanding of the recommended products,
+including a packaged credit card. Whether or not the credit assistance is in
+the consumer’s best interests may be informed by:
+• information about the consumer’s past use of similar products; and
+• the consumer’s financial situation (including investigating consumer
+spending habits, cash flow and capacity to meet repayments).
+Brokers should research the consumer’s circumstances and the products
+available. This information will affect the extent to which a package may or
+may not be in the consumer’s best interests, and may help the broker educate
+the consumer about what is involved for each product in a package.
+
+Matters outside your expertise
+RG 273.141
+
+As a mortgage broker, we do not expect you to give detailed advice on tax
+or other matters outside your expertise as part of the best interests duty.
+However, we do expect you to be able to give guidance about the suitability
+and value of product features for each of your consumers.
+
+RG 273.142
+
+Matters like a consumer’s tax position or investment objectives may be
+relevant to the assessment of the consumer’s individual circumstances.
+
+© Australian Securities and Investments Commission June 2020
+
+Page 34
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+RG 273.143
+
+If there are material implications the consumer should consider that go
+beyond your competence, you can act in the consumer’s best interests by
+ensuring that the credit assistance is:
+(a)
+
+based on advice given to the consumer by someone with appropriate
+expertise and competence, such as a registered tax agent or a financial
+adviser—in this situation, you must make it clear to the consumer that you
+are assuming that the advice given is appropriate, rather than endorsing it; or
+
+(b)
+
+limited to matters on which you are competent to advise—in this
+situation, you must take steps so that the consumer understands that
+they should seek advice from someone with appropriate expertise and
+competence before following your recommendation.
+
+© Australian Securities and Investments Commission June 2020
+
+Page 35
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+D
+
+Related obligations
+Key points
+This section sets out guidance on:
+• the conflict priority rule, which requires mortgage brokers to prioritise
+the consumer’s interests in the event of a conflict of interest;
+• the types of records that mortgage brokers may need to keep to
+demonstrate their compliance with the best interests obligations;
+• the obligations for credit licensees to ensure that their representatives
+comply with the best interests obligations; and
+• our approach to administering the anti-avoidance provision.
+
+The conflict priority rule
+RG 273.144
+
+As a mortgage broker, you must prioritise the interests of the consumer if you
+know, or reasonably ought to know, when you provide the credit assistance, that
+there is a conflict between the interests of the consumer and the interests of:
+(a)
+
+the credit licensee;
+
+(b)
+
+the credit representative;
+
+(c)
+
+an associate of the licensee;
+
+(d)
+
+an associate of the credit representative;
+
+(e)
+
+another representative of the licensee; or
+
+(f)
+
+an associate of another representative of the licensee.
+Note: The parties described in RG 273.144 are referred to as ‘related parties’ in this
+guide. We refer to the requirement in s158LB and 158LF as the ‘conflict priority rule’.
+
+RG 273.145
+
+Paragraph 3.28 of the Replacement Explanatory Memorandum states:
+In addition to the new best interests obligation, the new law also requires a
+mortgage broker to resolve conflicts of interests in the consumer’s favour.
+… This requirement is based on section 961J of the [Corporations Act 2001],
+which places an equivalent obligation on financial advisers.
+
+RG 273.146
+
+To comply with the conflict priority rule, you must first identify what
+interests you or your related parties have. You may then consider what a
+mortgage broker in your position but without a conflict of interest would do.
+
+RG 273.147
+
+The conflict priority rule means that you must not recommend a product or
+service of a related party that would create extra revenue for yourself, your
+credit licensee or another related party, unless doing so would also be in the
+consumer’s best interests.
+
+© Australian Securities and Investments Commission June 2020
+
+Page 36
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+RG 273.148
+
+If you have a conflict of interest and are unable to prioritise the consumer’s
+interests, you must not provide the credit assistance.
+
+RG 273.149
+
+As with the best interests duty, the conflict priority rule applies each time you
+provide credit assistance to the consumer: see RG 273.116–RG 273.122.
+
+RG 273.150
+
+The conflict priority rule applies in conjunction with the general obligation
+in s47(1)(b) imposed on all credit licensees to manage conflicts of interest.
+Example 16: Aligned interests
+Scenario
+Linh and Zelda approach a mortgage broker for a home loan. Based on the
+information they provide, the broker concludes that the best product for
+them is a particular home loan and offset package with no annual fee. The
+second-best product is similar, but has an annual fee of $149. The credit
+provider that offers the product the broker thinks is best for Linh and Zelda
+will also give the broker a higher commission for the same-sized loan.
+Commentary
+In prioritising the consumer’s interests, it is possible that the interests of
+the consumer and the broker will align. In this situation, the fact that there
+is a benefit for the broker does not indicate that the broker did not prioritise
+Linh and Zelda’s interests.
+If the situation was reversed, and the credit provider charging the annual
+fee also paid the broker a higher commission, recommending the higher
+fee product would be inconsistent with the conflict priority rule.
+
+Role conflicts
+RG 273.151
+
+We recognise that brokers and their related entities may have multiple roles
+on the same or related transactions. This can cause a conflict based on the
+earning of two or more income streams, dependent on the transaction.
+
+RG 273.152
+
+Examples of additional roles which may give rise to such a conflict include
+acting as a:
+
+RG 273.153
+
+(a)
+
+lawyer/conveyancer;
+
+(b)
+
+accountant;
+
+(c)
+
+financial planner;
+
+(d)
+
+real estate developer/vendor; or
+
+(e)
+
+real estate agent.
+
+In situations where you may earn multiple income streams, you will still need
+to ensure that where your interests and those of the consumer conflict, you
+give priority to the consumer’s interests when providing credit assistance.
+
+© Australian Securities and Investments Commission June 2020
+
+Page 37
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+Related party or credit provider conflicts
+RG 273.154
+
+The conflict priority rule means that you must not act to further your
+interests or those of one of your related parties over the consumer’s interests
+when providing credit assistance.
+
+RG 273.155
+
+This will require you to consider what conflicts may exist. Paragraph 3.29 of
+the Replacement Explanatory Memorandum states:
+The obligation to give priority to the consumer’s interests is not limited to
+conflicts of interest that mortgage brokers currently know about. Mortgage
+brokers are expected to take active steps to identify all conflicts of interest
+covered by section 158LB to minimise the risk of a contravention,
+including obligations that can arise because of their commercial
+relationships with third parties.
+
+RG 273.156
+
+Considering what benefits (if any) a credit licensee, credit representative or
+their related parties will receive if the consumer acts on your credit
+assistance may help you to determine whether a conflict exists.
+
+RG 273.157
+
+The systems you use will be an important part of complying with the
+conflict priority rule. We consider that systems should be structured without
+bias or conflicts. That is, product recommendation or aggregator software
+should not have in-built credit provider or product bias.
+
+RG 273.158
+
+You should inform the consumer where ownership structures or other
+commercial ties have the potential to affect the credit assistance provided.
+However, you cannot comply with the conflict priority rule merely by
+disclosing a conflict of interest or having the consumer consent to a conflict.
+Note: A condition of a contract (or other arrangement) is void if it seeks to waive any
+of the obligations in s158LB or 158LF: s334.
+
+RG 273.159
+
+There is potential for commissions given by credit providers to cause
+conflicts of interest. Examples of scenarios which would not satisfy the
+conflict priority rule include recommending, based on commission:
+(a)
+
+a loan with a higher interest rate than comparable alternatives;
+
+(b)
+
+a loan without features the consumer considers important or that would
+otherwise be in the consumer’s best interests; or
+
+(c)
+
+loans by a particular credit provider to a substantial proportion of
+consumers, irrespective of the consumers’ particular needs.
+
+RG 273.160
+
+The conflict priority rule will not always prohibit you from recommending a
+credit product provided by a related party. However, if there is a conflict,
+you should keep records of your reasoning behind any recommendation you
+make that the consumer acquire a certain product or increase their credit
+limit, where this would benefit the related party.
+
+RG 273.161
+
+You should ensure that all your recommendations are made with the
+consumer’s interests as the primary consideration. If you prioritise
+maximising or receiving non-consumer sources of remuneration over the
+interests of the consumer, you will be in breach of the conflict priority rule.
+
+© Australian Securities and Investments Commission June 2020
+
+Page 38
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+Example 17: Product of a related party
+Scenario
+William and Megan are thinking about refinancing their principal-andinterest loan. The broker makes an assessment and recommends a
+product provided by a related party of the broker.
+William and Megan benefit from the refinance with a lower interest rate.
+However, the broker did not explain that the product was from a related
+party.
+Commentary
+Whether the broker has complied with the conflict priority rule will depend
+on whether it was in William and Megan’s interests to recommend the
+related party product. In this scenario, the broker must be able to articulate
+how the consumer’s interests are placed ahead of the interests of the
+broker to comply with the conflict priority rule.
+Although disclosure is not sufficient to satisfy the conflict priority rule, the
+broker should have nonetheless explained to William and Megan the
+relationship between the broker and the related party, what benefit the
+broker may receive, why that product was recommended and how their
+interests were placed ahead of the broker’s.
+
+Record keeping
+RG 273.162
+
+As a mortgage broker, we expect you to keep records of how you have acted
+when providing credit assistance. This includes records of inquiries you
+make into the consumer’s circumstances, and the consideration,
+investigation and assessment of the products you recommend.
+
+RG 273.163
+
+We expect that these records will clearly show how you have complied with
+the best interests obligations. Good records will help you to demonstrate that
+you have complied with these obligations.
+
+RG 273.164
+
+You may also be subject to legal requirements to keep information relating to
+other obligations. Keeping good records may help you to demonstrate that you
+have met more than one set of obligations.
+Note: For information on record-keeping requirements relating to the responsible
+lending obligations, see Section D of RG 209. There are also record-keeping
+requirements associated with the product design and distribution obligations.
+
+RG 273.165
+
+Generally, we expect you to keep records that include:
+(a)
+
+a copy of the responsible lending assessment which may be provided to
+the consumer, or the documents and information that would be used to
+prepare the assessment if it is requested;
+Note: For our guidance on this assessment, see Section D of RG 209.
+
+(b)
+
+a copy of the credit guide which was provided to the consumer;
+
+© Australian Securities and Investments Commission June 2020
+
+Page 39
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+(c)
+
+information provided to the credit provider as part of the application
+process;
+
+(d)
+
+outcomes of credit applications;
+
+(e)
+
+relevant conversations with the consumer;
+
+(f)
+
+information showing that you acted in the best interests of the
+consumer (including records of efforts made to educate the consumer);
+
+(g)
+
+the options and ultimate recommendation you gave and the reasons
+why (including a detailed description of your decision-making
+process); and
+
+(h)
+
+any potential conflict of interest which you have identified, and the
+actions you have taken to prioritise the interests of the consumer over
+your own or those of a related party.
+
+RG 273.166
+
+We expect that the types of record you keep will vary depending on the
+recommendations and assistance you provided to the consumer, including
+their scope.
+
+RG 273.167
+
+Records may take various forms, and do not have to be paper based. For
+example, they may include:
+(a)
+
+documents used to make product recommendations;
+
+(b)
+
+file notes, including records of conversations;
+
+(c)
+
+correspondence;
+
+(d)
+
+working papers;
+
+(e)
+
+outputs of product and feature comparison tools, including graphical
+presentations and calculators;
+
+(f)
+
+fact-finding documents used when making inquiries into the
+consumer’s circumstances;
+
+(g)
+
+audio recordings; and
+
+(h)
+
+evidence of the compliance systems you used (including any
+compliance systems put in place by the credit licensee), such as—
+
+(i)
+
+(i)
+
+training materials;
+
+(ii)
+
+records of who is attending the training; and
+
+(iii)
+
+call scripts; and
+
+evidence of how you have complied with these systems.
+Note: This list is not intended to be exhaustive.
+
+RG 273.168
+
+How long these records should be kept may vary depending on factors such
+as the loan term, the interest-only period and whether the consumer
+refinances. You should use your judgement to consider the nature of the
+credit product and determine whether documents should be kept for a longer
+period. Keeping records for a short period of time will place you at risk of
+being unable to demonstrate how you have complied with your obligations.
+
+© Australian Securities and Investments Commission June 2020
+
+Page 40
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+RG 273.169
+
+Taking notes and keeping records throughout the process (contemporaneously)
+may help you to accurately capture your thinking and reasoning at each relevant
+point in time. Just drafting notes and creating records at the end of the process
+may not be as effective as taking a contemporaneous approach.
+
+RG 273.170
+
+As providing credit assistance is often not a linear process, it may be helpful to
+also prepare a concise narrative summary which connects the various records you
+have kept. A narrative summary can be an effective way of outlining why
+particular products were recommended, the decisions made by the consumer, and
+the steps you took throughout the process to act in the consumer’s best interests.
+It should be evidence based and supported by contemporaneous records.
+
+RG 273.171
+
+It is unlikely that you will need to provide reasons why you did not consider or
+recommend every alternative product on the market. Distinguishing the type of
+product or feature, as opposed to exhaustively excluding individual products, is
+likely to be sufficient.
+
+RG 273.172
+
+There may be situations where recording the reasons why you did not
+recommend a certain product or type of product will help you to demonstrate
+your compliance with the best interests duty. For example, if a product or type
+of product has the potential to be in the best interests of the consumer, you
+could document your reasons for why it is not.
+Example 18: Documenting types of products not recommended to the
+consumer
+Scenario
+Malia approaches a broker, Radha, for a home loan. Malia has $10,000
+she would like to put into an offset account. However, she says she might
+like to go on a holiday in the coming months. Malia indicates that if Radha
+does so, she will need to use a large part of the money that will otherwise
+be used to offset her loan.
+Radha explains to Malia that a loan with an offset account would not be in
+her best interests as this type of loan is generally more expensive. Radha
+also informs Malia that $10,000 in an offset account might not be sufficient
+to negate the higher account fees, especially if Malia withdraws most of the
+$10,000 and does not look to increase her savings over time.
+Malia agrees and Radha presents her with options and a recommendation
+which do not include offset accounts.
+Rather than waiting until the end of the process to record the details of the
+credit assistance, Radha decides to take thorough, contemporaneous
+notes throughout the process, including about her conversations with Malia
+and the reasons for not considering products with offset accounts.
+Commentary
+The mortgage broker in this scenario is likely to have acted in the best interests
+of the consumer by deciding not to closely consider products with a certain
+type of product feature. By keeping thorough notes and records throughout
+the process, mortgage brokers can accurately capture their reasoning,
+including why they might not closely consider certain types of products.
+
+© Australian Securities and Investments Commission June 2020
+
+Page 41
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+Obligations for credit licensees
+RG 273.173
+
+Credit licensees must take reasonable steps to ensure that their credit
+representatives who are mortgage brokers comply with the best interests
+duty and the conflict priority rule: s158LE(2) and 158LF(2). We consider
+that this includes the processes a licensee develops to help their mortgage
+brokers to comply with the best interests obligations.
+
+RG 273.174
+
+What constitutes reasonable steps may vary depending on the nature and
+scale of the broker’s operations and their relationship with the licensee.
+
+RG 273.175
+
+In determining whether the steps taken are reasonable, licensees should
+consider the likelihood of the mortgage broker not complying and the harm
+that would result from that non-compliance.
+
+RG 273.176
+
+The use of technology may be helpful in demonstrating that a licensee has
+taken reasonable steps to ensure compliance by their representatives.
+Helpful technology may include real time monitoring and automated
+analysis of trends in a representative’s credit assistance.
+
+RG 273.177
+
+These obligations require licensees to take reasonable steps to prevent
+contraventions, rather than simply respond to contraventions after they have
+happened: see Replacement Explanatory Memorandum, paragraph 3.31.
+Note: Courts have also interpreted in this way the very similar obligations on financial
+services licensees to take reasonable steps under s961L of the Corporations Act 2001
+(Corporations Act): see Australian Securities and Investments Commission v AMP
+Financial Planning Pty Ltd [2018] FCA 1708 at [105].
+
+RG 273.178
+
+As a result, a mortgage broker does not need to breach their best interests
+obligations for the licensee to have failed to take reasonable steps.
+Example 19: Taking reasonable steps
+Scenario
+Barra Brokers Pty Ltd (Barra), a credit licensee, learns that Hayao, one of
+its brokers, has breached the best interests duty. This breach has occurred
+despite Barra’s monitoring and training of its representatives, and has
+caused harm to Hayao’s clients.
+Although the breach is one that other brokers could commit in other
+situations, Barra does not make any attempt to educate its other brokers
+that this behaviour does not meet the best interests duty, or make any
+inquiries into how prevalent the behaviour is.
+Commentary
+Initially, Barra may have taken reasonable steps to ensure Hayao complied
+with the best interests duty.
+Once Hayao’s breach occurs, however, it is likely that Barra has breached
+its obligation to take reasonable steps, by failing to further educate its
+brokers or investigate the prevalence of similar breaches.
+
+© Australian Securities and Investments Commission June 2020
+
+Page 42
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+In these circumstances, it is reasonable to assume that, if preventative
+action is not taken, other brokers may engage in similar conduct, resulting
+in further breaches. As such, it may be reasonable for Barra to attempt to
+prevent such breaches in the future.
+Reasonable preventative steps could include providing additional training or
+an updated code of practice focusing on avoiding similar future breaches.
+RG 273.179
+
+To comply with this obligation, we generally expect credit licensees to:
+(a)
+
+ensure that their mortgage brokers are adequately trained and competent
+(noting the existing general requirements for licensees in relation to the
+training and competence of their credit representatives—see RG 206);
+
+(b)
+
+provide systems, guidelines and other materials to ensure that brokers
+understand and comply with their best interests obligations;
+
+(c)
+
+monitor compliance (noting that method and frequency may vary based
+on these factors and other information available to the licensee); and
+
+(d)
+
+ensure that appropriate records are kept, which demonstrate the mortgage
+broker’s compliance with the best interests obligations and the reasonable
+steps the licensee has taken.
+Note: For more information on the general conduct obligation requirements, see
+Section E of RG 205.
+
+Example 20: Licensee approach to reviewing broker compliance
+Scenario
+Loanbridge Pty Ltd (Loanbridge) is a credit licensee that authorises
+approximately 200 credit representatives who are mortgage brokers.
+One aspect of Loanbridge’s approach to ensuring that its broker
+representatives comply with the best interests obligations is to conduct
+reviews of broker files and transactions.
+Brokers are selected for review based on a range of factors including:
+• the volume of business they conduct;
+• the variety of credit providers and products they recommend or arrange;
+• the number of consumer complaints associated with them; and
+• the subsequent performance of the loans they arrange.
+Loanbridge’s software allows mortgage brokers to attach file notes,
+correspondence and other outputs to each consumer’s file. Loanbridge can
+access these records as part of its reviews.
+Commentary
+This type of review may form part of a licensee’s approach to taking
+reasonable steps to ensure that its mortgage broker representatives
+comply with the best interests obligations.
+Loanbridge may also need to consider whether anything identified during
+the reviews requires further action.
+
+© Australian Securities and Investments Commission June 2020
+
+Page 43
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+Example 21: Licensee systems
+Scenario
+XYZ Corporation (XYZ Corp) is a credit licensee that provides aggregation
+services to mortgage brokers who are its credit representatives.
+XYZ Corp’s corporate group includes an entity—XYZ Loans—which is a
+credit provider offering home loan products.
+XYZ Corp updates its aggregator platform software to change how home loan
+products are presented to mortgage brokers. The new algorithm prioritises
+loans offered by XYZ Loans when brokers sort available products.
+Commentary
+XYZ Corp has an obligation to take reasonable steps to ensure that its
+broker representatives comply with the best interests duty. Providing
+platform software that prioritises XYZ Loans’ products may be inconsistent
+with the obligation to take reasonable steps to ensure XYZ Corp’s
+mortgage broker representatives comply with the conflict priority rule.
+Whether or not a conflict exists, or whether an XYZ Loans product is in the
+consumer’s best interests, will depend upon the consumer’s circumstances.
+Software platforms have the potential to help mortgage brokers to comply
+with their obligations, and enable licensees to take reasonable steps to
+ensure this.
+Using software that sorts products by relevance (based on the consumer’s
+individual circumstances) or by price or in manner that is credit provider
+neutral, would appear to be more consistent with the obligations.
+
+The anti-avoidance provision
+What is anti-avoidance?
+RG 273.180
+
+The effect of the anti-avoidance provision is that a person must not, either alone or
+with other people, enter into or begin to carry out a scheme if:
+(a)
+
+it would be concluded that they did so for the sole or non-incidental
+purpose of avoiding the application of any provision of Pt 3-5A; and
+
+(b)
+
+the scheme or part of the scheme has achieved or would achieve that
+purpose.
+
+RG 273.181
+
+A person may be liable for a civil penalty if they are found to have breached
+s158T.
+
+RG 273.182
+
+The anti-avoidance provision is designed to ensure that the policy intent of
+the reforms is not avoided through industry or transaction structuring.
+
+RG 273.183
+
+Section 158T could potentially apply to a broad range of schemes (e.g. any
+contract, agreement, plan, proposal, course of action or course of conduct).
+
+© Australian Securities and Investments Commission June 2020
+
+Page 44
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+Our approach to administering the provision
+RG 273.184
+
+In administering the anti-avoidance provision, we are more likely to
+scrutinise schemes that appear to have no commercial purpose other than to
+avoid the application of the best interests duty, conflict priority rule and
+conflicted remuneration provisions.
+Note: The discussion in this section on arrangements to which the anti-avoidance
+provision applies is not intended to be exhaustive.
+
+RG 273.185
+
+We are unlikely to scrutinise schemes that are normal commercial
+transactions conducted in the ordinary course of business.
+
+RG 273.186
+
+We are also unlikely to take action on arrangements that have been
+genuinely entered into to comply with the ban on conflicted remuneration.
+
+© Australian Securities and Investments Commission June 2020
+
+Page 45
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+Appendix: Comparison of the responsible lending
+obligations and the best interests duty
+Table 2:
+
+Interaction of the responsible lending obligations and best interests duty
+
+Area
+
+Responsible lending obligations
+
+Best interests duty
+
+The purpose of the
+inquiry and
+verification
+obligations
+
+The purpose is to obtain reliable
+information to:
+
+The purpose is to obtain reliable
+information to:
+
+ assess whether a credit product or
+increased credit limit is unsuitable for
+that consumer; and
+
+ determine what the individual
+consumer’s best interests are;
+
+ not engage in the regulated conduct if
+the credit product or increased credit limit
+is unsuitable.
+As a mortgage broker, the information you
+gather is also likely to be relevant to the
+credit provider’s responsible lending
+obligations when entering into a credit
+product with the consumer you have
+assisted.
+Making reasonable
+inquiries about the
+consumer
+
+For all consumers, you must make
+reasonable inquiries about:
+ the consumer’s financial situation,
+requirements and objectives; and
+ the maximum credit limit that a consumer
+requires.
+Note: Additional requirements apply to
+some products, such as reverse
+mortgages.
+
+ determine that there are certain credit
+products which are in the consumer’s
+best interests, and others which are not;
+ determine that there are no conflicts of
+interest (and if there are, prioritise the
+consumer’s interests);
+ weigh up features according to their
+benefit to the consumer; and
+ provide recommendations to the
+consumer.
+You should consider each consumer’s
+individual circumstances, which will likely
+require information about:
+ the consumer’s priorities and
+preferences over different products;
+ the consumer’s needs and objectives;
+and
+ the consumer’s personal circumstances
+and financial situation.
+You should use your judgment to
+determine whether you should make
+additional inquiries, beyond the reasonable
+inquiries undertaken to comply with the
+responsible lending obligations. This could
+require you to obtain information that is not
+needed to comply those obligations.
+
+Switching and
+refinancing
+
+Additional matters to be considered include
+whether the new product would result in:
+
+Additional matters to be considered include
+whether the new product would result in:
+
+ overall cost savings to the consumer; or
+
+ overall cost savings to the consumer; or
+
+ minimal cost savings, but better meet the
+consumer’s requirements and objectives.
+
+ minimal cost savings, but better meet the
+consumer’s requirements and objectives.
+
+© Australian Securities and Investments Commission June 2020
+
+Page 46
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+Area
+
+Responsible lending obligations
+
+Best interests duty
+
+Assessing whether
+a credit product is
+‘not unsuitable’ or in
+the best interests of
+the consumer
+
+The credit product or credit limit increase
+will be unsuitable if (at the time of the
+assessment) it is likely that:
+
+This assessment is relevant to acting in the
+consumer’s best interests.
+
+ the consumer will be unable to comply
+with their financial obligations, or
+compliance will result in substantial
+hardship;
+ the contract will not meet the consumer’s
+requirements or objectives; or
+ circumstances prescribed in the National
+Credit Regulations apply.
+Note: There are additional matters that
+affect this assessment for some products,
+such as credit cards and reverse
+mortgages.
+
+However, you should take into account
+additional considerations when providing
+credit assistance in relation to products
+which are assessed as ‘not unsuitable’ for
+the purposes of the responsible lending
+obligations before determining that they are
+in the consumer’s best interests.
+For example, providing credit assistance in
+relation to such a product may not be in the
+consumer’s best interests if:
+ the consumer’s interests would be better
+served by you suggesting an alternative
+course of action (i.e. entering into a
+different credit product);
+ the recommendation is based on your
+own interests, rather than the interests of
+the consumer;
+ you prioritise conflicting interests of
+others over the consumer’s interests;
+ you have not considered the consumer’s
+circumstances and financial situation in
+sufficient detail to determine what is in
+the consumer’s best interests;
+ you have not considered a sufficiently
+broad range of relevant product options;
+or
+ you have not equipped and educated the
+consumer to make informed decisions.
+
+Reviewing the
+outcome of the
+assessments
+
+Credit licensees should periodically review
+their portfolio to consider whether the
+assessments are effectively identifying
+individual circumstances in which credit
+product are unsuitable or ‘not unsuitable’.
+
+© Australian Securities and Investments Commission June 2020
+
+The best interests obligations apply
+whenever credit assistance is provided.
+What is in the best interests of the
+consumer must be assessed at that time.
+Mortgage brokers should nonetheless
+periodically review their portfolio to
+consider whether, with the benefit of
+hindsight, their processes have enabled
+them to act in the consumers’ best
+interests.
+
+Page 47
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+Area
+
+Responsible lending obligations
+
+Best interests duty
+
+Record-keeping
+obligations
+
+We expect you to keep a record of inquiries
+made, verification steps taken, and
+information relied on in the assessment.
+
+We expect you to keep records that
+include:
+
+If requested by the consumer, you must
+provide a written copy of the assessment.
+A written assessment should include:
+ a statement of your understanding of the
+consumer’s requirements and objectives;
+ a description of the consumer’s financial
+position; and
+ if the consumer’s capacity to make
+repayments depends on them taking
+particular actions—a clear statement of
+what those actions are.
+ASIC may also ask for a copy of the written
+assessment.
+
+ a copy of the responsible lending
+assessment, or the documents and
+information that would be used to
+prepare such an assessment;
+ a copy of the credit guide which was
+provided to the consumer;
+ information provided to the credit
+provider;
+ outcomes of credit applications;
+ relevant conversations with the
+consumer;
+ information showing that you acted in the
+consumer’s best interests;
+ the options and recommendation you
+gave;
+ information explaining your reasons for
+the recommendation (e.g. why that
+product was in the consumer’s best
+interests); and
+ any potential conflicts identified, and any
+steps taken to prioritise the consumers’
+interests.
+
+© Australian Securities and Investments Commission June 2020
+
+Page 48
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+Key terms
+Term
+
+Meaning in this document
+
+aggregator
+
+A business which provides aggregation services to a
+broker business or broker and with which a credit
+provider has a direct contractual relationship.
+
+ASIC
+
+Australian Securities and Investments Commission
+
+best interests duty
+
+The duty for mortgage brokers to act in the best interests
+of their consumer when providing credit assistance in
+relation to credit contracts as set out in s158LA of the
+National Credit Act
+
+best interests
+obligations
+
+The obligations in Div 2 of Pt 3-5A of the National Credit
+Act
+
+conflict priority rule
+
+The requirement for mortgage brokers to prioritise their
+consumers’ interests when providing credit assistance as
+set out in s158LB and 158LF of the National Credit Act
+
+consumer
+
+A natural person or strata corporation
+Note: See s5 of the National Credit Act.
+
+consumer lease
+
+A consumer lease to which the National Credit Code
+applies
+Note: See s169–171 of the National Credit Code.
+
+CP 325 (for example)
+
+An ASIC consultation paper (in this example numbered
+325)
+
+credit
+
+Credit to which the National Credit Code applies
+Note: See s3 and 5–6 of the National Credit Code.
+
+credit assistance
+
+Has the meaning given in s8 of the National Credit Act
+
+credit assistance
+provider
+
+A person who provides credit assistance to a consumer in
+relation to a credit contract or a consumer lease and who
+is not the credit provider (for a credit contract) or the
+lessor (for a consumer lease)
+
+credit contract
+
+Has the meaning given in s4 of the National Credit Code
+
+credit licence
+
+An Australian credit licence under s35 of the National
+Credit Act that authorises a licensee to engage in
+particular credit activities
+
+credit licensee
+
+A person who holds an Australian credit licence under
+s35 of the National Credit Act
+
+credit provider
+
+Has the meaning given in s5 of the National Credit Act
+
+credit representative
+
+A person authorised to engage in specified credit
+activities on behalf of a credit licensee under s64(2) or
+65(2) of the National Credit Act
+
+© Australian Securities and Investments Commission June 2020
+
+Page 49
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+Term
+
+Meaning in this document
+
+final report
+
+The final report of the Royal Commission released in
+February 2019
+
+FHLDS
+
+First Home Loan Deposit Scheme
+
+FHSSS
+
+First Home Super Saver Scheme
+
+mortgage broker
+
+A person who:
+ carries on a business of providing credit assistance in
+relation to credit contracts secured by mortgages over
+residential property;
+ does not act as the credit provider in relation to most of
+those contracts; and
+ provides credit assistance in relation to credit contracts
+offered by more than one credit provider.
+Note: See s15B of the National Credit Act.
+
+Mortgage Broker
+Reforms Act
+
+Financial Sector Reform (Hayne Royal Commission
+Response—Protecting Consumers (2019 Measures)) Act
+2020
+
+Mortgage Broker
+Reforms Bill
+
+Financial Sector Reform (Hayne Royal Commission
+Response—Protecting Consumers (2019 Measures) Bill
+2019
+
+National Credit Act
+
+National Consumer Credit Protection Act 2009
+
+National Credit Code
+
+National Credit Code at Sch 1 to the National Credit Act
+
+National Credit
+Regulations
+
+National Consumer Credit Protection Regulations 2010
+
+REP 516 (for
+example)
+
+An ASIC report (in this example numbered 516)
+
+Replacement
+Explanatory
+Memorandum
+
+Replacement Explanatory Memorandum to the Mortgage
+Broker Reforms Bill
+
+RG 203 (for example)
+
+An ASIC regulatory guide (in this example numbered
+203)
+
+Royal Commission
+
+Royal Commission into Misconduct in the Banking,
+Superannuation and Financial Services Industry
+
+s15B (for example)
+
+A section of the National Credit Act (in this example
+numbered 15B), unless otherwise specified
+
+© Australian Securities and Investments Commission June 2020
+
+Page 50
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+Related information
+Headnotes
+Best interests duty, conflict priority rule, credit licensees, mortgage brokers,
+responsible lending
+
+Legislative instrument
+ASIC Credit (Deferral of Mortgage Broker Obligations) Instrument
+2020/487
+
+Regulatory guides
+RG 121 Doing financial services business in Australia
+RG 203 Do I need a credit licence?
+RG 205 Credit licensing: General conduct obligations
+RG 206 Credit licensing: Competence and training
+RG 209 Credit licensing: Responsible lending conduct
+
+Legislation
+ASIC Act, s12DA(1)
+Corporations Act, s961L
+Mortgage Broker Reforms Act
+Mortgage Broker Reforms Bill
+National Credit Act, Pt 3-5A, s15B, 47(1)(b), 117, 130, 140, 153, 158LA,
+158LB, 158LE, 158LE(2), 158LF, 158LF(2), 158T, 334
+
+Cases
+Australian Securities and Investments Commission v AMP Financial
+Planning Pty Ltd [2018] FCA 1708
+
+Consultation papers
+CP 325 Product design and distribution obligations
+CP 327 Implementing the Royal Commission recommendations: Mortgage
+brokers and the best interests duty
+
+© Australian Securities and Investments Commission June 2020
+
+Page 51
+
+REGULATORY GUIDE 273: Mortgage brokers: Best interests duty
+
+Reports
+REP 516 Review of mortgage broker remuneration
+REP 628 Looking for a mortgage: Consumer experiences and expectations
+in getting a home loan
+REP 662 Response to submissions on CP 327 on mortgage brokers and the
+best interests duty
+
+Media release
+20-109MR ASIC defers commencement of mortgage broker reforms and
+design and distribution obligations (8 May 2020)
+
+Other references
+Replacement Explanatory Memorandum to the Mortgage Broker Reforms
+Bill
+Royal Commission, Final report, 4 February 2019
+
+© Australian Securities and Investments Commission June 2020
+
+Page 52
+
+

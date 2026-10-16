@@ -76,19 +76,19 @@
 %% --- entry -------------------------------------------------------------------
 
 -spec fill(map(), map()) -> {map(), binary(), [map()]}.
-fill(_Args, Upstream) ->
+fill(Args, Upstream) ->
     Profile = maps:get(<<"profile">>, Upstream, #{}),
     %% Mode discriminator: only the investor blueprint runs a `tax_structure` component, so its
     %% outcome's presence upstream marks the Mode-C/D investor path (full CGT) vs the Mode-A/B
     %% owner-occupier path (main-residence-exempt). Same outcome type + calculator renderer.
     case maps:get(<<"tax_optimised_structure">>, Upstream, undefined) of
-        undefined -> fill_owner_occupier(Profile, Upstream);
-        Tax       -> fill_investor(Profile, Tax, Upstream)
+        undefined -> fill_owner_occupier(Args, Profile, Upstream);
+        Tax       -> fill_investor(Args, Profile, Tax, Upstream)
     end.
 
 %% --- Mode-A/B owner-occupier (main-residence-exempt) -------------------------
 
-fill_owner_occupier(Profile, Upstream) ->
+fill_owner_occupier(Args, Profile, Upstream) ->
     Budget    = maps:get(<<"budget_envelope">>, Upstream, #{}),
     Mortgage  = maps:get(<<"mortgage_plan">>, Upstream, #{}),
     Ownership = maps:get(<<"ongoing_obligations">>, Upstream, #{}),
@@ -98,15 +98,16 @@ fill_owner_occupier(Profile, Upstream) ->
     {GLow, GHigh, IsPlaceholder} = growth_band(),
 
     Sale          = sale_proceeds(Price, H, GLow, GHigh),
-    Selling       = selling_costs(Sale),
     Loan          = loan_payout(Mortgage, H),
+    Fees          = dispose_fees(Args, Sale, Loan, <<"other">>),
+    Selling       = selling_from(Sale, Fees),
     {Cgt, Status} = cgt(Profile),
     CgtContrib    = cgt_contribution(Cgt, Status),
     Net           = net_proceeds(Sale, Selling, Loan, CgtContrib),
     Full          = full_horizon(Net, Budget, Ownership, H),
     %% Mode-A/B/E four-actor swimlane (fh_engine_journey:actors/0) — the money-flow party for
     %% sale/selling is "other" there.
-    Events        = dispose_cash_events(Sale, Selling, Loan, Cgt, <<"other">>),
+    Events        = dispose_cash_events(Sale, Fees, Loan, Cgt, <<"other">>),
 
     Outcome = #{
         <<"horizon_years">>             => H,
@@ -118,6 +119,7 @@ fill_owner_occupier(Profile, Upstream) ->
         <<"net_proceeds">>              => Net,
         <<"full_horizon_net_position">> => Full,
         <<"dispose_cash_events">>       => Events,
+        <<"fee_pending">>               => element(2, Fees),
         <<"key_assumptions">>           => assumptions(H, GLow, GHigh, IsPlaceholder, Status, Loan)
     },
     KbVersions = fh_engine_kb:kb_anchors([?GROWTH, ?SELLING, ?CGT, ?SERVICEABILITY, ?COPY]),
@@ -129,7 +131,7 @@ fill_owner_occupier(Profile, Upstream) ->
 %% the investment-loan amortisation rate, the full-CGT computation, and a signed hold cash flow
 %% rolled into the full-horizon position.
 
-fill_investor(Profile, Tax, Upstream) ->
+fill_investor(Args, Profile, Tax, Upstream) ->
     Budget   = maps:get(<<"budget_envelope_investor">>, Upstream, #{}),
     CashFlow = maps:get(<<"cash_flow_projection">>, Upstream, #{}),
 
@@ -141,8 +143,9 @@ fill_investor(Profile, Tax, Upstream) ->
     {GLow, GHigh, IsPlaceholder} = growth_band(),
 
     Sale                = sale_proceeds(Price, H, GLow, GHigh),
-    Selling             = selling_costs(Sale),
     Loan                = loan_payout_investor(Budget, H),
+    Fees                = dispose_fees(Args, Sale, Loan, <<"services">>),
+    Selling             = selling_from(Sale, Fees),
     {Gain, Cgt, Status} = cgt_investor(Profile, Tax, Sale, Price),
     %% cgt IS the contribution: a money_range when computed, null (→ net PENDING) when to_verify.
     Net                 = net_proceeds(Sale, Selling, Loan, Cgt),
@@ -153,7 +156,7 @@ fill_investor(Profile, Tax, Upstream) ->
     %% sale_proceeds/selling_costs cells the moment a hold horizon is set (found via review,
     %% 2026-07-10 — [[firsthomey-bcd-lifecycle-restructure]] task 10). Fixed at the source: the
     %% investor path (the ONLY caller of the six-actor set) passes "services" here.
-    Events              = dispose_cash_events(Sale, Selling, Loan, Cgt, <<"services">>),
+    Events              = dispose_cash_events(Sale, Fees, Loan, Cgt, <<"services">>),
     %% Mode-D-only fields (frcgw_applicable is absent/false on Mode C's tax_optimised_structure
     %% ⟹ both null there — one function serves both modes, see frcgw_withheld/2's header note).
     FrcgwApplicable     = maps:get(<<"frcgw_applicable">>, Tax, false),
@@ -176,6 +179,7 @@ fill_investor(Profile, Tax, Upstream) ->
         <<"net_proceeds">>              => Net,
         <<"full_horizon_net_position">> => Full,
         <<"dispose_cash_events">>       => Events,
+        <<"fee_pending">>               => element(2, Fees),
         <<"key_assumptions">>           => assumptions_investor(H, GLow, GHigh, IsPlaceholder, Status, Loan, Frcgw)
     },
     FrcgwAnchors = case FrcgwApplicable of
@@ -232,20 +236,45 @@ sale_proceeds(Price, H, GLow, GHigh) when is_number(Price), is_integer(H) ->
     [round(Price * math:pow(1 + GLow / 100, H)),
      round(Price * math:pow(1 + GHigh / 100, H))].
 
-%% --- selling costs: commission% × sale_proceeds + legal + marketing ----------
-%% Itself a money_range because the proceeds are banded (kb.selling-costs.agent-legal).
-
+%% --- selling costs: the dispose fee lines -------------------------------------
+%% Whole lifecycle -> honesty tiers; one owner per fact -> disposition -> sell fee lines
+%% Purpose:   what selling costs, one line per fee (agent commission, marketing,
+%%            conveyancing, mortgage discharge; the money sent back to Vietnam in B/D),
+%%            each from its owning KB doc via fh_engine_fees (behavior 83), where one
+%%            selling_costs figure summed three of them before.
+%% Holds:     selling_costs = the sum of the lines the seller pays for sure
+%%            (fh_engine_fees:committed/1: optional ones such as the transfer back are
+%%            shown, not summed); a money_range because the proceeds are banded. The
+%%            transfer base is the proceeds less the loan payout when that is known.
 -spec selling_costs([integer()] | null) -> [integer()] | null.
-selling_costs(null) -> null;
-selling_costs([SaleLo, SaleHi]) ->
-    CLow    = param(?SELLING, <<"agent_commission_low_pct">>),
-    CHigh   = param(?SELLING, <<"agent_commission_high_pct">>),
-    LegalLo = param(?SELLING, <<"legal_conveyancing_low_aud">>),
-    LegalHi = param(?SELLING, <<"legal_conveyancing_high_aud">>),
-    MktLo   = param(?SELLING, <<"marketing_low_aud">>),
-    MktHi   = param(?SELLING, <<"marketing_high_aud">>),
-    [round(CLow / 100 * SaleLo) + LegalLo + MktLo,
-     round(CHigh / 100 * SaleHi) + LegalHi + MktHi].
+selling_costs(Sale) ->
+    %% the existing home's loan payout already carries the lender's discharge fee
+    %% (existing_home_disposal:total_payout), so that line is left out here: counted once.
+    %% The state's discharge registration is not in the payout and stays.
+    selling_from(Sale, drop_discharge(dispose_fees(#{blueprint_slug => <<"nexthome-domestic-au">>},
+                                                   Sale, null, <<"other">>))).
+
+drop_discharge({Events, Pending}) ->
+    {[E || E <- Events, not is_discharge(maps:get(<<"id">>, E))], Pending}.
+
+is_discharge(<<"mortgage_discharge">>) -> true;
+is_discharge(_)                       -> false.
+
+selling_from(null, _Fees) -> null;
+selling_from(_Sale, {Events, _}) -> fh_engine_fees:committed(Events).
+
+dispose_fees(_Args, null, _Loan, _Other) -> {[], []};
+dispose_fees(Args, Sale, Loan, Other) ->
+    fh_engine_fees:events([<<"dispose">>],
+        #{blueprint => maps:get(blueprint_slug, Args, <<"fhb-domestic-au">>),
+          state => case fh_engine_store:projection_state(maps:get(onboarding, Args, #{})) of
+                       S when is_binary(S) -> S; _ -> undefined end,
+          property => undefined, source => <<"disposition">>, counterparty => Other,
+          price => null, loan => null, rent => null, sale => Sale,
+          transfer => after_loan(Sale, Loan)}).
+
+after_loan([SL, SH], [LL, LH]) -> [max(0, SL - LH), max(0, SH - LL)];
+after_loan(Sale, _) -> Sale.
 
 %% --- loan payout: remaining principal at year H (amortisation) ---------------
 %% null until the loan AMOUNT is known (expected_borrowing_capacity is null at base,
@@ -503,16 +532,15 @@ full_horizon_investor([NLo, NHi], Budget, CashFlow, H) when is_integer(H) ->
 %% Mode-A/B/E four-actor set (fh_engine_journey:actors/0); "services" for the Mode-C/D
 %% six-actor set (fh_engine_journey:investor_actors/0). loan_payout/cgt use "lender"/
 %% "government", which both actor sets carry unchanged.
--spec dispose_cash_events([integer()] | null, [integer()] | null,
+-spec dispose_cash_events([integer()] | null, {[map()], [map()]},
                           [integer()] | null, [integer()] | null, binary()) -> [map()].
-dispose_cash_events(Sale, Selling, Loan, Cgt, MoneyPartyId) ->
+dispose_cash_events(Sale, {FeeEvents, _}, Loan, Cgt, MoneyPartyId) ->
     Candidates = [
         event(<<"sale_proceeds">>, <<"event_sale_proceeds">>, <<"in">>,  Sale,    MoneyPartyId),
-        event(<<"selling_costs">>, <<"event_selling_costs">>, <<"out">>, Selling, MoneyPartyId),
         event(<<"loan_payout">>,   <<"event_loan_payout">>,   <<"out">>, Loan,    <<"lender">>),
         event(<<"cgt">>,           <<"event_cgt">>,           <<"out">>, Cgt,     <<"government">>)
     ],
-    [E || E <- Candidates, maps:get(<<"amount">>, E) =/= null].
+    [E || E <- Candidates, maps:get(<<"amount">>, E) =/= null] ++ FeeEvents.
 
 event(Id, LabelCopyId, Dir, Amount, Counterparty) ->
     #{<<"id">>               => <<"dispose_", Id/binary>>,
