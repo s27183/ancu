@@ -885,10 +885,8 @@ The `mortgage_plan` outcome feeds `cash_position` (loan amount + buffer requirem
 {
   "type": "ongoing_obligations",
   "fields": {
-    "total_monthly_outgoings_estimate": "money|null",
-    "total_annual_outgoings_estimate": "money|null",
     "maintenance_reserve_target": "money_per_year",
-    "recurring_costs_estimate": "{ statutory_band: { low: money|null, high: money|null, period, components: array<string> }, strata_levies: money|null, utilities: money|null, building_insurance: money|null, notes: array<localized_text> }",
+    "recurring_costs_estimate": "{ statutory_band: { low: money|null, high: money|null, period, components: array<string> }, notes: array<localized_text> }",  // behavior 93 (2026-10-16): the yearly cost to own is the cash_events; the outgoings totals and the strata/utilities/insurance slots it superseded are gone
     "land_tax_check": "enum [exempt_ppor, applicable, to_verify]",
     "graduation_milestone": "{ target_lvr, estimated_year: number|null }",
     "alert_triggers_armed": "array<{ trigger: localized_text, action: localized_text }>",

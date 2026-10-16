@@ -963,9 +963,7 @@ Same as [Mode A ownership_planning](fhb-domestic-au.md#9-ownership_planning) wit
 {
   "type": "ongoing_obligations",
   "fields": {
-    "total_monthly_outgoings_estimate": "money",
-    "total_annual_outgoings_estimate": "money",
-    "vacancy_fee_at_risk_amount": "money",
+    "vacancy_fee_at_risk_amount": "money",  // behavior 93 (2026-10-16): the outgoings totals are gone — the yearly cost to own is the cash_events below
     "current_year_occupancy_status": "enum",
     "non_resident_tax_filing_required": "bool",
     "alert_triggers_armed": "array<{ trigger, action }>",

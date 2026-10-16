@@ -100,8 +100,6 @@ fill_foreign(Args, Upstream) ->
         <<"cash_events">> => own_cash_events(Args, Upstream, <<"budget_envelope">>,
                                              <<"other">>, owner, <<"ownership_planning">>),
         <<"fee_pending">> => own_fee_pending(Args, <<"other">>, <<"ownership_planning">>),
-        <<"total_monthly_outgoings_estimate">> => null,   %% pending: mortgage P&I unknown at base
-        <<"total_annual_outgoings_estimate">>  => null,   %% pending: as above
         <<"vacancy_fee_at_risk_amount">>       => vacancy_fee_at_risk(Fee),
         <<"current_year_occupancy_status">>    => null,   %% pending: occupancy intent not yet captured
         <<"non_resident_tax_filing_required">> => null,   %% pending: as above
@@ -517,14 +515,17 @@ nonneg(_) -> null.
 
 %% --- the ongoing_obligations outcome (honest partial) ------------------------
 %% Filled: maintenance_reserve_target, recurring_costs_estimate.statutory_band,
-%% graduation_milestone.target_lvr, alert_triggers_armed. Null/pending: the two
-%% outgoings totals (P&I-dominated), estimated graduation year, and the strata/
-%% utilities/insurance cost lines.
+%% graduation_milestone.target_lvr, alert_triggers_armed. Null/pending: the estimated
+%% graduation year.
+%% Whole lifecycle -> each phase has its money lines -> ownership_planning -> no slot the
+%% cash events superseded (behavior 93): the yearly cost to own is the Own phase's
+%% cash_events (rates and water, maintenance, repayments, the fee lines), so the outgoings
+%% totals, the strata/utilities/insurance slots — null at base, never filled — and the note
+%% that repayments were pending are gone (2026-10-16). statutory_band stays: disposition's
+%% hold cost and purchase_journey read it.
 
 ongoing_obligations(Ceiling, Intent, State, HasFhg, LandTax) ->
-    #{<<"total_monthly_outgoings_estimate">> => null,   %% pending: mortgage P&I unknown at base
-      <<"total_annual_outgoings_estimate">>  => null,   %% pending: as above
-      <<"maintenance_reserve_target">>       => maintenance_target(Ceiling),
+    #{<<"maintenance_reserve_target">>       => maintenance_target(Ceiling),
       <<"recurring_costs_estimate">>         => recurring_costs(),
       <<"graduation_milestone">> =>
           #{<<"target_lvr">>     => graduation_target_lvr(),
@@ -542,17 +543,10 @@ maintenance_target(V) when is_integer(V) ->
                    <<"reserve_pct_of_value_default">>),
     dollars(Pct * V / 100).
 
-%% the recurring NON-mortgage costs. statutory_band (council + water) is computable
-%% from KB now; strata needs the property type (no property at base), utilities +
-%% building insurance have no KB band / are property-specific (refine/per-property).
+%% the recurring non-mortgage costs: statutory_band (council + water), from the KB.
 recurring_costs() ->
-    #{<<"statutory_band">>     => statutory_band(),
-      <<"strata_levies">>      => null,   %% pending: needs property type (apartment/townhouse)
-      <<"utilities">>          => null,   %% pending: no KB band (electricity/gas) - refine
-      <<"building_insurance">> => null,   %% pending: sum-insured is property-specific - per-property
-      <<"notes">> =>
-          [copy(<<"note_indicative">>, #{}),
-           copy(<<"note_mortgage_pending">>, #{})]}.
+    #{<<"statutory_band">> => statutory_band(),
+      <<"notes">>          => [copy(<<"note_indicative">>, #{})]}.
 
 %% council + water annual band (strata excluded - applies only to strata title).
 -spec statutory_band() -> map().

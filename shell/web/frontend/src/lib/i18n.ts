@@ -875,13 +875,8 @@ const messages = {
 
     'plan.f.recurring': { vi: 'Chi phí định kỳ (ước tính)', en: 'Recurring costs (est.)' },
     'plan.f.statutory': { vi: 'Phí pháp định (rates + nước)', en: 'Council + water' },
-    'plan.f.strata': { vi: 'Phí chung cư', en: 'Strata levies' },
-    'plan.f.utilities': { vi: 'Điện nước', en: 'Utilities' },
-    'plan.f.insurance': { vi: 'Bảo hiểm công trình', en: 'Building insurance' },
     'plan.f.land_tax': { vi: 'Thuế đất', en: 'Land tax' },
     'plan.f.maintenance': { vi: 'Quỹ bảo trì mỗi năm', en: 'Maintenance reserve / yr' },
-    'plan.f.monthly': { vi: 'Chi phí hàng tháng', en: 'Monthly outgoings' },
-    'plan.f.annual': { vi: 'Chi phí hàng năm', en: 'Annual outgoings' },
     'plan.f.alerts': { vi: 'Nhắc nhở đã bật', en: 'Alerts armed' },
     'plan.landtax.exempt_ppor': { vi: 'Miễn (nhà ở chính)', en: 'Exempt (your home)' },
     'plan.landtax.applicable': { vi: 'Có áp dụng', en: 'Applicable' },

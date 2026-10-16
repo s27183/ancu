@@ -9,7 +9,7 @@
 %% flag every other Mode-B branch built in P2 keys on. The Mode-A body (fill_domestic/2,
 %% renamed verbatim) is byte-identical — zero regression. Loads the SAME materialized
 %% artifact the engine loads and asserts:
-%%   1. SCAFFOLD — the Mode-B ongoing_obligations is a DIFFERENT 7-field shape (vacancy
+%%   1. SCAFFOLD — the Mode-B ongoing_obligations is a DIFFERENT 5-field shape (vacancy
 %%      fee + non-resident tax framing, no land_tax_check/graduation_milestone/FHG).
 %%      vacancy_fee_at_risk_amount = 2× firb_workflow's OWN fee (PLACED, never
 %%      recomputed from price); current_year_occupancy_status / non_resident_tax_
@@ -42,8 +42,7 @@ main(_) ->
 %% --- fixtures ----------------------------------------------------------------
 
 fields() ->
-    [<<"total_monthly_outgoings_estimate">>, <<"total_annual_outgoings_estimate">>,
-     <<"vacancy_fee_at_risk_amount">>, <<"current_year_occupancy_status">>,
+    [<<"vacancy_fee_at_risk_amount">>, <<"current_year_occupancy_status">>,
      <<"non_resident_tax_filing_required">>, <<"alert_triggers_armed">>,
      <<"mode_switch_eligible">>, <<"cash_events">>, <<"fee_pending">>].
 
@@ -63,12 +62,8 @@ scaffold_cases() ->
     KbSlugs = [maps:get(<<"slug">>, E) || E <- Kb],
     Alerts = g(O, <<"alert_triggers_armed">>),
     [check("renderer = data-table", Rend, <<"data-table">>),
-     check("outcome has exactly the seven Mode-B ongoing_obligations fields + the own-phase cash_events (behavior 82)",
+     check("outcome has exactly the five Mode-B ongoing_obligations fields + the own-phase cash_events (behavior 82); the outgoings totals the cash events superseded are gone (behavior 93)",
            lists:sort(maps:keys(O)), lists:sort(fields())),
-     check("total_monthly_outgoings_estimate = null (pending mortgage P&I)",
-           g(O, <<"total_monthly_outgoings_estimate">>), null),
-     check("total_annual_outgoings_estimate = null (as above)",
-           g(O, <<"total_annual_outgoings_estimate">>), null),
      check("vacancy_fee_at_risk_amount = 30200 (2 x 15100, placed from firb_workflow)",
            g(O, <<"vacancy_fee_at_risk_amount">>), 30200),
      check("current_year_occupancy_status = null (occupancy intent not captured yet)",

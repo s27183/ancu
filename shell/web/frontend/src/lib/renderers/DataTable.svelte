@@ -1,9 +1,8 @@
 <script lang="ts">
-    // The `data-table` renderer — ownership_planning (ongoing_obligations): the cost
-    // of holding the home. At base scope this is honest-partial — the statutory band
-    // (council + water) and land-tax status are knowable; mortgage-dominated monthly /
-    // annual outgoings need a firm loan, so they show Pending until a property is
-    // attached.
+    // The `data-table` renderer — ownership_planning (ongoing_obligations): what holding
+    // the home asks of you — the statutory band (council + water), the maintenance reserve,
+    // land-tax status and the armed alerts. The yearly cost to own, repayments included, is
+    // the lifecycle statement's Own lines (behavior 93), not a total here.
     import { t } from '$lib/i18n';
     import { lang } from '$lib/stores/lang';
     import {
@@ -20,7 +19,6 @@
     import Chip from './Chip.svelte';
     import NoteList from './NoteList.svelte';
     import Pending from './Pending.svelte';
-    import StackedBar from './StackedBar.svelte';
 
     let { outcome, density = 'compact' }: {
         outcome: Record<string, unknown>;
@@ -214,23 +212,6 @@
         return `${lo} – ${hi}`;
     });
 
-    // Outgoings hero (plan-card-visual-spec §3.5): a segmented bar of the recurring cost
-    // lines. At base only the statutory band (council + water) is knowable; strata /
-    // utilities / building insurance need a property → hatched (counted, not sized). The
-    // monthly total is mortgage-dominated → Pending until a loan. Reuses StackedBar (R1/R2).
-    const num2 = (v: number | null | undefined): v is number => typeof v === 'number';
-    const bandMid = $derived(num2(band?.low) && num2(band?.high) ? (band!.low! + band!.high!) / 2 : null);
-    const rc = $derived(o.recurring_costs_estimate ?? null);
-    const outSegments = $derived([
-        { value: bandMid, label: $t('plan.f.statutory'), amount: statutory ?? '—', estimate: true },
-        { value: rc?.strata_levies ?? null, label: $t('plan.f.strata'),
-          amount: money(rc?.strata_levies, $lang) ?? '—', estimate: false },
-        { value: rc?.utilities ?? null, label: $t('plan.f.utilities'),
-          amount: money(rc?.utilities, $lang) ?? '—', estimate: false },
-        { value: rc?.building_insurance ?? null, label: $t('plan.f.insurance'),
-          amount: money(rc?.building_insurance, $lang) ?? '—', estimate: false }
-    ]);
-    const monthly = $derived(money(o.total_monthly_outgoings_estimate, $lang));
 
     // The "graduation" event (point 6) — when LVR crosses the target, the FHG falls away
     // and a no-LMI refinance window opens. Year is PENDING until a loan/savings fact.
@@ -507,15 +488,6 @@
      falling through to the FHB ownership-cost shape below. -->
 
 {:else}
-<!-- ── Outgoings hero ─────────────────────────────────────────────────── -->
-<div class="og-hero">
-    <div class="og-head">
-        <span class="og-label">{$t('plan.f.monthly')}</span>
-        {#if monthly}<span class="og-total">{monthly}</span>{:else}<Pending />{/if}
-    </div>
-    <StackedBar segments={outSegments} {density} />
-</div>
-
 <Field label={$t('plan.f.statutory')} value={statutory} />
 
 {#if o.land_tax_check}
@@ -528,8 +500,6 @@
 {/if}
 
 <Field label={$t('plan.f.maintenance')} value={money(o.maintenance_reserve_target, $lang)} />
-<Field label={$t('plan.f.monthly')} value={money(o.total_monthly_outgoings_estimate, $lang)} />
-<Field label={$t('plan.f.annual')} value={money(o.total_annual_outgoings_estimate, $lang)} />
 
 {#if isOwnershipForeign}
     <Field label={$t('plan.f.vacancy_fee_at_risk')} value={money(o.vacancy_fee_at_risk_amount, $lang)} />
@@ -603,26 +573,6 @@
         font-size: var(--fs-sm);
         color: var(--ink);
         line-height: 1.45;
-    }
-    .og-hero {
-        margin-bottom: 0.6rem;
-    }
-    .og-head {
-        display: flex;
-        align-items: baseline;
-        justify-content: space-between;
-        gap: 0.5rem;
-        margin-bottom: 0.5rem;
-    }
-    .og-label {
-        font-size: var(--fs-sm);
-        color: var(--muted);
-    }
-    .og-total {
-        font-size: var(--fs-lg);
-        font-weight: 700;
-        color: var(--accent);
-        font-variant-numeric: tabular-nums;
     }
     /* The graduation milestone — a calm highlight (the prototype's callout). */
     .og-grad {

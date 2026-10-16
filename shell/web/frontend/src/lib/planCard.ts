@@ -401,9 +401,6 @@ export interface StatutoryBand {
 }
 export interface RecurringCosts {
     statutory_band?: StatutoryBand | null;
-    strata_levies?: number | null;
-    utilities?: number | null;
-    building_insurance?: number | null;
     notes?: LocalizedText[] | null;
 }
 export interface AlertTrigger {
@@ -419,8 +416,6 @@ export interface GraduationMilestone {
 }
 /** ownership_planning → data-table (outcome type `ongoing_obligations`). */
 export interface OngoingObligationsOutcome {
-    total_monthly_outgoings_estimate?: number | null;
-    total_annual_outgoings_estimate?: number | null;
     maintenance_reserve_target?: number | null;
     recurring_costs_estimate?: RecurringCosts | null;
     land_tax_check?: string | null;

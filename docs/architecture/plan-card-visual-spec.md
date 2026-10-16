@@ -97,6 +97,7 @@ Each: the **essence** the section must convey, the **visual**, the **driving fie
  ⚑ armed: LVR<80% → refinance
 ```
 **Driving fields:** `total_monthly_outgoings_estimate`, `total_annual_outgoings_estimate`, `recurring_costs_estimate.{statutory_band, strata_levies, utilities, building_insurance}`, `maintenance_reserve_target`, `alert_triggers_armed[].{trigger, action}`.
+**Superseded 2026-10-16 (behavior 93):** the totals and the strata/utilities/insurance slots are gone from the outcome (the yearly cost to own is the lifecycle statement's Own lines), and so is this hero; the card shows the statutory band, the reserve and the alerts.
 **PENDING:** any null → banded / omitted segment.
 
 ---
