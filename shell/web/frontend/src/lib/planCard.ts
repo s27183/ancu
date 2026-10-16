@@ -961,6 +961,11 @@ export interface PlanCardSummary {
     plan_card_id: string;
     title: string;
     created_at: string;
+    /** The plan's state as the engine resolved it (behavior 84); null when it resolves
+     *  to none, or the engine could not answer the list. */
+    state?: string | null;
+    /** When the plan's figures last changed (a fill, a refine, a refresh); null as above. */
+    updated_at?: string | null;
 }
 
 /** The base components in DAG order — the projection renders in this order. The

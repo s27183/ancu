@@ -1,15 +1,19 @@
 <script lang="ts">
     // Whole lifecycle -> The web frontend -> the planner page (/plan)
     // Behavior 81: the plan has its own page, reached from the home, not from a suburb on
-    // the map. It shows the visitor's newest plan (listPlanCards is newest first), opened
-    // by id — its state the one the engine resolved for it (GET card `state`). With no plan
-    // yet: pick a state, answer the onboarding, and the plan is for that state alone (no
-    // suburb). Until behavior 84 lists every plan, an older suburb-titled plan is still
-    // shown here when it is the newest. A sign-in from the onboarding (the guest's daily
+    // the map. It shows one of the visitor's plans, opened by id — its state the one the
+    // engine resolved for it (GET card `state`). With no plan yet: pick a state, answer the
+    // onboarding, and the plan is for that state alone (no suburb). Behavior 84: the head
+    // lists every saved plan (title, state, last update — older plans titled by a suburb
+    // among them); the one opened is in the address (?plan=<id>), else the newest. A sign-in from the onboarding (the guest's daily
     // cap) or from a guest's plan comes back here (pendingOnboarding.ts, page 'plan').
     // The plan is drawn in the same frame as the map's sheet (.sheet) so its sticky rails,
     // section menu and popups behave as they did there; .page-sheet makes it a page.
+    import { goto } from '$app/navigation';
+    import { page } from '$app/state';
     import { listPlanCards } from '$lib/api';
+    import { clickOutside } from '$lib/actions/clickOutside';
+    import { lang } from '$lib/stores/lang';
     import type { PlanCardSummary } from '$lib/planCard';
     import { AU_STATES, STATE_NAMES, type AuState } from '$lib/map';
     import { session, guest, refreshSession } from '$lib/stores/session';
@@ -32,11 +36,25 @@
         void reload;
         listPlanCards().then((c) => (cards = c));
     });
-    const newest = $derived(cards?.[0] ?? null);
-    // The card's title is a suburb (made from the map) or a state code (made here).
-    const place = $derived(
-        newest ? (isState(newest.title) ? STATE_NAMES[newest.title] : newest.title) : ''
+    // The plan shown: the one the address names, if it is theirs, else the newest.
+    const wanted = $derived(page.url.searchParams.get('plan'));
+    const newest = $derived(
+        cards?.find((c) => c.plan_card_id === wanted) ?? cards?.[0] ?? null
     );
+    // The card's title is a suburb (made from the map) or a state code (made here).
+    const placeOf = (c: PlanCardSummary) => (isState(c.title) ? STATE_NAMES[c.title] : c.title);
+    const place = $derived(newest ? placeOf(newest) : '');
+    // The saved plans list (behavior 84): open in the head, one row per plan.
+    let listOpen = $state(false);
+    const df = $derived(
+        new Intl.DateTimeFormat($lang === 'vi' ? 'vi-VN' : 'en-AU', { dateStyle: 'medium' })
+    );
+    const updatedOn = (c: PlanCardSummary) => df.format(new Date(c.updated_at ?? c.created_at));
+    function openPlan(c: PlanCardSummary) {
+        listOpen = false;
+        if (c.plan_card_id !== newest?.plan_card_id)
+            goto(`/plan?plan=${encodeURIComponent(c.plan_card_id)}`, { noScroll: true, keepFocus: true });
+    }
 
     let pick = $state<AuState>('NSW');
     let planning = $state(false);
@@ -77,9 +95,42 @@
     <div class="sheet page-sheet" role="region" aria-label={$t('planpage.title')}>
         <header class="sheet-head">
             <HomeBack />
-            <div class="title">
+            <div class="title" use:clickOutside={() => (listOpen = false)}>
                 <h2>{$t('planpage.title')}</h2>
-                {#if place}<p class="sub">{place}</p>{/if}
+                {#if cards && cards.length > 1 && newest}
+                    <button
+                        type="button"
+                        class="plan-switch"
+                        aria-expanded={listOpen}
+                        aria-controls="plan-list"
+                        onclick={() => (listOpen = !listOpen)}
+                        >{place}{#if newest.state && newest.state !== newest.title}<span class="state-chip"
+                                >{newest.state}</span
+                            >{/if}<span class="plan-switch-count">{$t('planpage.plans').replace('{n}', String(cards.length))}</span
+                        ><svg viewBox="0 0 12 12" width="10" height="10" aria-hidden="true"
+                            ><path d="M2 4.5 6 8l4-3.5" fill="none" stroke="currentColor" stroke-width="1.6" /></svg
+                        ></button
+                    >
+                    {#if listOpen}
+                        <ul class="plan-list" id="plan-list" aria-label={$t('planpage.saved')}>
+                            {#each cards as c (c.plan_card_id)}
+                                <li>
+                                    <button
+                                        type="button"
+                                        aria-current={c.plan_card_id === newest.plan_card_id}
+                                        onclick={() => openPlan(c)}
+                                    >
+                                        <span class="plan-list-name">{placeOf(c)}</span>
+                                        {#if c.state}<span class="state-chip">{c.state}</span>{/if}
+                                        <span class="plan-list-date"
+                                            >{$t('planpage.updated').replace('{d}', updatedOn(c))}</span
+                                        >
+                                    </button>
+                                </li>
+                            {/each}
+                        </ul>
+                    {/if}
+                {:else if place}<p class="sub">{place}</p>{/if}
             </div>
             {#if sections.ask}
                 <button

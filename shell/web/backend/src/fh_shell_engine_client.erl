@@ -11,7 +11,7 @@
 %% (fetch state, SSE event proxy, messages, suburbs) lands as the shell UX surfaces
 %% are built (8-S1..8-S4). HTTP via inets httpc (started by the shell app).
 
--export([create_plan_card/2, get_plan_card/2, delete_plan_card/2, post_message/3, get_conversation/2,
+-export([create_plan_card/2, get_plan_card/2, plan_card_summaries/2, delete_plan_card/2, post_message/3, get_conversation/2,
          simulate/3,
          refine/3, set_profile_financials/3, set_checklist_status/3,
          attach_property/3, set_transaction_dates/4, upload_document/4, stream_events/3,
@@ -106,6 +106,24 @@ get_plan_card(UserId, PlanCardId) ->
         httpc:request(get, {Url, Headers},
                       [{timeout, ?RPC_TIMEOUT_MS}], [{body_format, binary}]),
     {Status, Resp}.
+
+%% Whole lifecycle -> The shell backend -> each listed plan's state and last update
+%% (behavior 84): GET /api/engine/plan-cards?ids=… for the ids the user owns. Returns
+%% {ok, #{Id => #{state, updated_at}}}, or {error, _} when the engine cannot answer (the
+%% list then goes out without them, never blocked on the engine).
+-spec plan_card_summaries(binary(), [binary()]) -> {ok, map()} | {error, term()}.
+plan_card_summaries(_UserId, []) -> {ok, #{}};
+plan_card_summaries(UserId, Ids) ->
+    Token = fh_shell_engine_jwt:mint(#{user_id => UserId}),
+    Url = base_url() ++ "/plan-cards?ids=" ++ binary_to_list(iolist_to_binary(lists:join(<<",">>, Ids))),
+    Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
+    case httpc:request(get, {Url, Headers}, [{timeout, ?RPC_TIMEOUT_MS}], [{body_format, binary}]) of
+        {ok, {{_, 200, _}, _, Resp}} ->
+            #{<<"plan_cards">> := Rows} = fh_shell_util:json_decode(Resp),
+            {ok, maps:from_list([{Id, R} || #{<<"plan_card_id">> := Id} = R <- Rows])};
+        {ok, {{_, Status, _}, _, _}} -> {error, {engine_status, Status}};
+        {error, Why} -> {error, Why}
+    end.
 
 %% Delete a plan card engine-side — DELETE /api/engine/plan-cards/:id, on behalf of
 %% the user that owns it (behavior 45: the guest purge, fh_shell_guest_purge). 204 on

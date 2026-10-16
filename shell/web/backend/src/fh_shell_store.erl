@@ -20,6 +20,8 @@
 -export([claim_guest_create/3, release_guest_create/3]).
 -export([questions_today/1, guest_creates_today/2, plans_saved/1]).
 -export([expired_guests/1, delete_guest/1, prune_guest_creates/0]).
+-export([list_saved_suburbs/1, save_suburb/4, unsave_suburb/2,
+         saved_seeded/1, seed_saved_suburbs/2]).
 
 %% --- identity (login flow) --------------------------------------------------
 
@@ -54,6 +56,10 @@ claim_guest(GuestId, UserId) ->
                     [GuestId, UserId]),
                 _ = query("UPDATE usage_records SET user_id = $2::uuid WHERE user_id = $1::uuid",
                           [GuestId, UserId]),
+                %% The claimed plans may be older suburb-titled ones: seed their
+                %% suburbs on the next saved-suburbs read (behavior 84).
+                N > 0 andalso query("UPDATE users SET saved_seeded_at = NULL "
+                                    "WHERE user_id = $1::uuid", [UserId]),
                 _ = query("DELETE FROM users WHERE user_id = $1::uuid AND guest", [GuestId]),
                 {ok, N}
         end
@@ -188,6 +194,62 @@ list_plan_card_views(UserId) ->
         [UserId]),
     [#{<<"plan_card_id">> => Id, <<"title">> => Title, <<"created_at">> => Created}
      || {Id, Title, Created} <- Rows].
+
+%% --- saved suburbs (behavior 84) ---------------------------------------------
+
+%% Whole lifecycle -> P-2 -> The shell database -> a saved suburb is a row
+%% The heart on the map's suburb sheet writes one row per (user, suburb)
+%% (006_saved_suburbs.sql); the map's saved list and pulse read them. Newest first.
+-spec list_saved_suburbs(binary()) -> [map()].
+list_saved_suburbs(UserId) ->
+    #{rows := Rows} = query(
+        "SELECT sal_code, name, state, "
+        "to_char(saved_at AT TIME ZONE 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') "
+        "FROM saved_suburbs WHERE user_id = $1::uuid ORDER BY saved_at DESC, name",
+        [UserId]),
+    [#{<<"sal_code">> => Sal, <<"name">> => Name, <<"state">> => St, <<"saved_at">> => At}
+     || {Sal, Name, St, At} <- Rows].
+
+%% Idempotent: saving a suburb already saved keeps its first saved_at.
+-spec save_suburb(binary(), binary(), binary(), binary()) -> ok.
+save_suburb(UserId, Sal, Name, St) ->
+    _ = query("INSERT INTO saved_suburbs (user_id, sal_code, name, state) "
+              "VALUES ($1::uuid, $2, $3, $4) ON CONFLICT DO NOTHING",
+              [UserId, Sal, Name, St]),
+    ok.
+
+-spec unsave_suburb(binary(), binary()) -> ok.
+unsave_suburb(UserId, Sal) ->
+    _ = query("DELETE FROM saved_suburbs WHERE user_id = $1::uuid AND sal_code = $2",
+              [UserId, Sal]),
+    ok.
+
+%% Whether the one-time seed from older plans has run for this user.
+-spec saved_seeded(binary()) -> boolean().
+saved_seeded(UserId) ->
+    case query("SELECT saved_seeded_at IS NOT NULL FROM users WHERE user_id = $1::uuid",
+               [UserId]) of
+        #{rows := [{Seeded}]} -> Seeded;
+        #{rows := []} -> true  % no such user: nothing to seed
+    end.
+
+%% Write the seed's rows and mark the user seeded, in one transaction. Rows is
+%% [{Sal, Name, State}]. Returns how many were new.
+-spec seed_saved_suburbs(binary(), [{binary(), binary(), binary()}]) -> non_neg_integer().
+seed_saved_suburbs(UserId, Rows) ->
+    {ok, New} = pgo:transaction(fun() ->
+        N = lists:sum([begin
+                           #{num_rows := K} = query(
+                               "INSERT INTO saved_suburbs (user_id, sal_code, name, state) "
+                               "VALUES ($1::uuid, $2, $3, $4) ON CONFLICT DO NOTHING",
+                               [UserId, Sal, Name, St]),
+                           K
+                       end || {Sal, Name, St} <- Rows]),
+        _ = query("UPDATE users SET saved_seeded_at = now() WHERE user_id = $1::uuid",
+                  [UserId]),
+        {ok, N}
+    end),
+    New.
 
 %% --- commerce (the §7 pre-call gate) ----------------------------------------
 
