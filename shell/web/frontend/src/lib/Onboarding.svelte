@@ -9,7 +9,7 @@
     // plan-first payload (constraint #1). Mobile-native: one decision per step, big tap
     // targets, the primary action in the thumb zone, calm terminal states (§7.1). The
     // base plan itself renders later, in the Plan tab (8-S4).
-    import { createPlanCard, startGuest, type CreateOutcome, type OnboardingInput } from '$lib/api';
+    import { createPlanCard, getPlanCard, startGuest, type CreateOutcome, type OnboardingInput } from '$lib/api';
     import {
         BUDGET_BANDS,
         buildOnboardingInput,
@@ -238,7 +238,7 @@
         if (phase === 'submitting') {
             inflight?.abort();
             wake?.();
-        }
+        } else if (phase === 'waiting' && createdId) void recheck(createdId);
     }
     onMount(() => {
         document.addEventListener('visibilitychange', onVisible);
@@ -279,19 +279,44 @@
     function stopWait() {
         stream?.close();
         stream = null;
+        clearTimeout(errTimer);
         clearInterval(ticker);
         clearTimeout(slowTimer);
     }
     onDestroy(stopWait);
+
+    // Behavior 97: a phone that locks during the wait freezes the ticker and may close
+    // the stream for good (iOS does; EventSource then stops reconnecting). So the wait
+    // also asks the card itself — GET /api/plan-cards/:id — when the page is shown again,
+    // when the stream errs, and when a reloaded tab resumes it: once the budget
+    // (cash_position) is on the card it lands at once, the remaining lines filled, and
+    // otherwise it listens to the stream afresh (the replay carries what was missed).
+    let filled = new Set<string>();
+    let ready = false;
+    let errTimer: ReturnType<typeof setTimeout> | undefined;
 
     function wait(id: string) {
         stopWait();
         shown = 0;
         slow = false;
         failure = null;
-        const filled = new Set<string>();
-        let ready = false;
+        filled = new Set<string>();
+        ready = false;
         const started = Date.now();
+        listen(id);
+        ticker = setInterval(() => {
+            const byEvents = filled.has('mortgage_finance') ? 2 : filled.size > 0 ? 1 : 0;
+            const byTime = Math.min(WAIT_LINES.length - 1, Math.floor((Date.now() - started) / TIME_STEP_MS));
+            const target = ready ? WAIT_LINES.length : Math.max(byEvents, byTime);
+            if (shown < target) shown += 1;
+            if (shown >= WAIT_LINES.length) land();
+        }, STEP_MS);
+        slowTimer = setTimeout(() => (slow = true), SLOW_MS);
+        void recheck(id, false);
+    }
+
+    function listen(id: string) {
+        stream?.close();
         stream = subscribePlanCard(id, {
             onComponentFilled: (e) => {
                 if (e.property_id) return;
@@ -308,16 +333,23 @@
                 // "Thử lại" is a new tap, for a new plan: it gets its own key.
                 createKey = '';
                 phase = 'failed';
+            },
+            onError: () => {
+                clearTimeout(errTimer);
+                errTimer = setTimeout(() => void recheck(id), 2000);
             }
         });
-        ticker = setInterval(() => {
-            const byEvents = filled.has('mortgage_finance') ? 2 : filled.size > 0 ? 1 : 0;
-            const byTime = Math.min(WAIT_LINES.length - 1, Math.floor((Date.now() - started) / TIME_STEP_MS));
-            const target = ready ? WAIT_LINES.length : Math.max(byEvents, byTime);
-            if (shown < target) shown += 1;
-            if (shown >= WAIT_LINES.length) land();
-        }, STEP_MS);
-        slowTimer = setTimeout(() => (slow = true), SLOW_MS);
+    }
+
+    // Read the card: land if its budget is there; else listen again if the stream died.
+    async function recheck(id: string, relisten = true) {
+        const got = await getPlanCard(id).catch(() => null);
+        if (phase !== 'waiting' || createdId !== id) return;
+        if (got?.kind === 'ok' && got.card.content?.components?.cash_position) {
+            ready = true;
+            shown = WAIT_LINES.length;
+            land();
+        } else if (relisten && document.visibilityState === 'visible') listen(id);
     }
 
     function land() {
