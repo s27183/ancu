@@ -1243,13 +1243,20 @@ const messages = {
         en: 'Choose the state you plan to buy in, then answer a few questions to get your plan.'
     },
     'planpage.state': { vi: 'Bang', en: 'State' },
-    // The saved plans list in the planner's head (behavior 84). {n} plans; {d} a date.
+    // The plans list at /plan (behaviors 84, 96). {d} a date.
     'planpage.saved': { vi: 'Kế hoạch đã lưu', en: 'Saved plans' },
-    // Behavior 86: a second plan from the planner's head, and the way back to the open one.
+    // Behavior 86 (on the list since 96): a new plan, and the way back to the list.
     'planpage.new': { vi: 'Kế hoạch mới', en: 'New plan' },
-    'planpage.back': { vi: 'Quay lại kế hoạch đang xem', en: 'Back to the open plan' },
-    'planpage.plans': { vi: '{n} kế hoạch', en: '{n} plans' },
+    'planpage.back': { vi: 'Quay lại danh sách kế hoạch', en: 'Back to your plans' },
+    // A plan's ‹ (behavior 96), named for readers.
+    'planpage.list': { vi: 'Danh sách kế hoạch', en: 'Your plans' },
     'planpage.updated': { vi: 'Cập nhật {d}', en: 'Updated {d}' },
+    // What a plan is for, on its list card (behavior 96).
+    'planpage.for.live': { vi: 'Để ở', en: 'To live in' },
+    'planpage.for.invest': { vi: 'Đầu tư', en: 'To invest' },
+    'planpage.buyer.first': { vi: 'nhà đầu tiên', en: 'first home' },
+    'planpage.buyer.next': { vi: 'đổi nhà', en: 'next home' },
+    'planpage.buyer.foreign': { vi: 'người mua nước ngoài', en: 'foreign buyer' },
     'planpage.cta': { vi: 'Lập kế hoạch', en: 'Make a plan' },
 
     // News overview sheet (kb-news-feature.md "News overview sheet") — layer 1 of the

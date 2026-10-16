@@ -966,6 +966,15 @@ export interface PlanCardSummary {
     state?: string | null;
     /** When the plan's figures last changed (a fill, a refine, a refresh); null as above. */
     updated_at?: string | null;
+    /** What the plan is for (behavior 96): owner_occupier | investment, and the derived
+     *  mode A–E (A first home, B foreign first home, C investor, D foreign investor,
+     *  E next home); null as above. */
+    intent?: string | null;
+    mode?: string | null;
+    /** The statement's Buy and Own-per-year totals (purchase_journey.lifecycle_budget),
+     *  so a list card's figures equal its statement's; null until the journey fills. */
+    buy?: MoneyRange | null;
+    own_per_year?: MoneyRange | null;
 }
 
 /** The base components in DAG order — the projection renders in this order. The
