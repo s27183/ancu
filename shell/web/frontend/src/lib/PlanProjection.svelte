@@ -31,6 +31,8 @@
         type ComponentEntry,
         type UiTab,
         type ProfileOutcome,
+        type BudgetEnvelopeOutcome,
+        type DepositBounds,
         type MoneyRange,
         type JourneySwimlaneOutcome,
         type PhasePlaybookOutcome,
@@ -136,6 +138,15 @@
     // is Phase-B (per-property), so it's not offered here. State seeds from the suburb the
     // card is projected under; only a CHANGED state is sent as an override.
     let priceInput = $state('');
+    // behavior 101: the deposit the visitor chooses on "Tài chính của bạn" ('' = the plan's
+    // own), and the range the engine refused it against (its 400 names min and max).
+    let depositInput = $state('');
+    let depositRefused = $state<{ min: number; max: number } | null>(null);
+    // An AUD amount as typed — 700000, 700.000 or 700,000 are all the same whole dollars.
+    function aud(s: string): number | null {
+        const d = s.replace(/[^0-9]/g, '');
+        return s.trim() !== '' && d !== '' ? Number(d) : null;
+    }
     // The horizon slider (TW6): the dispose-phase hold years H — a structural what-if at
     // PLAN scope (it re-renders the Full-horizon tab + the Flow dispose column, not just one
     // renderer — preview-is-commit-minus-persistence, place-at-scope-of-effect), so it lives
@@ -172,7 +183,9 @@
     let previewing = $state(false);
     let previewError = $state(false);
     const previewActive = $derived(previewOutcomes !== null);
-    const scenarioActive = $derived(previewActive && priceInput.trim() !== '');
+    // A price or deposit preview is on screen (not the hold chips' own preview).
+    let scenarioPreviewed = $state(false);
+    const scenarioActive = $derived(previewActive && scenarioPreviewed);
     // Save (W8) — the COMMIT half: refine persists the previewed overrides + runs a
     // base_resolver turn whose recomputed components arrive over the SAME SSE. `committing`
     // is set on a 202 so onDone clears the preview once the saved (== previewed) snapshot
@@ -663,36 +676,64 @@
         if (!Array.isArray(r) || r.length !== 2) return null;
         return r[0] === r[1] ? money(r[0], $lang) : moneyRange(r, $lang);
     });
+    const currentPriceIsPoint = $derived.by((): boolean => {
+        const o = firstComponentEntry(components, PROFILE_COMPONENT_IDS)?.outcome as
+            | ProfileOutcome
+            | undefined;
+        const r = o?.target_price_range as MoneyRange | null | undefined;
+        return Array.isArray(r) && r.length === 2 && r[0] === r[1];
+    });
+
+    // behavior 101: the deposit range of the plan on screen (a preview's, once previewed).
+    const depositBounds = $derived(
+        ((viewComponents.cash_position?.outcome as BudgetEnvelopeOutcome | undefined)
+            ?.deposit_bounds ?? null) as DepositBounds | null
+    );
+    const pricePreview = $derived(aud(priceInput));
+    function outright() {
+        const p = aud(priceInput) ?? depositBounds?.price ?? null;
+        if (p !== null) depositInput = String(p);
+    }
 
     // The overrides the current inputs describe — shared by preview and save so the saved
     // scenario is exactly the one on screen. Only a CHANGED state is an override (the
     // suburb's own state is the baseline); a non-positive / blank price is omitted.
     function buildOverrides(): SimulateOverrides {
         const overrides: SimulateOverrides = {};
-        const p = Number(priceInput.replace(/[^0-9.]/g, ''));
-        if (priceInput.trim() !== '' && Number.isFinite(p) && p > 0) overrides.target_price = p;
+        const p = aud(priceInput);
+        if (p !== null && p > 0) overrides.target_price = p;
+        const d = aud(depositInput);
+        if (d !== null) overrides.deposit = d;
         // horizon: only a positive H that differs from the card's baseline (omit 0 — the
         // engine has no "clear horizon" override; absence IS the indefinite default).
         if (horizonValue >= 1 && horizonValue !== baselineHorizon) overrides.horizon = horizonValue;
         return overrides;
     }
 
-    async function runPreview() {
+    async function runPreview(fromSheet = false) {
         if (!cardId) return;
         const overrides = buildOverrides();
         // Nothing varied → clear any prior preview rather than round-trip a no-op.
         if (Object.keys(overrides).length === 0) {
             previewOutcomes = null;
+            scenarioPreviewed = false;
             previewError = false;
             return;
         }
         previewing = true;
         previewError = false;
         saveError = false;
+        depositRefused = null;
         const res = await simulatePlanCard(cardId, overrides);
         previewing = false;
         if (res.kind === 'ok') {
             previewOutcomes = res.outcomes;
+            scenarioPreviewed = overrides.target_price !== undefined || overrides.deposit !== undefined;
+            // behavior 101: "Xem thử" on the finances sheet shows the statement it made
+            // (only that button: the hold chips' preview never moves the visitor)
+            if (fromSheet && page.state.lifecycle === 'finances') history.back();
+        } else if (res.kind === 'invalid' && res.min !== undefined && res.max !== undefined) {
+            depositRefused = { min: res.min, max: res.max };
         } else {
             previewError = true;
             previewOutcomes = null;
@@ -709,11 +750,15 @@
         if (Object.keys(overrides).length === 0) return;
         saving = true;
         saveError = false;
+        depositRefused = null;
         const res = await refinePlanCard(cardId, overrides);
         saving = false;
         if (res.kind === 'accepted') {
             turnDone = false;
             committing = true;
+            if (page.state.lifecycle === 'finances') history.back();
+        } else if (res.kind === 'invalid' && res.min !== undefined && res.max !== undefined) {
+            depositRefused = { min: res.min, max: res.max };
         } else {
             saveError = true;
         }
@@ -724,6 +769,9 @@
         previewError = false;
         saveError = false;
         priceInput = '';
+        depositInput = '';
+        depositRefused = null;
+        scenarioPreviewed = false;
         horizonValue = baselineHorizon;
         holdDefaulted = false;
     }
@@ -972,55 +1020,90 @@
     {/if}
 
 
-<!-- Behavior 95: the price change, beside the statement's hold picker — a new price previews
-     the statement (simulate), "Lưu" saves it to the plan (refine), as the cockpit did. -->
-{#snippet priceControl()}
+<!-- Behavior 101: the price and the deposit, first on "Tài chính của bạn" — "Xem thử"
+     previews the statement (simulate), "Lưu" saves both to the plan (refine). -->
+{#snippet scenario()}
     <div class="pp-price">
         <label class="pp-price-row">
             <span class="pp-price-label">{$t('plan.sheet.price')}</span>
             <input
+                id="fin-price"
                 type="text"
                 inputmode="numeric"
                 bind:value={priceInput}
                 placeholder={currentPriceLabel ?? $t('plan.cash.whatif.placeholder')}
-                onkeydown={(e) => e.key === 'Enter' && runPreview()}
+                onkeydown={(e) => e.key === 'Enter' && runPreview(true)}
             />
         </label>
-        <div class="pp-price-actions">
-            <button type="button" onclick={runPreview} disabled={previewing || priceInput.trim() === ''}
-                >{previewing ? $t('plan.whatif.running') : $t('plan.sheet.price_preview')}</button
-            >
-            {#if scenarioActive}
-                <button type="button" class="primary" onclick={saveScenario} disabled={saving}
-                    >{saving ? $t('plan.whatif.saving') : $t('plan.sheet.price_save')}</button
-                >
-                <button type="button" class="pp-wi-reset" onclick={resetPreview}
-                    >{$t('plan.whatif.reset')}</button
-                >
+        {#if pricePreview}<p class="pp-fin-shown">{$t('plan.fin.shown').replace('{x}', money(pricePreview, $lang) ?? '')}</p>{/if}
+        {#if currentPriceLabel}<p class="pp-fin-hint">{$t(currentPriceIsPoint ? 'plan.fin.price_hint_point' : 'plan.fin.price_hint').replace('{r}', currentPriceLabel)}</p>{/if}
+        <p class="pp-fin-effect">{$t('plan.fin.price_effect')}</p>
+    </div>
+    {#if depositBounds}
+        {@const b = depositBounds}
+        <div class="pp-price">
+            <label class="pp-price-row">
+                <span class="pp-price-label">{$t('plan.fin.deposit')}</span>
+                <input
+                    id="fin-deposit"
+                    type="text"
+                    inputmode="numeric"
+                    bind:value={depositInput}
+                    placeholder={money(b.chosen ?? b.assumed ?? b.min, $lang) ?? ''}
+                    onkeydown={(e) => e.key === 'Enter' && runPreview(true)}
+                />
+                <button type="button" class="pp-fin-outright" onclick={outright}>{$t('plan.fin.outright')}</button>
+            </label>
+            {#if aud(depositInput) !== null}<p class="pp-fin-shown">{$t('plan.fin.shown').replace('{x}', money(aud(depositInput) ?? 0, $lang) ?? '')}</p>{/if}
+            <p class="pp-fin-hint">
+                {$t('plan.fin.deposit_hint')
+                    .replace('{x}', money(b.chosen ?? b.assumed ?? b.min, $lang) ?? '—')
+                    .replace('{min}', money(b.min, $lang) ?? '—')
+                    .replace('{p}', String(b.min_pct))}
+            </p>
+            {#if depositRefused}
+                <p class="pp-wi-error" role="alert">
+                    {$t('plan.fin.deposit_out')
+                        .replace('{min}', money(depositRefused.min, $lang) ?? '—')
+                        .replace('{max}', money(depositRefused.max, $lang) ?? '—')}
+                </p>
             {/if}
+            <p class="pp-fin-effect">{$t('plan.fin.deposit_effect')}</p>
         </div>
-        {#if previewError}
-            <p class="pp-wi-error">{$t('plan.whatif.error')}</p>
-        {/if}
-        {#if saveError}
-            <p class="pp-wi-error">{$t('plan.whatif.saveerror')}</p>
+    {/if}
+    <div class="pp-price-actions">
+        <button type="button" onclick={() => runPreview(true)} disabled={previewing || Object.keys(buildOverrides()).length === 0}
+            >{previewing ? $t('plan.whatif.running') : $t('plan.sheet.price_preview')}</button
+        >
+        {#if scenarioActive}
+            <button type="button" class="primary" onclick={saveScenario} disabled={saving}
+                >{saving ? $t('plan.whatif.saving') : $t('plan.sheet.price_save')}</button
+            >
+            <button type="button" class="pp-wi-reset" onclick={resetPreview}
+                >{$t('plan.whatif.reset')}</button
+            >
         {/if}
     </div>
+    {#if previewError}
+        <p class="pp-wi-error">{$t('plan.whatif.error')}</p>
+    {/if}
+    {#if saveError}
+        <p class="pp-wi-error">{$t('plan.whatif.saveerror')}</p>
+    {/if}
 {/snippet}
 
 <!-- The household figures behind the loan (IC5), closed under the Mua sheet's
      "Tiền bạn có" (behavior 95: the cockpit's other half). -->
-{#snippet finances()}
-    <details class="pp-fin-wrap">
-        <summary>{$t('plan.sheet.finances')}</summary>
+{#snippet household()}
+    <div class="pp-fin-wrap">
+        <h4 class="pp-fin-title">{$t('plan.sheet.finances')}</h4>
+        <p class="pp-fin-effect">{$t('plan.fin.household_effect')}</p>
         <!-- Household financials (IC5): a persisted FACT — income + debts —
              distinct from the what-if scenario above and the client-side
              cash-on-hand. Commits via POST /profile → the engine recomputes
              borrowing capacity → the full-horizon net position arrives over
              the live SSE. Seeded from the engine SOT; full-replace on submit. -->
         <section class="pp-fin">
-            <h4 class="pp-fin-title">{$t('plan.fin.title')}</h4>
-            <p class="pp-fin-intro">{$t('plan.fin.intro')}</p>
             <div class="pp-fin-grid">
                 <label class="pp-ck-field pp-fin-wide">
                     <span class="pp-ck-label">{$t('plan.fin.income')}</span>
@@ -1088,7 +1171,7 @@
             {/if}
             <p class="pp-fin-disclaimer">{$t('plan.fin.disclaimer')}</p>
         </section>
-    </details>
+    </div>
 {/snippet}
 
     {#snippet settleCta()}
@@ -1273,8 +1356,8 @@
                         busy={previewing}
                         onhorizon={chooseHold}
                         planId={cardId}
-                        priceControl={viewingProperty ? undefined : priceControl}
-                        buyExtra={viewingProperty ? undefined : finances}
+                        scenario={viewingProperty ? undefined : scenario}
+                        household={viewingProperty ? undefined : household}
                         onstep={(st) => {
                             leaveLayer();
                             if (flowTab) sub = flowTab.tab_id;

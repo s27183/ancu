@@ -36,14 +36,16 @@
     //            Behavior 96: the plan's state is text in the statement's head, never a
     //            choice — a plan is for one state (81); another state is another plan,
     //            made from the planner's list.
-    //            Behavior 95: the budget is one of the planner's two places, so what the
-    //            cockpit held comes here — the price change beside the hold picker (the
-    //            planner's control, passed in as `priceControl`: preview, then "Lưu" saves
-    //            it to the plan), and "Tiền bạn có" as one row of the Mua sheet: a sum the
-    //            visitor types, set against the cash needed to buy (lifecycle_budget.buy) at
-    //            its low and high ends — "Đủ" or "Còn thiếu <total − sum>" — a subtraction,
-    //            never a figure of its own; kept in this browser per plan (localStorage),
-    //            never sent. The household figures behind the loan sit under it, closed.
+    //            Behavior 101 (over 95): every number the statement rests on has one home,
+    //            "Tài chính của bạn" — a button under the statement opens it as a layer
+    //            (page.state.lifecycle 'finances'): the price and the deposit (the
+    //            planner's `scenario`: "Xem thử" previews, "Lưu" saves to the plan), "Tiền
+    //            bạn có" (a sum the visitor types, set against the cash needed to buy,
+    //            lifecycle_budget.buy, at its low and high ends — "Đủ" or "Còn thiếu
+    //            <total − sum>" — a subtraction, never a figure of its own; kept in this
+    //            browser per plan, localStorage, never sent), then income and debts (the
+    //            planner's `household`). Each field says in one line what it moves. The
+    //            Mua sheet shows the cash verdict, never an input.
     //            A line's detail (LineDetail, the same body PhaseSheet opens over the
     //            checklist) names the checklist steps that link it; choosing one is
     //            `onstep` — the planner opens Hành trình at that step.
@@ -77,8 +79,8 @@
         busy = false,
         onhorizon,
         planId = null,
-        priceControl,
-        buyExtra,
+        scenario,
+        household,
         onstep
     }: {
         components: Record<string, ComponentEntry>;
@@ -91,10 +93,10 @@
         onhorizon: (years: number) => void;
         /** The plan whose "Tiền bạn có" this browser keeps. */
         planId?: string | null;
-        /** The price change, drawn beside the hold picker. */
-        priceControl?: Snippet;
-        /** Drawn on the Mua sheet under "Tiền bạn có". */
-        buyExtra?: Snippet;
+        /** The price and deposit fields with "Xem thử" / "Lưu", drawn first on the finances sheet. */
+        scenario?: Snippet;
+        /** Income and debts, drawn last on the finances sheet. */
+        household?: Snippet;
         /** A step that links a line, chosen from the line's detail: open Hành trình there. */
         onstep?: (s: LineStep) => void;
     } = $props();
@@ -255,7 +257,7 @@
         await tick();
         rootEl?.closest('.body')?.scrollTo({ top: 0 });
     }
-    function openPhase(key: PhaseKey) {
+    function openPhase(key: PhaseKey | 'finances') {
         // over whatever layer the page is on (the planner's list, behavior 96)
         pushState('', { ...page.state, lifecycle: key });
         void toTop();
@@ -305,7 +307,32 @@
     }
 </script>
 
-{#if openGroup}
+{#if openKey === 'finances' && scenario}
+    <!-- behavior 101: "Tài chính của bạn" — price, deposit, cash, income and debts -->
+    <section class="ls ls-fin" data-finances bind:this={rootEl} aria-labelledby="ls-fin-title">
+        <button type="button" class="ls-back" onclick={back}
+            ><span aria-hidden="true">‹</span> {$t('plan.sheet.back')}</button
+        >
+        <h3 id="ls-fin-title" class="ls-title">{$t('plan.fin.title')}</h3>
+        {@render scenario()}
+        <div class="ls-cash ls-fin-field">
+            <label class="ls-cash-row">
+                <span class="ls-label">{$t('plan.sheet.cash')}</span>
+                <input
+                    class="ls-cash-in"
+                    type="text"
+                    inputmode="numeric"
+                    bind:value={cashInput}
+                    oninput={keepCash}
+                    placeholder={$t('plan.cash.whatif.placeholder')}
+                />
+            </label>
+            <p class="ls-fin-effect">{$t('plan.fin.cash_effect')}</p>
+            {#if cash !== null && budget?.buy}{@render verdict(budget.buy, cash)}{/if}
+        </div>
+        {#if household}{@render household()}{/if}
+    </section>
+{:else if openGroup}
     {@const g = openGroup}
     {@const inTotal = g.lines.filter((e) => counted(e, g.key))}
     {@const rest = g.lines.filter((e) => !counted(e, g.key))}
@@ -378,30 +405,12 @@
                 <span class="ls-row-label">{$t('plan.sheet.cash_to_buy')}</span>
                 <span class="ls-row-fig">{@render ends(need)}</span>
             </div>
-            <div class="ls-cash">
-                <label class="ls-cash-row">
-                    <span class="ls-label">{$t('plan.sheet.cash')}</span>
-                    <input
-                        class="ls-cash-in"
-                        type="text"
-                        inputmode="numeric"
-                        bind:value={cashInput}
-                        oninput={keepCash}
-                        placeholder={$t('plan.cash.whatif.placeholder')}
-                    />
-                </label>
-                {#if cash !== null}
-                    <dl class="ls-cash-verdict" aria-live="polite">
-                        {#each [[$t('plan.sheet.cash_low'), need[0]], [$t('plan.sheet.cash_high'), need[1]]] as [lbl, n] (lbl)}
-                            <div class:ls-short={cash < Number(n)}>
-                                <dt>{lbl}</dt>
-                                <dd>{cashVerdict(Number(n), cash)}</dd>
-                            </div>
-                        {/each}
-                    </dl>
-                {/if}
-            </div>
-            {#if buyExtra}{@render buyExtra()}{/if}
+            {#if cash !== null}
+                <div class="ls-cash">
+                    <span class="ls-label">{$t('plan.sheet.cash')} · {money(cash, $lang)}</span>
+                    {@render verdict(need, cash)}
+                </div>
+            {/if}
         {/if}
 
         {#if rest.length > 0 || waiting.length > 0 || extra.length > 0}
@@ -465,7 +474,11 @@
                 >
             {/each}
         </div>
-        {#if priceControl}{@render priceControl()}{/if}
+        {#if scenario}
+            <button type="button" class="ls-fin-open" data-finances-open onclick={() => openPhase('finances')}
+                >{$t('plan.fin.title')} <span class="ls-caret" aria-hidden="true">›</span></button
+            >
+        {/if}
 
         {#if intoHome?.deposit || budget?.buy}
             <!-- behavior 98: not costs — what goes into the home, and the cash to buy -->
@@ -492,6 +505,17 @@
         {/if}
     </section>
 {/if}
+
+{#snippet verdict(need: MoneyRange, have: number)}
+    <dl class="ls-cash-verdict" aria-live="polite">
+        {#each [[$t('plan.sheet.cash_low'), need[0]], [$t('plan.sheet.cash_high'), need[1]]] as [lbl, n] (lbl)}
+            <div class:ls-short={have < Number(n)}>
+                <dt>{lbl}</dt>
+                <dd>{cashVerdict(Number(n), have)}</dd>
+            </div>
+        {/each}
+    </dl>
+{/snippet}
 
 {#snippet total(key: PhaseKey, r: MoneyRange | null, perYear: MoneyRange | null)}
     {#if r}
@@ -674,6 +698,16 @@
         background: var(--surface); color: var(--ink);
     }
     .ls-cash-verdict { margin: 0; display: grid; gap: 0.25rem; }
+    /* behavior 101: the finances sheet's opener under the statement, and its fields */
+    .ls-fin-open {
+        display: flex; justify-content: space-between; align-items: center; width: 100%;
+        margin-top: 0.75rem; padding: 0.7rem 0.9rem; font: inherit; font-weight: 600;
+        color: var(--ink); background: var(--surface);
+        border: 1px solid var(--border); border-radius: 0.75rem; cursor: pointer; text-align: left;
+    }
+    .ls-fin-open:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .ls-fin { display: grid; gap: 1rem; }
+    .ls-fin-effect { margin: 0.25rem 0 0; font-size: 0.85rem; color: var(--muted); }
     .ls-cash-verdict > div { display: flex; justify-content: space-between; gap: 0.75rem; }
     .ls-cash-verdict dt { color: var(--muted); font-size: var(--fs-sm, 0.875rem); }
     .ls-cash-verdict dd { margin: 0; font-weight: 700; color: var(--success); font-variant-numeric: tabular-nums; }

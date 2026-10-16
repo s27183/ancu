@@ -62,9 +62,6 @@ import kb_compiler  # noqa: E402 — path injected above
 # does reach the user some other way, or is genuinely internal/cross-component
 # wiring that carries no independent display value — never to silence a real gap.
 ALLOWLIST = {
-    # behavior 101 step 1 (2026-10-16): the engine emits deposit_bounds; step 2's finances
-    # sheet reads it (and this entry goes in that commit).
-    ("cash_position", "deposit_bounds"): "read by the finances sheet, behavior 101 step 2",
     # behavior 83 (2026-10-16): each owner's fee lines still waiting on an input reach the
     # screen through purchase_journey's lifecycle_budget.pending, which folds them in
     # (fh_engine_journey:harvest_fee_pending/1) and the lifecycle sheet lists.

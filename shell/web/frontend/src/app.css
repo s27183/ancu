@@ -2651,7 +2651,7 @@ main {
     opacity: 0.6;
     cursor: default;
 }
-/* Behavior 95: the statement's price change, beside the hold picker. */
+/* Behavior 101: the price and deposit fields on "Tài chính của bạn". */
 .pp-price {
     display: grid;
     gap: 0.5rem;
@@ -2692,12 +2692,36 @@ main {
     padding: 0.4rem 0.85rem;
     font-size: var(--fs-sm);
 }
-/* The household figures under "Tiền bạn có", closed until asked for. */
-.pp-fin-wrap > summary {
-    cursor: pointer;
+/* Behavior 101: a field's figure read back, its hint and its one-line effect. */
+.pp-fin-shown {
+    margin: 0;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
     font-size: var(--fs-sm);
+    color: var(--ink);
+}
+.pp-fin-hint,
+.pp-fin-effect {
+    margin: 0;
+    font-size: var(--fs-sm);
+    color: var(--muted);
+}
+.pp-fin-outright {
+    flex: none;
+    border: 1px solid var(--border);
+    background: var(--surface);
     color: var(--accent);
-    padding: 0.25rem 0;
+    border-radius: var(--radius-sm);
+    padding: 0.4rem 0.7rem;
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    cursor: pointer;
+}
+.pp-fin-wrap {
+    display: grid;
+    gap: 0.5rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border);
 }
 .pp-wi-reset {
     flex: none;

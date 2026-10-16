@@ -268,13 +268,30 @@ export interface SimulateOverrides {
     target_price?: number;
     state?: string;
     horizon?: number;
+    /** behavior 101: the deposit in AUD, from the plan's floor up to the price (outright);
+     *  outside that the engine answers 400 deposit_out_of_bounds with its min and max. */
+    deposit?: number;
+}
+
+/** A 400's reason: a deposit outside the plan's range names that range. */
+export interface InvalidOverride {
+    min?: number;
+    max?: number;
+}
+async function invalidOf(res: Response): Promise<InvalidOverride> {
+    try {
+        const b = (await res.json()) as { error?: string; min?: number; max?: number };
+        return b.error === 'deposit_out_of_bounds' ? { min: b.min, max: b.max } : {};
+    } catch {
+        return {};
+    }
 }
 
 /** A discriminated preview outcome. `invalid` is the engine's 400 for a rejected
  *  override (e.g. property_type, or an unknown key) — surfaced calmly, not thrown. */
 export type SimulateOutcome =
     | { kind: 'ok'; outcomes: Record<string, Record<string, unknown>> }
-    | { kind: 'invalid' }
+    | ({ kind: 'invalid' } & InvalidOverride)
     | { kind: 'not_found' }
     | { kind: 'auth_required' }
     | { kind: 'error'; status: number };
@@ -295,7 +312,7 @@ export async function simulatePlanCard(
         const body = (await res.json()) as { outcomes: Record<string, Record<string, unknown>> };
         return { kind: 'ok', outcomes: body.outcomes ?? {} };
     }
-    if (res.status === 400) return { kind: 'invalid' };
+    if (res.status === 400) return { kind: 'invalid', ...(await invalidOf(res)) };
     if (res.status === 404) return { kind: 'not_found' };
     if (res.status === 401) return { kind: 'auth_required' };
     return { kind: 'error', status: res.status };
@@ -306,7 +323,7 @@ export async function simulatePlanCard(
 export type RefineOutcome =
     | { kind: 'accepted'; turnId: string }
     | { kind: 'busy' }
-    | { kind: 'invalid' }
+    | ({ kind: 'invalid' } & InvalidOverride)
     | { kind: 'not_found' }
     | { kind: 'auth_required' }
     | { kind: 'error'; status: number };
@@ -330,7 +347,7 @@ export async function refinePlanCard(
         return { kind: 'accepted', turnId: body.turn_id };
     }
     if (res.status === 409) return { kind: 'busy' };
-    if (res.status === 400) return { kind: 'invalid' };
+    if (res.status === 400) return { kind: 'invalid', ...(await invalidOf(res)) };
     if (res.status === 404) return { kind: 'not_found' };
     if (res.status === 401) return { kind: 'auth_required' };
     return { kind: 'error', status: res.status };

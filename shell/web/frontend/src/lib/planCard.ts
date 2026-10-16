@@ -235,9 +235,23 @@ export interface FeeDetail {
 }
 
 /** cash_position → calculator (outcome type `budget_envelope`). */
+/** The deposit the plan can take (behavior 101): from the mode's floor (`min`, `min_pct`
+ *  of the price) to the whole price (`max`, buying outright); `assumed` is the plan's own
+ *  deposit, `chosen` the one the visitor saved (or previewed). */
+export interface DepositBounds {
+    min: number;
+    max: number;
+    min_pct: number;
+    assumed: number | null;
+    chosen: number | null;
+    price: number;
+}
+
 export interface BudgetEnvelopeOutcome {
     /** The financial spine: every money flow across the lifecycle phases. */
     cash_events?: CashEvent[] | null;
+    /** behavior 101: the deposit range "Tài chính của bạn" offers. */
+    deposit_bounds?: DepositBounds | null;
     stamp_duty?: StampDuty | null;
     // NEED side (Decision 9) — real at base.
     deposit?: Deposit | null;
