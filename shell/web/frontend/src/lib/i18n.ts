@@ -1241,6 +1241,9 @@ const messages = {
     'planpage.state': { vi: 'Bang', en: 'State' },
     // The saved plans list in the planner's head (behavior 84). {n} plans; {d} a date.
     'planpage.saved': { vi: 'Kế hoạch đã lưu', en: 'Saved plans' },
+    // Behavior 86: a second plan from the planner's head, and the way back to the open one.
+    'planpage.new': { vi: 'Kế hoạch mới', en: 'New plan' },
+    'planpage.back': { vi: 'Quay lại kế hoạch đang xem', en: 'Back to the open plan' },
     'planpage.plans': { vi: '{n} kế hoạch', en: '{n} plans' },
     'planpage.updated': { vi: 'Cập nhật {d}', en: 'Updated {d}' },
     'planpage.cta': { vi: 'Lập kế hoạch', en: 'Make a plan' },
