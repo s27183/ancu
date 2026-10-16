@@ -211,6 +211,8 @@
                 choosing = false;
                 reload++;
                 if (id) goto(`/plan?plan=${encodeURIComponent(id)}`, { noScroll: true });
+                // The new plan opens at its top (behavior 92), not where the last one was read.
+                toTop();
                 // A signed-out create made this browser a guest (behavior 45): re-read
                 // /api/me so the plan shows the 7-day notice.
                 void refreshSession();

@@ -22,6 +22,9 @@
     import { lang } from '$lib/stores/lang';
     import { sheetMotion, scrimMotion } from '$lib/sheetMotion';
     import type { OnboardingAnswers } from '$lib/pendingOnboarding';
+    import { subscribePlanCard, type PlanCardStream } from '$lib/planCardStream';
+    import { describeFailure, type FailureView } from '$lib/turnFailure';
+    import { onDestroy } from 'svelte';
 
     let { stateCode, suburbName, suburbSal, initial, onclose, onsignin, oncreated }: {
         stateCode: string;
@@ -58,7 +61,7 @@
         };
     }
     let createdId = '';
-    let phase = $state<'form' | 'submitting' | 'created' | 'auth' | 'limit' | 'error'>('form');
+    let phase = $state<'form' | 'submitting' | 'waiting' | 'failed' | 'auth' | 'limit' | 'error'>('form');
     let guestLimit = $state(3);
 
     // The gate branches on intent (mode-c-wedge.md P5-activate) AND, orthogonally, on
@@ -133,22 +136,98 @@
             buildOnboardingInput(stateCode, suburbName, suburbSal, band, intent, isForeign, buyerStage)
         );
         if (outcome.kind === 'guest_limit') guestLimit = outcome.limit;
-        if (outcome.kind === 'created') createdId = outcome.result.plan_card_id;
+        if (outcome.kind === 'created') {
+            createdId = outcome.result.plan_card_id;
+            phase = 'waiting';
+            wait(createdId);
+            return;
+        }
         phase =
-            outcome.kind === 'created' ? 'created'
-            : outcome.kind === 'guest_limit' ? 'limit'
+            outcome.kind === 'guest_limit' ? 'limit'
             : outcome.kind === 'auth_required' ? 'auth'
             : 'error';
     }
 
-    // ✕ once the plan exists is the same exit as the "created" button (behavior 28): the
-    // parent reloads the sheet's plan on oncreated only, so closing with ✕ after a create
-    // left the new plan missing until a page refresh (read 2026-10-08, +page.svelte).
+    // The wait after a create (behavior 92).
+    // Goal property: a visitor sees the plan being made, then lands on it with no tap.
+    // Invariant: the dialog lands on the plan once its budget (cash_position) has
+    //   arrived, or the turn completed; never earlier, and never stuck: a failed turn
+    //   says so with "Thử lại" (when describeFailure allows one), and past 20 s it says
+    //   it is taking longer and offers to open the plan anyway.
+    // Component: this dialog, on the new card's own stream (planCardStream), apart from
+    //   the projection's — it only counts arrivals, it renders nothing of them.
+    // Capability: the engine's quick pass (behavior 94) fills every base component,
+    //   cash_position included, within ~1 s, then the full pass refills them and
+    //   turn_completed follows 13-30 s later; component_filled may come twice per id.
+    //   The three progress lines step at most one per STEP_MS, so a 1 s plan still shows
+    //   each line rather than a flash; without arrivals they step on time alone up to the
+    //   last, which only the budget's arrival passes.
+    const STEP_MS = 700;
+    const TIME_STEP_MS = 4000;
+    const SLOW_MS = 20_000;
+    const WAIT_LINES = ['onboarding.wait.buy', 'onboarding.wait.hold', 'onboarding.wait.sell'] as const;
+    let shown = $state(0);
+    let slow = $state(false);
+    let failure = $state.raw<FailureView | null>(null);
+    let stream: PlanCardStream | null = null;
+    let ticker: ReturnType<typeof setInterval> | undefined;
+    let slowTimer: ReturnType<typeof setTimeout> | undefined;
+
+    function stopWait() {
+        stream?.close();
+        stream = null;
+        clearInterval(ticker);
+        clearTimeout(slowTimer);
+    }
+    onDestroy(stopWait);
+
+    function wait(id: string) {
+        stopWait();
+        shown = 0;
+        slow = false;
+        failure = null;
+        const filled = new Set<string>();
+        let ready = false;
+        const started = Date.now();
+        stream = subscribePlanCard(id, {
+            onComponentFilled: (e) => {
+                if (e.property_id) return;
+                filled.add(e.component_id);
+                if (e.component_id === 'cash_position') ready = true;
+            },
+            onDone: (failed) => {
+                if (failed === null || ready) {
+                    ready = true;
+                    return;
+                }
+                stopWait();
+                failure = describeFailure(failed);
+                phase = 'failed';
+            }
+        });
+        ticker = setInterval(() => {
+            const byEvents = filled.has('mortgage_finance') ? 2 : filled.size > 0 ? 1 : 0;
+            const byTime = Math.min(WAIT_LINES.length - 1, Math.floor((Date.now() - started) / TIME_STEP_MS));
+            const target = ready ? WAIT_LINES.length : Math.max(byEvents, byTime);
+            if (shown < target) shown += 1;
+            if (shown >= WAIT_LINES.length) land();
+        }, STEP_MS);
+        slowTimer = setTimeout(() => (slow = true), SLOW_MS);
+    }
+
+    function land() {
+        stopWait();
+        oncreated(createdId);
+    }
+
+    // ✕ once the plan exists lands on it, as the wait would (behavior 28): the parent
+    // reloads the sheet's plan on oncreated only, so closing with ✕ after a create left
+    // the new plan missing until a page refresh (read 2026-10-08, +page.svelte).
     // What the plan is for: the suburb on the map, the state on the planner page.
     const place = $derived(suburbName || STATE_NAMES[stateCode as AuState] || stateCode);
 
     function close() {
-        if (phase === 'created') oncreated(createdId);
+        if (phase === 'waiting' || phase === 'failed') land();
         else onclose();
     }
 </script>
@@ -162,11 +241,40 @@
         >
     </header>
 
-    {#if phase === 'created'}
+    {#if phase === 'waiting'}
+        <div class="ob-terminal ob-wait" role="status" aria-live="polite">
+            <svg class="ob-house" viewBox="0 0 120 104" aria-hidden="true">
+                <path class="roof" d="M10 50 60 10l50 40" />
+                <rect class="wall" x="22" y="44" width="76" height="54" rx="4" />
+                {#each WAIT_LINES as key, i (key)}
+                    <rect class="line-track" x="34" y={56 + i * 13} width="52" height="6" rx="3" />
+                    <rect
+                        class="line-fill"
+                        class:done={shown > i}
+                        class:now={shown === i}
+                        x="34"
+                        y={56 + i * 13}
+                        width="52"
+                        height="6"
+                        rx="3"
+                    />
+                {/each}
+            </svg>
+            <h3>{$t('onboarding.wait.title')}</h3>
+            <p class="ob-wait-line">{$t(WAIT_LINES[Math.min(shown, WAIT_LINES.length - 1)])}</p>
+            {#if slow}
+                <p>{$t('onboarding.wait.slow')}</p>
+                <button type="button" class="primary" onclick={land}>{$t('onboarding.wait.open')}</button>
+            {/if}
+        </div>
+    {:else if phase === 'failed' && failure}
         <div class="ob-terminal">
-            <h3>{$t('onboarding.created.title')}</h3>
-            <p>{$t('onboarding.created.body')}</p>
-            <button type="button" class="primary" onclick={() => oncreated(createdId)}>{$t('onboarding.created.cta')}</button>
+            <p class="ob-error">{$t(failure.key)}</p>
+            {#if failure.retry}
+                <button type="button" class="primary" onclick={submit}>{$t('onboarding.retry')}</button>
+            {:else}
+                <button type="button" class="primary" onclick={land}>{$t('onboarding.wait.open')}</button>
+            {/if}
         </div>
     {:else if phase === 'limit'}
         <div class="ob-terminal">
