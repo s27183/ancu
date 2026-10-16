@@ -45,7 +45,8 @@ handle_get(Req0, State) ->
                              end,
                     Body = Card#{<<"event_cursor">> => Cursor,
                                  <<"turn_running">> => Running,
-                                 <<"ui_tabs">> => UiTabs},
+                                 <<"ui_tabs">> => UiTabs,
+                                 <<"state">> => card_state(PlanCardId)},
                     {ok, fh_engine_http:reply_json(200, Body, Req0), State};
                 {error, not_found} ->
                     {ok, fh_engine_http:reply_json(404,
@@ -53,6 +54,22 @@ handle_get(Req0, State) ->
             end;
         {error, Status, Body} ->
             {ok, fh_engine_http:reply_json(Status, Body, Req0), State}
+    end.
+
+%% Whole lifecycle -> The engine -> the card names its state
+%% Behavior 81: the planner page opens a plan without a suburb, so it cannot take the
+%% state from a picked suburb as the map's sheet did; the plan's own state is the one the
+%% fills used — projection_state/1 of the onboarding, the saved scenario's when there is
+%% one (get_card_rerun_context/1 overlays it). null when it resolves to none (ALL scope
+%% with no suburb), and the page then lets the visitor pick.
+card_state(PlanCardId) ->
+    case fh_engine_store:get_card_rerun_context(PlanCardId) of
+        {ok, #{facts := Facts}} ->
+            case fh_engine_store:projection_state(maps:get(<<"onboarding">>, Facts, #{})) of
+                undefined -> null;
+                S -> S
+            end;
+        _ -> null
     end.
 
 handle_delete(Req0, State) ->
