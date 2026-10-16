@@ -7,6 +7,7 @@
     // the property-agnostic BASE components, identical across suburbs.
     import { onMount } from 'svelte';
     import { page } from '$app/state';
+    import { pushState } from '$app/navigation';
     import { t } from '$lib/i18n';
     import Termed from '$lib/Termed.svelte';
     import { lang } from '$lib/stores/lang';
@@ -51,6 +52,7 @@
     import OverviewCard from '$lib/renderers/OverviewCard.svelte';
     import FlowView from '$lib/renderers/FlowView.svelte';
     import LifecycleSheet from '$lib/LifecycleSheet.svelte';
+    import PlanHub from '$lib/PlanHub.svelte';
     import Tabs from '$lib/Tabs.svelte';
     import Chat from '$lib/Chat.svelte';
     import QaIntro from '$lib/QaIntro.svelte';
@@ -95,8 +97,7 @@
 
     // Behavior 95: the budget is one sheet chain (the statement → phase sheets → line
     // details, LifecycleSheet); the cockpit, table, breakdown and full-horizon sub-tabs are gone.
-    // A statement line's detail opens Hành trình at a step that links it (`flowAt`).
-    let flowAt = $state<{ phase: string; action: string } | null>(null);
+    // A statement line's detail opens Hành trình at a step that links it (openStep).
 
     let phase = $state<'loading' | 'ready' | 'no_card' | 'error'>('loading');
     let components = $state<Record<string, ComponentEntry>>({});
@@ -122,9 +123,9 @@
 
     // Behavior 55: the head's "Hỏi AI" (the plan's one way to the assistant since behavior
     // 93 took the foot bar off) opens it; the page scrolls its body to the top.
-    function openQa() {
-        leaveLayer();
-        sub = 'qa';
+    async function openQa() {
+        await leaveLayer();
+        enter('qa');
     }
 
     let stream: PlanCardStream | null = null;
@@ -576,14 +577,52 @@
     //            neither (an engine before ui_tabs) lists its tabs as before, so a version
     //            skew never blanks the menu.
     // Capability: picking Ngân sách from any sheet returns to the statement (leaveLayer pops
-    //            an open phase sheet); picking Hành trình opens the swimlane.
+    //            an open phase sheet or step); picking Hành trình opens the swimlane.
     const sectionReg = useSections();
     const budgetTab = $derived(uiTabs.find((tb) => tb.interactive));
     const flowTab = $derived(uiTabs.find((tb) => tb.kind === 'flow'));
-    // A pick from the menu leaves an open phase sheet of the statement (its history entry,
-    // LifecycleSheet), so the budget's first sheet is the statement again.
-    function leaveLayer() {
-        if (page.state.lifecycle) history.back();
+
+    // Whole lifecycle -> bilingual; information as is -> the web frontend -> the plan's levels
+    // Goal:      behavior 106 (Son 2026-10-17, his friend could not find her way back to the
+    //            overview): a plan opens on its hub (PlanHub: a Ngân sách card with the total
+    //            over the hold, a Hành trình card with steps done of all and the next one);
+    //            a card opens that sheet. Every level is one history entry — the hub is the
+    //            plan's own (page.state.overList); Ngân sách, Hành trình and the assistant
+    //            push `planView`; a phase sheet `lifecycle` (LifecycleSheet); a step of
+    //            Hành trình `flowPhase` (FlowView). The plan head's one back button
+    //            (routes/plan/+page.svelte) names the level above and is history.back(), so
+    //            it, the browser's back and a swipe cannot disagree — the button is the way
+    //            back (Son: the iPhone swipe is hard to use, never relied on).
+    // Invariant: the hub computes nothing — its total is lifecycle_budget.costs_total (the
+    //            statement's bottom line) and its count the playbook's actions under the
+    //            card's checklist_status (every blueprint carries a playbook: 30–35 steps,
+    //            measured 2026-10-17). A card with neither tab has no hub (version skew).
+    // Capability: the floating menu switches Ngân sách ↔ Hành trình in place (sub), so back
+    //            from either goes to the hub; it is not drawn on the hub, whose cards are the
+    //            way in.
+
+    // A pick from the menu, or "Hỏi AI", leaves an open phase sheet or step first, and
+    // waits for that back to land so a push that follows lands over the sheet, not under it.
+    function leaveLayer(): Promise<void> {
+        if (!page.state.lifecycle && !page.state.flowPhase) return Promise.resolve();
+        return new Promise((done) => {
+            addEventListener('popstate', () => setTimeout(done, 0), { once: true });
+            history.back();
+        });
+    }
+    // Behavior 106: the hub, or a view over it. A card with neither the budget nor the
+    // flow tab (an engine before ui_tabs) has no hub: its tabs show as before.
+    const hasHub = $derived(!!(budgetTab || flowTab));
+    const onHub = $derived(hasHub && !page.state.planView);
+    function enter(tab: string) {
+        if (hasHub && !page.state.planView) pushState('', { ...page.state, planView: true });
+        sub = tab;
+    }
+    // A line's detail names a step: Hành trình at that step, one level under the sheet.
+    async function openStep(st: { phase: string; id: string }) {
+        await leaveLayer();
+        if (flowTab) sub = flowTab.tab_id;
+        pushState('', { ...page.state, flowPhase: st.phase, flowAction: st.id });
     }
     const sectionGroups = $derived.by<SectionGroup[]>(() => {
         if (railTabs.length === 0) return [];
@@ -592,9 +631,8 @@
             label: $t(`plan.ltab.${tb.tab_id}` as 'plan.ltab.overview'),
             icon,
             active: sub === tb.tab_id,
-            select: () => {
-                leaveLayer();
-                flowAt = null;
+            select: async () => {
+                await leaveLayer();
                 sub = tb.tab_id;
             }
         });
@@ -614,10 +652,11 @@
     });
     $effect(() => {
         if (!sectionReg) return;
-        sectionReg.plan = sectionGroups;
-        sectionReg.current = sectionCurrent;
+        // behavior 106: the hub's cards are the way in; the menu is for the sheets under it
+        sectionReg.plan = onHub ? [] : sectionGroups;
+        sectionReg.current = onHub ? '' : sectionCurrent;
         // The sheet head's "Hỏi AI" (behavior 75): offered where the ask bar is.
-        sectionReg.ask = sub !== 'qa' && uiTabs.length > 0 ? openQa : null;
+        sectionReg.ask = (onHub || sub !== 'qa') && uiTabs.length > 0 ? openQa : null;
     });
     $effect(() => {
         const reg = sectionReg;
@@ -1280,7 +1319,7 @@
          tab (the financial spine is where you reason about money), but a scenario re-renders
          EVERY tab — so on the other tabs, signpost that the figures are a preview, with a
          reset. The calculator tab shows the full cockpit instead (below). -->
-    {#if scenarioActive && sub !== 'qa' && !activeTab?.interactive}
+    {#if scenarioActive && (onHub || (sub !== 'qa' && !activeTab?.interactive))}
         <div class="pp-whatif active">
             <p class="pp-wi-banner">{$t('plan.whatif.banner')}</p>
             <button type="button" class="pp-wi-reset" onclick={resetPreview}
@@ -1290,7 +1329,17 @@
     {/if}
 
     <div class="pp-subcontent">
-        {#if sub === 'qa'}
+        {#if onHub}
+            <PlanHub
+                components={viewComponents}
+                {checklistStatus}
+                filling={running}
+                hasBudget={!!budgetTab}
+                hasFlow={!!flowTab}
+                onbudget={() => budgetTab && enter(budgetTab.tab_id)}
+                onflow={() => flowTab && enter(flowTab.tab_id)}
+            />
+        {:else if sub === 'qa'}
             <!-- Chat runs over the FILLED card; the engine 409s a qa turn while the base
                  turn is still running, so gate it on the base turn having finished. -->
             {#if $guest}
@@ -1322,7 +1371,6 @@
                 {checklistStatus}
                 onToggle={toggleChecklist}
                 filling={running}
-                openAt={flowAt}
             />
             <!-- Whole lifecycle -> P-4 · The engine is coupled to no shell -> The web
                  frontend -> settlement_prep under the swimlane (behavior 25, #35)
@@ -1365,11 +1413,7 @@
                         planId={cardId}
                         scenario={viewingProperty ? undefined : scenario}
                         household={viewingProperty ? undefined : household}
-                        onstep={(st) => {
-                            leaveLayer();
-                            if (flowTab) sub = flowTab.tab_id;
-                            flowAt = { phase: st.phase, action: st.id };
-                        }}
+                        onstep={openStep}
                     />
                 {:else if running}
                     <p class="pp-computing"><span class="pp-spinner" aria-hidden="true"></span>{$t('plan.computing')}</p>
@@ -1432,7 +1476,7 @@
          one line since behavior 93 (the full notice stays on the assistant's tab). Since
          behavior 95 it sits at the foot, over the disclaimer, so nothing but the head is
          above the plan's first sheet. -->
-    {#if $guest && sub !== 'qa'}
+    {#if $guest && (onHub || sub !== 'qa')}
         <p class="pp-guest pp-guest-line" role="note">
             {$t('guest.notice_short')} ·
             <button type="button" class="pp-guest-signin" onclick={() => loginOpen.set(true)}
