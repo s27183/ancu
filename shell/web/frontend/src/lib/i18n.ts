@@ -145,8 +145,8 @@ const messages = {
         en: 'Preparing your plan'
     },
     'onboarding.created.body': {
-        vi: 'Kế hoạch cơ bản đang được tính toán và sẽ xuất hiện trong mục Kế hoạch.',
-        en: 'Your base plan is being computed and will appear in the Plan tab.'
+        vi: 'Kế hoạch cơ bản đang được tính toán và sẽ hiện ra trên trang Kế hoạch ngân sách.',
+        en: 'Your base plan is being computed and will appear on the budget plan page.'
     },
     'onboarding.created.cta': { vi: 'Xem kế hoạch', en: 'View your plan' },
     'onboarding.auth.title': { vi: 'Đăng nhập để lưu kế hoạch', en: 'Sign in to save your plan' },
@@ -1218,6 +1218,25 @@ const messages = {
     // with a CNBC/Bloomberg-style continuous scroll — distinct aria label from the
     // per-card ticker since this one is unfiltered, not "plan-relevant").
     'home.news.aria': { vi: 'Tin tức mới nhất', en: 'Latest updates' },
+    // The home's two ways in (behavior 81): plan a budget, or explore the map.
+    'home.plan.title': { vi: 'Lập kế hoạch ngân sách', en: 'Plan your budget' },
+    'home.plan.body': {
+        vi: 'Theo bang: chi phí khi mua, khi sở hữu và khi bán nhà.',
+        en: 'By state: what buying, owning and selling a home cost.'
+    },
+    'home.explore.title': { vi: 'Khám phá khu vực', en: 'Explore suburbs' },
+    'home.explore.body': {
+        vi: 'Xem các khu vực trên bản đồ: cộng đồng người Việt, dân số, kinh tế, an ninh.',
+        en: 'See suburbs on the map: Vietnamese community, population, income, crime.'
+    },
+    'nav.home': { vi: 'Trang chủ', en: 'Home' },
+    'planpage.title': { vi: 'Kế hoạch ngân sách', en: 'Budget plan' },
+    'planpage.intro': {
+        vi: 'Chọn bang bạn định mua nhà, rồi trả lời vài câu hỏi để có kế hoạch.',
+        en: 'Choose the state you plan to buy in, then answer a few questions to get your plan.'
+    },
+    'planpage.state': { vi: 'Bang', en: 'State' },
+    'planpage.cta': { vi: 'Lập kế hoạch', en: 'Make a plan' },
 
     // News overview sheet (kb-news-feature.md "News overview sheet") — layer 1 of the
     // two-layer homepage news flow: tapping the ticker opens this categorized, scrollable
@@ -1241,8 +1260,8 @@ const messages = {
         en: 'Owning real estate in Australia — with a clear plan'
     },
     'intro.lede': {
-        vi: `${BRAND} lập kế hoạch ngân sách cho cả hành trình bất động sản của bạn tại Úc — mua, giữ, bán — cho từng khu vực cụ thể, với các chỉ số chính của khu vực đó, theo quy định hiện hành và tối ưu cho hoàn cảnh của bạn. Mỗi kế hoạch có một trợ lý AI trả lời câu hỏi của bạn về chính kế hoạch đó.`,
-        en: `${BRAND} builds a budget plan for your whole Australian property journey — buy, hold, sell — for a specific suburb, with that suburb's key indicators in view, under current regulations and optimised for your situation. Each plan comes with an AI assistant that answers your questions about it.`
+        vi: `${BRAND} lập kế hoạch ngân sách cho cả hành trình bất động sản của bạn tại Úc — mua, giữ, bán — theo từng bang, theo quy định hiện hành và tối ưu cho hoàn cảnh của bạn. Mỗi kế hoạch có một trợ lý AI trả lời câu hỏi của bạn về chính kế hoạch đó. Bản đồ cho xem các chỉ số chính của từng khu vực.`,
+        en: `${BRAND} builds a budget plan for your whole Australian property journey — buy, hold, sell — for your state, under current regulations and optimised for your situation. Each plan comes with an AI assistant that answers your questions about it. The map shows each suburb's key indicators.`
     },
     // Behavior 44: the first screen leads to the platform's position in one tap
     // (invariants.md, the goal: independent; information as is, not an advice service).
@@ -1288,34 +1307,21 @@ const messages = {
         vi: 'Trợ lý AI đọc chính kế hoạch của bạn, gồm các con số và quy định có trích nguồn, rồi trả lời bằng tiếng Việt và tiếng Anh — mỗi ngày một câu hỏi, sau khi đăng nhập. Trợ lý không tự viết ra con số theo quy định nào, và câu trả lời là thông tin, không phải tư vấn.',
         en: 'The AI assistant reads your plan, its own figures and cited rules, and answers in Vietnamese and English — one question a day, once you sign in. It never writes a regulated figure, and its answers are information, not advice.'
     },
-    'intro.cta': { vi: 'Khám phá bản đồ', en: 'Explore the map' },
+    'intro.cta': { vi: 'Bắt đầu', en: 'Get started' },
     'intro.cta.hint': {
-        vi: 'Chọn một khu vực trên bản đồ để bắt đầu kế hoạch.',
-        en: 'Pick a suburb on the map to start your plan.'
+        vi: 'Lập kế hoạch ngân sách theo bang, hoặc khám phá từng khu vực trên bản đồ.',
+        en: 'Plan a budget for a state, or explore suburbs on the map.'
     },
     // The first-visit tour (behavior 52, tour.ts).
     'tour.aria': { vi: 'Hướng dẫn', en: 'Guide' },
     'tour.step1': {
-        vi: 'Chọn một khu vực để xem số liệu và lập kế hoạch',
-        en: 'Pick a suburb to see its figures and make a plan'
+        vi: 'Chọn một khu vực để xem số liệu',
+        en: 'Pick a suburb to see its figures'
     },
     'tour.try': { vi: 'Thử Cabramatta', en: 'Try Cabramatta' },
-    'tour.step2': { vi: 'Kế hoạch cho khu vực này ở đây', en: 'The plan for this suburb is here' },
-    'tour.step2.menu': {
-        vi: 'Chạm vào menu này, rồi chọn Kế hoạch',
-        en: 'Tap this menu, then choose Plan'
-    },
-    'tour.step3': {
-        vi: 'Trả lời 4 câu hỏi ngắn — không cần đăng nhập',
-        en: 'Answer 4 short questions — no sign-in needed'
-    },
-    'tour.step4': {
-        vi: 'Đây là kế hoạch của bạn: mua, giữ, bán, theo quy định hiện hành. Đăng nhập để lưu và hỏi trợ lý.',
-        en: 'This is your plan: buy, hold, sell, under current rules. Sign in to save it and ask the assistant.'
-    },
-    'tour.step4.menu': {
-        vi: 'Đây là kế hoạch của bạn: mua, giữ, bán, theo quy định hiện hành. Các phần của kế hoạch nằm trong menu này. Đăng nhập để lưu và hỏi trợ lý.',
-        en: 'This is your plan: buy, hold, sell, under current rules. Its sections are in this menu. Sign in to save it and ask the assistant.'
+    'tour.step2': {
+        vi: 'Đây là số liệu của khu vực này. Để lập kế hoạch ngân sách, quay về Trang chủ.',
+        en: "These are this suburb's figures. To plan a budget, go back Home."
     },
     'tour.skip': { vi: 'Bỏ qua', en: 'Skip' },
     'tour.done': { vi: 'Xong', en: 'Done' },

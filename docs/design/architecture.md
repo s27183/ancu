@@ -40,7 +40,7 @@ waiting for a session end.
 | **The suburb adapters** — per-source batch ingest into the suburb tables | `engine/build/suburbs/` | their developers (`docs/architecture/suburb-adapter-workflow.md`, Track B), rerun by Son when the monthly suburb-watch routine's issue names a newer release (`docs/architecture/suburb-watch-routine.md`) | the goal's *honest-partial* property |
 | **The shell backend** — identity, commerce, the usage gate, the engine proxy | `shell/web/backend/` | its developers, in commits | P-4–P-6; `docs/architecture/billing.md` |
 | **The shell database** — subscriptions, `usage_records`, charges, users | Postgres, `SHELL_DATABASE_URL`; migrations in `shell/web/backend/priv/migrations/`, sha256-guarded | the shell backend | P-2, P-5 |
-| **The web frontend** — the SvelteKit SPA: map-first home, onboarding, plan projection, chat, the news ticker | `shell/web/frontend/` | its developers, in commits | P-4, P-6, P-7 |
+| **The web frontend** — the SvelteKit SPA: the home (two ways in: plan, explore; behavior 81), the planner page (onboarding, plan projection, chat), the map page, the news band on every page | `shell/web/frontend/` | its developers, in commits | P-4, P-6, P-7 |
 
 **Where the code is.** One repo: the ground at `docs/design/`, the code
 beside it, and the rest of `docs/` the team's (Son, 2026-09-28). The tools read
