@@ -1,0 +1,33 @@
+{
+  "since": "2026-10-01",
+  "_about": "Behavior 104: scripts/visa_watch.py lists ministers' releases and Home Affairs pages dated on or after since; the kb-watch routine runs it with --update and commits this file in its PR. The first since (2026-10-01) covers pages that changed before the routine took over.",
+  "feeds": [
+    "https://minister.homeaffairs.gov.au/_layouts/15/AppPages/Rss.aspx?type=media&mini=TonyBurke",
+    "https://minister.homeaffairs.gov.au/_layouts/15/AppPages/Rss.aspx?type=media&mini=MattThistlethwaite",
+    "https://minister.homeaffairs.gov.au/_layouts/15/AppPages/Rss.aspx?type=media&mini=JulianHill"
+  ],
+  "pages": [
+    "https://immi.homeaffairs.gov.au/what-we-do/migration-program-planning-levels",
+    "https://immi.homeaffairs.gov.au/what-we-do/state-and-territory-nomination-allocations",
+    "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-processing-times/visa-processing-priorities/skilled-visa",
+    "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-processing-times/visa-processing-priorities/family-visa",
+    "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/skilled-independent-189",
+    "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/skilled-nominated-190",
+    "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/skilled-work-regional-provisional-491",
+    "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/skilled-regional-191",
+    "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/employer-nomination-scheme-186",
+    "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/skilled-employer-sponsored-regional-494",
+    "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/national-innovation-visa-858",
+    "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/temporary-graduate-485",
+    "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/partner-onshore",
+    "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/partner-offshore",
+    "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/prospective-marriage-300",
+    "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/parent-103",
+    "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/contributory-parent-143",
+    "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/aged-parent-804",
+    "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/contributory-aged-parent-864",
+    "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/contributory-parent-temporary-173",
+    "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/contributory-aged-parent-temporary-884",
+    "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/sponsored-parent-temporary-870"
+  ]
+}
