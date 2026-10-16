@@ -1227,6 +1227,14 @@ const messages = {
         vi: 'Theo bang: chi phí khi mua, khi sở hữu và khi bán nhà.',
         en: 'By state: what buying, owning and selling a home cost.'
     },
+    // Behavior 88: the home's third card and the News page it opens.
+    'home.news.title': { vi: 'Tin tức', en: 'News' },
+    'home.news.body': {
+        vi: 'Thay đổi về visa, tài chính, thuế và thị trường, theo từng chủ đề.',
+        en: 'Changes in visas, finance, tax and the market, by topic.'
+    },
+    'newspage.sub': { vi: 'Quy định và thị trường', en: 'Rules and the market' },
+    'newspage.empty': { vi: 'Chưa có tin nào.', en: 'No news yet.' },
     'home.explore.title': { vi: 'Khám phá khu vực', en: 'Explore suburbs' },
     'home.explore.body': {
         vi: 'Xem các khu vực trên bản đồ: cộng đồng người Việt, dân số, kinh tế, an ninh.',

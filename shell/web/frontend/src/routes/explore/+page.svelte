@@ -300,7 +300,6 @@
 </script>
 
 <div class="map-shell">
-    <HomeBack floating />
 
     {#if loadedOnce && !errored}
         <SuburbMap
@@ -331,6 +330,10 @@
         class:open={controlsOpen}
         use:clickOutside={() => (controlsOpen = false)}
     >
+        <!-- Behavior 88: the way home first, top-left, where the planner and the News
+             page carry it in their heads; the filters' button beside it. -->
+        <div class="controls-row">
+        <HomeBack />
         <button
             type="button"
             class="controls-toggle"
@@ -356,6 +359,7 @@
             </svg>
             <span class="controls-label">{$t('map.filters')}</span>
         </button>
+        </div>
 
         {#if showMapHint && !controlsOpen}
             <p class="map-hint" role="note">{$t('map.hint')}</p>

@@ -2,7 +2,7 @@
     // Bilingual -> the first-screen sentence -> The web frontend -> the home (/)
     // Behavior 81 (Son 2026-10-16): the home leads to two pages — plan a budget by state
     // (/plan) or explore suburbs on the map (/explore) — under the news band (the
-    // layout's). The map no longer opens first. A first visit still opens "Vì sao Úc?"
+    // layout's). Behavior 88: and a third, the News page (/news). The map no longer opens first. A first visit still opens "Vì sao Úc?"
     // (Welcome) over the cards, whose first screen leads to the independent /
     // information-not-advice position in one tap; minimised, it leaves the cards in view.
     import Welcome from '$lib/Welcome.svelte';
@@ -36,6 +36,21 @@
             <span class="home-way-text">
                 <span class="home-way-title">{$t('home.explore.title')}</span>
                 <span class="home-way-body">{$t('home.explore.body')}</span>
+            </span>
+            <svg class="home-way-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+                ><polyline points="9 6 15 12 9 18" /></svg
+            >
+        </a>
+        <a class="home-way" href="/news">
+            <span class="home-way-icon" aria-hidden="true">
+                <!-- a folded newspaper -->
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+                    ><path d="M4 5h13v14H6a2 2 0 0 1-2-2V5Z" /><path d="M17 9h3v8a2 2 0 0 1-2 2h-1" /><line x1="7.5" y1="9" x2="13.5" y2="9" /><line x1="7.5" y1="12.5" x2="13.5" y2="12.5" /><line x1="7.5" y1="16" x2="11" y2="16" /></svg
+                >
+            </span>
+            <span class="home-way-text">
+                <span class="home-way-title">{$t('home.news.title')}</span>
+                <span class="home-way-body">{$t('home.news.body')}</span>
             </span>
             <svg class="home-way-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
                 ><polyline points="9 6 15 12 9 18" /></svg
