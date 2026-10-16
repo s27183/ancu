@@ -3625,6 +3625,79 @@ main {
     color: var(--muted);
     letter-spacing: 0.02em;
 }
+/* The saved plans list in the planner's head (behavior 84): the place line becomes a
+   button that opens the list under it; each row is the plan's place, state and update. */
+.page-sheet .sheet-head .title {
+    position: relative;
+}
+.plan-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    max-width: 100%;
+    margin-top: 0.1rem;
+    padding: 0.15rem 0.5rem 0.15rem 0;
+    border: none;
+    background: transparent;
+    color: var(--ink-2);
+    font: inherit;
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    cursor: pointer;
+}
+.plan-switch .plan-switch-count {
+    font-weight: 400;
+    color: var(--muted);
+}
+.plan-switch:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: var(--radius);
+}
+.plan-list {
+    position: absolute;
+    top: calc(100% + 0.3rem);
+    left: 0;
+    z-index: 6;
+    width: min(22rem, calc(100vw - 2rem));
+    margin: 0;
+    padding: 0.25rem;
+    list-style: none;
+    max-height: 18rem;
+    overflow-y: auto;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-2);
+}
+.plan-list li button {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: baseline;
+    column-gap: 0.5rem;
+    width: 100%;
+    padding: 0.5rem 0.6rem;
+    border: none;
+    border-radius: calc(var(--radius) - 0.2rem);
+    background: transparent;
+    color: var(--ink);
+    font: inherit;
+    font-size: var(--fs-sm);
+    text-align: left;
+    cursor: pointer;
+}
+.plan-list li button:hover,
+.plan-list li button[aria-current='true'] {
+    background: var(--surface-2);
+}
+.plan-list-name {
+    font-weight: 600;
+}
+.plan-list-date {
+    grid-column: 1 / -1;
+    font-size: var(--fs-xs);
+    color: var(--muted);
+}
 /* On a phone the planner's head holds the way home, the title and "Hỏi AI": the way home
    is its house alone (named for readers) and the title a step smaller, so the title keeps
    one line at 390px. */

@@ -1239,6 +1239,10 @@ const messages = {
         en: 'Choose the state you plan to buy in, then answer a few questions to get your plan.'
     },
     'planpage.state': { vi: 'Bang', en: 'State' },
+    // The saved plans list in the planner's head (behavior 84). {n} plans; {d} a date.
+    'planpage.saved': { vi: 'Kế hoạch đã lưu', en: 'Saved plans' },
+    'planpage.plans': { vi: '{n} kế hoạch', en: '{n} plans' },
+    'planpage.updated': { vi: 'Cập nhật {d}', en: 'Updated {d}' },
     'planpage.cta': { vi: 'Lập kế hoạch', en: 'Make a plan' },
 
     // News overview sheet (kb-news-feature.md "News overview sheet") — layer 1 of the
