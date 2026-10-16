@@ -43,12 +43,13 @@ const messages = {
         vi: 'Gõ tên khu vực ở đây — hoặc phóng to bản đồ để tìm khu vực bạn quan tâm',
         en: "Type a suburb's name here — or zoom into the map to find the suburbs you care about"
     },
-    'filter.saved': { vi: 'Kế hoạch đã lưu', en: 'Saved plans' },
+    'filter.saved': { vi: 'Khu vực đã lưu', en: 'Saved suburbs' },
+    'filter.saved.list': { vi: 'Danh sách khu vực đã lưu', en: 'Your saved suburbs' },
     'filter.name.placeholder': { vi: 'Tìm khu vực…', en: 'Search suburbs…' },
     'filter.nomatch': { vi: 'Không tìm thấy khu vực phù hợp.', en: 'No matching suburbs.' },
     'filter.saved.empty': {
-        vi: 'Bạn chưa lưu kế hoạch nào. Hãy tạo một kế hoạch để ghim khu vực tại đây.',
-        en: 'No saved plans yet. Create a plan to pin a suburb here.'
+        vi: 'Bạn chưa lưu khu vực nào. Bấm ♡ trên thẻ khu vực để lưu.',
+        en: 'No saved suburbs yet. Tap ♡ on a suburb to save it.'
     },
     'map.sources': { vi: 'Nguồn dữ liệu', en: 'Data sources' },
     'map.basemap': { vi: 'Bản đồ nền', en: 'Basemap' },
@@ -63,6 +64,8 @@ const messages = {
     'sheet.tab.plan': { vi: 'Kế hoạch', en: 'Plan' },
     'sheet.head.plan': { vi: 'Kế hoạch →', en: 'Plan →' },
     'sheet.close': { vi: 'Đóng', en: 'Close' },
+    'sheet.save': { vi: 'Lưu khu vực này', en: 'Save this suburb' },
+    'sheet.unsave': { vi: 'Bỏ lưu khu vực này', en: 'Remove from saved' },
     'sheet.sections': { vi: 'Các mục', en: 'Sections' },
     'sheet.sections.hint': {
         vi: 'Kế hoạch và các mục khác ở đây ↓',

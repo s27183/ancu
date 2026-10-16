@@ -8,7 +8,15 @@
     // bottom-sheet on phone / centred panel on desktop (§7.1). The news band, sign-in
     // sheet and banners are the layout's.
     import { untrack } from 'svelte';
-    import { getSuburbs, listPlanCards, type Suburb, type SuburbSource } from '$lib/api';
+    import {
+        getSuburbs,
+        listSavedSuburbs,
+        saveSuburb,
+        unsaveSuburb,
+        type SavedSuburb,
+        type Suburb,
+        type SuburbSource
+    } from '$lib/api';
     import {
         MAP_SCOPES,
         STATE_NAMES,
@@ -21,7 +29,7 @@
         type MapScope,
         type SizeBy
     } from '$lib/map';
-    import { session, guest } from '$lib/stores/session';
+    import { session } from '$lib/stores/session';
     import { loginOpen } from '$lib/stores/ui';
     import { clickOutside } from '$lib/actions/clickOutside';
     import SuburbMap from '$lib/SuburbMap.svelte';
@@ -66,14 +74,13 @@
     let attrOpen = $state(false);
     let basemapOn = $state(false);
 
-    // --- Saved-plans + name filter (state × saved × name) --------------------
-    // "Suburbs with a saved plan" = those whose name matches a plan-card title — the
-    // SAME binding PlanProjection uses (title === suburb name). Signed-in only
-    // (listPlanCards 401 → []). The name is a sound key under ALL scope: ABS SAL names
-    // are nationally unique, state-tagged where they collide ("Richmond (Vic.)" vs
-    // "Richmond (NSW)"); measured 2026-10-07, 15,345 suburbs, 0 duplicate names
-    // (behavior 19). If a future source ever drops the tag, bind on sal_code instead.
-    let savedTitles = $state<Set<string>>(new Set());
+    // --- Saved suburbs + name filter (state × saved × name) -------------------
+    // Behavior 84 (Son 2026-10-16): a saved suburb is its own record, keyed by SAL code
+    // (/api/saved-suburbs; the shell seeds it once from a user's older suburb-titled
+    // plans), saved and unsaved by the heart on the suburb sheet. Signed-in only: a guest
+    // or a signed-out visitor holds none, and the heart asks them to sign in.
+    let saved = $state<SavedSuburb[]>([]);
+    const savedSals = $derived(new Set(saved.map((s) => s.sal_code)));
     let savedOnly = $state(false);
     let nameQuery = $state('');
     let comboFocused = $state(false);
@@ -110,13 +117,40 @@
             .toLowerCase()
             .trim();
 
-    // Refresh the saved set on sign-in.
+    // Refresh the saved set on sign-in; a sign-out empties it.
     $effect(() => {
-        void $session; // re-run when the session resolves / changes
-        listPlanCards().then((cards) => {
-            savedTitles = new Set(cards.map((c) => c.title));
-        });
+        if (!$session) {
+            saved = [];
+            return;
+        }
+        listSavedSuburbs().then((list) => (saved = list));
     });
+    // The heart: signed in, it saves or unsaves (the reply is the whole list, so the
+    // pulse and the list follow the database, never a guess); otherwise it opens sign-in,
+    // and the round-trip below brings them back to this suburb to save it.
+    let saving = $state(false);
+    async function toggleSaved(s: Suburb) {
+        if (!$session) {
+            loginOpen.set(true);
+            return;
+        }
+        if (saving) return;
+        saving = true;
+        try {
+            const list = savedSals.has(s.sal_code) ? await unsaveSuburb(s.sal_code) : await saveSuburb(s);
+            if (list) saved = list;
+        } finally {
+            saving = false;
+        }
+    }
+    // A saved suburb from the list: open it here if its scope is loaded, else switch to
+    // its state and open it once that has loaded (the sign-in restore's path).
+    function openSaved(x: SavedSuburb) {
+        const s = suburbs.find((y) => y.sal_code === x.sal_code);
+        if (s) return pickSuburb(s);
+        pendingRestore = { page: 'explore', sal: x.sal_code, scope: x.state, ts: Date.now() };
+        auState = x.state as MapScope;
+    }
     // Signing out hides the saved checkbox — don't strand the filter on an empty set.
     $effect(() => {
         if (!$session) savedOnly = false;
@@ -125,7 +159,7 @@
     // The visible set: state-fetched suburbs ∩ (saved?) ∩ (name search). All three AND.
     const visible = $derived.by(() => {
         let list = suburbs;
-        if (savedOnly) list = list.filter((s) => savedTitles.has(s.name));
+        if (savedOnly) list = list.filter((s) => savedSals.has(s.sal_code));
         const q = fold(nameQuery);
         if (q) list = list.filter((s) => fold(s.name).includes(q));
         return list;
@@ -134,7 +168,7 @@
     // saved filter is off (behavior 76) — kept while a name is typed, so a visitor never
     // loses sight of what they saved.
     const savedSuburbs = $derived(
-        savedOnly || savedTitles.size === 0 ? [] : suburbs.filter((s) => savedTitles.has(s.name))
+        savedOnly || savedSals.size === 0 ? [] : suburbs.filter((s) => savedSals.has(s.sal_code))
     );
     // Name-combobox suggestions: the current visible set with a point, capped — only
     // while typing (an empty query shows none, so the dropdown is gone after a pick).
@@ -257,9 +291,10 @@
         if (s) pickSuburb(s);
     });
     // Behavior 45: a guest opening sign-in with a suburb's sheet open (the header's menu)
-    // comes back to that suburb after the round-trip (the home routes it here, b81).
+    // comes back to that suburb after the round-trip (the home routes it here, b81) — and
+    // since behavior 84 any signed-out visitor, whom the sheet's heart sends to sign in.
     $effect(() => {
-        if ($loginOpen && $guest && selected)
+        if ($loginOpen && !$session && selected)
             savePending({ page: 'explore', sal: selected.sal_code, scope: auState, ts: Date.now() });
     });
 </script>
@@ -279,7 +314,7 @@
             saved={savedSuburbs}
             {selected}
             {recent}
-            recentSaved={!!recent && savedTitles.has(recent.name)}
+            recentSaved={!!recent && savedSals.has(recent.sal_code)}
             onselect={(s) => (selected = s)}
             onuserzoom={() => {
                 if (byVisitor()) hintGone = true;
@@ -354,9 +389,9 @@
                     </div>
                 </div>
 
-                <!-- Saved-plans filter — signed-in only (no saved plans = a dead control
-                     when logged out). The checkbox restricts the map to suburbs that have
-                     a saved plan (bright pulse); the combobox narrows further by name. The
+                <!-- Saved-suburbs filter — signed-in only (none saved = a dead control
+                     when logged out). The checkbox restricts the map to the saved suburbs
+                     (bright pulse), listed below the search; the combobox narrows by name. The
                      name search is for everyone (behavior 52: the tour's first bubble points
                      at it, and a guest can build a plan since behavior 45). -->
                 <div class="control control-saved">
@@ -392,8 +427,20 @@
                             </ul>
                         {/if}
                     </div>
-                    {#if savedOnly && savedTitles.size === 0}
+                    {#if $session && saved.length === 0}
                         <p class="filter-hint">{$t('filter.saved.empty')}</p>
+                    {:else if $session}
+                        <!-- The saved suburbs, newest first: a tap opens one (behavior 84). -->
+                        <ul class="saved-list" aria-label={$t('filter.saved.list')}>
+                            {#each saved as x (x.sal_code)}
+                                <li>
+                                    <button type="button" onclick={() => openSaved(x)}>
+                                        <span class="combo-name">{x.name}</span>
+                                        <span class="combo-state">{x.state}</span>
+                                    </button>
+                                </li>
+                            {/each}
+                        </ul>
                     {/if}
                 </div>
             </div>
@@ -473,6 +520,9 @@
         {#key selected.sal_code}
             <SuburbSheet
                 suburb={selected}
+                saved={savedSals.has(selected.sal_code)}
+                {saving}
+                ontogglesaved={() => selected && toggleSaved(selected)}
                 onclose={() => {
                     recent = selected;
                     selected = null;

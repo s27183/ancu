@@ -188,6 +188,44 @@ export async function listPlanCards(
     return body.plan_cards ?? [];
 }
 
+// --- Saved suburbs (behavior 84) ----------------------------------------------
+// The signed-in user's saved suburbs, a record of their own in the shell database
+// (/api/saved-suburbs); name and state are the map's label when saved. Each call answers
+// with the whole list, newest first. A guest or a signed-out visitor gets 401 → [] /
+// null (the map asks them to sign in before it ever calls a write).
+export interface SavedSuburb {
+    sal_code: string;
+    name: string;
+    state: string;
+    saved_at: string;
+}
+
+async function savedList(res: Response): Promise<SavedSuburb[] | null> {
+    if (!res.ok) return null;
+    const body = (await res.json()) as { saved_suburbs?: SavedSuburb[] };
+    return body.saved_suburbs ?? [];
+}
+
+export async function listSavedSuburbs(fetchFn: typeof fetch = fetch): Promise<SavedSuburb[]> {
+    return (await savedList(await fetchFn('/api/saved-suburbs'))) ?? [];
+}
+
+export async function saveSuburb(s: Pick<Suburb, 'sal_code' | 'name' | 'state'>): Promise<SavedSuburb[] | null> {
+    return savedList(
+        await fetch(`/api/saved-suburbs/${encodeURIComponent(s.sal_code)}`, {
+            method: 'PUT',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ name: s.name, state: s.state })
+        })
+    );
+}
+
+export async function unsaveSuburb(sal: string): Promise<SavedSuburb[] | null> {
+    return savedList(
+        await fetch(`/api/saved-suburbs/${encodeURIComponent(sal)}`, { method: 'DELETE' })
+    );
+}
+
 // --- Simulate: preview a structural what-if (W9) ----------------------------
 // POST /api/plan-cards/:id/simulate — the engine recomputes the base plan resolver-only
 // under {target_price, state} overrides and returns the recomputed outcomes in the BODY.
