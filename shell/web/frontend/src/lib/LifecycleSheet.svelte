@@ -233,21 +233,22 @@
     }
     .ls-line + .ls-line, .ls-line + .ls-empty { border-top: 1px solid var(--border); }
     .ls-line-btn {
-        width: 100%; display: flex; align-items: baseline; gap: 0.75rem;
+        /* Wraps: on a phone a band amount drops under its label rather than squeezing it. */
+        width: 100%; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.25rem 0.75rem;
         padding: 0.6rem 0.75rem; background: none; border: 0; text-align: left;
         font: inherit; color: var(--ink);
     }
     button.ls-line-btn { cursor: pointer; }
     button.ls-line-btn:hover { background: var(--accent-soft); }
     button.ls-line-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
-    .ls-label { flex: 1 1 auto; min-width: 0; display: flex; flex-wrap: wrap; gap: 0.25rem 0.5rem; align-items: baseline; }
-    .ls-amt { flex: 0 0 auto; font-variant-numeric: tabular-nums; white-space: nowrap; font-weight: 600; }
+    .ls-label { flex: 1 1 10rem; min-width: 0; display: flex; flex-wrap: wrap; gap: 0.25rem 0.5rem; align-items: baseline; }
+    .ls-amt { flex: 0 0 auto; margin-left: auto; font-variant-numeric: tabular-nums; white-space: nowrap; font-weight: 600; }
     .ls-in .ls-amt { color: var(--success); }
     .ls-unit { font-weight: 400; color: var(--muted); font-size: 0.85em; }
     .ls-caret { color: var(--muted); }
     .ls-tier {
         font-size: var(--fs-2xs, 0.6875rem); color: var(--warning); background: var(--warning-soft);
-        border-radius: 999px; padding: 0 0.45rem; line-height: 1.5;
+        border-radius: 999px; padding: 0 0.45rem; line-height: 1.5; white-space: nowrap;
     }
     .ls-tier.ls-exact { color: var(--info); background: var(--info-soft); }
     .ls-needs { font-size: var(--fs-xs, 0.75rem); color: var(--muted); font-style: italic; }
