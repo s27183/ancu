@@ -1537,11 +1537,15 @@ def run(emit=False):
             where = f"[line_details] {slug}/{e.get('id')}"
             if e.get("tier") not in LINE_TIERS:
                 fails.append(f"{where}: tier {e.get('tier')!r} not one of {LINE_TIERS}")
-            for key in ("how", "payer", "drivers", "note"):
+            for key in ("how", "payer", "drivers", "note", "label"):
                 if key == "how" or key in e:
                     err = check_copy_template(e.get(key))
                     if err:
                         fails.append(f"{where}.{key}: {err}")
+            # behavior 95: the components a line opens are named by id
+            ex = e.get("explains", [])
+            if not (isinstance(ex, list) and all(isinstance(c, str) and c for c in ex)):
+                fails.append(f"{where}: explains {ex!r} is not a list of component ids")
             src = e.get("source")
             idx = list(src.values()) if isinstance(src, dict) else [] if src is None else [src]
             for i in idx:

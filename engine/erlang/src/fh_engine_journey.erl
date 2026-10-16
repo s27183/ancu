@@ -89,7 +89,7 @@ fill_fhb(Upstream) ->
         <<"actors">>       => actors(),
         <<"cells">>        => Cells,
         <<"interactions">> => interactions(Cells),
-        <<"lifecycle_budget">> => lifecycle_budget(Events, DisposeEvents, harvest_fee_pending(Upstream), <<"income">>),
+        <<"lifecycle_budget">> => lifecycle_budget(Events, DisposeEvents, Upstream, <<"income">>),
         <<"key_assumptions">> =>
             [copy(<<"assumption_indicative">>), copy(<<"assumption_figures">>)]
     },
@@ -128,7 +128,7 @@ fill_fhb_foreign(Upstream) ->
         <<"actors">>       => actors(),
         <<"cells">>        => Cells,
         <<"interactions">> => interactions(Cells),
-        <<"lifecycle_budget">> => lifecycle_budget(Events, DisposeEvents, harvest_fee_pending(Upstream), <<"income">>),
+        <<"lifecycle_budget">> => lifecycle_budget(Events, DisposeEvents, Upstream, <<"income">>),
         <<"key_assumptions">> =>
             [fhb_foreign_copy(<<"assumption_indicative">>), fhb_foreign_copy(<<"assumption_figures">>),
              fhb_foreign_copy(<<"assumption_no_fhb_schemes">>)]
@@ -157,7 +157,7 @@ fill_investor(Upstream) ->
         <<"actors">>       => investor_actors(),
         <<"cells">>        => Cells,
         <<"interactions">> => interactions(Cells),
-        <<"lifecycle_budget">> => lifecycle_budget(Events, DisposeEvents, harvest_fee_pending(Upstream), <<"price">>),
+        <<"lifecycle_budget">> => lifecycle_budget(Events, DisposeEvents, Upstream, <<"price">>),
         <<"key_assumptions">> =>
             [investor_copy(<<"assumption_indicative">>), investor_copy(<<"assumption_figures">>),
              investor_copy(<<"assumption_no_fhb_schemes">>)]
@@ -189,7 +189,7 @@ fill_investor_foreign(Upstream) ->
         <<"actors">>       => investor_actors(),
         <<"cells">>        => Cells,
         <<"interactions">> => interactions(Cells),
-        <<"lifecycle_budget">> => lifecycle_budget(Events, DisposeEvents, harvest_fee_pending(Upstream), <<"price">>),
+        <<"lifecycle_budget">> => lifecycle_budget(Events, DisposeEvents, Upstream, <<"price">>),
         <<"key_assumptions">> =>
             [investor_foreign_copy(<<"assumption_indicative">>),
              investor_foreign_copy(<<"assumption_figures">>),
@@ -214,15 +214,18 @@ fill_investor_foreign(Upstream) ->
 %%            loan_payout then needs income (A, B, E: the borrowing capacity) or, for an
 %%            investor (C, D), the property's price (its loan amount); and each fee line whose base is
 %%            missing (fee_pending, behavior 83) names its input — price, income, rent or
-%%            a quote. Totals are null when nothing sums.
+%%            a quote. Totals are null when nothing sums. beside holds the lines that
+%%            say where money comes from or what the home earns (behavior 95), which no
+%%            total sums.
 %% Rests on:  disposition emits dispose_cash_events only with a horizon, and loan_payout
 %%            only with income (A, B, E) or an attached property (C, D: budget_envelope_
 %%            investor.loan_amount is null at base) — measured 2026-10-16, escript over
 %%            fh_engine_simulate:run: an investor with income 150000 still had no payout.
 %% Known gaps: repayments (own) use the price band less the deposit; disposition's
 %%            loan_payout uses borrowing capacity, so the two loans can differ.
--spec lifecycle_budget([map()], [map()], [map()], binary()) -> map().
-lifecycle_budget(Events, DisposeEvents, FeePending, PayoutNeeds) ->
+-spec lifecycle_budget([map()], [map()], map(), binary()) -> map().
+lifecycle_budget(Events, DisposeEvents, Upstream, PayoutNeeds) ->
+    FeePending = harvest_fee_pending(Upstream),
     Buy  = [E || E <- Events, out(E),
                  lists:member(maps:get(<<"phase">>, E), [<<"prepare">>, <<"pre_approve">>,
                                                           <<"contract">>, <<"settle">>])],
@@ -242,7 +245,36 @@ lifecycle_budget(Events, DisposeEvents, FeePending, PayoutNeeds) ->
     #{<<"buy">>          => sum_ranges(Buy),
       <<"own_per_year">> => sum_ranges(Own),
       <<"sell">>         => case DisposeEvents of [] -> null; _ -> sum_ranges(Sell) end,
-      <<"pending">>      => Pending ++ FeePending}.
+      <<"pending">>      => Pending ++ FeePending,
+      <<"beside">>       => beside(Upstream)}.
+
+%% behavior 95: the lines beside the totals (fh_engine_line_detail:beside/3) — a foreign
+%% buyer's "Nguồn tiền" on Mua when the plan moves money from overseas (transfer_plan),
+%% and an investor's "Tiền thuê thu về" on Giữ nhà when it models rent
+%% (cash_flow_projection); neither is in buy, own_per_year or sell.
+beside(Upstream) ->
+    Funding = case maps:is_key(<<"transfer_plan">>, Upstream) of
+                  true ->
+                      Family = maps:get(<<"family_funding_plan">>, Upstream, #{}),
+                      [fh_engine_line_detail:beside(
+                         <<"kb.vietnamese-family.financial-patterns">>, <<"funding_sources">>,
+                         {<<"prepare">>, as_range(field(<<"total_capacity_aud">>, Family)),
+                          null, <<"one_off">>})];
+                  false -> []
+              end,
+    Rent = case maps:find(<<"cash_flow_projection">>, Upstream) of
+               {ok, Cf} when is_map(Cf) ->
+                   R = as_range(field(<<"annual_rental_income_year_1">>, Cf)),
+                   [fh_engine_line_detail:beside(
+                      <<"kb.investor.rental-income-modelling">>, <<"rental_income">>,
+                      {<<"own">>, R, case R of null -> <<"rent">>; _ -> null end,
+                       <<"recurring">>})];
+               _ -> []
+           end,
+    Funding ++ Rent.
+
+field(K, M) when is_map(M) -> maps:get(K, M, null);
+field(_, _) -> null.
 
 %% an out-event the totals count: behavior 83 — an optional fee line (a buyer's agent) or one
 %% whose property condition is still open (a strata report before the type is known) is

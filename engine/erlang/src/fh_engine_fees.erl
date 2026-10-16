@@ -195,6 +195,9 @@ detail(E, Tier, Property) ->
                              {P, undefined}  -> P;    %% still open: shown as "if <P>"
                              {_, _}          -> null  %% known and it applies
                          end,
+      %% behavior 95: the components whose detail this line opens (an FX line: money from
+      %% overseas), as the KB entry names them
+      <<"explains">>  => maps:get(<<"explains">>, E, []),
       <<"owner">>     => maps:get(<<"_owner">>, E)}.
 
 pending(E, Needs) ->

@@ -11,11 +11,13 @@
 %%            with (never another computer); `source` is an index into that doc's own
 %%            `sources:` (by state where the source is a state's), so a detail can only cite
 %%            what the doc cites, and a doc with no source for the plan's state gives none.
-%%            A missing entry crashes (fail-closed, like fh_engine_kb:copy/2).
+%%            A missing entry crashes (fail-closed, like fh_engine_kb:copy/2). An entry's
+%%            `explains` names the components whose detail the line opens (behavior 95:
+%%            the FIRB fee opens FIRB), as the fee lines' entries do.
 %% Rests on:  the compiler's line_details gate (kb_compiler.py) — bilingual text, a known
 %%            tier, every source index inside the doc's `sources:`.
 
--export([attach/4, attach_all/2, detail/3, pct/1, price/2, money_range/1]).
+-export([attach/4, attach_all/2, detail/3, beside/3, pct/1, price/2, money_range/1]).
 
 %% Ctx: state (binary | undefined) and params (#{binary() => fh_engine_i18n:param()}).
 -type ctx() :: #{state => binary() | undefined, params => map()}.
@@ -64,7 +66,27 @@ detail(Slug, Id, Ctx) ->
                                 maps:get(state, Ctx, undefined)),
       <<"optional">>  => false,
       <<"condition">> => null,
+      <<"explains">>  => maps:get(<<"explains">>, Entry, []),
       <<"owner">>     => Slug}.
+
+%% Whole lifecycle -> "information as is, not advice" -> the engine -> a line beside the totals
+%% Goal: behavior 95 — where the money comes from (a foreign buyer's "Nguồn tiền") and what
+%% the home earns (an investor's "Tiền thuê thu về") sit on the statement after a sheet's
+%% divider, opening the details they explain, never summed: the bottom line stays what
+%% you pay.
+%% Invariant: its label and detail are the KB entry of the doc that owns the figure; its
+%% amount is the owning outcome's own figure or null, and a null amount names its input.
+%% Capability: one line {id, phase, label, amount, needs, timing, detail}.
+-spec beside(binary(), binary(), {binary(), [number()] | null, binary() | null, binary()}) -> map().
+beside(Slug, Id, {Phase, Amount, Needs, Timing}) ->
+    {Entry, _} = entry(Slug, Id),
+    #{<<"id">>     => Id,
+      <<"phase">>  => Phase,
+      <<"label">>  => maps:get(<<"label">>, Entry),
+      <<"amount">> => Amount,
+      <<"needs">>  => Needs,
+      <<"timing">> => Timing,
+      <<"detail">> => detail(Slug, Id, #{})}.
 
 %% a percentage as both languages write it: 6 → "6", 6.35 → "6.35" / "6,35".
 -spec pct(number()) -> fh_engine_i18n:localized().

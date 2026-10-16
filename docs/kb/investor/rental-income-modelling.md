@@ -45,6 +45,36 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
     "effective_income_formula": { "type": "string", "value": "effective_annual_rental_income = annual_gross_rental_income × (1 − vacancy_rate)", "note": "resolver formula — applies the vacancy band (kb.investor.vacancy-rate-assumptions); the income line all downstream yields build on" },
     "rent_input_is_agent_range": { "type": "bool", "value": true, "note": "the weekly rent is the agent-reasoned estimated_weekly_rent_range on property_assessment (reasoning_domain rentability), grounded in comparables (kb.property.rental-market-data-sources); carried as a range, surfaced as a range" },
     "vacancy_is_the_gross_to_effective_bridge": { "type": "bool", "value": true, "note": "vacancy (not arrears/letting fees) is the one reduction applied to gross→effective here; letting fees live in operating expenses (kb.investor.property-management-fees), counted once" }
+  },
+  "lookup": {
+    "line_details": {
+      "note": "behavior 95: the statement's \"Tiền thuê thu về\" line, after the Giữ nhà sheet's divider for an investor — the rent coming in, never netted off what you pay; it opens the yield and tax details (explains: the components it draws)",
+      "entries": [
+        {
+          "id": "rental_income",
+          "tier": "CONVENTION",
+          "label": { "vi": "Tiền thuê thu về", "en": "Rent coming in" },
+          "how": {
+            "vi": "Tiền thuê mỗi tuần × 52, trừ đi thời gian nhà trống giữa hai người thuê. Có con số khi bạn gắn một căn nhà cụ thể vào kế hoạch.",
+            "en": "The weekly rent × 52, less the weeks the home sits empty between tenants. It has a figure once you add a specific property to the plan."
+          },
+          "payer": {
+            "vi": "Người thuê trả cho bạn (qua công ty quản lý nếu có).",
+            "en": "The tenant pays you (through the property manager, if you have one)."
+          },
+          "drivers": {
+            "vi": "Giá thuê trong khu vực, tỷ lệ nhà trống, và tình trạng căn nhà.",
+            "en": "Rents in the area, the vacancy rate, and the state of the home."
+          },
+          "note": {
+            "vi": "Không tính vào tổng: tổng là số tiền bạn phải trả. Tiền thuê là thu nhập chịu thuế; thuế và khoản khấu trừ nằm trong phần chi tiết bên dưới.",
+            "en": "Not in the total: the total is what you pay. Rent is taxable income; the tax and the deductions are in the detail below."
+          },
+          "source": 1,
+          "explains": ["yield_modelling", "tax_structure", "tax_structure_non_resident"]
+        }
+      ]
+    }
   }
 }
 ```
