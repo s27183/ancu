@@ -262,6 +262,15 @@ Added 2026-10-16 (behavior 93; Son: too much text at first look on a plan):
   cash verdict once typed), which opens where they are changed (behavior 108,
   2026-10-17: you read your numbers before the result).
 
+Added 2026-10-17 (behavior 106; Son's friend could not find her way back to a plan's
+overview):
+
+- **A sheet goes back one level, from one button.** Every level of the planner — the
+  list, a plan's hub, Ngân sách or Hành trình, a phase sheet or a step — is one history
+  entry, and the head's single back button names the level above ("‹ Ngân sách") and
+  is the browser's back. No sheet draws a second way back in its body, and nothing
+  relies on a swipe (Son: the iPhone back-swipe is hard to use).
+
 ## What is deliberately not coupled
 
 *Empty at plant.* A thing that looks like it should be coupled and is not is
