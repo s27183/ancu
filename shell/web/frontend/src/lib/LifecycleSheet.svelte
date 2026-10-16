@@ -7,8 +7,12 @@
     //            Tapping a phase opens its sheet (that phase's lines); tapping a line opens
     //            its detail in place — what it is, how its figure is set, who pays, what
     //            moves it, its source (the engine's `detail`: a fee line's, behavior 83, or
-    //            any other line's, fh_engine_line_detail, behavior 93); no line opens a
-    //            component card. A phase sheet is a history entry (shallow routing,
+    //            any other line's, fh_engine_line_detail, behavior 93); a line never leaves
+    //            the sheet for a component card, but a detail whose KB entry `explains`
+    //            components draws them under its facts (behavior 95: the FIRB fee → FIRB,
+    //            an FX line → money from overseas, "Nguồn tiền" → family funding,
+    //            "Tiền thuê thu về" → yield and tax — those two from lifecycle_budget.beside,
+    //            after the divider, in no total). A phase sheet is a history entry (shallow routing,
     //            page.state.lifecycle), so back returns to the statement.
     // Holds:     it computes no figure but the bottom line, and that only as a sum of the
     //            engine's own totals (purchase_journey.lifecycle_budget) with the hold the
@@ -48,8 +52,10 @@
         type JourneySwimlaneOutcome,
         type FeeDetail,
         type MoneyRange,
-        type PendingLine
+        type PendingLine,
+        type BesideLine
     } from '$lib/planCard';
+    import ComponentCard from '$lib/renderers/ComponentCard.svelte';
     import { money, moneyRange } from '$lib/format';
 
     let {
@@ -124,6 +130,28 @@
     );
     const pending = $derived((budget?.pending ?? []) as PendingLine[]);
     const holdPending = $derived(pending.some((p) => p.needs === 'hold_years'));
+    // behavior 95: where the money comes from and the rent coming in — after the divider,
+    // in no total (fh_engine_journey beside/1).
+    const beside = $derived((budget?.beside ?? []) as BesideLine[]);
+    type SheetLine = CashEvent & { needs?: string | null };
+    function lineNeeds(e: SheetLine): string | null {
+        return e.needs ?? null;
+    }
+    function besideFor(key: PhaseKey): SheetLine[] {
+        return beside
+            .filter((b) => groupOf(b.phase) === key)
+            .map((b) => ({
+                id: b.id,
+                label: b.label,
+                amount: b.amount as MoneyRange,
+                direction: 'in' as const,
+                timing: b.timing === 'recurring' ? ('recurring' as const) : ('one_off' as const),
+                phase: b.phase,
+                is_estimate: b.amount !== null,
+                detail: b.detail,
+                needs: b.needs
+            }));
+    }
 
     const groups = $derived([
         {
@@ -243,6 +271,7 @@
     {@const inTotal = g.lines.filter((e) => counted(e, g.key))}
     {@const rest = g.lines.filter((e) => !counted(e, g.key))}
     {@const waiting = pendingFor(g.key)}
+    {@const extra = besideFor(g.key)}
     <section class="ls" data-group={g.key} bind:this={rootEl} aria-labelledby="ls-phase-title">
         <button type="button" class="ls-back" onclick={back}
             ><span aria-hidden="true">‹</span> {$t('plan.sheet.back')}</button
@@ -288,10 +317,11 @@
             {#if buyExtra}{@render buyExtra()}{/if}
         {/if}
 
-        {#if rest.length > 0 || waiting.length > 0}
+        {#if rest.length > 0 || waiting.length > 0 || extra.length > 0}
             <p class="ls-divider">{$t('plan.sheet.not_in_total')}</p>
             <ul class="ls-lines ls-rest">
                 {#each rest as e (e.id)}{@render line(e)}{/each}
+                {#each extra as e (e.id)}{@render line(e)}{/each}
                 {#each waiting as p (p.id)}
                     <li class="ls-line">
                         <div class="ls-line-btn ls-static">
@@ -424,20 +454,32 @@
                       ? $t('plan.sheet.fee.regulated_note')
                       : $t('plan.sheet.fee.quote_note')}
             </p>
+            {#each (d.explains ?? []).filter((c) => components[c]) as cid (cid)}
+                <div class="ls-explains">
+                    <ComponentCard componentId={cid} entry={components[cid]} {filling} />
+                </div>
+            {/each}
         </div>
     </details>
 {/snippet}
 
 {#snippet body(e: CashEvent)}
     <span class="ls-label">{pick(e.label, $lang)}</span>
-    <span class="ls-amt"
-        >{#if e.is_estimate}<span class="ls-mark" title={$t('plan.sheet.estimate')}>≈</span>{/if}{e.direction ===
-        'in'
-            ? '+'
-            : ''}{range(e.amount)}{#if e.timing === 'recurring'}<span class="ls-unit"
-                >{$t('plan.sheet.per_year')}</span
-            >{/if}</span
-    >
+    {#if !e.amount}
+        <!-- a line beside the totals with no figure yet (behavior 95) names its input, if any -->
+        {#if lineNeeds(e)}<span class="ls-needs"
+                >{$t(`plan.sheet.needs.${lineNeeds(e)}` as 'plan.sheet.needs.rent')}</span
+            >{/if}
+    {:else}
+        <span class="ls-amt"
+            >{#if e.is_estimate}<span class="ls-mark" title={$t('plan.sheet.estimate')}>≈</span>{/if}{e.direction ===
+            'in'
+                ? '+'
+                : ''}{range(e.amount)}{#if e.timing === 'recurring'}<span class="ls-unit"
+                    >{$t('plan.sheet.per_year')}</span
+                >{/if}</span
+        >
+    {/if}
 {/snippet}
 
 <style>
@@ -556,5 +598,8 @@
     .ls-cash-verdict dt { color: var(--muted); font-size: var(--fs-sm, 0.875rem); }
     .ls-cash-verdict dd { margin: 0; font-weight: 700; color: var(--success); font-variant-numeric: tabular-nums; }
     .ls-cash-verdict .ls-short dd { color: var(--danger, var(--warning)); }
+    /* behavior 95: the component a line explains, drawn inside its detail. */
+    .ls-explains { border-top: 1px solid var(--border); padding-top: 0.5rem; }
+    .ls-explains :global(.pp-card) { margin: 0; padding: 0; border: 0; box-shadow: none; background: none; }
     .ls-fee-note { margin: 0; font-size: var(--fs-xs, 0.75rem); color: var(--muted); }
 </style>

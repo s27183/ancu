@@ -230,6 +230,8 @@ export interface FeeDetail {
     owner?: string;
     how?: LocalizedText | null;
     note?: LocalizedText | null;
+    /** the components whose detail this line opens (behavior 95: the FIRB fee → FIRB). */
+    explains?: string[] | null;
 }
 
 /** cash_position → calculator (outcome type `budget_envelope`). */
@@ -777,6 +779,18 @@ export interface LifecycleBudget {
     own_per_year?: MoneyRange | null;
     sell?: MoneyRange | null;
     pending?: PendingLine[] | null;
+    /** behavior 95: lines after a sheet's divider that no total sums — where the money
+     *  comes from (Mua) and the rent coming in (Giữ nhà). */
+    beside?: BesideLine[] | null;
+}
+export interface BesideLine {
+    id: 'funding_sources' | 'rental_income' | string;
+    phase: string;
+    label: LocalizedText;
+    amount: MoneyRange | null;
+    needs: string | null;
+    timing: 'one_off' | 'recurring' | string;
+    detail: FeeDetail;
 }
 
 // --- phase_playbook → checklist + risk-flag-list (outcome `phase_playbook`) --
