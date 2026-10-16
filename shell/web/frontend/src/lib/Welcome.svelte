@@ -1,4 +1,13 @@
 <script lang="ts">
+    // Bilingual -> P-6 · Shells reach the engine only through the contract -> The web frontend -> the first-visit introduction
+    // Purpose:   says on its first screen what the product does and what it is not, so a
+    //            visitor knows before opening a plan that it budgets the whole lifecycle and
+    //            walks the journey step by step (Hành trình, behavior 107).
+    // Holds:     every item names a place the visitor can reach — the plan, Hành trình, the
+    //            suburb data, the news, the assistant; the launcher reads "Giới thiệu" /
+    //            "Introduction" (behavior 107, Son 2026-10-17: once "Vì sao Úc?").
+    // Rests on:  i18n.ts intro.* keys, VI and EN side by side.
+    //
     // The first-visit sheet (behavior 42): opens by itself the first time this browser
     // visits, says on its first screen what the product does (plan a budget, the journey's
     // checklist — behavior 107 — suburb data, news) and what it is not (a listing site, an advice service — behavior 90, Son
@@ -9,8 +18,7 @@
     // screen leads to the position card and the facts in one tap each); the browser then
     // remembers it was seen (facts.ts, introSeen). Under prefers-reduced-motion nothing
     // flies or pulses — it simply closes and the launcher sits still. The launcher pulses
-    // light green on every visit until it is tapped (behavior 50). It reads "Giới thiệu"
-    // (behavior 107, once "Vì sao Úc?").
+    // light green on every visit until it is tapped (behavior 50).
     import { onMount, tick } from 'svelte';
     import { lang } from '$lib/stores/lang';
     import { t } from '$lib/i18n';
