@@ -926,6 +926,7 @@ The `mortgage_plan` outcome feeds `cash_position` (loan amount + buffer requirem
     "actors": "array<{ id: string, label: localized_text }>",
     "cells": "array<{ phase: string, actor: string, item: localized_text, flow_marker: enum [none, money_out, money_in, document, milestone], amount: money_range, counterparty: string|null, source_component: string }>",
     "interactions": "array<{ from_actor: string, to_actor: string, phase: string, flows: array<{ label: localized_text, direction: enum [out, in], amount: money_range }> }>",
+    "lifecycle_budget": "{ buy: money_range|null, own_per_year: money_range|null, sell: money_range|null, pending: array<{ id: enum [sale_proceeds, selling_costs, loan_payout], phase: 'dispose', needs: enum [hold_years, income] }> }",  // behavior 82 (2026-10-16): the one-page sheet's three totals, summed HERE from the harvested events so the shell computes nothing — buy = prepare..settle out-events (a grant shown, never netted), own_per_year = recurring own out-events, sell = dispose out-events except loan_payout (repaid from the proceeds, not a cost); pending names each dispose line still waiting on an input (fh_engine_journey lifecycle_budget block)
     "key_assumptions": "array<localized_text>"
   }
 }

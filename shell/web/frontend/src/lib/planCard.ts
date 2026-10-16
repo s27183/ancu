@@ -736,7 +736,26 @@ export interface JourneySwimlaneOutcome {
     actors?: JourneyActor[] | null;
     cells?: JourneyCell[] | null;
     interactions?: JourneyInteraction[] | null;
+    /** The one-page sheet's totals, summed by the engine (behavior 82) — placed, never
+     *  recomputed here. */
+    lifecycle_budget?: LifecycleBudget | null;
     key_assumptions?: LocalizedText[] | null;
+}
+
+/** A dispose line still waiting on an input: hold years (no horizon set) or income. */
+export interface PendingLine {
+    id: 'sale_proceeds' | 'selling_costs' | 'loan_payout' | string;
+    phase: string;
+    needs: 'hold_years' | 'income' | string;
+}
+/** purchase_journey.lifecycle_budget (fh_engine_journey lifecycle_budget block): buy =
+ *  prepare..settle out-events (a grant shown, not netted), own_per_year = recurring own
+ *  out-events, sell = dispose out-events except loan_payout (null with no horizon). */
+export interface LifecycleBudget {
+    buy?: MoneyRange | null;
+    own_per_year?: MoneyRange | null;
+    sell?: MoneyRange | null;
+    pending?: PendingLine[] | null;
 }
 
 // --- phase_playbook → checklist + risk-flag-list (outcome `phase_playbook`) --

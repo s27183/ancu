@@ -18,9 +18,19 @@ modes() ->
      {<<"investor-foreign-au">>,  <<"investor">>,       true},
      {<<"nexthome-domestic-au">>, <<"owner_occupier">>, false}].
 
-onboarding() ->
+onboarding() -> onboarding(10).
+onboarding(H) ->
     #{<<"state">> => <<"VIC">>, <<"target_price_range">> => [600000, 800000],
-      <<"target_zone">> => [], <<"hold_horizon_years">> => 10}.
+      <<"target_zone">> => [], <<"hold_horizon_years">> => H}.
+
+%% the purchase_journey outcome's lifecycle_budget (behavior 82 step 3)
+budget(Out) ->
+    [B] = [maps:get(<<"lifecycle_budget">>, O) || O <- maps:values(Out), is_map(O),
+                                                  maps:is_key(<<"lifecycle_budget">>, O)],
+    B.
+
+sum(Es) -> [lists:sum([L || #{<<"amount">> := [L, _]} <- Es]),
+            lists:sum([H || #{<<"amount">> := [_, H]} <- Es])].
 
 %% every event list in the outcomes: `cash_events` and disposition's `dispose_cash_events`
 events(Out) ->
@@ -38,6 +48,9 @@ main(_) ->
 mode_cases({BP, Intent, Firb}) ->
     {ok, Out} = fh_engine_simulate:run(BP, onboarding(), Intent, #{}, Firb),
     Ev = events(Out),
+    B = budget(Out),
+    {ok, Out0} = fh_engine_simulate:run(BP, onboarding(null), Intent, #{}, Firb),
+    B0 = budget(Out0),
     Ph = fun(P) -> [E || E <- Ev, maps:get(<<"phase">>, E) =:= P] end,
     Own = Ph(<<"own">>),
     [chk(BP, "a buy event (contract or settle)", Ph(<<"contract">>) ++ Ph(<<"settle">>) =/= []),
@@ -51,7 +64,20 @@ mode_cases({BP, Intent, Firb}) ->
              [<<"council_rates_water">>, <<"loan_repayments">>, <<"maintenance_reserve">>]),
      chk(BP, "every amount is an ordered [lo, hi]", lists:all(fun(E) ->
             case maps:get(<<"amount">>, E) of [L, H] when is_number(L), is_number(H) -> L =< H; _ -> false end
-        end, Ev))].
+        end, Ev)),
+     chk(BP, "budget.buy = sum of prepare..settle out-events",
+         maps:get(<<"buy">>, B) =:= sum([E || E <- Ev, maps:get(<<"direction">>, E) =:= <<"out">>,
+             lists:member(maps:get(<<"phase">>, E), [<<"prepare">>, <<"pre_approve">>, <<"contract">>, <<"settle">>])])),
+     chk(BP, "budget.own_per_year = sum of own out-events",
+         maps:get(<<"own_per_year">>, B) =:= sum([E || E <- Own, maps:get(<<"direction">>, E) =:= <<"out">>])),
+     chk(BP, "budget.sell = dispose out-events except loan_payout",
+         maps:get(<<"sell">>, B) =:= sum([E || E <- Ph(<<"dispose">>), maps:get(<<"direction">>, E) =:= <<"out">>,
+                                           maps:get(<<"id">>, E) =/= <<"loan_payout">>])),
+     chk(BP, "no income: pending names loan_payout needing income",
+         maps:get(<<"pending">>, B) =:= [#{<<"id">> => <<"loan_payout">>, <<"phase">> => <<"dispose">>, <<"needs">> => <<"income">>}]),
+     chk(BP, "no horizon: sell null, every dispose line needs hold_years",
+         maps:get(<<"sell">>, B0) =:= null andalso
+         [maps:get(<<"needs">>, P) || P <- maps:get(<<"pending">>, B0)] =:= [<<"hold_years">>, <<"hold_years">>, <<"hold_years">>])].
 
 chk(BP, Label, true)  -> io:format("  PASS   ~s: ~s~n", [BP, Label]), pass;
 chk(BP, Label, false) -> io:format("  FAIL   ~s: ~s~n", [BP, Label]), fail.
