@@ -1380,6 +1380,17 @@ const messages = {
         vi: 'Lập ngân sách mua, giữ và bán nhà, theo từng bang',
         en: 'Plan the budget to buy, hold and sell, by state'
     },
+    // Behavior 113 (Son 2026-10-17): Hành trình is one of the main things, so the list
+    // names it; the line under the list says both the budget and the journey follow
+    // current government rules, each with its source (true since behavior 114).
+    'intro.does.journey': {
+        vi: 'Đi từng bước Hành trình — việc gì, ai làm, khi nào — từ lúc quyết định mua đến khi bán',
+        en: 'Walk the journey step by step — what to do, who does it, when — from deciding to buy to selling'
+    },
+    'intro.does.grounded': {
+        vi: 'Ngân sách và Hành trình đi theo quy định hiện hành của các cơ quan chính phủ Úc (ATO, FIRB, sở thuế từng bang…) — mỗi con số, mỗi bước kèm nguồn và ngày kiểm tra.',
+        en: "The budget and the journey follow the current rules of Australia's government bodies (the ATO, FIRB, each state's revenue office…) — each figure and each step with its source and the date it was checked."
+    },
     'intro.does.data': {
         vi: 'Xem số liệu từng khu vực trên bản đồ',
         en: "See each suburb's data on the map"
@@ -1444,8 +1455,8 @@ const messages = {
     },
     'intro.value.cited.title': { vi: 'Có nguồn, không phỏng đoán', en: 'Sourced, not guessed' },
     'intro.value.cited.body': {
-        vi: 'Như các số liệu trên trang này, mỗi con số trong kế hoạch dẫn về nguồn chính phủ.',
-        en: 'Like every figure on this page, each figure in your plan traces to a government source.'
+        vi: 'Như các số liệu trên trang này, mỗi con số trong Ngân sách và mỗi bước theo quy định trong Hành trình đều dẫn về nguồn chính phủ, kèm ngày kiểm tra; bước nào không do quy định nào chi phối thì ghi rõ là thông lệ.',
+        en: 'Like every figure on this page, each figure in the budget and each rule-bound step in the journey traces to a government source, with the date it was checked; a step no rule governs says it is common practice.'
     },
     'intro.value.info.title': { vi: 'Thông tin, không phải tư vấn', en: 'Information, not advice' },
     'intro.value.info.body': {
