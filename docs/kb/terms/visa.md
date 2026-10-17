@@ -6,7 +6,7 @@ last_verified: 2026-10-18
 
 # Visa terms — Thuật ngữ về visa
 
-The visa words the news uses. None has a KB doc of its own; each explanation rests on the Home Affairs page its `url` names, read on 2026-10-17 (the Direction page is archived as docs/sources/homeaffairs/skilled-visa-processing-priorities-2026-10-16.txt). The 485 and CRICOS terms (behavior 119) were read on 2026-10-18 and rest on the pages archived as docs/sources/homeaffairs/temporary-graduate-485*-2026-10-18.txt.
+The visa words the news uses. None has a KB doc of its own; each explanation rests on the Home Affairs page its `url` names, read on 2026-10-17 (the Direction page is archived as docs/sources/homeaffairs/skilled-visa-processing-priorities-2026-10-16.txt) or, for EOI and occupation ceiling, on 2026-10-18 (archived as docs/sources/homeaffairs/skillselect-invitation-rounds-2026-10-18.txt). The 485 and CRICOS terms (behavior 119) were read on 2026-10-18 and rest on the pages archived as docs/sources/homeaffairs/temporary-graduate-485*-2026-10-18.txt.
 
 ## Terms
 
@@ -42,6 +42,36 @@ The visa words the news uses. None has a KB doc of its own; each explanation res
         "en": "While you hold the temporary stage (820 or 309) you are a foreign person for FIRB; once 801 or 100 is granted you are a permanent resident."
       },
       "url": "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/partner-onshore"
+    },
+    {
+      "id": "eoi",
+      "abbr": "EOI",
+      "name": { "vi": "Hồ sơ bày tỏ nguyện vọng (Expression of Interest, EOI)", "en": "Expression of Interest" },
+      "forms": ["EOI", "EOIs", "Expression of Interest", "Hồ sơ bày tỏ nguyện vọng"],
+      "meaning": {
+        "vi": "Hồ sơ bạn nộp trên SkillSelect để cho biết muốn xin visa tay nghề như 189, 190 hay 491. Nộp EOI chưa phải là nộp visa: bạn chỉ được nộp visa khi được Bộ Nội vụ mời hoặc được một bang đề cử.",
+        "en": "What you lodge in SkillSelect to say you want a skilled visa such as the 189, 190 or 491. It is not a visa application: you may apply only once Home Affairs invites you or a state nominates you."
+      },
+      "why": {
+        "vi": "Không phải ai nộp EOI cũng được mời; khi chưa được cấp visa thường trú, bạn vẫn là người nước ngoài theo FIRB nếu đang giữ visa tạm.",
+        "en": "Not everyone who lodges an EOI is invited; until a permanent visa is granted, a temporary visa holder is still a foreign person for FIRB."
+      },
+      "url": "https://immi.homeaffairs.gov.au/visas/working-in-australia/skillselect/invitation-rounds"
+    },
+    {
+      "id": "occupation_ceiling",
+      "abbr": null,
+      "name": { "vi": "Trần nghề nghiệp (occupation ceiling)", "en": "Occupation ceiling" },
+      "forms": ["occupation ceiling", "occupation ceilings", "Occupation ceiling", "trần nghề nghiệp"],
+      "meaning": {
+        "vi": "Giới hạn trên có thể có về số EOI của một nghề mà Bộ Nội vụ mời. Bộ không công bố con số giới hạn, và trần này không áp dụng cho diện 190 hay diện 491 do bang đề cử.",
+        "en": "A possible upper limit on how many EOIs with a given occupation Home Affairs invites. It does not publish the limits, and they do not apply to the 190 or the state-nominated 491."
+      },
+      "why": {
+        "vi": "Không có \"hạn ngạch theo nghề\" được công bố để dựa vào khi tính thời điểm thành thường trú nhân.",
+        "en": "There is no published quota per occupation to plan on when you estimate when you might become a permanent resident."
+      },
+      "url": "https://immi.homeaffairs.gov.au/visas/working-in-australia/skillselect/invitation-rounds"
     },
     {
       "id": "tss_visa",

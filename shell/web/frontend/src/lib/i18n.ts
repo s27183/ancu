@@ -1264,7 +1264,6 @@ const messages = {
         vi: 'Danh sách đã đầy. Xoá một kế hoạch để tạo mới.',
         en: 'Your list is full. Delete a plan to make a new one.'
     },
-    'plans.delete': { vi: 'Xoá', en: 'Delete' },
     'plans.delete_label': { vi: 'Xoá kế hoạch {p}', en: 'Delete the {p} plan' },
     'plans.delete_q': { vi: 'Xoá kế hoạch này? Không khôi phục được.', en: 'Delete this plan? It can’t be undone.' },
     'plans.delete_yes': { vi: 'Xoá', en: 'Delete' },
