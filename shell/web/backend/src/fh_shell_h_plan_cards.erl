@@ -128,7 +128,10 @@ create_key(Req) ->
         _ -> invalid
     end.
 
-%% Guest plans -> P-5 · Metering, not gating -> The shell backend -> the cap runs before a guest is made
+%% Honest-partial -> P-5 · Metering, not gating -> The shell backend -> the cap runs before a guest is made
+%% An existing guest's create is first held to the plans it may hold (slot/3,
+%% fh_shell_guest:held_limit/1, behavior 111): at 7 it is 409 plans_full before any
+%% daily claim, so a refused create spends none of the day's cap.
 %% A guest's create is capped per guest and per client address each Sydney day
 %% (fh_shell_store:claim_guest_create/3). The address is claimed first, so an address
 %% over its cap makes no new guest row; a claim the engine then refuses is given back.
