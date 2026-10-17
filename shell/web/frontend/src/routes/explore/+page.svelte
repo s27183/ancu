@@ -331,7 +331,8 @@
         use:clickOutside={() => (controlsOpen = false)}
     >
         <!-- Behavior 88: the way home first, top-left, where the planner and the News
-             page carry it in their heads; the filters' button beside it. -->
+             page carry it in their heads; behavior 115: the filters' button at the far
+             right of the same row, the pointer and the panel under it. -->
         <div class="controls-row">
         <HomeBack />
         <button

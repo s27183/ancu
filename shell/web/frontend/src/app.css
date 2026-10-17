@@ -958,18 +958,27 @@ main {
     background: var(--map-ground);
 }
 
-/* Controls cluster — top-left. Collapsed to a glass icon by default; the panel drops
-   below the icon when open. The cluster owns the absolute positioning; the panel is a
-   normal-flow child so it stacks under the toggle. */
+/* Controls cluster — across the map's top: "Trang chủ" far left, "Tìm & lọc" far right
+   (behavior 115, Son 2026-10-18); the pointer and the panel drop below "Tìm & lọc", right-
+   aligned. The cluster owns the absolute positioning; the panel is a normal-flow child so it
+   stacks under the toggle. The cluster spans the map, so it takes no pointer events itself
+   (a drag in the gap between the buttons still pans the map); its controls do. */
 .controls-cluster {
     position: absolute;
     top: calc(var(--header-total) + var(--home-news-h, 0px) + 0.75rem);
     left: 0.75rem;
+    right: 0.75rem;
     z-index: 12;
     display: flex;
     flex-direction: column;
     gap: 0.55rem;
-    align-items: flex-start;
+    align-items: flex-end;
+    pointer-events: none;
+}
+.controls-cluster .home-back,
+.controls-cluster .controls-toggle,
+.controls-cluster .map-controls {
+    pointer-events: auto;
 }
 /* The glass icon button (the collapsed state). */
 /* Behavior 78: the button names itself — icon and "Tìm & lọc" / "Search & filter". */
@@ -1029,13 +1038,14 @@ main {
     line-height: 1.35;
     box-shadow: var(--shadow-2);
     pointer-events: none;
+    text-align: left;
     animation: map-hint-bob 1.6s ease-in-out infinite;
 }
 .map-hint::before {
     content: '';
     position: absolute;
     top: -0.4rem;
-    left: 1.05rem;
+    right: 1.4rem;
     border: 0.45rem solid transparent;
     border-top: 0;
     border-bottom-color: var(--accent);
@@ -3724,8 +3734,10 @@ main {
     outline-offset: 2px;
 }
 .controls-row {
+    align-self: stretch;
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 0.5rem;
 }
 .controls-row .home-back {
