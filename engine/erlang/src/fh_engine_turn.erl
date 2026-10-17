@@ -35,6 +35,7 @@
 -export([callback_mode/0, init/1, terminate/3]).
 -export([running/3, qa/3]).
 -export([base_components/1]).
+-export([outcomes_by_type/2]).  % fh_engine_journey:current/2 refills a stored budget
 %% exported for the Phase-B wiring smoke (no-PG integration of the per-property turn):
 -export([property_components/1, two_path_stored_leaf/2]).
 %% exported for due_diligence_conformance: the document gate that keeps due_diligence's

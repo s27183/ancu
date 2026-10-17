@@ -40,6 +40,7 @@ events(Out) ->
 main(_) ->
     ok = fh_engine_kb:load(),
     R = lists:flatten([mode_cases(M) || M <- modes()] ++ [spend_unit_cases()]
+                      ++ [refill_cases(M) || M <- modes()]
                       ++ [detail_cases(M, S) || M <- modes(),
                                                 S <- [<<"NSW">>, <<"VIC">>, <<"QLD">>, <<"WA">>]]),
     case [X || X <- R, X =:= fail] of
@@ -183,6 +184,42 @@ spend_cases(BP, Intent, Firb) ->
              andalso not lists:member(<<"loan_repayments">>, Own)
              andalso maps:get(<<"out_total">>, CB) =:=
                      Add([maps:get(<<"out_buy">>, CB), maps:get(<<"out_own">>, CB), maps:get(<<"costs_sell">>, CB)]))].
+
+%% a stored card's budget, current when read (behavior 110 revised, Expect 12): a card
+%% stored as the walk stores it (component_id-keyed, as content.components) with every
+%% figure 110 added taken off its budget reads back through fh_engine_journey:current/2
+%% with the budget a fill writes today; a current budget passes unchanged; with no hold a
+%% year of owning is still known (every recurring line less the rent; none at base).
+refill_cases({BP, Intent, Firb}) ->
+    Stored = fun(Out) ->
+        #{<<"components">> =>
+              maps:from_list([{maps:get(<<"name">>, C),
+                               #{<<"outcome">> => maps:get(maps:get(<<"outcome_type">>, C,
+                                                                    maps:get(<<"name">>, C)), Out)}}
+                              || C <- fh_engine_turn:base_components(BP)])}
+    end,
+    BudgetOf = fun(#{<<"components">> := #{<<"purchase_journey">> :=
+                       #{<<"outcome">> := #{<<"lifecycle_budget">> := B}}}}) -> B end,
+    Strip = fun(#{<<"components">> := #{<<"purchase_journey">> :=
+                    #{<<"outcome">> := #{<<"lifecycle_budget">> := B} = O} = PJ} = Cs} = C) ->
+                C#{<<"components">> := Cs#{<<"purchase_journey">> :=
+                    PJ#{<<"outcome">> := O#{<<"lifecycle_budget">> :=
+                        maps:without([<<"out_buy">>, <<"out_own">>, <<"out_own_per_year">>,
+                                      <<"out_total">>, <<"back">>], B)}}}}
+            end,
+    {ok, Out} = fh_engine_simulate:run(BP, onboarding(), Intent, #{}, Firb),
+    {ok, Out0} = fh_engine_simulate:run(BP, onboarding(null), Intent, #{}, Firb),
+    Card = Stored(Out),
+    B0 = budget(Out0),
+    [chk(BP, "a card stored without 110's figures reads back with a fresh fill's budget",
+         BudgetOf(fh_engine_journey:current(BP, Strip(Card))) =:= BudgetOf(Card)
+             andalso maps:is_key(<<"out_total">>, BudgetOf(fh_engine_journey:current(BP, Strip(Card))))),
+     chk(BP, "a current budget passes unchanged",
+         fh_engine_journey:current(BP, Card) =:= Card),
+     chk(BP, "no hold: Giữ nhà a year = every recurring line (no rent at base)",
+         maps:get(<<"hold_years">>, B0) =:= null
+             andalso maps:get(<<"out_own_per_year">>, B0) =/= null
+             andalso maps:get(<<"out_own_per_year">>, B0) =:= maps:get(<<"own_per_year">>, B0))].
 
 %% spend/6 with inflows no base fill emits (behavior 110, Expect 6): a grant the plan
 %% qualifies for comes off both ends, one still conditional off the low end only; rent

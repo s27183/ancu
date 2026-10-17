@@ -52,6 +52,8 @@
 %% spend/6 is pure; exported for lifecycle_sheet_conformance (behavior 110: a qualifying
 %% grant and rent, which no base fill emits).
 -export([spend/6]).
+%% current/2: a stored card's content with its budget brought up to date (behavior 110).
+-export([current/2]).
 
 -define(COPY,          <<"kb.journey.fhg-path">>).       %% Mode A bilingual labels + cell prose
 -define(INVESTOR_COPY, <<"kb.journey.investor-path">>).  %% Mode C bilingual labels + cell prose
@@ -250,7 +252,13 @@ lifecycle_budget(Events, DisposeEvents, Upstream, PayoutNeeds) ->
     BuyIn = [E || E <- Events, maps:get(<<"direction">>, E, null) =:= <<"in">>,
                   lists:member(maps:get(<<"phase">>, E), [<<"prepare">>, <<"pre_approve">>,
                                                            <<"contract">>, <<"settle">>])],
-    Spend = spend(sum_ranges(Buy), sum_ranges(BuyIn), Costs, rent(Upstream), SellTotal, Disp),
+    Spend0 = spend(sum_ranges(Buy), sum_ranges(BuyIn), Costs, rent(Upstream), SellTotal, Disp),
+    %% with no hold there is no N to divide by, yet a year of owning is still known: every
+    %% recurring line, repayments included, less the rent (equal to out_own / N with one)
+    Spend = case maps:get(<<"hold_years">>, Costs) of
+                null -> Spend0#{<<"out_own_per_year">> => offset(sum_ranges(Own), rent(Upstream))};
+                _    -> Spend0
+            end,
     Merged = maps:merge(Costs, Spend),
     Merged#{<<"buy">>          => sum_ranges(Buy),
            <<"own_per_year">> => sum_ranges(Own),
@@ -352,6 +360,42 @@ spend(BuyOut, BuyIn, Costs, Rent, SellTotal, Disp) ->
                                     null -> null;
                                     _ -> as_range(maps:get(<<"net_proceeds">>, Disp, null))
                                 end}.
+
+%% Whole lifecycle -> P-4 · The engine is coupled to no shell -> purchase_journey -> a stored card's budget, current when read
+%% Purpose:   behavior 110 (prod 2026-10-17): a card is stored with the budget its last
+%%            fill wrote, so a plan saved before a change to that budget kept the old one —
+%%            its statement and hub read "—", its list card the old fees-only figures,
+%%            beside a new plan's full ones. Read paths (GET a card, the plan list) pass the
+%%            stored content through here and see the budget a fill would write today.
+%% Holds:     a budget without out_total, or with out_own_per_year null while own_per_year
+%%            is known, is stale; it is refilled from the card's own stored outcomes
+%%            (fh_engine_turn:outcomes_by_type/2, the upstream the walk read) and only
+%%            lifecycle_budget is replaced. Nothing is written back; a fresh budget and a
+%%            content without a journey pass unchanged; a refill that fails serves the
+%%            stored one.
+%% Rests on:  fill/2 is pure in its upstream (no store, no turn), so the refill equals the
+%%            budget a re-fill of the same outcomes writes (lifecycle_sheet_conformance).
+-spec current(binary(), term()) -> term().
+current(Slug, #{<<"components">> := #{<<"purchase_journey">> :=
+                    #{<<"outcome">> := #{<<"lifecycle_budget">> := B} = O} = PJ} = Comps} = Content)
+  when is_map(B) ->
+    case stale(B) of
+        false -> Content;
+        true ->
+            try fill(#{blueprint_slug => Slug}, fh_engine_turn:outcomes_by_type(Slug, Comps)) of
+                {#{<<"lifecycle_budget">> := Fresh}, _, _} ->
+                    Content#{<<"components">> := Comps#{<<"purchase_journey">> :=
+                        PJ#{<<"outcome">> := O#{<<"lifecycle_budget">> := Fresh}}}};
+                _ -> Content
+            catch _:_ -> Content
+            end
+    end;
+current(_Slug, Content) -> Content.
+
+stale(B) ->
+    not maps:is_key(<<"out_total">>, B)
+        orelse (maps:get(<<"out_own_per_year">>, B, null) =:= null
+                andalso maps:get(<<"own_per_year">>, B, null) =/= null).
 
 %% money out less money in, low end paid with the high end received
 offset(null, _) -> null;

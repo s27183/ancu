@@ -44,7 +44,12 @@ handle_get(Req0, State) ->
                                  {ok, Tabs} -> Tabs;
                                  _          -> []
                              end,
-                    Body = Card#{<<"event_cursor">> => Cursor,
+                    %% behavior 110: a card stored before the budget changed is served
+                    %% with the budget a fill writes today (fh_engine_journey:current/2)
+                    Content = fh_engine_journey:current(maps:get(<<"blueprint_slug">>, Card),
+                                                        maps:get(<<"content">>, Card)),
+                    Body = Card#{<<"content">> => Content,
+                                 <<"event_cursor">> => Cursor,
                                  <<"turn_running">> => Running,
                                  <<"ui_tabs">> => UiTabs,
                                  <<"state">> => card_state(PlanCardId)},
