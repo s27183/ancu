@@ -55,6 +55,15 @@ sorted by `order`. **Honest-partial:** if a `budget_ref` does not match any `cas
 present in the buyer's `budget_envelope`, drop the ref (set `null`) — never fabricate a
 figure. `key_assumptions[]` ← the `assumption_*` lines.
 
+**Where each step's rule comes from** (behavior 114, 2026-10-17). Every action carries either
+`rule` — a list of `{kb, source}`, each naming the KB doc that owns the rule the step follows and
+the index, in that doc's `sources:`, of the government page that states it (a state → index map
+where the rule is a state's) — or `"practice": true`, a step no rule governs. The resolver shows
+the first entry that cites a source for the plan's state; a state's rule none of its entries
+cites for that state reads as the state's rule with no source yet, never a borrowed link. The
+compiler refuses a step with neither, a doc that does not exist, an index outside its `sources:`,
+or a source that is not a government page (a `.gov.au` host).
+
 ```jsonc
 {
   "fills": [],
@@ -63,61 +72,61 @@ figure. `key_assumptions[]` ← the `assumption_*` lines.
       {
         "phase": "prepare",
         "actions": [
-          { "id": "build_deposit",       "order": 1, "budget_ref": "deposit", "component_ref": "cash_position" },
-          { "id": "check_eligibility",   "order": 2, "budget_ref": null,      "component_ref": "eligibility" },
-          { "id": "set_up_fhss",         "order": 3, "budget_ref": null,      "component_ref": "eligibility" },
-          { "id": "compare_borrowing",   "order": 4, "budget_ref": null,      "component_ref": "mortgage_finance" },
-          { "id": "gather_documents",    "order": 5, "budget_ref": null,      "component_ref": "preparation" }
+          { "id": "build_deposit",       "order": 1, "budget_ref": "deposit", "component_ref": "cash_position", "practice": true },
+          { "id": "check_eligibility",   "order": 2, "budget_ref": null,      "component_ref": "eligibility", "rule": [{"kb": "kb.scheme.fhg", "source": 1}] },
+          { "id": "set_up_fhss",         "order": 3, "budget_ref": null,      "component_ref": "eligibility", "rule": [{"kb": "kb.scheme.fhss", "source": 0}] },
+          { "id": "compare_borrowing",   "order": 4, "budget_ref": null,      "component_ref": "mortgage_finance", "rule": [{"kb": "kb.lender.serviceability-basics", "source": 0}] },
+          { "id": "gather_documents",    "order": 5, "budget_ref": null,      "component_ref": "preparation", "practice": true }
         ]
       },
       {
         "phase": "pre_approve",
         "actions": [
-          { "id": "consider_broker",     "order": 1, "budget_ref": null, "component_ref": "mortgage_finance" },
-          { "id": "submit_preapproval",  "order": 2, "budget_ref": null, "component_ref": "mortgage_finance" },
-          { "id": "reserve_fhg",         "order": 3, "budget_ref": null, "component_ref": "eligibility" },
-          { "id": "note_validity",       "order": 4, "budget_ref": null, "component_ref": "mortgage_finance" }
+          { "id": "consider_broker",     "order": 1, "budget_ref": null, "component_ref": "mortgage_finance", "rule": [{"kb": "kb.buyer-costs.broker-and-buyers-agent", "source": 1}] },
+          { "id": "submit_preapproval",  "order": 2, "budget_ref": null, "component_ref": "mortgage_finance", "practice": true },
+          { "id": "reserve_fhg",         "order": 3, "budget_ref": null, "component_ref": "eligibility", "rule": [{"kb": "kb.scheme.fhg", "source": 1}] },
+          { "id": "note_validity",       "order": 4, "budget_ref": null, "component_ref": "mortgage_finance", "practice": true }
         ]
       },
       {
         "phase": "contract",
         "actions": [
-          { "id": "inspect_building_pest", "order": 1, "budget_ref": null,      "component_ref": "due_diligence" },
-          { "id": "review_contract",       "order": 2, "budget_ref": null,      "component_ref": "due_diligence" },
-          { "id": "decide_offer_strategy", "order": 3, "budget_ref": null,      "component_ref": "buying_strategy" },
-          { "id": "include_conditions",    "order": 4, "budget_ref": null,      "component_ref": "buying_strategy" },
-          { "id": "pay_deposit",           "order": 5, "budget_ref": "deposit", "component_ref": "cash_position" },
-          { "id": "lodge_concession",      "order": 6, "budget_ref": null,      "component_ref": "eligibility" },
-          { "id": "seek_unconditional",    "order": 7, "budget_ref": null,      "component_ref": "mortgage_finance" }
+          { "id": "inspect_building_pest", "order": 1, "budget_ref": null,      "component_ref": "due_diligence", "practice": true },
+          { "id": "review_contract",       "order": 2, "budget_ref": null,      "component_ref": "due_diligence", "rule": [{"kb": "kb.contract-of-sale.review-points-by-state", "source": {"NSW": 0, "QLD": 1}}, {"kb": "kb.s32.review-points", "source": {"VIC": 0}}] },
+          { "id": "decide_offer_strategy", "order": 3, "budget_ref": null,      "component_ref": "buying_strategy", "practice": true },
+          { "id": "include_conditions",    "order": 4, "budget_ref": null,      "component_ref": "buying_strategy", "practice": true },
+          { "id": "pay_deposit",           "order": 5, "budget_ref": "deposit", "component_ref": "cash_position", "rule": [{"kb": "kb.cooling-off.by-state", "source": {"NSW": 0, "VIC": 1, "QLD": 2}}] },
+          { "id": "lodge_concession",      "order": 6, "budget_ref": null,      "component_ref": "eligibility", "rule": [{"kb": "kb.scheme.nsw.fhbas", "source": {"NSW": 0}}, {"kb": "kb.scheme.vic.fhb-duty", "source": {"VIC": 0}}, {"kb": "kb.scheme.qld.fhc", "source": {"QLD": 0}}] },
+          { "id": "seek_unconditional",    "order": 7, "budget_ref": null,      "component_ref": "mortgage_finance", "practice": true }
         ]
       },
       {
         "phase": "settle",
         "actions": [
-          { "id": "bind_insurance",       "order": 1, "budget_ref": "building_insurance",                "component_ref": "settlement_prep" },
-          { "id": "pay_stamp_duty",       "order": 2, "budget_ref": "stamp_duty",        "component_ref": "cash_position" },
-          { "id": "settle_other_costs",   "order": 3, "budget_ref": "other_buying_costs","component_ref": "cash_position" },
-          { "id": "final_inspection",     "order": 4, "budget_ref": null,                "component_ref": "settlement_prep" },
-          { "id": "settlement_completes", "order": 5, "budget_ref": null,                "component_ref": "settlement_prep" }
+          { "id": "bind_insurance",       "order": 1, "budget_ref": "building_insurance",                "component_ref": "settlement_prep", "rule": [{"kb": "kb.insurance.timing-of-risk-pass", "source": {"NSW": 0, "VIC": 1, "QLD": 2}}] },
+          { "id": "pay_stamp_duty",       "order": 2, "budget_ref": "stamp_duty",        "component_ref": "cash_position", "rule": [{"kb": "kb.stamp-duty.calc-by-state", "source": {"NSW": 4, "VIC": 3, "QLD": 0}}] },
+          { "id": "settle_other_costs",   "order": 3, "budget_ref": "other_buying_costs","component_ref": "cash_position", "practice": true },
+          { "id": "final_inspection",     "order": 4, "budget_ref": null,                "component_ref": "settlement_prep", "practice": true },
+          { "id": "settlement_completes", "order": 5, "budget_ref": null,                "component_ref": "settlement_prep", "rule": [{"kb": "kb.pexa.settlement", "source": 0}] }
         ]
       },
       {
         "phase": "own",
         "actions": [
-          { "id": "move_in",         "order": 1, "budget_ref": "moving_costs", "component_ref": "ownership_planning" },
-          { "id": "budget_ongoing",  "order": 2, "budget_ref": "council_rates_water", "component_ref": "ownership_planning" },
-          { "id": "keep_ppor",       "order": 3, "budget_ref": null, "component_ref": "ownership_planning" },
-          { "id": "watch_refinance", "order": 4, "budget_ref": "loan_repayments", "component_ref": "ownership_planning" }
+          { "id": "move_in",         "order": 1, "budget_ref": "moving_costs", "component_ref": "ownership_planning", "practice": true },
+          { "id": "budget_ongoing",  "order": 2, "budget_ref": "council_rates_water", "component_ref": "ownership_planning", "practice": true },
+          { "id": "keep_ppor",       "order": 3, "budget_ref": null, "component_ref": "ownership_planning", "rule": [{"kb": "kb.tax.cgt-main-residence-exemption", "source": 0}] },
+          { "id": "watch_refinance", "order": 4, "budget_ref": "loan_repayments", "component_ref": "ownership_planning", "practice": true }
         ]
       },
       {
         "phase": "dispose",
         "actions": [
-          { "id": "decide_to_sell",        "order": 1, "budget_ref": null, "component_ref": "disposition" },
-          { "id": "engage_selling_agent",  "order": 2, "budget_ref": "commission", "component_ref": "disposition" },
-          { "id": "confirm_cgt_exemption", "order": 3, "budget_ref": null, "component_ref": "disposition" },
-          { "id": "discharge_mortgage",    "order": 4, "budget_ref": "mortgage_discharge", "component_ref": "disposition" },
-          { "id": "plan_next_purchase",    "order": 5, "budget_ref": null, "component_ref": "disposition" }
+          { "id": "decide_to_sell",        "order": 1, "budget_ref": null, "component_ref": "disposition", "practice": true },
+          { "id": "engage_selling_agent",  "order": 2, "budget_ref": "commission", "component_ref": "disposition", "practice": true },
+          { "id": "confirm_cgt_exemption", "order": 3, "budget_ref": null, "component_ref": "disposition", "rule": [{"kb": "kb.tax.cgt-main-residence-exemption", "source": 0}] },
+          { "id": "discharge_mortgage",    "order": 4, "budget_ref": "mortgage_discharge", "component_ref": "disposition", "practice": true },
+          { "id": "plan_next_purchase",    "order": 5, "budget_ref": null, "component_ref": "disposition", "practice": true }
         ]
       }
     ]

@@ -44,6 +44,15 @@ entry, emit `{ id, order, budget_ref, component_ref, label ← action_<phase>_<i
 action_<phase>_<id>_detail, status: not_started }`, sorted by `order`, dropping any `budget_ref`
 with no matching live `cash_event.id`.
 
+**Where each step's rule comes from** (behavior 114, 2026-10-17). Every action carries either
+`rule` — a list of `{kb, source}`, each naming the KB doc that owns the rule the step follows and
+the index, in that doc's `sources:`, of the government page that states it (a state → index map
+where the rule is a state's) — or `"practice": true`, a step no rule governs. The resolver shows
+the first entry that cites a source for the plan's state; a state's rule none of its entries
+cites for that state reads as the state's rule with no source yet, never a borrowed link. The
+compiler refuses a step with neither, a doc that does not exist, an index outside its `sources:`,
+or a source that is not a government page (a `.gov.au` host).
+
 ```jsonc
 {
   "fills": [],
@@ -52,65 +61,65 @@ with no matching live `cash_event.id`.
       {
         "phase": "prepare",
         "actions": [
-          { "id": "build_deposit",              "order": 1, "budget_ref": "deposit", "component_ref": "cash_position" },
-          { "id": "check_firb_eligible_property","order": 2, "budget_ref": null,      "component_ref": "firb_workflow" },
-          { "id": "compare_non_resident_lenders","order": 3, "budget_ref": null,      "component_ref": "mortgage_finance" },
-          { "id": "map_family_funding",          "order": 4, "budget_ref": null,      "component_ref": "family_context" },
-          { "id": "research_transfer_providers", "order": 5, "budget_ref": "fx_spread_in",      "component_ref": "cross_border_funding" }
+          { "id": "build_deposit",              "order": 1, "budget_ref": "deposit", "component_ref": "cash_position", "practice": true },
+          { "id": "check_firb_eligible_property","order": 2, "budget_ref": null,      "component_ref": "firb_workflow", "rule": [{"kb": "kb.firb.eligible-property-types-foreign-persons", "source": 0}] },
+          { "id": "compare_non_resident_lenders","order": 3, "budget_ref": null,      "component_ref": "mortgage_finance", "rule": [{"kb": "kb.lender.non-resident-friendly-shortlist", "source": 0}] },
+          { "id": "map_family_funding",          "order": 4, "budget_ref": null,      "component_ref": "family_context", "rule": [{"kb": "kb.au-aml-ctf.source-of-funds-documentation", "source": 0}] },
+          { "id": "research_transfer_providers", "order": 5, "budget_ref": "fx_spread_in",      "component_ref": "cross_border_funding", "rule": [{"kb": "kb.cross-border-settlement.coordination-best-practices", "source": 0}] }
         ]
       },
       {
         "phase": "pre_approve",
         "actions": [
-          { "id": "gather_documents",       "order": 1, "budget_ref": null, "component_ref": "mortgage_finance" },
-          { "id": "submit_preapproval",      "order": 2, "budget_ref": null, "component_ref": "mortgage_finance" },
-          { "id": "prepare_firb_application","order": 3, "budget_ref": "firb_application_help", "component_ref": "firb_workflow" },
-          { "id": "plan_transfer_timing",    "order": 4, "budget_ref": null, "component_ref": "cross_border_funding" }
+          { "id": "gather_documents",       "order": 1, "budget_ref": null, "component_ref": "mortgage_finance", "practice": true },
+          { "id": "submit_preapproval",      "order": 2, "budget_ref": null, "component_ref": "mortgage_finance", "practice": true },
+          { "id": "prepare_firb_application","order": 3, "budget_ref": "firb_application_help", "component_ref": "firb_workflow", "rule": [{"kb": "kb.firb.documents-required", "source": 0}] },
+          { "id": "plan_transfer_timing",    "order": 4, "budget_ref": null, "component_ref": "cross_border_funding", "practice": true }
         ]
       },
       {
         "phase": "contract",
         "actions": [
-          { "id": "inspect_property",             "order": 1, "budget_ref": null,                      "component_ref": "due_diligence" },
-          { "id": "review_contract",              "order": 2, "budget_ref": null,                      "component_ref": "due_diligence" },
-          { "id": "confirm_new_build_eligibility","order": 3, "budget_ref": null,                      "component_ref": "buying_strategy" },
-          { "id": "pay_deposit",                  "order": 4, "budget_ref": "deposit",                 "component_ref": "cash_position" },
-          { "id": "submit_firb_application",      "order": 5, "budget_ref": "firb_fee",                "component_ref": "firb_workflow" },
-          { "id": "seek_unconditional_finance",   "order": 6, "budget_ref": null,                      "component_ref": "mortgage_finance" },
-          { "id": "initiate_deposit_transfer",    "order": 7, "budget_ref": "vn_outbound_bank_fee",                      "component_ref": "cross_border_funding" }
+          { "id": "inspect_property",             "order": 1, "budget_ref": null,                      "component_ref": "due_diligence", "practice": true },
+          { "id": "review_contract",              "order": 2, "budget_ref": null,                      "component_ref": "due_diligence", "rule": [{"kb": "kb.contract-of-sale.review-points-by-state", "source": {"NSW": 0, "QLD": 1}}, {"kb": "kb.s32.review-points", "source": {"VIC": 0}}] },
+          { "id": "confirm_new_build_eligibility","order": 3, "budget_ref": null,                      "component_ref": "buying_strategy", "rule": [{"kb": "kb.firb.eligible-property-types-foreign-persons", "source": 0}] },
+          { "id": "pay_deposit",                  "order": 4, "budget_ref": "deposit",                 "component_ref": "cash_position", "rule": [{"kb": "kb.cooling-off.by-state", "source": {"NSW": 0, "VIC": 1, "QLD": 2}}] },
+          { "id": "submit_firb_application",      "order": 5, "budget_ref": "firb_fee",                "component_ref": "firb_workflow", "rule": [{"kb": "kb.firb.application-process", "source": 0}] },
+          { "id": "seek_unconditional_finance",   "order": 6, "budget_ref": null,                      "component_ref": "mortgage_finance", "practice": true },
+          { "id": "initiate_deposit_transfer",    "order": 7, "budget_ref": "vn_outbound_bank_fee",                      "component_ref": "cross_border_funding", "rule": [{"kb": "kb.cross-border-settlement.coordination-best-practices", "source": 0}] }
         ]
       },
       {
         "phase": "settle",
         "actions": [
-          { "id": "confirm_firb_approval",     "order": 1, "budget_ref": null,                     "component_ref": "firb_workflow" },
-          { "id": "pay_stamp_duty",            "order": 2, "budget_ref": "stamp_duty",             "component_ref": "cash_position" },
-          { "id": "pay_foreign_buyer_surcharge","order": 3, "budget_ref": "foreign_buyer_surcharge","component_ref": "cash_position" },
-          { "id": "complete_transfer",         "order": 4, "budget_ref": "au_inbound_bank_fee",                     "component_ref": "cross_border_funding" },
-          { "id": "settle_other_costs",        "order": 5, "budget_ref": "other_buying_costs",     "component_ref": "cash_position" },
-          { "id": "bind_insurance",            "order": 6, "budget_ref": "building_insurance",                     "component_ref": "settlement_prep" },
-          { "id": "final_inspection",          "order": 7, "budget_ref": null,                     "component_ref": "settlement_prep" },
-          { "id": "settlement_completes",      "order": 8, "budget_ref": null,                     "component_ref": "settlement_prep" }
+          { "id": "confirm_firb_approval",     "order": 1, "budget_ref": null,                     "component_ref": "firb_workflow", "rule": [{"kb": "kb.firb.approval-to-settlement-timeline", "source": 0}] },
+          { "id": "pay_stamp_duty",            "order": 2, "budget_ref": "stamp_duty",             "component_ref": "cash_position", "rule": [{"kb": "kb.stamp-duty.calc-by-state", "source": {"NSW": 4, "VIC": 3, "QLD": 0}}] },
+          { "id": "pay_foreign_buyer_surcharge","order": 3, "budget_ref": "foreign_buyer_surcharge","component_ref": "cash_position", "rule": [{"kb": "kb.foreign-buyer-surcharge.by-state", "source": {"NSW": 5, "VIC": 0, "QLD": 1, "WA": 2, "TAS": 3}}] },
+          { "id": "complete_transfer",         "order": 4, "budget_ref": "au_inbound_bank_fee",                     "component_ref": "cross_border_funding", "rule": [{"kb": "kb.cross-border-settlement.coordination-best-practices", "source": 0}] },
+          { "id": "settle_other_costs",        "order": 5, "budget_ref": "other_buying_costs",     "component_ref": "cash_position", "practice": true },
+          { "id": "bind_insurance",            "order": 6, "budget_ref": "building_insurance",                     "component_ref": "settlement_prep", "rule": [{"kb": "kb.insurance.timing-of-risk-pass", "source": {"NSW": 0, "VIC": 1, "QLD": 2}}] },
+          { "id": "final_inspection",          "order": 7, "budget_ref": null,                     "component_ref": "settlement_prep", "practice": true },
+          { "id": "settlement_completes",      "order": 8, "budget_ref": null,                     "component_ref": "settlement_prep", "rule": [{"kb": "kb.pexa.settlement", "source": 0}] }
         ]
       },
       {
         "phase": "own",
         "actions": [
-          { "id": "move_in",                  "order": 1, "budget_ref": "moving_costs", "component_ref": "ownership_planning" },
-          { "id": "budget_ongoing",           "order": 2, "budget_ref": "council_rates_water", "component_ref": "ownership_planning" },
-          { "id": "declare_vacancy_occupancy","order": 3, "budget_ref": null, "component_ref": "ownership_planning" },
-          { "id": "monitor_visa_status",      "order": 4, "budget_ref": null, "component_ref": "buyer_profile" },
-          { "id": "watch_refinance",          "order": 5, "budget_ref": "loan_repayments", "component_ref": "ownership_planning" }
+          { "id": "move_in",                  "order": 1, "budget_ref": "moving_costs", "component_ref": "ownership_planning", "practice": true },
+          { "id": "budget_ongoing",           "order": 2, "budget_ref": "council_rates_water", "component_ref": "ownership_planning", "practice": true },
+          { "id": "declare_vacancy_occupancy","order": 3, "budget_ref": null, "component_ref": "ownership_planning", "rule": [{"kb": "kb.firb.vacancy-fee-rules-2026", "source": 0}] },
+          { "id": "monitor_visa_status",      "order": 4, "budget_ref": null, "component_ref": "buyer_profile", "rule": [{"kb": "kb.visas.au-temporary-residency-classes", "source": 3}] },
+          { "id": "watch_refinance",          "order": 5, "budget_ref": "loan_repayments", "component_ref": "ownership_planning", "practice": true }
         ]
       },
       {
         "phase": "dispose",
         "actions": [
-          { "id": "decide_to_sell",                  "order": 1, "budget_ref": null, "component_ref": "disposition" },
-          { "id": "engage_selling_agent",             "order": 2, "budget_ref": "commission", "component_ref": "disposition" },
-          { "id": "confirm_cgt_tax_residency_position","order": 3, "budget_ref": null, "component_ref": "disposition" },
-          { "id": "discharge_mortgage",               "order": 4, "budget_ref": "mortgage_discharge", "component_ref": "disposition" },
-          { "id": "plan_next_step",                   "order": 5, "budget_ref": null, "component_ref": "disposition" }
+          { "id": "decide_to_sell",                  "order": 1, "budget_ref": null, "component_ref": "disposition", "practice": true },
+          { "id": "engage_selling_agent",             "order": 2, "budget_ref": "commission", "component_ref": "disposition", "practice": true },
+          { "id": "confirm_cgt_tax_residency_position","order": 3, "budget_ref": null, "component_ref": "disposition", "rule": [{"kb": "kb.non-resident-tax.cgt-no-ppor-exemption", "source": 0}] },
+          { "id": "discharge_mortgage",               "order": 4, "budget_ref": "mortgage_discharge", "component_ref": "disposition", "practice": true },
+          { "id": "plan_next_step",                   "order": 5, "budget_ref": null, "component_ref": "disposition", "practice": true }
         ]
       }
     ]
