@@ -3940,24 +3940,32 @@ main {
     color: var(--muted);
     font-size: 1.25rem;
 }
-/* Behavior 111: a plan's delete — quiet, at the card's foot, outside its button; the
-   confirm replaces it with one row in the page (no browser dialog). */
+/* Behavior 111, 116: a plan's delete — a trash icon at the card's top right, outside its
+   button; the confirm replaces it with one row in the page (no browser dialog). */
 .plan-cards > li {
     position: relative;
 }
 .plan-del {
     position: absolute;
-    right: 0.6rem;
-    bottom: 0.45rem;
-    padding: 0.3rem 0.5rem;
+    top: 0.3rem;
+    right: 0.3rem;
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
     border: 0;
     border-radius: var(--radius);
     background: none;
-    font-size: var(--fs-xs);
-    color: var(--muted);
+    color: var(--ink-2);
     cursor: pointer;
 }
-.plan-del:hover {
+/* the place line leaves room for the delete icon at the card's top right */
+.plan-cards .plan-card-place {
+    padding-right: 1.5rem;
+}
+.plan-del:hover,
+.plan-del:focus-visible {
     color: var(--danger, #b42318);
     background: var(--surface-2, var(--accent-soft));
 }

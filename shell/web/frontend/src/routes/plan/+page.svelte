@@ -45,9 +45,16 @@
         void reload;
         listPlanCards().then((c) => (cards = c));
     });
-    // Behavior 111: a plan leaves the list by its own delete, after a confirm in the page
-    // (the viewer may refuse browser dialogs): the card asks once, "Xoá" removes it
-    // (DELETE /api/plan-cards/:id, the slot frees at once) and the list reloads.
+    // Bilingual -> a visitor's own list is theirs to change -> the web frontend -> a plan's delete
+    // Goal:      behaviors 111/116 — a guest removes a plan from their list without help: a
+    //            trash icon at each card's top right (Son 2026-10-18, users: the old "Xoá" text at
+    //            the card's foot was too hard to use).
+    // Invariant: a delete asks first, in the page (the viewer may refuse browser dialogs), and
+    //            the icon sits outside the card's own button, so a tap elsewhere opens the plan.
+    // Capability: a 44px icon button named "Xoá kế hoạch <nơi>"; it opens the confirm row
+    //            ("Giữ lại" / "Xoá"); "Xoá" sends DELETE /api/plan-cards/:id, the slot frees at
+    //            once and the list reloads (measured 2026-10-18 before 116: a 38×24 px "Xoá",
+    //            12px muted text, at the card's bottom right).
     let confirming = $state<string | null>(null);
     let deleting = $state(false);
     let deleteFailed = $state(false);
@@ -297,7 +304,16 @@
                                         data-plan-delete
                                         aria-label={$t('plans.delete_label').replace('{p}', placeOf(c))}
                                         onclick={() => ((confirming = c.plan_card_id), (deleteFailed = false))}
-                                        >{$t('plans.delete')}</button
+                                        ><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"
+                                            ><path
+                                                d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                stroke-width="2"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                            /></svg
+                                        ></button
                                     >
                                 {/if}
                             </li>
