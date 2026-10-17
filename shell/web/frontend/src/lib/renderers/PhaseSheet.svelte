@@ -17,11 +17,16 @@
     // place) in a modal over this one — closing it returns to the checklist; a ref naming a
     // figure split into lines (its group) lists those lines, each opening its detail. Opened
     // from a line's detail (`focusAction`), the sheet starts on the checklist at that step.
-    // Behavior 114 (where a step's rule comes from): under each step, "Nguồn: <body> · kiểm
-    // tra <date>" linking the government page the engine resolved for the plan's state, or
-    // "Quy định của bang · chưa có nguồn cho <bang>" (a state's rule the KB cites no page
-    // for there yet — no link is borrowed), or "Thông lệ" (no rule governs it). The words
-    // are placed, never chosen here: grounding comes from fh_engine_phase_playbook.
+    //
+    // Whole lifecycle -> honesty tiers -> the web frontend -> where a step's rule comes from
+    // Goal:      behavior 114 — under each step, "Nguồn: <body> · kiểm tra <date>" linking
+    //            the government page the engine resolved for the plan's state, or "Quy định
+    //            của bang · chưa có nguồn cho <bang>", or "Thông lệ" (no rule governs it).
+    // Invariant: the grounding is placed, never chosen here (fh_engine_phase_playbook owns
+    //            it); a state_rule step borrows no other state's link; the body is named by
+    //            facts.ts PUBLISHERS, else the bare host.
+    // Capability: one source line per step; a step with no `grounding` (a card the engine
+    //            has not regrounded) shows none.
     import { tick } from 'svelte';
     import LineDetail from '$lib/LineDetail.svelte';
     import { t } from '$lib/i18n';
