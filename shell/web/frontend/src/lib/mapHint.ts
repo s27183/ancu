@@ -1,14 +1,15 @@
-// The map's finding pointer (behavior 78): when the page opens, a text bubble beside the
-// filter button says how to find a suburb — type its name there, or zoom into the map.
-//
-//   goal property: bilingual, self-serve — a guest builds a plan without sign-in (b45)
-//   invariant: a pointer points, the visitor acts; it never blocks a control (it takes
-//     no pointer events) and never talks over the first-visit sheet or the tour (b52),
-//     whose first step already points at the search
-//   component: this module + the bubble in routes/+page.svelte + Welcome.svelte (introOpen)
-//   capability: shown on each page open until a suburb has once been opened in this
-//     browser (HINT_KEY); gone for the page view on the first filter open, map zoom or
-//     suburb opened; still, not bobbing, under reduced motion (app.css)
+// Bilingual -> a pointer points, the visitor acts -> the web frontend -> the map's finding pointer
+// Goal:      behaviors 78/115 — a guest on the map learns how to find a suburb without help: a
+//            bubble under "Tìm & lọc" says type its name there, or zoom into the map.
+// Invariant: it never blocks a control (it takes no pointer events) and never talks over the
+//            first-visit sheet or the tour (b52), whose first step already points at the search;
+//            this module + the bubble in routes/explore/+page.svelte + Welcome.svelte (introOpen).
+// Capability: under "Tìm & lọc" at the map's top right, its arrow on that button, never on
+//            "Trang chủ" at the top left (measured 2026-10-18 in Chrome: arrow x 359 inside the
+//            button's 269–388 at 400px; before behavior 115 it sat at x≈29, over "Trang chủ");
+//            shown on each page open until a suburb has once been opened in this browser
+//            (HINT_KEY); gone for the page view on the first filter open, map zoom or suburb
+//            opened; still, not bobbing, under reduced motion (app.css).
 import { writable } from 'svelte/store';
 
 /** Whether the first-visit sheet is open — set by Welcome.svelte. */
