@@ -2,9 +2,12 @@
     // Bilingual -> P-6 · Shells reach the engine only through the contract -> The web frontend -> the first-visit introduction
     // Purpose:   says on its first screen what the product does and what it is not, so a
     //            visitor knows before opening a plan that it budgets the whole lifecycle and
-    //            walks the journey step by step (Hành trình, behavior 107).
+    //            walks the journey step by step (Hành trình, behavior 107), and that both
+    //            the budget and the journey follow current government rules, each cited.
     // Holds:     every item names a place the visitor can reach — the plan, Hành trình, the
-    //            suburb data, the news, the assistant; the launcher reads "Giới thiệu" /
+    //            suburb data, the news, the assistant; the first screen lists four (plan,
+    //            Hành trình, data, news) and claims grounding only for what cites it — every
+    //            figure and every rule-bound step (behaviors 113, 114); the launcher reads "Giới thiệu" /
     //            "Introduction" (behavior 107, Son 2026-10-17: once "Vì sao Úc?").
     // Rests on:  i18n.ts intro.* keys, VI and EN side by side.
     //
@@ -155,16 +158,19 @@
                     </svg>
                     <span class="wl-eyebrow">{$t('intro.eyebrow')}</span>
                     <h2 id="wl-title">{$t('intro.title')}</h2>
-                    <!-- Behavior 90: what it does (three) and what it is not (two), on the
-                         first screen, before any scroll. -->
+                    <!-- Behavior 90: what it does and what it is not, on the first screen,
+                         before any scroll; behavior 113: four things it does, Hành trình
+                         second, and under them the line on whose rules both rest. -->
                     <div class="wl-is">
                         <div class="wl-is-col">
                             <p class="wl-is-head">{$t('intro.does')}</p>
                             <ul>
                                 <li class="yes">{$t('intro.does.plan')}</li>
+                                <li class="yes">{$t('intro.does.journey')}</li>
                                 <li class="yes">{$t('intro.does.data')}</li>
                                 <li class="yes">{$t('intro.does.news')}</li>
                             </ul>
+                            <p class="wl-grounded">{$t('intro.does.grounded')}</p>
                         </div>
                         <div class="wl-is-col">
                             <p class="wl-is-head">{$t('intro.isnt')}</p>
@@ -497,6 +503,13 @@
     .wl-is li.yes::before {
         content: '✓';
         color: var(--gold-mark);
+    }
+    .wl-grounded {
+        margin: var(--sp-2) 0 0;
+        max-width: 38rem;
+        font-size: var(--fs-sm);
+        line-height: 1.45;
+        color: var(--on-dark);
     }
     .wl-is li.no::before {
         content: '✕';
