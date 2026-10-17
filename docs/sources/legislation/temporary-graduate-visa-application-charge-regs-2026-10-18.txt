@@ -1,0 +1,139 @@
+Source: https://www.legislation.gov.au/F2026L00163/asmade/2026-02-28/text/original/epub/OEBPS/document_1/document_1.html
+Retrieved: 2026-10-18
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML 5492249d8411c9586b971db7d77ac0f5a159313acc80995f4500b2934dea0c6b
+
+1 0 2017-04-26T01:27:00Z 2026-02-23T01:43:00Z 2026-02-23T01:44:00Z 8 1088 5485 210 168 6405 16.0000 unk Regulations 0x010100266966F133664895A6EE3632470D45F50002D5803A1C97BC4BB9F52B5429CBD06E 2026 AMD 0 Yes OPC67628 50f6adae-d5ef-4774-9e56-09b7c9ff5ceb 3 true Privileged OFFICIAL 2026-02-23T01:43:28Z 6872c766-c4c7-42a9-a973-8671fad5e15a 10, 0, 1, 1 A Migration Amendment (Temporary Graduate Visa Application Charge) Regulations 2026 SLI
+Migration Amendment (Temporary Graduate Visa Application Charge) Regulations 2026
+I, the Honourable Sam Mostyn AC, Governor ‑ General of the Commonwealth of Australia, acting with the advice of the Federal Executive Council, make the following regulations.
+Dated 19 February 2026
+Sam Mostyn AC
+Governor ‑ General
+By Her Excellency’s Command
+Tony Burke
+Minister for Immigration and Citizenship
+Contents
+1 Name
+2 Commencement
+3 Authority
+4 Schedules
+Schedule 1—Amendments
+Migration Regulations 1994
+1 Name
+This instrument is the Migration Amendment (Temporary Graduate Visa Application Charge) Regulations 2026 .
+2 Commencement
+(1) Each provision of this instrument specified in column 1 of the table commences, or is taken to have commenced, in accordance with column 2 of the table. Any other statement in column 2 has effect according to its terms.
+Commencement information
+Column 1
+Column 2
+Column 3
+Provisions
+Commencement
+Date/Details
+1. The whole of this instrument
+1 March 2026.
+1 March 2026
+Note: This table relates only to the provisions of this instrument as originally made. It will not be amended to deal with any later amendments of this instrument.
+(2) Any information in column 3 of the table is not part of this instrument. Information may be inserted in this column, or information in it may be edited, in any published version of this instrument.
+3 Authority
+This instrument is made under the Migration Act 1958 .
+4 Schedules
+Each instrument that is specified in a Schedule to this instrument is amended or repealed as set out in the applicable items in the Schedule concerned, and any other item in a Schedule to this instrument has effect according to its terms.
+Schedule 1 — Amendments
+Migration Regulations 1994
+1 Sub ‑ subparagraph 1222(2)(a)(ia)(A) of Schedule 1
+Omit “meet”, substitute “satisfy”.
+2 Sub ‑ subparagraph 1222(2)(a)(ia)(C) of Schedule 1
+Omit “who is a”, substitute “who claims to be”.
+3 Subparagraphs 1229(2)(a)(i) and (ii) of Schedule 1
+Repeal the subparagraphs, substitute:
+(i) for:
+(A) an applicant who is seeking to satisfy the primary criteria for the grant of a Subclass 485 (Temporary Graduate) visa in the Post ‑ Higher Education Work stream, holds a PHE visa and holds an eligible passport; or
+(B) an applicant whose application is combined, or sought to be combined, with an application made by that person; or
+(C) an applicant who claims to be a member of the family unit of a person who holds a PHE visa, if that person held a PHE visa immediately before the most recent grant of a Subclass 485 (Temporary Graduate) visa to that person and that person holds an eligible passport:
+First instalment
+Item
+Component
+Amount
+1
+Base application charge
+$905
+2
+Additional applicant charge for an applicant who is at least 18
+$455
+3
+Additional applicant charge for an applicant who is less than 18
+$230
+(ii) for:
+(A) an applicant who is seeking to satisfy the primary criteria for the grant of a Subclass 485 (Temporary Graduate) visa in the Post ‑ Higher Education Work stream, holds a PHE visa and does not hold an eligible passport; or
+(B) an applicant whose application is combined, or sought to be combined, with an application made by that person; or
+(C) an applicant who claims to be a member of the family unit of a person who holds a PHE visa, if that person held a PHE visa immediately before the most recent grant of a Subclass 485 (Temporary Graduate) visa to that person and that person does not hold an eligible passport:
+First instalment
+Item
+Component
+Amount
+1
+Base application charge
+$1 810
+2
+Additional applicant charge for an applicant who is at least 18
+$910
+3
+Additional applicant charge for an applicant who is less than 18
+$460
+(iii) for:
+(A) an applicant who is seeking to satisfy the primary criteria for the grant of a Skilled (Provisional) (Class VC) visa, holds an eligible passport and does not hold a PHE visa; or
+(B) an applicant whose application is combined, or sought to be combined, with an application made by that person; or
+(C) an applicant who claims to be a member of the family unit of a person who holds a Skilled (Provisional) (Class VC) visa and who did not, at the time of application, hold a PHE visa, and that person holds an eligible passport:
+First instalment
+Item
+Component
+Amount
+1
+Base application charge
+$2 300
+2
+Additional applicant charge for an applicant who is at least 18
+$1 150
+3
+Additional applicant charge for an applicant who is less than 18
+$580
+(iv) for any other applicant:
+First instalment
+Item
+Component
+Amount
+1
+Base application charge
+$4 600
+2
+Additional applicant charge for an applicant who is at least 18
+$2 300
+3
+Additional applicant charge for an applicant who is less than 18
+$1 160
+Note: Regulation 2.12C explains the components of the first instalment of visa application charge and specifies the amounts of subsequent temporary application charge and non ‑ Internet application charge. Not all of the components may apply to a particular application.
+Additional applicant charge is paid by an applicant who claims to be a member of the family unit of another applicant and seeks to combine the application with that applicant’s application.
+4 Subitem 1229(11) of Schedule 1
+Insert:
+eligible passport means a valid passport issued by one of the following countries:
+(a) Federated States of Micronesia;
+(b) Fiji;
+(c) Kiribati;
+(d) Nauru;
+(e) Palau;
+(f) Papua New Guinea;
+(g) Republic of the Marshall Islands;
+(h) Samoa;
+(i) Solomon Islands;
+(j) Timor ‑ Leste;
+(k) Tonga;
+(l) Tuvalu;
+(m) Vanuatu.
+PHE visa means either:
+(a) a Subclass 485 (Temporary Graduate) visa in the Post ‑ Study Work stream or the Post ‑ Higher Education Work stream; or
+(b) a Subclass 485 (Temporary Graduate) visa in the Replacement stream held by a person who previously held a Subclass 485 (Temporary Graduate) visa in the Post ‑ Study Work stream.
+5 In the appropriate position in Schedule 13
+Insert:
+Part 159 — Amendments made by the Migration Amendment (Temporary Graduate Visa Application Charge) Regulations 2026
+15901 Operation of amendments
+The amendments made by Schedule 1 to the Migration Amendment (Temporary Graduate Visa Application Charge) Regulations 2026 apply in relation to an application for a visa made on or after the commencement of that Schedule.

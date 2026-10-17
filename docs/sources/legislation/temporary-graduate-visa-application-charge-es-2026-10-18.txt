@@ -1,0 +1,179 @@
+Source: https://www.legislation.gov.au/F2026L00163/asmade/2026-02-28/es/original/epub/OEBPS/document_1/document_1.html
+Retrieved: 2026-10-18
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML 6eb75ab190c6bf92e0985832e27625f0a62731b2bc1530216f3d1ea894664cd9
+
+1 0 2026-02-25T02:23:00Z 2026-02-25T02:24:00Z 14 4704 25103 435 174 29730 16.0000 #ff0000,14,Aptos 264ce747,279cf27d,21a91e5f #ff0000,14,Aptos 5d94be7,2829e9cb,f10f6cb 04223eb7-70bc-49cd-b0ed-18911f78759a 3 true 2026-02-23T01:51:12Z 6872c766-c4c7-42a9-a973-8671fad5e15a 10, 0, 1, 1
+EXPLANATORY STATEMENT
+Issued by the Minister for Immigration and Citizenship
+Migration Act 1958
+Migration Amendment (Temporary Graduate Visa Application Charge) Regulations 2026
+The Migration Act 1958 (the Migration Act) is an Act relating to the entry into, and presence in, Australia of aliens, and the departure or deportation from Australia of aliens and certain other persons.
+Subsection 504(1) of the Migration Act provides that the Governor-General may make regulations, not inconsistent with the Migration Act, prescribing matters required or permitted to be prescribed, or necessary or convenient to be prescribed, for carrying out or giving effect to the Migration Act.
+Subsection 45B(1) of the Migration Act provides that the amount of the visa application charge (VAC) is the amount, not exceeding the VAC limit, prescribed by the Migration Regulations 1994 (the Migration Regulations) in relation to the visa application. The VAC limit is calculated with reference to sections 5 and 6 of the Migration (Visa Application) Charge Act 1997 .
+Section 45C of the Migration Act provides for matters for which the regulations may provide in relation to the VAC. Paragraph 45C(2)(b) of the Migration Act provides that the regulations may provide for the remission, refund or waiver of the VAC or an amount of the VAC.
+Division 2.2A of the Migration Regulations deals with the VAC and related matters. Regulation 2.12C prescribes the amount of VAC in relation to an application for a visa of a class to which an item of Schedule 1 relates.
+The Migration Amendment (Temporary Graduate Visa Application Charge) Regulations 2026 (the Regulations) amend the Migration Regulations to increase the first instalment of the VAC payable for a Subclass 485 (Temporary Graduate) visa. The Subclass 485 visa is a temporary visa that provides eligible international students with the opportunity to temporarily live, study and work in Australia after completing academic qualifications.
+The VAC uplift applies to applicants who seek to satisfy the primary criteria in Schedule 2 to the Migration Regulations (primary applicants). The increase also applies to secondary applicants who make a combined application with the primary applicant, or make an application as a member of the family unit of a person who holds a Subclass 485 visa, having satisfied the primary criteria for the grant of the visa (known as a subsequent entrant application).
+However, the VAC uplift does not apply if the primary applicant holds a valid passport issued by a specified country in the Pacific or Timor-Leste. Instead, the Regulations maintain the previous VAC amounts for both primary and secondary applicants where the primary applicant holds an eligible passport. This is consistent with the policy settings that implemented a reduced VAC for Subclass 500 (Student) visa applications where the primary applicant holds a valid passport issued by a specified country in the Pacific or Timor-Leste.
+Before the commencement of the Regulations, there were two tiers of VAC for a Subclass 485 visa. The applicable tier depended on whether the primary applicant was holding a Subclass 485 in the Post‑Study Work stream, the Post‑Higher Education Work stream or the Replacement stream, and was applying for a subsequent Subclass 485 visa in the Post‑Higher Education Work stream (a subsequent Subclass 485 visa applicant). A lower VAC applied to these applications in recognition of their continuing commitment to live, work and study in the same type of designated regional area that led to the grant of their first Subclass 485 visa.
+The Regulations now operate to specify the VAC in four separate tiers to implement the increased VAC amounts for non-eligible passport holders, while maintaining the distinction between subsequent Subclass 485 visa applicants and other applicants.
+The first instalment of the VAC for a Subclass 485 visa is as follows:
+For an applicant who is a subsequent Subclass 485 visa applicant and holds an eligible passport, the applicable VAC is: $905 for the primary applicant, $455 for an additional applicant aged 18 years or older, and $230 for an additional applicant under 18 years of age.
+For an applicant who is a subsequent Subclass 485 visa applicant and does not hold an eligible passport, the VAC is increased to: $1,810 for the primary applicant, $910 for an additional applicant aged 18 years or older, and $460 for an additional applicant under 18 years of age.
+For an applicant who holds an eligible passport and is not a subsequent Subclass 485 visa applicant, the applicable VAC is: $2,300 for the primary applicant, $1,150 for an additional applicant aged 18 years or older, and $580 for an additional applicant under 18 years of age.
+For any other applicant (being an applicant who does not hold an eligible passport and is not a subsequent Subclass 485 visa applicant), the applicable VAC is increased to: $4,600 for the primary applicant, $2,300 for an additional applicant aged 18 years or older, and $1,160 for an additional applicant under 18 years of age.
+The base application charge is also payable by the first applicant included in a subsequent entrant application, determined in accordance with the relevant tier on the basis of whether the primary visa holder was a subsequent Subclass 485 visa applicant at the time of application, and holds an eligible passport. The applicable additional applicant charge is payable for any additional dependent applicants included in the subsequent entrant application (dependent on the age of the additional applicant).
+There is no change to the second instalment of the VAC, which remains as nil, under paragraph 1229(2)(b) of Schedule 1.
+The Regulations also make minor technical amendments to item 1222 in relation to applications for a Student (Temporary) (Class TU) visa, to align with existing language in Schedule 1 to the Migration Regulations.
+The proposed Regulations give effect to a decision of Government made in accordance with the 2025 ‑ 26 Mid-Year Economic Outlook (MYEFO). Commonwealth agencies were consulted during the 2025 ‑ 26 MYEFO process to inform the Government’s decision in relation to increasing the VAC for Subclass 485 (Temporary Graduate) visa applicants, excluding those applicants who are holders of a valid passport issued by a specified country in the Pacific or Timor-Leste. No further consultation was considered necessary as the amendments seek to align with the policy settings implemented in relation to the VAC for Student (Temporary) (Class TU) visa applications. This accords with consultation requirements in subsection 17(1) of the Legislation Act 2003 (the Legislation Act).
+Excluding Pacific and Timor-Leste applicants from the VAC uplift supports the Australian Government’s commitment to deepening engagement with countries in the Pacific region by fostering global education, workforce development, and skills exchange.
+Advice in relation to the changes made by the Regulations will be provided for clients and other stakeholders on the Department’s website and through standard communication channels.
+A Statement of Compatibility with Human Rights (the Statement) has been completed in accordance with the Human Rights (Parliamentary Scrutiny) Act 2011 . The overall assessment is that the Regulations are compatible with human rights. A copy of the Statement is at Attachment A .
+The Regulations commence on 1 March 2026.
+Further details of the Regulations are set out in Attachment B .
+The Regulations amend the Migration Regulations, which are exempt from sunsetting under table item 38A of section 12 of the Legislation (Exemptions and Other Matters) Regulation 2015 . The Migration Regulations are exempt from sunsetting on the basis that the repeal and remaking of the Migration Regulations:
+is unnecessary as the Migration Regulations are regularly amended numerous times each year to update policy settings for immigration programs;
+would require complex and difficult to administer transitional provisions to ensure, amongst other things, the position of the many people who hold Australian visas, and similarly, there would likely be a significant impact on undecided visa and sponsorship applications; and
+would demand complicated and costly systems, training and operational changes that would impose significant strain on Government resources and the Australian public for insignificant gain, while not advancing the aims of the Legislation Act.
+The Regulations will be repealed by operation of Division 1 of Part 3 of Chapter 3 of the Legislation Act. Specifically, that Division (under section 48A) operates to automatically repeal a legislative instrument that has the sole purpose of amending or repealing another instrument. As the Regulations will automatically repeal, they do not engage the sunsetting framework under Part 4 of the Legislation Act.
+The Migration Act specifies no conditions that need to be satisfied before the power to make the Regulations may be exercised.
+The Regulations are a disallowable legislative instrument for the purposes of the Legislation Act.
+ATTACHMENT A
+Statement of Compatibility with Human Rights
+Prepared in accordance with Part 3 of the Human Rights (Parliamentary Scrutiny) Act 2011
+Migration Amendment (Temporary Graduate Visa Application Charge) Regulations 2026
+This Disallowable Legislative Instrument is compatible with the human rights and freedoms recognised or declared in the international instruments listed in section 3 of the Human Rights (Parliamentary Scrutiny) Act 2011 .
+Overview of the Disallowable Legislative Instrument
+The Migration Amendment (Temporary Graduate Visa Application Charge) Regulations 2026 (the Regulations) prescribes a 100 per cent increase to the visa application charge (VAC) for the Subclass 485 (Temporary Graduate) visa (Subclass 485 visa) for all applicants, with the exception of passport holders of certain countries. In line with the differentiated VAC structure for the Subclass 500 (Student) visa, the VAC increase in the Regulations does not apply for Subclass 485 visa applicants where the primary applicant holds a valid passport issued by one of the following countries:
+Federated States of Micronesia;
+Fiji;
+Kiribati;
+Nauru;
+Palau;
+Papua New Guinea;
+Republic of the Marshall Islands;
+Samoa;
+Solomon Islands;
+Timor-Leste;
+Tonga;
+Tuvalu;
+Vanuatu.
+In effect, this means that affected VACs for Subclass 485 visa applicants, except those listed above, are increased on 1 March 2026 from their previous 2025-26 amounts. The base application charge component of the VAC for an initial Subclass 485 visa for an affected primary applicant is increased to $4,600. The additional initial applicant charge component for any other affected applicant who is at least 18 is increased to $2,300, and the additional initial applicant charge component for any other affected applicant who is less than 18 is increased to $1,160.
+For affected primary applicants who hold a Subclass 485 visa in the Post‑Study Work stream, the Post‑Higher Education Work stream or the Replacement stream, and who are applying for a subsequent Subclass 485 visa in the Post‑Higher Education Work stream the VAC is increased to $1,810. The additional subsequent applicant charge component for any other affected applicant who is at least 18 is increased to $910, and the additional subsequent applicant charge component for any other affected applicant who is less than 18 is increased to $460.
+Human rights implications
+This Disallowable Legislative Instrument engages the following rights:
+The right to work in Article 6(1) and right to education in Article 13(1) of the International Covenant on Economic, Social and Cultural Rights (ICESCR)
+The right to equality and non-discrimination in Article 26 of the International Covenant on Civil and Political Rights (ICCPR) and Article 2(2) of the ICESCR.
+Right to work and right to education
+Article 6(1) of the ICESCR states:
+The States Parties to the present Covenant recognize the right of everyone to work. which includes the right of everyone to the opportunity to gain his living by work which he freely chooses or accepts, and will take appropriate steps to safeguard this right.
+Article 13(1) of the ICESCR states:
+The States Parties to the present Covenant recognize the right of everyone to education. They agree that education shall be directed to the full development of the human personality and the sense of its dignity, and shall strengthen the respect for human rights and fundamental freedoms. They further agree that education shall enable all persons to participate effectively in a free society, promote understanding, tolerance and friendship among all nations and all racial, ethnic or religious groups, and further the activities of the United Nations for the maintenance of peace.
+In circumstances where an applicant is in Australia and makes an application for a Subclass 485 visa, the VAC increase for this visa may engage the right to work in Article 6 and the right to education in Article 13 of the ICESCR.
+To the extent that increasing the VAC for the Subclass 485 visa limits these rights for applicants in Australia, the limitation is reasonable and proportionate because the VAC for the Subclass 485 visa is and remains a small part of the cost to live in Australia following the completion of study, noting that Subclass 485 holders are expected to support themselves and have unrestricted work rights.
+Right to equality and non-discrimination
+Article 26 of the ICCPR states:
+All persons are equal before the law and are entitled without any discrimination to the equal protection of the law. In this respect, the law shall prohibit any discrimination and guarantee to all persons equal and effective protection against discrimination on any ground such as race, colour, sex, language, religion, political or other opinion, national or social origin, property, birth or other status.
+Article 2(2) of ICESCR states:
+The States Parties to the present Covenant undertake to guarantee that the rights enunciated in the present Covenant will be exercised without discrimination of any kind as to race, colour, sex, language, religion, political or other opinion, national or social origin, property, birth or other status.
+However, not all treatment that differs among individuals or groups on any of the grounds mentioned in the ICCPR and ICESCR will amount to prohibited discrimination. In its General Comment 18 on Article 26 of the ICCPR, the UN Human Rights Committee stated that:
+The Committee observes that not every differentiation of treatment will constitute discrimination, if the criteria for such differentiation are reasonable and objective and if the aim is to achieve a purpose which is legitimate under the [ICCPR].
+In its General Comment 20 on Article 2(2) of the ICESCR, the United Nations Committee on Economic Social and Cultural Rights has stated that:
+Differential treatment based on prohibited grounds will be viewed as discriminatory unless the justification for differentiation is reasonable and objective. This will include an assessment as to whether the aim and effects of the measures or omissions are legitimate, compatible with the nature of the [ICESCR] rights and solely for the purpose of promoting the general welfare in a democratic society. In addition, there must be a clear and reasonable relationship of proportionality between the aim sought to be realized and the measures or omissions and their effects.
+The Regulations may engage the right to equality and non-discrimination in Article 2(2) of the ICESCR and Article 26 of the ICCPR by excluding applicants who are holders of a valid passport issued by a specified country in the Pacific or Timor-Leste, from the VAC increase for Subclass 485 visas. The Regulations maintain the previous VAC amounts for these applicants.
+Pacific and Timor-Leste applicants for a Subclass 485 visa would normally qualify for a lower VAC linked to their previous Student visa, which has embedded differentiated VAC settings for eligible Pacific and Timor-Leste applicants. The Regulations provide for eligible Pacific and Timor-Leste applicants, who may otherwise be impacted negatively, to be exempted from the VAC increase, supporting their access to education and work.
+It is important that nationals of exempt countries continue to benefit from the opportunities for graduates to consolidate skills and knowledge acquired during their studies through practical application in the Australian workforce and return home with enhanced capabilities, contributing to economic development and knowledge transfer in their home countries.
+While limiting the VAC exemption to these nationalities involves differential treatment, it is reasonable, proportionate, and aimed at promoting their general welfare. The measure supports Australia’s objective of deepening regional ties, fostering global education, workforce development and skills exchange, and contributing to a peaceful and prosperous Pacific.
+For other nationalities, the increased VAC represents a small share of the overall costs to living and studying in Australia following graduation. Therefore, the differential treatment does not impermissibly limit the right to work and education. The exemption for Pacific and Timor-Leste applicants is designed to enhance educational and work opportunities and strengthen regional connections.
+Conclusion
+This Disallowable Legislative Instrument is compatible with human rights and to the extent that it may limit human rights, those limitations are reasonable, necessary and proportionate to legitimate aims.
+The Hon Tony Burke MP
+Minister for Immigration and Citizenship
+ATTACHMENT B
+Details of the Migration Amendment (Temporary Graduate Visa Application Charge) Regulations 2026
+Section 1 – Name
+This section provides that the title of the instrument is the Migration Amendment (Temporary Graduate Visa Application Charge) Regulations 2026 (the Regulations).
+Section 2 – Commencement
+This section provides for the commencement of the instrument.
+Subsection 2(1) provides that each provision of the instrument specified in column 1 of the table commences, or is taken to have commenced, in accordance with column 2 of the table. Any other statement in column 2 has effect according to its terms.
+Table item 1 provides that the whole of the instrument commences on 1 March 2026.
+The note below the table covered by subsection 2(1) makes it clear that the table relates only to the provisions of the instrument as originally made. The table will not be amended to deal with any later amendments to the instrument.
+Subsection 2(2) provides that any information in column 3 of the table is not part of the instrument. Information may be inserted in this column, or information in it may be edited, in any published version of the instrument. The information in column 3 of the table confirms the commencement date is 1 March 2026.
+Section 3 – Authority
+This section provides that the instrument is made under the Migration Act 1958 (the Migration Act).
+Section 4 – Schedules
+This section provides that each instrument that is specified in a Schedule to this instrument is amended or repealed as set out in the applicable items in the Schedule concerned, and any other item in a Schedule to this instrument has effect according to its terms.
+Schedule 1—Amendments
+Migration Regulations 1994
+Item [1] – Sub subparagraph 1222(2)(a)(ia)(A) of Schedule 1
+This item is a technical amendment to align the wording in item 1222 with similar wording in Schedule 1 to the Migration Regulations. The amendment substitutes the word “meet” with the word “satisfy”.
+Sub-subparagraph 1222(2)(a)(ia)(A) specifies the VAC for an applicant who is seeking to satisfy the primary criteria for the grant of a Student (Temporary) (Class TU) visa. The amendment is technical only and seeks to align existing language in Schedule 1 when referring to a person who is seeking to satisfy Schedule 2 criteria for the grant of a visa.
+Item [2] – Sub-subparagraph 1222(2)(a)(ia)(C) of Schedule 1
+Similar to item [1], this item is a technical amendment to align the wording in item 1222 with similar wording in Schedule 1 to the Migration Regulations. The amendment omits the words “who is a” and substitutes it with “who claims to be”.
+Sub-subparagraph 1222(2)(a)(ia)(C) specifies the visa application charge (VAC) for an applicant who applies as a subsequent entrant for a Student (Temporary) (Class TU) visa, on the basis they claim to be a member of the family unit of a person who holds a Student (Temporary) (Class TU) visa, having satisfied the primary criteria for the grant of that visa. There is no change to existing arrangements made by this amendment; rather it reflects the objective nature of the requirements in Schedule 1 which must be met by a person in order to make a valid application for a Student (Temporary) (Class TU) visa.
+Item [3] – Subparagraphs 1229(2)(a)(i) and (ii) of Schedule 1
+This item repeals subparagraphs 1229(2)(a)(i) and (ii) of Schedule 1 to the Migration Regulations and substitutes it with new subparagraphs 1229(2)(a)(i)-(iv). Paragraph 1229(2)(a) of Schedule 1 specifies the amount of the first instalment of the VAC for an applicant applying for a Subclass 485 (Temporary Graduate) visa. The amendments have the effect of increasing the VAC amount for all visa applicants, unless the person who is seeking to satisfy the primary criteria for the grant of the visa (the primary applicant) holds an eligible passport.
+New subparagraph 1229(2)(a)(i) provides that:
+for an applicant who is seeking to satisfy the primary criteria for the grant of a Subclass 485 (Temporary Graduate) visa in the Post-Higher Education Work stream, holds a ‘PHE visa’ and holds an ‘eligible passport’ (as defined in subitem 1229(11)), the VAC payable is the base application charge of $905;
+for an applicant whose application is combined, or sought to be combined, with an application made by that person, the VAC for an applicant who is:
+at least 18 years of age is $455;
+less than 18 years of age is $230;
+for an applicant who applies as a subsequent entrant on the basis they claim to be a member of the family unit of a person who holds:
+a PHE visa, if that person held a PHE visa immediately before the most recent grant of a Subclass 485 (Temporary Graduate) visa to that person; and
+an eligible passport,
+the base application charge of $905 is payable for the first applicant included in the application, and the applicable additional applicant charge is payable for any additional dependent applicants (dependent on the age of the additional applicant).
+A PHE visa is defined in subitem 1229(11) to mean either:
+a Subclass 485 (Temporary Graduate) visa in the Post-Study Work stream or the Post-Higher Education Work stream; or
+a Subclass 485 (Temporary Graduate) visa in the Replacement stream held by a person who previously held a Subclass 485 (Temporary Graduate) visa in the Post-Study Work stream.
+Under paragraph 1229(3)(la), an applicant who is seeking to satisfy the primary criteria for the grant of a subsequent Subclass 485 (Temporary Graduate) visa in the Post-Higher Education Work stream must be the holder of one of the visas specified above. The definition of PHE visa in subitem 1229(11) aligns with this requirement.
+Further, amendments made by the Migration Amendment (Graduate Visas) Regulations 2024 on 1 July 2024 renamed the Post-Study Work stream as the Post-Higher Education Work stream. Prior to this, a subsequent visa application could be made in the Post-Study Work stream. (The Replacement stream was also closed to new applicants from 1 July 2024, however eligible visa holders are still able to apply for a subsequent visa in the Post-Higher Education Work stream.) The definition of PHE visa ensures that primary applicants and members of their family unit are still eligible to apply for a subsequent Subclass 485 visa in the Post-Higher Education Work stream and receive the benefit of the lower VAC amount.
+The overall effect of subparagraph 1229(2)(a)(i) is that where the primary applicant holds an eligible passport, and is applying for a subsequent Subclass 485 visa in the Post-Higher Education Work stream, there is no increase to the VAC amount.
+New subparagraph 1229(2)(a)(ii) provides that:
+for an applicant who is seeking to satisfy the primary criteria for the grant of a Subclass 485 visa in the Post-Higher Education Work stream, holds a PHE visa and does not hold an eligible passport, the VAC payable is the base application charge of $1,810;
+for an applicant whose application is combined, or sought to be combined, with an application made by that person, the VAC for an applicant who is:
+at least 18 years of age is $910;
+less than 18 years of age is $460;
+for an applicant who claims to be a member of the family unit of a person who:
+holds a PHE visa, if that person held a PHE visa immediately before the most recent grant of a Subclass 485 visa to that person; and
+that person does not hold an eligible passport,
+the base application charge of $1,810 is payable for the first applicant included in the application, and the applicable additional applicant charge is payable for any additional dependent applicants (dependent on the age of the additional applicant).
+Subparagraph 1229(2)(a)(ii) sets out new higher VAC amounts in circumstances where the primary applicant is applying for a subsequent Subclass 485 visa in the Post-Higher Education Work stream, but does not hold an eligible passport.
+New subparagraph 1229(2)(a)(iii) provides that:
+for an applicant who is seeking to satisfy the primary criteria for the grant of a Skilled (Provisional) (Class VC) visa, holds an eligible passport and does not hold a PHE visa, the VAC payable is the base application charge of $2,300;
+for an applicant whose application is combined, or sought to be combined, with an application made by that person, the VAC for an applicant who is:
+at least 18 years of age is $1,150;
+less than 18 years of age is $580;
+for an applicant who claims to be a member of the family unit of a person who:
+holds a Skilled (Provisional) (Class VC) visa;
+did not, at the time of application, hold a PHE visa; and
+that person holds an eligible passport,
+the base application charge of $2,300 is payable for the first applicant included in the application, and the applicable additional applicant charge is payable for any additional dependent applicants (dependent on the age of the additional applicant).
+Subparagraph 1229(2)(a)(iii) retains the previous VAC amounts in circumstances where the primary applicant is not applying for a subsequent Subclass 485 visa in the Post-Higher Education Work stream, but does hold an eligible passport.
+New subparagraph 1229(2)(a)(iv) provides a higher VAC amount for any other applicant. The following VAC amounts apply in circumstances where the primary applicant is not applying for a subsequent Subclass 485 visa in the Post-Higher Education Work stream, and does not hold an eligible passport:
+the base application charge (payable by the primary applicant) is $4,600;
+the additional applicant charge (payable by an applicant whose application is combined, or sought to be combined, with the primary applicant) is:
+for an applicant who is at least 18 years of age: $2,300;
+for an applicant who is less than 18 years of age: $1,160.
+The base application charge is also payable by a member of the family unit of a Subclass 485 visa holder who applies as a subsequent entrant to join the visa holder in Australia (ie. where the family unit member did not make a combined application). The base application charge of $4,600 is payable for the first applicant included in the subsequent entrant application, and the applicable additional applicant charge is payable for any additional dependent applicants (dependent on the age of the additional applicant).
+Item [4] – Subitem 1229(11) of Schedule 1
+This item inserts in subitem 1229(11), a new definition of eligible passport , for the purposes of identifying the relevant VAC payable under paragraph 1229(2)(a). An eligible passport is defined to mean a valid passport issued by one of the following countries:
+Federated States of Micronesia;
+Fiji;
+Kiribati;
+Nauru;
+Palau;
+Papua New Guinea;
+Republic of the Marshall Islands;
+Samoa;
+Solomon Islands;
+Timor-Leste;
+Tonga;
+Tuvalu;
+Vanuatu.
+This item also inserts in subitem 1229(11), a new definition of PHE visa which is defined to mean either:
+a Subclass 485 (Temporary Graduate) visa in the Post-Study Work stream or the Post-Higher Education Work stream; or
+a Subclass 485 (Temporary Graduate) visa in the Replacement stream held by a person who previously held a Subclass 485 (Temporary Graduate) visa in the Post-Study Work stream.
+As noted in item [3] above, the definition is necessary for the purposes of identifying the relevant VAC payable under new subparagraphs 1229(2)(a)(i)-(iv). The definition also aligns with the requirements in paragraph 1229(3)(la) and takes into account the impact of the amendments made by the Migration Amendment (Graduate Visas) Regulations 2024 on 1 July 2024.
+Item [5] – In the appropriate position in Schedule 13
+This item inserts new Part 159 into Schedule 13 to the Migration Regulations. Schedule 13 sets out the application and transitional provisions that apply to amendments of the Migration Regulations.
+Clause 15901 provides the amendments made by Schedule 1 to the amending regulations apply in relation to an application for a visa made on or after the commencement of that Schedule. This means the new VAC amounts apply only to new applications made on or after 1 March 2026.
