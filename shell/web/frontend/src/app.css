@@ -3899,11 +3899,14 @@ main {
 }
 .plan-card-fig {
     display: inline-flex;
-    gap: 0.4rem;
+    flex-wrap: wrap;
+    gap: 0 0.4rem;
     align-items: baseline;
 }
+/* behavior 110: "Chi phí giữ nhà" is one label; at phone width the figure drops under it whole */
 .plan-card-k {
     color: var(--muted);
+    white-space: nowrap;
 }
 .plan-card-v {
     font-weight: 600;
