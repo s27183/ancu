@@ -847,6 +847,14 @@ const messages = {
     'plan.flow.actions': { vi: 'Việc cần làm', en: 'What to do' },
     'plan.flow.risks': { vi: 'Rủi ro & cách xử lý', en: 'Risks & what to do' },
     'plan.flow.detail': { vi: 'Xem chi tiết', en: 'See detail' },
+    // behavior 114: under each Hành trình step, where its rule comes from
+    'plan.flow.source': { vi: 'Nguồn: {who} · kiểm tra {date}', en: 'Source: {who} · checked {date}' },
+    'plan.flow.state_rule': {
+        vi: 'Quy định của bang · chưa có nguồn cho {state}',
+        en: 'State rule · no source yet for {state}'
+    },
+    'plan.flow.state_rule_none': { vi: 'Quy định của bang · chưa có nguồn', en: 'State rule · no source yet' },
+    'plan.flow.practice': { vi: 'Thông lệ', en: 'Common practice' },
     'plan.flow.detail_hide': { vi: 'Ẩn chi tiết', en: 'Hide detail' },
     'plan.flow.done': { vi: 'Đã xong', en: 'Done' },
     // Risk-flag-list → severity chrome + mitigation label.

@@ -859,6 +859,12 @@ export interface PhaseAction {
     budget_ref?: string | null;
     component_ref?: string | null;
     status: 'not_started' | 'done';
+    /** Behavior 114: `rule` — the step follows a rule whose government page is `source`
+     *  (`checked` = the owning KB doc's last_verified); `state_rule` — a state's rule the KB
+     *  cites no page for in `rule_state` yet; `practice` — common practice, no rule. */
+    grounding?: 'rule' | 'state_rule' | 'practice';
+    source?: { url: string; checked: string } | null;
+    rule_state?: string | null;
 }
 /** One KB-grounded risk + its mitigation for a phase (the risk-flag-list). */
 export interface PhaseRisk {

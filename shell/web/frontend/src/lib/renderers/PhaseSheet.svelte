@@ -17,6 +17,11 @@
     // place) in a modal over this one — closing it returns to the checklist; a ref naming a
     // figure split into lines (its group) lists those lines, each opening its detail. Opened
     // from a line's detail (`focusAction`), the sheet starts on the checklist at that step.
+    // Behavior 114 (where a step's rule comes from): under each step, "Nguồn: <body> · kiểm
+    // tra <date>" linking the government page the engine resolved for the plan's state, or
+    // "Quy định của bang · chưa có nguồn cho <bang>" (a state's rule the KB cites no page
+    // for there yet — no link is borrowed), or "Thông lệ" (no rule governs it). The words
+    // are placed, never chosen here: grounding comes from fh_engine_phase_playbook.
     import { tick } from 'svelte';
     import LineDetail from '$lib/LineDetail.svelte';
     import { t } from '$lib/i18n';
@@ -31,7 +36,8 @@
         type ChecklistStatusMap,
         type MoneyRange
     } from '$lib/planCard';
-    import { money, moneyRange } from '$lib/format';
+    import { money, moneyRange, date } from '$lib/format';
+    import { publisher } from '$lib/facts';
     import Modal from '$lib/Modal.svelte';
     import Tabs from '$lib/Tabs.svelte';
     import SwimlaneDiagram from './SwimlaneDiagram.svelte';
@@ -180,6 +186,23 @@
                         >
                     {/if}
                     {#if a.detail}<p class="ps-act-detail">{pick(a.detail, $lang)}</p>{/if}
+                    {#if a.grounding === 'rule' && a.source}
+                        <p class="ps-act-src">
+                            <a href={a.source.url} target="_blank" rel="noopener noreferrer"
+                                >{$t('plan.flow.source')
+                                    .replace('{who}', publisher(a.source, $lang))
+                                    .replace('{date}', date(a.source.checked, $lang) ?? a.source.checked)}</a
+                            >
+                        </p>
+                    {:else if a.grounding === 'state_rule'}
+                        <p class="ps-act-src">
+                            {a.rule_state
+                                ? $t('plan.flow.state_rule').replace('{state}', a.rule_state)
+                                : $t('plan.flow.state_rule_none')}
+                        </p>
+                    {:else if a.grounding === 'practice'}
+                        <p class="ps-act-src">{$t('plan.flow.practice')}</p>
+                    {/if}
                     {#if a.component_ref}
                         <button type="button" class="ps-detail-btn" onclick={() => (selectedActionId = a.id)}>
                             {$t('plan.flow.detail')}
@@ -307,6 +330,18 @@
         font-size: var(--fs-xs);
         color: var(--muted);
         line-height: 1.4;
+    }
+    .ps-act-src {
+        margin: 0.2rem 0 0 1.5rem;
+        font-size: var(--fs-xs);
+        color: var(--muted);
+        line-height: 1.4;
+    }
+    .ps-act-src a {
+        color: var(--accent);
+        text-decoration: underline;
+        text-underline-offset: 2px;
+        overflow-wrap: anywhere;
     }
     .ps-detail-btn {
         margin: 0.3rem 0 0 1.5rem;
