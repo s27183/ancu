@@ -258,7 +258,7 @@ get_plan_card(TenantId, PlanCardId) ->
             {error, not_found}
     end.
 
-%% Whole lifecycle -> The engine -> a plan's list line (behaviors 84, 96)
+%% Whole lifecycle -> one computer per figure -> The engine -> a plan's list line (behaviors 84, 96, 110)
 %% The planner lists a user's plans by title, state and last update; the shell owns which
 %% ids are the user's (plan_card_views) and asks for these. Ids the tenant does not hold
 %% are left out. updated_at moves with every fill, refine, target and checklist write.
@@ -270,28 +270,37 @@ get_plan_card(TenantId, PlanCardId) ->
 %% Phí mua (costs_buy) and Phí giữ nhà a year (costs_own_per_year) — costs only, never the
 %% deposit or loan principal, which are money into the home, not costs.
 %% Behavior 110: the statement became the money spent, so the same two wire fields now carry
-%% Mua (out_buy) and Giữ nhà a year (out_own_per_year), falling back to the behavior-98
-%% fields on a card filled before 110 — the list still equals that card's statement.
+%% Mua (out_buy) and Giữ nhà a year (out_own_per_year). Since 110's revision (prod
+%% 2026-10-17) the budget is read through fh_engine_journey:current/2, the same as GET, so a
+%% card stored before 110 lists the figures its statement shows; the behavior-98 fields are
+%% left only for a card whose journey cannot be refilled.
 -spec plan_card_summaries(binary(), [binary()]) -> [map()].
 plan_card_summaries(_TenantId, []) -> [];
 plan_card_summaries(TenantId, Ids) ->
     Res = query(
         "SELECT plan_card_id::text, "
         "       to_char(updated_at AT TIME ZONE 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"'), "
-        "       intent, mode, "
-        "       coalesce(content_jsonb #> '{components,purchase_journey,outcome,lifecycle_budget,out_buy}', "
-        "                content_jsonb #> '{components,purchase_journey,outcome,lifecycle_budget,costs_buy}', "
-        "                'null'::jsonb), "
-        "       coalesce(content_jsonb #> '{components,purchase_journey,outcome,lifecycle_budget,out_own_per_year}', "
-        "                content_jsonb #> '{components,purchase_journey,outcome,lifecycle_budget,costs_own_per_year}', "
-        "                'null'::jsonb) "
+        "       intent, mode, blueprint_slug, coalesce(content_jsonb #> '{components}', '{}'::jsonb) "
         "FROM plan_cards WHERE tenant_id = $1::uuid AND plan_card_id = ANY($2::uuid[])",
         [TenantId, Ids]),
-    [#{<<"plan_card_id">> => Id, <<"updated_at">> => At,
-       <<"intent">> => Intent, <<"mode">> => Mode,
-       <<"costs_buy">> => decode_jsonb(Buy),
-       <<"costs_own_per_year">> => decode_jsonb(Own)}
-     || {Id, At, Intent, Mode, Buy, Own} <- rows(Res)].
+    [summary(Id, At, Intent, Mode, Slug, decode_jsonb(Comps))
+     || {Id, At, Intent, Mode, Slug, Comps} <- rows(Res)].
+
+summary(Id, At, Intent, Mode, Slug, Comps) ->
+    B = case fh_engine_journey:current(Slug, #{<<"components">> => Comps}) of
+            #{<<"components">> := #{<<"purchase_journey">> :=
+                  #{<<"outcome">> := #{<<"lifecycle_budget">> := Budget}}}} when is_map(Budget) ->
+                Budget;
+            _ -> #{}
+        end,
+    Either = fun(New, Old) -> case maps:get(New, B, null) of
+                                  null -> maps:get(Old, B, null);
+                                  V -> V
+                              end end,
+    #{<<"plan_card_id">> => Id, <<"updated_at">> => At,
+      <<"intent">> => Intent, <<"mode">> => Mode,
+      <<"costs_buy">> => Either(<<"out_buy">>, <<"costs_buy">>),
+      <<"costs_own_per_year">> => Either(<<"out_own_per_year">>, <<"costs_own_per_year">>)}.
 
 %% Reconstruct the base-turn inputs for an existing card (plan-card-refresh.md): join
 %% the card to its profile so a re-run recomputes against the CURRENT profile facts +

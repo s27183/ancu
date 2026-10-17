@@ -692,12 +692,12 @@ const messages = {
     'plan.sheet.sell': { vi: 'Bán', en: 'Sell' },
     // Behavior 110: the statement is the money spent on the home over the hold; what comes
     // back at sale sits under it, in no total.
-    'plan.sheet.costs_buy': { vi: 'Mua', en: 'Buying' },
-    'plan.sheet.costs_own': { vi: 'Giữ nhà trong {n} năm', en: 'Owning over {n} years' },
-    'plan.sheet.costs_own_none': { vi: 'Giữ nhà', en: 'Owning' },
-    'plan.sheet.costs_sell': { vi: 'Phí bán', en: 'Selling costs' },
-    'plan.sheet.total_hold': { vi: 'Tổng tiền bạn bỏ ra trong {n} năm', en: 'Total you spend over {n} years' },
-    'plan.sheet.total_hold_none': { vi: 'Tổng tiền bạn bỏ ra', en: 'Total you spend' },
+    'plan.sheet.costs_buy': { vi: 'Chi phí mua', en: 'Buying costs' },
+    'plan.sheet.costs_own': { vi: 'Chi phí giữ nhà trong {n} năm', en: 'Owning costs over {n} years' },
+    'plan.sheet.costs_own_none': { vi: 'Chi phí giữ nhà', en: 'Owning costs' },
+    'plan.sheet.costs_sell': { vi: 'Chi phí bán', en: 'Selling costs' },
+    'plan.sheet.total_hold': { vi: 'Tổng chi phí trong {n} năm', en: 'Total costs over {n} years' },
+    'plan.sheet.total_hold_none': { vi: 'Tổng chi phí', en: 'Total costs' },
     'plan.sheet.back_hold': { vi: 'Tiền về khi bán sau {n} năm', en: 'Back when you sell after {n} years' },
     'plan.sheet.back': { vi: 'Tiền về khi bán', en: 'Back when you sell' },
     // Behavior 106: the plan hub's cards (PlanHub.svelte).
