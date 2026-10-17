@@ -812,12 +812,15 @@ export interface LifecycleBudget {
     costs_own_per_year?: MoneyRange | null;
     costs_sell?: MoneyRange | null;
     costs_total?: MoneyRange | null;
-    into_home?: IntoHome | null;
-}
-export interface IntoHome {
-    deposit: MoneyRange | null;
-    principal_repaid: MoneyRange | null;
-    total: MoneyRange | null;
+    /** behavior 110: the money spent on the home over the hold (fh_engine_journey spend/6) —
+     *  Mua (deposit + fees less a grant), Giữ nhà (costs + every repayment less rent) over
+     *  the hold and a year, their total with Phí bán, and what comes back at sale (never in
+     *  a total). Over-the-hold figures null with no hold. */
+    out_buy?: MoneyRange | null;
+    out_own?: MoneyRange | null;
+    out_own_per_year?: MoneyRange | null;
+    out_total?: MoneyRange | null;
+    back?: MoneyRange | null;
 }
 export interface LoanOverHold {
     principal: MoneyRange;
@@ -1059,7 +1062,7 @@ export interface PlanCardSummary {
     intent?: string | null;
     mode?: string | null;
     /** The statement's Phí mua and Phí giữ nhà a year (purchase_journey.lifecycle_budget
-     *  costs_buy, costs_own_per_year; behavior 98: costs only, no deposit or principal),
+     *  out_buy, out_own_per_year since behavior 110, the money spent; the 98 costs on older cards),
      *  so a list card's figures equal its statement's; null until the journey fills. */
     costs_buy?: MoneyRange | null;
     costs_own_per_year?: MoneyRange | null;

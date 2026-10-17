@@ -6,7 +6,7 @@ declare global {
         // interface PageData {}
         // The plan's lifecycle statement opens a phase as a history entry (behavior 93).
         interface PageState {
-            lifecycle?: 'buy' | 'own' | 'sell' | 'finances';
+            lifecycle?: 'buy' | 'own' | 'sell' | 'back' | 'finances';
             // A plan opened over the planner's plans list (behavior 96): back returns to it.
             overList?: boolean;
             // Behavior 106: a plan's levels are history entries — the hub is the plan's own

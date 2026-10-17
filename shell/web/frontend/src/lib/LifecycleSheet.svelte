@@ -1,12 +1,13 @@
 <script lang="ts">
     // Whole lifecycle -> honest-partial; one computer per figure -> the web frontend -> the lifecycle statement
     // Purpose:   the plan's first sheet (behavior 93, over behavior 82's lines): the whole
-    //            lifecycle budget read top to bottom like a P&L of costs over the hold
-    //            chosen on the statement (behavior 98) — Phí mua, Phí giữ nhà trong N năm
-    //            (≈ X/năm beside it), Phí bán, each right-aligned, and the bottom line
-    //            "Tổng phí trong N năm", exactly their sum. Money into the home (the deposit,
-    //            the loan principal repaid by N) is not a cost: it sits after a divider, with
-    //            the cash needed to buy (deposit + Phí mua), on the statement and the Mua sheet.
+    //            lifecycle budget read top to bottom: the money spent on the home over the
+    //            hold chosen on the statement (behavior 110, over 98) — Mua (the deposit or
+    //            whole price and the fees, less a grant), Giữ nhà trong N năm (≈ X/năm beside
+    //            it: the yearly costs and every repayment, less rent), Phí bán, each
+    //            right-aligned, and the bottom line "Tổng tiền bạn bỏ ra trong N năm",
+    //            exactly their sum. Under it, one line apart and in no total, the money back
+    //            at the sale ("Tiền về khi bán sau N năm"), which opens as its own sheet.
     //            Tapping a phase opens its sheet (that phase's lines); tapping a line opens
     //            its detail in place — what it is, how its figure is set, who pays, what
     //            moves it, its source (the engine's `detail`: a fee line's, behavior 83, or
@@ -15,17 +16,16 @@
     //            components draws them under its facts (behavior 95: the FIRB fee → FIRB,
     //            an FX line → money from overseas, "Nguồn tiền" → family funding,
     //            "Tiền thuê thu về" → yield and tax — those two from lifecycle_budget.beside,
-    //            after the divider, in no total). A phase sheet is a history entry (shallow routing,
+    //            after the divider, in no total; rent netted in Giữ since 110). A phase sheet is a history entry (shallow routing,
     //            page.state.lifecycle), so back returns to the statement — by the plan
     //            head's one back button ("‹ Ngân sách", behavior 106), never a link in the
     //            sheet's body.
-    // Holds:     it computes no figure: every row, the bottom line and the money into the
-    //            home are the engine's (purchase_journey.lifecycle_budget costs_*, into_home,
-    //            buy; fh_engine_journey costs/4), for the hold they were made for
-    //            (hold_years). Phí giữ nhà's sheet lists the yearly lines and the loan's
-    //            interest over the hold (disposition.loan_over_hold) — the repayments line
-    //            itself, principal and interest together, after the divider — and says
-    //            "X/năm × N năm"; Phí bán's names the projected sale price and its growth
+    // Holds:     it computes no figure: every row, the bottom line and the money back are
+    //            the engine's (purchase_journey.lifecycle_budget out_buy, out_own,
+    //            out_own_per_year, costs_sell, out_total, back; fh_engine_journey spend/6),
+    //            for the hold they were made for (hold_years). Giữ nhà's sheet lists the
+    //            yearly lines and the repayments line, principal and interest together, and
+    //            says "X/năm × N năm"; a sheet shows money coming in as "−"; Phí bán's names the projected sale price and its growth
     //            band (disposition.growth_pct_pa). Lines are the engine's cash events. A line the engine's totals do
     //            not sum (a grant or sale price coming in, an optional or still-conditional
     //            fee, the loan payout, a line waiting on an input) sits after one quiet
@@ -43,7 +43,7 @@
     //            (page.state.lifecycle 'finances'): the price and the deposit (the
     //            planner's `scenario`: "Xem thử" previews, "Lưu" saves to the plan), "Tiền
     //            bạn có" (a sum the visitor types, set against the cash needed to buy,
-    //            lifecycle_budget.buy, at its low and high ends — "Đủ" or "Còn thiếu
+    //            lifecycle_budget.out_buy (behavior 110: net of a grant), at its low and high ends — "Đủ" or "Còn thiếu
     //            <total − sum>" — a subtraction, never a figure of its own; kept in this
     //            browser per plan, localStorage, never sent), then income and debts (the
     //            planner's `household`). Each field says in one line what it moves. The
@@ -191,7 +191,7 @@
             : $t('plan.sheet.cash_short').replace('{x}', money(need - have, $lang) ?? '—');
     }
 
-    type PhaseKey = 'buy' | 'own' | 'sell';
+    type PhaseKey = 'buy' | 'own' | 'sell' | 'back';
     const BUY_PHASES = ['prepare', 'pre_approve', 'contract', 'settle'];
     const HOLD_CHOICES = [5, 10, 15, 20, 30];
 
@@ -230,16 +230,13 @@
     // behavior 98: every figure on the statement is the engine's (lifecycle_budget costs/4) —
     // the hold they were made for, the costs and their total, the money into the home.
     const holdYears = $derived(budget?.hold_years ?? disposition?.horizon_years ?? 0);
-    const loan = $derived(disposition?.loan_over_hold ?? null);
-    const intoHome = $derived(budget?.into_home ?? null);
     const fit = $derived(loanFit(components));
-    const deposits = $derived(events.filter((e) => BUY_PHASES.includes(e.phase) && e.id === 'deposit'));
     const groups = $derived([
         {
             key: 'buy' as PhaseKey,
             title: $t('plan.sheet.costs_buy'),
-            lines: events.filter((e) => BUY_PHASES.includes(e.phase) && e.id !== 'deposit'),
-            total: budget?.costs_buy ?? null,
+            lines: events.filter((e) => BUY_PHASES.includes(e.phase)),
+            total: budget?.out_buy ?? null,
             perYear: null as MoneyRange | null
         },
         {
@@ -248,8 +245,8 @@
                 ? $t('plan.sheet.costs_own').replace('{n}', String(holdYears))
                 : $t('plan.sheet.costs_own_none'),
             lines: events.filter((e) => e.phase === 'own'),
-            total: budget?.costs_own ?? null,
-            perYear: budget?.costs_own_per_year ?? null
+            total: budget?.out_own ?? null,
+            perYear: budget?.out_own_per_year ?? null
         },
         {
             key: 'sell' as PhaseKey,
@@ -259,29 +256,30 @@
             perYear: null as MoneyRange | null
         }
     ]);
-    // The bottom line: the engine's costs_total, exactly the three rows' sum at each end.
-    const bottom = $derived(budget?.costs_total ?? null);
-
-    // The loan's interest over the hold, a line of Phí giữ nhà: the engine's split of the
-    // repayments line (disposition.loan_over_hold), with that line's detail — only where the
-    // plan has a repayments line, as costs/4 sums it.
-    const interestLine = $derived.by((): CashEvent | null => {
-        const rep = events.find((e) => e.phase === 'own' && e.id === 'loan_repayments');
-        if (!rep || !loan?.interest || !holdYears) return null;
-        const label = $t('plan.sheet.interest_hold').replace('{n}', String(holdYears));
-        return {
-            ...rep,
-            id: 'loan_interest_over_hold',
-            label: { vi: label, en: label },
-            amount: loan.interest,
-            timing: 'one_off',
-            is_estimate: true
-        };
+    // behavior 110: what comes back at the sale — its own layer, opened from the line under
+    // the bottom line, in no total: the sale price less the selling fees, the loan still
+    // owed and the tax (disposition.net_proceeds, lifecycle_budget.back).
+    const backGroup = $derived({
+        key: 'back' as PhaseKey,
+        title: holdYears
+            ? $t('plan.sheet.back_hold').replace('{n}', String(holdYears))
+            : $t('plan.sheet.back'),
+        lines: disposeEvents,
+        total: budget?.back ?? null,
+        perYear: null as MoneyRange | null
     });
+    // The bottom line: the engine's out_total, exactly the three rows' sum at each end.
+    const bottom = $derived(budget?.out_total ?? null);
+    // The cash on the day, set against "Tiền bạn có": Mua net of a grant (out_buy).
+    const cashNeed = $derived((budget?.out_buy ?? budget?.buy ?? null) as MoneyRange | null);
+    function sign(e: CashEvent, back: boolean): string {
+        if (back) return e.direction === 'in' ? '+' : '−';
+        return e.direction === 'in' ? '−' : '';
+    }
 
     // One line each on why Phí giữ nhà and Phí bán move with the hold.
     const ownWhy = $derived.by((): string | null => {
-        const p = budget?.costs_own_per_year;
+        const p = budget?.out_own_per_year;
         if (!p || !holdYears) return null;
         return $t('plan.sheet.own_why').replace('{x}', range(p)).replace('{n}', String(holdYears));
     });
@@ -298,7 +296,9 @@
 
     // The open layer: the statement (null) or one phase's sheet, kept in the history entry.
     const openKey = $derived(page.state.lifecycle ?? null);
-    const openGroup = $derived(groups.find((g) => g.key === openKey) ?? null);
+    const openGroup = $derived(
+        openKey === 'back' ? backGroup : (groups.find((g) => g.key === openKey) ?? null)
+    );
     let rootEl: HTMLElement | undefined = $state();
     async function toTop() {
         await tick();
@@ -322,19 +322,23 @@
     // Whether the engine's total for this phase sums the line (fh_engine_journey:
     // out/1 — an out-event, not optional, no open condition; own: recurring; sell: not the
     // loan payout, which the sale proceeds repay).
-    // behavior 98 (costs/4): the deposit is money into the home, never a cost; the loan
-    // repayments are not summed as they are — their interest over the hold is (a line of
-    // its own), their principal goes into the home.
+    // behavior 110 (spend/6): every dollar out counts — the deposit in Mua, the repayments
+    // whole in Giữ — and what comes in along the way comes off: a grant in Mua (an in-event),
+    // rent in Giữ (the beside line, netted). The money back at the sale counts in its own
+    // layer only: every dispose line, in and out.
     function counted(e: CashEvent, key: PhaseKey): boolean {
-        if (e.direction !== 'out') return false;
         if (e.detail && (e.detail.optional || e.detail.condition)) return false;
-        if (key === 'buy') return e.id !== 'deposit';
-        if (key === 'own') return e.timing === 'recurring' && e.id !== 'loan_repayments';
+        if (key === 'back') return true;
+        // a grant is an event; the beside lines are not — funding is where money comes
+        // from, never netted; rent is
+        if (e.direction !== 'out')
+            return (key === 'buy' && e.id !== 'funding_sources') || (key === 'own' && e.id === 'rental_income');
+        if (key === 'own') return e.timing === 'recurring';
         if (key === 'sell') return e.id !== 'dispose_loan_payout';
         return true;
     }
     // a pending line sits in its own phase's sheet: buy, own or sell.
-    function groupOf(phase: string): PhaseKey {
+    function groupOf(phase: string): 'buy' | 'own' | 'sell' {
         return phase === 'own' ? 'own' : phase === 'dispose' ? 'sell' : 'buy';
     }
     function pendingFor(key: PhaseKey): PendingLine[] {
@@ -368,81 +372,36 @@
                 />
             </label>
             <p class="ls-fin-effect">{$t('plan.fin.cash_effect')}</p>
-            {#if cash !== null && budget?.buy}{@render verdict(budget.buy, cash)}{/if}
+            {#if cash !== null && cashNeed}{@render verdict(cashNeed, cash)}{/if}
         </div>
         {#if household}{@render household()}{/if}
         {#if submit}<div class="ls-fin-submit">{@render submit()}</div>{/if}
     </section>
 {:else if openGroup}
     {@const g = openGroup}
-    {@const inTotal = g.lines.filter((e) => counted(e, g.key))}
-    {@const rest = g.lines.filter((e) => !counted(e, g.key))}
-    {@const waiting = pendingFor(g.key)}
-    {@const extra = besideFor(g.key)}
-    {@const interest = g.key === 'own' ? interestLine : null}
+    {@const all = g.key === 'back' ? g.lines : [...g.lines, ...besideFor(g.key)]}
+    {@const inTotal = all.filter((e) => e.amount && counted(e, g.key))}
+    {@const rest = all.filter((e) => !(e.amount && counted(e, g.key)))}
+    {@const waiting = g.key === 'back' ? [] : pendingFor(g.key)}
+    {@const back = g.key === 'back'}
     <section class="ls" data-group={g.key} bind:this={rootEl} aria-labelledby="ls-phase-title">
         <h3 id="ls-phase-title" class="ls-row ls-phase-head">
             <span class="ls-row-label">{g.title}</span>
             <span class="ls-row-fig">{@render total(g.key, g.total, null)}</span>
         </h3>
         {#if g.key === 'own' && ownWhy}<p class="ls-why">≈ {ownWhy}</p>{/if}
-        {#if g.key === 'sell' && sellWhy}<p class="ls-why">{sellWhy}</p>{/if}
+        {#if (g.key === 'sell' || back) && sellWhy}<p class="ls-why">{sellWhy}</p>{/if}
 
-        {#if inTotal.length > 0 || interest}
+        {#if inTotal.length > 0}
             <ul class="ls-lines">
-                {#each inTotal as e (e.id)}{@render line(e)}{/each}
-                {#if interest}{@render line(interest)}{/if}
+                {#each inTotal as e (e.id)}{@render line(e, back)}{/each}
             </ul>
         {:else if filling && rest.length === 0 && waiting.length === 0}
             <p class="ls-empty">{$t('plan.sheet.filling')}</p>
         {/if}
 
-        {#if g.key === 'buy' && (deposits.length > 0 || intoHome?.deposit)}
-            <!-- behavior 98: money that goes into the home, not a cost — apart, in no total -->
-            <p class="ls-divider">{$t('plan.sheet.not_a_cost')}</p>
-            <div class="ls-into" data-into-home>
-                <div class="ls-row ls-into-head">
-                    <span class="ls-row-label"
-                        >{holdYears
-                            ? $t('plan.sheet.into_home_hold').replace('{n}', String(holdYears))
-                            : $t('plan.sheet.into_home')}</span
-                    >
-                    <span class="ls-row-fig"
-                        >{#if intoHome?.total}{@render ends(intoHome.total)}{:else if intoHome?.deposit}{@render ends(intoHome.deposit)}{:else}—{/if}</span
-                    >
-                </div>
-                <ul class="ls-lines ls-rest">
-                    {#each deposits as e (e.id)}{@render line(e)}{/each}
-                    <li class="ls-line">
-                        <div class="ls-line-btn ls-static">
-                            <span class="ls-label"
-                                >{holdYears
-                                    ? $t('plan.sheet.into_principal').replace('{n}', String(holdYears))
-                                    : $t('plan.sheet.into_principal_none')}</span
-                            >
-                            {#if intoHome?.principal_repaid}
-                                <span class="ls-amt"
-                                    ><span class="ls-mark" title={$t('plan.sheet.estimate')}>≈</span>{range(
-                                        intoHome.principal_repaid
-                                    )}</span
-                                >
-                            {:else if !holdYears}
-                                <span class="ls-needs">{$t('plan.sheet.needs.hold_years')}</span>
-                            {:else}
-                                <span class="ls-amt">—</span>
-                            {/if}
-                        </div>
-                    </li>
-                </ul>
-            </div>
-        {/if}
-
-        {#if g.key === 'buy' && budget?.buy}
-            {@const need = budget.buy}
-            <div class="ls-row ls-need" data-cash-to-buy>
-                <span class="ls-row-label">{$t('plan.sheet.cash_to_buy')}</span>
-                <span class="ls-row-fig">{@render ends(need)}</span>
-            </div>
+        {#if g.key === 'buy' && cashNeed}
+            {@const need = cashNeed}
             {#if cash !== null}
                 <div class="ls-cash">
                     <span class="ls-label">{$t('plan.sheet.cash')} · {money(cash, $lang)}</span>
@@ -451,11 +410,10 @@
             {/if}
         {/if}
 
-        {#if rest.length > 0 || waiting.length > 0 || extra.length > 0}
+        {#if rest.length > 0 || waiting.length > 0}
             <p class="ls-divider">{$t('plan.sheet.not_in_total')}</p>
             <ul class="ls-lines ls-rest">
-                {#each rest as e (e.id)}{@render line(e)}{/each}
-                {#each extra as e (e.id)}{@render line(e)}{/each}
+                {#each rest as e (e.id)}{@render line(e, back)}{/each}
                 {#each waiting as p (p.id)}
                     <li class="ls-line">
                         <div class="ls-line-btn ls-static">
@@ -488,7 +446,7 @@
                         finDeposit && `${$t('plan.fin.line_deposit')} ${finDeposit}`
                     ]
                         .filter(Boolean)
-                        .join(' · ')}{#if cash !== null && budget?.buy}{@const v = finVerdict(budget.buy, cash)}{' · '}<span
+                        .join(' · ')}{#if cash !== null && cashNeed}{@const v = finVerdict(cashNeed, cash)}{' · '}<span
                             class="ls-fin-verdict"
                             class:ls-short={!v.ok}
                             data-fin-verdict>{v.text}</span
@@ -534,28 +492,15 @@
         </div>
 
 
-        {#if intoHome?.deposit || budget?.buy}
-            <!-- behavior 98: not costs — what goes into the home, and the cash to buy -->
-            <p class="ls-divider">{$t('plan.sheet.not_a_cost')}</p>
-            <div class="ls-aside">
-                {#if intoHome?.deposit}
-                    <button type="button" class="ls-row" data-into-home onclick={() => openPhase('buy')}>
-                        <span class="ls-row-label"
-                            >{holdYears
-                                ? $t('plan.sheet.into_home_hold').replace('{n}', String(holdYears))
-                                : $t('plan.sheet.into_home')}</span
-                        >
-                        <span class="ls-row-fig">{@render ends(intoHome.total ?? intoHome.deposit)}</span>
-                        <span class="ls-caret" aria-hidden="true">›</span>
-                    </button>
-                {/if}
-                {#if budget?.buy}
-                    <div class="ls-row ls-need" data-cash-to-buy>
-                        <span class="ls-row-label">{$t('plan.sheet.cash_to_buy')}</span>
-                        <span class="ls-row-fig">{@render ends(budget.buy)}</span>
-                    </div>
-                {/if}
-            </div>
+        {#if holdYears && (budget?.back || disposeEvents.length > 0)}
+            <!-- behavior 110: what comes back at the sale — one line apart, in no total -->
+            <button type="button" class="ls-row ls-back" data-back onclick={() => openPhase('back')}>
+                <span class="ls-row-label">{backGroup.title}</span>
+                <span class="ls-row-fig"
+                    >{#if budget?.back}{@render ends(budget.back)}{:else}—{/if}</span
+                >
+                <span class="ls-caret" aria-hidden="true">›</span>
+            </button>
         {/if}
         {#if fit.over && fit.loan && fit.capacity}
             <!-- behavior 101: the loan needed against what a lender may lend -->
@@ -603,20 +548,20 @@
     {#each rangeEnds(r) as end, i (i)}{#if i > 0}{' '}{/if}<span class="ls-end">{end}</span>{/each}
 {/snippet}
 
-{#snippet line(e: CashEvent)}
+{#snippet line(e: CashEvent, back = false)}
     <li class="ls-line" class:ls-in={e.direction === 'in'}>
         {#if e.detail}
-            {@render fee(e, e.detail)}
+            {@render fee(e, e.detail, back)}
         {:else}
-            <div class="ls-line-btn ls-static">{@render body(e)}</div>
+            <div class="ls-line-btn ls-static">{@render body(e, back)}</div>
         {/if}
     </li>
 {/snippet}
 
-{#snippet fee(e: CashEvent, d: FeeDetail)}
+{#snippet fee(e: CashEvent, d: FeeDetail, back: boolean)}
     <details class="ls-fee">
         <summary class="ls-line-btn">
-            {@render body(e)}
+            {@render body(e, back)}
             <span class="ls-caret ls-fee-caret" aria-hidden="true">›</span>
         </summary>
         <div class="ls-fee-detail">
@@ -625,7 +570,9 @@
     </details>
 {/snippet}
 
-{#snippet body(e: CashEvent)}
+<!-- behavior 110: on the spending sheets money in comes off ("−"); on the money-back
+     layer money in adds ("+") and money out comes off ("−"). -->
+{#snippet body(e: CashEvent, back: boolean)}
     <span class="ls-label"><Termed text={pick(e.label, $lang)} /></span>
     {#if !e.amount}
         <!-- a line beside the totals with no figure yet (behavior 95) names its input, if any -->
@@ -634,10 +581,7 @@
             >{/if}
     {:else}
         <span class="ls-amt"
-            >{#if e.is_estimate}<span class="ls-mark" title={$t('plan.sheet.estimate')}>≈</span>{/if}{e.direction ===
-            'in'
-                ? '+'
-                : ''}{range(e.amount)}{#if e.timing === 'recurring'}<span class="ls-unit"
+            >{#if e.is_estimate}<span class="ls-mark" title={$t('plan.sheet.estimate')}>≈</span>{/if}{sign(e, back)}{range(e.amount)}{#if e.timing === 'recurring'}<span class="ls-unit"
                     >{$t('plan.sheet.per_year')}</span
                 >{/if}</span
         >
@@ -680,17 +624,13 @@
     /* Phí giữ nhà's per-year figure, quiet beside its total. */
     .ls-per { display: block; font-size: var(--fs-xs, 0.75rem); font-weight: 500; color: var(--muted); }
     .ls-why { margin: -0.4rem 0 0; font-size: var(--fs-sm, 0.875rem); color: var(--muted); }
-    /* Not costs (behavior 98): the money into the home and the cash to buy, quieter than
-       the statement, their labels free to wrap on a phone. */
-    .ls-aside, .ls-into {
-        display: grid; background: var(--surface); border: 1px solid var(--border); border-radius: 0.75rem; overflow: hidden;
+    /* behavior 110: the money back at the sale, one line under the bottom line, quieter
+       than the statement and in no total; its label free to wrap on a phone. */
+    .ls-back {
+        background: var(--surface); border: 1px solid var(--border); border-radius: 0.75rem;
     }
-    .ls-aside > * + * { border-top: 1px solid var(--border); }
-    .ls-aside .ls-row-fig, .ls-into-head .ls-row-fig, .ls-need .ls-row-fig { font-weight: 600; }
-    .ls-need .ls-row-label, .ls-into-head .ls-row-label, .ls-aside .ls-row-label { white-space: normal; flex: 1 1 9rem; font-weight: 500; }
-    .ls-into .ls-rest { border: 0; border-top: 1px solid var(--border); border-radius: 0; }
-    .ls-need { background: var(--surface); border: 1px solid var(--border); border-radius: 0.75rem; }
-    .ls-aside .ls-need { border: 0; border-radius: 0; }
+    .ls-back .ls-row-label { white-space: normal; flex: 1 1 9rem; font-weight: 500; }
+    .ls-back .ls-row-fig { font-weight: 600; }
     .ls-hold { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0.75rem; }
     .ls-chip {
         font: inherit; font-size: var(--fs-xs, 0.75rem); padding: 0.3rem 0.7rem;
