@@ -1,0 +1,43 @@
+Source: https://immi.homeaffairs.gov.au/visas/getting-a-visa/fees-and-charges/current-visa-pricing
+Retrieved: 2026-10-18
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML 2bb8abd1333e636846941a74b515cf233975540c83f828fd784246ac419a54ed
+
+Visa fees and charges
+Skip to navigation
+Skip to main content
+Loading
+" />
+
+Select
+language
+English
+You have
+entered feedback mode. Right click on translated text to report
+​​​​
+ImmiAccount
+Visa Entitlement Verification Online (VEVO)
+My Tourist Refund Scheme (TRS) ​
+Page Image
+Fees and charges for visas
+Visa fees and charges
+Published
+Page Content
+​​​​​​​​​​​​​​​​​Current visa pricing table
+Use the Visa Prices table to help find the price of your visa.
+The table groups visas by what you plan to do in Australia. The categories are:
+visit
+study
+work
+live
+other
+​repealed or closed visas.
+For some visas, a lower visa cost may apply if you are an eligible citizen of a Pacific Island country, Timor-Leste or an ASEAN member country and you lodge a valid visa application.
+To work out your visa cost, use the Visa Pricing Estimator .
+​
+pop-up content starts
+Need a hand?
+×
+Cancel
+pop-up content ends
+Clickbot
+-->

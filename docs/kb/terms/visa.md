@@ -1,12 +1,12 @@
 ---
 slug: kb.terms.visa
 effective_from: 2026-10-17
-last_verified: 2026-10-17
+last_verified: 2026-10-18
 ---
 
 # Visa terms — Thuật ngữ về visa
 
-The visa words the news uses. Neither has a KB doc of its own; each explanation rests on the Home Affairs page its `url` names, read on 2026-10-17 (the Direction page is archived as docs/sources/homeaffairs/skilled-visa-processing-priorities-2026-10-16.txt).
+The visa words the news uses. None has a KB doc of its own; each explanation rests on the Home Affairs page its `url` names, read on 2026-10-17 (the Direction page is archived as docs/sources/homeaffairs/skilled-visa-processing-priorities-2026-10-16.txt). CPI (behavior 120, for the visa-charges note) rests on the ABS release page its `url` names, read on 2026-10-18 ("The Consumer Price Index (CPI) measures household inflation"); that visa charges are indexed to it each year is the F2026L00874 explanatory statement's "ongoing annual indexation of VACs".
 
 ## Terms
 
@@ -64,6 +64,28 @@ The visa words the news uses. Neither has a KB doc of its own; each explanation 
         "en": "A TSS or Skills in Demand holder is a temporary resident, and so a foreign person for FIRB when buying a home."
       },
       "url": "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/repealed-visas/temporary-skill-shortage-short-term-visa-subclass-482"
+    },
+    {
+      "id": "cpi",
+      "abbr": "CPI",
+      "name": {
+        "vi": "Chỉ số giá tiêu dùng (CPI)",
+        "en": "Consumer Price Index"
+      },
+      "forms": [
+        "CPI",
+        "Consumer Price Index",
+        "Chỉ số giá tiêu dùng"
+      ],
+      "meaning": {
+        "vi": "Chỉ số do Cục Thống kê Úc (ABS) công bố, đo mức lạm phát của hộ gia đình: giá các nhóm hàng hóa và dịch vụ mà hộ gia đình chi tiêu thay đổi bao nhiêu.",
+        "en": "The index the Australian Bureau of Statistics (ABS) publishes to measure household inflation: how much prices change across the things households spend on."
+      },
+      "why": {
+        "vi": "Nhiều khoản phí và ngưỡng của nhà nước, trong đó có phí nộp đơn visa, được điều chỉnh theo CPI mỗi năm, nên chi phí xin visa thường tăng hằng năm.",
+        "en": "Many government charges and thresholds, visa application charges among them, are indexed to CPI each year, so the cost of applying for a visa usually rises every year."
+      },
+      "url": "https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/consumer-price-index-australia/latest-release"
     }
   ]
 }
