@@ -39,7 +39,7 @@ events(Out) ->
 
 main(_) ->
     ok = fh_engine_kb:load(),
-    R = lists:flatten([mode_cases(M) || M <- modes()]
+    R = lists:flatten([mode_cases(M) || M <- modes()] ++ [spend_unit_cases()]
                       ++ [detail_cases(M, S) || M <- modes(),
                                                 S <- [<<"NSW">>, <<"VIC">>, <<"QLD">>, <<"WA">>]]),
     case [X || X <- R, X =:= fail] of
@@ -86,6 +86,7 @@ mode_cases({BP, Intent, Firb}) ->
      chk(BP, "with income: the payout is placed, never summed into sell, never pending",
          with_income(BP, Intent, Firb))]
     ++ cost_cases(BP, Intent, Firb, Out, B)
+    ++ spend_cases(BP, Intent, Firb)
     ++ [
      chk(BP, "no horizon: sell null, every dispose line needs hold_years",
          maps:get(<<"sell">>, B0) =:= null andalso
@@ -144,6 +145,64 @@ cost_cases(BP, Intent, Firb, Out10, B10) ->
              maps:get(<<"growth_pct_pa">>, Disp10) =:=
                  [V(<<"growth_band_low_pct_pa_nominal">>), V(<<"growth_band_high_pct_pa_nominal">>)]
          end)].
+
+%% Whole lifecycle -> P-4 · The engine is coupled to no shell -> purchase_journey -> the
+%% money spent over the hold (behavior 110, Expects 6-7). Every mode, every hold 5..30, in
+%% NSW (the state with a grant line): out_total = out_buy + out_own + costs_sell at both
+%% ends; out_buy = buy less the grant, low end paid with the high end received; out_own =
+%% costs_own + the principal repaid (no rent at base); back = disposition's net_proceeds,
+%% in no total. And bought outright (deposit = price): no repayments, no principal.
+spend_cases(BP, Intent, Firb) ->
+    Add = fun(Rs) -> [lists:sum([L || [L, _] <- Rs]), lists:sum([H || [_, H] <- Rs])] end,
+    Fin = #{<<"income">> => #{<<"assessable_income">> => 150000}},
+    Holds = fun(N) ->
+        {ok, O} = fh_engine_simulate:run(BP, (onboarding(N))#{<<"state">> => <<"NSW">>},
+                                         Intent, Fin, Firb),
+        B = budget(O),
+        In = [E || E <- events(O), maps:get(<<"direction">>, E) =:= <<"in">>,
+                   maps:get(<<"phase">>, E) =/= <<"dispose">>],
+        [BL, BH] = maps:get(<<"buy">>, B),
+        OutBuy = case In of [] -> [BL, BH]; _ -> [GL, GH] = sum(In), [BL - GH, BH - GL] end,
+        Repaid = maps:get(<<"principal_repaid">>, maps:get(<<"into_home">>, B)),
+        maps:get(<<"out_buy">>, B) =:= OutBuy
+            andalso maps:get(<<"out_own">>, B) =:= Add([maps:get(<<"costs_own">>, B), Repaid])
+            andalso maps:get(<<"out_total">>, B) =:=
+                    Add([maps:get(<<"out_buy">>, B), maps:get(<<"out_own">>, B), maps:get(<<"costs_sell">>, B)])
+            andalso maps:get(<<"back">>, B) =:= maps:get(<<"net_proceeds">>, maps:get(<<"disposition">>, O))
+    end,
+    {ok, Ob} = fh_engine_simulate:apply_overrides(#{<<"deposit">> => 800000},
+                   (onboarding())#{<<"target_price_range">> => [800000, 800000]}),
+    {ok, Cash} = fh_engine_simulate:run(BP, Ob, Intent, #{}, Firb),
+    CB = budget(Cash),
+    Own = [maps:get(<<"id">>, E) || E <- events(Cash), maps:get(<<"phase">>, E) =:= <<"own">>, counted(E),
+                                    maps:get(<<"amount">>, E) =/= [0, 0]],
+    [chk(BP, "every hold 5..30 in NSW: Tổng tiền bỏ ra = Mua + Giữ + Phí bán; grants off Mua; the sale apart",
+         lists:all(Holds, [5, 10, 15, 20, 30])),
+     chk(BP, "bought outright: Mua holds the whole price; no repayments in Giữ; out_total = the sum",
+         lists:nth(1, maps:get(<<"out_buy">>, CB)) >= 800000
+             andalso not lists:member(<<"loan_repayments">>, Own)
+             andalso maps:get(<<"out_total">>, CB) =:=
+                     Add([maps:get(<<"out_buy">>, CB), maps:get(<<"out_own">>, CB), maps:get(<<"costs_sell">>, CB)]))].
+
+%% spend/6 with inflows no base fill emits (behavior 110, Expect 6): a grant the plan
+%% qualifies for comes off both ends, one still conditional off the low end only; rent
+%% over the hold comes off Giữ, paired the same way.
+spend_unit_cases() ->
+    Costs = #{<<"hold_years">> => 10, <<"costs_own">> => [300000, 320000],
+              <<"into_home">> => #{<<"principal_repaid">> => [100000, 100000]}},
+    S = fun(In, Rent) -> fh_engine_journey:spend([50000, 60000], In, Costs, Rent, [20000, 40000], #{}) end,
+    Q = S([10000, 10000], null),
+    C = S([0, 10000], null),
+    R = S(null, [20000, 25000]),
+    [chk(<<"spend/6">>, "a qualifying grant comes off both ends of Mua",
+         maps:get(<<"out_buy">>, Q) =:= [40000, 50000]),
+     chk(<<"spend/6">>, "a conditional grant comes off the low end only",
+         maps:get(<<"out_buy">>, C) =:= [40000, 60000]),
+     chk(<<"spend/6">>, "rent over the hold comes off Giữ, low paid with high received",
+         maps:get(<<"out_own">>, R) =:= [400000 - 250000, 420000 - 200000]
+             andalso maps:get(<<"out_own_per_year">>, R) =:= [15000, 22000]),
+     chk(<<"spend/6">>, "out_total = Mua + Giữ + Phí bán",
+         maps:get(<<"out_total">>, R) =:= [50000 + 150000 + 20000, 60000 + 220000 + 40000])].
 
 %% Whole lifecycle -> every statement line opens its own detail -> the base fill -> every
 %% line carries a detail (behavior 93, Expect 10). Measured 2026-10-16 before the change:

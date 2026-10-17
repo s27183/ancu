@@ -269,6 +269,9 @@ get_plan_card(TenantId, PlanCardId) ->
 %% until the journey has filled. Behavior 98: the figures are the statement's cost framing,
 %% Phí mua (costs_buy) and Phí giữ nhà a year (costs_own_per_year) — costs only, never the
 %% deposit or loan principal, which are money into the home, not costs.
+%% Behavior 110: the statement became the money spent, so the same two wire fields now carry
+%% Mua (out_buy) and Giữ nhà a year (out_own_per_year), falling back to the behavior-98
+%% fields on a card filled before 110 — the list still equals that card's statement.
 -spec plan_card_summaries(binary(), [binary()]) -> [map()].
 plan_card_summaries(_TenantId, []) -> [];
 plan_card_summaries(TenantId, Ids) ->
@@ -276,9 +279,11 @@ plan_card_summaries(TenantId, Ids) ->
         "SELECT plan_card_id::text, "
         "       to_char(updated_at AT TIME ZONE 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"'), "
         "       intent, mode, "
-        "       coalesce(content_jsonb #> '{components,purchase_journey,outcome,lifecycle_budget,costs_buy}', "
+        "       coalesce(content_jsonb #> '{components,purchase_journey,outcome,lifecycle_budget,out_buy}', "
+        "                content_jsonb #> '{components,purchase_journey,outcome,lifecycle_budget,costs_buy}', "
         "                'null'::jsonb), "
-        "       coalesce(content_jsonb #> '{components,purchase_journey,outcome,lifecycle_budget,costs_own_per_year}', "
+        "       coalesce(content_jsonb #> '{components,purchase_journey,outcome,lifecycle_budget,out_own_per_year}', "
+        "                content_jsonb #> '{components,purchase_journey,outcome,lifecycle_budget,costs_own_per_year}', "
         "                'null'::jsonb) "
         "FROM plan_cards WHERE tenant_id = $1::uuid AND plan_card_id = ANY($2::uuid[])",
         [TenantId, Ids]),

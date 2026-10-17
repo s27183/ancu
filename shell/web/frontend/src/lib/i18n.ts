@@ -690,13 +690,16 @@ const messages = {
     'plan.sheet.buy': { vi: 'Mua', en: 'Buy' },
     'plan.sheet.own': { vi: 'Giữ nhà', en: 'Own' },
     'plan.sheet.sell': { vi: 'Bán', en: 'Sell' },
-    // Behavior 98: the statement reads as costs over the hold; money into the home sits apart.
-    'plan.sheet.costs_buy': { vi: 'Phí mua', en: 'Buying costs' },
-    'plan.sheet.costs_own': { vi: 'Phí giữ nhà trong {n} năm', en: 'Owning costs over {n} years' },
-    'plan.sheet.costs_own_none': { vi: 'Phí giữ nhà', en: 'Owning costs' },
+    // Behavior 110: the statement is the money spent on the home over the hold; what comes
+    // back at sale sits under it, in no total.
+    'plan.sheet.costs_buy': { vi: 'Mua', en: 'Buying' },
+    'plan.sheet.costs_own': { vi: 'Giữ nhà trong {n} năm', en: 'Owning over {n} years' },
+    'plan.sheet.costs_own_none': { vi: 'Giữ nhà', en: 'Owning' },
     'plan.sheet.costs_sell': { vi: 'Phí bán', en: 'Selling costs' },
-    'plan.sheet.total_hold': { vi: 'Tổng phí trong {n} năm', en: 'Total costs over {n} years' },
-    'plan.sheet.total_hold_none': { vi: 'Tổng phí', en: 'Total costs' },
+    'plan.sheet.total_hold': { vi: 'Tổng tiền bạn bỏ ra trong {n} năm', en: 'Total you spend over {n} years' },
+    'plan.sheet.total_hold_none': { vi: 'Tổng tiền bạn bỏ ra', en: 'Total you spend' },
+    'plan.sheet.back_hold': { vi: 'Tiền về khi bán sau {n} năm', en: 'Back when you sell after {n} years' },
+    'plan.sheet.back': { vi: 'Tiền về khi bán', en: 'Back when you sell' },
     // Behavior 106: the plan hub's cards (PlanHub.svelte).
     'plan.hub.steps': { vi: 'Bước đã xong', en: 'Steps done' },
     'plan.hub.next': { vi: 'Tiếp theo:', en: 'Next:' },
@@ -710,14 +713,6 @@ const messages = {
         vi: 'Theo giá bán dự kiến sau {n} năm: {p} (tăng {g}%/năm)',
         en: 'At the projected sale price after {n} years: {p} (growing {g}% a year)'
     },
-    'plan.sheet.interest_hold': { vi: 'Lãi vay trong {n} năm', en: 'Loan interest over {n} years' },
-    'plan.sheet.into_home': { vi: 'Tiền vào căn nhà', en: 'Money into the home' },
-    'plan.sheet.into_home_hold': { vi: 'Tiền vào căn nhà sau {n} năm', en: 'Money into the home after {n} years' },
-    'plan.sheet.into_deposit': { vi: 'Tiền đặt cọc', en: 'Deposit' },
-    'plan.sheet.into_principal': { vi: 'Tiền gốc vay đã trả trong {n} năm', en: 'Loan principal repaid over {n} years' },
-    'plan.sheet.into_principal_none': { vi: 'Tiền gốc vay đã trả', en: 'Loan principal repaid' },
-    'plan.sheet.cash_to_buy': { vi: 'Cần có khi mua (đặt cọc + phí mua)', en: 'Cash needed to buy (deposit + buying costs)' },
-    'plan.sheet.not_a_cost': { vi: 'Không phải phí · không tính vào tổng', en: 'Not a cost · not in the total' },
     'plan.sheet.not_in_total': { vi: 'Không tính vào tổng', en: 'Not in the total' },
     'plan.sheet.key': { vi: '≈ ước tính · không dấu: chính xác', en: '≈ estimate · unmarked: exact' },
     'plan.sheet.estimate': { vi: 'ước tính', en: 'estimate' },
@@ -791,8 +786,8 @@ const messages = {
         en: 'The plan uses {x}. At least {min} ({p}% of the price), at most the whole price.'
     },
     'plan.fin.deposit_effect': {
-        vi: 'Đổi khoản vay, nên đổi tiền lãi trong Phí giữ nhà. Dưới 20% giá nhà mà không có chương trình nào miễn thì có bảo hiểm khoản vay (LMI) trong Phí mua. Mua đứt: không vay, không lãi, không LMI, không phí vay; ưu đãi thuế trước bạ vẫn giữ, và Bảo lãnh mua nhà lần đầu không còn cần.',
-        en: 'Moves the loan, so the interest in Owning costs. Under 20% of the price with no scheme waiving it, lenders mortgage insurance (LMI) is added to Buying costs. Buying outright: no loan, interest, LMI or loan fees; the duty concession still applies, and the First Home Guarantee is not needed.'
+        vi: 'Đổi Mua và khoản vay, nên đổi tiền trả nợ trong Giữ nhà. Dưới 20% giá nhà mà không có chương trình nào miễn thì có bảo hiểm khoản vay (LMI) trong Mua. Mua đứt: không vay, không lãi, không LMI, không phí vay; ưu đãi thuế trước bạ vẫn giữ, và Bảo lãnh mua nhà lần đầu không còn cần.',
+        en: 'Moves Buying and the loan, so the repayments in Owning. Under 20% of the price with no scheme waiving it, lenders mortgage insurance (LMI) is added to Buying. Buying outright: no loan, interest, LMI or loan fees; the duty concession still applies, and the First Home Guarantee is not needed.'
     },
     'plan.fin.outright': { vi: 'Mua đứt', en: 'Buy outright' },
     'plan.fin.deposit_out': {

@@ -594,8 +594,8 @@
     //            (routes/plan/+page.svelte) names the level above and is history.back(), so
     //            it, the browser's back and a swipe cannot disagree — the button is the way
     //            back (Son: the iPhone swipe is hard to use, never relied on).
-    // Invariant: the hub computes nothing — its total is lifecycle_budget.costs_total (the
-    //            statement's bottom line) and its count the playbook's actions under the
+    // Invariant: the hub computes nothing — its total is lifecycle_budget.out_total (the
+    //            statement's bottom line, behavior 110) and its count the playbook's actions under the
     //            card's checklist_status (every blueprint carries a playbook: 30–35 steps,
     //            measured 2026-10-17). A card with neither tab has no hub (version skew).
     // Capability: the floating menu switches Ngân sách ↔ Hành trình in place (sub), so back
