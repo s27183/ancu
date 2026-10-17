@@ -599,8 +599,10 @@
     //            card's checklist_status (every blueprint carries a playbook: 30–35 steps,
     //            measured 2026-10-17). A card with neither tab has no hub (version skew).
     // Capability: the floating menu switches Ngân sách ↔ Hành trình in place (sub), so back
-    //            from either goes to the hub; it is not drawn on the hub, whose cards are the
-    //            way in.
+    //            from either goes to the hub; it is drawn on those two sheets only — not on
+    //            the hub, whose cards are the way in, nor on a level below them (a phase
+    //            sheet, "Tài chính của bạn", a step: page.state.lifecycle / flowPhase;
+    //            behavior 109), where the sheet's own back or submit is the way on.
 
     // A pick from the menu, or "Hỏi AI", leaves an open phase sheet or step first, and
     // waits for that back to land so a push that follows lands over the sheet, not under it.
@@ -804,15 +806,21 @@
         return false;
     }
 
-    // Behavior 109 (Son 2026-10-17: "I update the finance, then the whole plan update
-    // accordingly"): "Cập nhật tài chính", pinned at the foot of "Tài chính của bạn", is the
-    // sheet's one submit. It saves what changed — a typed price or deposit as a refine, a
-    // changed income or debt as a profile write; a field left alone keeps the plan's value
-    // (no override sent; the household form is seeded from the engine) — and goes back to
-    // Ngân sách. The two writes cannot overlap (refine 409s while a turn runs; a profile
-    // write mid-turn recomputes nothing), so when both changed the profile write waits for
-    // the refine's turn to end (onDone, `profileAfterRefine`). A refused write keeps the
-    // visitor on the sheet with its message. "Tiền bạn có" is kept as it is typed.
+    // Whole lifecycle -> P-2 · The database is the single source of truth -> The web frontend -> one submit for "Tài chính của bạn"
+    // Goal:      behavior 109 (Son 2026-10-17: "I update the finance, then the whole plan
+    //            update accordingly"): "Cập nhật tài chính", pinned at the foot of the
+    //            finances sheet (LifecycleSheet's .ls-fin-submit), is its one submit; it
+    //            saves what changed and goes back to Ngân sách. No unsaved preview, no
+    //            "Xem thử" / "Lưu" / "Đặt lại" — the plan shown is the saved plan.
+    // Invariant: a field left alone keeps the plan's value: a blank price or deposit sends no
+    //            override, and the household form is seeded from the engine's profile, its
+    //            write sent only when it differs from that seed (finSeeded). The two writes
+    //            never overlap (refine 409s while a turn runs; a profile write mid-turn
+    //            recomputes nothing), so when both changed the profile write waits for the
+    //            refine's turn to end (onDone, profileAfterRefine). Measured 2026-10-17 in
+    //            Chrome: price + HECS in one tap both landed (loan needed 712.500, HECS 0).
+    // Capability: a refused write keeps the visitor on the sheet with its message;
+    //            "Tiền bạn có" is kept as typed; Enter in price or deposit submits too.
     let profileAfterRefine = $state(false);
     const updating = $derived(saving || finSaving);
     async function updateFinances() {
