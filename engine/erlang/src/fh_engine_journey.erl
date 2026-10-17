@@ -49,6 +49,9 @@
 -export([fill/2]).
 %% exported for the conformance harness (Mode-A shape, UNCHANGED signatures):
 -export([phases/0, actors/0, prose_cells/0, money_cells/2, interactions/1]).
+%% spend/6 is pure; exported for lifecycle_sheet_conformance (behavior 110: a qualifying
+%% grant and rent, which no base fill emits).
+-export([spend/6]).
 
 -define(COPY,          <<"kb.journey.fhg-path">>).       %% Mode A bilingual labels + cell prose
 -define(INVESTOR_COPY, <<"kb.journey.investor-path">>).  %% Mode C bilingual labels + cell prose
@@ -206,7 +209,7 @@ fill_investor_foreign(Upstream) ->
 %%            shell places them and computes nothing (behavior 82, Expect 3).
 %% Holds:     an optional or still-conditional fee line is shown, never summed (out/1).
 %%            buy = sum of out-events in prepare..settle (a grant is an in-event: shown,
-%%            never netted — as total_cash_required); own_per_year = sum of recurring
+%%            not netted here — as total_cash_required; out_buy nets it, spend/6); own_per_year = sum of recurring
 %%            out-events in own; sell = sum of dispose out-events except loan_payout (the
 %%            loan is repaid from the proceeds, not a cost of selling), null with no dispose
 %%            events. A null-amount event adds nothing. pending names each dispose line
@@ -242,8 +245,14 @@ lifecycle_budget(Events, DisposeEvents, Upstream, PayoutNeeds) ->
                   {_, true}  -> []
               end,
     SellTotal = case DisposeEvents of [] -> null; _ -> sum_ranges(Sell) end,
-    Costs = costs(Buy, Own, SellTotal, maps:get(<<"disposition">>, Upstream, #{})),
-    Costs#{<<"buy">>          => sum_ranges(Buy),
+    Disp = maps:get(<<"disposition">>, Upstream, #{}),
+    Costs = costs(Buy, Own, SellTotal, Disp),
+    BuyIn = [E || E <- Events, maps:get(<<"direction">>, E, null) =:= <<"in">>,
+                  lists:member(maps:get(<<"phase">>, E), [<<"prepare">>, <<"pre_approve">>,
+                                                           <<"contract">>, <<"settle">>])],
+    Spend = spend(sum_ranges(Buy), sum_ranges(BuyIn), Costs, rent(Upstream), SellTotal, Disp),
+    Merged = maps:merge(Costs, Spend),
+    Merged#{<<"buy">>          => sum_ranges(Buy),
            <<"own_per_year">> => sum_ranges(Own),
            <<"sell">>         => SellTotal,
            <<"pending">>      => Pending ++ FeePending,
@@ -254,7 +263,9 @@ lifecycle_budget(Events, DisposeEvents, Upstream, PayoutNeeds) ->
 %% Purpose:   the statement reads as what the home costs over the hold the visitor picks —
 %%            Phí mua, Phí giữ nhà trong N năm, Phí bán — and a total that is exactly their
 %%            sum; money that goes into the home (the deposit, the principal repaid by year
-%%            N) is not a cost and sits apart, never in the total.
+%%            N) is not a cost and sits apart, never in the total. Since behavior 110 the
+%%            statement reads spend/6's totals instead; these stay on the budget for cards
+%%            and readers made before it (the plan list falls back to them).
 %% Holds:     costs_buy = buy less the deposit; costs_own = (every counted recurring own line
 %%            but the loan repayments) × N + the loan's interest over N (disposition's
 %%            loan_over_hold, the same loan and rate as the repayments and the payout);
@@ -296,6 +307,62 @@ costs(Buy, Own, SellTotal, Disp) ->
                                                                   null -> null;
                                                                   _ -> add_all([Deposit, Repaid])
                                                               end}}.
+
+%% Whole lifecycle -> P-4 · The engine is coupled to no shell -> purchase_journey -> the money spent over the hold
+%% Purpose:   behavior 110 (Son 2026-10-17: "the budget show the net cash outflow"): the
+%%            statement is the money the visitor spends on the home over the hold — every
+%%            dollar out, less what comes in along the way — and, apart, what comes back at
+%%            the sale, which no total nets ("agree with B": a budget is having the money
+%%            when each payment falls due).
+%% Holds:     out_buy = buy (deposit + counted fees, the cash on the day) less the buy-phase
+%%            in-events (a grant), paired low end paid with the high end received, so a
+%%            grant still conditional ([0, G]) comes off the low end only and one the plan
+%%            qualifies for ([G, G]) off both; out_own = costs_own + the principal repaid by
+%%            N (= every repayment and yearly line over N) less the rent over N, paired the
+%%            same way; out_own_per_year = out_own / N; out_total = out_buy + out_own +
+%%            costs_sell at each end, null unless all three are known; back = disposition's
+%%            net_proceeds (sale less selling costs, the loan still owed and CGT). A total
+%%            may go below zero only when an inflow exceeds what is paid; it is shown as is.
+%% Rests on:  the only in-events before the sale are grants (measured 2026-10-17, every
+%%            mode in NSW and QLD with income: grant_1 [0, 10000] in NSW FHB, none else);
+%%            rent is cash_flow_projection.annual_rental_income_year_1, the figure beside/1
+%%            lists — null until a rent is given, and then out_own waits on nothing.
+spend(BuyOut, BuyIn, Costs, Rent, SellTotal, Disp) ->
+    H = maps:get(<<"hold_years">>, Costs),
+    OutBuy = offset(BuyOut, BuyIn),
+    Repaid = maps:get(<<"principal_repaid">>, maps:get(<<"into_home">>, Costs)),
+    Gross = case {maps:get(<<"costs_own">>, Costs), Repaid} of
+                {null, _} -> null;
+                {C, null} -> C;
+                {C, R}    -> add_all([C, R])
+            end,
+    RentOver = case {Rent, H} of
+                   {[RL, RH], N} when is_integer(N) -> [RL * N, RH * N];
+                   _ -> null
+               end,
+    OutOwn = offset(Gross, RentOver),
+    #{<<"out_buy">>          => OutBuy,
+      <<"out_own">>          => OutOwn,
+      <<"out_own_per_year">> => case H of null -> null; _ -> per_year(OutOwn, H) end,
+      <<"out_total">>        => case SellTotal of
+                                    null -> null;
+                                    _ -> add_all([OutBuy, OutOwn, SellTotal])
+                                end,
+      <<"back">>             => case H of
+                                    null -> null;
+                                    _ -> as_range(maps:get(<<"net_proceeds">>, Disp, null))
+                                end}.
+
+%% money out less money in, low end paid with the high end received
+offset(null, _) -> null;
+offset(Out, null) -> Out;
+offset([OL, OH], [IL, IH]) -> [OL - IH, OH - IL].
+
+rent(Upstream) ->
+    case maps:find(<<"cash_flow_projection">>, Upstream) of
+        {ok, Cf} when is_map(Cf) -> as_range(field(<<"annual_rental_income_year_1">>, Cf));
+        _ -> null
+    end.
 
 into_home(E) -> maps:get(<<"id">>, E, null) =:= <<"deposit">>.
 
