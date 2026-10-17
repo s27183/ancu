@@ -3,8 +3,10 @@
     // Behavior 81: the planner and the map page each carry one plain control back to the
     // home's cards — a link, so it is also a real address (the header's brand goes there
     // too, but few read a logo as "home"). Behavior 88: the News page carries it too, and
-    // on every page it is first at the top-left (the map's controls row). A house and the
-    // word; on the planner's head on a phone the house alone (app.css).
+    // on every page it is first at the top-left (the map's controls row). Behavior 115
+    // (Son 2026-10-18: the house alone was hard to spot): the same pill on every page and
+    // width — house and word, 2.6rem high, shadowed (app.css .home-back; measured
+    // 2026-10-18 before it: 32×32 house alone on /news and /plan at 400px).
     import { t } from '$lib/i18n';
 </script>
 
