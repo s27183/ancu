@@ -1218,7 +1218,7 @@ wrong for QLD).
 {
   "type": "phase_playbook",
   "fields": {
-    "phases": "array<{ phase: string, actions: array<{ id: string, label: localized_text, detail: localized_text, order: integer, budget_ref: string|null, component_ref: string|null, status: enum [not_started, done] }>, risks: array<{ severity: enum [low, medium, high], item: localized_text, action: localized_text }> }>",
+    "phases": "array<{ phase: string, actions: array<{ id: string, label: localized_text, detail: localized_text, order: integer, budget_ref: string|null, component_ref: string|null, status: enum [not_started, done], grounding: enum [rule, state_rule, practice], source: { url: string, checked: string }|null, rule_state: string|null }>, risks: array<{ severity: enum [low, medium, high], item: localized_text, action: localized_text }> }>",
     // one entry per lifecycle phase (prepare → pre_approve → contract → settle → own → dispose); phase ids align with purchase_journey.phases + cash_event.phase.
     //   ACTION: order = temporal sequence within the phase. budget_ref → a cash_event.id (harvested off cash_position/yield_modelling/tax_structure; null when no cash consequence). component_ref → a component id (e.g. tax_structure behind 'Lodge annual return'; null when none). status is USER-ATTESTED via the §10.4 toggle-write, overlaid at read.
     //   RISK: item = the risk; action = the mitigation. KB-grounded (kb.risks.investor-by-phase), never generated. Honest-partial: a phase with no substantiated risk emits NO risk.

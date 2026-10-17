@@ -26,7 +26,7 @@ main(_) ->
     io:format("phase_playbook conformance — fh_engine_phase_playbook "
               "(actionable Flow spine, author-content / link-never-place)~n~n"),
     R = lists:flatten([structure_cases(), conformance_cases(),
-                       budget_ref_cases(), bilingual_case()]),
+                       budget_ref_cases(), bilingual_case(), grounding_cases()]),
     Fails = [X || X <- R, X =:= fail],
     io:format("~n================================================================~n"),
     case Fails of
@@ -166,6 +166,78 @@ bilingual_case() ->
            lists:any(fun(C) -> C > 127 end, unicode:characters_to_list(Vi)), true),
      check("risk item: vi carries a non-ASCII char (real Vietnamese)",
            lists:any(fun(C) -> C > 127 end, unicode:characters_to_list(RVi)), true)].
+
+%% --- behavior 114: every step's rule source, or practice -------------------------
+%% Every step of every mode in NSW, VIC and SA is one of rule (a .gov.au url and the
+%% doc's last_verified), state_rule (the plan's state, no url) or practice (no source);
+%% a state's rule never borrows another state's link; a stored card is grounded at read.
+gfill(Slug, State) ->
+    {O, _, _} = fh_engine_phase_playbook:fill(
+                  #{blueprint_slug => Slug, onboarding => #{<<"state">> => State}},
+                  full_upstream()),
+    O.
+
+well_grounded(A, State) ->
+    case A of
+        #{<<"grounding">> := <<"rule">>, <<"rule_state">> := null,
+          <<"source">> := #{<<"url">> := <<"https://", _/binary>> = U, <<"checked">> := C}}
+          when is_binary(C) -> gov(U);
+        #{<<"grounding">> := <<"state_rule">>, <<"source">> := null, <<"rule_state">> := State} -> true;
+        #{<<"grounding">> := <<"practice">>, <<"source">> := null, <<"rule_state">> := null} -> true;
+        _ -> false
+    end.
+
+gov(U) ->
+    [Host | _] = binary:split(binary:part(U, 8, byte_size(U) - 8), <<"/">>),
+    binary:longest_common_suffix([Host, <<".gov.au">>]) =:= 7.
+
+url(O, Phase, Id) ->
+    case maps:get(<<"source">>, find_action(O, Phase, Id)) of
+        #{<<"url">> := U} -> U;
+        null -> {maps:get(<<"grounding">>, find_action(O, Phase, Id)),
+                 maps:get(<<"rule_state">>, find_action(O, Phase, Id))}
+    end.
+
+grounding_cases() ->
+    Slugs = [<<"fhb-domestic-au">>, <<"fhb-foreign-au">>, <<"investor-domestic-au">>,
+             <<"investor-foreign-au">>],
+    All = [check(<<Slug/binary, " ", St/binary, ": every step is rule, state_rule or practice">>,
+                 lists:all(fun(A) -> well_grounded(A, St) end, all_actions(gfill(Slug, St))), true)
+           || Slug <- Slugs, St <- [<<"NSW">>, <<"VIC">>, <<"SA">>]],
+    ANsw = gfill(<<"fhb-domestic-au">>, <<"NSW">>),
+    ASa  = gfill(<<"fhb-domestic-au">>, <<"SA">>),
+    BVic = gfill(<<"fhb-foreign-au">>, <<"VIC">>),
+    Kinds = fun(O) -> [length([A || A <- all_actions(O), maps:get(<<"grounding">>, A) =:= K])
+                       || K <- [<<"rule">>, <<"state_rule">>, <<"practice">>]] end,
+    Stored = #{<<"components">> => #{<<"phase_playbook">> => #{<<"outcome">> =>
+                 ANsw#{<<"phases">> => [P#{<<"actions">> => [maps:without([<<"grounding">>, <<"source">>, <<"rule_state">>], A)
+                                                             || A <- maps:get(<<"actions">>, P)]}
+                                        || P <- maps:get(<<"phases">>, ANsw)]}}}},
+    #{<<"components">> := #{<<"phase_playbook">> := #{<<"outcome">> := Regrounded}}} =
+        fh_engine_phase_playbook:ground(<<"fhb-domestic-au">>, <<"NSW">>, Stored),
+    All ++
+    [check("A NSW stamp duty -> Revenue NSW transfer duty",
+           url(ANsw, <<"settle">>, <<"pay_stamp_duty">>),
+           <<"https://www.revenue.nsw.gov.au/taxes-duties-levies-royalties/transfer-duty">>),
+     check("A NSW review contract -> the NSW Conveyancing (Sale of Land) Regulation",
+           url(ANsw, <<"contract">>, <<"review_contract">>),
+           <<"https://legislation.nsw.gov.au/view/html/inforce/current/sl-2022-0485">>),
+     check("A NSW: 13 rule steps, 0 uncited state rules, 17 practice", Kinds(ANsw), [13, 0, 17]),
+     check("A SA stamp duty -> state_rule SA, no link",
+           url(ASa, <<"settle">>, <<"pay_stamp_duty">>), {<<"state_rule">>, <<"SA">>}),
+     check("A SA FHSS (federal) -> still firsthomebuyers.gov.au",
+           url(ASa, <<"prepare">>, <<"set_up_fhss">>),
+           <<"https://firsthomebuyers.gov.au/first-home-super-saver-scheme">>),
+     check("B VIC confirm FIRB approval -> foreigninvestment.gov.au guidance note 38",
+           url(BVic, <<"settle">>, <<"confirm_firb_approval">>),
+           <<"https://foreigninvestment.gov.au/sites/firb.gov.au/files/guidance-notes/GN_38-No_objection_notif.pdf">>),
+     check("B VIC surcharge -> SRO VIC", url(BVic, <<"settle">>, <<"pay_foreign_buyer_surcharge">>),
+           <<"https://www.sro.vic.gov.au/rates-taxes-duties-and-levies/foreign-purchaser-additional-duty-current-rates">>),
+     check("A NSW stamp duty checked = calc-by-state's last_verified",
+           maps:get(<<"checked">>, maps:get(<<"source">>, find_action(ANsw, <<"settle">>, <<"pay_stamp_duty">>))),
+           <<"2026-07-06">>),
+     check("a card stored without grounding is grounded at read as a fill grounds it",
+           Regrounded, ANsw)].
 
 %% --- helpers ----------------------------------------------------------------
 

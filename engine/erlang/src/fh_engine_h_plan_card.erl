@@ -28,6 +28,26 @@ init(Req0, State) ->
 %%            stored; nothing is written back, so the SSE replay of the stored log is unchanged.
 %% Rests on:  the plan list reads through the same function (fh_engine_store:plan_card_summaries/2),
 %%            so a list card equals the statement it opens.
+%% Whole lifecycle -> honesty tiers -> The engine -> a served journey cites today's sources
+%% Goal: behavior 114 — every step of a card's Hành trình shows its rule's source, a card
+%%   filled before the steps carried one too.
+%% Invariant: each step's grounding is fh_engine_phase_playbook:ground/3 for the plan's own
+%%   state (its profile's onboarding, as a fill reads it), recomputed from today's KB on
+%%   every read and never written back; a card whose state cannot be read is served as stored.
+%% Capability: grounded/3, the content with its playbook steps grounded.
+grounded(PlanCardId, Slug, Content) ->
+    try
+        State = case fh_engine_store:get_card_rerun_context(PlanCardId) of
+                    {ok, #{facts := Facts}} ->
+                        fh_engine_store:projection_state(maps:get(<<"onboarding">>, Facts, #{}));
+                    _ -> undefined
+                end,
+        fh_engine_phase_playbook:ground(Slug, State, Content)
+    catch C:W ->
+        logger:warning("[plan_card] grounding ~s failed: ~p:~p", [PlanCardId, C, W]),
+        Content
+    end.
+
 handle_get(Req0, State) ->
     case fh_engine_http:authenticate(Req0) of
         {ok, #{tenant_id := T}} ->
@@ -54,8 +74,9 @@ handle_get(Req0, State) ->
                              end,
                     %% behavior 110: a card stored before the budget changed is served
                     %% with the budget a fill writes today (fh_engine_journey:current/2)
-                    Content = fh_engine_journey:current(maps:get(<<"blueprint_slug">>, Card),
-                                                        maps:get(<<"content">>, Card)),
+                    Slug = maps:get(<<"blueprint_slug">>, Card),
+                    Content = grounded(PlanCardId, Slug,
+                                       fh_engine_journey:current(Slug, maps:get(<<"content">>, Card))),
                     Body = Card#{<<"content">> => Content,
                                  <<"event_cursor">> => Cursor,
                                  <<"turn_running">> => Running,

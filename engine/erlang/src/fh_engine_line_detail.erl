@@ -17,7 +17,8 @@
 %% Rests on:  the compiler's line_details gate (kb_compiler.py) — bilingual text, a known
 %%            tier, every source index inside the doc's `sources:`.
 
--export([attach/4, attach_all/2, detail/3, beside/3, pct/1, pct_range/1, price/2, money_range/1]).
+-export([attach/4, attach_all/2, detail/3, beside/3, pct/1, pct_range/1, price/2, money_range/1,
+         source/3]).
 
 %% Ctx: state (binary | undefined) and params (#{binary() => fh_engine_i18n:param()}).
 -type ctx() :: #{state => binary() | undefined, params => map()}.
