@@ -101,7 +101,9 @@ daily_limit() ->
 %%            once cannot both take the last slot; a repeat of a create key returns its
 %%            plan before the check. A guest's plans claimed at sign-in may take an
 %%            account past 28: it keeps them and only cannot make another.
-%% Rests on:  the guest purge still takes a guest's plans after 7 days (ttl/0).
+%% Rests on:  the guest purge still takes a guest's plans after 7 days (ttl/0); the
+%%            guest daily cap (daily_limit/0, 14) stays above this cap, so a slot freed by
+%%            a delete can be used the same day.
 -spec held_limit(guest | user) -> pos_integer().
 held_limit(guest) -> 7;
 held_limit(user)  -> 28.
