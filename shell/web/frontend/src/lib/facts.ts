@@ -145,6 +145,7 @@ const PUBLISHERS: Record<string, Localized> = {
     'www.ato.gov.au': { en: 'Australian Taxation Office (ATO)', vi: 'Sở Thuế Úc (ATO)' },
     'asic.gov.au': { en: 'ASIC', vi: 'Ủy ban Chứng khoán và Đầu tư Úc (ASIC)' },
     'download.asic.gov.au': { en: 'ASIC', vi: 'Ủy ban Chứng khoán và Đầu tư Úc (ASIC)' },
+    'moneysmart.gov.au': { en: 'ASIC Moneysmart', vi: 'Moneysmart của ASIC' },
     'www.apra.gov.au': { en: 'APRA', vi: 'Cơ quan Quản lý Thận trọng Úc (APRA)' },
     'handbook.apra.gov.au': { en: 'APRA', vi: 'Cơ quan Quản lý Thận trọng Úc (APRA)' },
     'www.austrac.gov.au': { en: 'AUSTRAC', vi: 'Cơ quan Phòng chống Rửa tiền Úc (AUSTRAC)' },
