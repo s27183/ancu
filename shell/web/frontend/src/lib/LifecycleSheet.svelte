@@ -251,7 +251,8 @@
         {
             key: 'sell' as PhaseKey,
             title: $t('plan.sheet.costs_sell'),
-            lines: disposeEvents,
+            // the fees only: the sale price and the loan payout are the money back (its layer)
+            lines: disposeEvents.filter((e) => e.direction === 'out' && e.id !== 'dispose_loan_payout'),
             total: budget?.costs_sell ?? null,
             perYear: null as MoneyRange | null
         }
@@ -275,6 +276,14 @@
     function sign(e: CashEvent, back: boolean): string {
         if (back) return e.direction === 'in' ? '+' : '−';
         return e.direction === 'in' ? '−' : '';
+    }
+    // A signed line's figure carries its sign on each end of a range ("−0 – −10.000" would
+    // read as a range from minus to plus otherwise).
+    function signed(e: CashEvent, back: boolean): string {
+        const sg = sign(e, back);
+        const r = e.amount;
+        if (!r || !sg || r[0] === r[1]) return sg + range(r);
+        return `${sg}${money(r[0], $lang) ?? '—'} – ${sg}${money(r[1], $lang) ?? '—'}`;
     }
 
     // One line each on why Phí giữ nhà and Phí bán move with the hold.
@@ -494,7 +503,7 @@
 
         {#if holdYears && (budget?.back || disposeEvents.length > 0)}
             <!-- behavior 110: what comes back at the sale — one line apart, in no total -->
-            <button type="button" class="ls-row ls-back" data-back onclick={() => openPhase('back')}>
+            <button type="button" class="ls-row ls-back" data-sale onclick={() => openPhase('back')}>
                 <span class="ls-row-label">{backGroup.title}</span>
                 <span class="ls-row-fig"
                     >{#if budget?.back}{@render ends(budget.back)}{:else}—{/if}</span
@@ -581,7 +590,7 @@
             >{/if}
     {:else}
         <span class="ls-amt"
-            >{#if e.is_estimate}<span class="ls-mark" title={$t('plan.sheet.estimate')}>≈</span>{/if}{sign(e, back)}{range(e.amount)}{#if e.timing === 'recurring'}<span class="ls-unit"
+            >{#if e.is_estimate}<span class="ls-mark" title={$t('plan.sheet.estimate')}>≈</span>{/if}{signed(e, back)}{#if e.timing === 'recurring'}<span class="ls-unit"
                     >{$t('plan.sheet.per_year')}</span
                 >{/if}</span
         >
@@ -609,7 +618,7 @@
     button.ls-row:hover { background: var(--accent-soft); }
     button.ls-row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
     /* On a phone a long range wraps inside the figure's column, after its dash. */
-    /* behavior 98: "Phí giữ nhà trong N năm" is long, so on a phone the label wraps rather
+    /* behavior 98: "Giữ nhà trong N năm" is long, so on a phone the label wraps rather
        than squeeze the figure under one whole end of its range. */
     .ls-row-label { flex: 0 1 auto; min-width: 0; font-weight: 600; }
     .ls-row-fig {
@@ -621,7 +630,7 @@
     .ls-bottom .ls-row-fig { font-size: var(--fs-lg, 1.125rem); }
     .ls-bottom .ls-row-label { font-weight: 700; }
 
-    /* Phí giữ nhà's per-year figure, quiet beside its total. */
+    /* Giữ nhà's per-year figure, quiet beside its total. */
     .ls-per { display: block; font-size: var(--fs-xs, 0.75rem); font-weight: 500; color: var(--muted); }
     .ls-why { margin: -0.4rem 0 0; font-size: var(--fs-sm, 0.875rem); color: var(--muted); }
     /* behavior 110: the money back at the sale, one line under the bottom line, quieter

@@ -786,8 +786,8 @@ const messages = {
         en: 'The plan uses {x}. At least {min} ({p}% of the price), at most the whole price.'
     },
     'plan.fin.deposit_effect': {
-        vi: 'Đổi khoản vay, nên đổi tiền lãi trong Phí giữ nhà. Dưới 20% giá nhà mà không có chương trình nào miễn thì có bảo hiểm khoản vay (LMI) trong Phí mua. Mua đứt: không vay, không lãi, không LMI, không phí vay; ưu đãi thuế trước bạ vẫn giữ, và Bảo lãnh mua nhà lần đầu không còn cần.',
-        en: 'Moves the loan, so the interest in Owning costs. Under 20% of the price with no scheme waiving it, lenders mortgage insurance (LMI) is added to Buying costs. Buying outright: no loan, interest, LMI or loan fees; the duty concession still applies, and the First Home Guarantee is not needed.'
+        vi: 'Đổi Mua và khoản vay, nên đổi tiền trả nợ trong Giữ nhà. Dưới 20% giá nhà mà không có chương trình nào miễn thì có bảo hiểm khoản vay (LMI) trong Mua. Mua đứt: không vay, không lãi, không LMI, không phí vay; ưu đãi thuế trước bạ vẫn giữ, và Bảo lãnh mua nhà lần đầu không còn cần.',
+        en: 'Moves Buying and the loan, so the repayments in Owning. Under 20% of the price with no scheme waiving it, lenders mortgage insurance (LMI) is added to Buying. Buying outright: no loan, interest, LMI or loan fees; the duty concession still applies, and the First Home Guarantee is not needed.'
     },
     'plan.fin.outright': { vi: 'Mua đứt', en: 'Buy outright' },
     'plan.fin.deposit_out': {
