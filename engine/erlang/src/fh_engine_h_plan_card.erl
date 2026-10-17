@@ -20,6 +20,14 @@ init(Req0, State) ->
                 #{<<"error">> => <<"method_not_allowed">>}, Req0), State}
     end.
 
+%% Whole lifecycle -> one computer per figure -> The engine -> a card served as a fill writes it today
+%% Purpose:   behavior 110 (prod 2026-10-17): a card saved before a change to its budget read
+%%            "—" on the statement and hub, beside a new card's full figures.
+%% Holds:     the content served is fh_engine_journey:current/2 of the stored one: a stale
+%%            lifecycle_budget refilled from the card's own outcomes, every other field as
+%%            stored; nothing is written back, so the SSE replay of the stored log is unchanged.
+%% Rests on:  the plan list reads through the same function (fh_engine_store:plan_card_summaries/2),
+%%            so a list card equals the statement it opens.
 handle_get(Req0, State) ->
     case fh_engine_http:authenticate(Req0) of
         {ok, #{tenant_id := T}} ->
