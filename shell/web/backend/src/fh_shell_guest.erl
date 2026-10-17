@@ -79,13 +79,14 @@ peer(Req) ->
     list_to_binary(inet:ntoa(Ip)).
 
 %% Plans a guest — and one address — may build a Sydney day (GUEST_DAILY_CREATES,
-%% default 3, Son 2026-10-10; 7 since behavior 111, so the held cap below is the limit
-%% a visitor meets, and 7 plans in a day are possible).
+%% default 3, Son 2026-10-10; 14 since behavior 111: twice the held cap below, so the
+%% held cap is the limit a visitor meets and a guest who fills 7 and deletes one can
+%% make another the same day — at 7 the freed slot waited for tomorrow).
 -spec daily_limit() -> pos_integer().
 daily_limit() ->
     case os:getenv("GUEST_DAILY_CREATES") of
-        false -> 7;
-        V -> try list_to_integer(V) of N when N >= 1 -> N; _ -> 7 catch _:_ -> 7 end
+        false -> 14;
+        V -> try list_to_integer(V) of N when N >= 1 -> N; _ -> 14 catch _:_ -> 14 end
     end.
 
 %% Guest plans -> P-5 · Metering, not gating -> The shell backend -> the plans a visitor holds

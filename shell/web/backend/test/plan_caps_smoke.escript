@@ -78,6 +78,8 @@ main(_) ->
     expect(true, "the quota reads 6 of 7"),
     {404, _, _} = req(delete, Base ++ "/api/plan-cards/" ++ binary_to_list(Gone), [Ck], <<>>),
     expect(true, "deleting it again -> 404"),
+    {202, _, _} = Create([Xff, Ck]),
+    expect(views(GuestId) =:= 7, "the freed slot is used the same day: the 8th create of the day -> 202"),
 
     %% --- a signed-in user: 28, the 29th refused, another's plan not theirs ---
     Email = <<"caps+", (uuid())/binary, "@example.com">>,
@@ -95,7 +97,7 @@ main(_) ->
     expect(true, "the user's quota reads 28 of 28"),
     [Theirs | _] = tl(Made),
     {404, _, _} = req(delete, Base ++ "/api/plan-cards/" ++ binary_to_list(Theirs), [Auth], <<>>),
-    expect(views(GuestId) =:= 6, "deleting another visitor's plan -> 404, nothing deleted"),
+    expect(views(GuestId) =:= 7, "deleting another visitor's plan -> 404, nothing deleted"),
     Mine = scalar("SELECT engine_plan_card_id::text FROM plan_card_views "
                   "WHERE user_id = $1::uuid LIMIT 1", [UserId]),
     {204, _, _} = req(delete, Base ++ "/api/plan-cards/" ++ binary_to_list(Mine), [Auth], <<>>),

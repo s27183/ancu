@@ -34,8 +34,8 @@ main(_) ->
     expect(G0 =:= #{<<"kind">> => <<"guest">>, <<"keep_days">> => 7,
                     <<"plans_saved">> => 0, <<"plans_limit">> => 7,
                     <<"questions_today">> => <<"sign_in">>,
-                    <<"plans_today">> => #{<<"used">> => 0, <<"limit">> => 7}},
-           "no session -> guest, 0 of 7 saved, 0 of 7 plans today, kept 7 days, sign in to ask"),
+                    <<"plans_today">> => #{<<"used">> => 0, <<"limit">> => 14}},
+           "no session -> guest, 0 of 7 saved, 0 of 14 plans today, kept 7 days, sign in to ask"),
 
     %% ── this address built two plans today ───────────────────────────────────
     {ok, _} = fh_shell_store:claim_guest_create(addr, list_to_binary(Addr), 3),
