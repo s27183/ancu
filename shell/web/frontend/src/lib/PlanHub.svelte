@@ -2,10 +2,11 @@
     // Whole lifecycle -> bilingual; information as is -> the web frontend -> the plan hub
     // Purpose:   the plan's first level (behavior 106): two cards, each the way into one
     //            sheet and each carrying the one fact that says why to open it — Ngân sách
-    //            with the statement's bottom line ("Tổng tiền bạn bỏ ra trong N năm", behavior 110), Hành trình with
+    //            with the statement's bottom line ("Tổng chi phí trong N năm", behavior 110), Hành trình with
     //            the checklist steps done of all and the next step. The plan's levels and
     //            the back button are PlanProjection's "the plan's levels" block.
-    // Holds:     it computes no figure: the total is lifecycle_budget.out_total for the
+    // Holds:     it computes no figure: the total is lifecycle_budget.out_total (a plan
+    //            stored before 110 is served it too, fh_engine_journey:current/2) for the
     //            hold it was made for (hold_years), as the statement shows it; the count
     //            is the playbook's actions with the card's checklist_status over them (the
     //            same overlay PhaseSheet's isDone reads), the next step the first not done

@@ -2,10 +2,11 @@
     // Whole lifecycle -> honest-partial; one computer per figure -> the web frontend -> the lifecycle statement
     // Purpose:   the plan's first sheet (behavior 93, over behavior 82's lines): the whole
     //            lifecycle budget read top to bottom: the money spent on the home over the
-    //            hold chosen on the statement (behavior 110, over 98) — Mua (the deposit or
-    //            whole price and the fees, less a grant), Giữ nhà trong N năm (≈ X/năm beside
-    //            it: the yearly costs and every repayment, less rent), Phí bán, each
-    //            right-aligned, and the bottom line "Tổng tiền bạn bỏ ra trong N năm",
+    //            hold chosen on the statement (behavior 110, over 98), each row a cost (Son
+    //            2026-10-17: "each line should be a kind of cost (Chi phí)") — Chi phí mua (the
+    //            deposit or whole price and the fees, less a grant), Chi phí giữ nhà trong N
+    //            năm (≈ X/năm beside it: the yearly costs and every repayment, less rent), Chi
+    //            phí bán, each right-aligned, and the bottom line "Tổng chi phí trong N năm",
     //            exactly their sum. Under it, one line apart and in no total, the money back
     //            at the sale ("Tiền về khi bán sau N năm"), which opens as its own sheet.
     //            Tapping a phase opens its sheet (that phase's lines); tapping a line opens
