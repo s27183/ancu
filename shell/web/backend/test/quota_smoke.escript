@@ -32,9 +32,10 @@ main(_) ->
     %% ── no session: a guest-to-be ────────────────────────────────────────────
     G0 = get_quota([{"x-forwarded-for", Addr}]),
     expect(G0 =:= #{<<"kind">> => <<"guest">>, <<"keep_days">> => 7,
-                    <<"plans_saved">> => 0, <<"questions_today">> => <<"sign_in">>,
-                    <<"plans_today">> => #{<<"used">> => 0, <<"limit">> => 3}},
-           "no session -> guest, 0 saved, 0 of 3 plans today, kept 7 days, sign in to ask"),
+                    <<"plans_saved">> => 0, <<"plans_limit">> => 7,
+                    <<"questions_today">> => <<"sign_in">>,
+                    <<"plans_today">> => #{<<"used">> => 0, <<"limit">> => 14}},
+           "no session -> guest, 0 of 7 saved, 0 of 14 plans today, kept 7 days, sign in to ask"),
 
     %% ── this address built two plans today ───────────────────────────────────
     {ok, _} = fh_shell_store:claim_guest_create(addr, list_to_binary(Addr), 3),
@@ -62,7 +63,7 @@ main(_) ->
     #{<<"kind">> := <<"user">>,
       <<"questions_today">> := #{<<"used">> := 0, <<"limit">> := 1},
       <<"allowance">> := #{<<"used_fraction">> := F0, <<"resets_at">> := Reset},
-      <<"plans_saved">> := 0, <<"plans_today">> := <<"unlimited">>,
+      <<"plans_saved">> := 0, <<"plans_limit">> := 28, <<"plans_today">> := <<"unlimited">>,
       <<"keep_days">> := <<"until_deleted">>} = U0,
     expect(F0 == 0 andalso is_binary(Reset), "a user with nothing used -> 0 of 1 questions, 0 of the allowance, a reset date"),
     expect(no_internal(U0), "no token count, tier or cost in the reply"),

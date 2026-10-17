@@ -64,7 +64,8 @@ with_summaries(UserId, Views) ->
 %% this browser's guest. Since behavior 97 the onboarding dialog makes the guest first
 %% (POST /api/auth/guest, fh_shell_h_guest), so a create normally arrives with a
 %% session; a create with none (a client that did not start a guest) still makes one
-%% here. A signed-in user's create is not capped.
+%% here. A signed-in user's create has no daily cap; since behavior 111 every create is
+%% held to the plans the visitor may hold (slot/3).
 handle_post(Req0, State) ->
     case fh_shell_http:read_json_body(Req0) of
         {ok, Body, Req1} ->
@@ -77,8 +78,9 @@ handle_post(Req0, State) ->
                         {ok, #{<<"user_id">> := UserId} = Claims} ->
                             case fh_shell_guest:is_guest(Claims) of
                                 false ->
-                                    reply_create(once(UserId, Key,
-                                        fun() -> create(UserId, Body, Key) end), Req1, State);
+                                    reply_create(once(UserId, Key, fun() ->
+                                        slot(UserId, user, fun() -> create(UserId, Body, Key) end)
+                                    end), Req1, State);
                                 true -> guest_create(UserId, Body, Key, Req1, State)
                             end;
                         {error, 401, _} ->
@@ -126,7 +128,10 @@ create_key(Req) ->
         _ -> invalid
     end.
 
-%% Guest plans -> P-5 · Metering, not gating -> The shell backend -> the cap runs before a guest is made
+%% Honest-partial -> P-5 · Metering, not gating -> The shell backend -> the cap runs before a guest is made
+%% An existing guest's create is first held to the plans it may hold (slot/3,
+%% fh_shell_guest:held_limit/1, behavior 111): at 7 it is 409 plans_full before any
+%% daily claim, so a refused create spends none of the day's cap.
 %% A guest's create is capped per guest and per client address each Sydney day
 %% (fh_shell_store:claim_guest_create/3). The address is claimed first, so an address
 %% over its cap makes no new guest row; a claim the engine then refuses is given back.
@@ -146,11 +151,23 @@ guest_create(new, Body, Key, Req0, State) ->
 guest_create(GuestId, Body, Key, Req0, State) ->
     {Limit, Addr} = guest_cap(Req0),
     reply_create(once(GuestId, Key, fun() ->
-        case fh_shell_store:claim_guest_create(addr, Addr, Limit) of
-            {limit, Resets} -> fh_shell_guest:limited(Limit, Resets);
-            {ok, AddrDay} -> claimed_create(GuestId, Addr, AddrDay, Limit, Body, Key)
-        end
+        slot(GuestId, guest, fun() ->
+            case fh_shell_store:claim_guest_create(addr, Addr, Limit) of
+                {limit, Resets} -> fh_shell_guest:limited(Limit, Resets);
+                {ok, AddrDay} -> claimed_create(GuestId, Addr, AddrDay, Limit, Body, Key)
+            end
+        end)
     end), Req0, State).
+
+%% Behavior 111: a create runs only while the owner holds fewer plans than their cap
+%% (fh_shell_guest's "the plans a visitor holds" block); at the cap it is 409 plans_full
+%% and nothing is claimed or made. A new guest holds none, so its first create is not
+%% checked.
+slot(Owner, Kind, Fun) ->
+    case fh_shell_store:with_plan_slot(Owner, fh_shell_guest:held_limit(Kind), Fun) of
+        {full, Held} -> fh_shell_guest:full(Kind, Held);
+        Reply -> Reply
+    end.
 
 guest_cap(Req) ->
     Addr = fh_shell_guest:client_addr(Req),

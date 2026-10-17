@@ -19,7 +19,7 @@
     // section menu and popups behave as they did there; .page-sheet makes it a page.
     import { goto } from '$app/navigation';
     import { page } from '$app/state';
-    import { listPlanCards } from '$lib/api';
+    import { deletePlanCard, listPlanCards } from '$lib/api';
     import { lang } from '$lib/stores/lang';
     import type { MoneyRange, PlanCardSummary } from '$lib/planCard';
     import { money, moneyRange } from '$lib/format';
@@ -45,6 +45,25 @@
         void reload;
         listPlanCards().then((c) => (cards = c));
     });
+    // Behavior 111: a plan leaves the list by its own delete, after a confirm in the page
+    // (the viewer may refuse browser dialogs): the card asks once, "Xoá" removes it
+    // (DELETE /api/plan-cards/:id, the slot frees at once) and the list reloads.
+    let confirming = $state<string | null>(null);
+    let deleting = $state(false);
+    let deleteFailed = $state(false);
+    async function removePlan(id: string) {
+        deleting = true;
+        deleteFailed = false;
+        const ok = await deletePlanCard(id);
+        deleting = false;
+        if (!ok) {
+            deleteFailed = true;
+            return;
+        }
+        confirming = null;
+        cards = cards?.filter((c) => c.plan_card_id !== id) ?? null;
+        reload++;
+    }
     // Newest first: the last update, else when it was made.
     const stamp = (c: PlanCardSummary) => Date.parse(c.updated_at ?? c.created_at) || 0;
     const sorted = $derived(cards ? [...cards].sort((a, b) => stamp(b) - stamp(a)) : null);
@@ -251,6 +270,36 @@
                                     >
                                     <span class="plan-card-caret" aria-hidden="true">›</span>
                                 </button>
+                                {#if confirming === c.plan_card_id}
+                                    <div class="plan-del-ask" role="group" aria-label={$t('plans.delete_q')}>
+                                        <span class="plan-del-q"
+                                            >{deleteFailed ? $t('plans.delete_failed') : $t('plans.delete_q')}</span
+                                        >
+                                        <button
+                                            type="button"
+                                            class="btn btn-secondary"
+                                            data-plan-delete-no
+                                            onclick={() => ((confirming = null), (deleteFailed = false))}
+                                            >{$t('plans.delete_no')}</button
+                                        >
+                                        <button
+                                            type="button"
+                                            class="btn plan-del-yes"
+                                            data-plan-delete-yes
+                                            disabled={deleting}
+                                            onclick={() => removePlan(c.plan_card_id)}>{$t('plans.delete_yes')}</button
+                                        >
+                                    </div>
+                                {:else}
+                                    <button
+                                        type="button"
+                                        class="plan-del"
+                                        data-plan-delete
+                                        aria-label={$t('plans.delete_label').replace('{p}', placeOf(c))}
+                                        onclick={() => ((confirming = c.plan_card_id), (deleteFailed = false))}
+                                        >{$t('plans.delete')}</button
+                                    >
+                                {/if}
                             </li>
                         {/each}
                     </ul>

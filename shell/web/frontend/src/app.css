@@ -3926,6 +3926,47 @@ main {
     color: var(--muted);
     font-size: 1.25rem;
 }
+/* Behavior 111: a plan's delete — quiet, at the card's foot, outside its button; the
+   confirm replaces it with one row in the page (no browser dialog). */
+.plan-cards > li {
+    position: relative;
+}
+.plan-del {
+    position: absolute;
+    right: 0.6rem;
+    bottom: 0.45rem;
+    padding: 0.3rem 0.5rem;
+    border: 0;
+    border-radius: var(--radius);
+    background: none;
+    font-size: var(--fs-xs);
+    color: var(--muted);
+    cursor: pointer;
+}
+.plan-del:hover {
+    color: var(--danger, #b42318);
+    background: var(--surface-2, var(--accent-soft));
+}
+.plan-del:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+}
+.plan-del-ask {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2);
+    padding: 0.6rem 0.25rem 0.1rem;
+}
+.plan-del-q {
+    flex: 1 1 12rem;
+    font-size: var(--fs-sm);
+    color: var(--ink);
+}
+.plan-del-yes {
+    background: var(--danger, #b42318);
+    color: #fff;
+}
 /* Behavior 106: a plan's back button — the one way up, on every level, naming where it
    goes ("‹ Ngân sách"); its own row above the title so a long name never squeezes it. */
 .page-sheet .sheet-head:has(.plan-back) {

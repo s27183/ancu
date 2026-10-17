@@ -13,6 +13,7 @@
 -export([insert_plan_card_view/3, insert_plan_card_view/4, owns_plan_card/2,
          list_plan_card_views/1]).
 -export([with_create_key/3, plan_card_by_create_key/2]).
+-export([with_plan_slot/3, delete_plan_card_view/2]).
 -export([upsert_user_by_email/1, insert_magic_token/2, redeem_magic_token/1]).
 -export([link_oauth/3]).
 -export([user_tier/1, user_email/1, link_subscription/3, update_subscription/5]).
@@ -189,6 +190,34 @@ with_create_key(UserId, Key, Fun) ->
                   [<<"create:", UserId/binary, ":", Key/binary>>]),
         Fun()
     end).
+
+%% Guest plans -> P-5 · Metering, not gating -> The shell database -> a slot for one more plan
+%% Behavior 111: Fun runs only while the owner holds fewer than Cap plans, else
+%% {full, Held}. A transaction-level advisory lock per owner serialises the check and the
+%% view insert Fun makes, so two creates at once cannot both take the last slot. Inside
+%% with_create_key/3 this is the same transaction (pgo 0.20.0 transaction/3 runs a nested
+%% fun in the open one: read at the locked version).
+-spec with_plan_slot(binary(), pos_integer(), fun(() -> T)) -> T | {full, non_neg_integer()}.
+with_plan_slot(UserId, Cap, Fun) ->
+    pgo:transaction(fun() ->
+        _ = query("SELECT 1 FROM pg_advisory_xact_lock(hashtextextended($1::text, 0))",
+                  [<<"plans:", UserId/binary>>]),
+        case plans_saved(UserId) of
+            Held when Held >= Cap -> {full, Held};
+            _ -> Fun()
+        end
+    end).
+
+%% Behavior 111: the owner deletes a plan from their list — their view row goes, so the
+%% slot frees at once; the engine's card is left, as the guest purge leaves it.
+-spec delete_plan_card_view(binary(), binary()) -> ok | not_found.
+delete_plan_card_view(UserId, EnginePlanCardId) ->
+    case query("DELETE FROM plan_card_views "
+               "WHERE user_id = $1::uuid AND engine_plan_card_id = $2::uuid",
+               [UserId, EnginePlanCardId]) of
+        #{num_rows := 0} -> not_found;
+        #{num_rows := _} -> ok
+    end.
 
 %% The plan this owner already made with this create key, if any.
 -spec plan_card_by_create_key(binary(), binary()) -> {ok, binary()} | none.

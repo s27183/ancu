@@ -21,6 +21,7 @@
 init(Req0, Opts) ->
     case {Opts, cowboy_req:method(Req0)} of
         {[], <<"GET">>}          -> with_owned_card(Req0, Opts, fun read/4);
+        {[], <<"DELETE">>}       -> with_owned_card(Req0, Opts, fun delete/4);
         {[messages], <<"POST">>} -> with_owned_card(Req0, Opts, fun ask/4);
         {[conversation], <<"GET">>} -> with_owned_card(Req0, Opts, fun conversation/4);
         {[simulate], <<"POST">>} -> with_owned_card(Req0, Opts, fun simulate/4);
@@ -36,6 +37,19 @@ init(Req0, Opts) ->
         _ ->
             {ok, fh_shell_http:reply_json(405,
                 #{<<"error">> => <<"method_not_allowed">>}, Req0), Opts}
+    end.
+
+%% Behavior 111: DELETE /api/plan-cards/:id — the owner removes a plan from their list
+%% (a guest too: it frees a slot under the cap of 7). Only the view row goes
+%% (fh_shell_store:delete_plan_card_view/2); the engine's card is left, as the guest
+%% purge leaves it. 204; another visitor's plan is the gate's uniform 404.
+delete(UserId, PlanCardId, Req, Opts) ->
+    case fh_shell_store:delete_plan_card_view(UserId, PlanCardId) of
+        ok ->
+            logger:info("[plan-cards] ~s deleted its view of ~s", [UserId, PlanCardId]),
+            {ok, cowboy_req:reply(204, Req), Opts};
+        not_found ->
+            {ok, fh_shell_http:reply_json(404, #{<<"error">> => <<"not_found">>}, Req), Opts}
     end.
 
 %% The shared gate: authenticate → validate the :id shape → confirm ownership, then
