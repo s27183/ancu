@@ -89,7 +89,7 @@ daily_limit() ->
         V -> try list_to_integer(V) of N when N >= 1 -> N; _ -> 14 catch _:_ -> 14 end
     end.
 
-%% Guest plans -> P-5 · Metering, not gating -> The shell backend -> the plans a visitor holds
+%% Honest-partial -> P-5 · Metering, not gating -> The shell backend -> the plans a visitor holds
 %% Purpose:   behavior 111 (Son 2026-10-17: "increase the number of saved plan for
 %%            non-signed in user to 7. for the signed in user, it's 28"): a visitor holds
 %%            at most this many plans at once — a guest 7, a signed-in visitor 28 — and
