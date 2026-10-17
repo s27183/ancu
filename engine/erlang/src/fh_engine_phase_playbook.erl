@@ -40,7 +40,7 @@
 %% cash_position + yield_modelling + tax_structure, needs its budget_refs validated against
 %% ALL of them, not just one).
 
--export([fill/2]).
+-export([fill/2, ground/3]).
 %% exported for the conformance harness:
 -export([phase_order/0, build_phase/4, build_phase/6]).
 
@@ -65,13 +65,8 @@
 
 -spec fill(map(), map()) -> {map(), binary(), [map()]}.
 fill(Args, Upstream) ->
-    {ActionsDoc, RisksDoc} =
-        case maps:get(blueprint_slug, Args, <<"fhb-domestic-au">>) of
-            <<"investor-domestic-au">> -> {?INVESTOR_ACTIONS, ?INVESTOR_RISKS};
-            <<"investor-foreign-au">>  -> {?INVESTOR_FOREIGN_ACTIONS, ?INVESTOR_FOREIGN_RISKS};
-            <<"fhb-foreign-au">>       -> {?FHB_FOREIGN_ACTIONS, ?FHB_FOREIGN_RISKS};
-            _                          -> {?ACTIONS, ?RISKS}
-        end,
+    {ActionsDoc, RisksDoc} = docs(maps:get(blueprint_slug, Args, <<"fhb-domestic-au">>)),
+    State = plan_state(Args),
     %% The only upstream read: the set of cash_event ids, for budget_ref validation —
     %% harvested from every upstream outcome that exposes the field.
     %% An event's `group` counts too: behavior 83 split other_buying_costs into one line per
@@ -89,7 +84,7 @@ fill(Args, Upstream) ->
     Phases = [build_phase(P,
                           maps:get(P, ActionsByPhase, []),
                           maps:get(P, RisksByPhase, []),
-                          ValidRefs, ActionsDoc, RisksDoc)
+                          ValidRefs, ActionsDoc, RisksDoc, State)
               || P <- ?PHASE_ORDER],
     Outcome = #{
         <<"phases">> => Phases,
@@ -135,6 +130,17 @@ held_lines(Args, Upstream) ->
         _ -> []
     end.
 
+docs(<<"investor-domestic-au">>) -> {?INVESTOR_ACTIONS, ?INVESTOR_RISKS};
+docs(<<"investor-foreign-au">>)  -> {?INVESTOR_FOREIGN_ACTIONS, ?INVESTOR_FOREIGN_RISKS};
+docs(<<"fhb-foreign-au">>)       -> {?FHB_FOREIGN_ACTIONS, ?FHB_FOREIGN_RISKS};
+docs(_)                          -> {?ACTIONS, ?RISKS}.
+
+plan_state(Args) ->
+    case fh_engine_store:projection_state(maps:get(onboarding, Args, #{})) of
+        S when is_binary(S) -> S;
+        _ -> undefined
+    end.
+
 -spec phase_order() -> [binary()].
 phase_order() -> ?PHASE_ORDER.
 
@@ -151,9 +157,13 @@ build_phase(Phase, ActionDefs, RiskDefs, ValidRefs) ->
 
 -spec build_phase(binary(), [map()], [map()], sets:set(), binary(), binary()) -> map().
 build_phase(Phase, ActionDefs, RiskDefs, ValidRefs, ActionsDoc, RisksDoc) ->
+    build_phase(Phase, ActionDefs, RiskDefs, ValidRefs, ActionsDoc, RisksDoc, undefined).
+
+build_phase(Phase, ActionDefs, RiskDefs, ValidRefs, ActionsDoc, RisksDoc, State) ->
     Actions = lists:sort(
                 fun(A, B) -> maps:get(<<"order">>, A) =< maps:get(<<"order">>, B) end,
-                [action(Phase, D, ValidRefs, ActionsDoc) || D <- ActionDefs]),
+                [maps:merge(action(Phase, D, ValidRefs, ActionsDoc), grounding(D, State))
+                 || D <- ActionDefs]),
     Risks   = [risk(Phase, D, RisksDoc) || D <- RiskDefs],
     #{<<"phase">>   => Phase,
       <<"actions">> => Actions,
@@ -181,6 +191,65 @@ risk(Phase, Def, RisksDoc) ->
     #{<<"severity">> => maps:get(<<"severity">>, Def),
       <<"item">>     => copy(RisksDoc, ckey(<<"risk">>, Phase, Id, <<"item">>)),
       <<"action">>   => copy(RisksDoc, ckey(<<"risk">>, Phase, Id, <<"action">>))}.
+
+%% Whole lifecycle -> honesty tiers -> phase_playbook -> where a step's rule comes from
+%% Goal: behavior 114 (Son 2026-10-17) — every Hành trình step follows a cited government
+%%   rule or says it is common practice, so "the journey rests on current rules" is true.
+%% Invariant: `grounding` is `rule` with `source` {url, checked} — the first of the step's
+%%   `rule` entries (kb.journey.* docs, GATE 16) whose doc cites a source for the plan's
+%%   state, its url from that doc's `sources:` (fh_engine_line_detail:source/3, the same
+%%   lookup a statement line uses) and `checked` its last_verified; `state_rule` with
+%%   `rule_state` when the rule is a state's and no entry cites one for this state (no
+%%   link is borrowed from another state); `practice` for a step no rule governs.
+%% Capability: ground/3 recomputes it on a stored card at read, from today's KB.
+grounding(#{<<"practice">> := true}, _State) ->
+    #{<<"grounding">> => <<"practice">>, <<"source">> => null, <<"rule_state">> => null};
+grounding(#{<<"rule">> := Rules}, State) when is_list(Rules), Rules =/= [] ->
+    case cited(Rules, State) of
+        {Url, Checked} ->
+            #{<<"grounding">> => <<"rule">>,
+              <<"source">> => #{<<"url">> => Url, <<"checked">> => Checked},
+              <<"rule_state">> => null};
+        none ->
+            #{<<"grounding">> => <<"state_rule">>, <<"source">> => null,
+              <<"rule_state">> => case State of undefined -> null; _ -> State end}
+    end;
+grounding(Def, _State) ->
+    error({journey_step_ungrounded, maps:get(<<"id">>, Def, null)}).
+
+cited([], _State) -> none;
+cited([R | Rest], State) ->
+    {ok, Kb} = fh_engine_kb:kb(maps:get(<<"kb">>, R)),
+    case fh_engine_line_detail:source(maps:get(<<"source">>, R, null),
+                                      maps:get(<<"sources">>, Kb, []), State) of
+        Url when is_binary(Url) -> {Url, maps:get(<<"last_verified">>, Kb, null)};
+        _ -> cited(Rest, State)
+    end.
+
+%% A stored card's phase_playbook with each step's grounding as today's KB gives it for
+%% the plan's state (a card filled before behavior 114 has none; a re-verified doc moves
+%% its `checked`). Anything not shaped as a playbook is returned as is.
+-spec ground(binary(), binary() | undefined, term()) -> term().
+ground(Slug, State, #{<<"components">> := #{<<"phase_playbook">> :=
+                        #{<<"outcome">> := #{<<"phases">> := Phases} = O} = PP} = Comps} = Content)
+  when is_list(Phases) ->
+    {ActionsDoc, _} = docs(Slug),
+    {ok, Cj} = fh_engine_kb:kb_rules(ActionsDoc),
+    Defs = index(Cj, <<"actions">>),
+    Grounded = [P#{<<"actions">> => [ground_action(A, maps:get(maps:get(<<"phase">>, P, null), Defs, []), State)
+                                     || A <- maps:get(<<"actions">>, P, [])]}
+                || P <- Phases, is_map(P)],
+    Content#{<<"components">> := Comps#{<<"phase_playbook">> :=
+        PP#{<<"outcome">> := O#{<<"phases">> := Grounded}}}};
+ground(_Slug, _State, Content) -> Content.
+
+ground_action(A, Defs, State) when is_map(A) ->
+    Id = maps:get(<<"id">>, A, null),
+    case [D || D <- Defs, maps:get(<<"id">>, D) =:= Id] of
+        [D | _] -> maps:merge(A, grounding(D, State));
+        []      -> A
+    end;
+ground_action(A, _Defs, _State) -> A.
 
 %% --- helpers -----------------------------------------------------------------
 

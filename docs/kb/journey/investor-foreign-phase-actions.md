@@ -47,6 +47,15 @@ Resolver mapping mirrors Mode C's `fh_engine_phase_playbook`: for each
 action_<phase>_<id>_label, detail ← action_<phase>_<id>_detail, status: not_started }`, sorted by
 `order`, dropping any `budget_ref` with no matching live `cash_event.id`.
 
+**Where each step's rule comes from** (behavior 114, 2026-10-17). Every action carries either
+`rule` — a list of `{kb, source}`, each naming the KB doc that owns the rule the step follows and
+the index, in that doc's `sources:`, of the government page that states it (a state → index map
+where the rule is a state's) — or `"practice": true`, a step no rule governs. The resolver shows
+the first entry that cites a source for the plan's state; a state's rule none of its entries
+cites for that state reads as the state's rule with no source yet, never a borrowed link. The
+compiler refuses a step with neither, a doc that does not exist, an index outside its `sources:`,
+or a source that is not a government page (a `.gov.au` host).
+
 ```jsonc
 {
   "fills": [],
@@ -55,66 +64,66 @@ action_<phase>_<id>_label, detail ← action_<phase>_<id>_detail, status: not_st
       {
         "phase": "prepare",
         "actions": [
-          { "id": "clarify_thesis",              "order": 1, "budget_ref": null, "component_ref": "investment_strategy" },
-          { "id": "compare_non_resident_lenders", "order": 2, "budget_ref": null, "component_ref": "mortgage_finance" },
-          { "id": "consider_entity",              "order": 3, "budget_ref": null, "component_ref": "tax_structure_non_resident" },
-          { "id": "engage_vn_advisor",             "order": 4, "budget_ref": null, "component_ref": "investor_profile_foreign" }
+          { "id": "clarify_thesis",              "order": 1, "budget_ref": null, "component_ref": "investment_strategy", "practice": true },
+          { "id": "compare_non_resident_lenders", "order": 2, "budget_ref": null, "component_ref": "mortgage_finance", "rule": [{"kb": "kb.lender.non-resident-friendly-shortlist", "source": 0}] },
+          { "id": "consider_entity",              "order": 3, "budget_ref": null, "component_ref": "tax_structure_non_resident", "rule": [{"kb": "kb.non-resident.entity-options-au-property", "source": 2}] },
+          { "id": "engage_vn_advisor",             "order": 4, "budget_ref": null, "component_ref": "investor_profile_foreign", "practice": true }
         ]
       },
       {
         "phase": "pre_approve",
         "actions": [
-          { "id": "gather_documents",           "order": 1, "budget_ref": null, "component_ref": "mortgage_finance" },
-          { "id": "submit_preapproval",          "order": 2, "budget_ref": null, "component_ref": "mortgage_finance" },
-          { "id": "prepare_firb_application",    "order": 3, "budget_ref": "firb_application_help", "component_ref": "firb_workflow" },
-          { "id": "engage_transfer_provider",    "order": 4, "budget_ref": "fx_spread_in", "component_ref": "cross_border_funding" }
+          { "id": "gather_documents",           "order": 1, "budget_ref": null, "component_ref": "mortgage_finance", "practice": true },
+          { "id": "submit_preapproval",          "order": 2, "budget_ref": null, "component_ref": "mortgage_finance", "practice": true },
+          { "id": "prepare_firb_application",    "order": 3, "budget_ref": "firb_application_help", "component_ref": "firb_workflow", "rule": [{"kb": "kb.firb.documents-required", "source": 0}] },
+          { "id": "engage_transfer_provider",    "order": 4, "budget_ref": "fx_spread_in", "component_ref": "cross_border_funding", "rule": [{"kb": "kb.cross-border-settlement.coordination-best-practices", "source": 0}] }
         ]
       },
       {
         "phase": "contract",
         "actions": [
-          { "id": "get_rental_appraisal",     "order": 1, "budget_ref": null,        "component_ref": "due_diligence" },
-          { "id": "get_depreciation_quote",   "order": 2, "budget_ref": "depreciation_schedule",        "component_ref": "due_diligence" },
-          { "id": "inspect_building_pest",    "order": 3, "budget_ref": null,        "component_ref": "due_diligence" },
-          { "id": "review_contract",          "order": 4, "budget_ref": null,        "component_ref": "due_diligence" },
-          { "id": "submit_firb_application",  "order": 5, "budget_ref": "firb_fee",  "component_ref": "firb_workflow" },
-          { "id": "pay_deposit",              "order": 6, "budget_ref": "deposit",   "component_ref": "cash_position" },
-          { "id": "seek_unconditional_finance","order": 7, "budget_ref": null,       "component_ref": "mortgage_finance" }
+          { "id": "get_rental_appraisal",     "order": 1, "budget_ref": null,        "component_ref": "due_diligence", "practice": true },
+          { "id": "get_depreciation_quote",   "order": 2, "budget_ref": "depreciation_schedule",        "component_ref": "due_diligence", "rule": [{"kb": "kb.tax.depreciation-division-43-and-40", "source": 1}] },
+          { "id": "inspect_building_pest",    "order": 3, "budget_ref": null,        "component_ref": "due_diligence", "practice": true },
+          { "id": "review_contract",          "order": 4, "budget_ref": null,        "component_ref": "due_diligence", "rule": [{"kb": "kb.contract-of-sale.review-points-by-state", "source": {"NSW": 0, "QLD": 1}}, {"kb": "kb.s32.review-points", "source": {"VIC": 0}}] },
+          { "id": "submit_firb_application",  "order": 5, "budget_ref": "firb_fee",  "component_ref": "firb_workflow", "rule": [{"kb": "kb.firb.application-process", "source": 0}] },
+          { "id": "pay_deposit",              "order": 6, "budget_ref": "deposit",   "component_ref": "cash_position", "rule": [{"kb": "kb.cooling-off.by-state", "source": {"NSW": 0, "VIC": 1, "QLD": 2}}] },
+          { "id": "seek_unconditional_finance","order": 7, "budget_ref": null,       "component_ref": "mortgage_finance", "practice": true }
         ]
       },
       {
         "phase": "settle",
         "actions": [
-          { "id": "confirm_firb_approval",     "order": 1, "budget_ref": null,                 "component_ref": "firb_workflow" },
-          { "id": "pay_stamp_duty_surcharge",  "order": 2, "budget_ref": "stamp_duty",          "component_ref": "cash_position" },
-          { "id": "pay_firb_fee",              "order": 3, "budget_ref": "firb_fee",            "component_ref": "cash_position" },
-          { "id": "complete_transfer",         "order": 4, "budget_ref": "au_inbound_bank_fee",                  "component_ref": "cross_border_funding" },
-          { "id": "complete_entity_setup",     "order": 5, "budget_ref": "entity_setup_costs",  "component_ref": "settlement_prep" },
-          { "id": "appoint_pm",                "order": 6, "budget_ref": "letting_fee",                  "component_ref": "settlement_prep" },
-          { "id": "bind_landlord_insurance",   "order": 7, "budget_ref": "landlord_insurance",                  "component_ref": "settlement_prep" },
-          { "id": "settlement_completes",      "order": 8, "budget_ref": null,                  "component_ref": "settlement_prep" }
+          { "id": "confirm_firb_approval",     "order": 1, "budget_ref": null,                 "component_ref": "firb_workflow", "rule": [{"kb": "kb.firb.approval-to-settlement-timeline", "source": 0}] },
+          { "id": "pay_stamp_duty_surcharge",  "order": 2, "budget_ref": "stamp_duty",          "component_ref": "cash_position", "rule": [{"kb": "kb.stamp-duty.calc-by-state", "source": {"NSW": 4, "VIC": 2, "QLD": 0}}, {"kb": "kb.foreign-buyer-surcharge.by-state", "source": {"NSW": 5, "VIC": 0, "QLD": 1, "WA": 2, "TAS": 3}}] },
+          { "id": "pay_firb_fee",              "order": 3, "budget_ref": "firb_fee",            "component_ref": "cash_position", "rule": [{"kb": "kb.firb.fee-schedule-current", "source": 1}] },
+          { "id": "complete_transfer",         "order": 4, "budget_ref": "au_inbound_bank_fee",                  "component_ref": "cross_border_funding", "rule": [{"kb": "kb.cross-border-settlement.coordination-best-practices", "source": 0}] },
+          { "id": "complete_entity_setup",     "order": 5, "budget_ref": "entity_setup_costs",  "component_ref": "settlement_prep", "rule": [{"kb": "kb.tax.entity-setup-costs", "source": 0}] },
+          { "id": "appoint_pm",                "order": 6, "budget_ref": "letting_fee",                  "component_ref": "settlement_prep", "rule": [{"kb": "kb.investor.property-management-appointment-timeline", "source": {"NSW": 0}}] },
+          { "id": "bind_landlord_insurance",   "order": 7, "budget_ref": "landlord_insurance",                  "component_ref": "settlement_prep", "practice": true },
+          { "id": "settlement_completes",      "order": 8, "budget_ref": null,                  "component_ref": "settlement_prep", "rule": [{"kb": "kb.pexa.settlement", "source": 0}] }
         ]
       },
       {
         "phase": "own",
         "actions": [
-          { "id": "track_cash_flow",           "order": 1, "budget_ref": "loan_repayments", "component_ref": "ownership_planning_foreign_investor" },
-          { "id": "lodge_au_tax_return",        "order": 2, "budget_ref": "tax_return_rental", "component_ref": "tax_structure_non_resident" },
-          { "id": "declare_vacancy_occupancy",  "order": 3, "budget_ref": null, "component_ref": "ownership_planning_foreign_investor" },
-          { "id": "monitor_land_tax_surcharge", "order": 4, "budget_ref": null, "component_ref": "ownership_planning_foreign_investor" },
-          { "id": "plan_repatriation",          "order": 5, "budget_ref": null, "component_ref": "ownership_planning_foreign_investor" },
-          { "id": "review_pm_performance",      "order": 6, "budget_ref": "property_management", "component_ref": "ownership_planning_foreign_investor" }
+          { "id": "track_cash_flow",           "order": 1, "budget_ref": "loan_repayments", "component_ref": "ownership_planning_foreign_investor", "practice": true },
+          { "id": "lodge_au_tax_return",        "order": 2, "budget_ref": "tax_return_rental", "component_ref": "tax_structure_non_resident", "rule": [{"kb": "kb.non-resident-tax.withholding-on-rental-income", "source": 1}] },
+          { "id": "declare_vacancy_occupancy",  "order": 3, "budget_ref": null, "component_ref": "ownership_planning_foreign_investor", "rule": [{"kb": "kb.firb.vacancy-fee-rules-2026", "source": 0}] },
+          { "id": "monitor_land_tax_surcharge", "order": 4, "budget_ref": null, "component_ref": "ownership_planning_foreign_investor", "rule": [{"kb": "kb.tax.land-tax-by-state", "source": {"QLD": 0, "VIC": 1, "WA": 2, "TAS": 3, "NSW": 4, "SA": 6, "ACT": 7}}] },
+          { "id": "plan_repatriation",          "order": 5, "budget_ref": null, "component_ref": "ownership_planning_foreign_investor", "rule": [{"kb": "kb.foreign-investor.repatriation-strategy", "source": 1}] },
+          { "id": "review_pm_performance",      "order": 6, "budget_ref": "property_management", "component_ref": "ownership_planning_foreign_investor", "practice": true }
         ]
       },
       {
         "phase": "dispose",
         "actions": [
-          { "id": "decide_to_sell",            "order": 1, "budget_ref": null, "component_ref": "disposition" },
-          { "id": "engage_selling_agent",      "order": 2, "budget_ref": "commission", "component_ref": "disposition" },
-          { "id": "confirm_cgt_frcgw_position","order": 3, "budget_ref": "dispose_cgt", "component_ref": "disposition" },
-          { "id": "discharge_mortgage",        "order": 4, "budget_ref": "mortgage_discharge", "component_ref": "disposition" },
-          { "id": "repatriate_proceeds",       "order": 5, "budget_ref": "fx_back", "component_ref": "disposition" },
-          { "id": "plan_next_purchase",        "order": 6, "budget_ref": null, "component_ref": "disposition" }
+          { "id": "decide_to_sell",            "order": 1, "budget_ref": null, "component_ref": "disposition", "practice": true },
+          { "id": "engage_selling_agent",      "order": 2, "budget_ref": "commission", "component_ref": "disposition", "practice": true },
+          { "id": "confirm_cgt_frcgw_position","order": 3, "budget_ref": "dispose_cgt", "component_ref": "disposition", "rule": [{"kb": "kb.non-resident-tax.foreign-resident-cgt-withholding", "source": 0}] },
+          { "id": "discharge_mortgage",        "order": 4, "budget_ref": "mortgage_discharge", "component_ref": "disposition", "practice": true },
+          { "id": "repatriate_proceeds",       "order": 5, "budget_ref": "fx_back", "component_ref": "disposition", "rule": [{"kb": "kb.foreign-investor.repatriation-strategy", "source": 1}] },
+          { "id": "plan_next_purchase",        "order": 6, "budget_ref": null, "component_ref": "disposition", "practice": true }
         ]
       }
     ]
@@ -261,8 +270,8 @@ action_<phase>_<id>_label, detail ← action_<phase>_<id>_detail, status: not_st
     },
     "action_own_plan_repatriation_label": { "vi": "Lập kế hoạch chuyển lợi nhuận về Việt Nam", "en": "Plan your repatriation of rental income" },
     "action_own_plan_repatriation_detail": {
-      "vi": "Chọn tần suất chuyển tiền (hằng tháng, hằng quý, hay tái đầu tư tại Úc) và dùng kênh chuyển tiền được cấp phép.",
-      "en": "Choose your repatriation frequency (monthly, quarterly, or reinvest in Australia) and use a licensed transfer channel."
+      "vi": "Chọn tần suất chuyển tiền (hằng tháng, hằng quý, hay tái đầu tư tại Úc) và dùng dịch vụ chuyển tiền đã đăng ký với AUSTRAC.",
+      "en": "Choose your repatriation frequency (monthly, quarterly, or reinvest in Australia) and use a transfer service registered with AUSTRAC."
     },
     "action_own_review_pm_performance_label": { "vi": "Xem lại hiệu quả quản lý cho thuê", "en": "Review property-management performance" },
     "action_own_review_pm_performance_detail": {
@@ -292,8 +301,8 @@ action_<phase>_<id>_label, detail ← action_<phase>_<id>_detail, status: not_st
     },
     "action_dispose_repatriate_proceeds_label": { "vi": "Chuyển vốn ròng về Việt Nam", "en": "Repatriate the net proceeds" },
     "action_dispose_repatriate_proceeds_detail": {
-      "vi": "Sau khi trừ chi phí bán, thuế, và tất toán vay, phần vốn ròng còn lại được chuyển về qua kênh chuyển tiền được cấp phép.",
-      "en": "After selling costs, tax, and the loan payout, the remaining net equity is transferred back via a licensed channel."
+      "vi": "Sau khi trừ chi phí bán, thuế, và tất toán vay, phần vốn ròng còn lại được chuyển về qua dịch vụ chuyển tiền đã đăng ký với AUSTRAC.",
+      "en": "After selling costs, tax, and the loan payout, the remaining net equity is transferred back via a transfer service registered with AUSTRAC."
     },
     "action_dispose_plan_next_purchase_label": { "vi": "Lập kế hoạch dùng vốn ròng cho bất động sản tiếp theo", "en": "Plan how your net equity funds your next property" },
     "action_dispose_plan_next_purchase_detail": {

@@ -994,7 +994,7 @@ The `mortgage_plan` outcome feeds `cash_position` (loan amount + buffer requirem
 {
   "type": "phase_playbook",
   "fields": {
-    "phases": "array<{ phase: string, actions: array<{ id: string, label: localized_text, detail: localized_text, order: integer, budget_ref: string|null, component_ref: string|null, status: enum [not_started, done] }>, risks: array<{ severity: enum [low, medium, high], item: localized_text, action: localized_text }> }>",
+    "phases": "array<{ phase: string, actions: array<{ id: string, label: localized_text, detail: localized_text, order: integer, budget_ref: string|null, component_ref: string|null, status: enum [not_started, done], grounding: enum [rule, state_rule, practice], source: { url: string, checked: string }|null, rule_state: string|null }>, risks: array<{ severity: enum [low, medium, high], item: localized_text, action: localized_text }> }>",
     "key_assumptions": "array<localized_text>"
   }
 }

@@ -57,7 +57,11 @@ the harness memory of earlier sessions):
   LENDER-POLICY (a band, labelled), or PLACEHOLDER (with a named re-ground
   source). A figure no primary supports is labelled or `to_verify`, never
   stated as fact. That covers per-row tiers in a multi-state table, and
-  announced reform that is not yet law.
+  announced reform that is not yet law. A journey step a rule governs names
+  the KB doc that owns that rule and shows its government source and check
+  date; where that doc has no source yet for the plan's state, the step says
+  so; a step no rule governs is labelled common practice, never presented as
+  a rule (behavior 114; kb_compiler GATE 16 holds it).
 - **Regulated figures are grounded — one owner per fact.** Each regulated fact
   has exactly one owning KB doc. Every other doc cross-references it by slug,
   and a variant doc owns only its deltas. Before writing a new doc, grep for an

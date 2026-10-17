@@ -363,6 +363,70 @@ def terms_fails(terms_docs, kb_docs):
     return out
 
 
+# Regulated figures are grounded -> honesty tiers -> The KB compiler -> a journey step names its rule's source
+# Goal: behavior 114 (Son 2026-10-17, "journey content grounded in latest regulations from
+#   gov organizations") — every Hành trình step either follows a rule whose government page
+#   the plan can show, or says it is common practice; it never seems to cite what it does not.
+# Invariant: each `layout.phases[].actions[]` entry of a kb.journey.* doc carries exactly one
+#   of `"practice": true` or `rule: [{kb, source}]`; each rule entry names a KB doc with
+#   `sources:`, and `source` is an index — or a state -> index map — into them whose url is
+#   on a government host (NEWS_SOURCE_HOST_SUFFIX). GATE 16, fail-closed; its planted
+#   fixtures (tests/fixtures/journey_rule) must keep failing, or the gate itself fails.
+# Capability: journey_rule_fails(kb_docs) -> the problems, each naming the doc and the step.
+JOURNEY_RULE_FIXTURES = ROOT / "tests" / "fixtures" / "journey_rule"
+
+
+def journey_rule_fails(kb_docs):
+    out = []
+    for slug, doc in sorted(kb_docs.items()):
+        cj = doc.get("content_json")
+        if not slug.startswith("kb.journey.") or not isinstance(cj, dict):
+            continue
+        for ph in (cj.get("layout") or {}).get("phases") or []:
+            for a in ph.get("actions") or []:
+                where = f"[journey] {slug} {ph.get('phase')}/{a.get('id')}"
+                rule, practice = a.get("rule"), a.get("practice")
+                if practice is True and rule is None:
+                    continue
+                if practice is not None or not isinstance(rule, list) or not rule:
+                    out.append(f"{where}: names neither a rule doc (`rule`) nor `\"practice\": true`"
+                               if practice is None and rule is None else
+                               f"{where}: carries both or a malformed `rule`/`practice`")
+                    continue
+                for r in rule:
+                    kb = r.get("kb") if isinstance(r, dict) else None
+                    if kb not in kb_docs:
+                        out.append(f"{where}: rule doc {kb!r} is not a KB doc")
+                        continue
+                    srcs = kb_docs[kb].get("sources") or []
+                    if not srcs:
+                        out.append(f"{where}: rule doc {kb} has no `sources:`")
+                        continue
+                    src = r.get("source")
+                    idx = list(src.values()) if isinstance(src, dict) and src else [src]
+                    for i in idx:
+                        if not (isinstance(i, int) and not isinstance(i, bool) and 0 <= i < len(srcs)):
+                            out.append(f"{where}: source {i!r} is not an index into {kb}'s {len(srcs)} `sources:`")
+                            continue
+                        err = news_source_host_error(srcs[i])
+                        if err:
+                            out.append(f"{where}: {kb} source {i}: {err}")
+    return out
+
+
+def journey_rule_self_test(kb_docs):
+    """The planted fixtures must each fail as named; returns (problems, the caught lines)."""
+    planted = dict(kb_docs)
+    for f in sorted(JOURNEY_RULE_FIXTURES.glob("*.md")):
+        d = parse_kb_doc(f)
+        planted[d["slug"]] = d
+    caught = [x for x in journey_rule_fails(planted) if "kb.journey.fixture" in x]
+    want = ("fixture/no_rule: names neither", "fixture/unsourced: rule doc kb.fixture.unsourced has no",
+            "fixture/out_of_range: source 9", "fixture/not_gov: kb.fixture.journey-rule source 0")
+    miss = [w for w in want if not any(w in c for c in caught)]
+    return [f"[journey] self-test: the planted fixture '{w}' is no longer caught" for w in miss], caught
+
+
 def facts_doc_fails(slug, doc, kb_docs):
     """GATE 12 problems for one fact doc (FACT_VISUALS block above)."""
     out = []
@@ -1646,6 +1710,17 @@ def run(emit=False):
     # ---- GATE 15: Australian terms (TERM_ID block above; behavior 102) ---- #
     fails.extend(terms_fails(terms_docs, kb_docs))
 
+    # ---- GATE 16: every journey step names its rule's source or is practice (behavior 114) ---- #
+    fails.extend(journey_rule_fails(kb_docs))
+    st_fails, caught = journey_rule_self_test(kb_docs)
+    fails.extend(st_fails)
+    info.extend(f"[journey self-test caught] {c}" for c in caught)
+    stats["journey_steps"] = {k: sum(1 for d in kb_docs.values() if d["slug"].startswith("kb.journey.")
+                                     and isinstance(d.get("content_json"), dict)
+                                     for ph in (d["content_json"].get("layout") or {}).get("phases") or []
+                                     for a in ph.get("actions") or [] if k in a)
+                              for k in ("rule", "practice")}
+
     # ---- GATE 14: a statement line's detail cites only its own doc (behavior 93) ---- #
     # Whole lifecycle -> honesty tiers; one owner per fact -> the KB compiler -> line details
     # A `lookup.line_details` entry is what a lifecycle-statement line opens to (the engine's
@@ -1970,6 +2045,9 @@ def main():
           f"fact docs: {stats.get('facts_docs')}, terms: {stats.get('terms')}")
     print(f"copy templates: {stats.get('copy_templates')} (bilingual gate, "
           f"locales={'+'.join(LOCALES)})")
+    js = stats.get("journey_steps") or {}
+    print(f"journey steps: {js.get('rule', 0)} follow a cited rule, "
+          f"{js.get('practice', 0)} are common practice (GATE 16)")
     if info:
         print(f"\nINFO ({len(info)}):")
         for m in info:

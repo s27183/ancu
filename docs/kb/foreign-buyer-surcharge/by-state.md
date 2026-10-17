@@ -14,6 +14,8 @@ sources:
   - url: https://www.pwc.com.au/tax/assets/stamp-duty/australian-stamp-duty-and-land-tax-maps.pdf
     retrieved: 2026-07-06
     path: docs/sources/foreign-buyer-surcharge/pwc-australian-stamp-duty-and-land-tax-maps.pdf
+  - url: https://www.revenue.nsw.gov.au/taxes-duties-levies-royalties/transfer-duty/surcharge-purchaser-duty
+    retrieved: 2026-10-17
 ---
 
 # Foreign purchaser stamp-duty surcharge — by state
@@ -98,7 +100,7 @@ Pure-reference (`fills: []`). The `cash_position` resolver reads the surcharge *
             "QLD": 1,
             "WA": 2,
             "TAS": 3,
-            "NSW": 4,
+            "NSW": 5,
             "SA": 4
           }
         }

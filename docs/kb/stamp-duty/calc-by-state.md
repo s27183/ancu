@@ -11,6 +11,9 @@ sources:
     retrieved: 2026-07-06
   - url: https://www.sro.vic.gov.au/about-us/rates-and-statistics/current-rates/land-transfer-duty-principal-place-residence-current-rates
     retrieved: 2026-07-06
+  - url: https://www.revenue.nsw.gov.au/taxes-duties-levies-royalties/transfer-duty
+    retrieved: 2026-10-17
+    path: docs/sources/nsw/how_to_calculate_transfer_duty.pdf
 ---
 
 # Transfer (stamp) duty — the statutory rate scale, by state
@@ -126,6 +129,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
             "en": "The price and the state: each state has its own scale, and the rate rises with the price."
           },
           "source": {
+            "NSW": 4,
             "QLD": 0,
             "VIC": 2
           }
@@ -146,6 +150,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
             "en": "The price, the state and whether you qualify as a first-home buyer: the concession shrinks as the price rises and ends at the state's cap."
           },
           "source": {
+            "NSW": 4,
             "QLD": 1,
             "VIC": 3
           }
