@@ -111,7 +111,7 @@ or a source that is not a government page (a `.gov.au` host).
           { "id": "lodge_au_tax_return",        "order": 2, "budget_ref": "tax_return_rental", "component_ref": "tax_structure_non_resident", "rule": [{"kb": "kb.non-resident-tax.withholding-on-rental-income", "source": 1}] },
           { "id": "declare_vacancy_occupancy",  "order": 3, "budget_ref": null, "component_ref": "ownership_planning_foreign_investor", "rule": [{"kb": "kb.firb.vacancy-fee-rules-2026", "source": 0}] },
           { "id": "monitor_land_tax_surcharge", "order": 4, "budget_ref": null, "component_ref": "ownership_planning_foreign_investor", "rule": [{"kb": "kb.tax.land-tax-by-state", "source": {"QLD": 0, "VIC": 1, "WA": 2, "TAS": 3, "NSW": 4, "SA": 6, "ACT": 7}}] },
-          { "id": "plan_repatriation",          "order": 5, "budget_ref": null, "component_ref": "ownership_planning_foreign_investor", "practice": true },
+          { "id": "plan_repatriation",          "order": 5, "budget_ref": null, "component_ref": "ownership_planning_foreign_investor", "rule": [{"kb": "kb.foreign-investor.repatriation-strategy", "source": 1}] },
           { "id": "review_pm_performance",      "order": 6, "budget_ref": "property_management", "component_ref": "ownership_planning_foreign_investor", "practice": true }
         ]
       },
@@ -122,7 +122,7 @@ or a source that is not a government page (a `.gov.au` host).
           { "id": "engage_selling_agent",      "order": 2, "budget_ref": "commission", "component_ref": "disposition", "practice": true },
           { "id": "confirm_cgt_frcgw_position","order": 3, "budget_ref": "dispose_cgt", "component_ref": "disposition", "rule": [{"kb": "kb.non-resident-tax.foreign-resident-cgt-withholding", "source": 0}] },
           { "id": "discharge_mortgage",        "order": 4, "budget_ref": "mortgage_discharge", "component_ref": "disposition", "practice": true },
-          { "id": "repatriate_proceeds",       "order": 5, "budget_ref": "fx_back", "component_ref": "disposition", "practice": true },
+          { "id": "repatriate_proceeds",       "order": 5, "budget_ref": "fx_back", "component_ref": "disposition", "rule": [{"kb": "kb.foreign-investor.repatriation-strategy", "source": 1}] },
           { "id": "plan_next_purchase",        "order": 6, "budget_ref": null, "component_ref": "disposition", "practice": true }
         ]
       }
@@ -270,8 +270,8 @@ or a source that is not a government page (a `.gov.au` host).
     },
     "action_own_plan_repatriation_label": { "vi": "Lập kế hoạch chuyển lợi nhuận về Việt Nam", "en": "Plan your repatriation of rental income" },
     "action_own_plan_repatriation_detail": {
-      "vi": "Chọn tần suất chuyển tiền (hằng tháng, hằng quý, hay tái đầu tư tại Úc) và dùng kênh chuyển tiền được cấp phép.",
-      "en": "Choose your repatriation frequency (monthly, quarterly, or reinvest in Australia) and use a licensed transfer channel."
+      "vi": "Chọn tần suất chuyển tiền (hằng tháng, hằng quý, hay tái đầu tư tại Úc) và dùng dịch vụ chuyển tiền đã đăng ký với AUSTRAC.",
+      "en": "Choose your repatriation frequency (monthly, quarterly, or reinvest in Australia) and use a transfer service registered with AUSTRAC."
     },
     "action_own_review_pm_performance_label": { "vi": "Xem lại hiệu quả quản lý cho thuê", "en": "Review property-management performance" },
     "action_own_review_pm_performance_detail": {
@@ -301,8 +301,8 @@ or a source that is not a government page (a `.gov.au` host).
     },
     "action_dispose_repatriate_proceeds_label": { "vi": "Chuyển vốn ròng về Việt Nam", "en": "Repatriate the net proceeds" },
     "action_dispose_repatriate_proceeds_detail": {
-      "vi": "Sau khi trừ chi phí bán, thuế, và tất toán vay, phần vốn ròng còn lại được chuyển về qua kênh chuyển tiền được cấp phép.",
-      "en": "After selling costs, tax, and the loan payout, the remaining net equity is transferred back via a licensed channel."
+      "vi": "Sau khi trừ chi phí bán, thuế, và tất toán vay, phần vốn ròng còn lại được chuyển về qua dịch vụ chuyển tiền đã đăng ký với AUSTRAC.",
+      "en": "After selling costs, tax, and the loan payout, the remaining net equity is transferred back via a transfer service registered with AUSTRAC."
     },
     "action_dispose_plan_next_purchase_label": { "vi": "Lập kế hoạch dùng vốn ròng cho bất động sản tiếp theo", "en": "Plan how your net equity funds your next property" },
     "action_dispose_plan_next_purchase_detail": {

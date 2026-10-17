@@ -1,11 +1,17 @@
 ---
 slug: kb.foreign-investor.repatriation-strategy
 effective_from: 2025-07-01
-last_verified: 2026-07-06
+last_verified: 2026-10-17
 sources:
   - url: https://wise.com/au/currency-converter/vnd-to-aud-rate
     retrieved: 2026-07-06
     note: "Wise (AUD↔VND) — the AU-side outbound-transfer provider mechanics (licensed money-transfer channel, transparent cost). The AU bank AML/CTF reporting obligation on the outbound leg is owned/cross-referenced by kb.au-aml-ctf.bank-due-diligence-expectations (Phase A); the AUSTRAC IFTI primary timed out repeatedly this session — NOT independently re-opened here."
+  - url: https://moneysmart.gov.au/banking/sending-money-overseas
+    retrieved: 2026-10-17
+    note: "ASIC Moneysmart — \"In Australia, money transfer services must be registered with AUSTRAC\"; check a provider is registered before using it. The rule both repatriation steps follow (behavior 114)."
+  - url: https://www.austrac.gov.au/industry-and-business/obligations-and-guidance/your-amlctf-program/reporting-us/international-funds-transfer-reports
+    retrieved: 2026-10-17
+    note: "AUSTRAC — an IFTI sent out of Australia is reported by the sending institution within 10 business days; IFTI reporting continues until the IVTS transition date, on or after 31 March 2029 (AML/CTF Transitional Rules 2026). Replaces the 404'd …/international-funds-transfer-instructions-iftis page."
 ---
 
 # Repatriating rental income and sale proceeds — the AU-side outbound transfer
@@ -17,6 +23,7 @@ This doc owns the **AU-side of sending money out of Australia** — rental incom
 An outbound transfer from Australia is not materially different in mechanism from the inbound transfer [`kb.au-aml-ctf.bank-due-diligence-expectations`](../au-aml-ctf/bank-due-diligence-expectations.md) already owns:
 
 - **The bank (or licensed provider) is the reporting entity, never this platform.** Same never-custodian discipline as the inbound case — the platform is informational only; the investor's own bank or a licensed money-transfer provider (Wise, OFX, or a bank) executes the transfer.
+- **The channel must be registered with AUSTRAC.** A money transfer service in Australia must be registered with AUSTRAC (ASIC Moneysmart); the investor checks the provider is registered before sending. A bank is a reporting entity in its own right.
 - **AUSTRAC reporting is symmetric.** An **International Funds Transfer Instruction (IFTI)** is lodged for a transfer of any value **out of** Australia, the same as for a transfer in — this is the AU bank/provider's filing, not the investor's, and is routine rather than a flag on the investor specifically.
 - **Provider choice is the same cost lever.** The FX spread on converting AUD rental income or sale proceeds to VND is owned by [`kb.fx.typical-spreads-vnd-aud`](../fx/typical-spreads-vnd-aud.md) and the provider-comparison framework by [`kb.fx-providers.wise-ofx-bank-comparison`](../fx-providers/wise-ofx-bank-comparison.md) — both already built mode-agnostic; this doc does not restate the spread bands, only confirms they apply in the outbound direction too.
 
@@ -58,5 +65,5 @@ Notes:
 
 ## Sources
 
-- AUSTRAC — *International funds transfer instructions (IFTIs)* (reported for transfers of any value into or out of Australia, filed by the reporting entity) — https://www.austrac.gov.au/business/how-comply-and-report-guidance-and-resources/reporting/international-funds-transfer-instructions-iftis
+- AUSTRAC — *International funds transfer instructions (IFTIs)* (reported for transfers of any value into or out of Australia, filed by the reporting entity) — https://www.austrac.gov.au/industry-and-business/obligations-and-guidance/your-amlctf-program/reporting-us/international-funds-transfer-reports (IFTI reporting continues until the IVTS transition, on or after 31 March 2029)
 - ASIC Moneysmart — *International money transfers* (provider comparison, exchange-rate margin as the real cost — applies to outbound transfers the same as inbound) — https://moneysmart.gov.au/banking/international-money-transfers
