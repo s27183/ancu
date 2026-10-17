@@ -12,6 +12,7 @@
 
 -export([is_guest/1, start/1, claim/2, refuse/1, ttl/0]).
 -export([client_addr/1, daily_limit/0, limited/2, start_limit/0]).
+-export([held_limit/1, full/2]).
 
 -define(SESSION_COOKIE, <<"fh_session">>).
 -define(TTL, 7 * 86400).
@@ -78,13 +79,40 @@ peer(Req) ->
     list_to_binary(inet:ntoa(Ip)).
 
 %% Plans a guest — and one address — may build a Sydney day (GUEST_DAILY_CREATES,
-%% default 3, Son 2026-10-10).
+%% default 3, Son 2026-10-10; 7 since behavior 111, so the held cap below is the limit
+%% a visitor meets, and 7 plans in a day are possible).
 -spec daily_limit() -> pos_integer().
 daily_limit() ->
     case os:getenv("GUEST_DAILY_CREATES") of
-        false -> 3;
-        V -> try list_to_integer(V) of N when N >= 1 -> N; _ -> 3 catch _:_ -> 3 end
+        false -> 7;
+        V -> try list_to_integer(V) of N when N >= 1 -> N; _ -> 7 catch _:_ -> 7 end
     end.
+
+%% Guest plans -> P-5 · Metering, not gating -> The shell backend -> the plans a visitor holds
+%% Purpose:   behavior 111 (Son 2026-10-17: "increase the number of saved plan for
+%%            non-signed in user to 7. for the signed in user, it's 28"): a visitor holds
+%%            at most this many plans at once — a guest 7, a signed-in visitor 28 — and
+%%            makes room by deleting one (DELETE /api/plan-cards/:id) or, a guest, by
+%%            signing in.
+%% Holds:     the count is plan_card_views not archived (fh_shell_store:plans_saved/1, the
+%%            rows the list shows), checked in the create under a per-owner lock in the
+%%            create's transaction (fh_shell_store:with_plan_slot/3), so two creates at
+%%            once cannot both take the last slot; a repeat of a create key returns its
+%%            plan before the check. A guest's plans claimed at sign-in may take an
+%%            account past 28: it keeps them and only cannot make another.
+%% Rests on:  the guest purge still takes a guest's plans after 7 days (ttl/0).
+-spec held_limit(guest | user) -> pos_integer().
+held_limit(guest) -> 7;
+held_limit(user)  -> 28.
+
+%% The reply to a create at the held cap: 409 with the cap, what is held and who holds
+%% it, so the page names the way out (delete a plan; a guest: sign in for 28).
+-spec full(guest | user, non_neg_integer()) -> {409, map()}.
+full(Kind, Held) ->
+    {409, #{<<"error">> => <<"plans_full">>,
+            <<"limit">> => held_limit(Kind),
+            <<"held">> => Held,
+            <<"kind">> => atom_to_binary(Kind)}}.
 
 %% Guests one address may start a Sydney day before any create (fh_shell_h_guest,
 %% behavior 97): three times the create cap — a browser keeps its guest for 7 days, so

@@ -4,10 +4,12 @@
 %% What the visitor can still use for free, for the menu (behavior 62). One shape for
 %% both kinds, so the menu shows the same three rows to everyone (Son 2026-10-11):
 %%   plans_saved   the plans the visitor holds now (plan_card_views, as the list shows);
+%%   plans_limit   how many they may hold (behavior 111: 7 signed out, 28 signed in;
+%%                 fh_shell_guest:held_limit/1) — the menu reads "N / limit";
 %%   plans_today   new plans today: {used, limit} signed out, from guest_daily_creates
 %%                 for this guest and this address against GUEST_DAILY_CREATES (the
 %%                 higher count governs, as guest_create/4 claims both); "unlimited"
-%%                 signed in (no cap on a user's saved plans);
+%%                 signed in (no daily cap: the held cap, plans_limit, bounds them);
 %%   keep_days     fh_shell_guest:ttl() in days signed out (the purge's age);
 %%                 "until_deleted" signed in;
 %%   questions_today  "sign_in" signed out (guests are refused the assistant); signed in
@@ -56,6 +58,7 @@ guest(GuestId, Req) ->
     fh_shell_http:reply_json(200, #{
         <<"kind">> => <<"guest">>,
         <<"plans_saved">> => Saved,
+        <<"plans_limit">> => fh_shell_guest:held_limit(guest),
         <<"plans_today">> => #{<<"used">> => min(Used, Limit), <<"limit">> => Limit},
         <<"keep_days">> => fh_shell_guest:ttl() div 86400,
         <<"questions_today">> => <<"sign_in">>
@@ -76,6 +79,7 @@ user(UserId, Req) ->
     fh_shell_http:reply_json(200, #{
         <<"kind">> => <<"user">>,
         <<"plans_saved">> => fh_shell_store:plans_saved(UserId),
+        <<"plans_limit">> => fh_shell_guest:held_limit(user),
         <<"plans_today">> => <<"unlimited">>,
         <<"keep_days">> => <<"until_deleted">>,
         <<"questions_today">> => Questions,

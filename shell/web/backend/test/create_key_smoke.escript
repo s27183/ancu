@@ -26,6 +26,8 @@ main(_) ->
     os:putenv("FH_SHELL_HTTP_PORT", integer_to_list(?SHELL_PORT)),
     os:putenv("FH_HTTP_IP", "127.0.0.1"),
     os:putenv("SHELL_JWT_SECRET", "create-key-smoke-secret"),
+    %% the daily cap this test reaches (3); its default is 7 since behavior 111
+    os:putenv("GUEST_DAILY_CREATES", "3"),
     {_Pub, Priv} = crypto:generate_key(eddsa, ed25519),
     os:putenv("SHELL_TENANT_ID", binary_to_list(uuid())),
     os:putenv("SHELL_TENANT_PRIVKEY", binary_to_list(base64:encode(Priv))),
