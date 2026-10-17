@@ -1252,8 +1252,22 @@ const messages = {
     },
     'quota.left': { vi: 'Còn {n}/{of}', en: '{n} of {of} left' },
     'quota.saved': { vi: 'Kế hoạch đã lưu', en: 'Saved plans' },
-    'quota.saved_cap': { vi: 'tối đa {n} mới/ngày', en: '{n} new a day' },
-    'quota.saved_nocap': { vi: 'không giới hạn', en: 'no cap' },
+    // Behavior 111: a visitor holds up to 7 plans signed out, 28 signed in.
+    'quota.full_guest': {
+        vi: 'Danh sách đã đầy. Xoá một kế hoạch để tạo mới, hoặc đăng nhập để lưu đến 28.',
+        en: 'Your list is full. Delete a plan to make a new one, or sign in to keep up to 28.'
+    },
+    'quota.full_user': {
+        vi: 'Danh sách đã đầy. Xoá một kế hoạch để tạo mới.',
+        en: 'Your list is full. Delete a plan to make a new one.'
+    },
+    'plans.delete': { vi: 'Xoá', en: 'Delete' },
+    'plans.delete_label': { vi: 'Xoá kế hoạch {p}', en: 'Delete the {p} plan' },
+    'plans.delete_q': { vi: 'Xoá kế hoạch này? Không khôi phục được.', en: 'Delete this plan? It can’t be undone.' },
+    'plans.delete_yes': { vi: 'Xoá', en: 'Delete' },
+    'plans.delete_no': { vi: 'Giữ lại', en: 'Keep' },
+    'plans.delete_failed': { vi: 'Chưa xoá được. Thử lại.', en: 'Couldn’t delete it. Try again.' },
+    'onboarding.full.back': { vi: 'Về danh sách kế hoạch', en: 'Back to your plans' },
     'quota.saved_none_left': {
         vi: 'Hôm nay bạn đã tạo đủ kế hoạch mới. Đăng nhập để tạo thêm.',
         en: 'You’ve made today’s new plans. Sign in to make more.'

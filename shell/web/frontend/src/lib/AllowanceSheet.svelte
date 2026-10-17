@@ -1,6 +1,7 @@
 <script lang="ts">
     // Honest-partial -> P-5 · Metering, not gating -> The web frontend -> the free allowance popup
     // What the visitor can still use for free (behaviors 62, 64), opened from the menu:
+    // (behavior 111: saved plans read "N / 7" signed out, "N / 28" signed in)
     // the same three rows for every visitor — saved plans, kept for, AI questions today —
     // read fresh from GET /api/me/quota (the gates' own counters) each time it opens. The
     // monthly AI allowance is a ceiling on what an account may cost, in a unit visitors
@@ -37,13 +38,15 @@
         <div class="menu-quota">
             <div class="menu-row">
                 <span class="menu-label">{$t('quota.saved')}</span>
-                <span class="menu-value"
-                    >{quota.plansSaved} · {quota.plansToday === 'unlimited'
-                        ? $t('quota.saved_nocap')
-                        : $t('quota.saved_cap').replace('{n}', String(quota.plansToday.limit))}</span
+                <!-- behavior 111: the plans held against the cap ("3 / 7"); an older shell
+                     without plans_limit reads the count alone -->
+                <span class="menu-value" data-plans-held
+                    >{quota.plansLimit ? `${quota.plansSaved} / ${quota.plansLimit}` : quota.plansSaved}</span
                 >
             </div>
-            {#if quota.plansToday !== 'unlimited' && quota.plansToday.used >= quota.plansToday.limit}
+            {#if quota.plansLimit && quota.plansSaved >= quota.plansLimit}
+                <p class="menu-note">{$t(quota.kind === 'guest' ? 'quota.full_guest' : 'quota.full_user')}</p>
+            {:else if quota.plansToday !== 'unlimited' && quota.plansToday.used >= quota.plansToday.limit}
                 <p class="menu-note">{$t('quota.saved_none_left')}</p>
             {/if}
             <div class="menu-row">

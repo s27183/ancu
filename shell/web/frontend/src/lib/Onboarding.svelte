@@ -69,7 +69,9 @@
     let createdId = resume?.planId ?? '';
     // svelte-ignore state_referenced_locally
     let createKey = resume?.createKey ?? '';
-    let phase = $state<'form' | 'submitting' | 'waiting' | 'failed' | 'auth' | 'limit' | 'error'>('form');
+    let phase = $state<'form' | 'submitting' | 'waiting' | 'failed' | 'auth' | 'limit' | 'full' | 'error'>('form');
+    // behavior 111: the list is full — whose cap it is decides the way out
+    let fullGuest = $state(true);
     let guestLimit = $state(3);
 
     // The gate branches on intent (mode-c-wedge.md P5-activate) AND, orthogonally, on
@@ -215,6 +217,7 @@
         );
         if (destroyed) return;
         if (outcome.kind === 'guest_limit') guestLimit = outcome.limit;
+        if (outcome.kind === 'full') fullGuest = outcome.guest;
         if (outcome.kind === 'created') {
             createdId = outcome.result.plan_card_id;
             phase = 'waiting';
@@ -227,6 +230,7 @@
         if (outcome.kind !== 'error') createKey = '';
         phase =
             outcome.kind === 'guest_limit' ? 'limit'
+            : outcome.kind === 'full' ? 'full'
             : outcome.kind === 'auth_required' ? 'auth'
             : 'error';
     }
@@ -427,6 +431,17 @@
             <p>{$t('guest.limit').replace('{n}', String(guestLimit))}</p>
             <button type="button" class="primary" onclick={signin}
                 >{$t('auth.signin')}</button
+            >
+        </div>
+    {:else if phase === 'full'}
+        <!-- behavior 111: no plan was made; delete one from the list, or sign in for 28 -->
+        <div class="ob-terminal" data-plans-full>
+            <p>{$t(fullGuest ? 'quota.full_guest' : 'quota.full_user')}</p>
+            {#if fullGuest}
+                <button type="button" class="primary" onclick={signin}>{$t('auth.signin')}</button>
+            {/if}
+            <button type="button" class={fullGuest ? 'btn btn-secondary' : 'primary'} onclick={close}
+                >{$t('onboarding.full.back')}</button
             >
         </div>
     {:else if phase === 'auth'}

@@ -126,6 +126,9 @@ export type CreateOutcome =
     | { kind: 'created'; result: CreatePlanCardResult }
     | { kind: 'auth_required' }
     | { kind: 'guest_limit'; limit: number }
+    /** behavior 111: the visitor holds as many plans as they may (7 a guest, 28 signed
+     *  in): nothing was made; delete a plan, or (a guest) sign in for 28. */
+    | { kind: 'full'; limit: number; guest: boolean }
     | { kind: 'error'; status: number };
 
 /** POST /api/plan-cards. No auth header is attached here yet — the login slice will
@@ -157,7 +160,24 @@ export async function createPlanCard(
         const b = (await res.json().catch(() => ({}))) as { error?: string; limit?: number };
         if (b.error === 'guest_daily_limit') return { kind: 'guest_limit', limit: b.limit ?? 3 };
     }
+    if (res.status === 409) {
+        const b = (await res.json().catch(() => ({}))) as { error?: string; limit?: number; kind?: string };
+        if (b.error === 'plans_full')
+            return { kind: 'full', limit: b.limit ?? 7, guest: b.kind !== 'user' };
+    }
     return { kind: 'error', status: res.status };
+}
+
+/** DELETE /api/plan-cards/:id (behavior 111): the visitor removes a plan from their
+ *  list, freeing its slot. True when it is gone (204, or 404: already gone or never
+ *  theirs — the list reloads either way). */
+export async function deletePlanCard(id: string, fetchFn: typeof fetch = fetch): Promise<boolean> {
+    try {
+        const res = await fetchFn(`/api/plan-cards/${encodeURIComponent(id)}`, { method: 'DELETE' });
+        return res.status === 204 || res.status === 404;
+    } catch {
+        return false;
+    }
 }
 
 /** POST /api/auth/guest (behavior 97): make this browser a guest before its first
@@ -908,6 +928,8 @@ export async function setTransactionDates(
 export type Quota = {
     kind: 'guest' | 'user';
     plansSaved: number;
+    /** behavior 111: how many plans the visitor may hold — 7 a guest, 28 signed in. */
+    plansLimit: number | null;
     plansToday: { used: number; limit: number } | 'unlimited';
     keepDays: number | 'until_deleted';
     questionsToday: { used: number; limit: number } | 'unlimited' | 'sign_in';
@@ -923,6 +945,7 @@ export async function getQuota(fetchFn: typeof fetch = fetch): Promise<Quota | n
         return {
             kind: b.kind,
             plansSaved: b.plans_saved ?? 0,
+            plansLimit: b.plans_limit ?? null,
             plansToday: b.plans_today,
             keepDays: b.keep_days,
             questionsToday: b.questions_today,
