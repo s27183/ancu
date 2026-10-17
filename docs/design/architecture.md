@@ -260,7 +260,11 @@ Added 2026-10-16 (behavior 93; Son: too much text at first look on a plan):
   shortened, never removed. One thing may sit above the budget's figure: the
   line naming the numbers it rests on ("Tài chính của bạn: giá · cọc", and the
   cash verdict once typed), which opens where they are changed (behavior 108,
-  2026-10-17: you read your numbers before the result).
+  2026-10-17: you read your numbers before the result), and under it the hold
+  chips, the input the figure is for (behavior 109). A sheet that takes inputs
+  has one submit, pinned at its foot, which saves what changed and goes back
+  one level — no preview to confirm, no reset; the floating menu shows only on
+  a place's top sheet (Ngân sách, Hành trình), never on one under it.
 
 Added 2026-10-17 (behavior 106; Son's friend could not find her way back to a plan's
 overview):

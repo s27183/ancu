@@ -169,8 +169,8 @@
     // Behavior 93: the statement opens with a hold picked, so its bottom line shows at
     // once — a plan saved with no hold previews DEFAULT_HOLD years, as a tap on that chip
     // would. Once per load (`holdDefaulted`; a reset re-arms it); the cockpit's slider can
-    // still clear it. The hold is shown on the statement's chips, so only a state or price
-    // what-if (`scenarioActive`) raises the preview banner.
+    // still clear it. The hold is shown on the statement's chips; no banner: since behavior
+    // 109 the chips' hold is the only preview, and the finances sheet saves (updateFinances).
     const DEFAULT_HOLD = 10;
     let holdDefaulted = false;
     $effect(() => {
@@ -186,9 +186,6 @@
     let previewing = $state(false);
     let previewError = $state(false);
     const previewActive = $derived(previewOutcomes !== null);
-    // A price or deposit preview is on screen (not the hold chips' own preview).
-    let scenarioPreviewed = $state(false);
-    const scenarioActive = $derived(previewActive && scenarioPreviewed);
     // Save (W8) — the COMMIT half: refine persists the previewed overrides + runs a
     // base_resolver turn whose recomputed components arrive over the SAME SSE. `committing`
     // is set on a 202 so onDone clears the preview once the saved (== previewed) snapshot
@@ -240,7 +237,11 @@
         finPersonal = num(d?.personal_loans_balance);
         finCar = num(d?.car_loan_balance);
         finBnpl = num(d?.buy_now_pay_later_balance);
+        finSeeded = JSON.stringify(buildFinancials());
     }
+    // behavior 109: the financials as last seeded, so "Cập nhật tài chính" writes them only
+    // when the visitor changed one.
+    let finSeeded = '';
 
     // Build the FULL financials object from the form (full-replace — a blank field is
     // omitted → cleared downstream → honest-partial null). Parses non-negative numbers,
@@ -598,8 +599,10 @@
     //            card's checklist_status (every blueprint carries a playbook: 30–35 steps,
     //            measured 2026-10-17). A card with neither tab has no hub (version skew).
     // Capability: the floating menu switches Ngân sách ↔ Hành trình in place (sub), so back
-    //            from either goes to the hub; it is not drawn on the hub, whose cards are the
-    //            way in.
+    //            from either goes to the hub; it is drawn on those two sheets only — not on
+    //            the hub, whose cards are the way in, nor on a level below them (a phase
+    //            sheet, "Tài chính của bạn", a step: page.state.lifecycle / flowPhase;
+    //            behavior 109), where the sheet's own back or submit is the way on.
 
     // A pick from the menu, or "Hỏi AI", leaves an open phase sheet or step first, and
     // waits for that back to land so a push that follows lands over the sheet, not under it.
@@ -653,7 +656,10 @@
     $effect(() => {
         if (!sectionReg) return;
         // behavior 106: the hub's cards are the way in; the menu is for the sheets under it
-        sectionReg.plan = onHub ? [] : sectionGroups;
+        // behavior 109: and only on Ngân sách and Hành trình themselves — a phase sheet,
+        // "Tài chính của bạn" (whose submit takes the menu's place) or a step hides it
+        const deeper = !!(page.state.lifecycle || page.state.flowPhase);
+        sectionReg.plan = onHub || deeper ? [] : sectionGroups;
         sectionReg.current = onHub ? '' : sectionCurrent;
         // The sheet head's "Hỏi AI" (behavior 75): offered where the ask bar is.
         sectionReg.ask = (onHub || sub !== 'qa') && uiTabs.length > 0 ? openQa : null;
@@ -740,11 +746,13 @@
     // The overrides the current inputs describe — shared by preview and save so the saved
     // scenario is exactly the one on screen. Only a CHANGED state is an override (the
     // suburb's own state is the baseline); a non-positive / blank price is omitted.
-    function buildOverrides(): SimulateOverrides {
+    // behavior 109: the hold chips preview the hold alone (withInputs false); the price and
+    // deposit typed on "Tài chính của bạn" are only ever saved, by updateFinances.
+    function buildOverrides(withInputs = true): SimulateOverrides {
         const overrides: SimulateOverrides = {};
-        const p = aud(priceInput);
+        const p = withInputs ? aud(priceInput) : null;
         if (p !== null && p > 0) overrides.target_price = p;
-        const d = aud(depositInput);
+        const d = withInputs ? aud(depositInput) : null;
         if (d !== null) overrides.deposit = d;
         // horizon: only a positive H that differs from the card's baseline (omit 0 — the
         // engine has no "clear horizon" override; absence IS the indefinite default).
@@ -752,30 +760,21 @@
         return overrides;
     }
 
-    async function runPreview(fromSheet = false) {
+    async function runPreview() {
         if (!cardId) return;
-        const overrides = buildOverrides();
+        const overrides = buildOverrides(false);
         // Nothing varied → clear any prior preview rather than round-trip a no-op.
         if (Object.keys(overrides).length === 0) {
             previewOutcomes = null;
-            scenarioPreviewed = false;
             previewError = false;
             return;
         }
         previewing = true;
         previewError = false;
-        saveError = false;
-        depositRefused = null;
         const res = await simulatePlanCard(cardId, overrides);
         previewing = false;
         if (res.kind === 'ok') {
             previewOutcomes = res.outcomes;
-            scenarioPreviewed = overrides.target_price !== undefined || overrides.deposit !== undefined;
-            // behavior 101: "Xem thử" on the finances sheet shows the statement it made
-            // (only that button: the hold chips' preview never moves the visitor)
-            if (fromSheet && page.state.lifecycle === 'finances') history.back();
-        } else if (res.kind === 'invalid' && res.min !== undefined && res.max !== undefined) {
-            depositRefused = { min: res.min, max: res.max };
         } else {
             previewError = true;
             previewOutcomes = null;
@@ -786,10 +785,10 @@
     // are persisted and a base_resolver turn recomputes the snapshot; we flip to running
     // (turnDone=false hides the bar and blocks a racing 2nd save) and keep the preview
     // overlay shown until onDone swaps in the now-live committed components.
-    async function saveScenario() {
-        if (!cardId) return;
+    async function saveScenario(): Promise<boolean> {
+        if (!cardId) return false;
         const overrides = buildOverrides();
-        if (Object.keys(overrides).length === 0) return;
+        if (Object.keys(overrides).length === 0) return true;
         saving = true;
         saveError = false;
         depositRefused = null;
@@ -798,12 +797,44 @@
         if (res.kind === 'accepted') {
             turnDone = false;
             committing = true;
-            if (page.state.lifecycle === 'finances') history.back();
+            return true;
         } else if (res.kind === 'invalid' && res.min !== undefined && res.max !== undefined) {
             depositRefused = { min: res.min, max: res.max };
         } else {
             saveError = true;
         }
+        return false;
+    }
+
+    // Whole lifecycle -> P-2 · The database is the single source of truth -> The web frontend -> one submit for "Tài chính của bạn"
+    // Goal:      behavior 109 (Son 2026-10-17: "I update the finance, then the whole plan
+    //            update accordingly"): "Cập nhật tài chính", pinned at the foot of the
+    //            finances sheet (LifecycleSheet's .ls-fin-submit), is its one submit; it
+    //            saves what changed and goes back to Ngân sách. No unsaved preview, no
+    //            "Xem thử" / "Lưu" / "Đặt lại" — the plan shown is the saved plan.
+    // Invariant: a field left alone keeps the plan's value: a blank price or deposit sends no
+    //            override, and the household form is seeded from the engine's profile, its
+    //            write sent only when it differs from that seed (finSeeded). The two writes
+    //            never overlap (refine 409s while a turn runs; a profile write mid-turn
+    //            recomputes nothing), so when both changed the profile write waits for the
+    //            refine's turn to end (onDone, profileAfterRefine). Measured 2026-10-17 in
+    //            Chrome: price + HECS in one tap both landed (loan needed 712.500, HECS 0).
+    // Capability: a refused write keeps the visitor on the sheet with its message;
+    //            "Tiền bạn có" is kept as typed; Enter in price or deposit submits too.
+    let profileAfterRefine = $state(false);
+    const updating = $derived(saving || finSaving);
+    async function updateFinances() {
+        if (!cardId || finBusy || saving) return;
+        const refine = aud(priceInput) !== null || aud(depositInput) !== null;
+        const profile = JSON.stringify(buildFinancials()) !== finSeeded;
+        if (refine) {
+            if (!(await saveScenario())) return;
+            profileAfterRefine = profile;
+        } else if (profile) {
+            await saveFinancials();
+            if (finError) return;
+        }
+        if (page.state.lifecycle === 'finances') history.back();
     }
 
     function resetPreview() {
@@ -813,7 +844,6 @@
         priceInput = '';
         depositInput = '';
         depositRefused = null;
-        scenarioPreviewed = false;
         horizonValue = baselineHorizon;
         holdDefaulted = false;
     }
@@ -888,6 +918,12 @@
                     if (committing) {
                         committing = false;
                         resetPreview();
+                        // behavior 109: the income or debts changed with the price — now
+                        // that the refine's turn is over, write them too.
+                        if (profileAfterRefine && !failed) {
+                            profileAfterRefine = false;
+                            void saveFinancials();
+                        }
                     } else if (previewOutcomes && !failed) {
                         // A preview made while the turn ran (the default hold, behavior 92)
                         // overlays every component: re-run it so the detail sheets carry
@@ -1062,8 +1098,8 @@
     {/if}
 
 
-<!-- Behavior 101: the price and the deposit, first on "Tài chính của bạn" — "Xem thử"
-     previews the statement (simulate), "Lưu" saves both to the plan (refine). -->
+<!-- Behavior 101: the price and the deposit, first on "Tài chính của bạn"; behavior 109:
+     saved with everything else by the sheet's one "Cập nhật tài chính" (updateFinances). -->
 {#snippet scenario()}
     <div class="pp-price">
         <label class="pp-price-row">
@@ -1074,7 +1110,7 @@
                 inputmode="numeric"
                 bind:value={priceInput}
                 placeholder={currentPriceLabel ?? $t('plan.cash.whatif.placeholder')}
-                onkeydown={(e) => e.key === 'Enter' && runPreview(true)}
+                onkeydown={(e) => e.key === 'Enter' && updateFinances()}
             />
         </label>
         {#if pricePreview}<p class="pp-fin-shown">{$t('plan.fin.shown').replace('{x}', money(pricePreview, $lang) ?? '')}</p>{/if}
@@ -1092,7 +1128,7 @@
                     inputmode="numeric"
                     bind:value={depositInput}
                     placeholder={money(b.chosen ?? b.assumed ?? b.min, $lang) ?? ''}
-                    onkeydown={(e) => e.key === 'Enter' && runPreview(true)}
+                    onkeydown={(e) => e.key === 'Enter' && updateFinances()}
                 />
                 <button type="button" class="pp-fin-outright" onclick={outright}>{$t('plan.fin.outright')}</button>
             </label>
@@ -1112,22 +1148,6 @@
             {/if}
             <p class="pp-fin-effect"><Termed text={$t('plan.fin.deposit_effect')} /></p>
         </div>
-    {/if}
-    <div class="pp-price-actions">
-        <button type="button" onclick={() => runPreview(true)} disabled={previewing || Object.keys(buildOverrides()).length === 0}
-            >{previewing ? $t('plan.whatif.running') : $t('plan.sheet.price_preview')}</button
-        >
-        {#if scenarioActive}
-            <button type="button" class="primary" onclick={saveScenario} disabled={saving}
-                >{saving ? $t('plan.whatif.saving') : $t('plan.sheet.price_save')}</button
-            >
-            <button type="button" class="pp-wi-reset" onclick={resetPreview}
-                >{$t('plan.whatif.reset')}</button
-            >
-        {/if}
-    </div>
-    {#if previewError}
-        <p class="pp-wi-error">{$t('plan.whatif.error')}</p>
     {/if}
     {#if saveError}
         <p class="pp-wi-error">{$t('plan.whatif.saveerror')}</p>
@@ -1201,11 +1221,6 @@
                         placeholder={$t('plan.fin.placeholder0')} disabled={finBusy} />
                 </label>
             </div>
-            <div class="pp-cockpit-actions">
-                <button type="button" class="primary" onclick={saveFinancials} disabled={finBusy}>
-                    {finSaving ? $t('plan.fin.saving') : $t('plan.fin.save')}
-                </button>
-            </div>
             {#if finRecomputing}
                 <p class="pp-wi-banner">{$t('plan.fin.recomputing')}</p>
             {:else if finError === 'busy'}
@@ -1218,6 +1233,13 @@
             <p class="pp-fin-disclaimer">{$t('plan.fin.disclaimer')}</p>
         </section>
     </div>
+{/snippet}
+
+<!-- Behavior 109: the finances sheet's one submit, pinned at its foot (LifecycleSheet). -->
+{#snippet finSubmit()}
+    <button type="button" class="primary" data-fin-update onclick={updateFinances} disabled={finBusy || updating}>
+        {updating ? $t('plan.fin.saving') : $t('plan.fin.save')}
+    </button>
 {/snippet}
 
     {#snippet settleCta()}
@@ -1315,18 +1337,6 @@
         </Modal>
     {/if}
 
-    <!-- Cross-tab what-if indicator: the price/state cockpit lives in the Cash-calculator
-         tab (the financial spine is where you reason about money), but a scenario re-renders
-         EVERY tab — so on the other tabs, signpost that the figures are a preview, with a
-         reset. The calculator tab shows the full cockpit instead (below). -->
-    {#if scenarioActive && (onHub || (sub !== 'qa' && !activeTab?.interactive))}
-        <div class="pp-whatif active">
-            <p class="pp-wi-banner">{$t('plan.whatif.banner')}</p>
-            <button type="button" class="pp-wi-reset" onclick={resetPreview}
-                >{$t('plan.whatif.reset')}</button
-            >
-        </div>
-    {/if}
 
     <div class="pp-subcontent">
         {#if onHub}
@@ -1395,14 +1405,6 @@
                  The interactive tab is [cash_position]; any other component falls through. -->
             <section class="pp-card pp-calc pp-flat">
                 {#if viewComponents.cash_position}
-                    {#if scenarioActive}
-                        <div class="pp-whatif active">
-                            <p class="pp-wi-banner">{$t('plan.whatif.banner')}</p>
-                            <button type="button" class="pp-wi-reset" onclick={resetPreview}
-                                >{$t('plan.whatif.reset')}</button
-                            >
-                        </div>
-                    {/if}
                     <LifecycleSheet
                         components={viewComponents}
                         filling={running}
@@ -1413,6 +1415,7 @@
                         planId={cardId}
                         scenario={viewingProperty ? undefined : scenario}
                         household={viewingProperty ? undefined : household}
+                        submit={viewingProperty ? undefined : finSubmit}
                         onstep={openStep}
                     />
                 {:else if running}

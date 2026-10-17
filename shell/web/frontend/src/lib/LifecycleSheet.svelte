@@ -57,6 +57,10 @@
     //            finances sheet shows (target_price_range), the deposit its field's own
     //            (deposit_bounds chosen, else assumed). No button sits under the statement;
     //            the over-loan prompt still opens the sheet.
+    //            Behavior 109: the hold chips sit under that line and above the table — the
+    //            inputs first, then the figures they make. The finances sheet ends in one
+    //            submit (`submit`, PlanProjection's updateFinances), pinned at the foot of the
+    //            sheet in place of the floating menu, which is hidden on every sheet here.
     //            A line's detail (LineDetail, the same body PhaseSheet opens over the
     //            checklist) names the checklist steps that link it; choosing one is
     //            `onstep` — the planner opens Hành trình at that step.
@@ -99,6 +103,7 @@
         planId = null,
         scenario,
         household,
+        submit,
         onstep
     }: {
         components: Record<string, ComponentEntry>;
@@ -115,6 +120,8 @@
         scenario?: Snippet;
         /** Income and debts, drawn last on the finances sheet. */
         household?: Snippet;
+        /** The finances sheet's one submit, pinned at its foot (behavior 109). */
+        submit?: Snippet;
         /** A step that links a line, chosen from the line's detail: open Hành trình there. */
         onstep?: (s: LineStep) => void;
     } = $props();
@@ -364,6 +371,7 @@
             {#if cash !== null && budget?.buy}{@render verdict(budget.buy, cash)}{/if}
         </div>
         {#if household}{@render household()}{/if}
+        {#if submit}<div class="ls-fin-submit">{@render submit()}</div>{/if}
     </section>
 {:else if openGroup}
     {@const g = openGroup}
@@ -490,6 +498,18 @@
             </button>
         {/if}
 
+        <div class="ls-hold" role="group" aria-label={$t('plan.sheet.hold_q')}>
+            {#each HOLD_CHOICES as y (y)}
+                <button
+                    type="button"
+                    class="ls-chip"
+                    aria-pressed={horizon === y}
+                    disabled={busy}
+                    onclick={() => onhorizon(y)}>{y} {$t('plan.sheet.years')}</button
+                >
+            {/each}
+        </div>
+
         <ul class="ls-statement">
             {#each groups as g (g.key)}
                 <li>
@@ -513,17 +533,6 @@
             >
         </div>
 
-        <div class="ls-hold" role="group" aria-label={$t('plan.sheet.hold_q')}>
-            {#each HOLD_CHOICES as y (y)}
-                <button
-                    type="button"
-                    class="ls-chip"
-                    aria-pressed={horizon === y}
-                    disabled={busy}
-                    onclick={() => onhorizon(y)}>{y} {$t('plan.sheet.years')}</button
-                >
-            {/each}
-        </div>
 
         {#if intoHome?.deposit || budget?.buy}
             <!-- behavior 98: not costs — what goes into the home, and the cash to buy -->
@@ -682,7 +691,7 @@
     .ls-into .ls-rest { border: 0; border-top: 1px solid var(--border); border-radius: 0; }
     .ls-need { background: var(--surface); border: 1px solid var(--border); border-radius: 0.75rem; }
     .ls-aside .ls-need { border: 0; border-radius: 0; }
-    .ls-hold { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+    .ls-hold { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0.75rem; }
     .ls-chip {
         font: inherit; font-size: var(--fs-xs, 0.75rem); padding: 0.3rem 0.7rem;
         border: 1px solid var(--border-strong); border-radius: 999px;
@@ -757,6 +766,17 @@
     .ls-fin-verdict { font-weight: 700; color: var(--success); }
     .ls-fin-verdict.ls-short { color: var(--danger, var(--warning)); }
     .ls-fin { display: grid; gap: 1rem; }
+    /* behavior 109: the one submit, in view at the foot of the sheet however far it scrolls.
+       Absolute on .sheet (its nearest positioned ancestor), where the section menu's pill
+       sits — not sticky: a sticky bar rests above the guest line and the disclaimer that
+       follow it in .body (measured 2026-10-17: 652 of 757 at the foot). The body keeps the
+       pill's bottom padding, so the last line scrolls clear of it. */
+    .ls-fin-submit {
+        position: absolute; left: 0; right: 0; bottom: 0; z-index: 6;
+        padding: 0.75rem var(--sp-5) calc(0.75rem + env(safe-area-inset-bottom, 0px));
+        background: linear-gradient(to bottom, transparent, var(--surface) 0.75rem);
+    }
+    .ls-fin-submit :global(button) { width: 100%; padding: 0.8rem 1rem; font: inherit; font-weight: 700; }
     .ls-fin-effect { margin: 0.25rem 0 0; font-size: 0.85rem; color: var(--muted); }
     .ls-cash-verdict > div { display: flex; justify-content: space-between; gap: 0.75rem; }
     .ls-cash-verdict dt { color: var(--muted); font-size: var(--fs-sm, 0.875rem); }
