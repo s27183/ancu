@@ -1,10 +1,10 @@
 ---
 slug: kb.lender.firb-approval-as-condition-precedent
 effective_from: 2025-07-01
-last_verified: 2026-07-06
+last_verified: 2026-10-18
 sources:
   - url: https://wise.com/us/blog/getting-a-mortgage-in-australia
-    retrieved: 2026-07-06
+    retrieved: 2026-10-18
     note: "\"Your mortgage application can't proceed without Foreign Investment Review Board approval, so start this process early\" — grounds the loan-side sequencing (FIRB before settlement). The regulated approval-before-acquisition requirement is owned by kb.firb.* (cross-ref). Lender-practice convention (aggregator source)"
 ---
 
