@@ -1,0 +1,105 @@
+Source: https://investment.infrastructure.gov.au/sites/default/files/documents/sa-state-overview-2026-27-budget.pdf
+Retrieved: 2026-10-18
+Extracted: pdftotext (reading order, not -layout: the overview sets its text in two columns) of the fetched PDF; sha256 of the fetched PDF 1ac129a008160589fbd99895cf18fb19266ed65a3559af9b3434eb039a6ad161
+
+www
+
+South Australia
+Infrastructure Investment Program
+2026–27 Budget
+
+Connecting Australians I Enriching Communities I Empowering Regions
+Supporting priority land transport infrastructure projects
+
+The Australian Government is continuing
+to invest in infrastructure around Australia,
+investing over $120 billion over 10 years in
+the infrastructure investment pipeline. Our
+infrastructure projects improve productivity,
+resilience, safety and liveability for
+communities around the country. We are
+carefully managing this investment to
+ensure that we can continue to deliver
+nationally significant and locally important
+infrastructure while retaining responsible
+financial management.
+Through the 2026-27 Budget, the
+Government has committed over
+$52 million to new and existing projects in
+the Infrastructure Investment Program
+(IIP), supporting the delivery and
+progression of important upgrades within
+South Australia.
+
+South Australia
+
+This means that as at the 2026-27 Budget,
+the Government’s total commitment to
+South Australia under the IIP, over the
+next 10 years, is $8.1 billion, including $7.1
+billion towards major road and rail projects
+and $1.0 billion for smaller projects and
+programs such as the Roads to Recovery,
+Safer Local Roads and Infrastructure, and
+Black Spot programs.
+The Government recognises that
+infrastructure delivery continues to be
+affected by uncertain global conditions,
+including market volatility, supply chain
+pressures and higher construction costs.
+We will continue working with South
+Australia to deliver projects that will benefit
+Australians into the future.
+
+New Projects
+Through the 2026–27 Budget, the Australian Government has committed $7.5 million to a new
+project in South Australia.
+
+AUKUS Planning Study and Business Case
+The Australian Government has committed $7.5 million to the project, which will
+undertake planning for key transport infrastructure upgrades that will improve
+commuter and freight access to the Lefevre Peninsula in North-West Adelaide,
+including to the AUKUS Defence precinct. Key elements include options analysis,
+reference design development, cost estimation, and business case preparation.
+Summary – New Projects
+
+($m)
+
+AUKUS Planning Study and Business Case
+
+7.5
+
+Total
+
+7.5
+
+Projects receiving additional funding
+Through the 2025–26 Budget, the Australian Government has committed $45 million to
+support the delivery of existing projects.
+
+South Eastern Freeway Upgrade
+This project is delivering essential repairs and safety works to the Heysen Tunnels,
+and introducing managed motorway technology to the South Eastern Freeway. This
+will improve road safety and reduce delays caused by traffic incidents.
+The Australian Government has committed an additional $45 million towards the
+project. This additional funding will be used to undertake essential repairs of crib walls
+at several locations along the South Eastern Freeway and install variable message signage to inform
+road users of incidents.
+The total Australian Government commitment towards the project is now $265 million.
+Summary – Additional Funding
+
+($m)
+
+South Eastern Freeway Upgrade
+
+45.0
+
+Total
+
+45.0
+
+South Australia
+
+Page 2 of 2
+
+

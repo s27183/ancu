@@ -1,0 +1,266 @@
+Source: https://investment.infrastructure.gov.au/sites/default/files/documents/vic-state-overview-2026-27-budget.pdf
+Retrieved: 2026-10-18
+Extracted: pdftotext (reading order, not -layout: the overview sets its text in two columns) of the fetched PDF; sha256 of the fetched PDF 11c6f57538cff2e6c49a145986734699ca5fe2af7caf0802bb0fdb228b948b41
+
+www
+
+Victoria
+Infrastructure Investment Program
+2026–27 Budget
+
+Connecting Australians I Enriching Communities I Empowering Regions
+Supporting priority land transport infrastructure projects
+
+The Australian Government is continuing
+to invest in infrastructure around Australia,
+investing over $120 billion over 10 years in
+the infrastructure investment pipeline. Our
+infrastructure projects improve productivity,
+resilience, safety and liveability for
+communities around the country. We are
+carefully managing this investment to
+ensure that we can continue to deliver
+nationally significant and locally important
+infrastructure while retaining responsible
+financial management.
+Through the 2026-27 Budget, the
+Government has committed nearly
+$130 million to new projects and
+$4.2 billion to existing projects in the
+Infrastructure Investment Program (IIP),
+supporting the delivery and progression of
+important upgrades within Victoria.
+
+Victoria
+
+This means that as at the 2026-27 Budget,
+the Government’s total commitment to
+Victoria under the IIP, over the next
+10 years, is $21.5 billion, including
+$19.1 billion towards major road and rail
+projects and $2.5 billion for smaller
+projects and programs such as the Roads
+to Recovery, Safer Local Roads and
+Infrastructure, and Black Spot programs.
+The Government recognises that
+infrastructure delivery continues to be
+affected by uncertain global conditions,
+including market volatility, supply chain
+pressures and higher construction costs.
+We will continue working with Victoria to
+deliver projects that will benefit Australians
+into the future.
+
+New Projects
+Through the 2026–27 Budget, the Australian Government has committed $127.4 million to
+three new projects in Victoria.
+
+Melton Line Electrification - Development
+The Australian Government has committed $76.4 million to the project, which will
+deliver development works to support future electrification of the Melton Line. Key
+elements include site investigations, design and planning, and long-lead equipment
+procurement to inform future electrification.
+
+Western Freeway Upgrade (Melton to Caroline Springs) Preconstruction
+The Australian Government has committed $50 million to deliver preconstruction
+works on the Western Freeway between Melton and Caroline Springs, progressing
+detailed investigations, design development, and targeted land, planning and
+environmental studies.
+
+Princes Highway West - Mackinnons Bridge Strengthening over Mount
+Emu Creek, Terang
+The Australian Government has committed $1 million to the project, which will
+upgrade Mackinnons Bridge over Mount Emu Creek, Terang on the Princes
+Highway.
+Summary – New Projects
+
+($m)
+
+Melton Line Electrification - Development
+
+76.4
+
+Western Freeway Upgrade (Melton to Caroline Springs) - Preconstruction
+
+50.0
+
+Princes Highway West - Mackinnons Bridge Strengthening over Mount Emu Creek, Terang
+
+1.0
+
+Total
+
+Victoria
+
+127.4
+
+Page 2 of 5
+
+Projects receiving additional funding
+Through the 2025–26 Budget, the Australian Government has committed $4.2 billion to
+support the delivery of 10 existing projects.
+
+Suburban Rail Loop East
+This project is delivering the first section of the Suburban Rail Loop through the
+construction of twin rail tunnels and six underground stations across east and south
+east Melbourne. This will enable improved connectivity between key employment,
+education and health precincts, including Cheltenham, Clayton, Monash, Burwood,
+Glen Waverley and Box Hill.
+The Australian Government has committed an additional $3.8 billion towards the project. This
+additional funding will support delivery of the project by increasing the Australian Government’s
+funding contribution. The total Australian Government commitment towards the project is now
+$6.0 billion.
+
+Western Highway - Ballarat to Stawell Duplication
+This project is delivering staged duplication of sections along the Western Highway
+between Ballarat and Stawell in western Victoria. It will improve safety and support
+increased capacity, improved connectivity and more realiable journeys along a key
+transport corridor linking western Victoria with Ballarat and the broader transport
+network.
+The Australian Government has committed an additional $372.5 million towards the project to
+address cost pressures arising from delays, escalation and redesign requirements associated for
+Section 2B (Buangor to Ararat). The total Australian Government commitment towards the project is
+now $970.9 million.
+
+Road Blitz
+This project is delivering a package of works to increase capacity and improve
+efficiency in Melbourne’s suburbs and surrounds.
+The Australian Government has committed an additional $37.4 million towards
+Road Blitz to deliver the Donnybrook Road Upgrade – Stage 2 project, which will
+duplicate Donnybrook Road over the Hume Freeway and improve the active transport
+connections over the freeway interchange.The total Australian Government commitment towards the
+project is now over $1.037 billion.
+
+Princes Highway East - Lloyd Street (Moe-Glengarry Road) and Waterloo
+Road Intersection Upgrade, Moe
+This project will deliver upgrades to the intersection of Lloyd Street (Moe-Glengarry
+Road) and Waterloo Road in Moe, including associated road-rail interfaces. This will
+enable improved traffic movement and safer integration between road and rail
+infrastructure at this key junction on the Princes Highway.
+The Australian Government has committed an additional $6.9 million towards the project. This
+additional funding will address cost pressures arising from general escalation, higher track
+occupation costs and increased signalling works. The total Australian Government commitment
+towards the project is now $16.2 million.
+Victoria
+
+Page 3 of 5
+
+Princes Highway East - Princes Highway and Bank Street Intersection
+Upgrade, Traralgon
+This project is delivering upgrades to the intersection of Princes Highway and Bank
+Street in Traralgon, including improved pedestrian facilities. This will enable safer
+and more efficient movement for pedestrians and vehicles at this key intersection on
+the Princes Highway.
+The Australian Government has committed an additional $5.8 million towards the project. This
+additional funding will address cost pressures arising from general escalation, higher track
+occupation costs and additional cable trenching works. The total Australian Government commitment
+towards the project is now $12.3 million.
+
+Princes Highway West - Blue Church Intersection Upgrade
+This project will deliver an upgrade to the intersection of the Princes Highwaywith
+Timboon-Colac Road and Nalangil Road at Pirron Yallock, west of Colac. This will
+enable improved traffic movement and connectivity at this key junction on the
+Princes Highway.
+The Australian Government has committed an additional $5.2 million towards the
+project. This additional funding will address cost pressures arising from market escalation exceeding
+the available contingency following consideration of alternative options which would not have
+achieved the project’s intended safety outcomes. The total Australian Government commitment
+towards the project is now $15.2 million.
+
+Princes Highway Intersection Upgrades - Pakenham to Beaconsfield
+This project has delivered four of the six planned upgrades to intersections along the
+Princes Highway between Pakenham and Beaconsfield. This has enabled improved
+traffic movement and connectivity along this busy section of the Princes Highway
+Corridor.
+The Australian Government has committed an additional $2.7 million towards the
+project. This additional funding will enable the delivery of the sixth intersection at Arena Parade and
+the Princes Highway. The total Australian Government commitment towards the project is now
+$26.3 million.
+
+Fitzsimons Lane and Main Road Corridor, Eltham - Nillumbik Shire
+Council
+This project has delivered targeted upgrades along the Fitzsimons Lane and Main
+Road corridor in Eltham. This has enabled improved traffic movement and
+connectivity along a key local transport corridor in the Nillumbik Shire area.
+The Australian Government has committed an additional $1.6 million towards the
+project. This additional funding will address cost pressures arising from increased construction costs,
+enabling delivery of the project’s final scope item, being the installation of pedestrian-operated traffic
+signals on Main Road at Eltham railway station.
+The total Australian Government commitment towards the project is now $6.6 million.
+
+Victoria
+
+Page 4 of 5
+
+Princes Highway West – Bridge Upgrade Moyne River, Rosebrook
+This project has delivered upgrades to the bridge over the Moyne River on the
+Princes Highway at Rosebrook. The upgrade hasThis has improved freight
+productivity, access and connectivity, and strengthened road safety along this
+corridor.
+The Australian Government has committed nearly $50,000 in additional funding to
+address towards the project. This additional funding will address cost pressures to reflect the final
+cost of the project. The total Australian Government commitment towards the project is now
+$1.0 million.
+
+Princes Highway West – Bridge Upgrade Merri River, Dennington
+This project has delivered upgrades to the bridge over the Merri River on the Princes
+Highway West at Dennington. This has enabled improvements to freight productivity,
+access and connectivity and road safety.
+The Australian Government has committed nearly $50,000 in additional funding
+towards the project. This additional funding will address cost pressures to reflect the
+final cost of the project. The total Australian Government commitment towards the project is now
+$1.6 million.
+
+Summary – Additional Funding
+Suburban Rail Loop East
+
+($m)
+3,800.00
+
+Western Highway - Ballarat to Stawell Duplication
+
+372.50
+
+Road Blitz
+
+37.40
+
+Princes Highway East - Lloyd Street (Moe-Glengarry Road) and Waterloo Road
+Intersection Upgrade, Moe
+
+6.90
+
+Princes Highway East - Princes Highway and Bank Street Intersection Upgrade,
+Traralgon
+
+5.80
+
+Princes Highway West - Blue Church Intersection Upgrade
+
+5.20
+
+Princes Highway Intersection Upgrades - Pakenham to Beaconsfield
+
+2.70
+
+Fitzsimons Lane and Main Road Corridor, Eltham - Nillumbik Shire Council
+
+1.60
+
+Princes Highway West - Bridge Upgrade Moyne River, Rosebrook
+
+0.05
+
+Princes Highway West - Bridge Upgrade Merri River, Dennington
+
+0.05
+
+Total
+
+Victoria
+
+4,232.10
+
+Page 5 of 5
+
+

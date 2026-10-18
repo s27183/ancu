@@ -1,0 +1,132 @@
+Source: https://investment.infrastructure.gov.au/sites/default/files/documents/nsw-state-overview-2026-27-budget.pdf
+Retrieved: 2026-10-18
+Extracted: pdftotext (reading order, not -layout: the overview sets its text in two columns) of the fetched PDF; sha256 of the fetched PDF ae267f051f8cb5dcc94f676e955635e03e250f5d9dc8f6177684e09b54bbc088
+
+www
+
+New South Wales
+Infrastructure Investment Program
+2026–27 Budget
+
+Connecting Australians I Enriching Communities I Empowering Regions
+Supporting priority land transport infrastructure projects
+
+The Australian Government is continuing
+to invest in infrastructure around Australia,
+investing over $120 billion over 10 years in
+the infrastructure investment pipeline. Our
+infrastructure projects improve productivity,
+resilience, safety and liveability for
+communities around the country. We are
+carefully managing this investment to
+ensure that we can continue to deliver
+nationally significant and locally important
+infrastructure while retaining responsible
+financial management.
+Through the 2026-27 Budget, the
+Government has committed $95 million to
+new projects and $300 million to existing
+projects in the Infrastructure Investment
+Program (IIP), supporting the delivery and
+progression of important upgrades within
+New South Wales.
+
+New South Wales
+
+This means that as at the 2026-27 Budget,
+the Government’s total commitment to
+New South Wales under the IIP, over the
+next 10 years, is $17.3 billion, including
+$13.9 billion towards major road and rail
+projects and $3.4 billion for smaller
+projects and programs such as the Roads
+to Recovery, Safer Local Roads and
+Infrastructure, and Black Spot programs.
+The Government recognises that
+infrastructure delivery continues to be
+affected by uncertain global conditions,
+including market volatility, supply chain
+pressures and higher construction costs.
+We will continue working with New South
+Wales to deliver projects that will benefit
+Australians into the future.
+
+New Projects
+Through the 2026–27 Budget, the Australian Government has committed $95 million to new
+projects in New South Wales.
+
+Sydney to Canberra Rail Corridor Upgrade
+The Australian Government has committed $50 million towards the Sydney to
+Canberra Rail Corridor Upgrade, to be delivered by the NSW Government. The
+project will deliver upgrades to the rail corridor and develop a business case for
+longer-term initiatives. With further investment from the NSW and ACT
+Governments, there is up to $100m available for this important project.
+
+M1 Safety Improvements
+The Australian Government has committed $45 million to the project, which will
+deliver new and upgraded road crossovers and install intelligent transport system
+signage on the M1 between Wahroonga and Beresfield.
+
+Summary – New Projects
+
+($m)
+
+Sydney to Canberra Rail Corridor Upgrade
+
+50.0
+
+M1 Safety Improvements
+
+45.0
+
+Total
+
+95.0
+
+New South Wales
+
+Page 2 of 3
+
+Projects receiving additional funding
+Through the 2026-27 Budget, the Australian Government has committed $300 million to
+support the delivery of existing projects.
+
+Liverpool to Airport Transit Corridor, Fifteenth Avenue
+This project will upgrade Fifteenth Avenue as part of a vital east west public
+transport corridor between Liverpool, Bradfield and the Western Sydney Airport.
+The Australian Government has committed an additional $200 million towards the
+project. This additional funding will allow for the full scope of upgrades to be delivered
+on Fifteenth Avenue, extending from Cowpasture Road through to Devonshire Road. The total
+Australian Government commitment towards the project is now $700 million.
+
+Elizabeth Drive - Priority Sections Upgrade
+This project will deliver upgrades to priority sections of Elizabeth Drive in Western
+Sydney. This will enable improved support for freight and commuter traffic, and
+support access to the Western Sydney International Airport and Aerotropolis
+precincts.
+The Australian Government has committed an additional $100 million towards the
+project. This additional funding will allow the full scope of upgrades to priority sections to be
+delivered, extending from east of Devonshire Road through to Badgerys Creek Road. The total
+Australian Government commitment towards the project is now $500 million.
+
+Summary – Additional Funding
+
+($m)
+
+Liverpool to Airport Transit Corridor, Fifteenth Avenue
+
+200.0
+
+Elizabeth Drive - Priority Sections Upgrade
+
+100.0
+
+Total
+
+300.0
+
+New South Wales
+
+Page 3 of 3
+
+

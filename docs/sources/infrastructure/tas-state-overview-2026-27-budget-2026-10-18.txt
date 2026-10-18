@@ -1,0 +1,107 @@
+Source: https://investment.infrastructure.gov.au/sites/default/files/documents/tas-state-overview-2026-27-budget.pdf
+Retrieved: 2026-10-18
+Extracted: pdftotext (reading order, not -layout: the overview sets its text in two columns) of the fetched PDF; sha256 of the fetched PDF 1d4a418b1933be7ed451302cb6887234f0bacc61c6834a6341f7616537734183
+
+www
+
+Tasmania
+Infrastructure Investment Program
+2026–27 Budget
+
+Connecting Australians I Enriching Communities I Empowering Regions
+Supporting priority land transport infrastructure projects
+
+The Australian Government is continuing
+to invest in infrastructure around Australia,
+investing over $120 billion over 10 years in
+the infrastructure investment pipeline. Our
+infrastructure projects improve productivity,
+resilience, safety and liveability for
+communities around the country. We are
+carefully managing this investment to
+ensure that we can continue to deliver
+nationally significant and locally important
+infrastructure while retaining responsible
+financial management.
+Through the 2026-27 Budget, the
+Government has committed over $6 million
+to new and existing projects in the
+Infrastructure Investment Program (IIP),
+supporting the delivery and progression of
+important upgrades within Tasmania.
+
+Tasmania
+
+This means that as at the 2026-27 Budget,
+the Government’s total commitment to
+Tasmania under the IIP, over the next
+10 years, is $2.2 billion, including
+$1.8 billion towards major road and rail
+projects and nearly $400 million for smaller
+projects and programs such as the Roads
+to Recovery, Safer Local Roads and
+Infrastructure, and Black Spot programs.
+The Government recognises that
+infrastructure delivery continues to be
+affected by uncertain global conditions,
+including market volatility, supply chain
+pressures and higher construction costs.
+We will continue working with Tasmania to
+deliver projects that will benefit Australians
+into the future.
+
+New Projects
+Through the 2026–27 Budget, the Australian Government has committed $4 million to one
+new project in Tasmania.
+
+East Derwent Highway - Bowen Bridge to Bridgewater Improvements Planning
+The Australian Government has committed $4 million to the project, which will
+undertake planning for upgrades at the East Derwent Highway and Goodwood Road
+intersection at the Bowen Bridge, as well as public and active transport
+improvements along the highway. Key elements include planning for the future delivery of
+intersection, bus stop, pedestrian facilities and active transport infrastructure upgrades.
+Summary – New Projects
+
+($m)
+
+East Derwent Highway - Bowen Bridge to Bridgewater Improvements - Planning
+
+4.0
+
+Total
+
+4.0
+
+Projects receiving additional funding
+Through the 2026-27 Budget, the Australian Government has committed $2.4 million to
+support the delivery of one existing project.
+
+Heavy Vehicle Rest Areas
+This project is delivering upgrades to an existing weighbridge site on the Bass
+Highway near Howth and constructing a new heavy vehicle rest area at the East
+Tamar Highway and Bridport Road junction at Bell Bay. These upgrades will enable
+improved rest and compliance facilities for heavy vehicle operators along key freight
+routes in Tasmania.
+The Australian Government has committed an additional $2.4 million towards the project. This
+additional funding will address cost pressures resulting from construction material increases, the
+inclusion of toilet facilities at the sites in response to industry requirements, contaminated soil at the
+original East Tamar site, and the associated infrastructure required to supply power and water to
+each site.
+The total Australian Government commitment towards the project is now $6.4 million.
+Summary – Additional Funding
+
+($m)
+
+Heavy Vehicle Rest Areas
+
+2.4
+
+Total
+
+2.4
+
+Tasmania
+
+Page 2 of 2
+
+
