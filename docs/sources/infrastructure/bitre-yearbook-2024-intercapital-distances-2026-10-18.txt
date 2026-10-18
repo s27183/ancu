@@ -1,0 +1,24 @@
+Source: https://www.bitre.gov.au/sites/default/files/documents/australian-infrastructure-and-transport-statistics--yearbook-2024--january-2025.pdf
+Retrieved: 2026-10-18
+Extracted: pdftotext -layout of PDF page 120 only (Table 6.1, Intercapital road distances) of the fetched PDF; sha256 of the fetched PDF 866fda91566feaadc2ca2a705b850ae437526953b50dc4ef74f74d97d7fe2006
+
+Chapter 6: Road
+
+
+Table 6.1         Intercapital road distances
+
+                        Sydney      Melbourne        Brisbane       Adelaide   Perth   Darwin   Canberra
+                                                                    km
+Sydney                        -            878            911          1 375   3 934    3 936        287
+Melbourne                     -              -          1 777            726   3 419    3 754        663
+Brisbane                      -              -              -          2 034   4 316    3 426      1 195
+Adelaide                      -              -              -              -   2 695    3 030      1 160
+Perth                         -              -              -              -       -    3 854      3 716
+Darwin                        -              -              -              -       -        -      3 935
+Source:     Google maps as at 16 November 2023
+
+
+
+
+120       Australian Infrastructure and Transport Statistics Yearbook 2024
+

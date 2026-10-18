@@ -37,7 +37,7 @@
                 {$t('intro.source')}:
                 {#each srcs as src, k (k)}{#if k}{', '}{/if}{#if src.url}<a href={src.url} target="_blank" rel="noopener noreferrer"
                             >{publisher(src, $lang)}</a
-                        >{/if}{#if src.kind === 'ranking'}{' '}<span class="wl-src-kind">({$t('intro.source.ranking')})</span>{/if}{/each}
+                        >{/if}{#if src.kind}{' '}<span class="wl-src-kind">({$t(src.kind === 'ranking' ? 'intro.source.ranking' : 'intro.source.reference')})</span>{/if}{/each}
                 · {formatAsOf(fact.as_of, $lang)}
             </p>
         </article>

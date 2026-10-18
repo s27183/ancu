@@ -1,0 +1,259 @@
+Source: https://en.wikipedia.org/wiki/Highway_1_(Australia)
+Retrieved: 2026-10-18
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML ec66860a546b34ca6b0c78c545c07c10a54cbd76d2854266fb734450b66f68a2
+
+Highway 1 (Australia) - Wikipedia
+Jump to content
+Route map :
+From Wikipedia, the free encyclopedia
+Network of highways that circumnavigate Australia
+{{AUshield|M|1|size=55px|alt=on}}&nbsp;{{AUshield|A|1|size=55px|alt=on}}{{AUshield|B|1|size=55px|alt=on}}&nbsp;{{AUshield|SA|R1|size=x40px|alt=on}}"},"location":{"wt":"Highway 1 (Australia) map.png"},"location_alt":{"wt":"Map of Australia's Highway 1"},"loc_caption":{"wt":"Map of Highway 1, which is a [[ring road]] around Australia. A separate section in [[Tasmania]] connects [[Hobart]] to [[Burnie, Tasmania|Burnie]]."},"maintained":{"wt":""},"length":{"wt":"14500"},"length_ref":{"wt":""},"est":{"wt":""},"route":{"wt":"{{AUshield|R|1|N|1|M|1}}{{AUshield|A|1|B|1|SA|R1}}"},"history":{"wt":"Highway 1 was established in 1955"},"show_links":{"wt":"yes"}},"i":0}}]}'>
+Highway 1
+Map of Highway 1, which is a ring road around Australia. A separate section in Tasmania connects Hobart to Burnie .
+General information
+Type
+Highway
+Length
+14,500 km (9,010 mi)
+History
+Highway 1 was established in 1955
+Route number(s)
+Highway system
+Highways in Australia
+National Highway • Freeways in Australia
+Australia ' s Highway 1 is a network of highways that circumnavigate the country, joining all mainland capital cities except the national capital, Canberra . At a total length of approximately 14,500 kilometres (9,000 miles) , it is the longest national highway in the world, surpassing the Trans-Siberian Highway (over 11,000 kilometres or 6,800 miles ) and the Trans-Canada Highway ( 8,030 kilometres or 4,990 miles ). Over a million people traverse some part of the highway network every day. [ 1 ] It is the longest continuing highway in the world as the Pan-American Highway is separated by the Darién Gap and AH1 is separated by the Sea of Japan . However, it is not the longest continuous stretch of highway as both the northern section of the Pan-American Highway and the continental section of AH1 still out-measure it.
+History
+[ edit ]
+Highway 1 was created as part of the National Route Numbering system , adopted in 1955. [ 2 ] The route was compiled from an existing network of state and local roads and tracks. [ 2 ] Highway 1 is the only route to reach across all Australian states, plus the Northern Territory. Many of the other national routes are tributaries of Highway 1.
+Under the original Highway 1 scheme, certain major traffic routes that ran parallel to the main route were designated National Route Alternative 1 . Most of these route designations have been replaced by either a state route designation, or an alpha-numeric route designation, depending on which state the section is in. An example of the Alternative 1 designation remaining is on the old Princes Highway route from Dandenong to South Melbourne in Victoria.
+Route markers
+[ edit ]
+The entirety of Highway 1 was originally marked with a National Route 1 shield (black number on a white shield). In 1974, the segments of the route that were declared part of the National Highway network were updated to use the National Highway shield (gold number on a green shield). [ 3 ]
+Since that time, all states and territories except for Western Australia have adopted (or are in the process of adopting) alphanumeric route numbers. As a consequence, much of Highway 1 is now marked with a M1, A1 or B1 route marker (depending on the route's quality and importance). A notable exception is in Tasmania , which was the first state to adopt alphanumeric route numbers but Highway 1 is still marked with a National Highway 1 shield.
+In South Australia , sections of Highway 1 which were once part of the National Highway were marked as "National Highway A1" or "National Highway M1" but have since been replaced by the standard "A1" and "M1" shield markers
+Track
+[ edit ]
+Large sections of Highway 1 are shared with the Australian National Highway , though the two are not synonymous. Where they diverge, Highway 1 follows a coastal route, such as the Princes Highway from Sydney to Melbourne, whereas the National Highway follows an inland (and generally more direct) route between major cities, such as the Hume Highway and Freeway from Sydney to Melbourne.
+Princes Highway, which is part of the Highway 1 network, at Moruya, New South Wales
+From Sydney , it heads southwards to Melbourne and onwards toward Adelaide . This section mostly follows the Princes Highway , except sections where that highway has been bypassed by freeways. It leaves the Sydney central business district via the Eastern Distributor , and continues southward through the Sydney metropolitan area via Southern Cross Drive , General Holmes Drive , The Grand Parade, President Avenue, and the Princes Highway (NSW) . From Sydney's southern outskirts, it proceeds to Wollongong via the Princes Motorway , which bypasses the parallel section of the Princes Highway. Highway 1 returns to the Princes Highway south of Wollongong, from which it traverses the length of the NSW South Coast and into Victoria. East of Melbourne, Highway 1/Princes Highway turns into the eastern section of the Princes Freeway . Within Melbourne, this freeway turns into the Monash Freeway , and then into CityLink , which passes just south of the Melbourne central business district.
+Highway 1 exits Melbourne to the west via the West Gate Freeway and the western section of the Princes Freeway towards Geelong , which it bypasses via the Geelong Ring Road . It then proceeds west following the Princes Highway to Warrnambool , into South Australia to Mount Gambier , and then to Adelaide.
+From there, it runs to Perth via Port Wakefield Road , Augusta Highway , Eyre Highway , Coolgardie-Esperance Highway , South Coast Highway and South Western Highway .
+It then heads to Darwin via Brand Highway , North West Coastal Highway , Great Northern Highway , Victoria Highway , and Stuart Highway .
+From Darwin, Highway 1 follows the Stuart Highway to Daly Waters , and thereafter the Carpentaria Highway to Borroloola . The Savannah Way is the largely unsignposted route for Highway 1 between the QLD/NT border, east of Borroloola, and Normanton, Queensland .
+From there, it follows the Gulf Developmental Road and Kennedy Highway to Cairns and southwards via the Bruce Highway and Gateway Motorway to Brisbane .
+It then returns to Sydney via the Queensland/northern NSW section of the Pacific Motorway (QLD/NSW) , the Pacific Highway (NSW) , and the Sydney–Newcastle section of the Pacific Motorway . The motorway ends in Sydney's northern suburbs, and Highway 1 follows the Pacific Highway through Sydney's upper north shore, before turning onto the Gore Hill Freeway , Warringah Freeway . It crosses beneath Sydney Harbour in the Sydney Harbour Tunnel , and follows the Cahill Expressway for a short stretch before joining the Eastern Distributor.
+In Tasmania , Highway 1 starts at the Brooker Highway in Hobart and heads towards Launceston via the Midland Highway . At Launceston it becomes the Bass Highway to Burnie . Highway 1 ends at Burnie; the Bass Highway continues to Marrawah on the west coast as Highway A2.
+Route markers
+[ edit ]
+State
+Segment
+Route marker
+Road(s)
+See also
+New South Wales
+Queensland border to West Ballina
+M1
+Pacific Motorway
+Highway 1 (New South Wales)
+West Ballina to Newcastle
+A1
+Pacific Highway
+Newcastle to Wahroonga
+M1
+Pacific Motorway
+Wahroonga to Artarmon
+A1
+Pacific Highway
+Artarmon to Mascot
+M1
+Gore Hill Freeway
+Warringah Freeway
+Sydney Harbour Tunnel
+Cahill Expressway
+Eastern Distributor
+Southern Cross Drive
+Mascot to Waterfall
+A1
+General Holmes Drive
+The Grand Parade
+President Avenue
+Princes Highway
+Waterfall to Yallah
+M1
+Princes Motorway
+Yallah to Traralgon
+A1
+Princes Highway
+Victoria
+Princes Highway (Vic)
+Highway 1 (Victoria)
+Traralgon to Colac
+M1
+Princes Freeway (east)
+Monash Freeway
+CityLink (southern link)
+West Gate Freeway
+Princes Freeway (west)
+Geelong Ring Road
+Colac to Mount Gambier
+A1
+Princes Highway
+South Australia
+Princes Highway
+Highway 1 (South Australia)
+Mount Gambier to Tailem Bend
+B1
+Tailem Bend to Murray Bridge
+A1
+Murray Bridge to Glen Osmond
+M1
+South Eastern Freeway
+Glen Osmond to Dulwich
+A1
+Glen Osmond Road
+Fullarton Road
+Dulwich to Medindie
+R1
+City Ring Route
+Medindie to WA border
+A1
+Main North Road
+Port Wakefield Road
+Port Wakefield Highway
+Augusta Highway
+Eyre Highway
+Western Australia
+SA border to Norseman
+National Highway 1
+Eyre Highway
+Highway 1 (Western Australia)
+Norseman to Port Hedland
+National Route 1
+Coolgardie–Esperance Highway (south)
+South Coast Highway
+South Western Highway
+Robertson Drive
+Forrest Highway
+Old Coast Road
+Mandurah Road
+Ennis Avenue
+Patterson Road
+Rockingham Road
+Stock Road
+Leach Highway
+Kwinana Freeway
+Canning Highway
+Great Eastern Highway
+Morrison Road
+Great Northern Highway
+Brand Highway
+North West Coastal Highway
+Port Hedland to NT border
+National Highway 1
+Great Northern Highway
+Victoria Highway
+Northern Territory
+WA border to Katherine
+Victoria Highway
+Highway 1 (Northern Territory)
+Katherine to Darwin spur
+Stuart Highway
+Katherine to Daly Waters
+Stuart Highway
+Daly Waters to Queensland border
+National Route 1
+Carpentaria Highway
+Savannah Way (see below)
+Queensland
+NT border to Cairns
+National Route 1
+Savannah Way (see below)
+Gulf Developmental Road
+Kennedy Highway
+Captain Cook Highway
+Highway 1 (Queensland)
+Cairns to Curra
+A1
+Bruce Highway
+Curra to NSW border
+M1
+Bruce Highway
+Gateway Motorway
+Pacific Motorway
+Tasmania
+Entire Route
+National Highway 1
+Brooker Highway
+Midland Highway
+Brighton Bypass
+Bass Highway
+Highway 1 (Tasmania)
+The Savannah Way section
+[ edit ]
+The 715-kilometre-long (444-mile) section from the eastern end of the Carpentaria Highway at Borroloola in the Northern Territory to the western end of the Gulf Developmental Road near Normanton in Queensland is part of the Savannah Way but has no highway name/s. Wollogorang Road runs from Borroloola to the NT/Qld border, and Westmoreland Road runs from there to Doomadgee . From there Doomadgee Road runs to Burketown , and Nardoo Burketown Road then runs to the Leichhardt River . Burketown Normanton Road runs from the river to the Burke Developmental Road near Normanton. National Highway 1 follows this south for 1.8 kilometres (1.1 mi) to the Gulf Developmental Road.
+Road conditions
+[ edit ]
+With such a vast length, road conditions vary greatly; [ 4 ] from multi-lane freeways in populous urban and rural areas, to sealed two-laners in remote areas, such as the Nullarbor Plain , to single lane roads, such as in northern Queensland .
+Some stretches are very isolated, such as the Eyre Highway , which crosses the Nullarbor Plain, and the Great Northern Highway , which runs close to the north-western coastline. Isolated roadhouses serving the small amount of passing traffic are often the only signs of human activity for hundreds of kilometres.
+Highway 1 has been described as a "death trap", [ 4 ] particularly two-lane sections in northern Queensland, due to driver fatigue. [ 4 ] The vast distances between destinations and limited rest areas, especially those suitable to trucks, contribute to the problem. [ 4 ]
+Sights
+[ edit ]
+Highway 1 covers practically every major inhabited part of Australia. Large capital cities, busy holiday resorts, dramatic coastlines, forests ranging from tropical to temperate gum forests, giant karri stands, scrubland, deserts, and huge tropical swamps are some of the variety of landscapes that can be found along the route.
+Stretches of Highway 1 are very popular with interstate and overseas tourists. A drive around Highway 1 with a major detour to Uluru and back again practically covers most of Australia. The number 1 shield became part of the bush landscape to many travellers, truckers/truckies, and country people.
+Record
+[ edit ]
+On 29 October 2023, Team Cobber Dingo set a new record for a complete lap of Australia [ 5 ] . While there have been previous attempts (notably Team Highway 1 to Hell’s record of 5 days, 13 hours & 43 minutes set in a 200 Series Toyota Landcruiser and which skipped Tasmania's stretch of road [ 6 ] ), Team Cobber Dingo did not omit sections of the highway, completing a full and complete lap of the longest National highway in the world. The vehicle chosen to complete the lap was a red 1998 Ford Falcon AU Series 1 Futura wagon nicknamed "Bill" [ 7 ] .
+Team Cobber Dingo (a team of 2 friends) commenced the lap in Hobart, Tasmania at midday on 22 October 2023, crossing the Bass Strait aboard the Spirit of Tasmania ferry that evening. The mainland portion of the lap commenced and concluded at the old Ford assembly plant in Geelong, Victoria. The direction of travel for the mainland portion (clockwise or anticlockwise) was determined by flipping a coin in the carpark of the old Ford assembly plant, the result being a clockwise loop [ 8 ] .
+The elapsed time, including the ferry voyage (approximately 10 hours), was 7 days, 3 hours & 11 minutes.
+See also
+[ edit ]
+Australian Roads portal
+Highway 1 (New South Wales)
+Highway 1 (Northern Territory)
+Highway 1 (Queensland)
+Highway 1 (South Australia)
+Highway 1 (Tasmania)
+Highway 1 (Victoria)
+Highway 1 (Western Australia)
+Highways in Australia
+List of A1 roads
+List of highways numbered 1
+References
+[ edit ]
+↑ "Journeys" (PDF) . Tourism Australia. December 2010. Archived from the original (PDF) on 22 February 2011 . Retrieved 6 February 2013 .
+1 2 Taylor, David (2012). The Highway One travel companion. Volume 1, Melbourne to Tweed Heads . Salisbury, Queensland: Boolarong Press. p. 9. ISBN 9780987218902 . Archived from the original on 6 October 2016 . Retrieved 13 January 2013 .
+↑ Distance book (12 ed.). Main Roads Western Australia. 2012. pp. 4– 5. ISBN 978-0-7309-7657-8 . Archived from the original on 24 October 2012 . Retrieved 8 October 2012 .
+1 2 3 4 Doyle, John (31 December 2012). "Australia's Highway 1" (MP3) . Radio National Breakfast . Australian Broadcasting Corporation. Archived from the original on 14 October 2013 . Retrieved 13 January 2013 .
+↑ "Cobber Dingo - Home" . cobberdingo.com.au . Retrieved 31 July 2026 .
+↑ "Around Australia speed record broken" . Archived from the original on 19 June 2017 . Retrieved 31 July 2026 .
+↑ "Bill, the car formally known as Priscilla (@bill_who_was_priscilla) • Instagram photos and videos" . www.instagram.com . Retrieved 31 July 2026 .
+↑ "Bill, the car formally known as Priscilla (@bill_who_was_priscilla) • Instagram photos and videos" . www.instagram.com . Retrieved 31 July 2026 .
+External links
+[ edit ]
+Male, Andrew. "National Highway One" . Australian Broadcasting Corporation . Archived from the original on 4 October 2007 . Retrieved 2 October 2007 .
+Further reading
+[ edit ]
+'''Route map''': </span>"}}'/>
+KML file ( edit · help )
+Template:Attached KML/Highway 1 (Australia)
+KML is from Wikidata
+Wikivoyage has a travel guide for Highway 1 (Australia) .
+Catherine Lawson; David Bristow (2012). High Way One: The Ultimate Australian Road Trip . Australian Geographic. ISBN 9781742453439 .
+Farwell, George; McArdle, Brian (1966), Around Australia on Highway One , Thomas Nelson (Australia)
+Retrieved from " https://en.wikipedia.org/w/index.php?title=Highway_1_(Australia)&oldid=1377622436 "
+Categories :
+Highway 1 (Australia)
+Highways in Australia
+Hidden categories:
+Articles with short description
+Short description matches Wikidata
+Use dmy dates from September 2018
+Use Australian English from September 2015
+All Wikipedia articles written in Australian English
+Pages using gadget WikiMiniAtlas
+Articles using KML from Wikidata
+Search
+Search
+Highway 1 (Australia)
+13 languages
+Add topic
