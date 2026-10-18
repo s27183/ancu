@@ -15,7 +15,10 @@ to the routine with `RemoteTrigger update` in the same behavior that changes it.
 **Why its own routine.** A news item read a week late is old news to a reader who
 opens the app every day; a fact re-check is not urgent in the same way, and doing
 30 of them daily would cost thirty times as much. Splitting them keeps the daily run
-to a few minutes (the news and visa steps of the 2026-10-18 kb-watch run).
+to a few minutes: measured 2026-10-19, the first forced run took 201 s and opened no
+PR, because the one open kb-watch PR (#164) already covered the day's visa releases;
+it restored `visa-watch.json` as step 2 says. It guessed four news-page addresses
+wrong (404) or was refused (403), so step 2 names each page.
 
 **How it stays inside the gate.** Its branch is `kb-watch-news-<yyyy-mm-dd>`, so
 scripts/kb_gate.py (`BRANCH_PREFIX = "kb-watch-"`) judges it as it judges kb-watch,
@@ -48,10 +51,24 @@ existing news note in `docs/kb/news/` as the shape to copy.
 
 2. News. Find each change a Vietnamese buyer of Australian property would care about,
    published since the newest `authored_date` among the covered notes, on these
-   government sites: ato.gov.au, revenue.nsw.gov.au, sro.vic.gov.au, qro.qld.gov.au,
-   revenuesa.sa.gov.au, finance.wa.gov.au (RevenueWA), treasury.gov.au and budget.gov.au,
-   firb.gov.au, housingaustralia.gov.au, rba.gov.au, asic.gov.au. Government sources
-   only: no news outlet, blog or aggregator.
+   government news pages (curl with `-A Mozilla/5.0 -L`; each answered 200 on
+   2026-10-19 unless noted):
+   - https://www.rba.gov.au/rss/rss-cb-media-releases.xml
+   - https://asic.gov.au/newsroom/media-releases/
+   - https://www.ato.gov.au/media-centre (refused a cloud run with 403 on 2026-10-19)
+   - https://treasury.gov.au/media-release and https://budget.gov.au/
+   - https://www.revenue.nsw.gov.au/news-media-releases
+   - https://www.sro.vic.gov.au/news
+   - https://qro.qld.gov.au/news/
+   - https://www.revenuesa.sa.gov.au/news (refused with 403 on 2026-10-19)
+   - https://www.wa.gov.au/government/media-statements (WA ministers; RevenueWA has no
+     news page of its own)
+   - https://foreigninvestment.gov.au/news-and-reports/news (FIRB; firb.gov.au's
+     certificate does not match its name)
+   - https://www.housingaustralia.gov.au/media
+   Government sources only: no news outlet, blog or aggregator. A page that refuses or
+   moved is reported in the PR body (or the final line), never replaced by a non-government
+   page.
    Visa news (Home Affairs and its ministers): run `python3 scripts/visa_watch.py
    --update`. Each `RELEASE` or `PAGE` line it prints is a candidate: open it with
    curl (never WebFetch, which Home Affairs refuses), read only what changed, and write
