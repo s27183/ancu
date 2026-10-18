@@ -1,0 +1,182 @@
+Source: https://investment.infrastructure.gov.au/sites/default/files/documents/qld-state-overview-2026-27-budget.pdf
+Retrieved: 2026-10-18
+Extracted: pdftotext (reading order, not -layout: the overview sets its text in two columns) of the fetched PDF; sha256 of the fetched PDF f6a5b001712258c8c09c92a7d891f323b5ca83c61aa9aedfdeb1aee38bfde300
+
+www
+
+Queensland
+Infrastructure Investment Program
+2026–27 Budget
+
+Connecting Australians I Enriching Communities I Empowering Regions
+Supporting priority land transport infrastructure projects
+
+The Australian Government is continuing
+to invest in infrastructure around Australia,
+investing over $120 billion over 10 years in
+the infrastructure investment pipeline. Our
+infrastructure projects improve productivity,
+resilience, safety and liveability for
+communities around the country. We are
+carefully managing this investment to
+ensure that we can continue to deliver
+nationally significant and locally important
+infrastructure while retaining responsible
+financial management.
+Through the 2026-27 Budget, the
+Government has committed over
+$820 million to new projects and over $530
+million to existing projects in the
+Infrastructure Investment Program (IIP),
+supporting the delivery and progression of
+important upgrades within Queensland.
+
+Queensland
+
+This means that as at the 2026-27 Budget,
+the Government’s total commitment to
+Queensland under the IIP over the next
+10 years, is $26.5 billion, including
+$24.0 billion towards major road and rail
+projects and $2.5 billion for smaller
+projects and programs such as the Roads
+to Recovery, Safer Local Roads and
+Infrastructure, and Black Spot programs.
+The Government recognises that
+infrastructure delivery continues to be
+affected by uncertain global conditions,
+including market volatility, supply chain
+pressures and higher fuel and construction
+costs.
+We will continue working with Queensland
+to deliver projects that will benefit
+Australians into the future.
+
+New Projects
+At the 2026–27 Budget, the Australian Government has committed $822.5 million towards two
+new projects in Queensland.
+
+Bruce Highway - Gateway Motorway to Dohles Rocks Road (Stage 2)
+The Australian Government has committed $812.5 million to upgrade the Bruce
+Highway from the Gateway Motorway to Dohles Rock Road. The project will
+construct new collector-distributor roads and bridges across the Pine River. This
+commitment builds on previous investments made by the Australian Government to
+increase capacity and traffic flow on the Gateway Motorway and Bruce Highways and will address a
+key pinch point ahead of the Brisbane 2032 Olympic and Paralympic Games.
+
+M1 Pacific Motorway - Exit 45 (North) Ormeau
+The Australian Government has committed $10 million to the project, which will
+include design and preconstruction activities to improve the overpass at Exit 45. This
+investment will build on previous investments made by the Australian Government to
+upgrade the southbound off-ramp at Exit 45 on the M1 Pacific Motorway.
+Summary – New Projects
+
+($m)
+
+Bruce Highway - Gateway Motorway to Dohles Rocks Road (Stage 2)
+
+812.5
+
+M1 Pacific Motorway - Exit 45 (North) Ormeau
+
+10.0
+
+Total
+
+822.5
+
+Queensland
+
+Page 2 of 4
+
+Projects Receiving Additional Funding
+At the 2026–27 Budget, the Australian Government has committed $534.2 million to support
+the delivery of six existing projects in Queensland.
+
+Bruce Highway – Tiaro Bypass
+This project will construct a new four lane 9.6-kilometre bypass of the Bruce
+Highway at Tiaro, south of Maryborough. The Australian Government has committed
+a further $251.2 million towards the project, bringing its total commitment to $520
+million. This additional funding will address higher design standards and costs and
+to support completion ahead of the Brisbane 2032 Olympic and Paralympic Games.
+
+Cairns Western Arterial Road Duplication
+This project will duplicate the Cairns Western Arterial Road between the Redlynch
+Connector Road and the Captain Cook Highway. The Australian Government has
+committed an additional $166.3 million towards the project, bringing its total
+commitment to $382.3 million. This additional funding will support the staged
+delivery of the project, including the construction of Section 1 from Lake Placid Road to
+Captain Cook Highway ahead of the Brisbane 2032 Olympic and Paralympic Games.
+
+Boundary Road Level Crossing, Coopers Plains
+This project will construct a new road-over-rail overpass and remove the existing
+level crossing at Boundary Road in Coopers Plains. This will improve safety and
+traffic flow for road and rail users in the area. The Australian Government has
+committed an additional $99.7 million towards the project, bringing its total
+commitment to $279.2 million. This additional funding will support progression of the
+project by increasing the Australian Government’s funding share relative to Queensland’s.
+
+Bowen Basin Service Link – Walkerston Bypass
+This project delivered a new, two-lane 10.4-kilometre bypass connecting the Peak
+Downs Highway to the Mackay Ring Road (Stage 1). The Australian Government
+has committed an additional $13 million towards the project, bringing its total
+commitment to $194.9 million. This additional funding will finalise the project
+following practical completion in September 2025.
+
+Bruce Highway – Caboolture-Bribie Island Road to Steve Irwin Way
+This project delivered 11 kilometres of upgrades and constructed an additional lane
+in each direction on the Bruce Highway between Caboolture-Bribie Island Road and
+Steve Irwin Way. The Australian Government has committed an additional
+$2 million towards the project, bringing its total commitment to $328.7 million. This
+additional funding will finalise the project following practical completion in
+July 2024.
+
+Queensland
+
+Page 3 of 4
+
+Glass House Mountains Road (Steve Irwin Way) and Caloundra Street
+Intersection Upgrade
+This project delivered an upgrade to the intersection of Glass House Mountains
+Road (Steve Irwin Way) and Caloundra Street at Landsborough. This will enable
+improved traffic movement and connectivity for road users in the Landsborough
+area. The Australian Government has committed an additional $2 million towards the
+project, bringing its total commitment to $5.8 million. This additional funding will finalise the project
+following practical completion in December 2025.
+Summary – Additional Funding
+
+($m)
+
+Bruce Highway – Tiaro Bypass
+
+251.2
+
+Cairns Western Arterial Road Duplication
+
+166.3
+
+Boundary Road Level Crossing, Coopers Plains
+
+99.7
+
+Bowen Basin Service Link – Walkerston Bypass
+
+13.0
+
+Bruce Highway – Caboolture-Bribie Island Road to Steve Irwin Way
+
+2.0
+
+Glass House Mountains Road (Steve Irwin Way) and Caloundra Street Intersection Upgrade
+
+2.0
+
+Total
+
+Queensland
+
+534.2
+
+Page 4 of 4
+
+

@@ -1,0 +1,223 @@
+Source: https://investment.infrastructure.gov.au/sites/default/files/documents/western-australia-state-overview-2026-27-budget.pdf
+Retrieved: 2026-10-18
+Extracted: pdftotext (reading order, not -layout: the overview sets its text in two columns) of the fetched PDF; sha256 of the fetched PDF 349fa69bf2599cebd3bf6625ed6db36542f5a193af753a7dd4a12cbf50a29140
+
+www
+
+Western Australia
+Infrastructure Investment Program
+2026–27 Budget
+
+Connecting Australians I Enriching Communities I Empowering Regions
+Supporting priority land transport infrastructure projects
+
+The Australian Government is continuing
+to invest in infrastructure around Australia,
+investing over $120 billion over 10 years in
+the infrastructure investment pipeline. Our
+infrastructure projects improve productivity,
+resilience, safety and liveability for
+communities around the country. We are
+carefully managing this investment to
+ensure that we can continue to deliver
+nationally significant and locally important
+infrastructure while retaining responsible
+financial management.
+Through the 2026-27 Budget, the
+Government has committed $556 million to
+new projects and $334.2 million to existing
+projects in the Infrastructure Investment
+Program (IIP), supporting the delivery and
+progression of important upgrades within
+Western Australia.
+
+Western Australia
+
+This means that as at the 2026-27 Budget,
+the Government’s total commitment to
+Western Australia under the IIP, over the
+next 10 years, is $6.3 billion, including $4.6
+billion towards major road and rail projects
+and $1.7 billion for smaller projects and
+programs such as the Roads to Recovery,
+Safer Local Roads and Infrastructure, and
+Black Spot programs.
+The Government recognises that
+infrastructure delivery continues to be
+affected by uncertain global conditions,
+including market volatility, supply chain
+pressures and higher construction costs.
+We will continue to work with Western
+Australia to deliver projects that will benefit
+Australians into the future.
+
+New Projects
+Through the 2026–27 Budget, the Australian Government has committed $556 million to new
+projects in Western Australia.
+
+Westport - Anketell Road Upgrades - Stage 1A and 1B
+The Australian Government has committed $552 million to the project, which will
+upgrade Anketell Road from Leath Road to Abercrombie Road to four lanes,
+including a grade separation at Rockingham Road, associated road/road grade
+separation structures, intersection upgrades and tie-ins. The project will support the
+proposed new Westport container port terminal and deliver increased road capacity, improved freight
+efficiency, reduced travel times, and increased safety for all road users.
+
+Great Northern Highway Improvements – Broome to Kununurra
+The Australian Government has committed $4 million to the project, which will
+deliver detailed planning for upgrades to improve road safety, transport connectivity
+and network resilience along the Great Northern Highway between Broome and
+Kununurra.
+
+Summary – New Projects
+
+($m)
+
+Westport - Anketell Road Upgrades - Stage 1A and 1B
+
+552.0
+
+Great Northern Highway Improvements – Broome to Kununurra
+Total
+
+Western Australia
+
+4.0
+556.0
+
+Page 2 of 5
+
+Projects receiving additional funding
+Through the 2025–26 Budget, the Australian Government has committed $334.2 million to
+support the delivery of existing projects.
+
+METRONET: Thornlie-Cockburn Link
+This project delivered a 17.5 kilometre extension of the passenger rail line from
+Thornlie to Cockburn Central, including new stations at Ranford Road and Nicholson
+Road. This enabled improved public transport connectivity and access between
+communities in Perth’s south-eastern corridor and the broader rail network.
+The Australian Government has committed an additional $152.3 million towards the
+project. This additional funding addresses cost pressures arising from increases in staffing, overhead
+and material costs, a longer than anticipated design phase, increased material quantities to meet
+technical specification, and higher procurement costs following the re-tendering of critical rail
+packages. The total Australian Government commitment towards the project is now $912.3 million.
+
+METRONET: Byford Extension
+This project delivered an approximately 8 kilometre extension of the Armadale
+passenger rail line south to Byford, including new stations at Armadale and Byford. It
+enabled improved public transport connectivity and access for communities in
+Perth’s south-eastern growth corridor, supporting access to employment and
+services across the metropolitan rail network.
+The Australian Government has committed an additional $60.8 million towards the project. This
+additional funding addresses ongoing cost pressures arising from enabling works for site conditions,
+design changes, increased labour and material costs, and additional resourcing requirements. The
+total Australian Government commitment towards the project is now $846 million.
+
+METRONET: Midland Station Project
+This project delivered construction of a new Midland Station, including associated
+bus facilities and parking, and related changes to rail and road interfaces in the
+Midland area. This enabled improved integration between rail, bus and active
+transport, support safer movement through the precinct, and enhance access to the
+metropolitan rail network for passengers in Perth’s eastern suburbs.
+The Australian Government has committed an additional $52.7 million towards the project. This
+additional funding will address cost pressures arising from escalation in labour and material costs,
+higher than expected tender outcomes, refined design requirements, and contaminated materials
+impacting civil works. The total Australian Government commitment towards the project is now
+$252.3 million.
+
+Western Australia
+
+Page 3 of 5
+
+METRONET: Yanchep Rail Extension
+This project delivered a 14.5 kilometre extension of the Joondalup passenger rail
+line from Butler to Yanchep, including new stations at Yanchep, Alkimos and
+Eglinton. This enabled improved public transport connectivity and access for
+communities in Perth’s northern growth corridor, supporting travel to employment,
+services and the wider metropolitan rail network.
+The Australian Government has committed an additional $43.6 million towards the project. This
+additional funding will address cost pressures arising from an extended design phase and significant
+escalation in material costs. The total Australian Government commitment towards the project is now
+$847.6 million.
+
+METRONET: Morley-Ellenbrook Line
+This project delivered a new passenger rail line between Ellenbrook and the Midland
+Line near Bayswater, including six new stations at Bayswater, Morley, Noranda,
+Malaga, Whiteman Park and Ellenbrook. This enabled improved public transport
+connectivity for Perth’s north‑eastern growth areas, supporting access to
+employment, services and the wider metropolitan rail network.
+The Australian Government has committed an additional $16.3 million towards the project. This
+additional funding will address cost pressures arising from higher than expected material costs,
+additional scope requirements identified during construction, further design works, and increased
+costs associated with the re‑award of the primary contractor. The total Australian Government
+commitment towards the project is now $1.131 billion.
+
+Flynn Drive Upgrade, Neerabup
+This project represents stage one of the broader Flynn Drive upgrades and will
+upgrade approximately 3 kilometres between Wanneroo Road and Pinjar Road.
+This will enable a dual carriageway connection along the full extent of Flynn Drive,
+improving connectivity and access along the Neerabup Strategic Link and supporting
+safer movement for vehicles, pedestrians and cyclists in Perth’s northern growth area.
+The Australian Government has committed an additional $1.3 million towards the project. This
+additional funding will address cost pressures arising from rising contractor rates, extensive utility
+relocations, land acquisition requirements and environmental compliance, compounded by broader
+market conditions. The total Australian Government commitment towards the project is now
+$3.8 million
+
+Neerabup Strategic Link – Flynn Drive Upgrade
+This project represents stage two of the broader Flynn Drive upgrades and will
+upgrade approximately 2 kilometres between Pinjar Road and Old Yanchep Road.
+This will enable a dual carriageway connection along the full extent of Flynn Drive,
+improving connectivity and access along the Neerabup Strategic Link and supporting
+safer movement for vehicles, pedestrians and cyclists in Perth’s northern growth area.
+The Australian Government has committed an additional $7.2 million towards the project. This
+additional funding will address cost pressures arising from rising contractor rates, extensive utility
+relocations, land acquisition requirements and environmental compliance, compounded by broader
+market conditions. The total Australian Government commitment towards the project is now
+$22.2 million.
+
+Western Australia
+
+Page 4 of 5
+
+Summary – Additional Funding
+
+($m)
+
+METRONET: Thornlie-Cockburn Link
+
+152.3
+
+METRONET: Byford Extension
+
+60.8
+
+METRONET: Midland Station Project
+
+52.7
+
+METRONET: Yanchep Rail Extension
+
+43.6
+
+METRONET: Morley-Ellenbrook Line
+
+16.3
+
+Neerabup Strategic Link - Flynn Drive Upgrade
+
+7.2
+
+Flynn Drive Upgrade, Neerabup
+
+1.3
+
+Total
+
+Western Australia
+
+334.2
+
+Page 5 of 5
+
+

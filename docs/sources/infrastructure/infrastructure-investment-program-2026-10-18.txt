@@ -1,0 +1,12 @@
+Source: https://investment.infrastructure.gov.au/
+Retrieved: 2026-10-18
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML cc02320975d0fdfd2ca7729789616b52977ea60afd8703c3c64ea5e879c89d68
+
+Infrastructure Investment Program | Infrastructure Investment Program
+Skip to main content
+Infrastructure Investment Program
+The Australian Government is committed to a 10-year, over $120 billion infrastructure investment pipeline, ensuring a rolling program of sustainable land transport infrastructure projects.
+The Government is working in partnership with states and territories to deliver a credible and sustainable pipeline of projects which support a range of economic and social objectives, including productivity and resilience, sustainability and liveability.
+Search for a place or project
+Projects near me
+Return focus to the top of the page
