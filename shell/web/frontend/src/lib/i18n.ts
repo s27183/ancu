@@ -1332,6 +1332,21 @@ const messages = {
     'fx.asof': { vi: 'tỷ giá', en: 'rate on' },
     'fx.time': { vi: '4 giờ chiều', en: '4pm' },
     'fx.source': { vi: 'Ngân hàng Dự trữ Úc (RBA)', en: 'Reserve Bank of Australia (RBA)' },
+    // Behavior 130: Vietcombank's AUD quote under the RBA's rate, a bank's price.
+    'fx.bank.title': { vi: 'Vietcombank mua và bán 1 AUD (VND)', en: 'Vietcombank buys and sells 1 AUD for (VND)' },
+    'fx.bank.buycash': { vi: 'Mua tiền mặt', en: 'Buys cash' },
+    'fx.bank.buytransfer': { vi: 'Mua chuyển khoản', en: 'Buys by transfer' },
+    'fx.bank.sell': { vi: 'Bán', en: 'Sells' },
+    'fx.bank.note': {
+        vi: 'Giá của ngân hàng, chỉ để tham khảo, không phải số liệu của cơ quan chính phủ;',
+        en: "A bank's price, for reference only, not a government figure;"
+    },
+    'fx.bank.at': { vi: 'lúc', en: 'at' },
+    'fx.bank.tz': { vi: 'giờ Việt Nam', en: 'Vietnam time' },
+    'factspage.note': {
+        vi: 'Mọi số liệu dưới đây lấy từ cơ quan chính phủ Úc, kèm nguồn và thời điểm, trừ giá mua bán của Vietcombank (giá ngân hàng).',
+        en: "Every figure below comes from an Australian government agency, with its source and date, except Vietcombank's buy and sell prices (a bank's)."
+    },
     'factspage.sub': { vi: 'Số liệu có nguồn trích dẫn', en: 'Every figure cited' },
     'factspage.empty': { vi: 'Chưa tải được số liệu. Thử lại sau.', en: 'The figures could not be loaded. Try again later.' },
     // Behavior 126: the section chips on /facts.
