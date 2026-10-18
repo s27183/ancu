@@ -85,10 +85,28 @@ export const SECTION_ORDER = [
     'kb.facts.living-in-australia'
 ];
 
-// The facts page's order (/facts, behavior 121): the Introduction's three, then Australia's
-// economy (behavior 124) and what the main visas cost (behavior 125). A fact doc the KB
-// adds later and this list does not name follows them, never ahead.
-export const PAGE_ORDER = [...SECTION_ORDER, 'kb.facts.australian-economy', 'kb.facts.visa-charges'];
+// The facts page's order (/facts, behavior 126, Son 2026-10-18): by what a buyer asks, in
+// the order they ask it — what the money is worth (the RBA rate, drawn before these), what
+// the visa costs, how the economy stands, the property itself, settling in, then where
+// Vietnamese buyers stand. A fact doc the KB adds later and this list does not name
+// follows them, never ahead. The Introduction sheet keeps SECTION_ORDER.
+export const PAGE_ORDER = [
+    'kb.facts.visa-charges',
+    'kb.facts.australian-economy',
+    'kb.facts.australian-property',
+    'kb.facts.living-in-australia',
+    'kb.facts.vietnamese-in-australia'
+];
+
+/** Behavior 126: each section's short name for the chips on /facts (i18n `facts.chip.<key>`);
+ *  a doc not named here is chipped by its title. */
+export const CHIP_KEY: Record<string, string> = {
+    'kb.facts.visa-charges': 'visa',
+    'kb.facts.australian-economy': 'economy',
+    'kb.facts.australian-property': 'property',
+    'kb.facts.living-in-australia': 'living',
+    'kb.facts.vietnamese-in-australia': 'vietnamese'
+};
 
 export function pageRank(slug: string): number {
     const i = PAGE_ORDER.indexOf(slug);
