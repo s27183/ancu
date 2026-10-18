@@ -11,8 +11,16 @@
 %%                 "source": "https://www.vietcombank.com.vn/…"} | null}
 %%   404 {"error": "no_rate", "rates": null}   — nothing stored yet and the feed unread
 %%
-%% `bank` (behavior 130) is a bank's reference price, not a government figure; it is read
-%% and kept by fh_shell_vcb, and null when no quote is stored.
+%% Honest-partial -> P-2 · The database is the single source of truth -> The shell backend -> one reply, two sources kept apart
+%% Purpose:   behaviors 123 and 130: /facts shows the RBA's reference rate and, beside it,
+%%            what Vietcombank buys and sells 1 AUD for — one request for the rate card.
+%% Holds:     the reply's top level (date, rates, source) is only the RBA's newest stored
+%%            row; `bank` is only fh_shell_vcb's newest stored quote, or null. Neither
+%%            fills in for the other: no RBA row answers 404 even with a bank quote stored
+%%            (the page's rate card needs the government figure first), and a missing bank
+%%            quote leaves the RBA rate untouched. Each keeps its own time and source.
+%% Rests on:  fx_rates (migration 008) and fx_bank_quotes (009) — Postgres, so a restart
+%%            serves the last good figures without reading either feed.
 %%
 %% Unlike its neighbours this handler does not proxy the engine: the rate is not a KB
 %% fact and no plan figure uses it, so the shell reads the RBA itself and keeps the rows
