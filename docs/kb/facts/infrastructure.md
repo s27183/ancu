@@ -73,8 +73,8 @@ Left out: airports, ports and energy (not in this program; no government figure 
       "unit": "aud_bn",
       "headline": {"en": "Queensland gets the most: $26.5 billion over 10 years",
                    "vi": "Queensland được nhiều nhất: 26,5 tỷ AUD trong 10 năm"},
-      "caption": {"en": "Federal commitment over the next 10 years by state and territory, A$ billion, as at the 2026–27 Budget (ACT: $646 million)",
-                  "vi": "Cam kết của liên bang trong 10 năm tới theo bang và vùng lãnh thổ, tỷ AUD, tính đến Ngân sách 2026–27 (ACT: 646 triệu AUD)"},
+      "caption": {"en": "Federal commitment over the next 10 years by state and territory, A$ billion, as at the 2026–27 Budget",
+                  "vi": "Cam kết của liên bang trong 10 năm tới theo bang và vùng lãnh thổ, tỷ AUD, tính đến Ngân sách 2026–27"},
       "as_of": "2026-05",
       "source": [1, 2, 3, 4, 5, 6, 7, 8],
       "items": [
@@ -84,7 +84,8 @@ Left out: airports, ports and energy (not in this program; no government figure 
         {"label": {"en": "South Australia", "vi": "Nam Úc (SA)"}, "value": 8.1},
         {"label": {"en": "Western Australia", "vi": "Tây Úc (WA)"}, "value": 6.3},
         {"label": {"en": "Northern Territory", "vi": "Lãnh thổ Bắc Úc (NT)"}, "value": 2.8},
-        {"label": {"en": "Tasmania", "vi": "Tasmania (thủ phủ Hobart)"}, "value": 2.2}
+        {"label": {"en": "Tasmania", "vi": "Tasmania (thủ phủ Hobart)"}, "value": 2.2},
+        {"label": {"en": "ACT ($646 million)", "vi": "Lãnh thổ Thủ đô Úc — ACT (646 triệu AUD)"}, "value": 0.646, "derived": "the overview's $646 million, in billions"}
       ],
       "note": {"en": "Most of each state's money goes to major road and rail projects (Queensland $24.0 billion, Victoria $19.1 billion, NSW $13.9 billion); the rest to smaller programs such as Roads to Recovery and Black Spot.",
                "vi": "Phần lớn số tiền của mỗi bang dành cho các dự án đường bộ và đường sắt lớn (Queensland 24,0 tỷ AUD, Victoria 19,1 tỷ, NSW 13,9 tỷ); phần còn lại cho các chương trình nhỏ hơn như Roads to Recovery và Black Spot."},
