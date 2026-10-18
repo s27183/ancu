@@ -39,6 +39,7 @@ routes() ->
         {"/api/suburbs", fh_shell_h_suburbs, []},
         {"/api/news", fh_shell_h_news, []},
         {"/api/facts", fh_shell_h_facts, []},
+        {"/api/fx", fh_shell_h_fx, []},
         {"/api/terms", fh_shell_h_terms, []},
         {"/api/plan-cards", fh_shell_h_plan_cards, []},
         {"/api/plan-cards/:id/events", fh_shell_h_events, []},
