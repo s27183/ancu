@@ -1,5 +1,5 @@
 <script lang="ts">
-    // Bilingual -> The web frontend -> the facts page (/facts)
+    // Bilingual -> P-6 · Shells reach the engine only through the contract -> The web frontend -> the facts page (/facts)
     // Purpose:   behavior 121/122 (Son 2026-10-18): the home's fourth card, "Úc qua số liệu" /
     //            "Australia in figures", opens one page of the facts about Australia a buyer
     //            cares about — the Introduction's three sections first, in its order, then the
