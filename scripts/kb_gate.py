@@ -5,7 +5,8 @@
         [--labels a,b] [--checks-ok yes|no] [--out <dir>]
 
 Regulated figures are grounded -> P-7 -> The KB update -> a verified KB update publishes itself; the rest is held for Son
-Behavior 74 (Son 2026-10-12: too much to review by hand). The weekly kb-watch PR
+Behavior 74 (Son 2026-10-12: too much to review by hand). A kb-watch PR (the weekly
+kb-watch-<date>, or since behavior 134 news-watch's daily kb-watch-news-<date>)
 merges itself only when each thing it changes is one of these:
   - date-only: in a docs/kb doc, only `last_verified:` / `retrieved:` lines moved;
   - a new news note (docs/kb/news/, added; a note is never edited);
