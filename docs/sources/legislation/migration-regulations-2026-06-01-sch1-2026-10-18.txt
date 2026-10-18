@@ -1,0 +1,716 @@
+Source: https://www.legislation.gov.au/F1996B03551/2026-06-01/2026-06-01/text/original/pdf/1
+Retrieved: 2026-10-18
+Extracted: pdftotext -layout of Volume 1 of the Migration Regulations 1994, Compilation No. 287, compilation date 1 June 2026 (Authorised Version F2026C00497 registered 19/06/2026; includes amendments F2026L00640), listed at https://www.legislation.gov.au/F1996B03551/latest/versions; sha256 of the fetched PDF dc238115025659adea09f823844e04903989370ed355b7bc79a0fd546f053ea4. Kept here: Schedule 1 items 1114B, 1124, 1124A, 1124B, 1129, 1130, 1130A, 1137, 1138, 1139, 1229, 1241 and 1242, each verbatim from its heading to the line that starts its second instalment.
+
+----- Schedule 1, item 1114B -----
+1114B Employer Nomination (Permanent) (Class EN)
+          (1) Form: The approved form specified by the Minister in a legislative instrument
+              made for this item under subregulation 2.07(5).
+          (2) Visa application charge:
+               (a) first instalment (payable at the time the application is made):
+
+First instalment
+Item      Component                                                                                     Amount
+1         Base application charge                                                                         $4 910
+2         Additional applicant charge for an applicant who is at least 18                                 $2 455
+3         Additional applicant charge for an applicant who is less than 18                                $1 230
+Note:    Regulation 2.12C explains the components of the first instalment of visa application charge and specifies
+         the amounts of subsequent temporary application charge and non-Internet application charge. Not all of
+         the components may apply to a particular application.
+         Additional applicant charge is paid by an applicant who claims to be a member of the family unit of
+         another applicant and seeks to combine the application with that applicant’s application.
+                 (b) second instalment (payable before grant of visa):
+
+----- Schedule 1, item 1124 -----
+1124 Parent (Migrant) (Class AX)
+          (1) Form: The approved form specified by the Minister in a legislative instrument
+              made for this item under subregulation 2.07(5).
+          (2) Visa application charge:
+               (a) first instalment (payable at the time the application is made):
+
+First instalment
+Item      Component                                                                                       Amount
+1         Base application charge                                                                           $5 280
+2         Additional applicant charge for an applicant who is at least 18                                   $2 640
+3         Additional applicant charge for an applicant who is less than 18                                  $1 325
+Note:    Regulation 2.12C explains the components of the first instalment of visa application charge and specifies
+         the amounts of subsequent temporary application charge and non-Internet application charge. Not all of
+         the components may apply to a particular application.
+         Additional applicant charge is paid by an applicant who claims to be a member of the family unit of
+         another applicant and seeks to combine the application with that applicant’s application.
+                 (b) the second instalment (payable before grant of visa) is $2 065.
+
+----- Schedule 1, item 1124A -----
+1124A Aged Parent (Residence) (Class BP)
+          (1) Form: The approved form specified by the Minister in a legislative instrument
+              made for this item under subregulation 2.07(5).
+          (2) Visa application charge:
+               (a) first instalment (payable at the time the application is made):
+
+First instalment
+Item      Component                                                                                     Amount
+1         Base application charge                                                                         $5 280
+2         Additional applicant charge for an applicant who is at least 18                                 $2 640
+3         Additional applicant charge for an applicant who is less than 18                                $1 325
+Note:    Regulation 2.12C explains the components of the first instalment of visa application charge and specifies
+         the amounts of subsequent temporary application charge and non-Internet application charge. Not all of
+         the components may apply to a particular application.
+         Additional applicant charge is paid by an applicant who claims to be a member of the family unit of
+         another applicant and seeks to combine the application with that applicant’s application.
+                 (b) the second instalment (payable before grant of visa) is $2 065.
+
+----- Schedule 1, item 1124B -----
+1124B Partner (Residence) (Class BS)
+          (1) Form: The approved form specified by the Minister in a legislative instrument
+              made for this item under subregulation 2.07(5).
+          (2) Visa application charge:
+               (a) first instalment (payable at the time the application is made):
+                     (i) for an applicant:
+                              (A) who is the holder of a Subclass 445 (Dependent Child) visa;
+                                  or
+                              (B) whose application is combined, or sought to be combined,
+                                  with an application made by that person:
+                          the amount is nil; and
+                    (ii) for an applicant:
+                              (A) who is the holder of a transitional (temporary) visa, granted
+                                  on the basis that the holder satisfied the criteria for grant of an
+                                  extended eligibility entry permit under the Migration (1989)
+                                  Regulations; or
+                              (B) whose application is combined, or sought to be combined,
+                                  with an application made by that person:
+
+                                              Migration Regulations 1994                                       409
+
+Compilation No. 287                                                                    Compilation date: 01/06/2026
+
+                             Authorised Version F2026C00497 registered 19/06/2026
+Schedule 1 Classes of visa
+Part 1 Permanent visas
+
+First instalment
+Item      Component                                                                                   Amount
+1         Base application charge                                                                          $560
+2         Additional applicant charge for an applicant who is at least 18                                  $280
+3         Additional applicant charge for an applicant who is less than 18                                 $145
+
+                      (iii) for an applicant who:
+                                (A) is not the holder of a substantive visa; and
+                                (B) entered Australia before 19 December 1989; and
+                                (C) at the time of entry, was engaged to be married to a person
+                                     who was an Australian citizen or Australian permanent
+                                     resident; and
+                                (D) has subsequently married that person;
+                            or whose application is combined, or sought to be combined, with an
+                            application made by that person:
+
+First instalment
+Item      Component                                                                                   Amount
+1         Base application charge                                                                       $1 980
+2         Additional applicant charge for an applicant who is at least 18                                  $990
+3         Additional applicant charge for an applicant who is less than 18                                 $500
+
+                      (iv) for an applicant who:
+                               (A) is not the holder of a substantive visa; and
+                               (B) entered Australia on or after 19 December 1989 as the holder
+                                    of a prospective marriage (code number 300) entry permit
+                                    granted under the Migration (1989) Regulations, or a Class
+                                    300 (prospective marriage) entry permit granted under the
+                                    Migration (1993) Regulations; and
+                               (C) ceased to hold a substantive visa after marrying the
+                                    Australian citizen or Australian permanent resident whom the
+                                    applicant entered Australia to marry;
+                           or whose application is combined, or sought to be combined, with an
+                           application made by that person:
+
+First instalment
+Item      Component                                                                                   Amount
+1         Base application charge                                                                       $1 980
+2         Additional applicant charge for an applicant who is at least 18                                  $990
+3         Additional applicant charge for an applicant who is less than 18                                 $500
+
+                      (v) for an applicant who:
+
+410                                            Migration Regulations 1994
+
+Compilation No. 287                                                                  Compilation date: 01/06/2026
+
+                              Authorised Version F2026C00497 registered 19/06/2026
+                                                                                     Classes of visa Schedule 1
+                                                                                        Permanent visas Part 1
+
+                               (A) is the holder of a Prospective Marriage (Temporary) (Class
+                                    TO) visa; and
+                               (B) is married to the person who was specified as the applicant’s
+                                    intended spouse in the application for that visa; and
+                               (C) seeks to remain in Australia permanently on the basis of that
+                                    marriage;
+                           or whose application is combined, or sought to be combined, with an
+                           application made by that person:
+
+First instalment
+Item      Component                                                                                      Amount
+1         Base application charge                                                                          $1 560
+2         Additional applicant charge for an applicant who is at least 18                                     $785
+3         Additional applicant charge for an applicant who is less than 18                                    $390
+
+                      (va) for an applicant:
+                               (A) who is covered by subitem (2A); or
+                               (B) whose application is combined, or sought to be combined,
+                                    with an application made by that person:
+
+First instalment
+Item      Component                                                                                      Amount
+1         Base application charge                                                                          $1 560
+2         Additional applicant charge for an applicant who is at least 18                                     $785
+3         Additional applicant charge for an applicant who is less than 18                                    $390
+
+                      (vi) In the case of an applicant who:
+                               (A) is not the holder of a substantive visa; and
+                               (B) entered Australia as the holder of a Prospective Marriage
+                                    (Temporary) (Class TO) visa; and
+                               (C) ceased to hold that visa after marrying the Australian citizen,
+                                    Australian permanent resident or eligible New Zealand
+                                    citizen whom the applicant entered Australia to marry; and
+                               (D) seeks to remain in Australia permanently on the basis of that
+                                    marriage;
+                           or whose application is combined, or sought to be combined, with an
+                           application made by that person:
+
+First instalment
+Item      Component                                                                                      Amount
+1         Base application charge                                                                          $1 980
+2         Additional applicant charge for an applicant who is at least 18                                     $990
+
+                                               Migration Regulations 1994                                       411
+
+Compilation No. 287                                                                     Compilation date: 01/06/2026
+
+                              Authorised Version F2026C00497 registered 19/06/2026
+Schedule 1 Classes of visa
+Part 1 Permanent visas
+
+First instalment
+Item      Component                                                                                     Amount
+3         Additional applicant charge for an applicant who is less than 18                                     $500
+
+                      (via) for an applicant:
+                                (A) who is covered by subitem (2B); or
+                                (B) whose application is combined, or sought to be combined,
+                                     with an application made by that person:
+
+First instalment
+Item      Component                                                                                     Amount
+1         Base application charge                                                                         $1 980
+2         Additional applicant charge for an applicant who is at least 18                                      $990
+3         Additional applicant charge for an applicant who is less than 18                                     $500
+
+                      (vii) for any other applicant:
+
+First instalment
+Item       Component                                                                                    Amount
+1          Base application charge                                                                        $9 365
+2          Additional applicant charge for an applicant who is at least 18                                $4 685
+3          Additional applicant charge for an applicant who is less than 18                               $2 345
+Note:    Regulation 2.12C explains the components of the first instalment of visa application charge and specifies
+         the amounts of subsequent temporary application charge and non-Internet application charge. Not all of
+         the components may apply to a particular application.
+         Additional applicant charge is paid by an applicant who claims to be a member of the family unit of
+         another applicant and seeks to combine the application with that applicant’s application.
+                 (b) the second instalment (payable before grant of visa) is nil.
+
+----- Schedule 1, item 1129 -----
+1129 Partner (Migrant) (Class BC)
+          (1) Form: The approved form specified by the Minister in a legislative instrument
+              made for this item under subregulation 2.07(5).
+
+                                             Migration Regulations 1994                                       417
+
+Compilation No. 287                                                                  Compilation date: 01/06/2026
+
+                           Authorised Version F2026C00497 registered 19/06/2026
+Schedule 1 Classes of visa
+Part 1 Permanent visas
+
+          (2) Visa application charge:
+               (a) first instalment (payable at the time the application is made):
+                     (i) for an applicant:
+                              (A) who is the holder of a Subclass 445 (Dependent Child) visa;
+                                  or
+                              (B) whose application is combined, or sought to be combined,
+                                  with an application made by that person;
+                          the amount is nil; and
+                    (ii) for any other applicant:
+
+First instalment
+Item      Component                                                                                     Amount
+1         Base application charge                                                                         $9 365
+2         Additional applicant charge for an applicant who is at least 18                                 $4 685
+3         Additional applicant charge for an applicant who is less than 18                                $2 345
+Note:    Regulation 2.12C explains the components of the first instalment of visa application charge and specifies
+         the amounts of subsequent temporary application charge and non-Internet application charge. Not all of
+         the components may apply to a particular application.
+         Additional applicant charge is paid by an applicant who claims to be a member of the family unit of
+         another applicant and seeks to combine the application with that applicant’s application.
+                 (b) the second instalment (payable before grant of visa) is nil.
+
+----- Schedule 1, item 1130 -----
+1130 Contributory Parent (Migrant) (Class CA)
+          (1) Form: The approved form specified by the Minister in a legislative instrument
+              made for this item under subregulation 2.07(5).
+          (2) Visa application charge:
+               (a) first instalment (payable at the time the application is made):
+                     (i) for an applicant:
+                             (A) who is the holder of a Subclass 173 (Contributory Parent
+                                  (Temporary)) visa at the time of application; or
+                              (B) whose application is combined, or sought to be combined,
+                                  with an application made by that person:
+
+First instalment
+Item      Component                                                                                      Amount
+1         Base application charge                                                                             $445
+2         Additional applicant charge for an applicant who is at least 18                                     $225
+3         Additional applicant charge for an applicant who is less than 18                                    $110
+
+                      (ii) for an applicant who:
+                               (A) has been the holder of a Subclass 173 (Contributory Parent
+                                    (Temporary)) visa; and
+                               (B) is the holder of a substituted Subclass 600 visa at the time of
+                                    application;
+                           or whose application is combined, or sought to be combined, with an
+                           application made by that person:
+
+First instalment
+Item      Component                                                                                      Amount
+1         Base application charge                                                                             $445
+2         Additional applicant charge for an applicant who is at least 18                                     $225
+3         Additional applicant charge for an applicant who is less than 18                                    $110
+
+                      (iii) for an applicant:
+                                (A) who has held a Subclass 173 (Contributory Parent
+                                     (Temporary)) visa at any time in the 28 days immediately
+                                     before making the application; or
+                                (B) whose application is combined, or sought to be combined,
+                                     with an application made by that person:
+
+                                               Migration Regulations 1994                                       419
+
+Compilation No. 287                                                                     Compilation date: 01/06/2026
+
+                              Authorised Version F2026C00497 registered 19/06/2026
+Schedule 1 Classes of visa
+Part 1 Permanent visas
+
+First instalment
+Item      Component                                                                                     Amount
+1         Base application charge                                                                              $445
+2         Additional applicant charge for an applicant who is at least 18                                      $225
+3         Additional applicant charge for an applicant who is less than 18                                     $110
+
+                      (iv) for an applicant who:
+                               (A) has been the holder of a Subclass 173 (Contributory Parent
+                                    (Temporary)) visa; and
+                               (B) provides the Minister with evidence that compassionate and
+                                    compelling circumstances exist for the person to be
+                                    considered to be the holder of a Subclass 173 (Contributory
+                                    Parent (Temporary)) visa for the purpose of the application;
+                           or whose application is combined, or sought to be combined, with an
+                           application made by that person:
+
+First instalment
+Item      Component                                                                                     Amount
+1         Base application charge                                                                         $3 235
+2         Additional applicant charge for an applicant who is at least 18                                 $1 615
+3         Additional applicant charge for an applicant who is less than 18                                     $810
+
+                       (v) for an applicant who:
+                               (A) made a valid application for a Parent (Migrant) (Class AX)
+                                    visa before 27 June 2003; and
+                               (B) withdrew that application at the same time as making the
+                                    application for the Contributory Parent (Migrant) (Class CA)
+                                    visa;
+                           or whose application is combined, or sought to be combined, with an
+                           application made by that person, the amount is nil; and
+                      (vi) for any other applicant:
+
+First instalment
+Item       Component                                                                                    Amount
+1          Base application charge                                                                        $5 040
+2          Additional applicant charge for an applicant who is at least 18                                $1 700
+3          Additional applicant charge for an applicant who is less than 18                                    $855
+Note:    Regulation 2.12C explains the components of the first instalment of visa application charge and specifies
+         the amounts of subsequent temporary application charge and non-Internet application charge. Not all of
+         the components may apply to a particular application.
+         Additional applicant charge is paid by an applicant who claims to be a member of the family unit of
+         another applicant and seeks to combine the application with that applicant’s application.
+                 (b) second instalment (payable before grant of visa):
+
+----- Schedule 1, item 1130A -----
+1130A Contributory Aged Parent (Residence) (Class DG)
+          (1) Form: The approved form specified by the Minister in a legislative instrument
+              made for this item under subregulation 2.07(5).
+          (2) Visa application charge:
+               (a) first instalment (payable at the time the application is made):
+                     (i) for an applicant who:
+                              (A) made a valid application for an Aged Parent (Residence)
+                                   (Class BP) visa before 1 July 2003; and
+                              (B) withdrew that application at the same time as making the
+                                   application for the Contributory Aged Parent (Residence)
+                                   (Class DG) visa;
+                          or whose application is combined, or sought to be combined, with an
+                          application made by that person, the amount is nil; and
+                    (ii) for an applicant:
+                              (A) who is the holder of a Subclass 884 (Contributory Aged
+                                   Parent (Temporary)) visa at the time of application; or
+                              (B) whose application is combined, or sought to be combined,
+                                   with an application made by that person:
+
+First instalment
+Item      Component                                                                                     Amount
+1         Base application charge                                                                            $445
+2         Additional applicant charge for an applicant who is at least 18                                    $225
+3         Additional applicant charge for an applicant who is less than 18                                   $110
+
+                      (iii) for an applicant who:
+                                (A) held a Subclass 884 (Contributory Aged Parent (Temporary))
+                                     visa; and
+                                (B) is the holder of a substituted Subclass 600 visa at the time of
+                                     application;
+                            or whose application is combined, or sought to be combined, with an
+                            application made by that person:
+
+First instalment
+Item      Component                                                                                     Amount
+1         Base application charge                                                                            $445
+2         Additional applicant charge for an applicant who is at least 18                                    $225
+3         Additional applicant charge for an applicant who is less than 18                                   $110
+
+                      (iv) for an applicant:
+
+                                               Migration Regulations 1994                                      423
+
+Compilation No. 287                                                                    Compilation date: 01/06/2026
+
+                             Authorised Version F2026C00497 registered 19/06/2026
+Schedule 1 Classes of visa
+Part 1 Permanent visas
+
+                                (A) who has held a Subclass 884 (Contributory Aged Parent
+                                    (Temporary)) visa at any time in the 28 days immediately
+                                    before making the application; or
+                                (B) whose application is combined, or sought to be combined,
+                                    with an application made by that person:
+
+First instalment
+Item      Component                                                                                     Amount
+1         Base application charge                                                                              $445
+2         Additional applicant charge for an applicant who is at least 18                                      $225
+3         Additional applicant charge for an applicant who is less than 18                                     $110
+
+                       (v) for an applicant who:
+                               (A) held a Subclass 884 (Contributory Aged Parent (Temporary))
+                                    visa, and
+                               (B) provides the Minister with evidence that compassionate and
+                                    compelling circumstances exist for the person to be
+                                    considered to be the holder of a Subclass 884 (Contributory
+                                    Aged Parent (Temporary)) visa for the purpose of the
+                                    application;
+                           or whose application is combined, or sought to be combined, with an
+                           application made by that person:
+
+First instalment
+Item      Component                                                                                     Amount
+1         Base application charge                                                                         $5 040
+2         Additional applicant charge for an applicant who is at least 18                                 $2 515
+3         Additional applicant charge for an applicant who is less than 18                                $1 260
+
+                      (vi) for any other applicant:
+
+First instalment
+Item      Component                                                                                     Amount
+1         Base application charge                                                                         $5 040
+2         Additional applicant charge for an applicant who is at least 18                                 $2 515
+3         Additional applicant charge for an applicant who is less than 18                                $1 260
+Note:    Regulation 2.12C explains the components of the first instalment of visa application charge and specifies
+         the amounts of subsequent temporary application charge and non-Internet application charge. Not all of
+         the components may apply to a particular application.
+         Additional applicant charge is paid by an applicant who claims to be a member of the family unit of
+         another applicant and seeks to combine the application with that applicant’s application.
+                 (b) second instalment (payable before grant of visa):
+
+----- Schedule 1, item 1137 -----
+1137 Skilled—Independent (Permanent) (Class SI)
+          (1) Form: The approved form specified by the Minister in a legislative instrument
+              made for this item under subregulation 2.07(5).
+
+               Points-tested stream
+          (2) Subitems (3) to (4C) set out the requirements for:
+               (a) an applicant (a primary Points-tested applicant) seeking to satisfy the
+                   primary criteria for the grant of a Subclass 189 (Skilled—Independent) visa
+                   in the Points-tested stream; or
+               (b) an applicant (a secondary applicant) seeking to satisfy the secondary
+                   criteria for the grant of a Subclass 189 (Skilled—Independent) visa, whose
+                   application is:
+                     (i) combined with the application of a primary Points-tested applicant; or
+                    (ii) sought to be combined with such an application before a decision is
+                         made in relation to that application.
+                      Note:   A member of the family unit of a primary Points-tested applicant may apply for
+                              the grant of a Subclass 189 (Skilled—Independent) visa, seeking to satisfy the
+                              secondary criteria. However, the application by the member of the family unit
+                              must be made before a decision is made in relation to the application by the
+                              primary Points-tested applicant.
+
+430                                            Migration Regulations 1994
+
+Compilation No. 287                                                                  Compilation date: 01/06/2026
+
+                              Authorised Version F2026C00497 registered 19/06/2026
+                                                                                    Classes of visa Schedule 1
+                                                                                       Permanent visas Part 1
+
+          (3) Visa application charge—first instalment (payable at the time the application is
+              made):
+
+First instalment—Visas in the Points-tested stream etc.
+Item      Component                                                                                     Amount
+1         Base application charge                                                                         $4 910
+2         Additional applicant charge for an applicant who is at least 18                                 $2 455
+3         Additional applicant charge for an applicant who is less than 18                                $1 230
+               Note:     Regulation 2.12C explains the components of the first instalment of visa application
+                         charge and specifies the amounts of subsequent temporary application charge and
+                         non-Internet application charge. Not all of the components may apply to a particular
+                         application.
+                         Additional applicant charge is paid by an applicant who claims to be a member of the
+                         family unit of another applicant and seeks to combine the application with that
+                         applicant’s application.
+
+          (4) Visa application charge—second instalment (payable before grant of visa):
+
+----- Schedule 1, item 1138 -----
+1138 Skilled—Nominated (Permanent) (Class SN)
+          (1) Form: The approved form specified by the Minister in a legislative instrument
+              made for this item under subregulation 2.07(5).
+          (2) Visa application charge:
+               (a) first instalment (payable at the time the application is made):
+
+First instalment
+Item      Component                                                                                       Amount
+1         Base application charge                                                                           $4 910
+2         Additional applicant charge for an applicant who is at least 18                                   $2 455
+3         Additional applicant charge for an applicant who is less than 18                                  $1 230
+Note:    Regulation 2.12C explains the components of the first instalment of visa application charge and specifies
+         the amounts of subsequent temporary application charge and non-Internet application charge. Not all of
+         the components may apply to a particular application.
+         Additional applicant charge is paid by an applicant who claims to be a member of the family unit of
+         another applicant and seeks to combine the application with that applicant’s application.
+                 (b) second instalment (payable before grant of visa):
+
+----- Schedule 1, item 1139 -----
+1139 Permanent Residence (Skilled Regional) (Class PR)
+          (1) Form: The approved form specified by the Minister in a legislative instrument
+              made for the purposes of this item under subregulation 2.07(5).
+          (2) Visa application charge:
+               (a) first instalment (payable at the time the application is made):
+                     (i) for:
+                              (A) an applicant (a primary Regional Provisional applicant)
+                                  seeking to satisfy the primary criteria for the grant of a
+                                  Subclass 191 (Permanent Residence (Skilled Regional)) visa
+                                  in the Regional Provisional Visas stream; or
+                              (B) an applicant (a secondary Regional Provisional applicant)
+                                  seeking to satisfy the secondary criteria for the grant of a
+                                  Subclass 191 (Permanent Residence (Skilled Regional)) visa
+                                  whose application is combined, or sought to be combined,
+                                  with an application of a primary Regional Provisional
+                                  applicant:
+
+First instalment—visas in the Regional Provisional Visas stream etc.
+Item      Component                                                                                        Amount
+1         Base application charge                                                                               $505
+2         Additional applicant charge for an applicant who is at least 18                                       $250
+3         Additional applicant charge for an applicant who is less than 18                                      $130
+
+                         (ii) for:
+                                     (A) an applicant (a primary HK applicant) seeking to satisfy the
+                                         primary criteria for the grant of a Subclass 191 (Permanent
+                                         Residence (Skilled Regional)) visa in the Hong Kong
+                                         (Regional) stream; or
+                                     (B) an applicant (a secondary HK applicant) seeking to satisfy
+                                         the secondary criteria for the grant of a Subclass 191
+                                         (Permanent Residence (Skilled Regional)) visa whose
+                                         application is combined, or sought to be combined, with an
+                                         application of a primary HK applicant:
+
+First instalment—visas in the Hong Kong (Regional) stream etc.
+Item      Component                                                                                        Amount
+1         Base application charge                                                                            $4 910
+2         Additional applicant charge for an applicant who is at least 18                                    $2 450
+3         Additional applicant charge for an applicant who is less than 18                                   $1 230
+               Note 1:      Regulation 2.12C explains the components of the first instalment of visa application
+                            charge and specifies the amounts of subsequent temporary application charge and
+
+                                                  Migration Regulations 1994                                       437
+
+Compilation No. 287                                                                       Compilation date: 01/06/2026
+
+                                Authorised Version F2026C00497 registered 19/06/2026
+Schedule 1 Classes of visa
+Part 1 Permanent visas
+
+                         non-Internet application charge. Not all of the components may apply to a particular
+                         application.
+               Note 2:   Additional applicant charge is paid by an applicant who claims to be a member of the
+                         family unit of another applicant and seeks to combine the application with that
+                         applicant’s application.
+                 (b) second instalment (payable before grant of visa):
+
+----- Schedule 1, item 1229 -----
+1229 Skilled (Provisional) (Class VC)
+          (1) Form: The approved form specified by the Minister in a legislative instrument
+              made for this item under subregulation 2.07(5).
+          (2) Visa application charge:
+               (a) first instalment (payable at the time the application is made):
+                     (i) for:
+                              (A) an applicant who is seeking to satisfy the primary criteria for
+                                  the grant of a Subclass 485 (Temporary Graduate) visa in the
+                                  Post-Higher Education Work stream, holds a PHE visa and
+                                  holds an eligible passport; or
+                              (B) an applicant whose application is combined, or sought to be
+                                  combined, with an application made by that person; or
+                              (C) an applicant who claims to be a member of the family unit of
+                                  a person who holds a PHE visa, if that person held a PHE visa
+                                  immediately before the most recent grant of a Subclass 485
+                                  (Temporary Graduate) visa to that person and that person
+                                  holds an eligible passport:
+
+                                                Migration Regulations 1994                                      469
+
+Compilation No. 287                                                                    Compilation date: 01/06/2026
+
+                               Authorised Version F2026C00497 registered 19/06/2026
+Schedule 1 Classes of visa
+Part 2 Temporary visas (other than bridging visas)
+
+    First instalment
+    Item    Component                                                                                 Amount
+    1       Base application charge                                                                        $905
+    2       Additional applicant charge for an applicant who is at least 18                                $455
+    3       Additional applicant charge for an applicant who is less than 18                               $230
+
+                       (ii) for:
+                                    (A) an applicant who is seeking to satisfy the primary criteria for
+                                        the grant of a Subclass 485 (Temporary Graduate) visa in the
+                                        Post-Higher Education Work stream, holds a PHE visa and
+                                        does not hold an eligible passport; or
+                                    (B) an applicant whose application is combined, or sought to be
+                                        combined, with an application made by that person; or
+                                    (C) an applicant who claims to be a member of the family unit of
+                                        a person who holds a PHE visa, if that person held a PHE visa
+                                        immediately before the most recent grant of a Subclass 485
+                                        (Temporary Graduate) visa to that person and that person
+                                        does not hold an eligible passport:
+
+    First instalment
+    Item    Component                                                                                 Amount
+    1       Base application charge                                                                      $1 810
+    2       Additional applicant charge for an applicant who is at least 18                                $910
+    3       Additional applicant charge for an applicant who is less than 18                               $460
+
+                       (iii) for:
+                                    (A) an applicant who is seeking to satisfy the primary criteria for
+                                        the grant of a Skilled (Provisional) (Class VC) visa, holds an
+                                        eligible passport and does not hold a PHE visa; or
+                                    (B) an applicant whose application is combined, or sought to be
+                                        combined, with an application made by that person; or
+                                    (C) an applicant who claims to be a member of the family unit of
+                                        a person who holds a Skilled (Provisional) (Class VC) visa
+                                        and who did not, at the time of application, hold a PHE visa,
+                                        and that person holds an eligible passport:
+
+First instalment
+Item       Component                                                                                   Amount
+1          Base application charge                                                                       $2 300
+2          Additional applicant charge for an applicant who is at least 18                               $1 150
+3          Additional applicant charge for an applicant who is less than 18                                 $580
+
+470                                              Migration Regulations 1994
+
+Compilation No. 287                                                                   Compilation date: 01/06/2026
+
+                               Authorised Version F2026C00497 registered 19/06/2026
+                                                                               Classes of visa Schedule 1
+                                                        Temporary visas (other than bridging visas) Part 2
+
+                       (iv) for any other applicant:
+
+First instalment
+Item      Component                                                                                     Amount
+1         Base application charge                                                                         $4 600
+2         Additional applicant charge for an applicant who is at least 18                                 $2 300
+3         Additional applicant charge for an applicant who is less than 18                                $1 160
+               Note:      Regulation 2.12C explains the components of the first instalment of visa application
+                          charge and specifies the amounts of subsequent temporary application charge and
+                          non-Internet application charge. Not all of the components may apply to a particular
+                          application.
+                          Additional applicant charge is paid by an applicant who claims to be a member of the
+                          family unit of another applicant and seeks to combine the application with that
+                          applicant’s application.
+                 (b) the second instalment (payable before grant of visa) is nil.
+
+----- Schedule 1, item 1241 -----
+1241 Skilled Work Regional (Provisional) (Class PS)
+          (1) Form: The approved form specified by the Minister in a legislative instrument
+              made for the purposes of this item under subregulation 2.07(5).
+          (2) Visa application charge:
+               (a) first instalment (payable at the time the application is made):
+
+First instalment
+Item      Component                                                                                   Amount
+1         Base application charge                                                                       $4 910
+2         Additional applicant charge for an applicant who is at least 18                               $2 455
+3         Additional applicant charge for an applicant who is less than 18                              $1 230
+
+                                               Migration Regulations 1994                                    493
+
+Compilation No. 287                                                                  Compilation date: 01/06/2026
+
+                              Authorised Version F2026C00497 registered 19/06/2026
+Schedule 1 Classes of visa
+Part 2 Temporary visas (other than bridging visas)
+
+                 Note 1:    Regulation 2.12C explains the components of the first instalment of visa application
+                            charge and specifies the amounts of subsequent temporary application charge and
+                            non-Internet application charge. Not all of the components may apply to a particular
+                            application.
+                 Note 2:    Additional applicant charge is paid by an applicant who claims to be a member of the
+                            family unit of another applicant and seeks to combine the application with that
+                            applicant’s application.
+                  (b) second instalment (payable before grant of visa):
+
+----- Schedule 1, item 1242 -----
+1242 Skilled Employer Sponsored Regional (Provisional) (Class PE)
+          (1) Form: The approved form specified by the Minister in a legislative instrument
+              made for the purposes of this item under subregulation 2.07(5).
+          (2) Visa application charge:
+
+                                                Migration Regulations 1994                                    495
+
+Compilation No. 287                                                                   Compilation date: 01/06/2026
+
+                               Authorised Version F2026C00497 registered 19/06/2026
+Schedule 1 Classes of visa
+Part 2 Temporary visas (other than bridging visas)
+
+                  (a) first instalment (payable at the time the application is made):
+
+First instalment
+Item      Component                                                                                     Amount
+1         Base application charge                                                                         $4 910
+2         Additional applicant charge for an applicant who is at least 18                                 $2 455
+3         Additional applicant charge for an applicant who is less than 18                                $1 230
+               Note 1:    Regulation 2.12C explains the components of the first instalment of visa application
+                          charge and specifies the amounts of subsequent temporary application charge and
+                          non-Internet application charge. Not all of the components may apply to a particular
+                          application.
+               Note 2:    Additional applicant charge is paid by an applicant who claims to be a member of the
+                          family unit of another applicant and seeks to combine the application with that
+                          applicant’s application.
+                 (b) the second instalment (payable before grant of visa):
