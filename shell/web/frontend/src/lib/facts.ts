@@ -27,7 +27,9 @@ export interface Fact {
     /** A statement's picture (behavior 49): the land parcel by default, or a health cross. */
     glyph?: 'health';
     /** Absent on a statement. */
-    unit?: 'count' | 'people' | 'pct' | 'aud_k' | 'aud' | 'years';
+    unit?: 'count' | 'people' | 'pct' | 'aud_k' | 'aud' | 'years' | 'usd_bn' | 'aud_bn' | 'aud_m' | 'million';
+    /** Digits after the point, fixed (behavior 124: DFAT's "2.0%" stays 2.0%). */
+    decimals?: number;
     headline: Localized;
     caption: Localized;
     /** YYYY-MM */
@@ -35,7 +37,8 @@ export interface Fact {
     /** Index into the doc's `sources`, or several (a rule and its exception). */
     source: number | number[];
     value?: number;
-    compare?: { label: Label; value: number };
+    /** `now_label` names the current row ("2025"); absent, it reads "now". */
+    compare?: { label: Label; value: number; now_label?: Label };
     items?: FactItem[];
     /** What the figure covers and leaves out (behavior 46), shown under the caption. */
     note?: Localized;
@@ -102,11 +105,11 @@ const LOCALE: Record<Lang, string> = { vi: 'vi-VN', en: 'en-AU' };
 /** A figure as a reader says it: grouped digits, a % for shares, $…k / $…m for prices
  *  given in $'000, dollars and cents for a wage or a fee. A figure keeps the decimals
  *  its source gives (24.92%, 12.8, 81.1 years — behavior 47), up to two. */
-export function formatValue(n: number, unit: Fact['unit'], lang: Lang): string {
+export function formatValue(n: number, unit: Fact['unit'], lang: Lang, decimals?: number): string {
     const nf = (v: number, digits = 0) =>
         new Intl.NumberFormat(LOCALE[lang], {
-            maximumFractionDigits: digits,
-            minimumFractionDigits: 0
+            maximumFractionDigits: decimals ?? digits,
+            minimumFractionDigits: decimals ?? 0
         }).format(v);
     if (unit === 'pct') return `${nf(n, 2)}%`;
     if (unit === 'aud_k') return n >= 1000 ? `$${nf(n / 1000, 2)}m` : `$${nf(n)}k`;
@@ -116,6 +119,11 @@ export function formatValue(n: number, unit: Fact['unit'], lang: Lang): string {
             maximumFractionDigits: 2
         }).format(n)}`;
     if (unit === 'years') return lang === 'vi' ? `${nf(n, 2)} tuổi` : `${nf(n, 2)} yrs`;
+    // Behavior 124: DFAT's figures in their own scale; Vietnamese names the scale in words.
+    if (unit === 'usd_bn') return lang === 'vi' ? `${nf(n, 1)} tỷ USD` : `US$${nf(n, 1)}b`;
+    if (unit === 'aud_bn') return lang === 'vi' ? `${nf(n, 1)} tỷ AUD` : `A$${nf(n, 1)}b`;
+    if (unit === 'aud_m') return lang === 'vi' ? `${nf(n, 1)} triệu AUD` : `A$${nf(n, 1)}m`;
+    if (unit === 'million') return lang === 'vi' ? `${nf(n, 1)} triệu` : `${nf(n, 1)}m`;
     return nf(n, 2);
 }
 
