@@ -587,14 +587,23 @@ def fact_note_fails(where, f, sources, texts):
     return out
 
 
+# Regulated figures are grounded -> P-7 -> The KB compiler -> a fact's number is found as its source writes it
+# Behavior 125: the Federal Register of Legislation groups a dollar amount's thousands
+# with a space ("Base application charge $6 135" in the Migration Regulations), so a
+# whole-dollar figure is also found as `$6 135` — only after a `$`, so a bare "4 910"
+# (a page number beside a count) never stands in for one.
 def quoted_number(n, text):
-    """True if `n` appears in `text` as written in a source (318,760 / 1,487.6 / 30.6)."""
+    """True if `n` appears in `text` as written in a source (318,760 / 1,487.6 / 30.6 / $6 135)."""
     forms = {f"{n:,}", str(n)}
     if isinstance(n, float):
         forms |= {f"{n:,.1f}", f"{n:.1f}", f"{n:,.2f}"}  # $25.00 as the PBS writes it
         if n.is_integer():
             forms |= {f"{int(n):,}", str(int(n))}
-    return any(re.search(rf"(?<![\d.,]){re.escape(x)}(?![\d]|[.,]\d)", text) for x in forms)
+    if any(re.search(rf"(?<![\d.,]){re.escape(x)}(?![\d]|[.,]\d)", text) for x in forms):
+        return True
+    # the Register's form, not followed by a further " ddd" group ($4 910 000 is not $4 910)
+    spaced = "$" + f"{int(n):,}".replace(",", " ") if float(n).is_integer() and abs(n) >= 1000 else None
+    return bool(spaced and re.search(rf"{re.escape(spaced)}(?![\d]|[.,]\d| \d{{3}}(?!\d))", text))
 
 
 def check_copy_template(pair, locales=LOCALES):
