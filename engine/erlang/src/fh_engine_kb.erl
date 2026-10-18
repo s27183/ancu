@@ -25,8 +25,10 @@
 -export([rules/0]).
 -export([registry/1, registry/2]).
 -export([news_for_slugs/1, all_news/0, all_facts/0, all_terms/0]).
+-export([content_version/0]).
 
 -define(PT_KEY, {?MODULE, artifact}).
+-define(PT_VERSION, {?MODULE, content_version}).
 
 %% --- load -------------------------------------------------------------------
 
@@ -40,6 +42,7 @@ load(Path) ->
         {ok, Bin} ->
             Artifact = fh_engine_util:json_decode(Bin),
             persistent_term:put(?PT_KEY, Artifact),
+            persistent_term:put(?PT_VERSION, version_of(Bin)),
             #{<<"kb">> := Kb, <<"blueprints">> := Bps} = Artifact,
             logger:info("KB artifact loaded from ~s: ~p KB entries, ~p blueprints, "
                         "schema_version ~p, in_scope=~p",
@@ -51,6 +54,21 @@ load(Path) ->
                          "without its compiled rules + blueprints", [Path, Reason]),
             error({kb_artifact_unreadable, Path, Reason})
     end.
+
+%% Regulated figures are grounded -> P-7 -> The engine -> an open page learns the KB it shows was replaced (behavior 135)
+%% The loaded artifact's own hash: the first 16 hex digits of the sha256 of the file's
+%% bytes, taken once at load. The page polls it (GET /api/engine/version via the shell's
+%% /api/version) and re-fetches news, facts and terms only when it changes. The bytes, not
+%% a commit SHA: DO injects no SHA (engine/app.yaml FH_DEPLOY_COMMIT_SHA is "unknown"), and
+%% kb_compiler.py writes no timestamp, so an unchanged KB keeps its hash across rebuilds and
+%% restarts. Any artifact change (a blueprint too) moves it: the page then re-fetches once.
+-spec content_version() -> binary().
+content_version() ->
+    persistent_term:get(?PT_VERSION).
+
+version_of(Bin) ->
+    Hex = binary:encode_hex(crypto:hash(sha256, Bin), lowercase),
+    binary:part(Hex, 0, 16).
 
 default_path() ->
     filename:join([code:priv_dir(fh_engine), "kb", "artifact.json"]).

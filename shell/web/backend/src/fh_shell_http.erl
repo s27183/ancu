@@ -41,6 +41,7 @@ routes() ->
         {"/api/facts", fh_shell_h_facts, []},
         {"/api/fx", fh_shell_h_fx, []},
         {"/api/terms", fh_shell_h_terms, []},
+        {"/api/version", fh_shell_h_version, []},
         {"/api/plan-cards", fh_shell_h_plan_cards, []},
         {"/api/plan-cards/:id/events", fh_shell_h_events, []},
         {"/api/plan-cards/:id/messages", fh_shell_h_plan_card, [messages]},
