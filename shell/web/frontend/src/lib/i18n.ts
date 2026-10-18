@@ -1327,6 +1327,11 @@ const messages = {
         en: 'Vietnamese in Australia, property, living, the economy and visa fees, from government sources.'
     },
     'factspage.news': { vi: 'Đọc tin', en: 'Read the news' },
+    // Behavior 123: the RBA's rate on /facts.
+    'fx.title': { vi: 'Tỷ giá đô la Úc', en: 'The Australian dollar' },
+    'fx.asof': { vi: 'tỷ giá', en: 'rate on' },
+    'fx.time': { vi: '4 giờ chiều', en: '4pm' },
+    'fx.source': { vi: 'Ngân hàng Dự trữ Úc (RBA)', en: 'Reserve Bank of Australia (RBA)' },
     'factspage.sub': { vi: 'Số liệu có nguồn trích dẫn', en: 'Every figure cited' },
     'factspage.empty': { vi: 'Chưa tải được số liệu. Thử lại sau.', en: 'The figures could not be loaded. Try again later.' },
     'newspage.sub': { vi: 'Quy định và thị trường', en: 'Rules and the market' },
