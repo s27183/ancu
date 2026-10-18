@@ -205,6 +205,11 @@ const PUBLISHERS: Record<string, Localized> = {
         vi: 'Bộ Biến đổi Khí hậu, Năng lượng, Môi trường và Nước Úc'
     },
     'www.health.gov.au': { en: 'Department of Health', vi: 'Bộ Y tế Úc' },
+    // Behavior 132: the Commonwealth's land transport program, named as its site names itself.
+    'investment.infrastructure.gov.au': {
+        en: 'Infrastructure Investment Program, Australian Government',
+        vi: 'Chương trình Đầu tư Hạ tầng của Chính phủ Úc'
+    },
     'www.pbs.gov.au': {
         en: 'Pharmaceutical Benefits Scheme',
         vi: 'Chương trình Trợ giá Thuốc (PBS)'
