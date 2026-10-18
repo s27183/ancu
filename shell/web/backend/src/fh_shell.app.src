@@ -10,6 +10,7 @@
         crypto,
         inets,
         ssl,
+        xmerl,
         pgo,
         cowboy
     ]},

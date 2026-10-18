@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  RECONSTRUCTED FIXTURE, not a byte copy of the RBA's feed (behavior 123).
+  The seat's sandbox cannot reach www.rba.gov.au over TLS (its proxy's self-signed
+  certificate), so this file rebuilds the shape of
+  https://www.rba.gov.au/rss/rss-cb-exchange-rates.xml (RSS 1.0 + the RSS-CB 1.2 module)
+  with two of its items, AUD->USD and AUD->VND, holding the values the seat read from the
+  live feed with WebFetch on 2026-10-18: USD 0.6947 and VND 17970, period 2026-10-16.
+  The live feed carries one item per currency (about twenty); the parser reads only these two.
+  Dev points FH_FX_FEED_URL at a local copy of this file; fx_conformance.escript parses it.
+-->
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns="http://purl.org/rss/1.0/"
+         xmlns:dc="http://purl.org/dc/elements/1.1/"
+         xmlns:cb="http://www.cbwiki.net/wiki/index.php/Specification_1.2/">
+  <channel rdf:about="https://www.rba.gov.au/rss/rss-cb-exchange-rates.xml">
+    <title>Reserve Bank of Australia: Exchange Rates</title>
+    <link>https://www.rba.gov.au/statistics/frequency/exchange-rates.html</link>
+    <description>Exchange rates published by the Reserve Bank of Australia</description>
+    <dc:publisher>Reserve Bank of Australia</dc:publisher>
+    <dc:language>en</dc:language>
+    <items>
+      <rdf:Seq>
+        <rdf:li rdf:resource="https://www.rba.gov.au/statistics/frequency/exchange-rates.html#USD"/>
+        <rdf:li rdf:resource="https://www.rba.gov.au/statistics/frequency/exchange-rates.html#VND"/>
+      </rdf:Seq>
+    </items>
+  </channel>
+  <item rdf:about="https://www.rba.gov.au/statistics/frequency/exchange-rates.html#USD">
+    <title>AU: 0.6947 USD = 1 AUD 2026-10-16 RBA 4.00 pm foreign exchange rates</title>
+    <link>https://www.rba.gov.au/statistics/frequency/exchange-rates.html#USD</link>
+    <description>AUD/USD representative rate as at 4.00 pm Eastern Australian time on 16 Oct 2026</description>
+    <dc:date>2026-10-16T16:00:00+11:00</dc:date>
+    <dc:language>en</dc:language>
+    <cb:statistics rdf:parseType="Resource">
+      <cb:country>AU</cb:country>
+      <cb:institutionAbbrev>RBA</cb:institutionAbbrev>
+      <cb:exchangeRate rdf:parseType="Resource">
+        <cb:observation rdf:parseType="Resource">
+          <cb:value>0.6947</cb:value>
+          <cb:unit>AUD</cb:unit>
+          <cb:decimals>4</cb:decimals>
+        </cb:observation>
+        <cb:baseCurrency>AUD</cb:baseCurrency>
+        <cb:targetCurrency>USD</cb:targetCurrency>
+        <cb:rateType>4.00 pm foreign exchange rates</cb:rateType>
+        <cb:observationPeriod rdf:parseType="Resource">
+          <cb:frequency>daily</cb:frequency>
+          <cb:period>2026-10-16</cb:period>
+        </cb:observationPeriod>
+      </cb:exchangeRate>
+    </cb:statistics>
+  </item>
+  <item rdf:about="https://www.rba.gov.au/statistics/frequency/exchange-rates.html#VND">
+    <title>AU: 17970 VND = 1 AUD 2026-10-16 RBA 4.00 pm foreign exchange rates</title>
+    <link>https://www.rba.gov.au/statistics/frequency/exchange-rates.html#VND</link>
+    <description>AUD/VND representative rate as at 4.00 pm Eastern Australian time on 16 Oct 2026</description>
+    <dc:date>2026-10-16T16:00:00+11:00</dc:date>
+    <dc:language>en</dc:language>
+    <cb:statistics rdf:parseType="Resource">
+      <cb:country>AU</cb:country>
+      <cb:institutionAbbrev>RBA</cb:institutionAbbrev>
+      <cb:exchangeRate rdf:parseType="Resource">
+        <cb:observation rdf:parseType="Resource">
+          <cb:value>17970</cb:value>
+          <cb:unit>AUD</cb:unit>
+          <cb:decimals>0</cb:decimals>
+        </cb:observation>
+        <cb:baseCurrency>AUD</cb:baseCurrency>
+        <cb:targetCurrency>VND</cb:targetCurrency>
+        <cb:rateType>4.00 pm foreign exchange rates</cb:rateType>
+        <cb:observationPeriod rdf:parseType="Resource">
+          <cb:frequency>daily</cb:frequency>
+          <cb:period>2026-10-16</cb:period>
+        </cb:observationPeriod>
+      </cb:exchangeRate>
+    </cb:statistics>
+  </item>
+</rdf:RDF>
