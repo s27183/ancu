@@ -88,11 +88,13 @@ Below are the nominations made **from 1 July 2026 to 31 August 2026** for people
 
 Home Affairs does not post the ceilings on its website, but in January 2026 it released the 2025–26 figures under FOI request 26/01/00545:
 
-| Occupation, 2025–26 | Ceiling | Already granted other skilled visas in 2024–25 (491, 494, 186, 190) | Places left for the 189 |
+| 2025–26 | Ceiling | Used | Left for 189 |
 |---|---|---|---|
 | Registered Nurses | 13,929 | 3,539 | 10,390 |
 | Other Medical Practitioners | 830 | 183 | 647 |
 | Specialist Physicians | 578 | 105 | 473 |
+
+"Used" is the places already taken by 2024–25 grants of other skilled visas (491, 494, 186, 190); the rest is left for the 189.
 
 Every other occupation is in the same document ([FOI 26/01/00545, PDF](https://www.homeaffairs.gov.au/foi/files/2026/fa-260100545-document-released.PDF)), on scanned pages. Home Affairs notes that ceilings "do not necessarily reflect the final outcomes of the program". The 2026–27 ceilings have not been released.
 
@@ -134,11 +136,13 @@ Bộ Nội vụ công bố mỗi bang và vùng lãnh thổ đã đề cử bao 
 
 Bộ Nội vụ không đăng các trần này trên trang web, nhưng tháng 1/2026 Bộ đã đưa ra số liệu 2025–26 khi trả lời yêu cầu FOI số 26/01/00545:
 
-| Nghề, 2025–26 | Trần | Đã cấp visa tay nghề khác năm 2024–25 (491, 494, 186, 190) | Số suất còn lại cho diện 189 |
+| 2025–26 | Trần | Đã dùng | Còn cho 189 |
 |---|---|---|---|
-| Điều dưỡng (Registered Nurses) | 13.929 | 3.539 | 10.390 |
-| Bác sĩ khác (Other Medical Practitioners) | 830 | 183 | 647 |
-| Bác sĩ chuyên khoa nội (Specialist Physicians) | 578 | 105 | 473 |
+| Điều dưỡng | 13.929 | 3.539 | 10.390 |
+| Bác sĩ khác | 830 | 183 | 647 |
+| Bác sĩ chuyên khoa nội | 578 | 105 | 473 |
+
+"Đã dùng" là số suất đã dành cho các visa tay nghề khác (491, 494, 186, 190) cấp trong năm 2024–25; phần còn lại dành cho diện 189. Tên nghề theo Home Affairs: Registered Nurses, Other Medical Practitioners, Specialist Physicians.
 
 Các nghề khác nằm trong cùng tài liệu ([FOI 26/01/00545, PDF](https://www.homeaffairs.gov.au/foi/files/2026/fa-260100545-document-released.PDF)), ở các trang scan. Bộ lưu ý các trần này không nhất thiết phản ánh kết quả cuối cùng của chương trình. Trần năm 2026–27 chưa được công bố.
 
