@@ -4,6 +4,7 @@
     //            "Australia in figures", opens one page of the facts about Australia a buyer
     //            cares about — the Introduction's three sections first, in its order, then the
     //            KB's other fact docs (the economy, visa charges: PAGE_ORDER, facts.ts).
+    //            Behavior 123: the RBA's latest AUD rate (GET /api/fx) leads them, or is absent.
     // Holds:     every figure comes from GET /api/facts and is drawn by FactCards, the same
     //            cards the Introduction sheet draws, so the two show the same figures and
     //            sources; the page frame and the way home are the News page's.
@@ -14,11 +15,16 @@
     import { type FactDoc, getFacts, pageRank, pick } from '$lib/facts';
     import FactCards from '$lib/FactCards.svelte';
     import HomeBack from '$lib/HomeBack.svelte';
+    import FxRate from '$lib/FxRate.svelte';
+    import { type FxRate as Fx, getFx } from '$lib/fx';
 
     let docs = $state<FactDoc[] | null>(null);
+    // Behavior 123: the RBA's latest rate leads the page; none stored, no section.
+    let fx = $state<Fx | null>(null);
     const ordered = $derived(docs ? [...docs].sort((a, b) => pageRank(a.slug) - pageRank(b.slug)) : []);
 
     onMount(async () => {
+        getFx().then((r) => (fx = r));
         // As in the sheet: an empty answer (a cold engine) is retried before giving up.
         let got: FactDoc[] = [];
         for (let i = 0; i < 3 && !got.length; i++) {
@@ -45,6 +51,7 @@
                 <div class="pp-state"><p>{$t('factspage.empty')}</p></div>
             {:else}
                 <p class="fp-note">{$t('intro.sources.note')}</p>
+                {#if fx}<FxRate rate={fx} />{/if}
                 {#each ordered as doc (doc.slug)}
                     <section class="fp-section" id={doc.slug} aria-labelledby="fp-{doc.slug}">
                         <h3 id="fp-{doc.slug}">{pick(doc.title, $lang)}</h3>
