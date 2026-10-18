@@ -40,8 +40,8 @@ Kept to the visas readers ask about: skilled (189, 190, 491), employer (186, 494
       "id": "skilled_employer",
       "visual": "growth",
       "unit": "aud",
-      "headline": {"en": "Skilled and employer visas now cost about $6,140 to apply for — 25% more",
-                   "vi": "Visa tay nghề và visa chủ lao động bảo lãnh nay tốn khoảng $6.140 khi nộp đơn — tăng 25%"},
+      "headline": {"en": "Skilled, graduate and employer visas now cost $5,750 to $6,140 to apply for — 25% more",
+                   "vi": "Visa tay nghề, tốt nghiệp và chủ lao động nay tốn $5.750 đến $6.140 khi nộp đơn — tăng 25%"},
       "caption": {"en": "Main applicant's charge, paid when applying: before → from 1 July 2026",
                   "vi": "Phí của người nộp đơn chính, trả khi nộp đơn: trước → từ 1/7/2026"},
       "as_of": "2026-07",
@@ -51,7 +51,8 @@ Kept to the visas readers ask about: skilled (189, 190, 491), employer (186, 494
         {"label": {"en": "Skilled Nominated (190)", "vi": "Tay nghề được bang đề cử (190)"}, "from": 4910, "value": 6140},
         {"label": {"en": "Skilled Work Regional (491)", "vi": "Tay nghề vùng regional (491)"}, "from": 4910, "value": 6140},
         {"label": {"en": "Employer Nomination (186)", "vi": "Chủ lao động đề cử (186)"}, "from": 4910, "value": 6140},
-        {"label": {"en": "Employer Sponsored Regional (494)", "vi": "Chủ lao động bảo lãnh vùng regional (494)"}, "from": 4910, "value": 6140}
+        {"label": {"en": "Employer Sponsored Regional (494)", "vi": "Chủ lao động bảo lãnh vùng regional (494)"}, "from": 4910, "value": 6140},
+        {"label": {"en": "Temporary Graduate (485)", "vi": "Tốt nghiệp tạm trú (485)"}, "from": 4600, "value": 5750}
       ],
       "note": {"en": "The charge rose by 25% for most visas from 1 July 2026, a 2026–27 Budget measure. Each family member who applies with you pays a further charge.",
                "vi": "Phí đã tăng 25% với hầu hết các loại visa từ 1/7/2026, một biện pháp trong Ngân sách 2026–27. Mỗi thành viên gia đình nộp đơn cùng bạn phải trả thêm một khoản phí."},
@@ -71,10 +72,14 @@ Kept to the visas readers ask about: skilled (189, 190, 491), employer (186, 494
                  "\"visaSubclassText\":\"Skilled Nominated visa (subclass 190)\",\"streamCode\":\"\",\"streamText\":\"\",\"onShore\":\"No\",\"basePrice\":\"AUD6,140.00\"",
                  "\"visaSubclassText\":\"Skilled Work Regional (Provisional) visa (subclass 491)\",\"streamCode\":\"\",\"streamText\":\"\",\"onShore\":\"No\",\"basePrice\":\"AUD6,140.00\"",
                  "\"visaSubclassText\":\"Employer Nomination Scheme visa (subclass 186) - Direct Entry stream\",\"streamCode\":\"\",\"streamText\":\"\",\"onShore\":\"No\",\"basePrice\":\"AUD6,140.00\"",
-                 "\"visaSubclassText\":\"Skilled Employer Sponsored Regional (Provisional) visa (subclass 494) - Employer Sponsored stream\",\"streamCode\":\"\",\"streamText\":\"\",\"onShore\":\"No\",\"basePrice\":\"AUD6,140.00\""]
+                 "\"visaSubclassText\":\"Skilled Employer Sponsored Regional (Provisional) visa (subclass 494) - Employer Sponsored stream\",\"streamCode\":\"\",\"streamText\":\"\",\"onShore\":\"No\",\"basePrice\":\"AUD6,140.00\"",
+                 "1229 Skilled (Provisional) (Class VC)",
+                 "(iv) for any other applicant: First instalment Item Component Amount 1 Base application charge $5 750",
+                 "(iv) for any other applicant: First instalment Item Component Amount 1 Base application charge $4 600",
+                 "\"visaSubclassText\":\"Temporary Graduate visa (subclass 485) - Post-Higher Education Work stream\",\"streamCode\":\"\",\"streamText\":\"\",\"onShore\":\"No\",\"basePrice\":\"AUD5,750.00\""]
     },
     {
-      "id": "graduate_partner_parent",
+      "id": "partner_parent",
       "visual": "growth",
       "unit": "aud",
       "headline": {"en": "A partner visa now costs $11,710 to apply for — 25% more",
@@ -84,7 +89,6 @@ Kept to the visas readers ask about: skilled (189, 190, 491), employer (186, 494
       "as_of": "2026-07",
       "source": [0, 1, 2],
       "items": [
-        {"label": {"en": "Temporary Graduate (485)", "vi": "Tốt nghiệp tạm trú (485)"}, "from": 4600, "value": 5750},
         {"label": {"en": "Partner (820/801, 309/100)", "vi": "Vợ/chồng — Partner (820/801, 309/100)"}, "from": 9365, "value": 11710, "highlight": true},
         {"label": {"en": "Parent (103, 804)", "vi": "Cha mẹ — Parent (103, 804)"}, "from": 5280, "value": 6600},
         {"label": {"en": "Contributory Parent (143, 864)", "vi": "Cha mẹ có đóng góp (143, 864)"}, "from": 5040, "value": 6300}
@@ -95,10 +99,7 @@ Kept to the visas readers ask about: skilled (189, 190, 491), employer (186, 494
       "note_quotes": ["a system-wide increase to the first instalment of the VAC by 25 per cent from 1 July 2026",
                       "implement 2026–27 Budget measures relating to the first instalment for visa application charges",
                       "Additional applicant charge is paid by an applicant who claims to be a member of the family unit of another applicant and seeks to combine the application with that applicant’s application."],
-      "quotes": ["1229 Skilled (Provisional) (Class VC)",
-                 "(iv) for any other applicant: First instalment Item Component Amount 1 Base application charge $5 750",
-                 "(iv) for any other applicant: First instalment Item Component Amount 1 Base application charge $4 600",
-                 "1124B Partner (Residence) (Class BS)",
+      "quotes": ["1124B Partner (Residence) (Class BS)",
                  "1129 Partner (Migrant) (Class BC)",
                  "(iii) for any other applicant: First instalment Item Component Amount 1 Base application charge $11 710",
                  "(vii) for any other applicant: First instalment Item Component Amount 1 Base application charge $9 365",
@@ -110,7 +111,6 @@ Kept to the visas readers ask about: skilled (189, 190, 491), employer (186, 494
                  "1130A Contributory Aged Parent (Residence) (Class DG)",
                  "(xi) for any other applicant: First instalment Item Component Amount 1 Base application charge $6 300",
                  "(vi) for any other applicant: First instalment Item Component Amount 1 Base application charge $5 040",
-                 "\"visaSubclassText\":\"Temporary Graduate visa (subclass 485) - Post-Higher Education Work stream\",\"streamCode\":\"\",\"streamText\":\"\",\"onShore\":\"No\",\"basePrice\":\"AUD5,750.00\"",
                  "\"visaSubclassText\":\"Partner visa (subclass 820/801)\",\"streamCode\":\"\",\"streamText\":\"\",\"onShore\":\"No\",\"basePrice\":\"AUD11,710.00\"",
                  "\"visaSubclassText\":\"Partner (Provisional and Migrant) visa (subclass 309/100)\",\"streamCode\":\"\",\"streamText\":\"\",\"onShore\":\"No\",\"basePrice\":\"AUD11,710.00\"",
                  "\"visaSubclassText\":\"Parent visa (subclass 103)\",\"streamCode\":\"\",\"streamText\":\"\",\"onShore\":\"No\",\"basePrice\":\"AUD6,600.00\"",
