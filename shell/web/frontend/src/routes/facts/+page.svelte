@@ -15,16 +15,25 @@
     import { type FactDoc, getFacts, pageRank, pick } from '$lib/facts';
     import FactCards from '$lib/FactCards.svelte';
     import HomeBack from '$lib/HomeBack.svelte';
+    import NewsDetailSheet from '$lib/NewsDetailSheet.svelte';
+    import { getAllNews, type NewsNote } from '$lib/api';
     import FxRate from '$lib/FxRate.svelte';
     import { type FxRate as Fx, getFx } from '$lib/fx';
 
     let docs = $state<FactDoc[] | null>(null);
     // Behavior 123: the RBA's latest rate leads the page; none stored, no section.
     let fx = $state<Fx | null>(null);
+    // Behavior 125: a section's `news` notes, linked under it; a tap opens the note over the
+    // page as on /news. A slug the news list lacks draws no link.
+    let news = $state<NewsNote[]>([]);
+    let selected = $state<NewsNote | null>(null);
+    const notesFor = (doc: FactDoc) =>
+        (doc.news ?? []).map((s) => news.find((n) => n.news_slug === s)).filter((n): n is NewsNote => !!n);
     const ordered = $derived(docs ? [...docs].sort((a, b) => pageRank(a.slug) - pageRank(b.slug)) : []);
 
     onMount(async () => {
         getFx().then((r) => (fx = r));
+        getAllNews().then((n) => (news = n));
         // As in the sheet: an empty answer (a cold engine) is retried before giving up.
         let got: FactDoc[] = [];
         for (let i = 0; i < 3 && !got.length; i++) {
@@ -56,12 +65,22 @@
                     <section class="fp-section" id={doc.slug} aria-labelledby="fp-{doc.slug}">
                         <h3 id="fp-{doc.slug}">{pick(doc.title, $lang)}</h3>
                         <FactCards {doc} />
+                        {#each notesFor(doc) as note (note.news_slug)}
+                            <button type="button" class="fp-news" onclick={() => (selected = note)}>
+                                <span class="fp-news-tag">{$t('factspage.news')}</span>
+                                <span>{($lang === 'vi' ? note.headline_vi : note.headline_en) ?? note.headline_en}</span>
+                            </button>
+                        {/each}
                     </section>
                 {/each}
             {/if}
         </div>
     </div>
 </div>
+
+{#if selected}
+    <NewsDetailSheet note={selected} onClose={() => (selected = null)} />
+{/if}
 
 <style>
     .fp-note {
@@ -79,5 +98,36 @@
         letter-spacing: -0.02em;
         color: var(--ink);
         text-wrap: balance;
+    }
+    .fp-news {
+        display: flex;
+        align-items: baseline;
+        gap: var(--sp-2);
+        width: 100%;
+        margin-top: var(--sp-3);
+        padding: var(--sp-3) var(--sp-4);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--surface-2, var(--surface));
+        color: var(--ink);
+        font: inherit;
+        font-size: var(--fs-sm);
+        text-align: left;
+        cursor: pointer;
+    }
+    .fp-news:hover {
+        border-color: var(--accent);
+    }
+    .fp-news:focus-visible {
+        outline: none;
+        box-shadow: var(--ring);
+    }
+    .fp-news-tag {
+        flex: none;
+        color: var(--accent);
+        font-weight: 700;
+        font-size: var(--fs-xs);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
     }
 </style>
