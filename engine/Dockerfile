@@ -25,6 +25,9 @@ FROM python:3.14-slim AS kb-builder
 WORKDIR /src
 COPY docs docs/
 COPY engine/build engine/build/
+# GATE 16's self-test plants these fixtures and fails closed without them (measured
+# 2026-10-18: every engine build from 4f1072c on failed here, production stayed on 671de87).
+COPY tests/fixtures/journey_rule tests/fixtures/journey_rule/
 RUN python3 engine/build/kb_compiler.py
 # -> /src/engine/erlang/priv/kb/artifact.json
 
