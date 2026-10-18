@@ -7,6 +7,8 @@
     // (Welcome) over the cards, whose first screen leads to the independent /
     // information-not-advice position in one tap; minimised, it leaves the cards in view.
     // Behavior 89: a dotted map of Australia lights up behind the cards (HomeBackdrop).
+    // Behavior 128: Welcome sits inside .home, after the cards, so its launcher can fall in
+    // behind them where at the bottom-right it would cover one.
     import Welcome from '$lib/Welcome.svelte';
     import HomeBackdrop from '$lib/HomeBackdrop.svelte';
     import { t } from '$lib/i18n';
@@ -76,7 +78,8 @@
             >
         </a>
     </nav>
+    <!-- First visit: the case for Australian property, then a launcher to reopen it
+         (behavior 42) — inside the home's scroll, so where the launcher would cover a
+         card it is drawn after them instead (behavior 128, Welcome's block). -->
+    <Welcome />
 </div>
-
-<!-- First visit: the case for Australian property, then a launcher to reopen it (behavior 42). -->
-<Welcome />
