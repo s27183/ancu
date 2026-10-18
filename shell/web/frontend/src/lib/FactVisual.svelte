@@ -65,6 +65,15 @@
         let n = 0;
         return items.map((i) => (i.highlight ? `hl-${h++ % 3}` : `nt-${n++ % 4}`));
     });
+
+    // A rise under double reads as a percentage (a visa charge up 25%: behavior 125), a larger
+    // one as a multiple (a city's prices ×3.0 over twenty years: behavior 42), rounded as quoted.
+    function rise(to: number, from: number): string {
+        const loc = $lang === 'vi' ? 'vi-VN' : 'en-AU';
+        const r = to / (from || 1);
+        if (r < 2) return `${r >= 1 ? '+' : '−'}${Math.round(Math.abs(r - 1) * 100)}%`;
+        return `×${r.toLocaleString(loc, { maximumFractionDigits: 1 })}`;
+    }
 </script>
 
 <div class="fv fv--{fact.visual}" class:shown>
@@ -140,7 +149,7 @@
                     <span class="fv-db-vals"
                         ><span class="muted">{fmt(from)}</span> → <strong>{fmt(it.value)}</strong></span
                     >
-                    <span class="fv-mult">×{(it.value / (from || 1)).toLocaleString($lang === 'vi' ? 'vi-VN' : 'en-AU', { maximumFractionDigits: 1 })}</span>
+                    <span class="fv-mult">{rise(it.value, from)}</span>
                 </li>
             {/each}
         </ul>

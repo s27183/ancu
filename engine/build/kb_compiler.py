@@ -429,7 +429,7 @@ def journey_rule_self_test(kb_docs):
     return [f"[journey] self-test: the planted fixture '{w}' is no longer caught" for w in miss], caught
 
 
-def facts_doc_fails(slug, doc, kb_docs):
+def facts_doc_fails(slug, doc, kb_docs, news_docs=None):
     """GATE 12 problems for one fact doc (FACT_VISUALS block above)."""
     out = []
     if doc["error"]:
@@ -456,6 +456,16 @@ def facts_doc_fails(slug, doc, kb_docs):
     err = check_copy_template(body.get("title") or {})
     if err:
         out.append(f"[facts] {slug}: title: {err}")
+    # Behavior 125: a doc may name the news notes that explain it (`"news": [<news slug>]`);
+    # /facts links them under the section. Each must be a current news note, so a link
+    # never opens nothing.
+    related = body.get("news", [])
+    if not isinstance(related, list) or not all(isinstance(n, str) for n in related):
+        out.append(f"[facts] {slug}: news must be a list of news slugs")
+    elif news_docs is not None:
+        for n in related:
+            if n not in news_docs:
+                out.append(f"[facts] {slug}: news {n!r} is no news note in docs/kb/news/")
     facts = body.get("facts") or []
     if not facts:
         out.append(f"[facts] {slug}: no facts")
@@ -587,14 +597,23 @@ def fact_note_fails(where, f, sources, texts):
     return out
 
 
+# Regulated figures are grounded -> P-7 -> The KB compiler -> a fact's number is found as its source writes it
+# Behavior 125: the Federal Register of Legislation groups a dollar amount's thousands
+# with a space ("Base application charge $6 135" in the Migration Regulations), so a
+# whole-dollar figure is also found as `$6 135` — only after a `$`, so a bare "4 910"
+# (a page number beside a count) never stands in for one.
 def quoted_number(n, text):
-    """True if `n` appears in `text` as written in a source (318,760 / 1,487.6 / 30.6)."""
+    """True if `n` appears in `text` as written in a source (318,760 / 1,487.6 / 30.6 / $6 135)."""
     forms = {f"{n:,}", str(n)}
     if isinstance(n, float):
         forms |= {f"{n:,.1f}", f"{n:.1f}", f"{n:,.2f}"}  # $25.00 as the PBS writes it
         if n.is_integer():
             forms |= {f"{int(n):,}", str(int(n))}
-    return any(re.search(rf"(?<![\d.,]){re.escape(x)}(?![\d]|[.,]\d)", text) for x in forms)
+    if any(re.search(rf"(?<![\d.,]){re.escape(x)}(?![\d]|[.,]\d)", text) for x in forms):
+        return True
+    # the Register's form, not followed by a further " ddd" group ($4 910 000 is not $4 910)
+    spaced = "$" + f"{int(n):,}".replace(",", " ") if float(n).is_integer() and abs(n) >= 1000 else None
+    return bool(spaced and re.search(rf"{re.escape(spaced)}(?![\d]|[.,]\d| \d{{3}}(?!\d))", text))
 
 
 def check_copy_template(pair, locales=LOCALES):
@@ -1688,7 +1707,7 @@ def run(emit=False):
 
     # ---- GATE 12: fact docs quote their archived primaries (FACT_VISUALS block) ---- #
     for slug, doc in sorted(facts_docs.items()):
-        fails.extend(facts_doc_fails(slug, doc, kb_docs))
+        fails.extend(facts_doc_fails(slug, doc, kb_docs, news_docs))
 
     # ---- GATE 8: bilingual copy-template well-formedness (all docs) -------- #
     # Every `copy` template is localized in every LOCALES locale (outcome-conformance.md
@@ -2010,6 +2029,7 @@ def build_artifact(blueprints, registries, kb_docs, news_docs, facts_docs=None, 
         "facts": {
             slug: {
                 "title": d["body"].get("title"),
+                "news": d["body"].get("news") or [],
                 "last_verified": d["last_verified"],
                 "sources": d.get("sources") or [],
                 "facts": [{k: v for k, v in f.items() if k not in ("quotes", "note_quotes")}
