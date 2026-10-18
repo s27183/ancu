@@ -70,14 +70,30 @@ CASES = [
 ]
 
 
+def edition_case() -> dict:
+    """Behavior 134: kb-watch moves `next_edition:` on when the new edition is not out
+    yet — a date, so with `last_verified:` alone it is date-only. On news-watch's
+    branch name, which the gate judges as it judges kb-watch's."""
+    path = "docs/kb/facts/fixture-edition.md"
+    body = "---\nslug: kb.fixture.edition\nlast_verified: {lv}\nnext_edition: {ne}\n---\n\nA figure.\n"
+    base = commit("HEAD", {path: body.format(lv="2026-10-01", ne="2027-05")}, "fixture base")
+    head = commit(base, {path: body.format(lv="2027-05-03", ne="2027-06")}, "fixture head")
+    return kb_gate.decide(base, head, "kb-watch-news-fixture", set(), True)
+
+
 def main() -> int:
     fails = 0
+    d = edition_case()
+    ok = d["decision"] == "merge"
+    fails += not ok
+    print(f"{'ok  ' if ok else 'FAIL'} next_edition moved on, on a kb-watch-news- branch → {d['decision']}"
+          + ("" if ok else f" {d['reasons']}"))
     for name, path, url, want, reason in CASES:
         d = case(path, url)
         ok = d["decision"] == want and (reason is None or any(reason in r for r in d["reasons"]))
         fails += not ok
         print(f"{'ok  ' if ok else 'FAIL'} {name} → {d['decision']}" + ("" if ok else f" {d['reasons']}"))
-    print(f"kb_gate_eval: {len(CASES) - fails}/{len(CASES)} cases")
+    print(f"kb_gate_eval: {len(CASES) + 1 - fails}/{len(CASES) + 1} cases")
     return 1 if fails else 0
 
 

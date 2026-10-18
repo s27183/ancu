@@ -2,6 +2,8 @@
 slug: kb.facts.visa-charges
 effective_from: 2026-07-01
 last_verified: 2026-10-18
+next_edition: 2027-07
+next_edition_at: https://immi.homeaffairs.gov.au/visas/getting-a-visa/fees-and-charges/current-visa-pricing
 sources:
   - url: https://www.legislation.gov.au/F1996B03551/2026-07-01/2026-07-01/text/original/pdf/1
     retrieved: 2026-10-18

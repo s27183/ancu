@@ -5,9 +5,10 @@
     python3 scripts/visa_watch.py --update   # the same, then set `since` to today
     python3 scripts/visa_watch.py --self-test
 
-Regulated figures are grounded -> P-7 · The KB -> The weekly kb-watch routine -> visa changes reach the news without Son's machine
-Behavior 104 (Son 2026-10-17): the weekly cloud kb-watch routine writes the visa news the
-seat on Son's machine used to write. This script is its trigger, not its reader: it
+Regulated figures are grounded -> P-7 · The KB -> The daily news-watch routine -> visa changes reach the news without Son's machine
+Behavior 104 (Son 2026-10-17): a cloud routine writes the visa news the seat on Son's
+machine used to write — the weekly kb-watch until behavior 134 (Son 2026-10-19), the
+daily news-watch since. This script is its trigger, not its reader: it
 names what moved, and the routine opens each named page, archives it and writes the note
 (kb-update-runbook.md "Home Affairs visa check").
 Holds:   two kinds of signal, kept in docs/sources/homeaffairs/visa-watch.json —

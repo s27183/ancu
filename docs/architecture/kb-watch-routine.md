@@ -1,4 +1,4 @@
-# kb-watch — the weekly KB and news routine
+# kb-watch — the weekly KB re-check routine
 
 Regulated figures are grounded -> P-7 -> The KB -> a weekly routine proposes the KB update as one PR; the gate merges it when verified, else Son
 
@@ -10,6 +10,14 @@ stopping before phase 6: it opens a PR and never merges or deploys. This file is
 the source of the routine's prompt. The block between the two `---8<---` lines is
 sent as the routine's message verbatim; a change here is pushed to the routine with
 `RemoteTrigger update` in the same behavior that changes it.
+
+**Since behavior 134** (Son 2026-10-19: readers open the app daily) the government
+sites and the Home Affairs visa check moved to the daily news-watch routine
+([news-watch-routine.md](news-watch-routine.md)); kb-watch writes news only for a
+doc whose figure it changed. It takes every doc whose next yearly edition is due
+(`next_edition:`, tests/kb_freshness.py's NEW EDITION DUE) first, then 30 overdue
+docs, not 10: 147 were overdue on 2026-10-19, so the backlog clears in about five
+weeks.
 
 **Why a PR and not a commit.** The goal's figures must trace to a *verified*
 source. The routine reads the primary and drafts. Behavior 57 made Son the verifying
@@ -35,16 +43,22 @@ regulated figure traces to a verified, cited source; every news item bilingual),
 `docs/architecture/kb-update-runbook.md` (Track A, phases 0–5), and one existing news note
 in `docs/kb/news/` as the shape to copy.
 
-1. Scope. Run `python3 tests/kb_freshness.py`. Take the 10 most overdue docs (largest
-   overdue first; ties by slug). Skip `kb.copy.*`, `kb.bilingual.*`, `kb.journey.*`.
+1. Scope. Run `python3 tests/kb_freshness.py`. Take every doc it lists under NEW EDITION
+   DUE, then the 30 most overdue docs (largest overdue first; ties by slug). Skip `kb.copy.*`, `kb.bilingual.*`, `kb.journey.*`.
    Also take `kb.fx.rba-aud-vnd`, where it exists, on every run (cadence weekly): its
    reading becomes the RBA's latest published AUD/VND rate on the page it cites, quoted
    from that page's saved copy. That reading changing is not news (step 3). A fee
    line's band (a `low`/`high` from several providers) is re-checked as the runbook's
    "Fee lines" section says.
 
-2. Re-verify each of the 10 against the primaries its own `sources:` list cites — open
-   each URL now (curl or your web fetch). Never verify against another KB doc, a search
+2. Re-verify each doc taken against the primaries its own `sources:` list cites — open
+   each URL now (curl or your web fetch). A NEW EDITION DUE doc is read off a yearly
+   edition (a Budget, a yearbook, a fee table): first find the new edition, starting at
+   its `next_edition_at:` page if it has one, from the same publisher. If it is out,
+   re-read each figure from it, replace that source's `url:`, archive it and quote it as
+   for a changed figure below, and set `next_edition:` a year on (the same month). If it
+   is not out yet, set `next_edition:` a month on and re-verify against the current
+   sources as usual. Never verify against another KB doc, a search
    snippet, or memory. For each doc decide exactly one:
    - unchanged: every figure still matches the primary. Bump `last_verified:` and each
      opened source's `retrieved:` to today. Nothing else.
@@ -75,28 +89,18 @@ in `docs/kb/news/` as the shape to copy.
    - could not verify: the source is down, moved, or no longer states the figure. Leave
      the doc unchanged and give the reason.
 
-3. News. Write a news note for each change a Vietnamese buyer of Australian property would
-   care about: every "changed" doc from step 2, and any change published since the newest
-   note's `authored_date` on these government sites: ato.gov.au, revenue.nsw.gov.au,
-   sro.vic.gov.au, qro.qld.gov.au, revenuesa.sa.gov.au, finance.wa.gov.au (RevenueWA),
-   treasury.gov.au and budget.gov.au, firb.gov.au,
-   housingaustralia.gov.au, rba.gov.au, asic.gov.au. Government sources only: no news
-   outlet, blog or aggregator. Skip anything already covered by an existing note.
-   Visa news (Home Affairs and its ministers): run `python3 scripts/visa_watch.py
-   --update`. Each `RELEASE` or `PAGE` line it prints is a candidate: open it with
-   curl (never WebFetch, which Home Affairs refuses), read only what changed, and write
-   a note if a buyer would care, as the runbook's "Home Affairs visa check" says —
-   archive each page you cite with `scripts/archive_source.py`, short paragraphs,
-   tables for quotas, plain visa names. A release about security, disasters or the arts
-   is not visa news. Commit `docs/sources/homeaffairs/visa-watch.json` (its new
-   `since`) whenever you open a PR. Each
-   note is `docs/kb/news/<yyyy-mm>-<slug>.md`, frontmatter `slug: kb.news.<same>`,
-   `category` (one of finance, market, property, scheme, tax, visa), `effective_from`, `authored_date: <today>`, `sources:` (url + retrieved
-   today, a page you opened), and four sections: Headline (EN), Headline (VI), Summary
-   (EN), Summary (VI). Vietnamese is natural Vietnamese for a buyer, with the same figures
-   as the English. Information, not advice: no "you should". A `## Notes` section is for
-   the reviewer; nothing a user reads goes there. Where the note concerns a KB doc, add
-   `affected_kb_slugs:` as the existing notes do.
+3. News. Write a news note for each "changed" doc from step 2 that a Vietnamese buyer of
+   Australian property would care about (a new edition with new figures counts). Other
+   government news and the Home Affairs visa check are the daily news-watch routine's:
+   do not look for them, and do not run `scripts/visa_watch.py`. Skip a change an
+   existing note (on `main`, or added by an open `kb-watch-*` branch) already covers.
+   Each note is `docs/kb/news/<yyyy-mm>-<slug>.md`, frontmatter `slug: kb.news.<same>`,
+   `category` (one of finance, market, property, scheme, tax, visa), `effective_from`,
+   `authored_date: <today>`, `sources:` (url + retrieved today, a page you opened), and
+   four sections: Headline (EN), Headline (VI), Summary (EN), Summary (VI). Vietnamese is
+   natural Vietnamese for a buyer, with the same figures as the English. Information, not
+   advice: no "you should". A `## Notes` section is for the reviewer; nothing a user reads
+   goes there. Add `affected_kb_slugs:` naming the doc, as the existing notes do.
    Every acronym in a headline or summary (ASIC, FHOG…) must be a term in
    `docs/kb/terms/*.md`, and so should a named rule a Vietnamese buyer may not know
    (Ministerial Direction): the reader taps it for an explanation. Add a missing one in the
@@ -124,9 +128,8 @@ in `docs/kb/news/` as the shape to copy.
    - one line per doc taken in step 1: `<slug> — unchanged` / `<slug> — changed <old> →
      <new> (<source url>)` / `<slug> — could not verify: <why>`
    - the news notes added, each with its EN headline and source
-   - the visa check: each `PAGE`/`RELEASE` line with what you did with it (a note, or
-     why none), each `COULD NOT READ` line as printed, or the one line
-     `Home Affairs visa check: no change since <date>`
+   - each NEW EDITION DUE doc: the new edition's URL, or `not out yet, next_edition
+     <yyyy-mm>`
    - kind-2/3 changes found and not drafted
    - any check that could not run
    The first line of the body says: "Opened by the weekly kb-watch routine (behaviors 57,

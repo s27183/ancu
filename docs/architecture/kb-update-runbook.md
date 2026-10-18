@@ -26,9 +26,12 @@ most "update the KB" asks are Track A.
 
 **Track A is proposed weekly by a routine and published by Son.** The Claude Code
 routine "ancu kb-watch" ([kb-watch-routine.md](kb-watch-routine.md), behavior 57)
-runs every Monday 06:00 AEDT: it takes the 10 most overdue docs from the freshness
-scanner (Phase 0), re-verifies them against their primaries, drafts news notes from
-the watched government sites, runs the gates (Phases 1, 2, 4, 5) and opens one PR.
+runs every Monday 06:00 AEDT: it takes every doc whose next yearly edition is due,
+then the 30 most overdue docs from the freshness scanner (Phase 0), re-verifies them
+against their primaries, drafts a news note for each figure that moved, runs the gates
+(Phases 1, 2, 4, 5) and opens one PR. The news from the watched government sites and
+the Home Affairs visa check are proposed daily by the "ancu news-watch" routine
+([news-watch-routine.md](news-watch-routine.md), behavior 134), one PR a day.
 It never merges or deploys: Phases 6–7 are Son's merge and deploy. Kind-2 and
 kind-3 changes are named in the PR body, not drafted, and are taken up in a session
 (Son + Claude Code) as before — which is also how an external event (a Budget, a
@@ -374,9 +377,10 @@ from a JSON blob — `scripts/archive_source.py` unpacks it (2026-10-17), and an
 and a browser user agent (both measured 2026-10-09). GATE 11 fails the build on
 any other host, naming the note and the host.
 
-#### Home Affairs visa check — in the weekly kb-watch routine (behaviors 100, 104)
+#### Home Affairs visa check — in the daily news-watch routine (behaviors 100, 104, 134)
 
-The cloud kb-watch routine runs this check each week (behavior 104, Son 2026-10-17);
+The cloud news-watch routine runs this check each day (behavior 134, Son 2026-10-19;
+the weekly kb-watch ran it from behavior 104, Son 2026-10-17);
 it used to wait for the seat on Son's machine, because Home Affairs was thought to
 refuse automated fetches. Measured 2026-10-17: curl reads every Home Affairs page and
 feed with HTTP 200, from Son's machine and from a cloud routine alike, with a browser
