@@ -25,18 +25,15 @@
     import { onMount, tick } from 'svelte';
     import { lang } from '$lib/stores/lang';
     import { t } from '$lib/i18n';
-    import FactVisual from '$lib/FactVisual.svelte';
+    import FactCards from '$lib/FactCards.svelte';
     import Sparkle from '$lib/Sparkle.svelte';
     import {
         type FactDoc,
         SECTION_ORDER,
-        factSources,
-        formatAsOf,
         getFacts,
         introSeen,
         markIntroSeen,
-        pick,
-        publisher
+        pick
     } from '$lib/facts';
     import { goto } from '$app/navigation';
     import { startTour } from '$lib/tour';
@@ -62,8 +59,10 @@
     // "Show me around" at the sheet's foot goes to the map and replays it there.
     let tourAfter = false;
 
+    // The sheet draws its own three sections only: the facts page (/facts, behavior 122)
+    // shows the KB's other fact docs (the economy, visa charges) and they stay off here.
     const ordered = $derived(
-        [...docs].sort((a, b) => SECTION_ORDER.indexOf(a.slug) - SECTION_ORDER.indexOf(b.slug))
+        docs.filter((d) => SECTION_ORDER.includes(d.slug)).sort((a, b) => SECTION_ORDER.indexOf(a.slug) - SECTION_ORDER.indexOf(b.slug))
     );
 
     const reduceMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
@@ -205,39 +204,7 @@
                 {#each ordered as doc (doc.slug)}
                     <section class="wl-section" aria-labelledby="wl-{doc.slug}">
                         <h3 id="wl-{doc.slug}">{pick(doc.title, $lang)}</h3>
-                        <div class="wl-grid">
-                            {#each doc.facts as fact (fact.id)}
-                                {@const srcs = factSources(doc, fact)}
-                                <article
-                                    class="wl-fact"
-                                    class:wide={fact.visual === 'bars' || fact.visual === 'growth'}
-                                    class:statement={fact.visual === 'statement'}
-                                    data-fact={fact.id}
-                                >
-                                    <h4>{pick(fact.headline, $lang)}</h4>
-                                    <FactVisual {fact} />
-                                    <p class="wl-caption">{pick(fact.caption, $lang)}</p>
-                                    {#if fact.note}
-                                        {@const nsrc = doc.sources[fact.note_sources?.[0] ?? -1]}
-                                        <p class="wl-fact-note">
-                                            {pick(fact.note, $lang)}
-                                            {#if nsrc?.url}<a href={nsrc.url} target="_blank" rel="noopener noreferrer"
-                                                    >{publisher(nsrc, $lang)}</a
-                                                >{/if}
-                                        </p>
-                                    {/if}
-                                    <p class="wl-src">
-                                        {$t('intro.source')}:
-                                        {#each srcs as src, k (k)}{#if k}{', '}{/if}{#if src.url}<a href={src.url} target="_blank" rel="noopener noreferrer"
-                                                    >{publisher(src, $lang)}</a
-                                                >{/if}{#if src.kind === 'ranking'}{' '}<span class="wl-src-kind"
-                                                    >({$t('intro.source.ranking')})</span
-                                                >{/if}{/each}
-                                        · {formatAsOf(fact.as_of, $lang)}
-                                    </p>
-                                </article>
-                            {/each}
-                        </div>
+                        <FactCards {doc} />
                     </section>
                 {/each}
 
@@ -418,8 +385,7 @@
     .wl-close:focus-visible,
     .wl-cta:focus-visible,
     .wl-what:focus-visible,
-    .wl-arrow:focus-visible,
-    .wl-src a:focus-visible {
+    .wl-arrow:focus-visible {
         outline: none;
         box-shadow: var(--ring);
     }
@@ -598,76 +564,6 @@
         letter-spacing: -0.02em;
         color: var(--ink);
     }
-    .wl-grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: var(--sp-3);
-    }
-    .wl-fact {
-        display: flex;
-        flex-direction: column;
-        gap: var(--sp-3);
-        padding: var(--sp-4);
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        box-shadow: var(--shadow-1);
-    }
-    .wl-fact h4 {
-        margin: 0;
-        font-size: var(--fs-md);
-        font-weight: 700;
-        line-height: 1.35;
-        letter-spacing: -0.01em;
-        color: var(--ink);
-        text-wrap: balance;
-    }
-    .wl-caption {
-        margin: 0;
-        font-size: var(--fs-xs);
-        color: var(--ink-2);
-    }
-    .wl-fact-note {
-        margin: 0;
-        padding: var(--sp-2) var(--sp-3);
-        background: var(--info-soft, var(--surface-2));
-        border-radius: var(--radius-xs);
-        font-size: var(--fs-2xs);
-        line-height: 1.5;
-        color: var(--ink-2);
-    }
-    .wl-fact-note a {
-        color: var(--accent);
-        font-weight: 600;
-        text-decoration: none;
-        white-space: nowrap;
-    }
-    /* A statement has no chart: its caption is the fact, so it reads at body size. */
-    .wl-fact.statement .wl-caption {
-        font-size: var(--fs-sm);
-        line-height: 1.55;
-    }
-    .wl-src-kind {
-        font-style: italic;
-    }
-    .wl-src {
-        margin: auto 0 0;
-        padding-top: var(--sp-2);
-        border-top: 1px solid var(--border);
-        font-size: var(--fs-2xs);
-        color: var(--muted);
-    }
-    .wl-src a {
-        color: var(--accent);
-        font-weight: 600;
-        text-decoration: none;
-        border-radius: var(--radius-xs);
-    }
-    .wl-src a:hover {
-        text-decoration: underline;
-        text-underline-offset: 2px;
-    }
-
     /* --- value ------------------------------------------------------------- */
     .wl-value {
         margin: var(--sp-5) var(--sp-5) 0;
@@ -896,12 +792,6 @@
         .wl-is {
             grid-template-columns: 1.2fr 1fr;
             gap: var(--sp-6);
-        }
-        .wl-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-        .wl-fact.wide {
-            grid-column: 1 / -1;
         }
     }
 

@@ -3641,10 +3641,11 @@ main {
     max-width: 64rem;
     margin: 0 auto;
 }
-/* Three ways in (behavior 88): one row from 48rem, stacked below it. */
+/* Four ways in (behavior 122; three in one row since behavior 88): two by two from 48rem,
+   stacked below it — four across a 64rem column would wrap each card's text. */
 @media (min-width: 48rem) {
     .home-ways {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(2, 1fr);
         padding-top: var(--sp-8);
     }
 }

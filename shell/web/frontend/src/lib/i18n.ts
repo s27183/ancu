@@ -1320,6 +1320,14 @@ const messages = {
         vi: 'Thay đổi về visa, tài chính, thuế và thị trường, theo từng chủ đề.',
         en: 'Changes in visas, finance, tax and the market, by topic.'
     },
+    // Behavior 122: the home's fourth card and the facts page (/facts) it opens.
+    'home.facts.title': { vi: 'Úc qua số liệu', en: 'Australia in figures' },
+    'home.facts.body': {
+        vi: 'Người Việt ở Úc, nhà đất, cuộc sống, kinh tế và phí visa, từ nguồn chính phủ.',
+        en: 'Vietnamese in Australia, property, living, the economy and visa fees, from government sources.'
+    },
+    'factspage.sub': { vi: 'Số liệu có nguồn trích dẫn', en: 'Every figure cited' },
+    'factspage.empty': { vi: 'Chưa tải được số liệu. Thử lại sau.', en: 'The figures could not be loaded. Try again later.' },
     'newspage.sub': { vi: 'Quy định và thị trường', en: 'Rules and the market' },
     'newspage.empty': { vi: 'Chưa có tin nào.', en: 'No news yet.' },
     'home.explore.title': { vi: 'Khám phá khu vực', en: 'Explore suburbs' },
