@@ -6,7 +6,7 @@ last_verified: 2026-10-18
 
 # Visa terms — Thuật ngữ về visa
 
-The visa words the news uses. None has a KB doc of its own; each explanation rests on the Home Affairs page its `url` names, read on 2026-10-17 (the Direction page is archived as docs/sources/homeaffairs/skilled-visa-processing-priorities-2026-10-16.txt) or, for EOI and occupation ceiling, on 2026-10-18 (archived as docs/sources/homeaffairs/skillselect-invitation-rounds-2026-10-18.txt). CPI (behavior 120, for the visa-charges note) rests on the ABS release page its `url` names, read on 2026-10-18 ("The Consumer Price Index (CPI) measures household inflation"); that visa charges are indexed to it each year is the F2026L00874 explanatory statement's "ongoing annual indexation of VACs". The 485 and CRICOS terms (behavior 119) were read on 2026-10-18 and rest on the pages archived as docs/sources/homeaffairs/temporary-graduate-485*-2026-10-18.txt.
+The visa words the news uses. None has a KB doc of its own; each explanation rests on the Home Affairs page its `url` names, read on 2026-10-17 (the Direction page is archived as docs/sources/homeaffairs/skilled-visa-processing-priorities-2026-10-16.txt) or, for EOI and occupation ceiling, on 2026-10-18 (archived as docs/sources/homeaffairs/skillselect-invitation-rounds-2026-10-18.txt). CPI (behavior 120, for the visa-charges note) rests on the ABS release page its `url` names, read on 2026-10-18 ("The Consumer Price Index (CPI) measures household inflation"); that visa charges are indexed to it each year is the F2026L00874 explanatory statement's "ongoing annual indexation of VACs". The 485 and CRICOS terms (behavior 119) were read on 2026-10-18 and rest on the pages archived as docs/sources/homeaffairs/temporary-graduate-485*-2026-10-18.txt. FOI (behavior 118) rests on Home Affairs' access-to-information page its `url` names, read on 2026-10-18 ("You have a right to request information held by the Department", "the Freedom of Information Act 1982 (FOI Act)").
 
 ## Terms
 
@@ -42,6 +42,21 @@ The visa words the news uses. None has a KB doc of its own; each explanation res
         "en": "While you hold the temporary stage (820 or 309) you are a foreign person for FIRB; once 801 or 100 is granted you are a permanent resident."
       },
       "url": "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/partner-onshore"
+    },
+    {
+      "id": "foi",
+      "abbr": "FOI",
+      "name": { "vi": "Tự do thông tin (Freedom of Information, FOI)", "en": "Freedom of Information" },
+      "forms": ["FOI", "freedom of information", "Freedom of Information", "tự do thông tin"],
+      "meaning": {
+        "vi": "Luật Tự do Thông tin 1982 (Freedom of Information Act 1982) cho bất kỳ ai quyền yêu cầu một cơ quan chính phủ Úc đưa ra tài liệu mà cơ quan đó đang giữ. Bộ Nội vụ đăng tài liệu đã đưa ra kèm số yêu cầu.",
+        "en": "The Freedom of Information Act 1982 gives anyone the right to ask an Australian government agency for documents it holds. Home Affairs publishes what it releases, under the request's number."
+      },
+      "why": {
+        "vi": "Một số con số Bộ Nội vụ không đăng trên trang web — như trần số suất của từng nghề — chỉ có trong tài liệu đưa ra theo yêu cầu FOI.",
+        "en": "Some figures Home Affairs does not post on its website — such as each occupation's ceiling — exist only in documents it released under FOI."
+      },
+      "url": "https://www.homeaffairs.gov.au/access-and-accountability/freedom-of-information"
     },
     {
       "id": "eoi",
