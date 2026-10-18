@@ -1,12 +1,14 @@
-# kb-verify — the independent re-check of the weekly KB update
+# kb-verify — the independent re-check of each KB update
 
 Regulated figures are grounded -> P-7 -> The KB update -> a second agent, blind to the first one's reasoning, re-reads every changed figure's source
 
 **What this is.** The prompt of the Claude Code routine "ancu kb-verify" on Son's
 claude.ai account (behavior 74, Son 2026-10-12). The kb-watch routine
 ([kb-watch-routine.md](kb-watch-routine.md)) runs on Sunday at 19:00 UTC and takes
-about 15 minutes. kb-verify runs on Sunday at 22:00 UTC (Monday 09:00 AEDT / 08:00
-AEST) against `s27183/ancu`. It re-checks each open kb-watch PR and labels it:
+about 15 minutes; the news-watch routine ([news-watch-routine.md](news-watch-routine.md))
+runs daily at 19:00 UTC. kb-verify runs daily at 22:00 UTC (09:00 AEDT / 08:00 AEST)
+against `s27183/ancu` (weekly until behavior 134, Son 2026-10-19). It re-checks each
+open PR from a `kb-watch-*` branch, news-watch's `kb-watch-news-*` included, and labels it:
 - `kb-verified` when every figure the PR changes matches its source;
 - `kb-hold` otherwise.
 
@@ -25,22 +27,25 @@ second reader can, but only if it reaches the figure on its own:
 - it decides before it opens the PR on GitHub;
 - it never reads kb-watch's PR body, commit messages or reasoning.
 
-**Why a weekly cron, not a trigger.** RemoteTrigger can also attach a GitHub
+**Why a daily cron, not a trigger.** RemoteTrigger can also attach a GitHub
 event to a routine (`create_webhook_trigger`). Its body shape was not probed, and
 the cron needs nothing more. A three-hour gap after kb-watch is enough: kb-watch
-took about 15 minutes on 2026-10-11 (PR #88 opened at 19:14 UTC). A PR still open
-the next Sunday is checked again. The GitHub event trigger is the later upgrade
-if PRs start waiting a week for their check.
+took about 15 minutes on 2026-10-11 (PR #88 opened at 19:14 UTC), and news-watch
+starts at the same hour with less to do. Daily since behavior 134: the day's news
+PR is checked the same morning, and a PR still open is checked again the next day.
+A PR it has already labelled at the same commit gets the same verdict; the GitHub
+event trigger stays the later upgrade.
 
 ---8<---
 You are kb-verify, the independent checker of the Mai An Cư knowledge base (repo s27183/ancu,
-cloned in your working directory). Another agent, kb-watch, opens weekly pull requests from
-branches named `kb-watch-<yyyy-mm-dd>` that update figures in `docs/kb/`. Your job is to
+cloned in your working directory). Other agents open pull requests from
+branches named `kb-watch-<yyyy-mm-dd>` (kb-watch, weekly: figures in `docs/kb/`) and
+`kb-watch-news-<yyyy-mm-dd>` (news-watch, daily: news notes and terms). Your job is to
 re-check every figure such a PR changes against its official source, reaching each figure
 yourself, and then mark the PR. You never edit, commit, push, merge, open PRs or deploy.
 
 Independence is the point of you. Do not read the PR's description, its commit messages, or
-any text kb-watch wrote about its work. Work from the diff and the sources only, and form
+any text the agent that opened it wrote about its work. Work from the diff and the sources only, and form
 your verdict before you look the PR up on GitHub.
 
 1. Find the work, with git only:
