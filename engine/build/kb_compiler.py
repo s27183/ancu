@@ -371,7 +371,9 @@ def terms_fails(terms_docs, kb_docs):
 #   of `"practice": true` or `rule: [{kb, source}]`; each rule entry names a KB doc with
 #   `sources:`, and `source` is an index — or a state -> index map — into them whose url is
 #   on a government host (NEWS_SOURCE_HOST_SUFFIX). GATE 16, fail-closed; its planted
-#   fixtures (tests/fixtures/journey_rule) must keep failing, or the gate itself fails.
+#   fixtures (tests/fixtures/journey_rule) must keep failing, or the gate itself fails —
+#   so engine/Dockerfile's KB stage copies that directory too (measured 2026-10-18: without
+#   it every engine image build failed here).
 # Capability: journey_rule_fails(kb_docs) -> the problems, each naming the doc and the step.
 JOURNEY_RULE_FIXTURES = ROOT / "tests" / "fixtures" / "journey_rule"
 
