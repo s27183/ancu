@@ -1,0 +1,50 @@
+Source: https://www.dfat.gov.au/sites/default/files/aust-cef.pdf
+Retrieved: 2026-10-18
+Extracted: pdftotext -layout of the fetched PDF; sha256 of the fetched PDF 3caa570a57f9bffd99f823ff7e2bbe8d76a0dce11929f460db150181c679ed8e
+
+                                                                AUSTRALIA
+                                                            Key economic indicators
+                                                                       Source: ABS.
+      Nominal GDP                      Real GDP growth                                       Unemployment                        Population
+      (USD billions)                    (% change YOY)                                     (% of labour force)                (People, millions)
+    2025        1,841.6                2025        2.0                                      2025         4.2                  2025          27.7
+    2024        1,800.7                2024        1.1                                      2024         4.0                  2024          27.4
+                                                    Australia's investment, 2025 (stocks)
+                                                                       Source: ABS.
+                  Investment in Australia                                                        Australia's investment abroad
+ Total (A$b)                                        Direct (A$b)                        Total (A$b)                         Direct (A$b)
+  5,116.3                                             1,302.3                            4,477.8                               1,217.5
+                                            Australia's major goods and services trade, 2025
+                                                             Source: DFAT-adjusted ABS data.
+Exports                                                      A$b                       Imports                                                      A$b
+Iron ore & concentrates                                     121.0                      Recreational travel                                          68.5
+Coal                                                         64.1                      Refined petroleum                                            43.9
+Natural gas                                                  59.7                      Passenger motor vehicles                                     34.5
+Gold                                                         59.5                      Prof, tech & other business services                         33.0
+Education-related travel                                     55.0                      Transport services                                           29.0
+Recreational travel                                          25.6                      Gold                                                         20.6
+Prof, tech & other business services                         19.3                      Intellectual property charges nie                            19.2
+Beef, f.c.f.                                                 18.7                      Telecom equipment & parts                                    18.7
+Aluminium ores & conc (incl alumina)                         13.2                      Computers                                                    16.6
+Intellectual property charges nie                            11.3                      Goods vehicles                                               15.8
+Total                                                       665.2                      Total                                                       658.3
+                              Australia's major global goods and services trade relationships, 2025
+                                                             Source: DFAT-adjusted ABS data.
+           Principal export destinations                                                           Principal import sources
+Destination                      Share                        Rank                     Source                         Share                         Rank
+China                           29.4%                            1                     China                         19.8%                             1
+Japan                             9.8%                           2                     United States                 15.0%                             2
+United States                     9.0%                           3                     Japan                           4.9%                            3
+Republic of Korea                 6.7%                           4                     Singapore                       4.3%                            4
+India                             4.8%                           5                     Thailand                        3.6%                            5
+                                                                   Flow of people
+                                                               Source: Home Affairs, DESE.
+      Visitor arrivals (movements)                       Resident returns (movements)                       International student numbers
+         Year ended Dec 2025                                 Year ended Dec 2025                                         2025
+                 8,937,390                                         12,549,290                                          845,933
+
+Compiled by the Trade Data Section, DFAT, using the latest data from the ABS, Home Affairs and DESE.
+Merchandise trade data may exclude confidential items of trade. Totals may not add up due to rounding.
+Investment data is stocks as at end December. All data may be subject to future revisions.
+GDP - Gross Domestic Product. na - Data is not available. np - Data is not published. f.c.f. Fresh, chilled or frozen.   nes - Not elsewhere specified.
+
