@@ -55,6 +55,8 @@ export interface FactSource {
 export interface FactDoc {
     slug: string;
     title: Localized;
+    /** News notes that explain the section (behavior 125), linked under it on /facts. */
+    news?: string[];
     last_verified: string;
     sources: FactSource[];
     facts: Fact[];

@@ -1326,6 +1326,7 @@ const messages = {
         vi: 'Người Việt ở Úc, nhà đất, cuộc sống, kinh tế và phí visa, từ nguồn chính phủ.',
         en: 'Vietnamese in Australia, property, living, the economy and visa fees, from government sources.'
     },
+    'factspage.news': { vi: 'Đọc tin', en: 'Read the news' },
     'factspage.sub': { vi: 'Số liệu có nguồn trích dẫn', en: 'Every figure cited' },
     'factspage.empty': { vi: 'Chưa tải được số liệu. Thử lại sau.', en: 'The figures could not be loaded. Try again later.' },
     'newspage.sub': { vi: 'Quy định và thị trường', en: 'Rules and the market' },
