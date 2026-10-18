@@ -10,9 +10,11 @@
     //            figure and every rule-bound step (behaviors 113, 114); the launcher reads "Giới thiệu" /
     //            "Introduction" (behavior 107, Son 2026-10-17: once "Vì sao Úc?"); the
     //            launcher never covers a home card (behavior 128): it sits fixed at the
-    //            bottom-right where its box meets none of the cards' column at any point of
-    //            the home's scroll, and otherwise is drawn after the cards, right-aligned,
-    //            scrolling with them — measured on load, on resize and on a language change.
+    //            bottom-right where its box, grown by a 12px gap, meets none of the cards'
+    //            column at any point of the home's scroll — a home that does not scroll
+    //            included — and otherwise is drawn after the cards, right-aligned,
+    //            scrolling with them — measured on load, on resize, on a language change, when
+    //            fonts land and when the news band's height moves the cards.
     // Rests on:  i18n.ts intro.* keys, VI and EN side by side; the home (routes/+page.svelte)
     //            mounting this inside its scrolling .home, after nav.home-ways, and .home
     //            making no stacking context of its own (app.css), so the sheet still covers
@@ -70,7 +72,12 @@
     // one synchronous read, the home's scroll put back after), against nav.home-ways over
     // the home's whole scroll range: the cards' top runs from top0 - range to top0 as the
     // home scrolls, so the fixed box meets them at some scroll s in [0, range] exactly
-    // when top0 - b.bottom < s < bottom0 - b.top has a solution there.
+    // when top0 - b.bottom < s < bottom0 - b.top has a solution there — the open interval
+    // (lo, hi) meets the closed [0, range] iff lo < range and hi > 0. The box is grown by
+    // CLEAR first, so "not meeting" also leaves a visible gap. The first version tested
+    // max(0, lo) < min(range, hi), which is never true when the home does not scroll
+    // (range 0): Son's iPhone, 2026-10-18, 440×760 — fixed, over the fourth card's corner.
+    const CLEAR = 12;
     let inline = $state(false);
     function placeLauncher() {
         const btn = launchEl;
@@ -84,8 +91,10 @@
         const range = Math.max(0, home.scrollHeight - home.clientHeight);
         const top0 = w.top + home.scrollTop;
         const bottom0 = w.bottom + home.scrollTop;
-        const across = b.left < w.right && b.right > w.left;
-        const meets = across && Math.max(0, top0 - b.bottom) < Math.min(range, bottom0 - b.top);
+        const across = b.left - CLEAR < w.right && b.right + CLEAR > w.left;
+        const lo = top0 - (b.bottom + CLEAR);
+        const hi = bottom0 - (b.top - CLEAR);
+        const meets = across && lo < range && hi > 0;
         btn.classList.toggle('inline', meets);
         home.scrollTop = kept;
         inline = meets;
@@ -98,7 +107,15 @@
         ro.observe(home);
         if (ways) ro.observe(ways);
         window.addEventListener('resize', placeLauncher);
+        // The news band's height reaches the home's top padding later, through
+        // --home-news-h on the root's style (+layout.svelte): that moves the cards down
+        // without resizing .home or the cards, so no ResizeObserver sees it (measured
+        // 2026-10-18: 440×720 placed fixed over the fourth card). Fonts landing do the same.
+        const mo = new MutationObserver(() => placeLauncher());
+        mo.observe(document.documentElement, { attributes: true, attributeFilter: ['style'] });
+        document.fonts?.ready.then(() => placeLauncher());
         return () => {
+            mo.disconnect();
             ro.disconnect();
             window.removeEventListener('resize', placeLauncher);
         };
