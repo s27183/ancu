@@ -48,7 +48,7 @@
     const items = $derived(fact.items ?? []);
     // Shares are drawn against the whole (100%), so 24.92% of the land reads as a quarter.
     const max = $derived(fact.unit === 'pct' ? 100 : Math.max(1, ...items.map((i) => i.value)));
-    const fmt = (n: number) => formatValue(n, fact.unit, $lang);
+    const fmt = (n: number) => formatValue(n, fact.unit, $lang, fact.decimals);
 
     // Waffle: which segment each of the 100 cells belongs to.
     const cells = $derived.by(() => {
@@ -91,7 +91,9 @@
                     <span class="fv-cmp-val">{fmt(from)}</span>
                 </div>
                 <div class="fv-cmp-row">
-                    <span class="fv-cmp-label">{$t('intro.now')}</span>
+                    <span class="fv-cmp-label"
+                        >{fact.compare.now_label ? pick(fact.compare.now_label, $lang) : $t('intro.now')}</span
+                    >
                     <span class="fv-cmp-track"><span class="fv-cmp-bar" style="--w:100%"></span></span>
                     <span class="fv-cmp-val strong">{fmt(to)}</span>
                 </div>

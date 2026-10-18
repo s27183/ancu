@@ -191,7 +191,10 @@ def news_source_host_error(src):
 # it. A fact may cite more than one source (`source: [3, 4]`, a rule and its exception
 # from two agencies); its quotes are then found in any of them.
 FACT_VISUALS = ("bars", "series", "figure", "split", "growth", "statement")
-FACT_UNITS = ("count", "people", "pct", "aud_k", "aud", "years")
+# Behavior 124: money in billions and millions as DFAT states it (US$1,841.6b, A$13,387.0m)
+# and a count in millions (27.7 million people); `decimals` keeps a quoted "2.0%" from
+# reading "2%", and `compare.now_label` names the current row ("2025") where "now" is wrong.
+FACT_UNITS = ("count", "people", "pct", "aud_k", "aud", "years", "usd_bn", "aud_bn", "aud_m", "million")
 
 
 # Regulated figures are grounded -> P-7 -> The KB compiler -> a fact may cite a named non-government ranking
@@ -498,6 +501,13 @@ def facts_doc_fails(slug, doc, kb_docs, news_docs=None):
                 out.append(f"{where}: glyph {f.get('glyph')!r} is not 'health' (absent: the land parcel)")
         elif f.get("unit") not in FACT_UNITS:
             out.append(f"{where}: unit {f.get('unit')!r} not one of {FACT_UNITS}")
+        if "decimals" in f and f["decimals"] not in (0, 1, 2):
+            out.append(f"{where}: decimals must be 0, 1 or 2")
+        cmp_ = f.get("compare")
+        if isinstance(cmp_, dict) and "now_label" in cmp_:
+            nl = cmp_["now_label"]
+            if not ((isinstance(nl, str) and nl.strip()) or not check_copy_template(nl or {})):
+                out.append(f"{where}: compare.now_label must be a string or {{en, vi}}")
         if not re.match(r"^\d{4}-\d{2}$", str(f.get("as_of") or "")):
             out.append(f"{where}: as_of must be YYYY-MM")
         for key in ("headline", "caption"):
