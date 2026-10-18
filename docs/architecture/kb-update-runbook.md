@@ -384,7 +384,10 @@ user agent or none; WebFetch alone gets 403. It covers the permanent visas a buy
 status rests on and the pathways to them: skilled (189, 190, 491/191),
 employer-sponsored (186, 494), graduate 485 to PR, partner (820/801, 309/100, 300),
 parent (103, 143, 804, 864 and their temporary 173/884/870), the permanent
-Migration Program's planning levels, and visa application charges (the
+Migration Program's planning levels, the states' 190/491 nomination allocations and
+SkillSelect's invitation rounds (nominations so far this year, the last round's
+minimum points per occupation; Home Affairs publishes no quota per occupation —
+behavior 118), and visa application charges (the
 current-visa-pricing page, which charges change on 1 July; read 2026-10-18 it was
 last updated 1/07/2026; behavior 120).
 
