@@ -2,6 +2,8 @@
 slug: kb.facts.infrastructure
 effective_from: 2026-05-12
 last_verified: 2026-10-18
+next_edition: 2027-05
+next_edition_at: https://investment.infrastructure.gov.au/
 sources:
   - url: https://investment.infrastructure.gov.au/
     retrieved: 2026-10-18

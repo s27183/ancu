@@ -37,6 +37,18 @@ to exit 1 when anything is overdue (e.g. to gate a deploy). Pass
 `--asof YYYY-MM-DD` to evaluate against a fixed date instead of today (testing /
 reproducibility).
 
+Regulated figures are grounded -> P-7 -> The KB -> a fact read off a yearly edition is re-read from the next edition once that edition is due
+Behavior 134 (Son 2026-10-19: readers open the facts daily). Re-checking a doc
+re-opens its own `sources:` URLs, so an edition published at a new URL (the next
+Budget's state overviews, BITRE's next yearbook, the 1 July fee table) is never
+seen. A doc read off such an edition says when the next one is expected:
+  next_edition: <yyyy-mm>      the month the next edition is due
+  next_edition_at: <url>       where it will appear (an index page, optional)
+From the first day of that month the doc is listed under NEW EDITION DUE, ahead
+of the overdue list, and kb-watch takes those docs first (kb-watch-routine.md
+step 1). kb-watch sets `next_edition:` to the following year once it has read
+the new edition. Measured 2026-10-19: 201 docs, 147 overdue.
+
 Usage:
     python3 tests/kb_freshness.py
     python3 tests/kb_freshness.py --strict
@@ -93,9 +105,13 @@ def parse_frontmatter(path):
     text = path.read_text()
     slug_m = re.search(r"^slug:\s*(\S+)", text, re.M)
     ver_m = re.search(r"^last_verified:\s*(\S+)", text, re.M)
+    ed_m = re.search(r"^next_edition:\s*['\"]?(\d{4}-\d{2})", text, re.M)
+    at_m = re.search(r"^next_edition_at:\s*(\S+)", text, re.M)
     return (
         slug_m.group(1) if slug_m else None,
         ver_m.group(1) if ver_m else None,
+        ed_m.group(1) if ed_m else None,
+        at_m.group(1) if at_m else None,
     )
 
 
@@ -115,6 +131,7 @@ def main():
 
     rows = []      # (slug, cadence, last_verified, age_days, budget, status)
     errors = []    # docs missing slug / last_verified — a real problem
+    due = []       # (slug, next_edition, next_edition_at) — a new edition is due
 
     for path in sorted(KB_DIR.rglob("*.md")):
         if NEWS_DIR in path.parents:
@@ -124,7 +141,7 @@ def main():
             # gets re-verified — there's nothing to be "stale" relative to, so
             # no cadence budget applies. Skip rather than flag.
             continue
-        slug, last_verified = parse_frontmatter(path)
+        slug, last_verified, next_edition, next_at = parse_frontmatter(path)
         rel = path.relative_to(ROOT)
         if not slug or not last_verified:
             missing = []
@@ -139,6 +156,8 @@ def main():
         except ValueError:
             errors.append((rel, f"unparseable last_verified: {last_verified!r}"))
             continue
+        if next_edition and next_edition <= asof.isoformat()[:7]:
+            due.append((slug, next_edition, next_at or ""))
         cadence = cadence_for(slug)
         budget = BUDGET_DAYS[cadence]
         age = (asof - lv).days
@@ -155,6 +174,13 @@ def main():
         print("FRONTMATTER ERRORS (fix before relying on this report):")
         for rel, why in errors:
             print(f"  ✗ {rel} — {why}")
+        print()
+
+    if due:
+        due.sort(key=lambda r: (r[1], r[0]))
+        print(f"NEW EDITION DUE ({len(due)}):")
+        for slug, month, at in due:
+            print(f"  {slug:<34} due {month}  {at}".rstrip())
         print()
 
     if stale:
