@@ -1,6 +1,6 @@
 Source: https://www.legislation.gov.au/F1996B03551/2026-07-01/2026-07-01/text/original/pdf/1
 Retrieved: 2026-10-18
-Extracted: pdftotext -layout of Volume 1 of the Migration Regulations 1994, Compilation No. 288, compilation date 1 July 2026 (Authorised Version F2026C00667 registered 20/07/2026; includes amendments F2026L00733, F2026L00874 and F2026L00876), listed at https://www.legislation.gov.au/F1996B03551/latest/versions; sha256 of the fetched PDF e43bef82d5dcbab76298588cb161bf70ca691408c476c38bc3088876d6b60959. Kept here: Schedule 1 items 1114B, 1124, 1124A, 1124B, 1129, 1130, 1130A, 1137, 1138, 1139, 1229, 1241 and 1242, each verbatim from its heading to the line that starts its second instalment.
+Extracted: pdftotext -layout of Volume 1 of the Migration Regulations 1994, Compilation No. 288, compilation date 1 July 2026 (Authorised Version F2026C00667 registered 20/07/2026; includes amendments F2026L00733, F2026L00874 and F2026L00876), listed at https://www.legislation.gov.au/F1996B03551/latest/versions; sha256 of the fetched PDF e43bef82d5dcbab76298588cb161bf70ca691408c476c38bc3088876d6b60959. Kept here: Schedule 1 items 1114B, 1124, 1124A, 1124B, 1129, 1130, 1130A, 1137, 1138, 1139, 1222, 1229, 1241 and 1242, each verbatim from its heading to the line that starts its second instalment, and item 1222's subitem (5A), the countries whose passports pay its (ib) and (ic) rates.
 
 ----- Schedule 1, item 1114B -----
 1114B Employer Nomination (Permanent) (Class EN)
@@ -1206,6 +1206,149 @@ Compilation No. 288                                                             
                                                                                        Permanent visas Part 1
 
                  (b) second instalment (payable before grant of visa):
+
+----- Schedule 1, item 1222 -----
+1222 Student (Temporary) (Class TU)
+          (1) Form: The approved form specified by the Minister in a legislative instrument
+              made for this item under subregulation 2.07(5).
+          (2) Visa application charge:
+               (a) first instalment (payable at the time the application is made):
+                     (i) for an applicant who is included in a class of persons specified in an
+                          instrument under paragraph (5)(a), the amount is nil;
+                    (ia) for:
+
+
+484                                              Migration Regulations 1994
+
+Compilation No. 288                                                                    Compilation date: 01/07/2026
+
+
+
+                                Authorised Version F2026C00667 registered 20/07/2026
+                                                                                Classes of visa Schedule 1
+                                                         Temporary visas (other than bridging visas) Part 2
+
+
+
+
+                                   (A) an applicant (the primary applicant) who is seeking to satisfy
+                                       the primary criteria for the grant of a Student (Temporary)
+                                       (Class TU) visa and who holds a valid passport issued by a
+                                       Pacific-regional country; or
+                                   (B) an applicant whose application is combined, or sought to be
+                                       combined, with an application made by the primary applicant;
+                                       or
+                                   (C) an applicant who claims to be member of the family unit of a
+                                       person who both holds a Student (Temporary) (Class TU)
+                                       visa, having satisfied the primary criteria for that visa, and
+                                       who holds a valid passport issued by a Pacific-regional
+                                       country:
+
+    First instalment
+    Item    Component                                                                                 Amount
+    1       Base application charge                                                                        $745
+    2       Additional applicant charge for an applicant who is at least 18                                $555
+    3       Additional applicant charge for an applicant who is less than 18                               $185
+                       (ib) for:
+                                   (A) an applicant (the primary applicant) who is seeking to satisfy
+                                       the primary criteria for the grant of a Subclass 500 (Student)
+                                       visa and who holds a valid passport issued by a country
+                                       specified in subitem (5A); or
+                                   (B) an applicant whose application is combined, or sought to be
+                                       combined, with an application made by the primary applicant;
+                                       or
+                                   (C) an applicant who claims to be member of the family unit of a
+                                       person who both holds a Subclass 500 (Student) visa, having
+                                       satisfied the primary criteria for that visa, and who holds a
+                                       valid passport issued by a country specified in subitem (5A):
+
+First instalment
+Item       Component                                                                                   Amount
+1          Base application charge                                                                       $2 050
+2          Additional applicant charge for any other applicant who is at least 18                        $1 255
+3          Additional applicant charge for any other applicant who is less than 18                          $410
+                       (ic) for:
+                                   (A) an applicant (the primary applicant) who is seeking to satisfy
+                                       the primary criteria for the grant of a Subclass 500 (Student)
+                                       visa on the basis of enrolment in an ELICOS or non-award
+                                       course, and who does not hold a valid passport issued by a
+                                       Pacific-regional country or a country specified in
+                                       subitem (5A); or
+
+
+
+
+                                                Migration Regulations 1994                                    485
+
+Compilation No. 288                                                                   Compilation date: 01/07/2026
+
+
+
+                               Authorised Version F2026C00667 registered 20/07/2026
+Schedule 1 Classes of visa
+Part 2 Temporary visas (other than bridging visas)
+
+
+
+
+                                 (B) an applicant whose application is combined, or sought to be
+                                     combined, with an application made by the primary applicant;
+                                     or
+                                 (C) an applicant who claims to be member of the family unit of a
+                                     person who both holds a Subclass 500 (Student) visa, having
+                                     satisfied the primary criteria for that visa on the basis of
+                                     enrolment in an ELICOS or non-award course, and who does
+                                     not hold a valid passport issued by a Pacific-regional country
+                                     or a country specified in subitem (5A):
+
+First instalment
+Item      Component                                                                                     Amount
+1         Base application charge                                                                         $2 050
+2         Additional applicant charge for any other applicant who is at least 18                          $1 255
+3         Additional applicant charge for any other applicant who is less than 18                             $410
+
+                       (ii) for any other applicant:
+
+First instalment
+Item      Component                                                                                     Amount
+1         Base application charge                                                                         $2 500
+2         Additional applicant charge for any other applicant who is at least 18                          $1 530
+3         Additional applicant charge for any other applicant who is less than 18                             $500
+Note 1: Regulation 2.12C explains the components of the first instalment of visa application charge and specifies
+        the amounts of subsequent temporary application charge and non-internet application charge. Not all of
+        the components may apply to a particular application.
+Note 2: Additional applicant charge is paid by an applicant who claims to be a member of the family unit of
+        another applicant and seeks to combine the application with that applicant’s application.
+                 (b) the second instalment (payable before grant of visa) is nil.
+----- Schedule 1, item 1222, subitem (5A) -----
+        (5A) For the purposes of subparagraphs (2)(a)(ib) and (ic), the following countries are
+             specified:
+               (a) Brunei;
+              (b) Cambodia;
+               (c) Indonesia;
+              (d) Laos;
+               (e) Malaysia;
+
+
+
+                                              Migration Regulations 1994                                    487
+
+Compilation No. 288                                                                 Compilation date: 01/07/2026
+
+
+
+                             Authorised Version F2026C00667 registered 20/07/2026
+Schedule 1 Classes of visa
+Part 2 Temporary visas (other than bridging visas)
+
+
+
+
+                  (f) Myanmar;
+                 (g) Philippines;
+                 (h) Singapore;
+                  (i) Thailand;
+                  (j) Vietnam.
 
 ----- Schedule 1, item 1229 -----
 1229 Skilled (Provisional) (Class VC)

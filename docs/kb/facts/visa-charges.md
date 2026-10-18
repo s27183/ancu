@@ -25,7 +25,7 @@ sources:
 
 What the main visas cost to apply for from 1 July 2026 (behavior 125), drawn on /facts as a before → after dumbbell per visa. The figures are the same as the visa-charges news note's table (kb.news.2026-07-visa-application-charges-2026-27, behavior 120) and quote the same archives: each charge is the base application charge of the first instalment — the main applicant's charge, paid when the application is made — "for any other applicant" (not a concessional group), from Schedule 1 of the Migration Regulations 1994 as compiled on 1 June 2026 (before) and 1 July 2026 (from); Home Affairs' price list carries the same new figures and names the subclass each belongs to. The 25% rise, and that a family member applying with you pays a further charge, are the note under each card, quoted from the explanatory statement and the 1 July compilation.
 
-Kept to the visas readers ask about: skilled (189, 190, 491), employer (186, 494), graduate (485), partner and parent. Left out: 191 ($505 → $630, a second step after 491), the second instalment, the lower Pacific / Timor-Leste / ASEAN rates — the news note covers them. 189 is its points-tested stream; 186 and 494 their main streams. The 485 charge had already risen on 1 March 2026 (behavior 119), so its "before" is the 1 June 2026 compilation's $4,600.
+Kept to the visas readers ask about: skilled (189, 190, 491), employer (186, 494), graduate (485), partner and parent. The student visa (behavior 131) is its own card because its rate depends on the passport: item 1222 of each compilation, the ASEAN rate for the countries its subitem (5A) lists (Vietnam among them; in June 2026 that subitem listed only Pacific countries and Timor-Leste, so a Vietnamese student then paid the $2,000 any other applicant paid). The ELICOS and non-award rate ($2,050 whatever the passport) and the family members' charges are left to the student note. Left out: 191 ($505 → $630, a second step after 491), the second instalment, the lower Pacific / Timor-Leste / ASEAN rates — the news note covers them. 189 is its points-tested stream; 186 and 494 their main streams. The 485 charge had already risen on 1 March 2026 (behavior 119), so its "before" is the 1 June 2026 compilation's $4,600.
 
 `news` names the note that explains the rise; GATE 12 checks it is a current news note and /facts links it under the section.
 
@@ -34,7 +34,7 @@ Kept to the visas readers ask about: skilled (189, 190, 491), employer (186, 494
 ```jsonc
 {
   "title": {"en": "Visa application charges", "vi": "Phí visa"},
-  "news": ["kb.news.2026-07-visa-application-charges-2026-27"],
+  "news": ["kb.news.2026-07-visa-application-charges-2026-27", "kb.news.2026-07-student-visa-charges-2026-27"],
   "facts": [
     {
       "id": "skilled_employer",
@@ -117,6 +117,37 @@ Kept to the visas readers ask about: skilled (189, 190, 491), employer (186, 494
                  "\"visaSubclassText\":\"Aged Parent (subclass 804)\",\"streamCode\":\"\",\"streamText\":\"\",\"onShore\":\"No\",\"basePrice\":\"AUD6,600.00\"",
                  "\"visaSubclassText\":\"Contributory Parent visa (subclass 143) - Applicant meets conditions defined in Note 19d2\",\"streamCode\":\"\",\"streamText\":\"\",\"onShore\":\"No\",\"basePrice\":\"AUD6,300.00\"",
                  "\"visaSubclassText\":\"Contributory Aged Parent visa (subclass 864) - any other applicants see note\",\"streamCode\":\"\",\"streamText\":\"\",\"onShore\":\"No\",\"basePrice\":\"AUD6,300.00\""]
+    },
+    {
+      "id": "student",
+      "visual": "growth",
+      "unit": "aud",
+      "headline": {"en": "A student visa now costs $2,500 to apply for — $2,050 with a Vietnamese passport",
+                   "vi": "Visa du học nay tốn $2.500 khi nộp đơn — $2.050 nếu mang hộ chiếu Việt Nam"},
+      "caption": {"en": "Student visa (500), main applicant's charge, paid when applying: before → from 1 July 2026",
+                  "vi": "Visa du học (500), phí của người nộp đơn chính, trả khi nộp đơn: trước → từ 1/7/2026"},
+      "as_of": "2026-07",
+      "source": [0, 1, 2],
+      "items": [
+        {"label": {"en": "Vietnamese and other ASEAN passports", "vi": "Hộ chiếu Việt Nam và các nước ASEAN khác"}, "from": 2000, "value": 2050, "highlight": true},
+        {"label": {"en": "Most other passports", "vi": "Hầu hết hộ chiếu khác"}, "from": 2000, "value": 2500},
+        {"label": {"en": "Pacific Island and Timor-Leste passports", "vi": "Hộ chiếu các quốc đảo Thái Bình Dương và Timor-Leste"}, "from": 730, "value": 745}
+      ],
+      "note": {"en": "Most students pay 25% more from 1 July 2026; students from ASEAN countries, Vietnam included, were exempted from that rise. Each family member who applies with you pays a further charge.",
+               "vi": "Từ 1/7/2026 hầu hết du học sinh trả thêm 25%; du học sinh từ các nước ASEAN, gồm Việt Nam, được miễn mức tăng đó. Mỗi thành viên gia đình nộp đơn cùng bạn phải trả thêm một khoản phí."},
+      "note_sources": [3, 0],
+      "note_quotes": ["The base application charge component of the first instalment for primary applicants increases from $2,000 to $2,500.",
+                      "The Amendment Regulations also exempts Student (Subclass 500) visa applicants from ASEAN countries from the broader increase and maintains current VAC levels.",
+                      "Additional applicant charge is paid by an applicant who claims to be a member of the family unit of another applicant and seeks to combine the application with that applicant’s application."],
+      "quotes": ["1222 Student (Temporary) (Class TU)",
+                 "who holds a valid passport issued by a country specified in subitem (5A): First instalment Item Component Amount 1 Base application charge $2 050",
+                 "(i) Thailand; (j) Vietnam.",
+                 "(ii) for any other applicant: First instalment Item Component Amount 1 Base application charge $2 500 2 Additional applicant charge for any other applicant who is at least 18 $1 530",
+                 "(ii) for any other applicant: First instalment Item Component Amount 1 Base application charge $2 000 2 Additional applicant charge for any other applicant who is at least 18 $1 225",
+                 "who holds a valid passport issued by a Pacific-regional country: First instalment Item Component Amount 1 Base application charge $745",
+                 "First instalment Item Component Amount 1 Base application charge $730",
+                 "(5A) For the purposes of subparagraph (2)(a)(ia), the following countries are specified: (a) Federated States of Micronesia;",
+                 "\"visaSubclassText\":\"Student visa (subclass 500) - All other students\",\"streamCode\":\"5133\",\"streamText\":\"All other students\",\"onShore\":\"Yes\",\"basePrice\":\"AUD2,500.00\""]
     }
   ]
 }
