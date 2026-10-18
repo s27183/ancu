@@ -1,0 +1,33 @@
+Source: https://www.homeaffairs.gov.au/foi/files/2026/fa-260100545-document-released.PDF
+Retrieved: 2026-10-18
+Extracted: pdftotext -layout of the fetched PDF, page 1 (pages 2–6 are scanned images with no text layer); sha256 of the fetched PDF 0aab9c9fb4e125b2f78aa5dc51cb7ce3eef3c95bc6cda7d80ba58d9a1f9e1e24
+
+Freedom of Information Request- FA 26/01/00545
+Notes:
+   1. Source: Department of Home Affairs
+   2. Occupation ceilings form part of the policy guidance for management of the Skilled Independent (subclass 189) and Skilled Work Regional (Provisional)
+       (Family Sponsored) (Subclass 491) visa programs. Occupation ceilings are subject to change and implementation of this policy guidance is subject
+       to operational circumstances, relevant Ministerial Directions and other priorities of the Australian Government. Occupation ceilings do not
+       necessarily reflect the final outcomes of the program
+   3. Occupation ceilings apply to the Skilled Independent (subclass 189) and Skilled Work Regional (Provisional) (Family Sponsored stream) (subclass 491) visa
+       programs. Occupation ceilings do not apply to Employer Sponsored or State and Territory Nominated skilled visa programs.
+
+
+Caveats:
+   •   This information is provided for the specific purpose of this request.
+   •   Please note that visa figures may vary between reports/data sources. Regarding Immigration data, the Department's current policy is to mask numbers
+       which are less than five as <5, or where the inclusion of other figures enable determining a masked value.
+
+
+                       The ceiling for each occupation under all four tiers of the Subclass 189 visa in the 2025-26 financial year
+                               Occupation               Average stock        Occupation Ceiling         Grants in PY24/25 to     Remaining places for
+           Unit Code                         Multiplier
+                                   Tier                     fiaure                 adiusted               491/494/186/190             PY25/26
+ 2544 Registered Nurses              1           4%           348233                  13929                        3539                       10,390
+   2539 Other Medical
+                                     1           4%            20749                   830                          183                         647
+      Practitioners
+     2533 Specialist
+                                     1           4%            14449                   578                          105                         473
+       Phvsicians
+
