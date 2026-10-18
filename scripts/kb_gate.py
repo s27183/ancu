@@ -8,7 +8,8 @@ Regulated figures are grounded -> P-7 -> The KB update -> a verified KB update p
 Behavior 74 (Son 2026-10-12: too much to review by hand). A kb-watch PR (the weekly
 kb-watch-<date>, or since behavior 134 news-watch's daily kb-watch-news-<date>)
 merges itself only when each thing it changes is one of these:
-  - date-only: in a docs/kb doc, only `last_verified:` / `retrieved:` lines moved;
+  - date-only: in a docs/kb doc, only `last_verified:` / `retrieved:` /
+    `next_edition:` lines moved;
   - a new news note (docs/kb/news/, added; a note is never edited);
   - a figure change that passed two independent checks: every number the PR adds
     to a doc's text appears in a word-for-word quote on that doc's sources, each
@@ -49,7 +50,9 @@ from kb_quote_check import archived_text, doc_fails, parse_sources  # noqa: E402
 
 BRANCH_PREFIX = "kb-watch-"
 ALLOWED_ROOTS = ("docs/kb/", "docs/sources/")
-DATE_FIELDS = re.compile(r"^\s*-?\s*(last_verified|retrieved):\s*\S+\s*$")
+# `next_edition:` is when the next yearly edition is due (behavior 134,
+# tests/kb_freshness.py): a date kb-watch moves on, not a figure a reader sees.
+DATE_FIELDS = re.compile(r"^\s*-?\s*(last_verified|retrieved|next_edition):\s*\S+\s*$")
 # Lines that only add or move the support for a figure (a source's saved copy and
 # quotes) — not themselves a figure change.
 SUPPORT_LINE = re.compile(r"^\s*(-\s*url:|path:|quotes:|-\s*[\"'])")
