@@ -68,10 +68,16 @@
 
     // A rise under double reads as a percentage (a visa charge up 25%: behavior 125), a larger
     // one as a multiple (a city's prices ×3.0 over twenty years: behavior 42), rounded as quoted.
+    // Under 10% it keeps one decimal, from the difference rather than the ratio (a student visa
+    // $2,000 → $2,050 is +2.5%, which 1.025 − 1 in floating point rounded down to +2%: behavior 131).
     function rise(to: number, from: number): string {
         const loc = $lang === 'vi' ? 'vi-VN' : 'en-AU';
         const r = to / (from || 1);
-        if (r < 2) return `${r >= 1 ? '+' : '−'}${Math.round(Math.abs(r - 1) * 100)}%`;
+        if (r < 2) {
+            const p = (Math.abs(to - from) / (from || 1)) * 100;
+            const shown = p.toLocaleString(loc, { maximumFractionDigits: p < 10 ? 1 : 0 });
+            return `${r >= 1 ? '+' : '−'}${shown}%`;
+        }
         return `×${r.toLocaleString(loc, { maximumFractionDigits: 1 })}`;
     }
 </script>
