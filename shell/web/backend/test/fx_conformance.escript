@@ -30,4 +30,32 @@ main(_) ->
     Fails = [Name || {Name, Input, Ok} <- Cases, not Ok(fh_shell_h_fx:parse(Input))],
     [io:format("FAIL ~s: ~p~n", [N, fh_shell_h_fx:parse(I)]) || {N, I, _} <- Cases, lists:member(N, Fails)],
     io:format("fx_conformance: ~B/~B~n", [length(Cases) - length(Fails), length(Cases)]),
-    halt(case Fails of [] -> 0; _ -> 1 end).
+    VFails = vcb(Refused),
+    halt(case Fails ++ VFails of [] -> 0; _ -> 1 end).
+
+%% Behavior 130: Vietcombank's board yields the AUD buy/transfer/sell quote and its time
+%% in Vietnam time, or nothing (fh_shell_vcb:parse/1). Offline: a byte copy of the board.
+vcb(Refused) ->
+    {ok, Board} = file:read_file("test/fixtures/vietcombank-exrate.xml"),
+    Sub = fun(From, To) -> binary:replace(Board, From, To) end,
+    Want = {ok, #{time => <<"2026-10-18T10:10:02+07:00">>, buy_cash => <<"17558.08">>,
+                  buy_transfer => <<"17735.44">>, sell => <<"18303.86">>}},
+    Cases = [
+        {"the board reads AUD 17558.08 / 17735.44 / 18303.86 at 10:10:02 +07:00",
+         Board, fun(R) -> R =:= Want end},
+        {"a PM time reads as 24-hour",
+         Sub(<<"10:10:02 AM">>, <<"3:05:09 PM">>),
+         fun({ok, #{time := <<"2026-10-18T15:05:09+07:00">>}}) -> true; (_) -> false end},
+        {"no AUD row is refused", Sub(<<"CurrencyCode=\"AUD\"">>, <<"CurrencyCode=\"XYZ\"">>), Refused},
+        {"a dash for a price is refused", Sub(<<"Buy=\"17,558.08\"">>, <<"Buy=\"-\"">>), Refused},
+        {"a zero price is refused", Sub(<<"Sell=\"18,303.86\"">>, <<"Sell=\"0\"">>), Refused},
+        {"no time is refused", Sub(<<"<DateTime>10/18/2026 10:10:02 AM</DateTime>">>, <<"">>), Refused},
+        {"an impossible date is refused", Sub(<<"10/18/2026">>, <<"13/45/2026">>), Refused},
+        {"an entity is refused",
+         <<"<?xml version=\"1.0\"?><!DOCTYPE a [<!ENTITY x \"y\">]><a>&x;</a>">>, Refused},
+        {"not XML is refused", <<"Service unavailable">>, Refused}
+    ],
+    Fails = [N || {N, I, Ok} <- Cases, not Ok(fh_shell_vcb:parse(I))],
+    [io:format("FAIL ~s: ~p~n", [N, fh_shell_vcb:parse(I)]) || {N, I, _} <- Cases, lists:member(N, Fails)],
+    io:format("vcb_conformance: ~B/~B~n", [length(Cases) - length(Fails), length(Cases)]),
+    Fails.
