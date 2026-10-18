@@ -2,7 +2,8 @@
     // Bilingual -> the first-screen sentence -> The web frontend -> the home (/)
     // Behavior 81 (Son 2026-10-16): the home leads to two pages — plan a budget by state
     // (/plan) or explore suburbs on the map (/explore) — under the news band (the
-    // layout's). Behavior 88: and a third, the News page (/news). The map no longer opens first. A first visit still opens "Giới thiệu"
+    // layout's). Behavior 88: and a third, the News page (/news). Behavior 122: and a
+    // fourth, "Úc qua số liệu" (/facts), the cited facts about Australia on one page. The map no longer opens first. A first visit still opens "Giới thiệu"
     // (Welcome) over the cards, whose first screen leads to the independent /
     // information-not-advice position in one tap; minimised, it leaves the cards in view.
     // Behavior 89: a dotted map of Australia lights up behind the cards (HomeBackdrop).
@@ -54,6 +55,21 @@
             <span class="home-way-text">
                 <span class="home-way-title">{$t('home.news.title')}</span>
                 <span class="home-way-body">{$t('home.news.body')}</span>
+            </span>
+            <svg class="home-way-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+                ><polyline points="9 6 15 12 9 18" /></svg
+            >
+        </a>
+        <a class="home-way" href="/facts">
+            <span class="home-way-icon" aria-hidden="true">
+                <!-- a bar chart: the figures -->
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+                    ><line x1="4" y1="20" x2="20" y2="20" /><rect x="5.5" y="12" width="3" height="8" /><rect x="10.5" y="7" width="3" height="13" /><rect x="15.5" y="4" width="3" height="16" /></svg
+                >
+            </span>
+            <span class="home-way-text">
+                <span class="home-way-title">{$t('home.facts.title')}</span>
+                <span class="home-way-body">{$t('home.facts.body')}</span>
             </span>
             <svg class="home-way-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
                 ><polyline points="9 6 15 12 9 18" /></svg

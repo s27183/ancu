@@ -82,6 +82,16 @@ export const SECTION_ORDER = [
     'kb.facts.living-in-australia'
 ];
 
+// The facts page's order (/facts, behavior 121): the Introduction's three, then Australia's
+// economy (behavior 124) and what the main visas cost (behavior 125). A fact doc the KB
+// adds later and this list does not name follows them, never ahead.
+export const PAGE_ORDER = [...SECTION_ORDER, 'kb.facts.australian-economy', 'kb.facts.visa-charges'];
+
+export function pageRank(slug: string): number {
+    const i = PAGE_ORDER.indexOf(slug);
+    return i < 0 ? PAGE_ORDER.length : i;
+}
+
 export function pick(l: Label | undefined, lang: Lang): string {
     if (!l) return '';
     return typeof l === 'string' ? l : (l[lang] ?? l.en);
@@ -127,6 +137,7 @@ const PUBLISHERS: Record<string, Localized> = {
         vi: 'Hội đồng Thẩm định Đầu tư Nước ngoài (FIRB)'
     },
     'www.homeaffairs.gov.au': { en: 'Department of Home Affairs', vi: 'Bộ Nội vụ Úc' },
+    'www.dfat.gov.au': { en: 'Department of Foreign Affairs and Trade (DFAT)', vi: 'Bộ Ngoại giao và Thương mại Úc (DFAT)' },
     'www.abs.gov.au': { en: 'Australian Bureau of Statistics', vi: 'Cục Thống kê Úc (ABS)' },
     'www.dcceew.gov.au': {
         en: 'Department of Climate Change, Energy, the Environment and Water',
