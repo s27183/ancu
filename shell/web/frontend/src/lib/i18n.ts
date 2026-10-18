@@ -1321,7 +1321,7 @@ const messages = {
         en: 'Changes in visas, finance, tax and the market, by topic.'
     },
     // Behavior 122: the home's fourth card and the facts page (/facts) it opens.
-    'home.facts.title': { vi: 'Úc qua số liệu', en: 'Australia in figures' },
+    'home.facts.title': { vi: 'Nước Úc qua số liệu', en: 'Australia in figures' },
     'home.facts.body': {
         vi: 'Người Việt ở Úc, nhà đất, cuộc sống, kinh tế và phí visa, từ nguồn chính phủ.',
         en: 'Vietnamese in Australia, property, living, the economy and visa fees, from government sources.'

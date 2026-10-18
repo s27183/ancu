@@ -3,7 +3,7 @@
     // Behavior 81 (Son 2026-10-16): the home leads to two pages — plan a budget by state
     // (/plan) or explore suburbs on the map (/explore) — under the news band (the
     // layout's). Behavior 88: and a third, the News page (/news). Behavior 122: and a
-    // fourth, "Úc qua số liệu" (/facts), the cited facts about Australia on one page. The map no longer opens first. A first visit still opens "Giới thiệu"
+    // fourth, "Nước Úc qua số liệu" (/facts; so titled by behavior 128), the cited facts about Australia on one page. The map no longer opens first. A first visit still opens "Giới thiệu"
     // (Welcome) over the cards, whose first screen leads to the independent /
     // information-not-advice position in one tap; minimised, it leaves the cards in view.
     // Behavior 89: a dotted map of Australia lights up behind the cards (HomeBackdrop).

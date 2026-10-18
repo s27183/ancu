@@ -1,6 +1,6 @@
 <script lang="ts">
     // Bilingual -> P-6 · Shells reach the engine only through the contract -> The web frontend -> the facts page (/facts)
-    // Purpose:   behavior 121/122 (Son 2026-10-18): the home's fourth card, "Úc qua số liệu" /
+    // Purpose:   behavior 121/122 (Son 2026-10-18): the home's fourth card, "Nước Úc qua số liệu" /
     //            "Australia in figures", opens one page of the facts about Australia a buyer
     //            cares about — the Introduction's three sections first, in its order, then the
     //            KB's other fact docs (the economy, visa charges: PAGE_ORDER, facts.ts).
