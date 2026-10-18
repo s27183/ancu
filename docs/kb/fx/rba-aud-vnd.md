@@ -1,10 +1,14 @@
 ---
 slug: kb.fx.rba-aud-vnd
-effective_from: 2026-10-15
-last_verified: 2026-10-16
+effective_from: 2026-10-16
+last_verified: 2026-10-18
 sources:
   - url: https://www.rba.gov.au/statistics/frequency/exchange-rates.html
-    retrieved: 2026-10-16
+    retrieved: 2026-10-18
+    path: docs/sources/rba/exchange-rates-2026-10-18.txt
+    quotes:
+      - "Units of Foreign Currencies per Australian Dollar 14 Oct 2026 15 Oct 2026 16 Oct 2026"
+      - "Vietnamese dong 18131 17997 17970"
 ---
 
 # AUD/VND — the RBA's reference rate, read weekly
@@ -15,7 +19,7 @@ It does **not** own what a buyer pays to convert: the spread and transfer fees a
 
 ## The reading
 
-On **15 October 2026** the RBA's reference rate was **17,997 dong per Australian dollar** (13 Oct: 18,037; 14 Oct: 18,131). The RBA publishes these rates daily, except on public and bank holidays observed in New South Wales.
+On **16 October 2026** the RBA's reference rate was **17,970 dong per Australian dollar** (14 Oct: 18,131; 15 Oct: 17,997). The RBA publishes these rates daily, except on public and bank holidays observed in New South Wales.
 
 ## Cadence
 
@@ -29,8 +33,8 @@ Pure-reference. `vnd_per_aud` is the latest reading; a VND display multiplies an
 {
   "fills": [],
   "parameters": {
-    "vnd_per_aud": { "type": "number", "value": 17997, "provenance": "REGULATED", "note": "RBA daily reference rate for the Vietnamese dong, VND per AUD, on as_of." },
-    "as_of": { "type": "string", "value": "2026-10-15", "provenance": "REGULATED", "note": "the RBA's publication date of vnd_per_aud." }
+    "vnd_per_aud": { "type": "number", "value": 17970, "provenance": "REGULATED", "note": "RBA daily reference rate for the Vietnamese dong, VND per AUD, on as_of." },
+    "as_of": { "type": "string", "value": "2026-10-16", "provenance": "REGULATED", "note": "the RBA's publication date of vnd_per_aud." }
   }
 }
 ```

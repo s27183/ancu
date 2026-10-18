@@ -1,0 +1,111 @@
+Source: https://www.rba.gov.au/statistics/frequency/exchange-rates.html
+Retrieved: 2026-10-18
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML 76ba14418210e0f35dd418ac50163525c20f3c205fd001c84a13805bd4a84648
+
+Exchange Rates | RBA
+Exchange Rates
+RSS Feed of Exchange Rates
+The Reserve Bank of Australia (RBA) calculates and publishes the Trade Weighted Index (TWI). The
+RBA annually recalculates the weights of the TWI based on the composition of Australia’s
+merchandise goods and services trade for the previous fiscal year. Currencies that are removed
+from the TWI will no longer have their exchange rate data published in our statistical tables.
+These data should not be relied upon for any regulatory or commercial purposes.
+Exchange rates are published daily except on public and bank holidays observed
+in New South Wales .
+Latest Exchange Rates
+Units of Foreign Currencies per Australian Dollar
+14 Oct 2026
+15 Oct 2026
+16 Oct 2026
+United States dollar
+0.7002
+0.6955
+0.6947
+Chinese renminbi
+4.6855
+4.6546
+4.6469
+Japanese yen
+110.74
+109.86
+109.67
+European euro
+0.6246
+0.6201
+0.6187
+South Korean won
+935.64
+938.40
+932.95
+Indian rupee
+66.49
+66.03
+65.89
+Singapore dollar
+0.8965
+0.8918
+0.8902
+New Zealand dollar
+1.2444
+1.2380
+1.2285
+UK pound sterling
+0.5275
+0.5252
+0.5222
+Thai baht
+23.48
+23.34
+23.27
+Malaysian ringgit
+2.8582
+2.8390
+2.8372
+Indonesian rupiah
+12524
+12481
+12536
+New Taiwan dollar
+22.53
+22.52
+22.54
+Vietnamese dong
+18131
+17997
+17970
+Hong Kong dollar
+5.4954
+5.4577
+5.4517
+Philippines peso
+43.97
+43.89
+43.78
+Canadian dollar
+0.9942
+0.9882
+0.9849
+Swiss franc
+0.5824
+0.5773
+0.5744
+Papua New Guinea kina
+3.1273
+3.1063
+3.1041
+Trade-weighted Index (4pm)
+65.0
+64.6
+64.4
+Special Drawing Right
+0.5177
+0.5141
+0.5131
+Graphs
+Related Information
+Definitions and Sources
+Historical Data
+TWI – Method of Calculation
+48 KB
+Weights for the TWI
+Special Drawing Right – Glossary Definition
