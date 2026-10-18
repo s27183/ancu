@@ -24,6 +24,7 @@
     import HomeBack from '$lib/HomeBack.svelte';
     import NewsDetailSheet from '$lib/NewsDetailSheet.svelte';
     import { getAllNews, type NewsNote } from '$lib/api';
+    import { onContentChange } from '$lib/stores/content';
     import FxRate from '$lib/FxRate.svelte';
     import { type FxRate as Fx, getFx } from '$lib/fx';
 
@@ -92,6 +93,15 @@
             chipRow.scrollTo({ left: Math.max(0, r), behavior: 'smooth' });
         }
     });
+
+    // Behavior 135: a replaced KB re-reads the facts and their news in place; an empty
+    // answer (a cold engine) keeps what the page shows.
+    onMount(() =>
+        onContentChange(() => {
+            getAllNews().then((n) => n.length && (news = n));
+            getFacts().then((d) => d.length && (docs = d));
+        })
+    );
 
     onMount(async () => {
         getFx().then((r) => (fx = r));

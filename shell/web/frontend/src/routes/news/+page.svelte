@@ -6,6 +6,7 @@
     // its note over the page; closing it shows the list again, on the tab that was open.
     import { onMount } from 'svelte';
     import { getAllNews, type NewsNote } from '$lib/api';
+    import { onContentChange } from '$lib/stores/content';
     import NewsList from '$lib/NewsList.svelte';
     import NewsDetailSheet from '$lib/NewsDetailSheet.svelte';
     import HomeBack from '$lib/HomeBack.svelte';
@@ -17,6 +18,8 @@
 
     onMount(() => {
         getAllNews().then((n) => (news = n));
+        // Behavior 135: a replaced KB re-reads in place; an empty answer keeps the list.
+        return onContentChange(() => getAllNews().then((n) => n.length && (news = n)));
     });
 </script>
 

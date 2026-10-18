@@ -33,6 +33,7 @@
     // light green on every visit until it is tapped (behavior 50).
     import { onMount, tick } from 'svelte';
     import { lang } from '$lib/stores/lang';
+    import { onContentChange } from '$lib/stores/content';
     import { t } from '$lib/i18n';
     import FactCards from '$lib/FactCards.svelte';
     import Sparkle from '$lib/Sparkle.svelte';
@@ -151,6 +152,8 @@
     onMount(() => {
         loadFacts();
         if (!introSeen()) open = true;
+        // Behavior 135: a replaced KB re-reads the facts in place; an empty answer keeps them.
+        return onContentChange(() => getFacts().then((d) => d.length && (docs = d)));
     });
 
     function closed() {

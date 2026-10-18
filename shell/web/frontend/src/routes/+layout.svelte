@@ -27,6 +27,8 @@
     import AllowanceSheet from '$lib/AllowanceSheet.svelte';
     import TermCard from '$lib/TermCard.svelte';
     import { loadTerms } from '$lib/terms';
+    import { watchContent, fetchKbVersion } from '$lib/contentWatch';
+    import { contentRevision } from '$lib/stores/content';
 
     let { children }: { children: import('svelte').Snippet } = $props();
 
@@ -46,6 +48,19 @@
     onMount(() => {
         refreshSession();
         void loadTerms(); // behavior 102: the term list every page marks with
+        // Behavior 135: a deploy that replaced the KB reaches this open page without a
+        // reload — the watch sees the engine's hash move; the terms re-load here, and
+        // each view that shows news or facts re-fetches them (stores/content.ts).
+        const stopWatch = watchContent({
+            fetchVersion: () => fetchKbVersion(),
+            onChange: () => {
+                void loadTerms(fetch, true);
+                contentRevision.update((n) => n + 1);
+            },
+            doc: document,
+            setInterval: (f, ms) => window.setInterval(f, ms),
+            clearInterval: (id) => window.clearInterval(id as number)
+        });
         const flag = signinFlag(window.location.search);
         if (flag) {
             banner = flag;
@@ -56,6 +71,7 @@
         }
         const to = window.location.pathname === '/' ? pendingPage() : null;
         if (to) void goto(`/${to}`, { replaceState: true });
+        return stopWatch;
     });
 
     // Honest-partial -> P-5 · Metering, not gating -> The web frontend -> the visitor's menu

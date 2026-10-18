@@ -44,9 +44,10 @@ export function termEvent(e: MouseEvent | KeyboardEvent): void {
 }
 
 let loading: Promise<void> | null = null;
-/** GET /api/terms once per page load; a failure leaves the list empty (nothing marked). */
-export function loadTerms(fetchFn: typeof fetch = fetch): Promise<void> {
-    if (loading) return loading;
+/** GET /api/terms once per page load, and again (`reload`) when the KB is replaced
+ *  (behavior 135); a failure leaves the list as it was (at first empty: nothing marked). */
+export function loadTerms(fetchFn: typeof fetch = fetch, reload = false): Promise<void> {
+    if (loading && !reload) return loading;
     loading = (async () => {
         try {
             const res = await fetchFn('/api/terms');
