@@ -87,14 +87,64 @@ export const SECTION_ORDER = [
     'kb.facts.living-in-australia'
 ];
 
-// The facts page's order (/facts, behavior 121): the Introduction's three, then Australia's
-// economy (behavior 124) and what the main visas cost (behavior 125). A fact doc the KB
-// adds later and this list does not name follows them, never ahead.
-export const PAGE_ORDER = [...SECTION_ORDER, 'kb.facts.australian-economy', 'kb.facts.visa-charges'];
+// The facts page's order (/facts, behavior 126, Son 2026-10-18): by what a buyer asks, in
+// the order they ask it — what the money is worth (the RBA rate, drawn before these), what
+// the visa costs, how the economy stands, the property itself, settling in, then where
+// Vietnamese buyers stand. A fact doc the KB adds later and this list does not name
+// follows them, never ahead. The Introduction sheet keeps SECTION_ORDER.
+export const PAGE_ORDER = [
+    'kb.facts.visa-charges',
+    'kb.facts.australian-economy',
+    'kb.facts.australian-property',
+    'kb.facts.living-in-australia',
+    'kb.facts.vietnamese-in-australia'
+];
+
+/** Behavior 126: each section's short name for the chips on /facts (i18n `facts.chip.<key>`);
+ *  a doc not named here is chipped by its title. */
+export const CHIP_KEY: Record<string, string> = {
+    'kb.facts.visa-charges': 'visa',
+    'kb.facts.australian-economy': 'economy',
+    'kb.facts.australian-property': 'property',
+    'kb.facts.living-in-australia': 'living',
+    'kb.facts.vietnamese-in-australia': 'vietnamese'
+};
 
 export function pageRank(slug: string): number {
     const i = PAGE_ORDER.indexOf(slug);
     return i < 0 ? PAGE_ORDER.length : i;
+}
+
+/** Behavior 126: the key figures that open /facts — each names a KB fact by doc and id
+ *  (and, for a list, its highlighted item), so its value is the card's own, never typed
+ *  here. `rank`: the highlighted item's place by value ("Vietnam is 3rd"). The rate (fx)
+ *  comes from GET /api/fx, drawn by the page. */
+export interface KeyFigureSpec {
+    key: string;
+    slug: string;
+    fact: string;
+    pick?: 'highlight';
+    rank?: boolean;
+}
+export const KEY_FIGURES: KeyFigureSpec[] = [
+    { key: 'visa189', slug: 'kb.facts.visa-charges', fact: 'skilled_employer', pick: 'highlight' },
+    { key: 'gdp', slug: 'kb.facts.australian-economy', fact: 'real_gdp_growth' },
+    { key: 'population', slug: 'kb.facts.australian-property', fact: 'population_growth' },
+    { key: 'wage', slug: 'kb.facts.living-in-australia', fact: 'minimum_wage' },
+    { key: 'vnrank', slug: 'kb.facts.vietnamese-in-australia', fact: 'firb_top_sources_quarter', rank: true }
+];
+
+/** The figure a spec names, formatted as its card formats it; null when the KB lacks it. */
+export function keyFigure(docs: FactDoc[], spec: KeyFigureSpec, lang: Lang): { value: string; rank?: number } | null {
+    const f = docs.find((d) => d.slug === spec.slug)?.facts.find((x) => x.id === spec.fact);
+    if (!f) return null;
+    if (spec.rank) {
+        const items = [...(f.items ?? [])].sort((a, b) => b.value - a.value);
+        const i = items.findIndex((x) => x.highlight);
+        return i < 0 ? null : { value: String(i + 1), rank: i + 1 };
+    }
+    const v = spec.pick ? f.items?.find((x) => x.highlight)?.value : f.value;
+    return v === undefined ? null : { value: formatValue(v, f.unit, lang, f.decimals) };
 }
 
 export function pick(l: Label | undefined, lang: Lang): string {
