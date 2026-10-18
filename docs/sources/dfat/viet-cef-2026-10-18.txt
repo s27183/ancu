@@ -1,0 +1,68 @@
+Source: https://www.dfat.gov.au/sites/default/files/viet-cef.pdf
+Retrieved: 2026-10-18
+Extracted: pdftotext -layout of the fetched PDF; sha256 of the fetched PDF 55dfd938a92a13ae4ea9cc01d628c257246fd7b5b6b390c9283c01df294ac76e
+
+                                                                                       VIETNAM
+   2025                  Key economic indicators: 2025 (top), 2024 (bottom) and sparkline (2020-2025). Estimates are blue.                                                    Source: IMF WEO
+
+    Nominal GDP                      Population                     Real GDP growth                 Unemployment                     Current account                Gross govt debt
+    (USD billions)                (people, millions)                     (% yoy)                    (% labour force)                 balance (% GDP)                   (% GDP)
+     494.0▴                           102.3▴                               8.0▴                           2.2﹣                             6.7▴                        30.3▾
+      459.4                            101.3                               7.0                               2.2                           6.6                          31.2
+
+   2025       
+                                                         Australia - Vietnam investment, 2025 (stocks)                                                                      A$m        A$b
+                                                                                         Source: ABS
+
+                           Investment in Vietnam                                                                              Investment from Vietnam
+               Total (A$m)                                      FDI (A$m)                                          Total (A$m)                                  FDI (A$m)
+                   921                                           490                                                1,104                                            np
+          Destination Ranking: na                                                                              Source Ranking: na
+   2025                                        Australia's goods and services trade with Vietnam, 2025                                                      A$000        A$m         A$b
+
+                                                                              Source: DFAT-adjusted ABS data
+
+Exports                                                     Destination Ranking: 13                Imports                                                            Source Ranking: 13
+
+ Item                                                                               A$m             Item                                                                              A$m
+
+ Coal                                                                             3,574.7           Recreational travel                                                            2,993.0
+ Education-related travel                                                         2,658.0           Telecom equipment & parts                                                      2,703.2
+ Iron ores & concentrates                                                         1,425.2           Crude petroleum                                                                  977.0
+ Aluminium                                                                         717.4            Footwear                                                                         908.5
+ Wheat                                                                             593.1            Computers                                                                        782.9
+ Cotton                                                                            592.5            Monitors, projectors & TVs                                                       475.5
+  Item                                                                             A$m              Item                                                                              A$m
+  Total                                                                       13,387.0              Total                                                                         16,575.9
+
+  2025                                         Vietnam's global merchandise trade relationships, 2025                                                    Source: Various international sources
+
+                         Principal export destinations                                                                             Principal import sources
+  Destination                                                         Share         Rank            Destination                                                          Share        Rank
+                                                                                                                                                                                     
+
+  United States                                                          31.9%          1           China                                                                    39.6%          1
+  China                                                                  13.8%          2           Republic of Korea                                                        13.2%          2
+  Republic of Korea                                                        6.3%         3           Taiwan                                                                    7.0%          3
+  Japan                                                                    5.9%         4           United States                                                             6.5%          4
+  Hong Kong (SAR of China)                                                 4.6%         5           Japan                                                                     5.5%          5
+  Australia                                                                1.2%        16           Australia                                                                 1.6%          9
+
+
+   2025                                    2025                       Flow of people from Vietnam                                                                  Source: Home Affairs, DESE
+  International student numbers             Visitor arrivals (movements)               Resident returns (movements)                        Arrivals and returns, years ended Dec
+                  2025                         Year ended Dec 2025                          Year ended Dec 2025
+
+            36,595                                  164,990                                    519,780                              0.4M
+                                                                                                                                                                                      arrivals
+                                                                                                                                    0.2M
+                                                                                                                                                                                      returns
+                  4.3%                                    1.8%                                        4.1%                          0.0M
+               Rank: 4                                                                                                                     2015             2020              2025
+                                                        Rank: 9                                    Rank: 9
+Compiled by the Trade Data Section, DFAT, using the latest data from the ABS, the IMF and various international sources. All data may be subject to future revisions.
+Merchandise trade data may exclude confidential items of trade. Totals may not add up due to rounding. Investment data is stocks as at end December.
+Belgium only: The majority of total investment from Belgium is portfolio investment liabilities in the form of debt securities (Belgium hosts a major clearing house and depository for
+euro-denominated bonds and other securities, Euroclear).
+GDP - Gross Domestic Product.     na - Data is not available.    np - Data is not published.   f.c.f - Fresh, chilled or frozen.   nes - Not elsewhere specified.
+
