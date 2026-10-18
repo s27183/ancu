@@ -27,13 +27,14 @@ What the main visas cost to apply for from 1 July 2026 (behavior 125), drawn on 
 
 Kept to the visas readers ask about: skilled (189, 190, 491), employer (186, 494), graduate (485), partner and parent. Left out: 191 ($505 → $630, a second step after 491), the second instalment, the lower Pacific / Timor-Leste / ASEAN rates — the news note covers them. 189 is its points-tested stream; 186 and 494 their main streams. The 485 charge had already risen on 1 March 2026 (behavior 119), so its "before" is the 1 June 2026 compilation's $4,600.
 
-A fact doc has no field that links a news note, so the note's link is the page's to draw (behavior 122), not this doc's.
+`news` names the note that explains the rise; GATE 12 checks it is a current news note and /facts links it under the section.
 
 ## Facts
 
 ```jsonc
 {
   "title": {"en": "Visa application charges", "vi": "Phí visa"},
+  "news": ["kb.news.2026-07-visa-application-charges-2026-27"],
   "facts": [
     {
       "id": "skilled_employer",

@@ -126,6 +126,7 @@ const PUBLISHERS: Record<string, Localized> = {
         en: 'Foreign Investment Review Board',
         vi: 'Hội đồng Thẩm định Đầu tư Nước ngoài (FIRB)'
     },
+    'immi.homeaffairs.gov.au': { en: 'Department of Home Affairs', vi: 'Bộ Nội vụ Úc' },
     'www.homeaffairs.gov.au': { en: 'Department of Home Affairs', vi: 'Bộ Nội vụ Úc' },
     'www.abs.gov.au': { en: 'Australian Bureau of Statistics', vi: 'Cục Thống kê Úc (ABS)' },
     'www.dcceew.gov.au': {

@@ -429,7 +429,7 @@ def journey_rule_self_test(kb_docs):
     return [f"[journey] self-test: the planted fixture '{w}' is no longer caught" for w in miss], caught
 
 
-def facts_doc_fails(slug, doc, kb_docs):
+def facts_doc_fails(slug, doc, kb_docs, news_docs=None):
     """GATE 12 problems for one fact doc (FACT_VISUALS block above)."""
     out = []
     if doc["error"]:
@@ -456,6 +456,16 @@ def facts_doc_fails(slug, doc, kb_docs):
     err = check_copy_template(body.get("title") or {})
     if err:
         out.append(f"[facts] {slug}: title: {err}")
+    # Behavior 125: a doc may name the news notes that explain it (`"news": [<news slug>]`);
+    # /facts links them under the section. Each must be a current news note, so a link
+    # never opens nothing.
+    related = body.get("news", [])
+    if not isinstance(related, list) or not all(isinstance(n, str) for n in related):
+        out.append(f"[facts] {slug}: news must be a list of news slugs")
+    elif news_docs is not None:
+        for n in related:
+            if n not in news_docs:
+                out.append(f"[facts] {slug}: news {n!r} is no news note in docs/kb/news/")
     facts = body.get("facts") or []
     if not facts:
         out.append(f"[facts] {slug}: no facts")
@@ -1697,7 +1707,7 @@ def run(emit=False):
 
     # ---- GATE 12: fact docs quote their archived primaries (FACT_VISUALS block) ---- #
     for slug, doc in sorted(facts_docs.items()):
-        fails.extend(facts_doc_fails(slug, doc, kb_docs))
+        fails.extend(facts_doc_fails(slug, doc, kb_docs, news_docs))
 
     # ---- GATE 8: bilingual copy-template well-formedness (all docs) -------- #
     # Every `copy` template is localized in every LOCALES locale (outcome-conformance.md
@@ -2019,6 +2029,7 @@ def build_artifact(blueprints, registries, kb_docs, news_docs, facts_docs=None, 
         "facts": {
             slug: {
                 "title": d["body"].get("title"),
+                "news": d["body"].get("news") or [],
                 "last_verified": d["last_verified"],
                 "sources": d.get("sources") or [],
                 "facts": [{k: v for k, v in f.items() if k not in ("quotes", "note_quotes")}
