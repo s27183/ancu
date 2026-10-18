@@ -1,0 +1,41 @@
+Source: https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/temporary-graduate-485
+Retrieved: 2026-10-18
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML 2f75e5ba96edc528ea741c2d5cffab2e069cff163e9e421d65651aeec5e936da; then the page's own text from its PageSchemaHiddenField JSON (the visa page draws itself from it)
+
+Temporary Graduate visa - Subclass 485
+Skip to navigation
+Skip to main content
+Loading
+
+Select
+language
+English
+You have
+entered feedback mode. Right click on translated text to report
+​​​​
+ImmiAccount
+Visa Entitlement Verification Online (VEVO)
+My Tourist Refund Scheme (TRS) ​
+" />
+A temporary visa that allows international students to live, study and work after you have finished your studies. </p>
+" />
+pop-up content starts
+Need a hand?
+×
+Cancel
+pop-up content ends
+Clickbot
+-->
+485-33
+485-34
+485-35
+Subclass 485
+Temporary Graduate visa
+A temporary visa that allows international students to live, study and work after you have finished your studies.
+You must:
+be aged 35 years or under when you apply. *Exceptions apply
+hold an eligible visa
+have held a Student visa in the last 6 months
+have a recent qualification in a CRICOS-registered course
+apply for your eligible stream (it is not possible to change streams after you apply)
+attach required evidence when you apply

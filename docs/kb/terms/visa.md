@@ -6,7 +6,7 @@ last_verified: 2026-10-18
 
 # Visa terms — Thuật ngữ về visa
 
-The visa words the news uses. None has a KB doc of its own; each explanation rests on the Home Affairs page its `url` names, read on 2026-10-17 (the Direction page is archived as docs/sources/homeaffairs/skilled-visa-processing-priorities-2026-10-16.txt) or, for EOI and occupation ceiling, on 2026-10-18 (archived as docs/sources/homeaffairs/skillselect-invitation-rounds-2026-10-18.txt). CPI (behavior 120, for the visa-charges note) rests on the ABS release page its `url` names, read on 2026-10-18 ("The Consumer Price Index (CPI) measures household inflation"); that visa charges are indexed to it each year is the F2026L00874 explanatory statement's "ongoing annual indexation of VACs".
+The visa words the news uses. None has a KB doc of its own; each explanation rests on the Home Affairs page its `url` names, read on 2026-10-17 (the Direction page is archived as docs/sources/homeaffairs/skilled-visa-processing-priorities-2026-10-16.txt) or, for EOI and occupation ceiling, on 2026-10-18 (archived as docs/sources/homeaffairs/skillselect-invitation-rounds-2026-10-18.txt). CPI (behavior 120, for the visa-charges note) rests on the ABS release page its `url` names, read on 2026-10-18 ("The Consumer Price Index (CPI) measures household inflation"); that visa charges are indexed to it each year is the F2026L00874 explanatory statement's "ongoing annual indexation of VACs". The 485 and CRICOS terms (behavior 119) were read on 2026-10-18 and rest on the pages archived as docs/sources/homeaffairs/temporary-graduate-485*-2026-10-18.txt.
 
 ## Terms
 
@@ -94,6 +94,42 @@ The visa words the news uses. None has a KB doc of its own; each explanation res
         "en": "A TSS or Skills in Demand holder is a temporary resident, and so a foreign person for FIRB when buying a home."
       },
       "url": "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/repealed-visas/temporary-skill-shortage-short-term-visa-subclass-482"
+    },
+    {
+      "id": "temporary_graduate_visa",
+      "abbr": null,
+      "name": {
+        "vi": "Visa Tốt nghiệp Tạm thời (Temporary Graduate, diện 485)",
+        "en": "Temporary Graduate visa (subclass 485)"
+      },
+      "forms": ["485", "Temporary Graduate visa", "visa Tốt nghiệp Tạm thời"],
+      "meaning": {
+        "vi": "Visa tạm trú cho du học sinh quốc tế ở lại Úc sống, học và làm việc sau khi học xong. Bằng cấp quyết định diện: associate degree, diploma hoặc chứng chỉ nghề nộp diện Post-Vocational Education Work; cử nhân, thạc sĩ hoặc tiến sĩ nộp diện Post-Higher Education Work.",
+        "en": "A temporary visa that lets international students live, study and work in Australia after they finish their studies. The qualification decides the stream: an associate degree, diploma or trade qualification goes to Post-Vocational Education Work; a bachelor, masters or doctoral degree to Post-Higher Education Work."
+      },
+      "why": {
+        "vi": "Người giữ visa 485 là người cư trú tạm thời, nên là người nước ngoài theo FIRB khi mua nhà, kể cả khi đang sống tại Úc.",
+        "en": "A 485 holder is a temporary resident, and so a foreign person for FIRB when buying a home, even while living in Australia."
+      },
+      "url": "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/temporary-graduate-485"
+    },
+    {
+      "id": "cricos",
+      "abbr": "CRICOS",
+      "name": {
+        "vi": "Danh bạ CRICOS (cơ sở và khóa học cho du học sinh)",
+        "en": "Commonwealth Register of Institutions and Courses for Overseas Students"
+      },
+      "forms": ["CRICOS", "CRICOS-registered", "Commonwealth Register of Institutions and Courses for Overseas Students"],
+      "meaning": {
+        "vi": "Danh bạ của Chính phủ Úc ghi các cơ sở giáo dục và khóa học dành cho du học sinh. Muốn xin visa 485, khóa học cho bạn bằng cấp phải có tên trong danh bạ này.",
+        "en": "The Australian Government's register of education providers and courses for overseas students. For a Temporary Graduate (485) visa, the course behind your qualification must be registered on it."
+      },
+      "why": {
+        "vi": "Chỉ khóa học có trên CRICOS mới được tính để xin visa 485 — visa nhiều người giữ khi đi làm ở Úc sau khi tốt nghiệp.",
+        "en": "Only a CRICOS-registered course counts toward a 485 — the visa many graduates hold while they work in Australia after study."
+      },
+      "url": "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/temporary-graduate-485/meeting-the-temporary-graduate-visa-subclass-485-study-requirement"
     },
     {
       "id": "cpi",
