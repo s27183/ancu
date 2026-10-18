@@ -8,8 +8,15 @@
     //            suburb data, the news, the assistant; the first screen lists four (plan,
     //            Hành trình, data, news) and claims grounding only for what cites it — every
     //            figure and every rule-bound step (behaviors 113, 114); the launcher reads "Giới thiệu" /
-    //            "Introduction" (behavior 107, Son 2026-10-17: once "Vì sao Úc?").
-    // Rests on:  i18n.ts intro.* keys, VI and EN side by side.
+    //            "Introduction" (behavior 107, Son 2026-10-17: once "Vì sao Úc?"); the
+    //            launcher never covers a home card (behavior 128): it sits fixed at the
+    //            bottom-right where its box meets none of the cards' column at any point of
+    //            the home's scroll, and otherwise is drawn after the cards, right-aligned,
+    //            scrolling with them — measured on load, on resize and on a language change.
+    // Rests on:  i18n.ts intro.* keys, VI and EN side by side; the home (routes/+page.svelte)
+    //            mounting this inside its scrolling .home, after nav.home-ways, and .home
+    //            making no stacking context of its own (app.css), so the sheet still covers
+    //            the header; the close's fly-back reads launchEl's rect wherever it sits.
     //
     // The first-visit sheet (behavior 42): opens by itself the first time this browser
     // visits, says on its first screen what the product does (plan a budget, the journey's
@@ -59,6 +66,49 @@
     // "Show me around" at the sheet's foot goes to the map and replays it there.
     let tourAfter = false;
 
+    // Behavior 128: where the launcher sits. Measured with it fixed (the class off for the
+    // one synchronous read, the home's scroll put back after), against nav.home-ways over
+    // the home's whole scroll range: the cards' top runs from top0 - range to top0 as the
+    // home scrolls, so the fixed box meets them at some scroll s in [0, range] exactly
+    // when top0 - b.bottom < s < bottom0 - b.top has a solution there.
+    let inline = $state(false);
+    function placeLauncher() {
+        const btn = launchEl;
+        const home = btn?.closest<HTMLElement>('.home');
+        const ways = home?.querySelector<HTMLElement>('.home-ways');
+        if (!btn || !home || !ways) return;
+        const kept = home.scrollTop;
+        btn.classList.remove('inline');
+        const b = btn.getBoundingClientRect();
+        const w = ways.getBoundingClientRect();
+        const range = Math.max(0, home.scrollHeight - home.clientHeight);
+        const top0 = w.top + home.scrollTop;
+        const bottom0 = w.bottom + home.scrollTop;
+        const across = b.left < w.right && b.right > w.left;
+        const meets = across && Math.max(0, top0 - b.bottom) < Math.min(range, bottom0 - b.top);
+        btn.classList.toggle('inline', meets);
+        home.scrollTop = kept;
+        inline = meets;
+    }
+    $effect(() => {
+        const home = launchEl?.closest<HTMLElement>('.home');
+        if (!home) return;
+        const ways = home.querySelector<HTMLElement>('.home-ways');
+        const ro = new ResizeObserver(() => placeLauncher());
+        ro.observe(home);
+        if (ways) ro.observe(ways);
+        window.addEventListener('resize', placeLauncher);
+        return () => {
+            ro.disconnect();
+            window.removeEventListener('resize', placeLauncher);
+        };
+    });
+    // The label's width changes with the language ("Giới thiệu" / "Introduction").
+    $effect(() => {
+        void $lang;
+        tick().then(placeLauncher);
+    });
+
     // The sheet draws its own three sections only: the facts page (/facts, behavior 122)
     // shows the KB's other fact docs (the economy, visa charges) and they stay off here.
     const ordered = $derived(
@@ -103,6 +153,9 @@
         if (!open || closing) return;
         markIntroSeen();
         if (reduceMotion() || !cardEl || !launchEl) return closed();
+        // Drawn after the cards (behavior 128), the launcher may be scrolled out of view:
+        // bring it in under the sheet first, so the card lands on a button one can see.
+        if (inline) launchEl.scrollIntoView({ block: 'center' });
         // Fly the card's centre onto the launcher's centre while it shrinks and fades.
         const c = cardEl.getBoundingClientRect();
         const l = launchEl.getBoundingClientRect();
@@ -280,6 +333,7 @@
     type="button"
     class="wl-launch"
     class:waiting={open}
+    class:inline
     class:arrived
     class:pulse
     aria-label={$t('intro.button.aria')}
@@ -684,6 +738,17 @@
         transition:
             transform var(--t-fast) var(--ease),
             box-shadow var(--t-fast) var(--ease);
+    }
+    /* Behavior 128: after the cards, at the right edge of their column (64rem, centred),
+       in the home's flow and its scroll; z-index auto keeps it under the header and band. */
+    .wl-launch.inline {
+        position: relative;
+        right: auto;
+        bottom: auto;
+        z-index: auto;
+        display: flex;
+        width: fit-content;
+        margin: var(--sp-4) max(0px, calc((100% - 64rem) / 2)) 0 auto;
     }
     .wl-launch:hover {
         transform: translateY(-2px);

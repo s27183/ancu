@@ -2,7 +2,7 @@
     // Bilingual -> The web frontend -> the facts, drawn the same wherever they appear
     // Purpose:   draws one KB fact doc's facts as cards — headline, picture, caption, note,
     //            sources and date — for the Introduction sheet (Welcome) and the
-    //            "Úc qua số liệu" page (/facts, behavior 122), so the two cannot disagree.
+    //            "Nước Úc qua số liệu" page (/facts, behavior 122), so the two cannot disagree.
     // Holds:     every figure and source comes from the doc (GET /api/facts); nothing here
     //            authors a fact.
     // Rests on:  facts.ts (pick, factSources, publisher, formatAsOf), FactVisual.svelte.

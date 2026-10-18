@@ -3,10 +3,12 @@
     // Behavior 81 (Son 2026-10-16): the home leads to two pages — plan a budget by state
     // (/plan) or explore suburbs on the map (/explore) — under the news band (the
     // layout's). Behavior 88: and a third, the News page (/news). Behavior 122: and a
-    // fourth, "Úc qua số liệu" (/facts), the cited facts about Australia on one page. The map no longer opens first. A first visit still opens "Giới thiệu"
+    // fourth, "Nước Úc qua số liệu" (/facts; so titled by behavior 128), the cited facts about Australia on one page. The map no longer opens first. A first visit still opens "Giới thiệu"
     // (Welcome) over the cards, whose first screen leads to the independent /
     // information-not-advice position in one tap; minimised, it leaves the cards in view.
     // Behavior 89: a dotted map of Australia lights up behind the cards (HomeBackdrop).
+    // Behavior 128: Welcome sits inside .home, after the cards, so its launcher can fall in
+    // behind them where at the bottom-right it would cover one.
     import Welcome from '$lib/Welcome.svelte';
     import HomeBackdrop from '$lib/HomeBackdrop.svelte';
     import { t } from '$lib/i18n';
@@ -76,7 +78,8 @@
             >
         </a>
     </nav>
+    <!-- First visit: the case for Australian property, then a launcher to reopen it
+         (behavior 42) — inside the home's scroll, so where the launcher would cover a
+         card it is drawn after them instead (behavior 128, Welcome's block). -->
+    <Welcome />
 </div>
-
-<!-- First visit: the case for Australian property, then a launcher to reopen it (behavior 42). -->
-<Welcome />
