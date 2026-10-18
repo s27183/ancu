@@ -1,0 +1,70 @@
+Source: https://www.bitre.gov.au/sites/default/files/documents/bitre-yearbook-2025.pdf
+Retrieved: 2026-10-18
+Extracted: pdftotext -layout of PDF page 84 only (Table 4.1a, Australian road length, by type of road) of the fetched PDF; sha256 of the fetched PDF 2c466979a7f328ec290022b4f31fc15b7f35da1b6de9683833b403ec9f711a76
+
+Chapter 4: Road
+
+
+Table 4.1a        Australian road length, by type of road
+
+Calendar                Paved undivided                Paved divided         Paved freeway   Paved total
+year                                             (excluding freeway)
+                                                                Kilometres
+1975                                                                                   444      228 657
+1976                                                                                   522      233 847
+1977                                                                                   558      239 046
+1978                                                                                   595      243 285
+1979                                                                                   656      247 564
+1980                                                                                   711      253 307
+1981                                                                                   720      260 828
+1982                                                                                   761      265 748
+1983                                                                                   799      269 813
+1984                                                                                   836      274 192
+1985                                                                                   892      278 681
+1986                                                                                   918      283 480
+1987                                                                                 1 016      287 548
+1988                                                                                 1 082      291 542
+1989                                                                                 1 215      294 726
+1990                                                                                 1 293      298 820
+1991                                                                                 1 306      302 225
+1992                                                                                 1 393      305 634
+1993                                                                                 1 484      309 870
+1994                                                                                 1 585      314 350
+1995                                                                                 1 763      318 836
+1996                                                                                 1 822      322 197
+1997                                                                                 1 865      326 919
+1998                                                                                 1 911      329 756
+1999                                                                                 1 962      333 516
+2000                                                                                 2 013      335 243
+2001                                                                                 2 085      339 858
+2002                                                                                 2 131      342 115
+2003                                                                                 2 208      343 976
+2004                                                                                 2 225      348 512
+2005                                                                                 2 244      352 148
+2006                                                                                 2 315      354 874
+2007                                                                                 2 346      360 103
+2008                                                                                 2 405      362 439
+2009                                                                                 2 567      367 747
+2010                                                                                 2 607      370 778
+2011                                                                                 2 695      375 616
+2012                                                                                 2 716      380 275
+2013                                                                                 2 826      384 862
+2014                                                                                 2 879      389 449
+2015                                                                                 2 925      394 037
+2016                                                                                 3 024      398 625
+2017                                                                                 3 131      403 214
+2018                                                                                 3 147      407 803
+2019                                                                                 3 234      412 392
+2020                                                                                 3 277      416 982
+2021                                                                                 3 292      421 195
+2022                                                                                 3 301      426 681
+2023                            446 887                       6 517                  4 885      458 289
+2024                            463 991                       6 534                  5 087      475 612
+Source:    BITRE estimates with reference to HERE 2025, OpenStreetMap database 2025.
+           2022 and prior from PSMA data and BITRE estimates
+
+
+
+
+84        Australian Infrastructure and Transport Statistics Yearbook 2025
+

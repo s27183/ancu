@@ -1536,6 +1536,7 @@ const messages = {
     'tour.replay': { vi: 'Xem hướng dẫn', en: 'Show me around' },
     'intro.source': { vi: 'Nguồn', en: 'Source' },
     'intro.source.ranking': { vi: 'xếp hạng độc lập', en: 'independent ranking' },
+    'intro.source.reference': { vi: 'không phải nguồn chính phủ', en: 'not a government source' },
     'intro.now': { vi: 'nay', en: 'now' },
     // behavior 107 (Son 2026-10-17, from his friend): the launcher names what it opens.
     'intro.button': { vi: 'Giới thiệu', en: 'Introduction' },

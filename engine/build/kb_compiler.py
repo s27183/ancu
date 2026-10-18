@@ -194,7 +194,8 @@ FACT_VISUALS = ("bars", "series", "figure", "split", "growth", "statement")
 # Behavior 124: money in billions and millions as DFAT states it (US$1,841.6b, A$13,387.0m)
 # and a count in millions (27.7 million people); `decimals` keeps a quoted "2.0%" from
 # reading "2%", and `compare.now_label` names the current row ("2025") where "now" is wrong.
-FACT_UNITS = ("count", "people", "pct", "aud_k", "aud", "years", "usd_bn", "aud_bn", "aud_m", "million")
+# Behavior 133: road length and distance in kilometres, as BITRE states them.
+FACT_UNITS = ("count", "people", "pct", "aud_k", "aud", "years", "usd_bn", "aud_bn", "aud_m", "million", "km")
 
 
 # Regulated figures are grounded -> P-7 -> The KB compiler -> a fact may cite a named non-government ranking
@@ -211,7 +212,16 @@ FACT_RANKING_SOURCES = {
     "https://www.prnewswire.com/news-releases/eiu-liveability-index-2026-copenhagen-vienna-and-melbourne-top-annual-city-ranking-with-new-york-recording-one-of-the-largest-score-gains-302818374.html": "EIU",
     "https://mmx.prnewswire.com/media/MS1877578/Liveability-Index-2026-top-ten.jpg?id=OA2747154&p=publish": "EIU",
 }
-FACT_SOURCE_KINDS = ("ranking",)
+# Regulated figures are grounded -> P-7 -> The KB compiler -> a fact may cite a named reference work
+# Behavior 133 (Son, 2026-10-18, confirmed): "is there one highway through every mainland
+# state" has no government answer — no *.gov.au page gives Highway 1's route or length
+# (searched 2026-10-18) — so its card cites Wikipedia, named here by exact URL and marked
+# `kind: reference` (the sheet labels it "not a government source"). Same archive rules as
+# a ranking. It is no licence for figures a government publishes: those stay on *.gov.au.
+FACT_REFERENCE_SOURCES = {
+    "https://en.wikipedia.org/wiki/Highway_1_(Australia)": "Wikipedia",
+}
+FACT_SOURCE_KINDS = ("ranking", "reference")
 
 
 def fact_source_error(src, archived_raw):
@@ -223,8 +233,9 @@ def fact_source_error(src, archived_raw):
         err = news_source_host_error(src)
         return f"{err} — a fact cites a government primary, or a named ranking" if err else None
     url = src.get("url")
-    if url not in FACT_RANKING_SOURCES:
-        return f"{url!r} is not a named ranking source (FACT_RANKING_SOURCES)"
+    named = FACT_RANKING_SOURCES if kind == "ranking" else FACT_REFERENCE_SOURCES
+    if url not in named:
+        return f"{url!r} is not a named {kind} source (FACT_{kind.upper()}_SOURCES)"
     if archived_raw is not None:
         head = archived_raw.splitlines()[:4]
         if not head or head[0].strip() != f"Source: {url}":

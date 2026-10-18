@@ -27,7 +27,7 @@ export interface Fact {
     /** A statement's picture (behavior 49): the land parcel by default, or a health cross. */
     glyph?: 'health';
     /** Absent on a statement. */
-    unit?: 'count' | 'people' | 'pct' | 'aud_k' | 'aud' | 'years' | 'usd_bn' | 'aud_bn' | 'aud_m' | 'million';
+    unit?: 'count' | 'people' | 'pct' | 'aud_k' | 'aud' | 'years' | 'usd_bn' | 'aud_bn' | 'aud_m' | 'million' | 'km';
     /** Digits after the point, fixed (behavior 124: DFAT's "2.0%" stays 2.0%). */
     decimals?: number;
     headline: Localized;
@@ -52,7 +52,8 @@ export interface FactSource {
     path?: string;
     note?: string;
     /** Behavior 49: a named non-government ranking (EIU), labelled as such in the sheet. */
-    kind?: 'ranking';
+    kind?: 'ranking' | 'reference';
+    /** Behavior 133: a named reference work (Wikipedia's Highway 1), where no government publishes the answer. */
 }
 
 export interface FactDoc {
@@ -176,6 +177,8 @@ export function formatValue(n: number, unit: Fact['unit'], lang: Lang, decimals?
     if (unit === 'aud_bn') return lang === 'vi' ? `${nf(n, 1)} tỷ AUD` : `A$${nf(n, 1)}b`;
     if (unit === 'aud_m') return lang === 'vi' ? `${nf(n, 1)} triệu AUD` : `A$${nf(n, 1)}m`;
     if (unit === 'million') return lang === 'vi' ? `${nf(n, 1)} triệu` : `${nf(n, 1)}m`;
+    // Behavior 133: BITRE's road lengths and intercapital distances.
+    if (unit === 'km') return `${nf(n)} km`;
     return nf(n, 2);
 }
 
@@ -245,7 +248,13 @@ const PUBLISHERS: Record<string, Localized> = {
     // Behavior 49: the one non-government source GATE 12 admits (FACT_RANKING_SOURCES),
     // EIU's own release and its table, distributed through PR Newswire.
     'www.prnewswire.com': { en: 'EIU', vi: 'EIU' },
-    'mmx.prnewswire.com': { en: 'EIU', vi: 'EIU' }
+    'mmx.prnewswire.com': { en: 'EIU', vi: 'EIU' },
+    // Behavior 133: the named reference work GATE 12 admits (FACT_REFERENCE_SOURCES).
+    'en.wikipedia.org': { en: 'Wikipedia', vi: 'Wikipedia' },
+    'www.bitre.gov.au': {
+        en: 'Bureau of Infrastructure and Transport Research Economics (BITRE)',
+        vi: 'Cục Nghiên cứu Kinh tế Hạ tầng và Giao thông Úc (BITRE)'
+    }
 };
 
 /** The sources a fact cites, in its own order, one per publisher (EIU's release and its
