@@ -1,0 +1,1392 @@
+Source: https://www.legislation.gov.au/F1996B03551/2026-07-01/2026-07-01/text/original/pdf/1
+Retrieved: 2026-10-18
+Extracted: pdftotext -layout of Volume 1 of the Migration Regulations 1994, Compilation No. 288, compilation date 1 July 2026 (Authorised Version F2026C00667 registered 20/07/2026; includes amendments F2026L00733, F2026L00874 and F2026L00876), listed at https://www.legislation.gov.au/F1996B03551/latest/versions; sha256 of the fetched PDF e43bef82d5dcbab76298588cb161bf70ca691408c476c38bc3088876d6b60959. Kept here: Schedule 1 items 1114B, 1124, 1124A, 1124B, 1129, 1130, 1130A, 1137, 1138, 1139, 1229, 1241 and 1242, each verbatim from its heading to the line that starts its second instalment.
+
+----- Schedule 1, item 1114B -----
+1114B Employer Nomination (Permanent) (Class EN)
+            (1) Form: The approved form specified by the Minister in a legislative instrument
+                made for this item under subregulation 2.07(5).
+            (2) Visa application charge:
+                 (a) first instalment (payable at the time the application is made):
+                       (i) for an applicant:
+                               (A) who is seeking to satisfy the primary criteria for the grant of
+                                    an Employer Nomination (Permanent) (Class EN) visa and
+                                    who holds a valid passport issued by a Pacific-regional
+                                    country; or
+                                (B) whose application is combined, or sought to be combined,
+                                    with an application made by that person:
+
+First instalment
+Item        Component                                                                                   Amount
+1           Base application charge                                                                       $5 035
+2           Additional applicant charge for an applicant who is at least 18                               $2 515
+3           Additional applicant charge for an applicant who is less than 18                              $1 260
+
+                        (ii) for any other applicant:
+
+First instalment
+Item        Component                                                                                   Amount
+1           Base application charge                                                                       $6 140
+2           Additional applicant charge for an applicant who is at least 18                               $3 070
+3           Additional applicant charge for an applicant who is less than 18                              $1 535
+
+402                                              Migration Regulations 1994
+
+Compilation No. 288                                                                    Compilation date: 01/07/2026
+
+                                Authorised Version F2026C00667 registered 20/07/2026
+                                                                                       Classes of visa Schedule 1
+                                                                                          Permanent visas Part 1
+
+Note:    Regulation 2.12C explains the components of the first instalment of visa application charge and specifies
+         the amounts of subsequent temporary application charge and non-Internet application charge. Not all of
+         the components may apply to a particular application.
+         Additional applicant charge is paid by an applicant who claims to be a member of the family unit of
+         another applicant and seeks to combine the application with that applicant’s application.
+                 (b) second instalment (payable before grant of visa):
+
+----- Schedule 1, item 1124 -----
+1124 Parent (Migrant) (Class AX)
+          (1) Form: The approved form specified by the Minister in a legislative instrument
+              made for this item under subregulation 2.07(5).
+          (2) Visa application charge:
+               (a) first instalment (payable at the time the application is made):
+                     (i) for an applicant:
+                             (A) who is seeking to satisfy the primary criteria for the grant of a
+                                  Parent (Migrant) (Class AX) visa and who holds a valid
+                                  passport issued by a Pacific-regional country; or
+                              (B) whose application is combined, or sought to be combined,
+                                  with an application made by that person:
+
+First instalment
+Item      Component                                                                                     Amount
+1         Base application charge                                                                         $5 410
+2         Additional applicant charge for an applicant who is at least 18                                 $2 705
+3         Additional applicant charge for an applicant who is less than 18                                $1 355
+
+                      (ii) for any other applicant:
+
+First instalment
+Item      Component                                                                                     Amount
+1         Base application charge                                                                         $6 600
+2         Additional applicant charge for an applicant who is at least 18                                 $3 300
+3         Additional applicant charge for an applicant who is less than 18                                $1 655
+Note:    Regulation 2.12C explains the components of the first instalment of visa application charge and specifies
+         the amounts of subsequent temporary application charge and non-Internet application charge. Not all of
+         the components may apply to a particular application.
+         Additional applicant charge is paid by an applicant who claims to be a member of the family unit of
+         another applicant and seeks to combine the application with that applicant’s application.
+                 (b) the second instalment (payable before grant of visa) is $2 065.
+
+----- Schedule 1, item 1124A -----
+1124A Aged Parent (Residence) (Class BP)
+          (1) Form: The approved form specified by the Minister in a legislative instrument
+              made for this item under subregulation 2.07(5).
+          (2) Visa application charge:
+               (a) first instalment (payable at the time the application is made):
+                     (i) for an applicant:
+                             (A) who is seeking to satisfy the primary criteria for the grant of
+                                  an Aged Parent (Residence) (Class BP) visa and who holds a
+                                  valid passport issued by a Pacific-regional country; or
+                              (B) whose application is combined, or sought to be combined,
+                                  with an application made by that person:
+
+                                              Migration Regulations 1994                                       413
+
+Compilation No. 288                                                                    Compilation date: 01/07/2026
+
+                             Authorised Version F2026C00667 registered 20/07/2026
+Schedule 1 Classes of visa
+Part 1 Permanent visas
+
+First instalment
+Item      Component                                                                                     Amount
+1         Base application charge                                                                         $5 410
+2         Additional applicant charge for an applicant who is at least 18                                 $2 705
+3         Additional applicant charge for an applicant who is less than 18                                $1 355
+
+                      (ii) for any other applicant:
+
+First instalment
+Item      Component                                                                                     Amount
+1         Base application charge                                                                         $6 600
+2         Additional applicant charge for an applicant who is at least 18                                 $3 300
+3         Additional applicant charge for an applicant who is less than 18                                $1 655
+Note:    Regulation 2.12C explains the components of the first instalment of visa application charge and specifies
+         the amounts of subsequent temporary application charge and non-Internet application charge. Not all of
+         the components may apply to a particular application.
+         Additional applicant charge is paid by an applicant who claims to be a member of the family unit of
+         another applicant and seeks to combine the application with that applicant’s application.
+                 (b) the second instalment (payable before grant of visa) is $2 065.
+
+----- Schedule 1, item 1124B -----
+1124B Partner (Residence) (Class BS)
+          (1) Form: The approved form specified by the Minister in a legislative instrument
+              made for this item under subregulation 2.07(5).
+          (2) Visa application charge:
+               (a) first instalment (payable at the time the application is made):
+                     (i) for an applicant:
+                              (A) who is the holder of a Subclass 445 (Dependent Child) visa;
+                                   or
+                              (B) whose application is combined, or sought to be combined,
+                                   with an application made by that person:
+                          the amount is nil; and
+                    (ii) for an applicant who:
+                              (A) is seeking to satisfy the primary criteria for the grant of a
+                                   Partner (Residence) (Class BS) visa; and
+                              (B) is the holder of a transitional (temporary) visa, granted on the
+                                   basis that the holder satisfied the criteria for grant of an
+                                   extended eligibility entry permit under the Migration (1989)
+                                   Regulations; and
+                              (C) holds a valid passport issued by a Pacific-regional country;
+                          or whose application is combined, or sought to be combined, with an
+                          application made by that person:
+
+First instalment
+Item      Component                                                                                     Amount
+1         Base application charge                                                                            $575
+2         Additional applicant charge for an applicant who is at least 18                                    $285
+3         Additional applicant charge for an applicant who is less than 18                                   $145
+
+                      (iii) for an applicant who:
+                                (A) is seeking to satisfy the primary criteria for the grant of a
+                                     Partner (Residence) (Class BS) visa; and
+                                (B) is the holder of a transitional (temporary) visa, granted on the
+                                     basis that the holder satisfied the criteria for grant of an
+                                     extended eligibility entry permit under the Migration (1989)
+                                     Regulations; and
+                                (C) does not hold a valid passport issued by a Pacific-regional
+                                     country;
+                            or whose application is combined, or sought to be combined, with an
+                            application made by that person:
+
+                                              Migration Regulations 1994                                       415
+
+Compilation No. 288                                                                    Compilation date: 01/07/2026
+
+                             Authorised Version F2026C00667 registered 20/07/2026
+Schedule 1 Classes of visa
+Part 1 Permanent visas
+
+First instalment
+Item      Component                                                                                  Amount
+1         Base application charge                                                                         $700
+2         Additional applicant charge for an applicant who is at least 18                                 $350
+3         Additional applicant charge for an applicant who is less than 18                                $180
+
+                      (iv) for an applicant who:
+                               (A) is seeking to satisfy the primary criteria for the grant of a
+                                    Partner (Residence) (Class BS) visa; and
+                               (B) is not the holder of a substantive visa; and
+                               (C) entered Australia before 19 December 1989; and
+                               (D) at the time of entry, was engaged to be married to a person
+                                    who was an Australian citizen or Australian permanent
+                                    resident; and
+                               (E) has subsequently married that person; and
+                               (F) holds a valid passport issued by a Pacific-regional country;
+                           or whose application is combined, or sought to be combined, with an
+                           application made by that person:
+
+First instalment
+Item      Component                                                                                  Amount
+1         Base application charge                                                                      $2 030
+2         Additional applicant charge for an applicant who is at least 18                              $1 015
+3         Additional applicant charge for an applicant who is less than 18                                $510
+
+                      (v) for an applicant who:
+                              (A) is seeking to satisfy the primary criteria for the grant of a
+                                   Partner (Residence) (Class BS) visa; and
+                              (B) is not the holder of a substantive visa; and
+                              (C) entered Australia before 19 December 1989; and
+                              (D) at the time of entry, was engaged to be married to a person
+                                   who was an Australian citizen or Australian permanent
+                                   resident; and
+                              (E) has subsequently married that person; and
+                              (F) does not hold a valid passport issued by a Pacific-regional
+                                   country;
+                          or whose application is combined, or sought to be combined, with an
+                          application made by that person:
+
+First instalment
+Item      Component                                                                                  Amount
+1         Base application charge                                                                      $2 475
+
+416                                           Migration Regulations 1994
+
+Compilation No. 288                                                                 Compilation date: 01/07/2026
+
+                             Authorised Version F2026C00667 registered 20/07/2026
+                                                                                     Classes of visa Schedule 1
+                                                                                        Permanent visas Part 1
+
+First instalment
+Item      Component                                                                                      Amount
+2         Additional applicant charge for an applicant who is at least 18                                  $1 235
+3         Additional applicant charge for an applicant who is less than 18                                    $625
+
+                      (vi) for an applicant who:
+                               (A) is seeking to satisfy the primary criteria for the grant of a
+                                    Partner (Residence) (Class BS) visa; and
+                               (B) is not the holder of a substantive visa; and
+                               (C) entered Australia on or after 19 December 1989 as the holder
+                                    of a prospective marriage (code number 300) entry permit
+                                    granted under the Migration (1989) Regulations, or a Class
+                                    300 (prospective marriage) entry permit granted under the
+                                    Migration (1993) Regulations; and
+                               (D) ceased to hold a substantive visa after marrying the
+                                    Australian citizen or Australian permanent resident whom the
+                                    applicant entered Australia to marry; and
+                               (E) holds a valid passport issued by a Pacific-regional country;
+                           or whose application is combined, or sought to be combined, with an
+                           application made by that person:
+
+First instalment
+Item      Component                                                                                      Amount
+1         Base application charge                                                                          $2 030
+2         Additional applicant charge for an applicant who is at least 18                                  $1 015
+3         Additional applicant charge for an applicant who is less than 18                                    $510
+
+                      (vii) for an applicant who:
+                                (A) is seeking to satisfy the primary criteria for the grant of a
+                                     Partner (Residence) (Class BS) visa; and
+                                (B) is not the holder of a substantive visa; and
+                                (C) entered Australia on or after 19 December 1989 as the holder
+                                     of a prospective marriage (code number 300) entry permit
+                                     granted under the Migration (1989) Regulations, or a Class
+                                     300 (prospective marriage) entry permit granted under the
+                                     Migration (1993) Regulations; and
+                                (D) ceased to hold a substantive visa after marrying the
+                                     Australian citizen or Australian permanent resident whom the
+                                     applicant entered Australia to marry; and
+                                (E) does not hold a valid passport issued by a Pacific-regional
+                                     country;
+                            or whose application is combined, or sought to be combined, with an
+                            application made by that person:
+
+                                               Migration Regulations 1994                                       417
+
+Compilation No. 288                                                                     Compilation date: 01/07/2026
+
+                              Authorised Version F2026C00667 registered 20/07/2026
+Schedule 1 Classes of visa
+Part 1 Permanent visas
+
+First instalment
+Item      Component                                                                                   Amount
+1         Base application charge                                                                       $2 475
+2         Additional applicant charge for an applicant who is at least 18                               $1 235
+3         Additional applicant charge for an applicant who is less than 18                                 $625
+
+                      (viii) for an applicant who:
+                                 (A) is seeking to satisfy the primary criteria for the grant of a
+                                      Partner (Residence) (Class BS) visa; and
+                                 (B) is the holder of a Prospective Marriage (Temporary) (Class
+                                      TO) visa; and
+                                 (C) is married to the person who was specified as the applicant’s
+                                      intended spouse in the application for that visa; and
+                                 (D) seeks to remain in Australia permanently on the basis of that
+                                      marriage; and
+                                 (E) holds a valid passport issued by a Pacific-regional country;
+                             or whose application is combined, or sought to be combined, with an
+                             application made by that person:
+
+First instalment
+Item      Component                                                                                   Amount
+1         Base application charge                                                                       $1 600
+2         Additional applicant charge for an applicant who is at least 18                                  $805
+3         Additional applicant charge for an applicant who is less than 18                                 $400
+
+                       (ix) for an applicant who:
+                                (A) is seeking to satisfy the primary criteria for the grant of a
+                                     Partner (Residence) (Class BS) visa; and
+                                (B) is the holder of a Prospective Marriage (Temporary) (Class
+                                     TO) visa; and
+                                (C) is married to the person who was specified as the applicant’s
+                                     intended spouse in the application for that visa; and
+                                (D) seeks to remain in Australia permanently on the basis of that
+                                     marriage; and
+                                (E) does not hold a valid passport issued by a Pacific-regional
+                                     country;
+                            or whose application is combined, or sought to be combined, with an
+                            application made by that person:
+
+418                                            Migration Regulations 1994
+
+Compilation No. 288                                                                  Compilation date: 01/07/2026
+
+                              Authorised Version F2026C00667 registered 20/07/2026
+                                                                                     Classes of visa Schedule 1
+                                                                                        Permanent visas Part 1
+
+First instalment
+Item      Component                                                                                      Amount
+1         Base application charge                                                                          $1 955
+2         Additional applicant charge for an applicant who is at least 18                                     $980
+3         Additional applicant charge for an applicant who is less than 18                                    $485
+
+                       (x) for an applicant:
+                               (A) who is seeking to satisfy the primary criteria for the grant of a
+                                    Partner (Residence) (Class BS) visa, is covered by
+                                    subitem (2A) and holds a valid passport issued by a
+                                    Pacific-regional country; or
+                               (B) whose application is combined, or sought to be combined,
+                                    with an application made by that person:
+
+First instalment
+Item      Component                                                                                      Amount
+1         Base application charge                                                                          $1 600
+2         Additional applicant charge for an applicant who is at least 18                                     $805
+3         Additional applicant charge for an applicant who is less than 18                                    $400
+
+                      (xi) for an applicant:
+                               (A) who is seeking to satisfy the primary criteria for the grant of a
+                                    Partner (Residence) (Class BS) visa, is covered by
+                                    subitem (2A) and does not hold a valid passport issued by a
+                                    Pacific-regional country; or
+                               (B) whose application is combined, or sought to be combined,
+                                    with an application made by that person:
+
+First instalment
+Item      Component                                                                                      Amount
+1         Base application charge                                                                          $1 955
+2         Additional applicant charge for an applicant who is at least 18                                     $980
+3         Additional applicant charge for an applicant who is less than 18                                    $485
+
+                      (xii) for an applicant who:
+                                (A) is seeking to satisfy the primary criteria for the grant of a
+                                     Partner (Residence) (Class BS) visa; and
+                                (B) is not the holder of a substantive visa; and
+                                (C) entered Australia as the holder of a Prospective Marriage
+                                     (Temporary) (Class TO) visa; and
+
+                                               Migration Regulations 1994                                       419
+
+Compilation No. 288                                                                     Compilation date: 01/07/2026
+
+                              Authorised Version F2026C00667 registered 20/07/2026
+Schedule 1 Classes of visa
+Part 1 Permanent visas
+
+                                (D) ceased to hold that visa after marrying the Australian citizen,
+                                     Australian permanent resident or eligible New Zealand
+                                     citizen whom the applicant entered Australia to marry; and
+                                (E) seeks to remain in Australia permanently on the basis of that
+                                     marriage; and
+                                (F) holds a valid passport issued by a Pacific-regional country;
+                            or whose application is combined, or sought to be combined, with an
+                            application made by that person:
+
+First instalment
+Item      Component                                                                                    Amount
+1         Base application charge                                                                        $2 030
+2         Additional applicant charge for an applicant who is at least 18                                $1 015
+3         Additional applicant charge for an applicant who is less than 18                                  $510
+
+                      (xiii) for an applicant who:
+                                 (A) is seeking to satisfy the primary criteria for the grant of a
+                                      Partner (Residence) (Class BS) visa; and
+                                 (B) is not the holder of a substantive visa; and
+                                 (C) entered Australia as the holder of a Prospective Marriage
+                                      (Temporary) (Class TO) visa; and
+                                 (D) ceased to hold that visa after marrying the Australian citizen,
+                                      Australian permanent resident or eligible New Zealand
+                                      citizen whom the applicant entered Australia to marry; and
+                                 (E) seeks to remain in Australia permanently on the basis of that
+                                      marriage; and
+                                 (F) does not hold a valid passport issued by a Pacific-regional
+                                      country;
+                             or whose application is combined, or sought to be combined, with an
+                             application made by that person:
+
+First instalment
+Item      Component                                                                                    Amount
+1         Base application charge                                                                        $2 475
+2         Additional applicant charge for an applicant who is at least 18                                $1 235
+3         Additional applicant charge for an applicant who is less than 18                                  $625
+
+                      (xiv) for an applicant:
+                                (A) who is seeking to satisfy the primary criteria for the grant of a
+                                     Partner (Residence) (Class BS) visa, is covered by
+                                     subitem (2B) and holds a valid passport issued by a
+                                     Pacific-regional country; or
+
+420                                             Migration Regulations 1994
+
+Compilation No. 288                                                                   Compilation date: 01/07/2026
+
+                               Authorised Version F2026C00667 registered 20/07/2026
+                                                                                      Classes of visa Schedule 1
+                                                                                         Permanent visas Part 1
+
+                                (B) whose application is combined, or sought to be combined,
+                                    with an application made by that person:
+
+First instalment
+Item      Component                                                                                       Amount
+1         Base application charge                                                                           $2 030
+2         Additional applicant charge for an applicant who is at least 18                                   $1 015
+3         Additional applicant charge for an applicant who is less than 18                                     $510
+
+                       (xv) for an applicant:
+                                (A) who is seeking to satisfy the primary criteria for the grant of a
+                                     Partner (Residence) (Class BS) visa, is covered by
+                                     subitem (2B) and does not hold a valid passport issued by a
+                                     Pacific-regional country; or
+                                (B) whose application is combined, or sought to be combined,
+                                     with an application made by that person:
+
+First instalment
+Item      Component                                                                                       Amount
+1         Base application charge                                                                           $2 475
+2         Additional applicant charge for an applicant who is at least 18                                   $1 235
+3         Additional applicant charge for an applicant who is less than 18                                     $625
+
+                      (xvi) for an applicant:
+                                (A) who is seeking to satisfy the primary criteria for the grant of a
+                                     Partner (Residence) (Class BS) visa; and
+                                (B) to whom none of the previous subparagraphs in this
+                                     paragraph apply; and
+                                (C) who holds a valid passport issued by a Pacific-regional
+                                     country;
+                            or whose application is combined, or sought to be combined, with an
+                            application made by that person:
+
+First instalment
+Item       Component                                                                                      Amount
+1          Base application charge                                                                          $9 600
+2          Additional applicant charge for an applicant who is at least 18                                  $4 805
+3          Additional applicant charge for an applicant who is less than 18                                 $2 405
+
+                      (xvii) for any other applicant:
+
+                                                Migration Regulations 1994                                       421
+
+Compilation No. 288                                                                      Compilation date: 01/07/2026
+
+                               Authorised Version F2026C00667 registered 20/07/2026
+Schedule 1 Classes of visa
+Part 1 Permanent visas
+
+First instalment
+Item       Component                                                                                    Amount
+1          Base application charge                                                                       $11 710
+2          Additional applicant charge for an applicant who is at least 18                                $5 860
+3          Additional applicant charge for an applicant who is less than 18                               $2 935
+Note:    Regulation 2.12C explains the components of the first instalment of visa application charge and specifies
+         the amounts of subsequent temporary application charge and non-Internet application charge. Not all of
+         the components may apply to a particular application.
+         Additional applicant charge is paid by an applicant who claims to be a member of the family unit of
+         another applicant and seeks to combine the application with that applicant’s application.
+                 (b) the second instalment (payable before grant of visa) is nil.
+
+----- Schedule 1, item 1129 -----
+1129 Partner (Migrant) (Class BC)
+          (1) Form: The approved form specified by the Minister in a legislative instrument
+              made for this item under subregulation 2.07(5).
+          (2) Visa application charge:
+               (a) first instalment (payable at the time the application is made):
+                     (i) for an applicant:
+                              (A) who is the holder of a Subclass 445 (Dependent Child) visa;
+                                  or
+                              (B) whose application is combined, or sought to be combined,
+                                  with an application made by that person;
+                          the amount is nil; and
+                    (ii) for an applicant:
+                              (A) who is seeking to satisfy the primary criteria for the grant of a
+                                  Partner (Migrant) (Class BC) visa and who holds a valid
+                                  passport issued by a Pacific-regional country; or
+                              (B) whose application is combined, or sought to be combined,
+                                  with an application made by that person:
+
+First instalment
+Item      Component                                                                                     Amount
+1         Base application charge                                                                         $9 600
+
+                                              Migration Regulations 1994                                       427
+
+Compilation No. 288                                                                    Compilation date: 01/07/2026
+
+                             Authorised Version F2026C00667 registered 20/07/2026
+Schedule 1 Classes of visa
+Part 1 Permanent visas
+
+First instalment
+Item      Component                                                                                     Amount
+2         Additional applicant charge for an applicant who is at least 18                                 $4 805
+3         Additional applicant charge for an applicant who is less than 18                                $2 405
+
+                      (iii) for any other applicant:
+
+First instalment
+Item      Component                                                                                     Amount
+1         Base application charge                                                                        $11 710
+2         Additional applicant charge for an applicant who is at least 18                                 $5 860
+3         Additional applicant charge for an applicant who is less than 18                                $2 935
+Note:    Regulation 2.12C explains the components of the first instalment of visa application charge and specifies
+         the amounts of subsequent temporary application charge and non-Internet application charge. Not all of
+         the components may apply to a particular application.
+         Additional applicant charge is paid by an applicant who claims to be a member of the family unit of
+         another applicant and seeks to combine the application with that applicant’s application.
+                 (b) the second instalment (payable before grant of visa) is nil.
+
+----- Schedule 1, item 1130 -----
+1130 Contributory Parent (Migrant) (Class CA)
+          (1) Form: The approved form specified by the Minister in a legislative instrument
+              made for this item under subregulation 2.07(5).
+          (2) Visa application charge:
+               (a) first instalment (payable at the time the application is made):
+                     (i) for an applicant:
+                             (A) who is seeking to satisfy the primary criteria for the grant of a
+                                  Contributory Parent (Migrant) (Class CA) visa, is the holder
+                                  of a Subclass 173 (Contributory Parent (Temporary)) visa at
+                                  the time of application and who holds a valid passport issued
+                                  by a Pacific-regional country; or
+                             (B) whose application is combined, or sought to be combined,
+                                  with an application made by that person:
+
+First instalment
+Item      Component                                                                                      Amount
+1         Base application charge                                                                             $455
+2         Additional applicant charge for an applicant who is at least 18                                     $230
+3         Additional applicant charge for an applicant who is less than 18                                    $110
+
+                      (ii) for an applicant:
+                               (A) who is seeking to satisfy the primary criteria for the grant of a
+                                    Contributory Parent (Migrant) (Class CA) visa, is the holder
+                                    of a Subclass 173 (Contributory Parent (Temporary)) visa at
+                                    the time of application and who does not hold a valid passport
+                                    issued by a Pacific-regional country; or
+                               (B) whose application is combined, or sought to be combined,
+                                    with an application made by that person:
+
+First instalment
+Item      Component                                                                                      Amount
+1         Base application charge                                                                             $555
+2         Additional applicant charge for an applicant who is at least 18                                     $280
+3         Additional applicant charge for an applicant who is less than 18                                    $135
+
+                      (iii) for an applicant who:
+                                (A) is seeking to satisfy the primary criteria for the grant of a
+                                     Contributory Parent (Migrant) (Class CA) visa; and
+                                (B) has been the holder of a Subclass 173 (Contributory Parent
+                                     (Temporary)) visa; and
+                                (C) is the holder of a substituted Subclass 600 visa at the time of
+                                     application; and
+
+                                               Migration Regulations 1994                                       429
+
+Compilation No. 288                                                                     Compilation date: 01/07/2026
+
+                              Authorised Version F2026C00667 registered 20/07/2026
+Schedule 1 Classes of visa
+Part 1 Permanent visas
+
+                               (D) holds a valid passport issued by a Pacific-regional country;
+                           or whose application is combined, or sought to be combined, with an
+                           application made by that person:
+
+First instalment
+Item      Component                                                                                  Amount
+1         Base application charge                                                                         $455
+2         Additional applicant charge for an applicant who is at least 18                                 $230
+3         Additional applicant charge for an applicant who is less than 18                                $110
+
+                      (iv) for an applicant who:
+                               (A) is seeking to satisfy the primary criteria for the grant of a
+                                    Contributory Parent (Migrant) (Class CA) visa; and
+                               (B) has been the holder of a Subclass 173 (Contributory Parent
+                                    (Temporary)) visa; and
+                               (C) is the holder of a substituted Subclass 600 visa at the time of
+                                    application; and
+                               (D) does not hold a valid passport issued by a Pacific-regional
+                                    country;
+                           or whose application is combined, or sought to be combined, with an
+                           application made by that person:
+
+First instalment
+Item      Component                                                                                  Amount
+1         Base application charge                                                                         $555
+2         Additional applicant charge for an applicant who is at least 18                                 $280
+3         Additional applicant charge for an applicant who is less than 18                                $135
+
+                      (v) for an applicant:
+                              (A) who is seeking to satisfy the primary criteria for the grant of a
+                                   Contributory Parent (Migrant) (Class CA) visa, has held a
+                                   Subclass 173 (Contributory Parent (Temporary)) visa at any
+                                   time in the 28 days immediately before making the
+                                   application, and holds a valid passport issued by a
+                                   Pacific-regional country; or
+                              (B) whose application is combined, or sought to be combined,
+                                   with an application made by that person:
+
+First instalment
+Item      Component                                                                                  Amount
+1         Base application charge                                                                         $455
+2         Additional applicant charge for an applicant who is at least 18                                 $230
+
+430                                           Migration Regulations 1994
+
+Compilation No. 288                                                                 Compilation date: 01/07/2026
+
+                             Authorised Version F2026C00667 registered 20/07/2026
+                                                                                      Classes of visa Schedule 1
+                                                                                         Permanent visas Part 1
+
+First instalment
+Item      Component                                                                                       Amount
+3         Additional applicant charge for an applicant who is less than 18                                     $110
+
+                       (vi) for an applicant:
+                                (A) who is seeking to satisfy the primary criteria for the grant of a
+                                     Contributory Parent (Migrant) (Class CA) visa, has held a
+                                     Subclass 173 (Contributory Parent (Temporary)) visa at any
+                                     time in the 28 days immediately before making the
+                                     application, and does not hold a valid passport issued by a
+                                     Pacific-regional country; or
+                                (B) whose application is combined, or sought to be combined,
+                                     with an application made by that person:
+
+First instalment
+Item      Component                                                                                       Amount
+1         Base application charge                                                                              $555
+2         Additional applicant charge for an applicant who is at least 18                                      $280
+3         Additional applicant charge for an applicant who is less than 18                                     $135
+
+                      (vii) for an applicant who:
+                                (A) is seeking to satisfy the primary criteria for the grant of a
+                                     Contributory Parent (Migrant) (Class CA) visa; and
+                                (B) has been the holder of a Subclass 173 (Contributory Parent
+                                     (Temporary)) visa; and
+                                (C) provides the Minister with evidence that compassionate and
+                                     compelling circumstances exist for the person to be
+                                     considered to be the holder of a Subclass 173 (Contributory
+                                     Parent (Temporary)) visa for the purpose of the application;
+                                     and
+                                (D) holds a valid passport issued by a Pacific-regional country;
+                            or whose application is combined, or sought to be combined, with an
+                            application made by that person:
+
+First instalment
+Item      Component                                                                                       Amount
+1         Base application charge                                                                           $3 315
+2         Additional applicant charge for an applicant who is at least 18                                   $1 655
+3         Additional applicant charge for an applicant who is less than 18                                     $830
+
+                      (viii) for an applicant who:
+
+                                                Migration Regulations 1994                                       431
+
+Compilation No. 288                                                                      Compilation date: 01/07/2026
+
+                               Authorised Version F2026C00667 registered 20/07/2026
+Schedule 1 Classes of visa
+Part 1 Permanent visas
+
+                              (A) is seeking to satisfy the primary criteria for the grant of a
+                                   Contributory Parent (Migrant) (Class CA) visa; and
+                              (B) has been the holder of a Subclass 173 (Contributory Parent
+                                   (Temporary)) visa; and
+                              (C) provides the Minister with evidence that compassionate and
+                                   compelling circumstances exist for the person to be
+                                   considered to be the holder of a Subclass 173 (Contributory
+                                   Parent (Temporary)) visa for the purpose of the application;
+                                   and
+                              (D) does not hold a valid passport issued by a Pacific-regional
+                                   country;
+                          or whose application is combined, or sought to be combined, with an
+                          application made by that person:
+
+First instalment
+Item      Component                                                                                  Amount
+1         Base application charge                                                                      $4 040
+2         Additional applicant charge for an applicant who is at least 18                              $2 020
+3         Additional applicant charge for an applicant who is less than 18                             $1 015
+
+                      (ix) for an applicant who:
+                               (A) is seeking to satisfy the primary criteria for the grant of a
+                                    Contributory Parent (Migrant) (Class CA) visa; and
+                               (B) made a valid application for a Parent (Migrant) (Class AX)
+                                    visa before 27 June 2003; and
+                               (C) withdrew that application at the same time as making the
+                                    application for the Contributory Parent (Migrant) (Class CA)
+                                    visa;
+                           or whose application is combined, or sought to be combined, with an
+                           application made by that person, the amount is nil; and
+                       (x) for an applicant who:
+                               (A) is seeking to satisfy the primary criteria for the grant of a
+                                    Contributory Parent (Migrant) (Class CA) visa; and
+                               (B) holds a valid passport issued by a Pacific-regional country;
+                                    and
+                               (C) is not the holder of a Subclass 173 (Contributory Parent
+                                    (Temporary)) visa at the time of application; and
+                               (D) if the applicant has been the holder of such a visa—is not the
+                                    holder of a substituted Subclass 600 visa at the time of the
+                                    application, and has not held a Subclass 173 (Contributory
+                                    Parent (Temporary)) visa at any time in the 28 days
+                                    immediately before making the application, and does not
+                                    provide the Minister with evidence that compassionate and
+                                    compelling circumstances exist for the person to be
+                                    considered to be the holder of a Subclass 173 (Contributory
+
+432                                           Migration Regulations 1994
+
+Compilation No. 288                                                                 Compilation date: 01/07/2026
+
+                             Authorised Version F2026C00667 registered 20/07/2026
+                                                                                      Classes of visa Schedule 1
+                                                                                         Permanent visas Part 1
+
+                                     Parent (Temporary)) visa for the purpose of the application;
+                                     and
+                                (E) has not made a valid application for a Parent (Migrant) (Class
+                                     AX) visa before 27 June 2003, or if the applicant has done so
+                                     did not withdraw that application at the same time as making
+                                     the application for the Contributory Parent (Migrant) (Class
+                                     CA) visa;
+                            or whose application is combined, or sought to be combined, with an
+                            application made by that person:
+
+First instalment
+Item       Component                                                                                      Amount
+1          Base application charge                                                                          $5 170
+2          Additional applicant charge for an applicant who is at least 18                                  $1 740
+3          Additional applicant charge for an applicant who is less than 18                                    $875
+
+                      (xi) for any other applicant:
+
+First instalment
+Item       Component                                                                                      Amount
+1          Base application charge                                                                          $6 300
+2          Additional applicant charge for an applicant who is at least 18                                  $2 125
+3          Additional applicant charge for an applicant who is less than 18                                 $1 065
+Note:    Regulation 2.12C explains the components of the first instalment of visa application charge and specifies
+         the amounts of subsequent temporary application charge and non-Internet application charge. Not all of
+         the components may apply to a particular application.
+         Additional applicant charge is paid by an applicant who claims to be a member of the family unit of
+         another applicant and seeks to combine the application with that applicant’s application.
+                 (b) second instalment (payable before grant of visa):
+
+----- Schedule 1, item 1130A -----
+1130A Contributory Aged Parent (Residence) (Class DG)
+          (1) Form: The approved form specified by the Minister in a legislative instrument
+              made for this item under subregulation 2.07(5).
+          (2) Visa application charge:
+               (a) first instalment (payable at the time the application is made):
+                     (i) for an applicant who:
+                             (A) is seeking to satisfy the primary criteria for the grant of a
+                                  Contributory Aged Parent (Residence) (Class DG) visa; and
+
+                                              Migration Regulations 1994                                       435
+
+Compilation No. 288                                                                    Compilation date: 01/07/2026
+
+                             Authorised Version F2026C00667 registered 20/07/2026
+Schedule 1 Classes of visa
+Part 1 Permanent visas
+
+                               (B) made a valid application for an Aged Parent (Residence)
+                                    (Class BP) visa before 1 July 2003; and
+                               (C) withdrew that application at the same time as making the
+                                    application for the Contributory Aged Parent (Residence)
+                                    (Class DG) visa;
+                           or whose application is combined, or sought to be combined, with an
+                           application made by that person, the amount is nil; and
+                      (ii) for an applicant:
+                               (A) who is seeking to satisfy the primary criteria for the grant of a
+                                    Contributory Aged Parent (Residence) (Class DG) visa, is the
+                                    holder of a Subclass 884 (Contributory Aged Parent
+                                    (Temporary)) visa at the time of application and who holds a
+                                    valid passport issued by a Pacific-regional country; or
+                               (B) whose application is combined, or sought to be combined,
+                                    with an application made by that person:
+
+First instalment
+Item      Component                                                                                   Amount
+1         Base application charge                                                                          $455
+2         Additional applicant charge for an applicant who is at least 18                                  $230
+3         Additional applicant charge for an applicant who is less than 18                                 $110
+
+                      (iii) for an applicant:
+                                (A) who is seeking to satisfy the primary criteria for the grant of a
+                                     Contributory Aged Parent (Residence) (Class DG) visa, is the
+                                     holder of a Subclass 884 (Contributory Aged Parent
+                                     (Temporary)) visa at the time of application and who does not
+                                     hold a valid passport issued by a Pacific-regional country; or
+                                (B) whose application is combined, or sought to be combined,
+                                     with an application made by that person:
+
+First instalment
+Item      Component                                                                                   Amount
+1         Base application charge                                                                          $555
+2         Additional applicant charge for an applicant who is at least 18                                  $280
+3         Additional applicant charge for an applicant who is less than 18                                 $135
+
+                      (iv) for an applicant who:
+                               (A) is seeking to satisfy the primary criteria for the grant of a
+                                    Contributory Aged Parent (Residence) (Class DG) visa; and
+                               (B) has been the holder of a Subclass 884 (Contributory Aged
+                                    Parent (Temporary)) visa; and
+
+436                                            Migration Regulations 1994
+
+Compilation No. 288                                                                  Compilation date: 01/07/2026
+
+                              Authorised Version F2026C00667 registered 20/07/2026
+                                                                                    Classes of visa Schedule 1
+                                                                                       Permanent visas Part 1
+
+                               (C) is the holder of a substituted Subclass 600 visa at the time of
+                                    application; and
+                               (D) holds a valid passport issued by a Pacific-regional country;
+                           or whose application is combined, or sought to be combined, with an
+                           application made by that person:
+
+First instalment
+Item      Component                                                                                     Amount
+1         Base application charge                                                                            $455
+2         Additional applicant charge for an applicant who is at least 18                                    $230
+3         Additional applicant charge for an applicant who is less than 18                                   $110
+
+                      (v) for an applicant who:
+                              (A) is seeking to satisfy the primary criteria for the grant of a
+                                   Contributory Aged Parent (Residence) (Class DG) visa; and
+                              (B) has been the holder of a Subclass 884 (Contributory Aged
+                                   Parent (Temporary)) visa; and
+                              (C) is the holder of a substituted Subclass 600 visa at the time of
+                                   application; and
+                              (D) does not hold a valid passport issued by a Pacific-regional
+                                   country;
+                          or whose application is combined, or sought to be combined, with an
+                          application made by that person:
+
+First instalment
+Item      Component                                                                                     Amount
+1         Base application charge                                                                            $555
+2         Additional applicant charge for an applicant who is at least 18                                    $280
+3         Additional applicant charge for an applicant who is less than 18                                   $135
+
+                      (vi) for an applicant:
+                               (A) who is seeking to satisfy the primary criteria for the grant of a
+                                    Contributory Aged Parent (Residence) (Class DG) visa, has
+                                    held a Subclass 884 (Contributory Aged Parent (Temporary))
+                                    visa at any time in the 28 days immediately before making
+                                    the application and who holds a valid passport issued by a
+                                    Pacific-regional country; or
+                               (B) whose application is combined, or sought to be combined,
+                                    with an application made by that person:
+
+                                              Migration Regulations 1994                                       437
+
+Compilation No. 288                                                                    Compilation date: 01/07/2026
+
+                             Authorised Version F2026C00667 registered 20/07/2026
+Schedule 1 Classes of visa
+Part 1 Permanent visas
+
+First instalment
+Item      Component                                                                                    Amount
+1         Base application charge                                                                           $455
+2         Additional applicant charge for an applicant who is at least 18                                   $230
+3         Additional applicant charge for an applicant who is less than 18                                  $110
+
+                      (vii) for an applicant:
+                                (A) who is seeking to satisfy the primary criteria for the grant of a
+                                     Contributory Aged Parent (Residence) (Class DG) visa, has
+                                     held a Subclass 884 (Contributory Aged Parent (Temporary))
+                                     visa at any time in the 28 days immediately before making
+                                     the application and who does not hold a valid passport issued
+                                     by a Pacific-regional country; or
+                                (B) whose application is combined, or sought to be combined,
+                                     with an application made by that person:
+
+First instalment
+Item      Component                                                                                    Amount
+1         Base application charge                                                                           $555
+2         Additional applicant charge for an applicant who is at least 18                                   $280
+3         Additional applicant charge for an applicant who is less than 18                                  $135
+
+                      (viii) for an applicant who:
+                                 (A) is seeking to satisfy the primary criteria for the grant of a
+                                      Contributory Aged Parent (Residence) (Class DG) visa; and
+                                 (B) has been the holder of a Subclass 884 (Contributory Aged
+                                      Parent (Temporary)) visa; and
+                                 (C) provides the Minister with evidence that compassionate and
+                                      compelling circumstances exist for the person to be
+                                      considered to be the holder of a Subclass 884 (Contributory
+                                      Aged Parent (Temporary)) visa for the purpose of the
+                                      application; and
+                                 (D) holds a valid passport issued by a Pacific-regional country;
+                             or whose application is combined, or sought to be combined, with an
+                             application made by that person:
+
+First instalment
+Item      Component                                                                                    Amount
+1         Base application charge                                                                        $5 170
+2         Additional applicant charge for an applicant who is at least 18                                $2 580
+3         Additional applicant charge for an applicant who is less than 18                               $1 295
+
+438                                             Migration Regulations 1994
+
+Compilation No. 288                                                                   Compilation date: 01/07/2026
+
+                               Authorised Version F2026C00667 registered 20/07/2026
+                                                                                    Classes of visa Schedule 1
+                                                                                       Permanent visas Part 1
+
+                      (ix) for an applicant who:
+                               (A) is seeking to satisfy the primary criteria for the grant of a
+                                    Contributory Aged Parent (Residence) (Class DG) visa; and
+                               (B) has been the holder of a Subclass 884 (Contributory Aged
+                                    Parent (Temporary)) visa; and
+                               (C) provides the Minister with evidence that compassionate and
+                                    compelling circumstances exist for the person to be
+                                    considered to be the holder of a Subclass 884 (Contributory
+                                    Aged Parent (Temporary)) visa for the purpose of the
+                                    application; and
+                               (D) does not hold a valid passport issued by a Pacific-regional
+                                    country;
+                           or whose application is combined, or sought to be combined, with an
+                           application made by that person:
+
+First instalment
+Item      Component                                                                                     Amount
+1         Base application charge                                                                         $6 300
+2         Additional applicant charge for an applicant who is at least 18                                 $3 145
+3         Additional applicant charge for an applicant who is less than 18                                $1 580
+
+                      (x) for an applicant who:
+                              (A) is seeking to satisfy the primary criteria for the grant of a
+                                   Contributory Aged Parent (Residence) (Class DG) visa; and
+                              (B) holds a valid passport issued by a Pacific-regional country;
+                                   and
+                              (C) is not the holder of a Subclass 884 (Contributory Aged Parent
+                                   (Temporary)) visa at the time of application; and
+                              (D) if the applicant has been the holder of such a visa—is not the
+                                   holder of a substituted Subclass 600 visa at the time of the
+                                   application, and has not held a Subclass 884 (Contributory
+                                   Aged Parent (Temporary)) visa at any time in the 28 days
+                                   immediately before making the application, and does not
+                                   provide the Minister with evidence that compassionate and
+                                   compelling circumstances exist for the person to be
+                                   considered to be the holder of a Subclass 884 (Contributory
+                                   Aged Parent (Temporary)) visa for the purpose of the
+                                   application; and
+                              (E) has not made a valid application for an Aged Parent
+                                   (Residence) (Class BP) visa before 1 July 2003, or if the
+                                   applicant has done so did not withdraw that application at the
+                                   same time as making the application for the Contributory
+                                   Aged Parent (Residence) (Class DG) visa;
+                          or whose application is combined, or sought to be combined, with an
+                          application made by that person:
+
+                                              Migration Regulations 1994                                       439
+
+Compilation No. 288                                                                    Compilation date: 01/07/2026
+
+                             Authorised Version F2026C00667 registered 20/07/2026
+Schedule 1 Classes of visa
+Part 1 Permanent visas
+
+First instalment
+Item       Component                                                                                    Amount
+1          Base application charge                                                                        $5 170
+2          Additional applicant charge for an applicant who is at least 18                                $2 580
+3          Additional applicant charge for an applicant who is less than 18                               $1 295
+
+                       (xi) for any other applicant:
+
+First instalment
+Item       Component                                                                                    Amount
+1          Base application charge                                                                        $6 300
+2          Additional applicant charge for an applicant who is at least 18                                $3 145
+3          Additional applicant charge for an applicant who is less than 18                               $1 580
+Note:    Regulation 2.12C explains the components of the first instalment of visa application charge and specifies
+         the amounts of subsequent temporary application charge and non-Internet application charge. Not all of
+         the components may apply to a particular application.
+         Additional applicant charge is paid by an applicant who claims to be a member of the family unit of
+         another applicant and seeks to combine the application with that applicant’s application.
+                 (b) second instalment (payable before grant of visa):
+
+----- Schedule 1, item 1137 -----
+1137 Skilled—Independent (Permanent) (Class SI)
+          (1) Form: The approved form specified by the Minister in a legislative instrument
+              made for this item under subregulation 2.07(5).
+
+               Points-tested stream
+          (2) Subitems (3) to (4C) set out the requirements for:
+               (a) an applicant (a primary Points-tested applicant) seeking to satisfy the
+                   primary criteria for the grant of a Subclass 189 (Skilled—Independent) visa
+                   in the Points-tested stream; or
+               (b) an applicant (a secondary applicant) seeking to satisfy the secondary
+                   criteria for the grant of a Subclass 189 (Skilled—Independent) visa, whose
+                   application is:
+                     (i) combined with the application of a primary Points-tested applicant; or
+                    (ii) sought to be combined with such an application before a decision is
+                         made in relation to that application.
+                      Note:   A member of the family unit of a primary Points-tested applicant may apply for
+                              the grant of a Subclass 189 (Skilled—Independent) visa, seeking to satisfy the
+                              secondary criteria. However, the application by the member of the family unit
+                              must be made before a decision is made in relation to the application by the
+                              primary Points-tested applicant.
+
+          (3) Visa application charge—first instalment (payable at the time the application is
+              made):
+
+                                               Migration Regulations 1994                                       447
+
+Compilation No. 288                                                                     Compilation date: 01/07/2026
+
+                              Authorised Version F2026C00667 registered 20/07/2026
+Schedule 1 Classes of visa
+Part 1 Permanent visas
+
+                  (a) for an applicant:
+                        (i) who is seeking to satisfy the primary criteria for the grant of a
+                            Subclass 189 (Skilled—Independent) visa and who holds a valid
+                            passport issued by a Pacific-regional country; or
+                       (ii) whose application is combined, or sought to be combined, with an
+                            application made by that person:
+
+First instalment—Visas in the Points-tested stream etc.
+Item      Component                                                                                     Amount
+1         Base application charge                                                                         $5 030
+2         Additional applicant charge for an applicant who is at least 18                                 $2 515
+3         Additional applicant charge for an applicant who is less than 18                                $1 260
+
+                 (b) for any other applicant:
+
+First instalment—Visas in the Points-tested stream etc.
+Item      Component                                                                                     Amount
+1         Base application charge                                                                         $6 135
+2         Additional applicant charge for an applicant who is at least 18                                 $3 070
+3         Additional applicant charge for an applicant who is less than 18                                $1 540
+Note:    Regulation 2.12C explains the components of the first instalment of visa application charge and specifies
+         the amounts of subsequent temporary application charge and non-Internet application charge. Not all of
+         the components may apply to a particular application.
+         Additional applicant charge is paid by an applicant who claims to be a member of the family unit of
+         another applicant and seeks to combine the application with that applicant’s application.
+
+          (4) Visa application charge—second instalment (payable before grant of visa):
+
+----- Schedule 1, item 1138 -----
+1138 Skilled—Nominated (Permanent) (Class SN)
+          (1) Form: The approved form specified by the Minister in a legislative instrument
+              made for this item under subregulation 2.07(5).
+          (2) Visa application charge:
+               (a) first instalment (payable at the time the application is made):
+                     (i) for an applicant:
+                             (A) who is seeking to satisfy the primary criteria for the grant of a
+                                  Nominated (Permanent) (Class SN) visa and who holds a
+                                  valid passport issued by a Pacific-regional country; or
+                              (B) whose application is combined, or sought to be combined,
+                                  with an application made by that person:
+
+First instalment
+Item      Component                                                                                       Amount
+1         Base application charge                                                                           $5 035
+2         Additional applicant charge for an applicant who is at least 18                                   $2 515
+3         Additional applicant charge for an applicant who is less than 18                                  $1 260
+
+                      (ii) for any other applicant:
+
+First instalment
+Item      Component                                                                                       Amount
+1         Base application charge                                                                           $6 140
+2         Additional applicant charge for an applicant who is at least 18                                   $3 070
+3         Additional applicant charge for an applicant who is less than 18                                  $1 535
+Note:    Regulation 2.12C explains the components of the first instalment of visa application charge and specifies
+         the amounts of subsequent temporary application charge and non-Internet application charge. Not all of
+         the components may apply to a particular application.
+         Additional applicant charge is paid by an applicant who claims to be a member of the family unit of
+         another applicant and seeks to combine the application with that applicant’s application.
+                 (b) second instalment (payable before grant of visa):
+
+----- Schedule 1, item 1139 -----
+1139 Permanent Residence (Skilled Regional) (Class PR)
+          (1) Form: The approved form specified by the Minister in a legislative instrument
+              made for the purposes of this item under subregulation 2.07(5).
+          (2) Visa application charge:
+               (a) first instalment (payable at the time the application is made):
+                     (i) for:
+                              (A) an applicant (a primary Regional Provisional applicant)
+                                  seeking to satisfy the primary criteria for the grant of a
+                                  Subclass 191 (Permanent Residence (Skilled Regional)) visa
+                                  in the Regional Provisional Visas stream who holds a valid
+                                  passport issued by a Pacific-regional country; or
+                              (B) an applicant (a secondary Regional Provisional applicant)
+                                  seeking to satisfy the secondary criteria for the grant of a
+                                  Subclass 191 (Permanent Residence (Skilled Regional)) visa
+                                  whose application is combined, or sought to be combined,
+                                  with an application of a primary Regional Provisional
+                                  applicant:
+
+First instalment—visas in the Regional Provisional Visas stream etc.
+Item      Component                                                                                     Amount
+1         Base application charge                                                                            $515
+2         Additional applicant charge for an applicant who is at least 18                                    $260
+3         Additional applicant charge for an applicant who is less than 18                                   $135
+
+                      (ii) for:
+                                  (A) an applicant (a primary Regional Provisional applicant)
+                                      seeking to satisfy the primary criteria for the grant of a
+                                      Subclass 191 (Permanent Residence (Skilled Regional)) visa
+                                      in the Regional Provisional Visas stream who does not hold a
+                                      valid passport issued by a Pacific-regional country; or
+                                  (B) an applicant (a secondary Regional Provisional applicant)
+                                      seeking to satisfy the secondary criteria for the grant of a
+                                      Subclass 191 (Permanent Residence (Skilled Regional)) visa
+                                      whose application is combined, or sought to be combined,
+                                      with an application of a primary Regional Provisional
+                                      applicant:
+
+First instalment—visas in the Regional Provisional Visas stream etc.
+Item      Component                                                                                     Amount
+1         Base application charge                                                                            $630
+2         Additional applicant charge for an applicant who is at least 18                                    $315
+
+                                              Migration Regulations 1994                                       455
+
+Compilation No. 288                                                                    Compilation date: 01/07/2026
+
+                             Authorised Version F2026C00667 registered 20/07/2026
+Schedule 1 Classes of visa
+Part 1 Permanent visas
+
+First instalment—visas in the Regional Provisional Visas stream etc.
+Item      Component                                                                                     Amount
+3         Additional applicant charge for an applicant who is less than 18                                     $160
+
+                      (iii) for:
+                                   (A) an applicant (a primary HK applicant) seeking to satisfy the
+                                       primary criteria for the grant of a Subclass 191 (Permanent
+                                       Residence (Skilled Regional)) visa in the Hong Kong
+                                       (Regional) stream who holds a valid passport issued by a
+                                       Pacific-regional country; or
+                                   (B) an applicant (a secondary HK applicant) seeking to satisfy
+                                       the secondary criteria for the grant of a Subclass 191
+                                       (Permanent Residence (Skilled Regional)) visa whose
+                                       application is combined, or sought to be combined, with an
+                                       application of a primary HK applicant:
+
+First instalment—visas in the Hong Kong (Regional) stream etc.
+Item      Component                                                                                     Amount
+1         Base application charge                                                                         $5 030
+2         Additional applicant charge for an applicant who is at least 18                                 $2 515
+3         Additional applicant charge for an applicant who is less than 18                                $1 260
+
+                      (iv) for:
+                                   (A) an applicant (a primary HK applicant) seeking to satisfy the
+                                       primary criteria for the grant of a Subclass 191 (Permanent
+                                       Residence (Skilled Regional)) visa in the Hong Kong
+                                       (Regional) stream who does not hold a valid passport issued
+                                       by a Pacific-regional country; or
+                                   (B) an applicant (a secondary HK applicant) seeking to satisfy
+                                       the secondary criteria for the grant of a Subclass 191
+                                       (Permanent Residence (Skilled Regional)) visa whose
+                                       application is combined, or sought to be combined, with an
+                                       application of a primary HK applicant:
+
+First instalment—visas in the Hong Kong (Regional) stream etc.
+Item      Component                                                                                     Amount
+1         Base application charge                                                                         $6 135
+2         Additional applicant charge for an applicant who is at least 18                                 $3 065
+3         Additional applicant charge for an applicant who is less than 18                                $1 535
+Note:    Regulation 2.12C explains the components of the first instalment of visa application charge and specifies
+         the amounts of subsequent temporary application charge and non-Internet application charge. Not all of
+         the components may apply to a particular application.
+         Additional applicant charge is paid by an applicant who claims to be a member of the family unit of
+         another applicant and seeks to combine the application with that applicant’s application.
+
+456                                             Migration Regulations 1994
+
+Compilation No. 288                                                                    Compilation date: 01/07/2026
+
+                               Authorised Version F2026C00667 registered 20/07/2026
+                                                                                    Classes of visa Schedule 1
+                                                                                       Permanent visas Part 1
+
+                 (b) second instalment (payable before grant of visa):
+
+----- Schedule 1, item 1229 -----
+1229 Skilled (Provisional) (Class VC)
+          (1) Form: The approved form specified by the Minister in a legislative instrument
+              made for this item under subregulation 2.07(5).
+          (2) Visa application charge:
+               (a) first instalment (payable at the time the application is made):
+                     (i) for:
+                              (A) an applicant who is seeking to satisfy the primary criteria for
+                                  the grant of a Subclass 485 (Temporary Graduate) visa in the
+                                  Post-Higher Education Work stream, holds a PHE visa and
+                                  holds a valid passport issued by a Pacific-regional country; or
+                              (B) an applicant whose application is combined, or sought to be
+                                  combined, with an application made by that person; or
+                              (C) an applicant who claims to be a member of the family unit of
+                                  a person who holds a PHE visa, if that person held a PHE visa
+                                  immediately before the most recent grant of a Subclass 485
+                                  (Temporary Graduate) visa to that person and that person
+                                  holds a valid passport issued by a Pacific-regional country:
+
+ First instalment
+ Item      Component                                                                                 Amount
+ 1         Base application charge                                                                        $930
+ 2         Additional applicant charge for an applicant who is at least 18                                $465
+ 3         Additional applicant charge for an applicant who is less than 18                               $235
+
+                      (ii) for:
+                                  (A) an applicant who is seeking to satisfy the primary criteria for
+                                      the grant of a Subclass 485 (Temporary Graduate) visa in the
+                                      Post-Higher Education Work stream, holds a PHE visa and
+                                      does not hold a valid passport issued by a Pacific-regional
+                                      country; or
+                                  (B) an applicant whose application is combined, or sought to be
+                                      combined, with an application made by that person; or
+
+                                               Migration Regulations 1994                                    495
+
+Compilation No. 288                                                                  Compilation date: 01/07/2026
+
+                              Authorised Version F2026C00667 registered 20/07/2026
+Schedule 1 Classes of visa
+Part 2 Temporary visas (other than bridging visas)
+
+                                     (C) an applicant who claims to be a member of the family unit of
+                                         a person who holds a PHE visa, if that person held a PHE visa
+                                         immediately before the most recent grant of a Subclass 485
+                                         (Temporary Graduate) visa to that person and that person
+                                         does not hold a valid passport issued by a Pacific-regional
+                                         country:
+
+    First instalment
+    Item    Component                                                                                    Amount
+    1       Base application charge                                                                         $2 265
+    2       Additional applicant charge for an applicant who is at least 18                                 $1 140
+    3       Additional applicant charge for an applicant who is less than 18                                  $575
+
+                        (iii) for:
+                                     (A) an applicant who is seeking to satisfy the primary criteria for
+                                         the grant of a Skilled (Provisional) (Class VC) visa, holds a
+                                         valid passport issued by a Pacific-regional country and does
+                                         not hold a PHE visa; or
+                                     (B) an applicant whose application is combined, or sought to be
+                                         combined, with an application made by that person; or
+                                     (C) an applicant who claims to be a member of the family unit of
+                                         a person who holds a Skilled (Provisional) (Class VC) visa
+                                         and who did not, at the time of application, hold a PHE visa,
+                                         and that person holds a valid passport issued by a
+                                         Pacific-regional country:
+
+    First instalment
+    Item    Component                                                                                    Amount
+    1       Base application charge                                                                         $2 360
+    2       Additional applicant charge for an applicant who is at least 18                                 $1 180
+    3       Additional applicant charge for an applicant who is less than 18                                  $595
+
+                        (iv) for any other applicant:
+
+First instalment
+Item       Component                                                                                      Amount
+1          Base application charge                                                                          $5 750
+2          Additional applicant charge for an applicant who is at least 18                                  $2 875
+3          Additional applicant charge for an applicant who is less than 18                                 $1 450
+                Note:       Regulation 2.12C explains the components of the first instalment of visa application
+                            charge and specifies the amounts of subsequent temporary application charge and
+                            non-Internet application charge. Not all of the components may apply to a particular
+                            application.
+
+496                                               Migration Regulations 1994
+
+Compilation No. 288                                                                      Compilation date: 01/07/2026
+
+                                Authorised Version F2026C00667 registered 20/07/2026
+                                                                              Classes of visa Schedule 1
+                                                       Temporary visas (other than bridging visas) Part 2
+
+                         Additional applicant charge is paid by an applicant who claims to be a member of the
+                         family unit of another applicant and seeks to combine the application with that
+                         applicant’s application.
+                 (b) the second instalment (payable before grant of visa) is nil.
+
+----- Schedule 1, item 1241 -----
+1241 Skilled Work Regional (Provisional) (Class PS)
+          (1) Form: The approved form specified by the Minister in a legislative instrument
+              made for the purposes of this item under subregulation 2.07(5).
+          (2) Visa application charge:
+               (a) first instalment (payable at the time the application is made):
+                     (i) for an applicant:
+                             (A) who is seeking to satisfy the primary criteria for the grant of a
+                                  Skilled Work Regional (Provisional) (Class PS) visa and who
+                                  holds a valid passport issued by a Pacific-regional country; or
+                              (B) whose application is combined, or sought to be combined,
+                                  with an application made by that person; or
+                              (C) who claims to be a member of the family unit of a person
+                                  who both holds a Skilled Work Regional (Provisional) (Class
+                                  PS) visa and holds a valid passport issued by a
+                                  Pacific-regional country:
+
+First instalment
+Item      Component                                                                                   Amount
+1         Base application charge                                                                       $5 035
+2         Additional applicant charge for an applicant who is at least 18                               $2 515
+3         Additional applicant charge for an applicant who is less than 18                              $1 260
+
+                      (ii) for any other applicant:
+
+First instalment
+Item      Component                                                                                   Amount
+1         Base application charge                                                                       $6 140
+2         Additional applicant charge for an applicant who is at least 18                               $3 070
+3         Additional applicant charge for an applicant who is less than 18                              $1 535
+
+522                                            Migration Regulations 1994
+
+Compilation No. 288                                                                  Compilation date: 01/07/2026
+
+                              Authorised Version F2026C00667 registered 20/07/2026
+                                                                                  Classes of visa Schedule 1
+                                                           Temporary visas (other than bridging visas) Part 2
+
+Note:      Regulation 2.12C explains the components of the first instalment of visa application charge and specifies
+           the amounts of subsequent temporary application charge and non-Internet application charge. Not all of
+           the components may apply to a particular application.
+           Additional applicant charge is paid by an applicant who claims to be a member of the family unit of
+           another applicant and seeks to combine the application with that applicant’s application.
+                  (b) second instalment (payable before grant of visa):
+
+----- Schedule 1, item 1242 -----
+1242 Skilled Employer Sponsored Regional (Provisional) (Class PE)
+          (1) Form: The approved form specified by the Minister in a legislative instrument
+              made for the purposes of this item under subregulation 2.07(5).
+          (2) Visa application charge:
+               (a) first instalment (payable at the time the application is made):
+                     (i) for an applicant:
+                             (A) who is seeking to satisfy the primary criteria for the grant of a
+                                  Skilled Employer Sponsored Regional (Provisional) (Class
+                                  PE) visa and who holds a valid passport issued by a
+                                  Pacific-regional country; or
+                              (B) whose application is combined, or sought to be combined,
+                                  with an application made by that person; or
+                              (C) who claims to be a member of the family unit of a person
+                                  who both holds a Skilled Employer Sponsored Regional
+                                  (Provisional) (Class PE) visa and holds a valid passport
+                                  issued by a Pacific-regional country:
+
+First instalment
+Item      Component                                                                                     Amount
+1         Base application charge                                                                         $5 035
+2         Additional applicant charge for an applicant who is at least 18                                 $2 515
+3         Additional applicant charge for an applicant who is less than 18                                $1 260
+
+                      (ii) for any other applicant:
+
+First instalment
+Item      Component                                                                                     Amount
+1         Base application charge                                                                         $6 140
+2         Additional applicant charge for an applicant who is at least 18                                 $3 070
+3         Additional applicant charge for an applicant who is less than 18                                $1 535
+
+Note:    Regulation 2.12C explains the components of the first instalment of visa application charge and specifies
+         the amounts of subsequent temporary application charge and non-Internet application charge. Not all of
+         the components may apply to a particular application.
+         Additional applicant charge is paid by an applicant who claims to be a member of the family unit of
+         another applicant and seeks to combine the application with that applicant’s application.
+                 (b) the second instalment (payable before grant of visa):

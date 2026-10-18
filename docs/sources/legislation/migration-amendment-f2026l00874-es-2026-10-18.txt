@@ -1,0 +1,1818 @@
+Source: https://www.legislation.gov.au/F2026L00874/asmade/2026-06-30/es/original/pdf
+Retrieved: 2026-10-18
+Extracted: pdftotext -layout of the fetched PDF (Explanatory Statement registered 30/06/2026 to F2026L00874); sha256 of the fetched PDF 969da3d7753505fc1d5a1a690f6ae2309344b1a6e3d1ba68e066bf5fd6319d66
+
+                                     EXPLANATORY STATEMENT
+
+                       Issued by the Minister for Immigration and Citizenship
+
+           Home Affairs Legislation Amendment (2026 Measures No. 1) Regulations 2026
+
+                                       Australian Citizenship Act 2007
+
+                                               Migration Act 1958
+
+The Australian Citizenship Act 2007 (the Citizenship Act) provides for the process of becoming an
+Australian citizen, the circumstances in which citizenship may cease, and other related matters.
+
+Section 54 of the Citizenship Act provides that the Governor-General may make regulations
+prescribing matters required or permitted by the Citizenship Act to be prescribed, or necessary or
+convenient to be prescribed, for carrying out or giving effect to the Citizenship Act. Paragraph
+46(1)(d) of the Citizenship Act provides that an application made under that Act must be
+accompanied by the fee (if any) prescribed by the regulations.
+
+The Migration Act 1958 (the Migration Act) is an Act relating to the entry into, and presence in,
+Australia of aliens, and the departure or deportation from Australia of aliens and certain other
+persons.
+
+Subsection 504(1) of the Migration Act provides that the Governor-General may make regulations,
+not inconsistent with the Migration Act, prescribing matters required or permitted to be prescribed,
+or necessary or convenient to be prescribed, for carrying out or giving effect to the Migration Act.
+
+Further details of authorising provisions are outlined in Attachment A.
+
+Overview
+
+The Home Affairs Legislation Amendment (2026 Measures No. 1) Regulations 2026 (the
+Amendment Regulations) amend the Australian Citizenship Regulation 2016 (the Citizenship
+Regulation) and the Migration Regulations 1994 (the Migration Regulations) (respectively) to:
+
+Citizenship Regulations
+Parts 1 and 2 of Schedule 1 to the Amendment Regulations operate to apply the Consumer Price
+Index (CPI) to current citizenship application fees, with prescribed increases to come into effect on
+1 July 2026. Fees for Australian citizenship applications are increased to keep pace with the cost of
+processing applications for Australian citizenship and delivering the Australian citizenship program.
+Citizenship application fees were last updated on 1 July 2025. There is no change to items in
+Schedule 3 to the Citizenship Regulation that provide for a nil fee. There is no change to some
+smaller fees due to rounding.
+
+
+
+
+                                                            1
+
+
+                       Authorised Version Explanatory Statement registered 30/06/2026 to F2026L00874
+Migration Regulations
+Schedule 2 to the Amendment Regulations amends the Migration Regulations to provide for the
+annual indexation of the temporary skilled migration income threshold (TSMIT) to occur under
+regulation 5.42A of the Migration Regulations, consistent with existing arrangements for the core
+skills income threshold (CSIT). The TSMIT applies to nominations made in relation to a Subclass
+494 (Skilled Employer Sponsored Regional (Provisional)) visa or Subclass 187 (Regional
+Sponsored Migration Scheme) visa.
+Previously, the TSMIT was specified in a legislative instrument made annually for 1 July
+commencement, to increase in line with the CSIT. In contrast, the CSIT increases annually on 1
+July each year under regulation 5.42A of the Migration Regulations, in accordance with the
+indexation formula in that regulation and with reference to annual Average Weekly Ordinary Times
+Earnings (AWOTE) figures. The effect of these amendments is that, from 1 July 2026, a revised
+TSMIT of $79,423 comes into effect. This is aligned with the indexed CSIT figure of $79,423 that
+comes into force on 1 July 2026 under regulation 5.42A of the Migration Regulations. The
+amendments will operate in future years to ensure that the TSMIT maintains alignment with the
+CSIT each 1 July, with the amount indexed in accordance with the Migration Regulations from 1
+July 2027.
+
+Schedule 3 to the Amendment Regulations amends Schedule 1 to the Migration Regulations to
+implement 2026–27 Budget measures relating to the first instalment for visa application charges
+(VACs) for certain visas. These amendments provide for:
+•   a system-wide increase to the first instalment of the VAC by 25 per cent from 1 July 2026 for
+    most visas specified in Schedule 1 to the Migration Regulations. This measure provides a broad-
+    based and efficient mechanism to raise revenue across the migration program while maintaining
+    the existing charge structure. A uniform increase supports administrative simplicity and ensures
+    consistency across visa categories;
+•   specific increases for certain visas—this measure implements a higher increase to the VAC for
+    Subclass 500 (Student) and Subclass 590 (Student Guardian) visas (Subclass 500 and 590 visas,
+    respectively). The base application charge component of the first instalment for primary
+    applicants increases from $2,000 to $2,500. This measure supports managed and sustainable
+    growth and the restoration of integrity in the international education sector. CPI indexation will
+    continue to apply in subsequent years;
+•   limited exemptions and differential settings for visa applicant for certain visas who hold a valid
+    passport issued by a specified country from the Pacific Island countries and Timor-Leste
+    (collectively referred to as Pacific-regional countries). These applicants will continue to benefit
+    from concessional VAC arrangements and are not subject to the additional increase for Subclass
+    500 and 590 visas. These concessional settings, initially introduced by the Migration
+    Amendment (Differential Student Visa Application Charge) Regulations 2025, will remain
+    subject to CPI indexation (forecast CPI of 2.6% (below)). This lower VAC applies to primary
+    applicants from these cohorts, as well as their family members and dependants. The existing
+    concessional VAC arrangements as applied to the increase to the VAC for Subclass 500 and 590
+    visas implemented by these amendments to the relevant provisions of Schedule 1 to the
+    Migration Regulations to mitigate the impact of increased VAC charges on applicants from the
+    above cohort for the specified visas. This promotes the right to education by removing a
+    potential barrier for applicants from the specified Pacific countries and Timor-Leste; and
+
+                                                             2
+
+
+                        Authorised Version Explanatory Statement registered 30/06/2026 to F2026L00874
+•   the ongoing annual indexation of VACs for all other visas in line with forecast CPI of 2.6%.
+    These amendments are intended to raise revenue in a consistent and administratively efficient
+    manner to support Government priorities, while also supporting policy objectives including
+    humanitarian access, labour mobility initiatives, and the stability and diversification of the
+    international education sector.
+
+Further details of the amendments provided for in Schedules 1, 2 and 3 to the Amendment
+Regulations are set out in Attachment D.
+
+The Amendment Regulations commence on 1 July 2026.
+
+Consultation
+
+Details of consultation undertaken by the Department of Home Affairs in relation to measures in
+each Schedule to the Amendment Regulations are set out in Attachment B. To the extent that
+consultation was considered necessary and appropriate in relation to each measure, this accords with
+consultation requirements under subsection 17(1) of the Legislation Act 2003.
+
+Parliamentary scrutiny etc
+
+Schedule 1 to the Amendment Regulations
+The Citizenship Act specifies no conditions that need to be satisfied before the power to make the
+Amendment Regulations may be exercised.
+
+Schedules 2 and 3 to the Amendment Regulations
+The Migration Act also does not specify any conditions that need to be satisfied before the power to
+make these Schedules to the Amendment Regulations may be exercised.
+
+Schedules 2 and 3 to the Amendment Regulations amend the Migration Regulations, which are
+exempt from sunsetting under table item 38A of section 12 of the Legislation (Exemptions and
+Other Matters) Regulation 2015. The Migration Regulations are exempt from sunsetting on the
+basis that the repeal and remaking of the Migration Regulations:
+•   is unnecessary as the Migration Regulations are regularly amended numerous times each year to
+    update policy settings for immigration programs;
+•   would require complex and difficult to administer transitional provisions to ensure, amongst
+    other things, the position of the many people who hold Australian visas, and similarly, there
+    would likely be a significant impact on undecided visa and sponsorship applications; and
+•   would demand complicated and costly systems, training and operational changes that would
+    impose significant strain on Government resources and the Australian public for insignificant
+    gain, while not advancing the aims of the Legislation Act.
+
+The Amendment Regulations will be repealed by operation of Division 1 of Part 3 of Chapter 3 of
+the Legislation Act. Specifically, that Division (under section 48A) operates to automatically repeal
+a legislative instrument or relevant provisions of a legislative instrument that has the sole purpose of
+amending or repealing another instrument. As the above provisions of Schedule 1 to the
+Amendment Regulations will automatically repeal, they do not engage the sunsetting framework
+under Part 4 of the Legislation Act.
+
+                                                            3
+
+
+                       Authorised Version Explanatory Statement registered 30/06/2026 to F2026L00874
+Statement of Compatibility with Human Rights
+A Statement of Compatibility with Human Rights (the Statement) has been completed in
+accordance with the Human Rights (Parliamentary Scrutiny) Act 2011. The overall assessment is
+that the Amendment Regulations are compatible with human rights. A copy of the Statement is at
+Attachment C.
+
+The Amendment Regulations are a disallowable legislative instrument for the purposes of the
+Legislation Act.
+
+
+
+
+                                                           4
+
+
+                      Authorised Version Explanatory Statement registered 30/06/2026 to F2026L00874
+                                                                                                       ATTACHMENT A
+
+Details of the authorising provisions for the Home Affairs Legislation Amendment (2026
+Measures No. 1) Regulations 2026
+
+Schedule 1 to the Amendment Regulations - Fees for citizenship applications
+Section 54 of the Australian Citizenship Act 2007 provides that the Governor-General may make
+regulations prescribing matters required or permitted by the Act to be prescribed, or necessary or
+convenient to be prescribed for carrying out or giving effect to the Act.
+
+In addition, the following provisions of that may also be relevant:
+•   Subsection 46(1) of the Act provides that an application for Australian citizenship under a
+    provision of the Act must: be on the relevant form approved by the Minister; contain the
+    information required by the form; be accompanied by any other information or documents
+    prescribed by the regulations; and be accompanied by the fee (if any) prescribed by the
+    regulations.
+•   Section 16 of the Australian Citizenship Regulation 2016 (the Citizenship Regulation) provides
+    that the fee to accompany an application is the amount set out in Schedule 3 to those Regulation,
+    in addition to any surcharge if the payment is made by credit card or PayPal.
+
+Schedules 2 and 3 to the Amendment Regulations - Temporary skilled migration income
+threshold (TSMIT) and Fees for visa applications (respectively)
+Subsection 504(1) of the Migration Act provides that the Governor-General may make regulations,
+not inconsistent with the Migration Act, prescribing matters required or permitted to be prescribed,
+or necessary or convenient to be prescribed, for carrying out or giving effect to the Migration Act.
+
+In addition, the following provisions of that Act may also be relevant to Schedule 3 to the
+Amendment Regulations:
+•   Section 45A of the Migration Act provides that a non-citizen who makes a visa application is
+    liable to pay a visa application charge (the VAC) if, assuming the charge were paid, the
+    application would be a valid visa application. The VAC is a tax imposed under section 4 of the
+    Migration (Visa Application) Charge Act 1997 (the VAC Act) and is made payable under
+    section 45A of the Migration Act.
+•   Subsection 45B(1) of the Migration Act provides that the amount of the visa application charge
+    (VAC) is the amount, not exceeding the VAC limit, prescribed by the Migration Regulations
+    1994 (the Migration Regulations) in relation to the visa application. The VAC limit is calculated
+    with reference to sections 5 and 6 of the VAC Act.
+•   Section 45C of the Migration Act provides for matters for which the regulations may provide in
+    relation to the VAC. Paragraph 45C(2)(b) of the Migration Act provides that the regulations
+    may provide for the remission, refund or waiver of the VAC or an amount of the VAC.
+•   Division 2.2A of the Migration Regulations deals with the VAC and related matters. Regulation
+    2.12C prescribes the amount of VAC in relation to an application for a visa of a class to which
+    an item of Schedule 1 relates.
+•   Subregulation 2.12C(1) of the Migration Regulations prescribes that for subsection 45B(1) of
+    the Migration Act, the VAC (if any) is the sum of the first and second instalments in relation to
+    an application for a visa of a class to which an item of Schedule 1 relates. Schedule 1 to the
+    Migration Regulations sets out the requirements to apply for a visa of a particular class,
+
+                                                            5
+
+
+                       Authorised Version Explanatory Statement registered 30/06/2026 to F2026L00874
+including the VAC payable. An application for a visa must meet the requirements in Schedule 1
+for the application to be valid (see subsection 46(1) of the Migration Act and regulation 2.07 of
+the Migration Regulations).
+
+
+
+
+                                                        6
+
+
+                   Authorised Version Explanatory Statement registered 30/06/2026 to F2026L00874
+                                                                                                      ATTACHMENT B
+
+Details of consultation undertaken for the Home Affairs Legislation Amendment (2026
+Measures No. 1) Regulations 2026
+
+Schedule 1 - Fees for citizenship applications
+The amendments to the Citizenship Regulation do not substantially alter existing arrangements and
+the indexation of citizenship application fees is a routine process that occurs annually. As the
+amendments maintain existing arrangements and give effect to a standing decision of government to
+provide for annual indexation of citizenship fees, consultation with stakeholders outside
+Commonwealth agencies in relation to the amendments was not considered necessary. The
+Department of Home Affairs (the Department) follows standard practices to notify clients about the
+proposed changes, including updating citizenship application fees on its website.
+
+Schedule 2 - Temporary skilled migration income threshold (TSMIT)
+The Department of Employment and Workplace Relations was consulted on the amendment to
+provide for the TSMIT to be indexed in accordance with the Migration Regulations rather than
+requiring the Minister to make a legislative instrument to annually index that threshold to maintain
+parity with the Core Skills Income Threshold (CSIT). This simplifies and standardises the manner
+in which TSMIT is to be indexed by aligning it with the existing indexation provisions in the
+Regulations for the CSIT. It does not change the policy intent or effect, which is for the TSMIT to
+maintain parity with the CSIT each 1 July, and instead provides greater certainty as indexation will
+now occur annually by operation of the Regulations rather than TSMIT being dependent on the
+Minister making a subordinate legislative instrument to specify the same figure as the Regulations
+provide for the CSIT. On this basis, no concerns were raised as part of the interdepartmental
+consultation, and consultation with stakeholders outside Commonwealth agencies in relation to the
+amendments was considered to be unnecessary. The Department follows standard practices to notify
+clients about the proposed changes, including updating the Department’s website and other client-
+facing information.
+
+Schedule 3 – Fees for visa applications
+Consultation with stakeholders outside Commonwealth agencies in relation to indexation was not
+considered necessary as the changes implement long-standing Government policy in relation to
+indexation in line with CPI, as well as Budget measures. Cross-government consultation occurred
+during the 2026-27 Budget process to inform the Government’s decision in relation to increasing
+the VAC. The Department will follow standard practices to notify clients and stakeholders about the
+changes, including updating visa application charges on its website.
+
+
+
+
+                                                           7
+
+
+                      Authorised Version Explanatory Statement registered 30/06/2026 to F2026L00874
+                                                                                                       ATTACHMENT C
+                          Statement of Compatibility with Human Rights
+    Prepared in accordance with Part 3 of the Human Rights (Parliamentary Scrutiny) Act 2011
+          Home Affairs Legislation Amendment (2026 Measures No. 1) Regulations 2026
+
+     This Disallowable Legislative Instrument is compatible with the human rights and freedoms
+    recognised or declared in the international instruments listed in section 3 of the Human Rights
+                                  (Parliamentary Scrutiny) Act 2011.
+
+Overview of the Disallowable Legislative Instrument
+The Home Affairs Legislation Amendment (2026 Measures No. 1) Regulations 2026 (the
+Amendment Regulations) amend the Australian Citizenship Regulation 2016 (the Citizenship
+Regulation) and the Migration Regulations 1994 (the Migration Regulations) (respectively) to:
+•   Parts 1 and 2 of Schedule 1 to the Amendment Regulations - Fees for citizenship applications:
+    ▪ applies the Consumer Price Index (CPI) to current citizenship application fees, with effect
+        from 1 July 2026. Fees for Australian citizenship applications are increased to keep pace with
+        the cost of processing applications for Australian citizenship and delivering the Australian
+        citizenship program.
+•   Schedule 2 to the Amendment Regulations - Temporary skilled migration income threshold:
+    ▪ amends the Migration Regulations, to specify the ‘temporary skilled migration income
+        threshold’ (TSMIT) applies to nominations made in relation to a Subclass 494 (Skilled
+        Employer Sponsored Regional (Provisional)) visa or the Subclass 187 (Regional Sponsored
+        Migration Scheme) visa. The amendments provide that the TSMIT is to be updated and
+        indexed annually together with the core skills income threshold (CSIT) and specialist skills
+        income threshold’ in accordance with the current requirements provided under regulation
+        5.42A. Additionally, the term ‘temporary skilled migration income threshold’ is included in
+        regulation 1.03 through the amendment to that regulation (see item 1 of Schedule 2 to the
+        Amendment Regulations). The purpose of these amendments is to align the salary threshold
+        and the annual indexation for TSMIT with CSIT and the specialist skills income threshold
+        (SSIT).
+•   Schedule 3 to the Amendment Regulations - Fees for visa applications:
+    ▪ amends certain provisions of Schedule 1 to the Migration Regulations to implement 2026–27
+        Budget measures relating to the first instalment for visa application charges (VACs) for
+        certain visas. Specifically, in summary, these amendments provide for (amongst others):
+        o a system-wide increase to the first instalment of the VAC by 25 per cent from 1 July 2026
+             for most visas specified in Schedule 1 to the Migration Regulations. This measure
+             provides a broad-based and efficient mechanism to raise revenue across the migration
+             program while maintaining the existing charge structure. A uniform increase supports
+             administrative simplicity and ensures consistency across visa categories.;
+        o targeted increases for specified visas—this measure implements a higher increase to the
+             VAC for Subclass 500 (Student) and Subclass 590 (Student Guardian) visas (Subclass
+             500 and 590 visas, respectively). The base application charge component of the first
+             instalment for primary applicants increases from $2,000 to $2,500. This measure supports
+             managed and sustainable growth and the restoration of integrity in the international
+             education sector. CPI indexation will continue to apply in subsequent years.;
+                                                            8
+
+
+                       Authorised Version Explanatory Statement registered 30/06/2026 to F2026L00874
+       o the introduction of limited exemptions and differential settings for particular cohorts—
+         this measure provides for a relevant visa applicant, who holds a valid passport issued by a
+         specified country from the Pacific Island countries and Timor-Leste (the Pacific-regional
+         cohort) continue to benefit from concessional VAC arrangements and are not subject to
+         the additional increase for Subclass 500 and 590 visas. These concessional settings,
+         introduced by the Migration Amendment (Differential Student Visa Application Charge)
+         Regulations 2025, will remain subject to CPI indexation (forecast CPI of 2.6% (below)).
+         This lower VAC applies to primary applicants from these cohorts, as well as their family
+         members and dependants. The existing concessional VAC arrangements as applied to the
+         increase to the VAC for Subclass 500 and 590 visas implemented by these amendments to
+         the relevant provisions of Schedule 1 to the Migration Regulations to mitigate the impact
+         of increased VAC charges on applicants from the above cohort for the specified visas.
+         This promotes the right to education by removing a potential barrier for applicants from
+         the specified Pacific countries and Timor-Leste, and
+       o the ongoing annual indexation of VACs for all other visas in line with forecast CPI of
+         2.6%. These amendments are intended to raise revenue in a consistent and
+         administratively efficient manner, while supporting policy objectives including
+         humanitarian access, labour mobility initiatives, and the stability and diversification of
+         the international education sector.
+Further details of each Schedule to the Amendment Regulations are set out below.
+
+Parts 1 and 2 of Schedule 1 to the Amendment Regulations - Fees for citizenship applications
+
+The Amendment Regulations amend the Citizenship Regulation to apply indexation to the fee
+payable for certain citizenship applications. These fees are set out in Schedule 3 to the Citizenship
+Regulation. The new fees apply from 1 July 2026.
+
+For the purposes of paragraph 46(1)(d) of the Australian Citizenship Act 2007 (the Citizenship Act),
+Schedule 3 to the Citizenship Regulation sets out the amount of the fee payable (if any) to
+accompany an application for citizenship.
+
+The previous citizenship application fees listed under Schedule 3 to the Citizenship Regulation were
+set on 1 July 2025. In line with the 2023-24 Budget Measure Revenue Options for Citizenship
+Application Fees, ongoing annual indexation of citizenship application fees from 1 July 2024 will
+apply. This means that from 1 July 2026, some of the fee amounts to accompany citizenship
+applications have changed. Items in Schedule 3 to the Citizenship Regulation that provide for a nil
+fee have not changed. Further, there is no change to some smaller fees due to rounding.
+
+The purpose of this amendment is to update citizenship application fees in order to keep pace with
+the latest increases in costs associated with processing applications and delivering the Citizenship
+Program. Citizenship application fees are categorised as a resource charge and are guided by the
+Australian Government Charging Framework issued by the Department of Finance.
+
+The fees are amended in accordance with the following table and set out in Attachment D.
+
+
+
+                                                            9
+
+
+                       Authorised Version Explanatory Statement registered 30/06/2026 to F2026L00874
+Item        Type of Application                              Fee from 1 July 2025              Fee from 1 July 2026
+Number                                                       (AUD)                             (AUD)
+of the
+Citizenship
+Regulation
+1           Citizenship by descent – person                  $370 for the                      $380 for the
+            born outside Australia to an                     application by the first          application by the first
+            Australian parent                                sibling, and                      sibling, and
+
+             Applications made at the same                   $150 for the                      $160 for the
+             time under section 16 of the Act                applications made by              applications made by
+             by 2 or more siblings                           the second and                    the second and
+                                                             subsequent siblings               subsequent siblings
+2            Citizenship by descent – person                 $370                              $380
+             born outside Australia to an
+             Australian parent
+
+             An application under section 16
+             of the Act, other than an
+             application mentioned in item 1
+3            Citizenship through adoption –                  $370 for the                      $380 for the
+             person adopted in accordance                    application by the first          application by the first
+             with the Hague Convention on                    sibling, and                      sibling, and
+             Intercountry Adoption or a
+             bilateral arrangement                           $150 for the                      $160 for the
+                                                             applications made by              applications made by
+             Applications made at the same                   the second and                    the second and
+             time under section 19C of the Act               subsequent siblings               subsequent siblings
+             by 2 or more siblings
+
+4            Citizenship through adoption –                  $370                              $380
+             person adopted in accordance
+             with the Hague Convention on
+             Intercountry Adoption or a
+             bilateral arrangement
+
+             An application under section 19C
+             of the Act, other than an
+             application mentioned in item 3
+10           Citizenship by conferral – other                $40                               $40 (no increase)
+             than general eligibility –
+             citizenship test not required –
+             eligible for concessional fee
+
+             An application under section 21
+             of the Act, other than an
+
+                                                        10
+
+
+                    Authorised Version Explanatory Statement registered 30/06/2026 to F2026L00874
+     application mentioned in items 5
+     to 9 or item 15, if:
+
+     (a) the applicant does not claim
+     eligibility on the basis of the
+     criteria in subsection 21(2) of the
+     Act; and
+     (b) the applicant:
+
+     (i) holds a pensioner concession
+     card issued by the
+     Commonwealth; or
+     (ii) is under the age of 18 and is
+     listed as a dependant on a
+     pensioner concession card issued
+     by the Commonwealth held by
+     another person
+13   Citizenship by conferral – general               $80                               $85
+     eligibility – eligible for
+     concessional fee
+
+     An application under section 21
+     of the Act, other than an
+     application mentioned in items 5
+     to 9 or item 15, if:
+
+     (a) the applicant claims eligibility
+     on the basis of the criteria in
+     subsection 21(2) of the Act; and
+     (b) the applicant:
+
+     (i) holds a pensioner concession
+     card issued by the
+     Commonwealth; or
+     (ii) is under the age of 18 and is
+     listed as a dependant on a
+     pensioner concession card issued
+     by the Commonwealth held by
+     another person
+14   Citizenship by conferral – general               $575                              $595
+     eligibility
+
+     An application under section 21
+     of the Act, other than an
+     application mentioned in items 5
+     to 13 or items 15 to 18, if the
+     applicant claims eligibility on the
+                                                 11
+
+
+             Authorised Version Explanatory Statement registered 30/06/2026 to F2026L00874
+     basis of the criteria in subsection
+     21(2) of the Act
+
+
+16   Citizenship by conferral – other                 $350                              $365
+     than general eligibility -
+     citizenship test not required
+
+     An application under section 21
+     of the Act, other than an
+     application mentioned in items 5
+     to 15 or items 17 and 18
+17   Citizenship by conferral – general               $40                               $40 (no increase)
+     eligibility – applicant previously
+     passed citizenship test in
+     association with a previous
+     application – eligible for
+     concessional fee
+
+     An application (the new
+     application) under section 21 of
+     the Act, other than an application
+     mentioned in item 5, 6, 8, 13 or
+     18, if:
+
+     (a) the applicant claims eligibility
+     on the basis of the criteria in
+     subsection 21(2) of the Act; and
+     (b) the applicant previously made
+     an application (the old
+     application) on or after 1 October
+     2007; and
+     (c) under the old application, the
+     applicant sat a test as described in
+     paragraph 21(2A)(a) of the Act;
+     and
+     (d) the applicant:
+
+     (i) holds a pensioner concession
+     card
+     issued by the Commonwealth; or
+     (ii) is under the age of 18 and is
+     listed as a dependant on a
+     pensioner concession card issued
+     by the Commonwealth held by
+     another person
+
+
+                                                 12
+
+
+             Authorised Version Explanatory Statement registered 30/06/2026 to F2026L00874
+ 18            Citizenship by conferral – general               $350                              $365
+               eligibility – applicant previously
+               passed citizenship test in
+               association with a previous
+               application
+
+               An application (the new
+               application) under section 21 of
+               the Act, other than an application
+               mentioned in item 5, 6, 8, 13 or
+               17, if:
+
+               (a) the applicant claims eligibility
+               on the basis of the criteria in
+               subsection 21(2) of the Act; and
+               (b) the applicant previously made
+               an application (the old
+               application) on or after 1 October
+               2007; and
+               (c) under the old application, the
+               applicant sat a test as described in
+               paragraph 21(2A)(a) of the Act
+ 20            Resumption of Australian                         $245                              $255
+               citizenship
+
+               An application under section 29
+               of the Act, other than an
+               application mentioned in item 19
+ 21            Renunciation of Australian                       $310                              $320
+               citizenship
+
+               An application under section 33
+               of the Act
+ 24            Evidence of Australian citizenship $280                                            $290
+
+               An application under section 37
+               of the Act, other than an
+               application mentioned in item
+               21A, 22 or 23
+
+Human rights implications
+The amendments in Schedule 1 to the Amendment Regulations may engage the right to acquire or
+change a nationality under the following international instruments:
+   • Article 24(3) of the International Covenant on Civil and Political Rights;
+   • Article 5(d)(iii) of the Convention on the Elimination of all Forms of Racial Discrimination;
+   • Article 18 of the Convention on the Rights of Persons with Disabilities;
+
+                                                           13
+
+
+                       Authorised Version Explanatory Statement registered 30/06/2026 to F2026L00874
+   •    Article 9 of the Convention on the Elimination of All Forms of Discrimination Against
+        Women; and
+    • Article 7 of the Convention of the Rights of the Child.
+An increase in fees for citizenship applications may engage the right to acquire or change a
+nationality under the instruments listed above. To the extent that a person has a right to acquire or
+change a nationality, an increase in fees may limit that right. However, any limitation is reasonable
+and proportionate, noting also that the Citizenship Regulation provides for concessional and nil fees
+for certain cohorts, including applicants on income support payments, or experiencing statelessness.
+The amendments are necessary to ensure the continued delivery of the Citizenship Program in a
+timely and efficient manner.
+
+Conclusion
+The amendments in Schedule 1 to the Amendment Regulations are compatible with human rights
+because, to the extent that it may limit human rights, those limitations are reasonable, necessary and
+proportionate.
+
+Schedule 2 to the Amendment Regulations - Temporary skilled migration income threshold
+
+Schedule 2 to the Amendment Regulations amends the Migration Regulations to specify the TSMIT,
+which applies to nominations made in relation to a Skilled Employer Sponsored Regional
+(Provisional) visa (Subclass 494 visa) and a Regional Sponsored Migration Scheme (Subclass 187)
+visa. Specifically, the Amendment Regulations provide for annual increases in the TSMIT, in
+alignment with the indexation that applies to the CSIT under the Migration Regulations.
+
+The purpose of this amendment is to ensure that visa applicants for certain skilled temporary and
+permanent visas are provided with remuneration and employment conditions that are at least
+equivalent to what is, or would be, provided to an Australian worker performing the same work at
+the same location. As criteria for the above visa types, the Minister must be satisfied that the
+monetary benefits for an equivalent Australian worker are at least the amount of the relevant income
+threshold (the TSMIT), that the nominated skilled migrant worker (that is, the nominee), is paid at
+least the same as an equivalent Australian worker, and that the nominee’s guaranteed annual
+earnings, excluding any non-monetary benefits, will not be less than the income threshold (the
+TSMIT).
+
+Income thresholds and indexation for the Skills in Demand (Subclass 482) and Employer
+Nomination Scheme (Subclass 186) visas are provided for in the Migration Regulations in
+accordance with the annual Average Weekly Ordinary Times Earnings figures (AWOTE) (see
+regulations 1.03 (definitions of CSIT and Specialist Skills Income Threshold (SSIT), and
+regulations 2.72, 2.72C, 2.79, 2.79A, 5.19, and 5.42A). As of 1 July 2025, the CSIT is $76,515 and
+the SSIT is $141,210. From 1 July 2026, these amounts will increase to $79,423 and $146,576
+respectively.
+
+A comparable annual increase for the TSMIT is currently managed by way of a legislative
+instrument made by the Minister under Migration (IMMI 18/033: Specification of Income Threshold
+and Annual Earnings and Methodology of Annual Market Salary Rate) Amendment (Annual TSMIT
+Increase) Instrument 2025 (IMMI 18/033).
+
+                                                           14
+
+
+                       Authorised Version Explanatory Statement registered 30/06/2026 to F2026L00874
+The TSMIT was introduced in 2009 but had not been systematically indexed annually since 2013
+until 2023, when it increased from $53,900 to $70,000 to give effect to the current Government’s
+policy intention to ensure skilled migrant workers are able to sufficiently support themselves while in
+Australia and to provide a safeguard against exploitation. It has increased annually since then, with
+the most recent amending instrument commencing on 1 July 2025, specifying the TSMIT amount to
+be $76,515 (equal to the CSIT).
+
+Requiring IMMI 18/033 to be updated annually by a legislative instrument instead of relying on the
+CSIT indexation formula creates a risk that income thresholds will come out of alignment if an
+instrument is not made to increase TSMIT in line with the CSIT. It also risks creating confusion for
+applicants/sponsors and other stakeholders and requires direct intervention by the Minister by
+making a legislative instrument for TSMIT where other annual income threshold increases occur
+automatically via the Migration Regulations.
+
+Amending the Migration Regulations so that TSMIT maintains parity with the CSIT (in such a way
+that where these Regulations provide for an increase of the CSIT on 1 July per the indexation
+provisions in regulation 5.42A), ensures the TSMIT is certain to increase in the same way/same rate
+as the CSIT. It will also reduce administrative (and legislative) burden by removing the need for a
+new legislative instrument to be made annually by the Minister to specify the TSMIT figure.
+
+The Skilled Visa Program is designed to be flexible and responsive to labour market conditions.
+Indexation of income thresholds reduces risk of exploitation of skilled migrants, which could occur if
+there was a lack of wage growth and greater gaps between their wages and those of Australian
+workers. Additionally, indexation is intended to ensure that migrant workers are adequately able to
+support themselves whilst in Australia, requiring their incomes to remain competitive with
+Australian wages and sufficient to ensure that they are not disadvantaged financially if cost of living
+and inflationary increases would reduce their real income.
+
+The changes to provide for the definition for the TSMIT in regulation 1.03 to the Migration
+Regulations, are intended to apply to nomination applications lodged on and after 1 July 2026, in
+relation to a visa subclass for which the TSMIT is the income threshold. From 1 July 2026, the
+TSMIT amount will increase to $79,423 to align with the CSIT.
+
+All nomination applications lodged prior to 1 July 2025 will continue to be assessed against the
+TSMIT amount that was in force at the time of the nomination lodgement.
+
+Human rights implications
+The amendments in Schedule 2 to the Amendment Regulations positively engage the following
+rights:
+
+  •   the right to the enjoyment of just and favourable conditions of work under Article 7 of
+      the International Covenant on Economic, Social and Cultural Rights (ICESCR), and
+
+  •   the right to an adequate standard of living under Article 11(1) of the ICESCR.
+
+
+
+
+                                                           15
+
+
+                       Authorised Version Explanatory Statement registered 30/06/2026 to F2026L00874
+Just and favourable conditions of work
+
+Article 7 of the ICESCR provides:
+
+       The States Parties to the present Covenant recognize the right of everyone to the enjoyment
+       of just and favourable conditions of work which ensure, in particular:
+
+       (a) Remuneration which provides all workers, as a minimum, with:
+
+               (i) Fair wages and equal remuneration for work of equal value without distinction of
+               any kind, in particular women being guaranteed conditions of work not inferior to
+               those enjoyed by men, with equal pay for equal work;
+
+               (ii) A decent living for themselves and their families in accordance with the provisions
+               of the present Covenant;
+
+       (b) Safe and healthy working conditions;
+
+       (c) Equal opportunity for everyone to be promoted in his employment to an appropriate
+       higher level, subject to no considerations other than those of seniority and competence;
+
+       (d) Rest, leisure and reasonable limitation of working hours and periodic holidays with pay,
+       as well as remuneration for public holidays.
+
+Specifying TSMIT and its indexation in the Migration Regulations is aimed at ensuring that skilled
+migrant workers are fairly remunerated for their work and in line with increases to the AWOTE,
+consistent with increases to the CSIT. By extension, this also helps to ensure that migrant workers
+are not undercutting the Australian labour market. Ensuring employers commit to paying their
+workers at least the increased TSMIT also helps to address risks of worker exploitation.
+
+Accordingly, the Amendment Regulations promote the right to fair conditions of work for under
+Article 7 of the ICESCR for skilled migrant workers.
+
+Adequate standard of living
+
+Article 11(1) of the ICESCR provides:
+
+       The States Parties to the present Covenant recognize the right of everyone to an adequate
+       standard of living for himself and his family, including adequate food, clothing and housing,
+       and to the continuous improvement of living conditions. The States Parties will take
+       appropriate steps to ensure the realization of this right, recognizing to this effect the essential
+       importance of international co-operation based on free consent.
+
+As mentioned above, indexation of the TSMIT is intended to ensure that migrant workers are
+adequately able to support themselves whilst in Australia, requiring their incomes to remain
+competitive with equivalent Australian workers’ wages and sufficient to ensure that they are not
+disadvantaged financially if cost of living and inflationary increases would reduce their real income.
+This helps to ensure that skilled migrant workers are able to maintain an adequate standard of living
+while in Australia, therefore, positively engaging Article 11(1) of the ICESCR.
+
+                                                           16
+
+
+                       Authorised Version Explanatory Statement registered 30/06/2026 to F2026L00874
+Conclusion
+The amendments in Schedule 2 to the Amendment Regulations are compatible with human rights
+because it promotes the protection of human rights.
+
+Schedule 3 to the Amendment Regulations - Fees for visa applications
+Schedule 3 to the Amendment Regulations amends Schedule 1 to the Migration Regulations to
+implement 2026–27 Budget measures relating to visa application charges (VACs). It provides for a
+system-wide increase to VACs for most visa subclasses, targeted increases for specified visas, the
+introduction of limited exemptions and differential settings for particular cohorts, and the ongoing
+indexation of VACs for all other visa subclasses in line with the Consumer Price Index (CPI). The
+amendments are intended to raise revenue in a consistent and administratively efficient manner,
+while supporting policy objectives including humanitarian access, labour mobility initiatives, and the
+stability and diversification of the international education sector.
+The Amendment Regulations increase the first instalment of the VAC by 25 per cent from 1 July
+2026 for most visa subclasses specified in Schedule 1. This measure provides a broad-based and
+efficient mechanism to raise revenue across the migration program while maintaining the existing
+charge structure. A uniform increase supports administrative simplicity and ensures consistency
+across visa categories.
+The Amendment Regulations also implement a higher increase to the VAC for Student (Subclass
+500) and Student Guardian (Subclass 590) visas. The base application charge component of the first
+instalment for primary applicants increases from $2,000 to $2,500. This measure supports managed
+and sustainable growth and the restoration of integrity in the international education sector. CPI
+indexation will continue to apply in subsequent years.
+
+Applicants from Pacific Island countries and Timor-Leste continue to benefit from concessional
+VAC arrangements and are not subject to the additional increase for Student (Subclass 500) and
+Student Guardian (Subclass 590) visas. These concessional settings, introduced by the Migration
+Amendment (Differential Student Visa Application Charge) Regulations 2025, will remain subject to
+CPI indexation. The lower VAC applies to primary applicants from these cohorts, as well as their
+family members and dependants. The existing concessional VAC arrangements as applied to the
+increase to the VAC for Student (Subclass 500) and Student Guardian (Subclass 590) visas
+implemented by this instrument mitigate the impact of increased VAC charges on applicants from
+Pacific Island countries and Timor-Leste for these visas. This promotes the right to education by
+removing a potential barrier for applicants from the Pacific and Timor-Leste. However, to the extent
+that the application of the existing concessional VAC arrangements to this instrument results in
+differentiation on the basis of nationality or citizenship, this is reasonable and proportionate to the
+meeting of a legitimate government objective. This is because a differential (lower) VAC to Student
+and Student Guardian visa applicants from the Pacific and Timor-Leste will assist to deepen
+Australia’s connections with these countries and support wider education opportunities within
+region. This contributes to Pacific economies and providing opportunities for cultural, education and
+skills exchange, in support of a peaceful, prosperous and resilient Pacific region.
+
+As far as the Amendment Regulations provides for indexation for all visa subclasses not otherwise
+affected by the above measures, this is consistent with government policy to annually index VACs in
+line with CPI and give effect to a long-standing budget measure.
+
+                                                           17
+
+
+                       Authorised Version Explanatory Statement registered 30/06/2026 to F2026L00874
+Exemptions from the system-wide increase
+
+The Amendment Regulations excludes the following visas and cohorts from the broad 25 per cent
+VAC increase:
+
+   •   Humanitarian and protection visas:
+           o Subclass 200, 201, 202, 203 and 204 visas
+           o Subclass 785 (Temporary Protection) visa
+           o Subclass 790 (Safe Haven Enterprise) visa
+           o Subclass 866 (Protection) visa
+   •   Selected temporary and regional mobility visas:
+           o Subclass 192 (Pacific Engagement) visa
+           o Subclass 403 (Temporary Work (International Relations)) visa – Pacific Australia
+              Labour Mobility (PALM) stream
+   •   Specified cohorts of Student visa applicants:
+           o Subclass 500 applicants enrolled in ELICOS or non-award sector courses who are
+              from ASEAN countries
+   •   Citizens of Pacific Island countries and Timor-Leste who are eligible under specific
+       Australian visa programs (for example, based on nationality, age, skills, or occupation
+       requirements) and who are applying for those visa subclasses.
+
+The above exemptions ensure that vulnerable applicants and priority cohorts are not adversely
+affected by increased costs. In particular:
+
+   •   Humanitarian and protection visa exemptions preserve access for individuals seeking
+       protection.
+   •   Pacific and regional labour mobility exemptions support Australia’s international and
+       regional engagement objectives.
+   •   Student visa exemptions for certain cohorts mitigate potential negative impacts on key
+       education sectors and regional partnerships.
+
+Targeted VAC increases for specified visas
+
+The Amendment Regulations applies targeted increases to selected visa subclasses instead of the
+general 25 per cent increase.
+
+These targeted increases are summarised as follows:
+
+   •   Working Holiday Maker visas - Subclass 417 (Working Holiday) and Subclass 462 (Work
+       and Holiday):
+          o Increase of $330 to second and third application VACs
+   •   Resident Return visa – Subclass 155 and 157
+          o Increase of 200% VAC
+   •   Bridging visa B – Subclass 020
+          o Increase of 200% VAC
+   •   New Zealand Citizen Family Relationship (Temporary) visa – Subclass 461
+          o Increase of 200% VAC
+
+                                                          18
+
+
+                      Authorised Version Explanatory Statement registered 30/06/2026 to F2026L00874
+These increases represent the full VAC adjustment for these visas and replace, rather than
+supplement, the general 25 per cent increase. Targeted increases align VAC settings more closely
+with the purpose and use of these visas, including repeat or discretionary applications, and better
+reflect administrative costs and demand patterns. Applying bespoke increases avoids compounding
+impacts from the general uplift and ensures charges remain proportionate to policy intent.
+
+Differential arrangements for certain Student visa applicants
+
+ELICOS and non-award sector applicants:
+
+The Amendment Regulations maintains existing VAC settings for Student (Subclass 500) visa
+applicants enrolled in ELICOS and non-award courses by exempting them from any increase.
+
+ASEAN applicants:
+
+The Amendment Regulations also exempts Student (Subclass 500) visa applicants from ASEAN
+countries from the broader increase and maintains current VAC levels.
+
+Both of these differential measures support the competitiveness and sustainability of Australia’s
+international education sector. Maintaining existing VAC levels for these applicant cohorts:
+
+   •   mitigates potential market disruption in price-sensitive student cohorts;
+   •   supports diversification of source countries in line with the government’s Southeast Asia
+       strategy; and,
+   •   ensures continued access for entry-level education pathways that are particularly
+       fee-sensitive.
+
+Indexation of remaining VACs
+
+The Amendment Regulations increases VAC instalments for all visa subclasses not otherwise
+affected by the above measures in accordance with annual indexation arrangements. The increases
+align with the CPI of 2.6 per cent, as provided in the 2026–27 budget. Indexation preserves the real
+value of VACs over time and ensures consistency with the government’s established annual
+adjustment mechanism under the 2017–18 budget measure on VAC indexation.
+
+Human rights implications
+The amendments in Schedule 3 to the Amendment Regulations engage the following rights:
+   •   the right to equality and non-discrimination in Article 26 of the International Covenant on
+       Civil and Political Rights (ICCPR);
+   •   the right to education in Article 13(1) of the International Covenant on Economic, Social and
+       Cultural Rights (ICESCR), including as read with Article 2(2) of the ICESCR;
+
+   •   the right to leave any country, including one’s own, in Article 12(2) of the ICCPR;
+   •   the right to enter one’s own country in Article 12(4) of the ICCPR; and,
+
+
+                                                           19
+
+
+                       Authorised Version Explanatory Statement registered 30/06/2026 to F2026L00874
+   •   rights relating to families and children, particularly those in Article 17(1) and 23(1) of the
+       ICCPR and Article 10 of the Convention on the Rights of the Child (CRC).
+In many instances, visa applicants are located outside Australia, and the measures will not engage
+applicable rights and freedoms for those applicants.
+Right to equality and non-discrimination as read with the right to education
+Articles 2(2) and 13(1) of the ICESCR and Article 26 of the ICCPR may be engaged by establishing
+a differential (lower) VAC for certain cohorts, at the exclusion of other applicants who will not be
+eligible for a differential VAC, including:
+   •   lower VACs for Student (Subclass 500) visa applicants from ASEAN countries; and,
+   •   lower VACs for Student (Subclass 500) visa applicants enrolled in ELICOS and non-award
+       sector courses.
+Article 2(2) of ICESCR states:
+
+       The States Parties to the present Covenant undertake to guarantee that the rights enunciated
+       in the present Covenant will be exercised without discrimination of any kind as to race,
+       colour, sex, language, religion, political or other opinion, national or social origin,
+       property, birth or other status.
+
+Article 26 of the ICCPR states:
+
+       All persons are equal before the law and are entitled without any discrimination to the equal
+       protection of the law. In this respect, the law shall prohibit any discrimination and guarantee
+       to all persons equal and effective protection against discrimination on any ground such as
+       race, colour, sex, language, religion, political or other opinion, national or social origin,
+       property, birth or other status.
+
+Article 13(1) of the ICESCR relevantly states:
+
+       The States Parties to the present Covenant recognize the right of everyone to education.
+
+In its General Comment on Article 2 of the ICESCR, the United Nations Committee on Economic
+Social and Cultural Rights has stated that:
+
+       Differential treatment based on prohibited grounds will be viewed as discriminatory unless
+       the justification for differentiation is reasonable and objective. This will include an
+       assessment as to whether the aim and effects of the measures or omissions are legitimate,
+       compatible with the nature of the [ICESCR] rights and solely for the purpose of promoting
+       the general welfare in a democratic society. In addition, there must be a clear and
+       reasonable relationship of proportionality between the aim sought to be realized and the
+       measures or omissions and their effects.
+
+Similarly, in its General Comment 18 on Article 26 of the ICCPR, the United Nations Human Rights
+Committee (UNHRC) stated that:
+
+
+                                                           20
+
+
+                       Authorised Version Explanatory Statement registered 30/06/2026 to F2026L00874
+       The Committee observes that not every differentiation of treatment will constitute
+       discrimination, if the criteria for such differentiation are reasonable and objective and if the
+       aim is to achieve a purpose which is legitimate under the [ICCPR].
+
+In most instances, Student (Subclass 500) visa applicants from ASEAN countries, and Student
+(Subclass 500) visa applicants who are enrolled in ELICOS and non-award sector courses, are
+outside Australia and the differential (lower) VAC for those applicants will not engage the applicable
+rights and freedoms.
+
+Where applicants are in Australia, the differential VAC may engage the right to education. The
+instrument promotes this right in two distinct ways. First, by introducing a lower VAC for applicants
+from ASEAN countries, it reduces financial barriers for this cohort. This supports Australia’s
+broader objective of strengthening regional engagement and enabling individuals from ASEAN
+countries to access Australian education and skills development opportunities, which in turn
+contribute to economic development and closer regional ties. Second, by providing a differential
+VAC for applicants enrolled in ELICOS and non-award sector courses, the measure supports entry-
+level and pathway education programs. These courses often serve as a foundation for further study,
+and maintaining a lower cost for visa application helps facilitate access, particularly for students at
+the early stages of their education journey. Together, these measures promote greater participation in
+Australian education by targeted cohorts and support balanced growth across the migration and
+international education systems.
+
+However, to the extent that the differential VAC will only be available to citizens from ASEAN
+countries, and applicants enrolled in ELICOS and non-award sector courses, the measure will limit
+the right to non-discrimination in the right to education, as it differentiates on the basis of national
+origin and ‘other status’. This limitation is compatible with the nature of the right and is solely for
+the purpose of promoting general welfare in a democratic society.
+
+To the extent that the instrument differentiates on the basis of national origin and ‘other status’, this
+is reasonable and proportionate to the meeting of a legitimate government objective. This is because
+providing a differential VAC to citizens from ASEAN countries and those enrolled in ELICOS and
+non-award sector courses supports Australia’s regional engagement and foreign policy priorities,
+including its Southeast Asia strategy; enhances access to education for priority cohorts, particularly
+in developing regions; promotes diversification and long-term sustainability in the international
+education sector; and strengthens economic development, skills exchange, and people-to-people
+links across the ASEAN region. More broadly, a differential VAC for citizens from ASEAN
+countries and applicants enrolled in ELICOS and non-award sector courses forms part of a
+framework aimed at ensuring that the migration program remains sustainable, administratively
+viable, and aligned with the national interest.
+To the extent that Student visa applicants from other nationalities, or applicants not enrolled in
+ELICOS and non-award sector courses, are not subject to an exemption to the increased VAC, any
+differential treatment is reasonable and objective. As the VAC is a small component of the cost of
+education in Australia, the VAC increase is unlikely to have a material impact on students choosing
+Australia as their country of education and will not impermissibly limit the right to education in
+
+
+                                                            21
+
+
+                        Authorised Version Explanatory Statement registered 30/06/2026 to F2026L00874
+Australia. As such, the unavailability of a lower VAC is unlikely to impact on the accessibility of
+Student visas for other cohorts.
+To the extent that the measure differentiates based on national origin and ‘other status’, this is
+reasonable, necessary and proportionate to achieving legitimate objectives. The differentiation is
+narrowly targeted to clearly defined cohorts and is directly linked to specific policy objectives. The
+measures are designed to expand access for priority groups rather than restrict opportunities for
+others, and the absence of a differential VAC for other applicants is unlikely to materially affect
+access to education.
+Right to education
+Article 13(1) of ICESCR relevantly states that:
+       The States Parties to the present Covenant recognize the right of everyone to education.
+This instrument may limit the right to education where an applicant for a Student visa is in Australia
+as the VAC increase for these visas may create an additional barrier to accessing education in
+Australia.
+The 25% VAC broad increase for visa applications (including Student visa applications) has the
+legitimate objective of promoting the general welfare of Australian society by ensuring managed,
+sustainable growth in the migration program.
+This measure has a rational connection to its objective because placing visa-related requirements,
+including a higher VAC, for the access of foreign students to education in Australia, assists in
+delivering sustainable and steady growth in migration and the education sector.
+The measure is therefore reasonable, necessary and proportionate to achieving its objective as the
+VAC for Student visas is and remains a small part of the cost to remain in Australia for the purposes
+of study, noting that Student visa holders are expected to support themselves with limited work
+rights. As the VAC is a small component of the cost of education in Australia, the VAC increase is
+unlikely to have a material impact on the students choosing Australia as their country of education
+and the guardians who support them and does not impermissibly limit the right to education in
+Australia.
+To the extent that the instrument may limit the right to education, that limitation is reasonable,
+necessary and proportionate to achieving a legitimate objective.
+
+
+
+
+                                                           22
+
+
+                       Authorised Version Explanatory Statement registered 30/06/2026 to F2026L00874
+Right to leave any country
+Article 12(2) of the ICCPR provides that:
+        Everyone shall be free to leave any country, including his own.
+The instrument may engage Article 12(2) of the ICCPR in respect of the VAC increases applied to
+the Five Year Resident Return (Subclass 155) and Three Month Resident Return (Subclass 157)
+visas. This is because the increased VAC applied to these visa subclasses could affect individuals
+located in Australia who seek to depart and who will incur a higher cost associated with obtaining a
+visa. However, any such impact is indirect and limited in scope.
+The VAC adjustments form part of a broader policy framework directed at legitimate objectives,
+including maintaining sustainable migration settings, ensuring appropriate cost recovery for visa
+processing, and supporting the efficient and effective operation of the migration system. As
+recognised in earlier VAC reforms, visa pricing mechanisms are an integral component of managing
+demand for entry to Australia and ensuring that migration remains orderly, sustainable, and aligned
+with national interests.
+There is a clear and rational connection between VAC increases and these objectives. Setting visa
+charges at an appropriate level helps regulate demand for visas, support the financial sustainability of
+the migration program and contributes to the broader integrity of Australia’s border and visa
+systems. These outcomes, in turn, support the general welfare of the Australian community as well as
+the continued viability of the migration framework.
+
+To the extent that the measure may affect the right of a person to leave Australia, any limitation is
+reasonable, necessary and proportionate. The instrument does not restrict a person’s ability to depart
+Australia, nor does it impose any prohibition on international travel. Rather, it relates only to the
+conditions for entry back into Australia. Individuals remain free to leave Australia and without
+restriction. Moreover, the VAC increases are moderate in the context of the overall costs associated
+with international travel and are accompanied by targeted exemptions and concessional settings for
+particular cohorts, which mitigate potential impacts on price-sensitive groups.
+In this context, the measure does not impose an arbitrary or disproportionate burden on individuals
+seeking to leave Australia. Instead, they represent a proportionate and policy-justified adjustment
+within the migration framework. Accordingly, the instrument is compatible with Article 12(2) of the
+ICCPR, as it does not constitute an impermissible limitation on the right to leave Australia.
+Right to enter one’s own country
+Article 12(4) of the ICCPR provides that:
+        No one shall be arbitrarily deprived of the right to enter his own country
+‘Own country’ in Article 12(4) is not limited to citizens of a country, but can include long term
+residents with strong ties to Australia and where ties to their country of nationality may have been
+severed.
+The instrument engages this right to a limited extent as a result of the VAC increases applied to the
+Five Year Resident Return (Subclass 155) and Three Month Resident Return (Subclass 157) visas,
+                                                            23
+
+
+                        Authorised Version Explanatory Statement registered 30/06/2026 to F2026L00874
+which are commonly used by Australian permanent residents seeking to re-enter Australia after
+travel overseas.
+However, the nature of the measure does not undermine or interfere with the substance of the right.
+The increase in VACs relates solely to the level of administrative charges payable in connection with
+a visa application and does not affect a person’s underlying entitlement to seek re-entry to Australia
+where they hold the relevant migration status. Individuals are not prevented from entering Australia,
+nor are additional substantive barriers imposed on their ability to return. The right protected by
+Article 12(4) concerns protection from arbitrary exclusion, and the present measure does not operate
+to exclude or deny entry to any person entitled to return.
+The VAC adjustments form part of a broader, well established policy framework aimed at ensuring
+the sustainability and integrity of the migration system. In this context, the increases contribute to
+appropriate cost recovery for visa processing, support efficient administration, and assist in
+maintaining a stable and effective migration program. There is a clear and rational connection
+between the imposition of visa charges and these objectives, as VACs are a standard mechanism
+through which the government funds and manages the visa system.
+To the extent that the measure engages the right to enter one’s own country, any impact is
+reasonable, necessary and proportionate. The requirement to pay a higher application charge does not
+amount to a denial of entry, but rather reflects a routine administrative condition associated with visa
+processing. The increase is moderate in the broader context of international travel and migration
+costs and do not impose a substantial or unreasonable burden on individuals seeking to return.
+Importantly, the measure is not arbitrary: it is applied consistently, is grounded in legitimate policy
+considerations, and does not target or single out individuals in a discriminatory manner in relation to
+their ability to re-enter their own country.
+Accordingly, the Amendment Regulations is compatible with Article 12(4) of the ICCPR, as it does
+not deprive any person of the right to enter their own country, nor does it give rise to any arbitrary
+restriction on that right.
+Rights relating to families and children
+The right to respect for the family is protected by Articles 17 and 23 of the ICCPR and Article 10 of
+the ICESCR.
+The broad 25 per cent increase in VAC may limit these rights by affecting access to family reunion
+pathways, including under the Child (Subclass 101), Parent (Subclass 103) and Partner visas.
+However, the government is of the view that this measure is compatible with these rights as the VAC
+is and remains a small part of the cost to come to Australia.
+The broad 25 per cent VAC increase forms part of an established policy framework that supports the
+sustainability, integrity and efficient administration of the migration program. In this context the
+measure contributes to cost recovery for resource-intensive processing across family visa streams,
+including high-volume Partner visas, complex Parent visa queues, and Child visa safeguarding and
+verification requirements.
+
+
+
+                                                           24
+
+
+                       Authorised Version Explanatory Statement registered 30/06/2026 to F2026L00874
+There is a clear and rational connection between the increase and these objectives, as VACs are a
+standard mechanism through which governments fund and manage visa systems. Setting VACs at an
+appropriate level helps manage demand for visas, supports the financial sustainability of the
+migration program, and contributes to the broader integrity of Australia’s border and visa systems.
+These outcomes, in turn, support the general welfare of the Australian community as well as the
+continued viability of the migration framework.
+The measure is appropriately calibrated to achieve legitimate objectives without unduly limiting
+access to family reunification. Any limitation on family rights is therefore justified as reasonable,
+necessary and proportionate, while preserving ongoing access to family migration pathways.
+Conclusion
+The amendments in Schedule 3 to the Amendment Regulations are compatible with human rights
+because to the extent that it may limit human rights, those limitations are not arbitrary and are
+reasonable, necessary and proportionate.
+
+
+                                     The Hon Tony Burke MP
+                              Minister for Immigration and Citizenship
+
+
+
+
+                                                           25
+
+
+                       Authorised Version Explanatory Statement registered 30/06/2026 to F2026L00874
+                                                                                                        ATTACHMENT D
+
+
+Details of the Home Affairs Legislation Amendment (2026 Measures No. 1) Regulations 2026
+Section 1 – Name
+This section provides that the title of the instrument is the Home Affairs Legislation Amendment
+(2026 Measures No. 1) Regulations 2026 (the Amendment Regulations).
+Section 2 – Commencement
+This section provides that the Amendment Regulations commence on 1 July 2026.
+Section 3 – Authority
+This section provides that the instrument is made under the Australian Citizenship Act 2007 and the
+Migration Act 1958.
+Section 4 – Schedules
+This section provides that each instrument that is specified in a Schedule to this instrument is
+amended or repealed as set out in the applicable items in the Schedule concerned, and any other item
+in a Schedule to this instrument has effect according to its terms.
+Schedule 1—Fees for citizenship applications
+Part 1—Fees
+Australian Citizenship Regulation 2016
+Items [1 to 13]
+Part 1 of Schedule 1 to the Amendment Regulations amends column 2 of the table in Schedule 3 to
+the Australian Citizenship Regulation 2016 (the Citizenship Regulation). Items 1 to 13 of Schedule 1
+to the Amendment Regulations give effect to increases to the citizenship application fee amounts
+from 1 July 2026.
+The amendments made by items 1 to 13 of Schedule 1 to the Amendment Regulations substitute
+previous citizenship fee amounts with indexed fee amounts. The following table summarises the
+changes that take effect on 1 July 2026.
+
+ Item Number                                                                  Fee from                   Fee from
+ of the                                                                       1 July 2025
+                   Type of Application                                                                   1 July 2026
+ Citizenship
+                                                                              (AUD)                      (AUD)
+ Regulation
+                                                                              $370 for the               $380 for the
+                                                                              application by the         application by the
+                   Citizenship by descent – person born outside               first sibling, and         first sibling, and
+                   Australia to an Australian parent
+ 1                                                                            $150 for the               $160 for the
+                   Applications made at the same time under                   applications made          applications made
+                   section 16 of the Act by 2 or more siblings                by the second and          by the second and
+                                                                              subsequent                 subsequent
+                                                                              siblings                   siblings
+                   Citizenship by descent – person born outside
+ 2                 Australia to an Australian parent                          $370                       $380
+
+
+                                                            26
+
+
+                        Authorised Version Explanatory Statement registered 30/06/2026 to F2026L00874
+Item Number                                                             Fee from                  Fee from
+of the                                                                  1 July 2025
+              Type of Application                                                                 1 July 2026
+Citizenship
+                                                                        (AUD)                     (AUD)
+Regulation
+              An application under section 16 of the Act,
+              other than an application mentioned in
+              item 1
+                                                                        $370 for the              $380 for the
+              Citizenship through adoption – person                     application by the        application by the
+              adopted in accordance with the Hague                      first sibling, and        first sibling, and
+              Convention on Intercountry Adoption or a
+3             bilateral arrangement
+                                                                        $150 for the              $160 for the
+                                                                        applications made         applications made
+              Applications made at the same time under                  by the second and         by the second and
+              section 19C of the Act by 2 or more siblings              subsequent                subsequent
+                                                                        siblings                  siblings
+              Citizenship through adoption – person
+              adopted in accordance with the Hague
+              Convention on Intercountry Adoption or a
+              bilateral arrangement
+4                                                                       $370                      $380
+              An application under section 19C of the Act,
+              other than an application mentioned in
+              item 3
+              Citizenship by conferral – general eligibility
+              – eligible for concessional fee
+
+              An application under section 21 of the Act,
+              other than an application mentioned in
+              items 5 to 9 or item 15, if:
+              (a) the applicant claims eligibility on the
+                  basis of the criteria in subsection 21(2)
+13                of the Act; and                                       $80                       $85
+              (b) the applicant:
+                  (i) holds a pensioner concession card
+                       issued by the Commonwealth; or
+                  (ii) is under the age of 18 and is listed as
+                       a dependant on a pensioner
+                       concession card issued by the
+                       Commonwealth held by another
+                       person
+              Citizenship by conferral – general eligibility
+
+              An application under section 21 of the Act,
+14            other than an application mentioned in items              $575                      $595
+              5 to 13 or items 15 to 18, if the applicant
+              claims eligibility on the basis of the criteria
+              in subsection 21(2) of the Act
+
+
+
+                                                      27
+
+
+                  Authorised Version Explanatory Statement registered 30/06/2026 to F2026L00874
+Item Number                                                             Fee from                  Fee from
+of the                                                                  1 July 2025
+              Type of Application                                                                 1 July 2026
+Citizenship
+                                                                        (AUD)                     (AUD)
+Regulation
+              Citizenship by conferral – other than general
+              eligibility - citizenship test not required
+16                                                                      $350                      $365
+              An application under section 21 of the Act,
+              other than an application mentioned in
+              items 5 to 15 or items 17 and 18
+              Citizenship by conferral – general eligibility
+              – applicant previously passed citizenship
+              test in association with a previous
+              application
+
+              An application (the new application) under
+              section 21 of the Act, other than an
+              application mentioned in
+              item 5, 6, 8, 13 or 17, if:
+18                                                                      $350                      $365
+              (a) the applicant claims eligibility on the
+                  basis of the criteria in subsection 21(2)
+                  of the Act; and
+              (b) the applicant previously made an
+                  application (the old application) on or
+                  after 1 October 2007; and
+              (c) under the old application, the applicant
+                  sat a test as described in paragraph
+                  21(2A)(a) of the Act
+              Resumption of Australian citizenship
+
+20            An application under section 29 of the Act,               $245                      $255
+              other than an application mentioned in
+              item 19
+              Renunciation of Australian citizenship
+21                                                                      $310                      $320
+              An application under section 33 of the Act
+              Evidence of Australian citizenship
+
+24            An application under section 37 of the Act,               $280                      $290
+              other than an application mentioned in
+              item 21A, 22 or 23
+
+
+
+
+                                                      28
+
+
+                  Authorised Version Explanatory Statement registered 30/06/2026 to F2026L00874
+Part 2—Transitional provisions
+Australian Citizenship Regulation 2016
+Item [14] In the appropriate position in Part 4
+This item inserts new section 38 into Part 4 of the Citizenship Regulation. Section 38 provides that
+amendments made by Part 1 of Schedule 1 to the Amendment Regulations apply in relation to an
+application made on or after 1 July 2026.
+
+
+
+
+                                                           29
+
+
+                       Authorised Version Explanatory Statement registered 30/06/2026 to F2026L00874
+Schedule 2—Temporary skilled migration income threshold
+Migration Regulations 1994
+Item [1] – Regulation 1.03
+Item 1 of Schedule 2 to the Amendment Regulations inserts the following definition of temporary
+skilled migration income threshold in regulation 1.03 of the Migration Regulations 1994 (the
+Migration Regulations):
+•   temporary skilled migration income threshold means $79,423.
+Item 1 of Schedule 2 to the Amendment Regulations includes a note under the definition of the
+expression temporary skilled migration income threshold. The note explains that the specified
+amount is indexed under regulation 5.42A of the Migration Regulations.
+The effect of item 1 of Schedule 2 to the Amendment Regulations is that the definition of temporary
+skilled migration income threshold is specified in the Migration Regulations.
+Items [2] – [4]
+Item 2 of Schedule 2 to the Amendment Regulations omits “specified by the Minister in a legislative
+instrument for the purposes of this paragraph” from paragraph 2.72C(15)(d) of the Migration
+Regulations.
+Amended paragraph 2.72C(15)(d) provides that the annual market salary rate, excluding any non-
+monetary benefits, for the occupation (determined by the person in accordance with an instrument
+made under subregulation 2.72(17)) is not less than the temporary skilled migration income
+threshold.
+Item 3 of Schedule 2 to the Amendment Regulations omits “specified by the Minister in a legislative
+instrument made for the purposes of paragraph (d) of this subregulation” from paragraph
+2.72C(15)(f).
+Amended paragraph 2.72C(15)(f) provides that the nominee's annual earnings, excluding any non-
+monetary benefits, in relation to the occupation will not be less than the temporary skilled migration
+income threshold.
+Item 4 of Schedule 2 to the Amendment Regulations omits “specified by the Minister in a legislative
+instrument made for the purposes of paragraph (15)(d) of this subregulation” from paragraph
+2.72C(16)(a)(i).
+Amended paragraph 2.72C(16)(a)(i) provides that the annual market salary rate for the occupation
+(determined by the person in accordance with an instrument made under subregulation 2.72(17)) is
+not less than the temporary skilled migration income threshold.
+The effect of items 2 to 4 is to remove references to amounts specified by Ministerial legislative
+instrument, so that the relevant provisions instead refer directly to the temporary skilled migration
+income threshold as defined in regulation 1.03.
+Item [5] – Subregulation 5.42A(1)
+Item 5 of Schedule 2 to the Amendment Regulations omits “and specialist skills income threshold”
+and substitutes “, specialist skills income threshold and temporary skilled migration income
+threshold” in subregulation 5.42A(1) of the Migration Regulations.
+Amended subregulation 5.42A(1) provides that if the indexation factor for an indexation day is
+greater than 1, the dollar amounts mentioned in the definitions of core skills income threshold,
+specialist skills income threshold and temporary skilled migration income threshold in regulation
+1.03 are, on that day, replaced by the amounts worked out using the following formula:
+
+                                                           30
+
+
+                       Authorised Version Explanatory Statement registered 30/06/2026 to F2026L00874
+ Dollar amount immediately
+                                  x Indexation factor for the indexation day
+ before the indexation day
+The effect of item 5 of Schedule 2 to the Amendment Regulations is to update subregulation
+5.42A(1) to include reference to the definition of temporary skilled migration income threshold in
+regulation 1.03 (see item 1, above) in subregulation 5.42A(1) for the calculation of indexation for
+certain amounts as prescribed in section 5.42A.
+Item [6] – In the appropriate position in Schedule 13
+Item 6 of Schedule 2 to the Amendment Regulations inserts the following:
+    Part 164—Amendments made by the Home Affairs Legislation Amendment (2026 Measures
+    No. 1) Regulations 2026
+    16401 Application of amendments
+    The amendments made by Schedule 2 to the Home Affairs Legislation Amendment (2026
+    Measures No. 1) Regulations 2026 apply in relation to an application for approval of a
+    nomination made on or after 1 July 2026.
+    16402 Application of indexation to temporary skilled migration income threshold
+    The first indexation day on which the dollar amount mentioned in the definition of temporary
+    skilled migration income threshold in regulation 1.03 may be indexed under regulation 5.42A
+    is 1 July 2027.
+The effect of item 6 of Schedule 2 to the Amendment Regulations is to specify that amendments
+made by Schedule 2 of the Amendment Regulations apply to nominations made on or after
+1 July 2026. Further, the effect of item 6 of Schedule 2 is to establish the first indexation day on
+which the dollar amount mentioned in the definition of temporary skilled migration income
+threshold in regulation 1.03 may be indexed under regulation 5.42A is 1 July 2027. That amount is
+$79,423, as of 1 July 2026.
+Overall, the effect of items [1] to [6] (above) of Schedule 2 to the Amendment Regulations
+collectively amends the relevant provisions of the Migration Regulations:
+•   to specify the ‘temporary skilled migration income threshold’ (TSMIT), which applies to
+    nominations made in relation to a Subclass 494 (Skilled Employer Sponsored Regional
+    (Provisional)) visa or Subclass 187 (Regional Sponsored Migration Scheme) visa.
+•   for the purposes of former paragraph 2.72C(15)(d) of the Migration Regulations, the previous
+    legislative scheme for TSMIT was prescribed through a legislative instrument made by the
+    Minister in accordance with above paragraph and as of 1 July 2025, the threshold was AUD
+    $76,515. The effect of the above amendments results in, as of 1 July 2026, a revised TSMIT of
+    $79,423, with the amount indexed in accordance with the relevant provisions of the Migration
+    Regulations from 1 July 2027.
+•   provide that the TSMIT is to be updated and indexed annually together with the core skills
+    income threshold (CSIT) and specialist skills income threshold (SSIT) (defined in regulation
+    1.03) in accordance with the current requirements provided under regulation 5.42A. Additionally,
+    the term ‘temporary skilled migration income threshold’ is included in regulation 1.03 through
+    the amendment to that regulation (see item 1, above). The purpose of these amendments is to
+    align the salary threshold and the annual indexation for TSMIT with CSIT.
+
+The current legislative scheme for CSIT automatically indexes on 1 July each year, and on
+1 July 2026 CSIT indexes to $79,423. This threshold is also the same for the TSMIT in Schedule 2 to
+                                                           31
+
+
+                       Authorised Version Explanatory Statement registered 30/06/2026 to F2026L00874
+the Amendment Regulations as of 1 July 2026, and the above amendments ensure that TSMIT
+continues to index to the same dollar figure in line with CSIT each 1 July in future years. These
+amendments also ensure that amendments to TSMIT are no longer amended manually by
+discretionary exercise of an instrument making power by the Minister.
+
+
+
+
+                                                           32
+
+
+                       Authorised Version Explanatory Statement registered 30/06/2026 to F2026L00874
+Schedule 3—Fees for visa applications
+
+Migration Regulations 1994
+
+Item [1] – Regulation 1.03
+
+This item inserts the definition of Pacific-regional country into the Migration Regulations and
+provides that expression to mean each of the following:
+        (a)     Federated States of Micronesia;
+        (b)     Fiji;
+        (c)     Kiribati;
+        (d)     Nauru;
+        (e)     Palau;
+        (f)     Papua New Guinea;
+        (g)     Republic of the Marshall Islands;
+        (h)     Samoa;
+        (i)     Solomon Islands;
+       (j)     Timor-Leste;
+        (k)     Tonga;
+        (l)     Tuvalu;
+        (m)     Vanuatu.
+
+The purpose of this amendment is to set out the meaning for that expression for the purposes of the
+Migration Regulations. Specifically, the expression is referred to by amendment made by items [2] to
+[6] to visa applicants who are citizens of Pacific Island countries and Timor-Leste to be the subject
+of a VAC increase that reflects a CPI of 2.6 percent increase.
+
+Items [2] to [64]
+
+Items [2] to [64] of Schedule 3 to the Amendment Regulations amend Schedule 1 to the Migration
+Regulations to give effect to the 2026–27 Budget measures and ongoing policy to increase the visa
+application charge (VAC). Specifically, the amendments:
+    •    increase the first instalment of the VAC for certain visas from their 2025–26 baseline amounts by
+         25%. The visas subject to this increase exclude the Refugee and Humanitarian (Class XB) visa,
+         Temporary Protection (Class XD) visa, Safe Haven Enterprise (Class XE) visa, Protection (Class XA)
+         visa, Pacific Engagement (Class PA) visa, Temporary Work (International Relations) (Class GD) visa,
+         and those visas referred to in the succeeding paragraphs;
+
+•       increases the base application charge component of the VAC, for applicants seeking to
+        satisfying the requirement for a Student (Temporary) (Class TU) visa under subparagraph
+        1222(2)(a)(ii) of Schedule 1 to the Migration Regulations, from 2000 Australian dollars (AUD)
+        to 2500 AUD;
+•       provides the VAC increase for Subclass 500 visa for applicants who are either enrolled in
+        English Language Intensive Course for Overseas Students (the ELICOS) or non-award
+        courses, or are from a country that is a part of the Association of Southeast Asian Nations (the
+        ASEAN), to be increased by the Consumer Price Index (CPI) of 2.6 percent from their 2025-26
+        baseline amounts instead of the increase set out in paragraph (a);
+
+                                                             33
+
+
+                         Authorised Version Explanatory Statement registered 30/06/2026 to F2026L00874
+•    enables visa applicants who are citizens of Pacific Island countries and Timor-Leste to be the
+     subject of a VAC increase that reflects a CPI of 2.6 percent increase from their 2025-26
+     baseline amounts instead of the increase set out in paragraph (a). These applicants are those
+     that hold a valid passport issued by a Pacific-regional country;
+•    applies targeted VAC increases for the Work and Holiday (Temporary) (Class US) visa,
+     Working Holiday (Temporary) (Class TZ) visa, Return (Residence) (Class BB) visa, Bridging
+     B (Class WB) visa, and New Zealand Citizen (Family Relationship) (Temporary) (Class UP)
+     visa.
+
+All increases are rounded to a multiple of $5.00 according to the following methodology:
+•    if the amount of the charge calculated under this formula is not a multiple of $5.00, and
+     exceeds the nearest lower multiple of $5.00 by $2.50 or more, the amount is rounded up to the
+     nearest $5.00;
+•    in any other case, where the charge calculated under the formula is not a multiple of $5.00, the
+     amount is rounded down to the nearest lower multiple of $5.00.
+
+The amount of the increase in these relevant items of Schedule 1 to the Migration Regulations does
+not exceed the applicable charge limit set out in the Migration (Visa Application) Charge Act 1997.
+
+Increase of first instalment of VAC by 25% for certain visas
+
+The increase of the VAC by 25 percent gives effect to related Budget Measures to raise revenue in a
+consistent and administratively efficient manner, while supporting policy objectives including
+humanitarian access, labour mobility initiatives, and the stability and diversification of the
+international education sector.
+
+Below are examples of relevant VAC increases made by amendments made by items in Schedule 3
+to the Amendment Regulations.
+
+For example, item [2] of Schedule 3 to the Amendment Regulations repeals paragraph 1104BA(2)(a)
+of Schedule 1 to the Migration Regulations and substitutes, in part, new subparagraph
+1104BA(2)(a)(ii).
+
+New subparagraph 1104BA(2)(a)(ii) sets out the first instalment of VAC for applicants for the
+Business Skills (Permanent) (Class EC) visa that exclude those covered by subparagraph
+1104BA(2)(a)(i). The applicants covered by subparagraph 1104BA(2)(a)(i) are those applicants who
+hold a valid passport issued by a Pacific-regional country.
+
+The VAC is as follows:
+
+ First instalment
+ Item      Component                                                                                   Amount
+ 1         Base application charge                                                                     $4 375
+ 2         Additional applicant charge for an applicant who is at least 18                             $2 195
+ 3         Additional applicant charge for an applicant who is less than 18                            $1 090
+
+
+                                                           34
+
+
+                       Authorised Version Explanatory Statement registered 30/06/2026 to F2026L00874
+The table below sets out a comparison between the first instalment of the VAC prior to the increase
+and post VAC increase.
+
+ Table item of the table under paragraph 1104BA(2)(a)                            2025-26                    2026-27
+ and new subparagraph 1104BA(2)(a)(ii) of Schedule 1                             baseline                   baseline
+ (respectively)                                                                  amount ($)                 amount
+ 1                                                                               $3,500                     $4 375
+ 2                                                                               $1,755                     $2 195
+ 3                                                                               $875                       $1 090
+
+By way of another example, item [7] of Schedule 3 to the Amendment Regulations repeals paragraph
+1114B(2)(a) of Schedule 1 of the Migration Regulations and substitutes, in part, new subparagraph
+1114B(2)(a)(ii).
+
+New subparagraph 1114B(2)(a)(ii) sets out the first instalment of VAC for applicants for the
+Employer Nomination (Permanent) (Class EN) visa that exclude those covered by subparagraph
+1114B(2)(a)(i). The applicants covered by subparagraph 1114B(2)(a)(i) are those applicants who
+hold a valid passport issued by a Pacific-regional country.
+
+The VAC is as follows:
+
+ First instalment
+ Item     Component                                                                                             Amount
+ 1        Base application charge                                                                               $6 140
+ 2        Additional applicant charge for an applicant who is at least 18                                       $3 070
+ 3        Additional applicant charge for an applicant who is less than 18                                      $1 535
+
+The table below sets out a comparison between the first instalment of the VAC prior to the increase
+and post VAC increase.
+
+ Table item of the table under paragraph
+                                                                2025-26 baseline                       2026-27 baseline
+ 1114B(2)(a) and new subparagraph
+                                                                amount ($)                             amount
+ 1114B(2)(a)(ii) of Schedule 1 (respectively)
+ 1                                                              $4 910                                 $6 140
+ 2                                                              $2 455                                 $3 070
+ 3                                                              $1 230                                 $1 535
+
+Increase base application charge component of the first instalment of VAC for a Student
+(Temporary) (Class TU) visa
+
+The increase of the base application charge component of the first instalment of VAC for a Student
+(Temporary) (Class TU) visa supports the Government’s approach to strengthening the integrity and
+sustainability of the international Student visa program and the international education sector. The
+VAC is a small component of the overall cost of education in Australia as an international student.
+The VAC increase is aimed at balancing these costs against the value gained by Student visa holders
+accessing Australia’s high quality education system and accessing the Australian labour market, with
+limited work rights as a Student visa holder. The VAC increases also promote the general welfare of
+
+                                                           35
+
+
+                       Authorised Version Explanatory Statement registered 30/06/2026 to F2026L00874
+Australian society by ensuring managed, sustainable migration growth and restoring integrity in the
+international education sector.
+
+The specific amendment is made by the amendment in item [42] of Schedule 3 to the Amendment
+Regulations, which repeals the table under subparagraph 1222(2)(a)(ii) of Schedule 1 to the
+Migration Regulations and substitutes a new table as follows.
+
+ First instalment
+ Item     Component                                                                                               Amount
+ 1        Base application charge                                                                                 $2 500
+ 2        Additional applicant charge for any other applicant who is at least 18                                  $1 530
+ 3        Additional applicant charge for any other applicant who is less than 18                                 $500
+
+The table below sets out a comparison between the first instalment of the VAC prior to the increase
+and post VAC increase.
+
+ Table item of the table under subparagraph
+                                                                  2025-26 baseline                       2026-27 baseline
+ 1222(2)(a)(ii) and subparagraph 1222(2)(a)(ii)
+                                                                  amount ($)                             amount
+ of Schedule 1 (respectively)
+ 1                                                                $2 000                                 $2 500
+ 2                                                                $1 225                                 $1 530
+ 3                                                                $400                                   $500
+
+The additional applicant charges component in table items 2 and 3 under subparagraph 1222(2)(a)(ii)
+is increased by 25 percent from their 2025-26 baseline amounts consistent with the general VAC
+increase to give effect to the 2026-2027 Budget Measures and ongoing policy to increase the VAC.
+
+The increase of VAC for applicants of the Student (Temporary) (Class TU) does not apply to the
+following applicants:
+    •    an applicant who is enrolled in ELICOS or a non-award course and is from a country that is part of
+         ASEAN;
+
+•       an applicant who holds a valid passport issued by a Pacific-regional country.
+
+VAC increase for applicants who are enrolled in ELICOS or non-award courses and are from
+ASEAN countries
+
+The increase in VACs for applicants who are enrolled in ELICOS or non-award courses and are from
+ASEAN countries, by CPI of 2.6 per cent from their 2025–26 baseline amounts, is intended to
+support the competitiveness and sustainability of Australia’s international education sector.
+
+Maintaining existing VAC levels for these Student (Temporary) (Class TU) visa applicant cohorts:
+•       mitigates potential market disruption in price sensitive student cohorts;
+•       supports diversification of source countries in line with the government’s Southeast Asia
+        strategy; and
+•       ensures continued access for entry level education pathways that are particularly fee sensitive.
+
+                                                             36
+
+
+                         Authorised Version Explanatory Statement registered 30/06/2026 to F2026L00874
+The specific amendments are made by the amendments in items [40], [41] and [43] of Schedule 3 to
+the Amendment Regulations.
+
+Item [41] of Schedule 3 to the Amendment Regulations inserts new subparagraphs 1222(2)(a)(ib)
+and 1222(2)(a)(ic) into Schedule 1 to the Migration Regulations.
+
+New subparagraph 1222(2)(a)(ib) provides that set out the first instalment of the VAC for each of the
+following applicants of the Student (Temporary) (Class TU) visa:
+•    an applicant (the primary applicant) who is seeking to satisfy the primary criteria for the grant
+     of a Subclass 500 (Student) visa and who holds a valid passport issued by a country specified
+     in subitem (5A);
+•    an applicant whose application is combined, or sought to be combined, with an application
+     made by the primary applicant;
+•    an applicant who claims to be member of the family unit of a person who both holds a Subclass
+     500 (Student) visa, having satisfied the primary criteria for that visa, and who holds a valid
+     passport issued by a country specified in subitem (5A).
+
+New subparagraph 1222(2)(a)(ic) provides that set out the first instalment of the VAC for each of the
+following applicants of the Student (Temporary) (Class TU) visa:
+•    an applicant (the primary applicant) who is seeking to satisfy the primary criteria for the grant
+     of a Subclass 500 (Student) visa on the basis of enrolment in an ELICOS or non-award course,
+     and who does not hold a valid passport issued by a Pacific-regional country or a country
+     specified in subitem (5A);
+•    an applicant whose application is combined, or sought to be combined, with an application
+     made by the primary applicant;
+•    an applicant who claims to be member of the family unit of a person who both holds a Subclass
+     500 (Student) visa, having satisfied the primary criteria for that visa on the basis of enrolment
+     in an ELICOS or non-award course, and who does not hold a valid passport issued by a
+     Pacific-regional country or a country specified in subitem (5A).
+
+The VAC for applicants seeking to satisfy subparagraph 1222(2)(a)(ib) or 1222(2)(a)(ic) is the same
+and is as follows:
+
+ First instalment
+ Item     Component                                                                                    Amount
+ 1        Base application charge                                                                      $2 050
+ 2        Additional applicant charge for any other applicant who is at least 18                       $1 255
+ 3        Additional applicant charge for any other applicant who is less than 18                      $410
+
+The effect of these amendments is that applicants to which the VAC applies are subject to a VAC
+increased by the CPI of 2.6 percent from their 2025-26 baseline amounts.
+
+The table below sets out a comparison between the first instalment of the VAC prior to the increase
+and post VAC increase.
+
+                                                           37
+
+
+                       Authorised Version Explanatory Statement registered 30/06/2026 to F2026L00874
+ Table item of the table under subparagraph
+ 1222(2)(a)(ii) and new subparagraphs                           2025-26 baseline                       2026-27 baseline
+ 1222(2)(a)(ib) and 1222(2)(a)(ic) of Schedule 1                amount ($)                             amount
+ (respectively)
+ 1                                                              $2 000                                 $2 050
+ 2                                                              $1 225                                 $1 255
+ 3                                                              $400                                   $410
+
+For the purposes of setting out the countries that are excluded by new subparagraph 1222(2)(a)(ib)
+and included by new subparagraph 1222(2)(a)(ic), item [43] of Schedule 3 to the Amendment
+Regulations repeals subitem 1222(5A) of Schedule 1 to the Migration Regulations and substitutes
+new subitem 1222(5A) in its place.
+
+New subitem 1222(5A) has the effect that, for the purposes of subparagraphs (2)(a)(ib) and (ic),
+Brunei, Cambodia, Indonesia, Laos, Malaysia, Myanmar, Philippines, Singapore, Thailand, and
+Vietnam are specified.
+
+VAC increase for applicants who are citizens of Pacific Island countries and Timor-Leste
+
+The VAC amendments for visa applicants who are citizens of Pacific Island countries or Timor-Leste
+ensure that those applicants continue to benefit from concessional VAC arrangements for all eligible
+VACs to which indexation is applied.
+
+Below are examples of relevant VAC increases made by amendments made by items in Schedule 3
+to the Amendment Regulations.
+
+For example, item [2] of Schedule 3 to the Amendment Regulations repeals paragraph 1104BA(2)(a)
+of Schedule 1 to the Migration Regulations and substitutes, in part, new subparagraph
+1104BA(2)(a)(i).
+
+New subparagraph 1104BA(2)(a)(i) sets out the first instalment of VAC for applicants for the
+Business Skills (Permanent) (Class EC) visa that exclude those covered by subparagraph
+1104BA(2)(a)(ii); see related example of VAC increases for VAC increases by 25 percent.
+
+The applicants covered by subparagraph 1104BA(2)(a)(i) are those applicants who hold a valid
+passport issued by a Pacific-regional country or who seek to combine his or her application with an
+application made by an applicant who holds such a passport.
+
+The VAC is as follows:
+
+ First instalment
+ Item      Component                                                                                             Amount
+ 1         Base application charge                                                                               $3 590
+ 2         Additional applicant charge for an applicant who is at least 18                                       $1 800
+ 3         Additional applicant charge for an applicant who is less than 18                                      $895
+
+                                                           38
+
+
+                       Authorised Version Explanatory Statement registered 30/06/2026 to F2026L00874
+The table below sets out a comparison between the first instalment of the VAC prior to the increase
+and post VAC increase.
+
+ Table item of the table under paragraph 1104BA(2)(a)                            2025-26                    2026-27
+ and new subparagraph 1104BA(2)(a)(i) of Schedule 1                              baseline                   baseline
+ (respectively)                                                                  amount ($)                 amount
+ 1                                                                               $3 500                     $3 590
+ 2                                                                               $1 755                     $1 800
+ 3                                                                               $875                       $895
+
+By way of another example, item [7] of Schedule 3 to the Amendment Regulations repeals paragraph
+1114B(2)(a) of Schedule 1 of the Migration Regulations and substitutes, in part, new subparagraph
+1114B(2)(a)(i).
+
+New subparagraph 1114B(2)(a)(i) sets out the first instalment of VAC for applicants for the
+Employer Nomination (Permanent) (Class EN) visa that exclude those covered by subparagraph
+1114B(2)(a)(ii); see related example of VAC increases for VAC increases by 25 percent.
+
+The applicants covered by subparagraph 1114B(2)(a)(i) are those applicants who hold a valid
+passport issued by a Pacific-regional country or who seek to combine his or her application with an
+application made by an applicant who holds such a passport.
+
+The VAC is as follows:
+
+ First instalment
+ Item     Component                                                                                             Amount
+ 1        Base application charge                                                                               $5 035
+ 2        Additional applicant charge for an applicant who is at least 18                                       $2 515
+ 3        Additional applicant charge for an applicant who is less than 18                                      $1 260
+
+The table below sets out a comparison between the first instalment of the VAC prior to the increase
+and post VAC increase.
+
+ Table item of the table under paragraph
+                                                                2025-26 baseline                       2026-27 baseline
+ 1114B(2)(a) and new subparagraph
+                                                                amount ($)                             amount
+ 1114B(2)(a)(i) of Schedule 1 (respectively)
+ 1                                                              $4 910                                 $5 035
+ 2                                                              $2 455                                 $2 515
+ 3                                                              $1 230                                 $1 260
+
+
+
+
+                                                           39
+
+
+                       Authorised Version Explanatory Statement registered 30/06/2026 to F2026L00874
+Specific VAC increases
+
+The specific increases align VAC settings more closely with the purpose and use of Work and
+Holiday (Temporary) (Class US) visa, Working Holiday (Temporary) (Class TZ) visa, Return
+(Residence) (Class BB) visa, Bridging B (Class WB) visa, and New Zealand Citizen (Family
+Relationship) (Temporary) (Class UP) visa, including repeat or discretionary applications, and better
+reflect administrative costs and demand patterns. Applying bespoke increases avoids compounding
+impacts from the general uplift and ensures charges remain proportionate to policy intent.
+
+For example, item [44] of Schedule 3 to the Amendment Regulations repeals subparagraph
+1224A(2)(a)(ii) of Schedule 1 to the Migration Regulations and substitutes in its place new
+subparagraphs 1224A(2)(a)(ii), (iii) and (iv) to set out specific VACs.
+
+New subparagraph 1224A(2)(a)(ii) provides that for an applicant who is not in such a class of
+persons and who holds a valid passport issued by a Pacific-regional country, the VAC is 690 AUD.
+
+New subparagraph 1224A(2)(a)(iii) provides that for an applicant who is not in such a class of
+persons, who does not hold a valid passport issued by a Pacific-regional country and is not, and has
+not previously been, in Australia as the holder of a Subclass 462 (Work and Holiday) visa other than
+an offshore COVID-19 affected visa, the VAC is 840 AUD.
+
+New subparagraph 1224A(2)(a)(iv) provides that for any other applicant (being applicants other than
+those covered by subparagraph 1224A(2)(a)(i), (ii), (iii) or (iv), the VAC is 1 000 AUD.
+
+
+
+
+                                                           40
+
+
+                       Authorised Version Explanatory Statement registered 30/06/2026 to F2026L00874
+
