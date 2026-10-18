@@ -6,7 +6,13 @@
 %%
 %%   200 {"date": "2026-10-16", "rates": {"VND": 17970, "USD": 0.6947},
 %%        "source": "https://www.rba.gov.au/statistics/frequency/exchange-rates.html"}
+%%        "bank": {"name": "Vietcombank", "time": "2026-10-18T10:10:02+07:00",
+%%                 "buy_cash": 17558.08, "buy_transfer": 17735.44, "sell": 18303.86,
+%%                 "source": "https://www.vietcombank.com.vn/…"} | null}
 %%   404 {"error": "no_rate", "rates": null}   — nothing stored yet and the feed unread
+%%
+%% `bank` (behavior 130) is a bank's reference price, not a government figure; it is read
+%% and kept by fh_shell_vcb, and null when no quote is stored.
 %%
 %% Unlike its neighbours this handler does not proxy the engine: the rate is not a KB
 %% fact and no plan figure uses it, so the shell reads the RBA itself and keeps the rows
@@ -26,7 +32,9 @@ init(Req0, State) ->
         <<"GET">> ->
             Req = case current() of
                 {ok, Rate} ->
-                    fh_shell_http:reply_json(200, Rate, Req0);
+                    %% Behavior 130: Vietcombank's quote rides beside the RBA's rate.
+                    fh_shell_http:reply_json(200,
+                        Rate#{<<"bank">> => fh_shell_vcb:current()}, Req0);
                 none ->
                     fh_shell_http:reply_json(404,
                         #{<<"error">> => <<"no_rate">>, <<"rates">> => null}, Req0);

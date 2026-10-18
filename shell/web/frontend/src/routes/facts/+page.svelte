@@ -149,7 +149,7 @@
                         </div>
                     </section>
                 {/if}
-                <p class="fp-note">{$t('intro.sources.note')}</p>
+                <p class="fp-note">{$t('factspage.note')}</p>
                 {#if fx}<div id="fp-fx" class="fp-anchor"><FxRate rate={fx} /></div>{/if}
                 {#each ordered as doc (doc.slug)}
                     <section class="fp-section" id={doc.slug} aria-labelledby="fp-{doc.slug}">
