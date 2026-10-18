@@ -113,6 +113,38 @@ export function pageRank(slug: string): number {
     return i < 0 ? PAGE_ORDER.length : i;
 }
 
+/** Behavior 126: the key figures that open /facts — each names a KB fact by doc and id
+ *  (and, for a list, its highlighted item), so its value is the card's own, never typed
+ *  here. `rank`: the highlighted item's place by value ("Vietnam is 3rd"). The rate (fx)
+ *  comes from GET /api/fx, drawn by the page. */
+export interface KeyFigureSpec {
+    key: string;
+    slug: string;
+    fact: string;
+    pick?: 'highlight';
+    rank?: boolean;
+}
+export const KEY_FIGURES: KeyFigureSpec[] = [
+    { key: 'visa189', slug: 'kb.facts.visa-charges', fact: 'skilled_employer', pick: 'highlight' },
+    { key: 'gdp', slug: 'kb.facts.australian-economy', fact: 'real_gdp_growth' },
+    { key: 'population', slug: 'kb.facts.australian-property', fact: 'population_growth' },
+    { key: 'wage', slug: 'kb.facts.living-in-australia', fact: 'minimum_wage' },
+    { key: 'vnrank', slug: 'kb.facts.vietnamese-in-australia', fact: 'firb_top_sources_quarter', rank: true }
+];
+
+/** The figure a spec names, formatted as its card formats it; null when the KB lacks it. */
+export function keyFigure(docs: FactDoc[], spec: KeyFigureSpec, lang: Lang): { value: string; rank?: number } | null {
+    const f = docs.find((d) => d.slug === spec.slug)?.facts.find((x) => x.id === spec.fact);
+    if (!f) return null;
+    if (spec.rank) {
+        const items = [...(f.items ?? [])].sort((a, b) => b.value - a.value);
+        const i = items.findIndex((x) => x.highlight);
+        return i < 0 ? null : { value: String(i + 1), rank: i + 1 };
+    }
+    const v = spec.pick ? f.items?.find((x) => x.highlight)?.value : f.value;
+    return v === undefined ? null : { value: formatValue(v, f.unit, lang, f.decimals) };
+}
+
 export function pick(l: Label | undefined, lang: Lang): string {
     if (!l) return '';
     return typeof l === 'string' ? l : (l[lang] ?? l.en);
