@@ -16,7 +16,12 @@ const config = {
             fallback: 'index.html',
             precompress: false,
             strict: true
-        })
+        }),
+        // Behavior 135: every merge rebuilds the bundle (Cloudflare Pages, measured
+        // 2026-10-19: version.json 4 min after the merge); the page asks for
+        // _app/version.json once a minute, and +layout.svelte loads a new bundle at the
+        // next move between pages or return to the tab (`updated` from $app/state).
+        version: { pollInterval: 60_000 }
     }
 };
 

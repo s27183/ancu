@@ -11,6 +11,7 @@
     import { afterNavigate } from '$app/navigation';
     import { page } from '$app/state';
     import { getAllNews, type NewsNote } from '$lib/api';
+    import { onContentChange } from '$lib/stores/content';
     import NewsTicker from '$lib/NewsTicker.svelte';
     import NewsListSheet from '$lib/NewsListSheet.svelte';
     import NewsDetailSheet from '$lib/NewsDetailSheet.svelte';
@@ -25,6 +26,8 @@
 
     onMount(() => {
         getAllNews().then((n) => (news = n));
+        // Behavior 135: a replaced KB re-reads in place; an empty answer keeps the band.
+        return onContentChange(() => getAllNews().then((n) => n.length && (news = n)));
     });
     // The band outlives a page change (it is the layout's); its sheets do not.
     afterNavigate(() => {

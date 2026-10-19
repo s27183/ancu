@@ -18,7 +18,8 @@
         dismissSessionExpired
     } from '$lib/stores/session';
     import { loginOpen } from '$lib/stores/ui';
-    import { goto } from '$app/navigation';
+    import { goto, beforeNavigate } from '$app/navigation';
+    import { updated } from '$app/state';
     import { signinFlag, type SigninFlag } from '$lib/auth';
     import { pendingPage } from '$lib/pendingOnboarding';
     import NewsBand from '$lib/NewsBand.svelte';
@@ -27,8 +28,31 @@
     import AllowanceSheet from '$lib/AllowanceSheet.svelte';
     import TermCard from '$lib/TermCard.svelte';
     import { loadTerms } from '$lib/terms';
+    import { watchContent, fetchKbVersion } from '$lib/contentWatch';
+    import { contentRevision } from '$lib/stores/content';
 
     let { children }: { children: import('svelte').Snippet } = $props();
+
+    // Regulated figures are grounded -> P-7 -> The web frontend -> a new bundle loads between reads, never under one (behavior 135)
+    // SvelteKit polls _app/version.json (svelte.config.js version.pollInterval) and sets
+    // `updated.current` when the deployed bundle is newer than this page's. The new bundle
+    // is loaded at the reader's next move between pages (a full load of where they were
+    // going) or when a tab left in the background is shown again — never while they read
+    // or type on one page. An onboarding in progress survives it: its answers are in
+    // sessionStorage after each tap (onboardingDraft.ts), and /plan reopens them.
+    beforeNavigate(({ willUnload, to, cancel }) => {
+        if (!updated.current || willUnload || !to?.url) return;
+        cancel();
+        location.href = to.url.href;
+    });
+    onMount(() => {
+        const onShow = async () => {
+            if (document.visibilityState !== 'visible') return;
+            if (updated.current || (await updated.check())) location.reload();
+        };
+        document.addEventListener('visibilitychange', onShow);
+        return () => document.removeEventListener('visibilitychange', onShow);
+    });
 
     // Bilingual -> The web frontend -> what every page shares
     // Behavior 81: the home, the planner (/plan) and the map (/explore) are three pages,
@@ -46,6 +70,19 @@
     onMount(() => {
         refreshSession();
         void loadTerms(); // behavior 102: the term list every page marks with
+        // Behavior 135: a deploy that replaced the KB reaches this open page without a
+        // reload — the watch sees the engine's hash move; the terms re-load here, and
+        // each view that shows news or facts re-fetches them (stores/content.ts).
+        const stopWatch = watchContent({
+            fetchVersion: () => fetchKbVersion(),
+            onChange: () => {
+                void loadTerms(fetch, true);
+                contentRevision.update((n) => n + 1);
+            },
+            doc: document,
+            setInterval: (f, ms) => window.setInterval(f, ms),
+            clearInterval: (id) => window.clearInterval(id as number)
+        });
         const flag = signinFlag(window.location.search);
         if (flag) {
             banner = flag;
@@ -56,6 +93,7 @@
         }
         const to = window.location.pathname === '/' ? pendingPage() : null;
         if (to) void goto(`/${to}`, { replaceState: true });
+        return stopWatch;
     });
 
     // Honest-partial -> P-5 · Metering, not gating -> The web frontend -> the visitor's menu

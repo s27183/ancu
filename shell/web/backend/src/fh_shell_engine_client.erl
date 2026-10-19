@@ -17,7 +17,7 @@
          attach_property/3, set_transaction_dates/4, upload_document/4, stream_events/3,
          list_suburbs/1, get_usage_events/2, start_httpc_profiles/0,
          get_news/2, dismiss_news/3, list_all_news/0, list_facts/0,
-         list_terms/0]).
+         list_terms/0, content_version/0]).
 
 %% Dedicated httpc profile for the LONG-LIVED SSE stream proxy (stream_events/3).
 %% SSE requests run with {timeout, infinity} and hold an httpc session for the entire
@@ -309,6 +309,18 @@ list_facts() ->
 list_terms() ->
     Token = fh_shell_engine_jwt:mint(#{user_id => ?ANON_USER_ID}),
     Url = base_url() ++ "/terms",
+    Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
+    {ok, {{_, Status, _}, _, Resp}} =
+        httpc:request(get, {Url, Headers},
+                      [{timeout, ?RPC_TIMEOUT_MS}], [{body_format, binary}]),
+    {Status, Resp}.
+
+%% The loaded KB's hash — GET /api/engine/version (behavior 135); same anonymous
+%% tenant-JWT posture as list_terms/0.
+-spec content_version() -> {non_neg_integer(), binary()}.
+content_version() ->
+    Token = fh_shell_engine_jwt:mint(#{user_id => ?ANON_USER_ID}),
+    Url = base_url() ++ "/version",
     Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
     {ok, {{_, Status, _}, _, Resp}} =
         httpc:request(get, {Url, Headers},
