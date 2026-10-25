@@ -20,6 +20,14 @@ PR, because the one open kb-watch PR (#164) already covered the day's visa relea
 it restored `visa-watch.json` as step 2 says. It guessed four news-page addresses
 wrong (404) or was refused (403), so step 2 names each page.
 
+**Why a script lists the news (behavior 136, Son 2026-10-25: "there have been few
+KB PRs but no news were detected").** Reading the pages by eye, PRs #168–170 took
+QRO's and ASIC's script-rendered pages for quiet and skipped Treasury's 16 Oct
+housing ministers' communiqué as "before the window" (the newest note's
+`authored_date`). Step 2 now runs `scripts/news_watch.py`, which reads each source in
+the form that carries its items (QRO's RSS, ASIC's newsroom JSON, the ministers'
+dated lists) from a stored `since`, and the PR accounts for every line it prints.
+
 **How it stays inside the gate.** Its branch is `kb-watch-news-<yyyy-mm-dd>`, so
 scripts/kb_gate.py (`BRANCH_PREFIX = "kb-watch-"`) judges it as it judges kb-watch,
 and kb-verify, now daily ([kb-verify-routine.md](kb-verify-routine.md)), re-reads
@@ -47,28 +55,29 @@ existing news note in `docs/kb/news/` as the shape to copy.
    `git diff --name-only --diff-filter=A origin/main...B -- docs/kb/news`, and read
    their sources. Those, and every note already in `docs/kb/news/` on main, are covered:
    never write a second note for the same change. Note also whether any B changes
-   `docs/sources/homeaffairs/visa-watch.json`.
+   `docs/sources/homeaffairs/visa-watch.json` or `docs/sources/news-watch.json`.
 
-2. News. Find each change a Vietnamese buyer of Australian property would care about,
-   published since the newest `authored_date` among the covered notes, on these
-   government news pages (curl with `-A Mozilla/5.0 -L`; each answered 200 on
-   2026-10-19 unless noted):
-   - https://www.rba.gov.au/rss/rss-cb-media-releases.xml
-   - https://asic.gov.au/newsroom/media-releases/
-   - https://www.ato.gov.au/media-centre (refused a cloud run with 403 on 2026-10-19)
-   - https://treasury.gov.au/media-release and https://budget.gov.au/
-   - https://www.revenue.nsw.gov.au/news-media-releases
-   - https://www.sro.vic.gov.au/news
-   - https://qro.qld.gov.au/news/
-   - https://www.revenuesa.sa.gov.au/news (refused with 403 on 2026-10-19)
-   - https://www.wa.gov.au/government/media-statements (WA ministers; RevenueWA has no
-     news page of its own)
-   - https://foreigninvestment.gov.au/news-and-reports/news (FIRB; firb.gov.au's
-     certificate does not match its name)
-   - https://www.housingaustralia.gov.au/media
-   Government sources only: no news outlet, blog or aggregator. A page that refuses or
-   moved is reported in the PR body (or the final line), never replaced by a non-government
-   page.
+2. News. Run `python3 scripts/news_watch.py --update`. It reads every government
+   source in `docs/sources/news-watch.json` (RBA, ASIC, ATO, Treasury and its
+   ministers, Budget, Revenue NSW, SRO Vic, QRO, RevenueSA, WA, FIRB, Housing
+   Australia) and prints, per source, each item dated on or after the file's `since`
+   (`ITEM <date> <source> <title> <url>`), or `<source>: no items since <date>`, or
+   `COULD NOT READ <source> …`; then it moves `since` to yesterday. Never narrow the
+   window yourself: an item it prints is in the window, even if it is older than the
+   newest note. Every `ITEM` line is a candidate: if a note on main or an open
+   `kb-watch-*` branch from step 1 already covers it, say which; otherwise open it with
+   curl (`-A Mozilla/5.0 -L`), and write a note if a Vietnamese buyer of Australian
+   property would care, or give in one phrase why not (an enforcement action against
+   one adviser, a payroll-tax login change). A `MORE` line means the source's list may
+   go further back than its first page: open the page it names and treat each item on
+   or after `since` there as an `ITEM`. An `OFF-LIST` line is a link off *.gov.au or a
+   redirect off the source's host: never open it, and cite nothing from it.
+   Government sources only: no news outlet, blog or aggregator. A source that prints
+   `COULD NOT READ` is named unread in the PR body (or the final line), never taken as
+   quiet and never replaced by a non-government page.
+   Commit `docs/sources/news-watch.json` (its new `since`) only if no open branch from
+   step 1 changes it; otherwise restore it
+   (`git checkout -- docs/sources/news-watch.json`) and leave it to that PR.
    Visa news (Home Affairs and its ministers): run `python3 scripts/visa_watch.py
    --update`. Each `RELEASE` or `PAGE` line it prints is a candidate: open it with
    curl (never WebFetch, which Home Affairs refuses), read only what changed, and write
@@ -105,19 +114,23 @@ existing news note in `docs/kb/news/` as the shape to copy.
    `engine/erlang/priv/kb/artifact.json` (it is untracked). If a check cannot run in your
    environment, say which and why in the PR body.
 
-4. Publish. If you wrote no note and `visa-watch.json` is unchanged (or restored), open no
-   PR and end with one line saying so. Otherwise: branch `kb-watch-news-<yyyy-mm-dd>` from
+4. Publish. If you wrote no note and both `visa-watch.json` and `news-watch.json` are
+   unchanged (or restored), open no PR and end with every line step 2's scripts printed,
+   each with its outcome. Otherwise: branch `kb-watch-news-<yyyy-mm-dd>` from
    `main`, one commit per note (its source copies and terms with it) and one for
-   `visa-watch.json` if it changed, push, and open a PR titled `news-watch <yyyy-mm-dd>`
+   the watch files that changed, push, and open a PR titled `news-watch <yyyy-mm-dd>`
    whose body has:
    - the news notes added, each with its EN headline and source
+   - the news check: every `ITEM` line news_watch.py printed with its outcome (the note
+     written, the reason none, or the note or open PR that already covers it), every
+     `MORE` line with what its page held, every `OFF-LIST` line as printed, and every
+     `COULD NOT READ` line as printed — never a summary in their place
    - the visa check: each `PAGE`/`RELEASE` line with what you did with it (a note, why
      none, or the open PR that already covers it), each `COULD NOT READ` line as printed,
      or the one line `Home Affairs visa check: no change since <date>`
-   - the government sites you checked and any you could not read, with why
    - any check that could not run
-   The first line of the body says: "Opened by the daily news-watch routine (behavior
-   134). The kb-gate check merges it when every note is verified; otherwise it waits for
+   The first line of the body says: "Opened by the daily news-watch routine (behaviors
+   134, 136). The kb-gate check merges it when every note is verified; otherwise it waits for
    Son."
    Change nothing in the PR after the kb-verify routine has commented on it, unless a
    check failed.
