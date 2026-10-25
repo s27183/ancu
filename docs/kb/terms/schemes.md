@@ -64,6 +64,26 @@ The federal first-home schemes the plan checks a buyer against: the guarantee th
         "en": "It is cash towards the deposit, but it usually requires citizenship or permanent residency and that you live in the home — check your state's conditions before counting on it."
       },
       "kb": "kb.scheme.nsw.fhog"
+    },
+    {
+      "id": "help_to_buy",
+      "name": {
+        "vi": "Chương trình đồng sở hữu Help to Buy",
+        "en": "Help to Buy"
+      },
+      "forms": [
+        "Help to Buy",
+        "Help to Buy scheme"
+      ],
+      "meaning": {
+        "vi": "Chương trình đồng sở hữu của chính phủ liên bang do Housing Australia quản lý: chính phủ góp một phần tiền mua nhà và sở hữu phần tương ứng của căn nhà, nên bạn vay ít hơn. Đây không phải khoản vay, trợ cấp hay bảo lãnh.",
+        "en": "A federal shared-equity scheme run by Housing Australia: the government contributes part of the purchase price and owns that share of the home, so you borrow less. It is not a loan, grant or guarantee."
+      },
+      "why": {
+        "vi": "Chỉ công dân Úc mới tham gia được (thường trú nhân thì không), và khi bán nhà bạn phải hoàn lại phần của chính phủ theo giá trị lúc đó — nên nó thay đổi cả khoản vay lẫn phần lời khi bán.",
+        "en": "Only Australian citizens can use it (permanent residents cannot), and when you sell you repay the government's share at the home's value then — so it changes both the loan and your gain on sale."
+      },
+      "kb": "kb.scheme.help-to-buy"
     }
   ]
 }
