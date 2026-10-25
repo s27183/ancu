@@ -6,7 +6,12 @@
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <!-- = app.css --bg / --chrome: the browser paints its bars in this (behavior 63). -->
         <meta name="theme-color" content="#f6f4ef" />
+        <style>
+            /* Behavior 137: the page's text for crawlers (scripts/seo.ts); the app shows it once script runs. */
+            .js #seo-static { display: none; }
+        </style>
         <script>
+            document.documentElement.classList.add('js');
             // Apply the persisted language to <html> before first paint (no flicker).
             // Default is vi (the product is VI-first; bilingual-content.md). localStorage
             // can throw in private mode — swallow and keep the markup default.

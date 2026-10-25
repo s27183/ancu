@@ -1,0 +1,11 @@
+{
+  "deployment_configs": {
+    "production": {
+      "env_vars": {
+        "NODE_VERSION": { "type": "plain_text", "value": "22" },
+        "SHELL_ORIGIN": { "type": "plain_text", "value": "https://api.maiancu.com" },
+        "VITE_PMTILES_URL": { "type": "plain_text", "value": "https://tiles.maiancu.com/planet.pmtiles" }
+      }
+    }
+  }
+}
