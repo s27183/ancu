@@ -217,9 +217,13 @@ browser calls it directly).
 
 ### Frontend (Cloudflare Pages project `maiancu`) — set by API
 
+Production and Preview carry the same three values (behavior 137: a branch preview with
+no `SHELL_ORIGIN` answers `/api` with 503, and with no `NODE_VERSION` builds on the
+image's default Node). The request bodies are `shell/web/frontend/deploy/pages-env-*.json`.
+
 | Var | Kind | Value |
 |---|---|---|
-| `NODE_VERSION` | build | `20` |
+| `NODE_VERSION` | build | `22` — the build runs `node scripts/seo_pages.ts`, which needs Node's type stripping (22.18+); Node 20 cannot run it (measured 2026-10-25: production built on 20.20.0, the preview on the image default 22.23.4) |
 | `VITE_PMTILES_URL` | **build** | Protomaps pmtiles basemap URL (8-S2d). Vite inlines `import.meta.env.VITE_*` at **build** time, so this is a Pages **build** env var. Unset → the `minimalStyle` fallback (no basemap, no regression). Prod: `https://tiles.maiancu.com/planet.pmtiles` — the whole-world planet in R2 bucket `maiancu-tiles` (map-stack.md, behavior 40). |
 | `SHELL_ORIGIN` | **runtime** | the shell backend origin the Pages **Function** proxies to (`https://api.maiancu.com`). Read by `functions/api/[[path]].js` + `functions/health.js` at request time — a Pages **runtime** env var, NOT a `VITE_` build var. Unset → the proxy 503s. |
 
