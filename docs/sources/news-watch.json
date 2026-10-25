@@ -1,0 +1,114 @@
+{
+  "since": "2026-10-15",
+  "sources": [
+    {
+      "name": "rba",
+      "kind": "rss",
+      "url": "https://www.rba.gov.au/rss/rss-cb-media-releases.xml",
+      "list": "https://www.rba.gov.au/media-releases/"
+    },
+    {
+      "name": "asic",
+      "kind": "asic-json",
+      "url": "https://download.asic.gov.au/asic-nga/data/newsroom/newsroom-mr-latest.json",
+      "note": "asic.gov.au/newsroom/media-releases/ is rendered by script from this file"
+    },
+    {
+      "name": "ato",
+      "kind": "html",
+      "url": "https://www.ato.gov.au/media-centre",
+      "item": "<li class=\"[^\"]*result",
+      "link": "href=\"(?P<url>[^\"]+)\"[^>]*>(?P<title>.*?)</a>",
+      "note": "the list is rendered by a search script; refused a cloud run with 403 on 2026-10-19"
+    },
+    {
+      "name": "treasury",
+      "kind": "html",
+      "url": "https://treasury.gov.au/media-release",
+      "item": "<div class=\"views-row\">",
+      "link": "<a href=\"(?P<url>[^\"]+)\"[^>]*>(?P<title>.*?)</a>"
+    },
+    {
+      "name": "treasurer",
+      "kind": "html",
+      "url": "https://ministers.treasury.gov.au/ministers/jim-chalmers-2022/media-releases",
+      "item": "<div class=\"views-row\">",
+      "link": "<a href=\"(?P<url>[^\"]+)\"[^>]*>(?P<title>.*?)</a>",
+      "note": "ministers.treasury.gov.au/rss.xml is stale (newest item 2023) and the per-minister feed answers 404"
+    },
+    {
+      "name": "housing-minister",
+      "kind": "html",
+      "url": "https://ministers.treasury.gov.au/ministers/clare-oneil-2025/media-releases",
+      "item": "<div class=\"views-row\">",
+      "link": "<a href=\"(?P<url>[^\"]+)\"[^>]*>(?P<title>.*?)</a>"
+    },
+    {
+      "name": "assistant-treasurer",
+      "kind": "html",
+      "url": "https://ministers.treasury.gov.au/ministers/daniel-mulino-2025/media-releases",
+      "item": "<div class=\"views-row\">",
+      "link": "<a href=\"(?P<url>[^\"]+)\"[^>]*>(?P<title>.*?)</a>"
+    },
+    {
+      "name": "budget",
+      "kind": "page",
+      "url": "https://budget.gov.au/",
+      "note": "one page, dated by its Last-Modified header"
+    },
+    {
+      "name": "revenue-nsw",
+      "kind": "html",
+      "url": "https://www.revenue.nsw.gov.au/news-media-releases",
+      "item": "<li class=\"results__item\">",
+      "link": "href=\"(?P<url>[^\"]+)\".*?results__title\">(?P<title>.*?)</h3>",
+      "date": "results__date\">(.*?)</div>",
+      "note": "titles carry dates (\"Lodge by 31 October 2026\"), so the date is read from results__date"
+    },
+    {
+      "name": "sro-vic",
+      "kind": "html",
+      "url": "https://www.sro.vic.gov.au/about-us/news-and-events/news",
+      "item": "<div class=\"col-12[^\"]*\" data-tags=",
+      "link": "href=\"(?P<url>[^\"]+)\".*?<h3[^>]*>(?P<title>.*?)</h3>"
+    },
+    {
+      "name": "qro",
+      "kind": "rss",
+      "url": "https://qro.qld.gov.au/feed/",
+      "note": "qro.qld.gov.au/news/ is rendered by script"
+    },
+    {
+      "name": "revenuesa",
+      "kind": "html",
+      "url": "https://www.revenuesa.sa.gov.au/news",
+      "item": "<article",
+      "link": "href=\"(?P<url>[^\"]+)\"[^>]*>(?P<title>.*?)</a>",
+      "note": "refused with 403 on 2026-10-19 and 2026-10-25"
+    },
+    {
+      "name": "wa",
+      "kind": "html",
+      "url": "https://www.wa.gov.au/government/media-statements",
+      "item": "<div class=\"views-row\">",
+      "link": "href=\"(?P<url>[^\"]+)\"[^>]*>(?P<title>.*?)</a>",
+      "note": "WA ministers; RevenueWA has no news page. The HTML as served held no statement links on 2026-10-25"
+    },
+    {
+      "name": "firb",
+      "kind": "html",
+      "url": "https://foreigninvestment.gov.au/news-and-reports/news",
+      "item": "<div class=\"views-row\">",
+      "link": "<a href=\"(?P<url>[^\"]+)\"[^>]*>(?P<title>.*?)</a>",
+      "note": "firb.gov.au's certificate does not match its name"
+    },
+    {
+      "name": "housing-australia",
+      "kind": "html",
+      "url": "https://www.housingaustralia.gov.au/media",
+      "item": "<div class=\"card__wrapper\">",
+      "link": "card__title[^\"]*\" href=\"(?P<url>[^\"]+)\"[^>]*>(?P<title>.*?)</a>",
+      "date": "card__date\">(.*?)</div>"
+    }
+  ]
+}
