@@ -1,10 +1,10 @@
 ---
 slug: kb.building-pest.interpretation
 effective_from: 2025-07-01
-last_verified: 2026-07-06
+last_verified: 2026-10-25
 sources:
   - url: https://www.nsw.gov.au/housing-and-construction/buying-and-selling-property/buying-property-nsw
-    retrieved: 2026-07-06
+    retrieved: 2026-10-25
     note: "NSW Government — buyers must arrange building and pest inspections and request existing reports before purchase (Step 7). The inspection standards AS 4349.1 / AS 4349.3 / AS 3660 are Standards Australia texts, paywalled — cited by designation in the body, not openable. Repair-cost bands are market figures (INDICATIVE)."
 ---
 
