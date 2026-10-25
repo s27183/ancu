@@ -184,8 +184,11 @@ export function factsPage(docs: FactDoc[]): Page {
     const sections = docs.map((d) => {
         const items = d.facts
             .map((f) => {
-                const src = ([] as number[]).concat(f.source).map((i) => d.sources[i]?.url).filter((u): u is string => !!u && /^https?:\/\//.test(u));
-                const cite = src.length ? ` <a href="${escapeHtml(src[0])}">Nguồn · Source</a>` : '';
+                // Every source the fact cites — a rule and its exception, or a figure and
+                // the note under it — so a crawler reads each citation (behavior 137 Expect 2).
+                const idx = [...new Set(([] as number[]).concat(f.source, f.note_sources ?? []))];
+                const src = [...new Set(idx.map((i) => d.sources[i]?.url).filter((u): u is string => !!u && /^https?:\/\//.test(u)))];
+                const cite = src.map((u, k) => ` <a href="${escapeHtml(u)}">${k ? `Nguồn ${k + 1}` : 'Nguồn · Source'}</a>`).join('');
                 return `<li><strong>${escapeHtml(f.headline.vi)}</strong> <span lang="en">(${escapeHtml(f.headline.en)})</span>${factValue(f)}. ${escapeHtml(f.caption.vi)} <span lang="en">${escapeHtml(f.caption.en)}</span>${f.as_of ? ` (${escapeHtml(f.as_of)})` : ''}.${cite}</li>`;
             })
             .join('');

@@ -77,8 +77,11 @@ const ARTIFACT = {
         'kb.facts.x': {
             title: { vi: 'Số X', en: 'Figure X' },
             last_verified: '2026-10-18',
-            sources: [{ url: 'https://www.abs.gov.au/x' }],
-            facts: [{ id: 'x', visual: 'figure', unit: 'pct', value: 4.2, headline: { vi: 'Thất nghiệp 4,2%', en: 'Unemployment 4.2%' }, caption: { vi: 'c', en: 'c' }, as_of: '2025-12', source: 0 }]
+            sources: [{ url: 'https://www.abs.gov.au/x' }, { url: 'https://www.abs.gov.au/rule' }, { url: 'https://www.abs.gov.au/exception' }, { url: 'https://www.abs.gov.au/note' }],
+            facts: [
+                { id: 'x', visual: 'figure', unit: 'pct', value: 4.2, headline: { vi: 'Thất nghiệp 4,2%', en: 'Unemployment 4.2%' }, caption: { vi: 'c', en: 'c' }, as_of: '2025-12', source: 0 },
+                { id: 'y', visual: 'figure', unit: 'aud', value: 5, headline: { vi: 'Phí Y', en: 'Fee Y' }, caption: { vi: 'c', en: 'c' }, source: [1, 2], note_sources: [3, 1] }
+            ]
         }
     }
 } as never;
@@ -108,7 +111,9 @@ test('index pages, robots, sitemap and llms.txt', () => {
     const news = allNews(ARTIFACT);
     const facts = allFacts(ARTIFACT);
     assert.match(render(SHELL, newsIndexPage(news)).match(/<div id="seo-static">[\s\S]*<\/div>/)![0], /href="\/news\/a"[\s\S]*href="\/news\/b"/);
-    assert.match(render(SHELL, factsPage(facts)), /Thất nghiệp 4,2%[\s\S]*4\.2 pct[\s\S]*https:\/\/www.abs.gov.au\/x/);
+    const fp = render(SHELL, factsPage(facts));
+    assert.match(fp, /Thất nghiệp 4,2%[\s\S]*4\.2 pct[\s\S]*https:\/\/www.abs.gov.au\/x/);
+    for (const u of ['rule', 'exception', 'note']) assert.equal(fp.split(`href="https://www.abs.gov.au/${u}"`).length, 2, `every cited source linked once: ${u}`);
     assert.match(render(SHELL, homePage(news)), /<title>Mai An Cư — /);
     const r = robots();
     for (const ua of ['*', 'GPTBot', 'OAI-SearchBot', 'ChatGPT-User', 'ClaudeBot', 'Claude-SearchBot', 'PerplexityBot', 'Google-Extended', 'Googlebot', 'Bingbot']) assert.ok(r.includes(`User-agent: ${ua}\n`), ua);
