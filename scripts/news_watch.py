@@ -28,12 +28,20 @@ Holds:   the sources and the window in docs/sources/news-watch.json, each source
          line `<source>: no items since <since>`, or a COULD NOT READ line — a 200 page
          from which no item parses is COULD NOT READ, never quiet (R-1). A source whose
          every listed item is on or after `since` also prints MORE: its list may hold
-         older ones on a next page, which the routine opens.
+         older ones on a next page, which the routine opens — or the source's `list`
+         page, where its feed carries only the latest (RBA's RDF feed holds one item).
          On-or-after, and `--update` sets `since` to the day before the run, so an item
          dated in a time zone a day behind, or published the evening of a run, is listed
          again rather than missed; the routine skips what a note already covers.
          Dates: an RSS pubDate is taken in Sydney time; an ISO date in a page or JSON as
          written (Drupal's `2026-10-16T12:00:00Z` is the page's 16 October).
+Unread:  measured 2026-10-25 from the cloud routine and in Chrome, three sources stay
+         COULD NOT READ by design, named in every PR for a person to check: ATO (its list
+         is a coveo.com search behind Akamai's bot screen, 403), RevenueSA (Cloudflare's
+         "Just a moment…" challenge, 403) and WA (its statements come from an Elastic
+         Cloud search on Azure, not a gov.au host; wa.gov.au's sitemap lists none). The
+         script does not run a browser or answer a bot challenge to read them (Son asked
+         2026-10-25 whether Chrome could; decided no — evading a site's bot screen).
 Guards:  only https, only *.gov.au. A source is fetched hop by hop (no curl -L): a
          redirect off its own host, or off https, is reported OFF-LIST and not followed.
          An item whose link is not https on a *.gov.au host (another site, a look-alike,
@@ -144,14 +152,33 @@ def text_date(s: str) -> datetime.date | None:
     return None
 
 
+def _local(tag: str) -> str:
+    return tag.rsplit("}", 1)[-1]
+
+
+def _child(it, name: str) -> str:
+    for c in it:
+        if _local(c.tag) == name:
+            return c.text or ""
+    return ""
+
+
 def rss_items(body: str, base: str) -> list[dict]:
+    # RSS 2.0 (<item> in <channel>, pubDate) and RSS 1.0/RDF (RBA, measured 2026-10-25:
+    # <item> in the RSS 1.0 namespace beside <channel>, dated by dc:date in ISO form).
     out = []
-    for it in ET.fromstring(body.lstrip()).iter("item"):
-        when = email.utils.parsedate_to_datetime(it.findtext("pubDate") or "")
+    for it in ET.fromstring(body.lstrip()).iter():
+        if _local(it.tag) != "item":
+            continue
+        raw = _child(it, "pubDate")
+        if raw:
+            when = email.utils.parsedate_to_datetime(raw)
+        else:
+            when = datetime.datetime.fromisoformat(_child(it, "date").strip())
         if when.tzinfo is not None:
             when = when.astimezone(SYDNEY)
-        out.append({"date": when.date(), "title": clean(it.findtext("title") or ""),
-                    "url": urljoin(base, (it.findtext("link") or "").strip())})
+        out.append({"date": when.date(), "title": clean(_child(it, "title")),
+                    "url": urljoin(base, _child(it, "link").strip())})
     return out
 
 
@@ -238,8 +265,11 @@ def watch(state: dict, hop=curl_hop, pause=PAUSE_S) -> list[str]:
         if not new:
             lines.append(f"{name}: no items since {since}")
         elif len(new) == len(items) and src["kind"] != "page":
+            # A feed that carries only its latest items (RBA's carries one) names its
+            # browsable list in `list`; the routine opens that, not the feed again.
+            more_at = src["list"] if gov_url(src.get("list", "")) else final
             lines.append(f"MORE {name} all {len(items)} listed items are on or after {since};"
-                         f" older ones may be on a next page of {final}")
+                         f" older ones may be on a next page of {more_at}")
     return lines
 
 
@@ -276,6 +306,12 @@ def self_test() -> int:
            "<item><title>Feed off-list</title><link>https://example.com/x</link>"
            "<pubDate>Fri, 16 Oct 2026 04:27:37 +0000</pubDate></item>"
            "</channel></rss>")
+    rdf = ("<?xml version='1.0'?><rdf:RDF xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'"
+           " xmlns='http://purl.org/rss/1.0/' xmlns:dc='http://purl.org/dc/elements/1.1/'>"
+           "<channel><title>Media Releases</title></channel>"
+           "<item><title>Planted RDF</title><link>https://www.rba.gov.au/mr-26-29.html</link>"
+           "<dc:date>2026-10-16T14:00:00+11:00</dc:date></item>"
+           "</rdf:RDF>")
     asic = json.dumps([
         {"name": "26-256MR Planted JSON", "publishedDate": "2026-10-23T15:40:00Z",
          "url": "/about-asic/26-256mr"},
@@ -296,6 +332,8 @@ def self_test() -> int:
                 "date": r'results__date">(.*?)</div>'}
     state = {"since": "2026-10-15", "sources": [
         {"name": "rss", "kind": "rss", "url": "https://r.gov.au/feed/"},
+        {"name": "rdf", "kind": "rss", "url": "https://www.rba.gov.au/rss/x.xml",
+         "list": "https://www.rba.gov.au/media-releases/"},
         {"name": "json", "kind": "asic-json", "url": "https://download.j.gov.au/mr.json"},
         dict(html_src, name="html", url="https://h.gov.au/news"),
         {"name": "page", "kind": "page", "url": "https://b.gov.au/"},
@@ -308,6 +346,7 @@ def self_test() -> int:
     ]}
     served = {
         "https://r.gov.au/feed/": (200, {}, rss, ""),
+        "https://www.rba.gov.au/rss/x.xml": (200, {}, rdf, ""),
         "https://download.j.gov.au/mr.json": (200, {}, asic, ""),
         "https://h.gov.au/news": (200, {}, page, ""),
         "https://b.gov.au/": (200, {"last-modified": "Wed, 21 Oct 2026 02:19:36 GMT"},
@@ -330,6 +369,9 @@ def self_test() -> int:
     want = [
         "ITEM 2026-10-16 rss Planted & RSS https://r.gov.au/new",
         "OFF-LIST 2026-10-16 rss Feed off-list https://example.com/x",
+        "ITEM 2026-10-16 rdf Planted RDF https://www.rba.gov.au/mr-26-29.html",
+        "MORE rdf all 1 listed items are on or after 2026-10-15; older ones may be on a"
+        " next page of https://www.rba.gov.au/media-releases/",
         "ITEM 2026-10-23 json 26-256MR Planted JSON https://asic.gov.au/about-asic/26-256mr",
         "ITEM 2026-10-24 html Planted HTML https://h.gov.au/news/planted",
         "OFF-LIST 2026-10-24 html Look-alike https://xgov.au/n",
@@ -375,7 +417,7 @@ def self_test() -> int:
     if fails:
         print("FAIL — news_watch self-test\n" + "\n".join(fails))
         return 1
-    print("PASS — planted RSS, JSON, HTML and page items on or after `since` are listed and "
+    print("PASS — planted RSS 2.0 and RDF, JSON, HTML and page items on or after `since` are listed and "
           "older ones not; a 403 and a page with no items are COULD NOT READ; off-list links "
           f"and redirects are OFF-LIST and unfetched ({cases} hostile cases, seed 136)")
     return 0

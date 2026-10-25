@@ -4,7 +4,8 @@
     {
       "name": "rba",
       "kind": "rss",
-      "url": "https://www.rba.gov.au/rss/rss-cb-media-releases.xml"
+      "url": "https://www.rba.gov.au/rss/rss-cb-media-releases.xml",
+      "list": "https://www.rba.gov.au/media-releases/"
     },
     {
       "name": "asic",
