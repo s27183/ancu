@@ -1,14 +1,14 @@
 ---
 slug: kb.fx.rba-aud-vnd
-effective_from: 2026-10-16
-last_verified: 2026-10-18
+effective_from: 2026-10-23
+last_verified: 2026-10-25
 sources:
   - url: https://www.rba.gov.au/statistics/frequency/exchange-rates.html
-    retrieved: 2026-10-18
-    path: docs/sources/rba/exchange-rates-2026-10-18.txt
+    retrieved: 2026-10-25
+    path: docs/sources/rba/exchange-rates-2026-10-25.txt
     quotes:
-      - "Units of Foreign Currencies per Australian Dollar 14 Oct 2026 15 Oct 2026 16 Oct 2026"
-      - "Vietnamese dong 18131 17997 17970"
+      - "Units of Foreign Currencies per Australian Dollar 21 Oct 2026 22 Oct 2026 23 Oct 2026"
+      - "Vietnamese dong 18140 18133 18101"
 ---
 
 # AUD/VND — the RBA's reference rate, read weekly
@@ -19,7 +19,7 @@ It does **not** own what a buyer pays to convert: the spread and transfer fees a
 
 ## The reading
 
-On **16 October 2026** the RBA's reference rate was **17,970 dong per Australian dollar** (14 Oct: 18,131; 15 Oct: 17,997). The RBA publishes these rates daily, except on public and bank holidays observed in New South Wales.
+On **23 October 2026** the RBA's reference rate was **18,101 dong per Australian dollar** (21 Oct: 18,140; 22 Oct: 18,133). The RBA publishes these rates daily, except on public and bank holidays observed in New South Wales.
 
 ## Cadence
 
@@ -33,8 +33,8 @@ Pure-reference. `vnd_per_aud` is the latest reading; a VND display multiplies an
 {
   "fills": [],
   "parameters": {
-    "vnd_per_aud": { "type": "number", "value": 17970, "provenance": "REGULATED", "note": "RBA daily reference rate for the Vietnamese dong, VND per AUD, on as_of." },
-    "as_of": { "type": "string", "value": "2026-10-16", "provenance": "REGULATED", "note": "the RBA's publication date of vnd_per_aud." }
+    "vnd_per_aud": { "type": "number", "value": 18101, "provenance": "REGULATED", "note": "RBA daily reference rate for the Vietnamese dong, VND per AUD, on as_of." },
+    "as_of": { "type": "string", "value": "2026-10-23", "provenance": "REGULATED", "note": "the RBA's publication date of vnd_per_aud." }
   }
 }
 ```

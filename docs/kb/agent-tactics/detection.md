@@ -1,10 +1,10 @@
 ---
 slug: kb.agent-tactics.detection
 effective_from: 2025-08-01
-last_verified: 2026-07-06
+last_verified: 2026-10-25
 sources:
   - url: https://www.consumer.vic.gov.au/underquoting
-    retrieved: 2026-07-06
+    retrieved: 2026-10-25
     note: "Consumer Affairs Victoria — underquoting rules (the regulated tactic this detection doc cross-refs; dummy bidding is owned by kb.auction.rules-by-state). The behavioural detection catalogue is consumer-protection/buyer's-agent convention. Moneysmart /property blocks automated fetch this session."
 ---
 
