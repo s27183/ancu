@@ -57,6 +57,26 @@
 %% faithful "no acting user" claim, not a spoof of a real one.
 -define(ANON_USER_ID, <<"00000000-0000-0000-0000-000000000000">>).
 
+%% P-6 · Shells reach the engine only through the contract -> The shell backend
+%% -> every id in an engine path is exactly one segment
+%% Mechanism: seg/1 percent-encodes an id (uri_string:quote), so `/`, `?`, `#`, `%`,
+%% `,` and control characters can never add a segment, a query or a fragment to the
+%% engine URL, whatever a handler forgot to check (behavior 139: a :pid of
+%% `../messages?` reached POST /plan-cards/<id>/messages).
+%% Capability: uri_string:quote/1 on OTP 29 leaves no `/` `?` `#` and round-trips —
+%% measured 2026-10-27, 5005 random ids, seed 139, no counterexample. A uuid passes
+%% through unchanged, so a well-formed id reaches the engine exactly as before.
+%% A whole-segment `.` or `..` cannot be encoded away: httpc decodes `%2E` back to `.`
+%% and then removes the dot segment — the Expect 2 property found plan card id <<".">>
+%% sent as /plan-cards/properties even as `%2E` (measured 2026-10-27, OTP 29). So an
+%% empty, `.` or `..` id raises not_an_id and nothing is sent (every real id is a uuid,
+%% and the handlers 404 a non-uuid first; this is the layer under them).
+-spec seg(binary()) -> string().
+seg(Id) when is_binary(Id), Id =/= <<>>, Id =/= <<".">>, Id =/= <<"..">> ->
+    unicode:characters_to_list(uri_string:quote(Id));
+seg(Id) ->
+    error({not_an_id, Id}).
+
 -spec base_url() -> string().
 base_url() ->
     case os:getenv("ENGINE_BASE_URL") of
@@ -101,7 +121,7 @@ create_plan_card(UserId, BodyMap) ->
 -spec get_plan_card(binary(), binary()) -> {non_neg_integer(), binary()}.
 get_plan_card(UserId, PlanCardId) ->
     Token = fh_shell_engine_jwt:mint(#{user_id => UserId}),
-    Url = base_url() ++ "/plan-cards/" ++ binary_to_list(PlanCardId),
+    Url = base_url() ++ "/plan-cards/" ++ seg(PlanCardId),
     Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
     {ok, {{_, Status, _}, _, Resp}} =
         httpc:request(get, {Url, Headers},
@@ -118,7 +138,7 @@ get_plan_card(UserId, PlanCardId) ->
 plan_card_summaries(_UserId, []) -> {ok, #{}};
 plan_card_summaries(UserId, Ids) ->
     Token = fh_shell_engine_jwt:mint(#{user_id => UserId}),
-    Url = base_url() ++ "/plan-cards?ids=" ++ binary_to_list(iolist_to_binary(lists:join(<<",">>, Ids))),
+    Url = base_url() ++ "/plan-cards?ids=" ++ string:join([seg(Id) || Id <- Ids], ","),
     Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
     case httpc:request(get, {Url, Headers}, [{timeout, ?RPC_TIMEOUT_MS}], [{body_format, binary}]) of
         {ok, {{_, 200, _}, _, Resp}} ->
@@ -134,7 +154,7 @@ plan_card_summaries(UserId, Ids) ->
 -spec delete_plan_card(binary(), binary()) -> non_neg_integer().
 delete_plan_card(UserId, PlanCardId) ->
     Token = fh_shell_engine_jwt:mint(#{user_id => UserId}),
-    Url = base_url() ++ "/plan-cards/" ++ binary_to_list(PlanCardId),
+    Url = base_url() ++ "/plan-cards/" ++ seg(PlanCardId),
     Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
     {ok, {{_, Status, _}, _, _}} =
         httpc:request(delete, {Url, Headers},
@@ -149,7 +169,7 @@ delete_plan_card(UserId, PlanCardId) ->
 -spec post_message(binary(), binary(), map()) -> {non_neg_integer(), binary()}.
 post_message(UserId, PlanCardId, BodyMap) ->
     Token = fh_shell_engine_jwt:mint(#{user_id => UserId}),
-    Url = base_url() ++ "/plan-cards/" ++ binary_to_list(PlanCardId) ++ "/messages",
+    Url = base_url() ++ "/plan-cards/" ++ seg(PlanCardId) ++ "/messages",
     Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
     Body = fh_shell_util:json_encode(BodyMap),
     {ok, {{_, Status, _}, _, Resp}} =
@@ -164,7 +184,7 @@ post_message(UserId, PlanCardId, BodyMap) ->
 -spec get_conversation(binary(), binary()) -> {non_neg_integer(), binary()}.
 get_conversation(UserId, PlanCardId) ->
     Token = fh_shell_engine_jwt:mint(#{user_id => UserId}),
-    Url = base_url() ++ "/plan-cards/" ++ binary_to_list(PlanCardId) ++ "/conversation",
+    Url = base_url() ++ "/plan-cards/" ++ seg(PlanCardId) ++ "/conversation",
     Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
     {ok, {{_, Status, _}, _, Resp}} =
         httpc:request(get, {Url, Headers},
@@ -181,7 +201,7 @@ get_conversation(UserId, PlanCardId) ->
 -spec simulate(binary(), binary(), map()) -> {non_neg_integer(), binary()}.
 simulate(UserId, PlanCardId, BodyMap) ->
     Token = fh_shell_engine_jwt:mint(#{user_id => UserId}),
-    Url = base_url() ++ "/plan-cards/" ++ binary_to_list(PlanCardId) ++ "/simulate",
+    Url = base_url() ++ "/plan-cards/" ++ seg(PlanCardId) ++ "/simulate",
     Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
     Body = fh_shell_util:json_encode(BodyMap),
     {ok, {{_, Status, _}, _, Resp}} =
@@ -201,7 +221,7 @@ simulate(UserId, PlanCardId, BodyMap) ->
 -spec refine(binary(), binary(), map()) -> {non_neg_integer(), binary()}.
 refine(UserId, PlanCardId, BodyMap) ->
     Token = fh_shell_engine_jwt:mint(#{user_id => UserId}),
-    Url = base_url() ++ "/plan-cards/" ++ binary_to_list(PlanCardId) ++ "/refine",
+    Url = base_url() ++ "/plan-cards/" ++ seg(PlanCardId) ++ "/refine",
     Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
     Body = fh_shell_util:json_encode(BodyMap),
     {ok, {{_, Status, _}, _, Resp}} =
@@ -218,7 +238,7 @@ refine(UserId, PlanCardId, BodyMap) ->
 -spec set_profile_financials(binary(), binary(), map()) -> {non_neg_integer(), binary()}.
 set_profile_financials(UserId, PlanCardId, BodyMap) ->
     Token = fh_shell_engine_jwt:mint(#{user_id => UserId}),
-    Url = base_url() ++ "/plan-cards/" ++ binary_to_list(PlanCardId) ++ "/profile",
+    Url = base_url() ++ "/plan-cards/" ++ seg(PlanCardId) ++ "/profile",
     Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
     Body = fh_shell_util:json_encode(BodyMap),
     {ok, {{_, Status, _}, _, Resp}} =
@@ -236,7 +256,7 @@ set_profile_financials(UserId, PlanCardId, BodyMap) ->
 -spec set_checklist_status(binary(), binary(), map()) -> {non_neg_integer(), binary()}.
 set_checklist_status(UserId, PlanCardId, BodyMap) ->
     Token = fh_shell_engine_jwt:mint(#{user_id => UserId}),
-    Url = base_url() ++ "/plan-cards/" ++ binary_to_list(PlanCardId) ++ "/checklist-status",
+    Url = base_url() ++ "/plan-cards/" ++ seg(PlanCardId) ++ "/checklist-status",
     Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
     Body = fh_shell_util:json_encode(BodyMap),
     {ok, {{_, Status, _}, _, Resp}} =
@@ -253,7 +273,7 @@ set_checklist_status(UserId, PlanCardId, BodyMap) ->
 -spec get_news(binary(), binary()) -> {non_neg_integer(), binary()}.
 get_news(UserId, PlanCardId) ->
     Token = fh_shell_engine_jwt:mint(#{user_id => UserId}),
-    Url = base_url() ++ "/plan-cards/" ++ binary_to_list(PlanCardId) ++ "/news",
+    Url = base_url() ++ "/plan-cards/" ++ seg(PlanCardId) ++ "/news",
     Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
     {ok, {{_, Status, _}, _, Resp}} =
         httpc:request(get, {Url, Headers},
@@ -269,7 +289,7 @@ get_news(UserId, PlanCardId) ->
 -spec dismiss_news(binary(), binary(), map()) -> {non_neg_integer(), binary()}.
 dismiss_news(UserId, PlanCardId, BodyMap) ->
     Token = fh_shell_engine_jwt:mint(#{user_id => UserId}),
-    Url = base_url() ++ "/plan-cards/" ++ binary_to_list(PlanCardId) ++ "/news",
+    Url = base_url() ++ "/plan-cards/" ++ seg(PlanCardId) ++ "/news",
     Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
     Body = fh_shell_util:json_encode(BodyMap),
     {ok, {{_, Status, _}, _, Resp}} =
@@ -338,7 +358,7 @@ content_version() ->
 -spec attach_property(binary(), binary(), map()) -> {non_neg_integer(), binary()}.
 attach_property(UserId, PlanCardId, BodyMap) ->
     Token = fh_shell_engine_jwt:mint(#{user_id => UserId}),
-    Url = base_url() ++ "/plan-cards/" ++ binary_to_list(PlanCardId) ++ "/properties",
+    Url = base_url() ++ "/plan-cards/" ++ seg(PlanCardId) ++ "/properties",
     Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
     Body = fh_shell_util:json_encode(BodyMap),
     {ok, {{_, Status, _}, _, Resp}} =
@@ -357,8 +377,8 @@ attach_property(UserId, PlanCardId, BodyMap) ->
     {non_neg_integer(), binary()}.
 set_transaction_dates(UserId, PlanCardId, PropertyId, BodyMap) ->
     Token = fh_shell_engine_jwt:mint(#{user_id => UserId}),
-    Url = base_url() ++ "/plan-cards/" ++ binary_to_list(PlanCardId)
-          ++ "/properties/" ++ binary_to_list(PropertyId) ++ "/transaction",
+    Url = base_url() ++ "/plan-cards/" ++ seg(PlanCardId)
+          ++ "/properties/" ++ seg(PropertyId) ++ "/transaction",
     Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
     Body = fh_shell_util:json_encode(BodyMap),
     {ok, {{_, Status, _}, _, Resp}} =
@@ -379,8 +399,8 @@ set_transaction_dates(UserId, PlanCardId, PropertyId, BodyMap) ->
     {non_neg_integer(), binary()}.
 upload_document(UserId, PlanCardId, PropertyId, BodyMap) ->
     Token = fh_shell_engine_jwt:mint(#{user_id => UserId}),
-    Url = base_url() ++ "/plan-cards/" ++ binary_to_list(PlanCardId)
-          ++ "/properties/" ++ binary_to_list(PropertyId) ++ "/documents",
+    Url = base_url() ++ "/plan-cards/" ++ seg(PlanCardId)
+          ++ "/properties/" ++ seg(PropertyId) ++ "/documents",
     Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}],
     Body = fh_shell_util:json_encode(BodyMap),
     {ok, {{_, Status, _}, _, Resp}} =
@@ -402,7 +422,7 @@ upload_document(UserId, PlanCardId, PropertyId, BodyMap) ->
     {ok, term()} | {error, term()}.
 stream_events(UserId, PlanCardId, LastEventId) ->
     Token = fh_shell_engine_jwt:mint(#{user_id => UserId}),
-    Url = base_url() ++ "/plan-cards/" ++ binary_to_list(PlanCardId) ++ "/events",
+    Url = base_url() ++ "/plan-cards/" ++ seg(PlanCardId) ++ "/events",
     Headers = [{"authorization", "Bearer " ++ binary_to_list(Token)}
                | last_event_id_header(LastEventId)],
     httpc:request(get, {Url, Headers},

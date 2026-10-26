@@ -36,11 +36,15 @@ uuid4() ->
 %% Cheap RFC-4122 shape check (8-4-4-4-12 hex). Guards a URL :id binding before it
 %% reaches a `$N::uuid` bind — pgo errors on a non-uuid cast — so a malformed id is
 %% a calm 404, not a 500. Shape only: NOT a claim the uuid exists or is owned.
+%% Also the guard that keeps an id from steering a shell -> engine path (behavior 139:
+%% a :pid of `..%2Fmessages%3F` reached another engine route). `dollar_endonly`: PCRE's
+%% `$` otherwise matches before a final newline — measured 2026-10-27, OTP 29:
+%% is_uuid(<<"<uuid>\n">>) was true without it.
 -spec is_uuid(binary()) -> boolean().
 is_uuid(Bin) when is_binary(Bin) ->
     match =:= re:run(Bin,
         "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-"
-        "[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$", [{capture, none}]);
+        "[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$", [dollar_endonly, {capture, none}]);
 is_uuid(_) -> false.
 
 %% base64url without padding (JWT segments).
