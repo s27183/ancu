@@ -403,6 +403,12 @@ LEAF_TIMEOUT_S = int(os.environ.get("FH_LEAF_TIMEOUT_S", "600"))
 QA_MODEL = os.environ.get("FH_QA_MODEL", "opus")
 QA_EFFORT = os.environ.get("FH_QA_EFFORT", "medium")
 QA_TIMEOUT_S = int(os.environ.get("FH_QA_TIMEOUT_S", "600"))
+# Turn caps (behavior 140). A structured-output leaf takes 2 turns with no tools (the
+# answer, then the StructuredOutput tool) — measured 2026-10-27, SDK 0.2.159 / CLI
+# 2.1.281; the Q&A adds one per kb_lookup. The caps leave room above that and stop a
+# runaway loop; a capped call fails as a timeout does today.
+LEAF_MAX_TURNS = int(os.environ.get("FH_LEAF_MAX_TURNS", "4"))
+QA_MAX_TURNS = int(os.environ.get("FH_QA_MAX_TURNS", "12"))
 
 
 def _credit_env():
@@ -416,6 +422,49 @@ def _credit_env():
     if not token:
         return {}
     return {"ANTHROPIC_API_KEY": "", "CLAUDE_CODE_OAUTH_TOKEN": token}
+
+# R-4 · Reasoning within its runtime -> The sidecar -> the planner model can only answer
+# Mechanism: every model call is built here. tools=[] puts `--tools ""` on the CLI, so the
+# model has no built-in tool at all (Read, Bash, Glob, Grep, WebFetch, Write, Task…);
+# the Q&A adds only its in-process kb_lookup through mcp_servers. cwd is a fresh empty
+# directory, so even a tool that slipped through would find nothing; no session is
+# persisted, so no transcript of a user's turn is written; max_turns caps the loop.
+# Fails when: the CLI's default toolset is live — measured 2026-10-27 before this
+# change: with no `tools` option the model, asked to "Use the Read tool on
+# ./secret.txt", printed the canary from its cwd (in production /app, with the
+# engine's whole environment readable) and the CLI wrote one transcript per turn
+# under ~/.claude/projects (behavior 140; security review L1, L2).
+# Capability: claude_agent_sdk 0.2.159 emits `--tools ""` only when tools is not None
+# (subprocess_cli.py:587-597); bundled CLI 2.1.281 then answers "NO-TOOL" to Read and
+# Bash yet still calls an SDK MCP tool and still returns structured output; with
+# `--no-session-persistence` 0 transcripts are written (1 without) — measured
+# 2026-10-27 with the served key. tests/sidecar_options_check.py holds every
+# ClaudeAgentOptions in this file to this helper.
+_FORBIDDEN_OPTION_KEYS = ("tools", "setting_sources", "cwd", "env", "extra_args",
+                          "permission_mode", "max_turns")
+
+
+def _model_options(*, max_turns, mcp_servers=None, allowed_tools=(), **kw):
+    """The ONE place a ClaudeAgentOptions is built. Callers pass model, effort,
+    system_prompt, output_format (and, for the Q&A, its kb MCP server + the one tool
+    name it may call); the confinement is not theirs to choose."""
+    import tempfile
+    from claude_agent_sdk import ClaudeAgentOptions
+    bad = [k for k in _FORBIDDEN_OPTION_KEYS if k in kw]
+    if bad:
+        raise TypeError(f"_model_options sets {bad} itself")
+    return ClaudeAgentOptions(
+        tools=[],                       # `--tools ""`: no built-in tool exists
+        mcp_servers=mcp_servers or {},  # Q&A: only the in-process kb server
+        allowed_tools=list(allowed_tools),
+        setting_sources=[],             # do NOT load CLAUDE.md / project settings
+        cwd=tempfile.mkdtemp(prefix="fh-sidecar-"),  # empty; the sidecar exits after one call
+        max_turns=max_turns,
+        extra_args={"no-session-persistence": None},
+        env=_credit_env(),              # subscription-credit auth, subprocess-scoped
+        **kw,
+    )
+
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 _KB_DOCS = {
@@ -1250,16 +1299,14 @@ async def fill_mortgage_finance(upstream_outcomes, resolver_outcome):
         return await fill_mortgage_finance_investor(upstream_outcomes, resolver_outcome)
     import time
     _t0 = time.monotonic()
-    from claude_agent_sdk import ClaudeAgentOptions, ResultMessage, query
+    from claude_agent_sdk import ResultMessage, query
     _t_import = time.monotonic()
 
-    options = ClaudeAgentOptions(
+    options = _model_options(
         model=LEAF_MODEL,
         effort=LEAF_EFFORT,   # bound reasoning depth (else opus thinks for minutes)
         system_prompt=build_system_prompt("lender_fit", _kb_block("lender_fit")),
-        setting_sources=[],   # do NOT load CLAUDE.md / project settings
-        allowed_tools=[],     # leaf-fill pulls no tools
-        env=_credit_env(),    # subscription-credit auth, subprocess-scoped
+        max_turns=LEAF_MAX_TURNS,  # no tools: the helper sets tools=[]
         output_format={"type": "json_schema",
                        "schema": LenderFitLeaves.model_json_schema()},
     )
@@ -1308,17 +1355,15 @@ async def fill_mortgage_finance_investor(upstream_outcomes, resolver_outcome):
     (leaves_dict, usage_dict) — same shape fill_mortgage_finance returns."""
     import time
     _t0 = time.monotonic()
-    from claude_agent_sdk import ClaudeAgentOptions, ResultMessage, query
+    from claude_agent_sdk import ResultMessage, query
     _t_import = time.monotonic()
 
-    options = ClaudeAgentOptions(
+    options = _model_options(
         model=LEAF_MODEL,
         effort=LEAF_EFFORT,   # bound reasoning depth (else opus thinks for minutes)
         system_prompt=build_system_prompt("lender_fit_investor",
                                           _kb_block("lender_fit_investor")),
-        setting_sources=[],   # do NOT load CLAUDE.md / project settings
-        allowed_tools=[],     # leaf-fill pulls no tools
-        env=_credit_env(),    # subscription-credit auth, subprocess-scoped
+        max_turns=LEAF_MAX_TURNS,  # no tools: the helper sets tools=[]
         output_format={"type": "json_schema",
                        "schema": LenderFitInvestorLeaves.model_json_schema()},
     )
@@ -1371,17 +1416,15 @@ async def fill_mortgage_finance_non_resident_investor(upstream_outcomes, resolve
     returns."""
     import time
     _t0 = time.monotonic()
-    from claude_agent_sdk import ClaudeAgentOptions, ResultMessage, query
+    from claude_agent_sdk import ResultMessage, query
     _t_import = time.monotonic()
 
-    options = ClaudeAgentOptions(
+    options = _model_options(
         model=LEAF_MODEL,
         effort=LEAF_EFFORT,   # bound reasoning depth (else opus thinks for minutes)
         system_prompt=build_system_prompt("lender_fit_investor_foreign",
                                           _kb_block("lender_fit_investor_foreign")),
-        setting_sources=[],   # do NOT load CLAUDE.md / project settings
-        allowed_tools=[],     # leaf-fill pulls no tools
-        env=_credit_env(),    # subscription-credit auth, subprocess-scoped
+        max_turns=LEAF_MAX_TURNS,  # no tools: the helper sets tools=[]
         output_format={"type": "json_schema",
                        "schema": LenderFitNonResidentInvestorLeaves.model_json_schema()},
     )
@@ -1428,17 +1471,15 @@ async def fill_investment_strategy(upstream_outcomes, resolver_outcome):
     (leaves_dict, usage_dict) — same shape fill_mortgage_finance returns."""
     import time
     _t0 = time.monotonic()
-    from claude_agent_sdk import ClaudeAgentOptions, ResultMessage, query
+    from claude_agent_sdk import ResultMessage, query
     _t_import = time.monotonic()
 
-    options = ClaudeAgentOptions(
+    options = _model_options(
         model=LEAF_MODEL,
         effort=LEAF_EFFORT,   # bound reasoning depth (else opus thinks for minutes)
         system_prompt=build_system_prompt("investment_thesis",
                                           _kb_block("investment_thesis")),
-        setting_sources=[],   # do NOT load CLAUDE.md / project settings
-        allowed_tools=[],     # leaf-fill pulls no tools
-        env=_credit_env(),    # subscription-credit auth, subprocess-scoped
+        max_turns=LEAF_MAX_TURNS,  # no tools: the helper sets tools=[]
         output_format={"type": "json_schema",
                        "schema": InvestmentThesisLeaves.model_json_schema()},
     )
@@ -1482,17 +1523,15 @@ async def fill_tax_structure(upstream_outcomes, resolver_outcome):
     usage_dict) — same shape the other two-path fills return."""
     import time
     _t0 = time.monotonic()
-    from claude_agent_sdk import ClaudeAgentOptions, ResultMessage, query
+    from claude_agent_sdk import ResultMessage, query
     _t_import = time.monotonic()
 
-    options = ClaudeAgentOptions(
+    options = _model_options(
         model=LEAF_MODEL,
         effort=LEAF_EFFORT,   # bound reasoning depth (else opus thinks for minutes)
         system_prompt=build_system_prompt("entity_structuring",
                                           _kb_block("entity_structuring")),
-        setting_sources=[],   # do NOT load CLAUDE.md / project settings
-        allowed_tools=[],     # leaf-fill pulls no tools
-        env=_credit_env(),    # subscription-credit auth, subprocess-scoped
+        max_turns=LEAF_MAX_TURNS,  # no tools: the helper sets tools=[]
         output_format={"type": "json_schema",
                        "schema": EntityStructuringLeaves.model_json_schema()},
     )
@@ -1536,16 +1575,14 @@ async def fill_buying_strategy(upstream_outcomes, resolver_outcome):
     return."""
     import time
     _t0 = time.monotonic()
-    from claude_agent_sdk import ClaudeAgentOptions, ResultMessage, query
+    from claude_agent_sdk import ResultMessage, query
     _t_import = time.monotonic()
 
-    options = ClaudeAgentOptions(
+    options = _model_options(
         model=LEAF_MODEL,
         effort=LEAF_EFFORT,   # bound reasoning depth (else opus thinks for minutes)
         system_prompt=build_system_prompt("negotiation", _kb_block("negotiation")),
-        setting_sources=[],   # do NOT load CLAUDE.md / project settings
-        allowed_tools=[],     # leaf-fill pulls no tools
-        env=_credit_env(),    # subscription-credit auth, subprocess-scoped
+        max_turns=LEAF_MAX_TURNS,  # no tools: the helper sets tools=[]
         output_format={"type": "json_schema",
                        "schema": NegotiationLeaves.model_json_schema()},
     )
@@ -1590,16 +1627,14 @@ async def fill_property_assessment(upstream_outcomes, resolver_outcome, property
     money_range_per_week convention the engine's gross_yield/2 + the outcome store expect)."""
     import time
     _t0 = time.monotonic()
-    from claude_agent_sdk import ClaudeAgentOptions, ResultMessage, query
+    from claude_agent_sdk import ResultMessage, query
     _t_import = time.monotonic()
 
-    options = ClaudeAgentOptions(
+    options = _model_options(
         model=LEAF_MODEL,
         effort=LEAF_EFFORT,   # bound reasoning depth (else opus thinks for minutes)
         system_prompt=build_system_prompt("property_fit", _kb_block("property_fit")),
-        setting_sources=[],   # do NOT load CLAUDE.md / project settings
-        allowed_tools=[],     # leaf-fill pulls no tools
-        env=_credit_env(),    # subscription-credit auth, subprocess-scoped
+        max_turns=LEAF_MAX_TURNS,  # no tools: the helper sets tools=[]
         output_format={"type": "json_schema",
                        "schema": PropertyFitLeaves.model_json_schema()},
     )
@@ -1682,19 +1717,17 @@ async def fill_lease_interpretation(upstream_outcomes, resolver_outcome, lease_d
     as `<lease_document>`; the bytes are transient (never persisted). Returns (leaves_dict, usage)."""
     import time
     _t0 = time.monotonic()
-    from claude_agent_sdk import ClaudeAgentOptions, ResultMessage, query
+    from claude_agent_sdk import ResultMessage, query
     _t_import = time.monotonic()
 
     lease_text = _extract_document_text(lease_document or {})
 
-    options = ClaudeAgentOptions(
+    options = _model_options(
         model=LEAF_MODEL,
         effort=LEAF_EFFORT,   # bound reasoning depth (else opus thinks for minutes)
         system_prompt=build_system_prompt("lease_interpretation",
                                           _kb_block("lease_interpretation")),
-        setting_sources=[],   # do NOT load CLAUDE.md / project settings
-        allowed_tools=[],     # leaf-fill pulls no tools
-        env=_credit_env(),    # subscription-credit auth, subprocess-scoped
+        max_turns=LEAF_MAX_TURNS,  # no tools: the helper sets tools=[]
         output_format={"type": "json_schema",
                        "schema": LeaseInterpretationLeaves.model_json_schema()},
     )
@@ -2028,7 +2061,7 @@ async def handle_qa(params):
         notify("error", {"code": "empty_message", "message": "qa: empty message"})
         return
 
-    from claude_agent_sdk import (ClaudeAgentOptions, ResultMessage,
+    from claude_agent_sdk import (ResultMessage,
                                   create_sdk_mcp_server, query, tool)
 
     kb = _load_kb_corpus()
@@ -2060,14 +2093,13 @@ async def handle_qa(params):
         return {"content": [{"type": "text", "text": text}]}
 
     server = create_sdk_mcp_server("kb", tools=[kb_lookup])
-    options = ClaudeAgentOptions(
+    options = _model_options(
         model=QA_MODEL,
         effort=QA_EFFORT,
         system_prompt=build_qa_system_prompt(),
-        setting_sources=[],                      # do NOT load CLAUDE.md / project settings
         mcp_servers={"kb": server},
         allowed_tools=["mcp__kb__kb_lookup"],    # the only tool; in-process
-        env=_credit_env(),                       # subscription-credit auth, subprocess-scoped
+        max_turns=QA_MAX_TURNS,
         output_format={"type": "json_schema",
                        "schema": QaAnswer.model_json_schema()},
     )
