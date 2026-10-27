@@ -2,23 +2,32 @@
 # Behavior 74 (Son 2026-10-12). On every kb-watch PR (branch kb-watch-*): wait for the
 # required "done checks" on its head, ask scripts/kb_gate.py whether the PR may merge
 # itself (its block says when; a push clears kb-verify's labels first), and say so
-# in one comment it keeps up to date. LIVE is "no" while the gate is proven (a dry
-# run only comments); turning it to "yes" is the Irreversible step of behavior 74 —
-# from then on a merge here deploys (deployment.md: main deploys on push), and
-# setting it back to "no" is the way back.
+# in one comment it keeps up to date. LIVE was "no" for two dry-run weeks
+# (2026-10-12..26: "would merge" on #164, #168, #169, #170, #174, a kb-hold on #176 —
+# Son merged each himself). "yes" is the Irreversible step of behavior 74: a merge
+# here deploys (deployment.md: main deploys on push); setting it back to "no" is the
+# way back, and a bad figure is undone by a revert PR.
+#
+# The rules that judge a PR are never the PR's own: the gate's code (kb_gate.py and
+# what it imports) is checked out at the base commit, and the PR's head is only read
+# through git (`git show <head>:<path>`). A PR editing scripts/ is held as outside
+# docs/kb either way; this keeps a rewritten kb_gate.py from deciding its own merge.
+# For the same reason the trigger is pull_request_target: GitHub runs this workflow
+# as it stands on main, so a PR that edits kb-gate.yml is judged by main's copy, not
+# its own (on `pull_request` the PR's merge ref supplies the workflow file). Nothing
+# from the head is executed.
 name: kb gate
 
 on:
-  pull_request:
+  pull_request_target:
     branches: [main]
     types: [opened, reopened, synchronize, labeled, unlabeled]
 
 env:
-  LIVE: "no"
+  LIVE: "yes"
 
-# contents: write joins these when LIVE turns "yes" (the merge needs it).
 permissions:
-  contents: read
+  contents: write
   pull-requests: write
   checks: read
   issues: write
@@ -42,8 +51,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.event.pull_request.base.sha }}
           fetch-depth: 0
+
+      - name: Fetch the PR head (read through git only)
+        run: git fetch --no-tags origin "$HEAD_SHA"
 
       - uses: actions/setup-python@v5
         with:

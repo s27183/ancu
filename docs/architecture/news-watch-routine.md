@@ -31,8 +31,8 @@ dated lists) from a stored `since`, and the PR accounts for every line it prints
 **How it stays inside the gate.** Its branch is `kb-watch-news-<yyyy-mm-dd>`, so
 scripts/kb_gate.py (`BRANCH_PREFIX = "kb-watch-"`) judges it as it judges kb-watch,
 and kb-verify, now daily ([kb-verify-routine.md](kb-verify-routine.md)), re-reads
-its notes against their sources. A day's PR may still be open the next morning (the
-gate is in behavior 74's dry run, so Son merges): the next run then skips what an
+its notes against their sources. A day's PR may still be open the next morning (held
+for Son, or not yet re-checked by kb-verify): the next run then skips what an
 open `kb-watch-*` branch already covers, and leaves `visa-watch.json` to the PR that
 already moves it, so two open PRs never change the same file.
 
