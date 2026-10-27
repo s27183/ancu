@@ -130,7 +130,9 @@ What this system must never stop being. Every decision must preserve them.
 matter — they are properties of **an agent in its environment**, and their proofs
 were measured on the agent runtime this project runs: the same model family,
 harness, sandbox and tool infrastructure that the attended seat is launched on.
-That identity is what makes the proof transfer rather than be borrowed.
+That identity is what makes the proof transfer rather than be borrowed. The four carry
+their proof here because they are the runtime's; this project's own invariants
+are held by its own code, so their proofs live with that code.
 
 They bind **the one seat there is** — attended, the designer and a Claude Code
 agent working together in this project's own repo. They say nothing about this
