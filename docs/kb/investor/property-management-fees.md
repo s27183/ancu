@@ -1,38 +1,38 @@
 ---
 slug: kb.investor.property-management-fees
 effective_from: 2025-07-01
-last_verified: 2026-10-16
+last_verified: 2026-10-27
 sources:
+  - url: https://www.consumer.vic.gov.au/housing/renting/starting-and-changing-rental-agreements/using-a-property-manager-or-agent
+    retrieved: 2026-10-27
+    path: docs/sources/vic/cav-using-a-property-manager-or-agent.txt
+    quotes:
+      - "You can negotiate all fees and expenses with an agent, except those that are fixed by law. You must record who is responsible for paying what fees and expenses on the authority (contract), including any GST liabilities."
+      - "Generally, this is the initial set-up cost for vetting and finding a renter. It is negotiable and usually charged at the beginning of each rental agreement. Some agents also charge a re-leasing fee (also subject to negotiation) if current renters sign a new rental agreement."
+      - "This is an ongoing fee that is taken out of the rent each time it is paid. If the management fee is worked out as a percentage of the rent, make sure it is also included as a dollar amount on the authority (contract)."
+      - "Examples of other costs you may be charged by an agent include statement fees, administrative and/or postage costs."
   - url: https://moneysmart.gov.au/property-investment/buying-an-investment-property
-    retrieved: 2026-07-06
+    retrieved: 2026-10-27
+    path: docs/sources/asic/moneysmart-buying-an-investment-property.txt
+    quotes:
+      - "property management fees (if you use an agent)"
   - url: https://www.ato.gov.au/individuals-and-families/investments-and-assets/property-and-land/residential-rental-properties/rental-expenses/common-property-expenses
-    retrieved: 2026-07-06
-  - url: https://www.canstar.com.au/home-loans/real-estate-commission-fees/
-    retrieved: 2026-07-06
-  - url: https://www.localagentfinder.com.au/blog/property-management-commission-fees
-    retrieved: 2026-10-16
-    path: docs/sources/investor/laf-property-management-fees.txt
+    retrieved: 2026-10-27
+    path: docs/sources/ato/rental-common-property-expenses.txt
     quotes:
-      - "The national average management fee across Australia is approximately 7.5% of weekly rent. The average letting fee is approximately 1.4 weeks' rent ."
-  - url: https://www.propspotter.com.au/property-management-fees
-    retrieved: 2026-10-16
-    path: docs/sources/investor/propspotter-property-management-fees.txt
-    quotes:
-      - "A fee closer to 5% could mean you are paying for management only."
-      - "Regional NSW landlords pay 7–12%, compared to Sydney's 5.4%."
-      - "In Sydney, expect 1–2 weeks' rent, averaging 1.2 weeks."
+      - "property agent's fees and commission"
 ---
 
 # Property management fees — structures and benchmarks
 
-A landlord who appoints a managing agent pays a **management fee** (an ongoing % of rent collected) plus a set of **transactional charges** (letting/leasing fee on a new tenancy, lease-renewal fee, and sundries). This doc owns the **fee structures and typical benchmarks** so the resolver can estimate `yield_modelling.operating_expenses.{property_management_annual, letting_fees_periodic}` for a base projection, and so the `ownership_planning_investor` management decision (PM vs self-managed, owned by `kb.investor.property-management-vs-self-managed`, Cluster S) has the cost side grounded. Figures are **banded** market conventions — fees are negotiable and vary by state and agency. Informational, no agency recommendation.
+A landlord who appoints a managing agent pays a **management fee** (an ongoing % of rent collected) plus a set of **transactional charges** (letting/leasing fee on a new tenancy, lease-renewal fee, and sundries). This doc owns the **fee structures and typical benchmarks** so the resolver can estimate `yield_modelling.operating_expenses.{property_management_annual, letting_fees_periodic}` for a base projection, and so the `ownership_planning_investor` management decision (PM vs self-managed, owned by `kb.investor.property-management-vs-self-managed`, Cluster S) has the cost side grounded. The fee *structure* is grounded on Consumer Affairs Victoria's own guidance; the *percentages* are PLACEHOLDER bands — fees are negotiable and vary by state and agency, and no primary yet states a market-wide figure. Informational, no agency recommendation.
 
 ## The fee structure
 
-- **Management fee** — an ongoing percentage of **rent collected**, typically **~5–10%** (plus GST), with **~7–8%** the common metropolitan band; the model defaults to **7.5%**. It is charged only on rent actually collected, so vacancy reduces it.
-- **Letting / leasing fee** — a one-off charge when a **new tenant** is placed, typically **1–2 weeks' rent** (plus GST); recurs on each turnover, which is why low tenant turnover helps net return.
-- **Lease-renewal fee** — a smaller charge to re-paper an existing tenant (a few hundred dollars or a fraction of a week's rent), where the agency charges one.
-- **Sundries** — periodic statement/admin fees, advertising for a new tenancy, and routine-inspection fees, where applicable — small but real; bundled into the model's PM line as a modest loading.
+- **Management fee** — an ongoing fee "taken out of the rent each time it is paid" (Consumer Affairs Victoria); where it is a percentage of rent, Victoria requires it also be stated as a dollar amount on the authority. The model carries a placeholder band of **~5–12%** of rent and defaults to **7.5%** (plus GST) until it is re-grounded on agencies' own published fee schedules. It is charged only on rent actually collected, so vacancy reduces it.
+- **Letting / leasing fee** — "the initial set-up cost for vetting and finding a renter", "usually charged at the beginning of each rental agreement" (Consumer Affairs Victoria); the model carries a placeholder **1–2 weeks' rent** (plus GST). It recurs on each turnover, which is why low tenant turnover helps net return.
+- **Lease-renewal (re-leasing) fee** — "Some agents also charge a re-leasing fee" when current renters sign a new agreement (Consumer Affairs Victoria); its size is not stated by any primary in hand.
+- **Sundries** — "statement fees, administrative and/or postage costs" (Consumer Affairs Victoria), and advertising or inspection fees where the agency charges them; bundled into the model's PM line as a modest loading.
 
 ## Why it is its own line
 
@@ -40,22 +40,22 @@ Property management is the single largest controllable operating cost and the pi
 
 ## Relevance for Vietnamese-Australian investors (Mode C)
 
-- **The fee is visible and negotiable.** The plan shows the management fee (~7.5% default) and the letting fee (1–2 weeks' rent) as explicit lines, noting they are negotiable — not a fixed cost.
+- **The fee is visible and negotiable.** The plan shows the management fee (a placeholder 7.5% default) and the letting fee (a placeholder 1–2 weeks' rent) as explicit lines, noting they are negotiable — not a fixed cost.
 - **Turnover costs money.** Because the letting fee recurs on each new tenancy, the plan flags that tenant retention (and lower turnover) improves net return — relevant when weighing a managing agent's quality, not just its fee.
 - **Manage vs self-manage is a real fork.** The plan surfaces the fee saved by self-managing against the time and compliance burden (bond, condition reports, minimum standards) — decision-support, the investor chooses (the decision doc is `kb.investor.property-management-vs-self-managed`).
 - **Banded, confirm with the agency.** Fees vary by state and agency; the binding figure is the management agreement the investor signs.
 
 ## Rules
 
-The resolver rules the artifact compiler extracts as this doc's `content_json` (schema: [architecture.md §11.9](../../architecture/architecture.md#119-blueprint-as-data-model--presentation-specification)). Everything above is `content_md`. This is a **reference** doc — it fills no slot; the PM cost lines are **resolver-estimated** from these benchmarks against the (effective) rent. All figures are CONVENTION — negotiable, state- and agency-variable.
+The resolver rules the artifact compiler extracts as this doc's `content_json` (schema: [architecture.md §11.9](../../architecture/architecture.md#119-blueprint-as-data-model--presentation-specification)). Everything above is `content_md`. This is a **reference** doc — it fills no slot; the PM cost lines are **resolver-estimated** from these benchmarks against the (effective) rent. The structure is grounded; the percentages are PLACEHOLDER — negotiable, state- and agency-variable, with no primary yet stating a market band.
 
 ```jsonc
 {
   "fills": [],
   "parameters": {
-    "management_fee_pct_default": { "type": "percentage", "value": 7.5, "note": "CONVENTION — default management fee as % of rent collected (the yield_modelling default); plus GST; charged on rent collected so vacancy reduces it" },
-    "lease_renewal_fee_applies": { "type": "bool", "value": true, "note": "CONVENTION — a smaller lease-renewal fee may apply where the agency charges one (a few hundred dollars or a fraction of a week's rent)" },
-    "sundries_loading": { "type": "string", "value": "modest loading for statement/admin, new-tenancy advertising, routine-inspection fees where applicable", "note": "CONVENTION — small per-agency charges, bundled into the PM line as a modest loading" },
+    "management_fee_pct_default": { "type": "percentage", "value": 7.5, "note": "PLACEHOLDER — no primary states this; re-ground on several managing agencies' own published fee schedules. Default management fee as % of rent collected (the yield_modelling default); plus GST; charged on rent collected so vacancy reduces it" },
+    "lease_renewal_fee_applies": { "type": "bool", "value": true, "note": "Consumer Affairs Victoria: 'Some agents also charge a re-leasing fee (also subject to negotiation) if current renters sign a new rental agreement.' Its size is not stated by a primary" },
+    "sundries_loading": { "type": "string", "value": "modest loading for statement/admin, new-tenancy advertising, routine-inspection fees where applicable", "note": "Consumer Affairs Victoria names 'statement fees, administrative and/or postage costs'; their size is set per agency, bundled into the PM line as a modest loading" },
     "fee_charged_on_rent_collected": { "type": "bool", "value": true, "note": "the management % is on rent COLLECTED — vacancy reduces it; letting fee recurs per new tenancy, so turnover raises cost" }
   },
   "lookup": {
@@ -66,7 +66,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
           "id": "property_management",
           "phase": "own",
           "timing": "per_year",
-          "tier": "CONVENTION",
+          "tier": "PLACEHOLDER",
           "basis": "pct_of_rent",
           "low": 5,
           "high": 12,
@@ -79,7 +79,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
             "property": "any"
           },
           "optional": false,
-          "note": "national average about 7.5%; regional NSW up to 12% (the prior band was 5–10%)",
+          "note": "PLACEHOLDER — no primary states this; re-ground on several managing agencies' own published fee schedules (management % of rent collected, plus GST)",
           "label": {
             "vi": "Phí quản lý cho thuê (property management)",
             "en": "Property management fee"
@@ -89,16 +89,16 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
             "en": "The owner pays, taken from the rent; tax-deductible"
           },
           "drivers": {
-            "vi": "Thành phố lớn cạnh tranh (~5–7,5%) rẻ hơn vùng xa (tới ~12%); có thể thương lượng. Tính trên tiền thuê thực thu, cộng GST.",
-            "en": "Competitive capital cities (~5–7.5%) cost less than regional areas (up to ~12%); negotiable. Charged on rent collected, plus GST."
+            "vi": "Khoảng tạm tính ~5–12% tiền thuê, tùy bang và công ty quản lý; có thể thương lượng. Trừ vào tiền thuê mỗi lần thu, cộng GST.",
+            "en": "A placeholder ~5–12% of rent, varying by state and agency; negotiable. Taken out of the rent each time it is paid, plus GST."
           },
-          "source": "https://www.propspotter.com.au/property-management-fees"
+          "source": "https://www.consumer.vic.gov.au/housing/renting/starting-and-changing-rental-agreements/using-a-property-manager-or-agent"
         },
         {
           "id": "letting_fee",
           "phase": "own",
           "timing": "per_year",
-          "tier": "CONVENTION",
+          "tier": "PLACEHOLDER",
           "basis": "pct_of_rent",
           "low": 1.9,
           "high": 3.8,
@@ -111,7 +111,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
             "property": "any"
           },
           "optional": false,
-          "note": "1–2 weeks' rent ÷ 52 weeks, assuming one re-let a year; national average about 1.4 weeks",
+          "note": "PLACEHOLDER — no primary states this; re-ground on several managing agencies' own published fee schedules. 1–2 weeks' rent ÷ 52 weeks, assuming one re-let a year",
           "label": {
             "vi": "Phí tìm người thuê (letting fee)",
             "en": "Letting fee (finding a tenant)"
@@ -124,7 +124,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
             "vi": "Khoảng 1–2 tuần tiền thuê mỗi lần tìm người thuê mới; dòng này giả định mỗi năm đổi người thuê một lần. Người thuê ở lâu thì ít tốn hơn.",
             "en": "About 1–2 weeks' rent per new tenancy; this line assumes one new tenancy a year. A tenant who stays longer makes it cheaper."
           },
-          "source": "https://www.propspotter.com.au/property-management-fees"
+          "source": "https://www.consumer.vic.gov.au/housing/renting/starting-and-changing-rental-agreements/using-a-property-manager-or-agent"
         }
       ]
     }
@@ -135,11 +135,11 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
 Notes:
 
 - **No `fills`.** The PM cost lines are resolver-estimated from these benchmarks against the rent; the doc supplies the structures and bands, not a property-specific fee.
-- **All CONVENTION.** Property management fees are not regulated figures — they are negotiable and vary by state and agency; presented as typical, the management agreement binds.
+- **Structure grounded, percentages PLACEHOLDER.** Property management fees are not regulated figures — they are negotiable and vary by state and agency. Consumer Affairs Victoria grounds the structure (management fee, letting fee, re-leasing fee, sundries; all negotiable; recorded on the authority); the percentages await agencies' own fee schedules. The management agreement binds.
 - **Cost here, decision elsewhere.** This doc owns the *fee structure and benchmarks* (consumed by `yield_modelling` for the cost line and by `ownership_planning_investor` for the management-cost side); the *PM-vs-self-managed decision* is owned by `kb.investor.property-management-vs-self-managed` (Cluster S). Single-owner via cross-ref.
 
 ## Sources
 
-- ASIC Moneysmart — *Investing in property* (property management fees as an ongoing cost of an investment property) — https://moneysmart.gov.au/property-investment/investing-in-property
-- ATO — *Rental expenses you can claim now* (property agent fees/commissions are a deductible rental expense) — https://www.ato.gov.au/individuals-and-families/investments-and-assets/property-and-land/residential-rental-properties/rental-expenses/rental-expenses-you-can-claim-now
-- Canstar — *Property management fees* (indicative — typical management %, letting fee in weeks of rent, by state) — https://www.canstar.com.au/home-loans/property-management-fees/
+- Consumer Affairs Victoria — *Using a property manager or agent* (the management, letting and re-leasing fees and sundries; all negotiable; recorded on the authority, a percentage fee also as a dollar amount) — https://www.consumer.vic.gov.au/housing/renting/starting-and-changing-rental-agreements/using-a-property-manager-or-agent
+- ASIC Moneysmart — *Buying an investment property* (property management fees as an ongoing cost of an investment property) — https://moneysmart.gov.au/property-investment/buying-an-investment-property
+- ATO — *Common property expenses* (property agent fees and commission are a deductible rental expense) — https://www.ato.gov.au/individuals-and-families/investments-and-assets/property-and-land/residential-rental-properties/rental-expenses/common-property-expenses

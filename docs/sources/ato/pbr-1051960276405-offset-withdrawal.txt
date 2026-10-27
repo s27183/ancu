@@ -1,0 +1,69 @@
+Source: https://www.ato.gov.au/law/view/document?DocID=EV/1051960276405
+Retrieved: 2026-10-27
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML 623e06d7bb3ff44a120c7885f39310aa4721e82fe591d735574918cc14e2c47b
+
+1051960276405 | Legal database
+Legal database
+Legal database
+Contents
+Email Print
+Back to browse
+Disclaimer
+This edited version has been archived due to the length of time since original publication. It should not be regarded as indicative of the ATO's current views. The law may have changed since original publication, and views in the edited version may also be affected by subsequent precedents and new approaches to the application of the law.
+You cannot rely on this record in your tax affairs. It is not binding and provides you with no protection (including from any underpaid tax, penalty or interest). In addition, this record is not an authority for the purposes of establishing a reasonably arguable position for you to apply to your own circumstances. For more information on the status of edited versions of private advice and reasons we publish them, see PS LA 2008/4 .
+Edited version of private advice
+Authorisation Number: 1051960276405
+Date of advice: 21 March 2022
+Ruling
+Subject: Deduction - interest
+Question
+Can the Taxpayer claim interest paid as a tax deduction on the $XXX paid out of the Offset account to purchase shares?
+Answer
+No.
+This private ruling applies for the following period:
+Year ending 30 June 20XX
+Year ending 30 June 20XX
+The scheme commences on:
+1 July 20XX
+Relevant facts and circumstances
+Taxpayer obtained a Home Loan to purchase a home. The Home Loan is linked to an Offset account.
+The Home Loan and the Offset account are in the names of the Taxpayer and spouse.
+The Taxpayer obtained a separate Line of Credit (LOC) with the intention to make an investment.
+The LOC loan is in the Taxpayers name only.
+The Taxpayer withdrew funds from the LOC loan account in full and deposited the funds into the Offset account.
+In XX/XX/XXXX, the Taxpayer withdrew $XX.XXX.XX from the Offset account to purchase shares in the company the Taxpayer works for with the expectation of earning income from dividends.
+The Taxpayer lodged the Income Tax Returns without claiming a deduction for the interest expense relating to the funds used to purchase the shares.
+Relevant legislative provisions
+Income Tax Assessment Act 1997 Section 8-1
+Reasons for decision
+Section 8-1 of the Income Tax Assessment Act 1997 (ITAA 1997) allows a deduction for all losses and outgoings to the extent to which they are incurred in gaining or producing assessable income except where the outgoings are of a capital, private or domestic nature.
+A number of significant court decisions have determined that for an expense to be an allowable deduction:
+• it must have the essential character of an outgoing incurred in gaining assessable income or, in other words, of an income-producing expense ( Lunney v. FC of T ; (1958) 100 CLR 478),
+• there must be a nexus between the outgoing and the assessable income so that the outgoing is incidental and relevant to the gaining of assessable income ( Ronpibon Tin NL v. FC of T , (1949) 78 CLR 47), and
+• it is necessary to determine the connection between the particular outgoing and the operations or activities by which the taxpayer most directly gains or produces his or her assessable income ( Charles Moore Co (WA) Pty Ltd v. FC of T , (1956) 95 CLR 344; FC of T v. Hatchett , 71 ATC 4184).
+Taxation Ruling TR 95/25 Income tax: deductions for interest under subsection 51(1) of the Income Tax Assessment Act 1936
+following FC of T v. Roberts; FC of T v. Smith provides the Commissioner's view regarding the deductibility of interest expenses. As outlined in TR 95/25, there must be a sufficient connection between the interest expense and the activities which produce assessable income. TR 95/25 specifies that to determine whether the associated interest expenses are deductible, it is necessary to examine the purpose of the borrowing and the use to which the borrowed funds are put.
+The 'use' test, established in the High Court case Federal Commissioner of Taxation v. Munro (1926) 38 CLR 153, (1926) 32 ALR 339 is the basic test for the deductibility of interest, and looks at the application of the borrowed funds as the main criterion.
+Where a borrowing is used to acquire an income producing asset or relates to an income producing activity, the interest on this borrowing is considered to be incurred in the course of producing assessable income. Accordingly, it follows that if a loan is used for investment purposes from which income is to be derived, the interest incurred on the loan will be deductible. However, where a loan relates to private purposes, no deduction is allowed.
+Taxation Ruling TR 93/6 Income tax and fringe benefits tax: loan account offset arrangements, outlines the Commissioner's view on loan account offset arrangements which are used to reduce the interest payable on a taxpayer's loan account. TR 93/6 provides that an acceptable loan account offset arrangement with dual accounts operates as follows:
+• There are two accounts - a loan account and a deposit account. It is accepted that where the deposit account is a sub-account, it will be treated as a separate account.
+• No interest is received on the deposit account.
+• The reduction of the loan account interest should be achieved by offsetting the balances of the two accounts.
+As highlighted in paragraph 6 of TR 93/6, to be an acceptable offset arrangement for tax purposes, it is essential that there be no entitlement, either in law or in equity, to receive interest payment or payments in the nature of interest on the amounts credited to the deposit account. The only benefit arising in the deposit account should be the right to ensure that the interest payable on the loan account is reduced.
+A taxpayer with an acceptable loan account offset arrangement is entitled to claim a deduction for the full amount of interest incurred on the loan account, whilst the loan is used wholly for income producing purposes.
+In order to determine the deductibility of the associated interest expense, it is necessary to examine the purpose of the borrowing and where the borrowed funds were put. This is best achieved by considering the attributes of an offset account and comparing these to a redraw facility.
+Taxation Ruling TR 2000/2 Income tax: deductibility of interest on moneys drawn down under line of credit facilities and redraw facilities considers the deductibility of interest incurred by borrowers on money drawn down under line of credit facilities and loans offering redraw facilities.
+The ruling establishes drawing any excess or available funds from a loan account is treated as a new loan. As such the purpose or use of the drawing is relevant. That is, the deductible portion of interest when further borrowings are made depends on the use to which the redrawn funds are put. This is independent of the purpose of the original borrowing. The redraw facilities referred to in TR 2000/2 is where a borrower redraws previous repayments of the loan principal in a loan account.
+Where a person uses the redrawn funds for different purposes then the loan account becomes a mixed purpose account. In a mixed purpose loan, the interest must be apportioned between the income producing and non-income producing purposes. The part of the accrued interest attributable to the funds used for private purposes is not deductible.
+Please note that the principles of TR 2000/2 apply to a loan account and not a deposit account. That is, a redraw from an offset account has no effect on the allowable portion of interest for a loan account. A withdrawal from an offset account is not a borrowing or a loan and therefore the use of the funds from an offset account is not relevant for tax purposes. That is, a redraw from an offset account is not a redraw from a loan account as discussed in TR 2000/2.
+As highlighted in paragraph 40 of TR 2000/2, the redraw facility does not involve separate loan and deposit accounts as discussed in TR 93/6.
+In the Taxpayer's situation, the LOC was fully drawn and the loan funds were deposited into an Offset account. To determine whether the associated interest expenses are deductible, it is necessary to examine the purpose of the borrowing and the use to which the borrowed funds are put.
+Whilst the Taxpayer's intention with the LOC was to make an investment, the funds were deposited into the Offset account. The only benefit arising in the Offset account is the right to ensure that the interest payable on the associated loan account is reduced. The funds were not used to purchase an income producing asset or used for an income producing activity. The funds were used for a non-income producing purpose and the interest incurred on the LOC will not be an allowable deduction.
+The private ruling application said placing the funds in an Offset account meant that no interest was paid on the funds withdrawn from the LOC. However, it was later confirmed the Offset account is not linked the LOC but linked to the private loan for the main residence. Therefore, placing the funds in the Offset account meant the interest payable on the Home Loan was decreased.
+An offset account is a separate account and deposits to and withdrawals from the offset account will not change the character of the interest expense on the associated loan, in this case, the Home Loan. The deposit to the Offset account will not decrease the balance of the Home loan. Depositing funds into the Offset account reflects an increase in savings.
+Conversely, withdrawing funds from the Offset account will increase the interest payable on the Home Loan, but will not increase the balance of the Home Loan. The money withdrawn from the Offset account is not in the form of borrowings and will not incur any interest. The amount withdrawn is reflected as a reduction in savings. Consequently, any use to which these funds are put (including an income producing purpose such as purchasing shares) is funded by savings and not a new loan.
+As the Offset account is linked to the Home Loan and the Home Loan is not used for income producing purposes, the Taxpayer is not entitled to claim a deduction for interest incurred on the Home Loan under section 8-1 of the ITAA 1997 as the expense was not incurred in gaining or producing assessable income and is considered private in nature.
+Other information
+It is noted that you asked for the private ruling to continue for as long as the Taxpayer holds the shares. The Commissioner does not rule for indefinite or extended periods as there may be changes to the facts of the arrangement or the law in question. Also, a public ruling may issue which affects the private ruling. Therefore, we have only ruled for the 2019-20 to 2020-21 income years.
+Taxation Ruling TR 2006/11 Private Rulings outlines the system of private rulings. A private ruling only applies to the particular scheme or circumstance that it describes. A private ruling applies for the specified period, as long as the law to which is relates remains in force. Each private ruling is specific to an entity, and it cannot be relied on by another entity. Further information about private rulings can be viewed by searching 'QC 40428' in the search function of www.ato.gov.au.
+Back to top

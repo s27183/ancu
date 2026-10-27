@@ -1,11 +1,39 @@
 ---
 slug: kb.fx-providers.wise-ofx-bank-comparison
 effective_from: 2025-07-01
-last_verified: 2026-10-18
+last_verified: 2026-10-27
 sources:
   - url: https://wise.com/au/currency-converter/vnd-to-aud-rate
-    retrieved: 2026-10-18
-    note: "Wise VND→AUD — transparent upfront fee on the real mid-market rate ('no sneaky mark-up'), the model this doc contrasts against banks that embed the margin in the exchange rate. Confirms the 'rank by transparent landed cost' comparison dimension. Spread magnitudes remain owned by kb.fx.typical-spreads-vnd-aud."
+    retrieved: 2026-10-27
+    path: docs/sources/fx/wise-vnd-to-aud-rate.txt
+    note: "Wise on its own pricing: the mid-market rate with an upfront fee. Spread magnitudes are owned by kb.fx.typical-spreads-vnd-aud."
+    quotes:
+      - "We use the real, mid-market rate with no sneaky mark-up to hide the fees."
+  - url: https://wise.com/au/send-money/send-money-to-vietnam
+    retrieved: 2026-10-27
+    path: docs/sources/fx/wise-send-money-to-vietnam.txt
+    quotes:
+      - "Low fees — fees get cheaper the more you send"
+      - "Sending over 40,000 AUD or equivalent? We'll discount our fee"
+      - "We use the mid-market exchange rate — the fairest rate — and always show your fees upfront."
+  - url: https://www.ofx.com/en-au/faqs/are-there-any-transfer-fees/
+    retrieved: 2026-10-27
+    path: docs/sources/fx/ofx-are-there-any-transfer-fees.txt
+    quotes:
+      - "OFX charges a transaction fee of AU$15 when transferring under AU$10,000 (or foreign currency equivalent)."
+      - "If you are comparing rates, you should bear in mind that an attractive exchange rate may be offset by a high transaction fee (or vice versa)."
+      - "Third-party banks may deduct a fee from your transfer before paying your recipient."
+  - url: https://www.ofx.com/en-us/exchange-rates/aud-to-vnd/
+    retrieved: 2026-10-27
+    path: docs/sources/fx/ofx-aud-to-vnd.txt
+    quotes:
+      - "The amounts above are calculated using the Market (Interbank) rate and are not indicative of OFX Customer Rates."
+  - url: https://moneysmart.gov.au/banking/sending-money-overseas
+    retrieved: 2026-10-27
+    path: docs/sources/asic/moneysmart-sending-money-overseas.txt
+    quotes:
+      - "Providers choose the exchange rate they use. They also charge fees."
+      - "the 'margin' fee to convert your currency"
 ---
 
 # FX / money-transfer provider comparison — VN→AU transfers
@@ -17,7 +45,7 @@ This is the Mode-B FX analogue of [`kb.lender.non-resident-friendly-shortlist`](
 ## What to compare — the dimensions
 
 - **Total landed cost** — the single ranking metric: FX margin (owned by [`kb.fx.typical-spreads-vnd-aud`](../fx/typical-spreads-vnd-aud.md)) + fixed transfer fee + any receiving-bank fee = the AUD that actually arrives. Everything else is a tie-breaker.
-- **Fee structure** (qualitative): specialist providers price mostly via a **transparent percentage fee at/near the mid-market rate**; margin-based providers build the cost **into the rate** and often **waive the fixed fee above a threshold**; banks add a **wire fee on top of a wider margin**.
+- **Fee structure** (qualitative, from each provider's own page): Wise prices at **the mid-market rate plus an upfront fee** that falls as the amount rises (a discount over AU$40,000); OFX builds its margin **into the rate it quotes** and charges **AU$15 under AU$10,000**, none above; a bank sells the currency at **its own rate** and adds its **wire fee** (owned, with the magnitudes, by [`kb.fx.typical-spreads-vnd-aud`](../fx/typical-spreads-vnd-aud.md)).
 - **Speed / ETA** — settlement timing matters against the transfer buffer before settlement.
 - **Transfer limits** — a large VN-side lump sum may exceed a provider's per-transfer cap, forcing a split or a bank route.
 - **VN-side compliance friction** — SBV documentation and declared purpose (owned by the VN placeholders) can make one channel far slower than another.
@@ -25,7 +53,7 @@ This is the Mode-B FX analogue of [`kb.lender.non-resident-friendly-shortlist`](
 
 ## The selection rule — rank by landed cost for the amount
 
-The resolver computes each candidate's **total landed cost for the user's specific amount** and ranks them; `recommendation_reasoning` states *why the top-ranked option is cheapest for that amount*. The **structural crossover**: for **small** transfers a flat-percentage-fee specialist usually wins; for **large** transfers a margin-based provider whose **margin shrinks with size** can beat it — so the cheapest *category* depends on the amount. The user then obtains a **live quote** (rates and fees move) and **picks**.
+The resolver computes each candidate's **total landed cost for the user's specific amount** and ranks them; `recommendation_reasoning` states *why the top-ranked option is cheapest for that amount*. The **structural crossover**: a percentage fee and a margin-in-rate scale differently with the amount, and OFX's fixed fee falls away above AU$10,000 while Wise discounts above AU$40,000 — so which category is cheapest depends on the amount, and the ranking is computed for it, never assumed. OFX itself warns that "an attractive exchange rate may be offset by a high transaction fee (or vice versa)". The user then obtains a **live quote** (rates and fees move) and **picks**.
 
 ## The boundary — decision-support, not advice
 
@@ -53,14 +81,14 @@ Pure-reference (`fills: []`). The resolver builds `evaluated_providers` by compu
     "no_provider_referral_fee": { "type": "bool", "value": true, "provenance": "CONVENTION", "note": "independence (principle 8) — the platform takes no commission/referral from any provider; ranking is by cost only." },
     "user_obtains_live_quote_and_picks": { "type": "bool", "value": true, "provenance": "CONVENTION", "note": "rates and fees move; the user obtains a live quote and confirms the choice." },
     "defer_execution_to_licensed_provider": { "type": "bool", "value": true, "provenance": "CONVENTION", "note": "the transfer is executed through a licensed money-transfer provider or bank; the platform stays informational." },
-    "cheapest_category_depends_on_amount": { "type": "bool", "value": true, "provenance": "CONVENTION", "note": "small transfers favour flat-%-fee specialists; large transfers can favour margin-based providers whose margin shrinks with size — rank for the actual amount." }
+    "cheapest_category_depends_on_amount": { "type": "bool", "value": true, "provenance": "CONVENTION", "note": "percentage-fee and margin-in-rate pricing scale differently with the amount (OFX: AU$15 fee under AU$10,000 only; Wise: fee discount over AU$40,000) — rank for the actual amount, never by category." }
   },
   "lookup": {
     "comparison_dimensions": {
       "note": "the dimensions the resolver reasons over to build a cost-ranked comparison; total landed cost is the ranking metric, the rest are tie-breakers. Magnitudes are owned by kb.fx.typical-spreads-vnd-aud, not duplicated here.",
       "entries": [
         { "dimension": "total_landed_cost", "role": "ranking_metric", "owner": "kb.fx.typical-spreads-vnd-aud" },
-        { "dimension": "fee_structure", "role": "cost_shape", "note": "specialist %-fee at mid-market vs margin-in-rate (fee waived above threshold) vs bank margin + wire fee" },
+        { "dimension": "fee_structure", "role": "cost_shape", "note": "Wise: mid-market + upfront fee; OFX: margin in the quoted rate + AU$15 under AU$10,000; bank: its own sell rate + wire fee" },
         { "dimension": "speed_eta", "role": "tie_breaker", "note": "against the transfer buffer before settlement" },
         { "dimension": "transfer_limits", "role": "tie_breaker", "note": "large VN-side sums may exceed a provider cap" },
         { "dimension": "vn_side_compliance_friction", "role": "tie_breaker", "owner": "kb.vn-capital-controls.declared-purpose-categories" },
@@ -79,8 +107,8 @@ Notes:
 
 ## Sources
 
-- ASIC Moneysmart — *International money transfers* (compare the exchange-rate margin and fees; total cost is margin + fees) — https://moneysmart.gov.au/banking/international-money-transfers
-- Wise — *OFX vs Wise* (transparent %-fee vs margin-in-rate; where each is cheaper by amount) — https://wise.com/us/blog/ofx-vs-wise
-- Wise — *Send money to Vietnam* (mid-market rate + upfront percentage fee; transfer limits) — https://wise.com/au/send-money/send-money-to-vietnam
-- OFX — *AUD to VND exchange rate* (margin-based pricing; fixed fee waived above a threshold; large-transfer positioning) — https://www.ofx.com/en-us/exchange-rates/aud-to-vnd/
-- The Currency Shop — *Cheaper Ways to Send Money to Vietnam from Australia* (specialist vs bank landed-cost comparison) — https://www.thecurrencyshop.com.au/international-money-transfers/send-money-to-vietnam
+- ASIC Moneysmart — *Sending money overseas* (providers choose their exchange rate and charge fees; compare the margin and the fees) — https://moneysmart.gov.au/banking/sending-money-overseas
+- Wise — *Send money to Vietnam* (mid-market rate + upfront fee; fee discount over AU$40,000) — https://wise.com/au/send-money/send-money-to-vietnam
+- Wise — *VND to AUD rate* (the mid-market rate, no mark-up) — https://wise.com/au/currency-converter/vnd-to-aud-rate
+- OFX — *Are there any transfer fees?* (AU$15 under AU$10,000; third-party bank fees) — https://www.ofx.com/en-au/faqs/are-there-any-transfer-fees/
+- OFX — *AUD to VND exchange rate* (the interbank rate shown is not OFX's customer rate) — https://www.ofx.com/en-us/exchange-rates/aud-to-vnd/

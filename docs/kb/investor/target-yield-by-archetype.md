@@ -1,13 +1,19 @@
 ---
 slug: kb.investor.target-yield-by-archetype
 effective_from: 2026-06-26
-last_verified: 2026-06-26
+last_verified: 2026-10-27
 sources:
-  # PLACEHOLDER doc — figures are NOT source-grounded (Son's call 2026-06-26). The entry below
-  # is the named re-grounding candidate (CoreLogic/Cotality gross-yield-by-dwelling-type), not a
-  # validation of the archetype defaults. Re-ground and bump last_verified before surfacing as authoritative.
-  - url: https://propertyinvestmentprofessionals.com.au/research-insights/cotality-housing-chart-pack-april-2026-investor-analysis
-    retrieved: 2026-07-06
+  # PLACEHOLDER doc — the archetype yields are NOT source-grounded (Son's call 2026-06-26). No
+  # primary states a target yield per strategy; the market anchor to re-ground on is a data
+  # producer's own gross-rental-yield-by-dwelling-type series (Cotality's own Housing Chart Pack,
+  # or SQM Research's own gross-yield series), read on the producer's page, never a third party's
+  # write-up of it. The entry below grounds only the qualitative posture (yield and growth are
+  # weighed together), not any figure.
+  - url: https://moneysmart.gov.au/property-investment/buying-an-investment-property
+    retrieved: 2026-10-27
+    path: docs/sources/asic/moneysmart-buying-an-investment-property.txt
+    quotes:
+      - "Look for areas with high growth, higher rental yield and low vacancy rates."
 ---
 
 # Default target gross yield by strategy archetype — PLACEHOLDER (pending authoritative source)
@@ -18,9 +24,9 @@ sources:
 > downstream yield-anchored bid discipline (`buying_strategy.yield_anchored_max_price`) has a value
 > to compute from when the investor has not stated their own target. They are **not** drawn from an
 > authoritative series. Before any figure derived from these is surfaced as authoritative, the
-> defaults **must** be re-grounded (candidates: a buyer's-agent / investment-advisory yield-target
-> convention; SQM Research / CoreLogic gross-yield-by-dwelling-type series as a market anchor) and
-> `last_verified` updated. Until then the resolver surfaces the derived anchor as **decision-support /
+> defaults **must** be re-grounded on a data producer's own gross-rental-yield-by-dwelling-type
+> series (Cotality's own Housing Chart Pack, or SQM Research's own gross-yield series) as a market
+> anchor — never a third party's write-up of that series — and the provenance moved off PLACEHOLDER. Until then the resolver surfaces the derived anchor as **decision-support /
 > indicative**, never as a target the investor must adopt. (The labelled-placeholder pattern
 > [[capital-growth-bands]] used until its 2026-10-07 ABS re-grounding; Son's call 2026-06-26.)
 
@@ -71,11 +77,11 @@ resolver's — the figure stays out of the LLM's reach, §98).
   "fills": [],
   "parameters": {
     "is_placeholder": { "type": "bool", "value": true, "note": "TRUE — indicative planning defaults, NOT a measured yield series; re-ground/confirm before surfacing as authoritative (Son, 2026-06-26)" },
-    "target_gross_yield_cash_flow":      { "type": "percentage", "value": 5.5,  "note": "PLACEHOLDER — cash-flow thesis demands the highest yield; NOT source-grounded" },
-    "target_gross_yield_dual_income":    { "type": "percentage", "value": 5.0,  "note": "PLACEHOLDER — two income streams lift the yield target; NOT source-grounded" },
-    "target_gross_yield_value_add":      { "type": "percentage", "value": 4.5,  "note": "PLACEHOLDER — manufactured-value thesis, mid yield target; NOT source-grounded" },
-    "target_gross_yield_balanced":       { "type": "percentage", "value": 4.0,  "note": "PLACEHOLDER — deliberate middle; NOT source-grounded" },
-    "target_gross_yield_capital_growth": { "type": "percentage", "value": 3.0,  "note": "PLACEHOLDER — growth thesis accepts the lowest yield; NOT source-grounded" },
+    "target_gross_yield_cash_flow":      { "type": "percentage", "value": 5.5,  "note": "PLACEHOLDER — no primary states this; re-ground on a producer's own gross-yield-by-dwelling-type series (Cotality Housing Chart Pack / SQM Research). Cash-flow thesis demands the highest yield" },
+    "target_gross_yield_dual_income":    { "type": "percentage", "value": 5.0,  "note": "PLACEHOLDER — no primary states this; re-ground on a producer's own gross-yield-by-dwelling-type series (Cotality Housing Chart Pack / SQM Research). Two income streams lift the yield target" },
+    "target_gross_yield_value_add":      { "type": "percentage", "value": 4.5,  "note": "PLACEHOLDER — no primary states this; re-ground on a producer's own gross-yield-by-dwelling-type series (Cotality Housing Chart Pack / SQM Research). Manufactured-value thesis, mid yield target" },
+    "target_gross_yield_balanced":       { "type": "percentage", "value": 4.0,  "note": "PLACEHOLDER — no primary states this; re-ground on a producer's own gross-yield-by-dwelling-type series (Cotality Housing Chart Pack / SQM Research). Deliberate middle" },
+    "target_gross_yield_capital_growth": { "type": "percentage", "value": 3.0,  "note": "PLACEHOLDER — no primary states this; re-ground on a producer's own gross-yield-by-dwelling-type series (Cotality Housing Chart Pack / SQM Research). Growth thesis accepts the lowest yield" },
     "target_gross_yield_land_banking":   { "type": "percentage", "value": null, "note": "NONE — land banking is not yield-driven; the yield anchor does not apply" }
   }
 }

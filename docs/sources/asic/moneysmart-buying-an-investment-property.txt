@@ -1,0 +1,154 @@
+Source: https://moneysmart.gov.au/property-investment/buying-an-investment-property
+Retrieved: 2026-10-27
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML 7fd1d735e2a5f528fa0c9c7b0156e72b7ec4d167045a1e492d471afedbe79786
+
+Buying an investment property - Moneysmart.gov.au
+Skip to main content
+Buying an investment property
+Last updated: 29 September 2026
+Houses and units seem easier to understand than many other types of investments. However, it's important to understand how investing in property works, to decide if it's right for you.
+Benefits and risks of property investment
+Property investment is often seen as being less risky than other forms of investment. However, while it may seem more straightforward, there are pitfalls to be aware of. Here's what you need to consider about investing in property.
+Potential benefits
+Less volatility – Property can be less volatile than shares or other investments.
+Income – You earn rental income if the property is tenanted.
+Capital growth – If your property increases in value, you will benefit from a capital gain when you sell.
+Tax deductions – You can offset most property expenses against rental income, including interest on any loan used to buy the property.
+Physical asset – You are investing in something you can see and touch.
+No specialised knowledge required – Unlike some complex investments, you don't need any particular specialised knowledge to invest in property.
+Risks and limitations
+Cost – Rental income may not cover your mortgage payments and other expenses.
+Interest rates – A rise in interest rates will mean higher repayments and lower disposable income.
+Vacancy – There may be times when you have to cover the costs yourself if you don't have a tenant.
+Inflexible – You can't sell off a bedroom if you need to access some cash in a hurry.
+Loss of value – If the property value goes down you could end up owing more than the property is worth.
+High entry and exit costs – Expenses such as stamp duty, legal fees and real estate agent's fees.
+There are restrictions on buying property through a self-managed super fund (SMSF). See SMSFs and property for more information.
+Diversify your investments
+Invest in more than just property so your money isn't all in one market. If you invest in one market, it'll increase your risk and means your portfolio isn't diversified . See choose your investments for how to find other investments to help you reach your goals.
+Costs of investing in property
+Buying, managing and selling an investment property can be costly and will affect your overall return.
+Cost to buy and sell
+Some of the costs involved to buy and sell a property include:
+stamp duty
+conveyancing fees
+legal costs
+search fees
+pest and building reports
+If you sell your property, you will have to pay agent's fees, advertising costs and legal fees. You may also have to pay capital gains tax (CGT) if the property has increased in value.
+Borrowing money to buy
+If you borrow to invest , you will have to pay the property mortgage. Don't rely on rental income to cover the mortgage – there may be times when your property is empty.
+Many people buy investment property with interest-only loans, but remember the interest-only period will end after a certain time. This means your repayments will increase to pay the amount borrowed, plus the interest. See interest-only home loans to find out how they work. And learn more about choosing a home loan .
+Interest-only mortgage calculator
+See what an interest-only loan will cost you.
+Costs to own an investment property
+Ongoing costs of investment properties include:
+council and water rates
+building insurance
+landlord insurance
+body corporate fees
+land tax
+property management fees (if you use an agent)
+repairs and maintenance costs
+Tax on your investment property
+Although you may be able to claim tax deductions on expenses, you'll still have to pay them up front. For positively geared investments , you may pay tax on your rental income.
+Visit the ATO for how tax works for investment properties .
+In the 2026 Federal Budget, delivered Tuesday 12th May, the government announced changes to the application of both negative gearing and capital gains tax. Please make sure you take these changes into account when considering future investments. Visit the ATO for more information.
+What to consider when buying an investment property
+The decision to buy an investment property should be part of your investment plan and take into consideration your goals and risk tolerance.
+Once you have a property in mind, do a budget to compare the income you expect to your outgoing expenses. If there is a shortfall, consider whether you can cover the expenses long-term. Also, work out whether you could cover all expenses short-term if you had no tenants for a while.
+Research the property market to decide how to get an investment property. Where and what you buy will affect your return on investment.
+How to assess a location
+Areas you're familiar with will take time to research.
+Look for areas with high growth, higher rental yield and low vacancy rates.
+Find out about proposed planning changes in the suburb that may affect future property prices.
+How to assess a property
+Look for properties with appealing features like a second bathroom, a garage and access to schools, shops and transport.
+Consider maintenance costs based on property type, age and features.
+How to assess advice and services
+Be wary of property investment advice from groups of service providers. Property developers, accountants, lawyers and mortgage brokers might recommend each other's services.
+You may have heard of property investment seminars promising to make you a fortune. These events often use high-pressure sales tactics to rush you into making big property investment decisions. Find out how to spot the warning signs of a dodgy investment seminar .
+Risks of overseas property investment
+Investing in overseas property is riskier than investing in property in Australia. It's harder to manage a property from afar and there may be costs that you haven't thought of.
+Here are some things to consider before you invest:
+Distance – Good tenants and property managers are hard to manage when you're so far away
+Renovations and repairs – You can't supervise repairs or know who does the work
+Extra costs – You must factor in Australian tax laws, local property taxes, insurance, management costs, and ongoing repairs. If you buy through a promoter, there may be other hidden costs
+Exchange rate – Changes could affect the amount of income you receive.
+Simon and Tiana consider an investment property
+Simon and Tiana are considering buying an investment property. They spot a unit that ticks all of their boxes: it's close to a train station and is a 10 minute walk to restaurants and shops.
+The property price is $550,000 with buying costs of $23,000. They have a deposit of $150,000 so they will need to borrow $423,000 to complete the purchase. Their monthly income and expenses are expected to be:
+Income and expenses
+$
+Rental income
+$2,250
+Less loan repayment
+-$2,725
+Less allowance for expenses
+-$225
+Less strata fees
+-$216
+Less allowance for repairs and maintenance
+-$500
+Monthly shortfall
+-$1,416
+Simon and Tiana can cover the monthly shortfall with Tiana's salary, which they currently save. They also have an emergency fund they can draw on if they were suddenly without tenants for a while.
+Do you find this page useful?
+Yes
+No
+Why?
+It had the information I was looking for
+The page makes sense
+The information is balanced and unbiased
+The information gave me a sense of what to do next
+Submit
+Any other feedback
+Why not?
+It didn't have the information I was looking for
+The page was confusing
+The information overwhelmed me
+There wasn't enough information for me to take action
+Submit
+Any other feedback
+Your feedback
+Your feedback relates to:
+Please select...
+Webpage Content
+Calculator or tool
+Complaint or scam
+Copyright requests
+Loans, money and personal finance advice
+Other feedback/suggestion
+You would like to:
+Please select...
+Report an Error
+Comment on a Webpage
+Ask a question
+Your issue is:
+Please select...
+You don't understand the calculator result
+You believe the calculator is incorrect
+The calculator/tool does not work (eg technical issue)
+You want to provide general feedback/suggestions
+Error loading Partial View script (file: ~/Views/MacroPartials/MoneySmart/Standard text.cshtml)
+Error loading Partial View script (file: ~/Views/MacroPartials/MoneySmart/Standard text.cshtml)
+Error loading Partial View script (file: ~/Views/MacroPartials/MoneySmart/Standard text.cshtml)
+Summary of your feedback:
+Your comments:
+The page/calculator/app you are referring to (eg. cut/paste URL):
+Cancel
+Send feedback
+Up next in Property investment
+Property funds
+Investing in listed and unlisted property funds
+4 min read
+SMSFs and property
+Mixing property and your self-managed super
+5 min read
+Land banking
+Land banking can be high risk. Know what to check before you invest.
+3 min read
+Timeshares
+Find out how timeshares work and the risks involved.
+5 min read
+search

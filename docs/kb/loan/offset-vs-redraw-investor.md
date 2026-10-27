@@ -1,11 +1,32 @@
 ---
 slug: kb.loan.offset-vs-redraw-investor
 effective_from: 2025-07-01
-last_verified: 2026-07-06
+last_verified: 2026-10-27
 sources:
-  - url: https://aintreegroup.com.au/insights/warning-for-those-redrawing-investment-loans/
-    retrieved: 2026-07-06
-    note: "Accounting-firm explainer of ATO TR 2000/2 — redraw is a new borrowing, deductibility follows the USE of redrawn funds; private redraw makes the loan mixed-purpose and contaminates deductibility; an offset withdrawal is NOT a new borrowing so it does not. Confirms the doc's core distinction. (Secondary source — the ATO TR 2000/2 primary at ato.gov.au was Cloudflare-blocked this session.)"
+  - url: https://www.ato.gov.au/law/view/document?docid=TXR/TR20002/NAT/ATO/00001
+    retrieved: 2026-10-27
+    path: docs/sources/ato/tr-2000-2.txt
+    quotes:
+      - "In this regard the term 'redraw' is a misnomer. It is in effect a new borrowing of funds."
+      - "The deductibility of interest on a further borrowing of money under a redraw facility depends upon the use to which the redrawn funds are put."
+      - "the loan account becomes a mixed purpose account and the same principles discussed above in relation to mixed purpose line of credit sub-accounts will apply to the mixed purpose loan account. There is an ongoing need to apportion interest on a mixed purpose loan account."
+  - url: https://www.ato.gov.au/law/view/document?DocID=EV/1051960276405
+    retrieved: 2026-10-27
+    path: docs/sources/ato/pbr-1051960276405-offset-withdrawal.txt
+    note: "ATO private ruling (edited, archived version — binds only its applicant; the ATO marks archived edited rulings as not necessarily its current view). It applies TR 2000/2 and TR 93/6 to an offset account."
+    quotes:
+      - "A withdrawal from an offset account is not a borrowing or a loan and therefore the use of the funds from an offset account is not relevant for tax purposes."
+  - url: https://www.ato.gov.au/individuals-and-families/investments-and-assets/property-and-land/residential-rental-properties/rental-expenses/interest-expenses
+    retrieved: 2026-10-27
+    path: docs/sources/ato/rental-interest-expenses.txt
+    quotes:
+      - "All loan repayments must be apportioned across both rental and private portions of the loan for the length of the loan."
+      - "Tyler must continue to apportion interest and repayments of principal in accordance with this ratio for the life of the loan."
+  - url: https://moneysmart.gov.au/home-loans/choosing-a-home-loan
+    retrieved: 2026-10-27
+    path: docs/sources/asic/moneysmart-choosing-a-home-loan.txt
+    quotes:
+      - "If you're able to keep $50,000 of savings in the offset, you'll pay interest on $700,000."
 ---
 
 # Offset vs redraw — for investors
@@ -36,7 +57,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
 {
   "fills": [],
   "parameters": {
-    "offset_preserves_deductibility":   { "type": "bool", "value": true, "note": "REGULATED (ATO TR 2000/2) — an offset is a deposit account; a withdrawal from it is NOT a borrowing, so offset use has no effect on the investment loan's interest deductibility" },
+    "offset_preserves_deductibility":   { "type": "bool", "value": true, "note": "REGULATED (ATO TR 2000/2 + TR 93/6, as applied in ATO private ruling 1051960276405) — an offset is a deposit account; a withdrawal from it is NOT a borrowing, so offset use has no effect on the investment loan's interest deductibility" },
     "redraw_is_new_borrowing_use_test": { "type": "bool", "value": true, "note": "REGULATED (ATO 'use' test, Munro; TR 2000/2) — a redraw is a new borrowing; deductibility of interest on redrawn funds follows the USE of those funds" },
     "private_redraw_contaminates_loan": { "type": "bool", "value": true, "note": "REGULATED — redraw from an investment loan for a PRIVATE purpose creates a mixed-purpose loan; interest is apportioned and the private portion is no longer deductible — permanent contamination" },
     "mixed_purpose_loan_apportioned":   { "type": "bool", "value": true, "note": "REGULATED — where borrowed funds serve both investment and private purposes, interest is apportioned; only the income-producing portion is deductible" },
@@ -54,6 +75,7 @@ Notes:
 
 ## Sources
 
-- ATO — *TR 2000/2 Income tax: deductibility of interest on moneys drawn down under line of credit facilities and redraw facilities* (redraw is a new borrowing; deductibility follows the use of the funds; offset withdrawals are not borrowings) — https://www.ato.gov.au/law/view/document?docid=TXR/TR20002/NAT/ATO/00001
-- ATO — *Interest expenses* (apportionment of interest on mixed-purpose loans; the "use" test) — https://www.ato.gov.au/individuals-and-families/investments-and-assets/property-and-land/residential-rental-properties/rental-expenses/interest-expenses
-- ASIC Moneysmart — *Offset accounts and redraw facilities* (how each works) — https://moneysmart.gov.au/home-loans/offset-accounts-and-redraw-facilities
+- ATO — *TR 2000/2 Income tax: deductibility of interest on moneys drawn down under line of credit facilities and redraw facilities* (redraw is a new borrowing; deductibility follows the use of the funds; a redraw facility has no separate deposit account, para 40) — https://www.ato.gov.au/law/view/document?docid=TXR/TR20002/NAT/ATO/00001
+- ATO — private ruling 1051960276405 (an offset withdrawal is not a borrowing; TR 2000/2 applies to a loan account, not a deposit account — an edited, archived ruling that binds only its applicant) — https://www.ato.gov.au/law/view/document?DocID=EV/1051960276405
+- ATO — *Interest expenses* (apportionment of interest on mixed-purpose loans, for the life of the loan) — https://www.ato.gov.au/individuals-and-families/investments-and-assets/property-and-land/residential-rental-properties/rental-expenses/interest-expenses
+- ASIC Moneysmart — *Choosing a home loan* (how an offset reduces the balance interest is charged on) — https://moneysmart.gov.au/home-loans/choosing-a-home-loan

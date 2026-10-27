@@ -326,15 +326,8 @@ def primary_fails(path, urls):
 # wire, an encyclopedia, and providers the map does not yet name for that doc). GATE 17
 # fails on a pair missing here and on a listed pair the docs no longer carry, so a new
 # secondary citation never enters and the list only shrinks; behavior 138 re-grounds each
-# group in its own commit until it is empty. Never add to it.
+# group in its own commit until it is empty — emptied 2026-10-27. Never add to it.
 KNOWN_SECONDARY = {
-    "docs/kb/fx-providers/wise-ofx-bank-comparison.md": ("www.thecurrencyshop.com.au",),
-    "docs/kb/fx/typical-spreads-vnd-aud.md": ("www.thecurrencyshop.com.au",),
-    "docs/kb/investor/operating-expenses-typical-ratios.md": ("nationalcover.com.au", "nestpath.com.au", "www.canstar.com.au", "www.mozo.com.au",),
-    "docs/kb/investor/property-management-fees.md": ("www.canstar.com.au", "www.localagentfinder.com.au", "www.propspotter.com.au",),
-    "docs/kb/investor/rental-appraisal-from-pm-agent.md": ("www.canstar.com.au",),
-    "docs/kb/investor/target-yield-by-archetype.md": ("propertyinvestmentprofessionals.com.au",),
-    "docs/kb/loan/offset-vs-redraw-investor.md": ("aintreegroup.com.au",),
 }
 
 
@@ -424,11 +417,22 @@ def _ratchet_property(corpus, seed=138, n=200):
     base_fails, found = primary_gate(corpus)
     if base_fails:
         return [("baseline", base_fails[:3])]
+    base_known = {p: tuple(hs) for p, hs in KNOWN_SECONDARY.items()}
+    if not found:
+        # the list is empty (behavior 138 done): plant two listed secondary citations so
+        # the same mutations still run against a corpus that carries some
+        corpus = {p: list(u) for p, u in corpus.items()}
+        for d, h in zip(sorted(corpus)[:2], ("www.canstar.com.au", "www.homeloanexperts.com.au")):
+            corpus[d] = corpus[d] + [f"https://{h}/planted"]
+            base_known[d] = base_known.get(d, ()) + (h,)
+        base_fails, found = primary_gate(corpus, base_known)
+        if base_fails:
+            return [("planted baseline", base_fails[:3])]
     listed = sorted(found)
     clean = sorted(p for p in corpus if not any(q == p for q, _ in listed))
     bad = []
     for i in range(n):
-        known = {p: tuple(hs) for p, hs in KNOWN_SECONDARY.items()}
+        known = dict(base_known)
         cor = {p: list(u) for p, u in corpus.items()}
         kind = ("drop", "add_list", "add_cite", "move", "case", "www")[i % 6]
         d, h = rng.choice(listed)

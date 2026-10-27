@@ -1,0 +1,79 @@
+Source: https://www.ato.gov.au/individuals-and-families/investments-and-assets/property-and-land/residential-rental-properties/rental-expenses/common-property-expenses
+Retrieved: 2026-10-27
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML 8a6fba73bc64c31796c57037495de0c0f5801fc55c4063356c9bc5310603888d
+
+Common property expenses | Australian Taxation Office
+Common property expenses
+Check the common rental expenses you can claim a deduction for.
+Last updated 21 May 2026
+Print or Download
+Expenses you can claim
+You can claim an immediate deduction for some expenses in the income year you incur them provided your property is held to produce assessable income , that is, rented or available to rent on commercial terms.
+If your rental property is also your holiday home , you can only claim an immediate deduction for ownership and use expenses , such as body corporate fees and land tax, if you used the property (or held it for use) mainly to produce rental income . For more information about what expenses you can and can't claim for a holiday home, see Holiday homes .
+To claim a deduction you must:
+actually incur the cost – you can't claim a deduction where the cost is paid by the tenant or someone else
+keep adequate records to prove your deductions if we ask for evidence.
+There are some rental expenses you must claim over several years – for example, capital works and borrowing expenses .
+Expenses you can claim an immediate deduction for include:
+advertising for tenants
+body corporate administrative fund fees and charges
+council rates, water charges, land tax
+cleaning, gardening and lawn mowing
+pest control
+insurance (building, contents, public liability, loss of rent)
+interest expenses
+pre-paid expenses
+property agent's fees and commission
+repairs and maintenance
+legal expenses .
+For more information, see Rental properties guide .
+Body corporate administrative fund fees and charges
+You may be able to claim a deduction for body corporate fees and charges you pay. Not all body corporate fees are deductible in full in the income year you incur them.
+Body corporate fees are a cost you pay to the body corporate or strata to manage the property and maintain common areas. Strata title body corporates are constituted under the strata title legislation of the various states and territories.
+These fees and charges may go towards payments to:
+cover the cost of day-to-day expenses to maintain and manage the building – for example, insurance premiums, maintenance of gardens and management of the body corporate itself
+a special purpose fund, for a specific expense – for example, roof repairs and building insurance.
+Regular payments you make to body corporate administration funds or general purpose sinking funds for ongoing administration and general maintenance are considered to be payments for the provision of services by the body corporate. You can claim an immediate deduction for these regular payments at the time you incur them.
+You can’t claim a deduction for a special levy you are required by the body corporate to pay to fund a particular capital improvement. You may be able to claim a capital works deduction for the cost of capital improvements or repairs of a capital nature once the work is completed. The cost must also be charged to either the special purpose fund or the general purpose sinking fund, if a special contribution has been levied.
+For a summary fact sheet of what you can and can't claim, go to the ATO Publication Ordering Service to download Rental property body corporate fees and charges (NAT 75375, PDF 222KB) External Link .
+Pre-paid expenses
+A pre-paid expense is a cost you incur under an agreement for services to be done (in whole or in part) in a later income year. For example, payment of an insurance premium on 1 January that provides cover for the entire calendar year or pre-paid interest on money you borrow.
+You can generally claim an immediate deduction in the income year you make the prepayment for:
+expenses of less than $1,000
+expenses of $1,000 or more where the eligible service period is 12 months or less and ends in the next income year (such as payment of an annual insurance premium part way through an income year).
+The eligible service period is the time taken for a thing to be done under an agreement in return for payment.
+The eligible service period begins on the later of either:
+the day the thing under the agreement begins to be done
+the day the expense is incurred.
+The eligible service period continues until the earlier of:
+the end of the last day the thing under the agreement stops being done
+10 years.
+A pre-paid expense for your rental property of more than $1,000, where the eligible service period is greater than 12 months, or ends later than the following income year, will have to be spread over the shorter of either:
+the eligible service period
+10 years.
+For more information, see Deductions for prepaid expenses .
+Legal expenses
+Rental property legal expenses are costs you incur to prepare, register, protect and manage your rental property.
+You can claim a deduction for some of the legal expenses you incur to produce your rental income. You can claim these expenses in the income year you incur them.
+You can claim the cost of the following as deductions:
+evicting a non-paying tenant
+expenses for taking court action for loss of rental income
+defending a claim for damages from injuries suffered by a third party on your rental property.
+You can also claim a deduction for solicitor’s fees for the preparation of loan documents as borrowing expenses . If the total of your borrowing expenses is more than $100, your deduction is spread over the life of the loan or 5 years, whichever is less.
+Most other legal expenses you incur relating to your rental property are capital and can’t be claimed as a deduction. The following legal expenses may be included in the cost base when you sell the property :
+solicitor's fees for the purchase or sale of the property
+legal costs associated with resisting land resumption
+legal costs associated with defending your title to the property (for example, defending an action by the mortgagee to take possession of the property where you have defaulted under the loan).
+Land tax expenses
+If you earn rental income from a property, you can claim a deduction for land tax. Include the deduction in the income year the liability relates to, not the year you pay it.
+State authorities sometimes issue land tax assessments for different periods of time, including amounts from earlier years (arrears). If you pay an amount in arrears, you must amend your tax return for the relevant year so the deduction is claimed correctly.
+You can claim a land tax deduction for:
+the current year as a deduction in your tax return
+prior years by lodging an amendment for the year the liability relates to.
+Land tax deductions don't need to be apportioned in the income year you:
+start to use the property as your main residence
+sell the property.
+You need to declare any land tax adjustments as rental income when you sell the property.
+For more information, see Rental properties guide – land tax .
+QC 103905
+Print or Download
