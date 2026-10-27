@@ -4,7 +4,7 @@
 
 This doc owns the **arithmetic** that composes a state's statutory transfer-duty scale with its first-home concession into the three `cash_position.stamp_duty.*` leaves. It is the `cash_position`-side companion to [`eligibility-resolution.md`](eligibility-resolution.md) (which decides *whether* a concession applies) and [`resolver-semantics.md`](resolver-semantics.md) (three-valued partial-knowledge resolution). Where eligibility answers **"which scheme, and is the buyer in the band?"**, this doc answers **"what dollar duty, before and after, and what saving?"**
 
-> **Regulated figures.** These are transfer-duty numbers a Mode-A buyer will budget against. Getting them wrong is real harm (CLAUDE.md hard constraints: ASIC decision-support line; "information, not advice"). Every formula below is **verified by postcondition** — it reproduces the relevant state revenue office's own calculator output to the dollar at named anchor points. That reproduction *is* the correctness criterion (the "prefer verifiable properties over asserted ones" principle), not the algebra in isolation.
+> **Regulated figures.** These are transfer-duty numbers a Mode-A buyer will budget against. Getting them wrong is real harm (The goal, [invariants.md](../design/invariants.md): ASIC decision-support line; "information, not advice"). Every formula below is **verified by postcondition** — it reproduces the relevant state revenue office's own calculator output to the dollar at named anchor points. That reproduction *is* the correctness criterion (the "prefer verifiable properties over asserted ones" principle), not the algebra in isolation.
 
 ---
 

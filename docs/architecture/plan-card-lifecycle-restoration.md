@@ -639,8 +639,8 @@ restructure lands, mode by mode per §11.5 — not worth a standalone patch to a
   - **One real gap found and fixed**: `OverviewCard.svelte` didn't read `firb_workflow` at all,
     even though task 9's own `ui_tabs` rewrite just declared it as an Overview-tab component — the
     doc would have said "Overview shows FIRB status" while the shell silently didn't. FIRB status is
-    a first-class user attribute (CLAUDE.md #10 — "build the gate into the architecture, not as a
-    disclaimer"), not optional headline chrome, so this was fixed rather than left as a documentation/
+    a first-class user attribute (every flow branches on it — the gate is built into the architecture, not as a
+    disclaimer), not optional headline chrome, so this was fixed rather than left as a documentation/
     behavior mismatch: added a `firbStatus`-presence-gated tile (mirrors the existing `scheme`/
     `existingHome` presence-gating pattern) showing the `current_stage` label via the already-existing
     `plan.firb.stage.*` i18n keys — no new copy needed. Presence-gated on the component, not
@@ -707,8 +707,8 @@ restructure lands, mode by mode per §11.5 — not worth a standalone patch to a
     phase/actor structure make this low-risk; a second live (metered) run wasn't spent chasing it.
     (2) `OverviewCard.svelte`'s new FIRB-stage tile (task 9) has NOT been eyeballed in a browser —
     `svelte-check`/`autofixer`/`build` verify types and compilation, not rendering. It reuses the
-    exact `ov-stat` markup/CSS three already-tested tiles use, so risk is low, but per CLAUDE.md's
-    own UI-verification instruction this is disclosed as an honest gap, not implied as covered by
+    exact `ov-stat` markup/CSS three already-tested tiles use, so risk is low, but per the project's
+    own UI-verification practice this is disclosed as an honest gap, not implied as covered by
     "build clean."
   - **Task 10 closes out the Mode D restructure** (tasks 8–10 all done), with one caveat carried
     forward: the dispose-cell counterparty bug above, affecting Mode C too. Next: task 11, Mode B
@@ -752,8 +752,8 @@ restructure lands, mode by mode per §11.5 — not worth a standalone patch to a
     the dispatch clause firing, stronger than an LLM-dependent live run would have been for
     non-agentic code.
   - **Gap 2 (OverviewCard FIRB tile, task 9) — partially closed, honestly**: no browser/screenshot
-    tool was available in this session, so a literal visual eyeball per CLAUDE.md's UI-verification
-    instruction was NOT possible — disclosed rather than silently claimed. Closed what's checkable
+    tool was available in this session, so a literal visual eyeball per the project's UI-verification
+    practice was NOT possible — disclosed rather than silently claimed. Closed what's checkable
     without one: `FirbStatusOutcome.current_stage`'s 8-value union (`fh_shell` `planCard.ts`) matches
     the 8 `plan.firb.stage.*` i18n keys the tile reads exactly, 1:1, no drift; `plan.f.stage` (the
     tile's label key) exists; `npm run build` clean. Still open: an actual rendered screenshot.

@@ -21,7 +21,7 @@ into `persistent_term` at boot — *not* Postgres) are out of scope here.
 
 Deferred to later migrations: the optional `properties` table (narrow-path
 property data; addenda otherwise live in `plan_cards.content_jsonb` —
-CLAUDE.md "Where to start building" 9).
+URL paste, Wedge 1c).
 
 ## Applying
 

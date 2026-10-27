@@ -284,7 +284,7 @@ refinance_plan_base() ->
 %% is the SAME shortlist shape Mode C's mortgage_plan uses (reconciled 2026-07-04 — the
 %% blueprint originally drafted a singular `recommended_lender` top-pick string, which
 %% collapsed the agent's lender_fit judgment to one named lender with no visible
-%% alternative, the exact pattern CLAUDE.md's ACL/credit-advice guardrail warns against;
+%% alternative, the exact pattern the goal's ACL/credit-advice boundary warns against;
 %% every other mode already surfaces a shortlist the user compares and picks from) —
 %% agent-authored (folded by merge_agent_investor_foreign/2 below); `io_vs_pi_recommendation`
 %% is the SAME agent leaf Mode C uses (reasoning_domain lender_fit).
@@ -432,7 +432,7 @@ merge_agent_investor(ResolverOutcome, AgentValues) ->
 %% fold the THREE Mode-D agent leaves (recommended_lender_shortlist: the SAME shortlist
 %% shape + fold as Mode C's merge_agent_investor/2 — reconciled 2026-07-04, was a singular
 %% top-pick string that collapsed the agent's judgment to one named lender, the ACL-line
-%% pattern CLAUDE.md's guardrail warns against; io_vs_pi_recommendation: the same
+%% pattern the goal's advice boundary warns against; io_vs_pi_recommendation: the same
 %% lender_fit leaf Mode C uses; fixed_vs_variable: reconciled 2026-07-05 — was already a
 %% Mode-D blueprint Parameter and already computed by the shared Python leaf-fill, but was
 %% silently discarded here, see mode-d-wedge.md). Deliberately only THREE, not Mode C's
@@ -576,7 +576,7 @@ copy(Id, Params) ->
 %% §98: a compliance-sensitive figure — banded, KB-grounded, resolver-computed,
 %% NEVER LLM-authored ([[no-judge-ground-the-producer]]). Reads the buyer_profile
 %% outcome's framed income/debt facts (profile holds facts; mortgage reasons —
-%% CLAUDE.md, no debt data in mortgage's own params). null until assessable_income
+%% architecture.md §11.9, no debt data in mortgage's own params). null until assessable_income
 %% is known (honest-partial — income/debts arrive on a refine turn, IC3).
 %%
 %% The band reflects the genuinely-uncertain inputs (the HEM living-expenses band,

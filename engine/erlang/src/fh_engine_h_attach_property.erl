@@ -5,8 +5,8 @@
 %% The body is a NORMALIZED property_card (the neutral facts a source supplies — address,
 %% suburb, state, price, property_type, year_built, land/internal area, strata facts). The
 %% engine's contract is "given a property_card, run Phase B": what PRODUCES the card (user
-%% URL paste, curator push, extension) is a separate, source-specific unit (CLAUDE.md items
-%% 8/9), deferred. Returns {plan_card_id, property_id, turn_id}; per-property events stream
+%% URL paste, curator push, extension) is a separate, source-specific unit (Wedges
+%% 1b/1c), deferred. Returns {plan_card_id, property_id, turn_id}; per-property events stream
 %% from .../events tagged with property_id.
 %%
 %% Slice A wires ONLY the investor `property_assessment` keystone (→ property_fit_investor):

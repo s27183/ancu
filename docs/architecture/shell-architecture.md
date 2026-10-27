@@ -2,7 +2,7 @@
 
 > The **shell** half of the engine/shell split — its runtime, identity, repo layout, and UX surfaces. This is the shell-side companion to [`engine-contract.md`](engine-contract.md): that doc defines the boundary *from the engine's side* (the primitives the engine exposes, the events it emits, the tokens it verifies); this one defines what sits *behind* the shell's edge of that boundary. Where the two touch — claims, event taxonomy, DB ownership — this doc cross-references rather than restates.
 >
-> Borrowed from [aleap's architecture](../../../aleap/docs/architecture/architecture.md) §"Shell — Web" and reshaped to FirstHomey's constraints (see [§9 Borrowed and reshaped](#9-borrowed-and-reshaped)). Read [`architecture.md` §11](architecture.md) first for the strategic engine/shell split; CLAUDE.md constraint #11 is the one-line version.
+> Borrowed from [aleap's architecture](../../../aleap/docs/architecture/architecture.md) §"Shell — Web" and reshaped to FirstHomey's constraints (see [§9 Borrowed and reshaped](#9-borrowed-and-reshaped)). Read [`architecture.md` §11](architecture.md) first for the strategic engine/shell split; [invariants.md](../design/invariants.md) P-4 and P-6 are the one-line version.
 
 ---
 
@@ -59,7 +59,7 @@ The frontend never talks to the engine directly — it always goes through the E
                         └────────────────────────────────────────┘
 ```
 
-**Wedge 1a is one web shell** with role-gated route groups (buyer · curator · admin), exactly as aleap folds customer/curator/admin into one shell. The browser **extension** (Phase B property capture, CLAUDE.md "Where to start building" #9) and a future **curator console** are separate *tenants* in the engine's eyes (`tenant_id ∈ web | extension | curator-console`, [`engine-contract.md`](engine-contract.md) §3) but Wedge 1a ships only `web`.
+**Wedge 1a is one web shell** with role-gated route groups (buyer · curator · admin), exactly as aleap folds customer/curator/admin into one shell. The browser **extension** (Phase B property capture, Wedge 1c) and a future **curator console** are separate *tenants* in the engine's eyes (`tenant_id ∈ web | extension | curator-console`, [`engine-contract.md`](engine-contract.md) §3) but Wedge 1a ships only `web`.
 
 ---
 
@@ -104,7 +104,7 @@ The full mint path is already exercised end-to-end by `engine/erlang/test/seam_s
 
 ## 4. Repository layout
 
-Borrows aleap's `shell/web/{frontend,backend}` shape (replacing CLAUDE.md's earlier `shell/svelte/{frontend,backend}` — the `svelte/backend` name was misleading; the backend is Erlang, not Svelte. See [§9](#9-borrowed-and-reshaped)).
+Borrows aleap's `shell/web/{frontend,backend}` shape (replacing the earlier `shell/svelte/{frontend,backend}` — the `svelte/backend` name was misleading; the backend is Erlang, not Svelte. See [§9](#9-borrowed-and-reshaped)).
 
 ```
 shell/
@@ -127,7 +127,7 @@ shell/
 └── extension/                          ← Phase B browser extension (property capture); own tenant
 ```
 
-The curator console is a role-gated *route group* inside the one web shell (aleap's pattern), not a separate deployable — until its consumer surface genuinely diverges (the forcing function, [`engine-contract.md`](engine-contract.md) §1). Tìm Nhà v1 is manual / spreadsheet-driven (CLAUDE.md #8); the console is its thin web surface.
+The curator console is a role-gated *route group* inside the one web shell (aleap's pattern), not a separate deployable — until its consumer surface genuinely diverges (the forcing function, [`engine-contract.md`](engine-contract.md) §1). Tìm Nhà v1 is manual / spreadsheet-driven (Wedge 1b); the console is its thin web surface.
 
 ---
 
@@ -238,7 +238,7 @@ Borrowed wholesale from aleap: the engine/shell runtime split, `shell/web/{front
 
 - **Tenant JWT is EdDSA/ed25519, not HS256.** FirstHomey's engine (`fh_engine_auth`) verifies ed25519 signatures against per-tenant public keys; aleap's verifies HS256. So the shell-backend holds an asymmetric *private* key and the engine holds only the public half — a stronger trust split (the engine cannot mint shell tokens even in principle).
 - **The buyer is the customer; there is no API product.** aleap sells `legal_research` as an API (API-key issuance, `/mcp`, customer dashboards of keys/quota). FirstHomey's buyer pays for planning; `/mcp` is deferred ([`engine-contract.md`](engine-contract.md) §2.2). **Deliberately not borrowed:** API-key issuance/lifecycle machinery, the customer key dashboard, the `/mcp` transport surface.
-- **Curator console is a web role-group, not a Mac plugin.** aleap runs curation flow-3 on Son's Mac via a Claude Code plugin (ADR 0008/0030). FirstHomey's Tìm Nhà v1 is manual/spreadsheet-driven inside the web shell (CLAUDE.md #8). **Deliberately not borrowed:** the `shell/plugin/` runtime; the `engine_jobs` worker queue (engine-side concern, not shell).
+- **Curator console is a web role-group, not a Mac plugin.** aleap runs curation flow-3 on Son's Mac via a Claude Code plugin (ADR 0008/0030). FirstHomey's Tìm Nhà v1 is manual/spreadsheet-driven inside the web shell (Wedge 1b). **Deliberately not borrowed:** the `shell/plugin/` runtime; the `engine_jobs` worker queue (engine-side concern, not shell).
 - **Map-first home.** aleap's shell is a dashboard of keys/usage; FirstHomey's is a suburb-intelligence map. The renderer vocabulary (constraint #7) and the plan projection model are FirstHomey-specific.
 
 ---
@@ -246,7 +246,7 @@ Borrowed wholesale from aleap: the engine/shell runtime split, `shell/web/{front
 ## Relationship to other docs
 
 - [`engine-contract.md`](engine-contract.md) — the boundary from the engine's side: the surfaces this shell calls (§2), the events it renders (§4), the claims it mints (§3), DB ownership (§9). **This doc is its shell-side companion** — it does not restate the contract, only what sits behind the shell's edge of it.
-- [`architecture.md` §11](architecture.md) — the strategic engine/shell split; constraint #11 in CLAUDE.md.
+- [`architecture.md` §11](architecture.md) — the strategic engine/shell split; P-4 and P-6 in [invariants.md](../design/invariants.md).
 - [`isolation-model.md`](isolation-model.md) — plan card vs turn, per-card serialization (what the shell's plan-card views project over).
 - [`bilingual-content.md`](bilingual-content.md) — why the engine emits `{vi, en}` and the shell only picks display.
 - [`04-ux-model.md`](../04-ux-model.md) §13 — the UX model §7 implements.

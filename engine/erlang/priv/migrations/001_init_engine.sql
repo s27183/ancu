@@ -9,7 +9,7 @@
 --   * KB + blueprints — git-authored, compiled to an in-memory artifact at
 --     deploy (persistent_term); never Postgres tables (engine-contract §9.1).
 --   * suburbs / properties — build-time enrichment + optional, narrow-path
---     property data; a later migration (CLAUDE.md "Where to start building" 2-3, 9).
+--     property data; a later migration (suburb enrichment; URL paste, Wedge 1c).
 --   * shell tables (identity, commerce, usage mirror) — a different database
 --     entirely (engine-contract §9.2); the API is the only contract.
 --

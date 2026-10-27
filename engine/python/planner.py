@@ -230,7 +230,7 @@ class LenderFitInvestorLeaves(BaseModel):
 # an offset at, which a Vietnam-located non-resident investor does not have by construction
 # (Mode D has no PPOR concept anywhere in its blueprint — the VN-side capital analogue is the
 # separate cross_border_funding component). Asking the LLM those two questions for Mode D was
-# mis-grounding it (CLAUDE.md #9 — the agent must ground in current state, not a reused frame)
+# mis-grounding it (The goal — the agent grounds in the plan card's current state, not a reused frame)
 # and paying for two leaves fh_engine_mortgage then silently discarded.
 class LenderFitNonResidentInvestorLeaves(BaseModel):
     io_vs_pi_recommendation: IoVsPi             # single-valued enum (schema-as-constraint)
@@ -457,7 +457,7 @@ def _model_options(*, max_turns, mcp_servers=None, allowed_tools=(), **kw):
         tools=[],                       # `--tools ""`: no built-in tool exists
         mcp_servers=mcp_servers or {},  # Q&A: only the in-process kb server
         allowed_tools=list(allowed_tools),
-        setting_sources=[],             # do NOT load CLAUDE.md / project settings
+        setting_sources=[],             # no project settings or memory file
         cwd=tempfile.mkdtemp(prefix="fh-sidecar-"),  # empty; the sidecar exits after one call
         max_turns=max_turns,
         extra_args={"no-session-persistence": None},

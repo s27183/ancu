@@ -715,8 +715,8 @@ per-property namespace. So Phase B is greenfield *runtime* on an already-compile
   surface, a cross-contract feature) is recorded design-first. Foundation-first: authored the prose-only
   `settlement_checklist` schema + `kb.copy.settlement`. `due_diligence` (upload pipeline) + `settlement_prep` **B**
   remain deferred; `due_diligence` still prose-only.
-- **Deferred by trigger:** #5 and the real property *sources* (URL-paste = CLAUDE.md item 9; curator push =
-  item 8). Slice A proves the contract with a **hand-fed normalized property_card** in a harness — exactly
+- **Deferred by trigger:** #5 and the real property *sources* (URL-paste = Wedge 1c; curator push =
+  Wedge 1b, Tìm Nhà). Slice A proves the contract with a **hand-fed normalized property_card** in a harness — exactly
   how the onboarding turn was proven (`investor_seam_smoke` feeds inputs). The engine's contract is "given a
   property_card, run Phase B"; what *produces* the card is a separate concern.
 
@@ -734,8 +734,8 @@ figure computed-not-authored (out of the LLM's reach, per `verify-regulated-figu
 - **Attachment + persistence:** `POST /api/engine/plan-cards/:id/properties` takes the normalized Property
   JSON (the `basics` + strata facts a source would supply) → persists it and runs the Phase-B turn.
   **Addenda as a namespace under `content_jsonb`** — `content.addenda.<property_id> = {property_card,
-  components: {…}}`, sibling to base `content.components`, **not a separate table** (CLAUDE.md marks
-  `properties` "OPTIONAL — not load-bearing"). This makes the existing "addenda preserved" reservations
+  components: {…}}`, sibling to base `content.components`, **not a separate table** (the `properties`
+  table is optional, not load-bearing — The goal, plan-first). This makes the existing "addenda preserved" reservations
   *literal* (the base refresh/rerun sweep touches `content.components`, leaves `content.addenda` alone) and
   needs no new migration. (Confirm the exact `snapshot_component` merge SQL at build.)
 - **Phase-B turn:** same `gen_statem` mechanism, component set filtered to `[property_assessment]` for
@@ -1120,7 +1120,7 @@ structure-now half is built next — Slice C-dd below.)*
 the tracker's "due_diligence genuinely blocked on the upload pipeline" framing — the same over-claim that
 C-settle corrected. The component's *defining risk-surfacing* output (`high_severity_flags`, the negotiation
 lever, the `lease_interpretation` concern) depends on **uploaded documents**, and the upload pipeline is not
-built (CLAUDE.md item 9; the only Phase-B input today is the source-supplied `property_card` of neutral
+built (Wedge 1c; the only Phase-B input today is the source-supplied `property_card` of neutral
 property facts, not the user's uploaded documents — a distinct input surface). But a **knowable structure-now
 half** exists — exactly like C-settle. The split:
 
@@ -1271,7 +1271,7 @@ it were a small form. It isn't — binding "shell half of `settlement_prep` B" i
 
 | Layer | What it is | Live state |
 |---|---|---|
-| **A — Attach** | shell proxy (route + handler + client + `api.ts`) + an attach affordance (URL-paste / Tìm Nhà) so an addendum is *created* | **Not built** (CLAUDE.md #8/#9, "defer when ready"). Zero `attach`/`properties` refs in the shell backend or `api.ts`; routes stop at base-card endpoints. |
+| **A — Attach** | shell proxy (route + handler + client + `api.ts`) + an attach affordance (URL-paste / Tìm Nhà) so an addendum is *created* | **Not built** (Wedges 1b/1c, after launch — The goal). Zero `attach`/`properties` refs in the shell backend or `api.ts`; routes stop at base-card endpoints. |
 | **B — Addendum render** | the shell `PlanCard` type carries `addenda`; `getPlanCard`/`PlanProjection` seed `content.addenda.<pid>.components`; the per-property **Settle phase** surfaces in the Flow | **Not built.** `planCard.ts` type has no `addenda` field (`content: { components? }`, base only); `PlanProjection.svelte:391` seeds `res.card.content.components` (base only). Only the *fallback* scaffolding (the "attach property" calm line in `PhaseSheet`/`PlanProjection`) exists. |
 | **C — The date form** | the two-field contract-date entry on the Settle sheet → POST the transaction endpoint → SSE swaps in the dated checklist | The scoped piece. **Depends on B, which depends on A.** |
 
@@ -1298,7 +1298,7 @@ renderer** (constraint #7). Bilingual via the engine-owned `LocalizedText` + `pi
 (field labels) via `$t`.
 
 **Next (a separate `go`):** the Phase-B shell surface (A attach proxy + UI, B addendum-render data path)
-is its own wedge (CLAUDE.md #8/#9), the prerequisite for C above. The unblocked engine units not resting
+is its own wedge (Wedges 1b/1c), the prerequisite for C above. The unblocked engine units not resting
 on it are the better next pick. **Still deferred:** `due_diligence` B (the upload pipeline /
 `<from_document>` extraction + the `lease_interpretation` leaf) — the heavy half of the cross-contract unit.
 

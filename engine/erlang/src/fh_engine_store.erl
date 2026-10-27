@@ -181,7 +181,7 @@ snapshot_component(PlanCardId, ComponentId, OutcomeEntry) ->
 %% are a SIBLING namespace to the base content.components (so the base refresh/rerun sweep,
 %% which touches only components.*, leaves addenda untouched — the existing
 %% per-property-addenda-preserved reservation, now literal). No new table: addenda live in
-%% the same plan_cards row (properties is "OPTIONAL — not load-bearing", CLAUDE.md item 1).
+%% the same plan_cards row (properties is optional, not load-bearing — The goal, plan-first).
 -spec attach_property(binary(), binary(), map()) -> ok.
 attach_property(PlanCardId, PropertyId, PropertyCard) ->
     _ = query(

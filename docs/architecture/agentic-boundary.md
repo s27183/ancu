@@ -66,7 +66,7 @@ Filling the plan card is mostly rules; *conversing about it* is the agent.
 
 ## Worked simulation — the validating case
 
-This case was used to confirm the rule; keep it as the canonical end-to-end test (cf. the testing approach in CLAUDE.md).
+This case was used to confirm the rule; keep it as the canonical end-to-end test (cf. the done checks, `docs/design/architecture.md` `checks:`).
 
 **Linh, 29.** Vietnamese-Australian, PR since 2023. Software contractor, 18-month ABN (Melbourne). Co-buying with her partner (citizen, PAYG). HECS $24k, car loan $9k, $40k cash + $60k parental gift (landed 3 weeks ago). Established house in St Albans, asking $700k. Previously owned and sold an apartment in Saigon.
 
