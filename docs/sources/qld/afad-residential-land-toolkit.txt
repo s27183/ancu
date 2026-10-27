@@ -1,0 +1,217 @@
+Source: https://qro.qld.gov.au/duties/self-assessors/toolkits/afad/
+Retrieved: 2026-10-27
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML 6d7681b7f0c02066a9f999a80f853d8359745ad1a0b92543776b950fbde82722
+
+AFAD residential land toolkit - Queensland Revenue Office
+Skip to content
+The Commissioner has updated several public rulings and practice directions.
+Learn more
+Public Ruling DA000.19.3 has been updated for changes to the administrative arrangement.
+Read more
+Your guide to all the available resources to support you to successfully assess and lodge transactions.
+Read more
+Home
+Duties
+Self assessors
+Toolkits
+AFAD residential land
+AFAD residential land toolkit
+This toolkit has everything you need to assess additional foreign acquirer duty (AFAD) on relevant transactions involving AFAD residential land.
+On this page:
+Other toolkits pages
+AFAD residential land
+Aggregated transactions (s.30)
+Business assets
+Change of tenure exemption (s.143)
+Change of trustee exemption (s.117)
+Correcting a clerical error exemption (s.152)
+Debt factoring agreements exemption (s.149)
+Deceased person’s estate exemption (s.124)
+Easements
+Electronic conveyancing
+Family business concession—prescribed business (s.105A)
+Family business concession—primary production (s.105)
+Family trust exemption (s.118)
+Land Act transactions exemption (s.136)
+Mandatory buyback under the Retirement Villages Act exemption (s.141A)
+Non-dutiable transactions
+Non-residential land
+Option agreements
+Other Acts exemption (s.430)
+Other transfers of eligible superannuation entities exemption (s.130B)
+Particular residences exemption (s.151)
+Particular vestings exemption (s.125)
+Queensland Treasury Corporation exemption (s.431A)
+Residential land concession
+Resumption of land
+Section 90 Family Law Act exemption
+Section 90L Family Law Act exemption
+Section 90WA Family Law Act exemption
+Security trust acquisition or surrender exemption (s.121)
+Superannuation fund exemption (s.119)
+Surrender of leases
+The state exemption (s.426)
+Transactions under the Housing Act exemption (s.429)
+Transfer by direction
+Transfer by direction to superannuation custodian exemption (s.130A)
+Transfer of existing rights
+Transfer of lease
+Transfer of mortgage
+Transfers to the state exemption (s.145)
+Unincorporated association trust exemption (s.120)
+Water allocations
+Payment options
+Contact us
+Chapter 4 of the Duties Act 2001 provides that additional duty may be imposed on relevant transactions involving AFAD residential land.
+AFAD applies to direct and indirect acquisitions of AFAD residential land in Queensland by foreign persons at the following rates:
+3% where the transaction’s liability for transfer duty arises between 1 October 2016 and 30 June 2018
+7% where the transaction’s liability for transfer duty arises between 1 July 2018 and 30 June 2024
+8% where the transaction’s liability for transfer duty arises on or after 1 July 2024.
+The same parties who are liable to pay transfer duty on a transaction will be liable for AFAD, if it is imposed.
+Assessing AFAD relevant transactions
+Use the AFAD interactive help to determine if AFAD applies to the property being acquired in the relevant transaction.
+A relevant transaction subject to AFAD with multiple lots of land contained in one instrument may be entered into QRO Online .
+Instruments that form substantially one arrangement and include an AFAD-relevant transaction should be aggregated under section 30 of the Duties Act.
+In both instances, the AFAD residential land value is entered separately.
+AFAD-relevant transactions may also be completed via electronic conveyancing , with the residential land value entered separately if applicable.
+Here are some tips to help you self assess these types of transactions in QRO Online.
+How to lodge online
+You must complete all mandatory data fields under each tab in QRO Online. Mandatory fields are marked with a red asterisk. There are some specific data requirements.
+AFAD transactions involving existing rights
+Select Transfer—Other than land as the Transaction class .
+In the Type of dutiable transaction drop-down list, select either:
+Agreement to transfer dutiable property —for transactions evidenced by an agreement
+Transfer of dutiable property —for transactions evidenced by a transfer only.
+Select Existing right as the Type of dutiable property from the drop-down list.
+Answer Yes to one of these questions:
+Are you a foreign person?
+Is the transferee an agent for a principal?
+Is the principal a foreign person?
+Answer Yes to the question: Is or will the land be AFAD residential land?
+Enter the full value of the AFAD land and QRO Online will calculate the duty based on the interest being acquired.
+(For example, AFAD land is valued at $1,200,000. The transferee is acquiring 50%. Enter $1,200,000.)
+AFAD transactions involving residential land
+Select Transfer of residential land as the Transaction class .
+In the Type of dutiable transaction drop-down list, select either:
+Agreement to transfer dutiable property —for transactions evidenced by a contract or agreement
+Transfer of dutiable property —for transactions evidenced by a transfer only.
+Select Land in Queensland as the Type of dutiable property .
+Answer Yes to one of the following questions:
+Are you a foreign person?
+Is the transferee an agent for a principal?
+Is the principal a foreign person?
+If a concession applies, provide this information for each transferee:
+Transfer date (usually the settlement date)
+Occupation date as declared on your client’s home, first home or first home (new home) transfer duty concession (Form D2.1)
+For a first home vacant land concession (Form D2.7), enter the transfer date plus 2 years. (The occupation date cannot be before the transfer date.)
+Enter the value of any non-residential property where the property contains a non-residential component (e.g. a dwelling with shop attached).
+Answer Yes to the question: Is or will the land be AFAD residential land?
+Enter the value of a 100% interest in the AFAD land, including chattels.
+(For example, if the transferee is acquiring 50% of AFAD residential land valued at $1,200,000, enter $1,200,000.)
+Determining the foreign acquirer’s interest
+AFAD is imposed only on the foreign acquirer’s interest in the land.
+So, if a foreign acquirer buys property with 2 other non-foreign parties in equal interests, AFAD will be imposed on the dutiable value of the foreign acquirer’s one-third interest in the land.
+In QRO Online, the value of the AFAD residential land must be entered as a 100% interest in the property.
+Exemptions and concessions
+A transaction that is exempt from transfer duty will also be exempt from AFAD.
+For transactions entered into:
+before 1 August 2026, a foreign acquirer can claim a transfer duty home concession if they meet the eligibility criteria
+on or after 1 August 2026, a person can claim a transfer duty home concession if they were an Australian citizen, permanent resident or specified foreign retiree at the time the transaction was entered into and meet the eligibility criteria.
+However, the concession will only apply to the transfer duty component, not the AFAD amount.
+All concession details must match the client’s declaration on their concession claim form.
+Exemption for retirement visas
+Specified foreign retirees may be exempt from AFAD on their principal place of residence purchased on or after 1 January 2023.
+To keep the benefit of the AFAD exemption in full, they must not:
+sell or transfer all or part of the property before moving in, or within 1 year of moving in
+lease or otherwise grant exclusive possession of all the property before moving in, or within 1 year of moving in
+lease or otherwise grant exclusive possession of part of the property within 1 year of moving in (unless the lease arrangement starts between 10 September 2024 and 5 December 2024, both dates inclusive).
+Read the public ruling on concessions for homes and AFAD exemption for specified foreign retirees—disposal and partial renting between 10 September and 5 December 2024 (DA000.18) .
+Find out more about concessions and exemptions for transfer duty.
+Endorsing documents
+You must stamp the contract of sale once you or the Commissioner of State Revenue has received the full amount of transfer duty, AFAD and unpaid tax interest (if applicable). You do not need to record the AFAD amount separately, so complete the stamp with the full amount.
+Transfers assessed as pursuant to the agreement under section 22 of the Duties Act 2001 are stamped with the same endorsement as the contract. Don’t enter these transfers into QRO Online separately.
+For electronic conveyancing transactions, the transfer will be endorsed electronically with the AFAD amount included.
+Non-Australian entity
+When a transaction includes real property, each transferor and transferee must declare whether they are a non-Australian entity.
+Non-Australian entity
+A transferor or transferee is a non-Australian entity if they are:
+an individual who is not an Australian citizen (non-Australian individuals include permanent residents)
+a company incorporated outside Australia
+a trust with a country of tax residence that is not Australia
+another body (e.g. body politic, corporation sole) formed outside Australia.
+A non-Australian transferor or transferee must complete an identity details annexure .
+For transferors, an email is automatically generated through QRO Online when the transaction is lodged, asking the transferor to complete an online identity details annexure. Contact the transferor or their agent to obtain the transferor’s email address.
+Transferees must complete an identity details annexure and you must enter these details in QRO Online.
+Forms
+Your client must complete one of these forms if they are eligible to claim a concession on the interest in land they are acquiring:
+Claim a home, first home or first home (new home) transfer duty concession (Form D2.1)
+Claim a first home vacant land transfer duty concession (Form D2.7) .
+An identity details annexure is required for each non-Australian transferor and transferee where the transaction involves a transfer of real property.
+If, after claiming a concession, a person cannot meet their occupancy requirements, they must complete a notice for reassessment—home, first home, first home (new home) or first home vacant land concessions (Form D2.4) .
+If no concession is claimed, the transferee must complete a dutiable transaction statement (Form D2.2) .
+If AFAD is not applied to a transaction and within 3 years the transferee acquirer becomes a foreign trust or foreign company, they must lodge all documents with the Commissioner for reassessment.
+Records you need to keep
+For this type of transaction, you must keep:
+a completed dutiable transaction statement (Form D2.2) —if no concession has been claimed, your client must complete the Form D2.2 and you retain it on file
+the concession claim form for each applicant (if applicable)
+evidence of value when only part of the land is used for residential purposes or the transfer is between related parties
+an identity details annexure for each non-Australian transferee, if the transaction involves real property.
+Find out more about your record-keeping obligations .
+Public rulings
+You may find the following public rulings useful when self assessing AFAD residential land:
+Foreign corporations and foreign trusts—interests of foreign persons and related persons (DA000.14)
+Additional foreign acquirer duty—ex gratia relief for significant development (DA000.15)
+Administrative arrangement—exemption from AFAD and land tax foreign surcharge for residential land developers ( GEN012 )
+AFAD residential land (DA232.1) .
+Also consider…
+See the data entry standards for QRO Online .
+Use the residential land concessions toolkit to learn more about assessing concessions for homes.
+Read the home concession rates or transfer duty rates .
+Use the transfer duty calculator to work out a duty liability.
+See our endorsing examples if you are unsure how to stamp the documents.
+Read the transfer duty self assessors guide (SA1) .
+See other self assessor guidelines .
+Read the Taxation Administration Act 2001 .
+Last updated: 31 July 2026
+Other toolkits pages
+AFAD residential land
+Aggregated transactions (s.30)
+Business assets
+Change of tenure exemption (s.143)
+Change of trustee exemption (s.117)
+Correcting a clerical error exemption (s.152)
+Debt factoring agreements exemption (s.149)
+Deceased person’s estate exemption (s.124)
+Easements
+Electronic conveyancing
+Family business concession—prescribed business (s.105A)
+Family business concession—primary production (s.105)
+Family trust exemption (s.118)
+Land Act transactions exemption (s.136)
+Mandatory buyback under the Retirement Villages Act exemption (s.141A)
+Non-dutiable transactions
+Non-residential land
+Option agreements
+Other Acts exemption (s.430)
+Other transfers of eligible superannuation entities exemption (s.130B)
+Particular residences exemption (s.151)
+Particular vestings exemption (s.125)
+Queensland Treasury Corporation exemption (s.431A)
+Residential land concession
+Resumption of land
+Section 90 Family Law Act exemption
+Section 90L Family Law Act exemption
+Section 90WA Family Law Act exemption
+Security trust acquisition or surrender exemption (s.121)
+Superannuation fund exemption (s.119)
+Surrender of leases
+The state exemption (s.426)
+Transactions under the Housing Act exemption (s.429)
+Transfer by direction
+Transfer by direction to superannuation custodian exemption (s.130A)
+Transfer of existing rights
+Transfer of lease
+Transfer of mortgage
+Transfers to the state exemption (s.145)
+Unincorporated association trust exemption (s.120)
+Water allocations

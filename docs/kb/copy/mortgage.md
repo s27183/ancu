@@ -76,12 +76,12 @@ kind (bilingual-content.md §3b).
       "en": "If any of the funds come from Vietnam, prepare source-of-funds evidence early (a certified translation may be needed) — both a lender requirement and an AML/CTF obligation."
     },
     "action_compare_non_resident_lenders": {
-      "vi": "So sánh nhóm nhỏ các ngân hàng chấp nhận cho người không thường trú vay (thường khoảng 5–10 ngân hàng), tốt nhất là qua một chuyên viên vay vốn có kinh nghiệm với hồ sơ nước ngoài.",
-      "en": "Compare the small pool of non-resident-friendly lenders (typically 5–10), ideally through a broker experienced with foreign-person applications."
+      "vi": "So sánh nhóm nhỏ các bên cho vay có công bố khoản vay cho người không cư trú trên trang của chính họ, tốt nhất là qua một chuyên viên vay vốn có kinh nghiệm với hồ sơ nước ngoài.",
+      "en": "Compare the small pool of lenders whose own pages offer a non-resident loan, ideally through a broker experienced with foreign-person applications."
     },
     "action_understand_deposit_convention": {
-      "vi": "Hiểu rằng khoản đặt cọc {pct}% là thông lệ phổ biến dành cho người mua nước ngoài (không phải chính sách của một ngân hàng cụ thể) — con số này có thể giảm khi biết rõ thị thực và thu nhập của bạn.",
-      "en": "Understand that the {pct}% deposit is the typical non-resident convention (not a specific lender's policy) — it may reduce once your visa and income situation is known."
+      "vi": "Hiểu rằng khoản đặt cọc {pct}% đủ cho mức cho vay tối đa mà các bên cho vay người không cư trú công bố (La Trobe Financial 75%, Brighten 80% giá nhà) — bên cho vay bạn chọn sẽ quyết định con số cuối cùng.",
+      "en": "Understand that the {pct}% deposit meets the maximum loan the non-resident lenders publish (La Trobe Financial 75%, Brighten 80% of the price) — the lender you choose sets the final figure."
     }
   }
 }

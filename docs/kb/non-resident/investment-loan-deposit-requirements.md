@@ -1,16 +1,18 @@
 ---
 slug: kb.non-resident.investment-loan-deposit-requirements
 effective_from: 2025-07-01
-last_verified: 2026-07-06
+last_verified: 2026-10-27
 sources:
-  - url: https://www.canstar.com.au/home-loans/non-resident-home-loans/
-    retrieved: 2026-07-06
-    note: "SECONDARY — WebFetched 2026-07-06. NOTE: the page uses 30% deposit @ 70% LVR / 40% @ 60% LVR only as an ILLUSTRATIVE explanation of how LVR works, and states deposit/LVR terms are lender-dependent — it does NOT assert the 30-40% band as a firm non-resident requirement. This is a synthesis doc (fills: []); the firm band is OWNED by kb.lender.foreign-buyer-deposit-requirements, which is where the authoritative citation belongs."
-  - url: https://www.odinmortgage.com/resources/7-australian-banks-and-lenders-that-finance-investment-properties-for-non-residents-what-each-one-requires-in-2026/
-    retrieved: 2026-07-06
-    note: "SECONDARY — WebFetched 2026-07-06. Confirms non-resident investment lending has tighter/individualized LVR policies and foreign-income shading, but gives no single firm deposit %/LVR figure (borrower-profile dependent)."
+  - url: https://brighten.com.au/home-loans/non-resident/
+    retrieved: 2026-10-27
+    path: docs/sources/lenders/brighten-non-resident-home-loan.txt
+    note: "Brighten's own page: \"Owner occupied or investment property\" under one \"Maximum LVR 80%\" for \"Australian Temporary Residents or Non Residents\""
+  - url: https://www.latrobefinancial.com.au/lending/international-borrower-loan/
+    retrieved: 2026-10-27
+    path: docs/sources/lenders/latrobe-international-borrower-loan.txt
+    note: "La Trobe Financial's own page: Non-resident Loan (to invest, with FIRB approval) \"Maximum Loan Amount: $5,000,000 (75% LVR) Maximum LVR: 75%\""
   - url: https://moneysmart.gov.au/how-to-invest/borrowing-to-invest
-    note: "POINTER (not re-fetched this session) — ASIC Moneysmart general borrowing-to-invest / investment-loan risk context (not a non-resident-specific figure); carried from the doc's markdown Sources block."
+    note: "POINTER (not re-fetched this session) — ASIC Moneysmart general borrowing-to-invest / investment-loan risk context (not a non-resident-specific figure)."
 ---
 
 # Deposit requirements — non-resident investment loans
@@ -19,33 +21,33 @@ This doc owns the **synthesis** of two single-owned facts for the specific case 
 
 ## The band is residency-driven, not occupancy-driven — so it's the same band
 
-The **30–40% deposit / 60–70% LVR cap** for a foreign person earning foreign income, owned by [`kb.lender.foreign-buyer-deposit-requirements`](../lender/foreign-buyer-deposit-requirements.md), is keyed on the borrower's **residency and income currency**, not on whether they intend to occupy or let the property. A non-resident investor faces the **same 30–40% band** as a non-resident buying to occupy — lender policy differentiates owner-occupier from investment loans by rate and serviceability treatment (investment loans are generally assessed more conservatively — [`kb.lender.serviceability-investment-loans`](../lender/serviceability-investment-loans.md)), not by a separate, higher deposit floor specifically for the non-resident-investment combination.
+The **20–25% deposit / 75–80% maximum LVR** for a foreign person earning foreign income, owned by [`kb.lender.foreign-buyer-deposit-requirements`](../lender/foreign-buyer-deposit-requirements.md), is keyed on the borrower's **residency and income currency**, not on whether they intend to occupy or let the property. The two lenders whose own pages publish a non-resident loan show this: **Brighten** applies one "Maximum LVR 80%" to "Owner occupied or investment property"; **La Trobe Financial**'s Non-resident Loan is an investment loan ("looking to invest in Australian real estate") at a "Maximum LVR: 75%". A non-resident investor therefore faces the **same 20–25% band** as a non-resident buying to occupy — lenders differentiate the investment case by rate and serviceability treatment ([`kb.lender.serviceability-investment-loans`](../lender/serviceability-investment-loans.md)), not by a separate deposit floor.
 
 ## What genuinely changes for the investment case
 
-- **No first-home-buyer leniency.** [`kb.investor.deposit-requirements-investment-loans`](../investor/deposit-requirements-investment-loans.md)'s "no FHB schemes apply" fact holds for a non-resident investor exactly as it does for a domestic one — there was never an FHB path to begin with, but the plan should not imply otherwise.
+- **No first-home-buyer leniency.** [`kb.investor.deposit-requirements-investment-loans`](../investor/deposit-requirements-investment-loans.md)'s "no FHB schemes apply" fact (a scheme rule, grounded there on government pages — not a lender policy) holds for a non-resident investor exactly as it does for a domestic one — there was never an FHB path to begin with, but the plan should not imply otherwise.
 - **The "buying with an AU citizen/PR partner" reduced-deposit path (down to 5%) does not apply the same way.** That path in the foreign-buyer-deposit doc assumes the purchase is assessed on the AU co-borrower's footing for what is, in substance, their home. A Vietnam-located investor's co-ownership structure (if any) is an investment decision, not a partner-occupancy one — the plan should not surface the 5%-deposit joint-purchase path as a live option here without the underlying occupancy fact that makes it work.
 - **Genuine savings still applies**, same as the base foreign-buyer doc — a lump-sum transfer from Vietnam can still fail the ~5%-held-3-months convention if not structured to qualify in time.
 
 ## Relevance for Vietnam-located investors (Mode D)
 
-- **Plan on 30–40%, same as a Mode-D buyer intending to occupy would.** Non-residency, not investment intent, sets the deposit floor.
+- **Plan on 20–25%, same as a Mode-D buyer intending to occupy would.** Non-residency, not investment intent, sets the deposit floor.
 - **Total cash-to-settle is larger than the deposit alone** — FIRB fee, foreign-buyer stamp-duty surcharge, entity setup cost (if applicable), QS report, and FX spread stack on top, each owned by its own anchor and assembled by `cash_position`.
 - **Banded, broker confirms.** Informational; a licensed mortgage broker confirms the actual requirement (ACL line).
 
 ## Rules
 
-Pure-reference (`fills: []`). The `cash_position` resolver selects `minimum_required_percentage_non_resident_investment_loan` from the same 30–40% band as `kb.lender.foreign-buyer-deposit-requirements`, applies the no-FHB-schemes fact from `kb.investor.deposit-requirements-investment-loans`, and does not offer the AU-partner reduced-deposit path unless the profile independently supports an occupancy fact justifying it.
+Pure-reference (`fills: []`). The `cash_position` resolver selects `minimum_required_percentage_non_resident_investment_loan` from the same 20–25% band as `kb.lender.foreign-buyer-deposit-requirements`, applies the no-FHB-schemes fact from `kb.investor.deposit-requirements-investment-loans`, and does not offer the AU-partner reduced-deposit path unless the profile independently supports an occupancy fact justifying it.
 
 ```jsonc
 {
   "fills": [],
   "parameters": {
-    "band_is_residency_driven_not_occupancy_driven": { "type": "bool", "value": true, "provenance": "CONVENTION", "note": "the 30-40% non-resident deposit band (kb.lender.foreign-buyer-deposit-requirements) is keyed on residency/income currency, not on occupy-vs-invest intent — the same band applies to a non-resident investor." },
-    "non_resident_investment_deposit_pct_low": { "type": "int", "value": 30, "provenance": "CONVENTION", "note": "same lower band as kb.lender.foreign-buyer-deposit-requirements, applied to the investment case." },
-    "non_resident_investment_deposit_pct_high": { "type": "int", "value": 40, "provenance": "CONVENTION", "note": "same upper band; investment loans generally assessed more conservatively than owner-occupier on rate/serviceability, not on a distinct deposit floor." },
+    "band_is_residency_driven_not_occupancy_driven": { "type": "bool", "value": true, "provenance": "LENDER-POLICY", "note": "Brighten applies one 80% max LVR to owner-occupied or investment non-resident loans; La Trobe Financial's Non-resident Loan is investment-only at 75% — the band follows residency, not occupy-vs-invest intent." },
+    "non_resident_investment_deposit_pct_low": { "type": "int", "value": 20, "provenance": "LENDER-POLICY", "note": "Brighten: non-resident, owner occupied or investment, maximum LVR 80% — the same low end as kb.lender.foreign-buyer-deposit-requirements." },
+    "non_resident_investment_deposit_pct_high": { "type": "int", "value": 25, "provenance": "LENDER-POLICY", "note": "La Trobe Financial Non-resident Loan (investment): maximum LVR 75% up to $5,000,000; a distinct deposit floor for the investment case is not published." },
     "au_partner_reduced_deposit_path_not_applicable": { "type": "bool", "value": true, "provenance": "CONVENTION", "note": "the 95% LVR joint-purchase-with-AU-partner path assumes occupancy on the AU co-borrower's footing; not surfaced for a Vietnam-located investor's co-ownership structure without that occupancy fact." },
-    "no_fhb_schemes_for_non_resident_investor": { "type": "bool", "value": true, "provenance": "CONVENTION", "note": "no FHB scheme/concession applies — same fact as kb.investor.deposit-requirements-investment-loans, restated for the non-resident case." }
+    "no_fhb_schemes_for_non_resident_investor": { "type": "bool", "value": true, "provenance": "CONVENTION", "note": "no FHB scheme/concession applies — a scheme rule owned and grounded by kb.investor.deposit-requirements-investment-loans (government pages), restated for the non-resident case; not a lender policy." }
   },
   "lookup": {
     "line_details": {
@@ -74,22 +76,22 @@ Pure-reference (`fills: []`). The `cash_position` resolver selects `minimum_requ
         },
         {
           "id": "deposit",
-          "tier": "CONVENTION",
+          "tier": "LENDER-POLICY",
           "how": {
-            "vi": "{pct}% của {price} — mức giữa của khoảng {lo}–{hi}% mà ngân hàng thường yêu cầu khi người không cư trú vay để đầu tư.",
-            "en": "{pct}% of {price} — the middle of the {lo}–{hi}% deposit lenders commonly ask of a non-resident borrowing to invest."
+            "vi": "{pct}% của {price} — mức giữa của khoảng {lo}–{hi}% mà các bên cho vay công bố chính sách cho người không cư trú yêu cầu khi vay để đầu tư (Brighten cho vay tối đa 80%, La Trobe Financial tối đa 75%).",
+            "en": "{pct}% of {price} — the middle of the {lo}–{hi}% deposit the lenders that publish a non-resident policy ask for an investment loan (Brighten lends up to 80%, La Trobe Financial up to 75%)."
           },
           "payer": {
             "vi": "Bạn và người thân góp tiền mua nhà, trả khi ký hợp đồng; khoản này được giữ trong tài khoản ủy thác (trust) đến ngày settlement.",
             "en": "You and any family funding the purchase, paid when you sign the contract and held in trust until settlement."
           },
           "drivers": {
-            "vi": "Tình trạng cư trú, đồng tiền bạn nhận thu nhập và ngân hàng: hồ sơ ít phổ biến thường ở mức cao của khoảng.",
-            "en": "Your residency, the currency you earn in and the lender: less usual profiles sit at the top of the band."
+            "vi": "Bên cho vay bạn chọn và số tiền vay: La Trobe Financial yêu cầu 25% với khoản vay đến 5 triệu đô.",
+            "en": "The lender you choose and the loan size: La Trobe Financial asks 25% on loans up to $5 million."
           },
           "note": {
-            "vi": "Con số thường gặp — ngân hàng bạn chọn sẽ quyết định.",
-            "en": "A typical figure — the lender you choose sets it."
+            "vi": "Theo chính sách các bên cho vay tự công bố — bên cho vay bạn chọn sẽ quyết định.",
+            "en": "From the lenders' own published policy — the lender you choose sets it."
           },
           "source": 0
         }
@@ -101,11 +103,11 @@ Pure-reference (`fills: []`). The `cash_position` resolver selects `minimum_requ
 
 Notes:
 
-- **No `fills`.** A synthesis of two existing bands, not a new figure. `deposit_ready_for_purchase` remains resolver-computed by placing the band against the price and summing the sibling-owned acquisition costs.
+- **No `fills`.** A synthesis of two existing bands, not a new figure. The lenders are named because their own pages are the band's primaries, not as a recommendation. `deposit_ready_for_purchase` remains resolver-computed by placing the band against the price and summing the sibling-owned acquisition costs.
 - **Single-owner via cross-ref.** The base non-resident deposit band → `kb.lender.foreign-buyer-deposit-requirements`; the investment-specific no-FHB-schemes fact → `kb.investor.deposit-requirements-investment-loans`; investment-loan serviceability → `kb.lender.serviceability-investment-loans`.
 
 ## Sources
 
-- Canstar — *Non-Resident Home Loans in Australia* (30–40% deposit / 60–70% LVR for foreign nationals; band keyed on residency/income currency) — https://www.canstar.com.au/home-loans/non-resident-home-loans/
-- Odin Mortgage — *7 Australian Banks and Lenders That Finance Investment Properties for Non-Residents* (non-resident investment lending policy and deposit expectations, 2026) — https://www.odinmortgage.com/resources/7-australian-banks-and-lenders-that-finance-investment-properties-for-non-residents-what-each-one-requires-in-2026/
+- Brighten — *Non-Resident Home Loans* (owner occupied or investment; maximum LVR 80%) — https://brighten.com.au/home-loans/non-resident/
+- La Trobe Financial — *International Borrower* (Non-resident Loan to invest; maximum LVR 75%) — https://www.latrobefinancial.com.au/lending/international-borrower-loan/
 - ASIC Moneysmart — *Borrowing to invest* (investment-loan deposit and risk considerations) — https://moneysmart.gov.au/how-to-invest/borrowing-to-invest

@@ -1,0 +1,1477 @@
+Source: https://www.macquarie.com.au/assets/bfs/documents/broker/mortgages/macquarie_broker-credit-guidelines.pdf
+Retrieved: 2026-10-27
+Extracted: pdftotext -layout of the PDF (Residential Home Loans Credit Guidelines, version 15.0, last updated 22 October 2026); sha256 of the PDF 4efa941e2cfc5b130dedd47aff00cf109f4e400e6dffd4f9c78dc0da3f4d883b
+
+                                                                      Residential Home Loans
+                                                                         Credit Guidelines
+
+
+ Version:                        15.0
+ Last updated:                   22 October 2026
+
+
+
+
+Unless stated otherwise, this information has been prepared by Macquarie Bank Limited ABN 46 008 583 542 AFSL & Australian Credit Licence 237502 for the use of licensed
+and accredited brokers and financial advisers only. In no circumstances is it to be used by a potential client for the purposes of making a decision about a financial product or
+class of products. 86 000 431 827
+Residential Home Loans Credit Guidelines – Version 15.0
+
+Contents
+Guidelines Overview ................................................................................................................................................................................................................................................. 4
+Standard Loan Parameters ...................................................................................................................................................................................................................................... 5
+   1.       Product Parameters ...................................................................................................................................................................................................................................... 5
+        1A. Loan Purpose .............................................................................................................................................................................................................................................. 5
+        1B. Loan Amount (Guide only) ......................................................................................................................................................................................................................... 7
+        1C. Loan Term .................................................................................................................................................................................................................................................... 7
+        1D. Maximum Loan to Value Ratio’s (LVR) & Loan Amounts ....................................................................................................................................................................... 8
+   2.       Character Parameters ................................................................................................................................................................................................................................. 10
+        2A. Borrowers .................................................................................................................................................................................................................................................. 10
+        2B. Residency Matrix ....................................................................................................................................................................................................................................... 12
+        2C. Independent legal and financial advice .................................................................................................................................................................................................. 13
+        2D. Credit reports ............................................................................................................................................................................................................................................ 13
+        2E. Contributions & Genuine Savings ........................................................................................................................................................................................................... 16
+        2F. Account Conduct ....................................................................................................................................................................................................................................... 17
+   3.       Capacity Parameters .................................................................................................................................................................................................................................. 19
+        3A. Serviceability Assessment ....................................................................................................................................................................................................................... 19
+        3B. Income – PAYG ......................................................................................................................................................................................................................................... 20
+        3C. Income – Self-Employed Income ............................................................................................................................................................................................................. 25
+        3D. Income – Rental Income ........................................................................................................................................................................................................................... 28
+        3E. Income – Other Income............................................................................................................................................................................................................................. 29
+        3F. Commitments – Existing financial obligations ...................................................................................................................................................................................... 31
+        3G. Commitments – Negative gearing ........................................................................................................................................................................................................... 32
+        3H. Commitments – Living expenses ............................................................................................................................................................................................................ 33
+        3I. Mature Age .................................................................................................................................................................................................................................................. 34
+        3J. Exit Strategy ............................................................................................................................................................................................................................................... 34
+                                                                                                                                                                                                                                                                               2
+Residential Home Loans Credit Guidelines – Version 15.0
+
+   4.       Collateral Parameters ................................................................................................................................................................................................................................. 35
+        4A. Security ...................................................................................................................................................................................................................................................... 35
+        4B. Valuations .................................................................................................................................................................................................................................................. 37
+        4C. Purchases .................................................................................................................................................................................................................................................. 37
+Construction Loans ................................................................................................................................................................................................................................................ 38
+   1.       Product Parameters .................................................................................................................................................................................................................................... 38
+        1A. Loan Purpose ............................................................................................................................................................................................................................................ 38
+        1B. Maximum Loan to Value Ratio (LVR) & Loan Amount .......................................................................................................................................................................... 39
+        1C. Other Requirements.................................................................................................................................................................................................................................. 39
+   2.       Character Parameters ................................................................................................................................................................................................................................. 40
+        2A. Contributions ............................................................................................................................................................................................................................................. 40
+   3.       Collateral Parameters ................................................................................................................................................................................................................................. 40
+        3A. Security Location ...................................................................................................................................................................................................................................... 40
+        3B. Valuation Requirements ........................................................................................................................................................................................................................... 41
+
+
+
+
+                                                                                                                                                                                                                                                                                 3
+Residential Home Loans Credit Guidelines – Version 15.0
+
+Guidelines Overview
+These guidelines set out credit parameters that Macquarie Bank considers when originating a residential home loan, specifically related to standard loans (residentially secured
+owner occupied and investment) and construction loans.
+Macquarie Bank originates loans in Australian dollars and does not take 2nd registered mortgages behind other lenders.
+Approval will be at the sole discretion of Macquarie Bank.
+A conditional approval will be valid for 90 days from the time of approval. Once the loan is formally approved the loan must settle within 90 days from the time it was formally
+approved. If the applicant would like to proceed after the formal approval expires, it can be extended up to a maximum of 180 days from formal approval, subject to completing
+your customer’s circumstance change declaration via live chat in Broker Portal and our team accepting any changes in your customer’s circumstances. Search ‘extend formal
+approval’ in our Broker Help Centre.
+For any scenarios that do not meet these guidelines or questions, please contact your BDM for assistance.
+These guidelines will be reviewed and updated from time to time in line with Macquarie Bank’s risk appetite, market practice, and/or changes in regulation/legislation.
+
+
+
+
+                                                                                                                                                                                   4
+Residential Home Loans Credit Guidelines – Version 15.0
+
+Standard Loan Parameters
+The below guidelines apply to standard loans. i.e. residentially secured owner occupied, residentially secured investment.
+Additional or varied parameters apply to non-standard loan types that are detailed in subsequent sections of the policy. This includes construction loans.
+
+1.      Product Parameters
+
+1A. Loan Purpose
+                                                                                Credit Guidelines
+ Acceptable loan           •   Purchase or construction of a residential dwelling
+ purpose                   •   Refinance of existing residential home loans or personal loans
+                           •   Equity release/cash out
+                           •   Home improvements – If an “on completion” valuation is to be relied upon, draw-downs must be controlled via a construction loan.
+                           •   Business purposes e.g. refinance business debt, business purchase (which includes unlisted shares) or equipment purchase so long as this is
+                               not the predominant purpose (i.e. no more than 50% of the total loan amount).
+ Unacceptable loan         •   Does not meet clients’ needs and objectives.
+ purpose                   •   By approving the loan, Macquarie Bank would be in breach of National Consumer Credit Protection Act obligations.
+                           •   Loans for development finance (construction of greater than 2 dwellings), purchase of multiple adjoining properties or any refinance associated
+                               with development.
+                           •   Vendor refinance (Vendor finance does not include arrangements where a parent has funded the purchase of a property for their child and the
+                               child is seeking a loan to payout their parents and the child is on title)
+                           •   Loans for payment of taxation liabilities or to fund working capital.
+                           •   Where the purpose is predominantly business related e.g. refinance business debt, business purchase (which includes unlisted shares) or
+                               equipment purchase.
+                           •   Any illegal purposes.
+                           •   Loans with a stand-alone second mortgage (where we do not also hold a first registered mortgage)
+                           •   Loans involving or offered in-conjunction with any shared equity schemes.
+
+
+
+
+                                                                                                                                                                                 5
+Residential Home Loans Credit Guidelines – Version 15.0
+
+ Equity release/cash out     Details regarding the purpose of the cash out must be provided based on discussion with the borrower.
+                              Examples of acceptable purposes                                          Examples of unacceptable purposes:
+                              •   Personal investment (share purchase)                                 •   Consolidating large unsecured debt
+                              •   Home improvements / renovations                                      •   Gambling
+                              •   Personal use (Travel, wedding etc.)                                  •   Maintain lifestyle
+                              •   Motor vehicle                                                        •   Meet repayments on existing commitments
+                              •   Deposit on property                                                  •   Development finance
+                              •   Purchase of property                                                 •   Tax debt
+                              •   Debt consolidation                                                   •   Any illegal activities
+
+
+                                                                                                 Above 80% up to 90% LVR (inclusive of capitalised low
+                              Up to 80% LVR
+                                                                                                 deposit fee)
+                              No limit is applicable to the equity release/cash out              No cash out, equity release or debt consolidation is allowed
+                              component. Subject to satisfactory client risk profile, capacity   (beyond a $5,000 allowance for costs).
+                              and collateral.
+
+
+ Refinance/consolidation      Up to 80% LVR                                                      Above 80% LVR
+ of unsecured debts1
+                              The refinancing/consolidation of unsecured debt(s) with            The refinancing/consolidation of unsecured debts is not allowed.
+ 1
+  Defined as Credit Cards,    combined limits totalling <= $50,000 can be considered.
+ Unsecured Personal           Subject to satisfactory client risk profile, capacity and
+ Loans, Store Cards,          collateral.
+ Unsecured Overdrafts,
+ Unsecured Lines Of
+ Credit, Buy Now Pay
+ Later.
+ Secured car/vehicle loans
+ are not included under
+ this policy.
+
+
+
+
+                                                                                                                                                                    6
+Residential Home Loans Credit Guidelines – Version 15.0
+
+1B. Loan Amount (Guide only)
+
+                                                                            Credit Guidelines
+ Minimum loan           $150,000
+ amount
+ Minimum principal      $25,000
+ increase amount
+ Maximum aggregate      $10,000,000
+ exposure per
+ Borrower
+
+1C. Loan Term
+
+                                                                                Credit Guidelines
+ Maximum loan term      30 years
+ Minimum loan term      5 years
+ Maximum initial        Up to 5 years
+ interest only period   Interest only is unavailable within the last 20 years of a loan term. For example, if a loan term of 23 years is requested, a maximum interest only
+                        period of 3 years is available at origination, as interest only is not available in the last 20 years of the loan term.
+ Maximum                Up to 5 years, subject to credit approval. The following additional requirements apply:
+ subsequent interest    1. Satisfactory repayment history over the 6 month period prior to the I/O rollover request must be evident;
+ only period            2. Capacity to service the loan must be evident using a P&I repayment over the remaining P&I loan term at the assessment rate.
+                        Interest only is unavailable within the last 20 years of a loan term. For example, if the loan term has 23 years remaining, a maximum interest only
+                        period of 3 years is available, however it cannot be in the last 20 years of the loan term
+ Interest Only          When an applicant requests an interest only loan, the application form must include at least one reason for the request which, including the desired
+                        interest only term, must be consistent with their loan purpose and needs and objectives. If the reason “Other” has been selected, comments must
+                        be provided confirming the details.
+
+
+
+
+                                                                                                                                                                               7
+Residential Home Loans Credit Guidelines – Version 15.0
+
+1D. Maximum Loan to Value Ratio’s (LVR) & Loan Amounts
+
+                                                                              Credit Guidelines
+   Maximum LVR         Loans with interest only   80% LVR.
+ per loan facility –   repayments
+     based on          Investor loans with        90% LVR inclusive of low deposit fee capitalisation.
+    purpose &          principal and interest     Note: If any portion of the loan has an interest only repayment method, the maximum LVR is 80%.
+  repayment type       repayments
+                       Refinance loans            90% LVR inclusive of low deposit fee capitalisation.
+                       Equity release loans       80% LVR - refer policy section 1A.
+                       Owner occupied             95% LVR inclusive of low deposit fee capitalisation.
+                       purchases with principal
+                       and interest repayments
+     Maximum
+  allowable LVR                                                                                    Maximum allowable LVR*
+   per security -                                     *Subject to all additional LVR caps identified throughout the policy also being met (including Valuation Red Flag requirements)
+ based on security
+  property value
+                                                                                                                                                    > 80% and <= 95%
+   and location                                                 <= 70%                               > 70% and <= 80%
+                                                                                                                                                      (LDF inclusive)
+
+                                                        $12m property limit
+                       Metro
+                                                  For properties > $12m a maximum LVR                $6m property limit                             $2m property limit
+                       (Category 1)
+                                                   of 60% applies (or $8.4m loan amount
+                                                               where higher)
+
+
+                                                       $3.5m property limit
+                       Non-metro & Regional
+                                                                                                     $2m property limit                             $1m property limit
+                       (Categories 2 & 3)         For properties > $3.5m a maximum LVR
+                                                               of 60% applies
+
+                       Other
+                       (Category 4)                                       Outside policy – Refer BDM                                                     Outside policy
+
+                       Multiple security          Where a facility is secured by multiple properties, a maximum LVR of 80% per security applies.
+                       properties
+
+                                                                                                                                                                                        8
+Residential Home Loans Credit Guidelines – Version 15.0
+
+                                                                          Credit Guidelines
+                    Valuation Red Flags         The following are considered valuation red flags (higher risk characteristics):
+                                                    •   an extended selling period requirement of greater than 6 months
+                                                    •   a Market Segment Conditions Risk Rating of 4 or 5
+                                                    •   any “5” risk ratings
+
+                                                For properties valued above $3m (Cat 1) and above $1m (Cat 2/3), where a valuation red flag is evident, a maximum LVR
+                                                of 75% applies for the security.
+
+                                                Additionally, the LVR cannot exceed 80% for any security where a valuation red flag is evident.
+
+  Maximum LVR       High risk postcode          80% LVR.
+  per security –    location
+                                                Refer to ‘Security Details’ section on the Manual Servicing Calculator to see if a High Risk postcode has been flagged
+  other security
+                                                once the postcode is entered.
+     features
+
+                    High density apartment/     Up to 80% LVR can be considered where the repayment type is Principal and Interest.
+                    unit(s)
+                                                Where any portion of the loan is interest only, the LVR is capped at 70%.
+
+                                                Refer to ‘Security Details’ section on the Manual Servicing Calculator to see if any High Density postcode has been
+                                                flagged once the postcode is entered.
+                    Restricted Security –       Refer to BDM.
+                    Studio/Bedsitter
+                    Restricted securities       Refer to restricted securities list in section 4A.
+                    Stratum Title (VIC) units   85% LVR inclusive of low deposit fee capitalisation. Property must be converted to a single or residential strata home unit
+                                                title prior to settlement.
+                    Off the plan                90% LVR inclusive of low deposit fee capitalisation.
+    Maximum         Up to 4 hectares            Standard LVR parameters.
+    LVR/Loan        >4 up to 10 hectares        80% LVR subject to location category limits.
+   amount per
+                    >10 up to 20 hectares       70% LVR subject to location category limits.
+  security – land
+       size         >20 up to 40 hectares       60% LVR subject to location category limits.
+                    >40 hectares                Unacceptable.
+
+
+
+
+                                                                                                                                                                              9
+Residential Home Loans Credit Guidelines – Version 15.0
+
+2. Character Parameters
+2A. Borrowers
+
+                                                                           Credit Guidelines
+ Acceptable borrowers/    •     Borrowers and guarantors must be natural persons.
+ guarantors               •     Individuals/natural persons must be no younger than 18 years old.
+                          •     Non-residents are subject to requirements outlined in the Residency Matrix.
+                          •     Mortgagors must be documented as either a Borrower or a Guarantor to the loan.
+
+                           The below table governs acceptable joint applicant structures:
+
+                              Borrower   Mortgagor   Guarantor    Structure acceptable                                                                                   Income
+
+                               A&B         A&B           N/A      Yes                                                                                                    A&B
+
+                                                                  For co-borrowers in a non-spousal relationship, please refer to additional requirements listed below
+                                                                  in this table.
+
+                               A&B           A           N/A      Only if A is in a spousal relationship with B.                                                         A&B
+
+                                 A         A&B            B       Only if A is in a spousal relationship with B. As per section 2C, Independent Legal Advice &           A&B
+                                                                  Independent Financial Advice is required for B.
+
+                                 A         A&B           N/A      No (All mortgagors to be a party to the loan).                                                         N/A
+
+                                 A           B            B       Only if A is in a spousal relationship with B. As per section 2C, ILA & IFA is required for B.         A&B
+
+                                 A           A            B       No                                                                                                     N/A
+
+
+
+                          For co-borrowers in a non-spousal relationship the following additional requirements apply:
+                                ❑ Minimum 20% ownership requirement for all applicants on any security property in the loan application. Note the following:
+                                      ➢ Applies to both purchase and refinance applications.
+                                      ➢ Applies to existing properties being used as collateral security to assist with a related purchase.
+                                      ➢ For existing properties, ownership cannot be transferred as part of the loan application process to meet this minimum
+                                        requirement i.e. it should be an established ownership structure that has been in place prior to the loan application or enquiry.
+                                      ➢ Where more than 5 co-borrowers exist, ownership shares to be equal.
+                                      ➢ Where more than 2 co-borrowers exist and 1 or more couples are evident, the minimum ownership requirement is to be applied
+                                        to each couple and any individual borrowers (a couple being defined as 2 borrowers in a spousal relationship).
+
+                                                                                                                                                                                  10
+Residential Home Loans Credit Guidelines – Version 15.0
+
+                                                                           Credit Guidelines
+                              ❑ Cash out and/or debt consolidation over and above any mortgage refinance amount is not allowed ($5,000 allowance can be granted for
+                                associated costs). The provision of funds for repairs/renovations to the security property can be considered only if the following
+                                requirements are met:
+                                    ➢ Evidence of the purpose is provided via quotes/invoices/tender or a building contract; and
+                                    ➢ All co-borrowers sign an undertaking/letter confirming the funds sought will be used for the renovations disclosed.
+
+                          Where a co-borrower notifies us prior to settlement that they no longer wish to be a co-borrower, settlement must not occur and application must
+                          be re-assessed based on the updated structure.
+
+ Unacceptable             Professional Property Investors – generally defined as an applicant who is predominantly in the business of developing real property, or where the
+ Borrowers                verified income being relied on in the servicing assessment is predominantly derived from property development (sales) or property investment
+                          (rental income).
+
+                          Borrowers of convenience - a borrower of convenience is a co-borrower not in a spousal relationship with the other borrower that is added to the
+                          loan application to provide serviceability and / or security but does not receive a benefit from the loan transaction.
+
+
+
+
+                                                                                                                                                                          11
+Residential Home Loans Credit Guidelines – Version 15.0
+
+2B. Residency Matrix
+
+ Residential address status    Citizenship Status                                                                                  Credit Requirement
+ One applicant:
+ Current/valid Australian      Australian citizen/permanent resident                                                               Standard loan parameters apply.
+ residential address held
+                               Non-Australian citizen/non-permanent resident (i.e. temporary resident or temporary visa holder)    Outside guidelines.
+ Current/valid Australian      Australian citizen/permanent resident                                                               Outside guidelines.
+ residential address NOT
+                               Non-Australian citizen/non-permanent resident (i.e. temporary resident or temporary visa holder)    Outside guidelines.
+ held
+
+
+ Two or more applicants:
+ Current/valid Australian      Australian citizen(s)/permanent resident(s) borrowing with either:                                  Standard loan parameters apply.
+ residential address held by   -   a co-applicant who is a non-Australian citizen/non-permanent resident (i.e. temporary
+ all applicants
+                                   resident or temporary visa holder) whose income is not required to service the debt; or
+                               -   a spousal co-applicant who is a non-Australian citizen/non-permanent resident (i.e.
+                                   temporary resident or temporary visa holder) who is not the predominant servicer of the loan.
+                               Australian citizen(s)/permanent resident(s) borrowing with either:                                  Outside guidelines.
+                               -   a non-spousal co-applicant who is a non-Australian citizen/non-permanent resident (i.e.
+                                   temporary resident or temporary visa holder) whose income is required to service the debt;
+                                   or
+                               -   a spousal co-applicant who is a non-Australian citizen/non-permanent resident (i.e.
+                                   temporary resident or temporary visa holder) who is the predominant servicer of the loan.
+ Current/valid Australian      Australian citizen(s)                                                                               Outside guidelines.
+ residential address NOT
+                               Australian citizen and an Australian permanent resident.                                            Outside guidelines.
+ held by any applicant
+                               Australian permanent resident(s)                                                                    Outside guidelines.
+                               Non-Australian citizen/non-permanent resident (any)                                                 Outside guidelines.
+
+
+
+
+                                                                                                                                                                     12
+Residential Home Loans Credit Guidelines – Version 15.0
+
+2C. Independent legal and financial advice
+
+                                                                               Credit Guidelines
+ Independent legal and     •   Independent legal and financial advice is required for:
+ financial advice                  o All borrowers 70 years old and over
+                                   o All non-English speaking borrowers. The legal advice needs to specifically go through the contracts and obligations of the loan. A
+                                       translation certificate is also required.
+                                   o All guarantors with the exception of:
+                                           ▪ Directors of company borrowers where Independent Financial Advice is not required (personal guarantees and Independent
+                                                Legal Advice still required for directors of company borrowers)
+                                   o Other applicants where deemed appropriate.
+                           •   Legal advice is not a requirement for a practicing lawyer and financial advice is not a requirement for a practicing accountant / financial
+                               planner. The spouse of a lawyer, accountant or financial planner is still required to obtain advice and it must be independent of the lawyer /
+                               accountant / financial planner spouse and the firm they work for.
+
+2D. Credit reports
+
+                                                                               Credit Guidelines
+ Credit reports            A credit report will be sourced for all borrowers and guarantors. All financial enquiries within the last 3 months must be confirmed as either ‘not
+                           proceeded’ or ‘proceeded’ and entered in liabilities.
+                           Unacceptable items            •   Bankrupts
+                                                         •   Judgements
+                                                         •   Court writs
+                                                         •   Outstanding defaults, financial or non-financial
+                           Adverse items                 •   Prior defaults greater than $500, can only be considered on an exception basis. Refer to your BDM. Any
+                                                             adverse findings must be supported by an explanation from the client.
+                                                         •   Paid non-financial defaults less than or equal to $500 can be considered if supported by a satisfactory
+                                                             explanation from the client.
+
+                           Credit Enquiries            •    Any open Macquarie retail home loan accounts where the applicant has provided a guarantee or is borrowing
+                                                            under a company or trust are to be investigated to ensure the conduct is acceptable, additionally the applicant or
+                                                            loan introducer on the applicant’s behalf is required to confirm either verbally or in writing that the entity linked to
+                                                            the guarantee or trust loan can continue meeting their liabilities without additional financial contribution from the
+                                                            applicant in a scenario where the total loan repayments were subjected to a 3% per annum serviceability buffer.
+                                                            If additional financial contributions are required, they must be factored into servicing as an Other regular and
+                                                            recurring expense with description Additional financial contribution.
+
+
+
+
+                                                                                                                                                                                   13
+Residential Home Loans Credit Guidelines – Version 15.0
+
+                                                                             Credit Guidelines
+                                                   •      Non-Macquarie i.e. ‘Other Financial Institution’ Consumer Real Property Mortgage enquiries with role type
+                                                          ‘Guarantor’ are an indication that an applicant may be providing a servicing guarantee.
+                                                   •      Regardless of their age the outcome of these credit enquiries are to be investigated.
+                                                   •      Where these credit enquiries result in an open loan that is also linked to a servicing guarantee, the applicant or
+                                                          loan introducer on the applicant’s behalf is required to confirm either verbally or in writing that the entity linked to
+                                                          the guarantee or trust loan can continue meeting their liabilities without additional financial contribution from the
+                                                          applicant in a scenario where the total loan repayments were subjected to a 3% per annum serviceability buffer.
+                                                          If additional financial contributions are required, they must be factored into servicing as an Other regular and
+                                                          recurring expense with description Additional financial contribution.
+                                                   •      The presence of four or more of these types of credit enquiries is an indicator of increased risk, where present
+                                                          the credit analyst is to decline the application.
+
+                          Comprehensive Credit     •      CCR data available will be reviewed as part of the credit assessment. Refer to section 2F for further information
+                          Reporting (CCR)                 in relation to account conduct.
+
+
+
+
+                                                                                                                                                                                 14
+Residential Home Loans Credit Guidelines – Version 15.0
+
+                          Company                  Where current directorships (including any trusts) to which the applicant is associated are identified (e.g. listed on a
+                          directorships/trusts     credit report, in financials) the following guidelines apply:
+                                                     Where        Definition
+                                                     income       Where income such as director wages/allowances, profits and/or trust distributions are being used
+                                                     from the     in servicing in line with self-employed guidelines.
+                                                     entity is
+                                                                  Documentation required
+                                                     required
+                                                     for          Self-employed guidelines to be followed (refer section 3C).
+                                                     servicing    Note:
+                                                                  The above does not apply and an applicant can be assessed under PAYG income verification
+                                                                  guidelines (refer section 3B) where both of the following criteria are met:
+                                                                  • The applicant owns less than 25% of the entity they work for; and
+                                                                  • Only their PAYG salary from the entity is being relied upon in servicing.
+                                                     Where        Definition
+                                                     income       Where income from a directorship (including any associated trusts) is not required for servicing,
+                                                     from the     financials for the entity are not required. The below also applies where using PAYG income
+                                                     entity is    verification guidelines (due to shareholding less than 25%) but is not applicable for public entities.
+                                                     not
+                                                                  Documentation required (in lieu of financial statements as per self-employed guidelines)
+                                                     required
+                                                     for          An applicant declaration is required confirming that the entities where they are a director/trustee are
+                                                     servicing    either profitable and can meet their liabilities, or if the entities are not operating, have no
+                                                                  outstanding liabilities.
+                                                                  The above declaration will be included as a settlement condition and obtained as part of the formal
+                                                                  loan documentation prior to settlement.
+                                                                  Where the above declaration does not hold true in relation to any directorship/trust (e.g. entity
+                                                                  running at a loss), financial statements for the relevant entity are required with self-employed
+                                                                  guidelines to be followed. For entities no longer operating (e.g. being wound up), any outstanding
+                                                                  liabilities are to be factored into servicing.
+                                                                  Note:
+                                                                  • Where poor repayment history is evident on the last 6 months, an accountant’s letter/email
+                                                                       confirming the above detail may be requested by our credit analyst.
+                                                                  • The above applicant declaration can be used for entities that hold property (where applicable).
+                                                     SMSF         Financials (or accountant letter/email) are required only for the super fund if there are mortgage
+                                                     trustee      credit enquiries evident on the related company trustee reports. Where mortgage enquiries are
+                                                     entities     evident, the financials (or accountant letter/email) must confirm no additional superannuation
+                                                                  contributions are required (above mandatory SGC requirements) in order to service the debt level
+                                                                  held within the fund. If additional superannuation contributions are required, they must be factored
+                                                                  into servicing accordingly.
+
+                                                                                                                                                                              15
+Residential Home Loans Credit Guidelines – Version 15.0
+
+2E. Contributions & Genuine Savings
+
+                                                                            Credit Guidelines
+ Gifts and Related Party   Where the borrower receives a gift from a family member or friend to assist with the purchase, written confirmation must be received from the
+ Loans                     donor of the funds confirming the amount and that funds are not repayable.
+                           Where the borrower receives a loan from a family member or friend to assist with the purchase, written confirmation must be received from the
+                           lender of the funds confirming the amount, any conditions and repayment terms.
+
+ Genuine savings           •   Where LVR > 85% (excluding low deposit fee capitalisation), 5% of purchase price is required to be evidenced as genuine savings.
+ requirement
+ Genuine savings source    Acceptable forms of genuine savings include one or a combination of the below and must be verified against source documents such as bank
+                           statements:
+                               •  Funds held or accumulated in a personal savings account or term deposit for 3 or more months.
+                               •  Shares or managed fund units purchased and held for at least 3 months.
+                               •  Sale of shares or managed fund units which had been held for at least 3 months.
+                               •  Equity in real estate. Deposits paid over 3 months ago for off the plan purchases can be considered – a copy of the deposit receipt is
+                                  required.
+                               •  Loan repayments in excess of contractual principal and interest repayments excluding unusual deposits. Lump sum deposits may be
+                                  acceptable if investigated and the applicant can demonstrate that the funds resulted from genuine savings.
+
+                           The following are unacceptable forms of genuine savings:
+                              •     First Home Owners’ Grant
+                              •     Any form of loan (even if held within applicants’ bank account for 3 or more months)
+                              •     Gifts and inheritance (can be considered acceptable where the amount has been held for three months or more)
+                              •     Projected savings, savings plans and/or rental purchase plans of any type
+                              •     Savings, shares or managed fund units held for less than the time frames described above
+                              •     Sale of assets other than real estate or investments meeting the above acceptable requirements
+                              •     Rental savings plans (e.g. where rent that is paid contributes to the deposit)
+                              •     Funds held in a business account unless evidence can be provided of funds being personally saved over the required period
+
+                           Applicants’ personal savings must be current and verified from original source documents.
+
+
+
+
+                                                                                                                                                                           16
+Residential Home Loans Credit Guidelines – Version 15.0
+
+2F. Account Conduct
+
+                                                                        Credit Guidelines
+ Comprehensive Credit     CCR RHI information will be reviewed on all accounts held over the last 24 months to confirm acceptable conduct is evident on all accounts
+ Reporting - Repayment    (including any accounts being refinanced):
+ History Information           • If any account shows any instances of RHI status code = 1 in the last 24 months we may be able to consider based on the overall strength
+ (CCR RHI)                         of the application.
+                               • If any account shows any instances of RHI status code = 2, 3, 4, 5, 6 or X in the last 24 months we will not be able to proceed with the
+                                   application.
+
+                           When reviewing CCR RHI data the following definitions apply:
+
+                            CCR RHI Status Code       Description
+
+
+                            0 (zero)                  The credit facility is current
+                            1                         Up to 29 days overdue
+                            2                         30-59 days overdue
+                            3                         60-89 days overdue
+                            4                         90-119 days overdue
+                            5                         120-149 days overdue
+                            6                         150-179 days overdue
+                            X                         180+ days overdue
+                            R                         Not reported- Repayment data was not reported for this period
+                                                      Pending – Repayment data has not been reported yet for this period (applies if the
+                            P
+                                                      repayment period is the current month or the month preceding the enquiry)
+                            C                         Closed
+                                                      Not Associated – Account is open, but subject of the report is not associated to the
+                            A
+                                                      account
+ Comprehensive Credit     CCR FHI information will be reviewed on all accounts held over the last 12 months (including any accounts being refinanced).
+ Reporting - Financial    Where an FHI status code of A or V is present, we need to see acceptable conduct on all accounts in the last 24 months and demonstrate
+ Hardship Information     serviceability via 6 months of making full payment post the end of the Financial Assistance arrangement. This is to satisfy Macquarie’s responsible
+ (CCR FHI)                lending obligations (see CCR RHI above). Refer to your BDM for assistance if further information is required.
+ Refinances - Manual      Credit analysts may at their discretion request statement(s) for a facility being refinanced to verify satisfactory repayment history. This is most
+ statement review         likely to occur in situations where the credit report does not contain any repayment history information, or the credit analyst is prompted to undertake
+                          further investigation.
+
+                          Where requested, statements should cover a 6 month period and show no more than 1 instance of a dishonoured/missed/late repayment or any
+                          amount over the approved limit per loan application (not per account being refinanced) which was resolved in less than 30 days or by the next
+                          scheduled repayment. The most recent statement should be no more than 6 weeks old as at date of submission.
+                                                                                                                                                                                17
+Residential Home Loans Credit Guidelines – Version 15.0
+
+                                                                            Credit Guidelines
+
+                          A bank statement can be considered acceptable where 6 full months’ repayments have been observed. For example we have a loan statement
+                          on file for a loan to be refinanced where the statement period commences 1 July 2017 and ends 28 December 2017, the repayments to the loan
+                          are credited on the first business day of the month, as we can observe 6 months of loan repayments the bank statement is considered acceptable.
+                          Credit cards only require statements covering a 3 month period.
+
+                          The following are examples of unsatisfactory repayment history;
+                          •  A facility being over the approved limit.
+                          •  A missed loan repayment remains unpaid.
+                          •  More than 1 dishonoured/missed/late repayment or over the approved limit during the last 6 months.
+
+                          Where the loan statement only shows the charged interest amount every month and does not show the actual payments being made,
+                          statements are required for the transaction account showing the payments being made over the same period.
+ Bank statement           The following are deemed acceptable in lieu of bank issued statements:
+ requirements             •  Internet statements; or
+                          •  Transaction listings; or
+                          •  Third-party provided statements (Bankstatements.com.au/illion, Frollo and MogoBankConnect only)
+                          Subject to the below being displayed:
+                          • The borrower’s name and account number; and
+                          • Individual transactions are itemised with a running account balance; and
+                          The logo of the bank or financial institution is displayed (where internet statements are solely relied upon)
+
+
+
+
+                                                                                                                                                                       18
+Residential Home Loans Credit Guidelines – Version 15.0
+
+3. Capacity Parameters
+3A. Serviceability Assessment
+
+                                                                         Credit Guidelines
+ Servicing surplus        A minimum servicing surplus of $500pa is required.
+
+                          The minimum servicing surplus of $500pa does not apply (but a minimum Net Serviceability Ratio of 1.00 will apply) if:
+                             I.  Declared living expenses are greater than or equal to 120% of the HEM benchmark; OR
+                            II.  Savings greater than or equal to $10,000 are held with the following noted:
+                                   ❑    Where a purchase is involved, the savings must be available based on the post settlement position after all costs.
+                                   ❑    Available redraw on existing loans can be considered where regular extra repayments have been made on the facility.
+                                   ❑    Other liquid assets can also be considered e.g. publicly listed shares.
+                                   ❑    Savings, redraw and/or other liquid assets are to be verified against source documents such as transaction, loan or holding
+                                        statements
+ Assessment rate          The higher of the carded rate plus assessment rate buffer or assessment rate floor is applied in servicing. The minimum assessment rate buffer
+                          is 3.00% with an assessment rate floor of 5.30%. The assessment rate buffer is applied to the higher of the carded interest rate or revert rate (as
+                          applicable to interest only & fixed) on the loan being sought, by loan split where applicable.
+
+                          For all repayment types (P&I or Interest Only), serviceability is assessed using P&I repayments. For loans with an interest only period, the P&I
+                          repayment is calculated using the remaining loan term. For example, a 30 year loan with a 5 year interest only period, with be assessed using a
+                          25 year P&I repayment.
+ Debt to income (DTI)     The following parameters apply:
+ cap
+                                •   A maximum DTI cap of 8 times applies to all loans.
+                                •   Additionally, where the DTI is greater than 6 times, a maximum LVR of 80% applies. Please note, any application in this category
+                                    deemed to have an overall high risk profile will be considered on a case-by-case basis.
+
+                          DTI caps do not apply in the following circumstances, as long as minimum NSR/servicing surplus requirements are met:
+
+                                •   Applications with the predominant (>50%) source of income included in servicing being non-taxable superannuation pensions.
+                                •   Applicants who have joint commitments with parties who are not included in the loan application, where 100% of the joint commitment is
+                                    included in the calculation.
+                          All verifiable income should be included and submitted with the loan application.
+
+
+
+
+                                                                                                                                                                           19
+Residential Home Loans Credit Guidelines – Version 15.0
+
+3B. Income – PAYG
+
+                                                                        Credit Guidelines
+ PAYG – Employment        •   Permanent salary/wage employment (full-time or part-time) and contract employment – minimum 6 months in current employment OR
+ history (Tenure)             employed for a minimum of 6 months in the same field/industry in prior role.
+                          •   Casual employment – minimum 6 months in current employment OR employed for a minimum of 6 months in the same field/industry.
+
+                          Note, in relation to the above, the time taken between roles does not need to be considered.
+
+ PAYG – Acceptable        Income Type                 Maximum          Conditions
+ income types and                                   proportion for
+ related deductions                                   servicing
+                          Base income                   100%           None.
+                          Casual income                 100%           None.
+                          Second job                    100%           Held for at least 12 months. However, where the applicant is employed within the healthcare,
+                                                                       teaching or aged/disability care industries (applies to both roles), there is no minimum term
+                                                                       applicable for the second job.
+                          Overtime – non                  80%          Confirmed as regular, ongoing and evidenced.
+                          essential services
+                          Overtime – essential          100%           Confirmed as regular, ongoing and evidenced.
+                          services                                     Essential services are limited to occupations in the following services:
+                                                                       • Public transport operations
+                                                                       • Fire fighters
+                                                                       • Provision of health services
+                                                                       • Provision of garbage or sewerage services
+                                                                       • Prison officers
+                                                                       • Police
+                                                                       • Power / energy technicians (this does not include electricians)
+                                                                       •   Frontline Aged & Disability care workers (excludes general support staff such as cooks,
+                                                                           cleaners and office/administration staff)
+                                                                       •   Frontline Aviation workers (excludes baggage handlers and office/administration staff)
+
+                          Commission or                   80%          Payment is consistent, ongoing and a condition of employment.
+                          bonus
+                                                                       *Note, the most recent bonus income payment(s) received can be evidenced/verified by:
+                                                                       -       a letter from the employer on letterhead; or
+                                                                       -       a payslip confirming the payment(s) made; or
+                                                                       -       the most recent financial year’s ATO income statement/payment summary or tax return (a
+                                                                       notice of assessment is only required where payment summary/tax return is handwritten).
+                                                                                                                                                                       20
+Residential Home Loans Credit Guidelines – Version 15.0
+
+                                                                           Credit Guidelines
+                          Car allowance                  100%            Permanent part of income and any associated lease payments are included in liabilities.
+                          Shift allowances               100%            Condition of employment and industry standard.
+                          Other allowances               100%            Other allowances are acceptable subject to condition of employment and industry standard.
+                          Salary sacrifice               100%            Confirmation that the amount is convertible to gross taxable income and is provided on a regular
+                          arrangements                                   basis and evidenced by:
+                          E.g. non-compulsory       Note: any loan           • Payslips confirming details of the salary packaging arrangement and clearly displays these
+                          superannuation          commitments must               pre-tax deduction items
+                          payments, loan           be included as an         • Any other Fringe Benefit Tax reportable income identified on a payslip or payment
+                          repayments,                   existing                 summary that is not linked to salary sacrifice arrangements is not acceptable income.
+                          expense repayments        commitment to
+                                                  calculate servicing.
+                          Salary sacrifice ‘tax          100%            •   Must be employed in public health, social work or charity work.
+                          free’ arrangements                             •   Confirmation that the amount is convertible to gross taxable income and is provided on a
+                                                    Note: any loan           regular basis and evidenced by:
+                                                  commitments must                ➢ Payslips confirming details of the salary packaging arrangement and clearly displays
+                                                   be included as an                  these pre-tax deduction items; and
+                                                        existing                  ➢ A letter from the employer detailing the salary sacrifice amount/arrangement OR
+                                                    commitment to                     copies of transaction statements (either from a bank or the salary packaging provider)
+                                                  calculate servicing.                showing 3 months’ worth of credits.
+                          Parental leave                 100%            Evidence of income being paid and will continue to be paid until the applicant returns to work.
+                          income (employer or                            Letter confirming return to work date is required and no more than 60 days old as at date of
+                          government paid)                               submission.
+
+                                                                         Return to work income can be considered where applicant has:
+                                                                         •  sufficient savings held in their bank account (including offset/redraw on loan to be refinanced)
+                                                                            for the parental leave period to cover the shortfall on all commitments and declared living
+                                                                            expenses (including consideration for future costs of any childcare due to returning to work),
+                                                                            AND
+                                                                         •  provided an employment letter confirming resume date and pay rate.
+
+                                                                         Return to work income can be used regardless of if the applicant is receiving any paid parental
+                                                                         leave income or not, however only one of these income types can be included in serviceability.
+
+                          Long service leave             100%            Where a PAYG applicant in permanent full-time employment is:
+                                                                            • On long service leave and on full pay, there is no requirement to obtain a return to work
+                                                                                letter. The full pay (as per payslips) can be used in servicing.
+                                                                            • On long service leave at half pay, half pay (as per payslips) can be used in the servicing
+                                                                                assessment. However, return to work income can be considered where applicant has:
+
+                                                                                                                                                                               21
+Residential Home Loans Credit Guidelines – Version 15.0
+
+                                                                           Credit Guidelines
+                                                                                       o        sufficient savings held in their bank account (including offset/redraw on
+                                                                                       loan to be refinanced) for the leave period to cover the shortfall on all
+                                                                                       commitments (at the assessed rate) and declared living expenses; AND
+                                                                                       o        provided an employment letter confirming resume date and pay rate.
+                                                                      Permanent part-time employees on long service leave can be considered, however, an
+                                                                      employment letter confirming the resume date and pay rate will be required regardless of whether
+                                                                      using full or half pay in the assessment.
+                          Deductions -                  100%          Where HELP/HECS and mandatory child support are visible on payslips these must be deemed as
+                          HELP/HECS &                                 involuntary and included in as an expense item in the existing commitments section. If evidence is
+                          mandatory child                             provided confirming the HELP/HECS debt has been paid out in full then the associated payments
+                          support                                     can be excluded.
+
+                          Other deductions                         Where there are other deductions on the payslip, the broker is to make reasonable enquiries with
+                                                                   the applicant and make commentary confirming the deductions are voluntary before adding them
+                                                                   back to income in the serviceability assessment.
+ PAYG – Income            Where base income is being used to service the loan:
+ evidence
+                              1. Two computer generated payslips with the latest no more than 60 days old and the oldest payslip being no more than four
+                                 months old as at the date of submission containing as a minimum the applicant’s name, employer’s name or ABN (if applicable), pay
+                                 period, gross and net pay, and ideally Year To Date income.
+                               OR if two payslips are not yet available;
+                              2. One computer generated payslip, as described above, no more than 60 days old as at date of submission can be accepted
+                                 where a copy of a signed employment contract/letter is held detailing the commencement date and base income. E.g. an applicant
+                                 has been working as a teacher for five years, they have recently accepted a full-time position at a private school. The applicant can
+                                 provide one payslip and their employment contract from their new employer. This is considered acceptable income verification when
+                                 using base income.
+                          Where more than base income is required to service the loan (e.g. overtime, commission, shift allowances)**, two recent computer
+                          generated payslips meeting requirements as described above are acceptable so long as the YTD figure covers a period of at least 3
+                          months. YTD income can be annualised to determine an annual wage, which may also include regular overtime, commission and shift allowances,
+                          however caution should be exercised annualising where either of the two payslips do not show any overtime, commission, or shift allowance
+                          payments being received or the nature of the employment is seasonal.
+                                  **Note, the above 3 month YTD requirement does not apply for:
+                                  •        Fixed allowances (e.g. car, phone) which can be applied as base income; and
+                                  •        Bonuses, which have a separate treatment elsewhere in policy (refer section ‘PAYG – Acceptable income types and related
+                                  deductions’).
+
+
+
+                                                                                                                                                                            22
+Residential Home Loans Credit Guidelines – Version 15.0
+
+                                                                     Credit Guidelines
+                          Where more than base income is required to service the loan and:
+                              •   the YTD income is missing; or
+                              •   the YTD income covers a period less than 3 months;
+                          then one of the following forms of additional income verification is required:
+                              •   The most recent financial year’s PAYG summary (ATO assessment notice only required where handwritten) or ATO income
+                                  statement (where status indicator is ‘Tax Ready’); OR
+                              •   The most recent financial year’s tax return (ATO assessment notice only required where handwritten). A draft tax return can be
+                                  considered where the return is pending lodgement, subject to an accountant’s letter confirming it will be unchanged when lodged; OR
+                              •   The last available payslip in June for the prior financial year confirming the YTD earned.
+
+                                  Where the above additional verification is provided and the YTD is missing or covers less than 3 months, the income to be used is the
+                                  lower of YTD annualised or the most recent financial year’s income (note, the same rule applies where the prior year’s income was
+                                  earned from other employers).
+                          Additional casual and PAYG contractor income requirements – the standard two computer generated payslip requirement as described
+                          above applies, however, the YTD income can be annualised to determine an annual wage where it covers a minimum period of 6
+                          months. Where the YTD figure covers less than 6 months (or is missing) then one of the following forms of additional income verification is
+                          required:
+                              •   The most recent financial year’s PAYG summary (ATO assessment notice only required where handwritten) or ATO income
+                                  statement (where status indicator is ‘Tax Ready’); OR
+                              •   The most recent financial year’s tax return (ATO assessment notice only required where handwritten). A draft tax return can be
+                                  considered where the return is pending lodgement, subject to an accountant’s letter confirming it will be unchanged when lodged; OR
+                              •   The last available payslip in June for the prior financial year confirming the YTD earned.
+
+                                  Where the above additional verification is provided and the YTD is missing or covers less than 6 months, the income to be used is the
+                                  lower of YTD annualised or the most recent financial year’s income (note, the same rule applies where the prior year’s income was
+                                  earned from other employers). An allowance can be made in the income calculation where the client has confirmed a prior period of
+                                  parental leave causing the YTD annualised and/or most recent financial year’s income to be low (note, ensure the associated dependent
+                                  is included in servicing).
+
+
+
+
+                                                                                                                                                                          23
+Residential Home Loans Credit Guidelines – Version 15.0
+
+ PAYG – Income             If an applicant is employed by a family owned or controlled business, any TWO of the following income verification options are to be satisfied:
+ evidence – Employed by
+                                 1.      Computer generated payslips as per standard policy requirements above. Alternatively, in lieu of payslips, the current financial
+ family owned or
+                                 year income statement showing “Year to date” and no older than 60 days at submission can be provided (available via my.Gov.au).
+ controlled businesses
+                                 2.      Bank Statements evidencing the most recent 6 months of regular salary credits.
+                                 3.      The most recent individual tax return and ATO tax assessment notice (if the ATO notice of assessment is not available, an
+                                 accountant's confirmation of lodgement is acceptable). Alternatively, the previous financial year income statement showing “Tax Ready”
+                                 Status can be provided (available via my.Gov.au).
+                          The above does not apply in cases where the PAYG applicant works for a self-employed spouse and both applicants are parties to the loan where
+                          self-employed income verification requirements are to be followed.
+ Temporary government      Where the most recent PAYG payslip includes an observable Temporary government assistance payment (or it is noted otherwise via the bank
+ assistance                statement or application process that the client is receiving Temporary government assistance payment), the following applies:
+
+                             •   the payslip for the previous period without the Temporary government assistance payment is required. The lower of the applicant’s prior
+                                 income or the Temporary government assistance payment is to be used in the servicing assessment; and
+                             •   the credit analyst must obtain a letter from the employer or complete a verbal employment check to obtain positive confirmation that the
+                                 applicant will be retained at their pre-Temporary government assistance income level and is currently actively working. Where the
+                                 applicant is not actively working (stood down), their income is not to be used unless the employer can confirm their actual resumption date.
+
+
+
+
+                                                                                                                                                                             24
+Residential Home Loans Credit Guidelines – Version 15.0
+
+3C. Income – Self-Employed Income
+
+                                                                            Credit Guidelines
+ Self-employed –           •   Self-employed - at least 2 years trading in the current business. For self-employed professionals, require a minimum of 1 year trading in
+ Employment history            their current business.
+ (Tenure)                  •   Self-employed contract workers that previously worked as PAYG in the same industry or field for over 2 years.
+ Self-employed –           The below guidelines are to apply and income to be included in line with the borrowers ownership rights (e.g. shares, units):
+ Acceptable income
+ types and related         1. In an upward trend a maximum income to be used is 120% of the previous year, not exceeding the highest year. The most recent year (i.e.
+ deductions                   the higher income year) can be used if the increase in income is ongoing and the applicant is able to provide year-to-date Business Activity
+                              Statements (BAS**) for a minimum period of 6 months supporting revenue in line with the most recent year (i.e. >=90% annualised).
+                           2. In a downward trend the income to be used is the most recent year. Additionally, year-to-date BAS** supporting revenue in line with the most
+                              recent year (>=90% annualised) must be provided where both of the following apply:
+                                   o       The most recent year’s income has decreased by more than 20% from the previous year; AND
+                                   o       Cash out/equity release for any purpose is being sought on top of the refinancing of existing debt(s) plus a $5,000 allowance for
+                                   costs (note, this does not apply where a deposit is being generated for a related purchase submitted through Macquarie).
+                           **Note the following in relation to BAS - from the 30th day following each quarter (60th day following the Oct - Dec quarter), BAS statements
+                           covering the period from the most recent financial statements through until the end of the most recent quarter are required. Accountant prepared
+                           interim financials covering the same period can also be considered in lieu of BAS to support the relevant income level.
+                           3. Rental income is to be taken out of the borrowers’ self-employed income and included in the rental income section to ensure the appropriate
+                              haircuts are applied.
+                           4. Self-employed contract workers only - Where self-employed income is greater than previous PAYG employment a maximum 120% of the
+                               PAYG income to be used, so long as this does not exceed the self-employed income.
+
+                           Allowable add-backs
+                           •   Directors’/Partners’ salaries (if not used separately in servicing calculations).
+                           •   Directors’ superannuation contributions in excess of the minimum compulsory amount.
+                           •   Interest charges relating to loans being refinanced can be added back to net profit because interest costs are included in the serviceability
+                               assessment. Where there are loans that are not being refinanced, the interest is not to be added back to net profit and servicing costs do not
+                               need to be included in other loan repayments.
+                           •   Business depreciation up to a total amount not exceeding 20% of business net profit.
+                           •   Non-recurring expenses or one off items subject to satisfactory confirmation from applicant’s accountant.
+                           •   Distributions from a discretionary family trust to children under 18.
+
+
+
+
+                                                                                                                                                                           25
+Residential Home Loans Credit Guidelines – Version 15.0
+
+                                                                             Credit Guidelines
+                           Note:
+                           •  Other add-backs of non-cash expenditure should only enhance serviceability and should not be relied upon to meet commitments.
+                           •  Non-recurring income should be deducted from assessable income (e.g. income generated from asset sales). In relation to temporary
+                              government incentives (e.g. JobKeeper, ATO cash flow boost), they only need to be deducted from each year’s assessable income where
+                              they are evident in the most recent year’s financials.
+                           •  If an applicant holds a minority shareholding (less than 50%) and any of the other shareholders are not in a spousal relationship with the
+                              applicant, any company profits used in the servicing calculation must be supported by actual dividends received.
+                           •  Income in this section of policy (3C) is defined as ‘profit/loss (before tax) minus non-recurring income plus any allowable addbacks’.
+
+ Standard Self-employed    Evidence of self-employed, company and trust income includes:
+ – Income evidence
+                           •   Business tax returns or accountant prepared profit & loss and balance sheet statements for the most recent 2 years (note: only the most
+                               recent year financial statement is required if it shows two year comparables); plus
+                           •   Personal tax returns for the 2 most recent financial years and the most recent ATO assessment notice of directors who are applicants. If the
+                               ATO notice of assessment is not available, an accountant’s confirmation of lodgement is acceptable. Note, a personal tax return (and NOA)
+                               is not required if the income within that tax return is not being used in the servicing calculation.
+
+                           Cash flow projections or any other projected incomes are unacceptable. Draft tax returns for the most recent year can be considered where the
+                           returns are pending lodgement, subject to an accountant’s letter or email confirming they will be unchanged when lodged.
+
+                           Effective 1 April each year, prior year financials are required for assessing all self-employed applicants. There will be a grace period of 2 weeks
+                           to allow for pipeline applications. However after 15 April, loans will require prior year financials to demonstrate servicing. If the Credit Analyst
+                           determines that updated financials are required prior to 1 April in order to satisfy themselves of the consistency of income, they are able to request
+                           them at any time.
+
+
+
+
+                                                                                                                                                                               26
+Residential Home Loans Credit Guidelines – Version 15.0
+
+ Professional              Where an applicant is a self-employed professional (refer to acceptable list below), their income can be verified using one of the following options:
+ Specialisation Self-          1. Standard self-employed verification requirements previously noted within policy, however, only the most recent year’s documentation is
+ employed – Income                required (one year) to verify income; OR
+ evidence
+                               2. The most recent year’s individual/personal tax return and notice of assessment. Note, only wages, allowances, dividends or distributions
+                                  from the current business (or a trust associated with business) can be used i.e. don’t include capital gains or income from other unrelated
+                                  sources.
+                                   o   Note in relation to option 2, where a YTD income statement covering a minimum 3-month period confirming the wage being paid from
+                                       current business (not tax ready is acceptable) is provided, the verified figure can be annualised to determine income (capped at 120%
+                                       of the total income figure verified in the personal tax return).
+                           Note, where utilising this policy (either of the above options):
+                              o The LVR must not exceed 80%; AND
+                              o No additional enquiry/documentation regarding the profitability of the trading entity is required; AND
+                              o The business must be trading for at least 12 months at time of application. Evidence of income received from the current business must
+                                  also cover a minimum 12 month period at time of application.
+                           Note, in relation to options 1 and 2:
+                              o Effective 1st April each year, prior year documentation is required. There is a grace period of 2 weeks to allow for pipeline applications.
+                                    However, after 15th April, prior year documentation is required.
+                              o Draft tax returns for the most recent year can be considered where the return is pending lodgement, subject to an accountant’s letter or
+                                    email confirming it will be unchanged when lodged. The notice of assessment would not be required in this scenario.
+
+                           Allowable professional specialisations include (evidence required):
+                               •   Accountant – CA ANZ, CPA or CFA qualified
+                               •   Actuary – FIAA qualified
+                               •   Lawyer – Law Society Practising Certificate
+                               •   Medical professional – Registered Medico
+                               •   Engineer – member of Engineers Australia (or state equivalent)
+                               •   Veterinary practitioner – registered with relevant state practitioners' board
+                               •   Architect - registered with relevant state practitioners' board
+                               •   Pharmacist – registered with Pharmacy Board of Australia
+                               •   Psychologist – registered with Psychology Board of Australia
+                               •   Podiatrist – registered with Podiatry Board of Australia
+                               •   Optometrist – registered with Optometry Board of Australia
+
+
+
+
+                                                                                                                                                                              27
+Residential Home Loans Credit Guidelines – Version 15.0
+
+3D. Income – Rental Income
+
+                                                                              Credit Guidelines
+ Residential                95% of gross rental income, in line with the borrower(s) % ownership of the property, representing a 5% shading for vacancy.
+
+                            A floor of 15% of gross rental income will be applied to investment property expenses.
+ Short term stay (holiday   80% of gross rental income, in line with the borrower(s) % ownership of the property, representing a 20% shading for vacancy.
+ letting/serviced
+ apartments) and room       A floor of 15% of gross rental income will be applied to investment property expenses.
+ rental properties
+ Non-residential (e.g.      80% of gross rental income, in line with the borrower(s) % ownership of the property, representing a 20% shading for vacancy.
+ commercial, industrial,
+ office)                    A floor of 15% of gross rental income will be applied to investment property expenses.
+
+                            Where significant reliance is made on rental from non-residential properties, lease agreements should be obtained to determine the risk.
+ Rental income              For proposed purchases:
+ verification               Where the property is to form part of Macquarie Bank loan security, the lesser of:
+                            • the rent as per the Macquarie Bank ordered valuation; or
+                            • a licensed real estate agent’s estimate/tenancy management agreement (no more than 60 days old at date of application submission). If a
+                                range is provided the lower is to be used; or
+                            • a current executed tenancy agreement, lease extension or variation (arms-length through a real estate agent), showing rent, commencement
+                                date and termination date (as evidenced in the contract of sale).
+
+                            For existing property/ies owned:
+                            The actual rental income as verified from any of the below acceptable sources:
+                            •   Recent rental income statement (must be addressed to borrower) no more than 60 days old at date of application submission; or
+                            •   Current executed tenancy agreement (arms-length through a real estate agent), showing rent, commencement date and termination date.
+                                Tenancy agreements are unacceptable if expired; or
+                            •   Most recent tax return; or
+                            •   Annual rental income statement covering the most recent financial year; or
+                            •   Bank statements (rental credits evident for a minimum of 3 months)
+
+
+
+
+                                                                                                                                                                    28
+Residential Home Loans Credit Guidelines – Version 15.0
+
+3E. Income – Other Income
+
+                                                                              Credit Guidelines
+ Investment income          Investment assets must be in the name of the borrower(s) and guarantor(s) and include:
+                                •    Cash in interest bearing accounts (interest income) not including offset accounts
+                                •    Shares (franked dividends, franking credits, unfranked dividends)
+                                •    Managed funds (distributions)
+                            80% of the investment income figure obtained by:
+                                • The lower investment income figure from the two most recent tax returns; OR
+                                • Taking a deeming rate of 3% of the investment asset’s value where actual income is unknown. The asset’s value must be verified via
+                                     stock holding reports or bank account statements and to ensure consistency is the lower value from the current statement or a
+                                     statement from 12 months ago, at the time of approval.
+ Family court               100% as supporting or secondary income if the following holds true:
+ maintenance                •   Agreement is registered with the Child Support Agency and a copy is provided to Macquarie Bank. A court order can also be considered if a
+                                copy is provided and payments are evidenced in line with the order.
+                            •   Six month’s consistent payments as evidenced via the borrower’s bank account statements.
+                            •   Maintenance payments are considered permanent for the next five years.
+                            •   Dependent child must be under 11 years of age at the time of the application.
+                            •   Cannot be sole source of income.
+ Superannuation             100% where confirmed as permanent and ongoing by superannuation provider. Includes government superannuation pensions (e.g. Comsuper
+ pensions                   and Military pensions).
+ Family allowance           100% as supporting or secondary income if the following holds true:
+                            •   Payments are verified via government issued family allowance statements
+                            •   Dependent child must be under 11 years of age at the time of the application
+ Foreign income             80% if consistent and evidenced via previous 2 years’ Australian tax returns. As a guide acceptable foreign income should be limited to annuity
+                            pension, rental or investment income. Cannot be sole source or majority of income required to meet loan serviceability.
+
+                            Note, the above does not apply where a PAYG applicant is employed by a foreign entity, is paid foreign income and has a valid current
+                            Australian residential address. In this scenario, the following guidelines apply instead:
+
+                             Employment         Limited to PAYG. It is desirable that applicants are working for a recognisable organisation.
+
+                             Income             Income used for serviceability must be verified by payslips in line with PAYG income verification guidelines (refer policy
+                                                section 3B).
+                             Foreign income     Acceptable foreign currencies are GBP, EUR, HKD, NZD, SGD, USD, CAD, JPY and CHF.
+                             currencies
+
+
+
+
+                                                                                                                                                                              29
+Residential Home Loans Credit Guidelines – Version 15.0
+
+                                                                             Credit Guidelines
+                               Foreign Income     Where foreign currency is to be converted to Australian dollars, only 80% of the amount after conversion at current
+                               Haircuts           exchange rates is to be used for loan servicing. Where overtime, commission or bonuses are used, they must be
+                                                  haircut by the required amount for income type variability in addition to the haircut for foreign income variability.
+
+
+
+                               Documentation      All income documents must be in English or translated into English with appropriate translation certificate from a
+                                                  registered licensed translation service domiciled in Australia.
+
+ Disability benefits and   100% as a supporting/secondary income (i.e. not the predominant income required for servicing) if evidence from the payment provider is held
+ salary continuance /      confirming the following:
+ income protection
+ insurance payments        •     The payment is ongoing and not subject to medical review; and
+                           •     The benefit is payable for the term of the loan or until retirement age (assumed to be age 70 unless advised they will retire earlier. Refer
+                                 section 3I – Mature age for exit strategy requirements).
+                           •     These income types are to be treated as taxable income.
+
+
+
+
+                                                                                                                                                                                30
+Residential Home Loans Credit Guidelines – Version 15.0
+
+3F. Commitments – Existing financial obligations
+
+                                                                                Credit Guidelines
+ Buffering of existing     Existing financial obligations will be included in the loan serviceability calculator per the following:
+ financial obligations     Existing Financial            Treatment in servicing (including buffers):
+                           Obligation Type
+                           Other secured /               The higher of:
+                           unsecured loans               •    Repayment amount on the loan commitment assessed at the assessment rate (higher of interest rate for this
+                                                              loan plus buffer or assessment rate floor) with the actual remaining P&I loan term; or
+                                                         •    Declared actual repayment amount.
+                           Credit cards                45.6% pa of the card limit.
+                           Charge card                 0% of the repayment amount or card limit, if 3 months statement are provided and the balance is paid off in full each
+                                                       statement period, for at least 3 statement periods.
+
+                                                       Should evidence exist that the borrower has not paid off the balance in full for the statements reviewed the highest
+                                                       monthly spend figure is to be included as a credit limit in the serviceability assessment.
+                           Rental expense              Declared amount.
+                           Buy Now Pay Later           The lower of:
+                           (BNPL)                      • The declared annualised repayment amount; or
+                                                       • The outstanding balance.
+
+                                                       Note, the declared repayment cannot be $0 where an outstanding balance >$0 is evident and vice versa.
+ Comprehensive Credit      CCR account data will be compared against the declared financial position in the loan application. Any discrepancies relating to account limits
+ Reporting (CCR)           and undisclosed accounts will be allowed for in the servicing calculation. Where an existing account is being closed or an existing account limit
+                           is being reduced, satisfactory evidence must be provided.
+ Joint commitments –       •    Where an applicant has a joint commitment with a non-applicant spouse (held or to be held either with Macquarie or another financial
+ Spousal debt reducer           institution) and 100% of the joint commitment is included in servicing, 100% of any associated rental income and negative gearing benefit
+                                can be used in the servicing calculation.
+
+                           Or
+
+                           •    Where an applicant has a joint commitment with a non-applicant spouse (held or to be held either with Macquarie or another financial
+                                institution), the joint commitment can be apportioned in the servicing calculation provided it can be verified that the non-applicant
+                                spouse/partner can also service the remainder. This can be verified by completing an additional combined household servicing calculation
+                                with the income and all commitments of the non-applicant spouse/partner also included. The following additional requirements apply:
+                                  I.    If the joint commitment is held with Macquarie, the original assessment can be reviewed to determine the employment, income and
+                                        financial position of the non-applicant spouse. If the original loan approval is over 90 days old, written confirmation from the non-
+                                        applicant is required confirming their financial position and employment has not changed.
+                                                                                                                                                                                31
+Residential Home Loans Credit Guidelines – Version 15.0
+
+                                                                             Credit Guidelines
+                                II.   If the joint commitment is held (or to be held) with another financial institution (or held with Macquarie and changes to the non-
+                                      applicant’s employment and/or financial position are evident), written confirmation of the non-applicant’s financial position and
+                                      employment is required. Satisfactory evidence of the non-applicant’s income is also required in line with current Macquarie policy
+                                      (excluding any telephone verification). An up to date statement for the subject joint commitment is to be reviewed if the facility has
+                                      already settled (statement guidelines as per section 2F of policy to apply).
+                               III.   Written acknowledgement is required from the non-applicant confirming they are aware of the new loan being applied for by their
+                                      partner. This is not required where the joint commitment is being applied for concurrently through Macquarie.
+
+                          •   Where an applicant has a joint commitment with parties other than their spouse/partner who are not included in the loan application, 100%
+                              of the commitment is to be used in the servicing calculation. If the applicant shares an investment property with the other party then the
+                              applicant’s ownership percentage should be applied when determining any rental income and negative gearing benefit used in the servicing
+                              calculation.
+
+
+3G. Commitments – Negative gearing
+
+                                                                           Credit Guidelines
+ Negative gearing on      Negative Gearing Benefit for residential property investment loans is acceptable where the purpose of the funds relates to residential property
+ investment property      investment and up to 100% of the purchase price (where all funds have been borrowed to fund the purchase).
+ and other loans
+                          Use of Negative Gearing Benefit for cash out for investment to be included or excluded as per the following scenarios:
+                          •   Scenario 1 - Cash out is for Funds to Complete (FTC) on an investment property purchase and the property is being funded by another
+                              bank. If we hold evidence of the purchase by executed purchase contract then will accept the cash out amount for Funds to Complete
+                              under negative gearing policy (clearly the other lender’s debt needs to be included in serviceability).
+                          •   Scenario 2 - Cash out is for purchase of an investment property that will not be our security. If we hold evidence of the purchase by
+                              executed purchase contract then will accept cash out amount under negative gearing policy.
+                          •   Scenario 3 - Cash out is for future purchase of an investment property yet to be located but applicant wants access to the funds now before
+                              selecting the property. Given no executed purchase contract is available then we will not accept the cash out under negative gearing policy.
+                          •   Scenario 4 – Cash out is for general investment purposes. Given no evidence available then will not accept cash out under negative
+                              gearing.
+                          •   Scenario 5 – Cash out is for the payout of an ex-partner's share of an investment property as part of a separation. If we hold evidence of
+                              the transfer amount (either copy of transfer or the separation agreement) then will accept the cash out amount under negative gearing
+                              policy.
+
+                          The income and debt amounts are to be input into the loan serviceability calculator per applicants’ proportionate ownership of the property.
+
+
+
+
+                                                                                                                                                                               32
+Residential Home Loans Credit Guidelines – Version 15.0
+
+                                                                            Credit Guidelines
+
+                           Negative Gearing Benefit on vacant land is unacceptable.
+
+                           Non-residential property investment negative gearing:
+                           Negative gearing for non-residential investment property is permitted where the debt has been evidenced via the most recent loan statement and
+                           where the property is held in the individual’s name (not a company or trust).
+
+
+                           Margin loan negative gearing:
+                           Negative gearing for margin loan interest is permitted ONLY where the debt has been evidenced through six months loan statements. The
+                           amount of negative gearing should be consistent with historical drawn balances as per the statements provided.
+
+                           Negative Gearing Benefit is not to be applied on loans in the name of a company or trust.
+
+
+3H. Commitments – Living expenses
+
+                                                                           Credit Guidelines
+ Living Expenses           The servicing calculator includes a breakdown of the borrower’s living expenses into categories:
+                               ➢   ‘General living expenses’ include – Medical/health (excludes health insurance), Groceries, Clothing/personal care,
+                                   Recreation/entertainment (includes pet care), Childcare, Telephone/Internet/media, Transport, Higher/tertiary education (excludes
+                                   HECS), Public primary/secondary education, General insurances (includes home & contents, car) and Primary residence costs
+                                   (excludes insurance and strata).
+                               ➢   ‘Additional living expenses’ include – Personal insurances (health/life/accident), Private education, Owner occupied strata/body
+                                   corporate fees, Secondary residence costs and any Other living expenses not included elsewhere.
+                           For servicing calculation purposes, the applicant(s) declared ‘General living expenses’ are compared to the income tiered HEM value with the
+                           maximum of these two figures plus any ‘Additional living expenses’ used in the servicing calculation.
+ Notional rental expense   Where an applicant is purchasing or refinancing an investment property and has stated or declared that they will reside with family or friends on a
+                           rent-free basis or at an unusually low rental cost, a notional rental expense of $650 per month per household is to be included as a commitment
+                           for loan serviceability. If the rental expense declared by the household is less than this, the notional amount is to be included.
+
+
+
+
+                                                                                                                                                                            33
+Residential Home Loans Credit Guidelines – Version 15.0
+
+3I. Mature Age
+
+
+                                                                           Credit Guidelines
+ Mature age policy        In general, where an applicant is approaching retirement age, care must be taken in assessing whether the applicant can continue to meet their
+                          loan obligations beyond retirement without undue hardship, has a reasonable exit strategy at retirement and/or can service the proposed loan
+                          over a reduced term.
+
+
+
+
+3J. Exit Strategy
+
+
+                                                                                  Credit Guidelines
+ Exit Strategy            An exit strategy is required in the following circumstances:
+ Requirements
+                              •    Individual applicant who is both:
+                                        ➢ 55 years old (or older) at application
+                                            AND
+                                        ➢ Will be 70 years old (or older) at loan maturity*.
+                              •    Joint applicants in a spousal relationship where any income required to service the loan is earned by an applicant who is both:
+                                        ➢ 55 years old (or older) at application
+                                            AND
+                                        ➢ Will be 70 years old (or older) at loan maturity*.
+                              •    Joint applicants in a non-spousal relationship where any applicant (regardless of if their income is required to service the loan) is both:
+                                        ➢ 55 years old (or older) at application
+                                            AND
+                                        ➢ Will be 70 years old (or older) at loan maturity*.
+
+                          * Or has advised an intention to have retired prior to loan maturity
+
+                          The following principles are used when assessing downsizing exit strategy:
+                              •    the property intended to be purchased is assessed at current market value
+                              •    the applicant needs to be able to purchase the new property and extinguish all debt on the existing property
+                              •    the loan size can be assessed at the amortised value at the point in time they intend to downsize, based on minimum contractual repayments
+                              •    no capital growth should be assumed in the property they are selling
+                              •    care is required where the loan is secured by an owner-occupied property which is the applicant’s main asset
+                              •    exit strategy plan, is detailed including the above and showing timeframe, purchase price and location, and aligns with applicant’s requirements and
+                                   objectives
+
+
+                                                                                                                                                                                          34
+Residential Home Loans Credit Guidelines – Version 15.0
+
+
+
+4. Collateral Parameters
+4A. Security
+
+                                                                              Credit Guidelines
+ Acceptable Securities     •  Residential house and land.
+                           •  Residential strata home unit with at least one bedroom having a living floor space area no less than 50m² (excluding balcony and car
+                              space).
+                           •  House & land on acreage or rural residential property with acceptable dwelling, essential services connected sealed roads and non-income
+                              producing. Note, tank water and septic tank connections are acceptable where considered common to the location with no related adverse
+                              comments outlined by the valuer.
+                           •  Off the plan purchases.
+                           •  Stratum title (VIC) home units.
+                           •  Mixed zoned properties where the property is for residential use and that is permitted under the zoning requirements.
+ Restricted Securities     The following higher risk security types may be considered on a case by case basis, Refer to your BDM to confirm if the security can be considered:
+                           • Display homes.
+                           •  Where the security boundary is located within 50 metres of high voltage transmission lines.
+                           •  Unique or limited appeal properties (as described by panel valuer).
+                           •  National trust, historic or heritage listed/zoned property.
+                           •  Flood affected property - properties located in an area where the Annual Expedient Probability – flood related measure is >= 1% (previously
+                              1:100 year flood zone) where:
+                                    o the known flood height level is higher than the floor level OR
+                                    o the valuer cannot confirm the floor level is above the flood height.
+                           •  Leasehold properties not in ACT where the unexpired lease term is 10 years greater than loan term.
+                           •  Studio apartments/Bed sitters having a living floor space area no less than 50 m² excluding balcony and car space.
+                           •  Valuer notes that the security expected sales period is greater than 6 months.
+                           •  Green wedge zoned properties.
+ Unacceptable securities   •   Vacant land with no intent to build
+                           •   More than two dwellings on one title
+                           •   Leasehold property under national parks & wildlife authority (e.g. land in Thredbo or Kosciusko)
+                           •   Property allotments in sparsely populated areas
+                           •   Company title, Company Share title (VIC)
+                           •   Purple Title (WA)
+                           •   Moiety Title (SA)
+                           •   Properties under a “time share” arrangement
+                           •   Land subject to licence to occupy or properties with “lease of life” covenants on title
+                           •   Properties subject to the Western Lands Act
+                           •   Strata title hotel/motel room
+                                                                                                                                                                            35
+Residential Home Loans Credit Guidelines – Version 15.0
+
+                                                                             Credit Guidelines
+                           •   Dual key apartments
+                           •   Commercial or industrial zoned property
+                           •   Properties that are not exclusively for residential use-regardless of zoning (e.g. a single residential dwelling that has been converted to allow
+                               or contains an ongoing retail, commercial, industrial operation within any part of the boundary).
+                           •   Stand-alone 2nd mortgage securities
+                           •   Partially complete properties (including properties where construction has commenced in any form) are unacceptable for standard loans.
+                               This security type can only be considered under construction loan parameters where the same builder who started the building is also
+                               completing the outstanding works.
+                           •   Relocatable or transportable homes
+                           •   Properties affected by contamination
+                           •   Properties where essential services are not connected
+                           •   Owner/builder construction
+                           •   University or student apartments
+                           •   Rural residential properties not meeting the acceptable criteria
+                           •   Properties located in remote mining towns
+                           •   Strata retirement village apartments
+                           •   Serviced apartments
+                           •   Third party securities
+                           •   Properties affected by any government or state planning schemes
+                           •   Properties in need of significant repair unless the repairs form part of the loan purpose and funds are adequately controlled.
+                           •   Properties adversely impacted by mine subsidence or landslip
+                           •   Studio apartments/Bed sitters having a living floor space area less than 50 m² excluding balcony and car space
+                           •   Properties deemed unsuitable for home loan purposes by the valuer.
+                           •   Where the borrower owns >25% or more than 4 dwellings in a single development
+
+
+
+
+                                                                                                                                                                              36
+Residential Home Loans Credit Guidelines – Version 15.0
+
+4B. Valuations
+
+                                                                              Credit Guidelines
+ Valuation requirements    Valuation can either be a full valuation, desktop, automated valuation (AVM) or contract of sale, which will be determined by the information
+                           input into the Property HUB. Inputting correct valuation data is essential to getting the correct valuation type. All valuations must be assigned to
+                           Macquarie. For applications with higher risk characteristics, another valuation may be required. Please note, for LVR’s above 80% a full
+                           valuation will always be required.
+ Valuation age             Valuation must be no older than 90 days at the time of submission (including ‘Off the Plan’ Purchases). Where the valuation is older than 90
+                           days at the time of approval a new valuation may be required. At settlement the valuation should be no older 180 days.
+ Off the plan purchases    If the Contract of Sale exchanged > 12 months prior to valuation, can utilise on completion valuation so long as the loan does not exceed 100%
+                           of the purchase price. If < 12 months, the lesser of the valuation or contract price is to be used to calculate Loan to Value Ratio.
+ Repairs                   Where the valuer notes that repairs are required they must provide detail on whether the repairs are “structural” and “essential”. They should
+                           also note the estimated cost of the repairs.
+                           Whenever essential or structural repairs for >$10k are required and are not part of a construction loan, the broker must provide reasonable
+                           grounds that the borrower has the capacity to afford the repairs, evidence may be required.
+ Developer Discounts       Where developer discounts exist, they are not to be treated as part of the borrowers’ deposit for LVR calculation purposes, they should reduce
+                           the sales price.
+
+4C. Purchases
+
+                                                                            Credit Guidelines
+ Contract of sale          Loans for the purchase of properties to be held as security are to be supported by at least the front page of the Contract of Sale with the
+                           amount, purchaser’s details and vendor’s details prior to loan approval. Where the full signed Contract of Sale cannot be provided prior to loan
+                           approval the loan may be approved subject to receipt of the full executed Contract of Sale noting the correctly assessed purchase price, prior to
+                           loan settlement.
+ Non-arm’s length          •   Maximum LVR is 100% of the purchase price.
+ transactions              •   Where the LVR is greater than 85% of the purchase price, the genuine savings requirement is to be met.
+ Builder developer sales   Properties purchased directly from a builder or developer commonly includes rebates and/or incentives which must be discounted from the
+                           purchase price.
+ Queensland properties     Where the property is located in Queensland and the builder/developer or a related party is the vendor, the valuer may request a copy of the
+                           Form 8 Certificate detailing total commission and marketing fees included in the transaction.
+
+
+
+
+                                                                                                                                                                                  37
+Residential Home Loans Credit Guidelines – Version 15.0
+
+Construction Loans
+1. Product Parameters
+
+1A. Loan Purpose
+
+                                                                               Credit Guidelines
+ Acceptable loan           To assist with the immediate building of up to 2 residential dwellings or renovations on an existing property. Construction must be performed by
+ purpose                   a fully licensed contracted builder and commence within three months of the initial loan settlement.
+ Unacceptable loan         •    Loans to owner-builders
+ purpose                   •    Loans for kit or demountable homes.
+                           •    Loans to builders or property developers for speculative investment purposes e.g. where the principal nature of their business or income
+                                generation is reliant on the development and/or future sale of the security property.
+                           •    Loans for the construction of more than 2 dwellings.
+                           •    Split Contracts for the construction of dwellings within multi-unit residential developments given the unacceptable level of third party risk due
+                                to inter-dependencies should the developer fall over or the borrower default prior to the completion of development.
+ Home improvements           Home improvement or renovation loans where we are reliant on the ‘on-completion’ value must be assessed as a construction loan. Macquarie
+ and renovations             Bank must control release of funds direct to the supplier upon receipt of invoice and signed customer authority.
+
+
+ Equity release for        If the LVR is 80% or below on an as-is valuation basis and the loan does not exceed the land value of the security property, a standard loan may
+ structure renovations     be approved. Building contracts, council plans and progress drawdowns are not required and MBL will not control the release of funds to the
+ and / or construction     supplier. The following additional requirements apply:
+                                   ➢ Partially complete properties (including properties where construction has commenced in any form) are unacceptable.
+                                   ➢ Confirmation is to be obtained (either verbally or in writing from introducer/applicant) that a licensed builder is being engaged for any
+                                     structural works being undertaken (Loans to owner builders are unacceptable).
+                                   ➢ The proposed build cost is to be provided to ensure the applicants have sufficient funds available to complete the intended works.
+
+                           Knockdown/rebuild (or where the security property being built upon is currently vacant land) scenarios can also be considered however the
+                           following additional requirements apply:
+                                   ➢ LVR must be 80% or below using the land value only.
+                                   ➢ A copy of the building contract must be provided in these cases.
+
+
+
+
+                                                                                                                                                                                38
+Residential Home Loans Credit Guidelines – Version 15.0
+
+1B. Maximum Loan to Value Ratio (LVR) & Loan Amount
+
+                                                                            Credit Guidelines
+ Maximum LVR              80%
+
+                          Note: LVR for construction loans is based on the lower of the on completion valuation or cost to complete (contracted construction price plus
+                          land value).
+ Minimum loan amount      $150,000
+ Maximum loan amount      •   Up to $2,000,000 at 80% LVR, also subject to parameters/caps as per standard policy section 1D ‘Maximum allowable LVR per security -
+                              based on security property value and location’.
+                          •   Construction component not to exceed 50% of loan size for loans > $1,500,000.
+
+
+1C. Other Requirements
+                                                                               Credit Guidelines
+ Building Contract and     •    The Building Agreement (contract) must be a “fixed price”, “fixed term”, industry standard contract and is to be entered into prior to formal
+ related documents              loan approval or at the latest, the settlement of the land (where the land is not already owned by the applicants).
+                           •    The building contract must be signed by all parties and include the progress payment schedule.
+                           •    Council approved plans and specifications should be provided prior to formal approval. If the plans are not yet approved, a copy of the plans
+                                which have been or are to be submitted to the council can be provided instead. Council approved plans and specifications are required prior
+                                to the first progress draw. The dwelling to be erected must comply with all applicable zoning requirements.
+ Progress payment          The Bank is concerned with construction contracts where a greater portion of the total contracted amount is paid to the builder than the portion
+ schedule                  of total work completed. Front loaded contracts can become problematic in the event the builder defaults before the property has been
+                           completed.
+
+                           Progress payments are to be made at each stage of construction. Whilst 5 stages is considered standard, up to 8 stages is considered within
+                           standard parameters. An example of a standard schedule is as follows:
+
+                                                        Single & Double Storey – All construction types
+                                                                   Milestones                                      Example        Cumulative
+                                                                                                                                    Total
+                                                         Stage 1     Foundations/Slab (including deposit)            20%            20%
+                                                         Stage 2     Frame                                           20%            40%
+                                                         Stage 3     External lining                                 30%            70%
+                                                         Stage 4     Lock-up/Internal lining                         20%            90%
+                                                         Stage 5     Practical completion                            10%            100%
+                                                                     TOTAL                                          100%
+
+
+                           The schedule is considered acceptable if it is not front loaded. This can be determined by one of the following:
+
+                                                                                                                                                                            39
+Residential Home Loans Credit Guidelines – Version 15.0
+
+                                                                            Credit Guidelines
+                               •   The valuer comments that the progress payment schedule is in line with industry or is acceptable.
+                               •   The payments are not in excess of the cumulative totals in the above example. Where there are more than 5 stages, the Broker should
+                                   be considering the cumulative total at the specified milestones.
+ Construction period       •   Commencement of the building works must take place within three months after the initial settlement date of the loan.
+                           •   Construction must be completed within 24 months of initial settlement. Where the LVR is > 80%, a maximum interest only period of 2 years
+                               applies to align with the proposed construction period.
+ Insurance                 •   Prior to the first progress draw, copies of appropriate builder’s indemnity/warranty (‘Insurance Under the Home Building Compensation
+                               Fund’ (IUHBCF) and construction insurance are required. Note builders home owners warranty insurance is not required for Tasmania and
+                               a fidelity fund certificate is required for Northern Territory instead. Prior to the final progress draw a copy of the general home insurance
+                               certificate is to be provided.
+ Other Requirements        •   Owners’ full equity to be provided at the initial land settlement. Maximum amount available at settlement = Loan amount – Construction
+                               costs. Funds to complete construction are to be retained at all times.
+                           •   The deposit for building works may be released directly to the borrower where receipt of the payment to the builder is provided.
+
+2. Character Parameters
+
+2A. Contributions
+
+                                                                             Credit Guidelines
+ Equity/borrower           The borrower’s contribution to the construction is required to be made prior to drawdown on the loan.
+ contribution
+
+3. Collateral Parameters
+
+3A. Security Location
+
+                                                                           Credit Guidelines
+ Security Location         Metro (Category 1) and non-metro (Category 2) locations only. Refer to ‘Security Details’ section on the Manual Servicing Calculator to see the
+                           security category once the postcode is entered.
+
+
+
+
+                                                                                                                                                                               40
+Residential Home Loans Credit Guidelines – Version 15.0
+
+3B. Valuation Requirements
+
+                                                                                  Credit Guidelines
+ Valuation Requirements       •   The valuer is to be provided with the following documents and is required to comment on the reasonableness of the construction costs and
+                                  whether the proposed progress payment schedule is in line with industry standards:
+                                      o Plans and specifications
+                                      o Building contract or tender (where building contract outstanding).
+                                      o Progress payment schedule.
+                              •   Only first (‘Slab Down’) and final (‘Practical completion’) progress draws need to be certified and approved by a panel valuer where the
+                                  building contract is ≤ $1,000,000. Valuer inspections and approval are required at each progress payment where the building contract is >
+                                  $1,000,000.
+
+
+Unless stated otherwise, this information has been prepared by Macquarie Bank Limited ABN 46 008 583 542 AFSL & Australian Credit Licence 237502 for the use of licensed
+and accredited brokers and financial advisers only. In no circumstances is it to be used by a potential client for the purposes of making a decision about a financial product or
+class of products.
+
+
+
+
+                                                                                                                                                                               41
+

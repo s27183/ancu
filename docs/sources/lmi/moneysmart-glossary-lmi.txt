@@ -1,0 +1,55 @@
+Source: https://moneysmart.gov.au/glossary/lenders-mortgage-insurance-lmi
+Retrieved: 2026-10-27
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML 14eaf00160dfde52f1d5e367afbec9da7a2f8d0539956a982c411be7cbdd1f7e
+
+lenders mortgage insurance (LMI) (glossary definition) - Moneysmart.gov.au
+Skip to main content
+lenders mortgage insurance (LMI)
+Last updated: 16 September 2019
+Lenders mortgage insurance (LMI) protects a credit provider if borrowers are unable to repay their loan. LMI is usually a one-off cost to a home loan borrower, payable when the amount borrowed exceeds 80% of the value of the property. LMI does not benefit the borrower, it only protects the lender.
+Do you find this page useful?
+Yes
+No
+Why?
+It had the information I was looking for
+The page makes sense
+The information is balanced and unbiased
+The information gave me a sense of what to do next
+Submit
+Any other feedback
+Why not?
+It didn't have the information I was looking for
+The page was confusing
+The information overwhelmed me
+There wasn't enough information for me to take action
+Submit
+Any other feedback
+Your feedback
+Your feedback relates to:
+Please select...
+Webpage Content
+Calculator or tool
+Complaint or scam
+Copyright requests
+Loans, money and personal finance advice
+Other feedback/suggestion
+You would like to:
+Please select...
+Report an Error
+Comment on a Webpage
+Ask a question
+Your issue is:
+Please select...
+You don't understand the calculator result
+You believe the calculator is incorrect
+The calculator/tool does not work (eg technical issue)
+You want to provide general feedback/suggestions
+Error loading Partial View script (file: ~/Views/MacroPartials/MoneySmart/Standard text.cshtml)
+Error loading Partial View script (file: ~/Views/MacroPartials/MoneySmart/Standard text.cshtml)
+Error loading Partial View script (file: ~/Views/MacroPartials/MoneySmart/Standard text.cshtml)
+Summary of your feedback:
+Your comments:
+The page/calculator/app you are referring to (eg. cut/paste URL):
+Cancel
+Send feedback
+search

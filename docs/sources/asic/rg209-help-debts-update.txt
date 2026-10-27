@@ -1,0 +1,17 @@
+Source: https://www.asic.gov.au/about-asic/news-centre/news-items/asic-has-updated-guidance-to-clarify-treatment-of-student-loan-commitments-by-banks-and-lenders/
+Retrieved: 2026-10-27
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML d99bb5d81b3189058ad33802ff2d98d04fb22e97b15404a0d600e9c266a3fd11
+
+ASIC has updated guidance to clarify treatment of student loan commitments by banks and lenders | ASIC
+Newsroom
+ASIC has updated guidance to clarify treatment of student loan commitments by banks and lenders
+ASIC has updated its regulatory guidance to clarify how the Higher Education Loan Program (HELP), and other student loan commitments, may be considered by banks and lenders assessing whether a consumer can afford to take on new credit.
+The update to Regulatory Guide 209 Credit licensing: Responsible lending conduct (RG 209) follows a request from the Treasurer for ASIC and the Australian Prudential Regulation Authority (APRA) to review their guidance for lenders, and subsequent consultation with industry associations and consumer groups .
+ASIC notes the Government’s program of reforms aims to improve access to credit and help more first home buyers get on the property ladder.
+The update to RG 209 acknowledges that HELP debts are different from other forms of debt because the amount that is required to be repaid depends on a person’s level of income.
+The update to RG 209 is limited to the treatment of HELP debts in lending assessments. It does not change broader lending policies or responsible lending obligations.
+It aims to provide clarity on the nature of HELP and student loan repayments and how lenders may consider HELP debts when undertaking responsible lending assessments.
+ASIC and APRA have been working together to ensure any changes to HELP guidance is consistent.
+More information
+Regulatory Guide 209 Credit licensing: Responsible lending conduct (RG 209 )
+ASIC is Australia’s corporate, markets and financial services regulator.

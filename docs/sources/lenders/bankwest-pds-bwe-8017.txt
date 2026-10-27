@@ -1,0 +1,283 @@
+Source: https://www.bankwest.com.au/content/dam/bankwest/documents/legal-library/PDS_BWE-8017.pdf
+Retrieved: 2026-10-27
+Extracted: pdftotext -layout of the PDF (Bankwest BWE-8017); sha256 of the PDF 7191199baf8c2fa9422ad7c69779d0588458f9a7a0c23ca59ed1fb2148808d21
+
+Application Submission
+Checklist                                                                                                            Bankwest, a division of Commonwealth Bank of Australia
+                                                                                                                  ABN 48 123 123 124 AFSL/Australian credit licence 234945
+
+Bankwest Brokers
+
+               Important information
+               –   Please log in to bankwest.com.au/brokers for more information and to download relevant forms from the below links.
+               –   Upload documents within the Broker Portal, where they are instantly uploaded to your Bankwest loan application.
+
+
+
+
+Broker name                                                                                                              Broker Code - BK #
+
+
+Application # / Related deal #                                       Customer name
+
+
+
+
+      Section 1 - General
+
+      All applications
+
+
+        Approved in Principle (AIP)            Full Approval
+
+  Note: A system generated indicative approval letter will be issued at time of submission. AIPs will only be assessed where there is a linked full application
+  or where the customer is attending an Auction and requires a fully assessed AIP to do so.
+        Signed and dated Privacy Collection Notice form is required for each individual applicant (including guarantors). The application will
+        not be assessed until the form(s) are held.
+        Cover page and notes with an overview of this deal.
+        Pricing Approval (if applicable) – Ensure this is finalised in the Pricing Tool.
+
+        Valuation ordered and valuation reference number linked to application in the Broker Portal.
+
+       Bankwest Serviceability Calculator to be provided with every deal.
+
+        Building Insurance Policy is required to meet settlement - Bankwest does not need to be listed on the policy.
+        Industry Professional LMI waiver - Ensure application meets policy, and LMI waiver is requested by providing commentary and supportive
+        evidence via the Broker Portal.
+
+
+
+
+      Fixed rate home loan application
+
+        Fixed Rate Cap Election Form signed by all borrowers required for each fixed rate home loan product.
+
+
+
+
+      Customer Identification (All Applications)
+
+        Where an applicant is a Non-Australian Citizen a copy of their original passport and electronic visa (e-visa) must be provided.
+
+  One of the following options must be completed:
+
+        Broker - Digital ID check
+
+        Broker - Manual identification – Provide the following:
+               Completed and signed Verification of Identity (VOI) Form (pre-filled form available in AOL); AND
+               Supporting evidence as stated on VOI Form
+
+  –     ZipID/IDYou are not acceptable methods of identification.
+  –     Ensure photos on ID documents match the customer’s appearance and names match across all forms of ID sighted.
+
+
+
+
+                                                                                                                                              Page 1 of 4   BWE-8017 300926
+    Customer Identification (All Applications) (continued)
+
+      Australia Post – Provide the applicant with the Mortgagor Identity Verification form (one form to be completed per applicant) and application
+      reference number, and refer them to their nearest participating Australia Post outlet.
+      –   Not all outlets offer this service, and a fee may be applicable.
+      –   The housing loan application must be lodged first as your applicant will need to quote their application reference number to
+          complete the identity check.
+      Overseas Verification – Refer to Identify your overseas customer
+
+      Vulnerable Customers or remote Aboriginal and Torres Strait Islander peoples; We may accept alternate documents from remote
+      Aboriginal and Torres Strait Islander peoples, refugees, people living in a declared natural disaster zone or people who’ve recently been released
+      from an Australian Correctional Centre. Call 13 17 18 to confirm identification documents that can be accepted.
+
+
+
+    Refinances
+
+      Current lender’s Discharge Authority Form is required to meet settlement.
+
+
+
+    Cash out
+
+      LVR ≤ 80%: Commentary within application submission confirming breakdown of funds. Where cash out is >$1m, formal supporting
+      documentation is also required.
+      LVR >80% to 90%: Commentary within application submission confirming breakdown of funds up to a maximum of $100k. Where cash out is
+      >$50k and ≤$100k, formal supporting documentation is also required.
+
+
+
+    Existing debts
+
+Use the following matrix for each OFI debt to determine which documents are required.
+
+                                       Account type                              Debt being refinanced                   Debt not being refinanced
+
+                         Home Loans                                    Nil                                       Evidence of:
+Comprehensive                                                                                                          Evidence of current interest rate,
+Credit Reporting                                                                                                       remaining loan term and remaining
+Available                                                                                                              interest only term (if applicable)
+
+                         Other loans including personal                Nil                                       Nil
+                         loans and credit cards
+
+                         Home Loans                                          Six (6) months statements*                One (1) month statement*
+CCR not available        Other loans including personal                      Three (3) months statements*              One (1) month statement*
+                         loans and credit cards
+
+–     Statements must include the account holder’s name, account number, name of the financial institution, limit, current interest rate,
+      remaining loan term and the remaining interest only term (if applicable) and be no older than 45 days from the date of submission.
+–     Internet statements are accepted provided they contain the same information as a bank statement. A combination of both may be used
+      provided the internet statement can be matched to the bank issued statement with an account number.
+
+
+
+    Purchases
+
+      Fully executed Contract of Sale including all annexures. (Note: For NSW and ACT properties the contract of sale is not required to be executed.
+      Full contract of sale is required to be provided, unless list of documents section is unmarked, then front page only can be accepted.)
+
+
+      Where a Contract of Sale for vacant land includes a buy-back/resale/timeframe to construct clause, an application (approval in principal or full
+      approval) for construction is also required to be lodged.
+
+      Foreign Investment Review Board (FIRB) approval/exemption certificate for temporary Australian resident visa holders eligible to purchase
+      property (if applicable)
+
+
+
+
+                                                                                                                                      Page 2 of 4   BWE-8017 300926
+Construction loans
+
+  Fully executed Fixed Price Building Contract. (Not required to be executed for NSW and ACT properties).
+  Plans and Specifications.
+  Progress Payment Schedule (refer to Construction policy).
+
+
+
+FHOG
+
+
+  FHOG application and relevant supporting documents.
+
+
+
+Funds to Complete
+
+
+  Breakdown of Funds to Complete.
+
+  Fully completed Gifted Funds Declaration Form signed by all grantors.
+
+
+
+Deal involves LMI and LVR is >90%
+
+  Bank Statement for the customer’s main transaction account, showing 30 days transactions (no older than 45 days from date of submission).
+
+  Bank Statements evidencing 5% savings or equity. (Note: FHOG does not count as savings)
+
+
+
+
+Guarantor involved
+
+  Guarantor Interview Checklist to be provided.
+
+  Full Statement of Position to be submitted within ApplyOnline. (i.e. assets, income, liabilities, expenses).
+
+  Signed and dated Privacy Collection Notice form.
+  Bank Statement for the borrower’s main transaction account, showing 30 days transactions (no older than 45 days from date of submission).
+
+
+
+Section 2 - Income
+
+  *Tax file numbers must be removed*
+
+  Refer to Income validation procedures for guidance on income figures to be used for servicing
+
+
+
+PAYG income
+
+  One acceptable payslip verifying base income that covers at least one pay cycle, dated within 60 days of application submission.
+    –   Payslip must contain borrower’s name, employer’s name, employer’s ABN (except government departments), gross income, tax paid, net
+        income. A signed letter on the employer’s letterhead confirming missing details is required if these details are not held.
+  For Additional Income (such as Allowances, Overtime and Bonuses), or Employment Status other than Full Time and Part Time (such as Casual
+  and Seasonal) provide additional income evidence as per the Serviceability and Eligible Incomes policy.
+
+  Commentary explaining the customer’s salary sacrifice arrangements and confirming that they are voluntary.
+
+
+
+
+                                                                                                                               Page 3 of 4   BWE-8017 300926
+ Self-employed income
+
+Note: Minimum ABN/ACN registration requirement is 18 months ≤80% LVR.
+
+Salaried Self-Employed
+Where customer is paying themselves a regular salary from their company or trust for a minimum of 6 months and there is no reliance on additional
+income from the business to demonstrate servicing.
+     Most recent personal tax return, OR
+     Most recent payslip showing >6 months YTD income
+
+AND Evidence the business is operating at a net profit:
+     Most recent business tax return, OR
+     Most recent accountant prepared business profit and loss statement, OR
+     Accountant prepared letter stating that the company/trust has sufficient profits to meet the business commitments and can
+     continue to pay the salary the customer has declared.
+
+Sole Trader
+     Bankwest Serviceability Calculator with details completed on Self Employed page
+     Most recent Notice of Assessment (NOA)
+     One year’s most recent personal tax return.
+
+Company, Trust, Partnership
+Where income from the business is required to demonstrate servicing.
+  Bankwest Serviceability Calculator with details completed on Self Employed page
+     Most recent personal tax return
+     Corresponding Notice of Assessment (NOA)
+     Most recent business tax return (for all entities)
+     Corresponding accountant prepared financial statements (including profit and loss statement, balance sheet and depreciation
+     schedule).
+
+Refer to Serviceability and Eligible Incomes policy for full policy details.
+
+
+
+ Rental income
+
+
+Standard Residential Investment Property
+
+     Lease Agreement that has not ended and is within its expiry date/ O&A confirming details of current lease.
+
+OR
+     Rental statement from the managing agent, dated within two months of the application.
+
+OR
+     Rental appraisal from real estate agent where the property is untenanted, dated within two months of the application.
+     –   Where the letter states a proposed range, the lower figure will be adopted.
+OR
+     Three months’ consecutive Bank Statements showing rental credits paid into the bank account.
+
+Short-Term/Holiday Letting
+
+     Most recent tax return, OR
+
+     Rental Statement from the managing agent less than two months old immediately preceding the date of application showing 12
+     months rental income.
+
+
+
+ Extended Leave ≤80%
+
+     Completed Extended Leave form.
+
+     Bankwest Serviceability Calculator confirming servicing positions as per Section 3 of the above form.
+
+
+
+
+                                                                                                                                   Page 4 of 4   BWE-8017 300926
+

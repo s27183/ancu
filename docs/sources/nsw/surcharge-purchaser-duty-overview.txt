@@ -1,0 +1,113 @@
+Source: https://www.revenue.nsw.gov.au/property-professionals-resource-centre/guides-rulings-cpns/topics/surcharge-purchaser-duty-guide/overview
+Retrieved: 2026-10-27
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML c2e1cc2b777204480cd3b3a5e845a923bdb94baa0c73c948b2d9d935acc7917b
+
+Surcharge purchaser duty overview | Revenue NSW
+-->
+-->
+-->
+-->
+Skip to content
+Skip to navigation
+Search for:
+Property Professionals Resource Centre
+Listen
+-->
+-->
+-->
+Listen -->
+-->
+-->
+-->
+-->
+Property professionals guide: Surcharge purchaser duty
+Surcharge purchaser duty overview
+Understand what transactions are liable for surcharge purchaser duty in NSW, the liability date and and how surcharge purchaser duty is calculated.
+Last updated: 29 May 2026
+On this page
+Foreign persons who acquire residential-related property in NSW must pay a foreign surcharge on that property.
+What is Surcharge Purchaser Duty?
+Surcharge Purchaser Duty came into effect on 21 June 2016. It applies to acquisitions of NSW residential-related property by those deemed to be foreign persons.
+The surcharge is calculated on the dutiable value and is paid in addition to the transfer duty payable on the acquisition of residential-related property.
+Who is a foreign person?
+Individuals, corporations, trusts, and governments can all be foreign persons for the purposes of Surcharge Purchaser Duty.
+Information provided in the chapters on the left hand side of this Guide, outlines the potential Surcharge Purchaser Duty liability for each.
+Note: Between 21 February 2023 and 8 April 2024, foreign persons who were citizens of certain nations were not considered to be subject to surcharge purchaser duty due to international tax treaties . Changes in federal legislation means that this no longer applies.
+What is residential-related property?
+Section 104K of the Duties Act 1997 defines residential-related property.
+Residential-related property includes:
+residential land as defined under section 104I of the Duties Act 1997
+an interest in residential-related property
+an option to purchase residential land in NSW
+a partnership interest (being an interest in a partnership that has partnership property that is residential-related property
+Residential land includes any of the following:
+Description
+Definition
+Parcel of land
+Where there are one or more dwellings on the land or a parcel of land on which there is a building under construction that, when completed, will constitute one or more dwellings.
+Strata lot
+If it is lawfully occupied as a separate dwelling, or suitable for lawful occupation as a separate dwelling.
+Utility lot
+If its use is restricted to the owner or occupier of a strata lot.
+Land use entitlement
+If it entitles the holder of the land use entitlement to occupy a building, or part of a building, as a separate dwelling e.g., company title and residential flats.
+Parcel of
+vacant land
+Zoned or otherwise designated for use for residential or principally for residential purposes.
+Residential land does not include land used for primary production that is exempt from Land Tax (refer to section 10AA of the Land Tax Management Act 1956 ).
+If a property has both residential and commercial purposes (mixed use property) the surcharge is calculated on the value of the residential component (refer to section 104ZB of the Duties Act 1997 ).
+Residential-related property acquired for a commercial purpose may be exempt from Surcharge Purchaser Duty but is conditional on the property type and the use of the property. Revenue Ruling G011 must be read in conjunction with this guide and provides further information on residential premises that are not considered dwellings.
+What transactions are liable to Surcharge Purchaser Duty?
+Surcharge purchaser duty may be payable on a variety of property transactions involving residential-related property, such as:
+agreements for sale of land
+real property transfers
+declarations of trust
+transfers of lease/leasehold interest
+deceased estate transfers (if ad valorem duty is payable pursuant to section 63(2) of the Duties Act 1997 )
+Section 104L , section 104N and section 104O of the Duties Act 1997 identify all transactions that may be subject to Surcharge Purchaser Duty.
+Transactions that are exempt or receive a concessional rate of transfer duty under Chapter 2 of the Duties Act 1997 may still be liable to Surcharge Purchaser Duty under Chapter 2A of the Duties Act 1997 , if any purchaser/transferees are foreign persons. This includes:
+transfers between married couples or de facto partners ( section 104B of the Duties Act 1997 )
+First Home Buyers Assistance (FHBA) transactions
+Other transactions, if exempt or subject to a concessional rate of transfer duty, are exempt from Surcharge Purchaser Duty and include:
+transfers as a result of a breakup of a marriage or de-facto relationship ( section 68 of the Duties Act 1997 )
+deceased estate transfers - that meet the criteria of section 63(1) of the Duties Act 1997
+The Duties Document Matrix (PDF, 418.62 KB) provides a comprehensive list of transactions where there may be a surcharge liability under Chapter 2A of the Duties Act 1997 .
+What is the liability date for Surcharge Purchaser Duty?
+A liability for Surcharge Purchaser Duty arises when a transfer of dutiable property occurs OR if the transfer of property is effected by an instrument, liability arises when the instrument is first executed.
+For an Agreement for Sale of Land, the date of first execution is the date of exchange.
+For an electronic registry instrument, for example when there is a transfer without a contract for sale, the date of first execution is taken to be when it is first digitally signed by a subscriber or otherwise, the date the information relating to the instrument is first received by Revenue NSW.
+The liability date is often referred to as the relevant date when determining Surcharge Purchaser Duty liability.
+Reference : section 104Q and section 12 of the Duties Act 1997 .
+How is Surcharge Purchaser Duty calculated?
+Surcharge Purchaser Duty is calculated on the dutiable value (the greater of the purchase price or value) and is paid in addition to transfer duty payable on the acquisition of residential-related property.
+Reference: section 104U of the Duties Act 1997 .
+Transactions dated
+From 1 January 2025
+9%
+1 July 2017 - 31 December 2024
+8%
+21 June 2016 - 30 June 2017
+4%
+Surcharge duty calculator
+Contact us
+Should you require further assistance or clarification, please contact:
+Duties on 1300 139 814 or email duties@revenue.nsw.gov.au
+Property professionals guide: Surcharge purchaser duty
+1. Overview
+2. Individuals
+3. Partnerships
+4. Corporations
+5. Discretionary trusts
+6. Other trusts
+7. Exemptions and concessions
+8. Videos
+Share this page
+Facebook
+Twitter
+LinkedIn
+Email
+Download or print PDF
+Page 1 of 8
+keyboard_arrow_right
+Next
+2. Individuals

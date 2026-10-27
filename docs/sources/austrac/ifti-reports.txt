@@ -1,0 +1,362 @@
+Source: https://www.austrac.gov.au/industry-and-business/obligations-and-guidance/your-amlctf-program/reporting-us/international-funds-transfer-reports
+Retrieved: 2026-10-27
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML 734edad58efc4df25d291cca3db7fd37ab7bf985cb53d97e950f04c2520ab9ba
+
+International funds transfer reports | AUSTRAC
+Skip to main content
+International funds transfer reports
+Learn about the 2 types of international funds transfer instructions (IFTIs) and when to submit one.
+Print
+Obligations and guidance
+Learn how to use this guidance
+Your obligations
+Your AML/CTF program
+Develop your AML/CTF programs
+Your AML/CTF program overview
+Step 1: Establish your governance framework
+Governing body
+Senior manager
+AML/CTF compliance officer
+Governance and oversight for sole traders and micro businesses
+Establishing a strong AML/CTF culture
+Step 2: Identify and assess your risks: risk assessment
+Step 3: Manage and mitigate your risks – AML/CTF policies
+Step 4: Review and update your AML/CTF program
+Step 5: Conduct an independent evaluation
+Record keeping
+Record keeping overview
+Record keeping in ADI authorised account transfers
+Record keeping in correspondent banking relationships
+Record keeping checklist
+Customer due diligence
+Overview of customer due diligence
+Assigning customer risk ratings
+Initial customer due diligence
+Overview of initial customer due diligence
+Initial customer due diligence guides by customer type
+Initial CDD for individuals
+Initial CDD for sole traders
+Initial CDD for body corporate, partnership or unincorporated association
+Initial CDD for trust
+Initial CDD for government body
+Delayed initial customer due diligence
+Identifying individuals who don't have standard ID
+Alternative ID for First Nations peoples
+Examples of using alternative ID procedures
+Reliance on customer identification by a third party
+Overview of reliance on customer identification by a third party
+Reliance under customer due diligence arrangements
+Reliance on a case-by-case basis
+Managing risk and assessing foreign jurisdictions
+Enhanced customer due diligence
+Ongoing customer due diligence
+Overview of ongoing customer due diligence
+What you must monitor for
+How to monitor your customers
+Responding to unusual transactions and behaviour
+Reviewing and updating customers’ ML/TF risk and KYC information
+Politically exposed persons
+Domestic PEP examples
+Foreign PEP example
+International organisation PEP example
+Persons designated for targeted financial sanctions
+Source of funds and source of wealth
+Examples of establishing source of funds and source of wealth with customers
+Transitioning existing customers
+Personnel due diligence and training
+Identifying personnel roles that require due diligence and training
+Personnel due diligence (PDD)
+AML/CTF training
+Examples of personnel due diligence and training in practice
+Reporting to us
+Suspicious matter reports
+Threshold transaction reports
+International funds transfer reports
+Our compliance reports
+Legal professional privilege (Reform)
+Tipping off
+Cross-border movement reports
+Exemptions and modifications
+Exemptions from AML/CTF obligations
+Applying for exemptions and modifications
+Exemption policy
+Keep open notices
+Industry contribution levy
+Consequences of not complying
+Additional guidance
+Applying to have an AUSTRAC decision reviewed
+Correspondent banking relationships
+Exemptions from AML/CTF obligations for businesses providing only item 54 designated services
+Financial services for customers that financial institutions assess to be higher risk
+Data breaches and AML/CTF considerations
+Determining ownership and control structures
+High-risk countries, regions and groups
+Reporting groups
+Understanding reporting groups
+Forming reporting groups
+Obligations for lead entities and members
+The travel rule
+When the travel rule doesn’t apply
+Travel rule overview
+Travel rule obligations for ordering institutions
+Travel rule obligations for intermediary institutions
+Travel rule obligations for beneficiary institutions
+Additional travel rule obligations when transferring virtual assets
+Foreign branches and subsidiaries
+Using outsourcing to help meet your obligations
+Repeal of the Financial Transaction Reports Act 1988
+New information gathering powers
+Section 172A examination powers
+Program starter kits
+Accountant program starter kit
+Accounting program starter kit: Getting started
+Step 1: Customise your accounting program using the starter kit
+Step 2: Use your accounting program
+Step 3: Maintain and review your accounting program
+Accounting program starter kit: Document library
+Accounting program starter kit: examples of dealing with clients
+Updates to the accountant program starter kit
+Conveyancer program starter kit
+Conveyancing program starter kit: Getting started
+Step 1: Customise your conveyancing program using the starter kit
+Step 2: Use your conveyancing program
+Step 3: Maintain and review your conveyancing program
+Conveyancing program starter kit: Document library
+Conveyancing program starter kit: examples of dealing with clients
+Updates to the conveyancer program starter kit
+Jeweller program starter kit
+Regulation options for dealers in precious metals, stones and products
+Jeweller program starter kit: Getting started
+Step 1: Customise your jeweller program using the starter kit
+Step 2: Use your jeweller program
+Step 3: Maintain and review your jeweller program
+Jeweller program starter kit: Document library
+Jeweller program starter kit: examples of dealing with customers
+Examples of linked transactions in practice for dealers in precious metals, stones and products
+Updates to the jeweller program starter kit
+Legal profession program starter kit
+Legal profession program starter kit: Getting started
+Step 1: Customise your legal profession program using the starter kit
+Step 2: Use your legal profession program
+Step 3: Maintain and review your legal profession program
+Legal profession program starter kit: Document library
+Legal profession program starter kit: examples of dealing with clients
+Updates to the legal profession program starter kit
+Real estate program starter kit
+Real estate program starter kit: Getting started
+Step 1: Customise your real estate program using the starter kit
+Step 2: Use your real estate program
+Step 3: Maintain and review your real estate program
+Real estate program starter kit: Document library
+Real estate program starter kit: examples of dealing with customers
+Updates to the real estate program starter kit
+Risks and indicators of suspicious activity
+Risks and indicators of suspicious activity overview
+Risk insights and indicators of suspicious activity for accountants
+Indicators of suspicious activity for the banking sector
+Indicators of suspicious activity for the bullion sector
+Indicators of suspicious activity for the casino sector
+Risk insights and indicators of suspicious activity for dealers in precious stones, metals and other products
+Indicators of suspicious activity for the financial planners sector
+Risk insights and indicators of suspicious activity for legal professionals
+Indicators of suspicious activity for the life insurance sector
+Indicators of suspicious activity for non-bank lenders and financiers
+Indicators of suspicious activity for the on-course bookmaker sector
+Indicators of suspicious activity for the online betting agencies sector
+Indicators of suspicious activity for the pubs and clubs sector
+Risk insights and indicators of suspicious activity for the real estate sector
+Indicators of suspicious activity relating to customers who are not for profit organisations
+Indicators of suspicious activity for the remittance service providers sector
+Indicators of suspicious activity for the securities and derivatives sector
+Indicators of suspicious activity for the superannuation sector
+Indicators of suspicious activity for virtual asset service providers
+Latest guidance updates
+Paying invoices and notices
+Education and resources
+Publications and resources
+Education
+e-learning
+Resources to help you understand your AML/CTF obligations
+Resources to help you build an AML/CTF program
+Resources to help you implement risk controls in your program
+Resources to help you maintain your AML/CTF program
+Smart real estate agent’s guide to AML/CTF
+Webinars
+Induction program for new reporting entities
+Continuing professional development
+Your industry
+Accountants
+Banking
+Bookmakers and betting agencies
+Bullion dealers
+Bullion dealers overview
+Casinos
+Conveyancers
+Dealers in precious metals, stones and products
+Financial services providers
+Legal professionals
+Pubs and clubs
+Real estate
+Remittance service providers
+Remittance service providers overview
+Unregistered remittance dealers
+Superannuation industry
+Virtual asset service providers
+Virtual asset service providers overview
+About AML/CTF reforms
+About the reforms
+Designated services for newly regulated entities
+Updates to the legislation
+AML/CTF transitional rules
+Amendments to the AML/CTF Rules
+AUSTRAC Online
+Designated service name changes
+Sign in to AUSTRAC Online
+Manage your account
+Update your details
+Update your annual earnings
+Request removal from our roll or registers
+Renew your registration
+Add a new business to your account
+AUSTRAC Online guides and resources
+AUSTRAC Online User guides
+User guide: Transaction reporting function access
+User guide: Business profile
+User guide: User account
+User guide: Compliance reports
+User guide: Cross-border movement – Monetary instrument
+User guide: Enrol a new business with us
+User guide: Event logs
+User guide: General AUSTRAC Online support
+User guide: Manage branches and agents
+User guide: Manage contacts
+User guide: Manage your users
+User guide: Other features of transaction reporting
+User guide: Register with us
+User guide: Reporting methods
+User guide: Reports requiring further action
+User guide: Transaction reports
+AUSTRAC Online document library
+AUSTRAC Online quick reference guides (QRGs)
+QRG: How to submit TTRs or SMRs through a file upload
+QRG: Navigating the reporting dashboard
+QRG: Requesting report amendment or withdrawal
+QRG: Submitting a suspicious matter report (SMR) in the training environment
+QRG: Submitting a threshold transaction report (TTR) in the training environment
+QRG: Using TTR/SMR training environment
+QRG: AUSTRAC Online new user sign-up
+QRG: How to enrol a business
+QRG: How to manage affiliates
+QRG: How to form a reporting group
+QRG: How to register a business
+QRG: How to renew your registration
+QRG: How to request removal from the registers
+QRG: How to request removal from the Reporting Entities Roll
+QRG: How to update your details
+QRG: Manage contacts and users
+QRG: New AUSTRAC Online features
+QRG: Registering for multi-factor authentication
+QRG: Transitioning from a DCE to a VASP
+AUSTRAC Online video resources
+Reporting Entity System Transformation (REST) Program
+Consultations
+✕
+Learn more about IFTIs, which involve an instruction accepted in Australia for money or property to be made available in another country, or vice versa.
+An international funds transfer instruction (IFTI) involves either:
+an instruction accepted in Australia for money or property to be made available in another country
+an instruction accepted in another country for money or property to be made available in Australia.
+The Anti‑Money Laundering and Counter‑Terrorism Financing Transitional Rules 2026 (the transitional rules) preserve the operation of the pre‑31 March 2026 IFTI reporting requirements.
+This means you must continue submitting IFTI reports until your international value transfer service (IVTS) reporting transition date, which will be on or after 31 March 2029. The transitional rules also explain how you will move from IFTI reporting to IVTS reporting.
+Learn more about the transitional rules .
+If you send an IFTI out of Australia or receive an IFTI into Australia, you must submit an IFTI report to us within 10 business days.
+There are two types of IFTI reports:
+IFTI-Es – for financial institutions transferring money to or from another country
+IFTI-DRAs – for remittance service providers, casinos and other entities that are not financial institutions, and relate to transfers of money or property.
+If you are a casino, see examples of IFTI reporting for casinos .
+How to submit IFTI reports
+You can submit IFTI reports through AUSTRAC Online . Paper forms are also available from AUSTRAC Central.
+There are different report forms for IFTI-Es and IFTI-DRAs. AUSTRAC Online provides instructions to help you complete each form.
+You can submit reports online through:
+data entry – manually complete and submit reports (best if you don’t submit many reports)
+spreadsheet upload – enter IFTI data into a spreadsheet available through AUSTRAC Online.
+extraction – use a computer program to extract relevant transaction information from your database, collate it into a single file and send it to us via AUSTRAC Online (best if you’re a large business which captures and stores transaction data electronically).
+After you submit an IFTI report
+AUSTRAC or another partner agency may send you a notice requesting more information about an IFTI report. This may be information about a customer or a particular transfer that could help us in an investigation, such as account information or customer details.
+You are legally required to provide this information if you are given the notice.
+International electronic funds transfer instructions (IFTI-E)
+An IFTI-E is a type of electronic funds transfer instruction (EFTI) for transferring money on behalf of a customer which is sent to or received from another country. In an IFTI-E:
+the instruction is carried out or passed on electronically
+the transfer is within the same financial institution or between financial institutions.
+An IFTI-E can be either:
+outgoing – the ordering institution accepts the instruction in Australia and transfers money to the payee via a beneficiary institution overseas
+incoming – the ordering institution accepts the instruction overseas and transfers money via a beneficiary institution in Australia.
+Information required in IFTI-E reports
+This section refers to Chapter 16 of the AML/CTF Rules 2007 as in force immediately before 30 March 2026 .
+IFTI-E reports must include details about all parties involved in the transfer, which are:
+the payer – who instructs the ordering institution to transfer money
+the ordering institution – who accepts the transfer instruction
+the sender (if different to the ordering institution) – who transmits the instruction to the beneficiary institution
+the beneficiary institution – who receives the instruction and makes the money available to the payee
+the payee – who ultimately receives the transferred money
+any intermediary institutions – other institutions in the transfer chain between the sender and beneficiary institution.
+You may also need to report:
+transaction dates
+the amount and type of currency
+the identification code assigned to the instruction
+any information the payer gave to the payee
+any information one of the institutions gives another
+any other details that appear in the instruction.
+IFTI under a designated remittance arrangement (IFTI-DRA)
+An IFTI-DRA is an instruction to transfer money or property to or from another country under a designated remittance arrangement (DRA). It applies when at least one of the following entities is not a financial institution:
+the entity accepting the instruction from the customer
+the entity making the money or property available.
+Information required in IFTI-DRA reports
+This section refers to Chapter 17 of the AML/CTF Rules 2007 as in immediately before 31 March 2026 .
+Reports about IFTI-DRAs must include details about everyone involved in the transfer:
+the transferor – who instructs the transfer of the money or property
+the sender – who accepts instructions from the transferor to transmit the money or property
+the transmitter (if different to the sender) – who transmits the instructions
+the disbursing entity – who arranges for the money or property to be made available to the transferee
+the transferee – who ultimately receives the money or property.
+You may also need to report:
+transfer dates
+the amount and type of currency
+reference and identification numbers
+for property transfers – a description and value of the property and details of the currency used in the valuation
+information about the purpose of the transfer
+how you identified and verified an individual’s identity.
+Examples of IFTI-DRAs
+Example 1 – Sending cash overseas through an agent
+Ms Amuza wants to send A$5,000 to her brother (Mr Bajaj) in Vietnam. Ms Amuza contacts Hafei Money Transfer, a registered remittance service provider, and instructs them to send A$5,000 to Mr Bajaj in Vietnam.
+Hafei sends a text message to its agent in Vietnam, who arranges to have A$5,000 delivered to Mr Bajaj the next business day. Hafei and the agent in Vietnam arrange to reconcile the funds between themselves later.
+Hafei must submit an IFTI-DRA report to us within 10 business days of receiving the instruction from Ms Amuza.
+Example 2
+Mr Praga wants to send A$2,000 to his family in India. He presents Hafei Money Transfer with a cheque for A$2,000 and instructs them to send A$2000 to Ms Dacia.
+Hafei contacts its agent in India via email. It deposits the funds into its bank account with Bank Vector in Australia, then transfers A$2,000 from that account to the agent’s bank account in India. The agent arranges to deliver the A$2,000 to Ms Dacia in India.
+Hafei must submit an IFTI-DRA report to us within 10 business days of receiving the instruction from Mr Praga.
+Affiliates of remittance network providers
+If an affiliate of a remittance network provider submits an IFTI-DRA using the provider’s network, the remittance network provider is responsible for lodging the IFTI.
+Penalties for not submitting an IFTI report
+If you are late in submitting an IFTI report, or don’t submit one when required, you can be fined:
+up to 100,000 penalty units if you are a body corporate
+up to 20,000 penalty units if you’re not a body corporate.
+Learn more about enforcement and penalties .
+Related legislation
+These laws continue to apply to IFTI reporting until your IVTS reporting transition date:
+Part 3, Division 4 (sections 45 and 46) of the AML/CTF Act as in force immediately before 31 March 2026 – International funds transfer instructions
+Chapter 16 of the AML/CTF Rules 2007 as in force immediately before 31 March 2026 – Reportable details for international funds transfer instructions (items 1 and 2 in section 46)
+Chapter 17 of the AML/CTF Rules 2007 as in force immediately before 31 March 2026 – Reportable details for international funds transfer instructions under a designated remittance arrangement (items 3 and 4 in section 46)
+This guidance sets out how we interpret certain Australian legislation, along with associated Rules and regulations. Australian courts are ultimately responsible for interpreting these laws and determining if any provisions of these laws are contravened.
+The examples and scenarios in this guidance are meant to help explain our interpretation of these laws. They’re not exhaustive or meant to cover every possible scenario.
+This guidance provides general information and isn't a substitute for legal advice. This guidance avoids legal language wherever possible and it might include generalisations about the application of the law. Some provisions of the law referred to have exceptions or important qualifications. In most cases your particular circumstances must be taken into account when determining how the law applies to you.
+Last updated:
+12 Oct 2026
+Was this page helpful?
+Was this page helpful?
+Was this page helpful?
+Yes
+No
+Why or why not? (optional)
+Please note that feedback you provide here will be used only for the purpose of improving our website. If you have a specific question about your AML/CTF obligations, please contact us .
+Leave this field blank
+Top

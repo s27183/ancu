@@ -1,0 +1,43 @@
+Source: https://www.revenue.act.gov.au/rates-and-property-charges/land-tax/foreign-ownership-surcharge-for-land-tax
+Retrieved: 2026-10-27
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML 32d2a14c92af993bf35480368f9326826cfecef6df1095e3adcbdd285257206d
+
+Foreign ownership surcharge for land tax - ACT Revenue Office
+You are using an automatic translation service (Google Translate) to translate our information on this website. This is a third party service and the ACT Revenue Office cannot guarantee the accuracy of this translation. Not all webpages are available for translation. For help, see Translation and Interpretation .
+Foreign ownership surcharge for land tax
+If you’re a foreign person who owns residential land in the ACT, you must pay a land tax surcharge of 0.75 per cent of the Average Unimproved Value per year from 1 July 2018 onwards.
+The surcharge is in addition to land tax you must pay if a property isn’t your principal place of residence.
+If you’re a foreign person and you already pay land tax, you’ll need to notify us about your foreign status which you can do using the Land tax notification form and pay the surcharge. Penalties may apply if you don’t notify us about your foreign status. We calculate the surcharge as part of your land tax assessment.
+Revenue Circular LTA002 145.4 KB Foreign Ownership Surcharge explains how the surcharge applies.
+Who is a foreign person?
+A foreign person can be a foreign individual, a foreign company or the trustee of a foreign trust.
+Foreign individuals
+You’re a foreign individual if you’re not an Australian citizen, a permanent resident, a New Zealand Citizen with a Special Category Visa, or a person ordinarily resident in Australia.
+A foreign individual does not include a foreign citizen who ordinary resides in Australia. To decide whether you’re ordinarily resident, we’ll consider a number of things including:
+the period of your physical presence in Australia
+your intention or purpose for being in Australia (including your visa status)
+your family and business or employment ties
+the maintenance and location of your assets
+your social and living arrangements
+You may be ordinarily resident in Australia even if you’re temporarily absent from the country.
+Foreign corporations
+A foreign corporation is a corporation that’s incorporated outside Australia or in which one or more foreign people hold a controlling interest. A controlling interest is constituted by controlling 50 per cent or more of the shares or voting power.
+Foreign trusts
+A foreign trust is a trust in which one or more foreign people, and people associated to foreign people, hold a controlling interest as beneficiaries.
+A controlling interest for a trust is 50 per cent or more of the interests in the trust as beneficiaries. However, for a discretionary trust, a foreign person can only hold a controlling interest if the person is specifically named in the trust deed as someone to whom a distribution can be made.
+When don't I have to pay the surcharge?
+In general, you don’t have to pay the surcharge if:
+you’re an Australian citizen or Australian resident
+you’re a foreign citizen, but you live in the ACT home as your principal place of residence
+the principal place of residence requirement has been satisfied by another owner of the property.
+When am I liable for the foreign ownership surcharge?
+You are liable for the surcharge if you are a foreign individual, foreign corporation or trustee of a foreign trust on the first day of each land tax quarter, beginning from the first quarter following settlement.
+If a parcel of land is owned by a foreign person, and occupied under a nil or nominal rent arrangement, the foreign owner would be liable for the surcharge but exempt from land tax.
+Am I classified as a foreign owner if I move or I am posted overseas? Can I still claim the property as my principal place of residence in Australia?
+You are not considered a foreign owner if you are posted overseas. You may however be required to pay land tax on your property if you are on a long term posting.
+Can a foreign citizen claim the principal place of residence exemption for land tax?
+Yes, a foreign citizen is able to claim the principal place of residence exemption.
+How do I notify the ACT Revenue Office if I cease being a foreign person?
+If you are currently paying the foreign ownership surcharge and you have self-assessed that you are no longer liable to pay this surcharge, you can notify our office of your change in circumstances by completing and submitting the Land tax notification form .
+Read next
+FAQs

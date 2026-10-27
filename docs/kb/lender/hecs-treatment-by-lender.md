@@ -1,7 +1,7 @@
 ---
 slug: kb.lender.hecs-treatment-by-lender
 effective_from: 2025-09-30
-last_verified: 2026-10-11
+last_verified: 2026-10-27
 sources:
   - url: https://www.apra.gov.au/clarifying-treatment-of-higher-education-loan-program-debt-obligations
     retrieved: 2026-10-11
@@ -9,6 +9,16 @@ sources:
   - url: https://www.nab.com.au/personal/life-moments/home-property/buy-first-home/hecs-home-loan
     retrieved: 2026-10-11
     note: "NAB own page — \"If your student debt is $20,000 or less, it won't impact how much you can borrow with us\" (ATO evidence required)"
+    path: docs/sources/lenders/nab-hecs-home-loan.txt
+  - url: https://www.apra.gov.au/system/files/2025-06/Prudential%20Practice%20Guide%20APG%20223%20Residential%20Mortgage%20Lending%20-%20Clean.pdf
+    retrieved: 2026-10-27
+    path: docs/sources/apra/apg-223-2025-06.txt
+  - url: https://www.commbank.com.au/articles/newsroom/2025/10/first-home-buyer-big-dream-small-deposit.html
+    retrieved: 2026-10-27
+    path: docs/sources/lenders/cba-newsroom-2025-10-help-debt.txt
+  - url: https://www.asic.gov.au/about-asic/news-centre/news-items/asic-has-updated-guidance-to-clarify-treatment-of-student-loan-commitments-by-banks-and-lenders/
+    retrieved: 2026-10-27
+    path: docs/sources/asic/rg209-help-debts-update.txt
 ---
 
 # HECS-HELP treatment in serviceability — by lender
@@ -19,7 +29,8 @@ Every lender counts the **compulsory HELP repayment** at the borrower's income a
 
 On **19 June 2025** APRA finalised targeted changes to **APG 223** (Residential Mortgage Lending) and **ARS 223.0**, effective **30 September 2025**, clarifying how ADIs treat HELP debt:
 
-- **Near-term-payoff exception.** APRA confirmed it can be reasonable for a lender to **remove the HELP repayment from serviceability** where the borrower is expected to **pay the HELP debt off in the near term** through compulsory repayments — in practice lenders apply this where the debt clears within about **12 months**.
+- **Near-term-payoff exception.** APRA confirmed it can be reasonable for a lender to **remove the HELP repayment from serviceability** where the borrower is expected to **pay the HELP debt off in the near term** through compulsory repayments. APRA's own example is a debt paid off "within 12 months through the compulsory repayments deducted from gross income" (APG 223, June 2025).
+- **ASIC followed.** ASIC updated its responsible-lending guide to match: "The update to RG 209 is limited to the treatment of HELP debts in lending assessments." 
 - **DTI reporting clarification.** APRA also clarified that HELP debt may be treated differently in the **debt-to-income** metric, removing a reason lenders had previously kept HELP fully loaded into capacity.
 
 This **inverts** pre-2025 guidance that HELP always reduced capacity for its full term. It is **relief by exception, not a blanket exclusion** — the baseline expectation remains that lenders count the HELP repayment in most assessments.
@@ -28,9 +39,9 @@ This **inverts** pre-2025 guidance that HELP always reduced capacity for its ful
 
 The exception is implemented per-lender; the policies below are **examples as at `last_verified`, not an exhaustive or guaranteed list** — confirm at application:
 
-- **Commonwealth Bank (CBA)** — from **April 2025**, excludes the HELP repayment from serviceability where the debt is expected to be **repaid within 12 months**; has also **piloted a reduced serviceability buffer** (toward ~1% instead of 3%) for borrowers due to clear HELP within ~5 years.
-- **NAB** — from **31 July 2025**, may **disregard HELP balances of $20,000 or less** in the assessment.
-- **ANZ and Westpac** — have signalled easing of HELP treatment in line with the APRA change; specific thresholds vary and move.
+- **Commonwealth Bank (CBA)** — its own newsroom (October 2025): "If you can repay your HELP debt within 12 months, we will exclude it from your serviceability assessment. If you can repay it within 1 - 5 years, we'll still include the repayments, but we'll apply a reduced serviceability buffer." CBA does not publish the size of the reduced buffer.
+- **NAB** — its own page: "If your student debt is $20,000 or less, it won't impact how much you can borrow with us" (ATO evidence of the balance required).
+- **Other lenders** — no other lender's own page states a HELP exception as of `last_verified`; ask the lender.
 
 The pattern: a **small or near-cleared** HELP balance is increasingly likely to be ignored, which can make **not** clearing it the better call (preserving deposit cash). A **large** balance still loads capacity at most lenders.
 
@@ -55,11 +66,11 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
   "parameters": {
     "apra_near_term_payoff_exclusion_allowed": { "type": "bool",    "value": true,         "note": "REGULATED (APG 223, finalised 19 Jun 2025, effective 30 Sep 2025) — by exception a lender MAY exclude the HELP repayment from serviceability where the debt is paid off in the near term via compulsory repayments" },
     "apra_change_effective_date":              { "type": "date",    "value": "2025-09-30" },
-    "near_term_payoff_window_months":          { "type": "integer", "value": 12,           "note": "CONVENTION — the ~12-month horizon lenders typically apply the near-payoff exception within; not a fixed regulatory figure" },
+    "near_term_payoff_window_months":          { "type": "integer", "value": 12,           "note": "REGULATED example — APG 223 (June 2025): an ADI may remove HELP repayments where the debt is paid off within 12 months through compulsory repayments; APRA leaves the exact policy to each ADI" },
     "baseline_is_still_counted":               { "type": "bool",    "value": true,         "note": "REGULATED baseline — outside the exception, the HELP repayment is still counted in serviceability (relief is targeted, not blanket)" },
-    "cba_payoff_exclusion_window_months":      { "type": "integer", "value": 12,           "note": "LENDER POLICY (CBA, from Apr 2025), time-sensitive — excludes HELP repayment if debt repaid within 12 months; confirm at application" },
-    "cba_reduced_buffer_pilot":                { "type": "bool",    "value": true,         "note": "LENDER POLICY (CBA pilot), time-sensitive — reduced serviceability buffer (~1% vs 3%) where HELP clears within ~5 years" },
-    "nab_disregard_balance_at_or_below":       { "type": "money",   "value": 20000,        "note": "LENDER POLICY (NAB, from 31 Jul 2025), time-sensitive — may disregard HELP balances ≤$20,000; confirm at application" }
+    "cba_payoff_exclusion_window_months":      { "type": "integer", "value": 12,           "note": "LENDER POLICY (CBA newsroom, Oct 2025), time-sensitive — excludes HELP repayment if debt repaid within 12 months; confirm at application" },
+    "cba_reduced_buffer_pilot":                { "type": "bool",    "value": true,         "note": "LENDER POLICY (CBA newsroom, Oct 2025), time-sensitive — repayments still counted but a reduced serviceability buffer applies where HELP clears within 1–5 years; CBA does not publish the buffer size" },
+    "nab_disregard_balance_at_or_below":       { "type": "money",   "value": 20000,        "note": "LENDER POLICY (NAB's own page), time-sensitive — a HELP balance ≤$20,000 does not affect borrowing capacity; confirm at application" }
   }
 }
 ```
@@ -79,6 +90,6 @@ Notes:
 - NAB — *Does HECS affect your home loan application?* (NAB's own policy: a HELP/HECS balance of $20,000 or less does not affect borrowing capacity, with ATO evidence; cites the APRA near-term-payoff guidance) — https://www.nab.com.au/personal/life-moments/home-property/buy-first-home/hecs-home-loan
 - CommBank Newsroom — *First home buyers taking new steps to get on the property ladder* (12 March 2026; CBA confirms "a more nuanced view of HELP debt" in its home-lending settings) — https://www.commbank.com.au/articles/newsroom/2026/03/first-home-buyers-taking-new-steps-to-get-on-property-ladder.html
 
-**Point-in-time reporting** — the dated CBA specifics below are not stated on CBA's own current pages; retained as the source-of-record for those figures, to be re-verified at `last_verified`:
-
-- savings.com.au — *CBA eases HECS home loan restrictions* (excludes HELP where repaid within 12 months, from April 2025; reduced-buffer pilot) — https://www.savings.com.au/news/cba-eases-hecs-home-loan-restrictions
+- APRA — *APG 223 Residential Mortgage Lending* (June 2025; the 12-month example for removing HELP repayments) — https://www.apra.gov.au/system/files/2025-06/Prudential%20Practice%20Guide%20APG%20223%20Residential%20Mortgage%20Lending%20-%20Clean.pdf
+- ASIC — *ASIC has updated guidance to clarify treatment of student loan commitments by banks and lenders* (RG 209 update limited to HELP debts) — https://www.asic.gov.au/about-asic/news-centre/news-items/asic-has-updated-guidance-to-clarify-treatment-of-student-loan-commitments-by-banks-and-lenders/
+- CommBank Newsroom — *First home buyers: big dream, small deposit* (October 2025; CBA's 12-month exclusion and 1–5-year reduced buffer) — https://www.commbank.com.au/articles/newsroom/2025/10/first-home-buyer-big-dream-small-deposit.html

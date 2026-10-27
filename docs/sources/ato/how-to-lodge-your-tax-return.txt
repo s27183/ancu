@@ -1,0 +1,24 @@
+Source: https://www.ato.gov.au/individuals-and-families/your-tax-return/how-to-lodge-your-tax-return
+Retrieved: 2026-10-27
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML 4c85eeb434883f9e861397ff30fe5325a5276dc6344f5513c04dd9a393f07fdb
+
+How to lodge your tax return | Australian Taxation Office
+How to lodge your tax return
+Check what options you have to lodge your tax return yourself or with help from someone else.
+Lodging your first tax return
+Find out what you need to do if you are preparing and lodging a tax return for the first time.
+Lodge your tax return online with myTax
+Prepare and lodge your tax return online. It's the quick and secure way to lodge. Most process in 12 business days.
+Lodge your tax return with a registered tax agent
+Use a registered tax agent to prepare and lodge your tax return, they are the only people that can charge a fee.
+Lodge a paper tax return
+You can use the paper tax return to lodge your tax return by mail, most refunds issue within 50 business days.
+Lodge your tax return before leaving Australia
+Find out if you can lodge your tax return early (by paper) if you are leaving Australia permanently.
+Lodge your tax return from outside Australia
+Find out how you can lodge if you are outside Australia when your tax return is due.
+Lodge a prior year tax return
+Find out how to lodge if you still need to lodge a tax return for a prior year.
+Lodge a non-lodgment advice
+Check what you need to do if you don't need to lodge a tax return.
+QC 65333

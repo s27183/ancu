@@ -1,30 +1,24 @@
 ---
 slug: kb.investor.annual-tax-return-investor
 effective_from: 2025-07-01
-last_verified: 2026-10-16
+last_verified: 2026-10-27
 sources:
   - url: https://www.ato.gov.au/individuals-and-families/investments-and-assets/property-and-land/residential-rental-properties
-    retrieved: 2026-07-06
+    retrieved: 2026-10-27
+    path: docs/sources/ato/residential-rental-properties.txt
   - url: https://www.ato.gov.au/individuals-and-families/jobs-and-employment-types/varying-your-payg-withholding
-    retrieved: 2026-07-06
-  - url: https://moneysmart.gov.au/property-investment
-    retrieved: 2026-07-06
-  - url: https://taxaccountantbrisbane.com.au/fees/
-    retrieved: 2026-10-16
-    path: docs/sources/investor/tax-accountant-brisbane-fees.txt
+    retrieved: 2026-10-27
+    path: docs/sources/ato/varying-your-payg-withholding.txt
+  - url: https://www.ato.gov.au/individuals-and-families/income-deductions-offsets-and-records/deductions-you-can-claim/cost-of-managing-tax-affairs
+    retrieved: 2026-10-27
+    path: docs/sources/ato/cost-of-managing-tax-affairs.txt
     quotes:
-      - "Individual returns start at $150 for salary income with standard deductions, $250–$450 with investments or a rental property"
-      - "Foreign income or part-year residency $390"
-  - url: https://tenfoldwealthaccountants.com.au/professional-fee-schedule/
-    retrieved: 2026-10-16
-    path: docs/sources/investor/tenfold-professional-fee-schedule.txt
+      - "lodging your tax return through a registered tax agent"
+  - url: https://www.ato.gov.au/individuals-and-families/your-tax-return/how-to-lodge-your-tax-return
+    retrieved: 2026-10-27
+    path: docs/sources/ato/how-to-lodge-your-tax-return.txt
     quotes:
-      - "Individual Tax Return with Investment / Airbnb Rental $480 from"
-  - url: https://beyondaccountancy.com.au/tax-returns/pricing/
-    retrieved: 2026-10-16
-    path: docs/sources/investor/beyond-accountancy-tax-return-pricing.txt
-    quotes:
-      - "One property, one owner $308^"
+      - "Use a registered tax agent to prepare and lodge your tax return, they are the only people that can charge a fee."
 ---
 
 # Annual tax return — the investor's obligations
@@ -46,7 +40,7 @@ For a negatively-geared property, the tax benefit normally arrives as a **refund
 
 - **Keep records** — rental statements, invoices, the loan interest summary, the depreciation schedule, and (for the eventual CGT calculation) all cost-base records, kept for the ATO's required retention period.
 - **Lodge by the deadline** — individuals by 31 October, or later if using a registered tax agent; `tax_return_due_date` carries the applicable date.
-- **A tax agent's fee is itself deductible** the following year.
+- **A tax agent's fee is itself deductible** the following year — the ATO lists, under the cost of managing tax affairs, the cost of "lodging your tax return through a registered tax agent".
 
 ## Relevance for Vietnamese-Australian investors (Mode C)
 
@@ -80,7 +74,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
           "id": "tax_return_rental",
           "phase": "own",
           "timing": "per_year",
-          "tier": "CONVENTION",
+          "tier": "PLACEHOLDER",
           "basis": "fixed",
           "low": 250,
           "high": 480,
@@ -93,7 +87,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
             "property": "any"
           },
           "optional": false,
-          "note": "published fixed fees for an individual return with one rental: $250–$450, $308, from $480. A foreign-resident return is in the same band on the one published price found ($390) — no separate line",
+          "note": "PLACEHOLDER — no primary states this band; re-ground on several registered tax agents' own published price pages (an individual return with one rental property; and a foreign-income / part-year-residency return). The $250–$480 band and the ~$390 foreign-income figure are kept from an earlier read of agents' fee pages, not yet re-read as primaries. The source grounds only the payer copy (a registered tax agent's fee is deductible), not the band",
           "label": {
             "vi": "Phí kế toán khai thuế hằng năm có nhà cho thuê (tax agent)",
             "en": "Accountant's fee for the yearly tax return with a rental"
@@ -106,7 +100,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
             "vi": "Số bất động sản và số người đứng tên, có lịch khấu hao (depreciation schedule) hay không, và thu nhập nước ngoài hoặc cư trú một phần năm (cao hơn — khoảng $390 trở lên).",
             "en": "How many properties and owners, whether there is a depreciation schedule, and foreign income or part-year residency (higher — about $390 and up)."
           },
-          "source": "https://taxaccountantbrisbane.com.au/fees/"
+          "source": "https://www.ato.gov.au/individuals-and-families/income-deductions-offsets-and-records/deductions-you-can-claim/cost-of-managing-tax-affairs"
         }
       ]
     }
@@ -123,6 +117,8 @@ Notes:
 
 ## Sources
 
-- ATO — *Residential rental properties* (declaring rental income; what you can and can't claim; keeping records) — https://www.ato.gov.au/individuals-and-families/investments-and-assets/property-and-land/residential-rental-properties
-- ATO — *PAYG withholding variation* (varying the amount withheld for expected deductions) — https://www.ato.gov.au/individuals-and-families/jobs-and-employment-types/working-as-an-employee/payg-withholding-variation
-- ASIC Moneysmart — *Investing in property* (the tax of a rental property; using a tax agent) — https://moneysmart.gov.au/property-investment/investing-in-property
+- ATO — *Residential rental properties* (declaring rental income; what you can and can't claim; keeping records) — https://www.ato.gov.au/individuals-and-families/investments-and-assets/property-and-land/residential-rental-properties (archived at docs/sources/ato/residential-rental-properties.txt)
+- ATO — *Varying your PAYG withholding* (varying the amount withheld for expected deductions) — https://www.ato.gov.au/individuals-and-families/jobs-and-employment-types/varying-your-payg-withholding (archived at docs/sources/ato/varying-your-payg-withholding.txt)
+- ATO — *Cost of managing tax affairs* (a registered tax agent's fee for lodging the return is deductible) — https://www.ato.gov.au/individuals-and-families/income-deductions-offsets-and-records/deductions-you-can-claim/cost-of-managing-tax-affairs (archived at docs/sources/ato/cost-of-managing-tax-affairs.txt)
+- ATO — *How to lodge your tax return* (a registered tax agent is the only person who can charge a fee to prepare and lodge it) — https://www.ato.gov.au/individuals-and-families/your-tax-return/how-to-lodge-your-tax-return (archived at docs/sources/ato/how-to-lodge-your-tax-return.txt)
+- Tax agent's fee band — PLACEHOLDER: no primary cited; re-ground on several registered tax agents' own published price pages.

@@ -1,0 +1,479 @@
+Source: https://www.austrac.gov.au/industry-and-business/obligations-and-guidance/your-amlctf-program/customer-due-diligence/enhanced-customer-due-diligence
+Retrieved: 2026-10-27
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML c3843df13352759e71ef28b0b135fd96a08587b556baaa05d449a7387cde1046
+
+Enhanced customer due diligence | AUSTRAC
+Skip to main content
+Enhanced customer due diligence
+Enhanced CDD plays an important role in detecting, disrupting and preventing ML/TF. Conducting enhanced CDD helps you identify, assess, manage and mitigate a customer’s ML/TF risks.
+Print
+Obligations and guidance
+Learn how to use this guidance
+Your obligations
+Your AML/CTF program
+Develop your AML/CTF programs
+Your AML/CTF program overview
+Step 1: Establish your governance framework
+Governing body
+Senior manager
+AML/CTF compliance officer
+Governance and oversight for sole traders and micro businesses
+Establishing a strong AML/CTF culture
+Step 2: Identify and assess your risks: risk assessment
+Step 3: Manage and mitigate your risks – AML/CTF policies
+Step 4: Review and update your AML/CTF program
+Step 5: Conduct an independent evaluation
+Record keeping
+Record keeping overview
+Record keeping in ADI authorised account transfers
+Record keeping in correspondent banking relationships
+Record keeping checklist
+Customer due diligence
+Overview of customer due diligence
+Assigning customer risk ratings
+Initial customer due diligence
+Overview of initial customer due diligence
+Initial customer due diligence guides by customer type
+Initial CDD for individuals
+Initial CDD for sole traders
+Initial CDD for body corporate, partnership or unincorporated association
+Initial CDD for trust
+Initial CDD for government body
+Delayed initial customer due diligence
+Identifying individuals who don't have standard ID
+Alternative ID for First Nations peoples
+Examples of using alternative ID procedures
+Reliance on customer identification by a third party
+Overview of reliance on customer identification by a third party
+Reliance under customer due diligence arrangements
+Reliance on a case-by-case basis
+Managing risk and assessing foreign jurisdictions
+Enhanced customer due diligence
+Ongoing customer due diligence
+Overview of ongoing customer due diligence
+What you must monitor for
+How to monitor your customers
+Responding to unusual transactions and behaviour
+Reviewing and updating customers’ ML/TF risk and KYC information
+Politically exposed persons
+Domestic PEP examples
+Foreign PEP example
+International organisation PEP example
+Persons designated for targeted financial sanctions
+Source of funds and source of wealth
+Examples of establishing source of funds and source of wealth with customers
+Transitioning existing customers
+Personnel due diligence and training
+Identifying personnel roles that require due diligence and training
+Personnel due diligence (PDD)
+AML/CTF training
+Examples of personnel due diligence and training in practice
+Reporting to us
+Suspicious matter reports
+Threshold transaction reports
+International funds transfer reports
+Our compliance reports
+Legal professional privilege (Reform)
+Tipping off
+Cross-border movement reports
+Exemptions and modifications
+Exemptions from AML/CTF obligations
+Applying for exemptions and modifications
+Exemption policy
+Keep open notices
+Industry contribution levy
+Consequences of not complying
+Additional guidance
+Applying to have an AUSTRAC decision reviewed
+Correspondent banking relationships
+Exemptions from AML/CTF obligations for businesses providing only item 54 designated services
+Financial services for customers that financial institutions assess to be higher risk
+Data breaches and AML/CTF considerations
+Determining ownership and control structures
+High-risk countries, regions and groups
+Reporting groups
+Understanding reporting groups
+Forming reporting groups
+Obligations for lead entities and members
+The travel rule
+When the travel rule doesn’t apply
+Travel rule overview
+Travel rule obligations for ordering institutions
+Travel rule obligations for intermediary institutions
+Travel rule obligations for beneficiary institutions
+Additional travel rule obligations when transferring virtual assets
+Foreign branches and subsidiaries
+Using outsourcing to help meet your obligations
+Repeal of the Financial Transaction Reports Act 1988
+New information gathering powers
+Section 172A examination powers
+Program starter kits
+Accountant program starter kit
+Accounting program starter kit: Getting started
+Step 1: Customise your accounting program using the starter kit
+Step 2: Use your accounting program
+Step 3: Maintain and review your accounting program
+Accounting program starter kit: Document library
+Accounting program starter kit: examples of dealing with clients
+Updates to the accountant program starter kit
+Conveyancer program starter kit
+Conveyancing program starter kit: Getting started
+Step 1: Customise your conveyancing program using the starter kit
+Step 2: Use your conveyancing program
+Step 3: Maintain and review your conveyancing program
+Conveyancing program starter kit: Document library
+Conveyancing program starter kit: examples of dealing with clients
+Updates to the conveyancer program starter kit
+Jeweller program starter kit
+Regulation options for dealers in precious metals, stones and products
+Jeweller program starter kit: Getting started
+Step 1: Customise your jeweller program using the starter kit
+Step 2: Use your jeweller program
+Step 3: Maintain and review your jeweller program
+Jeweller program starter kit: Document library
+Jeweller program starter kit: examples of dealing with customers
+Examples of linked transactions in practice for dealers in precious metals, stones and products
+Updates to the jeweller program starter kit
+Legal profession program starter kit
+Legal profession program starter kit: Getting started
+Step 1: Customise your legal profession program using the starter kit
+Step 2: Use your legal profession program
+Step 3: Maintain and review your legal profession program
+Legal profession program starter kit: Document library
+Legal profession program starter kit: examples of dealing with clients
+Updates to the legal profession program starter kit
+Real estate program starter kit
+Real estate program starter kit: Getting started
+Step 1: Customise your real estate program using the starter kit
+Step 2: Use your real estate program
+Step 3: Maintain and review your real estate program
+Real estate program starter kit: Document library
+Real estate program starter kit: examples of dealing with customers
+Updates to the real estate program starter kit
+Risks and indicators of suspicious activity
+Risks and indicators of suspicious activity overview
+Risk insights and indicators of suspicious activity for accountants
+Indicators of suspicious activity for the banking sector
+Indicators of suspicious activity for the bullion sector
+Indicators of suspicious activity for the casino sector
+Risk insights and indicators of suspicious activity for dealers in precious stones, metals and other products
+Indicators of suspicious activity for the financial planners sector
+Risk insights and indicators of suspicious activity for legal professionals
+Indicators of suspicious activity for the life insurance sector
+Indicators of suspicious activity for non-bank lenders and financiers
+Indicators of suspicious activity for the on-course bookmaker sector
+Indicators of suspicious activity for the online betting agencies sector
+Indicators of suspicious activity for the pubs and clubs sector
+Risk insights and indicators of suspicious activity for the real estate sector
+Indicators of suspicious activity relating to customers who are not for profit organisations
+Indicators of suspicious activity for the remittance service providers sector
+Indicators of suspicious activity for the securities and derivatives sector
+Indicators of suspicious activity for the superannuation sector
+Indicators of suspicious activity for virtual asset service providers
+Latest guidance updates
+Paying invoices and notices
+Education and resources
+Publications and resources
+Education
+e-learning
+Resources to help you understand your AML/CTF obligations
+Resources to help you build an AML/CTF program
+Resources to help you implement risk controls in your program
+Resources to help you maintain your AML/CTF program
+Smart real estate agent’s guide to AML/CTF
+Webinars
+Induction program for new reporting entities
+Continuing professional development
+Your industry
+Accountants
+Banking
+Bookmakers and betting agencies
+Bullion dealers
+Bullion dealers overview
+Casinos
+Conveyancers
+Dealers in precious metals, stones and products
+Financial services providers
+Legal professionals
+Pubs and clubs
+Real estate
+Remittance service providers
+Remittance service providers overview
+Unregistered remittance dealers
+Superannuation industry
+Virtual asset service providers
+Virtual asset service providers overview
+About AML/CTF reforms
+About the reforms
+Designated services for newly regulated entities
+Updates to the legislation
+AML/CTF transitional rules
+Amendments to the AML/CTF Rules
+AUSTRAC Online
+Designated service name changes
+Sign in to AUSTRAC Online
+Manage your account
+Update your details
+Update your annual earnings
+Request removal from our roll or registers
+Renew your registration
+Add a new business to your account
+AUSTRAC Online guides and resources
+AUSTRAC Online User guides
+User guide: Transaction reporting function access
+User guide: Business profile
+User guide: User account
+User guide: Compliance reports
+User guide: Cross-border movement – Monetary instrument
+User guide: Enrol a new business with us
+User guide: Event logs
+User guide: General AUSTRAC Online support
+User guide: Manage branches and agents
+User guide: Manage contacts
+User guide: Manage your users
+User guide: Other features of transaction reporting
+User guide: Register with us
+User guide: Reporting methods
+User guide: Reports requiring further action
+User guide: Transaction reports
+AUSTRAC Online document library
+AUSTRAC Online quick reference guides (QRGs)
+QRG: How to submit TTRs or SMRs through a file upload
+QRG: Navigating the reporting dashboard
+QRG: Requesting report amendment or withdrawal
+QRG: Submitting a suspicious matter report (SMR) in the training environment
+QRG: Submitting a threshold transaction report (TTR) in the training environment
+QRG: Using TTR/SMR training environment
+QRG: AUSTRAC Online new user sign-up
+QRG: How to enrol a business
+QRG: How to manage affiliates
+QRG: How to form a reporting group
+QRG: How to register a business
+QRG: How to renew your registration
+QRG: How to request removal from the registers
+QRG: How to request removal from the Reporting Entities Roll
+QRG: How to update your details
+QRG: Manage contacts and users
+QRG: New AUSTRAC Online features
+QRG: Registering for multi-factor authentication
+QRG: Transitioning from a DCE to a VASP
+AUSTRAC Online video resources
+Reporting Entity System Transformation (REST) Program
+Consultations
+✕
+Learn when you must conduct enhanced customer due diligence (CDD) to manage and mitigate your customer’s money laundering, terrorism financing and proliferation financing risks. We refer to these as ML/TF risks.
+Enhanced CDD must be applied in specific circumstances.
+To manage and mitigate ML/TF risks effectively, the enhanced CDD measures you apply need to be:
+targeted to your customer’s specific ML/TF risks
+proportionate to the risk level
+effective at managing and mitigating the risk
+appropriate to the risk duration. For example, you may need to apply enhanced CDD on an ongoing basis if the risk relates to ongoing activity or behaviour.
+Sometimes, you must apply specific enhanced CDD measures.
+Enhanced CDD and your AML/CTF policies
+This section refers to the Act section 26F.
+Your anti-money laundering and counter-terrorism financing (AML/CTF) policies must set out your policies, procedures, systems and controls for applying enhanced CDD.
+When interacting with a customer during enhanced CDD, you must make sure you comply with your tipping off obligations .
+We expect your AML/CTF policies for enhanced CDD to set out all of the following:
+when you’ll apply different enhanced CDD measures in response to specific ML/TF risks
+who in your business is responsible for applying enhanced CDD
+how you’ll monitor and review the effectiveness of your enhanced CDD measures
+how you’ll manage your tipping off obligations when conducting enhanced CDD.
+When you must apply enhanced CDD
+This section refers to the Act section 32 and the Rules section 6–20.
+You must apply enhanced CDD in all circumstances set out in this section. You may need to apply enhanced CDD during initial CDD, ongoing CDD, or both.
+There are also additional instances where you must apply specific enhanced CDD measures .
+The customer’s ML/TF risk is high
+You must conduct enhanced CDD if the customer’s ML/TF risk is high.
+You may identify that the customer’s ML/TF risk:
+is high while undertaking initial CDD
+becomes high while undertaking ongoing CDD.
+For example, you may assess that a customer’s ML/TF risk becomes high:
+following customer monitoring alerts
+when there are changes in their know your customer (KYC) information
+when there are other factors, such as a change in the kinds of designated services they’re requesting or the way they’re using your services.
+We expect your AML/CTF policies to enable you to detect if the customer’s ML/TF becomes high and set out what you’ll do in response.
+Learn more about identifying high-risk customers at assigning customer risk ratings .
+Example: identifying high ML/TF risk during initial CDD
+A business collects KYC information from a new customer. Through this process the business identifies that the customer is high ML/TF risk. The business conducts enhanced CDD as part of its initial CDD process. To ensure that it understands the customer’s financial position and how they are funding their transactions, the business collects and verifies information about the customer’s source of funds and source of wealth . This enables the business to better identify the customer's ML/TF risk and apply any necessary controls to manage and mitigate the risk.
+Example: identifying high ML/TF risk during ongoing CDD
+A business identifies an existing customer who was a medium ML/TF risk at onboarding has become a high ML/TF risk due to a change in their country of residence. The business applies enhanced CDD controls to manage and mitigate risks associated with the foreign country.
+You’re required to submit a suspicious matter report
+You must conduct enhanced CDD if you’re required to submit a suspicious matter report (SMR) in relation to the customer and intend to continue providing a designated service to the customer.
+You are not required to complete enhanced CDD before you submit an SMR. The SMR must be submitted within the required timeframes even if enhanced CDD is still being conducted.
+Learn more about suspicious matter reports .
+There may be instances where an SMR mentions a customer who isn’t the subject of the suspicion. For example, a customer who is a victim of suspected fraud. We don’t expect you to conduct enhanced CDD on a customer who isn’t the subject of the suspicion, unless this is necessary to manage and mitigate that customer’s ML/TF risk.
+Unusual, large or complex transactions
+You must apply enhanced CDD if a customer requests a designated service that would involve any of the following:
+transactions that are unusually complex or large
+transactions that have no apparent economic or legal purpose
+an unusual pattern of transactions.
+Learn how to identify unusual transactions .
+Designated services that are part of a nested services relationship
+You must conduct enhanced CDD if the customer requests a designated service that is or will be part of a nested services relationship .
+Foreign politically exposed persons
+You must conduct enhanced CDD if any of the following are a foreign politically exposed person (PEP):
+your customer
+any beneficial owner of the customer
+any person on whose behalf the customer is receiving the designated service, such as a beneficiary of a trust or foreign equivalent
+any person acting on behalf of the customer.
+Learn more about obligations that apply to PEPs .
+A person located or formed in a high-risk jurisdiction
+You must conduct enhanced CDD if any of the following are physically present in, or formed in, a high-risk jurisdiction that the Financial Action Task Force (FATF) has called for enhanced CDD to be applied:
+your customer
+any beneficial owner of the customer
+any person on whose behalf the customer is receiving the designated service, such as a beneficiary of a trust or foreign equivalent
+any person acting on behalf of the customer.
+The FATF issues public statements that identify high-risk countries that are subject to a call to action.
+Enhanced CDD measures you can apply
+We expect that your AML/CTF policies will include a range of enhanced CDD measures appropriate to managing and mitigating your customer’s ML/TF risks.
+It’s important that the enhanced CDD measures you apply in each case are informed by the reason why the customer was identified as high ML/TF risk and designed to manage and mitigate the ML/TF risk.
+For example, it may be appropriate to apply one or more of the following enhanced CDD measures:
+collecting and/or verifying more KYC information about the customer
+obtaining information on the destination of transfers of value
+obtaining the reason for certain transactions or services
+collecting and/or verifying information about the customer or beneficial owner’s source of funds or source of wealth
+taking additional measures to better understand the background, ownership (if relevant) and financial situation of the customer, and other parties to the transaction
+conducting more in-depth customer monitoring and analysis of transactions and behaviours.
+increasing the frequency of reviews of the business relationship, to assess whether the customer’s risk has changed and whether the risk remains manageable
+updating the customer’s KYC information more frequently than you would for other customers.
+It’s also important to note that when carrying out enhanced CDD, we expect that this will include taking active steps to manage and mitigate any ML/TF risks – not just additional monitoring.
+Examples include, where appropriate:
+electing not to provide a designated service where this falls outside your business’s risk appetite
+where you’re exposed to high value physical currency (cash) transactions – implementing a transaction limit for physical currency or requesting customers complete transactions through bank transfer or EFTPOS only.
+You may also need to escalate issues for further decision by your senior management in accordance with your AML/CTF policies.
+This is an important way of making sure your senior managers:
+have oversight of your business’s ML/TF risks
+can make informed decisions about the extent to which they’re equipped to manage and mitigate those risks.
+It also helps ensure that your business is providing designated services in line with your business’s risk appetite and is able to manage risks facing the business. Learn more about your governance responsibilities .
+There are circumstances where you must apply specific enhanced CDD measures.
+Collect additional KYC information from the customer
+Collecting additional KYC information when undertaking enhanced CDD can help you:
+obtain a greater level of confidence in the customer’s identity
+identify additional ML/TF risks
+update your assessment of the customer’s ML/TF risk
+make sure information the customer previously provided to you is accurate
+clarify or update KYC information relating to the customer
+better understand the nature and purpose of the business relationship or transaction with the customer
+decide whether to continue providing designated services to the customer or limit the services you provide, to manage and mitigate your ML/TF risks.
+Examples of extra KYC information about the customer’s identity could include:
+additional identity documents, such as a passport where you had previously collected the driver's licence
+photographs of customers holding their photo identity documents to confirm the documents belong to them.
+Examples of additional KYC information to collect as an enhanced CDD measure could include information about:
+the customer’s or beneficial owner’s source of funds, source of wealth, and overall financial position
+other people involved in the designated service including the counterparty, and their relationship with the customer
+why the customer is seeking a specific product or designated service
+the customer’s or beneficial owner’s reputation, such as their past and present business activities
+the destination of transfers of value
+the customer available online and from internet searches, including public social media accounts.
+Learn more about collecting KYC information .
+Verify or re-verify KYC information
+During initial CDD, you must verify KYC information as appropriate to the customer’s ML/TF risk. This means you may have verified some, but not all, of the KYC information you collected during initial CDD.
+Verifying additional KYC information during enhanced CDD can give you greater certainty about the information’s accuracy. You may also re-verify KYC information using different sources. This can help make sure the checks you did previously were accurate, and you can still trust the verification.
+For example, you may:
+re-verify a customer’s KYC information
+verify KYC information from additional independent and reliable sources
+verify additional information to make sure their KYC information and ML/TF risk is up to date
+re-verify information about the customer’s identity if you have doubts about the veracity or adequacy of the information you previously obtained when identifying the customer.
+Learn more about verifying KYC information .
+Conduct more detailed monitoring and analysis of transactions and behaviours
+It may be appropriate to monitor a customer in more depth to identify unusual transactions and behaviours.
+Some methods you could use for increased monitoring and analysis include:
+reviewing your customer’s past transactions more closely to help better identify and assess their ML/TF risk and understand how they use your designated services
+reviewing the customer’s transactions more frequently
+manually reviewing unusual, complex or high-value transactions
+updating monitoring triggers to flag additional kinds of transactions.
+Learn more about monitoring your customers transactions and behaviours .
+Source of funds and source of wealth
+It may be appropriate to conduct source of funds or source of wealth checks during enhanced CDD to manage and mitigate the customer’s ML/TF risk.
+Learn about when you must establish source of funds and source of wealth as part of enhanced CDD .
+Establishing the source of funds can help you determine if the funds for a transaction come from a legitimate source or illicit activity.
+Establishing the source of wealth can help you understand how the customer came to their financial position and if there may be illicit sources of wealth.
+Source of funds and source of wealth isn’t relevant to all types of ML/TF risks. For example, source of funds isn’t an effective enhanced CDD measure where a customer is using your services to commit an offence such as the purchase of child exploitation material or the financing of terrorism.
+We expect your enhanced CDD measures to be targeted to the nature of the ML/TF risk the customer presents.
+Example: unexplained wealth
+A customer whose usual transactions involve a Centrelink payment and typical living expenses wishes to conduct a transaction involving $70,000.
+The reporting entity flagged the transaction as unusual because this level of wealth is inconsistent with what they know about the customer’s source of funds. The reporting entity contacts the customer to collect and verify information about the source of these funds.
+The reporting entity also asks for information about the customer’s source of wealth, to help reassess the customer’s ML/TF risk.
+Learn how to establish source of funds and source of wealth .
+Important note: Source of funds and source of wealth of PEPs
+You must establish on reasonable grounds in initial CDD the source of funds and source of wealth of any of the following:
+a foreign PEP
+a high ML/TF risk domestic or international organisation PEP.
+Learn more about this obligation for PEPs .
+When you must apply specific enhanced CDD measures
+This section refers to the Act section 32 and the Rules sections 6-21 and 6-22.
+In certain circumstances, you must apply specific enhanced CDD measures to a customer. You may also need to apply other enhanced CDD measures to appropriately manage and mitigate their ML/TF risk.
+Learn how to establish source of funds and source of wealth .
+Source of funds and source of wealth where relevant to a customer’s ML/TF risk
+This section refers to the Rules sections 6–21, 6-23 and 6-24.
+You must establish the customer’s source of funds and source of wealth on reasonable grounds as part of initial CDD, if it’s relevant to the nature of their high ML/TF risk.
+During updating and reverifying KYC information as a part of ongoing CDD, you must also make sure you hold information about the customer’s source of funds and source of wealth if it’s relevant to their high ML/TF risk.
+When source of funds and source of wealth is relevant to a customer’s ML/TF risk
+There are some types of ML/TF risks which are best managed and mitigated by establishing a customer’s source of funds and source of wealth on reasonable grounds, for example:
+customers involved with high-risk jurisdictions that have high levels of corruption, weak AML regimes or sanctions laws, or conflict zones
+use of shell companies or complex trust or corporate structures that have obfuscated beneficial ownership
+a customer that has previously been a PEP, and who remains high ML/TF risk after ceasing to be a PEP due to continuing political influence
+a customer who isn't a PEP but holds another position of political influence and customer monitoring has detected large transactions inconsistent with what you know about the customer
+a customer who wants to conduct unusually large cash transactions, or only transacts in cash
+high-net-worth individuals whose income sources are unclear, or with complex or opaque wealth structures
+customers whose wealth or income comes from multiple jurisdictions
+there are inconsistencies between the information the customer provided and other information available to you related to their income or wealth
+there’s adverse media reporting or other reliable information about the customer’s business or commercial activities
+there has been a material change in the customer’s financial circumstances or position.
+In these scenarios, it’s important to understand where the assets are coming from to finance the designated service or which have enabled your customer to accumulate their wealth.
+Example: SMR following an unusually large transaction
+A customer approaches a lawyer to request they set up a wealth management structure for the assets held by their family. They advise that they have a number of assets and wish to set up the structure for ease of control and management of the assets, distribution of funds to family members, and tax planning.
+The lawyer decides to perform source of funds and source of wealth checks on the assets that will be moved into the new structure, to make sure they come from a legitimate source. They ask the customer to provide relevant documents for each of their assets, including evidence of sources of funds for bank accounts and investments.
+The customer provides relevant documents for each of their assets, including records of business ownership and dividends, inheritance from relatives, and share records.
+The lawyer is satisfied with the information provided and records the information. They also note on the file to conduct further checks if there are any new assets or significant changes to the customer’s financial position.
+Source of funds and source of wealth for virtual asset services
+This section refers to the Rules section 6–22.
+If you’re a virtual asset service provider (VASP) you must apply enhanced CDD to a customer who deposits or receives physical currency in exchange for virtual assets. This includes through a crypto ATM.
+You must also:
+collect and verify information on the customer’s source of funds
+make sure that you hold information on the source of the customer’s wealth as part of reviewing, updating and reverifying KYC information under ongoing CDD.
+Responding to enhanced CDD findings
+We expect that your AML/CTF policies will set out how you’ll respond to any enhanced CDD findings. This includes all of the following:
+processes to manage and mitigate the ML/TF risks you identify
+processes to escalate issues for further consideration by your business
+what you’ll do if enhanced measures can’t manage and mitigate the customer’s ML/TF risks
+processes for submitting an SMR to us when required. You may need to submit an SMR before you finish applying enhanced CDD measures
+considering if you’ll continue providing designated services to a customer or end the business relationship to manage and mitigate any ML/TF risks.
+You can still provide designated services to customers requiring enhanced CDD. However, you must have AML/CTF policies that appropriately manage and mitigate the ML/TF risk involved in providing them with a designated service.
+Record keeping
+This section refers to the Act sections 32 and 111.
+You must document the enhanced CDD measures you apply to a customer. This may include:
+the circumstances that required you to conduct enhanced CDD
+why you applied specific enhanced CDD measures
+any additional information you collected from the customer
+how you verified the information
+whether you submitted an SMR about the customer
+any changes you made to the customer’s ML/TF risk because of enhanced CDD
+decisions to apply additional measures to mitigate and manage new ML/TF risks or stop providing a designated service due to unacceptable risk.
+This will help you:
+show that you’re complying with your CDD obligations
+build a picture of the customer and any developing ML/TF risk
+adapt your enhanced CDD measures to changes and new information
+continue to identify, mitigate and manage ML/TF risks, including evolving risks.
+Learn more about record keeping .
+Related pages
+Pubs and clubs - reducing the risk of tipping off in enhanced customer due diligence
+Source of funds and source of wealth
+Initial customer due diligence
+Ongoing customer due diligence
+Tipping off
+Suspicious matter reports
+This guidance sets out how we interpret certain Australian legislation, along with associated Rules and regulations. Australian courts are ultimately responsible for interpreting these laws and determining if any provisions of these laws are contravened.
+The examples and scenarios in this guidance are meant to help explain our interpretation of these laws. They’re not exhaustive or meant to cover every possible scenario.
+This guidance provides general information and isn't a substitute for legal advice. This guidance avoids legal language wherever possible and it might include generalisations about the application of the law. Some provisions of the law referred to have exceptions or important qualifications. In most cases your particular circumstances must be taken into account when determining how the law applies to you.
+Last updated:
+15 Jul 2026
+Was this page helpful?
+Was this page helpful?
+Was this page helpful?
+Yes
+No
+Why or why not? (optional)
+Please note that feedback you provide here will be used only for the purpose of improving our website. If you have a specific question about your AML/CTF obligations, please contact us .
+Leave this field blank
+Top

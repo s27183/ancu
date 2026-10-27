@@ -1,0 +1,64 @@
+Source: https://www.macquarie.com.au/assets/bfs/documents/broker/mortgages/gift_loan_declaration.pdf
+Retrieved: 2026-10-27
+Extracted: pdftotext -layout of the PDF (form footer 07/17); sha256 of the PDF ad399bde2a64682b197865cbbad8474da7d9df5c7ddba20215c36c14d50363db
+
+        Gift and Loan Declaration
+        The Lender has been informed that the recipient will be receiving a monetary gift/loan to help with
+        purchasing a property that will be provided as security to their loan application. The Lender is required to
+        assess the below information as part of their responsible lending requirements.
+
+
+           I [insert donor’s name]
+
+
+           of [insert donor’s address]
+
+
+
+
+           am giving $ [insert amount]
+
+
+
+
+           to [recipient’s name]
+
+
+           of [recipient’s address]
+
+
+
+
+           to assist with the purchase of a property.
+
+
+
+           I declare:
+
+                   That the funds are a gift and not repayable.
+
+                   That the funds are repayable and have the following conditions
+
+           Repayment due date                /     /
+
+
+           Interest payable              $
+
+           Other
+
+
+
+           Signed: [Donor’s signature]
+
+
+
+
+           Date           /        /
+
+
+
+
+07/17
+
+        This information has been prepared by Macquarie Bank Limited ABN 46 008 583 542 AFSL and Australian Credit Licence 237502.
+

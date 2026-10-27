@@ -9,6 +9,13 @@ sources:
     retrieved: 2026-06-22
   - url: https://www.ato.gov.au/about-ato/new-legislation/in-detail/individuals/personal-income-tax-new-tax-cuts-for-every-australian-taxpayer
     retrieved: 2026-06-22
+  - url: https://www.ato.gov.au/individuals-and-families/medicare-and-private-health-insurance/medicare-levy/medicare-levy-reduction/medicare-levy-reduction-for-low-income-earners
+    retrieved: 2026-10-27
+    path: docs/sources/ato/medicare-levy-reduction-low-income-earners.txt
+    note: "PRIMARY (ATO) — the lower Medicare levy threshold for a single taxpayer, 2025-26."
+    quotes:
+      - "In 2025–26, you don't have to pay the Medicare levy if your taxable income is equal to or less than the lower Medicare levy threshold."
+      - "$28,011"
 ---
 
 # Resident individual income tax — 2025-26 schedule
@@ -52,7 +59,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
   "parameters": {
     "tax_free_threshold":        { "type": "money",      "value": 18200, "note": "REGULATED (ATO) — below this, nil income tax" },
     "medicare_levy_pct":         { "type": "percentage", "value": 2,     "note": "REGULATED — 2% of taxable income; full rate applies above the low-income phase-in (all serviceability-relevant incomes)" },
-    "medicare_low_income_single_threshold": { "type": "money", "value": 27222, "note": "CONTEXT — single-person low-income threshold below which the levy phases in/out; not load-bearing for capacity (below the HECS threshold). 2024-25 figure; re-confirm on the annual pass." },
+    "medicare_low_income_single_threshold": { "type": "money", "value": 28011, "note": "CONTEXT — single-person low-income threshold below which the levy phases in/out; not load-bearing for capacity (below the HECS threshold). The ATO's 2025-26 lower threshold for all other taxpayers ($28,011; the KB had the 2024-25 $27,222)." },
     "second_band_base":          { "type": "money",      "value": 4288,  "note": "tax at $45,000 = 16% × ($45,000 − $18,200)" },
     "third_band_base":           { "type": "money",      "value": 31288, "note": "tax at $135,000 = $4,288 + 30% × $90,000" },
     "top_band_base":             { "type": "money",      "value": 51638, "note": "tax at $190,000 = $31,288 + 37% × $55,000" }

@@ -1,16 +1,14 @@
 ---
 slug: kb.au-aml-ctf.source-of-funds-documentation
 effective_from: 2025-07-01
-last_verified: 2026-07-06
+last_verified: 2026-10-27
 sources:
   - url: https://www.austrac.gov.au/industry-and-business/obligations-and-guidance/your-amlctf-program/customer-due-diligence/enhanced-customer-due-diligence
-    retrieved: 2026-07-06
-  - url: https://www.homeloanexperts.com.au/home-loan-documents/gift-letter-template/
-    retrieved: 2026-07-06
-  - url: https://www.canstar.com.au/home-loans/gifted-deposits/
-    retrieved: 2026-07-06
-  - url: https://www.homeloanexperts.com.au/non-resident-mortgages/proving-foreign-income/
-    retrieved: 2026-07-06
+    retrieved: 2026-10-27
+    path: docs/sources/austrac/enhanced-customer-due-diligence.txt
+  - url: https://www.macquarie.com.au/assets/bfs/documents/broker/mortgages/macquarie_broker-credit-guidelines.pdf
+    retrieved: 2026-10-27
+    path: docs/sources/lenders/macquarie-credit-guidelines-v15.txt
 ---
 
 # Source-of-funds documentation — evidencing an overseas-sourced deposit
@@ -28,10 +26,11 @@ The distinction from the two *other* document gates is load-bearing: this is **n
 
 ## The two disciplines that decide the outcome
 
-- **Document the source *before* the money lands.** A contemporaneous paper trail assembled *before* transfer is worth far more than a reconstruction afterward; funds arriving un-evidenced are what get held ([`kb.au-aml-ctf.bank-due-diligence-expectations`](bank-due-diligence-expectations.md)).
-- **Gift, not loan.** The deposit must be a **genuine, non-repayable gift**. A repayable family loan — even interest-free — is assessed by the lender as a **borrowed deposit**, changing serviceability and often the decision. The gift letter ([`kb.cross-border.source-of-funds-letter-template`](../cross-border/source-of-funds-letter-template.md)) states this explicitly; the supporting evidence must not contradict it.
+- **When AUSTRAC requires it.** A bank "must establish the customer's source of funds and source of wealth on reasonable grounds as part of initial CDD, if it's relevant to the nature of their high ML/TF risk" (AUSTRAC, enhanced customer due diligence). A large inbound transfer from overseas for a property purchase is the kind of case a bank may treat as higher risk; how it treats it is its own call ([`kb.au-aml-ctf.bank-due-diligence-expectations`](bank-due-diligence-expectations.md)).
+- **Document the source early.** Assembling the paper trail before the transfer is common-sense preparation, not a published rule; no bank publishes how it handles un-evidenced funds.
+- **Gift, not loan — the lender asks which.** For a gift, Macquarie requires "written confirmation … from the donor of the funds confirming the amount and that funds are not repayable"; for a family loan, confirmation of "the amount, any conditions and repayment terms" (Macquarie credit guidelines v15.0). The gift letter ([`kb.cross-border.source-of-funds-letter-template`](../cross-border/source-of-funds-letter-template.md)) states which it is; the supporting evidence must not contradict it.
 
-Vietnam-issued documents (sale contracts, titles, bank statements, tax records) commonly need **certified English translation** — a frequent, avoidable cause of delay.
+Lenders ask for foreign documents in English: Macquarie requires income documents "in English or translated into English with appropriate translation certificate from a registered licensed translation service domiciled in Australia".
 
 ## Relevance for the Vietnam-parent-funded / temp-resident buyer (Mode B)
 
@@ -42,17 +41,17 @@ Vietnam-issued documents (sale contracts, titles, bank statements, tax records) 
 
 ## Rules
 
-Pure-reference (`fills: []`). The `cross_border_funding` resolver builds `supporting_documents` by marking each category's status against the profile, and sets `source_of_funds_letter_prepared` from the letter track. The *requirement to evidence source of funds* is `REGULATED` (flows from AML/CTF ECDD); the *specific document categories* are `CONVENTION` (bank/lender practice). No leaf asserted; no figure here.
+Pure-reference (`fills: []`). The `cross_border_funding` resolver builds `supporting_documents` by marking each category's status against the profile, and sets `source_of_funds_letter_prepared` from the letter track. The *requirement to evidence source of funds* is `REGULATED` where the bank rates the customer high-risk (AUSTRAC ECDD); the *specific document categories* are `CONVENTION` (bank/lender practice). No leaf asserted; no figure here.
 
 ```jsonc
 {
   "fills": [],
   "parameters": {
-    "source_of_funds_evidence_required": { "type": "bool", "value": true, "provenance": "REGULATED", "note": "establishing the legitimate origin of the deposit is required under the bank's AML/CTF ECDD (kb.au-aml-ctf.bank-due-diligence-expectations); a lender requirement in parallel." },
+    "source_of_funds_evidence_required": { "type": "bool", "value": true, "provenance": "REGULATED", "note": "AUSTRAC ECDD: a reporting entity must establish source of funds and source of wealth on reasonable grounds where relevant to the customer’s high ML/TF risk (kb.au-aml-ctf.bank-due-diligence-expectations); lenders ask for evidence of the deposit in parallel." },
     "trace_the_parents_origin_of_funds": { "type": "bool", "value": true, "provenance": "CONVENTION", "note": "the highest-risk leg is HOW the parent accumulated the money (property sale / savings / income / inheritance), not just the transfer — the most under-evidenced part." },
-    "document_before_funds_land": { "type": "bool", "value": true, "provenance": "CONVENTION", "note": "assemble a contemporaneous paper trail before transfer; funds arriving un-evidenced are what get held pending review." },
-    "must_be_genuine_non_repayable_gift": { "type": "bool", "value": true, "provenance": "CONVENTION", "note": "a repayable family loan (even interest-free) is assessed as a borrowed deposit, changing serviceability; the evidence must be consistent with a genuine gift." },
-    "vn_documents_may_need_certified_translation": { "type": "bool", "value": true, "provenance": "CONVENTION", "note": "VN-issued sale contracts, titles, bank/tax records commonly need certified English translation; a frequent cause of delay." }
+    "document_before_funds_land": { "type": "bool", "value": true, "provenance": "CONVENTION", "note": "PLACEHOLDER — no primary states this; re-ground on a lender’s or bank’s own gifted-deposit or international-transfer policy page." },
+    "must_be_genuine_non_repayable_gift": { "type": "bool", "value": true, "provenance": "CONVENTION", "note": "LENDER-POLICY — Macquarie credit guidelines v15.0: a gift needs the donor’s written confirmation that the funds are not repayable; a family loan needs the lender’s confirmation of amount, conditions and repayment terms. How a family loan changes serviceability is each lender’s own assessment." },
+    "vn_documents_may_need_certified_translation": { "type": "bool", "value": true, "provenance": "CONVENTION", "note": "LENDER-POLICY — Macquarie credit guidelines v15.0: income documents in English or translated with a translation certificate from a registered licensed translation service domiciled in Australia." }
   },
   "lookup": {
     "source_of_funds_evidence_categories": {
@@ -78,7 +77,5 @@ Notes:
 
 ## Sources
 
-- AUSTRAC — *Customer due diligence* / core guidance (identify the customer and, in higher-risk cases, establish source of funds and wealth) — https://www.austrac.gov.au/business/core-guidance/customer-identification-and-verification
-- Home Loan Experts — *Gift Letter Template / gifted deposit* (banks confirm the source of a deposit; overseas gifts need the source documented before the money lands, with a paper trail) — https://www.homeloanexperts.com.au/home-loan-documents/gift-letter-template/
-- Home Loan Experts — *Proving Your Foreign Income When Applying For A Mortgage* (overseas evidence, certified translation, conservative conversion) — https://www.homeloanexperts.com.au/non-resident-mortgages/proving-foreign-income/
-- Canstar — *Gifted Deposits: How They Work* (gift must be non-repayable; a repayable loan is treated as a borrowed deposit) — https://www.canstar.com.au/home-loans/gifted-deposits/
+- AUSTRAC — *Enhanced customer due diligence* (source of funds and source of wealth established where relevant to a customer's high ML/TF risk) — https://www.austrac.gov.au/industry-and-business/obligations-and-guidance/your-amlctf-program/customer-due-diligence/enhanced-customer-due-diligence
+- Macquarie Bank — *Residential Home Loans Credit Guidelines* v15.0 (gifts and related-party loans; English translation of income documents) — https://www.macquarie.com.au/assets/bfs/documents/broker/mortgages/macquarie_broker-credit-guidelines.pdf

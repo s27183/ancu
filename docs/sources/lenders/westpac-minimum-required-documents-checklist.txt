@@ -1,0 +1,417 @@
+Source: https://www.westpac.com.au/content/dam/public/brokers/documents/applications/wbc-minimum-required-documents-checklist.pdf
+Retrieved: 2026-10-27
+Extracted: pdftotext -layout of the PDF (Westpac minimum required documents checklist); sha256 of the PDF 5fc4e4a059286ea678a6bf92893241fcfddc7a187f0681ebf4a4b6f613449512
+
+Minimum required documents checklist
+          To ensure a smooth experience for your customers during the application assessment process, please follow this
+          checklist to ensure documents required to commence assessment are provided.
+
+ Application details.
+
+Applicant/s name                                                                                               Date
+
+                                                                                                                      /         /
+
+Lender reference number
+
+
+
+
+ This section is mandatory and must be completed for all applications.
+
+    Notes provided in the online lodgement (purpose, product, any mitigants, etc)
+
+    Signed Privacy Acknowledgments, Consents and Confirmation Form (except for existing loan increases)
+
+    All tax file numbers removed from all documentation
+
+    Completed NextGenID or verification of Identity (VoI) Certificate with the certified copies of identification documents,
+     where a new ACT, QLD, VIC, SA, WA or NSW mortgage is required
+
+    Completed NextGenID or signed Identification Verification Form and/or Certified Identification Form with certified
+     Copy of identification documentation produced (new customers to Westpac)
+
+    Rates Notices for all properties owned, not already mortgaged with or held as security by Westpac
+
+    Signed Business Purpose Declaration – to be used when loan is wholly or predominantly for business purposes,
+     or non‑residential investment purposes (If applicable)
+
+
+
+
+© Westpac Banking Corporation ABN 33 007 457 141 AFSL and Australian credit licence 233714. WBC22133 0226                          Page 1 of 8
+Minimum required documents checklist.
+
+
+
+
+Please select which section(s) are applicable to the application
+and ensure they are completed.
+    Section 1: PAYG Applicants                                                                               Go to checklist
+
+    Section 2: Self Employed/Company and Trust Applicants                                                    Go to checklist
+
+    Section 3: Other Sources of Income                                                                       Go to checklist
+
+    Section 4: Ongoing Expenses and Liabilities                                                              Go to checklist
+
+    Section 5: Property Purchases                                                                            Go to checklist
+
+    Section 6: Refinances                                                                                    Go to checklist
+
+    Section 7: Building Loans                                                                                Go to checklist
+
+    Section 8: First Home Owner’s Grant (FHOG)                                                               Go to checklist
+
+    Section 9: LMI – Mortgage Insured Application                                                            Go to checklist
+
+
+
+
+© Westpac Banking Corporation ABN 33 007 457 141 AFSL and Australian credit licence 233714. WBC22133 0226         Page 2 of 8
+Minimum required documents checklist.
+
+
+
+      Go back to contents
+
+
+ Section 1: PAYG Applicants.
+
+For ALL Loans:
+
+For PAYG base income (full-time & part-time) please provide:
+
+     Last 2 consecutive non-YTD payslips detailing base salary, no more than 2 months old from day of formal approval.
+OR
+
+     1 YTD payslip detailing base income covering last 2 pay cycles, no more than 2 months from day of formal approval.
+
+For casual income please provide:
+
+     1 YTD payslip covering at least 6 months, no more than 2 months old from day of formal approval.
+OR
+
+     2 consecutive non-YTD payslips no more than 2 months old from day of formal approval and a Group 2 document.
+
+For non-base income (i.e allowances, bonuses etc) please provide:
+
+     1 non-YTD payslip plus a YTD income statement
+OR
+
+     1 YTD payslip covering at least 3 months, no more than 2 months old from day of formal approval.
+
+ Group 2
+ 1. The final YTD payslip from the immediately previous financial year; or
+ 2. Latest PAYG Payment Summary;
+ OR
+ 3. Latest tax ready ATO Income Statement; or
+ 4. Latest Australian Tax Return and Australian Taxation Office Notice of Assessment
+
+Document Standards
+
+     Identify the applicant(s) and employer(s) name
+
+    When applicable, identify ALL components of income the applicant receives and which the bank considers acceptable to
+     include in the serviceability assessment of the loan (e.g. base income, overtime, commissions, bonus, allowances, etc)
+
+     Confirm period covered, gross and net salary, tax paid and YTD
+
+Note: Please refer to Credit Policy for full document standard requirements.
+
+ End of section
+
+
+
+
+© Westpac Banking Corporation ABN 33 007 457 141 AFSL and Australian credit licence 233714. WBC22133 0226                Page 3 of 8
+Minimum required documents checklist.
+
+
+
+      Go back to contents
+
+
+ Section 2: Self Employed/Company and Trust Applicants.
+ (If applicant(s) is required to include income deemed as Self Employed to meet serviceability).
+
+ If your customer has existing business lending with Westpac over $100k limit, please refer customer to their Westpac
+ Relationship Manager.
+
+Note: After 15th May it is mandatory to supply previous June 30 financials.
+
+Fast Track Self Employed (Non-Mortgage Insured applications only)
+
+    Last 2 years ATO Notices of Assessment only. (Refer to Credit Policy for Fast Track eligibility criteria)
+
+Fully Verified Self Employed
+
+    Last 2 years Financial statements and Income Tax Returns for Company/Trust/Partnership*
+
+    Last 2 years Personal Income Tax Returns for Individuals (supported by the latest year ATO Notice of Assessment for non-LMI
+     applications and each years ATO notice of assessment for LMI applications)
+
+    Details and supporting documents are required for all Company/Trust/Partnership commitments and liabilities
+
+    Details and comments on relevant issues or items in Financial Reports
+
+    Details of Directors of Company (Including Directorship/shareholding/interest in other entities). If using accountant letter,
+     please refer to policy.
+
+    Certified copy of the stamped Trust Deed
+
+1 Year Assessment Self Employed
+
+    Latest year Income Tax Returns and latest year balance sheet for Company/Trust/Partnership*
+
+    Latest year Personal Income Tax Returns for Individuals (supported by the latest year ATO Notice of Assessment)
+
+    Details and supporting documents are required for all Company/Trust/Partnership commitments and liabilities
+
+    Details of Directors of Company (Including Directorship/shareholding/interest in other entities). If using accountant letter,
+     please refer to policy.
+* where a customer cannot be confirmed as individual trustee OR director & shareholder of the corporate trustee company, a certified copy of the stamped trust deed
+  is required.
+
+Note: For Medico Sector Policy only 1 year financial – refer to credit policy, most recent year’s Financial statements and Income Tax
+Return(s) (i.e. individual and any associated entity, e.g. company, trust or partnership) are required (supported by the most recent
+ATO Tax Assessment Notice).
+
+ End of section
+
+
+
+
+© Westpac Banking Corporation ABN 33 007 457 141 AFSL and Australian credit licence 233714. WBC22133 0226                                                   Page 4 of 8
+Minimum required documents checklist.
+
+
+
+      Go back to contents
+
+
+ Section 3: Other Sources of Income.
+
+Rental Income
+
+     Rental income from a standard investment property currently tenanted.
+Any of the below may be used but where more than one of the rental verification documents is held, the most recent document
+must be used:
+• Existing rental agreement, or rental statement from licensed real estate property manager/agent/letting agent; or
+• Contract of Sale where the property is being purchased subject to an existing tenancy; or
+• Account transaction listing as stipulated in policy
+OR
+
+     Rental income from a standard investment property not currently tenanted.
+Any of the below may be used to verify rental income, but where more than one of the rental verification documents are held,
+the document with the lowest rental value must be used:
+• Valuation report (no older than 3 months) with rental estimate; or
+• Licensed real estate property manager’s/agent’s or letting agent email advice.
+
+     Rental income from a short term rental property i.e AirBnB.
+• Latest tax return and ATO NOA
+
+Foreign Income
+
+    Last 2 consecutive foreign income payslips or 1 YTD payslip covering 2 pay cycles, and in all cases an account statement
+     covering a minimum of 3 months evidencing consistent salary credits
+
+    Government letter showing Foreign Pension Income and account statements covering a minimum of 3 months evidencing
+     consistent pension credits and narratives.
+
+     Bank statement covering a minimum of 6 months evidencing consistent foreign rental income credits and narratives.
+
+Please note: If using Foreign Income, please complete and include the Translation Checklist on BrokerHub.
+
+Other Income
+
+     Dividend and Interest Income from ASX Listed Shares (other than from own company) – 1 year’s evidence required
+
+     Government Letter or Centrelink Statement providing details of eligible benefits – refer to credit policy for full list.
+
+ End of section
+
+
+
+ Section 4: Ongoing Expenses and Liabilities.
+
+Existing(s). E.g. Housing/investment loans, personal loans, car loans, margin loans, tax debts, credit card and/or store card,
+one of:
+
+A number of liability types can be verified (partially or fully) using CCR (refer to credit policy for more information).
+
+You can now access an upfront CCR on AOL. Using the CCR, we encourage you to:
+
+     Review limits of facilitates shown as ‘Open’
+
+     Review loan repayment history information (up to 24 months available).
+
+For any liability type that is not available on CCR (e.g. lease), please refer to Credit policy for further information.
+
+
+
+
+© Westpac Banking Corporation ABN 33 007 457 141 AFSL and Australian credit licence 233714. WBC22133 0226                      Page 5 of 8
+Minimum required documents checklist.
+
+
+
+     Go back to contents
+
+
+ Section 4: Ongoing Expenses and Liabilities (continued).
+
+Ongoing Rent Expenses
+
+For each ongoing rent commitment, one of:
+
+    Current signed and dated lease/rental agreement detailing the rental amount, frequency/cycle, property address and name(s)
+     of tenants
+
+    Letter from licensed property manager/agent detailing the rental amount, frequency/cycle, property address and name(s)
+     of tenants
+
+    Rental ledger from licensed property manager/agent (no older than 6 weeks) detailing rental amount, frequency/cycle and
+     name(s) of tenants
+
+Ongoing Board Expenses
+
+Board where >$0 and not paid in cash:
+
+    Account Statement – covering 2 payment cycles with narratives aligned to the commitment
+
+    Account Transaction listing – covering 2 payment cycles with narratives aligned to the commitment
+
+Where $0 or paid in cash:
+
+    Witnessed statutory declaration by appropriate person i.e a certified Justice of Peace
+
+Where $0 or paid in cash and resides with spouse who is not a co-borrower:
+
+    Council rates notice – showing a property owner matching the spousal partner’s name; or
+
+    Utility bill – showing a property owner matching the spousal partner’s name
+
+Child Support, Spouse or De-Facto Maintenance
+
+    Court order or child support agency letter confirming the amount of the ongoing obligations
+
+    Bank statement or transaction listing covering 2 payment cycles
+
+    Last 2 payslips showing the deduction
+
+ End of section
+
+
+
+ Section 5: Property Purchases.
+
+    Full copy of signed Purchase Contract/Offer (front page for NSW only) including title details and annexures.
+
+Note: For all contracts in Victoria, a fully executed contract of sale between the vendor(s) and purchaser(s) is required.
+
+    Copy of Share Certificate for Company Title
+
+Temporary VISA Applicants
+
+    Foreign Investment Review Board (FIRB) approval
+
+ End of section
+
+
+
+
+© Westpac Banking Corporation ABN 33 007 457 141 AFSL and Australian credit licence 233714. WBC22133 0226                   Page 6 of 8
+Minimum required documents checklist.
+
+
+
+     Go back to contents
+
+
+ Section 6: Refinances.
+
+We do not require statements to evidence repayment history on a majority of loan applications. You can now pull an upfront CCR
+on AOL to review your customers repayment history for up to 24 months. Using the CCR, we encourage you to:
+
+    Review limits of facilitates shown as ‘Open’
+
+    Review loan repayment history information.
+
+    For FastRefi please refer to the FastRef Checklist.
+
+ End of section
+
+
+
+ Section 7: Building Loans.
+
+All Building/Construction Loans
+
+    Fully executed Building Contract or tender signed by applicant(s) and builder dated <12 months.
+
+    Copy of plans, specifications and Schedule of payments
+
+    Evidence of funds to complete (borrowers contribution)
+
+Tender or contract must include builder’s business name and licence number, address of the property on which construction is to
+occur, cost in accordance with approved plans and specs.
+
+If Contract Builder, also include
+
+    External Tradespeople Quotes – Where additional building work outside of the primary builder’s fixed price contract AND the
+     valuer is being asked to consider these improvements when completing a ‘Construction’ valuation.
+
+If Owner Builder, kit homes also include
+
+    Council Approved Plans or Privately Certified Plan
+
+    A completed Independent Adviser’s Inspection Report
+
+    If a licensed builder also require schedule of payments
+
+    Copy of quotations from all subcontractors
+
+ End of section
+
+
+
+ Section 8: First Home Owner’s Grant (FHOG).
+
+    Copy of signed and completed FHOG Application form. Original sent to: FHOGInstructionsWBC@westpac.com.au
+
+    Signed and certified supporting documentation as required by the relevant state
+
+    If name changed then copy of Name Change Document (e.g. Marriage Certificate) must be provided
+
+Note: Document MUST be signed and certified by a JP as a true and exact copy
+
+ End of section
+
+
+
+
+© Westpac Banking Corporation ABN 33 007 457 141 AFSL and Australian credit licence 233714. WBC22133 0226               Page 7 of 8
+Minimum required documents checklist.
+
+
+
+     Go back to contents
+
+
+ Section 9: LMI – Mortgage Insured Applications.
+
+    Evidence of 5% genuine savings is required where the base LVR >90%
+
+Note: Refer to Consumer Credit Policy for acceptable supporting documents to evidence genuine savings
+
+
+
+
+Accessibility support.
+
+Visit westpac.com.au/web-accessibility for further information on our accessible products and services for people with disability,
+who are neurodivergent or where English is not your preferred language.
+
+© Westpac Banking Corporation ABN 33 007 457 141 AFSL and Australian credit licence 233714. WBC22133 0226                  Page 8 of 8
+

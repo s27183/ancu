@@ -213,6 +213,7 @@ PRIMARY_LENDER_HOSTS = (
     # non-bank lenders and a bank under its own domain, each cited for its own policy or
     # product (behavior 138 step 2)
     "suncorpbank.com.au", "latrobefinancial.com.au", "peppermoney.com.au", "loans.com.au",
+    "brighten.com.au", "firstmac.com.au",
 )
 # A provider's own published price is the primary for its own fee (behavior 85, Son
 # 2026-10-16): a bank's or transfer service's fee schedule for the FX docs, a lender's for
@@ -247,6 +248,12 @@ PRIMARY_PROVIDER_HOSTS = {
     "docs/kb/buyer-costs/foreign-buyer-services.md": ("naati.com.au",),
     "docs/kb/investor/vacancy-rate-assumptions.md": ("sqmresearch.com.au",),
     "docs/kb/property/rental-market-data-sources.md": ("sqmresearch.com.au",),
+    # behavior 138 step 3: lender policy re-grounded on the lenders' own pages and forms;
+    # Wise cited only for its own pricing.
+    "docs/kb/non-resident/investment-loan-deposit-requirements.md": PRIMARY_LENDER_HOSTS,
+    "docs/kb/au-aml-ctf/source-of-funds-documentation.md": PRIMARY_LENDER_HOSTS,
+    "docs/kb/fx/loan-currency-considerations.md": PRIMARY_LENDER_HOSTS,
+    "docs/kb/foreign-investor/currency-hedging-considerations.md": FX_PROVIDER_HOSTS,
 }
 
 
@@ -312,44 +319,24 @@ def primary_fails(path, urls):
 # secondary citation never enters and the list only shrinks; behavior 138 re-grounds each
 # group in its own commit until it is empty. Never add to it.
 KNOWN_SECONDARY = {
-    "docs/kb/au-aml-ctf/source-of-funds-documentation.md": ("www.canstar.com.au", "www.homeloanexperts.com.au",),
     "docs/kb/buyer-costs/broker-and-buyers-agent.md": ("rebaa.com.au", "whichrealestateagent.com.au", "www.canstar.com.au",),
     "docs/kb/buyer-costs/foreign-buyer-services.md": ("australiantranslationservices.com.au", "birthcertificatetranslation.com.au", "mynotary.com.au", "skyvia.com.au", "translayte.com", "www.fogartyoliverandrothschild.com.au", "www.notarypublichub.com.au",),
     "docs/kb/buyer-costs/inspections-conveyancing-fees.md": ("conveyancercompare.com.au", "elevatedstrata.com.au", "engie.com.au", "nestpath.com.au", "ourtop10.com.au", "rezzi.com.au", "whatsthedamage.com.au", "www.bark.com", "www.canstar.com.au", "www.finder.com.au", "www.savings.com.au",),
-    "docs/kb/cash-reserve/lender-expectations.md": ("www.huntergalloway.com.au",),
-    "docs/kb/cross-border/source-of-funds-letter-template.md": ("www.canstar.com.au", "www.homeloanexperts.com.au",),
     "docs/kb/existing-home-sale/net-proceeds.md": ("www.finder.com.au", "www.mozo.com.au",),
     "docs/kb/facts/infrastructure.md": ("en.wikipedia.org",),
     "docs/kb/facts/living-in-australia.md": ("mmx.prnewswire.com", "www.prnewswire.com",),
-    "docs/kb/foreign-buyer-surcharge/by-state.md": ("www.homeloanexperts.com.au", "www.pwc.com.au",),
-    "docs/kb/foreign-investor/currency-hedging-considerations.md": ("wise.com",),
-    "docs/kb/foreign-investor/repatriation-strategy.md": ("wise.com",),
     "docs/kb/fx-providers/wise-ofx-bank-comparison.md": ("www.thecurrencyshop.com.au",),
-    "docs/kb/fx/loan-currency-considerations.md": ("wise.com", "www.homeloanexperts.com.au",),
     "docs/kb/fx/typical-spreads-vnd-aud.md": ("www.thecurrencyshop.com.au",),
-    "docs/kb/hecs/thresholds.md": ("www.scalesuite.com.au", "www.wagecalculator.com.au",),
-    "docs/kb/investor/annual-tax-return-investor.md": ("beyondaccountancy.com.au", "taxaccountantbrisbane.com.au", "tenfoldwealthaccountants.com.au",),
     "docs/kb/investor/operating-expenses-typical-ratios.md": ("nationalcover.com.au", "nestpath.com.au", "www.canstar.com.au", "www.mozo.com.au",),
     "docs/kb/investor/property-management-fees.md": ("www.canstar.com.au", "www.localagentfinder.com.au", "www.propspotter.com.au",),
     "docs/kb/investor/rental-appraisal-from-pm-agent.md": ("www.canstar.com.au",),
     "docs/kb/investor/target-yield-by-archetype.md": ("propertyinvestmentprofessionals.com.au",),
-    "docs/kb/lender/485-visa-treatment.md": ("www.homeloanexperts.com.au", "www.professionalhomeloans.com.au",),
-    "docs/kb/lender/documentation-non-resident.md": ("wise.com", "www.homeloanexperts.com.au", "www.odinmortgage.com",),
-    "docs/kb/lender/firb-approval-as-condition-precedent.md": ("wise.com", "www.homeloanexperts.com.au",),
-    "docs/kb/lender/foreign-buyer-deposit-requirements.md": ("www.canstar.com.au", "www.homeloanexperts.com.au",),
-    "docs/kb/lender/hecs-treatment-by-lender.md": ("www.savings.com.au",),
-    "docs/kb/lender/non-resident-friendly-shortlist.md": ("www.canstar.com.au",),
-    "docs/kb/lender/non-resident-investment-loan-shortlist.md": ("www.canstar.com.au", "www.finder.com.au",),
-    "docs/kb/lender/temp-resident-lending-policies.md": ("www.canstar.com.au", "www.homeloanexperts.com.au",),
     "docs/kb/lmi/calculation-for-foreign-persons.md": ("www.homeloanexperts.com.au", "www.professionalhomeloans.com.au",),
     "docs/kb/lmi/calculation.md": ("www.money.com.au",),
     "docs/kb/lmi/providers.md": ("www.canstar.com.au", "www.insurancebusinessmag.com",),
     "docs/kb/loan/offset-vs-redraw-investor.md": ("aintreegroup.com.au",),
     "docs/kb/non-resident/entity-options-au-property.md": ("www.allens.com.au",),
-    "docs/kb/non-resident/investment-loan-deposit-requirements.md": ("www.canstar.com.au", "www.odinmortgage.com",),
     "docs/kb/selling-costs/agent-legal.md": ("whichrealestateagent.com.au", "www.openagent.com.au", "www.yourpropertyguide.com.au",),
-    "docs/kb/tax/income-tax-resident-2026-27.md": ("austax.tools", "www.scalesuite.com.au",),
-    "docs/kb/tax/quantity-surveyor-reports.md": ("tenfoldwealthaccountants.com.au", "www.washingtonbrown.com.au",),
     "docs/kb/visas/au-temporary-residency-classes.md": ("www.minterellison.com",),
     "docs/kb/vn-pdp/cross-border-data-transfer.md": ("eurochamvn.org", "www.dlapiper.com",),
 }
