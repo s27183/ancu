@@ -1,0 +1,60 @@
+Source: https://investor.helia.com.au/DownloadFile.axd?file=%2FReport%2FComNews%2F20250324%2F02927792.pdf
+Retrieved: 2026-10-27
+Extracted: pdftotext -layout of the PDF (Helia Group ASX announcement, Update on CBA Supply and Service contract, 24 March 2025); sha256 of the PDF 95652fbe98ae218d0680870a843d55c8757b407ddd1b5aa5351857a6bab45f5b
+
+               Update on CBA Supply and Service contract
+
+
+24 March 2025: Helia Group Limited (Helia or the Company) (ASX:HLI) provides the following update
+in relation to its Supply and Service contract with the Commonwealth Bank of Australia (CBA).
+
+In June 2024, CBA issued a Request for Proposal (RFP) relating to its external Lenders Mortgage
+Insurance (LMI) requirements. Helia has now been informed by CBA that as part of this process it has
+entered into exclusive negotiations with an alternative provider for the provision of LMI services to the
+CBA group. If those negotiations are successful Helia anticipates that Helia’s current Supply and
+Service contract with CBA will not be renewed beyond the current expiry on 31 December 2025.
+
+Ms Pauline Blight-Johnston, Chief Executive Officer and Managing Director of Helia, said “Together,
+CBA and Helia have helped hundreds of thousands of Australians to buy homes over the last 50 years.
+Given our longstanding and successful relationship with CBA, we are disappointed in this
+development. We would have welcomed the opportunity to continue our partnership.
+
+“Helia presented CBA with a strong offer that balanced the strategic importance of its relationship with
+CBA with the need to maintain adequate returns on equity for our shareholders. We will continue to
+work closely with CBA to ensure that we are supporting both CBA and its borrowers by maintaining our
+high service standards through to December 2025 and beyond.”
+
+Helia will continue to generate Gross Written Premium (GWP) from CBA until the end of FY25 and will
+recognise revenue associated with inforce policies over the next 15 years, in accordance with the
+AASB 17 timing of insurance revenue recognition. Accordingly, the financial impact of ceasing to write
+new business from CBA from FY26 will emerge gradually over time. The LMI business underwritten
+under this contract represented approximately 44 per cent of GWP in FY24. Helia’s previously issued
+guidance remains unchanged.
+
+Helia maintains its commitment to deliver market-leading LMI services and continues to see attractive
+partnership opportunities with new and existing lender customers. Plans for Helia to adapt to the
+expected reduction in the level of future GWP will be progressively implemented, positioning Helia to
+continue to support Australia’s home buyers and lenders into the future.
+
+The absence of new business from CBA from FY26 will likely increase the level of organic capital
+generation and scope for further capital management activity. The Board’s intention remains to return
+to and then operate within the Board target range of 1.40 – 1.60x PCA.
+
+
+
+
+Helia Group Limited ABN 72 154 890 730                                                             Page 1
+For more information, analysts, investors and other interested parties should contact:
+
+Investors:                                         Media:
+Paul O’Sullivan                                    Kath Carty
+Head of Investor Relations                         Head of Corporate Communications
+M: +61 499 088 640                                 M: +61 459 967 747
+
+The release of this announcement was authorised by the Board.
+
+
+
+
+Helia Group Limited ABN 72 154 890 730                                                   Page 2
+

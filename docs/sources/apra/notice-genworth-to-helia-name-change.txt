@@ -1,0 +1,53 @@
+Source: https://www.apra.gov.au/system/files/2023-07/Notice%20that%20general%20insurer%20or%20authorised%20NOHC%20has%20changed%20its%20name%20-%20Genworth%20to%20Helia.pdf
+Retrieved: 2026-10-27
+Extracted: pdftotext -layout of the PDF (APRA notice that general insurer or authorised NOHC has changed its name, Genworth to Helia); sha256 of the PDF 3f8ea2f595b9a5afa6b80dc011b61eadc107933091d1b5029b160a26dc696626
+
+Notice that general insurer or authorised NOHC
+has changed its name
+Insurance Act 1973
+
+I, Vincent Lee, a delegate of APRA, under subsection 29(3) of the Insurance Act 1973 (the
+Act), am satisfied that:
+
+    (a)     Genworth Mortgage Insurance Australia Limited ABN 72 154 890 730, an
+            authorised NOHC, has changed its name to:
+
+                      Helia Group Limited ABN 72 154 890 730
+
+    (b)     Genworth Financial Mortgage Insurance Pty Limited ABN 60 106 974 305, a
+            general insurer, has changed its name to:
+
+                      Helia Insurance Pty Limited ABN 60 106 974 305
+
+    (c)     Genworth Financial Mortgage Indemnity Limited ABN 55 001 825 725, a general
+            insurer, has changed its name to:
+
+                      Helia Indemnity Limited ABN 55 001 825 725
+
+with effect from 15 November 2022.
+
+Under subsection 29(4) of the Act, the authorisations for the general insurers under section
+12 of the Act, and the authorisation for the NOHC under section 18 of the Act, have effect after
+publication of this notice as if they had been granted under their changed names.
+
+This instrument commences on the day it is made.
+
+Date:12 December 2022
+
+
+
+Vincent Lee
+Senior Manager
+Insurance Division
+
+
+Interpretation
+
+APRA means the Australian Prudential Regulation Authority.
+general insurer has the meaning given in section 11 of the Act.
+NOHC is short for non-operating holding company and has the meaning given in subsection
+of 3(1) of the Act.
+authorised NOHC has the meaning given in subsection 3(1) of the Act.
+
+                                                                                       Page 1 of 1
+

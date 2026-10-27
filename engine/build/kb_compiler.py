@@ -333,14 +333,8 @@ KNOWN_SECONDARY = {
     "docs/kb/investor/property-management-fees.md": ("www.canstar.com.au", "www.localagentfinder.com.au", "www.propspotter.com.au",),
     "docs/kb/investor/rental-appraisal-from-pm-agent.md": ("www.canstar.com.au",),
     "docs/kb/investor/target-yield-by-archetype.md": ("propertyinvestmentprofessionals.com.au",),
-    "docs/kb/lmi/calculation-for-foreign-persons.md": ("www.homeloanexperts.com.au", "www.professionalhomeloans.com.au",),
-    "docs/kb/lmi/calculation.md": ("www.money.com.au",),
-    "docs/kb/lmi/providers.md": ("www.canstar.com.au", "www.insurancebusinessmag.com",),
     "docs/kb/loan/offset-vs-redraw-investor.md": ("aintreegroup.com.au",),
-    "docs/kb/non-resident/entity-options-au-property.md": ("www.allens.com.au",),
     "docs/kb/selling-costs/agent-legal.md": ("whichrealestateagent.com.au", "www.openagent.com.au", "www.yourpropertyguide.com.au",),
-    "docs/kb/visas/au-temporary-residency-classes.md": ("www.minterellison.com",),
-    "docs/kb/vn-pdp/cross-border-data-transfer.md": ("eurochamvn.org", "www.dlapiper.com",),
 }
 
 
