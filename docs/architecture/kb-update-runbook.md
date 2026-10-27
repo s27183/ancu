@@ -24,7 +24,7 @@ most "update the KB" asks are Track A.
 
 ## When it runs — triggers and cadence
 
-**Track A is proposed weekly by a routine and published by Son.** The Claude Code
+**Track A is proposed weekly by a routine and published by the kb gate.** The Claude Code
 routine "ancu kb-watch" ([kb-watch-routine.md](kb-watch-routine.md), behavior 57)
 runs every Monday 06:00 AEDT: it takes every doc whose next yearly edition is due,
 then the 30 most overdue docs from the freshness scanner (Phase 0), re-verifies them
@@ -34,7 +34,11 @@ the Home Affairs visa check are proposed daily by the "ancu news-watch" routine
 ([news-watch-routine.md](news-watch-routine.md), behavior 134), one PR a day;
 `scripts/news_watch.py` names what each site in `docs/sources/news-watch.json`
 published since the last run, and the PR accounts for every line (behavior 136).
-It never merges or deploys: Phases 6–7 are Son's merge and deploy. Kind-2 and
+The routines never merge. The kb gate (`.github/workflows/kb-gate.yml`, behavior 74)
+merges a PR whose every change `scripts/kb_gate.py` passes — date-only, a new news
+note, or a figure quoted word for word from a saved primary and re-checked by
+kb-verify — and the merge deploys (Phase 6). Anything else is held as one issue
+assigned to Son, naming each held item and why. Kind-2 and
 kind-3 changes are named in the PR body, not drafted, and are taken up in a session
 (Son + Claude Code) as before — which is also how an external event (a Budget, a
 regime change) is handled between runs.
