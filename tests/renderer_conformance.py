@@ -1,6 +1,20 @@
 #!/usr/bin/env python3
 """Renderer field-conformance gate (shell-side, mirrors the engine's own gates).
 
+Reproducible -> P-7 · One declaration per outcome shape -> Mechanisms -> every declared outcome field read by the shell
+Falsifier (invariants.md P-7): an `outcome_schema` field absent from, or typed
+differently in, the shell's types. This checks presence only; holding P-7 needs it
+extended to compare field types against shell/web/frontend/src/lib/planCard.ts, which
+holds 68 hand-written types mirroring engine outcomes. Why (moved from invariants.md):
+renderers dropped fields the producer computed, and Calculator.svelte's unguarded
+default branch rendered a "cash needed" hero onto cash_flow_projection and
+tax_optimised_structure outcomes it was not built for; this check, added after,
+reported a 30-field backlog. Held by: the blueprint outcome_schema as the single
+declaration, gated by kb_compiler's reference-integrity and type-compat gates; a
+component with no declared schema fails the build at kb_compiler GATE 12, and
+fh_engine_outcome:validate/3 refuses it only as a backstop ({outcome_undeclared, Slug,
+Type}; built 2026-10-06, PR #3); a wrong type name still passes both.
+
 Why this exists: the engine side already has a build-time gate that stops
 docs/blueprint drift from shipping silently — kb_compiler's structural gates
 (slug==path, renderer-in-enum, pipeline-acyclic) plus its semantic gates

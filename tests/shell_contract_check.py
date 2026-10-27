@@ -21,6 +21,12 @@ shell and requires each to be caught, naming file and line; a check that stopped
 biting fails here, not later.
 
     .venv/bin/python tests/shell_contract_check.py [--root <repo>]
+
+Held by (moved from invariants.md): the two-database split (engine-contract.md §9) and
+the shell's engine client (fh_shell_engine_client) as its one path to the engine. No
+failure seen (probed 2026-10-06: the shell backend uses only SHELL_DATABASE_URL,
+fh_shell_db.erl saying so; the SvelteKit frontend reaches the engine only through the
+shell backend's proxy, lib/api.ts).
 """
 
 import argparse

@@ -12,6 +12,15 @@
 %% that sidecar to write its pid, kills it from outside with `kill -9`, then reads the
 %% card's events back over the real SSE surface and from Postgres.
 %%
+%% Why P-3 holds here (moved from invariants.md, measured before 2026-10-06): the Agent
+%% SDK's bundled `claude` binary wrote to fd 1 — the {packet,4} port — corrupting frames
+%% and crashing the decoder (fixed by re-pointing fd 1 at stderr at sidecar start); a stub
+%% that exited before replying became a clean turn_failed ("sidecar exit 0 before reply"),
+%% not a hang. Held by: one disposable port per fill in fh_engine_turn; its exit_status as
+%% the structural death signal (no wall-clock timeout: erlang-design-checklist.md, "15. No
+%% Wall-Clock Timeouts on Supervised Ports"); a hung LLM call bounded in the sidecar by
+%% asyncio.wait_for. Passes: exactly one turn_failed, no partial component or usage.
+%%
 %% Run from the repo root (needs a local port and the seat's private Postgres):
 %%
 %%   bash scripts/live_smoke.sh sidecar_kill_smoke

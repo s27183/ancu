@@ -21,6 +21,13 @@
 %% without the LLM. A separate OS process is not needed: every process cache dies with
 %% the stopped applications (concluded from fh_engine_sup and pgo's own supervision).
 %%
+%% Why P-2 holds here (moved from invariants.md, measured 2026-08-06): Son's usage read
+%% `0 / 1,000,000` after real Q&A turns: fh_shell_usage_consumer bootstrapped its cursor
+%% once, at init/1, from MAX(engine_event_id), and smoke-test fixture rows had pushed that
+%% past every real event; deleting the rows did not recover it until the backend
+%% restarted. Held by: plan_card_events as the record SSE fans out from and replays; the
+%% usage cursor re-derived from the mirror table at start.
+%%
 %% Run from the repo root (needs a local port and the seat's private Postgres):
 %%
 %%   bash scripts/live_smoke.sh restart_replay_smoke

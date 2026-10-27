@@ -16,6 +16,10 @@ changes the mechanism. The shape it takes is the four-slot block below.
 there.** Who does what is `invariants.md` and this file; what each part *is* is the inline documentation in the code that part is
 made of.
 
+This file and `invariants.md` state rules and couplings only. What implements
+them — a module's internals, a measurement, the history of a decision — lives
+in the four-slot block beside the code, citing the rule; git keeps the rest.
+
 A coupling here with no reason behind it was inherited — it gets a reason or it
 gets removed. That is the test, and it is worth running on this table
 deliberately, because an architecture nobody deletes from becomes a picture
@@ -33,17 +37,17 @@ waiting for a session end.
 | **Secrets** | this repo's `.env`, never committed | each developer, by hand | never in the repo or a model's context |
 | **Mechanisms** — the checks that hold the design: tests, lint, CI, hooks | the repo's own tooling; a developer's local tools besides | code; no model in the loop | what a document cannot hold is code: a check, a hook |
 | **The engine** — the planning engine: `/api/engine/*` HTTP/SSE, one `fh_engine_turn` per card turn, resolver and agent fills, the compliance pipeline, `usage` metering | `engine/erlang/` | its developers, in commits | P-1–P-6; `docs/architecture/engine-contract.md` |
-| **The sidecar** — the planner the engine spawns per fill, over a `{packet,4}` port; its model can only answer: no built-in tool (the Q&A has only kb_lookup), an empty cwd, no transcript written, and an env with no engine secret (`_model_options`, `sidecar_env_keep`; behavior 140, measured 2026-10-27) | `engine/python/` | its developers, in commits | P-3, R-4 |
+| **The sidecar** — the planner the engine spawns per fill, over a `{packet,4}` port; its model can only answer: no built-in tool (the Q&A has only kb_lookup), an empty cwd, no transcript written, and an env with no engine secret (`_model_options`, `sidecar_env_keep`) | `engine/python/` | its developers, in commits | P-3, R-4 |
 | **The engine database** — `plan_card_events` (the record), `plan_cards`, `usage` events, the `suburbs` + `suburb_sources` tables | Postgres, `ENGINE_DATABASE_URL`; migrations in `engine/erlang/priv/migrations/` | the engine; the suburb tables by the suburb adapters | P-2; `engine-contract.md` §9.1 |
 | **The KB** — fact docs, bilingual copy, news notes, blueprints, and the archived primaries they cite; every URL a KB doc carries passes kb_compiler's primary gate (GATE 17: a strict https host match against a per-doc primary map — government and law hosts for any doc, a provider's own site for the docs it prices — which scripts/kb_gate.py imports) | `docs/kb/`, `docs/blueprints/`, `docs/sources/` | the KB update (`docs/architecture/kb-update-runbook.md`, Track A): news proposed daily by the news-watch routine (its sources and window in `docs/sources/news-watch.json`, read by `scripts/news_watch.py`), facts re-checked weekly by kb-watch, each as a PR merged by Son (`docs/architecture/news-watch-routine.md`, `docs/architecture/kb-watch-routine.md`) | the goal's *regulated figures are grounded* and *bilingual* properties; P-7 |
 | **The KB compiler** — gates the KB and emits the artifact the engine loads at boot | `engine/build/kb_compiler.py` → `engine/erlang/priv/kb/artifact.json` | its developers; the artifact by the compiler only — untracked (`.gitignore`), rebuilt from `docs/` at deploy, so git holds the docs and never the artifact | P-7; the goal's *reproducible* property |
 | **The suburb adapters** — per-source batch ingest into the suburb tables | `engine/build/suburbs/` | their developers (`docs/architecture/suburb-adapter-workflow.md`, Track B), rerun by Son when the monthly suburb-watch routine's issue names a newer release (`docs/architecture/suburb-watch-routine.md`) | the goal's *honest-partial* property |
 | **The shell backend** — identity, commerce, the usage gate, the engine proxy | `shell/web/backend/` | its developers, in commits | P-4–P-6; `docs/architecture/billing.md` |
 | **The shell database** — subscriptions, `usage_records`, charges, users | Postgres, `SHELL_DATABASE_URL`; migrations in `shell/web/backend/priv/migrations/`, sha256-guarded | the shell backend | P-2, P-5 |
-| **The web frontend** — the SvelteKit SPA: the home (three ways in: plan, explore, news; behaviors 81, 88), the planner page (the plans list, behavior 96; onboarding, plan projection, chat), the map page, the News page, the news band on every page; an open page follows a deploy without a reload — news, facts and terms re-read in place when the engine's KB hash (`/api/version`) moves, a new bundle loaded at the next page move or tab return (behavior 135); the public pages — the home, News, Facts and one `/news/<slug>` page per note — are written at build from the compiled KB artifact into copies of the SPA shell, each with its title, description, canonical link, JSON-LD and text that crawlers read without script, with robots.txt, sitemap.xml and llms.txt; live content still comes through `/api` (behavior 137) | `shell/web/frontend/` | its developers, in commits | P-4, P-6, P-7 |
+| **The web frontend** — the SvelteKit SPA: the home (three ways in: plan, explore, news), the planner page (the plans list; onboarding, plan projection, chat), the map page, the News page, the news band on every page; an open page follows a deploy without a reload — news, facts and terms re-read in place when the engine's KB hash (`/api/version`) moves, a new bundle loaded at the next page move or tab return; the public pages — the home, News, Facts and one `/news/<slug>` page per note — are written at build from the compiled KB artifact into copies of the SPA shell, each with its title, description, canonical link, JSON-LD and text that crawlers read without script, with robots.txt, sitemap.xml and llms.txt; live content still comes through `/api` | `shell/web/frontend/` | its developers, in commits | P-4, P-6, P-7 |
 
 **Where the code is.** One repo: the ground at `docs/design/`, the code
-beside it, and the rest of `docs/` the team's (Son, 2026-09-28). The tools read
+beside it, and the rest of `docs/` the team's. The tools read
 the whole repo outside `docs/` as code. One indented line in this file narrows
 that, and the linter warns (W15) when a path it names is not there:
 
@@ -79,12 +83,28 @@ W24 until answered):
 
     behaviors: `<command>` | none yet
 
-A behavior that needs another repo meets it at a **contract**. Each repo owns
-its own behaviors; the provider's contract is runnable on its side, the
-consumer checks against recorded examples of it, and a change to it is
-announced to each consumer by an issue before it lands. One line per contract:
+A behavior that needs another repo, or another team's part of this one, meets
+it at a **contract**. Each side owns its own behaviors. The provider declares
+the contract in its code, and the contract file is generated from those
+declarations, never written by hand: a test fails when the committed file
+differs from what the code declares, or when something it serves is
+undeclared. Each side is checked on every PR — the provider's tests fail when
+a real reply leaves its declaration, the consumer's when a call or a fake reply
+leaves the contract file — and the ground says what no test runs (a consumer
+against the real provider, say). A change is announced to each consumer before
+it lands: to another repo by an issue; inside this one by the consuming team's
+review, as code owners of the contract's path — where the host does not enforce
+that review, the ground says it is the team's rule. One line per contract, the
+repo this one's own when both sides are here:
 
     contract: <path> provides|consumes <repo>
+
+A project whose goal and invariants are another repo's — its invariants.md
+points there and restates none — names that repo, so a `Design:` line naming
+an invariant it lacks is read there, by that repo's commits since Son's
+confirm:
+
+    ground: <path to the repo whose goal and invariants these are>
 
 ### The four-slot block
 
@@ -178,18 +198,17 @@ no thing to ask and is not covered.
 A branch per behavior, a draft PR, Son merges; no CI, CONTRIBUTING or PR
 template (probed 2026-10-06). The done checks run from the repo root, offline —
 no LLM, no live stack, a few seconds each (all passed at 26f811d). `renderer_conformance.py`
-joined them with behavior 30 (2026-10-08): an outcome field no frontend file names fails
+joined them: an outcome field no frontend file names fails
 it, unless it is allowlisted with the component that reads it or listed as not yet produced. The escript
 smokes under `engine/erlang/test/` and `shell/web/backend/test/` need Postgres
 and some the planner; a behavior runs the ones it touches. The conformance escripts are the exception: offline, so
 `scripts/conformance_sweep.sh` runs all of them as the last done check (about
 8 s, measured 2026-10-06), after `kb_compiler.py` has emitted the artifact it
 reads. Offline means no Postgres, no planner, no `.env`: a conformance escript may
-open loopback ports for its own stubs, as the shell's `sse_cancel_conformance` does
-(behavior 29; the sweep took 13 s with it, measured 2026-10-08).
+open loopback ports for its own stubs, as the shell's `sse_cancel_conformance` does.
 `scripts/done_checks.sh` runs this line as written; CI runs that script on every pull
 request into `main`, and a ruleset makes its status "done checks" required, because a
-merge into `main` is a deploy (behavior 38, 2026-10-09).
+merge into `main` is a deploy.
 
     checks: `.venv/bin/python tests/validate_build.py`; `.venv/bin/python tests/kb_quote_check.py`; `.venv/bin/python tests/kb_gate_eval.py`; `.venv/bin/python tests/resolver_eval.py`; `.venv/bin/python tests/eligibility_benefit_eval.py`; `.venv/bin/python tests/cash_duty_eval.py`; `.venv/bin/python tests/mortgage_eval.py`; `.venv/bin/python tests/ownership_eval.py`; `.venv/bin/python tests/bilingual_eval.py`; `.venv/bin/python tests/terms_coverage.py`; `.venv/bin/python scripts/visa_watch.py --self-test`; `.venv/bin/python scripts/news_watch.py --self-test`; `.venv/bin/python tests/outcome_validate.py`; `.venv/bin/python tests/shell_contract_check.py`; `.venv/bin/python tests/sidecar_options_check.py`; `.venv/bin/python scripts/kb_gate.py --self-test`; `.venv/bin/python tests/renderer_conformance.py`; `.venv/bin/python scripts/doc_links.py docs`; `(cd engine/erlang && rebar3 compile)`; `(cd shell/web/backend && rebar3 compile)`; `(cd shell/web/frontend && npm run check)`; `(cd shell/web/frontend && npm test)`; `(cd shell/web/frontend && npm run build && node scripts/seo_check.ts)`; `bash scripts/conformance_sweep.sh`; `! git ls-files -- ':(glob,icase)**/claude.md' ':(glob,icase)**/agents.md' | grep .`
     attribution: co-author+session
@@ -207,12 +226,9 @@ a coupling held by nothing is a hope, and naming it here does not make it hold.
 | a blueprint/mode is added | a `fh_engine_turn:base_components/1` clause, onboarding `blueprint_for`, a `plan_cards.mode` CHECK migration, every shared renderer's shape branch, the `ui_tabs` kind it lands under, and a live seam smoke | by hand, as the mode is built | nothing: a missing slug falls through to Mode A (`fh_engine_turn.erl`), and `006_mode_e.sql` was found missing only by a live POST |
 | a KB doc is re-anchored to a new slug or lookup key | every blueprint `KB anchors:` line, plus resolver literals (`fh_engine_mortgage.erl` `?TAX`/`?HECS` and lookup keys, `fh_engine_fill.erl`'s provenance list) and the conformance escripts | grep the old slug across `engine/erlang` | nothing: the compiler cannot see Erlang literals |
 
-Rows two and three: Son agreed 2026-10-06, homed from earlier sessions' memory.
-
 ## Design rules
 
-Hold everywhere in this repo (Son agreed 2026-10-06, homed from the harness
-memory of earlier sessions):
+Hold everywhere in this repo:
 
 - **Enforce at chokepoints.** A rule is enforced where every artifact crosses
   (the compiler; the turn's commit seam). The check discovers what to check
@@ -233,8 +249,6 @@ memory of earlier sessions):
   to one byte and `json:encode` crashes, so VI copy is byte-fragile in both
   Erlang parts. Nothing checks this today.
 
-Added 2026-10-08 from the rest of that memory (Son left the choice to the goal):
-
 - **A fail-closed check is proven by a planted violation.** A check that fails
   closed is shown to fail on a violation planted for it (as
   `tests/shell_contract_check.py` does), not only by a green run.
@@ -251,29 +265,23 @@ Added 2026-10-08 from the rest of that memory (Son left the choice to the goal):
   the issuing body with its currency marker (an Authorised Version No., a dated
   schedule); a secondary aggregator never supplies the figure.
 
-Added 2026-10-16 (behavior 93; Son: too much text at first look on a plan):
-
 - **A planning sheet does one job.** Every sheet of the plan shows one job, its
   figure first, and the rest one tap down: no explanatory subtitle, an estimate
   as one small mark keyed once at the foot, the lines a total leaves out after
   one quiet divider, and every notice (the guest's, the disclaimer) one line —
   shortened, never removed. One thing may sit above the budget's figure: the
   line naming the numbers it rests on ("Tài chính của bạn: giá · cọc", and the
-  cash verdict once typed), which opens where they are changed (behavior 108,
-  2026-10-17: you read your numbers before the result), and under it the hold
-  chips, the input the figure is for (behavior 109). A sheet that takes inputs
+  cash verdict once typed), which opens where they are changed, and under it the hold
+  chips, the input the figure is for. A sheet that takes inputs
   has one submit, pinned at its foot, which saves what changed and goes back
   one level — no preview to confirm, no reset; the floating menu shows only on
   a place's top sheet (Ngân sách, Hành trình), never on one under it.
-
-Added 2026-10-17 (behavior 106; Son's friend could not find her way back to a plan's
-overview):
 
 - **A sheet goes back one level, from one button.** Every level of the planner — the
   list, a plan's hub, Ngân sách or Hành trình, a phase sheet or a step — is one history
   entry, and the head's single back button names the level above ("‹ Ngân sách") and
   is the browser's back. No sheet draws a second way back in its body, and nothing
-  relies on a swipe (Son: the iPhone back-swipe is hard to use).
+  relies on a swipe.
 
 ## What is deliberately not coupled
 
@@ -285,7 +293,7 @@ worth stating, with the reason — otherwise the next reader couples it.
 *Empty at plant.* What this document describes that does not exist yet, so a
 reader can tell a plan from a mechanism.
 
-<!-- planted from the enacs seed @ c38bd97; edit below freely — `plant.py --dry-run` reports what changed upstream -->
+<!-- planted from the enacs seed @ b71c1a5; edit below freely — `plant.py --dry-run` reports what changed upstream -->
 
 ## Where this project's existing design lives
 
@@ -302,4 +310,4 @@ into a block beside its mechanism (`/migrate`), and nothing here is ground until
 - `git issue list` — the open findings carried out of `grounding-checklist.md` (#1–#6)
 - harness memory, `~/.claude*/projects/-Users-son-s2718-firsthomey/memory/` — 76 files,
   no longer loaded; 40 of them are cited from tracked docs as `[[name]]` links
-- no root memory file: a `claude.md` or `agents.md` (any case, any depth) is never tracked — what a session reads about this project is `docs/design` (Son 2026-10-27, behavior 141; the last done check holds it)
+- no root memory file: a `claude.md` or `agents.md` (any case, any depth) is never tracked — what a session reads about this project is `docs/design` (the last done check holds it)
