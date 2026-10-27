@@ -1,5 +1,5 @@
-// Pure (framework-free) onboarding model — the domestic capture set (CLAUDE.md
-// constraint #1 plan-first; shell-architecture.md §7). The map gives the state + zone
+// Pure (framework-free) onboarding model — the domestic capture set (The goal,
+// plan-first; shell-architecture.md §7). The map gives the state + zone
 // (plan cards pin to a zone); onboarding adds the intent choice (owner_occupier → Mode A
 // FHB; investment → Mode C domestic investor — mode-c-wedge.md P5-activate), a
 // mode-qualifying gate, and a target budget band. The chosen intent selects the engine

@@ -49,7 +49,7 @@
         components.investment_strategy?.outcome as StrategyThesisOutcome | undefined
     );
     // Modes B/D only — firb_workflow doesn't exist for A/C/E. FIRB status is a first-class
-    // headline (CLAUDE.md #10 — "build the gate into the architecture, not as a disclaimer"),
+    // headline (every flow branches on it — the gate is built into the architecture, not as a disclaimer),
     // so it's presence-gated onto the Overview grid the same way `scheme`/`existingHome` are,
     // not left for the Flow tab alone to surface (task 9, plan-card-lifecycle-restoration §11.3
     // "overview" now lists firb_workflow for Mode D, mirroring how Mode A's overview lists

@@ -26,17 +26,17 @@ sources:
 
 ## What the project's standing constraint says
 
-The project's governing document (CLAUDE.md, "Hard regulatory constraints" + "Don't") still names **Decree 13/2023**: do not store Vietnam-located user data outside Vietnam without a PDP compliance review, and plan VN-side data residency for Wedge 2. The constraint's substance carries over to Law 91/2025/QH15 — the instrument it names has been replaced. This doc does not change that scope; it surfaces the same deferral to the Mode-B KB layer.
+The project's goal (`docs/design/invariants.md`, The goal) holds that a Vietnam-located user's data leaves Vietnam only under Law 91/2025/QH15 and Decree 356/2025/NĐ-CP, and that VN-side data residency is reviewed before VN-located users are onboarded. This doc does not change that scope; it surfaces the same deferral to the Mode-B KB layer.
 
 ## What is PENDING (the placeholder — and why it stays a placeholder, not an assertion)
 
 - **Whether/how the current engine's handling of a VN-side funder's documents (identity, source-of-funds evidence, uploaded under `family_context`/`cross_border_funding`) is a "cross-border transfer" under Art. 20 of the Law**, and if so, what the platform's impact-assessment dossier and filing look like. This is a legal-compliance determination, not something a KB doc can assert.
-- **The data-residency architecture** for VN-located user data (where it is collected, processed, and stored) — named as a Wedge-2 item in CLAUDE.md, not yet decided.
+- **The data-residency architecture** for VN-located user data (where it is collected, processed, and stored) — named as a Wedge-2 item in The goal, not yet decided.
 - Asserting "here is how the platform handles your data" before that review would **bury an unmade compliance decision** behind KB content ([[honest-deferral-not-rug]]) — this doc deliberately does not do that.
 
 ## Named re-ground obligation
 
-- The **Wedge-2 VN-side data-residency compliance review** already named in CLAUDE.md (identity-layer unification trigger) — this doc's operational content activates when that review lands, reading Law 91/2025/QH15 and Decree 356/2025/NĐ-CP.
+- The **Wedge-2 VN-side data-residency compliance review** already named in The goal (identity-layer unification trigger) — this doc's operational content activates when that review lands, reading Law 91/2025/QH15 and Decree 356/2025/NĐ-CP.
 - **VN legal/data-privacy counsel** — the same Mode-B counsel-gated blocker (strategy §9) as the capital-controls siblings, extended to data protection.
 
 ## Buyer / funder pointer (what the plan says today)
@@ -54,7 +54,7 @@ Pure-reference (`fills: []`), and — like `kb.fx.loan-currency-considerations` 
     "is_placeholder": { "type": "bool", "value": true, "provenance": "CONVENTION", "note": "PLACEHOLDER — this doc's operational content (whether/how the engine's VN-funder data handling is a cross-border transfer under Law 91/2025/QH15 Art. 20, and the resulting impact-assessment dossier) is not sourced; structure built, decision pending." },
     "decree_13_applies_to_vn_located_participants": { "type": "bool", "value": true, "provenance": "REGULATED", "note": "Name kept for the engine; Decree 13/2023 is repealed from 1 January 2026 (Decree 356/2025/NĐ-CP Art. 42(2)). The Personal Data Protection Law, Law 91/2025/QH15 (in force 1 January 2026, Art. 38(1)), now governs and applies to foreign bodies that directly take part in or are involved in processing Vietnamese citizens' personal data (Art. 1(2)(c)) — including a VN-side funder/parent's data in a Mode-B plan." },
     "cross_border_transfer_requires_impact_assessment_and_notification": { "type": "bool", "value": true, "provenance": "REGULATED", "note": "Law 91/2025/QH15 Art. 20(2): the transferring party prepares a cross-border transfer impact assessment dossier and sends one original to the personal data protection authority within 60 days of the first transfer; Art. 20(1)(c) counts using a platform outside Vietnam to process personal data collected in Vietnam as a transfer. Decree 356/2025/NĐ-CP implements the Law." },
-    "vn_data_residency_is_a_wedge_2_item_not_built_now": { "type": "bool", "value": true, "provenance": "CONVENTION", "note": "the platform's own compliance posture (data residency architecture, whether current handling is a cross-border transfer) is explicitly out of Wedge 1a scope per CLAUDE.md's Don't-list; this doc surfaces that deferral into the Mode-B KB layer rather than deciding it here." },
+    "vn_data_residency_is_a_wedge_2_item_not_built_now": { "type": "bool", "value": true, "provenance": "CONVENTION", "note": "the platform's own compliance posture (data residency architecture, whether current handling is a cross-border transfer) is explicitly out of Wedge 1a scope per The goal; this doc surfaces that deferral into the Mode-B KB layer rather than deciding it here." },
     "no_data_residency_guarantee_asserted_to_buyer": { "type": "bool", "value": true, "provenance": "CONVENTION", "note": "the buyer-facing disclosure states that data-handling practices are under active compliance review, and never asserts a specific residency/handling guarantee the platform has not yet built — avoids burying an unmade compliance decision behind KB content." }
   }
 }
@@ -64,7 +64,7 @@ Notes:
 
 - **No `fills`; a labelled-placeholder + boundary doc.** The REGULATED-tier facts here (the Law is in force; it applies to foreign processors of Vietnamese citizens' data; a cross-border transfer needs an impact-assessment dossier filed within 60 days) are read from the Law's and Decree's own text in the Official Gazette (Công báo), archived 2026-10-27. The *application to this platform's specific data flows* is the pending piece.
 - **The parameter name `decree_13_applies_to_vn_located_participants` is kept** because the compiled artifact carries it; its note says the Law now governs. Renaming it is an engine-side change.
-- **This is the one VN-side placeholder that is also a platform-architecture deferral, not only a buyer-facing information gap.** Its re-ground trigger is explicitly the Wedge-2 data-residency review already named in CLAUDE.md — don't build ahead of that review by inventing a data-handling answer here.
+- **This is the one VN-side placeholder that is also a platform-architecture deferral, not only a buyer-facing information gap.** Its re-ground trigger is explicitly the Wedge-2 data-residency review already named in The goal — don't build ahead of that review by inventing a data-handling answer here.
 - **Consumer:** `family_context` / `cross_border_funding` (component 7) — grounds the agent's data-handling disclosure to a VN-located participant; no specific outcome field consumes a value (a boundary/awareness doc, like `kb.fx.loan-currency-considerations`).
 
 ## Sources

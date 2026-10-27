@@ -386,7 +386,7 @@ and Mode D names it `investor_profile_foreign` — **a bug that predates this we
 Mode-C wedge P3 (2026-06-27) and never caught because Mode B/C's own "full-stack live-verified" P4/P5
 claims were HTTP/SSE/JSON-level (creating a card via the API, polling events, asserting outcome
 shape), not actual browser-rendered pixels — the shell's own onboarding form is still Mode-A-only
-(per `CLAUDE.md`), so nobody had loaded an `investor_profile` card in a real browser until this pass.
+(as the project notes then said), so nobody had loaded an `investor_profile` card in a real browser until this pass.
 Two fixes, both mechanical bug fixes proceeded directly (reversible local edits, not a design call):
 
 1. **`SummaryCard.svelte`'s reach-bar branch** was `{#if componentId === 'buyer_profile'}` / else =

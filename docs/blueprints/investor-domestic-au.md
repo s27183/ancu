@@ -866,8 +866,8 @@ Same as [Mode A due_diligence](fhb-domestic-au.md#7-due_diligence) with these ad
   "type": "risk_assessment_investor",
   "fields": {
     // honest-partial signal. `pending_upload` until the user supplies the due-diligence documents
-    // (rental appraisal, depreciation quote, lease) — the upload pipeline is NOT built (CLAUDE.md
-    // item 9; the only Phase-B input today is the source-supplied property_card of neutral property
+    // (rental appraisal, depreciation quote, lease) — the upload pipeline is NOT built (Wedge
+    // 1c; the only Phase-B input today is the source-supplied property_card of neutral property
     // facts, not the user's uploaded documents). `reviewed` once documents are uploaded + assessed →
     // the document-risk surfacing (high_severity_flags, the negotiation lever, the lease-interpretation
     // agent leaf) lights up. Deferred to a separate cross-contract unit (mode-c-wedge.md "due_diligence B").

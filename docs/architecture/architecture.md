@@ -195,7 +195,7 @@ Each component represents an **atomic unit of agent reasoning** — a coherent g
 
 The key abstraction: downstream components read **outcomes** (curated, structured), not upstream parameters (raw, hierarchical). This makes the pipeline composable, the agent's reasoning bounded, and migrations tractable.
 
-**Outcomes carry facts, not verdicts.** An upstream outcome exposes *normalised facts* — residency, age, ownership history, income, derived financials — never the result of applying a particular scheme's rules to them. A verdict ("FHG-eligible") is produced by the component that *owns* those rules (`eligibility`), in base or per-property scope, and is never pre-baked into a profile that the rule-owning component then reads from. One place owns each rule; the same facts feed every scheme's predicate; the judgment is auditable where it is made. (This is the component-flow rule in [CLAUDE.md](../../CLAUDE.md): *profile holds facts; downstream reasons about facts*.)
+**Outcomes carry facts, not verdicts.** An upstream outcome exposes *normalised facts* — residency, age, ownership history, income, derived financials — never the result of applying a particular scheme's rules to them. A verdict ("FHG-eligible") is produced by the component that *owns* those rules (`eligibility`), in base or per-property scope, and is never pre-baked into a profile that the rule-owning component then reads from. One place owns each rule; the same facts feed every scheme's predicate; the judgment is auditable where it is made. (This is the component-flow rule of §11.9: *profile holds facts; downstream reasons about facts*.)
 
 #### Component structure (template)
 

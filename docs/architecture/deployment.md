@@ -322,7 +322,7 @@ behavior 38).
 | **`FH_DEPLOY_COMMIT_SHA` injection** | image defaults `"unknown"` | DO can't auto-inject the git SHA on `deploy_on_push`; build via CI with `--build-arg` for a real audit SHA (constraint #6). |
 | **DNS + custom domains + DKIM/SPF** | Resend verified (`maiancu.com`) | `api` CNAME + the Pages custom domain `maiancu.com` (behavior 33). |
 | **Dev databases** | no backups, app-only, destroyed with the app | convert each to a managed database before real user data matters; check its connection limit against the pool size (10) if pools error. |
-| **VN data residency (Decree 13/2023)** | out of Wedge-1a scope | Wedge 1a is Mode A (AU users); plan VN-side residency from Wedge 2 before onboarding VN-located users (CLAUDE.md). |
+| **VN data residency (Law 91/2025/QH15, Decree 356/2025)** | out of Wedge-1a scope | Wedge 1a is Mode A (AU users); plan VN-side residency from Wedge 2 before onboarding VN-located users (The goal, [invariants.md](../design/invariants.md)). |
 | **Stripe / commerce** | **landed (8-S5)** | shell-only secrets (`STRIPE_SECRET_KEY`/`STRIPE_WEBHOOK_SECRET`/`STRIPE_PRICE_*`) now in `shell/web/app.yaml` §3; engine carries none (it meters; the shell gates). |
 
 ---

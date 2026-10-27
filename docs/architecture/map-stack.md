@@ -11,7 +11,7 @@
 
 The home surface (8-S2) is a full-bleed suburb-intelligence map; the **Vietnamese-community-proximity layer is the killer layer** and ships first. The decision is bound by three project constraints, not by map-framework fashion:
 
-- **Independence / lean cost** (CLAUDE.md: independent, paid by users). A per-map-load meter or a mandatory vendor account is a commercial dependency baked into the home screen — disqualifying for the default basemap and tile path.
+- **Independence / lean cost** (The goal: independent, paid by users). A per-map-load meter or a mandatory vendor account is a commercial dependency baked into the home screen — disqualifying for the default basemap and tile path.
 - **What the data *is* today vs. where it goes.** Verified against the dev engine DB this session: `suburbs` holds **0 polygons / 15,329 centroids** — the ABS-ASGS polygon/mesh-block mechanism was deferred ([[decompose-build-unit-by-mechanism]]). So **v1 is a point/bubble layer at centroids**, sized/coloured by `vietnamese_ancestry_pct` (with `seifa_irsad_decile`, `crime_incidents_per_1000`, `census_total_persons` as toggles). When polygons land, the killer layer wants a real **choropleth** — the engine choice must not have to change then.
 - **Svelte 5.** The frontend is a Svelte 5 + runes SPA ([[firsthomey-svelte-conventions]]). The integration mechanism, not the library, is what Svelte cares about (§3).
 

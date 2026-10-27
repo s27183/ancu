@@ -202,7 +202,7 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
     "funds_provenance": {
       "deposit_source": { "type": "enum", "options": ["genuine_savings", "family_gift", "family_loan", "sale_of_asset", "inheritance", "mixed"], "value": "<initial>", "note": "F5 — where the deposit comes from, distinct from the AMOUNT (family_gift_or_loan_amount). Source drives BOTH the lender's genuine-savings test and AUSTRAC source-of-funds expectations." },
       "cross_border_transfer": { "type": "bool", "value": false, "note": "F5 — true if any deposit funds are transferred from overseas (e.g. parents in Vietnam)." },
-      "transfer_channel": { "type": "string", "value": "<initial>", "note": "F5 — the licensed channel for any cross-border transfer (bank / Wise / OFX / partner bank). VN capital controls: the route must be SBV-compliant; we educate on legitimate channels and never recommend informal ones (CLAUDE.md hard constraint). Informational only — we are never custodian of funds (AUSTRAC)." }
+      "transfer_channel": { "type": "string", "value": "<initial>", "note": "F5 — the licensed channel for any cross-border transfer (bank / Wise / OFX / partner bank). VN capital controls: the route must be SBV-compliant; we educate on legitimate channels and never recommend informal ones (The goal: never custodian of funds). Informational only — we are never custodian of funds (AUSTRAC)." }
     }
   },
   "debts": {
@@ -242,7 +242,7 @@ UI tab assignment is a presentation concern; the blueprint defines the data mode
     "foreign_sourced_income_component": "money_per_year",  // F6 — offshore/FX portion lenders may haircut or exclude; mortgage_finance reads this, not just the total
     "approx_borrowing_capacity": "money_range",       // computed from combined income − debts
     "deposit_ready_for_purchase_amount": "money",     // cash + family + FHSS available
-    "debts": "{ hecs_balance, credit_card_limits_total, personal_loans_balance, car_loan_balance, buy_now_pay_later_balance } | null",  // raw debt facts (balances/limits) the serviceability resolver reads — profile HOLDS facts, mortgage_finance reasons over them (§11.9; CLAUDE.md "Don't merge debts into mortgage params"). Closes the pipeline's `mortgage_finance ◄── profile (incl. debts)` contract. null until captured on a refine turn (honest-partial).
+    "debts": "{ hecs_balance, credit_card_limits_total, personal_loans_balance, car_loan_balance, buy_now_pay_later_balance } | null",  // raw debt facts (balances/limits) the serviceability resolver reads — profile HOLDS facts, mortgage_finance reasons over them (§11.9: debts never merge into mortgage params). Closes the pipeline's `mortgage_finance ◄── profile (incl. debts)` contract. null until captured on a refine turn (honest-partial).
     // purchase-target facts (onboarding) — base-scope cap + cash checks run against these
     "target_price_range": "money_range",
     "target_zone": "array<string>",

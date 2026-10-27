@@ -249,7 +249,7 @@ Walk concrete *future* changes through the design; show the enumerate-approach m
   deliberately **not** extended: it indexes the major architecture/strategy docs, not the tier of
   implementation design notes (eligibility-resolution, mortgage-finance-two-path, bilingual-content
   are likewise absent) — adding only these two would be inconsistent. The hub (structure-map) is
-  the right home for built-structure discovery; CLAUDE.md and the grounding-checklist carry the
+  the right home for built-structure discovery; the docs index carries the
   pointers.
 
 ## 13. Placement & provenance — the next clause (the two-spines reframe)

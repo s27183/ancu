@@ -38,6 +38,26 @@ Wedge 1c (URL paste, extension), a per-property path for Modes A and D, and
 the work waiting on it come after launch; work before launch fixes what is
 built and adds no mode or wedge.
 
+What the product is and is not (carried from the retired root memory file,
+behavior 141, 2026-10-27; each sentence stands on Son's word at its Expect 6):
+
+- **Plan-first.** The base plan needs no property: a plan card is created and
+  filled with no property data, and a property attaches to it as an addendum.
+  The plan card is the central artifact, never a property card.
+- **No property scraping.** The platform runs no property-data acquisition: a
+  single page is fetched only when a user pastes its address, and property
+  data otherwise comes from public feeds, curation and partners.
+- **Never custodian of funds.** The platform never holds or moves a user's
+  money; money moves only through licensed partners (AUSTRAC). A cross-border
+  transfer is explained through legitimate channels under SBV capital
+  controls, never an informal one.
+- **The agent grounds in the plan card's current state.** Its context is the
+  card's state, the user's question and the KB, never the conversation
+  history, which is kept for the user to re-read.
+- **Vietnam-located users' data.** It leaves Vietnam only under Law
+  91/2025/QH15 and Decree 356/2025/NĐ-CP (impact assessment and filing);
+  VN-side data residency is reviewed before VN-located users are onboarded.
+
 | Property | Falsified by |
 |---|---|
 | **Regulated figures are grounded** | a duty, grant, cap or fee on a plan card that differs from the official calculator, was written by the LLM rather than the resolver, or traces to a KB doc with no `sources:` |

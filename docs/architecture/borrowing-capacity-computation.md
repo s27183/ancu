@@ -4,7 +4,7 @@
 
 This doc owns the **arithmetic** that fills `mortgage_finance.expected_borrowing_capacity` — what a lender may lend this household. Since behavior 98 (2026-10-16) it no longer gates the full-horizon chain: `disposition.loan_payout` is amortised from the price less the plan's deposit (the same loan as the Own-phase repayments), so an $800k home with a 5% deposit is a $760,000 loan, not the capacity. It is the resolver half of a **two-path** component; the agent half (qualitative lender fit) is owned by [`mortgage-finance-two-path.md`](mortgage-finance-two-path.md), which defers the formula to here.
 
-> **Regulated figure.** Capacity is a number a Mode-A buyer will plan their whole purchase against, and it is the sharpest ASIC surface in the base plan (no credit advice without an ACL — CLAUDE.md hard constraints). It is **resolver-computed and removed from the LLM's reach** ([agentic-boundary §98](agentic-boundary.md)). The correctness criterion is the same as its siblings: the verifiable inputs (the 2025-26 tax schedule, the Medicare levy, the APRA buffer, the HECS schedule) reproduce the official figures to the dollar; the genuinely-unsourced inputs (the HEM living-expenses band, the credit-card repayment band) are **labelled conventions**, and the output **band** is their surfaced uncertainty — never averaged away into a false point ([[verify-regulated-figures-by-postcondition]]).
+> **Regulated figure.** Capacity is a number a Mode-A buyer will plan their whole purchase against, and it is the sharpest ASIC surface in the base plan (no credit advice without an ACL — The goal's advice boundary, [invariants.md](../design/invariants.md)). It is **resolver-computed and removed from the LLM's reach** ([agentic-boundary §98](agentic-boundary.md)). The correctness criterion is the same as its siblings: the verifiable inputs (the 2025-26 tax schedule, the Medicare levy, the APRA buffer, the HECS schedule) reproduce the official figures to the dollar; the genuinely-unsourced inputs (the HEM living-expenses band, the credit-card repayment band) are **labelled conventions**, and the output **band** is their surfaced uncertainty — never averaged away into a false point ([[verify-regulated-figures-by-postcondition]]).
 
 ---
 
@@ -16,7 +16,7 @@ This doc owns the **arithmetic** that fills `mortgage_finance.expected_borrowing
 expected_borrowing_capacity : money_range | null   — banded; null until income is known
 ```
 
-**Inputs.** Read from the **`profile` outcome** (the flat projection of `facts_jsonb.household_financials`, [fact-model-unification.md §97](fact-model-unification.md)), never from `mortgage_finance`'s own params (CLAUDE.md: profile holds facts, mortgage reasons about facts):
+**Inputs.** Read from the **`profile` outcome** (the flat projection of `facts_jsonb.household_financials`, [fact-model-unification.md §97](fact-model-unification.md)), never from `mortgage_finance`'s own params ([architecture.md §11.9](architecture.md): profile holds facts, mortgage reasons about facts):
 
 ```
 profile.assessable_income            : money         — shaded combined household income

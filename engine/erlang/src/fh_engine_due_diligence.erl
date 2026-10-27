@@ -8,7 +8,7 @@
 %%
 %% HONEST-PARTIAL ([[base-turn-honest-partial-output]], [[honest-deferral-not-rug]]). The DEFINING
 %% risk-*surfacing* output — high_severity_flags, the negotiation lever, the lease-interpretation
-%% concern — depends on UPLOADED DOCUMENTS, and the upload pipeline is NOT built (CLAUDE.md item 9;
+%% concern — depends on UPLOADED DOCUMENTS, and the upload pipeline is NOT built (Wedge 1c;
 %% the only Phase-B input today is the source-supplied property_card of neutral PROPERTY facts,
 %% not the user's uploaded documents — a distinct input surface, mode-c-wedge.md "due_diligence B").
 %% So this resolver fills the KNOWABLE STRUCTURE now:
