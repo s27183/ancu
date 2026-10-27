@@ -12,34 +12,30 @@ decision lives beside the mechanism it governs, in the four-slot block
 **This system gives a Vietnamese buyer of Australian property — first-home,
 investor, or funded from Vietnam — a bilingual budget plan for the whole
 property lifecycle (buy, hold, sell), built from their own situation, whose every
-regulated figure traces to a verified, cited source.** (Son, 2026-10-06; "budget
-plan … (buy, hold, sell)" Son, 2026-10-08. The product name is left out
-on purpose: it is not settled, and renaming must not touch the ground. "Mai An Cư"
-(maiancu), the name users read today, is provisional until a final one is
-chosen — Son, 2026-10-09; it replaces "Rau" of 2026-10-06.)
+regulated figure traces to a verified, cited source.** The product name is
+left out on purpose: it is not settled, and renaming must not touch the
+ground. "Mai An Cư" (maiancu), the name users read today, is provisional until
+a final one is chosen.
 
 The plan is information provided as is, for budget planning across that
 lifecycle; the platform gives no legal, tax or financial advice service, and
-every disclaimer the user reads says so in those terms (Son, 2026-10-08).
+every disclaimer the user reads says so in those terms.
 The platform is independent: it is tied to no real-estate, legal or migration
 service, so its plan is an independent check of the whole lifecycle budget,
 for a buyer who already bought through the channel they know and for one who
 does not know where to start; the first screen the user sees leads to this
-position, and the information-not-advice one, in one tap (Son, 2026-10-10), and
+position, and the information-not-advice one, in one tap, and
 states what the platform does — budget planning, the journey step by step,
 suburb data, news — that both the budget and the journey rest on current
-government rules, each cited (Son, 2026-10-17), and what it is not — a property listing platform, an advisory service (Son, 2026-10-16:
-many users took it for a listing platform).
+government rules, each cited, and what it is not — a property listing platform, an advisory service.
 
-**The launch scope is the system as built** (Son, 2026-10-06: "stop at the
-current scope which is good enough for production launch"): Modes A-E with
+**The launch scope is the system as built**: Modes A-E with
 their base plans, Mode C's per-property path, and Wedge 1a. Wedge 1b (Tìm Nhà),
 Wedge 1c (URL paste, extension), a per-property path for Modes A and D, and
 the work waiting on it come after launch; work before launch fixes what is
 built and adds no mode or wedge.
 
-What the product is and is not (carried from the retired root memory file,
-behavior 141, 2026-10-27; each sentence stands on Son's word at its Expect 6):
+What the product is and is not:
 
 - **Plan-first.** The base plan needs no property: a plan card is created and
   filled with no property data, and a property attaches to it as an addendum.
@@ -66,8 +62,7 @@ behavior 141, 2026-10-27; each sentence stands on Son's word at its Expect 6):
 | **Honest-partial** | a figure shown for an input the user never gave, or a null `suburb.*` value filled in |
 | **Whole lifecycle** | a mode whose plan has no phase for where the user actually is (buy, hold or sell) |
 
-What the properties hold this project to (Son agreed 2026-10-06, homed from
-the harness memory of earlier sessions):
+What the properties hold this project to:
 
 - **Regulated figures are grounded — scope.** Regulated figures are grounded
   for what the buyer owes in Australia. Vietnam-side regulated content (SBV,
@@ -82,7 +77,7 @@ the harness memory of earlier sessions):
   the KB doc that owns that rule and shows its government source and check
   date; where that doc has no source yet for the plan's state, the step says
   so; a step no rule governs is labelled common practice, never presented as
-  a rule (behavior 114; kb_compiler GATE 16 holds it). A KB figure cites only
+  a rule (kb_compiler GATE 16 holds it). A KB figure cites only
   its primary: the body that makes or administers a rule (or the law's own
   text, including a faithful republication such as AustLII), the provider that
   sets its own product, price or policy, or the producer of its own data. A
@@ -90,8 +85,7 @@ the harness memory of earlier sessions):
   adviser's guide, news wire, encyclopedia) is never a source. A market-wide
   figure (a typical fee, a typical lender policy) is a labelled band built from
   several named primaries; with none, it is a PLACEHOLDER with a named primary
-  to re-ground on, or it is removed (Son 2026-10-27; behavior 138; kb_compiler
-  GATE 17 holds it).
+  to re-ground on, or it is removed (kb_compiler GATE 17 holds it).
 - **Regulated figures are grounded — one owner per fact.** Each regulated fact
   has exactly one owning KB doc. Every other doc cross-references it by slug,
   and a variant doc owns only its deltas. Before writing a new doc, grep for an
