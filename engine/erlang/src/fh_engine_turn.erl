@@ -911,8 +911,7 @@ outcomes_by_type(_BlueprintSlug, _Other) ->
 start_fill_port(Comp, #{plan_card_id := PC} = Data, ResolverOutcome) ->
     PythonExe = python_exe(),
     Script = planner_script(),
-    Port = open_port({spawn_executable, PythonExe},
-                     [{args, [Script]}, {packet, 4}, binary, exit_status]),
+    Port = open_port({spawn_executable, PythonExe}, sidecar_port_opts(Script)),
     %% For a two-path component the resolver has already computed the figures; hand
     %% them to the sidecar as READ-ONLY grounding so the lender reasoning is grounded
     %% in the real path/FHG facts. `undefined` (pure-agent) → no grounding block.
@@ -950,8 +949,7 @@ start_fill_port(Comp, #{plan_card_id := PC} = Data, ResolverOutcome) ->
 start_qa_port(#{plan_card_id := PC, message := Msg, card := Card} = Data, Glue) ->
     PythonExe = python_exe(),
     Script = planner_script(),
-    Port = open_port({spawn_executable, PythonExe},
-                     [{args, [Script]}, {packet, 4}, binary, exit_status]),
+    Port = open_port({spawn_executable, PythonExe}, sidecar_port_opts(Script)),
     Locale = case maps:get(locale, Data, undefined) of
                  undefined -> null;
                  L -> L
@@ -978,6 +976,38 @@ dag_reads(BlueprintSlug, Name) ->
         {ok, Bp} -> maps:get(Name, maps:get(<<"dag_reads">>, Bp, #{}), []);
         _        -> []
     end.
+
+%% R-4 · Reasoning within its runtime -> The sidecar -> the sidecar gets only the env it needs
+%% Mechanism: open_port's {env, [{Name, false}]} unsets a variable in the child, so every
+%% engine variable outside an allowlist (FH_*, the Claude credential, the OS basics) is
+%% unset for the sidecar. The planner reads only FH_* and CLAUDE_CODE_OAUTH_TOKEN
+%% (read 2026-10-27), and the claude CLI it starts inherits this env.
+%% Fails when: the sidecar holds ENGINE_DATABASE_URL, SHELL_TENANT_*, ANTHROPIC_API_KEY or
+%% whatever .env loaded — before behavior 140 both open_port calls passed no env, so a
+%% model with a Read tool could print them from /proc/self/environ.
+%% Capability: OTP 29 open_port {env, [{Name, false}]} removes Name from the child's
+%% environment — held by test/sidecar_env_smoke.escript (behavior 140, Expect 5).
+sidecar_port_opts(Script) ->
+    [{args, [Script]}, {packet, 4}, binary, exit_status, {env, sidecar_env_unset()}].
+
+sidecar_env_unset() ->
+    [{Name, false} || Entry <- os:getenv(),
+                      [Name | _] <- [string:split(Entry, "=")],
+                      not sidecar_env_keep(Name)].
+
+sidecar_env_keep("FH_" ++ _) -> true;
+sidecar_env_keep("LC_" ++ _) -> true;
+sidecar_env_keep(Name) ->
+    lists:member(Name, ["PATH", "HOME", "USER", "LOGNAME", "SHELL", "LANG", "TZ",
+                        "TMPDIR", "TMP", "TEMP",
+                        "CLAUDE_CODE_OAUTH_TOKEN", "CLAUDE_CONFIG_DIR",
+                        "DISABLE_AUTOUPDATER",
+                        %% a dev seat's served key (the CLI dials this socket)
+                        "ANTHROPIC_UNIX_SOCKET", "ANTHROPIC_BASE_URL",
+                        "VIRTUAL_ENV", "PYTHONPATH", "PYTHONHOME",
+                        "SSL_CERT_FILE", "SSL_CERT_DIR", "NODE_EXTRA_CA_CERTS",
+                        "HTTP_PROXY", "HTTPS_PROXY", "NO_PROXY",
+                        "http_proxy", "https_proxy", "no_proxy"]).
 
 close_port(#{port := Port}) ->
     case erlang:port_info(Port) of
