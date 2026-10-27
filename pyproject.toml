@@ -15,3 +15,9 @@ dependencies = [
 deploy = [
     "pyyaml>=6.0.3",
 ]
+
+[tool.uv]
+# Behavior 144: mcp comes in through claude-agent-sdk. 1.29.0 carries GHSA-5h93-6whr-6q8j,
+# GHSA-84m7-p3x7-pcfv, GHSA-rwrf-2pqf-9j8j and GHSA-w4fh-qvv9-3v23, all fixed in 1.30.0;
+# a re-lock never falls back below it. <2: mcp 2.x is a major the SDK is not measured on here.
+constraint-dependencies = ["mcp>=1.30.0,<2"]
