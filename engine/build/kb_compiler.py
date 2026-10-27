@@ -171,10 +171,315 @@ def news_source_host_error(src):
     url = src.get("url")
     if not url:
         return "an entry with no url (a news note cites a government page, not a note)"
-    host = (urllib.parse.urlsplit(url).hostname or "").lower()
-    if not host.endswith(NEWS_SOURCE_HOST_SUFFIX):
-        return f"{host or url!r} is not a government host (*{NEWS_SOURCE_HOST_SUFFIX})"
+    host = url_host(url)
+    if host is None:
+        return f"{url!r} is not a plain https URL (URL_AUTHORITY block)"
+    if not host_in(host, (NEWS_SOURCE_HOST_SUFFIX.lstrip("."),)):
+        return f"{host!r} is not a government host (*{NEWS_SOURCE_HOST_SUFFIX})"
     return None
+
+
+# Regulated figures are grounded -> honesty tiers -> The KB compiler -> a KB page cites only its primary
+# Goal: Son 2026-10-27 (behavior 138): "kb-watch do pull info from non-gov sources (e.g
+#   blog). that doesn't seem right" — a broker, blog or comparison page never grounds a figure.
+# Invariant: every URL a KB doc carries — `sources:`, body links, a fact's source, a term's
+#   url, a news note's sources — is an https URL whose host is a primary for that doc: a
+#   government or law host (PRIMARY_GOV_LAW_HOSTS, any doc) or a provider that
+#   PRIMARY_PROVIDER_HOSTS names for that doc's path (its own product, price, policy or
+#   data; per doc, behavior 85). A (doc, host) pair outside both fails GATE 17 unless
+#   KNOWN_SECONDARY lists it, and a listed pair no longer present fails too, so the list
+#   only shrinks — to empty by the end of behavior 138.
+# Mechanism: url_host matches the raw authority with URL_AUTHORITY — lowercase https only,
+#   no userinfo, backslash, percent-escape or trailing dot, port 443 or none — and never
+#   uses urlsplit().hostname: on Python 3.14.0 urlsplit("https://evil.com\\@ato.gov.au/x")
+#   .hostname is "ato.gov.au" while a browser opens evil.com, and "https://evil.com%2f.gov.au/x"
+#   reads as a gov host (measured 2026-10-27). scripts/kb_gate.py imports these names; it
+#   keeps no copy.
+# Capability: url_host(url) -> host | None; host_in(host, suffixes); primary_hosts(path);
+#   primary_fails(path, urls) -> the (host, why) problems for one doc.
+URL_AUTHORITY = re.compile(r"^https://([a-z0-9-]+(?:\.[a-z0-9-]+)+)(?::443)?(?=[/?#]|$)")
+PRIMARY_GOV_LAW_HOSTS = (
+    "gov.au",           # Commonwealth, state and territory bodies, regulators, the RBA, registers
+    "gov.vn",           # Vietnamese ministries and the State Bank
+    "chinhphu.vn",      # the Government of Vietnam's portal and its legal-document register
+    "austlii.edu.au",   # the law's own text, republished faithfully
+)
+# A lender's own site is the primary for its own policy and product (LENDER-POLICY tier).
+PRIMARY_LENDER_HOSTS = (
+    "commbank.com.au", "nab.com.au", "anz.com.au", "westpac.com.au",
+    "stgeorge.com.au", "banksa.com.au", "bankofmelbourne.com.au", "macquarie.com.au",
+    "ing.com.au", "suncorp.com.au", "bankwest.com.au", "boq.com.au",
+    "bendigobank.com.au", "amp.com.au", "hsbc.com.au", "citi.com.au",
+)
+# A provider's own published price is the primary for its own fee (behavior 85, Son
+# 2026-10-16): a bank's or transfer service's fee schedule for the FX docs, a lender's for
+# its discharge fee, a land registry's for its registration fee.
+FX_PROVIDER_HOSTS = PRIMARY_LENDER_HOSTS + (
+    "wise.com", "ofx.com", "westernunion.com", "remitly.com",
+    "vietcombank.com.vn", "techcombank.com", "techcombank.com.vn", "bidv.com.vn",
+    "vietinbank.vn", "acb.com.vn",
+)
+REGISTRY_HOSTS = ("nswlrs.com.au", "titlesqld.com.au")
+# Per doc path (a folder ends in "/"): a provider's site proves nothing about another doc.
+PRIMARY_PROVIDER_HOSTS = {
+    "docs/kb/lender/": PRIMARY_LENDER_HOSTS,
+    "docs/kb/fx/typical-spreads-vnd-aud.md": FX_PROVIDER_HOSTS,
+    "docs/kb/fx-providers/": FX_PROVIDER_HOSTS,
+    "docs/kb/existing-home-sale/net-proceeds.md": PRIMARY_LENDER_HOSTS + REGISTRY_HOSTS,
+    "docs/kb/buyer-costs/inspections-conveyancing-fees.md": REGISTRY_HOSTS,
+}
+
+
+def url_host(url):
+    """The host of a plain https URL (URL_AUTHORITY), or None for anything else."""
+    m = URL_AUTHORITY.match(url or "")
+    return m.group(1) if m else None
+
+
+def host_in(host, suffixes):
+    return any(host == h or host.endswith("." + h) for h in suffixes)
+
+
+def primary_hosts(path):
+    """Every host suffix that is a primary for the doc at repo-relative `path`."""
+    extra = ()
+    for where, hosts in PRIMARY_PROVIDER_HOSTS.items():
+        if path == where or (where.endswith("/") and path.startswith(where)):
+            extra += hosts
+    return PRIMARY_GOV_LAW_HOSTS + extra
+
+
+# A link target or URL in a doc's text: a markdown link's target, or a bare URL with any
+# scheme (javascript:, http:, a protocol-relative //host are caught, not skipped).
+_LINK_TARGET = re.compile(r"\]\(\s*<?([^)\s>]+)")
+_BARE_URL = re.compile(r"(?i)(?<![\w])(?:[a-z][a-z0-9+.-]*://|//)[^\s)<>\]\"'`|]+")
+
+
+def doc_urls(text):
+    """Every URL a doc carries (frontmatter and body), relative links left out."""
+    out = []
+    for m in _LINK_TARGET.finditer(text):
+        t = m.group(1)
+        if re.match(r"(?i)^([a-z][a-z0-9+.-]*:|//)", t):
+            out.append(t)
+    for m in _BARE_URL.finditer(text):
+        out.append(m.group(0).rstrip(".,;:!"))
+    # a `url:` value in frontmatter or a fenced block, written bare
+    for m in re.finditer(r"(?m)\burl\"?:\s*\"?([^\s\",}]+)", text):
+        out.append(m.group(1))
+    return list(dict.fromkeys(out))
+
+
+def primary_fails(path, urls):
+    """(host or url, why) for each URL in the doc at `path` that is not one of its primaries."""
+    out = []
+    allowed = primary_hosts(path)
+    for u in urls:
+        host = url_host(u)
+        if host is None:
+            out.append((u, "not a plain https URL (no userinfo, backslash, %-escape, trailing dot or port)"))
+        elif not host_in(host, allowed):
+            out.append((host, "not a primary for this doc (a government or law host, or a provider "
+                              "PRIMARY_PROVIDER_HOSTS names for it)"))
+    return out
+
+
+# Regulated figures are grounded -> honesty tiers -> The KB compiler -> the secondary citations still to re-ground
+# Every (doc, host) pair a KB doc cites today that is not a primary for it (measured
+# 2026-10-27: 107 pairs in 49 docs — brokers, comparison sites, blogs, accountants, a news
+# wire, an encyclopedia, and providers the map does not yet name for that doc). GATE 17
+# fails on a pair missing here and on a listed pair the docs no longer carry, so a new
+# secondary citation never enters and the list only shrinks; behavior 138 re-grounds each
+# group in its own commit until it is empty. Never add to it.
+KNOWN_SECONDARY = {
+    "docs/kb/au-aml-ctf/source-of-funds-documentation.md": ("www.canstar.com.au", "www.homeloanexperts.com.au",),
+    "docs/kb/bridging-finance/mechanics.md": ("www.westpac.com.au",),
+    "docs/kb/buyer-costs/broker-and-buyers-agent.md": ("rebaa.com.au", "whichrealestateagent.com.au", "www.canstar.com.au",),
+    "docs/kb/buyer-costs/foreign-buyer-services.md": ("australiantranslationservices.com.au", "birthcertificatetranslation.com.au", "mynotary.com.au", "skyvia.com.au", "translayte.com", "www.fogartyoliverandrothschild.com.au", "www.naati.com.au", "www.notarypublichub.com.au",),
+    "docs/kb/buyer-costs/inspections-conveyancing-fees.md": ("conveyancercompare.com.au", "elevatedstrata.com.au", "engie.com.au", "nestpath.com.au", "ourtop10.com.au", "rezzi.com.au", "whatsthedamage.com.au", "www.bark.com", "www.canstar.com.au", "www.finder.com.au", "www.savings.com.au",),
+    "docs/kb/cash-reserve/lender-expectations.md": ("www.huntergalloway.com.au", "www.loans.com.au", "www.peppermoney.com.au",),
+    "docs/kb/cross-border/source-of-funds-letter-template.md": ("www.canstar.com.au", "www.homeloanexperts.com.au", "www.macquarie.com.au",),
+    "docs/kb/existing-home-sale/net-proceeds.md": ("www.finder.com.au", "www.mozo.com.au",),
+    "docs/kb/facts/infrastructure.md": ("en.wikipedia.org",),
+    "docs/kb/facts/living-in-australia.md": ("mmx.prnewswire.com", "www.prnewswire.com",),
+    "docs/kb/foreign-buyer-surcharge/by-state.md": ("www.homeloanexperts.com.au", "www.pwc.com.au",),
+    "docs/kb/foreign-investor/currency-hedging-considerations.md": ("wise.com",),
+    "docs/kb/foreign-investor/repatriation-strategy.md": ("wise.com",),
+    "docs/kb/fx-providers/wise-ofx-bank-comparison.md": ("www.thecurrencyshop.com.au",),
+    "docs/kb/fx/loan-currency-considerations.md": ("wise.com", "www.homeloanexperts.com.au",),
+    "docs/kb/fx/typical-spreads-vnd-aud.md": ("www.thecurrencyshop.com.au",),
+    "docs/kb/graduation/lvr80.md": ("www.commbank.com.au",),
+    "docs/kb/hecs/thresholds.md": ("www.scalesuite.com.au", "www.wagecalculator.com.au",),
+    "docs/kb/investor/annual-tax-return-investor.md": ("beyondaccountancy.com.au", "taxaccountantbrisbane.com.au", "tenfoldwealthaccountants.com.au",),
+    "docs/kb/investor/operating-expenses-typical-ratios.md": ("nationalcover.com.au", "nestpath.com.au", "www.canstar.com.au", "www.mozo.com.au",),
+    "docs/kb/investor/property-management-fees.md": ("www.canstar.com.au", "www.localagentfinder.com.au", "www.propspotter.com.au",),
+    "docs/kb/investor/rental-appraisal-from-pm-agent.md": ("www.canstar.com.au",),
+    "docs/kb/investor/target-yield-by-archetype.md": ("propertyinvestmentprofessionals.com.au",),
+    "docs/kb/investor/vacancy-rate-assumptions.md": ("sqmresearch.com.au",),
+    "docs/kb/lender-docs/standard-timeline.md": ("www.commbank.com.au", "www.suncorpbank.com.au",),
+    "docs/kb/lender/485-visa-treatment.md": ("www.homeloanexperts.com.au", "www.professionalhomeloans.com.au",),
+    "docs/kb/lender/documentation-non-resident.md": ("wise.com", "www.homeloanexperts.com.au", "www.odinmortgage.com",),
+    "docs/kb/lender/firb-approval-as-condition-precedent.md": ("wise.com", "www.homeloanexperts.com.au",),
+    "docs/kb/lender/foreign-buyer-deposit-requirements.md": ("www.canstar.com.au", "www.homeloanexperts.com.au",),
+    "docs/kb/lender/hecs-treatment-by-lender.md": ("www.savings.com.au",),
+    "docs/kb/lender/non-resident-friendly-shortlist.md": ("www.canstar.com.au",),
+    "docs/kb/lender/non-resident-investment-loan-shortlist.md": ("www.canstar.com.au", "www.finder.com.au", "www.latrobefinancial.com.au",),
+    "docs/kb/lender/temp-resident-lending-policies.md": ("www.canstar.com.au", "www.homeloanexperts.com.au",),
+    "docs/kb/lmi/calculation-for-foreign-persons.md": ("www.homeloanexperts.com.au", "www.professionalhomeloans.com.au",),
+    "docs/kb/lmi/calculation.md": ("www.helia.com.au", "www.money.com.au", "www.qbe.com",),
+    "docs/kb/lmi/providers.md": ("mortgage.archgroup.com", "www.canstar.com.au", "www.helia.com.au", "www.insurancebusinessmag.com", "www.qbe.com",),
+    "docs/kb/loan/offset-vs-redraw-investor.md": ("aintreegroup.com.au",),
+    "docs/kb/non-resident/entity-options-au-property.md": ("www.allens.com.au",),
+    "docs/kb/non-resident/investment-loan-deposit-requirements.md": ("www.canstar.com.au", "www.odinmortgage.com",),
+    "docs/kb/offset-account/basics.md": ("www.commbank.com.au",),
+    "docs/kb/pexa/settlement.md": ("www.titlesqld.com.au",),
+    "docs/kb/property/rental-market-data-sources.md": ("sqmresearch.com.au",),
+    "docs/kb/refinance/windows-and-triggers.md": ("www.commbank.com.au",),
+    "docs/kb/scheme/help-to-buy.md": ("www.money.com.au",),
+    "docs/kb/selling-costs/agent-legal.md": ("whichrealestateagent.com.au", "www.openagent.com.au", "www.yourpropertyguide.com.au",),
+    "docs/kb/tax/income-tax-resident-2026-27.md": ("austax.tools", "www.scalesuite.com.au",),
+    "docs/kb/tax/quantity-surveyor-reports.md": ("tenfoldwealthaccountants.com.au", "www.washingtonbrown.com.au",),
+    "docs/kb/visas/au-temporary-residency-classes.md": ("www.minterellison.com",),
+    "docs/kb/vn-pdp/cross-border-data-transfer.md": ("eurochamvn.org", "www.dlapiper.com",),
+}
+
+
+def primary_gate(corpus, known=None):
+    """GATE 17 over {repo-relative path: [urls]}: (problems, the secondary pairs found)."""
+    known = {(p, h) for p, hs in (KNOWN_SECONDARY if known is None else known).items() for h in hs}
+    fails, found = [], set()
+    for path in sorted(corpus):
+        for what, why in primary_fails(path, corpus[path]):
+            if why.startswith("not a plain"):
+                fails.append(f"[primary] {path}: {what!r} is {why}")
+            else:
+                found.add((path, what))
+    for path, host in sorted(found - known):
+        fails.append(f"[primary] {path}: cites {host}, not a primary for this doc — cite the body "
+                     f"that makes the rule, or the provider's own page; a market figure is a band "
+                     f"of named primaries or a PLACEHOLDER (invariants.md, honesty tiers)")
+    for path, host in sorted(known - found):
+        fails.append(f"[primary] {path}: KNOWN_SECONDARY lists {host} but the doc no longer cites "
+                     f"it — drop it from the list (it only shrinks)")
+    return fails, found
+
+
+def kb_corpus():
+    """{repo-relative path: [urls]} for every doc under docs/kb."""
+    return {str(f.relative_to(ROOT)): doc_urls(f.read_text()) for f in sorted(KB.rglob("*.md"))}
+
+
+# Planted fixtures (behavior 138 Expect 1): each must fail, or pass, as named.
+PRIMARY_FIXTURES = (
+    ("fail", "docs/kb/lender/fixture.md", "sources:\n  - url: https://www.canstar.com.au/home-loans/x\n"),
+    ("fail", "docs/kb/lender/fixture.md", "sources:\n  - url: https://wise.com/au/pricing\n"),
+    ("fail", "docs/kb/tax/fixture.md", "See [the guide](https://www.finder.com.au/stamp-duty).\n"),
+    ("fail", "docs/kb/tax/fixture.md", "sources:\n  - url: https://evil.com\\@ato.gov.au/x\n"),
+    ("fail", "docs/kb/tax/fixture.md", "sources:\n  - url: https://evil.com%2f.gov.au/x\n"),
+    ("fail", "docs/kb/tax/fixture.md", "sources:\n  - url: http://www.ato.gov.au/x\n"),
+    ("fail", "docs/kb/tax/fixture.md", "[x](javascript:alert(1)) and [y](//evil.com/z)\n"),
+    ("pass", "docs/kb/lender/fixture.md", "sources:\n  - url: https://www.macquarie.com.au/home-loans.html\n"),
+    ("pass", "docs/kb/tax/fixture.md", "sources:\n  - url: https://www.ato.gov.au/individuals\n"
+                                       "Text, see https://www.ato.gov.au/x.\n"),
+)
+
+
+def _primary_property(seed=138, n=500):
+    """Expect 2: the host check passes exactly an https URL whose authority is a primary for
+    its doc. The oracle reads each case's construction, never primary_hosts."""
+    import random
+    rng = random.Random(seed)
+    schemes = ("https://", "http://", "HTTPS://", "javascript://", "//")
+    hosts = {"gov": ("www.ato.gov.au", "www.revenue.nsw.gov.au", "legislation.gov.au"),
+             "law": ("www.austlii.edu.au", "vanban.chinhphu.vn"),
+             "lender": ("www.macquarie.com.au", "www.commbank.com.au"),
+             "fx": ("wise.com", "www.ofx.com"),
+             "registry": ("www.titlesqld.com.au", "nswlrs.com.au"),
+             "secondary": ("www.canstar.com.au", "www.homeloanexperts.com.au", "en.wikipedia.org"),
+             "lookalike": ("ato.gov.au.evil.com", "evilmacquarie.com.au", "macquarie.com.au.evil.com",
+                           "gov.au-evil.com", "wise.com.evil.com")}
+    decos = ("none", "@host", "\\@host", "%2f", ":443", ":8443", "dot", "#", "?")
+    # which host kinds are primaries for each doc (the doc's own provider kinds + gov/law)
+    docs = {"docs/kb/lender/x.md": {"lender"}, "docs/kb/fx-providers/x.md": {"lender", "fx"},
+            "docs/kb/fx/typical-spreads-vnd-aud.md": {"lender", "fx"},
+            "docs/kb/existing-home-sale/net-proceeds.md": {"lender", "registry"},
+            "docs/kb/buyer-costs/inspections-conveyancing-fees.md": {"registry"},
+            "docs/kb/tax/x.md": set(), "docs/kb/facts/x.md": set(), "docs/kb/news/x.md": set()}
+    bad = []
+    for _ in range(n):
+        scheme, kind, deco, doc = (rng.choice(schemes), rng.choice(sorted(hosts)), rng.choice(decos),
+                                   rng.choice(sorted(docs)))
+        host = rng.choice(hosts[kind])
+        auth = {"none": host, "@host": "evil.com@" + host, "\\@host": "evil.com\\@" + host,
+                "%2f": "evil.com%2f." + host, ":443": host + ":443", ":8443": host + ":8443",
+                "dot": host + ".", "#": host + "#f", "?": host + "?q=1"}[deco]
+        url = scheme + auth + ("" if deco in ("#", "?") else "/p/x")
+        expect = (scheme == "https://" and deco in ("none", ":443", "#", "?")
+                  and kind in ({"gov", "law"} | docs[doc]))
+        got = not primary_fails(doc, [url])
+        if got != expect:
+            bad.append((doc, url, expect))
+    return bad
+
+
+def _ratchet_property(corpus, seed=138, n=200):
+    """Expect 11: any edit that adds a secondary citation or empties the list without
+    re-grounding fails GATE 17 naming the pair; the untouched corpus passes."""
+    import random
+    rng = random.Random(seed)
+    base_fails, found = primary_gate(corpus)
+    if base_fails:
+        return [("baseline", base_fails[:3])]
+    listed = sorted(found)
+    clean = sorted(p for p in corpus if not any(q == p for q, _ in listed))
+    bad = []
+    for i in range(n):
+        known = {p: tuple(hs) for p, hs in KNOWN_SECONDARY.items()}
+        cor = {p: list(u) for p, u in corpus.items()}
+        kind = ("drop", "add_list", "add_cite", "move", "case", "www")[i % 6]
+        d, h = rng.choice(listed)
+        if kind == "drop":               # drop a listed pair the doc still cites
+            known[d] = tuple(x for x in known[d] if x != h)
+            want = h
+        elif kind == "add_list":         # list a pair no doc cites
+            known[d] = known[d] + ("www.example-broker.com.au",)
+            want = "www.example-broker.com.au"
+        elif kind == "add_cite":         # a secondary host in a doc with none listed
+            d = rng.choice(clean)
+            cor[d] = cor[d] + [f"https://{h}/new"]
+            want = h
+        elif kind == "move":             # a listed host cited from another doc instead
+            d2 = rng.choice([p for p in sorted(corpus) if (p, h) not in found])
+            cor[d] = [u for u in cor[d] if url_host(u) != h]
+            cor[d2] = cor[d2] + [f"https://{h}/moved"]
+            want = h
+        elif kind == "case":             # the same host, upper-cased
+            cor[d] = cor[d] + [f"https://{h.upper()}/x"]
+            want = h.upper()
+        else:                            # the same site under www. or without it
+            alt = h[4:] if h.startswith("www.") else "www." + h
+            cor[d] = cor[d] + [f"https://{alt}/x"]
+            want = alt
+        fails, _ = primary_gate(cor, known)
+        if not any(want in f for f in fails):
+            bad.append((kind, d, h))
+    return bad
+
+
+def primary_self_test(corpus):
+    """Behavior 138 Expect 1, 2, 11: (problems, summary line)."""
+    out = []
+    for verdict, path, text in PRIMARY_FIXTURES:
+        got = "fail" if primary_fails(path, doc_urls(text)) else "pass"
+        if got != verdict:
+            out.append(f"[primary] self-test: the fixture {path} {text.strip()[:60]!r} should {verdict}, it does {got}")
+    prop = _primary_property()
+    out += [f"[primary] self-test: host check wrong on {u!r} for {d} (expected {'pass' if e else 'fail'})"
+            for d, u, e in prop[:5]]
+    ratchet = _ratchet_property(corpus)
+    out += [f"[primary] self-test: ratchet missed {r}" for r in ratchet[:5]]
+    return out, (f"[primary] self-test: {len(PRIMARY_FIXTURES)} fixtures as named; host check 500 cases, "
+                 f"seed 138: {len(prop)} counterexamples; ratchet 200 cases, seed 138: {len(ratchet)} counterexamples")
 
 
 # Regulated figures are grounded -> P-7 · One declaration per outcome shape -> The KB compiler -> a fact doc quotes its archived primary
@@ -1627,6 +1932,17 @@ def run(emit=False):
         if not doc.get("sources"):
             fails.append(f"[sources] {slug}: no `sources:` citation (kb-update-runbook.md Phase 1)")
 
+    # ---- GATE 17: every URL a KB doc carries is a primary for it (behavior 138) ---- #
+    # (URL_AUTHORITY / KNOWN_SECONDARY blocks.) Over every doc under docs/kb — fact docs,
+    # terms, news notes, copy and journey docs included — fail-closed, with its self-test.
+    corpus = kb_corpus()
+    pf, found = primary_gate(corpus)
+    fails.extend(pf)
+    st, summary = primary_self_test(corpus)
+    fails.extend(st)
+    info.append(summary)
+    stats["secondary"] = (len(found), len({p for p, _ in found}))
+
     # ---- GATE 11: news-note well-formedness (docs/kb/news/*.md) ------------ #
     # kb-update-runbook.md "authoring a news note": kb_slug + every affected_kb_slugs
     # entry must resolve to a real KB doc (the relevance-filter key has to point at
@@ -2088,6 +2404,8 @@ def main():
           f"fact docs: {stats.get('facts_docs')}, terms: {stats.get('terms')}")
     print(f"copy templates: {stats.get('copy_templates')} (bilingual gate, "
           f"locales={'+'.join(LOCALES)})")
+    sec = stats.get("secondary") or (0, 0)
+    print(f"[primary] {sec[0]} secondary citations in {sec[1]} docs (KNOWN_SECONDARY; only shrinks, to 0)")
     js = stats.get("journey_steps") or {}
     print(f"journey steps: {js.get('rule', 0)} follow a cited rule, "
           f"{js.get('practice', 0)} are common practice (GATE 16)")

@@ -62,7 +62,16 @@ the harness memory of earlier sessions):
   the KB doc that owns that rule and shows its government source and check
   date; where that doc has no source yet for the plan's state, the step says
   so; a step no rule governs is labelled common practice, never presented as
-  a rule (behavior 114; kb_compiler GATE 16 holds it).
+  a rule (behavior 114; kb_compiler GATE 16 holds it). A KB figure cites only
+  its primary: the body that makes or administers a rule (or the law's own
+  text, including a faithful republication such as AustLII), the provider that
+  sets its own product, price or policy, or the producer of its own data. A
+  page that reports someone else's figure (a blog, broker, comparison site,
+  adviser's guide, news wire, encyclopedia) is never a source. A market-wide
+  figure (a typical fee, a typical lender policy) is a labelled band built from
+  several named primaries; with none, it is a PLACEHOLDER with a named primary
+  to re-ground on, or it is removed (Son 2026-10-27; behavior 138; kb_compiler
+  GATE 17 holds it).
 - **Regulated figures are grounded — one owner per fact.** Each regulated fact
   has exactly one owning KB doc. Every other doc cross-references it by slug,
   and a variant doc owns only its deltas. Before writing a new doc, grep for an
