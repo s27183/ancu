@@ -20,6 +20,16 @@
 %%
 %%   SHELL_DATABASE_URL=postgres://shell:shell_dev_pw@localhost:5434/ancu_shell?sslmode=disable \
 %%   ERL_LIBS=_build/default/lib escript test/quota_gate_smoke.escript
+%%
+%% Reproducible -> P-5 · Metering, not gating -> Mechanisms -> the gate is the shell's
+%% Falsifier (invariants.md P-5): an engine module or migration that names a quota, credit
+%% or price, or an engine route that returns a refusal on usage. Held by: the gate in the
+%% shell (fh_shell_h_plan_card, fh_shell_meter), pricing in fh_shell_pricing and
+%% fh_shell_billing, and fh_shell_usage_consumer tailing /api/engine/usage_events. No
+%% engine-side gate has been seen (probed 2026-10-06: no quota/credit/deny-on-usage logic
+%% in engine/erlang/src); the metering seam has failed shell-side only — P-2's usage-cursor
+%% proof (restart_replay_smoke). Not built: tests/engine_no_gating.py, failing the build on
+%% a credit/quota table or call under engine/.
 
 -mode(compile).
 

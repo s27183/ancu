@@ -284,108 +284,69 @@ that passed at task start followed by a failure whose cause was the runtime.
 
 ## This project's invariants
 
-Written in the form above; each ends with the check that would trip its
-falsifier.
+Each is written as its rule and nothing else: the statement in bold, a term
+list under it where the statement needs one, **Fails when**, **Falsifier, from
+this system's artifacts:**, and **Checked by** — the test that would trip the
+falsifier, one or more backticked paths or commands.
+
+How each is held is not written here. The proof, the mechanism that holds it,
+what was measured and on which build is the four-slot block beside that
+mechanism, naming the invariant; when and why it changed is git's.
 
 ## P-1 · One process per concern
 
 **Every long-lived concern — a plan card's turn, a sidecar call, an SSE
 stream — runs in its own supervised process, sharing no resource whose
 exhaustion would stall another; a crash or a hang takes down only that
-concern.** (Son, 2026-10-06, from the erlang-engine prior;
-carried from the archived `principles.md` §1.)
+concern.**
 
 **Fails when** a failure in one concern stalls or fails a request that does
 not touch it.
 
-**Proof, shown in this system (June 2026).** The shell proxied the engine's
-SSE stream on httpc's default profile with `{timeout, infinity}`, and its
-plain calls (`get_plan_card`, `simulate`, `refine`, `list_suburbs`) ran on
-the same pool with no timeout: the never-ending stream held a pooled
-session, calls routed onto it hung forever, intermittently — two concurrent
-identical GETs, one 200 in 7 ms, the other hung 8 s. Separate processes, one
-shared pool: the concern boundary leaked through the resource.
+**Falsifier, from this system's artifacts:** killing one card's sidecar
+mid-turn, or holding one stream open, makes another card's turn or call fail
+or hang.
 
-**Held by** one `fh_engine_turn` gen_statem per card under
-`fh_engine_turn_sup`; the shell's stream on its own httpc profile
-(`fh_shell_engine_client`, `?SSE_PROFILE`) with a finite timeout on every
-plain call.
-
-**Falsifier:** killing one card's sidecar mid-turn, or holding one stream
-open, makes another card's turn or call fail or hang.
-
-**Checked by** `engine/erlang/test/concern_isolation_smoke.escript` (built
-2026-10-06): card A's sidecar hangs mid-fill and is then `kill -9`ed while card
-B's turn completes with all its components; and, for the shell,
-`shell/web/backend/test/sse_isolation_smoke.escript`: four SSE streams held
-open through the shell while plain proxied calls answer in milliseconds. Both
-run with `bash scripts/live_smoke.sh <name>`.
+**Checked by** `engine/erlang/test/concern_isolation_smoke.escript`;
+`shell/web/backend/test/sse_isolation_smoke.escript`
 
 ## P-2 · The database is the single source of truth
 
 **Every fact that survives a restart lives in Postgres — `plan_card_events`,
 `usage_records`, the suburb tables — and process state is a cache rebuilt
-from it.** (Son, 2026-10-06, from the erlang-engine prior;
-carried from the archived `principles.md` §2.)
+from it.**
 
 **Fails when** a restart loses or changes what a user saw committed, or a
 process cache diverges from the database and does not recover by itself.
 
-**Proof, shown in this system (2026-08-06).** Son's usage read `0 / 1,000,000`
-after real Q&A turns: `fh_shell_usage_consumer` bootstraps its cursor once,
-at `init/1`, from `MAX(engine_event_id)`, and smoke-test fixture rows had
-pushed that past every real event. Deleting the rows did not recover it; the
-running process held the stale cursor until the backend restarted.
+**Falsifier, from this system's artifacts:** after a forced engine or shell
+restart, a card's replayed events, or a user's usage total, differ from what
+was streamed before it.
 
-**Held by** `plan_card_events` as the record SSE fans out from and replays;
-the usage cursor re-derived from the mirror table at start.
-
-**Falsifier:** after a forced engine or shell restart, a card's replayed
-events, or a user's usage total, differ from what was streamed before it.
-
-**Checked by** `engine/erlang/test/restart_replay_smoke.escript` (built
-2026-10-06): a card's events streamed, the engine and its pool stopped and
-started, the replay from `Last-Event-ID: 0` and the projection compared byte
-for byte. The usage-total half is unchecked: usage events come only from
-metered planner fills.
+**Checked by** `engine/erlang/test/restart_replay_smoke.escript`
 
 ## P-3 · The sidecar is stateless and disposable
 
 **Each fill runs in its own Python port, given its full context on stdin,
 exiting when done; any sidecar can be killed at any moment and the engine
 turns that into a `turn_failed` or a retry — nothing lost, no caller left
-waiting.** (Son, 2026-10-06, from the erlang-engine prior;
-carried from the archived `principles.md` §3.)
+waiting.**
 
 **Fails when** a killed sidecar corrupts `plan_card_events` or leaves a turn
 hanging, or state carries from one fill into the next.
 
-**Proof, shown in this system.** The Agent SDK's bundled `claude` binary
-wrote to fd 1 — the `{packet,4}` port — corrupting frames and crashing the
-decoder (fixed by re-pointing fd 1 at stderr at sidecar start). A stub that
-exited before replying became a clean `turn_failed` ("sidecar exit 0 before
-reply"), not a hang: the hold below working.
+**Falsifier, from this system's artifacts:** `kill -9` on a sidecar mid-fill
+leaves the turn without a `turn_failed`, or leaves a partial component in
+`plan_card_events`.
 
-**Held by** one disposable port per fill in `fh_engine_turn`; its
-`exit_status` as the structural death signal (no wall-clock timeout:
-`docs/architecture/erlang-design-checklist.md`, "15. No Wall-Clock Timeouts
-on Supervised Ports"); a hung LLM call bounded in the sidecar by
-`asyncio.wait_for`.
-
-**Falsifier:** `kill -9` on a sidecar mid-fill leaves the turn without a
-`turn_failed`, or leaves a partial component in `plan_card_events`.
-
-**Checked by** `engine/erlang/test/sidecar_kill_smoke.escript` (built
-2026-10-06): a stub sidecar (`test/hang_sidecar.py`) is `kill -9`ed mid-fill;
-the turn has exactly one `turn_failed` and no partial component or usage.
+**Checked by** `engine/erlang/test/sidecar_kill_smoke.escript`
 
 ## P-4 · The engine is coupled to no shell
 
 **The engine exposes primitives — typed component outcomes and a renderer
 name; UX, presentation, identity and commerce are the shells'. If two shells
 (the web app, a browser extension, the Tìm Nhà console) would render a thing
-differently, it is the shell's.** (Son, 2026-10-06, from the erlang-engine
-prior; `engine-contract.md` §1 and the archived `principles.md` §4 stated it.)
+differently, it is the shell's.**
 
 The one declared exception: `ui_tabs`, a tab grouping declared in the
 blueprint (`architecture.md` §11.9) that the engine passes through unshaped
@@ -394,45 +355,27 @@ blueprint (`architecture.md` §11.9) that the engine passes through unshaped
 **Fails when** the engine carries a field, route, branch or name that exists
 for one shell, or a new shell needs an engine change beyond a new primitive.
 
-**Proof, shown in this system:** none yet — confirmed on the design
-(Son, 2026-10-06), not on a failure seen here; the first instance found
-becomes its proof, or shows the boundary drawn in the wrong place.
+**Falsifier, from this system's artifacts:** an engine response field or
+route that only one shell reads, or that the engine shapes for one shell's
+layout.
 
-**Held by** `engine-contract.md` §1's forcing function, applied at each engine
-route or response-field change; the engine returning raw typed outcomes, the
-shell projecting them.
-
-**Falsifier:** an engine response field or route that only one shell reads,
-or that the engine shapes for one shell's layout.
-
-**Checked by** `docs/architecture/engine-contract.md` — unbuilt as a test:
-the check is the §1 review question at every engine route or field change.
+**Checked by** `docs/architecture/engine-contract.md`
 
 ## P-5 · Metering, not gating
 
 **The engine emits `usage` at each LLM-call boundary and never decides
 whether work proceeds on money; the shell prices usage and gates the next
 call.** Compliance gates (FIRB, ASIC, AML) are the engine's: they protect the
-agent's behavior, not commerce. (Son, 2026-10-06, from the erlang-engine
-prior; `engine-contract.md` §1 and the archived `principles.md` §5 stated it.)
+agent's behavior, not commerce.
 
 **Fails when** an engine path refuses or shapes a call on a price, quota or
 credit rule, or the engine DB holds a credit or quota table.
 
-**Proof, shown in this system:** none yet as an engine-side gate (probed
-2026-10-06: no quota/credit/deny-on-usage logic in `engine/erlang/src`). The
-metering seam itself has failed shell-side — P-2's usage-cursor proof.
+**Falsifier, from this system's artifacts:** an engine module or migration
+that names a quota, credit or price, or an engine route that returns a
+refusal on usage.
 
-**Held by** the gate in the shell (`fh_shell_h_plan_card`, `fh_shell_meter`),
-pricing in `fh_shell_pricing` and `fh_shell_billing`, and
-`fh_shell_usage_consumer` tailing `/api/engine/usage_events`.
-
-**Falsifier:** an engine module or migration that names a quota, credit or
-price, or an engine route that returns a refusal on usage.
-
-**Checked by** `shell/web/backend/test/quota_gate_smoke.escript` (the gate is
-the shell's) and `tests/engine_no_gating.py` — unbuilt: fail the build on a
-credit/quota table or call under `engine/`.
+**Checked by** `shell/web/backend/test/quota_gate_smoke.escript`
 
 ## P-6 · Shells reach the engine only through the contract
 
@@ -441,64 +384,35 @@ credit/quota table or call under `engine/`.
 deferred — and no shell touches an engine table, queue or function any other
 way. Where a protocol already defines a mechanism (vendor SDK events,
 JSON-RPC to the sidecar, SSE), the contract implements it rather than
-inventing a parallel one.** (Son, 2026-10-06, from the erlang-engine prior;
-the archived `principles.md` §6 stated the second sentence.)
+inventing a parallel one.**
 
 **Fails when** a shell reaches engine state around the contract, or the
 engine grows a homegrown mechanism where a protocol already defines one.
 
-**Proof, shown in this system:** none yet (probed 2026-10-06: the shell
-backend uses only `SHELL_DATABASE_URL`, `fh_shell_db.erl` saying so; the
-SvelteKit frontend reaches the engine only through the shell backend's proxy,
-`lib/api.ts`).
+**Falsifier, from this system's artifacts:** a shell module reading
+`ENGINE_DATABASE_URL` or an engine table, or calling an `/api/engine/*` path
+the engine does not register.
 
-**Held by** the two-database split (`engine-contract.md` §9) and the shell's
-engine client (`fh_shell_engine_client`) as its one path to the engine.
-
-**Falsifier:** a shell module reading `ENGINE_DATABASE_URL` or an engine
-table, or calling an `/api/engine/*` path the engine does not register.
-
-**Checked by** `tests/shell_contract_check.py` (built 2026-10-06, a done
-check): the shell sources, comments stripped, for `ENGINE_DATABASE_URL` or an
-engine table, and every engine path they build matched against
-`fh_engine_http:routes/0`; it plants one of each violation in a scratch copy
-and fails if any goes uncaught.
+**Checked by** `tests/shell_contract_check.py`
 
 ## P-7 · One declaration per outcome shape
 
 **Each component's outcome shape is declared once, in its blueprint's
 `outcome_schema`, compiled by `engine/build/kb_compiler.py`; the shell's
 types for it are checked against that declaration, never maintained as an
-independent copy.** (Son, 2026-10-06, adapting the erlang-engine prior's
-"one declaration per primitive": its generator is a separate SDK project this
-repo does not use, so the declaration here is the blueprint and the hold is a
-check, not generation.)
+independent copy.**
+
+A component with no declared `outcome_schema` is refused at the compiler — the
+build fails, so it never reaches a user.
 
 **Fails when** a shell type and the outcome it reads diverge — a field the
 engine emits that no renderer reads, or a field a renderer reads with a shape
 the engine does not emit.
 
-**Proof, shown in this system.** Renderers dropped fields the producer
-computed, and `Calculator.svelte`'s unguarded default branch rendered a
-"cash needed" hero onto `cash_flow_projection` and `tax_optimised_structure`
-outcomes it was not built for; `tests/renderer_conformance.py`, added after,
-reports a 30-field backlog. `shell/web/frontend/src/lib/planCard.ts` holds 68
-hand-written types mirroring engine outcomes.
+**Falsifier, from this system's artifacts:** an `outcome_schema` field absent
+from, or typed differently in, the shell's types.
 
-**Held by** the blueprint `outcome_schema` as the single declaration, gated
-by the compiler's reference-integrity and type-compat gates;
-`tests/renderer_conformance.py` on the shell side.
-A component with no declared `outcome_schema` is refused **at the compiler** —
-the build fails, so it never reaches a user — and `fh_engine_outcome:validate/3`
-refuses a missing schema only as a backstop (Son, 2026-10-06). Built
-2026-10-06 (PR #3): the compiler's GATE 12 and validate/3's
-`{outcome_undeclared, Slug, Type}`; a wrong type *name* still passes both.
-
-**Falsifier:** an `outcome_schema` field absent from, or typed differently
-in, the shell's types.
-
-**Checked by** `tests/renderer_conformance.py` — presence only today; holding
-this needs it extended to compare field types against `planCard.ts`.
+**Checked by** `tests/renderer_conformance.py`
 
 ---
 
@@ -517,4 +431,4 @@ are the failures that have been *seen*, on the runtime this project runs. A real
 task here will show others, and a seeded proof that fails to reproduce here is
 amended on this project's evidence, not defended.
 
-<!-- planted from the enacs seed @ c38bd97; edit below freely — `plant.py --dry-run` reports what changed upstream -->
+<!-- planted from the enacs seed @ b71c1a5; edit below freely — `plant.py --dry-run` reports what changed upstream -->

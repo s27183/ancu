@@ -18,6 +18,16 @@
 %% inets 9.8 it passes with the split ablated too (measured 2026-10-06; why, at
 %% fh_shell_engine_client ?SSE_PROFILE).
 %%
+%% Why P-1 holds here (moved from invariants.md, measured June 2026): the shell proxied the
+%% engine's SSE stream on httpc's default profile with {timeout, infinity}, and its plain
+%% calls (get_plan_card, simulate, refine, list_suburbs) ran on the same pool with no
+%% timeout: the never-ending stream held a pooled session and calls routed onto it hung,
+%% intermittently — two concurrent identical GETs, one 200 in 7 ms, the other hung 8 s.
+%% Separate processes, one shared pool: the concern boundary leaked through the resource.
+%% Held by: one fh_engine_turn gen_statem per card under fh_engine_turn_sup (the engine
+%% half, concern_isolation_smoke); the shell's stream on its own httpc profile
+%% (fh_shell_engine_client ?SSE_PROFILE) with a finite timeout on every plain call.
+%%
 %% Run from the repo root (needs local ports and the seat's private Postgres):
 %%
 %%   bash scripts/live_smoke.sh sse_isolation_smoke

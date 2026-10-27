@@ -10,6 +10,8 @@ Companion references: [`docs/design/invariants.md`](../design/invariants.md) P-1
 
 Forcing function: if two different shells (web app, browser extension, Tìm Nhà curator console) would reasonably render the same plan-card data differently, that data is shell-owned and the engine must not shape it. The engine emits typed component outcomes + a renderer name; projection to pixels is the shell's job.
 
+Held by (invariants.md P-4 · The engine is coupled to no shell): this forcing function, asked as a review question at every engine route or response-field change, and the engine returning raw typed outcomes for the shell to project. It is not yet a test, and no failure has been seen here; the first instance found becomes its proof, or shows the boundary drawn in the wrong place.
+
 | Engine owns (agentic) | Shell owns (UX / commerce) |
 |---|---|
 | Running the planning turn — deterministic resolver fills + agent reasoning (architecture §11.9, two fill paths) | Onboarding UX (mode/state/price-range/zone capture) |
