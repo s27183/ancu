@@ -74,12 +74,14 @@ in `docs/kb/news/` as the shape to copy.
            quotes:
              - "Surcharge purchaser duty is 9% of the dutiable value"
      Every number you add to the doc's body must appear in one of its quotes, written
-     the same way. Quote only a primary: a government site (*.gov.au) for a regulated
-     figure, or the provider's own published price for its own fee: the lender's site
-     for a lender policy or discharge fee, a bank's or transfer service's fee page for
-     the FX docs, the land registry (nswlrs.com.au, titlesqld.com.au) for its
-     registration fee (scripts/kb_gate.py PROVIDER_HOSTS). A figure whose only source is
-     a broker, comparison or news site is still drafted, but it will be held for Son.
+     the same way. Quote only a primary: a government site or the law for a regulated
+     figure, or the provider's own published page for its own product or fee: the
+     lender's site for its lender policy or fee, an insurer's for its LMI, a bank's or
+     transfer service's for its FX price, the land registry for its registration fee
+     (the per-doc map, kb_compiler's PRIMARY_PROVIDER_HOSTS). Never cite, save or draft
+     from a broker, comparison, directory, blog, law-firm or news page: a figure whose
+     only source is one of those is not drafted. List it in the PR body as "no primary:
+     <doc> — <figure> — <where it was seen>" and leave the doc unchanged.
      For a first-visit fact (`docs/kb/facts/`), also make sure every `quotes` string the
      fact carries is found in the archive (GATE 12). Bump
      `last_verified:`; bump `effective_from:` only if the rule's own start date changed.
