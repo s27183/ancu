@@ -254,6 +254,10 @@ PRIMARY_PROVIDER_HOSTS = {
     "docs/kb/au-aml-ctf/source-of-funds-documentation.md": PRIMARY_LENDER_HOSTS,
     "docs/kb/fx/loan-currency-considerations.md": PRIMARY_LENDER_HOSTS,
     "docs/kb/foreign-investor/currency-hedging-considerations.md": FX_PROVIDER_HOSTS,
+    # behavior 138 step 6: EIU's ranking from its own release, which EIU distributes only
+    # through PR Newswire (eiu.com publishes no 2026 ranks, measured 2026-10-27); GATE 12
+    # still admits only the two exact URLs FACT_RANKING_SOURCES names.
+    "docs/kb/facts/living-in-australia.md": ("prnewswire.com",),
 }
 
 
@@ -323,8 +327,6 @@ KNOWN_SECONDARY = {
     "docs/kb/buyer-costs/foreign-buyer-services.md": ("australiantranslationservices.com.au", "birthcertificatetranslation.com.au", "mynotary.com.au", "skyvia.com.au", "translayte.com", "www.fogartyoliverandrothschild.com.au", "www.notarypublichub.com.au",),
     "docs/kb/buyer-costs/inspections-conveyancing-fees.md": ("conveyancercompare.com.au", "elevatedstrata.com.au", "engie.com.au", "nestpath.com.au", "ourtop10.com.au", "rezzi.com.au", "whatsthedamage.com.au", "www.bark.com", "www.canstar.com.au", "www.finder.com.au", "www.savings.com.au",),
     "docs/kb/existing-home-sale/net-proceeds.md": ("www.finder.com.au", "www.mozo.com.au",),
-    "docs/kb/facts/infrastructure.md": ("en.wikipedia.org",),
-    "docs/kb/facts/living-in-australia.md": ("mmx.prnewswire.com", "www.prnewswire.com",),
     "docs/kb/fx-providers/wise-ofx-bank-comparison.md": ("www.thecurrencyshop.com.au",),
     "docs/kb/fx/typical-spreads-vnd-aud.md": ("www.thecurrencyshop.com.au",),
     "docs/kb/investor/operating-expenses-typical-ratios.md": ("nationalcover.com.au", "nestpath.com.au", "www.canstar.com.au", "www.mozo.com.au",),
@@ -516,14 +518,11 @@ FACT_RANKING_SOURCES = {
     "https://mmx.prnewswire.com/media/MS1877578/Liveability-Index-2026-top-ten.jpg?id=OA2747154&p=publish": "EIU",
 }
 # Regulated figures are grounded -> P-7 -> The KB compiler -> a fact may cite a named reference work
-# Behavior 133 (Son, 2026-10-18, confirmed): "is there one highway through every mainland
-# state" has no government answer — no *.gov.au page gives Highway 1's route or length
-# (searched 2026-10-18) — so its card cites Wikipedia, named here by exact URL and marked
-# `kind: reference` (the sheet labels it "not a government source"). Same archive rules as
-# a ranking. It is no licence for figures a government publishes: those stay on *.gov.au.
-FACT_REFERENCE_SOURCES = {
-    "https://en.wikipedia.org/wiki/Highway_1_(Australia)": "Wikipedia",
-}
+# Behavior 133 named Wikipedia's Highway 1 page here; behavior 138 (2026-10-27: the KB
+# cites only primaries) removed that card, as no *.gov.au page gives Highway 1's route.
+# The kind stays so a reference work a government itself publishes could be named; the
+# list is empty, and a non-primary host added here still fails GATE 17.
+FACT_REFERENCE_SOURCES = {}
 FACT_SOURCE_KINDS = ("ranking", "reference")
 
 

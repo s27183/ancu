@@ -53,7 +53,7 @@ export interface FactSource {
     note?: string;
     /** Behavior 49: a named non-government ranking (EIU), labelled as such in the sheet. */
     kind?: 'ranking' | 'reference';
-    /** Behavior 133: a named reference work (Wikipedia's Highway 1), where no government publishes the answer. */
+    /** Behavior 133: a named reference work, where no government publishes the answer (none is named since behavior 138 removed Highway 1). */
 }
 
 export interface FactDoc {
@@ -249,8 +249,6 @@ const PUBLISHERS: Record<string, Localized> = {
     // EIU's own release and its table, distributed through PR Newswire.
     'www.prnewswire.com': { en: 'EIU', vi: 'EIU' },
     'mmx.prnewswire.com': { en: 'EIU', vi: 'EIU' },
-    // Behavior 133: the named reference work GATE 12 admits (FACT_REFERENCE_SOURCES).
-    'en.wikipedia.org': { en: 'Wikipedia', vi: 'Wikipedia' },
     'www.bitre.gov.au': {
         en: 'Bureau of Infrastructure and Transport Research Economics (BITRE)',
         vi: 'Cục Nghiên cứu Kinh tế Hạ tầng và Giao thông Úc (BITRE)'

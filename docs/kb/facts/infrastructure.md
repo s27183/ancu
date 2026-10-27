@@ -49,11 +49,6 @@ sources:
     retrieved: 2026-10-18
     path: docs/sources/infrastructure/bitre-yearbook-2024-intercapital-distances-2026-10-18.txt
     note: "BITRE, Australian Infrastructure and Transport Statistics Yearbook 2024, Table 6.1 — intercapital road distances (the 2025 yearbook has no such table)."
-  - url: https://en.wikipedia.org/wiki/Highway_1_(Australia)
-    retrieved: 2026-10-18
-    path: docs/sources/infrastructure/wikipedia-highway-1-australia-2026-10-18.txt
-    kind: reference
-    note: "Wikipedia, Highway 1 (Australia) — no government page gives Highway 1's route or length (searched 2026-10-18)."
 ---
 
 # Infrastructure — facts for /facts
@@ -62,7 +57,7 @@ What the Australian Government has committed to roads and rail (behavior 132; So
 
 Left out: airports, ports and energy (not in this program; no government figure for them was read from the seat — BITRE's pages answered 404/403 on 2026-10-18), Infrastructure Australia's 2026 Infrastructure Priority List (priorities in prose, no figures per state), and projects already funded before this Budget (each overview lists them; the cards keep to totals and the new ones). When the next Budget's overviews are published (usually May), re-fetch all eight, re-archive, and update the figures and quotes together.
 
-Behavior 133 (Son 2026-10-18, a friend's questions: "number of highways, longest high ways … a highway connecting all states"): three more cards. BITRE's yearbooks give the length of Australia's paved roads by type (2025 yearbook, 2024 figures) and the road distance between capitals (2024 yearbook; the 2025 one dropped the table). BITRE writes thousands with a space (475 612), so each of those values says it is read off the quoted row (`derived`). Australia keeps no count of its highways: BITRE measures roads by type (undivided, divided, freeway), not by named highway, so "how many highways" is answered by the length card. Whether one highway links every mainland state has no government answer; the Highway 1 card cites Wikipedia, named in GATE 12's FACT_REFERENCE_SOURCES and labelled "not a government source" on the card. Wikipedia's "longest single highway" (Great Northern Highway) is left out: it gives no source for the figure.
+Behavior 133 (Son 2026-10-18, a friend's questions: "number of highways, longest high ways … a highway connecting all states"): two more cards (a third, Highway 1, was removed by behavior 138). BITRE's yearbooks give the length of Australia's paved roads by type (2025 yearbook, 2024 figures) and the road distance between capitals (2024 yearbook; the 2025 one dropped the table). BITRE writes thousands with a space (475 612), so each of those values says it is read off the quoted row (`derived`). Australia keeps no count of its highways: BITRE measures roads by type (undivided, divided, freeway), not by named highway, so "how many highways" is answered by the length card. Whether one highway links every mainland state has no government answer (no *.gov.au page gives Highway 1's route or length, searched 2026-10-18 and again 2026-10-27), so there is no card for it: behavior 138 (2026-10-27) removed the Highway 1 card, which cited Wikipedia — the KB cites only primaries.
 
 ## Facts
 
@@ -194,20 +189,6 @@ Behavior 133 (Son 2026-10-18, a friend's questions: "number of highways, longest
       "quotes": ["Sydney Melbourne Brisbane Adelaide Perth Darwin Canberra km",
                  "Sydney - 878 911 1 375 3 934 3 936 287",
                  "Source: Google maps as at 16 November 2023"]
-    },
-    {
-      "id": "highway_1",
-      "visual": "statement",
-      "headline": {"en": "One highway reaches every mainland state: Highway 1, about 14,500 km around the coast",
-                   "vi": "Có một xa lộ đi qua mọi bang trên đất liền: Xa lộ số 1, khoảng 14.500 km quanh bờ biển"},
-      "caption": {"en": "Highway 1 is a chain of highways sharing route number 1 that circles the country. It joins every mainland capital except Canberra and reaches every state, plus the Northern Territory; in Tasmania a separate Highway 1 runs from Hobart to Burnie. It is the longest national highway in the world.",
-                  "vi": "Xa lộ số 1 là chuỗi các xa lộ cùng mang số hiệu 1, chạy vòng quanh nước Úc. Nó nối mọi thủ phủ trên đất liền trừ Canberra và đi qua mọi bang, cùng Lãnh thổ Bắc Úc; ở Tasmania có một đoạn Xa lộ số 1 riêng từ Hobart đến Burnie. Đây là xa lộ quốc gia dài nhất thế giới."},
-      "as_of": "2026-10",
-      "source": [11],
-      "quotes": ["Highway 1 is a network of highways that circumnavigate the country, joining all mainland capital cities except the national capital, Canberra .",
-                 "At a total length of approximately 14,500 kilometres (9,000 miles) , it is the longest national highway in the world",
-                 "Highway 1 is the only route to reach across all Australian states, plus the Northern Territory.",
-                 "A separate section in Tasmania connects Hobart to Burnie ."]
     }
   ]
 }
