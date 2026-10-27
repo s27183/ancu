@@ -1,7 +1,7 @@
 ---
 slug: kb.buyer-costs.foreign-buyer-services
 effective_from: 2026-10-16
-last_verified: 2026-10-16
+last_verified: 2026-10-27
 sources:
   - url: https://www.naati.com.au/resources/dfat-translation-requirements/
     retrieved: 2026-10-16
@@ -39,17 +39,13 @@ sources:
     path: docs/sources/foreign-buyer/mynotary-fees.txt
     quotes:
       - "Certifying two to five individual copy documents (of up to five pages each) under one notarial certificate $185"
-  - url: https://www.fogartyoliverandrothschild.com.au/insights/conveyancing-fees-melbourne
-    retrieved: 2026-10-16
-    path: docs/sources/foreign-buyer/fogarty-conveyancing-fees-melbourne.txt
+  - url: https://www.fogartyoliverandrothschild.com.au/conveyancing/bentleigh
+    retrieved: 2026-10-27
+    path: docs/sources/foreign-buyer/fogarty-conveyancing-fixed-fees.txt
     quotes:
-      - "$660 — Standard residential sale or purchase, no complexity"
-      - "$990 — Multi-title properties, FIRB transactions, restrictive covenant analysis"
-  - url: https://skyvia.com.au/posts/firb-foreign-buyer-guide/
-    retrieved: 2026-10-16
-    path: docs/sources/foreign-buyer/skyvia-firb-foreign-buyer-guide.txt
-    quotes:
-      - "很多人选择让律师代为提交 FIRB 申请，费用大约 $1,000-$3,000（律师服务费，不含 FIRB 申请费本身）"
+      - "$660 — Standard residential sale or purchase, no overlay complexity, no owners corporation, first-home buyer or standard transaction"
+      - "$990 — Complex matters — multiple titles, subdivisions, FIRB transactions, properties with ongoing OC litigation"
+      - "Fixed fee $660–$990 inc GST, disbursements at cost"
 ---
 
 # Foreign-buyer services — certified translation, document certification, FIRB application help
@@ -71,7 +67,7 @@ So the plan places **$0–$275**: $0 when a JP's certification is enough, up to 
 
 ## FIRB application help (optional)
 
-The buyer can lodge the FIRB application themselves; many hire a lawyer or adviser to prepare it. Published pricing is thin. A Melbourne law firm prices a FIRB purchase at **$990** fixed against **$660** for a standard purchase, so FIRB work adds about **$330** when the conveyancing lawyer handles it in-house. A foreign-buyer guide puts a lawyer's fee to prepare the application at **about $1,000–$3,000** (excluding the government fee). The plan places **$330–$3,000** and marks the line optional.
+The buyer can lodge the FIRB application themselves; many hire a lawyer or adviser to prepare it. Published pricing is thin. A Melbourne law firm (Fogarty Oliver Rothschild) publishes fixed conveyancing fees of **$990** for complex matters including FIRB transactions against **$660** for a standard purchase, so FIRB work adds about **$330** when the conveyancing lawyer handles it in-house. No provider read for this doc publishes a price for preparing a FIRB application separately; firms that advertise FIRB work quote on request. The plan places **$330–$3,000** and marks the line optional; the **$3,000** upper end is a **placeholder**, not a published price.
 
 ## Relevance for buyers based in Vietnam (Modes B, D)
 
@@ -135,11 +131,11 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
           "low": 330, "high": 3000,
           "applies": { "modes": ["fhb-foreign-au", "investor-foreign-au"], "states": "all", "property": "any" },
           "optional": true,
-          "note": "low = a law firm's published FIRB premium over its standard purchase fee ($990 − $660); high = a foreign-buyer guide's $1,000–$3,000 lawyer fee. Few firms publish a FIRB-only price — re-ground when two do",
+          "note": "low = Fogarty Oliver Rothschild's published FIRB-tier conveyancing fee over its standard purchase fee ($990 − $660). PLACEHOLDER — no primary states the $3,000 high end; re-ground on two law firms' or FIRB advisers' own published fixed fees for preparing a residential FIRB application (a firm's own FIRB fee page).",
           "label":   { "vi": "Phí luật sư/tư vấn chuẩn bị hồ sơ FIRB (không gồm lệ phí FIRB)", "en": "Help preparing the FIRB application (not the FIRB fee)" },
           "payer":   { "vi": "Người mua trả — không bắt buộc, có thể tự nộp", "en": "The buyer pays — optional; the buyer can lodge it themselves" },
           "drivers": { "vi": "Rẻ nhất khi luật sư làm thủ tục mua nhà (conveyancing) xử lý luôn FIRB; đắt hơn khi thuê riêng, khi mua qua công ty/quỹ tín thác (trust) hoặc hồ sơ phức tạp.", "en": "Lowest when the conveyancing lawyer handles FIRB in-house; higher when hired separately, or when buying through a company or trust, or the case is complex." },
-          "source":  "https://skyvia.com.au/posts/firb-foreign-buyer-guide/"
+          "source":  "https://www.fogartyoliverandrothschild.com.au/conveyancing/bentleigh"
         }
       ]
     }
@@ -152,13 +148,14 @@ Notes:
 - **No `fills`.** Each line is a cash event the engine emits for Modes B and D; no outcome leaf is set.
 - **CONVENTION, never regulated.** Translators, notaries and lawyers set their own prices. The plan shows a range and the buyer's quote replaces it.
 - **The translation band is derived.** Published per-page prices × an assumed 3–6 page set (the `typical_document_pages_*` parameters); the derivation is stated so a re-ground can redo it.
-- **FIRB help is thinly sourced.** Only one firm publishes a FIRB-specific price, and one guide gives the $1,000–$3,000 range. Re-ground when two providers publish a FIRB-only fixed fee.
+- **FIRB help is thinly sourced.** Only one firm publishes a FIRB-tier price ($990 against $660 standard); the $3,000 upper end is a PLACEHOLDER. Re-ground when two providers publish a FIRB-only fixed fee.
+- **Every band is a provider's own price page.** The translation band rests on three translators' own NAATI price pages (Translayte from A$59 a page; Australian Translation Services from AU $60 a page; Birth Certificate Translation from $79); the notary band on two notaries' own fee pages (MyNotary $185; Notary Public Hub $275 incl. GST); the JP $0 on the SA Government's Law Handbook.
 - **Single owner.** The FIRB government fee → `kb.firb.fee-schedule-current`; the money transfer from Vietnam → `kb.fx.typical-spreads-vnd-aud`.
 
 ## Sources
 
 - NAATI — *DFAT requirements for translators* (what a certified translator's stamp shows; DFAT accepts only NAATI-certified translations) — https://www.naati.com.au/resources/dfat-translation-requirements/
-- Published NAATI translation prices — https://translayte.com/certified-translations/naati-translator ; https://australiantranslationservices.com.au/languages/naati-vietnamese-translator/ ; https://birthcertificatetranslation.com.au/vietnamese-birth-certificate-translation-naati/
+- Translators' own NAATI price pages — https://translayte.com/certified-translations/naati-translator ; https://australiantranslationservices.com.au/languages/naati-vietnamese-translator/ ; https://birthcertificatetranslation.com.au/vietnamese-birth-certificate-translation-naati/
 - Law Handbook (SA Government) — *Justices of the Peace* (JP services are free; notaries can charge) — https://lawhandbook.sa.gov.au/ch26s04s08.php
-- Published notary prices — https://www.notarypublichub.com.au/pricing ; https://mynotary.com.au/ (Society of Notaries of Victoria benchmark scale)
-- FIRB application help — https://www.fogartyoliverandrothschild.com.au/insights/conveyancing-fees-melbourne ; https://skyvia.com.au/posts/firb-foreign-buyer-guide/
+- Notaries' own fee pages — https://www.notarypublichub.com.au/pricing ; https://mynotary.com.au/ (Society of Notaries of Victoria benchmark scale)
+- FIRB application help — Fogarty Oliver Rothschild's own fixed-fee conveyancing page ($660 standard; $990 complex matters including FIRB transactions) — https://www.fogartyoliverandrothschild.com.au/conveyancing/bentleigh

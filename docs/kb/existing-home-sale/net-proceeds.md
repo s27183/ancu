@@ -1,16 +1,23 @@
 ---
 slug: kb.existing-home-sale.net-proceeds
 effective_from: 2026-07-05
-last_verified: 2026-10-16
+last_verified: 2026-10-27
 sources:
-  - url: https://www.mozo.com.au/home-loans/resources/guides/how-to-discharge-your-mortgage-and-what-it-means.html
-    retrieved: 2026-07-06
-  - url: https://www.finder.com.au/home-loans/home-loan-exit-fees
-    retrieved: 2026-10-16
-    path: docs/sources/existing-home-sale/finder-home-loan-discharge-fees.txt
+  - url: https://www.commbank.com.au/content/dam/commbank/personal/apply-online/download-printed-forms/003-750.pdf
+    retrieved: 2026-10-27
+    path: docs/sources/existing-home-sale/cba-mortgage-lending-fees-2026-07.txt
     quotes:
-      - "The average mortgage discharge fee is just over $300. Some lenders charge as much as $500 or as little as $150."
-      - "CBA discharge fee: $350"
+      - "Payable if you discharge the loan, i.e. either sell part or all of $350"
+  - url: https://www.nab.com.au/important-information/personal/fees-charges/home-loan
+    retrieved: 2026-10-27
+    path: docs/sources/existing-home-sale/nab-home-loan-fees.txt
+    quotes:
+      - "Includes preparation of discharge, attending settlement and lodgement of documents where applicable. $350"
+  - url: https://www.loans.com.au/home-loans/faqs/managing-your-home-loan
+    retrieved: 2026-10-27
+    path: docs/sources/existing-home-sale/loanscomau-managing-your-home-loan-faq.txt
+    quotes:
+      - "Typically, there will be $300 discharge fee and $250 discharge documentation fee."
   - url: https://www.westpac.com.au/personal-banking/home-loans/fees/
     retrieved: 2026-10-16
     path: docs/sources/existing-home-sale/westpac-home-loan-fees.txt
@@ -43,7 +50,7 @@ Each term is either **reused from an existing KB doc** (selling costs, CGT — t
 Selling the home requires **discharging** (paying out and closing) any mortgage secured against it. Two components:
 
 - **Outstanding principal balance** — the amount still owed, a fact from the buyer's own loan statement (not a KB estimate; the resolver takes it as user-attested input, same discipline as `<from_transaction>` facts elsewhere in this architecture — never inferred).
-- **Discharge/settlement administration fee** — a lender-set fee to process the discharge, conventionally **$150–$500** (some lenders up to ~$795; reported averages cluster around $300–$330). This is a **market-set estimate**, not a regulated figure — no statutory fee schedule exists for it.
+- **Discharge/settlement administration fee** — a lender-set fee to process the discharge. Each lender publishes its own: **CommBank $350** (its "Settlement Fee (Discharge)"), **NAB $350**, **Westpac $350**, and **loans.com.au $300 plus a $250 discharge documentation fee**. The plan carries a **$150–$500** band; the top sits below loans.com.au's $550 combined, and no lender page read for this doc publishes a fee as low as $150, so the low end is not grounded on a primary (see the note on the fee line). This is a **lender-policy figure**, not a regulated one — no statutory fee schedule exists for it.
 
 **If the loan is fixed-rate and being discharged before the fixed term ends**, a **break cost** (also called an early-repayment or break fee) applies. This is **not a fixed percentage or regulated figure** — it reflects the lender's own **economic loss** from the borrower exiting early (driven by how much interest rates have moved since the fixed rate was locked in; larger when rates have fallen more). The resolver surfaces this as a **`to_verify` flag** when the buyer's loan is fixed-rate, never an estimated dollar figure — the number can only come from the buyer's own lender.
 
@@ -96,8 +103,9 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
           "timing": "one_off",
           "tier": "LENDER-POLICY",
           "basis": "fixed",
-          "low": 150,
-          "high": 500,
+          "low": 350,
+          "high": 550,
+          "note": "LENDER-POLICY band — CommBank: $350 (Settlement Fee (Discharge), 003-750 July 2026); NAB: $350 (Mortgage Discharge Fee); Westpac: $350 (Loan discharge fee); loans.com.au: $300 discharge fee + $250 discharge documentation fee. Low $350 (the three majors), high $550 (loans.com.au combined); was 150–500, which no lender page supported.",
           "applies": {
             "modes": [
               "fhb-domestic-au",
@@ -119,10 +127,10 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
             "en": "The seller pays the lender when the loan is paid out"
           },
           "drivers": {
-            "vi": "Do từng ngân hàng quy định; bốn ngân hàng lớn thường ~$350. Vay lãi suất cố định còn có thể chịu phí phá vỡ hợp đồng (break cost) — tính riêng.",
-            "en": "Set by each lender; the major banks are typically ~$350. A fixed-rate loan can also carry a break cost — separate."
+            "vi": "Do từng ngân hàng quy định: CommBank, NAB và Westpac đều $350; loans.com.au $300 cộng $250 phí giấy tờ. Vay lãi suất cố định còn có thể chịu phí phá vỡ hợp đồng (break cost) — tính riêng.",
+            "en": "Set by each lender: CommBank, NAB and Westpac each charge $350; loans.com.au $300 plus a $250 documentation fee. A fixed-rate loan can also carry a break cost — separate."
           },
-          "source": "https://www.finder.com.au/home-loans/home-loan-exit-fees"
+          "source": "https://www.nab.com.au/important-information/personal/fees-charges/home-loan"
         },
         {
           "id": "mortgage_discharge_registration_nsw",
@@ -255,7 +263,7 @@ Notes:
 - ASIC Regulatory Guide 220 — *Early termination fees for residential loans* — https://download.asic.gov.au/media/seubdgt4/rg220-published-09-november-2023.pdf (named as a corroborating secondary; PDF text not successfully parsed this pass — not independently re-read).
 - MoneySmart (ASIC) — glossary entry, *"break fee"* — https://moneysmart.gov.au/glossary/break-fee (retrieved via search snippet; direct fetch blocked by the site, HTTP 403).
 
-**Estimates — conventional market ranges (not a regulated primary):**
+**Lender policy — each lender's own published fee:**
 
-- Discharge/settlement admin fee range ($150–$500, some lenders to ~$795) — aggregator corroboration (Yard Home Loans, Canstar); re-verify against a primary lender fee schedule before treating as more than indicative.
+- Discharge/settlement admin fee (LENDER-POLICY band) — each lender's own fee schedule: CommBank, *Fees we charge for consumer mortgage lending products* (003-750, July 2026) — https://www.commbank.com.au/content/dam/commbank/personal/apply-online/download-printed-forms/003-750.pdf ($350); NAB, *Home loan and line of credit fees and charges* — https://www.nab.com.au/important-information/personal/fees-charges/home-loan ($350); Westpac, *Home loan fees* — https://www.westpac.com.au/personal-banking/home-loans/fees/ ($350); loans.com.au, *Managing your home loan FAQs* — https://www.loans.com.au/home-loans/faqs/managing-your-home-loan ($300 + $250 documentation).
 - Discharge processing notice period (10–21 business days) — lender-published requirement pages: nab.com.au, anz.com.au, hsbc.com.au.

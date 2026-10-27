@@ -1,0 +1,427 @@
+Source: https://www.commbank.com.au/content/dam/commbank/personal/apply-online/download-printed-forms/003-750.pdf
+Retrieved: 2026-10-27
+Extracted: pdftotext -layout of the fetched PDF; sha256 of the fetched PDF 814afee1c2b4f801596c9eaae2e5f847fd3a7c67334d57e2201e59682af3b1f4
+
+                         Section 1: Understanding fees and charges
+
+
+
+
+                         Section 2: Summary of fees
+Fees we charge for
+consumer mortgage
+lending products.
+Effective October 2026
+When we may charge fees
+The Commonwealth Bank charges fees for administering your account and providing
+banking services.
+Generally, we may charge fees:
+
+
+
+
+                                                                                                     Section 1: Understanding fees and charges
+• When you settle the loan
+• During the loan term
+• If you break a fixed rate loan
+• When you fully pay off the loan.
+The fees we charge may vary depending on the product you choose or the type of service
+you request.
+
+
+How we collect fees
+Fees will be debited to your loan or related account when we process your request or transaction.
+
+
+Government charges
+Government fees (e.g. stamp duty, transfer, and mortgage registration fees) apply and vary
+by State or Territory.
+Norfolk Island also has specific charges such as Stamp Duty (payable on cheques issued in
+Norfolk Island) and Goods and Services Tax (on certain service fees the Bank provides). The
+Bank collects the Goods and Services Tax from you and passes this on to the Government.
+
+          Note: Government fees are not bank fees. The Bank collects these charges
+          on behalf of the Government. Please contact the relevant State Government
+          Department to find out how much you will be charged.
+
+
+
+Changes to fees
+
+
+                                                                                                     Section 2: Summary of fees
+When we change fees, we will notify you of any changes by advertising in a leading daily
+newspaper in each State or Territory, or in writing to you, no later than the day on which the
+variation takes effect, or as required under your Loan Contract.
+
+
+
+
+                                                                                                 2
+Meaning of words
+Home loan term         Description
+
+Extra home loan        Product is removed from sale on and from 10 September 2025 and
+                       limit increases (top ups) are unavailable on and from 4 October 2025.
+
+
+
+
+                                                                                                   Section 1: Understanding fees and charges
+Fixed rate             An interest rate that is set for an agreed term.
+
+Guarantor              A party who has legally agreed to be responsible for the payment
+                       of another party’s debts.
+
+Home loan              Includes Owner Occupied, Investment, Low Documentation,
+                       Interest in Advance and Off the Plan purchase home loans.
+
+Loan                   The credit, described on the front page of the Schedule, we give you
+                       under the Contract.
+
+Low Documentation      A loan generally for self-employed people who may not have the
+                       financial documents normally required to obtain a loan.
+
+Off the plan           Buying a property – usually an apartment – from seeing the plans,
+                       before it is completed or even built.
+
+Package                The Package benefits (which may also be described as ‘Wealth
+                       Package’ or ‘Mortgage Advantage’ in certain contexts) that are
+                       set out in the Consumer Mortgage Lending Products Terms and
+                       Conditions and the applicable Product Guides.
+
+Packaged Loan          Means a Loan that is entitled to the benefits of a Package.
+
+Product Guide          A document for eligible home loans/Viridian Line of Credit that
+                       sets out the key considerations for the product including details of
+                       Package benefits.
+
+Redraw facility        Allows access to additional (special) repayments made on a loan.
+
+Security               An asset – usually the property purchased with the loan funds – that
+                       can be sold by a lender if the debt is not repaid in full.
+
+Settlement             When the sale or purchase of a property is completed and the owner
+
+
+
+
+                                                                                                   Section 2: Summary of fees
+                       takes possession of the property.
+
+Settlement date        The date when the new owner makes a final payment and takes
+                       possession of a property.
+
+Variable rate          An interest rate that can go up and down.
+
+Viridian Line of Credit Includes Low Documentation Lines of Credit (introduced to us via
+                        a Broker), Low Documentation Viridian Lines of Credit, and Equity
+                        Unlock for Seniors.
+                       On and from 3 June 2023, Viridian Line of Credit is unavailable for
+                       new fundings and limit increases.
+
+
+
+
+                                                                                               3
+Fees payable at the time of settlement
+or funding
+There are fees associated with the preparation to settlement of a home loan, including if you
+instruct bank staff to prepare relevant loan documents and any correspondence that may
+
+
+
+
+                                                                                                                    Section 1: Understanding fees and charges
+arise when we talk to your legal representative.
+Your Loan Contract Schedule identifies the fees that are payable at settlement.
+
+ Name of fee        When is the fee payable                                           $
+
+ Additional         Payable if we require you to provide more than one security       $150
+ Security Fee       (i.e. the security used to support the repayment of the loan),    per new security
+                    and one or more of these securities is ‘new’ i.e. does not
+                    already secure another loan.
+ Establishment      We charge the Establishment Fee to cover the costs we incur in establishing your loan
+ Fee^               and unless it is waived by us, is payable at the date of settlement or funding. This does
+                    not include other fees and charges that may also be payable when you enter into the
+                    loan, including fees related to settlement or the specific circumstances of your loan.
+                    The Establishment Fee isn’t related to any legal costs.
+                    Fees are payable for:                                      $300
+                      Simple Home Loan when purchasing an established property Or $800 for
+                      or refinance (excludes internal refinances and top ups). off-the-plan
+
+                      Digi Home Loan when purchasing an established property          $300
+                      or refinance.
+                    The following products when topping up an existing loan:          $300
+                    • Standard Variable Rate (if the loan is not a Packaged Loan)
+                    • Fixed Rate (if the loan is not a Packaged Loan)
+                    • Economiser/Rate Saver
+                    • No Fee Variable Rate
+
+ Progressive        Payable when we make progressive payments to the funding          $75 per drawing
+ Drawing Fee        of your loan. Payable at your final drawing.
+
+ Rate Lock Fee      Payable if you elect to lock in your reference interest rates on $750 per Rate Lock
+                    new Fixed Rate Home Loan or Fixed Rate Investment Home
+                    Loan applications. The Rate Lock Fee is debited from your
+                    Related Account when the Rate Lock request is processed, and
+                    this is when the 90 day Rate Lock period begins.
+
+
+
+
+                                                                                                                    Section 2: Summary of fees
+ Security           Payable if guarantor(s) are required on the loan.                 $200 per borrower
+ Guarantee Fee
+
+ Settlement Fee**   Payable regardless of whether we attend settlement or not,        $200
+                    when the Bank or our representative, arranges the funding of      ($150 if the disclosure
+                    the loan.                                                         date in the Contract is
+                                                                                      before 03/02/12)
+
+ Settlement         Payable if you require additional cheques (more than two) to      $30 per cheque
+ Cheque Fee         fund/settle the loan.
+
+
+
+
+                                                                                                                4
+ Name of fee                      When is the fee payable                                                                   $
+
+Lenders’ Mortgage                 We may require you to pay LMI depending on the                    To be advised when
+Insurance Premium                 circumstances and increased risk associated with your loan.       we calculate the
+(LMI)                             LMI protects us (not you) against the potential loss we may       premium
+                                  incur if you can’t repay your loan. If the security property is
+                                  sold and the proceeds are insufficient to fully repay the loan,
+
+
+
+
+                                                                                                                                                         Section 1: Understanding fees and charges
+                                  we may recover the outstanding amount under our LMI policy.
+                                  The LMI provider may seek to recover the outstanding amount
+                                  from you, as you are still responsible for repaying the whole
+                                  loan. The LMI premium is a one-off charge added to the total
+                                  loan amount and is collected on your behalf and passed to our
+                                  insurance provider. It is not a bank fee or an establishment fee.
+ Low Deposit                      We may require you to pay LDP depending on the                                            To be advised when
+ Premium (LDP)                    circumstances and increased risk associated with your loan.                               we calculate the
+                                  LDP is a one-off bank fee added to the total loan amount,                                 premium
+                                  and if we ask you to pay LDP we won’t ask you to pay for
+                                  LMI. It is not a fee for the establishment of the loan. Even if
+                                  you have paid LDP, we may still seek to recover from you any
+                                  outstanding amount if the security property is sold and the
+                                  proceeds are insufficient to fully repay the loan.
+
+^ Extra home loan is unavailable for new applications on and from 10 September 2025 and loan limit increases (top ups) are unavailable on and from
+  4 October 2025.
+** Not payable if your loan type is Digi Home Loan.
+
+
+
+
+Fees that may apply during the term
+of your loan
+                Note: The following fees do not apply to existing No Fee Variable Rate Home Loan
+                or No Fee Variable Rate Investment Home Loans.
+
+ Name of fee                      When is the fee payable                                                                   $
+
+ Access Fees                      Payable if you make withdrawals from your Line of Credit.
+ (overseas
+                                  Different Access Fees apply depending on the method of
+ transactions)
+                                  access you choose (fees are in Australian currency):
+
+
+
+
+                                                                                                                                                         Section 2: Summary of fees
+                                     Through the Automatic Teller Machines of ASB Bank                                      $2
+                                     in New Zealand, Commonwealth Bank in Indonesia and
+                                     Commonwealth Bank in Vietnam.
+                                     Overseas access through the Maestro and Cirrus,
+                                     Mastercard or Visa Plus networks of electronic terminals:
+                                     – Maestro (EFTPOS) or Debit Mastercard purchase in                                     3.5% of the
+                                       foreign currency (or transaction that involves a currency                            transaction value
+                                       conversion).
+                                     – Cirrus, Mastercard or Visa Plus ATM cash withdrawal in                               $5 plus 3.5% of the
+                                       foreign currency.                                                                    transaction value
+
+                                     – Maestro (EFTPOS) or Debit Mastercard purchase in                                     3.5% of the
+                                       Australian dollars when overseas.                                                    transaction value
+
+
+
+
+                                                                                                                                                     5
+Name of fee            When is the fee payable                                              $
+
+ATM fees within        The Bank does not charge Access Fees on withdrawals or account balance enquiries
+Australia              on lines of credit through non-Commonwealth Bank ATMs in Australia. However,
+                       ATM owners may charge a fee to your loan if you proceed. For more information,
+                       please refer to our Electronic Banking Terms and Conditions brochure which can
+                       be obtained by contacting us and available at commbank.com.au.
+
+
+
+
+                                                                                                                  Section 1: Understanding fees and charges
+Annual Service Fee     Payable if your home loan is with the former State Bank of           $33
+                       Victoria and the terms and conditions state the fee is required.
+Annual Wealth          The non-refundable Package Fee will be charged to a loan that        $395 per annum
+Package and            receives Package benefits or may be redirected to a related
+Mortgage Advantage     transaction account to the eligible loan (for example, for interest-
+Fee                    only loans) in accordance with the terms and conditions of that
+                       loan. Please refer to the applicable product guide and Consumer
+                       Mortgage Lending Products Terms and Conditions for full details.
+Late Payment Fee#      For home loans – If your account falls into arrears, you will be     $20
+                       charged a late payment fee. This fee is payable on the fifth
+                       business day after the monthly repayment due date. We will
+                       continue to charge the fee monthly until you repay all arrears or
+                       you enter into an arrangement with us for the full repayment of
+                       those arrears (even if you repay your loan weekly or fortnightly).
+                       If you break that arrangement the fee will continue to apply.
+Loan Service Fee^*     • For home loans (excluding Digi Home Loan, Extra home loan, $8 per month
+                         Simple Home Loan and Packaged Loans) – charged monthly
+                         to each Loan Account on the repayment due date.
+                       • For Interest in Advance Investment Home Loans, the fee
+                         is charged to the Related Account monthly on the first
+                         business day of each month.
+                       • For Digi Home Loan                                                 $0 per month
+                       • For Viridian Lines of Credit (excluding Packaged Loans) –          $12 per month
+                         charged to your nominated account on the first calendar day
+                         of each month for each loan.
+                       • For Simple Home Loan – charged monthly to each Loan                $10 per month
+                         Account on the repayment due date.
+Other Electronic       Payable if you use any of our electronic banking services to access your account.
+Banking Fees           For details of fees please refer to our Electronic Banking Terms and Conditions
+                       brochure which can be obtained by contacting us and is available at
+                       commbank.com.au.
+
+Outward Dishonour      Payable if you have insufficient funds in your Viridian Line of      $5
+Fee                    Credit account and a cheque is drawn.
+
+
+
+
+                                                                                                                  Section 2: Summary of fees
+Paper Statement Fee For Digi Home Loan – Payable if you opt out of electronic        $2.50 per
+                    statements and request bi-annual paper statements, ask us to statement
+                    print a statement or provide you with an ad-hoc paper statement.
+Periodical Payments    Payable if you arrange a periodical payment or ask us to             $1.80 plus transfer
+or Transfers           transfer funds.                                                      fee, bank cheque
+                                                                                            fee and postage
+                                                                                            as applicable
+Security Substitution Payable if you ask us to substitute one of your securities with       $300
+Fee                   another.
+Stop Payment           Payable if you ask us to stop payment on a cheque you have           $15 per request
+Notice Fee             written.
+Switching Fee          For Digi Home Loan – Payable when switching your loan                $50 per change
+                       purpose, repayment type or product type.
+Trust Investigation    Payable if we incur investigation cost for loans involving a Trust. To be advised when
+Fee and UTC            This fee applies even if we don’t give you a loan. (Refer to UTC we calculate the fee
+Clause 2.1             Clause 2.1)
+                                                                                                              6
+ Name of fee                      When is the fee payable                                                                    $
+
+ Voucher Fee                      Payable if you ask us to retrieve a voucher (i.e. deposit, credit or                          $4 per voucher
+                                  debit slips) that records a transaction on the Loan Account.                                  (minimum charge
+                                                                                                                                $12) or $60 per
+                                                                                                                                hour spent to
+                                                                                                                                retrieve voucher(s)
+
+
+
+
+                                                                                                                                                          Section 1: Understanding fees and charges
+^ Extra home loan is unavailable for new applications on and from 10 September 2025 and loan limit increases (top ups) are unavailable on and from
+  4 October 2025.
+* Not payable if your loan type is Equity Unlock for Seniors.
+# Not payable if your loan type is:
+  – Viridian Line of Credit
+  – Equity Unlock for Seniors
+
+
+
+
+Fees if you prepay or switch a fixed rate loan
+When the Bank processes your request we debit the Administrative Fee and Early Repayment
+Adjustment to your Loan Account.
+ Name of fee                      When is the fee payable                                                                   $
+ Administrative Fee               Fixed Rate Home Loan                                                                      $50
+                                  Payable if you:
+                                  • Repay your home loan in full before the fixed interest rate
+                                    period expires; or
+                                  • Make partial prepayments which exceed $10,000 in any
+                                    year of your fixed rate loan.
+ Early Repayment                  Payable if you:                                                To be advised when
+ Adjustment                       • Make partial prepayments on a fixed rate loan which exceed we calculate the fee
+                                    $10,000 in any year of your fixed rate loan (including
+                                    paying the loan off in full); or
+                                  • Switch your fixed rate loan before the selected fixed period
+                                    expires; or
+                                  • Top up the amount of credit of a home loan during a fixed
+                                    rate period.
+
+
+
+
+Fees if you pay off your loan early
+
+
+                                                                                                                                                          Section 2: Summary of fees
+                Note: The following fees do not apply to existing No Fee Variable Rate Home Loan
+                or No Fee Variable Rate Investment Home Loans.
+
+ Name of fee                      When is the fee payable                                                                   $
+ Early Repayment Fee              Payable if you:                                                    To be advised when
+ payable on Standard              • repay the loan early, in full or by lump sum payment; or         we calculate the fee
+ Variable Rate and                • refinance your loan internally or externally.
+ Base Variable Rate
+ (approved before                 Fee calculation: This fee is calculated by multiplying the loan
+ 1 November 1996)                 balance at the time of repayment by one month’s interest. The
+                                  interest rate charged will be at the rate applicable at that date.
+ Settlement Fee                   Payable if you discharge the loan, i.e. either sell part or all of                       $350
+ (Discharge)                      the Security Property or refinance your Loan with another
+                                  credit provider.
+
+
+                                                                                                                                                      7
+                                                                                                                                  Section 1: Understanding fees and charges
+
+
+
+
+We’re here to help.
+If you have any questions or want more information:
+
+          Book an appointment with a Home Lending
+          Specialist at commbank.com.au/appointment
+          or contact your Broker.
+
+
+
+
+                                                                                                                                  Section 2: Summary of fees
+          Message us in the CommBank app
+
+
+          Call us on 13 2224
+
+
+          For more information visit
+          commbank.com.au/homeloans
+
+
+
+
+Things you should know:
+Loan applications are subject to credit approval and any loan offer includes full terms and conditions. Fees and charges apply.
+Commonwealth Bank of Australia ABN 48 123 123 124, AFSL & Australian credit licence 234945.
+
+
+003-750 011026
+                                                                                                                            8
+

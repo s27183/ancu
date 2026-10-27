@@ -232,7 +232,7 @@ PRIMARY_PROVIDER_HOSTS = {
     "docs/kb/fx/typical-spreads-vnd-aud.md": FX_PROVIDER_HOSTS,
     "docs/kb/fx-providers/": FX_PROVIDER_HOSTS,
     "docs/kb/existing-home-sale/net-proceeds.md": PRIMARY_LENDER_HOSTS + REGISTRY_HOSTS,
-    "docs/kb/buyer-costs/inspections-conveyancing-fees.md": REGISTRY_HOSTS,
+    "docs/kb/buyer-costs/inspections-conveyancing-fees.md": REGISTRY_HOSTS + PRIMARY_LENDER_HOSTS,
     # behavior 138 step 2: docs whose cited page is already its maker's own — a lender on
     # its own product, form or policy; an LMI insurer on its own product; a registry on
     # its own rule; NAATI on its own certification; SQM on its own vacancy series.
@@ -245,7 +245,12 @@ PRIMARY_PROVIDER_HOSTS = {
     "docs/kb/refinance/": PRIMARY_LENDER_HOSTS,
     "docs/kb/lmi/": LMI_INSURER_HOSTS,
     "docs/kb/pexa/": REGISTRY_HOSTS,
-    "docs/kb/buyer-costs/foreign-buyer-services.md": ("naati.com.au",),
+    # behavior 138 step 5: each translator, notary and conveyancer quoted for its own
+    # published price (a market band of named providers' own pages).
+    "docs/kb/buyer-costs/foreign-buyer-services.md": (
+        "naati.com.au", "translayte.com", "australiantranslationservices.com.au",
+        "birthcertificatetranslation.com.au", "notarypublichub.com.au", "mynotary.com.au",
+        "fogartyoliverandrothschild.com.au"),
     "docs/kb/investor/vacancy-rate-assumptions.md": ("sqmresearch.com.au",),
     "docs/kb/property/rental-market-data-sources.md": ("sqmresearch.com.au",),
     # behavior 138 step 3: lender policy re-grounded on the lenders' own pages and forms;
@@ -323,10 +328,6 @@ def primary_fails(path, urls):
 # secondary citation never enters and the list only shrinks; behavior 138 re-grounds each
 # group in its own commit until it is empty. Never add to it.
 KNOWN_SECONDARY = {
-    "docs/kb/buyer-costs/broker-and-buyers-agent.md": ("rebaa.com.au", "whichrealestateagent.com.au", "www.canstar.com.au",),
-    "docs/kb/buyer-costs/foreign-buyer-services.md": ("australiantranslationservices.com.au", "birthcertificatetranslation.com.au", "mynotary.com.au", "skyvia.com.au", "translayte.com", "www.fogartyoliverandrothschild.com.au", "www.notarypublichub.com.au",),
-    "docs/kb/buyer-costs/inspections-conveyancing-fees.md": ("conveyancercompare.com.au", "elevatedstrata.com.au", "engie.com.au", "nestpath.com.au", "ourtop10.com.au", "rezzi.com.au", "whatsthedamage.com.au", "www.bark.com", "www.canstar.com.au", "www.finder.com.au", "www.savings.com.au",),
-    "docs/kb/existing-home-sale/net-proceeds.md": ("www.finder.com.au", "www.mozo.com.au",),
     "docs/kb/fx-providers/wise-ofx-bank-comparison.md": ("www.thecurrencyshop.com.au",),
     "docs/kb/fx/typical-spreads-vnd-aud.md": ("www.thecurrencyshop.com.au",),
     "docs/kb/investor/operating-expenses-typical-ratios.md": ("nationalcover.com.au", "nestpath.com.au", "www.canstar.com.au", "www.mozo.com.au",),
@@ -334,7 +335,6 @@ KNOWN_SECONDARY = {
     "docs/kb/investor/rental-appraisal-from-pm-agent.md": ("www.canstar.com.au",),
     "docs/kb/investor/target-yield-by-archetype.md": ("propertyinvestmentprofessionals.com.au",),
     "docs/kb/loan/offset-vs-redraw-investor.md": ("aintreegroup.com.au",),
-    "docs/kb/selling-costs/agent-legal.md": ("whichrealestateagent.com.au", "www.openagent.com.au", "www.yourpropertyguide.com.au",),
 }
 
 
@@ -397,7 +397,7 @@ def _primary_property(seed=138, n=500):
     docs = {"docs/kb/lender/x.md": {"lender"}, "docs/kb/fx-providers/x.md": {"lender", "fx"},
             "docs/kb/fx/typical-spreads-vnd-aud.md": {"lender", "fx"},
             "docs/kb/existing-home-sale/net-proceeds.md": {"lender", "registry"},
-            "docs/kb/buyer-costs/inspections-conveyancing-fees.md": {"registry"},
+            "docs/kb/buyer-costs/inspections-conveyancing-fees.md": {"lender", "registry"},
             "docs/kb/tax/x.md": set(), "docs/kb/facts/x.md": set(), "docs/kb/news/x.md": set()}
     bad = []
     for _ in range(n):
