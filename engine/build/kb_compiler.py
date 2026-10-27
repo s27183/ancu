@@ -347,7 +347,6 @@ KNOWN_SECONDARY = {
     "docs/kb/loan/offset-vs-redraw-investor.md": ("aintreegroup.com.au",),
     "docs/kb/non-resident/entity-options-au-property.md": ("www.allens.com.au",),
     "docs/kb/non-resident/investment-loan-deposit-requirements.md": ("www.canstar.com.au", "www.odinmortgage.com",),
-    "docs/kb/scheme/help-to-buy.md": ("www.money.com.au",),
     "docs/kb/selling-costs/agent-legal.md": ("whichrealestateagent.com.au", "www.openagent.com.au", "www.yourpropertyguide.com.au",),
     "docs/kb/tax/income-tax-resident-2026-27.md": ("austax.tools", "www.scalesuite.com.au",),
     "docs/kb/tax/quantity-surveyor-reports.md": ("tenfoldwealthaccountants.com.au", "www.washingtonbrown.com.au",),
