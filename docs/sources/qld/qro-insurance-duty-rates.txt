@@ -1,0 +1,61 @@
+Source: https://qro.qld.gov.au/duties/insurance-duty/rates/
+Retrieved: 2026-10-27
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML f826512168096f3ec067e2093d31ce4a028f69cbb8aa7f0c05a0a6259dae542b
+
+Insurance Duty Rates in Queensland | Queensland Revenue Office
+Skip to content
+Home
+Duties
+Insurance duty
+Rates
+Insurance duty rates
+Different rates of insurance duty apply based on the type of insurance the premium is paid for.
+On this page:
+Other insurance duty pages
+Register for insurance duty
+Rates
+Eligibility tester
+Exemptions
+Apportionment of premiums
+Lodging returns
+Reassessments
+Payment options
+Contact us
+Insurance duty is charged on the premium (the total amount paid to the insurance company for the insurance) and GST, which is considered part of the premium.
+General insurance
+General insurance includes car, home and contents insurance. The insurance duty rate for both class 1 and class 2 general insurance is 9% of the premium paid (including GST).
+Class 1 general insurance is general insurance other than compulsory third party (CTP) or class 2 general insurance.
+Class 2 general insurance is general insurance for, or relating to:
+professional indemnity
+a motor vehicle (other than CTP insurance)
+a first home mortgage
+personal injury relating to aircraft travel
+a life insurance rider.
+A life insurance rider is attached to a life insurance policy and provides for additional capital payments if the insured person becomes disabled or accidentally dies. All or part of the premium for the rider must be stated separately on the policy.
+CTP insurance
+Insurance duty of 10 cents is imposed on a premium for CTP insurance.
+Life insurance
+The insurance duty on a contract of temporary or term life insurance is 5% of the first year’s premium.
+On another contract of life insurance, the duty is calculated as follows:
+for a sum insured up to $2,000
+0.05% of the sum insured
+for a sum insured over $2,000
+0.05% of the first $2,000
+and
+0.1% of the balance of the sum insured.
+Accident insurance
+Insurance duty on WorkCover policies is 5% of the net premium.
+Also consider…
+Find out if you need to pay insurance duty with our interactive help .
+Read the public ruling on insurance duty on contracts of general insurance subject to GST ( DA353.1 ).
+Read the public ruling on insurance duty on policies of accident insurance under the Workers’ Compensation and Rehabilitation Act 2003 subject to GST ( DA356.1 ).
+Find previous insurance duty rates .
+Last updated: 13 March 2025
+Other insurance duty pages
+Register for insurance duty
+Rates
+Eligibility tester
+Exemptions
+Apportionment of premiums
+Lodging returns
+Reassessments

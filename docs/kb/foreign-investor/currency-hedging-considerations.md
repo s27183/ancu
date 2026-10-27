@@ -1,11 +1,15 @@
 ---
 slug: kb.foreign-investor.currency-hedging-considerations
 effective_from: 2025-07-01
-last_verified: 2026-07-06
+last_verified: 2026-10-27
 sources:
   - url: https://wise.com/au/currency-converter/vnd-to-aud-rate
     retrieved: 2026-07-06
-    note: "Wise VND→AUD — grounds the FX-cost basis (mid-market rate + transparent fee) the exposure is measured against. This doc is informational (no retail hedging product assumed); the source supports the transfer-cost anchor, not a hedging instrument."
+    note: "Wise on its own pricing only (mid-market rate plus its fee). The general point that a provider's margin is a cost at every conversion is grounded on ASIC Moneysmart below."
+  - url: https://moneysmart.gov.au/banking/sending-money-overseas
+    retrieved: 2026-10-27
+    path: docs/sources/asic/moneysmart-sending-money-overseas.txt
+    note: "ASIC Moneysmart — \"Providers choose the exchange rate they use. They also charge fees.\"; the 'margin' fee to convert your currency"
 ---
 
 # VND/AUD currency exposure across the investment hold — considerations, not a hedging product
@@ -48,7 +52,7 @@ Pure-reference (`fills: []`). This is a decision-support doc — it fills no slo
     "loan_is_aud_no_loan_side_fx": { "type": "bool", "value": true, "provenance": "CONVENTION", "note": "restates kb.fx.loan-currency-considerations — the loan carries no FX; exposure sits on transfers and conversions, not the debt itself." },
     "servicing_from_au_rent_is_a_natural_hedge": { "type": "bool", "value": true, "provenance": "CONVENTION", "note": "leaving rental income in AUD to service the AUD loan and AU-side costs eliminates recurring hold-phase FX exposure entirely — the highest-leverage structural lever, no product needed." },
     "sale_proceeds_repatriation_is_the_largest_single_exposure": { "type": "bool", "value": true, "provenance": "CONVENTION", "note": "a lump-sum conversion of net sale proceeds is the largest single FX event across the lifecycle." },
-    "retail_forward_contracts_generally_impractical_at_this_scale": { "type": "bool", "value": true, "provenance": "CONVENTION", "note": "forward FX contracts are uncommon/uneconomic for a single property's cash flow or one-off transfer at retail scale; not a routine recommendation without a specific provider quote." },
+    "retail_forward_contracts_generally_impractical_at_this_scale": { "type": "bool", "value": true, "provenance": "CONVENTION", "note": "PLACEHOLDER — no primary states this; re-ground on an FX provider’s own forward-contract terms (minimum amount, eligibility), e.g. OFX or a bank." },
     "no_hedging_product_recommended": { "type": "bool", "value": true, "provenance": "CONVENTION", "note": "the plan names exposure points and structural levers; it does not recommend a specific financial/FX product — ASIC line." }
   }
 }
@@ -61,5 +65,4 @@ Notes:
 
 ## Sources
 
-- ASIC Moneysmart — *International money transfers* (exchange-rate margin as the real cost; applies at every conversion point, not just the initial transfer) — https://moneysmart.gov.au/banking/international-money-transfers
-- Wise — *Send money to Vietnam* (specialist-provider margin and mechanics, applicable at any conversion point in the lifecycle, not only the initial deposit transfer) — https://wise.com/au/send-money/send-money-to-vietnam
+- ASIC Moneysmart — *Sending money overseas* (providers choose their exchange rate and charge fees; the margin is a cost at every conversion point, not just the initial transfer) — https://moneysmart.gov.au/banking/sending-money-overseas

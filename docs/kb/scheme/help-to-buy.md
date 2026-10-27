@@ -1,10 +1,17 @@
 ---
 slug: kb.scheme.help-to-buy
 effective_from: 2025-12-05
-last_verified: 2026-07-06
+last_verified: 2026-10-27
 sources:
   - url: https://firsthomebuyers.gov.au/australian-government-help-buy-scheme
-    retrieved: 2026-07-06
+    retrieved: 2026-10-27
+    path: docs/sources/housing-australia/help-to-buy-scheme.txt
+  - url: https://www.legislation.gov.au/F2025L00682/latest/text
+    retrieved: 2026-10-27
+    path: docs/sources/legislation/help-to-buy-program-directions-2025.txt
+  - url: https://www.parliament.tas.gov.au/__data/assets/pdf_file/0015/107223/HA-Tuesday-16-June-2026.pdf
+    retrieved: 2026-10-27
+    path: docs/sources/housing-australia/tas-house-of-assembly-2026-06-16-assent.txt
 ---
 
 # Help to Buy (federal shared-equity scheme)
@@ -34,13 +41,13 @@ To be eligible, the buyer must:
 
 ## Property price caps
 
-Price caps vary by state/territory and by capital-city vs regional location; Housing Australia publishes a postcode lookup. The current capital-city caps are: **Sydney $1,300,000**, **Melbourne $950,000**, **Brisbane $1,000,000**, **Perth $850,000**, **Adelaide $700,000**, **Hobart $700,000**, **Darwin $700,000**, **Canberra $900,000**; regional caps are lower (down to around $600,000 in some regional areas). **Tasmania does not yet have the enabling legislation** to participate, so the scheme is currently unavailable there.
+The caps are set in section 7 of the **Help to Buy Program Directions 2025** (F2025L00682, unamended — compilation 0 as of 2026-10-27); firsthomebuyers.gov.au has a postcode lookup. Capital city (and, in NSW/VIC/QLD, listed regional centres) / rest of state: **NSW $1,300,000 / $800,000**, **VIC $950,000 / $650,000**, **QLD $1,000,000 / $700,000**, **WA $850,000 / $600,000**, **SA $900,000 / $500,000**, **TAS $700,000 / $550,000**; **ACT $1,000,000**, **NT $600,000** (one cap each). The regional centres on the capital-city cap are Newcastle and Lake Macquarie, Illawarra, Central Coast, Mid-North Coast, Coffs Harbour–Grafton and Richmond–Tweed (NSW), Geelong (VIC), and Gold Coast and Sunshine Coast (QLD). **Tasmania** passed its enabling law late: the House of Assembly recorded assent to the *Help to Buy (Commonwealth Powers) Bill 2026* on 16 June 2026.
 
 ## Stacking with other support
 
-- **Mutually exclusive with [First Home Guarantee](fhg.md) (and the wider Home Guarantee Scheme).** The scheme rules prohibit combining Help to Buy with "funding from other Australian Government shared equity programs, home-buyer assistance schemes, guarantees, loans, or loans from state and territory programs." FHG is a guarantee toward the same deposit/LMI problem, so a buyer uses **one or the other**, not both. This is the central first-home financing fork for an eligible Mode A buyer.
+- **Mutually exclusive with [First Home Guarantee](fhg.md) (and the wider Home Guarantee Scheme).** The Program Directions (s 17(d)) make an applicant ineligible while "receiving assistance from" "a home-buyer guarantee provided by a Commonwealth entity or Commonwealth company", "a shared equity scheme", or "a loan or guarantee provided by or on behalf of a State or Territory to support home ownership". FHG is a guarantee toward the same deposit/LMI problem, so a buyer uses **one or the other**, not both. This is the central first-home financing fork for an eligible Mode A buyer.
 - **Combines with [FHSS](fhss.md)** — FHSS releases the buyer's **own** super contributions to fund the 2% deposit; it is not government equity/guarantee/loan funding, so it can supply the deposit. *(Not explicitly enumerated in the scheme's published combine-list; modelled as combinable because FHSS is buyer-sourced deposit money — flag in Notes.)*
-- **Combines with state stamp-duty concessions and the state First Home Owner Grant** — Housing Australia explicitly allows using "First Home Owners Grant, stamp duty concessions, and similar government incentives to help make up your deposit." Per the [§11.9](../../architecture/architecture.md#119-blueprint-as-data-model--presentation-specification) stacking convention, those symmetric federal↔state edges are declared on the **state** docs (`kb.scheme.qld.fhc`, `kb.scheme.qld.fhnhc`, `kb.scheme.nsw.fhbas`, `kb.scheme.nsw.fhog`, `kb.scheme.vic.fhb-duty`, `kb.scheme.vic.fhog`), so this federal doc does not enumerate them.
+- **Combines with state stamp-duty concessions and the state First Home Owner Grant** — the scheme page says applicants "can still benefit from stamp duty concessions, grants and other exemptions." Per the [§11.9](../../architecture/architecture.md#119-blueprint-as-data-model--presentation-specification) stacking convention, those symmetric federal↔state edges are declared on the **state** docs (`kb.scheme.qld.fhc`, `kb.scheme.qld.fhnhc`, `kb.scheme.nsw.fhbas`, `kb.scheme.nsw.fhog`, `kb.scheme.vic.fhb-duty`, `kb.scheme.vic.fhog`), so this federal doc does not enumerate them.
 
 ## Relevance for Vietnamese-Australian buyers (Mode A)
 
@@ -77,9 +84,9 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
     "total_places":                   { "type": "integer", "value": 40000 },                 // over the 4-year program — capped, unlike FHG
     "property_price_caps_capital": { "type": "lookup", "key": "property_fit.state", "table": {
       "NSW": 1300000, "VIC": 950000, "QLD": 1000000, "WA": 850000,
-      "SA": 700000, "ACT": 900000, "NT": 700000, "TAS": null
-    }, "note": "capital-city caps; regional caps are lower (postcode lookup); TAS null — no enabling legislation yet" },
-    "non_participating_states":       { "type": "array<string>", "value": ["TAS"] }
+      "SA": 900000, "ACT": 1000000, "NT": 600000, "TAS": 700000
+    }, "note": "Program Directions 2025 s 7 capital-city caps (NSW/VIC/QLD regional centres share them); the rest of each state is lower (postcode lookup)" },
+    "non_participating_states":       { "type": "array<string>", "value": [] }   // TAS enabling Act assented 16 Jun 2026
   },
   "stacking": {
     "alternative_to": ["kb.scheme.fhg"],   // mutually exclusive — both address the deposit/LMI gap; scheme rules bar combining with other gov shared-equity/guarantee/loan programs
@@ -100,7 +107,8 @@ Notes:
 
 ## Sources
 
-- First Home Buyers (Australian Government) — *Australian Government Help to Buy Scheme* (income caps $100k/$160k, equity 30%/40%, 2% deposit, citizen-only, current-ownership test, 10,000 places/year, owner-occupier) — https://firsthomebuyers.gov.au/australian-government-help-buy-scheme
+- First Home Buyers (Australian Government) — *Australian Government Help to Buy Scheme* (income caps $103k/$165k for FY2026 incomes, stamp duty concessions and grants still allowed, equity 30%/40%, 2% deposit, citizen-only, current-ownership test, 10,000 places/year, owner-occupier) — https://firsthomebuyers.gov.au/australian-government-help-buy-scheme
 - Housing Australia — *Applications now open for the Australian Government Help to Buy Scheme* (commenced 5 Dec 2025; 40,000 households; equity 30%/40%; initial lenders) — https://www.housingaustralia.gov.au/media/applications-now-open-australian-government-help-buy-scheme
-- money.com.au — *Help to Buy Scheme Australia (2026 guide)* (price caps by state, exclusion of other gov shared-equity/guarantee/loan programs, allowed combination with FHOG and stamp-duty concessions) — https://www.money.com.au/home-loans/help-to-buy-scheme
+- Federal Register of Legislation — *Help to Buy Program Directions 2025* (F2025L00682: s 7 price caps and regional centres, s 8–9 income thresholds and indexation, s 17 eligibility incl. the bar on other guarantee/shared-equity/state-loan assistance) — https://www.legislation.gov.au/F2025L00682/latest/text
+- Parliament of Tasmania — *House of Assembly, 16 June 2026* (assent to the Help to Buy (Commonwealth Powers) Bill 2026) — https://www.parliament.tas.gov.au/__data/assets/pdf_file/0015/107223/HA-Tuesday-16-June-2026.pdf
 - Treasury — *Supporting people into home ownership* (scheme policy context) — https://treasury.gov.au/policy-topics/housing/home-ownership-support

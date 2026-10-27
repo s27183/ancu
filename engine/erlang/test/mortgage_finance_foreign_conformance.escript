@@ -15,7 +15,7 @@
 %%      reapplication_required / key_assumptions; adds deposit_required +
 %%      firb_dependency_acknowledged=true, definitional). Honest-partial: capacity null
 %%      (no income), recommended_path null (no visa captured), deposit_required a
-%%      conservative 30%-of-ceiling estimate, the agent shortlist slot null.
+%%      conservative 25%-of-ceiling estimate, the agent shortlist slot null.
 %%   2. THE VISA-CLASS PATH HEURISTIC — recommended_path_foreign/1 resolves
 %%      temp_resident_with_au_income for an AU-income-eligible visa (485/student/etc),
 %%      standard_non_resident for a known non-AU-income visa, null when unset.
@@ -81,8 +81,8 @@ scaffold_cases() ->
            g(O, <<"recommended_path">>), null),
      check("expected_borrowing_capacity = null (no income captured)",
            g(O, <<"expected_borrowing_capacity">>), null),
-     check("deposit_required = 270000 (30% of the $900,000 ceiling)",
-           g(O, <<"deposit_required">>), 270000),
+     check("deposit_required = 225000 (25% of the $900,000 ceiling)",
+           g(O, <<"deposit_required">>), 225000),
      check("recommended_lender_shortlist null (agent slot)",
            g(O, <<"recommended_lender_shortlist">>), null),
      check("firb_dependency_acknowledged = true (definitional)",
@@ -124,8 +124,8 @@ path_heuristic_cases() ->
      check("no visa captured -> null (undetermined, not a guess)",
            fh_engine_mortgage:recommended_path_foreign(UnsetProfile), null),
      check("deposit_required(null) = null", fh_engine_mortgage:deposit_required(null), null),
-     check("deposit_required(1000000) = 300000 (30%)",
-           fh_engine_mortgage:deposit_required(1000000), 300000)].
+     check("deposit_required(1000000) = 250000 (25%)",
+           fh_engine_mortgage:deposit_required(1000000), 250000)].
 
 %% --- 3. merge (the §98 slot-scoped fold + the refresh inverse) --------------
 

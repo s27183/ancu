@@ -1,0 +1,1944 @@
+Source: https://www.helia.com.au/media/tg4jxazi/lmi-underwriting-standards-and-guidelines-2026-aug-10.pdf
+Retrieved: 2026-10-27
+Extracted: pdftotext -layout of the PDF (Helia LMI underwriting standards and guidelines, Australia, effective 10 August 2026); sha256 of the PDF 8dadba017daa8bc2c4e1965b4b3ff475823263b9d6094f927d1752493e5fac05
+
+Underwriting
+standards and
+guidelines
+
+
+
+
+Effective date: 10 August 2026
+
+
+
+
+                Helia LMI underwriting standards and guidelines   – Australia –Aug 2026   1
+                                                  2025
+                                                 Public
+At Helia , we pride ourselves on our commitment to our        Lender and broker customers, ensuring each interaction is a
+positive experience.
+
+Our customer service centre can assist with your enquiries regarding an LMI proposal.
+If you would like to discuss a new proposal, a variation to an existing policy, or if you have an enquiry about a premium
+credit, please contact the customer service centre.
+Phone : 1300 661 118
+Email : underwritingsupport@helia.com.au
+Hours : 8.30am to 5.30pm, Monday to Friday (AEST)
+
+
+                                Helia LMI underwriting standards and guidelines   – Australia –Aug 2026                     2
+                                                                  2025
+                                                                 Public
+Contents
+
+
+1   Introduction ................................................................................................................................................................. 5
+2   Products ....................................................................................................................................................................... 6
+    2.1 Standard LMI ....................................................................................................................................................... 6
+    2.2 Business Select ................................................................................................................................................... 6
+    2.3 Family Pledge ...................................................................................................................................................... 7
+3   Borrowers and guarantors ......................................................................................................................................... 9
+    3.1 Acceptable borrowers .......................................................................................................................................... 9
+    3.2 Additional underwriting requirements ................................................................................................................... 9
+    3.2.1  Company incorporated in Australia.................................................................................................................. 9
+    3.2.2  Trustee of a trust ............................................................................................................................................. 9
+    3.2.3  Trustee of a self-managed super fund ............................................................................................................. 9
+    3.2.4  Permanent residents of Australia................................................................................................................... 11
+    3.2.5  Guarantors .................................................................................................................................................... 11
+    3.3 Unacceptable borrowers .................................................................................................................................... 11
+    3.4 Packages ........................................................................................................................................................... 12
+    3.4.1  First Home Buyers (First home)..................................................................................................................... 12
+4   Loan purpose............................................................................................................................................................. 13
+    4.1 Acceptable loan purposes.................................................................................................................................. 13
+    4.2 Additional underwriting requirements ................................................................................................................. 13
+    4.2.1  Purchase of a new or existing residential dwelling ........................................................................................ 13
+    4.2.2  Construction of a single or duplex residential dwelling .................................................................................. 13
+    4.2.3  Refinance of an existing loan ........................................................................................................................ 14
+    4.2.4  Off-the-Plan Strata Purchase ........................................................................................................................ 14
+    4.2.5  Home Improvements/renovations .................................................................................................................. 14
+    4.2.6  Bridging Loan ................................................................................................................................................ 14
+    4.2.7  Debt Consolidation ........................................................................................................................................ 15
+    4.2.8  Equity Release (cash out) ............................................................................................................................. 15
+    4.3 Unacceptable loan purposes ............................................................................................................................. 15
+5   Employment and income .......................................................................................................................................... 16
+    5.1 Employment ....................................................................................................................................................... 16
+    5.1.1  Self Employed ............................................................................................................................................... 16
+    5.1.2  Acceptance of ATO Tax Assessment Notices for Self-Employed applicants ................................................. 16
+    5.2 Income ............................................................................................................................................................... 16
+    5.3 Unacceptable income types ............................................................................................................................... 16
+6   Serviceability ............................................................................................................................................................. 17
+7   Source of deposit funds and equity ........................................................................................................................ 18
+    7.1 Deposit funds ..................................................................................................................................................... 18
+    7.1.1  Acceptable sources of deposit funds ............................................................................................................. 18
+    7.1.2  Unacceptable sources of deposit funds ......................................................................................................... 18
+8   Security ...................................................................................................................................................................... 19
+    8.1 Acceptable security ............................................................................................................................................ 19
+    8.2 Minimum requirements ...................................................................................................................................... 20
+    8.3 Additional underwriting requirements ................................................................................................................. 20
+    8.3.1   Vacant Land (up to 2.2 hectares) .................................................................................................................. 20
+    8.3.2   Rural/rural residential (up to 50 hectares) ..................................................................................................... 20
+    8.3.3   Single industry postcodes .............................................................................................................................. 21
+    8.3.4   Investment/rental property ............................................................................................................................. 21
+    8.3.5   Display homes ............................................................................................................................................... 21
+    8.3.6   Pre-fabricated Kit Home (transportable home) .............................................................................................. 21
+    8.3.7   Relocated Home ............................................................................................................................................ 21
+    8.3.8   New house and land package ....................................................................................................................... 22
+    8.3.9   Serviced or Managed Apartments ................................................................................................................. 22
+    8.3.10       Dual Key Apartments ................................................................................................................................ 22
+    8.3.11       Builder/Developer Sale (New Property) .................................................................................................... 23
+    8.3.12       Property sold by Private Sale .................................................................................................................... 23
+    8.3.13       Non-Arm’s Length Transactions and Advantageous / Favourable Purchases .......................................... 23
+    8.3.14       Split Contract Residential Security (party or common wall) ....................................................................... 23
+    8.3.15       Third party mortgages/guarantees ............................................................................................................ 23
+    8.3.16       Cross Collateralisation .............................................................................................................................. 25
+    8.4 Unacceptable securities ..................................................................................................................................... 25
+9   Security value ............................................................................................................................................................ 26
+    9.1 Short form (including alternative short form valuations) & long form valuation requirements............................. 26
+
+
+                                         Helia LMI underwriting standards and guidelines                   – Australia –Aug 2026                                                    3
+                                                                                     2025
+                                                                                    Public
+     9.2 Desktop Assessment requirements ................................................................................................................... 26
+     9.2.1 Acceptable Desktop Assessment .................................................................................................................. 27
+     9.3 Contract of Sale (COS) Purchase Price validated by Automated Valuation Model (AVM) Requirements ......... 27
+     9.3.1 Acceptable Contract of Sale .......................................................................................................................... 28
+     9.3.2 Automated Valuation Method ........................................................................................................................ 28
+     9.4 COS / AVM & Desktop Valuation Excluded Postcodes List ............................................................................... 28
+10   Loan features ............................................................................................................................................................. 29
+     10.1 Acceptable loan features ................................................................................................................................... 29
+     10.2 Additional underwriting requirements ................................................................................................................. 29
+     10.2.1     Interest-only loans ..................................................................................................................................... 29
+     10.2.2     Combination Loan ..................................................................................................................................... 29
+     10.2.3     Split borrowings (same borrowers with common security) ........................................................................ 30
+     10.2.4     Parenting Repayment Break ..................................................................................................................... 30
+11   Credit reporting ......................................................................................................................................................... 31
+     11.1 Ban period ......................................................................................................................................................... 31
+12   Documentation .......................................................................................................................................................... 32
+     12.1 Mandatory documentation required for LMI proposals ....................................................................................... 32
+13   Helia Decision ............................................................................................................................................................ 33
+14   Top Ups ...................................................................................................................................................................... 34
+15   LMI policy variations ................................................................................................................................................. 35
+     15.1 Substitution of security ....................................................................................................................................... 35
+     15.1.1     LVR and loan amount remain the same or decrease ................................................................................ 35
+     15.1.2     LVR or loan amount increases within guidelines ....................................................................................... 35
+     15.2 Partial release of security................................................................................................................................... 35
+     15.2.1     LVR remains the same or decreases ........................................................................................................ 35
+     15.2.2     LVR increases within guidelines (total net sale proceeds are applied to the loan) .................................... 35
+     15.2.3     LVR increases within guidelines (part sale proceeds are applied to the loan) .......................................... 36
+     15.2.4     LVR increases outside of guidelines (resulting from Hardship) ................................................................. 36
+     15.2.5     LVR increases outside of guidelines (not resulting from Hardship) ........................................................... 36
+     15.3 Borrower amendments....................................................................................................................................... 36
+     15.3.1     Release and / or addition of a borrower .................................................................................................... 36
+     15.3.2     Change of borrower name ........................................................................................................................ 37
+     15.4 Variation refund ................................................................................................................................................. 37
+     15.5 Loan discharges - cancellations ......................................................................................................................... 37
+16   Glossary ..................................................................................................................................................................... 38
+
+
+
+
+                                         Helia LMI underwriting standards and guidelines                   – Australia –Aug 2026                                                    4
+                                                                                      2025
+                                                                                    Public
+1     Introduction
+Who is Helia and what is LMI ?
+Helia Insurance Pty Limited     (Helia ) is a leading provider of   Lender s Mortgage Insurance (LMI) in Australia.
+LMI facilitates residential mortgage lending by transferring risk from           Lender s to LMI providers, predominantly for high
+L oan -to-V alue R atio residential mortgage loans.
+LMI has been an important part of the Australian residential mortgage lending market since it was introduced by the
+Australian Government in 1965.
+T he provision of LMI to Lender s has contributed to comparatively high levels of Australian home ownership and residential
+mortgage loan accessibility, supporting the housing market in Australia.
+
+Purpose of these LMI       underwriting s tandards and g uidelines
+These LMI underwriting standards and g uidelines (g uidelines) are designed for those involved in the mortgage lending
+industry to assist in completing LMI proposals. These g uidelines represent the acceptable requirements for submission of
+an LMI proposal to Helia .
+The examples given in these g uidelines are not comprehensive . Helia will consider any LMI proposal that does not meet
+these g uid elines based on individual merit if the Lender fully support s the LMI proposal. Helia reserves the right to accept
+and approve LMI proposals in its absolute and sole discretion and decline any LMI proposal notwithstanding the LMI
+proposal may comply or appear to comply with these         g uidelines.
+Helia reserves the right to change the     se g uidelines at any time without prior or subsequent notice.
+
+Lender’s responsibility
+Helia relies on the Lender to conduct a complete and thorough credit assessment for all loan proposals in accordance with
+the principles of responsible lending , applicable law and the Lender ’s own lending guidelines.
+Lender s must also comply with their duty of disclosure and these            g uidelines in connection with Helia providing LMI under
+the master policy between Helia and the Lender .
+Helia is not liable for any direct or indirect loss for any reliance or purported reliance on these          g uidelines regardless of how
+that loss is caused (including negligence).
+
+Helia website
+Visit helia.com.au for the following resources :
+     •    LMI premium estimator
+     •    Forms
+
+Customer s ervice centre
+If you would like to discuss an LMI proposal before submitting to            Helia , please contact our customer service centre on
+1300 661 118 or by email at underwritingsupport@helia.com.au
+
+
+
+
+                                 Helia LMI underwriting standards and guidelines     – Australia –Aug 2026                                   5
+                                                                     2025
+                                                                    Public
+2    Products
+This section provides an overview of:
+    •       Helia ’s current LMI product range
+    •       additional underwriting requirements, including verification, that apply to specific LMI products.
+
+
+As a means of regulating the level of acceptable LMI risk,    Helia has maximum LVRs, and a maximum         T otal E xposure
+amount of $5,000,000 to any one borrower.        Helia may choose to limit the loan amount or the LVR based on the individual
+merit of the LMI proposal or the specific loan product.
+
+
+For a purchase construction, or home improvement, the LVR is calculated by dividing the         Base L oan A mount by the lesser
+of the purchase price or the security valuation amount. For     Refinances and E quity Release, the LVR is based on the
+valuation amount only. The maximum LVR including         LMI P remium C apitalisation must not exceed 100%. All LVRs exclude
+LMI Premium Capitalisation unless indicated.
+If you would like to discuss an LMI proposal before submitting to           Helia , please c ontact our customer service centre on
+1300 661 118 or by email at underwritingsupport@helia.com.au
+
+    2.1      Standard LMI
+Available for a wide range of borrowers, including       F irst H ome Buyers and investors wishing to access residential mortgage
+finance.
+ Additional underwriting requirements
+ Maximum LVR                   • 95% for owner occupied
+                               • 95% including LMI Premium Capitalisation           for investment
+ Maximum loan                  • Helia will consider any LMI proposal on a case -by -case basis, based on its merits and risks,
+ amount                          subject to the maximum T otal E xposure of $5,000,000 to any one borrower limit
+ Loan purpose                  • Any acceptable loan purpose
+ Security                      • Any acceptable security
+ Deposit/equity                • > 90% LVR requires 5% deposit funds
+ Loan term                     • Maximum 40 years
+
+
+
+
+    2.2      Business S elect
+Available for S elf-E mployed borrowers who are unable to produce current financial information or documentation.
+ Additional underwriting requirements
+ Maximum LVR                   • 80% for owner occupied
+                               • 80% for Investment
+ Maximum loan                  • $1,000,000
+ amount
+ Loan purpose                  • Excludes:
+                                   ─ Refinance of investment property loans
+                                   ─ Debt C onsolidation
+                                   ─ Equity R elease (cash out )
+ Security                      • Size of pro perty not to exceed 2.2 hectares
+ Deposit/equity                • Must have existing equity in real estate ; or
+                               • Deposit funds of at least 20% equity of the property purchase      ; or
+                               • If borrowers have recently sold property and are in the process of purchasing another, this
+                                 requirement can be waived
+ Borrowers                     • Excludes expatriates
+ Em ployment and               • At least one borrower must be Se lf-E mployed
+ income                        • All S elf-E mployed b orrowers must hold:
+
+
+
+                                  Helia LMI underwriting standards and guidelines    – Australia –Aug 2026                           6
+                                                                    2025
+                                                                   Public
+                                 ─ an active ABN for at least two years ; and
+                                 ─ GST registration for at least 12 months
+                            • Declared income must be consistent with the borrower’s stated occupation and assets and
+                              liabilities position
+ Loan term                  • Maximum 30 y ears
+ Loan features              • Exc ludes P arenting R epayment Break
+ Additional Lender          Lender is to retain:
+ verification               • signed and dated income declaration
+ requirements               • past 12 months’ BAS statements lodged with the ATO including evidence of lodgement for
+                              each trading entity (if the borrower declare s income from those trading entities in the LMI
+                              proposal )
+                            • past six months’ personal transaction account st        atements (primary account only)
+
+
+   2.3       Family Pledge
+Available for borrowers, especially F irst H ome Buyers with no deposit, who have        a parent, child or sibling   that is willing and
+able to offer security.
+Provides access to finance for full purchase price     or construction cost , plus an additional 10% to cover other costs such as
+stamp duty, renovations or setting up their home.
+
+
+ Additional underwriting requirements
+ Maximum LVR                • 85% for owner occupied
+                            • 85% for Investment
+ Maximum loan               • $750,000
+ amount
+ Loan purpose               • May include small Debt C onsolidation or E quity R elease (cash out) of up to 10% of purchase
+                              price (at time of original loan application only)
+                            • Excludes:
+                                 ─ Purchase V acant L and
+                                 ─ Home Improvements
+                                 ─ Refinance existing mortgage
+                                 ─ Equity R elease (cash out) greater than 10% additional costs noted above.
+ Security                   • Maximum of two security properties for each LMI proposal (property being purchased plus
+                              pledge security)
+                            • Excludes:
+                                 ─ Vacant L and
+                                 ─ Properties exceeding 2.2 hectares
+ Deposit/equity             • No deposit or equity required
+ Borrowers                  • All borrowers must be titleholders for the property being purchased
+                            • Must be a natural person
+ Loan term                  • Maximum 30 years
+ Repayment type             • Excludes Interest -only (unless converting to P&I)
+ Lender responsibility      • Lender needs to have satisfactory systems and/or processes in place that link borrower and
+                              guarantor securities and loans
+                            • Required to have parameters and documentation to manage risks involved with third party
+                              guarantee securities. ( Helia does not cover losses eventuating from the pledge guarantee
+                              being invalid or unenforceable)
+
+ Guarantor/pledge           • Borrower ’s maximum LVR before the pledge is 110% (ie total loan amount ÷ purchase
+                              property security value or purchase price)
+                            • Guarantor ’s maximum LVR is 50% for the pledge component only (ie total pledge amount ÷
+                              guarantor security property value)
+
+
+
+
+                                Helia LMI underwriting standards and guidelines   – Australia –Aug 2026                                     7
+                                                                  2025
+                                                                 Public
+                • Guarantor ’s maximum LVR is 70% including all pledge amounts and any outstanding debt
+                  secured by the guarantor’s property (ie total guarantor debts secured by this security
+                  property = pledge amount ÷ guarantors security property value)
+                • The pledge is a ‘limited’ personal guarantee that limits the guarantors’ liability to a specific
+                  amount
+                • The guarantee must be supported by either a first or       S econd Mortgage over residential real
+                  estate
+                • Eligible guarantors must be a parent,      child or sibling of the borrower
+                • All registered proprietors of the pledge security property must be guarantors
+                • No company or trustee guarantors
+                • A maximum of one pledge per LMI proposal. However, guarantors can provide up to a
+                  maximum of two pledges, provided each pledge applies to an individual loan proposal for
+                  separate borrowers
+                • In the event of borrower default, Helia would exercise its rights under the master policy to
+                  require the Lender to exercise its own rights under the pledge prior to the submission of an
+                  LMI claim
+                • The guarantors must provide a full application form with supporting financial information
+                  including details of the security property and any outstanding debt against the security
+                  property
+                • Where there is finance outstanding against the guarantor’s security property, six months’
+                  loan statements evidencing satisfactory conduct are required
+                • Serviceability will be tested on guarantors to determine whether they can service the
+                  guaranteed loan in the event the borrowers cannot meet their commitment. In cases where
+                  serviceability is not evident by guarantors, consideration will be given to other      sources of
+                  equity to clear the debt outside of selling the guarantor’s owner       -occupied property
+Loan features   • Excludes:
+                    ─ Line of credit
+                    ─ Parenting R epayment Break
+
+
+
+
+                   Helia LMI underwriting standards and guidelines   – Australia –Aug 2026                            8
+                                                     2025
+                                                    Public
+3    Borrowers and guarantors
+This section provides an overview of:
+    •     types of borrowers that are acceptable to        Helia for the purposes of LMI
+    •     additional underwriting requirements, including verification, for specific borrower types and guarantors
+    •     unacceptable borrower types.
+Helia will consider LMI for any other borrower type not listed below, other than unacceptable borrowers . If you would like to
+discuss an LMI proposal before submitting to    Helia , please contact our customer service centre on 1300 661 118 or by
+email at underwritingsupport@helia.com.au
+
+    3.1      Acceptable borrowers
+    •     Natural person (over the age of 18) who is a citizen or permanent resident of Australia           or New Zealand who are
+          resident in Australia or New Zealand
+    •     C itizens of Australia who are expatriates (i.e. they are not resident in Australia     or New Zealand )
+    •     Small proprietary company incorporated in Australia
+    •     Trust ee of a trust
+    •     Trustee of a self-managed superannuation fund (SMSF) .
+Helia also offers packages for     F irst H ome Buyers . Details can be found in P ackages section below.
+
+    3.2      Additional underwriting requirements
+Additional underwriting requirements apply to the following borrower types.
+
+3.2.1 Company incorporated in Australia
+ Additional underwriting requirements
+ • All directors and shareholders must provide unconditional joint and several personal guarantees
+
+
+3.2.2 Trustee of a trust
+ Additional underwriting requirements
+ • Where the trustee is a company, directors and shareholders are required to provide unconditional joint and several
+   guarantees
+ • The trustee of the trust must always be the borrower in its own right and as trustee for the trust
+ • This requirement applies to both family/discretionary and unit trusts
+
+
+3.2.3 Trustee of a self -managed super fund
+Helia will insure loans to SMSFs where the       Lender has been pre -approved by Helia to do so .
+ Additional underwriting requirements
+ Maximum LVR                    • 90% including LMI Premium Capitalisation
+ Maximum loan                   • $1,000,000
+ amount
+ Product availability           • Standard LMI only
+ Loan Purpose                   $ for $ Refinance of an existing SMSF loan plus costs
+ Loan type                      • Limited recourse loan which complies with the relevant legislative requirements (and any
+                                  associated regulations)
+ Loan term                      • Maximum 30 years
+ Repayment type                 • P&I
+                                • Interest -only not converting to P&I within 10 years
+                                • Interest -only converting to P&I within 10 years
+ Borrowers                      • SMSF trustee, which hold the beneficial interest in the security property, has the right to
+                                  acquire the property from the property trustee, and is permitted to borrow in accordance
+                                  with the relevant legislative requirements (and any associated regulations)
+
+
+                                  Helia LMI underwriting standards and guidelines   – Australia –Aug 2026                            9
+                                                                    2025
+                                                                   Public
+Mortgagors              • Property trustee, which meet the requirements of the relevant legislation (and any
+                          associated regulations). Holds the legal interest in the security property on trust for the
+                          SMSF
+Security                • Must be secured by one single occupancy dwelling on one title       and the loan must not cover
+                          any additional assets purchased at the time of property purchase. This includes furnishings
+                          or other items which are not fixtures
+                        • Excludes:
+                             ─ Vacant L and
+                             ─ Off-the-P lan S trata P urchases
+                             ─ More than one property or occupancy on a single title
+                             ─ Residential apartments that have a car space or storage area on a separate title that
+                                can be sold individually
+Guarantors              • Loan must be supported by personal guarantees from all beneficiaries of the SMSF for the
+                          full amount of the loan
+                        • The Lender must verify the guarantor’s financial position as being able to meet the
+                          obligations under the guarantee (please note that full income serviceability and asset and
+                          liabilit y details are required to be held by the lender )
+                        • Non -R esident guarantors are unacceptable
+Serviceability          • Serviceability must be calculated using the      Helia SMSF serviceability calculator (prior
+                          written agreement must be obtained from Helia to use the lender’s SMSF serviceability
+                          calculator) , allowing for the following:
+                             ─ 80% of rental income from investment properties held by the SMSF
+                             ─ Rental yield for all investment/rental properties (including those not held as security)
+                                will be limited to 6% of the value of the properties
+                             ─ Income from interest/dividend earning investments to be assessed using a deeming
+                                rate of 3% per annum (in some circumstances higher rates may be used in calculating
+                                serviceability)
+                             ─ Income derived from other assets is to be excluded
+                             ─ Only mandatory superannuation contributions (currently          12%) to be included
+                             ─ Superannuation taxation rules apply
+                             ─ Loan repayment amount to be calculated on a P&I basis
+                             ─ Must allow for ongoing expenses associated with running a SMSF
+                               Where a newly established SMSF cannot provide evidence (letter from their
+                               accountant) to confirm the running costs of the SMSF, a minimum of $3000 is to be
+                               included in the SMSF serviceability calculator, otherwise use the running costs stated
+                               on the accountant’s correspondence
+Additional servicing    • Additional servicing capacity will be considered above the mandatory          12 % superannuation
+capacity                   contribution and up to the allowed ATO limits where:
+                              ─ regular additional contributions have been made to superannuation, investments or
+                                 savings, or
+                              ─ additional loan repayments have been made above the scheduled loan repayments
+                             These items are not to be included in the serviceability assessment but can be considered
+                             to mitigate serviceability shortfall
+                        All sources listed above must be verified over a two     -year period
+Additional assessment   • The SMSF must have a minimum liquid asset (interest/dividend earning assets) balance of
+requirements              5% of the total debts of the SMSF (including the loan amount) after the loan transaction is
+                          complete
+Other exclusions        • Top Ups
+                        Substitution of security
+Lender responsibility        •    SMSF and property trust deeds, guarantees and loan agreement must comply with
+                                  relevant legal requirements including those which apply in relation to SMSF
+                                  borrowing, the giving of security and the appointment of a nominee
+                             •    Lender to obtain written independent financial or legal advice that to the SMSF
+                                  trustee that SMSF is in compliance with the requirements of the Superannuation
+                                  Industry (Supervision) Act 1993, which must be evidenced on the loan file
+
+
+
+                          Helia LMI underwriting standards and guidelines   – Australia –Aug 2026                             10
+                                                            2025
+                                                           Public
+                                    •  Lender has verified guarantors’ financial position as being able to meet the
+                                       obligations under the guarantee
+                             • Lender to pursue guarantors issuing all notices up to and including the notice of demand
+                               prior to making LMI claim
+ Additional Lender           • Pay slips for PAYG SMSF beneficiaries showing mandatory superannuation contributions at
+ verification                  12%
+ requirements                • Statement from SMSF trustee verifying mandatory super annuation contributions by S elf-
+                               E mployed beneficiaries for the past two years
+                             • Letter from Government employers that have higher than           12% mandatory super annuation -
+                               this can apply if employment term exceeds two years
+                             • Proof of SMSF’s investments that are interest/dividend earning. Ownership by the SMSF
+                               must be verified via referencing actual share certificates, holding statements or financial
+                               statements
+                             Note : To rely on fixed interest rates higher than 3% deeming rate, such higher rate       s must be
+                             demonstrated to have been received for a minimum period of two years
+                                    •    Proof of expenses for SMSF - if new, letter estimating costs from an accountant or
+                                         financial planner; or if established, previous year’s invoices/receipts
+
+3.2.4 Permanent reside nts of Australia
+ Additional underwriting requirements
+ Additional Lender           • Current visa evidencing permanent residency status   ; or
+ verification                • Current passport evidencing permanent residency status
+ requirements
+                             To confirm the borrower’s current Visa eligibility, please refer to the following Australian
+                             government website https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing prior to
+                             submitting your proposal to Helia
+
+
+3.2.5 Guarantors
+ Additional underwriting requirements
+ Documentation               • Guarantors are required to complete a full application form including personal details,
+                               financial position, employment details and sign the     Lender s Privacy Act declaration, which
+                               includes provision for LMI
+ Other                       • Lender employment and income g uidelines to apply , including verification of employment
+                               and income, apply regardless of whether the guarantor’s income is required to service the
+                               proposed debt
+
+
+
+   3.3     Unacceptable borrowers
+    •    Associations
+    •    Religious institutions
+    •    Clubs
+    •    Minors (persons under the age of 18)
+    •    Borrowers of C onvenience
+    •    Non -R esidents
+              o    except where the Non-R esident is a spouse or de           facto partner of a citizen of Australia (who is resid ent in
+                   Australia or New Zealand or an E xpatriate) ; or,
+              o    except where the Non-R esident is a spouse or de facto partner of a permanent resident of Australia or
+                   New Zealand (who is resident in Australia or New Zealand).
+    •    Temporary visa holders
+              o    except where the temporary visa holder is a spouse or de       facto partner of a citizen of Australia (who is
+                   resid ent in Australia or New Zealand or an E xpatriate) ; or,
+              o    except where the temporary visa holder is a spouse or de   facto partner of permanent resident of
+                   Australia or New Zealand (who is resident in Australia or New Zealand ).
+
+
+                                  Helia LMI underwriting standards and guidelines   – Australia –Aug 2026                               11
+                                                                    2025
+                                                                   Public
+              o     Refer to section 3.2.4 of this document to clarify the Visa eligibility of the proposed borrower.
+
+   3.4     Packages
+
+3.4.1 First H ome B uyers (First home)
+Helia First home is an initiative aimed at helping F irst H ome Buyers afford their first owner occupied or Investment
+property sooner (including vacant land purchase, where construction is to be commenced within 12 months)          . Depending
+on arrangements in place with the Lender , a special discounted LMI premium rate may apply.
+ Feature                     Additional underwriting requirements
+ Product availability        • Standard LMI , Family Pledge
+ Borrower eligibility        • To be eligible for this initiative, all borrowers must be either:
+                                 ─ eligible for the government’s FHOG (where applicable), or
+                                 ─ a genuine F irst H ome Buyer (where FHOG is not applicable)
+ Additional Lender           • Where the FHOG applies, the Lender is required to obtain and hold written evidence of the
+ verification                  FHOG eligibility
+ requirements                • Where there is no FHOG, however F irst H ome Buyer stamp duty concessions apply, the
+                               Lender is required to obtain written evidence of eligibility
+                             • Where neither the FHOG nor the F irst H ome Buyer stamp duty concessions apply, the
+                               Lender must undertake reasonable enquiries to confirm that all borrowers are genuine   F irst
+                               H ome Buyers. These enquiries include perusal of:
+                                  ─ Asset and liabilities statement which may show existing real estate assets in the
+                                    borrower ’s name; and/or
+                                  ─ credit bureau report which may indicate the existence of any previous
+                                    mortgages/loans
+                             • Evidence of the Lender s enquiries must be retained on the loan file
+
+
+
+
+                                Helia LMI underwriting standards and guidelines   – Australia –Aug 2026                         12
+                                                                  2025
+                                                                 Public
+4     Loan purpose
+This section provides an overview of:
+     •    loan purposes that are acceptable to      Helia for the purposes of LMI
+     •    additional underwriting requirements, including        Lender responsibilities , that apply to specific loan purposes
+     •    unaccepta ble loan purposes .
+Helia will consider LMI for any loan purpose not listed below      , other than unacceptable loan purposes . If you would like to
+discuss an LMI proposal before submitting to       Helia , please contact our customer service centre on 1300 661 118 or by
+email at underwritingsupport@helia.com.au
+
+    4.1     Acceptable loan purposes
+Note : All LVRs exclude LMI Premium Capitalisation unless otherwise stated in             these guidelines .
+ Loan purpose                                     Standard LMI                     Business Select               Family Pledge
+ Purchase of a new or existing residential
+                                                  95%                              80%                           85%
+ dwelling (owner -occupied)
+                                                  95% (including LMI
+ Purchase of a new or existing residential
+                                                  Premium                          80%                           85%
+ dwelling (Investment)
+                                                  Capitalisation )
+ Purchase of vacant residential land*             95%                              80%                           Not available
+ Off-the-P lan S trata P urchase*                 95%                              80%                           85%
+ Construction of a single or duplex
+                                                  95%                              80%                           85%
+ residential dwelling
+ Refinance dollar for dollar plus
+                                                  95%                              80%                           Not available
+ reasonable costs (owner -occupied)
+                                                  95% (including LMI
+ Refinance dollar for dollar plus
+                                                  Premium                          Not available                 Not available
+ reasonable costs (Investment)
+                                                  Capitalisation )
+ Home Improvements/ R enovations                  95%                              80%                           Not available
+ Bridging L oan                                   85%                              80%                           Not available
+ Debt C onsolidation                              90%                              Not available                 85%
+ Equity R elease (cash out)                       90%                              Not available                 Not available
+ Controlled funds                                 90%                              Not available                 Not available
+
+* 95% LVR including LMI Premium Capitalisation   is the maximum allowable where security is investment      property .
+
+
+    4.2     Additional underwriting requirements
+Additional underwriting requirements apply to the following loan purposes.
+
+4.2.1 Purchase of a new or existing residential dwelling
+ Additional underwriting requirements
+ Maximum LVR                  • 95% plus LMI Premium Capitalisation where security is wholly owner   -occupied property
+                              • 95% including LMI Premium Capitalisation where security is wholly or partially investment
+                                property
+
+
+
+4.2.2 Construction of a single or duplex residential dwelling
+Licensed builder
+ Additional underwriting requirements
+ Maximum LVR                  • 95% plus LMI Premium Capitalisation where security is wholly owner -occupied property
+                              • 95% including LMI Premium Capitalisation where security is wholly or partially investment
+                                property
+
+
+                                 Helia LMI underwriting standards and guidelines    – Australia –Aug 2026                           13
+                                                                   2025
+                                                                  Public
+                         • LVR is the loan amount as a percentage of the lesser of the cost   price (purchase price of the
+                           land plus building costs as per the tender) or the on -completion valuation
+ Building Contract       • Must be a fixed price building contract from a licensed builder
+
+Owner-builder
+ Additional underwriting requirements
+ Maximum LVR             • 50% of the expected on -completion valuation
+
+
+4.2.3 Refinance of an existing loan
+ Additional underwriting requirements
+ Maximum LVR             • 95% (or product limit if lower) if dollar for dollar and owner occupied .
+                         • 95% (or product limit if lower) including LMI Premium Capitalisation if dollar for dollar and
+                           investment .
+                         • 90% (or product limit if lower) if combined with     E quity R elease , controlled funds or Debt
+                           C onsolidation .
+                         • LVR is to be calculated using the valuation amount
+ Lender responsibility   • Lender s are responsible to ensure that the borrower is not in a worse position follo wing
+                           R efinance
+                         • Verify satisfactory repayment history by completing a review of loan conduct over the
+                           previous six months via either loan statements, or CCR and repayment history information.
+                           Evidence of the review to be documented by       Lender .
+
+
+4.2.4 Off-the -Plan S trata P urchase
+ Additional underwriting requirements
+ Maximum LVR             Contract of sale signed                                 Maximum LVR
+                         More than 12 months ago , from loan                     90% of as -if-complete valuation
+                         application date
+                         Less than 12 months ago , from loan application         95% of purchase price or valuation
+                         date                                                    (whichever is lower) if owner occupied, 9 5%
+                                                                                 including LMI Premium Capitalisation if
+                                                                                 investment.
+                         • The loan amount must not e xce ed 100% of the p urchase/con tract price
+
+
+4.2.5 Home Improvements/renovations
+ Additional underwriting requirements
+ Maximum LVR             • 95% of revised (on -completion) valuation, as c onfirmed by a qualified valuer
+ Lender responsibility   • Where an increased security value (resulting from proposed     H ome Improvements) is to be
+                           relied upon, the Lender must ensure that the funds are applied to the security property and
+                           the additional H ome Improvements are satisfactorily completed
+
+
+4.2.6 Bridging Loan
+ Additional underwriting requirements
+ Maximum LVR             • 85% (or product limit if lower) based on T otal E xposure including capita     lised interest for
+                           term of the Bridging L oan
+                         • Upo n sale of the existing property the residual LVR is not to be any grea     ter than that
+                           approved for the Bridging L oan
+ Serviceability          • A serviceability calculation must be completed to ensure s        erviceability requirements are
+                           met based on 100 % of the proposed residual debt
+ Loan term               • Up to a maximum of 12 months
+ Repayment type          • The Lender can allow for interest on one of the loans to be capitalised for up to 12 months
+                           pending th e sale of the existing property
+
+
+
+
+                            Helia LMI underwriting standards and guidelines   – Australia –Aug 2026                             14
+                                                              2025
+                                                             Public
+4.2.7 Debt C onsolidation
+ Additional underwriting requirements
+ Maximum LVR                   • 90 % (or product limit if lower) regardless of the number of debts
+                               • LVR is to be calculated using the valuation amount
+ Security                      • Vacant L and is unacceptable
+ Lender responsibility         • The Lender must control the release of funds directly to creditors to ensure consolidated
+                                 debts are repaid and closed
+                               • Lender s must ensure that the borrower is not in a worse position f    ollowing consolidation of
+                                 debts
+                               • Verify satisfactory repayment history by completing a review of loan conduct over the
+                                 previous three months via either loan statements, or CCR and repayment history
+                                 information. Evidence of the review to be documented by       Lender .
+
+
+4.2.8 Equity R elease (cash out)
+ Additional underwriting requirements
+ Maximum LVR                   • > 85% LVR and ≤ 90 % LVR – cash out component is limited to 20% of the security value
+                               • ≤ 85% LVR – no limit ap plicable to cash out component
+                               • LVR is to be calculated using the valuation amount
+
+
+   4.3          Unacceptable loan purposes
+Helia does not insure loans for the following       loan purposes:
+• Loans for development finance:
+            ─     construction of more than two dwellings on one block of land
+            ─     purchase of multiple blocks of    V acant L and in a subdivision
+            ─     refinancing commercial facilities that have been used to fund development finance or developers gearing up
+                  against residual stock to fund next developmen      t
+• Vendor F inance .
+
+
+
+
+                                   Helia LMI underwriting standards and guidelines   – Australia –Aug 2026                          15
+                                                                      2025
+                                                                     Public
+5     Employment and income
+Lender s must ensure that the borrower’s capacity to repay their loan commitments has been verified        by the Lender by the
+collection and assessment of employment and income information in a manner that meets           all Lender policies and
+regulatory requirements.
+If you would like to discuss an LMI proposal before submitting to         Helia , please contact our customer service centre on
+1300 661 118 or by email at underwritingsupport@helia.com.au
+
+    5.1    Employment
+Helia relies on Lender s to confirm and verify all applicants’ employment in line with their policy and      obligations under
+regulatory requirements.
+
+5.1.1 Self E mployed
+T o utilise income derived from S elf-E mployed means, Helia requires a minimum of two financial years trading to be
+evidenced and verified by Lender s. Exceptions may be considered to accept    12 months financial trading if two years
+previous employment within a similar field can be evidenced.
+
+5.1.2 Acceptance of ATO Tax Assessment Notices for Self                            -Employed applicants
+For self -employed loan applicants, the most recent two (2)       notices of assessment (2 years) issued by the Australian
+Tax ation Office (ATO) may be accepted as        the primary method of income verification . The notices of assessment must
+clearly display the applicant’s name, financial year, taxable income and issue date.        The Tax File Number (TFN) must be
+readacted from all notices of assessment. The assessments must be final (not amended or provisional) and issued directly
+by the ATO. Where electronic copies are provided, authenticity         must be verified via the ATO online portal or by cross -
+referencing with other supporting documentation, such as lodged tax returns or an accountant’s certification.
+The two (2) notices of assessments should demonstrate consistency or reasonable growth in taxable income                  over the two
+(2) years . Any significant income decline (greater than 20%) must be adequately explained and recorded               . Where income
+fluctuates materially (greater than 20%), the lower       income of the two (2) years must be used for serviceability assessment
+unless acceptable justification /reason is provided and recorded . Additional documentation may be requested to confirm
+the ongoing viability of the applicant’s business. If the     loan application is received post March of the current calendar year,
+the most recent notice of assessment must be for the financial year ending June 30th of the previous calendar year.              The
+purpose of this self -employment income verification policy is to ensure that income verification for self         -employed
+borrowers is effective.
+
+
+
+    5.2    Income
+All i ncome calculations and verification requirements are to meet        Lender policies and all regulatory requirements.
+
+    5.3    Unacceptable income                types
+Helia does not accept the following income sources:
+     •    Workers’ compensation
+     •    Income from boarders
+     •    Unemployment benefit
+     •    Sickness allowance.
+
+
+
+
+                                Helia LMI underwriting standards and guidelines   – Australia –Aug 2026                                  16
+                                                                  2025
+                                                                 Public
+6     Serviceability
+Helia relies on Lende rs to confirm and ensure that the borrower’s capacity to repay their loan commitments has been
+verified by the L ender the using its servicing methodology in a manner that meets all Lender policies and regulatory
+requirements.
+Helia will accept the Lender’s serviceability result that has been used to assess the risk related to a borrower’s ability to
+meet regular fixed commitments .
+Lender’s serviceability calculators are required to accommodate all legislative changes to negative gearing             , for new and
+established residential property.
+
+
+
+
+                                 Helia LMI underwriting standards and guidelines   – Australia –Aug 2026                                17
+                                                                   2025
+                                                                  Public
+7    Source of deposit funds and equity
+This section provides an overview of:
+    •     Sources of deposit funds /equity that are acceptable to           Helia for the purposes of LMI
+    •     additional underwriting requirements, including verification          .
+Helia will consider other sources of deposit funds not listed below for the purposes of underwriting of LMI . If you would like
+to discuss an LMI proposal before submitting to   Helia , please contact our customer service centre on 1300 661 118 or by
+email at underwritingsupport@helia.com.au
+
+    7.1    Deposit funds
+The verification of the deposit funds (non -borrowed ), including the ownership and origin of            such funds, in line with the
+following policy is the responsibility of the Lender .
+For standard product where the base LVR exceeds 90%, Helia requires           Lender s to validate that the borrower has 5%
+deposit funds from an acceptable source.       T he d eposit funds must be held in the borrower ’s name at the time of
+application . If not already held in the borrower’s bank account    with the Lender at the time of the application , the funds
+must be deposited into the borrower’s bank account prior to the settlement of the loan.
+
+7.1.1 Acceptable sources of deposit funds
+The s ource of funds can include any combination of        funds from the following :
+    •     Funds held or accumulated in      bank accounts (including term deposit )
+    •     First Home Saver Account      or First Home Super Saver Scheme            (initiative by the Australian Government)
+    •     Equity in, or funds from , sale of residential property
+    •     Funds sourced from superannuation account
+    •     Shares
+    •     Accelerated loan repayments – where savings have been sacrificed by making accelerated loan repayments,                       the
+          amount of the excess repayments, can be accepted
+    •     Gifts received from an Immediate F amily Member (evidence that the amount pledged has been received by the
+          borrower must be held on file. Gifts received from a non -Immediate F amily Member are not acceptable to Helia .)
+    •     Employer paid bonus
+    •     Tax refund
+    •     Inheritance
+    •     Sale of assets for example, motor vehicles
+    •     F irst H ome Owner Grant (FHOG)
+    •     Funds held in company/business accounts
+
+7.1.2 Unacceptable sources of deposit funds
+The following sources of funds do not contribute towards the           minimum 5% deposit funds requirement:
+    •     Any funds that cannot be verified by the      Lender as being held in the borrower’s name          at the time of application,
+    •     Any funds not deposited in the borrower’s bank account prior to settlement
+    •     Borrowed funds
+               o    If LVR is above 90% and 5% deposit funds  are validated in line with above, funds borrowed from a party
+                    other than the Lender may contribute to additional funds to complete as needed,
+               o    If LVR is 90% or below, funds     borrowed from a party other than the        Lender are allowable with
+                    appropriate validation.
+
+
+
+
+                                 Helia LMI underwriting standards and guidelines     – Australia –Aug 2026                                 18
+                                                                     2025
+                                                                    Public
+8     Security
+This section provides an overview of:
+     •    security types that are acceptable to       Helia for the purposes of LMI
+     •    additional underwriting requirements that apply to specific security types
+     •    unacceptable security types.
+Helia will consider LMI for any security type s not listed below, other than unacceptable securit ies . If you would like to
+discuss an LMI proposal before submitting to     Helia , please contact our customer service centre on 1300 661 118 or by
+email at underwritingsupport@helia.com.au
+
+    8.1     Acceptable security
+Note: All LVRs exclude LMI Premium Capitalisation unless otherwise stated in               these guidelines .
+ Security type                                                         Standard LMI             Business Select   Family Pledge
+ Residential dwelling (house, townhouse, villa, unit,
+ apartment , including Serviced and Dual Key
+                                                                             95%                          80%          85%
+ Apartments - refer to sections 8.3.10 and 8.3.11 for
+ specific limitations – and studios )
+ Vacant L and (up to 2.2 hectares)                                           95%                          80%     Not available
+ Rural/ rural residential (up to 50 hectares)                                95%                  Not available   Not available
+                                                                    90% ( including LMI
+ Single industry postcodes                                               Premium                          80%          85%
+                                                                      Capitalisation )
+ Transportable home and        R elocated H ome                              95%                          80%          85%
+ New house and land package and          display homes                       95%                          80%          85%
+
+                                                                                             . In addition to the above
+*Construction loans for investment will be capped at a n LVR of 95% inclusive of the LMI capitalisation
+security types, additional underwriting requirements may apply to the following security property characteristics.
+ Security property characteristic                                      Standard LMI             Business Select   Family Pledge
+                                                                    95% (including LMI
+ Investment/rental property used as security                            Premium                           80%          85%
+                                                                      Capitalisation )
+ Builder/ Developer S ale (New Property)                                     95%                          80%          85%
+ Third party mortgage/guarantee                                              95%                          80%          85%
+ Private S ale                                                               95%                          80%          85%
+ Split C ontract Residential S ecurity (party or common
+                                                                             95%                          80%          85%
+ wall)
+ Non -A rm’s L ength T ransaction                                            95%                          80%          85%
+ Non -A rm’s L ength T ransaction ( V acant L and)                           95%                          80%     Not available
+
+
+
+
+                                  Helia LMI underwriting standards and guidelines     – Australia –Aug 2026                       19
+                                                                     2025
+                                                                    Public
+   8.2       Minimum requirements
+    •    Must be zoned for residential use
+    •    A house, villa, home unit, townhouse, duplex, or V acant L and
+    •    Acceptable land tenures include:
+         ─    Freehold - including strata, g roup and community titles ( community title properties in NSW           , VIC , SA and WA
+              are only acceptable if the development has been fully completed)
+         ─    Crown leasehold (ACT only)
+         ─    Residential area rights and residence licences (Victoria only)
+    •    Power and water sources (mains or tank) are        connected
+    •    Must have direct vehicular    and all-weather road access
+    •    Readily saleable with no adverse features       that significantly affect marketability       such as:
+         ─    Affected by any government or state       /territory planning scheme
+         ─    In need of substantial repair or has been poorly maintained             (ie not able to be rented)
+         ─    Adverse marketability (i.e. selling period above agreed parameters)
+    •    At least 30 m2 in living area, excluding balconies and car space         .
+    •    Where a borrower/guarantor is providing security that consists of multiple properties located within a
+         concentrated area, Helia will limit the exposure to the borrower to a maximum of four units or 25% of a
+         development, whichever is the lower.
+
+   8.3       Additional underwriting requirements
+Additional requirements apply to the following security types        .
+
+8.3.1 Vacant L and (up to 2.2 hectares)
+ Additional underwriting requirements
+ Maximum LVR                • 95% (or product / loan purpose limit if lower )
+ Other                      • Security must conform to the following:
+                                ─ Land size not to exceed 2.2 hectares
+                                ─ Electricity must be connected (or available for connection) to property
+                            • The unimproved V acant L and can be zoned residential, rural residential or rural
+                            • The value of V acant L and only will be relied upon (i.e. no sheds or auxiliary improvements)
+
+
+8.3.2 Rural/ rural residential (up to 50 hectares)
+ Additional underwriting requirements
+ Maximum LVR                Size                                           Maximum LVR               Location
+                            Up to 50 hectares                              95 % (or product          All locations
+                                                                           / loan purpose
+                                                                           limit if lower)
+ Other                      • Rural/ rural residential properties must not be income producing
+                            • Non -residential improvements should be noted in the valuation, but the value must be
+                              assessed excluding non -residential improvements. i .e. barns, orchards, stables etc
+
+
+
+
+                                Helia LMI underwriting standards and guidelines       – Australia –Aug 2026                          20
+                                                                  2025
+                                                                 Public
+8.3.3 Single industry postcodes
+ Additional underwriting requirements
+ Maximum LVR              • 90% (or product / loan purpose limit if lower) including LMI Premium Capitalisation                  (owner
+                            occupied and Investment)
+ Single industry postcodes
+ NSW              V IC                 QLD                 SA                    WA                    NT                 T AS
+       2835              N/A                4413                 5722                    6225                 N/A                7467
+       2880                                 4415                 5725                 6429 -6430                                 7469
+                                            4455                                         6432
+                                            4615                                         6440
+                                            4680                                         6442
+                                         4715-4719                                     6713-6714
+                                         4720 -472 3                                     6718
+                                            4737                                      6720 -6722
+                                         474 1-4746                                      6728
+                                           4804                                          6751
+                                            4805                                         6753
+                                            4825
+                                            4874
+
+
+
+
+8.3.4 Investment/rental property
+ Additional underwriting requirements
+ Maximum LVR              • 95% (or product limit if lowe r) including LMI Premium Capitalisation               where security wholly or
+                            partially by an Investment / rental property
+
+
+8.3.5 Display homes
+ Additional underwriting requirements
+ Maximum LVR              • 95% (or product / loan purpose limit if lower )
+ Other                    • If the subject property is situated within a designated ‘exhibition village’, and the active life of
+                            that village has more than six months to run, LMI is only available in the following
+                            circumstances:
+                                o There is no reliance on rental income from the security, or
+                                o A bank guarantee is provided to the Lender by or on behalf of the borrower for an
+                                     amount equal to the total rent payable from the date of commencement of the loan
+                                     until the date the exhibition village will cease to operate
+                          • Helia will assess rental income at normal market rates based on the valuation or existing
+                            tenancy agreement
+
+
+8.3.6 Pre -fabricated K it H ome (transportable home)
+ Additional underwriting requirements
+ Maximum LVR              • 95% (or product / loan purpose limit         if lower )
+ Other                    • The construction of a P re-fabricated Kit dwelling must be undertaken by a licensed builder
+                            under the Lender ’s normal progress payments and progress inspection criteria
+                          • The dwelling must be connected to all normal services (i  .e. water, sewerage, electricity) and
+                            fixed to the ground to prevent easy removal
+
+
+8.3.7 Relocated H ome
+ Additional underwriting requirements
+ Maximum LVR              • 95% (or product / loan purpose limit         if lower )
+
+
+
+
+                               Helia LMI underwriting standards and guidelines        – Australia –Aug 2026                                21
+                                                                 2025
+                                                                Public
+ Other                    • Helia will assess the LMI proposal after the house has been installed onto the new location
+                            and all services are connected
+                          • An on -completion inspection and report from a qualified valuer must confirm the house has
+                            been installed and the property meets our      acceptable security g uidelines
+
+
+8.3.8 New house and land package
+ Additional underwriting requirements
+ Maximum LVR              • 95% (or product / loan purpose       limit if lower )
+ Other                    • Valuation obtained from a qualified valuer confirming the security is a house and land
+                            package. Must also document details of any rebates and/or incentives
+                          • Where builder rebates and/or incentives are noted, the value of the rebate and/or incentive
+                            will be discounted from the purchase price
+
+
+8.3.9 Serviced or Managed Apartments
+ Additional underwriting requirements
+ Maximum LVR              • 95% base plus LMI capitalisation for Owner Occupied
+                          • 95% including LMI capitalisation for investment
+ Loan Purposes            • Purchase
+                          • Refinance
+ Exclusions               • Debt Consolidation
+                          • Cash Out /Equity Release
+                          • Construction
+                          • Home Improvement
+                          • Bridging
+                          • Off the Plan
+ Other                    • Shortform v aluation from a qualified valuer (including digital Shortform) confirming the
+                            security is eligible for owner occupation (Compliant Apartment)
+                          • Rent al income used for servicing for serviced or managed apartments will be determined by
+                            the valuer
+                          • Valuer comments must confirm compliance that         permanent owner occupation is allowed,
+                            and/or security can be removed from a management pool within a 6 month notice period
+                          • Where the security is deemed ineligible     for permanent owner occupation by the valuer, the
+                            security is unacceptable for LMI purposes
+
+
+
+8.3.10 Dual Key Apartments
+ Additional underwriting requirements
+ Maximum LVR              • 95% base plus LMI capitalisation for Owner Occupied
+                          • 95% including LMI capitalisation for investment
+ Loan Purposes            • Purchase
+                          • Refinance
+ Exclusions               • Debt Consolidation
+                          • Cash Out/Equity Release
+                          • Construction
+                          • Home Improvement
+                          • Bridging
+                          • Off the Plan
+ Other                    • Shortform v aluation from a qualified valuer (including digital Shortform)
+                          • Rent al income used for servicing for Dual Key A partments will be determined by the valuer
+                          • The rent al income for one or both units can be used in servicing    if the proposed transaction
+                            is that both apartments will be rented
+
+
+
+                             Helia LMI underwriting standards and guidelines        – Australia –Aug 2026                      22
+                                                               2025
+                                                              Public
+8.3.11Builder/ Developer S ale ( New Property)
+ Additional underwriting requirements
+ Maximum LVR                  • 95% (or product / loan purpose limit        if lower )
+ Other                        • Where builder/developer rebates and/or incentives are noted, the value of the rebate and/or
+                                incentive will be discounted from the purchase price
+                              • Any clause or provision in the contract of sale or affecting the title that restricts the ability to
+                                sell the property on the open market if the property is sold by the         Lender exercising its
+                                power of sale as the mortgage -in-possession or borrower conducting a borrower sale (i.e. a
+                                sale by the borrower in lieu of the Lender exercis ing its power of sale) is unacceptable for
+                                LMI. If there are restrictions on selling the property known (e.g. noted in a valuation) to the
+                                Lender , the Lender must confirm in writing that the clauses do not apply in the event of
+                                mortgagee -in-possession or borrower sale
+
+
+8.3.12 Property sold by Private S ale
+ Additional underwriting requirements
+ Maximum LVR                  • 95% (or product / loan purpose limit        if lower )
+ Lender responsibility        • The Lender is required to ensure that the valuation report clearly states that:
+                                  ─ the parties are not related and the transaction is at arm’s length
+                                  ─ it is a sale without the intervention of an ag ent between non -related parties
+
+
+8.3.13 Non -Arm’s L ength T ransactions and                       Advantageous / F avo urable Purchases
+ Additional underwriting requirements
+ Maximum LVR                  • 95% (or product / loan purpose limit        if lower) based on the valuation amount (rather than the
+                                purchase price)
+                              • The loan amount must not e xce ed 100% of the p urchase/con tract price
+ Security                     • One single occupancy dwelling on one title
+ Deposit/equity               • The borrowers must contribute equity         /deposit funds based on the purchase price
+ Lender responsibility        • The Lender is to:
+                                  ─ confirm in writing the details of the transaction
+                                  ─ ensure that the qualified valuer has noted the purchase price and the nature of the
+                                     tran saction
+
+
+8.3.14 Split C ontract R esidential S ecurity (party or common wall)
+ Additional underwriting requirements
+ Maximum LVR                  • 95% (or product / loan purpose limit        if lower)
+ Security                     • Helia will only accept this security:
+                                  ─ once the development is fully complete
+                                  ─ the subject unit can be occupied, and
+                                  ─ individual titles have been issued
+ Valuation                    • A single ‘as if complete’ valuation is required reflecting the market value of the completed
+                                dwelling, on the basis of the whole development (including party or common wall) being
+                                finished
+
+
+8.3.15 Third party mortgages/guarantees
+The table below outlines third party relationships that        Helia will consider acceptable security for LMI.
+ Borrower                         Mortgagor/guarantor              Acceptability
+ A. and B. Citizen                A. Citizen (or B. Citizen)       Y
+ A. Citizen (or B. Citizen)       A. and B. Citizen                Y
+ A. Citizen                       B. Citizen                       Only if mortgagor is common law spouse of the borrower
+
+
+
+                                 Helia LMI underwriting standards and guidelines         – Australia –Aug 2026                         23
+                                                                    2025
+                                                                   Public
+A. and B. and C. Citizen    A. and B. Citizen                 Y
+A. and B. Citizen Pty Ltd   A. and B. Citizen                 Only if both borrowers are directors of the borrower company
+A. and B. Citizen           A. and B. Citizen Pty Ltd         Only if borrowers are the only directors of the guarantor
+                                                              company
+A. Citizen                  J. Bloggs                         Only if mortgagor is common law spouse of the borrower
+B. Citizen                  B. Citizen and J. Bloggs          Only if mortgagors are common law spouses
+
+
+
+
+                            Helia LMI underwriting standards and guidelines   – Australia –Aug 2026                          24
+                                                              2025
+                                                             Public
+8.3.16 Cross C ollateralisation
+Helia will consider LMI for loans with cross collateralised security where the following         underwriting requirements are met:
+     •    Security property must be common to all loans under the cross           -collateralised structure
+     •    Each mortgagor under the cross collateralised structure must either be a debtor or guarantor
+     •    Any guarantor on any loan within the cross collateralised structure will be required to guarantee all loans within
+          this structure .
+In terms of processing such    LMI proposals, the following is to apply:
+     •    Each loan must be presente     d with a separate LMI proposal form
+     •    Each loan must be presented with a separate loan application form outlining the proposed structure
+     •    A cover page or memo must be attached outlining the scenario, connection to other                LMI proposals and T otal
+          E xposure .
+A common acceptable scenario is noted below as an example:
+ New loan 1                                                                                          New loan 2 (taken out at same
+                                                                                                     time as new loan 1)
+ Borrower              A and B – natural persons                                                     Company – directors A and B
+ Mortgagor             A and B – property 1 (no existing mortgage over property 1)                   A and B – property 1
+ Guarantor             A and B – property 1 (no existing mortgage over Property 1)                   A and B
+
+
+   8.4      Unacceptable securities
+     •    Income producing R ural properties
+     •    Properties designed, zoned, or used for purposes other than residential use, such as commercial, industrial, retail
+          (excluding residential home units in a commercially zoned development)
+     •    Properties to be constructed by an owner builder (in whole or part), where the LVR exceeds 50% of the lesser of
+          the cost price or valuation
+     •    Crown land (other than the ACT)
+     •    Leasehold properties (other than crown land in the ACT)
+     •    Purple title (WA), or moiety title (SA)
+     •    Company title (located outside 10kms of a capital city’s CBD)
+     •    Company share title (V IC )
+     •    Stratum title (V IC ) unit
+     •    Improved site with land size larger than     50 hectares
+     •    Under a ‘time share ’ arrangement
+     •    Land subject to licence to occupy
+     •    Limited title (any defects)
+     •    Mobile or temporary homes
+     •    Boarding house / hostel
+     •    Land / improvements contaminated
+     •    Properties with ‘lease of life ’ covenants on title
+     •    A strata title home unit less than 30 m²
+     •    Properties subject to the Western Lands Act
+     •    Properties adversely impacted by mine subsidence
+     •    Serviced apartments, or apartments that are subject to a management agreement           and are ineligible for
+          permanent owner occupation
+     •    Strata title hotel/motel room
+     •    Properties that are un ique, or have restrictive usage
+     •    Any property that is ‘l andlocked ’ (i.e. the property does not have street access)
+     •    Known flood height level is higher than the floor level
+     •    Multiple occupancy security (more than two dwellings on the title)
+     •    Located on an island without sealed road connection to mainland
+     •    Security boundary located within 50 metres of high voltage transmission lines
+     •    Vacant L and exceeding 2.2 hectares
+     •    NDIS purpose -built properties
+
+
+
+
+                                Helia LMI underwriting standards and guidelines    – Australia –Aug 2026                              25
+                                                                  2025
+                                                                 Public
+9    Security value
+To obtain approval for LMI, any valuation , Desktop A ssessment or validation of a contract of sale purchase price must
+comply with the requirements of Helia’s valuation minimum s tandards in addition to the requirements set out in this
+document.
+If multiple valuation types are held, the valuation should be used in the following priority: a short form (including alternative
+short form) / long form should always be used first , followed by Desktop, and then COS supported by AVM.
+
+    9.1      Short form (including alternative short form valuations ) & long form valuation
+             requirements
+A short form valuation (including an alternative shortform valuation) or long form valuation provide s a brief description of
+the proposed security including the location and surrounding area, the size and construction, type of improvements,
+recent comparable sales, and the condition and marketability of the property       .
+For a valuation to be acceptable to     Helia the following minimum components must be included and verified:
+    •       Must be less than 90 days old      at the time acceptance advi ce is issued
+    •       Must provide at least three acceptable and recent settled comparable sales of similar properties
+    •       The valu e of a security is not to include any component for GST
+    •       The qualified valuer must state that the security property is suitable for mortgage lending purposes and may be
+            relied upon by Helia
+    •       Must be based on existing condition of property and/or the on           -completion value of proposed construction
+            including relevant costs
+    •       Essential repairs are to be detailed as either an estimate cost or an allowance provided
+    •       A separate value is to be provided for land and improvements, except where strata title properties are involved
+    •       Improvements to the land must comply with the local government zoning/planning scheme.
+Helia prefers the Australian Property Institute (API)   property pro-forma report template developed specifically for
+residential mortgage valuation work. However, where outside the API       property pro supporting memorandum guidelines
+(or equivalent API document) a residential long form report may be required.
+
+
+
+    9.2      Desktop Assessment requirements
+Desktop A ssessments are available to Lender s where the Lender has been pre -approved in writing by Helia to offer this
+method of assessing a security’s value for LMI .
+
+
+ Additional underwriting requirements
+ Maximum limits               LVR                                                   90%
+                              Loan amount                                           $1,80 0,000
+                              Security value                                        $2,0 00,000
+ Loan purpose                 • Construction
+ exclusion
+ Security                     • Single existing residential dwellings
+                              • Land size of securit y not to exceed 2 hectares
+                              • Security must be located in an approved postcode location (refer list below)
+ Security exclusions          • Any security that requires an extended selling period of more than 6 months
+                              • Any security property known to be incomplete or under construction
+                              • Off the plan / new dwelling (i.e. has never been sold )
+                              • Any environmental risks impacting the property
+                              • Vacant L and
+                              • Serviced apartments
+                              • Dual Key Apartments
+
+
+
+
+                                  Helia LMI underwriting standards and guidelines     – Australia –Aug 2026                      26
+                                                                    2025
+                                                                   Public
+ Security c ondition          • T he security property will be deemed by Helia to be readily saleable and in habitable
+                                condition as at the date of the Desktop A ssessment for all purposes associated with             Lender s
+                                mortgage insurance.
+
+
+
+9.2.1 Acceptable Desktop Assessment
+For a Desktop A ssessment to be acceptable to Helia the following minimum components must be included                      in the
+assessment :
+    •       Full security property address
+    •       Title details
+    •       Property type (i.e. house or unit)
+    •       Number of bedrooms and bathrooms
+    •       Land area (houses only)
+    •       Image which clearly shows the improvements in adequate detail
+    •       Street or location map
+    •       Minimum three settled comparable sales that transacted within the last six months
+    •       Confirm the report is extended for use to Helia or the Lender ’s LMI provider
+    •       Must be less than 90 days old at the time acceptance advice is issued
+    •       The value of a security is not to include any component for GST
+    •       The A ssessment must state     that it may be used and / or relied upon by         Helia or a Lender s mortgage insurer
+
+   9.3       C ontract of S ale (COS) Purchase Price validated by Automated Valuation Model
+             (AVM) R equirements
+COS purchase price (consideration) validated by AVM is available to       Lender s where the Lender has been pre -approved in
+writing by Helia to offer this method of assessing a security’s value for LMI.
+
+In the instance where an arm ’s length purchase price (consideration) can be validated by an AVM and is within the
+parameters addressed below , no V aluation or Desktop A ssessment will be required.
+
+
+ Additional underwriting requirements
+ Maximum limits               LVR                                                   90%
+                              Maximum security value                                $2,000,000
+                              Minimum security value                                $250,000
+ Loan purpose                 • Purchase for owner occupied or Investment purposes only
+ Security                     • Single existing residential dwellings
+                              • Security must be located in an approved postcode            list (refer section 9.4 )
+ Security exclusions          • Vacant L and
+                              • Purchases which have a settlement date greater than 2 months of the contract date
+                              • Off the plan / new dwelling (i.e. has never been sold)
+                              • Serviced Apartments
+                              • Dual Key Apartments
+ Security condition           • The security property will be assumed to be readily saleable and in habitable condition as at
+                                the date of the contract of sale for all purposes associated with Lender s mortgage insurance.
+
+
+
+
+                                  Helia LMI underwriting standards and guidelines     – Australia –Aug 2026                             27
+                                                                    2025
+                                                                   Public
+9.3.1 Acceptable C ontract of S ale
+For a purchase price (consideration) stated on a  contract of sale to be acceptable to Helia the following minimum
+requirements must be met:
+       • The purchase price (consideration) stated in the COS must have been negotiated in arm              ’s length transaction
+           through an independent Australian based real estate agent (that is, not a private sale) with the property
+           marketed to the open market
+       • The purchase price (consideration) stated in the COS must be inclusive of any rebates or other discounts.
+       • The COS must have a settlement date within 2 months of the date the contract is entered into (i.e. the contract
+           date) .
+       • The purchase price (consideration) must be supported by an AVM in accordance with the requirements of this
+           document
+
+
+9.3.2 Automated Valuation Method
+Use of the AVM provides validation of the accuracy of the purchase price (consideration) stated in a COS . Therefore, to
+accept a purchase price (consideration) stated in a COS  , the following AVM tolerance must be met:
+       • The value of the property stated in or produced by the      AVM must be within plus or minus 15% of the purchase
+           price (consideration) stated in the COS; and
+       • The value of the property stated in or produced by the      AVM must have a F orecast S tandard Deviation (FSD) or
+           confidence score of 15 or below
+Where the AVM tolerances are not met Helia will require an alternate valuation type to be provided .
+
+
+   9.4        COS / AVM & Desktop Valuation Excluded Postcodes List
+ NSW                V IC                 QLD                 SA                    WA               NT               T AS
+       2835                N/A                4413                 5722                6225                N/A              7467
+       2880                                   4415                 5725             6429 -6430                              7469
+                                              4455                                     6432
+                                              4615                                     6440
+                                              4680                                     6442
+                                           4715-4719                                 6713-6714
+                                           4720 -472 3                                 6718
+                                              4737                                  6720 -6722
+                                           474 1-4746                                  6728
+                                             4804                                      6751
+                                              4805                                     6753
+                                              4825
+                                              4874
+
+
+
+
+                                 Helia LMI underwriting standards and guidelines   – Australia –Aug 2026                            28
+                                                                   2025
+                                                                  Public
+10 Loan features
+This section provides an overview of:
+     •    loan features that are acceptable to    Helia for the purposes of LMI
+     •    additional underwriting requirements, including verification, that apply to specific loan features.
+If you would like to discuss an LMI proposal before submitting to Helia , please please contact our C ustomer S ervice C entre
+on 1300 661 118 or by email at underwritingsupport@helia.com.au
+
+   10.1 Acceptable loan features
+ Loan feature                             Standard LMI                     Business Select                  Family Pledge
+ Interest -only not converting to         90%                              80%                              Not available
+ P&I within 10 years
+ Interest -only converting to P&I         95%                              80%                              85%
+ within 10 years
+ Line of credit                           90%                              80%                              Not available
+ Combination L oan                        95%                              Not available                    Not available
+ Split borrowings                         95%                              80%                              85%
+ Redraw                                   Yes                              Yes                              Yes
+ Maximum loan term                        40 years                         30 years                         30 years
+ Parenting Repayment Break                90%                              Not available                    Not available
+
+
+   10.2 Additional underwriting requirements
+Additional underwriting requirements apply to the following loan features.
+
+10.2.1Interest -only loans
+ Additional underwriting requirements
+ Maximum LVR and             Repayment structure                              Maximum LVR             Maximum term
+ term                        Interest -only loans converting to P&I                                   Maximum Interest -only term
+                                                                              95%
+                             within 10 years                                                          not to exceed 10 years
+                             Interest -only loans NOT converting to           90% including LMI       10 years
+                             P&I within 10 years                              Premium
+                                                                              Capitalisation
+ Serviceability              Interest -only facilities will have their repayments calculated over the total loan term less the
+                             initial Interest -only period. i .e. original loan term 30 years with original Interest -only term five
+                             years, repayments will be calculated at         P&I over 25 years
+
+
+10.2.2 Combination L oan
+A C ombination L oan allows a borrower to structure their loan to combine a line of credit facility with          a P&I loan.
+ Additional underwriting requirements
+ Line of credit              Maximum amount                                                       Maximum LVR
+ (Interest -only)
+                             20% of the total loan amount                                         95%
+ Repayment type              • For loans up to 90% LVR, the total loan can be Interest -only or P&I
+                             • For loans above 90% LVR, the non -line of credit component must be fully amortising from
+                               commencement (i .e. cannot be Interest -only conver ting to P&I )
+ Other                       • For loans above 90% LVR, a line of credit component can only be insured where                Helia
+                               insures all loa ns secured by the same property
+                             • A maximum of f our loan components are allowed
+ Lender responsibility       • Lender is to provide:
+                                 ─ loan amount split – e.g . $20,000 line of credit Interest -only and $80,000 loan             P&I
+                                 ─ interest rate type - example fixed/v ariable for each loan component
+
+
+                                Helia LMI underwriting standards and guidelines     – Australia –Aug 2026                              29
+                                                                  2025
+                                                                 Public
+10.2.3 Split borrowings (same borrowers with common security)
+ Additional underwriting requirements
+ • Helia will consider LMI for split loans with the same borrowers, which may have different loan purposes, different
+   interest rates, repayment methods or different loan terms
+ • Helia will calculate the LMI premium based on the combined exposure and apportion between the loans
+
+
+10.2.4 Parenting Repayment Break
+Subject to the additional underwriting requirements      below, Lender s can approve the Parenting       R epayment Break without
+seeking consent from Helia .
+ Additional underwriting requirements
+ Maximum LVR                • 90% – at time of request
+ Loan purpose               • Owner -occupied loans only
+ Credit history             • 12 full monthly repayments must be made prior to Parenting    R epayment Break
+                            • Repayment history must be clear of missed/late    repayments for at least six months
+ Repayment type             • Interest -only not permitted
+ Other                      • Parenting R epayment Break can be taken as either:
+                                ─ three months ‘no repayments’ or
+                                ─ six months ‘half repayments’
+                            • Maximum of two Parenting R epayment Breaks during life of loan
+                            • 12 full monthly repayments must be made between each subsequent       Parenting R epayment
+                              Break
+                            • Repayments to be re -amortised over remaining term following a Parenting Repayment
+                              Break
+ Documentation              • Lender is to retain evidence of:
+                                ─ parental leave approval
+                                ─ lender ’s approval of Parenting Repayment B reak
+                                ─ re-amortisation, serviceability calculations and
+                                ─ income evidence (if applicable)
+
+
+
+
+                               Helia LMI underwriting standards and guidelines   – Australia –Aug 2026                          30
+                                                                 2025
+                                                                Public
+11 Credit reporting
+This section provides an overview of   Helia ’s credit reporting requirements, including verification, for the purposes of LMI. If
+you would like to discuss an LMI proposal before submitting to       Helia , please contact our C ustomer S ervice C entre on 1300
+661 118 or by email at underwritingsupport@helia.com.au
+     •     The Lender must obtain a credit bureau report on all individual borrowers and guarantors and any        related
+           directorships and / or proprietorships, where income     or benefit from these related entities is being applied for
+           servicing purposes
+           ─     The credit bureau report must be clear of any writs,          judgments or bankruptcy
+           ─     Unpaid defaults will not be accepted under any circumstance            s
+           ─     Maximum two paid defaults, from non -financial institutions, up to a total of $1 ,000 are acceptable
+     •     The Lender must:
+           ─     investigate all enquiries within the last 12 months and compare them against the              assets and liabilities
+                 statement on the loan application *
+           ─     provide an explanation of unmatched credit enquires with the LMI proposal
+           ─     investigate all credit bureau reports including possible matches and             cross -referenced files *
+           ─     validate credit bureau reports with applicants’ identification details
+           ─     provide a written explanation signed by the individual on adverse findings on a borrower’s or guarantor’s
+                 credit bureau report
+           ─     investigate and confirm the directors of each related entity (if        any) *
+           ─     investigate and confirm the directorships of individual borrowers and guarantors (if any             ). *
+     •     Where the Lender received CCR information, the             Lender must:
+           ─     Investigate and address any open accounts evidenced in the             CCR to ensure satisfactory account conduct*
+           ─     Investigate and address any undisclosed liabilities          referred to in the CCR *
+*a notation on file is required in these instances
+
+
+    11.1 Ban period
+     •     An individual who believes that they are, or are likely to be, a victim of fraud can request a credit reporting              agency
+           not to use or disclose their credit reporting information
+     •     The duration of a ban period is 21 days however it can be extended
+     •     During a ban period, Helia will not consider an application for LMI
+     •     The Lender will need to advise Helia when the ban period is lifted as the credit reporting             agency does not send an
+           automatic notification.
+
+
+
+
+                                     Helia LMI underwriting standards and guidelines   – Australia –Aug 2026                                 31
+                                                                       2025
+                                                                      Public
+12 Documentation
+This section provides an overview of details of the relevant documentation that must be sent to           Helia to support the LMI
+proposal , if submitted via email or eLMI Portal ( excluding e-form) .
+    •    Helia reserves the right to request more detailed information or supporting documents for any LMI proposal
+    •    In addition to documents detailed below, other documentation     is obtained as part of the loan approval process.
+         Th is documentation do es not need to be sent to Helia unless requested or considered appropriate under your
+         duty of disclosure, however it must be retained on the Lender file
+    •    A downloadable version of     the LMI proposal c hecklist can be found on our website.
+
+   12.1 Mandatory documentation required for LMI proposals
+ Mandatory documents to be sent to         Helia
+ • A completed Helia LMI proposal form
+ • A copy of the completed loan application
+ • A copy of the serviceability calculation used in your loan assessment
+ • Full valuation report (or approved alternative)     - no more than 90 days old
+ • Lender s supporting notes (in all instances) . Also, i f the LMI proposal is outside of    these g uidelines, Lender s notes
+   should outline the strengths of the LMI proposal
+
+
+
+
+                                Helia LMI underwriting standards and guidelines   – Australia –Aug 2026                              32
+                                                                  2025
+                                                                 Public
+13 Helia Decision
+    •    After the LMI proposal has been assessed,       Helia will issue:
+         ─    an acceptance advice
+         ─    a conditional approval advice
+         ─    a decline advice; or
+         ─    a request for additional information depending on the outcome of the assessment
+    •    If approved, the acceptance advice will include the amount of the LMI premium plus GST and s               tamp duty payable
+         at settlement
+    •    Upon payment of the LMI premium, a certificate of insurance will be issued.
+
+Acceptance advice and conditional approval advice
+    •    An acceptance advice is issued after     Helia has fully as sessed and approved a n LMI proposal
+    •    A conditional approval advice is issued after assessment subject to satisfactory valuation only.
+    •    Any changes to the assessed information  (including financial position, or income and expenses of the applicants)
+         should be noted and resubmitted to Helia for reassessment.
+ Document                                                                         Approval duration
+ Acceptance advice                                                                180 days
+ Conditional approvals advice                                                     90 days
+
+Expired acceptance advice
+Where loan funds have not been advanced
+    •    Where an acceptance advice has expired and the loan funds have not yet been advanced, a                 new LMI proposal will
+         be required .
+
+Where the loan funds have been advanced, but the LMI premium has not been paid
+    •    Where an acceptance advice has expired and the loan funds have been advanced,                Helia may consider accepting
+         the LMI premium
+    •    Each LMI proposal must be referred to the       Helia ’s customer s ervice centre for consideration .
+    Note : Any loans with arrears history will no t be accepted for reinstatement
+
+Expired conditional approval advice
+    •    Any conditional approval advice that does not convert into a full approval within the           90 -day time frame will expire
+    •    No reinstatement is available
+    •    If LMI is still required, the LMI proposal will need to be resubmitted to     Helia for reassessment in the normal
+         fashion .
+Note : All borrower/guarantor information must be verified again         for Helia to reassess the LMI proposal.
+
+Payment of LMI premium
+    •    Following approval (acceptance) of the LMI proposal, the          LMI premium must be paid to      Helia within 28 days of:
+         ─    settlement (for a property purchase or     R efinance); or
+         ─    the first loan advance (for any other loan purpose).
+
+Lapsed LMI approval
+    •    Where the LMI premium is not paid within six       months of the LMI approval, the approval will lapse and will be
+         withdrawn .
+
+Re -lodgement proposal
+    •    Where the LMI approval has been withdrawn and LMI is still required, a new        re lodgement proposal form will need
+         to be submitted with updated assessment criteria as well as a copy of the loan statement from drawdown (if the
+         loan has been advanced).
+
+
+
+
+                               Helia LMI underwriting standards and guidelines   – Australia –Aug 2026                                 33
+                                                                 2025
+                                                                Public
+14 Top Ups
+Minimum underwriting requirements
+Documentation           • A completed Helia LMI proposal form
+requirements            • Documentation will be required as per        documentation section of these g uidelines
+Maximum LVR             • 95% plus LMI Premium Capitalisation (or product / loan purpose / security type limit if lower)
+                          where security is wholly owner -occupied property
+                        • 95% including LMI Premium Capitalisation (or product / loan purpose / security type limit if
+                          lower) where security is wholly or partially investment property   when calculating the total
+                          loan limit and LVR, the S cheduled Balance on existing loan, plus the new loan are to be used
+Loan purpose            • Purchase, R efinance (dollar for dollar) will be considered at 95% plus LMI Premium
+                          Capitalisation (or product / security type limit if lower)
+                        • Construction, R efinance, E quity R elease/ C ash out, Debt C onsolidation, C ontrolled F unds will
+                          be considered at 90% plus LMI Premium Capitalisation (or product / security type limit if
+                          lower)
+Other requirements      • Must satisfy these g uidelines
+Additional underwriting requirements
+Credit history          • Acceptable repayment history for at least the past three months
+Existing loan history   • Existing loan must have been operating for at least three months
+                        • Only one T op Up permitted within any three month period
+                        • A written explanation is required where full monthly contractual repayments have not been
+                          made (e .g . Parenting Repayment Break)
+Loan term               • Remaining loan term must not exceed maximum allowable term for product
+LMI premium - where     • The LMI premium for a T op Up will be calculated on the existing S cheduled Balance plus T op
+original loan insured     Up amount at the new LVR . The LMI premium for an Internal R efinance will be calculated on
+by Helia                  the existing current S cheduled Balance plus the amount that the Internal R efinanced loan
+                          amount exceeds the S cheduled Balance d at the new LVR
+                        • The LMI premium amount previously paid      to Helia on the existing insured loan, and any
+                          subsequent Internal R efinance or T op Ups, will be deducted from the new LMI premium as a
+                          P remium C redit
+                        • The original LMI policy (and any prior T op Up and/ or Internal R efinance policies) will be
+                          superseded by the new T op Up and/ or Internal R efinance LMI policy for the total insured
+                          amount
+LMI premium - where     • Additional advances that subsequently require LMI where the existing loan is not already
+original loan is not      insured by Helia will be treated as a new LMI proposal for the total loan amount
+insured by Helia        • No P remium C redit will apply (unless Lender has alternate pre -approved premium
+                          arrangement)
+Other                   • Where a Lender submits an LMI proposal for a T op Up under a different LMI product to the
+                          original LMI policy, the LMI proposal can be considered under the new LMI product provided
+                          the LMI proposal meets all g uidelines for the new LMI product
+                        • Pricing will be calculated using the LMI premium rate for the new LMI product
+
+
+
+
+                           Helia LMI underwriting standards and guidelines   – Australia –Aug 2026                              34
+                                                             2025
+                                                            Public
+15 LMI policy variations
+During the term of an insured loan, circumstances may change and a borrower may seek to vary certain aspects of the loan
+by way of addition or removal of borrow ers and/or guarantors , or even a change to the security property.
+Helia is required to be advised of and consent to the listed variations types below. Other variations made to a loan
+including (but not limited to) repayments changes (Interest -only to P rincip al and Interest, P rincip al and Interest to Interest -
+only, fixed t o variable, variable to fixed etc), loan product switches, consolidation or splitting of loan s, are not required to be
+reported to Helia .
+All LVRs excludes LMI Premium Capitalisation unless indicated            (i.e. base LVR) .
+
+   15.1 Substitution of security
+Where a borrower proposes to sell an existing security       property and replace it with another of similar or higher value,        Helia
+will consider a substitution of security subject to the    underwriting requirements set out below.
+
+15.1.1 LVR and loan amount remain the same or decrease
+ Minimum underwriting requirements
+ Documentation             • A completed Helia LMI variation form including confirmation of residual loan amount and LVR
+ requirements              • Full valuation of new/remaining security not older than 90 days
+ Other requirements        • The residual loan amount, LVR and security must satisfy           these g uidelines
+ LMI premium               • No fee or additional LMI premium will apply
+                           • Original LMI policy will remain in force and a       variation ref und will not apply
+
+
+15.1.2 LVR or loan amount increases within                     g uidelines
+ Minimum underwriting requirements
+ Documentation             • A completed Helia LMI proposal form
+ requirements              • Documentation will be required as per         the documentation section of these g uidelines
+                           • Full valuation of new/remaining      security not older than 90 days
+ Other requirements        • Must satisfy these g uidelines
+ LMI premium               • A new LMI premium will be payable
+                           • The original L MI policy will be cancelled and       where applicable , a variation refund will apply
+
+
+   15.2 Partial release of security
+Where a subdivision or boundary realignment is to occur on an existing security property, or where                an insured loan is
+secured by mortgage over more than one property, and one or more of the securities is to be sold,                Helia will consider a
+variation to the LMI policy subject to the minimum requirements set out below.
+
+15.2.1 LVR remains the same or decreases
+ Minimum underwriting requirements
+ Documentation             • A completed Helia LMI variation form including confirmation of residual loan amount and LVR
+ requirements              • Full valuation of remaining security     not older than 90 days
+ Other requirements        • The residual loan amount, LVR and security must satisfy           the g uidelines
+ LMI premium               • No fee or additional LMI premium will apply
+                           • Original LMI policy will remain in force and a       variation refund will not apply
+
+
+15.2.2 LVR increases within              g uidelines (total net sale proceeds are applied to the loan)
+ Minimum underwriting requirements
+ Documentation             • A completed Helia LMI variation form including confirmation of residual loan amount and LVR
+ requirements              • C urrent assets and liabilities
+                           • Full valuation of remaining security not older than 90 days
+                           • Contract of sale for outgoing security
+
+
+                                Helia LMI underwriting standards and guidelines    – Australia –Aug 2026                                 35
+                                                                  2025
+                                                                 Public
+                            • Settlement disbursement details confirming net proceeds and destination of funds. In cases
+                              where a disbursement notice is not available, confirmation in writing that full net proceed         s are
+                              being applied to the loan
+ Other requirements         • Must satisfy these g uidelines
+ LMI premium                • A fee of $500 will apply
+                            • The original LMI policy will remain in force, and a     variation refund will not apply
+
+
+15.2.3 LVR increases within              g uidelines (part sale proceeds are applied to the loan)
+ Minimum underwriting requirements
+ Documentation              • A completed Helia LMI proposal form
+ requirements               • Documentation will be required as per the documentation section of these g uidelines
+ Other requirements         • Must satisfy these g uidelines
+ LMI premium                • A new LMI premium will be payable
+                            • The original LMI policy will be cancelled and, where applicable        , a variation refund will apply
+
+
+15.2.4 LVR increases outside of                g uidelines (resulting from            H ardship)
+Variations resulting from   a H ardship must be submitte d to our H ardship team by email at         hardshipsAU@helia.com.au
+ Minimum underwriting requirements
+ Documentation              • A completed Helia hardship application form
+ requirements               • Confirmation that all avenues have been exhausted to reduce LVR to maximum product LVR
+                            • Declaration (by Lender /funder) that borrower is in a distressed financial situation
+                            • Valuation of remaining security not older than 90 days
+                            • Arm’s length contract of sale (involving a licensed real estate agent) or valuation report (not
+                              older than 90 days) for outgoing security
+                            • Settlement disbursement details confirming net proceeds and destination of funds. In cases
+                              where a disbursement notice is not available, confirmation in writing is required that full net
+                              proceed s are being applied to the loan
+
+
+15.2.5 LVR increases outside of                g uidelines (not resulting from             H ardship)
+ Minimum underwriting requirements
+ Documentation              • A completed Helia LMI variation form including confirmation of residual loan amount and LVR
+ requirements               • Confirmation all avenues have been exhausted to reduce LVR to maximum product LVR
+                            • Confirmation H ardship assistance is not required
+                            • Full set of mandatory documentation as per the documentation section of these g uidelines
+                            • Valuation of remaining security not older than 90 days
+                            • Arm’s length contract of sale (involving a licensed real estate agent) or valuation report (not
+                              greater than 90 days) for outgoing security
+                            • Settlement disbursement details confirming net proceeds and destination of funds. In cases
+                              where a disbursement notice is not available, confirmation in writing is required that full net
+                              proceed s are being applied to the loan
+ Other requirements         • Amendments falling under this scenario will be considered on an exception basis only
+                            • Must satisfy these g uidelines
+                            • A risk -based fee determined on application will apply
+                            • The original LMI policy will remain in force, and a     variation refund will not apply
+
+
+   15.3 Borrower amendments
+Where an insured loan has a change to the borrower(s)          and/or guarantors , Helia will consider a variation to the LMI policy,
+subject to the minimum requirements set out below.
+
+15.3.1Release and / or addition of a borrower
+ Minimum underwriting requirements
+
+
+                                 Helia LMI underwriting standards and guidelines    – Australia –Aug 2026                                 36
+                                                                   2025
+                                                                  Public
+ Documentation             • A completed Helia LMI variation form including confirmation of residual loan amount, LVR,
+ requirements                and remaining and new borrower/s details
+                           • A copy of completed loan application form including new borrower details (including personal
+                             details, income & employment details)
+ LMI premium               • No fee or additional LMI premium will apply
+                           • Original LMI policy will remain in force and a        variation refund will not apply
+
+
+
+15.3.2 Change of borrower name
+Applicable where a borrower has legally changed their name.
+ Minimum underwriting requirements
+ Documentation             • A completed Helia LMI variation form including confirmation of residual loan amount, LVR,
+ requirements                and remaining borrower/s changed details
+ LMI premium               • No fee or additional LMI premium will apply
+                           • Original LMI policy will remain in force and a        variation refund will not apply
+
+
+   15.4 Variation refund
+    •    For loan variations such as substitution of security and partial release of security, and any others, which increase
+         the exposure or risk, a new LMI proposal and LM        I premium will apply
+    •    A variation refund in respect of the existing LMI policy          may be payable where the exposure is reduced by the
+         variation
+    •    No refund will be paid where the amount calculated is less than $500
+    •    The following variation refunds apply:
+ Period from date of LMI premium payment to date of variation                                                Refund payable
+ Three months or less                                                                                        80%
+ Over three months to one year                                                                               70%
+ Over one year to two years                                                                                  50%
+Note : Any enquiries received by   Helia from borrowers regarding refunds will be forwarded to the             Lender to address .
+
+   15.5 Loan discharges              - cancellations
+    •    The Lender is to advise Helia as soon as the loan has been fully repaid so that the           LMI policy can be cancelled in
+         our system and any refund (if applicable) due calculated
+    •    A cancellation refund may not be payable where a reduced LMI pre               mium has been paid
+    •    No refund is payable where:
+         ─    separate arrangements are in place with the        Lender for a reduced LMI premium rate in lieu of taking
+              premium refunds ; or
+         ─    the loan is repaid within one year of the maturity date of the mortgage; or
+         ─    the notification of cancellation of the   LMI policy is received by      Helia more than three months after repayment
+              of the insured loan; or
+         ─    the refund amount is less than $500; or
+         ─    a loss has eventuated; or
+         ─    the loan has been reported to     Helia to have had arrears.
+See below for the current refund rate table, which is subject to change:
+ Period from date of LMI premium payment to date when loan has been repaid in full                           Refund payable
+
+ One year or less                                                                                            40%
+ Over one year to two years                                                                                  20%
+Note : Any enquiries received by   Helia from borrowers regarding refunds will be forwarded to the             Lender to address .
+
+
+
+
+                                Helia LMI underwriting standards and guidelines      – Australia –Aug 2026                              37
+                                                                    2025
+                                                                 Public
+16 Glossary
+Term                        Definition
+Advantageous/               Refers to purchases from a family member at a discounted price or where a vendor is
+F avo urable P urchases     selling the property at a discounted price to a person to whom    they are indebted
+AVM                         Automated V aluation Model
+AVM P rovider               Is a company or organisation that provides AVM’s
+Base L oan A mount          The Base L oan A mount is the loan amount approved befor          e adding the LMI premium
+                            charge
+Borrowers of                A borrower that is added to the loan application to provide serviceability and/or security
+convenience                 support but does not receive a tangible benefit from the loan transaction. Borrowers must
+                            have a beneficial interest in the loan transaction either by way of joint o      wnership of the
+                            security and/or dependence on the mortgagor in a m          arital or de facto relationship
+Bridging loan               A Bridging L oan enables a borrower to purchase another home prior to completing the sale
+                            of an existing property. The Lender takes a mortgage over both the existing and the new
+                            property pendin g the sale of the existing home
+Builder/ developer sale     Properties purchased directly from a builder or developer and may be in the for          m of a
+                            house and land package, V acant L and, house , home unit, villa or townhouse
+Combination loan            Allows a borrower to structure their loan to combine a line of credit facility with a        P&I loan
+                            A C omprehensive C redit Report being a report that includes credit information concerning
+Comprehensive C redit
+                            a borrower such as repayment history of accounts, account open and closed dates, credit
+R eporting (CCR)
+                            enquiries and other information
+Construction loan           A C onstruction L oan enables a borrower to build a single or duplex residential property on
+                            an existing block or vacant residential land, or to carry out structural improvements to an
+                            existing dwelling, either for owner occupation or investment purposes
+                            Construction loans must be completed under a fixed price contract from a licensed builder
+COS                         Contract of S ale
+Cross c ollateralisation    Cross C ollateralisation allows Lender s to use equity in all properties held as security by that
+                            Lender , to secure all debts outstanding for the same borrower
+Debt consolidation          Debt C onsolidation enables a borrower to consolidate existing consumer loans with their
+                            home loan, all in one new loan. Examples of consumer loans are personal loans, car loans,
+                            credit cards etc. As a consequence of consolidation of all existing debts, the borro    wer has
+                            only one monthly repayment, which in many cases may improve their serviceability and
+                            reduce their commitment level
+Desktop assessment          A written assessment or report of value of the security property prepared, without
+                            undertaking an internal or external physical inspection of that property, by a valuer and
+                            issued by Desktop A ssessment P rovider. The value may also be described in the
+                            assessment or report as an assessed value. A      Desktop A ssessment may also be known as a
+                            Desktop V aluation or R esidential Desktop A ssessment.
+Equity release (cash out)   Includes any loan, or component of a loan where the loan funds are released directly to the
+                            borrower, regardless of the proposed purpose
+Expatriates                 Australian citizens living and working either permanently or temporarily in any country
+                            other than Australia or New Zealand
+First Home Owner Grant      A grant available to Australians who are buying or building their first home and have not
+(FHOG)                      previously owned a home, either jointly, separately or with another person
+First Home Super Saver      The initiative by the Australian Government aimed at assisting Australians aged 18 and
+Scheme                      over to save for their first home. This scheme allows borrowers save money for their first
+                            home within their superannuation fund. This can be achieved by making addition          al
+                            contributions to superannuation funds (before or after tax) up to a maximum $30,000
+First Home Saver            The initiative by the Australian Government aimed at assisting Australians aged 18 and
+Account                     over to save for their first home. The government will contribute 17% on the first $5,000
+                            (indexed) of individual contributions made each year with a capped balance of $         90,000
+
+First home buyer            Borrowers purchasing an owner         -occupied or investment property for the first time.
+
+
+
+                            Helia LMI underwriting standards and guidelines   – Australia –Aug 2026                                 38
+                                                              2025
+                                                             Public
+Funding program               A F unding P rogram is an organisation that provides funding and credit criteria for the
+                              origination of mortgages by a third party
+
+FSD                           Forecast S tandard Deviation. It may also be associated with a confidence score.
+Hardship                      Where a borrower is experiencing difficulties in meeting their mortgage repayments due to
+                              unforeseen circumstances or an unexpected life event
+Home improvements /           Genuine H ome Improvements are additions or alterations made to the property that add
+renovations                   value to the property. Examples of acceptable    H ome Improvements include replacement or
+                              major upgrade of kitchen or bathroom, addition of swimming pool, garage or carport,
+                              extensive landscaping, upgrade or inclusion of a concrete driveway and / or complete re -
+                              roofing of premises
+Immediate family              A spouse, de facto partner, child, parent, grandparent, aunt, uncle, cousin, grandchild or
+member                        sibling of an applicant ; or a child, parent, grandparent, aunt, uncle, cousin, grandchild or
+                              sibling of an applicant’s spouse or de facto partner. It includes step   -relations (e .g. step -
+                              parents and step -children) and adoptive relations.
+Internal refinance            A refinance of a loan currently held with the same       Lender where the existing loan is entirely
+                              replaced by a new loan.
+Interest -only                An Interest -only facility is where the borrower is only required to meet interest repayments
+                              for a specific period of time
+
+Investment                    An investment property loan enables a borrower to purchase or construct residential real
+                              estate for investment purposes, and may also include borrowings secured by residential
+                              property for any investment purpose
+Lender                        Those with a direct relationship with Helia such as traditional Lender s and F unding
+                              P rograms. Excludes mortgage managers and originators who generate loans though a
+                              F unding P rogram
+LMI P remium                  Refers to the add ing of the fee charged to the borrower for the cost of the LMI premium
+C apitalisation               (including stamp duty on the LMI premium) to the     Base L oan A mount. This total amount is
+                              then paid from the loan account. Borrowers avoid paying the LMI     fee up front as it is
+                              amortise d over the term of the loan
+Loan to V alue R atio (LVR)   For a purchase or construction, the LVR is calculated by dividing the        Base L oan A mount by
+                              the lesser of the purchase price or the security valuation amount. For       Refinances, the LVR
+                              is usually based on the valuation amount only
+Net Monthly C ash             Income available each month after all expenses and commitments have been factored in,
+S urplus ( net MCS)           including proposed home loan repayments
+
+
+Negative g earing             Neg ative Gearing for an invest ment prop erty occ urs when the annual interest payable on
+                              the loan us ed to acquire the pro perty plus other expens es inc urred in ma intaining the
+                              prop erty exce eds the a nnual rental inc ome from the property
+Net disposable income         The net amount of income a borrower has available after payment of tax, existing
+(NDI)                         commitments and family living expenses
+New property                  Any property (including any house, unit, villa or townhouse) that has been fully completed
+                              for less than 12 months and/or has not been sold since the construction of that property (ie
+                              the vendor is a developer/builder or a related party of the developer/bu       ilder)
+Non -arm’s length             Relates to the sale of a property where a registered real estate agent is not acting for the
+transaction                   vendor, and the parties (purchaser and vendor) are related
+Non -resident                 A Non-R esident is any person without permanent residency status in Australia, and             / or any
+                              person who resides and is employed in another country. Excludes New Zealand citizens
+                              and E xpatriates
+Off-the-plan strata           Refers to unit / town house developments that have not commenced construction at the
+purchase                      time finance is sought/contract of sale signed. When a property is purchased ‘off   -the-plan’
+                              it may be up to 12 months (or more) before settlement can be       achieved upon completion of
+                              construction
+Parenting repayment           Provides a break in repayments for eligible borrowers who are on, or planning to, take
+break                         maternity/paternity leave
+
+
+
+
+                              Helia LMI underwriting standards and guidelines   – Australia –Aug 2026                               39
+                                                                2025
+                                                               Public
+Prefabricated kit home       Applies to a range of P refabricated K it style dwellings, which, once properly erected and
+(transportable home)         connected to power and water, are not significantly different to a traditional dwelling
+Premium credit               For a T op Up or Internal R efinance proposal, the P remium C redit is the total amount of any
+                             premiums previously paid to Helia (less stamp duty) in respect of the existing insured loan
+                             for the same insured , one or more common borrower/s and one or more common security
+Principal and interest       A loan where the principal and the interest are repaid together over the term of the loan
+(P&I)
+Private sale                 This relates to the sale of a property between parties that are not related, without the
+                             intervention of an agent. This transaction type is considered to be at arm’s length
+
+Redraw                       A facility that allows access to additional repayments made on a loan up to the            S cheduled
+                             Balance
+Refinance                    A R efinance is where a borrower pays out an existing mortgage loan with funds from a new
+                             loan, (through another Lender ), using the same security property. A    Refinance may often
+                             form part of a Debt C onsolidation loan, and may include additional funds in the form of an
+                             E quity R elease
+Relocated home               Where an existing dwelling is purchased and then relocated onto another block of land. A
+                             R elocated H ome should not be confused with a P refabricated K it H ome
+Rental purchase plans        Rental P urchase P lans enable the borrower to save the deposit whilst occupying the
+                             security
+Savings plans                Savings P lans provide for the borrower to save for the deposit on a home after approval of a
+                             mortgage loan
+Scheduled balance            The Scheduled Balance is the loan amount that would have been outstanding if the
+                             minimum repayment under the loan contract had been made on the due dates
+
+Second mortgage              A S econd Mortgage is where a borrower obtains an additional loan using an already
+                             mortgaged property as security
+
+Self -employed               For LMI purposes, an individual is considered      S elf-E mployed when they receive the
+                             majority (i .e. more than 50%) of their total income from a business in which they are the sole
+                             trader, a partner, director or shareholder. Includes     independent contractors who invoice
+                             employer for payment
+Split contract residential   Relates to land being purchased by a borrower that is subject to the purchaser entering
+security (party or           into a building contract arrangement for a dwelling that will be part of a development (ie
+common wall)                 have common walls or slab and common property/driveway)
+Top Up                       A further advance to an existing loan insured by       Helia that is either added to the existing
+                             loan or maintained in a separate loan account
+
+Total exposure               Total Helia insured dollar value of current and      in force loans across all Lender s.
+Vacant land                  Land that is devoid of any improvements. The vacant unimproved land can be zoned
+                             residential, rural residential or rural
+Vendor finance (WRAP         Typically, the balance of the purchase price of a property is paid at settlement (usually six
+finance)                     weeks from the exchange of the contract of sale). Vendor         finance allows for the balance to
+                             be paid in instalments over a specified period of time. The title is transferred into the
+                             purchaser’s name upon receipt of the final instalment
+
+
+
+
+                             Helia LMI underwriting standards and guidelines   – Australia –Aug 2026                                 40
+                                                               2025
+                                                              Public
+

@@ -1,0 +1,1272 @@
+Source: https://foreigninvestment.gov.au/sites/foreigninvestment.gov.au/files/2026-06/guidance-note-6-residential-land-v5.pdf
+Retrieved: 2026-10-27
+Extracted: pdftotext -layout of the PDF (FIRB Guidance Note 6, Residential land, v5); sha256 of the PDF ad09c51335a498a21fe3108a5cc7641e33ac4c22f0e60a3988138405365d51b0
+
+Guidance Note 6
+Residential Land
+•   Foreign persons generally require foreign investment approval before acquiring an
+    interest in residential land, regardless of its value.
+    – The Government’s policy is to channel foreign investment into new dwellings, as
+      opposed to established dwellings, as this helps add to housing supply for Australians,
+      creates additional jobs in the construction industry, and helps support economic
+      growth. It can also increase government revenues, in the form of stamp duties and
+      other taxes, and from the overall higher economic growth that flows from the
+      additional investment. Foreign investment applications are therefore generally
+      considered in light of the overarching principle that the proposed investment should
+      increase Australia’s housing stock.
+•   Approval for an acquisition of vacant land for residential development will generally be
+    conditional on the construction being completed within four years and the land not being
+    sold until the construction is complete. The Government is focused on ensuring that
+    foreign investors comply with conditions of approval, and enforcement action will be
+    taken to address non-compliance.
+•   Approval for an acquisition of a new dwelling is not usually subject to any conditions
+    concerning its usage.
+    – Property developers looking to sell new dwellings “off the plan” or newly developed
+      dwellings to foreign persons can also apply for foreign investment approval on behalf
+      of their foreign customers. Where a developer holds such an approval, the foreign
+      person will generally not need to seek their own foreign investment approval.
+•   From 1 April 2025 to 30 June 2029, it is the Government’s policy that foreign persons are
+    generally banned from purchasing established dwellings. However, subject to foreign
+    investment approval, limited exceptions to the policy include:
+    – foreign persons who seek to purchase established dwellings for redevelopment, if the
+      redevelopment will significantly increase Australia’s housing stock by at least 20
+      additional dwellings (this includes but is not limited to Build to Rent developments).
+    – foreign persons who seek to purchase an established dwelling where the acquisition
+      supports the availability of housing on a commercial scale. This includes (but is not
+      limited to) proposals to acquire an interest in one or more established dwellings in
+      multi-unit developments (such as existing Build to Rent developments where the
+      development will continue to be operated as Build to Rent, retirement villages,
+
+
+
+                                                                        Version 5 (1 July 2026) | 1
+       assisted living or aged care facilities, and student accommodation) on a commercial
+       scale.
+    – foreign-controlled companies that employ workers from Pacific island countries and
+      Timor-Leste and are required to provide housing for them, including those
+      participating in the Pacific Australia Labour Mobility (PALM) scheme, who seek to
+      purchase an established dwelling to house their Australian-based workers.
+•   Other limited exemptions from foreign investment screening altogether may also apply –
+    see the Key Concepts Guidance Note.
+•   Foreign persons must give notice of certain actions relating to residential land to the
+    Registrar of the Register of Foreign Ownership of Australian Assets. For more information,
+    see the Register of Foreign Ownership of Australian Assets Guidance Note.
+•   Foreign persons who own residential property will be required to pay an annual vacancy
+    fee if their property is not residentially occupied or genuinely available for rent for more
+    than 183 days (approximately six months) during a year.
+•   Approval for an acquisition of residential land to be used for a non-residential purpose
+    (e.g. redevelopment for commercial use) will generally be subject to development
+    conditions, as assessed on a case-by-case basis.
+•   Foreign persons must keep records relating to certain actions concerning their foreign
+    investment for up to five years.
+
+
+
+
+                                                                         Version 5 (1 July 2026) | 2
+Looking for more?
+A: When does a proposed investment in residential land require approval? ................................ 4
+B: Acquisitions of vacant residential land ...................................................................................... 6
+C: Acquisitions of new (and near-new) dwellings .......................................................................... 8
+D: Property developers, and acquisitions of new (and near-new) dwellings ............................... 11
+E: Ban on purchases of established dwellings ............................................................................. 15
+F: Purchases of established dwellings for redevelopment........................................................... 17
+G: Purchases of established dwellings that support the availability of housing on a commercial
+scale ............................................................................................................................................. 21
+H: Purchases of established dwellings for certain Australian-based employees ......................... 22
+I: Build to Rent developments ..................................................................................................... 24
+J: Vacancy fees ............................................................................................................................. 26
+K: Integrated Tourism Resorts – grandfathered treatment of residential land ........................... 31
+Further information ..................................................................................................................... 33
+
+
+
+
+                                                                                                                Version 5 (1 July 2026) | 3
+A: When does a proposed investment in residential land
+require approval?
+See also the Overview, Key Concepts, National Security and Fees Guidance Notes.
+Under Australia’s foreign investment framework, foreign persons must notify the Treasurer
+before taking a notifiable action or a notifiable national security action. Some notifiable actions
+are also significant actions. A foreign person must not take a notifiable and significant action,
+and/or a notifiable national security action, until they have received foreign investment
+approval for that proposed action.
+•     Where a foreign person acquires an interest in residential land, 1 this will be a notifiable
+      and significant action, regardless of the value of the investment.
+•     Where a foreign person acquires an interest in residential land that is considered national
+      security land, 2 this will be a notifiable national security action, in addition to a notifiable
+      and significant action.
+A foreign person seeking to acquire an interest in residential land that meets one of these
+conditions must apply for foreign investment approval before taking the action. 3 Applications
+are submitted electronically on the Australian Taxation Office (ATO) website, 4 and are
+supported by further guidance. A fee is payable for all foreign investment applications.
+If a proposed investment is a notifiable and significant action, it will be screened for foreign
+investment approval under the national interest test (including in circumstances where a
+proposed investment is also a notifiable national security action). If a proposed investment is a
+notifiable national security action, and is not also a significant action, it will be screened under
+the narrower national security test. Regardless of which test the investment is screened under,
+a foreign person must not take the action until they have received foreign investment approval.
+Significant penalties (including infringement notices, civil and criminal penalties) may apply for
+breaches of the foreign investment law.
+
+
+
+
+1 There are a number of ways in which a foreign person may acquire an interest in residential land (see,
+  for example, section 12 of the Foreign Acquisitions and Takeovers Act 1975 (the Act)). Acquisitions of
+  Australian land are considered on a title-by-title basis.
+2 There are a number of ways in which a foreign person may acquire an interest in residential land (see,
+  for example, section 12 of the Act). Acquisitions of Australian land are considered on a title-by-title
+  basis.
+3 Foreign persons who want to minimise the risk of an asset they are interested in purchasing being
+  sold to someone else before they receive foreign investment approval can enter into a contract as
+  long as the contract is conditional on receiving foreign investment approval.
+4 Applications for foreign investment approval relating to residential land are generally processed by
+  the ATO.
+
+
+                                                                               Version 5 (1 July 2026) | 4
+Exemptions from requiring approval
+Part 3 of the Foreign Acquisitions and Takeovers Regulation 2015 (the Regulation) provides a
+number of exemptions, where an acquisition of residential land may not be considered a
+notifiable action, a significant action, and/or a notifiable national security action, and may thus
+not need to be notified to the Treasurer. See the Key Concepts Guidance Note.
+A foreign person is also not obliged to notify the Treasurer that they are proposing to take a
+significant action unless the action is also a notifiable action or notifiable national security
+action. However, under the Act the Treasurer has the power to make a range of orders in
+relation to a significant action that a person is proposing to take or has already taken (even if
+they do not inform the Treasurer about it).
+Certain foreign investments that are not notifiable actions or notifiable national security actions
+may be reviewable national security actions. Where a reviewable national security action is not
+notified to the Treasurer (including as a result of one of these exemptions), the action may be
+called-in for review if the Treasurer considers that the action may pose a national security
+concern. Foreign persons can choose to extinguish the Treasurer’s call-in power by voluntarily
+notifying of reviewable national security actions. Guidance on investment areas that may raise
+national security concerns, and where investors are therefore encouraged to voluntarily notify,
+are outlined in the National Security Guidance Note. If a proposed investment is only a
+reviewable national security action, it will be screened under the narrower national security
+test.
+
+
+
+
+                                                                           Version 5 (1 July 2026) | 5
+B: Acquisitions of vacant residential land
+Definition of vacant residential land
+Vacant land in Australia is considered to be vacant residential land if it is land on which the
+number of dwellings that could reasonably be built is less than 10, and the land is not being
+used wholly and exclusively for a primary production business.
+Land that previously had a residential dwelling built on it would generally not be treated as
+vacant residential land. This is because a new dwelling built on the land would not genuinely
+increase the housing stock (as a dwelling already existed before its demolition). The land is
+therefore subject to the eligibility and conditions applicable for established dwellings.
+
+Approval conditions 5
+As part of the national interest test, the Treasurer will generally seek to ensure that vacant
+residential land, once acquired, is put to productive use within a reasonable timeframe and
+‘land banking’ does not occur.
+If an application for vacant residential land is approved, it will generally be approved subject to:
+•     the purchase price being no greater than the value specified in the approval;
+•     at least one residential dwelling being built on the land;
+•     construction of all dwelling(s) being completed within four years from the date of notice
+      of approval;
+•     evidence of the completion of the dwelling(s) being submitted to the Government within
+      30 days of being received; 6 and
+•     the foreign person not selling, transferring, or otherwise disposing of their interest in the
+      land prior to construction of all dwelling(s) being completed.
+Once developed, there are generally no ongoing conditions on the foreign person’s use of the
+property – for example, they may residentially occupy the property, or rent it out.
+There is no limit on the number of vacant land parcels that a foreign person can acquire for
+residential development.
+
+Exemption certificates
+See also the Overview and Exemption Certificates Guidance Notes.
+Foreign persons may apply for approval to purchase vacant residential land through either a no
+objection notification (when seeking approval for a specified title of land), or through an
+
+
+
+5 The Treasurer has the ability to impose any condition(s) that the Treasurer considers necessary to
+  protect the national interest (or national security, as the case requires). While this section outlines
+  some of the more common conditions applied for these types of investments, all investments are
+  considered on a case-by-case basis, and thus the actual conditions imposed may vary from these. See
+  the Principles for Developing Conditions Guidance Note.
+6 Evidence could include a certificate of fitness for occupancy or use, or final occupancy or builder’s
+  completion certificate.
+
+
+                                                                                 Version 5 (1 July 2026) | 6
+exemption certificate under section 43B of the Regulation (when an exact title of land has not
+yet been identified).
+A Residential Land (other than Established Dwelling) Exemption Certificate will allow a foreign
+person to acquire any vacant title of residential land, within the parameters of the certificate,
+without having to apply for individual approval for each title of land they attempt to purchase.
+It can significantly streamline the approval process for those foreign persons that may have
+several unsuccessful attempts at purchasing a title of land (e.g. being outbid at auction) before
+finally securing one.
+If an application for a Residential Land (other than Established Dwelling) Exemption Certificate is
+approved, it will generally be approved subject to:
+•      the foreign person purchasing only one title of vacant residential land;
+•      the land being located in the state or territory specified in the certificate; and
+•      the purchase price being no greater than the value specified in the certificate.
+The certificate will generally be valid for 12 months from the date of approval.
+The standard conditions applying to acquisitions of vacant residential land (such as completing
+construction within four years) will also still continue to apply, regardless of whether the land
+was acquired through a no objection notification or exemption certificate.
+
+
+
+    Example 1
+    A foreign person wants to purchase a vacant residential land title up to the value of
+    $2 million in Sydney to develop a house on. They apply for a Residential Land (other than
+    Established Dwelling) Exemption Certificate to allow them to purchase any parcel of vacant
+    residential land valued at $2 million or less. The foreign person is granted an exemption
+    certificate that is valid for 12 months, for a single purchase up to $2 million.
+    The foreign person attends multiple auctions, and is unsuccessful. They then make a
+    private offer on a title of vacant residential land for $1.5 million, and the offer is accepted.
+    When the foreign person uses the exemption certificate to purchase one title of vacant
+    residential land they are no longer able to use that exemption certificate to acquire any
+    other vacant residential land titles.
+
+    Example 2
+    James lives in London and is not a permanent resident or Australian citizen. He wants to
+    purchase vacant residential land to build a new house. The residential land is part of a new
+    subdivision and has never had a dwelling on it previously. James cannot purchase the
+    property without foreign investment approval. The purchase of vacant land will be subject
+    to development conditions which require at least one residential dwelling being built on
+    the land, construction of all dwelling(s) being completed within four years from the date of
+    notice of approval and providing evidence of completion of the dwelling(s).
+    The ban on foreign purchases of established dwellings does not apply to vacant land that
+    has not previously had a dwelling on it. Foreign persons can purchase vacant land subject
+    to foreign investment approval and conditions.
+
+
+
+
+                                                                              Version 5 (1 July 2026) | 7
+C: Acquisitions of new (and near-new) dwellings
+Definition of new (and near-new) residential dwellings
+A new dwelling is a dwelling that:
+•      will be, is being, or has been, built on residential land;
+•      has not been previously sold as a dwelling; and
+•      has not been previously occupied. 7
+A near-new dwelling is a dwelling that:
+•      will be, is being, or has been, built on residential land;
+•      is part of a residential development; 8
+•      was previously sold 9 by the developer of that development, but the transaction failed to
+       settle; and
+•      has not been previously occupied for more than 12 months in total.
+For the avoidance of doubt, new (and near-new) dwellings do not include established
+residential dwellings that have been refurbished or renovated, or a single dwelling that has
+been built to replace one or more demolished established dwellings. This is because the
+refurbished or renovated dwelling, or a new dwelling built on the land, does not genuinely
+increase the housing stock (as a dwelling already existed before its refurbishment/demolition).
+The land in these situations is therefore subject to the eligibility and conditions applicable for
+established dwellings.
+
+
+
+    Example 3
+    Bryce decided to demolish the existing dwelling on his property and rebuild a new single
+    dwelling. When construction was completed, Bryce decided that he wanted to sell the
+    property. Bryce has not occupied the dwelling or rented it out.
+    In this case, the rebuilt dwelling does not represent a genuine increase in Australia’s
+    housing supply (even if it is larger or of higher quality than the original dwelling), and so
+    will be treated as an established dwelling, and not a new dwelling, under Australia’s
+    foreign investment framework.
+
+
+
+
+7 Section 4 of the Act.
+8 Section 4 of the Act (and section 15 of the Regulation) defines a development as one or more
+  multi-story buildings with at least 50 independent self-contained dwellings (other than townhouses).
+9 A property is considered “sold” once a binding purchase agreement has been entered into, regardless
+  of whether the sale is completed (or settled).
+
+
+                                                                              Version 5 (1 July 2026) | 8
+    Example 4
+    Joe lives in Singapore and is not a permanent resident or Australian citizen. He wants to
+    purchase an apartment in a new residential development. Joe cannot purchase the
+    property without foreign investment approval. The ban on established dwellings does not
+    apply to new residential dwellings. Foreign persons can purchase new dwellings subject to
+    foreign investment approval and conditions.
+
+
+
+Approval conditions 10
+If an application for a new (or near-new) residential dwelling is approved, it will generally be
+approved subject to the purchase price being no greater than the value specified in the
+approval.
+Once acquired, there are generally no ongoing conditions on the foreign person’s use of the
+property – for example, they may residentially occupy the property, or rent it out. However, the
+foreign person will be required to lodge an annual vacancy fee return. See the Vacancy Fee
+section in this Guidance Note.
+There is no limit on the number of new (or near-new) dwellings that a foreign person can
+acquire.
+
+Exemption certificates
+See also the Overview and Exemption Certificates Guidance Notes.
+Foreign persons may apply for approval to purchase new (or near-new) residential dwellings
+through either a no objection notification (when seeking approval for a specified property), or
+through an exemption certificate under section 43B of the Regulation (when an exact property
+has not yet been identified).
+A Residential Land (other than Established Dwelling) Exemption Certificate will allow a foreign
+person to acquire any new (or near-new) residential dwelling, within the parameters of the
+certificate, without having to apply for individual approval for each property they attempt to
+purchase. It can significantly streamline the approval process for those foreign persons that may
+have several unsuccessful attempts at purchasing a property (e.g. being outbid at auction)
+before finally securing one.
+If an application for a Residential Land (other than Established Dwelling) Exemption Certificate is
+approved, it will generally be approved subject to:
+•      the foreign person purchasing only one new (or near-new) residential dwelling;
+•      the property being located in the state or territory specified in the certificate; and
+•      the purchase price being no greater than the value specified in the certificate.
+
+
+
+
+10 The Treasurer has the ability to impose any condition(s) that the Treasurer considers necessary to
+   protect the national interest (or national security, as the case requires). While this section outlines
+   some of the more common conditions applied for these types of investments, all investments are
+   considered on a case-by-case basis, and thus the actual conditions imposed may vary from these. See
+   the Principles for Developing Conditions Guidance Note.
+
+
+                                                                                Version 5 (1 July 2026) | 9
+The certificate will generally be valid for 12 months from the date of approval.
+The standard conditions applying to acquisitions of new (or near-new) residential dwellings
+(such as registration on the foreign ownership register) will also still continue to apply,
+regardless of whether the property was acquired through a no objection notification or
+exemption certificate.
+
+
+
+  Example 5
+  A foreign person wants to purchase a new dwelling in Queensland to rent out. They apply
+  for a Residential Land (other than Established Dwelling) Exemption Certificate to allow
+  them to purchase one unspecified new dwelling for $1 million or less, and is granted an
+  exemption certificate that is valid for 12 months.
+  The foreign person attends an auction where the bidding reaches $1.2 million and
+  continues to bid on the property, despite reaching the value limit specified on the
+  exemption certificate, and is the highest bidder for the property with a bid of $1.3 million.
+  Where the purchase price for a new dwelling is higher than the amount specified in the
+  exemption certificate, the certificate will not be valid for the property purchase. Therefore,
+  the foreign person did not have foreign investment approval to purchase a property over
+  $1 million. The foreign person has breached the law and may be subject to significant
+  penalties.
+
+
+
+
+                                                                         Version 5 (1 July 2026) | 10
+D: Property developers, and acquisitions of new (and
+near-new) dwellings
+See also the Exemption Certificates Guidance Note.
+Property developers (and other vendors) can apply for a New (or Near-New) Dwelling Exemption
+Certificate. Where a developer holds such a certificate, a foreign person purchasing a
+new (or near-new) dwelling in that development will not generally be required to seek their
+own individual foreign investment approval. This can significantly streamline the sale process of
+dwellings in a new development.
+Foreign persons who seek to rely on the developer holding such a certificate when purchasing
+residential land should check the certificate to ensure that it covers their intended action(s).
+
+A New (or Near-New) Dwelling Exemption Certificate will generally only provide approval for a
+foreign person to purchase up to $3 million worth of dwellings in a single development. 11
+Should the foreign person wish to acquire interests with a cumulative value greater than
+$3 million in a development, the foreign person will be required to seek their own individual
+foreign investment approval.
+
+
+
+  Example 6
+  Lauren is a foreign person who wants to acquire a new dwelling off-the-plan worth
+  $2 million from a developer that holds a New (or Near-New) Dwelling Exemption
+  Certificate. If the developer provides Lauren with a copy of the certificate, then she does
+  not need to seek separate foreign investment approval for the proposed acquisition.
+  Lauren then decides she would like to acquire another dwelling worth $1.3 million
+  off-the-plan in the same development. This would bring the total value of dwellings
+  acquired by Lauren to $3.3 million. As this would take her total interest in the
+  development above the $3 million threshold for purchases in the same development,
+  Lauren would be required to seek separate foreign investment approval (including paying
+  the relevant application fee), to acquire the $1.3 million dwelling.
+
+  Example 7
+  Mitchell is a foreign person who wants to acquire a new dwelling worth $3.5 million
+  off-the-plan from a developer that holds a New (or Near-New) Dwelling Exemption
+  Certificate. As the value of the single dwelling is above the $3 million threshold for
+  acquisitions in the specified development, Mitchell would be required to seek separate
+  foreign investment approval to purchase the dwelling and pay the relevant application fee.
+
+
+
+
+11 In working out if this threshold is met; sum up the consideration for the current proposed investment,
+   along with the considerations paid for any other interests acquired in the development under the
+   same certificate.
+
+
+                                                                              Version 5 (1 July 2026) | 11
+Developer eligibility
+Developers (either Australian or foreign) can apply for a New (or Near-New) Dwelling Exemption
+Certificate for a specified development, if the development: 12
+•     will consist of 50 or more dwellings (other than townhouses);
+•     has development approval from the relevant government authority; and
+•     if applicable, foreign investment approval was given to purchase the land and any
+      conditions are being met.
+A project meeting the above definition will be considered to be a ‘development’ where it
+comprises one or more multi-storey buildings that will be, are being, or have been, built under
+one development approval. For the purposes of a New (or Near-New) Dwelling Exemption
+Certificate, a ‘development’ does not include house and land packages.
+If the developer does not have unconditional approval to commence development from the
+relevant government authority, for example because further approval or action is required, the
+developer may not be eligible for a New (or Near-New) Dwelling Exemption Certificate.
+Applications for a New (or Near-New) Dwelling Exemption Certificate will be considered on a
+case-by-case basis. Consideration will be given to a number of factors, including:
+•     a marketing or advertising schedule that outlines when, where, and how, the
+      development will be marketed in Australia, including dates and budgeted expenditure;
+•     a schedule of the number of dwellings to be built in the development, or stage of the
+      development. New (or Near-New) Dwelling Exemption Certificate for developments with
+      multiple stages may not be approved for all stages of the development in the first
+      instance, even if development approval has been granted for the entire development;
+•     information on the specific units to be built in the development or stage of the
+      development, such as the unit number, number of bedrooms in each unit, allocated car
+      spaces and the expected sale price of each unit;
+•     ownership information of the development, including shareholders and beneficiaries, as
+      applicable;
+•     architectural plans and artists impressions of the proposed development; and
+•     compliance standing – if an applicant, or any related person or entity, has held an
+      exemption certificate previously (such as those previously known as an ‘advanced
+      off-the-plan’ certificate) and has not complied with its conditions, this compliance history
+      will be taken into account when assessing the application.
+
+
+
+
+12 Development is defined in section 4 of the Act.
+
+
+                                                                         Version 5 (1 July 2026) | 12
+Approval conditions 13
+If an application for a New (or Near-New) Dwelling Exemption Certificate is approved, it will
+generally be approved subject to the developer:
+•     marketing the dwellings for sale in Australia;
+•     selling no more than 50 per cent of the total number of dwellings in the development to
+      foreign persons under the certificate;
+•     selling no more than $3 million worth of dwellings in the development to a single foreign
+      person under the certificate;
+•     providing a copy of the certificate to each foreign purchaser;
+•     reporting to the Government, every six months (until all dwellings in the development are
+      sold), on the dwellings sold to foreign persons under the certificate, including the
+      purchaser details and the value of the sales;
+•     notifying the Government, within 30 days, if the number of dwellings in the development
+      is reduced to less than 50; and
+•     paying a fee for each dwelling sold under the certificate.
+
+
+
+
+13 The Treasurer has the ability to impose any condition(s) that the Treasurer considers necessary to
+   protect the national interest (or national security, as the case requires). While this section outlines
+   some of the more common conditions applied for these types of investments, all investments are
+   considered on a case-by-case basis, and thus the actual conditions imposed may vary from these.
+   See the Principles for Developing Conditions Guidance Note.
+
+
+                                                                                 Version 5 (1 July 2026) | 13
+   Example 8
+   City Builder Co. is a developer who wants to construct a 100 dwelling apartment complex.
+   The local government authority has issued City Builder Co. with a permit for the
+   development subject to the condition that the developer receives approval from the State
+   transit authority. The developer may not commence development until the approval from
+   the State transit authority has been submitted to the local government authority, and the
+   local government authority has issued a development approval. City Builder Co. may not
+   meet the eligibility criteria for a New (or Near-New) Dwelling Exemption Certificate prior
+   to receiving the development approval which will enable City Builder Co. to commence
+   development.
+
+   Example 9
+   Sam’s Building Co. is a developer who wants to construct a 200 dwelling apartment
+   complex in two stages. Sales for the first stage, which will consist of 90 dwellings, are likely
+   to commence in the next six months, and Sam’s Building Co. wants to obtain a New (or
+   Near-New) Dwelling Exemption Certificate to be able to sell new dwellings in the
+   development to foreign persons. Sam’s Building Co. applies for a New (or Near-New)
+   Dwelling Exemption Certificate and supplies detailed plans for the first stage, however, is
+   unable to provide details for the second stage, which is still waiting on local government
+   approval. Sam’s Building Co. is granted an exemption certificate for stage one of the
+   development and can apply for an exemption certificate for stage two in the future.
+
+
+Fees per sale
+See also the Fees Guidance Note.
+Consistent with all other applications for foreign investment approval, developers will need to
+pay a fee when applying for a New (or Near-New) Dwelling Exemption Certificate.
+If the certificate is granted, a separate fee will also be payable for each dwelling sold to a
+foreign person under the certificate. These fees must be paid within 30 days of the end of each
+six month period (until all dwellings in the development are sold), covering all of the dwellings
+sold under the certificate during that period (referred to as the reconciliation period).
+While developers are nominally liable to pay these fees, it is possible for the developer and the
+foreign person to reach an agreement about who will pay the fee. Where a foreign person
+agrees to pay the fee directly to the ATO, they can do so using the payment reference number
+listed on the certificate.
+
+
+
+
+                                                                           Version 5 (1 July 2026) | 14
+E: Ban on purchases of established dwellings
+From 1 April 2025 to 30 June 2029, it is the Government’s policy that foreign persons are
+generally banned from purchasing established dwellings in Australia. However, subject to
+foreign investment approval, limited exceptions to the policy include:
+    •   foreign persons who seek to purchase established dwellings for redevelopment, if the
+        redevelopment will significantly increase Australia’s housing stock by at least 20
+        additional dwellings (this includes but is not limited to Build to Rent developments).
+    •   foreign persons who seek to purchase an established dwelling where the acquisition
+        supports the availability of housing on a commercial scale. This includes (but is not
+        limited to) proposals to acquire an interest in one or more established dwellings in
+        multi-unit developments (such as existing Build to Rent developments where the
+        development will continue to be operated as Build to Rent, retirement villages, assisted
+        living or aged care facilities, and student accommodation) on a commercial scale.
+    •   foreign controlled companies, that employ workers from Pacific island countries and
+        Timor-Leste and are required to provide housing for them, including those participating
+        in the Pacific Australia Labour Mobility (PALM) scheme, who seek to purchase an
+        established dwelling to house their Australian based workers.
+All applications to purchase established dwellings are considered on a case-by-case basis.
+    •   Applications that have incidental established dwellings as part of a larger transaction,
+        including but not limited to: acquisitions of agricultural land, commercial land (such as a
+        mine), partial interests held through a joint venture, acquisitions of land entities or
+        foreign companies providing employee accommodation in remote and rural areas may
+        be considered for an exception to the ban where they are incidental to larger
+        commercial transactions.
+    •   Security interests over established dwellings (such as mortgages from foreign lenders)
+        are not subject to the ban.
+    •   Established dwellings that are near-new dwellings may be considered for an exception
+        to the ban, for example where the initial sale of a new dwelling did not complete.
+If you have queries about the application of the Government’s policy to your commercial
+investment proposal, please contact Treasury at ForeignInvestmentEnquiries@treasury.gov.au.
+The acquisition of an established dwelling may be permitted under either a no objection
+notification or an exemption certificate. The conditions applying to the acquisition of
+established dwellings will apply regardless of whether the property was acquired through a no
+objection notification or exemption certificate. See also the Overview and Exemption
+Certificates Guidance Notes.
+Transitional arrangements
+Applications made prior to 1 April 2025 for purchases of established dwellings will be
+considered under the guidance published in the Residential Land Guidance Note, version 2 (1
+July 2023).
+Where a person has acquired an interest in residential land without prior foreign investment
+approval in breach of the Act, they may apply for retrospective approval. Retrospective
+applications will be considered in accordance with the national interest test at the time of
+application. For established dwellings, this means that retrospective applications made on 1
+April 2025 or later will be considered against the Government’s policy regarding the purchase of
+established dwellings by foreign persons from 1 April 2025.
+
+
+
+
+                                                                         Version 5 (1 July 2026) | 15
+Example 10
+Lucia is a temporary resident. She enters into a contract to purchase an established
+dwelling to use as her principal place of residence on 25 March 2025. The contract is not
+binding until Lucia receives foreign investment approval. Lucia makes a foreign investment
+application on the same day. Lucia’s application is approved. Because Lucia applied before
+1 April 2025, her application is considered in line with the policy in place before 1 April 2025,
+even if a decision on her application is not made until after 1 April 2025. Applications made
+before 1 April 2025 will be considered in line with the policy in place before 1 April 2025,
+even if a decision is not made until after 1 April 2025.
+
+Example 11
+Aditya is a temporary resident. He acquired an established dwelling to use as his principal
+place of residence on 3 March 2025 without receiving foreign investment approval. He
+gives retrospective notice of acquiring the dwelling on 2 April 2025. Aditya’s application is
+not approved. This is because Aditya gave notice after 1 April 2025, which is when the ban
+on foreign persons purchasing established dwellings commenced. He may be required to
+sell the property and pay a penalty. Notices given after 1 April 2025 will be considered in
+line with the new policy, including the ban, even if the notice relates to a purchase that
+was made before 1 April 2025.
+
+Example 12
+Isla is a New Zealand citizen living in Auckland who would be eligible for a Special Category
+Visa if she came to Australia. She purchases an established dwelling on 15 April 2025.
+Because Isla is eligible for a Special Category Visa, she does not need to apply for or receive
+foreign investment approval before purchasing residential property (including an
+established dwelling) in Australia. New Zealanders eligible for or holding Special Category
+Visas do not need to apply for or receive foreign investment approval before purchasing
+residential property (including an established dwelling) in Australia.
+
+Example 13
+Oliver is a permanent resident. He purchases an established dwelling on 10 May 2025.
+Because Oliver holds a permanent visa, he does not need to apply for or receive foreign
+investment approval before purchasing residential property (including an established
+dwelling) in Australia. Holders of permanent visas do not need to apply for or receive
+foreign investment approval before purchasing residential property (including an
+established dwelling) in Australia.
+
+Example 14
+MineCo wants to purchase agricultural land that is being used for farming, to build mining
+accommodation. There are two established dwellings on the land. The dwellings take up a
+small part of the area of the land. MineCo is permitted to purchase the land if it obtains
+foreign investment approval. The purchase is permitted because the existing dwellings are
+considered to be incidental to the agricultural business. Purchases of small numbers of
+established dwellings may be permitted where they are incidental to large agricultural
+businesses. These will be assessed on a case-by-case basis.
+
+
+
+
+                                                                         Version 5 (1 July 2026) | 16
+Example 15
+
+MineCo wants to purchase land on which there is a primary production business to build
+25 mining accommodation units. There is an established dwelling on the land. The land is
+not used wholly and exclusively for a primary production business. Even though a primary
+production business is being carried on on the land, the land is residential land because
+there is at least one dwelling on the land and the land is not used wholly and exclusively
+for a primary production business. MineCo is permitted to purchase the land if it obtains
+foreign investment approval. This is because it has stated that it will construct at least 20
+additional dwellings on the land.
+
+Example 16
+MineCo is purchasing an interest in an unincorporated joint venture in relation to a mine.
+The joint venture assets include residential land on which there is an established dwelling.
+The value of the residential land is only a very small part of the total value of the joint
+venture assets. MineCo will acquire an interest in the residential land as a tenant in
+common. MineCo is permitted to purchase the residential land if it obtains foreign
+investment approval.
+Purchases of interests in established dwellings may be permitted where they are incidental
+to and appropriately connected with a large commercial transaction. These will be
+assessed on a case-by-case basis.
+
+Example 17
+HouseGroupCo owns a number of established dwellings that are part of a commercial
+operation. HouseGroupCo undertakes an internal reorganisation, resulting in the
+established dwellings being transferred to another entity within the group.
+BuildingCo is permitted to transfer the established dwellings within the group.
+Acquisitions of interests in established dwellings may be permitted where the acquisitions
+arise from an internal reorganisation of a group structure.
+
+
+
+
+                                                                       Version 5 (1 July 2026) | 17
+F: Purchases of established dwellings for redevelopment
+It is the Government’s policy that foreign persons are generally banned from purchasing
+established dwellings in Australia. However, approval may be granted if a proposal to redevelop
+established dwellings will significantly increase Australia’s housing stock.
+‘Significantly’ increase Australia’s housing stock means that a redevelopment proposal would
+create at least 20 additional dwellings in the redevelopment. The foreign person will generally
+need to provide evidence regarding the actions taken in respect of development and
+construction to satisfy any development conditions.
+Investment proposals that do not propose 20 additional dwellings in a redevelopment may be
+considered for approval on a case-by-case basis, including under the commercial scale
+exception described in Section G of this Guidance Note, where the developer is able to clearly
+establish that the proposal significantly improves housing affordability and supply.
+A residential land (established dwelling) application fee will generally apply. However, proposals
+that qualify for an exception to the ban may also seek fee waivers to commercial land rates. See
+the Fees Guidance Note for further information.
+
+Approval conditions
+The Treasurer may impose any condition(s) that the Treasurer considers necessary to protect
+the national interest (or national security, as the case requires). While this section outlines
+some of the more common conditions applied for these types of investments, all investments
+are considered on a case-by-case basis, and thus the actual conditions imposed may vary from
+these. See the Principles for Developing Conditions Guidance Note.
+Established dwelling being retained
+If an application for redevelopment – involving an established dwelling being retained – is
+approved, it will generally be approved subject to:
+•     the purchase price being no greater than the value specified in the approval;
+•     the property being vacant at settlement;
+•     at least 20 additional dwellings being built on the land;
+•     no part of the existing dwelling being occupied from the date of settlement until
+      construction of the additional dwellings is complete;
+•     construction of all additional dwellings being completed within four years from the date
+      of notice of approval;
+•     evidence of completion of the dwellings being submitted to the Government within
+      30 days of it being received; 14
+•     the foreign person not selling, transferring, or otherwise disposing of their interest in the
+      land prior to construction of all dwellings being completed; and
+
+
+
+
+14 Evidence could include a certificate of fitness for occupancy or use, or final occupancy or builder’s
+   completion certificate.
+
+
+                                                                                Version 5 (1 July 2026) | 18
+•     once construction of the new dwellings is complete, one or more of the dwellings on the
+      land being made available for use by independent third parties (e.g. by renting out or
+      selling the dwellings).
+Established dwelling being demolished
+If an application for redevelopment – involving an established dwelling being demolished – is
+approved, it will generally be approved subject to:
+•     the purchase price being no greater than the value specified in the approval;
+•     the property being vacant at settlement, and no part of the existing dwelling being
+      occupied from the date of settlement to the commencement of demolition;
+•     the demolished dwelling(s) being replaced with at least 20 additional dwellings; 15
+•     construction of all new dwellings being completed within four years from the date of
+      notice of approval;
+•     evidence of completion of the dwellings being submitted to the Government within
+      30 days of it being received; 16 and
+•     the foreign person not selling, transferring or otherwise disposing of their interest in the
+      land prior to construction of all dwellings being completed.
+Parcel of vacant land that previously had a dwelling on it
+If an application for development – involving a parcel of vacant land that previously had a
+dwelling on it – is approved, it will generally be approved subject to:
+•     the purchase price being no greater than the value specified in the approval;
+•     at least 20 additional dwellings being built on the land;
+•     construction of all the dwellings being completed within four years from the date of
+      notice of approval;
+•     evidence of completion of the dwellings being submitted to the Government within
+      30 days of it being received; 17 and
+•     the foreign person not selling, transferring or otherwise disposing of their interest in the
+      land prior to construction of all dwellings being completed.
+
+
+
+
+15 For the avoidance of doubt, the requirement is that 20 additional dwellings are created, when
+   compared to the number of established dwellings that are demolished. See Example 18 below.
+16 Evidence could include a certificate of fitness for occupancy or use, or final occupancy or builder’s
+   completion certificate.
+17 Evidence could include a certificate of fitness for occupancy or use, or final occupancy or builder’s
+   completion certificate.
+
+
+                                                                                Version 5 (1 July 2026) | 19
+Example 18
+Gina, a foreign person, wants to purchase three established dwellings on adjacent blocks
+to demolish and redevelop into a 23 dwelling complex. She applies for approval to
+purchase each property and redevelop them, and pays the relevant application fee for
+each property. As the redevelopment will significantly increase the housing stock, that is,
+when compared to the three existing dwellings, an additional 20 dwellings will be created
+(for a total of 23), Gina is given approval for the purchase, subject to conditions for
+redevelopment into multiple dwellings.
+
+Example 19
+James wants to purchase one established dwelling to retain and build an additional
+dwelling on the property. The additional dwelling is planned to be a separate, standalone
+house located on the back of the block and be similar in size to the existing dwelling. James
+plans to make both dwellings available for rent when the redevelopment is complete.
+The proposal does not significantly increase the housing supply by an additional 20
+dwellings and will generally not be permitted.
+
+
+
+
+                                                                      Version 5 (1 July 2026) | 20
+G: Purchases of established dwellings that support the
+availability of housing on a commercial scale
+It is the Government’s policy that foreign persons are generally banned from purchasing
+established dwellings in Australia. However, established dwelling acquisition proposals that
+support the availability of housing on a commercial scale will be considered on a case-by-case
+basis. This includes (but is not limited to) proposals to acquire an interest in one or more
+established dwellings in multi-unit developments (such as existing Build to Rent developments
+where the development will continue to be operated as Build to Rent, retirement villages,
+assisted living or aged care facilities, and student accommodation) on a commercial scale.
+Foreign persons who seek to purchase established dwellings on the basis that it will support the
+availability of housing supply on a commercial scale should contact Treasury regarding the
+submission process, by email to ForeignInvestmentEnquiries@treasury.gov.au.
+A residential land (established dwelling) application fee will generally apply. However, proposals
+that qualify for an exception to the ban may also seek fee waivers to commercial land rates. See
+the Fees Guidance Note for further information.
+
+
+
+  Example 20
+  A fund, which is a foreign person, is proposing to acquire a 60 per cent interest in an
+  Australian land entity that is a residential aged care operator, via the holding entity of the
+  Australian land entity.
+  The residential aged care facility has been operated as such for many years and contains
+  100 dwellings, comprising of different levels of aged care. The fund will continue to
+  operate the facility as an aged care facility, providing housing to older Australians.
+  This acquisition of interests in the Australian land entity supports the availability of housing
+  supply on a commercial scale, and approval for this acquisition is likely to be considered
+  favourably.
+  Example 21
+  ABCCo is an NDIS provider proposing to buy multiple established dwellings in a series of
+  one-by-one acquisitions to convert into Specialist Disability Accommodation. ABCCo
+  discusses its proposal with Treasury (because Treasury, rather than the ATO, considers
+  applications of this nature), applies for, and receives an exemption certificate which
+  permits it to purchase the dwellings as part of its ongoing operations that redevelop and
+  improve dwellings on a commercial scale.
+  Similar one-by-one acquisitions may be considered under the exception to the ban for
+  acquisitions of established dwellings that support the availability of housing on a
+  commercial scale.
+
+
+
+
+                                                                          Version 5 (1 July 2026) | 21
+H: Purchases of established dwellings for certain
+Australian-based employees
+It is the Government’s policy that foreign persons are generally banned from purchasing
+established dwellings in Australia.
+However, the Government recognises that employers who employ people from Pacific island
+countries and Timor-Leste, including those participating in the Pacific Australia Labour Mobility
+(PALM) scheme, may be obliged to provide or arrange accommodation for these people. The
+Government also recognises land entities or business that provide employee accommodation in
+remote or rural areas may also need to acquire interests in established residential dwellings as
+part of a broader commercial transaction. These acquisitions may be considered for an
+exception to the ban on a case-by-case basis.
+Employers can apply to purchase established residential dwellings for use by these employees,
+where they are obliged to provide accommodation or arrange (for example, through labour hire
+firms) accommodation. A PALM scheme employer is an employer with a current PALM scheme
+deed and PALM workers are citizens of participating countries who are engaged by those
+employers as part of the PALM scheme.
+A residential land (established dwelling) application fee will generally apply. However, proposals
+that qualify for an exception to the ban may also seek fee waivers to commercial land rates.
+See the Fees Guidance Note for further information.
+
+Eligibility
+Foreign persons who employ people from Pacific island countries and Timor-Leste, including
+those participating in the PALM scheme, and are required to provide housing for them, will be
+required to show that they are operating a substantial Australian business to be eligible for
+approval to purchase one or more established dwellings under this category.
+To determine whether a business is substantial, consideration will be given to the turnover,
+profit and asset base of the business, as well as the number of Australian based employees
+(both Australian and foreign) employed by the business.
+Foreign persons would not be eligible to purchase an established dwelling under this category
+where the dwelling would represent a significant proportion of its Australian assets.
+In making an application, foreign persons that operate a substantial Australian business will be
+required to demonstrate a genuine need to purchase one or more established dwellings to
+house Australian based employees. Consideration will be given to a number of factors,
+including:
+•     The type of business being operated.
+•     The location of the business operations. For example, businesses operating in rural and
+      remote areas are more likely to demonstrate a genuine need for established dwellings to
+      house employees.
+•     Difficulty in obtaining suitable rental accommodation on an ongoing basis.
+•     Difficulty in obtaining new dwellings or vacant land, or securing builders to build new
+      dwellings.
+•     Difficulty in attracting and retaining suitable employees in the absence of suitable rental
+      accommodation on an ongoing basis.
+
+
+                                                                         Version 5 (1 July 2026) | 22
+•     The location of the dwelling, including its proximity to the business operation.
+•     The scale of the business operations. Larger operations requiring a substantial number of
+      employees are more likely to demonstrate a genuine need for established dwellings for
+      housing.
+•     The duration of the need for housing for Australian-based employees. Businesses will
+      generally need to demonstrate a longer-term operational plan requiring employees and
+      employee housing on an ongoing basis.
+•     The foreign person’s operating history in Australia and compliance standing.
+
+
+Approval conditions 18
+If an application for an established dwelling for Australian based employees is approved, it will
+generally be approved subject to:
+•     the property being used solely to accommodate workers from Pacific island countries and
+      Timor-Leste; and
+•     the foreign person selling, transferring or otherwise disposing of the property within
+      six months from when it is first expected to remain vacant for six months or more, or has
+      remained vacant for six months or more, whichever occurs first.
+
+
+
+
+18 The Treasurer has the ability to impose any condition(s) that the Treasurer considers necessary to
+   protect the national interest (or national security, as the case requires). While this section outlines
+   some of the more common conditions applied for these types of investments, all investments are
+   considered on a case-by-case basis, and thus the actual conditions imposed may vary from these. See
+   the Principles for Developing Conditions Guidance Note.
+
+
+                                                                               Version 5 (1 July 2026) | 23
+I: Build to Rent developments
+Foreign persons are banned from purchasing established dwellings in Australia. However, to
+encourage foreign institutional investment in rental stock and affordable housing, foreign
+investors may be permitted to purchase established Build to Rent (BTR) developments (the BTR
+exemption). 19
+Investments in established BTR developments (or acquisitions of residential or agricultural land
+for new BTR developments 20) may also qualify for lower application fees at commercial land
+rates. See the Fee waivers and remissions section of the Fees Guidance Note for further
+information.
+The Government recognises that some investors may choose to not opt in to the concessional
+tax treatment of BTR developments. 21 Proposed BTR developments or acquisitions of BTR
+developments may still qualify for an exemption from the ban and lower commercial fees
+regardless of whether they opt in to the concessional tax treatment if they meet the eligibility
+criteria.
+
+Eligibility
+To be considered for an exception to the ban and concessional fee treatment, the development
+should meet the following criteria:
+•        be a BTR development (as this term is commonly understood), and
+•        remain a BTR development for the period during which you hold an interest in the
+         development.
+The acquisition of a partial interest in a BTR development will be considered for the BTR
+exemption and concessional fee treatment on a case-by-case basis.
+If the development you are proposing to acquire an interest in involves BTR and non-BTR
+elements (for example, mixed-use developments), you may still qualify for the BTR exemption.
+However, the purchase of established dwellings for non-BTR purposes will not be permitted
+(unless other limited exemptions apply, see the exceptions in this Guidance Note).
+You should provide evidence with your application that enables verification of the
+development’s BTR characteristics and the intent for it to remain a BTR development. Treasury
+may request further information as required.
+
+
+How to apply
+Investment proposals that seek the BTR exemption (and any fee waiver request) should be
+submitted to Treasury through the Application Portal, even if they only involve the purchase of
+residential land. Exemption certificate applications should request an exemption certificate
+under section 58 of the Act.
+
+
+
+
+19
+     Announced as part of the 2024-25 Commonwealth Budget.
+20
+     Announced as part of the 2023-24 Mid-Year Economic and Fiscal Outlook.
+21
+     For further information, see https://www.ato.gov.au/businesses-and-organisations/assets-and-
+      property/build-to-rent-development-tax-incentives.
+
+
+                                                                              Version 5 (1 July 2026) | 24
+Your application cover letter should address the BTR definition and eligibility criteria above, and
+include an express request for a BTR fee waiver consideration. These applications should not be
+submitted to the ATO.
+
+Conditions
+If your proposal to acquire a BTR development is approved, it will generally be approved subject
+to conditions. The conditions imposed are considered on a case-by-case basis, including the
+nature of the interest being acquired. 22
+The BTR conditions will usually require:
+•       commencement of construction of the development within 5 years (for land purchases),
+•       that the development meets the definition of a BTR development while you hold an
+        interest in it, and
+•       reporting information to be provided for the calculation of any applicable vacancy fees.
+Other conditions, such as periodic reporting on compliance with specific conditions, may also be
+imposed.
+Maintaining strong compliance with Australia’s foreign investment framework is a priority for
+the Australian Government, to ensure that foreign investment is not contrary to the national
+interest, or national security. You may be liable for significant penalties, including infringement
+notices, and civil and criminal penalties, if you engage in conduct that contravenes a condition
+included in your no objection notification, notice imposing conditions, or exemption certificate.
+
+
+
+     Example 22
+     A foreign person submits a foreign investment proposal to purchase 80 per cent of the
+     shares in an entity that has a BTR development under construction, and provides sufficient
+     evidence of the development’s characteristics as a BTR development (in the ordinary
+     commercial sense of the term).
+     A decision is made to allow the purchase subject to conditions, including requiring that the
+     development remains a BTR development until the foreign person ceases to hold an
+     interest in it (via the 80 per cent stake in the company).
+     During the relevant period, the company is required to annually report to Treasury in
+     accordance with the imposed reporting conditions.
+
+
+
+
+22
+     The Treasurer may impose any condition(s) that the Treasurer considers necessary to protect the
+     national interest (or national security, as the case requires). While this section outlines some of the
+     more common conditions applied for these types of investments, all investments are considered on a
+     case-by-case basis, and thus the actual conditions imposed may vary from these. See the Principles for
+     Developing Conditions Guidance Note.
+
+
+                                                                                Version 5 (1 July 2026) | 25
+J: Vacancy fees
+See also the Fees Guidance Note.
+In accordance with Part 6A of the Act, an annual vacancy fee is levied on foreign owners of
+residential property if their property is not residentially occupied or genuinely available on the
+rental market for at least 183 days (approximately six months) in a 12-month period.
+The fee is intended to encourage foreign owners of residential property to make their
+properties available for rent when they are not occupied as a residence, and so increase the
+number of properties available for Australians to live in.
+The vacancy fee applies to:
+•     foreign persons who made a foreign investment application for residential land on or after
+      7:30PM (AEST) on 9 May 2017; and
+•     foreign persons who purchased a dwelling in a development under a New (or Near-New)
+      Dwelling Exemption Certificate that was applied for by the developer on or after
+      7:30PM (AEST) on 9 May 2017.
+Foreign owners of residential property that meet the above criteria must lodge an annual
+vacancy fee return.
+
+What does residentially occupied or genuinely available for rent mean?
+For the purpose of the vacancy fee, foreign owned residential property is considered
+residentially occupied, or genuinely available on the rental market, if it can be proven 23 that:
+•     the property owner, or a relative of the owner, genuinely occupied the property as a place
+      of residence; or
+•     the property was genuinely occupied as a place of residence subject to a lease or licence
+      with a term of at least 30 days; or
+•     the property was made genuinely available as a place of residence on the rental market,
+      with a contract term of at least 30 days.
+Properties made available for short-term leases of less than 30 days (including via web-based
+vacation rental sites) are not considered residentially occupied or genuinely available on the
+rental market.
+
+
+
+
+23 Examples of supporting evidence may include: tenancy agreement(s); income tax returns or notices of
+   assessment; title search or certificate of title showing the date that title was transferred; bank
+   statements; insurance certificates for tenant’s or landlord’s insurance; and/or evidence of the
+   property being genuinely available for rent.
+
+
+                                                                           Version 5 (1 July 2026) | 26
+     Example 23
+     Maria purchases a new apartment in St Kilda. She intends to spend significant time there
+     for work and her family enjoy coming to Australia to holiday from overseas.
+     Maria finds herself spending more and more time away from Australia and decides to
+     place the apartment on an online short-stay accommodation rental site. She feels that this
+     will provide the flexibility to use the property through the year as the apartment is
+     generally rented via an online rental site for less than one week at a time. Maria ends up
+     spending only six weeks in Australia over the 12 month period after the purchase of the
+     apartment settled. She lodges her vacancy fee return with the ATO and is advised that she
+     is liable to pay the vacancy fee.
+     In this situation, Maria is liable for the vacancy fee as this type of rental has not made the
+     apartment genuinely available as a rental property for a continuous period of 30 days or
+     more throughout the vacancy year. While the total number of days that the property was
+     occupied is over 183 days, the holiday rentals were not for a continuous period of 30 days
+     or more.
+
+
+
+The vacancy fee year, and lodging on-time
+A foreign person’s liability for the vacancy fee is reassessed annually, based on the use of the
+property over the preceding 12 months (the vacancy year). The first assessable vacancy year
+starts on the first day that the person acquires the right to occupy the property (for example,
+the date of settlement or receipt of an occupancy certificate). 24
+Foreign owners need to lodge their vacancy fee return – outlining the use of their property in
+the previous 12 months – within 30 days of the end of each vacancy year.
+
+
+
+
+24
+     See section 115C(3) of the FATA.
+
+
+                                                                            Version 5 (1 July 2026) | 27
+  Example 24
+  André and Marc purchase a new apartment in Sydney. They will be entitled to occupy the
+  apartment on 23 September 2018. In this case, the first occupation day is 23 September
+  2018, and their vacancy fee year will end on 22 September 2019. They have 30 days from
+  the end of the vacancy fee year to submit their first vacancy fee return.
+
+  Example 25
+  Mateo is a temporary resident and sought approval to purchase an established dwelling
+  for redevelopment in Northern Sydney in January 2017. Foreign investment approval is
+  granted subject to conditions.
+  Mateo settles on the property on 1 June 2017 and completes the construction of two new
+  dwellings 17 months later. Occupancy certificates are issued on 1 November 2018. Mateo
+  then sells one dwelling and uses the other as his residence.
+  On 1 June 2018, Mateo is not liable for the vacancy fee because the new dwelling has not
+  been completed. Mateo’s use of the dwelling he owns will be assessed, for the purpose of
+  the vacancy fee, on 1 November each year, as this is the date which Mateo was first able
+  to occupy the property. The first year he must submit a return will be for the vacancy fee
+  year 1 November 2018 to 31 October 2019.
+
+  Example 26
+  Sophia and Frederick decide to buy a new house close to their Australian relatives in
+  Brisbane to use when they visit each year. Prior to purchasing, Sophia and Frederick submit
+  a foreign investment application on 30 May 2017. An approval is granted and the purchase
+  of the property is settled on 22 August 2017.
+  In the year following settlement, Sophia and Frederick live in their Brisbane property for
+  three months over the summer. At the end of summer, Sophia and Frederick leave
+  Australia and do not return until August 2018. Their Brisbane property is not lived in or
+  made available for rent while Sophia and Frederick are not in Australia.
+  Sophia and Frederick’s vacancy year is the 12 month period following the occupation date
+  (settlement date) which is the period 22 August 2017 to 21 August 2018.
+  Within 30 days from 21 August 2018, Sophia and Frederick must lodge a vacancy fee
+  return advising whether the property was residentially occupied, or genuinely available for
+  rent, for at least 183 days in the past 12 months. Following lodgement of the vacancy fee
+  return, Sophia and Frederick are advised that they are liable to pay the vacancy fee.
+
+
+
+Vacancy fee returns are lodged electronically on the ATO website. 25
+
+
+
+
+25 To lodge a vacancy fee return, the foreign ownership of the property needs to have been registered
+   on the Register of Foreign Ownership of Residential Land (for pre-July 2023 approvals) or the Register
+   of Foreign Ownership of Australian Assets (for approvals in July 2023 and onwards). This registration is
+   a requirement of purchasing residential land in Australia. The registration will create a Register
+   reference number, which is then needed to complete the vacancy fee return.
+
+
+                                                                               Version 5 (1 July 2026) | 28
+Where a property is jointly owned:
+•      In the case of joint tenants; only one return needs to be lodged, and if liable, only one fee
+       will be payable.
+•      For tenants in common; each tenant will need to lodge a return, and if liable, the fee
+       payable will be equal to the foreign investment application fee that was payable by each
+       individual tenant.
+•      Where a property is co-owned by a foreign person and non-foreign person; the
+       non-foreign person will have no liability to pay a vacancy fee.
+After completing the lodgement, the confirmation page will indicate any liability for a vacancy
+fee and the amount payable. A notice of liability of the vacancy fee payable will also be provided
+to the foreign owner via email after lodgement. The notice will provide information on the
+reason the fee is being charged, the fee payable, payment details, and the due date.
+Where a vacancy fee return is not lodged on time (i.e. within 30 days of the end of the vacancy
+year), the foreign owner of the property may be deemed to be liable to pay the vacancy fee,
+regardless of the number of days during the vacancy year in which the dwelling was
+residentially occupied or genuinely available for rent.
+
+
+
+    Example 27
+    Nikolai is an Estonian national who has received foreign investment approval to acquire a
+    new dwelling in Perth. Nikolai residentially occupies the property for 250 days during his
+    vacancy year whilst he is in Australia. However, Nikolai does not lodge his vacancy fee
+    return on the ATO website within 30 days of the end of his vacancy year. As such, despite
+    the property being adequately occupied during the vacancy year, Nikolai may still be liable
+    to pay a vacancy fee for that year.
+
+
+
+Exemptions from paying the vacancy fee
+There are a number of situations where a foreign person may be exempt from being liable for a
+vacancy fee. Some of these situations are listed in the table below.
+Where a foreign person meets one of the exemptions, they will still be required to lodge an
+annual vacancy fee return and make a declaration specifying the exemption that applies. In
+order to benefit from an exemption, foreign investors may be required to provide acceptable
+supporting evidence that they were unable to occupy the dwelling for one of the following
+reasons.
+
+
+
+
+                                                                           Version 5 (1 July 2026) | 29
+ Exemption                                       Examples of acceptable evidence
+                                                 •     Title search or certificate of title
+ Legal ownership of the property changed
+                                                       showing the date that title was
+ during the year.
+                                                       transferred
+
+ The property is undergoing substantial          •     Evidence of the reason for repairs, such
+ repair, for example, due to fire, malicious           as an insurance claim or police report
+ damage or natural disaster.
+                                                 •     Building permit details
+ The property is undergoing substantial
+ renovations or is deemed to be too unsafe to    •     Building certificate or other third party
+ occupy.                                               report evidencing a safety issue
+                                                 •     Contact information for care facility
+ The resident of the property is receiving
+ long-term, in-patient, medical or residential   •     Letter from care facility confirming you
+ care.                                                 or your tenant is under
+                                                       medical/residential care away from the
+                                                       property
+
+ Legal restrictions by an order of a court or    •     Court orders or documents outlining
+ tribunal, or a law of the Commonwealth, a             the legal restrictions
+ state or a territory.
+
+ The registered owner is deceased and            •     Death certificate of registered owner
+ administration of the estate is pending.
+
+
+Should a foreign owner of residential property cease to be a foreign person during a vacancy
+year, the vacancy fee obligations will cease to apply, and the person does not need to lodge a
+vacancy fee return. However, if the property was registered on the Register of Foreign
+Ownership of Australian Assets, a register notice may be required to be given. For more
+information, see the Register of Foreign Ownership of Australian Assets Guidance Note.
+
+How much is the fee?
+See the Fees Guidance Note.
+
+
+
+
+                                                                         Version 5 (1 July 2026) | 30
+K: Integrated Tourism Resorts – grandfathered treatment
+of residential land
+Foreign persons seeking to purchase vacant residential land, a new dwelling, or an established
+residential dwelling, within a resort that was designated as an Integrated Tourism Resort (ITR) 26
+prior to September 1999 are exempt from the need to apply and receive foreign investment
+approval.
+For resorts designated as ITRs on or after September 1999, foreign persons are exempt from
+the need to receive foreign investment approval for purchases of developed residential
+property in the resort that is:
+•     subject to a lease of 10 years or more to the resort operator;
+•     available as tourist accommodation when it is not occupied by the owner; and
+•     the acquisition is consistent with any conditions imposed on the ITR at that time.
+These exemptions from needing foreign investment approval only apply to residential land
+located within the original designated boundaries of the ITR.
+
+List of Integrated Tourism Resorts
+The following resorts were designated as integrated tourism resorts before September 1999:
+•     Hamilton Island Resort, Whitsunday Passage, Queensland
+•     Hope Island Resort, Hope Island, Queensland
+•     Hyatt Regency Resort, Coolum, Queensland
+•     Kooralbyn Valley Resort, Queensland
+•     Laguna Quays Resort – Stage 1, Repulse Bay, Queensland
+•     Mirage Port Douglas Resort, Port Douglas, Queensland
+•     Palm Cove Travelodge Resort, Queensland
+•     Royal Pines Resort, Ashmore, Queensland
+•     Sanctuary Cove, Hope Island, Queensland
+•     Joondalup Resort, Western Australia
+•     Wirrina Cove Resort, South Australia
+
+
+
+
+26 An integrated tourism resort was a development that held a mix of accommodation, recreation and
+   commercial facilities that was planned and constructed by a single developer on single or adjoining
+   sites within a well-defined area. The development normally included a hotel or hotels that supplied a
+   substantial amount of the total accommodation, as well as recreational facilities such as swimming
+   pools, gyms and/or sporting facilities within the boundaries of the resort. Integrated developments
+   might also host commercial zones for retail, restaurants and entertainment facilities.
+
+
+                                                                              Version 5 (1 July 2026) | 31
+The following resorts were designated as integrated tourism resorts on or after
+September 1999:
+•        Heritage Golf and Country Club, Chirnside Park, Victoria
+•        Hunter Valley Golf and Country Club Resort, New South Wales
+•        Kingfisher Bay Resort Village, Fraser Island, Queensland
+In 2015 the Act was amended, and no longer includes a mechanism to approve new integrated
+developments as ITRs. The treatment of existing ITRs has been grandfathered to minimise
+adverse impacts on current foreign investors. 27
+
+
+     Example 28
+     Li lives in Hong Kong and is not a permanent resident or Australian citizen. She wants to
+     purchase an established dwelling located within Sanctuary Cove Resort in Queensland. The
+     resort was designated as an ITR before September 1999, and the vendor has provided Li a
+     copy of their ITR approval certificate, so Li does not need foreign investment approval.
+     If a resort was designated as an Integrated Tourism Resort before September 1999, a
+     purchase of a dwelling (including an established dwelling) within the resort may be exempt
+     from foreign investment approval.
+     Example 29
+     Minato lives in Kyoto and is not a permanent resident or Australian citizen. He wants to
+     purchase an established dwelling located within a resort that has never been designated as
+     an Integrated Tourism Resort. Minato cannot purchase the property without foreign
+     investment approval. If a resort was not designated as an ITR before September 1999, a
+     purchase of a dwelling within the resort generally requires foreign investment approval.
+
+
+
+
+27
+     See item 8(1) of the Foreign Acquisitions and Takeovers Legislation Amendment Act 2015.
+
+
+                                                                               Version 5 (1 July 2026) | 32
+Further information
+Further information is available on the Foreign Investment website or by contacting
+1800 050 377 from Australia or +61 2 6216 1111 from overseas.
+Important notice: This Guidance Note provides a summary of the relevant law. As this Note tries
+to avoid legal language wherever possible it may include some generalisations about the law.
+Some provisions of the law referred to have exceptions or important qualifications, not all of
+which may be described here. The Commonwealth does not guarantee the accuracy, currency
+or completeness of any information contained in this document and will not accept
+responsibility for any loss caused by reliance on it. Your particular circumstances must be taken
+into account when determining how the law applies to you. This Guidance Note is therefore not
+a substitute for obtaining your own legal advice.
+
+
+
+
+                                                                        Version 5 (1 July 2026) | 33
+

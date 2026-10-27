@@ -128,13 +128,13 @@ figure_cases() ->
      %% 1.5–3.5% × sale [16127, 50144] + marketing [600, 8000] + sale conveyancing [500, 2500]
      %% + the lender's discharge [150, 500] (no state ⟹ no state discharge registration).
      check("selling_costs = the committed dispose fee lines", g(Outcome, <<"selling_costs">>),
-           [17377, 61144]),
+           [17577, 61194]),
      check("loan_payout = P&I remaining balance at year 10 (560000 @ 6.0%)", g(Outcome, <<"loan_payout">>),
            [468640, 468640]),
      check("net_proceeds = sale − selling − loan − cgt (interval arithmetic)", g(Outcome, <<"net_proceeds">>),
-           [545349, 946661]),
+           [545299, 946461]),
      check("full_horizon_net_position = net − acquire − hold×H (placed)",
-           g(Outcome, <<"full_horizon_net_position">>), [304349, 724661])].
+           g(Outcome, <<"full_horizon_net_position">>), [304299, 724461])].
 
 %% --- 2. place-never-recompute: net/full are the exported interval arithmetic ---
 
@@ -152,9 +152,9 @@ arithmetic_cases() ->
            g(Outcome, <<"full_horizon_net_position">>), FullFromExport),
      %% interval discipline: net_lo subtracts the HIGH cost ends, net_hi the LOW ends
      check("net_lo = sale_lo − selling_hi − loan_hi − cgt_hi",
-           hd(g(Outcome, <<"net_proceeds">>)), 1075133 - 61144 - 468640 - 0),
+           hd(g(Outcome, <<"net_proceeds">>)), 1075133 - 61194 - 468640 - 0),
      check("net_hi = sale_hi − selling_lo − loan_lo − cgt_lo",
-           lists:last(g(Outcome, <<"net_proceeds">>)), 1432678 - 17377 - 468640 - 0)].
+           lists:last(g(Outcome, <<"net_proceeds">>)), 1432678 - 17577 - 468640 - 0)].
 
 %% --- 3. CGT (Mode-A main residence) -----------------------------------------
 
@@ -308,7 +308,7 @@ honest_partial_cases() ->
            length(g(A, <<"key_assumptions">>)), 1),
      %% loan-pending: sale/selling banded, loan/net/full PENDING — no fabricated point.
      check("H set, loan unknown: sale banded", g(B, <<"sale_proceeds">>), [1075133, 1432678]),
-     check("H set, loan unknown: selling banded", g(B, <<"selling_costs">>), [17377, 61144]),
+     check("H set, loan unknown: selling banded", g(B, <<"selling_costs">>), [17577, 61194]),
      check("H set, loan unknown: loan PENDING", g(B, <<"loan_payout">>), null),
      check("H set, loan unknown: net PENDING", g(B, <<"net_proceeds">>), null),
      check("H set, loan unknown: full PENDING", g(B, <<"full_horizon_net_position">>), null)].

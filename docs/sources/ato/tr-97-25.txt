@@ -1,0 +1,249 @@
+Source: https://www.ato.gov.au/law/view/document?docid=TXR/TR9725/NAT/ATO/00001
+Retrieved: 2026-10-27
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML 30e624f778eb728b2fc0496e77d1dc3dbf15c82afe4dc928d02e649af5e82045
+
+TR 97/25 | Legal database
+Legal database
+Legal database
+Contents
+Download Email Print
+Back to browse 44 related documents
+Taxation Ruling
+TR 97/25
+Income tax: property development: deduction for capital expenditure on construction of income producing capital works, including buildings and structural improvements
+Please note that the
+PDF version
+is the authorised consolidated version of this ruling and amending notices.
+This document incorporates revisions made since original publication. View its history and amending notices, if applicable.
+FOI status:
+May be releasedFOI number: I 1017415
+contents
+para
+What this Ruling is about
+1
+Class of person/arrangement
+3
+Previous Rulings
+4
+Date of effect
+6
+Ruling
+7
+Construction expenditure
+7
+Farm accommodation expenditure excluded
+10A
+Capital works purchased from a speculative builder
+11
+Apportionment - indirect costs
+13
+Apportionment - capital works partly used in deductible way
+14
+Use of estimate when actual construction expenditure is not available
+16
+Construction costs exceed purchase price
+17
+Destruction of capital works
+18
+Explanations
+19
+Construction expenditure
+19
+Farm accommodation expenditure excluded
+20A
+Capital works purchased from a speculative builder
+21
+Use of estimate when actual construction expenditure is not available
+23
+Examples
+31A
+Preamble
+This Ruling, to the extent that it is capable of being a 'public ruling' in terms of Part IVAAA of the
+Taxation Administration Act 1953,
+is a public ruling for the purposes of that Part. Taxation Ruling TR 92/1 explains when a Ruling is a public ruling and how it is binding on the Commissioner.
+The Tax Law Improvement Project is restructuring, renumbering and rewriting the income tax law in plain language. The Parliament is amending the income tax law progressively to reflect these aims. As new laws come into effect, Taxation Rulings about old laws are being brought into line with them.
+[Note: This is a consolidated version of this document. Refer to the Legal Database (http://www.ato.gov.au/law) to check its currency and to view the details of all changes.]
+What this Ruling is about
+1. This Ruling addresses a number of matters that are relevant in determining entitlement to, and the amount of, a deduction under Division 43 of the Income Tax Assessment Act 1997 ('the 1997 Act') in respect of expenditure on the construction of assessable income producing buildings and other capital works. Division 43 expresses the same ideas as and replaces Divisions 10C and 10D of the Income Tax Assessment Act 1936 ('the 1936 Act').
+2. In particular, this Ruling identifies certain expenses that are included in construction expenditure and addresses the manner in which the deduction under Division 43 is calculated when properties are not wholly used in a deductible way during an income year.
+Class of person/arrangement
+3. This Ruling applies to a taxpayer who holds an income producing building or other capital works during an income year.
+Previous Rulings
+4. This Ruling replaces Taxation Rulings IT 2397 Income tax : application of Division 10D where residential buildings used partly for income-producing purposes and IT 2640 Income tax: Division 10D - qualfying expenditure as well as Taxation Determinations TD 92/177 Income tax: if the construction cost of an eligible building is greater than the sale proceeds of that building, what is the amount of the qualifying expenditure under section 124ZG of the Income Tax Assessment Act 1936? , TD 93/85 Income tax: property development: how are indirect costs apportioned for the purposes of calculating depreciation on plant under section 54 of the Income Tax Assessment Act 1936 and a deduction for capital expenditure on certain buildings under Division 10D of Part III of the Act?, TD 93/105 Income tax: property development: is voluntary demolition of a building 'destruction' for the purposes of section 124ZK of the Income Tax Assessment Act 1936?, TD 94/83 Income tax: property development: who is a 'qualified person' to make an estimate of the actual cost of construction of a building for the purposes of Division 10D of Part III of the Income Tax Assessment Act 1936?, ATO Interpretative Decisions ATO ID 2002/626 Income Tax Renovations to a building on a farming property and ATO ID 2010/41 Income Tax Capital works: plant - improvements partly used for accommodation of employees, which are now withdrawn. These documents considered issues involving the amount of the deduction allowable, the consequences of voluntary demolition of a building, the types of person qualified to estimate construction costs and whether capital expenditure on farm accommodation is deductible under Division 43 of the 1997 Act.
+5. We also outline the operation of the 1997 Act in relation to the entitlement to a deduction for property acquired from a speculative builder that was addressed in Taxation Ruling IT 2640.
+Date of Effect
+6. This Ruling applies to the 1997-98 and later income years.
+Ruling
+Construction expenditure
+7. A deduction for capital works under Division 43 is based on the amount of construction expenditure, that is, capital expenditure (including expenditure assumed, by operation of subsection 43-85(2), to be capital expenditure) incurred in respect of the construction of those capital works. Section 43-20 of the 1997 Act recognises three categories of capital works:
+•
+buildings or extensions, alterations or improvements to buildings;
+•
+structural improvements or extensions, alterations or improvements to structural improvements; and
+•
+environment protection earthworks.
+8. Capital works do not include structural improvements in the form of earthworks described in subsection 43-20(4). Similarly, capital expenditure on land (on which the capital works are to be constructed), including clearing, demolition and landscaping costs, is not part of construction expenditure. These are specifically excluded by paragraphs 43-70(2)(b), (c) and (d) of the 1997 Act.
+9. We consider that construction expenditure includes:
+•
+preliminary expenses such as architect fees, engineering fees, foundation excavation expenses and costs of building permits;
+•
+cost of structural features that are an integral part of the income producing buildings or income producing structural improvements, such as atriums and lift wells; and
+•
+some portion of indirect costs.
+10. We also take the view that, in relation to an owner/builder entitled to a deduction under Division 43, the value of the owner/builder's contributions to the works (such as labour and expertise) and any notional profit element do not form part of construction expenditure.
+Farm accommodation expenditure excluded
+10A. Capital expenditure on 'plant' (as defined under section 45-40 of the 1997 Act) is also specifically excluded from being construction expenditure (by paragraph 43-70(2)(e) of the 1997 Act). Plant includes structural improvements on land that is used for agricultural or pastoral operations where that improvement is used for domestic or residential purposes, if it is provided for the accommodation of employees, tenants or sharefarmers engaged in or in connection with agricultural or pastoral activities (paragraph 45-40(1)(f) of the 1997 Act).
+10B. Concurrent use of the structural improvements for another purpose (for example, accommodation by the owner of the farm property) does not exclude them from the definition of plant.
+10C. As a result, no deduction is allowed for such expenditure under Division 43 of the 1997 Act.
+Capital works purchased from a speculative builder
+11. A taxpayer who purchases capital works from a speculative builder may be entitled to claim a deduction under Division 43. The 1997 Act requires an assumption to be made that the expenditure incurred by the builder on the capital works is capital expenditure. However, the limitations imposed by subsection 43-70(2) of the 1997 Act (which sets out the type of expenditure excluded from construction expenditure) apply in determining whether such capital expenditure is also construction expenditure.
+12. Where a taxpayer buys capital works from a speculative builder, that builder's contributions to capital works (such as labour and expertise) and any profit element on the sale of the capital works do not form part of construction expenditure for the purposes of Division 43 in relation to those works.
+Apportionment - indirect costs
+13. Indirect costs, in the context of construction activities, are those that, by reference to accounting records or other documentation, cannot be allocated wholly to an individual element of a construction project, such as the building or plant. We take the view that, in determining construction expenditure in respect of capital works, indirect costs generally are allocated between elements to which they relate in the same proportion that the direct costs of those elements bear to one another: see BP Refinery (Kwinana) Ltd v. FC of T (1961) ALR 52; (1960) 12 ATD 204. Where any other method is employed, it must be justified by sound accounting principles and practical considerations.
+Apportionment - capital works partly used in deductible way
+14. Sections 43-210 and 43-215 of the 1997 Act set out the steps to be followed in calculating the amount of the deduction allowable for capital expenditure on the construction of capital works. They require the determination of a reduced amount where capital works are used in an income year only partly for the purpose of producing assessable income or for research and development.
+15. Where only part of the capital works is used in a relevant way, we consider the reduction generally should be calculated on a floor area basis. This is done by reference to the floor area not used to produce assessable income or for research and development as a proportion of the total floor area of the capital works. However, if another basis is more appropriate in a particular situation, that other basis should be adopted.
+Use of estimate when actual construction expenditure is not available
+16. Where it is not possible to ascertain the actual construction expenditure incurred on capital works, we accept an estimate provided by an appropriately qualified person.
+Construction costs exceed purchase price
+17. Where a taxpayer purchases capital works at a price lower than the construction expenditure for those works, the deduction for the capital works is calculated by reference to the construction expenditure, not the purchase price.
+Destruction of capital works
+18. We consider that section 43-40 of the 1997 Act applies both to voluntary and involuntary destruction of capital works.
+Explanations
+Construction expenditure
+19. A deduction under Division 43 is dependent, among other things, on capital expenditure having been incurred in respect of the construction of capital works. The deduction is determined by reference to the amount of such expenditure incurred by the owner, lessee or quasi-owner of the capital works at the time those works were undertaken.
+20. In the case of capital works constructed by an owner/builder for retention as an income producing asset, the deduction is calculated with regard to capital expenditure actually incurred in respect of the construction of capital works . The value of the owner's contributions (such as labour and expertise and any notional profit element) do not form part of construction expenditure.
+Farm accommodation expenditure excluded
+20A. Paragraph 45-40(1)(f) of the 1997 Act specifically includes structural improvements as plant, even though they are used for domestic or residential purposes, where they are provided for the accommodation of employees, tenants or sharefarmers engaged in or in connection with agricultural or pastoral activities, and the improvements are situated on land used for these activities.
+20B. There is no requirement in paragraph 45-40(1)(f) of the 1997 Act that the structural improvements be used solely for the accommodation of employees, tenants or sharefarmers. Therefore, concurrent use of the structural improvements for another purpose does not exclude them from the definition of plant in subsection 45-40(1) of the 1997 Act.
+Capital works purchased from a speculative builder
+21. A speculative builder constructing a building for sale incurs expenditure on revenue rather than capital account. In the absence of any capital expenditure in respect of the building, the builder is not entitled to a deduction under Division 43. However, the 1997 Act, in subsection 43-75(3) and section 43-85, specifically addresses a situation in which a taxpayer purchases capital works from a speculative builder. Broadly stated, it allows a deduction to a taxpayer who purchases capital works from an entity that:
+(a)
+is not an associate of the taxpayer; and
+(b)
+incurred expenditure in constructing the capital works on land it owned or leased in the course of a business that included the construction and sale of such capital works.
+In effect, the 1997 Act assumes expenditure on construction of those capital works to be capital expenditure. It allows a deduction based on that part of the expenditure that otherwise comes within the meaning of construction expenditure.
+22. Again, the construction expenditure is determined by reference to the builder's actual costs in constructing the capital works. Specifically excluded from construction expenditure are the value of the builder's own contributions to the construction process and any profit element on the sale transaction.
+Use of estimate when actual construction expenditure is not available
+23. Subsection 262A(4AJA) of the 1936 Act operates upon a disposal, by way of transfer, of capital works begun after 26 February 1992 and in respect of which deductions have been allowed or are allowable under Divisions 10C or 10D of the 1936 Act or Division 43 of the new Act. Broadly stated, it requires the transferor to provide the transferee with information that enables the latter to determine any entitlement under Division 43.
+24. It is not always possible for the purchaser of a building to establish the actual cost of the building, particularly in circumstances where the builder or previous owner becomes bankrupt or is not able, for other reasons, to provide the information. In those circumstances, we accept a building cost estimate by an appropriately qualified person.
+25. We consider that an appropriately qualified person has expertise in the calculation of building construction costs and is likely to be accepted by a court or tribunal as an expert witness on the issue of calculating the cost of construction of the particular building. That expertise may have been acquired through a course of study or through relevant experience in providing building cost estimates over a significant period of time.
+26. The attainment of relevant professional qualifications or recognition by an appropriate professional association or organisation is indicative of expertise in this field.
+27. Unless they are otherwise qualified, valuers, real estate agents, accountants and solicitors generally have neither the relevant qualifications nor experience to make such an estimate.
+28. Appropriately qualified people might include:
+•
+a quantity surveyor, who has expertise in the relevant type of construction;
+•
+a clerk of works, such as a project organiser for major building projects;
+•
+a supervising architect who approves payments at each stage in major projects and who may approve individual payments to subcontractors in smaller projects; or
+•
+a builder who is experienced in estimating construction costs of similar building projects.
+29. The question of whether a person has the required expertise is an issue of fact in each case.
+30. We do not accept the use of published building cost guides to estimate the actual cost of construction, unless they are used merely as a guide by an appropriately qualified person. Building cost guides typically provide a cost per square metre of a range of building projects, based on industry averages. They are not sufficiently specific to the particular building being valued.
+31. Building cost guides also include a reasonable profit margin for the builder. However, the builder's profit margin does not form part of the construction expenditure unless the original construction was commissioned from a builder whose charges for the work included such a profit. Where the original construction was carried out directly by the then owner, or by that owner using trade subcontractors and perhaps an architect, no such builder's profit was incurred as part of the capital expenditure on construction.
+Examples
+Farm accommodation expenditure excluded
+31A. Gavin lives in a residence in the city. However, he also owns a farm and incurs expenditure on structural improvements to a disused cottage on the property. This cottage is to be used for accommodation of his farm employees. Gavin will also occupy the cottage when working on the property, either on his own, or at times when employees are also present in the cottage. As the structural improvements, including the building, are provided for use as accommodation for employees engaged in the agricultural or pastoral operations, they are 'plant' within the definition. The whole of the expenditure on the structural improvements is therefore expenditure on plant and is specifically excluded from deduction under Division 43. This will be the case even if Gavin concurrently uses the cottage when working at the property, either on his own or at a time when employees are also present in the cottage.
+Capital works purchased from a speculative builder
+32. Guiseppe is a builder and land developer who constructs dwellings of standard design either on land that he owns, for sale as a house and land package, or on the client's own site. One of his more popular designs is the 'Outback Manor' that costs him $95,000 to construct but has a list price of $110,000 when sold from a display village.
+33. Mary, an investor, contracts for this house to be built on a site she owns. Upon completion she lets the house. Mary can deduct an amount under Division 43 based on the construction cost of $110,000, which was the cost to her of constructing the building.
+34. Guiseppe owns a site near Mary's site that is intended for speculative development and sale as a house and land package. Because of the time he can save by overseeing two construction projects in close proximity, he decides to undertake the construction of buildings on Mary's and his own land concurrently. After the house on his land is completed, Guiseppe decides to retain it for some time, as the real estate market is sluggish and he cannot get the price he wants. He lets the property. Guiseppe is not entitled to a deduction under Division 43 as he has incurred expenditure on revenue account rather than capital account in constructing this building.
+35. After two years, house prices improve and he sells the property to Tom, an investor. In accordance with sections 43-75 and 43-85 of the 1997 Act, expenditure on the construction of the house is assumed to be capital expenditure because the house had been purchased from an entity that is not an associate and it had been built as part of a business of constructing houses for sale. Therefore, Tom is entitled to claim a deduction for capital expenditure on the building under Division 43, based on the $95,000 that it cost Guiseppe to construct the house. No amount for Guiseppe's time and profit margin for constructing the building is included in the calculation of the construction expenditure.
+Apportionment - indirect costs
+36. A company undertakes the construction of a building on land it owns with a view to retaining it as an investment. In the course of constructing the building, the company incurs direct construction expenditure in respect of the building, plant and landscaping totalling $87,000, $6,000 and $12,000 respectively, and pays a further sum of $9,000 to furnish the building. In addition, it incurs costs of $1,000 for facilities erected on the building site for the use of all construction workers.
+37. The cost of the facilities for the construction workers is considered to be an indirect expense that is applicable to the cost of plant, the building and landscaping works. In calculating the construction expenditure of the building for the purposes of Division 43, this indirect cost is allocated between plant, buildings and other works in the ratio that the direct costs of those elements bear to one another. The cost of the furniture is not included for the purposes of apportionment because there is no nexus between the furniture and the indirect costs.
+38. The capital expenditure on each element of the construction project is:
+Direct Cost
+$
+Indirect Cost
+$
+Capital Expenditure
+$
+Building
+87,000
+829
+87,829
+Plant
+6,000
+57
+6,057
+Landscaping
+12,000
+114
+12,114
+Furniture
+9,000
+0
+9,000
+114,000
+1,000
+115,000
+Allocation of indirect expenses is calculated as follows:
+Building:
+(87,000 * 1,000)/(87,000 + 6,000 + 12,000) = $829
+Plant:
+(6,000 * 1,000)/(87,000 + 6,000 + 12,000) = $57
+Landscaping:
+(12,000 * 1,000)/(87,000 + 6,000 + 12,000) = $114
+Apportionment - capital works partly used in a deductible way
+39. In November 1997, Dr Claude Jones commenced construction of a residence and surgery to cater specifically for his circumstances. He runs a part-time private medical practice three half days a week from his residence. He also works part-time as a consulting physician at the local bush nursing hospital. The part of the new building designed specifically for his medical practice incorporates a waiting room, a storage room and two consulting rooms. The suite of four rooms has a separate entrance, is furnished specially for the practice and is not suitable for residential accommodation for Dr Jones and his family.
+40. The building is a single construction expenditure area, only part of which is used for income producing purposes. To the extent that the building is used for residential accommodation, it is taken not to be used for the purpose of producing assessable income (section 43-170). This situation is taken into account in calculating the amount of the deduction under section 43-210. Therefore, the calculation in step 1 of section 43-210 needs to be based on a reduced amount, excluding the area used as a dwelling. Dr Jones has to reduce the amount on which to base his deduction by reference to the floor area of the residence, unless another method is more appropriate.
+Construction cost exceeds purchase price
+41. Damian is a property developer who constructs a condominium of 38 units in a popular holiday resort. All units are intended for sale. During the construction period, he sells 28 of the units off the plan. After completion of the project, real estate prices drop significantly and he decides to sell the last of the units below cost.
+David, an investor, buys one of the last units for $95,000. The actual construction cost of the unit to Damian was $105,000. David is entitled to a deduction under Division 43 based on construction expenditure of $105,000.
+Destruction of capital works
+42. Lindsay operates a service station and garage. In 1989, he constructed a new lubrication/service bay. In 1997, due to new technology and increased business demand, the existing service bay is not adequate and he builds a larger lubrication/service bay that can accommodate more cars and also the latest tools and equipment required for the later model cars. After completing the new bay, he demolishes the 1989 extension and replaces it with a self-service car wash. In his return of income for the 1997-98 year, Lindsay can deduct an amount in respect of undeducted construction expenditure related to the 1989 extension under section 43-40 of the 1997 Act. The fact that the demolition is voluntary does not affect his entitlement to a deduction under that section.
+Last Ruling
+This is the last Taxation Ruling for the 1997 calendar year. The next Ruling will be Taxation Ruling TR 98/1.
+Commissioner of Taxation
+17 December 1997
+References
+ATO references:
+NO 97/2155-0
+97/2188-6
+97/10085-3
+BO csf25/12
+ISSN 1039 - 0731
+Subject References:
+building write off
+capital allowance
+Business Line:
+IAI
+Legislative References:
+ITAA97 Div 43
+ITAA97 43-20
+ITAA97 43-20(4)
+ITAA97 43-40
+ITAA97 43-70(2)
+ITAA97 43-70(2)(b)
+ITAA97 43-70(2)(c)
+ITAA97 43-70(2)(d)
+ITAA97 43-75
+ITAA97 43-75(3)
+ITAA97 43-85
+ITAA97 43-85(2)
+ITAA97 43-170
+ITAA97 43-210
+ITAA97 43-215
+ITAA36 Div 10C
+ITAA36 Div 10D
+ITAA36 262A(4AJA)
+Case References:
+BP Refinery (Kwinana) Ltd v. FC of T
+(1961) ALR 52
+(1960) 12 ATD 204
+TR 97/25 history
+Date:
+Version:
+Change:
+17 December 1997
+Original ruling
+27 May 1998
+Consolidated ruling
+Addendum
+You are here →
+5 July 2017
+Consolidated ruling
+Addendum
+Back to top

@@ -69,7 +69,11 @@ your verdict before you look the PR up on GitHub.
        c. in force on the date the doc gives (`effective_from:`), not a past or proposed
           rate;
        d. any `quotes:` on that source is the sentence that states it, and its saved copy
-          (the `path:` file in the diff) is that page.
+          (the `path:` file in the diff) is that page;
+       e. that page is a primary for the figure: the government body or law that makes
+          the rule, or the provider's own page for its own product or fee. A figure whose
+          source is a broker, comparison, directory, blog, law-firm or news page is a
+          fail, even when the page states it.
      A source you cannot open (blocked, moved, rendered by JavaScript) is a fail: say so.
    - A changed `docs/kb/terms/` doc: for each term added or changed, open its `url` (or the
      first source of the KB doc its `kb` names) yourself and confirm its `meaning` and `why`

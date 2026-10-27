@@ -1,0 +1,43 @@
+Source: https://www.latrobefinancial.com.au/wp-content/uploads/latrobefinancial-international-borrower-term-sheet.pdf
+Retrieved: 2026-10-27
+Extracted: pdftotext of the PDF (International Borrower term sheet, ref 03B_005_300626). The term sheet is marked "for accredited broker use only" and reserves reproduction, so only the Non-Resident Loan column and the requirement lines the KB quotes are kept, verbatim, under the term sheet's own row headings; sha256 of the PDF d431059b1f86a2d3c508e67d97a7118af22c66b3bacc65c422a55f38bc2e658d
+
+== General Features: Non-Resident Loan
+A loan for international borrowers looking to invest in
+Australian real-estate with Foreign Investment Review
+Board approval (“FIRB”).
+== Purpose
+Purchase and refinance only. Cash out not available.
+== Maximum LVR (Non-Resident Loan)
+75% up to $5,000,000
+70% up to $25,000,000
+== Application Fee (Non-Resident Loan)
+1.50% of the loan amount.
+== Non-Resident Premium
+1.00% of the loan amount.
+== Repayment Type (Non-Resident Loan)
+Principal & interest.
+== Serviceability (PAYG)
+3 latest payslips translated into English by NAATI*
+3 months bank statements translated into English
+by NAATI*
+Employment letter translated into English by NAATI*
+XE currency conversion to be completed and
+provided with submission.
+== Serviceability (Self employed)
+2 years financials translated into English by NAATI* and
+6 months statements showing business income to be
+translated into English by NAATI*
+* Please note all income documents provided to La Trobe Financial are to be translated into English by NAATI (National Accreditation Authority for Translators
+and Interpreters).
+Serviceability calculation method: 90% of foreign income used for serviceability calculation as well as Net Surplus Income Calculator. 2% sensitivity buffer
+applied to applicable interest rate.
+== Additional Requirements
+FIRB approval is required
+Evidence of deposit held in an Australian bank
+Appointment of an agent (not broker)
+Satisfactory Customer Identification Check
+If refinancing, 6 months recent statements
+Copy of their credit report from their country
+Evidence of funds to complete transaction held
+in an Australian bank in the name of applicant.

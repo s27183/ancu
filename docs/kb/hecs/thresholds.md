@@ -1,14 +1,16 @@
 ---
 slug: kb.hecs.thresholds
 effective_from: 2026-07-01
-last_verified: 2026-07-06
+last_verified: 2026-10-27
 sources:
-  - url: https://www.ato.gov.au/tax-rates-and-codes/study-and-training-support-loans-rates-and-repayment-thresholds
-    note: "PRIMARY (ATO) — 403 Forbidden to WebFetch in-sandbox this session; the 2026-27 figures below were corroborated to the digit against two independent secondary sources that cite it. Re-verify directly against this page when a non-blocked fetch is available."
-  - url: https://www.scalesuite.com.au/resources/understanding-stsl-tax-a-comprehensive-guide
-    retrieved: 2026-07-06
-  - url: https://www.wagecalculator.com.au/guides/hecs-help-repayment
-    retrieved: 2026-07-06
+  - url: https://www.ato.gov.au/tax-rates-and-codes/study-and-training-loan-minimum-repayment-income-and-rates
+    retrieved: 2026-10-27
+    path: docs/sources/ato/study-and-training-loan-repayment-rates-2026-27.txt
+    note: "PRIMARY (ATO) — the 2026-27 schedule (Table 1) and the 2025-26 schedule (Table 2). The ATO's earlier URL for this page (…/study-and-training-support-loans-rates-and-repayment-thresholds) redirects here."
+    quotes:
+      - "$129,718 – $186,050"
+      - "$9,028 plus 17c for each $1 over $129,717"
+      - "$0 – $67,000"
 ---
 
 # HECS-HELP repayment thresholds and lender treatment
@@ -93,8 +95,6 @@ Notes:
 
 ## Sources
 
-- Australian Taxation Office — *Study and training support loans — rates and repayment thresholds* (PRIMARY for the marginal schedule + minimum threshold) — https://www.ato.gov.au/tax-rates-and-codes/study-and-training-support-loans-rates-and-repayment-thresholds — **NOTE: 403 Forbidden to WebFetch in this sandbox on 2026-07-06; the 2026-27 figures below were corroborated to the digit against the two independent secondary sources that cite it. Re-verify directly against this page when a non-blocked fetch is available.**
-- ScaleSuite — *Understanding STSL Tax: 2026-27 thresholds and marginal rates* ($69,528 minimum; bands $69,529–$129,717 @ 15c, $129,718–$186,050 @ $9,028 + 17c, $186,051+ @ 10% of total; confirms rise from $67,000 in 2025-26) — https://www.scalesuite.com.au/resources/understanding-stsl-tax-a-comprehensive-guide (retrieved 2026-07-06)
-- WageCalculator — *HECS/HELP Repayment Thresholds 2026–2027* (same four-band 2026-27 schedule; $69,528 threshold) — https://www.wagecalculator.com.au/guides/hecs-help-repayment (retrieved 2026-07-06)
+- Australian Taxation Office — *Study and training loan minimum repayment income and rates* (PRIMARY for the 2026-27 marginal schedule and minimum repayment income, Table 1: "$0 – $69,528" nil, "15c for each $1 over $69,528", "$9,028 plus 17c for each $1 over $129,717", "10% of your total repayment income" from $186,051; and the 2025-26 schedule, Table 2: "$0 – $67,000" nil) — https://www.ato.gov.au/tax-rates-and-codes/study-and-training-loan-minimum-repayment-income-and-rates (retrieved 2026-10-27; archived at docs/sources/ato/study-and-training-loan-repayment-rates-2026-27.txt)
 - Department of Education — *Making HELP and student loan repayments fairer* (marginal-system reform, effective 2025-26) — https://www.education.gov.au/higher-education-loan-program/making-help-and-student-loan-repayments-fairer
 - Australian Taxation Office — *Study and training loans — what's new* (20% one-off reduction as at 1 June 2025; indexation reform) — https://www.ato.gov.au/individuals-and-families/study-and-training-support-loans/study-and-training-loans-what-s-new

@@ -1,0 +1,57 @@
+Source: https://www.helia.com.au/the-hub/calculators-estimators/lmi-fee-estimator
+Retrieved: 2026-10-27
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML 5ef5088b85c5f2388111e29359bb20ce4f2849229c4cffea6ff639f5359514da
+
+LMI fee estimator. | Helia
+LMI fee
+estimator
+This tool will assist you with an
+estimate of your LMI premium
+LMI fee
+estimator
+This tool will assist you with an
+estimate of your LMI premium
+Home
+The Hub
+Calculators & Estimators
+LMI fee estimator
+LMI fee estimator
+Lenders Mortgage Insurance (LMI) is one of the most popular ways to achieve the dream of home ownership sooner for borrowers that don't have a large deposit. LMI can either be paid upfront or capitalised into the loan. Helia have created an LMI premium estimator to give you an indication of the LMI premium payable.
+While every effort has been made to ensure the accuracy of this premium estimator, the actual premium is the premium calculated by Helia at the time of application for LMI. The actual premium may vary from the estimate depending on a range of factors including, but not limited to, the loan purpose, borrower type or security type, or updated information received at the time of the application of LMI. The results from this premium estimator should be used as an indication only.
+Enter details
+Estimated property value ($)
+$
+Deposit amount ($)
+$
+First home buyer?
+Select Yes No
+Loan term
+Select Up to 30 years 31 to 35 years 36 to 40 years
+Occupancy type
+Select Investment Owner Occupied
+I have read and agree with the Privacy Policy and Disclaimer
+Calculate
+Results
+Estimated property value
+Loan amount
+First home buyer
+Occupancy type
+Loan term
+Loan to value ratio (LVR)
+Upfront LMI premium
+Upfront LMI premium
+(including GST)
+excluding stamp duty
+Learn more Download ‘LMI Fact Sheet’ for Upfront LMI Premium
+Monthly LMI premium
+Monthly LMI premium
+(including GST)
+excluding stamp duty
+Learn more Download ‘Monthly LMI Fact Sheet’ for Upfront LMI Premium
+Start again
+Error: oops something happened...
+Copyright ©2026 Helia Group Limited ABN 72 154 890 730. All rights reserved. Contact us for more information.
+Helia Group Limited acknowledges the Traditional Custodians of the lands on which we operate and pay our respects to Elders past and present. We also acknowledge the important role Aboriginal and Torres Strait Islander peoples continue to play within the communities in which we operate and where our team members reside.
+Important information
+The information contained on this website is general information. It does not constitute legal, tax, credit or financial advice, and is not tailored to a borrower’s specific circumstances. Borrowers should consider their own personal circumstances and seek advice from their professional advisers before making any decisions that may impact their financial position.
+Helia Insurance Pty Limited’s (‘Helia’) credit activities are limited to credit activities engaged by it as an assignee in relation to providing lenders mortgage insurance (LMI) products or as a credit provider under the doctrine of subrogation in relation to providing LMI products. LMI is insurance that protects credit providers, not home buyers, and cannot be provided directly to home buyers. The information provided on this website does not refer to a credit contract with any particular credit provider.

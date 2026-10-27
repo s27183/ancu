@@ -326,7 +326,7 @@ after_loan(Sale, _) -> Sale.
 %%            budget_envelope_investor.loan_amount (C, D; null at base, so D's payout was
 %%            pending). The rate is the kind's band (rate_band/1): the KB representative
 %%            owner-occupier rate, + the investment premium for an investor, + the
-%%            non-resident premium band (kb.lender.non-resident-friendly-shortlist, 50-150bp)
+%%            non-resident premium band (kb.lender.non-resident-friendly-shortlist, a PLACEHOLDER band)
 %%            for a foreign buyer (B, D) — the low end of a band at the low premium, the
 %%            high end at the high. Never the agent's loan_structure_recommendation.rate,
 %%            which holds a rate-STRUCTURE enum (§98, measured 2026-10-08).

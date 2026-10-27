@@ -1,0 +1,35 @@
+Source: https://www.parliament.tas.gov.au/__data/assets/pdf_file/0015/107223/HA-Tuesday-16-June-2026.pdf
+Retrieved: 2026-10-27
+Extracted: pdftotext of the PDF, lines 1040-1070 (the Governor's messages on assent); sha256 of the PDF 7e08183164afd63b6e802e341efea2b24b4c7bbb9c5e4f09d226664edac0ed79
+
+24
+
+Tuesday 16 June 2026
+
+The report be received and printed.
+Motion agreed to.
+MESSAGE FROM THE GOVERNOR
+Royal Assent to Bills
+[2.09 p.m.]
+The SPEAKER - I am in receipt of a message from the Her Excellency, the Governor
+regarding assent to the following bills:
+•
+
+Help to Buy (Commonwealth Powers) Bill 2026 (No. 9)
+
+•
+
+Education and Care Services National Law (Application) Amendment
+Bill 2026 (No. 7)
+
+•
+
+Building Amendment Bill 2026 (No. 1)
+
+having been presented to the Governor for the Royal Assent, she has, in the
+name and on behalf of His Majesty the King, assented to the said Bills.
+Barbara Baker, Governor
+Government House, Hobart,
+5 June 2026.
+TAXATION AND RELATED LEGISLATION (MISCELLANEOUS
+AMENDMENTS) BILL 2026 (No. 21)

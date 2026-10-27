@@ -1,28 +1,14 @@
 ---
 slug: kb.selling-costs.agent-legal
 effective_from: 2026-06-21
-last_verified: 2026-10-16
+last_verified: 2026-10-27
 sources:
-  - url: https://whichrealestateagent.com.au/agent-fees/how-much-do-real-estate-agents-charge/
-    retrieved: 2026-07-06
-    path: docs/sources/selling-costs/wrea-how-much-agents-charge.txt
+  - url: https://www.nsw.gov.au/housing-and-construction/buying-and-selling-property/selling-a-property/agency-agreements
+    retrieved: 2026-10-27
+    path: docs/sources/selling-costs/nswgov-agency-agreements.txt
     quotes:
-      - "On average, real estate agents in Australia charge between 2% and 3% of your home’s final selling price ."
-      - "In Hobart and regional areas, commission rates are higher (around 3% or more)"
-  - url: https://www.yourpropertyguide.com.au/guides/real-estate-agent-fees-australia
-    retrieved: 2026-10-16
-    path: docs/sources/selling-costs/ypg-real-estate-agent-fees.txt
-    quotes:
-      - "Australian real estate commission is negotiable and typically ranges from 1.5% to 3.5% of the sale price, depending on state, suburb and property value."
-      - "Marketing costs (photography, online listings, signboard, styling) are usually charged separately on top of commission and typically run $3,000 to $6,000 for an average home."
-  - url: https://www.openagent.com.au/blog/cost-selling-house
-    retrieved: 2026-10-16
-    path: docs/sources/selling-costs/openagent-cost-selling-house.txt
-    quotes:
-      - "For advertising and marketing, you can expect to pay anywhere between $600 - $10,000, depending on what package you opt for."
-      - "Depending on what package you opt for, expect to pay anywhere from $500 - $8000 for advertising and marketing in Victoria"
-      - "As for legal fees, NSW solicitors and conveyancers typically charge around $700 - $2500."
-      - "In terms of other selling costs in the Sunshine State, conveyancing ranges anywhere from $500 to $2200."
+      - "You can negotiate with the agent about the amounts of any commissions, fees or other expenses that you may be required to pay."
+      - "Ask each agent for a printed list of their fees and commission rates and the expenses (for example, advertising) they charge."
 ---
 
 # Selling costs — agent commission, legal, and marketing
@@ -31,20 +17,20 @@ When a property is **sold** (the `dispose` phase), the proceeds are reduced by t
 
 ## Agent commission — the dominant cost
 
-The selling agent's commission is the largest selling cost and is **negotiable**; it varies by **state**, by **price**, and by **agency**. Conventionally it runs roughly **1.5%–3.5% of the sale price** (lower in higher-priced, more competitive metro markets such as parts of NSW/VIC; historically higher in QLD and regional areas). It may be a flat percentage or a tiered/incentive structure. Because it is a percentage of the sale price, the `disposition` resolver applies it to the **projected** `sale_proceeds`, so it is itself a `money_range` when the proceeds are banded.
+The selling agent's commission is the largest selling cost and is **negotiable**: the NSW Government says a seller "can negotiate with the agent about the amounts of any commissions, fees or other expenses", and that commission may change with the price (a tiered or incentive structure) rather than be a flat fee. It varies by **state**, by **price**, and by **agency**. The plan carries **1.5%–3.5% of the sale price** as a **placeholder** — no selling agency's own published commission has been read for this doc yet, so the band is not grounded on a primary; the agent's written agency agreement is the figure. Because it is a percentage of the sale price, the `disposition` resolver applies it to the **projected** `sale_proceeds`, so it is itself a `money_range` when the proceeds are banded.
 
 ## Legal / conveyancing on sale
 
-Sale-side **conveyancing or solicitor** costs to prepare the contract of sale / vendor statement and handle settlement run conventionally around **$500–$2,500**, broadly similar to the buyer-side figure (`kb.buyer-costs`). State-specific document requirements (e.g. a VIC Section 32 vendor statement) sit at the higher end.
+Sale-side **conveyancing or solicitor** costs cover preparing the contract of sale / vendor statement and handling settlement. The plan carries **$500–$2,500** as a **placeholder** — no conveyancer's own published sale fee grounds the band yet; the conveyancer's quote is the figure. State-specific document requirements (e.g. a VIC Section 32 vendor statement) push it up.
 
 ## Marketing / advertising
 
-**Marketing** (photography, listing portals, signboard, copywriting, and — for an auction — the auctioneer fee) is typically paid by the vendor and runs conventionally around **$600–$8,000** (about $3,000–$6,000 for an average home) depending on the campaign and price point. Premium campaigns (video, staging/styling) push higher; a low-key private-treaty sale lower.
+**Marketing** (photography, listing portals, signboard, copywriting, and — for an auction — the auctioneer fee) is typically paid by the vendor; in NSW the agency agreement must state these expenses, and the government tells sellers to ask each agent for "a printed list of their fees and commission rates and the expenses (for example, advertising) they charge". The plan carries **$600–$8,000** as a **placeholder** — no agency's own published campaign price grounds it yet. Premium campaigns (video, staging/styling) push higher; a low-key private-treaty sale lower.
 
 ## Relevance for Vietnamese-Australian buyers (Mode A)
 
 - **Selling costs net down the equity-at-sale.** For a Mode A owner the dispose phase is the **graduation / upgrade** story — equity realised at sale → the next purchase. Selling costs (agent + legal + marketing) are the real haircut on that equity, so the plan places them explicitly rather than leaving the net proceeds overstated.
-- **Banded, because they are estimates.** Commission is negotiable and marketing is campaign-dependent; the plan surfaces a **range** with the assumption stated, not a single asserted figure.
+- **Banded, because they are estimates — and placeholders.** Commission is negotiable and marketing is campaign-dependent; the plan surfaces a **range** labelled as a placeholder, not a single asserted figure, until the bands are re-grounded on providers' own published fees.
 - **Information, not advice.** The plan states conventional ranges and notes they are negotiable; it does not recommend an agent or a commission rate.
 
 ## Rules
@@ -70,6 +56,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json`. 
           "basis": "pct_of_sale",
           "low": 1.5,
           "high": 3.5,
+          "note": "PLACEHOLDER — no primary states this band; re-ground on several selling agencies' own published commission rates (an agency's own fee page or its standard agency agreement). The NSW Government confirms only that commission is negotiable and may change with price.",
           "applies": {
             "modes": [
               "fhb-domestic-au",
@@ -91,10 +78,10 @@ The resolver rules the artifact compiler extracts as this doc's `content_json`. 
             "en": "The seller pays, from the sale proceeds"
           },
           "drivers": {
-            "vi": "Bang, khu vực và giá nhà: thành phố lớn cạnh tranh thường ~2–2,5%; Hobart và vùng xa ~3% trở lên. Có thể thương lượng.",
-            "en": "State, suburb and price: competitive capital cities are often ~2–2.5%; Hobart and regional areas ~3% or more. Negotiable."
+            "vi": "Bang, khu vực, giá nhà và từng công ty môi giới; có thể thương lượng, và có thể thay đổi theo giá bán. Hợp đồng ủy quyền (agency agreement) ghi con số thật.",
+            "en": "State, suburb, price and agency; negotiable, and it can change with the sale price. The written agency agreement holds the real figure."
           },
-          "source": "https://www.yourpropertyguide.com.au/guides/real-estate-agent-fees-australia"
+          "source": "https://www.nsw.gov.au/housing-and-construction/buying-and-selling-property/selling-a-property/agency-agreements"
         },
         {
           "id": "marketing",
@@ -116,7 +103,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json`. 
             "property": "any"
           },
           "optional": false,
-          "note": "$600 is the low end of the national $600–$10,000; $8,000 the top of the Victorian $500–$8,000 (the prior marketing band was $1,000–$8,000)",
+          "note": "PLACEHOLDER — no primary states this band; re-ground on several selling agencies' own published marketing or advertising campaign prices (an agency's own price list, or the expenses its agency agreement states).",
           "label": {
             "vi": "Chi phí quảng cáo bán nhà (marketing)",
             "en": "Sale marketing and advertising"
@@ -126,10 +113,10 @@ The resolver rules the artifact compiler extracts as this doc's `content_json`. 
             "en": "The seller pays, often before the sale completes"
           },
           "drivers": {
-            "vi": "Gói quảng cáo: ảnh chụp, đăng tin trên các trang bất động sản, bảng hiệu, dàn dựng nội thất (styling). Nhà trung bình khoảng $3.000–$6.000; gói cao cấp hoặc đấu giá cao hơn.",
-            "en": "The package: photography, listings on property portals, signboard, styling. An average home is about $3,000–$6,000; a premium campaign or auction costs more."
+            "vi": "Gói quảng cáo: ảnh chụp, đăng tin trên các trang bất động sản, bảng hiệu, dàn dựng nội thất (styling); gói cao cấp hoặc đấu giá cao hơn. Hỏi môi giới danh sách phí in sẵn.",
+            "en": "The package: photography, listings on property portals, signboard, styling; a premium campaign or auction costs more. Ask the agent for a printed list of its expenses."
           },
-          "source": "https://www.openagent.com.au/blog/cost-selling-house"
+          "source": "https://www.nsw.gov.au/housing-and-construction/buying-and-selling-property/selling-a-property/agency-agreements"
         },
         {
           "id": "sale_conveyancing",
@@ -151,7 +138,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json`. 
             "property": "any"
           },
           "optional": false,
-          "note": "QLD $500–$2,200, NSW $700–$2,500",
+          "note": "PLACEHOLDER — no primary states this band; re-ground on several conveyancers' or solicitors' own published fixed fees for a residential sale (a firm's own fee page), per state.",
           "label": {
             "vi": "Phí luật sư/chuyển nhượng khi bán (conveyancing)",
             "en": "Conveyancing / legal on the sale"
@@ -164,7 +151,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json`. 
             "vi": "Bang (VIC cần bản kê của người bán — Section 32 — nên cao hơn), độ phức tạp của hợp đồng và chọn chuyên viên chuyển nhượng (conveyancer) hay luật sư.",
             "en": "State (VIC needs a vendor's statement — Section 32 — so costs more), the contract's complexity, and a conveyancer versus a solicitor."
           },
-          "source": "https://www.openagent.com.au/blog/cost-selling-house"
+          "source": null
         }
       ]
     }
@@ -175,11 +162,16 @@ The resolver rules the artifact compiler extracts as this doc's `content_json`. 
 Notes:
 
 - **No `fills`.** No outcome leaf is set by a KB rule. `disposition.selling_costs` is resolver-computed from these bands applied to the projected proceeds; the doc supplies the bands and the method.
+- **PLACEHOLDER bands.** The three bands keep their values (the engine sums them into `selling_costs`) but none is yet grounded on a provider's own published price; each note names the provider page to re-ground on. A comparison site, directory or another firm's market article never grounds them.
 - **ESTIMATES, not regulated.** Unlike the buyer-side *registration* fees (regulated, per-state, exact — `kb.buyer-costs`) or duty (`kb.stamp-duty.calc-by-state`), selling agent commission and marketing are **negotiable, market-set estimates** — surfaced as bands and labelled as such, consistent with the verify-by-postcondition discipline (regulated figures to the dollar; estimates as ranges).
 - **Scope discipline.** Buyer-side purchase transaction costs are owned by `kb.buyer-costs.inspections-conveyancing-fees`; this doc owns only the **sale-side** costs at the dispose phase.
 
 ## Sources
 
-**Estimates — conventional market ranges (not a regulated primary):**
+**Regulator:**
 
-- Conventional Australian selling-agent commission ranges and vendor marketing costs are market-set and negotiable; the bands above are conservative conventional ranges to be periodically sanity-checked against current state-level agent-fee surveys (e.g. state consumer-affairs / fair-trading guidance and reputable agent-comparison data). Re-verify the bands on the regulatory/data freshness cadence; update `last_verified`.
+- NSW Government — *Agency agreements for the sale of property in NSW* (commissions, fees and expenses are negotiable; commission may change with price; ask each agent for a printed list of fees, commission rates and expenses such as advertising) — https://www.nsw.gov.au/housing-and-construction/buying-and-selling-property/selling-a-property/agency-agreements
+
+**Bands — PLACEHOLDER (no primary yet):**
+
+- Commission 1.5%–3.5%, marketing $600–$8,000 and sale conveyancing $500–$2,500 are placeholders. Re-ground each on several providers' own published prices: selling agencies' own commission and campaign price lists, and conveyancers' own fixed sale fees. Update `last_verified` when they are.

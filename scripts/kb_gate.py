@@ -14,9 +14,9 @@ merges itself only when each thing it changes is one of these:
   - a figure change that passed two independent checks: every number the PR adds
     to a doc's text appears in a word-for-word quote on that doc's sources, each
     quote is found in its saved copy (tests/kb_quote_check.py), and each quoting
-    source is a primary — a government host (*.gov.au) or, for a provider's fee, the
-    provider's own site (PROVIDER_HOSTS, per doc: lenders, FX providers, land
-    registries; behavior 85) — and the independent kb-verify routine
+    source is a primary — a government or law host or, for a provider's fee, the
+    provider's own site (kb_compiler's PRIMARY_GOV_LAW_HOSTS and PRIMARY_PROVIDER_HOSTS,
+    per doc; behaviors 85, 138) — and the independent kb-verify routine
     has labelled the PR `kb-verified` after re-reading the sources itself.
 Anything else holds the whole PR, with one reason per held item: a path outside
 docs/kb and docs/sources, a new or deleted doc (a new rule or scheme is kind-2/3,
@@ -41,10 +41,11 @@ import re
 import subprocess
 import sys
 import tempfile
-import urllib.parse
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+# The repo the PR's refs live in: ROOT, or the throwaway repo of --self-test.
+REPO = ROOT
 sys.path.insert(0, str(ROOT / "tests"))
 from kb_quote_check import archived_text, doc_fails, parse_sources  # noqa: E402
 
@@ -56,33 +57,11 @@ DATE_FIELDS = re.compile(r"^\s*-?\s*(last_verified|retrieved|next_edition):\s*\S
 # Lines that only add or move the support for a figure (a source's saved copy and
 # quotes) — not themselves a figure change.
 SUPPORT_LINE = re.compile(r"^\s*(-\s*url:|path:|quotes:|-\s*[\"'])")
-GOV_SUFFIX = ".gov.au"
-# A lender's own site is the primary for its own policy (LENDER-POLICY tier,
-# invariants.md); comparison and broker sites never are.
-PRIMARY_LENDER_HOSTS = (
-    "commbank.com.au", "nab.com.au", "anz.com.au", "westpac.com.au",
-    "stgeorge.com.au", "banksa.com.au", "bankofmelbourne.com.au", "macquarie.com.au",
-    "ing.com.au", "suncorp.com.au", "bankwest.com.au", "boq.com.au",
-    "bendigobank.com.au", "amp.com.au", "hsbc.com.au", "citi.com.au",
-)
-# A provider's own published price is the primary for its own fee (behavior 85, Son
-# 2026-10-16): a bank's or transfer service's fee schedule for the FX doc, a lender's
-# for its discharge fee, a land registry's for its registration fee. Per doc (or doc
-# folder): a provider's site proves nothing about another doc's figures, and a
-# comparison or broker site is never a provider.
-FX_PROVIDER_HOSTS = PRIMARY_LENDER_HOSTS + (
-    "wise.com", "ofx.com", "westernunion.com", "remitly.com",
-    "vietcombank.com.vn", "techcombank.com", "techcombank.com.vn", "bidv.com.vn",
-    "vietinbank.vn", "acb.com.vn",
-)
-REGISTRY_HOSTS = ("nswlrs.com.au", "titlesqld.com.au")
-PROVIDER_HOSTS = {
-    "docs/kb/lender/": PRIMARY_LENDER_HOSTS,
-    "docs/kb/fx/typical-spreads-vnd-aud.md": FX_PROVIDER_HOSTS,
-    "docs/kb/fx-providers/": FX_PROVIDER_HOSTS,
-    "docs/kb/existing-home-sale/net-proceeds.md": PRIMARY_LENDER_HOSTS + REGISTRY_HOSTS,
-    "docs/kb/buyer-costs/inspections-conveyancing-fees.md": REGISTRY_HOSTS,
-}
+# The primaries — government and law hosts for any doc, a provider's own site for the docs
+# it prices (behavior 85) — and the strict host check are kb_compiler's (behavior 138: one
+# declaration, URL_AUTHORITY block); this gate reads them, never a copy.
+sys.path.insert(0, str(ROOT / "engine" / "build"))
+from kb_compiler import PRIMARY_PROVIDER_HOSTS, primary_hosts, url_host, host_in  # noqa: E402
 DERIVED = ("docs/kb/copy/", "docs/kb/bilingual/", "docs/kb/journey/")
 LABEL_OK = "kb-verified"
 LABEL_HOLD = "kb-hold"
@@ -110,15 +89,12 @@ def numbers(text: str) -> set[str]:
 
 
 def git(*args: str) -> str:
-    return subprocess.run(["git", *args], cwd=ROOT, check=True, capture_output=True, text=True).stdout
+    return subprocess.run(["git", *args], cwd=REPO, check=True, capture_output=True, text=True).stdout
 
 
 def host_ok(url: str, path: str) -> bool:
-    host = (urllib.parse.urlsplit(url or "").hostname or "").lower()
-    if host.endswith(GOV_SUFFIX):
-        return True
-    hosts = next((hs for where, hs in PROVIDER_HOSTS.items() if path.startswith(where)), ())
-    return any(host == h or host.endswith("." + h) for h in hosts)
+    host = url_host(url)
+    return host is not None and host_in(host, primary_hosts(path))
 
 
 def changed_lines(base: str, head: str, path: str) -> tuple[list[str], list[str], list[str], list[str]]:
@@ -155,7 +131,7 @@ def copy_at(ref: str, path: str) -> str | None:
     """A saved copy's searchable text as `ref` has it (archived_text, from git)."""
     if not path_exists(ref, path):
         return None
-    raw = subprocess.run(["git", "show", f"{ref}:{path}"], cwd=ROOT, check=True,
+    raw = subprocess.run(["git", "show", f"{ref}:{path}"], cwd=REPO, check=True,
                          capture_output=True).stdout
     with tempfile.TemporaryDirectory() as d:
         f = Path(d) / Path(path).name
@@ -164,7 +140,7 @@ def copy_at(ref: str, path: str) -> str | None:
 
 
 def path_exists(ref: str, path: str) -> bool:
-    return subprocess.run(["git", "cat-file", "-e", f"{ref}:{path}"], cwd=ROOT,
+    return subprocess.run(["git", "cat-file", "-e", f"{ref}:{path}"], cwd=REPO,
                           capture_output=True).returncode == 0
 
 
@@ -220,7 +196,7 @@ def decide(base: str, head: str, branch: str, labels: set[str], checks_ok: bool)
             reasons.append(f"`{path}`: {', '.join(missing)} {'is' if len(missing) == 1 else 'are'} in the change but in no quote on its sources")
         for s in quoted:
             if not host_ok(s.get("url", ""), path):
-                host = urllib.parse.urlsplit(s.get("url", "")).hostname or s.get("url")
+                host = url_host(s.get("url", "")) or s.get("url")
                 reasons.append(f"`{path}`: quoted source {host} is not a primary (a government site, or the provider's own for this doc's fee) — secondary source")
         for f in doc_fails(Path(path), text, lambda sp: copy_at(head, sp)):
             reasons.append(f"`{path}`: " + f.split(": ", 1)[1])
@@ -269,7 +245,61 @@ def issue(d: dict, pr: str) -> str:
     return "\n".join(lines) + "\n"
 
 
+# Regulated figures are grounded -> honesty tiers -> The KB update -> a kb-watch PR citing a secondary page is held
+# Behavior 138 Expect 5. Fails when this gate keeps its own host list (the map is
+# kb_compiler's, one declaration), or when a kb-watch PR whose new figure is quoted from a
+# comparison site (canstar.com.au) is not held as a secondary source; a PR quoting the
+# lender's own page must not be. Runs decide() on a throwaway git repo, offline.
+def self_test() -> int:
+    global REPO
+    import kb_compiler
+    problems = []
+    if PRIMARY_PROVIDER_HOSTS is not kb_compiler.PRIMARY_PROVIDER_HOSTS:
+        problems.append("PRIMARY_PROVIDER_HOSTS is not kb_compiler's own object")
+    if re.search(r"(?m)^[A-Z_]*HOSTS\s*=", Path(__file__).read_text()):
+        problems.append("kb_gate.py declares a host list of its own")
+    doc = "docs/kb/lender/fixture-rate.md"
+    base = "---\nslug: kb.lender.fixture-rate\nsources:\n  - url: https://www.macquarie.com.au/a\n---\nDeposit 10%.\n"
+
+    def head(url: str) -> str:
+        return ("---\nslug: kb.lender.fixture-rate\nsources:\n  - url: " + url +
+                "\n    quotes:\n      - \"a deposit of 15% applies\"\n---\nDeposit 15%.\n")
+    env = {"GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@t", "GIT_COMMITTER_NAME": "t",
+           "GIT_COMMITTER_EMAIL": "t@t", "PATH": __import__("os").environ.get("PATH", "")}
+    held = {}
+    for label, url in (("canstar", "https://www.canstar.com.au/home-loans/x"),
+                       ("macquarie", "https://www.macquarie.com.au/home-loans.html")):
+        with tempfile.TemporaryDirectory() as d:
+            REPO = Path(d)
+
+            def run(*a: str) -> None:
+                subprocess.run(["git", *a], cwd=d, check=True, capture_output=True, env=env)
+            run("init", "-q", "-b", "main")
+            (REPO / "docs/kb/lender").mkdir(parents=True)
+            (REPO / doc).write_text(base)
+            run("add", "-A")
+            run("commit", "-q", "-m", "base")
+            run("switch", "-q", "-c", "kb-watch-fixture")
+            (REPO / doc).write_text(head(url))
+            run("commit", "-q", "-am", "figure")
+            dec = decide("main", "kb-watch-fixture", "kb-watch-fixture", {LABEL_OK}, True)
+            held[label] = (dec["decision"], [r for r in dec["reasons"] if "secondary source" in r])
+    REPO = ROOT
+    if held["canstar"][0] != "hold" or not any("www.canstar.com.au" in r for r in held["canstar"][1]):
+        problems.append(f"a kb-watch PR quoting canstar.com.au was not held as secondary: {held['canstar']}")
+    if held["macquarie"][1]:
+        problems.append(f"a PR quoting the lender's own page was held as secondary: {held['macquarie'][1]}")
+    for p in problems:
+        print(f"FAIL kb_gate self-test: {p}")
+    if not problems:
+        print("ok   kb_gate self-test: the primary map is kb_compiler's; a kb-watch PR quoting "
+              f"canstar.com.au is held ({held['canstar'][1][0]}); one quoting macquarie.com.au is not")
+    return 1 if problems else 0
+
+
 def main() -> int:
+    if "--self-test" in sys.argv:
+        return self_test()
     ap = argparse.ArgumentParser()
     ap.add_argument("--base", required=True)
     ap.add_argument("--head", required=True)

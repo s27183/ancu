@@ -1,7 +1,7 @@
 ---
 slug: kb.buyer-costs.broker-and-buyers-agent
 effective_from: 2021-01-01
-last_verified: 2026-10-16
+last_verified: 2026-10-27
 sources:
   - url: https://download.asic.gov.au/media/4213629/rep516-published-16-3-2017-1.pdf
     retrieved: 2026-10-16
@@ -21,11 +21,6 @@ sources:
       - "Lenders generally pay mortgage brokers a commission for distributing their products, so you don't pay them directly."
       - "Sometimes brokers might charge you a fee directly."
       - "You must sign a quote before a broker can provide services and request payment of a fee."
-  - url: https://www.canstar.com.au/home-loans/mortgage-brokers-fees/
-    retrieved: 2026-10-16
-    path: docs/sources/buyer-costs/canstar-mortgage-broker-fees.txt
-    quotes:
-      - "No, the borrower doesn’t pay a mortgage broker a fee for their service."
   - url: https://www.nsw.gov.au/housing-and-construction/buying-and-selling-property/buying-property-nsw/using-a-real-estate-agent-to-buy-a-property
     retrieved: 2026-10-16
     path: docs/sources/buyer-costs/nswgov-using-agent-to-buy.txt
@@ -36,16 +31,6 @@ sources:
     path: docs/sources/buyer-costs/cav-seek-expert-advice.txt
     quotes:
       - "You can negotiate the cost of commissions and fees, as they are not set by law."
-  - url: https://rebaa.com.au/buyers-agents/
-    retrieved: 2026-10-16
-    path: docs/sources/buyer-costs/rebaa-buyers-agents.txt
-    quotes:
-      - "the industry average fee is somewhere between 2% and 3% of the purchase price, plus GST and an engagement fee to get started"
-  - url: https://whichrealestateagent.com.au/buyers-agent/fees/
-    retrieved: 2026-10-16
-    path: docs/sources/buyer-costs/wrea-buyers-agent-fees.txt
-    quotes:
-      - "Most agents will charge between 1% and 3%, depending on the service they provide."
 ---
 
 # Buyer-side professionals — mortgage broker and buyer's agent
@@ -60,12 +45,12 @@ Sometimes a broker charges the buyer a fee directly; it must be set out in a wri
 
 ## The convention cost — buyer's agent
 
-Buyer's agent fees are **not set by law** (NSW Government; Consumer Affairs Victoria) — they are negotiated and written into the agency agreement. The agent may charge a **fixed fee or a percentage of the purchase price**. The market sits around **1%–3% of the price** (the industry body REBAA puts a full-service average at 2%–3% plus GST and an engagement fee), so the line is a **percentage of price**, marked **optional** — the buyer may well not use one.
+Buyer's agent fees are **not set by law** (NSW Government; Consumer Affairs Victoria) — they are negotiated and written into the agency agreement. The agent may charge a **fixed fee or a percentage of the purchase price**. The plan carries **1%–3% of the price** as a **placeholder**: no buyer's agent's own published fee has been read for this doc yet, so the band is not grounded on a primary and the buyer's own quote replaces it. The line is a **percentage of price**, marked **optional** — the buyer may well not use one.
 
 ## Relevance for Vietnamese-Australian buyers (Mode A)
 
 - **A broker usually costs the buyer nothing** — worth knowing for a first-timer who assumes advice must be paid for. The commission is the lender's cost; the best-interests duty is the protection. Ask the broker how they are paid.
-- **A buyer's agent is a real cost at the top of the band** — 1%–3% on a $700,000 home is $7,000–$21,000 plus GST. Shown as optional so it never inflates the committed total.
+- **A buyer's agent can be a real cost** — at the placeholder 1%–3%, a $700,000 home would be $7,000–$21,000; the agent's own written quote is the figure. Shown as optional so it never inflates the committed total.
 - **Information, not advice.** The doc describes the market; it does not recommend a broker, a buyer's agent, or whether to use one.
 
 ## Rules
@@ -99,6 +84,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json`. 
           "id": "buyers_agent",
           "phase": "settle", "timing": "one_off", "tier": "CONVENTION", "basis": "pct_of_price",
           "low": 1, "high": 3,
+          "note": "PLACEHOLDER — no primary states this band; re-ground on two or more buyer's agencies' own published fee pages (a percentage-of-price or fixed fee, plus any engagement fee). NSW Government and Consumer Affairs Victoria confirm only that the fee is a fixed fee or a percentage and is not set by law.",
           "applies": {
             "modes": ["fhb-domestic-au", "fhb-foreign-au", "investor-domestic-au", "investor-foreign-au", "nexthome-domestic-au"],
             "states": "all",
@@ -108,7 +94,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json`. 
           "label":   { "vi": "Đại lý mua nhà (buyer's agent)", "en": "Buyer's agent" },
           "payer":   { "vi": "Người mua trả, nếu thuê", "en": "The buyer pays, if they hire one" },
           "drivers": { "vi": "Phí không do luật quy định, có thể thương lượng: tính theo % giá nhà hoặc phí cố định. Dịch vụ trọn gói (tìm, kiểm tra, thương lượng) ở mức cao; chỉ thương lượng hoặc đấu giá thì thấp hơn. Thường cộng GST và một khoản phí ký hợp đồng ban đầu (engagement fee).", "en": "Not set by law and negotiable: a percentage of price or a fixed fee. A full search-to-negotiation service sits at the top; negotiation-only or auction bidding costs less. Usually plus GST and an upfront engagement fee." },
-          "source": "https://rebaa.com.au/buyers-agents/"
+          "source": "https://www.nsw.gov.au/housing-and-construction/buying-and-selling-property/buying-property-nsw/using-a-real-estate-agent-to-buy-a-property"
         }
       ]
     }
@@ -119,8 +105,8 @@ The resolver rules the artifact compiler extracts as this doc's `content_json`. 
 Notes:
 
 - **No `fills`, no parameters.** The engine reads only the `fee_lines` lookup.
-- **Two tiers.** The broker line is **LENDER-POLICY** — the commission is the lender's cost and the rates are ASIC's 2017 measure, not a fixed schedule. The buyer's agent line is **CONVENTION** — fees are not set by law; the band rests on the industry body (REBAA) and a market survey (which real estate agent), the state guides confirming only that it is negotiable.
-- **Percentage band, excluding GST.** Both sources quote 1%–3% (REBAA 2%–3%) of the price before GST; a fixed-fee agent lands within the band at typical prices.
+- **Two tiers.** The broker line is **LENDER-POLICY** — the commission is the lender's cost and the rates are ASIC's 2017 measure, not a fixed schedule. The buyer's agent line is **CONVENTION** in kind — fees are not set by law (the state guides confirm it is negotiable, fixed or a percentage) — but its 1%–3% figure is a **PLACEHOLDER**: no buyer's agency's own fee page grounds it yet. Re-ground on several agencies' own published fees.
+- **Percentage band, excluding GST.** The placeholder is a percentage of price before GST; a re-ground that finds fixed fees converts them at typical prices.
 - **`effective_from` 2021-01-01** is the start of the mortgage broker best-interests duty (National Credit Act Pt 3-5A).
 
 ## Sources
@@ -128,8 +114,6 @@ Notes:
 - ASIC — *Report 516: Review of mortgage broker remuneration* (March 2017) — upfront 0.62% and trail 0.18% paid by the lender
 - ASIC — *Regulatory Guide 273: Mortgage brokers: Best interests duty* (June 2020) — s158LA and s158LE of the National Credit Act
 - ASIC Moneysmart — *Using a mortgage broker* — lenders generally pay the commission; a direct fee needs a signed written quote
-- Canstar — *Mortgage broker fees, costs, and commissions* — the borrower does not usually pay the broker
 - NSW Government — *Using a real estate agent to buy a property* — buyer's agent fees fixed or a percentage, not set by law
 - Consumer Affairs Victoria — *Seek expert advice on property* — buyer's agent fees negotiable, not set by law
-- REBAA (Real Estate Buyers Agents Association of Australia) — *Buyer's Agent* — industry average 2%–3% plus GST and an engagement fee
-- which real estate agent — *Buyer's agent fees* — most agents charge 1%–3%
+- Buyer's agent 1%–3% band — PLACEHOLDER; no buyer's agency's own fee page read yet (re-ground on several agencies' own published fees)

@@ -1,0 +1,290 @@
+Source: https://www.wa.gov.au/government/publications/foreign-transfer-duty
+Retrieved: 2026-10-27
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML 0e326ad171db7e35f4dc3a278d0e8002bc74ec2aaeb88432f6e4beec25b36ed9
+
+Foreign transfer duty
+Skip to main content
+Header navigation
+Toggle navigation menu
+Translate Content
+Language selection
+English Afrikaans Albanian Amharic Arabic Armenian Azerbaijani Basque Belarusian Bengali Bosnian Bulgarian Catalan Chichewa Chinese (Simplified) Chinese (Traditional) Corsican Croatian Czech Danish Dutch Esperanto Estonian Ewe Filipino Finnish French Frisian Galician Georgian German Greek Guarani Gujarati Haitian Creole Hausa Hawaiian Hebrew Hindi Hungarian Icelandic Igbo Indonesian Irish Italian Japanese Javanese Kannada Kazakh Khmer Kinyarwanda Korean Krio Kurdish (Kurmanji) Kurdish (Soranî) Kyrgyz Lao Latvian Lingala Lithuanian Luganda Macedonian Malagasy Malay Malayalam Maltese Maori Marathi Mongolian Nepali Norwegian Odia (Oriya) Oromo Pashto Persian Polish Portuguese Punjabi Quechua Romanian Russian Scots Gaelic Serbian Sesotho Shona Sindhi Sinhala Slovak Slovenian Somali Spanish Sundanese Swahili Swedish Tajik Tamil Tatar Telugu Thai Tigrinya Turkish Turkmen Uyghur Ukrainian Urdu Uzbek Vietnamese Welsh Xhosa Yiddish Yoruba Zulu
+Search this website
+Search
+Submit
+Placeholder text
+Hide this bar
+Close menu
+Return to previous menu
+Translate Content
+Language selection
+Language
+English
+Afrikaans
+Albanian
+Amharic
+Arabic
+Armenian
+Azerbaijani
+Basque
+Belarusian
+Bengali
+Bosnian
+Bulgarian
+Catalan
+Chichewa
+Chinese (Simplified)
+Chinese (Traditional)
+Corsican
+Croatian
+Czech
+Danish
+Dutch
+Esperanto
+Estonian
+Ewe
+Filipino
+Finnish
+French
+Frisian
+Galician
+Georgian
+German
+Greek
+Guarani
+Gujarati
+Haitian Creole
+Hausa
+Hawaiian
+Hebrew
+Hindi
+Hungarian
+Icelandic
+Igbo
+Indonesian
+Irish
+Italian
+Japanese
+Javanese
+Kannada
+Kazakh
+Khmer
+Kinyarwanda
+Korean
+Krio
+Kurdish (Kurmanji)
+Kurdish (Soranî)
+Kyrgyz
+Lao
+Latvian
+Lingala
+Lithuanian
+Luganda
+Macedonian
+Malagasy
+Malay
+Malayalam
+Maltese
+Maori
+Marathi
+Mongolian
+Nepali
+Norwegian
+Odia (Oriya)
+Oromo
+Pashto
+Persian
+Polish
+Portuguese
+Punjabi
+Quechua
+Romanian
+Russian
+Scots Gaelic
+Serbian
+Sesotho
+Shona
+Sindhi
+Sinhala
+Slovak
+Slovenian
+Somali
+Spanish
+Sundanese
+Swahili
+Swedish
+Tajik
+Tamil
+Tatar
+Telugu
+Thai
+Tigrinya
+Turkish
+Turkmen
+Uyghur
+Ukrainian
+Urdu
+Uzbek
+Vietnamese
+Welsh
+Xhosa
+Yiddish
+Yoruba
+Zulu
+Foreign transfer duty
+Fact sheet
+Additional duty is imposed when a foreign person acquires residential property.
+First published: 23 October 2026
+Last updated: 23 October 2026
+Transfer duty is charged on dutiable transactions over dutiable property. The person liable to pay duty is generally the purchaser, transferee or person receiving the property. See information about dutiable property and transactions .
+Additional duty of 7% applies when foreign persons purchase residential property. See Commissioner’s Practice DA 44 for an explanation of how the Commissioner will determine a person’s foreign status and whether property is residential property.
+Each purchaser must complete a foreign transfer duty declaration if the transaction involves land, including commercial land.
+See the attached fact sheet for examples and more detailed explanations of this information.
+Foreign person
+Show more
+A foreign person can be a foreign individual, a foreign corporation or a foreign trustee.
+Foreign individual
+A foreign individual means an individual who is not:
+an Australian citizen as defined in the Australian Citizenship Act 2007 (Commonwealth) section 3 or
+the holder of a permanent visa or special category visa as defined in the Migration Act 1958 (Commonwealth) section 5(1).
+A permanent visa is a visa to remain in Australia indefinitely without condition. Holders of permanent visas are commonly referred to as Australian permanent residents.
+Temporary visas, including those that allow the visa holder to remain indefinitely but are subject to the happening of a certain event (such as assessment of their permanent visa application) or only apply while the visa holder has a specified status, are not permanent visas. Common examples of visas that provide the right to remain indefinitely, but are not permanent visas include:
+Partner (temporary) visa - subclass 820
+Bridging visas A, B, C and E - subclasses 010, 020, 030, 050, 051
+If you are uncertain about your visa status, we recommend contacting the Department of Home Affairs to confirm if your visa is a permanent or temporary visa under section 30(1) or 30(2) of the Migrations Act 1958 .
+Foreign corporation
+A foreign corporation is a corporation:
+that was incorporated outside Australia or
+in which foreign persons have a controlling interest.
+Foreign persons are taken to have a controlling interest in a corporation if one or more foreign persons or their associates directly or indirectly control at least 50 per cent of the voting or potential voting power, or hold at least 50 per cent of the issued shares in the corporation.
+Voting power in a corporation refers to the number of votes that might be cast at a general meeting of a corporation. Potential voting power in a corporation refers to the voting power based on the assumption that the votes:
+may exist in the future because of an exercise of a right and
+if they came into existence, would be capable of being cast at a general meeting of a corporation.
+Foreign trustee
+A foreign trustee is a trustee of a foreign trust. An individual or corporation acting as trustee for a foreign trust is considered a foreign trustee, even if they are not a foreign person in their own capacity.
+A foreign trust is:
+a discretionary trust controlled by a foreign person or
+a discretionary trust in which one or more foreign persons that are takers in default, together with their associates, hold at least 50 per cent interest in the discretionary trust or
+a trust (other than a discretionary trust) where one or more foreign persons, together with their associates, hold beneficial interests in at least 50 per cent of the income or property of the trust.
+A person controls a discretionary trust if they are in a position to directly or indirectly influence the vesting of the capital of the trust property or the distribution of income from the trust property. This includes the trustee of a trust.
+Associates
+A person is an associate of another person if they are:
+family members or
+related corporations or
+trustees of trusts sharing any common beneficiary or
+an individual and a corporation where that individual is a majority shareholder, director or secretary of the corporation (or a related corporation) or
+a trustee and a beneficiary of the same trust or
+a corporation and a trustee of a trust where the corporation or its majority shareholder, director or secretary is a beneficiary or
+a corporation and a trustee of a trust where a related corporation is a beneficiary or
+partners in the same partnership.
+If a beneficiary of a trust, other than a unit trust scheme or a discretionary trust, is an associate of a person, the trustee is also treated as an associate of that person.
+Residential property
+Show more
+Residential property is land which is:
+currently used, capable of being used, or intended to be used solely or dominantly for residential purposes or
+vacant (or substantially vacant) and zoned solely for residential purposes,
+and includes any estate or interest in land or anything that is part of the land as a fixture.
+The value of any chattels transferred with residential property will be combined with the value of the property if the chattels are directly linked to or are incidental to the use of the property. Examples include white goods, furniture, appliances, air conditioners, gardening equipment and portable pools.
+Examples of properties capable of being (or intended to be) used solely or dominantly for residential purposes include:
+established homes and apartments
+commercial property that a person intends to convert into a residence
+land on which a person intends to construct a residence
+land which a person intends to develop into residential properties or subdivide to enable another person to construct a home or apartment on the land or
+partially constructed residences which a person intends to complete.
+If multiple lots are acquired, each lot will be considered separately to determine if the lot is residential property.
+See Commissioner’s Practice DA 44 ‘Residential Property for the Purposes of Foreign Transfer Duty’ for information about when foreign transfer duty applies.
+Excluded property
+Show more
+Certain property is specifically excluded from foreign transfer duty because it is not residential property. This is:
+land that is intended to be used solely or dominantly for the purposes of an aged care facility
+land intended to be used solely or dominantly for the purposes of commercial residential premises
+land intended to be used solely or dominantly for the purposes of a retirement village
+an easement
+a security interest
+a carbon right or carbon covenant registered under the Carbon Rights Act 2003 and
+things fixed to the land that will be permanently removed.
+Exempt transactions
+Show more
+If a dutiable transaction is exempt or partially exempt from transfer duty or chargeable with nominal duty, it will generally be exempt or partially exempt from foreign transfer duty.
+However, foreign transfer duty applies to certain transactions exempt from duty, or charged with nominal duty, if:
+the transferee is a foreign person and
+foreign transfer duty was not charged when the property was originally acquired, unless the property was originally acquired by the transferor before 1 January 2019.
+When the transferee is not a foreign person
+An agreement to transfer residential property will be exempt from foreign transfer duty when the purchaser on the agreement is a foreign person but the transferee on the transfer is not and no double duty applies to the transfer because:
+the transferee is related to the purchaser or
+the purchaser was acting as agent for the transferee or
+the purchaser is a trustee for a related beneficiary or
+the purchaser enters into an agreement to acquire property with the intention of transferring it to a corporation which was in the process of being incorporated, or a dormant corporation which was in the process of being acquired.
+If a purchaser who was a foreign person at the time of executing the agreement is no longer a foreign person when the property is transferred to them, submit Form FDA42 ‘Foreign Transfer Duty - Change in Foreign Status’ .
+Residential developer exemptions
+An exemption from foreign transfer duty may apply if the foreign person constructs, refurbishes or subdivides property to create ten or more residential dwellings, or lots on which ten or more dwellings can be constructed.
+If the transaction was entered into on or before 6 May 2026 - foreign transfer duty may be reassessed and the amount refunded to the taxpayer.
+If the transaction was entered into on or after 7 May 2026 - an upfront exemption may apply.
+For transactions entered into on or after 7 May 2026, an upfront build-to-sell exemption may apply to property purchased by foreign persons who will add at least one additional dwelling to the housing supply by:
+constructing a new dwelling or dwellings on the land for sale or
+creating a new dwelling or dwellings on the land for sale by substantially refurbishing an existing building, or part of a building, that is not capable of being used solely or dominantly as a place of residence.
+See the foreign buyers duty webpage for links to the relevant application forms, each of which contains full eligibility conditions and details of required supporting documents.
+Transfers between spouses or de facto partners
+The transfer of certain residential property between spouses or de facto partners is exempt from transfer duty.
+If a person acquires property on or after 1 January 2019 and later transfers a 50 per cent interest to a spouse or de facto partner who is a foreign person, foreign transfer duty is chargeable on the 50 per cent transfer unless it was paid on the original acquisition.
+Vesting of a discretionary trust
+Nominal duty applies to an eligible transfer of property to a taker in default of a discretionary trust on the vesting or termination of the trust.
+If the trust purchased residential property on or after 1 January 2019, foreign transfer duty will apply to the transfer of the property from vesting or terminating the trust if the taker in default is a foreign person and did not pay foreign transfer duty on the original purchase.
+Transfers of dutiable property to a beneficiary of a trust
+Nominal duty applies to transfers of trust property to a beneficiary of the trust.
+If the trust acquired residential property on or after 1 January 2019, foreign transfer duty will apply to the transfer of the property to a beneficiary who is a foreign person if the trustee did not pay foreign transfer duty on the original purchase.
+Transfers to a real purchaser
+Nominal duty applies to certain transactions where property was held by an apparent purchaser and is transferred to the real purchaser who provided the funds for the purchase.
+If the apparent purchaser acquired the property on or after 1 January 2019, foreign transfer duty will apply to the transfer of the property to a foreign real purchaser if the apparent purchaser did not pay it on the original purchase.
+No double duty
+Show more
+Foreign transfer duty will not be charged on two or more dutiable transactions relating to the same transaction. This applies to the transfer of, or declaration of trust over, residential property if the agreement has already been endorsed for foreign transfer duty and the transfer or declaration is in conformity with the agreement.
+If a transfer to a foreign person is not in conformity with an agreement because the transferee is different to the purchaser, foreign transfer duty will not be chargeable on the transfer if the agreement has already been endorsed for foreign transfer duty and:
+the transferee is related to the purchaser or
+the purchaser was acting as agent for the transferee or
+the purchaser is a trustee for a related beneficiary or
+the purchaser enters into an agreement to buy property to transfer it to a corporation which was in the process of being incorporated, or a dormant corporation which was in the process of being acquired or
+the purchaser enters into an agreement for the transfer of the property that results in the property becoming scheme property for a managed investment scheme.
+See more information about no double duty transactions .
+First home owners
+Show more
+When the first home owner rate of duty is applied to a transaction and one or more of the purchasers are foreign persons, the transaction will be chargeable with foreign transfer duty on the dutiable value of the foreign person’s interest in the property.
+Documents
+Foreign Transfer Duty Fact Sheet (PDF, 241.64KB)
+Related services and information
+About foreign buyers duty
+Make a foreign buyers duty enquiry
+Foreign transfer duty: duty requirements
+Duties CP - Foreign Transfer Duty
+Change in foreign status
+Sidebar
+Related information
+Transfer duty
+Foreign buyers duty
+Calculate duty
+Find a form or publication
+See how to contact us
+Provided by
+Department of Treasury and Finance
+Contact
+Telephone:
+61 8 9262 1100 (Duties)
+61 8 9262 1113 (Online Duties)
+1300 368 364 (WA country landline callers)
+Monday to Friday, 8.30am-4.30pm
+Make a Duties enquiry
+Make an Online Duties enquiry
+Provide feedback
+Print this page
+Share
+Facebook share (Opens in a new tab/window)
+X (Opens in a new tab/window)
+LinkedIn (Opens in a new tab/window)
+Copy URL
+Have a question or want to report a problem?
+Fill in the form to get assistance or tell us about a problem with this information or service.
+Send feedback
+Acknowledgement of Country, Footer navigation and Copyright info
+Acknowledgement of Country
+The Government of Western Australia acknowledges the traditional custodians throughout Western Australia and their continuing connection to the land, waters and community. We pay our respects to all members of the Aboriginal communities and their cultures; and to Elders both past and present.
+© Government of Western Australia 2017 to 2026

@@ -1,0 +1,149 @@
+Source: https://moneysmart.gov.au/home-loans/choosing-a-home-loan
+Retrieved: 2026-10-27
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML 67f0f62a74334a2bbefd1b01764183373031ade547f910232181df0cb7034a6a
+
+Choosing a home loan - Moneysmart.gov.au
+Skip to main content
+Choosing a home loan
+Last updated: 16 September 2026
+Spending some time choosing a good-value home loan can save many thousands of dollars over time. A home loan is a long-term debt so even a small difference in cost adds up over time.
+Home loan basics
+Your home loan (mortgage) might be the biggest debt – for the longest period of time – that you ever have. Choosing a loan that’s right for you can save you thousands of dollars over time. The first step is to choose between a principal and interest (P&I) or an interest-only loan.
+Principal and interest loans
+Principal and interest will pay off the loan - most people get this type of home loan. You make regular repayments on the amount borrowed (the principal), plus you pay interest on that amount. You pay off the loan over an agreed period of time (loan term), for example, 30 years.
+Interest-only loans
+For an initial period (for example, five years), your repayments only cover interest on the amount borrowed. You aren't paying off the principal you borrowed, so your debt isn't reduced. Repayments may be lower during the interest-only period, but they will go up after that. Make sure you can afford them. See interest-only home loans .
+Tip: choose the shortest loan term you can afford
+Your loan term is how long you have to pay off the loan. It impacts the size of your mortgage repayments and how much interest you'll pay.
+A shorter loan term (for example, 25 years) means higher repayments, but you'll pay less in interest.
+A longer loan term (for example, 30 years) means lower repayments, but you'll pay more in interest.
+You can use our mortgage calculator to work out what your repayments would be - and what the total cost of your home loan would be - depending on the interest rate and the length of the loan.
+Try the Moneysmart mortgage calculator now
+Compare interest rates
+An interest rate even 0.2% lower could save you thousands of dollars over time. The Moneysmart mortgage calculator shows current average interest rates for both principal and interest and interest-only home loans, across both owner occupier and investment loans.
+It’s important to weigh up the pros and cons of fixed and variable interest rates to decide which suits you.
+A fixed interest rate stays the same for a set period, usually between one and five years. During that time, your repayments won't change, even if market interest rates rise or fall.
+A variable interest rate can go up or down over time. Your lender decides whether to change the rate and by how much.
+A partially-fixed rate (split loan) means a portion of your loan has a fixed rate and the rest has a variable rate. You can decide how to split the loan (for example, 50/50 or 20/80).
+Check the average mortgage interest rate
+Mortgage features may come at a cost
+Home loans with more options or features can come at a higher cost. These could include an offset account , redraw or line of credit facilities. Most are ways of putting extra money into your loan to reduce the amount of interest you pay.
+Weigh up if features are worth it
+For example, suppose you are considering a $750,000 loan with an offset account. If you're able to keep $50,000 of savings in the offset, you'll pay interest on $700,000. But if your offset balance will always be low (for example under $10,000), it may not be worth paying for this feature.
+Avoid paying more for 'nice-to-have' options
+When comparing loans, consider your lifestyle and what options you really need. What features are 'must-haves'? What are 'nice-to-haves'? Is it worth paying extra for features you may never use? You may be better off choosing a basic loan with limited features.
+Work out what you can afford to borrow
+Be realistic about what you can afford. To give yourself some breathing room, calculate what your costs would be if interest rates went up by 3%.
+Use the Moneysmart mortgage calculator to see what your repayments might be at different interest rates
+Get the Key Fact Sheets
+With the amount you can afford to borrow, compare loans from at least two different lenders. Check the loan interest rates, fees and features to get the best loan for you.
+For all home loans you want to compare, get the Key Fact Sheet for that loan, based on the amount you're likely to borrow. You can generally get the Key Fact sheet from your mortgage broker (if you're using one), from the lender directly, or from the lender’s website.
+The Key Fact Sheet is compulsory, and the layout is the same for every home loan across every lender. That way you can be confident that you're comparing like for like.
+When you ask for the fact sheet, you’ll need to decide:
+repayment method – will you pay principal and interest or interest-only?
+repayment frequency – will you pay monthly, fortnightly, or some other frequency?
+type of interest rate – will you choose variable, or fixed, or a mix of both?
+Once you’ve got the Key Fact Sheets for all the loans you're considering, compare these features:
+Interest rate (per year)
+The interest rate you’ll be charged initially
+Peronalised comparison rate
+A single figure that combines the interest rate and most fees. This can help you compare the overall cost of different loans.
+Total amount to be paid back
+Shows how much you’ll repay over the life of the loan, including the amount borrowed and fees.
+Monthly repayment
+How much you'll have to pay each month on a loan
+Establishment fees
+Upfront fees charged when you take out the loan
+Ongoing fees
+Fees charged every month or year for administering a loan, also called service or administration fees
+Questions to ask that aren't covered by the Key Facts Sheet
+The Key Facts Sheet is a great way to compare the cost of different loans, but it doesn't include every feature or condition. Before choosing a loan, ask the mortgage broker or lender:
+Can I make extra repayments without paying a fee?
+Is there an offset account or redraw facility?
+Are there fees for using loan features?
+Can I switch to a different loan later?
+Are there break costs if I repay the loan early or refinance?
+What happens when a fixed or introductory interest rate ends?
+Are there any other fees or charges that could apply?
+Different lenders offer different features and conditions. Compare these alongside the cost information in the Key Facts Sheet to find the loan that's right for you.
+With many lenders to choose from, you may decide to get a mortgage broker to find loan options for you. See using a mortgage broker for tips on what to ask your lender or broker.
+Do you find this page useful?
+Yes
+No
+Why?
+It had the information I was looking for
+The page makes sense
+The information is balanced and unbiased
+The information gave me a sense of what to do next
+Submit
+Any other feedback
+Why not?
+It didn't have the information I was looking for
+The page was confusing
+The information overwhelmed me
+There wasn't enough information for me to take action
+Submit
+Any other feedback
+Your feedback
+Your feedback relates to:
+Please select...
+Webpage Content
+Calculator or tool
+Complaint or scam
+Copyright requests
+Loans, money and personal finance advice
+Other feedback/suggestion
+You would like to:
+Please select...
+Report an Error
+Comment on a Webpage
+Ask a question
+Your issue is:
+Please select...
+You don't understand the calculator result
+You believe the calculator is incorrect
+The calculator/tool does not work (eg technical issue)
+You want to provide general feedback/suggestions
+Error loading Partial View script (file: ~/Views/MacroPartials/MoneySmart/Standard text.cshtml)
+Error loading Partial View script (file: ~/Views/MacroPartials/MoneySmart/Standard text.cshtml)
+Error loading Partial View script (file: ~/Views/MacroPartials/MoneySmart/Standard text.cshtml)
+Summary of your feedback:
+Your comments:
+The page/calculator/app you are referring to (eg. cut/paste URL):
+Cancel
+Send feedback
+Up next in Home loans
+Buying a house
+Step through the house buying process, so you know what to expect
+7 min read
+Using a mortgage broker
+Before using a mortgage broker, understand how they work, how they get paid, and what to ask to make sure you're getting a loan that suits your needs.
+4 min read
+Fixed vs variable home loan interest rates
+What's the difference between fixed and variable home loan rates? Learn the pros, cons and key questions to ask before choosing a loan.
+92 min read
+Mortgage calculator
+Small differences in your mortgage interest rate can make a big difference to the long-term cost of your home loan
+3 min read
+Interest-only home loans
+Decide whether an interest-only home loan is right for you
+3 min read
+Interest-only mortgage calculator
+This calculator helps you to work out your mortgage repayments before and after the interest-only period
+2 min read
+Switching home loans
+Work out if you could save money by switching to another mortgage
+3 min read
+Mortgage switching calculator
+Calculate the cost of switching your mortgage, to decide whether you could save money
+5 min read
+Pay off your mortgage faster
+Some Moneysmart tips to get rid of your mortgage debt faster
+3 min read
+Problems paying your mortgage
+If you're struggling with your home loan repayments, there is help available. The earlier you get help, the more options you'll have
+4 min read
+Mortgage offset accounts
+Learn how a mortgage offset account works, how it can reduce your home loan interest, and whether it’s worth having.
+5 min read
+search

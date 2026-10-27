@@ -334,7 +334,7 @@ fill_investor_foreign(_Args, Upstream) ->
     {Outcome, <<"summary-card">>, KbVersions}.
 
 %% the non-resident-investment deposit % (kb.non-resident.investment-loan-deposit-requirements):
-%% midpoint of the 30-40% band — matches the blueprint's own stated default (35).
+%% midpoint of the band its lenders publish (20-25%, La Trobe Financial and Brighten).
 -spec deposit_pct_foreign() -> number().
 deposit_pct_foreign() ->
     Slug = <<"kb.non-resident.investment-loan-deposit-requirements">>,

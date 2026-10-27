@@ -1,0 +1,2694 @@
+Source: https://www.legislation.gov.au/F2025L00682/latest/text
+Retrieved: 2026-10-27
+Extracted: pdftotext -layout of https://www.legislation.gov.au/F2025L00682/asmade/2025-06-13/text/original/pdf (the latest version: compilation 0, no unincorporated amendments, per /F2025L00682/latest/downloads on 2026-10-27); sha256 of the PDF 9c03b38338b7a172a2f651364a1b3502d04f3a5c8ed07e8ac5977b670b267790
+
+Help to Buy Program Directions 2025
+I, Clare O’Neil, Minister for Housing, Minister for Homelessness, and Minister for Cities,
+being satisfied of the matters listed in section 46 of the Help to Buy Act 2024 (about State
+and Territory approval), and having regard to the object of that Act, make the following
+directions.
+
+
+
+Dated           13 June 2025
+
+
+
+
+Clare O’Neil
+Minister for Housing
+Minister for Homelessness
+Minister for Cities
+
+
+
+
+                           Authorised Version F2025L00682 registered 13/06/2025
+Authorised Version F2025L00682 registered 13/06/2025
+Contents
+Part 1—Introduction                                                                                                                                       1
+   Division 1—Preliminary                                                                                                                                  1
+             1 Name .......................................................................................................................................1
+             2 Commencement........................................................................................................................1
+             3 Authority ..................................................................................................................................1
+   Division 2—Simplified outline of this instrument                                                                                         2
+             4 Simplified outline of this instrument........................................................................................2
+   Division 3—Definitions                                                                                                                                  3
+             5 Definitions ................................................................................................................................3
+             6 Definition of adequately insured..............................................................................................6
+             7 Price caps..................................................................................................................................6
+             8 Single and joint income thresholds ..........................................................................................7
+             9 Indexing the income thresholds................................................................................................7
+             10 References to participants ......................................................................................................8
+
+Part 2—Entering into Help to Buy arrangements                                                                                                             9
+   Division 1—Introduction                                                                                                                         9
+             11 Simplified outline of this Part ................................................................................................9
+             12 Application of this Part...........................................................................................................9
+   Division 2—When can Housing Australia enter into a Help to Buy
+              arrangement?                                                                                             10
+             13 Housing Australia can only enter into arrangements where this instrument permits...........10
+             14 Housing Australia may enter into arrangements with one or more applicants ....................10
+             15 Circumstances in which Housing Australia may revoke approvals .....................................11
+             16 Minimum and maximum contributions to purchase price....................................................12
+   Division 3—Who is an eligible applicant?                                                                                                  13
+             17 Who is an eligible applicant? ...............................................................................................13
+             18 Exception to requirement not to hold interest in real estate .................................................13
+             19 Income test for single and joint applicants...........................................................................14
+             20 Financial capacity test for single and joint applicants..........................................................14
+   Division 4—What is an eligible property?                                                                                                  15
+             21 What is an eligible property?................................................................................................15
+   Division 5—Contract, mortgage and timeframe requirements                                                                                  16
+             22 Requirements relating to mortgages.....................................................................................16
+             23 New home contract requirements.........................................................................................16
+             24 Timeframe requirements ......................................................................................................17
+   Division 6—Securing Housing Australia’s entitlement to a return                                             18
+             25 The Commonwealth share and Commonwealth share percentage ......................................18
+
+Part 3—Participating in the Help to Buy program                                                                                                         20
+   Division 1—Introduction                                                                                                                       20
+             26 Simplified outline of this Part ..............................................................................................20
+             27 Application of this Part.........................................................................................................20
+   Division 2—Participation requirements                                                                                        21
+             28 Arrangements must require compliance with participation requirements............................21
+             29 Exceptions to sale of existing property requirement ............................................................21
+             30 Exceptions to principal place of residence requirement: all properties................................21
+             31 Delayed application of principal place of residence requirement: new homes....................22
+
+
+                                                 Help to Buy Program Directions 2025                                                                           i
+
+
+
+                                Authorised Version F2025L00682 registered 13/06/2025
+               32 Borrowing additional funds under a mortgage from participating lenders ..........................22
+     Division 3—Monitoring participants’ compliance                                                                                             24
+               33 Housing Australia must monitor participant compliance.....................................................24
+               34 Housing Australia must conduct 5-yearly reviews...............................................................24
+               35 Housing Australia must review arrangement where mortgage with a participating
+                       lender is discharged.....................................................................................................25
+     Division 4—Managing participants’ compliance                                                                                                26
+               36 How Housing Australia is to respond where review identifies potential
+                       non-compliance ...........................................................................................................26
+               37 Housing Australia may require repayment and terminate arrangement...............................26
+     Division 5—Varying arrangements                                                                                                  30
+               38 Varying the participants in an arrangement .........................................................................30
+               39 Varying or entering into new construction contracts ...........................................................30
+     Division 6—Terminating arrangements in specified circumstances                                                                                32
+               40 Housing Australia must reserve power to terminate arrangements in certain
+                       circumstances ..............................................................................................................32
+
+Part 4—Exiting the program                                                                                                                       33
+     Division 1—Introduction                                                                                                                       33
+               41 Simplified outline of this Part ..............................................................................................33
+               42 Application of this Part.........................................................................................................33
+     Division 2—Exiting the program                                                                                                    34
+               43 Housing Australia must allow voluntary early repayments .................................................34
+               44 Housing Australia must allow the relevant property to be sold ...........................................34
+               45 Options for deceased estates of participants.........................................................................34
+
+Part 5—Miscellaneous                                                                                                                             36
+     Division 1—Introduction                                                                                                                    36
+               46 Simplified outline of this Part ..............................................................................................36
+     Division 2—Allocating Help to Buy places                                                                                                   37
+               47 Application of this Division .................................................................................................37
+               48 Allocating places—first year of the program .......................................................................37
+               49 Committing and using places—first year of the program ....................................................37
+               50 Allocating places—subsequent years of the program ..........................................................38
+               51 Committing and using places—subsequent years of the program .......................................39
+               52 Actions where a State intends to cease participating ...........................................................40
+               53 Managing places where purchase does not settle.................................................................41
+     Division 3—Administering the program                                                                                                       42
+               54 Application of this Division .................................................................................................42
+               55 Indexing relevant amounts ...................................................................................................42
+               56 Meaning of CPI index number .............................................................................................43
+               57 Housing Australia must not charge certain fees...................................................................43
+               58 Valuing a relevant property..................................................................................................43
+               59 Timing of Housing Australia’s financial contributions to purchase price ...........................44
+               60 Home improvements ............................................................................................................45
+               61 Housing Australia must have an internal complaints review mechanism............................45
+               62 Housing Australia must establish arrangements for approving participating lenders..........45
+               63 Housing Australia may rely on information.........................................................................46
+               64 How Housing Australia must manage arrangements where participant is
+                        experiencing hardship .................................................................................................46
+               65 Principles for operation of the Help to Buy program...........................................................46
+
+
+ii                                  Help to Buy Program Directions 2025
+
+
+
+
+                                Authorised Version F2025L00682 registered 13/06/2025
+Schedule 1—Participation requirements                                                                                                        48
+          1.1 Sale of existing property......................................................................................................48
+          1.2 Participant must remain only registered owner of property ................................................48
+          1.3 Property must remain principal place of residence .............................................................48
+          1.4 Participant must not take out further mortgages over property...........................................48
+          1.5 Participant must notify Housing Australia when borrowing additional funds from a
+                   participating lender......................................................................................................48
+          1.6 Participant must not receive assistance from other relevant schemes.................................49
+          1.7 Participant must not acquire disqualifying property interest...............................................49
+          1.8 Participant must maintain the property ...............................................................................49
+          1.9 Participant must not lease the property ...............................................................................49
+          1.10 Participant must not use the property for business purposes.............................................49
+          1.11 Participant must maintain adequate insurance ..................................................................49
+          1.12 Participant must pay ongoing costs ...................................................................................50
+          1.13 Participant must notify Housing Australia of relevant changes of circumstances ............50
+          1.14 Participant may only vary or enter new construction contract in certain cases ................50
+
+
+
+
+                                            Help to Buy Program Directions 2025                                                              iii
+
+
+
+                           Authorised Version F2025L00682 registered 13/06/2025
+Authorised Version F2025L00682 registered 13/06/2025
+                                                                                           Introduction Part 1
+                                                                                        Preliminary Division 1
+
+                                                                                                      Section 1
+
+
+Part 1—Introduction
+Division 1—Preliminary
+
+1 Name
+              This instrument is the Help to Buy Program Directions 2025.
+
+2 Commencement
+       (1) Each provision of this instrument specified in column 1 of the table commences,
+           or is taken to have commenced, in accordance with column 2 of the table. Any
+           other statement in column 2 has effect according to its terms.
+
+ Commencement information
+ Column 1                    Column 2                                                        Column 3
+ Provisions                  Commencement                                                    Date/Details
+ 1. The whole of this        The day after this instrument is registered.
+ instrument
+              Note:     This table relates only to the provisions of this instrument as originally made. It will
+                        not be amended to deal with any later amendments of this instrument.
+
+       (2) Any information in column 3 of the table is not part of this instrument.
+           Information may be inserted in this column, or information in it may be edited, in
+           any published version of this instrument.
+
+3 Authority
+              This instrument is made under the Help to Buy Act 2024.
+
+
+
+
+                                        Help to Buy Program Directions 2025                                        1
+
+
+
+                             Authorised Version F2025L00682 registered 13/06/2025
+Part 1 Introduction
+Division 2 Simplified outline of this instrument
+
+Section 4
+
+Division 2—Simplified outline of this instrument
+
+4 Simplified outline of this instrument
+
+              This instrument gives directions to the Board about the performance of certain
+              functions of Housing Australia under the Act. The Act requires Housing
+              Australia to take all reasonable steps to comply with these directions when
+              performing those functions.
+
+              This instrument has 5 Parts. Part 1 deals with preliminary matters, including the
+              definitions of key terms.
+
+              Part 2 deals with entry into Help to Buy arrangements. The provisions in Part 2
+              are relevant to the performance of Housing Australia’s functions in relation to
+              participating States and the Territories. They set out the circumstances in which
+              Housing Australia may enter into a Help to Buy arrangement, including by
+              specifying the individuals and properties in respect of which Housing Australia
+              may enter into such arrangements.
+
+              Part 3 deals with participation in the Help to Buy program. The provisions in
+              Part 3 are relevant to the performance of Housing Australia’s functions in
+              relation to both participating and cooperating States and the Territories. Among
+              other things, Part 3 provides for the conditions of participation in Help to Buy
+              arrangements and the consequences of failing to comply with them.
+
+              Part 4 sets out how an individual can end a Help to Buy arrangement early. Part 4
+              is relevant to the performance of Housing Australia’s functions in relation to
+              both participating and cooperating States and the Territories. It provides, among
+              other things, for Housing Australia to accept voluntary early repayments, and for
+              arrangements to end upon the sale of the relevant property (subject to certain
+              exceptions), and covers arrangements for deceased estates of participants.
+
+              Part 5 deals with miscellaneous matters, such as Housing Australia’s ability to
+              charge fees in relation to arrangements, the approval of participating lenders, and
+              the making of improvements to relevant properties. Part 5 is relevant to the
+              performance of Housing Australia’s functions in relation to both participating
+              and cooperating States and the Territories.
+
+
+
+
+ 2                             Help to Buy Program Directions 2025
+
+
+
+
+                             Authorised Version F2025L00682 registered 13/06/2025
+                                                                                        Introduction Part 1
+                                                                                      Definitions Division 3
+
+                                                                                                   Section 5
+
+Division 3—Definitions
+
+5 Definitions
+Note:   Expressions have the same meaning in this instrument as in the Help to Buy Act 2024 as in force from
+        time to time—see paragraph 13(1)(b) of the Legislation Act 2003.
+
+             In this instrument:
+             adequately insured: see section 6.
+             administrative costs include legal costs, conveyancing costs and stamp duty,
+             where applicable.
+             agreed percentage: see section 16.
+             allocated: a place is allocated where it is made available for use for an
+             arrangement in respect of property in a particular State or Territory under
+             section 48 or 50.
+             arrangement means a Help to Buy arrangement.
+             Australian Defence Force has the same meaning as in the Defence Act 1903.
+             Australian Statistical Geography Standard means the Australian Statistical
+             Geography Standard (ASGS) Edition 3, as published by the Australian
+             Statistician on 20 July 2021.
+             Note:       The Australian Statistical Geography Standard could in 2025 be viewed on the
+                         Australian Bureau of Statistics website (https://www.abs.gov.au).
+
+             capital city, of a State or the Northern Territory, means the Greater Capital City
+             Statistical Area (within the meaning of the Australian Statistical Geography
+             Standard) in that State or Territory.
+             committed: a place is committed where:
+               (a) an applicant or applicants have applied for an arrangement; and
+              (b) Housing Australia has not yet approved the application under
+                   subsection 14(4); and
+               (c) Housing Australia has decided that it is reasonably likely that the applicant
+                   or applicants will satisfy paragraph 14(4)(c) (eligibility), disregarding the
+                   financial capacity test; and
+              (d) the applicant or applicants have obtained mortgage pre-approval from a
+                   participating lender for such funds as they are likely to require in order to
+                   purchase the relevant property (when combined with their deposit and the
+                   Commonwealth’s contribution).
+             Commonwealth company has the meaning given by section 89 of the Public
+             Governance, Performance and Accountability Act 2013.
+             Commonwealth entity has the meaning given by section 10 of the Public
+             Governance, Performance and Accountability Act 2013.
+             Commonwealth share: see section 25.
+             Commonwealth share percentage: see paragraph 25(1)(b).
+
+
+                                        Help to Buy Program Directions 2025                                    3
+
+
+
+                              Authorised Version F2025L00682 registered 13/06/2025
+Part 1 Introduction
+Division 3 Definitions
+
+Section 5
+             CPI index number: see section 56.
+             credit activities has the same meaning as in the National Consumer Credit
+             Protection Act 2009.
+             credit service has the same meaning as in the National Consumer Credit
+             Protection Act 2009.
+             dependent child: an individual is a dependent child of a second individual (the
+             adult) if:
+              (a) the adult is a natural or adoptive parent or a legal guardian of the child; and
+              (b) either:
+                     (i) the individual is a dependent child of the adult within the meaning of
+                         subsections 5(2) to (7) of the Social Security Act 1991; or
+                    (ii) the individual lives with the adult and is in receipt of a disability
+                         support pension within the meaning of the Social Security Act 1991.
+             disqualifying property interest: an individual holds a disqualifying property
+             interest if they hold:
+               (a) a freehold interest in real property in Australia; or
+               (b) a lease of land in Australia (including a renewal or extension of such a
+                   lease) as described in paragraph 104-115(1)(b) of the Income Tax
+                   Assessment Act 1997; or
+               (c) a company title interest (within the meaning of Part X of the Income Tax
+                   Assessment Act 1936) in land in Australia;
+             including a beneficial interest in any of the above.
+             eligible applicant: see section 17.
+             eligible property: see section 21.
+             financial capacity test, in relation to an applicant for an arrangement: see
+             section 20.
+             hardship includes financial hardship.
+             income test, in relation to an applicant for an arrangement: see section 19.
+             Investment Mandate has the same meaning as in the Housing Australia
+             Act 2018.
+             joint income threshold: see section 8.
+             lender means a person who carries on a business of making loans.
+             mortgage requirements: see section 22.
+             new home means a dwelling that meets the requirements of
+             paragraph 40-75(1)(a) of the A New Tax System (Goods and Services Tax)
+             Act 1999, other than a dwelling that, prior to sale, has been rented or leased, or
+             made available for rental or lease, as commercial residential premises or
+             residential premises (as those terms are defined in that Act).
+
+
+
+ 4                           Help to Buy Program Directions 2025
+
+
+
+
+                           Authorised Version F2025L00682 registered 13/06/2025
+                                                                         Introduction Part 1
+                                                                       Definitions Division 3
+
+                                                                                     Section 5
+new home contract requirements: see section 23.
+participant: see section 10.
+participating lender means a lender that has been approved by Housing
+Australia under section 62, and has not been notified, in writing, that the
+approval has been revoked.
+participation requirements: see section 28 and Schedule 1.
+price cap: see section 7.
+place means the opportunity to enter into an arrangement.
+population of a State or a Territory, or of Australia, for a particular financial
+year, means the population of the State, Territory, or Australia, as most recently
+estimated and published by the Australian Statistician as at 30 June of the
+preceding financial year.
+Note:     The Australian Statistician’s estimates of population could in 2025 be viewed on the
+          Australian Bureau of Statistics website (https://www.abs.gov.au) in quarterly
+          publications titled National, state and territory population.
+
+purchase price, in relation to:
+  (a) a house and land package; or
+ (b) separate arrangements for the purchase of land and the construction of a
+      dwelling on that land;
+means the sum of the purchase price for the land and the contract price for the
+construction of a dwelling on that land.
+regional centre: see subsection 7(2).
+relevant property means the residential property that is, or is to be, the subject of
+an arrangement.
+repayment means a payment made by a participant in an arrangement to reduce
+the Commonwealth share in respect of the relevant property.
+shared equity scheme means a scheme (other than an arrangement) in relation to
+a residential property that is an arrangement or contract with one or more
+individuals under which the Commonwealth, or a State or Territory:
+  (a) contributes (including by means of a loan) part of the cost of the individual
+      or individuals acquiring the residential property; and
+  (b) is entitled to a return on that contribution worked out, in whole or in part,
+      by reference to the value of the residential property at one or more times;
+      and
+  (c) secures that entitlement by means of a mortgage or other right relating to
+      the residential property.
+single, in relation to an individual, means an individual that does not have a
+spouse or de facto partner.
+single income threshold: see section 8.
+single parent means a single individual who has at least one dependent child.
+
+
+                         Help to Buy Program Directions 2025                                     5
+
+
+
+              Authorised Version F2025L00682 registered 13/06/2025
+Part 1 Introduction
+Division 3 Definitions
+
+Section 6
+                  Note:     A single parent includes someone who has legal guardianship of a child: see the
+                            definition of “dependent child”.
+
+                  Statistical Area Level 4 area has the same meaning as in the Australian
+                  Statistical Geography Standard.
+                  taxable income has the meaning given by the Income Tax Assessment Act 1997.
+                  the Act means the Help to Buy Act 2024.
+                  timeframe requirements: see section 24.
+                  used: a place is used when Housing Australia approves an application to enter
+                  into an arrangement with a participant or joint participants in respect of the place
+                  (whether or not the arrangement is actually entered into at that time).
+                  wage price index number, for a quarter, is the Wage Price Index (total hourly
+                  rates of pay excluding bonuses/all sectors/all Australia/original) number
+                  published by the Australian Statistician in respect of that quarter.
+                  Note:     The Wage Price Index could in 2025 be viewed on the Australian Bureau of Statistics
+                            website (https://www.abs.gov.au).
+
+
+6 Definition of adequately insured
+                  Where an arrangement has been entered into in respect of a relevant property, the
+                  property is adequately insured at a particular time if:
+                    (a) the arrangement specifies insurance requirements; and
+                   (b) those requirements are met at that time.
+                  Note 1:   Housing Australia cannot enter into an arrangement in respect of a relevant property
+                            unless it is satisfied that the property, once purchased, will be adequately insured: see
+                            paragraph 14(4)(g).
+                  Note 2:   A participant must keep the relevant property adequately insured across the life of an
+                            arrangement: see section 28 and clause 1.11 of Schedule 1.
+
+
+7 Price caps
+
+             Price caps
+         (1) The price cap for the area in which a property is located is the amount set out in the
+             following table.
+                  Note:     The price caps are relevant to a number of provisions of this instrument, including
+                            paragraph 21(b). Paragraph 21(b) provides that a property is only an ‘eligible property’
+                            for the purposes of a proposed arrangement if the purchase price does not exceed the
+                            price cap for the area in which the property is located.
+
+
+     Price cap for an area
+     Item            Area                                                                              Price cap
+     1               New South Wales—capital city and regional centre                                      $1,300,000
+     2               New South Wales—other                                                                   $800,000
+     3               Victoria—capital city and regional centre                                               $950,000
+     4               Victoria—other                                                                          $650,000
+
+
+ 6                                 Help to Buy Program Directions 2025
+
+
+
+
+                                 Authorised Version F2025L00682 registered 13/06/2025
+                                                                                       Introduction Part 1
+                                                                                     Definitions Division 3
+
+                                                                                                Section 8
+
+  Price cap for an area
+  Item            Area                                                                       Price cap
+  5               Queensland—capital city and regional centre                                   $1,000,000
+  6               Queensland—other                                                                $700,000
+  7               Western Australia—capital city                                                  $850,000
+  8               Western Australia—other                                                         $600,000
+  9               South Australia—capital city                                                    $900,000
+  10              South Australia—other                                                           $500,000
+  11              Tasmania—capital city                                                           $700,000
+  12              Tasmania—other                                                                  $550,000
+  13              Australian Capital Territory                                                  $1,000,000
+  14              Northern Territory                                                              $600,000
+  15              Jervis Bay Territory and Norfolk Island                                         $550,000
+  16              Christmas Island and Cocos (Keeling) Islands                                    $400,000
+
+
+
+             Price caps—meaning of regional centre
+         (2) A regional centre, for a State specified in an item in the following table, is any
+             of the Statistical Area Level 4 areas specified in that item.
+
+              Item         State                                         Regional Centre
+              1            New South Wales                               Newcastle and Lake Macquarie
+                                                                         Illawarra
+                                                                         Central Coast
+                                                                         Mid-North Coast
+                                                                         Coffs Harbour–Grafton
+                                                                         Richmond–Tweed
+              2            Victoria                                      Geelong
+              3            Queensland                                    Gold Coast
+                                                                         Sunshine Coast
+
+
+
+8 Single and joint income thresholds
+         (1) The single income threshold, for a financial year, is $100,000, as indexed in
+             accordance with section 9.
+         (2) The joint income threshold, for a financial year, is $160,000, as indexed in
+             accordance with section 9.
+
+9 Indexing the income thresholds
+         (1) An amount mentioned in section 8 is to be indexed on the first day of each
+             financial year starting on or after 1 July 2026 by multiplying it by its indexation
+             factor for 1 June in the preceding financial year.
+
+
+                                        Help to Buy Program Directions 2025                              7
+
+
+
+                              Authorised Version F2025L00682 registered 13/06/2025
+Part 1 Introduction
+Division 3 Definitions
+
+Section 10
+         (2) The indexation factor for 1 June in a financial year is the number worked out as
+             follows:
+
+             Method statement
+             Step 1.     Add:
+                         (a)      the wage price index number for the quarter ending on 31 March
+                                  in that financial year; and
+                         (b)      the wage price index numbers for the 3 quarters that immediately
+                                  preceded that quarter.
+             Step 2.     Add:
+                         (a)      the wage price index number for the quarter ending on 31 March
+                                  in the immediately preceding financial year; and
+                         (b)      the wage price index numbers for the 3 quarters that immediately
+                                  preceded that quarter.
+             Step 3.     The indexation factor for 1 June in the financial year is the amount
+                         under step 1 divided by the amount under step 2.
+
+         (3) The indexation factor is to be worked out to 3 decimal places, rounding up if the
+             fourth decimal place is 5 or more.
+         (4) An amount mentioned in section 8, after indexation, must be rounded to the
+             nearest $1,000.
+
+10 References to participants
+         (1) Participant means an individual who is party to an arrangement.
+         (2) Where a provision of this instrument applies in respect of an arrangement with
+             joint participants:
+               (a) in relation to a provision referring to a participant giving notice of a
+                   matter—Housing Australia is to allow one of the participants to give notice
+                   of the matter on behalf of both participants; and
+               (b) in relation to a provision referring to a participant taking an action that, in
+                   law, both participants would need to take jointly—a reference to a
+                   participant is a reference to both participants acting jointly; and
+               (c) in other cases—a reference to a participant is a reference to each
+                   participant in the arrangement.
+             Example: Clause 1.14 of Schedule 1, read with section 28, requires Housing Australia to ensure
+                      that a participant must give notice to Housing Australia before a contract for the
+                      construction of a new home is varied. Where the relevant arrangement is with 2
+                      participants jointly, one of the participants may give notice of the matter on behalf of
+                      both.
+                         The effect of section 44 is that a participant must be allowed to sell the relevant
+                         property. Where the arrangement is with 2 participants who jointly own the property,
+                         that property could only be sold by the participants acting jointly.
+
+
+
+
+ 8                               Help to Buy Program Directions 2025
+
+
+
+
+                               Authorised Version F2025L00682 registered 13/06/2025
+                                                       Entering into Help to Buy arrangements Part 2
+                                                                              Introduction Division 1
+
+                                                                                        Section 11
+
+Part 2—Entering into Help to Buy arrangements
+Division 1—Introduction
+
+11 Simplified outline of this Part
+
+           This Part contains directions regarding the circumstances in which Housing
+           Australia can enter into arrangements. The directions in this Part are relevant to
+           the performance of Housing Australia’s functions in relation to participating
+           States and the Territories.
+
+           Housing Australia may only enter into a Help to Buy arrangement in accordance
+           with this instrument. Division 2 of this Part sets out overarching requirements
+           relating to entry into arrangements, including requirements around the
+           individuals with whom, and properties in respect of which, arrangements can be
+           entered into. It also sets limits on the amount that Housing Australia can
+           contribute, on behalf of the Commonwealth, to the purchase of a relevant
+           property.
+
+           Division 3 of this Part defines the class of individuals with whom Housing
+           Australia can enter into arrangements, while Division 4 of this Part defines the
+           class of properties that can be purchased under an arrangement. Division 5 of this
+           Part sets out standards in relation to mortgages, and to contracts and timeframes
+           for the construction of new homes. Finally, Division 6 of this Part deals with the
+           “Commonwealth share” in a relevant property, and the circumstances in which
+           the “Commonwealth share percentage” can be adjusted.
+
+
+12 Application of this Part
+           This Part:
+            (a) applies to the performance of Housing Australia’s functions in relation to
+                 the participating States and the Territories (for the purposes of
+                 subparagraph 24(1)(a)(i) of the Act); and
+            (b) does not apply to the performance of Housing Australia’s functions in
+                 relation to cooperating States.
+
+
+
+
+                                   Help to Buy Program Directions 2025                            9
+
+
+
+                         Authorised Version F2025L00682 registered 13/06/2025
+Part 2 Entering into Help to Buy arrangements
+Division 2 When can Housing Australia enter into a Help to Buy arrangement?
+
+Section 13
+
+Division 2—When can Housing Australia enter into a Help to Buy
+          arrangement?
+
+13 Housing Australia can only enter into arrangements where this instrument
+         permits
+        (1) Housing Australia must not enter into an arrangement other than in accordance
+            with this instrument.
+        (2) Housing Australia must ensure that each arrangement contains such terms and
+            conditions as are necessary to enable it to comply with the requirements of this
+            instrument.
+        (3) This instrument does not limit the terms and conditions that Housing Australia
+            may include in an arrangement, except to the extent that those terms and
+            conditions are directly inconsistent with this instrument.
+             Example 1: Division 2 of Part 3 deals with the “participation requirements” that Housing Australia
+                        must include in arrangements. This does not prevent Housing Australia from also
+                        including other participation requirements unless they are directly inconsistent with this
+                        instrument.
+             Example 2: If the effect of a provision of this instrument is that an arrangement must require
+                        someone to give notice of a particular matter to Housing Australia, this instrument does
+                        not prevent the arrangement from specifying the timeframe within which that notice
+                        must be given, or requiring the giving of other kinds of notices to Housing Australia,
+                        unless doing so would be inconsistent with this instrument.
+
+
+14 Housing Australia may enter into arrangements with one or more applicants
+
+             When Housing Australia may enter into an arrangement
+        (1) Housing Australia may enter into an arrangement in relation to a property with
+            an individual, or 2 individuals jointly, where:
+              (a) the individual (the applicant), or individuals jointly (each being an
+                  applicant), apply for the arrangement in accordance with subsection (2);
+                  and
+             (b) Housing Australia has approved the application under subsection (4); and
+              (c) the approval has not expired or been revoked before the arrangement is
+                  entered into; and
+             (d) entering into the arrangement would not be contrary to Division 2 of Part 5.
+             Note 1:    See section 15 for the circumstances in which Housing Australia may revoke an
+                        approval before entering into an arrangement.
+             Note 2:    Division 2 of Part 5 affects when Housing Australia may enter into arrangements in
+                        respect of properties in particular jurisdictions. It also provides for the expiry of
+                        approvals in certain circumstances.
+
+        (2) An application for an arrangement must be:
+             (a) in writing; and
+             (b) if Housing Australia has approved, in writing, and published on its website,
+                 the manner and form for an application—made in that manner and form;
+                 and
+
+
+ 10                             Help to Buy Program Directions 2025
+
+
+
+
+                             Authorised Version F2025L00682 registered 13/06/2025
+                                                 Entering into Help to Buy arrangements Part 2
+                    When can Housing Australia enter into a Help to Buy arrangement? Division 2
+
+                                                                                             Section 15
+            (c) accompanied by the information or documents required by any such
+                approved form.
+      (3) Housing Australia must commence consideration of applications in the order in
+          which Housing Australia receives each application that complies with
+          subsection (2).
+
+          When Housing Australia may approve an application to enter into an
+          arrangement
+      (4) Housing Australia may approve an application to enter into an arrangement if, at
+          the time it decides the application:
+            (a) Housing Australia is satisfied that the dealings with the vendor of the
+                 relevant property will be carried out on an arm’s-length basis; and
+            (b) the arrangement would relate to the purchase of the whole of the relevant
+                 property, unless subsection 18(1) applies; and
+            (c) the applicant, or each applicant, is an eligible applicant (see section 17);
+                 and
+            (d) the relevant property is an eligible property (see section 21); and
+            (e) Housing Australia is satisfied that the mortgage requirements will be met
+                 by the settlement date (see section 22); and
+             (f) where the arrangement relates to the construction of a new home—Housing
+                 Australia is satisfied that:
+                   (i) the new home contract requirements will be met by the settlement
+                       date (see section 23); and
+                  (ii) the timeframe requirements will be met (see section 24); and
+            (g) Housing Australia is satisfied that the property, once purchased, will be
+                 adequately insured (see section 6); and
+            (h) approving the application would not be contrary to Division 2 of Part 5.
+          Note:     Division 2 of Part 5 affects when Housing Australia may approve applications in
+                    respect of properties in particular jurisdictions.
+
+
+15 Circumstances in which Housing Australia may revoke approvals
+      (1) Housing Australia may revoke an approval under subsection 14(4) at a time
+          before the entry into the arrangement to which the approval relates if, at that
+          time, a criterion in that subsection has ceased to be satisfied.
+          Note 1:   See section 53 for the circumstances in which Housing Australia must revoke an
+                    approval.
+          Note 2:   This section deals with revoking approvals to enter into arrangements. Approvals stop
+                    being relevant once an arrangement is entered into as arrangements are contractual in
+                    nature and can only be terminated in accordance with their terms. Division 6 of Part 3
+                    requires Housing Australia to ensure arrangements allow it to terminate the
+                    arrangement in certain circumstances.
+
+      (2) To avoid doubt:
+           (a) a purported revocation of an approval after an arrangement has been
+               entered into is of no effect; and
+           (b) this section does not limit Housing Australia’s power to terminate an
+               arrangement in accordance with the terms of that arrangement.
+
+
+                                   Help to Buy Program Directions 2025                                 11
+
+
+
+                        Authorised Version F2025L00682 registered 13/06/2025
+Part 2 Entering into Help to Buy arrangements
+Division 2 When can Housing Australia enter into a Help to Buy arrangement?
+
+Section 16
+16 Minimum and maximum contributions to purchase price
+        (1) The contribution made by Housing Australia, on behalf of the Commonwealth,
+            to the purchase price of a relevant property under an arrangement must fall
+            within the limits set out in the following table.
+
+  Commonwealth’s contribution
+  Property type             Minimum contribution                    Maximum contribution
+  Existing dwelling         5% of purchase price                    30% of purchase price
+  New home                  5% of purchase price                    40% of purchase price
+             Note:      The remainder of the purchase price will be supplied by the participant’s deposit and
+                        funding from a participating lender secured by way of a mortgage.
+
+        (2) However, Housing Australia must not contribute, on behalf of the
+            Commonwealth, less than the amount required to ensure that its contribution and
+            the participant’s deposit will together equal at least 20% of the value of the
+            property as assessed by the participating lender mentioned in paragraph 21(1)(a).
+             Note:      Where the Commonwealth’s contribution, and the participant’s deposit, together equal
+                        at least 20% of the value of the property, the participant will not need to bear the cost
+                        of lenders’ mortgage insurance.
+             Example: If the participant is contributing 5% of the assessed value as a deposit, Housing
+                      Australia’s minimum contribution amount would be 15% of the assessed value.
+
+        (3) Housing Australia must determine the percentage that the Commonwealth will
+            contribute (the agreed percentage), taking into account:
+              (a) the percentage (if any) that a participant requested in their application; and
+             (b) the principle that a participant must contribute as large a deposit as can
+                  reasonably be required in light of their personal circumstances and
+                  financial capacity.
+             Note:      The agreed percentage must fall within the limits set out in subsection (1) at the time
+                        the arrangement is entered into. However, on or after settlement, it is possible to vary
+                        the percentage of the value of the relevant property to which the Commonwealth is
+                        entitled in accordance with subsections 25(3) and (4). Accordingly, that percentage
+                        might subsequently fall outside of the ranges in subsection (1) of this section.
+
+
+
+
+ 12                            Help to Buy Program Directions 2025
+
+
+
+
+                             Authorised Version F2025L00682 registered 13/06/2025
+                                                       Entering into Help to Buy arrangements Part 2
+                                                              Who is an eligible applicant? Division 3
+
+                                                                                               Section 17
+
+Division 3—Who is an eligible applicant?
+
+17 Who is an eligible applicant?
+           An applicant is an eligible applicant, at a particular time, if, at that time:
+            (a) the applicant is an Australian citizen of at least 18 years of age; and
+            (b) the income test (section 19) and the financial capacity test (section 20) are
+                 satisfied in relation to the applicant; and
+            (c) Housing Australia is satisfied that the applicant will comply with the
+                 principal place of residence requirement (clause 1.3 of Schedule 1); and
+            (d) the applicant is not receiving assistance from one or more of the following:
+                   (i) a home-buyer guarantee provided by a Commonwealth entity or
+                       Commonwealth company;
+                  (ii) a shared equity scheme;
+                 (iii) a loan or guarantee provided by or on behalf of a State or Territory to
+                       support home ownership; and
+            (e) except where Housing Australia is satisfied that section 18 applies—the
+                 applicant does not hold a disqualifying property interest; and
+             (f) Housing Australia is satisfied that the applicant will, either individually or
+                 jointly with another applicant:
+                   (i) provide a deposit of at least 2% of the purchase price of the relevant
+                       property; and
+                  (ii) cover all additional costs (such as conveyancing costs, legal costs and
+                       stamp duty) associated with the purchase of the property; and
+            (g) Housing Australia is satisfied that the applicant will, either individually or
+                 jointly with another applicant, upon settlement, be the only registered
+                 owner of the property.
+           Note:     Paragraph (d) does not extend to home buyer assistance in other forms, such as first
+                     home owner grants or tax concessions, or the First Home Super Saver scheme.
+
+
+18 Exception to requirement not to hold interest in real estate
+
+           Exception—single parent buying out existing property
+       (1) This section applies where an applicant for an arrangement:
+            (a) is a single parent; and
+            (b) holds a disqualifying property interest as a joint tenant or tenant in
+                 common in the relevant property; and
+            (c) intends to become the sole registered owner of that property with the
+                 assistance of the arrangement.
+
+           Exception—simultaneous purchase of the property and sale of existing property
+       (2) This section also applies where an applicant for an arrangement:
+            (a) is a single parent; and
+            (b) holds a disqualifying property interest; and
+            (c) intends to cease to hold that interest within 4 weeks of the applicant
+                 becoming the registered owner of the property to be purchased with the
+                 assistance of the arrangement.
+
+                                    Help to Buy Program Directions 2025                                     13
+
+
+
+                         Authorised Version F2025L00682 registered 13/06/2025
+Part 2 Entering into Help to Buy arrangements
+Division 3 Who is an eligible applicant?
+
+Section 19
+19 Income test for single and joint applicants
+        (1) The income test is satisfied in relation to an applicant for an arrangement if:
+             (a) in the case of an applicant, other than a single parent, who will be the only
+                 party to the arrangement—the single income threshold for the financial
+                 year in which the applicant applied for the arrangement is greater than or
+                 equal to the applicant’s taxable income for the most recent income year
+                 (within the meaning of the Income Tax Assessment Act 1936) for which the
+                 Commissioner of Taxation has given the applicant a notice of assessment;
+                 and
+             (b) in the case of an applicant who is a single parent and who will be the only
+                 party to the arrangement—the joint income threshold for the financial year
+                 in which they applied for the arrangement is greater than or equal to the
+                 applicant’s taxable income for the most recent income year (within the
+                 meaning of the Income Tax Assessment Act 1936) for which the
+                 Commissioner of Taxation has given the applicant a notice of assessment;
+                 and
+             (c) in the case of 2 applicants who will be party to the arrangement—the joint
+                 income threshold for the financial year in which both applicants applied for
+                 the arrangement is greater than or equal to the combined taxable incomes
+                 of the applicants, calculated using the taxable income for each of the
+                 applicant’s most recent income year (within the meaning of the Income Tax
+                 Assessment Act 1936) for which the Commissioner of Taxation has given
+                 that applicant a notice of assessment.
+
+20 Financial capacity test for single and joint applicants
+             The financial capacity test is satisfied in relation to an applicant or applicants for
+             an arrangement if Housing Australia reasonably believes that it is unlikely that
+             the applicant, or both applicants together, could acquire the relevant property at
+             that time without the assistance of the arrangement, having regard to the value of
+             their assets (including assets that either applicant owns jointly with another
+             person), their liabilities, their income, and any other financial assistance, of a
+             material nature, likely to be provided by the Commonwealth, a State or a
+             Territory.
+
+
+
+
+ 14                          Help to Buy Program Directions 2025
+
+
+
+
+                           Authorised Version F2025L00682 registered 13/06/2025
+                                                     Entering into Help to Buy arrangements Part 2
+                                                            What is an eligible property? Division 4
+
+                                                                                       Section 21
+
+Division 4—What is an eligible property?
+
+21 What is an eligible property?
+          A property is an eligible property if:
+           (a) it is an existing dwelling or a new home; and
+           (b) the purchase price does not exceed the price cap for the area in which the
+               property is located (see section 7).
+
+
+
+
+                                 Help to Buy Program Directions 2025                            15
+
+
+
+                       Authorised Version F2025L00682 registered 13/06/2025
+Part 2 Entering into Help to Buy arrangements
+Division 5 Contract, mortgage and timeframe requirements
+
+Section 22
+
+Division 5—Contract, mortgage and timeframe requirements
+
+22 Requirements relating to mortgages
+        (1) The mortgage requirements in relation to a proposed arrangement are as
+            follows:
+              (a) the purchase of the relevant property is financed by a single mortgage with
+                  a participating lender (the first mortgage); and
+              (b) the following requirements will be satisfied in relation to the first mortgage
+                  at the time of settlement of the purchase of the relevant property:
+                    (i) the applicant or applicants are the only counterparties to the mortgage
+                        agreement; and
+                   (ii) the mortgage is a variable or fixed rate loan, or a combination of both
+                        (and not a line of credit); and
+                  (iii) subject to subsections (2) and (3), the mortgage agreement requires
+                        scheduled payments of both principal and interest for the full period
+                        of the agreement which is a period of not more than 30 years; and
+              (c) the applicant or applicants have granted a second mortgage over the
+                  relevant property in favour of the Commonwealth.
+        (2) The mortgage agreement may be varied in relation to an applicant who is
+            experiencing hardship.
+             Example: A participating lender may provide for interest-only payments to be made while a
+                      borrower is experiencing hardship.
+
+        (3) Where the arrangement relates to the construction of a new home:
+             (a) the mortgage agreement may provide for interest-only payments to be
+                 made while the home is being constructed; and
+             (b) the period of the mortgage may exceed 30 years, but only if the period of
+                 the mortgage agreement after completion of construction of the home is not
+                 more than 30 years.
+
+23 New home contract requirements
+             The new home contract requirements, in relation to a contract for the
+             construction of a new home that is a relevant property, are that the applicant or
+             applicants for the arrangement have entered into a contract that meets all the
+             following requirements:
+               (a) the contract is a fixed-price contract under which the purchase price for the
+                   property does not exceed the price cap for the area in which the property is
+                   located;
+               (b) the contract is with a builder who holds all the licences and registrations
+                   required by law in order to perform the work required by the contract in the
+                   relevant jurisdiction;
+               (c) insurance policies are in place in relation to the construction of the new
+                   home, as required by law;
+               (d) the contract is entered into on an arm’s-length basis;
+
+
+
+
+ 16                            Help to Buy Program Directions 2025
+
+
+
+
+                            Authorised Version F2025L00682 registered 13/06/2025
+                                                   Entering into Help to Buy arrangements Part 2
+                                        Contract, mortgage and timeframe requirements Division 5
+
+                                                                                    Section 24
+            (e) the contract requires the builder to construct a fully completed dwelling on
+                the land, up to and including the point at which the new home is certified
+                as fit for occupation.
+
+24 Timeframe requirements
+      (1) Subject to subsection (2), the timeframe requirements for an arrangement
+          relating to the construction of a new home are as follows:
+            (a) if the new home is an off-the-plan dwelling:
+                  (i) the construction of the dwelling must commence before the parties
+                      enter into the contract of sale; and
+                 (ii) the settlement date must be no later than 90 days after the application
+                      to enter into the arrangement is approved;
+            (b) in all other cases:
+                  (i) the construction of the new home must commence within 12 months
+                      of the day on which the applicant becomes the registered owner of the
+                      relevant property (the transfer date); and
+                 (ii) the construction must be completed within 36 months of the transfer
+                      date.
+      (2) If Housing Australia is satisfied, in relation to a particular arrangement, that it is
+          necessary or appropriate to adjust the timeframes in subsection (1) in response to
+          the circumstances of the particular case, then the timeframe requirements for
+          that arrangement are the requirements specified by Housing Australia by notice
+          given to the applicant or applicants in writing.
+
+
+
+
+                                  Help to Buy Program Directions 2025                        17
+
+
+
+                        Authorised Version F2025L00682 registered 13/06/2025
+Part 2 Entering into Help to Buy arrangements
+Division 6 Securing Housing Australia’s entitlement to a return
+
+Section 25
+
+Division 6—Securing Housing Australia’s entitlement to a return
+
+25 The Commonwealth share and Commonwealth share percentage
+         (1) Housing Australia must ensure that each arrangement provides for the
+             Commonwealth share and Commonwealth share percentage to be determined
+             and adjusted in accordance with this section.
+             Note:      The definition of “shared equity arrangement” in subsection 7(1) of the Act allows
+                        return entitlements to be worked out either in whole or in part by reference to the value
+                        of the relevant property at one or more times. The effect of this section is that an
+                        arrangement must create a return entitlement that is worked out wholly by reference to
+                        the value of the relevant property.
+
+         (2) The Commonwealth share, in relation to a relevant property:
+              (a) means the return to which the Commonwealth is entitled under the
+                  arrangement in respect of that property; and
+              (b) is expressed as a percentage of the value of the relevant property from time
+                  to time, where the percentage (the Commonwealth share percentage) is:
+                    (i) unless adjusted as set out in subsections (3) and (4)—the agreed
+                        percentage (see section 16); and
+                   (ii) if adjusted as set out in subsections (3) and (4)—the agreed
+                        percentage as adjusted.
+             Note:      Because the value of the relevant property will change from time to time, the precise
+                        monetary value of the Commonwealth share will also vary depending on the time at
+                        which it is calculated. This will be the case even if the Commonwealth share
+                        percentage itself has not been adjusted.
+             Example: If the Commonwealth share is 20% of the value of a relevant property, and the
+                      property, at a particular time, is valued at $600,000, the monetary value of the
+                      Commonwealth share at that time is $120,000.
+
+             Adjustments to the Commonwealth share percentage
+         (3) Housing Australia must ensure that each arrangement must allow Housing
+             Australia, on or after settlement, to increase the Commonwealth share percentage
+             without making further financial contributions:
+              (a) in the circumstances mentioned in column 1 of an item of the following
+                  table; and
+              (b) as set out in column 2 of that item.
+
+                          Column 1                                      Column 2
+               Item       Circumstances                                 Amount by which Commonwealth
+                                                                        share percentage may be increased
+               1          Where the value of the relevant               To a percentage that preserves what
+                          property, as assessed by the                  would have been the value of the
+                          participating lender for the purpose of       Commonwealth share on the date of
+                          settlement, is lower than the purchase        settlement, had the value of the
+                          price                                         property at that date been equal to
+                                                                        the purchase price
+               2          Where Housing Australia considers             To a percentage that preserves what
+                          that a participant’s negligence,              would have been the value of the
+
+
+ 18                            Help to Buy Program Directions 2025
+
+
+
+
+                             Authorised Version F2025L00682 registered 13/06/2025
+                                               Entering into Help to Buy arrangements Part 2
+                                Securing Housing Australia’s entitlement to a return Division 6
+
+                                                                                          Section 25
+
+                Column 1                                       Column 2
+     Item       Circumstances                                  Amount by which Commonwealth
+                                                               share percentage may be increased
+                fraudulent behaviour, or other                 Commonwealth share but for the act
+                unreasonable deliberate or reckless            or omission
+                act or omission, has reduced, or is
+                likely to reduce, the value of the
+                relevant property
+    Example: For item 1, the Commonwealth contributes 30% of the purchase price of a relevant
+             property (this being the agreed percentage). The purchase price is $500,000, so the
+             Commonwealth’s contribution is $150,000. The Commonwealth share, immediately
+             before settlement, is 30% of the value of the relevant property at that time.
+               However, the property is valued at $475,000 for the purpose of settlement. This would
+               reduce the value of the Commonwealth share at that time to $142,500, based on the
+               original percentage return of 30%. The arrangement is to permit the Commonwealth
+               share to be increased to 31.58% of the value of the property at settlement so that, as at
+               the settlement date, the value of the Commonwealth share is preserved at $150,000.
+
+(4) Housing Australia must ensure that each arrangement enables Housing Australia
+    to reduce the Commonwealth share percentage:
+      (a) to reflect a repayment mentioned in section 37 or 43; or
+      (b) in the circumstances mentioned in section 60 (home improvements).
+
+
+
+
+                              Help to Buy Program Directions 2025                                    19
+
+
+
+                   Authorised Version F2025L00682 registered 13/06/2025
+Part 3 Participating in the Help to Buy program
+Division 1 Introduction
+
+Section 26
+
+Part 3—Participating in the Help to Buy program
+Division 1—Introduction
+
+26 Simplified outline of this Part
+
+             This Part deals with participation in the Help to Buy program. The provisions in
+             this Part are relevant to the performance of Housing Australia’s functions in
+             relation to the Territories, and participating and cooperating States.
+
+             Division 2 of this Part, in combination with Schedule 1, deals with the conditions
+             of participation in an arrangement. Division 3 of this Part requires Housing
+             Australia to take certain steps to monitor compliance with those conditions, and
+             Division 4 of this Part defines how Housing Australia is to respond where an
+             individual ceases to comply with the conditions.
+
+             Participants are not bound by the conditions of participation by force of this
+             instrument. Rather, Housing Australia is to ensure that its arrangements with
+             participants enable it to take the steps set out in Division 4 where an individual
+             ceases to meet those conditions.
+
+             Division 5 of this Part sets out the circumstances in which Housing Australia
+             may vary an arrangement.
+
+             Finally, Division 6 of this Part requires Housing Australia to ensure that it may
+             terminate arrangements in certain circumstances.
+
+
+27 Application of this Part
+             This Part applies to the performance of Housing Australia’s functions in relation
+             to:
+               (a) the participating States, and the Territories (under subparagraph 24(1)(a)(i)
+                   of the Act); and
+               (b) cooperating States (under subparagraph 24(1)(a)(ii) of the Act).
+
+
+
+
+ 20                           Help to Buy Program Directions 2025
+
+
+
+
+                            Authorised Version F2025L00682 registered 13/06/2025
+                                                      Participating in the Help to Buy program Part 3
+                                                                 Participation requirements Division 2
+
+                                                                                              Section 28
+
+Division 2—Participation requirements
+
+28 Arrangements must require compliance with participation requirements
+       (1) Housing Australia must ensure that each arrangement requires the participant to
+           comply with the participation requirements specified in Schedule 1 for the
+           duration of the arrangement.
+       (2) Those requirements, as set out in each arrangement, are the participation
+           requirements for that arrangement.
+       (3) To avoid doubt, the participation requirements, for an arrangement, are to apply
+           to a participant only during the life of that arrangement and are not to apply
+           where the arrangement has been brought to an end early (for example, because of
+           voluntary early repayment of the Commonwealth share in full or the sale of the
+           relevant property).
+           Note 1:   The participation requirements have legal force by virtue of an arrangement. This
+                     instrument does not impose such obligations on participants directly.
+           Note 2:   There is no participation requirement relating to the income thresholds. However,
+                     Division 4 of Part 3 requires Housing Australia to take certain actions where a
+                     participant exceeds the income threshold at a particular time.
+
+
+29 Exceptions to sale of existing property requirement
+       (1) Housing Australia must ensure that each arrangement, where relevant, provides
+           that the participant is not required to comply with the participation requirement
+           outlined in clause 1.1 of Schedule 1 (the sale of existing property requirement)
+           if Housing Australia is satisfied, based on satisfactory evidence provided by the
+           participant, that it is impracticable for the participant to meet that requirement:
+             (a) because the participant is experiencing hardship; or
+             (b) on other compassionate grounds.
+       (2) Housing Australia may, if satisfied as mentioned in subsection (1):
+            (a) allow the participant not to comply with the sale of existing property
+                requirement for such a period as Housing Australia considers appropriate;
+                and
+            (b) extend that period, as it considers appropriate.
+
+30 Exceptions to principal place of residence requirement: all properties
+       (1) Housing Australia must ensure that each arrangement provides that a participant
+           is not required to comply with the participation requirement outlined in
+           clause 1.3 of Schedule 1 (the principal place of residence requirement) if
+           Housing Australia is satisfied, based on satisfactory evidence provided by the
+           participant, that it is impracticable for the participant to meet that requirement:
+             (a) because of a posting required in the course of the participant performing
+                 their duties as a member of the Australian Defence Force, other than as a
+                 member of the Naval Reserve, the Army Reserve or the Air Force Reserve
+                 (within the meaning of the Defence Act 1903); or
+
+
+
+
+                                    Help to Buy Program Directions 2025                                  21
+
+
+
+                         Authorised Version F2025L00682 registered 13/06/2025
+Part 3 Participating in the Help to Buy program
+Division 2 Participation requirements
+
+Section 31
+               (b) because the participant’s employer has required them to relocate, in
+                   circumstances where the participant has been employed by that employer
+                   for:
+                     (i) at least 12 months; or
+                    (ii) a lesser period, where Housing Australia is satisfied that a lesser
+                         period is appropriate having regard to the nature of the ongoing
+                         employment relationship between the parties; or
+               (c) because the participant, or an individual for whom a participant exercises
+                   carer responsibilities, is suffering from a serious illness; or
+               (d) on other compassionate grounds.
+         (2) Housing Australia may, if satisfied as mentioned in subsection (1):
+              (a) allow the participant not to comply with the principal place of residence
+                  requirement under paragraph (1)(a) for such a period as Housing Australia
+                  considers appropriate; and
+              (b) extend that period, as it considers appropriate.
+         (3) The period of allowed non-compliance under paragraph (1)(b), (c) or (d) must
+             not be longer than 12 months. However, Housing Australia may, where it
+             considers it appropriate to do so:
+               (a) in relation to a situation covered by paragraph (1)(b)—extend the period by
+                   up to 2 further 12-month periods; and
+              (b) in relation to a situation covered by paragraph (1)(c) or (d)— extend the
+                   period by one or more 12-month periods.
+         (4) Housing Australia may, at any time during a period of allowed non-compliance,
+             if satisfied that the reasons for which the non-compliance was allowed no longer
+             apply, require the participant to comply with the principal place of residence
+             requirement.
+
+31 Delayed application of principal place of residence requirement: new homes
+             Where an arrangement relates to the construction of a new home, Housing
+             Australia must ensure that the arrangement provides that the participant does not
+             breach the participation requirement set out in clause 1.3 of Schedule 1 by failing
+             to treat the relevant property as the participant’s principal place of residence
+             between the commencement of the arrangement and the date mentioned in
+             paragraph (c) of this section, if:
+               (a) the participant does not occupy the relevant property because construction
+                    of the new home is being carried out; and
+               (b) the participant does not own the property that is their principal place of
+                    residence during the construction period; and
+               (c) the participant begins to treat the relevant property as their principal place
+                    of residence within 3 months of the construction being completed.
+
+32 Borrowing additional funds under a mortgage from participating lenders
+             Housing Australia must ensure that each arrangement provides that the
+             participant may only borrow additional funds from a participating lender:
+
+
+ 22                           Help to Buy Program Directions 2025
+
+
+
+
+                            Authorised Version F2025L00682 registered 13/06/2025
+                                             Participating in the Help to Buy program Part 3
+                                                        Participation requirements Division 2
+
+                                                                                       Section 32
+ (a) for the purpose of making a payment to reduce the Commonwealth share in
+     respect of the relevant property; or
+ (b) for the purpose of maintenance or capital expenditure in respect of the
+     relevant property (including home improvements); or
+ (c) in accordance with the participating lender’s policies for assisting
+     borrowers who are experiencing hardship.
+Note 1:   This does not limit a participant’s capacity to take out a new mortgage with a
+          participating lender, or with their current participating lender, if the refinancing does
+          not result in a larger mortgage.
+Note 2:   For when participants must notify Housing Australia about borrowing additional funds
+          from participating lenders, see clause 1.5 of Schedule 1.
+
+
+
+
+                          Help to Buy Program Directions 2025                                     23
+
+
+
+               Authorised Version F2025L00682 registered 13/06/2025
+Part 3 Participating in the Help to Buy program
+Division 3 Monitoring participants’ compliance
+
+Section 33
+
+Division 3—Monitoring participants’ compliance
+
+33 Housing Australia must monitor participant compliance
+             Housing Australia must monitor each participant’s compliance with the
+             participation requirements throughout the life of an arrangement.
+
+34 Housing Australia must conduct 5-yearly reviews
+             Without limiting section 33, Housing Australia must, for each arrangement,
+             conduct a review at least every 5 years to determine:
+               (a) in the case of a participant, other than a single parent, who is a sole
+                   participant—whether the participant’s taxable income:
+                     (i) for the most recent income year (within the meaning of the Income
+                         Tax Assessment Act 1936) for which the Commissioner of Taxation
+                         has given the participant a notice of assessment—exceeded the single
+                         income threshold for the financial year in which the review is
+                         undertaken; and
+                    (ii) for the income year immediately preceding the most recent income
+                         year for which the Commissioner of Taxation has given the
+                         participant a notice of assessment—exceeded the single income
+                         threshold for the financial year preceding the year in which the review
+                         is undertaken; and
+              (b) in the case of a participant who is a single parent—whether the
+                   participant’s taxable income:
+                     (i) for the most recent income year (within the meaning of the Income
+                         Tax Assessment Act 1936) for which the Commissioner of Taxation
+                         has given the participant a notice of assessment—exceeded the joint
+                         income threshold for the financial year in which the review is
+                         undertaken; and
+                    (ii) for the income year immediately preceding the most recent income
+                         year for which the Commissioner of Taxation has given the
+                         participant a notice of assessment—exceeded the income threshold for
+                         the financial year preceding the year in which the review is
+                         undertaken; and
+               (c) in the case of joint participants—whether the participants’ combined
+                   taxable incomes:
+                     (i) calculated by adding together the taxable income of each participant
+                         for the most recent income year for which the Commissioner of
+                         Taxation has given each of the participants a notice of assessment—
+                         exceeded the joint income threshold for the financial year in which the
+                         review is undertaken; and
+                    (ii) calculated by adding together the taxable income of each participant
+                         for the income year immediately preceding the most recent income
+                         year for which the Commissioner of Taxation has given each of the
+                         participants a notice of assessment—exceeded the joint income
+                         threshold for the financial year preceding the year in which the review
+                         is undertaken; and
+              (d) whether each participant has met the participation requirements.
+
+ 24                           Help to Buy Program Directions 2025
+
+
+
+
+                            Authorised Version F2025L00682 registered 13/06/2025
+                                                     Participating in the Help to Buy program Part 3
+                                                     Monitoring participants’ compliance Division 3
+
+                                                                                       Section 35
+35 Housing Australia must review arrangement where mortgage with a
+         participating lender is discharged
+       (1) Upon a participant discharging their mortgage with a participating lender,
+           Housing Australia must, within a reasonable time, review the arrangement in
+           order to determine:
+             (a) whether the participant has met the participation requirements; and
+            (b) whether the participant should be required to undergo the processes set out
+                 in section 37.
+      (2) Subsection (1) does not apply if the participant:
+             (a) has repaid the Commonwealth share in full at the time of discharging the
+                 mortgage; or
+            (b) has taken out a new mortgage with another participating lender in order to
+                 discharge their mortgage with their current participating lender and move
+                 their borrowing to the new lender.
+
+
+
+
+                                  Help to Buy Program Directions 2025                           25
+
+
+
+                        Authorised Version F2025L00682 registered 13/06/2025
+Part 3 Participating in the Help to Buy program
+Division 4 Managing participants’ compliance
+
+Section 36
+
+Division 4—Managing participants’ compliance
+
+36 How Housing Australia is to respond where review identifies potential
+        non-compliance
+         (1) Housing Australia must take action under an arrangement in accordance with
+             section 37 where, after conducting a review mentioned in section 34, Housing
+             Australia is satisfied that:
+               (a) for a sole participant, other than a single parent—the participant’s taxable
+                   income during the periods mentioned in paragraph 34(a) exceeded the
+                   thresholds mentioned in that paragraph; and
+               (b) in the case of a participant who is a single parent— the participant’s
+                   taxable income during the periods mentioned in paragraph 34(b) exceeded
+                   the thresholds mentioned in that paragraph; and
+               (c) for joint participants—the participants’ combined taxable income during
+                   the periods mentioned in paragraph 34(c) exceeded the thresholds
+                   mentioned in that paragraph.
+         (2) Housing Australia may take action under an arrangement in accordance with
+             section 37 where Housing Australia is satisfied that the participant has, at any
+             time, not met a participation requirement, if it considers it appropriate to do so.
+             Note:     Subsection 13(2) requires Housing Australia to ensure that each arrangement contains
+                       such terms and conditions as are necessary to enable Housing Australia to comply with
+                       the requirements of this instrument.
+
+         (3) This section does not prevent Housing Australia from making provision in an
+             arrangement for the imposition of other measures relating to compliance, except
+             to the extent that those provisions are directly inconsistent with this instrument.
+
+37 Housing Australia may require repayment and terminate arrangement
+
+             Assessment of capacity to repay Commonwealth share
+         (1) Housing Australia must ensure that each arrangement requires the participant to
+             obtain, and provide to Housing Australia, an assessment by the participating
+             lender of the participant’s capacity to repay the Commonwealth share in respect
+             of the relevant property (as valued at the time of the assessment):
+               (a) where Housing Australia determines, under paragraph 35(1)(b), that the
+                   participant should be required to undergo the process set out in this section;
+                   or
+               (b) in the circumstances mentioned in subsection 36(1) or (2); or
+               (c) where a further assessment is required under subsection (5), (6), (9) or (12)
+                   of this section.
+         (2) An assessment mentioned in subsection (1) must:
+              (a) if the Commonwealth share is greater than 5% of the value of the property
+                  (as at the time of the assessment)—assess whether the participant does, or
+                  does not, have the capacity to repay a minimum amount of 5% of that
+                  property value; and
+
+
+
+ 26                           Help to Buy Program Directions 2025
+
+
+
+
+                            Authorised Version F2025L00682 registered 13/06/2025
+                                                 Participating in the Help to Buy program Part 3
+                                                  Managing participants’ compliance Division 4
+
+                                                                                       Section 37
+     (b) if the Commonwealth share is equal to or less than 5% of the property
+         value (as at the time of the assessment)—assess whether the participant
+         does, or does not, have the capacity to repay the Commonwealth share of
+         that property value in full; and
+     (c) be obtained within the period determined by Housing Australia and
+         notified, in writing, to the participant.
+(3) In determining the period under paragraph (2)(c), Housing Australia must:
+      (a) consider the participant’s personal circumstances and financial capacity;
+          and
+      (b) consider the reason, or reasons, why the participant was required to obtain
+          the assessment (including, if the assessment is a further assessment, the
+          reason, or reasons, for the previous assessment); and
+      (c) where the assessment is required because of subsection (5), (6), (9)
+          or (12)—set a start date for the period that is not less than 12 months after
+          the previous assessment.
+    Example: If Housing Australia has dealt with an arrangement under this section because the
+             participant’s taxable income exceeded the relevant threshold as set out in section 34,
+             Housing Australia must consider the extent to which the participant’s taxable income
+             exceeded that threshold.
+
+    Arrangements must allow Housing Australia to require repayment of
+    Commonwealth share
+(4) Housing Australia must ensure that each arrangement allows Housing Australia
+    to require the participant to repay the Commonwealth share in full or in part in
+    the circumstances specified in this section.
+
+    Commonwealth share greater than 5% of value of property
+(5) Where:
+     (a) Housing Australia receives an assessment mentioned in subsection (1); and
+     (b) the Commonwealth share in respect of the relevant property is greater
+          than 5% of the value of the property (as at the time of the assessment); and
+     (c) the participating lender assessed the participant to have the capacity to
+          repay a minimum amount of 5% of that property value; and
+     (d) Housing Australia is satisfied that the assessment was properly made;
+    Housing Australia, under the arrangement:
+     (e) must require the participant to repay that minimum amount (rounded to the
+          nearest $1,000) within 90 days of the date of the assessment; and
+      (f) may allow the participant to repay more than the minimum amount; and
+     (g) where the Commonwealth share percentage of the relevant property,
+          re-calculated by Housing Australia to reflect a payment mentioned in
+          paragraph (e) or (f) (as applicable), is greater than 0%—must require a
+          further assessment under subsection (1) to be undertaken; and
+     (h) where the Commonwealth share percentage of the relevant property,
+          calculated by Housing Australia to reflect a payment mentioned in
+          paragraph (e) or (f) (as applicable), is 0%—must terminate the
+          arrangement.
+
+
+
+                              Help to Buy Program Directions 2025                                27
+
+
+
+                    Authorised Version F2025L00682 registered 13/06/2025
+Part 3 Participating in the Help to Buy program
+Division 4 Managing participants’ compliance
+
+Section 37
+         (6) Where:
+              (a) Housing Australia receives an assessment mentioned in subsection (1); and
+              (b) the participating lender has assessed the participant not to have the capacity
+                  to repay a minimum amount of 5% of the property value; and
+              (c) Housing Australia is satisfied that assessment was properly made;
+             Housing Australia must require a further assessment under subsection (1).
+             Example: If Housing Australia is satisfied with an assessment that a participant does not have the
+                      capacity to repay the minimum amount, the participant need not make a repayment, but
+                      will be required to obtain another assessment at a later time determined by Housing
+                      Australia.
+
+         (7) Despite anything else in this section, Housing Australia must not require, but
+             may allow, a participant to repay an amount if repayment of that amount would
+             render the participant liable to bear the cost of lenders’ mortgage insurance.
+             Note:      The participant may become liable to bear the cost of lenders’ mortgage insurance if,
+                        for example, they borrow further funds from their participating lender in order to repay
+                        the Commonwealth share, and this results in them borrowing more than a certain
+                        percentage of the property’s value from that lender.
+
+             Commonwealth share equal to or less than 5% of value of property
+         (8) Where:
+              (a) Housing Australia receives an assessment mentioned in subsection (1); and
+              (b) the Commonwealth share in respect of the relevant property is equal to or
+                   less than 5% of the value of the property (as at the time of the assessment);
+                   and
+              (c) the participating lender has assessed the participant to have the capacity to
+                   repay the Commonwealth share of that value in full; and
+              (d) Housing Australia is satisfied that the assessment was properly made;
+             Housing Australia, under the arrangement:
+              (e) must require the participant to repay the Commonwealth share in full
+                   within 90 days from the time the assessment is made; and
+               (f) terminate the arrangement when the repayment in full has been made.
+         (9) If:
+               (a) the participating lender has assessed the participant not to have the capacity
+                   to repay the Commonwealth share of the value in full as mentioned in
+                   paragraph (2)(b); and
+               (b) Housing Australia is satisfied that the assessment was properly made;
+             Housing Australia must require a further assessment, as mentioned in
+             subsection (1).
+             Example: If Housing Australia is satisfied with an assessment that a participant does not have the
+                      capacity to repay the Commonwealth share in full, the participant need not make a
+                      repayment but will be required to obtain another assessment at a later time determined
+                      by Housing Australia.
+             Note:      The participant may repay the Commonwealth share by, for example, borrowing
+                        further funds from their participating lender, or using their own savings or assets.
+
+
+
+
+ 28                             Help to Buy Program Directions 2025
+
+
+
+
+                             Authorised Version F2025L00682 registered 13/06/2025
+                                                  Participating in the Help to Buy program Part 3
+                                                   Managing participants’ compliance Division 4
+
+                                                                                          Section 37
+(10) Despite paragraph (8)(e), Housing Australia must not require, but may allow, a
+     participant to repay the Commonwealth share in full even if this would render the
+     participant liable to bear the cost of lenders’ mortgage insurance.
+     Note:      The participant may become liable to bear the cost of lenders’ mortgage insurance if,
+                for example, they borrow further funds from their participating lender in order to repay
+                the Commonwealth share, and this results in them borrowing more than a certain
+                percentage of the property’s value from that lender.
+
+     Housing Australia may not seek repayment in certain circumstances
+(11) Housing Australia may choose not to enforce a requirement for a participant to
+     repay an amount as set out in this section if Housing Australia considers it
+     reasonable in the circumstances after considering:
+       (a) the participant’s personal circumstances and financial capacity; and
+       (b) the reason, or reasons, the participant was required to obtain an assessment
+           of their capacity to repay the Commonwealth share in respect of the
+           relevant property.
+     Example: If Housing Australia has dealt with an arrangement under this section because the
+              participant’s taxable income exceeded the threshold as set out in section 34, Housing
+              Australia would consider the extent which the participant’s taxable income exceeded
+              the threshold.
+
+(12) Where Housing Australia chooses not to enforce a requirement for a participant
+     to repay an amount as set out in this section, Housing Australia must require a
+     further assessment, as mentioned in subsection (1).
+
+
+
+
+                               Help to Buy Program Directions 2025                                  29
+
+
+
+                     Authorised Version F2025L00682 registered 13/06/2025
+Part 3 Participating in the Help to Buy program
+Division 5 Varying arrangements
+
+Section 38
+
+Division 5—Varying arrangements
+
+38 Varying the participants in an arrangement
+         (1) Housing Australia must not vary an arrangement:
+              (a) so that there are more than 2 participants; or
+              (b) to remove all of the original participants.
+         (2) Housing Australia may only vary an arrangement by adding a participant where
+             Housing Australia is satisfied that:
+              (a) the new participant is an eligible applicant (see section 17), subject to the
+                  following qualifications:
+                    (i) where the variation occurs after the parties enter into the contract of
+                        sale, but on or before the settlement date—subparagraph 17(f)(i) need
+                        not apply; and
+                   (ii) where the variation occurs after the settlement date—paragraph 17(f)
+                        does not apply; and
+              (b) any transactions with the vendor or builder that involve the new participant
+                  would be conducted on an arm’s-length basis.
+         (3) Housing Australia must not vary an arrangement by removing a participant
+             unless it is satisfied that:
+              (a) the relevant participating lender has determined that the participant in the
+                   arrangement, as varied, would be able to meet their obligations under the
+                   mortgage agreement; or
+              (b) it is necessary to do so to enable or facilitate compliance with a court order.
+        (4) This section does not apply in the circumstances mentioned in section 45.
+             Note:      Section 45 provides for the alteration of arrangements in circumstances involving the
+                        death of a participant.
+
+
+39 Varying or entering into new construction contracts
+         (1) Where:
+               (a) a construction contract for a new home is to be varied, or a replacement
+                   contract is to be entered into, in the circumstances mentioned in clause 1.14
+                   of Schedule 1; and
+               (b) the purchase price under the varied or replacement contract is higher than
+                   the original purchase price;
+             Housing Australia must not increase the Commonwealth’s contribution to the
+             purchase price to more than 40% of the purchase price under the varied or
+             replacement contract.
+             Example: The original construction contract is for the amount of $500,000 and the
+                      Commonwealth contribution is 30% of the purchase price of the property. Under the
+                      arrangement, Housing Australia would pay, on behalf of the Commonwealth, 30% of
+                      the purchase price of the land at the settlement date, followed by 30% of the value of
+                      each progress payment during the course of the construction. During construction, the
+                      contract is varied due to higher building costs, resulting in a new amount of $600,000.
+                      Housing Australia may provide up to an additional $90,000, on behalf of the
+                      Commonwealth, for a total contribution of $240,000 (40% of $600,000). If an
+
+
+
+ 30                            Help to Buy Program Directions 2025
+
+
+
+
+                             Authorised Version F2025L00682 registered 13/06/2025
+                                              Participating in the Help to Buy program Part 3
+                                                             Varying arrangements Division 5
+
+                                                                                      Section 39
+             additional $90,000 is paid on behalf of the Commonwealth, this would increase the
+             Commonwealth share to 40%.
+
+(2) Subsection (1) applies even if the increase to the purchase price would mean that
+    Housing Australia contributes less than the amount required to ensure that its
+    contribution and applicant’s deposit together equal at least 20% of the new value
+    of the property.
+    Note:    This may mean that the participant has to bear the cost of lenders’ mortgage insurance.
+
+
+
+
+                            Help to Buy Program Directions 2025                                  31
+
+
+
+                 Authorised Version F2025L00682 registered 13/06/2025
+Part 3 Participating in the Help to Buy program
+Division 6 Terminating arrangements in specified circumstances
+
+Section 40
+
+Division 6—Terminating arrangements in specified circumstances
+
+40 Housing Australia must reserve power to terminate arrangements in certain
+         circumstances
+         (1) Housing Australia must ensure that an arrangement may be terminated if, before
+             the settlement date for the purchase of the relevant property:
+               (a) due to a change of circumstances, the participant stops being an eligible
+                   applicant; or
+               (b) Housing Australia stops being satisfied that the mortgage requirements or
+                   new home contract requirements will be met by the settlement date.
+         (2) Housing Australia must ensure that an arrangement can be terminated at any time
+             if:
+               (a) Housing Australia stops being satisfied that the timeframe requirements
+                   will be met; or
+               (b) the timeframe requirements have not been met; or
+               (c) Division 2 of Part 5 (about allocating Help to Buy places) would require
+                   the arrangement to be terminated.
+         (3) This section does not limit the circumstances in which an arrangement may allow
+             Housing Australia to terminate the arrangement.
+
+
+
+
+ 32                          Help to Buy Program Directions 2025
+
+
+
+
+                           Authorised Version F2025L00682 registered 13/06/2025
+                                                                                Exiting the program Part 4
+                                                                                   Introduction Division 1
+
+                                                                                              Section 41
+
+Part 4—Exiting the program
+Division 1—Introduction
+
+41 Simplified outline of this Part
+
+           This Part sets out additional means by which an arrangement is to be able to be
+           brought to an early end, such as voluntary early repayments or sale of the
+           relevant property. It also deals with how Housing Australia may manage
+           arrangements in respect of deceased estates of participants. It is relevant to the
+           performance of Housing Australia’s functions in relation to both participating
+           and cooperating States, and the Territories.
+
+
+42 Application of this Part
+           This Part applies to the performance of Housing Australia’s functions in relation
+           to:
+             (a) the participating States and the Territories (under subparagraph 24(1)(a)(i)
+                 of the Act); and
+             (b) cooperating States (under subparagraph 24(1)(a)(ii) of the Act).
+
+
+
+
+                                   Help to Buy Program Directions 2025                                33
+
+
+
+                         Authorised Version F2025L00682 registered 13/06/2025
+Part 4 Exiting the program
+Division 2 Exiting the program
+
+Section 43
+
+Division 2—Exiting the program
+
+43 Housing Australia must allow voluntary early repayments
+        (1) Housing Australia must ensure that each arrangement permits a participant to
+            make one or more voluntary repayments, provided that each repayment would:
+             (a) when rounded to the nearest $1,000, reduce the Commonwealth share
+                 percentage by at least 5% of the value of the relevant property as at the
+                 time of the repayment; or
+             (b) repay the Commonwealth share (as valued at that time) in full.
+        (2) Housing Australia must ensure that each arrangement allows Housing Australia
+            to require the participant to bear the costs of obtaining a valuation, and any other
+            administrative costs, associated with a repayment.
+
+44 Housing Australia must allow the relevant property to be sold
+        (1) Housing Australia must ensure that each arrangement allows the participant to
+            sell the relevant property at any time, subject to the conditions specified in the
+            arrangement and mentioned in subsection (2).
+        (2) For the purposes of subsection (1), the conditions are that:
+              (a) the participant must give Housing Australia written notice of a sale
+                  immediately after the parties enter into a contract of sale; and
+              (b) Housing Australia is satisfied that the contract of sale has been entered into
+                  on an arm’s-length basis; and
+             (c) the participant must bear the costs of obtaining a valuation, and any other
+                  administrative costs, associated with the sale.
+
+45 Options for deceased estates of participants
+        (1) Housing Australia must ensure that each arrangement provides for Housing
+            Australia to be able to recover the Commonwealth share (as valued at the time it
+            is recovered), in accordance with this section, where:
+              (a) a sole participant in an arrangement dies; or
+              (b) 2 joint participants own the relevant property as joint tenants, and both
+                  participants die.
+             Note:     Subsection 13(2) requires Housing Australia to ensure that each arrangement contains
+                       such terms and conditions as are necessary to enable it to comply with the requirements
+                       of this instrument.
+
+        (2) However, the arrangement must also provide that Housing Australia need not
+            recover the Commonwealth share where:
+              (a) the relevant property is inherited by a single beneficiary (or 2 beneficiaries
+                  jointly) of the estate of one or both of the deceased participants; and
+              (b) each beneficiary applies, in the manner and form approved by Housing
+                  Australia, to be accepted as a participant in the arrangement; and
+              (c) the requirements in paragraphs 17(a) to (e) (about eligible applicants) are
+                  met in respect of each beneficiary at the time of the application; and
+
+
+ 34                           Help to Buy Program Directions 2025
+
+
+
+
+                           Authorised Version F2025L00682 registered 13/06/2025
+                                                                      Exiting the program Part 4
+                                                                  Exiting the program Division 2
+
+                                                                                    Section 45
+      (d) Housing Australia agrees to substitute each beneficiary as a party to, and
+          participant in, the arrangement in respect of the relevant property.
+(3) Housing Australia must ensure that each arrangement provides for Housing
+    Australia to be able to recover the Commonwealth share (as valued at the time it
+    is recovered), where:
+      (a) 2 joint participants own the relevant property as tenants in common; and
+      (b) one of the participants dies; and
+      (c) an individual, other than the surviving participant, inherits the deceased
+          participant’s interest in the property.
+(4) However, the arrangement must also provide that Housing Australia need not
+    recover the Commonwealth share where:
+      (a) the deceased participant’s interest in the relevant property is inherited by a
+          beneficiary of the estate of the deceased or by a surviving participant (the
+          successor); and
+      (b) the successor applies, in the manner and form approved by Housing
+          Australia, to be accepted as a participant in the arrangement; and
+      (c) the requirements in paragraphs 17(a) to (e) (about eligible applicants) are
+          met in respect of the successor at the time of the application; and
+      (d) Housing Australia agrees to substitute the successor as a participant in the
+          arrangement in respect of the relevant property.
+(5) Where Housing Australia must recover a Commonwealth share under a provision
+    of an arrangement required by this section, Housing Australia must do so within:
+      (a) 2 years of the date of the deceased participant’s death; or
+     (b) such longer period as Housing Australia considers reasonable, where a
+          surviving participant or beneficiary is experiencing hardship.
+(6) Housing Australia must ensure that an arrangement allows Housing Australia to
+    require a beneficiary to bear any administrative costs associated with a
+    substitution under subsection (2) or (4).
+
+
+
+
+                            Help to Buy Program Directions 2025                             35
+
+
+
+                  Authorised Version F2025L00682 registered 13/06/2025
+Part 5 Miscellaneous
+Division 1 Introduction
+
+Section 46
+
+Part 5—Miscellaneous
+Division 1—Introduction
+
+46 Simplified outline of this Part
+
+             This Part deals with allocation of Help to Buy places across the participating
+             jurisdictions. It also deals with miscellaneous matters relevant to the
+             administration of the program, such as Housing Australia’s ability to charge fees
+             in relation to arrangements, the approval of participating lenders, and the making
+             of improvements to relevant properties.
+
+             This Part is relevant to the performance of Housing Australia’s functions in
+             relation to the participating States and the Territories, and, in some respects, the
+             cooperating States.
+
+
+
+
+ 36                          Help to Buy Program Directions 2025
+
+
+
+
+                           Authorised Version F2025L00682 registered 13/06/2025
+                                                                                   Miscellaneous Part 5
+                                                                Allocating Help to Buy places Division 2
+
+                                                                                                 Section 47
+
+Division 2—Allocating Help to Buy places
+
+47 Application of this Division
+           This Division applies to the performance of Housing Australia’s functions in
+           relation to the participating States and the Territories (under
+           subparagraph 24(1)(a)(i) of the Act).
+           Note:       Paragraphs 14(1)(d) and 14(4)(h) of this instrument provide that Housing Australia
+                       may only approve applications for arrangements, and enter into arrangements, where
+                       this Division allows.
+
+
+48 Allocating places—first year of the program
+
+           10,000 places are available in the first year of program
+       (1) 10,000 places are to be made available in the period starting on 1 July 2025 and
+           ending on 30 June 2026 (the initial period).
+
+           Initial per capita allocation to participating jurisdictions
+       (2) The places are to be allocated between the participating States and the Territories
+           as follows:
+             (a) each State, that is a participating State on 1 July 2025, is allocated a
+                 number of places on 1 July 2025; and
+             (b) each State, that is not a participating State on 1 July 2025, but becomes a
+                 participating State before 1 March 2026, is allocated a number of places on
+                 the day it becomes a participating State; and
+             (c) each Territory is allocated a number of places on 1 July 2025.
+           Note:       This section operates subject to section 52 (which prevents places from being allocated
+                       in certain circumstances once a participating State has given notice of its intention to
+                       stop participating).
+
+       (3) The number of places to be allocated for a participating State or a Territory for
+           the initial period is the number of places worked out in accordance with the
+           following formula:
+                       𝑝𝑜𝑝𝑢𝑙𝑎𝑡𝑖𝑜𝑛 𝑜𝑓 𝑝𝑎𝑟𝑡𝑖𝑐𝑖𝑝𝑎𝑡𝑖𝑛𝑔 𝑆𝑡𝑎𝑡𝑒 𝑜𝑟 𝑇𝑒𝑟𝑟𝑖𝑡𝑜𝑟𝑦 𝑓𝑜𝑟 𝑡ℎ𝑒 2025-26 𝑓𝑖𝑛𝑎𝑛𝑐𝑖𝑎𝑙 𝑦𝑒𝑎𝑟
+            10,000 ×
+                                  𝑝𝑜𝑝𝑢𝑙𝑎𝑡𝑖𝑜𝑛 𝑜𝑓 𝐴𝑢𝑠𝑡𝑟𝑎𝑙𝑖𝑎 𝑓𝑜𝑟 𝑡ℎ𝑒 2025-26 𝑓𝑖𝑛𝑎𝑛𝑐𝑖𝑎𝑙 𝑦𝑒𝑎𝑟
+
+
+           Where the result of the formula is not a whole number, round down to the nearest
+           whole number.
+
+49 Committing and using places—first year of the program
+       (1) Where a place has been allocated to a particular State or Territory under
+           subsection 48(2), Housing Australia may, on or after the allocation date, commit
+           or use the place for an arrangement in respect of property in that State or
+           Territory at any time before 1 March 2026.
+           Note 1:     Paragraph 14(4)(h) means that Housing Australia cannot approve an application except
+                       where this Division allows.
+
+
+
+
+                                      Help to Buy Program Directions 2025                                  37
+
+
+
+                           Authorised Version F2025L00682 registered 13/06/2025
+Part 5 Miscellaneous
+Division 2 Allocating Help to Buy places
+
+Section 50
+             Note 2:   This section operates subject to section 52 (which prevents places from being used and
+                       arrangements from being entered into in certain circumstances once a participating
+                       State has given notice of its intention to cease participating).
+
+             Committing and using places from 1 March 2026
+         (2) Where a place remains unallocated or uncommitted on 1 March 2026, Housing
+             Australia may, on or after that date, commit or use the place for an arrangement
+             in respect of property in any participating State or a Territory at any time before
+             the end of the 2025-26 financial year.
+             Note:     Places will be unallocated on 1 March 2026 if not all States are participating by that
+                       date, or, if all States are participating, if rounding under subsection 48(3) results in
+                       some places being unallocated.
+
+             Uncommitted places at end of year treated as unused for next financial year
+         (3) If a place has not been committed before the end of 30 June 2026, for the
+             purposes of working out the number of unused places in a financial year, it is to
+             be treated as an unused place for the next financial year.
+
+             Where place is committed, arrangement need not be entered into before end of
+             financial year
+         (4) If a place is committed before the end of 30 June 2026:
+               (a) Housing Australia may only use the place, and enter into an arrangement in
+                    respect of the place, before the end of 30 June 2027; and
+               (b) after 30 June 2027, for the purposes of working out the number of unused
+                    places in a financial year, the place is to be treated as an unused place.
+             Note 1:   This allows the place to be rolled over under subsection 50(1). However, this section
+                       applies subject to section 52, which deals with situations where a State gives notice of
+                       its intention to stop participating in the program.
+             Note 2:   Paragraph 14(1)(d) provides that Housing Australia may only enter into an arrangement
+                       where this Division allows. This section will sometimes prevent Housing Australia
+                       from entering into an arrangement in respect of a place even where it had previously
+                       approved an application to enter into the arrangement.
+
+
+50 Allocating places—subsequent years of the program
+
+             Number of places available in subsequent years
+         (1) The annual number of places that are to be made available in a financial year
+             after the 2025-26 financial year is the sum of:
+               (a) 10,000 places; and
+               (b) the number of unused places from a previous financial year that are treated
+                    as unused places for that financial year.
+
+             Initial per-capita allocation to participating jurisdictions
+         (2) The places are allocated between the participating States and the Territories for a
+             financial year as follows:
+               (a) each State, that is a participating State before the start of the financial year,
+                   is allocated a number of places on 1 July of that year; and
+
+
+ 38                           Help to Buy Program Directions 2025
+
+
+
+
+                            Authorised Version F2025L00682 registered 13/06/2025
+                                                                                   Miscellaneous Part 5
+                                                                Allocating Help to Buy places Division 2
+
+                                                                                                  Section 51
+              (b) each Territory is allocated a number of places on 1 July of each financial
+                  year starting on or after 1 July 2026.
+            Note:      This section operates subject to section 52 (which prevents places from being allocated
+                       in certain circumstances once a participating State has given notice of its intention to
+                       withdraw).
+
+       (3) The allocated number of places for a participating State or a Territory for a
+           financial year is the number of places worked out in accordance with the
+           following formula:
+   𝑎𝑛𝑛𝑢𝑎𝑙 𝑛𝑢𝑚𝑏𝑒𝑟        𝑝𝑜𝑝𝑢𝑙𝑎𝑡𝑖𝑜𝑛 𝑜𝑓 𝑝𝑎𝑟𝑡𝑖𝑐𝑖𝑝𝑎𝑡𝑖𝑛𝑔 𝑆𝑡𝑎𝑡𝑒 𝑜𝑟 𝑇𝑒𝑟𝑟𝑖𝑡𝑜𝑟𝑦 𝑓𝑜𝑟 𝑡ℎ𝑒 𝑓𝑖𝑛𝑎𝑛𝑐𝑖𝑎𝑙 𝑦𝑒𝑎𝑟
+                 ×
+     𝑜𝑓 𝑝𝑙𝑎𝑐𝑒𝑠     𝑝𝑜𝑝𝑢𝑙𝑎𝑡𝑖𝑜𝑛 𝑜𝑓 𝑎𝑙𝑙 𝑝𝑎𝑟𝑡𝑖𝑐𝑖𝑝𝑎𝑡𝑖𝑛𝑔 𝑆𝑡𝑎𝑡𝑒𝑠 𝑎𝑛𝑑 𝑡ℎ𝑒 𝑇𝑒𝑟𝑟𝑖𝑡𝑜𝑟𝑖𝑒𝑠 𝑓𝑜𝑟 𝑡ℎ𝑒 𝑓𝑖𝑛𝑎𝑛𝑐𝑖𝑎𝑙 𝑦𝑒𝑎𝑟
+
+
+            Where the result of the formula is not a whole number, round down to the nearest
+            whole number.
+
+            Maximum number of places that can be allocated under the program
+       (4) Despite subsection (1), the annual number of places for a financial year is to be
+           reduced so that the total number of used places, for all financial years, does not
+           exceed 40,000. Where this subsection applies, Housing Australia must pro rata
+           each participating State’s and each Territory’s allocation for the financial year.
+
+51 Committing and using places—subsequent years of the program
+       (1) Where a place has been allocated to a particular State or Territory under
+           subsection 50(2), Housing Australia may, on or after the allocation date, commit
+           or use the place for an arrangement in respect of property in that State or
+           Territory at any time before 1 March of the relevant financial year.
+            Note 1:    Paragraph 14(3)(h) means that Housing Australia cannot approve an application except
+                       where this Division allows.
+            Note 2:    This section operates subject to section 52 (which prevents places from being used and
+                       arrangements from being entered into in certain circumstances once a participating
+                       State has given notice of its intention to withdraw).
+
+       (2) Where a place is unallocated following the application of section 50, Housing
+           Australia may, after 1 March of the relevant financial year, commit or use the
+           place for an arrangement in respect of property in any participating State or a
+           Territory at any time before the end of that financial year.
+            Note:      A place may be unallocated because of a rounding under subsection 50(3), because of
+                       the operation of section 52 (which prevents places from being allocated in certain
+                       circumstances once a participating State has given notice of its intention to withdraw),
+                       or because a State is not a participating State.
+
+            Uncommitted places after 1 March of the relevant financial year
+       (3) Where a place remains uncommitted on 1 March of a relevant financial year,
+           Housing Australia may, on or after that date, commit or use the place for an
+           arrangement in respect of property in any participating State or a Territory at any
+           time before the end of that financial year.
+
+
+
+
+                                      Help to Buy Program Directions 2025                                   39
+
+
+
+                           Authorised Version F2025L00682 registered 13/06/2025
+Part 5 Miscellaneous
+Division 2 Allocating Help to Buy places
+
+Section 52
+             Uncommitted places at end of year treated as unused places for next financial
+             year
+         (4) If a place remains uncommitted on 30 June of a relevant financial year, for the
+             purposes of working out the number of unused places in a financial year, it is to
+             be treated as an unused place for the next financial year.
+
+             Where place is committed, arrangement need not be entered into before end of
+             financial year
+         (5) If a place is committed before the end of 30 June of the relevant financial year:
+               (a) Housing Australia may use the place, and enter into an arrangement in
+                    respect of the place, at any time before the end of 30 June of the next
+                    financial year; and
+               (b) at the end of that next financial year:
+                      (i) subject to subparagraph (ii), the place may no longer be used, and an
+                          arrangement may no longer be entered into in respect of the place; and
+                     (ii) for the purposes of working out the number of unused places in a
+                          financial year, it is to be treated as an unused place for the next
+                          financial year.
+             Note 1:   This allows the place to be rolled over under subsection 50(1). However, this section
+                       applies subject to section 52, which deals with situations where a State gives notice of
+                       its intention to cease participating.
+             Note 2:   Paragraph 14(1)(c) provides that Housing Australia may only enter into an arrangement
+                       where this Division permits. This section will sometimes prevent Housing Australia
+                       from entering into an arrangement in respect of a place even where it had previously
+                       approved an application to enter into the arrangement.
+
+
+52 Actions where a State intends to cease participating
+         (1) Where a participating State gives notice, in accordance with the
+             Intergovernmental Agreement on the Help to Buy Scheme, that it intends to stop
+             being a participating State:
+               (a) no further places are to be allocated to the State after the date Housing
+                   Australia becomes aware of the giving of the notice; and
+               (b) Housing Australia may still use a place for an arrangement, or enter into an
+                   arrangement, in respect of property in that State, if:
+                     (i) Housing Australia had committed the place before the date mentioned
+                         in paragraph (a); and
+                    (ii) the State has not ceased to be a participating State as of the date the
+                         place is used or the arrangement is entered into.
+             Note:     See subsection 35(4) of the Act for the circumstances in which a State stops being a
+                       participating State.
+
+         (2) If a State ceases to be a participating State:
+               (a) Housing Australia cannot use a place in respect of a relevant property in
+                    that State from the day the State becomes a cooperating State or a
+                    withdrawn State (in both cases, the withdrawal day), even if it had
+                    committed the place before that day; and
+
+
+
+ 40                           Help to Buy Program Directions 2025
+
+
+
+
+                           Authorised Version F2025L00682 registered 13/06/2025
+                                                                                 Miscellaneous Part 5
+                                                              Allocating Help to Buy places Division 2
+
+                                                                                         Section 53
+            (b) if Housing Australia has entered into an arrangement in respect of a
+                relevant property in that State, but settlement has not been completed as of
+                the withdrawal day—Housing Australia must terminate the arrangement.
+       (3) Where, under this section, Housing Australia:
+             (a) can no longer use a place, or enter into an arrangement in respect of a
+                 place, in relation to property in a particular State; or
+             (b) terminates an arrangement in respect of a place, in relation to property in
+                 that State;
+           Housing Australia may commit or use the place for an arrangement in respect of
+           property in any other participating State or a Territory at any time between
+           1 March in the financial year in which the notice was given by the participating
+           State that it intends to stop being a participating State and the end of that
+           financial year.
+       (4) This section applies despite anything in sections 48 and 50.
+
+53 Managing places where purchase does not settle
+       (1) Subsections (2) to (3) apply where Housing Australia has committed or used a
+           place, but:
+             (a) the participating lender withdraws their mortgage approval prior to
+                 settlement of the purchase of the relevant property and Housing Australia is
+                 satisfied that the participating lender, or another participating lender, will
+                 not enter into a mortgage over the relevant property within a reasonable
+                 time; or
+            (b) the settlement fails for any other reason and Housing Australia is satisfied
+                 that settlement will not proceed within a reasonable time.
+       (2) Following a withdrawal or failure mentioned in subsection (1), Housing
+           Australia:
+            (a) must not approve an application to enter into an arrangement in respect of
+                that place; and
+            (b) if the approval has already been granted, but an arrangement has not yet
+                been entered into—must revoke the approval; and
+            (c) must not enter into an arrangement in respect of the place (whether or not
+                an approval has already been granted); and
+            (d) if an arrangement has already been entered into—must terminate the
+                arrangement.
+       (3) Housing Australia may, on or after the date of the withdrawal or failure
+           mentioned in subsection (1), commit or use the place for an arrangement in
+           respect of property in any participating State or a Territory at any time between
+           1 March in the financial year in which the withdrawal or failure occurred and the
+           end of that financial year.
+
+
+
+
+                                   Help to Buy Program Directions 2025                            41
+
+
+
+                         Authorised Version F2025L00682 registered 13/06/2025
+Part 5 Miscellaneous
+Division 3 Administering the program
+
+Section 54
+
+Division 3—Administering the program
+
+54 Application of this Division
+             This Division applies to the performance of Housing Australia’s functions in
+             relation to:
+               (a) the participating States and the Territories (under subparagraph 24(1)(a)(i)
+                    of the Act); and
+               (b) cooperating States (under subparagraph 24(1)(a)(ii) of the Act).
+
+55 Indexing relevant amounts
+        (1) Each amount mentioned in paragraph 60(2)(d) and paragraph 1.13(1)(e) of
+            Schedule 1 is to be indexed on the first day of each financial year starting on or
+            after 1 July 2026 by multiplying it by its indexation factor for 1 June in the
+            preceding financial year.
+        (2) The indexation factor for 1 June in a financial year is the number worked out as
+            follows:
+
+             Method statement
+
+             Step 1.   Add:
+
+                       (a)      the CPI index number for the quarter ending on 31 March in that
+                                financial year; and
+
+                       (b)      the CPI index numbers for the 3 quarters that immediately
+                                preceded that quarter.
+
+             Step 2.   Add:
+
+                       (a)      the CPI index number for the quarter ending on 31 March in the
+                                immediately preceding financial year; and
+
+                       (b)      the CPI index numbers for the 3 quarters that immediately
+                                preceded that quarter.
+
+             Step 3.   The indexation factor for 1 June in the financial year is the amount
+                       under step 1 divided by the amount under step 2.
+
+        (3) The indexation factor is to be worked out to 3 decimal places, rounding up if the
+            fourth decimal place is 5 or more.
+        (4) An amount mentioned in paragraph 60(2)(d) or paragraph 13(1)(e) of
+            Schedule 1, after indexation, must be rounded to the nearest $1,000.
+
+
+
+
+ 42                            Help to Buy Program Directions 2025
+
+
+
+
+                             Authorised Version F2025L00682 registered 13/06/2025
+                                                                                 Miscellaneous Part 5
+                                                                 Administering the program Division 3
+
+                                                                                          Section 56
+56 Meaning of CPI index number
+       (1) The CPI index number for a quarter is the All Groups Consumer Price Index
+           number (being the weighted average of the 8 capital cities) published by the
+           Australian Statistician in respect of that quarter.
+           Note:     The All Groups Consumer Price Index could in 2025 be viewed on the Australian
+                     Bureau of Statistics website (https://www.abs.gov.au).
+
+       (2) Subject to subsection (3), if, at any time before or after the commencement of
+           this instrument:
+             (a) the Australian Statistician has published or publishes an index number in
+                  respect of a quarter; and
+             (b) that index number is in substitution for an index number previously
+                  published by the Australian Statistician in respect of that quarter;
+           disregard the publication of the later index number for the purposes of this
+           section.
+       (3) If, at any time before or after the commencement of this instrument, the
+           Australian Statistician has changed or changes the index reference period for the
+           Consumer Price Index, then, for the purposes of applying this section after the
+           change took place or takes place, have regard only to index numbers published in
+           terms of the new index reference period.
+
+57 Housing Australia must not charge certain fees
+       (1) Housing Australia must not charge fees under an arrangement:
+            (a) in relation to the application for, or approval of, the arrangement; or
+            (b) to cover Housing Australia’s operating costs.
+       (2) However, this instrument does not:
+            (a) prevent Housing Australia from passing on to an applicant or participant
+                the cost of:
+                  (i) obtaining a property valuation or other costs related to obtaining the
+                      valuation; or
+                 (ii) taking action under Division 4 of Part 3 (about managing
+                      compliance), or otherwise enforcing an arrangement; or
+            (b) place any further limits on Housing Australia’s power to require payment
+                under an arrangement, agreement or contract.
+       (3) Housing Australia must not pay a mortgage registration fee on behalf of an
+           applicant or participant.
+
+58 Valuing a relevant property
+
+           Ascertaining the value of a relevant property
+       (1) This section applies where it is necessary for Housing Australia to ascertain the
+           value of a property at a particular time because of:
+            (a) a provision of the Act or this instrument; or
+            (b) a term of an arrangement.
+
+
+
+                                   Help to Buy Program Directions 2025                               43
+
+
+
+                         Authorised Version F2025L00682 registered 13/06/2025
+Part 5 Miscellaneous
+Division 3 Administering the program
+
+Section 59
+             Example: It would be necessary to value a property where a participant wishes to make a
+                      voluntary repayment under section 43, because such a payment must reduce the
+                      Commonwealth share percentage by at least 5% of the value of the property, and the
+                      size of the payment required to meet that condition will depend on the value of the
+                      property at the relevant time (see section 25).
+
+        (2) The value of the property is the value that Housing Australia is satisfied most
+            closely represents the property’s market value, based on:
+              (a) a valuation provided by an independent expert acceptable to Housing
+                  Australia who:
+                    (i) holds the authorisations (if any) that they are required by law to hold
+                        in order to provide valuations in the jurisdiction in which the relevant
+                        property is located; and
+                   (ii) if there are no such legal requirements for the relevant jurisdiction—is
+                        a valuer that Housing Australia considers has the appropriate
+                        experience and qualifications taking into account the legislative
+                        requirements in other jurisdictions; and
+                  (iii) operates on an arm’s-length basis from the applicant or participant;
+                        and
+              (b) any other valuation that Housing Australia considers it appropriate to take
+                  into account; and
+              (c) any other matter that Housing Australia thinks is relevant.
+             Note:      Subsection 13(2) requires Housing Australia to ensure that each arrangement contains
+                        such terms and conditions as are necessary to enable it to comply with the requirements
+                        of this instrument. As such, each arrangement will need to ensure that the valuation
+                        requirements under that arrangement reflect this section.
+
+
+59 Timing of Housing Australia’s financial contributions to purchase price
+        (1) For an arrangement relating to the construction of a new home, Housing
+            Australia must pay the Commonwealth’s contribution:
+             (a) for the agreed percentage of the purchase price of the land—at the time of
+                 settlement of the purchase of the land to which the arrangement relates; and
+             (b) for the agreed percentage of each progress payment:
+                   (i) at the time that Housing Australia considers appropriate to assist the
+                       participating lender to facilitate the progress of construction, but also
+                       having regard to any associated risk to Commonwealth funds; and
+                  (ii) no later than the time when the progress payment is required under the
+                       construction contract.
+             Example: Housing Australia agrees to provide 40% of the purchase price under an arrangement
+                      relating to a house and land package. It pays 40% of the purchase price of the land at
+                      the settlement date, followed by 40% of the value of each progress payment in the
+                      course of the construction.
+
+        (2) For any other arrangement, Housing Australia must pay the Commonwealth’s
+            contribution to the purchase price at the time of settlement.
+
+
+
+
+ 44                            Help to Buy Program Directions 2025
+
+
+
+
+                             Authorised Version F2025L00682 registered 13/06/2025
+                                                                                 Miscellaneous Part 5
+                                                                 Administering the program Division 3
+
+                                                                                             Section 60
+60 Home improvements
+       (1) Housing Australia must not impose terms and conditions on an arrangement that
+           would prevent a participant from making improvements to the relevant property
+           at their own expense.
+       (2) To ensure that the Commonwealth does not benefit from any part of the increase
+           in the property’s value resulting from the improvements, Housing Australia
+           must, under the arrangement:
+             (a) reduce the Commonwealth share percentage; and
+             (b) make any necessary amendments to the arrangement, or contracts or
+                  agreements relating to the arrangement;
+           where:
+             (c) the participant gives notice to Housing Australia of the proposed
+                  improvements in the form approved by Housing Australia; and
+             (d) the improvements cost $20,000 or more (as indexed in accordance with
+                  section 55); and
+             (e) the participant obtained any approvals required under the law of the
+                  relevant jurisdiction before commencing the improvements; and
+              (f) the property is valued before and after the improvements are carried out to
+                  ascertain their impact on its value (disregarding the impact of other factors
+                  such as market movements, repairs or maintenance).
+           Note:     If the cost of the improvements is less than $20,000, the Commonwealth will share in
+                     any resultant increase in value.
+
+       (3) For the purposes of subsection (2), a continuous series of separate improvements
+           carried out over a period of up to 12 months is to be treated as one set of
+           improvements.
+
+61 Housing Australia must have an internal complaints review mechanism
+           Housing Australia must establish and maintain a mechanism for:
+            (a) applicants and participants to make complaints about actions taken or
+                decisions made by Housing Australia under this instrument or an
+                arrangement; and
+            (b) Housing Australia to properly consider and respond to such complaints.
+
+62 Housing Australia must establish arrangements for approving participating
+         lenders
+       (1) Housing Australia may approve, in writing, a lender to provide mortgages in
+           connection with arrangements.
+       (2) Housing Australia may revoke an approval under subsection (1) by notifying the
+           lender in writing.
+       (3) Housing Australia must establish criteria and processes for the approval of
+           entities under subsection (1), and for the revocation of such approvals under
+           subsection (2), which must include criteria directed at assessing the following
+           matters:
+
+
+
+                                    Help to Buy Program Directions 2025                                45
+
+
+
+                         Authorised Version F2025L00682 registered 13/06/2025
+Part 5 Miscellaneous
+Division 3 Administering the program
+
+Section 63
+              (a) the entity’s standard of customer care, including its treatment of borrowers
+                   in hardship; and
+              (b) the competitiveness of the mortgage products that the entity would offer in
+                   connection with arrangements, including interest rates and other fees and
+                   charges; and
+              (c) the quality of an entity’s loan origination processes (including distribution
+                   channels, such as branches or online portals, and origination channels, such
+                   as use of mortgage brokers) and the associated level of financial risk to the
+                   Commonwealth; and
+              (d) the entity’s reputation; and
+              (e) the extent to which approving the entity would promote competition in
+                   lending and related markets; and
+               (f) the extent to which all entities approved, considered together, could
+                   undertake credit activities across Australia (including through other entities
+                   providing credit services); and
+              (g) whether the entity holds all the licences and approvals it would require to
+                   provide mortgages in connection with arrangements; and
+              (h) the lender’s capacity to work with Housing Australia over the life of
+                   arrangements and the Help to Buy program.
+
+63 Housing Australia may rely on information
+             Housing Australia may rely on information supplied by a participating lender,
+             participant, or other person or entity, that Housing Australia reasonably believes
+             to be accurate.
+
+64 How Housing Australia must manage arrangements where participant is
+        experiencing hardship
+             Housing Australia must establish policies and procedures for dealing with and
+             assisting participants who:
+               (a) are unable to comply with their obligations under an arrangement (whether
+                    those obligations relate to repayments or other matters); and
+               (b) should, in Housing Australia’s opinion and as allowed under this
+                    instrument, not be required to comply with those obligations; and
+             in applying those policies and procedures, must consider a participant’s
+             individual circumstances.
+
+65 Principles for operation of the Help to Buy program
+             Housing Australia must administer the Help to Buy program:
+              (a) with integrity; and
+              (b) to promote the object of improving housing outcomes for Australians by
+                  assisting low-income and middle-income individuals to buy homes; and
+              (c) in a manner consistent with the Intergovernmental Agreement on the Help
+                  to Buy scheme, as existing at the time this instrument commenced; and
+              (d) in a manner designed to:
+
+
+
+ 46                          Help to Buy Program Directions 2025
+
+
+
+
+                          Authorised Version F2025L00682 registered 13/06/2025
+                                                               Miscellaneous Part 5
+                                               Administering the program Division 3
+
+                                                                       Section 65
+  (i) effectively manage risks associated with the program, including by
+      managing the risks of fraud and non-compliance in relation to
+      arrangements and other agreements; and
+ (ii) give applicants as much flexibility as possible in their choice of home,
+      and in decisions relating to the relevant property; and
+(iii) ensure that the program is consistent with current industry and
+      community standards and expectations and
+(iv) encourage participants to repay the Commonwealth share as early as
+      their financial circumstances allow; and
+ (v) protect the Commonwealth’s investment from loss; and
+(vi) raise awareness and educate interested parties about the program.
+
+
+
+
+                 Help to Buy Program Directions 2025                           47
+
+
+
+       Authorised Version F2025L00682 registered 13/06/2025
+Schedule 1 Participation requirements
+
+
+
+
+Clause 1.1
+
+Schedule 1—Participation requirements
+Note 1: See section 28.
+Note 2: This Schedule does not impose legal obligations on participants directly. Rather, Housing Australia, in
+        accordance with section 28, must ensure that arrangements require participants to meet these
+        requirements.
+
+
+1.1 Sale of existing property
+               Subject to section 29, a participant in an arrangement who is a single parent must
+               not continue to hold a disqualifying property interest more than 4 weeks after
+               becoming the registered owner of the relevant property.
+
+1.2 Participant must remain only registered owner of property
+               Subject to section 45 (about deceased estates), a participant must remain the only
+               registered owner of the property.
+
+1.3 Property must remain principal place of residence
+               Subject to section 30, each participant must treat the relevant property as their
+               principal place of residence.
+
+1.4 Participant must not take out further mortgages over property
+         (1) A participant must not take out any mortgages over the relevant property other
+             than:
+               (a) the mortgage with their participating lender; and
+               (b) the mortgage securing the Commonwealth share.
+          (2) To avoid doubt, a participant:
+               (a) may only hold one mortgage with one participating lender at a time; but
+               (b) may take out a new mortgage with a participating lender in order to
+                   discharge their mortgage with their current participating lender.
+         (3) This clause does not apply if, at the time when the participant takes out a
+             mortgage, the Commonwealth share in respect of the relevant property will be
+             repaid in full.
+
+1.5 Participant must notify Housing Australia when borrowing additional funds
+           from a participating lender
+          (1) A participant must not:
+               (a) borrow additional funds under their mortgage with their participating
+                   lender; or
+               (b) take out a new and larger mortgage with a participating lender to discharge
+                   their mortgage with their current participating lender;
+              without first notifying Housing Australia of their intent to do so.
+               Note:       Housing Australia must ensure that an arrangement enables a participant to increase the
+                           size of their mortgage only where the proposed increase is for a specified purpose as set
+                           out in section 32.
+
+
+ 48                               Help to Buy Program Directions 2025
+
+
+
+
+                                Authorised Version F2025L00682 registered 13/06/2025
+                                                                 Participation requirements Schedule 1
+
+
+
+                                                                                          Clause 1.6
+
+       (2) To avoid doubt, this clause does not require notification by a participant of any
+           borrowing, nor limit the capacity of a participant to borrow, other than by way of
+           a mortgage.
+
+1.6 Participant must not receive assistance from other relevant schemes
+           A participant must not receive assistance by way of one or more of the
+           following:
+             (a) a home-buyer guarantee provided by a Commonwealth entity or
+                 Commonwealth company;
+             (b) a shared equity scheme;
+             (c) a loan or guarantee provided by or on behalf of a State or Territory to
+                 support home ownership.
+
+1.7 Participant must not acquire disqualifying property interest
+       (1) A participant must not hold a disqualifying property interest.
+       (2) Where the participant acquires the disqualifying property interest as a beneficiary
+           in a deceased estate, subsection (1) does not apply for the first 2 years after the
+           deceased’s death.
+
+1.8 Participant must maintain the property
+           A participant must maintain the relevant property to a standard that is adequate to
+           preserve its value.
+
+1.9 Participant must not lease the property
+           A participant must not enter into a lease arrangement in respect of the relevant
+           property unless:
+             (a) the participant is allowed, as set out under section 30, to not comply with
+                 the principal place of residence requirement at all times during the currency
+                 of the lease arrangement; and
+            (b) the participant notifies Housing Australia before entering into the lease
+                 arrangement.
+
+1.10 Participant must not use the property for business purposes
+           A participant must not use the relevant property for a business or commercial
+           purpose.
+
+1.11 Participant must maintain adequate insurance
+           A participant must:
+            (a) keep the relevant property adequately insured; and
+            (b) provide evidence of their insurance arrangements to Housing Australia
+                each year; and
+            (c) notify Housing Australia of any changes to their insurance policy within
+                60 days of the change taking effect.
+
+
+
+                                    Help to Buy Program Directions 2025                           49
+
+
+
+                         Authorised Version F2025L00682 registered 13/06/2025
+Schedule 1 Participation requirements
+
+
+
+
+Clause 1.12
+1.12 Participant must pay ongoing costs
+              A participant must ensure that all ongoing costs associated with the relevant
+              property (such as rates and strata fees) are paid.
+
+1.13 Participant must notify Housing Australia of relevant changes of
+           circumstances
+         (1) A participant must notify Housing Australia if any of the following events occur:
+              (a) the participant breaches a participation requirement (including the
+                  participation requirement outlined in this clause);
+              (b) the participant ceases to be an Australian citizen;
+              (c) the participant refinances or discharges their mortgage with their
+                  participating lender;
+              (d) a progress payment has become due and payable under a contract for the
+                  construction of a new home;
+              (e) the relevant property sustains damage that would cost in excess of $20,000
+                  to repair (indexed in accordance with section 55).
+         (2) The participant must give notice in the form approved by Housing Australia,
+             within 90 days of the day on which the participant became aware, or should have
+             become aware, of the relevant event.
+
+1.14 Participant may only vary or enter new construction contract in certain
+           cases
+         (1) Where an arrangement relates to the construction of a new home, a participant
+             must not agree to vary the construction contract (the original contract) for that
+             arrangement unless:
+               (a) the varied contract would require the construction of substantially the same
+                   dwelling as the original contract; and
+               (b) the varied contract would require the builder to construct a fully completed
+                   dwelling on the land, up to and including the point at which the home is
+                   certified as fit for occupation; and
+               (c) the varied purchase price would be a fixed price that does not exceed the
+                   price cap that applied at the time the arrangement was entered into for the
+                   area in which the property is located; and
+               (d) the participant gives 21 days’ notice to Housing Australia before the
+                   variation is executed; and
+               (e) the construction timeframes set out in the original contract would continue
+                   to apply, subject to any reasonable variations approved by Housing
+                   Australia.
+         (2) Where the arrangement relates to the construction of a new home, a participant
+             must not enter into a new contract (the replacement contract) for the
+             construction of that home unless:
+               (a) Housing Australia is satisfied that the original contract was terminated due
+                   to circumstances beyond the participant’s control or that it is otherwise
+                   appropriate for the participant to do so in the circumstances; and
+
+
+ 50                          Help to Buy Program Directions 2025
+
+
+
+
+                           Authorised Version F2025L00682 registered 13/06/2025
+                                                    Participation requirements Schedule 1
+
+
+
+                                                                           Clause 1.14
+
+(b) the replacement contract would provide for the construction of
+     substantially the same dwelling as the original contract; and
+(c) the replacement contract would meet the requirements of paragraphs 23(b),
+     (c) and (d); and
+(d) the fixed price for the construction of the dwelling under the replacement
+     contract, together with the costs incurred under the original contract, would
+     not exceed the price cap that applied at the time the arrangement was
+     entered into for the area in which the property is located; and
+(e) where the participant terminated the original contract—the participant gave
+     Housing Australia 21 days’ notice before doing so; and
+ (f) where the builder terminated the original contract:
+       (i) the participant gave 21 days’ notice to Housing Australia before the
+           contract was terminated; or
+      (ii) where it was not possible to give 21 days’ notice—the participant
+           gave notice as early as possible in the circumstances; and
+(g) the construction timeframes in the original contract would continue to
+     apply under the replacement contract, subject to any reasonable variations
+     approved by Housing Australia.
+
+
+
+
+                       Help to Buy Program Directions 2025                           51
+
+
+
+            Authorised Version F2025L00682 registered 13/06/2025
+

@@ -1,12 +1,19 @@
 ---
 slug: kb.investor.rental-appraisal-from-pm-agent
 effective_from: 2025-07-01
-last_verified: 2026-07-06
+last_verified: 2026-10-27
 sources:
   - url: https://moneysmart.gov.au/property-investment/buying-an-investment-property
-    retrieved: 2026-07-06
-  - url: https://www.canstar.com.au/home-loans/how-much-rent-to-charge/
-    retrieved: 2026-07-06
+    retrieved: 2026-10-27
+    path: docs/sources/asic/moneysmart-buying-an-investment-property.txt
+    quotes:
+      - "Once you have a property in mind, do a budget to compare the income you expect to your outgoing expenses."
+      - "Don't rely on rental income to cover the mortgage – there may be times when your property is empty."
+  - url: https://www.nsw.gov.au/housing-and-construction/property-professionals
+    retrieved: 2026-10-27
+    path: docs/sources/nsw/property-professionals.txt
+    quotes:
+      - "Information about property agent licensing and getting your qualifications. Includes licence types and classes plus fees and links to forms."
 ---
 
 # Rental appraisal from a property manager
@@ -58,5 +65,5 @@ Notes:
 
 ## Sources
 
-- ASIC Moneysmart — *Investing in property* (estimating rental income; getting a realistic rent figure) — https://moneysmart.gov.au/property-investment/investing-in-property
-- NSW Fair Trading — *Property managers and agents* (the role and licensing of property managers) — https://www.nsw.gov.au/housing-and-construction/property-professionals
+- ASIC Moneysmart — *Buying an investment property* (budget the income you expect against the outgoings before buying) — https://moneysmart.gov.au/property-investment/buying-an-investment-property
+- NSW Government — *Property professionals* (the role and licensing of property managers) — https://www.nsw.gov.au/housing-and-construction/property-professionals

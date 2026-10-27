@@ -1,0 +1,129 @@
+Source: https://moneysmart.gov.au/banking/sending-money-overseas
+Retrieved: 2026-10-27
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML 2d331c07f3f030dac1f19b836b72ca6fcd4f3113daed84db45cfe055f6349bcb
+
+Sending money overseas - Moneysmart.gov.au
+Skip to main content
+Sending money overseas
+Last updated: 17 September 2026
+Look for a good currency exchange rate and check the fees when sending money overseas.
+How to send money overseas
+You can send money to other countries using providers of a money transfer service. These services are sometimes called international wire transfers, cross border payments or remittances.
+You can use your bank or a money transfer business, and can send the money online, using a mobile app, or in person.
+Not all services send money to every country. Each service has its own process and costs.
+Providers choose the exchange rate they use. They also charge fees. The costs depend on:
+how much money you send
+where you send it
+how you send it.
+Send money through a bank transfer
+Banks can send money to banks in other countries. Banks use a system called 'SWIFT' which connects financial institutions around the world.
+If you already use a bank, you usually send money:
+through online banking, or
+by visiting a branch.
+If you're not an existing customer, the bank will ask you to show government-issued identification.
+Use a money transfer business
+A money transfer business (also known as a remittance service provider) is an individual, business or organisation that sends money to someone in another country. These businesses are different from banks.
+They can:
+send money to a bank account, or
+let the person collect the money at a local branch or agent.
+Many money transfer businesses operate online only. They use websites or mobile apps instead of a physical store, and these firms can be faster and cheaper than banks.
+While the transfer is often started online, you may be able to send the money by bank deposit, cash pickup, direct debit and home delivery.
+In Australia, money transfer services must be registered with AUSTRAC (Australian Transaction Reports and Analysis Centre).
+Before you use a money transfer business, check that it is registered .
+Compare money transfer costs
+It's a good idea to shop around before you send money overseas. Different companies can charge very different prices. You can save money by comparing exchange rates and fees.
+Compare the rates and types of transfers on these independent sites:
+SaverAsia – For money sent from Australia to countries in Asia.
+Remittance Prices Worldwide – The World Bank's website for other international transfers.
+Compare these features:
+Currency exchange rate
+how much your money is worth in another country (for example, how many Australian dollars it takes to buy 1 euro)
+whether the advertised rate is the rate you get
+Exchange rate guarantee
+whether the exchange rate stays the same or can change
+Transfer fees and commission
+the type of conversion fee (a flat rate or a percentage, or both)
+whether the receiver pays any fees
+the 'margin' fee to convert your currency
+Payment method
+online via credit card, or cash or EFTPOS
+Transfer time
+how long the money takes to arrive (it could be instant, take a few minutes, or take up to five business days)
+Transfer amount
+the smallest or largest amount you can send
+Receive method
+how the receiver gets the money — for example:
+cash pick-up
+bank deposit
+cash delivery
+online wallet linked to their phone number
+crypto-asset exchange
+If an overseas transfer goes wrong
+If there's a problem with your transfer, contact the bank or money transfer business first.
+If you're not happy with their response, and they are a member of the Australian Financial Complaints Authority (AFCA), you can complain to AFCA .
+Beware of scams: If you send money to someone and that person turns out to be a scammer , it's almost impossible to get your money back. Be very careful who you send your money to. Visit Scamwatch to learn more about scams.
+Join thousands of Australians and get help with your money - straight to your inbox.
+Each month we'll send you practical tips, calculators and insights tailored to every stage of life
+Sign up
+Do you find this page useful?
+Yes
+No
+Why?
+It had the information I was looking for
+The page makes sense
+The information is balanced and unbiased
+The information gave me a sense of what to do next
+Submit
+Any other feedback
+Why not?
+It didn't have the information I was looking for
+The page was confusing
+The information overwhelmed me
+There wasn't enough information for me to take action
+Submit
+Any other feedback
+Your feedback
+Your feedback relates to:
+Please select...
+Webpage Content
+Calculator or tool
+Complaint or scam
+Copyright requests
+Loans, money and personal finance advice
+Other feedback/suggestion
+You would like to:
+Please select...
+Report an Error
+Comment on a Webpage
+Ask a question
+Your issue is:
+Please select...
+You don't understand the calculator result
+You believe the calculator is incorrect
+The calculator/tool does not work (eg technical issue)
+You want to provide general feedback/suggestions
+Error loading Partial View script (file: ~/Views/MacroPartials/MoneySmart/Standard text.cshtml)
+Error loading Partial View script (file: ~/Views/MacroPartials/MoneySmart/Standard text.cshtml)
+Error loading Partial View script (file: ~/Views/MacroPartials/MoneySmart/Standard text.cshtml)
+Summary of your feedback:
+Your comments:
+The page/calculator/app you are referring to (eg. cut/paste URL):
+Cancel
+Send feedback
+Up next in Banking
+Savings accounts
+How to find the best savings account for you
+3 min read
+Transaction accounts and debit cards
+How to find the best day-to-day bank account
+4 min read
+Joint accounts
+Understand the benefits and risks of joint accounts
+3 min read
+Direct debits
+Set up and cancel automatic payments
+3 min read
+Bank transaction problems
+What to do when you find something wrong on your statement
+4 min read
+search

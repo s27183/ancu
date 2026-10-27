@@ -1,0 +1,139 @@
+Source: https://www.commbank.com.au/home-loans/making-australia-home.html
+Retrieved: 2026-10-27
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML b6931a36efcb57d910c375e2d5a1d75ccbc759c98435d04033fef420274b6992
+
+Making the move | How to buy a home in Australia | CommBank
+var trackerID = s.c_r("CBATracker") ? "&d_dpuuid="+ s.c_r("CBATracker") : "";
+var oScript = document.createElement('script');
+oScript.type = 'text/javascript';
+oScript.async = false;
+if (typeof trackerID !== "undefined" && trackerID.length > 20) {
+oScript.src = "https://cba.demdex.net/event?d_stuff=1&d_dst=1&d_rtbd=json&d_cts=1&d_cb=aam_tnt_cb&d_dpid=604&d_dpuuid=" + trackerID;
+}
+else{
+oScript.src = "https://cba.demdex.net/event?d_stuff=1&d_dst=1&d_rtbd=json&d_cts=1&d_cb=aam_tnt_cb&d_dpid=604";
+}
+document.getElementsByTagName('head')[0].appendChild(oScript);
+Skip to main content
+Skip to log on
+Skip to search
+Accessibility at CommBank
+Banking
+Home loans
+Insurance
+Investing & Super
+Business
+Institutional
+CommBank Yello
+Log on
+NetBank log on
+CommBiz log on
+CommSec log on
+Banking
+Home loans
+Insurance
+Investing & Super
+Business
+Institutional
+CommBank Yello
+Locate us
+Help & support
+CommBank Search. Dialog start.
+Search CommBank. Start typing…
+Popular searches
+Travel insurance
+Foreign exchange calculator
+Discharge/ Refinance authority form
+Activate a CommBank card
+Cardless cash
+Interest rates & fees
+Help & support
+Locate us
+Contact us
+Home loans
+/
+Making the move
+Buying property in Australia as a foreigner
+Looking to move to Australia? Whether you're a resident, non-resident or foreigner we can help you get started on your home buying journey with the right tools and resources.
+Why choose CommBank?
+Helping you into your first home sooner
+Awarded Canstar’s Bank of the Year for First Home Buyers 9 and Digital Banking 10 in 2025, CommBank offers flexible home loan features to suit your needs.
+Australia’s largest bank 8
+An extensive branch , digital and ATM network along with world class security to help you stay safe.
+Support at every step
+Access expert guides, calculators, and help with government grants and schemes — all designed to make your journey easier.
+Start your home-buying journey with Buy a home in the CommBank app.
+We speak your language
+We provide quality customer service, with bilingual staff in many of our branches and multilingual ATM s in seven languages.
+Get started – buying as a resident
+As a resident holding a permanent or temporary visa, book an appointment with a Home Lending Specialist to check if your current visa classification is eligible for a home loan.
+Home loan types & interest rates
+Explore different loan types, home loan interest rates and borrowing options. Navigate home buying with confidence.
+See home loans
+Home loan offers
+Take advantage of our current home loan offers that could help with your new property.
+Find out more
+Home buying made easy.
+Your step by step guide
+Download home buying guide
+Living and Working in Australia
+Saving for a house deposit
+Moving to Australia to study
+Cost of buying a home
+Recently arrived
+Understanding the home loans process
+Calculators & tools
+Use our calculators to estimate how much you can borrow , calculate repayments , stamp duty and any upfront costs
+Use our budget planner to help you budget for life in Australia
+Download the CommBank app and access Buy a Home for guidance throughout your home buying journey, including Property Search to find properties and explore local market insights
+Make moving to Australia easier with our moving to Australia checklist .
+Foreign investments for non- Australian residents
+The Foreign Investment Review Board (FIRB) manages foreign investment in Australia.
+Non-residents and foreign investors can purchase residential property in Australia, provided they submit an application with the Australian Taxation Office (ATO).
+Depending on the type of residential property, whether it’s a new dwelling, established dwelling or vacant land, supporting documents will be required and application fees will apply.
+Learn more about foreign investment in Australia
+Helping you on your home buying journey
+We provide quality customer service with bilingual staff in many of our branches to help support your home buying journey. Speak to a Home Lending Specialist today.
+We speak your language
+Mandarin Chinese: 我们说您的语言
+Spanish: Hablamos su idioma
+Hindi: हम आपकी भाषा बोलते हैं
+Korean: 우리는 당신의 언어를 말합니다
+French: Nous parlons votre langue
+Māori: Ka kōrero mātou i tō reo
+Vietnamese: Chúng tôi nói ngôn ngữ của bạn
+Book an appointment
+Easy English resources
+If English isn’t your first language, the Australian Government’s free Translating and Interpreting Service can help you communicate with us. We can arrange this service when you call us or visit us in branch.
+See service
+Support
+Articles for the big move
+Finding a job in Australia
+How to find a place to live
+Paying tax in Australia
+How to avoid bank fees
+Premier Banking
+If you’re on a skilled migrant visa earning between $150,000 - $400,000 and intending to borrow or invest over $850,000, you may be eligible for Premier Banking .
+Moving from...
+Moving from the UK
+Moving from New Zealand
+Moving from India
+Moving from China
+Message us 24/7
+Get help from Ceba in the CommBank app or connect with a specialist who can message you back. You’ll need CommBank app notifications turned on so you know when you’ve received a reply.
+Message us
+We're here to help
+Book an appointment
+Book instantly to speak to a Home Loan Specialist at a time that suits you.
+Manage your loan online
+Redraw, change your repayments or loan type to better meet your needs and more.
+Contact us
+Fast-track your call, see expected wait times and connect with a specialist in the CommBank app.
+Message us
+Get instant help from our virtual assistant or chat to a specialist.
+Things you should know
+The contents of this page are intended to provide general information of an educational nature only, without regard to the financial situation or needs of any reader and must not be relied upon as financial product advice. As the information has been provided without considering your objectives, financial situation or needs, you should, before acting on the information, consider its appropriateness to your circumstances. You should consider the Terms and Conditions and/or Product Disclosure Statement, as well as the Target Market Determination, of any product before deciding whether a product is appropriate for you. You should also consider seeking independent professional legal, tax and financial advice. Applications for finance are subject to credit approval. Fees and charges may be payable.
+8 CBA 2025 Annual Report , page 8, “We are Australia’s largest bank serving more than 18 million customers."
+9 Awarded 'Bank of the Year - First Home Buyers' by Canstar in July 2025.
+10 Awarded 'Bank of the Year - Digital Banking' for 2025 by Canstar in May 2025.
+Commonwealth Bank

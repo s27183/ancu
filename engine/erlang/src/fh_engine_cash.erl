@@ -222,7 +222,7 @@ fill_fhb_foreign(Args, Upstream) ->
     DutyAfter = maps:get(<<"after_concession">>, Duty, null),
     Surcharge = surcharge_amount(State, Ceiling),
     FirbFee   = maps:get(<<"total_firb_fee_payable">>, FirbStatus, null),
-    %% base convention: the mortgage variant's own deposit_required default (30%,
+    %% base convention: the mortgage variant's own deposit_required default (25%,
     %% kb.lender.foreign-buyer-deposit-requirements) is well above the 80%-LVR/20%-deposit
     %% LMI trigger, so LMI is not applicable at the base estimate (kb.lmi.calculation-for-
     %% foreign-persons: "typically $0" for a foreign-income borrower) — a KB-grounded

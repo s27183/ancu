@@ -1,17 +1,16 @@
 ---
 slug: kb.foreign-investor.repatriation-strategy
 effective_from: 2025-07-01
-last_verified: 2026-10-17
+last_verified: 2026-10-27
 sources:
-  - url: https://wise.com/au/currency-converter/vnd-to-aud-rate
-    retrieved: 2026-07-06
-    note: "Wise (AUD↔VND) — the AU-side outbound-transfer provider mechanics (licensed money-transfer channel, transparent cost). The AU bank AML/CTF reporting obligation on the outbound leg is owned/cross-referenced by kb.au-aml-ctf.bank-due-diligence-expectations (Phase A); the AUSTRAC IFTI primary timed out repeatedly this session — NOT independently re-opened here."
   - url: https://moneysmart.gov.au/banking/sending-money-overseas
     retrieved: 2026-10-17
     note: "ASIC Moneysmart — \"In Australia, money transfer services must be registered with AUSTRAC\"; check a provider is registered before using it. The rule both repatriation steps follow (behavior 114)."
+    path: docs/sources/asic/moneysmart-sending-money-overseas.txt
   - url: https://www.austrac.gov.au/industry-and-business/obligations-and-guidance/your-amlctf-program/reporting-us/international-funds-transfer-reports
     retrieved: 2026-10-17
     note: "AUSTRAC — an IFTI sent out of Australia is reported by the sending institution within 10 business days; IFTI reporting continues until the IVTS transition date, on or after 31 March 2029 (AML/CTF Transitional Rules 2026). Replaces the 404'd …/international-funds-transfer-instructions-iftis page."
+    path: docs/sources/austrac/ifti-reports.txt
 ---
 
 # Repatriating rental income and sale proceeds — the AU-side outbound transfer
@@ -29,7 +28,7 @@ An outbound transfer from Australia is not materially different in mechanism fro
 
 ## What's different about the sale-proceeds case specifically
 
-A one-off, large outbound transfer of **net sale proceeds** (after FRCGW, agent/legal selling costs, and loan payout — owned by `disposition`, component 14) is the highest-value single outbound event in the lifecycle and the one most likely to trigger the AU bank's own **enhanced due diligence on the outbound side** (a large, first-time or infrequent outbound transfer from an account is itself a due-diligence trigger, mirroring the inbound ECDD pattern). Pre-engaging the sending bank before initiating a large sale-proceeds transfer — confirming what evidence it wants (proof the funds are the settlement proceeds of the specific property, the investor's own identity documentation) — is the same pre-engagement discipline the inbound doc already recommends, applied in reverse.
+A one-off, large outbound transfer of **net sale proceeds** (after FRCGW, agent/legal selling costs, and loan payout — owned by `disposition`, component 14) is the highest-value single outbound event in the lifecycle and the one most likely to trigger the AU bank's own **enhanced due diligence on the outbound side** (whether a large outbound transfer triggers the bank's enhanced due diligence is the bank's own risk call — AUSTRAC requires source of funds and wealth where relevant to a customer's high ML/TF risk, [`kb.au-aml-ctf.source-of-funds-documentation`](../au-aml-ctf/source-of-funds-documentation.md)). Pre-engaging the sending bank before initiating a large sale-proceeds transfer — confirming what evidence it wants (proof the funds are the settlement proceeds of the specific property, the investor's own identity documentation) — is the same pre-engagement discipline the inbound doc already recommends, applied in reverse.
 
 ## The VN-side, named but not built
 
@@ -53,7 +52,7 @@ Pure-reference (`fills: []`). This is a synthesis/pointer doc — it fills no sl
     "au_side_only_vn_side_is_placeholder": { "type": "bool", "value": true, "provenance": "CONVENTION", "note": "per the 2026-07-03 scoping decision — this doc owns the AU outbound-transfer mechanics only; VN-side receiving compliance is a labelled gap pointing to the investor's own VN bank/advisor, not asserted content." },
     "ifti_reporting_symmetric_outbound": { "type": "bool", "value": true, "provenance": "REGULATED", "note": "AUSTRAC — an IFTI is lodged for an international funds transfer of any value in either direction; the bank/provider's filing, routine, not a flag on the investor." },
     "never_custodian_of_funds": { "type": "bool", "value": true, "provenance": "POLICY", "note": "the platform never holds or moves the investor's funds; all transfer is via the investor's own bank or a licensed provider, mirroring the inbound-funding discipline." },
-    "sale_proceeds_transfer_warrants_pre_engagement": { "type": "bool", "value": true, "provenance": "CONVENTION", "note": "a large, infrequent outbound transfer of net sale proceeds is likely to trigger the sending bank's own enhanced due diligence; pre-engaging before initiating avoids a held-pending-review delay, mirroring kb.au-aml-ctf.bank-due-diligence-expectations' inbound pre-engagement recommendation." }
+    "sale_proceeds_transfer_warrants_pre_engagement": { "type": "bool", "value": true, "provenance": "CONVENTION", "note": "PLACEHOLDER — no primary states that a large outbound transfer triggers enhanced due diligence; re-ground on AUSTRAC enhanced customer due diligence guidance (https://www.austrac.gov.au/industry-and-business/obligations-and-guidance/your-amlctf-program/customer-due-diligence/enhanced-customer-due-diligence) and the sending bank’s own policy. Contacting the bank first is common-sense preparation." }
   }
 }
 ```
@@ -66,4 +65,4 @@ Notes:
 ## Sources
 
 - AUSTRAC — *International funds transfer instructions (IFTIs)* (reported for transfers of any value into or out of Australia, filed by the reporting entity) — https://www.austrac.gov.au/industry-and-business/obligations-and-guidance/your-amlctf-program/reporting-us/international-funds-transfer-reports (IFTI reporting continues until the IVTS transition, on or after 31 March 2029)
-- ASIC Moneysmart — *International money transfers* (provider comparison, exchange-rate margin as the real cost — applies to outbound transfers the same as inbound) — https://moneysmart.gov.au/banking/international-money-transfers
+- ASIC Moneysmart — *Sending money overseas* (money transfer services must be registered with AUSTRAC; providers choose their rate and charge fees — applies to outbound transfers the same as inbound) — https://moneysmart.gov.au/banking/sending-money-overseas

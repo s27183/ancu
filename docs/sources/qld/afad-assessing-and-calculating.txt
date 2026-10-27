@@ -1,0 +1,207 @@
+Source: https://qro.qld.gov.au/duties/investors/afad/assessing/
+Retrieved: 2026-10-27
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML ca827ee650292e8a93d1da1ae4ba72db482cc9cd5c3d2d63127a09acb366855c
+
+Assessing and calculating AFAD - Queensland Revenue Office
+Skip to content
+Home
+Duties
+Businesses, trusts and investors
+Additional foreign acquirer duty (AFAD)
+Assessing and calculating AFAD
+Assessing and calculating additional foreign acquirer duty
+Learn how additional foreign acquirer duty (AFAD) transactions are treated when lodged for assessment of (stamp) duty.
+On this page:
+Other additional foreign acquirer duty (AFAD) pages
+AFAD residential land
+Types of foreign persons for AFAD
+Assessing and calculating AFAD
+Reassessing AFAD
+Exemption or ex gratia relief from AFAD
+Evidence for AFAD exemption application
+Payment options
+Contact us
+Additional foreign acquirer duty (AFAD) receives the same treatment as transfer duty, landholder duty or corporate trustee duty in terms of:
+time of liability
+liable parties
+notification
+lodgement
+stamping.
+Liability and change of resident status
+If you are a foreign person entering into a transaction involving AFAD residential land
+AFAD residential land
+Land in Queensland that is or will be used solely or primarily for residential purposes, including:
+established homes and apartments
+vacant land on which a home or apartment will be built
+land for development for residential use, such as
+smaller unit block developments
+housing subdivisions
+major developments with a residential component
+buildings refurbished, renovated or extended for residential use.
+Other types of residential property, such as retirement villages and student accommodation, are considered on a case-by-case basis.
+AFAD residential land does not include land used for hotel and motel purposes.
+See also the definition of residential land .
+, you will be liable for AFAD.
+AFAD will continue to apply to the transaction even if your foreign status changes to an Australian citizen or a permanent resident at a later date.
+Because duty is imposed on a relevant transaction at the time the liability for duty on the transaction arises, the change of resident status will not affect your liability.
+This allows for taxpayer certainty on their liability for duty under the Duties Act 2001 . This position is also consistent with the way that duty is imposed generally.
+Exemption for retirement visas
+If you are a specified foreign retiree
+Specified foreign retiree
+For the purposes of additional foreign acquirer duty (AFAD) or when claiming one of the home concessions, a specified foreign retiree is an individual (not an agent) who:
+holds a retirement visa (subclass 405 or 410)
+or
+applied for a parent visa (subclass 103) or contributory parent visa (subclass 143) on or after 8 May 2018 and the application is pending, and the last substantive visa held before applying is a retirement visa (subclass 405 or 410).
+, you may be exempt from AFAD on your principal place of residence
+Principal place of residence
+Transfer duty
+A residence you live in (with your personal belongings) on a daily basis.
+Other factors may determine whether a residence is your principal place of residence, such as:
+where your family lives
+the extent of time you live in the residence
+the address you have your mail delivered to
+whether utilities (e.g. electricity, gas and telephone) are connected to the dwelling and the accounts are in your name
+whether the residence address is recorded against your name on electoral rolls.
+See the public ruling on occupancy requirements for home and first home concessions ( DA085.1 ).
+purchased on or after 1 January 2023.
+To keep the benefit of the AFAD exemption in full, you must not:
+sell or transfer all or part of the property before moving in, or within 1 year of moving in
+lease or otherwise grant exclusive possession of all the property before moving in, or within 1 year of moving in
+lease or otherwise grant exclusive possession of part of the property within 1 year of moving in (unless the lease arrangement starts between 10 September 2024 and 5 December 2024, both dates inclusive).
+Read the public ruling on concessions for homes and AFAD exemption for specified foreign retirees—disposal and partial renting between 10 September and 5 December 2024 ( DA000.18 ).
+Note: You may also wish to consider potential implications with other authorities—such as your obligations as a landlord with the Residential Tenancies Authority (RTA)—or what it means for your income and other federal taxes with the Australian Taxation Office (ATO) or for your coverage with your insurance provider.
+Example—permanent resident
+A foreign individual enters into an agreement that involves AFAD residential land, but she has permanent residency at settlement date and intends to reside in the property following settlement.
+AFAD will apply, because the person was a foreign individual when they became liable for transfer duty—the date the agreement was made.
+Lodging documents
+If AFAD applies to your transaction, you must lodge the transaction documents and any required forms within 30 days.
+Self assessors can use:
+the AFAD residential land interactive help
+the AFAD residential land toolkit
+other transfer duty toolkits for information about assessing particular transactions and what forms need to be completed.
+If you are claiming the AFAD specified foreign retiree exemption, use one of these forms when applying for a transfer duty home concessions
+Home concession
+A reduction in the amount of transfer duty you pay when you purchase a home to live in
+There are 4 types of home concession:
+home concession —for your second or subsequent home
+first home concession —for your first home (other than a new home)
+first home (new home) concession —for your first home that is a new home
+first home vacant land concession —for vacant land on which to build your first home.
+You can claim one concession for your home.
+See also the definition for new home .
+:
+Claim a home, first home or first home (new home) transfer duty concession ( Form D2.1 )
+Claim a first home vacant land concession ( Form D2.7 ).
+You can otherwise find out about:
+common forms to lodge for transfer duty transactions
+lodging documents for relevant acquisitions in a landholder
+lodging documents for relevant acquisitions in a corporate trustee .
+Calculating AFAD
+The current rate of AFAD is 8% in addition to the transfer duty rate.
+AFAD for transfer duty is based on the foreign acquirer’s interest of the dutiable value of the AFAD residential land. The GST-inclusive purchase price is used when determining the dutiable value of the property. The dutiable property
+Dutiable property
+Property that is involved in a dutiable transaction in Queensland.
+When you buy or sell dutiable property, you’re likely to pay duty. This can include:
+land in Queensland
+a transferable site area
+an existing right
+a Queensland business asset
+a chattel (e.g. furniture, other freestanding moveable items) in Queensland.
+Chattels are only dutiable if the transaction either:
+includes another type of dutiable property
+is aggregated with a transaction for another type of dutiable property.
+Read section 10 of the Duties Act 2001 for more on property types.
+will also include the value of any chattels acquired in the transaction.
+AFAD applies whether the AFAD residential land is for investment or non-investment purposes. It also applies where the dutiable property is an existing right that contains AFAD residential land.
+Any AFAD payable on the transactions will be added to the transfer duty.
+If there are multiple transferees, AFAD applies only to the interests of the foreign acquirers. For example, if there are 3 individual transferees in equal shares but only one is a foreign acquirer, AFAD applies to that person’s one-third interest.
+If a person is appointed in writing as an agent acting for another person (a principal) in an agreement to transfer dutiable property, AFAD will apply if the agent or principal is a foreign person. Where an agent is foreign, but the principal is not, AFAD will apply when the agreement is assessed. But, when the agent transfers the property to the principal, AFAD will be reassessed.
+Similarly, AFAD will apply when a transferee enters into an agreement for the transfer of dutiable property for, or for the benefit of, a company proposed to be registered under the Corporations Act 2001 (Cwlth) and the company is a foreign corporation when the dutiable property is transferred.
+If there is more than one transaction, they may be aggregated for transfer duty under section 30 of the Duties Act.
+Example—investment property for individual
+A foreign individual signs a contract to buy a house with a dutiable value of $980,000. The house will be an investment property.
+Using the transfer duty rates , the duty is calculated as:
+$17,325 (for the first $540,000)
++ $19,800 ($4.50 for every $100 in $440,000, the balance above $540,000)
+= $37,125 (the transfer duty payable).
+The individual is a foreign person and liable for additional foreign acquirer duty. AFAD is calculated as:
+$980,000 × 8% = $78,400.
+The total amount of duty payable is $115,525 ($37,125 + $78,400).
+Example—investment property for couple
+A couple purchases an apartment for $800,000 in equal shares. One of them is a foreign person and the property is an investment.
+Using the transfer duty rates , the duty is calculated as:
+$17,325 (for the first $540,000)
++ $11,700 ($4.50 for every $100 in $260,000, the balance above $540,000)
+= $29,025 (the transfer duty payable).
+The transaction is liable for AFAD. AFAD is calculated as:
+($800,000 × ½) × 8% = $32,000.
+The total duty payable is $61,025 ($29,025 + $32,000).
+Concessions and exemptions
+As a foreign acquirer, you may be eligible to claim one of the home concessions
+Home concession
+A reduction in the amount of transfer duty you pay when you purchase a home to live in
+There are 4 types of home concession:
+home concession —for your second or subsequent home
+first home concession —for your first home (other than a new home)
+first home (new home) concession —for your first home that is a new home
+first home vacant land concession —for vacant land on which to build your first home.
+You can claim one concession for your home.
+See also the definition for new home .
+if you meet the relevant criteria. The concession will only apply to the calculation of transfer duty—you will still need to pay the AFAD calculated on the dutiable value of the AFAD residential land.
+You are exempt from AFAD on your principal place of residence
+Principal place of residence
+Transfer duty
+A residence you live in (with your personal belongings) on a daily basis.
+Other factors may determine whether a residence is your principal place of residence, such as:
+where your family lives
+the extent of time you live in the residence
+the address you have your mail delivered to
+whether utilities (e.g. electricity, gas and telephone) are connected to the dwelling and the accounts are in your name
+whether the residence address is recorded against your name on electoral rolls.
+See the public ruling on occupancy requirements for home and first home concessions ( DA085.1 ).
+for transactions dated on or after 1 January 2023 if you are a specified foreign retiree.
+Specified foreign retiree
+For the purposes of additional foreign acquirer duty (AFAD) or when claiming one of the home concessions, a specified foreign retiree is an individual (not an agent) who:
+holds a retirement visa (subclass 405 or 410)
+or
+applied for a parent visa (subclass 103) or contributory parent visa (subclass 143) on or after 8 May 2018 and the application is pending, and the last substantive visa held before applying is a retirement visa (subclass 405 or 410).
+If your relevant transaction is exempt from transfer duty, landholder duty or corporate trustee duty, it will also be exempt from AFAD.
+If you received the AFAD exemption on the original transaction and it is later reassessed to remove the home concession, a reassessment for AFAD will be made at the same time.
+Read more about the requirements for the different home concessions .
+Example—home concession for individual
+A specified foreign retiree purchases residential property for $1,200,000. The property is to be their principal residence and they qualify for a transfer duty home concession.
+Using the transfer duty home concession rates , the transfer duty is calculated as:
+$30,850 (for the first $1,000,000)
++ $11,500 ($5.75 for every $100 in $200,000, the balance above $1,000,000)
+= $42,350 (the transfer duty payable).
+AFAD is calculated as $96,000 ($1,200,000 × 8%).
+They pay $42,350 in transfer duty and $96,000 in additional foreign acquirer duty.
+Example—first home (new home) concession for couple
+A couple (one being a foreign individual and the other being a specified foreign retiree) purchases a residential property for $1,200,000. The property will be their first home. Only the specified foreign retiree qualifies for a first home (new home) transfer duty concession.
+Using the transfer duty home concession rates , $25,550 of transfer duty is payable for the foreign individual’s half-interest. No transfer duty is payable for the specified foreign retiree’s half-interest as a result of the first home (new home) concession.
+AFAD for the foreign individual is calculated as ($1,200,000 × ½) × 8% = $48,000.
+Therefore, they pay $73,550 in total ($25,550 transfer duty plus $48,000 additional foreign acquirer duty).
+Build-to-rent concession
+You may be eligible for a build-to-rent concession for AFAD for transfers, or agreements to transfer, entered into from 1 July 2023 for:
+land on which the acquirer will construct an eligible build-to-rent (BTR) development
+land that contains an eligible BTR development that is already receiving the BTR land tax concessions.
+Find out more about build-to-rent concessions .
+Paying
+If you are liable to pay duty on a transaction, you are also liable to pay any applicable AFAD. If you paid AFAD for a transaction but you are not a foreign acquirer for the purposes of the transaction, you can recover the AFAD from the foreign acquirers under section 246I of the Duties Act .
+Late payments
+If you don’t pay the transfer duty (including the applicable AFAD) on a relevant transaction by the due date, a charge on the interest of specified acquirers will be imposed on the AFAD residential land for the amount of unpaid duty. In some circumstances, the Commissioner of State Revenue may apply to the Supreme Court for an order to sell the land.
+Also consider…
+Find out more about transfer duty .
+Read about additional foreign acquirer duty for landholder duty and corporate trustee duty .
+Read the additional foreign acquirer duty provisions in Chapter 4 of the Duties Act 2001 .
+Find out about payment options .
+Learn about unpaid tax interest and penalty tax .
+See previous additional foreign acquirer duty rates .
+Last updated: 31 July 2026
+Other additional foreign acquirer duty (AFAD) pages
+AFAD residential land
+Types of foreign persons for AFAD
+Assessing and calculating AFAD
+Reassessing AFAD
+Exemption or ex gratia relief from AFAD
+Evidence for AFAD exemption application
