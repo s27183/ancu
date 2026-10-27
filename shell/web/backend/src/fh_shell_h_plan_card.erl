@@ -282,7 +282,9 @@ properties(UserId, PlanCardId, Req0, Opts) ->
 %% a typed `code`). Relay verbatim — the engine owns the transaction contract. 202
 %% {plan_card_id, property_id, turn_id}; the recomputed settlement_checklist streams over /events.
 transaction(UserId, PlanCardId, Req0, Opts) ->
-    PropertyId = cowboy_req:binding(pid, Req0),
+    with_property_id(Req0, Opts, fun(PropertyId) -> transaction(UserId, PlanCardId, PropertyId, Req0, Opts) end).
+
+transaction(UserId, PlanCardId, PropertyId, Req0, Opts) ->
     case fh_shell_http:read_json_body(Req0) of
         {ok, Body, Req1} ->
             {Status, Resp} =
@@ -305,9 +307,11 @@ transaction(UserId, PlanCardId, Req0, Opts) ->
 %% are transient (never persisted, engine-side). Relay verbatim. 202 {plan_card_id, property_id,
 %% turn_id}; the reviewed risk_assessment_investor streams over /events.
 documents(UserId, PlanCardId, Req0, Opts) ->
+    with_property_id(Req0, Opts, fun(PropertyId) -> documents(UserId, PlanCardId, PropertyId, Req0, Opts) end).
+
+documents(UserId, PlanCardId, PropertyId, Req0, Opts) ->
     case fh_shell_meter:gate(UserId) of
         allow ->
-            PropertyId = cowboy_req:binding(pid, Req0),
             case fh_shell_http:read_json_body(Req0) of
                 {ok, Body, Req1} ->
                     {Status, Resp} =
@@ -324,6 +328,24 @@ documents(UserId, PlanCardId, Req0, Opts) ->
                   <<"tier">> => Tier,
                   <<"used_tokens">> => Used,
                   <<"limit_tokens">> => Limit}, Req0), Opts}
+    end.
+
+%% P-6 · Shells reach the engine only through the contract -> The shell backend
+%% -> a :pid is a property id or a 404 (no goal property names who may reach a plan:
+%% the slot is absent, not unknown)
+%% Mechanism: the :pid binding (cowboy has already percent-decoded it) must be a uuid —
+%% every property id is one (fh_engine_h_attach_property mints uuid4) — before the
+%% engine is called, the meter is gated or the body is read.
+%% Fails when: a decoded :pid such as `../messages?` or `../../<B>/simulate?` reaches
+%% the engine client and becomes another route or another plan card (behavior 139;
+%% measured 2026-10-27 with the reviewer's repro against cowboy 2.14.2).
+%% Capability: fh_shell_util:is_uuid/1 (dollar_endonly); the engine client also
+%% encodes every path segment, so a later route that forgets this still cannot steer.
+with_property_id(Req0, Opts, Action) ->
+    PropertyId = cowboy_req:binding(pid, Req0),
+    case is_binary(PropertyId) andalso fh_shell_util:is_uuid(PropertyId) of
+        true -> Action(PropertyId);
+        false -> {ok, fh_shell_http:reply_json(404, #{<<"error">> => <<"not_found">>}, Req0), Opts}
     end.
 
 %% Relay the engine's already-encoded JSON body + status verbatim (same as the
