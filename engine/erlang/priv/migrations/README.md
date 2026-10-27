@@ -49,6 +49,11 @@ cd engine/erlang && rebar3 shell      # or release boot — start applies pendin
 - **Checksum forward-only guard.** If an already-applied file's bytes change, boot
   **aborts** (`migration_checksum_mismatch`). You add a new migration; you never
   edit an applied one.
+- **Frozen in CI.** `SHA256SUMS` lists each applied file's sha256;
+  `tests/migrations_frozen.py` (a done check) fails when one changes, is renamed or
+  deleted, or a `.sql` file is unlisted. A new migration adds its line:
+  `shasum -a 256 NNN_name.sql >> SHA256SUMS`. Comments count: a reworded comment in
+  `001_init_engine.sql` stopped four production deploys on 2026-10-27.
 - **Fail-closed.** Any migration error raises → application start aborts.
 
 Statements are separated by a context-aware splitter (handles `'…'`, `"…"`,
