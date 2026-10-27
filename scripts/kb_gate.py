@@ -19,7 +19,7 @@ merges itself only when each thing it changes is one of these:
     per doc; behaviors 85, 138) — and the independent kb-verify routine
     has labelled the PR `kb-verified` after re-reading the sources itself.
 Anything else holds the whole PR, with one reason per held item: a path outside
-docs/kb and docs/sources, a new or deleted doc (a new rule or scheme is kind-2/3,
+docs/kb and docs/sources (either side of a rename or copy), a new or deleted doc (a new rule or scheme is kind-2/3,
 a session with Son), an edited news note, a number no quote states, a quote from
 a broker, comparison or other secondary site, a quote missing from its copy, no
 `kb-verified` label, a `kb-hold` label (kb-verify disagreed), or done checks not
@@ -156,8 +156,14 @@ def decide(base: str, head: str, branch: str, labels: set[str], checks_ok: bool)
     for row in git("diff", "--name-status", f"{base}...{head}").splitlines():
         status, *paths = row.split("\t")
         path = paths[-1]
-        if not path.startswith(ALLOWED_ROOTS):
-            reasons.append(f"`{path}`: outside docs/kb and docs/sources")
+        # Every path of the row: a rename or copy row names its source first, and a
+        # file moved out of engine/ into docs/sources/ is a change to engine/
+        # (measured 2026-10-27, behavior 136 Expect 7: with only the new path read,
+        # 1 of 200 cases — .github/workflows/x.md renamed into docs/sources/ — was
+        # 'merge').
+        outside = [p for p in paths if not p.startswith(ALLOWED_ROOTS)]
+        if outside:
+            reasons += [f"`{p}`: outside docs/kb and docs/sources" for p in outside]
             continue
         if path.startswith("docs/sources/"):
             items.append(f"`{path}`: saved source copy")
@@ -249,7 +255,9 @@ def issue(d: dict, pr: str) -> str:
 # Behavior 138 Expect 5. Fails when this gate keeps its own host list (the map is
 # kb_compiler's, one declaration), or when a kb-watch PR whose new figure is quoted from a
 # comparison site (canstar.com.au) is not held as a secondary source; a PR quoting the
-# lender's own page must not be. Runs decide() on a throwaway git repo, offline.
+# lender's own page must not be; or when a file renamed from outside into docs/sources/
+# is not held as outside (behavior 136 Expect 7). Runs decide() on throwaway git repos,
+# offline.
 def self_test() -> int:
     global REPO
     import kb_compiler
@@ -284,7 +292,26 @@ def self_test() -> int:
             run("commit", "-q", "-am", "figure")
             dec = decide("main", "kb-watch-fixture", "kb-watch-fixture", {LABEL_OK}, True)
             held[label] = (dec["decision"], [r for r in dec["reasons"] if "secondary source" in r])
+    # a file renamed from outside into docs/sources/ is held as a change outside
+    with tempfile.TemporaryDirectory() as d:
+        REPO = Path(d)
+
+        def run(*a: str) -> None:
+            subprocess.run(["git", *a], cwd=d, check=True, capture_output=True, env=env)
+        run("init", "-q", "-b", "main")
+        (REPO / "scripts").mkdir()
+        (REPO / "scripts/tool.py").write_text("print('outside')\nx = 1\ny = 2\n")
+        run("add", "-A")
+        run("commit", "-q", "-m", "base")
+        run("switch", "-q", "-c", "kb-watch-rename")
+        (REPO / "docs/sources").mkdir(parents=True)
+        run("mv", "scripts/tool.py", "docs/sources/tool.py")
+        run("commit", "-q", "-m", "move")
+        dec = decide("main", "kb-watch-rename", "kb-watch-rename", {LABEL_OK}, True)
+        held["rename"] = (dec["decision"], [r for r in dec["reasons"] if "scripts/tool.py" in r])
     REPO = ROOT
+    if held["rename"][0] != "hold" or not held["rename"][1]:
+        problems.append(f"a rename of scripts/tool.py into docs/sources/ was not held as outside: {held['rename']}")
     if held["canstar"][0] != "hold" or not any("www.canstar.com.au" in r for r in held["canstar"][1]):
         problems.append(f"a kb-watch PR quoting canstar.com.au was not held as secondary: {held['canstar']}")
     if held["macquarie"][1]:
@@ -293,7 +320,8 @@ def self_test() -> int:
         print(f"FAIL kb_gate self-test: {p}")
     if not problems:
         print("ok   kb_gate self-test: the primary map is kb_compiler's; a kb-watch PR quoting "
-              f"canstar.com.au is held ({held['canstar'][1][0]}); one quoting macquarie.com.au is not")
+              f"canstar.com.au is held ({held['canstar'][1][0]}); one quoting macquarie.com.au is not; "
+              "a file renamed from scripts/ into docs/sources/ is held as outside")
     return 1 if problems else 0
 
 
