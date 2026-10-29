@@ -1,5 +1,5 @@
 {
-  "since": "2026-10-28",
+  "since": "2026-10-29",
   "_about": "Behavior 104: scripts/visa_watch.py lists ministers' releases and Home Affairs pages dated on or after since; the kb-watch routine runs it with --update and commits this file in its PR. The first since (2026-10-01) covers pages that changed before the routine took over.",
   "feeds": [
     "https://minister.homeaffairs.gov.au/_layouts/15/AppPages/Rss.aspx?type=media&mini=TonyBurke",
