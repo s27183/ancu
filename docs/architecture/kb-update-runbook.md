@@ -33,7 +33,9 @@ kb-watch, kb-verify, suburb-watch), and the seat:
   with the seat's sandbox and Son's gh login (each `gh` call a bare command);
 - fetches with curl, which the scripts hand certifi's CA bundle (`scripts/curl_ca.py`:
   macOS's /etc/ssl/cert.pem fails "self signed certificate in certificate chain" in the
-  seat, measured 2026-10-31), or with WebFetch where the prompt allows it;
+  seat, measured 2026-10-31); a curl the prompt runs by hand passes the same bundle,
+  `curl --cacert "$(.venv/bin/python -m certifi)" …`, since a bare curl in the seat still
+  fails that way; or WebFetch where the prompt allows it;
 - hands kb-verify to a fresh subagent whose whole prompt is kb-verify's `---8<---` block, so
   it stays blind to the drafter's reasoning; it labels the PR `kb-verified` or `kb-hold` at
   its head, and the kb gate then merges or holds it as before.
