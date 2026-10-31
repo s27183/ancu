@@ -24,6 +24,25 @@ most "update the KB" asks are Track A.
 
 ## When it runs — triggers and cadence
 
+**Since behavior 145 (Son 2026-10-31) each routine runs in a live session, on Son's word.**
+The four claude.ai routines are disabled (none deleted), and no job runs on a schedule.
+In an attended Claude Code session on Son's Mac, Son says "run news-watch", "run kb-watch",
+"run kb-verify", "run suburb-watch" or "run the KB update" (all four in that order: news-watch,
+kb-watch, kb-verify, suburb-watch), and the seat:
+- runs the prompt between the `---8<---` lines of that routine's doc as written, in this clone,
+  with the seat's sandbox and Son's gh login (each `gh` call a bare command);
+- fetches with curl, which the scripts hand certifi's CA bundle (`scripts/curl_ca.py`:
+  macOS's /etc/ssl/cert.pem fails "self signed certificate in certificate chain" in the
+  seat, measured 2026-10-31); a curl the prompt runs by hand passes the same bundle,
+  `curl --cacert "$(.venv/bin/python -m certifi)" …`, since a bare curl in the seat still
+  fails that way; or WebFetch where the prompt allows it;
+- hands kb-verify to a fresh subagent whose whole prompt is kb-verify's `---8<---` block, so
+  it stays blind to the drafter's reasoning; it labels the PR `kb-verified` or `kb-hold` at
+  its head, and the kb gate then merges or holds it as before.
+
+The cadences below are what each routine was scheduled at; they are now how often Son is
+likely to ask.
+
 **Track A is proposed weekly by a routine and published by the kb gate.** The Claude Code
 routine "ancu kb-watch" ([kb-watch-routine.md](kb-watch-routine.md), behavior 57)
 runs every Monday 06:00 AEDT: it takes every doc whose next yearly edition is due,

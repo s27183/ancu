@@ -65,6 +65,8 @@ import time
 import xml.etree.ElementTree as ET
 from pathlib import Path
 from urllib.parse import urljoin, urlsplit
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from curl_ca import ca_args  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 STATE = ROOT / "docs/sources/news-watch.json"
@@ -107,7 +109,7 @@ def curl_hop(url: str) -> tuple[int, dict, str, str]:
     with tempfile.TemporaryDirectory() as d:
         hdr, body = Path(d) / "h", Path(d) / "b"
         r = subprocess.run(
-            ["curl", "-s", "--max-time", "30", "--proto", "=https", "-A", UA,
+            ["curl", "-s", "--max-time", "30", "--proto", "=https", *ca_args(), "-A", UA,
              "-D", str(hdr), "-o", str(body), "-w", "%{http_code} %{redirect_url}", url],
             capture_output=True, text=True, errors="replace")
         code, _, loc = r.stdout.partition(" ")

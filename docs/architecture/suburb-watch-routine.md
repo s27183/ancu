@@ -2,6 +2,10 @@
 
 Honest-partial -> P-2 -> The suburb adapters -> a monthly routine reports newer releases as one issue; Son reruns
 
+**Since behavior 145 (Son 2026-10-31)** the claude.ai routine is disabled: the prompt below
+runs in a live session when Son asks for it (`docs/architecture/kb-update-runbook.md`,
+"When it runs"). "Your GitHub tools" are then `gh`, run as Son's login.
+
 **What this is.** The prompt of the Claude Code routine "ancu suburb-watch" on Son's
 claude.ai account (behavior 58, Son 2026-10-10). It runs monthly on the 1st at 07:00 UTC
 (18:00 AEDT / 17:00 AEST, still the 1st in Sydney; 06:00 Sydney on the 1st is the

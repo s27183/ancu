@@ -2,6 +2,10 @@
 
 Regulated figures are grounded -> P-7 -> The KB -> a weekly routine proposes the KB update as one PR; the gate merges it when verified, else Son
 
+**Since behavior 145 (Son 2026-10-31)** the claude.ai routine is disabled: the prompt below
+runs in a live session when Son asks for it (`docs/architecture/kb-update-runbook.md`,
+"When it runs"). "Your GitHub tools" are then `gh`, run as Son's login.
+
 **What this is.** The prompt of the Claude Code routine "ancu kb-watch" on Son's
 claude.ai account (behavior 57, Son 2026-10-10). The routine runs weekly
 (Sunday 19:00 UTC = Monday 06:00 AEDT / 05:00 AEST) against `s27183/ancu` and
@@ -141,7 +145,7 @@ in `docs/kb/news/` as the shape to copy.
    check failed.
 
 6. Son's issue. If step 2 found any doc you could not verify or any kind-2/3 change,
-   open one GitHub issue in s27183/ancu with your GitHub tools, assigned to `s27183`,
+   open one GitHub issue in s27183/ancu with gh (or your GitHub tools), assigned to `s27183`,
    titled `kb-watch <yyyy-mm-dd>: needs Son`. It lists one line per item:
    `<slug> — could not verify: <why> (<url>)` or `<slug> — kind-2/3: <what changed>
    (<url>)`, and links the PR (or says no PR was opened). If an open issue with that

@@ -21,6 +21,8 @@ import re
 import subprocess
 import sys
 from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from curl_ca import ca_args  # noqa: E402
 
 DROP = r"<(script|style|noscript|nav|header|footer|svg)\b.*?</\1>"
 BLOCK = r"</?(p|div|li|h[1-6]|tr|td|th|table|section|article|br|dt|dd)\b[^>]*>"
@@ -103,7 +105,7 @@ def main() -> None:
     # curl, not urllib: through the sandbox's egress proxy urllib's chunked reads end
     # in IncompleteRead (measured 2026-10-10 on foreigninvestment.gov.au); curl reads
     # the same pages whole.
-    fetched = subprocess.run(["curl", "-fsSL", "--proto", "=https", "--proto-redir", "=https",
+    fetched = subprocess.run(["curl", "-fsSL", "--proto", "=https", "--proto-redir", "=https", *ca_args(),
                               "--max-redirs", "8", "-m", "60", "-A", "Mozilla/5.0 (archive_source)",
                               "-w", "\n%{url_effective}", url],
                              check=True, capture_output=True).stdout
