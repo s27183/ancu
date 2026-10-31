@@ -24,21 +24,18 @@ most "update the KB" asks are Track A.
 
 ## When it runs — triggers and cadence
 
-**Track A is proposed weekly by a job on Son's Mac and published by the kb gate.** Since
-behavior 145 (Son 2026-10-31) every KB job runs locally as the `ancuauto` user under
-launchd ([auto-jobs.md](auto-jobs.md)); before that they were claude.ai routines. The
-kb-watch job ([kb-watch-routine.md](kb-watch-routine.md), behavior 57)
-runs every Monday 06:00 local time: it takes every doc whose next yearly edition is due,
+**Track A is proposed weekly by a routine and published by the kb gate.** The Claude Code
+routine "ancu kb-watch" ([kb-watch-routine.md](kb-watch-routine.md), behavior 57)
+runs every Monday 06:00 AEDT: it takes every doc whose next yearly edition is due,
 then the 30 most overdue docs from the freshness scanner (Phase 0), re-verifies them
 against their primaries, drafts a news note for each figure that moved, runs the gates
 (Phases 1, 2, 4, 5) and opens one PR. The news from the watched government sites and
-the Home Affairs visa check are proposed daily by the news-watch job
+the Home Affairs visa check are proposed daily by the "ancu news-watch" routine
 ([news-watch-routine.md](news-watch-routine.md), behavior 134), one PR a day;
 `scripts/news_watch.py` names what each site in `docs/sources/news-watch.json`
 published since the last run, and the PR accounts for every line (behavior 136).
-The jobs' agents never merge, and never hold a GitHub key. The kb gate
-(`scripts/auto/gate.py`, run at 09:45 daily on Son's Mac after kb-verify; behaviors 74, 145)
-runs the done checks at the PR's head, then merges a PR whose every change `scripts/kb_gate.py` passes — date-only, a new news
+The routines never merge. The kb gate (`.github/workflows/kb-gate.yml`, behavior 74)
+merges a PR whose every change `scripts/kb_gate.py` passes — date-only, a new news
 note, or a figure quoted word for word from a saved primary and re-checked by
 kb-verify — and the merge deploys (Phase 6). Anything else is held as one issue
 assigned to Son, naming each held item and why. Kind-2 and
@@ -46,7 +43,7 @@ kind-3 changes are named in the PR body, not drafted, and are taken up in a sess
 (Son + Claude Code) as before — which is also how an external event (a Budget, a
 regime change) is handled between runs.
 
-**Track B is reported monthly, rerun by hand.** The suburb-watch job
+**Track B is reported monthly, rerun by hand.** The routine "ancu suburb-watch"
 ([suburb-watch-routine.md](suburb-watch-routine.md), behavior 58) opens one issue on
 the 1st when a suburb source has a newer release than the one in
 `engine/build/suburbs/data/README.md`'s "Built from" table. The rerun writes the
@@ -388,7 +385,7 @@ any other host, naming the note and the host.
 
 #### Home Affairs visa check — in the daily news-watch routine (behaviors 100, 104, 134)
 
-The daily news-watch job runs this check (behavior 134, Son 2026-10-19; on Son's Mac since behavior 145;
+The cloud news-watch routine runs this check each day (behavior 134, Son 2026-10-19;
 the weekly kb-watch ran it from behavior 104, Son 2026-10-17);
 it used to wait for the seat on Son's machine, because Home Affairs was thought to
 refuse automated fetches. Measured 2026-10-17: curl reads every Home Affairs page and
