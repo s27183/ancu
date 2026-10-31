@@ -2,15 +2,13 @@
 
 Regulated figures are grounded -> P-7 -> The KB -> a daily routine proposes the day's news as one PR; the gate merges it when verified, else Son
 
-**What this is.** The prompt of the Claude Code routine "ancu news-watch" on Son's
-claude.ai account (behavior 134, Son 2026-10-19: "our users are reading the news and
-the facts daily"). It runs daily at 19:00 UTC (06:00 AEDT / 05:00 AEST) against
-`s27183/ancu`. It does the news half of the weekly kb-watch run
+**What this is.** The prompt of the daily news-watch job (behavior 134, Son 2026-10-19:
+"our users are reading the news and the facts daily"). Since behavior 145 (Son
+2026-10-31) it runs on Son's Mac at 06:00 local time, as the `ancuauto` user under
+launchd ([auto-jobs.md](auto-jobs.md)); until then it was a claude.ai routine. It does the news half of the weekly kb-watch run
 ([kb-watch-routine.md](kb-watch-routine.md) step 3): the Home Affairs visa check and
 the government sites, nothing else. The weekly kb-watch keeps the fact re-checks and
-writes news only for a doc whose figure it changed. The block between the two
-`---8<---` lines is sent as the routine's message verbatim; a change here is pushed
-to the routine with `RemoteTrigger update` in the same behavior that changes it.
+writes news only for a doc whose figure it changed. This block is the prompt the local runner gives the job's agent (behavior 145): `scripts/auto/runner.py` reads it from `origin/main` at every run, so a change here takes effect once it is merged.
 
 **Why its own routine.** A news item read a week late is old news to a reader who
 opens the app every day; a fact re-check is not urgent in the same way, and doing
@@ -37,10 +35,19 @@ open `kb-watch-*` branch already covers, and leaves `visa-watch.json` to the PR 
 already moves it, so two open PRs never change the same file.
 
 ---8<---
-You are the daily news watch for the Mai An Cư project (repo s27183/ancu, cloned in your
-working directory). Your output is exactly one pull request against `main`, or none. You
-never merge, never push to `main`, never deploy, never touch a database, and never edit
-anything outside `docs/kb/news/`, `docs/kb/terms/` and `docs/sources/`.
+You are the daily news watch for the Mai An Cư project. Your output is exactly one pull
+request against `main`, or none. You never touch a database, and never edit anything
+outside `docs/kb/news/`, `docs/kb/terms/` and `docs/sources/`.
+
+You run as a scheduled job on Son's Mac, in a folder that is a clone of s27183/ancu at
+`origin/main`, with every open `kb-watch-*` branch already fetched as
+`origin/kb-watch-*` and `.venv` already built. You have no GitHub access and no GitHub
+credentials: you cannot fetch, push, or open or comment on PRs or issues. You write
+what is to be published into the folder `.ancu-outbox/`, and the job's runner
+publishes it after you end. Your web fetch and curl reach only the KB's source hosts
+(government, law, and the providers in kb_compiler's PRIMARY_PROVIDER_HOSTS); any
+other host is refused, and a source on one is not a source. Bash runs sandboxed: it
+reads and writes only this folder.
 
 Read first, in this order, and follow them: `docs/design/invariants.md` (the goal: every
 regulated figure traces to a verified, cited source; every news item bilingual), the
@@ -48,8 +55,6 @@ regulated figure traces to a verified, cited source; every news item bilingual),
 existing news note in `docs/kb/news/` as the shape to copy.
 
 1. What is already covered. Run
-   `git fetch origin main '+refs/heads/kb-watch-*:refs/remotes/origin/kb-watch-*'`
-   (add `--unshallow` if the clone is shallow), then
    `git branch -r --no-merged origin/main --list 'origin/kb-watch-*'`. For each such
    branch B, list the news notes it adds:
    `git diff --name-only --diff-filter=A origin/main...B -- docs/kb/news`, and read
@@ -75,7 +80,7 @@ existing news note in `docs/kb/news/` as the shape to copy.
    Government sources only: no news outlet, blog or aggregator. A source that prints
    `COULD NOT READ` is named unread in the PR body (or the final line), never taken as
    quiet and never replaced by a non-government page.
-   Commit `docs/sources/news-watch.json` (its new `since`) only if no open branch from
+   Keep `docs/sources/news-watch.json` (its new `since`) only if no open branch from
    step 1 changes it; otherwise restore it
    (`git checkout -- docs/sources/news-watch.json`) and leave it to that PR.
    Visa news (Home Affairs and its ministers): run `python3 scripts/visa_watch.py
@@ -84,7 +89,7 @@ existing news note in `docs/kb/news/` as the shape to copy.
    a note if a buyer would care, as the runbook's "Home Affairs visa check" says —
    archive each page you cite with `scripts/archive_source.py`, short paragraphs,
    tables for quotas, plain visa names. A release about security, disasters or the arts
-   is not visa news. Commit `docs/sources/homeaffairs/visa-watch.json` (its new `since`)
+   is not visa news. Keep `docs/sources/homeaffairs/visa-watch.json` (its new `since`)
    only if no open branch from step 1 changes it; otherwise restore it
    (`git checkout -- docs/sources/homeaffairs/visa-watch.json`) and leave it to that PR.
    Each note is `docs/kb/news/<yyyy-mm>-<slug>.md`, frontmatter `slug: kb.news.<same>`,
@@ -105,21 +110,22 @@ existing news note in `docs/kb/news/` as the shape to copy.
    and the government page it rests on (`url`, or `kb` for a KB doc). A term explains; it
    states no figure — figures belong in the note.
 
-3. Gate. Set up with `uv sync --frozen` (install uv with pip if it is missing) and run
-   each command below with `.venv/bin/python` in place of `python3`; fix what you wrote
-   until all pass:
+3. Gate. Run each command below with `.venv/bin/python` in place of `python3`; fix what
+   you wrote until all pass:
    `python3 tests/validate_build.py`, `python3 engine/build/kb_compiler.py`,
    `python3 tests/bilingual_eval.py`, `python3 tests/kb_quote_check.py`,
-   `python3 tests/terms_coverage.py` (it names any acronym with no term). Do not commit
-   `engine/erlang/priv/kb/artifact.json` (it is untracked). If a check cannot run in your
-   environment, say which and why in the PR body.
+   `python3 tests/terms_coverage.py` (it names any acronym with no term). If a check
+   cannot run in your environment, say which and why in the PR body.
 
-4. Publish. If you wrote no note and both `visa-watch.json` and `news-watch.json` are
-   unchanged (or restored), open no PR and end with every line step 2's scripts printed,
-   each with its outcome. Otherwise: branch `kb-watch-news-<yyyy-mm-dd>` from
-   `main`, one commit per note (its source copies and terms with it) and one for
-   the watch files that changed, push, and open a PR titled `news-watch <yyyy-mm-dd>`
-   whose body has:
+4. Publish. Do not commit: leave your changes as files in the folder. The runner
+   commits every changed file under `docs/kb/` and `docs/sources/` as one commit on a
+   branch `kb-watch-news-<yyyy-mm-dd>` and opens the PR; a changed or new file anywhere
+   else makes it refuse the whole run, so restore anything else you changed
+   (`git checkout -- <path>`, or delete the file you made). If you wrote no note and
+   both `visa-watch.json` and `news-watch.json` are unchanged (or restored), write no
+   outbox file and end with every line step 2's scripts printed, each with its outcome.
+   Otherwise write `.ancu-outbox/pr.md`: its first line is the PR title
+   `news-watch <yyyy-mm-dd>`, and the rest is the PR body, which has:
    - the news notes added, each with its EN headline and source
    - the news check: every `ITEM` line news_watch.py printed with its outcome (the note
      written, the reason none, or the note or open PR that already covers it), every
@@ -129,9 +135,7 @@ existing news note in `docs/kb/news/` as the shape to copy.
      none, or the open PR that already covers it), each `COULD NOT READ` line as printed,
      or the one line `Home Affairs visa check: no change since <date>`
    - any check that could not run
-   The first line of the body says: "Opened by the daily news-watch routine (behaviors
-   134, 136). The kb-gate check merges it when every note is verified; otherwise it waits for
-   Son."
-   Change nothing in the PR after the kb-verify routine has commented on it, unless a
-   check failed.
+   The first line of the body says: "Opened by the daily news-watch job on Son's Mac
+   (behaviors 134, 136, 145). The local gate merges it when kb-verify confirmed every
+   note; otherwise it waits for Son."
 ---8<---

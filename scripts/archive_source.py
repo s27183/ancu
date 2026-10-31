@@ -73,15 +73,44 @@ def schema_text(raw: str) -> str:
     return "\n".join(out)
 
 
+# Regulated figures are grounded -> R-3 -> The KB update -> archive_source fetches only https on a KB source host
+# Behavior 145: a job's agent runs this on pages that may carry someone's intent, and its
+# output is published. So before any fetch the URL must be https on a primary host as
+# kb_compiler's strict authority match reads it (no userinfo, backslash, escape, port,
+# other scheme), else exit 2; curl may follow only https redirects, and the page it ended
+# on must pass the same test, else exit 2 and nothing is written. Defense in depth: the
+# agent's sandbox (denyRead /Users, network to the source hosts) is the boundary.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "engine" / "build"))
+import kb_compiler  # noqa: E402
+
+
+def allowed(url: str) -> bool:
+    host = kb_compiler.url_host(url)
+    hosts = set(kb_compiler.PRIMARY_GOV_LAW_HOSTS)
+    for hs in kb_compiler.PRIMARY_PROVIDER_HOSTS.values():
+        hosts.update(hs)
+    return bool(host) and kb_compiler.host_in(host, sorted(hosts))
+
+
 def main() -> None:
     if len(sys.argv) != 3:
         sys.exit(__doc__)
     url, out = sys.argv[1], Path(sys.argv[2])
+    if not allowed(url):
+        print(f"archive_source: refused {url!r}: not https on a KB source host", file=sys.stderr)
+        sys.exit(2)
     # curl, not urllib: through the sandbox's egress proxy urllib's chunked reads end
     # in IncompleteRead (measured 2026-10-10 on foreigninvestment.gov.au); curl reads
     # the same pages whole.
-    body = subprocess.run(["curl", "-fsSL", "-m", "60", "-A", "Mozilla/5.0 (archive_source)", url],
-                          check=True, capture_output=True).stdout
+    fetched = subprocess.run(["curl", "-fsSL", "--proto", "=https", "--proto-redir", "=https",
+                              "--max-redirs", "8", "-m", "60", "-A", "Mozilla/5.0 (archive_source)",
+                              "-w", "\n%{url_effective}", url],
+                             check=True, capture_output=True).stdout
+    body, _, final = fetched.rpartition(b"\n")
+    final_url = final.decode("utf-8", errors="replace")
+    if not allowed(final_url):
+        print(f"archive_source: refused {url!r}: it redirected to {final_url!r}", file=sys.stderr)
+        sys.exit(2)
     raw = body.decode("utf-8", errors="replace")
     title = re.search(r"<title>(.*?)</title>", raw, re.S | re.I)
     if title and re.search(r"not found|404", title.group(1), re.I):

@@ -5,6 +5,11 @@
 # after building what a clean checkout lacks (.venv, the KB artifact, node_modules).
 # Toolchain = the dev seat's, measured 2026-10-09: OTP 29.1.1 / rebar3 3.27.0, Node 26,
 # Python per uv.lock (requires-python >=3.14). Offline checks only: no Postgres, no keys.
+# One exception (behavior 145, Son 2026-10-31): a same-repo kb-watch-* PR whose every change is
+# a regular file under docs/kb or docs/sources was checked by the local gate on Son's Mac
+# (docs/architecture/auto-jobs.md), which runs this same script at the head before merging.
+# For that PR alone the first step, scripts/auto/ci_scope.py, says kb_only=true and the
+# job passes without the rest; any other diff on such a branch runs every step.
 name: done checks
 
 on:
@@ -27,29 +32,49 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Scope (a KB-only kb-watch head, checked by the local gate?)
+        id: scope
+        env:
+          EVENT: ${{ github.event_name }}
+          REPO: ${{ github.repository }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: python3 scripts/auto/ci_scope.py >> "$GITHUB_OUTPUT"
 
       - uses: erlef/setup-beam@v1
+        if: steps.scope.outputs.kb_only != 'true'
         with:
           otp-version: "29.1.1"
           rebar3-version: "3.27.0"
 
       - uses: actions/setup-node@v4
+        if: steps.scope.outputs.kb_only != 'true'
         with:
           node-version: "26"
           cache: npm
           cache-dependency-path: shell/web/frontend/package-lock.json
 
       - uses: astral-sh/setup-uv@v6
+        if: steps.scope.outputs.kb_only != 'true'
 
       - name: Python deps (uv.lock)
+        if: steps.scope.outputs.kb_only != 'true'
         run: uv sync --frozen
 
       - name: KB artifact
+        if: steps.scope.outputs.kb_only != 'true'
         run: .venv/bin/python engine/build/kb_compiler.py
 
       - name: Frontend deps
+        if: steps.scope.outputs.kb_only != 'true'
         working-directory: shell/web/frontend
         run: npm ci
 
       - name: Done checks (architecture.md `checks:`)
+        if: steps.scope.outputs.kb_only != 'true'
         run: bash scripts/done_checks.sh
