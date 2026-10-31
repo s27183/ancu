@@ -126,3 +126,132 @@ test('index pages, robots, sitemap and llms.txt', () => {
     assert.match(l, /^# Mai An Cư\n\n> /);
     assert.match(l, /- \[News A\]\(https:\/\/maiancu.com\/news\/a\): Tin A \(2026-10-20\)/);
 });
+
+// ---- Guides (behavior 146) ----------------------------------------------------------------
+// Expect 2: for all KB docs in the compiled artifact plus 200 planted hostile docs (seed 146):
+// a page exists iff the doc passes the publish rule; it keeps its H1, every other heading as an
+// h2/h3 and at least nine tenths of the doc's reader text; it holds no PLACEHOLDER, "Mode-",
+// tag outside the allowlist or raw `](../`; its JSON-LD parses. Expect 3: every href in a
+// guide's article is https, and one on maiancu.com names a guide that is built.
+import { readFileSync, existsSync } from 'node:fs';
+import { allGuides, guidePage, guideTitles, guidePath, guideIndexPage, isPublished, llmsFull, staticPage, type KbDoc } from '../scripts/seo.ts';
+
+const ARTIFACT_JSON = new URL('../../../../engine/erlang/priv/kb/artifact.json', import.meta.url);
+
+// The publish rule, written again from the behavior's words as the oracle.
+function shouldPublish(slug: string, d: KbDoc): boolean {
+    const cat = slug.split('.')[1];
+    if (cat === 'copy' || cat === 'journey' || cat === 'bilingual') return false;
+    if (d.content_md.includes('PLACEHOLDER') || d.content_md.includes('NOT SOURCE-GROUNDED')) return false;
+    return (d.sources ?? []).some((s) => (s.url ?? '').startsWith('https://'));
+}
+
+const ALLOWED = new Set(['html', 'head', 'meta', 'title', 'link', 'script', 'style', 'body', 'header', 'nav', 'a', 'main', 'article', 'footer', 'h1', 'h2', 'h3', 'p', 'time', 'ul', 'ol', 'li', 'strong', 'em', 'code', 'pre', 'br', 'hr', 'blockquote', 'div', 'table', 'thead', 'tbody', 'tr', 'th', 'td']);
+
+const decode = (s: string) => s.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&amp;/g, '&');
+const squash = (s: string) => s.replace(/\s+/g, '');
+
+/** The doc's text as a reader sees it, from the markdown: link targets, marks and the H1 gone. */
+function readerText(md: string): string {
+    const lines = md.split('\n');
+    lines.splice(lines.findIndex((l) => /^\s{0,3}#\s/.test(l)), 1);
+    return squash(
+        lines
+            .join('\n')
+            .replace(/\[([^\]\n]*)\]\([^)\n]*\)/g, '$1')
+            .replace(/`kb\.[a-z0-9.-]+`/g, '')
+            .replace(/\(agent reasons over these\)/g, '')
+            .replace(/^\s*\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)*\|?\s*$/gm, '')
+            .replace(/^\s*([-*+]|\d{1,9}[.)])\s+/gm, '')
+            .replace(/^\s{0,3}([-*_])(\s*\1){2,}\s*$/gm, '')
+            .replace(/^\s{0,3}(#{1,6}|>)\s?/gm, '')
+            .replace(/[*_`|\\]/g, '')
+    );
+}
+
+function headings(md: string): number {
+    let fenced = false;
+    let n = 0;
+    for (const line of md.split('\n')) {
+        if (/^\s*```/.test(line)) fenced = !fenced;
+        else if (!fenced && /^\s{0,3}#{2,6}\s+\S/.test(line)) n++;
+    }
+    return n;
+}
+
+function checkGuide(slug: string, d: KbDoc, titles: Map<string, string>, why: string): string {
+    const html = staticPage(guidePage(slug, d, titles));
+    const article = html.slice(html.indexOf('<article>'), html.indexOf('</article>'));
+    assert.match(article, /<h1>[^<]+<\/h1>/, `${why}: H1`);
+    const hs = [...article.matchAll(/<h([23])>/g)].length - 1; // less the Sources heading
+    assert.equal(hs, headings(d.content_md), `${why}: every heading is an h2/h3`);
+    const text = squash(decode(article.replace(/<p class="meta">[\s\S]*?<\/p>/, '').replace(/<h2>Sources<\/h2>[\s\S]*$/, '').replace(/<h1>[\s\S]*?<\/h1>/, '').replace(/<[^>]+>/g, '')));
+    const want = readerText(d.content_md);
+    assert.ok(text.length >= want.length * 0.9, `${why}: body ${text.length} of ${want.length}`);
+    for (const bad of ['PLACEHOLDER', 'Mode-', '](../']) assert.ok(!html.includes(bad), `${why}: holds ${bad}`);
+    for (const m of html.matchAll(/<\/?([a-zA-Z][a-zA-Z0-9-]*)/g)) assert.ok(ALLOWED.has(m[1].toLowerCase()), `${why}: tag <${m[1]}>`);
+    assert.equal([...html.matchAll(/<script\b/gi)].length, 1, `${why}: one script element, the JSON-LD`);
+    const [ld] = ldOf(html) as { '@type': string; headline: string }[];
+    assert.equal(ld['@type'], 'Article', `${why}: Article JSON-LD`);
+    for (const m of article.matchAll(/<a\b([^>]*)>/g)) {
+        const href = /^ href="([^"]*)"/.exec(m[1]);
+        assert.ok(href, `${why}: <a> without a leading href: ${m[1]}`);
+        const u = decode(href[1]);
+        assert.ok(u.startsWith('https://'), `${why}: href ${u}`);
+        if (u.startsWith('https://maiancu.com/')) {
+            const p = u.slice('https://maiancu.com'.length);
+            assert.ok([...titles.keys()].some((k) => guidePath(k) === p), `${why}: ${p} is a built guide`);
+        }
+    }
+    return html;
+}
+
+test('property: every real KB doc gets a guide iff published, and each guide keeps its text and only safe links', { skip: !existsSync(ARTIFACT_JSON) && 'no compiled artifact' }, () => {
+    const kb = (JSON.parse(readFileSync(ARTIFACT_JSON, 'utf8')) as { kb: Record<string, KbDoc> }).kb;
+    const guides = allGuides({ kb });
+    const titles = guideTitles(guides);
+    for (const [slug, d] of Object.entries(kb)) {
+        assert.equal(isPublished(slug, d), shouldPublish(slug, d), slug);
+        assert.equal(titles.has(slug), shouldPublish(slug, d), slug);
+        if (titles.has(slug)) checkGuide(slug, d, titles, slug);
+    }
+    assert.ok(guides.length > 100, `${guides.length} guides`);
+    const index = llms([], [], guides) + llmsFull([], [], guides) + staticPage(guideIndexPage(guides));
+    for (const bad of ['PLACEHOLDER', 'NOT SOURCE-GROUNDED', 'Mode-', '](../']) assert.ok(!index.includes(bad), `llms.txt, llms-full.txt and /guide hold no ${bad}`);
+});
+
+const HOSTILE = ['</script>', '<img src=x onerror=alert(1)>', '<!--', '"', '&', ' ', '[run](javascript:alert(1))', '[d](data:text/html,x)', '[h](http://example.com/x)', '[ok](https://www.ato.gov.au/x)', '[far](https://evil.example/x)', '[peer](../scheme/fhg.md)', '[hidden](../copy/x.md)', '[frag](#anchor)', '[abs](/plan)', 'a Mode-B buyer', 'Modes B and D', 'Mode A/C', '(agent reasons over these)', '`kb.scheme.fhg`', '| a | b |\n|---|---|\n| 1 | 2 |\n', '- item\n', '**bold** ', 'Phí ', '$46,800 ', '\n\n', ' ', 'x'];
+
+function plantedBody(r: () => number): string {
+    let s = '';
+    const n = 3 + Math.floor(r() * 14);
+    for (let i = 0; i < n; i++) {
+        if (r() < 0.15) s += `\n## ${draw(r).replace(/\n/g, ' ')} ${HOSTILE[Math.floor(r() * HOSTILE.length)].replace(/\n/g, ' ')}\n`;
+        s += HOSTILE[Math.floor(r() * HOSTILE.length)];
+    }
+    return s;
+}
+
+test('property: planted hostile docs (200 cases, seed 146)', () => {
+    const r = rng(146);
+    const cats = ['scheme', 'firb', 'copy', 'journey', 'bilingual', 'tax'];
+    const peer: KbDoc = { content_md: '# First Home Guarantee\n\nThe guarantee.', sources: [{ url: 'https://www.housingaustralia.gov.au/x' }] };
+    let built = 0;
+    for (let i = 0; i < 200; i++) {
+        const slug = `kb.${cats[Math.floor(r() * cats.length)]}.case-${i}`;
+        const mark = r() < 0.1 ? 'PLACEHOLDER ' : r() < 0.05 ? 'NOT SOURCE-GROUNDED ' : '';
+        const srcs = r() < 0.1 ? [] : r() < 0.1 ? [{ note: 'NOT VERIFIED' } as never] : [{ url: r() < 0.1 ? 'javascript:alert(1)' : 'https://www.ato.gov.au/case', retrieved: '2026-10-01' }];
+        const d: KbDoc = { content_md: `# ${draw(r).replace(/\n/g, ' ') || 'T'}x\n\n${mark}${plantedBody(r)}`, last_verified: '2026-10-01', sources: srcs };
+        const kb = { [slug]: d, 'kb.scheme.fhg': peer, 'kb.copy.x': { content_md: '# Copy\n\nx', sources: [{ url: 'https://a.gov.au/' }] } };
+        const titles = guideTitles(allGuides({ kb }));
+        assert.equal(titles.has(slug), shouldPublish(slug, d), `case ${i}: published iff the rule passes`);
+        assert.ok(!titles.has('kb.copy.x'), 'copy never published');
+        if (!titles.has(slug)) continue;
+        built++;
+        const html = checkGuide(slug, d, titles, `case ${i}`);
+        for (const bad of ['javascript:', 'data:text', 'http://example.com', '/copy/', '#anchor"', 'href="/plan"></a']) assert.ok(!html.includes(`href="${bad}`) && !html.includes(bad + '"'), `case ${i}: no ${bad} href`);
+        if (d.content_md.includes('[peer](../scheme/fhg.md)')) assert.ok(html.includes('href="https://maiancu.com/guide/scheme-fhg"'), `case ${i}: a published peer links to its guide`);
+        if (d.content_md.includes('[hidden](../copy/x.md)')) assert.ok(html.includes('hidden'), `case ${i}: an unpublished peer stays as text`);
+    }
+    assert.ok(built >= 40, `${built} planted guides built`);
+});
