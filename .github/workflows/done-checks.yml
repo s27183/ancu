@@ -5,6 +5,9 @@
 # after building what a clean checkout lacks (.venv, the KB artifact, node_modules).
 # Toolchain = the dev seat's, measured 2026-10-09: OTP 29.1.1 / rebar3 3.27.0, Node 26,
 # Python per uv.lock (requires-python >=3.14). Offline checks only: no Postgres, no keys.
+# One exception (behavior 145, Son 2026-10-31): a same-repo kb-watch-* PR is checked by the
+# local gate on Son's Mac (docs/architecture/auto-jobs.md), which runs this same script at
+# the head sha before it merges; here that job is skipped, which the ruleset counts as passed.
 name: done checks
 
 on:
@@ -23,6 +26,13 @@ concurrency:
 jobs:
   done-checks:
     name: done checks
+    # A same-repo kb-watch-* PR is the local gate's: it ran these checks on Son's Mac at the
+    # head sha before merging (scripts/auto/gate.py, behavior 145). A job skipped by `if:`
+    # reports success to main's required "done checks"; a fork's PR or any other head runs.
+    if: >-
+      github.event_name != 'pull_request'
+      || github.event.pull_request.head.repo.full_name != github.repository
+      || !startsWith(github.event.pull_request.head.ref, 'kb-watch-')
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
