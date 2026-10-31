@@ -31,6 +31,7 @@ ROOT = HERE.parents[1]
 TMP = Path(tempfile.mkdtemp(prefix="ancu-selftest-"))
 os.environ["ANCU_AUTO_HOME"] = str(TMP / "home")
 os.environ["ANCU_AUTO_LOGS"] = str(TMP / "logs")
+os.environ["ANCU_AUTO_SHARED"] = str(TMP / "shared")
 sys.path.insert(0, str(HERE))
 import autolib as A  # noqa: E402
 import publish  # noqa: E402
@@ -61,7 +62,7 @@ def static_checks() -> None:
         p = A.prompt(job)
         check(f"prompt {job} is its doc's one ---8<--- block",
               doc.count("---8<---\n") == 2 and p and p in doc)
-    s = A.settings(Path("/Users/ancuauto/jobs/x"), Path("/Users/ancuauto"))
+    s = A.settings(Path("/Users/Shared/ancu-auto/jobs/x"))
     perm, sb = s["permissions"], s["sandbox"]
     allow = perm["allow"]
     check("settings: Read and Edit only ./**",
@@ -73,13 +74,20 @@ def static_checks() -> None:
           sb["enabled"] and sb["failIfUnavailable"] and sb["allowUnsandboxedCommands"] is False)
     fs = sb["filesystem"]
     check("settings: sandbox denyRead /Users, allowRead only the folder and toolchain",
-          fs["denyRead"] == ["/Users"] and fs["allowWrite"] == ["/Users/ancuauto/jobs/x"]
-          and set(fs["allowRead"]) == {"/Users/ancuauto/jobs/x", "/Users/ancuauto/.local",
-                                       "/Users/ancuauto/.cache/uv", "/Users/ancuauto/.claude-jobs"})
+          fs["denyRead"] == ["/Users"] and fs["allowWrite"] == ["/Users/Shared/ancu-auto/jobs/x"]
+          and set(fs["allowRead"]) == {"/Users/Shared/ancu-auto/jobs/x", "/Users/ancuagent/.local",
+                                       str(A.PY_DIR), "/Users/ancuagent/.claude-jobs"})
     check("settings: sandbox network only the source hosts",
           {d.lstrip("*.") for d in sb["network"]["allowedDomains"]} == set(A.source_hosts()))
     env = A.agent_env()
     check("agent env holds no GitHub token", not any(k.startswith(("GH_", "GITHUB")) for k in env))
+    w = (HERE / "ancu-agent.sh").read_text()
+    check("the agent runs as ancuagent only through the wrapper, with an environment of its own",
+          A.AGENT_USER == "ancuagent" and str(A.WRAPPER) == "/usr/local/libexec/ancu-agent"
+          and 'unset "$v"' in w and "umask 007" in w and 'exec "$H/.local/bin/claude" "$@"' in w
+          and "GH_" not in w and "JOBS=/Users/Shared/ancu-auto/jobs" in w
+          and '"sudo", "-n", "-u", AGENT_USER, str(WRAPPER)' in (HERE / "autolib.py").read_text()
+          and "refusing to run the agent as the runner's" in (HERE / "autolib.py").read_text())
     rj = (HERE / "run_job.sh").read_text()
     check("run_job.sh runs the runner from its own checkout at origin/main, hooks off",
           "checkout --quiet --force --detach origin/main" in rj and "core.hooksPath=/dev/null" in rj
@@ -283,6 +291,92 @@ def url_property() -> None:
           f"{len(bad_cases)} counterexamples, first: {bad_cases[0] if bad_cases else ''}")
 
 
+# --- CI's scope and the gate agree on KB-only (Expect 12) ------------------------------
+
+SCOPE_GOOD = ["add docs/kb/n{r}.md", "mod docs/kb/a.md", "del docs/kb/news/n.md",
+              "add docs/sources/x/{r}.txt", "add docs/kb/tin tức {r}.md", "mv docs/kb/a.md docs/kb/m{r}.md"]
+SCOPE_BAD = ["mod scripts/x.py", "add .github/workflows/e{r}.yml", "mv docs/kb/a.md scripts/a{r}.md",
+             "mv scripts/x.py docs/kb/x{r}.py", "link docs/kb/l{r}.md", "sub docs/kb/s{r}",
+             "exec docs/kb/e{r}.sh", "add docs/kb/.h{r}.md", "add tests/t{r}.py"]
+
+
+def scope_property() -> None:
+    import ci_scope
+    import gate as G
+    rng = random.Random(SEED)
+    repo = TMP / "scope"
+    repo.mkdir()
+    sh("git", "init", "-q", "-b", "main", cwd=repo)
+    for f, t in BASE_FILES.items():
+        (repo / f).parent.mkdir(parents=True, exist_ok=True)
+        (repo / f).write_text(t)
+    sh("git", "add", "-A", cwd=repo)
+    sh("git", "commit", "-q", "-m", "base", cwd=repo)
+    base = sh("git", "rev-parse", "HEAD", cwd=repo).strip()
+    bad = []
+    for case in range(N):
+        same = rng.random() < 0.75
+        ref = rng.choice(["kb-watch-2026-11-02", "kb-watch-news-2026-11-01", "b145-x", "kb-watchx",
+                          "fix/kb-watch-1"])
+        pool = SCOPE_GOOD + (SCOPE_BAD if rng.random() < 0.5 else [])
+        ops = list(dict.fromkeys(rng.choice(pool).format(r=rng.randrange(999))
+                                 for _ in range(rng.randint(0, 3))))
+        sh("git", "checkout", "-q", "-f", "-B", f"c{case}", base, cwd=repo)
+        sh("git", "clean", "-fdq", cwd=repo)
+        applied, gitlinks = [], []
+        for op in ops:
+            kind, path = op.split(" ", 1)
+            p = repo / path
+            if kind == "mv":
+                src, dst = path.split(" ", 1) if path.count(" ") == 1 else (None, None)
+                if src is None or not (repo / src).is_file():
+                    continue
+                (repo / dst).parent.mkdir(parents=True, exist_ok=True)
+                (repo / src).rename(repo / dst)
+            elif kind == "del":
+                if not p.is_file():
+                    continue
+                p.unlink()
+            elif kind == "sub":
+                gitlinks.append(path)
+            else:
+                p.parent.mkdir(parents=True, exist_ok=True)
+                if kind == "link":
+                    os.symlink("../../scripts/x.py", p)
+                else:
+                    p.write_text(f"{op}\n")
+                    if kind == "exec":
+                        p.chmod(0o755)
+            applied.append(op)
+        sh("git", "add", "-A", cwd=repo)
+        for g in gitlinks:
+            sh("git", "update-index", "--add", "--cacheinfo", f"160000,{base},{g}", cwd=repo)
+        sh("git", "commit", "-q", "--allow-empty", "-m", f"case {case}", cwd=repo)
+        head = sh("git", "rev-parse", "HEAD", cwd=repo).strip()
+        entries = ci_scope.diff_entries(repo, base, head)
+        got, why = ci_scope.kb_only(same, ref, entries)
+        is_bad = any(_matches(op, t) for op in applied for t in SCOPE_BAD)
+        want = same and ref.startswith("kb-watch-") and bool(applied) and not is_bad
+        calls = {"checks": 0}
+        pr = {"number": case, "headRefOid": head, "headRefName": ref, "baseRefName": "main",
+              "isCrossRepository": not same}
+        G.plan_pr(pr, entries, {"sha": head, "verdict": "kb-verified"},
+                  lambda _s: calls.__setitem__("checks", calls["checks"] + 1) or True,
+                  lambda labels, ok: "merge")
+        if got != want or (calls["checks"] > 0) != want:
+            bad.append(f"case {case}: same {same} {ref} ops {applied} → kb_only {got} ({why}), "
+                       f"gate ran checks {calls['checks']}, expected {want}")
+    check(f"ci scope property: {N} cases, seed {SEED} (CI skips and the gate checks the same PRs)",
+          not bad, f"{len(bad)} counterexamples, first: {bad[0] if bad else ''}")
+
+
+def _matches(op: str, template: str) -> bool:
+    """Whether `op` was drawn from `template` ({r} stands for digits)."""
+    import re as _re
+    pat = "^" + _re.escape(template).replace(_re.escape("{r}"), r"\d+") + "$"
+    return bool(_re.match(pat, op))
+
+
 def main() -> int:
     try:
         static_checks()
@@ -294,6 +388,7 @@ def main() -> int:
         if gate.is_file() and "--no-gate" not in sys.argv:
             import gate as G
             G.self_test(check, SEED, N)
+            scope_property()
     finally:
         shutil.rmtree(TMP, ignore_errors=True)
     print(f"selftest: {'ok' if not FAILS else f'{len(FAILS)} failed'}")

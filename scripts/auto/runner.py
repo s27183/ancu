@@ -7,10 +7,11 @@ Invariant: the agent never holds a GitHub key and never runs outside its folder;
 Mechanism: run_job.sh brings the runner checkout to origin/main and execs this file from it.
   run() takes a lock, fetches main and the open kb-watch-* branches into the runner checkout,
   runs the canary (abort on anything but `held`, and file one issue for Son), clones the
-  runner checkout into jobs/<job>-<stamp> with the remote-tracking branches copied in, builds
-  .venv there with `uv sync --frozen` (for kb-verify, also writes .ancu-outbox/known.json from
+  runner checkout into /Users/Shared/ancu-auto/jobs/<job>-<stamp> with the remote-tracking branches copied in, builds
+  .venv there with `uv sync --frozen` (its Python in the shared PY_DIR, the clone made
+  group-writable for ancuagent; for kb-verify, also writes .ancu-outbox/known.json from
   ~/state/verdicts.json, so heads already judged are skipped), then starts the agent with autolib.settings() and the
-  job's prompt from its `---8<---` block, and hands the folder to publish.py, which reads it
+  job's prompt from its `---8<---` block — as ancuagent, through the wrapper — and hands the folder to publish.py, which reads it
   with os, never with git. Every step is logged to /Users/Shared/ancu-auto/logs/<job>-<stamp>.log
   with the agent's stream-json transcript beside it.
 Capability: `run_job.sh <job>` (launchd) → `python3 runner.py <job>`; exit 0 when the job ran
@@ -66,9 +67,13 @@ def make_folder(job: str, stamp: str, base: str, log: Log) -> Path:
     A.git(d, "branch", "--quiet", "--set-upstream-to=origin/main", "main")
     A.git(d, "remote", "set-url", "origin", f"https://github.com/{A.REPO_SLUG}.git")
     r = subprocess.run(["uv", "sync", "--frozen", "--quiet"], cwd=d, capture_output=True,
-                       text=True, env={"PATH": A.TOOLCHAIN_PATH, "HOME": str(A.HOME), **A.net_env()})
+                       text=True, env={"PATH": A.TOOLCHAIN_PATH, "HOME": str(A.HOME),
+                                       "UV_PYTHON_INSTALL_DIR": str(A.PY_DIR),
+                                       "UV_LINK_MODE": "copy", **A.net_env()})
     if r.returncode:
         raise RuntimeError(f"uv sync: {r.stderr.strip()[-400:]}")
+    # the agent (ancuagent, group ancu-jobs) edits the clone; -R does not follow symlinks
+    subprocess.run(["chmod", "-R", "g+rwX", str(d)], check=True)
     log(f"folder {d} at {base[:10]}, .venv built")
     return d
 
@@ -123,7 +128,7 @@ def run(job: str) -> int:
         folder = make_folder(job, stamp, base, log)
         if job == "kb-verify":
             write_known(folder, log)
-        settings_file = A.STATE / f"settings-{job}-{stamp}.json"
+        settings_file = A.SETTINGS_DIR / f"{job}-{stamp}.json"
         A.write_json(settings_file, A.settings(folder))
         transcript = A.LOGS / f"{job}-{stamp}.jsonl"
         log(f"{job}: agent {model}, max {turns} turns, prompt from {doc}")

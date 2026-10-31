@@ -14,8 +14,13 @@ Mechanism: settings() builds the job's Claude Code settings — permission rules
   `Read(./**)` refused it (absolute, ../, Grep, Glob); `WebFetch(domain:*.gov.au)` matched
   www.rba.gov.au while `domain:austlii.edu.au` did not match www.austlii.edu.au (so each
   host goes in both forms); with the sandbox required and unable to start, Bash refused
-  every command. Outside all of it, the jobs run as the macOS user ancuauto, which cannot
-  open /Users/son (drwx------).
+  every command. Outside all of it, two macOS users (Son 2026-10-31, after the checker found
+  the agent sharing a uid with the GitHub key): the runner is ancuauto, which alone holds
+  that key; the agent is ancuagent, started only through the root-owned wrapper
+  /usr/local/libexec/ancu-agent (ancu-agent.sh), which holds only its claude key and reaches
+  the job folders through the group ancu-jobs. Neither can open /Users/son (drwx------).
+  run_agent() refuses to start an agent as the runner's own user unless ANCU_AUTO_SEAT=1
+  (the canary in Son's seat, where no GitHub key exists).
 Capability: source_hosts(), settings(job_dir), prompt(job), allowed_path(p),
   changed_files(job_dir, base) and secret_hits(text) — the pure parts the runner, the
   publisher, the gate and selftest.sh share.
@@ -37,15 +42,20 @@ import kb_compiler  # noqa: E402  (stdlib only; its host lists are the KB's prim
 REPO_SLUG = "s27183/ancu"
 SON = "s27183"
 HOME = Path(os.environ.get("ANCU_AUTO_HOME", str(Path.home())))
-JOBS = HOME / "jobs"
 STATE = HOME / "state"
 CONF = HOME / ".config" / "ancu-auto"
 GH_TOKEN_FILE = CONF / "gh-token"
-CLAUDE_TOKEN_FILE = CONF / "claude-token"
 CLAUDE_DIR = HOME / ".claude-jobs"
-LOGS = Path(os.environ.get("ANCU_AUTO_LOGS", "/Users/Shared/ancu-auto/logs"))
+SHARED = Path(os.environ.get("ANCU_AUTO_SHARED", "/Users/Shared/ancu-auto"))
+LOGS = Path(os.environ.get("ANCU_AUTO_LOGS", str(SHARED / "logs")))
+JOBS = SHARED / "jobs"             # group ancu-jobs, 2770: the runner and the agent both
+SETTINGS_DIR = SHARED / "settings"  # group ancu-jobs, 2750: the agent reads, never writes
+PY_DIR = SHARED / "python"         # uv's managed Python, which every job's .venv links to
+AGENT_USER = "ancuagent"
+AGENT_HOME = Path("/Users") / AGENT_USER
+WRAPPER = Path("/usr/local/libexec/ancu-agent")
 OUTBOX = ".ancu-outbox"
-ALLOWED_ROOTS = ("docs/kb/", "docs/sources/")
+from ci_scope import ALLOWED_ROOTS, allowed_path  # noqa: E402,F401  (one path rule for all)
 
 # job -> (its prompt's doc, the branch prefix its PR takes, the model, max turns)
 JOBS_TABLE = {
@@ -71,8 +81,8 @@ def url_allowed(url: str) -> bool:
     return bool(host) and kb_compiler.host_in(host, source_hosts())
 
 
-def settings(job_dir: Path, home: Path = HOME) -> dict:
-    """The Claude Code settings one job's agent runs under."""
+def settings(job_dir: Path, home: Path = AGENT_HOME) -> dict:
+    """The Claude Code settings one job's agent runs under (`home`: the agent user's)."""
     hosts = source_hosts()
     both = [d for h in hosts for d in (h, "*." + h)]
     return {
@@ -88,8 +98,8 @@ def settings(job_dir: Path, home: Path = HOME) -> dict:
             "autoAllowBashIfSandboxed": True,
             "filesystem": {
                 "denyRead": ["/Users"],
-                "allowRead": [str(job_dir), str(home / ".local"), str(home / ".cache" / "uv"),
-                              str(CLAUDE_DIR if home == HOME else home / ".claude-jobs")],
+                "allowRead": [str(job_dir), str(home / ".local"), str(PY_DIR),
+                              str(home / ".claude-jobs")],
                 "allowWrite": [str(job_dir)],
             },
             "network": {"allowedDomains": both},
@@ -105,17 +115,6 @@ def prompt(job: str, root: Path = RUNNER) -> str:
     if len(parts) != 3:
         raise SystemExit(f"{JOBS_TABLE[job][0]}: expected one ---8<--- block")
     return parts[1].rstrip("\n")
-
-
-def allowed_path(p: str) -> bool:
-    """A path the publisher may commit: relative, normalised, under docs/kb or docs/sources,
-    no dot segment, no control or backslash character."""
-    if not p or p.startswith("/") or "\\" in p or any(ord(c) < 32 or ord(c) == 127 for c in p):
-        return False
-    segs = p.split("/")
-    if any(s in ("", ".", "..") or s.startswith(".") for s in segs):
-        return False
-    return p.startswith(ALLOWED_ROOTS)
 
 
 def git(repo: Path, *args: str, input: bytes | None = None, check: bool = True,
@@ -213,7 +212,7 @@ SECRET_SHAPES = re.compile(r"(sk-ant-[A-Za-z0-9_-]{16,}|gh[opusr]_[A-Za-z0-9]{20
 
 def secrets() -> list[str]:
     out = []
-    for f in (GH_TOKEN_FILE, CLAUDE_TOKEN_FILE):
+    for f in (GH_TOKEN_FILE,):
         if f.is_file():
             v = f.read_text().strip()
             if len(v) >= 12:
@@ -253,18 +252,15 @@ TOOLCHAIN_PATH = ":".join([str(HOME / ".local" / "bin"), str(HOME / ".cache" / "
 
 
 def agent_env() -> dict:
-    """The agent's environment: no GitHub token, no git config; the claude key from the job
-    user's token file, or (in Son's seat, for the canary) the served-key variables."""
+    """The agent's environment in Son's seat (the canary with --seat): no GitHub token, no git
+    config, the served-key variables. Under launchd the wrapper builds its own (ancu-agent.sh)."""
     env = {"PATH": TOOLCHAIN_PATH, "HOME": str(HOME), "SHELL": "/bin/bash", "LANG": "en_US.UTF-8",
            "CLAUDE_CONFIG_DIR": str(CLAUDE_DIR), "GIT_CONFIG_NOSYSTEM": "1",
            "GIT_CONFIG_GLOBAL": "/dev/null", "GIT_TERMINAL_PROMPT": "0",
            "TMPDIR": os.environ.get("TMPDIR", "/tmp")}
-    if CLAUDE_TOKEN_FILE.is_file():
-        env["CLAUDE_CODE_OAUTH_TOKEN"] = CLAUDE_TOKEN_FILE.read_text().strip()
-    else:
-        for k in ("ANTHROPIC_UNIX_SOCKET", "ANTHROPIC_BASE_URL", "CLAUDE_CODE_OAUTH_TOKEN"):
-            if k in os.environ:
-                env[k] = os.environ[k]
+    for k in ("ANTHROPIC_UNIX_SOCKET", "ANTHROPIC_BASE_URL", "CLAUDE_CODE_OAUTH_TOKEN"):
+        if k in os.environ:
+            env[k] = os.environ[k]
     return env
 
 
@@ -286,16 +282,31 @@ def run_agent(job_dir: Path, text: str, model: str, max_turns: int, settings_fil
               transcript: Path, timeout: int = 3 * 3600) -> int:
     """`claude -p` in job_dir under settings_file, no settings from anywhere else, no MCP, no
     session kept; its stream-json transcript goes to `transcript`. Returns the exit code."""
-    cmd = [claude_bin(), "-p", text, "--output-format", "stream-json", "--verbose",
+    args = ["-p", text, "--output-format", "stream-json", "--verbose",
            "--model", model, "--max-turns", str(max_turns), "--tools", AGENT_TOOLS,
            "--settings", str(settings_file), "--setting-sources", "", "--strict-mcp-config",
            "--no-session-persistence"]
+    if WRAPPER.exists():
+        # as ancuagent; sudo clears the environment, the wrapper sets its own (ancu-agent.sh)
+        cmd, env = ["sudo", "-n", "-u", AGENT_USER, str(WRAPPER), str(job_dir), *args], \
+            {"PATH": "/usr/bin:/bin:/usr/sbin:/sbin"}
+    elif os.environ.get("ANCU_AUTO_SEAT") == "1":
+        cmd, env = [claude_bin(), *args], agent_env()
+    else:
+        raise RuntimeError(f"{WRAPPER} is missing: refusing to run the agent as the runner's "
+                           "own user, which holds the GitHub key (run install.sh)")
     transcript.parent.mkdir(parents=True, exist_ok=True)
     with open(transcript, "wb") as out:
+        p = subprocess.Popen(cmd, cwd=job_dir, env=env, stdin=subprocess.DEVNULL, stdout=out,
+                             stderr=subprocess.STDOUT)
         try:
-            return subprocess.run(cmd, cwd=job_dir, env=agent_env(), stdin=subprocess.DEVNULL,
-                                  stdout=out, stderr=subprocess.STDOUT, timeout=timeout).returncode
+            return p.wait(timeout=timeout)
         except subprocess.TimeoutExpired:
+            p.terminate()  # sudo relays SIGTERM to the agent; SIGKILL would orphan it
+            try:
+                p.wait(timeout=60)
+            except subprocess.TimeoutExpired:
+                p.kill()
             return 124
 
 
@@ -310,7 +321,8 @@ def stream_events(transcript: Path) -> list[dict]:
 
 
 def tool_calls(events: list[dict]) -> list[dict]:
-    """Each tool call in order: {id, name, input, result, error} (result text joined)."""
+    """Each tool call in order: {id, name, input, result, error} (result text joined; a call
+    with no tool_result — cancelled beside a sibling that failed — has error "no result")."""
     calls, by_id = [], {}
     for e in events:
         m = e.get("message")
@@ -320,7 +332,7 @@ def tool_calls(events: list[dict]) -> list[dict]:
         for c in content:
             if c.get("type") == "tool_use":
                 call = {"id": c.get("id"), "name": c.get("name"), "input": c.get("input") or {},
-                        "result": "", "error": None}
+                        "result": "", "error": "no result"}  # never answered: not run
                 calls.append(call)
                 by_id[call["id"]] = call
             elif c.get("type") == "tool_result" and c.get("tool_use_id") in by_id:

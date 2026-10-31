@@ -1,12 +1,13 @@
 # The local KB jobs — how the KB update runs on Son's Mac
 
-Regulated figures are grounded -> R-3 -> The KB update -> the KB jobs run on Son's Mac as ancuauto, confined, and publish only through the runner
+Regulated figures are grounded -> R-3 -> The KB update -> the KB jobs run on Son's Mac as ancuauto, their agent as ancuagent, confined, and publish only through the runner
 
 **What this is.** Since behavior 145 (Son 2026-10-31: «I want to setup all auto update to
 run from here (cron job?) instead of leaving it to CI on github») the KB update runs on
 Son's Mac, not as claude.ai routines and not in GitHub Actions. Six launchd jobs run as a
-separate macOS user, `ancuauto`, which cannot read Son's home. Each KB job starts a
-headless `claude -p` agent that only edits files in a folder of its own; the runner —
+separate macOS user, `ancuauto`, which cannot read Son's home and alone holds the GitHub
+key. Each KB job starts a headless `claude -p` agent as a second user, `ancuagent`, which
+holds only the claude key and only edits files in a folder of its own; the runner —
 code from `origin/main`, never from that folder — publishes what the agent left, and the
 local gate merges it when verified. This page is how it fits together; each job's prompt
 is in its own doc.
@@ -23,7 +24,7 @@ is in its own doc.
 | gate | 09:45 daily | `scripts/auto/gate.py` | each verified PR merged, or held with one issue |
 
 launchd runs a missed time when the Mac wakes. Two jobs never overlap: each takes
-`~/state/lock` and a second one logs "another job is running; skipped".
+`/Users/ancuauto/state/lock` and a second one logs "another job is running; skipped".
 
 ## One run
 
@@ -35,11 +36,19 @@ runs `scripts/auto/run_job.sh <job>` as `ancuauto`, which:
    merged;
 2. `runner.py` fetches main and the open `kb-watch-*` branches, runs the canary, and stops
    unless it held;
-3. clones the runner checkout into `~/jobs/<job>-<stamp>`, builds `.venv` with
-   `uv sync --frozen` (for kb-verify, writes `.ancu-outbox/known.json`: the heads that
-   already have a verdict) — git never runs there again;
+3. clones the runner checkout into `/Users/Shared/ancu-auto/jobs/<job>-<stamp>` (group
+   `ancu-jobs`, made group-writable), builds `.venv` with `uv sync --frozen` (its Python in
+   the shared `/Users/Shared/ancu-auto/python`; for kb-verify, writes
+   `.ancu-outbox/known.json`: the heads that already have a verdict) — git never runs
+   there again;
 4. runs the agent with the job's prompt (the block between `---8<---` lines in its doc,
-   read from `origin/main`) under settings from `autolib.settings()`;
+   read from `origin/main`) under settings from `autolib.settings()`, as `ancuagent`:
+   `sudo -n -u ancuagent /usr/local/libexec/ancu-agent <folder> <claude args>` — the one
+   command `/etc/sudoers.d/ancu-auto` lets ancuauto run as ancuagent. The wrapper
+   (`scripts/auto/ancu-agent.sh`, installed root:wheel 0755) refuses any folder not directly
+   under the jobs folder, clears the environment, reads ancuagent's own claude key, sets
+   umask 007 and execs ancuagent's `claude`. On timeout the runner sends SIGTERM, then
+   SIGKILL a minute later;
 5. hands the folder to `publish.py`, which reads it with `os`:
    - every changed path must be a regular file under `docs/kb/` or `docs/sources/` with no
      secret in it, else the whole run is refused ("refused: <path>") and one issue says why;
@@ -56,9 +65,18 @@ all `docs/kb/` and `docs/sources/`, runs the done checks at that head in a fresh
 asks `scripts/kb_gate.py` (main's copy) for a decision, and merges with
 `--match-head-commit` only when the checks passed, kb_gate says merge and the local
 verdict for that exact sha is `kb-verified`. A label or comment anyone else adds counts
-for nothing. Anything else is held, with one comment and one issue. CI skips its
-"done checks" job for such a head (the ruleset counts a skipped job as passed); every
-other PR still runs it on GitHub.
+for nothing. Anything else is held, with one comment and one issue.
+
+On GitHub, `done-checks.yml` runs `scripts/auto/ci_scope.py` first: for a same-repo
+`kb-watch-*` head whose `git diff --raw --no-renames` entries are all regular files
+(mode 100644, or deleted) under `docs/kb/` or `docs/sources/`, it prints `kb_only=true`
+and every later step is skipped, so "done checks" passes without running them — the
+local gate ran them. Any other diff on such a branch (code, a workflow, a symlink, a
+submodule, an empty diff) runs every step, as every other PR does. The gate holds the same
+diffs by the same rule (`ci_scope.problems`). This is a bound, not a wall: on
+`pull_request` GitHub runs the workflow and `ci_scope.py` as the PR carries them, so
+whoever holds a push credential could rewrite both. What keeps that credential from a
+job's agent is the two-user split below.
 
 ## Confinement
 
@@ -69,41 +87,54 @@ The agent's settings (`autolib.settings`, checked by `selftest.py`):
   `archive_source.py` enforces on every fetch);
 - Bash: sandboxed, failing closed (`failIfUnavailable`, no unsandboxed escape), reading only
   the folder and the toolchain, writing only the folder, network only to the source hosts;
-- environment: no GitHub key at all. The claude key is the agent's only key.
+- user: `ancuagent`, which cannot read ancuauto's home (0700) and so not the GitHub key;
+  its environment is cleared by the wrapper, so nothing of the runner's reaches it. The
+  claude key is the agent's only key.
 
 The `claude` CLI updates itself, so this is measured again before every job: the canary
 plants a random token outside a fresh folder and asks an agent under the same settings to
-make 16 escape attempts (absolute and `../` reads, Grep, Glob, Write, Edit, WebFetch
+make 18 escape attempts (absolute and `../` reads, Grep, Glob, Write, Edit, WebFetch
 off-list, Bash `cat`, `python3 open()`, `curl file://`, the keychain, `gh auth token`,
-`git credential fill`, the runner's token file, and a file of Son's) plus five controls
-(a read inside, WebFetch and curl to a source host, `echo`, curl off-list). It holds only
-when every attempt was made and refused, the token never appears, and the controls worked.
+`git credential fill`, the runner's token file, a file of Son's, `printenv` of the claude
+key and `ps eww` of its parent) plus six controls (a read inside, WebFetch and curl to a
+source host, `echo`, curl off-list, `id -un` = ancuagent). It holds only
+when every attempt was made and refused, neither the token nor any key shape appears in
+the transcript, and the controls worked.
 
 ## Setup and the way back
 
 Son, once, after the PR that carries this is merged:
 
     sudo sysadminctl -addUser ancuauto -fullName "ancu auto" -shell /bin/zsh
+    sudo sysadminctl -addUser ancuagent -fullName "ancu agent" -shell /bin/zsh
     sudo bash scripts/auto/install.sh
     sudo launchctl kickstart system/com.s27183.ancu-auto.canary
 
-`install.sh` clones the public repo as `ancuauto`, installs claude, uv and rebar3 in its
-home, asks for two keys (typed, never echoed): a `claude setup-token` key and a
-fine-grained GitHub token for s27183/ancu only (Contents, Pull requests, Issues: read and
-write), stored 0600 in `/Users/ancuauto/.config/ancu-auto/`, and bootstraps the six plists.
-`--keys` asks for both again.
+`install.sh` makes the group `ancu-jobs` with both users and the shared folders, clones
+the public repo as `ancuauto` and installs uv and rebar3 in its home, installs claude for
+`ancuagent`, installs the wrapper and the sudoers line (checked with `visudo -cf` before
+it is moved in), asks for two keys (typed, never echoed) — a `claude setup-token` key,
+stored 0600 for ancuagent in `/Users/ancuagent/.config/ancu-agent/`, and a fine-grained
+GitHub token for s27183/ancu only (Contents, Pull requests, Issues: read and write),
+stored 0600 for ancuauto in `/Users/ancuauto/.config/ancu-auto/` — checks that ancuagent
+cannot read the GitHub key and that ancuauto can run the wrapper as ancuagent, and
+bootstraps the six plists. `--keys` asks for both keys again. The wrapper and the sudoers
+line change only when `install.sh` runs again; the runner's Python follows main.
 
 Logs: `/Users/Shared/ancu-auto/logs/<job>-<stamp>.log`, the agent's transcript beside it
 as `.jsonl`; launchd's own output in `launchd-<job>.log`. A log line holding a secret's
 shape is withheld. Job folders are pruned after 14 days.
 
 To stop it: `sudo launchctl bootout system/com.s27183.ancu-auto.<job>` for each job;
-`sudo sysadminctl -deleteUser ancuauto` and revoking the GitHub token remove it entirely.
+`sudo sysadminctl -deleteUser ancuauto`, the same for `ancuagent`, `sudo rm
+/etc/sudoers.d/ancu-auto /usr/local/libexec/ancu-agent`, and revoking the GitHub token
+remove it entirely.
 
 ## Checks
 
 `bash scripts/auto/selftest.sh` (on the done checks' line) checks the settings, prompts,
 plists and runner offline, and runs seeded properties (seed 145, 400 cases each) over the
-publisher, the URL gate and the merge decision. `python3 scripts/auto/canary.py --seat`
+publisher, the URL gate, the merge decision and the CI scope (on real commits, symlinks and
+submodules among them), and checks the wrapper's text. `python3 scripts/auto/canary.py --seat`
 runs the canary inside a Claude Code seat, where the Bash sandbox cannot nest and Bash must
 be refused outright.

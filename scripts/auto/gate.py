@@ -3,14 +3,14 @@ it replaces .github/workflows/kb-gate.yml).
 
 Regulated figures are grounded -> P-7 -> The KB update -> the local gate merges a kb-watch PR only on this Mac's own verdict and checks for its head
 Invariant: a PR merges here only if it is a same-repo kb-watch-* branch whose every changed
-  path is under docs/kb/ or docs/sources/, this Mac's kb-verify recorded kb-verified for its
+  path is a regular file under docs/kb/ or docs/sources/ (no symlink, no submodule), this Mac's kb-verify recorded kb-verified for its
   exact head sha, the done checks passed here on that sha, and scripts/kb_gate.py from
   origin/main says merge. Nothing from a PR runs before its paths are classified; a label,
   a comment or a fork's branch name counts for nothing.
 Mechanism: plan_pr() is the pure rule (selftest's Expect 4 property draws its inputs);
   run() lists open PRs with the runner's token, fetches each candidate head into the
   runner's checkout (at origin/main, so kb_gate.py and the checks are main's), classifies
-  its paths with `git diff --no-renames` before anything runs, runs the done checks in a
+  its paths and file modes with ci_scope (the rule CI's done-checks job uses) before anything runs, runs the done checks in a
   fresh clone at the head (the same setup CI had: uv sync, kb_compiler, npm ci), caches the
   result by sha, then asks kb_gate.py with --labels from ~/state/verdicts.json. A merge is
   `gh pr merge --merge --match-head-commit <sha>`; a hold comments on the PR and keeps one
@@ -30,13 +30,15 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import autolib as A  # noqa: E402
+import ci_scope  # noqa: E402
 
 PREFIX = "kb-watch-"
 
 
-def plan_pr(pr: dict, paths: list[str] | None, verdict: dict | None, run_checks, kb_decide) -> dict:
-    """What the gate does with one open PR. `paths` is the head's diff against main (None if
-    the head could not be read); `verdict` this Mac's kb-verify entry for the branch;
+def plan_pr(pr: dict, paths: list[tuple[str, str]] | None, verdict: dict | None, run_checks,
+            kb_decide) -> dict:
+    """What the gate does with one open PR. `paths` is the head's diff against main as
+    (path, new mode) entries (None if the head could not be read); `verdict` this Mac's kb-verify entry for the branch;
     run_checks(sha) -> bool and kb_decide(labels, checks_ok) -> 'merge'|'hold' are called
     only when the rule allows (the property counts their calls)."""
     sha, branch = pr["headRefOid"], pr["headRefName"]
@@ -45,10 +47,10 @@ def plan_pr(pr: dict, paths: list[str] | None, verdict: dict | None, run_checks,
         return {"action": "skip", "why": "not a same-repo kb-watch-* PR into main"}
     if paths is None:
         return {"action": "skip", "why": "its head could not be read"}
-    outside = [p for p in paths if not A.allowed_path(p)]
-    if outside or not paths:
-        return {"action": "hold", "why": "changes outside docs/kb and docs/sources: "
-                + ", ".join(outside[:10]) if outside else "an empty diff", "checks": None}
+    problems = ci_scope.problems(paths)  # the rule CI's done-checks job uses too
+    if problems:
+        return {"action": "hold", "why": "not KB-only: " + "; ".join(problems[:10]),
+                "checks": None}
     ok = bool(run_checks(sha))
     labels = set()
     if verdict and verdict.get("sha") == sha and verdict.get("verdict") in ("kb-verified", "kb-hold"):
@@ -61,13 +63,12 @@ def plan_pr(pr: dict, paths: list[str] | None, verdict: dict | None, run_checks,
                  f"local verdict {sorted(labels) or 'none for this sha'}"}
 
 
-def diff_paths(sha: str) -> list[str] | None:
+def diff_paths(sha: str) -> list[tuple[str, str]] | None:
     try:
         A.git(A.RUNNER, "cat-file", "-e", f"{sha}^{{commit}}")
-        out = A.git(A.RUNNER, "diff", "--no-renames", "-z", "--name-only", f"origin/main...{sha}")
     except RuntimeError:
         return None
-    return [p for p in out.split("\0") if p]
+    return ci_scope.diff_entries(A.RUNNER, "origin/main", sha, env=A.git_env())
 
 
 def done_checks(sha: str, log) -> bool:
@@ -189,9 +190,14 @@ def self_test(check, seed: int, n: int) -> None:
                              "main", "kb-watchx", "fix/kb-watch-1"])
         base_ref = rng.choice(["main"] * 5 + ["release"])
         paths = rng.choice([
-            ["docs/kb/news/a.md"], ["docs/sources/x/y.txt", "docs/kb/f.md"],
-            ["scripts/kb_gate.py"], ["docs/kb/a.md", ".github/workflows/x.yml"],
-            ["tests/t.py"], ["docs/kb/../../scripts/x.py"], [], None, ["docs/kb/.hidden"]])
+            [("docs/kb/news/a.md", "100644")],
+            [("docs/sources/x/y.txt", "100644"), ("docs/kb/f.md", "000000")],
+            [("scripts/kb_gate.py", "100644")],
+            [("docs/kb/a.md", "100644"), (".github/workflows/x.yml", "100644")],
+            [("tests/t.py", "100644")], [("docs/kb/../../scripts/x.py", "100644")], [], None,
+            [("docs/kb/.hidden", "100644")], [("docs/kb/l.md", "120000")],
+            [("docs/kb/sub", "160000")], [("docs/kb/run.sh", "100755")],
+            [("docs/kb/a.md", "000000"), ("scripts/a.md", "100644")]])
         verdict = rng.choice([None, {"sha": sha, "verdict": "kb-verified"},
                               {"sha": "%040x" % rng.getrandbits(160), "verdict": "kb-verified"},
                               {"sha": sha, "verdict": "kb-hold"}])
@@ -212,7 +218,8 @@ def self_test(check, seed: int, n: int) -> None:
               "isCrossRepository": fork, "labels": labels_on_github}
         p = plan_pr(pr, paths, verdict, rc, kd)
         eligible = (not fork and base_ref == "main" and branch.startswith("kb-watch-")
-                    and paths is not None and bool(paths) and all(A.allowed_path(x) for x in paths))
+                    and paths is not None and bool(paths)
+                    and all(A.allowed_path(x) and m in ("100644", "000000") for x, m in paths))
         may_merge = (eligible and verdict is not None and verdict["sha"] == sha
                      and verdict["verdict"] == "kb-verified" and checks_pass and kb_says == "merge")
         if (calls["checks"] > 0) != eligible or (p["action"] == "merge") != may_merge:
