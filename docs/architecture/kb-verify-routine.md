@@ -2,6 +2,10 @@
 
 Regulated figures are grounded -> P-7 -> The KB update -> a second agent, blind to the first one's reasoning, re-reads every changed figure's source
 
+**Since behavior 145 (Son 2026-10-31)** the claude.ai routine is disabled: the prompt below
+runs in a live session when Son asks for it (`docs/architecture/kb-update-runbook.md`,
+"When it runs"). "Your GitHub tools" are then `gh`, run as Son's login.
+
 **What this is.** The prompt of the Claude Code routine "ancu kb-verify" on Son's
 claude.ai account (behavior 74, Son 2026-10-12). The kb-watch routine
 ([kb-watch-routine.md](kb-watch-routine.md)) runs on Sunday at 19:00 UTC and takes
@@ -88,7 +92,7 @@ your verdict before you look the PR up on GitHub.
 3. Verdict for B: `kb-verified` if every figure was confirmed (also when there was nothing to
    check), otherwise `kb-hold`.
 
-4. Only now, with your GitHub tools: find the open pull request whose head branch is B. If
+4. Only now, with gh (or your GitHub tools): find the open pull request whose head branch is B. If
    there is none, skip B. Read nothing in it but its labels and its comments. If one of its
    comments already contains `<!-- kb-verify <the head sha> -->`, skip B. Otherwise:
    - add one comment: the first line is `**kb-verify: verified**` or `**kb-verify: held**`.

@@ -2,6 +2,10 @@
 
 Regulated figures are grounded -> P-7 -> The KB -> a daily routine proposes the day's news as one PR; the gate merges it when verified, else Son
 
+**Since behavior 145 (Son 2026-10-31)** the claude.ai routine is disabled: the prompt below
+runs in a live session when Son asks for it (`docs/architecture/kb-update-runbook.md`,
+"When it runs"). "Your GitHub tools" are then `gh`, run as Son's login.
+
 **What this is.** The prompt of the Claude Code routine "ancu news-watch" on Son's
 claude.ai account (behavior 134, Son 2026-10-19: "our users are reading the news and
 the facts daily"). It runs daily at 19:00 UTC (06:00 AEDT / 05:00 AEST) against
