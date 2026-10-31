@@ -268,6 +268,17 @@ def agent_env() -> dict:
     return env
 
 
+NET_VARS = ("HTTP_PROXY", "HTTPS_PROXY", "NO_PROXY", "http_proxy", "https_proxy", "no_proxy",
+            "SSL_CERT_FILE", "NODE_EXTRA_CA_CERTS", "REQUESTS_CA_BUNDLE", "CURL_CA_BUNDLE",
+            "GIT_SSL_CAINFO")
+
+
+def net_env() -> dict:
+    """The proxy and CA variables of the calling environment, if any (none under launchd;
+    Son's seat routes egress through a proxy with its own CA)."""
+    return {k: os.environ[k] for k in NET_VARS if k in os.environ}
+
+
 AGENT_TOOLS = "Read,Edit,Write,Grep,Glob,WebFetch,Bash"
 
 

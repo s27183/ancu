@@ -65,7 +65,7 @@ def make_folder(job: str, stamp: str, base: str, log: Log) -> Path:
     A.git(d, "branch", "--quiet", "--set-upstream-to=origin/main", "main")
     A.git(d, "remote", "set-url", "origin", f"https://github.com/{A.REPO_SLUG}.git")
     r = subprocess.run(["uv", "sync", "--frozen", "--quiet"], cwd=d, capture_output=True,
-                       text=True, env={"PATH": A.TOOLCHAIN_PATH, "HOME": str(A.HOME)})
+                       text=True, env={"PATH": A.TOOLCHAIN_PATH, "HOME": str(A.HOME), **A.net_env()})
     if r.returncode:
         raise RuntimeError(f"uv sync: {r.stderr.strip()[-400:]}")
     log(f"folder {d} at {base[:10]}, .venv built")
