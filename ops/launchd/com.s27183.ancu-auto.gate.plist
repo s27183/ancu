@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>HOME</key>
+		<string>/Users/ancuauto</string>
+		<key>LANG</key>
+		<string>en_AU.UTF-8</string>
+	</dict>
+	<key>GroupName</key>
+	<string>staff</string>
+	<key>Label</key>
+	<string>com.s27183.ancu-auto.gate</string>
+	<key>ProcessType</key>
+	<string>Background</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/bin/bash</string>
+		<string>/Users/ancuauto/ancu/scripts/auto/run_job.sh</string>
+		<string>gate</string>
+	</array>
+	<key>RunAtLoad</key>
+	<false/>
+	<key>StandardErrorPath</key>
+	<string>/Users/Shared/ancu-auto/logs/launchd-gate.log</string>
+	<key>StandardOutPath</key>
+	<string>/Users/Shared/ancu-auto/logs/launchd-gate.log</string>
+	<key>StartCalendarInterval</key>
+	<dict>
+		<key>Hour</key>
+		<integer>9</integer>
+		<key>Minute</key>
+		<integer>45</integer>
+	</dict>
+	<key>Umask</key>
+	<integer>18</integer>
+	<key>UserName</key>
+	<string>ancuauto</string>
+	<key>WorkingDirectory</key>
+	<string>/Users/ancuauto</string>
+</dict>
+</plist>
