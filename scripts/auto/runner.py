@@ -44,32 +44,6 @@ class Log:
         print(line, flush=True)
 
 
-def gh(*args: str, input: str | None = None, check: bool = True) -> str:
-    """gh as the runner, with the single-repo token from its file; never in the agent's env."""
-    env = {"PATH": A.TOOLCHAIN_PATH, "HOME": str(A.HOME), "GH_CONFIG_DIR": str(A.STATE / "gh"),
-           "GH_PROMPT_DISABLED": "1", "GH_NO_UPDATE_NOTIFIER": "1", "NO_COLOR": "1"}
-    if A.GH_TOKEN_FILE.is_file():
-        env["GH_TOKEN"] = A.GH_TOKEN_FILE.read_text().strip()
-    r = subprocess.run(["gh", *args], env=env, input=input, capture_output=True, text=True)
-    if check and r.returncode:
-        raise RuntimeError(f"gh {args[0]} {args[1] if len(args) > 1 else ''}: {r.stderr.strip()}")
-    return r.stdout
-
-
-def file_issue(title: str, body: str, log: Log) -> None:
-    """One open issue per title, assigned to Son: edit it if open, else create it."""
-    found = gh("issue", "list", "-R", A.REPO_SLUG, "--state", "open", "--search",
-               f'"{title}" in:title', "--json", "number,title", "-q",
-               f'.[] | select(.title == "{title}") | .number').split()
-    if found:
-        gh("issue", "comment", found[0], "-R", A.REPO_SLUG, "--body-file", "-", input=body)
-        log(f"issue #{found[0]} updated: {title}")
-    else:
-        out = gh("issue", "create", "-R", A.REPO_SLUG, "--title", title, "--assignee", A.SON,
-                 "--body-file", "-", input=body)
-        log(f"issue filed: {out.strip()}")
-
-
 def fetch_runner(log: Log) -> str:
     """Bring origin/main and every kb-watch-* branch into the runner checkout; main's sha."""
     A.git(A.RUNNER, "fetch", "--prune", "origin", "+refs/heads/main:refs/remotes/origin/main",
@@ -127,7 +101,7 @@ def run(job: str) -> int:
         last = r.stdout.rstrip().splitlines()[-1:] or [""]
         if r.returncode or not last[0].startswith("canary: held"):
             log(f"{job}: stopped — the canary did not hold; the agent did not run")
-            file_issue(f"ancu-auto: canary failed {time.strftime('%Y-%m-%d')}",
+            A.file_issue(f"ancu-auto: canary failed {time.strftime('%Y-%m-%d')}",
                        f"The confinement canary did not hold before `{job}` (log "
                        f"{A.LOGS}/{job}-{stamp}.log on Son's Mac). No job runs its agent until "
                        "it holds again.\n\n```\n" + r.stdout[-3000:] + "\n```\n", log)

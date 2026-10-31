@@ -118,10 +118,12 @@ def allowed_path(p: str) -> bool:
     return p.startswith(ALLOWED_ROOTS)
 
 
-def git(repo: Path, *args: str, input: bytes | None = None, check: bool = True) -> str:
+def git(repo: Path, *args: str, input: bytes | None = None, check: bool = True,
+        env: dict | None = None) -> str:
     """git in a repo the runner owns (never the agent's folder), hooks and fsmonitor off."""
     r = subprocess.run(["git", "-c", "core.hooksPath=/dev/null", "-c", "core.fsmonitor=false",
-                        *args], cwd=repo, input=input, capture_output=True, env=git_env())
+                        *args], cwd=repo, input=input, capture_output=True,
+                       env={**git_env(), **(env or {})})
     if check and r.returncode:
         raise RuntimeError(f"git {' '.join(args)}: {r.stderr.decode(errors='replace').strip()}")
     return r.stdout.decode(errors="replace")
@@ -317,3 +319,33 @@ def tool_calls(events: list[dict]) -> list[dict]:
                 by_id[c["tool_use_id"]]["result"] = str(r or "")
                 by_id[c["tool_use_id"]]["error"] = bool(c.get("is_error"))
     return calls
+
+
+# --- GitHub, as the runner ------------------------------------------------------------
+
+def gh(*args: str, input: str | None = None, check: bool = True) -> str:
+    """gh as the runner, with the single-repo token from its file; never in the agent's env."""
+    env = {"PATH": TOOLCHAIN_PATH, "HOME": str(HOME), "GH_CONFIG_DIR": str(STATE / "gh"),
+           "GH_PROMPT_DISABLED": "1", "GH_NO_UPDATE_NOTIFIER": "1", "NO_COLOR": "1"}
+    if GH_TOKEN_FILE.is_file():
+        env["GH_TOKEN"] = GH_TOKEN_FILE.read_text().strip()
+    r = subprocess.run(["gh", *args], env=env, input=input, capture_output=True, text=True)
+    if check and r.returncode:
+        raise RuntimeError(f"gh {args[0]} {args[1] if len(args) > 1 else ''}: {r.stderr.strip()}")
+    return r.stdout
+
+
+def file_issue(title: str, body: str, log) -> None:
+    """One open issue per title, assigned to Son: edit it if open, else create it."""
+    # the title may come from an agent's outbox: it is matched here in Python, never put
+    # into a jq filter or a search query (jq can read $ENV, where GH_TOKEN is)
+    listed = json.loads(gh("issue", "list", "-R", REPO_SLUG, "--state", "open", "--limit",
+                           "200", "--json", "number,title") or "[]")
+    found = [str(i["number"]) for i in listed if i.get("title") == title]
+    if found:
+        gh("issue", "comment", found[0], "-R", REPO_SLUG, "--body-file", "-", input=body)
+        log(f"issue #{found[0]} updated: {title}")
+    else:
+        out = gh("issue", "create", "-R", REPO_SLUG, "--title", title, "--assignee", SON,
+                 "--body-file", "-", input=body)
+        log(f"issue filed: {out.strip()}")
