@@ -41,17 +41,19 @@ kb-watch, kb-verify, suburb-watch), and the seat:
   its head, and the kb gate then merges or holds it as before.
 
 **It also runs by itself while the seat is open (behavior 145, Son 2026-11-01).** The seat
-keeps one session-only CronCreate job, "ancu KB update", daily at 06:13 Melbourne (the
-scheduler may start it up to 30 minutes late, and only while the session is idle). Its
-prompt runs news-watch, then kb-verify, then kb-watch when no `kb-watch-<date>` PR was
-opened in the last 7 days, then suburb-watch when this month has no `suburb-watch <yyyy-mm>`
+keeps one session-only CronCreate job, "ancu KB update", daily at 12:00 Melbourne (the
+scheduler may start it up to 30 minutes late, and only while the session is idle; Son
+2026-11-01: «kb related watch is weekly and news-watch is daily»). Its prompt runs
+news-watch every day, then kb-watch when no `kb-watch-<date>` PR was opened in the last 7
+days (so weekly, and a missed week runs at the next live noon), then kb-verify on any PR
+they opened, then suburb-watch when this month has no `suburb-watch <yyyy-mm>`
 issue. It first re-creates itself and deletes the job that fired, so it never reaches
 Claude Code's 7-day expiry of a recurring job. It is session-only (`durable: false`) on
 purpose: a durable job is written to `.claude/scheduled_tasks.json`, and Claude Code 2.1.316
 fires a durable job whose creating process has died in whichever session next holds the
 project's scheduler lock — another seat, under its own sandbox and branch (read from the
 2.1.316 scheduler, 2026-11-01). So the job dies with the seat, and the seat arms it again
-at each launch or relaunch when CronList shows none. A day the seat is closed is skipped,
+at each launch or relaunch when CronList shows none (a `--resume` relaunch kept it, measured 2026-11-01). A day the seat is closed is skipped,
 not replayed; the next run catches up through each routine's own window.
 
 The cadences below are what each routine was scheduled at in the cloud.
