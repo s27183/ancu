@@ -134,7 +134,7 @@ test('index pages, robots, sitemap and llms.txt', () => {
 // tag outside the allowlist or raw `](../`; its JSON-LD parses. Expect 3: every href in a
 // guide's article is https, and one on maiancu.com names a guide that is built.
 import { readFileSync, existsSync } from 'node:fs';
-import { allGuides, guidePage, guideTitles, guidePath, isPublished, staticPage, type KbDoc } from '../scripts/seo.ts';
+import { allGuides, guidePage, guideTitles, guidePath, guideIndexPage, isPublished, llmsFull, staticPage, type KbDoc } from '../scripts/seo.ts';
 
 const ARTIFACT_JSON = new URL('../../../../engine/erlang/priv/kb/artifact.json', import.meta.url);
 
@@ -216,6 +216,8 @@ test('property: every real KB doc gets a guide iff published, and each guide kee
         if (titles.has(slug)) checkGuide(slug, d, titles, slug);
     }
     assert.ok(guides.length > 100, `${guides.length} guides`);
+    const index = llms([], [], guides) + llmsFull([], [], guides) + staticPage(guideIndexPage(guides));
+    for (const bad of ['PLACEHOLDER', 'NOT SOURCE-GROUNDED', 'Mode-', '](../']) assert.ok(!index.includes(bad), `llms.txt, llms-full.txt and /guide hold no ${bad}`);
 });
 
 const HOSTILE = ['</script>', '<img src=x onerror=alert(1)>', '<!--', '"', '&', ' ', '[run](javascript:alert(1))', '[d](data:text/html,x)', '[h](http://example.com/x)', '[ok](https://www.ato.gov.au/x)', '[far](https://evil.example/x)', '[peer](../scheme/fhg.md)', '[hidden](../copy/x.md)', '[frag](#anchor)', '[abs](/plan)', 'a Mode-B buyer', 'Modes B and D', 'Mode A/C', '(agent reasons over these)', '`kb.scheme.fhg`', '| a | b |\n|---|---|\n| 1 | 2 |\n', '- item\n', '**bold** ', 'Phí ', '$46,800 ', '\n\n', ' ', 'x'];

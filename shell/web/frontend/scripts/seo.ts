@@ -189,6 +189,26 @@ function factValue(f: FactDoc['facts'][number]): string {
     return f.value === undefined ? '' : ` — ${escapeHtml(String(f.value))}${f.unit ? ' ' + escapeHtml(f.unit) : ''}`;
 }
 
+/** One facts section as a schema.org Dataset (behavior 146): its figures, their sources. */
+export function factDataset(d: FactDoc): Record<string, unknown> {
+    const urls = [...new Set(d.sources.map((s) => s.url ?? '').filter((u) => /^https:\/\//.test(u)))];
+    return {
+        '@context': 'https://schema.org',
+        '@type': 'Dataset',
+        name: d.title.en,
+        alternateName: d.title.vi,
+        description: `${d.title.en}, from Australian and Vietnamese government sources: ${d.facts.map((f) => f.headline.en).join('; ')}.`,
+        url: ORIGIN + '/facts',
+        inLanguage: ['vi', 'en'],
+        isAccessibleForFree: true,
+        ...(d.last_verified ? { dateModified: d.last_verified } : {}),
+        variableMeasured: d.facts.map((f) => f.headline.en),
+        citation: urls,
+        creator: publisher,
+        publisher
+    };
+}
+
 export function factsPage(docs: FactDoc[]): Page {
     const sections = docs.map((d) => {
         const items = d.facts
@@ -208,7 +228,7 @@ export function factsPage(docs: FactDoc[]): Page {
         title: `Nước Úc qua số liệu · Australia in figures | ${BRAND}`,
         description:
             'Người Việt ở Úc, nhà đất, cuộc sống, kinh tế và phí visa, từ nguồn chính phủ. Vietnamese in Australia, property, living, the economy and visa fees, from government sources.',
-        ld: [{ '@context': 'https://schema.org', '@type': 'CollectionPage', name: 'Nước Úc qua số liệu · Australia in figures', url: ORIGIN + '/facts', inLanguage: 'vi' }],
+        ld: [{ '@context': 'https://schema.org', '@type': 'CollectionPage', name: 'Nước Úc qua số liệu · Australia in figures', url: ORIGIN + '/facts', inLanguage: 'vi' }, ...docs.map(factDataset)],
         body: `${nav}<h1>Nước Úc qua số liệu · <span lang="en">Australia in figures</span></h1>${sections.join('')}`
     };
 }
@@ -242,29 +262,44 @@ export function robots(): string {
     ].join('\n');
 }
 
-export function sitemap(news: NewsNote[], facts: FactDoc[]): string {
+export function sitemap(news: NewsNote[], facts: FactDoc[], guides: [string, KbDoc][] = []): string {
     const newest = news[0]?.authored_date;
     const factsDate = facts.map((d) => d.last_verified).filter(Boolean).sort().at(-1);
     const urls: [string, string | undefined][] = [
         ['/', newest],
         ['/news', newest],
         ['/facts', factsDate],
-        ...news.map((n): [string, string | undefined] => [notePath(n), n.authored_date])
+        ...news.map((n): [string, string | undefined] => [notePath(n), n.authored_date]),
+        ...(guides.length ? [['/guide', guides.map(([, d]) => d.last_verified).filter(Boolean).sort().at(-1)] as [string, string | undefined]] : []),
+        ...guides.map(([k, d]): [string, string | undefined] => [guidePath(k), d.last_verified])
     ];
     const rows = urls.map(([p, d]) => `  <url><loc>${escapeHtml(ORIGIN + p)}</loc>${d ? `<lastmod>${escapeHtml(d)}</lastmod>` : ''}</url>`);
     return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${rows.join('\n')}\n</urlset>\n`;
 }
 
 /** llms.txt (llmstxt.org): a plain index an AI assistant reads to find the right page. */
-export function llms(news: NewsNote[], facts: FactDoc[]): string {
+export function llms(news: NewsNote[], facts: FactDoc[], guides: [string, KbDoc][] = []): string {
     const oneLine = (s: string) => s.replace(/\s+/g, ' ').trim();
+    const titles = guideTitles(guides);
     return [
         `# ${BRAND}`,
         '',
         `> ${TAGLINE_EN}. A bilingual (Vietnamese and English) guide for Vietnamese buyers of Australian property: what buying, owning and selling a home cost by state, and the visa, tax, finance and scheme rules behind those costs. Every figure and news note cites a government source.`,
         '',
-        'Pages are in Vietnamese with English alongside. The budget planner (/plan) is an interactive app and is not indexed.',
+        'News and facts pages are in Vietnamese with English alongside; guides are in English. The budget planner (/plan) is an interactive app and is not indexed.',
         '',
+        `The full text of every page below is in [llms-full.txt](${ORIGIN}/llms-full.txt).`,
+        '',
+        ...(guides.length
+            ? [
+                  '## Guides',
+                  '',
+                  'One page per topic: the rule, the figure, who it applies to, and the government source it comes from.',
+                  '',
+                  ...guides.map(([k, d]) => `- [${oneLine(titles.get(k) ?? k)}](${ORIGIN}${guidePath(k)}): ${oneLine(guideDescription(k, d, titles))}${d.last_verified ? ` (verified ${d.last_verified})` : ''}`),
+                  ''
+              ]
+            : []),
         '## News',
         '',
         ...news.map((n) => `- [${oneLine(n.headline_en || n.headline_vi || '')}](${ORIGIN}${notePath(n)}): ${oneLine(n.headline_vi || '')}${n.authored_date ? ` (${n.authored_date})` : ''}`),
@@ -426,7 +461,13 @@ function splitH1(md: string): [string, string] {
 
 /** Each published doc's slug and title, the map readerMarkdown links by. */
 export function guideTitles(guides: [string, KbDoc][]): Map<string, string> {
-    return new Map(guides.map(([k, d]) => [k, guideTitle(k, d.content_md).replace(/[[\]\n]/g, '')]));
+    return new Map(guides.map(([k, d]) => [k, guideTitle(k, modeWords(d.content_md)).replace(/[[\]\n]/g, '')]));
+}
+
+/** A guide's one-line summary: the start of its text, headings left out. */
+export function guideDescription(slug: string, d: KbDoc, published: Map<string, string>): string {
+    const [h1, body] = splitH1(readerMarkdown(slug, d.content_md, published));
+    return plain(body.split('\n').filter((l) => !GHEAD.test(l)).join('\n')) || plain(h1);
 }
 
 export function guidePage(slug: string, d: KbDoc, published: Map<string, string>): Page {
@@ -446,7 +487,7 @@ export function guidePage(slug: string, d: KbDoc, published: Map<string, string>
             : '',
         `</article>`
     ].join('\n');
-    const description = plain(body.split('\n').filter((l) => !GHEAD.test(l)).join('\n')) || title;
+    const description = guideDescription(slug, d, published) || title;
     return {
         path,
         title: `${title} | ${BRAND}`,
@@ -502,4 +543,57 @@ ${p.body}
 </body>
 </html>
 `;
+}
+
+/** /guide: the list of guides, as a static page like each guide. */
+export function guideIndexPage(guides: [string, KbDoc][]): Page {
+    const titles = guideTitles(guides);
+    const byTopic = new Map<string, [string, KbDoc][]>();
+    for (const g of guides) {
+        const t = g[0].split('.')[1] ?? '';
+        byTopic.set(t, [...(byTopic.get(t) ?? []), g]);
+    }
+    const topic = (t: string) => t.replace(/-/g, ' ').replace(/\b(au|vn|aml|ctf|firb|lmi|fx|hecs|pexa|s32|cgt)\b/g, (w) => w.toUpperCase()).replace(/^./, (c) => c.toUpperCase());
+    const body = [
+        `<h1>Guides</h1>`,
+        `<p>Buying, owning and selling a home in Australia, for Vietnamese buyers: each guide states the rule and the figures and links the government source it comes from.</p>`,
+        ...[...byTopic].map(([t, gs]) => `<h2>${escapeHtml(topic(t))}</h2><ul>${gs.map(([k, d]) => `<li><a href="${guidePath(k)}">${escapeHtml(titles.get(k) ?? k)}</a>${d.last_verified ? ` <span class="meta">(verified ${escapeHtml(d.last_verified)})</span>` : ''}</li>`).join('')}</ul>`)
+    ].join('\n');
+    return {
+        path: '/guide',
+        title: `Guides to buying property in Australia | ${BRAND}`,
+        description: 'Guides for Vietnamese buyers of Australian property: stamp duty, first-home schemes, FIRB, loans, tax and selling costs, each citing its government source.',
+        ld: [{ '@context': 'https://schema.org', '@type': 'CollectionPage', name: 'Guides', url: ORIGIN + '/guide', inLanguage: 'en', hasPart: guides.map(([k]) => ({ '@type': 'Article', name: titles.get(k), url: ORIGIN + guidePath(k) })) }],
+        body
+    };
+}
+
+/** llms-full.txt: the full text of every public page, as markdown, for an assistant to read at once. */
+export function llmsFull(news: NewsNote[], facts: FactDoc[], guides: [string, KbDoc][]): string {
+    const titles = guideTitles(guides);
+    const out: string[] = [`# ${BRAND} — full text`, '', `> ${TAGLINE_EN}. Every page of ${ORIGIN} as plain markdown: the guides (English), then the news and the facts (Vietnamese and English). Each part names its page and its sources.`, ''];
+    for (const [k, d] of guides) {
+        const [h1, body] = splitH1(readerMarkdown(k, d.content_md, titles));
+        const urls = [...new Set((d.sources ?? []).map((s) => s.url ?? '').filter((u) => /^https:\/\//.test(u)))];
+        out.push(`# ${h1 || titles.get(k)}`, '', `Page: ${ORIGIN}${guidePath(k)}${d.last_verified ? ` · last verified ${d.last_verified}` : ''}`, '', body.trim(), '', 'Sources:', ...urls.map((u) => `- ${u}`), '', '---', '');
+    }
+    for (const n of news) {
+        const urls = [...new Set((n.sources ?? []).map((s) => s.url ?? '').filter((u) => /^https:\/\//.test(u)))];
+        out.push(`# ${n.headline_en || n.headline_vi || noteSlug(n.news_slug)}`, '', `Page: ${ORIGIN}${notePath(n)}${n.authored_date ? ` · ${n.authored_date}` : ''}`, '');
+        if (n.headline_vi) out.push(`Tiêu đề: ${n.headline_vi}`, '');
+        if (n.summary_en) out.push(n.summary_en.trim(), '');
+        if (n.summary_vi) out.push(n.summary_vi.trim(), '');
+        out.push('Sources:', ...urls.map((u) => `- ${u}`), '', '---', '');
+    }
+    for (const d of facts) {
+        out.push(`# ${d.title.en} · ${d.title.vi}`, '', `Page: ${ORIGIN}/facts${d.last_verified ? ` · last verified ${d.last_verified}` : ''}`, '');
+        for (const f of d.facts) {
+            const idx = [...new Set(([] as number[]).concat(f.source, f.note_sources ?? []))];
+            const src = [...new Set(idx.map((i) => d.sources[i]?.url).filter((u): u is string => !!u && /^https:\/\//.test(u)))];
+            const v = f.value === undefined ? '' : ` — ${f.value}${f.unit ? ' ' + f.unit : ''}`;
+            out.push(`- ${f.headline.en}${v}. ${f.caption.en}${f.as_of ? ` (${f.as_of})` : ''}. ${f.headline.vi}. ${f.caption.vi}${src.length ? ` Sources: ${src.join(' ')}` : ''}`);
+        }
+        out.push('', '---', '');
+    }
+    return out.join('\n');
 }
