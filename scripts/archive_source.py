@@ -74,12 +74,13 @@ def schema_text(raw: str) -> str:
 
 
 # Regulated figures are grounded -> R-3 -> The KB update -> archive_source fetches only https on a KB source host
-# Behavior 145: a job's agent runs this on pages that may carry someone's intent, and its
-# output is published. So before any fetch the URL must be https on a primary host as
-# kb_compiler's strict authority match reads it (no userinfo, backslash, escape, port,
-# other scheme), else exit 2; curl may follow only https redirects, and the page it ended
-# on must pass the same test, else exit 2 and nothing is written. Defense in depth: the
-# agent's sandbox (denyRead /Users, network to the source hosts) is the boundary.
+# Behavior 145: the agent that runs this (a live seat session, on Son's word) reads pages
+# that may carry someone's intent, and what it archives is published. So before any fetch
+# the URL must be https on a primary host as kb_compiler's strict authority match reads it
+# (no userinfo, backslash, escape, port, other scheme), else exit 2; curl may follow only
+# https redirects, and the page it ended on must pass the same test, else exit 2 and
+# nothing is written. Defense in depth: the seat's sandbox is the boundary.
+# Checked by scripts/test_archive_source.py (seed 145, 400 cases) on the checks: line.
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "engine" / "build"))
 import kb_compiler  # noqa: E402
 
