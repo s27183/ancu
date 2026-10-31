@@ -19,6 +19,7 @@ from __future__ import annotations
 import os
 import plistlib
 import random
+import re
 import shutil
 import subprocess
 import sys
@@ -85,7 +86,9 @@ def static_checks() -> None:
           and "exec /usr/bin/python3 scripts/auto/runner.py" in rj)
     rn = (HERE / "runner.py").read_text()
     check("runner publishes with its own publish.py, never from the job folder",
-          "import publish" in rn and "folder /" not in rn and "sys.path.insert(0, str(Path(__file__)" in rn)
+          "import publish" in rn and "sys.path.insert(0, str(Path(__file__)" in rn
+          and rn.count("sys.path") == 1 and not re.search(r"runpy|exec\(|import_module|"
+                                                          r"\[\"python|\.venv/bin|folder\s*/\s*\"scripts", rn))
     check("git in the runner: hooks and fsmonitor off, no global or system config",
           "core.hooksPath=/dev/null" in (HERE / "autolib.py").read_text()
           and A.git_env().get("GIT_CONFIG_GLOBAL") == "/dev/null")

@@ -8,7 +8,8 @@ Mechanism: run_job.sh brings the runner checkout to origin/main and execs this f
   run() takes a lock, fetches main and the open kb-watch-* branches into the runner checkout,
   runs the canary (abort on anything but `held`, and file one issue for Son), clones the
   runner checkout into jobs/<job>-<stamp> with the remote-tracking branches copied in, builds
-  .venv there with `uv sync --frozen`, then starts the agent with autolib.settings() and the
+  .venv there with `uv sync --frozen` (for kb-verify, also writes .ancu-outbox/known.json from
+  ~/state/verdicts.json, so heads already judged are skipped), then starts the agent with autolib.settings() and the
   job's prompt from its `---8<---` block, and hands the folder to publish.py, which reads it
   with os, never with git. Every step is logged to /Users/Shared/ancu-auto/logs/<job>-<stamp>.log
   with the agent's stream-json transcript beside it.
@@ -72,6 +73,18 @@ def make_folder(job: str, stamp: str, base: str, log: Log) -> Path:
     return d
 
 
+def write_known(folder: Path, log: Log) -> None:
+    """kb-verify's .ancu-outbox/known.json: branch -> the head sha it already has a verdict for,
+    so the agent skips a branch whose head has not moved (the agent cannot read ~/state)."""
+    import json
+    f = A.STATE / "verdicts.json"
+    state = json.loads(f.read_text()) if f.is_file() else {}
+    known = {b: v["sha"] for b, v in state.items() if isinstance(v, dict) and "sha" in v}
+    (folder / A.OUTBOX).mkdir(exist_ok=True)
+    A.write_json(folder / A.OUTBOX / "known.json", known)
+    log(f"kb-verify: {len(known)} branch(es) already have a verdict")
+
+
 def prune(log: Log) -> None:
     cutoff = time.time() - KEEP_DAYS * 86400
     for d in A.JOBS.glob("*-*"):
@@ -108,6 +121,8 @@ def run(job: str) -> int:
             return 1
         doc, _prefix, model, turns = A.JOBS_TABLE[job]
         folder = make_folder(job, stamp, base, log)
+        if job == "kb-verify":
+            write_known(folder, log)
         settings_file = A.STATE / f"settings-{job}-{stamp}.json"
         A.write_json(settings_file, A.settings(folder))
         transcript = A.LOGS / f"{job}-{stamp}.jsonl"
