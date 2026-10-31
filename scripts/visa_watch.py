@@ -36,6 +36,8 @@ import sys
 import time
 import xml.etree.ElementTree as ET
 from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from curl_ca import ca_args  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 STATE = ROOT / "docs/sources/homeaffairs/visa-watch.json"
@@ -46,7 +48,7 @@ PAUSE_S = 3
 
 def fetch(url: str) -> tuple[int, str]:
     r = subprocess.run(
-        ["curl", "-sL", "--max-time", "30", "-A", UA, "-w", "\n%{http_code}", url],
+        ["curl", "-sL", "--max-time", "30", *ca_args(), "-A", UA, "-w", "\n%{http_code}", url],
         capture_output=True, text=True, errors="replace")
     body, _, code = r.stdout.rpartition("\n")
     return (int(code) if code.isdigit() else 0), body
