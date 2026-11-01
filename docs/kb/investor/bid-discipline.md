@@ -1,12 +1,12 @@
 ---
 slug: kb.investor.bid-discipline
 effective_from: 2025-07-01
-last_verified: 2026-07-06
+last_verified: 2026-11-01
 sources:
   - url: https://moneysmart.gov.au/home-loans/buying-a-house
-    retrieved: 2026-07-06
+    retrieved: 2026-11-01
   - url: https://moneysmart.gov.au/property-investment
-    retrieved: 2026-07-06
+    retrieved: 2026-11-01
 ---
 
 # Bid discipline
