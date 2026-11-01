@@ -49,10 +49,23 @@ of the overdue list, and kb-watch takes those docs first (kb-watch-routine.md
 step 1). kb-watch sets `next_edition:` to the following year once it has read
 the new edition. Measured 2026-10-19: 201 docs, 147 overdue.
 
+Regulated figures are grounded -> P-7 -> The KB -> a doc with nothing a primary could confirm is not re-verified
+Behavior 147 (Son 2026-11-01, issue #198). A doc whose sources are notes only (no
+`url:`), that says nothing is REGULATED and that states no figure (a %, a $ amount,
+a day/week/month/year count, a thousands-grouped number) has nothing kb-watch can
+re-open or re-check: a copy template, a terms list, a placeholder. Such a doc is
+listed under NOTHING TO RE-VERIFY and kept out of the overdue list kb-watch draws
+its 30 from, so the weekly check stops reporting it as could-not-verify. A note-only
+doc that does state a figure stays overdue: kb-watch checks it against the owner
+docs its note names (kb-watch-routine.md step 2). Measured 2026-11-01: 201 docs,
+18 listed. `--self-test` runs the rule over every doc plus four planted fixtures
+(tests/fixtures/kb_freshness/) against a separately written reading of it.
+
 Usage:
     python3 tests/kb_freshness.py
     python3 tests/kb_freshness.py --strict
     python3 tests/kb_freshness.py --asof 2026-09-01
+    python3 tests/kb_freshness.py --self-test
 """
 import datetime
 import pathlib
@@ -62,6 +75,30 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 KB_DIR = ROOT / "docs" / "kb"
 NEWS_DIR = KB_DIR / "news"
+FIXTURES = ROOT / "tests" / "fixtures" / "kb_freshness"
+
+# A figure a primary could confirm: a %, a $ amount, a day/week/month/year count
+# (optionally a range, optionally business/calendar/clear days), or a number with
+# thousands separators.
+FIGURE = re.compile(
+    r"\d\s*%"
+    r"|\$\s?\d"
+    r"|\b\d+(?:\.\d+)?(?:\s*[–-]\s*\d+)?\s+(?:business\s+|calendar\s+|clear\s+)?"
+    r"(?:day|week|month|year)s?\b"
+    r"|\b\d{1,3}(?:,\d{3})+\b",
+    re.I,
+)
+
+
+def nothing_to_reverify(text):
+    """True when the doc has no `url:` source, no REGULATED line and no figure."""
+    m = re.match(r"---\n(.*?)\n---\n", text, re.S)
+    front = m.group(1) if m else ""
+    if re.search(r"^\s*-?\s*url:\s*\S", front, re.M):
+        return False
+    if "REGULATED" in text:
+        return False
+    return not FIGURE.search(text)
 
 # Re-verification budget per cadence tier, in days. Grounded in architecture
 # §11.2; the day counts give a small grace over the nominal period.
@@ -115,6 +152,43 @@ def parse_frontmatter(path):
     )
 
 
+def self_test():
+    """Every doc and each planted fixture: listed exactly when an independent
+    reading says it has no url source, no REGULATED line and no figure."""
+    def oracle(text):
+        lines = text.split("\n")
+        end = lines.index("---", 1) if lines and lines[0] == "---" and "---" in lines[1:] else 0
+        has_url = any(l.strip().lstrip("- ").startswith("url:") and l.split("url:", 1)[1].strip()
+                      for l in lines[1:end])
+        has_reg = any("REGULATED" in l for l in lines)
+        words = text.replace("\n", " ")
+        has_fig = bool(
+            re.search(r"[0-9] ?%", words)
+            or re.search(r"\$ ?[0-9]", words)
+            or re.search(r"(?i)\b[0-9][0-9.]*(?: ?[–-] ?[0-9]+)? +(?:(?:business|calendar|clear) +)?(?:days?|weeks?|months?|years?)\b", words)
+            or re.search(r"\b[0-9]{1,3}(?:,[0-9]{3})+\b", words)
+        )
+        return not (has_url or has_reg or has_fig)
+
+    expected = {"note-no-figure.md": True, "note-figure.md": False,
+                "note-regulated.md": False, "url-no-figure.md": False}
+    paths = [p for p in sorted(KB_DIR.rglob("*.md")) if NEWS_DIR not in p.parents]
+    paths += [FIXTURES / name for name in sorted(expected)]
+    bad = []
+    for p in paths:
+        text = p.read_text()
+        got = nothing_to_reverify(text)
+        want = expected.get(p.name, None) if p.parent == FIXTURES else oracle(text)
+        if p.parent == FIXTURES and oracle(text) != want:
+            bad.append(f"{p.name}: the oracle reads it as {oracle(text)}, planted as {want}")
+        if got != want:
+            bad.append(f"{p.relative_to(ROOT)}: listed={got}, expected {want}")
+    print(f"kb_freshness self-test: {len(paths)} cases, {len(bad)} counterexamples")
+    for b in bad:
+        print(f"  ✗ {b}")
+    return 1 if bad else 0
+
+
 def parse_args(argv):
     strict = "--strict" in argv
     asof = datetime.date.today()
@@ -127,11 +201,14 @@ def parse_args(argv):
 
 
 def main():
+    if "--self-test" in sys.argv[1:]:
+        return self_test()
     strict, asof = parse_args(sys.argv[1:])
 
     rows = []      # (slug, cadence, last_verified, age_days, budget, status)
     errors = []    # docs missing slug / last_verified — a real problem
     due = []       # (slug, next_edition, next_edition_at) — a new edition is due
+    quiet = []     # slugs with nothing a primary could confirm (behavior 147)
 
     for path in sorted(KB_DIR.rglob("*.md")):
         if NEWS_DIR in path.parents:
@@ -156,6 +233,9 @@ def main():
         except ValueError:
             errors.append((rel, f"unparseable last_verified: {last_verified!r}"))
             continue
+        if nothing_to_reverify(path.read_text()):
+            quiet.append(slug)
+            continue
         if next_edition and next_edition <= asof.isoformat()[:7]:
             due.append((slug, next_edition, next_at or ""))
         cadence = cadence_for(slug)
@@ -168,7 +248,7 @@ def main():
     # Most overdue first; ties broken by slug for a stable report.
     stale.sort(key=lambda r: (-(r[3] - r[4]), r[0]))
 
-    print(f"KB freshness — as of {asof.isoformat()} ({len(rows)} docs scanned)\n")
+    print(f"KB freshness — as of {asof.isoformat()} ({len(rows) + len(quiet)} docs scanned)\n")
 
     if errors:
         print("FRONTMATTER ERRORS (fix before relying on this report):")
@@ -191,6 +271,12 @@ def main():
         print()
     else:
         print("All scanned docs are within their re-verification budget.\n")
+
+    if quiet:
+        print(f"NOTHING TO RE-VERIFY ({len(quiet)}): no url source, no REGULATED line, no figure")
+        for slug in sorted(quiet):
+            print(f"  {slug}")
+        print()
 
     # Per-cadence summary so the operator sees the shape at a glance.
     print("By cadence:")
