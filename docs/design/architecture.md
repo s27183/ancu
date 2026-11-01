@@ -69,6 +69,17 @@ and the linter warns (W23):
 
     checks: `<command>`[; `<command>`]
 
+**Secrets** — the files that hold this project's secrets. The launch denies
+each one to every read and write the seat makes, beside the floor it always
+denies: `.env`, `.env.local`, `.env.*.local`, `.env.production`, `.env.prod`, `.env.development`, `.env.dev`, `.env.staging`, `.env.test`, their backup copies (`.env.bak*`, `.env.old*`, …) and `.envrc`. An entry is a file name,
+matched at any depth, or a repo-relative path, `*` only inside a name; `not
+<path>` marks a file named like a secret that holds none. An entry once
+declared stays denied after it leaves the line: the launcher keeps it. A
+`Trace:` line's file source is one of these. Unanswered, or a secret-named
+file left undeclared, the linter warns (W31):
+
+    secrets: <file name or repo path>[, <entry>][, not <path>]
+
 **No new record is written to settle a question.** A rule that holds everywhere
 becomes a sentence in one of the two ground documents. A rule that holds at one
 mechanism becomes a four-slot block beside that mechanism. There is no third
@@ -212,6 +223,7 @@ merge into `main` is a deploy.
 
     checks: `.venv/bin/python tests/validate_build.py`; `.venv/bin/python tests/kb_quote_check.py`; `.venv/bin/python tests/kb_freshness.py --self-test`; `.venv/bin/python tests/kb_gate_eval.py`; `.venv/bin/python tests/resolver_eval.py`; `.venv/bin/python tests/eligibility_benefit_eval.py`; `.venv/bin/python tests/cash_duty_eval.py`; `.venv/bin/python tests/mortgage_eval.py`; `.venv/bin/python tests/ownership_eval.py`; `.venv/bin/python tests/bilingual_eval.py`; `.venv/bin/python tests/terms_coverage.py`; `.venv/bin/python scripts/visa_watch.py --self-test`; `.venv/bin/python scripts/news_watch.py --self-test`; `.venv/bin/python tests/outcome_validate.py`; `.venv/bin/python tests/shell_contract_check.py`; `.venv/bin/python tests/sidecar_options_check.py`; `.venv/bin/python tests/migrations_frozen.py`; `.venv/bin/python tests/migrations_frozen.py --self-test`; `.venv/bin/python scripts/kb_gate.py --self-test`; `.venv/bin/python scripts/test_archive_source.py`; `.venv/bin/python tests/renderer_conformance.py`; `.venv/bin/python scripts/doc_links.py docs`; `(cd engine/erlang && rebar3 compile)`; `(cd shell/web/backend && rebar3 compile)`; `(cd shell/web/frontend && npm run check)`; `(cd shell/web/frontend && npm test)`; `(cd shell/web/frontend && npm run build && node scripts/seo_check.ts)`; `bash scripts/conformance_sweep.sh`; `! git ls-files -- ':(glob,icase)**/claude.md' ':(glob,icase)**/agents.md' | grep .`
     attribution: co-author+session
+    secrets: .env
     behaviors: none yet
 
 ## The couplings
@@ -294,7 +306,7 @@ worth stating, with the reason — otherwise the next reader couples it.
 *Empty at plant.* What this document describes that does not exist yet, so a
 reader can tell a plan from a mechanism.
 
-<!-- planted from the enacs seed @ b71c1a5; edit below freely — `plant.py --dry-run` reports what changed upstream -->
+<!-- planted from the enacs seed @ 865b82d; edit below freely — `plant.py --dry-run` reports what changed upstream -->
 
 ## Where this project's existing design lives
 
