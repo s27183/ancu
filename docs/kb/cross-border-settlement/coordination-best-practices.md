@@ -1,12 +1,12 @@
 ---
 slug: kb.cross-border-settlement.coordination-best-practices
 effective_from: 2025-07-01
-last_verified: 2026-07-06
+last_verified: 2026-11-01
 sources:
   - url: https://www.austrac.gov.au/business/core-guidance/reporting/money-transferred-and-overseas-international-funds-transfer-instruction-ifti-reports
-    retrieved: 2026-07-06
+    retrieved: 2026-11-01
   - url: https://moneysmart.gov.au/banking/sending-money-overseas
-    retrieved: 2026-07-06
+    retrieved: 2026-11-01
 ---
 
 # Cross-border settlement coordination — sequencing the two-country critical path
