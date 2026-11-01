@@ -10,6 +10,12 @@ sources:
     retrieved: 2026-07-06
     path: docs/sources/nsw/conveyancing_act_1919_no_6.pdf
     note: "NSW Conveyancing Act 1919 s66ZS — off-the-plan sunset-clause rescission requires every purchaser's consent or a Supreme Court order; read via archived PDF, current for 15 Aug 2025"
+  - url: https://www.nsw.gov.au/housing-and-construction/buying-and-selling-property/buying-property-nsw/buying-property-off-plan
+    retrieved: 2026-11-01
+    path: docs/sources/nsw/nswgov-buying-property-off-plan.txt
+    quotes:
+      - "Developers will need a buyer’s consent before they end a contract using a sunset clause. Otherwise the developer will need to apply to the NSW Supreme Court to justify termination."
+    note: "NSW Government — the s66ZS sunset-clause rule (consent or a Supreme Court order), on a page a script can read"
   - url: https://www.legislation.vic.gov.au/in-force/acts/sale-land-act-1962
     retrieved: 2026-07-06
     path: docs/sources/vic/sales_of_land_act_1962.pdf
