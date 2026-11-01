@@ -11,7 +11,7 @@ sources:
     retrieved: 2026-07-06
     path: docs/sources/qld/property_occupations_act_2014.pdf
     note: "QLD Property Occupations Act 2014 s229A seller's right to bid, s214 no reserve/price-guide disclosure, s159 registered bidder; read via archived PDF, current as at 1 Aug 2025. NSW (Property and Stock Agents Act 2002) stays at Act-name granularity — legislation.nsw.gov.au 403s WebFetch."
-  - url: https://www.consumer.vic.gov.au/underquoting
+  - url: https://www.consumer.vic.gov.au/housing/buying-and-selling-property/understanding-property-prices-and-underquoting-for-buyers
     retrieved: 2026-11-01
     path: docs/sources/vic/cav-underquoting-2026-11-01.txt
     quotes:

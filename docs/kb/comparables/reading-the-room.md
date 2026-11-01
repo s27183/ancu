@@ -3,7 +3,7 @@ slug: kb.comparables.reading-the-room
 effective_from: 2026-10-16
 last_verified: 2026-11-01
 sources:
-  - url: https://www.consumer.vic.gov.au/underquoting
+  - url: https://www.consumer.vic.gov.au/housing/buying-and-selling-property/understanding-property-prices-and-underquoting-for-buyers
     retrieved: 2026-11-01
     path: docs/sources/vic/cav-underquoting-2026-11-01.txt
     quotes:
@@ -102,7 +102,7 @@ Notes:
 
 **Canonical (regulators — the price-disclosure regimes):**
 
-- Consumer Affairs Victoria — *Understanding property prices and underquoting (for buyers)* (Property Price Statement, which replaced the Statement of Information from 1 Oct 2026: price or range up to 10%, 3 comparable sales, suburb median; reserve published at least 7 days before an auction or fixed-date sale held from 16 Oct 2026; banned qualifying words) — https://www.consumer.vic.gov.au/underquoting
+- Consumer Affairs Victoria — *Understanding property prices and underquoting (for buyers)* (Property Price Statement, which replaced the Statement of Information from 1 Oct 2026: price or range up to 10%, 3 comparable sales, suburb median; reserve published at least 7 days before an auction or fixed-date sale held from 16 Oct 2026; banned qualifying words) — https://www.consumer.vic.gov.au/housing/buying-and-selling-property/understanding-property-prices-and-underquoting-for-buyers
 - Consumer Affairs Victoria — *Property sales method and price* — https://www.consumer.vic.gov.au/housing/buying-and-selling-property/selling-property/property-sales-method-and-price
 - NSW Government — *Price estimation and underquoting when selling a property* (advertised price must not be below the agent's estimated selling price; banned phrases; penalties) — https://www.nsw.gov.au/housing-and-construction/buying-and-selling-property/selling-a-property/price-estimation-and-underquoting
 - NSW Fair Trading — *Underquoting guidelines for residential property* — https://www.fairtrading.nsw.gov.au/__data/assets/pdf_file/0010/613891/Underquoting_Guidelines.pdf

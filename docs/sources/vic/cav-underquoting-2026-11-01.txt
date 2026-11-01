@@ -1,6 +1,6 @@
-Source: https://www.consumer.vic.gov.au/underquoting
+Source: https://www.consumer.vic.gov.au/housing/buying-and-selling-property/understanding-property-prices-and-underquoting-for-buyers
 Retrieved: 2026-11-01
-Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML aeb845bc982e65805dd0050300e36ec14db6f1f247bcd6074ae1fbcb62287e47
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML 3a2ea6b1ebfa6eedd92dcb437d591c9b56b8c899cd6fdb085bbfe2d0211a06a4
 
 Understanding property prices and underquoting for buyers - Consumer Affairs Victoria
 Skip to content
