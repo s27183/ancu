@@ -49,6 +49,8 @@ in `docs/kb/news/` as the shape to copy.
 
 1. Scope. Run `python3 tests/kb_freshness.py`. Take every doc it lists under NEW EDITION
    DUE, then the 30 most overdue docs (largest overdue first; ties by slug). Skip `kb.copy.*`, `kb.bilingual.*`, `kb.journey.*`.
+   Docs it lists under NOTHING TO RE-VERIFY are not overdue and not in the 30: they have
+   no `url:` source, no REGULATED line and no figure, so there is nothing to re-open.
    Also take `kb.fx.rba-aud-vnd`, where it exists, on every run (cadence weekly): its
    reading becomes the RBA's latest published AUD/VND rate on the page it cites, quoted
    from that page's saved copy. That reading changing is not news (step 3). A fee
@@ -63,7 +65,13 @@ in `docs/kb/news/` as the shape to copy.
    for a changed figure below, and set `next_edition:` a year on (the same month). If it
    is not out yet, set `next_edition:` a month on and re-verify against the current
    sources as usual. Never verify against another KB doc, a search
-   snippet, or memory. For each doc decide exactly one:
+   snippet, or memory — with one exception: a doc whose `sources:` are notes only (no
+   `url:`) that name the owner KB docs its figures come from is checked against those
+   owners, each figure against the owner's current figure, as the runbook's Phase 2 does
+   for `docs/kb/copy/`. It is then unchanged (bump `last_verified:`), changed to match the
+   owner (say which owner in the doc's note), or a figure no owner states (list it in
+   Son's issue, step 6); never "could not verify" for want of a url.
+   For each doc decide exactly one:
    - unchanged: every figure still matches the primary. Bump `last_verified:` and each
      opened source's `retrieved:` to today. Nothing else.
    - changed: a figure moved. Change the figure in the body and in the `## Rules` block,

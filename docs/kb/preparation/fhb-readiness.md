@@ -1,9 +1,9 @@
 ---
 slug: kb.preparation.fhb-readiness
 effective_from: 2026-06-01
-last_verified: 2026-06-18
+last_verified: 2026-11-01
 sources:
-  - note: "NOT VERIFIED — bilingual copy/checklist doc (kb.copy.*-adjacent in kind, though not in that namespace): every readiness item is grounded internally in its owning KB doc (the scheme, FIRB, or lender fact it points to), not asserted independently here. No external Sources section by design. Checked 2026-07-06 during the Phase B backfill."
+  - note: "NOT VERIFIED — bilingual copy/checklist doc (kb.copy.*-adjacent in kind, though not in that namespace): every readiness item is grounded internally in its owning KB doc (the scheme, FIRB, or lender fact it points to), not asserted independently here. No external Sources section by design. Checked 2026-07-06 during the Phase B backfill; its one figure checked 2026-11-01 (behavior 147): bank statements over at least the last 3 months, as kb.cash-reserve.lender-expectations (savings held 3 months) and kb.lender.documentation-non-resident (3 months of statements) state; the old 3–6 months had no owner."
 ---
 
 # Mode-A FHB readiness template (bilingual)
@@ -82,8 +82,8 @@ Resolver mapping (the shape `fh_engine_preparation` assembles, W6):
       "en": "Bank statements"
     },
     "doc_bank_statements_why": {
-      "vi": "3–6 tháng gần nhất, cho thấy thu nhập, chi tiêu và quá trình tiết kiệm của bạn.",
-      "en": "The last 3–6 months, showing your income, spending and savings pattern."
+      "vi": "Ít nhất 3 tháng gần nhất, cho thấy thu nhập, chi tiêu và quá trình tiết kiệm của bạn.",
+      "en": "At least the last 3 months, showing your income, spending and savings pattern."
     },
     "doc_deposit_evidence_item": {
       "vi": "Bằng chứng tiền cọc và tiền tiết kiệm tích lũy",

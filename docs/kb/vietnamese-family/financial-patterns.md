@@ -1,9 +1,9 @@
 ---
 slug: kb.vietnamese-family.financial-patterns
 effective_from: 2025-07-01
-last_verified: 2026-07-02
+last_verified: 2026-11-01
 sources:
-  - note: "NOT VERIFIED — a 2026-07-06 search (Phase B backfill) for Vietnamese-diaspora-specific funding-pattern research surfaced only generic AU 'bank of mum and dad' material, nothing Vietnamese-diaspora-specific; declined to force a weak/mismatched citation. This is behavioural domain knowledge, not a sourceable regulator fact — the regulated consequences it touches (FIRB exposure, capital-control thresholds) are sourced in their owning docs, not re-derived here."
+  - note: "NOT VERIFIED — a 2026-07-06 search (Phase B backfill) for Vietnamese-diaspora-specific funding-pattern research surfaced only generic AU 'bank of mum and dad' material, nothing Vietnamese-diaspora-specific; declined to force a weak/mismatched citation. This is behavioural domain knowledge, not a sourceable regulator fact — the regulated consequences it touches (FIRB exposure, capital-control thresholds) are sourced in their owning docs, not re-derived here. Checked 2026-11-01 (behavior 147) against kb.cash-reserve.lender-expectations: the old '1% rule' was not in it and now reads as its 5% / 3-month figures."
 ---
 
 # Vietnamese family financial patterns — how a cross-border purchase is funded, and where the pattern collides with the lender
@@ -31,7 +31,7 @@ This doc owns only the **cultural-pattern → funding-plan consequence** (that a
 
 - **Genuine-gift-not-loan / source-of-funds evidence** → [`kb.au-aml-ctf.source-of-funds-documentation`](../au-aml-ctf/source-of-funds-documentation.md) (the two-leg paper trail; repayable = a borrowed deposit).
 - **The genuine-gift letter anatomy** → [`kb.cross-border.source-of-funds-letter-template`](../cross-border/source-of-funds-letter-template.md) (the genuine-gift clause is the decisive, most-rejected element).
-- **The lender genuine-savings / cash-reserve gate** → [`kb.cash-reserve.lender-expectations`](../cash-reserve/lender-expectations.md) (the 1% rule; a gift that landed <3 months ago is excluded from genuine savings).
+- **The lender genuine-savings / cash-reserve gate** → [`kb.cash-reserve.lender-expectations`](../cash-reserve/lender-expectations.md) (Macquarie, for example, asks for 5% of the price as genuine savings above 85% LVR; a gift held for less than 3 months is not counted as genuine savings).
 - **Moving the money out of Vietnam** → `kb.vn-capital-controls.*` (SBV outbound thresholds / declared purpose — labelled placeholders, VN-side regulated content pending).
 
 So the plan's job here is to **detect the pattern and route it to the right regulated owner** — flag "is this a gift or a loan?" as a `documentation_gap` and drive the family to document it as a genuine gift *before* the funds move, not to give a structuring recommendation.
@@ -107,4 +107,4 @@ Behavioural / reference doc — no regulator publishes family funding patterns. 
 
 - [`kb.au-aml-ctf.source-of-funds-documentation`](../au-aml-ctf/source-of-funds-documentation.md) — source-of-funds evidence standards, genuine-gift-not-loan (AUSTRAC-anchored).
 - [`kb.cross-border.source-of-funds-letter-template`](../cross-border/source-of-funds-letter-template.md) — the genuine-gift letter anatomy.
-- [`kb.cash-reserve.lender-expectations`](../cash-reserve/lender-expectations.md) — genuine savings / the 1% rule (APRA APG 223).
+- [`kb.cash-reserve.lender-expectations`](../cash-reserve/lender-expectations.md) — genuine savings (APRA APG 223 sets the principle; each lender sets its own figure).
