@@ -1,0 +1,45 @@
+Source: https://www.ato.gov.au/individuals-and-families/investments-and-assets/foreign-resident-investments/foreign-investment-in-australia/are-you-a-foreign-person-buying-property-in-australia
+Retrieved: 2026-11-01
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML cf24f3b281877a21a5bca20184d1430a3cd230c6d3cb74d77b74bda28ce0331a
+
+Are you a foreign person buying property in Australia? | Australian Taxation Office
+Are you a foreign person buying property in Australia?
+How to determine if you are a 'foreign person' when buying property in Australia.
+Last updated 13 May 2026
+Print or Download
+Definition of a foreign person
+The definition of a 'foreign person' is complex and may apply to individuals, corporations, trusts and other entities, in ways that are not immediately obvious.
+The legal definition of a foreign person is in Guidance Note 2 – Key Concepts published on the Foreign investment website. External Link
+The term is defined in Part 1, Section 4 of the Foreign Acquisitions and Takeovers Act 1975.
+If you are unsure if you are a foreign person, you should seek independent legal advice for help.
+Individuals considered foreign persons
+You are a foreign person if you intend to buy Australian residential or commercial property, and you are not a:
+citizen of Australia
+permanent resident of Australia, or
+New Zealand citizen with a special category visa.
+A permanent resident who is not ordinarily a resident in Australia may be a foreign person in some circumstances.
+Temporary residents considered foreign persons
+From 1 April 2025 to 30 June 2029, foreign persons are banned from purchasing established dwellings in Australia (limited exceptions apply). The government has extended the ban, which was due to end on 31 March 2027. This includes temporary residents purchasing an established dwelling for use as a principal place of residence. Temporary residents can still apply for approval to purchase vacant land or new dwellings.
+You are a foreign person in the Australian foreign investment legislation if you are a:
+temporary resident in Australia, or
+New Zealand citizen who is non-resident in Australia.
+Special rules apply to temporary residents who purchased an established dwelling (or received foreign investment approval to buy an established dwelling) before 1 April 2025.
+A temporary resident is an individual who:
+holds a temporary visa that allows them to stay in Australia for a continuous period of 12 months or more (regardless of the time remaining on the visa), or
+resides in Australia, has submitted an application for a permanent visa and holds a bridging visa that allows them to stay in Australia until their application is finalised.
+Business or non-individuals considered foreign persons
+Generally, the following are considered foreign persons:
+the corporation in which an individual not ordinarily resident in Australia, a foreign corporation or a foreign government holds a substantial interest
+a corporation in which 2 or more persons hold an aggregate substantial interest, each of whom is one of the following
+an individual not an ordinarily resident in Australia
+a foreign corporation
+a foreign government
+the trustee of a trust in which an individual not ordinarily resident in Australia, a foreign corporation or a foreign government holds a substantial interest
+the trustee of a trust in which 2 or more persons hold an aggregate substantial interest, each of whom is one of the following
+an individual not ordinarily resident in Australia
+a foreign corporation
+a foreign government
+a foreign government
+any other person that meets the conditions, prescribed by the Foreign Acquisitions and Takeovers Regulation 2015 .
+QC 103919
+Print or Download

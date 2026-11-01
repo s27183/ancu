@@ -1,12 +1,19 @@
 ---
 slug: kb.contract-of-sale.review-points-by-state
 effective_from: 2025-08-01
-last_verified: 2026-07-06
+last_verified: 2026-11-01
 sources:
   - url: https://legislation.nsw.gov.au/view/html/inforce/current/sl-2022-0485
     retrieved: 2026-07-06
     path: docs/sources/nsw/conveyancing_regulation_2022_act.pdf
     note: "NSW Conveyancing (Sale of Land) Regulation 2022 Sch 1 Pt 1 prescribed documents, made under Conveyancing Act s52A(2)(a); read via archived PDF (as-made, Published LW 26 Aug 2022 / 2022 No 485)"
+  - url: https://www.nsw.gov.au/housing-and-construction/property-professionals/working-as-an-agent/sales-contracts
+    retrieved: 2026-11-01
+    path: docs/sources/nsw/nswgov-sales-contracts.txt
+    quotes:
+      - "The documents required by section 52A of the Conveyancing Act 1919 (the Act) must be attached to the contract include:"
+      - "If you fail to attach one of these documents to the sales contract before it is signed, the purchaser may rescind the sale contract within 14 days of exchange."
+    note: "NSW Government — the s52A prescribed documents (title search, drainage diagrams, planning certificate, dealings, smoke-alarm and loose-fill asbestos notice) and the 14-day rescission, on a page a script can read"
   - url: https://www.legislation.qld.gov.au/view/pdf/inforce/current/act-2023-027
     retrieved: 2026-07-06
     note: "QLD Property Law Act 2023 Pt 7 Div 4 ss99-105 — seller disclosure before signing (s99), buyer termination for failed/inaccurate disclosure (s104), seller repay on termination (s105); Act No. 27, current as at 28 Apr 2026 (read via WebFetch-to-disk + pdftotext)"

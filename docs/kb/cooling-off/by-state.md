@@ -1,12 +1,21 @@
 ---
 slug: kb.cooling-off.by-state
 effective_from: 2025-07-01
-last_verified: 2026-07-06
+last_verified: 2026-11-01
 sources:
   - url: https://legislation.nsw.gov.au/view/html/inforce/current/act-1919-006
     retrieved: 2026-07-06
     path: docs/sources/nsw/conveyancing_act_1919_no_6.pdf
     note: "NSW Conveyancing Act 1919 ss66S-66W — 5 business days (10 off-the-plan), 0.25% forfeiture, s66W certificate; read via archived PDF (landing page blocks automated fetch), current for 15 Aug 2025"
+  - url: https://www.nsw.gov.au/housing-and-construction/buying-and-selling-property/buying-property-nsw/contracts-and-deposits
+    retrieved: 2026-11-01
+    path: docs/sources/nsw/nswgov-contracts-and-deposits.txt
+    quotes:
+      - "you have a 5 business day cooling-off period after you exchange contracts"
+      - "A 10 business day cooling-off period applies to these contracts."
+      - "you will have to pay the vendor 0.25% of the purchase price"
+      - "You can waive the cooling-off period by giving the vendor a ‘66W certificate’."
+    note: "NSW Government — the cooling-off figures of Conveyancing Act 1919 ss66S-66W, on a page a script can read (legislation.nsw.gov.au answers scripts 403)"
   - url: https://www.legislation.vic.gov.au/in-force/acts/sale-land-act-1962
     retrieved: 2026-07-06
     path: docs/sources/vic/sales_of_land_act_1962.pdf

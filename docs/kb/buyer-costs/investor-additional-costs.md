@@ -8,6 +8,8 @@ sources:
     path: docs/sources/vic/cav-minimum-standards-rental-properties-2026-11-01.txt
     quotes:
       - "There are 15 categories of minimum standards for rental properties."
+      - "From 13 October 2026, all rental providers must keep records sufficient to show the property meets the rental minimum standards."
+      - "New minimum rental standards for energy efficiency will come into effect from 1 March 2027."
   - url: https://www.rta.qld.gov.au/during-a-tenancy/minimum-housing-standards
     retrieved: 2026-11-01
   - url: https://moneysmart.gov.au/property-investment/buying-an-investment-property
@@ -21,7 +23,7 @@ An investor faces the same core acquisition costs as a first home buyer — depo
 ## The investor-only acquisition adders
 
 - **Minimum rental / housing standards compliance (REGULATED — the load-bearing investor-only cost).** A property let to a tenant must meet the state's **minimum rental standards** — a regulated bar an owner-occupier never faces. If the property doesn't already comply, bringing it up to standard is a **one-off acquisition cost** (commonly heating, safety switches/RCDs, smoke alarms, locks, ventilation, mould/damp, hot/cold water). The standards and their commencement vary by state:
-  - **VIC** — 15 categories of rental minimum standards under the *Residential Tenancies Regulations 2021*, applying to agreements signed on/after **29 March 2021** (heating, electrical/gas safety checks, WELS-rated tapware/toilets, etc.).
+  - **VIC** — 15 categories of rental minimum standards under the *Residential Tenancies Regulations 2021*, applying to agreements signed on/after **29 March 2021** (heating, electrical/gas safety checks, WELS-rated tapware/toilets, etc.). From **13 October 2026** every rental provider must **keep records** showing the property met the standards before it was advertised and before the renter moved in (Consumer Affairs Victoria can ask to see them), and **new energy-efficiency minimum standards** take effect from **1 March 2027** — a VIC investor should budget for both the record-keeping (inspection evidence) and any energy-efficiency upgrade.
   - **QLD** — **minimum housing standards** under the RTRA framework: new tenancies from **1 Sept 2023**, **all tenancies from 1 Sept 2024**.
   - **NSW** — **7 minimum standards** (fitness for habitation) plus mandatory working **smoke alarms** (landlord-maintained) under the *Residential Tenancies Act 2010* and regulation.
   - Other states have their own equivalents (confirm per state). The cost is **banded** (depends entirely on the property's starting condition) and surfaced as a compliance check, not a fixed figure.
@@ -65,7 +67,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
     "minimum_rental_standards_by_state": {
       "note": "REGULATED — the state minimum-standards regimes that can trigger an upgrade cost. The standards are regulated; the dollar upgrade cost is banded (depends on the property's starting condition).",
       "entries": [
-        { "state": "VIC", "regime": "15 categories of rental minimum standards", "instrument": "Residential Tenancies Regulations 2021", "applies_from": "2021-03-29", "verification": "regulator-confirmed (Consumer Affairs Victoria / VBA)" },
+        { "state": "VIC", "regime": "15 categories of rental minimum standards", "instrument": "Residential Tenancies Regulations 2021", "applies_from": "2021-03-29", "records_required_from": "2026-10-13", "energy_efficiency_standards_from": "2027-03-01", "verification": "regulator-confirmed (Consumer Affairs Victoria / VBA)" },
         { "state": "QLD", "regime": "minimum housing standards", "instrument": "RTRA framework (RTA)", "applies_from": "2023-09-01 new tenancies; 2024-09-01 all tenancies", "verification": "regulator-confirmed (Residential Tenancies Authority)" },
         { "state": "NSW", "regime": "7 minimum standards (fitness for habitation) + mandatory working smoke alarms", "instrument": "Residential Tenancies Act 2010 + Regulation", "applies_from": "ongoing", "verification": "regulator-confirmed (NSW Fair Trading); to_verify — sections not pinpointed" },
         { "state": "SA/WA/TAS/ACT/NT", "regime": "state equivalents apply", "instrument": "per-state residential tenancy law", "applies_from": "to_verify", "verification": "INDICATIVE — to_verify against each state's tenancy authority" }
@@ -79,14 +81,14 @@ Notes:
 
 - **No `fills`.** No outcome leaf is set; the investor cost adders are resolver-estimated and summed into `cash_position` with the sibling-owned costs. The doc supplies the investor-specific adders, asserting no buyer-specific total.
 - **Delta, not a re-band.** The shared inspection/conveyancing/registration ranges are owned by `kb.buyer-costs.inspections-conveyancing-fees`; QS report, entity setup, duty, and landlord insurance by their own anchors. This doc owns only the investor-only adders (minimum-standards compliance, lease review, initial letting flag) — single-owner via cross-ref.
-- **Minimum standards: regulated regime, banded cost.** The standards and commencement dates are regulated and per-state (VIC 29 Mar 2021, QLD all-tenancies 1 Sep 2024, NSW ongoing); the *upgrade cost* is banded because it depends on the property's starting condition. SA/WA/TAS/ACT/NT regimes are `to_verify` (row-level verification tier, the same honest-partial move as `kb.tax.land-tax-by-state`).
+- **Minimum standards: regulated regime, banded cost.** The standards and commencement dates are regulated and per-state (VIC 29 Mar 2021, records from 13 Oct 2026, energy-efficiency standards from 1 Mar 2027; QLD all-tenancies 1 Sep 2024, NSW ongoing); the *upgrade cost* is banded because it depends on the property's starting condition. SA/WA/TAS/ACT/NT regimes are `to_verify` (row-level verification tier, the same honest-partial move as `kb.tax.land-tax-by-state`).
 - **No double-count.** Landlord insurance is a holding cost (operating expenses), flagged here only so it's planned from settlement, not summed into acquisition.
 
 ## Sources
 
 **Minimum rental standards (REGULATED — state tenancy authorities):**
 
-- Consumer Affairs Victoria — *Rental properties – minimum standards* (14 standards; agreements on/after 29 March 2021) — https://www.consumer.vic.gov.au/housing/renting/repairs-alterations-safety-and-pets/minimum-standards/minimum-standards-for-rental-properties
+- Consumer Affairs Victoria — *Rental properties – minimum standards* (15 categories; agreements on/after 29 March 2021; records from 13 October 2026; energy-efficiency standards from 1 March 2027) — https://www.consumer.vic.gov.au/housing/renting/repairs-alterations-safety-and-pets/minimum-standards/minimum-standards-for-rental-properties
 - Residential Tenancies Authority (QLD) — *Minimum housing standards* (new tenancies 1 Sept 2023; all tenancies 1 Sept 2024) — https://www.rta.qld.gov.au/during-a-tenancy/maintenance-and-repairs/minimum-housing-standards
 - NSW Government — *Minimum standards for rental properties* (7 standards; fitness for habitation) — https://www.nsw.gov.au/housing-and-construction/rules/minimum-standards-for-rental-properties
 - NSW Government — *Smoke alarms in a rental property* (mandatory working smoke alarms; landlord-maintained) — https://www.nsw.gov.au/housing-and-construction/rules/smoke-alarms-a-rental-property

@@ -1,7 +1,7 @@
 ---
 slug: kb.building-types.risk-by-type
 effective_from: 2025-08-01
-last_verified: 2026-07-06
+last_verified: 2026-11-01
 sources:
   - url: https://www.qbcc.qld.gov.au/home-owner-hub/queensland-home-warranty-scheme/what-home-warranty-insurance
     retrieved: 2026-07-06
@@ -10,10 +10,25 @@ sources:
     retrieved: 2026-07-06
     path: docs/sources/nsw/conveyancing_act_1919_no_6.pdf
     note: "NSW Conveyancing Act 1919 s66ZS — off-the-plan sunset-clause rescission requires every purchaser's consent or a Supreme Court order; read via archived PDF, current for 15 Aug 2025"
+  - url: https://www.nsw.gov.au/housing-and-construction/buying-and-selling-property/buying-property-nsw/buying-property-off-plan
+    retrieved: 2026-11-01
+    path: docs/sources/nsw/nswgov-buying-property-off-plan.txt
+    quotes:
+      - "Developers will need a buyer’s consent before they end a contract using a sunset clause. Otherwise the developer will need to apply to the NSW Supreme Court to justify termination."
+    note: "NSW Government — the s66ZS sunset-clause rule (consent or a Supreme Court order), on a page a script can read"
   - url: https://www.legislation.vic.gov.au/in-force/acts/sale-land-act-1962
     retrieved: 2026-07-06
     path: docs/sources/vic/sales_of_land_act_1962.pdf
     note: "VIC Sale of Land Act 1962 ss10A-10F off-the-plan sunset clauses (inserted by No. 14/2019); read via archived PDF, Authorised Version No. 172 as at 25 Nov 2025"
+  - url: https://content.legislation.vic.gov.au/sites/default/files/2026-09/62-6975aa174-authorised.pdf
+    retrieved: 2026-11-01
+    path: docs/sources/vic/sale-of-land-act-1962-av174.txt
+    quotes:
+      - "The vendor under an off-the-plan contract must not require or permit the purchaser under the contract to take possession of the lot to which the contract relates if— (a) the contract is for a lot in a residential apartment building; and (b) an occupancy permit has not been issued for the lot"
+      - "A purchaser under an off-the-plan contract may rescind the off-the-plan contract if— (a) the contract is for a lot in a residential apartment building; and (b) an occupancy permit has been issued for the lot; and (c) the developer of the residential apartment building— (i) has not arranged for the issue or execution of a developer bond; or"
+      - "has arranged for the issue or execution of a developer bond that secures an amount that is less than the amount required under section 137ZP of the Building Act 1993 to be secured."
+      - "any amount paid by the purchaser to the developer for the purchase of the lot, including any amount paid as a deposit;"
+    note: "VIC Sale of Land Act 1962 s9ADA (no possession of an apartment lot before an occupancy permit; inserted by No. 17/2025) and s9AEA (purchaser may rescind when the developer has no, or too small, a developer bond under Building Act 1993 s137ZP; inserted by No. 17/2025); Authorised Version No. 174, text extracted from the authorised PDF"
 ---
 
 # Risk profiles by property type
@@ -30,6 +45,7 @@ Every dwelling type carries a **different risk profile** — what can go wrong, 
   - **Long settlement.** Months or years between signing and completion → interest-rate and serviceability **drift**; a pre-approval at signing may not hold at completion.
   - **Developer insolvency** and **unknown build quality** — the buyer commits before the dwelling exists.
   - **Sunset clauses — now buyer-protective.** A vendor can no longer freely rescind under a sunset clause to re-sell at a higher price: in **NSW** (Conveyancing Act 1919 **s66ZS**) and **VIC** (Sale of Land Act 1962 **ss10A–10F**) the vendor may rescind under a sunset clause **only with every purchaser's written consent or a Supreme Court order**, on 28 days' notice, and contracting-out is void. (QLD has **no** equivalent statutory sunset-clause restriction — protection there is contractual; review the contract.)
+  - **VIC apartments — occupancy permit and developer bond.** For a lot in a **residential apartment building** bought off the plan in **VIC**, the vendor **must not let the buyer take possession before an occupancy permit has been issued** for the lot or its part of the building (Sale of Land Act 1962 **s 9ADA**; breach lets the buyer rescind before the plan is registered, s 9AE(1)). Once the occupancy permit has issued, the buyer **may rescind if the developer has not arranged a developer bond, or one that secures less than the Building Act 1993 s 137ZP amount** (**s 9AEA**), and recover what they paid, deposit included, with penalty interest — unless the developer is excepted from the bond requirement. Ask the vendor for evidence of the developer bond before settlement.
 - **`house_and_land`.** Typically a **split contract** (land purchase + a separate building contract) with **progress payments** through the build and **fixed-price build risk**; statutory home-warranty insurance applies to the build component (per the state thresholds above).
 
 ## Relevance for Vietnamese-Australian buyers (Mode A)

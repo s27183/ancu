@@ -1,12 +1,19 @@
 ---
 slug: kb.foreign-investor.future-migration-pathway-considerations
 effective_from: 2025-04-01
-last_verified: 2026-07-06
+last_verified: 2026-11-01
 sources:
   - url: https://foreigninvestment.gov.au/sites/foreigninvestment.gov.au/files/2025-03/guidance-note-6-residential-land-v3.pdf
     retrieved: 2026-07-06
     path: docs/sources/firb/guidance-note-6-residential-land-v3.pdf
-    note: "FIRB GN6 v3 — Australian permanent residents and citizens are NOT foreign persons; acquiring PR/citizenship removes the foreign-person restrictions. Confirms the mode-switch trigger this doc owns. (Tax-residency change follows the separate ATO residency test, as the doc states.)"
+    note: "FIRB GN6 v3 — the residential-land rules a foreign person meets; who is a foreign person is stated on the ATO page below, not in GN6 v3. (Tax-residency change follows the separate ATO residency test, as the doc states.)"
+  - url: https://www.ato.gov.au/individuals-and-families/investments-and-assets/foreign-resident-investments/foreign-investment-in-australia/are-you-a-foreign-person-buying-property-in-australia
+    retrieved: 2026-11-01
+    path: docs/sources/ato/are-you-a-foreign-person-buying-property.txt
+    quotes:
+      - "You are a foreign person if you intend to buy Australian residential or commercial property, and you are not a:"
+      - "A permanent resident who is not ordinarily a resident in Australia may be a foreign person in some circumstances."
+    note: "ATO (administers the residential foreign-investment framework) — a citizen or permanent resident is not a foreign person, unless not ordinarily resident; the page states what GN6 v3 does not"
 ---
 
 # Future migration pathway — the Mode-D mode-switch structural doc

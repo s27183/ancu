@@ -1,0 +1,137 @@
+Source: https://www.consumer.vic.gov.au/housing/buying-and-selling-property/understanding-property-prices-and-underquoting-for-buyers
+Retrieved: 2026-11-01
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML 3a2ea6b1ebfa6eedd92dcb437d591c9b56b8c899cd6fdb085bbfe2d0211a06a4
+
+Understanding property prices and underquoting for buyers - Consumer Affairs Victoria
+Skip to content
+Skip to main navigation
+Skip to footer
+Back
+Understanding property prices and underquoting for buyers
+Skip listen and sharing tools
+Listen
+Share this page
+Print
+Email
+Facebook
+On this page:
+Real estate advertising and pricing must not be misleading and deceptive
+Property pricing
+Do your research on property prices
+Enforcing real estate pricing laws
+New property price transparency rules have started
+From 1 October 2026, new laws require real estate agents to:
+disclose a seller's reserve price 7 days before auction or fixed-sale date
+publish the property's final sold price once a sale becomes unconditional
+use the new Property Price Statement , which replaces the Statement of Information, and follow the new rules for its use.
+Read more .
+Real estate advertising and pricing must not be misleading or deceptive
+It is illegal for a seller or agent to misrepresent a property in any way when advertising or marketing that property, whether verbally or in writing.
+However, when it comes to an advertised price, you should use it as a guide only – because it can change while the property is on the market.
+Underquoting
+It is illegal for an agent to advertise or advise you of a price that is less than:
+the seller's auction reserve price or asking price
+a price in a written offer already rejected by the seller on the basis it is too low, or
+the agent's current estimated selling price.
+Agents must update the price information they provide to buyers if any of these things change during the sales campaign.
+If an agent does not comply with the above, then they are engaging in underquoting.
+When a property sells for more than the price for which it was initially advertised, this does not always mean that underquoting has taken place. Sometimes a property will sell for more than initially indicated. This can happen when a number of interested buyers compete against each other to buy a property, and in doing so push up the sale price of the property.
+Please read through the information below to understand how property prices are set and how to report underquoting if you suspect it has occurred.
+Report underquoting
+Property pricing
+Agent’s price estimate for the seller
+When a seller is first engaging an agent, they need to have discussions about price.
+The seller does not need to make any decisions about price at this time, but the agent must provide a document to the seller called the agent's sales authority, which will contain the agent’s estimated selling price.
+The agent’s estimated selling price must be reasonable and based on research into comparable properties. It will form the basis of information provided for potential buyers and may change while the property is on the market
+Price information provided for buyers
+When the property is on the market, the agent:
+may advertise a price or price range for the property
+must provide a selling price in the Property Price Statement for the property.
+If a property advertisement includes a price, it must be listed as a single figure or a range of up to 10%. The price cannot use any qualifying words or symbols, such as 'from', 'offers above', or '+'.
+The property must not be advertised at a price that is less than the agent's estimated selling price.
+You can ask an agent to explain how they developed any price information they provide or advertise and if it has changed.
+Property Price Statement
+It is a legal requirement for all residential properties advertised for sale in Victoria by an estate agent to have a Property Price Statement. It contains important price information to assist home buyers. It is the first thing you should check once you have found a property you like.
+It must include:
+a selling price or price range for the property of up to 10%
+the key features of the property being sold
+details of the 3 most comparable property sales - including the address, key features, date of sale, and sale price, if available
+if only 1 or 2 comparable properties can be found, the key features of those properties and an explanation as to why 3 comparable properties could not be identified
+the median price for a property in the same suburb as the property for sale
+the seller’s reserve price, at least 7 days out from an auction or fixed-date sale
+within 7 days of the sale going unconditional, the property’s sale price.
+What are ‘key features’?
+A property’s key features are the:
+type of building
+number of bedrooms
+number of bathrooms
+number of car spaces
+size of internal built areas (floor space) in square metres
+total size of the land in square metres.
+You can get a Property Price Statement:
+at the property's open for inspection
+by checking online advertising — agents must display it visibly or via a hyperlink immediately next to the advertised price on the first visible part of the main online advertisement
+from the agent — they must give it to you within 2 business days of your request.
+Seller's reserve or asking price
+This price may be different from the agent’s estimated selling price for the property if the seller has chosen not to accept their agent’s advice on price.
+A seller can choose not to tell their agent their asking price at the start of the marketing campaign. It may be higher than the advertised price, which is based on the agent’s estimated selling price.
+However, if a seller tells the agent of their asking or reserve price during the marketing campaign, the agent cannot advertise the property below that price.
+Under new laws, for auctions and fixed date sales held on and from 16 October 2026, estate agents must ask the seller to provide their reserve price ahead of time, and must then publish the seller’s reserve price at least 7 days before the auction or fixed date sale. Agent must do this by:
+including the seller's reserve price in any advertisement for the property
+updating all marketing materials to reflect the reserve price once it is set, and withdrawing outdated advertising immediately
+including the seller’s reserve price, once it has been received, in the Property Price Statement.
+The seller’s reserve price must be a single dollar amount that is not modified by any additional words or symbols, such as ‘from’, ‘over’, ‘+’ or ‘starting at’.
+An auction or fixed-date sale will not be able to proceed unless the reserve price has been published for the full 7-day period.
+What is a fixed-date sale?
+A fixed-date sale is any sale method where a property seller sets a date and time by which potential buyers must make an offer to buy the property.
+Do your research on property prices
+Research the market value of property in your preferred areas by searching the internet, looking at recent Property Price Statements for similar properties (these are required to include the price the property sold for), attending auctions, speaking with a variety of estate agents and monitoring auction results. This will give you a realistic idea of the suburbs and types of properties you can afford. For more information and resources, go to Property data
+Use any price that is advertised as a guide only. The agent represents the seller but must be fair and honest with buyers.
+Ask the agent to justify price information they provide. They should have knowledge of the market in the area to support their estimate.
+If no selling price is advertised, use the selling price and the comparable property sales found in the Property Price Statement as a price guide.
+Do not allow emotion to cloud your judgment and be realistic about the price the property is likely to sell for.
+Sale price disclosure
+Once a sale becomes unconditional, agents must publish the property's final sale price as part of the Property Price Statement and make sure that the Property Price Statement is published online, free of charge, for at least 18 months following the date when the sale became unconditional.
+The requirement to disclose the sale price in the Property Price Statement applies to all properties sold after 1 October 2026, unless:
+1. The agent’s written engagement or appointment to sell a property was entered into before 1 October 2026, and
+2. The engagement or appointment to sell the property includes a term which requires the sale price to not be disclosed.
+Exemption from disclosing the sale price
+The seller or buyer (or their agent) can apply to Consumer Affairs Victoria for an exemption from disclosing the sale price on the Property Price Statement if there are circumstances related to family violence or personal violence involving the seller or buyer.
+How to apply for an exemption
+Click this link to access the exemption application form:
+Open exemption application form
+Once Consumer Affairs Victoria receives the application, we will notify the person applying and the seller’s agent. The seller’s agent can’t disclose the sale price while an application is being considered.
+If we need more information to make a decision on an exemption application, we will contact the person applying.
+Result of an exemption application
+Once we have made a decision on the exemption application, we will inform the person applying and the seller’s agent. If we approve the exemption, we will inform both the seller and the buyer.
+If we approve the exemption application, the seller’s agent must not disclose the sale price.
+Reporting underquoting
+If you believe underquoting has occurred and want to report it to Consumer Affairs Victoria, you will need to provide the following information:
+property address
+your contact details
+details of the real estate agent
+screen shots of the property advertisement
+Property Price Statement
+written representations made about the property (if relevant)
+explain the problem - for example, why you think the property advertising is misleading
+any other documents that you think may help us.
+We do not respond to every report we receive, but we keep all information for our intelligence purposes and use it to inform our compliance and enforcement activities.
+Report underquoting
+Enforcing real estate pricing laws
+We regularly inspect real estate agencies and conduct reviews of agency documentation to ensure estate agents are complying with the law.
+We use a range of compliance tools against agents who underquote, including warning letters, enforceable undertakings, injunctions and prosecutions.
+The action we take depends on the impact on a buyer and the seriousness of the breach. Our focus is to help consumers who are at most risk of harm and to act on issues that have the potential to cause widespread detriment to Victorians.
+Find more information about Regulatory approach and compliance policy .
+Related links
+Due diligence checklist for property buyers
+Buying property checklist
+Price advertising - information for estate agents
+Last updated: 2 October 2026
+Feedback
+Was this page helpful?
+Yes
+No
+Why? (optional). If you require a response, use our General enquiry online form .
+Why not? (optional). If you require a response, use our General enquiry online form .
+Please ensure that this field is always blank.
+Back To Top

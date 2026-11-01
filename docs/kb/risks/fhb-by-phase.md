@@ -1,9 +1,9 @@
 ---
 slug: kb.risks.fhb-by-phase
 effective_from: 2026-06-01
-last_verified: 2026-06-20
+last_verified: 2026-11-01
 sources:
-  - note: "NOT VERIFIED — bilingual copy/checklist doc: each risk is grounded in a named owning KB doc, not asserted independently here. No external Sources section by design. Checked 2026-07-06 during the Phase B backfill."
+  - note: "NOT VERIFIED — bilingual copy/checklist doc: each risk is grounded in a named owning KB doc, not asserted independently here. No external Sources section by design. Checked 2026-07-06 during the Phase B backfill; figures checked 2026-11-01 (behavior 147) against their owners: 3–5 business days and the penalty (now 0.2%–0.25%: VIC 0.2%, NSW/QLD 0.25%) against kb.cooling-off.by-state; about 90 days against kb.lender-docs.standard-timeline (CBA 90 days); 1.5%–3.5% commission against kb.selling-costs.agent-legal."
 ---
 
 # Mode-A FHB per-phase risks and mitigations (bilingual)
@@ -167,8 +167,8 @@ and its `risks`.
       "en": "On a private-treaty offer, include a subject-to-finance condition with a realistic approval date."
     },
     "risk_contract_short_cooling_off_item": {
-      "vi": "Thời gian cân nhắc rút lui khi mua theo thương lượng rất ngắn (3–5 ngày làm việc) và việc rút lui phải chịu phạt (~0,25% giá mua).",
-      "en": "The private-treaty cooling-off window is short (3–5 business days) and withdrawing carries a penalty (around 0.25% of the price)."
+      "vi": "Thời gian cân nhắc rút lui khi mua theo thương lượng rất ngắn (3–5 ngày làm việc) và việc rút lui phải chịu phạt (0,2%–0,25% giá mua).",
+      "en": "The private-treaty cooling-off window is short (3–5 business days) and withdrawing carries a penalty (0.2%–0.25% of the price)."
     },
     "risk_contract_short_cooling_off_action": {
       "vi": "Dùng khoảng thời gian này cho việc kiểm tra và luật sư rà soát; đừng xem nó như một lối thoát miễn phí.",
