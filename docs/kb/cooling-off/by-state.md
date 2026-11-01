@@ -4,9 +4,9 @@ effective_from: 2025-07-01
 last_verified: 2026-11-01
 sources:
   - url: https://legislation.nsw.gov.au/view/html/inforce/current/act-1919-006
-    retrieved: 2026-07-06
+    retrieved: 2026-11-01
     path: docs/sources/nsw/conveyancing_act_1919_no_6.pdf
-    note: "NSW Conveyancing Act 1919 ss66S-66W — 5 business days (10 off-the-plan), 0.25% forfeiture, s66W certificate; read via archived PDF (landing page blocks automated fetch), current for 15 Aug 2025"
+    note: "NSW Conveyancing Act 1919 ss66S-66W — 5 business days (10 off-the-plan), 0.25% forfeiture, s66W certificate; read via archived PDF (landing page blocks automated fetch), current for 3 Aug 2026 (saved 1 Nov 2026)"
   - url: https://www.nsw.gov.au/housing-and-construction/buying-and-selling-property/buying-property-nsw/contracts-and-deposits
     retrieved: 2026-11-01
     path: docs/sources/nsw/nswgov-contracts-and-deposits.txt

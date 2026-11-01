@@ -4,10 +4,10 @@ effective_from: 2025-08-01
 last_verified: 2026-07-06
 sources:
   - url: https://legislation.nsw.gov.au/view/html/inforce/current/act-1919-006
-    retrieved: 2026-06-02
+    retrieved: 2026-11-01
     browser_only: "legislation.nsw.gov.au answers scripts with HTTP 403 cf-mitigated: challenge (measured 2026-11-01); Son re-saves it in a browser"
     path: docs/sources/nsw/conveyancing-act-1919-no-6.txt
-    note: "NSW Conveyancing Act 1919 ss66J-66M — s66K postponement of passing of risk, s66L 28-day rescission for substantial damage; saved PDF current for 15 Aug 2025 (accessed 2 Jun 2026), extracted text"
+    note: "NSW Conveyancing Act 1919 ss66J-66M — s66K postponement of passing of risk, s66L 28-day rescission for substantial damage; saved PDF current for 3 Aug 2026 (saved 1 Nov 2026), extracted text"
     quotes:
       - "The risk in respect of damage to land shall not pass to the purchaser under a contract for the sale of the land until— (a) the completion of the sale"
       - "within 28 days after the purchaser first became aware of the damage"

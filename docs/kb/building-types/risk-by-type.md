@@ -7,9 +7,9 @@ sources:
     retrieved: 2026-07-06
     note: "QBCC Queensland Home Warranty Scheme — compulsory for residential construction over $3,300 (incl materials/labour/GST); excludes multi-dwelling buildings over three storeys"
   - url: https://legislation.nsw.gov.au/view/html/inforce/current/act-1919-006
-    retrieved: 2026-07-06
+    retrieved: 2026-11-01
     path: docs/sources/nsw/conveyancing_act_1919_no_6.pdf
-    note: "NSW Conveyancing Act 1919 s66ZS — off-the-plan sunset-clause rescission requires every purchaser's consent or a Supreme Court order; read via archived PDF, current for 15 Aug 2025"
+    note: "NSW Conveyancing Act 1919 s66ZS — off-the-plan sunset-clause rescission requires every purchaser's consent or a Supreme Court order; read via archived PDF, current for 3 Aug 2026 (saved 1 Nov 2026)"
   - url: https://www.nsw.gov.au/housing-and-construction/buying-and-selling-property/buying-property-nsw/buying-property-off-plan
     retrieved: 2026-11-01
     path: docs/sources/nsw/nswgov-buying-property-off-plan.txt
