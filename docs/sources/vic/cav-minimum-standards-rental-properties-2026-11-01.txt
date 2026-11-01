@@ -1,0 +1,169 @@
+Source: https://www.consumer.vic.gov.au/housing/renting/repairs-alterations-safety-and-pets/minimum-standards/minimum-standards-for-rental-properties
+Retrieved: 2026-11-01
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML 07db95ceb20761b65991aab2f9e052b11ce85d9f5aebe18c67376933b678aa15
+
+Rental properties - minimum standards - Consumer Affairs Victoria
+Skip to content
+Skip to main navigation
+Skip to footer
+Back
+important:
+New changes to the rental laws are now in effect. Read about the changes.
+× Dismiss
+Rental properties - minimum standards
+Skip listen and sharing tools
+Listen
+Share this page
+Print
+Email
+Facebook
+From 13 October 2026, all rental providers must keep records sufficient to show the property meets the rental minimum standards. Read more below.
+On this page:
+Rental properties must meet the minimum standards
+When do minimum standards apply?
+When do minimum standards not apply?
+Record keeping for minimum standards
+Renters' rights when the property does not meet minimum standards
+Minimum standards checklists for rental providers and renters
+Read the renting minimum standards
+Find other language translations of this content in Arabic, Chinese Simplified, Chinese Traditional, Greek, Thai and Vietnamese.
+Rental properties must meet the minimum standards
+There are 15 categories of minimum standards for rental properties.
+All rental properties must meet the standards for each category.
+Rental providers (landlords) and agents must make sure a property meets minimum standards at the time they advertise or offer to let the property.
+Rental providers must also make sure a property meets the minimum standards before the renter moves in.
+Find more details about the 15 categories of minimum standards below.
+Note: There are special rules for minimum standards in rooming houses .
+When do minimum standards apply?
+Rental properties must meet the minimum standards before they are advertised.
+For existing rental agreements, the minimum standards, detailed in Schedule 4 of the Residential Tenancies Regulations 2021 , apply if your agreement started:
+on or after 29 March 2021, or
+before 29 March 2021 and became a periodic agreement (month to month) on or after 29 March 2021.
+When do minimum standards not apply?
+They don't apply if your rental agreement became a periodic agreement (month to month) before 29 March 2021.
+Record keeping for minimum standards
+Rental providers and their agents must keep records showing that the property met the minimum rental standards before the property was advertised or offered for rent.
+Rental providers must also keep records showing that the property met the minimum rental standards before the renter moved in.
+Consumer Affairs Victoria can ask rental providers and agents to show us these records.
+Renters' rights when the property does not meet minimum standards
+Find out about your rights as a renter if the property does not meet minimum standards , including where the rental provider fails to repair the property.
+Minimum standards checklists for rental providers and renters
+Rental providers
+Learn more about the minimum standards and use our checklist before you move a renter into your rental property.
+Download: Rental minimum standards checklist for rental providers (PDF, 160 KB)
+Renters
+Learn more about the minimum standards and use our checklist before you move into a new rental property.
+Download: Rental minimum standards checklist for renters (PDF, 152 KB)
+Read the renting minimum standards
+New minimum rental standards for energy efficiency will come into effect from 1 March 2027. Read about what the new standards will mean for you.
+Bathrooms
+A rental property’s bathroom must have a washbasin and a shower or bath and be connected to a reasonable supply of hot and cold water.
+Showers must have a shower head with a 3-star water efficiency rating. If one cannot be installed, for example because of the property’s age, then a shower head with a 1- or 2-star rating is acceptable.
+Electrical safety
+The electrical safety rental minimum standard commenced on 29 March 2023.
+Rental properties must have modern switchboards, with circuit breakers and electrical safety switches installed. Electrical safety switches are known as residual current devices (RCD, RCCB or RCBO).
+Rental providers are responsible for engaging an electrician to ensure their rental property complies with the electrical safety standard.
+If your rented premises has a circuit breaker type switchboard
+The rented premises can meet the minimum standard if the electrician adds circuit breaker components to the power outlets and lighting circuits, without the need to add to or modify the circuit protection to other circuits (such as fixed cooking equipment, hot water units or air-conditioning circuits).
+The circuit breaker components include:
+an overcurrent circuit breaker and a residual current device (RCDs), or
+an overcurrent circuit breaker and a residual current operated circuit-breakers without integral overcurrent protection (RCCBs), or
+a residual current operated circuit-breaker with integral overcurrent protection (RCBOs).
+If your rented premises does not have a circuit breaker type switchboard
+Some properties do not have circuit breaker type switchboards, such as older properties that have a panel and fuse board or a federal fuse board.
+With these older fuse boards, an electrician may not have the option of adding circuit breaker components (such as RCDs, RCCBs or RCBOs) and may have to replace the entire switchboard to ensure the rented premises meets the electrical safety standard. In this case, there must be circuit breaker components for all the circuits at the switchboard, including fixed cooking equipment, hot water units and air-conditioning circuits.
+Heating
+All rental properties must have a fixed heater (not portable) in good working order in the main living area.
+For rental agreements entered into from 29 March 2023, this must be an energy efficient fixed heater in the main living area. If there is an existing fixed heater that is not energy efficient, the rental provider must upgrade it.
+An energy efficient fixed heater must be one of the following:
+a non-ducted air conditioner or heat pump with a 2 star or above energy rating
+a gas space heater with a 2 star or above energy rating
+a ducted heating or hydronic heating system with an outlet in the main living area
+a domestic solid fuel burning appliance, such as a fireplace or wood burning stove.
+Apartments
+In some apartment blocks it may not be practical to install an energy efficient heater - because of owner’s corporation rules, or costs, for example.
+It may be unreasonable to install an energy efficient heater if:
+the cost of installation would be significantly higher than the average cost in a domestic apartment building
+owners corporation rules prohibit it
+compliance with any other Act or local law makes the installation cost prohibitive.
+If this is the case, the rental provider must still install a fixed heater in the main living area.
+If a rental provider considers that it would be unreasonable to install an energy efficient fixed heater, they should:
+have evidence to show that it is unreasonable, and
+let the renter know before they enter into a rental agreement.
+You can download our guide for more information: Minimum rental standards for heating - Residential Tenancies Regulations 2021 .
+Kitchen
+The property must have a kitchen with:
+a dedicated cooking and food preparation area
+a sink in good working order connected to a reasonable supply of hot and cold water
+a stovetop in good working order that has two or more burners.
+If there is an oven, it needs to be in good working order.
+These requirements do not apply if the property is listed in the heritage register at Heritage Council Victoria and has an approved exemption from the standard.
+Laundry
+If there is a laundry on the property, it must be connected to a reasonable supply of hot and cold water.
+Lighting
+Inside rooms, corridors and hallways must have access to light to make the areas functional. During the day, natural light can include light borrowed from an adjoining room. At night, renters should have access to artificial light.
+These requirements do not apply if the property is registered under the Heritage Act 2017 and has an approved exemption from the standard.
+Locks
+The property’s external entry doors must have functioning deadlocks (a ‘deadlock’ is defined as a deadlatch with at least one cylinder) or be fitted with locks that can be unlocked with a key from the outside but can be unlocked without one from the inside.
+The only cases where a deadlock doesn’t have to be fitted to a door are when:
+a door cannot be secured with a deadlock - for example, because of its position
+it is a screen door in the same door frame as an external door
+a different type of lock or device is required under another Act or law
+the door is not accessible because there is another type of security barrier. For example, a locked door to an apartment building, or a locked gate
+the property is registered under the Heritage Act 2017 and has an approved exemption from the standard.
+Read more about locks and security .
+Mould and damp
+All rooms must be free from mould and damp caused by or related to the building structure.
+Structural soundness
+The property must be structurally sound and weatherproof.
+Toilets
+The property’s toilet must be in good working order and connected to either:
+pipes that carry the sewage to a treatment plant (a reticulated sewerage system)
+a wastewater treatment system permitted under the Code of practice – Onsite wastewater management at EPA Victoria
+any other system approved by the local council .
+The toilet must be in a separate room in the property, either by itself, or in an appropriate room like a bathroom or in a combined bathroom-laundry.
+Ventilation
+Rental properties must have adequate ventilation in all habitable rooms including the bathroom, shower, toilet and laundry.
+The property must meet the appropriate ventilation requirements of the Building Code of Australia, which are different for different kinds of properties. You can search resources in the Australian Building Codes Board resources library .
+Vermin proof bins
+Rental providers must supply a rubbish bin and a recycling bin for the renter to use.
+The bins can be provided by the local council or purchased elsewhere, as long as they are vermin (for example, rats and mice) proof and meet council collection standards.
+Windows
+All external windows in the rented premises which are capable of opening must have a functioning latch to secure the windows against external entry.
+Openable windows must also be able to be left in the open or closed position.
+Window coverings
+Windows in rooms likely to be used as bedrooms or living areas must be fitted with curtains or blinds that can be closed, block light and provide privacy.
+Window covering anchors
+From 1 December 2025, all corded internal window coverings, such as blinds and curtains, must have an anchor installed to secure the cords and prevent them forming loops.
+You can order a free kit from us or buy one from a hardware store.
+Regulations
+If you want to know what the law says about minimum standards for rental properties , read:
+Residential Tenancies Regulations 2021 Schedule 4 – Rental minimum standards
+For further detail on the window covering anchors requirements, read:
+Residential Tenancies Amendment (Housing Statement Reform and Part 4A Site Agreements) Regulations
+Sections of the Act
+If you want to know what the law says about minimum standards for rental properties, you can read these sections of the Residential Tenancies Act 1997 :
+Section 65A – Occupation of rented premises that do not comply with rental minimum standards
+Section 65B – Advertisement of premises for rent that do not comply with rental minimum standards
+Section 65C - Records in relation to compliance with rental minimum standards for rented premises
+Section 65D - Residential rental provider must produce relevant records at Director's request
+Section 65E - Records in relation to compliance with rental minimum standards for premises advertised for rent
+Section 65F Residential rental provider or provider's agent must produce relevant records at Director's request
+Section 68C - Residential rental provider must conduct pre-draughtproofing gas check
+Section 72 – Urgent repairs
+Section 77 – Payment of rent into Rent Special Account
+Related links
+Know the Funda-rentals
+Repairs in rental properties
+Report an issue with an advertised rental property
+New minimum energy efficiency and safety standards for rental properties and rooming houses
+Gas electrical and water safety standards
+Other languages
+Last updated: 14 October 2026
+Feedback
+Was this page helpful?
+Yes
+No
+Why? (optional). If you require a response, use our General enquiry online form .
+Why not? (optional). If you require a response, use our General enquiry online form .
+Please ensure that this field is always blank.
