@@ -102,6 +102,15 @@ in `docs/kb/news/` as the shape to copy.
      session with Son, and leave the doc unchanged.
    - could not verify: the source is down, moved, or no longer states the figure. Leave
      the doc unchanged and give the reason.
+   A source marked `browser_only:` is the exception to opening each URL: its host
+   answers scripts with a bot challenge (its `browser_only:` line says which, and when
+   that was measured), so it is not fetched — never try to get past the challenge, and
+   never swap in a secondary page. It counts as checked when its `quotes:` are found in
+   its saved copy (`python3 tests/kb_quote_check.py <doc>`); the doc's other sources
+   decide the doc as above. Never bump a browser-only source's `retrieved:` and never
+   edit its saved copy: only a copy Son re-saves in a browser moves them. Its age is the
+   saved copy's own `Retrieved:` header; `tests/kb_freshness.py` lists the doc under
+   RE-SAVE IN A BROWSER once that copy is older than the doc's budget (step 6).
 
 3. News. Write a news note for each "changed" doc from step 2 that a Vietnamese buyer of
    Australian property would care about (a new edition with new figures counts). Other
@@ -153,9 +162,12 @@ in `docs/kb/news/` as the shape to copy.
    check failed.
 
 6. Son's issue. If step 2 found any doc you could not verify or any kind-2/3 change,
+   or step 1's `kb_freshness.py` printed a RE-SAVE IN A BROWSER section,
    open one GitHub issue in s27183/ancu with gh (or your GitHub tools), assigned to `s27183`,
    titled `kb-watch <yyyy-mm-dd>: needs Son`. It lists one line per item:
-   `<slug> — could not verify: <why> (<url>)` or `<slug> — kind-2/3: <what changed>
-   (<url>)`, and links the PR (or says no PR was opened). If an open issue with that
+   `<slug> — could not verify: <why> (<url>)`, `<slug> — kind-2/3: <what changed>
+   (<url>)` or, for each RE-SAVE line, `<slug> — re-save in a browser: <url> (copy of
+   <date>)` (the runbook's "Browser-only sources" says what happens next), and links
+   the PR (or says no PR was opened). If an open issue with that
    title already exists, add to it instead. If there is no such item, open no issue.
 ---8<---
