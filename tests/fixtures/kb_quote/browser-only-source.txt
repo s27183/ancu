@@ -1,0 +1,6 @@
+Source: https://legislation.nsw.gov.au/view/html/inforce/current/act-1919-006
+Retrieved: 2026-06-02 (fixture for tests/kb_quote_check.py)
+
+66L Power to rescind contract where land substantially damaged
+(a) within 28 days after the purchaser first became
+aware of the damage, or
