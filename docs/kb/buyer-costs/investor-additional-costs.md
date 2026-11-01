@@ -1,14 +1,17 @@
 ---
 slug: kb.buyer-costs.investor-additional-costs
 effective_from: 2024-09-01
-last_verified: 2026-07-06
+last_verified: 2026-11-01
 sources:
   - url: https://www.consumer.vic.gov.au/housing/renting/repairs-alterations-safety-and-pets/minimum-standards/minimum-standards-for-rental-properties
-    retrieved: 2026-07-06
+    retrieved: 2026-11-01
+    path: docs/sources/vic/cav-minimum-standards-rental-properties-2026-11-01.txt
+    quotes:
+      - "There are 15 categories of minimum standards for rental properties."
   - url: https://www.rta.qld.gov.au/during-a-tenancy/minimum-housing-standards
-    retrieved: 2026-07-06
+    retrieved: 2026-11-01
   - url: https://moneysmart.gov.au/property-investment/buying-an-investment-property
-    retrieved: 2026-07-06
+    retrieved: 2026-11-01
 ---
 
 # Buyer-side costs — additional costs specific to investors
@@ -18,7 +21,7 @@ An investor faces the same core acquisition costs as a first home buyer — depo
 ## The investor-only acquisition adders
 
 - **Minimum rental / housing standards compliance (REGULATED — the load-bearing investor-only cost).** A property let to a tenant must meet the state's **minimum rental standards** — a regulated bar an owner-occupier never faces. If the property doesn't already comply, bringing it up to standard is a **one-off acquisition cost** (commonly heating, safety switches/RCDs, smoke alarms, locks, ventilation, mould/damp, hot/cold water). The standards and their commencement vary by state:
-  - **VIC** — 14 rental minimum standards under the *Residential Tenancies Regulations 2021*, applying to agreements signed on/after **29 March 2021** (heating, electrical/gas safety checks, WELS-rated tapware/toilets, etc.).
+  - **VIC** — 15 categories of rental minimum standards under the *Residential Tenancies Regulations 2021*, applying to agreements signed on/after **29 March 2021** (heating, electrical/gas safety checks, WELS-rated tapware/toilets, etc.).
   - **QLD** — **minimum housing standards** under the RTRA framework: new tenancies from **1 Sept 2023**, **all tenancies from 1 Sept 2024**.
   - **NSW** — **7 minimum standards** (fitness for habitation) plus mandatory working **smoke alarms** (landlord-maintained) under the *Residential Tenancies Act 2010* and regulation.
   - Other states have their own equivalents (confirm per state). The cost is **banded** (depends entirely on the property's starting condition) and surfaced as a compliance check, not a fixed figure.
@@ -62,7 +65,7 @@ The resolver rules the artifact compiler extracts as this doc's `content_json` (
     "minimum_rental_standards_by_state": {
       "note": "REGULATED — the state minimum-standards regimes that can trigger an upgrade cost. The standards are regulated; the dollar upgrade cost is banded (depends on the property's starting condition).",
       "entries": [
-        { "state": "VIC", "regime": "14 rental minimum standards", "instrument": "Residential Tenancies Regulations 2021", "applies_from": "2021-03-29", "verification": "regulator-confirmed (Consumer Affairs Victoria / VBA)" },
+        { "state": "VIC", "regime": "15 categories of rental minimum standards", "instrument": "Residential Tenancies Regulations 2021", "applies_from": "2021-03-29", "verification": "regulator-confirmed (Consumer Affairs Victoria / VBA)" },
         { "state": "QLD", "regime": "minimum housing standards", "instrument": "RTRA framework (RTA)", "applies_from": "2023-09-01 new tenancies; 2024-09-01 all tenancies", "verification": "regulator-confirmed (Residential Tenancies Authority)" },
         { "state": "NSW", "regime": "7 minimum standards (fitness for habitation) + mandatory working smoke alarms", "instrument": "Residential Tenancies Act 2010 + Regulation", "applies_from": "ongoing", "verification": "regulator-confirmed (NSW Fair Trading); to_verify — sections not pinpointed" },
         { "state": "SA/WA/TAS/ACT/NT", "regime": "state equivalents apply", "instrument": "per-state residential tenancy law", "applies_from": "to_verify", "verification": "INDICATIVE — to_verify against each state's tenancy authority" }
