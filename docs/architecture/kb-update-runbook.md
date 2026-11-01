@@ -520,6 +520,29 @@ outcome" or "None of these measures are enacted or confirmed." Never present a
 forecast as the platform's own conclusion (the ASIC line), and exclude only
 content with no real connection to a buyer's decision.
 
+#### Browser-only sources — a primary no script reaches (behavior 148)
+
+Some primaries answer every script with a bot challenge — `legislation.nsw.gov.au`
+returns HTTP 403 with `cf-mitigated: challenge` on every path (measured 2026-11-01).
+No script is built to get past it. Such a source is marked `browser_only: "<why,
+when measured>"` in the doc's `sources:` and quoted from a copy Son saves in a browser:
+
+1. Son opens the URL in his browser and saves the page or its PDF under
+   `docs/sources/<area>/` (keep the PDF beside the text).
+2. A session extracts it as text (a PDF with the locked `pypdf`, one `[page n]` marker
+   per page) into a `.txt` whose first lines are `Source: <url>`, `Retrieved: <the date
+   Son saved it>` and `Extracted: <how, the version line the page itself prints, and
+   the PDF's sha256>` — as `docs/sources/nsw/conveyancing-act-1919-no-6.txt` has.
+3. On the source: `path:` the `.txt`, `retrieved:` the same date, `quotes:` the
+   sentences that state each figure, word for word; then run
+   `python3 tests/kb_quote_check.py <doc>`. A quote no longer in the new copy means the
+   law changed: re-read the section and change the doc as for any changed figure.
+
+`tests/kb_quote_check.py` fails a browser-only source with no quotes or with a copy that
+has no `Retrieved:` header; `tests/kb_freshness.py` lists it under RE-SAVE IN A BROWSER
+once that header date is older than the doc's budget, and the kb-watch routine puts
+the line in Son's issue. kb-watch never bumps its `retrieved:` itself.
+
 #### Fee lines — re-checking a hard-to-know fee's band (behaviors 83, 85)
 
 A fee the buyer cannot know until they hire someone or get a quote (conveyancing,

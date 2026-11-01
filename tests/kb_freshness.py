@@ -152,6 +152,96 @@ def parse_frontmatter(path):
     )
 
 
+# Behavior 148 (Son 2026-11-01): a source marked `browser_only:` sits behind a bot challenge
+# no script passes (legislation.nsw.gov.au, measured 2026-11-01), so kb-watch never opens
+# it; its evidence is the copy Son saved in a browser. Its age is the `Retrieved: <date>`
+# header of that saved copy — not the doc's `retrieved:`, which a date-only kb-watch edit
+# could move and so silence this list. Once the copy is older than the doc's budget, the
+# doc is listed under RE-SAVE IN A BROWSER and kb-watch puts it in Son's issue (step 6).
+COPY_RETRIEVED = re.compile(r"(?:^|\s)Retrieved: (\d{4}-\d{2}-\d{2})")
+
+
+def browser_only_sources(text):
+    """(url, path) of each frontmatter source carrying `browser_only:`."""
+    m = re.match(r"---\n(.*?)\n---", text, re.S)
+    out, cur = [], None
+    for line in (m.group(1) if m else "").splitlines():
+        s = re.match(r"^\s*-\s*(url|note):\s*(.+?)\s*$", line)
+        if s and len(line) - len(line.lstrip()) <= 4:
+            cur = {s.group(1): s.group(2).strip('"')}
+            out.append(cur)
+            continue
+        s = re.match(r"^\s+(browser_only|path):\s*(.+?)\s*$", line)
+        if s and cur is not None:
+            cur[s.group(1)] = s.group(2).strip('"')
+    return [(c.get("url", ""), c.get("path", "")) for c in out if c.get("browser_only")]
+
+
+def copy_retrieved(path_str):
+    """The saved copy's own Retrieved: date, or None (missing copy or header)."""
+    f = ROOT / path_str if path_str else None
+    if not f or not f.is_file():
+        return None
+    m = COPY_RETRIEVED.search(f.read_text(errors="ignore")[:400])
+    return m.group(1) if m else None
+
+
+def resaves(text, asof, budget):
+    """(url, copy date or 'none') for each browser-only source whose saved copy is
+    older than `budget` days at `asof`, or has no dated copy at all."""
+    out = []
+    for url, path_str in browser_only_sources(text):
+        d = copy_retrieved(path_str)
+        if d is None or (asof - datetime.date.fromisoformat(d)).days > budget:
+            out.append((url, d or "none"))
+    return out
+
+
+def resave_self_test():
+    """Planted browser-only fixtures at a fixed date, against an oracle that reads the
+    copy's header with plain string splitting."""
+    asof = datetime.date(2026, 11, 1)
+    planted = {"browser-only-fresh.md": False, "browser-only-old.md": True,
+               "browser-only-no-copy.md": True}
+    bad = []
+
+    def oracle(text):
+        parts = text.split("---")
+        fm = parts[1] if len(parts) > 2 else ""
+        blocks = fm.split("- url:")[1:]
+        for b in blocks:
+            if "browser_only:" not in b:
+                continue
+            path = [l.split("path:", 1)[1].strip() for l in b.split("\n") if l.strip().startswith("path:")]
+            f = ROOT / path[0] if path else None
+            if not f or not f.is_file():
+                return True
+            head = [l for l in f.read_text().split("\n")[:5] if l.startswith("Retrieved: ")]
+            if not head:
+                return True
+            y, mo, d = head[0].split()[1].split("-")
+            if (asof - datetime.date(int(y), int(mo), int(d))).days > 92:
+                return True
+        return False
+
+    for name, want in planted.items():
+        text = (FIXTURES / name).read_text()
+        got = bool(resaves(text, asof, 92))
+        if oracle(text) != want:
+            bad.append(f"{name}: the oracle reads it as {oracle(text)}, planted as {want}")
+        if got != want:
+            bad.append(f"{name}: listed for re-save={got}, expected {want}")
+    for p in sorted(KB_DIR.rglob("*.md")):
+        if NEWS_DIR in p.parents:
+            continue
+        text = p.read_text()
+        slug, *_ = parse_frontmatter(p)
+        got = bool(resaves(text, asof, BUDGET_DAYS[cadence_for(slug or "")]))
+        if BUDGET_DAYS[cadence_for(slug or "")] == 92 and got != oracle(text):
+            bad.append(f"{p.relative_to(ROOT)}: listed for re-save={got}, oracle {oracle(text)}")
+    return len(planted), bad
+
+
 def self_test():
     """Every doc and each planted fixture: listed exactly when an independent
     reading says it has no url source, no REGULATED line and no figure."""
@@ -183,7 +273,9 @@ def self_test():
             bad.append(f"{p.name}: the oracle reads it as {oracle(text)}, planted as {want}")
         if got != want:
             bad.append(f"{p.relative_to(ROOT)}: listed={got}, expected {want}")
-    print(f"kb_freshness self-test: {len(paths)} cases, {len(bad)} counterexamples")
+    n_resave, bad_resave = resave_self_test()
+    bad += bad_resave
+    print(f"kb_freshness self-test: {len(paths) + n_resave} cases, {len(bad)} counterexamples")
     for b in bad:
         print(f"  ✗ {b}")
     return 1 if bad else 0
@@ -209,6 +301,7 @@ def main():
     errors = []    # docs missing slug / last_verified — a real problem
     due = []       # (slug, next_edition, next_edition_at) — a new edition is due
     quiet = []     # slugs with nothing a primary could confirm (behavior 147)
+    resave = []    # (slug, url, copy date) — a browser-only copy past budget (behavior 148)
 
     for path in sorted(KB_DIR.rglob("*.md")):
         if NEWS_DIR in path.parents:
@@ -240,6 +333,7 @@ def main():
             due.append((slug, next_edition, next_at or ""))
         cadence = cadence_for(slug)
         budget = BUDGET_DAYS[cadence]
+        resave += [(slug, url, d) for url, d in resaves(path.read_text(), asof, budget)]
         age = (asof - lv).days
         status = "STALE" if age > budget else "ok"
         rows.append((slug, cadence, last_verified, age, budget, status))
@@ -271,6 +365,12 @@ def main():
         print()
     else:
         print("All scanned docs are within their re-verification budget.\n")
+
+    if resave:
+        print(f"RE-SAVE IN A BROWSER ({len(resave)}): a browser-only source's saved copy is past the doc's budget")
+        for slug, url, d in resave:
+            print(f"  {slug:<34} {url}  (copy of {d})")
+        print()
 
     if quiet:
         print(f"NOTHING TO RE-VERIFY ({len(quiet)}): no url source, no REGULATED line, no figure")
