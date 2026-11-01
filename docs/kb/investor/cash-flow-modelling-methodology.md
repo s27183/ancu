@@ -1,12 +1,12 @@
 ---
 slug: kb.investor.cash-flow-modelling-methodology
 effective_from: 2025-07-01
-last_verified: 2026-07-06
+last_verified: 2026-11-01
 sources:
   - url: https://moneysmart.gov.au/property-investment/buying-an-investment-property
-    retrieved: 2026-07-06
+    retrieved: 2026-11-01
   - url: https://www.ato.gov.au/individuals-and-families/investments-and-assets/property-and-land/residential-rental-properties
-    retrieved: 2026-07-06
+    retrieved: 2026-11-01
 ---
 
 # Cash-flow modelling — methodology
