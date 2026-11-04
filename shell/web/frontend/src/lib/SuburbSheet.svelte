@@ -13,7 +13,7 @@
     import { lang } from '$lib/stores/lang';
     import { sheetMotion, scrimMotion } from '$lib/sheetMotion';
     import ListingSheet from '$lib/ListingSheet.svelte';
-    import { plainSuburbName } from '$lib/listingLinks';
+    import { listingLinks, plainSuburbName } from '$lib/listingLinks';
 
     let {
         suburb,
@@ -135,9 +135,11 @@
                 {/if}
             </div>
         </div>
+        {#if listingLinks(suburb.name, suburb.state, f.postcode).length}
         <button type="button" class="listing-open" onclick={() => (listingOpen = true)}
             >{$t('listing.button').replace('{name}', plainSuburbName(suburb.name))} →</button
         >
+        {/if}
     </div>
     {#if listingOpen}
         <ListingSheet {suburb} onClose={() => (listingOpen = false)} />

@@ -36,6 +36,9 @@ const SITE_NAMES: Record<ListingSite, string> = {
 
 const STATES = new Set(['NSW', 'VIC', 'QLD', 'SA', 'WA', 'TAS', 'NT', 'ACT']);
 
+/** ABS's per-state placeholder areas (SAL x9494, x9797): no place, so no listings to link. */
+const PLACEHOLDER = /^(no usual address|migratory - offshore - shipping)\b/i;
+
 /** "Box Hill (Vic.)" → "Box Hill": ABS's disambiguating qualifier, which the sites do not use.
  *  Every parenthesised group goes, wherever it sits, so none can reach a link. */
 export function plainSuburbName(name: string): string {
@@ -60,6 +63,7 @@ function reaSegment(name: string): string {
 /** The links for one suburb, REA first; [] when nothing safe can be built. */
 export function listingLinks(name: string, state: string, postcode?: string | null): ListingLink[] {
     const plain = plainSuburbName(name);
+    if (PLACEHOLDER.test(plain)) return [];
     const st = String(state ?? '').toUpperCase();
     if (!STATES.has(st)) return [];
     const nameSlug = slug(plain);

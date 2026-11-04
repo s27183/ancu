@@ -66,10 +66,12 @@ test('every suburb in the snapshot builds only safe, well-formed links', () => {
         if (p.length) bad.push(`${s.name} ${s.state}: ${p.join('; ')}`);
         const n = listingLinks(s.name, s.state, pc).length;
         if (pc && n === 3) three++;
-        if (n === 0) bad.push(`${s.name} ${s.state}: no link at all`);
+        const placeholder = /^(No usual address|Migratory - Offshore - Shipping) \(/.test(s.name);
+        if (placeholder ? n !== 0 : n === 0) bad.push(`${s.name} ${s.state}: ${n} links`);
     }
     assert.deepEqual(bad.slice(0, 20), []);
     assert.equal(three, withPc, 'every suburb with a postcode gets all three links');
+    assert.equal(snapshot.filter((s) => /^(No usual address|Migratory - Offshore - Shipping) \(/.test(s.name)).length, 16);
 });
 
 test('200 hostile names, seed 150: no link leaves the three hosts or their patterns', () => {
