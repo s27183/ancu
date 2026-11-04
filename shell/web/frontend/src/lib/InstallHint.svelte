@@ -7,10 +7,14 @@
     // video's error, and the player is dropped, so the sheet never shows a broken player.
     // The clip is cropped to 540×1000, above the phone's dock, so no frame shows the apps
     // pinned on Son's own phone (behavior 156); the player sizes it by width alone.
+    // Where the browser offers an install (Chrome, Edge: caught in app.html as
+    // window.__ancuInstall), the sheet puts a one-tap Install button above the steps; the
+    // tap opens the browser's own dialog. Install says so in the sheet and drops the pill;
+    // Cancel drops the button, as each offer opens one dialog (behavior 157).
     import { onMount } from 'svelte';
     import { t } from '$lib/i18n';
     import Modal from '$lib/Modal.svelte';
-    import { browserHintEnv, installSteps, type InstallSteps } from '$lib/installHint';
+    import { browserHintEnv, installSteps, showInstallButton, type InstallSteps, type OfferState } from '$lib/installHint';
 
     const VIDEO = '/install/add-to-home.mp4';
 
@@ -18,10 +22,45 @@
     let open = $state(false);
     let videoOk = $state(true);
     let videoReady = $state(false);
+    let offerState = $state<OfferState>('none');
+    let installed = $state(false);
+
+    interface InstallOffer extends Event {
+        prompt(): Promise<void>;
+        userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+    }
+    type Held = { offer: InstallOffer | null; installed: boolean };
+    const held = (): Held | undefined => (window as Window & { __ancuInstall?: Held }).__ancuInstall;
+
+    function readOffer() {
+        const h = held();
+        if (h?.installed) installed = true;
+        offerState = h?.offer ? 'held' : offerState === 'held' ? 'used' : offerState;
+    }
 
     onMount(() => {
         steps = installSteps(browserHintEnv());
+        readOffer();
+        window.addEventListener('ancu-install', readOffer);
+        return () => window.removeEventListener('ancu-install', readOffer);
     });
+
+    async function install() {
+        const h = held();
+        const offer = h?.offer;
+        if (!h || !offer) return;
+        h.offer = null;
+        offerState = 'used';
+        try {
+            await offer.prompt();
+        } catch {
+            // The browser refused to open the dialog (no tap reached it): keep the offer.
+            h.offer = offer;
+            offerState = 'held';
+            return;
+        }
+        if ((await offer.userChoice).outcome === 'accepted') installed = true;
+    }
 
     function show() {
         videoOk = true;
@@ -30,7 +69,7 @@
     }
 </script>
 
-{#if steps}
+{#if steps && !installed}
     <button type="button" class="home-pill install-pill" onclick={show} aria-haspopup="dialog">
         <span class="install-pill-ico" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
@@ -39,9 +78,16 @@
         </span>
         <span>{$t('installhint.pill')}</span>
     </button>
-    {#if open}
-        <Modal title={$t('installhint.label')} onClose={() => (open = false)}>
-            <div class="install-sheet">
+{/if}
+{#if steps && open}
+    <Modal title={$t('installhint.label')} onClose={() => (open = false)}>
+        <div class="install-sheet">
+            {#if installed}
+                <p class="install-done" role="status">{$t('installhint.installed')}</p>
+            {:else}
+                {#if showInstallButton(steps, offerState)}
+                    <button type="button" class="btn btn-primary install-now" onclick={install}>{$t('installhint.install')}</button>
+                {/if}
                 <ol class="install-steps">
                     {#if steps.inApp}
                         <li>{$t(steps.platform === 'ios' ? 'installhint.inapp.ios' : 'installhint.inapp.android')}</li>
@@ -68,7 +114,7 @@
                         onerror={() => (videoOk = false)}
                     ></video>
                 {/if}
-            </div>
-        </Modal>
-    {/if}
+            {/if}
+        </div>
+    </Modal>
 {/if}

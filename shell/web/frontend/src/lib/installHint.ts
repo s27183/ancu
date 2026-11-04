@@ -46,6 +46,18 @@ export function installSteps(env: HintEnv): InstallSteps | null {
     return { platform, inApp: platform !== 'desktop' && IN_APP.test(ua) };
 }
 
+// Behavior 157: the one-tap Install button.
+// Invariant: the button shows exactly when the browser's install offer is held (caught in
+//            app.html), the page is not the installed app and not an in-app browser; each
+//            offer opens one dialog, so once used (Install or Cancel) the button goes until
+//            the browser makes a new offer. Every other case keeps the steps as behavior 153
+//            set them.
+export type OfferState = 'held' | 'used' | 'none';
+
+export function showInstallButton(steps: InstallSteps | null, offer: OfferState): boolean {
+    return offer === 'held' && steps !== null && !steps.inApp;
+}
+
 /** The page's own environment; any signal that throws reads as false. */
 export function browserHintEnv(): HintEnv {
     let displayStandalone = false;
