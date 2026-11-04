@@ -3939,6 +3939,19 @@ main {
     color: var(--ink-2);
     font-size: var(--fs-sm);
 }
+/* The sheet's clip picker (behavior 158): the language toggle's track and thumb, its two
+   segments equal so the half-width thumb sits under either. */
+.clip-pick {
+    align-self: center;
+}
+.clip-pick button {
+    min-width: 5.5rem;
+    font-size: var(--fs-sm);
+    padding-block: 0.35rem;
+}
+.clip-pick[data-active='android'] .lang-thumb {
+    transform: translateX(100%);
+}
 /* --ar is the clip's own width / height (installHint.ts): the box is as wide as the clip
    shows at up to 60vh tall, so a tall Android clip has no bars beside it (behavior 158). */
 .install-video {

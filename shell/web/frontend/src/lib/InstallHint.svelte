@@ -2,13 +2,14 @@
     // Bilingual -> the bilingual plan reaches the phone it is read on -> the web frontend ->
     // the Add to Home Screen pill and its sheet (behavior 153; the rule and its block:
     // installHint.ts). The pill sits at the right of the home's top row, opposite the
-    // Introduction pill; its sheet gives this device's steps and, once Son publishes it,
-    // the clip installVideo names for this device (muted, inline, looping, with controls;
-    // iPhone or Android, none on a computer: behavior 158). A missing file fires the
-    // video's error, and the player is dropped, so the sheet never shows a broken player.
-    // The iPhone clip is cropped to 540×1000, above the phone's dock, so no frame shows the
-    // apps pinned on Son's own phone (behavior 156); the player takes each clip's own aspect
-    // (--ar), its height capped at 60vh, so a tall clip has no bars beside it.
+    // Introduction pill; its sheet gives this device's steps and a clip of the install
+    // (muted, inline, looping, with controls). Two pills, iPhone and Android, pick the clip;
+    // the sheet opens on the one installClip names for this device: Android on an Android
+    // phone, iPhone otherwise (behavior 158). A clip whose file fails fires the video's
+    // error: its player is dropped and the pills stay, so the sheet never shows a broken
+    // player. The iPhone clip is cropped to 540×1000, above the phone's dock, so no frame
+    // shows the apps pinned on Son's own phone (behavior 156); the player takes each clip's
+    // own aspect (--ar), its height capped at 60vh, so a tall clip has no bars beside it.
     // Where the browser offers an install (Chrome, Edge: caught in app.html as
     // window.__ancuInstall), the sheet puts a one-tap Install button above the steps; the
     // tap opens the browser's own dialog. Install says so in the sheet and drops the pill;
@@ -18,12 +19,17 @@
     import { onMount } from 'svelte';
     import { t } from '$lib/i18n';
     import Modal from '$lib/Modal.svelte';
-    import { browserHintEnv, installSteps, installVideo, showInstallButton, type InstallSteps, type OfferState } from '$lib/installHint';
+    import { browserHintEnv, INSTALL_VIDEOS, installClip, installSteps, showInstallButton, type InstallClip, type InstallSteps, type OfferState } from '$lib/installHint';
 
     let steps = $state<InstallSteps | null>(null);
-    const video = $derived(installVideo(steps));
+    let clip = $state<InstallClip>('ios');
+    const video = $derived(INSTALL_VIDEOS[clip]);
+    const CLIPS: [InstallClip, string][] = [
+        ['ios', 'iPhone'],
+        ['android', 'Android']
+    ];
     let open = $state(false);
-    let videoOk = $state(true);
+    let failed = $state<Record<InstallClip, boolean>>({ ios: false, android: false });
     let videoReady = $state(false);
     let offerState = $state<OfferState>('none');
     let installed = $state(false);
@@ -69,9 +75,16 @@
     }
 
     function show() {
-        videoOk = true;
+        clip = installClip(steps) ?? 'ios';
+        failed = { ios: false, android: false };
         videoReady = false;
         open = true;
+    }
+
+    function pick(c: InstallClip) {
+        if (c === clip) return;
+        videoReady = false;
+        clip = c;
     }
 </script>
 
@@ -103,7 +116,13 @@
                     {/each}
                 </ol>
                 <p class="install-after">{$t('installhint.after')}</p>
-                {#if video && videoOk}
+                <div class="lang clip-pick" data-active={clip} role="group" aria-label={$t('installhint.video')}>
+                    <span class="lang-thumb" aria-hidden="true"></span>
+                    {#each CLIPS as [c, name] (c)}
+                        <button type="button" class:active={clip === c} aria-pressed={clip === c} onclick={() => pick(c)}>{name}</button>
+                    {/each}
+                </div>
+                {#if !failed[clip]}
                     <!-- svelte-ignore a11y_media_has_caption -->
                     <video
                         class="install-video"
@@ -120,7 +139,7 @@
                         preload="metadata"
                         aria-label={$t('installhint.video')}
                         onloadeddata={() => (videoReady = true)}
-                        onerror={() => (videoOk = false)}
+                        onerror={() => (failed[clip] = true)}
                     ></video>
                 {/if}
             {/if}

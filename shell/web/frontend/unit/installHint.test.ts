@@ -4,7 +4,7 @@
 // in a browser first. Run over every agent × standalone signal, and seeded hostile agents.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { ANDROID_VIDEO, IOS_VIDEO, installSteps, installVideo, showInstallButton, type InstallPlatform, type OfferState } from '../src/lib/installHint.ts';
+import { ANDROID_VIDEO, INSTALL_VIDEOS, IOS_VIDEO, installClip, installSteps, installVideo, showInstallButton, type InstallPlatform, type OfferState } from '../src/lib/installHint.ts';
 
 const SEED = 153;
 function mulberry32(a: number) {
@@ -103,10 +103,11 @@ test('2,000 hostile cases, seed 157: the button exactly when held, not standalon
     assert.deepEqual(bad, []);
 });
 
-// Behavior 158: each phone its own clip; none on a computer, none in the installed app.
-const WANT_VIDEO = { ios: IOS_VIDEO, android: ANDROID_VIDEO, desktop: null };
+// Behavior 158: the sheet opens on the visitor's own phone's clip: Android on android, the
+// iPhone clip on an iPhone, an iPad or a computer; none in the installed app.
+const WANT_VIDEO = { ios: IOS_VIDEO, android: ANDROID_VIDEO, desktop: IOS_VIDEO };
 
-test('every agent × standalone signal: the iPhone clip on ios, the Android clip on android, none on desktop or in the app', () => {
+test('every agent × standalone signal: the Android clip on android, the iPhone clip otherwise, none in the app', () => {
     for (const a of AGENTS)
         for (const ns of [false, true])
             for (const ds of [false, true]) {
@@ -114,6 +115,7 @@ test('every agent × standalone signal: the iPhone clip on ios, the Android clip
                 assert.equal(got, ns || ds ? null : WANT_VIDEO[a.platform], `${a.name} ns=${ns} ds=${ds}`);
             }
     assert.equal(installVideo(null), null);
+    assert.deepEqual(INSTALL_VIDEOS, { ios: IOS_VIDEO, android: ANDROID_VIDEO });
 });
 
 test('2,000 hostile cases, seed 158: the clip follows the platform exactly; never throws', () => {
@@ -133,6 +135,8 @@ test('2,000 hostile cases, seed 158: the clip follows the platform exactly; neve
             const want = steps === null ? null : WANT_VIDEO[steps.platform];
             if (got !== want) bad.push(`${i}: ${JSON.stringify(steps)} -> ${got?.src}`);
             if ((ns || ds) && got) bad.push(`${i}: clip in the installed app`);
+            if (steps && (got === ANDROID_VIDEO) !== (steps.platform === 'android')) bad.push(`${i}: Android clip off android`);
+            if (installClip(steps) !== (steps ? (steps.platform === 'android' ? 'android' : 'ios') : null)) bad.push(`${i}: clip key`);
         } catch (e) {
             bad.push(`${i}: threw ${e}`);
         }

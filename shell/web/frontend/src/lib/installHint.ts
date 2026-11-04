@@ -58,13 +58,15 @@ export function showInstallButton(steps: InstallSteps | null, offer: OfferState)
     return offer === 'held' && steps !== null && !steps.inApp;
 }
 
-// Behavior 158: the sheet's clip is the visitor's own phone's.
-// Invariant: an iPhone or iPad (Safari or an in-app browser) gets the iPhone clip, recorded
-//            on Son's iPhone and cropped above its dock (behavior 156); an Android phone gets
-//            the Android clip, recorded uncropped on the Pixel 9 Pro emulator set to
-//            Vietnamese (Son, 2026-11-04: «it's just a simulator»); a computer gets none, since
-//            neither clip shows its steps; the installed app has no sheet. width × height are
-//            each file's own, so the player is sized to the clip with no bars beside it.
+// Behavior 158: two clips, iPhone and Android, behind two pills in the sheet.
+// Invariant: the sheet opens on the visitor's own phone's clip: an Android phone (Chrome or
+//            an in-app browser) gets the Android clip; an iPhone, an iPad or a computer the
+//            iPhone clip (Son, 2026-11-04: both videos in the guide, the pills to switch);
+//            the installed app has no sheet. The iPhone clip was recorded on Son's iPhone and
+//            cropped above its dock (behavior 156); the Android clip on the Pixel 9 Pro
+//            emulator set to Vietnamese, uncropped (Son: «it's just a simulator»).
+//            width × height are each file's own, so the player is sized to the clip with no
+//            bars beside it.
 export interface InstallVideo {
     src: string;
     width: number;
@@ -74,10 +76,18 @@ export interface InstallVideo {
 export const IOS_VIDEO: InstallVideo = { src: '/install/add-to-home.mp4', width: 540, height: 1000 };
 export const ANDROID_VIDEO: InstallVideo = { src: '/install/add-to-home-android.mp4', width: 720, height: 1606 };
 
+export type InstallClip = 'ios' | 'android';
+export const INSTALL_VIDEOS: Record<InstallClip, InstallVideo> = { ios: IOS_VIDEO, android: ANDROID_VIDEO };
+
+/** The clip the sheet opens on; null inside the installed app. */
+export function installClip(steps: InstallSteps | null): InstallClip | null {
+    if (!steps) return null;
+    return steps.platform === 'android' ? 'android' : 'ios';
+}
+
 export function installVideo(steps: InstallSteps | null): InstallVideo | null {
-    if (steps?.platform === 'ios') return IOS_VIDEO;
-    if (steps?.platform === 'android') return ANDROID_VIDEO;
-    return null;
+    const clip = installClip(steps);
+    return clip ? INSTALL_VIDEOS[clip] : null;
 }
 
 /** The page's own environment; any signal that throws reads as false. */
