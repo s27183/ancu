@@ -1619,6 +1619,78 @@ main {
     font-weight: 700;
     letter-spacing: 0.04em;
 }
+/* Honest-partial -> the suburb data the goal names -> the web frontend -> the listings sheet
+   Behavior 150: the button under a suburb's facts and the sheet it opens — our own line
+   that these are other companies' sites, then one row per site, each leaving the app. */
+.listing-open {
+    margin-top: var(--sp-4);
+    width: 100%;
+    padding: var(--sp-3) var(--sp-4);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+    background: var(--accent-soft);
+    color: var(--accent);
+    font: inherit;
+    font-weight: 700;
+    text-align: left;
+    cursor: pointer;
+}
+.listing-open:focus-visible,
+.listing-link:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+.listing {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-3);
+}
+.listing-place {
+    margin: 0;
+    font-weight: 700;
+    color: var(--ink);
+}
+.listing-place .state-chip {
+    margin-left: 0.35rem;
+    padding: 0.1rem 0.5rem;
+    border-radius: var(--radius-pill);
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-size: var(--fs-xs);
+    letter-spacing: 0.04em;
+}
+.listing-note,
+.listing-only {
+    margin: 0;
+    font-size: var(--fs-sm);
+    color: var(--muted);
+}
+.listing-links {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+}
+.listing-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--sp-3);
+    padding: var(--sp-3) var(--sp-4);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--ink);
+    font-weight: 700;
+    text-decoration: none;
+}
+.listing-link:hover {
+    border-color: var(--accent);
+}
+.listing-host {
+    font-size: var(--fs-xs);
+    font-weight: 500;
+    color: var(--muted);
+}
 /* Zone facts as tiles: the Vietnamese-community share leads across the full width,
    the rest sit two-up (one column on a phone). */
 .metrics {
