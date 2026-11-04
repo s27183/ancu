@@ -24,6 +24,14 @@ const messages = {
 
     'map.state.label': { vi: 'Bang', en: 'State' },
     'map.state.all': { vi: 'Tất cả', en: 'All' },
+    // Behavior 154: the state list runs by capital-city population (stateInfo.ts); a chosen
+    // state shows its capital's figures from kb.facts.capital-cities ({…} filled in the page).
+    'map.state.rank': { vi: 'Xếp theo dân số thủ phủ (ABS, 30/6/2025)', en: 'By capital-city population (ABS, 30 Jun 2025)' },
+    'map.state.pop': { vi: 'Thủ phủ {city}: {n} dân (30/6/2025)', en: 'Capital {city}: {n} people (30 Jun 2025)' },
+    'map.state.prices': {
+        vi: 'Giá trung vị: nhà riêng {house} · căn hộ, nhà liền kề {attached} (6/2026)',
+        en: 'Median price: house {house} · apartment or townhouse {attached} (Jun 2026)'
+    },
     // Size filter — the criterion driving each suburb dot's colour + size. The chosen
     // criterion's label doubles as the legend title.
     'map.size.label': { vi: 'Hiển thị theo', en: 'Show by' },

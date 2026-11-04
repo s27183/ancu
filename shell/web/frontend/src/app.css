@@ -1093,6 +1093,21 @@ main {
     flex-direction: column;
     gap: 0.2rem;
 }
+/* Behavior 154: under the state list, the chosen state's capital-city figures (ABS). */
+.map-controls .state-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    margin: 0.15rem 0 0;
+    font-size: var(--fs-xs);
+    line-height: 1.35;
+    color: var(--ink-2);
+    font-variant-numeric: tabular-nums;
+}
+.map-controls .state-info-src {
+    color: var(--muted);
+    font-size: var(--fs-2xs);
+}
 .map-controls label {
     font-size: var(--fs-2xs);
     font-weight: 600;
