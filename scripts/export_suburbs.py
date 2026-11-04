@@ -13,7 +13,8 @@ reproducible -> P-2 -> the suburb snapshot -> export
   ENGINE_DATABASE_URL) cannot fill it; the data they produced on the dev stack ships
   with the engine instead (behavior 37). Every source is CC BY 4.0 with redistribution
   'permitted' (suburb_sources) — the export refuses any source that is not. Re-run after
-  an adapter run to refresh the file; the engine loads it only into an empty table.
+  an adapter run to refresh the file; at boot the engine upserts it whenever its sha256
+  differs from the one it last loaded (fh_engine_suburb_snapshot.erl).
 """
 from __future__ import annotations
 

@@ -35,6 +35,8 @@ export interface SuburbFacts {
     crime_incidents_per_1000?: number;
     crime_incidents_annual?: number;
     crime_period?: string;
+    /** Postal area of the centroid (abs_poa.py); four digits fitting the state, or absent. */
+    postcode?: string;
 }
 
 export interface Suburb {

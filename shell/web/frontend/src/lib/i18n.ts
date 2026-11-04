@@ -89,6 +89,17 @@ const messages = {
         en: 'A reference figure — not a rating of the area.'
     },
     'sheet.nodata': { vi: 'Chưa có dữ liệu', en: 'No data yet' },
+    // behavior 150 (Son 2026-11-04): the homes for sale in a suburb, on the listing sites.
+    'listing.button': { vi: 'Nhà đang bán ở {name}', en: 'Homes for sale in {name}' },
+    'listing.title': { vi: 'Nhà đang bán', en: 'Homes for sale' },
+    'listing.note': {
+        vi: `Đây là trang web của các công ty khác; ${BRAND} không có liên kết gì với họ.`,
+        en: `These are other companies' websites; ${BRAND} has no tie to them.`
+    },
+    'listing.rea_only': {
+        vi: 'Chưa có mã bưu điện của khu vực này, nên chỉ có realestate.com.au.',
+        en: "We don't have this suburb's postcode yet, so only realestate.com.au."
+    },
     'sheet.plan.placeholder': {
         vi: 'Kế hoạch mua nhà cho khu vực này sẽ xuất hiện ở đây.',
         en: 'Your home-buying plan for this suburb will appear here.'

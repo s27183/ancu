@@ -12,6 +12,8 @@
     import { t } from '$lib/i18n';
     import { lang } from '$lib/stores/lang';
     import { sheetMotion, scrimMotion } from '$lib/sheetMotion';
+    import ListingSheet from '$lib/ListingSheet.svelte';
+    import { listingLinks, plainSuburbName } from '$lib/listingLinks';
 
     let {
         suburb,
@@ -32,6 +34,8 @@
 
     const nf = $derived(new Intl.NumberFormat($lang === 'vi' ? 'vi-VN' : 'en-AU'));
     const f = $derived(suburb.facts);
+    // behavior 150: the listings sheet, opened from the button under the facts.
+    let listingOpen = $state(false);
 
     function pct(n: number | undefined): string {
         return typeof n === 'number' ? `${nf.format(n)}%` : '';
@@ -131,5 +135,13 @@
                 {/if}
             </div>
         </div>
+        {#if listingLinks(suburb.name, suburb.state, f.postcode).length}
+        <button type="button" class="listing-open" onclick={() => (listingOpen = true)}
+            >{$t('listing.button').replace('{name}', plainSuburbName(suburb.name))} →</button
+        >
+        {/if}
     </div>
+    {#if listingOpen}
+        <ListingSheet {suburb} onClose={() => (listingOpen = false)} />
+    {/if}
 </div>

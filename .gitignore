@@ -105,3 +105,6 @@ app/build/
 local.properties
 .kotlin/
 /captures/
+
+# behavior 150: abs_poa.py caches its per-suburb postal-area answers here to resume a run
+engine/build/suburbs/data/.poa_cache.json
