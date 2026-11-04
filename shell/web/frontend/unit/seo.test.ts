@@ -120,7 +120,9 @@ test('index pages, robots, sitemap and llms.txt', () => {
     assert.match(r, /Allow: \/\nDisallow: \/plan\nDisallow: \/status\nDisallow: \/api\/\n/);
     assert.match(r, /Sitemap: https:\/\/maiancu.com\/sitemap.xml/);
     const sm = sitemap(news, facts);
-    assert.equal([...sm.matchAll(/<loc>/g)].length, 3 + news.length);
+    // behavior 151: /, /news, /facts, /market, then one per note
+    assert.equal([...sm.matchAll(/<loc>/g)].length, 4 + news.length);
+    assert.match(sm, /<loc>https:\/\/maiancu.com\/market<\/loc>/);
     assert.match(sm, /<loc>https:\/\/maiancu.com\/news\/a<\/loc><lastmod>2026-10-20<\/lastmod>/);
     const l = llms(news, facts);
     assert.match(l, /^# Mai An Cư\n\n> /);

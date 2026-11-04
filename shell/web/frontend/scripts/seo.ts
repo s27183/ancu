@@ -18,6 +18,10 @@
 import { escapeHtml, renderMarkdown, renderInlineMarkdown } from '../src/lib/markdown.ts';
 import type { NewsNote } from '../src/lib/api.ts';
 import type { FactDoc } from '../src/lib/facts.ts';
+import { isMarketDoc } from '../src/lib/facts.ts';
+
+/** Behavior 151: the page a fact doc is drawn on — /market for MARKET_DOCS, /facts for every other. */
+export const factPath = (slug: string): '/market' | '/facts' => (isMarketDoc(slug) ? '/market' : '/facts');
 
 export const ORIGIN = 'https://maiancu.com';
 export const BRAND = 'Mai An Cư';
@@ -118,7 +122,7 @@ export function render(shell: string, p: Page): string {
         .replace(/<body[^>]*>/, (b) => `${b}\n        <div id="seo-static">${p.body}</div>`);
 }
 
-const nav = `<nav><a href="/">${BRAND}</a> · <a href="/news">Tin tức · News</a> · <a href="/facts">Số liệu · Facts</a> · <a href="/plan">Lập kế hoạch · Plan</a></nav>`;
+const nav = `<nav><a href="/">${BRAND}</a> · <a href="/news">Tin tức · News</a> · <a href="/facts">Số liệu · Facts</a> · <a href="/market">Thị trường nhà · Property market</a> · <a href="/plan">Lập kế hoạch · Plan</a></nav>`;
 
 function sourcesList(urls: string[]): string {
     const u = [...new Set(urls.filter((x) => /^https?:\/\//.test(x)))];
@@ -198,7 +202,7 @@ export function factDataset(d: FactDoc): Record<string, unknown> {
         name: d.title.en,
         alternateName: d.title.vi,
         description: `${d.title.en}, from Australian and Vietnamese government sources: ${d.facts.map((f) => f.headline.en).join('; ')}.`,
-        url: ORIGIN + '/facts',
+        url: ORIGIN + factPath(d.slug),
         inLanguage: ['vi', 'en'],
         isAccessibleForFree: true,
         ...(d.last_verified ? { dateModified: d.last_verified } : {}),
@@ -209,8 +213,8 @@ export function factDataset(d: FactDoc): Record<string, unknown> {
     };
 }
 
-export function factsPage(docs: FactDoc[]): Page {
-    const sections = docs.map((d) => {
+function factSections(docs: FactDoc[]): string[] {
+    return docs.map((d) => {
         const items = d.facts
             .map((f) => {
                 // Every source the fact cites — a rule and its exception, or a figure and
@@ -223,13 +227,39 @@ export function factsPage(docs: FactDoc[]): Page {
             .join('');
         return `<section><h2>${escapeHtml(d.title.vi)} · <span lang="en">${escapeHtml(d.title.en)}</span></h2><ul>${items}</ul></section>`;
     });
+}
+
+/** /facts: every fact doc but the property market's (behavior 151). */
+export function factsPage(all: FactDoc[]): Page {
+    const docs = all.filter((d) => !isMarketDoc(d.slug));
     return {
         path: '/facts',
         title: `Nước Úc qua số liệu · Australia in figures | ${BRAND}`,
         description:
-            'Người Việt ở Úc, nhà đất, cuộc sống, kinh tế và phí visa, từ nguồn chính phủ. Vietnamese in Australia, property, living, the economy and visa fees, from government sources.',
+            'Người Việt ở Úc, cuộc sống, kinh tế và phí visa, từ nguồn chính phủ. Vietnamese in Australia, living, the economy and visa fees, from government sources.',
         ld: [{ '@context': 'https://schema.org', '@type': 'CollectionPage', name: 'Nước Úc qua số liệu · Australia in figures', url: ORIGIN + '/facts', inLanguage: 'vi' }, ...docs.map(factDataset)],
-        body: `${nav}<h1>Nước Úc qua số liệu · <span lang="en">Australia in figures</span></h1>${sections.join('')}`
+        body: `${nav}<h1>Nước Úc qua số liệu · <span lang="en">Australia in figures</span></h1>${factSections(docs).join('')}`
+    };
+}
+
+/** Behavior 151: the listing sites /market names — private companies, no tie (the page's own constants). */
+export const LISTING_SITES = [
+    { name: 'realestate.com.au', href: 'https://www.realestate.com.au/' },
+    { name: 'Domain', href: 'https://www.domain.com.au/' },
+    { name: 'Allhomes', href: 'https://www.allhomes.com.au/' }
+];
+
+/** /market (behavior 151): the property market's fact docs, then the listing sites. */
+export function marketPage(all: FactDoc[]): Page {
+    const docs = all.filter((d) => isMarketDoc(d.slug));
+    const sites = LISTING_SITES.map((l) => `<li><a href="${escapeHtml(l.href)}" rel="noopener noreferrer">${escapeHtml(l.name)}</a></li>`).join('');
+    return {
+        path: '/market',
+        title: `Thị trường nhà ở Úc · Australia's property market | ${BRAND}`,
+        description:
+            "Giá nhà, những bảo đảm khi mua và các trang rao bán chính, từ nguồn chính phủ. Prices, the safeguards when you buy, and the main listing sites, from government sources.",
+        ld: [{ '@context': 'https://schema.org', '@type': 'CollectionPage', name: "Thị trường nhà ở Úc · Australia's property market", url: ORIGIN + '/market', inLanguage: 'vi' }, ...docs.map(factDataset)],
+        body: `${nav}<h1>Thị trường nhà ở Úc · <span lang="en">Australia's property market</span></h1>${factSections(docs).join('')}<section><h2>Các trang rao bán nhà chính · <span lang="en">The main listing sites</span></h2><ul>${sites}</ul><p>Đây là các công ty tư nhân. Mai An Cư không có liên hệ hay thỏa thuận nào với họ. <span lang="en">These are private companies. Mai An Cư has no tie or arrangement with any of them.</span></p></section>`
     };
 }
 
@@ -242,7 +272,7 @@ export function homePage(news: NewsNote[]): Page {
             { '@context': 'https://schema.org', '@type': 'WebSite', name: BRAND, url: ORIGIN + '/', inLanguage: ['vi', 'en'], description: `${TAGLINE_VI}. ${TAGLINE_EN}.` },
             { '@context': 'https://schema.org', ...publisher }
         ],
-        body: `${nav}<h1>${BRAND}</h1><p>${escapeHtml(TAGLINE_VI)}. <span lang="en">${escapeHtml(TAGLINE_EN)}.</span></p><ul><li><a href="/plan">Lập kế hoạch ngân sách · Plan your budget</a>: chi phí khi mua, khi sở hữu và khi bán nhà, theo bang.</li><li><a href="/news">Tin tức · News</a></li><li><a href="/facts">Nước Úc qua số liệu · Australia in figures</a></li></ul><h2>Tin mới · Latest</h2><ul>${news.slice(0, 10).map(noteItem).join('')}</ul>`
+        body: `${nav}<h1>${BRAND}</h1><p>${escapeHtml(TAGLINE_VI)}. <span lang="en">${escapeHtml(TAGLINE_EN)}.</span></p><ul><li><a href="/plan">Lập kế hoạch ngân sách · Plan your budget</a>: chi phí khi mua, khi sở hữu và khi bán nhà, theo bang.</li><li><a href="/news">Tin tức · News</a></li><li><a href="/facts">Nước Úc qua số liệu · Australia in figures</a></li><li><a href="/market">Thị trường nhà ở Úc · Australia's property market</a></li></ul><h2>Tin mới · Latest</h2><ul>${news.slice(0, 10).map(noteItem).join('')}</ul>`
     };
 }
 
@@ -264,11 +294,12 @@ export function robots(): string {
 
 export function sitemap(news: NewsNote[], facts: FactDoc[], guides: [string, KbDoc][] = []): string {
     const newest = news[0]?.authored_date;
-    const factsDate = facts.map((d) => d.last_verified).filter(Boolean).sort().at(-1);
+    const dateOf = (market: boolean) => facts.filter((d) => isMarketDoc(d.slug) === market).map((d) => d.last_verified).filter(Boolean).sort().at(-1);
     const urls: [string, string | undefined][] = [
         ['/', newest],
         ['/news', newest],
-        ['/facts', factsDate],
+        ['/facts', dateOf(false)],
+        ['/market', dateOf(true)],
         ...news.map((n): [string, string | undefined] => [notePath(n), n.authored_date]),
         ...(guides.length ? [['/guide', guides.map(([, d]) => d.last_verified).filter(Boolean).sort().at(-1)] as [string, string | undefined]] : []),
         ...guides.map(([k, d]): [string, string | undefined] => [guidePath(k), d.last_verified])
@@ -306,7 +337,8 @@ export function llms(news: NewsNote[], facts: FactDoc[], guides: [string, KbDoc]
         '',
         '## Facts',
         '',
-        `- [Australia in figures](${ORIGIN}/facts): ${facts.map((d) => d.title.en).join('; ')}`,
+        `- [Australia in figures](${ORIGIN}/facts): ${facts.filter((d) => !isMarketDoc(d.slug)).map((d) => d.title.en).join('; ')}`,
+        `- [Australia's property market](${ORIGIN}/market): ${facts.filter((d) => isMarketDoc(d.slug)).map((d) => d.title.en).join('; ')}; the main listing sites`,
         '',
         '## Optional',
         '',
@@ -535,7 +567,7 @@ ${(p.ld ?? []).map((o) => `<script type="application/ld+json">${jsonLd(o)}</scri
 <style>${STATIC_CSS}</style>
 </head>
 <body>
-<header><nav><a href="/">${BRAND}</a><a href="/guide">Guides</a><a href="/news">News</a><a href="/facts">Facts</a><a href="/plan">Plan your budget</a></nav></header>
+<header><nav><a href="/">${BRAND}</a><a href="/guide">Guides</a><a href="/news">News</a><a href="/facts">Facts</a><a href="/market">Property market</a><a href="/plan">Plan your budget</a></nav></header>
 <main>
 ${p.body}
 </main>
@@ -586,7 +618,7 @@ export function llmsFull(news: NewsNote[], facts: FactDoc[], guides: [string, Kb
         out.push('Sources:', ...urls.map((u) => `- ${u}`), '', '---', '');
     }
     for (const d of facts) {
-        out.push(`# ${d.title.en} · ${d.title.vi}`, '', `Page: ${ORIGIN}/facts${d.last_verified ? ` · last verified ${d.last_verified}` : ''}`, '');
+        out.push(`# ${d.title.en} · ${d.title.vi}`, '', `Page: ${ORIGIN}${factPath(d.slug)}${d.last_verified ? ` · last verified ${d.last_verified}` : ''}`, '');
         for (const f of d.facts) {
             const idx = [...new Set(([] as number[]).concat(f.source, f.note_sources ?? []))];
             const src = [...new Set(idx.map((i) => d.sources[i]?.url).filter((u): u is string => !!u && /^https:\/\//.test(u)))];
