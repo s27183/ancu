@@ -36,6 +36,8 @@
     let videoReady = $state(false);
     let offerState = $state<OfferState>('none');
     let installed = $state(false);
+    // Behavior 159: pulses as the «Giới thiệu» pill does, every page view until tapped.
+    let pulse = $state(true);
     const view = $derived(steps ? sheetView(steps, clip, offerState) : null);
     let declined = false;
 
@@ -79,6 +81,7 @@
     }
 
     function show() {
+        pulse = false;
         clip = installClip(steps) ?? 'ios';
         failed = { ios: false, android: false };
         videoReady = false;
@@ -93,7 +96,7 @@
 </script>
 
 {#if steps && !installed}
-    <button type="button" class="home-pill install-pill" onclick={show} aria-haspopup="dialog">
+    <button type="button" class="home-pill install-pill pill-pulse" class:pulse onclick={show} aria-haspopup="dialog">
         <span class="install-pill-ico" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
                 ><rect x="6" y="2.5" width="12" height="19" rx="2.5" /><line x1="12" y1="8.5" x2="12" y2="14.5" /><line x1="9" y1="11.5" x2="15" y2="11.5" /></svg
