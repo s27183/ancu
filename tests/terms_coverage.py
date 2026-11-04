@@ -31,6 +31,9 @@ NOT_TERMS = {
     "AI", "PDF", "KB",
     # the statistics bureau, named as a source; the regional bloc Vietnam belongs to
     "ABS", "ASEAN",
+    # iOS's own Vietnamese menu label, quoted as the phone shows it: "Thêm vào MH chính"
+    # (behavior 152's install hint)
+    "MH",
     # capitals for emphasis in a sentence
     "NOT", "PLACEHOLDER", "CONVENTION", "PREPAYMENT", "TYPICAL", "NGAY",
 }

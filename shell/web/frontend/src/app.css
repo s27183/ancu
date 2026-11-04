@@ -3710,6 +3710,58 @@ main {
     color: var(--muted);
 }
 
+/* Bilingual -> the bilingual plan reaches the phone it is read on -> the web frontend ->
+   the iPhone's add-to-home-screen hint (behavior 152; rule in installHint.ts). A quiet
+   strip under the cards, in the home's own scroll: it covers nothing and leaves the
+   bottom-right to the Introduction launcher. */
+.install-hint {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    max-width: 64rem;
+    margin: var(--sp-5) auto 0;
+    padding: var(--sp-3) var(--sp-3) var(--sp-3) var(--sp-4);
+    border: 1px dashed var(--accent-line);
+    border-radius: var(--radius-lg);
+    background: var(--accent-soft);
+    color: var(--ink);
+    font-size: var(--fs-sm);
+}
+.install-hint-icon {
+    flex: none;
+    display: grid;
+    place-items: center;
+    color: var(--accent);
+}
+.install-hint-icon svg {
+    width: 1.4rem;
+    height: 1.4rem;
+}
+.install-hint-text {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+.install-hint-close {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 0;
+    border-radius: var(--radius);
+    background: transparent;
+    color: var(--ink-2);
+    cursor: pointer;
+}
+.install-hint-close svg {
+    width: 1.1rem;
+    height: 1.1rem;
+}
+.install-hint-close:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
 /* The way back home: first in the head of the planner and the News page, and first in the
    map's top-left controls row (behavior 88), so it is in the same place on every page —
    and the same pill everywhere, house and word, height and shadow (behavior 115). */
