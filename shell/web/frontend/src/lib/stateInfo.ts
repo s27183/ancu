@@ -8,15 +8,16 @@
 //            quoted from the ABS, GATE 12); none is authored here. A figure shows only from
 //            a finite value > 0 under a known capital's label; anything else leaves that
 //            figure out. The list is always the 8 states: those with a population first,
-//            largest first, then the rest in AU_STATES' order. AU_STATES itself keeps its
+//            largest first, then the rest in the shipped ranking (STATE_ORDER). AU_STATES itself keeps its
 //            order (the plan pages iterate it). Nothing here throws.
 // Capability: pure over getFacts' answer, so unit/stateInfo.test.ts runs it over hostile ones.
 import type { AuState } from './map';
 
-/** AU_STATES' order (map.ts), the fixed order for a state with no population. Repeated here,
- *  typed against map.ts's AuState, because map.ts loads MapLibre and so cannot run under
- *  node --test; the type keeps the two lists to the same 8 states. */
-const STATE_ORDER: readonly AuState[] = ['NSW', 'VIC', 'QLD', 'WA', 'SA', 'TAS', 'ACT', 'NT'];
+/** The fixed order for a state with no population: the capitals' order by population as
+ *  of kb.facts.capital-cities (ACT before TAS), so the list reads the same when /api/facts
+ *  fails. Kept here, typed against map.ts's AuState, because map.ts loads MapLibre and so
+ *  cannot run under node --test; the type keeps it to the same 8 states. */
+const STATE_ORDER: readonly AuState[] = ['NSW', 'VIC', 'QLD', 'WA', 'SA', 'ACT', 'TAS', 'NT'];
 
 /** Each state's capital city, as the ABS names its Greater Capital City Statistical Area
  *  (kb.facts.capital-cities' item labels). Proper names, never translated. */

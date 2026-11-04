@@ -34,10 +34,10 @@ test('the shipped doc: Sydney first, every state with its three figures', () => 
     for (const r of rows) assert.ok(r.population && r.house && r.attached, r.state);
 });
 
-test('no facts: the 8 states in the fixed order, no figures', () => {
+test('no facts: the 8 states in the same order as with them, no figures', () => {
     for (const answer of [[], null, undefined, 'x', [{ slug: 'other' }]]) {
         const rows = stateRows(answer);
-        assert.deepEqual(rows.map((r) => r.state), ['NSW', 'VIC', 'QLD', 'WA', 'SA', 'TAS', 'ACT', 'NT']);
+        assert.deepEqual(rows.map((r) => r.state), ['NSW', 'VIC', 'QLD', 'WA', 'SA', 'ACT', 'TAS', 'NT']);
         assert.ok(rows.every((r) => r.population === null && r.house === null && r.attached === null));
     }
 });
