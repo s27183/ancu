@@ -2,7 +2,9 @@
     // Regulated figures are grounded -> P-6 · Shells reach the engine only through the contract -> The web frontend -> the property market page (/market)
     // Purpose:   behavior 151 (Son 2026-11-04): the home's fifth card, "Thị trường nhà ở Úc" /
     //            "Australia's property market", opens one page of why the market can be
-    //            trusted — the property facts (kb.facts.australian-property, until now on
+    //            trusted — how prices are disclosed (kb.facts.listing-transparency, behavior
+    //            153: first, the question Vietnamese buyers ask most), the property facts
+    //            (kb.facts.australian-property, until now on
     //            /facts), the safeguards when you buy (kb.facts.property-safeguards, each a
     //            sentence its linked government page states), then the main listing sites.
     // Holds:     the fact docs drawn are MARKET_DOCS (facts.ts) and /facts draws every other,

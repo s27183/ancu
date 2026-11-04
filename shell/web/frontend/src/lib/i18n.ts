@@ -1340,8 +1340,8 @@ const messages = {
     // Behavior 151: the home's fifth card and the property market page (/market) it opens.
     'home.market.title': { vi: 'Thị trường nhà ở Úc', en: "Australia's property market" },
     'home.market.body': {
-        vi: 'Giá nhà, những bảo đảm khi mua và các trang rao bán chính.',
-        en: 'Prices, the safeguards when you buy, and the main listing sites.'
+        vi: 'Giá nhà được công khai thế nào, những bảo đảm khi mua và các trang rao bán chính.',
+        en: 'How prices are disclosed, the safeguards when you buy, and the main listing sites.'
     },
     'marketpage.sub': { vi: 'Có nguồn chính phủ', en: 'From government sources' },
     'marketpage.note': {

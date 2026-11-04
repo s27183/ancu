@@ -104,7 +104,7 @@ export const PAGE_ORDER = [
  *  fact docs, in this order, and /facts draws every other — one list, read by both pages,
  *  their static SEO pages, the sitemap and llms.txt (scripts/seo.ts), so a property fact
  *  is never on both and never on neither. */
-export const MARKET_DOCS = ['kb.facts.australian-property', 'kb.facts.property-safeguards'];
+export const MARKET_DOCS = ['kb.facts.listing-transparency', 'kb.facts.australian-property', 'kb.facts.property-safeguards'];
 export const isMarketDoc = (slug: string): boolean => MARKET_DOCS.includes(slug);
 
 /** Behavior 126: each section's short name for the chips on /facts (i18n `facts.chip.<key>`);

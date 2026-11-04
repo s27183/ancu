@@ -1,6 +1,6 @@
 // Regulated figures are grounded -> P-6 -> The web frontend -> the facts fetch and the /facts–/market split, proven on fakes
 // Behavior 151, Expect 7: every way GET /api/facts can fail yields [] and never throws,
-// so /market keeps its listing sites and frame. MARKET_DOCS names the two property docs,
+// so /market keeps its listing sites and frame. MARKET_DOCS names the three property docs (listing transparency first, behavior 153),
 // and each fact doc belongs to exactly one page.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -18,7 +18,7 @@ for (const [name, f] of failures) {
 }
 
 test('MARKET_DOCS are the property docs, and /facts orders none of them', () => {
-    assert.deepEqual(MARKET_DOCS, ['kb.facts.australian-property', 'kb.facts.property-safeguards']);
+    assert.deepEqual(MARKET_DOCS, ['kb.facts.listing-transparency', 'kb.facts.australian-property', 'kb.facts.property-safeguards']);
     for (const s of PAGE_ORDER) assert.equal(isMarketDoc(s), false, s);
     for (const k of KEY_FIGURES) assert.equal(isMarketDoc(k.slug), false, k.key);
 });
