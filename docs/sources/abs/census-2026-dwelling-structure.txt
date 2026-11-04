@@ -1,0 +1,116 @@
+Source: https://www.abs.gov.au/census/guide-census-data/census-dictionary/2026/variables-topic/housing/dwelling-structure-strd
+Retrieved: 2026-11-04
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML a72ca0c58ac2d55df2ee94edc5011fd64f73d197a6a4a9e2e9ddcbe3c0ab2bd4
+
+Dwelling structure (STRD) | Australian Bureau of Statistics
+Search ABS
+APA
+Copy
+Detail
+Cite
+Citation
+Close
+Print
+Print current page
+Print all pages
+Dwelling structure (STRD)
+Latest release
+Census of Population and Housing: Census dictionary
+APA
+Copy
+Detail
+Cite
+Citation
+Close
+Print
+Print current page
+Print all pages
+Reference period
+2026
+Released
+21/07/2026
+Next release Unknown
+Previous releases
+Census of Population and Housing: Census dictionary Reference Period 2021
+Census of Population and Housing: Census Dictionary, 2016 Archive release Reference Period 2016
+View all releases
+Definition
+This variable classifies the structural type of private dwellings and describes the physical form of the dwelling. It assigns each dwelling to a standard category based on its structure, such as a separate house, a semi‑detached dwelling, a flat or apartment, a caravan, or a cabin, as well as other types of structures including houseboats or improvised dwellings.
+Scope
+Private dwellings
+Categories
+Code
+Category
+11
+Separate house
+21
+Semi-detached, row or terrace house, townhouse etc. with one storey
+22
+Semi-detached, row or terrace house, townhouse etc. with two or more storeys
+31
+Flat or apartment in a one or two storey block
+32
+Flat or apartment in a three storey block
+33
+Flat or apartment in a four to eight storey block
+34
+Flat or apartment in a nine or more storey block
+35
+Flat or apartment attached to a house
+91
+Caravan
+92
+Cabin, houseboat
+93
+Improvised home, tent, sleepers out
+94
+House or flat attached to a shop, office, etc.
+&&
+Not stated
+@@
+Not applicable
+Number of categories: 14
+Not applicable (@@) category comprises:
+non-private dwellings
+migratory, offshore and shipping SA1
+See Understanding supplementary codes for more information.
+Category definitions
+Separate house
+Is structurally independent from surrounding dwellings.
+May have a flat attached to it, such as a granny flat or converted garage (the flat is categorised under Flat or apartment - see below).
+The number of storeys of separate houses is not recorded.
+Includes dwellings in manufactured home estates.
+Semi-detached, row or terrace house, townhouse, etc. with one, two or more storeys
+Have their own private grounds.
+No other dwelling above or below them.
+They are attached in some structural way to one or more neighbouring dwellings.
+Flat or apartment
+Dwellings in blocks of flats or apartments.
+Do not have their own private grounds.
+Usually share a common entrance foyer or stairwell.
+Includes flats attached to houses such as granny flats, and houses converted into two or more flats.
+Caravan
+Includes all occupied caravans, regardless of where they are located. Occupied campervans are also included. For further detailed information see Caravans in the glossary.
+Cabins and houseboats
+Includes all occupied cabins and houseboats.
+Cabins are self-contained dwellings that are not intended for long-term residential use. This includes occupied cabins located in residential parks or used as temporary accommodation.
+A houseboat is a mobile dwelling designed for use on water and used as a place of residence.
+Occupied houseboats are treated as occupied private dwellings regardless of location.
+Separate houses in caravan parks, residential parks or marinas occupied by managers or caretakers are not included in this category.
+Improvised home, tent, sleepers-out
+These include sheds, tents, humpies and other improvised dwellings that were occupied on Census night.
+This category includes people sleeping-out, including those sleeping on the streets, in abandoned buildings, under bridges or in cars.
+House or flat attached to a shop, office, etc.
+A house or flat attached to a shop, office, factory or any other non-residential structure is included in this category.
+Question(s) from the Census form
+This variable is not collected from a question on the Census form.
+How this variable is created
+This variable is initially sourced from the ABS Address Register, as outlined in the ABS Address Register Information Guide . Dwelling structure may also be updated when ABS field officers return information gathered during their visits to dwellings.
+New dwellings identified by Census staff can have their structure recorded by the field officer. Where this is not possible, dwelling structure may be imputed from the characteristics of nearby dwellings during processing. Depending on the dwelling type and how the Address Register has been updated, a private dwelling’s structure may be derived from the Address Register (supported in some cases by Building Approvals data) or from field‑collected information. For non‑private dwellings, structure is coded as ‘Not applicable’.
+Certain dwelling types, such as improvised homes, tents and sleepers‑out, receive additional attention during processing to ensure the quality of data relating to the homeless population.
+History and changes
+Information on the structure of private dwellings has been collected to some degree in every Census since 1911, though classification methods have changed over time. Until 1986, occupied craft in marinas were treated as non‑private dwellings; from 1986 onward, occupied houseboats and small boats have been classified as occupied private dwellings.
+From 1976 to 2011, dwelling structure was recorded by Census Field Officers in the Collector Record Book when forms were delivered. In 2016, this information was collected mainly through the new Address Register. This continues to be the primary source of dwelling location data, with updates made by Field and Office staff as needed.
+Definitions for separate houses and semi‑detached dwellings were updated in 2021. The former half‑metre separation rule was removed, and a separate house built in the last 20 years must now be structurally independent, aligning the definition with Building Approvals data.
+There have been no changes in 2026.
+Back to top of the page

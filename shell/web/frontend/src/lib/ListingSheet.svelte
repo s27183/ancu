@@ -7,12 +7,15 @@
     //            nothing here frames or fetches those pages, and the opened page gets no
     //            handle on ours — window.opener null (noopener, noreferrer) both ways.
     //            Behavior 153: before the links, that their prices are in AUD (AudNote).
+//            Behavior 154: after them, how to read a listing and the property types
+//            (ListingGuide.svelte).
     // Capability: a phone (below 48rem, sheetMotion's WIDE) follows a plain <a target=_blank>
     //            to a new tab; a desktop opens a smaller popup window over the app through
     //            window.open's `popup` feature (Chrome 156, behavior 150 Expect 5); where a
     //            browser ignores `popup` it is still the same link in a tab.
     import Modal from '$lib/Modal.svelte';
     import AudNote from '$lib/AudNote.svelte';
+    import ListingGuide from '$lib/ListingGuide.svelte';
     import { t } from '$lib/i18n';
     import { listingLinks, type ListingLink } from '$lib/listingLinks';
     import type { Suburb } from '$lib/api';
@@ -50,5 +53,6 @@
         {#if links.length === 1}
             <p class="listing-only">{$t('listing.rea_only')}</p>
         {/if}
+        <ListingGuide />
     </div>
 </Modal>
