@@ -5,6 +5,8 @@
     // Introduction pill; its sheet gives this device's steps and, once Son publishes it,
     // the video at VIDEO (muted, inline, looping, with controls). A missing file fires the
     // video's error, and the player is dropped, so the sheet never shows a broken player.
+    // The clip is cropped to 540×1000, above the phone's dock, so no frame shows the apps
+    // pinned on Son's own phone (behavior 156); the player sizes it by width alone.
     import { onMount } from 'svelte';
     import { t } from '$lib/i18n';
     import Modal from '$lib/Modal.svelte';
