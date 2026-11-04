@@ -1506,8 +1506,9 @@ const messages = {
     },
     'intro.isnt': { vi: `${BRAND} không phải`, en: `${BRAND} is not` },
     'intro.isnt.listing': {
-        vi: 'Trang rao bán nhà đất: không đăng bán nhà, không môi giới',
-        en: 'A property listing site: no homes for sale, no agents'
+        // Behavior 153: and the listing sites it links to are not its own.
+        vi: 'Trang rao bán nhà đất: không đăng bán nhà, không môi giới; chỉ dẫn link đến các trang rao bán lớn nhất (realestate.com.au, Domain, Allhomes), không liên kết gì với họ',
+        en: 'A property listing site: no homes for sale, no agents; it only links to the largest listing sites (realestate.com.au, Domain, Allhomes), with no tie to them'
     },
     'intro.isnt.advice': {
         vi: 'Dịch vụ tư vấn pháp lý, thuế hay tài chính',
@@ -1539,8 +1540,8 @@ const messages = {
     },
     'intro.value.listing.title': { vi: 'Không phải trang rao bán nhà đất', en: 'Not a property listing site' },
     'intro.value.listing.body': {
-        vi: `${BRAND} không đăng bán bất động sản nào và không làm môi giới; không gắn với môi giới, luật sư, đại lý di trú hay chủ đầu tư nào. Bạn tìm nhà qua kênh mình chọn — ${BRAND} là bản kiểm tra độc lập cho toàn bộ ngân sách mua, giữ và bán theo quy định hiện hành, dù bạn đã mua hay chưa biết bắt đầu từ đâu.`,
-        en: `${BRAND} lists no property for sale and acts as no agent; it is tied to no real-estate agent, lawyer, migration agent or developer. You find a home through the channel you choose — ${BRAND} is an independent check of the whole budget to buy, hold and sell under current regulations, whether you already bought or don’t know where to start.`
+        vi: `${BRAND} không đăng bán bất động sản nào và không làm môi giới; không gắn với môi giới, luật sư, đại lý di trú hay chủ đầu tư nào. Để xem nhà đang rao bán, ${BRAND} dẫn link đến các trang rao bán lớn nhất — realestate.com.au, Domain và Allhomes — là các công ty tư nhân không có liên kết gì với ${BRAND}. Bạn tìm nhà qua kênh mình chọn — ${BRAND} là bản kiểm tra độc lập cho toàn bộ ngân sách mua, giữ và bán theo quy định hiện hành, dù bạn đã mua hay chưa biết bắt đầu từ đâu.`,
+        en: `${BRAND} lists no property for sale and acts as no agent; it is tied to no real-estate agent, lawyer, migration agent or developer. To see homes for sale, ${BRAND} links to the largest listing sites — realestate.com.au, Domain and Allhomes — private companies with no tie to ${BRAND}. You find a home through the channel you choose — ${BRAND} is an independent check of the whole budget to buy, hold and sell under current regulations, whether you already bought or don’t know where to start.`
     },
     'intro.value.plan.title': { vi: 'Kế hoạch trọn hành trình', en: 'One plan, the whole journey' },
     'intro.value.plan.body': {
