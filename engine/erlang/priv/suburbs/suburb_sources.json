@@ -11,6 +11,17 @@
   "url": "https://geo.abs.gov.au/arcgis/rest/services/ASGS2021/SAL/MapServer/2"
  },
  {
+  "attribution": "Australian Bureau of Statistics, Australian Statistical Geography Standard (ASGS) Edition 3, 2021 — Postal Areas",
+  "cadence": "per-edition",
+  "license": "CC BY 4.0",
+  "name": "Australian Statistical Geography Standard (ASGS) Edition 3 2021 — Postal Areas",
+  "notes": "facts_jsonb.postcode = the postal area (POA) holding the suburb's SAL centroid; used to build Domain/Allhomes suburb links (behavior 150).",
+  "publisher": "Australian Bureau of Statistics",
+  "redistribution": "permitted",
+  "source_id": "abs_asgs_2021_poa",
+  "url": "https://geo.abs.gov.au/arcgis/rest/services/ASGS2021/POA/MapServer/0"
+ },
+ {
   "attribution": "Australian Bureau of Statistics, Census of Population and Housing 2021",
   "cadence": "5y",
   "license": "CC BY 4.0",
