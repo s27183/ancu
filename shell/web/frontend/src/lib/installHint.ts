@@ -105,3 +105,32 @@ export function browserHintEnv(): HintEnv {
         displayStandalone
     };
 }
+
+// Behavior 159: the iPhone and Android pills pick the steps as well as the clip.
+// Invariant: the phone steps under the pills are always the picked pill's phone. The
+//            one-tap button (157's rule) and the in-app line show only while the pill is the
+//            visitor's own phone (an iPhone never gets the button: Safari has no offer); on a
+//            computer the computer's button and steps stay at the top, for this computer,
+//            and the pills below are for a phone (Son, 2026-11-04: «why do we still have ios
+//            guide text for android? where is the "Cài đặt ứng dụng" button?»).
+export interface SheetView {
+    /** A computer: its own steps (and button) at the top, the phone steps under a heading. */
+    desktop: boolean;
+    /** The phone whose steps show under the pills. */
+    phone: InstallClip;
+    /** The in-app line above the phone steps. */
+    inApp: boolean;
+    /** The one-tap Install button. */
+    button: boolean;
+}
+
+export function sheetView(steps: InstallSteps, clip: InstallClip, offer: OfferState): SheetView {
+    const desktop = steps.platform === 'desktop';
+    const own = steps.platform === clip;
+    return {
+        desktop,
+        phone: clip,
+        inApp: own && steps.inApp,
+        button: showInstallButton(steps, offer) && steps.platform !== 'ios' && (desktop || own)
+    };
+}
