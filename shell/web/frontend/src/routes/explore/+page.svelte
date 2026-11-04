@@ -7,7 +7,7 @@
     // plan lives on /plan now. Mobile-native: full-bleed canvas, the sheet is a
     // bottom-sheet on phone / centred panel on desktop (§7.1). The news band, sign-in
     // sheet and banners are the layout's.
-    import { untrack } from 'svelte';
+    import { onMount, untrack } from 'svelte';
     import {
         getSuburbs,
         listSavedSuburbs,
@@ -40,6 +40,9 @@
     import { tourStep, tourRun, tourEvent, tourDone, startTour } from '$lib/tour';
     import { introOpen, mapHintDone, markMapHintDone } from '$lib/mapHint';
     import { t } from '$lib/i18n';
+    import { lang } from '$lib/stores/lang';
+    import { getFacts } from '$lib/facts';
+    import { stateRows, popShort, popFull, priceK, type StateRow } from '$lib/stateInfo';
 
     // NB: never name a $state var `state` — svelte-check reads it as a store subscribe.
     let auState = $state<MapScope>(DEFAULT_STATE);
@@ -73,6 +76,16 @@
     // CC-BY attribution is required (§6.1) but space-cheap when collapsed to a chip.
     let attrOpen = $state(false);
     let basemapOn = $state(false);
+
+    // Behavior 154: the state list ranked by capital-city population, with each capital's
+    // figures from /api/facts (kb.facts.capital-cities); with no facts, the names alone in
+    // the fixed order (stateInfo.ts holds the rule). Fetched once, on load.
+    let stateInfo = $state<StateRow[]>(stateRows(null));
+    onMount(() => {
+        getFacts().then((docs) => (stateInfo = stateRows(docs)));
+    });
+    const vl = $derived($lang === 'vi' ? 'vi' : 'en');
+    const chosenInfo = $derived(auState === 'ALL' ? null : (stateInfo.find((r) => r.state === auState) ?? null));
 
     // --- Saved suburbs + name filter (state × saved × name) -------------------
     // Behavior 84 (Son 2026-10-16): a saved suburb is its own record, keyed by SAL code
@@ -373,15 +386,37 @@
                     <label for="state-select">{$t('map.state.label')}</label>
                     <div class="select-wrap">
                         <select id="state-select" bind:value={auState}>
-                            {#each MAP_SCOPES as s (s)}
-                                <option value={s}
-                                    >{s === 'ALL'
-                                        ? $t('map.state.all')
-                                        : `${STATE_NAMES[s]} (${s})`}</option
+                            <option value="ALL">{$t('map.state.all')}</option>
+                            {#each stateInfo as r (r.state)}
+                                <option value={r.state}
+                                    >{`${STATE_NAMES[r.state]} (${r.state})`}{r.population !== null
+                                        ? ` · ${r.capital} ${popShort(r.population, vl)}`
+                                        : ''}</option
                                 >
                             {/each}
                         </select>
                     </div>
+                    {#if auState === 'ALL'}
+                        {#if stateInfo[0]?.population !== null}
+                            <p class="state-info">{$t('map.state.rank')}</p>
+                        {/if}
+                    {:else if chosenInfo && chosenInfo.population !== null}
+                        <p class="state-info">
+                            <span
+                                >{$t('map.state.pop')
+                                    .replace('{city}', chosenInfo.capital)
+                                    .replace('{n}', popFull(chosenInfo.population, vl))}</span
+                            >
+                            {#if chosenInfo.house !== null && chosenInfo.attached !== null}
+                                <span
+                                    >{$t('map.state.prices')
+                                        .replace('{house}', priceK(chosenInfo.house, vl))
+                                        .replace('{attached}', priceK(chosenInfo.attached, vl))}</span
+                                >
+                            {/if}
+                            <span class="state-info-src">ABS</span>
+                        </p>
+                    {/if}
                 </div>
                 <div class="control">
                     <label for="size-select">{$t('map.size.label')}</label>

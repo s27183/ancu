@@ -1,0 +1,593 @@
+Source: https://www.abs.gov.au/statistics/people/population/regional-population/latest-release
+Retrieved: 2026-11-04
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML a022417dd69a9fe7ba001aa91db935e401d68bb96ab5a153c71a4b194c619041
+
+Regional population, 2024-25 financial year | Australian Bureau of Statistics
+Search ABS
+APA
+Copy
+Detail
+Cite
+Citation
+Close
+Print
+Regional population
+Latest release
+Statistics about the population and components of change (births, deaths, migration) for Australia's capital cities and regions
+APA
+Copy
+Detail
+Cite
+Citation
+Close
+Print
+Reference period
+2024-25 financial year
+Released
+31/03/2026
+Next release 25/03/2027
+Previous releases
+Regional population Reference Period 2023-24 financial year
+Regional population Reference Period 2022-23 financial year
+Regional population Reference Period 2021-22 financial year
+View all releases
+Release date and time
+31/03/2026 11:30am AEDT
+Key statistics
+The capitals grew by 324,700 people (1.8%) in 2024–25.
+Capital city growth comprised overseas migration (258,100), natural increase (96,300) and internal migration (-29,800).
+Melbourne had the largest increase (105,000), Perth had the highest growth rate (2.4%).
+Regional Australia grew by 94,700 (1.1%).
+Any reference to population refers to Estimated Resident Population (ERP) and any reference to population change is for the 2024–25 financial year.
+Any reference to capital city refers to Greater Capital City Statistical Area (GCCSA), and any reference to area refers to Statistical Area Level 2 (SA2).
+Estimates of both internal and overseas migration for 2021–22 to 2023–24 have been revised in this release.
+Capital cities
+Population change
+Melbourne had the largest growth (up by 105,000 people), followed by Sydney (75,200), Brisbane (58,200) and Perth (58,100).
+Perth had the highest growth rate (2.4%), followed by Brisbane (2.1%) and Melbourne (2.0%).
+Population change by capital city
+Capital city
+ERP at 30 June 2025
+2024-25 (no.)
+2024-25 (%)
+Sydney
+5,638,830
+75,230
+1.4
+Melbourne
+5,435,590
+105,030
+2.0
+Brisbane
+2,833,524
+58,223
+2.1
+Adelaide
+1,491,015
+18,647
+1.3
+Perth
+2,452,765
+58,088
+2.4
+Hobart
+255,250
+542
+0.2
+Darwin
+159,284
+2,719
+1.7
+Canberra
+484,630
+6,200
+1.3
+Total capital cities
+18,750,888
+324,679
+1.8
+Components of population change
+Population change at the regional level has three components: natural increase, internal migration and overseas migration.
+Natural increase was highest in Melbourne followed by Sydney, Brisbane and Perth.
+Brisbane and Perth were the only capitals to have net internal migration gains. Net internal migration loss was largest in Sydney and Melbourne.
+All capital cities experienced net overseas migration gain, which was largest in Melbourne followed by Sydney, Perth and Brisbane.
+Graph Table
+Download
+Download table as CSV
+Download table as XLSX
+Download graph as PNG image
+Download graph as JPG image
+Download graph as SVG Vector image
+Components of population change by capital city
+Capital city
+Natural increase
+Internal migration
+Overseas migration
+Sydney
+30,109
+-33,282
+78,403
+Melbourne
+32,416
+-8,554
+81,168
+Brisbane
+13,212
+11,077
+33,934
+Adelaide
+3,248
+-2,425
+17,824
+Perth
+12,588
+8,211
+37,289
+Hobart
+587
+-1,878
+1,833
+Darwin
+1,302
+-1,430
+2,847
+Canberra
+2,882
+-1,501
+4,819
+Components of population change by capital city ["Capital city","Natural increase","Internal migration","Overseas migration"] [["Sydney","Melbourne","Brisbane","Adelaide","Perth","Hobart","Darwin","Canberra"],[[30109],[32416],[13212],[3248],[12588],[587],[1302],[2882]],[[-33282],[-8554],[11077],[-2425],[8211],[-1878],[-1430],[-1501]],[[78403],[81168],[33934],[17824],[37289],[1833],[2847],[4819]]] [] [{"value":"0","axis_id":"0","axis_title":"","axis_units":"","tooltip_units":"","table_units":"","axis_min":null,"axis_max":null,"tick_interval":null,"precision":"-1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}] [{"value":"0","axis_id":"0","axis_title":"","axis_units":"","tooltip_units":"","table_units":"","axis_min":"-50000","axis_max":"125000","tick_interval":null,"precision":"-1","data_unit_prefix":"","data_unit_suffix":"","reverse_axis":false}]
+Regions
+The areas with the largest growth were:
+Rockbank - Mount Cottrell (up by 4,600 people) and Fraser Rise - Plumpton (4,100) in Melbourne's outer west
+Mickleham - Yuroke (4,100) in Melbourne’s outer north.
+The areas with the highest growth rates were:
+Port Melbourne Industrial (23%) in the inner city
+Berrimah (22%), to the east of Darwin city
+Fraser Rise - Plumpton (20%).
+Outside of the capital cities:
+Caloundra West - Baringa on Queensland's Sunshine Coast had the largest growth (up by 2,000 people)
+Googong, just outside the Australian Capital Territory, had the highest growth rate (9.7%).
+Areas with the largest growth
+SA2
+SA4
+ERP at 30 June 2025
+2024-25 (no.)
+Rockbank - Mount Cottrell
+Melbourne - West
+35,856
+4,602
+Mickleham - Yuroke
+Melbourne - North West
+39,389
+4,145
+Fraser Rise - Plumpton
+Melbourne - West
+24,739
+4,064
+Box Hill - Nelson
+Sydney - Baulkham Hills and Hawkesbury
+26,348
+3,911
+Clyde North - South
+Melbourne - South East
+28,328
+3,771
+Areas with the highest growth rates
+SA2(a)
+SA4
+ERP at 30 June 2025
+2024-25 (%)
+Port Melbourne Industrial
+Melbourne - Inner
+3,148
+22.6
+Berrimah
+Darwin
+2,871
+22.5
+Fraser Rise - Plumpton
+Melbourne - West
+24,739
+19.7
+Tarneit - North
+Melbourne - West
+15,880
+18.5
+Box Hill - Nelson
+Sydney - Baulkham Hills and Hawkesbury
+26,348
+17.4
+Excludes SA2s with less than 1,000 people at June 2024.
+Centre of population
+Australia's centre of population:
+was around 30 kilometres east of the Ivanhoe township in western New South Wales, reflecting the concentration of population in south-east Australia
+moved 2.0 kilometres west in 2024–25, reflecting strong growth in Western Australia.
+Centre of population, 2024 and 2025
+Image
+Description
+This image shows the location of Australia’s centre of population on a map of Australia. The centre of population, shown as a yellow dot on the map, is located in Far West SA2, north of Hay SA2 in NSW. The popout box highlights the directional change of the centre of population between 30 June 2024 and 30 June 2025.
+Population density
+Australia's population density at June 2025 was 3.6 people per square kilometre (sq km).
+The most densely populated areas were:
+Melbourne CBD - North (43,300 people per sq km)
+Southbank - East (24,300) in inner Melbourne
+Sydney (South) - Haymarket (22,900) in the city centre.
+Population grid
+Population density can also be explored at a finer level by breaking Australia up into 1 km² grid cells. The grid can be viewed in the Interactive maps and Data downloads section of this product.
+Grid cells can be grouped into population density classes, ranging from no population to very high.
+Sydney had the largest combined area in the high and very high density classes (203 km²), followed by Melbourne (73 km²) and Brisbane (27 km²).
+Hobart was the only capital city to have no areas in the high or very high density classes.
+Total area (km²) in population density classes by capital city
+No population
+Very low
+Low
+Medium
+High
+Very high
+(0)*
+(Less than 500)*
+(500 to less than 2000)*
+(2000 to less than 5000)*
+(5000 to less than 8000)*
+(8000 or more)*
+Sydney
+6,964
+3,498
+783
+917
+143
+60
+Melbourne
+2,920
+4,856
+1,022
+1,133
+57
+16
+Brisbane
+6,913
+7,611
+814
+484
+23
+4
+Adelaide
+530
+2,002
+385
+330
+2
+0
+Perth
+2,800
+2,422
+667
+522
+3
+0
+Hobart
+516
+1,042
+114
+22
+0
+0
+Darwin
+2,427
+675
+54
+22
+1
+0
+Canberra
+1,852
+234
+201
+70
+3
+0
+* people per square kilometre
+New South Wales
+Population change
+Greater Sydney increased by 75,200 people (1.4%), the rest of the state increased by 25,200 (0.9%).
+The areas with the largest growth were:
+Box Hill - Nelson (up by 3,900 people) and Marsden Park - Shanes Park (3,200) in Sydney’s outer north-west
+Austral - Greendale (3,100) in Sydney’s outer south-west.
+The areas with the highest growth rates were:
+Box Hill - Nelson (17%)
+Austral - Greendale (16%)
+Marsden Park - Shanes Park (12%).
+Components of population change
+While net overseas migration (78,400 people) and natural increase (30,100) were positive contributors to Greater Sydney's population increase, net internal migration was negative (-33,300).
+Schofields - East had the largest natural increase (530 people).
+Box Hill - Nelson had the largest net internal migration gain (3,500).
+Sydney (South) - Haymarket in the city centre had the largest net overseas migration gain (1,300).
+Centre of population
+The centre for New South Wales:
+was near the Hawkesbury River at June 2025, in the suburb of Sackville North
+moved 220 metres south-east over 2024–25, reflecting growth in Sydney.
+The centre for Greater Sydney:
+was near the Parramatta River at June 2025, in the suburb of Rosehill in western Sydney
+moved 80 metres west over 2024–25, reflecting stronger growth in the western suburbs.
+Population density
+The areas with the highest density at June 2025 were:
+Sydney (South) - Haymarket (22,900 people per sq km)
+Chippendale (20,500), to the south of Sydney’s city centre
+Ultimo (18,900) in inner Sydney.
+Victoria
+Population change
+Greater Melbourne increased by 105,000 people (2.0%), the rest of the state increased by 17,900 (1.1%).
+The areas with the largest growth were:
+Rockbank - Mount Cottrell (up 4,600 people) and Fraser Rise - Plumpton (4,100), both in Melbourne’s outer west
+Mickleham - Yuroke (4,100) in Melbourne’s outer north.
+The areas with the highest growth rates were:
+Port Melbourne Industrial (23%) in the inner city
+Fraser Rise - Plumpton (20%)
+Tarneit - North (18%) in Melbourne's outer west.
+Components of population change
+While net overseas migration (81,200 people) and natural increase (32,400) were positive contributors to Greater Melbourne's population increase, net internal migration was negative (-8,600).
+Rockbank - Mount Cottrell had the largest natural increase (980 people) and net internal migration gain (3,500).
+Carlton, in inner Melbourne, had the largest net overseas migration gain (1,800).
+Centre of population
+The centre for Victoria:
+was in the suburb of Coburg at June 2025, north of Melbourne’s central business district
+moved 130 metres south over 2024–25, reflecting higher growth in Greater Melbourne.
+The centre for Greater Melbourne:
+was in the suburb of Malvern at June 2025, near the Monash Freeway
+moved 130 metres north-west over 2024–25, reflecting stronger growth in Melbourne's north-west.
+Population density
+The areas with the highest density at June 2025 were all in inner Melbourne:
+Melbourne CBD - North (43,300 people per sq km)
+Southbank - East (24,300)
+Melbourne CBD - West (22,100).
+Queensland
+Population change
+Greater Brisbane increased by 58,200 people (2.1%), the rest of the state increased by 39,700 (1.4%).
+The areas with the largest growth were:
+Ripley (up by 3,100 people) in Ipswich
+Caloundra West - Baringa on Queensland's Sunshine Coast (2,000)
+Chambers Flat - Logan Reserve (1,800) in Logan.
+The areas with the highest growth rates were:
+Ripley (15%)
+Morayfield (15%) in Moreton Bay
+Greenbank - North Maclean (14%) in Logan.
+Components of population change
+Net overseas migration (33,900 people) was the largest contributor to Greater Brisbane's population increase, followed by natural increase (13,200) and net internal migration (11,100).
+Redbank Plains in Ipswich had the largest natural increase (460 people).
+Ripley had the largest net internal migration gain (2,700).
+Brisbane City had the largest net overseas migration gain (900).
+Centre of population
+The centre for Queensland:
+was in the rural locality of Booubyjan at June 2025, south-west of Maryborough
+moved 1.5 kilometres south-east over 2024–25, reflecting strong population growth in South East Queensland.
+The centre for Greater Brisbane:
+was in the suburb of Highgate Hill at June 2025, to the south of Brisbane's central business district
+moved 80 metres south-west over 2024–25, indicating slightly higher growth in south-west Brisbane.
+Population density
+The areas with the highest density at June 2025 were all inner Brisbane suburbs:
+Fortitude Valley (9,300 people per sq km)
+West End and Kangaroo Point (both 9,100).
+South Australia
+Population change
+Greater Adelaide increased by 18,600 people (1.3%), the rest of the state increased by 1,900 (0.5%).
+The areas with the largest growth were:
+Munno Para West - Angle Vale (up by 2,400 people) and Virginia - Waterloo Corner (1,300) in Adelaide's outer north
+Mount Barker (1,200) in the Adelaide Hills.
+The areas with the highest growth rates were all in Adelaide’s outer north:
+Virginia - Waterloo Corner (17%)
+Munno Para West - Angle Vale (11%)
+Lewiston - Two Wells (5.0%).
+Components of population change
+While net overseas migration (17,800 people) and natural increase (3,200) were positive contributors to Greater Adelaide's population increase, net internal migration was negative (-2,400).
+Munno Para West - Angle Vale had the largest natural increase (390 people) and net internal migration gain (2,000).
+The city centre of Adelaide had the largest net overseas migration gain (1,100).
+Centre of population
+The centre for South Australia:
+was in the suburb of Greenacres at June 2025, in Adelaide's inner north-east
+moved 60 metres south over 2024–25, reflecting stronger growth in the state's south.
+The centre for Greater Adelaide:
+was near the banks of the River Torrens at June 2025, north of Adelaide's Botanic Park
+moved marginally over 2024–25, reflecting similar growth in Adelaide's north and south.
+​​​​​​​Population density
+The areas with the highest density at June 2025 were all near Adelaide's central business district:
+Norwood to the east and Unley - Parkside to the south (both 3,100 people per sq km)
+Prospect to the north (also 3,100).
+Western Australia
+Population change
+Greater Perth increased by 58,100 people (2.4%), the rest of the state increased by 8,100 (1.4%).
+The areas with the largest growth were:
+Alkimos - Eglinton (up by 2,500 people) in Perth's outer north-west
+Brabham - Henley Brook (1,800) in Perth's outer north-east
+Baldivis - North in Perth’s outer south (1,700).
+The areas with the highest growth rates were:
+Alkimos - Eglinton (13%)
+Brabham - Henley Brook (12%)
+Baldivis - North (11%).
+Components of population change
+Net overseas migration (37,300 people) was the largest contributor to Greater Perth's population increase, followed by natural increase (12,600) and net internal migration (8,200).
+Byford in Perth’s outer south-east had the largest natural increase (400 people).
+Alkimos - Eglinton had the largest net internal migration gain (1,900).
+Bentley - Wilson - St James, to the south-east of Perth's city centre, had the largest net overseas migration gain (1,100).
+Centre of population
+The centre for Western Australia:
+was in the Avon Valley National Park at June 2025, around 30 kilometres south-west of the town of Toodyay
+moved 690 metres south-west over 2024–25, reflecting stronger growth in and around Greater Perth.
+The centre for Greater Perth:
+was in the suburb of Como at June 2025, near the banks of the Swan River
+moved marginally over 2024–25, reflecting similar growth in Perth's north and south.
+Population density
+The areas with the highest density at June 2025 were:
+Perth (North) - Highgate (4,600 people per sq km), to the north of the city centre
+East Perth (4,200), an inner suburb of Perth
+Scarborough (4,100) in Perth's north-west.
+Tasmania
+Population change
+Greater Hobart increased by 540 people (0.2%), the rest of the state increased by 950 (0.3%).
+The areas with the largest growth were:
+Rokeby (up by 240 people) on the eastern shore of the Derwent River in Hobart
+Sorell - Richmond (150) in Hobart's north-east.
+The areas with the highest growth rates were:
+Rokeby (2.7%)
+Cygnet (1.5%) in south-eastern Tasmania
+Westbury (1.5%), south-west of Launceston.
+Components of population change
+While net overseas migration (1,800 people) and natural increase (590) were positive contributors to Greater Hobart's population increase, net internal migration was negative (-1,900).
+Rokeby had the largest natural increase (140 people).
+St Helens - Scamander on Tasmania’s eastern seaboard had the largest internal migration gain (110).
+Sandy Bay, to the south of Hobart's city centre, had the largest net overseas migration gain (310).
+Centre of population
+The centre for Tasmania:
+was in the rural locality of Steppes at June 2025, in the state's Central Highlands
+moved marginally over 2024–25, reflecting relatively even growth across Tasmania.
+The centre for Greater Hobart:
+was just south of the Royal Tasmanian Botanical Gardens at June 2025, in the suburb of Queens Domain
+moved marginally over 2024–25, reflecting relatively even growth across Hobart.
+Population density
+The areas with the highest density at June 2025 all surrounded Hobart's central business district:
+West Moonah (2,400 people per sq km)
+Moonah (2,000)
+Sandy Bay (1,800).
+Northern Territory
+Population change
+Greater Darwin increased by 2,700 people (1.7%), the rest of the territory increased by 950 (0.9%).
+The areas with the largest growth were:
+Berrimah (up by 530 people), to the east of Darwin City
+Palmerston - South (340), to the south-east of Darwin City
+Darwin City (320).
+The areas with the highest growth rates were:
+Berrimah (22%)
+Palmerston - South and Darwin City (both 3.9%).
+Components of population change
+While net overseas migration (2,800 people) and natural increase (1,300) were positive contributors to Greater Darwin's population increase, net internal migration was negative (-1,400).
+Palmerston - South had the largest natural increase (150 people).
+Berrimah had the largest net internal migration gain (480).
+Darwin City had the largest net overseas migration gain (430).
+Centre of population
+The centre for the Northern Territory:
+was in the rural locality of Manbulloo at June 2025, around 40 kilometres south-west of Katherine
+moved 840 metres north-west over 2024–25, reflecting stronger growth in the north-western areas in the rest of territory.
+The centre for Greater Darwin:
+was in Wishart at June 2025, south of the Stuart Highway
+moved marginally over 2024–25, reflecting relatively even growth across Darwin.
+Population density
+The areas with the highest density at June 2025 were:
+Nightcliff (3,000 people per sq km) in Darwin's northern suburbs
+Parap (2,900) and Stuart Park (2,800), both inner suburbs of Darwin.
+Australian Capital Territory
+Population change
+The number of people living in the Australian Capital Territory increased by 6,200 (1.3%).
+The areas with the largest growth were:
+Taylor (up by 700 people) in Canberra's outer north
+Phillip (580), south of Canberra CBD
+Denman Prospect (560) in the Molonglo Valley.
+The areas with the highest growth rates were:
+Taylor (15%)
+Strathnairn (14%) in Canberra’s outer north-west
+Denman Prospect (11%).
+Components of population change
+While net overseas migration (4,800) and natural increase (2,900 people) were positive contributors to Canberra's population increase, net internal migration was negative (-1,500).
+Taylor had the largest natural increase (170 people).
+Whitlam in Canberra’s west had the largest net internal migration gain (650).
+Belconnen town centre in Canberra's north-west had the largest net overseas migration gain (240).
+Centre of population
+The centre for the Australian Capital Territory:
+was in Lake Burley Griffin at June 2025, south of Black Mountain
+moved marginally over 2024–25, reflecting relatively even growth across the Australian Capital Territory.
+Population density
+The areas with the highest density at June 2025 were:
+Kingston, on the south-eastern banks of Lake Burley Griffin, and Braddon in the inner north (both 5,300 people per sq km)
+inner-city Civic (3,700).
+Interactive maps
+On each map an area can be selected to view the underlying data. All data can be found in the Data downloads section of this publication.
+Population grid
+Population grid 2025
+Population change by Statistical Areas Level 2
+Map Description
+This interactive map displays the percentage population change in Statistical Areas Level 2 (SA2s) between 2024 and 2025. Percentage of population change is divided into 5 data classes:
+3.0% or more (dark red)
+2.0% to less than 3.0% (light red)
+1.0% to less than 2.0% (dark orange)
+0.0% to less than 1.0% (light orange)
+Decline (yellow)
+The top 10 growth SA2s are also displayed with blue dots.
+This map shows that the SA2s with the highest population growth rates in 2024–25 were generally on the outskirts of Australia's capital cities. The top 10 were:
+Port Melbourne Industrial, Fraser Rise - Plumpton, Tarneit - North, Clyde North - South and Whittlesea in Melbourne
+Berrimah in Darwin
+Box Hill - Nelson and Austral - Greendale in Sydney
+Virginia - Waterloo Corner in Adelaide
+Ripley in Brisbane.
+Accessibility statement: We are committed to providing information and services to the widest possible audience. We’ve designed this website to comply with the Australian Government Digital Service Standard and aim to meet the latest WCAG Guidelines which describe how to make web content more usable and accessible for everyone. However, some functions of this interactive map may be inaccessible, or difficult to use with assistive technology. All data underlying this map can be downloaded in table format from the Data downloads section of this publication. For further information or assistance, or to advise of accessibility issues with this product, please email client.services@abs.gov.au .
+Source
+Regional population 2024–25: SA2 geospatial web service
+Population change by Local Government Areas
+Map Description
+This interactive map displays the percentage population change in Local Government Areas (LGAs) between 2024 and 2025. Percentage of population change is divided into 5 data classes:
+3.0% or more (dark red)
+2.0% to less than 3.0% (light red)
+1.0% to less than 2.0% (dark orange)
+0.0% to less than 1.0% (light orange)
+Decline (yellow)
+The top 10 growth LGAs are also displayed with blue dots.
+This map shows that the LGAs with the highest population growth rates in 2024–25 were generally located on the outskirts of the country's capitals. The top 10 were:
+Melton and Mitchell in or just outside Melbourne
+Kwinana, Serpentine-Jarrahdale, Swan, Murray, Dandaragan and Chittering in or just outside Perth
+Playford in Adelaide
+Wollondilly in Sydney.
+Accessibility statement: We are committed to providing information and services to the widest possible audience. We’ve designed this website to comply with the Australian Government Digital Service Standard and aim to meet the latest WCAG Guidelines which describe how to make web content more usable and accessible for everyone. However, some functions of this interactive map may be inaccessible, or difficult to use with assistive technology. All data underlying this map can be downloaded in table format from the Data downloads section of this publication. For further information or assistance, or to advise of accessibility issues with this product, please email client.services@abs.gov.au .
+Source
+Regional population 2024–25: LGA geospatial web service
+Geographic areas
+The population change map uses Statistical Area Level 2 (SA2) and 2025 Local Government Area (LGA) boundaries according to the Australian Statistical Geography Standard (ASGS) Edition 3 .
+The population grid map uses a 1km x 1km grid for all of Australia based on the National Nested Grid Standard .
+Data downloads
+Data cubes
+Download all (2.29 MB)
+Data files
+Population estimates and components by SA2, 2024 to 2025
+Download xlsx [745.99 KB]
+Population estimates and components by LGA, 2024 to 2025
+Download xlsx [115.57 KB]
+Population estimates by SA2 and above, 2001 to 2025
+Download xlsx [672.1 KB]
+Population estimates by LGA, Significant Urban Area, Remoteness Area and electoral division, 2001 to 2025
+Download xlsx [293.01 KB]
+Population components by SA2 and above, 2021–22 to 2024–25
+Download xlsx [823.93 KB]
+Population components by LGA, 2021–22 to 2024–25
+Download xlsx [169.29 KB]
+Population grid files
+Data files
+Australian population grid 2025 in GeoTIFF format
+Download zip [1.1 MB]
+Australian population grid 2025 in JPEG format
+Download zip [4.69 MB]
+Data Explorer datasets
+Caution: Data Explorer can be problematic when trying to view and manipulate large datasets, such as SA2-based or LGA geographies released in this product. Please use the Excel data cubes provided above for these datasets.
+Data in Data Explorer is currently released after the 11:30am release on the ABS website. Please check the reference period when using Data Explorer.
+Population estimates and components by SA2 and above, 2022 to 2025
+Population estimates and components by LGA, 2022 to 2025
+Population estimates by SA2 and above, 2001 to 2025
+Population estimates by LGA, 2001 to 2025
+Regional internal migration estimates by region of arrival and departure, SA4 and above, 2021–22 to 2024–25
+For information on Data Explorer and how it works, see the Data Explorer user guide .
+Geospatial web services
+Regional population estimates are available as a web service for the following geographies:
+SA2, Regional population 2024–25
+LGA, Regional population 2024–25
+Previous catalogue number
+This release previously used catalogue number 3218.0.
+Methodology
+Regional population methodology, 2024-25 financial year
+Media releases
+Original publication date
+31 March 2026
+Capital city growth slows
+View media release
+Do you need more detailed statistics?
+Request data
+We can provide customised data to meet your requirements
+Request a quote
+Microdata and TableBuilder
+We can provide access to detailed, customisable data on selected topics
+View available Microdata and TableBuilder
+Back to top of the page

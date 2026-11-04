@@ -1093,6 +1093,21 @@ main {
     flex-direction: column;
     gap: 0.2rem;
 }
+/* Behavior 154: under the state list, the chosen state's capital-city figures (ABS). */
+.map-controls .state-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    margin: 0.15rem 0 0;
+    font-size: var(--fs-xs);
+    line-height: 1.35;
+    color: var(--ink-2);
+    font-variant-numeric: tabular-nums;
+}
+.map-controls .state-info-src {
+    color: var(--muted);
+    font-size: var(--fs-2xs);
+}
 .map-controls label {
     font-size: var(--fs-2xs);
     font-weight: 600;
@@ -3779,13 +3794,13 @@ main {
     gap: var(--sp-1);
 }
 .home-way-title {
-    font-size: var(--fs-lg);
+    font-size: 1.25rem; /* behavior 154: a step up from --fs-lg */
     font-weight: 700;
     letter-spacing: -0.01em;
     text-wrap: balance;
 }
 .home-way-body {
-    font-size: var(--fs-sm);
+    font-size: var(--fs-md);
     color: var(--ink-2);
 }
 .home-way-chev {
@@ -3794,7 +3809,7 @@ main {
     height: 1.25rem;
     color: var(--muted);
 }
-/* Behavior 153: on a phone each card is at most 104px tall and all five, under the pill
+/* Behavior 154: text a step larger (17px / 14px), at most 112px a card. Behavior 153: on a phone each card is at most 104px tall and all five, under the pill
    row, fit a 390×844 screen without scrolling, in both languages (measured in a 390px
    iframe, 2026-11-04: 84–101px with these sizes; 115–163px before). */
 @media (max-width: 47.99rem) {
@@ -3817,10 +3832,10 @@ main {
         gap: 2px;
     }
     .home-way-title {
-        font-size: 1rem;
+        font-size: 1.0625rem;
     }
     .home-way-body {
-        font-size: 0.8125rem;
+        font-size: var(--fs-sm);
         line-height: 1.3;
     }
     .home-pills {
