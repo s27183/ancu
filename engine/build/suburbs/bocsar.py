@@ -152,6 +152,7 @@ def run() -> tuple[int, int]:
             rows.append({"sal_code": sal, "facts": facts, "prov": prov})
 
         db.ensure_source(conn, SOURCE)
+        db.clear_source_facts(conn, SOURCE["source_id"])  # a rerun replaces its release
         matched, missed = db.update_facts(conn, rows)
         conn.commit()
     finally:
