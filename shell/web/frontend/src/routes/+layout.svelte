@@ -136,7 +136,9 @@
 </svelte:head>
 
 <header class="app-header">
-    <a class="brand" href="/">
+    <!-- Behavior 153: below 48rem the logo stands alone (app.css hides .brand-name), so the
+         link carries the brand as its accessible name. -->
+    <a class="brand" href="/" aria-label={$t('brand.name')}>
         <!-- The brand mark (Son's pick, 2026-10-09): the four stars of the Southern Cross
              placed to trace a house — roof, walls, floor — with a small gold star inside,
              the household. Australian sky, a home under it. -->

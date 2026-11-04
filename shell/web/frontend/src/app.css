@@ -476,6 +476,12 @@ body {
     white-space: nowrap; /* "Mai An Cư" is one name: never split over two lines at 390px */
     min-width: 0;
 }
+/* Behavior 153 (Son 2026-11-04): on a phone the logo alone; the link's aria-label keeps the name. */
+@media (max-width: 47.99rem) {
+    .app-header .brand-name {
+        display: none;
+    }
+}
 .brand-mark {
     display: grid;
     place-items: center;
@@ -3720,6 +3726,9 @@ main {
 @media (min-width: 48rem) {
     .home-ways {
         grid-template-columns: repeat(2, 1fr);
+    }
+    /* The space under the band that the cards kept is the pill row's since behavior 153. */
+    .home-pills {
         padding-top: var(--sp-8);
     }
     /* Behavior 151: a fifth card spans the row rather than sit alone in half of it. */
@@ -3784,6 +3793,39 @@ main {
     width: 1.25rem;
     height: 1.25rem;
     color: var(--muted);
+}
+/* Behavior 153: on a phone each card is at most 104px tall and all five, under the pill
+   row, fit a 390×844 screen without scrolling, in both languages (measured in a 390px
+   iframe, 2026-11-04: 84–101px with these sizes; 115–163px before). */
+@media (max-width: 47.99rem) {
+    .home-ways {
+        gap: 0.625rem;
+    }
+    .home-way {
+        gap: var(--sp-3);
+        padding: 0.6875rem 0.875rem;
+    }
+    .home-way-icon {
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+    .home-way-icon svg {
+        width: 1.35rem;
+        height: 1.35rem;
+    }
+    .home-way-text {
+        gap: 2px;
+    }
+    .home-way-title {
+        font-size: 1rem;
+    }
+    .home-way-body {
+        font-size: 0.8125rem;
+        line-height: 1.3;
+    }
+    .home-pills {
+        margin-bottom: var(--sp-3);
+    }
 }
 
 /* Bilingual -> the bilingual plan reaches the phone it is read on -> the web frontend ->
