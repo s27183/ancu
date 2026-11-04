@@ -3,10 +3,12 @@
     // the Add to Home Screen pill and its sheet (behavior 153; the rule and its block:
     // installHint.ts). The pill sits at the right of the home's top row, opposite the
     // Introduction pill; its sheet gives this device's steps and, once Son publishes it,
-    // the video at VIDEO (muted, inline, looping, with controls). A missing file fires the
+    // the clip installVideo names for this device (muted, inline, looping, with controls;
+    // iPhone or Android, none on a computer: behavior 158). A missing file fires the
     // video's error, and the player is dropped, so the sheet never shows a broken player.
-    // The clip is cropped to 540×1000, above the phone's dock, so no frame shows the apps
-    // pinned on Son's own phone (behavior 156); the player sizes it by width alone.
+    // The iPhone clip is cropped to 540×1000, above the phone's dock, so no frame shows the
+    // apps pinned on Son's own phone (behavior 156); the player takes each clip's own aspect
+    // (--ar), its height capped at 60vh, so a tall clip has no bars beside it.
     // Where the browser offers an install (Chrome, Edge: caught in app.html as
     // window.__ancuInstall), the sheet puts a one-tap Install button above the steps; the
     // tap opens the browser's own dialog. Install says so in the sheet and drops the pill;
@@ -16,11 +18,10 @@
     import { onMount } from 'svelte';
     import { t } from '$lib/i18n';
     import Modal from '$lib/Modal.svelte';
-    import { browserHintEnv, installSteps, showInstallButton, type InstallSteps, type OfferState } from '$lib/installHint';
-
-    const VIDEO = '/install/add-to-home.mp4';
+    import { browserHintEnv, installSteps, installVideo, showInstallButton, type InstallSteps, type OfferState } from '$lib/installHint';
 
     let steps = $state<InstallSteps | null>(null);
+    const video = $derived(installVideo(steps));
     let open = $state(false);
     let videoOk = $state(true);
     let videoReady = $state(false);
@@ -102,12 +103,15 @@
                     {/each}
                 </ol>
                 <p class="install-after">{$t('installhint.after')}</p>
-                {#if videoOk}
+                {#if video && videoOk}
                     <!-- svelte-ignore a11y_media_has_caption -->
                     <video
                         class="install-video"
                         class:ready={videoReady}
-                        src={VIDEO}
+                        src={video.src}
+                        width={video.width}
+                        height={video.height}
+                        style:--ar={video.width / video.height}
                         muted
                         playsinline
                         loop
