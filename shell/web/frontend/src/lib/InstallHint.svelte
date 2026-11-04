@@ -5,7 +5,10 @@
     // Introduction pill; its sheet gives this device's steps and a clip of the install
     // (muted, inline, looping, with controls). Two pills, iPhone and Android, pick the clip;
     // the sheet opens on the one installClip names for this device: Android on an Android
-    // phone, iPhone otherwise (behavior 158). A clip whose file fails fires the video's
+    // phone, iPhone otherwise (behavior 158). The pills sit above the steps and pick them
+    // too; the button and the in-app line show only on the visitor's own phone's pill; a
+    // computer keeps its own steps on top and the phone steps under «On your phone»
+    // (behavior 159; the rule: sheetView). A clip whose file fails fires the video's
     // error: its player is dropped and the pills stay, so the sheet never shows a broken
     // player. The iPhone clip is cropped to 540×1000, above the phone's dock, so no frame
     // shows the apps pinned on Son's own phone (behavior 156); the player takes each clip's
@@ -19,7 +22,7 @@
     import { onMount } from 'svelte';
     import { t } from '$lib/i18n';
     import Modal from '$lib/Modal.svelte';
-    import { browserHintEnv, INSTALL_VIDEOS, installClip, installSteps, showInstallButton, type InstallClip, type InstallSteps, type OfferState } from '$lib/installHint';
+    import { browserHintEnv, INSTALL_VIDEOS, installClip, installSteps, sheetView, type InstallClip, type InstallSteps, type OfferState } from '$lib/installHint';
 
     let steps = $state<InstallSteps | null>(null);
     let clip = $state<InstallClip>('ios');
@@ -33,6 +36,7 @@
     let videoReady = $state(false);
     let offerState = $state<OfferState>('none');
     let installed = $state(false);
+    const view = $derived(steps ? sheetView(steps, clip, offerState) : null);
     let declined = false;
 
     interface InstallOffer extends Event {
@@ -104,24 +108,35 @@
             {#if installed}
                 <p class="install-done" role="status">{$t('installhint.installed')}</p>
             {:else}
-                {#if showInstallButton(steps, offerState)}
-                    <button type="button" class="btn btn-primary install-now" onclick={install}>{$t('installhint.install')}</button>
-                {/if}
-                <ol class="install-steps">
-                    {#if steps.inApp}
-                        <li>{$t(steps.platform === 'ios' ? 'installhint.inapp.ios' : 'installhint.inapp.android')}</li>
+                {#if view?.desktop}
+                    {#if view.button}
+                        <button type="button" class="btn btn-primary install-now" onclick={install}>{$t('installhint.install')}</button>
                     {/if}
-                    {#each ['1', '2'] as const as k (k)}
-                        <li>{$t(`installhint.${steps.platform}.${k}`)}</li>
-                    {/each}
-                </ol>
-                <p class="install-after">{$t('installhint.after')}</p>
+                    <ol class="install-steps">
+                        {#each ['1', '2'] as const as k (k)}
+                            <li>{$t(`installhint.desktop.${k}`)}</li>
+                        {/each}
+                    </ol>
+                    <p class="install-phone">{$t('installhint.phone')}</p>
+                {/if}
                 <div class="lang clip-pick" data-active={clip} role="group" aria-label={$t('installhint.video')}>
                     <span class="lang-thumb" aria-hidden="true"></span>
                     {#each CLIPS as [c, name] (c)}
                         <button type="button" class:active={clip === c} aria-pressed={clip === c} onclick={() => pick(c)}>{name}</button>
                     {/each}
                 </div>
+                {#if view && !view.desktop && view.button}
+                    <button type="button" class="btn btn-primary install-now" onclick={install}>{$t('installhint.install')}</button>
+                {/if}
+                <ol class="install-steps">
+                    {#if view?.inApp}
+                        <li>{$t(clip === 'ios' ? 'installhint.inapp.ios' : 'installhint.inapp.android')}</li>
+                    {/if}
+                    {#each ['1', '2'] as const as k (k)}
+                        <li>{$t(`installhint.${clip}.${k}`)}</li>
+                    {/each}
+                </ol>
+                <p class="install-after">{$t('installhint.after')}</p>
                 {#if !failed[clip]}
                     <!-- svelte-ignore a11y_media_has_caption -->
                     <video

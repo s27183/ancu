@@ -1429,6 +1429,8 @@ const messages = {
         en: 'Look for the install button in the address bar, or open the browser’s menu.'
     },
     'installhint.desktop.2': { vi: 'Chọn Cài đặt Mai An Cư.', en: 'Choose Install Mai An Cư.' },
+    // Behavior 159: on a computer, above the phone pills and steps.
+    'installhint.phone': { vi: 'Trên điện thoại', en: 'On your phone' },
     'installhint.after': {
         vi: 'Biểu tượng Mai An Cư sẽ hiện trên màn hình chính, mở như một ứng dụng.',
         en: 'The Mai An Cư icon appears on your Home Screen and opens like an app.'

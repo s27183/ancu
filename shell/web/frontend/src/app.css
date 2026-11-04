@@ -3934,6 +3934,15 @@ main {
     color: var(--ink);
     font-weight: 700;
 }
+/* Behavior 159: on a computer, the heading that sets the phone steps apart from its own. */
+.install-phone {
+    margin: var(--sp-2) 0 0;
+    color: var(--ink-2);
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
 .install-after {
     margin: 0;
     color: var(--ink-2);
