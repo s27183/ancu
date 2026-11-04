@@ -1,6 +1,6 @@
 <script lang="ts">
     // Bilingual -> the bilingual plan reaches the phone it is read on -> the web frontend ->
-    // the Add to Home Screen pill and its sheet (behavior 153; the rule and its block:
+    // the «Use as an app» pill and its sheet (behavior 153; the rule and its block:
     // installHint.ts). The pill sits at the right of the home's top row, opposite the
     // Introduction pill; its sheet gives this device's steps and a clip of the install
     // (muted, inline, looping, with controls). Two pills, iPhone and Android, pick the clip;

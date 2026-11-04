@@ -1,5 +1,5 @@
 // Bilingual -> the bilingual plan reaches the phone it is read on -> the web frontend -> the
-// Add to Home Screen pill and its sheet
+// «Use as an app» pill and its sheet
 // Goal:      behavior 153 (was 152's strip under the cards): a pill at the top-right of the
 //            home opens a sheet with the steps for this device, and Son's video once one is
 //            published (InstallSheet.svelte). iOS 26.2 Safari keeps Share under its ⋯ menu

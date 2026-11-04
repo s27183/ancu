@@ -1,5 +1,5 @@
 // Bilingual -> the bilingual plan reaches the phone it is read on -> the web frontend -> the
-// Add to Home Screen pill's rule (behavior 153, was 152): every browser gets the pill except
+// «Use as an app» pill's rule (behavior 153, was 152): every browser gets the pill except
 // the installed app; each device its own steps; an in-app browser is told to open the page
 // in a browser first. Run over every agent × standalone signal, and seeded hostile agents.
 import { test } from 'node:test';

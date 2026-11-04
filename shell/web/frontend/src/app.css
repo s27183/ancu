@@ -3860,7 +3860,7 @@ main {
 
 /* Bilingual -> the bilingual plan reaches the phone it is read on -> the web frontend ->
    the home's top row (behavior 153): the "Giới thiệu" launcher (Welcome.svelte) on the
-   left, the Add to Home Screen pill (InstallHint.svelte; rule in installHint.ts) on the
+   left, the «Use as an app» pill (InstallHint.svelte; rule in installHint.ts) on the
    right, in the flow above the cards and on their column's edges, so neither covers a
    card. The row makes no stacking context, so the introduction sheet inside it still
    covers the header. */

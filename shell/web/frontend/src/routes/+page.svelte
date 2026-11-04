@@ -13,7 +13,7 @@
     // news — since each suburb now links to its homes for sale; the cards' text is a step
     // larger at the same gaps.
     // Behavior 153: one row heads the home, above every card (.home-pills): Welcome's
-    // "Giới thiệu" launcher on the left, the Add to Home Screen pill (InstallHint) on the
+    // "Giới thiệu" launcher on the left, the «Use as an app» pill (InstallHint) on the
     // right. In the flow, neither can cover a card (behavior 128's placement retired), and
     // the install pill replaces behavior 152's strip under the cards.
     import Welcome from '$lib/Welcome.svelte';
