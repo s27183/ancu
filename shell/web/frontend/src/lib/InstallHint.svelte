@@ -10,7 +10,9 @@
     // Where the browser offers an install (Chrome, Edge: caught in app.html as
     // window.__ancuInstall), the sheet puts a one-tap Install button above the steps; the
     // tap opens the browser's own dialog. Install says so in the sheet and drops the pill;
-    // Cancel drops the button, as each offer opens one dialog (behavior 157).
+    // Cancel drops the button for the rest of the page load: Chrome for Android makes a new
+    // offer at once after a dismissal (seen on the Pixel 9 Pro emulator), and the visitor has
+    // just said no; the menu steps stay (behavior 157).
     import { onMount } from 'svelte';
     import { t } from '$lib/i18n';
     import Modal from '$lib/Modal.svelte';
@@ -24,6 +26,7 @@
     let videoReady = $state(false);
     let offerState = $state<OfferState>('none');
     let installed = $state(false);
+    let declined = false;
 
     interface InstallOffer extends Event {
         prompt(): Promise<void>;
@@ -35,7 +38,7 @@
     function readOffer() {
         const h = held();
         if (h?.installed) installed = true;
-        offerState = h?.offer ? 'held' : offerState === 'held' ? 'used' : offerState;
+        offerState = declined ? 'used' : h?.offer ? 'held' : offerState === 'held' ? 'used' : offerState;
     }
 
     onMount(() => {
@@ -60,6 +63,8 @@
             return;
         }
         if ((await offer.userChoice).outcome === 'accepted') installed = true;
+        else declined = true;
+        readOffer();
     }
 
     function show() {
