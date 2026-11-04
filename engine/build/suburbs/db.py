@@ -80,35 +80,6 @@ WHERE sal_code = %(sal_code)s
 """
 
 
-# Honest-partial -> P-2 · The database is the single source of truth -> The suburb adapters -> a rerun replaces its release
-# The merge keeps a key no later run writes, so a rerun of an enrichment adapter first drops
-# every key its own source wrote (found by provenance source_id), in the same transaction as
-# its update_facts. Without it a suburb a new release no longer reports keeps the old
-# release's figure (5 VIC suburbs kept a Dec 2025 median after the Mar 2026 VPSR run;
-# measured 2026-11-04, behavior 155).
-_CLEAR_SOURCE = """
-UPDATE suburbs s
-SET facts_jsonb      = s.facts_jsonb - k.keys,
-    provenance_jsonb = s.provenance_jsonb - k.keys,
-    updated_at       = now()
-FROM (
-    SELECT sal_code, array_agg(e.key) AS keys
-    FROM suburbs, jsonb_each(provenance_jsonb) AS e(key, val)
-    WHERE jsonb_typeof(e.val) = 'object' AND e.val->>'source_id' = %(source_id)s
-    GROUP BY sal_code
-) k
-WHERE s.sal_code = k.sal_code
-"""
-
-
-def clear_source_facts(conn: psycopg.Connection, source_id: str) -> int:
-    """Drop every fact (and its provenance) that `source_id` wrote; returns rows touched.
-    Call it before update_facts and commit both together, so a rerun replaces its release."""
-    with conn.cursor() as cur:
-        cur.execute(_CLEAR_SOURCE, {"source_id": source_id})
-        return cur.rowcount
-
-
 def update_facts(conn: psycopg.Connection, rows: list[dict]) -> tuple[int, list[str]]:
     """Enrichment path: UPDATE-only (no insert), for adapters with no spine (name/state).
 
