@@ -1,5 +1,5 @@
 // Bilingual -> the bilingual plan reaches the phone it is read on -> the web frontend -> the
-// Add to Home Screen pill and its sheet
+// «Use as an app» pill and its sheet
 // Goal:      behavior 153 (was 152's strip under the cards): a pill at the top-right of the
 //            home opens a sheet with the steps for this device, and Son's video once one is
 //            published (InstallSheet.svelte). iOS 26.2 Safari keeps Share under its ⋯ menu
@@ -56,6 +56,38 @@ export type OfferState = 'held' | 'used' | 'none';
 
 export function showInstallButton(steps: InstallSteps | null, offer: OfferState): boolean {
     return offer === 'held' && steps !== null && !steps.inApp;
+}
+
+// Behavior 158: two clips, iPhone and Android, behind two pills in the sheet.
+// Invariant: the sheet opens on the visitor's own phone's clip: an Android phone (Chrome or
+//            an in-app browser) gets the Android clip; an iPhone, an iPad or a computer the
+//            iPhone clip (Son, 2026-11-04: both videos in the guide, the pills to switch);
+//            the installed app has no sheet. The iPhone clip was recorded on Son's iPhone and
+//            cropped above its dock (behavior 156); the Android clip on the Pixel 9 Pro
+//            emulator set to Vietnamese, uncropped (Son: «it's just a simulator»).
+//            width × height are each file's own, so the player is sized to the clip with no
+//            bars beside it.
+export interface InstallVideo {
+    src: string;
+    width: number;
+    height: number;
+}
+
+export const IOS_VIDEO: InstallVideo = { src: '/install/add-to-home.mp4', width: 540, height: 1000 };
+export const ANDROID_VIDEO: InstallVideo = { src: '/install/add-to-home-android.mp4', width: 720, height: 1606 };
+
+export type InstallClip = 'ios' | 'android';
+export const INSTALL_VIDEOS: Record<InstallClip, InstallVideo> = { ios: IOS_VIDEO, android: ANDROID_VIDEO };
+
+/** The clip the sheet opens on; null inside the installed app. */
+export function installClip(steps: InstallSteps | null): InstallClip | null {
+    if (!steps) return null;
+    return steps.platform === 'android' ? 'android' : 'ios';
+}
+
+export function installVideo(steps: InstallSteps | null): InstallVideo | null {
+    const clip = installClip(steps);
+    return clip ? INSTALL_VIDEOS[clip] : null;
 }
 
 /** The page's own environment; any signal that throws reads as false. */

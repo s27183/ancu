@@ -1,10 +1,10 @@
 // Bilingual -> the bilingual plan reaches the phone it is read on -> the web frontend -> the
-// Add to Home Screen pill's rule (behavior 153, was 152): every browser gets the pill except
+// «Use as an app» pill's rule (behavior 153, was 152): every browser gets the pill except
 // the installed app; each device its own steps; an in-app browser is told to open the page
 // in a browser first. Run over every agent × standalone signal, and seeded hostile agents.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { installSteps, showInstallButton, type InstallPlatform, type OfferState } from '../src/lib/installHint.ts';
+import { ANDROID_VIDEO, INSTALL_VIDEOS, IOS_VIDEO, installClip, installSteps, installVideo, showInstallButton, type InstallPlatform, type OfferState } from '../src/lib/installHint.ts';
 
 const SEED = 153;
 function mulberry32(a: number) {
@@ -96,6 +96,47 @@ test('2,000 hostile cases, seed 157: the button exactly when held, not standalon
             if (showInstallButton(steps, o) !== want) bad.push(`${i}: ${o} ns=${ns} ds=${ds} ${JSON.stringify(steps)}`);
             if ((ns || ds) && showInstallButton(steps, o)) bad.push(`${i}: button in the installed app`);
             if (steps?.inApp && showInstallButton(steps, o)) bad.push(`${i}: button in an in-app browser`);
+        } catch (e) {
+            bad.push(`${i}: threw ${e}`);
+        }
+    }
+    assert.deepEqual(bad, []);
+});
+
+// Behavior 158: the sheet opens on the visitor's own phone's clip: Android on android, the
+// iPhone clip on an iPhone, an iPad or a computer; none in the installed app.
+const WANT_VIDEO = { ios: IOS_VIDEO, android: ANDROID_VIDEO, desktop: IOS_VIDEO };
+
+test('every agent × standalone signal: the Android clip on android, the iPhone clip otherwise, none in the app', () => {
+    for (const a of AGENTS)
+        for (const ns of [false, true])
+            for (const ds of [false, true]) {
+                const got = installVideo(installSteps({ ua: a.ua, maxTouchPoints: a.touch, navigatorStandalone: ns, displayStandalone: ds }));
+                assert.equal(got, ns || ds ? null : WANT_VIDEO[a.platform], `${a.name} ns=${ns} ds=${ds}`);
+            }
+    assert.equal(installVideo(null), null);
+    assert.deepEqual(INSTALL_VIDEOS, { ios: IOS_VIDEO, android: ANDROID_VIDEO });
+});
+
+test('2,000 hostile cases, seed 158: the clip follows the platform exactly; never throws', () => {
+    const rand = mulberry32(158);
+    const parts = ['<script>alert(1)</script>', '\u0000\u202e', 'iPhone', 'iPad', 'Android', 'Zalo', 'FBAN', 'Instagram', 'Macintosh', 'Windows', 'CriOS/1', 'Chrome/156', '"\'`', '\n', 'x'.repeat(4096)];
+    const bad: string[] = [];
+    for (let i = 0; i < 2000; i++) {
+        let ua = '';
+        for (let k = 0, n = Math.floor(rand() * 5); k <= n; k++) ua += parts[Math.floor(rand() * parts.length)];
+        const odd = [ua, ua, undefined, null, 42][Math.floor(rand() * 5)] as unknown as string;
+        const touch = [0, 5, NaN, -1, Infinity][Math.floor(rand() * 5)];
+        const ns = rand() < 0.2;
+        const ds = rand() < 0.2;
+        try {
+            const steps = installSteps({ ua: odd, maxTouchPoints: touch, navigatorStandalone: ns, displayStandalone: ds });
+            const got = installVideo(steps);
+            const want = steps === null ? null : WANT_VIDEO[steps.platform];
+            if (got !== want) bad.push(`${i}: ${JSON.stringify(steps)} -> ${got?.src}`);
+            if ((ns || ds) && got) bad.push(`${i}: clip in the installed app`);
+            if (steps && (got === ANDROID_VIDEO) !== (steps.platform === 'android')) bad.push(`${i}: Android clip off android`);
+            if (installClip(steps) !== (steps ? (steps.platform === 'android' ? 'android' : 'ios') : null)) bad.push(`${i}: clip key`);
         } catch (e) {
             bad.push(`${i}: threw ${e}`);
         }

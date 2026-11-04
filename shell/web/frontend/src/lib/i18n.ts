@@ -1403,8 +1403,9 @@ const messages = {
     },
     'factspage.news': { vi: 'Đọc tin', en: 'Read the news' },
     // Behavior 153 (was 152's strip): the Add to Home Screen pill and its sheet (installHint.ts).
-    'installhint.pill': { vi: 'Thêm vào màn hình chính', en: 'Add to Home Screen' },
-    'installhint.label': { vi: 'Thêm Mai An Cư vào màn hình chính', en: 'Add Mai An Cư to your Home Screen' },
+    // Behavior 158: named for what the visitor gets, an app; the steps below keep the phone's own menu words.
+    'installhint.pill': { vi: 'Dùng như ứng dụng', en: 'Use as an app' },
+    'installhint.label': { vi: 'Dùng Mai An Cư như một ứng dụng', en: 'Use Mai An Cư as an app' },
     'installhint.inapp.ios': {
         vi: 'Bạn đang xem trong một ứng dụng (như Zalo hay Facebook): mở trang này trong Safari trước.',
         en: 'You are in an app’s browser (such as Zalo or Facebook): open this page in Safari first.'
@@ -1438,7 +1439,7 @@ const messages = {
         vi: `Đã cài. Mở ${BRAND} từ màn hình chính.`,
         en: `Installed. Open ${BRAND} from your home screen.`
     },
-    'installhint.video': { vi: 'Video: cách thêm Mai An Cư vào màn hình chính', en: 'Video: adding Mai An Cư to the Home Screen' },
+    'installhint.video': { vi: 'Video: cách dùng Mai An Cư như ứng dụng', en: 'Video: using Mai An Cư as an app' },
     // Behavior 123: the RBA's rate on /facts.
     'fx.title': { vi: 'Tỷ giá đô la Úc', en: 'The Australian dollar' },
     'fx.asof': { vi: 'tỷ giá', en: 'rate on' },
