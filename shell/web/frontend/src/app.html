@@ -6,6 +6,14 @@
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <!-- = app.css --bg / --chrome: the browser paints its bars in this (behavior 63). -->
         <meta name="theme-color" content="#f6f4ef" />
+        <!-- Behavior 152: installable — the manifest (static/manifest.webmanifest) and the
+             iPhone's home-screen icon and name; display only, no new scope or permission. -->
+        <link rel="manifest" href="/manifest.webmanifest" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-title" content="Mai An Cư" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <style>
             /* Behavior 137: the page's text for crawlers (scripts/seo.ts); the app shows it once script runs. */
             .js #seo-static { display: none; }
