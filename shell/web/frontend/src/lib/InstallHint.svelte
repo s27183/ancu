@@ -1,36 +1,72 @@
 <script lang="ts">
     // Bilingual -> the bilingual plan reaches the phone it is read on -> the web frontend ->
-    // the iPhone's add-to-home-screen hint (behavior 152; the rule and its block:
-    // installHint.ts). Drawn after the home's cards, in the page's own scroll, so it covers
-    // no card and no control; the Share glyph is iOS's own square-and-arrow.
+    // the Add to Home Screen pill and its sheet (behavior 153; the rule and its block:
+    // installHint.ts). The pill sits at the right of the home's top row, opposite the
+    // Introduction pill; its sheet gives this device's steps and, once Son publishes it,
+    // the video at VIDEO (muted, inline, looping, with controls). A missing file fires the
+    // video's error, and the player is dropped, so the sheet never shows a broken player.
     import { onMount } from 'svelte';
     import { t } from '$lib/i18n';
-    import { browserHintEnv, closeInstallHint, shouldShowInstallHint } from '$lib/installHint';
+    import Modal from '$lib/Modal.svelte';
+    import { browserHintEnv, installSteps, type InstallSteps } from '$lib/installHint';
 
-    let show = $state(false);
+    const VIDEO = '/install/add-to-home.mp4';
+
+    let steps = $state<InstallSteps | null>(null);
+    let open = $state(false);
+    let videoOk = $state(true);
+    let videoReady = $state(false);
 
     onMount(() => {
-        show = shouldShowInstallHint(browserHintEnv());
+        steps = installSteps(browserHintEnv());
     });
 
-    function close() {
-        closeInstallHint(browserHintEnv().storage);
-        show = false;
+    function show() {
+        videoOk = true;
+        videoReady = false;
+        open = true;
     }
 </script>
 
-{#if show}
-    <aside class="install-hint" aria-label={$t('installhint.label')}>
-        <span class="install-hint-icon" aria-hidden="true">
+{#if steps}
+    <button type="button" class="home-pill install-pill" onclick={show} aria-haspopup="dialog">
+        <span class="install-pill-ico" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
-                ><path d="M8 9H6a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V10a1 1 0 0 0-1-1h-2" /><line x1="12" y1="3" x2="12" y2="15" /><polyline points="8.5 6.5 12 3 15.5 6.5" /></svg
+                ><rect x="6" y="2.5" width="12" height="19" rx="2.5" /><line x1="12" y1="8.5" x2="12" y2="14.5" /><line x1="9" y1="11.5" x2="15" y2="11.5" /></svg
             >
         </span>
-        <span class="install-hint-text">{$t('installhint.text')}</span>
-        <button type="button" class="install-hint-close" aria-label={$t('installhint.close')} onclick={close}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"
-                ><line x1="6" y1="6" x2="18" y2="18" /><line x1="18" y1="6" x2="6" y2="18" /></svg
-            >
-        </button>
-    </aside>
+        <span>{$t('installhint.pill')}</span>
+    </button>
+    {#if open}
+        <Modal title={$t('installhint.label')} onClose={() => (open = false)}>
+            <div class="install-sheet">
+                <ol class="install-steps">
+                    {#if steps.inApp}
+                        <li>{$t(steps.platform === 'ios' ? 'installhint.inapp.ios' : 'installhint.inapp.android')}</li>
+                    {/if}
+                    {#each ['1', '2'] as const as k (k)}
+                        <li>{$t(`installhint.${steps.platform}.${k}`)}</li>
+                    {/each}
+                </ol>
+                <p class="install-after">{$t('installhint.after')}</p>
+                {#if videoOk}
+                    <!-- svelte-ignore a11y_media_has_caption -->
+                    <video
+                        class="install-video"
+                        class:ready={videoReady}
+                        src={VIDEO}
+                        muted
+                        playsinline
+                        loop
+                        autoplay
+                        controls
+                        preload="metadata"
+                        aria-label={$t('installhint.video')}
+                        onloadeddata={() => (videoReady = true)}
+                        onerror={() => (videoOk = false)}
+                    ></video>
+                {/if}
+            </div>
+        </Modal>
+    {/if}
 {/if}

@@ -1,0 +1,143 @@
+Source: https://www.nsw.gov.au/housing-and-construction/property-professionals/working-as-an-agent/underquoting-guidance
+Retrieved: 2026-11-04
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML cd39a34f9d8aefcadf1fb55f91c419bdbfef4a996b1bcba2057382d4d1075e73
+
+Underquoting guidance for property professionals | NSW Government
+Underquoting guidance for property professionals
+These guidelines help property professionals understand underquoting laws and support licence holders in meeting their legal responsibilities.
+Last updated:
+08 July 2026
+Listen
+An agent is underquoting the selling price of a residential property if they make a statement or publish an advertisement about its price that is less than their reasonable estimate of the property’s likely selling price.
+info
+Upcoming changes to underquoting laws
+New laws for underquoting and prices in property sale advertisements are expected to start towards the end of 2026.
+Changes to property and stock agents laws
+The legal requirements for agency licence holders quoting on the selling price of residential properties are set out by:
+the Property and Stock Agents Act 2002 (the Act) and
+the Secretary’s guidelines for the proper supervision of the business of a licensee (the supervision guidelines ), issued under section 32 of the Act.
+Penalties for underquoting
+NSW Fair Trading is taking a zero tolerance approach to underquoting. We can issue you with a penalty infringement notice of $2,200. Depending on the circumstances, it could also be grounds for us to take further disciplinary action on your licence. If the matter is prosecuted in court and you are found guilty of underquoting, you may face a fine of up to $22,000. You could also lose the full commission and any fees for the property or properties you have underquoted.
+What the underquoting laws are for
+The underquoting laws ensure that buyers don’t waste money and time on property inspections, getting reports and attending auctions for properties that will be out of their price range.
+The underquoting guidelines are to inform and help licence holders to comply with their legal requirements. See NSW Fair Trading’s underquoting guidelines .
+Key requirements for residential property agents
+As an agent, you must:
+include your reasonable estimate of a property's likely selling price in the agency agreement
+ensure the higher price in a price range does not exceed the lower price by more than 10 percent if the estimate is expressed as a price range. For example, if the lower price is $500,000 the maximum price cannot exceed $550,000.
+provide evidence to the seller or prospective seller of how you estimated the selling price, or revised the estimated selling price. Detailed records should be retained to justify changes in the estimated selling price.
+ensure your estimated selling price remains reasonable
+revise your estimated selling price if there is evidence or circumstances that impact its reasonableness, by:
+notifying the seller of the revised price, and
+amending the agency agreement with the revised estimate.
+take all reasonable steps to amend or retract advertisements that have a selling price less than the revised estimate.
+ensure the supervision guidelines are followed. For example, written procedures are in place to ensure the following factors have been considered when determining the estimated selling price:
+any sales of comparable properties
+feedback from potential purchasers
+any current or relevant valuations provided in respect of the property
+the characteristics and features of the property
+the methods used to market the property, and
+any other available factor that may affect the estimated selling price.
+if required, show that the difference between the estimated selling price and actual selling price was reasonable in the circumstances.
+As an agent, you must not:
+provide a selling price (whether written or in person) less than what you have reasonably estimated (as recorded in the agency agreement with the seller). This applies to advertising the property or in any communication with prospective buyers while marketing the property.
+use any statements such as ‘offers above’ or ‘offers over’ an amount, or any symbols or words which could underquote or obscure a property's estimated value such as by adding ‘plus to a particular price (for example, $500,000+).
+make a statement about the last bid accepted at auction if it was a vendor bid (bid by auctioneer on behalf of the seller), where the residential property or rural land was passed in at auction. The exception is where the statement indicates that the bid was a vendor bid.
+Underquoting is an offence under the Act. Agents can face penalties of up to $22,000 for failing to comply. Agents may also lose their commission and fees gained from selling an underquoted property.
+Examples of underquoting
+Expand all Collapse all
+A seller or agent wants to advertise a lower price than the estimated selling price to attract market interest
+You should make sure that the seller is aware of your legal obligation not to indicate a selling price lower than your estimated selling price.
+Your role is to get the seller the highest possible price for the property through fair, effective marketing and enabling competition between buyers for whom the property is likely to be affordable.
+Direct the seller to our underquoting information for sellers page.
+Advertising ‘offers over $890K’ for a property when the estimated selling price was $900,000-$990,000
+You must not conduct any advertising that includes such references, for example:
+'offers above $900,000'
+'offers over $900,000' or
+'$900,000+'.
+These statements do not provide buyers with enough information to decide whether the property is within their price range. Such statements can mislead buyers by indicating that a property is likely to sell for the minimum offer advertised when it is more likely the property will be sold for more than that.
+A seller wants more than the estimated selling price
+If the seller wants to sell the property for more than your estimated selling price, you can advertise at a higher price that meets the seller’s instructions.
+You are not underquoting as long as you do not advertise or disclose any price that is less than the estimated selling price in the agency agreement.
+Make sure the seller knows that quoting the estimated selling price where the seller has advised that they will only sell for a higher price may be considered false or misleading under the Australian Consumer Law.
+Find out more about your requirements under the Australian Consumer Law at:
+NSW Fair Trading's underquoting guidelines for residential property
+Australian Consumer and Competition Commission real estate web page .
+The estimated selling price must be up to date
+Agents must review and amend their estimate in line with market feedback and other relevant factors that might affect a property's selling price. They are not allowed to continue to market a property at an estimated selling price that they know, or should know, is no longer a reasonable estimate. Accurate records should be maintained to justify any amendment to the estimated selling price.
+Reliable offers influence the estimated selling price
+You should request all offers in writing and keep accurate records of these offers. If you consider that any offer or offers received changes the likely selling price of the property, you should update the estimated selling price.
+A newspaper goes to print with an earlier estimated selling price
+It may not be practical to retract published newspaper advertising. You must be able to show that you have made reasonable attempts to update any advertising material that no longer shows your reasonable estimated selling price.
+Talking to a potential buyer on the phone or at an open house
+If you make a statement about a residential property’s likely selling price in marketing that property to a buyer, potential buyer, seller or potential seller, you must make a written record of the statement.
+The record of the statement must have:
+the address of the property concerned
+the price or price range, and
+the date and time of the statement.
+The underquoting guidelines for residential property has information about your record keeping requirements.
+Marketing multi-unit residential property or multi-lot residential subdivisions
+Collective marketing of residential units or lots that includes a price indication should also tell prospective buyers that there are multiple properties, of varying prices, within each category.
+Multi-unit residential properties
+Any advertising must include the estimated selling prices for
+the lowest and
+the highest priced properties
+in each category of unit (e.g. studio, one bedroom, two bedroom etc.).
+Advertisements for multi-unit properties must show prices in one of 2 ways:
+Give the price ranges for each category. The low end of the range is the estimated selling price of the lowest priced unit in the category and the higher end of the range is the most expensive property in that category. For example:
+one-bedroom units available - price range: $550K-$700K.
+$550K is the estimated selling price of the lowest priced one-bedroom unit. $700K is the estimated selling price of the highest priced one-bedroom unit.
+Note: because this method is for properties you are marketing as a group, it does not breach the rule related to estimated selling prices expressed as a range, which is for single properties.
+Give the estimated selling price in the agency agreement for each of the lowest and highest priced units in a property category. For example:
+one bedroom units available - the lowest priced unit is $550K, the highest priced unit is $700K;
+two bedroom units available - the lowest priced unit is $700K, the highest priced unit is $900K.
+Multi-lot subdivisions
+Multi-lot subdivisions need to include the lowest priced lot and the highest priced lot. The price indication should also advise prospective buyers that there are multiple properties within each category, of varying prices within that range.
+Updating prices when units or lots are sold
+You must update all advertising and marketing to reflect the value of the new lowest price unit or lot available when you sell:
+the lowest priced unit or lot, or
+the last of the lowest priced units in the price range for a particular category.
+Illegal practices for collective marketing
+Be aware that some earlier practices are now illegal, such as:
+a billboard promoting off-the-plan residential property that says: 'From $400,000'.
+promoting a range such as 'property available from $400K-$2.2M'.
+These examples do not show the price ranges for each category of residential units or lots being marketed.
+Not showing a price in advertisements
+Agents can ask potential buyers to contact them for further information. Agents must not indicate any price (verbal, written or advertised) for a specific property less than its estimated selling price.
+Estimated selling prices for multi-unit property and multi-lot subdivisions
+An agent can include a schedule of the:
+lots with their individual prices, or
+properties available with their features and a price for each.
+Agents should attach this to the agency agreement. Any prices included in the schedule cannot be less than the estimated selling price for each unit or lot.
+More ways to avoid underquoting
+1
+Download the underquoting guidelines for residential property
+This has more details on agents’ responsibilities and guidance on how to avoid underquoting.
+Download the guidelines
+2
+Subscribe to NSW Fair Trading's Property Matters email updates
+These emails will help you understand and comply with your requirements as a licence-holder in the property industry.
+Subscribe to Property Matters
+3
+Attend an information seminar for agents
+NSW Fair Trading holds sessions across NSW.
+4
+Use the underquoting checklist
+This can help you and your customers understand what underquoting is.
+Download the checklist
+5
+Speak to an NSW Fair Trading officer
+Phone: 13 32 20
+You will not be at risk of breaching the underquoting laws if you comply with all the requirements expected of agents under the Act.
+Related information
+Underquoting guidelines for residential property
+download Download as PDF
+print Print this page
+share Share this page
+Facebook
+LinkedIn
+X
+Email
+mail
+Top of page
+north

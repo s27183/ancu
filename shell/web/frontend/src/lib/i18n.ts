@@ -92,6 +92,8 @@ const messages = {
     // behavior 150 (Son 2026-11-04): the homes for sale in a suburb, on the listing sites.
     'listing.button': { vi: 'Nhà đang bán ở {name}', en: 'Homes for sale in {name}' },
     'listing.title': { vi: 'Nhà đang bán', en: 'Homes for sale' },
+    // Behavior 153: before the listing-site links (AudNote.svelte, fxLine.ts).
+    'listing.aud': { vi: 'Giá trên các trang này tính bằng đô la Úc (AUD)', en: 'Prices on these sites are in Australian dollars (AUD)' },
     'listing.note': {
         vi: `Đây là trang web của các công ty khác; ${BRAND} không có liên kết gì với họ.`,
         en: `These are other companies' websites; ${BRAND} has no tie to them.`
@@ -1340,8 +1342,8 @@ const messages = {
     // Behavior 151: the home's fifth card and the property market page (/market) it opens.
     'home.market.title': { vi: 'Thị trường nhà ở Úc', en: "Australia's property market" },
     'home.market.body': {
-        vi: 'Giá nhà, những bảo đảm khi mua và các trang rao bán chính.',
-        en: 'Prices, the safeguards when you buy, and the main listing sites.'
+        vi: 'Giá nhà được công khai thế nào, những bảo đảm khi mua và các trang rao bán chính.',
+        en: 'How prices are disclosed, the safeguards when you buy, and the main listing sites.'
     },
     'marketpage.sub': { vi: 'Có nguồn chính phủ', en: 'From government sources' },
     'marketpage.note': {
@@ -1354,13 +1356,37 @@ const messages = {
         en: 'These are private companies. Mai An Cư has no tie or arrangement with any of them.'
     },
     'factspage.news': { vi: 'Đọc tin', en: 'Read the news' },
-    // Behavior 152: the iPhone's add-to-home-screen hint on the home (installHint.ts).
+    // Behavior 153 (was 152's strip): the Add to Home Screen pill and its sheet (installHint.ts).
+    'installhint.pill': { vi: 'Thêm vào màn hình chính', en: 'Add to Home Screen' },
     'installhint.label': { vi: 'Thêm Mai An Cư vào màn hình chính', en: 'Add Mai An Cư to your Home Screen' },
-    'installhint.text': {
-        vi: 'Chạm Chia sẻ (trong ⋯ trên iOS 26), rồi Thêm vào MH chính',
-        en: 'Tap Share (under ⋯ on iOS 26), then Add to Home Screen'
+    'installhint.inapp.ios': {
+        vi: 'Bạn đang xem trong một ứng dụng (như Zalo hay Facebook): mở trang này trong Safari trước.',
+        en: 'You are in an app’s browser (such as Zalo or Facebook): open this page in Safari first.'
     },
-    'installhint.close': { vi: 'Đóng gợi ý', en: 'Close the hint' },
+    'installhint.inapp.android': {
+        vi: 'Bạn đang xem trong một ứng dụng (như Zalo hay Facebook): mở trang này trong Chrome trước.',
+        en: 'You are in an app’s browser (such as Zalo or Facebook): open this page in Chrome first.'
+    },
+    'installhint.ios.1': {
+        vi: 'Chạm nút Chia sẻ (trên iOS 26, nằm trong nút ⋯).',
+        en: 'Tap Share (on iOS 26, it is under the ⋯ button).'
+    },
+    'installhint.ios.2': { vi: 'Chọn Thêm vào MH chính, rồi Thêm.', en: 'Choose Add to Home Screen, then Add.' },
+    'installhint.android.1': { vi: 'Mở menu ⋮ của trình duyệt.', en: 'Open the browser’s ⋮ menu.' },
+    'installhint.android.2': {
+        vi: 'Chọn Thêm vào màn hình chính hoặc Cài đặt ứng dụng.',
+        en: 'Choose Add to Home screen or Install app.'
+    },
+    'installhint.desktop.1': {
+        vi: 'Tìm nút cài đặt ở thanh địa chỉ, hoặc mở menu của trình duyệt.',
+        en: 'Look for the install button in the address bar, or open the browser’s menu.'
+    },
+    'installhint.desktop.2': { vi: 'Chọn Cài đặt Mai An Cư.', en: 'Choose Install Mai An Cư.' },
+    'installhint.after': {
+        vi: 'Biểu tượng Mai An Cư sẽ hiện trên màn hình chính, mở như một ứng dụng.',
+        en: 'The Mai An Cư icon appears on your Home Screen and opens like an app.'
+    },
+    'installhint.video': { vi: 'Video: cách thêm Mai An Cư vào màn hình chính', en: 'Video: adding Mai An Cư to the Home Screen' },
     // Behavior 123: the RBA's rate on /facts.
     'fx.title': { vi: 'Tỷ giá đô la Úc', en: 'The Australian dollar' },
     'fx.asof': { vi: 'tỷ giá', en: 'rate on' },
@@ -1480,8 +1506,9 @@ const messages = {
     },
     'intro.isnt': { vi: `${BRAND} không phải`, en: `${BRAND} is not` },
     'intro.isnt.listing': {
-        vi: 'Trang rao bán nhà đất: không đăng bán nhà, không môi giới',
-        en: 'A property listing site: no homes for sale, no agents'
+        // Behavior 153: and the listing sites it links to are not its own.
+        vi: 'Trang rao bán nhà đất: không đăng bán nhà, không môi giới; chỉ dẫn link đến các trang rao bán lớn nhất (realestate.com.au, Domain, Allhomes), không liên kết gì với họ',
+        en: 'A property listing site: no homes for sale, no agents; it only links to the largest listing sites (realestate.com.au, Domain, Allhomes), with no tie to them'
     },
     'intro.isnt.advice': {
         vi: 'Dịch vụ tư vấn pháp lý, thuế hay tài chính',
@@ -1513,8 +1540,8 @@ const messages = {
     },
     'intro.value.listing.title': { vi: 'Không phải trang rao bán nhà đất', en: 'Not a property listing site' },
     'intro.value.listing.body': {
-        vi: `${BRAND} không đăng bán bất động sản nào và không làm môi giới; không gắn với môi giới, luật sư, đại lý di trú hay chủ đầu tư nào. Bạn tìm nhà qua kênh mình chọn — ${BRAND} là bản kiểm tra độc lập cho toàn bộ ngân sách mua, giữ và bán theo quy định hiện hành, dù bạn đã mua hay chưa biết bắt đầu từ đâu.`,
-        en: `${BRAND} lists no property for sale and acts as no agent; it is tied to no real-estate agent, lawyer, migration agent or developer. You find a home through the channel you choose — ${BRAND} is an independent check of the whole budget to buy, hold and sell under current regulations, whether you already bought or don’t know where to start.`
+        vi: `${BRAND} không đăng bán bất động sản nào và không làm môi giới; không gắn với môi giới, luật sư, đại lý di trú hay chủ đầu tư nào. Để xem nhà đang rao bán, ${BRAND} dẫn link đến các trang rao bán lớn nhất — realestate.com.au, Domain và Allhomes — là các công ty tư nhân không có liên kết gì với ${BRAND}. Bạn tìm nhà qua kênh mình chọn — ${BRAND} là bản kiểm tra độc lập cho toàn bộ ngân sách mua, giữ và bán theo quy định hiện hành, dù bạn đã mua hay chưa biết bắt đầu từ đâu.`,
+        en: `${BRAND} lists no property for sale and acts as no agent; it is tied to no real-estate agent, lawyer, migration agent or developer. To see homes for sale, ${BRAND} links to the largest listing sites — realestate.com.au, Domain and Allhomes — private companies with no tie to ${BRAND}. You find a home through the channel you choose — ${BRAND} is an independent check of the whole budget to buy, hold and sell under current regulations, whether you already bought or don’t know where to start.`
     },
     'intro.value.plan.title': { vi: 'Kế hoạch trọn hành trình', en: 'One plan, the whole journey' },
     'intro.value.plan.body': {

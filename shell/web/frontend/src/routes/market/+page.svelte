@@ -2,7 +2,9 @@
     // Regulated figures are grounded -> P-6 · Shells reach the engine only through the contract -> The web frontend -> the property market page (/market)
     // Purpose:   behavior 151 (Son 2026-11-04): the home's fifth card, "Thị trường nhà ở Úc" /
     //            "Australia's property market", opens one page of why the market can be
-    //            trusted — the property facts (kb.facts.australian-property, until now on
+    //            trusted — how prices are disclosed (kb.facts.listing-transparency, behavior
+    //            153: first, the question Vietnamese buyers ask most), the property facts
+    //            (kb.facts.australian-property, until now on
     //            /facts), the safeguards when you buy (kb.facts.property-safeguards, each a
     //            sentence its linked government page states), then the main listing sites.
     // Holds:     the fact docs drawn are MARKET_DOCS (facts.ts) and /facts draws every other,
@@ -19,6 +21,7 @@
     import { type FactDoc, getFacts, MARKET_DOCS, pick } from '$lib/facts';
     import FactCards from '$lib/FactCards.svelte';
     import HomeBack from '$lib/HomeBack.svelte';
+    import AudNote from '$lib/AudNote.svelte';
     import { onContentChange } from '$lib/stores/content';
 
     // Name and address only: no ranking or description, which no government source states.
@@ -72,6 +75,8 @@
             {/if}
             <section class="mk-section" id="mk-listings" aria-labelledby="mk-listings-title">
                 <h3 id="mk-listings-title">{$t('marketpage.listings.title')}</h3>
+                <!-- Behavior 153: their prices are in AUD, with the RBA's rate. -->
+                <AudNote />
                 <ul class="mk-sites">
                     {#each LISTINGS as s (s.href)}
                         <li>
@@ -112,7 +117,7 @@
     .mk-sites {
         display: grid;
         gap: var(--sp-2);
-        margin: 0;
+        margin: var(--sp-3) 0 0;
         padding: 0;
         list-style: none;
     }

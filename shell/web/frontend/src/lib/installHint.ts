@@ -1,27 +1,17 @@
 // Bilingual -> the bilingual plan reaches the phone it is read on -> the web frontend -> the
-// iPhone's add-to-home-screen hint
-// Goal:      behavior 152 — iPhone Safari has no install prompt of its own, so the home page
-//            says how: "Chạm Chia sẻ (trong ⋯ trên iOS 26), rồi Thêm vào MH chính" / "Tap Share
-//            (under ⋯ on iOS 26), then Add to Home Screen" (InstallHint.svelte) — iOS 26.2 Safari
-//            keeps Share under its ⋯ menu (measured 2026-11-04: its own first-run tip says so).
-// Invariant: shown only in iOS Safari, never inside the installed app (navigator.standalone or
-//            display-mode: standalone) nor in another iOS browser (CriOS, FxiOS, EdgiOS, …,
-//            whose Share sheet has no Add to Home Screen of ours to point at); once closed with
-//            ✕ it does not come back (HINT_KEY). Storage that throws never throws here: a
-//            blocked read shows the hint, a blocked write hides it for the page view only.
-// Capability: a pure rule over what the page can read — the user agent, touch points (iPadOS
-//            reports a Mac user agent), the two standalone signals and a storage — so
-//            unit/installHint.test.ts runs it over every case; Android Chrome offers its own
-//            install prompt from the manifest (measured 2026-11-04: Chrome 156 fires
-//            beforeinstallprompt with no service worker).
-
-export const HINT_KEY = 'ancu-install-hint-closed';
-
-/** The part of Storage the rule uses; a real localStorage or a test double. */
-export interface HintStorage {
-    getItem(key: string): string | null;
-    setItem(key: string, value: string): void;
-}
+// Add to Home Screen pill and its sheet
+// Goal:      behavior 153 (was 152's strip under the cards): a pill at the top-right of the
+//            home opens a sheet with the steps for this device, and Son's video once one is
+//            published (InstallSheet.svelte). iOS 26.2 Safari keeps Share under its ⋯ menu
+//            (measured 2026-11-04: its own first-run tip says so).
+// Invariant: the pill shows in every browser except the installed app (navigator.standalone
+//            or display-mode: standalone). The steps are those of the device the page reads:
+//            an in-app browser (Zalo, Facebook, Instagram, …, which has no Add to Home
+//            Screen of its own) is told to open the page in Safari or Chrome first, then the
+//            phone's own steps. Nothing read here can throw.
+// Capability: a pure rule over what the page can read — the user agent, touch points
+//            (iPadOS reports a Mac user agent) and the two standalone signals — so
+//            unit/installHint.test.ts runs it over every case.
 
 export interface HintEnv {
     ua: string;
@@ -30,51 +20,34 @@ export interface HintEnv {
     navigatorStandalone: boolean;
     /** matchMedia('(display-mode: standalone)').matches */
     displayStandalone: boolean;
-    storage: HintStorage | null;
 }
 
-// Other browsers on iOS wrap WebKit and keep "Safari/" in their user agent; each adds its mark.
-const OTHER_IOS_BROWSER = /CriOS|FxiOS|EdgiOS|OPiOS|OPT\/|GSA\/|YaBrowser|DuckDuckGo|Brave|FBAN|FBAV|Instagram|Line\/|Zalo|MicroMessenger|Snapchat|Twitter|LinkedInApp|Pinterest/i;
+export type InstallPlatform = 'ios' | 'android' | 'desktop';
 
-export function isIosSafari(ua: string, maxTouchPoints: number): boolean {
-    if (typeof ua !== 'string') return false;
-    const iosDevice = /\b(iPhone|iPad|iPod)\b/.test(ua) || (/\bMacintosh\b/.test(ua) && maxTouchPoints > 1);
-    if (!iosDevice) return false;
-    if (!/\bVersion\/\d/.test(ua) || !/\bSafari\//.test(ua) || !/AppleWebKit\//.test(ua)) return false;
-    return !OTHER_IOS_BROWSER.test(ua);
+export interface InstallSteps {
+    platform: InstallPlatform;
+    /** An in-app browser: open the page in Safari or Chrome first. */
+    inApp: boolean;
 }
 
-function closed(storage: HintStorage | null): boolean {
-    try {
-        return storage?.getItem(HINT_KEY) === '1';
-    } catch {
-        return false;
-    }
+// In-app browsers of the apps Vietnamese visitors arrive from; each adds its mark.
+const IN_APP = /FBAN|FBAV|FB_IAB|Instagram|Zalo|Line\/|MicroMessenger|Messenger|Snapchat|Twitter|LinkedInApp|Pinterest|TikTok|musical_ly|BytedanceWebview/i;
+
+function isIosDevice(ua: string, maxTouchPoints: number): boolean {
+    return /\b(iPhone|iPad|iPod)\b/.test(ua) || (/\bMacintosh\b/.test(ua) && maxTouchPoints > 1);
 }
 
-export function shouldShowInstallHint(env: HintEnv): boolean {
-    if (env.navigatorStandalone || env.displayStandalone) return false;
-    if (!isIosSafari(env.ua, env.maxTouchPoints)) return false;
-    return !closed(env.storage);
+/** null inside the installed app: no pill. */
+export function installSteps(env: HintEnv): InstallSteps | null {
+    if (env.navigatorStandalone || env.displayStandalone) return null;
+    const ua = typeof env.ua === 'string' ? env.ua : '';
+    const touch = Number.isFinite(env.maxTouchPoints) ? env.maxTouchPoints : 0;
+    const platform: InstallPlatform = isIosDevice(ua, touch) ? 'ios' : /\bAndroid\b/.test(ua) ? 'android' : 'desktop';
+    return { platform, inApp: platform !== 'desktop' && IN_APP.test(ua) };
 }
 
-/** ✕: remember it in this browser; a storage that refuses only loses the memory. */
-export function closeInstallHint(storage: HintStorage | null): void {
-    try {
-        storage?.setItem(HINT_KEY, '1');
-    } catch {
-        /* storage blocked: hidden for this page view, shown again next visit */
-    }
-}
-
-/** The page's own environment; null storage where reading localStorage itself throws. */
+/** The page's own environment; any signal that throws reads as false. */
 export function browserHintEnv(): HintEnv {
-    let storage: HintStorage | null = null;
-    try {
-        storage = window.localStorage;
-    } catch {
-        storage = null;
-    }
     let displayStandalone = false;
     try {
         displayStandalone = window.matchMedia('(display-mode: standalone)').matches;
@@ -85,7 +58,6 @@ export function browserHintEnv(): HintEnv {
         ua: navigator.userAgent,
         maxTouchPoints: navigator.maxTouchPoints ?? 0,
         navigatorStandalone: (navigator as Navigator & { standalone?: boolean }).standalone === true,
-        displayStandalone,
-        storage
+        displayStandalone
     };
 }
