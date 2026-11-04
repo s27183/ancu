@@ -152,7 +152,6 @@ def run() -> tuple[int, int]:
             {"sal_code": sal, "facts": facts[sal], "prov": prov[sal]} for sal in facts
         ]
         db.ensure_source(conn, SOURCE)
-        db.clear_source_facts(conn, SOURCE["source_id"])  # a rerun replaces its release
         matched, missed = db.update_facts(conn, update_rows)
         conn.commit()
     finally:
