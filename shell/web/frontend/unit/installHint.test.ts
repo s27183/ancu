@@ -4,7 +4,7 @@
 // in a browser first. Run over every agent × standalone signal, and seeded hostile agents.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { ANDROID_VIDEO, INSTALL_VIDEOS, IOS_VIDEO, installClip, installSteps, installVideo, showInstallButton, type InstallPlatform, type OfferState } from '../src/lib/installHint.ts';
+import { ANDROID_VIDEO, INSTALL_VIDEOS, IOS_VIDEO, installClip, installSteps, installVideo, sheetView, showInstallButton, type InstallPlatform, type OfferState } from '../src/lib/installHint.ts';
 
 const SEED = 153;
 function mulberry32(a: number) {
@@ -141,5 +141,38 @@ test('2,000 hostile cases, seed 158: the clip follows the platform exactly; neve
             bad.push(`${i}: threw ${e}`);
         }
     }
+    assert.deepEqual(bad, []);
+});
+
+test('2,000 hostile cases, seed 159: the steps follow the pill; the button and in-app line only on the own phone; never throws', () => {
+    const rand = mulberry32(159);
+    const parts = ['<script>alert(1)</script>', '\u0000\u202e', 'iPhone', 'iPad', 'Android', 'Zalo', 'FBAN', 'Instagram', 'Macintosh', 'Windows', 'CriOS/1', 'Chrome/156', '"\'`', '\n', 'x'.repeat(4096)];
+    const offers: OfferState[] = ['held', 'used', 'none'];
+    const bad: string[] = [];
+    let seen = 0;
+    for (let i = 0; i < 2000; i++) {
+        let ua = '';
+        for (let k = 0, n = Math.floor(rand() * 5); k <= n; k++) ua += parts[Math.floor(rand() * parts.length)];
+        const odd = [ua, ua, undefined, null, 42][Math.floor(rand() * 5)] as unknown as string;
+        const touch = [0, 5, NaN, -1, Infinity][Math.floor(rand() * 5)];
+        const offer = offers[Math.floor(rand() * 3)];
+        const clip = rand() < 0.5 ? 'ios' : 'android';
+        try {
+            const steps = installSteps({ ua: odd, maxTouchPoints: touch, navigatorStandalone: rand() < 0.2, displayStandalone: rand() < 0.2 });
+            if (!steps) continue;
+            seen++;
+            const v = sheetView(steps, clip, offer);
+            const own = steps.platform === clip;
+            const desktop = steps.platform === 'desktop';
+            if (v.phone !== clip) bad.push(`${i}: steps ${v.phone} under the ${clip} pill`);
+            if (v.desktop !== desktop) bad.push(`${i}: desktop ${v.desktop}`);
+            if (v.inApp !== (own && steps.inApp)) bad.push(`${i}: in-app line ${v.inApp}`);
+            if (v.button !== (offer === 'held' && !steps.inApp && steps.platform !== 'ios' && (desktop || own))) bad.push(`${i}: button ${v.button} (${steps.platform}, ${clip}, ${offer})`);
+            if (v.button && steps.platform === 'ios') bad.push(`${i}: button on an iPhone`);
+        } catch (e) {
+            bad.push(`${i}: threw ${e}`);
+        }
+    }
+    assert.ok(seen > 1000, `only ${seen} sheets`);
     assert.deepEqual(bad, []);
 });

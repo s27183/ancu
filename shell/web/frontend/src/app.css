@@ -3873,6 +3873,43 @@ main {
     max-width: 64rem;
     margin: 0 auto var(--sp-4);
 }
+/* Behavior 159 (was Welcome.svelte's, behavior 50/51): the light-green pulse both home
+   pills share — a layer behind the label whose opacity alone animates, so the compositor
+   runs it without repainting the pill. It runs while the pill has .pulse (every page view
+   until the pill is tapped) and never under reduced motion. The pill is the layer's
+   positioned box and its children sit above it. */
+.pill-pulse {
+    position: relative;
+}
+.pill-pulse::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--accent-soft-2);
+    opacity: 0;
+    pointer-events: none;
+}
+.pill-pulse > * {
+    position: relative;
+}
+.pill-pulse.pulse::before {
+    animation: pill-pulse 2.4s ease-in-out infinite;
+}
+@keyframes pill-pulse {
+    0%,
+    100% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .pill-pulse.pulse::before {
+        animation: none;
+    }
+}
 .install-pill {
     margin-left: auto;
     display: inline-flex;
@@ -3933,6 +3970,15 @@ main {
     margin: 0;
     color: var(--ink);
     font-weight: 700;
+}
+/* Behavior 159: on a computer, the heading that sets the phone steps apart from its own. */
+.install-phone {
+    margin: var(--sp-2) 0 0;
+    color: var(--ink-2);
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
 }
 .install-after {
     margin: 0;

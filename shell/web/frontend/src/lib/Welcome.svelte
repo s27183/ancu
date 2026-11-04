@@ -291,7 +291,7 @@
 
 <button
     type="button"
-    class="wl-launch"
+    class="wl-launch pill-pulse"
     class:waiting={open}
     class:arrived
     class:pulse
@@ -734,33 +734,8 @@
     .wl-launch-ico .b3 {
         fill: var(--gold-mark);
     }
-    /* The pulse (behavior 50) fades a light-green layer behind the label in and out.
-       Only its opacity animates, so the compositor runs it without repainting the
-       button each frame (behavior 51); the old box-shadow ring repainted every frame. */
-    .wl-launch::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        border-radius: inherit;
-        background: var(--accent-soft-2);
-        opacity: 0;
-        pointer-events: none;
-    }
-    .wl-launch > * {
-        position: relative;
-    }
-    .wl-launch.pulse::before {
-        animation: wl-pulse 2.4s ease-in-out infinite;
-    }
-    @keyframes wl-pulse {
-        0%,
-        100% {
-            opacity: 0;
-        }
-        50% {
-            opacity: 1;
-        }
-    }
+    /* The pulse (behavior 50) is the shared .pill-pulse in app.css (behavior 159), so the
+       «Use as an app» pill beside this one pulses by the same rule. */
 
     /* --- wider screens: a centred card, facts two-up ------------------------ */
     @media (min-width: 48rem) {
@@ -812,7 +787,6 @@
         .wl-scrim,
         .wl-launch,
         .wl-launch.arrived,
-        .wl-launch.pulse::before,
         .wl-arrow svg {
             animation: none;
             transition: none;
