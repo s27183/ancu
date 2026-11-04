@@ -9,15 +9,12 @@
     //            Hành trình, data, news) and claims grounding only for what cites it — every
     //            figure and every rule-bound step (behaviors 113, 114); the launcher reads "Giới thiệu" /
     //            "Introduction" (behavior 107, Son 2026-10-17: once "Vì sao Úc?"); the
-    //            launcher never covers a home card (behavior 128): it sits fixed at the
-    //            bottom-right where its box, grown by a 12px gap, meets none of the cards'
-    //            column at any point of the home's scroll — a home that does not scroll
-    //            included — and otherwise is drawn after the cards, right-aligned,
-    //            scrolling with them — measured on load, on resize, on a language change, when
-    //            fonts land and when the news band's height moves the cards.
+    //            launcher never covers a home card: since behavior 153 it is the left pill
+    //            of the home's top row (.home-pills), in the flow above the cards, which
+    //            retired behavior 128's measured placement.
     // Rests on:  i18n.ts intro.* keys, VI and EN side by side; the home (routes/+page.svelte)
-    //            mounting this inside its scrolling .home, after nav.home-ways, and .home
-    //            making no stacking context of its own (app.css), so the sheet still covers
+    //            mounting this inside its scrolling .home, in .home-pills before nav.home-ways,
+    //            and neither making a stacking context of its own (app.css), so the sheet still covers
     //            the header; the close's fly-back reads launchEl's rect wherever it sits.
     //
     // The first-visit sheet (behavior 42): opens by itself the first time this browser
@@ -26,14 +23,14 @@
     // 2026-10-16: many took it for a listing site), draws the KB's cited facts —
     // where Vietnamese buyers stand, then why Australian property — and what the product
     // adds on top of them. Closing it (✕, scrim, Escape or the CTA) flies the card into a
-    // small animated launcher at the bottom-right, which reopens it (behavior 44: its first
+    // small animated launcher at the home's top-left, which reopens it (behavior 44: its first
     // screen leads to the position card and the facts in one tap each); the browser then
     // remembers it was seen (facts.ts, introSeen). Under prefers-reduced-motion nothing
     // flies or pulses — it simply closes and the launcher sits still. The launcher pulses
     // light green on every visit until it is tapped (behavior 50).
     import { onMount, tick } from 'svelte';
-    import { lang } from '$lib/stores/lang';
     import { onContentChange } from '$lib/stores/content';
+    import { lang } from '$lib/stores/lang';
     import { t } from '$lib/i18n';
     import FactCards from '$lib/FactCards.svelte';
     import Sparkle from '$lib/Sparkle.svelte';
@@ -68,64 +65,6 @@
     // home starts nothing (the map page starts it on its own first visit, tour.ts);
     // "Show me around" at the sheet's foot goes to the map and replays it there.
     let tourAfter = false;
-
-    // Behavior 128: where the launcher sits. Measured with it fixed (the class off for the
-    // one synchronous read, the home's scroll put back after), against nav.home-ways over
-    // the home's whole scroll range: the cards' top runs from top0 - range to top0 as the
-    // home scrolls, so the fixed box meets them at some scroll s in [0, range] exactly
-    // when top0 - b.bottom < s < bottom0 - b.top has a solution there — the open interval
-    // (lo, hi) meets the closed [0, range] iff lo < range and hi > 0. The box is grown by
-    // CLEAR first, so "not meeting" also leaves a visible gap. The first version tested
-    // max(0, lo) < min(range, hi), which is never true when the home does not scroll
-    // (range 0): Son's iPhone, 2026-10-18, 440×760 — fixed, over the fourth card's corner.
-    const CLEAR = 12;
-    let inline = $state(false);
-    function placeLauncher() {
-        const btn = launchEl;
-        const home = btn?.closest<HTMLElement>('.home');
-        const ways = home?.querySelector<HTMLElement>('.home-ways');
-        if (!btn || !home || !ways) return;
-        const kept = home.scrollTop;
-        btn.classList.remove('inline');
-        const b = btn.getBoundingClientRect();
-        const w = ways.getBoundingClientRect();
-        const range = Math.max(0, home.scrollHeight - home.clientHeight);
-        const top0 = w.top + home.scrollTop;
-        const bottom0 = w.bottom + home.scrollTop;
-        const across = b.left - CLEAR < w.right && b.right + CLEAR > w.left;
-        const lo = top0 - (b.bottom + CLEAR);
-        const hi = bottom0 - (b.top - CLEAR);
-        const meets = across && lo < range && hi > 0;
-        btn.classList.toggle('inline', meets);
-        home.scrollTop = kept;
-        inline = meets;
-    }
-    $effect(() => {
-        const home = launchEl?.closest<HTMLElement>('.home');
-        if (!home) return;
-        const ways = home.querySelector<HTMLElement>('.home-ways');
-        const ro = new ResizeObserver(() => placeLauncher());
-        ro.observe(home);
-        if (ways) ro.observe(ways);
-        window.addEventListener('resize', placeLauncher);
-        // The news band's height reaches the home's top padding later, through
-        // --home-news-h on the root's style (+layout.svelte): that moves the cards down
-        // without resizing .home or the cards, so no ResizeObserver sees it (measured
-        // 2026-10-18: 440×720 placed fixed over the fourth card). Fonts landing do the same.
-        const mo = new MutationObserver(() => placeLauncher());
-        mo.observe(document.documentElement, { attributes: true, attributeFilter: ['style'] });
-        document.fonts?.ready.then(() => placeLauncher());
-        return () => {
-            mo.disconnect();
-            ro.disconnect();
-            window.removeEventListener('resize', placeLauncher);
-        };
-    });
-    // The label's width changes with the language ("Giới thiệu" / "Introduction").
-    $effect(() => {
-        void $lang;
-        tick().then(placeLauncher);
-    });
 
     // The sheet draws its own three sections only: the facts page (/facts, behavior 122)
     // shows the KB's other fact docs (the economy, visa charges) and they stay off here.
@@ -173,9 +112,10 @@
         if (!open || closing) return;
         markIntroSeen();
         if (reduceMotion() || !cardEl || !launchEl) return closed();
-        // Drawn after the cards (behavior 128), the launcher may be scrolled out of view:
-        // bring it in under the sheet first, so the card lands on a button one can see.
-        if (inline) launchEl.scrollIntoView({ block: 'center' });
+        // The launcher heads the home (behavior 153), so a scrolled home may have taken it
+        // out of view: bring it in under the sheet first, so the card lands on a button one sees.
+        const top = launchEl.getBoundingClientRect();
+        if (top.bottom < 0 || top.top > window.innerHeight) launchEl.scrollIntoView({ block: 'center' });
         // Fly the card's centre onto the launcher's centre while it shrinks and fades.
         const c = cardEl.getBoundingClientRect();
         const l = launchEl.getBoundingClientRect();
@@ -353,7 +293,6 @@
     type="button"
     class="wl-launch"
     class:waiting={open}
-    class:inline
     class:arrived
     class:pulse
     aria-label={$t('intro.button.aria')}
@@ -738,11 +677,10 @@
     }
 
     /* --- launcher ----------------------------------------------------------- */
+    /* Behavior 153: the left pill of the home's top row, in the flow; position relative
+       anchors the pulse layer, and z-index auto keeps it under the header and the band. */
     .wl-launch {
-        position: fixed;
-        right: 0.75rem;
-        bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
-        z-index: 20;
+        position: relative;
         display: inline-flex;
         align-items: center;
         gap: var(--sp-2);
@@ -758,17 +696,6 @@
         transition:
             transform var(--t-fast) var(--ease),
             box-shadow var(--t-fast) var(--ease);
-    }
-    /* Behavior 128: after the cards, at the right edge of their column (64rem, centred),
-       in the home's flow and its scroll; z-index auto keeps it under the header and band. */
-    .wl-launch.inline {
-        position: relative;
-        right: auto;
-        bottom: auto;
-        z-index: auto;
-        display: flex;
-        width: fit-content;
-        margin: var(--sp-4) max(0px, calc((100% - 64rem) / 2)) 0 auto;
     }
     .wl-launch:hover {
         transform: translateY(-2px);

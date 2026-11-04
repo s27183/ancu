@@ -7,9 +7,10 @@
     // (Welcome) over the cards, whose first screen leads to the independent /
     // information-not-advice position in one tap; minimised, it leaves the cards in view.
     // Behavior 89: a dotted map of Australia lights up behind the cards (HomeBackdrop).
-    // Behavior 128: Welcome sits inside .home, after the cards, so its launcher can fall in
-    // behind them where at the bottom-right it would cover one.
-    // Behavior 152: under the cards, on iPhone Safari only, how to add it to the Home Screen.
+    // Behavior 153: one row heads the home, above every card (.home-pills): Welcome's
+    // "Giới thiệu" launcher on the left, the Add to Home Screen pill (InstallHint) on the
+    // right. In the flow, neither can cover a card (behavior 128's placement retired), and
+    // the install pill replaces behavior 152's strip under the cards.
     import Welcome from '$lib/Welcome.svelte';
     import HomeBackdrop from '$lib/HomeBackdrop.svelte';
     import InstallHint from '$lib/InstallHint.svelte';
@@ -18,6 +19,11 @@
 
 <HomeBackdrop />
 <div class="home">
+    <div class="home-pills">
+        <!-- First visit: the case for Australian property, then the launcher that reopens it (behavior 42). -->
+        <Welcome />
+        <InstallHint />
+    </div>
     <nav class="home-ways" aria-label={$t('brand.name')}>
         <a class="home-way" href="/plan">
             <span class="home-way-icon" aria-hidden="true">
@@ -95,10 +101,4 @@
             >
         </a>
     </nav>
-    <!-- Behavior 152: on iPhone Safari only, how to add the site to the Home Screen. -->
-    <InstallHint />
-    <!-- First visit: the case for Australian property, then a launcher to reopen it
-         (behavior 42) — inside the home's scroll, so where the launcher would cover a
-         card it is drawn after them instead (behavior 128, Welcome's block). -->
-    <Welcome />
 </div>

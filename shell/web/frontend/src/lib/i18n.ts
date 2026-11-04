@@ -1354,13 +1354,37 @@ const messages = {
         en: 'These are private companies. Mai An Cư has no tie or arrangement with any of them.'
     },
     'factspage.news': { vi: 'Đọc tin', en: 'Read the news' },
-    // Behavior 152: the iPhone's add-to-home-screen hint on the home (installHint.ts).
+    // Behavior 153 (was 152's strip): the Add to Home Screen pill and its sheet (installHint.ts).
+    'installhint.pill': { vi: 'Thêm vào màn hình chính', en: 'Add to Home Screen' },
     'installhint.label': { vi: 'Thêm Mai An Cư vào màn hình chính', en: 'Add Mai An Cư to your Home Screen' },
-    'installhint.text': {
-        vi: 'Chạm Chia sẻ (trong ⋯ trên iOS 26), rồi Thêm vào MH chính',
-        en: 'Tap Share (under ⋯ on iOS 26), then Add to Home Screen'
+    'installhint.inapp.ios': {
+        vi: 'Bạn đang xem trong một ứng dụng (như Zalo hay Facebook): mở trang này trong Safari trước.',
+        en: 'You are in an app’s browser (such as Zalo or Facebook): open this page in Safari first.'
     },
-    'installhint.close': { vi: 'Đóng gợi ý', en: 'Close the hint' },
+    'installhint.inapp.android': {
+        vi: 'Bạn đang xem trong một ứng dụng (như Zalo hay Facebook): mở trang này trong Chrome trước.',
+        en: 'You are in an app’s browser (such as Zalo or Facebook): open this page in Chrome first.'
+    },
+    'installhint.ios.1': {
+        vi: 'Chạm nút Chia sẻ (trên iOS 26, nằm trong nút ⋯).',
+        en: 'Tap Share (on iOS 26, it is under the ⋯ button).'
+    },
+    'installhint.ios.2': { vi: 'Chọn Thêm vào MH chính, rồi Thêm.', en: 'Choose Add to Home Screen, then Add.' },
+    'installhint.android.1': { vi: 'Mở menu ⋮ của trình duyệt.', en: 'Open the browser’s ⋮ menu.' },
+    'installhint.android.2': {
+        vi: 'Chọn Thêm vào màn hình chính hoặc Cài đặt ứng dụng.',
+        en: 'Choose Add to Home screen or Install app.'
+    },
+    'installhint.desktop.1': {
+        vi: 'Tìm nút cài đặt ở thanh địa chỉ, hoặc mở menu của trình duyệt.',
+        en: 'Look for the install button in the address bar, or open the browser’s menu.'
+    },
+    'installhint.desktop.2': { vi: 'Chọn Cài đặt Mai An Cư.', en: 'Choose Install Mai An Cư.' },
+    'installhint.after': {
+        vi: 'Biểu tượng Mai An Cư sẽ hiện trên màn hình chính, mở như một ứng dụng.',
+        en: 'The Mai An Cư icon appears on your Home Screen and opens like an app.'
+    },
+    'installhint.video': { vi: 'Video: cách thêm Mai An Cư vào màn hình chính', en: 'Video: adding Mai An Cư to the Home Screen' },
     // Behavior 123: the RBA's rate on /facts.
     'fx.title': { vi: 'Tỷ giá đô la Úc', en: 'The Australian dollar' },
     'fx.asof': { vi: 'tỷ giá', en: 'rate on' },
