@@ -44,6 +44,39 @@
   "url": "https://data.api.abs.gov.au/rest/data/ABS_SEIFA2021_SAL"
  },
  {
+  "attribution": "© State of New South Wales (NSW Bureau of Crime Statistics and Research)",
+  "cadence": "quarterly",
+  "license": "CC BY 4.0",
+  "name": "BOCSAR Recorded Criminal Incidents by month – by suburb",
+  "notes": "Live-pull SuburbData.zip (Azure blob). Monthly incident counts → trailing-12mo sum / census_total_persons * 1000 = crime_incidents_per_1000 (NSW). All offences summed; map-only raw, no resolver band (§1). VIC/QLD crime are separate (§6).",
+  "publisher": "NSW Bureau of Crime Statistics and Research",
+  "redistribution": "permitted",
+  "source_id": "bocsar",
+  "url": "https://data.nsw.gov.au/data/dataset/crime-by-offence-by-nsw-suburb"
+ },
+ {
+  "attribution": "© State of Victoria (Crime Statistics Agency)",
+  "cadence": "quarterly",
+  "license": "CC BY 4.0",
+  "name": "Recorded Offences by suburb/town – LGA Recorded Offences, Table 03",
+  "notes": "Human-staged .xlsx (Table 03, suburb/town grain). Annual offence counts (year ending December) summed across subgroups + postcodes per suburb → /census_total_persons * 1000 = crime_incidents_per_1000 (VIC). Map-only raw, no resolver band (§1). NSW=bocsar, QLD deferred.",
+  "publisher": "Crime Statistics Agency Victoria",
+  "redistribution": "permitted",
+  "source_id": "csa_vic",
+  "url": "https://www.crimestatistics.vic.gov.au/crime-statistics/latest-victorian-crime-data/download-data"
+ },
+ {
+  "attribution": "© Government of South Australia (Department for Housing and Urban Development), Metro Median House Sales",
+  "cadence": "quarterly",
+  "license": "CC BY 3.0 AU",
+  "name": "Metro median house sales — median by suburb (house), quarterly (metro Adelaide only)",
+  "notes": "Human-staged .xlsx (data.sa.gov.au walls programmatic clients; resolve via data.gov.au CKAN). Metro Adelaide only → regional-SA suburbs keep median=null (§7). Median by suburb → name→SAL crosswalk; facts_jsonb median_house_price + median_house_sales_qtr (same keys as vic_vpsr).",
+  "publisher": "Department for Housing and Urban Development (South Australia)",
+  "redistribution": "permitted",
+  "source_id": "sa_metro_price",
+  "url": "https://data.sa.gov.au/data/dataset/metro-median-house-sales"
+ },
+ {
   "attribution": "© State of Victoria (Department of Transport and Planning), Victorian Property Sales Report",
   "cadence": "quarterly",
   "license": "CC BY 4.0",

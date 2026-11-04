@@ -17,19 +17,20 @@ Drop the file(s) named below into this directory, then run the adapter.
 The monthly suburb-watch routine (behavior 58,
 [`docs/architecture/suburb-watch-routine.md`](../../../../docs/architecture/suburb-watch-routine.md))
 compares this table with each source's latest publication. Whoever reruns an adapter
-updates its row in the same commit. Read 2026-10-10 from the adapters' recorded `as_of`
-(`docs/architecture/suburb-data-foundation.md`) and the staged files.
+updates its row in the same commit. Read 2026-11-04 (behavior 155's rerun) from the
+adapters' recorded `as_of` and the staged files; the snapshot in
+`engine/erlang/priv/suburbs/` holds exactly these releases.
 
 | Adapter | Built from (release / window end) | Where the latest release is announced |
 |---|---|---|
 | `abs_asgs` | ASGS Edition 3 (2021) | https://www.abs.gov.au/statistics/standards/australian-statistical-geography-standard-asgs-edition-3 |
 | `abs_census` | Census 2021 (G08 Ancestry) | https://www.abs.gov.au/census |
 | `abs_seifa` | SEIFA 2021 | https://www.abs.gov.au/statistics/people/people-and-communities/socio-economic-indexes-areas-seifa-australia |
-| `bocsar` | Jan–Dec 2025 (as_of 2025-12-31) | https://data.nsw.gov.au/data/dataset/crime-by-offence-by-nsw-suburb |
+| `bocsar` | Jul 2025–Jun 2026 (as_of 2026-06-30) | https://data.nsw.gov.au/data/dataset/crime-by-offence-by-nsw-suburb |
 | `csa_vic` | year ending December 2025 | https://www.crimestatistics.vic.gov.au/crime-statistics/latest-victorian-crime-data/download-data |
-| `qps` | 12 months to May 2026 | https://www.data.qld.gov.au/dataset/offence-numbers-police-divisions-monthly-from-july-2001 |
+| `qps` | not in the snapshot: the division grain (a division's count over one suburb's population inflates its rate; behavior 155). Staged file runs to May 2026 | https://www.data.qld.gov.au/dataset/offence-numbers-police-divisions-monthly-from-july-2001 |
 | `sa_metro_price` | Q1 2026 (`lsg_stats_2026_q1.xlsx`) | https://data.gov.au/data/api/3/action/package_show?id=metro-median-house-sales |
-| `vic_vpsr` | Oct–Dec 2025 (`vpsr-median-*.xls`) | https://discover.data.vic.gov.au/dataset/victorian-property-sales-report-median-house-by-suburb |
+| `vic_vpsr` | Jan–Mar 2026 (`vpsr-median-*.xls`, March quarter 2026; a suburb whose March median is suppressed keeps Oct–Dec 2025) | https://discover.data.vic.gov.au/dataset/victorian-property-sales-report-median-house-by-suburb |
 
 ## CSA Victoria crime — how to refetch
 
@@ -52,9 +53,13 @@ Licence: CC BY 4.0 — © State of Victoria (Crime Statistics Agency).
 The adapter reads offence counts by **police division** (not suburb — QPS publishes no
 suburb-level data), monthly.
 
-1. Open the dataset (the portal is behind an AWS WAF challenge — load it in a browser):
+1. The CSV resource of the dataset
    <https://www.data.qld.gov.au/dataset/offence-numbers-police-divisions-monthly-from-july-2001>
-2. Download the CSV resource (`division_Reported_Offences_Number.csv`, ~21 MB) into this directory.
+   is a plain S3 object, no browser step (200, 22,149,617 bytes, Last-Modified 2026-10-20;
+   measured 2026-11-04):
+   <https://open-crime-data.s3-ap-southeast-2.amazonaws.com/Crime%20Statistics/division_Reported_Offences_Number.csv>
+2. Save it as `division_Reported_Offences_Number.csv` in this directory. Its figures stay out
+   of the shipped snapshot until a suburb-grain rate exists (behavior 155).
 3. The adapter takes the trailing 12 months ending at the latest month in the file and sums the
    three top-level QPS categories (Person + Property + Other) per division.
 
