@@ -21,6 +21,7 @@
     import { type FactDoc, getFacts, MARKET_DOCS, pick } from '$lib/facts';
     import FactCards from '$lib/FactCards.svelte';
     import HomeBack from '$lib/HomeBack.svelte';
+    import AudNote from '$lib/AudNote.svelte';
     import { onContentChange } from '$lib/stores/content';
 
     // Name and address only: no ranking or description, which no government source states.
@@ -74,6 +75,8 @@
             {/if}
             <section class="mk-section" id="mk-listings" aria-labelledby="mk-listings-title">
                 <h3 id="mk-listings-title">{$t('marketpage.listings.title')}</h3>
+                <!-- Behavior 153: their prices are in AUD, with the RBA's rate. -->
+                <AudNote />
                 <ul class="mk-sites">
                     {#each LISTINGS as s (s.href)}
                         <li>
@@ -114,7 +117,7 @@
     .mk-sites {
         display: grid;
         gap: var(--sp-2);
-        margin: 0;
+        margin: var(--sp-3) 0 0;
         padding: 0;
         list-style: none;
     }

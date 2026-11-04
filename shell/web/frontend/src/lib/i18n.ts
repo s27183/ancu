@@ -92,6 +92,8 @@ const messages = {
     // behavior 150 (Son 2026-11-04): the homes for sale in a suburb, on the listing sites.
     'listing.button': { vi: 'Nhà đang bán ở {name}', en: 'Homes for sale in {name}' },
     'listing.title': { vi: 'Nhà đang bán', en: 'Homes for sale' },
+    // Behavior 153: before the listing-site links (AudNote.svelte, fxLine.ts).
+    'listing.aud': { vi: 'Giá trên các trang này tính bằng đô la Úc (AUD)', en: 'Prices on these sites are in Australian dollars (AUD)' },
     'listing.note': {
         vi: `Đây là trang web của các công ty khác; ${BRAND} không có liên kết gì với họ.`,
         en: `These are other companies' websites; ${BRAND} has no tie to them.`
