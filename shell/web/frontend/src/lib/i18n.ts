@@ -1323,8 +1323,24 @@ const messages = {
     // Behavior 122: the home's fourth card and the facts page (/facts) it opens.
     'home.facts.title': { vi: 'Nước Úc qua số liệu', en: 'Australia in figures' },
     'home.facts.body': {
-        vi: 'Người Việt ở Úc, nhà đất, cuộc sống, kinh tế và phí visa, từ nguồn chính phủ.',
-        en: 'Vietnamese in Australia, property, living, the economy and visa fees, from government sources.'
+        vi: 'Người Việt ở Úc, cuộc sống, kinh tế và phí visa, từ nguồn chính phủ.',
+        en: 'Vietnamese in Australia, living, the economy and visa fees, from government sources.'
+    },
+    // Behavior 151: the home's fifth card and the property market page (/market) it opens.
+    'home.market.title': { vi: 'Thị trường nhà ở Úc', en: "Australia's property market" },
+    'home.market.body': {
+        vi: 'Giá nhà, những bảo đảm khi mua và các trang rao bán chính.',
+        en: 'Prices, the safeguards when you buy, and the main listing sites.'
+    },
+    'marketpage.sub': { vi: 'Có nguồn chính phủ', en: 'From government sources' },
+    'marketpage.note': {
+        vi: 'Mỗi bảo đảm dưới đây chỉ nói điều mà trang chính phủ được dẫn nói, lấy NSW làm ví dụ; mỗi bang có quy định riêng.',
+        en: 'Each safeguard below says only what its linked government page says, with NSW as the example; each state has its own rules.'
+    },
+    'marketpage.listings.title': { vi: 'Các trang rao bán nhà chính', en: 'The main listing sites' },
+    'marketpage.listings.notie': {
+        vi: 'Đây là các công ty tư nhân. Mai An Cư không có liên hệ hay thỏa thuận nào với họ.',
+        en: 'These are private companies. Mai An Cư has no tie or arrangement with any of them.'
     },
     'factspage.news': { vi: 'Đọc tin', en: 'Read the news' },
     // Behavior 123: the RBA's rate on /facts.
@@ -1361,7 +1377,7 @@ const messages = {
     'facts.key.fx': { vi: '1 đô la Úc', en: '1 Australian dollar' },
     'facts.key.visa189': { vi: 'Phí nộp visa tay nghề 189', en: 'Skilled visa 189 charge' },
     'facts.key.gdp': { vi: 'Tăng trưởng kinh tế', en: 'Economic growth' },
-    'facts.key.population': { vi: 'Dân số tăng trong một năm', en: 'Population growth in a year' },
+    'facts.key.population': { vi: 'Dân số', en: 'Population' },
     'facts.key.wage': { vi: 'Lương tối thiểu mỗi giờ', en: 'Minimum wage per hour' },
     'facts.key.vnrank': { vi: 'Việt Nam trong hồ sơ mua nhà nước ngoài được duyệt', en: 'Vietnam among approved foreign purchases' },
     'facts.key.rankvalue': { vi: 'Thứ {n}', en: 'No. {n}' },

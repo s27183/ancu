@@ -1,0 +1,75 @@
+Source: https://www.nsw.gov.au/housing-and-construction/land-values-nsw/how-to-find-property-sales-information
+Retrieved: 2026-11-04
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML 9685ab2e10a2002ce9ca5b6433d97d7929e42baf9f72255e8eca32aeef5b778d
+
+How to find property sales information | NSW Government
+How to find property sales information
+Learn how you can access property sales information and data with our online tools and services.
+Listen
+The Valuer General of NSW is an independent statutory officer that sets and oversees the valuation of land in NSW. Value NSW manages and supports this valuation system.
+Together, we help ensure fair and accurate land valuations in NSW.
+How we use property sales data
+Property sales are the most important factor valuers consider when valuing land.
+NSW property sales information comes from Notices of Sale lodged with Land Registry Services .
+Property sales search tool
+You can access this information using our property search tools.
+Use this property sales search tool to access detailed information. You can search for suburb, street, or individual property sales dating back to 2001.
+Use this guide to help you find property sales information:
+1
+Search by suburb/street
+To use the property search tool , you can:
+enter the suburb
+enter the street (optional)
+enter the dates you want to search for
+enter the purchase prices (optional)
+select a property type house or unit (optional).
+2
+Search by property number
+You can also search by property number:
+enter the property number
+enter the sales dates
+enter the purchase prices (optional).
+3
+Find your property number
+You can find your property number:
+by logging in the NSW Valuation and Objection Portal . Visit the portal page to log in, create an account, or manage your details
+on your notice of valuation , which we issue at least once every three years
+on your land tax assessment notice from Revenue NSW
+by conducting a title reference enquiry if you know your title reference
+by conducting a property address enquiry if you know your property address.
+Bulk property sales information
+You can use the bulk property sales information service to download bulk property sales data since 1990.
+How you can use this information
+Property sales information on this website is available for non-commercial use only under a Creative Commons Attribution–NonCommercial–NoDerivatives 4.0 licence .
+You need a Property Sales Information (PSI) licence if you want to use this data for commercial purposes, share it for business use, or include it in products or services.
+To use this data commercially or to find out more about PSI licences, contact vnswprivacy@dpie.nsw.gov.au
+Benchmark component report
+You can use your property number to produce a benchmark component report. The report shows the sales the valuer used to value the benchmark properties in your component.
+Valuation sales report
+You can also use your property number to produce a valuation sales report. This report shows some of the sales that valuers considered during the valuation process. The report includes:
+land size
+contract price
+purchase price
+adjusted land value.
+Valuation sales reports are not available for individual strata units as we value strata schemes as a whole site. You can produce a report for the whole strata scheme, but you will need the strata scheme property number to do this.
+The land values and property sales map
+Property sales are available on the land values and property sales map as a joint initiative of the Valuer General and Spatial Services . You can use this interactive map to explore land values and property sale prices across NSW.
+You can access sales information for:
+individual properties since 2001
+streets and suburbs for the last 5 years.
+How to find land values
+east
+How and why we value land
+east
+Object to a valuation
+east
+download Download as PDF
+print Print this page
+share Share this page
+Facebook
+LinkedIn
+X
+Email
+mail
+Top of page
+north

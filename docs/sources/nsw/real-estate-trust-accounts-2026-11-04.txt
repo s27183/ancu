@@ -1,0 +1,171 @@
+Source: https://www.nsw.gov.au/housing-and-construction/property-professionals/supervising-an-agency/real-estate-trust-accounts-and-audit-requirements
+Retrieved: 2026-11-04
+Extracted: visible page text (scripts and navigation removed); sha256 of the fetched HTML bf56da8c533972790d9b7627945906c9bf351ae41e1b4663bc3e701543a99539
+
+Real estate trust accounts and audit requirements | NSW Government
+Real estate trust accounts and audit requirements
+Licensees under the Property and Stock Agents Act 2002 must hold clients’ funds in a trust account and follow trust account management and audit rules.
+Listen
+Payment of trust money into a trust account
+Licensees under the Property and Stock Agents Act 2002 (the Act) must hold clients’ funds in a trust account.
+Those funds cannot be used for any purpose other than for that client and must be disbursed as the client directs.
+‘General’ trust accounts should not be confused with ‘Separate’ trust accounts opened on behalf of vendor/purchaser or strata plans or established by the owners corporation of a strata scheme as required under the Strata Schemes Management Act 2015 (the Act).
+Licensees in charge to authorise trust account withdrawals
+Only a licensee in charge (LIC) of a business may authorise trust account withdrawals from a trust account.
+This means that LICs are responsible for reviewing and approving all transactions for the trust account before they occur, including electronic fund transfers and payment of trust money by cheque.
+There can also only be one LIC who is able to authorise withdrawals for a trust account.
+An LIC is unable to delegate their authority to another person.
+LICs should be aware that if they allow another person to withdraw funds from the trust account on their behalf, they may still be held liable for any breach or defalcation (misuse).
+Learn more about LIC responsibilities .
+Approved deposit-taking institutions
+Trust accounts must be kept at an authorised deposit-taking institution in NSW.
+The Secretary has approved the following deposit-taking institutions:
+ANZ Bank - Australia and New Zealand Banking Group Limited
+BCU Bank - a division of Police & Nurses Limited
+Bank of Sydney Ltd
+Bendigo Bank – Bendigo and Adelaide Bank Limited
+Coastline Credit Union Ltd
+Commonwealth Bank of Australia
+HSBC Bank Australia Limited
+Hume Bank Limited
+Illawarra Credit Union Limited
+IMB Bank - IMB Ltd
+Macquarie Bank Limited
+Maitland Mutual Limited T/as The Mutual Bank
+NAB Bank - National Australia Bank Limited
+Newcastle Greater Mutual Group Limited
+Regional Australia Bank Ltd
+St. George Bank Limited
+State Bank of India
+Suncorp Bank - Norfina Limited
+The Summerland Credit Union Ltd
+Unity Bank Limited
+BankWAW - WAW Credit Union Co-operative Ltd
+Westpac – Westpac Banking Corporation.
+Requirements when opening a trust account
+When opening a trust account, these requirements apply:
+licensees need to notify the authorised deposit-taking institution in writing that the account is a ‘trust account’ required by the Act
+if held by a corporation, the trust account must be in the name of the corporation
+if not held by a corporation, the trust account must be in the name of the licensee or the firm
+the name of the licensee, firm or corporation needs to appear as a prefix of the account name, followed by any other necessary identifier of the trust account
+the words 'Trust Account' must also be included in the name of the trust account and all cheques drawn on the trust account.
+Unique identifying numbers for general trust accounts
+Under the Property and Stock Agents Regulation 2022 , a licensee who opens a trust account must provide the authorised deposit-taking institution (bank) with a unique identifying number (UID) given by NSW Fair Trading.
+The licensee must ensure that each trust account has a UID. If a business maintains multiple trust accounts, each account will need to be registered separately. If the trust account is held by a corporation, the trust account must be registered using the corporation's licence number.
+Licensees can use NSW OneGov to apply for a UID and obtain the necessary form(s) to notify their authorised deposit-taking institution.
+The authorised deposit-taking institution lodges its monthly returns using this UID.
+How can I register online?
+Access the trust account registration to get a UID for all trust accounts you intend to open or maintain.
+Once you enter your licence number and email address, you will be sent a confirmation email with a notification form in duplicate attached.
+Print the forms and lodge them with your financial institution and keep the duplicate once stamped by the financial institution.
+Note for interstate licensees
+Interstate licensees intending to work here under Automatic Mutual Recognition (AMR) are unable to request a unique identifying number using the trust account registration portal.
+You will need to complete your notification to NSW Fair Trading to work here under AMR. Once your notification has passed verification by Fair Trading, you can contact the Statutory Interest Unit to register for a unique identifying number by email to statutoryinterestunit@customerservice.nsw.gov.au
+See more information on the AMR scheme .
+Access the trust account registration
+Authorised deposit-taking institutions’ requirements
+The Act sets out requirements for approved authorised deposit-taking institutions with regard to:
+calculating interest on agents' trust accounts
+paying a prescribed proportion of interest earned on agents' trust accounts to the Property Services Statutory Interest Account
+monthly reporting to the Secretary, and
+providing the Secretary their annual auditor’s certificate.
+Exempt trust accounts
+An authorised deposit-taking institution is not required to pay interest to the Statutory Interest Account or provide monthly reports to NSW Fair Trading for trust accounts that are a 'Separate' trust account:
+kept on the instructions of the client for the exclusive benefit of the client, or
+for the exclusive benefit of both a vendor and purchaser of land.
+Requirements when closing a trust account
+A licensee must, within 14 days after closing a trust account, notify NSW Fair Trading in one of the 3 following ways:
+online via Trust Account Registration ( see note below for interstate licensees)
+attend Service NSW, or
+complete the notice of closing a trust account form (green form) and submit it to NSW Fair Trading.
+Note: If a financial institution has not uploaded the closing account details to Trust Account Registration system, it will not recognise the account number entered by an agent.
+The licensee must keep the trust account closure confirmation notice for 3 years.
+The form needs to be signed by the licensee (in duplicate):
+Original – sent by the agent to NSW Fair Trading via email to statutoryinterestunit@customerservice.nsw.gov.au within 14 days after closing the trust account.
+Copy – kept by the agent.
+Note for interstate licensees
+Interstate licensees working here under Automatic Mutual Recognition (AMR) are unable to use the trust account registration portal when closing a trust account.
+Within 14 days after closing a trust account you must complete a notice of closing a trust account form and send it to NSW Fair Trading by email to statutoryinterestunit@customerservice.nsw.gov.au
+NSW Fair Trading no longer accepts original forms by physical mail. Please scan and email completed forms via email .
+Unclaimed trust money
+Handling unclaimed trust money is the responsibility of Revenue NSW.
+The Unclaimed Money Act 1995 (the Act) applies to unclaimed money held in a trust account under the Act.
+Trust money is considered unclaimed if it has been held by a licensee for more than 2 years in a trust account. This applies to all amounts of money.
+A licensee must make reasonable efforts to locate the owner of any outstanding money in the trust account.
+Failure to do so could attract a penalty of up to $5,500.
+Money held in a trust account by a former licensee or the personal representative of a deceased licensee is unclaimed money and must be returned to Revenue NSW within 3 months after the person ceased to be a licensee or became a personal representative.
+Failure to comply can attract a penalty of up to $5,500 and up to $550 for each additional day of non-compliance.
+What to do with unclaimed trust money
+All returns and payments should be made to the Chief Commissioner Revenue NSW, and not to NSW Fair Trading.
+Visit the unclaimed money page of the Revenue NSW website for more information.
+Trust account audit requirements
+Licensees' records in relation to the handling of trust money must be audited.
+Who is required to have their trust accounts audited?
+The following people must have their trust accounts audited if they received or held trust money during the audit period ending 30 June:
+a licensee (corporation or individual)
+a former licensee (corporation or individual), or
+a personal representative of a licensee.
+Generally, for licensed corporations, it is the corporation that receives and is responsible for trust funds and not an individual licensee. In these cases, the corporation must ensure the trust account audit takes place.
+However, if an individual licensee receives and is responsible for trust money, then they must ensure the trust account audit is done.
+Who is required to submit an audit?
+All trust account audits must be completed and submitted online by the auditor through the Auditor’s Report Online portal.
+When must the audit be submitted?
+All audits must be submitted to the Secretary within 3 months after the end of the audit period and no later than 30 September of that year.
+If a trust account audit is not submitted by the due date, licensees could be disqualified from holding or renewing a licence.
+Who can conduct the audit?
+Auditors must be qualified under section 115 of the Property and Stock Agents Act 2002 (the Act).
+Registered audit companies, authorised company auditors and members of a Professional Accounting Body holding a Public Practising Certificate or Certificate of Public Practice can conduct the audit.
+Professional Accounting Body is defined under the Australian Securities and Investments Commission Act 2001 (the Act), for example, CPA Australia, Chartered Accountants Australia and New Zealand and the Institute of Public Accountants.
+Who can't conduct the audit?
+Within the last 2 years of the audit period, an auditor must not have been employed by, nor be a partner of, the person whose records or documents are to be audited.
+An auditor must not be a licensee, or a shareholder in a corporation that is a licensee with less than 20 shareholders.
+Check that an auditor is registered by searching for their details on the ASIC website.
+Auditor search
+Annual audit requirements
+The 'audit period' is the year ending on 30 June and the audit must be submitted by 30 September. To prepare an audit report for trust money held during the audit period, see more about lodging audits .
+Audits must be submitted using Auditor’s Report Online .
+If you have any questions about the audit requirements, contact NSW Fair Trading on 13 32 20 .
+If no trust money held during the whole audit period
+If a licensed corporation or an individual licensee holds a trust account during the audit period and there have been no transactions and zero balance, you must send an email with a copy of the bank statement for the full audit period to audits@customerservice.nsw.gov.au .
+Audits for other audit periods
+Your auditor can submit outstanding audits for the previous 3 years by choosing the "+Submit Prior Year Audits" option.
+Frequently asked questions
+Who's responsible for lodging the auditor’s report correctly and by the due date?
+Under the Property and Stock Agents Act 2002 (the Act) and Conveyancers Licensing Act 2003 (the Act), all licensees are required to lodge a trust account auditor’s report if they received or held trust money during the audit period.
+The Act makes it clear it's the licensee’s responsibility to ensure the report is lodged by the due date.
+Before engaging an auditor, inform them that the report must be lodged by 30 September and confirm that the auditor will be able to complete the report in time for you to lodge it by the due date.
+Give the auditor access to all records and documents relating to money held in a trust account for the audit period, as soon as possible after the end of the audit period.
+Monitor the progress of your report with the auditor on a regular basis.
+Don't leave the report with the auditor and forget about it.
+If your auditor cannot complete the report within the agreed timeframe due to some unforeseen circumstance preventing on time lodgement, you should immediately engage another auditor.
+What if I am in partnership with other licensees?
+Only one licensee in a partnership has to lodge an audit for the partnership.
+When does it have to be lodged?
+Lodgement must be within 3 months of the end of the audit period which is 30 June each year.
+The due date for lodgement is 30 September each year. You still need to lodge even if you ceased trading during the period or only traded for part of the period.
+How do I lodge an auditor’s report?
+Your auditor will be completing and submitting your auditor’s report through the ‘Auditor’s Report Online’ portal.
+To confirm engagement of your auditor, you'll need to authorise the auditor through an email from the auditor requesting permission to lodge an Auditor’s Report on your behalf.
+When the report is completed and submitted by your auditor, you'll receive a copy via email.
+Can the lodgement deadline be extended?
+All auditor’s reports are required to be lodged by the due date.
+The deadline will only be extended in exceptional circumstances that have existed over a period of time and can be supported by evidence.
+Reasons such as unaware of the requirement to lodge, forgetting to provide access to the auditor, allowing insufficient time for the auditor to complete the report, forgetting to lodge the report, the auditor was too busy to get it done in time or the auditor forgot to lodge the report, aren't acceptable.
+What happens if the auditor’s report isn't lodged by the due date?
+If an auditor’s report isn't lodged by the due date or not lodged at all, and you don't have an acceptable reason, NSW Fair Trading will contact you and take action based on your circumstances.
+Failure to lodge by the due date makes an individual or corporation a disqualified person under the Act and liable to disciplinary action.
+Alternatively, NSW Fair Trading could issue a $550 fine for a late lodged audit by an individual or $1,100 for a corporation.
+Failure to lodge an auditor’s report means you may not be able to renew your licence until you lodge.
+Related information
+Lodging audits for real estate and conveyancer trust accounts
+Guide to the Auditor's Report Online portal
+download Download as PDF
+print Print this page
+share Share this page
+Facebook
+LinkedIn
+X
+Email
+mail
+Top of page
+north

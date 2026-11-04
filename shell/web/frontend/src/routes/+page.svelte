@@ -3,7 +3,7 @@
     // Behavior 81 (Son 2026-10-16): the home leads to two pages — plan a budget by state
     // (/plan) or explore suburbs on the map (/explore) — under the news band (the
     // layout's). Behavior 88: and a third, the News page (/news). Behavior 122: and a
-    // fourth, "Nước Úc qua số liệu" (/facts; so titled by behavior 128), the cited facts about Australia on one page. The map no longer opens first. A first visit still opens "Giới thiệu"
+    // fourth, "Nước Úc qua số liệu" (/facts; so titled by behavior 128), the cited facts about Australia on one page. Behavior 151: and a fifth, "Thị trường nhà ở Úc" (/market), the property market and its safeguards. The map no longer opens first. A first visit still opens "Giới thiệu"
     // (Welcome) over the cards, whose first screen leads to the independent /
     // information-not-advice position in one tap; minimised, it leaves the cards in view.
     // Behavior 89: a dotted map of Australia lights up behind the cards (HomeBackdrop).
@@ -72,6 +72,21 @@
             <span class="home-way-text">
                 <span class="home-way-title">{$t('home.facts.title')}</span>
                 <span class="home-way-body">{$t('home.facts.body')}</span>
+            </span>
+            <svg class="home-way-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+                ><polyline points="9 6 15 12 9 18" /></svg
+            >
+        </a>
+        <a class="home-way" href="/market">
+            <span class="home-way-icon" aria-hidden="true">
+                <!-- a house under a check: the market's safeguards -->
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+                    ><path d="M3 11 12 4l9 7" /><path d="M5 10v10h14V10" /><polyline points="9 14.5 11.2 16.7 15.5 12.4" /></svg
+                >
+            </span>
+            <span class="home-way-text">
+                <span class="home-way-title">{$t('home.market.title')}</span>
+                <span class="home-way-body">{$t('home.market.body')}</span>
             </span>
             <svg class="home-way-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
                 ><polyline points="9 6 15 12 9 18" /></svg

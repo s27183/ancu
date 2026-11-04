@@ -12,6 +12,8 @@
     //            sections, key figures (KEY_FIGURES, facts.ts: picked by fact id, so each
     //            equals its card) each name their section and jump to it; one whose fact the
     //            KB lacks is not drawn.
+    //            Behavior 151 (Son 2026-11-04): the property docs (MARKET_DOCS) moved to /market;
+    //            the population key figure is the economy section's.
     // Holds:     every figure comes from GET /api/facts and is drawn by FactCards, the same
     //            cards the Introduction sheet draws, so the two show the same figures and
     //            sources; the page frame and the way home are the News page's.
@@ -19,7 +21,7 @@
     import { onMount } from 'svelte';
     import { lang } from '$lib/stores/lang';
     import { t, type MessageKey } from '$lib/i18n';
-    import { CHIP_KEY, type FactDoc, getFacts, KEY_FIGURES, keyFigure, pageRank, pick } from '$lib/facts';
+    import { CHIP_KEY, type FactDoc, getFacts, isMarketDoc, KEY_FIGURES, keyFigure, pageRank, pick } from '$lib/facts';
     import FactCards from '$lib/FactCards.svelte';
     import HomeBack from '$lib/HomeBack.svelte';
     import NewsDetailSheet from '$lib/NewsDetailSheet.svelte';
@@ -37,7 +39,10 @@
     let selected = $state<NewsNote | null>(null);
     const notesFor = (doc: FactDoc) =>
         (doc.news ?? []).map((s) => news.find((n) => n.news_slug === s)).filter((n): n is NewsNote => !!n);
-    const ordered = $derived(docs ? [...docs].sort((a, b) => pageRank(a.slug) - pageRank(b.slug)) : []);
+    // Behavior 151: the property market's docs (MARKET_DOCS) are /market's, never drawn here.
+    const ordered = $derived(
+        docs ? docs.filter((d) => !isMarketDoc(d.slug)).sort((a, b) => pageRank(a.slug) - pageRank(b.slug)) : []
+    );
 
     // Behavior 126: one chip per drawn section, in page order; ids are the sections' ids.
     const chips = $derived([

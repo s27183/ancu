@@ -96,17 +96,22 @@ export const SECTION_ORDER = [
 export const PAGE_ORDER = [
     'kb.facts.visa-charges',
     'kb.facts.australian-economy',
-    'kb.facts.australian-property',
     'kb.facts.living-in-australia',
     'kb.facts.vietnamese-in-australia'
 ];
+
+/** Behavior 151 (Son 2026-11-04): the property market's own page (/market) draws these
+ *  fact docs, in this order, and /facts draws every other — one list, read by both pages,
+ *  their static SEO pages, the sitemap and llms.txt (scripts/seo.ts), so a property fact
+ *  is never on both and never on neither. */
+export const MARKET_DOCS = ['kb.facts.australian-property', 'kb.facts.property-safeguards'];
+export const isMarketDoc = (slug: string): boolean => MARKET_DOCS.includes(slug);
 
 /** Behavior 126: each section's short name for the chips on /facts (i18n `facts.chip.<key>`);
  *  a doc not named here is chipped by its title. */
 export const CHIP_KEY: Record<string, string> = {
     'kb.facts.visa-charges': 'visa',
     'kb.facts.australian-economy': 'economy',
-    'kb.facts.australian-property': 'property',
     'kb.facts.living-in-australia': 'living',
     'kb.facts.vietnamese-in-australia': 'vietnamese'
 };
@@ -130,7 +135,7 @@ export interface KeyFigureSpec {
 export const KEY_FIGURES: KeyFigureSpec[] = [
     { key: 'visa189', slug: 'kb.facts.visa-charges', fact: 'skilled_employer', pick: 'highlight' },
     { key: 'gdp', slug: 'kb.facts.australian-economy', fact: 'real_gdp_growth' },
-    { key: 'population', slug: 'kb.facts.australian-property', fact: 'population_growth' },
+    { key: 'population', slug: 'kb.facts.australian-economy', fact: 'population' },
     { key: 'wage', slug: 'kb.facts.living-in-australia', fact: 'minimum_wage' },
     { key: 'vnrank', slug: 'kb.facts.vietnamese-in-australia', fact: 'firb_top_sources_quarter', rank: true }
 ];
@@ -235,6 +240,7 @@ const PUBLISHERS: Record<string, Localized> = {
     'www.revenue.nsw.gov.au': { en: 'Revenue NSW', vi: 'Sở Thuế bang NSW (Revenue NSW)' },
     'www.nsw.gov.au': { en: 'NSW Government', vi: 'Chính quyền bang NSW' },
     'www.fairtrading.nsw.gov.au': { en: 'NSW Fair Trading', vi: 'Cơ quan Thương mại Công bằng NSW' },
+    'www.registrargeneral.nsw.gov.au': { en: 'NSW Registrar General', vi: 'Cơ quan Đăng ký Tổng hợp NSW' },
     'legislation.nsw.gov.au': { en: 'NSW Legislation', vi: 'Luật bang NSW' },
     'www.sro.vic.gov.au': { en: 'State Revenue Office Victoria', vi: 'Sở Thuế bang Victoria (SRO)' },
     'www.legislation.vic.gov.au': { en: 'Victorian Legislation', vi: 'Luật bang Victoria' },
