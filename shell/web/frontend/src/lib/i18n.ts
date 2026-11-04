@@ -1432,6 +1432,12 @@ const messages = {
         vi: 'Biểu tượng Mai An Cư sẽ hiện trên màn hình chính, mở như một ứng dụng.',
         en: 'The Mai An Cư icon appears on your Home Screen and opens like an app.'
     },
+    // Behavior 157: the one-tap Install button where the browser offers it.
+    'installhint.install': { vi: 'Cài đặt ứng dụng', en: 'Install app' },
+    'installhint.installed': {
+        vi: `Đã cài. Mở ${BRAND} từ màn hình chính.`,
+        en: `Installed. Open ${BRAND} from your home screen.`
+    },
     'installhint.video': { vi: 'Video: cách thêm Mai An Cư vào màn hình chính', en: 'Video: adding Mai An Cư to the Home Screen' },
     // Behavior 123: the RBA's rate on /facts.
     'fx.title': { vi: 'Tỷ giá đô la Úc', en: 'The Australian dollar' },

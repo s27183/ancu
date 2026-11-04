@@ -3926,6 +3926,14 @@ main {
     gap: var(--sp-2);
     color: var(--ink);
 }
+.install-now {
+    align-self: flex-start;
+}
+.install-done {
+    margin: 0;
+    color: var(--ink);
+    font-weight: 700;
+}
 .install-after {
     margin: 0;
     color: var(--ink-2);

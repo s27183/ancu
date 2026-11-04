@@ -4,7 +4,7 @@
 // in a browser first. Run over every agent × standalone signal, and seeded hostile agents.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { installSteps, type InstallPlatform } from '../src/lib/installHint.ts';
+import { installSteps, showInstallButton, type InstallPlatform, type OfferState } from '../src/lib/installHint.ts';
 
 const SEED = 153;
 function mulberry32(a: number) {
@@ -54,6 +54,48 @@ test('300 hostile agents, seed 153: never throws, always a known platform, null 
             const got = installSteps({ ua: odd, maxTouchPoints: touch, navigatorStandalone: standalone, displayStandalone: false });
             if (standalone ? got !== null : !got || !['ios', 'android', 'desktop'].includes(got.platform)) bad.push(`${i}: ${JSON.stringify(got)}`);
             if (got?.inApp && got.platform === 'desktop') bad.push(`${i}: in-app on desktop`);
+        } catch (e) {
+            bad.push(`${i}: threw ${e}`);
+        }
+    }
+    assert.deepEqual(bad, []);
+});
+
+// Behavior 157: the one-tap Install button shows exactly when the browser's offer is held,
+// the page is not the installed app and not an in-app browser; every other case keeps the
+// steps as they were.
+const OFFERS: OfferState[] = ['held', 'used', 'none'];
+
+test('every agent × standalone signal × offer state: the button only with a held offer, outside the app and in-app browsers', () => {
+    for (const a of AGENTS)
+        for (const ns of [false, true])
+            for (const ds of [false, true])
+                for (const o of OFFERS) {
+                    const steps = installSteps({ ua: a.ua, maxTouchPoints: a.touch, navigatorStandalone: ns, displayStandalone: ds });
+                    const want = o === 'held' && !ns && !ds && !a.inApp;
+                    assert.equal(showInstallButton(steps, o), want, `${a.name} ns=${ns} ds=${ds} ${o}`);
+                    if (!ns && !ds) assert.deepEqual(steps, { platform: a.platform, inApp: a.inApp }, `${a.name} steps unchanged`);
+                }
+});
+
+test('2,000 hostile cases, seed 157: the button exactly when held, not standalone, not in-app; never throws', () => {
+    const rand = mulberry32(157);
+    const parts = ['<script>alert(1)</script>', '\u0000‮', 'iPhone', 'Android', 'Zalo', 'FBAN', 'Instagram', 'Macintosh', 'CriOS/1', 'Chrome/156', '"\'`', '\n', 'x'.repeat(4096)];
+    const bad: string[] = [];
+    for (let i = 0; i < 2000; i++) {
+        let ua = '';
+        for (let k = 0, n = Math.floor(rand() * 5); k <= n; k++) ua += parts[Math.floor(rand() * parts.length)];
+        const odd = [ua, ua, undefined, null, 42][Math.floor(rand() * 5)] as unknown as string;
+        const touch = [0, 5, NaN, -1, Infinity][Math.floor(rand() * 5)];
+        const ns = rand() < 0.2;
+        const ds = rand() < 0.2;
+        const o = [...OFFERS, 'bogus' as OfferState][Math.floor(rand() * 4)];
+        try {
+            const steps = installSteps({ ua: odd, maxTouchPoints: touch, navigatorStandalone: ns, displayStandalone: ds });
+            const want = o === 'held' && !ns && !ds && steps !== null && !steps.inApp;
+            if (showInstallButton(steps, o) !== want) bad.push(`${i}: ${o} ns=${ns} ds=${ds} ${JSON.stringify(steps)}`);
+            if ((ns || ds) && showInstallButton(steps, o)) bad.push(`${i}: button in the installed app`);
+            if (steps?.inApp && showInstallButton(steps, o)) bad.push(`${i}: button in an in-app browser`);
         } catch (e) {
             bad.push(`${i}: threw ${e}`);
         }

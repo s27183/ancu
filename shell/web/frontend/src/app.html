@@ -29,6 +29,28 @@
                     if (l) document.documentElement.setAttribute('lang', l);
                 } catch (e) {}
             })();
+            // Behavior 157: hold the browser's install offer (Chrome, Edge) for the Add to
+            // Home Screen sheet's button (InstallHint.svelte; rule in installHint.ts). The
+            // offer can come before the app hydrates, so it is caught here. preventDefault
+            // keeps Chrome's own bottom banner away: the pill is the one invitation.
+            (function () {
+                var s = (window.__ancuInstall = { offer: null, installed: false });
+                function tell() {
+                    try {
+                        window.dispatchEvent(new Event('ancu-install'));
+                    } catch (e) {}
+                }
+                window.addEventListener('beforeinstallprompt', function (e) {
+                    e.preventDefault();
+                    s.offer = e;
+                    tell();
+                });
+                window.addEventListener('appinstalled', function () {
+                    s.offer = null;
+                    s.installed = true;
+                    tell();
+                });
+            })();
         </script>
         %sveltekit.head%
     </head>
