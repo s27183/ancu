@@ -80,8 +80,10 @@ regime change) is handled between runs.
 **Track B is reported monthly, rerun by hand.** The routine "ancu suburb-watch"
 ([suburb-watch-routine.md](suburb-watch-routine.md), behavior 58) opens one issue on
 the 1st when a suburb source has a newer release than the one in
-`engine/build/suburbs/data/README.md`'s "Built from" table. The rerun writes the
-engine's suburb tables, so it stays Son's.
+`engine/build/suburbs/data/README.md`'s "Built from" table. The rerun writes the dev
+engine's suburb tables and exports `engine/erlang/priv/suburbs/` (scripts/export_suburbs.py);
+production loads that committed snapshot at boot (behavior 37), so a rerun lands as a PR
+Son merges (behavior 155).
 
 The Monthly/Quarterly/Per-event labels below (defined in
 [architecture.md §11.2](architecture.md)) are **re-verification budgets** — the
