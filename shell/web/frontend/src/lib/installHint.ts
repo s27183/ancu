@@ -1,8 +1,9 @@
 // Bilingual -> the bilingual plan reaches the phone it is read on -> the web frontend -> the
 // iPhone's add-to-home-screen hint
 // Goal:      behavior 152 — iPhone Safari has no install prompt of its own, so the home page
-//            says how: "Chạm Chia sẻ, rồi Thêm vào MH chính" / "Tap Share, then Add to Home
-//            Screen" (InstallHint.svelte).
+//            says how: "Chạm Chia sẻ (trong ⋯ trên iOS 26), rồi Thêm vào MH chính" / "Tap Share
+//            (under ⋯ on iOS 26), then Add to Home Screen" (InstallHint.svelte) — iOS 26.2 Safari
+//            keeps Share under its ⋯ menu (measured 2026-11-04: its own first-run tip says so).
 // Invariant: shown only in iOS Safari, never inside the installed app (navigator.standalone or
 //            display-mode: standalone) nor in another iOS browser (CriOS, FxiOS, EdgiOS, …,
 //            whose Share sheet has no Add to Home Screen of ours to point at); once closed with

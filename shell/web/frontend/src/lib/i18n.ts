@@ -1329,7 +1329,10 @@ const messages = {
     'factspage.news': { vi: 'Đọc tin', en: 'Read the news' },
     // Behavior 152: the iPhone's add-to-home-screen hint on the home (installHint.ts).
     'installhint.label': { vi: 'Thêm Mai An Cư vào màn hình chính', en: 'Add Mai An Cư to your Home Screen' },
-    'installhint.text': { vi: 'Chạm Chia sẻ, rồi Thêm vào MH chính', en: 'Tap Share, then Add to Home Screen' },
+    'installhint.text': {
+        vi: 'Chạm Chia sẻ (trong ⋯ trên iOS 26), rồi Thêm vào MH chính',
+        en: 'Tap Share (under ⋯ on iOS 26), then Add to Home Screen'
+    },
     'installhint.close': { vi: 'Đóng gợi ý', en: 'Close the hint' },
     // Behavior 123: the RBA's rate on /facts.
     'fx.title': { vi: 'Tỷ giá đô la Úc', en: 'The Australian dollar' },
