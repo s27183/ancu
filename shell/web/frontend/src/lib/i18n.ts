@@ -1476,8 +1476,8 @@ const messages = {
     'newspage.empty': { vi: 'Chưa có tin nào.', en: 'No news yet.' },
     'home.explore.title': { vi: 'Khám phá khu vực', en: 'Explore suburbs' },
     'home.explore.body': {
-        vi: 'Xem các khu vực trên bản đồ: cộng đồng người Việt, dân số, kinh tế, an ninh.',
-        en: 'See suburbs on the map: Vietnamese community, population, income, crime.'
+        vi: 'Xem các khu vực trên bản đồ: cộng đồng người Việt, dân số, kinh tế, an ninh, và nhà đang bán ở từng khu.',
+        en: 'On the map: Vietnamese community, population, income, crime, and homes for sale in each suburb.'
     },
     'nav.home': { vi: 'Trang chủ', en: 'Home' },
     'planpage.title': { vi: 'Kế hoạch ngân sách', en: 'Budget plan' },

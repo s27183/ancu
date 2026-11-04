@@ -9,6 +9,9 @@
     // Behavior 89: a dotted map of Australia lights up behind the cards (HomeBackdrop).
     // Behavior 153: the cards run market, explore, plan, facts, news (Son 2026-11-04:
     // how prices are disclosed is what Vietnamese buyers ask first).
+    // Behavior 154 (Son 2026-11-04): explore leads again — explore, market, plan, facts,
+    // news — since each suburb now links to its homes for sale; the cards' text is a step
+    // larger at the same gaps.
     // Behavior 153: one row heads the home, above every card (.home-pills): Welcome's
     // "Giới thiệu" launcher on the left, the Add to Home Screen pill (InstallHint) on the
     // right. In the flow, neither can cover a card (behavior 128's placement retired), and
@@ -27,21 +30,6 @@
         <InstallHint />
     </div>
     <nav class="home-ways" aria-label={$t('brand.name')}>
-        <a class="home-way" href="/market">
-            <span class="home-way-icon" aria-hidden="true">
-                <!-- a house under a check: the market's safeguards -->
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
-                    ><path d="M3 11 12 4l9 7" /><path d="M5 10v10h14V10" /><polyline points="9 14.5 11.2 16.7 15.5 12.4" /></svg
-                >
-            </span>
-            <span class="home-way-text">
-                <span class="home-way-title">{$t('home.market.title')}</span>
-                <span class="home-way-body">{$t('home.market.body')}</span>
-            </span>
-            <svg class="home-way-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
-                ><polyline points="9 6 15 12 9 18" /></svg
-            >
-        </a>
         <a class="home-way" href="/explore">
             <span class="home-way-icon" aria-hidden="true">
                 <!-- a pin on a folded map -->
@@ -52,6 +40,21 @@
             <span class="home-way-text">
                 <span class="home-way-title">{$t('home.explore.title')}</span>
                 <span class="home-way-body">{$t('home.explore.body')}</span>
+            </span>
+            <svg class="home-way-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+                ><polyline points="9 6 15 12 9 18" /></svg
+            >
+        </a>
+        <a class="home-way" href="/market">
+            <span class="home-way-icon" aria-hidden="true">
+                <!-- a house under a check: the market's safeguards -->
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+                    ><path d="M3 11 12 4l9 7" /><path d="M5 10v10h14V10" /><polyline points="9 14.5 11.2 16.7 15.5 12.4" /></svg
+                >
+            </span>
+            <span class="home-way-text">
+                <span class="home-way-title">{$t('home.market.title')}</span>
+                <span class="home-way-body">{$t('home.market.body')}</span>
             </span>
             <svg class="home-way-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
                 ><polyline points="9 6 15 12 9 18" /></svg
