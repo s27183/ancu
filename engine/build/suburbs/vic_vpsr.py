@@ -46,7 +46,6 @@ from . import _namecross, db
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
 MEDIAN_COL = 9   # rightmost of the five quarter-median columns (1,3,5,7,9) = latest quarter
 SALES_COL = 11   # No. of Sales for that latest quarter (the small-n denominator)
-FIRST_DATA_ROW = 5
 
 # (file, median fact key, sales-count fact key)
 FILES = [
@@ -75,23 +74,36 @@ SOURCE = {
 }
 
 
-def _as_of(sheet) -> str:
-    """Derive the data quarter from the latest median column's header (row 1 range +
-    row 2 year), e.g. 'Oct-Dec' 2025 → '2025-12-31'. Fail-closed if unrecognised — we do
-    not guess the currency of a regulated-adjacent figure."""
-    label = str(sheet.cell_value(1, MEDIAN_COL)).strip()
-    year = int(float(sheet.cell_value(2, MEDIAN_COL)))
-    if label not in _QUARTER_END:
-        raise ValueError(f"vic_vpsr: unrecognised quarter label {label!r} at col {MEDIAN_COL} — layout changed?")
-    return f"{year}-{_QUARTER_END[label]}"
+def _as_of(sheet) -> tuple[str, int]:
+    """Derive the data quarter from the latest median column's header — its month range,
+    then the year in the row below — e.g. 'Jan-Mar' 2026 → '2026-03-31', and return it with
+    the first row after the header. The header's row moves between releases (rows 1–2 in
+    the Dec 2025 file, rows 0–1 in Mar 2026; measured 2026-11-04, behavior 155), so it is
+    found by its label, not a fixed row. Fail-closed if no label is found, if the year is not
+    one, or if the sales column names another quarter — we do not guess the currency of a
+    regulated-adjacent figure."""
+    for r in range(min(4, sheet.nrows - 1)):
+        label = str(sheet.cell_value(r, MEDIAN_COL)).strip()
+        if label in _QUARTER_END:
+            break
+    else:
+        raise ValueError(f"vic_vpsr: no quarter label in rows 0-3 at col {MEDIAN_COL} — layout changed?")
+    try:
+        year = int(float(sheet.cell_value(r + 1, MEDIAN_COL)))
+    except ValueError:
+        raise ValueError(f"vic_vpsr: no year under {label!r} at col {MEDIAN_COL} — layout changed?") from None
+    sales_head = [str(sheet.cell_value(i, SALES_COL)).strip() for i in range(r + 3)]
+    if "No. of Sales" not in sales_head or label not in sales_head:
+        raise ValueError(f"vic_vpsr: col {SALES_COL} is not the {label} sales count: {sales_head!r}")
+    return f"{year}-{_QUARTER_END[label]}", r + 2
 
 
 def _read_file(path: str) -> tuple[list[tuple[str, int, int | None]], str]:
     """Parse one VPSR sheet → ([(locality, median_int, sales_int|None)], as_of)."""
     sheet = xlrd.open_workbook(path).sheet_by_index(0)
-    as_of = _as_of(sheet)
+    as_of, first_row = _as_of(sheet)
     out: list[tuple[str, int, int | None]] = []
-    for r in range(FIRST_DATA_ROW, sheet.nrows):
+    for r in range(first_row, sheet.nrows):
         locality = str(sheet.cell_value(r, 0)).strip()
         raw = str(sheet.cell_value(r, MEDIAN_COL)).strip()
         if not locality or not raw.replace(".", "").isdigit():
