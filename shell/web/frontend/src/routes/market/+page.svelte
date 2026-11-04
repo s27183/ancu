@@ -15,16 +15,17 @@
     // Rests on:  facts.ts (getFacts, MARKET_DOCS), FactCards.svelte, HomeBack.svelte, app.css .page-sheet.
     import { onMount } from 'svelte';
     import { lang } from '$lib/stores/lang';
-    import { t, type MessageKey } from '$lib/i18n';
+    import { t } from '$lib/i18n';
     import { type FactDoc, getFacts, MARKET_DOCS, pick } from '$lib/facts';
     import FactCards from '$lib/FactCards.svelte';
     import HomeBack from '$lib/HomeBack.svelte';
     import { onContentChange } from '$lib/stores/content';
 
-    const LISTINGS: { name: string; href: string; key: MessageKey }[] = [
-        { name: 'realestate.com.au', href: 'https://www.realestate.com.au/', key: 'marketpage.listings.rea' },
-        { name: 'Domain', href: 'https://www.domain.com.au/', key: 'marketpage.listings.domain' },
-        { name: 'Allhomes', href: 'https://www.allhomes.com.au/', key: 'marketpage.listings.allhomes' }
+    // Name and address only: no ranking or description, which no government source states.
+    const LISTINGS: { name: string; href: string }[] = [
+        { name: 'realestate.com.au', href: 'https://www.realestate.com.au/' },
+        { name: 'Domain', href: 'https://www.domain.com.au/' },
+        { name: 'Allhomes', href: 'https://www.allhomes.com.au/' }
     ];
 
     let docs = $state<FactDoc[] | null>(null);
@@ -76,7 +77,7 @@
                         <li>
                             <a class="mk-site" href={s.href} target="_blank" rel="noopener noreferrer">
                                 <strong>{s.name}</strong>
-                                <span>{$t(s.key)}</span>
+                                <span>{new URL(s.href).host}</span>
                             </a>
                         </li>
                     {/each}

@@ -1342,9 +1342,6 @@ const messages = {
         vi: 'Đây là các công ty tư nhân. Mai An Cư không có liên hệ hay thỏa thuận nào với họ.',
         en: 'These are private companies. Mai An Cư has no tie or arrangement with any of them.'
     },
-    'marketpage.listings.allhomes': { vi: 'Mạnh ở Canberra (ACT)', en: 'Strongest in Canberra (ACT)' },
-    'marketpage.listings.rea': { vi: 'Trang rao bán lớn nhất', en: 'The largest listing site' },
-    'marketpage.listings.domain': { vi: 'Trang rao bán lớn thứ hai', en: 'The second-largest listing site' },
     'factspage.news': { vi: 'Đọc tin', en: 'Read the news' },
     // Behavior 123: the RBA's rate on /facts.
     'fx.title': { vi: 'Tỷ giá đô la Úc', en: 'The Australian dollar' },
