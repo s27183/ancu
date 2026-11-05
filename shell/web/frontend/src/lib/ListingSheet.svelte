@@ -12,11 +12,13 @@
     // Capability: a phone (below 48rem, sheetMotion's WIDE) follows a plain <a target=_blank>
     //            to a new tab; a desktop opens a smaller popup window over the app through
     //            window.open's `popup` feature (Chrome 156, behavior 150 Expect 5); where a
-    //            browser ignores `popup` it is still the same link in a tab.
+    //            browser ignores `popup` it is still the same link in a tab. In the phone app
+    //            (behavior 161) neither: nativeLinks.ts opens it in the in-app browser.
     import Modal from '$lib/Modal.svelte';
     import AudNote from '$lib/AudNote.svelte';
     import ListingGuide from '$lib/ListingGuide.svelte';
     import { t } from '$lib/i18n';
+    import { isNativeApp } from '$lib/nativeLinks';
     import { listingLinks, type ListingLink } from '$lib/listingLinks';
     import type { Suburb } from '$lib/api';
 
@@ -26,6 +28,7 @@
     const WIDE = '(min-width: 48rem)';
 
     function open(e: MouseEvent, l: ListingLink) {
+        if (isNativeApp()) return; // the app: nativeLinks.ts opens it in the in-app browser (behavior 161)
         if (typeof matchMedia !== 'function' || !matchMedia(WIDE).matches) return; // phone: the <a>
         if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return; // the user's own tab choice
         e.preventDefault();
