@@ -40,32 +40,29 @@ kb-watch, kb-verify, suburb-watch), and the seat:
   it stays blind to the drafter's reasoning; it labels the PR `kb-verified` or `kb-hold` at
   its head, and the kb gate then merges or holds it as before.
 
-**It also runs by itself while the seat is open (behavior 145, Son 2026-11-01; hourly since
-behavior 160, Son 2026-11-05).** The seat keeps one session-only CronCreate job, "ancu KB
-update check", at :17 each hour from 12:00 to 23:00 Melbourne (`17 12-23 * * *`; the
-scheduler adds a fixed per-job delay of up to 30 minutes, and fires only while the session
-is idle; Son 2026-11-01: «kb related watch is weekly and news-watch is daily»). Each fire
-first reads the Melbourne date, the marker `$(git rev-parse --git-common-dir)/kb-update-last`
-(untracked, shared by every worktree of the clone) and `git status --porcelain`: when the
-marker holds today's date, or the work tree has uncommitted changes (a behavior mid-build,
-which a routine's branch switch would disturb), it ends in one line and does nothing else.
-Otherwise it writes today's date to the marker — before any routine, so a run that fails
-half-way is not repeated each hour — re-creates itself and deletes the job that fired (so it
-never reaches Claude Code's 7-day expiry of a recurring job), and runs news-watch, then
-kb-watch when no `kb-watch-<date>` PR was opened in the last 7 days (so weekly, and a missed
-week runs at the next live run), then kb-verify on any PR they opened, then suburb-watch
-when this month has no `suburb-watch <yyyy-mm>` issue. Why hourly: observed 2026-11-05, the
-once-a-day job (then `0 12 * * *`, due 12:30) did not fire although the seat was open
-from before noon and busy with Son around 12:30; whether a fire due mid-turn is dropped or
-should wait is not settled, and the hourly retry holds either way. Its cost: up to 11
-one-line checks a day after the run, each a full seat turn. It is session-only
-(`durable: false`) on purpose: a durable job is written to `.claude/scheduled_tasks.json`,
-and Claude Code 2.1.316 fires a durable job whose creating process has died in whichever
-session next holds the project's scheduler lock — another seat, under its own sandbox and
-branch (read from the 2.1.316 scheduler, 2026-11-01). So the job dies with the seat, and the
-seat arms it again at each launch or relaunch when CronList shows none (a `--resume`
-relaunch kept it, measured 2026-11-01). A day the seat is closed is skipped, not replayed;
-the next run catches up through each routine's own window.
+**It also runs by itself once a day (behavior 145, Son 2026-11-01; durable since behavior
+160, Son 2026-11-05: «can I just have one check a day pls. just make it perisstent»).** The
+seat keeps one durable CronCreate job, "ancu KB update", daily at 12:17 Melbourne
+(`17 12 * * *`; the scheduler adds a fixed per-job delay of up to 30 minutes, so it runs at
+12:47, and fires only while the session is idle). Durable means it is written to the
+git-ignored `.claude/scheduled_tasks.json`, so a relaunch keeps it. Its check first reads the
+Melbourne date, the marker `$(git rev-parse --git-common-dir)/kb-update-last` (untracked,
+shared by every worktree of the clone) and `git status --porcelain`: when the marker holds
+today's date, or the work tree has uncommitted changes (a behavior mid-build, which a
+routine's branch switch would disturb), it ends in one line and does nothing else.
+Otherwise it writes today's date to the marker — before any routine, so a second fire the
+same day does nothing — re-creates itself and deletes the job that fired (so it never
+reaches Claude Code's 7-day expiry of a recurring job), and runs news-watch, then kb-watch
+when no `kb-watch-<date>` PR was opened in the last 7 days (so weekly, and a missed week
+runs at the next run), then kb-verify on any PR they opened, then suburb-watch when this
+month has no `suburb-watch <yyyy-mm>` issue. Observed 2026-11-05: the session-only noon job
+it replaces did not fire although the seat was open from before noon; whether a fire due
+while the seat is busy waits for the turn to end or is lost is not settled — a lost day is
+skipped like a day the seat is closed. Claude Code 2.1.316 fires a durable job whose
+creating process has died in whichever session next holds the project's scheduler lock
+(read from the 2.1.316 scheduler, 2026-11-01), so another session open in this clone may
+run it; the marker keeps that to once a day. A day the seat is closed is skipped, not
+replayed; the next run catches up through each routine's own window.
 
 The cadences below are what each routine was scheduled at in the cloud.
 
