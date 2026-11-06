@@ -18,7 +18,7 @@
 import { escapeHtml, renderMarkdown, renderInlineMarkdown } from '../src/lib/markdown.ts';
 import type { NewsNote } from '../src/lib/api.ts';
 import type { FactDoc } from '../src/lib/facts.ts';
-import { isMarketDoc } from '../src/lib/facts.ts';
+import { isMarketDoc, pageRank } from '../src/lib/facts.ts';
 
 /** Behavior 151: the page a fact doc is drawn on — /market for MARKET_DOCS, /facts for every other. */
 export const factPath = (slug: string): '/market' | '/facts' => (isMarketDoc(slug) ? '/market' : '/facts');
@@ -231,7 +231,8 @@ function factSections(docs: FactDoc[]): string[] {
 
 /** /facts: every fact doc but the property market's (behavior 151). */
 export function factsPage(all: FactDoc[]): Page {
-    const docs = all.filter((d) => !isMarketDoc(d.slug));
+    // Behavior 163: in the live page's order (PAGE_ORDER), so a crawler reads what a visitor reads.
+    const docs = all.filter((d) => !isMarketDoc(d.slug)).sort((a, b) => pageRank(a.slug) - pageRank(b.slug));
     return {
         path: '/facts',
         title: `Nước Úc qua số liệu · Australia in figures | ${BRAND}`,
@@ -618,7 +619,7 @@ export function llmsFull(news: NewsNote[], facts: FactDoc[], guides: [string, Kb
         if (n.summary_vi) out.push(n.summary_vi.trim(), '');
         out.push('Sources:', ...urls.map((u) => `- ${u}`), '', '---', '');
     }
-    for (const d of facts) {
+    for (const d of [...facts].sort((a, b) => pageRank(a.slug) - pageRank(b.slug))) {
         out.push(`# ${d.title.en} · ${d.title.vi}`, '', `Page: ${ORIGIN}${factPath(d.slug)}${d.last_verified ? ` · last verified ${d.last_verified}` : ''}`, '');
         for (const f of d.facts) {
             const idx = [...new Set(([] as number[]).concat(f.source, f.note_sources ?? []))];

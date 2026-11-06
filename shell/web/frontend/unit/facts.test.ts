@@ -4,7 +4,7 @@
 // and each fact doc belongs to exactly one page.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { getFacts, isMarketDoc, MARKET_DOCS, PAGE_ORDER, KEY_FIGURES } from '../src/lib/facts.ts';
+import { getFacts, isMarketDoc, MARKET_DOCS, PAGE_ORDER, KEY_FIGURES, SECTION_ORDER } from '../src/lib/facts.ts';
 
 const failures: [string, typeof fetch][] = [
     ['network error', (async () => { throw new TypeError('fetch failed'); }) as unknown as typeof fetch],
@@ -21,4 +21,12 @@ test('MARKET_DOCS are the property docs, and /facts orders none of them', () => 
     assert.deepEqual(MARKET_DOCS, ['kb.facts.listing-transparency', 'kb.facts.australian-property', 'kb.facts.property-safeguards']);
     for (const s of PAGE_ORDER) assert.equal(isMarketDoc(s), false, s);
     for (const k of KEY_FIGURES) assert.equal(isMarketDoc(k.slug), false, k.key);
+});
+
+test('behavior 163: Vietnamese home-buying demand leads /facts, its key figures and the Introduction sheet', () => {
+    assert.equal(PAGE_ORDER[0], 'kb.facts.vietnamese-buyers');
+    assert.equal(SECTION_ORDER[0], 'kb.facts.vietnamese-buyers');
+    assert.equal(SECTION_ORDER[1], 'kb.facts.vietnamese-in-australia');
+    assert.equal(KEY_FIGURES[0].slug, 'kb.facts.vietnamese-buyers');
+    assert.ok(PAGE_ORDER.includes('kb.facts.vietnamese-in-australia'));
 });

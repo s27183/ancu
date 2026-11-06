@@ -787,7 +787,7 @@ def facts_doc_fails(slug, doc, kb_docs, news_docs=None):
     # Behavior 47 (Son, 2026-10-10: "select facts that have recent figures"): the
     # "Settling in Australia" section shows only figures dated 2024 or later. A doc says so
     # with frontmatter `recent_since: YYYY-MM`, and every fact's `as_of` must be on or after
-    # it — per doc, because the Vietnamese-buyers doc rightly keeps Census 2021, the latest
+    # it — per doc, because the Vietnamese-in-Australia doc rightly keeps Census 2021, the latest
     # census there is. YYYY-MM strings compare in date order.
     recent = doc.get("recent_since")
     if recent is not None and not re.match(r"^\d{4}-\d{2}$", recent):
