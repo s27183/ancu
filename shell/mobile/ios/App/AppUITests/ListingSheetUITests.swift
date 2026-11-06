@@ -132,6 +132,47 @@ final class ListingSheetUITests: XCTestCase {
         print("161 news note: in app; links now: " + app.links.allElementsBoundByIndex.map { $0.label }.joined(separator: " | "))
     }
 
+    /// Expect 4's phase sheet: a guest plan (or the one an earlier run made) → Ngân sách → the buy
+    /// phase → the FIRB line's term card, whose «Nguồn» link must open in the Safari sheet.
+    func testPhaseSheetLink() throws {
+        let app = XCUIApplication()
+        way(app, "Lập kế hoạch ngân sách")
+        print("161 plan buttons: " + app.buttons.allElementsBoundByIndex.prefix(80).map { $0.label }.filter { !$0.isEmpty }.joined(separator: " | "))
+        let start = app.buttons.matching(NSPredicate(format: "label == 'Lập kế hoạch'")).firstMatch
+        if start.exists { start.tap(); sleep(5) }
+        // to live in; not a citizen or PR (FIRB); first home: yes (the third question shows after the second)
+        // then the lowest budget band («Dưới …», Onboarding.svelte's bandLabel), then create
+        for (pred, nth) in [("label == 'Để ở'", 0), ("label == 'Không'", 0), ("label == 'Có'", 1),
+                            ("label BEGINSWITH 'Dưới'", 0), ("label == 'Tạo kế hoạch'", 0)] {
+            let q = app.descendants(matching: .any).matching(NSPredicate(format: pred))
+            _ = q.firstMatch.waitForExistence(timeout: 10)
+            sleep(1)
+            if q.count > nth { q.element(boundBy: nth).tap(); sleep(2) } else { print("161 plan: no «\(pred)» #\(nth)") }
+        }
+        sleep(20)
+        dump(app, "plan statement")
+        func texts() -> String {
+            (app.buttons.allElementsBoundByIndex + app.staticTexts.allElementsBoundByIndex)
+                .map { $0.label }.filter { !$0.isEmpty && $0.count < 80 && !$0.hasPrefix("•") }.joined(separator: " | ")
+        }
+        print("161 statement texts: " + texts())
+        let any = app.descendants(matching: .any)
+        // a later run finds the guest plan made earlier: the list shows it; open it
+        let row = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'New South Wales'")).firstMatch
+        if !any.matching(NSPredicate(format: "label BEGINSWITH 'Ngân sách'")).firstMatch.exists, row.exists { row.tap(); sleep(5) }
+        for (pred, name) in [("label BEGINSWITH 'Ngân sách'", "budget"), ("label BEGINSWITH 'Chi phí mua'", "buy phase"),
+                             ("label CONTAINS 'FIRB' AND NOT (label CONTAINS 'Tin')", "FIRB line")] {
+            let e = any.matching(NSPredicate(format: pred)).firstMatch
+            if e.waitForExistence(timeout: 10) { e.tap(); sleep(4) } else { print("161 plan: no \(name)") }
+            dump(app, "plan \(name)")
+            print("161 \(name) texts: " + texts())
+            print("161 \(name) links: " + app.links.allElementsBoundByIndex.map { $0.label }.joined(separator: " | "))
+        }
+        // the plan's buy phase → the FIRB term card: its source link opens in the Safari sheet
+        let source = find(app, app.links, "label == 'Nguồn'", "the FIRB card's source link")
+        outside(app, source, "phase sheet source", stay: source)
+    }
+
     func testListLinks() throws {
         let app = XCUIApplication()
         for way in ["Nước Úc qua số liệu", "Thị trường nhà ở Úc", "Tin tức", "Lập kế hoạch ngân sách"] {
