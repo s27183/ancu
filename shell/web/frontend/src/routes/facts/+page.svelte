@@ -14,10 +14,9 @@
     //            KB lacks is not drawn.
     //            Behavior 151 (Son 2026-11-04): the property docs (MARKET_DOCS) moved to /market;
     //            the population key figure is the economy section's.
-    //            Behavior 163 (Son 2026-11-06: «this card should be at the top»): the first doc
-    //            in PAGE_ORDER, Vietnamese home-buying demand, leads — its section, chip and
-    //            key figure come before the rate's, which is second (behavior 123's «leads
-    //            them» rewritten).
+    //            Behavior 164 (Son 2026-11-06): Vietnamese home-buying demand (DEMAND_DOCS) has
+    //            its own page, /demand, from the home's first card, and is never drawn here
+    //            (behavior 163's lead before the rate retired: the rate leads again).
     // Holds:     every figure comes from GET /api/facts and is drawn by FactCards, the same
     //            cards the Introduction sheet draws, so the two show the same figures and
     //            sources; the page frame and the way home are the News page's.
@@ -25,7 +24,7 @@
     import { onMount } from 'svelte';
     import { lang } from '$lib/stores/lang';
     import { t, type MessageKey } from '$lib/i18n';
-    import { CHIP_KEY, type FactDoc, getFacts, isMarketDoc, KEY_FIGURES, keyFigure, PAGE_ORDER, pageRank, pick } from '$lib/facts';
+    import { CHIP_KEY, type FactDoc, getFacts, isDemandDoc, isMarketDoc, KEY_FIGURES, keyFigure, pageRank, pick } from '$lib/facts';
     import FactCards from '$lib/FactCards.svelte';
     import HomeBack from '$lib/HomeBack.svelte';
     import NewsDetailSheet from '$lib/NewsDetailSheet.svelte';
@@ -43,29 +42,27 @@
     let selected = $state<NewsNote | null>(null);
     const notesFor = (doc: FactDoc) =>
         (doc.news ?? []).map((s) => news.find((n) => n.news_slug === s)).filter((n): n is NewsNote => !!n);
-    // Behavior 151: the property market's docs (MARKET_DOCS) are /market's, never drawn here.
+    // Behavior 151: the property market's docs (MARKET_DOCS) are /market's, never drawn here;
+    // behavior 164: nor the buying demand's (DEMAND_DOCS), /demand's.
     const ordered = $derived(
-        docs ? docs.filter((d) => !isMarketDoc(d.slug)).sort((a, b) => pageRank(a.slug) - pageRank(b.slug)) : []
+        docs ? docs.filter((d) => !isMarketDoc(d.slug) && !isDemandDoc(d.slug)).sort((a, b) => pageRank(a.slug) - pageRank(b.slug)) : []
     );
 
     // Behavior 126: one chip per drawn section, in page order; ids are the sections' ids.
-    // Behavior 163: PAGE_ORDER's first doc, when drawn, comes before the rate.
-    const leadN = $derived(ordered[0]?.slug === PAGE_ORDER[0] ? 1 : 0);
-    const docChips = $derived(
-        ordered.map((d) => ({
+    const chips = $derived([
+        ...(fx ? [{ id: 'fp-fx', label: $t('facts.chip.fx') }] : []),
+        ...ordered.map((d) => ({
             id: d.slug,
             label: CHIP_KEY[d.slug] ? $t(`facts.chip.${CHIP_KEY[d.slug]}` as MessageKey) : pick(d.title, $lang)
         }))
-    );
-    const chips = $derived([
-        ...docChips.slice(0, leadN),
-        ...(fx ? [{ id: 'fp-fx', label: $t('facts.chip.fx') }] : []),
-        ...docChips.slice(leadN)
     ]);
     const chipName = (id: string) => chips.find((c) => c.id === id)?.label ?? '';
     const loc = $derived($lang === 'vi' ? 'vi-VN' : 'en-AU');
-    const docKeys = $derived(
-        (docs ?? []).length
+    const keys = $derived([
+        ...(fx
+            ? [{ key: 'fx', id: 'fp-fx', value: `${new Intl.NumberFormat(loc).format(fx.rates.VND)} VND` }]
+            : []),
+        ...(docs ?? []).length
             ? KEY_FIGURES.flatMap((k) => {
                   const f = keyFigure(docs ?? [], k, $lang);
                   if (!f) return [];
@@ -73,13 +70,6 @@
                   return [{ key: k.key, id: k.slug, value }];
               })
             : []
-    );
-    // Behavior 163: the lead doc's key figure (KEY_FIGURES' first) before the rate's.
-    const keyLead = $derived(docKeys[0]?.id === PAGE_ORDER[0] ? 1 : 0);
-    const keys = $derived([
-        ...docKeys.slice(0, keyLead),
-        ...(fx ? [{ key: 'fx', id: 'fp-fx', value: `${new Intl.NumberFormat(loc).format(fx.rates.VND)} VND` }] : []),
-        ...docKeys.slice(keyLead)
     ]);
     let body = $state<HTMLDivElement | null>(null);
     let chipRow = $state<HTMLElement | null>(null);
@@ -179,8 +169,8 @@
                     </section>
                 {/if}
                 <p class="fp-note">{$t('factspage.note')}</p>
-                {#each ordered as doc, i (doc.slug)}
-                    {#if fx && i === leadN}<div id="fp-fx" class="fp-anchor"><FxRate rate={fx} /></div>{/if}
+                {#if fx}<div id="fp-fx" class="fp-anchor"><FxRate rate={fx} /></div>{/if}
+                {#each ordered as doc (doc.slug)}
                     <section class="fp-section" id={doc.slug} aria-labelledby="fp-{doc.slug}">
                         <h3 id="fp-{doc.slug}">{pick(doc.title, $lang)}</h3>
                         <FactCards {doc} />
@@ -192,7 +182,6 @@
                         {/each}
                     </section>
                 {/each}
-                {#if fx && ordered.length <= leadN}<div id="fp-fx" class="fp-anchor"><FxRate rate={fx} /></div>{/if}
             {/if}
         </div>
     </div>
