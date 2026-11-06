@@ -5,13 +5,13 @@
 // sitemap; llms.txt links each note. Behavior 146: one static guide page per published KB
 // doc (title, canonical, one Article JSON-LD, an h1, its sources), /guide, llms.txt's Guides
 // section, llms-full.txt naming every page, the guides in the sitemap and one Dataset per
-// facts section on /facts. Behavior 151: /market holds MARKET_DOCS and the listing sites,
+// facts section on /facts. Behavior 164: /demand holds DEMAND_DOCS. Behavior 151: /market holds MARKET_DOCS and the listing sites,
 // /facts every other fact doc, each in the sitemap and llms.txt. Exits 1 naming what is missing.
 //   node scripts/seo_check.ts [artifact.json] [build dir]
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { allNews, allFacts, allGuides, guideSlug, LISTING_SITES, noteSlug, ORIGIN, type Artifact } from './seo.ts';
-import { isMarketDoc } from '../src/lib/facts.ts';
+import { factPath } from '../src/lib/facts.ts';
 
 const artifactPath = process.argv[2] ?? '../../../engine/erlang/priv/kb/artifact.json';
 const build = process.argv[3] ?? 'build';
@@ -52,24 +52,25 @@ for (const [k, d] of guides) {
     if (/<script(?! type="application\/ld\+json")/.test(html)) bad.push(`guide ${slug}: runs script`);
     for (const s of d.sources ?? []) if (s.url?.startsWith('https://') && !html.includes(`<a href="${s.url.replace(/&/g, '&amp;').replace(/"/g, '&quot;')}">`)) bad.push(`guide ${slug}: source ${s.url} not linked`);
 }
-// Behavior 151: each fact doc is on exactly one page — /market for MARKET_DOCS, /facts for the rest.
-for (const [page, market] of [['facts.html', false], ['market.html', true]] as const) {
+// Behavior 151/164: each fact doc is on exactly one page — /demand for DEMAND_DOCS, /market for MARKET_DOCS, /facts for the rest.
+for (const [page, path] of [['facts.html', '/facts'], ['market.html', '/market'], ['demand.html', '/demand']] as const) {
+    const market = path === '/market';
     if (!existsSync(join(build, page))) continue;
     const html = readFileSync(join(build, page), 'utf8');
-    const want = facts.filter((d) => isMarketDoc(d.slug) === market);
+    const want = facts.filter((d) => factPath(d.slug) === path);
     const n = ldTypes(html).filter((t) => t === 'Dataset').length;
     if (n !== want.length) bad.push(`${page} holds ${n} Dataset, want ${want.length}`);
     for (const d of facts) {
         const on = html.includes(`<h2>${d.title.vi.replace(/&/g, '&amp;')} · `);
-        if (on !== (isMarketDoc(d.slug) === market)) bad.push(`${page} ${on ? 'holds' : 'misses'} ${d.slug}`);
+        if (on !== (factPath(d.slug) === path)) bad.push(`${page} ${on ? 'holds' : 'misses'} ${d.slug}`);
     }
     if (market) for (const l of LISTING_SITES) if (!html.includes(`<a href="${l.href}" rel="noopener noreferrer">`)) bad.push(`market.html misses ${l.name}`);
 }
-for (const p of ['index.html', 'news.html', 'facts.html', 'market.html', 'guide.html', 'robots.txt', 'sitemap.xml', 'llms.txt', 'llms-full.txt']) if (!existsSync(join(build, p))) bad.push(`no ${p}`);
+for (const p of ['index.html', 'news.html', 'facts.html', 'market.html', 'demand.html', 'guide.html', 'robots.txt', 'sitemap.xml', 'llms.txt', 'llms-full.txt']) if (!existsSync(join(build, p))) bad.push(`no ${p}`);
 if (!bad.length) {
     const sm = readFileSync(join(build, 'sitemap.xml'), 'utf8');
     const locs = [...sm.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
-    const want = [`${ORIGIN}/`, `${ORIGIN}/news`, `${ORIGIN}/facts`, `${ORIGIN}/market`, ...news.map((n) => `${ORIGIN}/news/${noteSlug(n.news_slug)}`), `${ORIGIN}/guide`, ...guides.map(([k]) => `${ORIGIN}/guide/${guideSlug(k)}`)];
+    const want = [`${ORIGIN}/`, `${ORIGIN}/news`, `${ORIGIN}/demand`, `${ORIGIN}/facts`, `${ORIGIN}/market`, ...news.map((n) => `${ORIGIN}/news/${noteSlug(n.news_slug)}`), `${ORIGIN}/guide`, ...guides.map(([k]) => `${ORIGIN}/guide/${guideSlug(k)}`)];
     if (locs.length !== want.length || want.some((u) => !locs.includes(u))) bad.push(`sitemap lists ${locs.length} URLs, want ${want.length}`);
     if (!readFileSync(join(build, 'robots.txt'), 'utf8').includes(`Sitemap: ${ORIGIN}/sitemap.xml`)) bad.push('robots.txt names no sitemap');
     const l = readFileSync(join(build, 'llms.txt'), 'utf8');
@@ -83,9 +84,12 @@ if (!bad.length) {
     if (!full.includes(`Page: ${ORIGIN}/facts`)) bad.push('llms-full.txt misses /facts');
     if (!full.includes(`Page: ${ORIGIN}/market`)) bad.push('llms-full.txt misses /market');
     if (!l.includes(`(${ORIGIN}/market)`)) bad.push('llms.txt misses /market');
+    if (!full.includes(`Page: ${ORIGIN}/demand`)) bad.push('llms-full.txt misses /demand');
+    if (!l.includes(`(${ORIGIN}/demand)`)) bad.push('llms.txt misses /demand');
+    if (!readFileSync(join(build, 'index.html'), 'utf8').includes('<a href="/demand">')) bad.push('the static home misses /demand');
 }
 if (bad.length) {
     console.error(bad.join('\n'));
     process.exit(1);
 }
-console.log(`seo_check: ${news.length} note pages, ${guides.length} guide pages (/guide), sitemap ${news.length + guides.length + 5} URLs, ${facts.length} facts Datasets, robots.txt, llms.txt (Guides), llms-full.txt — ok`);
+console.log(`seo_check: ${news.length} note pages, ${guides.length} guide pages (/guide), sitemap ${news.length + guides.length + 6} URLs, ${facts.length} facts Datasets, robots.txt, llms.txt (Guides), llms-full.txt — ok`);
