@@ -6,6 +6,7 @@
     import '@fontsource-variable/newsreader';
     import '../app.css';
     import { onMount } from 'svelte';
+    import { installNativeLinks } from '$lib/nativeLinks';
     import { lang } from '$lib/stores/lang';
     import { t, type MessageKey } from '$lib/i18n';
     import {
@@ -45,6 +46,10 @@
         cancel();
         location.href = to.url.href;
     });
+    // Honest-partial -> The web frontend -> outside links in the phone app (behavior 161):
+    // inside the Capacitor app every outside link opens in the in-app browser
+    // (nativeLinks.ts); on the website this installs nothing.
+    onMount(() => installNativeLinks());
     onMount(() => {
         const onShow = async () => {
             if (document.visibilityState !== 'visible') return;
