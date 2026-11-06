@@ -3746,8 +3746,11 @@ main {
     .home-pills {
         padding-top: var(--sp-8);
     }
-    /* Behavior 151: a fifth card spans the row rather than sit alone in half of it. */
-    .home-way:last-child:nth-child(odd) {
+    /* Behavior 164: the demand card leads across the row; behind it the other five run
+       two by two, the last (the sixth child) spanning the row rather than sit alone in
+       half of it (behavior 151's rule, shifted by the lead). */
+    .home-way-lead,
+    .home-way:last-child:nth-child(even) {
         grid-column: 1 / -1;
     }
 }
@@ -3763,6 +3766,10 @@ main {
     color: var(--ink);
     text-decoration: none;
     transition: border-color var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
+}
+/* Behavior 164: the lead card is set off by its accent edge, the rest unchanged. */
+.home-way-lead {
+    border-color: var(--accent-line);
 }
 .home-way:hover {
     border-color: var(--accent-line);

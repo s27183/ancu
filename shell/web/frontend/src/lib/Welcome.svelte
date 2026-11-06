@@ -30,6 +30,7 @@
     // light green on every visit until it is tapped (behavior 50).
     import { onMount, tick } from 'svelte';
     import { onContentChange } from '$lib/stores/content';
+    import { homeFacts } from '$lib/stores/facts';
     import { lang } from '$lib/stores/lang';
     import { t } from '$lib/i18n';
     import FactCards from '$lib/FactCards.svelte';
@@ -52,6 +53,10 @@
     let closing = $state(false);
     let arrived = $state(false);
     let docs = $state<FactDoc[]>([]);
+    // Behavior 164: the home's demand card reads the same answer (stores/facts.ts).
+    $effect(() => {
+        if (docs.length) homeFacts.set(docs);
+    });
     let cardEl = $state<HTMLElement | null>(null);
     let launchEl = $state<HTMLButtonElement | null>(null);
     // Behavior 50 (revised 2026-10-10): the launcher pulses light green on every page
