@@ -91,13 +91,11 @@ export const SECTION_ORDER = [
 ];
 
 // The facts page's order (/facts, behavior 126, Son 2026-10-18): by what a buyer asks, in
-// the order they ask it. Behavior 163 (Son 2026-11-06: «this card should be at the top»):
-// Vietnamese home-buying demand comes first, ahead of the RBA rate (the page draws the
-// rate second); then what the visa costs, how the economy stands, settling in, and the
-// Vietnamese community. A fact doc the KB adds later and this list does not name
-// follows them, never ahead. The Introduction sheet keeps SECTION_ORDER.
+// the order they ask it — after the RBA rate (the page draws it first): what the visa
+// costs, how the economy stands, settling in, and the Vietnamese community. A fact doc
+// the KB adds later and this list does not name follows them, never ahead. The
+// Introduction sheet keeps SECTION_ORDER.
 export const PAGE_ORDER = [
-    'kb.facts.vietnamese-buyers',
     'kb.facts.visa-charges',
     'kb.facts.australian-economy',
     'kb.facts.living-in-australia',
@@ -111,14 +109,23 @@ export const PAGE_ORDER = [
 export const MARKET_DOCS = ['kb.facts.listing-transparency', 'kb.facts.australian-property', 'kb.facts.property-safeguards'];
 export const isMarketDoc = (slug: string): boolean => MARKET_DOCS.includes(slug);
 
+/** Behavior 164 (Son 2026-11-06: «a separate card in the main page, on top … we move those
+ *  facts out of the "Australia in figures" card»): Vietnamese home-buying demand has its
+ *  own page (/demand), opened from the home's first card; /facts draws none of these.
+ *  Disjoint from MARKET_DOCS, so each fact doc is on exactly one page. */
+export const DEMAND_DOCS = ['kb.facts.vietnamese-buyers'];
+export const isDemandDoc = (slug: string): boolean => DEMAND_DOCS.includes(slug);
+/** The page that draws a fact doc: /demand, /market, or /facts for every other. */
+export const factPath = (slug: string): '/demand' | '/market' | '/facts' =>
+    isDemandDoc(slug) ? '/demand' : isMarketDoc(slug) ? '/market' : '/facts';
+
 /** Behavior 126: each section's short name for the chips on /facts (i18n `facts.chip.<key>`);
  *  a doc not named here is chipped by its title. */
 export const CHIP_KEY: Record<string, string> = {
     'kb.facts.visa-charges': 'visa',
     'kb.facts.australian-economy': 'economy',
     'kb.facts.living-in-australia': 'living',
-    'kb.facts.vietnamese-in-australia': 'vietnamese',
-    'kb.facts.vietnamese-buyers': 'buyers'
+    'kb.facts.vietnamese-in-australia': 'vietnamese'
 };
 
 export function pageRank(slug: string): number {
@@ -138,25 +145,36 @@ export interface KeyFigureSpec {
     rank?: boolean;
 }
 export const KEY_FIGURES: KeyFigureSpec[] = [
-    // Behavior 163: the buying demand's figure leads, as its section does (the rate is second).
-    { key: 'vnrank', slug: 'kb.facts.vietnamese-buyers', fact: 'firb_top_sources_quarter', rank: true },
     { key: 'visa189', slug: 'kb.facts.visa-charges', fact: 'skilled_employer', pick: 'highlight' },
     { key: 'gdp', slug: 'kb.facts.australian-economy', fact: 'real_gdp_growth' },
     { key: 'population', slug: 'kb.facts.australian-economy', fact: 'population' },
     { key: 'wage', slug: 'kb.facts.living-in-australia', fact: 'minimum_wage' }
 ];
 
-/** The figure a spec names, formatted as its card formats it; null when the KB lacks it. */
-export function keyFigure(docs: FactDoc[], spec: KeyFigureSpec, lang: Lang): { value: string; rank?: number } | null {
+/** Behavior 164: the home's demand card names Vietnam's place among approved foreign
+ *  home purchases (FIRB), with the fact's own quarter — never typed here. */
+export const DEMAND_RANK: KeyFigureSpec = { key: 'vnrank', slug: 'kb.facts.vietnamese-buyers', fact: 'firb_top_sources_quarter', rank: true };
+
+/** The figure a spec names, formatted as its card formats it, with its as_of; null when
+ *  the KB lacks it. */
+export function keyFigure(docs: FactDoc[], spec: KeyFigureSpec, lang: Lang): { value: string; rank?: number; as_of: string } | null {
     const f = docs.find((d) => d.slug === spec.slug)?.facts.find((x) => x.id === spec.fact);
     if (!f) return null;
     if (spec.rank) {
         const items = [...(f.items ?? [])].sort((a, b) => b.value - a.value);
         const i = items.findIndex((x) => x.highlight);
-        return i < 0 ? null : { value: String(i + 1), rank: i + 1 };
+        return i < 0 ? null : { value: String(i + 1), rank: i + 1, as_of: f.as_of };
     }
     const v = spec.pick ? f.items?.find((x) => x.highlight)?.value : f.value;
-    return v === undefined ? null : { value: formatValue(v, f.unit, lang, f.decimals) };
+    return v === undefined ? null : { value: formatValue(v, f.unit, lang, f.decimals), as_of: f.as_of };
+}
+
+/** "quý 1/2026" / "Q1 2026" from YYYY-MM: the quarter a month falls in. */
+export function formatQuarter(asOf: string, lang: Lang): string {
+    const [y, m] = asOf.split('-').map(Number);
+    if (!y || !m) return asOf;
+    const q = Math.ceil(m / 3);
+    return lang === 'vi' ? `quý ${q}/${y}` : `Q${q} ${y}`;
 }
 
 export function pick(l: Label | undefined, lang: Lang): string {

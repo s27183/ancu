@@ -18,10 +18,11 @@
 import { escapeHtml, renderMarkdown, renderInlineMarkdown } from '../src/lib/markdown.ts';
 import type { NewsNote } from '../src/lib/api.ts';
 import type { FactDoc } from '../src/lib/facts.ts';
-import { isMarketDoc, pageRank } from '../src/lib/facts.ts';
+import { factPath, isDemandDoc, isMarketDoc, pageRank } from '../src/lib/facts.ts';
 
-/** Behavior 151: the page a fact doc is drawn on — /market for MARKET_DOCS, /facts for every other. */
-export const factPath = (slug: string): '/market' | '/facts' => (isMarketDoc(slug) ? '/market' : '/facts');
+/** Behavior 151/164: the page a fact doc is drawn on — /demand for DEMAND_DOCS, /market for
+ *  MARKET_DOCS, /facts for every other (facts.ts, the one list the live pages read too). */
+export { factPath };
 
 export const ORIGIN = 'https://maiancu.com';
 export const BRAND = 'Mai An Cư';
@@ -122,7 +123,7 @@ export function render(shell: string, p: Page): string {
         .replace(/<body[^>]*>/, (b) => `${b}\n        <div id="seo-static">${p.body}</div>`);
 }
 
-const nav = `<nav><a href="/">${BRAND}</a> · <a href="/news">Tin tức · News</a> · <a href="/facts">Số liệu · Facts</a> · <a href="/market">Thị trường nhà · Property market</a> · <a href="/plan">Lập kế hoạch · Plan</a></nav>`;
+const nav = `<nav><a href="/">${BRAND}</a> · <a href="/news">Tin tức · News</a> · <a href="/demand">Nhu cầu mua nhà · Demand</a> · <a href="/facts">Số liệu · Facts</a> · <a href="/market">Thị trường nhà · Property market</a> · <a href="/plan">Lập kế hoạch · Plan</a></nav>`;
 
 function sourcesList(urls: string[]): string {
     const u = [...new Set(urls.filter((x) => /^https?:\/\//.test(x)))];
@@ -229,10 +230,23 @@ function factSections(docs: FactDoc[]): string[] {
     });
 }
 
-/** /facts: every fact doc but the property market's (behavior 151). */
+/** /demand (behavior 164): Vietnamese home-buying demand, the home's first card. */
+export function demandPage(all: FactDoc[]): Page {
+    const docs = all.filter((d) => isDemandDoc(d.slug));
+    return {
+        path: '/demand',
+        title: `Nhu cầu mua nhà ở Úc của người Việt · Vietnamese demand for Australian homes | ${BRAND}`,
+        description:
+            'Hồ sơ mua nhà được duyệt và sở hữu nhà của người Việt ở Úc, từ FIRB và ATO. Vietnamese home purchases approved and owned in Australia, from FIRB and the ATO.',
+        ld: [{ '@context': 'https://schema.org', '@type': 'CollectionPage', name: 'Nhu cầu mua nhà ở Úc của người Việt · Vietnamese demand for Australian homes', url: ORIGIN + '/demand', inLanguage: 'vi' }, ...docs.map(factDataset)],
+        body: `${nav}<h1>Nhu cầu mua nhà ở Úc của người Việt · <span lang="en">Vietnamese demand for Australian homes</span></h1>${factSections(docs).join('')}`
+    };
+}
+
+/** /facts: every fact doc but the property market's (behavior 151) and the buying demand's (164). */
 export function factsPage(all: FactDoc[]): Page {
     // Behavior 163: in the live page's order (PAGE_ORDER), so a crawler reads what a visitor reads.
-    const docs = all.filter((d) => !isMarketDoc(d.slug)).sort((a, b) => pageRank(a.slug) - pageRank(b.slug));
+    const docs = all.filter((d) => factPath(d.slug) === '/facts').sort((a, b) => pageRank(a.slug) - pageRank(b.slug));
     return {
         path: '/facts',
         title: `Nước Úc qua số liệu · Australia in figures | ${BRAND}`,
@@ -274,7 +288,7 @@ export function homePage(news: NewsNote[]): Page {
             { '@context': 'https://schema.org', '@type': 'WebSite', name: BRAND, url: ORIGIN + '/', inLanguage: ['vi', 'en'], description: `${TAGLINE_VI}. ${TAGLINE_EN}.` },
             { '@context': 'https://schema.org', ...publisher }
         ],
-        body: `${nav}<h1>${BRAND}</h1><p>${escapeHtml(TAGLINE_VI)}. <span lang="en">${escapeHtml(TAGLINE_EN)}.</span></p><ul><li><a href="/plan">Lập kế hoạch ngân sách · Plan your budget</a>: chi phí khi mua, khi sở hữu và khi bán nhà, theo bang.</li><li><a href="/news">Tin tức · News</a></li><li><a href="/facts">Nước Úc qua số liệu · Australia in figures</a></li><li><a href="/market">Thị trường nhà ở Úc · Australia's property market</a></li></ul><h2>Tin mới · Latest</h2><ul>${news.slice(0, 10).map(noteItem).join('')}</ul>`
+        body: `${nav}<h1>${BRAND}</h1><p>${escapeHtml(TAGLINE_VI)}. <span lang="en">${escapeHtml(TAGLINE_EN)}.</span></p><ul><li><a href="/demand">Nhu cầu mua nhà ở Úc của người Việt · Vietnamese demand for Australian homes</a></li><li><a href="/plan">Lập kế hoạch ngân sách · Plan your budget</a>: chi phí khi mua, khi sở hữu và khi bán nhà, theo bang.</li><li><a href="/news">Tin tức · News</a></li><li><a href="/facts">Nước Úc qua số liệu · Australia in figures</a></li><li><a href="/market">Thị trường nhà ở Úc · Australia's property market</a></li></ul><h2>Tin mới · Latest</h2><ul>${news.slice(0, 10).map(noteItem).join('')}</ul>`
     };
 }
 
@@ -296,12 +310,13 @@ export function robots(): string {
 
 export function sitemap(news: NewsNote[], facts: FactDoc[], guides: [string, KbDoc][] = []): string {
     const newest = news[0]?.authored_date;
-    const dateOf = (market: boolean) => facts.filter((d) => isMarketDoc(d.slug) === market).map((d) => d.last_verified).filter(Boolean).sort().at(-1);
+    const dateOf = (page: string) => facts.filter((d) => factPath(d.slug) === page).map((d) => d.last_verified).filter(Boolean).sort().at(-1);
     const urls: [string, string | undefined][] = [
         ['/', newest],
         ['/news', newest],
-        ['/facts', dateOf(false)],
-        ['/market', dateOf(true)],
+        ['/demand', dateOf('/demand')],
+        ['/facts', dateOf('/facts')],
+        ['/market', dateOf('/market')],
         ...news.map((n): [string, string | undefined] => [notePath(n), n.authored_date]),
         ...(guides.length ? [['/guide', guides.map(([, d]) => d.last_verified).filter(Boolean).sort().at(-1)] as [string, string | undefined]] : []),
         ...guides.map(([k, d]): [string, string | undefined] => [guidePath(k), d.last_verified])
@@ -339,7 +354,8 @@ export function llms(news: NewsNote[], facts: FactDoc[], guides: [string, KbDoc]
         '',
         '## Facts',
         '',
-        `- [Australia in figures](${ORIGIN}/facts): ${facts.filter((d) => !isMarketDoc(d.slug)).map((d) => d.title.en).join('; ')}`,
+        `- [Vietnamese demand for Australian homes](${ORIGIN}/demand): ${facts.filter((d) => isDemandDoc(d.slug)).map((d) => d.title.en).join('; ')}`,
+        `- [Australia in figures](${ORIGIN}/facts): ${facts.filter((d) => factPath(d.slug) === '/facts').map((d) => d.title.en).join('; ')}`,
         `- [Australia's property market](${ORIGIN}/market): ${facts.filter((d) => isMarketDoc(d.slug)).map((d) => d.title.en).join('; ')}; the main listing sites`,
         '',
         '## Optional',
@@ -569,7 +585,7 @@ ${(p.ld ?? []).map((o) => `<script type="application/ld+json">${jsonLd(o)}</scri
 <style>${STATIC_CSS}</style>
 </head>
 <body>
-<header><nav><a href="/">${BRAND}</a><a href="/guide">Guides</a><a href="/news">News</a><a href="/facts">Facts</a><a href="/market">Property market</a><a href="/plan">Plan your budget</a></nav></header>
+<header><nav><a href="/">${BRAND}</a><a href="/guide">Guides</a><a href="/news">News</a><a href="/demand">Vietnamese demand</a><a href="/facts">Facts</a><a href="/market">Property market</a><a href="/plan">Plan your budget</a></nav></header>
 <main>
 ${p.body}
 </main>

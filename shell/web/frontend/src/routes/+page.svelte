@@ -16,10 +16,23 @@
     // "Giới thiệu" launcher on the left, the «Use as an app» pill (InstallHint) on the
     // right. In the flow, neither can cover a card (behavior 128's placement retired), and
     // the install pill replaces behavior 152's strip under the cards.
+    // Behavior 164 (Son 2026-11-06: «a separate card in the main page, on top of other
+    // page»): a sixth card leads, across the row — Vietnamese home-buying demand, opening
+    // /demand. Its line names Vietnam's FIRB rank and that fact's quarter, read from the
+    // facts the Introduction sheet already fetched (homeFacts), never typed here; until
+    // they land, or if they fail, it reads as a plain line with no figure.
     import Welcome from '$lib/Welcome.svelte';
     import HomeBackdrop from '$lib/HomeBackdrop.svelte';
     import InstallHint from '$lib/InstallHint.svelte';
     import { t } from '$lib/i18n';
+    import { lang } from '$lib/stores/lang';
+    import { homeFacts } from '$lib/stores/facts';
+    import { DEMAND_RANK, formatQuarter, keyFigure } from '$lib/facts';
+
+    const rank = $derived(keyFigure($homeFacts, DEMAND_RANK, $lang));
+    const demandLine = $derived(
+        rank?.rank ? $t('home.demand.rank').replace('{n}', String(rank.rank)).replace('{q}', formatQuarter(rank.as_of, $lang)) : $t('home.demand.body')
+    );
 </script>
 
 <HomeBackdrop />
@@ -30,6 +43,21 @@
         <InstallHint />
     </div>
     <nav class="home-ways" aria-label={$t('brand.name')}>
+        <a class="home-way home-way-lead" href="/demand">
+            <span class="home-way-icon" aria-hidden="true">
+                <!-- a house with a rising line: homes Vietnamese buyers seek -->
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+                    ><path d="M3 11 12 4l9 7" /><path d="M5 10v10h14V10" /><polyline points="8.5 16.5 11 14 13 15.5 16 12.5" /></svg
+                >
+            </span>
+            <span class="home-way-text">
+                <span class="home-way-title">{$t('home.demand.title')}</span>
+                <span class="home-way-body">{demandLine}</span>
+            </span>
+            <svg class="home-way-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+                ><polyline points="9 6 15 12 9 18" /></svg
+            >
+        </a>
         <a class="home-way" href="/explore">
             <span class="home-way-icon" aria-hidden="true">
                 <!-- a pin on a folded map -->

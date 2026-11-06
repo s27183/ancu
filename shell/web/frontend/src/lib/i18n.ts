@@ -1378,6 +1378,18 @@ const messages = {
         vi: 'Theo bang: chi phí khi mua, khi sở hữu và khi bán nhà.',
         en: 'By state: what buying, owning and selling a home cost.'
     },
+    // Behavior 164: the home's first card and the buying demand page (/demand) it opens.
+    // The title is the KB doc's own (kb.facts.vietnamese-buyers), shown while it loads;
+    // the line's rank and quarter come from the FIRB fact ({n}, {q}), never typed here.
+    'home.demand.title': { vi: 'Nhu cầu mua nhà ở Úc của người Việt', en: 'Vietnamese demand for Australian homes' },
+    'home.demand.rank': {
+        vi: 'Việt Nam thứ {n} về hồ sơ mua nhà nước ngoài được duyệt · FIRB, {q}',
+        en: 'Vietnam is No. {n} among approved foreign home purchases · FIRB, {q}'
+    },
+    'home.demand.body': {
+        vi: 'Hồ sơ mua nhà được duyệt và sở hữu nhà của người Việt, từ nguồn chính phủ.',
+        en: 'Vietnamese home purchases approved and owned, from government sources.'
+    },
     // Behavior 88: the home's third card and the News page it opens.
     'home.news.title': { vi: 'Tin tức', en: 'News' },
     'home.news.body': {
@@ -1476,8 +1488,6 @@ const messages = {
     'facts.chip.property': { vi: 'Nhà đất', en: 'Property' },
     'facts.chip.living': { vi: 'Cuộc sống', en: 'Living' },
     'facts.chip.vietnamese': { vi: 'Người Việt tại Úc', en: 'Vietnamese in Australia' },
-    // Behavior 163: the home-buying demand section, first on /facts.
-    'facts.chip.buyers': { vi: 'Nhu cầu mua nhà', en: 'Buying demand' },
     // Behavior 126: the key figures that open /facts.
     'facts.key.title': { vi: 'Số liệu chính', en: 'Key figures' },
     'facts.key.fx': { vi: '1 đô la Úc', en: '1 Australian dollar' },
@@ -1485,7 +1495,6 @@ const messages = {
     'facts.key.gdp': { vi: 'Tăng trưởng kinh tế', en: 'Economic growth' },
     'facts.key.population': { vi: 'Dân số', en: 'Population' },
     'facts.key.wage': { vi: 'Lương tối thiểu mỗi giờ', en: 'Minimum wage per hour' },
-    'facts.key.vnrank': { vi: 'Việt Nam trong hồ sơ mua nhà nước ngoài được duyệt', en: 'Vietnam among approved foreign purchases' },
     'facts.key.rankvalue': { vi: 'Thứ {n}', en: 'No. {n}' },
     'facts.chips': { vi: 'Các mục', en: 'Sections' },
     'newspage.sub': { vi: 'Quy định và thị trường', en: 'Rules and the market' },
