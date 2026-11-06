@@ -79,21 +79,25 @@ export async function getFacts(fetchFn: typeof fetch = fetch): Promise<FactDoc[]
     }
 }
 
-// The display order of the sheet's fact sections: where Vietnamese buyers stand, then
-// why Australian property (Son's brief, behavior 42), then what settling there gives a
-// family (behavior 47: people buy because they mean to settle).
+// The display order of the sheet's fact sections: where Vietnamese buyers stand — their
+// home-buying demand first (behavior 163), then the community — then why Australian
+// property (Son's brief, behavior 42), then what settling there gives a family
+// (behavior 47: people buy because they mean to settle).
 export const SECTION_ORDER = [
+    'kb.facts.vietnamese-buyers',
     'kb.facts.vietnamese-in-australia',
     'kb.facts.australian-property',
     'kb.facts.living-in-australia'
 ];
 
 // The facts page's order (/facts, behavior 126, Son 2026-10-18): by what a buyer asks, in
-// the order they ask it — what the money is worth (the RBA rate, drawn before these), what
-// the visa costs, how the economy stands, the property itself, settling in, then where
-// Vietnamese buyers stand. A fact doc the KB adds later and this list does not name
+// the order they ask it. Behavior 163 (Son 2026-11-06: «this card should be at the top»):
+// Vietnamese home-buying demand comes first, ahead of the RBA rate (the page draws the
+// rate second); then what the visa costs, how the economy stands, settling in, and the
+// Vietnamese community. A fact doc the KB adds later and this list does not name
 // follows them, never ahead. The Introduction sheet keeps SECTION_ORDER.
 export const PAGE_ORDER = [
+    'kb.facts.vietnamese-buyers',
     'kb.facts.visa-charges',
     'kb.facts.australian-economy',
     'kb.facts.living-in-australia',
@@ -113,7 +117,8 @@ export const CHIP_KEY: Record<string, string> = {
     'kb.facts.visa-charges': 'visa',
     'kb.facts.australian-economy': 'economy',
     'kb.facts.living-in-australia': 'living',
-    'kb.facts.vietnamese-in-australia': 'vietnamese'
+    'kb.facts.vietnamese-in-australia': 'vietnamese',
+    'kb.facts.vietnamese-buyers': 'buyers'
 };
 
 export function pageRank(slug: string): number {
@@ -133,11 +138,12 @@ export interface KeyFigureSpec {
     rank?: boolean;
 }
 export const KEY_FIGURES: KeyFigureSpec[] = [
+    // Behavior 163: the buying demand's figure leads, as its section does (the rate is second).
+    { key: 'vnrank', slug: 'kb.facts.vietnamese-buyers', fact: 'firb_top_sources_quarter', rank: true },
     { key: 'visa189', slug: 'kb.facts.visa-charges', fact: 'skilled_employer', pick: 'highlight' },
     { key: 'gdp', slug: 'kb.facts.australian-economy', fact: 'real_gdp_growth' },
     { key: 'population', slug: 'kb.facts.australian-economy', fact: 'population' },
-    { key: 'wage', slug: 'kb.facts.living-in-australia', fact: 'minimum_wage' },
-    { key: 'vnrank', slug: 'kb.facts.vietnamese-in-australia', fact: 'firb_top_sources_quarter', rank: true }
+    { key: 'wage', slug: 'kb.facts.living-in-australia', fact: 'minimum_wage' }
 ];
 
 /** The figure a spec names, formatted as its card formats it; null when the KB lacks it. */

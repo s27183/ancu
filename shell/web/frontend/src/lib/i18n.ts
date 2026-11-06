@@ -1475,7 +1475,9 @@ const messages = {
     'facts.chip.economy': { vi: 'Kinh tế', en: 'Economy' },
     'facts.chip.property': { vi: 'Nhà đất', en: 'Property' },
     'facts.chip.living': { vi: 'Cuộc sống', en: 'Living' },
-    'facts.chip.vietnamese': { vi: 'Người Việt', en: 'Vietnamese buyers' },
+    'facts.chip.vietnamese': { vi: 'Người Việt tại Úc', en: 'Vietnamese in Australia' },
+    // Behavior 163: the home-buying demand section, first on /facts.
+    'facts.chip.buyers': { vi: 'Nhu cầu mua nhà', en: 'Buying demand' },
     // Behavior 126: the key figures that open /facts.
     'facts.key.title': { vi: 'Số liệu chính', en: 'Key figures' },
     'facts.key.fx': { vi: '1 đô la Úc', en: '1 Australian dollar' },

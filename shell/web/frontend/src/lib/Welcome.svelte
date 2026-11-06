@@ -66,7 +66,7 @@
     // "Show me around" at the sheet's foot goes to the map and replays it there.
     let tourAfter = false;
 
-    // The sheet draws its own three sections only: the facts page (/facts, behavior 122)
+    // The sheet draws its own sections only (SECTION_ORDER: the buying demand and the community — behavior 163 —, the property, settling in): the facts page (/facts, behavior 122)
     // shows the KB's other fact docs (the economy, visa charges) and they stay off here.
     const ordered = $derived(
         docs.filter((d) => SECTION_ORDER.includes(d.slug)).sort((a, b) => SECTION_ORDER.indexOf(a.slug) - SECTION_ORDER.indexOf(b.slug))
@@ -203,7 +203,7 @@
                     <button
                         type="button"
                         class="wl-arrow"
-                        onclick={() => scrollToId('wl-kb.facts.vietnamese-in-australia')}
+                        onclick={() => scrollToId('wl-kb.facts.vietnamese-buyers')}
                     >
                         <span>{$t('intro.facts.arrow')}</span>
                         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v15M5.5 12.5 12 19l6.5-6.5" /></svg>
