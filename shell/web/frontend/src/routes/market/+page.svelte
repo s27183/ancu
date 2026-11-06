@@ -25,9 +25,10 @@
     import { onContentChange } from '$lib/stores/content';
 
     // Name and address only: no ranking or description, which no government source states.
+    // Behavior 162: Domain first — it opens from Vietnam; realestate.com.au and Allhomes may not.
     const LISTINGS: { name: string; href: string }[] = [
-        { name: 'realestate.com.au', href: 'https://www.realestate.com.au/' },
         { name: 'Domain', href: 'https://www.domain.com.au/' },
+        { name: 'realestate.com.au', href: 'https://www.realestate.com.au/' },
         { name: 'Allhomes', href: 'https://www.allhomes.com.au/' }
     ];
 
@@ -87,6 +88,7 @@
                         </li>
                     {/each}
                 </ul>
+                <p class="mk-notie">{$t('listing.vietnam')}</p>
                 <p class="mk-notie">{$t('marketpage.listings.notie')}</p>
             </section>
         </div>
