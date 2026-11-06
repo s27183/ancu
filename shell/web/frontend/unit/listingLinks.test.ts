@@ -1,7 +1,8 @@
 // Honest-partial -> the suburb data the goal names -> the web frontend -> the listing sites'
 // links, proven over every suburb the snapshot ships and 200 seeded hostile names
 // (behavior 150, Expect 1): each link's host is one of the three, its path the site's
-// suburb pattern, no "(Vic.)" qualifier left, and Domain/Allhomes only with a postcode.
+// suburb pattern, no "(Vic.)" qualifier left, Domain/Allhomes only with a postcode, and
+// (behavior 162) the order Domain, REA, Allhomes.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -51,6 +52,9 @@ function problems(name: string, state: string, postcode: unknown): string[] {
     }
     const sites = links.map((l) => l.site);
     if (!hasPc && (sites.includes('domain') || sites.includes('allhomes'))) out.push('domain/allhomes without a postcode');
+    // behavior 162: Domain first (it opens from Vietnam), then REA, then Allhomes; REA alone without a postcode
+    const order = sites.join(',');
+    if (links.length && order !== (hasPc ? 'domain,rea,allhomes' : 'rea')) out.push(`order ${order}`);
     return out;
 }
 
@@ -94,13 +98,13 @@ test('200 hostile names, seed 150: no link leaves the three hosts or their patte
 test('the measured forms (probe 2/9)', () => {
     const urls = (n: string, s: string, p?: string) => listingLinks(n, s, p).map((l) => l.url);
     assert.deepEqual(urls('Box Hill (Vic.)', 'VIC', '3128'), [
-        'https://www.realestate.com.au/buy/in-box+hill,+vic/list-1',
         'https://www.domain.com.au/sale/box-hill-vic-3128/',
+        'https://www.realestate.com.au/buy/in-box+hill,+vic/list-1',
         'https://www.allhomes.com.au/sale/box-hill-vic-3128/'
     ]);
     assert.deepEqual(urls("O'Connor (ACT)", 'ACT', '2602'), [
-        "https://www.realestate.com.au/buy/in-o'connor,+act/list-1",
         'https://www.domain.com.au/sale/o-connor-act-2602/',
+        "https://www.realestate.com.au/buy/in-o'connor,+act/list-1",
         'https://www.allhomes.com.au/sale/o-connor-act-2602/'
     ]);
     assert.deepEqual(urls('Richmond (Vic.)', 'VIC'), ['https://www.realestate.com.au/buy/in-richmond,+vic/list-1']);

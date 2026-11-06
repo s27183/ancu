@@ -1,7 +1,9 @@
 // Honest-partial -> the suburb data the goal names -> the web frontend -> the listing sites' links
 // Goal:      behavior 150 — a suburb's sheet leads, in one tap, to the homes for sale there on
-//            realestate.com.au, Domain and Allhomes; Mai An Cư links out and never frames,
-//            fetches or copies their pages ("No property scraping", invariants.md).
+//            Domain, realestate.com.au and Allhomes — Domain first, the one of the three that
+//            opens from Vietnam (behavior 162; Son 2026-11-06, checked through a VPN: REA and
+//            Allhomes do not); Mai An Cư links out and never frames, fetches or copies their
+//            pages ("No property scraping", invariants.md).
 // Invariant: every link is https://<one of three fixed hosts>/<path> — a suburb name can shape
 //            only the path: Domain and Allhomes get a slug of [a-z0-9-] only, REA a
 //            percent-encoded segment. Domain and Allhomes links exist only where the suburb
@@ -60,7 +62,8 @@ function reaSegment(name: string): string {
     return encodeURIComponent(name.toLowerCase()).replace(/%20/g, '+');
 }
 
-/** The links for one suburb, REA first; [] when nothing safe can be built. */
+/** The links for one suburb: Domain, REA, Allhomes (REA alone without a postcode); [] when
+ *  nothing safe can be built. */
 export function listingLinks(name: string, state: string, postcode?: string | null): ListingLink[] {
     const plain = plainSuburbName(name);
     if (PLACEHOLDER.test(plain)) return [];
@@ -70,11 +73,10 @@ export function listingLinks(name: string, state: string, postcode?: string | nu
     if (!nameSlug) return [];
     const links: ListingLink[] = [];
     const make = (site: ListingSite, path: string) => links.push({ site, name: SITE_NAMES[site], host: LISTING_HOSTS[site], url: `https://${LISTING_HOSTS[site]}${path}` });
+    const pc = typeof postcode === 'string' && /^[0-9]{4}$/.test(postcode) ? postcode : null;
+    const tail = pc && `${nameSlug}-${st.toLowerCase()}-${pc}`;
+    if (tail) make('domain', `/sale/${tail}/`);
     make('rea', `/buy/in-${reaSegment(plain)},+${st.toLowerCase()}/list-1`);
-    if (typeof postcode === 'string' && /^[0-9]{4}$/.test(postcode)) {
-        const tail = `${nameSlug}-${st.toLowerCase()}-${postcode}`;
-        make('domain', `/sale/${tail}/`);
-        make('allhomes', `/sale/${tail}/`);
-    }
+    if (tail) make('allhomes', `/sale/${tail}/`);
     return links;
 }
