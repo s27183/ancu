@@ -242,10 +242,11 @@ export function factsPage(all: FactDoc[]): Page {
     };
 }
 
-/** Behavior 151: the listing sites /market names — private companies, no tie (the page's own constants). */
+/** Behavior 151: the listing sites /market names — private companies, no tie (the page's own constants);
+ *  behavior 162: Domain first, the one that opens from Vietnam. */
 export const LISTING_SITES = [
-    { name: 'realestate.com.au', href: 'https://www.realestate.com.au/' },
     { name: 'Domain', href: 'https://www.domain.com.au/' },
+    { name: 'realestate.com.au', href: 'https://www.realestate.com.au/' },
     { name: 'Allhomes', href: 'https://www.allhomes.com.au/' }
 ];
 

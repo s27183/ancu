@@ -106,6 +106,11 @@ const messages = {
         vi: `Đây là trang web của các công ty khác; ${BRAND} không có liên kết gì với họ.`,
         en: `These are other companies' websites; ${BRAND} has no tie to them.`
     },
+    // Behavior 162 (Son 2026-11-06, his VPN check): which of the three open from Vietnam.
+    'listing.vietnam': {
+        vi: 'Ở Việt Nam, realestate.com.au và Allhomes có thể không mở được; Domain thì mở được.',
+        en: 'From Vietnam, realestate.com.au and Allhomes may not open; Domain does.'
+    },
     'listing.rea_only': {
         vi: 'Chưa có mã bưu điện của khu vực này, nên chỉ có realestate.com.au.',
         en: "We don't have this suburb's postcode yet, so only realestate.com.au."

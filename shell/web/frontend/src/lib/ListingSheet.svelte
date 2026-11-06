@@ -9,6 +9,8 @@
     //            Behavior 153: before the links, that their prices are in AUD (AudNote).
 //            Behavior 154: after them, how to read a listing and the property types
 //            (ListingGuide.svelte).
+    //            Behavior 162: Domain first (listingLinks.ts) and a line that REA and Allhomes
+    //            may not open from Vietnam.
     // Capability: a phone (below 48rem, sheetMotion's WIDE) follows a plain <a target=_blank>
     //            to a new tab; a desktop opens a smaller popup window over the app through
     //            window.open's `popup` feature (Chrome 156, behavior 150 Expect 5); where a
@@ -52,6 +54,9 @@
         </div>
         {#if links.length === 1}
             <p class="listing-only">{$t('listing.rea_only')}</p>
+        {:else}
+            <!-- Behavior 162: Domain first, the one that opens from Vietnam; not shown beside REA alone. -->
+            <p class="listing-only">{$t('listing.vietnam')}</p>
         {/if}
         <ListingGuide />
     </div>
